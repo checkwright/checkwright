@@ -12,37 +12,6 @@
 
 ## New Features
 
-- **test-hermetic-port-cut** [spec: SPEC-hermetic-cut.md] — settle
-  `gate-sdk/lib/test-hermetic.sh` (52), the file gate-sdk/SPEC.md §lib/test-hermetic.sh calls
-  **deliberately not declared**.
-  **THIS CUT DELIVERS 428 PORTED LINES AND 52 DECLARED, not four ports** — stated on the lead
-  paragraph because scope's composition recorded the four-file cut as 480 lines, which is an
-  OWED-COLUMN figure (`--tree` subtracts a declared member exactly as a ported one) and reads
-  as a ported total if left unqualified. The survey record's block is corrected in place.
-  **The disposition is a DECLARATION, ruled `lead, own-authority 2026-09-05` on an escalation
-  from spec — and ruled to be the ORDINARY application of the rule, not an exception.** The
-  escalation had called it envelope-class; gate-sdk/SPEC.md §The port-candidate criteria says
-  otherwise in its own words — the seven are "an engineering roster and an ordering signal,
-  NEVER an eligibility screen", and for a plain tracked file the `--tree` predicate asks only
-  "is there a stated disposition". A `# no-port:` cause is free text naming the surface that
-  carries the reason, not a pick from a closed roster.
-  The ground: the file's API is three shell functions that **92 of the 94 files matching
-  `*/gate-tests/*.test.sh`** source — corpus named, because the wider tree-wide `.test.sh` count
-  is larger and a bare "92 of 94" re-derived against it reads as a contradiction — and a binary
-  arm cannot be sourced into bash. What kept it undeclarable was a second `GATE_SDK_NATIVE_BIN`
-  default, and removing that is the same edit that fixes the defect: resolve through
-  `gate_native_bin` and absolutize, the shape `bin/run-gate-tests.sh:24-28` already uses.
-  **Two alternatives refused with the ruling:** leaving it owed and undeclared, because a file
-  owed for a reason that no longer exists is a false entry in the oracle; and moving the env
-  pinning into the ported runner, because narrowing `check-test-hermetic` to runner-spawned
-  tests trades a contract that holds for a standalone `bash <name>.test.sh` for one that does
-  not — a real loss for a bookkeeping win.
-  **`hermetic-bin-suffix-pin-placement` RIDES INSIDE THIS CUT** under
-  `native-gate-port-remaining-corpus`' ruling (6) and the operator's 2026-09-05 ruling that it
-  blocks nothing; its whole deliverable is this amendment's delta 1 and it reaches Done with it.
-  `kit-library-port-residue` loses the member as a **delivery**, not an unblocking.
-  Filed 2026-09-05 by spec as a per-cut feature unit.
-
 - **guard-tests-runner-port-cut** [spec: SPEC-guard-tests-cut.md] — port
   `guard-kit/bin/run-guard-tests.sh` (101) to the bridged `--run-guard-tests` `Arm::Run`.
   **It empties guard-kit's owed column outright** — the only one of this iteration's four cuts
@@ -377,15 +346,18 @@
   and a file one directory deeper that the glob never reaches. Both are **owed, not undecided** —
   each already carries a sentence in its own SPEC section naming this entry.
   **The members still owed** — the roster is durable, the sizes are not, so read those off
-  `--emit port-blockers --tree`: `gate-sdk/lib/inject.sh`, `gate-sdk/lib/test-hermetic.sh`,
-  `context-kit/lib/toolfloor.sh`. Measured 2026-09-03 at build they read 80 / 37 / 58;
-  `test-hermetic.sh` reached 52 by the 2026-09-05 close, on no work of this entry's.
-  **Three of the original six are DISCHARGED.** Two are `context-kit/lib/pub-lang/{rust,ts}.sh`,
+  `--emit port-blockers --tree`: `gate-sdk/lib/inject.sh` and `context-kit/lib/toolfloor.sh`.
+  Measured 2026-09-03 at build they read 80 / 58.
+  **Four of the original six are DISCHARGED.** Two are `context-kit/lib/pub-lang/{rust,ts}.sh`,
   the bundled members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate;
   they waited on the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of
   `pub-index` is it (context-kit/SPEC.md §Index-first reading). The third is
   `gate-sdk/lib/declaration.sh`: the library, its parity arm and both harnesses deleted, the
-  grammar left with its one compiled holder (gate-sdk/SPEC.md §lib/declaration.sh).
+  grammar left with its one compiled holder (gate-sdk/SPEC.md §lib/declaration.sh). The fourth is
+  `gate-sdk/lib/test-hermetic.sh`, and it leaves this roster as a **delivery**: the second
+  `GATE_SDK_NATIVE_BIN` default that kept it undeclarable is gone, and the file now carries a
+  stated `# no-port:` on a two-limb ground of its own (gate-sdk/SPEC.md §lib/test-hermetic.sh).
+  Nothing about the member is left owed, so it is not an *unblocked and takeable* correction.
   So this entry **demotes** rather than reaching Done — its deliverable is a corpus, and the next
   cut re-promotes with a fresh amendment (canon-kit/SPEC.md §Merging an amendment). Its hostings
   differ in ground: 2026-09-01 delivered two members; 2026-09-02 delivered **none** and discharged
@@ -395,9 +367,6 @@
   `inject.sh` has ONE shell sourcer left — `doctrine-kit/bin/install-doctrine.sh` — itself owed, so
   it moves behind that one. It is NOT unblocked: 2026-09-03's two cuts took the other two, and the
   survivor is sequenced by an operator ruling at doctrine-kit/SPEC.md §install-doctrine.
-  `test-hermetic.sh` is **deliberately not declared**: it computes a second default for the bridged
-  knob `GATE_SDK_NATIVE_BIN`, and declaring a file that holds a second producer would bless the
-  duplication the class ruling rests on refusing. Its disposition waits on the defect below.
   `toolfloor.sh`'s roster is read on the installer path and by `check-install-toolchain`'s parity
   assertion, so it is sequenced behind the installer's behind-invoke relocation rather than by
   anything in this class. Both slugs that carried that sequencing were ruled wontfix by the
@@ -405,11 +374,6 @@
   rulings' own home, installer/README.md §The install boundary — `behind-invoke` is a port
   obligation that keeps a file owed until the step moves behind the invoke — and the live entry
   owning that relocation is `powershell-installer-surface`.
-  **The one live defect inside this set, already filed:** `gate-sdk/lib/test-hermetic.sh:14`
-  omits `gate_exe_suffix`, which `gate-sdk/lib/gate.sh` appends, so on a Windows host every
-  bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is the Deferred entry
-  `hermetic-bin-suffix-pin-placement` (drained there from the gap inbox 2026-08-31 by close) and is
-  **not** re-filed here; this entry owns the port disposition that waits on it.
   **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
   is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
   work, not the argument.
@@ -544,34 +508,6 @@
   Filed 2026-08-30 by scope directly into the icebox under that tier's direct-filing rule; returned
   to Deferred 2026-08-31 by close, judging the recurrence off three gap-inbox bullets that between
   them report one iteration's instances and correct each other's readings of them.
-
-- **hermetic-bin-suffix-pin-placement** [design-pending] — the bespoke-test harness pins the gate
-  binary's path before the suffix's owner is loaded, so on a Windows host every bespoke
-  `gate-tests/*.test.sh` names an executable that does not exist.
-  **The mechanism, read rather than inferred.** `gate-sdk/lib/test-hermetic.sh:14` exports
-  `GATE_SDK_NATIVE_BIN` absolute — deliberate, and reasoned in its own `spec:` directive, because a
-  case runs from a sandbox cwd where the repo-relative default resolves to nothing. What it omits is
-  `gate_exe_suffix`, which `gate-sdk/lib/gate.sh` appends to its own default where it resolves it.
-  **Why this is a PLACEMENT question and not a missing call, which is what holds it at
-  `[design-pending]`.** The suffix has one owner by stated contract — gate-sdk/SPEC.md §lib/gate.sh
-  rules that no other surface spells the executable suffix — and `gate.sh` defines it. But
-  `test-hermetic.sh` is sourced at the TOP of every bespoke test while `gate.sh` is sourced later,
-  inside `gate_run`, so the owner does not exist at the moment the pin is written. Inlining the
-  suffix breaks the single-owner rule; sourcing `gate.sh` first lets its own relative default win
-  and breaks the absolute pin. Either the pin moves after the source, or the harness exports a tree
-  ROOT and lets `gate_run` compose the path — and which of those is right is unruled.
-  **No CI path reaches it today, verified rather than assumed.** `.github/workflows/gates.yml`'s
-  `install-smoke-windows` runs the probe steps, the shellcheck scaffold and the consumer smoke; no
-  fixture-suite step runs on a Windows host, so this is unobserved rather than green.
-  **Cost while deferred:** paid entirely by a consumer developing on Windows who runs a kit's
-  fixture suite — every bespoke case fails to launch, and the failure names a missing file rather
-  than a mispinned knob, so the first hour of diagnosis goes to the wrong question.
-  Filed 2026-08-31 by close, draining the 2026-08-30 gap bullet that build batch C sharpened. Fix
-  was tried first and refused as a design call; icebox second, refused because a Windows adopter
-  running a fixture suite is an adopter-facing witness under TRAJECTORY.md's 2026-08-30
-  discriminator.
-  **PORT-CRITICAL, INSIDE-THE-CUT SHAPE — RULED 2026-09-05 (operator, consult):** it rides the
-  `test-hermetic.sh` cut it blocks, TRAJECTORY.md §PRIORITY DIRECTIVE.
 
 - **path-dialect-clauses-unenforced** [design-pending] — the two clauses gate-sdk/SPEC.md §The
   path-dialect contract gained 2026-08-30 are held by review alone, and neither is shaped like the
@@ -10086,5 +10022,7 @@
 
 - ruled-line-retirement-dropped-provenance
 - gate-tests-runner-port-cut
+- test-hermetic-port-cut
+- hermetic-bin-suffix-pin-placement
 
 ## Lessons Learned

@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — pin every kit's <KIT>_CONFIG_FILE to one shared empty file so a bespoke gate-tests/*.test.sh runs on kit defaults, never the invoker's cwd config; knob-free by design (a config-pinning tool cannot be configured by the surface it pins)
+# no-port: gate-sdk/SPEC.md §lib/test-hermetic.sh — this library's whole API is three shell functions, gate_env, gate_run and gate_arm_run, called *inside* the caller's own shell, and a binary arm cannot be sourced into bash: 92 of the 94 files matching */gate-tests/*.test.sh source this file as their first act, and there is no in-crate arm a source line can name. gate_env exists rather than an env prefix for the same reason a compiled form cannot recover — env cannot invoke a shell function, and a bridged knob is resolved when the argv is built, so an override set around the binary arrives after the value it was meant to change has been read. What the two composing functions compose is the bridge itself: gate_run calls gate_command and gate_arm_run calls gate_native_bin and gate_knob_env, all from lib/gate.sh, which is permanently shell, so this file sits inside the bridge rather than beside it. It resolves no knob of its own and computes no default. Structural, not a sizing judgment.
 _th_root="$(cd "${BASH_SOURCE[0]%/*}/../.." && pwd)"
 _th_empty="${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.sh"
 : >"$_th_empty"
@@ -9,10 +10,17 @@ for _th_kit in "$_th_root"/gate-sdk "$_th_root"/*-kit; do
     export "${_th_var}=${_th_empty}"
 done
 GATE_SDK_TEST_LIB_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
-# spec: gate-sdk/SPEC.md §run-gate-tests — the binary pinned absolute, because a bespoke test
-# runs its gate from a sandbox cwd where the knob's repo-relative default resolves to nothing
-export GATE_SDK_NATIVE_BIN="${GATE_SDK_NATIVE_BIN:-${_th_root}/native/target/release/checkwright-gates}"
-unset _th_root _th_empty _th_kit _th_var
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the accessor's answer absolutized against this
+# library's own anchor, never a second default; the already-set guard is the bridge's, and that
+# section owns why the block must stay a no-op once lib/gate.sh has run.
+if [[ -z "${GATE_SDK_NATIVE_BIN:-}" ]]; then
+    # shellcheck source=./gate.sh
+    source "$GATE_SDK_TEST_LIB_DIR/gate.sh"
+    _th_bin="$(gate_native_bin)"
+    [[ "$_th_bin" == /* ]] || _th_bin="$_th_root/$_th_bin"
+    export GATE_SDK_NATIVE_BIN="$_th_bin"
+fi
+unset _th_root _th_empty _th_kit _th_var _th_bin
 
 # spec: gate-sdk/SPEC.md §run-gate-tests — invoke a gate through its declared dispatch rather
 # than by script path, so a bespoke test names a gate and never a substrate: gate_command

@@ -8054,7 +8054,11 @@ Rust, and it stands** — a cut is not less legitimate for resolving to
 declarations when the declarations are structural, and re-cutting for Rust was
 the alternative refused.
 
-**Leg 1 — the config bridge, and it is the load-bearing one.** *The registration
+**Leg 1 — the config bridge, and it is the load-bearing one.** A second file now
+stands on the same shape rather than restating it: `gate-sdk/lib/test-hermetic.sh`
+declares on being sourced into its callers' own shell and resolving
+`GATE_SDK_NATIVE_BIN` through the accessor, so it too sits inside the bridge
+rather than beside it (§lib/test-hermetic.sh). *The registration
 accounting* above probes each unregistered gate through `gate_command`
 (§lib/gate.sh), which builds the bridge by sourcing each owning kit's `lib/*.sh`.
 §lib/gate.sh rules **exactly one place a knob's value is computed**, so a
@@ -8891,7 +8895,12 @@ file and its `bash` execution all survive in `--emit-pub-index`, and the two
 shipped grammars are in-crate rather than owed shell
 (context-kit/SPEC.md §Index-first reading). The libraries that
 ride the glob resolving nothing are owed still, each for its own reason, and each
-names the entry that owns its port in its own section.
+names the entry that owns its port in its own section — **except the first of
+them to take a stated ground of its own**: `gate-sdk/lib/test-hermetic.sh` leaves
+this set by declaring on a two-limb ground its own section states rather than by
+being ported (§lib/test-hermetic.sh), which is the route
+`context-kit/lib/pub-lang/`'s extractors opened and the shape a later member of
+this set should reach for before assuming a port is owed.
 
 **What reopens it**, written as a reopening condition rather than a permanence
 claim, on §Consumer smoke *The port disposition*'s terms: the ground dissolves
@@ -9170,24 +9179,74 @@ pins. A test that must exercise real config overrides after the source (a later
 assignment, or an `env -u <KIT>_CONFIG_FILE` prefix so the loader falls back to
 its cwd-relative default) — ordering wins, no opt-in flag needed.
 
-**It is owed to the port and is deliberately *not* declared, which is a stronger
-statement than being unreached.** It rides the bridge's `lib/*.sh` glob and
-resolves no knob of its own, so §The kit-library port disposition does not reach
-it — but it also computes a **second** default for a bridged knob,
-`GATE_SDK_NATIVE_BIN`, and declaring a file that does that would bless the very
-duplication the class ruling rests on refusing. The second spelling is not
-gratuitous: pinning the knob absolute is documented and deliberate, since the
-repo-relative default resolves to nothing from a sandbox cwd (§Layout and
-configuration). What is undefended is that this spelling omits the
-executable-suffix helper §lib/gate.sh's default appends, so on a Windows host
-every bespoke test pins the knob to a suffix-less path that cannot exist. **The
-order that makes it reachable is the test's, not the bridge's**: this library is
-sourced at the top of every `gate-tests/*.test.sh`, before `lib/gate.sh` is
-sourced at all, so its value is already set when `lib/gate.sh`'s own guarded
-assignment runs and that assignment is the no-op. Inside the bridge's own
-subshell the glob orders `gate.sh` first and the hazard is unreachable. The
-defect rides inside this file's own port cut rather than blocking it; the entry
-that owns the port work is `kit-library-port-residue`.
+**The binary pin is an *absolutization of the accessor's answer*, never a second
+default.** A bespoke test runs its gate from a sandbox cwd where the knob's
+deliberately repo-relative default resolves to nothing (§Layout and
+configuration), so the value has to arrive absolute — but spelling the default
+here again would leave two spellings of one value agreeing by hand, and the
+second spelling would omit the executable-suffix helper §lib/gate.sh's own
+default appends, pinning every bespoke test on a Windows host to a suffix-less
+path that cannot exist. So the library sources `lib/gate.sh`, reads
+`gate_native_bin`, and joins a relative answer to **its own anchor** — the
+gate-sdk parent it already derives the kit roster from, not the invoker's cwd,
+which is the whole point. One producer computes the value; the suffix rides
+along; this file adds only the join.
+
+**The already-set guard around that block is the bridge's, and it is load-bearing
+rather than defensive.** The block runs only when `GATE_SDK_NATIVE_BIN` is unset,
+which is exactly the `:-` semantics the pin has always had, and it must stay that
+way in **both** directions. Reading forward: this library is sourced at the top of
+every `gate-tests/*.test.sh`, before `lib/gate.sh` is sourced at all, so the pin
+fires there and `lib/gate.sh`'s own guarded assignment is the no-op. Reading
+backward: inside the bridge's own resolution subshell the flat `lib/*.sh` glob
+orders `gate.sh` **first**, so a case's own cwd-relative config has already set
+the knob by the time this file is sourced — and an *unconditional* absolutization
+here would silently rewrite that case's value against the repo root. That is not
+hypothetical: §check-gate-binary-fresh's fixture pair pins the knob to a
+case-local `./stub-bin`, and it is the oracle that catches the unguarded shape.
+
+**Its port disposition is a declaration, and the ground is stated here because no
+existing class reaches it.** It rides the bridge's `lib/*.sh` glob and resolves no
+knob of its own, so §The kit-library port disposition does not reach it — that
+section is explicit that a member sourced into the resolution subshell which
+computes no knob "contributes nothing to the bridge and is **not** held by this
+ground". The ground has two independent limbs.
+
+- **Its API is three shell functions, and a binary arm cannot be sourced into
+  bash.** `gate_env`, `gate_run` and `gate_arm_run` are called *inside* the
+  caller's own shell — which is why `gate_env` exists rather than an `env` prefix,
+  §run-gate-tests giving the reason a compiled form cannot recover. Of the files
+  matching `*/gate-tests/*.test.sh`, all but two source this library; the wider
+  tree-wide `*.test.sh` corpus is larger and is not that figure's denominator.
+  There is no in-crate arm a `source` line can name.
+- **What the two composing functions compose is the bridge itself.** `gate_run`
+  calls `gate_command` and `gate_arm_run` calls `gate_native_bin` and
+  `gate_knob_env`, all from `lib/gate.sh` — which §The kit-library port
+  disposition calls the second producer squared and holds permanently shell. The
+  relationship is the one `lib/consumer-smoke.sh` declares on under §Consumer
+  smoke *The port disposition* leg 1: sourced into its callers' own shell and
+  resolving `GATE_SDK_NATIVE_BIN` through the accessor, so it sits **inside** the
+  bridge rather than beside it.
+
+**Three alternatives are refused, each on its own ground.** An
+`--emit-test-hermetic` arm emitting the export lines for the library to `eval`
+would make the hermetic bootstrap depend on the binary being present, and a
+consumer vendoring the shell library on an uncovered platform would lose
+hermeticity silently — the bootstrap's role is to be the *first* act of every
+bespoke test, before anything has established that a binary exists. Moving the
+environment pinning into the `--run-gate-tests` arm, leaving this file its
+functions alone, narrows the contract: §check-test-hermetic requires the source
+line as each test's first act precisely so a standalone `bash <name>.test.sh` is
+hermetic too, and a runner-side pin reaches only the tests the runner spawns.
+And appending `gate_exe_suffix` beside the old hand-spelled default would have
+left the two spellings agreeing by hand, which is the duplication the whole class
+ruling rests on refusing.
+
+**What reopens it**, as a reopening condition rather than a permanence claim: the
+ground dissolves if `lib/gate.sh` ever admits a second bridge producer, and it
+dissolves for this file if the bespoke `*.test.sh` corpus stops being bash — a
+member outside the bridge whose callers are compiled is held by neither limb, and
+its disposition would then be whatever this section could state for it.
 
 ### run-gates
 
@@ -9808,8 +9867,9 @@ shipped form is the literal per-case transcription.
 **The port does not discharge gate-sdk, and the section says so because a reader
 will assume otherwise from the kit's short owed column.** This section's whole
 owed set is this one member, so the cut and the section coincide; what is left
-owed to gate-sdk is `lib/test-hermetic.sh` (§lib/test-hermetic.sh) and
-`lib/inject.sh` (§lib/inject.sh), each behind the entry its own section names.
+owed to gate-sdk is `lib/inject.sh` (§lib/inject.sh) alone, behind
+`doctrine-kit/bin/install-doctrine.sh` under the sequencing
+doctrine-kit/SPEC.md §install-doctrine states.
 
 **The one deliberate narrowing, stated because it is unobservable.** The shell
 form's `args=($(grep -v '^#' "$casedir/args"))` was unquoted, so bash applied
@@ -9867,7 +9927,9 @@ rather than in a sibling directory beside itself.
 **A bespoke `*.test.sh` reaches its gate the same way, through `gate_run`**
 (`lib/test-hermetic.sh`): it names a gate and a checks dir, never a script path,
 so a member's port leaves its behavioral tests untouched. Two mechanics make
-that work where a `"$GATE"` path did not. The binary is pinned absolute, because
+that work where a `"$GATE"` path did not. The binary is pinned **absolutized**
+rather than defaulted — the accessor's own answer joined to the bootstrap's
+anchor (§lib/test-hermetic.sh) — because
 these tests run their gate from a sandbox cwd where the knob's repo-relative
 default resolves to nothing. And a case's environment is applied with `gate_env`
 inside the command substitution rather than with `env`, because `env` cannot
