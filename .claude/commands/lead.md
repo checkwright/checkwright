@@ -11,115 +11,40 @@ drain). Three stages depart from the Opus default, and by the per-batch tiering
 the template §Economics "Tier each batch to its work class" rule now names:
 
 **The split here is by session, not by tier, and the `supervision` row is the
-receipt — measured 2026-09-01 at `cause-instrument-and-queue-kit-cut`:
-`cost=13.70` of the iteration's 98.33, 14%, on Opus.** The template's stated
-premise for splitting — what it takes the lead's turns to be, and why they should
-therefore stop paying judgment-tier prices — is the template's own
-§Economics (*Split the lead where the tail dominates*). That premise did not hold
-on this iteration and the discrepancy is recorded rather than smoothed over: the
-lead's turns were judgment. It ruled five escalations, and each one it ruled alone
-it ruled by
-reading a governed surface directly rather than by relaying — the 2026-08-28
-composer against §The queue-index arm, canon-kit §Merging an amendment's
-demotion branch, `main.rs`'s `--needs` arm, `proc.rs`'s two `code()` return
-types. Two of those rulings found grounds the escalating session had missed.
-**The tier is NOT flipped on this datum**, and the reason is the same evidence:
-a cheaper lead plausibly relays those questions instead of answering them, and
-the routing-only lead the premise describes is not the lead this repo's
-escalation protocol actually asks for. What is owed is a decision, not a drift —
-so **the discriminator, for whoever takes it up**: read the escalations of an
-iteration and count how many the lead ruled *alone by reading a governed
-surface*. Near zero, the premise holds and the tier is overpaying; consistently
-several, the premise is wrong and the template's §Economics "Split the lead
-where the tail dominates" bullet is what needs amending, not the tier. One
-iteration is one point; do not flip on it either way.
+receipt.** The template's stated premise for splitting — what it takes the lead's
+turns to be, and why they should therefore stop paying judgment-tier prices — is
+the template's own §Economics (*Split the lead where the tail dominates*).
 
-**Second point, 2026-09-01 at `index-first-and-survey-record-cuts`:
-`cost=7.90` of the iteration's 85.65, 9.2%, on Opus — and the discriminator was
-applied rather than the share read.** FOUR escalations, every one ruled by the
-lead alone off a governed surface read directly: the iteration composition
-against the queue's own 2026-08-30 one-cut-per-iteration ruling, the three
-threshold recurrences against TRAJECTORY.md's port-only run, spec's
-two-`[spec:]`-ref blocker against `QUEUE_KIT_WRAP_BUDGET` in
-`queue-kit/lib/queue.sh` with both queue lines' columns measured, and validate's
-dirty-tree block against the lead template's own filing direction. TWO of the
-four found grounds the escalating session had missed — the composition ruling
-decided on a standing ruling rather than on scope's economics argument, and the
-blocker ruling caught an arithmetic error in spec's premise while reaching the
-same conclusion. **The two axes now separate, which is what the second point
-buys.** On cost the split premise holds and strengthens: the share fell from 14%
-to 9.2%, so the lead's turns *are* the cheap tail in dollars. On character it
-fails again: five escalations then, four now, each ruled alone off a surface, so
-"consistently several" is no longer one iteration's accident. Read together they
-say the tier question was never a cost question — a routing-only lead would be
-cheaper still and would have relayed four rulings it instead made. **Still not
-flipped, and now the amendment target is named rather than implied:** two points
-against the premise put the burden on the template's §Economics *Split the lead
-where the tail dominates* bullet rather than on this repo's tier. A third
-iteration at several ruled-alone escalations should amend that bullet.
+**The discriminator stays here, because setting it is what this binding
+contributed:** read the escalations of an iteration and count how many the lead
+ruled *alone by reading a governed surface*. Near zero, the premise holds and the
+tier is overpaying; consistently several, the premise is wrong and the template's
+§Economics *Split the lead where the tail dominates* bullet is what needs
+amending, not this repo's tier. One iteration is one point; do not flip on it
+either way.
 
-**Third point, 2026-09-02 at `test-runner-and-upgrade-cuts-with-liveness-attribution`:
-`cost=10.27` of the iteration's 105.75, 9.7%, on Opus. THE TRIGGER THE BULLET ABOVE
-NAMED HAS FIRED.** Several escalations again, every one ruled by the lead alone off a
-governed surface read directly: the two-cut composition against the queue's own
-2026-08-30 refusal of one-cut-per-iteration; cut B's host against
-`QUEUE_KIT_WRAP_BUDGET` with both queue lines' columns measured; crate-tests-rather-
-than-bridged-arms against `Arm::Emit`'s error collapse; the crate-arms bullet
-disposition against a replayed predicate; and a correction to spec's stated *cause*
-for a lost ruling, read off `canon-kit/SPEC.md:175-184`. That is three consecutive
-iterations, so "consistently several" is now a trend and not two accidents. The cost
-axis holds a third time (14% → 9.2% → 9.7%), which is the same separation the second
-point bought: the tier question was never a cost question.
-**One ruling was WRONG, and it belongs beside them or this is not a watch.** The lead
-told the operator it had "verified both halves myself" that `native/src/hook/*.rs` and
-`native/src/emit/*.rs` fall outside `check-crate-arms`' trigger. Both halves were
-false. It had read the `.gate` manifest line and `main.rs`'s table dispatch and called
-that verification; the predicate was never run, and a `couples=` field is matched as a
-bash **string** pattern in which `*` crosses `/`. The claim propagated into a gap
-filing, a ruling and two dispatch briefs before a build session ran it. **Why this
-weighs on the amendment rather than merely beside it:** the ruled-alone count credits
-the lead's capacity to settle a question at a governed surface, and this failure is
-that same faculty missing — reading a surface and calling it verification. A later
-judge should read the count and this together rather than netting them, since one
-argues the premise is wrong about what a lead does and the other bounds how much
-credit the count itself carries.
+**Every reading is the entry's, not this file's.** The cost series, the
+ruled-alone counts, the counters and the refused premises live on
+`lead-tier-split-premise-unamended`, which declares itself the governed surface
+for that figure whenever a dispatch relays a different one. Close records each
+iteration's reading there; read it there. **The restatement this replaces is why
+the rule matters rather than an untidiness:** both surfaces accreted their own
+numbering, they disagreed at the fifth point, and a lead reading them against each
+other could not reconcile them.
 
-**The fourth point is not recorded here and is not lost.** It lives on
-`lead-tier-split-premise-unamended`, which declares itself the governed surface for
-the firing count: `scan-prompts-cut`, 2026-09-04, supervision at 14.8% of an 85.00
-iteration on a ruled-alone count of seven, reversing the fall. That entry also says
-"the priced share read 10.7% at the fourth point" two lines earlier — read that as a
-FIRING ordinal rather than a member of the cost series it prints as `14, 9.2, 9.7,
-14.8`. The entry runs two numberings and does not say which is which; disambiguated
-here rather than reconciled silently, since the reconciliation is a reading.
+**The standing conclusion, which is not a datum and does not move with one.** On
+COST the premise holds every time it has been measured; on CHARACTER it fails
+every time, because a routing-only lead would be cheaper still and would have
+relayed the rulings this lead instead made. **The tier is NOT flipped**, and the
+amendment target is the template's bullet rather than this repo's tier.
 
-**Fifth point, 2026-09-04 at `usage-verdict-cut`: `cost=6.6469` of an iteration
-summing to 75.31, 8.8%, on Opus — AND 8.8% IS A CEILING.** The close row was still
-accumulating when the meter last ran, so the completed total is larger and the true
-share smaller. Either way the point sits below the 9.2% that had been the series
-minimum, which says the 14.8 was a spike and not a new level. FOUR escalations, every
-one ruled by the lead alone off a governed surface read directly: the cut selection
-against gate-sdk/SPEC.md's `lines=`-is-a-floor paragraph, where the ESCALATING
-SESSION'S STATED GROUND WAS REPLACED rather than accepted (scope argued "retires a
-contract rather than moving one", a true description of the previous cut and a
-criterion stated nowhere); the threshold-recurrence batch, which SPLIT because
-applying scope's own reported finding moved one entry out of the lead's authority and
-into the operator's; the residency disposition; and the build batching and tiering
-override against delegation-kit's mixed-work split trigger.
-**The counter, and the figure was the lead's own rather than a subagent's.** The
-validate dispatch asserted a gap-inbox depth of three from memory; it held four, two
-of them the lead's own filings from that same session. Cost zero — the validate
-session ran the count and reported the discrepancy instead of acting on the figure,
-so the containment is the stage's and not the lead's. **The corrective is what this
-close can attest to first-hand:** the next dispatch carried the count re-run at
-`grep -c`, said so, and flagged the earlier error unprompted — and the receiving
-session re-ran it anyway and got five. So the class §A running session is asked,
-never instructed names fired and was answered inside one iteration, which is a
-different datum from the failure alone.
-**What a later judge inherits:** five cost points, the premise holding on cost every
-time and failing on character every time. No tier flip is proposed and no entry is
-filed — `lead-tier-split-premise-unamended` already owns the amendment and already
-records that the port-only run forecloses taking it.
+**One correction a later judge needs, because the superseded figures were wrong in
+a systematic direction.** Every cost point this file used to carry was read
+MID-CLOSE, so each was a ceiling nobody lowered. The series was re-derived from
+the completed meter on 2026-09-05 and the entry carries the derived values; the
+8.8 % ceiling recorded here held at 8.7, and the 14.8 % spike read 11.7. Do not
+resurrect a figure from this file's history — take it from the entry, or
+re-derive it.
 
 - **`validate`** — the lead dispatches it with a `model: sonnet` override.
   validate's batches are uniformly *mechanical oracle-running* (run the battery,
