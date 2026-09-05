@@ -533,6 +533,23 @@
   silently converts into a stamping session, and the stamp IS the cursor.
   **DISTINCT from every entry about what the entry gate ASSERTS**: this one's
   subject is argument parsing, and it stands whatever those assertions say.
+  **SECOND DATED ATTESTATION 2026-09-05**, judged a recurrence by the lead and
+  stamped at that close's drain: spec ran `--enter-stage build --simulate`, the
+  trailing flag went unread, a real build stamp landed and had to be hand-reverted
+  with `git checkout --`. Same shape as the 2026-08-30 attestation, one iteration
+  of the arm's port later, so the port did not carry the defect away.
+  **AND IT IS ONE DEFECT WITH `enter-stage-arg-position-silent-drop`, judged at
+  that same drain and NOT ruled upstream.** Same arm, same flag, same positional
+  parse (`native/src/emit/enter_stage.rs` tests argument one and shifts), same
+  silent-accept failure, same candidate fixes. Nothing in the pool asserted them
+  distinct — the "DISTINCT from" line two entries down pairs a different two. Both
+  are kept rather than merged, because both sit inside
+  `drain-order-retroactive-debt-sweep`'s named ten and that unit disposes of them
+  together; whichever fix lands discharges both, and neither may be counted twice
+  when the sweep costs its ten. Promotion is barred meanwhile: not port-critical
+  by TRAJECTORY.md's test, so the port-only run bars it like every other deferred
+  entry, and a recurrence count does not buy the exception.
+  recurrence: enter-stage-flag-position-silently-ignored 2026-09-05
   Filed 2026-08-30 by close from the gap inbox, attested by the filing session
   upon itself.
 
@@ -2858,6 +2875,11 @@
   Related and worth reading together: `enter-stage-simulate-no-write-fixture` (icebox) pins
   the no-write guard with a fixture, and would **not** have caught this — a fixture written
   the documented way puts the flag first and passes.
+  **ONE DEFECT WITH `enter-stage-flag-position-silently-ignored`, judged 2026-09-05 at close's
+  drain.** That entry re-filed this same positional parse from a later attestation, and carries
+  the two later dates; both are kept rather than merged because
+  `drain-order-retroactive-debt-sweep` names that one among its ten and disposes of the pair
+  together. Whichever fix lands discharges both, and the sweep may not cost them twice.
   **Cost while deferred:** every session that reaches for the preflight can destroy the
   state it meant to inspect, and the sessions most likely to run it are stage sessions at a
   boundary, which is exactly when the state is most valuable and least reconstructible.
@@ -8200,9 +8222,8 @@
   observation the entry needed in order to be drained before that push was permitted. This is
   a standing property of the state machine, not a quirk of `windows-artifact-proof`.
   **What this iteration paid to discover it:** three pushes rather than the budgeted one to two, by
-  operator ruling — one for round 3, one for round 4's repair so the drain could happen upstream of
-  close, a third for close itself. The headline entry still did not complete: it was deferred with
-  its PRODUCED half discharged.
+  operator ruling — rounds 3 and 4 plus close. The headline entry still did not complete: it was
+  deferred with its PRODUCED half discharged.
   **Why `[design-pending]`:** no shape is costed and each candidate costs something real — a
   two-iteration protocol for these entries, a standing extra push, or splitting each into
   a produce half and an observe half at scope.
@@ -8212,24 +8233,25 @@
   validate. Its price is legibility: the grammar cannot mark a unit landed-but-unobservable, so
   a demoted entry reads as unstarted and the next rider of this shape re-buys the same wedge.
   **RECURRENCE JUDGED 2026-08-31 by close, and it is a sharper datum than the instance.**
-  `platform-support-ci-matrix` rode `port-declaration-cohort-and-windows-leg` carrying the
-  `precondition-ok: run-observed` tag whose spelling THIS entry's own lead line uses, and was
-  structurally undrainable from the moment it entered the unit set. So the miss is not that two
-  facts were never composed: the composition was written down and deferred three days earlier, and
-  an entry of the named shape was promoted anyway — a FILING-VISIBILITY failure rather than an
-  analysis one — sharpening it would not have helped — and the half a costed look weighs first.
+  `platform-support-ci-matrix` carried the `precondition-ok: run-observed` tag whose spelling THIS
+  entry's lead line uses, and was undrainable from the moment it entered the unit set. So the miss
+  is FILING-VISIBILITY, not analysis: the composition was written down and deferred three days
+  earlier, and an entry of the named shape was promoted anyway. Sharpening would not have helped.
   **Machinery-class, but NOT icebox-class by default**: TRAJECTORY.md's 2026-08-30 discriminator is
   conjunctive and the second conjunct fails — this DID block validate's entry until a lead cleared.
-  **THE FOUR SHAPES ALL ADDRESS THE DRAIN SIDE; A FIFTH READ AS OWED FOR THE RECORD SIDE, AND ITS
-  PREMISE IS NOW FALSIFIED.** Measured 2026-08-31: the round-6 outcome exists only AFTER the close
-  push, so writing it onto the entry is a commit postdating the iteration's last push — priced as
-  spending the second push the green branch was to earn. **LEAD-RULED 2026-09-01 on the close that
-  actually did it: it spends NONE.** Commits accumulate locally and ride one watched push at close,
-  which that iteration demonstrated by carrying two lead commits unpushed. So the record side costs
-  one commit and a compression against the cap, never a push, and the false dichotomy —
-  land-and-push against file-cheaply-elsewhere — is what a session meeting this next should not
-  re-derive. The gap that survives is narrower and still real: the four shapes each answer *when the
-  entry may be drained*, none for an observation the drain gate sits upstream of.
+  **THE FOUR SHAPES ALL ADDRESS THE DRAIN SIDE; A FIFTH FOR THE RECORD SIDE HAD ITS PREMISE
+  FALSIFIED.** Writing a post-push outcome onto the entry was priced as spending a second push;
+  **LEAD-RULED 2026-09-01 on the close that actually did it: it spends NONE**, because commits
+  accumulate locally and ride one watched push at close. The gap that survives is narrower and
+  still real: the four shapes each answer *when the entry may be drained*, none for an observation
+  the drain gate sits upstream of.
+  **THE LIVE HALF IS *WHICH* PUSH PRODUCES THE OBSERVATION — derived 2026-09-05 at spec, drained
+  onto this entry at that close.** The wedge as recorded holds only where the CLOSE push produces
+  it. Under the one-to-two push budget an iteration may spend a FIRST push mid-iteration, and the
+  observation then arrives BETWEEN the two — early enough to be read, committed locally, and
+  carried out on the close push, which the ruling above already establishes costs no push of its
+  own. This CORRECTS the recorded wedge's reach; it re-attests nothing, so no `recurrence:` date
+  joins, and a later reader must not count it as an instance.
   ruled: observation-predicate-entry-cannot-drain-in-its-own-iteration lead 2026-09-01 own-authority
   **Cost while deferred:** every entry of this shape either overruns its push budget or
   defers, and the deferral is invisible until the close that cannot drain it.
@@ -9696,6 +9718,69 @@
   Captured 2026-09-05 by close, relayed by the lead as a lesson about its own dispatch shape.
   Deferred, never promoted — the port-only run holds the active sections shut
   (TRAJECTORY.md §PRIORITY DIRECTIVE); a Deferred filing is what its qualification leaves open.
+
+- **pack-installer-no-owning-spec-section** [design-pending] — the largest reachable member of the
+  owed port column has no SPEC section claiming it, so its cut has no boundary to be authored
+  against and no gate reports the hole.
+  **Measured 2026-09-05 at spec, section by section rather than by grep.**
+  `scripts/pack-installer.sh`
+  (196 owed lines) carries `# spec: CLAUDE.md §Housekeeping` — an always-loaded manifest the
+  2026-09-05 operator ruling bars as a cut boundary — and no section of `installer/README.md` or
+  `gate-sdk/SPEC.md` claims the file: §The install boundary scopes itself to `installer/lib` and
+  `installer/bin`, and §The consumer smoke disclaims reaching either.
+  **Why `[design-pending]` and why the fix was refused here.** Authoring or naming the owning
+  section is the deliverable, and WHICH home is right is the unruled part — `gate-sdk/SPEC.md`
+  §Consumer payload already owns the payload's derivation and is the near candidate, against a new
+  `installer/README.md` section that would put the packer beside the surface it packs. Picking one
+  at a drain would settle a placement question by accident.
+  **Why not icebox:** the trigger is live and dated — the port-only run cannot cut this file until
+  a section exists, so the owed column stalls on it rather than merely aging.
+  **DISTINCT from the `demo/run-demo.sh` and `installer/bin/checkwright.sh` mis-pointers of the
+  same class**, each of which HAS a resolvable home; this one has none to point at.
+  **Gap generalization:** the check class is a `# spec:` pointer resolving to a surface that is not
+  a legal cut boundary — buildable, and filed as `spec-pointer-boundary-legality` below.
+  **Cost while deferred:** low per read and paid at the worst moment — the session that reaches
+  this file is mid-cut, and it discovers the hole after it has already sized the work.
+  Filed 2026-09-05 by close, promoting a gap bullet after fix was refused as a design call and
+  icebox refused on the live port trigger.
+
+- **spec-pointer-boundary-legality** [design-pending] — `check-spec-pointer` grades that a `# spec:`
+  target resolves, never that the target is a surface a cut may be bounded against.
+  **The hole, read off the live instance.** `scripts/pack-installer.sh` points at
+  `CLAUDE.md §Housekeeping`; the pointer resolves, so the gate is green, while the 2026-09-05
+  operator ruling bars an always-loaded manifest as a cut boundary. A file can therefore be fully
+  compliant and still unownable, which is `pack-installer-no-owning-spec-section` above.
+  **Why `[design-pending]`:** the illegal-target set is the design call. "Always-loaded manifest"
+  is one member and the ruling names it; whether `README.md`, a template, or a docs page joins it
+  is unruled, and a scanner asserting a set nobody has closed reds on judgment calls.
+  **Cost while deferred:** the class is found only by a session doing the section-by-section read
+  by hand, which is the exact cost the pointer gate exists to remove.
+  Filed 2026-09-05 by close, discharging the gap-generalization obligation on the entry above.
+
+- **dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it** [design-pending] — an
+  amendment's definition of done names a stage for the entry's queue transition without reading the
+  configured drain stage, and nothing refuses the DoD until a session tries to execute it.
+  **Measured 2026-09-05 across spec and build.** spec authored a DoD parking
+  `platform-support-ci-matrix`'s queue transition at CLOSE; the lead confirmed it. Both missed that
+  `lifecycle-kit/lib/stages.sh:29` sets `LIFECYCLE_KIT_DRAIN_STAGE=validate` in this tree, so the
+  DoD was not merely late but UNEXECUTABLE: the pre-dispatch `--enter-stage validate --simulate`
+  refused, and build had to demote the entry on a resume after its push was already spent.
+  **The cost is measured, not estimated:** one resume round trip, and a demotion taken under time
+  pressure rather than as the planned exit.
+  **NEW, not a recurrence, and both nearby candidates were read before saying so.**
+  `amendment-dod-sibling-dependence` is a DoD item whose satisfiability depends on SIBLING UNITS the
+  amendment never names; there is no sibling here, and the dependence is on a config value.
+  `observation-predicate-entry-cannot-drain-in-its-own-iteration` is about WHETHER the observation
+  arrives before the drain; this is about the DoD naming the wrong stage for the drain at all, and
+  it would have fired on an entry with no observation predicate.
+  **Why `[design-pending]`:** the candidates differ in kind — an authoring clause in the spec stage
+  template (a DoD's queue transition names the configured drain stage, never a literal), or an
+  assertion over the amendment glob reading a DoD's stage word against `LIFECYCLE_KIT_DRAIN_STAGE`.
+  The second is mechanical and the first is cheaper; which is right depends on whether a DoD may
+  legitimately name a non-drain stage, and that is unruled.
+  **Cost while deferred:** every iteration whose unit has a queue transition in its DoD can buy the
+  same resume, and the defect surfaces only at the dispatch that the wrong stage refuses.
+  Filed 2026-09-05 by close, routed by the lead as a finding neither spec nor build had filed.
 
 ## Icebox
 

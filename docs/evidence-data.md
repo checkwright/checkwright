@@ -139,3 +139,4 @@
 | evidence-runner-trend-and-install-hooks-cuts | sc sp a b v c | 5f/1d | 4 · ≤1d | 28s 3✗ | 108 |
 | front-end-stub-and-gate-caller-cuts | sc sp a b v c | 5f/0d | 3 · ≤0d | 20s clean | 108 |
 | drift-meter-pair-and-scratch-run-cuts | sc sp a b v c | 5f/0d | 3 · ≤0d | 20s clean | 108 |
+| windows-leg-manifest-cause-read | sc sp · b v c | 2f/1d | 1 · ≤0d | 20s clean | 108 |

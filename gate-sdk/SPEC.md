@@ -608,9 +608,14 @@ nothing about when they are called.
 ### How the claim is held, with no oracle that can run it
 
 There is **no CI oracle** for this, and the contract says so rather than implying
-one: the Windows leg runs the installer smoke, `continue-on-error`, and dies
-before the battery runs, while the Ubuntu leg only cross-compiles. So the arm is
-local and host-independent, on the mechanism §Fail-closed contract already
+one — though not on the ground this section first stated. The Windows leg runs
+the installer smoke `continue-on-error`, and it reaches far enough to run the
+scratch consumer's whole battery through the shipped executable before failing
+at a later step, so it does exercise the binary on a native Windows host; the
+Ubuntu leg only cross-compiles. What it still does not give is a verdict on
+*this* composition: a passing battery there says the roots resolved for whatever
+cwd spelling that run held, and asserts nothing about a foreign one. So the arm
+is local and host-independent, on the mechanism §Fail-closed contract already
 established for `on_path` — the platform-dependent input is **injected**, which
 makes the decision a pure function a Linux host can exercise, and the assertion is
 **paired with a control** that fails if it would otherwise pass vacuously. Here
@@ -9177,8 +9182,8 @@ sourced at the top of every `gate-tests/*.test.sh`, before `lib/gate.sh` is
 sourced at all, so its value is already set when `lib/gate.sh`'s own guarded
 assignment runs and that assignment is the no-op. Inside the bridge's own
 subshell the glob orders `gate.sh` first and the hazard is unreachable. The
-defect is filed to the gap inbox and the disposition waits on it; the entry that
-owns the port work is `kit-library-port-residue`.
+defect rides inside this file's own port cut rather than blocking it; the entry
+that owns the port work is `kit-library-port-residue`.
 
 ### run-gates
 
