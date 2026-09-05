@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §build-native — the one spelling of the crate build, so its readers cite a script rather than each carrying a copy of the command (a tool, not a gate; no # graph: manifest)
+# no-port: gate-sdk/SPEC.md §build-native, The port disposition — ruled 2026-09-05 by the operator in consult. A fresh clone carries no binary, so nothing compiled exists to run the first build: this is the contributor-side meeting of the same irreducible the install bootstrap records (installer/README.md §The install boundary). A ported build arm would also be the crate's authoritative rebuild-yourself step for its own staleness check — gate-sdk/SPEC.md §check-gate-binary-fresh names this script as the remedy from inside the crate — which cannot hold. The cause is per-file and never a class: nothing else in bin/ may cite it, and a second builder is a new file with its own disposition.
 #
 # usage: build-native.sh [cargo-arg…]
 #   Run from the repo root. Trailing arguments reach cargo unchanged, so a

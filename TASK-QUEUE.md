@@ -83,26 +83,6 @@
 
 ## Technical Debt
 
-- **build-native-bootstrap-declaration** — add the one `# no-port:` header line
-  `gate-sdk/bin/build-native.sh` (110) is already ruled to carry, closing a gap between landed
-  prose and the tracked file.
-  **DEBT AND NOT A FEATURE, on canon-kit/SPEC.md §The amendment lifecycle's own litmus: it fixes
-  behavior to an EXISTING spec and needs no amendment.** gate-sdk/SPEC.md:10539-10548 §build-native
-  already carries *"The port disposition: declared, on a per-file bootstrap cause"* and ends *"So
-  this file takes `# no-port:` citing this paragraph"* — probed, the file carries no `# no-port:`
-  line at all, only `# spec:` pointers. No contract changes and no design ruling is left; the
-  operator ruled it 2026-09-05 in consult on `build-native-bootstrap-port-disposition-unruled`.
-  **Work class: {mechanical}** — one header line, then the oracle. Stated here because the lead
-  tiers batches off that label and a debt entry carries no amendment to hold it.
-  **The cause is per-file, never a class** — §build-native's own words, *"nothing else in `bin/`
-  may cite it"*. House style is a SPEC pointer plus a condensed restatement, matching the register
-  at `gate-sdk/lib/gate.sh:3` and `installer/consumer-smoke/run-smoke.sh:3`.
-  **It subtracts 110 lines from the completion predicate**, which is why it was operator-class and
-  why the ruling had to precede it. Nothing gates on the file's path, which is unchanged.
-  ruled: build-native-bootstrap-declaration lead 2026-09-05 own-authority
-  Promoted 2026-09-05 by spec from `build-native-bootstrap-port-disposition-unruled`'s answered
-  ruling; that entry keeps the ruling and this one is the work.
-
 ## Deferred
 
 - **measured-marker-cannot-sit-mid-paragraph** [design-pending] — `check-measured-claim` binds its
@@ -10126,5 +10106,7 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
+
+- build-native-bootstrap-declaration
 
 ## Lessons Learned
