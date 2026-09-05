@@ -6,3 +6,4 @@
 
 front-end-stub-and-gate-caller-cuts scope a0fa10e5 2026-09-05 156576c0
 front-end-stub-and-gate-caller-cuts spec a136aa0f 2026-09-05 2bf2f204
+front-end-stub-and-gate-caller-cuts spec a136aa0f 2026-09-05 dff0f83e
