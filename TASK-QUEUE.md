@@ -4359,23 +4359,38 @@
 
 - **bin-argv-shape-residual-member** [design-pending] — one `bin/` tool was left outside the
   argument-shape contract this iteration landed, and it is the only member of its own class.
-  `SPEC-bin-argv.md` shipped the contract against a five-member census;
-  `gate-sdk/bin/run-gate-tests.sh` is a sixth with the same arity-only-not-shape defect, found at
-  align and **deliberately not folded in** — expanding a pending amendment's member count mid-align
-  widens its asserted deliverable past align's stage contract.
-  **The defect, re-verified at close rather than carried:** `TESTS_DIR=${1:-…}` and
-  `GATE_DIRS=(${@:2})` take free-text positional directory paths gated only by `$# -gt 1`, with no
-  `-h`/`--help` handling anywhere in the file. Witness: `bash gate-sdk/bin/run-gate-tests.sh --help`
-  prints `no fixture tree at --help` — a misleading nonexistent-directory error where the contract
-  wants usage text.
-  **Milder than the amendment's five, and the difference is what makes it deferrable**: it writes
-  nothing durable, so a bad argument fails a `-d` existence check rather than corrupting a governed
-  surface. That is severity, not correctness — the contract still does not hold across the roster it
-  claims.
-  **Deliverable, and why `[design-pending]`:** apply the shipped contract to the sixth member, then
-  decide whether the roster is closed. The census that found five and the sweep that found the sixth
-  used different screens, so what is open is whether `bin/` membership is derivable — a roster gate
-  over every kit's `bin/` — or stays a hand-curated set that the next tool added silently escapes.
+  `SPEC-bin-argv.md` shipped the contract against a five-member census; gate-sdk's fixture runner
+  (then `bin/run-gate-tests.sh`, now the `--run-gate-tests` arm) is a sixth with the same
+  arity-only-not-shape defect, found at align and **deliberately not folded in** — expanding a
+  pending amendment's member count mid-align widens its deliverable past align's stage contract.
+  **THE SUBJECT HAS PORTED AND THE DEFECT CROSSED WITH IT.** The shell file is gone; the member is
+  the bridged `--run-gate-tests` arm, and `native/src/emit/run_gate_tests.rs` takes `args.first()`
+  straight into `tests_dir` with no `-h`, no `--` and no leading-`-` refusal. Reproduced at spec
+  2026-09-06: `--run-gate-tests --help` prints `run-gate-tests: no fixture tree at --help`, exit 2,
+  no usage. Still milder than the amendment's five and still deferrable — it writes nothing durable,
+  so a bad argument fails a directory check rather than corrupting a governed surface. That is
+  severity, not correctness.
+  **THE SIXTH-READER-INSTANCE QUESTION IS ANSWERED (b), YES, AND IT IS NOT A RULING** — determined
+  by the owner doc, so it needed no authority and none is claimed. Landed by spec 2026-09-06 on the
+  lead's dispatch, which delegated the question and recommended (b) without taking it.
+  gate-sdk/SPEC.md §The bin/-tool contract rules that the shape half OUTLIVES a member's port, and
+  all five enumerated reader instances are themselves ported members — so a ported free-text member
+  joining the enumeration is the clause read as written, not a widening of it. The prior sub-claim
+  that the deliverable is "ownerless" therefore falls: the owner is that contract.
+  **What earns it an enumeration slot rather than a bare tally, because five instances each carry a
+  distinguishing property:** it is the FIRST whose defect SURVIVED its own port. The five prior all
+  record a shell-form defect the port FIXED — "the port added all three behaviours the shell form
+  had none of, the clause working forward". This one ported intact, which is the finding.
+  **And where its usage goes is already settled, not open.** The "help arm retires to the
+  front-end" branch is UNAVAILABLE to this member: it holds no `case` arm and gets no named line or
+  paragraph in `run-gates.sh --help` — verified against that help text — so the narrower reading the
+  clause settled at its fifth instance binds, and usage lives at the member's own shape refusal.
+  **Deliverable, and why `[design-pending]` SURVIVES:** apply the contract to the sixth member —
+  now a mechanical delta, its three behaviours and their home all determined above — then answer the
+  half that is genuinely open. The census that found five and the sweep that found the sixth used
+  different screens, so what is open is whether `bin/` membership is derivable — a roster gate over
+  every kit's `bin/` — or stays a hand-curated set the next tool added silently escapes. That
+  question is the design residue, and it is the whole of what keeps the tag on.
   **Cost while deferred:** the contract reads as roster-complete while one member fails it, which is
   the shape a later session trusts rather than re-screens.
   Filed 2026-08-13 by close, draining the gap inbox; found at align 2026-08-12, escalated to the
