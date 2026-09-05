@@ -98,6 +98,42 @@ cost. It is taken because the *front-end* spelling is the one every human caller
 workflow file and every settings grant in every consumer tree already types, and
 because the alias lives in one function next to the table rather than in a second tree.
 
+**`--only` gains a bounded argv channel, and it is single-member-or-refuse.** Ruled by
+the lead on its own authority, 2026-09-05, on an escalation from this stage: argv after a
+`--` separator is **forwarded to the selected gate**, and forwarded **only when the
+selection resolves to exactly one member**. A `--` with two or more selected members is a
+**refusal**, not a broadcast — handing one argument vector to N gates is the failure the
+constraint exists to foreclose, and it is spelled as a refusal rather than a silent
+first-member rule so a caller cannot get a narrower run than it asked for and not know.
+
+**Why the channel is owed here rather than worked around in evidence-kit.** The sibling
+`preflight-front-end-cut` re-points nine `LIFECYCLE_KIT_ENTRY_PREFLIGHT` entries onto this
+form, and every one of them carries an argument. Without the channel the re-point does not
+merely lose coverage on some entries — it **refuses every one of them**, because
+`native/src/emit/enter_stage.rs:1260-1263` appends `<queue> <state>` to each entry's argv
+and `--only` consumes every remaining token as a member name
+(`native/src/runner.rs:69-72`), so the appended pair resolves as two unregistered gates.
+The capability being moved is real: `scripts/gate-exec.sh` resolved a gate name and
+invoked it *with* arguments, and the operator ruled the caller now lives here.
+
+**The alternative the escalation recommended was refused, and its premise was the
+error.** Widening `check-producer-liveness` to read both corpora with no positional
+contradicts `evidence-kit/SPEC.md:1045-1049` — *"The two modes are told apart by the
+argument being a directory, not by a flag: the caller already knows which it holds"* —
+and would retire as an accident the `.run`/`.lock` split that `:1051-1056` rules
+*"load-bearing rather than cosmetic"* and `:1206-1212` rules keeps both entry kinds side
+by side. It would also have failed on the appended-argv fact above, which no knob
+addresses. Recorded because a later reader meeting the same gap will reach for the same
+workaround.
+
+**The existing `# spec:` at `run-gates.sh:331` is amended, not deleted.** Its sentence —
+*"empty for every member under `--only`, which names gates and has no paths to hand one"*
+— stays **true of the battery case** and was never written about a single-member
+selection. It gains that case rather than losing its subject, which is the difference
+between correcting a claim and erasing the reasoning behind it. `Selected { name, args }`
+(`native/src/runner.rs:30-33`) already carries the per-member argv field this fills, so
+the type does not change.
+
 ### (3) The binary-less dispatch loop is deleted, not ported, and its standing byte-comparison goes with it
 
 `run-gates.sh:308-503` — the registry-not-found handling and its `--only` steer, the
@@ -318,6 +354,10 @@ and a reworded diagnostic would red it.
 - `gate-sdk/SPEC.md` §run-gates, the **output contract** and the `--only` steer prose
   (`:9200-9226`) — unchanged in substance, re-attributed (delta 3): they are the arm's,
   and with the loop gone there is no second producer to hedge against.
+- `gate-sdk/SPEC.md` §run-gates, the **`--only` selector's contract** — it gains the
+  `--` argv channel, its single-member precondition and its multi-member refusal
+  (delta 2). This is the one place the grammar is stated, and the sibling
+  `preflight-front-end-cut` cites it rather than restating it.
 - `gate-sdk/SPEC.md` §The port-candidate criteria, criterion 5 — its
   vendored-form-stays-runnable branch keeps its rule and loses its one shell instance
   (deltas 3, 6). The criterion is not retired: it still governs what an artifact-less
