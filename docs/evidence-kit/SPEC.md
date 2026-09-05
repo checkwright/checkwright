@@ -1113,6 +1113,14 @@ dead and the case would silently invert. Everything the pair cannot hold — a
 live PID the test itself owns, the unparseable-lock exit, and the writer-side
 behavior — is covered by `gate-tests/producer-lock.test.sh`.
 
+**The dead side of any such scenario is bought with a PID no platform can
+issue**, and stating it here keeps the next author from re-deriving it off a test
+body: `2147483646` sits above every platform's `pid_max` ceiling, so a `.run`
+record or a lock naming it reads dead without anything having been spawned and
+without a race against a reaped PID being recycled. Both witnesses spell that
+literal — `gate-tests/producer-lock.test.sh` for the record and lock scenarios,
+and the compiled gate's own unit assertion for the predicate.
+
 **Set mode's verdicts are covered there too rather than in the pair, and the
 reason is the runner's shape.** A fixture dir holds exactly one `good/` and one
 `bad/` case, so a mode with four verdicts and an aggregation rule between them

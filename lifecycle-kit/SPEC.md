@@ -2476,6 +2476,14 @@ its own exec bit: a consumer wiring a gate here configures the gate's *invocatio
 and not its declaration file, and a configured path that stops being executable —
 a member ported to a binary substrate leaving a data-file descriptor behind — is
 a stage-entry breakage rather than a stale reference.
+**The `<queue> <state>` pair above is appended to the end of that argv**, on
+every matching entry and whether or not the entry carries an argument of its own,
+which is what a configured front end has to be wired against. A command whose own
+grammar consumes its tail — a selector reading a list of names, say — takes the
+appended pair as two more of its own arguments, so such a front end needs a
+separator its grammar honours and the wiring is unconditional rather than
+per-entry. The kit fixes only that the pair is appended; the separator and the
+wiring belong to whatever the consumer configured.
 
 **The one-shot pre-flight valve admits one entry past a refusing pre-flight
 command.** `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` names a committed **valve

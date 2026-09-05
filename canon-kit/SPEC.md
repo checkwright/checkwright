@@ -783,6 +783,17 @@ held on a second axis by `check-amendment-update-target`
 whose subject is what the file says about itself rather than how it pairs with
 the queue.
 
+**Arm (c) has an authoring consequence worth stating, because it is discovered
+otherwise only by losing something.** The pairing is bidirectional, so deleting a
+merged amendment and moving its task out of the live sections have to land in one
+commit — neither half is legal alone. Everything the entry's body carried goes
+with it in that commit: a ruling's grounds, an authority stamp, a measurement the
+entry was the only holder of. So prose that is worth more than the entry's own
+lifetime belongs in a governed surface *before* the landing commit, never on the
+entry as its permanent home. This is a consequence of (c) rather than a further
+rule, and no gate can catch it — the loss is indistinguishable from an ordinary
+disposition.
+
 **The amendment finder is best-effort, and the port had to reproduce that
 rather than harden it.** `spec_amendments` ends `2>/dev/null … || true`, so an
 unwalkable scan root yields *no amendments* instead of a refusal. Read against
