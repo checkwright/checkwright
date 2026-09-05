@@ -503,8 +503,8 @@
   `drain-order-retroactive-debt-sweep`'s named ten and that unit disposes of them
   together; whichever fix lands discharges both, and neither may be counted twice
   when the sweep costs its ten. Promotion is barred meanwhile: not port-critical
-  by TRAJECTORY.md's test, so the port-only run bars it like every other deferred
-  entry, and a recurrence count does not buy the exception.
+  by TRAJECTORY.md's test, and under the port-first run that superseded the port-only
+  one it meets no other joining ground either; a recurrence count alone does not buy it.
   recurrence: enter-stage-flag-position-silently-ignored 2026-09-05
   Filed 2026-08-30 by close from the gap inbox, attested by the filing session
   upon itself.
@@ -571,8 +571,10 @@
   the project makes about it stays a reading rather than a measurement, and the `find -printf`
   defect above sits unfixed on the install path every macOS adopter takes today.
   **PORT-CRITICAL, OWN-ITERATION SHAPE — RULED 2026-09-05 (operator, consult):** a lawful
-  iteration under the port-only run, TRAJECTORY.md §PRIORITY DIRECTIVE; the `find -printf` fix
-  rides inside it.
+  iteration under the run then standing, and the port-first run that superseded it the same day
+  names this leg's shape in terms — port-critical, its own iteration when it cannot ride a cut
+  (TRAJECTORY.md §PRIORITY DIRECTIVE). The ruling is re-named onto its successor, never reversed;
+  the `find -printf` fix rides inside it.
   Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
@@ -887,49 +889,52 @@
   Found 2026-08-18 by this iteration's scope at its own entry, from the surviving directory rather
   than from a reading of the code; filed under scope-gated intake rather than fixed in-session.
 
-- **gap-inbox-commit-ownership** [design-pending] — nothing says who **commits** a gap-inbox
-  bullet, so a filed bullet can reach the next iteration uncommitted and be carried by whichever
-  session happens to stage next.
-  **Re-tiered out of the icebox 2026-08-19 on a falsified premise, ruled by the iteration lead
-  rather than the operator because the entry's own cost field is what decides it.** Icebox
-  membership asserts "no named event is waiting to promote it"; a named event has now occurred.
-  **The firing, probed rather than inferred.** The capture affordance appends the bullet and
-  never commits — no `git` invocation in it, before or after its port to an arm.
-  `git log -- .workflow/gap-inbox.md`
-  shows the `wide-budget-batch-and-hold-declaration` close's first two bullets each landing in
-  their own `chore(gap):` commit while the third was written and left in the working tree, so it
-  reached a **new iteration's** scope session as an uncommitted modification and was carried into
-  history by that session's boundary stamp commit.
-  **The distinction the firing turns on:** committing a bullet is **not** its disposition. The
-  carrying session had to say so explicitly in the stamp commit's message, because the drain
-  contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one
-  disposition — promoted, fixed inline, or discarded with cause — and none of them is "committed".
-  A surface named *the committed gap inbox* whose filer never commits is the gap in one phrase.
-  **Why `[design-pending]`:** the shapes differ in who pays. Have `--emit file-gap` commit its own
-  bullet — cheapest, but it makes a capture affordance a committing tool, and it contends on a
-  shared index with whatever stage session is mid-commit. Oblige the filing session to commit in
-  the same turn — no tool change, but it is an instruction, and this iteration is the evidence
-  that instructions of that shape get missed. Or rule the carry legitimate and state that the
-  next stamping session commits it, which is what happened here by accident rather than by
-  contract.
-  **Cost while deferred:** small per instance and silent — a bullet outside git until some later
-  session notices, invisible to `git log` and to any reader who is not looking at a dirty tree,
-  and lost outright if that tree is reset. It is also the one class the inbox's own
-  merge=union answer cannot cover, since union protects a committed surface and this bullet was
-  never on one. **That "small and silent" reading is corrected 2026-09-01 by measurement, not by a
-  re-filing:** an uncommitted bullet aborted `run-validate.sh` after 16 of 22 suites had run clean,
-  through the unscoped pack-step predicate `pack-step-dirty-tree-predicate-unscoped` owns. The
-  per-instance cost is loud where it meets that predicate and silent everywhere else.
-  **RECURRENCE JUDGED 2026-08-31 by close, on three attested firings inside one iteration.** Build
-  batches A, B and C each carried a lead-filed bullet into history by hand-off instruction in the
-  dispatch prompt, each recording the carry in its commit message and none dispositioning it; batch
-  D had no bullet to carry and so broke the streak without resolving anything. That is the entry's
-  own third candidate shape — rule the carry legitimate and instruct the next session — running in
-  production, and it is now measured rather than projected: the workaround is one line in a dispatch
-  prompt and it fails SILENTLY the moment a dispatch omits it, because a filed-but-uncommitted
-  bullet is invisible to `git log` and to every reader not looking at a dirty tree. The grounds sit
-  here beside the declaration because the drain that judged them is the commit that truncated them.
-  recurrence: gap-inbox-commit-ownership 2026-08-31
+- **gap-inbox-commit-ownership** [design-pending] — the filing session commits its own bullet, and
+  what is left is landing that rule where a filer reads it. Until then a filed bullet reaches the
+  next iteration uncommitted and is carried by whichever session happens to stage next. The tag
+  marks deferred-section membership, which `check-amendment-queue` holds over every entry here; the
+  SHAPE is ruled below and is no longer the pending part.
+  **Re-tiered out of the icebox 2026-08-19 on a falsified premise, by the lead rather than the
+  operator because the entry's own cost field decides it:** icebox membership asserts "no named
+  event is waiting to promote it", and a named event had occurred.
+  **The firing, probed rather than inferred.** The capture affordance appends and never commits — no
+  `git` invocation in it, before or after its port. `git log -- .workflow/gap-inbox.md` shows one
+  close's third bullet left in the working tree and carried into history by the NEXT iteration's
+  scope stamp.
+  **The distinction the firing turns on:** committing a bullet is **not** its disposition — the
+  drain contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one,
+  promoted, fixed inline or discarded with cause, and none of them is "committed". A surface named
+  *the committed gap inbox* whose filer never commits is the gap in one phrase.
+  **THE SHAPE IS RULED AND THE TAG IS SPENT — 2026-09-06 by the operator, through an interactive
+  prompt in the lead session, relayed by the lead rather than ruled by it: a session that files a
+  gap-inbox bullet COMMITS IT ITSELF, at the first moment the git index is free of stage-session
+  work**, on the stated ground that an uncommitted gap-inbox is prone to be lost. That selects the
+  second shape (oblige the filing session) and refutes the third (rule the carry legitimate). The
+  first — have `--emit file-gap` commit its own bullet — is left unruled, and the ruling's own
+  index-free precondition argues against it, since a capture affordance cannot judge whether an
+  index is free. **The precondition is NEW material rather than a restatement:** the standing
+  objection to shape one was index contention, and the ruling answers that objection with a timing
+  test instead of by rejecting committing.
+  **THE DELIVERABLE, with its target named.** `lifecycle-kit/templates/lead.md` says every
+  lifecycle-state write happens in the stage session and never in the lead, while the same
+  template's §Stamps are authoritative sanctions the lead writing this surface with `--emit
+  file-gap` and its own enumeration omits commits — so a lead reading the prohibition literally
+  writes the bullet and does not commit it. One clause carving a gap-inbox commit out of that
+  prohibition with its precondition, plus the shape selection in lifecycle-kit/SPEC.md. Debt.
+  **Cost while deferred:** low per instance and silent — a bullet outside git until some later
+  session notices, invisible to `git log`, lost outright if the tree is reset; it is also the one
+  class the inbox's own merge=union answer cannot cover, union protecting a committed surface only.
+  **Corrected 2026-09-01 by measurement rather than by a re-filing:** an uncommitted bullet aborted
+  `run-validate.sh` after 16 of 22 suites ran clean, through the unscoped predicate
+  `pack-step-dirty-tree-predicate-unscoped` owns — loud there, silent everywhere else.
+  **RECURRENCE JUDGED 2026-08-31 by close, on three attested firings inside one iteration:** build
+  batches A, B and C each carried a lead-filed bullet into history on a dispatch-prompt instruction
+  and none dispositioned it — the third shape running in production, failing SILENTLY the moment a
+  dispatch omits the line. That evidence is what the 2026-09-06 ruling answers.
+  **FIRED AGAIN 2026-09-06** at the iteration-open boundary, in the same shape: the lead filed a
+  bullet with `--emit file-gap` and left it uncommitted for this scope session's stamp to carry.
+  That firing is what carried the ruling above.
+  recurrence: gap-inbox-commit-ownership 2026-08-31 2026-09-06
   Filed 2026-07-25 by close draining its own gap inbox, and born in the icebox rather than demoted
   to it — `git log -S` over the slug returns that one commit, which is the whole of its history
   before this move. Fired 2026-08-18 and re-tiered 2026-08-19 by the scope session the
@@ -3144,13 +3149,10 @@
 
 - **ruling-record-condition-staleness-probe** [design-pending] — a ruling conditioned on an
   event nobody retires once the event fires.
-  `TRAJECTORY.md` carries rulings whose text is conditioned on a future event — the 2026-08-26
-  Windows-leg ruling's "only once that leg has produced and exercised its artifact" is a live
-  example re-verified 2026-08-28, beside "After the port: `companion-toolkit-profile`" — and
-  nothing retires one when its condition is met. Today obsolescence rides the unit that
-  discharges the ruling, whose own entry names the rows it removes on landing; that holds only
-  where an author remembered to write the removal in, and nothing catches the ruling whose
-  condition a unit met silently.
+  `TRAJECTORY.md` carries rulings conditioned on a future event — the 2026-08-26 Windows-leg
+  ruling's "only once that leg has produced and exercised its artifact", beside "After the port:
+  `companion-toolkit-profile`" — and nothing retires one when its condition fires. Obsolescence
+  rides the discharging unit's own entry, so a condition met silently is caught by nothing.
   **The enforceable half is a probe, never a prune — and the ground for that has moved.** It
   rested on retirement being operator-class; the 2026-08-08 pruning directive
   (`trajectory-prune-on-completion`) authorizes the prune, so what keeps this entry to a probe is
@@ -3159,10 +3161,9 @@
   whatever declaration makes a condition machine-readable — a ruling stating its own discharge
   event is the design question, since a prose condition carries no syntactic tell. That
   declaration is this entry's alone: the pruning unit ships prose convention, not form.
-  **Both attested conditions have now fired, which settles the recurrence and not the
-  deliverable.** One was already missed at the 2026-08-06 close — a ruling naming an iteration's
-  close as the tag point, which passed uncut with no surface saying so; the other fired
-  2026-08-07 (v0.22.0), discharging every row conditioned on it at once. No probe watched either.
+  **Both attested conditions have fired, which settles the recurrence and not the deliverable.**
+  One was missed at the 2026-08-06 close, a ruling naming an iteration's close as the tag point
+  that passed uncut; the other fired 2026-08-07 (v0.22.0). No probe watched either.
   **The class reaches the record's corrections, not only its conditions** — the surface written
   to record the missed condition went stale itself in under a day.
   **Widened 2026-08-09 by the first post-prune close: the inbound half, and it is the mirror
@@ -3172,8 +3173,7 @@
   The pointer names the surviving *section*, so it resolves and the battery reports clean over
   it. Now that pruning is licensed, every prune manufactures this exposure. Three instances were
   verified individually at that close, each having survived a full green battery, and all fixed
-  there. **No denominator is stated on purpose:** two sweeps of the citation corpus returned
-  counts irreconcilable under differing exclusion sets — `check-measured-claim`'s subject.
+  there.
   **The design input worth more than the instances, because a probe would miss it.** A fourth
   instance — `gate-timing-baseline-comparability`, corrected at the same close — cites the
   deleted ruling **by its distinctive phrasing, naming no file at all**, so no probe scoped to
@@ -3186,11 +3186,16 @@
   sessions that consult the record for what is settled, and the record's authority makes that
   steer expensive to unwind. The widening adds the sharper cost: the citing surfaces are
   *published* — a kit SPEC and its docs mirror — so the blast radius reaches adopters.
-  **Fifth inbound instance, 2026-08-13, and the first from a *deliberate retirement* rather than
-  a prune** — `gate-sdk/SPEC.md` citing a ruling the retirement deleted from a surviving section;
-  cleaned by `spent-ruling-retirement`, so the exposure this entry attributes to pruning is now
-  attested on the retirement path too.
-  recurrence: ruling-record-condition-staleness-probe 2026-08-13
+  **Fifth inbound instance, 2026-08-13, the first from a *deliberate retirement* rather than a
+  prune** — `gate-sdk/SPEC.md` citing a ruling the retirement deleted from a surviving section,
+  cleaned by `spent-ruling-retirement`.
+  **SIXTH, 2026-09-06, the largest cohort yet: ELEVEN live deferred entries — filed as five —
+  stating in the present tense that the port-only run bars an active-section promotion, after the
+  port-first ruling superseded that whole run.** Fixed inline at that drain. Two design inputs a
+  file-name-scoped probe misses: two of the eleven rested their own FILING decision on the retired
+  qualification, and one recorded a LIVE operator ruling under the retired run's name — so the
+  remedy re-names the run, never the ruling, and a probe blind to that proposes reversals.
+  recurrence: ruling-record-condition-staleness-probe 2026-08-13 2026-09-06
   Filed 2026-08-07 by close, draining the gap inbox.
 
 - **stage-economics-log-key-session-collision** [design-pending] — two sessions in one
@@ -8041,55 +8046,56 @@
   Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; attested
   2026-08-27 by the `windows-adopter-unblock` close's own verifying push.
 
-- **worktree-lock-pid-is-not-agent-liveness** [design-pending] — a linked worktree's lock
-  reason names the harness PROCESS rather than the agent that created the worktree, so
-  reading that pid for liveness always answers "still in use" and the iteration-boundary
-  refusal on a linked worktree looks unclearable.
-  **The pid is the top-level `claude` process's, not the dispatching session's, and it is
-  CONSTANT across the run — twice attested rather than argued.** 2026-08-27: three read-only
-  sweeps all carried the pid a different session had recorded hours earlier, with one `claude`
-  process alive throughout. 2026-09-05: two worktree dispatches from one scope session again
-  carried one identical pid, which was the host CLI. The signal carries no information about
-  any agent at all.
-  **Why it traps a compliant session.** delegation-kit's protocol teaches a session to
-  distrust pattern matching and to trust a recorded PID's liveness, so a session meeting a
-  locked worktree does exactly the sanctioned thing, reads a live pid, and concludes the
-  worktree is in use. It is not: the agent that created it had finished. The boundary refusal
-  (lifecycle-kit/SPEC.md §bin/enter-stage.sh) then meets a session with no lawful remedy,
-  which is the shape that has previously invited an agent to invent a mutating one.
-  **The remedy is cheap and was exercised**: unlock, then remove, then delete the branch, no
-  force needed, after verifying the worktree clean and carrying no commits past its base.
-  Nothing about the lock's pid gates that.
-  **The failure direction is a DEADLOCK, not a conservative refusal, and that is the sharpening
-  the third sighting adds.** The spec's error-direction argument — a reused pid classifies live,
-  and live refuses rather than authorising a removal — holds only where the captured pid belongs
-  to the holder. Here it belongs to a process guaranteed alive for as long as the entering
-  session runs, so "wait for the named pid to return" is unsatisfiable by construction: the pid
-  returns only when the session that needs to cross the boundary exits.
+- **worktree-lock-pid-is-not-agent-liveness** [design-pending] — a linked worktree's lock reason
+  names the harness PROCESS rather than the agent that created it, so reading that pid for liveness
+  always answers "still in use" and the iteration-boundary refusal looks unclearable.
+  **The pid is the top-level `claude` process's, not the dispatching session's, and it is CONSTANT
+  across the run — now THRICE attested rather than argued.** 2026-08-27: three read-only sweeps all
+  carried a pid a different session had recorded hours earlier. 2026-09-05 and 2026-09-06: worktree
+  dispatches from one scope session again carried one identical host-CLI pid, one of them started
+  the previous day, so the pid is constant across an iteration boundary too.
+  **Why it traps a compliant session.** delegation-kit's protocol teaches a session to distrust
+  pattern matching and trust a recorded PID's liveness, so a session meeting a locked worktree does
+  the sanctioned thing, reads a live pid, and concludes it is in use. It is not. The refusal then
+  meets a session with no lawful remedy — the shape that has invited an agent to invent one.
+  **The remedy is cheap and was exercised**: unlock, remove, delete the branch — no force — after
+  verifying the worktree clean and carrying nothing past its base. The lock's pid gates none of it.
+  **The failure direction is a DEADLOCK, not a conservative refusal.** The error-direction argument
+  — a reused pid classifies live, and live refuses rather than authorising a removal — holds only
+  where the captured pid belongs to the holder. Here it belongs to a process alive as long as the
+  entering session is, so "wait for the named pid" returns only when that session exits.
   **The lock reason carries the harness's AGENT ID verbatim beside that pid**
-  (`claude agent agent-<id> (pid <n> start <n>)`), so the first candidate shape has a real field
-  to read rather than a hoped-for one — probe the agent id against the harness's running-agent
-  roster instead of probing the pid.
-  **A force-reap over the live-class guidance was ruled at the 2026-09-05 boundary by the
-  operator, through an interactive prompt in the lead session, which relayed rather than ruled
-  it** — on verified grounds: the captured pid was the host CLI itself, no agent session was
-  running, and the worktree's tree was clean with its HEAD already an ancestor of master, so the
-  reap was lossless. A one-off disposition of one worktree; it settles nothing about the
-  classifier, which is what this entry still owns.
-  **Why `[design-pending]`:** three uncosted shapes — have the boundary refusal name that
-  remedy so the message is not a dead end; state in delegation-kit's isolation bullet that a
-  lock reason's pid is the harness's and is not a liveness signal for the agent, that bullet
-  being where a session learns to reap both halves; or have the reap be asserted at the
-  dispatching session's own turn end rather than at the next boundary, so it lands on the
-  party that can see what the worktree was for.
+  (`claude agent agent-<id> (pid <n> start <n>)`), so a shape probing the agent id has a real field
+  to read — but `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` matches that id with `[^ ]+` and does not
+  CAPTURE it, and the reader hardcodes group one, so that shape is coupled to
+  `ere-matcher-capture-groups-unowned`.
+  **A one-off force-reap over the live-class guidance was operator-ruled at the 2026-09-05 boundary
+  and again at 2026-09-06, both relayed by the lead rather than ruled by it**, each on verified
+  grounds — host-CLI pid, clean tree, HEAD already an ancestor of master, so each reap was lossless.
+  Neither settles the classifier, which is what this entry owns.
+  **SHAPE ONE HAS PARTLY LANDED AND DID NOT REPAIR THE DEAD END.** `--enter-stage` now names the
+  reap remedy for the ORPHANED class — but the classifier routes on captured-pid liveness and the
+  host pid is always alive, so the branch that actually fires tells the session to wait for the
+  named pid and adds "Do not remove it and do not force it". The tool forbids the correct action,
+  which is why the refusal-message shape is spent rather than pending.
+  **Why `[design-pending]`:** the two live shapes — state in delegation-kit's isolation bullet that
+  a lock reason's pid is the harness's and not an agent liveness signal, that bullet being where a
+  session learns to reap both halves; or assert the reap at the DISPATCHING session's own turn end
+  rather than at the next boundary, so it lands on the party that knows what the worktree was for.
   **DISTINCT from delegation-kit's reap-both-halves rule**, which says WHAT to delete and is
   silent on how to judge whether deleting is safe.
+  **FOURTH SIGHTING 2026-09-06, and it is the evidence that RANKS the two shapes.** The orphan was
+  minted at the prior iteration's SPEC stage and survived align, three build sessions, validate and
+  close without any of six sessions noticing; only the boundary refusal surfaced it. Those five
+  later sessions had no reason to look, and the party who knew what the worktree was for was gone
+  six sessions before the refusal fired — which is shape three's own argument, made by the record.
   **Cost while deferred:** every boundary crossing behind an orphaned worktree is a session
-  reasoning correctly to a false conclusion, and its only honest fallback is to ask.
-  recurrence: worktree-lock-pid-is-not-agent-liveness 2026-09-05
+  reasoning correctly to a false conclusion against help that forbids the remedy, and the fallback
+  is an operator round trip — now paid twice.
+  recurrence: worktree-lock-pid-is-not-agent-liveness 2026-09-05 2026-09-06
   Filed 2026-08-27 by the lead at scope, promoted 2026-08-27 by close draining the gap inbox.
-  Re-fired 2026-09-05 at the `windows-leg-manifest-cause-read` close's boundary, where it
-  REFUSED the scope entry outright; that bullet is drained here into this entry.
+  Re-fired 2026-09-05 at the `windows-leg-manifest-cause-read` close's boundary; drained again
+  2026-09-06 at scope from the lead's judged fourth-sighting bullet.
 
 - **exe-suffix-single-spelling-unenforced** [design-pending] — gate-sdk/SPEC.md §lib/gate.sh
   asserts that `gate_exe_suffix` is the executable suffix's single owner and that no other
@@ -8232,52 +8238,52 @@
   rows an allowlist entry could retire with rows no entry can ever match, so each close re-triages
   a class no action retires.
   **Measured at the windows-artifact-proof close:** of 208 prompting calls across 52 patterns,
-  fourteen redirect-shaped rows are ungrantable *by construction*, `cat >>` the top row at 26x.
-  **The guard says so in its own refusal text**, which is what makes this structural rather than a
-  tuning complaint: a `Bash(...)` entry matches a bare command, so any chaining, redirect or
-  expansion breaks the match and the call is decided out of band whatever the allowlist holds.
+  fourteen redirect-shaped rows are ungrantable *by construction*. **The guard says so in its own
+  refusal text**, which makes this structural rather than a tuning complaint: a `Bash(...)` entry
+  matches a bare command, so any chaining, redirect or expansion breaks the match and the call is
+  decided out of band whatever the allowlist holds.
   **All three of the triage's dispositions are wrong for these rows.** An allowlist entry cannot
   reach them; a guard steer already covers the read shapes while the write shapes are legitimate
-  journal and scratch appends; and a habit change leaves the row ranking identically, the shape
-  and not the habit being what falls through. The honest disposition is a fourth the ranking does
-  not offer: structurally ungrantable, retired from the actionable set.
+  journal and scratch appends, which guard rule 17 now auto-allows outright; and a habit change
+  leaves the row ranking identically. The honest disposition is a fourth the ranking does not
+  offer: structurally ungrantable, retired from the actionable set.
   **DISTINCT from `friction-key-segment-selection-unruled`**, whose axis is *which* segment of a
-  compound is keyed: that entry would change which name a row files under and would leave every
-  one of these rows ranking. DISTINCT from `file-authoring-act-ungoverned`, which owns whether the
-  authoring act is governed at all — its guard-steer shape would retire these rows by changing
-  behaviour, where this entry's question is what the ranking should say while it has not.
-  **Why `[design-pending]`:** the three candidate shapes buy different things and none is obviously
-  right. Partitioning the ranked output as it already partitions overlay-covered rows is most
-  legible and moves the KPI's denominator; grading each row against the allowlist's own matching
-  rule is most accurate and duplicates that rule; a guard-kit/SPEC.md note is cheapest, buys least.
+  compound is keyed: it changes which name a row files under and leaves every row ranking. DISTINCT
+  from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed at all —
+  its guard-steer shape retires these rows by changing behaviour, where this entry asks what the
+  ranking should say while it has not.
+  **Why `[design-pending]`:** the three candidate shapes buy different things. Partitioning the
+  ranked output as it already partitions overlay-covered rows is most legible and moves the KPI's
+  denominator; grading each row against the allowlist's own matching rule is most accurate and
+  duplicates that rule; a guard-kit/SPEC.md note is cheapest, buys least.
+  **THE INSTRUMENT IS CONTAMINATED and every measurement above is a MULTI-WINDOW read until it is
+  cleared — 2026-09-06, probed at scope.** `.workflow/prompt-friction.log` still carried a PRIOR
+  iteration's close calls verbatim, so no emitted figure denominates one window. A fifth gap bullet
+  re-derived this diagnosis off that log, again without citing this entry, and reported a head row
+  and total irreconcilable with the fourth measurement of the SAME close — the contamination
+  showing, not a disagreement about the class. Clearing the log is a precondition of the next one.
   **Cost while deferred:** one re-triage of the same unretireable rows per close, on the surface a
   close reads to decide where friction is; the top row is always one of them.
-  **FOURTH MEASUREMENT 2026-09-05 at this close, and it ANSWERS the design question.** 126 calls,
-  27 patterns, 498 fall-throughs; head `python3 -` heredocs at 61x, `cat >>` second at 24x — down
-  from 50x, so the earlier GROWING read tracked the command word, not the class. A THIRD word takes
-  the head across four samples while the SHAPE never moves: grading rows by the matching rule chases
-  that, partitioning by shape is what the samples buy. Found at the triage step: not a recurrence.
+  **FOURTH MEASUREMENT 2026-09-05, and it ANSWERS the design question.** 126 calls, 27 patterns,
+  498 fall-throughs; head `python3 -` heredocs at 61x, `cat >>` second at 24x — down from 50x, so
+  the earlier GROWING read tracked the command word, not the class. A THIRD word takes the head
+  across four samples while the SHAPE never moves: partitioning by shape is what the samples buy.
   recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03
   **THIRD MEASUREMENT, 2026-09-03, ANSWERED by the fourth and kept only for what it adds:** a gap
-  bullet re-derived the three-arms-all-wrong finding without finding this entry, naming the first
-  DISTINCT sibling and missing the owner. Its one novel half — a bare-command journal-append
-  affordance — is the SECOND sibling's, being a behaviour change rather than a ranking one.
+  bullet re-derived the finding without finding this entry, naming the first DISTINCT sibling and
+  missing the owner; its one novel half, a bare-command journal-append affordance, is the SECOND
+  sibling's.
   **THRESHOLD 2026-09-03, twice declined (lead, own-authority); deferred 2026-09-05 (operator,
-  lead-relay) under the port-only run. THAT GROUND IS SPENT** — the port-first ruling superseded
-  that run the same day, so the deferral rests on its successor rule instead: MACHINERY-class by
-  the 2026-08-30 discriminator (the demand witness is this repo's own close-time triage), meeting
-  none of the three joining grounds. Re-composed at scope 2026-09-05, `lead, own-authority`.
-  **SECOND MEASUREMENT, 2026-08-28 at `port-oracle-and-composer-ruling`'s close**, arriving as a gap
-  bullet that re-derived this diagnosis without finding this entry, and drained here on a dedup
-  sweep rather than promoted. A different head, the same class:
-  `bash scripts/producer-liveness-reader.sh` at 64 prompting calls, **63 of the 64 composed** —
-  chained, redirected or expanding — and 46 of those one repeated poll string. It also
-  **falsified a tempting sub-case**: ten `GATE_SDK_VERBOSE=1` calls read as a missing-`env`-word
-  steer were all piped into `grep`, so the prefix would have changed nothing. It also moved the
-  ungrantable rows from a redirect-shaped *tail* to the *head*, sizing the ranking's bulk.
-  Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close, which paid the cost;
-  promoted 2026-08-27 by the next scope, at the boundary that could legally run the drain.
-  Also ruled on prompt-ranking-ungrantable-shape-class: lead 2026-09-04 (own-authority).
+  lead-relay) under the port-only run. THAT GROUND IS SPENT** — the port-first ruling superseded it
+  the same day, so the deferral rests on its successor: MACHINERY-class by the 2026-08-30
+  discriminator, meeting none of the three joining grounds. Re-composed at scope 2026-09-05.
+  **SECOND MEASUREMENT, 2026-08-28**, another gap bullet re-deriving this diagnosis without finding
+  this entry: a different head, the same class, 63 of 64 calls composed. It **falsified a tempting
+  sub-case** — ten `GATE_SDK_VERBOSE=1` calls read as a missing-`env`-word steer were all piped into
+  `grep`, so the prefix changes nothing — and moved the ungrantable rows from tail to head.
+  Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close; promoted 2026-08-27 by the
+  next scope. Also ruled on: lead 2026-09-04 (own-authority). Fifth re-derivation drained here
+  2026-09-06 at scope — discarded as a ranking finding, its instrument half kept above.
 
 - **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — the remedy
   `artifact-digest-mismatch-remedy-inert` shipped — `init` rewriting a gate binary whose bytes no
@@ -8895,8 +8901,8 @@
   one stage this iteration.
   recurrence: record-stamp-encoding-compression 2026-09-03
   Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception, staged and
-  committed in one motion. FILED AND NOT BUILT: the port-only run forecloses building it while
-  `--tree` reads owed, and this is no hotfix.
+  committed in one motion. FILED AND NOT BUILT: it rides no cut and meets none of the three joining
+  grounds the port-first run that superseded the port-only one states, and this is no hotfix.
 
 - **editor-diagnostic-unruled** [design-pending] — the harness LSP channel contradicts the tree's
   own oracles on crate-touching commits, and no surface rules that channel out as an oracle.
@@ -9002,9 +9008,9 @@
   reader and says in terms that the rest are not re-pointed, so the residue is legible at the
   source and not only here.
   **Why it was not taken with the hotfix.** The lead ruled that envelope narrow: a resolver over
-  twenty sites triages as a feature, a feature is a yield, and the port-only run admits the hotfix
-  as its single exception. Filing is not the promotion that ruling bars, `## Deferred` being no
-  active section.
+  twenty sites triages as a feature, a feature is a yield, and the run then standing admitted the
+  hotfix as its single exception. Filing is not promotion, `## Deferred` being no active section;
+  under the port-first run that superseded it, a promotion turns on the three joining grounds.
   **Why `[design-pending]`:** the shape is unruled — one holder with a governed name, a call-site
   sweep, or a lint that reds a bare interpreter name — and the choice interacts with
   `registry-needs-conflates-requirement-and-spawn`, which is what a resolved spawn breaks.
@@ -9444,9 +9450,10 @@
   prohibition, never the bar). Two further undecided shapes: whether cleanup belongs to the
   producer at all rather than to a reaper the boundary check already implies, and whether the
   consumer-smoke library owes the same trap.
-  **Deferred rather than active BY RULING, not by ranking.** The port-only run bars an
-  active-section promotion and expressly does not bar a Deferred filing (TRAJECTORY.md's two
-  paragraphs at §PRIORITY DIRECTIVE); the icebox tier cannot take it either, because it blocks an
+  **Deferred rather than active BY RULING, not by ranking.** Under the port-first run that
+  superseded the port-only one it meets none of the three joining grounds, and no run has ever
+  barred a Deferred filing (TRAJECTORY.md §PRIORITY DIRECTIVE); the icebox tier cannot take it
+  either, because it blocks an
   iteration-boundary entry and the machinery-class default is conjunctive.
   **Cost while deferred:** every externally killed validate spine converts one lost run into a
   refused iteration boundary for the next session, and the remedy is a two-`--force` reap that
@@ -9476,8 +9483,9 @@
   upgrade: an `Inst::Save`, per-thread slot vectors, and a STATED POSIX leftmost-longest
   subexpression rule — the sub-match rule is the half POSIX specifies and ordinary leftmost-first
   engines get wrong — against a governed matcher carrying its own acceptance oracle.
-  **Deferred by ruling rather than by ranking.** An active-section promotion is barred by the
-  port-only run, which expressly does not bar a Deferred filing (TRAJECTORY.md §PRIORITY
+  **Deferred by ruling rather than by ranking.** It meets none of the three joining grounds the
+  port-first run states, that run having superseded the port-only one, and no run has ever barred
+  a Deferred filing (TRAJECTORY.md §PRIORITY
   DIRECTIVE); the icebox tier cannot take it either, the trigger being live — every stage entry
   runs the path.
   **Cost while deferred:** one bash spawn per iteration-boundary worktree row, and a divergence
@@ -9589,8 +9597,8 @@
   nobody is obliged to run, and the failure surfaces in an adopter's tree rather than in ours.
   Filed 2026-09-05 to the gap inbox by the close of `evidence-runner-trend-and-install-hooks-cuts`;
   promoted here at this iteration's scope, →fix refused (a new gate is build work, not scope's) and
-  →icebox refused on the product witness above. Deferred and not active: the port-only run bars an
-  active-section promotion (TRAJECTORY.md §PRIORITY DIRECTIVE, 2026-09-04).
+  →icebox refused on the product witness above. Deferred and not active: it meets none of the three
+  joining grounds the port-first run states (TRAJECTORY.md §PRIORITY DIRECTIVE).
 
 - **fail-open-arm-status-second-source** [design-pending] — the stub holds the bridged arms'
   unavailable exit status as a two-name shell test, and nothing holds that set in lockstep with
@@ -9619,8 +9627,8 @@
   **Cost while deferred:** the set is two names and correct today, so the whole cost is future — a
   divergence lands silently and is found by an adopter rather than by the battery.
   Filed 2026-09-05 to the gap inbox at spec and again at build's batch 3; promoted at this close.
-  Deferred and not active: the port-only run bars an active-section promotion
-  (TRAJECTORY.md §PRIORITY DIRECTIVE, 2026-09-04).
+  Deferred and not active: it meets none of the three joining grounds the port-first run states
+  (TRAJECTORY.md §PRIORITY DIRECTIVE).
 
 - **audit-depth-measure-degrades-under-fanout** [design-pending] — the two artifact-grounded
   audit-depth numbers a lead's dispatch asked align and build to journal are not comparable across
@@ -9646,8 +9654,8 @@
   the instruction dies with the dispatches carrying it — a later judge inherits an incomparable
   pair and no way to extend the series.
   Captured 2026-09-05 by close, which was handed the keep-or-file decision and made it.
-  Filed to Deferred and not promoted: the port-only run forecloses an active-section entry
-  (TRAJECTORY.md §PRIORITY DIRECTIVE), and its 2026-09-04 qualification permits this filing.
+  Filed to Deferred and not promoted: it meets none of the three joining grounds the port-first run
+  states (TRAJECTORY.md §PRIORITY DIRECTIVE), and no run has ever barred a Deferred filing.
 
 - **candidate-list-anchors-a-sweep-obligation** [design-pending] — a dispatch handing a
   grep-derived candidate list where the obligation is a whole-tree sweep anchors the sweeper on the
@@ -9672,8 +9680,8 @@
   Filed 2026-09-05 by close, relayed by the lead as a lesson about its own dispatch shape.
   (`Captured` was the original verb; the defer-date reader takes `Surfaced`/`Filed` only, so the
   entry read as undated and the age filter never reached it — corrected at the 2026-09-05 drain.)
-  Deferred, never promoted — the port-only run holds the active sections shut
-  (TRAJECTORY.md §PRIORITY DIRECTIVE); a Deferred filing is what its qualification leaves open.
+  Deferred, never promoted — it meets none of the three joining grounds the port-first run states
+  (TRAJECTORY.md §PRIORITY DIRECTIVE); no run has ever barred a Deferred filing.
 
 - **pack-installer-no-owning-spec-section** [design-pending] — the largest reachable member of the
   owed port column has no SPEC section claiming it, so its cut has no boundary to be authored
@@ -9689,8 +9697,9 @@
   §Consumer payload already owns the payload's derivation and is the near candidate, against a new
   `installer/README.md` section that would put the packer beside the surface it packs. Picking one
   at a drain would settle a placement question by accident.
-  **Why not icebox:** the trigger is live and dated — the port-only run cannot cut this file until
-  a section exists, so the owed column stalls on it rather than merely aging.
+  **Why not icebox:** the trigger is live and dated — no cut can take this file until a section
+  exists, so the owed column stalls on it rather than merely aging, and the port-first run that
+  superseded the port-only one still puts a cut first in every iteration.
   **DISTINCT from the `demo/run-demo.sh` and `installer/bin/checkwright.sh` mis-pointers of the
   same class**, each of which HAS a resolvable home; this one has none to point at.
   **Gap generalization:** the check class is a `# spec:` pointer resolving to a surface that is not
@@ -9870,6 +9879,105 @@
   teaches the one lesson this tree can least afford — that a red arm may be re-run, not fixed.
   Surfaced 2026-09-05 by build batches B (an unnamed red, never reproduced) and C (the named test);
   drained here with both merged, the rate measured and the icebox ground refuted.
+
+- **composition-test-scores-a-section-cut-as-one-unit** [design-pending] — the economic composition
+  test counts a port cut as ONE unit however many SPEC sections it spans, so a window is
+  pre-committed before any composition choice is made and the test then runs on the residue.
+  **The finding is about the test's INPUT, not its arithmetic.** At the 2026-09-05 close the cut
+  alone was four amendments and a directed sweep made five — already past the widest attested
+  width — before either threshold member was weighed. What the test scored as "four" was one unit
+  sized by sections, so the three-slot remainder is what the test actually judged.
+  **Measured at that close rather than estimated:** governance share 70 per cent against an expected
+  66, governed prose +552 net lines over 16 files, `qnet` +3 for the second consecutive close, and
+  correctness cost ZERO — validate ran 20 of 20 clean with no regression. So this is a budget
+  finding and not a quality one, which is exactly why no gate will ever surface it.
+  **Why `[design-pending]`:** three shapes, none ruled — score a multi-section cut by its sections
+  rather than as one amendment; make the window a budget over sections rather than over amendments;
+  or leave the test alone and treat a section-sized cut as a declared exception. Which is right
+  turns on what a window is denominated in, and nothing states that today.
+  **The owner is a KIT surface, which decides who may fix it.**
+  `lifecycle-kit/templates/stages/scope.md` §the economic composition test is the sole normative
+  home; TRAJECTORY.md and CLAUDE.md only cite it, and TRAJECTORY.md says in terms that the test is
+  the kit's and stays. So this is a kit-shaped change, never a repo-local calibration, and the
+  provenance seam bars the repo's own measurements above from following the fix into that template.
+  **NO GATE ENFORCES ANY OF IT** — nothing in `scripts/gates.list`, the crate, or any `.gate`
+  descriptor reads a composition test, an amendment count or a window budget, so enforcement-first
+  is unmet by construction and the shape chosen has to say whether it ever can be.
+  **Cost while deferred:** every iteration whose cut spans several sections is composed against a
+  test that has already spent most of the window it is meant to bound, and the overrun reads as a
+  composer's misjudgment rather than as the measurement artefact it is.
+  Surfaced 2026-09-05 by the `test-harness-cut-seam-sweep` close, which was assigned the judgment
+  and filed it; drained here at the 2026-09-06 scope boundary. →fix refused: the deliverable is a
+  kit template's and the three shapes are unruled. →icebox refused: the trigger is live and fires at
+  every multi-section cut, which the port-first run makes every iteration.
+  (The filing bullet cited `TRAJECTORY.md:621-622`; the commit that filed it deleted that paragraph
+  on its own discharge condition, so the anchor resolves to nothing; `:601` carries the sentence.)
+
+- **deleted-runner-anchors-across-ten-entries** [design-pending] — ten live deferred entries carry
+  mechanism paragraphs written against `gate-sdk/bin/run-gate-tests.sh` and
+  `guard-kit/bin/run-guard-tests.sh`, both deleted at the 2026-09-05 port cuts, and each needs
+  RE-ANCHORING against the ported arm rather than re-tensing.
+  **TWO ported modules, not one, and this is the correction that makes the batch runnable.** The
+  filing bullet named `native/src/emit/run_gate_tests.rs` alone; guard-kit's runner ported to its
+  own `native/src/emit/run_guard_tests.rs`, so both `consumer-guard-*` members re-anchor THERE. A
+  batch worked off the bullet as filed would send two of ten to the wrong file.
+  **TEN, not the seven filed** — the filing sweep missed `unregistered-gate-fixture-coverage`,
+  `guard-rule-number-intra-kit-citations-ungated` and `pre-grammar-disposition-authority-ambiguity`.
+  That undercount is itself evidence for `audit-roster-grammar-and-stored-probe-set` below, whose
+  stored probe set is what bounded the sweep.
+  **Six are cheap re-anchors** — `gate-tests-suite-identity-in-evidence` (locator-only),
+  `bridged-knob-case-tmp-dir-override-inert` (the bullet's proposed targets verified exactly right),
+  `fixture-runner-checks-dir-fails-open` (substance explicitly carried by the port, which names the
+  entry in a `spec:` comment, so it is NOT a Done candidate), both `consumer-guard-*`, and
+  `gate-command-status-conflation-third-caller`, HALF-DISCHARGED: the port captures the real status
+  and then collapses two failure classes into one, so only the message half survives.
+  **Two of the filing bullet's own sub-claims FALL, and a session must not inherit them.** That
+  `bin-argv-shape-residual-member`'s deliverable is "ownerless" is CONTESTED: gate-sdk/SPEC.md's
+  bin/-tool contract has since been generalised past its `*/bin/*.sh` corpus and enumerates its
+  reader instances, so the open question is whether the ported arm becomes another — a reading to
+  escalate, not a fact to build on. And that the verification-lane proposal "points at a file that
+  can no longer take a knob" is refuted by `run_guard_tests.rs`'s own declared `KNOBS`.
+  **Why `[design-pending]`:** one member needs that reading before the batch can be sized whole.
+  **Cost while deferred:** ten entries describe machinery that no longer exists, in the present
+  tense, with every citation resolving — so a session reads a confident mechanism paragraph and
+  builds against a file that is gone. No gate reaches it: the anchors name live modules.
+  Surfaced 2026-09-05 by the `test-harness-cut-seam-sweep` close's capability-pendency sweep;
+  drained here at the 2026-09-06 scope boundary with the count and the target module corrected.
+  →fix refused: ten paragraph rewrites are a build unit, not a drain's inline correction, and one
+  member is unruled. →icebox refused: the trigger is live and dated, and the class grows with the
+  port.
+
+- **audit-roster-grammar-and-stored-probe-set** [design-pending] — `.workflow/audit-roster.txt`
+  declares a four-field line and has become a narrative log, and one of its standing probes is a
+  stored constant where the correct form is a derivation.
+  **Measured 2026-09-06, and the figures had already aged past their filing.** 202,259 bytes across
+  SEVEN data lines, the longest 62,091 bytes carrying 80 em-dash fields, because every sweep appends
+  its whole narrative into the `due:` field. Tracked by git; read by no gate.
+  **Two consequences, both bitten.** Reading one row to judge due-ness costs a full-file read no
+  session can afford; and the `last:` stamp sits at the end of a 62KB line where only a regex finds
+  it. The grammar the header declares has stopped describing the file.
+  **The sharper half is the STORED PROBE SET, and its failure is attested rather than projected.**
+  The capability-pendency row mandates a standing probe over `{checks,bin,lib}`. The 2026-09-05
+  iteration deleted `context-kit/smoke/agents-md.sh`, so the second path components actually deleted
+  were `{bin, smoke}` — and `smoke` is outside the stored set. The mandated form therefore returned
+  a CLEAN verdict on a corpus carrying its three sharpest findings, and only a session that widened
+  the set on its own judgment caught them.
+  **The correction is mechanical and was RUN at this drain, not proposed:** take the second path
+  component of every deleted `.sh` in `git diff --diff-filter=D --name-only <base>..HEAD` and union
+  it into the probe's regex. Against this window it yields `{bin, smoke}` and catches the miss.
+  **ICEBOX-BY-DEFAULT IS OVERRIDDEN ON THIS ENTRY'S OWN STATED WITNESS.** It was filed
+  machinery-class and icebox-eligible "unless the next close finds the roster unreadable again —
+  which is the witness to watch". The witness fired inside the very inbox that carried it: two
+  sibling bullets, both produced by sweeps off this roster, were measured at this drain as
+  under-enumerated — seven against ten, and five against eleven. A default whose own witness has
+  fired is not a default any more.
+  **Why `[design-pending]`:** the format split is a design call — one file per row, or a rotated log
+  beside a short roster — and it decides whether the standing contract stays greppable.
+  **Cost while deferred:** every sweep dispatched off this roster is bounded by a constant nobody
+  re-derives, and returns a clean verdict that reads as coverage. Two such verdicts are already on
+  the record, and both were wrong in the same direction.
+  Surfaced 2026-09-05 by the `test-harness-cut-seam-sweep` close; drained here at the 2026-09-06
+  scope boundary. →fix refused: the format split is unruled and the roster is not scope's surface.
 
 ## Icebox
 
