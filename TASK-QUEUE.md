@@ -15,6 +15,110 @@
 
 ## Technical Debt
 
+- **worktree-lock-pid-is-not-agent-liveness** — a linked worktree's lock reason names the harness
+  PROCESS rather than the agent that created it, so reading that pid for liveness always answers
+  "still in use" and the iteration-boundary refusal looks unclearable.
+  **THE ENVELOPE IS RULED AND IT IS SHAPES ONE AND TWO ONLY — operator, 2026-09-06, through an
+  interactive prompt in the lead session; the lead relayed it and did not rule it.** Shape one:
+  have the boundary refusal name the reap remedy on the branch that actually fires. Shape two:
+  state in delegation-kit's isolation bullet that a lock reason's pid is the harness's and is NOT
+  an agent liveness signal, that bullet being where a session learns to reap both halves.
+  **SHAPE THREE IS OUT OF ENVELOPE and the entry stays open on it** — asserting the reap at the
+  dispatching session's own turn end is not this unit's work, however well the record supports it.
+  A session meeting this entry re-opens neither: one and two are ruled in, three is ruled out.
+  **What shape one actually costs, because "landed" is half true.** `--enter-stage` already names
+  the reap remedy for the ORPHANED class. The classifier routes on captured-pid liveness and the
+  host pid is always alive, so every real case reaches the LIVE branch instead, whose help says
+  "wait for the named pid to return … Do not remove it and do not force it". The tool therefore
+  forbids the correct action. Shape one is finishing that reach, not starting it.
+  **Debt, not a feature: no governed name is added** — a help string, its SPEC section, the
+  delegation-kit template bullet, the existing boundary-refusal fixture, and the docs mirrors.
+  **The pid is the top-level `claude` process's, not the dispatching session's, and it is CONSTANT
+  across the run — THRICE attested rather than argued.** 2026-08-27: three read-only sweeps all
+  carried a pid a different session had recorded hours earlier. 2026-09-05 and 2026-09-06: worktree
+  dispatches from one scope session again carried one identical host-CLI pid, one of them started
+  the previous day, so the pid is constant across an iteration boundary too.
+  **Why it traps a compliant session.** delegation-kit's protocol teaches a session to distrust
+  pattern matching and trust a recorded PID's liveness, so a session meeting a locked worktree does
+  the sanctioned thing, reads a live pid, and concludes it is in use. It is not. The refusal then
+  meets a session with no lawful remedy — the shape that has invited an agent to invent one.
+  **The remedy is cheap and was exercised**: unlock, remove, delete the branch — no force — after
+  verifying the worktree clean and carrying nothing past its base. The lock's pid gates none of it.
+  **The failure direction is a DEADLOCK, not a conservative refusal.** The error-direction argument
+  — a reused pid classifies live, and live refuses rather than authorising a removal — holds only
+  where the captured pid belongs to the holder. Here it belongs to a process alive as long as the
+  entering session is, so "wait for the named pid" returns only when that session exits.
+  **A shape probing the AGENT ID is coupled to another entry, and that is why it is not shape one.**
+  The lock reason carries the id verbatim (`claude agent agent-<id> (pid <n> start <n>)`), but
+  `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` matches it with `[^ ]+` without CAPTURING it and the reader
+  hardcodes group one, so it waits on `ere-matcher-capture-groups-unowned`.
+  **A one-off force-reap over the live-class guidance was operator-ruled at the 2026-09-05 boundary
+  and again at 2026-09-06, both relayed by the lead rather than ruled by it**, each on verified
+  grounds — host-CLI pid, clean tree, HEAD already an ancestor of master, so each reap was lossless.
+  Neither settles the classifier, which is what this entry owns.
+  **DISTINCT from delegation-kit's reap-both-halves rule**, which says WHAT to delete and is silent
+  on how to judge whether deleting is safe.
+  **FOURTH SIGHTING 2026-09-06, and it is the evidence that RANKED the shapes.** The orphan was
+  minted at the prior iteration's SPEC stage and survived align, three build sessions, validate and
+  close without any of six sessions noticing; only the boundary refusal surfaced it. Those five
+  later sessions had no reason to look, and the party who knew what the worktree was for was gone
+  six sessions before the refusal fired — shape three's own argument, made by the record, and
+  recorded here because the shape it argues for is deferred rather than refuted.
+  recurrence: worktree-lock-pid-is-not-agent-liveness 2026-09-05 2026-09-06
+  Filed 2026-08-27 by the lead at scope, promoted 2026-08-27 by close draining the gap inbox.
+  Re-fired 2026-09-05 at the `windows-leg-manifest-cause-read` close's boundary; drained again
+  2026-09-06 at scope from the lead's judged fourth-sighting bullet, which took it to the recurrence
+  threshold. Promoted here 2026-09-06 as a threshold member under the port-first run's
+  product-class ground — the class ruled `lead, own-authority` on the 2026-08-30 discriminator's
+  counterfactual-witness clause, the envelope ruled by the operator as above.
+
+- **kit-spec-provenance-seam-sweep-remainder** — ten kit SPECs still carry this project's ruling
+  provenance, plus the seam gate that can only go green once the last of them is swept.
+  **THIS ITERATION TAKES THE context-kit + guard-kit SLICE ONLY — `lead, own-authority`,
+  2026-09-06, derivable rather than escalated:** TRAJECTORY.md §PRIORITY DIRECTIVE says in terms
+  that scope sizes this unit against the window and MAY SPLIT IT BY KIT, so the split needs no
+  waiver. Those two kits are exactly the surfaces this iteration's port cuts already edit, which is
+  the port-first run's same-surface joining ground with the ceremony already paid.
+  **IT DEMOTES BACK TO `## Deferred` AT CLOSE, never to `## Done`** — the deliverable is a corpus
+  and eight kits plus the gate remain, so the next cut re-promotes with its own amendment
+  (canon-kit/SPEC.md §Merging an amendment). A session meeting this active and unfinished is
+  reading the split working.
+  **THE GATE IS NOT IN THIS SLICE and the sweep ships ungated in the interim.** Enforcement-first
+  wants the sweep and its gate in one unit; the by-kit split defers rather than dissolves that
+  objection, and the gate attaches to the LAST kit's landing because it cannot go green before then.
+  **THE GATE MUST ENCODE ONE SANCTIONED EXEMPTION when it is built**, recorded here because this
+  entry owns the gate: gate-sdk/SPEC.md §The decisions this substrate already closed is carved out
+  (`lead, own-authority 2026-09-05`) — TRAJECTORY.md positively ASSIGNS it that ownership, so its
+  dated stamps are sanctioned rather than in violation, and a gate that does not know this reds on a
+  section the ruling record blesses. The exemption retires only if
+  `provenance-ownership-recording-rule-assigns-into-kit-specs` lands first.
+  **SIZE THIS SLICE BY FIXING THE PREDICATE, NOT BY RE-RUNNING THE SCAN.** Three successive
+  re-measures of the parent missed: 87 sites across 6 SPECs, then 246 lines across 11, then ≈87-92
+  sites over gate-sdk alone. Every one used a `ruled`-near-a-date scan, which matches ordinary prose
+  and misses every stamp spelled without the word — plus an AUTHORITY-ATTRIBUTED-BUT-UNDATED
+  subclass no date-bearing scan reaches. The per-kit rank ordering (context-kit 3, guard-kit 6) is
+  kept ONLY as an ordering and is not a count to build against.
+  **Two things carry from the parent and must not be re-derived.** The predicate is harder than the
+  parent originally sized it — guard-kit's spelling is `operator ruled (<date>, <channel>)` and
+  drift-kit's is a date in a trailing parenthetical, so any fixture pair owes those shapes. And
+  drift-kit and guard-kit are now the SOLE home of two rulings TRAJECTORY.md retired as spent, so
+  the strip must MOVE those grounds rather than delete them — which reaches guard-kit in this slice.
+  **The parent's discriminator and its move-versus-delete test carry here unchanged**: attribution
+  decides the voice, and TRAJECTORY.md's own recording rule decides move versus delete.
+  **THE POINTER CLASS IS THE GATE'S TOO and is answered for EVERY kit SPEC at once or not at all** —
+  `CLAUDE.md §The provenance seam` citations resolve in this tree and in no vendoring consumer's.
+  Measured rather than estimated: 17 across five kit SPECs (gate-sdk 10, guard-kit 4,
+  canon-kit/delegation-kit/lifecycle-kit 1 each). Outside the ruled discriminator, so the gate must
+  encode whichever way it goes; guard-kit's four are reachable in this slice.
+  **Debt, not a feature, for this slice:** stripping provenance prose adds no governed name. The
+  gate is the feature and it is not here.
+  **DISCHARGE CONSEQUENCE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and
+  the gate is green", and the gate is this entry's — so that paragraph survives until THIS entry
+  lands whole, not until this slice does.
+  Filed 2026-09-05 at scope with the gate-sdk-boundary split that created it; its parent slug
+  retired 2026-09-05 with the gate-sdk half landed. Promoted here 2026-09-06 on the operator's
+  2026-09-05 direction, still live and half-discharged, at the by-kit slice the lead sized.
+
 ## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
@@ -8046,57 +8150,6 @@
   Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; attested
   2026-08-27 by the `windows-adopter-unblock` close's own verifying push.
 
-- **worktree-lock-pid-is-not-agent-liveness** [design-pending] — a linked worktree's lock reason
-  names the harness PROCESS rather than the agent that created it, so reading that pid for liveness
-  always answers "still in use" and the iteration-boundary refusal looks unclearable.
-  **The pid is the top-level `claude` process's, not the dispatching session's, and it is CONSTANT
-  across the run — now THRICE attested rather than argued.** 2026-08-27: three read-only sweeps all
-  carried a pid a different session had recorded hours earlier. 2026-09-05 and 2026-09-06: worktree
-  dispatches from one scope session again carried one identical host-CLI pid, one of them started
-  the previous day, so the pid is constant across an iteration boundary too.
-  **Why it traps a compliant session.** delegation-kit's protocol teaches a session to distrust
-  pattern matching and trust a recorded PID's liveness, so a session meeting a locked worktree does
-  the sanctioned thing, reads a live pid, and concludes it is in use. It is not. The refusal then
-  meets a session with no lawful remedy — the shape that has invited an agent to invent one.
-  **The remedy is cheap and was exercised**: unlock, remove, delete the branch — no force — after
-  verifying the worktree clean and carrying nothing past its base. The lock's pid gates none of it.
-  **The failure direction is a DEADLOCK, not a conservative refusal.** The error-direction argument
-  — a reused pid classifies live, and live refuses rather than authorising a removal — holds only
-  where the captured pid belongs to the holder. Here it belongs to a process alive as long as the
-  entering session is, so "wait for the named pid" returns only when that session exits.
-  **The lock reason carries the harness's AGENT ID verbatim beside that pid**
-  (`claude agent agent-<id> (pid <n> start <n>)`), so a shape probing the agent id has a real field
-  to read — but `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` matches that id with `[^ ]+` and does not
-  CAPTURE it, and the reader hardcodes group one, so that shape is coupled to
-  `ere-matcher-capture-groups-unowned`.
-  **A one-off force-reap over the live-class guidance was operator-ruled at the 2026-09-05 boundary
-  and again at 2026-09-06, both relayed by the lead rather than ruled by it**, each on verified
-  grounds — host-CLI pid, clean tree, HEAD already an ancestor of master, so each reap was lossless.
-  Neither settles the classifier, which is what this entry owns.
-  **SHAPE ONE HAS PARTLY LANDED AND DID NOT REPAIR THE DEAD END.** `--enter-stage` now names the
-  reap remedy for the ORPHANED class — but the classifier routes on captured-pid liveness and the
-  host pid is always alive, so the branch that actually fires tells the session to wait for the
-  named pid and adds "Do not remove it and do not force it". The tool forbids the correct action,
-  which is why the refusal-message shape is spent rather than pending.
-  **Why `[design-pending]`:** the two live shapes — state in delegation-kit's isolation bullet that
-  a lock reason's pid is the harness's and not an agent liveness signal, that bullet being where a
-  session learns to reap both halves; or assert the reap at the DISPATCHING session's own turn end
-  rather than at the next boundary, so it lands on the party that knows what the worktree was for.
-  **DISTINCT from delegation-kit's reap-both-halves rule**, which says WHAT to delete and is
-  silent on how to judge whether deleting is safe.
-  **FOURTH SIGHTING 2026-09-06, and it is the evidence that RANKS the two shapes.** The orphan was
-  minted at the prior iteration's SPEC stage and survived align, three build sessions, validate and
-  close without any of six sessions noticing; only the boundary refusal surfaced it. Those five
-  later sessions had no reason to look, and the party who knew what the worktree was for was gone
-  six sessions before the refusal fired — which is shape three's own argument, made by the record.
-  **Cost while deferred:** every boundary crossing behind an orphaned worktree is a session
-  reasoning correctly to a false conclusion against help that forbids the remedy, and the fallback
-  is an operator round trip — now paid twice.
-  recurrence: worktree-lock-pid-is-not-agent-liveness 2026-09-05 2026-09-06
-  Filed 2026-08-27 by the lead at scope, promoted 2026-08-27 by close draining the gap inbox.
-  Re-fired 2026-09-05 at the `windows-leg-manifest-cause-read` close's boundary; drained again
-  2026-09-06 at scope from the lead's judged fourth-sighting bullet.
-
 - **exe-suffix-single-spelling-unenforced** [design-pending] — gate-sdk/SPEC.md §lib/gate.sh
   asserts that `gate_exe_suffix` is the executable suffix's single owner and that no other
   surface in any kit spells the Windows suffix, with no gate behind it, so a second spelling
@@ -9168,56 +9221,6 @@
   and its own reading instead of reading a figure, which is the state the sizing ruling names and
   declines to leave.
   Surfaced 2026-09-03 in the consult that closed the build-window sizing ruling; drained here.
-
-- **kit-spec-provenance-seam-sweep-remainder** [design-pending] — the other half of the
-  gate-sdk-boundary split, and THE HOME OF THE GATE: ten kit SPECs still carrying this project's
-  ruling provenance, plus the seam gate that can only go green once the last of them is swept.
-  **Filed 2026-09-05 at scope with the split that created it** (`lead, own-authority`, under the
-  permission the operator's directive grants), so the remainder has an owner instead of existing
-  only in a scope journal — a split whose second half is unfiled is a dropped unit.
-  **THE ~89 IS UNSOUND AND THIS ENTRY IS UNSIZED — and THE PREDICATE ITSELF IS WHAT KEEPS
-  FAILING, which is the part that decides how to size it next.** Three successive re-measures
-  have now missed: 87 sites across 6 SPECs filed, 246 lines across 11 measured, then ≈87-92
-  sites and ≈300-400 lines measured again over gate-sdk alone. Every one used a `ruled`-near-a-
-  date scan, which matches ordinary prose ("the rule", "reads as a rule") and misses every stamp
-  spelled without the word ("Ratified by the operator"). **So the next session sizes this by
-  FIXING THE PREDICATE, not by running the same scan a fourth time** — the class has at least
-  four spellings plus an AUTHORITY-ATTRIBUTED-BUT-UNDATED subclass no date-bearing scan reaches.
-  The per-kit split (lifecycle-kit 30, delegation-kit 18, queue-kit 16, guard-kit 6, canon-kit 6,
-  doctrine-kit 3, context-kit 3, drift-kit 3, site-kit 2, evidence-kit 2) is kept ONLY as a rank
-  ordering. Ten SPECs and ten docs mirrors, against the parent's one.
-  **The parent's discriminator and its move-versus-delete test carry here unchanged** and are not
-  re-derived: attribution decides the voice, and TRAJECTORY.md:52-55 decides move versus delete.
-  **THE GATE MUST ENCODE ONE SANCTIONED EXEMPTION, and it is recorded HERE because this entry
-  owns the gate.** gate-sdk/SPEC.md §The decisions this substrate already closed is carved out
-  of the parent's sweep (`lead, own-authority 2026-09-05`): TRAJECTORY.md:118-130 positively
-  assigns it that ownership, so its dated stamps are sanctioned rather than in violation. A gate
-  that does not know this goes green in development and reds on a section the ruling record
-  blesses. The exemption retires only if
-  `provenance-ownership-recording-rule-assigns-into-kit-specs` lands first.
-  **THE GATE IS THIS ENTRY'S, AND THAT IS THE WHOLE POINT OF FILING IT.** Enforcement-first wants
-  the sweep and its gate in one unit; the split defers rather than dissolves that objection, so the
-  gate attaches here as the last kit's landing and the parent ships swept-but-ungated in the
-  interim. A session meeting a stripped gate-sdk/SPEC.md and no gate should read that as the split
-  working, not as an omission.
-  **Two things carry from the parent and must not be re-derived.** The predicate is HARDER than the
-  parent entry originally sized it — a naive `ruled`-near-a-date scan misses both the drift-kit and
-  guard-kit sites, whose spellings are `operator ruled (<date>, <channel>)` and a date in a
-  trailing parenthetical — so the fixture pair owes those shapes. And drift-kit and guard-kit are
-  now the SOLE home of two rulings TRAJECTORY.md retired as spent, so the strip must MOVE those
-  grounds rather than delete them.
-  **DISCHARGE CONSEQUENCE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and
-  the gate is green", and the gate is here — so that paragraph survives until THIS entry lands, not
-  until its parent does.
-  **THE POINTER CLASS IS THIS GATE'S TOO, and it is answered for EVERY kit SPEC at once or not at
-  all** — `CLAUDE.md §The provenance seam` citations resolve in this tree and in no vendoring
-  consumer's. Measured at this drain rather than estimated: 17 across five kit SPECs (gate-sdk 10,
-  guard-kit 4, canon-kit/delegation-kit/lifecycle-kit 1 each), correcting a filed "eight, in
-  gate-sdk". Outside the ruled discriminator, so the gate must encode whichever way it goes.
-  **Cost while deferred:** the parent's cost line, at 36 % of its magnitude — ten published kit
-  SPECs and every adopter's vendored copy of them carry private ruling history as mechanism, and
-  pointers a consumer cannot follow. Product-class, and accreting: two new sites landed in one
-  iteration, both from cuts that were not editing provenance.
 
 - **provenance-ownership-recording-rule-assigns-into-kit-specs** [design-pending]
   — TRAJECTORY.md's recording rule does not merely permit the provenance class the seam sweep
