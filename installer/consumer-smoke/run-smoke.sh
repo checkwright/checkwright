@@ -161,19 +161,44 @@ consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
 }
 
 # spec: installer/README.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
-assert_install() {   # $1 = profile, $2 = scratch consumer dir
-    local profile="$1" C="$2" out rc before after LOCK mismatch checked path want got target seam bin list k m line omitted want_omitted n_omitted
+# spec: installer/README.md §The gate binary — the expected battery outcome is a PARAMETER of this
+# shared helper rather than a branch inside it: every covered-platform leg passes the green
+# expectation it asserts today, and the binary-less leg passes the refusal its install actually earns
+assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery expectation: green | unavailable
+    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked path want got target seam bin list k m line omitted want_omitted n_omitted
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }
     say "init: $(grep -m1 '^INIT:' <<<"$out")"
 
     out="$( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh 2>&1 )"; rc=$?
-    if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
-        printf '%s\n' "$out"
-        fail "the battery is not green on the $profile consumer init just made"
-    fi
-    say "battery: $(grep -E 'All [0-9]+ gates passed' <<<"$out")"
+    case "$battery_want" in
+        green)
+            if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
+                printf '%s\n' "$out"
+                fail "the battery is not green on the $profile consumer init just made"
+            fi
+            say "battery: $(grep -E 'All [0-9]+ gates passed' <<<"$out")"
+            ;;
+        # spec: installer/README.md §The gate binary — an install that packed no artifact has nothing
+        # to dispatch to, so the honest post-condition is the front-end's own absent-binary refusal at
+        # exit 2 naming the build remedy, not a green battery over a registry with no live member
+        unavailable)
+            if [[ "$rc" -ne 2 ]] || ! grep -q 'is absent or not executable' <<<"$out" \
+                || ! grep -q 'bash gate-sdk/bin/build-native.sh' <<<"$out"; then
+                printf '%s\n' "$out"
+                fail "the $profile install packed no artifact, so its battery must refuse at exit 2 naming the build remedy — got exit $rc"
+            fi
+            if grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
+                printf '%s\n' "$out"
+                fail "the $profile install packed no artifact, yet its battery reported a pass"
+            fi
+            say "battery: declined — $(grep -m1 'dispatches to the native binary' <<<"$out")"
+            ;;
+        *)
+            fail "assert_install: '$battery_want' is not a battery expectation — the caller names 'green' or 'unavailable'"
+            ;;
+    esac
 
     # spec: installer/README.md §The manifest — the files[] hash is what init's changed-file detection reads, so a manifest that disagrees with the tree it describes would make the non-destructive re-run report on noise
     LOCK="$C/checkwright.lock"
@@ -354,7 +379,7 @@ for profile in "${PROFILES[@]}"; do
     printf '%s\n' "$profile"
     C="$(consumer "$profile")" || fail "could not build a scratch consumer for $profile"
     SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
-    assert_install "$profile" "$C"
+    assert_install "$profile" "$C" green
     assert_value "$profile" "$C"
     [[ "$VALUE_VERDICT" == red ]] && VALUE_RED+=("$profile")
     assert_reversal "$profile" "$C" "$SEED"
@@ -369,7 +394,7 @@ for p in "${VALUE_RED[@]}"; do [[ "$p" != "$PROFILE_DERIVED" ]] && value_below_m
     || fail "only $PROFILE_DERIVED caught the planted prose defect — no profile short of everything delivers value on prose"
 say "value: caught by ${VALUE_RED[*]}, at least one of them below $PROFILE_DERIVED"
 
-# spec: installer/README.md §The consumer smoke — the binary-less leg, which is a named install rather than the shape the loop above used to fall into by accident. The loop packs a real artifact, so nothing there speaks for an adopter whose host the payload carries none for. This leg installs one profile from an artifact-free payload and asserts **disclosure**: every member the install loses is recorded in the consumer's own registry, and the count is non-zero, so the completeness assertion cannot hold vacuously on a payload that dispatches nothing — which is exactly how a cohort passed a per-member reading while emptying a class. It deliberately does not assert that the planted defect goes uncaught: pinning a missing capability as expected behavior would make the hole permanent the moment it closes. Naming a profile here is a scoping choice about which install to run — not the derivation of which profiles catch what that the value claim above refuses to spell
+# spec: installer/README.md §The consumer smoke — the binary-less leg, which is a named install rather than the shape the loop above used to fall into by accident. The loop packs a real artifact, so nothing there speaks for an adopter whose host the payload carries none for. This leg installs one profile from an artifact-free payload and asserts **disclosure**: every member the install loses is recorded in the consumer's own registry, and the count is non-zero, so the completeness assertion cannot hold vacuously on a payload that dispatches nothing — which is exactly how a cohort passed a per-member reading while emptying a class. Since every registered member now dispatches to the binary, that disclosure is total rather than partial, which is why the leg's battery expectation is `unavailable` and not a green run: an install with no live member left has no battery to be green. It deliberately does not assert that the planted defect goes uncaught: pinning a missing capability as expected behavior would make the hole permanent the moment it closes. Naming a profile here is a scoping choice about which install to run — not the derivation of which profiles catch what that the value claim above refuses to spell
 resolves_profile() { local p; for p in "${PROFILES[@]}"; do [[ "$p" == "$1" ]] && return 0; done; return 1; }
 BARE_PROFILE=prose
 resolves_profile "$BARE_PROFILE" \
@@ -392,11 +417,18 @@ shopt -u nullglob
 ENTRY=(bash "$BARE/package/bin/checkwright.sh")
 RUN_PATH="$PATH"
 C="$(consumer binary-less)" || fail "could not build a scratch consumer for the binary-less leg"
-assert_install "$BARE_PROFILE" "$C"
+assert_install "$BARE_PROFILE" "$C" unavailable
 BARE_OMITTED="$INSTALL_OMITTED"
 [[ "$BARE_OMITTED" -gt 0 ]] \
     || fail "the binary-less $BARE_PROFILE install omitted nothing, so the completeness assertion held vacuously — this payload dispatches no member to a binary and the leg proves no disclosure at all"
 say "disclosure: $BARE_OMITTED member(s) lost with the binary, each recorded in the consumer's own registry"
+
+# spec: installer/README.md §doctor — the consequence the omission counts do not carry: an adopter whose registry retains no live member reads the same per-reason lines as one who lost two, so doctor says the battery cannot run here at all. Asserted on this leg because it is the only install in the suite that produces the condition
+out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "doctor exited $rc on the binary-less install"; }
+grep -q 'no gate survives here, so the battery cannot run at all on this platform' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "doctor reported omission counts on an install with no live member and never said the battery cannot run"; }
+say "doctor: names the all-omitted consequence and its remedy"
 
 # spec: installer/README.md §The consumer smoke — the download transport, asserted rather than documented: verify the digest, extract with tar rather than npm, and drive the same post-conditions with node/npm masked, so a latent Node dependency reds here instead of passing on a host that happens to carry Node
 printf 'download arm (%s, node/npm masked)\n' "$PROFILE_DERIVED"
@@ -431,7 +463,7 @@ done
 say "mask: node, npm and npx resolve to failing shims"
 C="$(consumer "download")" || fail "could not build a scratch consumer for the download arm"
 SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
-assert_install "$PROFILE_DERIVED" "$C"
+assert_install "$PROFILE_DERIVED" "$C" green
 assert_reversal "$PROFILE_DERIVED" "$C" "$SEED"
 
 # spec: installer/README.md §The consumer smoke — the toolchain-free arm, and the reason it uses the mask the Node-free arm already proved rather than a knob: the preflight requires cargo and rustc because the smoke builds the binary the payload carries, so every arm above drives doctor and init on a machine that has them and none could observe an install path demanding them. The payload it installs carries that prebuilt artifact, so this arm asserts the pre-compiled path end to end on a host that could not have compiled it. A masked PATH is what a machine with no Rust toolchain actually is, where a knob suppressing a roster member would be a second, test-only audience axis no adopter ever exercises
@@ -465,7 +497,7 @@ if grep -qE '^  (cargo|rustc) ' <<<"$out"; then
     fail "doctor rendered a contributor-audience member to an adopter — such a member is omitted from the consumer verdict, not reported as informational"
 fi
 say "doctor: clean with no Rust toolchain on PATH, and silent about the members that need one"
-assert_install "$PROFILE_DERIVED" "$C"
+assert_install "$PROFILE_DERIVED" "$C" green
 
 # spec: installer/README.md §The consumer smoke — the jq-less arm, and the gap it closes is total: this script's own preflight requires jq, so every arm above runs with it present and nothing in this tree has ever exercised a jq-less install. Masking is per-arm, and per-arm is load-bearing here for a reason the other two masks do not have — this harness reads every manifest assertion with jq itself, so a mask on the harness's own PATH would disarm the assertions rather than the installer. The mask rides the verb's PATH alone. The assertion is the **message**: the exit status was already 2 before the preflight existed, so an arm checking the status alone would have passed against the very defect being fixed
 # spec: installer/README.md §The consumer smoke — the mask is by ABSENCE, not by the failing shim the node and cargo arms use, and the difference is the question each arm asks rather than a style choice. Those arms ask whether the payload ever *reaches* a program, so a shim that fails loudly is exactly right. This arm asks what a machine *without* jq is told, and a shim is a jq that is present: `command -v jq` — the preflight's own predicate — resolves it and the preflight never fires, so a shim-masked arm would drive the verbs straight into the misdiagnosis it exists to catch. The farm is derived from the live PATH rather than from a maintained list of the programs the verbs use, so it cannot drift out of date the way such a list would
@@ -810,7 +842,7 @@ say "the packed payload carries $NATIVE_BIN for $HOST_TARGET with the sidecar th
 ENTRY=(bash "$ARTP/package/bin/checkwright.sh")
 RUN_PATH="$PATH"
 C="$(consumer artifact)" || fail "could not build a scratch consumer for the artifact arm"
-assert_install "$PROFILE_MIN" "$C"
+assert_install "$PROFILE_MIN" "$C" green
 LOCK="$C/checkwright.lock"
 # spec: installer/README.md §The gate binary — target resolution is asserted against what the toolchain says this host is, not against whatever init selected: the two derivations are independent (uname pair versus rustc's own triple) and only comparing them catches a mapping that resolves confidently to the wrong roster line
 [[ "$(jq -r '.artifact.target' "$LOCK")" == "$HOST_TARGET" ]] \

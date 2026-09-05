@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §run-gates — end-to-end lock-in for the runner's *contract* over a
-# hermetic scratch registry: the front-end's argv refusals, the arm's output contract (the exact
-# green phrase, each FAIL tail, the declared-omission line staying off the summary line), the
-# determinism the worker pool owes, and the byte-equality the binary-less dispatch loop owes the arm.
-# spec: gate-sdk/SPEC.md §The port-candidate criteria — the last two are the criterion-6 discharge
-# for the one duplication the port carries: standing comparisons, not proofs taken once.
+# hermetic scratch registry: the argv refusals, the arm's output contract (the exact green phrase,
+# each FAIL tail, the declared-omission line staying off the summary line), the `--only` argv
+# channel and its single-member bound, and the determinism the worker pool owes.
 # Run by run-gate-tests.sh.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
@@ -112,13 +110,38 @@ diff -q "$scratch/par1.txt" "$scratch/par2.txt" >/dev/null \
 diff -q "$scratch/par1.txt" "$scratch/ser.txt" >/dev/null \
     || { echo "FAIL [determinism]: GATE_SDK_JOBS=1 diverged from the default worker count"; diff "$scratch/par1.txt" "$scratch/ser.txt"; fails=$((fails + 1)); }
 
-# ---- the binary-less loop against the arm --------------------------------------
-# spec: gate-sdk/SPEC.md §run-gates — criterion 5's omit-and-declare branch keeps a shell dispatch
-# loop in the front-end; this is the standing comparison that admits the duplication.
-GATE_SDK_VERBOSE=1 GATE_SDK_NATIVE_BIN="$scratch/absent-binary" merged > "$scratch/fallback.txt"
-diff -q "$scratch/par1.txt" "$scratch/fallback.txt" >/dev/null \
-    || { echo "FAIL [fallback-parity]: the binary-less dispatch loop and the arm disagree"; diff "$scratch/par1.txt" "$scratch/fallback.txt"; fails=$((fails + 1)); }
+# ---- the --only argv channel and its single-member bound -----------------------
+# spec: gate-sdk/SPEC.md §run-gates — argv after a `--` separator is forwarded to the selected gate,
+# and only when the selection resolves to exactly one member; two or more is a refusal and never a
+# broadcast, so the bound is asserted as executed behaviour rather than as documented intent.
+{ printf '#!/usr/bin/env bash\n'
+  printf '# graph: couples=cfg dir=one valve=none tier=precommit trigger=*\n'
+  printf 'echo "g_args saw: $*"\n'
+} > "$scratch/g_args.sh"
+chmod +x "$scratch/g_args.sh"
+{ echo g_args; echo g_pass; } > "$scratch/gates.list"
+
+out="$(GATE_SDK_VERBOSE=1 merged --only g_args -- alpha beta)"; rc=$?
+assert_rc  only-argv "$rc" 0
+assert_has only-argv 'g_args saw: alpha beta' "$out"
+assert_has only-argv 'All 1 gates passed.'    "$out"
+
+# the separator with nothing after it still selects one member and forwards an empty vector
+out="$(GATE_SDK_VERBOSE=1 merged --only g_args --)"; rc=$?
+assert_rc  only-argv-empty "$rc" 0
+assert_has only-argv-empty 'g_args saw: ' "$out"
+
+out="$(merged --only g_args g_pass -- alpha)"; rc=$?
+assert_rc  only-argv-broadcast "$rc" 2
+assert_has only-argv-broadcast "run-gates: --only: a '--' separator forwards its arguments to one selected gate, and this selection resolves to 2: g_args g_pass" "$out"
+assert_absent only-argv-broadcast 'g_args saw:' "$out"
+
+# without the separator a selection of two is an ordinary narrower run, args or no args
+out="$(GATE_SDK_VERBOSE=1 merged --only g_args g_pass)"; rc=$?
+assert_rc  only-no-argv "$rc" 0
+assert_has only-no-argv 'g_args saw: ' "$out"
+assert_has only-no-argv 'All 2 gates passed.' "$out"
 
 [[ "$fails" -eq 0 ]] || { echo "run-arm-contract.test: $fails assertion(s) failed"; exit 1; }
-echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four front-end refusals, two default runs and a serial run byte-identical, and the binary-less loop byte-identical to the arm)"
+echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the --only argv channel forwarded on a single-member selection and refused on a two-member one, and two default runs and a serial run byte-identical)"
 exit 0

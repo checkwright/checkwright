@@ -14,6 +14,125 @@ use std::time::Instant;
 // message shapes are the tool's documented surface and the arm is what the front-end exec'd
 const TOOL: &str = "run-gates";
 
+// spec: gate-sdk/SPEC.md §run-gates — the one usage text, the stdout body of a help request and the
+// stderr body of an unrecognized-option refusal, per §The bin/-tool contract. It lives beside the
+// arm table it describes, because it grows by a paragraph per bridged arm.
+pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run every registered gate
+       run-gates.sh --only <name> [<name>...]  run only the named registered gates
+       run-gates.sh --only <name> -- <arg>...  run one named gate, forwarding <arg>...
+       run-gates.sh --for <path> [<path>...]   run only gates coupling to those paths
+       run-gates.sh --emit <arm> [args...]     dispatch a ported non-gate emitter arm
+       run-gates.sh --hook <member>            dispatch a harness hook member, payload on stdin
+       run-gates.sh --statusline               render the harness status line, payload on stdin
+       run-gates.sh --usage-poll               refresh the usage snapshot from its source
+       run-gates.sh --usage-verdict [paths]    budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
+       run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
+       run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
+       run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
+       run-gates.sh --install-hooks            wire this clone's core.hooksPath (per-clone opt-in)
+       run-gates.sh --enter-stage <stage>      stamp a stage entry (or --rename an iteration)
+       run-gates.sh --wait-probe <sub> [args]  the wait-primitive probe: 'sweep' is the reproducer
+       run-gates.sh --run-validate             run the codified validate spine over the roster
+       run-gates.sh --diff-baseline <group>... diff captured logs against the baseline slice
+       run-gates.sh -h | --help                this text, on stdout, exit 0
+
+  --only  runs the named members in registry order whatever order they were
+          typed; duplicates collapse, and an unregistered name is a refusal.
+          The [gates-dir] positional is unavailable in this form — point
+          GATE_SDK_GATES_DIR at another registry instead. A `--` separator ends
+          the name list and forwards every remaining argument to the selected
+          gate, which requires the selection to resolve to exactly one member:
+          two or more with a `--` is a refusal, never a broadcast.
+  --for   selects by coupling: every gate whose effective trigger matches one
+          of the given repo-relative paths, exactly as the generated hook
+          would. A path no gate couples to is a note, not a failure.
+  --emit  dispatches the named non-gate arm of the native binary, handing it
+          every remaining argument.
+  --hook  dispatches the named harness hook member: the harness payload passes
+          through on stdin, the hook-JSON envelope (where the member emits one)
+          comes back on stdout, and the exit status is the harness's own
+          allow/block signal. Where the binary is absent or its configuration
+          cannot be resolved, this arm declines with a diagnostic on stderr and
+          exit 0 rather than blocking every guarded tool call.
+  --statusline  renders the status line for the harness's statusLine hook and
+          rewrites the usage snapshot; declines like --hook when unavailable.
+  --usage-poll  runs one poll cycle against the usage source and rewrites the
+          snapshot. Its caller is a refresh command or a session rather than a
+          gate on a tool call, so it refuses with exit 2 when unavailable.
+  --usage-verdict  emits one budget verdict line on stdout from the usage
+          snapshot: exit 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable
+          (budget-unknown, which never blocks delegation). Two optional
+          positionals override the snapshot and credentials paths for test
+          injection; a path beginning with a dash is passed after `--`.
+          Unavailable is exit 2, the same code an unreadable snapshot takes.
+  --lesson-sink  reads a lesson body on stdin and runs the sink configured for
+          <tag>, or appends to <workflow-dir>/<tag>-harvest.md when none is.
+          The sink's exit status is this arm's, so a failing sink is visible to
+          the close step that ran it; unavailable is exit 2 for the same reason.
+  --upgrade-smoke  vendors every kit at GATE_SDK_UPGRADE_FROM into a scratch
+          consumer, swaps them wholesale to GATE_SDK_UPGRADE_TO and asserts the
+          sync is deterministic and the phase-B red set is declared. Takes no
+          argument. Exit 0 clean with one UPGRADE-SMOKE line on stdout, 1 an
+          upgrade finding, 2 a broken tag or environment; unavailable is 2.
+  --install-lifecycle  writes the lifecycle registration block into the
+          always-loaded agent file, the iteration-scoped merge attributes into
+          .gitattributes, and the keep-ours merge driver into this clone's git
+          config. The optional positional is the agent file to write into,
+          overriding LIFECYCLE_KIT_AGENT_FILE. Idempotent; exit 2 when the agent
+          file is absent or a marker pair is malformed, and unavailable is 2.
+  --install-hooks  points this clone's core.hooksPath at the generated hooks dir,
+          sets blame.ignoreRevsFile where that file exists, makes the hooks
+          executable and runs check-identity once so a fresh clone learns of a
+          wrong-identity mapping before its first commit. The gate is resolved
+          through the registry, so a consumer shadow still wins; a consumer
+          without it is skipped. Takes no argument. Exit 0 wired and verified,
+          1 the identity gate's own finding, 2 no hooks dir or an
+          uninterpretable manifest; unavailable is 2.
+  --enter-stage  appends the invocation stamp that IS a stage transition, after
+          running the entry pre-flight; `--simulate` runs everything up to the
+          write and writes nothing, and `--rename <name>` renames the iteration
+          across the queue header and column 1 of every stamp. Exit 0 a stamp or
+          a reported no-op, 1 a refusal, 2 a usage or configuration error;
+          unavailable is 2, because the caller is a stage session's first step
+          whose failure must be visible and a silent 0 would let a session
+          believe it had stamped.
+  --wait-probe  stands known-duration producers up and measures candidate wait
+          forms against them, one trial line per run. The subcommand is an
+          operand: produce, waiter, arm-local, record, report, sweep — the
+          roster prints on stderr at exit 2 on misuse. Exit 0 on a completed
+          subcommand, 1 for `report` with no trials recorded, 2 on misuse;
+          unavailable is 2. Hand-invoked, wired into no tier, and `sweep`
+          sleeps for its declared durations.
+  --run-validate  claims the producer-liveness lock, then runs each configured
+          suite foreground, parses it, diffs the baseline slice per-scenario and
+          folds one evidence line per suite into the tracked manifest after the
+          whole roster has run. Takes no argument: the whole input is the
+          bridged EVIDENCE_KIT_* environment. Exit 0 every suite clean, 1 a
+          suite recorded new-failures, 2 the run could not start (no suites, no
+          run key, absent manifest, a held or unclaimable lock, a missing suite
+          command, a failing pre-hook, a parser producing no result is 1);
+          unavailable is 2, because a caller that read a silent 0 would believe
+          a run it never got had passed.
+  --diff-baseline  parses each captured log named on argv and diffs it against
+          the baseline's suite slice per-scenario, printing `new-failure` and
+          `recovery` findings. Each argument group is `<suite> <logfile>
+          [<status>]`, repeated; an `exit-code` suite must carry its status or
+          the tool refuses rather than assuming success. A positional beginning
+          with a dash is a refusal, and `--` ends option processing. Exit 0
+          clean, 1 new failures against the baseline, 2 misuse or an unreadable
+          log; unavailable is 2, its one functional caller being a CI leg that
+          reads nothing but the status.
+  --      ends option processing, so a gates-dir spelled with a leading dash
+          is still reachable.
+
+The battery itself is the binary's `--run` arm; run-gates.sh resolves its
+bridged environment and execs it.
+
+GATE_SDK_VERBOSE (any non-empty value) restores the per-gate banner roll the
+quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
+(default: the machine's parallelism; 1 restores a serial run). Per-gate timings
+land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
+
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own bridged reads, plus the union sentinel:
 // `--knobs --run` prints these with every registry member's added, expanded in `emit::knobs`. The
 // sentinel is what expresses the dispatch union per member rather than per `Arm` variant.
@@ -25,8 +144,9 @@ pub const KNOBS: &[&str] = &[
     crate::emit::EVERY_REGISTERED_KNOB,
 ];
 
-// spec: gate-sdk/SPEC.md §run-gates — one selected member: the name, and the staged-mode positional
-// arguments `--for` hands it (empty for every member under `--only` and under a bare run)
+// spec: gate-sdk/SPEC.md §run-gates — one selected member: the name, and the positional arguments
+// the selection hands it — `--for`'s matching paths under a staged-mode member, and the argv after
+// `--only`'s `--` separator under a single-member selection. Empty under a bare run.
 struct Selected {
     name: String,
     args: Vec<String>,
@@ -41,40 +161,109 @@ struct Outcome {
     ms: u128,
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — the front-end's parsed selection, the one argv contract
-// between the two halves; the user-facing grammar is the front-end's and is unchanged by it
+// spec: gate-sdk/SPEC.md §run-gates — the whole user-facing argument grammar, which is this arm's
+// after the front-end cut: the front-end resolves the gates dir and execs, and every other form
+// lands here, beside the arm table and the usage text.
 struct Args {
     gates_dir: Option<String>,
     only: Vec<String>,
     paths: Vec<String>,
+    // spec: gate-sdk/SPEC.md §run-gates — `Some` exactly when a `--` separator followed `--only`,
+    // which is what makes an empty forwarded vector distinguishable from no channel at all: the
+    // separator is the caller's assertion that one gate is selected, and it is checked as one.
+    only_args: Option<Vec<String>>,
+    help: bool,
 }
 
-fn parse(args: &[String]) -> Result<Args, String> {
+// spec: gate-sdk/SPEC.md §run-gates — a refusal decidable from argv alone, and whether the usage
+// text is its body: an unrecognized option prints it (§The bin/-tool contract), an arity or shape
+// refusal names the argument instead, because a usage dump is not an answer to a well-formed flag.
+struct Refusal {
+    message: String,
+    usage: bool,
+}
+
+fn plain(message: &str) -> Refusal {
+    Refusal {
+        message: message.to_string(),
+        usage: false,
+    }
+}
+
+fn unrecognized(option: &str) -> Refusal {
+    Refusal {
+        message: format!("unrecognized option: {}", option),
+        usage: true,
+    }
+}
+
+fn parse(args: &[String]) -> Result<Args, Refusal> {
     let mut out = Args {
         gates_dir: None,
         only: Vec::new(),
         paths: Vec::new(),
+        only_args: None,
+        help: false,
     };
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
+            "-h" | "--help" => {
+                out.help = true;
+                return Ok(out);
+            }
             "--gates-dir" => {
                 i += 1;
                 match args.get(i) {
                     Some(d) => out.gates_dir = Some(d.clone()),
-                    None => return Err("--gates-dir needs a directory".to_string()),
+                    None => return Err(plain("--gates-dir needs a directory")),
                 }
                 i += 1;
             }
+            // spec: gate-sdk/SPEC.md §run-gates — the emitter front-end's arity refusal, kept at its
+            // own message rather than collapsed into the unrecognized-option one: `--emit` is a
+            // recognized flag missing its operand, and the two are different mistakes
+            "--emit" => return Err(plain("--emit needs an arm name")),
             "--only" => {
-                out.only = args[i + 1..].to_vec();
-                break;
+                let mut j = i + 1;
+                while j < args.len() && args[j] != "--" {
+                    // spec: gate-sdk/SPEC.md §run-gates — a name beginning with '-' is an
+                    // unrecognized option wherever it stands, so `--only --for` refuses at the name
+                    // instead of taking it for a gate and reporting it unregistered
+                    if args[j].starts_with('-') {
+                        return Err(unrecognized(&args[j]));
+                    }
+                    out.only.push(args[j].clone());
+                    j += 1;
+                }
+                if out.only.is_empty() {
+                    return Err(plain("--only needs at least one gate name"));
+                }
+                if j < args.len() {
+                    out.only_args = Some(args[j + 1..].to_vec());
+                }
+                return Ok(out);
             }
             "--for" => {
                 out.paths = args[i + 1..].to_vec();
-                break;
+                if out.paths.is_empty() {
+                    return Err(plain("--for needs at least one path"));
+                }
+                return Ok(out);
             }
-            other => return Err(format!("unrecognized argument: {}", other)),
+            // spec: gate-sdk/SPEC.md §run-gates — `--` ends option processing, so a gates-dir
+            // legitimately spelled with a leading dash stays reachable
+            "--" => {
+                if let Some(d) = args.get(i + 1) {
+                    out.gates_dir = Some(d.clone());
+                }
+                return Ok(out);
+            }
+            other if other.starts_with('-') => return Err(unrecognized(other)),
+            other => {
+                out.gates_dir = Some(other.to_string());
+                return Ok(out);
+            }
         }
     }
     Ok(out)
@@ -201,19 +390,43 @@ fn select_for(
 // spec: gate-sdk/SPEC.md §run-gates — `--only` selection: set-shaped and registry-ordered, so two
 // names give one transcript whichever way they were typed; an unregistered name is a refusal
 // because a name is a claim about the registry, never a fact about the tree
-fn select_only(members: &[String], list: &str, only: &[String]) -> Result<Vec<Selected>, i32> {
+fn select_only(
+    members: &[String],
+    list: &str,
+    only: &[String],
+    forwarded: Option<&[String]>,
+) -> Result<Vec<Selected>, i32> {
     for n in only {
         if !members.iter().any(|m| m == n) {
             eprintln!("{}: --only: '{}' is not registered in {}", TOOL, n, list);
             return Err(2);
         }
     }
-    Ok(members
+    let picked: Vec<&String> = members
         .iter()
         .filter(|m| only.iter().any(|n| n == *m))
+        .collect();
+    // spec: gate-sdk/SPEC.md §run-gates — the `--` channel is single-member-or-refuse, and the check
+    // sits here rather than in the parser because only the registry resolves the cardinality the
+    // bound is about.
+    if forwarded.is_some() && picked.len() != 1 {
+        eprintln!(
+            "{}: --only: a '--' separator forwards its arguments to one selected gate, and this selection resolves to {}: {}",
+            TOOL,
+            picked.len(),
+            picked.iter().map(|m| m.as_str()).collect::<Vec<_>>().join(" ")
+        );
+        eprintln!(
+            "  help: name exactly one registered gate before the '--'; broadcasting one argument vector across a selection is refused, not narrowed"
+        );
+        return Err(2);
+    }
+    let args = forwarded.unwrap_or(&[]);
+    Ok(picked
+        .into_iter()
         .map(|m| Selected {
             name: m.clone(),
-            args: Vec::new(),
+            args: args.to_vec(),
         })
         .collect())
 }
@@ -395,10 +608,20 @@ pub fn run(args: &[String]) -> i32 {
     let parsed = match parse(args) {
         Ok(p) => p,
         Err(e) => {
-            eprintln!("{}: {}", TOOL, e);
+            eprintln!("{}: {}", TOOL, e.message);
+            if e.usage {
+                eprintln!("{}", USAGE);
+            }
             return 2;
         }
     };
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — a help request is the usage text on stdout at
+    // exit 0, and it is answered before any knob is read: the text describes the arm roster, which is
+    // a property of the binary rather than of the tree it was pointed at
+    if parsed.help {
+        println!("{}", USAGE);
+        return 0;
+    }
     let knob = |n: &str| walk::knob_scalar(n);
     let configured_dir = match knob("GATE_SDK_GATES_DIR") {
         Ok(v) => v,
@@ -440,7 +663,7 @@ pub fn run(args: &[String]) -> i32 {
     let resolve_dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
 
     let selected: Vec<Selected> = if !parsed.only.is_empty() {
-        match select_only(&members, &list, &parsed.only) {
+        match select_only(&members, &list, &parsed.only, parsed.only_args.as_deref()) {
             Ok(s) => s,
             Err(c) => return c,
         }

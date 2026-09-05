@@ -478,9 +478,14 @@ platform that step runs on today, and today it is not. §The gate binary's
 selection table has three outcomes and two of them leave `init` with no binary —
 a host whose triple the payload's roster does not carry
 (`substrate-unavailable`), and a host with no SHA-256 hasher
-(`digest-unverifiable`). Both **proceed** today, omitting the compiled gates and
-declaring the omission in the consumer's `gates.list`, and that branch is what
-keeps a freshly vendored battery alive on an uncovered platform. Once
+(`digest-unverifiable`). Both **proceed**, omitting the compiled gates and
+declaring the omission in the consumer's `gates.list`. That branch does not keep a
+battery alive on an uncovered platform: every registered member dispatches to the
+binary, so an artifact-less install retains no live member and its battery
+refuses. What the branch delivers is the
+**install and its disclosure**: the vendored kits, the manifest and every seeded
+surface land, every lost member is recorded, and `doctor` says the battery cannot
+run here at all (§doctor). Once
 conditional install logic sits behind the invoke, the same branch has nothing to
 run at all: the failure mode the relocation introduces is **not a smaller
 battery but no install**, and nothing in tree asserts that a relocated step
@@ -616,6 +621,15 @@ because there are two remedies:
   is no adopter action; the platform is not in the support roster.
 - `digest-unverifiable` — an artifact exists but no hasher does. Install
   `sha256sum` or `shasum` and re-run `init`.
+
+**Where every member is omitted, the count is not the whole story and `doctor`
+says the rest.** The per-reason counts read identically whether an install lost
+two members or all of them, and the second is the case where an adopter's battery
+cannot run at all. So `doctor` emits one further line exactly when no live member
+survives, naming that consequence and its remedy — a line `init` deliberately does
+not turn into a refusal: refusing there would cost an uncovered platform the
+vendored kits, the manifest and every seeded surface along with the battery, which
+is a worse install than an honest one that declares what it lost.
 
 A third token would need a third remedy to earn its place, and one was
 **proposed and refused on exactly that rule**: splitting `substrate-unavailable`
@@ -1307,7 +1321,15 @@ discharged a cohort that left such a consumer with no markdown-link governance a
 all (gate-sdk/SPEC.md §The port-candidate criteria, criterion 5). The leg
 deliberately does **not** assert that the planted defect goes uncaught: pinning a
 missing capability as expected behavior would make the hole permanent the moment
-it closes. It names a profile where the value claim above names none, and the
+it closes. **The battery expectation it passes is `unavailable` rather than
+green**, and that is the whole re-scope: with every registered member dispatching
+to the binary, this install retains no live member, so the honest post-condition
+is the front-end's absent-binary refusal at exit 2 naming the build remedy, plus
+`doctor`'s all-omitted line. The expectation is a **parameter** of the shared
+install assertion rather than a branch inside it — every covered-platform leg
+passes the green expectation it asserts today — because a helper that inferred
+which outcome to expect from some property of the install is how a leg silently
+stops asserting. It names a profile where the value claim above names none, and the
 difference is real — this is a scoping choice about which install to run, not a
 derivation of which profiles catch what. The profile it names is the one whose
 roster criterion the binary-gated class empties.

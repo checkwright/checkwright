@@ -1004,10 +1004,10 @@ exists and could not be built. **So a caller captures `gate_command`'s status �
 a command substitution, never a process substitution** — and branches on it:
 status 1 is the resolves-in-no-check-dir refusal it may name itself, and any
 other non-zero status is a failure `gate_command` has already named on stderr and
-is propagated without a second, contradicting sentence. Both in-tree dispatchers
-take that shape (`gate-sdk/bin/run-gates.sh`, and this repo's front end
-`scripts/gate-exec.sh`, whose obligation evidence-kit/SPEC.md
-§check-evidence-manifest owns).
+is propagated without a second, contradicting sentence. This repo's front end
+`scripts/gate-exec.sh` takes that shape, and its obligation is
+evidence-kit/SPEC.md §check-evidence-manifest's. `gate-sdk/bin/run-gates.sh` took
+it too until the stub cut left it calling no `gate_command` at all (§run-gates).
 
 **The wrapper contract: a member whose rule *is* an external program refuses with
 its own message, at the shell form's own point in the order.** Criterion 7's
@@ -3484,8 +3484,20 @@ that answers each is the one whose corpus matches its question.
    roster carries an artifact for resolves, verifies and runs the ported member.
    The criterion is satisfied **per target, not globally** — one declared triple has
    a published artifact today, and a host with none is omitted-and-declared rather
-   than dispatched into an absent binary, which is the branch that keeps a freshly
-   vendored battery alive on an uncovered platform.
+   than dispatched into an absent binary.
+
+   **What that branch governs is what an uncovered host is *told*, rather than
+   whether its battery still runs.** Every registered member dispatches to the
+   binary, so an artifact-less install retains no live member and its battery
+   refuses; the front-end's shell dispatch loop, which kept such a battery green
+   while any member still resolved to a `.sh` script, is deleted with the branch it
+   served (§run-gates), and the installer's binary-less leg asserts the refusal
+   such an install earns and the disclosure that makes it legible.
+   **The criterion is not retired by losing its instance**: it
+   still binds every omission to a record in the consumer's own registry, and it
+   now also binds `doctor` to say, when nothing survives, that the battery cannot
+   run here at all — which is the honest form of "stays runnable" on a host where
+   it does not.
 
    **That branch bounds what the *installer* may relocate, not only whether a
    ported gate stays runnable.** Both no-binary outcomes leave `init` with nothing
@@ -3817,11 +3829,15 @@ that answers each is the one whose corpus matches its question.
    which is the *unless* clause exactly. The discharge is the same standing
    comparison: one canned corpus of glob/path pairs fed to `gate_staged_matches`
    and to the crate matcher, verdicts compared byte for byte, run in the owning
-   kit's fixture lane. **A second pair rides the same lane for the same reason** —
-   the front-end's binary-less dispatch loop against the arm (§run-gates), one
-   hermetic registry, both transcripts required byte-identical. Read together with
-   `lib/queue.sh` above, the pair says the road is available to a duplication a
-   port *creates*, not only to one it finds.
+   kit's fixture lane. **A second pair rode the same lane for the same reason
+   until its subject retired** — the front-end's binary-less dispatch loop against
+   the arm, one hermetic registry, both transcripts required byte-identical. The
+   stub cut deleted the loop, so the comparison went with it (§run-gates), and the
+   pair is recorded because the road it demonstrates outlives either instance: read
+   together with `lib/queue.sh` above, it says the road is available to a
+   duplication a port *creates*, not only to one it finds — and that a discharge
+   ends when its duplication does, rather than being kept as a comparison with one
+   side left.
 
    **`ek_pid_alive` and `ek_lock_read` are the third instance, and they carry the
    correction a reader most needs: the *unless* clause binds on a helper **set**,
@@ -4739,6 +4755,16 @@ already holds to the tree. Without the rule the section count scales with the
 tail — roughly one section per batch across the remaining singletons — and the
 fixed per-iteration ceremony the arm exists to amortize gets paid a second time,
 in prose, on the one surface a porting session must read end to end.
+
+**The first finding the arm recorded, kept generic like the arm itself: where a
+front end's argument grammar and a binary's arm table must agree, the alias
+belongs in the file holding the table.** That is the only place the config-bridge
+door and the dispatch door cannot drift apart, because one normalization above
+both is a property a second table can only imitate by hand. The worked instance
+is §run-gates' stub cut, which is where the reasoning and its two refused
+alternatives live; recorded here because the *selection* consequence is the
+arm's — a front end that grows by a branch per bridged arm is a member the budget
+arm should order early, and the finding is what tells a later selector why.
 
 **The arm names no remainder, which is what keeps it kit content.** It is stated
 generically — no gate names, no member roster, no count of any tree's remaining
@@ -9081,13 +9107,24 @@ nowhere is a failure, not a skip. Exit 0 only when every member passed.
 **The runner is two halves, and which half owns what is the first thing to know
 here.** The **arm** is `--run`, a bridged non-gate arm of the binary (§The
 non-gate arm): it owns the registry walk, both selectors, the dispatch, the
-worker pool, the timings, the omission accounting and the output contract.
-`bin/run-gates.sh` is the **front-end**: it resolves the repo root, sources
-`lib/gate.sh`, parses argv, resolves the arm's bridged environment in **one**
-`gate_knob_env` call, and `exec`s the binary — the shape `--emit` already had,
-which is the precedent the runner's own arm is built on. Everything the argument
-grammar below specifies is the front-end's; everything the output contract
-specifies is the arm's.
+worker pool, the timings, the omission accounting, the output contract, **the
+usage text, and the argument grammar below with every refusal decidable from
+it**. `bin/run-gates.sh` is the **front-end**, and after the stub cut it is a
+residue: it resolves the repo root, sources `lib/gate.sh`, resolves the
+**gates-dir positional**, makes **one** `gate_knob_env` call, and `exec`s the
+binary — the shape `--emit` already had, which is the precedent the runner's own
+arm is built on.
+
+**The positional is the whole of what the front-end still knows about argv, and
+the reason is a genuine ambiguity rather than an unfinished cut.** The binary is
+dispatched as `checkwright-gates <gate-name>` by its own battery and by every
+`.gate` member, so a bare leading token that names a gate cannot also mean a
+gates dir at that door; only the front-end, which is never invoked to run one
+member, can read it unambiguously. So the front-end resolves it and spells it
+`--gates-dir`, which is also what scopes the arm's declared-knob union to that
+registry — and a form that runs no member, `-h` and `--help`, deliberately
+carries none, since a help request that resolved every member's knobs would fail
+wherever any one of them could not be resolved.
 
 **The front-end requires a checkout and the arm does not, which decides who may
 call what.** Resolving the repo root is the front-end's first act and it refuses
@@ -9098,38 +9135,76 @@ invocation rather than as a boundary. Such a caller reaches the binary through
 `gate_native_bin`, the same binary-level path a substrate-parity harness takes
 (§check-gate-substrate-parity).
 
-**The front-end keeps a shell dispatch loop for one branch, and the branch is
-criterion 5's.** A host the payload carries no verified artifact for is an
-*omit-and-declare* install (installer/README.md §The gate binary): its
-`gates.list` records the lost members as comments and keeps its shell ones, and
-its battery has to stay green — an asserted contract, exercised by the
-installer's binary-less leg. So where `GATE_SDK_NATIVE_BIN` names nothing
-executable the front-end dispatches the registry itself, and where it names a
-binary — every covered platform — the arm does. This is the one duplication the
-port carries, it is admitted on criterion 6's *unless* clause, and it is held by
-an **executed comparison** rather than by care: the two dispatchers' transcripts
-over one hermetic registry are required byte-identical, banners, tails, omission
-line and summary alike (§run-gate-tests). `--emit` has no such fallback and
-refuses when the binary is absent, because an emitter has no shell half left to
-run.
+**The front-end kept a shell dispatch loop for one branch until the stub cut, and
+the admission is preserved as closed history rather than deleted.** A host the
+payload carries no verified artifact for is an *omit-and-declare* install
+(installer/README.md §The gate binary), and while any member still resolved to a
+`.sh` script that install's battery could stay green, so where
+`GATE_SDK_NATIVE_BIN` named nothing executable the front-end dispatched the
+registry itself. That was the one duplication the port carried, admitted on
+criterion 6's *unless* clause and held by an **executed comparison** rather than
+by care: the two dispatchers' transcripts over one hermetic registry were
+required byte-identical, banners, tails, omission line and summary alike. **The
+discipline outlived the duplication and is why it is recorded**: a second holder
+of a contract is admitted only against a standing comparison, never against
+care, and a later reader asking why an arm and a shell dispatcher were ever
+required byte-identical needs that answer rather than a silence. `--emit` never
+had the fallback and refused when the binary was absent, because an emitter had
+no shell half left to run; the whole front-end now behaves that way.
 
-**The front-end's port disposition: it ports down to a stub, and the loop above
-retires with the cut.** The loop's only served branch, the omit-and-declare
-install, dispatches nothing once no `.sh` member is registered — an artifact-less
-host then seeds an empty registry, which `run-gates` refuses rather than passes
-vacuously — so the duplication criterion 6 admitted has no branch left to serve
-and is deleted, not ported; the installer's binary-less leg re-scopes at the same
-cut to assert the declared omission and, where nothing survives, say so. The
-per-arm dispatch branches, which grow the file by one per bridged arm, move into
-the binary's own argv parsing. What remains is the residue this section already
-names: resolve the repo root, make the one `gate_knob_env` call that is the config
+**The front-end's port disposition is landed: it is the stub, and the loop
+retired with the cut.** The loop's only served branch dispatched nothing once no
+`.sh` member was registered — an artifact-less host seeds a registry with no live
+member, which the arm refuses rather than passing vacuously — so the duplication
+criterion 6 admitted had no branch left to serve and was deleted, not ported. The
+installer's binary-less leg re-scoped at the same cut, from asserting a green
+battery to asserting the declared omission and the refusal an install with
+nothing left to dispatch actually earns. The per-arm dispatch branches, which grew
+the file by one per bridged arm, moved into the binary's own argv parsing. What
+remains is the residue this section names: resolve the repo root, resolve the
+gates-dir positional, make the one `gate_knob_env` call that is the config
 bridge's bash producer (§lib/gate.sh, §The config-seam port disposition), and
-`exec` the binary with argv verbatim. That stub declares `# no-port:` on the
-config-seam cause `lib/gate.sh` itself carries — an existing cause, never a new
-class — and it is the whole of what stays shell on the hook-to-binary path. Two
-readings are refused: porting the file whole with the loop inside, which keeps a
-duplication serving no branch; and declaring the whole file, a subtraction that
-grows with every arm.
+`exec` the binary. That stub declares `# no-port:` on the config-seam cause
+`lib/gate.sh` itself carries — an existing cause, never a new class — and it is
+the whole of what stays shell on the hook-to-binary path. Two readings were
+refused: porting the file whole with the loop inside, which keeps a duplication
+serving no branch; and declaring the whole file, a subtraction that grows with
+every arm.
+
+**The residual argv grammar: the crate's parser takes the front-end's spelling as
+one normalization step, and the fused arm names stay the arm table's one
+spelling.** `--emit <name>` normalizes to `--emit-<name>`; a token that already
+names an arm, a gate or a top-level flag passes untouched; and every other
+leading-dash token is the battery's own grammar, so it reaches the `--run` arm
+that owns the selectors, the help request and every argv-decidable refusal. The
+step runs **above both doors** and recurses through `--knobs`, so the config
+bridge and the dispatch read one normalized arm name and cannot disagree — the
+property the shell front-end could hold only by hand. **Two alternatives are
+refused.** A second, parallel arm table keyed on the front-end spelling is a
+second source: `--emit-<name>` is what `.gate` dispatch and every hermetic
+`gate_native_bin` caller already use (§check-gate-substrate-parity), and a table
+edited twice per arm is the per-arm growth this cut deleted, relocated rather
+than removed. Leaving the composition in the front-end is refused because it is
+the whole of what grew — seventeen `case` arms existed to compose seventeen arm
+names. **One asymmetry is admitted rather than hidden**: the crate now accepts
+`--emit graph` and `--emit-graph` as the same arm, and an alias is a cost. It is
+taken because the front-end spelling is what every human caller, workflow file
+and settings grant in every consumer tree already types, and because the alias
+lives in one function beside the table rather than in a second tree.
+
+**The stub keeps one piece of per-arm knowledge, and it is exactly the one that
+cannot be asked of an absent binary.** `ARM_UNAVAILABLE_STATUS` is read on
+precisely the path where the binary is absent or not executable — the branch that
+prints the build remedy naming `bash gate-sdk/bin/build-native.sh` — so a property
+the binary would have to be running to report is unavailable exactly when it is
+needed. The stub holds it as a two-name test on the leading token, `--hook` and
+`--statusline` taking the fail-open `0`, not as a seventeen-arm table. **It is a
+second source and this section says so rather than claiming otherwise**: each
+arm's contract prose states its own unavailable status and nothing holds the two
+halves in lockstep. What bounds the exposure is that the shell half is two names
+and a default, so it grows only when a new fail-open arm is minted; the honest
+closure is a parity assertion over the fail-open set, which the cut did not build
+and filed rather than flagged.
 
 **The split exists to delete a per-member bash bridge, and the arithmetic is why
 it was worth a port.** The front-end resolves the declared-knob union once for
@@ -9345,13 +9420,12 @@ into the argv value and stderr apart from it.
 **The arm is not one of those callers, and keeps no capture file under the tmp
 dir.** It builds argv **as data** and never parses a stream into it, so the
 failure class is structurally absent there, and the runner's shared
-dispatch-stderr file is retired with the branch that read it. The front-end's
-binary-less loop still *is* a caller and still splits the two streams, into a
-scratch file of its own that nothing outside that loop reads. The rule stays here
-for every surviving caller — that loop, the hook generator, the fixture runner,
-the hook installer, the consumer smoke, the hermetic-test library, the
-stage-entry step and the exec shim among them — each of which parses
-`gate_command`'s stdout as argv and must hold the two streams apart.
+dispatch-stderr file retired with the branch that read it. The front-end is no
+longer a caller either: the stub resolves one bridged environment and execs, and
+parses no argv out of a stream at all. The rule stays here for every surviving
+caller — the hook generator, the fixture runner, the hook installer, the consumer
+smoke, the hermetic-test library and the stage-entry step among them — each of
+which parses `gate_command`'s stdout as argv and must hold the two streams apart.
 
 The failure this closes was neither theoretical nor a race: a helper that
 abandoned a pipe producer mid-write emitted a broken-pipe diagnostic on **every**
@@ -9366,11 +9440,10 @@ signal environment (`trap '' PIPE`), which is what makes the
 `lib-gate.test.sh` arm deterministic instead of environmental.
 
 `run-gates.sh --hook <member>` dispatches a **harness-integration arm** (§The
-non-gate arm), and it is the front-end's one branch whose caller is not this
-project's. The member name is an **operand** here and the **whole flag** in the
-crate — unlike `--emit <name>`, which the front-end composes into `--emit-<name>`
-— because composing `--hook-<member>` would be one arm per member, the refused
-shape, reached by the front-end's grammar instead of by the crate's. There is no
+non-gate arm), and it is the one branch whose caller is not this project's. The
+member name is an **operand** in both halves — unlike `--emit <name>`, which the
+crate's normalization fuses into `--emit-<name>` — because `--hook-<member>` would
+be one arm per member, the refused shape. There is no
 new shell file: `exec_arm` already resolves the bridged environment and `exec`s,
 and `exec` preserves stdin, so the harness payload reaches the arm untouched and
 the front-end writes nothing on stdout along this path. A dedicated
@@ -9451,9 +9524,30 @@ tree, so the path-keyed selector notes it and exits 0, whereas a *name* is a
 claim about the registry and a wrong one is a typo or a stale memory — exiting 0
 there would print `All 0 gates passed.`, the vacuous green the summary line
 exists to make impossible. A `mode=staged` member receives **no** positional
-arguments under `--only`, which is the bare-run behavior rather than the hook's:
-`--for` hands such a member its matching paths because it *has* paths, and
-`--only` names gates and has none, so the member runs over its full corpus.
+arguments under `--only` unless the caller passes some through the channel below,
+which is the bare-run behavior rather than the hook's: `--for` hands such a member
+its matching paths because it *has* paths, and `--only` names gates, so a member
+it selects runs over its full corpus by default.
+
+**`--only` carries a bounded argv channel, and it is single-member-or-refuse.** A
+`--` separator ends the name list, and every remaining argument is forwarded to
+the selected gate — **only when the selection resolves to exactly one member**. A
+`--` with two or more selected members is a **refusal**, exit 2, naming the
+cardinality and the members: handing one argument vector to N gates is the failure
+the bound exists to foreclose, and it is spelled as a refusal rather than a silent
+first-member rule so a caller cannot get a narrower run than it asked for and not
+know. The cardinality is resolved after the registry intersection, so duplicate
+names still collapse to one member and still forward. The channel exists because
+the capability is real and moved rather than appearing: a caller that resolved a
+gate's name and invoked it *with* arguments is exactly what the stage-entry
+pre-flight does, and it now spells that through this selector. Without it that
+caller does not merely lose coverage — `--enter-stage` appends `<queue> <state>`
+to every pre-flight entry's argv, `--only` consumes every remaining token as a
+gate name, and each appended token would resolve as a gate the registry does not
+name, so the `--` is mandatory rather than stylistic even on an entry whose knob
+default matches its positional. This is the one place the grammar is stated;
+evidence-kit's pre-flight roster cites it rather than restating it.
+
 Everything downstream is untouched, which is the whole value of siting this on
 the runner rather than in a second tool — the `GATE_SDK_KNOB_*` config bridge,
 the consumer-first resolve-dir order, the worker pool, the per-gate timing,
@@ -9462,16 +9556,18 @@ exactly as in a bare run. The summary line's `N` is the **selected** count, as i
 already is under `--for`; the roster-collapse tripwire that count serves is a
 property of a bare run, and neither selector claims it.
 
-**Where each refusal lives is a consequence of the split, and the shapes are
-preserved whichever half prints them.** The **front-end** owns every refusal
-decidable from argv alone: the two empty-list refusals, the unrecognized-option
-refusal, and a leading-dash name inside `--only`. The **arm** owns every refusal
-that has to read the registry — `no registry at <list>`, the `--only` steer
-beside it, `<list> names no gates`, an unregistered `--only` name, and a member
-`--for` cannot resolve. Each keeps the `run-gates:` prefix it always had, because
-the message shape is this tool's documented surface and the arm is what the
-front-end exec'd; a caller cannot tell which process printed it, and none should
-have to.
+**Every refusal is the arm's after the stub cut, and the shapes are preserved
+whichever process prints them.** The refusals decidable from argv alone — the two
+empty-list refusals, the unrecognized-option refusal, `--emit` with no arm name,
+and a leading-dash name inside `--only` — moved with the usage text, because the
+usage text *is* the unrecognized-option refusal's body and splitting the two
+would put one contract in two files. The arm already owned every refusal that has
+to read the registry: `no registry at <list>`, the `--only` steer beside it,
+`<list> names no gates`, an unregistered `--only` name, the `--` channel's
+multi-member refusal, and a member `--for` cannot resolve. Each keeps the
+`run-gates:` prefix it always had, because the message shape is this tool's
+documented surface and the arm is what the front-end exec'd; a caller cannot tell
+which process printed it, and none should have to.
 
 **The runner honours §The bin/-tool contract**, which binds because its
 positional is free text — a path — and an arity check is not a shape check. `-h`
@@ -9486,6 +9582,19 @@ on a contract the family already carries, not a new design: before it,
 `run-gates.sh --help` fell through to the positional and died with `no registry
 at --help/gates.list` — a message about a missing file in answer to a rejected
 argument, which is why a wrong guess cost three steps instead of one.
+
+**The usage text is the arm's, and one behaviour changed with the move.** It is
+the single largest block the front-end carried and a per-arm description that
+grows by a paragraph per bridged arm, so it belongs beside the table that mints
+them; a second short usage in the stub is refused outright as the SSOT breach it
+plainly is. The consequence is stated rather than left to be discovered: `-h` and
+`--help` used to print and exit 0 before any binary check, so they worked on a
+tree with no binary, and they now reach the binary like every other arm — on a
+binary-less tree they get the absent-binary diagnostic, which names the build
+command, at the unavailable status instead of the usage text at 0. **That trade
+is taken deliberately**: a usage text listing seventeen arms none of which can run
+is a worse answer than one line naming the one command that makes them run.
+`--help`'s status where the binary is present is unchanged at 0.
 
 **A gates-dir that is really a gate name steers to `--only`.** When the
 positional holds no `gates.list` and names a member of the **default** registry

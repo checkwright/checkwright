@@ -12,36 +12,6 @@
 
 ## New Features
 
-- **run-gates-stub-cut** [spec: SPEC-stub-cut.md] — port `gate-sdk/bin/run-gates.sh` (503)
-  down to the stub gate-sdk/SPEC.md §run-gates names, the one owed file declaring that section.
-  **Selection ground: the OWED column of `--emit port-blockers --tree`** — 94 scanned, 64
-  `no-port`, 0 held, 30 owed at HEAD `2bf2f204`. Never the registry `--group` read, which answers
-  for the battery and not for the tree (gate-sdk/SPEC.md §port-blockers).
-  **The budget arm's precondition was RUN at spec, not inherited:** `--emit port-blockers --group`
-  trails 108 scanned, 0 groups, 108 already ported, 0 still owed, **0 takeable at this cut** — no
-  takeable group, so the arm composes. This file orders early INSIDE that arm because it grows by
-  a branch per bridged arm; that is ruling (7)'s taxing-member case and never the blocker-retiring
-  override, whose text turns on *queued behind* (gate-sdk/SPEC.md §The first cohort).
-  **Host: `native-gate-port-remaining-corpus`**, whose stated-contract composer selects it and
-  whose ruling (2) puts this cut's settings-grant edits in-cut. This entry is the cut's own unit
-  and reaches `## Done` at build; the corpus entry stays Deferred and is deliberately not
-  promoted — a `[spec:]` ref is lead-line-scoped and one host holds one ref.
-  **IT CARRIES `binary-less-dispatch-loop-retirement` WHOLE**, per that entry's own 2026-09-05
-  operator ruling: the loop, the installer's binary-less leg re-scope, and the nine
-  `.workflow/validate-baseline.txt` rows are deltas of this amendment, not a sibling unit. Close
-  retires that entry against this cut rather than draining it.
-  **Two behavior changes are ruled in the amendment and neither is incidental:** `--help` on a
-  binary-less tree gets the build remedy instead of the usage text, and the crate's argv parser
-  gains the front-end spelling as one alias step so argv passes verbatim.
-  **IT BUILDS THE `--only` ARGV CHANNEL ITS SIBLING CONSUMES — ruled 2026-09-05 (lead), on this
-  stage's escalation.** Delta (2) gains `--only <gate> -- <args...>`, forwarded only when the
-  selection resolves to exactly ONE member and a refusal at two or more; gate-sdk/SPEC.md
-  §run-gates owns the grammar and `preflight-front-end-cut` cites it. **THIS CUT LANDS FIRST:**
-  its sibling re-points nine stage-entry pre-flight entries onto that channel, and without it
-  every stage entry in the repo refuses.
-  ruled: run-gates-stub-cut lead 2026-09-05 own-authority
-  Filed 2026-09-05 by spec, minted and promoted in one motion with its amendment.
-
 - **liveness-reader-cut** [spec: SPEC-liveness-reader-cut.md] — delete
   `scripts/producer-liveness-reader.sh` (26) and make the compiled gate the hook's default reader,
   the one owed file behind delegation-kit/SPEC.md §The turn-end liveness hook.
@@ -10108,5 +10078,6 @@
 ## Done
 
 - build-native-bootstrap-declaration
+- run-gates-stub-cut
 
 ## Lessons Learned

@@ -257,8 +257,57 @@ fn guard_lib_parity(args: &[String]) -> i32 {
     }
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — the arms that live in `main` rather than in either lookup
+// table, rostered because the normalization below must know an arm name when it sees one.
+const TOP_LEVEL_FLAGS: &[&str] = &[
+    "--source-stamp",
+    "--list",
+    "--queue-parity",
+    "--toolfloor-parity",
+    "--stages-lib-parity",
+    "--guard-lib-parity",
+    "--install",
+    "--reads",
+    "--needs",
+    "--knobs",
+];
+
+fn known_arm(name: &str) -> bool {
+    TOP_LEVEL_FLAGS.contains(&name) || emit::lookup(name).is_some() || gates::lookup(name).is_some()
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the front-end's spelling normalized to the arm table's, above
+// both doors and recursing through `--knobs` so they cannot disagree. A dashless leading token is
+// left alone: only the front-end can tell a gates-dir from a gate name.
+fn normalize(argv: Vec<String>) -> Vec<String> {
+    let Some(first) = argv.first().cloned() else {
+        return argv;
+    };
+    if first == "--knobs" && argv.len() > 1 {
+        let mut out = vec![first];
+        out.extend(normalize(argv[1..].to_vec()));
+        return out;
+    }
+    if first == "--emit" {
+        if let Some(name) = argv.get(1) {
+            let mut out = vec![format!("--emit-{}", name)];
+            out.extend_from_slice(&argv[2..]);
+            return out;
+        }
+    }
+    if known_arm(&first) {
+        return argv;
+    }
+    if first.starts_with('-') {
+        let mut out = vec!["--run".to_string()];
+        out.extend(argv);
+        return out;
+    }
+    argv
+}
+
 fn main() {
-    let argv: Vec<String> = std::env::args().skip(1).collect();
+    let argv: Vec<String> = normalize(std::env::args().skip(1).collect());
 
     let first = match argv.first() {
         Some(a) => a.as_str(),

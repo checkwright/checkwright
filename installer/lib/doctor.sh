@@ -142,6 +142,15 @@ else
                         printf '  %-12s %d gate(s), %s\n' omitted "$count" "$reason" ;;
                 esac
             done < <(awk '$1 == "#" && $2 == "omitted:" { print $4 }' "$ROOT/$list" | sort | uniq -c)
+
+            # spec: installer/README.md §The gate binary — the all-omitted install's own line, said
+            # only when no live member survives: the per-reason counts read identically at 24-of-26
+            # and at 26-of-26, and the second is the one where an adopter's battery cannot run at all
+            live="$(awk '!/^[[:space:]]*(#|$)/ { n++ } END { print n + 0 }' "$ROOT/$list")"
+            if [[ "$live" -eq 0 ]]; then
+                printf '  %-12s no gate survives here, so the battery cannot run at all on this platform\n' battery
+                printf '  %-12s install from a payload carrying a verified binary for this platform, then re-run init\n' remedy
+            fi
         fi
     fi
 
