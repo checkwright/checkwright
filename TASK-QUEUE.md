@@ -7529,6 +7529,14 @@
   **Cost while deferred:** low per instance and paid at the worst moment — a build session either
   buys a sweep the amendment implied was already scoped, or writes something to make a vacuous
   target non-vacuous.
+  **JUDGED RECURRENCE 2026-09-05 at the close drain, on a second roster.** `SPEC-preflight-cut.md`
+  rostered eleven reader rows for ten readers: a quote living at `evidence-kit/SPEC.md:836` was
+  also attributed to `delegation-kit/SPEC.md:836`, and align verified the citation's TEXT without
+  checking that the file named holds it. Same finding, one axis over — a rostered row resolving to
+  nothing in the file it names, undetected — and the deliverable below already covers it verbatim,
+  so no entry is minted. It widens the deliverable's corpus from the update-target roster to any
+  amendment roster carrying a path.
+  recurrence: amendment-update-target-overcount-undetected 2026-09-05
   Filed 2026-08-25 by build; drained and promoted 2026-08-25 at close, which re-ran the sweep and
   corrected its reported reach.
 
@@ -9945,6 +9953,36 @@
   →icebox refused on the product witness above. Deferred and not active: the port-only run bars an
   active-section promotion (TRAJECTORY.md §PRIORITY DIRECTIVE, 2026-09-04).
 
+- **fail-open-arm-status-second-source** [design-pending] — the stub holds the bridged arms'
+  unavailable exit status as a two-name shell test, and nothing holds that set in lockstep with
+  the status each arm's own contract prose states.
+  **Re-verified at the drain rather than taken from the bullets.** `gate-sdk/bin/run-gates.sh` is
+  70 lines after the cut; line 20 sets `ARM_UNAVAILABLE_STATUS=2` and line 42 flips it to `0` for
+  `--hook | --statusline` alone. The shell must keep holding it: the value is read exactly when
+  the binary is absent and cannot be asked, so this duplication cannot be removed the way the
+  dispatch loop's was — only asserted.
+  **Two bullets, one gap.** This drain merged the spec filing, which names the crate's per-arm
+  contract prose as the second source, with batch 3's, which names each arm's own SPEC section.
+  They are two spellings of one second source and a single assertion closes both.
+  **Why →fix failed at the drain:** the closure is a parity assertion over the fail-open set, and
+  a new gate here is born native — a Rust module, a `.gate` descriptor and a `good/`+`bad/`
+  fixture pair — which is build work, not a close-session edit.
+  **Why →icebox failed:** the trigger is live. `--hook` and `--statusline` are the whole fail-open
+  set today and the port run keeps landing non-gate arms (gate-sdk/SPEC.md §The non-gate arm), so
+  the first harness-integration arm added without the two-name test wedges a binary-less adopter
+  at the exact point a hook grades a user action.
+  **Product-class on TRAJECTORY.md's 2026-08-30 witness discriminator**, which is what keeps this
+  off the one-line tier: `run-gates.sh` is the adopter entry point, so the demand witness is a
+  vendored tree with no binary rather than this repo's own accounting.
+  **Deliverable:** an assertion that the shell's fail-open name set equals the set of arms whose
+  owning SPEC section declares status 0, including which of the two surfaces is authoritative when
+  they disagree.
+  **Cost while deferred:** the set is two names and correct today, so the whole cost is future — a
+  divergence lands silently and is found by an adopter rather than by the battery.
+  Filed 2026-09-05 to the gap inbox at spec and again at build's batch 3; promoted at this close.
+  Deferred and not active: the port-only run bars an active-section promotion
+  (TRAJECTORY.md §PRIORITY DIRECTIVE, 2026-09-04).
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -10035,6 +10073,7 @@
 - **release-record-retired-knob** [design-pending] — A removal's basis may not name its own knob.
 - **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
+- **ruled-line-width-ceiling** [design-pending] — A 61-char slug's ruled: line measures 101.
 
 ## Done
 
