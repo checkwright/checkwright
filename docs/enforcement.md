@@ -197,7 +197,7 @@ leaves its section absent.
 | (consumer) | installer_smoke |
 | [gate-sdk](gate-sdk/index.md) | consumer_smoke |
 | [gate-sdk](gate-sdk/index.md) | upgrade |
-| [context-kit](context-kit/index.md) | agents_md_smoke |
+| [gate-sdk](gate-sdk/index.md) | agents_md_smoke |
 | [context-kit](context-kit/index.md) | index_tests |
 | (consumer) | native_crate |
 

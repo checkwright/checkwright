@@ -452,7 +452,7 @@ Checkwright defaults to `CLAUDE.md` as the always-loaded agent file, but no kit
 mechanism resolves that file by literal — each reads its kit's knob. A consumer
 whose harness reads `AGENTS.md` (or any other always-loaded agent file) runs
 every kit mechanism by pointing those knobs at that file. This path is not just
-asserted: context-kit ships `smoke/agents-md.sh`, which stands up an `AGENTS.md`
+asserted: context-kit's `--agents-md-smoke` arm stands up an `AGENTS.md`
 consumer, sets the knobs below, and runs the full battery green (see
 [the tiered compatibility claim](positioning.md#the-tiered-compatibility-claim)).
 

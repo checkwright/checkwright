@@ -1,8 +1,10 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — the ported arms. Each owes no descriptor, no
 // registration and no fixture pair, and owes a named caller instead: a regen command, a
 // comparator calling `emit()`, a stage step, a gate reaching it in process.
+pub mod agents_md_smoke;
 pub mod cite_survey;
 pub mod close_surfaces;
+pub mod csmoke;
 pub mod diff_baseline;
 pub mod docs_mirror;
 pub mod drift_report;
@@ -568,6 +570,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--run-guard-tests",
         Arm::Run(run_guard_tests::run),
         run_guard_tests::KNOBS,
+    ),
+    // spec: context-kit/SPEC.md §Testing — an `Arm::Run` because the contract is the verdict, which
+    // an emitting arm cannot carry, and a table member because the vendoring reads the consumer's
+    // kit roots and the binary placement the consumer's own `GATE_SDK_NATIVE_BIN`
+    (
+        "--agents-md-smoke",
+        Arm::Run(agents_md_smoke::run),
+        agents_md_smoke::KNOBS,
     ),
 ];
 

@@ -2,6 +2,7 @@
 // member: its contract is the exit status (2 broken tag or environment, 1 upgrade finding, 0 clean
 // with one verdict line on stdout), which `Arm::Emit` collapses to 0-or-2
 use crate::declaration::{self, SectionVerdict};
+use crate::emit::csmoke;
 use crate::ere::Ere;
 use crate::proc::{self, Stderr};
 use crate::walk;
@@ -347,7 +348,7 @@ fn mktemp_dir(base: &str) -> Result<String, Fail> {
 // `pipefail` over an abandoned producer is the property being relied on.
 fn extract(repo: &str, git_ref: &str, tree: &str) -> Result<(), Fail> {
     let script = r#"set -o pipefail; git -C "$1" archive "$2" | tar -x -C "$3""#;
-    let done = bash(&[script, "bash", repo, git_ref, tree], Stderr::Inherit)?;
+    let done = bash(script, &[repo, git_ref, tree], Stderr::Inherit)?;
     if done.code() != 0 {
         return Err(broken(one(format!(
             "{}: git archive of {} failed",
@@ -377,31 +378,18 @@ fn kit_dirs_in(tree: &str) -> Result<Vec<String>, Fail> {
     Ok(out)
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the three consumer-smoke helpers are **called in the
-// library that owns them**, never reimplemented: the arm spawns `bash`, sources the unchanged
-// library and reads back the one value the caller needs (§The port-candidate criteria, criterion 6).
-fn csmoke(script: &str, args: &[&str], stderr: Stderr) -> Result<proc::Streamed, Fail> {
-    let mut argv: Vec<&str> = vec![script, "bash"];
-    argv.extend_from_slice(args);
-    bash(&argv, stderr)
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the shared spawn seam wearing this arm's failure type:
+// a spawn this member could not make is a broken environment, never an upgrade finding.
+fn bash(script: &str, args: &[&str], stderr: Stderr) -> Result<proc::Streamed, Fail> {
+    csmoke::spawn(script, args, stderr).map_err(|e| broken(one(format!("{}: {}", NAME, e))))
 }
-
-fn bash(argv: &[&str], stderr: Stderr) -> Result<proc::Streamed, Fail> {
-    let mut args: Vec<&str> = vec!["-c"];
-    args.extend_from_slice(argv);
-    proc::run_streamed("bash", &args, b"", stderr)
-        .map_err(|e| broken(one(format!("{}: {}", NAME, e))))
-}
-
-const SOURCE_CSMOKE: &str =
-    r#"source "$1/lib/gate.sh"; source "$1/lib/consumer-smoke.sh";"#;
 
 fn descriptors(sdk: &str, roots: &[String]) -> Result<i64, Fail> {
-    let script = format!("{} shift; csmoke_gate_descriptors \"$@\"", SOURCE_CSMOKE);
+    let script = format!("{} shift; csmoke_gate_descriptors \"$@\"", csmoke::SOURCE);
     let refs: Vec<&str> = std::iter::once(sdk)
         .chain(roots.iter().map(String::as_str))
         .collect();
-    let done = csmoke(&script, &refs, Stderr::Inherit)?;
+    let done = bash(&script, &refs, Stderr::Inherit)?;
     let text = String::from_utf8_lossy(done.stdout()).trim().to_string();
     text.parse::<i64>().map_err(|_| {
         broken(one(format!(
@@ -425,13 +413,13 @@ fn vendor_and_install(
     let script = format!(
         "{} TMPDIR=\"$2\"; export TMPDIR; host=\"$3\"; shift 3; \
          csmoke_vendor_and_install \"$host\" \"$@\" 1>&2; st=$?; printf '%s' \"$SCRATCH\"; exit $st",
-        SOURCE_CSMOKE
+        csmoke::SOURCE
     );
     let refs: Vec<&str> = vec![sdk, base, host]
         .into_iter()
         .chain(roots.iter().map(String::as_str))
         .collect();
-    let done = csmoke(&script, &refs, Stderr::Inherit)?;
+    let done = bash(&script, &refs, Stderr::Inherit)?;
     let scratch = String::from_utf8_lossy(done.stdout()).trim().to_string();
     env.consumer = scratch.clone();
     if done.code() != 0 || scratch.is_empty() {
@@ -455,13 +443,13 @@ fn place_binary(
 ) -> Result<(), Fail> {
     let script = format!(
         "{} SCRATCH=\"$2\"; host=\"$3\"; shift 3; csmoke_place_binary \"$host\" \"$@\" 1>&2",
-        SOURCE_CSMOKE
+        csmoke::SOURCE
     );
     let refs: Vec<&str> = vec![sdk, consumer, host]
         .into_iter()
         .chain(roots.iter().map(String::as_str))
         .collect();
-    let done = csmoke(&script, &refs, Stderr::Inherit)?;
+    let done = bash(&script, &refs, Stderr::Inherit)?;
     if done.code() != 0 {
         return Err(broken(one(format!(
             "{}: FAIL(env) — could not place TO ({})'s gate binary in the scratch consumer",
@@ -573,10 +561,7 @@ fn basename(p: &str) -> String {
 // spec: gate-sdk/SPEC.md §upgrade-smoke — `cp -R` rather than a crate-side tree walk: the kit trees
 // carry executable bits the installer runs off, and `cp` is on `GATE_SDK_PROGRAM_FLOOR`
 fn copy_tree(src: &str, dest: &str) -> Result<(), Fail> {
-    let done = bash(
-        &[r#"cp -R "$1" "$2""#, "bash", src, dest],
-        Stderr::Inherit,
-    )?;
+    let done = bash(r#"cp -R "$1" "$2""#, &[src, dest], Stderr::Inherit)?;
     if done.code() != 0 {
         return Err(broken(one(format!(
             "{}: cannot place the TO kit {} in the scratch consumer",
@@ -637,11 +622,8 @@ fn stage_all(consumer: &str) -> Result<(), Fail> {
 // process's, because the host's value is a different tree's.
 fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     let hook = bash(
-        &[
-            r#"cd "$1" && exec bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null"#,
-            "bash",
-            consumer,
-        ],
+        r#"cd "$1" && exec bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null"#,
+        &[consumer],
         Stderr::Inherit,
     )?;
     if hook.code() != 0 {
@@ -652,11 +634,8 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     }
 
     let resolved = bash(
-        &[
-            r#"cd "$1" && source gate-sdk/lib/gate.sh && printf '%s' "$GATE_SDK_GRAPH_ARTIFACT""#,
-            "bash",
-            consumer,
-        ],
+        r#"cd "$1" && source gate-sdk/lib/gate.sh && printf '%s' "$GATE_SDK_GRAPH_ARTIFACT""#,
+        &[consumer],
         Stderr::Inherit,
     )?;
     let artifact = String::from_utf8_lossy(resolved.stdout()).trim().to_string();
@@ -674,12 +653,8 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     }
 
     let emitted = bash(
-        &[
-            r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --emit graph > "$2""#,
-            "bash",
-            consumer,
-            &artifact,
-        ],
+        r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --emit graph > "$2""#,
+        &[consumer, &artifact],
         Stderr::Inherit,
     )?;
     if emitted.code() != 0 {
@@ -691,11 +666,8 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
 
     if Path::new(&format!("{}/doctrine-kit/bin/install-doctrine.sh", consumer)).is_file() {
         let doctrine = bash(
-            &[
-                r#"cd "$1" && exec bash doctrine-kit/bin/install-doctrine.sh >/dev/null"#,
-                "bash",
-                consumer,
-            ],
+            r#"cd "$1" && exec bash doctrine-kit/bin/install-doctrine.sh >/dev/null"#,
+            &[consumer],
             Stderr::Inherit,
         )?;
         if doctrine.code() != 0 {

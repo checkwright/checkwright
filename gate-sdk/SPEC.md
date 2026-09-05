@@ -2139,9 +2139,10 @@ amendment and carry a second amendment when the sequenced member frees.
 context-kit/SPEC.md is the instance that grounds it, because it states both
 shapes in one file: §Layout and configuration sequences `lib/toolfloor.sh` behind
 the installer's behind-invoke relocation and says nothing of the kind about
-`bin/env-probe.sh`, where §Testing declares its own group *blocked as a whole* —
-so the owner doc has already said which of its groups cuts whole, and
-spec-over-precedent reads it there. Four things bind the shape. The sequenced
+`bin/env-probe.sh`, where §Testing sequences two named members behind that same
+relocation and rules a third — the AGENTS.md smoke — unblocked on its own ground.
+So the owner doc has already said which of its groups cuts whole and which cuts
+in part, and spec-over-precedent reads it there. Four things bind the shape. The sequenced
 member stays **owed**: it takes no `# port-until:`, because a held file leaves
 §port-blockers' owed column and the completion predicate admits no
 contributor-side subtraction; its
@@ -2340,8 +2341,9 @@ and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
 §bin/diff-baseline.sh), `--scratch-run`
 (guard-kit/SPEC.md §scratch-run — the class's first member
 whose port **removes** a grant naming its own path rather than relocating one)
-`--run-gate-tests` (§run-gate-tests)
-and `--run-guard-tests` (guard-kit/SPEC.md §Testing) —
+`--run-gate-tests` (§run-gate-tests),
+`--run-guard-tests` (guard-kit/SPEC.md §Testing)
+and `--agents-md-smoke` (context-kit/SPEC.md §Testing) —
 and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
@@ -2460,6 +2462,11 @@ change**, and it belongs beside that worst case for the same reason: `uname`,
 `date`, `sort`, and every element of a roster the consumer may shadow, since
 `PROBE_SET` lives in a file rather than in the crate (context-kit/SPEC.md
 §bin/env-probe).
+**`--agents-md-smoke` shares `--upgrade-smoke`'s shape and not its weight**, and
+is named beside it because both reach `lib/consumer-smoke.sh` by spawning: `bash`,
+`git`, `mktemp`, and through the vendoring whatever `csmoke_vendor_and_install`
+reaches — no `cargo` and no `tar`, because it archives no ref and builds no
+binary (context-kit/SPEC.md §Testing).
 **`--run-guard-tests` is the class's first member whose set is split between the
 arm and the subject it spawns**, and stating it that way is what keeps the port's
 dividend honest: `bash`, `git` and `mktemp` are the arm's own — one `bash` per
@@ -7758,7 +7765,7 @@ rather than in `run-consumer-smoke.sh` for the reason the factoring exists at
 all: every caller builds a tree the vendored kits' descriptors are in, so a
 placement in one caller would leave the others reddening identically. The caller
 owns its cleanup trap and every assertion after the baseline commit.
-context-kit's `smoke/agents-md.sh` is that second caller: it builds the same
+context-kit's **AGENTS.md smoke** is that second caller: it builds the same
 baseline, then converts the consumer to a nondefault agent file (`AGENTS.md`)
 and asserts the agent-file knobs carry it — an assertion `run-consumer-smoke.sh`
 cannot make, since it fixes the kit defaults under zero config
@@ -7766,28 +7773,30 @@ cannot make, since it fixes the kit defaults under zero config
 builds the same FROM baseline, then diverges into the two-phase upgrade proof
 (§upgrade-smoke).
 
-**That third caller is a compiled arm, and it reaches the library by spawning
-`bash` rather than by sourcing it.** Its shell driver was deleted at its port, so
-it does not source this file at all; the arm invokes each helper in a `bash -c`
-that sources the unchanged library, calls the function and prints back the one
-value the caller needs. The library gains a caller of a new **kind** and loses a
-shell one, and it acquires no crate twin — which is the whole of why the port
-cleared criterion 6 on the duplication-*absent* road rather than needing the
-machine-held-twin one (§The port-candidate criteria, criterion 6). Two helpers
-here communicate by setting or reading their caller's shell variable — `SCRATCH`
-in both directions — and a process boundary carries neither, so the arm supplies
-it on the way in and reads it off stdout on the way out. That protocol is the
-function's own contract read out, never a private one minted beside it.
+**Two of those three are compiled arms, and each reaches the library by spawning
+`bash` rather than by sourcing it.** Each one's shell driver was deleted at its
+port, so neither sources this file at all; the arm invokes each helper in a
+`bash -c` that sources the unchanged library, calls the function and prints back
+the one value the caller needs. The library gains callers of a new **kind** and
+loses shell ones, and it acquires no crate twin — which is the whole of why both
+ports cleared criterion 6 on the duplication-*absent* road rather than needing
+the machine-held-twin one (§The port-candidate criteria, criterion 6). Two
+helpers here communicate by setting or reading their caller's shell variable —
+`SCRATCH` in both directions — and a process boundary carries neither, so the arm
+supplies it on the way in and reads it off stdout on the way out. That protocol
+is the function's own contract read out, never a private one minted beside it,
+and it has **one producer crate-side**: the spawn wrapper and the script prologue
+live in a module both arms call, never a copy each (§upgrade-smoke).
 
-**The library's sourcer set is wider than the builder's caller set, and the two
-are counted separately.** The three named above are the callers of
-`csmoke_vendor_and_install`, one of them now across a process boundary. The file
-itself has a **third** shell sourcer beyond the two that build a consumer:
-`demo/run-demo.sh`, which sources it for `csmoke_place_binary` alone and never
-builds a scratch consumer at all. So "sourced by three" is false of the library
-and true only of the builder — read the distinction off this paragraph rather
-than counting callers of one function and generalising, which is the
-re-derivation that put a wrong count into an amendment.
+**The library's sourcer set is narrower than the builder's caller set, and the
+two are counted separately.** Of the three callers of
+`csmoke_vendor_and_install` above, two now reach it across a process boundary and
+none of the three sources this file. What is left sourcing it is
+`demo/run-demo.sh` alone, which takes `csmoke_place_binary` and never builds a
+scratch consumer at all — so the sourcer set is **one** and the builder's caller
+set is three. Read the distinction off this paragraph rather than counting
+callers of one function and generalising, which is the re-derivation that put a
+wrong count into an amendment once already.
 
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
@@ -10150,8 +10159,8 @@ expression nor mints an arm on a gate for one caller.
 
 **That read is a `bash -c` sourcing the consumer's own library, and the same
 protocol is how the whole suite reaches `lib/consumer-smoke.sh`.** That library is
-permanently `# no-port:` (§Consumer smoke, *The port disposition*) and keeps
-shell sourcers besides this one, so criterion 6's delete-the-original road is
+permanently `# no-port:` (§Consumer smoke, *The port disposition*) and keeps a
+shell sourcer besides this one, so criterion 6's delete-the-original road is
 unavailable. The road taken is not the *unless* clause's machine-held-twin form
 but its strongest one — **the duplication is absent, because the arm creates
 none**. `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and
@@ -10165,7 +10174,12 @@ variable, and the idiom that solves it is the one above.**
 `csmoke_place_binary` by reading it, and no process boundary carries either; so
 the arm supplies it on the way in and reads it back off a one-line stdout protocol
 on the way out, which is the function's own contract read out rather than a
-private one minted beside it. **One consequence is visible and is stated rather
+private one minted beside it. **The spawn wrapper and its script prologue are a
+shared crate module rather than this arm's**, because this seam now has a second
+spawn-side caller (context-kit/SPEC.md §Testing): a second copy would be the
+duplication the road exists to avoid, relocated from two shell scripts into two
+Rust modules — the refusal §lib/gate.sh's *exactly one place a value is computed*
+states, applied to a technique rather than to a knob. **One consequence is visible and is stated rather
 than left to be noticed:** the shell driver let the vendoring step's installer
 output reach *its* stdout, which this section's own contract already reserved for
 the one clean line; the stdout protocol forces that output to stderr, so the

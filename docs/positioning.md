@@ -59,7 +59,7 @@ broad claim that would not survive contact:
   always-loaded agent file) runs every kit mechanism by setting existing knobs.
   This is *tested*, not asserted: a shipped smoke stands up an `AGENTS.md`
   consumer, sets the agent-file knobs, and runs the full battery green
-  (context-kit's `smoke/agents-md.sh`); the adapter recipe with its honest limits
+  (context-kit's `--agents-md-smoke` arm); the adapter recipe with its honest limits
   is in [the install guide](install.md). What stays genuinely Claude-Code-native
   is the residue with no cross-harness target: the stage-skill auto-load bindings
   (the `.claude/` shims that point a `/build` at its template — one binding, not

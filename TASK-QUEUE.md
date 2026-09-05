@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **agents-md-smoke-port-cut** [spec: SPEC-agents-md-cut.md]
-  [precondition-ok: owner-doc-rules-it-unblocked] — port
-  `context-kit/smoke/agents-md.sh` (139) to the bridged `--agents-md-smoke` `Arm::Run`.
-  §Testing's **unblocked remainder**: the owner doc already rules that its behind-invoke
-  sequencing "reaches exactly those two members" and that this one is unblocked on its own
-  ground, so the two sequenced members stay owed and take no `# port-until:`.
-  Takes the same duplication-absent road, and the shared `csmoke()` spawn helper is **extracted**
-  from `upgrade_smoke.rs` rather than copied. Updates `gate-sdk/lib/consumer-smoke.sh`'s own
-  `# no-port:` header, which names this file in its live list of shell sourcers — false after the
-  cut.
-  **Carries the gate-sdk/SPEC.md:2149 staleness fix**, on the surface it already edits: that
-  passage still says in the present tense that context-kit §Testing declares its group blocked
-  as a whole, twenty-five lines above the corollary recording the correction.
-  Filed 2026-09-05 by spec, fourth of the four per-cut units.
-
 - **lead-tier-split-premise-unamended** [spec: SPEC-lead-tier-split.md]
   — `lifecycle-kit/templates/lead.md`
   §Economics rests its *Split the lead where the tail dominates* bullet on a premise TWELVE
@@ -9930,5 +9915,6 @@
 - hermetic-bin-suffix-pin-placement
 - kit-spec-provenance-seam-sweep
 - guard-tests-runner-port-cut
+- agents-md-smoke-port-cut
 
 ## Lessons Learned

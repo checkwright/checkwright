@@ -1101,7 +1101,6 @@ context-kit/
   templates/close-brevity.md
   smoke/install.sh
   smoke/violation.sh
-  smoke/agents-md.sh             # the AGENTS.md adapter smoke (its own validate suite)
 ```
 
 **The one library member beside `lib/context.sh` is owed to the port** —
@@ -1316,11 +1315,15 @@ built-in grammar's recorded in the golden. **The runner itself stays shell**, an
 the arms it drives: it declares §Testing, and it is sequenced together with
 `index-tests/toolfloor-cases.sh`, which exercises `lib/toolfloor.sh`'s floor
 predicate — a library sequenced behind the installer's behind-invoke relocation.
-That sequencing reaches exactly those two members: `smoke/agents-md.sh` declares
-the same section, sources neither the runner nor the library, and its own header
-calls it a standalone validate suite, so it is unblocked on its own ground
+That sequencing reaches exactly those two members, and the AGENTS.md smoke below
+is the worked case: it declared the same section, sourced neither the runner nor
+the library, and its own header called it a standalone validate suite, so it was
+unblocked on its own ground and has since cut as this section's remainder
 (gate-sdk/SPEC.md §Porting a gate to the binary substrate — a stated cause reaches
-only the members it names).
+only the members it names). What the cut left owed to context-kit is those two
+members, `lib/toolfloor.sh` behind the same relocation, and `bin/always-loaded.sh`
+(§The always-loaded meter) — correctly homed, behind nothing, and takeable as a
+singleton whenever a cut wants it.
 The floor predicate rides the same runner rather than a fixture pair —
 it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
 `lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed
@@ -1383,14 +1386,15 @@ Both of those scripts stay on the shell substrate permanently and carry
 class ruling at gate-sdk/SPEC.md §Consumer smoke, *The port disposition*, which
 reaches them by its **ground** rather than by its scope — that ruling's
 stated-contract cut covers the recipes answering to §Consumer smoke, and these
-two answer here, but its legs 2 and 3 hold of them identically. `smoke/agents-md.sh`
-below is **not** a member and stays owed to the port: it is a standalone
-validate-suite driver, not an install or violation recipe, and neither leg
-reaches it.
+two answer here, but its legs 2 and 3 hold of them identically. The AGENTS.md
+smoke below was never a member of that class and is why the distinction is worth
+keeping: it is a standalone validate-suite driver, not an install or violation
+recipe, so neither leg reached it and it ported.
 
-`smoke/agents-md.sh` is the agent-file adapter smoke — the exercise behind the
+The **AGENTS.md agent-file adapter smoke** is the exercise behind the
 Tier-two compatibility claim (docs/positioning.md §The tiered compatibility
-claim). It vendors a scratch consumer through the shared consumer-smoke
+claim), and it is the bridged `--agents-md-smoke` arm (gate-sdk/SPEC.md §The
+non-gate arm). It vendors a scratch consumer through the shared consumer-smoke
 mechanics (gate-sdk/SPEC.md §Consumer smoke), converts its agent file from
 `CLAUDE.md` to `AGENTS.md`, sets the agent-file knobs in the consumer's config
 seams (`GATE_SDK_AGENT_FILE`, `LIFECYCLE_KIT_AGENT_FILE`, `DOCTRINE_KIT_AGENT_FILE`,
@@ -1401,6 +1405,76 @@ measure the `AGENTS.md` surface, and `check-root-tiering`'s built-in allowlist a
 harness — not driven by `run-consumer-smoke.sh`, which asserts the kit defaults
 under zero config — and registers as its own evidence-kit validate suite
 (`agents_md_smoke`, the `demo` precedent).
+
+**The member is an `Arm::Run` and a bridged-arm table row.** The contract is a
+verdict — 0 with the clean line, 1 with a `FAIL — <reason>` line, 2 a
+precondition the harness could not meet — and an `Arm::Emit` could carry the
+report but not the verdict, which is what the validate suite reads through its
+`EVIDENCE_KIT_PARSER` setting (evidence-kit/SPEC.md §Layout and configuration
+owns the values). It is spelled `--agents-md-smoke` and not
+`--emit-agents-md-smoke` because the `--emit-` prefix is load-bearing for the
+emit family alone, `bin/run-gates.sh` composing it from an `--emit <name>`
+operand; a non-emitting `Arm::Run` is spelled directly, as `--upgrade-smoke`,
+`--run-validate` and `--scratch-run` already are. No front-end edit is owed
+either way.
+
+**Its declared roster is `GATE_KIT_ROOTS_HERE` and `GATE_SDK_NATIVE_BIN`, and it
+declares no `CONTEXT_KIT_` knob at all** — which is the point rather than an
+omission. The first is what tells the arm which kits to vendor and the second
+what the binary placement needs; every knob in the six-knob set above is
+**written into the scratch consumer's own config seams** and never resolved for
+the arm itself, because resolving one here would hand the arm this repo's posture
+in place of the one it is constructing.
+
+**The consumer-smoke helpers are called in the library that owns them.**
+`gate-sdk/lib/consumer-smoke.sh` is permanently `# no-port:` — it sits inside the
+config bridge — so the arm takes the **duplication-absent road** the upgrade
+suite already took: a `bash -c` that sources the unchanged library, calls
+`csmoke_vendor_and_install` and reads the helper's own `SCRATCH` back off stdout,
+because that variable is set in the callee's shell and no process boundary
+carries it. The spawn wrapper and its script prologue are a **shared crate
+module** both arms call rather than a copy each. Two consequences are stated
+because they are observable: the helper's own installer output moves to stderr,
+that channel being reserved for the value coming back, and the library's shell
+sourcer set loses this member — leaving `demo/run-demo.sh` alone
+(gate-sdk/SPEC.md §Consumer smoke).
+
+**Everything after the vendoring is the arm's own, and the step a port most
+easily loses is the regeneration ordering.** Each kit's `install.sh` already
+wrote the hook and `CHECK-GRAPH.html`, but that write ran before
+`scripts/canon-config.sh` existed, so the baked `# graph:` derivation used
+canon-kit's bare default rather than the `AGENTS.md`-widened manifest set. The
+arm regenerates both **under the same env the battery will run with** —
+`LIFECYCLE_KIT_AGENT_FILE` and `CANON_KIT_CONFIG_FILE`, which ride the
+environment of every spawned battery run because the lifecycle knob is scalar
+with no default config file and canon resolves its manifest only through its
+config file — or `check-graph` reds the AGENTS.md consumer on a hook stale by
+construction. A regeneration step the arm could not complete is exit 2, the
+harness-precondition code: it is the arm's own construction and not a finding
+about the consumer.
+
+**The one place the arm must not act for itself is the root-tiering dispatch.**
+`check-root-tiering`'s argv is resolved **once against the vendored tree**, whose
+knobs and binary are the consumer's, by a `bash -c` sourcing that tree's
+`lib/gate.sh` and calling `gate_command`; only then is it run from a separate
+orientation-clean repo. That resolution stays on the shell side for the same
+reason the vendoring does, and a literal `checks/<gate>.sh` path would name a
+substrate the port has moved. A dispatch that resolves to nothing is a `FAIL`
+rather than an argv the arm then tries to execute — the shell form's `mapfile`
+made that check vacuous, because an empty capture still yields one empty element.
+
+**The scratch lifecycle is the arm's own control flow rather than a trap.** The
+shell form owned two scratch trees and one `trap … EXIT` that was **re-armed**
+partway through, so the second `trap` was what made the first tree's cleanup
+survive the second tree's creation — a shell idiom rather than a contract, and
+one a failure between the two arms could defeat. The arm cleans both trees on
+every exit path and `--keep` suppresses both, printing the scratch consumer's
+retained path as the shell form did; the orientation repo is retained beside it
+under `${TMPDIR}/agents-md-rt.*`, findable by name. `--keep` is an argument the
+rule itself consumes rather than a selector for where configuration comes from,
+so it survives the port as argv (gate-sdk/SPEC.md §The non-gate arm's
+distinguishing test), and the file's usage sentence moves to the arm's own
+refusal text.
 
 ## Out of scope
 
