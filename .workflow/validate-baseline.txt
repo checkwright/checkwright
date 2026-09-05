@@ -93,15 +93,15 @@ installer_smoke build pass
 installer_smoke pack pass
 installer_smoke install pass
 installer_smoke profile-invariant pass
-installer_smoke binary-less-leg fail binary-less-dispatch-loop-retirement
-installer_smoke download-arm ignore binary-less-dispatch-loop-retirement
-installer_smoke toolchain-free-arm ignore binary-less-dispatch-loop-retirement
-installer_smoke jq-less-arm ignore binary-less-dispatch-loop-retirement
-installer_smoke upgrade-arm ignore binary-less-dispatch-loop-retirement
-installer_smoke cross-version-reversal-arm ignore binary-less-dispatch-loop-retirement
-installer_smoke seam-arm ignore binary-less-dispatch-loop-retirement
-installer_smoke narrowing-arm ignore binary-less-dispatch-loop-retirement
-installer_smoke artifact-arm ignore binary-less-dispatch-loop-retirement
+installer_smoke binary-less-leg pass
+installer_smoke download-arm pass
+installer_smoke toolchain-free-arm pass
+installer_smoke jq-less-arm pass
+installer_smoke upgrade-arm pass
+installer_smoke cross-version-reversal-arm pass
+installer_smoke seam-arm pass
+installer_smoke narrowing-arm pass
+installer_smoke artifact-arm pass
 consumer_smoke consumer_smoke pass
 upgrade upgrade pass
 agents_md_smoke agents_md_smoke pass

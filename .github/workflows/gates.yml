@@ -95,22 +95,22 @@ jobs:
           fetch-depth: 0
 
       # **This leg is green against a recorded baseline, never green simpliciter,
-      # and the distinction is the whole reason it is shaped this way.** The suite
-      # exits non-zero today at its binary-less leg on `run-gates: scripts/gates.list
-      # names no gates` — a ruled outcome held in .workflow/validate-baseline.txt
-      # against `binary-less-dispatch-loop-retirement`, not a defect this leg may
-      # clear. So the suite's status is captured rather than obeyed, and the
-      # verdict comes from --diff-baseline, which reds only where the observed
-      # result *deviates* from that record. Reading this step as a plain smoke run
-      # would misread both what it asserts and what a red here means.
+      # and the distinction is the whole reason it is shaped this way.** The
+      # suite's status is captured rather than obeyed, and the verdict comes from
+      # --diff-baseline, which reds only where the observed result *deviates* from
+      # .workflow/validate-baseline.txt. That shape is not an artifact of the one
+      # ruled failure it was built around — the stub cut repaired that arm and
+      # every row now records `pass` — it is what lets a ruled outcome be held
+      # without a leg that must be remembered to be re-enabled. Reading this step
+      # as a plain smoke run would misread both what it asserts and what a red
+      # here means.
       #
       # **What a green here does and does not say.** The suite is on a per-arm
       # parser, so each printed arm of the smoke is its own baseline scenario and
       # the diff reds when an arm that is baselined `pass` comes back red *or
-      # absent* (evidence-kit/SPEC.md §Baseline manifest). The ruled failure is
-      # held on the binary-less arm alone, and the arms behind it are recorded at
-      # `ignore` — a non-verdict for arms nobody observed — so an abort that moves
-      # earlier reds every arm it skipped. That is the coverage this leg lacked
+      # absent* (evidence-kit/SPEC.md §Baseline manifest). Every arm is baselined
+      # `pass`, so an abort anywhere reds not only the arm that failed but every
+      # arm it skipped. That is the coverage this leg lacked
       # while the whole suite was one `exit-code` scenario, where every outcome
       # read clean and a green meant nothing. Still read the log: a green says the
       # arms the run reached behaved as recorded, not that the install path is
