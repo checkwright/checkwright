@@ -21,7 +21,8 @@ sessions is the signal. See [SPEC.md](SPEC.md) for the report frame, the plugin
 contract, the bundled KPI set, and the knowledge-friction loop.
 
 Like [guard-kit](https://github.com/checkwright/checkwright/tree/master/guard-kit/), drift-kit registers **no gates**: its surface
-is an advisory `bin/` tool and a KPI registry, so nothing joins `gates.list`. It
+is a pair of advisory `--emit` arms and a KPI registry, so nothing joins
+`gates.list`. It
 follows gate-sdk's resolution and smoke conventions without depending on its
 registry.
 

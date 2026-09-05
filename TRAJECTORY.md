@@ -472,22 +472,6 @@ that owns no mechanism. Re-homing a `# spec:` that points at a manifest is a def
 and not the re-homing the 2026-09-03 ruling refused, which was a re-pointing away from a SPEC
 section that already owned the file.
 
-**Both drift-kit meters adopt the stage-economics session-key derivation — ruled 2026-09-05 by
-the operator in consult.** Mechanism at drift-kit/SPEC.md §The overhead meter. Refused: porting
-each meter with its own derivation, which makes the recorded divergence permanent in-crate and
-leaves `overhead-meter-measures-the-lead`'s mis-attribution standing after the port.
-
-**The scratch runner's port owes a grant REMOVAL and no addition — ruled 2026-09-05 by the
-operator in-session, the operator's own re-scoping of an earlier pre-authorization the same day.**
-The addition premise was false: the forced-family test makes the ported arm bridged, so it is
-reached as `run-gates.sh --scratch-run`, a string the front-end grant already covers. The removal
-of the path-naming grant landed in the deleting commit under the 2026-08-29 base, and the 2026-08-22
-bar is untouched. The same ruling knowingly retires the consumer opt-out guard-kit sold, with that
-cost named in the question; it is not a general licence over `.claude/settings.json` and not a
-finding that consumer opt-outs are cheap. Refused: a `# no-port:` citing guard-kit's
-permission-addition paragraph, a subtraction on a ground that is a scheduling fact rather than an
-irreducible.
-
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete

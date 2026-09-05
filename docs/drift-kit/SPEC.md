@@ -645,12 +645,12 @@ is the governance share. `session8` is the dedup key the meter reads on append
 — re-measuring a session replaces its line rather than double-counting it.
 **That key was once derived differently from the sibling meter's, and the closed
 divergence is kept here because a later reader asking why two meters ever keyed
-differently needs the answer.** Until the 2026-09-05 port this meter took the
-transcript basename's first eight characters and scanned one flat tier of the
-sessions directory, while the stage-economics meter stripped a leading `agent-`
-first and scanned the subagent tier as well (§The stage-economics meter) — so one
-subagent transcript keyed differently in the two logs, and neither derivation was
-wrong on its own terms. The operator ruled (2026-09-05, consult) that **the port
+differently needs the answer.** Until the 2026-09-05 port each meter normalized
+the transcript name and enumerated the sessions tiers on its own terms — the two
+shapes are git history and not contract, since the scripts holding them are
+deleted — so one subagent transcript keyed differently in the two logs, and
+neither derivation was wrong on its own terms (§The stage-economics meter). The
+operator ruled (2026-09-05, consult) that **the port
 adopts the stage-economics derivation for both meters**: strip a leading
 `agent-`, scan the subagent tier as well as the flat one, and resolve the session
 delegation-aware. The refused alternative — porting each meter with its own key —

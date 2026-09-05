@@ -138,3 +138,4 @@
 | enter-stage-cut-and-file-authoring-act | sc sp a b v c | 3f/0d | 2 · ≤0d | 20s 1✗ | 108 |
 | evidence-runner-trend-and-install-hooks-cuts | sc sp a b v c | 5f/1d | 4 · ≤1d | 28s 3✗ | 108 |
 | front-end-stub-and-gate-caller-cuts | sc sp a b v c | 5f/0d | 3 · ≤0d | 20s clean | 108 |
+| drift-meter-pair-and-scratch-run-cuts | sc sp a b v c | 5f/0d | 3 · ≤0d | 20s clean | 108 |

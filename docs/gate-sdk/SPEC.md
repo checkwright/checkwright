@@ -10690,6 +10690,12 @@ what lets a caller running from a scratch tree — the consumer smoke's build le
 set cwd and get that tree's crate, and it is why the contract says "from the repo
 root" rather than leaving the working directory unstated.
 
+**A session adding a NEW crate source stages it before running this, never
+after.** The tree side §check-gate-binary-fresh compares is derived over
+`git ls-files`, so an untracked file is invisible to it and a build that precedes
+the `git add` is already stale at the commit. That section owns the trap and its
+reason; the pointer is here because this is the step whose order is wrong.
+
 **The crate is deliberately not `rustfmt`-clean, and running `cargo fmt` over it
 is a defect rather than housekeeping.** Measured 2026-08-30 by
 `cargo fmt --check`: 130 of the crate's files diverge from rustfmt's output,
