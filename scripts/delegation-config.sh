@@ -6,11 +6,6 @@
 # shellcheck disable=SC2034  # consumed by the --hook agent-dispatch-guard arm, which the config bridge resolves this roster for
 DELEGATION_KIT_READONLY_TYPES=(audit-sweep)
 
-# spec: gate-sdk/SPEC.md §The non-gate arm — the deleted driver's inline default, moved to the seam that owns its VALUE rather than to the kit library: this path is the consumer's own vocabulary, so delegation-kit ships the knob empty and this repo names its reader here. Without it the guard logs a verdict it never probed.
-# spec: delegation-kit/SPEC.md §Layout and configuration — guarded, never a plain assignment: the driver spelled this `${DELEGATION_KIT_LIVENESS_CMD-<default>}`, so an environment override won, and an unconditional assignment here would silently take that seam away from every caller that sets it.
-# shellcheck disable=SC2034  # consumed by the --hook subagent-stop-liveness arm, which the config bridge resolves this path for
-[[ -v DELEGATION_KIT_LIVENESS_CMD ]] || DELEGATION_KIT_LIVENESS_CMD="scripts/producer-liveness-reader.sh"
-
 # spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; --emit-usage-trend reports the evolution
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_USAGE_HISTORY=".metric/usage-history.log"

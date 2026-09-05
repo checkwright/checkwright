@@ -50,17 +50,23 @@ pub fn run(payload: Option<&Value>) -> i32 {
         Ok(v) => v,
         Err(e) => return hook::decline("subagent-stop-liveness", &e),
     };
-    let firing = fire(payload, &log, &liveness_cmd, &run_dir);
+    let reader = reader_argv(&liveness_cmd, &run_dir);
+    let firing = fire(payload, &log, reader.as_deref(), &run_dir);
     if !firing.stderr.is_empty() {
         eprint!("{}", firing.stderr);
     }
     firing.code
 }
 
-// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the firing itself, knobs already
-// resolved. Nothing here writes stdout: this member emits no hook JSON on any path, and a byte
-// there would be a decision it never makes.
-pub fn fire(payload: Option<&Value>, log: &str, liveness_cmd: &str, run_dir: &str) -> Firing {
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the firing itself, the reader argv
+// already resolved and `None` where nothing resolved. Nothing here writes stdout: this member emits
+// no hook JSON on any path, and a byte there would be a decision it never makes.
+pub fn fire(
+    payload: Option<&Value>,
+    log: &str,
+    reader: Option<&[String]>,
+    run_dir: &str,
+) -> Firing {
     let event = sanitize(&hook::field(payload, &["hook_event_name"]));
     let session = sanitize(&hook::field(payload, &["session_id"]));
     let keys = sanitize(&top_level_keys(payload));
@@ -71,7 +77,7 @@ pub fn fire(payload: Option<&Value>, log: &str, liveness_cmd: &str, run_dir: &st
         .and_then(Value::as_bool)
         .unwrap_or(false);
 
-    let reader_status = read_liveness(liveness_cmd, run_dir);
+    let reader_status = reader.and_then(read_liveness);
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set is read AFTER the
     // reader ran, so a record created during the reading is counted rather than missed and an
@@ -120,7 +126,7 @@ pub fn fire(payload: Option<&Value>, log: &str, liveness_cmd: &str, run_dir: &st
     if decision != "refuse" {
         return Firing { code: 0, stderr: String::new() };
     }
-    Firing { code: 2, stderr: refusal(verdict, liveness_cmd, run_dir, &runs) }
+    Firing { code: 2, stderr: refusal(verdict, reader, run_dir, &runs) }
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record's line form: the stamp,
@@ -172,20 +178,41 @@ fn top_level_keys(payload: Option<&Value>) -> String {
         .unwrap_or_default()
 }
 
-// spec: delegation-kit/SPEC.md §The turn-end liveness hook — no shipped default: the reader is a
-// path the consumer names, so an empty or unreadable one means the reader never ran at all.
-fn read_liveness(cmd: &str, run_dir: &str) -> Option<i32> {
-    if cmd.is_empty() || !std::path::Path::new(cmd).is_file() {
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the reader argv, resolved once for
+// both the spawn and the refusal text: an unset knob is the DEFAULT and an override is spawned
+// directly, no interpreter word.
+fn reader_argv(cmd: &str, run_dir: &str) -> Option<Vec<String>> {
+    if cmd.is_empty() {
+        let exe = std::env::current_exe().ok()?;
+        return Some(vec![
+            exe.display().to_string(),
+            "check-producer-liveness".to_string(),
+            run_dir.to_string(),
+        ]);
+    }
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — executability rather than mere
+    // file-ness is the override's resolution predicate now that no interpreter word is prepended:
+    // an override without the bit cannot be spawned, so it resolves to no reader at all.
+    if !proc::is_executable(std::path::Path::new(cmd)) {
         return None;
     }
-    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the liveness reader stays external
-    // and stays spawned: it is a member of the `scripts/` owed cohort, not of this cut.
-    match proc::run_bounded("bash", &[cmd, run_dir], READER_BOUND_SECS) {
+    Some(vec![cmd.to_string(), run_dir.to_string()])
+}
+
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the reading is a CHILD's exit class,
+// for the default exactly as for an override: one code path with two values of one argv, so every
+// row of the verdict table stays true of both.
+fn read_liveness(argv: &[String]) -> Option<i32> {
+    let args: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
+    match proc::run_bounded(&argv[0], &args, READER_BOUND_SECS) {
         // spec: delegation-kit/SPEC.md §The turn-end liveness hook — a timeout is an error and
         // allows, so a refusal is only ever the reader's own verdict
         Ok(None) => Some(124),
         Ok(Some(code)) => Some(code),
-        Err(_) => Some(127),
+        // spec: delegation-kit/SPEC.md §The turn-end liveness hook — a spawn that never started is
+        // `unavailable`, not `error`: `error` reports a reader that RAN and returned an unmapped
+        // code, so reporting it here would name a reading that was never taken.
+        Err(_) => None,
     }
 }
 
@@ -215,7 +242,7 @@ fn read_run_keys(run_dir: &str) -> Vec<String> {
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the `red` and `corrupt` arms name the
 // record set the decision was taken over, which at `records=1` is the matched record exactly and
 // above it the candidate set; `unresolved` takes no such field, its set being empty by construction
-fn refusal(verdict: &str, liveness_cmd: &str, run_dir: &str, runs: &str) -> String {
+fn refusal(verdict: &str, reader: Option<&[String]>, run_dir: &str, runs: &str) -> String {
     let ways = "Two ways forward: wait for the producer on its own artifact, in a loop that ends when the condition goes true; or delete the record once the producer has exited.";
     let (finding, ways, look) = match verdict {
         "red" => (
@@ -234,9 +261,15 @@ fn refusal(verdict: &str, liveness_cmd: &str, run_dir: &str, runs: &str) -> Stri
             "to see the reader's own reason",
         ),
     };
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the reader argv is printed as the
+    // hook spawned it, interpreter word and all where there is one, so re-running it by hand is the
+    // same invocation rather than a transcription of it
     format!(
-        "turn-end refused: {}.\n{}\nRun `bash {} {}` {}.\n",
-        finding, ways, liveness_cmd, run_dir, look
+        "turn-end refused: {}.\n{}\nRun `{}` {}.\n",
+        finding,
+        ways,
+        reader.map(|a| a.join(" ")).unwrap_or_default(),
+        look
     )
 }
 
@@ -263,11 +296,20 @@ mod tests {
         fn at(&self, rel: &str) -> String {
             self.0.join(rel).display().to_string()
         }
-        // comment-tier-exempt: a reader stub, one per exit class — the case table's own shape
-        fn reader(&self, name: &str, code: i32) -> String {
+        // spec: delegation-kit/SPEC.md §The turn-end liveness hook — a reader stub is written the
+        // way the contract requires a shell override to be written: its own shebang and its own
+        // executable bit, because no interpreter word is prepended to it
+        fn stub(&self, name: &str, body: &str) -> String {
             let p = self.at(name);
-            std::fs::write(&p, format!("exit {}\n", code)).expect("stub must be writable");
+            std::fs::write(&p, format!("#!/usr/bin/env bash\n{}\n", body))
+                .expect("stub must be writable");
+            crate::install::make_executable(std::path::Path::new(&p)).expect("stub must be runnable");
             p
+        }
+        // comment-tier-exempt: a reader stub's resolved argv, one per exit class — the case table's own shape
+        fn reader(&self, name: &str, code: i32) -> Vec<String> {
+            let p = self.stub(name, &format!("exit {}", code));
+            reader_argv(&p, &self.at("runs")).expect("an executable stub must resolve")
         }
         fn record(&self, name: &str) {
             std::fs::write(self.0.join("runs").join(name), "pid=1 run=k\n").expect("record");
@@ -308,7 +350,7 @@ mod tests {
     #[test]
     fn no_reader_at_all_is_unavailable_and_allows() {
         let s = Scratch::new("no-reader");
-        let f = fire(payload(PAYLOAD).as_ref(), &s.at("a.log"), "", &s.at("runs"));
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("a.log"), None, &s.at("runs"));
         assert_eq!(f.code, 0);
         assert!(f.stderr.is_empty(), "an allowing firing must write no reason");
         want(&s.log("a.log"), "no-reader", &[
@@ -331,14 +373,14 @@ mod tests {
                 .to_string()
         }
 
-        fire(payload(PAYLOAD).as_ref(), &s.at("empty.log"), "", &s.at("runs"));
+        fire(payload(PAYLOAD).as_ref(), &s.at("empty.log"), None, &s.at("runs"));
         let empty = s.log("empty.log");
         assert_eq!(field(&empty, "runs"), "-", "an empty record set renders absent: {}", empty);
         assert_eq!(field(&empty, "records"), "0");
 
         s.record("beta.run");
         s.record("alpha.run");
-        fire(payload(PAYLOAD).as_ref(), &s.at("full.log"), "", &s.at("runs"));
+        fire(payload(PAYLOAD).as_ref(), &s.at("full.log"), None, &s.at("runs"));
         let full = s.log("full.log");
         assert_eq!(
             field(&full, "runs"), "alpha,beta",
@@ -357,13 +399,13 @@ mod tests {
     fn the_two_record_bearing_arms_name_the_set_and_unresolved_does_not() {
         let s = Scratch::new("runs-message");
         s.record("sibling.run");
-        let red = fire(payload(PAYLOAD).as_ref(), &s.at("mr.log"), &s.reader("mrr", 1), &s.at("runs"));
+        let red = fire(payload(PAYLOAD).as_ref(), &s.at("mr.log"), Some(&s.reader("mrr", 1)), &s.at("runs"));
         want(&red.stderr, "red-runs", &["runs=sibling"]);
-        let corrupt = fire(payload(PAYLOAD).as_ref(), &s.at("mc.log"), &s.reader("mcc", 2), &s.at("runs"));
+        let corrupt = fire(payload(PAYLOAD).as_ref(), &s.at("mc.log"), Some(&s.reader("mcc", 2)), &s.at("runs"));
         want(&corrupt.stderr, "corrupt-runs", &["runs=sibling"]);
 
         let u = Scratch::new("runs-message-unresolved");
-        let unresolved = fire(payload(PAYLOAD).as_ref(), &u.at("mu.log"), &u.reader("muu", 2), &u.at("runs"));
+        let unresolved = fire(payload(PAYLOAD).as_ref(), &u.at("mu.log"), Some(&u.reader("muu", 2)), &u.at("runs"));
         assert_eq!(unresolved.code, 2);
         assert!(
             !unresolved.stderr.contains("runs="),
@@ -387,7 +429,7 @@ mod tests {
             s.record("k.run");
             let stub = s.reader(&format!("reader-{}", verdict), code);
             let log = s.at(&format!("{}.log", verdict));
-            let f = fire(payload(PAYLOAD).as_ref(), &log, &stub, &s.at("runs"));
+            let f = fire(payload(PAYLOAD).as_ref(), &log, Some(&stub), &s.at("runs"));
             assert_eq!(f.code, rc, "reader exit {} must map to exit {}", code, rc);
             assert_eq!(
                 !f.stderr.is_empty(), rc == 2,
@@ -407,12 +449,12 @@ mod tests {
     fn each_refusing_arm_names_its_own_finding_and_remedy() {
         let s = Scratch::new("messages");
         s.record("k.run");
-        let red = fire(payload(PAYLOAD).as_ref(), &s.at("r.log"), &s.reader("rr", 1), &s.at("runs"));
+        let red = fire(payload(PAYLOAD).as_ref(), &s.at("r.log"), Some(&s.reader("rr", 1)), &s.at("runs"));
         want(&red.stderr, "red-message", &[
             "turn-end refused", "wait for the producer on its own artifact",
             "delete the record once the producer has exited", &s.at("runs"),
         ]);
-        let corrupt = fire(payload(PAYLOAD).as_ref(), &s.at("c.log"), &s.reader("cc", 2), &s.at("runs"));
+        let corrupt = fire(payload(PAYLOAD).as_ref(), &s.at("c.log"), Some(&s.reader("cc", 2)), &s.at("runs"));
         want(&corrupt.stderr, "corrupt-message", &["does not parse", "which record is malformed"]);
     }
 
@@ -422,7 +464,7 @@ mod tests {
     #[test]
     fn reader_exit_two_over_an_empty_set_is_unresolved_not_corrupt() {
         let s = Scratch::new("unresolved");
-        let f = fire(payload(PAYLOAD).as_ref(), &s.at("u.log"), &s.reader("ru", 2), &s.at("runs"));
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("u.log"), Some(&s.reader("ru", 2)), &s.at("runs"));
         assert_eq!(f.code, 2);
         want(&s.log("u.log"), "unresolved", &[
             "verdict=unresolved", "live=no", "records=0", "decision=refuse",
@@ -442,7 +484,7 @@ mod tests {
     #[test]
     fn unresolved_allows_once_the_harness_is_already_continuing() {
         let s = Scratch::new("continuing");
-        let f = fire(payload(CONTINUING).as_ref(), &s.at("uc.log"), &s.reader("ruc", 2), &s.at("runs"));
+        let f = fire(payload(CONTINUING).as_ref(), &s.at("uc.log"), Some(&s.reader("ruc", 2)), &s.at("runs"));
         assert_eq!(f.code, 0);
         want(&s.log("uc.log"), "unresolved-continuing", &[
             "verdict=unresolved", "records=0", "decision=allow",
@@ -450,7 +492,7 @@ mod tests {
         s.record("k.run");
         for (verdict, code) in [("red", 1), ("corrupt", 2)] {
             let log = s.at(&format!("{}c.log", verdict));
-            let g = fire(payload(CONTINUING).as_ref(), &log, &s.reader(&format!("c{}", verdict), code), &s.at("runs"));
+            let g = fire(payload(CONTINUING).as_ref(), &log, Some(&s.reader(&format!("c{}", verdict), code)), &s.at("runs"));
             assert_eq!(g.code, 2, "{} still refuses while continuing", verdict);
             want(&s.log(&format!("{}c.log", verdict)), verdict, &[
                 &format!("verdict={}", verdict), "decision=refuse",
@@ -464,28 +506,64 @@ mod tests {
     #[test]
     fn the_record_set_is_counted_after_the_reader_ran() {
         let s = Scratch::new("race");
-        let stub = s.at("reader-race");
-        std::fs::write(
-            &stub,
-            format!("printf 'pid=1 run=r\\n' > {}/r.run\nexit 2\n", s.at("runs")),
-        )
-        .expect("stub must be writable");
-        let f = fire(payload(PAYLOAD).as_ref(), &s.at("race.log"), &stub, &s.at("runs"));
+        let path = s.stub(
+            "reader-race",
+            &format!("printf 'pid=1 run=r\\n' > {}/r.run\nexit 2", s.at("runs")),
+        );
+        let stub = reader_argv(&path, &s.at("runs")).expect("an executable stub must resolve");
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("race.log"), Some(&stub), &s.at("runs"));
         assert_eq!(f.code, 2);
         want(&s.log("race.log"), "race", &["verdict=corrupt", "records=1", "decision=refuse"]);
     }
 
-    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case G: a reader that cannot be
-    // run at all is the vendoring prerequisite failing, so the hook degrades to `unavailable` and
-    // allows rather than refusing every turn end in a tree that never configured enforcement.
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case G: an OVERRIDE that resolves
+    // to nothing is `unavailable`'s remaining producer once the unset knob means the default, so
+    // the hook degrades and allows rather than refusing every turn end behind a mis-set knob.
     #[test]
-    fn an_unresolvable_reader_path_is_unavailable_and_allows() {
+    fn an_unresolvable_override_is_unavailable_and_allows() {
         let s = Scratch::new("absent");
         s.record("k.run");
-        let f = fire(payload(PAYLOAD).as_ref(), &s.at("g.log"), &s.at("nowhere/check.sh"), &s.at("runs"));
+        let reader = reader_argv(&s.at("nowhere/check.sh"), &s.at("runs"));
+        assert!(reader.is_none(), "a path that is not there resolves to no reader");
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("g.log"), reader.as_deref(), &s.at("runs"));
         assert_eq!(f.code, 0);
         assert!(f.stderr.is_empty());
         want(&s.log("g.log"), "absent-reader", &["verdict=unavailable", "live=no", "decision=allow"]);
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the unset knob is the DEFAULT and
+    // not an absence: it resolves to the running executable, which carries the gate as a member, so
+    // the argv is the binary, the gate name and the run dir.
+    #[test]
+    fn an_unset_knob_resolves_the_running_executable_and_the_gate_name() {
+        let argv = reader_argv("", "/run/dir").expect("the default must resolve");
+        let exe = std::env::current_exe().expect("a running test has an executable");
+        assert_eq!(
+            argv,
+            vec![exe.display().to_string(), "check-producer-liveness".to_string(), "/run/dir".to_string()],
+            "the default is the running executable spawned with the gate name and the run dir"
+        );
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — an override is spawned DIRECTLY
+    // with the scratch dir as its only argument, so one lacking the executable bit resolves to no
+    // reader rather than being run under a borrowed interpreter.
+    #[test]
+    fn an_override_is_spawned_with_no_interpreter_word_and_owes_its_own_bit() {
+        let s = Scratch::new("override-argv");
+        let exec = s.stub("with-bit", "exit 0");
+        assert_eq!(
+            reader_argv(&exec, "/run/dir").expect("an executable override must resolve"),
+            vec![exec.clone(), "/run/dir".to_string()],
+            "argv[0] is the override itself, and the run dir is its only argument"
+        );
+
+        let plain = s.at("no-bit");
+        std::fs::write(&plain, "#!/usr/bin/env bash\nexit 0\n").expect("stub must be writable");
+        assert!(
+            reader_argv(&plain, "/run/dir").is_none(),
+            "an override without the executable bit cannot be spawned, so it resolves to no reader"
+        );
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case H: an unwritable log drops
@@ -495,7 +573,7 @@ mod tests {
     fn an_unwritable_log_drops_the_line_and_decides_anyway() {
         let s = Scratch::new("unwritable");
         std::fs::write(s.at("blocker"), "not a directory\n").expect("blocker");
-        let f = fire(payload(PAYLOAD).as_ref(), &s.at("blocker/probe.log"), "", &s.at("runs"));
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("blocker/probe.log"), None, &s.at("runs"));
         assert_eq!(f.code, 0);
     }
 
@@ -508,7 +586,7 @@ mod tests {
         let f = fire(
             payload(r#"{"session_id":"a b\tc","hook_event_name":"Subagent Stop"}"#).as_ref(),
             &s.at("i.log"),
-            "",
+            None,
             &s.at("runs"),
         );
         assert_eq!(f.code, 0);
@@ -526,7 +604,7 @@ mod tests {
     fn an_empty_payload_degrades_its_fields_and_still_decides() {
         let s = Scratch::new("empty-payload");
         s.record("k.run");
-        let f = fire(None, &s.at("j.log"), &s.reader("rj", 1), &s.at("runs"));
+        let f = fire(None, &s.at("j.log"), Some(&s.reader("rj", 1)), &s.at("runs"));
         assert_eq!(f.code, 2);
         want(&s.log("j.log"), "empty-payload", &[
             "event=-", "session=-", "keys=-", "live=yes", "decision=refuse",
@@ -539,8 +617,8 @@ mod tests {
     fn one_firing_appends_exactly_one_line() {
         let s = Scratch::new("append");
         let log = s.at("k.log");
-        fire(payload(PAYLOAD).as_ref(), &log, "", &s.at("runs"));
-        fire(payload(PAYLOAD).as_ref(), &log, "", &s.at("runs"));
+        fire(payload(PAYLOAD).as_ref(), &log, None, &s.at("runs"));
+        fire(payload(PAYLOAD).as_ref(), &log, None, &s.at("runs"));
         assert_eq!(s.log("k.log").lines().filter(|l| !l.is_empty()).count(), 2);
     }
 

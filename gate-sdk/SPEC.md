@@ -460,9 +460,9 @@ the corpus's three families source three different libraries and two resolve the
 root before sourcing anything at all, so a shared helper buys a cross-kit
 dependency to save a one-line idiom, against the provenance seam and for no error
 class `check-path-dialect` does not already catch. The idiom needs no name:
-`scripts/producer-liveness-reader.sh` and `scripts/pack-installer.sh` both write
-it already, neither as a dialect measure, which is the evidence that it is the
-shape a shell author reaches for unprompted.
+`scripts/pack-installer.sh` and `installer/lib/init.sh` both write it
+already, neither as a dialect measure, which is the evidence that it is the shape
+a shell author reaches for unprompted.
 
 A value already inside the tree is in the declared dialect by the clause above and
 is **never re-normalized**: a second
@@ -639,11 +639,15 @@ What this section keeps is the one verdict a reader most needs a worked instance
 of, *exposed-but-satisfied* — a site whose consumption **is** dialect-exposed and
 which is nonetheless owed no change, because its value was already crossed:
 
-- `scripts/producer-liveness-reader.sh` resolves `git rev-parse --git-common-dir`
-  inline with `pwd -P`, then **concatenates** the result (`${_plr_common%/*}`, then
+- `scripts/producer-liveness-reader.sh` resolved `git rev-parse --git-common-dir`
+  inline with `pwd -P`, then **concatenated** the result (`${_plr_common%/*}`, then
   `"$_plr_main/$GATE_SDK_NATIVE_BIN"`). Exposed consumption, satisfied at its own
-  crossing: **no change owed**, and adding a normalization downstream would be
-  exactly the re-normalization the boundary clause forbids.
+  crossing: **no change owed**, and adding a normalization downstream would have
+  been exactly the re-normalization the boundary clause forbids. **That site is
+  gone**, deleted with the liveness reader once the hook's default became the
+  running executable and left it nothing to resolve; like the entry below it is
+  kept in the past tense rather than struck out, because what it teaches is the
+  predicate rather than the file.
 - drift-kit's `drift-report.sh` carried the same verdict on a second root, `KIT`,
   crossed by `cd "$(dirname …)" && pwd`. **That site is gone**, deleted with the
   shell collator by the 2026-08-29 drift-kit cut, and it is kept in the past tense
@@ -4765,6 +4769,20 @@ is §run-gates' stub cut, which is where the reasoning and its two refused
 alternatives live; recorded here because the *selection* consequence is the
 arm's — a front end that grows by a branch per bridged arm is a member the budget
 arm should order early, and the finding is what tells a later selector why.
+
+**The second finding is a homing rule, and it exists because the naive reading is
+wrong twice over: a consumer-side *adapter* is homed at the kit section whose
+contract it implements.** An adapter is an executable that is the **value** of a
+kit knob rather than a place a knob is set — its whole body is a resolution and a
+dispatch. It therefore falls outside a consumer's config-and-vocabulary class,
+whose ground is that a file holds a knob roster or a vocabulary an adopter edits;
+an adapter holds neither and is the thing a knob points *at*. And it is not the
+consumer's always-loaded manifest's either, by the standing rule that an
+always-loaded manifest is never a cut boundary. What owns it is the kit section
+that states the knob's contract, which is also the section a cut has to rewrite
+when the adapter goes. Recorded because a later selector reaching such a file
+would otherwise re-make the same wrong turn, and because the disposition and the
+prose edits then land in two different SPECs for no reason.
 
 **The arm names no remainder, which is what keeps it kit content.** It is stated
 generically — no gate names, no member roster, no count of any tree's remaining

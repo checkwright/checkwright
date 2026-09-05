@@ -60,19 +60,20 @@ cmp -s "$pp/usage.before" "$pp/usage.txt" || {
     echo "delegation-kit/smoke: poller fetch failure touched the snapshot" >&2; exit 1; }
 rm -rf "$pp"
 
-# spec: delegation-kit/SPEC.md §The turn-end liveness hook — the --hook subagent-stop-liveness arm is exercised with a crafted payload on its allowing arm: the knob is emptied, so the firing holds no reading (verdict=unavailable) whatever the run dir carries, and it must exit 0 and append exactly one grammar-conformant line
+# spec: delegation-kit/SPEC.md §The turn-end liveness hook — the --hook subagent-stop-liveness arm is exercised with a crafted payload on its allowing arm: the knob is emptied, so the reader is the binary's own compiled gate, and over a record naming a dead pid it reads green and allows. The route to the allowing arm is a reading rather than the absence of one, which is what a vendored consumer tree buys by holding the default — it must exit 0 and append exactly one grammar-conformant line
 sp="$PWD/.tmp/stop-probe-smoke"
 rm -rf "$sp"; mkdir -p "$sp"
-printf 'pid=1 run=smoke\n' > "$sp/smoke.run"
+# comment-tier-exempt: a pid above every attested pid_max is dead without a spawn, the same idiom evidence-kit's own producer-lock test buys its dead-record arms with — a live pid here would read red and refuse, which is the arm this one is not
+printf 'pid=2147483646 run=smoke\n' > "$sp/smoke.run"
 printf '{"session_id":"smoke","hook_event_name":"SubagentStop"}' | \
     DELEGATION_KIT_STOP_LOG="$sp/probe.log" \
     DELEGATION_KIT_LIVENESS_CMD="" \
     GATE_SDK_TMP_DIR="$sp" \
     bash "$SDK/bin/run-gates.sh" --hook subagent-stop-liveness || {
-    echo "delegation-kit/smoke: the SubagentStop hook did not exit 0 on its unavailable arm" >&2; exit 1; }
+    echo "delegation-kit/smoke: the SubagentStop hook did not exit 0 on its allowing arm" >&2; exit 1; }
 probe_line="$(cat "$sp/probe.log")"
 case "$probe_line" in
-    *"event=SubagentStop"*"session=smoke"*"live=no"*"verdict=unavailable"*"records=1"*"runs=smoke"*"decision=allow"*"keys="*) ;;
+    *"event=SubagentStop"*"session=smoke"*"live=no"*"verdict=green"*"records=1"*"runs=smoke"*"decision=allow"*"keys="*) ;;
     *) echo "delegation-kit/smoke: hook line off grammar: $probe_line" >&2; exit 1 ;;
 esac
 if [[ "$(grep -c . "$sp/probe.log")" -ne 1 ]]; then

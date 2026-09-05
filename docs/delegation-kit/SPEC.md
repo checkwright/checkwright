@@ -1007,7 +1007,7 @@ The count picks the **name**, never the decision — both refuse.
 | `red` | a live producer under a launch record | log, **exit 2** — the whole subject |
 | `corrupt` | reader exit 2 over a non-empty record set: a record that does not parse | log, **exit 2** — see below |
 | `unresolved` | reader exit 2 over an **empty** record set: a reader that could not run at all | log, **exit 2 once** — allows when `stop_hook_active` is true; see below |
-| `unavailable` | no reading at all (no reader named or resolvable) | log, exit 0 |
+| `unavailable` | no reading at all: an **override** that resolves to nothing spawnable — the default always resolves | log, exit 0 |
 | `error` | a configured reader that ran and did not answer | log, exit 0 |
 
 **`corrupt` refuses, and it diverges from guard-kit rule 14 on purpose.** Rule 14
@@ -1104,9 +1104,10 @@ refusal, only which of two refusing names the reading gets. Record count decides
 no refusal anywhere in this hook, on either arm.
 
 **`unavailable` and `error` allow on the degradation posture, not on leniency.**
-Both mean the hook obtained no reading — the knob names no reader, or a configured
-reader failed. Refusing there would refuse every turn end in a tree that has not
-configured a reader, in a kit that ships this hook opt-in and inert. **This is
+Both mean the hook obtained no reading — an **override** resolved to nothing
+spawnable, or a reader that ran failed to answer. Refusing there would refuse
+every turn end behind a mis-set knob or a broken reader, in a kit that ships this
+hook opt-in and inert. **This is
 where `unresolved` parts from them and the boundary is the reader's own contract,
 not a preference:** `unavailable` is a reader that never ran and `error` is one
 whose answer this hook does not map, while `unresolved` is a configured, readable
@@ -1149,52 +1150,84 @@ resolves *exit 2 wins over red wins over green* (evidence-kit/SPEC.md
 now the exit code. Nothing about how a PID's liveness is decided is seconded
 here.
 
-**The prerequisite is stated, not assumed.** A consumer that wires this hook with
-no reader resolvable at `DELEGATION_KIT_LIVENESS_CMD` — evidence-kit unvendored,
-or the knob left unset — gets `verdict=unavailable decision=allow` on every line:
-a hook that answers nothing and refuses nothing. That is honest degradation and it
-is preferable to a silent third parse that would work everywhere and drift from
-its owner.
+**The prerequisite is discharged by construction, and what remains of it is
+stated rather than assumed.** The reading is the binary's own compiled
+`check-producer-liveness`, so a tree that can fire this hook at all can take a
+reading: the prerequisite is the binary, which *is* the hook. What survives is the
+**override**'s prerequisite — a consumer that points
+`DELEGATION_KIT_LIVENESS_CMD` at a path that is absent or carries no executable
+bit gets `verdict=unavailable decision=allow` on every line: a hook that answers
+nothing and refuses nothing. That is honest degradation and it is preferable to a
+silent third parse that would work everywhere and drift from its owner.
 
-**The kit ships no default reader, and enforcement makes that ruling
-stronger rather than negotiable.** It defaulted to
+**The kit shipped no default reader for as long as it could not ship a real one,
+and enforcement made that ruling stronger rather than negotiable.** It defaulted to
 `evidence-kit/checks/check-producer-liveness.sh` while that gate was
 shell-declared. `shell-gate-tail-port` made the gate a descriptor dispatched to
 the binary, so that path exists in **no** tree — the readability test the reader
 sits behind fails everywhere, and the hook logged `unavailable` on every firing
 in a tree whose battery was green over it. A default naming a path nothing
 resolves is a fake default: it reads as a shipped capability and is none, which is
-worse than declaring the prerequisite. So the knob has no default and the reader
-is the consumer's to name; a kit-side default would now decide whether a tree
+worse than declaring the prerequisite. So the knob took no default and the reader
+was the consumer's to name; a kit-side default would decide whether a tree
 *refuses*. **The alternative was to teach this knob to resolve a gate *name*, and
-it is refused on a recorded precedent rather than on taste**:
+it was refused on a recorded precedent rather than on taste**:
 evidence-kit/SPEC.md §check-evidence-manifest met the identical break one caller
 over, when the same port turned a pre-flight entry's named path into a descriptor,
 and discharged it with a **consumer-side front end** resolving the name —
 "deliberately not teaching lifecycle-kit to resolve a name in that knob, which
-would be a kit-contract change". The same reasoning binds here, and it is the
-reason this repair changes no contract: the value is still a path this hook runs
-with the scratch dir as its only argument. This repo's own reader is
-`scripts/producer-liveness-reader.sh`, which reaches the gate by name
-through the front end its whole pre-flight roster already uses.
+would be a kit-contract change". The same reasoning bound here, and it is the
+reason that repair changed no contract: the value is still a path this hook runs
+with the scratch dir as its only argument. **The record is kept in the past tense
+rather than struck out**, because the paragraph below is the lapse of exactly this
+refusal's premise and reads as a non-sequitur without it.
 
-**That ruling's premise has lapsed, and the port disposition follows from the
-lapse.** The refusal above was written while the gate was a descriptor a bash
-front end dispatched, so "only a consumer knows its front end" was true. The hook
-and `check-producer-liveness` are now members of one binary, and a binary knows
-its own path: the hook reaches the gate through its **own executable** rather
-than through any front end, so the default reader is the compiled gate and the
-knob's absence means the default reader, not an unavailable verdict. `DELEGATION_KIT_LIVENESS_CMD`
-survives as the consumer **override** — a path executed directly with the scratch
-dir as its only argument, no interpreter word — for a consumer whose reader is not
-this gate. The worktree-resolution requirement below is discharged by construction
-for the default: the executable that is running is, by definition, present. This
-repo's shell reader and the front end it exec'd leave the tree with that cut; a
-consumer override that is a shell script names its interpreter in its own
-shebang, which is what dropping the `bash` prefix relies on.
+**That ruling's premise lapsed, and the kit now ships the default it could not
+ship before.** The refusal above was written while the gate was a descriptor a
+bash front end dispatched, so "only a consumer knows its front end" was true. The
+hook and `check-producer-liveness` are members of one binary, and a binary knows
+its own path: the hook reaches the gate through its **own executable** rather than
+through any front end, so **an unset or empty knob resolves to
+`current_exe()`, spawned with the gate name and the scratch dir as its argv**.
+That is a real default rather than a fake one — the executable that is running is,
+by definition, present — and it is what retires the fake-default objection above
+rather than reversing it. `DELEGATION_KIT_LIVENESS_CMD` survives as the consumer
+**override**: a path executed directly with the scratch dir as its only argument,
+**no interpreter word**, for a consumer whose reader is not this gate. An override
+that is a shell script therefore names its interpreter in its own shebang and
+carries its own executable bit, and **executability rather than mere file-ness is
+the override's resolution predicate** — one lacking the bit cannot be spawned, so
+it resolves to no reader and reads `unavailable` rather than being run under an
+interpreter the kit chose for it.
 
-**A consumer's reader must resolve from a worktree-isolated dispatch, and this is
-a requirement on the adapter rather than advice to it.** The consequence of one
+**The default is spawned rather than called in process, and the ground is the seam
+rather than caution.** `check-producer-liveness` is compiled into this binary and
+the gate table would hand back the function, so an in-process call is available and
+looks free. It is refused because this hook's whole predicate is *the reader's exit
+class* — the six-arm table above — and that table is written over a **child
+process's** status, with "no reading at all" as an arm no return value can
+express. An in-process call yields an integer and can never yield that arm, so the
+default and an override would travel two code paths with two arm sets, and
+`unavailable` would become unreachable for the default while staying reachable for
+an override. One code path with two values of one argv keeps every row of the
+table true of both, which is the property the table's readers — the close-stage
+triage below and this hook's own refusal text — depend on. For the same reason a
+spawn that never started reads `unavailable` and not `error`: `error` names a
+reader that **ran** and returned an unmapped code, so reporting it over a failed
+spawn would name a reading that was never taken.
+
+**`unavailable` is not retired by the default, and where it survives is stated**,
+because the obvious reading of a working default is that no firing can lack a
+reading again. An override naming a path that is absent, carries no executable bit,
+or cannot be spawned still yields no reading, so the arm keeps its producer. What
+it loses is the *unset knob* as a routine producer — precisely the fake-default
+degradation this section records as the reason the knob had no default at all.
+
+**A consumer's *override* must resolve from a worktree-isolated dispatch, and this
+is a requirement on the override rather than advice to it.** The default is
+discharged by construction — the executable that is running is present wherever it
+is running, so there is no absent path to resolve and no git query to make — which
+leaves this a requirement on the consumer who replaces it. The consequence of one
 that does not is severe and indirect, so it is named here: a fresh
 `git worktree add` checkout carries no build output, a reader that dispatches to
 a compiled binary therefore fails closed inside it, the hook reads `unresolved`
@@ -1207,26 +1240,38 @@ than as a dropped report. The bind can be structural rather than a rate: where a
 consumer's dispatch rules *require* isolation for read-only agents, isolation is
 also what arms this, and no dispatch shape avoids it while staying in contract.
 
-**The kit states the bar and cannot clear it, which is why this is stated at
-all.** Only a consumer knows its front end — the reason the knob has no default —
-so the requirement takes the same shape as the reader's exit-code contract above:
-something a consumer's adapter must satisfy. This repo's own reader satisfies it
-by resolving the configured binary against the **main checkout** when the
-configured path does not exist and the cwd is a linked worktree, deriving the
-main checkout vendor-neutrally from `git rev-parse --git-common-dir`.
-**That narrow resolution is safe where a general one would not be:**
-`check-producer-liveness` reads `*.run` records and nothing else, so its verdict
-does not depend on the binary matching the worktree's source and a main-checkout
-binary answers the same question a locally-built one would. That is emphatically
-not true of gates in general — `check-gate-binary-fresh` exists precisely to
-compare a binary against the source in its own tree — which is why this belongs
-in one consumer front end for one gate and not in how the binary knob resolves.
+**The kit states the bar for the override and clears it for the default, and the
+worked example is the default's own discharge.** The reader that runs when the
+knob is unset is the binary that is *already executing the hook*, so inside a
+linked worktree carrying no build output it is still present and still answers:
+there is nothing to resolve, which is a stronger discharge than any resolution
+and is why no git query survives this section. An override takes the bar instead,
+in the same shape as the reader's exit-code contract above: something the
+consumer's own path must satisfy, because only that consumer knows where its
+reader lives.
 
-**It resolves an artifact; it does not build one.** The recorded refusal this
-might look like reversing is untouched: an isolated agent still may not build the
-crate, and there is still no hook that can reach a worktree which does not exist
-yet at dispatch time. This resolves a binary that already exists in a tree that
-already exists, at the moment the reader runs.
+**Not re-implementing a resolution for the override is a narrowing, and it is
+deliberate rather than an omission.** A consumer whose override names a
+compiled-binary path gets no repair inside a worktree — the `unresolved` and
+`unavailable` arms stay reachable for exactly that consumer, which is why neither
+row is retired. The kit that once carried a resolving adapter is the kit that no
+longer needs one, and a consumer who reintroduces the shape owns it: resolving a
+configured binary against the **main checkout** when the configured path is absent
+and the cwd is a linked worktree, deriving the main checkout vendor-neutrally from
+`git rev-parse --git-common-dir`. **That narrow resolution is safe where a general
+one would not be:** `check-producer-liveness` reads `*.run` records and nothing
+else, so its verdict does not depend on the binary matching the worktree's source
+and a main-checkout binary answers the same question a locally-built one would.
+That is emphatically not true of gates in general — `check-gate-binary-fresh`
+exists precisely to compare a binary against the source in its own tree — which is
+why it belonged in one consumer front end for one gate and never in how the binary
+knob resolves.
+
+**Such a resolution resolves an artifact; it does not build one.** The recorded
+refusal it might look like reversing is untouched: an isolated agent still may not
+build the crate, and there is still no hook that can reach a worktree which does
+not exist yet at dispatch time. It resolves a binary that already exists in a tree
+that already exists, at the moment the reader runs.
 
 **The cost is stated beside the requirement, because it is what makes the bar
 worth stating rather than leaving to be discovered.** The ordinary case is one
@@ -1331,8 +1376,8 @@ list does not name one for:
   and is not available, which it leaves standing.
 - **`verdict=error`** — a **configured** reader that ran and did not answer: an
   unmapped exit code, or the `timeout` bound firing. Its named reader is the
-  close-stage triage below, at the same transition, distinguishing *this tree
-  never configured enforcement* (`unavailable`) from *this tree's enforcement is
+  close-stage triage below, at the same transition, distinguishing *this tree's
+  override resolves to nothing* (`unavailable`) from *this tree's enforcement is
   broken* (`error`). Before enforcement both meant "no reading" and the
   distinction cost more than it bought.
 - **`verdict=unresolved`** — the **third** state that triage tells apart, and the
@@ -1340,7 +1385,7 @@ list does not name one for:
   held no record to be about. It is what earns a third name rather than a fold
   onto `unavailable`, because the fix is a different one — the reader could not
   run at all, where `error` is a reader that ran and answered off-contract and
-  `unavailable` is a tree that never wired one. Its named reader is the same
+  `unavailable` is an override that resolved to nothing. Its named reader is the same
   close-stage triage at the same transition. Unlike the other two it also
   **refuses**, so the triage reads it for a second question the others never
   raise: whether a refusal was diagnostic rather than about a real producer.
@@ -1691,15 +1736,17 @@ nothing in the battery says so.
 
 **One half of that is now observed, and the half that is not is the same half.**
 The *registration* is still unwatched, for the reasons above. What is watched is
-the **configured reader**, on `scripts/gate-tests/subagent-stop-reader.test.sh`,
-which fires this repo's wired `--hook subagent-stop-liveness` arm against its own
-configured reader over a scratch run dir it constructs, asserting `green` and an
-allowed exit on an empty dir, `red`, `decision=refuse` and exit 2 with a reason on
-a record naming a PID that is always alive, and `unresolved decision=refuse` when
-the reader is real and resolvable but the binary it dispatches to is absent over
-an empty run dir — the isolated-dispatch shape, and the one arm that must **not**
-come back `unavailable`, which would misreport a wired reader as one that was
-never configured. `unavailable` fails that lane by name. **Both record-bearing
+the **resolved reader**, on `scripts/gate-tests/subagent-stop-reader.test.sh`,
+which fires this repo's wired `--hook subagent-stop-liveness` arm over a scratch
+run dir it constructs, asserting `green` and an allowed exit on an empty dir,
+`red`, `decision=refuse` and exit 2 with a reason on a record naming a PID that is
+always alive — the reason naming the argv the hook actually spawned, which is how
+that lane sees the *default* resolving rather than merely a verdict arriving — and
+`unresolved decision=refuse` when an override is real and spawnable but produces
+no reading over an empty run dir. That last is the isolated-dispatch shape, and
+the one arm that must **not** come back `unavailable`, which would misreport a
+working override as one that resolved to nothing. `unavailable` fails that lane by
+name. **Both record-bearing
 arms also assert `runs`** — the empty-dir arm that it renders the absent token,
 the live-record arm that the row *and the refusal message* carry that record's
 key — so the field's two consumers are proved on the one lane that exercises the
@@ -1765,8 +1812,12 @@ expectation rather than re-derived from the code it tests, with one deliberate
 divergence: `keys` is asserted sorted, this section's own rule, where the table
 recorded document order. The real-reader lane above still reaches neither
 `corrupt` nor `error`, and does not need to — the stub lane is where a reader's
-exit class is chosen, and the real lane exists to prove the *configured* reader
-resolves at all.
+exit class is chosen, and the real lane exists to prove the *resolved* reader runs
+at all. **Since the default landed, that stub lane also carries the resolution
+itself**: the unset knob resolving to the running executable and the gate name, an
+override resolving to itself with the run dir as its only argument, and an
+override without the executable bit resolving to no reader — the three readings a
+lane driving pre-resolved argv could not otherwise reach.
 
 ### What `background_tasks` carries
 
@@ -3107,14 +3158,17 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   be a name nothing reads, and the close stage reaches the file through the
   roster's literal rather than through a knob.
 - `DELEGATION_KIT_LIVENESS_CMD` — the liveness reader the probe invokes in set
-  mode, a path run with the scratch dir as its only argument; **no default**.
-  A knob rather than a literal because a consumer's evidence-kit may sit
-  elsewhere, and defaultless because the gate behind it is reached by *name*
-  rather than by path and only a consumer knows its front end (§The turn-end liveness hook owns why the knob is not taught to resolve a name).
-  Unset and empty are therefore the same value here, and both are the supported
-  way to run the hook with no reader at all — the honest-degradation case the
-  section states, in which every firing logs `verdict=unavailable decision=allow`
-  and refuses nothing.
+  mode, a path executed **directly** with the scratch dir as its only argument, no
+  interpreter word, so a shell reader owes its own shebang and its own executable
+  bit. It is an **override over a working default**: unset and empty are the same
+  value and both mean the binary's own compiled `check-producer-liveness`, spawned
+  with the gate name and the scratch dir (§The turn-end liveness hook owns why the
+  default is spawned rather than called in process, and why the earlier
+  no-default ruling lapsed). A knob rather than a literal because a consumer's
+  reader may not be this gate at all; the honest-degradation case the section
+  states — every firing logging `verdict=unavailable decision=allow` and refusing
+  nothing — is now reached by an override that resolves to nothing, never by
+  leaving the knob alone.
 - `DELEGATION_KIT_READONLY_TYPES` — agent-type names the consumer dispatches for
   read-only work; D2's only trigger (§The delegation model). Default empty, in
   which case D2 is inert by construction. Every entry is the consumer's own
@@ -3154,8 +3208,9 @@ event. It registers under `SubagentStop` in the consumer's `.claude/settings.jso
 — an event that takes **no matcher**, so the entry carries a `hooks` array alone
 and is not tool-scoped, the shape a `SessionStart` entry already has. Wire
 `bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness`; it
-sources no kit lib at all (§The turn-end liveness hook owns why) and
-resolves its reader through `DELEGATION_KIT_LIVENESS_CMD`. Registration is again
+sources no kit lib at all (§The turn-end liveness hook owns why) and reads its own
+compiled `check-producer-liveness` unless `DELEGATION_KIT_LIVENESS_CMD` overrides
+it, so wiring alone is enough and no reader path is owed. Registration is again
 the whole opt-in, and here the opt-in is also the consent: the wiring is a
 permission-surface write, so it is the consumer's own act and never an agent
 session's.

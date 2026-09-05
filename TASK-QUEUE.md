@@ -12,22 +12,6 @@
 
 ## New Features
 
-- **liveness-reader-cut** [spec: SPEC-liveness-reader-cut.md] — delete
-  `scripts/producer-liveness-reader.sh` (26) and make the compiled gate the hook's default reader,
-  the one owed file behind delegation-kit/SPEC.md §The turn-end liveness hook.
-  **Selection ground, host and packaging: `run-gates-stub-cut`'s**, not restated.
-  **BUILD-HELD ORDERING — the crate default lands BEFORE the deletion, in the same commit.**
-  Probed rather than assumed: `native/src/hook/stop_liveness.rs:177-184` still returns `None` on
-  an empty knob and still spawns with a `bash` interpreter word, its own comment saying the reader
-  *"stays external and stays spawned … not of this cut"*. Deleting the script while relying on the
-  kit default reproduces the attested regression exactly — 77 `verdict=unavailable` firings in one
-  46-minute window under a green battery, recorded on `kit-knob-consumer-adapter-convention`.
-  **It invalidates a shipped smoke scenario and that is measured, not projected:**
-  `delegation-kit/smoke/install.sh:63-81` buys its allowing arm by emptying the knob over a
-  `pid=1` record; under a working default that firing reads `red` and refuses at exit 2.
-  ruled: liveness-reader-cut lead 2026-09-05 own-authority
-  Filed 2026-09-05 by spec, minted with its amendment and promoted in the same commit.
-
 - **preflight-front-end-cut** [spec: SPEC-preflight-cut.md] — delete `scripts/gate-exec.sh` (29)
   and re-point the nine `LIFECYCLE_KIT_ENTRY_PREFLIGHT` entries onto `run-gates.sh --only`, the
   one owed file behind evidence-kit/SPEC.md §check-evidence-manifest.
@@ -10079,5 +10063,6 @@
 
 - build-native-bootstrap-declaration
 - run-gates-stub-cut
+- liveness-reader-cut
 
 ## Lessons Learned
