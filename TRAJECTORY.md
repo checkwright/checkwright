@@ -600,28 +600,6 @@ or a closed ruling has mooted; joining units under the grounds above is work on 
 triage. Discharge event: the oracle's owed count reads zero, at which point the port-cut-first
 clause is spent and this paragraph is deleted; the composition test is the kit's and stays.
 
-**`test-harness-cut-seam-sweep` runs WIDE at seven amendments, deliberately and with the cost
-disclosed — ruled 2026-09-05 by the operator through an interactive prompt in the lead session,
-which relayed it and did not rule it.** Composition: the four-section test-harness port cut, the
-directed provenance-seam sweep split to gate-sdk, and both recurrence-threshold members
-(`lead-tier-split-premise-unamended`, `cardinal-notation-splits-gate-reach`). Nothing is reversed
-and no exception is granted; this is the one exit of three that needed neither.
-**The cause is NOT the join, and recording it that way would misstate it.** The port cut alone is
-four amendments — the widest window on record (`583f5e44`) — and the directed sweep makes five, so
-the overrun exists before either threshold member is considered. The two took it from five to
-seven. Two alternatives were put to the operator and declined: applying the joining grounds'
-own *ordered so when the window cannot hold every candidate* tie-break, which drops both
-product-class members but reaches only five and so was never a sufficient remedy; and shrinking the
-port cut, which collides with the port-first run's *never displaced by a joined unit* above.
-**How close scores it:** as a disclosed wide shape rather than as drift, against the port-first
-run's own *cheapest per member and the dearest in total* characterization and the triad read at
-this iteration's boundary — governance share 68 % against an expected fall from 66 %, governed
-prose +27 net lines, the pool flat at 291 deferred and 83 icebox. That prose figure is the
-BASELINE, not the result: landing this window's rulings took it to +77, roughly fifty of which is
-scope's own, so close measures against +27 and counts the rest as spend. Whether seven-against-four
-is itself a finding about the composition test is close's to judge.
-Discharge event: this iteration closes, at which point this paragraph is deleted.
-
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
 §The closed rulings names, `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree`'s owed count reaching zero, and it stands

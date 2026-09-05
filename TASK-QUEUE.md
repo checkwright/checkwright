@@ -9968,14 +9968,4 @@
 
 ## Done
 
-- ruled-line-retirement-dropped-provenance
-- gate-tests-runner-port-cut
-- test-hermetic-port-cut
-- hermetic-bin-suffix-pin-placement
-- kit-spec-provenance-seam-sweep
-- guard-tests-runner-port-cut
-- agents-md-smoke-port-cut
-- cardinal-notation-splits-gate-reach
-- lead-tier-split-premise-unamended
-
 ## Lessons Learned
