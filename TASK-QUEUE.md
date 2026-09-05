@@ -9736,6 +9736,45 @@
   same resume, and the defect surfaces only at the dispatch that the wrong stage refuses.
   Filed 2026-09-05 by close, routed by the lead as a finding neither spec nor build had filed.
 
+- **ruled-line-retirement-dropped-provenance** [design-pending] — retiring the `ruled:`
+  declaration line deleted 44 provenance assertions and relocated 2, on a premise that was
+  measured on one entry and is false for most of the pool.
+  **MEASURED 2026-09-05 at scope, every deleted line resolved to its (authority, date, channel)
+  triples and every host entry read WHOLE at HEAD rather than through the diff hunk.** `111e61a3`
+  deleted 44 `ruled:` lines across 27 distinct slugs and added 2 inline replacements — 18
+  insertions against 86 deletions. Of the 27 slugs: **4 CLEAN**, **15 PARTIAL** (the date
+  survives, the authority and/or the channel is gone on at least one instance), **8 LOST** (at
+  least one ruling triple has NO textual trace, so a reader cannot tell the ruling happened).
+  **The retirement's own recorded premise** — the body already carried authority, date and
+  channel inline, so deleting the line loses nothing — holds for a minority. It was verified on
+  the host entry that forced the compression and generalised to the pool unmeasured.
+  **The failure has a SHAPE, which is why this is repairable rather than only regrettable.** It
+  concentrates on entries hosting SEVERAL rulings of one authority across different dates: only
+  the newest instance was restated inline and the older co-located ones were dropped outright
+  instead of folded in. The pool's two densest hosts, `platform-support-ci-matrix` and
+  `native-gate-port-remaining-corpus`, are both LOST for that reason.
+  **Two elements drop, not one.** Usually the channel; on `kpi-cost-per-unit` and
+  `kit-spec-provenance-seam-sweep` it is the AUTHORITY that is gone — a direction CLAUDE.md's own
+  worked example does not anticipate, so a session auditing for the anticipated failure misses it.
+  **NOT ONLY THIS TREE — the shipped rule is indicted too, which is the half that makes this
+  product-class under the 2026-08-30 witness discriminator.** queue-kit/SPEC.md's
+  inline-provenance rule rides the installer payload and the public site, and states no folding
+  obligation for an entry hosting several rulings — exactly the case that failed here 23 times in
+  27. An adopter following the rule as written reproduces the loss.
+  **Why `[design-pending]`:** the repair is one question and the rule is another. Restoring this
+  tree's 27 entries is bounded — every assertion is verbatim in `git show 111e61a3` — but several
+  hosts sit at or near the entry cap, so restoring provenance forces a compression judgment rather
+  than an insertion, which is the part no session should take by accident. And whether the tag
+  algebra gains a stated folding obligation, a gate over it, or only a worked example is unsettled.
+  **DISTINCT from `ruling-accretion-outgrows-the-entry-cap`**, whose subject is a body outgrowing
+  the cap; this one is a record that was deleted and never re-landed.
+  **Cost while deferred:** low today and rising — the assertions are one `git show` away now, and
+  every later edit to those 27 entries moves the text the restoration has to be woven into. Until
+  it is repaired, eight entries assert rulings a reader cannot attribute at all, on a queue whose
+  own doctrine is that the owner doc is ground truth.
+  Surfaced 2026-09-05 at this scope's boundary sweep, four commits after the retirement landed;
+  filed rather than repaired here under scope-gated intake.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
