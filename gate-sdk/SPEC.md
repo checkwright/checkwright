@@ -12644,6 +12644,18 @@ battery was green *because* the file was untracked. The order is **stage the new
 source, then run `bash gate-sdk/bin/build-native.sh`**; a rebuild is what the
 red asks for and re-running the battery without one reproduces it.
 
+**A green verdict here does not discharge the build**, and the ground is the
+sentence above rather than a separate rule. The tree side is the tracked set, so
+this gate is green on a tree carrying an untracked crate source the binary was
+never built from — the freshness claim is *the binary matches what git knows
+about*, which is weaker than *the binary matches the source on disk*. A session
+reading a green battery as evidence that the build step is redundant is reading
+past that gap, and the reading is wrong on exactly the tree where it costs
+something. So a consumer whose commit-time obligation names the battery **and**
+the build is not carrying a redundancy, and neither obligation discharges the
+other: only the build reaches the untracked source, and only the gate reaches a
+binary nobody rebuilt.
+
 **A bespoke case for this member cannot vary the binary through the dispatch.**
 Its subject *is* `GATE_SDK_NATIVE_BIN`, which `gate_command` also resolves the
 dispatch through, so pointing that knob at a missing binary makes the dispatcher
