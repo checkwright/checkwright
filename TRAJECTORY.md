@@ -477,13 +477,16 @@ the operator in consult.** Mechanism at drift-kit/SPEC.md §The overhead meter. 
 each meter with its own derivation, which makes the recorded divergence permanent in-crate and
 leaves `overhead-meter-measures-the-lead`'s mis-attribution standing after the port.
 
-**The scratch runner's port is pre-authorized: build prepares the grant addition, the operator
-applies it — ruled 2026-09-05 by the operator in consult.** The 2026-08-22 bar is untouched:
-build lands the ported arm with the existing path-naming grant still in place and records the
-one-line grant diff on `scratch-run-port-blocker-unrecorded`; the arm goes live when the operator
-applies it out of band, and the shell path keeps working until then, so no window exists where
-neither runs. Refused: a `# no-port:` citing guard-kit's permission-addition paragraph, a
-subtraction on a ground that is a scheduling fact rather than an irreducible.
+**The scratch runner's port owes a grant REMOVAL and no addition — ruled 2026-09-05 by the
+operator in-session, the operator's own re-scoping of an earlier pre-authorization the same day.**
+The addition premise was false: the forced-family test makes the ported arm bridged, so it is
+reached as `run-gates.sh --scratch-run`, a string the front-end grant already covers. The removal
+of the path-naming grant landed in the deleting commit under the 2026-08-29 base, and the 2026-08-22
+bar is untouched. The same ruling knowingly retires the consumer opt-out guard-kit sold, with that
+cost named in the question; it is not a general licence over `.claude/settings.json` and not a
+finding that consumer opt-outs are cheap. Refused: a `# no-port:` citing guard-kit's
+permission-addition paragraph, a subtraction on a ground that is a scheduling fact rather than an
+irreducible.
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 

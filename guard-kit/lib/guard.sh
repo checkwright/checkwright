@@ -1162,10 +1162,12 @@ _guard_stdin_redirect() {
         | sed -E 's/^[^<]?<[[:space:]]*//'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both resolve the runner from GUARD_KIT_LIB so a consumer that vendors the kit elsewhere is told where its own copy is
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both resolve the runner from GUARD_KIT_LIB so a consumer that vendors the kit elsewhere is told where its own copy is. The runner is a bridged arm of gate-sdk's front end, so what the steer composes is that front end's path, derived from the vendor root this kit's own location already names rather than hardcoded — a relocated tree still prints a path that resolves.
 _guard_block_interpreter() {
-    local arm="$1" word="$2" src="$3" runner="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
-    runner="${runner%/lib/guard.sh}/bin/scratch-run.sh"
+    local arm="$1" word="$2" src="$3" runner="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}" root
+    root="${runner%/lib/guard.sh}"
+    if [[ "$root" == */* ]]; then root="${root%/*}/"; else root=""; fi
+    runner="${root}gate-sdk/bin/run-gates.sh --scratch-run"
     if [[ "$arm" == a ]]; then
         guard_block "run a scratch script through the runner: 'bash $runner <script> [args…]' (guard-kit/SPEC.md §scratch-run). This call takes the program body for '$word' from '$src', which sits in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs. The runner is allowlistable and echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."
     fi

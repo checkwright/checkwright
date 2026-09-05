@@ -46,7 +46,7 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
      whenever the file does — and a path under the gitignored scratch dir is
      rewritable by any session. Read the shape, not the literal: it reads as a
      specific command until one notices the target is writable. Such a run has a
-     sanctioned form already — `bin/scratch-run.sh`, whose echo-at-execution is
+     sanctioned form already — the `--scratch-run` arm, whose echo-at-execution is
      the compensating control (§scratch-run) — so route the run through the
      runner and remove the direct-path grant. Removing instances without applying
      this criterion re-arms for the next one.

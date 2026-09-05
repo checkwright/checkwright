@@ -1165,11 +1165,19 @@ that harness exists would be designing against no case.
     command that invokes a script interpreter on a program body it takes from
     **outside** the command string is **blocked** when that body's source is a
     path under a `GUARD_KIT_SCRATCH_DIRS` member. Two arms, one predicate:
-    arm **(a)**, the interpreter is `bash` or `sh`, steers to
-    `bin/scratch-run.sh` — the allowlistable path that echoes the body as it
+    arm **(a)**, the interpreter is `bash` or `sh`, steers to the
+    `--scratch-run` arm — the allowlistable command that echoes the body as it
     executes; arm **(b)**, the interpreter is a
     `GUARD_KIT_SCRIPT_INTERPRETERS` member, states the bash-only rule
-    (§scratch-run) and names the same runner. Declares `sq dq hd`.
+    (§scratch-run) and names the same runner. Declares `sq dq hd`. The steer's
+    printed command is **derived**, not hardcoded: `lib/guard.sh` composes the
+    front end's path from the vendor root its own location already names, so a
+    relocated tree prints a path that resolves. That is a cross-kit path
+    coupling — a guard-kit library naming a gate-sdk
+    sibling — and it is admissible on a ground already in the tree: guard-kit
+    already depends on gate-sdk for `GATE_SDK_TMP_DIR`, the scratch dir the whole
+    rule is written about, and `lib/guard.sh` is `# no-port:` permanently, so the
+    coupling has one holder and no parity obligation.
     **The predicate is body visibility, and the discriminator is the same one
     that bought the runner its grant.** §scratch-run's whole argument is that a
     scratch path is rewritable by any session, so the body the operator approved
@@ -1195,7 +1203,7 @@ that harness exists would be designing against no case.
     producer's operand, or a substitution operand.
     **That resolution is also what keeps the rule off legitimate tooling**, and
     it is exact rather than a carve-out: `python3 tools/gen.py` and
-    `bash <kit>/bin/scratch-run.sh .tmp/x.sh` both name a body that is **not**
+    `bash <root>/gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh` both name a body that is **not**
     under a scratch dir — a tracked tool in the first, the runner itself in the
     second, with the scratch path an argument *to* it — so neither fires. The
     scratch-directory scope is not the proxy the previous paragraph drops: the
@@ -1260,8 +1268,13 @@ the hook never reads.
 
 ## scratch-run
 
-`bin/scratch-run.sh <script> [args…]` closes a loop the steering rules
-themselves open. The generic ruleset pushes probes and multi-line sweeps
+`--scratch-run <script> [args…]` closes a loop the steering rules
+themselves open. **The member is the gate binary's arm**, reached through the
+front end as `bash gate-sdk/bin/run-gates.sh --scratch-run <script> [args…]`;
+the heading is a section name, not a file name, and it keeps this spelling
+because the citations pointing here resolve against it. The `--emit-` prefix is
+load-bearing (gate-sdk/SPEC.md §The non-gate arm) and this member is a runner,
+so it is spelled bare, the shape `--wait-probe` and `--upgrade-smoke` take. The generic ruleset pushes probes and multi-line sweeps
 into the consumer's gitignored scratch dir (`GATE_SDK_TMP_DIR`) and refuses
 the harness scratchpad by name — yet nothing allowlists *executing* what
 lands there, so every run of a steered-to script is decided out of band, forever. The
@@ -1292,9 +1305,21 @@ one-liner do not reach the same code once it sits inside a scratch file.
 The echoed body is the **compensating control**, and it relocates review
 rather than removing it — from *before* execution, where the permission
 decision put it, to *after*, in the transcript a supervisor reads. That is
-the actual posture of the entry, and a consumer unwilling to move review
-downstream should simply not add it: the tool still runs without it, and its
-runs still take that decision.
+the actual posture of the entry.
+
+**The consumer's opt-out is retired, knowingly, and the sentence that sold it is
+replaced rather than deleted.** This section used to tell a consumer unwilling to
+move review downstream to simply not add the grant — the tool still ran without
+it. Post-port that is false: the runner is a bridged arm, so it is reachable
+wherever the battery front end is, and a consumer cannot decline scratch
+execution without declining the battery. What a consumer loses is the ability to
+**separate** the two decisions; what is unchanged is the compensating control
+itself, which lives in the code and never lived in the grant. This is a **taken
+cost, not a discovery**: the operator ruled the removal-only shape with this
+retirement named in the question (2026-09-05). It does **not** establish that a
+port may retire a consumer guarantee whenever a family rule forces its hand —
+the retirement was escalated rather than decided in the cut, and a later cut
+proposing another owes its own escalation.
 
 **Scratch execution is bash-only, and the runner's hardcoded interpreter is the
 statement of that rule rather than an unexamined default.** Executing a program
@@ -1313,15 +1338,21 @@ permission behind the boundary the consumer's operator owns, through a code
 change no permission gate reads. That is a security argument rather than a cost
 one, and it stands on its own.
 
-**Re-implementing the runner on another substrate is a permission ADDITION rather
-than a migration, and that is what prices the work.** The grant is an allowlist entry
-naming this fixed path, so a compiled or relocated arm is a different command string
-and the consumer must ADD an entry for it — a permission set is matched, not
-versioned, so the old entry cannot be edited into the new one without a window where
-neither runs. Where a consumer's own rules make a settings edit an operator act, that
-addition is one, and the work stalls at whatever session cannot apply it however small
-the code change is. The opposite case does not reach this: dropping a grant whose
-target a change deletes is a pure narrowing, forced by the change and landing with it.
+**A grant naming a fixed path cannot be edited into its successor, and that
+structural fact stands; what it prices does not.** A permission set is matched,
+not versioned, so a *relocated* arm is a different command string and the old
+entry cannot become the new one without a window where neither runs. What this
+section used to conclude from that — *and that is what prices the work* — the
+2026-09-05 port falsified. Under gate-sdk/SPEC.md §The non-gate arm's
+forced-family test the runner is a **bridged** arm, so its new command string is
+the battery **front end's**, which a consumer's front-end grant already buys
+whole: any addition owed is that grant, bought once for every bridged arm, and
+not a decision about scratch execution at all. A consumer running lifecycle
+stages already holds it; one running only the generated pre-commit hook may not,
+and owes the front-end grant rather than this tool's. So this port forced a
+**removal** and no addition — and the opposite case was always outside the bar:
+dropping a grant whose target a change deletes is a pure narrowing, forced by the
+change and landing in the same commit as it.
 
 **What bash-only costs, stated rather than glossed.** It removes a capability: a
 session wanting a Python scratch script must write a `.sh` that invokes Python
@@ -1339,8 +1370,10 @@ shebang is unaffected, which keeps every `.sh` the runner handles today working.
 That is **exact** where a roster is approximate, and it is derivation-first: the
 file states its own interpreter. Two mechanisms, each exact for the input it
 actually has — the guard has a command string and no file, the runner has a
-file, and this is why the runner deliberately does not read
-`GUARD_KIT_SCRIPT_INTERPRETERS`.
+file, and this is why the arm deliberately does not read
+`GUARD_KIT_SCRIPT_INTERPRETERS` and does not declare it. A port that declared the
+knob because it sits in the kit's namespace would retire that reasoning by
+accident.
 
 **What deliberately does not become config: the policy.** Bash-only is a rule,
 not a setting, and a knob that turned it off would restore the honour system the
@@ -1354,10 +1387,38 @@ scratch surface the guard already steers into. The test reads the
 like any other outsider. Refusal, an absent target, and a missing argument
 are each exit 2 — which the passthrough makes ambiguous by construction,
 since a child exiting 2 is indistinguishable by code alone; the echo is the
-discriminator, as a refusal prints no body. Content-agnostic generic
-mechanism: the scratch dir comes from gate-sdk's existing `GATE_SDK_TMP_DIR`
-and no kit knob is added, while the consumer's allowlist entry for the fixed
-path is that consumer's settings, never a kit literal.
+discriminator, as a refusal prints no body.
+
+**The resolution is what forces the mechanism, and the cheaper alternative is
+refused on security rather than on cost.** *Resolved, never the spelling* means
+the arm resolves through `walk::canonicalize` — the crate's only
+`std::fs::canonicalize` (gate-sdk/SPEC.md §The crate's crosser), whose dialect
+obligation this caller inherits: the comparison runs on two answers from that one
+producer, never on one canonicalized path against one composed string. The
+crate's ordinary shape — an absolutise, a lexical normalize and a prefix
+compare — handles a `..` traversal but does **not** follow a **symlink** out of
+the scratch dir, so a symlink planted inside would pass a test the shell form
+fails. That is a narrowing of a fail-closed control, which this paragraph's own
+rule forbids, and the seam test asserts the symlink case rather than assuming it.
+
+Content-agnostic generic mechanism: the scratch dir comes from gate-sdk's
+existing `GATE_SDK_TMP_DIR` and no kit knob is added — and through the bridge
+that knob is now actually **resolved**, where the standalone script sourced no
+config and read it straight from the process environment, so a consumer setting
+it in their gates-dir config got a runner that ignored it. The port is a fix
+there rather than a translation, and it does not disturb how the knob is driven
+under test: an environment-set value still wins (`gate.sh` uses `[[ -v … ]]`),
+and the bridge resolves a member's knobs in a subshell that **inherits the
+caller's environment**. The consumer's allowlist entry is that consumer's
+settings, never a kit literal.
+
+**This section's port-owed set is empty.** Every surface declaring it is now
+either in-crate — `native/src/emit/scratch_run.rs` and its `BRIDGED_ARMS` row —
+or declared `# no-port:` (`lib/guard.sh`, which composes rule 23's steer). The
+seam cases stay in `gate-tests/scratch-run.test.sh`, on the shell substrate by
+their own nature. `bin/scratch-run.sh` was the one owed surface and the
+2026-09-05 cut took it, so **no later port cut is sequenced against this
+section**.
 
 ## scan-prompts
 
@@ -1810,7 +1871,7 @@ entries and promote recurring safe patterns to the committed settings as
 globs; clear the friction log. Two judgments the reports cannot make sit in
 that last step. An entry naming a **script path** rather than a fixed command is
 not content-pinned — it grants whatever the file says at run time — and its
-sanctioned form is `bin/scratch-run.sh` (§scratch-run), whose echo is the
+sanctioned form is the `--scratch-run` arm (§scratch-run), whose echo is the
 compensating control; and widening the committed set is the consumer's call,
 since a session does not widen its own auto-allow set on its own say-so. Goal: the local set stays small, every
 durable pattern lives in the committed, reviewable allowlist, and no local glob
@@ -1830,12 +1891,11 @@ close-surface: .workflow/prompt-friction.log advisory reclaim=: > .workflow/prom
 guard-kit/
   lib/guard.sh              # primitives + generic ruleset functions
   bin/compare-settings-allow.sh
-  bin/scratch-run.sh        # echo-then-exec runner for scratch scripts
   bin/run-guard-tests.sh    # decision-table runner, narrowed to bash-guard with the escalation-guard port
   guard-tests/cases.tsv     # expected-decision <TAB> command
   guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message; read by the crate test that replaced this runner's escalation lane
   guard-tests/background-cases.tsv  # expected-decision <TAB> run_in_background <TAB> command
-  gate-tests/scratch-run.test.sh    # bespoke unit test, run by gate-sdk's runner
+  gate-tests/scratch-run.test.sh    # the --scratch-run arm's SEAM cases, run by gate-sdk's runner
   gate-tests/scan-prompts.test.sh   # bespoke unit test, run by gate-sdk's runner
   gate-tests/compare-settings-allow.test.sh  # bespoke unit test, run by gate-sdk's runner
   gate-tests/git-mutation-under-producer.test.sh  # bespoke unit test, run by gate-sdk's runner
@@ -1925,8 +1985,9 @@ Knobs (this repo's layout as defaults):
   `GUARD_KIT_BREADTH_PROBES` it is kit-shippable *with* defaults; that roster is
   consumer config because its members are private, so the test is the content and
   never the shape. It has **exactly one** reader by design: arm (b)'s trigger.
-  `bin/scratch-run.sh` deliberately does not read it (§scratch-run), so the knob
-  never becomes a second copy of a fact the target file itself states.
+  the `--scratch-run` arm deliberately does not read it and does not declare it
+  (§scratch-run), so the knob never becomes a second copy of a fact the target
+  file itself states.
 
 Both logs are per-iteration scratch: a consumer gitignores them even where
 its workflow dir is otherwise committed.
@@ -1963,8 +2024,8 @@ poisons the next close's ranking with its payload. Measured rather than
 hypothetical: one such probe contributed 30 of 237 ranked prompting calls at a
 single close, ranking second. **No scanner is proposed:** the polluting caller is
 a one-off script in the gitignored scratch dir, so there is no committed corpus
-to scan and the convention is carried by this sentence and by
-`bin/scratch-run.sh`'s echo-at-execution.
+to scan and the convention is carried by this sentence and by the
+`--scratch-run` arm's echo-at-execution.
 
 **The decision table is the instrument for any change to what the guard
 refuses, and its red condition is not monotone.** A change that *narrows*
@@ -2037,11 +2098,18 @@ set, which is the assertion that the lookup never became a glob match. It drives
 `GUARD_KIT_CONFIG_FILE` pointed at a sandbox config, so the consumer's own probe
 array cannot leak into the fixture.
 
-A shipped `bin/` tool that is not a hook takes neither lane. `bin/scratch-run.sh`
-(§scratch-run) is tested by a bespoke unit test at
-`gate-tests/scratch-run.test.sh`, asserting echo-then-exec on an in-scratch
-target, pass-through of args and exit code, and the fail-closed refusal of an
-out-of-scratch one. It is **not** a `guard-tests/` row: that table's grammar is a
+A shipped tool that is not a hook takes neither lane, and the `--scratch-run`
+arm (§scratch-run) **splits** on the kfric port's precedent. Its **seam** cases
+stay at `gate-tests/scratch-run.test.sh` — echo-then-exec ordering, pass-through
+of args and exit code, the out-of-scratch, traversal and symlink-escape
+refusals, the absent-target and missing-argument exits, and the
+refusal-prints-no-body discriminator — because each is a property of the front
+end resolving the arm, the bridge supplying the knob, and a real child process,
+which a crate unit test cannot see. Its **unit** cases — the shebang classifier
+across its spellings and the containment predicate — are pinned in the ported
+module's own `#[cfg(test)]` tests, where `check-crate-arms` runs them: they are
+pure functions over inputs and want no process. No assertion was dropped in the
+split. It is **not** a `guard-tests/` row: that table's grammar is a
 decision paired with a command, which cannot express any of the three. It is not
 a gate either, so no `good/`+`bad/` fixture pair is owed — but shipped mechanism
 owes a test, and the bespoke-unit-test lane is gate-sdk's

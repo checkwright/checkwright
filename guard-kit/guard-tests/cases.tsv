@@ -295,7 +295,7 @@ fallthrough	printf 'print(1)' | python3
 # in the repo, and the runner's own invocation takes a scratch path as an
 # argument to a tracked script rather than as a body
 fallthrough	python3 tools/gen.py
-fallthrough	bash guard-kit/bin/scratch-run.sh .tmp/x.sh
+fallthrough	bash gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh
 
 # rule 24 — anything else falls through to the friction log
 fallthrough	make build

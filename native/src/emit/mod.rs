@@ -34,6 +34,7 @@ pub mod scan_prompts;
 pub mod stage_rules;
 pub mod roadmap;
 pub mod run_validate;
+pub mod scratch_run;
 pub mod session_id;
 pub mod trajectory;
 pub mod upgrade_smoke;
@@ -468,6 +469,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--usage-verdict",
         Arm::Run(crate::hook::verdict::run),
         crate::hook::verdict::KNOBS,
+    ),
+    // spec: guard-kit/SPEC.md §scratch-run — an `Arm::Run` on two independent grounds: the runner
+    // passes the child's exit code through verbatim, and its stdout must reach the terminal as the
+    // child produces it rather than as a string returned at the end.
+    (
+        "--scratch-run",
+        Arm::Run(scratch_run::run),
+        scratch_run::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof: an `Arm::Run` because
     // its contract is the 1-versus-2 split of its exit status, which an emitting arm collapses, and

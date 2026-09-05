@@ -65,62 +65,6 @@
   `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
   Re-promoted 2026-09-05 by spec, hosting both members' cuts on the two amendments above.
 
-- **scratch-run-port-blocker-unrecorded** [spec: SPEC-scratch-run-cut.md]
-  — the third operator-class port blocker
-  is the only one with no queue entry, so every boundary re-derives it from a SPEC.
-  **The asymmetry is exact and probed.** `guard-kit/bin/scratch-run.sh` reads `owed` at
-  `--emit port-blockers --tree` and its only blocker is operator-class — as with both sibling
-  blockers named below, and unlike them it has no entry. guard-kit/SPEC.md prices re-implementing
-  the runner on another substrate as a permission ADDITION rather than a migration: the grant is
-  an allowlist entry naming a fixed path, a permission set is matched rather than versioned, and
-  the work stalls at whatever session cannot apply it. Every OTHER takeable member clears this,
-  because the wildcard grant on the `run-gates` front end already covers every bridged arm and
-  their port is a pure grant REMOVAL; this grant names its own fixed path by design and cannot
-  ride the front-end grant.
-  **The settings carve-out does not reach it.** `native-gate-port-remaining-corpus`' ruling (2)
-  covers grant REMOVALS a ruled cut forces. This is an addition, and TRAJECTORY.md's 2026-08-22
-  ruling makes a permission-settings edit operator-class.
-  **DISTINCT from `run-gates-front-end-cut-legality-unruled` and from
-  `build-native-bootstrap-port-disposition-unruled`, and not a re-filing of either.** Those own a
-  named file's UNRULED disposition and each already exists as an entry; this owns the ABSENCE of
-  an entry for a third file whose disposition is not unruled at all — it is ruled BLOCKED and
-  simply unrecorded. Fixing either of those leaves this untouched.
-  **Cost while deferred:** one SPEC read per scope boundary, attested rather than predicted —
-  three consecutive scope sessions re-derived it, the 2026-09-03 boundary calling it "one
-  contested file the prior survey did not name" and the two after it re-reading the same SPEC.
-  →fix failed because an absent entry has no in-place surface that resolves it, and parity with
-  the two sibling blockers — each its own entry — is what the fix has to reach; →icebox failed on
-  the live per-boundary trigger. Machinery-class: its only demand witness is this repo's own port
-  accounting.
-  **PRE-AUTHORIZED 2026-09-05 (operator, consult):** build lands the ported arm with the old
-  grant in place and records the one-line grant diff HERE; the operator applies it out of band
-  and the shell path works until then. The 2026-08-22 bar is untouched — TRAJECTORY.md §The
-  closed rulings.
-  **SUPERSEDED, NOTHING OWED — ruled 2026-09-05 (operator, in-session-prompt), the operator's own
-  re-scoping of the two lines above.** The ADDITION premise is FALSE: the forced-family test
-  (gate-sdk/SPEC.md §The non-gate arm) makes the ported arm bridged, so it is reached as
-  `run-gates.sh --scratch-run` — a string `.claude/settings.json`'s front-end end-wildcard already
-  grants. The port owes a grant REMOVAL, in the deleting commit under ruling (2)'s 2026-08-29 base;
-  no diff is recorded here and the operator applies nothing. The same ruling retires the consumer
-  opt-out guard-kit/SPEC.md sells, knowingly and with that cost named in the question — see
-  `SPEC-scratch-run-cut.md` delta 5. An out-of-band settings approval relayed earlier the same day
-  is a no-op for the same reason. It is NOT a general licence over `.claude/settings.json`.
-  **NOT CARRIED BY `front-end-stub-and-gate-caller-cuts`, not even as a droppable stretch — ruled
-  2026-09-05 (lead, own-authority); it is the NEXT cut's.** Two grounds. The cut is already at the
-  top of the measured 350-650 build window before its own understatement is priced (17 arms of
-  dispatch the owed column cannot show), so 50 more owed lines widen a cut whose true width is
-  unmeasured. And "droppable" is cheap to not-take and dear to drop: a drop at build discards
-  spec's authored delta and align's audit of it, and the out-of-band grant above makes this the
-  member most likely to be dropped. Build having room is not licence to add.
-  **TAKEN AS `drift-meter-pair-and-scratch-run-cuts`' THIRD CUT — ruled 2026-09-05 (lead,
-  own-authority), superseding the deferral above on its own stated ground:** that ground was a cut
-  already at the window's top at 668; this one reads 619, so it has lapsed and the 50 lines ride.
-  ruled: scratch-run-port-blocker-unrecorded lead 2026-09-05 own-authority
-  ruled: scratch-run-port-blocker-unrecorded operator 2026-09-05 consult
-  ruled: scratch-run-port-blocker-unrecorded operator 2026-09-05 in-session-prompt
-  Filed 2026-09-04 to the gap inbox at scope; promoted 2026-09-05 by close.
-  Re-promoted 2026-09-05 by spec, hosting the cut on the amendment above.
-
 ## Technical Debt
 
 ## Deferred
@@ -9832,5 +9776,6 @@
 ## Done
 
 - overhead-meter-measures-the-lead
+- scratch-run-port-blocker-unrecorded
 
 ## Lessons Learned

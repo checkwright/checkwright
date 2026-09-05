@@ -589,11 +589,18 @@ produce one.** `path_root` reads `\\?\C:\repo` as separator-rooted, so
 `normalize_abs` would return `/?/C:/repo` — a mangling, not a conversion. On
 Windows `std::fs::canonicalize` answers in exactly that spelling, which is why
 `walk::canonicalize()` is the one producer that hands its answer back unconverted
-rather than crossing. That is safe on the evidence and only on it: both callers
-compare its output **against its own output only** — `check-gate-exemption-tasks`
-matches two canonicalized directories, `check-surface-duplication` takes a
-basename — so the spelling is symmetric and unobservable. No third caller may
-assume that. Which spelling Windows actually returns, and whether a strip rule is
+rather than crossing. That is safe on the evidence and only on it: **every**
+caller compares its output **against its own output only** —
+`check-gate-exemption-tasks` matches two canonicalized directories,
+`check-surface-duplication` takes a basename, the workflow-state hook compares two
+resolutions of the same path, and the `--scratch-run` arm compares a canonicalized
+scratch root against a canonicalized target parent (guard-kit/SPEC.md §scratch-run
+forces the resolution there, since a lexical compare would not follow a symlink out
+of the scratch dir and would narrow a fail-closed control). So the spelling is
+symmetric and unobservable. That is a property each caller must hold, not one a
+caller may assume: a caller comparing this producer's answer against a composed
+string breaks it, and the roster above is stated by name rather than counted so it
+cannot go stale against the tree the way a count did. Which spelling Windows actually returns, and whether a strip rule is
 owed, is not decidable from a Linux host and is filed rather than guessed.
 
 `native/src/registry.rs` is the consumer whose failure was the observed one: it
@@ -2323,10 +2330,13 @@ arms below it, and the bridged `Arm::Run` members that are neither —
 §bin/install-lifecycle.sh, its 2026-09-03 member), `--usage-verdict`
 (delegation-kit/SPEC.md §usage-verdict), `--wait-probe`
 (delegation-kit/SPEC.md §bin/wait-probe), `--enter-stage`
-(lifecycle-kit/SPEC.md §bin/enter-stage.sh), `--install-hooks` (§install-hooks)
-and evidence-kit's `--run-validate`
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh), `--install-hooks` (§install-hooks),
+evidence-kit's `--run-validate`
 and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
-§bin/diff-baseline.sh, its 2026-09-04 pair) — and the class
+§bin/diff-baseline.sh, its 2026-09-04 pair) and `--scratch-run`
+(guard-kit/SPEC.md §scratch-run, its 2026-09-05 one — the class's first member
+whose port **removes** a grant naming its own path rather than relocating one) —
+and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -4815,6 +4825,18 @@ rewrite: promote the private items to a top-level module and leave the original
 holder a thin caller of it. Recorded because "carry it once" reads as new work
 until the crate is read, and a selector pricing such a member off its owed line
 count will price the wrong thing.
+
+**The fourth finding is a pricing rule about *permission* costs, and it is worth
+recording because a member priced as blocked by one can be unblocked by arithmetic
+alone.** Where a member's stated blocker is that porting it forces a permission
+*addition*, re-derive that cost against the **forced family** before composing:
+the family decides the command string, and the command string decides whether any
+grant is owed at all. A member forced onto the bridged family is reached through
+the battery front end, whose grant a consumer either already holds or owes once
+for every bridged arm — so a blocker written against a *relocated-path* assumption
+evaporates, and what the port actually forces is a **removal**. Recorded because
+the assumption is invisible: the blocker reads as a fact about the tool when it is
+a fact about a shape the family rule does not produce.
 
 **The arm names no remainder, which is what keeps it kit content.** It is stated
 generically — no gate names, no member roster, no count of any tree's remaining
