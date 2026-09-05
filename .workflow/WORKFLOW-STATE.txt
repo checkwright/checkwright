@@ -4,4 +4,4 @@
 
 ---
 
-— scope a0fa10e5 2026-09-05 156576c0
+front-end-stub-and-gate-caller-cuts scope a0fa10e5 2026-09-05 156576c0
