@@ -221,22 +221,19 @@
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window has no
   working install path on Windows; `powershell-installer-surface` stays sequenced behind this; and
   installer/README.md §The install boundary holds every `installer/lib` and `installer/bin` file
-  owed behind this leg and the macOS one — 1237 lines, measured 2026-09-05 in TRAJECTORY.md.
+  owed behind this leg and the macOS one — 1246 lines, re-read off the oracle 2026-09-05 at scope.
   **ROUND 7 NAMED THE CAUSE, rounds 8-11 repeated it, round 12 ANSWERED it** — `graph.rs` spawned
   a BARE `bash` into a NATIVE Windows process, so a Win32 PATH search found WSL's launcher ahead of
-  Git's `usr/bin`; that record RETIRES both 2026-08-31 TRAJECTORY.md paragraphs naming it. THE
-  METHOD READING THAT OUTLIVES IT: round 6's two guessed repairs could never have landed, the
-  unguarded command being in the GATE and not the generator's prologue — so cause-read-first is the
-  instrument's case, and round 12 is the first repair built on a read cause.
-  **THE REPAIR WAS RULED 2026-09-03 an operator-directed hotfix — minimal, one commit, UNSEQUENCED
-  against the port cut, the sequenced variant offered and declined — AND ROUND 12 VERIFIES IT AT
-  THE REMOTE ORACLE:** run `33782234328`, head `32f73806`, `battery: All 11 gates passed` against
-  round 11's `1 of 11 gates FAILED: check-graph`. **The LEG still exits 1, at a strictly later
-  stage the battery was masking:** `477 of 477 manifest entries disagree with the tree`.
-  **THE TWO 2026-09-03 GAP BULLETS DRAIN HERE** — filed by
-  `parser-and-enum-adapter-cuts-with-graph-hotfix`'s close and its lead, drained into this entry
-  rather than promoted, the port-only run barring a promote. **They NARROW and claim NO CAUSE.** A
-  binary is in the mismatch set and that same `.exe` produced the job's green battery line, so no
+  Git's `usr/bin`. THE METHOD READING THAT OUTLIVES IT: round 6's two guessed repairs could never
+  have landed, the unguarded command being in the GATE and not the generator's prologue — so
+  cause-read-first is the instrument's case, round 12 the first repair built on a read cause.
+  **THE REPAIR WAS RULED 2026-09-03 an operator-directed hotfix, minimal and one commit, AND ROUND
+  12 VERIFIES IT AT THE REMOTE ORACLE:** run `33782234328`, head `32f73806`, `battery: All 11 gates
+  passed` against round 11's `1 of 11 gates FAILED: check-graph`. **The LEG still exits 1, at a
+  strictly later stage the battery was masking:** `477 of 477 manifest entries disagree with tree`.
+  **THE TWO 2026-09-03 GAP BULLETS DRAIN HERE**, filed by
+  `parser-and-enum-adapter-cuts-with-graph-hotfix`'s close and its lead. **They NARROW and claim NO
+  CAUSE.** A binary is in the mismatch set and that same `.exe` produced the job's green battery, so
   content transform mangled it. `want` and `got` are the IDENTICAL command — `lock_hash` is
   `git hash-object --` and the smoke's check spells the same — so there is no second hashing
   algorithm and the only asymmetry left is the process context each runs in. And round 12's log
@@ -244,11 +241,15 @@
   leaving two VALID, DIFFERENT hashes over one byte-stream. The next act is a cause read; its facts
   need a Windows host; 2026-09-03 spent a round — the diagnostic bailed before any comparison.
   **DEMOTED 2026-09-01 AT BUILD**, a recurrence rather than a tail — a NEW iteration on a FRESH
-  amendment; the wedge is `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
-  **Port-critical, own-iteration shape — ruled 2026-09-05**, TRAJECTORY.md §PRIORITY DIRECTIVE.
+  amendment; the wedge is `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s, so SPEC
+  settles this iteration's definition of done and close never argues it. **SELECTED AS THIS
+  ITERATION'S UNIT, port-critical own-iteration shape — ruled 2026-09-05 (lead, own-authority)** on
+  TRAJECTORY.md:275's sequencing sentence, not on leverage; envelope unchanged at the 2026-08-30 cap
+  above. The four-cut test-harness alternative is HELD as the NEXT iteration on this scope's
+  committed census — NO RE-SURVEY OWED.
   ruled: platform-support-ci-matrix operator 2026-08-27 2026-08-30 2026-08-31 2026-09-03 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-31 2026-09-05 consult
-  ruled: platform-support-ci-matrix lead 2026-08-30 2026-09-01 own-authority
+  ruled: platform-support-ci-matrix lead 2026-08-30 2026-09-01 2026-09-05 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
   promoted/deferred 08-25 through 09-01; rounds 6-12 ran 08-31 to 09-03, 8-11 identical to 7.
 
