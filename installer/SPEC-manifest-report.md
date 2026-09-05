@@ -85,7 +85,12 @@ rendered **byte-exactly** beside its plain form, together with the standard
 error of every call that produced one. {design-bearing}
 
 - **`want`** — `files[P]` out of the consumer's `checkwright.lock`: what `init`
-  recorded.
+  recorded. *Corrected at build 2026-09-05, after round 13 read: the merged form
+  in `installer/README.md` takes this value as the arm's own loop held it rather
+  than by re-reading the manifest, because a re-read is exactly what made this
+  bullet's byte rendering blind on the leg it was authored for. The merged text
+  is the canonical one; this line is left as authored so the correction is
+  visible rather than silent, and no re-merge is owed.*
 - **`got`** — `git hash-object -- "$C/P"` from the smoke's own current
   directory: the failing read, spelled exactly as the arm spells it.
 - **`own`** — `git -C "$C" hash-object -- "P"`: the same command in the
