@@ -95,7 +95,7 @@ directly with `--fixture <dir>` only for testing.
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
+bash gate-sdk/bin/run-gates.sh --run-gate-tests delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
 ```
 
 The `usage-verdict` decision table and the `usage-trend` assertions are no

@@ -24,7 +24,7 @@ honest:
   bridge or the output contract: `--only <name>...` runs the gates you name (in
   registry order; an unregistered name is a refusal), and `--for <path>...` runs
   the gates coupling to the paths you name, exactly as the generated hook would.
-- `bin/run-gate-tests.sh` — the golden-fixture runner: every gate proves it
+- the `--run-gate-tests` arm — the golden-fixture runner: every gate proves it
   accepts a `good/` case and rejects a `bad/` case with the right error text.
 - `bin/run-consumer-smoke.sh` — the end-to-end check no fixture makes: builds a
   fresh scratch consumer, runs each vendored kit's `smoke/` installer, and
@@ -85,7 +85,7 @@ bash gate-sdk/bin/run-gates.sh --install-hooks                    # opt in this 
 bash gate-sdk/bin/run-gates.sh                                    # the full battery
 bash gate-sdk/bin/run-gates.sh --only check-graph                 # one gate's verdict
 bash gate-sdk/bin/run-gates.sh --for scripts/gates.list           # the gates coupling to a path
-bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests
+bash gate-sdk/bin/run-gates.sh --run-gate-tests gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests
 ```
 
 Write your first gate by copying `gate-sdk/templates/check-skeleton.sh` to

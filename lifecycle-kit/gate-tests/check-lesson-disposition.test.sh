@@ -4,7 +4,7 @@
 # (B) a Lessons entry still present in the worktree is not a removal, so it
 # needs no stamp; (C) a stored prefix matches a longer lead line (prefix join).
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

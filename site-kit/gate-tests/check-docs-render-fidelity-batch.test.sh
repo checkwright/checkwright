@@ -27,7 +27,7 @@
 # and never a config path, so the bridge is the one thing that reads a config file
 # (gate-sdk/SPEC.md §lib/gate.sh). gate_run resolves it from this cwd.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

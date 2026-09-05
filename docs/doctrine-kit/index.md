@@ -44,7 +44,7 @@ your own paths if they differ from the defaults.
 ## Quick start
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
 ```
 
 ## Contracts

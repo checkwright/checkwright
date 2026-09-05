@@ -9,7 +9,7 @@
 # reached with the knob unset, so what these arms prove is the whole consumer path — front end,
 # binary, compiled gate — rather than a path this repo names.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

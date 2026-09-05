@@ -34,6 +34,7 @@ pub mod scan_prompts;
 pub mod stage_economics;
 pub mod stage_rules;
 pub mod roadmap;
+pub mod run_gate_tests;
 pub mod run_validate;
 pub mod scratch_run;
 pub mod session_id;
@@ -550,6 +551,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--diff-baseline",
         Arm::Run(diff_baseline::run),
         diff_baseline::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §run-gate-tests — an `Arm::Run` because the contract is a three-valued
+    // exit — 0 clean, 1 a logic failure, 2 a harness or fixture error — and a table member because
+    // it resolves four knobs a hardcoded flag would silently ignore
+    (
+        "--run-gate-tests",
+        Arm::Run(run_gate_tests::run),
+        run_gate_tests::KNOBS,
     ),
 ];
 

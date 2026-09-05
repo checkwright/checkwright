@@ -64,7 +64,7 @@ jobs:
           while IFS=$'\t' read -r suite tests checks; do
             echo "== $suite =="
             # shellcheck disable=SC2086  # empty checks expands to no arg by design
-            bash gate-sdk/bin/run-gate-tests.sh "$tests" $checks || rc=1
+            bash gate-sdk/bin/run-gates.sh --run-gate-tests "$tests" $checks || rc=1
           done < <(gate_fixture_suites)
           exit $rc
       - name: guard-kit decision table

@@ -7,7 +7,7 @@
 # with no reclaim command) — is exercised in sandbox repos here, the
 # check-merge-attrs / check-exec-bit precedent. The pair covers assertion B.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -5,7 +5,7 @@
 # host-block-less CLI config into — plus the `users`/`user` key collision, whose
 # whole point is that a wrong implementation still passes the pair.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/test-hermetic.sh"
 

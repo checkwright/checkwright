@@ -4,7 +4,7 @@
 # `git rev-parse --show-toplevel` branch and its refusal are exercised by nothing. This drives
 # both: a sandbox git repo entered with no argument, and the same tree with git unable to answer.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/test-hermetic.sh"
 

@@ -79,5 +79,5 @@ code instead. Author amendments up front; merge and delete them at build.
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests canon-kit/gate-tests canon-kit/checks
 ```

@@ -18,7 +18,7 @@
 #    check-spec-dod-singleton.test.sh carries the same prune's canonical-spec
 #    half; these cases are its mirror on the README finder.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

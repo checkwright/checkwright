@@ -8,7 +8,7 @@
 # binary does not carry still earns. Deterministic by construction — a stand-in kit library that
 # writes to stderr while still resolving its knob reproduces the shape without reproducing the
 # SIGPIPE-disposition accident that first exposed it.
-# Run by run-gate-tests.sh.
+# Run by the --run-gate-tests arm.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -26,7 +26,7 @@ external configuration you point the kit at.
 
 ```bash
 bash gate-sdk/bin/run-gates.sh --enter-stage <stage>        # stamp the stage entry, committed
-bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
 ```
 
 ## Contracts

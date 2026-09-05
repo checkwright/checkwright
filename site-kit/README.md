@@ -64,5 +64,5 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh site-kit/gate-tests site-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests site-kit/gate-tests site-kit/checks
 ```

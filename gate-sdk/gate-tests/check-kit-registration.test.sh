@@ -7,7 +7,7 @@
 # rule for a kit without gate-tests, A's acceptance of both registry link forms
 # (bare kit dir / a page under it), and the fail-closed missing-doc path.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -54,7 +54,7 @@ run() {  # $1=label $2=want-rc $3=want-substring $4=runner-doc-body
 # Clean also means A took beta's page-form row: a bare-dir-only match would
 # name beta here.
 run "b-owed-satisfied" 0 "(2 kit root(s) each carry a registry row; 1 shipping gate-tests" \
-    "run-gate-tests.sh alpha-kit/gate-tests alpha-kit/checks"
+    "--run-gate-tests alpha-kit/gate-tests alpha-kit/checks"
 
 # Runner doc omits alpha's fixture line: a gate-tests-shipping kit fell out of
 # the documented battery -> assertion B rejects, naming alpha-kit.

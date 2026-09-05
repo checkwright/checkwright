@@ -15,7 +15,7 @@
 # The gate is invoked through gate_run, so this test names a gate and never a
 # substrate (gate-sdk/SPEC.md §run-gate-tests).
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -110,7 +110,7 @@ pub fn run(_args: &[String]) -> i32 {
                 println!("  {}", m);
             }
             println!();
-            println!("  help: add <tests-dir>/<gate>/{{good,bad}}/ (run by run-gate-tests.sh), OR");
+            println!("  help: add <tests-dir>/<gate>/{{good,bad}}/ (run by --run-gate-tests), OR");
             println!("        a '# no-fixture: <why>' header line for a whole-tree scanner with");
             println!("        no synthetic-dir mode (stopgap on a fixture-capable gate -> file");
             println!("        a fixture-backfill debt task and list it there).");

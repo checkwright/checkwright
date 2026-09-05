@@ -16,7 +16,7 @@
 # filters with `is_file()`, which follows the link, so a resolvable one is scanned
 # rather than skipped and the arm would assert the opposite of what it exists for.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

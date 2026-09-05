@@ -13,7 +13,7 @@
 # construction, and the non-zero-`--reads` refusal is now a descriptor whose name the registry
 # does not carry — the same condition reached the way the compiled form can reach it.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/test-hermetic.sh"
 

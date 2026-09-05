@@ -6,7 +6,7 @@
 # finder's kit-root scoping — a DoD-less vendored kit SPEC.md is pruned by
 # default (so exactly-one holds on a vendored tree) and re-included by the knob.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

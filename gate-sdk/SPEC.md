@@ -1190,8 +1190,8 @@ spawns that happened to pass through it.
 ### Fixture-pair discipline
 
 When a gate is written or edited, it ships with — or updates — its
-`good/`+`bad/` fixture pair under `<tests-dir>/<gate>/`, run by
-`run-gate-tests.sh`. A gate that prints `clean` on broken input is invisible to
+`good/`+`bad/` fixture pair under `<tests-dir>/<gate>/`, run by the
+`--run-gate-tests` arm. A gate that prints `clean` on broken input is invisible to
 every static check; the only proof it fails closed and that its error text is
 right is a known-bad input (the `bad/` case asserting exit 1 + its `expect.txt`
 line(s) — every one of them, §run-gate-tests owning the semantics), paired with
@@ -1226,7 +1226,7 @@ enumerates a kit's payload with an unfiltered `find . -type f`, so the pair
 arrives whole. What the ruling changes is its weight rather than its delivery:
 with the predicate withheld it is **the only thing a consumer can independently
 check**, where alongside readable source it was a convenience. The pair plus
-`run-gate-tests.sh` is the entire answer to *does this
+the `--run-gate-tests` arm is the entire answer to *does this
 binary do what its SPEC section says*. `gate_command`'s substrate-blind dispatch
 (§run-gate-tests) is what makes it work across substrates, so nothing new is
 built here — only the statement that the property is a contract and may not be
@@ -1373,13 +1373,13 @@ Three concentric tiers, each an outer backstop for the one inside it:
   (`git commit --no-verify` is a valve, not a hole, once an outer tier exists).
 - **pre-push / full battery** (opt-in, per-clone, fuller) — `run-gates.sh`
   whole-tree before the work leaves the machine.
-- **CI** (server-side, authoritative) — `run-gates.sh` + `run-gate-tests.sh`
-  on every push, with branch protection making a merge conditional on them.
+- **CI** (server-side, authoritative) — `run-gates.sh` + its `--run-gate-tests`
+  arm on every push, with branch protection making a merge conditional on them.
   The copy-out is `templates/gates-workflow.yml` (see there); only this tier is
   a guarantee, and it stops bypass but not workflow self-edit — the tamper-proof
   verifier is the deferred hosted-attestation rung. The inner tiers are latency
   optimizations.
-  `run-gate-tests.sh` runs as its own step, not folded into the battery —
+  `--run-gate-tests` runs as its own step, not folded into the battery —
   `check-gate-fixture-coverage` asserts fixtures *exist* but never *executes*
   them; the execution is the gate-authority backstop, kept separate so a
   fixture-logic failure is attributed to the gate.
@@ -1912,7 +1912,7 @@ holds for the same reason it always did.
 | Meta-gate | Disposition for a `.gate`-dispatched member |
 |---|---|
 | `check-shellcheck` | **Retired with cause, and the cause is per-member rather than about this gate.** For a `.gate`-dispatched member there is no shell file to lint, so this meta-gate makes no assertion about it; `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. Read as a statement about the *gate* the row would be false, and the distinction is worth the sentence: the gate is `zero-config`, an adopter cannot author a compiled gate, and a vendoring consumer's gate family is shell by construction — so what ends when a tree's last `.sh` leaves is that tree's registration, never the shipped gate (§check-shellcheck). **This member is itself `.gate`-dispatched since `shell-gate-tail-port`**, ported as criterion 7's wrapper: its rule is an invocation of `shellcheck`, which stays a declared dependency the compiled form spawns and refuses at exit 2 without. Its own port moves nothing in the rule and one thing in its corpus — one fewer `.sh` to lint — which is this row's disposition measured rather than asserted. |
-| `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
+| `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in the `--run-gate-tests` arm (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
 | `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and the queue-kit cohort landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — and the property is held crate-side rather than by review: the spawn wrapper and its unit tests (§Fail-closed contract) leave a gate module unable to construct a `Command` at all, and unable to reach stdout without the status having been read. Machine-held rather than remembered, which is the same answer the `check-reads-couples` row below gives to the same problem, and what keeps this retirement honest. |
 | `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API, because a direct walk would be invisible to the recorder and unverify A. B's vendored half is held by an **allowlist over the resolved graph**: a spelling roster cannot catch a walker inside a dependency, so every crate in the tracked `Cargo.lock` — transitive included, since a transitive crate walks as visibly as a direct one — is admitted by name with the clause of the dependency bar it cleared (§The settings cohort, and the crate's first dependency), and the assertion reds both on an unadmitted crate and on an allowlist entry absent from the graph. Reading only the `[dependencies]` table would admit an entire subtree unexamined, which is why the lock is tracked rather than gitignored. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — a name the substrate does not carry, and an unresolvable filter knob — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). **This member is itself `.gate`-dispatched** since §The sixth budget batch, which is that closing clause discharging on the auditor: the compiled form reaches the read set in process rather than spawning the arm, so the absent-binary refusal is answered out of existence rather than retired, and the row now describes a ported member auditing ported members. What `--reads` verifies is unchanged and is worth restating because the natural reading is wrong: a member's declared roots are **registry data**, not a derivation from its Rust source, and the declaration-to-code link is held by unit test A. Both members ported in that batch with a non-empty root set carry `?` alone, and the auditor's own root set is empty and stays empty, so no self-assertion is lost. |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. **This member is itself `.gate`-dispatched** since the eighth budget batch (§The first cohort, and the rule that selects the next), and its port moved more than its own spelling: the section it audits gained an enumerated contract of its own, so the gate now reads **its own implementation module** and the contingent immunity that kept its own heading out of discovery is ended deliberately (§check-gate-assertions). Its fixture pair, not the live tree, is what proves those arms — the `check-comment-tier` sentence, inherited for the same reason. |
@@ -2337,9 +2337,10 @@ arms below it, and the bridged `Arm::Run` members that are neither —
 (lifecycle-kit/SPEC.md §bin/enter-stage.sh), `--install-hooks` (§install-hooks),
 evidence-kit's `--run-validate`
 and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
-§bin/diff-baseline.sh, its 2026-09-04 pair) and `--scratch-run`
+§bin/diff-baseline.sh, its 2026-09-04 pair), `--scratch-run`
 (guard-kit/SPEC.md §scratch-run, its 2026-09-05 one — the class's first member
-whose port **removes** a grant naming its own path rather than relocating one) —
+whose port **removes** a grant naming its own path rather than relocating one)
+and `--run-gate-tests` (§run-gate-tests) —
 and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
@@ -2440,7 +2441,10 @@ than a reader would guess: `git` under several `--emit-` arms and under the
 origin-URL lookup this table's own module makes, `date` under
 `--emit-queue-index`, `--emit-file-gap`, `--emit-kfric` and `--emit-file-survey`
 (which spawns `git` too, for the
-`rev` it machine-stamps), `bash` under `--lesson-sink`, `--emit-port-blockers` and
+`rev` it machine-stamps), `bash` under `--lesson-sink`, `--emit-port-blockers`,
+`--run-gate-tests` — once per case to read `gate_command`'s answer out of the
+library that owns it, once more for the default gate-declaration dir set, and
+again per bespoke `*.test.sh` it runs — and
 `--emit-pub-index` — that last twice per language whose extractor resolves to a
 *consumer* file and not at all for a built-in grammar, because only a consumer's
 public-surface extractor is a sourced bash file and that seam survives the port
@@ -9745,8 +9749,10 @@ failure path of its own.
 
 ### run-gate-tests
 
-Golden-fixture runner. Each `<tests-dir>/<gate>/` holds `good/` + `bad/` case
-dirs; the runner `cd`s into the case dir and invokes the gate with the args in
+Golden-fixture runner, the bridged `--run-gate-tests` arm (§The non-gate arm).
+Each `<tests-dir>/<gate>/` holds `good/` + `bad/` case
+dirs; the runner runs the gate **with the case dir as the child's working
+directory** and invokes it with the args in
 the case's `args` file: `#` lines are stripped and the surviving text is
 word-split on whitespace into argv, **not** taken one argument per line — so an
 argument containing a space is unexpressible in this file, and any second
@@ -9755,6 +9761,66 @@ reproduce the splitting rule, not guess it. `good/` must exit 0 (and, when
 `good/expect.txt` exists, satisfy it); `bad/` must exit 1 and satisfy
 `bad/expect.txt` — a rejection expectation is required, so the *right*
 finding fired.
+
+**The member is an `Arm::Run` and a bridged-arm table row, and both are forced
+rather than chosen.** The contract is a three-valued exit — 0 clean, 1 a logic
+failure in a gate or a unit test, 2 a harness or fixture error — which every
+caller reads and which an `Arm::Emit` collapses to 0-or-2: such a member could
+carry the report but not the verdict, and the verdict is what the evidence-kit
+suite and the per-kit roster line consume. It is a table member and not a
+hardcoded top-level flag because it is **configured**: `GATE_SDK_TESTS_DIR`,
+`GATE_SDK_TMP_DIR`, `GATE_SDK_NATIVE_BIN` and `GATE_KIT_ROOTS_HERE` all reach it
+through `lib/gate.sh`, and §The non-gate arm rules that a configured tool ported
+as a top-level flag resolves platform defaults and silently ignores every
+consumer override. The kit-roots knob is the **transport**: a compiled arm has no
+`BASH_SOURCE` anchor to find gate-sdk's own shell library from. The front-end
+needs no edit for any of this — `bin/run-gates.sh` hands every leading `--<token>`
+that is not one of the five forms it names straight to `exec_arm`, and
+`ARM_UNAVAILABLE_STATUS` stays 2 for this arm by falling outside that file's
+two-name test: a test runner whose binary is absent has not passed, and 0 is
+reserved for a harness-integration arm gating a user action, which this is not.
+
+**Every resolution `lib/gate.sh` owns stays in `lib/gate.sh`, reached by a bash
+spawn.** The runner needs `gate_command` once per case, and `gate_command`
+resolves each member's declared knobs by sourcing the owning kit's `lib/*.sh` in
+a subshell — so a crate-side resolver would be the **second producer**
+§The port-candidate criteria's criterion 6 refuses, which is the ground
+`bin/run-consumer-smoke.sh` carries its own `# no-port:` on. The discriminator is
+not the library a member calls but whether the crate **re-derives** what the
+library computes: that harness's *accounting* re-derives a resolution, while this
+runner only ever consumes `gate_command`'s answer. So the arm resolves each
+case's dispatch by spawning
+`bash -c 'export GATE_SDK_NATIVE_BIN="$1"; source "$2/lib/gate.sh"; shift 2; cd "$1"; shift; gate_command "$@"'`
+and reading the resolved argv off stdout, one element per line, and it resolves
+the **default** gate-declaration dir set the same way, out of `gate_check_dirs`.
+Three properties of the shell form survive unchanged and each is why a cheaper
+shape was refused. The `cd` into the case dir happens on the shell side, *before*
+`gate_command` runs, which keeps the invoker-root/case-dir split below
+byte-identical. A refusal is a **status, not a parse**: `gate_command` names it on
+stderr, which the spawn inherits, and its status becomes the `HARNESS:` line.
+And nothing is re-implemented — the crate learns the argv and nothing about how
+it was derived, which is what makes the duplication *absent* rather than
+machine-held. Whether the spawn is per case or batched is a calibration under one
+binding constraint, that the resolution for a case runs with the process cwd
+inside that case's own directory and that batching changes no resolved value; the
+shipped form is the literal per-case transcription.
+
+**The port does not discharge gate-sdk, and the section says so because a reader
+will assume otherwise from the kit's short owed column.** This section's whole
+owed set is this one member, so the cut and the section coincide; what is left
+owed to gate-sdk is `lib/test-hermetic.sh` (§lib/test-hermetic.sh) and
+`lib/inject.sh` (§lib/inject.sh), each behind the entry its own section names.
+
+**The one deliberate narrowing, stated because it is unobservable.** The shell
+form's `args=($(grep -v '^#' "$casedir/args"))` was unquoted, so bash applied
+**pathname expansion** after word-splitting, against the *invoker's* cwd rather
+than the case's. The arm performs word-splitting alone. Two facts make this a
+narrowing to state and not a defect to preserve: this section specifies
+word-splitting and says nothing of globbing, so the expansion was unspecified
+behavior rather than contract; and it is unreachable in tree — no non-comment
+`args` line across the tracked corpus carries a glob metacharacter. Recorded
+because a later reader comparing the two implementations will find the difference
+and must not read it as an oversight.
 
 **The case runs whatever the member dispatches to.** The invocation resolves
 through `gate_command` (§lib/gate.sh), so a case runs `<binary> <name>` for a
@@ -9768,7 +9834,13 @@ pair passes against the subcommand **before** the script it replaces is
 deleted, never after.
 
 **The two argument positions fail in opposite directions, and the second one's
-symptom does not name its cause.** `$1` is the tests dir and is fail-closed — an
+symptom does not name its cause.** Both survive the port unchanged, each on §The
+non-gate arm's distinguishing test rather than on a count: the first is a
+**scan-root** positional the rule itself composes, the second an
+**input-corpus** positional selecting what the rule analyses, and neither
+redirects something `gate_command` has already resolved, so neither is the
+arrives-too-late kind that section deletes. `$1` is the tests dir and is
+fail-closed — an
 absent tree exits 2 saying so. `${@:2}` is the gate-declaration dir set and
 **replaces** the resolved default rather than extending it, with a `[[ -d ]]`
 filter that drops a non-existent member silently. Pass a checks dir that is not
@@ -9781,7 +9853,10 @@ former home: this repo's own consumer remainder keeps no `checks/` dir at all, s
 its roster line (README.md §This repo, governed) passes the tests dir alone, and
 supplying a plausible-looking `scripts/checks` produces the empty-list symptom
 across the whole tree. Filed for a fail-closed second position as
-`fixture-runner-checks-dir-fails-open`.
+`fixture-runner-checks-dir-fails-open`, and the arm **carries the filter and the
+symptom exactly rather than fixing them**: repairing an interface inside a port
+is the shape §The non-gate arm's argument test exists to keep separate from an
+implementation move.
 
 **Every subdirectory of a tests dir is read as a case pair.** The runner globs
 `<tests-dir>/*/` and demands `good/` and `bad/` under each, so a directory that
@@ -9825,7 +9900,8 @@ clean line.
 
 The runner is the **one caller that needs the dispatch executable rather than
 the whole command**, so it is the one the config bridge's argv shape reaches
-(§lib/gate.sh). It takes the first element that is neither `env` nor a
+(§lib/gate.sh) — and it reaches it through the spawned resolution above rather
+than by calling `gate_command` in process. It takes the first element that is neither `env` nor a
 `NAME=VALUE` assignment, and applies both the executable guard and the
 absolutization to *that* element. Both halves matter: `env` is a PATH lookup
 with no directory to resolve, so guarding argv[0] would reject every bridged
@@ -9863,16 +9939,20 @@ blank or whitespace-only line asserts nothing — it is a separator, not a pin, 
 line `grep -F` would match against any output at all. A failing case names
 **every** missing line rather than the first, so one re-run resolves the case
 instead of revealing one absent pin per run. Exit 2 from a gate marks the
-fixture malformed (harness error, distinct from logic failure). Fixture-pair hermeticity is the `cd` into the case
-dir: a gate resolving its `<KIT>_CONFIG_FILE` under the cwd finds only the case's
+fixture malformed (harness error, distinct from logic failure). Fixture-pair hermeticity is the case dir as the
+child's working directory: a gate resolving its `<KIT>_CONFIG_FILE` under the cwd finds only the case's
 own files (and a fixture may ship its own cwd-relative config deliberately).
+**The runner sets that directory on the spawn and never enters it itself**,
+which is stronger than the shell form's `$( cd "$casedir" && … )` subshell: the
+hermeticity is unchanged and the harness gains an invariant the subshell only had
+by construction — no code path can leave the process in a case dir.
 
-That `cd` buys the **read** side and costs the **write** side, so the runner pays
+That working directory buys the **read** side and costs the **write** side, so the runner pays
 the write side back: `GATE_SDK_TMP_DIR` is absolutized at the invoker's root and
 handed to the **case invocation**, for the mirror of the reason the dispatch
 executable is. A member's runtime scratch — `check-crate-arms`'s source-stamp
 cache is the live instance — resolves that knob's deliberately repo-relative
-default against whatever cwd it has, and under the `cd` that cwd is a **tracked**
+default against whatever cwd it has, and under the case dir that cwd is a **tracked**
 fixture corpus: the gate deposits state inside the very directory it is the
 oracle for, where it is `.gitignore`d, survives the run, and rides `cp -R` into
 anything that vendors the kit tree verbatim. The fix belongs here and not in the
@@ -9924,7 +10004,13 @@ audited by nothing. Its own coverage is the bespoke
 `gate-tests/run-gate-tests.test.sh`, which drives it over scratch fixture trees
 to pin the expect-line conjunction above; the inner invocation is bounded by
 handing it a tests dir holding fixture dirs and **no** `*.test.sh`, so it runs
-pairs and returns.
+pairs and returns. That test reaches its subject through `gate_arm_run`
+(§lib/test-hermetic.sh), the arm counterpart of `gate_run`, rather than through
+`bin/run-gates.sh`: the front-end `cd`s to the git toplevel and refuses outside a
+repository, and the write-side row drives the runner from a non-git sandbox cwd.
+Its scratch-pin override is an `unset` inside that row's subshell rather than an
+`env -u` prefix, for the reason `gate_env` exists at all — `env` cannot invoke a
+shell function.
 
 ### run-consumer-smoke
 

@@ -46,7 +46,6 @@ declare -p DELEGATION_KIT_GATE_FILES &>/dev/null || DELEGATION_KIT_GATE_FILES=(
     "${GATE_SDK_GATES_DIR:-scripts}/check-*.sh"
     "${GATE_SDK_GATES_DIR:-scripts}/check-*.gate"
     "${GATE_SDK_GATES_DIR:-scripts}/lib/gate.sh"
-    "${GATE_SDK_GATES_DIR:-scripts}/run-gate-tests.sh"
 )
 declare -p DELEGATION_KIT_META_PATHS &>/dev/null || DELEGATION_KIT_META_PATHS=(
     "${GATE_SDK_GATES_DIR:-scripts}/"

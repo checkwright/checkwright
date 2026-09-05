@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Behavioral test of check-merge-attrs — the scenarios the one-pair
-# good/bad harness cannot hold. The good/bad fixture pair (run-gate-tests.sh)
+# good/bad harness cannot hold. The good/bad fixture pair (--run-gate-tests)
 # covers the reverse-direction safety edge (a merge=iteration-scoped attribute
 # on a path outside the derived set); this file covers the forward direction (a
 # derived surface with no attribute), the missing-file case, the union set's
@@ -9,7 +9,7 @@
 # consumer usage), and the end-to-end proof that the keep-ours driver resolves an
 # attributed surface to the arriving (checked-out) side across a real two-branch merge.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

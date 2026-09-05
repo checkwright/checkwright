@@ -6,7 +6,7 @@
 # the suite whose EVIDENCE_KIT_RUN_<suite> is unset, which run-validate rejects
 # and this gate therefore leaves alone rather than reporting as undocumented.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

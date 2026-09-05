@@ -5,7 +5,7 @@
 # the missing-template case, and the two skip cases (a skill with no binding
 # directive, and a template with no slots) that must all leave the gate green.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -13,7 +13,7 @@
 # expected file: a maintained golden would be a third copy to drift, and the
 # failure this exists to catch is one side edited without the other.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 # shellcheck source=../../gate-sdk/lib/gate.sh
@@ -39,7 +39,7 @@ if [[ ! -x "$BIN" ]]; then
 fi
 
 # The corpus lives here rather than in a directory beside this runner because
-# run-gate-tests.sh globs <tests-dir>/*/ as fixture *pairs*: a corpus directory
+# --run-gate-tests globs <tests-dir>/*/ as fixture *pairs*: a corpus directory
 # there is a harness error, not a fixture. It exercises every branch each side
 # has — a bold lead-in in each task section, a lessons line, a bare-slug done
 # bullet, and a bullet in a section that is none of these — and it is driven

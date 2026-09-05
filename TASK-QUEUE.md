@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **gate-tests-runner-port-cut** [spec: SPEC-gate-tests-cut.md] — port
-  `gate-sdk/bin/run-gate-tests.sh` (188) to the bridged `--run-gate-tests` `Arm::Run`.
-  The stated-contract cut behind gate-sdk/SPEC.md §run-gate-tests, whose whole owed set is this
-  one file. **The design ruling is the road, not the arm:** the runner calls `gate_command` per
-  case, which is the ground `bin/run-consumer-smoke.sh` is declared `# no-port:` on, so the port
-  is lawful only on the **duplication-absent road** — a bash spawn sourcing `lib/gate.sh`
-  unchanged, the shape `--upgrade-smoke` already took. Re-points
-  `scripts/evidence-config.sh:10`, which composes EVERY per-kit fixture suite's run command.
-  Reaches `## Done` at build: its deliverable is one section's owed files and this cut finishes
-  them, so the corpus-demotion branch does not reach it.
-  Filed 2026-09-05 by spec as a per-cut feature unit, under the packaging ruling
-  gate-sdk/SPEC.md §Porting a gate to the binary substrate states — four refs cannot pair with
-  one host, and minting a host is refused.
-
 - **test-hermetic-port-cut** [spec: SPEC-hermetic-cut.md] — settle
   `gate-sdk/lib/test-hermetic.sh` (52), the file gate-sdk/SPEC.md §lib/test-hermetic.sh calls
   **deliberately not declared**.
@@ -10099,5 +10085,6 @@
 ## Done
 
 - ruled-line-retirement-dropped-provenance
+- gate-tests-runner-port-cut
 
 ## Lessons Learned

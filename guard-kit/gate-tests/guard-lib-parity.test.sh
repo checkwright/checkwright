@@ -18,7 +18,7 @@
 # the compiled `skeleton` implements exactly the reachable subset. The newline case is asserted
 # separately below, as an out-of-contract refusal rather than as a compared classification.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 # shellcheck source=../../gate-sdk/lib/gate.sh

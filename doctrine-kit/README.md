@@ -76,5 +76,5 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
 ```

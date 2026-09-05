@@ -293,6 +293,18 @@ impl Merged {
 // file description (`try_clone` is `dup`), `dispatch`'s own technique, so the streams interleave
 // as bash's `2>&1` did rather than concatenating in the wrong order
 pub fn run_merged(program: &str, args: &[&str]) -> Result<Merged, String> {
+    run_merged_in(program, args, &[], None)
+}
+
+// spec: gate-sdk/SPEC.md §run-gate-tests — `run_merged` with the child's own working directory and
+// environment additions, the one shape `run_merged` cannot carry: a fixture case runs *inside* its
+// own case dir, and setting the caller's cwd instead would be process-global.
+pub fn run_merged_in(
+    program: &str,
+    args: &[&str],
+    env: &[(String, String)],
+    cwd: Option<&std::path::Path>,
+) -> Result<Merged, String> {
     #[cfg(test)]
     recorder::note(program);
     let spawn_err = |e: std::io::Error| {
@@ -308,12 +320,18 @@ pub fn run_merged(program: &str, args: &[&str]) -> Result<Merged, String> {
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
     let err = out.try_clone().map_err(spawn_err)?;
-    let status = Command::new(program)
-        .args(args)
+    let mut cmd = Command::new(program);
+    cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
-        .stderr(std::process::Stdio::from(err))
-        .status();
+        .stderr(std::process::Stdio::from(err));
+    for (k, v) in env {
+        cmd.env(k, v);
+    }
+    if let Some(dir) = cwd {
+        cmd.current_dir(dir);
+    }
+    let status = cmd.status();
     let status = match status {
         Ok(s) => s,
         Err(e) => {

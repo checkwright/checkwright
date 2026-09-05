@@ -3,7 +3,7 @@
 # selection over a hermetic scratch registry: the two behaviors the live gate
 # set cannot exercise (the no-match note on an ungoverned path, a mode=staged
 # gate's git-pathspec exact-or-subtree match with its matching paths passed as
-# args) plus the trigger='*'/plain-glob cases. Run by run-gate-tests.sh.
+# args) plus the trigger='*'/plain-glob cases. Run by the --run-gate-tests arm.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

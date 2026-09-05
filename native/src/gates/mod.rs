@@ -1941,7 +1941,7 @@ mod tests {
                 walk::bridge_case_knobs(&env, &case, name, member_knobs);
                 let prev = walk::cwd().expect("cannot read cwd");
                 // spec: gate-sdk/SPEC.md §check-reads-couples — the case is entered exactly
-                // as run-gate-tests.sh enters it, so an observed root is the same string the
+                // as the --run-gate-tests arm enters it, so an observed root is the same string the
                 // gate would walk from the repo root in the battery.
                 std::env::set_current_dir(&case)
                     .unwrap_or_else(|e| panic!("cannot enter {}: {}", case.display(), e));

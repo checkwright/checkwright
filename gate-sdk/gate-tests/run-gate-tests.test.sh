@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
-# Direct unit test of gate-sdk/bin/run-gate-tests.sh's expect.txt semantics —
-# every non-blank line of an expect file is a separate assertion, and a case
-# fails when any one of them is absent. A fixture pair cannot cover this: the
-# runner is a bin/ tool, never a gates.list member, so it owes no good/+bad/
-# pair, and a pair here would sit outside check-gate-fixture-coverage's registry
-# authority set and be audited by nothing.
+# Direct unit test of the --run-gate-tests arm's expect.txt semantics — every
+# non-blank line of an expect file is a separate assertion, and a case fails
+# when any one of them is absent. A fixture pair cannot cover this: the runner
+# is a test layer parallel to the gates, never a gates.list member, so it owes
+# no good/+bad/ pair, and a pair here would sit outside
+# check-gate-fixture-coverage's registry authority set and be audited by
+# nothing.
+#
+# The arm is reached through gate_arm_run, the arm counterpart of gate_run: the
+# battery front-end cds to the git toplevel and refuses outside a repository,
+# and the write-side row below drives the runner from a non-git sandbox cwd.
 #
 # The self-invocation is bounded by an inner tree that cannot reach the runner
 # again: rows below hand it fixture dirs and no *.test.sh at all, and the one
 # tree that ships a *.test.sh ships a leaf that reads its environment and exits.
 # A scratch *.test.sh that re-invokes the runner would not be bounded.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
-
-ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null || pwd)"
-RUN="$ROOT/gate-sdk/bin/run-gate-tests.sh"
-[[ -x "$RUN" ]] || { echo "run-gate-tests.test: runner not found: $RUN"; exit 2; }
 
 scratch="$(mktemp -d)"
 trap 'rm -rf "$scratch"' EXIT
@@ -49,7 +50,7 @@ mk_tree() {
     echo "$scratch/$name"
 }
 
-run_tree() { bash "$RUN" "$1" "$scratch/checks" 2>&1; }
+run_tree() { gate_arm_run --run-gate-tests "$1" "$scratch/checks" 2>&1; }
 
 fails=0
 assert_has()    { grep -qF -- "$2" <<<"$3" || { echo "FAIL [$1]: expected present: $2"; fails=$((fails + 1)); }; }
@@ -173,7 +174,10 @@ mk_writer() {
 } > "$scratch/checks/stub-writer.sh"
 chmod +x "$scratch/checks/stub-writer.sh"
 t="$(mk_writer)"
-out="$( cd "$scratch" && env -u GATE_SDK_TMP_DIR bash "$RUN" "$t" "$scratch/checks" 2>&1 )"; rc=$?
+# gate_arm_run is a shell function, so the override is an `unset` inside the
+# subshell rather than an `env -u` prefix — the reason §run-gate-tests gives for
+# gate_env existing at all: env cannot invoke a shell function.
+out="$( cd "$scratch" && unset GATE_SDK_TMP_DIR && gate_arm_run --run-gate-tests "$t" "$scratch/checks" 2>&1 )"; rc=$?
 assert_rc  writer "$rc" 0
 [[ -f "$scratch/.tmp/stub-writer.marker" ]] || {
     echo "FAIL [writer]: the scratch write did not land at the invoker's root — the corpus assertion below would pass on a write that never happened"

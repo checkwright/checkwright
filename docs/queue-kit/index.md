@@ -27,7 +27,7 @@ Vendor the `queue-kit/` directory into your repo, register its gates in
 
 ```bash
 bash gate-sdk/bin/run-gates.sh --emit queue-index    # list selectable work
-bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests queue-kit/gate-tests queue-kit/checks
 ```
 
 ## Contracts

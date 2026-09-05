@@ -8,7 +8,7 @@
 # and named as a *gate*, never as a script path: the member is `.gate`-dispatched since
 # shell-gate-tail-port, and a path would have pinned the substrate this test is indifferent to.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

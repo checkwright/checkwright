@@ -9,7 +9,7 @@
 # it reaches the no-crate arm, which needs a tree with no crate manifest, a state a
 # case dir inside this repository cannot have.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -140,5 +140,5 @@ gate-sdk/SPEC.md §The bin/-tool contract, which outlives the port.
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
 ```

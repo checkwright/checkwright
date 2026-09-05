@@ -3243,7 +3243,7 @@ costs the work in flight.
 `check-gate-tamper` speaks the full gate contract (`GATE-TAMPER: clean
 (…)` / findings + `help:` lines / exit 0-1-2) and ships the standard
 `good/`+`bad/` fixture pair driven through `--fixture` by gate-sdk's
-`run-gate-tests.sh`. The pair reaches both assertions — the bad case carries a
+`--run-gate-tests` arm. The pair reaches both assertions — the bad case carries a
 co-staged non-meta path *and* a newly added path exemption matching one of its
 own staged files, beside a bare token assertion B must pass over.
 
@@ -3261,7 +3261,7 @@ to read.
 
 `check-rule-citation` speaks the same gate contract and ships the standard
 `good/`+`bad/` fixture pair (a citation resolving to a template lead-in vs one
-naming an absent lead-in), driven by `run-gate-tests.sh` over fixture-local
+naming an absent lead-in), driven by the `--run-gate-tests` arm over fixture-local
 spec + template files passed as its two positional arguments.
 
 `check-agent-tier-explicit` speaks the same gate contract and ships the standard

@@ -5,7 +5,7 @@
 # Each case asserts the exit status AND the construct named in the message, so the
 # boundary is proved by the oracle rather than described in prose.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/test-hermetic.sh"
 

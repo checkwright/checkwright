@@ -22,7 +22,6 @@ DELEGATION_KIT_GATE_FILES=(
     "scripts/check-*.sh"
     "scripts/check-*.gate"
     "gate-sdk/lib/gate.sh"
-    "gate-sdk/bin/run-gate-tests.sh"
 )
 
 # comment-tier-exempt: the kit roots are auto-unioned by delegation.sh (a vendored kit's edits are meta-layer by definition), so only the non-kit prefixes are declared here; native/ is declared explicitly because it ships no checks/ or smoke/ and so is never a kit root by gate_kit_roots's predicate, despite carrying ported gates' Rust implementations (gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate, check-gate-tamper row)

@@ -13,7 +13,7 @@
 # beyond the one pair, and "the join never double-reports a same-line hit" is a
 # negative — expect.txt asserts presence only, so absence has no pair spelling.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

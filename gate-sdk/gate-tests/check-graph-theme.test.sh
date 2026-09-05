@@ -7,7 +7,7 @@
 # assertion E relies on it), the kit body survives theming, and the RETIRED
 # sourced-function seam refuses loudly rather than silently dropping a theme.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

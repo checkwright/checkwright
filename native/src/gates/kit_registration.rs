@@ -194,7 +194,7 @@ pub fn run_captured(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<
         ));
         stdout.push("        dir or a page under it, e.g. '](<kit>/index.md)') and,".to_string());
         stdout.push(
-            "        for a kit that ships gate-tests, its 'run-gate-tests.sh <kit>/gate-tests'"
+            "        for a kit that ships gate-tests, its '--run-gate-tests <kit>/gate-tests'"
                 .to_string(),
         );
         stdout.push(format!(

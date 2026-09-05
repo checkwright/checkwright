@@ -6,7 +6,7 @@
 # broken machine, not a clean tree), which run-gate-tests reads as a harness
 # error from a bad/ tree — so it lives here.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

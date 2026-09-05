@@ -3,7 +3,7 @@
 # hermetic scratch registry: the argv refusals, the arm's output contract (the exact green phrase,
 # each FAIL tail, the declared-omission line staying off the summary line), the `--only` argv
 # channel with its single-member bound and sole-name widening, and the pool's determinism.
-# Run by run-gate-tests.sh.
+# Run by the --run-gate-tests arm.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

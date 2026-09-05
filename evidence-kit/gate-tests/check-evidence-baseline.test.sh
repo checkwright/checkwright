@@ -4,7 +4,7 @@
 # slug is stale-red, an unknown slug is red, a permanent marker is accepted, and
 # a configured scenario glob asserts manifest↔disk set equality both ways.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

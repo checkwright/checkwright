@@ -7,7 +7,7 @@ EVIDENCE_KIT_SUITES=(gates)
 # spec: gate-sdk/SPEC.md §lib/gate.sh — derive the per-kit fixture suites from the gate-tests dirs on disk (gate_fixture_suites, in scope via evidence-kit → gate-sdk), so a new kit's fixtures enrol with no edit here; the suites below the loop have no gate-tests dir and stay hand-listed.
 while IFS=$'\t' read -r _suite _tests _checks; do
     EVIDENCE_KIT_SUITES+=("$_suite")
-    declare "EVIDENCE_KIT_RUN_$_suite=bash gate-sdk/bin/run-gate-tests.sh $_tests${_checks:+ $_checks}"
+    declare "EVIDENCE_KIT_RUN_$_suite=bash gate-sdk/bin/run-gates.sh --run-gate-tests $_tests${_checks:+ $_checks}"
 done < <(gate_fixture_suites)
 unset _suite _tests _checks
 EVIDENCE_KIT_SUITES+=(guard_tests demo installer_smoke consumer_smoke upgrade agents_md_smoke index_tests native_crate)

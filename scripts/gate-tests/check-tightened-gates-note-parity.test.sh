@@ -5,7 +5,7 @@
 # direction so neither can pass on the other's finding, exercises the arming
 # predicate against real tags in scratch repositories, and covers every refusal.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -4,7 +4,7 @@
 # stages a KPI plugin at index mode 100644 (red), re-stages it 100755 (green) —
 # the exact silent-degradation the gate exists to catch.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

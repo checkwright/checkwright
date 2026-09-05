@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Behavioral test of check-stage-entry assertions B and C — the
 # scenarios the one-pair good/bad harness cannot hold. The good/bad fixture
-# pair (run-gate-tests.sh) covers assertion A (prerequisite-stamp ordering: a
+# pair (--run-gate-tests) covers assertion A (prerequisite-stamp ordering: a
 # close cursor with no validate stamp); the harness admits only one
 # bad/ dir, so assertion B drives untagged residue at drain entry (exit 1),
 # [drain-exempt:] residue at drain entry (exit 0, reason echoed), an
@@ -10,7 +10,7 @@
 # cross-component build-entry scenarios (2-dir amendments ±waiver,
 # single-amendment cross-component body, single-component amendment).
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -118,26 +118,26 @@ no configured suite.
 
 <!-- battery-roster:begin -->
 ```bash
-bash gate-sdk/bin/run-gates.sh                                                      # full battery
-bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks             # gate-sdk fixtures
-bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks   # lifecycle-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks           # queue-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks           # canon-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks # delegation-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks       # context-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks     # evidence-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh site-kit/gate-tests site-kit/checks             # site-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks     # doctrine-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                              # consumer-gate fixtures
-bash gate-sdk/bin/run-gate-tests.sh guard-kit/gate-tests                            # guard-kit bespoke + seam suites
-bash guard-kit/bin/run-guard-tests.sh                                               # guard-kit decision table
-bash context-kit/bin/run-index-tests.sh                                             # context-kit index tools
-cargo test --release --manifest-path native/Cargo.toml                              # native crate unit tests
-bash context-kit/smoke/agents-md.sh                                                 # the AGENTS.md projection, end to end
-bash gate-sdk/bin/run-consumer-smoke.sh                                             # every kit installs into a scratch consumer
-bash gate-sdk/bin/run-gates.sh --upgrade-smoke                                      # a vendored tree upgrades in place
-bash installer/consumer-smoke/run-smoke.sh                                          # the activation path, per profile
-bash demo/run-demo.sh                                                               # the adoption walkthrough
+bash gate-sdk/bin/run-gates.sh                                                                  # full battery
+bash gate-sdk/bin/run-gates.sh --run-gate-tests gate-sdk/gate-tests gate-sdk/checks             # gate-sdk fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks   # lifecycle-kit fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests queue-kit/gate-tests queue-kit/checks           # queue-kit fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests canon-kit/gate-tests canon-kit/checks           # canon-kit fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests delegation-kit/gate-tests delegation-kit/checks # delegation-kit fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests context-kit/gate-tests context-kit/checks       # context-kit fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests evidence-kit/gate-tests evidence-kit/checks     # evidence-kit fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests site-kit/gate-tests site-kit/checks             # site-kit fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks     # doctrine-kit fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests scripts/gate-tests                              # consumer-gate fixtures
+bash gate-sdk/bin/run-gates.sh --run-gate-tests guard-kit/gate-tests                            # guard-kit bespoke + seam suites
+bash guard-kit/bin/run-guard-tests.sh                                                           # guard-kit decision table
+bash context-kit/bin/run-index-tests.sh                                                         # context-kit index tools
+cargo test --release --manifest-path native/Cargo.toml                                          # native crate unit tests
+bash context-kit/smoke/agents-md.sh                                                             # the AGENTS.md projection, end to end
+bash gate-sdk/bin/run-consumer-smoke.sh                                                         # every kit installs into a scratch consumer
+bash gate-sdk/bin/run-gates.sh --upgrade-smoke                                                  # a vendored tree upgrades in place
+bash installer/consumer-smoke/run-smoke.sh                                                      # the activation path, per profile
+bash demo/run-demo.sh                                                                           # the adoption walkthrough
 ```
 <!-- battery-roster:end -->
 

@@ -7,7 +7,7 @@
 # the SPEC states — are counted, not flagged. A GATE_SDK_KIT_DIRS override makes two
 # sandbox kits the whole roster, deterministic and independent of the real tree.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

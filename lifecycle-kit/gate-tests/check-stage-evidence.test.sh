@@ -11,7 +11,7 @@
 # HEAD and a real staged path set, so a static good/bad fixture pair cannot carry
 # one. Part 2 below builds a throwaway git repo per case for exactly that.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

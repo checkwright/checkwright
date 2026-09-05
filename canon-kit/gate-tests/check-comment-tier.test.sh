@@ -14,7 +14,7 @@
 # exempt valve reaches it. Those two are here for the same config reason as the
 # rest: each pins CANON_KIT_COMMENT_SURFACE to its own one-file roster.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

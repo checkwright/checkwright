@@ -7,7 +7,7 @@
 # sections coming back renamed — is pinned in the ported module's own #[cfg(test)] tests, where
 # check-crate-arms runs them; duplicating it here would assert the same thing twice.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

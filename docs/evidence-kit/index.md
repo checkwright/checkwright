@@ -24,7 +24,7 @@ Vendor the `evidence-kit/` directory into your repo, register its gates in
 ## Quick start
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests evidence-kit/gate-tests evidence-kit/checks
 ```
 
 ## Contracts

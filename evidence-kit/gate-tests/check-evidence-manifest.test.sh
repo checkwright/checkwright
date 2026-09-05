@@ -9,7 +9,7 @@
 # below drives the stage axis from <state-body> and the header carries the name
 # axis alone — a header-sourced stage would make these cases prove nothing.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -7,7 +7,7 @@
 # Each case builds a throwaway git repo, stages a commit shape, and runs the gate inside it, so
 # the corpus is a real index rather than an injected list.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

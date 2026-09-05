@@ -77,5 +77,5 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests evidence-kit/gate-tests evidence-kit/checks
 ```

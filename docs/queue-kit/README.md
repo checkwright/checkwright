@@ -85,5 +85,5 @@ unconfigured consumer gets a clean skip rather than a kit-shaped roadmap.
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks
+bash gate-sdk/bin/run-gates.sh --run-gate-tests queue-kit/gate-tests queue-kit/checks
 ```

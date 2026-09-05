@@ -11,7 +11,7 @@
 # which is what a caller can observe: a baseline row is the probe, and a scenario the parser failed
 # to produce reds as an absent one.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

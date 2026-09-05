@@ -10,7 +10,7 @@ amendment a unit is mid-merge on — the git index and HEAD besides, shared by
 every committing agent regardless of source disjointness.
 
 **validate-battery** — `bash gate-sdk/bin/run-gates.sh`, then the
-`run-gate-tests.sh <kit>/gate-tests <kit>/checks` row for the kit **owning each
+`--run-gate-tests <kit>/gate-tests <kit>/checks` row for the kit **owning each
 gate whose behaviour or output text the commit changed** — which is where that
 gate's fixture pair lives, and is not always a kit the commit edited. Selecting
 by edited kit instead is attested to miss: a commit that changed a

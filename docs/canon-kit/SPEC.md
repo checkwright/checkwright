@@ -903,7 +903,7 @@ empty-corpus clean, which a one-pair harness cannot spell.
 
 Producer of nothing but a verdict; its consumer is the committing session through
 the output contract, on the generated pre-commit hook, `run-gates.sh` and CI, and
-`run-gate-tests.sh` through the fixture pair. Its input is `spec_amendments`'
+the `--run-gate-tests` arm through the fixture pair. Its input is `spec_amendments`'
 output — an existing producer with an existing enabling path, so nothing new must
 be configured for the gate to see a live corpus. `precommit` tier.
 
@@ -2589,7 +2589,7 @@ is mandatory (the `comment-tier-exempt:` convention — a deliberate stylistic
 keep carries its cause in-line, a reasonless valve is red). The gate is a
 producer of nothing but a verdict: the committing session reads the red and
 either fixes the prose or lands a reasoned valve (oracle-first), the fixture
-pair feeds `run-gate-tests.sh`, and every `CANON_KIT_PROSE_TELL_*` field is read
+pair feeds the `--run-gate-tests` arm, and every `CANON_KIT_PROSE_TELL_*` field is read
 by `check-prose-tells` at scan time and no other component.
 
 ### templates/

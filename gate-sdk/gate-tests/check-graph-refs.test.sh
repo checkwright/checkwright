@@ -9,7 +9,7 @@
 # is injected through a GATE_SDK_GRAPH_THEME_DIR part file: this test is not
 # theme-neutral, so it carries the same migration the theme test does.
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

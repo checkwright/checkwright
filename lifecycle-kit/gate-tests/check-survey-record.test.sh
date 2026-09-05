@@ -10,7 +10,7 @@
 # which the hermetic pair cannot reach for the same reason, and its valve; plus
 # the two inert shapes (no record at all, a header-only record).
 #
-# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+# Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
