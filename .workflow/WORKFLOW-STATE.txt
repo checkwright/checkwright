@@ -4,11 +4,4 @@
 
 ---
 
-test-harness-cut-seam-sweep scope a6003d04 2026-09-05 c2a1ce8e
-test-harness-cut-seam-sweep spec a00704a1 2026-09-05 46f4df2d
-test-harness-cut-seam-sweep align ac60b4ce 2026-09-05 f52cf984
-test-harness-cut-seam-sweep build a4a1ea69 2026-09-05 a29779e2
-test-harness-cut-seam-sweep build adb3add4 2026-09-05 3b81af69
-test-harness-cut-seam-sweep build ad050e12 2026-09-05 4a833c17
-test-harness-cut-seam-sweep validate a0367768 2026-09-05 a054dfbc
-test-harness-cut-seam-sweep close abf5257a 2026-09-05 3ba2b005
+— scope aa443aef 2026-09-06 8e71a32d
