@@ -73,9 +73,11 @@ jobs:
   # The activation path, exercised server-side. It is a job rather than a step in
   # `gates` because it asserts a different thing — that an adopter's install
   # works, not that this tree is clean — and because the per-platform siblings
-  # join here as further jobs. The native Windows one is below; the macOS one is
-  # still owed and belongs to `macos-install-smoke-ci-leg`, which the same-day
-  # split moved it to after this comment was written.
+  # join here as further jobs. Both are below, and each one's own header says what
+  # it asserts rather than this comment: the native Windows leg and the macOS leg
+  # are instruments whose product is their log, where this job is binding against
+  # a recorded baseline. Nothing in tree owes a leg on a fourth platform; one is
+  # bought by the entry that wants it, not implied by this group.
   #
   # Not a matrix, and specifically **not derived from native/targets.list**. That
   # roster is the artifact commitment, and a smoke leg on a platform is exactly
@@ -411,4 +413,192 @@ jobs:
           echo "A zero here is not a roster join on its own: gate-sdk/SPEC.md §Consumer payload"
           echo "wants an artifact produced AND exercised, and an omit-and-declare install"
           echo "exercises none. See this job's header for what stands between the two."
+          exit "$rc"
+
+  # The macOS sibling, and the second non-Linux host this repository runs on. Its
+  # posture is the WINDOWS leg's above and not the Linux leg's, and the two are
+  # different assertions rather than two spellings of one: the Linux leg is
+  # binding through `--diff-baseline installer_smoke` because a green baseline
+  # exists to diff against. Nothing has ever run green against macOS, so there is
+  # no baseline here, a binding leg would red `master` on the push that
+  # introduces it, and the standing file-and-defer-without-looping ruling on the
+  # sibling entry — file a red cause, do not loop on it — is impossible to honour
+  # from a job the workflow obeys. This leg is an instrument; its product is its
+  # log.
+  #
+  # **The runner label floats, and read the honest limit with it.**
+  # `macos-latest` matches `ubuntu-latest` and `windows-latest` beside it because
+  # this leg's subject is the platform an adopter meets *today*, and a pinned
+  # label would freeze the instrument against a host adopters have already left.
+  # The consequence is that `macos-latest` is **arm64**, so this leg measures
+  # arm64 and nothing else. Do not read one green arm64 run as a macOS claim: an
+  # Intel leg is a separate job this one neither buys nor blocks.
+  install-smoke-macos:
+    runs-on: macos-latest
+    # The instrument runs to its end and reports; it does not decide this
+    # workflow. Drop this line on the run it is first observed green and not
+    # before — the same instruction, on the same trigger, the Windows sibling
+    # above carries.
+    continue-on-error: true
+    # Do NOT copy the Windows leg's 90 here. That figure buys MSYS emulating
+    # `fork` on every one of this suite's thousands of spawns, and its own comment
+    # says the Linux figure is not the planning basis *there*. Spawns are native
+    # on macOS, so the Linux leg's observed runtime (installer/README.md §The
+    # consumer smoke) IS the basis, widened for a cold Homebrew install and a cold
+    # cargo build. Revise this on the first observed run, which is the only
+    # measurement that can settle it.
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
+      # --tags`, for the reason the Linux leg above states.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+
+      # **Read this step as the assertion, not as scaffolding** — which is what
+      # separates it from the Windows sibling's `choco install`. It performs
+      # exactly the adopter action docs/install.md §Requirements documents for a
+      # Mac: GNU bash, coreutils and gawk, `PATH`-ordered ahead of `/usr/bin`,
+      # plus the `shellcheck` that same section sends a Mac to Homebrew for and
+      # `init` refuses without. The whole value of this leg is that the documented
+      # remedy stops being a reading and becomes a run, so a leg reaching green by
+      # installing something the page does not name would be measuring a host no
+      # adopter has.
+      #
+      # **Hold this package set and §Requirements' list equal, in both
+      # directions.** In particular do not add `findutils`: the vendoring loop's
+      # `-printf` was replaced in the same unit that landed this leg, so the
+      # documented list is complete — and a leg that installed findutils anyway
+      # would go green over an adopter path that stayed broken for everyone who
+      # installed exactly what the page names. A divergence between this list and
+      # that section is a defect in whichever of the two moved.
+      #
+      # It never fails: a brew that did not land is read off the probe below,
+      # where it appears as the `<MISSING>` or the BSD flavour it actually is,
+      # rather than truncating the job before the measurements.
+      - name: install the GNU userland docs/install.md names, and PATH-order it
+        run: |
+          set +e
+          brew install bash coreutils gawk shellcheck
+          echo "brew exited $?"
+          prefix="$(brew --prefix)"
+          # gnubin carries the members under their unprefixed names, which is what
+          # `PATH`-ordering means for a page that asks for `sort` and `awk` and not
+          # for `gsort` and `gawk`.
+          {
+            echo "$prefix/opt/coreutils/libexec/gnubin"
+            echo "$prefix/opt/gawk/libexec/gnubin"
+            echo "$prefix/bin"
+          } >> "$GITHUB_PATH"
+          exit 0
+
+      # Reporting only, and it never fails. Every claim this project makes about
+      # macOS is a reading rather than a measurement, and this step is where that
+      # stops being true — it is worth more than the suite below on the first run,
+      # because a suite that dies at its preflight says nothing about the host and
+      # this says it all at once.
+      #
+      # It runs AFTER the install above deliberately: what it reports is then the
+      # `PATH` an adopter who followed §Requirements actually has. Probing the
+      # stock image instead would measure a host nobody following the page is on.
+      # `BASH_VERSION` beside `command -v bash` is the check that the ordering
+      # took — the stock interpreter is 3.2 and the floor is 4.3, so those two
+      # disagreeing is itself the finding.
+      - name: probe the runner
+        run: |
+          set +e
+          echo "== interpreter =="
+          echo "BASH_VERSION=$BASH_VERSION"
+          echo "command -v bash: $(command -v bash)"
+          uname -a
+          sw_vers
+          echo "== toolchain, by what PATH actually resolves =="
+          for t in bash git jq awk gawk sed grep sort find realpath sha256sum \
+                   shasum tar npm node cargo rustc rustup shellcheck ruby brew; do
+            printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
+          done
+          echo "== flavours, against the GNU-first floor docs/install.md asserts =="
+          for t in awk sed sort grep find tar; do
+            printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
+          done
+          echo "== the install path's own GNU-only constructs, probed not reasoned about =="
+          printf '1.2.3\n1.10.0\n' | sort -V; echo "sort -V exited $?"
+          realpath --relative-to=/ /usr/bin; echo "realpath --relative-to exited $?"
+          # The construct this unit removed from installer/lib/init.sh, kept here
+          # as the measurement that says whether removing it was necessary on this
+          # host. A non-zero is the BSD refusal the fix was for; a zero means this
+          # runner carries GNU findutils and the fix was owed to adopters rather
+          # than to this leg.
+          find . -maxdepth 1 -type f -printf '%P\n' >/dev/null 2>&1
+          echo "find -printf exited $? (non-zero is the BSD refusal delta 3 removed)"
+          echo "== rust =="
+          rustc -vV
+          echo "== git =="
+          for k in core.autocrlf core.symlinks core.longpaths core.filemode; do
+            printf '%-16s %s\n' "$k" "$(git config --get "$k" || echo '<unset>')"
+          done
+          echo "-- porcelain on a fresh checkout; empty is what every pack step demands --"
+          git status --porcelain | head -n 40
+          echo "== scratch =="
+          echo "RUNNER_TEMP=$RUNNER_TEMP"
+          echo "TMPDIR=${TMPDIR:-<unset>}"
+          exit 0
+
+      # Reporting only. The crate is where a non-Linux host fails first if it
+      # fails at all, and a build that dies inside the suite makes every later
+      # step's silence unreadable — so it is probed alone, before the suite that
+      # depends on it, for the reason the Windows sibling states. The worktree is
+      # re-read afterwards because a release build leaving mode churn is what
+      # breaks the clean-tree precondition the pack step holds.
+      - name: probe the crate build
+        run: |
+          set +e
+          bash gate-sdk/bin/build-native.sh
+          echo "build-native exited $?"
+          ls -l native/target/release/ 2>&1 | head -n 20
+          echo "-- porcelain after a release build; the smoke asserts this is empty --"
+          git status --porcelain | head -n 40
+          exit 0
+
+      # The suite itself, under one steering that is **measurement scaffolding and
+      # not a fix**, exactly as the Windows sibling's is. It is a precondition
+      # rather than a preference: `native/targets.list` carries one line,
+      # `x86_64-unknown-linux-gnu`, and gate-sdk/SPEC.md §Consumer payload rules
+      # that a consumer smoke building its artifact from the host it runs on
+      # cannot satisfy a roster naming a platform that host is not. An unsteered
+      # smoke here therefore fails on the roster before it reaches anything this
+      # leg is measuring — a failure that looks exactly like the platform finding
+      # this leg exists to collect.
+      #
+      # **A zero here licenses NO line in `native/targets.list`**, and the clause
+      # is quoted here rather than left in the SPEC to be found. §Consumer payload
+      # admits a triple only on a green run that PRODUCED AND EXERCISED its
+      # artifact, and it goes on to rule that removing a blocker is not the
+      # granting of a permission — naming this exact misreading, that an iteration
+      # making a target *possible* invites its next reader to read the removal of
+      # a blocker as the arrival of a permission. This leg is that iteration. The
+      # discriminator is sharper still: the smoke builds its artifact **from the
+      # host it runs on**, which §Consumer payload already classifies as a harness
+      # stand-in and not that rule relaxing. So a green here proves the adopter
+      # path works on macOS and proves nothing about a released macOS artifact,
+      # because no released artifact was involved.
+      - name: install smoke on a macOS host
+        run: |
+          set +e
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] \
+            || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
+          echo "host triple: $host"
+          roster="$RUNNER_TEMP/targets.list"
+          printf '%s\n' "$host" > "$roster"
+          log="$RUNNER_TEMP/installer-smoke-macos.log"
+          GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$RUNNER_TEMP" \
+            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+          rc="${PIPESTATUS[0]}"
+          echo "== verdict =="
+          echo "installer_smoke on macOS exited $rc"
+          echo "This leg reports; it does not judge. The log above is the measurement."
+          echo "A zero here is not a roster join: see this step's header for why."
           exit "$rc"
