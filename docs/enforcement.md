@@ -198,7 +198,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | consumer_smoke |
 | [gate-sdk](gate-sdk/index.md) | upgrade |
 | [gate-sdk](gate-sdk/index.md) | agents_md_smoke |
-| [context-kit](context-kit/index.md) | index_tests |
+| [gate-sdk](gate-sdk/index.md) | index_tests |
 | (consumer) | native_crate |
 
 ## Monitors

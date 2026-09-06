@@ -42,6 +42,7 @@ pub mod roadmap;
 pub mod ruling_staleness;
 pub mod run_gate_tests;
 pub mod run_guard_tests;
+pub mod run_index_tests;
 pub mod run_validate;
 pub mod scratch_run;
 pub mod session_id;
@@ -598,6 +599,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--run-guard-tests",
         Arm::Run(run_guard_tests::run),
         run_guard_tests::KNOBS,
+    ),
+    // spec: context-kit/SPEC.md §Testing — an `Arm::Run` because the contract is the three-valued
+    // exit the `index_tests` validate suite reads, and a table member because it reaches two kit
+    // roots a hardcoded flag could not take from a consumer
+    (
+        "--run-index-tests",
+        Arm::Run(run_index_tests::run),
+        run_index_tests::KNOBS,
     ),
     // spec: context-kit/SPEC.md §Testing — an `Arm::Run` because the contract is the verdict, which
     // an emitting arm cannot carry, and a table member because the vendoring reads the consumer's

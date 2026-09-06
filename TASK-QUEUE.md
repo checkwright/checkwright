@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **context-kit-testing-hold-is-colocation-not-coupling** [spec: SPEC-index-runner-release.md]
-  — `context-kit/SPEC.md` §Testing holds `bin/run-index-tests.sh` owed on a CO-LOCATION ground
-  where its sibling's is content coupling. The amendment narrows the sequencing to the two members
-  that genuinely couple, corrects "three files, and no fourth", and specifies the released
-  107-line singleton's cut as the `--run-index-tests` non-gate arm. The discriminator, the whole
-  reader survey and the port's acceptance oracle are the amendment's, cited and not restated.
-  **PORT-CRITICAL:** its discharge is the stated precondition of that cut, read off §Testing's own
-  sequencing sentence rather than off a session's judgment of usefulness, so it rides inside the
-  cut it unblocks — this is what turns "no cut takeable" back into a takeable cut.
-  **Measured at spec, HEAD `18ce331c`:** `--emit port-blockers --tree` reads 16 owed of 83 scanned
-  and reports this member **`owed`, not held** — it carries no hold declaration — so the hold lives
-  in §Testing's prose and nowhere else, and the amendment is the whole release mechanism.
-  Filed 2026-09-06 by scope out of the port-takeability census; declined the same day as a *build
-  reading* and scoped into this iteration as an amendment, both `lead, own-authority` through this
-  iteration's dispatch relay. Promoted here by spec 2026-09-06, the authoring being the promotion.
 - **platform-support-ci-matrix** [spec: SPEC-smoke-comparison.md] [roadmap: next/reliability]
   [precondition-ok: run-observed]
   — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, gate-sdk/SPEC.md §Consumer
@@ -10235,5 +10220,7 @@
 - **post-build-instrument-edit-unowned** [design-pending] — No stage owns a post-build tree edit.
 
 ## Done
+
+- context-kit-testing-hold-is-colocation-not-coupling
 
 ## Lessons Learned

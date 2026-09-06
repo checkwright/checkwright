@@ -1129,7 +1129,6 @@ no bare collection total.
 context-kit/
   lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
   lib/toolfloor.sh               # sourceable owner: the probe roster + the floor predicate
-  bin/run-index-tests.sh         # expected-output runner for the index-first tools
   checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
@@ -1373,7 +1372,8 @@ headings, fences, and link-bearing first sentences; Rust with the pub-item
 kinds; TypeScript with every kind the `ts` grammar claims — including
 `const enum` and `export default` — beside re-export and non-export lines it
 must skip; a baseline file) beside expected outputs, and
-`bin/run-index-tests.sh` drives each one through the `--emit` front-end over
+the bridged `--run-index-tests` arm (gate-sdk/SPEC.md §The non-gate arm) drives
+each one through the `--emit` front-end over
 that corpus and asserts exact output, failing on any diff. **The goldens are the
 port's parity oracle and they are unusually strong**: they were produced by the
 shell implementations the arms replaced, so holding them byte-for-byte is a
@@ -1384,23 +1384,35 @@ A consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
 whose `rust.sh` emits a marker row: it is the extractor seam's **end-to-end
 proof**, the consumer-first resolution order and the `bash` spawn that executes a
 consumer extractor both exercised, with the shadow's output rather than the
-built-in grammar's recorded in the golden. **The runner itself stays shell**, and its ground is its own section rather than
-the arms it drives: it declares §Testing, and it is sequenced together with
-`index-tests/toolfloor-cases.sh`, which exercises `lib/toolfloor.sh`'s floor
-predicate — a library sequenced behind the installer's behind-invoke relocation.
-That sequencing reaches exactly those two members, and the AGENTS.md smoke below
-is the worked case: it declared the same section, sourced neither the runner nor
-the library, and its own header called it a standalone validate suite, so it was
-unblocked on its own ground and has since cut as this section's remainder
-(gate-sdk/SPEC.md §Porting a gate to the binary substrate — a stated cause reaches
-only the members it names). `bin/always-loaded.sh` (§The always-loaded meter) was
-a different section's owed file, correctly homed and takeable as a singleton on
-its own, and it has since cut too — its golden is the arm's parity oracle, held
-byte-for-byte over an unedited expectation file (below). What stays owed to
-context-kit after both cuts is the two sequenced members named above and
-`lib/toolfloor.sh` behind the same installer relocation — three files, and no
-fourth.
-The floor predicate rides the same runner rather than a fixture pair —
+built-in grammar's recorded in the golden. **The sequencing behind the
+installer's behind-invoke relocation reaches `index-tests/toolfloor-cases.sh` and
+`lib/toolfloor.sh`, and it is stated with its mechanism so a later reader can
+re-run the test rather than inherit the verdict**: `index-tests/toolfloor-cases.sh`
+*sources* `lib/toolfloor.sh`, so the case table is a projection of that library's
+own verdict set and the two move together. The driver above was once bound into
+that pair too, on the strength of a shared section and a shared subject — a
+co-location claim wearing a coupling claim's words. It sourced neither the runner
+nor the library; its only contact with the sequenced library was a `bash`
+subprocess spawn whose stdout was diffed against a golden, a process boundary
+structurally identical to the spawns that already reached ported arms through the
+front-end. **That discriminator is this section's own**, worked here first for
+the AGENTS.md smoke below: a member that sources neither the runner nor the
+library is unblocked on its own ground, because a stated cause reaches only the
+members it names (gate-sdk/SPEC.md §Porting a gate to the binary substrate). The
+smoke declared the same section, sourced neither, and its own header called it a
+standalone validate suite, so it was unblocked and has since cut; the driver was
+released on the same test and has since cut too (below). **Releasing the driver
+released nothing else**: `index-tests/toolfloor-cases.sh` stays owed and is still
+spawned, now by the compiled arm. `bin/always-loaded.sh` (§The always-loaded
+meter) was a different section's owed file, correctly homed and takeable as a
+singleton on its own, and it has since cut too — its golden is the arm's parity
+oracle, held byte-for-byte over an unedited expectation file (below). What stays
+owed to context-kit is `index-tests/toolfloor-cases.sh` and `lib/toolfloor.sh`
+behind that same installer relocation and nothing else — a later session may not
+quietly add a member this section does not name, and the roster's oracle is
+`bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` rather than a count
+maintained here.
+The floor predicate rides the same arm rather than a fixture pair —
 it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
 `lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed
 verdict set, the spellings of an unconstrained member, and the
@@ -1416,8 +1428,9 @@ parsed field and the consumer-side predicate per element rather than a verdict,
 because no verdict reads that field: its present, empty and omitted forms are
 each a case, the emptiness rule being the part of the grammar a reader is
 likeliest to get wrong.
-The runner registers as its own evidence-kit validate suite
-(`index_tests`, the `demo` precedent): the golden the refactor leans on now
+The arm registers as its own evidence-kit validate suite
+(`index_tests`, the `demo` precedent, read by exit code): the golden the refactor
+leans on now
 has an automated validate-stage consumer. The footprint emitter is advisory the same way, but its
 projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds
 `docs/footprint.md` against `--emit`. `check-brevity`, `check-settings-pins`,
@@ -1553,6 +1566,56 @@ rule itself consumes rather than a selector for where configuration comes from,
 so it survives the port as argv (gate-sdk/SPEC.md §The non-gate arm's
 distinguishing test), and the file's usage sentence moves to the arm's own
 refusal text.
+
+The **expected-output runner** above is the section's other `Arm::Run`, spelled
+`--run-index-tests`, and the two dispositions sit together because the second was
+decided against the first. Its contract is a **verdict** — 0 with the clean
+summary line, 1 with the failing-check report, 2 on a harness error (no golden, a
+tool that exited non-zero) — which the `index_tests` validate suite reads by exit
+code, so an `Arm::Emit` could carry the report but not the verdict. The variant
+fixes the spelling: an `Arm::Run` is a bare flag, the `--emit-` prefix being
+load-bearing for the emit family alone (gate-sdk/SPEC.md §The non-gate arm's
+correlation rule). `--update` is an argument the rule itself consumes rather than
+a selector for where configuration comes from, so it survives as argv on
+`--keep`'s precedent, and the file's `usage:` line moves to the arm's own refusal
+text — where, unlike the shell form's `$1` read, an unrecognised word is a
+refusal rather than silently ignored.
+
+**The arm keeps spawning the front-end, and that is the property the port must
+not lose.** Each check reaches its arm through `bash gate-sdk/bin/run-gates.sh
+--emit <name>` rather than through the binary, for the reason stated above; the
+compiled arm therefore spawns `bash` per check and nothing else, and it resolves
+the front-end and the fixture corpus out of the transported kit roots because a
+compiled member has no `BASH_SOURCE` anchor. It places the child in the host
+checkout, the front-end refusing outside a git repository — a condition the shell
+form met only by being run from the root.
+
+**The goldens were the port's acceptance oracle and no expectation file was
+edited by the cut.** The shell form's stdout and exit status were captured at the
+commit before its deletion, across the bare arm and `--update`, and both diffed
+byte-for-byte against the compiled arm's. An edited golden would have converted
+the parity oracle into an assertion about the new implementation, which is the
+one way this port could have passed while destroying the thing it ported.
+
+**Three sub-behaviours no golden holds each assert in the arm**, named because a
+port loses these first. The **consumer-shadowing case** writes its scratch
+`rust.sh` to disk and passes `CONTEXT_KIT_CONFIG_FILE` into a *spawned* child —
+resolving that knob for the arm itself would hand it this repo's posture instead
+of the one it is constructing, the rule this section already states for the
+AGENTS.md smoke's six-knob set. The **refusal case** asserts exit 2, the usage
+block on **stderr**, and **nothing on stdout** for an unrecognised meter mode;
+the assertion is the exit status and the stream, so it lives in the arm rather
+than in an expectation file, and one spawn answers what the shell form needed two
+for. `norm()`'s **path rewrite** folds an absolute corpus path to the corpus-relative
+one; losing it makes every golden hold an absolute path and the suite passes only
+on the machine that last ran `--update`.
+
+**Its scratch lifecycle is control flow rather than a trap**, and here the port
+repairs a window rather than transcribing one: the shell form armed its single
+`trap … EXIT` *after* the shadow dir and config were created and used, so a
+failure in between leaked them. The arm removes one scratch root on every exit
+path. Its declared roster is `GATE_KIT_ROOTS_HERE` and no `CONTEXT_KIT_` knob at
+all, for the same reason the smoke above declares none.
 
 ## Out of scope
 

@@ -84,5 +84,5 @@ bash gate-sdk/bin/run-gates.sh --emit env-probe     # re-probe the local machine
 
 ```bash
 bash gate-sdk/bin/run-gates.sh --run-gate-tests context-kit/gate-tests context-kit/checks  # the gate fixture pairs
-bash context-kit/bin/run-index-tests.sh                                        # the advisory tools vs golden output
+bash gate-sdk/bin/run-gates.sh --run-index-tests                               # the advisory tools vs golden output
 ```

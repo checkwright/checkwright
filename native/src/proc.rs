@@ -30,6 +30,13 @@ impl Completed {
         self.status.code()
     }
 
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the same widening `Merged` carries, for a
+    // caller that *prints* a failed child's status rather than branching on it: a signal-killed
+    // child reports `128 + n`, the spelling bash's own `$?` gave the shell forms this replaced
+    pub fn reported_code(&self) -> i32 {
+        exit_code(&self.status)
+    }
+
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the sanctioned widening: the failed child's
     // whole account of itself, reachable only where `stdout()` already said `None`, composed into
     // a `String` so no caller can parse it back into a verdict
@@ -440,12 +447,27 @@ pub fn run_with_env(
     args: &[&str],
     env: &[(String, String)],
 ) -> Result<Completed, String> {
+    run_with_env_in(program, args, env, None)
+}
+
+// spec: context-kit/SPEC.md §Testing — `run_with_env` with the child's own working directory, the
+// one shape it cannot carry: an arm invoking a front-end by absolute path must still place the
+// child inside the tree, that front-end refusing outside a git repository.
+pub fn run_with_env_in(
+    program: &str,
+    args: &[&str],
+    env: &[(String, String)],
+    cwd: Option<&std::path::Path>,
+) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program);
     let mut cmd = Command::new(program);
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
+    }
+    if let Some(dir) = cwd {
+        cmd.current_dir(dir);
     }
     let out = cmd.output().map_err(|e| {
         format!(

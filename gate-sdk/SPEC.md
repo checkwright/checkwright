@@ -2360,7 +2360,7 @@ and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
 whose port **removes** a grant naming its own path rather than relocating one)
 `--run-gate-tests` (§run-gate-tests),
 `--run-guard-tests` (guard-kit/SPEC.md §Testing),
-`--agents-md-smoke` (context-kit/SPEC.md §Testing)
+`--agents-md-smoke` and `--run-index-tests` (context-kit/SPEC.md §Testing)
 and `--run-demo`, the adoption walkthrough (§Consumer smoke) —
 and the class
 they form is named here because a
@@ -2516,6 +2516,17 @@ case to spawn the unchanged guard, the other two to build the sandbox — while
 `jq` is reached only *through* that subject, which reads the sandbox's allowlist
 with it. The arm stopped spawning `jq` for its own payload construction and still
 refuses without it, for that reason (guard-kit/SPEC.md §Testing).
+**`--run-index-tests` sits beside it as the member whose set is *one* program
+reached many times, and it is stated because the shape invites over-counting**:
+`bash`, once per check, and nothing else — no `git`, no `mktemp`, no `diff`, no
+`env`, all three of which the shell form reached and the port shrank away (an
+in-crate scratch, the crate's own diff renderer, and a child's knobs set on the
+child rather than through an `env` prefix). That one spawn is the member's whole
+subject rather than an implementation detail: every check reaches its arm through
+the `--emit` front-end, which is what resolves the bridged environment two of
+them declare (context-kit/SPEC.md §Testing), so an implementation that compiled
+it away would stop testing the thing — `--wait-probe`'s property, arrived at from
+the other direction.
 **`--wait-probe` is the class's first member whose *subject* rather than whose
 implementation fixes the set**, and it belongs beside those two because it is the
 one case where a smaller set would be the defect: `bash`, and through it `nohup`,
@@ -15135,7 +15146,9 @@ is not executable" cannot read as "a descriptor is not covered": the descriptor
 is data — a manifest and directives, never sourced and never run — and an
 executable one invites a reader to run a file carrying no interpreter line. The
 first class is by-path-invoked kit scripts — gate-sdk's runner
-(`run-gates.sh`), context-kit's `bin/run-index-tests.sh`, and lifecycle-kit's
+(`run-gates.sh`), gate-sdk's consumer-smoke harness (`bin/run-consumer-smoke.sh`,
+which runs each vendored kit's own `smoke/install.sh` and `smoke/violation.sh` by
+path), and lifecycle-kit's
 entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
 is by-convention path-invocable — so a script committed `100644` degrades
 silently in a fresh clone: a KPI plugin to `n/a (plugin failed)`, a
