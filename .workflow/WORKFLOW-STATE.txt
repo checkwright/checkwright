@@ -6,3 +6,4 @@
 
 demo-cut-record-authority-and-attribution scope acdb36a9 2026-09-06 fe560880
 demo-cut-record-authority-and-attribution spec a7526cb0 2026-09-06 45e25bae
+demo-cut-record-authority-and-attribution align a954c9c2 2026-09-06 01c95935
