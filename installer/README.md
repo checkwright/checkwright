@@ -416,10 +416,16 @@ is wrong.
 
 **The two bootstraps are hand-kept, and parity is held by running, not by
 generation — ruled 2026-08-26.** Each half is authored in its own language
-against the five steps above, and the oracle that holds them equal is the
-per-platform install-smoke leg (`platform-support-ci-matrix`): a leg per
-bootstrap, each exercising the payload end to end on the host that bootstrap is
-for. The alternative refused is one declaration generating both halves. Its
+against the five steps above, and the oracle that holds them equal is a
+per-**bootstrap** install-smoke leg, each exercising the payload end to end on
+the host that bootstrap is for. **Count those legs by bootstrap and never by
+platform.** `.github/workflows/gates.yml` carries three install-smoke jobs —
+Linux, native Windows and macOS — and all three drive the *bash* half, the
+Windows one through Git-for-Windows bash. So a reader counting platforms
+concludes this ruling's oracle is in place when it is not: the PowerShell half's
+leg is owed with that half itself, under `platform-support-ci-matrix`, and no
+other leg substitutes for it. The alternative refused is one declaration
+generating both halves. Its
 grounds: at five steps the generator is a third artifact — a template language,
 a freshness gate and a projection-roster row — maintained for a surface small
 enough to be written twice by design, and a generated twin still needs the

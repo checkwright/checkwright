@@ -408,10 +408,12 @@ has produced and exercised its artifact — which is exactly why the leg is what
 alternative refused: leaving native Windows to WSL, which serves the adopter today and is the
 interim path until the leg is green, but reaches no evaluator objective 2 names.
 
-**The two bootstraps are hand-kept, held in parity by the per-platform install-smoke legs —
+**The two bootstraps are hand-kept, held in parity by a per-bootstrap install-smoke leg —
 ruled 2026-08-26 by the operator**, closing `powershell-installer-surface`'s fork 2. The
 mechanism and the refused generated-twins alternative are owned at `installer/README.md`
-§The install boundary.
+§The install boundary, which also says why the legs are counted by bootstrap and not by
+platform — three platforms run one of the two halves, so a platform count reads this
+ruling's oracle as in place while it is still owed.
 
 **The port's completion predicate is literal — `--tree`'s owed count reaching zero, over the whole
 derived corpus, with no contributor-side subtraction — ruled 2026-08-28 by the operator**,

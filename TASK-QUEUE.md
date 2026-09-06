@@ -12,50 +12,6 @@
 
 ## New Features
 
-- **macos-install-smoke-ci-leg** [spec: SPEC-macos-leg.md] [roadmap: next/reliability] — a macOS
-  install-smoke leg; nothing has ever run green against macOS.
-  roadmap-summary: A CI install-smoke leg on macOS, so the platform claim has a run behind it.
-  **PORT-CRITICAL, OWN-ITERATION SHAPE — RULED 2026-09-05 (operator, consult)**, re-named onto the
-  port-first run rather than reversed. **OPENED 2026-09-06 — operator, direct answer to the lead
-  session's ask, lead-relayed**, against both the scope session's recommendation and the lead's,
-  with the own-iteration ruling put in front of the operator in as many words. The push-budget
-  concern is recorded ANSWERED rather than overlooked: `platform-support-ci-matrix`'s standing
-  file-and-defer-without-looping ruling bounds it, so a red cause is filed and NOT looped on.
-  **The cost is measured rather than estimated**, and the measurement is the amendment's premise —
-  runners are free on a public repo, and what the leg must buy is a GNU userland: the macOS image
-  ships bash 3.2.57 with no coreutils and no gawk, while cargo, rustc, jq, node and Homebrew are
-  present. Measured at build 2026-08-25 against the runner-image manifests.
-  **Read `platform-support-ci-matrix` before designing the leg** rather than re-deriving its
-  shape — it carries the non-blocking probe-then-suite instrument this one copies, and most of
-  its unanswered probe questions a macOS host owes answers to as well.
-  `init-vendoring-assumes-gnu-findutils` rides inside per the 2026-09-05 arrangement and is
-  promoted onto the same amendment.
-  Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling;
-  promoted 2026-09-06 at spec.
-
-- **init-vendoring-assumes-gnu-findutils** [spec: SPEC-macos-leg.md] — `checkwright init`
-  enumerates each kit's payload with `find -printf`, a GNU findutils extension, in the loop that
-  vendors every install, so a stock macOS or BSD host vendors zero files.
-  `installer/lib/init.sh:201` runs it unconditionally per kit with stderr NOT suppressed. `:126`
-  uses the same construct on the artifact path, conditionally and with stderr suppressed, and
-  that twin is DORMANT — `native/targets.list` carries one non-Darwin line, so `select_artifact`
-  returns before ever reaching it.
-  **THIS ENTRY'S FAILURE-MODE PREMISE IS FALSE AND IS CORRECTED HERE, at spec 2026-09-06, off the
-  control flow.** It costed the defect as "a green `init` over an empty vendor tree, discovered
-  later as missing kits rather than at install time". But `gate-sdk` is itself one of the vendored
-  kits, so an empty loop leaves no hook generator under the install root and `init.sh:301-302`
-  reaches `die "gate-sdk's hook generator failed"` BEFORE the `git add` and commit block: a loud
-  partial die over a half-written, uncommitted tree. Read on a machine with no Mac, at the same
-  tier as the original reading; the leg's first run is the oracle that settles it.
-  **THE TWO CANDIDATE FIXES ARE RULED AT SPEC and the amendment carries the ground:** the
-  construct is replaced portably AND an empty enumeration becomes a refusal, since the real defect
-  is that a failed enumeration is indistinguishable from an empty kit; the toolchain floor and
-  `docs/install.md` §Requirements are NOT widened to findutils, because after the fix the install
-  path carries no findutils extension and its only other GNU-isms — `sort -V` and
-  `realpath --relative-to` — are already named there.
-  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by build; promoted
-  2026-09-06 at spec into the leg that carries it.
-
 ## Technical Debt
 
 ## Deferred
@@ -664,7 +620,8 @@
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
   forks are RULED**: fork 2 on 2026-08-26 by the operator — two hand-kept bootstraps, parity held
-  by the per-platform install-smoke legs, mechanism and the refused generated-twins alternative at
+  by a per-BOOTSTRAP leg — the three running legs all drive the bash half, so this entry still owes
+  the PowerShell one — with the mechanism and the refused generated-twins alternative at
   installer/README.md §The install boundary; fork 1 merged 2026-08-25 into that same section —
   five bootstrap steps, one retirement (`jq`), everything else behind the invoke. What remains is
   the work: the PowerShell half, the relocation (this entry's since `install-step-relocation`
@@ -10153,5 +10110,7 @@
 
 - lead-open-authorization-channel-and-cardinality
 - pack-installer-no-owning-spec-section
+- macos-install-smoke-ci-leg
+- init-vendoring-assumes-gnu-findutils
 
 ## Lessons Learned
