@@ -1536,11 +1536,12 @@ shape, and the one host that needs this one is the host nobody is standing at.
 recorded here because they are what the next rider of the leg would otherwise
 re-buy. Rounds 12 (run `33782234328`, head `32f73806`), 13 (run `33963571906`,
 head `c4850072`, the first round the report above ran on) and 14 (run
-`34002192468`, head `a5b6907b`) all fail the same arm on the same profile, 12
-and 13 at `starter: 477 of 477 manifest entries disagree with the tree` and 14
-at `starter: 476 of 476` — the count moved with the payload, not with the
-defect. *In every round below, the value labelled `got` in the log is the value
-this section now calls `reread`: those rounds ran before the held operand
+`34002192468`, head `a5b6907b`) and 15 (run `34054512420`, head `bf1fc722`, the
+first round with **both** operands held) all fail the same arm on the same
+profile, 12 and 13 at `starter: 477 of 477 manifest entries disagree with the
+tree`, 14 and 15 at `476 of 476` — the count moved with the payload, not with
+the defect. *In rounds 12 to 14, the value labelled `got` in the log is the
+value this section now calls `reread`: those rounds ran before the held operand
 existed.*
 
 - Every entry reads `manifest hash disagrees with the tree` and none reads
@@ -1550,15 +1551,19 @@ existed.*
   other branch reports. In round 14 the disagreement lines run with **nothing
   interleaved**, so `git hash-object` emitted no standard error across any of
   the calls behind them.
-- `scripts/checkwright-gates.exe` is in the disagreeing set, and rounds 13 and
-  14 both sampled it as the artifact row.
-- **Rounds 13 and 14 printed identical values on both samples** — the `.md`
-  and the `.exe` — every one a clean 40-hex with nothing in its byte rendering.
+- **Rounds 13, 14 and 15 printed identical values on both samples** — the `.md`
+  and `scripts/checkwright-gates.exe`, which is in the disagreeing set every
+  round and is what all three sampled as the artifact row — every value a clean
+  40-hex with nothing in its byte rendering.
   `reread == own` retires the process-context asymmetry that was this leg's
   standing narrowing; `raw` equal to the rest retires every end-of-line
   hypothesis about the file's content; and the artifact control read
   `recorded` and `recomputed` equal, so the binary's bytes are exactly the bytes
-  `init` published. Round 14 adds `want` **as the loop held it** to that set.
+  `init` published. Round 14 adds `want` **as the loop held it** to that set and
+  round 15 adds `got`, so in round 15 all five values on both samples are one
+  string — `affdbceb…d982` on `gate-sdk/README.md`, `4159af89…f942e` on the
+  `.exe` — and `%q` renders every one of the ten unquoted, which is the whole of
+  what a byte rendering can say.
 - **The consumer's `git status --porcelain` printed nothing**, so the tree holds
   what `init` committed, and no round carries a `fatal` line from any hash
   call, so no per-path refusal is open. Round 14's only `fatal` lines are the
@@ -1575,34 +1580,49 @@ existed.*
   host ahead of it. The consumer's own battery passed, `All 11 gates passed`,
   immediately before the manifest arm failed.
 
-*What these rounds therefore establish, and what they do not.* The recorded
-value, the tree's bytes, every git context **and the `want` the loop held** all
-agree, so the disagreement is **in the comparison and not in the hashing** — the
-table's second row. Round 13's report could not settle
-that, because its first form re-read `want` through a second channel instead of
-printing the one the comparison used; round 14 carried the corrected `want` and
-it agreed with everything. **That correction was applied to one operand of
-two.** The remaining locus is therefore the `got` the loop held — the operand
-the report re-read rather than carried — and once it is carried, nothing in the
-comparison is unread: both operands are then printed as the comparison received
-them. That is what makes the next round the *last* diagnostic round by
-construction rather than one of an open series, decided under the two
-comparison rows above. No mechanism is claimed here beyond that: a line
-terminator surviving `read`, which strips `\n` alone, is consistent with every
-printed line and with the count, but it is a candidate and not a reading.
+*What round 15 settled, and the one thing it opened.* Both operands are now
+printed as the comparison received them, and they are **byte-equal**. That is
+the table's fifth row, reached on evidence rather than by elimination: two equal
+values were compared and reported unequal, which bash cannot do, so the pairing
+`bad_hash` recorded is wrong rather than the hashing. Rows one, two and three
+are all retired by the same observation — every value including `raw` agrees, so
+no context filters and no byte moved — and the carriage-return candidate rounds
+12 to 14 left standing is **falsified**, because `%q` would have quoted one and
+did not. The diagnostic series is closed: the defect is in the comparison's
+operand pairing, and no further round narrows it.
+
+*The verdict and the report named different entries, and that is round 15's own
+finding.* The run exited **2**, not 1 — `a manifest comparison operand is not 40
+lowercase hex` — while both sampled entries' operands are well-formed 40-hex.
+Both statements are true because they are about different rows: `malformed` is a
+**run-wide flag** any one of the 476 disagreements can set, and the report
+samples the *first* disagreeing path plus the artifact row. So the entry that
+earned the exit-2 verdict is, by construction, one the report cannot print. That
+is not a hypothesis about this host — it follows from the arm's own shape, and
+it means the honest-code rule above bought a verdict at the cost of the value
+that justifies it. The next repair owns that, not another round.
 
 *Who reads the next round, and the trap that would otherwise swallow it.*
 `install-smoke-windows` is a job of the `gates` workflow, which runs on every
 push to master, so the reading has an owner inside the ordinary stage set and
-costs no push of its own: **close**, at the push it already makes and watches,
-reading the finished run for free with `gh run view <id> --log`. The reading is
-an explicit, **job-keyed** act — read that job's log, never the workflow's
-conclusion. The job is `continue-on-error: true`, so the two verdicts come
-apart, and that is measured rather than predicted: run `34002192468` concluded
-`success` while `install-smoke-windows` concluded `failure`. A session that
-watched the run to green and inferred the leg from that verdict would read a
-passing workflow as a passing leg. What gets recorded here afterwards is what
-was observed, by whoever observed it — this section predicts no content for it.
+costs no push of its own: **close**, at the push it already makes and watches.
+The reading is an explicit, **job-keyed** act — read that job's log, never the
+workflow's conclusion. The job is `continue-on-error: true`, so the two verdicts
+come apart, and that is measured rather than predicted: runs `34002192468` and
+`34054512420` both concluded `success` while `install-smoke-windows` concluded
+`failure`. A session that watched the run to green and inferred the leg from
+that verdict would read a passing workflow as a passing leg. What gets recorded
+here afterwards is what was observed, by whoever observed it — this section
+predicts no content for it.
+
+*The free log read is gated on the run, not on the job, and the way past that is
+a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still
+in progress; logs will be available when it is complete` even when the Windows
+job itself has finished, so a close reading a job-keyed leg would otherwise wait
+on the slowest sibling — `install-smoke-macos`, which this leg has no dependency
+on. `gh api repos/<owner>/<repo>/actions/jobs/<job-id>/logs` answers for a
+finished job while its run is still going, and that is the call to make; the job
+id comes from `gh run view <id> --json jobs`. Measured at round 15.
 
 *Why the CI diagnostic that used to stand beside this leg is gone.* A
 `read one manifest disagreement in place` step stood up its own consumer and
