@@ -37,21 +37,21 @@
   hotfix and verified at the remote oracle by round 12 (`33782234328`, head `32f73806`). THE READING
   THAT OUTLIVES THEM: round 6's two guessed repairs could never have landed, so cause-read-first is
   the instrument's case, vindicated again by round 13.
-  **ROUND 13 IS THE CAUSE READ — run `33963571906`, head `c4850072`, the first round with the report
-  inside the arm; still exits 1 at `starter: 477 of 477`. THE MECHANISM IS NOT NAMED; THE SITE IS.**
-  **installer/README.md §The consumer smoke OWNS the record** — every value, every host fact, and
-  the line retiring each hypothesis — cited, not restated. FOUR RETIRED THERE: the process-context
-  asymmetry (also what the two 2026-09-03 gap bullets held, so they drain here REFUTED rather than
-  merely spent); every end-of-line hypothesis about content; "the bytes on disk are not the bytes
-  `init` hashed"; and an errored `got`. **WHAT SURVIVES IS ONE SITE:** all four values agree, so the
-  disagreement is IN THE COMPARISON and not in the hashing, and the only value left unread is the
-  one the arm's loop held in `want` — which is also **THE ROUND'S OWN INSTRUMENT GAP, corrected in
-  the same build**: the first report RE-READ `want` instead of printing what the comparison used, so
-  its byte rendering saw nothing. `want` is now the held value and the next round is decisive under
-  that section's truth table's FOURTH row. **NO REPAIR IS STARTED** — a terminator surviving `read`
-  is a candidate, not a reading. **AND THE NEXT ROUND IS ALREADY BOUGHT:** `gates` runs
-  `install-smoke-windows` on every master push under no `if:` gating, so close's push runs the
-  corrected instrument at no extra cost — verified against the workflow file at build, not inferred.
+  **ROUND 14 IS DECISIVE AND IT FIRED — run `34002192468`, head `a5b6907b`, bought by the close
+  push at no extra cost exactly as round 13 predicted; still exits 1, now at `starter: 476 of 476`.
+  THE LAST UNREAD OPERAND IS READ AND IT AGREES.** The corrected instrument printed the value the
+  failing comparison actually used, and for the first rendered entry ALL FOUR hashes — `want` (off
+  the arm's own jq stream), `got`, `own` and `raw` — are byte-identical, each rendered as bytes. So
+  the comparison consumed a value equal to the tree's hash and reported disagreement anyway, for
+  every one of 476 entries.
+  **WHAT THIS RETIRES: every value-side hypothesis, the whole class.** Rounds 13 and 14 together
+  eliminate the process-context asymmetry (also what the two 2026-09-03 gap bullets held, so they
+  stand REFUTED rather than merely spent), every end-of-line hypothesis about content, "the bytes
+  on disk are not the bytes `init` hashed", an errored `got`, and now the held `want`.
+  **installer/README.md §The consumer smoke OWNS the record**, cited and not restated.
+  **WHAT SURVIVES IS THE COMPARISON ITSELF** — its control flow or its key, never its operands.
+  **NO REPAIR IS STARTED AND NO ROUND IS BOUGHT:** a desynchronised stream and a surviving
+  terminator are candidates, not readings, and the ruling's red-cause limb says file and defer.
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
   promoted/deferred 08-25 through 09-05; rounds 6-13 ran 08-31 to 09-05, 8-11 identical to 7.
   **DEMOTED 2026-09-05 AT BUILD, and the demotion IS the settled outcome rather than a shortfall.**
