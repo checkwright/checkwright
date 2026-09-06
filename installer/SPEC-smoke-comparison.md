@@ -87,7 +87,10 @@ hashing:
 | `want == got`, byte-equal, both held | the comparison received two equal values and reported disagreement, which bash cannot do — so the pairing is wrong and `bad_hash` associated a `want` with another entry's `got`; read the sampled path against the loop's own echo order |
 
 The existing four rows are unchanged in substance; where a row's subject is the hashing rather
-than the comparison, its `got` term reads `reread`.
+than the comparison, its `got` term reads `reread`. The fourth row's own count updates too — *"any
+of the four is not 40 lowercase hex"* becomes *"any of the five"*, since `reread` is now a fifth
+printed value carrying the same byte rendering and is no less able to show a stray byte than the
+other four; nothing in delta 1 exempts it from that row's catch-all.
 
 ### (2) A malformed operand is a harness precondition at exit 2, never a manifest verdict at exit 1
 
@@ -223,11 +226,10 @@ because it rides no payload and reaches no adopter.
 - `installer/consumer-smoke/run-smoke.sh` — the manifest arm at `:313-324`, `manifest_report()`
   at `:190-235`, and `hash_probe`'s call sites; the file's own `# spec:` header sentence
   describing the manifest post-condition, which now has a second exit code (deltas 1 and 2).
+<!-- update-target-exempt: the drop condition is a green observation this envelope explicitly does not assert, so touching it would assert what delta 4 records as unasserted -->
 - `.github/workflows/gates.yml` — **deliberately untouched**. The `continue-on-error` line's own
   comment conditions its removal on the run the leg is first observed **green**, and green is
-  exactly what this amendment does not assert; the line and its comment stay
-  <!-- update-target-exempt: the drop condition is a green observation this envelope explicitly
-  does not assert, so touching it would assert what delta 4 records as unasserted -->.
+  exactly what this amendment does not assert, so the line and its comment stay.
 - `TASK-QUEUE.md` — `platform-support-ci-matrix` promotes to New Features with this file's
   `[spec:]` ref, in the same commit as this file (all deltas).
 

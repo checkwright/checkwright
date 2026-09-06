@@ -172,7 +172,7 @@ the probe. Every reader, with its disposition:
 | `.claude/settings.json:22-23` | two literal Bash grants, gated by `check-settings-paths` | removed; a grant naming a deleted path is the `--scratch-run` precedent, a port that **removes** a grant rather than relocating one |
 | `scripts/git-hooks/pre-commit` (3 baked copies) | **generated** projection of the knob set | regenerated, never hand-edited |
 | `docs/context-kit/README.md`, `docs/context-kit/SPEC.md:1132,1376`, `docs/gate-sdk/SPEC.md:15143` | **generated** docs mirrors | regenerated |
-| `TASK-QUEUE.md:146,150`, `.workflow/survey-record.md:15` | queue and survey records of this very finding | left as the dated record they are |
+| `TASK-QUEUE.md:16,19`, `.workflow/survey-record.md:15` | queue and survey records of this very finding | left as the dated record they are |
 
 **The `gate-sdk/SPEC.md:15138` citation is the one cross-component consequence and it does not
 simply delete.** §check-exec-bit names three instances of a script that invokes kit scripts *by
