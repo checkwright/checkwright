@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+index-runner-hold-release-and-windows-smoke-comparison gates sha256=c7e80b03190513e405d59520d9cafe5262461e87e9aa37be7ddb3566aef81f89 pass=108 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison gate_sdk sha256=485d6084712585611a0084632d12a2e63293583c135bfa1628c52f390e2cd828 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison guard_kit sha256=8745aafc1908d64352c326c2e02750ea926728f29f9e0eb3ef0e3a036d029497 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison guard_tests sha256=ec9e4732f5a48d8f828776b25ea5eb17fb9089d4efcea531f3a0ef5a625e3965 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison demo sha256=c241cbdc077b4251d0a67ed9f3d499db3692bdbba40ac6150caac3c94b72fb65 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison installer_smoke sha256=5530be3204538cde96a22d737d09190250ec0276e098b6df3f00d81decbe8fed pass=13 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison consumer_smoke sha256=155b1c40643695e7ee8b5f536d77a4ee69ac0d18a6264bff00d121fd626d50c8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison upgrade sha256=9f1eb68812bbbafa5266758feb86408c6e4a29ebe842d00c102a0b6bbc1eaba9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison agents_md_smoke sha256=a3c657f810f7cda8182d12273e9ded60beda718e3bab5d83766a89d035d4dc48 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison index_tests sha256=9e9e77093cb0e99295e11b076057098221a0d5837e32559f90936cce747bc153 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+index-runner-hold-release-and-windows-smoke-comparison native_crate sha256=821c2c552a4bb38f96a5d495cf5d05dbfefacf7aa2ca89c182a7885bd43b8c3d pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
