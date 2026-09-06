@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+demo-cut-record-authority-and-attribution gates sha256=3e9cd10fd5e9804694235fbc991582227c56da43a56e80501a7117ec57019973 pass=108 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution gate_sdk sha256=485d6084712585611a0084632d12a2e63293583c135bfa1628c52f390e2cd828 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution guard_kit sha256=8745aafc1908d64352c326c2e02750ea926728f29f9e0eb3ef0e3a036d029497 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution guard_tests sha256=ec9e4732f5a48d8f828776b25ea5eb17fb9089d4efcea531f3a0ef5a625e3965 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution demo sha256=30e4e163bc5cd37602fbd426a60261f60b045f971b8c1d768cad57fb2c475ae0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution installer_smoke sha256=ca4eecf97d24db233d5bd675fe74a0c8bba143bb7727dd14c30a1f3fd578e354 pass=13 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution consumer_smoke sha256=a62ef2df0b154abe40cf4ce2f70109b6888fbe5601666c1f61344e55f5118ef1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution upgrade sha256=36aa6473c70c4367404074106a6c4011714f04badbd026c3e1eb9cfee64eb69c pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution agents_md_smoke sha256=3d99180b0d5fed0e982979eb07115e3558822f7074213aaf27fae11253e43f90 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution index_tests sha256=9e9e77093cb0e99295e11b076057098221a0d5837e32559f90936cce747bc153 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+demo-cut-record-authority-and-attribution native_crate sha256=fd90d05b81cb855953228401bf8f7c8ca9ac6e6be20a59cd067ad79a648ea70a pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
