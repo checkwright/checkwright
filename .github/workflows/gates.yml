@@ -227,10 +227,10 @@ jobs:
           fetch-depth: 0
 
       # Reporting only, and it never fails. Every claim this project makes about
-      # a non-Linux platform is currently a reading rather than a measurement,
-      # and this step is where that stops being true — it is worth more than the
-      # suite below on the first run, because a suite that dies at its preflight
-      # says nothing about the host and this says it all at once.
+      # Windows is currently a reading rather than a measurement, and this step is
+      # where that stops being true — it is worth more than the suite below on the
+      # first run, because a suite that dies at its preflight says nothing about
+      # the host and this says it all at once.
       - name: probe the runner
         shell: bash
         run: |
