@@ -182,9 +182,43 @@ honestly.
 ## Opening an iteration
 
 **Whether an iteration opens at all is the operator's decision, obtained
-explicitly and separately before anything else in this section applies.** Not
+explicitly before anything else in this section applies.** Not
 inferred from a queue that holds work, not read out of an instruction about what
 ought to be fixed, and not implied by the previous iteration having ended.
+
+**Explicit and *separate* are not the same requirement, and only the first one is
+general.** Authorization arrives through **one channel, the one this consumer's
+binding names below** — never inferred by the lead from anything else. A channel
+can be explicit without being a second act, and where the bound channel is such a
+channel, an invoked lead holds its authorization already and asks for nothing
+further. The not-inferred-from clauses just above are untouched by this: what they
+bound is the lead's *inference*, and naming the channel a grant travels on bounds
+no inference at all. Where a consumer binds no channel, the default is that the
+lead asks and the answer is the grant — a kit that shipped a channel of its own
+would be shipping one harness's layout.
+
+**A grant authorizes a stated number of opens, and absent a stated number it
+authorizes one.** The bound is a property of the grant, so the lead knows it at
+the moment it reads what it holds rather than at the far end of the iteration the
+grant paid for. The default is one rather than unbounded for the scale reason
+below, which is per-iteration: each open commits its own reset, its own stage
+walk, its own session per stage, so an unbounded default would let a single answer
+about a single iteration's worth of machinery authorize an unbounded amount of it.
+A grant may state a larger number. What it may not do is leave the number to the
+reader. **And the cardinality is *spent*, never renewed** — an iteration that opens
+consumes one of the grant's opens, and a grant with none left authorizes nothing.
+
+**Nothing enforces the channel or the cardinality, and nothing can:** an
+authorization is a fact about a conversation, so every encoding of it is written
+by the same session it binds. lifecycle-kit/SPEC.md §Honest limit on the lead's
+open authorization records that limit, weighs the candidate mechanisms and rules
+them out. A lead meeting this section obeys prose here and finds no gate behind
+it because there is none to find.
+
+*<open-authorization-channel: the channel through which this consumer's operator
+grants an open, and the cardinality one grant on that channel carries — or the
+statement that this consumer binds no channel, leaving the ask-and-answer default
+above.>*
 
 **The ground is *scale*, and stating it is what makes the rule obeyable.**
 An open commits a boundary reset that truncates the evidence surfaces, a walk of
@@ -241,10 +275,13 @@ that has already caught a false filed premise in practice.
 ## Closing an iteration
 
 When the iteration's final stage completes, the lead **stops and reports what it
-believes is owed**, and does not open the next one. This is the section above
-met from the other side: one rule attached to the iteration boundary, rather
-than two rules attached to the two ends, so that repairing one end can never
-leave the other standing.
+believes is owed**, and does not open the next one. This is not a second rule
+standing at a second end — it is the consequence of the first one: the grant that
+authorized this iteration is spent, §Opening an iteration states what a spent
+grant authorizes, and so the next open takes a fresh grant that the lead does not
+hold. One rule, attached to the grant and *met* here, which is why repairing the
+opening end can never leave this one standing on stale terms, and why the rule
+covers both postures — a spent grant is spent under either.
 
 Reporting is the lead's whole remaining act there — the state of the queue as the
 closing stage left it, whatever was filed for the next intake, and what the lead

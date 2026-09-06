@@ -2,6 +2,11 @@ Execute the template at lifecycle-kit/templates/lead.md, applying the bindings b
 
 ## Bindings
 
+**open-authorization-channel** — the lead skill's own invocation. Typing `/lead`
+here *is* the operator's grant; no separate act is looked for and none is asked
+for. Cardinality: **one iteration per invocation.** A second iteration wants a
+second `/lead`.
+
 **ruling-config** — `.claude/agents/stage-session.md` (dispatch `subagent_type:
 stage-session`); its §Ruling classes holds the escalate-vs-decide roster.
 Posture: **Split** (template §The lead model). Lead and every stage — scope

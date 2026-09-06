@@ -140,43 +140,6 @@
   Filed 2026-09-05 by close, promoting a gap bullet after fix was refused as a design call and
   icebox refused on the live port trigger; promoted 2026-09-06 at spec with its placement ruled.
 
-- **lead-open-authorization-channel-and-cardinality** [spec: SPEC-lead-grant.md] — the lead
-  template tells a lead that its own invocation authorized nothing, names no channel by which
-  authorization does arrive, and carries the one-open bound at the iteration BOUNDARY rather than
-  on the GRANT, so a lead learns the cardinality an iteration late.
-  **Ruled and directed 2026-09-06 by the operator**, in a direct in-session reply to a lead
-  session's authorization ask, relayed by that lead: the invocation IS the grant, and one
-  invocation grants exactly one iteration. The verbatim, the grounds, and the measured failure
-  behind it — a lead opening a second iteration on one grant — are TRAJECTORY.md §The closed
-  rulings', landed at `e818e6fd` and not restated here. The operator directed the correction in
-  the same breath: "Correct your instructions if not clear."
-  **The read that makes it a defect rather than a preference, verified 2026-09-06 at scope:**
-  `lifecycle-kit/templates/lead.md:184-185` demands authorization "obtained explicitly and
-  separately"; `:223-230` disqualifies a relayed directive as evidence; §Opening names NO channel
-  and NO cardinality at all; `:241-247` attaches the bound to the boundary.
-  **TWO EDITS ON TWO TIERS, and the split is the provenance seam's.** Kit mechanism — a channel
-  the consumer BINDS, and a cardinality the grant carries — goes in the template's §Opening;
-  consumer config — that this tree's bound channel is the lead skill's own invocation — goes in
-  `.claude/commands/lead.md`. A slash-command literal in a kit template would publish one
-  harness's layout.
-  **WHICH SLOT CARRIES THE CONSUMER HALF IS RULED `lead, own-authority` 2026-09-06**, on the spec
-  session's escalation: a NEWLY MINTED slot in §Opening, NOT the existing `ruling-config`.
-  TRAJECTORY.md's mechanism sentence said `ruling-config` and this entry said a new name; both
-  cannot hold, since a shim binds a slot by a `**slot-name** —` lead line. Ruled on two surfaces
-  neither cited: `ruling-config` DECLARES its own subject ("the tracked agent-definition the lead
-  dispatches and the roster it carries"), which the authorization channel is not; and §Policy is
-  config puts policy binding the lead ITSELF in the template rather than in the dispatched agent
-  definition. TRAJECTORY.md's sentence is corrected where it stands — the transitional MECHANISM
-  half, never the ruling, its date or its channel.
-  **IT PROMISES PROSE AND NEVER A GATE.** `lifecycle-kit/SPEC.md:337` already records the
-  authorization fact as NOT encodable — unencodable, not expensive to encode, with two mechanisms
-  weighed and ruled out on record — so the correction must say so where it lands rather than read
-  as a gate a later session goes looking for.
-  **THE MINT'S COST IS PRICED, NOT WAVED OFF:** an unbound slot is red, so every vendoring
-  consumer reds until it binds the new token. Discharged as ONE release-note line under the
-  allowed-reds shape, which is where this cost is always paid.
-  Filed 2026-09-06 by scope, landing the ruling that directed it; promoted 2026-09-06 at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -10180,5 +10143,7 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
+
+- lead-open-authorization-channel-and-cardinality
 
 ## Lessons Learned

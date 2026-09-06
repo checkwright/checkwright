@@ -340,15 +340,24 @@ of one dispatch: the one above is about waiting for stage N to be *over*, this
 one about which command is safe *once it is*.
 
 **Honest limit on the lead's open authorization.** The rule that opening an
-iteration is the operator's decision, obtained explicitly, and that the lead
-stops and reports rather than opening the next one at the boundary
-(§templates/lead.md, both ends of the one rule) is **prose-only and
-human-enforced** like its two siblings above — and here the cause is that the
+iteration is the operator's decision, obtained explicitly through the channel the
+consumer binds; that the grant arriving on that channel carries a cardinality and
+is spent by the open it pays for; and that the lead therefore stops and reports
+rather than opening the next one at the boundary
+(§templates/lead.md, one rule seated on the grant and read at both ends) is
+**prose-only and human-enforced** like its two siblings above — and here the cause is that the
 fact is **not encodable**, not that encoding is expensive. An authorization is a
 fact about a conversation. Every encoding of it — a flag on `--enter-stage`, a
 committed line naming an authority, a ledger arming — is written by the same
 session it binds, so it raises the cost of proceeding unauthorized and does not
-make an unauthorized open detectable afterward. Recording the limit is what keeps
+make an unauthorized open detectable afterward. **The channel and the cardinality
+are unencodable for that identical reason, said here rather than left inferable,
+because a bound channel and a stated number both look more mechanical than the
+bare decision does.** A bound channel is still a fact about a conversation, and a
+session could write *my invocation carried a two-iteration grant* exactly as
+easily as it could proceed unauthorized today; a number recorded anywhere is
+recorded by the reader it constrains. Neither mechanism named below is re-weighed
+against them and no third is proposed. Recording the limit is what keeps
 the prose rule from reading as a weaker stand-in for a mechanism that was
 available. **Two mechanisms were weighed, and which is which is on record.** The
 one-shot entry valve (§bin/enter-stage.sh) is ruled out **by its own contract**

@@ -601,14 +601,17 @@ The ground is a measured failure and not a preference: a lead opened a second it
 grant, and the instruction surface is what let it. §Opening names no channel by which authorization
 arrives and no cardinality at all, so a lead reads that its own invocation authorized nothing and
 learns the bound only an iteration later, at the far end. The operator directed the correction with
-the ruling — *"Correct your instructions if not clear"* — and it is owed rather than taken here
-because it is two edits on two tiers. **The generic half** — authorization arrives through a channel
-the consumer binds, and a grant carries a cardinality — is kit mechanism for
-`lifecycle-kit/templates/lead.md` §Opening an iteration. **The consumer half** — that this tree's
-bound channel is the lead skill's own invocation — is consumer config for the `ruling-config` slot
-of `.claude/commands/lead.md`; a slash-command name written into a kit literal would cross the
-provenance seam and publish one harness's layout. When both land, this paragraph's mechanism
-relocates to those two homes and what stays here is the ruling, its date and its channel.
+the ruling — *"Correct your instructions if not clear"* — and it was owed rather than taken here
+because it is two edits on two tiers. **Both landed 2026-09-06 and this paragraph's mechanism has
+relocated to them, on the instruction this paragraph itself carried.** The generic half is
+`lifecycle-kit/templates/lead.md` §Opening an iteration; the consumer half is the
+**`open-authorization-channel`** binding in `.claude/commands/lead.md`, a **newly minted** slot and
+not the `ruling-config` one this sentence named while the mechanism was still owed — ruled `lead,
+own-authority` 2026-09-06 on the spec session's escalation, since `ruling-config` declares a
+different subject and policy binding the lead itself belongs to the template. **Correcting a
+mechanism sentence this paragraph had already marked transitional is the last act of the
+relocation, not a reversal of anything closed:** what is closed is the ruling's two limbs, their
+date and their channel, and those stand exactly as recorded above.
 ruling: the lead-invocation open grant
 
 ## PRIORITY DIRECTIVE — the port track's sequence
