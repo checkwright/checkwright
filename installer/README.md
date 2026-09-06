@@ -1271,12 +1271,20 @@ install boundary's three dispositions apply to the steps of an install, and the
 packer runs no install but assembles the artifact an install later consumes, so
 that section's behind-invoke hold does not reach it. It ships to no adopter: the
 packed set is `installer/` plus the enumerated kit roots, `scripts/` is neither,
-and no adopter receives or executes this file. Its callers — the release publish
-path and `consumer-smoke/run-smoke.sh` — each build the gate binary before they
-reach the pack step, on the host that step runs on, so a compiled form is
-reachable wherever the packer runs, the macOS install-smoke leg included.
-Nothing holds it: its lines sit in the reachable column of
-`--emit port-blockers --tree`, and a cut is authored against this section.
+and no adopter receives or executes this file. Nothing holds it either: its
+lines sit in the reachable column of `--emit port-blockers --tree`, and a cut is
+authored against this section.
+
+**A cut owes the binary's reachability at both callers, and the two are not in
+the same position.** `consumer-smoke/run-smoke.sh` builds the gate binary before
+it reaches any of its pack call sites, on the host it runs on, so a compiled
+form is already reachable there — the macOS install-smoke leg included, since
+that leg builds from its own host before it packs. The release publish
+workflow is not: it packs in a job with its own checkout and no build step,
+holding the downloaded per-target artifacts and no built binary. So a cut must
+make the binary reachable in that job — by building it there, or by resolving
+`GATE_SDK_NATIVE_BIN` onto the artifact the build legs already produced — and
+that lands in the same unit as the cut rather than after it.
 
 **The disposition is stated here rather than in a kit SPEC, and the ground is
 the provenance seam.** gate-sdk is a kit, vendored into every adopter's tree. A

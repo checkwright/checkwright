@@ -87,6 +87,17 @@
   **DELTAS 1-2 LANDED at build**: `installer/README.md` §The packer exists, and the pointers that
   named the barred manifest and §The consumer smoke are re-homed onto it; the ones naming
   gate-sdk/SPEC.md §Consumer payload stayed put. Delta 3, the 196-line cut, is what remains owed.
+  **DELTA 3 IS BLOCKED, and the blocker is a PREMISE THE AMENDMENT ASSERTED AS CHECKED.** The
+  amendment states both callers build the binary before reaching the pack step, so reachability is
+  "not a new obligation for either". PROBED at build and FALSE for the release path:
+  `.github/workflows/publish.yml` `pack` is a SEPARATE JOB from `build` (`:132` vs `:75`), each
+  with its own `actions/checkout` on its own runner, and `pack` runs no build step — it holds the
+  downloaded per-target artifacts and no `native/target/release/` binary. `needs: build` orders
+  jobs, it does not share a workspace. The smoke half holds: `run-smoke.sh:51` builds before its
+  first pack at `:67`.
+  **So the cut owes a release-path route, and which one is a ruling**: build the binary in the
+  `pack` job, or resolve `GATE_SDK_NATIVE_BIN` onto a downloaded artifact — the second executes a
+  binary the job did not produce, inside the release path. Escalated to the lead at build.
   Filed 2026-09-05 by close, promoting a gap bullet after fix was refused as a design call and
   icebox refused on the live port trigger; promoted 2026-09-06 at spec with its placement ruled.
 
