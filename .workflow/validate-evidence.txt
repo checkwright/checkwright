@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+always-loaded-cut-and-seam-slice gates sha256=bbedd69cce9a4047d0cf58f22fd38726583b5efe2cf488ac8b63b724cd61ace9 pass=108 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice gate_sdk sha256=485d6084712585611a0084632d12a2e63293583c135bfa1628c52f390e2cd828 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice guard_kit sha256=8745aafc1908d64352c326c2e02750ea926728f29f9e0eb3ef0e3a036d029497 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice lifecycle_kit sha256=5563780fe661af1b34ae1cff37c89221a31b113d8d975f4b4630b66bb0c4a50e pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice guard_tests sha256=ec9e4732f5a48d8f828776b25ea5eb17fb9089d4efcea531f3a0ef5a625e3965 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice demo sha256=83933729b9efcb636f74299725a4067922804773fac22a163d713344a3bc1aeb pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice installer_smoke sha256=c75d8a38a074c530651e8ab821bb5ffd1464623871137a833ad21e13a23afb5b pass=13 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice consumer_smoke sha256=cca7e04954ae88fe56679f2e977f166366758c405f9df2c7c1e4b3fd4753921b pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice upgrade sha256=575263ef606966dfce6ea2dcee5c8eca86a3ab84889d8a93eddc9dd77748be14 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice agents_md_smoke sha256=2e2714d9b5e5c043f6edf045625afa3b6e4fdc340f1ce6e97028d8cdbb2c5b23 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice index_tests sha256=9e9e77093cb0e99295e11b076057098221a0d5837e32559f90936cce747bc153 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
+always-loaded-cut-and-seam-slice native_crate sha256=9c9118126ffe97b6853dc74f83b2bfd26909214fc96f8c4e6aa54e86941ad8b7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-06
