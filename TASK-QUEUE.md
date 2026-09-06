@@ -12,6 +12,22 @@
 
 ## New Features
 
+- **context-kit-testing-hold-is-colocation-not-coupling** [spec: SPEC-index-runner-release.md]
+  — `context-kit/SPEC.md` §Testing holds `bin/run-index-tests.sh` owed on a CO-LOCATION ground
+  where its sibling's is content coupling. The amendment narrows the sequencing to the two members
+  that genuinely couple, corrects "three files, and no fourth", and specifies the released
+  107-line singleton's cut as the `--run-index-tests` non-gate arm. The discriminator, the whole
+  reader survey and the port's acceptance oracle are the amendment's, cited and not restated.
+  **PORT-CRITICAL:** its discharge is the stated precondition of that cut, read off §Testing's own
+  sequencing sentence rather than off a session's judgment of usefulness, so it rides inside the
+  cut it unblocks — this is what turns "no cut takeable" back into a takeable cut.
+  **Measured at spec, HEAD `18ce331c`:** `--emit port-blockers --tree` reads 16 owed of 83 scanned
+  and reports this member **`owed`, not held** — it carries no hold declaration — so the hold lives
+  in §Testing's prose and nowhere else, and the amendment is the whole release mechanism.
+  Filed 2026-09-06 by scope out of the port-takeability census; declined the same day as a *build
+  reading* and scoped into this iteration as an amendment, both `lead, own-authority` through this
+  iteration's dispatch relay. Promoted here by spec 2026-09-06, the authoring being the promotion.
+
 ## Technical Debt
 
 ## Deferred
@@ -141,35 +157,6 @@
   is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
   work, not the argument.
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
-
-- **context-kit-testing-hold-is-colocation-not-coupling** [design-pending] — `context-kit/SPEC.md`
-  §Testing holds `bin/run-index-tests.sh` owed on a CO-LOCATION ground where its sibling's is
-  content coupling, so a 107-line singleton may be held by an over-declaration rather than by a
-  blocker. **Measured 2026-09-06 at scope, both sides read.** `index-tests/toolfloor-cases.sh:8`
-  genuinely `source`s `lib/toolfloor.sh`, which is sequenced behind the installer's behind-invoke
-  relocation. `bin/run-index-tests.sh` does NOT: its only contact is `:53`, a `bash` subprocess
-  spawn whose stdout is diffed against a golden, structurally identical to the five spawns above
-  it at `:49-52` that already reach ported arms. The section's own words are "sequenced together
-  with". **The discriminator that would release it is the section's own.** The 2026-09-05
-  stated-cause ruling's test is "neither sources nor reads", and `context-kit/SPEC.md:1386-1390`
-  works exactly this case for the AGENTS.md smoke — same section, sourced neither the runner nor
-  the library, released on its own ground and since cut. **WHY IT IS FILED RATHER THAN TAKEN, and
-  this is the whole of it:** the owner doc NAMES the member and closes its own reach at
-  `:1394-1397` — "three files, and no fourth" — so releasing it is an amendment to §Testing, never
-  a reading, and spec-over-precedent binds. Declined 2026-09-06 by the lead (`lead,
-  own-authority`) on exactly that ground, with the argument recorded PERSUASIVE and the route left
-  open to a future `spec` stage that takes it as an amendment. **THAT ROUTE IS NOW TAKEN — SCOPED
-  2026-09-06 `lead, own-authority`** into `index-runner-hold-release-and-windows-smoke-comparison`
-  on the PORT-CRITICAL ground: its discharge is the stated precondition of an owed file's cut, read
-  off §Testing's own sequencing sentence and not off a session's judgment of usefulness, so it rides
-  inside the cut it unblocks. `spec` authors the §Testing amendment (narrowing the sequencing to the
-  two members that genuinely couple and correcting "three files, and no fourth"); build takes the
-  released 107-line singleton as a non-gate arm. Re-verified against the tree at this scope, not
-  inherited from the filing: `:53` is still the sole contact and still a spawn.
-  **Cost while deferred:** the port's
-  reachable column reads empty while it may hold a takeable 107-line singleton, so every iteration
-  composes around a blocker that may not be one. Filed 2026-09-06 by scope, out of the
-  port-takeability census the same session recorded.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
