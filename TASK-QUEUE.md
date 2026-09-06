@@ -8882,7 +8882,7 @@
   unlowered ceiling, which is why this entry and the binding once disagreed. **NOT APPENDED at the
   fourteenth OR the fifteenth**, same ground both times: the closing session's own row is still
   growing, so any ratio it reads is a ceiling. Two consecutive declines say the appending rule has
-  no satisfiable moment inside close; filed to the gap inbox rather than absorbed here.
+  no satisfiable moment inside close; that limb is `cost-series-limb-unreadable-inside-close`.
   **THE COUNTER-EVIDENCE IS NINE INSTANCES OF ONE SHAPE — a claim verified at one surface and read
   as covering a wider one.** Eight are the lead's own, the ninth on a stage session's carry.
   **NEITHER a counter nor a refused premise NETS against the count**, which measures whether an
@@ -10226,6 +10226,8 @@
 - **release-record-retired-knob** [design-pending] — A removal's basis may not name its own knob.
 - **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
+- **cost-series-limb-unreadable-inside-close** [design-pending] — Close cannot price its open row.
+- **post-build-instrument-edit-unowned** [design-pending] — No stage owns a post-build tree edit.
 
 ## Done
 
