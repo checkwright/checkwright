@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a binary-less leg installing one profile from an artifact-free payload and asserting disclosure — every lost member declared in the consumer's registry, at a non-zero count — a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero omission count in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that init, diff and uninstall each refuse naming jq at exit 2 while doctor still reports, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the undeclared host's omit-and-declare and the two refusals between it and placement; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a binary-less leg installing one profile from an artifact-free payload and asserting disclosure — every lost member declared in the consumer's registry, at a non-zero count — a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero omission count in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that init, diff and uninstall each refuse naming jq at exit 2 while doctor still reports, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the undeclared host's omit-and-declare and the two refusals between it and placement; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 # no-port: installer/README.md §The consumer smoke, The port disposition — ruled 2026-08-31 by the operator in consult. This is the repo's own acceptance harness for the installer and rides no payload: scripts/pack-installer.sh assembles the tarball and the npm package out of the kit roots and never out of installer/consumer-smoke/, so no adopter receives or runs it, and its only callers are the evidence-kit installer_smoke validate suite and the gates workflow. It is the same shape gate-sdk/SPEC.md §Consumer smoke, The port disposition declares on its leg 3 — a smoke executed by no adopter path — reached one step further, for a harness the payload does not even carry; and it drives cargo, the packer and init as black boxes across every profile, so a crate-side form would test the binary from inside the binary. Structural, not a sizing judgment: its size was measured at the ruling and is not the ground.
 set -uo pipefail
 
@@ -163,16 +163,23 @@ consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
     printf '%s' "$c"
 }
 
-# spec: installer/README.md §The consumer smoke — one value of the manifest report's four-hash block: the plain value, the same value rendered byte-exactly because a hash carrying a trailing carriage return compares unequal and prints equal and no other line can see it, the call that produced it rather than a hand-written description of the call, and that call's standard error so a refusal is named instead of showing as an empty value
+# spec: installer/README.md §The consumer smoke — one RE-READ value of the manifest report's five-value block: the plain value, the same value rendered byte-exactly because a hash carrying a trailing carriage return compares unequal and prints equal and no other line can see it, the call that produced it rather than a hand-written description of the call, and that call's standard error so a refusal is named instead of showing as an empty value
 hash_probe() {   # $1 = label, $2.. = the command whose stdout is the value
     local label="$1"; shift
     local val err e="$SCRATCH/manifest-report.err"
     val="$("$@" 2>"$e")"
     err="$(<"$e")"
-    printf '    %-4s %s\n' "$label" "${val:-<empty>}"
-    printf '         bytes  %s\n' "$(printf '%q' "$val")"
-    printf '         call   %s\n' "$*"
-    [[ -z "$err" ]] || printf '         stderr %s\n' "$err"
+    printf '    %-6s %s\n' "$label" "${val:-<empty>}"
+    printf '           bytes  %s\n' "$(printf '%q' "$val")"
+    printf '           call   %s\n' "$*"
+    [[ -z "$err" ]] || printf '           stderr %s\n' "$err"
+}
+
+# spec: installer/README.md §The consumer smoke — one HELD value of that block, printed out of the variable the failing comparison read instead of by re-running the call that produced it, which is what lets a value that reaches the comparison mangled and re-reads clean still be seen; its call line names where the loop got the value, since a command a reader could re-run is exactly what this print refuses to be
+held_probe() {   # $1 = label, $2 = the value the comparison held, $3 = where the loop got it
+    printf '    %-6s %s\n' "$1" "${2:-<empty>}"
+    printf '           bytes  %s\n' "$(printf '%q' "$2")"
+    printf '           call   %s\n' "$3"
 }
 
 # spec: installer/README.md §The consumer smoke — one attribute lookup of the manifest report, printed as three distinguishable outcomes rather than one blob: the attributes a repository reports, git's refusal where the path is outside the repository asked and no attribute chain is reachable from it, and a clean silence where the path simply carries none
@@ -187,13 +194,13 @@ attr_probe() {   # $1 = the repository to ask, $2 = which repository that is, $3
 }
 
 # spec: installer/README.md §The consumer smoke — the manifest arm's failure report, in the arm because this script mktemps its scratch under a cleanup trap and nothing after the run can open the disagreeing consumer; it is a straight-line sequence of prints with no branch that can change the verdict the caller goes on to fail with, and every value it prints has a named reader in that section's truth table
-manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 = mismatch count, $5 = checked count, $6.. = one '<path><TAB><the want the loop held>' per hash disagreement, in the order the loop found them
+manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 = mismatch count, $5 = checked count, $6.. = one '<path><TAB><the want the loop held><TAB><the got the loop held>' per hash disagreement, in the order the loop found them
     local profile="$1" C="$2" LOCK="$3" mismatch="$4" checked="$5"; shift 5
     local -a bad=("$@") samples=()
-    local target digest_want art seam entry p w r out found
+    local target digest_want art seam entry p w g rest r out found
 
     printf '  == manifest report: %s, %s of %s entries disagree ==\n' "$profile" "$mismatch" "$checked"
-    printf '  read the four hashes below against the truth table in installer/README.md §The consumer smoke\n'
+    printf '  read the five values below against the truth table in installer/README.md §The consumer smoke\n'
     if [[ ${#bad[@]} -eq 0 ]]; then
         printf '  every disagreement is a path the manifest names and the tree does not hold, so there is no hash to compare\n'
         return 0
@@ -224,12 +231,11 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
     fi
 
     for entry in "${samples[@]}"; do
-        p="${entry%%$'\t'*}"; w="${entry#*$'\t'}"
+        p="${entry%%$'\t'*}"; rest="${entry#*$'\t'}"; w="${rest%%$'\t'*}"; g="${rest#*$'\t'}"
         printf '  -- %s\n' "$p"
-        printf '    %-4s %s\n' "want" "${w:-<empty>}"
-        printf '         bytes  %s\n' "$(printf '%q' "$w")"
-        printf '         call   read off the arm own jq stream of .files, which is the value the failing comparison used and not a second read of it\n'
-        hash_probe got git hash-object -- "$C/$p"
+        held_probe want "$w" 'read off the arm own jq stream of .files, which is the value the failing comparison used and not a second read of it'
+        held_probe got "$g" 'the value the arm own command substitution assigned, carried out of the loop, which is the other operand the failing comparison used and not a second read of it'
+        hash_probe reread git hash-object -- "$C/$p"
         hash_probe own git -C "$C" hash-object -- "$p"
         hash_probe raw git hash-object --no-filters -- "$C/$p"
     done
@@ -266,7 +272,7 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
 # shared helper rather than a branch inside it: every covered-platform leg passes the green
 # expectation it asserts today, and the binary-less leg passes the refusal its install actually earns
 assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery expectation: green | unavailable
-    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked path want got target seam bin list k m line omitted want_omitted n_omitted
+    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked malformed path want got target seam bin list k m line omitted want_omitted n_omitted
     local -a bad_hash=()
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
@@ -310,17 +316,22 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
         || fail "$profile: manifest records version $(jq -r '.version' "$LOCK"), packed $VERSION"
     [[ "$(jq -r '.commit' "$LOCK")" =~ ^[0-9a-f]{40}$ ]] || fail "$profile: manifest records no 40-hex commit"
     [[ "$(jq -r '.profile' "$LOCK")" == "$profile" ]] || fail "$profile: manifest records the wrong profile"
-    mismatch=0; checked=0
+    mismatch=0; checked=0; malformed=""
     while IFS=$'\t' read -r path want; do
         checked=$((checked + 1))
         [[ -f "$C/$path" ]] || { echo "  manifest names a file that is not there: $path"; mismatch=$((mismatch + 1)); continue; }
         got="$(git hash-object -- "$C/$path")"
+        # spec: installer/README.md §The consumer smoke — the shape test sits on the failure branch beside the tuple it diagnoses, over BOTH operands, because a value that is not a hash makes the disagreement a statement about this harness rather than about the consumer's tree, and the verdict below has to be able to say which
         [[ "$got" == "$want" ]] \
-            || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1)); bad_hash+=("$path"$'\t'"$want"); }
+            || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1)); bad_hash+=("$path"$'\t'"$want"$'\t'"$got")
+                 [[ "$want" =~ ^[0-9a-f]{40}$ && "$got" =~ ^[0-9a-f]{40}$ ]] || malformed=1; }
     done < <(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")
-    # spec: installer/README.md §The consumer smoke — the report runs while the disagreeing consumer is still on disk and immediately before the fail that stands today, so a leg that reds here says what it found rather than only how many
+    # spec: installer/README.md §The consumer smoke — the report runs while the disagreeing consumer is still on disk and immediately before the verdict, so a leg that reds here says what it found rather than only how many
     [[ "$mismatch" -eq 0 ]] \
         || manifest_report "$profile" "$C" "$LOCK" "$mismatch" "$checked" ${bad_hash[@]+"${bad_hash[@]}"}
+    # spec: installer/README.md §The consumer smoke — the malformed operand is refused AFTER the report, not at the first bad value, because the report is exactly what diagnoses it; and it refuses at the harness-precondition code rather than the manifest verdict, since an operand that is not a hash says nothing about whether the tree matches what init recorded
+    [[ "$mismatch" -eq 0 || -z "$malformed" ]] \
+        || blocked "$profile: a manifest comparison operand is not 40 lowercase hex — the report above renders it byte-exactly. That is this harness's own precondition, not a finding about the consumer."
     [[ "$mismatch" -eq 0 ]] || fail "$profile: $mismatch of $checked manifest entries disagree with the tree"
     [[ "$checked" -gt 0 ]] || fail "$profile: the manifest records no file"
     mapfile -t lock_kits < <(jq -r '.kits[]' "$LOCK")

@@ -58,7 +58,6 @@ everything else to
 
 ### next
 
-- **`platform-support-ci-matrix`** *(reliability)* — A CI install-smoke leg per supported platform, or an honest label.
 - **`companion-toolkit-profile`** *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - **`gate-authoring-sdk-surface`** *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 

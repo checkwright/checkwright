@@ -1380,7 +1380,8 @@ reversal below still runs against the tree `init` wrote.
 
 **A disagreeing manifest arm reports what it found, in place, before it fails.**
 On the failure path only, the arm prints a bounded fact set about the
-disagreement and then fails exactly as it always did. It has to be the arm and
+disagreement and only then picks its verdict — the class of which is settled
+below. It has to be the arm and
 not a step beside it: this script mktemps its scratch under `trap cleanup EXIT`
 and `fail` exits 1, so the consumer whose manifest disagreed is torn down before
 anything later could open its `checkwright.lock`. The standing alternative was a
@@ -1407,41 +1408,74 @@ says so rather than printing a blank, and so are the other two ways it can fail
 to resolve: a manifest recording an artifact no config seam names a path for,
 and an artifact row that is not in the disagreeing set.
 
-**Four hashes per sampled path, and the truth table that reads them.** Each is
+**Five values per sampled path, and the truth table that reads them.** Each is
 labelled, printed plain and rendered byte-exactly beside it, with the call that
-produced it and that call's standard error:
+produced it and that call's standard error. **Two of the five are the operands
+the failing comparison used, printed out of the variables it read; the other
+three are re-reads**, and the split is the block's whole architecture rather
+than a presentational choice — a value that reaches the comparison mangled and
+re-reads clean is invisible to a report that asks again, and that is not a
+hypothetical: the first form of this report re-read `want`, and saw nothing on a
+leg where every entry disagreed.
 
-- **`want`** — `files[P]` as the arm's own loop holds it: the value
-  `IFS=$'\t' read -r path want` gave it off the manifest stream, which is the
-  value the failing comparison actually used. It is deliberately **not** re-read
-  through a second channel, for the same reason `got` is spelled exactly as the
-  arm spells it — a value that reaches the comparison mangled and re-reads clean
-  is invisible to a report that asks again, and that is not a hypothetical: the
-  first form of this report re-read it, and saw nothing on a leg where every
-  entry disagreed.
-- **`got`** — `git hash-object -- "$C/P"` from the smoke's own current
-  directory: the failing read, spelled exactly as the arm spells it.
-- **`own`** — `git -C "$C" hash-object -- "P"`: the same command in the
-  repository context `lock_hash` runs in, which is the only thing the two call
-  sites differ by.
-- **`raw`** — `git hash-object --no-filters -- "$C/P"`: the file's bytes with
-  the attribute mechanism removed. `--no-filters` ignores attributes entirely,
-  so this value depends on no repository, which is what makes it the fixed point
-  the other three are measured against.
+- **`want`** — **held.** `files[P]` as the arm's own loop holds it: the value
+  `IFS=$'\t' read -r path want` gave it off the manifest stream, which is one of
+  the two values the failing comparison actually used. It is deliberately **not**
+  re-read through a second channel.
+- **`got`** — **held.** The value the arm's own
+  `got="$(git hash-object -- "$C/P")"` assigned, carried out of the loop on the
+  failure branch: the comparison's other operand, not a description of one. It
+  is the second half of the correction `want` already carries, and the reason it
+  is spelled out here is that applying that correction to one operand of two is
+  precisely how the remaining asymmetry stayed invisible.
+- **`reread`** — a re-read. `git hash-object -- "$C/P"` run again at report time
+  from the smoke's own current directory. This is the value the label `got`
+  printed before the held operand existed; it is renamed rather than dropped, so
+  that a held value and a re-read of the same call can never be read as one
+  thing — a single label covering both is how the asymmetry hid.
+- **`own`** — a re-read. `git -C "$C" hash-object -- "P"`: the same command in
+  the repository context `lock_hash` runs in, which is the only thing the two
+  call sites differ by.
+- **`raw`** — a re-read. `git hash-object --no-filters -- "$C/P"`: the file's
+  bytes with the attribute mechanism removed. `--no-filters` ignores attributes
+  entirely, so this value depends on no repository, which is what makes it the
+  fixed point the other re-reads are measured against.
 
-Two values cannot separate *one side filtered* from *the bytes changed*; four
-can, and the reading rule lives here rather than with whoever reads the log next:
+Two values cannot separate *one side filtered* from *the bytes changed*, and no
+number of re-reads alone can separate either from *the comparison was handed
+something else*; five can, and the reading rule lives here rather than with
+whoever reads the log next. The first three rows read the **hashing**, the next
+two read the **comparison**, and the last is the catch-all on any value's shape:
 
 | observation | reading |
 | --- | --- |
-| `want == own == raw` and `got != raw` | the read side's context applies a filter the write side's does not; the defect is at `run-smoke.sh`'s call site and the two-call-site narrowing is confirmed |
-| `want == own == got` and all differ from `raw` | both contexts filter identically, so the hashes agree and the arm could not have failed on this path — the disagreement is in the comparison, not in the hashing |
-| `own == got == raw` and `want != raw` | the bytes on disk are not the bytes `init` hashed; the porcelain below and the artifact control say which |
-| any of the four is not 40 lowercase hex | the value is not a hash — a stray byte, a truncation or a refusal; the byte rendering shows which and the captured standard error names the refusal |
+| `want == own == raw` and `reread != raw` | the read side's context applies a filter the write side's does not; the defect is at `run-smoke.sh`'s call site and the two-call-site narrowing is confirmed |
+| `want == own == reread` and all differ from `raw` | both contexts filter identically, so the hashes agree and the arm could not have failed on this path — the disagreement is in the comparison, not in the hashing |
+| `own == reread == raw` and `want != raw` | the bytes on disk are not the bytes `init` hashed; the porcelain below and the artifact control say which |
+| `got != reread` | the value the comparison used is not the value the same call yields now, so the mangling happens at capture time inside the loop; `got`'s byte rendering names the stray byte |
+| `want == got`, byte-equal, both held | the comparison received two equal values and reported them unequal, which bash cannot do — so the pairing is wrong and `bad_hash` associated one entry's `want` with another entry's `got`; read the sampled path against the loop's own echo order |
+| any of the five is not 40 lowercase hex | the value is not a hash — a stray byte, a truncation or a refusal; the byte rendering shows which and the captured standard error names the refusal. The arm acts on this row too, and that is the one row it acts on: a malformed operand makes the run **exit 2** rather than 1 |
 
 The byte rendering is not decoration and not optional: a value carrying a
 trailing carriage return compares unequal and *prints* equal, and no other line
 in the report can see it.
+
+**A malformed operand is a precondition of this harness, so it exits 2 — never
+the manifest verdict at 1.** `starter: N of N manifest entries disagree with the
+tree` at exit 1 is a statement *about the consumer*: the tree `init` wrote no
+longer matches what `init` recorded. If instead a value reached the comparison
+malformed, nothing about the consumer has been established and the honest code
+is the harness-precondition one — the same line this section already draws for
+the report's own construction, extended from the report to the arm's operands.
+The arm therefore shape-tests both operands on the failure branch, and after the
+report has printed it routes a malformed one through `blocked` at exit 2 instead
+of `fail` at exit 1. **It fires after the report, not at the first bad value**,
+because diagnosing that value is exactly what the report exists for; refusing
+early would trade the report for the verdict and lose the more valuable half.
+This does not make the shape row above redundant: that row tells a **reader**
+what a bad rendering means, and this makes the **arm** act on it. A report a
+human reads and a verdict a suite reads are two consumers, and deleting either
+for the other is the mistake.
 
 Once per failing profile, and outside the per-path block because each is a fact
 about the run rather than about a path, the report also prints the consumer's
@@ -1489,48 +1523,75 @@ shape, and the one host that needs this one is the host nobody is standing at.
 **What the native Windows leg has measured so far.** That leg is
 `continue-on-error` and reports rather than judges; these are its findings,
 recorded here because they are what the next rider of the leg would otherwise
-re-buy. Rounds 12 (run `33782234328`, head `32f73806`) and 13 (run
-`33963571906`, head `c4850072`, the first round the report above ran on) both
-fail at `starter: 477 of 477 manifest entries disagree with the tree`:
+re-buy. Rounds 12 (run `33782234328`, head `32f73806`), 13 (run `33963571906`,
+head `c4850072`, the first round the report above ran on) and 14 (run
+`34002192468`, head `a5b6907b`) all fail the same arm on the same profile, 12
+and 13 at `starter: 477 of 477 manifest entries disagree with the tree` and 14
+at `starter: 476 of 476` — the count moved with the payload, not with the
+defect. *In every round below, the value labelled `got` in the log is the value
+this section now calls `reread`: those rounds ran before the held operand
+existed.*
 
-- All 477 entries read `manifest hash disagrees with the tree` and none read
+- Every entry reads `manifest hash disagrees with the tree` and none reads
   `manifest names a file that is not there` — those are the arm's two branches,
   so the failure is genuinely a hash disagreement rather than a missing path.
   It also means every recorded path exists, since the existence test is what the
-  other branch reports.
-- `scripts/checkwright-gates.exe` is in the disagreeing set, and round 13
-  sampled it as the artifact row.
-- **Round 13's four values came back identical on both samples** — the `.md`
+  other branch reports. In round 14 the disagreement lines run with **nothing
+  interleaved**, so `git hash-object` emitted no standard error across any of
+  the calls behind them.
+- `scripts/checkwright-gates.exe` is in the disagreeing set, and rounds 13 and
+  14 both sampled it as the artifact row.
+- **Rounds 13 and 14 printed identical values on both samples** — the `.md`
   and the `.exe` — every one a clean 40-hex with nothing in its byte rendering.
-  `got == own` retires the process-context asymmetry that was this leg's
+  `reread == own` retires the process-context asymmetry that was this leg's
   standing narrowing; `raw` equal to the rest retires every end-of-line
   hypothesis about the file's content; and the artifact control read
   `recorded` and `recomputed` equal, so the binary's bytes are exactly the bytes
-  `init` published.
+  `init` published. Round 14 adds `want` **as the loop held it** to that set.
 - **The consumer's `git status --porcelain` printed nothing**, so the tree holds
-  what `init` committed, and neither round carries a `fatal` line from any hash
-  call, so no per-path refusal is open.
-- Both rounds read `core.autocrlf` as `true` in the system gitconfig and `false`
+  what `init` committed, and no round carries a `fatal` line from any hash
+  call, so no per-path refusal is open. Round 14's only `fatal` lines are the
+  two the attribute lookup is *expected* to produce, git refusing a path outside
+  the repository it was asked.
+- Every round read `core.autocrlf` as `true` in the system gitconfig and `false`
   in the user's — the same two origins in the consumer and in the checkout, so
   the effective value is `false` on both sides — with `core.eol` and
   `core.safecrlf` unset and no attribute reported for either sampled path.
 - The other host facts: `core.symlinks true`, `core.longpaths` unset,
   `core.filemode false`, git 2.55.0.windows.5, bash 5.3.15, and the failing
-  profile is `starter` — the profile that vendors one kit and writes a 477-entry
-  manifest. The consumer's own battery passed, `All 11 gates passed`,
+  profile is `starter` — the profile that vendors one kit. It is also the
+  **first** profile the loop drives, so no profile has passed this arm on that
+  host ahead of it. The consumer's own battery passed, `All 11 gates passed`,
   immediately before the manifest arm failed.
 
-*What round 13 therefore establishes, and what it does not.* The recorded value,
-the tree's bytes and every git context all agree, so the disagreement is **in
-the comparison and not in the hashing** — the table's second row, in its
-strongest form. That leaves exactly one locus: the value the arm's loop held in
-`want`. Round 13's report could not show it, because that first form re-read
-`want` through a second channel instead of printing the one the comparison used;
-the bullet above is the correction, and it is what makes the next round decisive
-under the table's fourth row rather than its second. No mechanism is claimed
-here beyond that: a line terminator surviving `read`, which strips `\n` alone,
-is consistent with every printed line and with the count, but it is a candidate
-and not a reading.
+*What these rounds therefore establish, and what they do not.* The recorded
+value, the tree's bytes, every git context **and the `want` the loop held** all
+agree, so the disagreement is **in the comparison and not in the hashing** — the
+table's second row, in its strongest form. Round 13's report could not settle
+that, because its first form re-read `want` through a second channel instead of
+printing the one the comparison used; round 14 carried the corrected `want` and
+it agreed with everything. **That correction was applied to one operand of
+two.** The remaining locus is therefore the `got` the loop held — the operand
+the report re-read rather than carried — and once it is carried, nothing in the
+comparison is unread: both operands are then printed as the comparison received
+them. That is what makes the next round the *last* diagnostic round by
+construction rather than one of an open series, decided under the two
+comparison rows above. No mechanism is claimed here beyond that: a line
+terminator surviving `read`, which strips `\n` alone, is consistent with every
+printed line and with the count, but it is a candidate and not a reading.
+
+*Who reads the next round, and the trap that would otherwise swallow it.*
+`install-smoke-windows` is a job of the `gates` workflow, which runs on every
+push to master, so the reading has an owner inside the ordinary stage set and
+costs no push of its own: **close**, at the push it already makes and watches,
+reading the finished run for free with `gh run view <id> --log`. The reading is
+an explicit, **job-keyed** act — read that job's log, never the workflow's
+conclusion. The job is `continue-on-error: true`, so the two verdicts come
+apart, and that is measured rather than predicted: run `34002192468` concluded
+`success` while `install-smoke-windows` concluded `failure`. A session that
+watched the run to green and inferred the leg from that verdict would read a
+passing workflow as a passing leg. What gets recorded here afterwards is what
+was observed, by whoever observed it — this section predicts no content for it.
 
 *Why the CI diagnostic that used to stand beside this leg is gone.* A
 `read one manifest disagreement in place` step stood up its own consumer and

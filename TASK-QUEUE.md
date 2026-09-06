@@ -12,62 +12,6 @@
 
 ## New Features
 
-- **platform-support-ci-matrix** [spec: SPEC-smoke-comparison.md] [roadmap: next/reliability]
-  [precondition-ok: run-observed]
-  — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, gate-sdk/SPEC.md §Consumer
-  payload's join for `x86_64-pc-windows-msvc`; slug NOT renamed (`powershell-installer-surface`).
-  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  **BOTH HALVES DISCHARGED** at round 5 (`33298006656`, `fb9ed980`); blockers 5 and 6 MEASURED.
-  **THE 2026-08-30 OPERATOR RULING:** on green, drop `continue-on-error` on the job comment's own
-  trigger and STOP, the `targets.list` join being separately measured work; on a red cause, file and
-  defer without looping. Both consequences stay UNEXECUTED on an OBSERVED ground — both wait on a
-  first-observed-green run, and green is exactly what this iteration does not assert.
-  **The join half is more than a line edit, measured:** `native/targets.list:43-48` — the smoke
-  builds from its host and refuses a foreign roster, so it wants steering or a cross-build.
-  **Cost while promoted-but-unobservable:** the one adopter class with a named days-to-weeks
-  adoption window has no working install path on Windows; `powershell-installer-surface` stays
-  sequenced behind this; and installer/README.md §The install boundary holds every
-  `installer/lib`/`installer/bin` file owed behind this leg and the macOS one — 1246 lines,
-  re-read off the oracle 2026-09-05 at scope.
-  **ROUNDS 6-14 ARE ANSWERED and installer/README.md §The consumer smoke OWNS the record**, cited
-  and not restated; the amendment carries round 14 into it. THE READING THAT OUTLIVES THEM: round
-  6's two guessed repairs could never have landed, so cause-read-first is the instrument's case.
-  Every value-side hypothesis is retired, the whole class — the two 2026-09-03 gap bullets among
-  them, REFUTED rather than merely spent.
-  **THE DEFECT IS NAMED, at spec 2026-09-06, and it is the instrument's own control flow:** the
-  comparison at `run-smoke.sh:318` has TWO operands and the report holds one. `:319` carries only
-  `want`, so `:232` RE-READS `got` — the exact trap §The consumer smoke names for `want`, whose
-  round-13 correction was applied to one operand of two. `installer/README.md:1526`'s "exactly one
-  locus: `want`" is therefore FALSIFIED, and after `got`-as-held nothing in the comparison is
-  unread, so the next round is the LAST diagnostic round by construction.
-  **RULED A, `lead, own-authority` 2026-09-06 through this iteration's dispatch relay** — the
-  envelope splits by what validate can check. ASSERTED: both operands held; a malformed operand at
-  exit 2 rather than a consumer verdict at exit 1; the record carried through round 14; the locus
-  sentence corrected. NOT ASSERTED: a green leg, and the CONTENT of the next round's reading —
-  landed-but-unobservable, not unstarted.
-  **THE RESERVED LIMB FIRED AND RESOLVED TO PROCEED, on a refuted premise not a judgment call:**
-  `.github/workflows/gates.yml:9-13` triggers on every push to master and `:202-208` leaves the leg
-  `continue-on-error`, so a Windows round rides a push the iteration already makes. Rounds here
-  spend wall-clock and attention, NEVER the push budget the 2026-08-30 ruling protects, so that
-  constraint does not reach this case. Verified independently by the lead at the ruling.
-  **REFUSED `lead, own-authority` 2026-09-06, and not an alternative worth revisiting:** normalizing
-  the two operands to their 40-hex core before comparing. It would green the leg while making the
-  instrument accept a mangled producer silently, and an unreadable green is worse than a red.
-  **THE NEXT ROUND'S READING IS JOB-KEYED, measured rather than predicted:** run `34002192468`
-  concluded `success` while `install-smoke-windows` concluded `failure`, so a session inferring the
-  leg from the workflow's verdict reads a passing workflow as a passing leg. Close owns the reading
-  off the run its own push produces; a finished run is `gh run view <id> --log` and costs no push.
-  Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
-  promoted/deferred 08-25 through 09-05; rounds 6-13 ran 08-31 to 09-05, 8-11 identical to 7; round
-  14 ran 09-06. DEMOTED 2026-09-05 at build (`lead own-authority`, on the drain-stage machinery at
-  `lifecycle-kit/lib/stages.sh:29`); `SPEC-manifest-report.md` merged into installer/README.md and
-  was DELETED in that same commit, which is what the bidirectional pairing requires of both halves.
-  **PROMOTED 2026-09-06 `lead, own-authority` as ordinary intake, the 2026-08-30 red-cause limb
-  SATISFIED and NOT re-scoped.** Its four-cut test-harness hold is SPENT:
-  `test-harness-cut-seam-sweep` took it. Also ruled: operator 2026-08-27, 08-31 (lead-relay),
-  08-31 (consult); lead 09-01, 09-05.
-
-
 ## Technical Debt
 
 ## Deferred
@@ -10222,5 +10166,6 @@
 ## Done
 
 - context-kit-testing-hold-is-colocation-not-coupling
+- platform-support-ci-matrix
 
 ## Lessons Learned
