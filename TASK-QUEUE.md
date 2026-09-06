@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: demo-cut-record-authority-and-attribution
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -179,6 +179,10 @@
   **(6) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER THE BLOCKER-RETIRING OVERRIDE, AND
   THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING STAGE RUNS, 2026-09-05 (lead)** —
   both owned by gate-sdk/SPEC.md §The first cohort.
+  **(7) `demo/run-demo.sh` PORTS; the `# no-port:` route its residue class grants is DECLINED —
+  operator, 2026-09-06, relayed by the lead session.** Its `# spec:` is re-homed FIRST, the
+  mis-homed correction gate-sdk/SPEC.md §Porting a gate to the binary substrate rules and not the
+  re-pointing (3) refused; the legal owner is in the file's own header. The fork ends here.
   **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
   lifecycle layer; relaxation is closed at §The port-candidate criteria, `gate-battery-result-cache`
   unsubsumed. **THE PORT-FIRST RUN, ruled 2026-09-05 (operator, consult), supersedes the 2026-08-31
@@ -519,12 +523,10 @@
   intended a read-only probe.
   **No harm landed on the first firing, and that was luck rather than design** — the entry was
   clean and the stamp was wanted a moment later. The luck ran out at the fourth firing below.
-  **The caller was wrong and the tool is still at fault.** The usage string
-  does document flag-first. The defect is that a surplus argument is accepted
-  and ignored rather than refused, and an in-repo precedent already settles
-  which behaviour is right: `run-gates.sh` refuses an unrecognised option by
-  name and prints usage, asserted by its own consumer smoke. The entry tool
-  does neither.
+  **The caller was wrong and the tool is still at fault.** The usage string documents flag-first;
+  the defect is a surplus argument accepted and ignored rather than refused, and an in-repo
+  precedent settles which behaviour is right: `run-gates.sh` refuses an unrecognised option by
+  name and prints usage, asserted by its own consumer smoke. The entry tool does neither.
   **Candidate shapes, none costed:** refuse any argument after the stage name; or accept the flag
   in any position; or make the mode an env knob so position cannot express it. First is smallest.
   **Cost while deferred:** the read-only mode is specifically the LEAD's
@@ -546,9 +548,11 @@
   are kept rather than merged, because both sit inside
   `drain-order-retroactive-debt-sweep`'s named ten and that unit disposes of them
   together; whichever fix lands discharges both, and neither may be counted twice
-  when the sweep costs its ten. Promotion is barred meanwhile: not port-critical
-  by TRAJECTORY.md's test, and under the port-first run that superseded the port-only
-  one it meets no other joining ground either; a recurrence count alone does not buy it.
+  when the sweep costs its ten.
+  **PROPOSED AT THRESHOLD 2026-09-06 AND ANSWERED — deferred (lead, own-authority, 2026-09-06),
+  recorded explicitly rather than by silence.** The recurrence route is now SPENT: a threshold
+  member is proposed once and never re-escalated as a set already answered. What carries it next is
+  the aggregation — 5 inbound edges, the highest in the pool at that survey — on its merits.
   **THIRD AND FOURTH ATTESTATIONS, BOTH 2026-09-06, one iteration.** Third: a lead session in
   Split posture, where the write is also a posture violation. Fourth: a build session's probe
   stamped a `validate` entry, moving the cursor a WHOLE STAGE AHEAD while that session still ran —
@@ -10101,7 +10105,12 @@
   **Cost while deferred:** the top friction row every close is a decline nobody can diagnose, so
   each close re-triages it and each remedy is a guess. Directed 2026-09-06 (operator, relayed by
   the lead session) as *"Add the useful grant"*; the directive's own premise is what this entry
-  falsifies, so it is escalated rather than discharged.
+  falsifies, so it was escalated rather than discharged.
+  **THE DIRECTIVE IS DISCHARGED BY THE FALSIFICATION AND THIS ENTRY STAYS DEFERRED — operator,
+  2026-09-06, relayed by the lead session.** Rule 17 already grants the append and both candidate
+  shapes are answered by the tree, so NO WORK WAS OWED: a directive answering a proposal is
+  discharged when the proposal's premise measures false, and neither survivor folds into the
+  iteration. Recorded here so a later session reading only the directive does not re-derive it.
   Surfaced 2026-09-06 by the `always-loaded-cut-and-seam-slice` close; drained here at the
   2026-09-06 scope boundary, promoted after the fix was refused as operator-class.
 
