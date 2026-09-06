@@ -24,7 +24,7 @@ One command runs the entire arc against a throwaway consumer repo, installing
 nothing:
 
 ```bash
-bash demo/run-demo.sh
+bash gate-sdk/bin/run-gates.sh --run-demo
 ```
 
 It vendors the kits into a fresh git repo, passes the battery clean, introduces

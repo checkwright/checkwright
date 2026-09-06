@@ -22,13 +22,14 @@ One command runs the entire arc against a throwaway consumer repo, installing
 nothing and touching no tree but its own:
 
 ```bash
-bash demo/run-demo.sh
+bash gate-sdk/bin/run-gates.sh --run-demo
 ```
 
 It vendors the kits into a fresh git repo, passes the battery clean, introduces
 a defect and shows the gate that blocks it, then drops the defect and goes green
-again. The script is [`demo/run-demo.sh`](demo/run-demo.sh), and it runs on every
-validate stage, so the walkthrough cannot rot.
+again. The walkthrough is the `--run-demo` arm, specified in
+[gate-sdk/SPEC.md](gate-sdk/SPEC.md) §Consumer smoke, and it runs on every
+validate stage, so it cannot rot.
 
 ## What that buys you
 
@@ -137,7 +138,7 @@ bash gate-sdk/bin/run-gates.sh --agents-md-smoke                                
 bash gate-sdk/bin/run-consumer-smoke.sh                                                         # every kit installs into a scratch consumer
 bash gate-sdk/bin/run-gates.sh --upgrade-smoke                                                  # a vendored tree upgrades in place
 bash installer/consumer-smoke/run-smoke.sh                                                      # the activation path, per profile
-bash demo/run-demo.sh                                                                           # the adoption walkthrough
+bash gate-sdk/bin/run-gates.sh --run-demo                                                        # the adoption walkthrough
 ```
 <!-- battery-roster:end -->
 

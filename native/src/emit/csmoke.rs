@@ -14,3 +14,25 @@ pub fn spawn(script: &str, args: &[&str], stderr: Stderr) -> Result<proc::Stream
     argv.extend_from_slice(args);
     proc::run_streamed("bash", &argv, b"", stderr)
 }
+
+// spec: gate-sdk/SPEC.md §Consumer smoke — `csmoke_place_binary` reads its caller's `SCRATCH`, so
+// the shared seam runs in the input direction: the arm supplies the variable the helper's own
+// contract names and the library is untouched.
+// spec: gate-sdk/SPEC.md §Consumer smoke — it lives beside the prologue rather than in either arm,
+// having gained its second caller; `Ok` is the helper's status, so each arm renders its own verdict.
+pub fn place_binary(
+    sdk: &str,
+    consumer: &str,
+    host: &str,
+    roots: &[String],
+) -> Result<i32, String> {
+    let script = format!(
+        "{} SCRATCH=\"$2\"; host=\"$3\"; shift 3; csmoke_place_binary \"$host\" \"$@\" 1>&2",
+        SOURCE
+    );
+    let refs: Vec<&str> = vec![sdk, consumer, host]
+        .into_iter()
+        .chain(roots.iter().map(String::as_str))
+        .collect();
+    Ok(spawn(&script, &refs, Stderr::Inherit)?.code())
+}

@@ -431,9 +431,9 @@ fn vendor_and_install(
     Ok(scratch)
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — `csmoke_place_binary` reads its caller's `SCRATCH` too,
-// so the same seam runs in the input direction: the arm supplies the variable the helper's own
-// contract names and the library is untouched.
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the placement's spawn wrapper moved into `csmoke.rs` when
+// it gained its second caller; this arm keeps only its own verdict for the helper's status, a
+// placement it could not make being a broken environment and never an upgrade finding.
 fn place_binary(
     sdk: &str,
     consumer: &str,
@@ -441,16 +441,9 @@ fn place_binary(
     roots: &[String],
     to: &str,
 ) -> Result<(), Fail> {
-    let script = format!(
-        "{} SCRATCH=\"$2\"; host=\"$3\"; shift 3; csmoke_place_binary \"$host\" \"$@\" 1>&2",
-        csmoke::SOURCE
-    );
-    let refs: Vec<&str> = vec![sdk, consumer, host]
-        .into_iter()
-        .chain(roots.iter().map(String::as_str))
-        .collect();
-    let done = bash(&script, &refs, Stderr::Inherit)?;
-    if done.code() != 0 {
+    let code = csmoke::place_binary(sdk, consumer, host, roots)
+        .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
+    if code != 0 {
         return Err(broken(one(format!(
             "{}: FAIL(env) — could not place TO ({})'s gate binary in the scratch consumer",
             NAME, to

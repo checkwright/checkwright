@@ -193,7 +193,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | site_kit |
 | [gate-sdk](gate-sdk/index.md) | scripts |
 | [gate-sdk](gate-sdk/index.md) | guard_tests |
-| (consumer) | demo |
+| [gate-sdk](gate-sdk/index.md) | demo |
 | (consumer) | installer_smoke |
 | [gate-sdk](gate-sdk/index.md) | consumer_smoke |
 | [gate-sdk](gate-sdk/index.md) | upgrade |

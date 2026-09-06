@@ -22,7 +22,7 @@ EVIDENCE_KIT_RUN_gates='env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh'
 EVIDENCE_KIT_PARSER_installer_smoke='bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log installer/consumer-smoke/run-smoke.sh'
 
 EVIDENCE_KIT_RUN_guard_tests='bash gate-sdk/bin/run-gates.sh --run-guard-tests'
-EVIDENCE_KIT_RUN_demo='bash demo/run-demo.sh'
+EVIDENCE_KIT_RUN_demo='bash gate-sdk/bin/run-gates.sh --run-demo'
 EVIDENCE_KIT_RUN_installer_smoke='bash installer/consumer-smoke/run-smoke.sh'
 EVIDENCE_KIT_RUN_consumer_smoke='bash gate-sdk/bin/run-consumer-smoke.sh'
 EVIDENCE_KIT_RUN_upgrade='bash gate-sdk/bin/run-gates.sh --upgrade-smoke'

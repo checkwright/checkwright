@@ -2792,8 +2792,11 @@ measurement: it stands a **known-duration producer** up and exercises candidate
 wait forms against it, recording one line per trial. Hand-invoked, no trigger,
 wired into **no** tier — it launches processes and sleeps for its declared
 durations, so a gate tier would put a multi-second sleep on every commit for a
-measurement bought once. Its precedent for existing at all is `demo/run-demo.sh`,
-a runnable artifact a session invokes by hand. It writes nothing tracked:
+measurement bought once. Its precedent for existing at all is the adoption
+walkthrough (`--run-demo`, gate-sdk/SPEC.md §Consumer smoke), a runnable artifact
+a session invokes by hand — and the precedent reads stronger since that
+walkthrough ported: it is now an arm, which is what this member is. It writes
+nothing tracked:
 producers, markers and launch records go to
 `GATE_SDK_TMP_DIR`, trials to the capture-tier evidence file below, and it mints
 no knob of its own for either (§Layout and configuration owns why).

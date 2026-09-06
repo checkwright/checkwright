@@ -32,9 +32,6 @@ assets
 # Public docs site (GitHub Pages serves this directory as the site root)
 docs
 
-# Runnable adoption walkthrough (registered as the evidence-kit demo suite)
-demo
-
 # Published activation surface (the npm package; not a kit — it carries no checks/ or smoke/)
 installer
 

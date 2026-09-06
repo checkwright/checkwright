@@ -174,9 +174,9 @@ load behind that trigger, so they are not resident here.
   `CNAME`), repo-root-governed, no owning kit; its chrome, page-authoring rules,
   generated projections and docs gate roster live in the load-triggered
   [docs/site-architecture.md](docs/site-architecture.md).
-- `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
-  violation blocked → fix → green), the evidence-kit `demo` validate suite on the
-  gate-sdk consumer-smoke mechanics, so a bit-rotted walkthrough is a red validate.
+- `--run-demo` is the runnable adoption walkthrough (vendor → clean pass →
+  violation blocked → fix → green), the evidence-kit `demo` validate suite, so a
+  bit-rotted walkthrough is a red validate; gate-sdk/SPEC.md §Consumer smoke owns it.
 - `installer/` is the published activation surface (bash up to the boundary its
   README rules, shipped over two transports from one payload — the Release
   tarball and the npm package), repo-root-governed, no owning kit; its layout is

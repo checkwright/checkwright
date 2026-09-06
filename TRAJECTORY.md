@@ -277,8 +277,10 @@ adopter-facing work, sequenced and never blocking a cut — a priority statement
 nothing from the owed column (the 2026-08-28 ruling below). Kit `smoke/` suites and kit-resident
 test runners ride the installer payload with their kit roots and land committed in adopter trees,
 so they are kit mechanism on the claim like any owed file; the residue genuinely shipping to no
-adopter — `demo/`, `installer/consumer-smoke/`, the declared `scripts/` class — takes a per-file
-disposition when reached.
+adopter — `installer/consumer-smoke/`, the declared `scripts/` class — takes a per-file
+disposition when reached. That disposition is a **disjunction, not a default**: its branches are a
+declaration and a port, and the adoption walkthrough took the porting one (2026-09-06) where
+`installer/consumer-smoke/run-smoke.sh` took the declaring one.
 
 **That predicate has an oracle, and it is not the one that measures the battery.**
 `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` reports the port disposition of every tracked non-test

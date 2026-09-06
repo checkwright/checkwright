@@ -7,6 +7,7 @@ pub mod cite_survey;
 pub mod close_surfaces;
 pub mod compare_settings_allow;
 pub mod csmoke;
+pub mod demo;
 pub mod diff_baseline;
 pub mod docs_mirror;
 pub mod drift_report;
@@ -597,6 +598,10 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(agents_md_smoke::run),
         agents_md_smoke::KNOBS,
     ),
+    // spec: gate-sdk/SPEC.md §Consumer smoke — an `Arm::Run` because the contract is the 1-versus-2
+    // split of its exit status, which an emitting arm collapses, and a table member because the
+    // vendoring and the binary placement both read the consumer's own knobs
+    ("--run-demo", Arm::Run(demo::run), demo::KNOBS),
 ];
 
 // spec: gate-sdk/SPEC.md §run-gates — the child's declared knob environment, filtered out of the

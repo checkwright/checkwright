@@ -2188,8 +2188,9 @@ header and its knob line both pointed at a consumer's CLAUDE.md, a section that
 described the walkthrough and specified no mechanism of it — not even the scratch-base
 knob that line told the reader it owned — while the file's own third pointer already
 named §Consumer smoke for the one decision it had needed a spec for. The pointers
-re-home there first and separately, because re-homing is a legal end state on its own
-and the reverse order leaves no tree in which the mis-homing was ever corrected.
+re-homed there first and separately, because re-homing is a legal end state on its own
+and the reverse order leaves no tree in which the mis-homing was ever corrected; the
+section then ported the member it had just been given.
 
 **A consumer's plugin on a kit seam is owed like any file; the extension-point
 ruling reaches the seam alone.** That ruling protects an extension point's
@@ -2357,8 +2358,9 @@ and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
 (guard-kit/SPEC.md §scratch-run — the class's first member
 whose port **removes** a grant naming its own path rather than relocating one)
 `--run-gate-tests` (§run-gate-tests),
-`--run-guard-tests` (guard-kit/SPEC.md §Testing)
-and `--agents-md-smoke` (context-kit/SPEC.md §Testing) —
+`--run-guard-tests` (guard-kit/SPEC.md §Testing),
+`--agents-md-smoke` (context-kit/SPEC.md §Testing)
+and `--run-demo`, the adoption walkthrough (§Consumer smoke) —
 and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
@@ -2494,6 +2496,15 @@ is named beside it because both reach `lib/consumer-smoke.sh` by spawning: `bash
 `git`, `mktemp`, and through the vendoring whatever `csmoke_vendor_and_install`
 reaches — no `cargo` and no `tar`, because it archives no ref and builds no
 binary (context-kit/SPEC.md §Testing).
+**`--run-demo` is the third member on that road**, and its set is stated beside
+the other two rather than assumed from the shape: `bash`, `git`, `mktemp` and
+`cp`, plus whatever the vendored kits' own installers spawn. The shell form's
+`rm` and `awk` are **not** in it — the scratch teardown is the arm's own `Drop`
+and the reddened gate's quoted block is an in-crate line filter — so this is one
+of the few places a port shrank a set rather than carrying it across. It is
+**not** a consumer-changeable set: no knob names a program here, which is the
+axis on which `--emit-always-loaded` and `--emit-env-probe` differ from it
+(§Consumer smoke).
 **`--run-guard-tests` is the class's first member whose set is split between the
 arm and the subject it spawns**, and stating it that way is what keeps the port's
 dividend honest: `bash`, `git` and `mktemp` are the arm's own — one `bash` per
@@ -2688,6 +2699,16 @@ rather than a port, which is a thing a faithful port may not take on its own
 authority. The pair is what makes the class's shape legible: an empty roster is
 not always a member with no configuration, and where it is the second kind, the
 row is the *only* reachable spelling.
+
+**`--run-demo` carries the same refusal inside a roster that is not empty, which
+is the third shape.** Its declared pair is `GATE_KIT_ROOTS_HERE` and
+`GATE_SDK_NATIVE_BIN`; the scratch base it also reads, `DEMO_TMP_DIR` with its
+`TMPDIR` fallback, is **absent from that roster and must be** — neither name
+carries a kit prefix the bridge can partition by, and neither is defined in a kit
+library, so declaring either would meet the same undeclared-knob refusal and
+fail-close the arm on every invocation (§Consumer smoke). Read together with
+`--emit-session-id`: the refusal is a property of the *name*, not of the roster's
+size, so a member may declare what it can and still read what it may not declare.
 
 **A declared roster may span more than one kit, and the bridge's does-not-define
 refusal is what makes that look risky when it is not.** `gate_knob_env_set`
@@ -7818,15 +7839,26 @@ live in a module both arms call, never a copy each (§upgrade-smoke).
 **The library's sourcer set is narrower than the builder's caller set, and the
 two are counted separately.** Of the three callers of
 `csmoke_vendor_and_install` above, two now reach it across a process boundary and
-none of the three sources this file. What is left sourcing it is
-`demo/run-demo.sh` alone, which takes `csmoke_place_binary` and never builds a
-scratch consumer at all — so the sourcer set is **one** and the builder's caller
-set is three. Read the distinction off this paragraph rather than counting
-callers of one function and generalising, which is the re-derivation that put a
-wrong count into an amendment once already.
+none of the three sources this file. The adoption walkthrough below was the last
+shell sourcer — it took `csmoke_place_binary` and never built a scratch consumer
+at all — and it has ported too, so the sourcer set is now **zero** while the
+builder's caller set is unchanged at three. Read the distinction off this
+paragraph rather than counting callers of one function and generalising, which is
+the re-derivation that put a wrong count into an amendment once already.
+
+**An empty sourcer set does not reopen the library's own `no-port` cause, and
+this sentence sits beside the count because the misreading is cheap.** Leg 1 of
+*The port disposition* below rests on the **config bridge**: this library
+resolves `GATE_SDK_NATIVE_BIN` through §lib/gate.sh's accessor, so it sits inside
+the bridge rather than beside it, and §lib/gate.sh rules exactly one place a
+knob's value is computed. That is a property of the library, not of how many
+shells source it. A library with no shell sourcer left *looks* like one whose
+callers are all compiled and therefore like a candidate for going in-crate; it is
+not, because a crate-side placement would resolve the same knob a second time and
+be the second producer criterion 6 refuses.
 
 **The adoption walkthrough is this section's other member, and this is the
-mechanism owner its own header pointed elsewhere for.** `demo/run-demo.sh` narrates
+mechanism owner its own header pointed elsewhere for.** `--run-demo` narrates
 the arc a new adopter walks — vendor the kits and run each installer, commit clean
 and watch the battery pass, craft one violation and watch the battery turn red naming
 the gate that caught it, drop the change and watch green return — and exit 0 asserts
@@ -7840,7 +7872,61 @@ walkthrough's tree and the harness's comparable, and why folding it onto
 `GATE_SDK_TMP_DIR` (repo-relative `.tmp`, absolutized at the invoker's root) would
 break that parity silently. It is **not** a kit knob: it carries no `<KIT>_` prefix,
 is defined in no kit library, and is read straight off the process environment, which
-is exactly what a caller overriding it on the command line does.
+is exactly what a caller overriding it on the command line does. **Retiring it was
+weighed and refused**: an override a consumer may set on the command line is an
+extension point however thinly used, and a cut narrows the port, never an extension
+point. What the cut owed it was an owner, and this paragraph is it.
+
+**The member is an `Arm::Run`, and this is where the sibling cuts' ground is
+false.** The `Arm::Emit` members of this kit were admitted on "the arm declares no
+1 and never has", so collapsing to {0, 2} discarded nothing. The walkthrough's
+shell form declared 1 from all seven of its failure sites, and that 1 is the whole
+verdict the `demo` suite reads: the suite declares no `EVIDENCE_KIT_PARSER_demo`,
+falls to the `EVIDENCE_KIT_PARSER` default (evidence-kit/SPEC.md §Layout and
+configuration owns its value), and its entire product is the status. An
+emitting arm would fold a broken walkthrough into the dispatch-failure band and the
+suite would report a real finding as an environment error. Its **table membership**
+is forced on the same test as `--agents-md-smoke`'s: it resolves
+`GATE_KIT_ROOTS_HERE` (which kits to vendor) and `GATE_SDK_NATIVE_BIN` (the
+placement, and the scratch `.gitignore` line that spares it), and a hardcoded
+top-level flag would receive neither. No front-end edit is owed and none is legal —
+`bin/run-gates.sh` passes a leading `-*` token straight through to the crate's own
+parser, so the arm is reachable the moment the table row exists, and a case for it
+in the stub would be a second spelling of the arm roster.
+
+**Its exit grammar is this section's 0/1/2, which the shell form never held.** All
+seven of that form's failure sites returned 1, including the two that were only ever
+statements that the harness could not be stood up: the native binary could not be
+placed in the scratch consumer, and a vendored kit's installer errored. Neither is a
+statement about the adoption arc, and the ported arm maps both to **2**, leaving
+**1** for the five genuine assertions — the battery not green after install, the
+violation printing no expected-gate name, the violation not turning the battery red,
+the wrong gate catching it, and green not returning after the fix. Exit 1 carries the
+`DEMO: FAIL — <cause>` line on stdout naming which act broke; exit 2 carries
+`DEMO: FAIL(env) — <cause>` on stderr. This is a **behaviour change** under the
+suite's exit-code parser and is named as one: a run that could not place the binary
+stops reporting as a failed walkthrough and starts reporting as an environment
+failure. On the same ground, an **operand is a refusal** — the shell form ran the
+full walkthrough and ignored the word, and the arm prints `usage: --run-demo` and
+exits 2, because once 2 means the harness could not be stood up, a swallowed operand
+is the one way a caller believes it selected a mode and reads a verdict about a
+different run. `--agents-md-smoke` accepts `--keep` and this member accepts nothing:
+its scratch is narrated and torn down as part of the arc, so there is no mode to keep.
+
+**It reaches `csmoke_place_binary` by spawn, and that helper's wrapper moved when it
+gained its second caller.** The rule two paragraphs up — the spawn wrapper and the
+script prologue live in a module both arms call, never a copy each — binds at the
+moment a second arm calls the same helper, which is here; the placement wrapper was
+private to `--upgrade-smoke` and now sits beside the prologue, returning the helper's
+own status so each arm renders its own verdict for it. A crate-side reimplementation
+of the placement is refused, and not on effort: it would resolve
+`GATE_SDK_NATIVE_BIN` a second time, which is the second producer that put this
+library in the `no-port` class to begin with. Porting the *caller* while leaving the
+*library* is the whole shape of legs 1 and 2, and this member is an instance of it
+rather than an exception to it. The **spawned battery stays spawned**, and that is
+load-bearing: the subject under test is the vendored consumer's own front-end, so
+calling this binary's registry in-process would run the host's gates against the
+scratch tree — the pairing defect the placement's own record names.
 
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
@@ -8091,6 +8177,17 @@ so what decides this class is what its members *are*. **The cut resolves to
 declarations and writes no Rust, and it stands on that measurement** — a cut is
 not less legitimate for resolving to declarations when the declarations are
 structural, and re-cutting for Rust was the alternative refused.
+
+**The class membership above is closed and enumerated, and this section's one owed
+non-member was the adoption walkthrough.** It was in none of those sets — not a
+`smoke/` recipe, not a member of this harness — and it ported (§Consumer smoke's
+walkthrough paragraphs). Stated in terms so a later reader does not have to derive
+non-membership from an enumeration, and because the worked precedent for a
+validate-suite *driver* porting sits in this same kit's reach: context-kit's AGENTS.md
+smoke was one by the identical predicate and became `--agents-md-smoke`. What stays
+owed to this tree after that cut is the installer family, held behind the
+behind-invoke relocation, and the four reachable non-installer members; the live
+count is `--emit port-blockers --tree`'s and is not restated here.
 
 **Leg 1 — the config bridge, and it is the load-bearing one.** A second file now
 stands on the same shape rather than restating it: `gate-sdk/lib/test-hermetic.sh`
@@ -11665,7 +11762,7 @@ descriptor to name this project's crate directory would publish this project's
 layout for exactly the reason above. The gap is left covered by the
 full-battery-before-every-commit rule, which is the disposition this section
 already takes for the consumer-defined corpus its own uncovered set sits in. In this tree the
-uncovered set is the twelve files under `installer/` and `demo/`, and the
+uncovered set is the eleven shell files under `installer/`, and the
 full-battery-before-every-commit rule is what covers them, since it runs
 `check-graph` unconditionally where the hook's own trigger does not. **The
 regeneration cost was measured rather than argued**: over two hundred commits,

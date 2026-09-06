@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **demo-walkthrough-port-cut** [spec: SPEC-demo-cut.md] — port `demo/run-demo.sh` (96) to
-  the bridged `--run-demo` `Arm::Run`, after re-homing its `# spec:` pointers.
-  The stated-contract cut behind gate-sdk/SPEC.md §Consumer smoke. **The re-home comes FIRST and is
-  its own commit** — the mis-homed correction §Porting a gate to the binary substrate rules, NOT the
-  re-pointing the 2026-09-03 ruling refused: `:2` and `:11` point at `CLAUDE.md §Housekeeping`, a
-  manifest that owns no mechanism and does not even name the knob it claims, while `:35` already
-  names the legal owner. This gives a file the owner it never had.
-  **The `# no-port:` fork is CLOSED — operator, 2026-09-06, relayed by the lead session.** The
-  residue clause grants a per-file *disposition*, a disjunction; this file takes the porting branch.
-  **`Arm::Run`, not `Arm::Emit`, and the natural instinct is wrong here.** Every sibling cut in this
-  kit cleared `Arm::Emit` on "it declares no 1 and never has". FALSE for this member: all seven
-  `fail()` sites exit 1 and that 1 is the whole verdict the `demo` suite reads under
-  `EVIDENCE_KIT_PARSER=exit-code`.
-  **Two named behaviour changes.** The exit grammar becomes the 0/1/2 §Consumer smoke already
-  specifies — the shell form has NO exit-2 path, so its two environment-class failures (binary
-  placement, installer error) report today as failed walkthroughs; and an operand becomes a refusal.
-  `csmoke_place_binary`'s spawn helper MOVES from `upgrade_smoke.rs` into `csmoke.rs` on gaining its
-  second caller, and the library's shell sourcer set empties — which does **not** reopen leg 1,
-  whose ground is the config bridge and not a sourcer count.
-  `DEMO_TMP_DIR` SURVIVES, read undeclared off the process environment (declaring it would
-  fail-close the arm); retiring it would be a cut narrowing an extension point, which ruling (1)
-  forbids.
-  **Three sites are ONE atomic edit** — `EVIDENCE_KIT_RUN_demo`, `README.md`'s `battery-roster`
-  block line, and the hook regen; `check-battery-roster` reds on either half alone.
-  Reaches `## Done` at build: its deliverable is one section's owed file and this cut finishes it.
-  Filed 2026-09-06 by spec as a per-cut feature unit, under the packaging ruling gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate states — two refs cannot pair with one host.
-
 - **close-ruling-record-repair-authority** [spec: SPEC-record-authority.md] — the closing
   stage may correct an aged fact inside a live ruling, and reversal stays operator-class.
   **Operator, 2026-09-06, relayed by the lead session, verbatim: "/close can correct invalid or
@@ -10246,5 +10218,7 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
+
+- demo-walkthrough-port-cut
 
 ## Lessons Learned

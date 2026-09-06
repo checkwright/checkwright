@@ -1513,7 +1513,8 @@ carries it. The spawn wrapper and its script prologue are a **shared crate
 module** both arms call rather than a copy each. Two consequences are stated
 because they are observable: the helper's own installer output moves to stderr,
 that channel being reserved for the value coming back, and the library's shell
-sourcer set loses this member — leaving `demo/run-demo.sh` alone
+sourcer set loses this member — leaving the adoption walkthrough as the last
+sourcer, which has since ported too and emptied that set
 (gate-sdk/SPEC.md §Consumer smoke).
 
 **Everything after the vendoring is the arm's own, and the step a port most
