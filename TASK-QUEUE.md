@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: macos-leg-packer-cut-and-seam-slice
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -142,6 +142,53 @@
   work, not the argument.
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
 
+- **lead-open-authorization-channel-and-cardinality** [design-pending] — the lead template tells a
+  lead that its own invocation authorized nothing, names no channel by which authorization does
+  arrive, and carries the one-open bound at the iteration BOUNDARY rather than on the GRANT, so a
+  lead learns the cardinality an iteration late. **Ruled and directed 2026-09-06 by the
+  operator**, in a direct in-session reply to a lead session's authorization ask, relayed by that
+  lead: the invocation IS the grant, and one invocation grants exactly one iteration. The
+  verbatim, the grounds, and the measured failure behind it — a lead opening a second iteration on
+  one grant — are TRAJECTORY.md §The closed rulings', landed at `e818e6fd` and not restated here.
+  The operator directed the correction in the same breath: "Correct your instructions if not
+  clear." **The read that makes it a defect rather than a preference, verified 2026-09-06 at
+  scope:** `lifecycle-kit/templates/lead.md:184-185` demands authorization "obtained explicitly
+  and separately"; `:223-230` disqualifies a relayed directive as evidence; §Opening names NO
+  channel and NO cardinality at all; `:241-247` attaches the bound to the boundary. **TWO EDITS ON
+  TWO TIERS, and the split is the provenance seam's.** Kit mechanism — a channel the consumer
+  BINDS, and a cardinality the grant carries — goes in the template's §Opening behind a binding
+  slot, which is a new governed name, so this is a FEATURE and owes an amendment. Consumer config
+  — that this tree's bound channel is the lead skill's own invocation — goes in
+  `.claude/commands/lead.md`'s `ruling-config` slot. A slash-command literal in a kit template
+  would publish one harness's layout. **IT PROMISES PROSE AND NEVER A GATE.**
+  `lifecycle-kit/SPEC.md:337` already records the authorization fact as NOT encodable —
+  unencodable, not expensive to encode — so the correction must say so where it lands rather than
+  read as a gate a later session goes looking for. **Cost while deferred:** every lead session
+  runs under text telling it its invocation authorized nothing, which is what bought the round
+  trip this ruling came out of, and the bound stays discoverable only one iteration after it
+  binds. Filed 2026-09-06 by scope, landing the ruling that directed it.
+
+- **context-kit-testing-hold-is-colocation-not-coupling** [design-pending] — `context-kit/SPEC.md`
+  §Testing holds `bin/run-index-tests.sh` owed on a CO-LOCATION ground where its sibling's is
+  content coupling, so a 107-line singleton may be held by an over-declaration rather than by a
+  blocker. **Measured 2026-09-06 at scope, both sides read.** `index-tests/toolfloor-cases.sh:8`
+  genuinely `source`s `lib/toolfloor.sh`, which is sequenced behind the installer's behind-invoke
+  relocation. `bin/run-index-tests.sh` does NOT: its only contact is `:53`, a `bash` subprocess
+  spawn whose stdout is diffed against a golden, structurally identical to the five spawns above
+  it at `:49-52` that already reach ported arms. The section's own words are "sequenced together
+  with". **The discriminator that would release it is the section's own.** The 2026-09-05
+  stated-cause ruling's test is "neither sources nor reads", and `context-kit/SPEC.md:1386-1390`
+  works exactly this case for the AGENTS.md smoke — same section, sourced neither the runner nor
+  the library, released on its own ground and since cut. **WHY IT IS FILED RATHER THAN TAKEN, and
+  this is the whole of it:** the owner doc NAMES the member and closes its own reach at
+  `:1394-1397` — "three files, and no fourth" — so releasing it is an amendment to §Testing, never
+  a reading, and spec-over-precedent binds. Declined 2026-09-06 by the lead (`lead,
+  own-authority`) on exactly that ground, with the argument recorded PERSUASIVE and the route left
+  open to a future `spec` stage that takes it as an amendment. **Cost while deferred:** the port's
+  reachable column reads empty while it may hold a takeable 107-line singleton, so every iteration
+  composes around a blocker that may not be one. Filed 2026-09-06 by scope, out of the
+  port-takeability census the same session recorded.
+
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
@@ -179,9 +226,10 @@
   **(6) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER THE BLOCKER-RETIRING OVERRIDE, AND
   THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING STAGE RUNS, 2026-09-05 (lead)** —
   both owned by gate-sdk/SPEC.md §The first cohort.
-  **(7) `demo/run-demo.sh` PORTS; the `# no-port:` route its residue class grants is DECLINED —
-  operator, 2026-09-06, relayed by the lead session; DISCHARGED the same day**, the cut landing as
-  `--run-demo` behind a separate re-home of its mis-homed `# spec:`. The fork ends here.
+  **(8) NO CUT TAKEABLE 2026-09-06 — `lead, own-authority`: all 16 owed files held by their owning
+  sections, so §PRIORITY DIRECTIVE's empty-column clause fires on both disjuncts.**
+  **(7) `demo/run-demo.sh` PORTED, its residue-class `# no-port:` route DECLINED — operator
+  2026-09-06 (lead-relay), DISCHARGED same day behind a separate `# spec:` re-home. Fork closed.**
   **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
   lifecycle layer; relaxation is closed at §The port-candidate criteria, `gate-battery-result-cache`
   unsubsumed. **THE PORT-FIRST RUN, ruled 2026-09-05 (operator, consult), supersedes the 2026-08-31
@@ -628,6 +676,16 @@
   names this leg's shape in terms — port-critical, its own iteration when it cannot ride a cut
   (TRAJECTORY.md §PRIORITY DIRECTIVE). The ruling is re-named onto its successor, never reversed;
   the `find -printf` fix rides inside it.
+  **OPENED 2026-09-06 — operator, direct answer to the lead session's ask, lead-relayed.** Ruled
+  AGAINST both the scope session's recommendation and the lead's, and with the 2026-09-05
+  own-iteration ruling above put in front of the operator in as many words, so it is ruled with that
+  fact in view rather than around it. Scope had recommended deferring one iteration on the push
+  budget — the Windows leg spent fourteen rounds — and that concern is recorded ANSWERED rather than
+  overlooked: `platform-support-ci-matrix`'s standing file-and-defer-without-looping ruling bounds
+  it, so a red cause is filed and NOT looped on. `init-vendoring-assumes-gnu-findutils` rides inside
+  per the 2026-09-05 arrangement, which is now the arrangement being EXECUTED rather than one being
+  pre-empted. Its own text — "the defect is live whether or not a macOS leg is ever bought" — is why
+  the rider survives a leg that ends in file-and-defer.
   Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
@@ -9105,15 +9163,16 @@
 - **kit-spec-provenance-seam-sweep-remainder** [design-pending] — EIGHT kit SPECs still carry this
   project's ruling provenance, plus the seam gate that can only go green once the last is swept.
   gate-sdk landed with the parent split; context-kit and guard-kit landed 2026-09-06, 14 sites.
-  **DEMOTED AT BUILD, NOT AT CLOSE — `lead, own-authority`, 2026-09-06, relayed in-session.** The
-  superseded clause said close performs it; it cannot — validate is entered before close and
-  `check-stage-entry` assertion B refuses a validate entry on a non-empty active queue, so waiting
-  for close makes the by-kit split structurally impossible. The drain-residue marker is scoped to a
-  unit whose remaining half IS drain-stage work, so it does not reach this one. Only the stage
-  moved, and the superseded clause carried no attribution: no reversal. **IT BELONGS IN THE
-  `Deferred` SECTION AND NEVER IN `Done`** — the deliverable is a corpus, so the next cut
-  re-promotes with its own amendment (canon-kit/SPEC.md §Merging an amendment). A by-kit slice needs
-  no waiver — TRAJECTORY.md §PRIORITY DIRECTIVE says scope may split it by kit.
+  **IT BELONGS IN `Deferred`, NEVER `Done`, AND IT DEMOTES AT BUILD, NEVER AT CLOSE** (`lead,
+  own-authority`, 2026-09-06): the deliverable is a corpus, so the next cut re-promotes with its own
+  amendment (canon-kit/SPEC.md §Merging an amendment), and `check-stage-entry` assertion B refuses a
+  validate entry on a non-empty active queue, so a close demotion makes the by-kit split impossible.
+  A by-kit slice needs no waiver — TRAJECTORY.md §PRIORITY DIRECTIVE grants scope the split.
+  **OWED ON A RE-TAKEN GROUND, 2026-09-06 — operator, direct answer to the lead session's ask,
+  lead-relayed.** The 2026-09-03 standing direction (a joined unit beside the test-harness cut) is
+  SPENT: that iteration ran and joined it. The operator chose RE-GROUNDING over renewing the
+  direction, so what carries this now is **product-class with a live trigger** on its own accretion,
+  not the original direction still running.
   **DO NOT RE-AUTHOR THE PREDICATE OR RE-RUN THE SCAN — RECOVER IT** from the parent half's merged
   amendment, `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`: delta 1 is the discriminator (the
   seam decides the VOICE, never the content — a ground carried with an authority, a date, a channel
@@ -9126,12 +9185,12 @@
   ordinals or port chronology. The parent's rank order — lifecycle, delegation, queue, canon,
   doctrine, drift, site, evidence — held qualitatively and failed quantitatively, at 7 swept sites
   per kit against ranks 3 and 6, so it orders and never counts.
-  **MOVE-VERSUS-DELETE IS ANSWERED, NO SWEPT SITE WAS SOLE-HOME, AND drift-kit IS LAST TO OWE IT.**
-  At guard-kit §scratch-run's retired consumer opt-out it resolved to *do not delete the paragraph*:
-  the ground stays restated impersonally and the spent stamp goes to git history, migrating a
-  finished ruling back into the record being what its doctrine forbids. drift-kit's half of that
-  spent pair is untouched, owes exactly that, and owes its spelling's fixture shape — a
-  trailing-parenthetical date. **THE POINTER CLASS IS OPEN, answered for EVERY kit SPEC at once or
+  **MOVE-VERSUS-DELETE IS ANSWERED, NO SWEPT SITE WAS SOLE-HOME, drift-kit IS LAST TO OWE IT.** At
+  guard-kit §scratch-run's retired consumer opt-out it resolved to *do not delete the paragraph*:
+  the ground stays restated impersonally and the spent stamp goes to git history, since migrating a
+  finished ruling back into the record is what its doctrine forbids. drift-kit's half of that spent
+  pair is untouched, owes that, and owes its spelling's fixture shape — a parenthetical date.
+  **THE POINTER CLASS IS OPEN, answered for EVERY kit SPEC at once or
   not at all** — `CLAUDE.md §The provenance seam` citations resolve in this tree and in no vendoring
   consumer's: 17 across five kit SPECs (gate-sdk 10, guard-kit 4,
   canon-kit/delegation-kit/lifecycle-kit 1 each), plus a `docs/`- and `BRIEF.local.md`-class the
@@ -9674,6 +9733,13 @@
   a legal cut boundary — buildable, and filed as `spec-pointer-boundary-legality` below.
   **Cost while deferred:** low per read and paid at the worst moment — the session that reaches
   this file is mid-cut, and it discovers the hole after it has already sized the work.
+  **PROMOTABLE 2026-09-06 ON THE PURPOSIVE READING OF GROUND 1 — operator, direct answer to the lead
+  session's ask, lead-relayed**, answering the ambiguity scope escalated. The port-first run's
+  port-critical test is "the owning section's own sequencing sentence", and it is UNSATISFIABLE here
+  because the missing section IS the defect. The purposive reading governs — this entry's own
+  "no cut can take this file until a section exists" is the sentence a section would have carried —
+  and the section-authoring plus the 196-line cut MAY RIDE ONE ITERATION. Refused with it: the
+  strict reading (no section, no sentence, not port-critical) and the outside-the-cut-economy one.
   Filed 2026-09-05 by close, promoting a gap bullet after fix was refused as a design call and
   icebox refused on the live port trigger.
 

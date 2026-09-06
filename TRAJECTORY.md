@@ -541,12 +541,12 @@ gate held it. The alternative refused: leaving the class in place as design rati
 publishes private history as mechanism and ships pointers a consumer cannot follow. The sweep and
 the gate that holds the seam afterwards are one queue unit, filed from this consult —
 `kit-spec-provenance-seam-sweep-remainder`, the surface that survives after scope split that filing
-by kit, **directed 2026-09-05 by the operator in consult as the next
-iteration's joined unit beside the test-harness cut**, on the port-first run's same-surface ground
-(gate-sdk/SPEC.md hosts two of the four cuts and most of the class) and as a product-class entry
-whose class accreted two sites while it waited; scope sizes it against the window and may split it
-by kit. Discharge event: that entry lands whole, its gate included, at which point this paragraph is
-deleted.
+by kit. The 2026-09-05 direction that sent it beside the test-harness cut is **spent** — that
+iteration ran and joined it, and a second joined it again — and its same-surface ground went with
+it, gate-sdk being swept. **Re-grounded 2026-09-06 by the operator on product-class with a live
+trigger alone**, the accretion being self-attesting: the class grows from cuts that never touch
+provenance. Scope sizes it against the window and may split it by kit. Discharge event: that entry
+lands whole, its gate included, at which point this paragraph is deleted.
 
 **No governed file is exempt from brevity; the close pass walks every file that grew — ruled
 2026-09-05 by the operator in consult.** The close-stage brevity pass had measured `CLAUDE.md` alone
