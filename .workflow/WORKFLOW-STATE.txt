@@ -5,3 +5,4 @@
 ---
 
 macos-leg-packer-cut-and-seam-slice scope aabb5f48 2026-09-06 34eebbd2
+macos-leg-packer-cut-and-seam-slice spec a403eb7a 2026-09-06 867a57f0
