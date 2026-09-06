@@ -56,51 +56,6 @@
   Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by build; promoted
   2026-09-06 at spec into the leg that carries it.
 
-- **pack-installer-no-owning-spec-section** [spec: SPEC-packer-boundary.md] — the largest
-  reachable member of the owed port column has no SPEC section claiming it, so its cut has no
-  boundary to be authored against and no gate reports the hole.
-  **Measured 2026-09-05 at spec, section by section rather than by grep.**
-  `scripts/pack-installer.sh` (196 owed lines) carried `# spec: CLAUDE.md §Housekeeping` — an
-  always-loaded manifest the 2026-09-05 operator ruling bars as a cut boundary — and no section
-  of `installer/README.md` or `gate-sdk/SPEC.md` claimed the file.
-  **PROMOTABLE ON THE PURPOSIVE READING OF GROUND 1 — operator, direct answer to the lead
-  session's ask, lead-relayed, 2026-09-06.** The port-first run's port-critical test is "the
-  owning section's own sequencing sentence", and it is UNSATISFIABLE here because the missing
-  section IS the defect. The purposive reading governs, and the section-authoring plus the
-  196-line cut MAY RIDE ONE ITERATION. Refused with it: the strict reading and the
-  outside-the-cut-economy one.
-  **PLACEMENT RULED `lead, own-authority` 2026-09-06**, on the spec session's escalation and
-  recommendation, with the lead re-reading all three supporting citations in the tree rather than
-  accepting them: a NEW `installer/README.md` section owns the file. The PRIMARY ground is the
-  provenance seam — gate-sdk is a KIT, so a kit SPEC governing a `scripts/` file no adopter
-  receives inverts the kit/consumer layering and publishes a private rule as kit mechanism.
-  Secondary and independent: §Consumer payload bounds its own reach to "what a gate ships".
-  Decisive positive evidence: `installer/README.md` §The consumer smoke ALREADY hosts this exact
-  shape for `installer/consumer-smoke/run-smoke.sh` — a repo-private tool riding no payload — and
-  establishes that status BY CITING THE PACKER. The two are one family.
-  **The sequencing sentence turns out to be a negative one:** the packer carries no bootstrap
-  step, ships to no adopter (`pack_tracked` packs `installer/` and the kit roots; `scripts/` is
-  neither), and both its callers already build the binary — so nothing sequences it and it is a
-  plain port obligation.
-  **DISTINCT from `spec-pointer-boundary-legality`**, which stays filed: this unit gives one file
-  a legal target and does not teach the gate to grade target legality.
-  **DELTAS 1-2 LANDED at build**: `installer/README.md` §The packer exists, and the pointers that
-  named the barred manifest and §The consumer smoke are re-homed onto it; the ones naming
-  gate-sdk/SPEC.md §Consumer payload stayed put. Delta 3, the 196-line cut, is what remains owed.
-  **DELTA 3 IS BLOCKED, and the blocker is a PREMISE THE AMENDMENT ASSERTED AS CHECKED.** The
-  amendment states both callers build the binary before reaching the pack step, so reachability is
-  "not a new obligation for either". PROBED at build and FALSE for the release path:
-  `.github/workflows/publish.yml` `pack` is a SEPARATE JOB from `build` (`:132` vs `:75`), each
-  with its own `actions/checkout` on its own runner, and `pack` runs no build step — it holds the
-  downloaded per-target artifacts and no `native/target/release/` binary. `needs: build` orders
-  jobs, it does not share a workspace. The smoke half holds: `run-smoke.sh:51` builds before its
-  first pack at `:67`.
-  **So the cut owes a release-path route, and which one is a ruling**: build the binary in the
-  `pack` job, or resolve `GATE_SDK_NATIVE_BIN` onto a downloaded artifact — the second executes a
-  binary the job did not produce, inside the release path. Escalated to the lead at build.
-  Filed 2026-09-05 by close, promoting a gap bullet after fix was refused as a design call and
-  icebox refused on the live port trigger; promoted 2026-09-06 at spec with its placement ruled.
-
 ## Technical Debt
 
 ## Deferred
@@ -9704,6 +9659,43 @@
   Deferred, never promoted — it meets none of the three joining grounds the port-first run states
   (TRAJECTORY.md §PRIORITY DIRECTIVE); no run has ever barred a Deferred filing.
 
+- **pack-installer-cut-to-a-non-gate-arm** [design-pending] — the packer's lines are the largest
+  single item in the owed port column and their owning boundary now exists, but the cut cannot
+  land until the release path can reach a gate binary.
+  **Owner surface:** `installer/README.md` §The packer, authored 2026-09-06 — it carries the port
+  disposition, the negative sequencing sentence, and the reachability obligation a cut owes.
+  **Size, read off the oracle** rather than counted by hand: `--emit port-blockers --tree` reports
+  `scripts/pack-installer.sh owed lines=196`.
+  **THE BLOCKER, probed 2026-09-06 at build and re-probed by the lead before ruling.**
+  `.github/workflows/publish.yml` `pack:` (`:132`) is a SEPARATE JOB from `build:` (`:75`): its own
+  `actions/checkout` (`:138`), its own `runs-on: ubuntu-latest` (`:134`), a download-artifact
+  (`:140`) and the assemble step (`:145-183`) — and NOTHING between them builds. `needs: build`
+  orders jobs; it does not share a workspace, so `native/target/release/` does not exist there.
+  The smoke half holds: `run-smoke.sh:51-53` builds and asserts the executable before its pack
+  call sites at `:67`, `:511`, `:681` and `:759`.
+  **BOTH ROUTES WERE NAMED AND NEITHER TAKEN — `lead, own-authority` 2026-09-06**, on the build
+  session's escalation and with the lead re-running the probe rather than relaying it. The grounds
+  are written down here so a later session does not re-derive them:
+  - ROUTE 1, build the crate inside the `pack` job. REFUSED ON THE TRIGGER, not on minutes:
+    `publish.yml:26-29` fires only on a version tag, so new release-path wiring is first exercised
+    by a real publish. The release is deferred, so the untested window is open-ended, and a cargo
+    build newly introduced into the signing path is worst discovered on release day.
+  - ROUTE 2, resolve `GATE_SDK_NATIVE_BIN` onto a downloaded artifact. REFUSED ON A STATED
+    SURFACE: `publish.yml:87-97` names the checkout+bash tamper floor as why the build leg stays
+    bash on preinstalled cargo, and the `pack` job today executes only bytes it checked out. This
+    would make the one job that assembles and stamps the published tarball execute bytes it did
+    not produce, cutting across the once-computed-digest grain at `:18-21`, `:112-116`, `:194-198`.
+  **DEPENDS ON the gap-inbox bullet about `gate-sdk/SPEC.md` §The non-gate arm**, and the
+  dependency is not bookkeeping: that section claims only an `--emit-<name>` spelling is front-end
+  reachable, which is false, and the merged amendment's flag-spelling paragraph (in git history)
+  was derived from it. Fix the sentence BEFORE this cut is re-specced, or the cut re-derives the
+  same false premise. The live convention is `Arm::Run` => bare flag, `Arm::Emit` => `--emit-`.
+  **Cost while deferred:** the owed column keeps its largest reachable member, so the port track's
+  completion predicate cannot reach zero; and the packer stays shell while its own owning section
+  states the port obligation, which is a standing disagreement between a surface and the tree.
+  Filed 2026-09-06 by build on the lead's deferral of the cut; the same amendment's other deltas
+  landed and closed `pack-installer-no-owning-spec-section`.
+
 - **spec-pointer-boundary-legality** [design-pending] — `check-spec-pointer` grades that a `# spec:`
   target resolves, never that the target is a surface a cut may be bounded against.
   **The hole, read off a live instance.** `installer/bin/checkwright.sh` — an owed file, read off
@@ -10160,5 +10152,6 @@
 ## Done
 
 - lead-open-authorization-channel-and-cardinality
+- pack-installer-no-owning-spec-section
 
 ## Lessons Learned
