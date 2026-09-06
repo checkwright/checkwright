@@ -12,6 +12,100 @@
 
 ## New Features
 
+- **macos-install-smoke-ci-leg** [spec: SPEC-macos-leg.md] [roadmap: next/reliability] — a macOS
+  install-smoke leg; nothing has ever run green against macOS.
+  roadmap-summary: A CI install-smoke leg on macOS, so the platform claim has a run behind it.
+  **PORT-CRITICAL, OWN-ITERATION SHAPE — RULED 2026-09-05 (operator, consult)**, re-named onto the
+  port-first run rather than reversed. **OPENED 2026-09-06 — operator, direct answer to the lead
+  session's ask, lead-relayed**, against both the scope session's recommendation and the lead's,
+  with the own-iteration ruling put in front of the operator in as many words. The push-budget
+  concern is recorded ANSWERED rather than overlooked: `platform-support-ci-matrix`'s standing
+  file-and-defer-without-looping ruling bounds it, so a red cause is filed and NOT looped on.
+  **The cost is measured rather than estimated**, and the measurement is the amendment's premise —
+  runners are free on a public repo, and what the leg must buy is a GNU userland: the macOS image
+  ships bash 3.2.57 with no coreutils and no gawk, while cargo, rustc, jq, node and Homebrew are
+  present. Measured at build 2026-08-25 against the runner-image manifests.
+  **Read `platform-support-ci-matrix` before designing the leg** rather than re-deriving its
+  shape — it carries the non-blocking probe-then-suite instrument this one copies, and most of
+  its unanswered probe questions a macOS host owes answers to as well.
+  `init-vendoring-assumes-gnu-findutils` rides inside per the 2026-09-05 arrangement and is
+  promoted onto the same amendment.
+  Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling;
+  promoted 2026-09-06 at spec.
+
+- **init-vendoring-assumes-gnu-findutils** [spec: SPEC-macos-leg.md] — `checkwright init`
+  enumerates each kit's payload with `find -printf`, a GNU findutils extension, in the loop that
+  vendors every install, so a stock macOS or BSD host vendors zero files.
+  `installer/lib/init.sh:201` runs it unconditionally per kit with stderr NOT suppressed. `:126`
+  uses the same construct on the artifact path, conditionally and with stderr suppressed, and
+  that twin is DORMANT — `native/targets.list` carries one non-Darwin line, so `select_artifact`
+  returns before ever reaching it.
+  **THIS ENTRY'S FAILURE-MODE PREMISE IS FALSE AND IS CORRECTED HERE, at spec 2026-09-06, off the
+  control flow.** It costed the defect as "a green `init` over an empty vendor tree, discovered
+  later as missing kits rather than at install time". But `gate-sdk` is itself one of the vendored
+  kits, so an empty loop leaves no hook generator under the install root and `init.sh:301-302`
+  reaches `die "gate-sdk's hook generator failed"` BEFORE the `git add` and commit block: a loud
+  partial die over a half-written, uncommitted tree. Read on a machine with no Mac, at the same
+  tier as the original reading; the leg's first run is the oracle that settles it.
+  **THE TWO CANDIDATE FIXES ARE RULED AT SPEC and the amendment carries the ground:** the
+  construct is replaced portably AND an empty enumeration becomes a refusal, since the real defect
+  is that a failed enumeration is indistinguishable from an empty kit; the toolchain floor and
+  `docs/install.md` §Requirements are NOT widened to findutils, because after the fix the install
+  path carries no findutils extension and its only other GNU-isms — `sort -V` and
+  `realpath --relative-to` — are already named there.
+  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by build; promoted
+  2026-09-06 at spec into the leg that carries it.
+
+- **kit-spec-provenance-seam-sweep-remainder** [spec: SPEC-seam-slice.md] — EIGHT kit SPECs
+  [precondition-ok: both forward preconditions named below — the pointer-class answer and the
+  recording-rule carve-out — bind the slice that lands the GATE, not this three-kit sweep, which
+  ships the pointer class intact by design and builds no gate]
+  carried this project's ruling provenance; this slice takes THREE — lifecycle, delegation,
+  queue — off the parent's own rank order, leaving FIVE kits and the gate.
+  **OWED ON A RE-GROUNDED BASIS, 2026-09-06 — operator, direct answer to the lead session's ask,
+  lead-relayed:** the 2026-09-03 standing direction is SPENT, and the operator chose RE-GROUNDING
+  over renewing it, so what carries this now is product-class with a live trigger on its own
+  accretion.
+  **IT DEMOTES AT BUILD, NEVER AT CLOSE** (`lead, own-authority`, 2026-09-06): the deliverable is
+  a corpus, so the next cut re-promotes with its own amendment, and `check-stage-entry` assertion
+  B refuses a validate entry on a non-empty active queue.
+  **DO NOT RE-AUTHOR THE PREDICATE OR RE-RUN THE SCAN — RECOVER IT** from the parent half's merged
+  amendment, `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`: delta 1 is the discriminator (the
+  seam decides the VOICE, never the content), delta 2 the taxonomy, delta 3 the move-versus-delete
+  test. Delta 1's COROLLARY is the sizing lever — the test is the IDENTIFIER, never the tense —
+  and delta 2 excludes a dated MEASUREMENT, whose date is its freeze and must survive.
+  **WHAT THE FAILING SCANS MISSED IS EVENT DEIXIS, NOT UNDATED AUTHORITY:** 39 of 48 candidate
+  sites over the first swept slice, against 3 undated-authority sites, 2 of them dated. A date
+  scan plus that subclass MISSES AGAIN — neither sees queue slugs, cut ordinals or port
+  chronology. This slice's census is FILED on `.workflow/survey-record.md` with the witness a
+  later stage runs: ~38 sites and ~100-125 lines across the three, with the nine event-deixis
+  sites enumerated by line.
+  **THE RANK ORDER ORDERS AND NEVER COUNTS** — lifecycle, delegation, queue, canon, doctrine,
+  drift, site, evidence. It held qualitatively and failed quantitatively at ranks 3 and 6 over
+  the first slice; across THIS slice's three it also held quantitatively (20 > 11 > 7), which
+  adjudicates nothing about the five that remain.
+  **MOVE-VERSUS-DELETE OVER THE EARLIER SLICES IS ANSWERED, NO SWEPT SITE WAS SOLE-HOME, and
+  drift-kit IS STILL LAST TO OWE IT.** At guard-kit §scratch-run's retired consumer opt-out it
+  resolved to *do not delete the paragraph*: the ground stays restated impersonally and the spent
+  stamp goes to git history, since migrating a finished ruling back into the record is what its
+  doctrine forbids. drift-kit's half of that spent pair is untouched, owes that, and owes its
+  spelling's fixture shape — a parenthetical date.
+  **THE POINTER CLASS STAYS OPEN and ships intact for the third consecutive unit.** Re-verified
+  2026-09-06 as still EXACT at 17 across five kit SPECs (gate-sdk 10, guard-kit 4,
+  canon-kit/delegation-kit/lifecycle-kit 1 each; queue-kit zero), plus a `docs/`- and
+  `BRIEF.local.md`-class the same question reaches. Two fall in this slice. A derivation, not a
+  ruling, open for the lead or operator and outside the ruled discriminator; answerable for every
+  kit SPEC at once or not at all, so the answer is owed BEFORE the slice that lands the gate and
+  not before any earlier one.
+  **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile.** It must encode the
+  sanctioned exemption for gate-sdk/SPEC.md §The decisions this substrate already closed (`lead,
+  own-authority` 2026-09-05), which retires only if
+  `provenance-ownership-recording-rule-assigns-into-kit-specs` lands first.
+  **DISCHARGE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and the gate
+  is green", so it survives until this entry lands WHOLE.
+  Filed 2026-09-05 at scope with the split that created it; promoted and demoted 2026-09-06;
+  re-promoted 2026-09-06 at spec for the three-kit slice.
+
 ## Technical Debt
 
 ## Deferred
@@ -643,50 +737,6 @@
   round a loop with no exit.
   Filed 2026-08-30 by close from the gap inbox, attested by that session while
   recovering from the loop this describes.
-
-- **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
-  install-smoke leg; nothing has ever run green against macOS.
-  roadmap-summary: A CI install-smoke leg on macOS, so the platform claim has a run behind it.
-  Split 2026-08-26 at build from `platform-support-ci-matrix`, which keeps the Windows leg, under
-  the operator ruling that reversed that entry's no-split line: the two legs stopped being
-  co-built when Windows landed and macOS never started, and they now take different dispositions.
-  **The cost is measured rather than estimated.** Runners are not the obstacle and never were: the
-  repo is public, so `macos-latest`, `macos-26` (arm64) and `macos-15-intel` / `macos-26-intel`
-  (x64) are all available at no cost, and `macos-13` is retired and no longer a label at all. What
-  the leg must actually buy is a GNU userland — the `macos-15-arm64` image ships bash 3.2.57 with
-  no coreutils and no gawk, while cargo, rustc, jq, node and Homebrew are present. So the leg
-  brew-installs bash, coreutils and gawk and PATH-orders them ahead of `/usr/bin`, which is
-  precisely the adopter action `docs/install.md` §Requirements documents and which this entry
-  exists to put a run behind. Measured at build 2026-08-25 against the runner-image manifests.
-  **One defect it will meet is already known, which is why a first-try green is not the planning
-  assumption.** `installer/lib/init.sh:197`'s unconditional vendoring loop uses `find -printf`, a
-  GNU findutils primary macOS does not carry, so a stock-macOS init vendors zero files and still
-  writes a manifest. Owned by `init-vendoring-assumes-gnu-findutils`, which the 2026-08-26 drain
-  promoted out of the gap inbox — read that entry for the two candidate fixes rather than
-  re-diagnosing here. (This paragraph said "undrained" when it was written; corrected at close.)
-  **What the Windows leg already bought this one.** `platform-support-ci-matrix` carries the
-  instrument shape a second leg copies — a non-blocking probe-then-suite job — and most of the
-  unanswered probe questions it lists are ones a macOS host owes answers to as well. Read that
-  entry before designing this leg rather than re-deriving its shape.
-  **Cost while deferred:** macOS is named in the trajectory's OS-reach objective and every claim
-  the project makes about it stays a reading rather than a measurement, and the `find -printf`
-  defect above sits unfixed on the install path every macOS adopter takes today.
-  **PORT-CRITICAL, OWN-ITERATION SHAPE — RULED 2026-09-05 (operator, consult):** a lawful
-  iteration under the run then standing, and the port-first run that superseded it the same day
-  names this leg's shape in terms — port-critical, its own iteration when it cannot ride a cut
-  (TRAJECTORY.md §PRIORITY DIRECTIVE). The ruling is re-named onto its successor, never reversed;
-  the `find -printf` fix rides inside it.
-  **OPENED 2026-09-06 — operator, direct answer to the lead session's ask, lead-relayed.** Ruled
-  AGAINST both the scope session's recommendation and the lead's, and with the 2026-09-05
-  own-iteration ruling above put in front of the operator in as many words, so it is ruled with that
-  fact in view rather than around it. Scope had recommended deferring one iteration on the push
-  budget — the Windows leg spent fourteen rounds — and that concern is recorded ANSWERED rather than
-  overlooked: `platform-support-ci-matrix`'s standing file-and-defer-without-looping ruling bounds
-  it, so a red cause is filed and NOT looped on. `init-vendoring-assumes-gnu-findutils` rides inside
-  per the 2026-09-05 arrangement, which is now the arrangement being EXECUTED rather than one being
-  pre-empted. Its own text — "the defect is live whether or not a macOS leg is ever bought" — is why
-  the rider survives a leg that ends in file-and-defer.
-  Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
   forks are RULED**: fork 2 on 2026-08-26 by the operator — two hand-kept bootstraps, parity held
@@ -7566,31 +7616,6 @@
   a read of four gate sources — the re-derivation the survey record exists to prevent.
   Filed 2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
 
-- **init-vendoring-assumes-gnu-findutils** [design-pending] — `checkwright init` enumerates each
-  kit's payload with `find -printf`, a GNU findutils extension, in the loop that vendors every
-  install — so a stock macOS or BSD host vendors zero files and still writes a manifest.
-  `installer/lib/init.sh:197` runs `find . -type f -printf '%P\n'` unconditionally per kit; `:126`
-  uses the same construct on the artifact path, conditionally and with stderr suppressed. Where
-  `find` refuses the primary, the `while`-read loop receives nothing and `init` reports a successful
-  install over an empty tree instead of refusing.
-  **The documented floor does not cover it, and the near-miss is the trap.**
-  `context-kit/lib/toolfloor.sh`'s `PROBE_SET` names `awk::GNU` and `sort::coreutils` and no
-  findutils member; `docs/install.md` §Requirements offers coreutils and gawk as the stand-ins.
-  `find` ships in findutils, so an adopter who installs exactly what the page names still has a
-  broken `init` and no probe fires.
-  **Why `[design-pending]`, two candidate fixes differing in kind:** name GNU findutils on the
-  toolchain floor and in §Requirements, a user-facing widening of what an adopter must install; or
-  replace the construct with a portable one, an adopter-path code change costing nobody anything.
-  The second reads preferable on its face, and the open call is whether the floor should widen
-  anyway, since this loop is not the only GNU-ism the install path may carry.
-  **Found by reading, on a machine with no Mac.** This is the class `platform-support-ci-matrix`
-  exists to surface, and it CITES that entry rather than waiting on it: the defect is live whether
-  or not a macOS leg is ever bought.
-  **Cost while deferred:** the published install path is silently broken for every non-GNU host,
-  in the worst available failure mode — a green `init` over an empty vendor tree, discovered later
-  as missing kits rather than at install time.
-  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by build.
-
 - **wait-record-self-deadlock** [design-pending] — a backgrounded **wait** that registers itself as
   a producer makes its own exit condition unsatisfiable, and blocks every concurrent session's
   commits while it spins.
@@ -9159,56 +9184,6 @@
   and its own reading instead of reading a figure, which is the state the sizing ruling names and
   declines to leave.
   Surfaced 2026-09-03 in the consult that closed the build-window sizing ruling; drained here.
-
-- **kit-spec-provenance-seam-sweep-remainder** [design-pending] — EIGHT kit SPECs still carry this
-  project's ruling provenance, plus the seam gate that can only go green once the last is swept.
-  gate-sdk landed with the parent split; context-kit and guard-kit landed 2026-09-06, 14 sites.
-  **IT BELONGS IN `Deferred`, NEVER `Done`, AND IT DEMOTES AT BUILD, NEVER AT CLOSE** (`lead,
-  own-authority`, 2026-09-06): the deliverable is a corpus, so the next cut re-promotes with its own
-  amendment (canon-kit/SPEC.md §Merging an amendment), and `check-stage-entry` assertion B refuses a
-  validate entry on a non-empty active queue, so a close demotion makes the by-kit split impossible.
-  A by-kit slice needs no waiver — TRAJECTORY.md §PRIORITY DIRECTIVE grants scope the split.
-  **OWED ON A RE-TAKEN GROUND, 2026-09-06 — operator, direct answer to the lead session's ask,
-  lead-relayed.** The 2026-09-03 standing direction (a joined unit beside the test-harness cut) is
-  SPENT: that iteration ran and joined it. The operator chose RE-GROUNDING over renewing the
-  direction, so what carries this now is **product-class with a live trigger** on its own accretion,
-  not the original direction still running.
-  **DO NOT RE-AUTHOR THE PREDICATE OR RE-RUN THE SCAN — RECOVER IT** from the parent half's merged
-  amendment, `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`: delta 1 is the discriminator (the
-  seam decides the VOICE, never the content — a ground carried with an authority, a date, a channel
-  or an internal identifier is swept; an undated engineering ground naming none of those STAYS),
-  delta 2 the taxonomy, delta 3 the move-versus-delete test. Delta 1's COROLLARY is the sizing lever
-  — the test is the IDENTIFIER, never the tense — and delta 2 excludes a dated MEASUREMENT, whose
-  date is its freeze and must survive. **WHAT THE FAILING SCANS MISSED IS EVENT DEIXIS, NOT UNDATED
-  AUTHORITY:** 39 of 48 candidate sites over the swept slice, against 3 undated-authority sites, 2
-  of them dated. A date scan plus that subclass MISSES AGAIN — neither sees queue slugs, cut
-  ordinals or port chronology. The parent's rank order — lifecycle, delegation, queue, canon,
-  doctrine, drift, site, evidence — held qualitatively and failed quantitatively, at 7 swept sites
-  per kit against ranks 3 and 6, so it orders and never counts.
-  **MOVE-VERSUS-DELETE IS ANSWERED, NO SWEPT SITE WAS SOLE-HOME, drift-kit IS LAST TO OWE IT.** At
-  guard-kit §scratch-run's retired consumer opt-out it resolved to *do not delete the paragraph*:
-  the ground stays restated impersonally and the spent stamp goes to git history, since migrating a
-  finished ruling back into the record is what its doctrine forbids. drift-kit's half of that spent
-  pair is untouched, owes that, and owes its spelling's fixture shape — a parenthetical date.
-  **THE POINTER CLASS IS OPEN, answered for EVERY kit SPEC at once or
-  not at all** — `CLAUDE.md §The provenance seam` citations resolve in this tree and in no vendoring
-  consumer's: 17 across five kit SPECs (gate-sdk 10, guard-kit 4,
-  canon-kit/delegation-kit/lifecycle-kit 1 each), plus a `docs/`- and `BRIEF.local.md`-class the
-  same question reaches. ALL still stand, deliberately: the parent filed it unanswered and shipped
-  its ten intact; the slice left its nine likewise. A derivation, not a ruling, open for the lead or
-  operator; outside the ruled discriminator, so the gate encodes whichever way it goes.
-  **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile**: the split defers rather
-  than dissolves enforcement-first's one-unit objection. **IT MUST ENCODE ONE SANCTIONED
-  EXEMPTION:** gate-sdk/SPEC.md §The decisions this substrate already closed is carved out (`lead,
-  own-authority 2026-09-05`) — TRAJECTORY.md positively ASSIGNS it that ownership, so a gate blind
-  to it reds on a section the ruling record blesses; it retires only if
-  `provenance-ownership-recording-rule-assigns-into-kit-specs` lands first. **DISCHARGE:**
-  TRAJECTORY.md's directive paragraph discharges on "that unit lands and the gate is green", so it
-  survives until THIS entry lands WHOLE. **Cost while deferred:** eight published kit SPECs and
-  every adopter's vendored copy carry private ruling history as mechanism and pointers a consumer
-  cannot follow; product-class and accreting — two new sites landed in one iteration from cuts not
-  editing provenance. Filed 2026-09-05 at scope with the split that created it; promoted and demoted
-  2026-09-06.
 
 - **provenance-ownership-recording-rule-assigns-into-kit-specs** [design-pending]
   — TRAJECTORY.md's recording rule does not merely permit the provenance class the seam sweep
