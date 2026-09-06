@@ -2467,8 +2467,8 @@ change**, and it belongs beside that worst case for the same reason: `uname`,
 `PROBE_SET` lives in a file rather than in the crate (context-kit/SPEC.md
 §bin/env-probe).
 **`--emit-always-loaded` is the second such member**, and its changeable element
-is a whole command rather than a roster entry: `bash`, plus `git` for the
-`--growth` mode's `diff --numstat` and the `--update-baseline` mode's `rev-parse`,
+is a whole command rather than a roster entry: `bash`, plus `git` for the baseline
+commit and the growth diff,
 plus whatever program the consumer's `CONTEXT_KIT_HOOK_CMD` names — the knob being
 a command seam the port deliberately keeps spawned (context-kit/SPEC.md §The
 always-loaded meter). `--needs` answers about registry members only and a bridged

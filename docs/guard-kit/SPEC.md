@@ -2236,20 +2236,14 @@ distinguishable:** a crate test is the right home when the member's **subject**
 is in-crate, which the escalation guard's is; an arm is the right home when the
 subject is a spawned shell surface the payload ships, which `bash-guard.sh` is.
 
-**The `run-guard-tests` cut emptied this section's owed set and not the kit's**,
-and the difference earned a sentence because a kit whose owed column shrinks to
-one reads as discharged. `bin/run-guard-tests.sh` was §Testing's one owed file,
-so that cut and the section coincided; `lib/guard.sh` and `templates/bash-guard.sh`
-carry `# no-port:` on the two independent grounds §The guard framework states.
-What stayed owed to guard-kit was `bin/compare-settings-allow.sh`
-(§compare-settings-allow) — a different section, correctly homed, and takeable as
-a singleton on its own rather than behind anything that cut moved.
-
-**The `compare-settings-allow` cut empties guard-kit's owed column outright, for
-the second time and the last.** That file was the only member left, and it ports
-to the `--emit-compare-settings-allow` arm above, carrying an `owed` reading
-nowhere. `lib/guard.sh` and `templates/bash-guard.sh` still carry `# no-port:` on
-the same two grounds, reopened by neither cut. Guard-kit has no owed file at
+**The `compare-settings-allow` cut empties guard-kit's owed column outright**, and
+it is the second cut to reach this section: the `run-guard-tests` cut took
+§Testing's one owed file, leaving `bin/compare-settings-allow.sh`
+(§compare-settings-allow) as the kit's last member — a different section,
+correctly homed, and takeable as a singleton — and this cut ports that to the
+`--emit-compare-settings-allow` arm above. `lib/guard.sh` and
+`templates/bash-guard.sh` carry `# no-port:` on the two independent grounds §The
+guard framework states, reopened by neither cut. Guard-kit has no owed file at
 all.
 
 A **third** table, `guard-tests/background-cases.tsv`

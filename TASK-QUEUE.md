@@ -4073,7 +4073,7 @@
   entry naming a *script path* rather than a fixed command grants whatever that file says at
   run time, and a path under the gitignored scratch dir is rewritable by any session, so the
   run routes through the `--scratch-run` arm and the direct-path grant is removed.
-  `guard-kit/bin/compare-settings-allow.sh` builds only `redundant` and `too_broad`; it has no
+  The `compare-settings-allow` arm builds only `redundant` and `too_broad`; it has no
   content-pin arm and prints no such section, so that disposition is hand-executed every close
   against an unbounded surface, with the template's own wording ("Read the shape, not the
   literal") as the only method.
@@ -4590,7 +4590,7 @@
 
 - **consumer-guard-rule-coverage** [design-pending] — the guard decision table has no reach into
   the consumer copy, so this repo's most destructive guards are its untested ones.
-  `guard-kit/bin/run-guard-tests.sh` drives `guard-kit/templates/bash-guard.sh`, so the three
+  The `--run-guard-tests` arm drives `guard-kit/templates/bash-guard.sh`, so the three
   project rules in `scripts/bash-guard.sh` — the hook-bypass block, the harness-scratchpad path
   block and the `git clean -x` block — carry zero behavioral coverage. It was four until
   `scratch-execution-control-is-bash-only` generalized the scratch-run steer into rule 23 and
@@ -5061,7 +5061,7 @@
   grant live on the machine it was working on. That is the tracked-versus-local split this entry
   already names, now with a measured instance: the gateable corpus is the one that was checked, and
   the ungateable one is where the dead grant survived.
-  **Why the existing tool cannot see it.** `compare-settings-allow.sh` reports redundancy (a
+  **Why the existing tool cannot see it.** The `compare-settings-allow` arm reports redundancy (a
   committed glob already grants the entry) and breadth (a declared probe the glob auto-allows).
   Both compare *globs against globs*; neither resolves a target. A dead entry is redundant with
   nothing and broad over nothing, so it reports clean — and it reported clean on all seven.
@@ -5073,7 +5073,7 @@
   **Why `[design-pending]`:** the corpus is the open part, and it is a tracked-versus-local
   question. The committed allowlist is tracked and gateable; the overlay is gitignored and
   per-machine, so a *gate* over it would red on a state no commit can fix — the shape a
-  pre-commit gate must not have. Candidates: an advisory arm on `compare-settings-allow.sh`,
+  pre-commit gate must not have. Candidates: an advisory mode on `--emit compare-settings-allow`,
   which already reads both files, is already advisory, and would cost no new surface and no
   gate; a committed-only gate plus that advisory arm; or resolving only entries whose first
   token is a known interpreter followed by a repo-relative path, which is the subset decidable
@@ -6547,7 +6547,7 @@
   outlive its subject with nothing noticing: the knob records a ruling about one glob and never
   verifies that glob is still in the local allowlist, still over-broad, or still real.
   **Probed at the drain:** the declaration lookup sits *inside* the local-allow-by-breadth-probe
-  loop (`guard-kit/bin/compare-settings-allow.sh`), so a declaration keyed on an entry that has
+  loop (the `compare-settings-allow` arm), so a declaration keyed on an entry that has
   left the overlay is never looked up — it is not reported stale, it is not reported at all.
   **A stale-declaration *red* was already weighed and refused** inside the amendment that shipped
   the knob, because it would print every declaration naming a committed glob as stale. The cheap
@@ -9321,14 +9321,14 @@
   `scratch-run.sh --help` answered `scratch-run: no such script: --help` at exit 2;
   `compare-settings-allow.sh --help` prints usage on **stderr** at exit 2, the unrecognized-option
   refusal branch and not a help arm; `stage-economics.sh --help` **ignored the argument entirely
-  and ran the full meter**. The first and third were ported to bridged arms 2026-09-05 and their
-  shell paths deleted, so **only the middle probe is still live**; the other two stay as the
-  attested shapes the design question is about, never as current instances.
+  and ran the full meter**. ALL THREE shell paths are now deleted (the first and third 2026-09-05,
+  the middle 2026-09-06), so all three stay as attested shapes and none is a current instance.
   **Why they survived, and it is not "no gate reads the contract".** That is ruled and deliberate
   (gate-sdk/SPEC.md §The bin/-tool contract), and the ruling names its own substitute in the same
   breath — *"Each member's coverage follows it"*, behavioral coverage in `smoke/`, on the
   `enter-stage.sh --simulate` precedent. gate-sdk, lifecycle-kit and drift-kit smokes each carry it;
-  **guard-kit's `smoke/install.sh` is 26 lines and carries none**, for two `bin/` tools. The gap
+  **context-kit's and doctrine-kit's smokes carry none**, one `bin/` tool each, measured at the
+  2026-09-06 close; guard-kit's carried none either and its `bin/` left with the cut. The gap
   is the kits that never took the ruled substitute, not a missing scanner.
   **Why `[design-pending]`: the contract's own scope is the design question.** §The bin/-tool
   contract states its three behaviors under a free-text-positional rule, yet

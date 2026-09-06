@@ -17,7 +17,7 @@ granted — the one thing that *is* recorded. See [SPEC.md](SPEC.md) for the
 framework, the generic ruleset, what the steering buys, and the triage criterion.
 
 Unlike the other kits, guard-kit registers **no gates**: its surfaces are
-hooks and advisory `bin/` tools, so nothing joins `gates.list`. It follows
+hooks, a library and templates, so nothing joins `gates.list`. It follows
 gate-sdk's layout and smoke conventions without depending on its registry.
 
 ## Install
