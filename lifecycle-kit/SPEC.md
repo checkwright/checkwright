@@ -1333,6 +1333,11 @@ boundary's ranking, `finding` by the consuming session. The heading is the
 discovery key and it states the *question*, because a later stage searches by
 the question it is about to ask, not by the corpus it has not yet chosen.
 
+**`corpus` is spliced verbatim into the composed witness, so it is a pathspec
+and nothing else.** Scoping prose belongs in `finding`. Prose in this field does
+not error: `git diff` accepts the words as pathspecs matching nothing and exits
+clean, so the witness certifies a corpus it never read.
+
 **`edges` sits fourth, between the witness and the judgment, and the position is
 not arbitrary.** `corpus`, `oracle` and `rev` are the *witness* — the three
 strings the two-command re-use protocol consumes — and they stay contiguous.

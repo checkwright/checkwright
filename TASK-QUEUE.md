@@ -398,6 +398,54 @@
   Filed 2026-08-30 by close from the gap inbox, carrying the first census
   datum it asked for.
 
+- **design-pending-tag-restates-its-own-section** [design-pending] — the tag every deferred entry
+  carries is derivable from section membership alone, which is the two-sources defect
+  queue-kit/SPEC.md refuses by name for a challenger while exempting the incumbent.
+  **The argument is the spec's own, not a filer's.** queue-kit/SPEC.md:190-194, ruling out an
+  `[icebox]` tag for the icebox tier: "No `[icebox]` tag is minted: section membership *is* the
+  state, and a tag restating its own section is the two-sources defect. What generalizes across
+  the amendment lifecycle is the design-pending **section set**, not its tag set." This tag
+  restates its own section set exactly as the refused one would have, and derivation-first says
+  the same independently. The coupling is total and BIDIRECTIONAL —
+  `native/src/gates/amendment_queue.rs` reds a deferred entry lacking the tag (:201) and an
+  active entry carrying it (:191, :197) — which is a proof of derivability, not a protection.
+  **Mechanical cause of the misreading, the part a rename fixes and a warning does not:** the
+  identical string names two things. On a lead line it is a structural section marker carrying no
+  information; in a body, `Why [design-pending]` is a conventional field (queue-kit/SPEC.md:32)
+  whose stated job is "what the open design actually is" — genuinely semantic. Re-derived at the
+  2026-09-06 drain: 4 body fields against 382 lead-line tags, 579 occurrences file-wide;
+  re-derive rather than compare a number, which drifts every demotion.
+  **Measured confusion cost, one iteration, two sessions:** a lead read the tag as a semantic
+  claim and proposed a stale-tag correction on an entry an operator ruling had already settled;
+  a scope session dropped the tag and TOOK THE RED learning the same thing, finding its own drain
+  prose contradicting itself in the process.
+  **The accidental-move defence does not survive contact, and it was this filer's own.** The
+  claimed value is a checksum making a cross-section move detectable. The promote direction is
+  ALREADY guarded by `amendment_queue.rs:205`, which reds a design-pending-section entry carrying
+  a spec-ref tag — keyed on a marker that carries real information. And the tag CREATES the
+  error class it detects: without it, relocating an entry is moving lines and there is nothing to
+  forget. That is a redundant field, not a guard. **The one honest residual, owed inside the
+  unit:** the demote direction keeps no equivalent checksum, and nobody has measured whether an
+  accidental demotion ever occurred — one `git log -L` over a section boundary answers it.
+  **Costed, mechanical and wide rather than deep:** the file-wide occurrences above; three checks
+  in `amendment_queue.rs` plus `tag_lead_line.rs` and `task_conservation.rs`; the grammar block
+  at queue-kit/SPEC.md:187 and the icebox paragraph whose argument would invert; four gate-test
+  fixture pairs under `queue-kit/gate-tests/`; and the docs mirrors. Far past fix-inline.
+  **PRODUCT-CLASS by the 2026-08-30 discriminator, without needing its counterfactual clause:**
+  shipped queue-kit grammar every adopter's queue wears and every adopter's gate enforces.
+  **Three alternative shapes, and this entry rules none — the choice is operator-class.** Remove
+  the tag and rely on section membership as the icebox tier does; or RENAME so the string cannot
+  be read as the body field's semantics, preserving the demote-direction checksum at the same
+  sweep cost; or keep as-is and document the trap, cheapest and leaving the confusion in place.
+  **This entry wears the tag it questions, and that is correct rather than a joke** — the grammar
+  binds until it is changed, and an entry exempting itself would be the second source it names.
+  **Cost while deferred:** every reader meets a string that is a section marker in one place and
+  a semantic field in another; the two sightings above are what that costs per iteration, and the
+  sweep grows by one lead line per demotion.
+  Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
+  whether the tag earns its keep; the operator noted having proposed removal before and gave no
+  ruling. Promoted 2026-09-06 by close — too wide to fix inline, live trigger bars the icebox.
+
 - **entry-compression-contract-unenforced** [design-pending] — the compression
   relief that queue-kit/SPEC.md §check-queue-entry-budget mandates most often
   is enforced by nothing, and the failure is invisible where it lands.
@@ -469,19 +517,16 @@
   silently off: the tool stamped the workflow-state file for real, printed its
   ordinary success line with no simulate prefix, and exited 0. The session
   intended a read-only probe.
-  **No harm landed, and that was luck rather than design** — the entry
-  happened to be clean and the stamp was wanted a moment later. Probing an
-  entry the session did NOT want to make would have left a write recoverable
-  only by hand-editing the evidence file.
+  **No harm landed on the first firing, and that was luck rather than design** — the entry was
+  clean and the stamp was wanted a moment later. The luck ran out at the fourth firing below.
   **The caller was wrong and the tool is still at fault.** The usage string
   does document flag-first. The defect is that a surplus argument is accepted
   and ignored rather than refused, and an in-repo precedent already settles
   which behaviour is right: `run-gates.sh` refuses an unrecognised option by
   name and prints usage, asserted by its own consumer smoke. The entry tool
   does neither.
-  **Candidate shapes, none costed:** refuse any argument after the stage name;
-  or accept the flag in any position; or make the mode an env knob so position
-  cannot express it. The first is smallest and matches the in-repo precedent.
+  **Candidate shapes, none costed:** refuse any argument after the stage name; or accept the flag
+  in any position; or make the mode an env knob so position cannot express it. First is smallest.
   **Cost while deferred:** the read-only mode is specifically the LEAD's
   instrument, gating an expensive dispatch on a cheap probe — so the caller
   most likely to probe rather than enter is the one a mis-ordered flag
@@ -504,7 +549,13 @@
   when the sweep costs its ten. Promotion is barred meanwhile: not port-critical
   by TRAJECTORY.md's test, and under the port-first run that superseded the port-only
   one it meets no other joining ground either; a recurrence count alone does not buy it.
-  recurrence: enter-stage-flag-position-silently-ignored 2026-09-05
+  **THIRD AND FOURTH ATTESTATIONS, BOTH 2026-09-06, one iteration.** Third: a lead session in
+  Split posture, where the write is also a posture violation. Fourth: a build session's probe
+  stamped a `validate` entry, moving the cursor a WHOLE STAGE AHEAD while that session still ran —
+  the blast radius that takes this off a single argv nit's icebox-class default. Cause pinned by
+  reading: `:152` honours the flag at argv[0] only and `:389` has no arity check, while the
+  sibling `:169`'s `rename()` tests `rest.len() != 1` and refuses.
+  recurrence: enter-stage-flag-position-silently-ignored 2026-09-05 2026-09-06
   Filed 2026-08-30 by close from the gap inbox, attested by the filing session
   upon itself.
 
@@ -5888,6 +5939,38 @@
   witnessed, at the moment a later stage is already relying on it.
   Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox.
 
+- **survey-witness-composed-from-unvalidated-corpus** [design-pending] — the `--emit file-survey`
+  arm composes its recorded witness command out of a `corpus:` field nothing validates, so a
+  survey files clean carrying a witness that reports a false clean.
+  **The mechanism, read at the 2026-09-06 drain rather than relayed.**
+  `native/src/emit/file_survey.rs:106-107` writes `- corpus: {}` verbatim into the block; `:123`
+  composes `git diff --quiet <rev>..HEAD -- <corpus>` out of the same unvalidated string. Nothing
+  between them checks that the corpus is usable as a git pathspec.
+  **The failure is a FALSE CLEAN, not an unrunnable command, and that is worse than filed.**
+  Probed at the drain: a witness whose corpus is a sentence of English exits **0**. A prose corpus
+  does not error; git accepts the words as pathspecs matching nothing, so the witness
+  affirmatively certifies "corpus unchanged, survey still valid" for a corpus it never looked at.
+  A later stage citing that witness is relying on a check that cannot fail.
+  **Scale, measured on the live record at the same drain:** of the 10 blocks in
+  `.workflow/survey-record.md`, **8 carry a corpus that is prose or prose-contaminated**. The two
+  runnable ones are precisely the two a session hand-repaired mid-flight — at the spec stage and
+  at a build batch, one iteration, both repairs manual and neither enforced. That recurrence is
+  the filing ground, not either sighting.
+  **DISTINCT from `survey-oracle-liveness-unasserted`** above, whose subject is the `oracle:`
+  field naming a boundary-wiped path — a witness that fails loudly when run. This one's subject is
+  the `corpus:` field, and its witness passes.
+  **Same fail-open family as `enter-stage-flag-position-silently-ignored`:** a tool composing a
+  command out of input it does not validate and then reporting success. Recorded as a family
+  resemblance, not a merge — different arm, different input, no shared fix.
+  **Candidate shapes, none ruled:** refuse a corpus whose leading token is not an existing path;
+  or warn at file time and record the block anyway; or drop the composed witness and record the
+  corpus as prose only, which is honest and loses the affordance the record was minted for.
+  **Cost while deferred:** every survey filed with a prose corpus hands the next stage a green
+  witness it did not earn, and the record's whole value rests on that witness discriminating.
+  Judged and filed 2026-09-06 by the lead at build, own-authority, on the recurrence rather than
+  on either sighting. Promoted 2026-09-06 by close after →fix failed (the shape is unruled and the
+  change is crate work scope gates) and →icebox failed (a live per-filing trigger).
+
 - **lead-held-block-no-sanctioned-surface** [design-pending] — a lead-held block is invisible to
   the queue and its gates, so the next session picks a latently-blocked entry as first-unblocked.
   **The instance, and it did not bite.** This iteration the lead held two units blocked on an
@@ -9216,20 +9299,21 @@
   Filed 2026-09-05 by spec, on the lead's ruling (`lead, own-authority 2026-09-05`) that the
   carve-out stands and its real fix is the recording rule.
 
-- **bin-tool-help-arm-absent-tree-wide** [design-pending] — nine of the eleven shipped `bin/`
-  tools, across four kits, answer `-h`/`--help` with something other than usage on stdout at
-  exit 0.
+- **bin-tool-help-arm-absent-tree-wide** [design-pending] — most shipped `bin/` tools answer
+  `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
+  and deliberately not frozen in this sentence.
   **THE CENSUS IS DERIVABLE AND THIS IS ITS COMMAND**, stated on the entry because a count whose
   oracle is unstated is unmaintainable by anyone but its author. Run
-  `git ls-files '*/bin/*.sh' | grep -v '/gate-tests/' | xargs grep -L -- '--help'`; it returns
-  **9** of 11 shipped tools, re-derived 2026-09-05 at the meter-pair build, whose three cuts
-  deleted three more shipped tools. Dropping the `grep -v` re-admits the three gate fixtures the
-  census excludes. The proxy is static and a **lower bound** — a file merely mentioning `--help`
-  in a comment counts as having an arm — but it was checked exact at this reading: the only two
-  matching tools, `gate-sdk/bin/run-gates.sh` and `installer/bin/checkwright.sh`, each carry a
-  real `-h | --help)` dispatch branch. The nine sit in **four** kits — context-kit, doctrine-kit,
-  gate-sdk, guard-kit — drift-kit having left the corpus entirely when the meter pair's port took
-  its last `bin/` member and the directory with it.
+  `git ls-files '*/bin/*.sh' | grep -v '/gate-tests/' | xargs grep -L -- '--help'`. Dropping the
+  `grep -v` re-admits the gate fixtures the census excludes. The proxy is static and a **lower
+  bound** — a file merely mentioning `--help` in a comment counts as having an arm — but it was
+  checked exact at the 2026-09-05 reading: the only matching tools, `gate-sdk/bin/run-gates.sh`
+  and `installer/bin/checkwright.sh`, each carry a real `-h | --help)` dispatch branch.
+  **RE-DERIVED 2026-09-06 at close, and the drift is this entry's own lesson landing on itself:**
+  the command returns **5 of 7**, in **three** kits (context-kit, doctrine-kit, gate-sdk). The
+  corpus was already 9 at that iteration's start, so two tools had left before the port cuts took
+  the other two, and guard-kit has now left the `bin/` corpus entirely as drift-kit did. The lead
+  line's frozen count was falsified twice over and is de-literalized here. Run the command.
   **Every earlier figure on this entry is superseded by that command and none is restated**, which
   is the whole reason the command is here: a 2026-09-04 measurement stated no pattern and no later
   session could reproduce it: re-derive rather than compare a bare number.
@@ -9253,11 +9337,11 @@
   most of the census — is unstated, and the answer sets the corpus before any member is fixed.
   **Cost while deferred:** one wrong answer instead of usage per session that probes a tool for its
   modes, and the attested shapes are silently-wrong rather than merely unhelpful.
-  **Six of the nine are also owed to the port**, so a cut can apply the split per member — but only
-  once the scope question is answered, since it decides which members owe an arm. The other three,
-  `gate-sdk/bin/build-native.sh`, `gen-pre-commit.sh` and `run-consumer-smoke.sh`, are declared
-  `no-port` and will never ride a cut, so their arm has no cut to ride and needs its own. That
-  split re-derives off the census command joined with `--emit port-blockers --tree`.
+  **The remainder is also owed to the port**, so a cut can apply the split per member — but only
+  once the scope question is answered, since it decides which members owe an arm. `build-native.sh`,
+  `gen-pre-commit.sh` and `run-consumer-smoke.sh` are declared `no-port` and will never ride a cut,
+  so their arm has no cut to ride and needs its own. That split re-derives off the census command
+  joined with `--emit port-blockers --tree`.
   Filed 2026-09-04 to the gap inbox at spec as a guard-kit-local two-tool finding; WIDENED at that
   drain from 2 tools to a tree-wide census and from "no gate" to "no smoke coverage", after →fix
   failed on the unsettled scope question and →icebox failed on the live per-session trigger.
@@ -9401,7 +9485,7 @@
   mid-iteration advisory — so one killed run converts into a blocked boundary for whoever arrives
   next, which is why the filing close met it only as a warning.
   **DISTINCT from every open worktree entry, checked rather than asserted.**
-  `worktree-lock-pid-is-not-agent-liveness`, `worktree-lock-start-time-guard-untaken` and
+  `worktree-lock-pid-is-not-agent-liveness` (retired), `worktree-lock-start-time-guard-untaken` and
   `worktree-cleanliness-assertion-scopes-to-checkout` are all about the DETECTOR's judgment, and
   `upgrade-smoke-refuses-inside-a-worktree` is about running INSIDE one. This is the PRODUCER
   never cleaning up. It re-files none of them and adds no recurrence date to any.
@@ -9422,6 +9506,41 @@
   session has to be told about.
   Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
   2026-09-04 at this iteration's scope entry, the boundary having carried it.
+
+- **worktree-reap-unasserted-at-dispatching-turn-end** [design-pending] — nothing asserts the
+  worktree reap at the DISPATCHING session's own turn end, so an orphan minted mid-iteration
+  survives every later session until an iteration boundary meets it.
+  **This is shape three of the retired `worktree-lock-pid-is-not-agent-liveness`**, whose shapes
+  one and two landed 2026-09-06 and whose slug is now out of the pool, so that pointer resolves
+  to history rather than to live work; the substance is restated here rather than cited.
+  **Ruled out of that unit's ENVELOPE, not refuted — operator, 2026-09-06, through an interactive
+  prompt in the lead session, relayed by the lead.** The ruling scoped one iteration's work and
+  said nothing about the shape's merit; the parent entry recorded it in exactly those terms,
+  "deferred rather than refuted".
+  **The record's own argument for it, and it is the evidence that ranked the shapes.** The fourth
+  sighting, 2026-09-06: an orphan minted at the prior iteration's spec stage survived align, three
+  build sessions, validate and close without any of six sessions noticing, and only the boundary
+  refusal surfaced it. Those five later sessions had no reason to look, and the party who knew
+  what the worktree was for was gone six sessions before the refusal fired. Reaping at the
+  dispatching turn end is the only shape that puts the judgment where the knowledge is.
+  **DISTINCT from what landed and from what already exists.** Shape one gave the boundary
+  refusal's LIVE branch a loss-gated reap remedy, which reaches a session that ALREADY MET the
+  refusal. Shape two told delegation-kit's isolation bullet that a lock reason's pid is the
+  harness's and not an agent liveness signal. Neither reaches an orphan nobody has met yet, and
+  delegation-kit's reap-both-halves rule says WHAT to delete while staying silent on WHEN.
+  **Candidate shapes, none costed:** assert the reap in the dispatching session's turn-end
+  obligations beside the existing liveness-record rule; or have the isolation arm register the
+  worktree so a later sweep reaps it without the dispatcher; or leave it to the boundary and
+  accept the latency, which is today's behaviour.
+  **Cost while deferred:** an orphan minted at any stage rides to the next iteration boundary and
+  converts there into a refused entry for a session with no context on it, which is the one moment
+  the loss question is hardest to answer; measured at six sessions of carry on the sighting above.
+  Filed 2026-09-06 by a build session to the gap inbox so the ranked evidence would survive the
+  parent's move out of the pool, explicitly as a record rather than a re-opening, and called
+  icebox-class by default there. Promoted to Deferred instead at the 2026-09-06 close —
+  `lead, own-authority`, 2026-09-06, relayed to the close session in its dispatch — on the ground
+  that the parent had already recorded the shape as deferred rather than refuted, which is a live
+  trigger the icebox tier's no-live-trigger predicate refuses.
 
 - **ere-matcher-capture-groups-unowned** [design-pending] — the crate's POSIX ERE matcher reports
   spans and cannot report a capture group, so the first consumer needing one shells out to bash.
@@ -10037,9 +10156,5 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
-
-- always-loaded-meter-port-cut
-- settings-allow-port-cut
-- worktree-lock-pid-is-not-agent-liveness
 
 ## Lessons Learned
