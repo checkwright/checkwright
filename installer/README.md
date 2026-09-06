@@ -1465,8 +1465,9 @@ the manifest verdict at 1.** `starter: N of N manifest entries disagree with the
 tree` at exit 1 is a statement *about the consumer*: the tree `init` wrote no
 longer matches what `init` recorded. If instead a value reached the comparison
 malformed, nothing about the consumer has been established and the honest code
-is the harness-precondition one — the same line this section already draws for
-the report's own construction, extended from the report to the arm's operands.
+is the harness-precondition one — the code every preflight refusal in this
+script already takes, from a missing tool to a crate that will not compile,
+reached one step inward to the arm's own operands.
 The arm therefore shape-tests both operands on the failure branch, and after the
 report has printed it routes a malformed one through `blocked` at exit 2 instead
 of `fail` at exit 1. **It fires after the report, not at the first bad value**,
@@ -1476,6 +1477,16 @@ This does not make the shape row above redundant: that row tells a **reader**
 what a bad rendering means, and this makes the **arm** act on it. A report a
 human reads and a verdict a suite reads are two consumers, and deleting either
 for the other is the mistake.
+
+**What the arm must not do is normalize.** Trimming the operands to their
+40-hex core before comparing would turn a mangled-operand red green, and it is
+the one repair this arm is closed to: it would make the instrument accept a
+broken producer silently — enforcement inverted, the defect absorbed by the
+detector — and it would make a subsequent green unreadable as evidence, because
+such a green fails to distinguish *the tree matches* from *the tree matches once
+the arm discards whatever reached it*. The refusal above is the honest form of the
+same observation: an operand that is not a hash stops the run instead of being
+repaired into one.
 
 Once per failing profile, and outside the per-path block because each is a fact
 about the run rather than about a path, the report also prints the consumer's
