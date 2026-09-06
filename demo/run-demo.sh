@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: CLAUDE.md §Housekeeping — narrated end-to-end adoption walkthrough on the consumer-smoke mechanics; exit 0 asserts the whole arc (vendor → clean pass → violation blocked → fix → green), the evidence-kit 'demo' validate suite each validate stage re-runs.
+# spec: gate-sdk/SPEC.md §Consumer smoke — narrated end-to-end adoption walkthrough on the consumer-smoke mechanics; exit 0 asserts the whole arc (vendor → clean pass → violation blocked → fix → green), the evidence-kit 'demo' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -8,7 +8,7 @@ source "$REPO/gate-sdk/lib/gate.sh"
 # shellcheck source=../gate-sdk/lib/consumer-smoke.sh
 source "$REPO/gate-sdk/lib/consumer-smoke.sh"
 
-# spec: CLAUDE.md §Housekeeping — DEMO_TMP_DIR is the only knob; default is the smoke harness's scratch base
+# spec: gate-sdk/SPEC.md §Consumer smoke — DEMO_TMP_DIR is the only knob; default is the smoke harness's scratch base
 BASE="${DEMO_TMP_DIR:-${TMPDIR:-/tmp}}"
 SCRATCH="$(mktemp -d "$BASE/demo-consumer.XXXXXX")"
 cleanup() { rm -rf "$SCRATCH"; }

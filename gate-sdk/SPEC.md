@@ -2178,7 +2178,13 @@ consumer's CLAUDE.md owns no mechanism, so a file whose `# spec:` points there i
 doc that owns the file's mechanism, and the file then cuts as a singleton under
 that owner. This is not the re-pointing the paragraph above refuses: that one
 moved a file away from a SPEC section that already owned it, and this one gives a
-file the owner it never had.
+file the owner it never had. The worked instance is the adoption walkthrough: its
+header and its knob line both pointed at a consumer's CLAUDE.md, a section that
+described the walkthrough and specified no mechanism of it — not even the scratch-base
+knob that line told the reader it owned — while the file's own third pointer already
+named §Consumer smoke for the one decision it had needed a spec for. The pointers
+re-home there first and separately, because re-homing is a legal end state on its own
+and the reverse order leaves no tree in which the mis-homing was ever corrected.
 
 **A consumer's plugin on a kit seam is owed like any file; the extension-point
 ruling reaches the seam alone.** That ruling protects an extension point's
@@ -7813,6 +7819,23 @@ scratch consumer at all — so the sourcer set is **one** and the builder's call
 set is three. Read the distinction off this paragraph rather than counting
 callers of one function and generalising, which is the re-derivation that put a
 wrong count into an amendment once already.
+
+**The adoption walkthrough is this section's other member, and this is the
+mechanism owner its own header pointed elsewhere for.** `demo/run-demo.sh` narrates
+the arc a new adopter walks — vendor the kits and run each installer, commit clean
+and watch the battery pass, craft one violation and watch the battery turn red naming
+the gate that caught it, drop the change and watch green return — and exit 0 asserts
+every act of it. It is registered as the evidence-kit `demo` validate suite, so a
+bit-rotted walkthrough is a red validate rather than a stale file nobody runs. It
+builds its own scratch consumer instead of calling `csmoke_vendor_and_install`,
+because the vendoring is part of what it narrates, and reaches this library for
+`csmoke_place_binary` alone. Its scratch base is `DEMO_TMP_DIR`, falling back to
+`TMPDIR` and then `/tmp` — the builder's own base, which is what keeps the
+walkthrough's tree and the harness's comparable, and why folding it onto
+`GATE_SDK_TMP_DIR` (repo-relative `.tmp`, absolutized at the invoker's root) would
+break that parity silently. It is **not** a kit knob: it carries no `<KIT>_` prefix,
+is defined in no kit library, and is read straight off the process environment, which
+is exactly what a caller overriding it on the command line does.
 
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
