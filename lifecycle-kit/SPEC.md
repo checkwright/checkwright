@@ -2163,12 +2163,6 @@ already carries, and the count of entries naming a deleted path is **probed rath
 than assumed** at the cut. The cut created no twin — the derivation sources no kit
 library, and the shell caller set emptied — so no parity oracle is owed.
 
-**One question a port here deliberately leaves open**, so a reader does not take
-the silence for a discharge: `LIFECYCLE_KIT_SESSION_ID` is documented on §Layout
-and configuration as a kit knob but is environment-only in practice, and whether
-it should become bridged or be redocumented is a filing rather than a ruling this
-section takes. It outlives the port in either direction.
-
 One fact a session taking this cut should not re-derive: its sole production
 caller is `--enter-stage`, which resolves the id internally — but the kit's
 own stage templates and `templates/lead.md` name this helper as the id's source

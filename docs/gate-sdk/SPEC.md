@@ -2378,11 +2378,14 @@ A **non-gate arm** is specified by three properties:
 
 - **It is a top-level `--`-prefixed flag, resolved in `main` before the
   registry lookup, and it is absent from `--list`.** The flag's spelling and the
-  front-end's grammar are **one decision, not two**: `bin/run-gates.sh` composes
-  `--emit-<name>` from its `--emit <name>` operand, so a member spelled anything
-  else is reachable by no shipped front-end and is callable only against the
-  binary directly. Read the `--emit-` prefix as load-bearing rather than as the
-  family's house style. The placement is
+  member's variant are **one decision, not two**, and the correlation holds
+  across the whole roster with no exception: an `Arm::Emit` member spells
+  `--emit-<name>`, which `bin/run-gates.sh` composes from its `--emit <name>`
+  operand, and an `Arm::Run` member spells a bare flag, which the front-end
+  passes through — its argv case falls through on any leading `-` token and
+  execs it as the arm name. Both families are front-end reachable; read the
+  `--emit-` prefix as recording the variant rather than as the family's house
+  style, and never as what makes a member reachable. The placement is
   load-bearing rather than stylistic: §check-gate-substrate-parity assertion B
   equates the `.gate` descriptor set with exactly the roster `--list` prints, so
   an arm inside that roster would read as a subcommand nothing declares and red
@@ -10491,6 +10494,16 @@ defines the note's section as one bullet per gate that landed new or got
 stricter, so a surface holding only strictly-tightened gates would make the
 composition lossy. It costs the assertion nothing — containment is red ⊆
 declared, so a declared gate that never reds is inert.
+
+**A gate whose *input* moved is appended on the same ground, and the producer
+clause reaches it.** Build minting a new template binding slot reds the gate that
+grades slot binding in every vendoring consumer until that consumer binds it,
+while the gate's own rule stands still. What makes a declaration owed is a red a
+vendored tree meets on upgrade, not a diff inside the gate — so "lands or
+tightens" names the common producers rather than the boundary, and a build
+reading it as the boundary declares nothing and hands the consumer an undeclared
+red. The one-line remedy such a red needs is the note bullet's to carry, and this
+surface, taking bare names only, cannot hold it.
 
 It **accumulates**, and that shape is chosen rather than inherited. Tightened
 gates is a *release*-level aggregate, not an iteration-level one: several

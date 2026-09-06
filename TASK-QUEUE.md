@@ -542,12 +542,10 @@
   silently off: the tool stamped the workflow-state file for real, printed its
   ordinary success line with no simulate prefix, and exited 0. The session
   intended a read-only probe.
-  **No harm landed on the first firing, and that was luck rather than design** — the entry was
-  clean and the stamp was wanted a moment later. The luck ran out at the fourth firing below.
-  **The caller was wrong and the tool is still at fault.** The usage string documents flag-first;
-  the defect is a surplus argument accepted and ignored rather than refused, and an in-repo
-  precedent settles which behaviour is right: `run-gates.sh` refuses an unrecognised option by
-  name and prints usage, asserted by its own consumer smoke. The entry tool does neither.
+  **The caller was wrong and the tool is still at fault**, settled by in-repo precedent rather
+  than left arguable: `run-gates.sh` refuses an unrecognised option by name and prints usage,
+  asserted by its own consumer smoke, while the entry tool accepts a surplus argument and ignores
+  it. No harm landed on the first firing — luck rather than design, and it ran out below.
   **Candidate shapes, none costed:** refuse any argument after the stage name; or accept the flag
   in any position; or make the mode an env knob so position cannot express it. First is smallest.
   **Cost while deferred:** the read-only mode is specifically the LEAD's
@@ -574,12 +572,14 @@
   recorded explicitly rather than by silence.** The recurrence route is now SPENT: a threshold
   member is proposed once and never re-escalated as a set already answered. What carries it next is
   the aggregation — 5 inbound edges, the highest in the pool at that survey — on its merits.
-  **THIRD AND FOURTH ATTESTATIONS, BOTH 2026-09-06, one iteration.** Third: a lead session in
-  Split posture, where the write is also a posture violation. Fourth: a build session's probe
-  stamped a `validate` entry, moving the cursor a WHOLE STAGE AHEAD while that session still ran —
-  the blast radius that takes this off a single argv nit's icebox-class default. Cause pinned by
-  reading: `:152` honours the flag at argv[0] only and `:389` has no arity check, while the
-  sibling `:169`'s `rename()` tests `rest.len() != 1` and refuses.
+  **THIRD, FOURTH AND FIFTH ATTESTATIONS, ALL 2026-09-06, across two iterations.** Third: a lead
+  session in Split posture, where the write is also a posture violation. Fourth: a build session's
+  probe stamped a `validate` entry, moving the cursor a WHOLE STAGE AHEAD while that session still
+  ran — the blast radius that takes this off a single argv nit's icebox-class default. Fifth: a
+  scope session, both spellings run back-to-back at one HEAD, `--enter-stage spec --simulate`
+  stamping for real at exit 0 with no simulate prefix. Cause pinned by reading and it is
+  arm-independent: `:152` honours the flag at argv[0] only and `:389` has no arity check, while the
+  sibling `:169`'s `rename()` tests `rest.len() != 1` and refuses. Five arms, one parse.
   recurrence: enter-stage-flag-position-silently-ignored 2026-09-05 2026-09-06
   Filed 2026-08-30 by close from the gap inbox, attested by the filing session
   upon itself.
@@ -2715,7 +2715,14 @@
   gate — so the surface cannot hold it even in principle. That is the reconstruction cost this entry
   predicts, arriving in the half the open question is about: the tightening is real and the existing
   surface's grammar, not just its scope, is what excludes it.
-  recurrence: behavior-change-surface 2026-08-25
+  **SECOND INSTANCE 2026-09-06 at build, and it comes at the grammar from the OTHER side.** The
+  2026-08-25 witness was a surface that could not hold the *name*. Here it held the name and could
+  not hold the *remedy*: minting the `open-authorization-channel` binding slot reds
+  `check-skill-binding` in every vendoring consumer until that consumer binds it, so build appended
+  the bare name — correctly — and the one-line remedy a consumer needs had no route from build to
+  the composing session. Two witnesses, both landing on "name plus prose versus bare names", is the
+  open design question above asked twice rather than a second question.
+  recurrence: behavior-change-surface 2026-08-25 2026-09-06
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
 
 - **consumer-smoke-subset-accounting-verdict** [design-pending] — a per-kit smoke run reds an
@@ -8676,10 +8683,20 @@
   whether or not it substitutes anything. What this iteration adds is a second slice the first does
   not cover: a **renumber**, where the old and new values are a relation over a range and the
   citations do not share a spelling. Whether one mechanism covers both is the open question.
+  **FIVE-FOR-FIVE 2026-09-06, every batch of one iteration, and the run is the datum.** Batch 1's
+  stale `lifecycle-kit/SPEC.md` §templates/lead.md sentence; batch 2's `spec-pointer-boundary-
+  legality` grounding case; batch 2's own gap bullet dangled by its amendment's deletion; batch 3's
+  second `-printf` site in `installer/lib/init.sh`, which the amendment recorded DORMANT and delta 5
+  needed live; and the `gates.yml:229-233` non-Linux over-claim. **Every one was found by grep and
+  none was named by the roster** — so a five-batch run with no roster hit is not a sampling
+  accident, and the entry's own "the deriving grep is not merely unrun" line is now measured rather
+  than argued. What it does NOT show is a detection failure: see
+  `removal-propagation-site-argued-out-of-scope`, where the fifth was found and then dispositioned
+  away, which is a different defect and files as one.
   **Cost while deferred:** revised upward from the iceboxing. A short roster now ships, and the
   reader who eventually greps is a later stage or a later iteration, so the stale sentence is
   live in the tree for the whole of that gap.
-  recurrence: amendment-roster-omission-detection 2026-08-29
+  recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06
   Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned
   2026-08-29 by close, the six stale citations verified against guard-kit/SPEC.md at HEAD.
 
@@ -8842,48 +8859,48 @@
   (`lifecycle-kit/templates/lead.md` §Economics) now states both limbs and the method for taking
   the reading; what stays local is the threshold, in `.claude/commands/lead.md`, and every reading,
   which is this entry's. **The deliverable that made the template wrong is DISCHARGED** — the
-  premise is amended and its slug is retired. What survives it is the standing measurement, which
-  the landing did not moot. Split `lead, own-authority 2026-09-05`.
-  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, thirteen points and
-  OPEN** — close appends each iteration's reading: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1.
-  The threshold is a third such iteration and is ANSWERED; one iteration is one point and the
-  posture does not flip on one either way. The thirteenth is SEVEN — validate was handed a stale
-  six, flagged the disagreement rather than picking a number, and was right to.
-  **THE FOURTEENTH IS ONE, the series' minimum, and its shape is what the number cannot carry.**
-  Six stage sessions plus two build batches; scope raised FOUR questions and every stage after it
-  raised ZERO. Of the four, THREE were relayed to the operator and one the lead ruled alone — so the
-  count is 1 not because escalation stopped but because the lead ROUTED rather than ruled, which is
-  the opposite failure mode from the twelve-point iteration and reads as one point toward the
-  posture being right rather than against it. A single low point is still one point.
-  **THE COST SERIES IS NOT APPENDED at the fourteenth, deliberately.** Bare `supervision` reads
-  10.9953 against a mid-close priced total of 177.78 (6.2%), and this close session's own row is
-  still growing — an unlowered ceiling, exactly the defect the 2026-09-05 derivation corrected the
-  series for. Appending it would re-accrete what that meter run bought.
-  **CHARACTER THE COUNT CANNOT SEE, recorded because by design the count cannot.** Two of the seven
-  were not ordinary readings. One RULED THE LEAD WRONG — instructed to carry three `recurrence:`
-  dates onto this slug, the filing batch refused and held, they being re-filings of the discharged
-  premise. One ruled WHERE THIS SERIES LIVES, so it is a datum for the series it preserved. Both
-  point one way, measured THREE times that iteration: a lead instruction is not a governed surface,
-  and three batches each checked one against a governed surface and were right.
+  premise is amended, its slug retired, and what survives is the standing measurement the landing
+  did not moot. Split `lead, own-authority 2026-09-05`.
+  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, fifteen points and
+  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5. The
+  threshold is a third such iteration and is ANSWERED; the posture flips on no single point.
+  **THE FOURTEENTH WAS ONE, the series' minimum, and its shape was what the number cannot carry:**
+  the lead ROUTED rather than ruled — scope raised four questions, three went to the operator, and
+  every later stage raised zero — so a low count read TOWARD the posture rather than against it.
+  **THE FIFTEENTH IS FIVE AND ITS SHAPE IS THE EXACT INVERSE.** Scope raised four and the lead ruled
+  ONE alone (no port cut takeable, off the ruling record's own escape clause); spec raised three and
+  the lead ruled ALL THREE alone; a build batch's packer-cut escalation is the fifth. Only the unit
+  set went up. **One datum cuts the other way and belongs on the same series:** the lead ESCALATED
+  whether the CI leg's `continue-on-error` drop could land post-build rather than ruling it. Two
+  consecutive points of opposite shape, at 1 and 5; neither is a flip.
+  **CHARACTER THE COUNT CANNOT SEE, recorded because by design the count cannot.** At the thirteenth
+  two of seven ruled the lead WRONG or ruled WHERE THIS SERIES LIVES; it recurred twice at the
+  fifteenth — a build batch refused the lead's relayed `owed lines=53` figure and was right, another
+  killed a false safety claim in its own draft. A lead instruction is not a governed surface.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
   4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** — every earlier point was a mid-close
-  unlowered ceiling, which is why this entry and the binding once disagreed. That correction was
-  bought from a meter run over six iterations and is not re-derivable from prose.
+  unlowered ceiling, which is why this entry and the binding once disagreed. **NOT APPENDED at the
+  fourteenth OR the fifteenth**, same ground both times: the closing session's own row is still
+  growing, so any ratio it reads is a ceiling. Two consecutive declines say the appending rule has
+  no satisfiable moment inside close; filed to the gap inbox rather than absorbed here.
   **THE COUNTER-EVIDENCE IS NINE INSTANCES OF ONE SHAPE — a claim verified at one surface and read
-  as covering a wider one.** Eight are the lead's own; the ninth widens the shape onto a stage
-  session's carry. **NEITHER a counter nor a refused premise NETS against the count**, which
-  measures whether an escalation was answered off a governed surface and never whether its grounds
-  held. The nine stayed nine across the eleventh through fourteenth.
-  **THE ALIGN WATCH'S GAP IS CLOSED at the fourteenth**: align fired, and its bare row reads
-  cr=9.35M, mid-pack — `align-checklist-fanout-calibration` holds that reading and its grammar
-  caveat.
+  as covering a wider one.** Eight are the lead's own, the ninth on a stage session's carry.
+  **NEITHER a counter nor a refused premise NETS against the count**, which measures whether an
+  escalation was answered off a governed surface, never whether its grounds held. Nine at fifteen.
+  **ALIGN READING SIX, AND THE REVERT SIGNAL FIRED — first firing in six readings.** Bare `align`
+  reads cr=13.78M, upper-mid of a 6.1M–32.0M band. The signal is a missed spec defect surfacing as a
+  build round-trip and both halves are present: align was handed the packer cut's reachability
+  premise AS a named audit target, reported it verified off `publish.yml:110→182`, and those lines
+  sit on opposite sides of a job boundary — `pack:` is a separate job from `build:` with no build
+  step. Build blocked, escalated, and the delta left as a deferred entry. **Recorded, not acted on,
+  and two-sided:** the same run caught three real defects an Opus spec shipped, and the tier lives
+  in ruling-config while this entry holds only readings.
   **Cost while deferred:** the posture is run unjudged, so a tier assignment wrong on the character
   limb costs every iteration and shows up as nothing — the count is the only instrument that reports
   it, and an unread instrument is indistinguishable from a healthy one. The cost series' 2026-09-05
   correction also decays: re-deriving it re-runs the meter over six receding iterations.
-  **NO `recurrence:` LINE, and the omission is deliberate** — the three dated re-filings belonged to
-  the discharged deliverable, not to this premise, which has been surfaced once; carrying them would
-  state a recurrence that did not happen. The deferred-age clock reads off `Surfaced` instead.
+  **NO `recurrence:` line, deliberately** — the three dated re-filings belonged to the discharged
+  deliverable; the deferred-age clock reads off `Surfaced`.
   Surfaced 2026-09-02. Filed 2026-09-05 by build, splitting the measurement half off the amendment
   it was riding.
 
@@ -9642,11 +9659,10 @@
     bash on preinstalled cargo, and the `pack` job today executes only bytes it checked out. This
     would make the one job that assembles and stamps the published tarball execute bytes it did
     not produce, cutting across the once-computed-digest grain at `:18-21`, `:112-116`, `:194-198`.
-  **DEPENDS ON the gap-inbox bullet about `gate-sdk/SPEC.md` §The non-gate arm**, and the
-  dependency is not bookkeeping: that section claims only an `--emit-<name>` spelling is front-end
-  reachable, which is false, and the merged amendment's flag-spelling paragraph (in git history)
-  was derived from it. Fix the sentence BEFORE this cut is re-specced, or the cut re-derives the
-  same false premise. The live convention is `Arm::Run` => bare flag, `Arm::Emit` => `--emit-`.
+  **THE BLOCKING DEPENDENCY IS DISCHARGED, 2026-09-06 at close.** `gate-sdk/SPEC.md` §The non-gate
+  arm no longer claims only an `--emit-<name>` spelling is front-end reachable; it states the
+  correlated convention (`Arm::Emit` => `--emit-<name>`, `Arm::Run` => bare flag, both reachable),
+  verified against `run-gates.sh:60-61`'s fall-through and all 51 members (33 Emit, 18 Run).
   **Cost while deferred:** the owed column keeps its largest reachable member, so the port track's
   completion predicate cannot reach zero; and the packer stays shell while its own owning section
   states the port obligation, which is a standing disagreement between a surface and the tree.
@@ -10010,6 +10026,108 @@
   Surfaced 2026-09-06 by the `always-loaded-cut-and-seam-slice` close; drained here at the
   2026-09-06 scope boundary, promoted after the fix was refused as operator-class.
 
+- **port-created-failure-mode-refusal-unruled** [design-pending] — whether a port may add a refusal
+  covering a failure mode the port itself created is unruled, and the one instance that raised the
+  question lost its record.
+  **The instance.** `lifecycle-kit/SPEC.md` §bin/session-id.sh: the port replaced a vendored shell
+  driver — present wherever the kit was — with an arm needing a BUILT binary, so it added an
+  absent-binary refusal for a case that did not exist before the cut. The SPEC recorded, as
+  procedural status, that the operator had been asked whether that reads as an envelope widening
+  and had not answered when the cut closed.
+  **What changed 2026-09-06.** The seam slice stripped that procedural status, and stripping it was
+  right — a dated ask with an authority attached is exactly the provenance a kit SPEC may not carry.
+  The engineering ground survives impersonally at `:2151-2158` ("a faithful port owes the case it
+  created"), but it now reads as a settled rule, and nothing records that it was put to the operator
+  and left unanswered. Probed at that build: no answer in `TRAJECTORY.md`, in the queue, or in the
+  gap inbox.
+  **Why the SPEC's own sentence is not the answer.** It states the conclusion; it does not carry the
+  authority to settle an envelope question, and the section itself says the two readings "differ in
+  what a port may add without asking". A rule a kit SPEC asserts about its own envelope is the thing
+  under question, not the settling of it.
+  **Two shapes, neither ruled here:** put the question to the operator and record the answer where a
+  port-envelope rule belongs; or rule it closed on the stated ground and retire the question. Close
+  could take neither — the first needs the operator, the second is envelope-class.
+  **Cost while deferred:** every port that opens a failure mode of its own re-asks this from
+  scratch, and the next one to guess wrong widens an envelope without asking. The port programme has
+  16 owed files left, so the next asker is not hypothetical.
+  Surfaced 2026-09-06 by build during the seam slice; promoted here at the 2026-09-06 close drain
+  after fix and icebox were both refused — fix because the answer is not close's to give, icebox
+  because a one-line lead cannot hold an open ask.
+
+- **removal-propagation-site-argued-out-of-scope** [design-pending] — a propagation site that WAS
+  found gets dispositioned away on an ownership boundary drawn around a region of a file rather
+  than around who caused the falsity.
+  **This refines a five-for-five run, and the refinement is the finding.** Across five build batches
+  of one iteration a removal's propagation site was missed every time, and every one was found by
+  grep. `amendment-roster-omission-detection` owns that half. The fifth instance shows the half it
+  does not own: **detection was never the failing step.**
+  **The witness, 2026-09-06.** The session grepped, FOUND the `gates.yml:229-233` non-Linux
+  over-claim, and then filed it instead of fixing it on two grounds — it sat inside a ringfenced
+  job, and it was already false at HEAD before that batch's own cut. Both true; neither carries.
+  "Already false at HEAD" establishes WHEN the sentence broke, not WHOSE it was, and the measurement
+  that falsified it was this unit's own product. The gap-disposition order the filing itself cited
+  puts fix before icebox, so a one-clause repair in an open file is a fix.
+  **The formulation worth keeping, the session's own once corrected:** an ownership boundary is
+  about who caused the falsity, not which region of a file it sits in — **a ringfence names a
+  hazard, not an address range.**
+  **Why it is not gateable, and what is unruled.** No scanner separates a correctly-scoped refusal
+  from a wrongly-scoped one; the deliverable is a rule and its TIER is the open question. Three
+  candidate homes, none ruled: the Gap-disposition rule in `doctrine-kit/DOCTRINE.md`, whose subject
+  is already the fix/icebox/promote order; the build stage template's session ritual, where the
+  disposition is actually taken; or the amendment grammar's own definition of done, which is where a
+  ringfence gets drawn in the first place.
+  **DISTINCT from `amendment-roster-omission-detection`** — that entry's subject is a roster short
+  by a surface and its candidate fix is a deriving grep. This one's subject is what happens AFTER
+  the grep succeeds, and a perfect roster would not touch it.
+  **Cost while deferred:** the ringfence argument is cheap, plausible and self-serving under time
+  pressure, and it converts a found defect into a filed one at exactly the moment the fix is
+  cheapest. Paid once per amendment that draws a ringfence.
+  Surfaced 2026-09-06 by the lead's override of a build disposition; promoted here at the 2026-09-06
+  close drain as the iteration's promote-class finding.
+
+- **macos-leg-brew-set-vs-documented-requirements** [design-pending] — nothing holds the macOS CI
+  leg's brew package set equal to the macOS toolchain `docs/install.md` §Requirements documents.
+  **The assertion exists and it is prose.** The leg's own comment states the equality in both
+  directions and calls a divergence "a defect in whichever moved". Enforcement-first wants the gate,
+  and this is the enforcement half of a unit that shipped its fix without it.
+  **The two sides derive from nothing shared.** The leg installs `bash`, `coreutils`, `gawk` and
+  `shellcheck`; §Requirements derives its toolchain block from context-kit's `PROBE_SET`.
+  **The cost of the gate, which is why this is not a same-session fix.** It needs a
+  floor-member-to-brew-formula mapping surface, and none exists: `PROBE_SET` names interpreter and
+  tool floor members, brew names formulae, and the map between them is neither one-to-one nor
+  derivable from either side.
+  **The live consequence is worse than when it was filed.** The leg became BINDING 2026-09-06, so on
+  drift it greens `master` over an adopter path broken for anyone who installed exactly what the
+  page names — the near-miss the fixed findutils defect identified before it landed.
+  **Cost while deferred:** the equality holds only while two hand-maintained lists agree, and the
+  reader who notices the disagreement is a macOS adopter rather than a gate.
+  Filed 2026-09-06 by build as one of two enforcement-first gaps the macOS leg surfaced; promoted
+  here at the 2026-09-06 close drain.
+
+- **gnu-ism-on-adopter-install-path-ungated** [design-pending] — no gate keeps a GNU-only shell
+  construct off the adopter install path; the live one was found by a hand survey.
+  **The attested instance.** `find -printf` in `installer/lib/init.sh`, both sites, on the path
+  since the loop was written and found only by a spec-stage hand survey 2026-09-06. Fixed the same
+  iteration by the findutils rider; nothing catches the next one entering.
+  **What remains live is DECLARED, not accidental.** `sort -V` and `realpath --relative-to` are
+  named in `docs/install.md` §Requirements — they are the exemption set a gate would carry, not
+  the violations it would find.
+  **The corpus is small and named**, which is what makes this buildable: `installer/lib`,
+  `installer/bin`, `gate-sdk/lib/gate.sh` and `gate-sdk/bin/gen-pre-commit.sh`, the files `init`
+  actually reaches. guard-kit already ships blocklist-roster mechanism, so the shape is a blocklist
+  gate over that corpus with the documented constructs exempted.
+  **Open before it can be built:** the blocklist's own membership. A construct list is a vocabulary,
+  and a kit literal spelling one publishes it — so it is consumer config on the
+  `check-graph`/`scripts/graph-vocab.sh` pattern, never a kit array.
+  **DISTINCT from `macos-leg-brew-set-vs-documented-requirements`**, which holds a package set equal
+  to a documented list. This one keeps a construct class off a code path, and it is not
+  macOS-specific: any BSD userland meets it.
+  **Cost while deferred:** a GNU-ism reaching the path is invisible until a macOS or BSD adopter
+  meets it, or until the macOS leg's next run does — and that leg is binding now, so that run reds
+  `master`.
+  Filed 2026-09-06 by build as the second of two enforcement-first gaps the macOS leg surfaced;
+  promoted here at the 2026-09-06 close drain.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -10036,6 +10154,7 @@
 - **split-posture-waiver-writer** [design-pending] — A lead-issued waiver stamp has no writer.
 - **supervisor-verification-attestation** [design-pending] — The verification duty is unattested.
 - **gate-spec-claim-assertion-parity** [design-pending] — Ruled a human-audit class, not gateable.
+- **port-takeability-has-no-instrument** [design-pending] — Takeability hand-read on the tree axis.
 - **scope-amendment-authoring-gate** [design-pending] — Scope can do spec's job and stay green.
 - **evidence-journal-hash-chain** [design-pending] — Tamper-evidence wanted only by a hosted rung.
 - **md-section-near-miss-match** [design-pending] — Empty on a near miss; correct on an exact query.
