@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: index-runner-hold-release-and-windows-smoke-comparison
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -61,10 +61,10 @@
   and was DELETED in the same commit — what the bidirectional pairing requires of both halves — and
   the spec pointer drops with it. **READ THIS AS LANDED-BUT-UNOBSERVABLE, NOT UNSTARTED** — this
   shape's known legibility price (`observation-predicate-entry-cannot-drain-in-its-own-iteration`,
-  fourth shape). The four-cut test-harness alternative is HELD as the NEXT iteration on this
-  scope's census — NO RE-SURVEY OWED.
-  Also ruled: operator 2026-08-27 and 2026-08-31 (lead-relay), 2026-08-31 (consult); lead
-  2026-09-01 (own-authority).
+  fourth shape). Its four-cut test-harness hold is SPENT: `test-harness-cut-seam-sweep` took it.
+  **PROMOTED 2026-09-06 `lead, own-authority` as ordinary intake, the 2026-08-30 red-cause limb
+  SATISFIED and NOT re-scoped: a repair wanting ROUNDS rather than one verification push goes up.**
+  Also ruled: operator 2026-08-27, 08-31 (lead-relay), 08-31 (consult); lead 09-01 own-authority.
 
 - **measured-marker-cannot-sit-mid-paragraph** [design-pending] — `check-measured-claim` binds its
   marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
@@ -158,7 +158,15 @@
   `:1394-1397` — "three files, and no fourth" — so releasing it is an amendment to §Testing, never
   a reading, and spec-over-precedent binds. Declined 2026-09-06 by the lead (`lead,
   own-authority`) on exactly that ground, with the argument recorded PERSUASIVE and the route left
-  open to a future `spec` stage that takes it as an amendment. **Cost while deferred:** the port's
+  open to a future `spec` stage that takes it as an amendment. **THAT ROUTE IS NOW TAKEN — SCOPED
+  2026-09-06 `lead, own-authority`** into `index-runner-hold-release-and-windows-smoke-comparison`
+  on the PORT-CRITICAL ground: its discharge is the stated precondition of an owed file's cut, read
+  off §Testing's own sequencing sentence and not off a session's judgment of usefulness, so it rides
+  inside the cut it unblocks. `spec` authors the §Testing amendment (narrowing the sequencing to the
+  two members that genuinely couple and correcting "three files, and no fourth"); build takes the
+  released 107-line singleton as a non-gate arm. Re-verified against the tree at this scope, not
+  inherited from the filing: `:53` is still the sole contact and still a spawn.
+  **Cost while deferred:** the port's
   reachable column reads empty while it may hold a takeable 107-line singleton, so every iteration
   composes around a blocker that may not be one. Filed 2026-09-06 by scope, out of the
   port-takeability census the same session recorded.
@@ -200,8 +208,8 @@
   **(6) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER THE BLOCKER-RETIRING OVERRIDE, AND
   THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING STAGE RUNS, 2026-09-05 (lead)** —
   both owned by gate-sdk/SPEC.md §The first cohort.
-  **(8) NO CUT TAKEABLE 2026-09-06 — `lead, own-authority`: all 16 owed files held by their owning
-  sections, so §PRIORITY DIRECTIVE's empty-column clause fires on both disjuncts.**
+  **(8) NO CUT TAKEABLE 2026-09-06 `lead, own-authority`: 15 held by their owning sections and the
+  16th, `pack-installer.sh`, by `pack-installer-cut-to-a-non-gate-arm`; empty-column, both fire.**
   **(7) `demo/run-demo.sh` PORTED, its residue-class `# no-port:` route DECLINED — operator
   2026-09-06 (lead-relay), DISCHARGED same day behind a separate `# spec:` re-home. Fork closed.**
   **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
@@ -2722,6 +2730,8 @@
   the bare name — correctly — and the one-line remedy a consumer needs had no route from build to
   the composing session. Two witnesses, both landing on "name plus prose versus bare names", is the
   open design question above asked twice rather than a second question.
+  **PROPOSED AT THRESHOLD 2026-09-06 AND ANSWERED — deferred (`lead, own-authority`), on this
+  deliverable's machinery shape displacing a product unit, plus window capacity. Route SPENT.**
   recurrence: behavior-change-surface 2026-08-25 2026-09-06
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
 
@@ -8696,6 +8706,8 @@
   **Cost while deferred:** revised upward from the iceboxing. A short roster now ships, and the
   reader who eventually greps is a later stage or a later iteration, so the stale sentence is
   live in the tree for the whole of that gap.
+  **AT THRESHOLD 2026-09-06 AND ANSWERED — deferred `lead, own-authority` on WINDOW CAPACITY
+  ALONE; class UNSETTLED, NOT machinery: did those six guard-kit citations ever ship tagged?**
   recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06
   Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned
   2026-08-29 by close, the six stale citations verified against guard-kit/SPEC.md at HEAD.
