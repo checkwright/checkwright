@@ -819,10 +819,14 @@ priced cost, never the account the tokens billed to.
    `input`, `output`, `cache_read`, `cache_creation` — per model id seen on those
    turns. A streaming transcript repeats a message id across lines (input/cache
    constant, output growing), so the sum keeps the last usage per message id
-   before aggregating — summing raw lines would multi-count. Because this repo runs
-   one session per stage under `LIFECYCLE_KIT_SESSION_BOUNDARY` (lifecycle-kit/SPEC.md
-   §The state machine; its roster owns the setting), a session maps to exactly one
-   stage, so per-session usage *is* per-stage usage. Under an iteration-boundary
+   before aggregating — summing raw lines would multi-count. Under
+   `LIFECYCLE_KIT_SESSION_BOUNDARY` (lifecycle-kit/SPEC.md §The state machine; its
+   roster owns the setting) a session maps to **at most one** stage, so a session's
+   usage is attributable with no apportionment. It does **not** follow that a stage
+   maps to at most one session — a batch split stamps once per session — so
+   per-session usage is not per-stage usage, and the several sessions of a stage sum
+   into that stage's single row (the fold, under The trend log). The inverse failure
+   is the one this input handles: under an iteration-boundary
    consumer a session may span stages, and then it bears **several stamps**. The
    join therefore keys on the **session, not the stamp**: a session's usage is
    summed once and attributed to the `(iteration, stage)` of its **last** stamp,
@@ -913,7 +917,8 @@ no owed file and no `bin/` directory at all; neither cut of the pair could make
 that claim alone.
 
 **The trend log.** One line is appended per `(iteration, stage, model)` triple to
-`DRIFT_KIT_STAGE_ECONOMICS_LOG`, grammar:
+`DRIFT_KIT_STAGE_ECONOMICS_LOG` — **a sum over that key's sessions**, not an
+assertion that only one contributes — grammar:
 
 ```
 <date> <iteration> <stage> <model> in=<tok> out=<tok> cr=<tok> cw=<tok> cost=<usd|n/a>
@@ -931,7 +936,71 @@ re-measuring a triple replaces its line rather than double-counting, exactly as
 the overhead meter dedups on `session8`. That key is also what makes the
 history ∪ live read safe with no added mechanism: a history arm re-derives rows
 already logged, and re-derivation replaces a triple's line rather than
-double-counting it. **Per-model row order is deterministic**, where the shell
+double-counting it.
+
+**The fold happens before the write, and the replace-on-append is what it must
+not touch.** A stage run as several sessions in one iteration (a batch split)
+stamps once per session, so one triple draws from several transcripts. The pass
+therefore **accumulates in memory across a row key's sessions and emits once per
+key** — the shape the fan-out row below already has, and correct here for its own
+three reasons: the accumulation completes before any write, so the writer is
+invoked once per key and its replace can never annihilate a sibling; the key is a
+tuple joined by a separator that cannot occur in a field, so no two distinct keys
+alias; and the stdout column degrades honestly when the fold is non-trivial (next
+paragraph). Writing once per *session* instead is the defect this replaced: two
+appends under one triple made the dedup key replace the first with the second,
+and because the run seeds its retained set from the log and writes it back whole,
+that loss landed **inside a single invocation** rather than needing a second run.
+Converting the *write* to an accumulate is the opposite fix and is refused: the
+collector re-derives every historical row on every invocation, unbounded and with
+no watermark, and the replace is the only thing making the history ∪ live union
+safe — an accumulating write would duplicate every logged row on every run. **The
+fold moves the summation earlier; it does not move it into the log.**
+
+**The row's stdout discriminator degrades to a session count.** The report keeps
+one line per emitted row, and its `who` column reads `<n> sessions` wherever a row
+key drew from more than one session, exactly as the fan-out row's reads
+`<n> anchors`; where a key drew from one, the column is that session's id
+unchanged. This is the fold's honesty half and it is not optional — a fold without
+it replaces a silent loss with a silent sum, and the `/economics` narrative is
+where the caveat is read. **No log field is added**, on the section's standing
+rule that a log field with no reader is a field removed: the narrative reads
+stdout, the operator reads `cost`, no gate reads the log, and the one prose reader
+that parses the stage column reads the column and not a count.
+
+**Two alternatives were weighed and refused.** *Widening the dedup key with the
+session id* is not a re-keying of an existing column — the id is **not written to
+the log at all**, appearing only in the stdout `who` discriminator — so it would
+add a column the grammar never had, moving every surface that quotes the grammar
+block and breaking five of the six fixture sets' anchored row assertions. It
+contradicts this paragraph's own statement that the key **is** the triple, it
+fails the no-field-without-a-reader rule, and it cannot answer what a **folded
+fan-out** row's id would be (the discriminator is already a count) or a
+**supervision** row's (a lead's id apportioned across iterations) without a
+nullable sentinel or undoing the fan-out fold. *Making the row an explicit
+aggregate the writer recomputes* is either this fold with more machinery and the
+same result, or the grammar cost just refused; and it buys no completeness, since
+stage membership is known only through the stamp and the transcript finder
+resolves at most one file per short session id, so a recompute would silently miss
+a member on a short-id collision.
+
+**What the fold costs, priced rather than waved past, and the price is stated
+exactly.** Neither the log nor stdout answers *what did each session of a split
+stage cost* — for a stage held by one session both surfaces are unchanged, and for
+a split one the per-session breakdown collapses into the summed row and its count.
+That is a real narrowing and it is the same one the fan-out row already carries;
+what it is **not** is the loss the collision was: a sum names its contributors'
+number, where a replace named nothing at all and left a figure that looked like one
+session's because it *was* one session's. The narrowing is accepted on the log's
+stated purpose — the trend, not the audit. Its readers are a close-over-close cost
+comparison, the deferred measurement rung that consumes rather than rebuilds this
+log, and the tiering watch below; every one reads a per-stage series, which a
+per-session breakdown would serve none of better. It is also worth naming why the
+collision survived from its filing to its fix: the one named narrative reader reads
+**stdout**, which no replace ever touched, so the surface a session actually looked
+at was never wrong — only the persisted series was.
+
+**Per-model row order is deterministic**, where the shell
 form's array iteration was unspecified and a session touching two models could
 emit its rows in a different order between runs: no row's *identity* depends on
 the order either way, the dedup key being the triple, but the emission's does and
@@ -1021,6 +1090,20 @@ skeleton); the same rule decides this.
   harness, `smoke/install.sh`, which counts log lines. No *gate* reads it (it
   lives under the gitignored `DRIFT_KIT_METRIC_DIR`), and the `/economics`
   narrative reads it as prose rather than parsing the stage column.
+  **A fourth reader exists and it does parse the column**, so the conclusion is
+  "no reader *in production code* parses it" rather than "no reader parses it" —
+  the original wording is what would let a later widening be cleared by
+  inspection. The consumer's lead binding judges an align-tier decision on the
+  `cr` field of the **bare** `align` rows, explicitly never mixed with the
+  `align+fanout` family. It is prose-tier and hand-read, which is why the
+  narrative's carve-out above does not cover it: the narrative does not
+  discriminate on the column and this reader does. The fold leaves its contract
+  intact — the stage token is unchanged, the bare-versus-suffixed discrimination
+  is unchanged, and one row per `(iteration, align, model)` still holds — while
+  moving its **conclusions**: a split stage's `cr` rises to its true value, so a
+  tier judged cheap on a truncated series may not be. *The reader is unbroken* and
+  *the reader's answer is unchanged* are different claims and only the first is
+  true; the second belongs to whoever owns the tiering judgment.
   **The trajectory arm does not parse this column at all** — the reader worth
   naming, since it is the surface a hardcoded stage roster once broke; it reads
   stamps and its own `DRIFT_KIT_STAGES` roster, never this log. So a non-stage
@@ -1114,10 +1197,16 @@ subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
   is the *row key*, not the anchor — and the alternative is not a second row but a
   **lost** one: two appends under one `<iteration> <stage> <model>` triple make
   the dedup key replace the first with the second, stranding its transcripts
-  attributed to a row the replacement erased. Apportionment happens **first and the
-  fold second**, since the dispatch-count split is a property of the anchor while
-  the row is not. The stdout caveat names the contributing anchor count where it
-  exceeds one, so a folded row is never read as one session's.
+  attributed to a row the replacement erased. **That reasoning is the meter's, not
+  this row's**: the same batch split gives one triple several *stage* sessions and
+  loses a row the same way, which is why the accumulate-then-emit shape is stated
+  under The trend log as the rule for both row families and cited from here rather
+  than owned here. What stays the fan-out's own is the **apportionment**, which
+  happens **first and the fold second**, since the dispatch-count split is a
+  property of the anchor while the row is not. The stdout caveat names the
+  contributing anchor count where it exceeds one, so a folded row is never read as
+  one session's — and the stage rows' caveat names a session count on the same
+  rule.
 - **Collision rule.** The default suffix is collision-proof by construction — the
   stamp reader's stage-field alphabet is lowercase alphanumerics and hyphens, so a
   `+` can never appear in a stamped stage name. A consumer overriding the knob can
@@ -1487,17 +1576,27 @@ notice. (iii) A *fan-out* fixture — a synthetic three-level tree: a flat
 `<lead>.jsonl`, and under `<lead>/subagents/` a stamped stage transcript with a
 `spawnDepth` 1 meta record, a child at `spawnDepth` 2 naming it as
 `parentAgentId`, and a grandchild at `spawnDepth` 3 naming the child; plus a
-**second session stamped into the same `(iteration, stage)`** carrying no
-assistant usage, with a child of its own — the batch-split shape, which is also
-the one that proves a stage anchors on its stamp *resolving* rather than on
-emitting a row. It asserts exactly one fan-out row for the stamped stage whose
+**second session stamped into the same `(iteration, stage)`** carrying usage of
+its own, with a child of its own — the batch-split shape, which is the witness for
+**both** folds. It asserts exactly one fan-out row for the stamped stage whose
 tokens are the **sum over the whole subtree** (so both a walk that stopped at
 depth 2 and two anchors racing under the dedup key instead of folding red), that
-the contributing anchor count is named where it exceeds one, that the stage
-row still carries only the stage session's own usage (so a fold reds), that the
-suffix comes from `DRIFT_KIT_FANOUT_SUFFIX` rather than a literal, that a stamp
-whose stage ends in the suffix raises the collision notice and suppresses the row,
-and that the under-count bound excludes every transcript the pass attributed.
+the contributing anchor count is named where it exceeds one, that the **stage** row
+is likewise exactly one and carries the **sum over both same-stage sessions** with
+its contributing session count named on stdout, that the suffix comes from
+`DRIFT_KIT_FANOUT_SUFFIX` rather than a literal, that a stamp whose stage ends in
+the suffix raises the collision notice and suppresses the row, and that the
+under-count bound excludes every transcript the pass attributed.
+**That second session carried no usage until the stage fold landed, and stating why
+is the reusable half.** With no usage it anchored without emitting a row, which
+exercised the anchor walk and left the stage-row collision invisible: the flat
+fixture set's line assertion is a **file-global count**, monotone in duplication and
+completely blind to replacement, so a violation that *replaces* rather than
+duplicates leaves the count at one and the assertion green. That is the structural
+reason the collision survived six fixture sets and a full port parity run, and it is
+why the assertion added with the fold asserts a **value** rather than a count. The
+flat set's own line count and its re-measure idempotence check are untouched — both
+are about duplication rather than loss, and both still hold.
 Its two **degradation** assertions are what make the coupling's bounded failure
 testable rather than asserted, and neither may be dropped for brevity: deleting
 the grandchild's meta record moves it back into the under-count bound and raises

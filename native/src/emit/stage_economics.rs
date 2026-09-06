@@ -403,6 +403,13 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let mut leads: Vec<String> = Vec::new();
     let (mut unmatched, mut unstamped) = (0usize, 0usize);
 
+    // spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: the stage pass
+    // accumulates per row key and emits once, the fan-out pass's own shape, so the writer's
+    // replace can never annihilate a sibling session's row.
+    let mut stage_rows: Ordered<(Tokens, String, usize)> = Ordered::default();
+    let mut stage_row_key: Vec<(String, String, String)> = Vec::new();
+    let mut skipped: Vec<String> = Vec::new();
+
     let session_order: Vec<String> = sessions.order.clone();
     for session8 in &session_order {
         let (iter, stage) = sessions.map[session8].clone();
@@ -437,15 +444,39 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         }
         let usage = r.usage(&transcript);
         if usage.is_empty() {
-            r.say(&format!(
+            skipped.push(format!(
                 "  {} {} {}: no assistant-turn usage found (skipped)",
                 iter, stage, session8
             ));
             continue;
         }
         for (model, t) in usage {
-            r.emit_row(&iter, &stage, session8, &model, t);
+            let rk = format!("{}\u{1}{}\u{1}{}", iter, stage, model);
+            if stage_rows.insert_new(&rk, (t, session8.clone(), 1)) {
+                stage_row_key.push((iter.clone(), stage.clone(), model.clone()));
+            } else {
+                let e = stage_rows.entry_mut(&rk, (Tokens::default(), session8.clone(), 0));
+                e.0.add(t);
+                e.2 += 1;
+            }
         }
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: one row per accumulated
+    // key, its `who` degrading to a session count where the fold was non-trivial, so a folded row
+    // is never read as one session's.
+    for (iter, stage, model) in &stage_row_key {
+        let rk = format!("{}\u{1}{}\u{1}{}", iter, stage, model);
+        let (t, who, count) = stage_rows.get(&rk).expect("the row key was just recorded").clone();
+        let who = if count == 1 {
+            who
+        } else {
+            format!("{} sessions", count)
+        };
+        r.emit_row(iter, stage, &who, model, t);
+    }
+    for line in &skipped {
+        r.say(line);
     }
 
     for session8 in &session_order {
@@ -899,6 +930,45 @@ mod tests {
         assert_eq!(history_stamp("+Alpha build s2 2025-01-01"), None, "uppercase iteration");
         assert_eq!(history_stamp("+alpha build s2 2025-1-1"), None, "short date");
         assert_eq!(history_stamp("alpha build s2 2025-01-01"), None, "no + prefix");
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: the stage fold keys on a
+    // control-character-joined triple, so no two distinct keys can alias through a field carrying a
+    // space, and the accumulator sums a key's sessions before any write.
+    #[test]
+    fn the_stage_fold_sums_a_key_and_cannot_alias_two() {
+        let key = |i: &str, s: &str, m: &str| format!("{}\u{1}{}\u{1}{}", i, s, m);
+        assert_ne!(key("a b", "c", "m"), key("a", "b c", "m"));
+        let mut rows: Ordered<(Tokens, String, usize)> = Ordered::default();
+        let one = Tokens {
+            input: 10,
+            output: 20,
+            cache_read: 30,
+            cache_write: 40,
+        };
+        let two = Tokens {
+            input: 5,
+            output: 6,
+            cache_read: 7,
+            cache_write: 8,
+        };
+        let rk = key("it", "build", "m");
+        assert!(rows.insert_new(&rk, (one, "s1".to_string(), 1)));
+        let e = rows.entry_mut(&rk, (Tokens::default(), "s2".to_string(), 0));
+        e.0.add(two);
+        e.2 += 1;
+        let (t, who, count) = rows.get(&rk).expect("just recorded").clone();
+        assert_eq!(
+            t,
+            Tokens {
+                input: 15,
+                output: 26,
+                cache_read: 37,
+                cache_write: 48
+            }
+        );
+        assert_eq!(who, "s1", "the first session's id survives for a one-session key");
+        assert_eq!(count, 2, "the contributing session count is what degrades the column");
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — the table's skipped rows, and the

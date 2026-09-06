@@ -71,45 +71,6 @@
   neither trigger nor authority and said in terms that nothing in it licensed a session to prune;
   what authorized pruning was the amendment that landed the record's header contract.
 
-- **stage-economics-log-key-session-collision** [spec: SPEC-economics-fold.md] — two sessions
-  in one (iteration, stage) overwrite each other in the trend log.
-  **Operator, 2026-09-06, relayed by the lead session, verbatim: "For per-batch tiering meter, if
-  you means that we need to correct the calculation to consider whether the specific build ran on
-  Opus or Sonnet, fix it."** That directive promotes this entry; it authored no new one.
-  The `--emit stage-economics` row writer dedups on the `<iteration> <stage> <model>` triple, so a
-  batch-split stage appends twice and the second silently replaces the first, under-reporting that
-  stage by a whole session. **The defect survived the 2026-09-05 port unchanged** — the parity
-  harness reproduced the shell form's trend log byte for byte across eight fixture sets and the
-  ported writer filters the same triple.
-  **THE CLOSE IS THE FOLD, and it is settled by the owner doc rather than chosen among three.**
-  drift-kit/SPEC.md's fan-out bullet already rules this fold correct for the sibling row family
-  AND names the stage rows' loss verbatim — "two appends under one triple make the dedup key replace
-  the first with the second, stranding its transcripts attributed to a row the replacement erased" —
-  while fixing only its own. The stage pass takes `fanout_pass`'s shape: accumulate per row key in
-  memory, emit ONCE per key. Grammar unchanged, dedup key unchanged, no field added.
-  **TWO PREMISES ON THIS ENTRY WERE FALSE AND ARE CORRECTED HERE.** (a) "The session id is written
-  as a same-line field" — it is **not written to the log at all**; `who` appears only on stdout, so
-  the key-widening candidate is *adding a column the grammar never had*, a materially worse trade
-  than priced. (b) The loss needs no second run: the run seeds its retained set from the log and
-  writes it back whole, so two rows under one triple annihilate inside a SINGLE invocation.
-  **Replace-on-append is load-bearing and is kept**: the collector re-derives every logged row on
-  every run, unbounded and with no watermark, and drift-kit/SPEC.md says the key is what makes the
-  history-union-live read safe with no added mechanism. The fold moves the summation earlier, never
-  into the log.
-  **`.claude/commands/lead.md`'s bare-`align`-vs-`align+fanout` discrimination SURVIVES** — stage
-  token unchanged, one row per `(iteration, align, model)` still holds. What moves is its
-  CONCLUSIONS: a split stage's `cr` rises to its true value, which
-  `lead-split-posture-limb-unjudged` is owed. `/economics` reads stdout, never the log, so the
-  narrative reader was always immune — which is how this survived since its filing.
-  **drift-kit/SPEC.md contradicts itself on the premise and both sides move**: one passage asserts
-  per-session usage IS per-stage usage, another asserts one `(iteration, stage)` may hold several
-  anchors; and the section's reader roster is stale, enumerating three readers and asserting none
-  parses the stage column when the lead binding does.
-  The cheapest regression witness already half-exists: `drift-kit/smoke/install.sh`'s fan-out set
-  stands up a second same-stage session with NO usage; give it usage and the live assertion reds.
-  Filed 2026-08-07 by close, draining the gap inbox; found at build. Merged 2026-08-08 at scope by
-  lead ruling with `stage-economics-log-multi-session-undercount`, the same defect re-found.
-
 - **lead-iteration-open-authorization** [spec: SPEC-open-authorization.md] — the iteration lead
   may open an iteration on its own inference, and opening one is the operator's call.
   **Operator, 2026-09-06, relayed by the lead session, verbatim: "Speaking of a new iteration, if
@@ -10220,5 +10181,6 @@
 ## Done
 
 - demo-walkthrough-port-cut
+- stage-economics-log-key-session-collision
 
 ## Lessons Learned

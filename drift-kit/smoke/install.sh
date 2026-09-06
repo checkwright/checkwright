@@ -502,9 +502,12 @@ EOF
 cat > "$fosub/agent-fogrand3feed.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"G1","model":"test-model","usage":{"input_tokens":100,"output_tokens":200,"cache_read_input_tokens":300,"cache_creation_input_tokens":400}}}
 EOF
-# spec: drift-kit/SPEC.md §Testing — the fixture's second same-stage session: no usage of its own, so
-# it anchors without emitting a row and its child must fold rather than replace the first anchor's.
-printf '{"type":"user","message":{"role":"user","content":"no usage here"}}\n' > "$fosub/agent-fostage4feed.jsonl"
+# spec: drift-kit/SPEC.md §Testing — the fixture's second same-stage session, with usage of its own:
+# it is the stage fold's regression witness, and its child is the fan-out fold's. Give it no usage and
+# the stage-row assertion below goes green against a row that lost a whole session.
+cat > "$fosub/agent-fostage4feed.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"S4","model":"test-model","usage":{"input_tokens":5,"output_tokens":6,"cache_read_input_tokens":7,"cache_creation_input_tokens":8}}}
+EOF
 cat > "$fosub/agent-fochild5feed.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"C5","model":"test-model","usage":{"input_tokens":1000,"output_tokens":2000,"cache_read_input_tokens":3000,"cache_creation_input_tokens":4000}}}
 EOF
@@ -533,8 +536,12 @@ grep -qE ' foiter build\+fanout test-model in=1101 out=2202 cr=3303 cw=4404 cost
     || fail "the fan-out row is not the sum over the whole subtree — a walk that stopped at depth 2, or two anchors racing under the dedup key instead of folding: $(cat "$folog")"
 grep -q ' foiter build+fanout 2 anchors ' <<<"$foout" \
     || fail "two anchors sharing one (iteration, stage) did not fold into one row: $foout"
-grep -qE ' foiter build test-model in=10 out=20 cr=30 cw=40 cost=300\.[0-9]+$' "$folog" \
-    || fail "the stage row lost its own usage to the subtree (the fold this row exists to refuse): $(cat "$folog")"
+grep -qE ' foiter build test-model in=15 out=26 cr=37 cw=48 cost=370\.[0-9]+$' "$folog" \
+    || fail "the stage row is not the sum over both same-stage sessions — either it lost its own usage to the subtree, or one session's append replaced the other's under the dedup key: $(cat "$folog")"
+[[ "$(grep -c ' foiter build test-model ' "$folog")" -eq 1 ]] \
+    || fail "two same-stage sessions did not fold into one stage row: $(cat "$folog")"
+grep -q ' foiter build 2 sessions ' <<<"$foout" \
+    || fail "the folded stage row does not name its contributing session count, so a two-session row reads as one session's: $foout"
 grep -q 'resolved no anchor' <<<"$foout" \
     && fail "an intact meta layer must resolve every dispatched transcript: $foout"
 grep -q 'match no stamp and resolved no anchor' <<<"$foout" \
