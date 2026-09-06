@@ -144,3 +144,4 @@
 | always-loaded-cut-and-seam-slice | sc sp a b v c | 4f/1d | 2 · ≤0d | 20s clean | 108 |
 | demo-cut-record-authority-and-attribution | sc sp a b v c | 3f/2d | 4 · ≤0d | 20s clean | 108 |
 | macos-leg-packer-cut-and-seam-slice | sc sp a b v c | 5f/2d | 4 · ≤0d | 20s clean | 108 |
+| index-runner-hold-release-and-windows-smoke-comparison | sc sp a b v c | 4f/1d | 2 · ≤0d | 20s clean | 108 |

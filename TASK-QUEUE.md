@@ -555,10 +555,10 @@
   installer/README.md §The install boundary; fork 1 merged 2026-08-25 into that same section —
   five bootstrap steps, one retirement (`jq`), everything else behind the invoke. What remains is
   the work: the PowerShell half, the relocation (this entry's since `install-step-relocation`
-  retired as mooted, re-scoped 2026-08-24), and the native Windows leg `platform-support-ci-matrix`
-  now orders first. A named adopter is live (the 2026-08-26 Windows-leg ruling, TRAJECTORY.md §The
-  closed rulings), so the trigger is no longer dormant. **Ordered by the trajectory pivot
-  2026-08-03** — objectives 2 and 6, TRAJECTORY.md's.
+  retired as mooted, re-scoped 2026-08-24). The Windows leg that ordered ahead of it shipped with
+  `platform-support-ci-matrix`, retired 2026-09-06, so nothing orders first now and the named
+  adopter is live: the trigger is no longer dormant. **Ordered by the trajectory pivot 2026-08-03**
+  — objectives 2 and 6, TRAJECTORY.md's.
   **THE TWO SOURCE BLOCKERS THAT ROUTED HERE ON 2026-08-26 HAVE MOVED OUT, operator-ruled the
   same day**: `BN_ART` and `target_of_host()` joined the Windows blocker unit at
   `gate-binary-target-roster-widening`, which shipped both repairs and reached `## Done` — cleared
@@ -938,6 +938,13 @@
   choice. A rename that outruns its assertion is the failure mode to avoid.
   **Cost while deferred:** one more 1-in-N false red on `check-crate-arms`, paid by every port
   commit — the same tax `crate-test-env-knob-race` was fixed to remove, re-armed on a second axis.
+  **That cost was PAID TWICE in one iteration, by two independent sessions**, which is what the date
+  below attests: a lead at scope-commit verification and a build batch at pre-commit, each a red
+  `cargo test` exit 101 that went green on an immediate standalone re-run of the same source.
+  **The honest limit on the attribution:** neither witness read the failing test's NAME, so the tie
+  to *this* mechanism rests on the symptom matching this entry's own cost line and on no competing
+  entry claiming a flaky `check-crate-arms` — not on a culprit read off a log.
+  recurrence: crate-test-cwd-process-global-race 2026-09-06
   Filed 2026-08-18 by close, draining the gap inbox; re-verified by probe, not by prose.
 
 - **baseline-move-stales-evidence-line** [design-pending] — promoting a task and moving a suite's
@@ -1020,12 +1027,13 @@
   this repo holds green evidence for, runner availability explicitly NOT being the
   constraint. So the uncovered set today is not a hypothetical Windows adopter — it is
   **every macOS adopter**, for whom omit-and-declare is already the normal path on day one.
-  **Why the existing entries do not cover it.** `platform-support-ci-matrix` owns the CI leg
-  and, since 2026-08-27, the widening itself: `gate-binary-target-roster-widening` shipped
-  **without widening the roster**, and deliberately — `native/targets.list`'s own header rules
-  the msvc triple stays off until a run has produced AND EXERCISED its artifact, which is that
+  **Why the existing entries do not cover it.** `platform-support-ci-matrix`, retired 2026-09-06,
+  owned the CI leg and, since 2026-08-27, the widening itself: `gate-binary-target-roster-widening`
+  shipped **without widening the roster**, and deliberately — `native/targets.list`'s own header
+  rules the msvc triple stays off until a run has produced AND EXERCISED its artifact, which is that
   leg's promotion condition. An iteration named *unblock* removes a blocker; it does not grant
-  a permission. So one live entry now owns *closing* the gap. Nothing owns the *accumulation*
+  a permission. So *closing* the gap is now owned by no live entry at all — the leg's owner having
+  retired ahead of its promotion condition. Nothing owns the *accumulation*
   the flip creates while it stays open, and nothing would redden if it grew without bound.
   **What is genuinely open:** whether the right instrument is a measurement (a count of
   omitted members per uncovered target, so the pile is visible), a bound (a policy ceiling
@@ -3655,7 +3663,13 @@
   this is about a populated one whose entries carry no distinction between a measurement and an
   estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
   sweep *cites*; this covers what a session captures about its own work.
-  recurrence: kfric-capture-unverified-assertion 2026-08-28
+  recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
+  **THIRD INSTANCE, 2026-09-06, and it is a wrong OWNERSHIP claim rather than a wrong fact.** The
+  capture's fact — `run-gates.sh` refuses a working directory outside a checkout — is true; what is
+  false is the clause beside it, "no gate-sdk/SPEC.md section states it". That section had stated it
+  since `121e76cb`, 2026-09-04, landed by *this same triage loop* two days earlier. The axis this
+  adds: a capture's ownership clause is what routes the drain's remediation, so a false one buys a
+  duplicate home for a fact that already had one — the shape the star topology exists to refuse.
   **SECOND INSTANCE, 2026-08-28, and it is a wrong MECHANISM rather than a wrong number.** A kfric
   stamped at spec asserted that `check-stage-entry` assertion C's component dir is a directory
   holding `LIFECYCLE_KIT_ROSTER_BASENAME`, so `installer/` and `native/` are not components; close's
@@ -8648,7 +8662,8 @@
   missing fact is *which spelling the harness uses on Windows*, an observation of another program
   on a host this tree has none of, and no command on a Linux box produces it — writing a fold
   without it would be inventing a Windows fact, which is what spec declined to do. →icebox fails
-  because a live trigger exists and is dated: `platform-support-ci-matrix`'s Windows leg is the
+  because a live trigger exists and is dated: the Windows leg `platform-support-ci-matrix` shipped
+  before retiring 2026-09-06 still runs on every push to master and is the
   run that can observe it, and the migration that just landed made every *other* producer
   dialect-correct, so these three are now the tree's recorded exception rather than part of a
   uniform unfixed background.
@@ -8958,10 +8973,11 @@
   the bullets above cite; that deletion repairs no part of this entry, which still owns batching
   the staging call so no host's `ARG_MAX` is the ceiling. Only the second was ever this entry's.
   **Cost while deferred:** a native-Windows adopter on the full profile cannot install, and the
-  named adopter behind TRAJECTORY.md's 2026-08-26 Windows ruling is exactly that population — an
-  install-path claim witnesses it, so it is product-class outright.
-  **DISTINCT from `platform-support-ci-matrix`**, whose subject is the leg and the manifest
-  mismatch; this is one `git` invocation's argv width, and fixing either leaves the other standing.
+  named adopter the 2026-08-26 operator ruling ordered the Windows leg for is exactly that
+  population — an install-path claim witnesses it, so it is product-class outright.
+  **DISTINCT from `platform-support-ci-matrix`, retired 2026-09-06**, whose subject was the leg and
+  the manifest mismatch; this is one `git` invocation's argv width, and its retirement leaves this
+  standing untouched.
   Surfaced 2026-09-03 at the close of `capture-and-meter-cuts-with-windows-manifest-diagnostic`;
   drained here at the next boundary.
 
@@ -10164,8 +10180,5 @@
 - **post-build-instrument-edit-unowned** [design-pending] — No stage owns a post-build tree edit.
 
 ## Done
-
-- context-kit-testing-hold-is-colocation-not-coupling
-- platform-support-ci-matrix
 
 ## Lessons Learned

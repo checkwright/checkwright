@@ -1450,7 +1450,7 @@ two read the **comparison**, and the last is the catch-all on any value's shape:
 | observation | reading |
 | --- | --- |
 | `want == own == raw` and `reread != raw` | the read side's context applies a filter the write side's does not; the defect is at `run-smoke.sh`'s call site and the two-call-site narrowing is confirmed |
-| `want == own == reread` and all differ from `raw` | both contexts filter identically, so the hashes agree and the arm could not have failed on this path — the disagreement is in the comparison, not in the hashing |
+| `want == own == reread` | the hashes agree and the arm could not have failed on this path — the disagreement is in the comparison, not in the hashing (whether they also equal `raw` says only *why* they agree: equal, no context filters at all; unequal, both contexts filter identically — neither changes the reading) |
 | `own == reread == raw` and `want != raw` | the bytes on disk are not the bytes `init` hashed; the porcelain below and the artifact control say which |
 | `got != reread` | the value the comparison used is not the value the same call yields now, so the mangling happens at capture time inside the loop; `got`'s byte rendering names the stray byte |
 | `want == got`, byte-equal, both held | the comparison received two equal values and reported them unequal, which bash cannot do — so the pairing is wrong and `bad_hash` associated one entry's `want` with another entry's `got`; read the sampled path against the loop's own echo order |
@@ -1578,7 +1578,7 @@ existed.*
 *What these rounds therefore establish, and what they do not.* The recorded
 value, the tree's bytes, every git context **and the `want` the loop held** all
 agree, so the disagreement is **in the comparison and not in the hashing** — the
-table's second row, in its strongest form. Round 13's report could not settle
+table's second row. Round 13's report could not settle
 that, because its first form re-read `want` through a second channel instead of
 printing the one the comparison used; round 14 carried the corrected `want` and
 it agreed with everything. **That correction was applied to one operand of

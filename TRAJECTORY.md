@@ -399,15 +399,6 @@ the port oracle's answer. Untouched by the 2026-08-30 config-seam ruling, which 
 the left-owed set on an **edit-seam** ground the vocabulary question never asked; gate-sdk/SPEC.md
 §The config-seam port disposition states the two grounds as cumulative.
 
-**A native Windows CI leg joins `platform-support-ci-matrix`, ordered ahead of the macOS leg —
-ruled 2026-08-26 by the operator.** This reopens the 2026-08-25 narrowing of that entry's
-platform set to macOS alone, and the ground is a named adopter rather than a plan: a native
-Windows project is ready to adopt, the first member of the population objective 2 was ruled for.
-The roster rule is untouched — a Windows triple joins `native/targets.list` only once that leg
-has produced and exercised its artifact — which is exactly why the leg is what is ordered. The
-alternative refused: leaving native Windows to WSL, which serves the adopter today and is the
-interim path until the leg is green, but reaches no evaluator objective 2 names.
-
 **The two bootstraps are hand-kept, held in parity by a per-bootstrap install-smoke leg —
 ruled 2026-08-26 by the operator**, closing `powershell-installer-surface`'s fork 2. The
 mechanism and the refused generated-twins alternative are owned at `installer/README.md`
