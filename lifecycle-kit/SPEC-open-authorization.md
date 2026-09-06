@@ -23,7 +23,8 @@ ruling-authority names — nothing in the machinery would branch on the value.
 **The mechanical floor is refused for this unit, with the shape named for whoever wants it later.**
 Delta 4 owns that refusal and its grounds.
 
-**This amendment is one of five in an iteration spanning gate-sdk, lifecycle-kit and drift-kit**, so
+**This amendment is one of five units in a four-amendment iteration spanning gate-sdk, lifecycle-kit
+and drift-kit**, so
 `check-stage-entry` assertion C is armed on the amendment file count alone and the audit stage's
 stamp will be demanded at build's entry.
 

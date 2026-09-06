@@ -36,7 +36,7 @@ takeable at this cut* — no takeable group, which is the budget arm's stated pr
 *84 file(s) scanned, 67 declared no-port, 0 temporarily held, 17 owed* — where this file reads
 `owed lines=96`. After the cut: 16 owed, 1930 lines.
 
-**This cut is one of five units in a five-amendment iteration spanning gate-sdk, lifecycle-kit and
+**This cut is one of five units in a four-amendment iteration spanning gate-sdk, lifecycle-kit and
 drift-kit**, so `check-stage-entry` assertion C is armed on the amendment **file count** alone
 (≥2 component dirs) before any body token is read: the audit stage's stamp will be demanded at
 build's entry. Stated here so the downstream entry does not discover it.
@@ -88,9 +88,10 @@ in `native/src/emit/mod.rs`'s `BRIDGED_ARMS`, with the body in `native/src/emit/
 **`Arm::Run` is forced by the exit grammar, and this is where the natural instinct is wrong.** The
 sibling port cuts in this kit have been `Arm::Emit` members admitted on the ground that they
 "declare no 1 and never have", so the collapse to {0, 2} discards nothing. That ground is **false
-here**: `fail()` at `:24` exits **1**, and every one of the walkthrough's six assertions reaches
-it — the battery not green after install, the violation not turning it red, the wrong gate
-catching it, the battery not returning to green. That 1 is the whole verdict the `demo` validate
+here**: `fail()` at `:24` exits **1**, and every one of the walkthrough's five assertions reaches
+it — the battery not green after install, the violation printing no expected-gate name, the
+violation not turning the battery red, the wrong gate catching it, and the battery not returning to
+green. That 1 is the whole verdict the `demo` validate
 suite reads. An `Arm::Emit` would collapse it into the dispatch-failure band and the suite would
 report a broken demo as an environment error. The rule is already written for exactly this shape at
 `--upgrade-smoke` — "an `Arm::Run` because its contract is the 1-versus-2 split of its exit status,

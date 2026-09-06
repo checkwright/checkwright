@@ -35,9 +35,10 @@ splits along that seam by construction:
 
 That split is also what holds the provenance seam here without further argument.
 
-**This amendment is one of five in an iteration spanning gate-sdk, lifecycle-kit and drift-kit**, so
+**This amendment is one of five units in a four-amendment iteration spanning gate-sdk, lifecycle-kit
+and drift-kit**, so
 `check-stage-entry` assertion C is armed on the amendment file count alone, and the audit stage's
-stamp will be demanded at build's entry. It is also one of **three** lifecycle-kit amendments in
+stamp will be demanded at build's entry. It is also one of **two** lifecycle-kit amendments in
 flight, so the Definition of Done's none-remain assertion is discharged at the **iteration**, not at
 this file's own merge commit — the branch §Merging an amendment already carries for exactly this
 case.
@@ -388,7 +389,7 @@ ruling record fires almost none of them. The battery is the oracle here, never t
       section (not appended); the merged spec reads as one coherent document a reader who never saw
       the amendment can use alone.
 - [ ] **Amendment deleted** — this file removed on merge. The none-remain half is discharged **at the
-      iteration**, three lifecycle-kit amendments being in flight, so only the batch merging the last
+      iteration**, two lifecycle-kit amendments being in flight, so only the batch merging the last
       of them satisfies `ls lifecycle-kit/SPEC-*.md`.
 - [ ] **Removals propagated** — grepped every spec, template and doc for the corrected pruning-
       directive premise and for the retired slug; nothing dangles, and the generated mirror is

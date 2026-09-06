@@ -33,7 +33,8 @@ built on either would be built on sand.
   under one triple annihilate **inside a single invocation**. A first measurement of a split stage
   is already lossy.
 
-**This amendment is one of five in an iteration spanning gate-sdk, lifecycle-kit and drift-kit**, so
+**This amendment is one of five units in a four-amendment iteration spanning gate-sdk, lifecycle-kit
+and drift-kit**, so
 `check-stage-entry` assertion C is armed on the amendment file count alone and the audit stage's
 stamp will be demanded at build's entry.
 
