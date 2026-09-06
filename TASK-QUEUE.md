@@ -10060,6 +10060,51 @@
   Surfaced 2026-09-05 by the `test-harness-cut-seam-sweep` close; drained here at the 2026-09-06
   scope boundary. →fix refused: the format split is unruled and the roster is not scope's surface.
 
+- **append-grant-decline-cause-unlogged** [design-pending] — the mandated resume-journal append IS
+  granted and still declines on real calls, and the fall-through log truncates at exactly the point
+  that would say why.
+  **THE FILING PREMISE IS FALSIFIED, and that is this entry's first deliverable.** The bullet this
+  drains proposed a standing grant on the ground that `.claude/settings.json` "grants no form of"
+  the append. Probed at this scope rather than relayed: guard rule 17, *Auto-allow a write to a
+  gitignored target* (guard-kit/SPEC.md §Consumer rules rule 17, `guard-kit/lib/guard.sh:838-874`),
+  exists for exactly this append and has since `10d538da` (2026-09-04). It is fixture-attested on
+  the exact `cat >> .tmp/journal.md <<'EOF'` spelling (`guard-kit/guard-tests/cases.tsv`), and a
+  hand-built payload plus all three live log records replayed through `scripts/bash-guard.sh`
+  return `permissionDecision: allow`.
+  **BOTH CANDIDATE GRANT SHAPES ARE ANSWERED BY THE TREE, so neither is the work.** A path-scoped
+  `Bash(cat >> .tmp/*)` is INOPERATIVE, not merely inferior — rule 17's own text states the harness
+  checks a redirect TARGET as a file write, so a `Bash(...)` entry grants the command and never the
+  target; it would also pass `check-settings-paths` vacuously, that gate filtering on a `.sh`
+  command token before its `*` rule is reached, so no oracle would report that it bought nothing.
+  A dedicated `--emit` arm needs NO settings entry either: `.claude/settings.json`'s
+  `Bash(bash gate-sdk/bin/run-gates.sh *)` already covers any arm name, attested by `file-gap`,
+  `file-survey` and `kfric` carrying no per-arm entry and by `65e22a28` REMOVING a settings line
+  when two affordances ported onto the binary.
+  **WHAT SURVIVES, and it is two things.** (1) Three `cat >> .tmp/*-journal.md <<'EOF'` calls
+  written AFTER rule 17 landed sit in `.workflow/prompt-friction.log` as genuine declines —
+  `guard_allow` exits, so a logged line is never an allowed call also logged — and every record is
+  truncated at exactly 500 chars by `guard_log_fallthrough`, which drops the heredoc terminator and
+  everything past it, so the declining clause is UNRECOVERABLE from the record. (2) The operative
+  instruction an agent loads names a different mechanism entirely:
+  `delegation-kit/templates/agent-execution.md` says the agent **`Write`s** the journal, while
+  `delegation-kit/SPEC.md` §Resume journal obliges an ARTIFACT and no mechanism — so a session
+  appending through Bash at all may be departing from the template, which would make the whole
+  measured friction self-inflicted and the remedy a steer rather than a grant.
+  **DISTINCT from `prompt-ranking-ungrantable-shape-class`**, which owns what the RANKING should
+  say about rows no entry can match; this owns why a row that IS covered by a standing grant still
+  falls through, and it is the first instance where the answer is a live decline rather than an
+  ungrantable shape.
+  **Why `[design-pending]`:** the two survivors want different shapes — widening the log record
+  (or recording the declining clause id beside it) against re-pointing the operative template at
+  `Write` — and which is right depends on whether a Bash append is sanctioned at all, which is
+  unruled.
+  **Cost while deferred:** the top friction row every close is a decline nobody can diagnose, so
+  each close re-triages it and each remedy is a guess. Directed 2026-09-06 (operator, relayed by
+  the lead session) as *"Add the useful grant"*; the directive's own premise is what this entry
+  falsifies, so it is escalated rather than discharged.
+  Surfaced 2026-09-06 by the `always-loaded-cut-and-seam-slice` close; drained here at the
+  2026-09-06 scope boundary, promoted after the fix was refused as operator-class.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -10069,6 +10114,7 @@
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
 - **audit-roster-grammar-ungated** [design-pending] — Row fields ungraded; waits on the format.
+- **bridged-arm-spawned-program-set-unheld** [design-pending] — Declared set unheld; shape ships.
 - **icebox-drops-a-bought-census** [design-pending] — No dormant home for a measured payload.
 - **inline-source-literal-ungateable** [design-pending] — Fence-only oracle; no rename pending.
 - **turn-end-refusal-used-as-a-busy-wait** [design-pending] — Sessions busy-wait via the stop hook.
