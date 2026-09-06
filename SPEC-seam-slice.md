@@ -115,16 +115,24 @@ record's five-kit breakdown re-verified this session as still exact at seventeen
 
 **The question is answerable for every kit SPEC at once or not at all**, which is what makes
 this slice the wrong place to answer it: a ruling taken here would bind five kits nobody has
-swept and would be applied by a session that surveyed three. The parent shipped its ten intact,
-the first slice shipped its nine, and this one ships its two on the same ground — deliberately,
-not by omission, and a reader meeting a swept file with a live `CLAUDE.md` citation in it should
-read that as this rule holding.
+swept and would be applied by a session that surveyed three. Escalated at authoring and **ruled
+`lead, own-authority` 2026-09-06 on the escalating session's own recommendation: the citations
+stay standing and the slice ships as shaped.**
 
-**When it must be answered is stated, because "open" with no deadline is how it has stayed open
-across three units.** The seam gate encodes whichever way it goes, so the answer is owed **before
-the slice that lands the gate** and not before any earlier one. It is a derivation rather than a
-ruling — the citations resolve in this tree and in no vendoring consumer's — and it is escalated
-with this amendment rather than taken.
+**This is the third consecutive deferral and the count is stated because the count is the debt.**
+The parent shipped **ten** intact, the first slice shipped **nine**, and this one ships **two** —
+twenty-one dispositions deferred across three units, of a class of seventeen live sites plus the
+`docs/`- and private-brief-class the same question reaches. Each deferral is the right call on
+its own iteration and each one adds to a balance nobody is looking at, and a reader who cannot
+see the count cannot see the debt. So the count rides the rule rather than being recoverable
+only by reading three amendments in sequence.
+
+**When it must be answered, and by whom.** The answer is owed **to the operator, before the
+slice that lands the gate**, and not before any earlier one — the gate encodes whichever way it
+goes, so the last slice is the first one that cannot proceed without it. It is a derivation
+rather than a ruling on its face — the citations resolve in this tree and in no vendoring
+consumer's — but it reaches the provenance seam, which is a privacy boundary before it is a
+design one, and that is what puts it above a lead's own authority when it is finally taken.
 
 ### (6) The gate is not this slice's, and the enforcement-first objection is deferred rather than dissolved
 

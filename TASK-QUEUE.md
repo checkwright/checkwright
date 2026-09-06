@@ -93,10 +93,13 @@
   **THE POINTER CLASS STAYS OPEN and ships intact for the third consecutive unit.** Re-verified
   2026-09-06 as still EXACT at 17 across five kit SPECs (gate-sdk 10, guard-kit 4,
   canon-kit/delegation-kit/lifecycle-kit 1 each; queue-kit zero), plus a `docs/`- and
-  `BRIEF.local.md`-class the same question reaches. Two fall in this slice. A derivation, not a
-  ruling, open for the lead or operator and outside the ruled discriminator; answerable for every
-  kit SPEC at once or not at all, so the answer is owed BEFORE the slice that lands the gate and
-  not before any earlier one.
+  `BRIEF.local.md`-class the same question reaches. Two fall in this slice. **RULED `lead,
+  own-authority` 2026-09-06, on the spec session's escalation and its own recommendation: they
+  STAY STANDING and this slice ships as shaped.** It is answerable for every kit SPEC at once or
+  not at all, so the answer is owed **to the OPERATOR, before the slice that lands the gate** and
+  not before any earlier one — it reaches the provenance seam, which is a privacy boundary before
+  it is a design one. **THIRD CONSECUTIVE DEFERRAL, and the count is the debt:** the parent
+  shipped ten intact, the first slice nine, this one two. Right each time, and accruing.
   **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile.** It must encode the
   sanctioned exemption for gate-sdk/SPEC.md §The decisions this substrate already closed (`lead,
   own-authority` 2026-09-05), which retires only if
@@ -105,6 +108,74 @@
   is green", so it survives until this entry lands WHOLE.
   Filed 2026-09-05 at scope with the split that created it; promoted and demoted 2026-09-06;
   re-promoted 2026-09-06 at spec for the three-kit slice.
+
+- **pack-installer-no-owning-spec-section** [spec: SPEC-packer-boundary.md] — the largest
+  reachable member of the owed port column has no SPEC section claiming it, so its cut has no
+  boundary to be authored against and no gate reports the hole.
+  **Measured 2026-09-05 at spec, section by section rather than by grep.**
+  `scripts/pack-installer.sh` (196 owed lines) carries `# spec: CLAUDE.md §Housekeeping` — an
+  always-loaded manifest the 2026-09-05 operator ruling bars as a cut boundary — and no section
+  of `installer/README.md` or `gate-sdk/SPEC.md` claims the file.
+  **PROMOTABLE ON THE PURPOSIVE READING OF GROUND 1 — operator, direct answer to the lead
+  session's ask, lead-relayed, 2026-09-06.** The port-first run's port-critical test is "the
+  owning section's own sequencing sentence", and it is UNSATISFIABLE here because the missing
+  section IS the defect. The purposive reading governs, and the section-authoring plus the
+  196-line cut MAY RIDE ONE ITERATION. Refused with it: the strict reading and the
+  outside-the-cut-economy one.
+  **PLACEMENT RULED `lead, own-authority` 2026-09-06**, on the spec session's escalation and
+  recommendation, with the lead re-reading all three supporting citations in the tree rather than
+  accepting them: a NEW `installer/README.md` section owns the file. The PRIMARY ground is the
+  provenance seam — gate-sdk is a KIT, so a kit SPEC governing a `scripts/` file no adopter
+  receives inverts the kit/consumer layering and publishes a private rule as kit mechanism.
+  Secondary and independent: §Consumer payload bounds its own reach to "what a gate ships".
+  Decisive positive evidence: `installer/README.md` §The consumer smoke ALREADY hosts this exact
+  shape for `installer/consumer-smoke/run-smoke.sh` — a repo-private tool riding no payload — and
+  establishes that status BY CITING THE PACKER. The two are one family.
+  **The sequencing sentence turns out to be a negative one:** the packer carries no bootstrap
+  step, ships to no adopter (`pack_tracked` packs `installer/` and the kit roots; `scripts/` is
+  neither), and both its callers already build the binary — so nothing sequences it and it is a
+  plain port obligation.
+  **DISTINCT from `spec-pointer-boundary-legality`**, which stays filed: this unit gives one file
+  a legal target and does not teach the gate to grade target legality.
+  Filed 2026-09-05 by close, promoting a gap bullet after fix was refused as a design call and
+  icebox refused on the live port trigger; promoted 2026-09-06 at spec with its placement ruled.
+
+- **lead-open-authorization-channel-and-cardinality** [spec: SPEC-lead-grant.md] — the lead
+  template tells a lead that its own invocation authorized nothing, names no channel by which
+  authorization does arrive, and carries the one-open bound at the iteration BOUNDARY rather than
+  on the GRANT, so a lead learns the cardinality an iteration late.
+  **Ruled and directed 2026-09-06 by the operator**, in a direct in-session reply to a lead
+  session's authorization ask, relayed by that lead: the invocation IS the grant, and one
+  invocation grants exactly one iteration. The verbatim, the grounds, and the measured failure
+  behind it — a lead opening a second iteration on one grant — are TRAJECTORY.md §The closed
+  rulings', landed at `e818e6fd` and not restated here. The operator directed the correction in
+  the same breath: "Correct your instructions if not clear."
+  **The read that makes it a defect rather than a preference, verified 2026-09-06 at scope:**
+  `lifecycle-kit/templates/lead.md:184-185` demands authorization "obtained explicitly and
+  separately"; `:223-230` disqualifies a relayed directive as evidence; §Opening names NO channel
+  and NO cardinality at all; `:241-247` attaches the bound to the boundary.
+  **TWO EDITS ON TWO TIERS, and the split is the provenance seam's.** Kit mechanism — a channel
+  the consumer BINDS, and a cardinality the grant carries — goes in the template's §Opening;
+  consumer config — that this tree's bound channel is the lead skill's own invocation — goes in
+  `.claude/commands/lead.md`. A slash-command literal in a kit template would publish one
+  harness's layout.
+  **WHICH SLOT CARRIES THE CONSUMER HALF IS RULED `lead, own-authority` 2026-09-06**, on the spec
+  session's escalation: a NEWLY MINTED slot in §Opening, NOT the existing `ruling-config`.
+  TRAJECTORY.md's mechanism sentence said `ruling-config` and this entry said a new name; both
+  cannot hold, since a shim binds a slot by a `**slot-name** —` lead line. Ruled on two surfaces
+  neither cited: `ruling-config` DECLARES its own subject ("the tracked agent-definition the lead
+  dispatches and the roster it carries"), which the authorization channel is not; and §Policy is
+  config puts policy binding the lead ITSELF in the template rather than in the dispatched agent
+  definition. TRAJECTORY.md's sentence is corrected where it stands — the transitional MECHANISM
+  half, never the ruling, its date or its channel.
+  **IT PROMISES PROSE AND NEVER A GATE.** `lifecycle-kit/SPEC.md:337` already records the
+  authorization fact as NOT encodable — unencodable, not expensive to encode, with two mechanisms
+  weighed and ruled out on record — so the correction must say so where it lands rather than read
+  as a gate a later session goes looking for.
+  **THE MINT'S COST IS PRICED, NOT WAVED OFF:** an unbound slot is red, so every vendoring
+  consumer reds until it binds the new token. Discharged as ONE release-note line under the
+  allowed-reds shape, which is where this cost is always paid.
+  Filed 2026-09-06 by scope, landing the ruling that directed it; promoted 2026-09-06 at spec.
 
 ## Technical Debt
 
@@ -235,32 +306,6 @@
   is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
   work, not the argument.
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
-
-- **lead-open-authorization-channel-and-cardinality** [design-pending] — the lead template tells a
-  lead that its own invocation authorized nothing, names no channel by which authorization does
-  arrive, and carries the one-open bound at the iteration BOUNDARY rather than on the GRANT, so a
-  lead learns the cardinality an iteration late. **Ruled and directed 2026-09-06 by the
-  operator**, in a direct in-session reply to a lead session's authorization ask, relayed by that
-  lead: the invocation IS the grant, and one invocation grants exactly one iteration. The
-  verbatim, the grounds, and the measured failure behind it — a lead opening a second iteration on
-  one grant — are TRAJECTORY.md §The closed rulings', landed at `e818e6fd` and not restated here.
-  The operator directed the correction in the same breath: "Correct your instructions if not
-  clear." **The read that makes it a defect rather than a preference, verified 2026-09-06 at
-  scope:** `lifecycle-kit/templates/lead.md:184-185` demands authorization "obtained explicitly
-  and separately"; `:223-230` disqualifies a relayed directive as evidence; §Opening names NO
-  channel and NO cardinality at all; `:241-247` attaches the bound to the boundary. **TWO EDITS ON
-  TWO TIERS, and the split is the provenance seam's.** Kit mechanism — a channel the consumer
-  BINDS, and a cardinality the grant carries — goes in the template's §Opening behind a binding
-  slot, which is a new governed name, so this is a FEATURE and owes an amendment. Consumer config
-  — that this tree's bound channel is the lead skill's own invocation — goes in
-  `.claude/commands/lead.md`'s `ruling-config` slot. A slash-command literal in a kit template
-  would publish one harness's layout. **IT PROMISES PROSE AND NEVER A GATE.**
-  `lifecycle-kit/SPEC.md:337` already records the authorization fact as NOT encodable —
-  unencodable, not expensive to encode — so the correction must say so where it lands rather than
-  read as a gate a later session goes looking for. **Cost while deferred:** every lead session
-  runs under text telling it its invocation authorized nothing, which is what bought the round
-  trip this ruling came out of, and the bound stays discoverable only one iteration after it
-  binds. Filed 2026-09-06 by scope, landing the ruling that directed it.
 
 - **context-kit-testing-hold-is-colocation-not-coupling** [design-pending] — `context-kit/SPEC.md`
   §Testing holds `bin/run-index-tests.sh` owed on a CO-LOCATION ground where its sibling's is
@@ -9684,39 +9729,6 @@
   entry read as undated and the age filter never reached it — corrected at the 2026-09-05 drain.)
   Deferred, never promoted — it meets none of the three joining grounds the port-first run states
   (TRAJECTORY.md §PRIORITY DIRECTIVE); no run has ever barred a Deferred filing.
-
-- **pack-installer-no-owning-spec-section** [design-pending] — the largest reachable member of the
-  owed port column has no SPEC section claiming it, so its cut has no boundary to be authored
-  against and no gate reports the hole.
-  **Measured 2026-09-05 at spec, section by section rather than by grep.**
-  `scripts/pack-installer.sh`
-  (196 owed lines) carries `# spec: CLAUDE.md §Housekeeping` — an always-loaded manifest the
-  2026-09-05 operator ruling bars as a cut boundary — and no section of `installer/README.md` or
-  `gate-sdk/SPEC.md` claims the file: §The install boundary scopes itself to `installer/lib` and
-  `installer/bin`, and §The consumer smoke disclaims reaching either.
-  **Why `[design-pending]` and why the fix was refused here.** Authoring or naming the owning
-  section is the deliverable, and WHICH home is right is the unruled part — `gate-sdk/SPEC.md`
-  §Consumer payload already owns the payload's derivation and is the near candidate, against a new
-  `installer/README.md` section that would put the packer beside the surface it packs. Picking one
-  at a drain would settle a placement question by accident.
-  **Why not icebox:** the trigger is live and dated — no cut can take this file until a section
-  exists, so the owed column stalls on it rather than merely aging, and the port-first run that
-  superseded the port-only one still puts a cut first in every iteration.
-  **DISTINCT from the `installer/bin/checkwright.sh` mis-pointer of the same class**, which HAS a
-  resolvable home; this one has none to point at.
-  **Gap generalization:** the check class is a `# spec:` pointer resolving to a surface that is not
-  a legal cut boundary — buildable, and filed as `spec-pointer-boundary-legality` below.
-  **Cost while deferred:** low per read and paid at the worst moment — the session that reaches
-  this file is mid-cut, and it discovers the hole after it has already sized the work.
-  **PROMOTABLE 2026-09-06 ON THE PURPOSIVE READING OF GROUND 1 — operator, direct answer to the lead
-  session's ask, lead-relayed**, answering the ambiguity scope escalated. The port-first run's
-  port-critical test is "the owning section's own sequencing sentence", and it is UNSATISFIABLE here
-  because the missing section IS the defect. The purposive reading governs — this entry's own
-  "no cut can take this file until a section exists" is the sentence a section would have carried —
-  and the section-authoring plus the 196-line cut MAY RIDE ONE ITERATION. Refused with it: the
-  strict reading (no section, no sentence, not port-critical) and the outside-the-cut-economy one.
-  Filed 2026-09-05 by close, promoting a gap bullet after fix was refused as a design call and
-  icebox refused on the live port trigger.
 
 - **spec-pointer-boundary-legality** [design-pending] — `check-spec-pointer` grades that a `# spec:`
   target resolves, never that the target is a surface a cut may be bounded against.
