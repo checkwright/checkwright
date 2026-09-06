@@ -25,8 +25,11 @@ LIFECYCLE_KIT_ENTRY_PREFLIGHT=(
 )
 # spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's session-boundary posture: 'iteration' sanctions the lead's inline fallback; cost accepted that the dogfood evidence stops demonstrating the strict posture
 LIFECYCLE_KIT_SESSION_BOUNDARY=iteration
-# spec: lifecycle-kit/SPEC.md §The close-surface roster — this repo's declaration surfaces beyond the kit SPECs: the always-loaded agent file, the doctrine deliverable, and the stage-skill bindings, which own the consumer-side capture surfaces no kit may name
-LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS=("*/SPEC.md" "CLAUDE.md" "doctrine-kit/DOCTRINE.md" ".claude/commands/*.md")
+# spec: lifecycle-kit/SPEC.md §The close-surface roster — this repo's declaration surfaces beyond the kit SPECs: the always-loaded agent file, the doctrine deliverable, the stage-skill bindings which own the consumer-side capture surfaces no kit may name, and the ruling record, which declares itself in its own header because it owns itself and no binding owns any part of it
+LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS=("*/SPEC.md" "CLAUDE.md" "doctrine-kit/DOCTRINE.md" ".claude/commands/*.md" "TRAJECTORY.md")
+# spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — this repo's ruling record and the surfaces that argue about its rulings; the kit defaults both empty because a record's name and a tree's arguing surfaces are the consumer's facts, and an adopter keeping no record leaves the machinery inert
+LIFECYCLE_KIT_RULING_RECORD=TRAJECTORY.md
+LIFECYCLE_KIT_RULING_CITERS=("TASK-QUEUE.md" "CLAUDE.md" "*/SPEC.md" "doctrine-kit/DOCTRINE.md" ".workflow/audit-roster.txt")
 # spec: lifecycle-kit/SPEC.md §check-scratch-citation — this repo's widening beyond the kit default (the queue alone): the governed spec set, the other permanent surface where a carried finding wants to land. The array replaces rather than extends, so the queue is restated here.
 LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS=("TASK-QUEUE.md" "*/SPEC.md")
 # spec: lifecycle-kit/SPEC.md §check-stage-entry — this repo splits amendment authoring into a dedicated trigger-gated `spec` stage (scope bounds, spec authors, align verifies); the roster and its `[spec]=scope` predecessor edge are set together — a roster member absent from the predecessor map fails config-load validation. Only `scope` (LIFECYCLE_KIT_FIRST_STAGE) resets the evidence file; `spec` appends. `spec` is omitted as any stage's mandatory predecessor (same calibration as the trigger-gated audit stage), so align/build/validate/close edges are unchanged.

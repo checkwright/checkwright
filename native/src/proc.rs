@@ -378,6 +378,60 @@ pub fn run_bounded(program: &str, args: &[&str], secs: u64) -> Result<Option<i32
     }
 }
 
+// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — `run_bounded` for a caller that needs
+// the child's *output* and not only its code. Capture goes to a file, not a pipe: a poll loop and a
+// filled pipe buffer deadlock each other. `Ok(None)` is the bound expiring.
+pub fn run_bounded_capture(
+    program: &str,
+    args: &[&str],
+    secs: u64,
+) -> Result<Option<(i32, Vec<u8>)>, String> {
+    #[cfg(test)]
+    recorder::note(program);
+    let spawn_err = |e: std::io::Error| {
+        format!(
+            "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+            program, e
+        )
+    };
+    let capture = std::env::temp_dir().join(format!(
+        "checkwright-bounded.{}.{}",
+        std::process::id(),
+        MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    ));
+    let out = std::fs::File::create(&capture).map_err(spawn_err)?;
+    let mut child = Command::new(program)
+        .args(args)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::from(out))
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| {
+            let _ = std::fs::remove_file(&capture);
+            spawn_err(e)
+        })?;
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(secs);
+    let outcome = loop {
+        match child.try_wait() {
+            Ok(Some(status)) => break Some(exit_code(&status)),
+            Ok(None) => {}
+            Err(e) => {
+                let _ = std::fs::remove_file(&capture);
+                return Err(format!("cannot wait for {}: {}", program, e));
+            }
+        }
+        if std::time::Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            break None;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    };
+    let bytes = std::fs::read(&capture).map_err(spawn_err)?;
+    let _ = std::fs::remove_file(&capture);
+    Ok(outcome.map(|code| (code, bytes)))
+}
+
 // spec: drift-kit/SPEC.md §The KPI plugin contract — `run` with additions to the *child's*
 // environment, the one shape `run` cannot carry. Writing the child's rather than the process's is
 // what leaves knobenv's guard the only writer of the process-global one.

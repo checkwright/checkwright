@@ -334,6 +334,33 @@ nothing. The two limits in this section are the same shape from opposite sides
 of one dispatch: the one above is about waiting for stage N to be *over*, this
 one about which command is safe *once it is*.
 
+**Honest limit on the lead's open authorization.** The rule that opening an
+iteration is the operator's decision, obtained explicitly, and that the lead
+stops and reports rather than opening the next one at the boundary
+(§templates/lead.md, both ends of the one rule) is **prose-only and
+human-enforced** like its two siblings above — and here the cause is that the
+fact is **not encodable**, not that encoding is expensive. An authorization is a
+fact about a conversation. Every encoding of it — a flag on `--enter-stage`, a
+committed line naming an authority, a ledger arming — is written by the same
+session it binds, so it raises the cost of proceeding unauthorized and does not
+make an unauthorized open detectable afterward. Recording the limit is what keeps
+the prose rule from reading as a weaker stand-in for a mechanism that was
+available. **Two mechanisms were weighed, and which is which is on record.** The
+one-shot entry valve (§bin/enter-stage.sh) is ruled out **by its own contract**
+rather than by preference: it reaches no iteration-boundary refusal at all, and
+its ledger matches the queue header's iteration name while the boundary entry
+stamps the unnamed placeholder — so at the moment an authorization would be
+checked there is no name an arming could have been written against.
+`LIFECYCLE_KIT_BOUNDARY_REQUIRE` is the shape that would actually fit, already
+firing only on the first stage, reading a committed file, and failing closed when
+the file is absent; two costs are named with it rather than discovered later — it
+is guarded on the closing iteration having a name, so a consumer's very first
+iteration skips it, and its refusal text is written for the disposition semantics
+it currently serves, so a second semantic needs either a second knob or a
+generalized message. **Naming the shape is not proposing it**; it is what a later
+reader needs so that *no floor was buildable* is not the conclusion drawn from
+this refusal.
+
 ### Deviation transitions
 
 The stages walk `scope → align → build → validate → close` in order by
@@ -615,6 +642,25 @@ the clause's reader is a human or agent rather than a gate.
   declaration vocabulary is kit-owned and carries no consumer content; the roster
   is derived, never a kit literal — a kit shipping the *names* of a consumer's
   inbound surfaces would publish that consumer's private workflow.
+- `LIFECYCLE_KIT_RULING_RECORD` — the consumer's ruling-record path
+  (§The ruling-staleness probe); **default empty**, so the whole
+  ruling-staleness machinery is inert for a consumer that keeps no such record,
+  exactly as the pre-flight valve's ledger knob defaults empty and no valve
+  exists. A kit shipping a default filename would be asserting that every adopter
+  keeps this artifact, under this name.
+- `LIFECYCLE_KIT_RULING_CITERS` — array of path globs the citing-side report
+  sweeps for a declared ruling name (§The ruling-staleness probe); **default
+  empty**, on the same ground the other prose-surface glob rosters above are the
+  consumer's: which of a tree's surfaces argue about rulings is a fact about that
+  tree, and a kit literal naming them would publish that consumer's layout.
+- `LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT` — positive integer seconds bounding a
+  declared discharge oracle's dispatch (§The ruling-staleness probe); default
+  `10`. It exists so a hung command cannot wedge the arm that dispatches it, and
+  a timeout reports as a **dispatch failure** rather than as a verdict.
+  **No knob carries a condition vocabulary or an authority vocabulary**, and the
+  refusal is the one this kit already records for ruling-authority names: nothing
+  in the machinery branches on such a value, so a knob holding one would have the
+  knob-citation gate as its only reader.
 - `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` — array of path globs for the surfaces
   held to the no-retrieval-pointer rule (§check-scratch-citation); default the
   queue file alone (`LIFECYCLE_KIT_QUEUE_FILE`). That default is the one permanent
@@ -912,6 +958,16 @@ its authority was. Deleting it would delete the only thing that can produce the
 prompt, and the prompt is what reaches the one party who can answer cheaply: a
 mid-build filer routinely has not read the queue, which is why the matcher
 existed in the first place.
+
+**The objection has a second application, and the same answer.** A citation of a
+ruling carries no tell either: a surface may name a retired ruling as **evidence
+about the past**, which is correct prose, or restate it as a **live rule**, which
+is the defect — and one measured cohort holds the instance that settles it, a
+site recording a *live* ruling under a retired run's name, where the repair was
+to re-name the run and leave the ruling standing. So the citing-side reader takes
+the same demotion this one takes: it reports the sites and quotes them, and never
+says a citation is wrong (§The ruling-staleness probe). Two applications of one
+objection, with one answer, is what makes it a rule rather than a local excuse.
 
 **Its honest limit.** A bullet describing a recurrence without spelling the slug
 raises no advisory at all. That leaves no hole in this channel, because the drain
@@ -1690,6 +1746,20 @@ source is the closure that makes the roster fail loudly: a capture surface added
 with no declaration appears as `(undeclared)` rather than not appearing at all.
 The roster reports the hole instead of inheriting it, which is the whole
 difference between a derived roster and a maintained one.
+
+**A consumer's ruling record is a roster member, and that is what makes close's
+repair step derived rather than remembered.** Close reads the record for aged
+facts and fired discharge conditions (§templates/stages/), so the record is an
+inbound triage surface by the same test as any other — and declaring it puts the
+obligation on the roster the stage already walks instead of in a session's
+memory. It declares itself in its own header, `advisory`: no structural forcing
+function exists, since nothing can red on a record nobody read, and the mode is
+what makes a skipped repair a visible judgment. It is tracked rather than
+capture-tier, so no `reclaim=` is owed. **The empty-knob case is the point of
+declaring it this way**: a consumer that keeps no ruling record leaves
+`LIFECYCLE_KIT_RULING_RECORD` empty and writes no declaration, the roster
+therefore carries no such row, and close's step **skips rather than fails** —
+the same inertness the probe's knobs buy at the other end.
 
 **Ruled out: shrinking the roster by merging the two capture logs.** The obvious
 way to make close's inbox count smaller is to merge the two friction capture logs
@@ -3082,6 +3152,132 @@ duplicate *surfaces*, not duplicate declarations). A path-only sort would leave
 the tie order at the sorter's discretion and churn the gate's error order for no
 edit.
 
+### The ruling-staleness probe
+
+A **reporting** arm (`--emit ruling-staleness`) over a consumer's ruling record.
+It renders a document and its exit carries no verdict a caller branches on — it
+escalates to a reader rather than gating an act — so, like the roster arm above,
+it owes no `good`/`bad` fixture pair (§The non-gate arm's ground: an arm
+returning a document has no pass and no fail to fixture). It resolves three
+knobs (§Layout and configuration) and reads nothing else; with
+`LIFECYCLE_KIT_RULING_RECORD` empty it reports that it is unconfigured and
+returns, which is what makes close's repair step skip rather than fail for a
+consumer keeping no such record.
+
+**Two declarations are its whole input grammar**, both body lines in the record,
+both hand-written under judgment by the session recording or retiring a ruling.
+Neither is a **tag**: a tag marks a move across a pending/ready boundary and
+these mark none, which is the further-tag test's own words.
+
+```
+ruling: <name>[ <name>…]
+discharge: <name> <oracle>
+```
+
+`ruling:` names the ruling in the words other surfaces use for it — **one or
+more names, appended and never rewritten** — and exists for the *citing* side.
+That is the finding the obvious design does not have. The inbound half of this
+class reads naturally as *a citation resolving to a surviving section while the
+ruling inside it is gone*, and measured against a real cohort that diagnosis is
+too narrow twice over: in the largest instance on record, eight of eleven stale
+citations named the file, seven named the section, and **every one still
+resolved**, because the heading survived and only the body under it was
+rewritten. A probe over citation *targets* therefore reaches zero of eleven. The
+single invariant across all eleven was the ruling's **proper noun** in a
+present-tense claim anchored to no file at all, and across a tree that shape is
+the large majority. A twelfth site in that same cohort survived its repair by
+writing the noun one word differently, which is why a single declared name is
+insufficient by construction and the field takes a list.
+
+`discharge:` is for a ruling conditioned on a future event, and it declares an
+**oracle** — a command — never a predicate the kit interprets. **Inventing a
+condition language was the obvious design and is refused on a structural fact.**
+Every machine-parsed conditional in this kit's neighbourhood resolves its
+condition against one domain, a queue's live/done partition, and that is not an
+implementation accident: a queue entry has a slug and a pool with an exit, and a
+ruling has neither. A condition grammar for rulings would have to mint the first
+non-queue condition domain and be expressive enough for the conditions records
+actually carry — a CI leg producing an artifact, an oracle's owed count reaching
+zero, a metric read at or below zero across three closes, a release channel
+flipping — which is a vocabulary that would be wrong the day after it landed.
+The oracle form instead reuses a doctrine this kit already ships: §The survey
+record's rule that a carried finding is a citation with a falsifiable staleness
+witness and never a substitute for the oracle. A discharge condition is that
+shape read forward — the ruling names the command, and the session that would
+rely on the ruling runs it. The kit interprets nothing; it dispatches and
+reports.
+
+**The oracle's contract is the exit status and one line of output, in three
+bands**, and the third band is why a broken oracle can never read as a fired
+condition:
+
+- **not fired** — a non-zero exit, or a clean run printing nothing. The ruling
+  stands.
+- **fired** — a clean run that prints. The ruling becomes a **retirement
+  candidate** a session must judge under the record's mood test, never a
+  retirement the arm performs.
+- **dispatch failure** — the command could not be run, or exceeded
+  `LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT`. Reported as such and joined to neither
+  other band.
+
+**A condition no command can settle takes the literal operand `manual`**,
+followed by the prose condition, and this is the case that forced the operand
+rather than an escape hatch: a record may carry a ruling whose condition resolves
+only against an untracked local surface no tracked oracle can reach, and a probe
+scoped to tracked surfaces would silently skip it. Declaring it `manual` makes it
+report as **owed to judgment**, which is the difference between a probe that
+knows what it cannot answer and one that answers wrongly.
+
+**Two reports, one arm.** The **discharge report** is one row per declared
+condition: the ruling's name, the oracle's band, the declaration's own site, and,
+for a fired one, the oracle's own output line as the evidence; a `manual` row
+carries its prose. The **citing report** is, per subject ruling, the sites across
+`LIFECYCLE_KIT_RULING_CITERS` naming it, with the citing line **quoted verbatim**
+so a reader judges the claim rather than the match. A ruling's `ruling:` names are
+the search keys, all of them; a subject the record declares no names for is swept
+under its own spelling alone, which is the no-retrofit decision showing through
+rather than a fallback worth hiding.
+
+**The subject set is the fired conditions plus the arm's argv tail**, and the
+tail is what makes the report reachable for a retirement the record does not yet
+carry: *whose retirement a session has recorded* has no artifact to read at the
+moment it matters, since the session asking what would go stale is asking
+**before** it writes. So it names the ruling, and the arm answers. With no
+operand the report covers exactly the fired conditions, which is the close-stage
+step's reading.
+
+**Escalation-only, and the refusal is the design.** The arm proposes no edit,
+retires nothing, and never says a citation is wrong. That boundary answers this
+kit's own standing objection to mechanizing this class (§The committed gap
+inbox): a claim about *what a finding is* has no syntactic tell separating
+"this recurred" from "this is about", and the same objection reaches a citation —
+a surface may name a retired ruling as **evidence about the past**, which is
+correct prose, or restate it as a **live rule**, which is the defect, and no
+scanner tells them apart. The instance that proves it sits inside the eleven-entry
+cohort itself: one of the eleven recorded a *live* ruling under the retired run's
+name, so the remedy there was to re-name the run and leave the ruling untouched.
+**A probe blind to that distinction proposes reversals**, which is the one act
+the record holds operator-class throughout.
+
+**An undeclared condition is reported, not inherited.** A ruling whose prose names
+a future event and which carries no `discharge:` line is reported as
+**undeclared**, taking the same closure §The close-surface roster takes for a
+capture surface nobody declared: the roster reports the hole instead of inheriting
+it, which is the whole difference between a derived roster and a maintained one.
+Without it the no-retrofit decision would be a silent hole rather than an honest
+one — a record whose rulings already name discharge events in prose under its own
+authoring convention, none of them machine-readable, would report one condition
+and look complete the moment a single declaration landed. **The detection is
+deliberately weak and is stated as weak**: it is a prose match over
+forward-looking phrasing, FP-bearing by construction, on the same honest posture a
+forward-precondition scan takes about the same problem. It reports, it does not
+red, and a false positive costs a reader one line.
+
+**The producer/checker split is the one the port track already runs on.** A
+declaration *reports* and a separate reader *escalates when the named thing
+changes state*; that pairing is why a stale hold cannot silently under-count owed
+work, and it is copied here rather than re-invented.
+
 ### check-close-surfaces
 
 Three assertions, over the derived roster: (A) **no undeclared surface** — every
@@ -4055,6 +4251,29 @@ ledger is truncated at the boundary — so "how many times did we reach for the
 valve" has a bounded, committed answer for exactly as long as anyone can act on
 it.
 
+The `close` template carries a **ruling-record repair step**, placed with the
+staleness read and never with the brevity pass: close reads the record for aged
+facts and fired discharge conditions and repairs what the record's own contract
+puts in a session's hands. The step names the record **generically** and states
+the boundary by *pointing at* the record's contract rather than restating it —
+write authority on a ruling record is not a kit template's to grant
+(§templates/consult.md), so the kit adds obligation and the record grants
+authority. The placement is forced by the predicate: a repair asks *is it still
+true?*, which is the staleness step exactly, where the later pass's licence is
+compression and a correction made under it would be a deletion wearing a
+compression's clothes. **A repair is fix-shaped by the drain's existing litmus
+and needs no new criterion** — it adds no governed name and lands
+test-and-doc-complete in the closing session's own commit, which that litmus
+already admits; stating it is what stops a later session routing a two-word
+correction through a deferred entry. The record is a declared roster row
+(§The close-surface roster), so the obligation is derived rather than remembered
+and an unconfigured consumer sees the step skip. One act inside the step is a
+**recording** rather than a repair: an operator directive discharged by
+**falsification** — its premise measured false rather than the work being done —
+is recorded on the record as a closed-ruling line, because such a discharge leaves
+no landed unit and no queue trace, so a later session reading only the directive
+re-derives the whole investigation that falsified it.
+
 The `close` template carries a **release-disposition step**: every close
 dispositions the iteration at the release boundary — reading the consumer's
 `release-policy` slot and either executing its release procedure or stamping an
@@ -4191,7 +4410,21 @@ opening-an-iteration contract (the lead never selects the unit set — it relays
 the operator's standing directive, a theme bounding scope's survey and never a
 slug list, verbatim in the scope dispatch, and routes scope's proposed set back
 as an ordinary escalation; selection is scope's contract, and a lead-authored
-menu pre-empts the premise re-verification), the four-header
+menu pre-empts the premise re-verification; and — the limb the other three
+presuppose — **whether an iteration opens at all is the operator's decision**,
+obtained explicitly rather than inferred, on the ground that an open commits a
+*scale* of spend the operator chooses even where the work's content plainly
+routes through the lifecycle, which is why an instruction to fix filed work is
+named as no authorization and why the template's whole-authority sentence
+excludes opening; the undirected path is scoped to an authorized iteration
+carrying no theme rather than deleted, and a lead-relayed directive is stated as
+no evidence of authorization, so the surveying stage is asked for no check it
+holds less information to make), the closing-an-iteration contract as that same
+rule met at the other end — the lead stops at the final stage's completion and
+reports what it believes is owed instead of opening the next iteration, one rule
+attached to the boundary rather than two attached to the ends, which is also what
+covers both postures given the unified posture's lead *is* the previous scope
+session sitting on preserved notes at exactly that moment, the four-header
 escalation block (Question / Options / Recommendation / Evidence) together with
 the one class the lead never rules under either posture — reversing, demoting or
 re-scoping a recorded operator ruling or a stated objective is operator-class and

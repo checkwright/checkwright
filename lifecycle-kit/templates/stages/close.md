@@ -172,13 +172,33 @@ session.
    name the check class that should have caught it, and file the missing
    check as a deferred task or state in one line why no scanner is
    buildable — a silent fix forfeits the check.
-7. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
+7. **Repair the ruling record** — read it for aged facts and fired discharge
+   conditions, and repair what its own contract puts in this session's hands.
+   The record grants the authority and states the boundary; this step only adds
+   the obligation to look, so read the boundary there rather than from a
+   restatement here. A repair is **fix-shaped by the drain's own litmus** and
+   needs no new criterion — it adds no governed name and lands test-and-doc-
+   complete in this session's own commit — so a two-word correction is not routed
+   through a deferred entry. The record is a declared row on the close-surface
+   roster (§The close-surface roster), so a consumer that configures none sees
+   this step skip rather than fail, and the probe that reports fired conditions,
+   undeclared ones and the citing sites is
+   lifecycle-kit/SPEC.md §The ruling-staleness probe. It lands here, beside the
+   staleness read, and not in the brevity pass: a repair asks *is it still true?*
+   exactly, and running it under a pass whose licence is compression would put a
+   correction inside a step licensed to delete. **One discharge this step records
+   rather than repairs:** where an operator directive was discharged by
+   **falsification** — the premise it rested on measured false rather than the
+   work being done — that discharge is recorded on the record as a closed-ruling
+   line, because it leaves no landed unit and no queue trace, so a later session
+   reading only the directive re-derives the whole investigation.
+8. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
    introduced this iteration (log, cache, scratch dir) has a named cleanup
    trigger: a write-path needs a paired reclaim-path. For a workflow-directory
    artifact the roster already answers it: the `reclaim=` field is that named
    trigger, and `check-close-surfaces` blocks a capture-tier declaration without
    one. What stays a judgment here is the artifact *outside* that directory.
-8. **Release disposition** — run after the surface-mutating steps above and
+9. **Release disposition** — run after the surface-mutating steps above and
    **before** the brevity pass (the disposition note is itself such a write).
    Every close dispositions the iteration at the release boundary: read the
    consumer's release policy (the `release-policy` slot below) and either
@@ -200,7 +220,7 @@ session.
    citation, the disposition-evidence path, and any boundary-only sub-procedures
    (e.g. a major-only deprecation sweep); or a plain "no release process — every
    iteration stamps none" line for a consumer without one.>*
-9. **Brevity pass on every governed prose file** — run this **last**, after
+10. **Brevity pass on every governed prose file** — run this **last**, after
    every surface-mutating step above. Scope by principle, not a fixed list:
    every surface injected into each agent session, and every file that grew
    since the last close. Staleness asks *is it still true?*; brevity asks *is
@@ -208,9 +228,9 @@ session.
    outdated context goes to git history. No file is exempt: an on-demand file
    pays at every open, and one a stage opens each iteration is always-loaded in
    effect.
-10. **Optionally merge** — an iteration can close without merging if validate
+11. **Optionally merge** — an iteration can close without merging if validate
    is incomplete or a follow-up iteration is planned.
-11. **The push precondition — select the writing identity, immediately before
+12. **The push precondition — select the writing identity, immediately before
    each push.** Any push this stage makes runs the consumer's identity
    precondition first, and that holds for the *ordinary* close push and not only
    for a release — a close that pushes without releasing otherwise never reaches

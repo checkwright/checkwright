@@ -3,7 +3,10 @@
 This file is the project's **ruling record**: the objectives the work aims at,
 the decisions the operator has closed on the way there, and the sequence the
 port track runs in. It is hand-authored and answers *toward what, and under
-which closed rulings*.
+which closed rulings*. Close reads it for aged facts and fired discharge
+conditions (lifecycle-kit/SPEC.md §The close-surface roster):
+
+close-surface: TRAJECTORY.md advisory
 
 **It is not [ROADMAP.md](ROADMAP.md), and the two must not be merged.**
 ROADMAP is a *generated* projection of `TASK-QUEUE.md`'s curated `[roadmap:]`
@@ -40,14 +43,59 @@ a gate. Nothing mechanizes *the operator closed this*, and nothing should — th
 alternative is a session attesting to its own consent, which is worth less than
 the rule.
 
+**The third act is correction, and the line between it and reversal is the one
+the rules above leave undrawn** — ruled 2026-09-06 by the operator, relayed
+by the lead session: "/close can correct invalid or remove obsolete data from
+TRAJECTORY". Three acts, named and separated:
+
+- **Correcting an aged fact** — a slug the queue has retired, a count the tree
+  has moved, a pointer whose target does not carry the claim, a condition
+  naming a unit or a gate that does not exist. The fact is wrong *about the
+  world*, so correcting it decides nothing, and the completion-time contract
+  below already directs that it be corrected where it stands. **Session-class,
+  including inside the text of a ruling that is still in force.**
+- **Retiring a spent ruling** — it directed something that has already happened,
+  so deleting the record decides nothing. **Session-class**, as above.
+- **Reversing, demoting or re-scoping** — making a closed ruling stop being the
+  rule, narrowing what it reaches, or moving it down a priority order.
+  **Operator-class, unchanged**, however well-grounded the finding and however
+  urgent the fix.
+
+**What makes the first act safe is that it is decidable against the tree, and
+that is the test rather than the category.** A correction qualifies only where the
+aged fact is one an oracle settles — a slug's presence in the live set, a count
+re-derivable by a command, a pointer's target. A "fact" that is really a judgment
+about whether the ruling still ought to govern is a reversal wearing a
+correction's clothes, and the sentence separating them is the one worth writing:
+**if the repair would change what the ruling directs, it is not a repair.** The
+honest limit is the one stated above, unchanged — an authoring contract, not a
+gate. What the boundary buys is that a session meeting an aged fact inside a live
+ruling now has an answer other than stopping, and a session tempted to re-decide
+still has to write down that it is only correcting.
+
 **Where the grounds live.** A ruling whose mechanism already has a canonical
 home is registered here with a pointer to that home rather than restated —
 one owner per fact, as everywhere else. What this file *owns* is what has no
 other durable home: the objectives, the rulings named below without a pointer,
 and the sequence.
 
-That is the authoring-time half. The completion-time half is two triggers, and
-they are the whole rule:
+That is the authoring-time half. The completion-time half is two triggers — but
+a ruling is tested by **mood** before it is tested by completion, and taking
+those in the wrong order is what makes the newest rulings the most dangerous to
+judge. A ruling that **directed work** is spent when the work lands. A ruling
+that **establishes a rule** is never spent while the rule governs, however
+completely the mechanism that prompted it has shipped — and such a ruling looks
+retirable under a naive subject-finished read at exactly the moment its landing
+commits make a retirement sweep due. The mood question costs one question and is
+the one a completion test cannot ask itself.
+
+**Relocation is a third disposition beside delete and keep.** Where a
+rule-establishing ruling's content belongs when its home changes, it is retired
+from here and its content **relocates** to the surface that owns the mechanism —
+which is not what the completion trigger below describes, and naming it is what
+stops a later session reading a relocation as a loss.
+
+The two triggers, and they are the whole rule:
 
 - **A ruling whose subject is finished is deleted outright.** Not distilled to a
   line, and not annotated as finished. Git history holds the obsolete text and
@@ -62,16 +110,47 @@ One authoring convention follows, and it is what makes the next application
 cheap: **a ruling able to name its own discharge event says so in its own
 text**, so the session that meets the event deletes rather than judges.
 
+**Two body-line declarations make that convention resolvable rather than merely
+followed.** Both are declarations and not tags — a tag marks a move across a
+pending/ready boundary and these mark none — and both are hand-written by the
+session recording or retiring the ruling, at the moment it writes it, on the
+self-naming discipline every body-line declaration inherits:
+
+- `ruling: <name>[ <name>…]` — the ruling's own proper noun, in the words other
+  surfaces use for it, plus each variant a surface has actually used. **One or
+  more, appended and never rewritten.** The plural is not generosity: the largest
+  measured cohort of stale citations shared exactly one invariant, the ruling's
+  proper noun in a present-tense claim anchored to no file, and one site in that
+  same cohort survived its own repair by writing the noun a single word
+  differently. A single declared name is insufficient by construction.
+- `discharge: <name> <oracle>` — for a ruling conditioned on a future event: the
+  ruling's declared name and a **command** whose output settles whether the event
+  has fired, never a predicate a reader interprets. A non-zero exit, or a clean
+  run printing nothing, means the condition has **not** fired and the ruling
+  stands; a clean run that prints means it **has**, and the ruling becomes a
+  retirement candidate to judge under the mood test above. A condition no command
+  can settle takes the literal operand `manual` followed by the prose condition,
+  which reports as owed to judgment rather than being silently skipped.
+
+**Existing rulings are not back-filled and no gate demands a declaration** — a
+scanner cannot demand one written under judgment. A ruling carrying none is
+simply one the citing-side report cannot reach, and the probe reports that hole
+instead of inheriting it (lifecycle-kit/SPEC.md §The ruling-staleness probe).
+
 **A retirement's blast radius is derived, never rostered**, and stating that here
 is what stops each retiring session re-discovering it. No surface owns a list of
 what cites this file and none should — a maintained roster would be one more copy
-to stale — so a retirement greps for its own citations. Two properties make the
-grep non-obvious enough to write down. `docs/` is a **generated mirror**, so every
+to stale — so a retirement greps for its own citations, and the declared names
+above are what that grep is run over. Two properties make it non-obvious enough
+to write down. `docs/` is a **generated mirror**, so every
 kit-SPEC citation appears twice and only the source is editable; regenerate rather
-than hand-edit the second. And a citation naming a surviving **section** still
-resolves after the ruling inside it is deleted, so the grep finds the pointer
-while no gate finds the staleness — the inbound half of the class, whose design
-lives in `ruling-record-condition-staleness-probe`.
+than hand-edit the second. And the citation shape to grep for is **not** the one
+the pointer suggests: a citation naming a surviving **section** still resolves
+after the ruling inside it is deleted, so the grep finds the pointer while no gate
+finds the staleness — but measured against a real cohort that shape is the
+minority, and the majority name no file at all and carry only the ruling's proper
+noun. The design of both halves lives at lifecycle-kit/SPEC.md §The
+ruling-staleness probe.
 
 ## The objectives
 
@@ -461,11 +540,12 @@ and this file the index — the seam's content classes named vocabulary and neve
 gate held it. The alternative refused: leaving the class in place as design rationale, which
 publishes private history as mechanism and ships pointers a consumer cannot follow. The sweep and
 the gate that holds the seam afterwards are one queue unit, filed from this consult —
-`kit-spec-provenance-seam-sweep`, **directed 2026-09-05 by the operator in consult as the next
+`kit-spec-provenance-seam-sweep-remainder`, the surface that survives after scope split that filing
+by kit, **directed 2026-09-05 by the operator in consult as the next
 iteration's joined unit beside the test-harness cut**, on the port-first run's same-surface ground
 (gate-sdk/SPEC.md hosts two of the four cuts and most of the class) and as a product-class entry
 whose class accreted two sites while it waited; scope sizes it against the window and may split it
-by kit. Discharge event: that unit lands and the gate is green, at which point this paragraph is
+by kit. Discharge event: that entry lands whole, its gate included, at which point this paragraph is
 deleted.
 
 **No governed file is exempt from brevity; the close pass walks every file that grew — ruled
@@ -495,6 +575,17 @@ subject as one cut under CLAUDE.md §Housekeeping, which is averaging grounds un
 that owns no mechanism. Re-homing a `# spec:` that points at a manifest is a defect correction
 and not the re-homing the 2026-09-03 ruling refused, which was a re-pointing away from a SPEC
 section that already owned the file.
+
+**The "add the useful grant" directive is discharged by falsification, and no grant was owed —
+ruled 2026-09-06 by the operator, relayed by the lead session.** The directive answered a proposal
+whose premise measures false: the standing prompt-guard rule has granted the resume-journal append
+since 2026-09-04, and both shapes the remaining residue could take are already answered by the tree,
+so no work was owed and neither survivor folds into an iteration. What earns the line is the general
+form — a directive answering a proposal is discharged when the proposal's premise measures false,
+and such a discharge leaves no landed unit and no queue trace, so a later session reading only the
+directive re-derives the whole investigation that falsified it. The surviving two-shape residue
+stays queued and deferred on `append-grant-decline-cause-unlogged`, which owns the measurement.
+ruling: add the useful grant
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 

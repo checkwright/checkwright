@@ -120,6 +120,7 @@ bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"   # route a work-shaped f
 bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"
 bash gate-sdk/bin/run-gates.sh --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
 bash gate-sdk/bin/run-gates.sh --emit session-id                       # the canonical stamp id, by the derivation order
+bash gate-sdk/bin/run-gates.sh --emit ruling-staleness ["<ruling name>"…]  # fired conditions, undeclared ones, citing sites
 ```
 
 `--emit session-id` is [SPEC.md](SPEC.md) §bin/session-id.sh's derivation order,

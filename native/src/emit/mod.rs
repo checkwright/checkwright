@@ -39,6 +39,7 @@ pub mod scan_prompts;
 pub mod stage_economics;
 pub mod stage_rules;
 pub mod roadmap;
+pub mod ruling_staleness;
 pub mod run_gate_tests;
 pub mod run_guard_tests;
 pub mod run_validate;
@@ -179,6 +180,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS",
             "GATE_SDK_WORKFLOW_DIR",
         ],
+    ),
+    // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — a reporting member whose callers
+    // are the closing stage's repair step and a session running it by hand before relying on a
+    // ruling; nothing stores its two reports, for the roster arm's reason above.
+    (
+        "--emit-ruling-staleness",
+        Arm::Emit(ruling_staleness::emit),
+        ruling_staleness::KNOBS,
     ),
     (
         "--emit-enforcement-map",

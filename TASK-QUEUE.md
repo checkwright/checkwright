@@ -12,101 +12,6 @@
 
 ## New Features
 
-- **close-ruling-record-repair-authority** [spec: SPEC-record-authority.md] — the closing
-  stage may correct an aged fact inside a live ruling, and reversal stays operator-class.
-  **Operator, 2026-09-06, relayed by the lead session, verbatim: "/close can correct invalid or
-  remove obsolete data from TRAJECTORY".**
-  **The authority is already HALF granted, which is what keeps this from reading as a reversal.**
-  TRAJECTORY.md's completion-time contract already directs that "a fact that has aged is corrected
-  where it stands". The gap is exact: a session meeting an aged fact inside a ruling **still in
-  force** stops, because the rule beside it holds a recorded ruling closed. Both are correct and
-  neither says which governs.
-  **It codifies an attested practice.** Close RETIRES a spent paragraph (`8e71a32d`, a five-conjunct
-  test applied unaided), CORRECTS an aged count inside a ruling, and DECLINES only where the edit
-  touches operator-attributed text of a live ruling — twice on the same fact, escalating each time
-  (`.workflow/audit-roster.txt`). The line to draw is the one the practice already has.
-  **The test is decidability, not category: if the repair would change what the ruling DIRECTS, it
-  is not a repair.** Retirement is tested by MOOD before completion — a ruling that DIRECTED work is
-  spent when the work lands; one that ESTABLISHES A RULE is never spent while the rule governs.
-  **The architecture is forced, not chosen**: lifecycle-kit/SPEC.md §templates/consult.md rules that
-  write authority on a ruling record is not a kit template's to grant, so the AUTHORITY lands on
-  TRAJECTORY.md (dated stamp sanctioned) and only the OBLIGATION lands in the kit, undated.
-  **Its worked instance is this iteration's own**: TRAJECTORY.md:462's slug retired 2026-09-05,
-  superseded by `kit-spec-provenance-seam-sweep-remainder`, and its discharge event names a unit and
-  a gate that do not exist.
-  Filed 2026-09-06 by spec, minted for the directive; paired with the detection half below on one
-  amendment, and neither entry's terminal move is legal while the other still cites that file.
-
-- **ruling-record-condition-staleness-probe** [spec: SPEC-record-authority.md] — a ruling
-  conditioned on an event nobody retires once the event fires.
-  In by the operator's composition ruling, 2026-09-06, relayed by the lead session, as the DETECTION
-  half of the authority half above; both promote on one amendment.
-  **The corpus is NINE deep, and the standing claim that pruning emptied it is FALSE** —
-  `.workflow/audit-roster.txt` records that claim and it is itself an instance of this class. Six of
-  the nine already name a discharge event IN PROSE under the record's own authoring convention; none
-  is resolvable.
-  **The citing-side finding no earlier design had, and it is the whole design.** The inbound half
-  was diagnosed as a citation resolving to a surviving section. Measured against the largest cohort
-  — a superseded run restated in the present tense across ELEVEN live entries — EIGHT named it,
-  seven named the section, and every one still RESOLVED, because only the body under the heading was
-  rewritten. A probe over citation targets reaches ZERO of eleven. What all eleven shared is the
-  ruling's PROPER NOUN in a present-tense claim anchored to no file; tree-wide that shape is ~115
-  sites. A twelfth site survived that drain on one word of variance. So a ruling DECLARES ITS OWN
-  NAME, one or more, and the name is the search key.
-  **A discharge condition is declared as an ORACLE, never as a predicate language.** Every
-  machine-parsed conditional in this tree resolves against the queue's live/done partition alone,
-  because a ruling has no slug and no pool with an exit; a condition grammar would have to mint the
-  first non-queue domain and enumerate a vocabulary wrong the day it landed. The oracle form reuses
-  lifecycle-kit/SPEC.md §The survey record's ruled shape, a falsifiable witness re-run on use.
-  A condition no command settles takes the literal `manual`, reported as owed-to-judgment; the live
-  record carries one whose condition resolves only against an untracked local brief.
-  **Escalation-only, and that answers the standing objection** at lifecycle-kit/SPEC.md §The
-  committed gap inbox: no syntactic tell separates a retired ruling cited as past EVIDENCE from one
-  restated as a live RULE. One of the eleven recorded a live operator ruling under the retired run's
-  name, so a probe blind to that proposes reversals — the one act held operator-class throughout.
-  An undeclared condition is REPORTED, never inherited, on the close-surface roster's own closure.
-  recurrence: ruling-record-condition-staleness-probe 2026-08-13 2026-09-06
-  Filed 2026-08-07 by close, draining the gap inbox. **Its own body's claim that the 2026-08-08
-  pruning directive authorizes the prune is FALSE and is corrected at build**: that directive named
-  neither trigger nor authority and said in terms that nothing in it licensed a session to prune;
-  what authorized pruning was the amendment that landed the record's header contract.
-
-- **lead-iteration-open-authorization** [spec: SPEC-open-authorization.md] — the iteration lead
-  may open an iteration on its own inference, and opening one is the operator's call.
-  **Operator, 2026-09-06, relayed by the lead session, verbatim: "Speaking of a new iteration, if
-  fixing something requires it, I should be warned and approve it explicitly. I let this new
-  iteration run, but you should correct your instructions. Starting a new iteration out of the blue
-  is not acceptable in future."** That is this entry's SECOND instance, not its first — it was filed
-  2026-08-01 from the identical failure.
-  lifecycle-kit/templates/lead.md §Opening an iteration governs everything about an iteration that
-  is opening and never states WHO DECIDES one opens; its :193 "absent a directive, the lead
-  dispatches scope undirected" is about the THEME being absent and reads as licence, because it is
-  the section's only permissive sentence beside a single prohibition about unit selection. The
-  undirected path stays lawful: it is what an operator-opened iteration with no theme looks like.
-  **THE SILENCE IS SYMMETRIC and that widens the deliverable**: `post-close` has zero hits in the
-  template — a lead after close is not merely unruled but unmentioned — while
-  lifecycle-kit/SPEC.md POSITIVELY designs for a live lead at the boundary, its session marker and
-  journal being the two scratch artifacts the boundary wipe preserves. Under the unified posture
-  that session IS the previous scope session. So the rule lands AT THE BOUNDARY, covering both
-  postures, not only at §Opening an iteration.
-  **THIS ENTRY'S OWN PREMISE IS FALSE AND IS CORRECTED AT BUILD**: `--enter-stage`'s first-stage
-  branch does NOT "differ only in stamping `—`" — it differs in ten ways, one of which
-  (`LIFECYCLE_KIT_BOUNDARY_REQUIRE`) is already a first-stage-only committed-file precondition that
-  fails closed on a missing file. That is a better-fitting floor shape than the pre-flight
-  valve this entry's costing implies, and it was never considered.
-  **The floor is REFUSED for this unit with its ground stated, and the shape is named for whoever
-  wants it later** (lead, own-authority 2026-09-06): an authorization is a fact about a conversation
-  and every encoding is forgeable by the session it binds, so the directive's own ask — correct the
-  instruction — is the prose half and is what ships. The valve is ruled out by its own contract: it
-  reaches no iteration-boundary refusal, and its ledger matches the queue header's iteration while
-  the boundary entry stamps the unnamed placeholder.
-  **The provenance seam binds at full force**: lead.md is a kit template, so the rule lands undated,
-  impersonal and slug-free, drafted as the twin of the operator-class carve-out that template
-  already carries. It mints NO slot — a new slot reds `check-skill-binding` until every shim binds
-  it — and `check-shim-restatement`'s 9-word n-gram against `CLAUDE.md` is run, never emulated.
-  Filed 2026-08-01 at close from the gap inbox, operator-directed, from a live instance in that
-  iteration's own opening; re-instanced 2026-09-06 and promoted at spec on the directive above.
-
 ## Technical Debt
 
 ## Deferred
@@ -3735,11 +3640,14 @@
   Both sections exist. The gate passed — "every target file tracked and named §heading present"
   is its own verdict text, and presence is the whole of what it checks. Caught only by reading
   the file to confirm the sentence was there.
-  **It is the mechanism under this iteration's headline class.** The inbound half of
-  `ruling-record-condition-staleness-probe` — a citation surviving the deletion of the ruling
-  it names — and this are one defect seen from two sides: a pointer is verified against the
-  section's *existence*, so nothing notices when the section stops carrying the claim, whether
-  because the claim was pruned out of it or because the wrong section was named to begin with.
+  **It is the mechanism under the ruling-staleness class.** The inbound half that class
+  diagnoses — a citation surviving the deletion of the ruling it names, now designed at
+  lifecycle-kit/SPEC.md §The ruling-staleness probe — and this are one defect seen from two
+  sides: a pointer is verified against the section's *existence*, so nothing notices when the
+  section stops carrying the claim, whether because the claim was pruned out of it or because
+  the wrong section was named to begin with. That section also records the measurement narrowing
+  the inbound reading: a probe over citation targets reaches almost none of the real cohort,
+  because the heading survives and only the body under it is rewritten.
   **Distinct from the three sibling entries in this cluster**, which are all about citations
   that resolve to *nothing*: `unqualified-section-citation-liveness` (a bare `§Heading` with no
   path), `spec-pointer-self-section-citation` (the self-citing form), and
@@ -10180,7 +10088,10 @@
 
 ## Done
 
+- close-ruling-record-repair-authority
 - demo-walkthrough-port-cut
+- lead-iteration-open-authorization
+- ruling-record-condition-staleness-probe
 - stage-economics-log-key-session-collision
 
 ## Lessons Learned

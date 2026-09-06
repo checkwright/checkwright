@@ -2,8 +2,10 @@ The **iteration lead** — a live session that dispatches an iteration's stage
 sessions and answers their escalations, so a blocked stage resumes in place
 rather than restarting. It is **not a stage skill**: it invokes no
 `--enter-stage`, stamps no evidence, moves no cursor, and joins no stage
-roster. Its whole authority is *dispatch* and *answers* — and, at iteration open, the
-operator's selection **directive**, relayed to scope verbatim, never authored.
+roster. Its whole authority is *dispatch* and *answers* — and, once an iteration
+is opening, the operator's selection **directive**, relayed to scope verbatim,
+never authored. Deciding that one opens is not among them (§Opening an
+iteration).
 
 The lead is optional. An iteration runs correctly with no lead — each stage is
 an ordinary skill invocation that stops and surfaces to the user. The lead only
@@ -179,6 +181,28 @@ honestly.
 
 ## Opening an iteration
 
+**Whether an iteration opens at all is the operator's decision, obtained
+explicitly and separately before anything else in this section applies.** Not
+inferred from a queue that holds work, not read out of an instruction about what
+ought to be fixed, and not implied by the previous iteration having ended.
+
+**The ground is *scale*, and stating it is what makes the rule obeyable.**
+An open commits a boundary reset that truncates the evidence surfaces, a walk of
+the whole stage set, and a session per stage — and how much machinery to spend is
+the operator's to choose even where the work's *content* plainly routes through
+the lifecycle. That split is what hides the failure from inside: an instruction
+to fix filed work can be entirely correct about what should be done while saying
+nothing about how much should be spent doing it, so a lead reading it as
+authorization is reasoning soundly about content and silently about scale. The
+ambiguous case is therefore ruled by name — **an instruction to fix filed work is
+not an authorization to open an iteration, and the lead asks.**
+
+Read it as the twin of the one class §The escalation protocol carves out below.
+There the lead may not *reverse* a recorded ruling however well-grounded its
+evidence; here it may not *open* however plainly the work routes through the
+lifecycle. Both are classes where the lead's inference is locally sound and the
+decision is still not the lead's to make.
+
 The lead never selects the iteration's unit set. Selection is the **scope**
 stage's contract — the survey, the intake boundary sweep, and the
 re-verification of each queued premise against the current tree are scope's
@@ -186,12 +210,24 @@ first job, and a lead-made list pre-empts exactly the half that catches a stale
 premise. The designed path runs end to end already: scope surveys and proposes,
 a queue change escalates, the operator rules.
 
-Before dispatching scope, the lead obtains the operator's **standing directive**
+Once the open is authorized and before dispatching scope, the lead obtains the
+operator's **standing directive**
 for the iteration — a theme bounding scope's survey, never a slug list — and
 passes it in the scope dispatch prompt **verbatim**. The directive varies per
 iteration, so per the policy-is-config rule it rides the dispatch prompt, not the
 agent definition. Absent a directive, the lead dispatches scope undirected: scope
-surveys and recommends either way.
+surveys and recommends either way. **That undirected path is what an authorized
+iteration carrying no theme looks like, and it is nothing more** — a missing
+theme is not a missing authorization, and it is not a second way in.
+
+**A directive that reaches scope through the lead is not evidence the open was
+authorized.** Authorization and directive are separate: the operator authorizes
+the open, and the theme may travel to the surveying stage by way of the lead,
+which is the relay this section already describes. The surveying stage cannot
+tell an authorized open from an unauthorized one and is not asked to — its
+contract is the survey, and an authorization check there would give one fact two
+holders, the second of them holding strictly less information. The obligation
+stays here, with the party that holds it.
 
 Scope's proposed unit set returns as an ordinary four-header escalation, and the
 lead routes it like any scope/queue change — ruled by the operator, or by the
@@ -201,6 +237,30 @@ rule the escalation protocol below already states).
 The anti-pattern, named: a lead-authored menu restates the operator's own queue
 view from staler data, costs a round trip, and skips the premise re-verification
 that has already caught a false filed premise in practice.
+
+## Closing an iteration
+
+When the iteration's final stage completes, the lead **stops and reports what it
+believes is owed**, and does not open the next one. This is the section above
+met from the other side: one rule attached to the iteration boundary, rather
+than two rules attached to the two ends, so that repairing one end can never
+leave the other standing.
+
+Reporting is the lead's whole remaining act there — the state of the queue as the
+closing stage left it, whatever was filed for the next intake, and what the lead
+would recommend doing about it, offered as information for a decision and never
+as a decision taken.
+
+**The boundary is exactly where the design seats a session most able to roll
+forward, which is why it is ruled rather than left to judgment.** The
+session-role marker and the lead's own resume journal are the scratch artifacts
+that survive the boundary reset, precisely so that a session live at the boundary
+can file a judgment there for the entering session's intake. So the design puts a
+session holding full context and preserved notes at the very moment the next
+iteration would open, and the rule is what it is handed. Under the **unified**
+posture that session *is* the previous scope session, whose situation has changed
+in nothing but a drained queue — the case likeliest to roll straight forward.
+Attaching the rule to the boundary covers both postures by construction.
 
 ## The escalation protocol
 

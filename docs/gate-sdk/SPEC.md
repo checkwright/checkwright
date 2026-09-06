@@ -2343,7 +2343,11 @@ drift-kit's two meters, `--emit-overhead-meter`, the
 governance-overhead byte proxy (drift-kit/SPEC.md §The overhead meter), and
 `--emit-stage-economics`, the stage × model × iteration spend pricer
 (drift-kit/SPEC.md §The stage-economics meter) — which spawns `git` and `date`
-and no interpreter, the shell form's `jq`, `awk` and `sed` all leaving with it), the
+and no interpreter, the shell form's `jq`, `awk` and `sed` all leaving with it;
+and `--emit-ruling-staleness`, lifecycle-kit's discharge-condition and
+citing-site reporter over a consumer's ruling record (lifecycle-kit/SPEC.md
+§The ruling-staleness probe), whose spawned set the paragraph below records as
+unbounded by construction), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
@@ -2520,6 +2524,18 @@ one case where a smaller set would be the defect: `bash`, and through it `nohup`
 implementation that compiled them away would empty the set and change the
 measurement in the same motion. The two off-floor members of that set are stated
 as a cost there rather than claimed as a dividend the port removed.
+**`--emit-ruling-staleness` is the class's first member whose set is fixed by
+*data in a consumer's file* rather than by a knob, a roster or its own
+implementation** (lifecycle-kit/SPEC.md §The ruling-staleness probe), and it
+belongs beside `--emit-env-probe` and `--emit-always-loaded` because it is the
+next axis along from theirs: those two are consumer-**changeable** through a
+configured roster or a configured command, where this one is unbounded by
+construction — its own spawn is `bash`, and through that shell whatever program a
+`discharge:` declaration's oracle names, which the arm never sees before it runs
+it. That is not a gap in the record: an arm that dispatches a declared command
+has no set to state, and stating that it has none is what stops a later reader
+taking the omission for an oversight. The bound the timeout knob carries is the
+mitigation the shape admits.
 `grep -rn 'proc::' native/src/emit/` is the derivation; nothing maintains a
 list, and an enumeration written here would be one more thing to stale. This states
 the scope as it stands and rules nothing about whether it should: making arm

@@ -88,6 +88,11 @@ lifecycle_stage_journal_written() { # <path>
 
 declare -p LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS &>/dev/null || LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS=("*/SPEC.md")
 
+# spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — both roster knobs default empty so the whole machinery is inert for a consumer keeping no ruling record: a kit shipping a filename would assert that every adopter keeps this artifact under this name, and which of a tree's surfaces argue about rulings is a fact about that tree. The bound exists so a hung oracle cannot wedge the arm that dispatches it, and its expiry reports as a dispatch failure rather than as a verdict.
+[[ -v LIFECYCLE_KIT_RULING_RECORD ]] || LIFECYCLE_KIT_RULING_RECORD=''
+declare -p LIFECYCLE_KIT_RULING_CITERS &>/dev/null || LIFECYCLE_KIT_RULING_CITERS=()
+[[ -v LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT ]] || LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT=10
+
 # spec: lifecycle-kit/SPEC.md §The survey record — the surfaces held to the no-retrieval-pointer rule; the queue file alone by default because it is the one permanent surface this kit owns and where both attested firings landed, so the default is non-vacuous in every consumer and over-reaches in none
 declare -p LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS &>/dev/null \
     || LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS=("$LIFECYCLE_KIT_QUEUE_FILE")
