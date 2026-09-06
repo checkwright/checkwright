@@ -4,10 +4,4 @@
 
 ---
 
-demo-cut-record-authority-and-attribution scope acdb36a9 2026-09-06 fe560880
-demo-cut-record-authority-and-attribution spec a7526cb0 2026-09-06 45e25bae
-demo-cut-record-authority-and-attribution align a954c9c2 2026-09-06 01c95935
-demo-cut-record-authority-and-attribution build ad1b3e32 2026-09-06 0c1542b3
-demo-cut-record-authority-and-attribution build a149fce2 2026-09-06 8cd8c707
-demo-cut-record-authority-and-attribution validate a7672fe7 2026-09-06 3bb04d77
-demo-cut-record-authority-and-attribution close aa4e46b6 2026-09-06 57c3141c
+— scope aabb5f48 2026-09-06 34eebbd2
