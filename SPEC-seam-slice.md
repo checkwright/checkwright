@@ -207,9 +207,14 @@ additionally selects `check-rule-citation`.**
   declared set are hand-listed in one paragraph with a member omitted. Delta 2's split can turn a
   narrated status into a partial enumeration, which is exactly the shape this gate measures, so
   any enumeration the sweep produces is complete or is not a list at all.
-- **`check-surface-duplication`** reds on a canonical definition restated outside its owner.
-  Deltas 1 through 4 **cite** the parent's recovered discriminator rather than restating it,
-  which is what keeps this reader green and is also why this amendment carries no copy of it.
+- **`check-surface-duplication` is not a live reader of this corpus, and it is named to say so
+  rather than left for a later session to assume otherwise.** It reds on a canonical definition
+  restated outside its owner, but canon-kit/SPEC.md §check-surface-duplication records that this
+  tree registers it in no `gates.list`, and `--for` over each of the three files confirms it —
+  run at align, none of the 30- or 31-gate sets it returns names this gate. Deltas 1 through 4
+  still **cite** the parent's recovered discriminator rather than restating it, on the ordinary
+  de-literalization ground the amendment would follow regardless, but no gate's green status
+  turns on that choice here.
 - **`check-rule-citation`**, selected by `delegation-kit/SPEC.md` alone, is named because the
   per-file reader set is not uniform across this corpus and a sweep that clears two files by
   inspection has not thereby cleared the third.

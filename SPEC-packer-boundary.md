@@ -154,9 +154,11 @@ binds and each reader's RED condition is enumerated rather than its subject.**
   source into the crate, so it stales by construction and clears only by
   `bash gate-sdk/bin/build-native.sh` — the commit-time obligation the battery does not
   discharge.
-- **`check-port-blockers`'s `--tree` arm** reads an owed count. This delta set **removes** 196
-  lines from the owed column; the count is the completion predicate and moves monotonically down
-  here, so it is read rather than reasoned about.
+- **`--emit-port-blockers --tree`** (gate-sdk/SPEC.md §port-blockers) reads an owed count; it is
+  a non-gate arm, not a `check-` gate, and is named correctly here on that ground rather than
+  filed under an invented gate name. This delta set **removes** 196 lines from the owed column;
+  the count is the completion predicate and moves monotonically down here, so it is read rather
+  than reasoned about.
 - **`check-install-claim`**'s red condition is a **zero count** over the primary-install-path
   claim. Delta 1 adds a section to `installer/README.md`, which is install-claim-bearing prose;
   the count can move in either direction and it is run.

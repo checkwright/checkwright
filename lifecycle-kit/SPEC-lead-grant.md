@@ -202,11 +202,13 @@ rather than its subject.**
   relocated mechanism sentences can only remove references, so it is monotone here and clearable
   by inspection — except where delta 3 rewrites a sentence carrying a surviving `§` citation,
   which build runs rather than inspects.
-- **`check-surface-duplication`** reds on a canonical definition restated outside its owner.
-  Delta 3's §Closing wording **cites** §Opening's cardinality statement rather than restating
-  it, and delta 5 cites rather than restates; that is what keeps this reader green, and it is
-  the same constraint stated from the gate's side that delta 3's anti-repair states from the
-  design's.
+- **`check-surface-duplication` is not a live reader here either, checked the same way as its
+  sibling amendment's citation of it.** canon-kit/SPEC.md §check-surface-duplication records
+  that this tree registers it in no `gates.list`, and `--for lifecycle-kit/templates/lead.md`
+  confirms it at align — the twelve-gate set it returns names no such member. Delta 3's
+  §Closing wording still **cites** §Opening's cardinality statement rather than restating it,
+  and delta 5 cites rather than restates, on the same de-literalization ground delta 3's
+  anti-repair states from the design's side — but no gate's green status turns on it.
 - **`check-lifecycle-registration`** reds on `CLAUDE.md`'s marker block drifting from the block
   regenerated from the live stage machine. **Probed, not assumed:** the block derives from the
   stage machine — stage names, order, the queue file — and from no template slot, so this change

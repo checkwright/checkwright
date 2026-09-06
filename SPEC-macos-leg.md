@@ -240,7 +240,9 @@ than its subject, in both directions.**
   the parity mechanism in terms of the legs that exist (delta 7).
 - **`context-kit/lib/toolfloor.sh` and `docs/install.md` §Requirements** — read, and
   deliberately **not** changed; delta 5 records why, so the next reader does not take the silence
-  for an oversight (delta 5).
+  for an oversight. `docs/install.md` is read a second time under delta 6's bound — it gains no
+  macOS support claim, on the same first-observed-green trigger as the roster non-widening — so
+  the file's own non-edit is recorded under both deltas rather than delta 5 alone (deltas 5, 6).
 - **`native/targets.list`** — read, and deliberately **not** changed; delta 6 records the bound
   and its trigger (delta 6).
 - **`TRAJECTORY.md`**, the sentence stating that the two hand-kept bootstraps are held in parity
