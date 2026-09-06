@@ -74,10 +74,11 @@ jobs:
   # `gates` because it asserts a different thing — that an adopter's install
   # works, not that this tree is clean — and because the per-platform siblings
   # join here as further jobs. Both are below, and each one's own header says what
-  # it asserts rather than this comment: the native Windows leg and the macOS leg
-  # are instruments whose product is their log, where this job is binding against
-  # a recorded baseline. Nothing in tree owes a leg on a fourth platform; one is
-  # bought by the entry that wants it, not implied by this group.
+  # it asserts rather than this comment: the native Windows leg is an instrument
+  # whose product is its log, the macOS leg is binding on its own exit status, and
+  # this job is binding against a recorded baseline — three postures, not one.
+  # Nothing in tree owes a leg on a fourth platform; one is bought by the entry
+  # that wants it, not implied by this group.
   #
   # Not a matrix, and specifically **not derived from native/targets.list**. That
   # roster is the artifact commitment, and a smoke leg on a platform is exactly
@@ -415,38 +416,31 @@ jobs:
           echo "exercises none. See this job's header for what stands between the two."
           exit "$rc"
 
-  # The macOS sibling, and the second non-Linux host this repository runs on. Its
-  # posture is the WINDOWS leg's above and not the Linux leg's, and the two are
-  # different assertions rather than two spellings of one: the Linux leg is
-  # binding through `--diff-baseline installer_smoke` because a green baseline
-  # exists to diff against. Nothing has ever run green against macOS, so there is
-  # no baseline here, a binding leg would red `master` on the push that
-  # introduces it, and the standing file-and-defer-without-looping ruling on the
-  # sibling entry — file a red cause, do not loop on it — is impossible to honour
-  # from a job the workflow obeys. This leg is an instrument; its product is its
-  # log.
+  # The macOS sibling, and the second non-Linux host this repository runs on.
+  # **It is binding: its red fails this workflow.** Read that as a different
+  # assertion from the Linux leg's rather than the same one spelled twice — the
+  # Linux leg is binding through `--diff-baseline installer_smoke`, against a
+  # recorded baseline, where this leg has no baseline and is binding on its own
+  # exit status. Do not read this posture onto the WINDOWS sibling above, which is
+  # still an instrument; the two legs are no longer the same shape.
   #
   # **The runner label floats, and read the honest limit with it.**
   # `macos-latest` matches `ubuntu-latest` and `windows-latest` beside it because
   # this leg's subject is the platform an adopter meets *today*, and a pinned
-  # label would freeze the instrument against a host adopters have already left.
+  # label would freeze this leg against a host adopters have already left.
   # The consequence is that `macos-latest` is **arm64**, so this leg measures
   # arm64 and nothing else. Do not read one green arm64 run as a macOS claim: an
   # Intel leg is a separate job this one neither buys nor blocks.
   install-smoke-macos:
     runs-on: macos-latest
-    # The instrument runs to its end and reports; it does not decide this
-    # workflow. Drop this line on the run it is first observed green and not
-    # before — the same instruction, on the same trigger, the Windows sibling
-    # above carries.
-    continue-on-error: true
-    # Do NOT copy the Windows leg's 90 here. That figure buys MSYS emulating
-    # `fork` on every one of this suite's thousands of spawns, and its own comment
-    # says the Linux figure is not the planning basis *there*. Spawns are native
-    # on macOS, so the Linux leg's observed runtime (installer/README.md §The
-    # consumer smoke) IS the basis, widened for a cold Homebrew install and a cold
-    # cargo build. Revise this on the first observed run, which is the only
-    # measurement that can settle it.
+    # Measured, not predicted: this leg took **20m12s** on run `34038127178`, over
+    # a cold Homebrew install and a cold `cargo` build — which is exactly the case
+    # this figure was widened for, so the measurement already covers the worst
+    # start. The ~2.2x headroom left over it is deliberate now the leg is binding:
+    # a timeout that reds `master` on runner variance costs more than a long leg,
+    # so widen this before you narrow it. Do NOT copy the Windows leg's 90 — that
+    # figure buys MSYS emulating `fork` on every one of this suite's thousands of
+    # spawns, which macOS, whose spawns are native, does not pay.
     timeout-minutes: 45
     permissions:
       contents: read
@@ -494,11 +488,10 @@ jobs:
           } >> "$GITHUB_PATH"
           exit 0
 
-      # Reporting only, and it never fails. Every claim this project makes about
-      # macOS is a reading rather than a measurement, and this step is where that
-      # stops being true — it is worth more than the suite below on the first run,
-      # because a suite that dies at its preflight says nothing about the host and
-      # this says it all at once.
+      # Reporting only, and it never fails. It is what makes a red suite below
+      # readable, which matters more now that the suite is binding: a suite dying
+      # at its preflight says nothing about the host, and this says it all at once,
+      # so read this step first when the leg goes red.
       #
       # It runs AFTER the install above deliberately: what it reports is then the
       # `PATH` an adopter who followed §Requirements actually has. Probing the
@@ -599,6 +592,6 @@ jobs:
           rc="${PIPESTATUS[0]}"
           echo "== verdict =="
           echo "installer_smoke on macOS exited $rc"
-          echo "This leg reports; it does not judge. The log above is the measurement."
+          echo "This leg is binding: a non-zero here fails the workflow."
           echo "A zero here is not a roster join: see this step's header for why."
           exit "$rc"
