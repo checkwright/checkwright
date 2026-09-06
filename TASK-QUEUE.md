@@ -12,6 +12,168 @@
 
 ## New Features
 
+- **demo-walkthrough-port-cut** [spec: SPEC-demo-cut.md] — port `demo/run-demo.sh` (96) to
+  the bridged `--run-demo` `Arm::Run`, after re-homing its `# spec:` pointers.
+  The stated-contract cut behind gate-sdk/SPEC.md §Consumer smoke. **The re-home comes FIRST and is
+  its own commit** — the mis-homed correction §Porting a gate to the binary substrate rules, NOT the
+  re-pointing the 2026-09-03 ruling refused: `:2` and `:11` point at `CLAUDE.md §Housekeeping`, a
+  manifest that owns no mechanism and does not even name the knob it claims, while `:35` already
+  names the legal owner. This gives a file the owner it never had.
+  **The `# no-port:` fork is CLOSED — operator, 2026-09-06, relayed by the lead session.** The
+  residue clause grants a per-file *disposition*, a disjunction; this file takes the porting branch.
+  **`Arm::Run`, not `Arm::Emit`, and the natural instinct is wrong here.** Every sibling cut in this
+  kit cleared `Arm::Emit` on "it declares no 1 and never has". FALSE for this member: all seven
+  `fail()` sites exit 1 and that 1 is the whole verdict the `demo` suite reads under
+  `EVIDENCE_KIT_PARSER=exit-code`.
+  **Two named behaviour changes.** The exit grammar becomes the 0/1/2 §Consumer smoke already
+  specifies — the shell form has NO exit-2 path, so its two environment-class failures (binary
+  placement, installer error) report today as failed walkthroughs; and an operand becomes a refusal.
+  `csmoke_place_binary`'s spawn helper MOVES from `upgrade_smoke.rs` into `csmoke.rs` on gaining its
+  second caller, and the library's shell sourcer set empties — which does **not** reopen leg 1,
+  whose ground is the config bridge and not a sourcer count.
+  `DEMO_TMP_DIR` SURVIVES, read undeclared off the process environment (declaring it would
+  fail-close the arm); retiring it would be a cut narrowing an extension point, which ruling (1)
+  forbids.
+  **Three sites are ONE atomic edit** — `EVIDENCE_KIT_RUN_demo`, `README.md`'s `battery-roster`
+  block line, and the hook regen; `check-battery-roster` reds on either half alone.
+  Reaches `## Done` at build: its deliverable is one section's owed file and this cut finishes it.
+  Filed 2026-09-06 by spec as a per-cut feature unit, under the packaging ruling gate-sdk/SPEC.md
+  §Porting a gate to the binary substrate states — two refs cannot pair with one host.
+
+- **close-ruling-record-repair-authority** [spec: SPEC-record-authority.md] — the closing
+  stage may correct an aged fact inside a live ruling, and reversal stays operator-class.
+  **Operator, 2026-09-06, relayed by the lead session, verbatim: "/close can correct invalid or
+  remove obsolete data from TRAJECTORY".**
+  **The authority is already HALF granted, which is what keeps this from reading as a reversal.**
+  TRAJECTORY.md's completion-time contract already directs that "a fact that has aged is corrected
+  where it stands". The gap is exact: a session meeting an aged fact inside a ruling **still in
+  force** stops, because the rule beside it holds a recorded ruling closed. Both are correct and
+  neither says which governs.
+  **It codifies an attested practice.** Close RETIRES a spent paragraph (`8e71a32d`, a five-conjunct
+  test applied unaided), CORRECTS an aged count inside a ruling, and DECLINES only where the edit
+  touches operator-attributed text of a live ruling — twice on the same fact, escalating each time
+  (`.workflow/audit-roster.txt`). The line to draw is the one the practice already has.
+  **The test is decidability, not category: if the repair would change what the ruling DIRECTS, it
+  is not a repair.** Retirement is tested by MOOD before completion — a ruling that DIRECTED work is
+  spent when the work lands; one that ESTABLISHES A RULE is never spent while the rule governs.
+  **The architecture is forced, not chosen**: lifecycle-kit/SPEC.md §templates/consult.md rules that
+  write authority on a ruling record is not a kit template's to grant, so the AUTHORITY lands on
+  TRAJECTORY.md (dated stamp sanctioned) and only the OBLIGATION lands in the kit, undated.
+  **Its worked instance is this iteration's own**: TRAJECTORY.md:462's slug retired 2026-09-05,
+  superseded by `kit-spec-provenance-seam-sweep-remainder`, and its discharge event names a unit and
+  a gate that do not exist.
+  Filed 2026-09-06 by spec, minted for the directive; paired with the detection half below on one
+  amendment, and neither entry's terminal move is legal while the other still cites that file.
+
+- **ruling-record-condition-staleness-probe** [spec: SPEC-record-authority.md] — a ruling
+  conditioned on an event nobody retires once the event fires.
+  In by the operator's composition ruling, 2026-09-06, relayed by the lead session, as the DETECTION
+  half of the authority half above; both promote on one amendment.
+  **The corpus is NINE deep, and the standing claim that pruning emptied it is FALSE** —
+  `.workflow/audit-roster.txt` records that claim and it is itself an instance of this class. Six of
+  the nine already name a discharge event IN PROSE under the record's own authoring convention; none
+  is resolvable.
+  **The citing-side finding no earlier design had, and it is the whole design.** The inbound half
+  was diagnosed as a citation resolving to a surviving section. Measured against the largest cohort
+  — a superseded run restated in the present tense across ELEVEN live entries — EIGHT named it,
+  seven named the section, and every one still RESOLVED, because only the body under the heading was
+  rewritten. A probe over citation targets reaches ZERO of eleven. What all eleven shared is the
+  ruling's PROPER NOUN in a present-tense claim anchored to no file; tree-wide that shape is ~115
+  sites. A twelfth site survived that drain on one word of variance. So a ruling DECLARES ITS OWN
+  NAME, one or more, and the name is the search key.
+  **A discharge condition is declared as an ORACLE, never as a predicate language.** Every
+  machine-parsed conditional in this tree resolves against the queue's live/done partition alone,
+  because a ruling has no slug and no pool with an exit; a condition grammar would have to mint the
+  first non-queue domain and enumerate a vocabulary wrong the day it landed. The oracle form reuses
+  lifecycle-kit/SPEC.md §The survey record's ruled shape, a falsifiable witness re-run on use.
+  A condition no command settles takes the literal `manual`, reported as owed-to-judgment; the live
+  record carries one whose condition resolves only against an untracked local brief.
+  **Escalation-only, and that answers the standing objection** at lifecycle-kit/SPEC.md §The
+  committed gap inbox: no syntactic tell separates a retired ruling cited as past EVIDENCE from one
+  restated as a live RULE. One of the eleven recorded a live operator ruling under the retired run's
+  name, so a probe blind to that proposes reversals — the one act held operator-class throughout.
+  An undeclared condition is REPORTED, never inherited, on the close-surface roster's own closure.
+  recurrence: ruling-record-condition-staleness-probe 2026-08-13 2026-09-06
+  Filed 2026-08-07 by close, draining the gap inbox. **Its own body's claim that the 2026-08-08
+  pruning directive authorizes the prune is FALSE and is corrected at build**: that directive named
+  neither trigger nor authority and said in terms that nothing in it licensed a session to prune;
+  what authorized pruning was the amendment that landed the record's header contract.
+
+- **stage-economics-log-key-session-collision** [spec: SPEC-economics-fold.md] — two sessions
+  in one (iteration, stage) overwrite each other in the trend log.
+  **Operator, 2026-09-06, relayed by the lead session, verbatim: "For per-batch tiering meter, if
+  you means that we need to correct the calculation to consider whether the specific build ran on
+  Opus or Sonnet, fix it."** That directive promotes this entry; it authored no new one.
+  The `--emit stage-economics` row writer dedups on the `<iteration> <stage> <model>` triple, so a
+  batch-split stage appends twice and the second silently replaces the first, under-reporting that
+  stage by a whole session. **The defect survived the 2026-09-05 port unchanged** — the parity
+  harness reproduced the shell form's trend log byte for byte across eight fixture sets and the
+  ported writer filters the same triple.
+  **THE CLOSE IS THE FOLD, and it is settled by the owner doc rather than chosen among three.**
+  drift-kit/SPEC.md's fan-out bullet already rules this fold correct for the sibling row family
+  AND names the stage rows' loss verbatim — "two appends under one triple make the dedup key replace
+  the first with the second, stranding its transcripts attributed to a row the replacement erased" —
+  while fixing only its own. The stage pass takes `fanout_pass`'s shape: accumulate per row key in
+  memory, emit ONCE per key. Grammar unchanged, dedup key unchanged, no field added.
+  **TWO PREMISES ON THIS ENTRY WERE FALSE AND ARE CORRECTED HERE.** (a) "The session id is written
+  as a same-line field" — it is **not written to the log at all**; `who` appears only on stdout, so
+  the key-widening candidate is *adding a column the grammar never had*, a materially worse trade
+  than priced. (b) The loss needs no second run: the run seeds its retained set from the log and
+  writes it back whole, so two rows under one triple annihilate inside a SINGLE invocation.
+  **Replace-on-append is load-bearing and is kept**: the collector re-derives every logged row on
+  every run, unbounded and with no watermark, and drift-kit/SPEC.md says the key is what makes the
+  history-union-live read safe with no added mechanism. The fold moves the summation earlier, never
+  into the log.
+  **`.claude/commands/lead.md`'s bare-`align`-vs-`align+fanout` discrimination SURVIVES** — stage
+  token unchanged, one row per `(iteration, align, model)` still holds. What moves is its
+  CONCLUSIONS: a split stage's `cr` rises to its true value, which
+  `lead-split-posture-limb-unjudged` is owed. `/economics` reads stdout, never the log, so the
+  narrative reader was always immune — which is how this survived since its filing.
+  **drift-kit/SPEC.md contradicts itself on the premise and both sides move**: one passage asserts
+  per-session usage IS per-stage usage, another asserts one `(iteration, stage)` may hold several
+  anchors; and the section's reader roster is stale, enumerating three readers and asserting none
+  parses the stage column when the lead binding does.
+  The cheapest regression witness already half-exists: `drift-kit/smoke/install.sh`'s fan-out set
+  stands up a second same-stage session with NO usage; give it usage and the live assertion reds.
+  Filed 2026-08-07 by close, draining the gap inbox; found at build. Merged 2026-08-08 at scope by
+  lead ruling with `stage-economics-log-multi-session-undercount`, the same defect re-found.
+
+- **lead-iteration-open-authorization** [spec: SPEC-open-authorization.md] — the iteration lead
+  may open an iteration on its own inference, and opening one is the operator's call.
+  **Operator, 2026-09-06, relayed by the lead session, verbatim: "Speaking of a new iteration, if
+  fixing something requires it, I should be warned and approve it explicitly. I let this new
+  iteration run, but you should correct your instructions. Starting a new iteration out of the blue
+  is not acceptable in future."** That is this entry's SECOND instance, not its first — it was filed
+  2026-08-01 from the identical failure.
+  lifecycle-kit/templates/lead.md §Opening an iteration governs everything about an iteration that
+  is opening and never states WHO DECIDES one opens; its :193 "absent a directive, the lead
+  dispatches scope undirected" is about the THEME being absent and reads as licence, because it is
+  the section's only permissive sentence beside a single prohibition about unit selection. The
+  undirected path stays lawful: it is what an operator-opened iteration with no theme looks like.
+  **THE SILENCE IS SYMMETRIC and that widens the deliverable**: `post-close` has zero hits in the
+  template — a lead after close is not merely unruled but unmentioned — while
+  lifecycle-kit/SPEC.md POSITIVELY designs for a live lead at the boundary, its session marker and
+  journal being the two scratch artifacts the boundary wipe preserves. Under the unified posture
+  that session IS the previous scope session. So the rule lands AT THE BOUNDARY, covering both
+  postures, not only at §Opening an iteration.
+  **THIS ENTRY'S OWN PREMISE IS FALSE AND IS CORRECTED AT BUILD**: `--enter-stage`'s first-stage
+  branch does NOT "differ only in stamping `—`" — it differs in ten ways, one of which
+  (`LIFECYCLE_KIT_BOUNDARY_REQUIRE`) is already a first-stage-only committed-file precondition that
+  fails closed on a missing file. That is a better-fitting floor shape than the pre-flight
+  valve this entry's costing implies, and it was never considered.
+  **The floor is REFUSED for this unit with its ground stated, and the shape is named for whoever
+  wants it later** (lead, own-authority 2026-09-06): an authorization is a fact about a conversation
+  and every encoding is forgeable by the session it binds, so the directive's own ask — correct the
+  instruction — is the prose half and is what ships. The valve is ruled out by its own contract: it
+  reaches no iteration-boundary refusal, and its ledger matches the queue header's iteration while
+  the boundary entry stamps the unnamed placeholder.
+  **The provenance seam binds at full force**: lead.md is a kit template, so the rule lands undated,
+  impersonal and slug-free, drafted as the twin of the operator-class carve-out that template
+  already carries. It mints NO slot — a new slot reds `check-skill-binding` until every shim binds
+  it — and `check-shim-restatement`'s 9-word n-gram against `CLAUDE.md` is run, never emulated.
+  Filed 2026-08-01 at close from the gap inbox, operator-directed, from a live instance in that
+  iteration's own opening; re-instanced 2026-09-06 and promoted at spec on the directive above.
+
 ## Technical Debt
 
 ## Deferred
@@ -1737,39 +1899,6 @@
   above; the `check-md-refs` blind spot and the `AGENTS.md` false-positive case
   were both verified against source before filing.
 
-- **lead-iteration-open-authorization** [design-pending] — the iteration lead may
-  open an iteration on its own inference, and opening one is the operator's call.
-  lifecycle-kit/templates/lead.md §Opening an iteration requires only the
-  operator's standing **directive** — a theme bounding scope's survey — and
-  explicitly permits proceeding without even that ("absent a directive, the lead
-  dispatches scope undirected"). The directive slot presupposes the decision to
-  open has already been made and is silent on who makes it; re-verified at this
-  close, the file contains no authorization word at all, and
-  `gate-sdk/bin/run-gates.sh --enter-stage` carries no floor either — its first-stage
-  branch differs only in stamping `—` for the iteration name.
-  **The live instance.** The operator said "fix all" about four outstanding
-  release defects, two of them edits to governed surfaces; the lead read that as
-  authorization to open an iteration, reset the boundary, dispatch scope, and
-  stamp — and the operator then stated plainly that they had not asked for one
-  and that opening one requires their explicit approval. The inference was
-  defensible on the *content* (governed-surface edits do route through the
-  lifecycle) and wrong on the *scale*, which was the operator's to choose.
-  **Deliverable:** state in lead.md that opening an iteration requires explicit
-  operator authorization, distinct from and prior to the standing directive, and
-  that an ambiguous instruction to fix filed work is not that authorization — the
-  lead asks. **Why `[design-pending]`:** whether a mechanical floor is buildable
-  is the open question. Prose requests and guards enforce, so the shape worth
-  costing is an `enter-stage.sh` first-stage precondition; against it, the
-  authorization is a fact about a conversation, and every encoding of it
-  (a flag, a stamped operator line) is forgeable by the same session it binds.
-  **Cost while deferred:** a lead can spend an iteration's full opening cost on a
-  scale the operator never chose, and the only detector is the operator noticing
-  after the stamp has landed. Recurs per iteration opened under ambiguity.
-  Debt: one prose rule, optionally one precondition; adds no governed name
-  unless the floor lands.
-  Filed 2026-08-01 at close from the gap inbox, operator-directed, from a live
-  instance in this iteration's own opening.
-
 - **template-copy-parity-yaml-widening** [design-pending] — a kit `.yml` template
   and this repository's copy of it are mirrored by hand and a missed half is caught
   by nothing. Re-verified at this close: `check-template-copy-parity` globs
@@ -3200,100 +3329,6 @@
   its author already knew was wrong.
   Filed 2026-08-06 by close from the gap inbox; both instances reached `## Done`, so the class is
   all that survives.
-
-- **ruling-record-condition-staleness-probe** [design-pending] — a ruling conditioned on an
-  event nobody retires once the event fires.
-  `TRAJECTORY.md` carries rulings conditioned on a future event — the 2026-08-26 Windows-leg
-  ruling's "only once that leg has produced and exercised its artifact", beside "After the port:
-  `companion-toolkit-profile`" — and nothing retires one when its condition fires. Obsolescence
-  rides the discharging unit's own entry, so a condition met silently is caught by nothing.
-  **The enforceable half is a probe, never a prune — and the ground for that has moved.** It
-  rested on retirement being operator-class; the 2026-08-08 pruning directive
-  (`trajectory-prune-on-completion`) authorizes the prune, so what keeps this entry to a probe is
-  its own deliverable rather than an authority limit.
-  The deliverable is a *staleness probe* over condition-bearing rulings that escalates, plus
-  whatever declaration makes a condition machine-readable — a ruling stating its own discharge
-  event is the design question, since a prose condition carries no syntactic tell. That
-  declaration is this entry's alone: the pruning unit ships prose convention, not form.
-  **Both attested conditions have fired, which settles the recurrence and not the deliverable.**
-  One was missed at the 2026-08-06 close, a ruling naming an iteration's close as the tag point
-  that passed uncut; the other fired 2026-08-07 (v0.22.0). No probe watched either.
-  **The class reaches the record's corrections, not only its conditions** — the surface written
-  to record the missed condition went stale itself in under a day.
-  **Widened 2026-08-09 by the first post-prune close: the inbound half, and it is the mirror
-  of what `SPEC-ruling-record-prune` D9 refused.** D9 weighed slug-liveness *over* the record
-  — the record citing dead slugs — and correctly ruled it a no-op. The other direction was
-  never considered: **another governed surface citing a ruling the record no longer carries.**
-  The pointer names the surviving *section*, so it resolves and the battery reports clean over
-  it. Now that pruning is licensed, every prune manufactures this exposure. Three instances were
-  verified individually at that close, each having survived a full green battery, and all fixed
-  there.
-  **The design input worth more than the instances, because a probe would miss it.** A fourth
-  instance — `gate-timing-baseline-comparability`, corrected at the same close — cites the
-  deleted ruling **by its distinctive phrasing, naming no file at all**, so no probe scoped to
-  file-name citations reaches it; and it was the highest-consequence of the four, a deferral
-  argument resting on the expired premise rather than stale narration. So the condition
-  vocabulary must be readable from the *citing* side, not only the record's.
-  **Why `[design-pending]`:** the condition vocabulary is the whole design, and the
-  escalation-only boundary rules out the cheap fix.
-  **Cost while deferred:** a ruling read as live after its condition passed steers the very
-  sessions that consult the record for what is settled, and the record's authority makes that
-  steer expensive to unwind. The widening adds the sharper cost: the citing surfaces are
-  *published* — a kit SPEC and its docs mirror — so the blast radius reaches adopters.
-  **Fifth inbound instance, 2026-08-13, the first from a *deliberate retirement* rather than a
-  prune** — `gate-sdk/SPEC.md` citing a ruling the retirement deleted from a surviving section,
-  cleaned by `spent-ruling-retirement`.
-  **SIXTH, 2026-09-06, the largest cohort yet: ELEVEN live deferred entries — filed as five —
-  stating in the present tense that the port-only run bars an active-section promotion, after the
-  port-first ruling superseded that whole run.** Fixed inline at that drain. Two design inputs a
-  file-name-scoped probe misses: two of the eleven rested their own FILING decision on the retired
-  qualification, and one recorded a LIVE operator ruling under the retired run's name — so the
-  remedy re-names the run, never the ruling, and a probe blind to that proposes reversals.
-  recurrence: ruling-record-condition-staleness-probe 2026-08-13 2026-09-06
-  Filed 2026-08-07 by close, draining the gap inbox.
-
-- **stage-economics-log-key-session-collision** [design-pending] — two sessions in one
-  (iteration, stage) overwrite each other in the trend log.
-  the `--emit stage-economics` arm's row writer dedups on the `<iteration> <stage> <model>`
-  triple, so a batch-split stage — several sessions stamped into the same pair — appends twice
-  and the second silently replaces the first, under-reporting that stage by a whole session.
-  **The defect survived the 2026-09-05 port unchanged**, which is a fact rather than an
-  assumption: the port's parity harness reproduced the shell form's trend log byte for byte
-  across eight fixture sets, and the ported writer filters the same triple. Only the path in
-  this entry moved.
-  The session id is written as a same-line field, never into the key.
-  **Found by exercising the meter against the real sessions directory**, not by reading it:
-  one iteration's build stage had run as two sessions and only one row survived. The fan-out
-  pass folds its own rows for exactly this reason; the stage rows still race.
-  **Held out of the ruled cut deliberately** by the iteration that fixed the fan-out half, so
-  this is the named remainder rather than a regression.
-  **Re-measured 2026-08-08 at close, on a second independent instance.** That iteration's build
-  ran four batches tiered per batch across two models, two sessions each; the log retained one
-  row per model, so each retained row carries a single batch's draw as though it were the
-  stage's — an under-report of roughly a third on both models, with nothing in the file marking
-  that anything was dropped. Two refinements that instance adds to the diagnosis above: the
-  per-session report on **stdout is correct**, so only the persisted rollup is lossy and it is
-  the persisted rollup that trends; and **per-batch model tiering is precisely the shape that
-  breaks the dedupe**, which was written for one session per stage per model, where re-running
-  the collector must not double-count.
-  **Why `[design-pending]`:** the honest closes differ in kind, and there are three. Folding
-  stage rows the way the fan-out pass folds keeps the key and loses per-session detail; widening
-  the key with the session id is a trend-log grammar change every existing reader inherits; and
-  making the row an explicit aggregate the writer recomputes from every matching transcript
-  keeps the grain but moves the work into the writer. Naive summing is ruled out on its own —
-  the collector is re-runnable, so a sum double-counts on every re-run.
-  **Cost while deferred:** every per-stage figure for a split stage under-reports, and the
-  under-report is invisible in the log — a cross-stage comparison drawn from a split iteration
-  is not signal, and nothing in the log says so. The Split posture makes splitting routine, so
-  the defect's reach grows with the posture's adoption. Sharper under model tiering: the rollup
-  is the surface a standing tiering watch reads, so a model looks cheaper exactly when its stage
-  ran more batches.
-  Filed 2026-08-07 by close, draining the gap inbox; found at build. **Merged 2026-08-08 at
-  scope by lead ruling** with `stage-economics-log-multi-session-undercount` (filed 2026-08-08
-  by close), which was the same defect re-found: identical `log_line` dedupe on the
-  iteration/stage/model triple, verified against the source. That entry's premise that the work
-  was unfiled is false; its measurement and its third design candidate are folded in above and
-  the duplicate slug is dropped.
 
 - **rejected-compound-commit-relabel** [design-pending] — a rejected stage-and-commit leaves
   the index staged and the bare retry mislabels the work.
