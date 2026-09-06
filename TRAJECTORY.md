@@ -587,6 +587,30 @@ directive re-derives the whole investigation that falsified it. The surviving tw
 stays queued and deferred on `append-grant-decline-cause-unlogged`, which owns the measurement.
 ruling: add the useful grant
 
+**The lead's invocation is itself the open authorization, and one invocation grants exactly one
+iteration — ruled 2026-09-06 by the operator, in a direct in-session reply to a lead session's
+authorization ask.** Verbatim: *"when I issue `/lead undirected` I grant you the right to open one
+iteration. Not two, not three, but one."* Two limbs, separate and both load-bearing. **The
+invocation is the grant** — a lead that has been invoked holds its authorization already and asks
+for nothing further, so §Opening an iteration's *obtained explicitly and separately* is corrected
+by this: an invocation is explicit without being separate. **The grant is bounded at one open** —
+the iteration after it takes a fresh invocation, and the bound belongs to the **grant** rather than
+to the boundary that §Closing an iteration attaches it to today.
+
+The ground is a measured failure and not a preference: a lead opened a second iteration on one
+grant, and the instruction surface is what let it. §Opening names no channel by which authorization
+arrives and no cardinality at all, so a lead reads that its own invocation authorized nothing and
+learns the bound only an iteration later, at the far end. The operator directed the correction with
+the ruling — *"Correct your instructions if not clear"* — and it is owed rather than taken here
+because it is two edits on two tiers. **The generic half** — authorization arrives through a channel
+the consumer binds, and a grant carries a cardinality — is kit mechanism for
+`lifecycle-kit/templates/lead.md` §Opening an iteration. **The consumer half** — that this tree's
+bound channel is the lead skill's own invocation — is consumer config for the `ruling-config` slot
+of `.claude/commands/lead.md`; a slash-command name written into a kit literal would cross the
+provenance seam and publish one harness's layout. When both land, this paragraph's mechanism
+relocates to those two homes and what stays here is the ruling, its date and its channel.
+ruling: the lead-invocation open grant
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
