@@ -1948,6 +1948,16 @@ that block now falls: the build precedes the main pack, so a second declared
 target stops the whole smoke rather than only its last arm — which is the honest
 consequence of the main payload carrying the artifact, not a regression.
 
+**A platform leg's steered roster makes the artifact branch live on that host,
+and that is the fact a dormancy argument gets wrong.** A per-platform
+install-smoke leg steers `GATE_SDK_NATIVE_TARGETS_FILE` at a single-host roster,
+the packer copies that roster into the payload verbatim, and `target_of_host()`
+maps the leg's host to a triple — so the roster comparison matches and
+`select_artifact` takes its artifact-present branch on a platform
+`native/targets.list` does not declare. A claim that code below that branch is
+dormant *because the shipped roster carries no such line* is therefore false on
+every platform leg, and a site costed dormant on that ground is a live site.
+
 Its only knob is `INSTALLER_SMOKE_TMP_DIR`, and it writes nothing inside the
 worktree: the crate's build output lands in gitignored build space and the
 artifact directory it assembles lives under the smoke's own scratch, so the

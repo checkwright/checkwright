@@ -9334,6 +9334,8 @@
   unreadable until the same close restored it (the field sits 43311 characters into the row at
   `b2cedcd3`). So "compact each row" is not safe unattended: a compression pass reads an accreted
   row as prose, and the roster's grammar is graded by nothing.
+  **THIRD POINT 2026-09-06: 214955 bytes over 12 lines, 65KB BELOW the second** — growth is not
+  monotone once a compaction lands, so the cost line prices appends rather than the file.
   Surfaced 2026-09-04 in the gap inbox by the `usage-verdict-cut` close's own later steps and
   drained at the next iteration's scope entry, which is why its disposition is dated after it.
 - **upgrade-smoke-producer-leaks-worktrees-on-signal** [design-pending] — the upgrade-smoke arm
@@ -10226,10 +10228,5 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
-
-- lead-open-authorization-channel-and-cardinality
-- pack-installer-no-owning-spec-section
-- macos-install-smoke-ci-leg
-- init-vendoring-assumes-gnu-findutils
 
 ## Lessons Learned
