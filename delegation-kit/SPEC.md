@@ -61,9 +61,9 @@ backgrounded a *shell* producer, ended its turn, and the process kept running
 and kept writing its output file for minutes. Reaping holds for an `Agent`
 child and not for a shell one, so the rule's mechanism is the unconditional
 loss of the **observer**, not the conditional loss of the work — and the
-surviving-producer case is the worse of the two, since it is
-`validate-producer-liveness-unobservable`'s hazard (an unread producer mutating
-shared files while the next actor moves) arriving through the backgrounding
+surviving-producer case is the worse of the two, since it is the
+unobservable-producer hazard — an unread producer mutating
+shared files while the next actor moves — arriving through the backgrounding
 door. The rule is anchored on the invariant either way — an agent's contract
 with its caller is its return value, so work whose result is not in the return
 did not happen as far as the caller is concerned — which is why the
@@ -934,22 +934,19 @@ stop while a background child is live?** — came back *no* (§The probe is
 asymmetric), so the axis §The delegation model's waiting rule exists for holds at
 the turn-end too and a blocking hook was the only lever left.
 
-**The authorization is recorded here because it is spent.** Turning the observer
-into a refuser was ruled by the operator on 2026-08-24, **unconditionally**, and
-the ruling named its own discharge event — spent when the enforcing hook ships —
-so it is retired from TRAJECTORY.md §The closed rulings and its content lives
-here. Two things it settled bind any later change. First, a **capped** variant
+**The refuser is unconditional, and two decisions behind that bind any later
+change to it.** They are stated here rather than left to be re-derived. First, a
+**capped** variant
 was offered as an explicit option and **refused**: refuse only on a
 `verdict=red live=yes` reading carrying at least one record, stay advisory
 otherwise. So every narrowing below is argued on its own stated grounds, never
 inherited as a safety margin, and where a boundary here coincides with the
 refused option's the coincidence is disclosed rather than left to be read back
-in through the resemblance. Second, what needed authorizing was the **class** —
-an observer turned refuser at a turn end. A scope probe established that this
-repo had the hook registered already, so the change was a script edit rather than
-a permission-surface write under TRAJECTORY.md's 2026-08-22 wall; that is a true
-finding about **cost** and it is not what the authorization rests on, which is
-why it would have been given just the same had the registration been absent.
+in through the resemblance. Second, what was at stake was the **class** —
+an observer turned refuser at a turn end — and never the size of the edit that
+delivered it. A tree whose harness already registers the hook gets a script edit
+rather than a permission-surface write; that is a true finding about **cost**, and
+a decision resting on it would come out the same way with the registration absent.
 
 **The event is `SubagentStop`, never `Stop`.** A dispatched session is a
 subagent, so its turn end fires `SubagentStop`, and every attested firing of the
@@ -1050,25 +1047,25 @@ is the isolated dispatch as this arm's *routine* producer, never the arm.
 than a first draft.** The split was first drafted with `unresolved` **allowing**,
 on the sound ground just given that the case cannot be record corruption. Checked
 against the shipped hook, that would have flipped a `records=0` reading from
-`refuse` to `allow` — a real, mechanical edge of the "unconditionally" the
-authorization above records. **Ruled 2026-08-24 by the operator: keep the split
-for its diagnostic value and map `unresolved` to `decision=refuse`, so no edge of
-the secured refusal set narrows.** That is not a reversal of the 2026-08-24
-authorization; it is that authorization holding intact against a delta that would
+`refuse` to `allow` — a real, mechanical edge of the unconditional refusal the
+section above secures. **The split is kept for its diagnostic value and
+`unresolved` maps to `decision=refuse`, so no edge of
+the secured refusal set narrows.** That is not a reversal of the unconditional
+refusal; it is that refusal holding intact against a delta that would
 have narrowed it. The technical ground was not found wrong — the unconditional
 refusal was simply worth more than the one provably-empty reading it costs. The
 finding is recorded here and not only the disposition, because a later reader who
 re-derives the *cannot be corruption* proof will reach the drafted conclusion
-again and needs to find the ruling rather than the argument alone.
+again and needs to find the decision rather than the argument alone.
 
-**The cost that ruling keeps is stated rather than left to be discovered — and it
-was measured, then bounded, without narrowing the ruling.** A worktree-isolated
+**The cost that decision keeps is stated rather than left to be discovered — and it
+was measured, then bounded, without narrowing the refusal.** A worktree-isolated
 dispatch is still refused at turn end on a binary-absent reading, because
-`unresolved` refuses. Priced as one wasted exit when ruled, it was measured on
-2026-08-25 as a **loop**: a refused turn end is retried, the condition — a
-reader that cannot run — is invariant under anything the child does, so one
-read-only audit spent 142 tool uses and ~179k tokens refusing and its report
-was lost with them. **Hotfixed 2026-08-25 on operator ruling: `unresolved`
+`unresolved` refuses. Priced as one wasted exit when first decided, it was
+measured on 2026-08-25 as a **loop**: a refused turn end is retried, the
+condition — a reader that cannot run — is invariant under anything the child
+does, so one read-only audit spent 142 tool uses and ~179k tokens refusing and
+its report was lost with them. **The bound that answers it: `unresolved`
 refuses once.** The hook reads the payload's `stop_hook_active` — true when the
 harness is already continuing because of a stop hook — and on that firing the
 `unresolved` arm allows, logging `verdict=unresolved decision=allow`, which is
@@ -1076,11 +1073,11 @@ how a triage reader tells a bounded refusal from a first one without a new
 field. `red` and `corrupt` read nothing from the field and stay unconditional:
 their conditions resolve (the producer ends; the record is deleted), so the
 loop they hold is the rule's own bound, and the field is read for the one arm
-whose condition never resolves. No edge of the 2026-08-24 refusal set narrows —
+whose condition never resolves. No edge of the secured refusal set narrows —
 the first refusal on every arm stands — and the refused alternative, allowing
 `unresolved` inside a linked worktree, is refused for exactly that reason. The
-root fix, a reader resolvable inside a worktree, is
-`worktree-isolated-dispatch-cannot-reach-the-main-checkout`'s and dissolves the
+root fix, a reader resolvable inside a worktree, belongs to separately queued
+work and dissolves the
 arm's firing rather than bounding it. **Measured live the same day, after the
 fix:** a worktree-isolated read-only dispatch was refused once and allowed on
 its next stop — two tool uses, ~18k child tokens, report delivered — against
@@ -1156,10 +1153,10 @@ nothing and refuses nothing. That is honest degradation and it is preferable to 
 silent third parse that would work everywhere and drift from its owner.
 
 **The kit shipped no default reader for as long as it could not ship a real one,
-and enforcement made that ruling stronger rather than negotiable.** It defaulted to
+and enforcement made that rule stronger rather than negotiable.** It defaulted to
 `evidence-kit/checks/check-producer-liveness.sh` while that gate was
-shell-declared. `shell-gate-tail-port` made the gate a descriptor dispatched to
-the binary, so that path exists in **no** tree — the readability test the reader
+shell-declared. Porting the gate to a descriptor dispatched to
+the binary left that path existing in **no** tree — the readability test the reader
 sits behind fails everywhere, and the hook logged `unavailable` on every firing
 in a tree whose battery was green over it. A default naming a path nothing
 resolves is a fake default: it reads as a shipped capability and is none, which is
@@ -1605,7 +1602,7 @@ The same reasoning binds here and for the same reason, so this hook adds no knob
 
 **The ordinary escape is not the operator's, and that matters under the permission
 wall.** Unwiring means editing the consumer's settings, which is operator-class
-work no stage session may do (TRAJECTORY.md §The closed rulings, 2026-08-22). If
+work no stage session may do. If
 unwiring were the *only* escape, this hook would be a mechanism whose every
 recovery path needed the operator. It is not: the record set is the session's own
 artifact, `check-producer-liveness` names the blocking record, and deleting a
@@ -1625,8 +1622,8 @@ correction is recorded rather than silently made because the refusal's *other*
 ground still holds and still decides the shape: for `red` and `corrupt` the
 refusal's trigger is a real-world condition that ends when the producer ends or
 the record is retracted, so the loop is bounded by the thing the rule is about
-and the field is not read. For `unresolved` no such bound exists — see §The
-cost that ruling keeps — so the field is read there and nowhere else. The
+and the field is not read. For `unresolved` no such bound exists — see the
+measured-cost paragraph above — so the field is read there and nowhere else. The
 harness cap did not bound the measured loop, presumably because a child's tool
 calls between refusals break the consecutive count; recorded as observed, not
 explained, so a reader does not mistake the cap for a guard this tree relies on.
@@ -1822,18 +1819,13 @@ touching this hook**: the consumer's hook copy dumped each firing's raw
 payload to gitignored scratch across five firings and was restored byte-for-byte,
 so the grammar above still logs keys and never values.
 
-**The ruling the read was bought to inform: the probe keeps logging key names
-only.** No field is added and the grammar takes no delta. Ruled 2026-08-23 by the
-iteration lead under an explicit operator delegation — the question was relayed
-to the operator as operator-class and the operator returned it to the lead
-("your call"), so the authorization is delegated rather than exercised, and the
-ruling is neither the operator's own nor one the lead took unilaterally. The
-channel is cited here because a later reader cannot otherwise tell those three
-apart. **What decided it is the read's own result, and the direction is the
-unusual part: the read STRENGTHENED the ruling rather than merely failing to
+**The decision the read was bought to inform: the probe keeps logging key names
+only.** No field is added and the grammar takes no delta. **What decided it is
+the read's own result, and the direction is the
+unusual part: the read STRENGTHENED the restriction rather than merely failing to
 overturn it.** The only named reader a value log would ever have had was the
 harness-view substitution below, and the read falsified that reader outright. A
-ruling with nothing on the other side of it has stopped being a restriction.
+restriction with nothing on the other side of it has stopped being one.
 A derived non-value — a count, a type tally — was weighed and refused on the same
 ground: it serves no reader either, and a grammar delta plus a member edit are
 not spent on a field nothing reads.
@@ -2187,11 +2179,11 @@ which is the natural first stop, therefore gives the wrong answer for the tree
 the port actually runs against; gate-sdk/SPEC.md §The port-candidate criteria
 carries the instance class.
 
-**Two behaviours changed with the port, and both are rulings rather than
+**Two behaviours changed with the port, and both are decisions rather than
 drift.** Assertion B's report lines came out of the shell form in no
 reproducible order once a commit added two matching exemptions; the
-compiled form emits the same **set** byte-sorted, on the kit-roots cohort's
-ruling that a compiled form implements set semantics rather than a shell's
+compiled form emits the same **set** byte-sorted, on the standing rule that a
+compiled form implements set semantics rather than a shell's
 incidental ordering. And a trailing `--fixture` with no directory after it
 **hung** the shell form in its argument-parsing loop; the compiled form reads the
 missing value as the empty directory name and refuses. A hang is not a verdict, so ending it costs no assertion.
@@ -2602,8 +2594,8 @@ distinguishable and the group stays aligned rather than only the collision
 changing width.
 
 **The call is in process, and the paragraph that ruled a subprocess call *the
-contract* retires with its ground — ruled 2026-08-31 by the lead on own
-authority, uniformly across this section and queue-kit/SPEC.md §The queue-counts
+contract* retires with its ground — uniformly across this section and
+queue-kit/SPEC.md §The queue-counts
 arm, whose own subprocess paragraph stated the same ground and retires with it.**
 That ground was that the counter's shell
 library exits 2 at source time on a malformed queue config, so an in-process call
@@ -2769,8 +2761,8 @@ order, and on a full-key tie the two choose different segment endpoints and
 therefore print different token deltas. That difference was measured at the
 port, not reasoned about.
 
-**One option of a live deferred entry leaves the design space with the shell
-file.** `assertion-strength-exit-header-reach`'s option (c) is *give this tool
+**One option of a live deferred question leaves the design space with the shell
+file.** That question's option (c) is *give this tool
 an uppercase-token `# exit:` header*, one line against a still-owed shell file
 restoring a nonzero map for a gate whose live reach is already zero. The file is
 gone, so (c) is foreclosed; the gate is not broken by that, because it resolves

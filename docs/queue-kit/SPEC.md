@@ -224,8 +224,8 @@ removed rather than added.
 
 **Eligibility**, judged at the closing stage: the entry's cost field opens in
 the low class; it carries no `[roadmap:]` tag; and it has **no live promotion
-trigger**. **What counts as live was narrowed 2026-08-23 by operator ruling**,
-on a measured pool where the prior reading let almost nothing qualify: a live
+trigger**. **What counts as live is deliberately narrow**, and it was narrowed
+against a measured pool where the prior reading let almost nothing qualify: a live
 trigger is a **live, unbuilt queue slug** the entry names, a dated `recurrence:`
 line, or a `[roadmap:]` tag. A trigger that is itself gated on launch — a first
 external adopter, a preview cohort, an install count — is **dormant**: the entry
@@ -250,10 +250,10 @@ The cost field's opening token is the class word the
 `--icebox-candidates` arm reads (`low`, `zero`, `bounded`, `cosmetic`), so a
 cost field that opens in prose has declared no class and is read as not-low;
 authoring the class word first is the contract, and the gate that holds it is
-owed — filed 2026-08-23 into the gap inbox, drained by the next close.
+owed.
 
-**That opener is not re-authored to unblock an eviction — ruled 2026-08-31 by
-the lead on its own authority.** A session holding an entry whose prose opener
+**That opener is not re-authored to unblock an eviction.** A session holding an
+entry whose prose opener
 keeps it off the `--icebox-candidates` worklist may not rewrite the field to
 read low. The opener is an honest signal, and re-authoring it makes an entry
 *look* evictable without making it dormant — emulating the oracle rather than
@@ -267,7 +267,7 @@ ruling, and if it is not low the re-authoring is the gaming this refuses — the
 option only has force in the case it is wrong for. *Waiting for the owed
 opener gate above*: that gate would enforce the opener's **shape** and never
 adjudicate a cost's truth, so it cannot answer this question and waiting on it
-defers indefinitely for no information. The measurement the ruling turned on
+defers indefinitely for no information. The measurement this rule turned on
 was the substance behind two such openers on a citation-liveness hub — 171
 unqualified citations and 902 directive pointers, which are not low-cost
 carries.
@@ -278,8 +278,8 @@ because the cost limb blocks first and the clause's own antecedent — *where a
 consumer classifies a set dormant as a class* — never obtains. A second limb
 does not fail by being unreached; that is the clause working as written.
 
-**Direct filing into the icebox is permitted on one condition — ruled
-2026-08-23, reversing the prior rule.** The prior rule held that nothing files
+**Direct filing into the icebox is permitted on one condition, reversing an
+earlier rule.** That prior rule held that nothing files
 directly into the icebox because a newly filed finding has never been triaged.
 What changed is who triages: the closing stage's drain *is* the triage, and a
 drained bullet whose cost opens in the low class and names no live trigger may
@@ -809,7 +809,7 @@ delegation-kit/SPEC.md §The statusline arm gives. Read this paragraph's silence
 on it as silence rather than as coverage.
 
 **The three tools that remained in `bin/` take this section's dispositions, and
-that class ruling is what composed the cut they landed in.** Each was "a tool,
+that class disposition is what composed the cut they landed in.** Each was "a tool,
 not a gate (no `# graph:` manifest)" in its own words, and §The queue-edges arm
 already stated its membership as *following the queue-index precedent*. This
 section ported the **first** member of that class and settled every question the
@@ -818,14 +818,14 @@ that the derived shell regexes were never a configuration surface and so do not
 cross, that a mode rides the arm's own argv tail rather than earning a second
 arm, and that stdout is byte-preserved while an error path's exit code collapses
 to 2. So §The queue-counts arm, §The queue-edges arm and §The lesson-sink arm
-each take those answers rather than re-deciding them, and the ruling lives here
-because this is the section the answers came from. **The kit reaching zero owed
+each take those answers rather than re-deciding them, and the answers live here
+because this is the section they came from. **The kit reaching zero owed
 files is a result of taking the class, not the reason for taking it** — a
-kit-ordered composer is refused (`native-gate-port-remaining-corpus`'s 2026-08-28
-ruling), and the test this cut met would still be met if a fourth queue-kit tool
-were owed or if one of the three sat in another kit. **The cut's well-formedness
-under that composer was ruled 2026-08-31 by the lead on own authority**, naming
-this section as the one contract the cut selects; the ruling's home is here
+kit-ordered composer is refused, and the test this cut met would still be met if
+a fourth queue-kit tool
+were owed or if one of the three sat in another kit. **The cut is well-formed
+under that composer**, naming
+this section as the one contract it selects; the mechanism's home is here
 because this is where a later selector meets it.
 
 **One member does not take the `--emit-` spelling, and the exception is a
@@ -839,7 +839,7 @@ by family (gate-sdk/SPEC.md §The non-gate arm).
 a usage flag with no in-crate counterpart, and usage for a bridged arm lives in `run-gates.sh --help` and in
 queue-kit/README.md — where the class already keeps it. A per-arm help flag would
 be a second home for one sentence, so `-h` lands on the unknown-option refusal
-like any other unrecognised flag. This arm's own `--help` predates the ruling and
+like any other unrecognised flag. This arm's own `--help` predates that rule and
 is left standing rather than removed for symmetry: three modes need the mode
 roster somewhere, and a single-grammar arm does not.
 
@@ -912,12 +912,12 @@ is exactly the right ceiling. **A pool younger than the age threshold yields an
 empty worklist**, which is correct and is not a reason to seed a tier by hand
 against the tool: eligibility is the rule, the worklist is the convenience.
 
-**The worklist applies the tier's categorical exclusions, reopening a ruling that
-held them off.** Operator-ruled 2026-08-18 that it deliberately would not, on
-five consecutive measurements at zero precision: filtering the machine-readable
+**The worklist applies the tier's categorical exclusions, reopening an earlier
+decision that held them off.** That decision was that it deliberately would not,
+on five consecutive measurements at zero precision: filtering the machine-readable
 half would have moved the eligible count from zero to zero, and the other half
-read as a prose-parsing fork nothing justified. **Reopened and taken by operator
-ruling 2026-08-24**, on measurement rather than on preference. Both halves of the
+read as a prose-parsing fork nothing justified. **It was reopened and taken on
+measurement rather than on preference.** Both halves of the
 ground fell: all three triggers are mechanically decidable — the `[roadmap:]` tag
 is a lead-line tag, the dated `recurrence:` declaration is one indented body line
 with a fixed lead token (§The queue format), and a named live slug is the

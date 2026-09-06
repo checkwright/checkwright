@@ -1037,8 +1037,8 @@ contending on. A capture affordance that stamped a `recurrence:` declaration ont
 a queue entry would do the one thing the inbox was built to prevent. The queue write
 therefore belongs to the closing stage's drain, which writes the queue anyway.
 
-**A queue entry cites this inbox as provenance, never as a locator — ruled
-2026-09-02 by the operator.** The inbox is drained every close, so a sentence
+**A queue entry cites this inbox as provenance, never as a locator.** The inbox
+is drained every close, so a sentence
 naming it as a fact's *current home* — "it is in the gap inbox as of" a date, or
 a parenthetical "(gap inbox," plus a date) — is broken by the next drain, while a
 sentence stating that a finding *was filed there and drained from it on a date*
@@ -1052,14 +1052,15 @@ tree-facing heuristic whose over-refusal cost the tree already pays elsewhere, a
 the measured rate — two locators in the inbox's whole life, both caught by one
 read — does not buy one.
 
-**A dated attestation freezes the claim, never the locator — ruled 2026-09-03 by
-the operator on a consult's recommendation, lead-relayed.** The test above
+**A dated attestation freezes the claim, never the locator.** The test above
 generalises past these two surfaces to every dated claim in queue prose. A dated
 measurement or judgment — *verified 2026-08-30: the three sites are …* — is
 history: true on its date, immune to later drift, and never refreshed, which is
 the freeze the ruling record's dated-measurement idiom already states per
-instance (TRAJECTORY.md §The closed rulings; gate-sdk/SPEC.md §The decisions this
-substrate already closed). A `path:line` beside it is a locator by construction —
+instance (gate-sdk/SPEC.md §The decisions this substrate already closed). The
+date in that example is a **specimen** and not an attestation of anything: it
+denotes no event, and any other date would leave the surrounding rule equally
+true. A `path:line` beside it is a locator by construction —
 its only reader follows it now — so drift falsifies the literal, and a literal
 position in prose is the de-literalization defect whatever date sits beside it
 (doctrine-kit/DOCTRINE.md §Methodology-maintenance rules). A date is not a rev:
@@ -1077,11 +1078,11 @@ refused. *A historical record immune to drift* makes a date a licence to carry
 rotting locators, contradicts de-literalization and spec-over-precedent, and
 would un-find a citation resolving to different text. *A live pointer the drift
 falsifies whole* makes the dated-measurement idiom defective and invites the
-recount that ruling forbids. A scanner gate over anchors is refused on the
+recount the freeze forbids. A scanner gate over anchors is refused on the
 grounds the paragraph above already gives.
 
-**The drain's dispositions are ordered, and promotion is last — ruled 2026-08-30
-by the operator, on a measured drain.** The disposition set is fix, icebox,
+**The drain's dispositions are ordered, and promotion is last, on a measured
+drain rather than on a preference.** The disposition set is fix, icebox,
 promote, discard; the drain tries them in that order per bullet and a promotion
 states in the close commit message which earlier disposition it failed and why.
 The measurement: with the set listed promotion-first, fifteen consecutive drained
@@ -1098,8 +1099,8 @@ what it admits is exactly what that refusal said a hotfix is not — debt-shaped
 work. It is also not an intake violation: scope gates *initiatives*, and a
 defect the drain fixes in one commit adds nothing for scope to weigh. A bullet
 is icebox-shaped on queue-kit/SPEC.md §The icebox tier's eligibility, read at
-the drain. The alternative refused with the ruling: a gate reddening a close on
-net pool growth. Enforcement-first would prefer it, but the refusal ground is
+the drain. The alternative refused alongside the ordering: a gate reddening a
+close on net pool growth. Enforcement-first would prefer it, but the refusal ground is
 that the exits are judgments — a forced exit is a fake one — so the figure is
 surfaced instead: drift-kit's `kpi-queue-net-delta` already computes it, and
 the drain's commit message states its `qnet` fragment.
@@ -1281,8 +1282,8 @@ reverses it. Independently, the only available mechanism is the capture-time
 matcher, whose honest limit above runs in the **under-counting** direction, so
 mechanizing on it would dress a known-lossy predicate as a count.
 
-*Prospective only, operator-ruled 2026-08-17, and this is the ruling's own reach
-rather than a narrowing of it.* No session backfills a date onto a judgment an
+*Prospective only, and that is the rule's own reach rather than a narrowing of
+it.* No session backfills a date onto a judgment an
 earlier session declined to stamp. The trade below is what forecloses it: this
 rule concedes re-derivability and pays with **auditability by inspection**, so a
 date is legible only because the prose it was judged from sits in the same diff —
@@ -1595,7 +1596,7 @@ shape contract is a census find rather than a firing: it carries
 flag, and while it writes nothing, its help behavior was the same misleading
 error — the half of that finding the port discharges outright.
 
-**Four shell files implement this section and the 2026-09-01 port cut took two of
+**Four shell files implement this section and a port cut has taken two of
 them**, so the section is not discharged and that is written here rather than
 left to be inferred. The two that moved are the affordances above, each of which
 declared this section in its own `# spec:` header. The two that did not are
@@ -1930,7 +1931,7 @@ gates that assert what it writes (§check-merge-attrs,
 §check-lifecycle-registration), in one substrate.
 
 **All four are shell holders with no caller outside this file, kept rather than
-deleted with this cut.** The 2026-09-03 port of §bin/install-lifecycle.sh
+deleted with this cut.** The port of §bin/install-lifecycle.sh
 moved the writer in-crate and closed their caller set on itself: nothing outside
 `lib/stages.sh` names any of the four, and inside it `lifecycle_merge_attrs_block`
 is the sole caller of `lifecycle_supersede_set` and `lifecycle_union_set` — which
@@ -1951,8 +1952,7 @@ sitting inside a `no-port` file, not an owed or held file of their own; they tak
 no `# port-until:` because that field is file-scoped too and would misdescribe
 the file around them. The cut that next takes §lib/stages.sh's own contract
 removes all four in one motion. Written here so that cut does not rediscover the
-caller set from scratch (lead-ruled 2026-09-03, own-authority; filed to the gap
-inbox with its probe). `lifecycle_stage_journal <stage>` is the **journal-path
+caller set from scratch. `lifecycle_stage_journal <stage>` is the **journal-path
 derivation**:
 `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` with `<stage>` expanded, hoisted here for
 the same reason the cursor is — three readers must name one file or the
@@ -1985,7 +1985,7 @@ return non-zero on a routine non-match, run as a bare command, aborts every
 `set -e` caller that sources this file. The attested cost of getting it wrong was
 a consumer with a pattern configured being unable to re-emit its own derived
 surfaces, silently and at exit 1 — that caller was `bin/install-lifecycle.sh`,
-which ported on 2026-09-03, and no surviving shell sourcer in this tree
+which has since ported, and no surviving shell sourcer in this tree
 (`--enter-stage`) runs under `set -e`. The contract binds
 the next one that does, which is why it is stated as a property of the loader
 rather than as a note about one caller.
@@ -2048,7 +2048,7 @@ and exit 2.
 
 **This section owns the derivation's contract; the derivation itself lives in one
 shared crate module** (`native/src/sessions.rs`), which drift-kit's two meters
-read as well as this arm — one copy in-crate, on the operator's 2026-09-05 ruling
+read as well as this arm — one copy in-crate rather than one per reader
 (drift-kit/SPEC.md §The overhead meter). Nothing about the rules below changes:
 the module reads no environment at all, every input arriving as a value, so each
 consuming arm resolves **its own kit's** sessions-dir knob and hands the answer
@@ -2153,41 +2153,32 @@ two readers use. Neither the derivation nor either exit status moved otherwise �
 the port was held against the deleted driver over the derivation order's five
 axes, all three refusal texts, a cross-tier mtime tie, a broken symlink, a
 dotfile and four cwd axes, with no difference in output or status.
-**In-envelope rather than a widening — ruled 2026-09-03 by the lead on its own
-authority.** The cut *opens* this failure mode rather than inheriting it: the
-deleted driver was a vendored shell script, present wherever the kit was, where
-the arm needs a **built** binary — so the refusal covers a case that did not
-exist before the cut, and a faithful port owes the case it created. Recorded as a
-lead ruling and not an operator-blessed one: the operator was asked whether they
-read the added refusal as a widening and had not answered when the cut closed.
+**The refusal is in-envelope rather than a widening.** The cut *opens* this
+failure mode rather than inheriting it: the deleted driver was a vendored shell
+script, present wherever the kit was, where the arm needs a **built** binary — so
+the refusal covers a case that did not exist before the cut, and a faithful port
+owes the case it created. That reading is worth stating rather than assuming,
+because a port's envelope rule does not settle on its face whether a refusal
+covering a failure mode the port itself created is inside the envelope or outside
+it, and the two answers differ in what a port may add without asking.
 
-**The port disposition: taken 2026-09-03**, hosted on
-`native-gate-port-remaining-corpus`, which discharges the deferral this section
-recorded — the member was dropped once from
-`declaration-install-and-stage-helper-cuts` for want of a host rather than for
-any property of the file, and a host is all it ever needed. Exactly **one**
-`.claude/settings.json` allow entry named the deleted path, and the deleting
-commit carries its deletion — the count probed rather than assumed, per the
-2026-08-29 settings-grant carve-out on that entry. No grant is added: the
-post-port
-invocation is covered by the committed `Bash(bash gate-sdk/bin/run-gates.sh)`
-entries. The cut created no twin — the derivation sources no kit library, and
-the shell caller set emptied — so no parity oracle is owed.
+A port taking this derivation adds no permission grant: the post-port invocation
+is covered by the committed run-gates entries a consumer's own permission surface
+already carries, and the count of entries naming a deleted path is **probed rather
+than assumed** at the cut. The cut created no twin — the derivation sources no kit
+library, and the shell caller set emptied — so no parity oracle is owed.
 
-**One question this cut deliberately leaves open**, so a reader does not take the
-silence for a discharge: `LIFECYCLE_KIT_SESSION_ID` is documented on §Layout and
-configuration as a kit knob but is environment-only in practice, and whether it
-should become bridged or be redocumented is filed to the committed gap inbox
-rather than ruled here. It outlives the port in either direction.
+**One question a port here deliberately leaves open**, so a reader does not take
+the silence for a discharge: `LIFECYCLE_KIT_SESSION_ID` is documented on §Layout
+and configuration as a kit knob but is environment-only in practice, and whether
+it should become bridged or be redocumented is a filing rather than a ruling this
+section takes. It outlives the port in either direction.
 
-Two facts a session taking this cut should not re-derive. Its sole production
+One fact a session taking this cut should not re-derive: its sole production
 caller is `--enter-stage`, which resolves the id internally — but the kit's
 own stage templates and `templates/lead.md` name this helper as the id's source
 and one of them **invokes it directly**, so a port edits kit `templates/*.md` and
-stales whatever projection reads them. And it is the one member of that iteration's
-candidate set whose path a committed permission grant names, so the 2026-08-29
-settings-grant carve-out on `native-gate-port-remaining-corpus` is exercised
-**once** here — the count probed rather than assumed, as that ruling requires.
+stales whatever projection reads them.
 
 ### bin/enter-stage.sh
 
@@ -2372,8 +2363,8 @@ witness is the failure the witness exists to prevent. It rides the tool every
 stage already invokes as its first step, so it adds no invocation point and no
 schedule, and it lands at the one moment a stage session is guaranteed to be
 looking. **This trigger and the truncation above are the survey record's
-surviving shell half**: the two capture affordances ported onto the binary in the
-2026-09-01 cut, this file declares §bin/enter-stage.sh rather than that section
+surviving shell half**: the two capture affordances having ported onto the
+binary, this file declares §bin/enter-stage.sh rather than that section
 and so ports in a different cut, and a later cut selector meets that fact here,
 where it works, rather than only in the other section (§The survey record).
 
@@ -3000,8 +2991,8 @@ into the always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default
 `CLAUDE.md`; the positional override points a smoke or fixture at a scratch
 tree without touching consumer config), idempotently. **The `###
 bin/install-lifecycle.sh` heading is the section name, not a file name** — the
-in-SPEC citations resolve against it, and the shell tool it was named after
-ported on 2026-09-03. The block is bounded by
+in-SPEC citations resolve against it, and the shell tool it was named after has
+since ported. The block is bounded by
 fixed marker lines (`<!-- lifecycle-kit:begin -->` … `<!-- lifecycle-kit:end -->`);
 a run replaces the content between the markers when present and appends the
 block when absent, so re-running never duplicates. A begin marker without its
@@ -3069,7 +3060,7 @@ member (keep-ours) and one `merge=union` line per union member (the gap inbox,
 git-native) — so a reshaped supersede or union set flows into the attribute lines
 by construction and `check-merge-attrs` certifies the same rendering. **The
 writer/asserter split survives the port and its two implementations collapse to
-one**: before 2026-09-03 the writer was shell and the asserter was crate, deriving
+one**: before the port the writer was shell and the asserter was crate, deriving
 the same lines through two implementations held together by nothing but
 `smoke/install.sh`; they now compose the same two set derivations in one
 substrate. Unlike the agent file, the arm legitimately **mints
@@ -3098,7 +3089,7 @@ exited 0. The soft-skip property above is the **driver-config step's**, and it i
 intact: when the arm runs, a cwd whose repository has no driver registered still
 prints its skip to stderr at exit 0. Stated in these terms deliberately, because
 "a narrowing we accepted" invites a later session to try to restore a behaviour
-that was wrong (lead-ruled 2026-09-03, own-authority).
+that was wrong.
 
 Advisory tooling, not a gate: no fixture pair is owed; every step is exercised
 end-to-end in `smoke/install.sh`, which is the member's only caller. **Criterion
@@ -4442,7 +4433,11 @@ slug list, verbatim in the scope dispatch, and routes scope's proposed set back
 as an ordinary escalation; selection is scope's contract, and a lead-authored
 menu pre-empts the premise re-verification; and — the limb the other three
 presuppose — **whether an iteration opens at all is the operator's decision**,
-obtained explicitly rather than inferred, on the ground that an open commits a
+obtained explicitly rather than inferred, arriving through **one channel the
+consumer's own binding names** (explicit and *separate* being distinct
+requirements, of which only the first is general) and carrying a **cardinality**
+that defaults to one open and is spent rather than renewed, on the ground that an
+open commits a
 *scale* of spend the operator chooses even where the work's content plainly
 routes through the lifecycle, which is why an instruction to fix filed work is
 named as no authorization and why the template's whole-authority sentence
@@ -4450,9 +4445,11 @@ excludes opening; the undirected path is scoped to an authorized iteration
 carrying no theme rather than deleted, and a lead-relayed directive is stated as
 no evidence of authorization, so the surveying stage is asked for no check it
 holds less information to make), the closing-an-iteration contract as that same
-rule met at the other end — the lead stops at the final stage's completion and
-reports what it believes is owed instead of opening the next iteration, one rule
-attached to the boundary rather than two attached to the ends, which is also what
+rule's **consequence** rather than a second rule standing at a second end — the
+lead stops at the final stage's completion and
+reports what it believes is owed instead of opening the next iteration, because
+the grant that paid for this iteration is spent; one rule seated on the grant and
+met at the boundary, which is also what
 covers both postures given the unified posture's lead *is* the previous scope
 session sitting on preserved notes at exactly that moment, the four-header
 escalation block (Question / Options / Recommendation / Evidence) together with
