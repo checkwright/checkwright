@@ -402,6 +402,9 @@ obligation**: a file carrying any such step stays `owed` in
 the shell that ran it is deleted. `retired` steps are deleted, not declared. So
 today no `installer/lib/` or `installer/bin/` file declares, and none should
 until the relocation lands — the owed column is reading this section correctly.
+`scripts/pack-installer.sh` is outside this section's reach and its disposition
+is §The packer's, so a reader hunting the packer's port standing here is in the
+wrong section.
 Two readings were refused with it, so the next cut does not re-argue them:
 *`behind-invoke` alone is the obligation and `bootstrap` is silent* — refused
 because it leaves the one shell surface the trajectory sanctions with no cause
@@ -1227,6 +1230,69 @@ every tree nobody has repointed, and where they part it is the row that is still
 right about what `uninstall` has to reverse. The distinction is the one every
 `files` row already carries, not a special case for this one.
 
+## The packer
+
+`scripts/pack-installer.sh` assembles the payload both transports ship — the
+Release tarball and the npm package — out of this repo's own kit roots, and
+npm-packs it in a scratch directory outside the worktree. This section owns that
+file: its boundary, its port disposition, and the contracts its own `# spec:`
+pointers cite.
+
+**Nothing is written inside the worktree, and no second copy of any kit is ever
+checked in.** The payload's kit set is derived at pack time from the roots the
+battery itself enumerates, so the shipped set cannot drift from the governed
+one, and the assembly happens under `INSTALLER_PACK_TMP_DIR` rather than in
+tree.
+
+**The payload is stamped with the commit it was packed from, so the tree must be
+clean.** That stamp is the whole of what makes a vendored tree resolvable to an
+upstream state, and a dirty tree would stamp a commit the payload does not
+describe — so the packer refuses instead of stamping one. The version stamped
+beside it comes from the newest reachable tag unless `--version` names one, and
+never from an edit to `installer/package.json`.
+
+**The caller names the tree it means.** `--root` takes the work-tree top level
+to pack and stamp, and the value is validated to be one: silently promoting a
+named subdirectory to its toplevel would be the same quiet correction the flag
+exists to remove, since without it the current directory selects a tree the
+caller never named. Absent `--root`, the git toplevel of the current directory
+is what gets packed.
+
+**The flag roster has exactly one tier and it is the tool itself.** `--help`
+prints it on stdout at exit 0, so no doc carries a second copy to drift. Help is
+adopted here on its own merits and does not extend gate-sdk/SPEC.md §The
+bin/-tool contract to this repo's `scripts/`: with a flag surface this wide, an
+unknown-argument refusal is too thin a discovery route to be a caller's only
+one.
+
+**The port disposition is a plain obligation, and the sequencing sentence is
+that nothing sequences it.** The packer carries no `bootstrap` step — §The
+install boundary's three dispositions apply to the steps of an install, and the
+packer runs no install but assembles the artifact an install later consumes, so
+that section's behind-invoke hold does not reach it. It ships to no adopter: the
+packed set is `installer/` plus the enumerated kit roots, `scripts/` is neither,
+and no adopter receives or executes this file. Its callers — the release publish
+path and `consumer-smoke/run-smoke.sh` — each build the gate binary before they
+reach the pack step, on the host that step runs on, so a compiled form is
+reachable wherever the packer runs, the macOS install-smoke leg included.
+Nothing holds it: its lines sit in the reachable column of
+`--emit port-blockers --tree`, and a cut is authored against this section.
+
+**The disposition is stated here rather than in a kit SPEC, and the ground is
+the provenance seam.** gate-sdk is a kit, vendored into every adopter's tree. A
+kit SPEC section governing the disposition of a file that lives in this repo's
+`scripts/` — a file no adopter receives, and whose existence no adopter can
+verify — inverts the kit/consumer layering and publishes a rule about a private
+tool as kit mechanism. Independently, gate-sdk/SPEC.md §Consumer payload bounds
+its own reach to what a gate ships, and a port disposition for a release
+assembler is not a disclosure rule; the payload-content rules that section
+states about the packer stay exactly where they are, because already describing
+a file is not owning it. This surface is repo-root-governed with no owning kit,
+which is the governance class the packer is in, and it already hosts this shape
+for the harness §The consumer smoke governs — a repo-private tool that rides no
+payload, whose non-shipping status is established by citing the packer. Ruled
+`lead, own-authority` 2026-09-06, the seam ground primary.
+
 ## The consumer smoke
 
 `consumer-smoke/run-smoke.sh` is the acceptor for everything above, and it is
@@ -1253,10 +1319,10 @@ does not select it.** The script resolves that tree from its own path and hands
 it to `scripts/pack-installer.sh --root` at every one of its pack call sites, so
 the packed tree and the asserted tree are the same tree whatever directory you
 invoke from. A clone's copy invoked by absolute path, a second
-checkout, a linked worktree: all pack the tree the script belongs to. The
-packer's flag roster has exactly one tier and it is the script itself —
-`bash scripts/pack-installer.sh --help` prints it on stdout at exit 0 — so no
-doc carries a second copy to drift.
+checkout, a linked worktree: all pack the tree the script belongs to. What
+`--root` promises the caller, and the packer's single-tier flag roster, are
+§The packer's — this section cites that contract rather than hosting a copy of
+it.
 
 *The former invocation requirement is retired, not merely unstated.* Until
 `--root` existed, this section carried a standing rule — "run it with the

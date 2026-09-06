@@ -60,9 +60,9 @@
   reachable member of the owed port column has no SPEC section claiming it, so its cut has no
   boundary to be authored against and no gate reports the hole.
   **Measured 2026-09-05 at spec, section by section rather than by grep.**
-  `scripts/pack-installer.sh` (196 owed lines) carries `# spec: CLAUDE.md §Housekeeping` — an
+  `scripts/pack-installer.sh` (196 owed lines) carried `# spec: CLAUDE.md §Housekeeping` — an
   always-loaded manifest the 2026-09-05 operator ruling bars as a cut boundary — and no section
-  of `installer/README.md` or `gate-sdk/SPEC.md` claims the file.
+  of `installer/README.md` or `gate-sdk/SPEC.md` claimed the file.
   **PROMOTABLE ON THE PURPOSIVE READING OF GROUND 1 — operator, direct answer to the lead
   session's ask, lead-relayed, 2026-09-06.** The port-first run's port-critical test is "the
   owning section's own sequencing sentence", and it is UNSATISFIABLE here because the missing
@@ -84,6 +84,9 @@
   plain port obligation.
   **DISTINCT from `spec-pointer-boundary-legality`**, which stays filed: this unit gives one file
   a legal target and does not teach the gate to grade target legality.
+  **DELTAS 1-2 LANDED at build**: `installer/README.md` §The packer exists, and the pointers that
+  named the barred manifest and §The consumer smoke are re-homed onto it; the ones naming
+  gate-sdk/SPEC.md §Consumer payload stayed put. Delta 3, the 196-line cut, is what remains owed.
   Filed 2026-09-05 by close, promoting a gap bullet after fix was refused as a design call and
   icebox refused on the live port trigger; promoted 2026-09-06 at spec with its placement ruled.
 
@@ -9692,10 +9695,14 @@
 
 - **spec-pointer-boundary-legality** [design-pending] — `check-spec-pointer` grades that a `# spec:`
   target resolves, never that the target is a surface a cut may be bounded against.
-  **The hole, read off the live instance.** `scripts/pack-installer.sh` points at
-  `CLAUDE.md §Housekeeping`; the pointer resolves, so the gate is green, while the 2026-09-05
-  operator ruling bars an always-loaded manifest as a cut boundary. A file can therefore be fully
-  compliant and still unownable, which is `pack-installer-no-owning-spec-section` above.
+  **The hole, read off a live instance.** `installer/bin/checkwright.sh` — an owed file, read off
+  `--emit port-blockers --tree` — points at `CLAUDE.md §Housekeeping`; the pointer resolves, so the
+  gate is green, while the 2026-09-05 operator ruling bars an always-loaded manifest as a cut
+  boundary. A file can therefore be fully compliant and still unownable.
+  **The instance was re-based, and that is itself evidence for the entry.** The witness used to be
+  `scripts/pack-installer.sh`; `pack-installer-no-owning-spec-section` cured that one file by
+  authoring it an owner, which the gate could neither prompt nor confirm — so curing an instance
+  costs a hand read and leaves the class exactly where it was.
   **Why `[design-pending]`:** the illegal-target set is the design call. "Always-loaded manifest"
   is one member and the ruling names it; whether `README.md`, a template, or a docs page joins it
   is unruled, and a scanner asserting a set nobody has closed reds on judgment calls.

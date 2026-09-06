@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: CLAUDE.md §Housekeeping — assemble the installer package out of tree and npm-pack it there; the payload is derived from the repo's own kit roots at pack time, so no second copy of any kit is ever checked in or written inside the worktree
+# spec: installer/README.md §The packer — assemble the installer package out of tree and npm-pack it there; the payload is derived from the repo's own kit roots at pack time, so no second copy of any kit is ever checked in or written inside the worktree
 set -uo pipefail
 
 SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
@@ -25,13 +25,13 @@ while [[ $# -gt 0 ]]; do
         --out) OUT="${2:-}"; shift 2 ;;
         --artifacts) ARTIFACTS="${2:-}"; shift 2 ;;
         --root) ROOT="${2:-}"; shift 2 ;;
-        # spec: installer/README.md §The consumer smoke — help is adopted on its own merits and does not extend gate-sdk/SPEC.md §The bin/-tool contract to a consumer's scripts/: with four flags the packer is past the point where an unknown-argument refusal is the only discovery route
+        # spec: installer/README.md §The packer — help is adopted on its own merits and does not extend gate-sdk/SPEC.md §The bin/-tool contract to a consumer's scripts/: with four flags the packer is past the point where an unknown-argument refusal is the only discovery route
         -h|--help) usage; exit 0 ;;
         *) echo "pack-installer: unknown argument: $1" >&2; exit 2 ;;
     esac
 done
 
-# spec: installer/README.md §The consumer smoke — a caller that already holds the tree it means says so, rather than letting the current directory select one it never named; the value is validated to a work-tree top level because silently promoting a subdirectory to its toplevel is the same silent correction this flag exists to remove
+# spec: installer/README.md §The packer — a caller that already holds the tree it means says so, rather than letting the current directory select one it never named; the value is validated to a work-tree top level because silently promoting a subdirectory to its toplevel is the same silent correction this flag exists to remove
 if [[ -n "$ROOT" ]]; then
     [[ -d "$ROOT" ]] || {
         echo "pack-installer: --root is not a directory: $ROOT" >&2
@@ -67,7 +67,7 @@ done
     exit 2
 }
 
-# spec: CLAUDE.md §Housekeeping — a dirty tree would stamp a commit that does not describe the payload, and that stamp is the whole of what makes a vendored tree resolvable to an upstream state
+# spec: installer/README.md §The packer — a dirty tree would stamp a commit that does not describe the payload, and that stamp is the whole of what makes a vendored tree resolvable to an upstream state
 if [[ -n "$(git status --porcelain)" ]]; then
     echo "pack-installer: the worktree at $ROOT is dirty — refusing to stamp a commit the payload does not match." >&2
     echo "  help: this is checked once per invocation, against the tree as it is now — not as it was when your run started, so a concurrent edit during a long run trips it here rather than at the point you invoked the run." >&2
@@ -121,7 +121,7 @@ pack_tracked() {
 
 pack_tracked installer "$ASM" || exit 2
 
-# spec: CLAUDE.md §Housekeeping — the payload's kit set is gate_kit_roots_rel, the same derivation the battery runs on, so the shipped set cannot drift from the governed one
+# spec: installer/README.md §The packer — the payload's kit set is gate_kit_roots_rel, the same derivation the battery runs on, so the shipped set cannot drift from the governed one
 mkdir -p "$ASM/payload" || exit 2
 packed=0
 while IFS= read -r kit; do
