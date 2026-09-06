@@ -113,7 +113,8 @@ ARTIFACT_SRC=""; ARTIFACT_PATH=""; ARTIFACT_TARGET=""; ARTIFACT_DIGEST=""; OMIT_
 
 # spec: installer/README.md §The gate binary — selection has three outcomes and collapsing any two is the defect, which is why the payload's roster copy is read rather than a directory's presence inferred from: without it a platform that was never committed to and one whose artifact went missing look identical, and reading the second as the first turns a broken payload into a silently smaller green battery
 select_artifact() {
-    local roster target src want got names
+    local roster target src want got n
+    local -a names
     if [[ ! -d "$PAYLOAD/artifact" ]]; then
         OMIT_REASON="substrate-unavailable"
         return 0
@@ -127,7 +128,12 @@ select_artifact() {
         return 0
     fi
     src="$PAYLOAD/artifact/$target"
-    mapfile -t names < <(find "$src" -maxdepth 1 -type f ! -name '*.sha256' -printf '%P\n' 2>/dev/null | sort)
+    # spec: installer/README.md §The gate binary — the artifact directory is enumerated with a POSIX `find` and the starting-point prefix stripped here, never with a `-printf '%P'` primary: that primary is GNU findutils, a BSD `find` refuses it, and the refusal lands in the *same* empty result as a genuinely incomplete artifact — so this selection would die naming a payload defect on a host whose only fault is its `find`. Reached on any host the roster names, which the steered single-host roster a platform smoke packs makes true of macOS
+    names=()
+    while IFS= read -r n; do
+        n="${n#"$src/"}"
+        [[ -n "$n" ]] && names+=("$n")
+    done < <(find "$src" -maxdepth 1 -type f ! -name '*.sha256' | sort)
     [[ ${#names[@]} -eq 1 && -f "$src/${names[0]}.sha256" ]] \
         || die "the payload declares $target but carries no complete artifact for it" \
            "a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on — refusing rather than installing a battery that silently shrank." 1
@@ -196,9 +202,16 @@ copy_in() {   # $1 = source file, $2 = repo-relative destination
 for kit in "${KITS[@]}"; do
     [[ -d "$PAYLOAD/$kit" ]] || die "profile '$PROFILE' names $kit, which this payload does not carry" \
         "the payload's kit set is derived from the source tree at pack time; a profile naming a kit that is not there is a roster that has drifted."
+    # spec: installer/README.md §What init seeds — the enumeration is a POSIX `find` with the `./` the walk prefixes stripped in the loop, never a `-printf '%P'` primary: that primary is GNU findutils, so a stock BSD or macOS `find` refuses it and this loop reads nothing, vendoring zero files for the kit. The count is asserted rather than trusted because that outlives the primary — a failed enumeration and an empty kit reach this loop identically, so the next construct that fails on an untested host would again install a tree silently missing a kit; `scripts/pack-installer.sh` refuses an empty kit enumeration at pack time on the same ground, one layer out, and gate-sdk/SPEC.md §Consumer payload puts that failure at the release
+    vendored=0
     while IFS= read -r f; do
+        f="${f#./}"
+        [[ -n "$f" ]] || continue
         copy_in "$PAYLOAD/$kit/$f" "$kit/$f"
-    done < <(cd "$PAYLOAD/$kit" && find . -type f -printf '%P\n' | sort)
+        vendored=$(( vendored + 1 ))
+    done < <(cd "$PAYLOAD/$kit" && find . -type f | sort)
+    (( vendored > 0 )) || die "the payload carries $kit but enumerating its files produced nothing" \
+        "a kit directory this payload ships is never empty, so either the package is damaged or this host's 'find' refused the walk. Re-install the package; if it still refuses, report what this prints: find $PAYLOAD/$kit -type f"
 done
 
 mkdir -p "$ROOT/$GATES_DIR" "$ROOT/.workflow" 2>/dev/null
