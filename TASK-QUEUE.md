@@ -180,9 +180,8 @@
   THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING STAGE RUNS, 2026-09-05 (lead)** —
   both owned by gate-sdk/SPEC.md §The first cohort.
   **(7) `demo/run-demo.sh` PORTS; the `# no-port:` route its residue class grants is DECLINED —
-  operator, 2026-09-06, relayed by the lead session.** Its `# spec:` is re-homed FIRST, the
-  mis-homed correction gate-sdk/SPEC.md §Porting a gate to the binary substrate rules and not the
-  re-pointing (3) refused; the legal owner is in the file's own header. The fork ends here.
+  operator, 2026-09-06, relayed by the lead session; DISCHARGED the same day**, the cut landing as
+  `--run-demo` behind a separate re-home of its mis-homed `# spec:`. The fork ends here.
   **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
   lifecycle layer; relaxation is closed at §The port-candidate criteria, `gate-battery-result-cache`
   unsubsumed. **THE PORT-FIRST RUN, ruled 2026-09-05 (operator, consult), supersedes the 2026-08-31
@@ -1736,6 +1735,7 @@
   Filed 2026-07-31 at close as the gap-generalization owed by the inline fix
   above; the `check-md-refs` blind spot and the `AGENTS.md` false-positive case
   were both verified against source before filing.
+  recurrence: prose-filename-citation-liveness 2026-09-06
 
 - **template-copy-parity-yaml-widening** [design-pending] — a kit `.yml` template
   and this repository's copy of it are mirrored by hand and a missed half is caught
@@ -1821,7 +1821,7 @@
   lines, mostly mechanism the owning SPECs own, with only the `*.local.md` roster
   genuinely resident-worthy), the `installer/` bullet (8 lines naming
   `installer/README.md` as layout owner then carrying packing mechanics and a
-  scratch knob), the `demo/` bullet (compresses a `README.md` paragraph), and
+  scratch knob), the `--run-demo` bullet (compresses a `README.md` paragraph), and
   `reserve/` (2 lines guarding a mistake no session is near). Each needs content
   *relocated*, not merely deleted, which is unit-shaped rather than pass-shaped —
   filed here rather than done under release pressure.
@@ -3320,49 +3320,48 @@
   names one live revert trigger, a missed spec defect surfacing as a build ROUND-TRIP; nothing here
   is grounds to revert the tier, and conflating the two is the misreading this entry prevents.
   **First reading, `native-cohort-activation`.** Align passed all four amendments at zero
-  divergence; the four build batches then found **ten** real defects. Six were one shape — a section
-  a change touched that the amendment's update roster failed to name, or a reader-facing surface
-  still asserting a retired predicate, twice in the release note, which is the front door. **That
-  half is ANSWERED and needs no re-arguing:** the mechanical fan-out check over an amendment's
-  roster was filed, merged and retired as `amendment-update-target-coverage`. **Why
-  `[design-pending]` is what REMAINS of the split** — how much is a checklist edit to align's
-  template, how much a further gate, and whether a "keeps" list keeps standing as an input at all.
-  That last is the sharp one: a "keeps" list is the author's claim about what a change does not
-  touch, so align reading it as a boundary inherits the blind spot that produced the miss.
-  **Second reading, `consumer-cohort-completion-and-wait-enforcement` — the other half.** Align
-  found **five real defects** and escalated nothing spurious, so zero divergence did not recur;
-  three amendment claims were nonetheless falsified by **probes** at build, one of which would have
-  reddened the battery on every invocation. **Third reading,
-  `leak-guard-and-assertion-meta-gate-port`: the same at five for five** — every batch found its
-  amendment's stated tree *behaviour* wrong while its *ruling* was right, each settled by one probe.
+  divergence; the four build batches then found **ten** real defects, six of one shape — a section
+  the amendment's update roster failed to name. **That half is ANSWERED and needs no re-arguing:**
+  the mechanical fan-out check over an amendment's roster was filed, merged and retired. **What
+  REMAINS `[design-pending]`** is how much is a checklist edit to align's template, how much a
+  further gate, and whether a "keeps" list stands as an input at all — the sharp one, since a
+  "keeps" list is the author's claim about what a change does not touch, so align reading it as a
+  boundary inherits the blind spot that produced the miss.
+  **Second and third readings** (`consumer-cohort-completion-and-wait-enforcement`,
+  `leak-guard-and-assertion-meta-gate-port`): five real defects each, nothing spurious escalated, so
+  zero divergence did not recur — while every batch found its amendment's stated tree *behaviour*
+  wrong and its *ruling* right, each settled by one probe.
   **The two point opposite ways and the entry keeps both.** The revert signal AS DEFINED — a missed
   spec defect surfacing as a build ROUND-TRIP — has never fired, build absorbing every one
   in-session. Whether in-session absorption counts against the tier is the judgment this calibrates.
-  **FOURTH READING, 2026-09-05, and it is the COST half at its maximum.** Bare `align` reads
-  cr=32.0M / 7.96 — the HIGHEST bare-align cache-read in the log, against a recent median near 11M
-  and a prior maximum of 27.7M; its one background sweep bills separately at 6.1M and is not summed
-  in. Scored against no scale proxy, amendment count having been retired as one on 2026-09-04. The
-  verdict was NOT zero-divergence — eight in-envelope repairs, zero escalations — so this reading
-  cuts AGAINST the first reading's thesis while sharpening the cost field below. Its best find was
-  CROSS-amendment and no per-amendment pass could have reached it: all four amendments falsely
-  claimed a `check-measured-claim` red on `tree-shell-owed`, three contradicting themselves in
-  their own text.
-  **THE COUNTER, whose excuse is recorded as TESTABLE rather than settled.** Four design-bearing
-  amendment claims survived align and died at build. Declined as a miss on one ground — each needed
-  EXECUTION to falsify (a running both-substrates comparison, a crafted tie-input cargo test, a
-  bridge refusal), build's instrument and not align's. That ground is falsifiable, and the next
-  reading tests it: the first align that passes a claim it could have falsified by READING spends
-  the excuse, and this sentence exists so a later session cannot re-spend it.
+  **FOURTH READING, 2026-09-05, the COST half at its MAXIMUM.** Bare `align` read cr=32.0M / 7.96,
+  the highest bare-align cache-read in the log against a recent median near 11M; scored against no
+  scale proxy, amendment count having been retired as one on 2026-09-04. The verdict was NOT
+  zero-divergence — eight in-envelope repairs, zero escalations — so it cuts AGAINST the first
+  reading's thesis while sharpening the cost field. Its best find was CROSS-amendment and no
+  per-amendment pass could have reached it: all four amendments falsely claimed a
+  `check-measured-claim` red on `tree-shell-owed`, three contradicting themselves in their own text.
+  **FIFTH READING, 2026-09-06, the cost half at its MEDIAN.** Bare `align` reads cr=9.35M / 2.83,
+  mid-pack against the twelve prior bare rows (median ≈9.2M, range 6.1M–32.0M). Three real count
+  defects found, NO build round-trip, so the revert signal has not fired in five readings.
+  **That comparison crosses a grammar change, stated rather than hidden:** the fold landed THIS
+  iteration, so a split stage's row now SUMS its sessions where it carried one session's draw
+  before. Bare `align` was single-session in all five, so the column is fold-neutral by inspection —
+  but an earlier split align would have logged low and the log alone cannot exclude one. The COUNTER
+  below is neither spent nor preserved: nothing here records a claim align passed that reading alone
+  could have falsified.
+  **THE COUNTER, recorded as TESTABLE rather than settled.** Four design-bearing amendment claims
+  survived align and died at build. Declined as a miss on one ground — each needed EXECUTION to
+  falsify, build's instrument and not align's. That ground is falsifiable: the first align that
+  passes a claim it could have falsified by READING spends the excuse.
   recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
-  **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
-  the stage's signal value decays toward zero while its cost does not — and a zero-divergence
-  pass is read as evidence the amendments were right.
+  **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
+  stage's signal value decays toward zero while its cost does not.
   **THRESHOLD ROUTING 2026-09-04 (lead, own-authority); deferred 2026-09-05 (operator, lead-relay)
-  under the port-only run. THAT GROUND IS SPENT** — the port-first ruling superseded that run the
-  same day and legislates threshold members itself, so the deferral now rests on the successor
-  rule: MACHINERY-class by the 2026-08-30 discriminator (its demand witness is this repo's own
-  align stage), which meets none of the three joining grounds. Re-composed at scope 2026-09-05,
-  `lead, own-authority`.
+  under the port-only run. THAT GROUND IS SPENT** — the successor port-first rule legislates
+  threshold members itself, and this is MACHINERY-class by the 2026-08-30 discriminator (its demand
+  witness is this repo's own align stage), meeting none of the three joining grounds. Re-composed at
+  scope 2026-09-05, `lead, own-authority`.
   Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
@@ -6371,6 +6370,13 @@
   — the one surface whose whole purpose is outliving the queue entries it was extracted from.
   Surfaced 2026-08-19 at the same close's staleness review, filed to the gap inbox beside the entry
   above; promoted 2026-08-20 by the next iteration's scope, which drained that inbox to its header.
+  **A second true positive, 2026-09-06, and it falsifies the rarity half of the probe above**, not
+  the class: `gate-sdk/SPEC.md` claimed an open installer-and-probe trade "stays
+  `install-path-gnu-userland-undeclared`'s" for a slug landed several iterations earlier. Published
+  surface, single-backtick form, and `check-queue-slug-liveness`' corpus does not reach it — so the
+  false-positive budget question the entry owes now has two instances to size against, both on
+  surfaces whose whole purpose is outliving the queue.
+  recurrence: retired-slug-live-pointer-citation 2026-09-06
 
 - **queue-status-parenthetical-liveness** [design-pending] — a queue cross-citation's section-status
   parenthetical goes stale when the cited entry moves section, and nothing reads it.
@@ -8872,25 +8878,29 @@
   (`lifecycle-kit/templates/lead.md` §Economics) now states both limbs and the method for taking
   the reading; what stays local is the threshold, in `.claude/commands/lead.md`, and every reading,
   which is this entry's. **The deliverable that made the template wrong is DISCHARGED** — the
-  premise is amended and `lead-tier-split-premise-unamended` is Done. What survives it is the
-  standing measurement, which the landing did not moot: nothing about the amendment makes the next
-  iteration's count unnecessary. Split from that slug `lead, own-authority 2026-09-05`, relayed to
-  the build session that found the store the Done move would have destroyed.
+  premise is amended and its slug is retired. What survives it is the standing measurement, which
+  the landing did not moot. Split `lead, own-authority 2026-09-05`.
   **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, thirteen points and
-  OPEN** — close appends each iteration's reading: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7.
+  OPEN** — close appends each iteration's reading: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1.
   The threshold is a third such iteration and is ANSWERED; one iteration is one point and the
   posture does not flip on one either way. The thirteenth is SEVEN — validate was handed a stale
   six, flagged the disagreement rather than picking a number, and was right to.
+  **THE FOURTEENTH IS ONE, the series' minimum, and its shape is what the number cannot carry.**
+  Six stage sessions plus two build batches; scope raised FOUR questions and every stage after it
+  raised ZERO. Of the four, THREE were relayed to the operator and one the lead ruled alone — so the
+  count is 1 not because escalation stopped but because the lead ROUTED rather than ruled, which is
+  the opposite failure mode from the twelve-point iteration and reads as one point toward the
+  posture being right rather than against it. A single low point is still one point.
+  **THE COST SERIES IS NOT APPENDED at the fourteenth, deliberately.** Bare `supervision` reads
+  10.9953 against a mid-close priced total of 177.78 (6.2%), and this close session's own row is
+  still growing — an unlowered ceiling, exactly the defect the 2026-09-05 derivation corrected the
+  series for. Appending it would re-accrete what that meter run bought.
   **CHARACTER THE COUNT CANNOT SEE, recorded because by design the count cannot.** Two of the seven
-  are not ordinary readings. One RULED THE LEAD WRONG: instructed to carry three `recurrence:` dates
-  onto this slug, the filing batch refused and held — they are re-filings of the discharged premise
-  (queue-kit:442), and TRAJECTORY.md:578-581 makes "entries at the recurrence threshold" a
-  product-class joining ground and then BURNS it for the member, so carrying them would hand a fresh
-  slug an unburned proposal on a closed ground through a line reading as bookkeeping; the stated
-  purpose, the deferred-age clock, reads off `Surfaced` (queue-kit:57-59). One ruled WHERE THIS
-  SERIES LIVES, so it is a datum for the series it preserved. Both point one way, measured THREE
-  times this iteration: a lead instruction is not a governed surface, and batches A, B and C each
-  checked one against a governed surface and were right.
+  were not ordinary readings. One RULED THE LEAD WRONG — instructed to carry three `recurrence:`
+  dates onto this slug, the filing batch refused and held, they being re-filings of the discharged
+  premise. One ruled WHERE THIS SERIES LIVES, so it is a datum for the series it preserved. Both
+  point one way, measured THREE times that iteration: a lead instruction is not a governed surface,
+  and three batches each checked one against a governed surface and were right.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
   4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** — every earlier point was a mid-close
   unlowered ceiling, which is why this entry and the binding once disagreed. That correction was
@@ -8899,20 +8909,17 @@
   as covering a wider one.** Eight are the lead's own; the ninth widens the shape onto a stage
   session's carry. **NEITHER a counter nor a refused premise NETS against the count**, which
   measures whether an escalation was answered off a governed surface and never whether its grounds
-  held; netting reports neither fact. Both counters stayed clean across the eleventh and twelfth,
-  so the nine stayed nine.
-  **THE ALIGN WATCH HAS A GAP:** align never fired at the twelfth, so no bare-align datum exists
-  for it, and the `cr` column of the bare `align` rows is where that trend is read.
-  **Cost while deferred:** the posture is run unjudged, so a tier assignment that is wrong on the
-  character limb costs every iteration and shows up as nothing — the count is the only instrument
-  that reports it, and an unread instrument is indistinguishable from a healthy one. The cost
-  series' 2026-09-05 correction also decays: re-deriving it means re-running the meter over six
-  iterations that keep receding.
+  held. The nine stayed nine across the eleventh through fourteenth.
+  **THE ALIGN WATCH'S GAP IS CLOSED at the fourteenth**: align fired, and its bare row reads
+  cr=9.35M, mid-pack — `align-checklist-fanout-calibration` holds that reading and its grammar
+  caveat.
+  **Cost while deferred:** the posture is run unjudged, so a tier assignment wrong on the character
+  limb costs every iteration and shows up as nothing — the count is the only instrument that reports
+  it, and an unread instrument is indistinguishable from a healthy one. The cost series' 2026-09-05
+  correction also decays: re-deriving it re-runs the meter over six receding iterations.
   **NO `recurrence:` LINE, and the omission is deliberate** — the three dated re-filings belonged to
-  the discharged deliverable, not to this premise, which has been surfaced once. Carrying them
-  would state a recurrence that did not happen and would re-arm the once-only proposal ground
-  TRAJECTORY.md's port-first ruling burns for a threshold member, on a fresh slug the burn does not
-  reach. The deferred-age clock is preserved by `Surfaced` instead, which is what carries it.
+  the discharged deliverable, not to this premise, which has been surfaced once; carrying them would
+  state a recurrence that did not happen. The deferred-age clock reads off `Surfaced` instead.
   Surfaced 2026-09-02. Filed 2026-09-05 by build, splitting the measurement half off the amendment
   it was riding.
 
@@ -9661,8 +9668,8 @@
   **Why not icebox:** the trigger is live and dated — no cut can take this file until a section
   exists, so the owed column stalls on it rather than merely aging, and the port-first run that
   superseded the port-only one still puts a cut first in every iteration.
-  **DISTINCT from the `demo/run-demo.sh` and `installer/bin/checkwright.sh` mis-pointers of the
-  same class**, each of which HAS a resolvable home; this one has none to point at.
+  **DISTINCT from the `installer/bin/checkwright.sh` mis-pointer of the same class**, which HAS a
+  resolvable home; this one has none to point at.
   **Gap generalization:** the check class is a `# spec:` pointer resolving to a surface that is not
   a legal cut boundary — buildable, and filed as `spec-pointer-boundary-legality` below.
   **Cost while deferred:** low per read and paid at the worst moment — the session that reaches
@@ -9682,6 +9689,39 @@
   **Cost while deferred:** the class is found only by a session doing the section-by-section read
   by hand, which is the exact cost the pointer gate exists to remove.
   Filed 2026-09-05 by close, discharging the gap-generalization obligation on the entry above.
+
+- **manifest-family-couples-misses-the-consumer-widened-corpus** [design-pending] — eleven gates
+  read a consumer-configured doc corpus and none of them triggers on the members the consumer
+  added, so `couples=` under-covers its own runtime reads by construction rather than by omission.
+  **Measured 2026-09-06 with the selection oracle, and it is a CLASS rather than one file.**
+  `run-gates.sh --for TRAJECTORY.md` selects EIGHT gates, of which only `check-measured-claim` and
+  `check-unmarked-claim` read the file; `--for RELEASING.md` and `--for CONTRIBUTING.md` select the
+  identical eight. Meanwhile eleven canon-kit descriptors declare
+  `couples=*SPEC*.md,*README.md,CLAUDE.md` and scan the whole of
+  `scripts/canon-config.sh`'s `CANON_KIT_MANIFEST_FILES`, which this consumer widened to add
+  `TRAJECTORY.md`, `RELEASING.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
+  `ROADMAP.md`, `doctrine-kit/DOCTRINE.md` and the `docs/` pages. Every one of those is scanned by
+  the citation, temporal, link and count gates and triggers none of them. That is a direct breach of
+  gate-sdk/SPEC.md §Porting a gate to the binary substrate's stated authoring rule — `couples=` must
+  cover every path the gate reads at runtime, never a subset — and `check-reads-couples` cannot see
+  it, because the corpus arrives through a consumer array rather than a statically resolvable walk.
+  **Why `[design-pending]`, and why the drain's fix disposition FAILED.** The obvious repair —
+  write the consumer's file names into the eleven kit descriptors — puts consumer content in a kit
+  literal, which the provenance seam refuses (CLAUDE.md §The provenance seam). The kit's default
+  triple is CORRECT for the kit's default corpus; what is missing is a lever by which a consumer
+  that widens `CANON_KIT_MANIFEST_FILES` also widens the trigger. Three shapes are live and
+  unranked: a consumer-side trigger-extension knob the hook emitter reads, a `couples=` token that
+  resolves a knob the way `kit:<glob>` resolves the kit set, or per-consumer descriptor shadowing.
+  Picking one at a drain would settle a kit/consumer seam question by accident.
+  **Why NOT icebox:** the trigger is live and this iteration made it materially more expensive —
+  close now holds ruling-record repair authority, so `TRAJECTORY.md` became a surface close writes
+  routinely, and a routine writer of a file no doc gate fires on is the worst case for the class.
+  **Cost while deferred:** every commit touching one of those members runs the two whole-corpus
+  claim gates and skips the four that grade its citations, links, temporal narration and counts —
+  silent, and paid at the moment the surface is least reviewed.
+  Filed 2026-09-06 by close from the gap inbox, after re-verification widened the bullet: the bullet
+  said four gates trigger and the fix was three `couples=` triples; the oracle reads eight
+  triggering and the fix is not three triples at all.
 
 - **dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it** [design-pending] — an
   amendment's definition of done names a stage for the entry's queue transition without reading the
@@ -10076,7 +10116,7 @@
 - **prune-set-convergence-question** [design-pending] — Two kits' prune sets diverge, unruled.
 - **gap-inbox-slug-predicate-ground** [design-pending] — Its anti-cycle premise died unreplaced.
 - **emit-arm-usage-unreachable** [design-pending] — Prints only on a refusal; lead-ruled 2026-09-03.
-- **check-graph-trigger-consumer-path-reach** [design-pending] — couples= misses installer/, demo/.
+- **check-graph-trigger-consumer-path-reach** [design-pending] — couples= misses installer/.
 - **precondition-gate-negation-false-positive** [design-pending] — Reds a true negated precondition.
 - **worktree-isolated-dispatch-cannot-reach-the-main-checkout** [design-pending] — Bridge undecided.
 - **cited-object-token-sweep-corpus-narrower-than-the-class** [design-pending] — Corpus unruled.
@@ -10087,11 +10127,5 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
-
-- close-ruling-record-repair-authority
-- demo-walkthrough-port-cut
-- lead-iteration-open-authorization
-- ruling-record-condition-staleness-probe
-- stage-economics-log-key-session-collision
 
 ## Lessons Learned

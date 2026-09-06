@@ -3273,6 +3273,22 @@ forward-looking phrasing, FP-bearing by construction, on the same honest posture
 forward-precondition scan takes about the same problem. It reports, it does not
 red, and a false positive costs a reader one line.
 
+**A malformed declaration reports as malformed, and never as absent.** Both
+declarations are hand-written and both have a likeliest slip — a `discharge:`
+naming a ruling and no oracle, a `ruling:` whose name list is empty — which the
+readers above drop rather than report. Dropped alone that is a silent loss;
+**composed it is worse than writing nothing**, because the undeclared pass
+skipped a paragraph on the *presence* of a `discharge:` line, so a typo
+suppressed the report that would otherwise name the ruling. So the arm carries a
+fourth band, **malformed**, one row per unreadable declaration with its site and
+what the grammar wanted — and the undeclared pass reads **well-formed**
+declarations only, which is the half that costs. A paragraph whose declaration
+cannot be read reports under both bands, correctly rather than duplicatively:
+they answer *this line is unreadable* and *this ruling has no readable
+condition*, and repairing the first must leave the second true. This is a
+**validity** read over a declaration that was written, so it neither takes nor
+reopens the refusal of a **presence** gate demanding one.
+
 **The producer/checker split is the one the port track already runs on.** A
 declaration *reports* and a separate reader *escalates when the named thing
 changes state*; that pairing is why a stale hold cannot silently under-count owed

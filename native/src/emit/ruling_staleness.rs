@@ -44,6 +44,12 @@ pub struct Undeclared {
     pub excerpt: String,
 }
 
+pub struct Malformed {
+    pub line: usize,
+    pub raw: String,
+    pub want: &'static str,
+}
+
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the oracle contract's three bands. The
 // third exists so a broken oracle can never read as a fired condition, which is why a dispatch
 // failure is its own variant rather than a `NotFired` with a note.
@@ -118,19 +124,54 @@ fn split_names(rest: &str) -> Vec<String> {
         .collect()
 }
 
+// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the one reader of a `discharge:` body,
+// so a line this rejects is unreadable everywhere: the discharge report drops it, the malformed band
+// reports it, and the undeclared pass no longer counts it as a declaration.
+fn split_discharge(rest: &str) -> Option<(String, String)> {
+    let (name, oracle) = rest.split_once("  ").or_else(|| rest.split_once(' '))?;
+    let name = name.trim_matches(WS).to_string();
+    let oracle = oracle.trim_matches(WS).to_string();
+    if name.is_empty() || oracle.is_empty() {
+        return None;
+    }
+    Some((name, oracle))
+}
+
 pub fn discharges(text: &str) -> Vec<Declared> {
     declarations(text, "discharge:")
         .into_iter()
         .filter_map(|(line, rest)| {
-            let (name, oracle) = rest.split_once("  ").or_else(|| rest.split_once(' '))?;
-            let name = name.trim_matches(WS).to_string();
-            let oracle = oracle.trim_matches(WS).to_string();
-            if name.is_empty() || oracle.is_empty() {
-                return None;
-            }
+            let (name, oracle) = split_discharge(rest)?;
             Some(Declared { name, oracle, line })
         })
         .collect()
+}
+
+// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the fourth band: a hand-written
+// declaration neither reader can read is reported as malformed rather than dropped, because dropped
+// it composes with the undeclared pass into a typo that is worse than writing nothing.
+pub fn malformed(text: &str) -> Vec<Malformed> {
+    let mut out: Vec<Malformed> = Vec::new();
+    for (line, rest) in declarations(text, "discharge:") {
+        if split_discharge(rest).is_none() {
+            out.push(Malformed {
+                line,
+                raw: rest.to_string(),
+                want: "discharge: <name>  <oracle> — a name and a command, separated",
+            });
+        }
+    }
+    for (line, rest) in declarations(text, "ruling:") {
+        if split_names(rest).is_empty() {
+            out.push(Malformed {
+                line,
+                raw: rest.to_string(),
+                want: "ruling: <name>[  <name>…] — at least one non-empty name",
+            });
+        }
+    }
+    out.sort_by_key(|m| m.line);
+    out
 }
 
 fn paragraphs(text: &str) -> Vec<(usize, String)> {
@@ -157,15 +198,20 @@ fn paragraphs(text: &str) -> Vec<(usize, String)> {
 }
 
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — an undeclared condition is reported,
-// never inherited: without this the no-retrofit decision would be a silent hole, since a record
-// with one declaration would report one condition and look complete.
+// never inherited, and the pass reads well-formed declarations only: a paragraph is excused by a
+// `discharge:` line the arm can read, never by the token's presence.
 pub fn undeclared(text: &str) -> Vec<Undeclared> {
     paragraphs(text)
         .into_iter()
         .filter(|(_, p)| {
             let low = p.to_lowercase();
             FORWARD_PHRASES.iter().any(|ph| low.contains(ph))
-                && !p.lines().any(|l| l.trim_start_matches(WS).starts_with("discharge:"))
+                && !p.lines().any(|l| match l.trim_start_matches(WS).strip_prefix("discharge:") {
+                    Some(rest) if rest.starts_with(WS) => {
+                        split_discharge(rest.trim_matches(WS)).is_some()
+                    }
+                    _ => false,
+                })
         })
         .map(|(line, p)| Undeclared {
             line,
@@ -324,6 +370,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         ));
     }
 
+    out.push_str("\n== malformed declarations ==\n");
+    let bad = malformed(&text);
+    if bad.is_empty() {
+        out.push_str("(none)\n");
+    }
+    for m in &bad {
+        out.push_str(&format!("{}:{}\t{}\twant: {}\n", record, m.line, m.raw, m.want));
+    }
+
     out.push_str("\n== undeclared conditions ==\n");
     let holes = undeclared(&text);
     if holes.is_empty() {
@@ -438,7 +493,7 @@ mod tests {
 
     // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — an undeclared condition is reported
     // rather than inherited, and the detection is deliberately weak: a paragraph carrying a
-    // `discharge:` line is declared and drops out, whatever its prose says.
+    // READABLE `discharge:` line is declared and drops out, whatever its prose says.
     #[test]
     fn a_conditioned_paragraph_reports_undeclared_until_it_carries_a_declaration() {
         let text = "A ruling. Discharge event: that unit lands.\n\n\
@@ -447,6 +502,34 @@ mod tests {
         let holes = undeclared(text);
         assert_eq!(holes.len(), 1);
         assert_eq!(holes[0].line, 1);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — a malformed declaration reports as
+    // malformed and never as absent, and the undeclared pass reads well-formed declarations only,
+    // so a typo cannot suppress the report that names the ruling.
+    #[test]
+    fn a_malformed_declaration_is_reported_and_never_excuses_its_paragraph() {
+        let text = "A ruling. Discharge event: the gate is green.\ndischarge: slug-only\n\n\
+                    Another. Discharge event: it lands.\ndischarge: good  true\n\n\
+                    ruling:   \n";
+        let bad = malformed(text);
+        assert_eq!(bad.len(), 2, "the oracle-less discharge and the nameless ruling");
+        assert_eq!(bad[0].line, 2);
+        assert_eq!(bad[0].raw, "slug-only");
+        assert_eq!(bad[1].line, 7);
+
+        let holes = undeclared(text);
+        assert_eq!(
+            holes.len(),
+            1,
+            "the typo'd paragraph is still a hole; the readable one is excused"
+        );
+        assert_eq!(holes[0].line, 1);
+
+        assert!(
+            malformed("discharge: good  true\nruling: a name\n").is_empty(),
+            "a readable declaration of either kind is not malformed"
+        );
     }
 
     // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — escalation-only, proved rather than

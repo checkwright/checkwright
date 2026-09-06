@@ -2285,8 +2285,10 @@ userlands but not a stock macOS install fails an objective rather than a
 preference — and the pivot's own direction, shrinking the interpreter surface to
 the unavoidable, is the one this costing already pointed, which makes the
 costing a step on the trajectory rather than a casualty of it. The narrower
-installer-and-probe trade this does **not** close stays
-`install-path-gnu-userland-undeclared`'s.
+installer-and-probe trade this does **not** close has since been settled the
+declaring way rather than the shimming one: docs/install.md §Requirements states
+the GNU-userland requirement for the **install path and the probe** and not the
+battery alone, so nothing about that trade is left open here.
 
 The figures above are a **dated measurement, not a live claim** about this tree:
 they record what the floor would have cost when it was rejected. A later session

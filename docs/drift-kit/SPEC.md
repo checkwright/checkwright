@@ -1362,7 +1362,14 @@ drift-kit/
 ```
 
 Registers no gates (advisory; the guard-kit precedent), so no `checks/`,
-`gate-tests/`, or `smoke/violation.sh`.
+`gate-tests/`, or `smoke/violation.sh`. **So every assertion this kit makes —
+the stage-economics meter, the overhead meter, the bundled KPIs — runs from
+`smoke/install.sh`**, reached by `run-consumer-smoke.sh` with **every** kit
+vendored. Two invocations a session reaches for first do not work and are not
+worth re-deriving: `--run-gate-tests drift-kit/gate-tests` errors *no fixture
+tree*, because there is none by the line above; and naming a subset of kits
+fails in gate-sdk's own install, because `check-reads-couples` declares a
+lifecycle-kit knob a tree without lifecycle-kit cannot resolve.
 
 `templates/kpis.list` names every bundled member, never a starter subset: it is
 the kit's claim about what it bundles, which the roster above, this SPEC, and the

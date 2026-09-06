@@ -142,3 +142,4 @@
 | windows-leg-manifest-cause-read | sc sp · b v c | 2f/1d | 1 · ≤0d | 20s clean | 108 |
 | test-harness-cut-seam-sweep | sc sp a b v c | 10f/0d | 7 · ≤0d | 20s clean | 108 |
 | always-loaded-cut-and-seam-slice | sc sp a b v c | 4f/1d | 2 · ≤0d | 20s clean | 108 |
+| demo-cut-record-authority-and-attribution | sc sp a b v c | 3f/2d | 4 · ≤0d | 20s clean | 108 |

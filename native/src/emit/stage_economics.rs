@@ -259,8 +259,8 @@ impl Run {
             "  {} {} {} [{}]: in={} out={} cr={} cw={} cost={}",
             iter, stage, who, model, t.input, t.output, t.cache_read, t.cache_write, cost
         ));
-        let marker = format!(" {} {} {} in=", iter, stage, model);
-        self.kept.retain(|l| !l.contains(&marker));
+        let marker = format!("{} {} {} in=", iter, stage, model);
+        self.kept.retain(|l| !logged_under(l, &marker));
         self.kept.push(format!(
             "{} {} {} {} in={} out={} cr={} cw={} cost={}",
             self.today, iter, stage, model, t.input, t.output, t.cache_read, t.cache_write, cost
@@ -274,6 +274,13 @@ impl Run {
             Err(_) => Vec::new(),
         }
     }
+}
+
+// spec: drift-kit/SPEC.md §The stage-economics meter — a logged line belongs to a row key when the
+// key matches at the line's own field boundaries: the date field splits off and the triple matches
+// as a prefix of the remainder terminated by ` in=`, never as a free substring.
+fn logged_under(line: &str, marker: &str) -> bool {
+    matches!(line.split_once(' '), Some((_, rest)) if rest.starts_with(marker))
 }
 
 fn knob(name: &str) -> Result<String, String> {
@@ -930,6 +937,31 @@ mod tests {
         assert_eq!(history_stamp("+Alpha build s2 2025-01-01"), None, "uppercase iteration");
         assert_eq!(history_stamp("+alpha build s2 2025-1-1"), None, "short date");
         assert_eq!(history_stamp("alpha build s2 2025-01-01"), None, "no + prefix");
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — the log's replace-on-append matches the
+    // dedup triple at the logged line's field boundaries, so a key that is a space-joined substring
+    // of another's line leaves that line standing.
+    #[test]
+    fn the_logs_replace_matches_the_triple_at_its_field_boundaries() {
+        let line = "2026-01-01 alpha build m in=1 out=2 cr=3 cw=4 cost=0.1";
+        assert!(logged_under(line, "alpha build m in="), "its own key matches");
+        assert!(
+            !logged_under(line, "build m in="),
+            "a key that is a mid-line substring must not match: iteration/stage/model are unquoted"
+        );
+        assert!(
+            !logged_under(line, "alpha build m2 in="),
+            "a longer model sharing the shorter one's prefix must not match"
+        );
+        assert!(
+            logged_under(
+                "2026-01-01 alph a build m in=1 out=2 cr=3 cw=4 cost=0.1",
+                "alph a build m in="
+            ),
+            "a field carrying a space still matches its own key verbatim"
+        );
+        assert!(!logged_under("nodatefield", "alpha build m in="));
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: the stage fold keys on a
