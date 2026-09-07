@@ -37,6 +37,11 @@
   **Product-class under the 2026-08-30 witness discriminator:** the smoke asserts the payload an
   adopter receives, so the manifest's integrity claim is unasserted on the Windows install path —
   the payload witnesses it, wherever the fix lands.
+  **JOINED TO `supported-platform-roster-widening` ON THE SAME-SURFACE GROUND — `lead,
+  own-authority` 2026-09-07.** `gate-sdk/SPEC.md` §Consumer payload and `native/targets.list`'s
+  own header both rule that a second roster line blocks on the consumer smoke's re-entry, so the
+  roster unit edits this file; and the octet witness this entry still owes rides a CI round that
+  unit must buy regardless.
   **Cost while deferred:** the leg is `continue-on-error`, so this red never reaches a workflow
   conclusion, and every run of it re-buys the same diagnosis.
   Filed 2026-09-07 into the gap inbox by the close of `windows-install-path-behind-the-invoke`,
@@ -68,6 +73,10 @@
   malformed value whatever.
   **Product-class under the 2026-08-30 witness discriminator:** a diagnostic the install path
   prints about the payload it verified is an adopter-facing claim.
+  **JOINED ON THE SAME-SURFACE GROUND TO `supported-platform-roster-widening` — ruled
+  `lead, own-authority` 2026-09-07**, with its sibling above and on the same reading of the
+  consumer-smoke re-entry. It is joined rather than folded in because the two defects are
+  distinct and either repair can land without the other.
   **Cost while deferred:** every future round of this leg's diagnosis reads a report that may be
   adjudicating a value the comparison never used.
   Filed 2026-09-07 by that same close as the second of its two consumer-smoke bullets; taken at
@@ -373,6 +382,12 @@
   and `stamp-provenance-remedy-loops-when-uncommitted` (a gate's help prescribes a remedy that
   does not clear its red) — and the planning assumption is that those two fix,
   the two port-disposition entries are two of the four retired above, and the rest icebox.
+  **ADMITTED AS A FULL UNIT OF `supported-platform-roster-widening` — ruled by the OPERATOR
+  2026-09-07, through the lead's question relay in a lead session and lead-relayed.** It
+  qualifies on none of the port-first run's three joining grounds; the operator admitted it
+  anyway, on the escalation that put that fact in front of them rather than around it.
+  **IT DISPOSES OF `enter-stage-flag-position-silently-ignored`, WHICH IS THEREFORE NOT COUNTED
+  TWICE** — that entry is one of the ten named above and the no-double-count rule is its own.
   **Why [design-pending]:** per-slug exits are judgments the unit makes at build, not now;
   recovery of each body is mandatory before ruling on it.
   **Cost while deferred:** low, and it compounds — each close under the new order files new
@@ -586,10 +601,10 @@
   `drain-order-retroactive-debt-sweep`'s named ten and that unit disposes of them
   together; whichever fix lands discharges both, and neither may be counted twice
   when the sweep costs its ten.
-  **PROPOSED AT THRESHOLD 2026-09-06 AND ANSWERED — deferred (lead, own-authority, 2026-09-06),
-  recorded explicitly rather than by silence.** The recurrence route is now SPENT: a threshold
-  member is proposed once and never re-escalated as a set already answered. What carries it next is
-  the aggregation — 5 inbound edges, the highest in the pool at that survey — on its merits.
+  **THE ROUTE WAS NOT SPENT — a THIRD threshold recurrence (2026-09-07) routed to the OPERATOR,
+  who ruled 2026-09-07, lead-relayed from a lead session, that the routing clause GOVERNS over
+  propose-once.** That supersedes the 2026-09-06 lead deferral. **DISPOSED OF BY
+  `drain-order-retroactive-debt-sweep`, admitted the same day — NOT counted twice, per below.**
   **THIRD, FOURTH AND FIFTH ATTESTATIONS, ALL 2026-09-06, across two iterations.** Third: a lead
   session in Split posture, where the write is also a posture violation. Fourth: a build session's
   probe stamped a `validate` entry, moving the cursor a WHOLE STAGE AHEAD while that session still
@@ -680,6 +695,10 @@
   **FILED 2026-09-07 by spec on the operator's Q1 ruling** (AskUserQuestion channel in a lead
   session, lead-relayed), which took `powershell-installer-surface`'s PowerShell half only and
   directed the widening filed separately.
+  **ADMITTED AS THE LEAD UNIT OF `supported-platform-roster-widening` — `lead, own-authority`
+  2026-09-07**, on that iteration's scope escalation. Port-critical and un-nestable: the scope
+  sweep read FIFTEEN of the sixteen owed files chaining to this one precondition, so it cannot
+  ride inside a cut and is its own iteration.
   **THE OWNER RETIRED AHEAD OF THE PROMOTION CONDITION.** `platform-support-ci-matrix`, retired
   2026-09-06, owned the CI leg and — since 2026-08-27 — the widening itself.
   `gate-binary-target-roster-widening` shipped WITHOUT widening the roster, deliberately: an
@@ -1161,6 +1180,11 @@
   on how far the omitted set may grow before widening is forced), or nothing beyond the
   exception rule the flip's own amendment must state — in which case this entry closes
   against that amendment rather than shipping.
+  **JOINED SAME-SURFACE TO `supported-platform-roster-widening` — ruled `lead, own-authority`
+  2026-09-07**, beside `gate-binary-roster-covers-supported-platforms`. Same
+  `native/targets.list` single triple and the same criterion-5 section, and the widening moves
+  the very uncovered set this entry measures — so whether the instrument is a measurement, a
+  bound, or nothing beyond the flip's own amendment is decidable only once the roster has moved.
   **Cost while deferred:** an adopter class the project has never observed installing
   silently loses more of the battery every iteration, and the first evidence of how much
   would arrive from a macOS preview adopter rather than from the tree — the exact
@@ -8768,12 +8792,12 @@
   **Cost while deferred:** revised upward from the iceboxing. A short roster now ships, and the
   reader who eventually greps is a later stage or a later iteration, so the stale sentence is
   live in the tree for the whole of that gap.
-  **THAT DEFERRAL'S OPEN FACT IS PROBED — 2026-09-07 at scope on the lead's instruction: THEY NEVER
-  SHIPPED TAGGED** (renumber `1a23be6c` 2026-08-29, last tag `v0.25.0` 2026-08-23,
-  `git tag --contains` empty), so it stays deferred on the lead's disposition for that branch.
-  **LIMIT:** they missed an adopter only because the release is 1118 commits deferred, so the
-  ATTESTED INSTANCE is settled and the CLASS is not — "would witness" and the not-inherited
-  instruction stand.
+  **ADMITTED AS A FULL UNIT OF THIS ITERATION — ruled by the OPERATOR 2026-09-07, through the
+  lead's question relay in a lead session and lead-relayed**, on the
+  third threshold recurrence below. This ANSWERS the 2026-09-06 lead deferral taken on window
+  capacity and the 2026-09-07 probe that settled the ATTESTED INSTANCE and expressly not the
+  CLASS (the six stale citations never shipped tagged: renumber `1a23be6c`, last tag `v0.25.0`).
+  **Spec owns bounding the design question; this admission does not settle it.**
   recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06 2026-09-07
   Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned
   2026-08-29 by close, the six stale citations verified against guard-kit/SPEC.md at HEAD.
