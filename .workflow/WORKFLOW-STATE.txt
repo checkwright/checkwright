@@ -4,10 +4,4 @@
 
 ---
 
-index-runner-hold-release-and-windows-smoke-comparison scope adb6276c 2026-09-06 a906ac99
-index-runner-hold-release-and-windows-smoke-comparison spec a90232c8 2026-09-06 3c5b4c29
-index-runner-hold-release-and-windows-smoke-comparison align a0d13a7d 2026-09-06 310f6507
-index-runner-hold-release-and-windows-smoke-comparison build ac625fd2 2026-09-06 fdd9f40c
-index-runner-hold-release-and-windows-smoke-comparison build af905065 2026-09-06 1895373e
-index-runner-hold-release-and-windows-smoke-comparison validate ade4c669 2026-09-06 e21796b2
-index-runner-hold-release-and-windows-smoke-comparison close aa382683 2026-09-06 7f4e8d2d
+— scope acaba422 2026-09-07 daf82d3c
