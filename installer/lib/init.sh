@@ -7,6 +7,8 @@ set -uo pipefail
 
 INSTALLER="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PAYLOAD="$INSTALLER/payload"
+# shellcheck source=./common/argv.sh
+source "$INSTALLER/lib/common/argv.sh"
 # shellcheck source=./common/lock.sh
 source "$INSTALLER/lib/common/lock.sh"
 # shellcheck source=./common/profile.sh
@@ -391,13 +393,13 @@ if [[ ${#CHANGED[@]} -gt 0 ]]; then
     printf '  help: review the differences; re-run with --force to take the packaged version.\n\n'
 fi
 
-git -C "$ROOT" add -- "${STAGE[@]}" || die "could not stage the vendored files"
+argv_batched git -C "$ROOT" add -- "${STAGE[@]}" || die "could not stage the vendored files"
 
 # spec: installer/README.md §init — idempotence is a property of the tree, so a re-run that changed nothing reports and exits clean rather than failing on an empty commit: "nothing to do" is the success case, not an error. The predicate reads the index rather than the worktree and it stays the guard on whether a commit is attempted, because a commit against an empty index exits non-zero and init treats a failed commit as a fatal install failure — an arm placed ahead of this branch would turn the pure idempotent path into a false hard error
 if git -C "$ROOT" diff --cached --quiet; then
     # spec: installer/README.md §init — a run init considers a no-op still commits what it rewrote, so this branch asks what the predicate above cannot: whether anything on the roster init just recorded differs from the committed tree. The clean-worktree precondition is what makes the answer attributable — nothing dirty at those paths can be the adopter's — and --no-commit is exempt because it waives that precondition and hands the commit over. The expected answer is "nothing", at the cost of one status call; the arm is here so the one-commit contract survives the staged set failing to cover what init wrote rather than resting on the assumption that it never will, and the inner index check is what keeps that survival from becoming the empty commit the paragraph above rules out
-    if (( DO_COMMIT )) && [[ -n "$(git -C "$ROOT" status --porcelain -- "${WRITTEN[@]}")" ]]; then
-        git -C "$ROOT" add -- "${WRITTEN[@]}" \
+    if (( DO_COMMIT )) && [[ -n "$(argv_batched git -C "$ROOT" status --porcelain -- "${WRITTEN[@]}")" ]]; then
+        argv_batched git -C "$ROOT" add -- "${WRITTEN[@]}" \
             || die "could not stage the files init rewrote but left out of the vendoring commit"
         if ! git -C "$ROOT" diff --cached --quiet; then
             residue="$(git -C "$ROOT" diff --cached --name-only | grep -c .)"

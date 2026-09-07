@@ -204,6 +204,17 @@ instead of silently un-covering the pair, and a rename of either command moves
 one string with nothing to keep in step. What that arm asserts against the
 grammar, and what it deliberately does not, is that section's to state.
 
+**An install's size is not bounded by the host's argv width.** `init` names every
+vendored path to `git` — when it stages, and again when it asks what the run left
+behind — and a large profile's roster is long enough to exceed the command line a
+host will actually accept, which surfaces as `Argument list too long` and leaves
+the install incomplete on exactly the profiles that vendor the most. Those calls
+are issued in batches, so what a profile may carry is bounded by the payload and
+never by how many characters one process may be handed. The ceiling that binds is
+the host's, not POSIX's: it is a native Windows process limit that a POSIX-shaped
+`getconf` reports nothing useful about, so the batch size is a fixed conservative
+budget rather than a probed one.
+
 **Re-running is idempotent and non-destructive.** A second `init` reads each
 recorded hash from the manifest: a file whose hash still matches is `init`'s to
 rewrite, and one that has changed since is **yours** — it is reported and left
