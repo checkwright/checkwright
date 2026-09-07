@@ -671,53 +671,96 @@
   recovering from the loop this describes.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
-  forks are RULED**: fork 2 on 2026-08-26 by the operator — two hand-kept bootstraps, parity held
-  by a per-BOOTSTRAP leg — the three running legs all drive the bash half, so this entry still owes
-  the PowerShell one — with the mechanism and the refused generated-twins alternative at
-  installer/README.md §The install boundary; fork 1 merged 2026-08-25 into that same section —
-  five bootstrap steps, one retirement (`jq`), everything else behind the invoke. What remains is
-  the work: the PowerShell half, the relocation (this entry's since `install-step-relocation`
-  retired as mooted, re-scoped 2026-08-24). The Windows leg that ordered ahead of it shipped with
-  `platform-support-ci-matrix`, retired 2026-09-06, so nothing orders first now and the named
-  adopter is live: the trigger is no longer dormant. **Ordered by the trajectory pivot 2026-08-03**
-  — objectives 2 and 6, TRAJECTORY.md's.
-  **THE TWO SOURCE BLOCKERS THAT ROUTED HERE ON 2026-08-26 HAVE MOVED OUT, operator-ruled the same
-  day**: `BN_ART` and `target_of_host()` shipped with `gate-binary-target-roster-widening`, whose
-  record and that ruling's two refusals (a new entry, widening the Windows leg) are retired to git
-  history. `target_of_host` is still bootstrap step 2 wherever the bootstrap is built; the one-line
-  repair moved, the design never did, and it stays this entry's whole.
-  **MEASURED 2026-08-26 at close on a native Windows runner** (harvest in git history, as above).
-  Two assumptions this bootstrap makes are now facts rather than hopes: `[[ -x ]]` HOLDS on a
-  freshly `chmod +x`'d shebang script, which executes directly despite `core.filemode=false`; and it
-  HOLDS on npm's extension-less bin shim, written mode `-rwxr-xr-x` beside its `.cmd` and `.ps1`
-  siblings. So neither `-x` test needs a Windows special case.
-  **THIS ITERATION TAKES IT WHOLE — ruled 2026-09-07 by the operator, through the AskUserQuestion
-  channel in a lead session and relayed by the lead**, joined by `init-vendor-staging-argv-overflow`
-  (same-surface) and by a new Windows manifest entry (product-class, live trigger). Scope proposed
-  it on a hold structure verified at source, not inherited: every one of the 14 non-packer owed
-  files waits on the behind-invoke relocation THIS entry owns, so no cut can move the owed column
-  until it lands. The size risk — the PowerShell half plus a ~350-line relocation may overrun one
-  build window — was stated and accepted. **If the halves are sequenced inside the unit, the
-  RELOCATION half is the one that discharges those 14 files**: `installer/README.md` §The install
-  boundary rules that a file whose whole body is bootstrap steps DECLARES rather than ports, so the
-  PowerShell half alone leaves the owed count unchanged. The clause reading that makes an
-  own-iteration leg schedulable at all is TRAJECTORY.md §PRIORITY DIRECTIVE's, same date and
-  channel. It is FEATURE-class, so spec authors its amendment and the authoring is the promotion.
-  The bootstrap is bash end to end. The `--install <op>` seam both bootstraps call is specified
-  there and the first cut is taken — `--install place-artifact`, the artifact placement and the
-  config-seam write, on the rule that a step is takeable only if it already runs when an artifact
-  was selected: a relocated step is unreachable on the platforms criterion 5 leaves with no binary
-  (gate-sdk/SPEC.md §Porting a gate to the binary substrate). **The per-step roster is not restated
-  here**: fork 1's merge put the assigning rule and the five steps in that same section and made
-  `behind-invoke` its stated default, so a step's disposition is read off the rule against `init.sh`
-  top to bottom rather than off a second copy pinned to a stale commit.
-  Every sibling surface is `behind-invoke` whole — `doctor.sh`, `diff.sh`, `uninstall.sh`,
-  `update.sh`, all of `lib/common/` — bar `digest.sh`'s hasher resolution, re-implemented rather
-  than called because step 4 needs it first; `bin/checkwright.sh` collapses into the bootstrap.
+  forks are RULED and both are ANSWERED into installer/README.md §The install boundary**, cited and
+  not restated: fork 2 (operator, 2026-08-26) two hand-kept bootstraps with parity held by a
+  per-BOOTSTRAP leg and the generated-twins alternative refused; fork 1 (merged 2026-08-25) the
+  five bootstrap steps, one retirement (`jq`), everything else `behind-invoke` by default. What
+  remains is the work: the PowerShell half, and the relocation (this entry's since
+  `install-step-relocation` retired as mooted, re-scoped 2026-08-24). The per-step roster, the
+  sibling surfaces and the `--install <op>` seam are all read off that section against `init.sh`
+  rather than off a second copy here. **Ordered by the trajectory pivot 2026-08-03** — objectives
+  2 and 6, TRAJECTORY.md's. The Windows leg that ordered ahead shipped with
+  `platform-support-ci-matrix`, retired 2026-09-06, so nothing orders first and the named adopter
+  is live. The two source blockers that routed here on 2026-08-26 have MOVED OUT, operator-ruled
+  the same day, and the 2026-08-26 native-runner measurements that retire both `-x` assumptions are
+  carried into this iteration's amendment, whose merge lands them in that same section.
+  **THIS ITERATION TAKES THE POWERSHELL BOOTSTRAP HALF ONLY — ruled 2026-09-07 by the operator,
+  through the AskUserQuestion channel in a lead session and relayed by the lead.** The RELOCATION
+  half stays deferred and stays this entry's; the roster widening it waits on is filed as
+  `gate-binary-roster-covers-supported-platforms`. Joined by `init-vendor-staging-argv-overflow`
+  (same-surface) and by a new Windows manifest entry (product-class, live trigger).
+  **THIS NARROWS THE SAME DAY'S TAKE-WHOLE RULING, on new evidence — that ruling was not wrong.**
+  It was taken on a unit-set proposal that did not carry the relocation's precondition; a spec
+  probe surfaced it. The ground is `doctrine-kit/SPEC.md`:213-216, the OPERATOR's own ruling of
+  2026-09-03 on this identical precondition, where a member was "dropped from that iteration's unit
+  set rather than ported, because the relocation's own precondition forbids it today". The
+  precondition is `installer/README.md`:528-530 — the unconditional remainder is sequenced behind
+  the artifact roster covering every supported platform — and `native/targets.list` carries ONE
+  triple against a supported set of at least Linux and macOS.
+  **THE CONSEQUENCE WAS STATED AND ACCEPTED: THE OWED COLUMN DOES NOT MOVE THIS ITERATION.**
+  Recorded so a later reader does not flag it as a failure of the port-first run. It is not one:
+  that rule binds "while the ruled composer can reach one", and this boundary's survey established
+  no cut is takeable — all 14 non-packer owed files wait on the relocation, verified at source and
+  re-verified at spec. §The install boundary rules that a whole-bootstrap file DECLARES rather than
+  ports, so the PowerShell half leaves the owed count unchanged BY CONSTRUCTION, not by shortfall.
+  **THE HALVES INTERACT, and this iteration's output widens what the other half owes.** Shipping
+  the PowerShell bootstrap makes native Windows a SUPPORTED PLATFORM, which widens the relocation's
+  own precondition from {Linux, macOS} to {Linux, macOS, native Windows}. Whatever entry takes the
+  roster widening inherits a wider target than it has today. Stated here because it is a fact about
+  this iteration's output and a later reader can only recover it from here.
+  It is FEATURE-class, so spec authors its amendment and the authoring is the promotion; the
+  amendment delivers ONE INCREMENT of a two-half deliverable, so this entry DEMOTES at merge rather
+  than reaching Done (canon-kit/SPEC.md §Merging an amendment step 4).
+  **`installer/README.md`:442 rides this entry's amendment — `lead, own-authority` 2026-09-07**
+  through this iteration's dispatch relay: it cites the retired `platform-support-ci-matrix` as the
+  owner of the PowerShell leg, an ORDERING claim this half discharges. That slug's three
+  precondition-bearing cites ride `gate-binary-roster-covers-supported-platforms` instead.
   **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
   names that no current path reaches, and every install-path change is authored bash-first.
-  Filed 2026-08-03 by spec; re-scoped 2026-08-24 at scope; fork 1 merged and demoted 2026-08-25;
-  the two source blockers re-scoped out 2026-08-26 by operator ruling.
+  Filed 2026-08-03 by spec; re-scoped 2026-08-24; fork 1 merged and demoted 2026-08-25; the two
+  source blockers re-scoped out 2026-08-26, all by operator ruling.
+
+- **gate-binary-roster-covers-supported-platforms** [design-pending] — `native/targets.list`
+  carries ONE triple, `x86_64-unknown-linux-gnu`, against a supported set of at least Linux and
+  macOS, and the gap is now owned by no live entry.
+  **FILED 2026-09-07 by spec on the operator's Q1 ruling** (AskUserQuestion channel in a lead
+  session, lead-relayed), which took `powershell-installer-surface`'s PowerShell half only and
+  directed the widening filed separately.
+  **THE OWNER RETIRED AHEAD OF THE PROMOTION CONDITION.** `platform-support-ci-matrix`, retired
+  2026-09-06, owned the CI leg and — since 2026-08-27 — the widening itself.
+  `gate-binary-target-roster-widening` shipped WITHOUT widening the roster, deliberately: an
+  iteration named *unblock* removes a blocker, it does not grant a permission. So the widening has
+  no owner. `TASK-QUEUE.md`'s `born-native-omission-accumulation` records the same orphaning from
+  the battery side; this entry owns the roster itself.
+  **WHAT IT BLOCKS, and this is why it is not merely tidy:** `installer/README.md`:528-530
+  sequences the installer's behind-invoke RELOCATION behind "the artifact roster covering every
+  supported platform". So this entry is the stated precondition of the relocation, which is in turn
+  the stated precondition of all 14 non-packer `owed` files in `--emit port-blockers --tree`. The
+  port's owed column cannot fall until this lands. Verified at source at spec 2026-09-07.
+  **THE TARGET IS WIDER THAN IT LOOKS, and it widened this iteration.** Shipping
+  `powershell-installer-surface`'s PowerShell half makes native Windows a supported platform, so
+  this entry inherits {Linux, macOS, native Windows} rather than {Linux, macOS}.
+  **WHAT IS GENUINELY OPEN, and why it is `[design-pending]` rather than debt.** The macOS leg
+  `install-smoke-macos` is BINDING and does a cold `cargo` build, so green evidence for
+  `aarch64-apple-darwin` — produced and exercised — plausibly exists today; but `macos-latest` is
+  arm64, and that job's own comment refuses reading one green arm64 run as a macOS claim, so Intel
+  macOS is a separate leg. And `native/targets.list`:43-48 prices a second roster line beyond the
+  publish half: the consumer smoke builds its artifact from the host it runs on and refuses a
+  roster naming a platform that host is not, wanting steering or a cross-build. The steering knob
+  EXISTS and is in use — `GATE_SDK_NATIVE_TARGETS_FILE`, `.github/workflows/gates.yml`:408 on the
+  Windows leg — so the shape is reachable; which of steering or a cross-build the roster takes is
+  the design ruling this owes.
+  **IT CARRIES THE THREE PRECONDITION-BEARING CITATIONS OF THE RETIRED SLUG — ruled `lead,
+  own-authority` 2026-09-07** through this iteration's dispatch relay: `installer/README.md`:530
+  and `native/targets.list`:31 and :51-52 each name `platform-support-ci-matrix` as the OWNER of
+  this live, undischarged precondition, and they are made true again only by this discharge, so no
+  other entry can honestly carry them. (`installer/README.md`:442 is a fourth, ordering rather than
+  precondition-bearing, and rides `powershell-installer-surface`'s amendment.) None of the four
+  reds: `check-queue-slug-liveness` resolves only the bold-code membership form and all four are
+  in-prose single-backtick citations — so a green battery is not evidence against this.
+  **Cost while deferred:** the port's completion predicate cannot approach zero by ANY cut, every
+  macOS adopter silently loses more of the battery each iteration a born-native gate lands, and
+  three governed surfaces keep pointing at a retired entry as the owner of live work.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
