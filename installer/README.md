@@ -199,14 +199,10 @@ containing a `/` — any token before it is the interpreter the line spells — 
 every token after the target beginning with `-` is a flag.
 
 That grammar is a contract rather than a layout choice because §The consumer
-smoke's follow-up arm parses the block out of what `init` actually printed and
-asserts that each target resolves and is executable in the payload `init` just
-wrote, and that each flag the line names is one that target accepts. So a later
-edit that reflows the block reds that arm instead of silently un-covering the
-pair, and a rename of either command moves one string with nothing to keep in
-step. What the arm does **not** assert is that the commands succeed — that is the
-business of the arm that already asserts the battery; conflating the two would
-make one red unreadable as either.
+smoke's follow-up arm reads it: a later edit that reflows the block reds that arm
+instead of silently un-covering the pair, and a rename of either command moves
+one string with nothing to keep in step. What that arm asserts against the
+grammar, and what it deliberately does not, is that section's to state.
 
 **Re-running is idempotent and non-destructive.** A second `init` reads each
 recorded hash from the manifest: a file whose hash still matches is `init`'s to
@@ -1422,6 +1418,18 @@ command, in this order because each makes the next meaningful:
   unknown, and the refusal it earns *by name* is what the positive run of the line
   as printed is then measured against. No refusal string is spelled in the smoke:
   the expected one is the control's own line with the sentinel substituted back.
+
+*On a payload that packed no artifact, the flag half is omitted and declared.*
+The battery expectation is a parameter of this arm for the same reason it is one
+of the arm below it: an install with no artifact has nothing for the front-end to
+dispatch to, so it refuses **every** arm before it judges argv at all — which is
+the binary-less leg's own asserted post-condition, not a finding. Asking that
+front-end whether a flag is one it accepts gets the absent-binary refusal
+whatever the flag is, so the answer would be an artifact of the leg rather than a
+fact about the flag. The block assertion and the target's own resolution still
+run there, and the omission is **said** rather than passed over — the same
+omitted-and-declared shape §The gate binary already rules for the queue arm's
+section floor on a host the payload carries no artifact for.
 
 *Which `init` invocation it rides, and why it is not the obvious one.* It rides
 the first `init --profile` call, never the idempotent re-run below: that re-run's

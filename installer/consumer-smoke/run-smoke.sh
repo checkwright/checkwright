@@ -293,8 +293,9 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
 
 # spec: installer/README.md §init — the follow-up block's grammar is the operand, so this arm parses the pair out of what init PRINTED rather than comparing it against a second copy a rename would have to be remembered to move; the cheap form of this assertion is exactly the defect it exists to close
 # spec: installer/README.md §The consumer smoke — the flag probe runs in a throwaway copy of the consumer because the probe RUNS the printed command, and the live flag wires the clone's hooksPath: executing it in the consumer itself would put a pre-commit hook in front of every later arm's commit, including the value arm's planted defect, so the arm would decide what it is supposed to observe
-assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = init's captured output
-    local profile="$1" C="$2" out="$3" line target flag sentinel ctl expect probe sandbox i ti
+# spec: installer/README.md §The gate binary — the battery expectation is a PARAMETER here for the same reason it is one on assert_install: an install that packed no artifact has nothing for the front-end to dispatch to, so it refuses every arm BEFORE it judges argv and cannot say whether a flag is one it accepts. On that leg the flag probe is omitted-and-declared, exactly as the queue arm's section floor already is, while the block and the target's own resolution stay asserted
+assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = init's captured output, $4 = battery expectation: green | unavailable
+    local profile="$1" C="$2" out="$3" battery_want="$4" line target flag sentinel ctl expect probe sandbox i ti
     local -a cmds=() toks=() ctl_argv=()
 
     mapfile -t cmds < <(awk '$0 == "next:" { b = 1; next } b && /^[[:space:]]+[^[:space:]]/ { sub(/#.*$/, ""); sub(/^[[:space:]]+/, ""); sub(/[[:space:]]+$/, ""); print; next } b { exit }' <<<"$out")
@@ -302,9 +303,12 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
     [[ ${#cmds[@]} -gt 0 ]] \
         || { printf '%s\n' "$out" >&2; blocked "$profile: init printed no follow-up block matching the grammar installer/README.md §init states, so this arm has nothing to assert over."; }
 
-    sandbox="$SCRATCH/followup-$profile"
-    rm -rf "$sandbox"
-    cp -Rp "$C" "$sandbox" || fail "$profile: could not copy the consumer for the follow-up probe"
+    sandbox=""
+    if [[ "$battery_want" != unavailable ]]; then
+        sandbox="$SCRATCH/followup-$profile"
+        rm -rf "$sandbox"
+        cp -Rp "$C" "$sandbox" || fail "$profile: could not copy the consumer for the follow-up probe"
+    fi
 
     for line in "${cmds[@]}"; do
         read -r -a toks <<<"$line"
@@ -318,6 +322,7 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
         for (( i = ti + 1; i < ${#toks[@]}; i++ )); do
             flag="${toks[$i]}"
             [[ "$flag" == -* ]] || continue
+            [[ -n "$sandbox" ]] || continue
             # spec: installer/README.md §The consumer smoke — the negative control is what keeps the flag assertion from passing vacuously: it establishes that this target refuses an unknown flag BY NAME, and the refusal it prints is what the positive probe is then measured against, so no refusal string is spelled here
             sentinel="$flag--checkwright-smoke-unknown"
             ctl_argv=("${toks[@]}"); ctl_argv[$i]="$sentinel"
@@ -331,8 +336,12 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
         done
     done
 
-    rm -rf "$sandbox"
-    say "follow-up: ${#cmds[@]} printed command(s), each resolving in the install with every flag it names accepted"
+    if [[ -n "$sandbox" ]]; then
+        rm -rf "$sandbox"
+        say "follow-up: ${#cmds[@]} printed command(s), each resolving in the install with every flag it names accepted"
+    else
+        say "follow-up: ${#cmds[@]} printed command(s), each resolving in the install; the flag probe is omitted-and-declared, since this payload carries no artifact for the front-end to dispatch a flag to"
+    fi
 }
 
 # spec: installer/README.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
@@ -347,7 +356,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }
     say "init: $(grep -m1 '^INIT:' <<<"$out")"
     # spec: installer/README.md §init — the arm rides THIS init invocation and never the idempotent re-run below, whose no-op branch prints no follow-up block at all: an arm placed there would assert over an empty block on every profile and pass by vacuity, which is the hole the emptiness assertion exists to close arriving through the back door
-    assert_followups "$profile" "$C" "$out"
+    assert_followups "$profile" "$C" "$out" "$battery_want"
 
     out="$( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh 2>&1 )"; rc=$?
     case "$battery_want" in
