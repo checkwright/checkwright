@@ -423,6 +423,7 @@ else
         "${#KITS[@]}" "$PROFILE" "$VERSION"
 fi
 
+# spec: installer/README.md §init — the follow-up block is a STATED GRAMMAR with a named reader, not a layout choice: the banner alone on its line, one indented command per line with its reason after a `#`, and the block ending at the first line that is not one. The consumer smoke parses it out of what this prints and asserts each command resolves against the payload just written, so reflowing these three lines reds that arm instead of silently un-covering the pair
 printf '\nnext:\n'
 printf '  bash gate-sdk/bin/run-gates.sh --install-hooks   # opt this clone into the generated pre-commit hook\n'
 printf '  bash gate-sdk/bin/run-gates.sh       # the battery, green on what was just vendored\n'

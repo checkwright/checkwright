@@ -12,42 +12,6 @@
 
 ## New Features
 
-- **consumer-smoke-manifest-verdict-outruns-its-report** [spec: SPEC-verdict-witness.md] — the
-  manifest arm's `malformed` flag is run-wide while its report samples the first disagreeing path,
-  so the entry earning the exit-2 verdict is by construction one the report never prints.
-  **The witness.** Windows round 15 (run `34054512420`, head `bf1fc722`) exited 2 naming a
-  malformed operand while both sampled entries printed `want`/`got`/`reread`/`own`/`raw` as one
-  byte-identical clean 40-hex, with the `%q` byte rendering unquoted on all ten values. The defect
-  follows from the arm's shape, not from that host.
-  **What the SPEC claims.** installer/README.md §The consumer smoke states the refusal "fires after
-  the report, not at the first bad value, because diagnosing that value is exactly what the report
-  exists for" — and on this evidence it does not diagnose it. Any one of that round's 476
-  disagreements sets the run-wide flag; `manifest_report` samples the first disagreeing path plus
-  the artifact row, and neither is required to be the entry that set it.
-  **RULED AT SPEC 2026-09-07 and the amendment holds the grounds:** carry the malformed entry into
-  the sample set as a WITNESS the flag records, keeping the sampler's other two members; the wider
-  re-shaping of the arm's verdict is refused, since an arm reports through one exit code and the
-  section already refuses refusing early. What that option was right about is kept — a run-wide
-  flag recording only THAT something tripped it is the defect.
-  **The diagnostic series this arm was built for is CLOSED**, which is what makes the next unit on
-  this leg a repair rather than another observation: round 15 read `want` equal to `got`
-  byte-equal, the truth table's fifth row, so the defect is the pairing `bad_hash` records and no
-  further round narrows it.
-  **Cost while deferred:** the Windows leg stays continue-on-error and unassertable — that
-  iteration explicitly declined to assert it green — so every later round re-buys a verdict whose
-  operand cannot be read. Blocks no stage entry and no push.
-  **PROPOSED AT SCOPE AND TAKEN 2026-09-07 — `lead, own-authority`, relayed in this session's
-  dispatch**, on the product-class ground and same-surface with the two installer entries beside
-  it. It also carries the iteration's sequencing weight: `install-smoke-windows` is the file's only
-  `continue-on-error: true` leg (`gates.yml:207`), so while this arm cannot state a readable
-  verdict the Windows leg cannot be asserted — the ground on which the same ruling gave this window
-  to deferred entries rather than to `powershell-installer-surface`.
-  Filed 2026-09-06 by the same close, off Windows round 15's own log rather than off a stage
-  surface; no stage of `index-runner-hold-release-and-windows-smoke-comparison` could drain it, so
-  it carried into this iteration's scope intake and is promoted here one iteration late.
-  Promoted 2026-09-07 by spec, the authoring being the promotion; nothing on this entry needed
-  correcting — both premises re-probed clean at `run-smoke.sh:319-336` and `:197-268`.
-
 - **gnu-ism-on-adopter-install-path-ungated** [spec: SPEC-portability-floor.md] — no gate keeps a
   GNU-only shell
   construct off the adopter install path; the live one was found by a hand survey.
@@ -86,45 +50,6 @@
   Promoted 2026-09-07 by spec as `check-portability-floor`, born native, vocabulary and corpus both
   consumer config on the `check-graph` pattern with a per-site declaration valve; the census behind
   the corrected corpus is in `.workflow/survey-record.md`.
-
-- **installer-printed-followup-commands-uncovered** [spec: SPEC-printed-followup.md] — `init`
-  prints two commands
-  an adopter is told to run next, and no gate in either substrate checks that either resolves.
-  **Probed rather than assumed.** `installer/lib/init.sh` prints both with `printf` and runs
-  neither; `installer/README.md` narrates the same pair. `installer/consumer-smoke/` carries zero
-  references to either arm, so nothing exercises the printed strings, and `check-docs-cmd` cannot
-  reach them either — its subject is a FENCED invoked repo-relative `.sh` path and these are
-  format strings in shell source, not fences.
-  **The exposure is concrete and this iteration moved one of the two.** The hooks cut renamed the
-  opt-in behind one of the printed commands; the cut re-spelled both strings by hand and they are
-  correct today. What is uncovered is the NEXT such move — an adopter follows a command that no
-  longer exists, at the moment they are least able to diagnose it: first install, fresh clone.
-  **DISTINCT from the `check-docs-cmd` fence-scope wording fixed in gate-sdk/SPEC.md §The port
-  candidate criteria's dispatch table at this same close, and not a re-filing of it.** That was a
-  claim about UNFENCED MARKDOWN reading as coverage; this is a printed command inside INSTALLER
-  SHELL SOURCE that no gate's corpus reaches in any form. Rewording the claim settles nothing
-  here, and covering a printf string needs a different oracle.
-  **The fix, named so the entry is takeable:** one assertion in the consumer smoke that each
-  command `init` printed resolves against the payload it just installed — the smoke already
-  captures `init`'s output, so the assertion is short.
-  →fix failed on where the fix has to live: the consumer smoke is an 853-line acceptance harness
-  that builds the crate, packs a tarball and installs it per profile, so adding to it needs a
-  validate re-run this close cannot buy, and that suite already carries a held-constant red.
-  →icebox failed on the live trigger — first-install is the one path with no operator watching.
-  **Cost while deferred:** zero until a printed arm is renamed, then one adopter's failed install
-  with no oracle between the rename and them.
-  **TAKEN INTO THE ITERATION 2026-09-07, `lead, own-authority` relayed at scope** — the same
-  product-class ground as its two neighbours, and same-surface with both.
-  The `→fix` refusal above does not survive this window: it failed because close could not buy a
-  validate re-run, and an iteration provides one. Premise re-probed at HEAD — `init.sh:426-428`
-  prints exactly two commands under a `next:` banner and the consumer smoke references neither.
-  Filed 2026-09-05 to the gap inbox at build; promoted 2026-09-05 by close.
-  **Promoted 2026-09-07 by spec, which corrected one premise and found a second exposure.** The
-  amendment refuses the hand-kept expected pair and takes its operand from `init`'s captured output
-  (`run-smoke.sh:278-280`), so a rename moves the string and the assertion follows it. The second
-  exposure: `installer/README.md:184-189` narrates the pair as `run-gates.sh --install-hooks`
-  where the script prints `bash gate-sdk/bin/run-gates.sh --install-hooks`, so the prose and the
-  print have drifted already, on the doc side, before any rename.
 
 - **kfric-capture-unverified-assertion** [spec: SPEC-kfric-drain.md] — the knowledge-friction
   channel has
@@ -10291,5 +10216,8 @@
 - **post-build-instrument-edit-unowned** [design-pending] — No stage owns a post-build tree edit.
 
 ## Done
+
+- consumer-smoke-manifest-verdict-outruns-its-report
+- installer-printed-followup-commands-uncovered
 
 ## Lessons Learned

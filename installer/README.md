@@ -184,9 +184,29 @@ a single file is written:
 It writes the selected profile's kit directories, a `gates.list` seeded with
 each kit's starting gates, the config seam files those kits need, and the
 manifest. Then it makes **one commit** naming the profile and the version, and
-prints the two commands that finish the setup — `run-gates.sh --install-hooks`
-to opt this clone into the generated hook, and `gate-sdk/bin/run-gates.sh` to
-run the battery.
+prints a **follow-up block**: the commands that finish the setup, one per line,
+each carrying its reason beside it. The commands are deliberately **not spelled
+on this page** — what `init` prints is `init`'s to say, and a second copy here is
+a string a rename has to be remembered to move.
+
+**The block has a stated grammar, because something reads it.** The banner line
+is exactly `next:`; each line after it that begins with whitespace and then a
+non-whitespace character is one command; the block ends at the first line that is
+not one of those, or at the end of the output. On a command line, everything from
+the first `#` is commentary for the adopter and is read by nothing else. The
+command's **target** is a repo-relative script path, so it is the first token
+containing a `/` — any token before it is the interpreter the line spells — and
+every token after the target beginning with `-` is a flag.
+
+That grammar is a contract rather than a layout choice because §The consumer
+smoke's follow-up arm parses the block out of what `init` actually printed and
+asserts that each target resolves and is executable in the payload `init` just
+wrote, and that each flag the line names is one that target accepts. So a later
+edit that reflows the block reds that arm instead of silently un-covering the
+pair, and a rename of either command moves one string with nothing to keep in
+step. What the arm does **not** assert is that the commands succeed — that is the
+business of the arm that already asserts the battery; conflating the two would
+make one red unreadable as either.
 
 **Re-running is idempotent and non-destructive.** A second `init` reads each
 recorded hash from the manifest: a file whose hash still matches is `init`'s to
@@ -1362,7 +1382,9 @@ rather than as a broken installer.
 
 It builds the host gate binary, packs the package around it, installs it **from
 the resulting tarball with
-`--offline`**, and drives a scratch consumer once per profile: `init`, then the
+`--offline`**, and drives a scratch consumer once per profile: `init`, then the **follow-up
+arm** — every command `init` printed in its block must resolve to an executable
+path in the payload just written, with every flag it names accepted — then the
 battery must be green, then the manifest must agree with the tree it describes
 file by file, then the **queue post-condition** — a profile whose kit set reads
 the queue file must have one, satisfying `check-queue-sections`, and a profile
@@ -1378,6 +1400,54 @@ scan having narrowed, and a profile green on the first run must still be green
 on the second. The arm restores the consumer to the commit it found, so the
 reversal below still runs against the tree `init` wrote.
 
+**The follow-up arm asserts what `init` printed, not a copy of it.** `init` ends
+by telling the adopter to run two commands, and until this arm nothing anywhere
+checked that either one resolved: they are `printf` format literals in installer
+shell source, which no markdown-fence corpus reaches. The cheap assertion — write
+the expected pair into the smoke and compare — mints exactly the defect it would
+be closing, so the arm instead **parses the pair out of the output the invocation
+already captured**, under the grammar §init states. A rename moves the printed
+string and the arm follows it with no edit here. Three assertions per extracted
+command, in this order because each makes the next meaningful:
+
+- **The block is present and non-empty.** Zero commands extracted is a red, never
+  a skip: an assertion over an empty set passes vacuously, so a reflowed banner
+  would otherwise turn full coverage into silent zero coverage.
+- **The target resolves and is executable** inside the consumer the arm was handed.
+- **Each flag the line names is accepted by that target.** `--install-hooks` is
+  the live case: a path that still resolves while its flag does not is precisely
+  the half a path check alone misses. The probe is the target's **own refusal
+  behavior**, and it is two-sided so it cannot pass vacuously — a negative control
+  runs the line with that flag replaced by a token derived from it and guaranteed
+  unknown, and the refusal it earns *by name* is what the positive run of the line
+  as printed is then measured against. No refusal string is spelled in the smoke:
+  the expected one is the control's own line with the sentinel substituted back.
+
+*Which `init` invocation it rides, and why it is not the obvious one.* It rides
+the first `init --profile` call, never the idempotent re-run below: that re-run's
+no-op branch prints no banner at all, so an arm placed there would assert over an
+empty block on every profile and pass by vacuity — the exact hole the first
+assertion closes, arriving through the back door.
+
+*The probe runs in a throwaway copy of the consumer, and that is not thrift.*
+Asserting acceptance through the target's refusal behavior means **running the
+printed command**, and the live flag wires the clone's `core.hooksPath`. Run in
+the consumer itself, it would put a generated pre-commit hook in front of every
+later arm's commit — including the value arm's, which commits a deliberately
+defective page and expects the battery to catch it rather than the commit to be
+blocked. The arm would then decide the thing it exists to observe. The copy is
+made from the payload just installed, so the probe still runs against the tree
+under test and never against this repo's own.
+
+*Its verdict classes are this file's existing line, not a second one.* A printed
+command that does not resolve, or a flag the target refuses, is a statement about
+the payload `init` just wrote: `fail` at exit 1. A block the arm could not read
+at all — `init` succeeded and printed nothing the grammar matches, or a command
+line names no path — is a failure of this harness's own construction: `blocked`
+at exit 2. What the arm does not assert is that the commands *succeed*; the
+battery arm two steps down already owns that, and conflating them would make one
+red unreadable as either.
+
 **A disagreeing manifest arm reports what it found, in place, before it fails.**
 On the failure path only, the arm prints a bounded fact set about the
 disagreement and only then picks its verdict — the class of which is settled
@@ -1392,9 +1462,10 @@ failing state, so removing the duplication beats maintaining it. On a green leg
 none of this runs and the arm prints the `manifest: N file(s) agree with the
 tree` line it always printed.
 
-**It samples at most two paths, and neither is chosen by arrival.** The first
-disagreeing path is one, because it is what a reader would have opened anyway.
-The other is the **artifact's `files` row** — §The manifest's ordinary row for
+**It samples at most three paths, and none of them is chosen by arrival.** The
+first disagreeing path is one, because it is what a reader would have opened
+anyway.
+The second is the **artifact's `files` row** — §The manifest's ordinary row for
 the binary, recorded with the same `git hash-object` hash every entry carries —
 whenever the manifest records an `artifact` key and that row is in the
 disagreeing set. First-come alone is not a sample but an accident, and here the
@@ -1407,6 +1478,33 @@ installs exactly such a payload — the second sample is absent and the report
 says so rather than printing a blank, and so are the other two ways it can fail
 to resolve: a manifest recording an artifact no config seam names a path for,
 and an artifact row that is not in the disagreeing set.
+
+The third is the **witness for the exit-2 verdict** — the first disagreeing
+entry whose `want` or `got` failed the operand shape test, carried out of the
+loop as the same `<path><TAB><want><TAB><got>` tuple every disagreement is
+recorded as. It is appended last and deduplicated against the two above, so a
+run cannot exit 2 on an entry this report did not print. Where it coincides with
+a sample already chosen the report **says so** rather than collapsing the two
+silently — the same shape the artifact row already uses, because the reader's
+question is the same one ("is this the row the verdict is about?") and a silent
+collapse answers it wrongly. The header states **how many** disagreements failed
+that test, and that count is what says whether the one printed witness row is
+representative: one malformed entry out of hundreds is a statement about that
+path, all of them a statement about the capture step every entry runs through,
+and those two readings send a reader to different places.
+
+> **A run-wide verdict states which entry earned it, or it is not readable.**
+> Where an arm reports a bounded sample and decides on an unbounded scan, the
+> deciding entry joins the sample. A flag recording only *that* something tripped
+> it hands the reader a verdict and withholds its subject.
+
+The witness is the first such entry rather than every one, on the sampler's own
+standing ground: the report is a bounded sample by design, and a report that
+prints hundreds of rows is a report nobody reads. Keeping the other two members
+is deliberate — they answer different questions from the verdict's row, and the
+artifact row in particular is the discriminating case the binary-conversion
+argument above rests on. A sampler narrowed to the verdict's row alone would buy
+the verdict's legibility with the discriminating case.
 
 **Five values per sampled path, and the truth table that reads them.** Each is
 labelled, printed plain and rendered byte-exactly beside it, with the call that
@@ -1454,7 +1552,7 @@ two read the **comparison**, and the last is the catch-all on any value's shape:
 | `own == reread == raw` and `want != raw` | the bytes on disk are not the bytes `init` hashed; the porcelain below and the artifact control say which |
 | `got != reread` | the value the comparison used is not the value the same call yields now, so the mangling happens at capture time inside the loop; `got`'s byte rendering names the stray byte |
 | `want == got`, byte-equal, both held | the comparison received two equal values and reported them unequal, which bash cannot do — so the pairing is wrong and `bad_hash` associated one entry's `want` with another entry's `got`; read the sampled path against the loop's own echo order |
-| any of the five is not 40 lowercase hex | the value is not a hash — a stray byte, a truncation or a refusal; the byte rendering shows which and the captured standard error names the refusal. The arm acts on this row too, and that is the one row it acts on: a malformed operand makes the run **exit 2** rather than 1 |
+| any of the five is not 40 lowercase hex | the value is not a hash — a stray byte, a truncation or a refusal; the byte rendering shows which and the captured standard error names the refusal. The arm acts on this row too, and that is the one row it acts on: a malformed operand makes the run **exit 2** rather than 1. Read it with the header's count: **one** entry failing the shape test is a statement about the sampled path, **all** of them a statement about the capture step every entry runs through |
 
 The byte rendering is not decoration and not optional: a value carrying a
 trailing carriage return compares unequal and *prints* equal, and no other line
@@ -1473,10 +1571,27 @@ report has printed it routes a malformed one through `blocked` at exit 2 instead
 of `fail` at exit 1. **It fires after the report, not at the first bad value**,
 because diagnosing that value is exactly what the report exists for; refusing
 early would trade the report for the verdict and lose the more valuable half.
+That ordering argument assumed all along that the report the refusal points at
+contains the refusal's subject, and the witness sample above is what makes it
+true rather than hoped for. The refusal itself names that subject: the path, which
+of `want` and `got` failed the shape test (or both), and how many disagreements
+failed it — so the verdict is readable from the last line alone, by a reader who
+never scrolls up.
 This does not make the shape row above redundant: that row tells a **reader**
 what a bad rendering means, and this makes the **arm** act on it. A report a
 human reads and a verdict a suite reads are two consumers, and deleting either
 for the other is the mistake.
+
+*Who actually reads the 2, and the honest limit that has to be stated with it.*
+The verdict class is read by CI's job verdict and by a human reading the log — and
+by **nothing else**. `scripts/evidence-config.sh` gives the `installer_smoke`
+suite the `parse-smoke-log` parser, and that custom-parser path never references
+the process status it is handed: the evidence row is derived from the log's arm
+headers alone, so **exit 1 and exit 2 are indistinguishable to it**. The
+distinction is real and it is invisible to `--run-validate`'s evidence. Nothing
+above changes that or depends on it; it is stated here because the natural
+reading of a refusal this specific is that a suite consumes its class, and that
+reading is false.
 
 **What the arm must not do is normalize.** Trimming the operands to their
 40-hex core before comparing would turn a mangled-operand red green, and it is
@@ -1597,10 +1712,14 @@ lowercase hex` — while both sampled entries' operands are well-formed 40-hex.
 Both statements are true because they are about different rows: `malformed` is a
 **run-wide flag** any one of the 476 disagreements can set, and the report
 samples the *first* disagreeing path plus the artifact row. So the entry that
-earned the exit-2 verdict is, by construction, one the report cannot print. That
-is not a hypothesis about this host — it follows from the arm's own shape, and
-it means the honest-code rule above bought a verdict at the cost of the value
-that justifies it. The next repair owns that, not another round.
+earned the exit-2 verdict was, by construction, one the report could not print.
+That is not a hypothesis about this host — it followed from the arm's own shape,
+and it meant the honest-code rule above bought a verdict at the cost of the value
+that justifies it. **That finding is drained** into the witness sample and the
+operand-naming refusal above: the arm now carries the deciding entry into the
+report and names it in the refusal, so a round after this repair reads its own
+verdict's row. Nothing else about rounds 12 to 15 moves — what they measured is
+what is recorded here, and the diagnostic series stays closed on the pairing.
 
 *Who reads the next round, and the trap that would otherwise swallow it.*
 `install-smoke-windows` is a job of the `gates` workflow, which runs on every
