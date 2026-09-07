@@ -258,7 +258,12 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   `DONE` marker. Each finding is
   written into the journal *inline as it is confirmed* — never "see final
   output": the agent's return message dies with the session, so a pointer-only
-  journal makes `DONE` lie about recoverability. **Nobody deletes a journal
+  journal makes `DONE` lie about recoverability. **Spell the append as its own
+  bare statement**, never chained after a diagnostic read on the same command
+  line: a consumer whose permission layer auto-grants a scratch write bounds that
+  grant to a single-statement command, so a chained append loses it and buys a
+  permission decision on the most frequent write the protocol asks for. Measured
+  at one close: that one spelling was a third of the session's prompting calls. **Nobody deletes a journal
   while the work it covers is live** — not the agent (no `rm`) and not the
   supervisor, whose deletion would take the file out from under a resumed agent
   and destroy its own pull channel mid-unit. Cleanup is the consumer's scratch

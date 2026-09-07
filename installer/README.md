@@ -1988,6 +1988,43 @@ that verdict would read a passing workflow as a passing leg. What gets recorded
 here afterwards is what was observed, by whoever observed it — this section
 predicts no content for it.
 
+**Round 18 closed the series, and its answer was the first partition — observed
+2026-09-07 at close, run `34142337941`, job `install-smoke-windows`.** The
+workflow concluded `success` and the job concluded `failure`, exactly as this
+section predicted the two would come apart.
+
+*What was observed.* The verdict decomposed `want` on `gate-sdk/README.md` as
+`len40=no class=dirty[residue=$'\r' first=40] shape=fail` — **a carriage return
+at offset 40**, so the operand is forty hex digits followed by one byte that is
+not. That is a mangled value and a partition-one round: the subject is the
+pipeline, not the matcher. The carriage-return candidate rounds 12 through 17
+believed falsified was never falsified; it was invisible to `%q`, which is the
+whole reason the octet dump was added.
+
+*Where the mangling enters, localized by the `wantalt` operand added for exactly
+this.* `wantalt` reads the same key with a standalone `jq` call against the lock
+and comes back **clean**, so the value *stored in the manifest* is a clean
+40-hex string and the manifest pipeline is excluded. What differs is the read:
+the loop takes its entries from a process substitution,
+`while IFS=$'\t' read -r path want; do … done < <(jq -r '.files | to_entries[]…')`,
+and `read` strips the newline but not a preceding `\r`. A `jq` writing CRLF into
+that stream therefore appends a carriage return to **every** `want`, which is
+why the count is **493 of 493** rather than a subset — a whole-manifest count is
+the signature of a suffix on the reader, never of real hash divergence. The two
+operands were never compared as hashes at all. This last step is an inference
+from the tree and the log rather than an observation of `jq`'s output mode; the
+cheap witness for whoever takes it is one octet dump of a raw line off that
+stream, on the runner.
+
+*And round 18 exposed a second defect the series was not looking for.* The report
+printed that same `want` as `len40=yes class=clean shape=pass` while the verdict
+printed it dirty — one value, one entry, one run, two decompositions that
+disagree. The report's own `call` field asserts the value is "the value the
+failing comparison used and not a second read of it", and that assertion is
+false. This is a fresh instance of the class `manifest-shape-predicate-and-rendering-disagree`
+was closed for, arriving after that fix landed, so it is a new defect rather
+than a reopening of the old one.
+
 *The free log read is gated on the run, not on the job, and the way past that is
 a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still
 in progress; logs will be available when it is complete` even when the Windows

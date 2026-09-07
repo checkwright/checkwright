@@ -633,8 +633,11 @@
   **WHAT IT BLOCKS, and this is why it is not merely tidy:** `installer/README.md`:610-612
   sequences the installer's behind-invoke RELOCATION behind "the artifact roster covering every
   supported platform". So this entry is the stated precondition of the relocation, which is in turn
-  the stated precondition of all 14 non-packer `owed` files in `--emit port-blockers --tree`. The
-  port's owed column cannot fall until this lands. Verified at source at spec 2026-09-07.
+  the stated precondition of every non-packer `owed` file in `--emit port-blockers --tree` — the
+  count is the oracle's to state and is not carried here, because it moves whenever an owed file
+  lands or is added, as one was this iteration. The port's owed column cannot fall until this
+  lands. Verified at source at spec 2026-09-07; the literal count it carried was corrected at that
+  iteration's close, having aged within its own iteration.
   **THE TARGET IS WIDER THAN IT LOOKS, and it widened this iteration.** Shipping
   `powershell-installer-surface`'s PowerShell half makes native Windows a supported platform, so
   this entry inherits {Linux, macOS, native Windows} rather than {Linux, macOS}.

@@ -433,17 +433,16 @@ jobs:
   # RELOCATION and is recorded as owed rather than dropped — read the absence as
   # sequencing, not as an oversight to quietly fill in.
   #
-  # **The continue-on-error posture is chosen here, not inherited from the sibling
-  # above.** That job's non-binding status is what let a manifest defect survive
-  # seventeen unread rounds, and acquiring the same posture by proximity would
-  # repeat the cost, so it is argued instead: the bootstrap this job drives has
-  # never executed anywhere, because the repository that authored it has no
-  # PowerShell to run it on, so this job's first run is that code's first run and a
-  # binding red would spend a watched push on the very defect the leg exists to
-  # surface. That is a one-run reason with an expiry. **Drop this line on the first
-  # run it is observed green, and not before.** Until then read it JOB-KEYED: a
-  # continue-on-error job concludes `failure` while its workflow concludes
-  # `success`, which is exactly how the sibling above went unread.
+  # **This leg is BINDING, and it was non-binding for exactly one run.** The
+  # continue-on-error it carried was argued rather than inherited: the bootstrap
+  # this job drives had never executed anywhere, because the repository that
+  # authored it has no PowerShell to run it on, so its first run was that code's
+  # first run and a binding red would have spent a watched push on the very defect
+  # the leg exists to surface. That reason carried its own expiry — drop the line
+  # on the first run observed green — and the expiry fired: run `34142337941`
+  # concluded this job `success` with all eight checks `ok`, so the line is gone.
+  # It is not re-added without a fresh argument; a leg that has run green once is
+  # not in the position that bought the exemption.
   #
   # **The setup steps are bash and that is not a breach of the standing "assume no
   # POSIX shell" obligation**, which binds the BOOTSTRAP and not the publisher.
@@ -452,7 +451,6 @@ jobs:
   # checkwright.ps1 — and that step is pwsh, reading only the packed tarball.
   install-smoke-powershell:
     runs-on: windows-latest
-    continue-on-error: true
     timeout-minutes: 45
     permissions:
       contents: read
