@@ -242,9 +242,13 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
 ( cd "$cw" && sha256sum -c checkwright-X.Y.Z.tgz.sha256 && tar -xzf checkwright-X.Y.Z.tgz )
 
 bash "$cw/package/bin/checkwright.sh" init  # from your repository root
-bash gate-sdk/bin/run-gates.sh --install-hooks   # opt this clone into the generated hook
-bash gate-sdk/bin/run-gates.sh              # the battery, green on what was just vendored
 ```
+
+`init` ends by printing the commands that finish the setup, one per line with its
+reason beside it. They are not copied here on purpose: what `init` prints is
+`init`'s to say, and a second copy on this page is a string a rename has to be
+remembered to move (installer/README.md §init states the rule and the consumer
+smoke asserts the printed block rather than a copy of it).
 
 Unpack outside the repository rather than inside it. `init` refuses a worktree
 that is not clean, and an extracted `package/` sitting in your root is untracked
