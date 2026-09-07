@@ -77,9 +77,11 @@ one malformed row knows whether the run held one or four hundred.
 
 **The sampler's other two members are kept.** This is the half of the entry's option (a) that is
 load-bearing: the first disagreeing path and the artifact row answer different questions from the
-verdict's row, and the artifact row in particular is the filter-free control the section builds
-its whole content argument on (`installer/README.md:1511`). A sampler narrowed to the verdict's
-row would buy the verdict's legibility with the control.
+verdict's row, and the artifact row in particular is the discriminating case the section's
+binary-conversion argument rests on (`installer/README.md:1395-1409`) — distinct from the artifact
+*digest* recompute at `:1511-1522`, a separate filter-free control this delta does not touch. A
+sampler narrowed to the verdict's row would buy the verdict's legibility with the discriminating
+case.
 
 ### (3) The refusal names its operand instead of describing its class
 
@@ -135,7 +137,10 @@ changes.
   loop, assigning on its first firing only. It is produced exactly where the flag it replaces is
   produced, so no new code path and no enabling configuration is minted — the arm is failure-path
   code with no knob, which is deliberate and is the section's own standing rule (*a report
-  enabled by a configuration no CI job sets is the dead-producer shape*).
+  enabled by a configuration no CI job sets is the dead-producer shape*). `assert_install()`'s own
+  `local` declaration at `:275` currently scopes the one scalar it replaces; both new names join
+  that same line, or they leak as globals across the per-profile loop that calls this function once
+  per profile.
 - **Consumers, two, at two named transitions.** `manifest_report()` receives it as an operand and
   prints it as a sample (delta 2), read by a human reading the failing job's log; and the
   `blocked` call at `:334` reads its path field into the refusal message (delta 3), read by the
@@ -145,12 +150,12 @@ changes.
   the refusal message, `want` and `got` by `held_probe` at `:236-237`. No field is added to the
   tuple, so none is unread.
 
-**New state: `malformed_n`, the count (deltas 1, 3, 4).**
+**New state: `malformed_n`, the count (deltas 1, 2, 3, 4).**
 
 - **Producer.** The same failure branch, incremented on each entry failing the shape test.
-- **Consumer.** The report's header line and the refusal message; its reader is the human, at the
-  transition delta 4's own record names — close, reading `install-smoke-windows`'s log off the run
-  its own push produced.
+- **Consumer.** The report's header line (delta 2) and the refusal message (delta 3); its reader is
+  the human, at the transition delta 4's own record names — close, reading
+  `install-smoke-windows`'s log off the run its own push produced.
 - **Its red condition, and why the field is not merely informational.** Nothing reds on the count;
   it discriminates two readings of one red. That is a field whose reader is a person rather than a
   gate, which is admitted here because the whole report is that kind of artifact — and it is
@@ -160,7 +165,8 @@ changes.
 **The verdict's evidence-side reader, and the honest limit that has to be stated here.**
 `scripts/evidence-config.sh:22` gives the `installer_smoke` suite the parser
 `bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log …`, and the custom-parser arm at
-`native/src/evidence.rs:114-122` never references the process status it is handed. So the
+`native/src/evidence.rs:119-132`, the `_` match arm reached for any non-bundled parser value, never
+references the process status it is handed. So the
 evidence row is derived from the log's arm headers alone, and **exit 1 and exit 2 are
 indistinguishable to it**. The distinction is real for CI's job verdict and for a human reading
 the log, and it is invisible to `--run-validate`'s evidence. This amendment changes nothing about
@@ -193,7 +199,9 @@ other rebases on it rather than on this text.
   `:1457` (deltas 1 and 4); the round record at `:1534-1625`, which gains the drain sentence and
   loses nothing (delta 4); and the new run-wide-verdict rule (delta 4).
 - `installer/consumer-smoke/run-smoke.sh` — the manifest arm at `:319-336`, `manifest_report()`
-  at `:197-268`, and the three `# spec:` comments at `:324`, `:329` and `:332` (all deltas).
+  at `:197-268`, `assert_install()`'s `local` declaration at `:275` (which scopes the two new names
+  in place of the one it replaces), and the three `# spec:` comments at `:324`, `:329` and `:332`
+  (all deltas).
 <!-- update-target-exempt: the drop condition is a green observation this amendment expressly declines to make -->
 - `.github/workflows/gates.yml` — **deliberately untouched**; the `continue-on-error` line's own
   comment conditions its removal on the run the leg is first observed green, and green is what

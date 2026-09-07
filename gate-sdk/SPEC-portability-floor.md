@@ -62,8 +62,12 @@ matches a configured banned-construct pattern, except at a site carrying a decla
   consumer may legitimately empty, and a coupling glob matching nothing is a red.
 - **Module** `native/src/gates/portability_floor.rs`. Born native, no shell form authored: a
   crate-carrying tree births a gate native by default and none of the exception classes at
-  gate-sdk/SPEC.md §The port-candidate criteria applies — the corpus reaches no gate declaration
-  path, so criterion 4 clears, exactly as it did for `check-tree-terms`.
+  gate-sdk/SPEC.md §The port-candidate criteria applies — the corpus is five named roots, none of
+  them a `.gate` descriptor or a `native/src/gates/*.rs` module, so it reaches no gate declaration
+  path and criterion 4 clears, on the same reading `check-amendment-update-target` gives its own
+  corpus (canon-kit/SPEC.md §check-amendment-update-target) — not `check-tree-terms`, whose corpus
+  is `git ls-files` over the whole tracked tree and is the register's widest **bound** instance
+  under this same criterion (gate-sdk/SPEC.md §The port-candidate criteria, criterion 4).
 - **Verdict.** Exit 1 on a matching site with no valve, reporting `path:lineno:line` and the
   pattern that matched. Exit 2 on the fail-closed set: a corpus member that is not readable, a
   pattern file that is not readable, and a pattern the ERE engine refuses at compile — the same
@@ -141,10 +145,13 @@ and what the construct is doing there.
 
 Every projection a new gate stales is regenerated in the landing unit {mechanical}.
 
-`docs/site-architecture.md` §Generated projections and their freshness gates owns the roster and
-each row prints its own command on red; the members a new gate touches are the on-site SPEC
-mirror, `docs/enforcement.md`, `docs/value.md`'s rollup block, `docs/check-graph.html`,
-gate-sdk's `README.md` gate-roster block, gate-sdk's `smoke/install.sh` expected-gate roster, the
+Two rosters, each owned where the section itself draws the line. gate-sdk's own kit-landing
+checklist (gate-sdk/SPEC.md) covers the kit-side obligations — the SPEC section, the `good/`+`bad/`
+pair, `smoke/`, registration in `scripts/gates.list`, and gate-sdk's own `README.md`
+`<!-- gate-roster:begin -->` block. `docs/site-architecture.md` §Generated projections and their
+freshness gates is explicitly silent on that block and owns a disjoint set instead, each row
+printing its own command on red: the on-site SPEC mirror, `docs/enforcement.md`, `docs/value.md`'s
+rollup block, `docs/check-graph.html`, gate-sdk's `smoke/install.sh` expected-gate roster, the
 `ported-gate-members` measured claim in `docs/install.md`, and — this gate being `tier=precommit`
 — the generated pre-commit hook. **The two hook-and-binary regenerations are staging-ordered**:
 both derive through `git ls-files`, so the unit stages its new files first and regenerates second.
@@ -218,11 +225,17 @@ repo's layout as the defaults, which is the convention as written.
   defaults (delta 2).
 - `gate-sdk/SPEC.md` §check-tree-terms — the sentence naming the pattern-file mechanism's
   consumers, which is no longer a pair (deltas 1 and 2).
-- `gate-sdk/README.md` — the `<!-- gate-roster:begin -->` block (delta 4).
+- `gate-sdk/README.md` (kit-landing checklist's gate-roster block), the on-site SPEC mirror,
+  `docs/enforcement.md`, `docs/value.md`'s rollup block, `docs/check-graph.html`,
+  `smoke/install.sh`'s expected-gate roster, `docs/install.md`'s `ported-gate-members` claim, and
+  the generated pre-commit hook — delta 4's full regenerated fan-out, none hand-edited, all
+  mechanized by the commands each freshness gate itself names on red.
 - `docs/install.md` §Requirements — the declared-construct paragraphs at `:103-107` and
   `:179-186`, which gain the coupling sentence naming the valve that cites them (delta 3).
 - `installer/lib/init.sh`, `context-kit/lib/toolfloor.sh`, `gate-sdk/lib/gate.sh`,
-  `gate-sdk/bin/gen-pre-commit.sh` — the six declared sites, each gaining its valve (delta 3).
+  `gate-sdk/bin/gen-pre-commit.sh` — the six declared sites, each gaining its valve (delta 3);
+  `gate-sdk/lib/gate.sh` additionally gains the two knobs' resolution and `GATE_SDK_KNOB_*`
+  bridging (delta 2).
 - `scripts/gates.list`, `scripts/gate-sdk-config.sh`, `scripts/portability-patterns.list`,
   `gate-sdk/checks/check-portability-floor.gate`, `native/src/gates/mod.rs` — registration and
   this repo's own config (deltas 1, 2 and 4).

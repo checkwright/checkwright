@@ -159,11 +159,12 @@ neither restates.
   gains the arm in its running order (deltas 2 and 3).
 - `installer/lib/init.sh` — the follow-up block at `:426-428` and its `# spec:` coupling to the
   grammar's new home (delta 1).
-- `installer/consumer-smoke/run-smoke.sh` — `assert_install()` at `:274` onward, the block
-  immediately after `:280`, and the `# spec:` comment stating why the arm rides the first `init`
-  and not the re-run (delta 2).
+- `installer/consumer-smoke/run-smoke.sh` — the block immediately after `:280`, inside
+  `assert_install()` (which opens at `:274` but is otherwise untouched — the sibling amendment owns
+  its `:319-336`), and the `# spec:` comment stating why the arm rides the first `init` and not the
+  re-run (delta 2).
 <!-- update-target-exempt: the gate's stated corpus is markdown fences and this unit deliberately covers a surface no markdown gate can reach -->
-- `gate-sdk/SPEC.md` §check-docs-cmd — **deliberately untouched**. Its fence-scope limit is
+- `canon-kit/SPEC.md` §check-docs-cmd — **deliberately untouched**. Its fence-scope limit is
   correct as it stands and this unit is not a re-filing of it; a printed format string in shell
   source is outside any markdown-fence corpus by construction, and widening that gate to reach one
   would be a different unit with a different oracle.
