@@ -437,17 +437,60 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    specific value or structure reconstructed from the prior artifact because no
    doc owns it.
 2. **Triage (close)** — `templates/close-knowledge.md`, spliced into the
-   consumer's close skill (the close-triage/close-brevity pattern): walk
-   the log; for each entry, the remediation is a **doc-owner edit** — give
-   the fact a home under the consumer's tier contract (canon-kit's star
-   topology: one owner per fact), or a pointer from where the session
-   looked to where the owner is. Never a standing session-start
-   instruction: that converts one re-derivation into a permanent
+   consumer's close skill (the close-triage/close-brevity pattern): walk the
+   log and, per entry, **re-verify before remediating** — name the claim the
+   remediation turns on, name the command that establishes it, run that
+   command, and remediate against what it returned. The ground is the
+   sibling's and is cited rather than restated:
+   lifecycle-kit/SPEC.md §The committed gap inbox rules the same obligation for
+   the other frictionless capture channel, on an argument about cheap capture
+   that is not specific to gaps. What this section owns is the obligation's
+   shape *for this channel*. **Why the drain and not the capture** is that same
+   asymmetry: the whole value of the affordance above is that stamping costs
+   less than deferring, so a check at capture time is paid on every capture and
+   buys accuracy with the capture rate the loop depends on, while the drain is
+   paid once per entry by a session already reading the entry to place the fact.
+   **A capture carries two claims, and the second is the one that routes the
+   fix.** A logged line is `<date> <fact> ← <surface>`, and that second field is
+   an implicit **ownership claim** — *this fact has no owner, or its owner is
+   not the surface I read it off* — which the sibling channel's bullets have no
+   analogue for and its rule therefore never names. Both limbs are checked, and
+   the remediation is keyed on which one fell:
+   - **Both hold** — a **doc-owner edit**: give the fact a home under the
+     consumer's tier contract (canon-kit's star topology: one owner per fact).
+   - **The fact is false** — no doc-owner edit. The entry is dropped with the
+     correction recorded, and a false fact that already reached a governed
+     surface is a *work-shaped* finding routing to the consumer's committed gap
+     channel, never fixed silently inside a triage step.
+   - **The fact holds and the ownership clause does not** — a pointer from
+     where the session looked to where the owner is, and never a second home
+     for a fact that already had one. The shape is not new; what the
+     re-verification adds is that a check *selects* it, rather than the filer's
+     own clause selecting it unchecked.
+   - **No cheap command settles either limb** — remediate the entry *as a
+     claim*: say so, and let whatever it produces carry the unverified premise
+     openly. A drain blocked on an unsettleable claim converts a cheap loop
+     into a stalling one.
+   **No remediation above is ever a standing session-start
+   instruction:** that converts one re-derivation into a permanent
    per-session tax, exactly what context-kit's brevity machinery rejects.
    **This is a rule about standing instructions, not a rule about triage** — it
    binds the **capture** side identically, which is why a per-stage capture
    prompt is refused below rather than reconsidered each time the log reads
    empty.
+   **The outcome is recorded where the dispositions are recorded** — the close
+   commit that clears the log states which entries were re-verified and what
+   fell. Without that the obligation is unobservable: a triage that silently
+   re-verified and one that silently did not leave identical trees, the log
+   being cleared either way and the doc-owner edit looking the same. It rides
+   the commit message rather than a file because the log is gitignored scratch
+   reclaimed in the same motion, so a record placed *in* the channel is erased
+   by the channel's own reclaim. **The honest limit, stated here rather than
+   left to be discovered:** this is an authoring obligation attested by a commit
+   message, not a gate — nothing mechanizes *a command was run*, and a session
+   attesting to its own diligence in a parsed field is worth less than the rule.
+   That is the limit lifecycle-kit states for its own channel too, so the
+   missing gate is the sibling's posture rather than this obligation's debt.
    Then clear the log — its named reclaim path. Nothing refuses a close that
    skips the walk, so the log declares itself advisory on the close-surface
    roster (lifecycle-kit/SPEC.md §The close-surface roster) with that clear as

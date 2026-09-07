@@ -12,61 +12,6 @@
 
 ## New Features
 
-- **kfric-capture-unverified-assertion** [spec: SPEC-kfric-drain.md] — the knowledge-friction
-  channel has
-  no oracle, so it captures whatever a session asserts and the next reader reads it as measured.
-  **Self-witnessed this iteration, with both halves in the log at once.** A build batch stamped
-  the consumer smoke's cost as "~50-60 minutes" and reasoned from it that the run serializes
-  against all tracked editing for that window. Validate measured it twice independently at
-  **227s** and superseded the entry in place rather than deleting it, so the log now carries the
-  mis-derivation beside its correction — which is what makes this filable rather than anecdotal.
-  **The mis-derivation is the more interesting artifact.** The figure was disprovable from
-  evidence already in front of every reader: the reporting batch's own total session runtime
-  was ~26 minutes, so a 50-60 minute sub-step could not have fitted inside it. It was relayed
-  onward unchecked and shaped two sessions' scheduling before validate measured it.
-  Distinct from `kfric-empty-log-ambiguity`, retired, which is about an *empty* log's two readings;
-  this is about a populated one whose entries carry no distinction between a measurement and an
-  estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
-  sweep *cites*; this covers what a session captures about its own work.
-  recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
-  **THIRD INSTANCE, 2026-09-06, and it is a wrong OWNERSHIP claim rather than a wrong fact.** The
-  capture's fact — `run-gates.sh` refuses a working directory outside a checkout — is true; what is
-  false is the clause beside it, "no gate-sdk/SPEC.md section states it". That section had stated it
-  since `121e76cb`, 2026-09-04, landed by *this same triage loop* two days earlier. The axis this
-  adds: a capture's ownership clause is what routes the drain's remediation, so a false one buys a
-  duplicate home for a fact that already had one — the shape the star topology exists to refuse.
-  **SECOND INSTANCE, 2026-08-28, and it is a wrong MECHANISM rather than a wrong number.** A kfric
-  stamped at spec asserted that `check-stage-entry` assertion C's component dir is a directory
-  holding `LIFECYCLE_KIT_ROSTER_BASENAME`, so `installer/` and `native/` are not components; close's
-  remediation wrote that into `lifecycle-kit/SPEC.md` §check-stage-entry as a definition. It is
-  false against `native/src/gates/stage_entry.rs`: the roster is consulted as a predicate at exactly
-  one site, :185; the multi-file arm returns at :147 on `amend_dirs.len() >= 2` with no roster test;
-  and the single-amendment arm seeds `comps` with `dir(af)` unconditionally at :172. Corrected in
-  the same close. So the harm this entry's cost line predicts is now attested on a governed kit
-  SPEC, not only on a scratch log.
-  **That instance opens a SECOND deliverable axis, on the DRAIN rather than on capture.**
-  `drift-kit/templates/close-knowledge.md` tells close to remediate each entry as a doc-owner edit
-  and never to re-verify the entry's claim, while lifecycle-kit/SPEC.md §The committed gap inbox
-  makes exactly that re-verification mandatory for the other frictionless capture channel, on an
-  argument that transfers verbatim — capture is deliberately cheap, so nothing upstream established
-  the claim. Two channels, one property, one guard.
-  **Deliverable, and the capture-side design question this amendment leaves unruled:** whether the
-  affordance should carry a measured-vs-estimated distinction at all. The whole value of
-  the `--emit-kfric` affordance is that stamping is cheaper than deferring, so a field that slows
-  capture buys accuracy with the capture rate the loop depends on. A convention may beat a flag.
-  **Cost while deferred:** an unverified assertion in the log is indistinguishable from a
-  measurement, and close's own triage is chartered to promote it into a doc-owner edit — which
-  is the channel by which a wrong number reaches a canonical surface with a citation on it.
-  **AT THRESHOLD 2026-09-07 AND TAKEN IN PART — `lead, own-authority`, relayed in dispatch: the
-  DRAIN-SIDE AXIS ONLY**, the one above needing no design ruling because the argument transfers
-  verbatim from the sibling channel's already-mandatory re-verification. **The capture-side question
-  is UNTOUCHED and this entry is NOT spent** — the measured-vs-estimated call is unruled and returns
-  by the conserved route, so the terminal move at merge is a DEMOTION and never a `## Done` move.
-  Filed 2026-08-09 by close, from its own knowledge-friction triage.
-  Promoted 2026-09-07 by spec on the drain axis alone. The amendment adds the limb the sibling's
-  rule has no reason to name: a capture's SURFACE field is an ownership claim, it is what routes the
-  remediation, and the 2026-09-06 instance is the case where the fact held and that clause did not.
-
 ## Technical Debt
 
 ## Deferred
@@ -3732,6 +3677,45 @@
   worse than none — and it is the first command a cautious adopter runs, which is the same
   first-contact surface the profile work is being bought to improve.
   Filed 2026-08-09 by close, draining the build stage's bullet.
+
+- **kfric-capture-unverified-assertion** [design-pending] — the knowledge-friction channel has
+  no oracle, so it captures whatever a session asserts and the next reader reads it as measured.
+  **The DRAIN-side axis is LANDED**, 2026-09-07, in `drift-kit/SPEC.md` §The knowledge-friction
+  loop and `templates/close-knowledge.md`: the drain re-verifies both limbs of a capture — the fact
+  and the ownership clause its surface field asserts — and records the outcome in the close commit.
+  **What returns here is the capture-side question alone, and it is unruled:** whether the
+  affordance should carry a measured-vs-estimated distinction at all. The whole value of
+  `--emit-kfric` is that stamping is cheaper than deferring, so a field that slows capture buys
+  accuracy with the capture rate the loop depends on. A convention may beat a flag — and
+  lifecycle-kit/SPEC.md §The committed gap inbox has **already refused both obvious shapes** for
+  the sibling channel, a filing-time prompt and a fact-versus-inference grammar, so a proposal
+  here argues against a recorded refusal or finds a third shape.
+  recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
+  **Three attested instances, each falling on a different limb.** A build batch stamped the
+  consumer smoke's cost as "~50-60 minutes" and reasoned that the run serializes against all
+  tracked editing for that window; validate measured **227s** twice. The figure was disprovable
+  from evidence already in front of every reader — the reporting batch's own session runtime was
+  ~26 minutes — and was relayed onward unchecked, shaping two sessions' scheduling.
+  2026-08-28, a wrong MECHANISM rather than a wrong number: a kfric asserted that
+  `check-stage-entry` assertion C's component dir is one holding `LIFECYCLE_KIT_ROSTER_BASENAME`,
+  and close's remediation wrote that into lifecycle-kit/SPEC.md §check-stage-entry as a
+  definition. It is false against `native/src/gates/stage_entry.rs`, whose multi-file arm returns
+  on `amend_dirs.len() >= 2` with no roster test. Corrected in the same close — so the harm is
+  attested on a governed kit SPEC, not only on a scratch log.
+  2026-09-06, a wrong OWNERSHIP claim rather than a wrong fact: the fact held and the clause beside
+  it, "no gate-sdk/SPEC.md section states it", did not — that section having stated it since
+  `121e76cb`, two days earlier, landed by this same triage loop.
+  Distinct from `kfric-empty-log-ambiguity`, retired, which is about an *empty* log's two readings;
+  this is about a populated one whose entries carry no distinction between a measurement and an
+  estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
+  sweep *cites*; this covers what a session captures about its own work.
+  **Cost while deferred:** an unverified assertion in the log is still indistinguishable from a
+  measurement. The drain axis caught the channel by which a wrong number reaches a canonical
+  surface with a citation on it; it did not make the log itself readable, so every consumer of a
+  captured line before the drain still reads an estimate as a measurement.
+  Filed 2026-08-09 by close, from its own knowledge-friction triage. Promoted 2026-09-07 by spec
+  on the drain axis alone — `lead, own-authority`, relayed in that iteration's dispatch — and
+  demoted at merge with that axis landed and this one untaken.
 
 - **knob-default-accessor-singularity** [design-pending] — the missing check class
   behind two knob-default re-spellings drained this iteration.

@@ -69,8 +69,9 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
    `--help`: the usage is here and in the SPEC. Raw append stays legal
    (drift-kit/SPEC.md §The knowledge-friction loop).
 2. Gitignore the log (per-iteration scratch), and splice
-   `templates/close-knowledge.md` into your close skill so each entry becomes a
-   doc-owner tiering edit and the log is cleared — its reclaim path.
+   `templates/close-knowledge.md` into your close skill so each entry is
+   re-verified, becomes the tiering edit or the correction that outcome selects,
+   and the log is cleared — its reclaim path.
 
 ## Use
 
