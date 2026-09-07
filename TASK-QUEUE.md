@@ -10235,7 +10235,4 @@
 
 ## Done
 
-- manifest-shape-predicate-and-rendering-disagree
-- init-vendor-staging-argv-overflow
-
 ## Lessons Learned
