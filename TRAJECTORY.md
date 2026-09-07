@@ -73,6 +73,28 @@ gate. What the boundary buys is that a session meeting an aged fact inside a liv
 ruling now has an answer other than stopping, and a session tempted to re-decide
 still has to write down that it is only correcting.
 
+**The fourth act is annotation, and it is the one the three above leave
+unnamed — ruled 2026-09-07 by the operator, answered in a lead session and
+relayed by the lead.** Where a closed ruling's stated **ground** turns out to
+have been false when the ruling was taken, and the ruling's **conclusion is
+unchanged**, the ground is annotated beside the ruling and the ruling's own text
+is left standing. **Session-class**, on the same test as correction: it decides
+nothing, since what the ruling directs does not move. Both alternatives were
+weighed and refused. Repairing the ground where it stands rewrites a closed
+ruling and hides that the ground was ever wrong — which is what a later reader
+judging that ruling needs most. Leaving it unannotated is refused too, because
+the next composing session re-derives the same finding and re-escalates a
+question already answered.
+
+**Why this does not contradict the never-append rule below, and the price it
+accepts.** That rule governs a fact that has **aged**: the world moved, the old
+reading is simply wrong now, and correcting it in place loses nothing. A ground
+that was wrong at its writing is the other case, and correcting it in place
+loses the only record that it was. The price is real and is the one that rule
+names — two readings of one fact, which is why this act is bounded to a ground
+whose conclusion survives it. A ruling whose **conclusion** does not survive is
+not annotated: that is reversal, and the bullet above owns it.
+
 **Where the grounds live.** A ruling whose mechanism already has a canonical
 home is registered here with a pointer to that home rather than restated —
 one owner per fact, as everywhere else. What this file *owns* is what has no
@@ -712,6 +734,23 @@ triaged after the port, as one iteration** that iceboxes by class and retires wh
 or a closed ruling has mooted; joining units under the grounds above is work on the pool, not that
 triage. Discharge event: the oracle's owed count reads zero, at which point the port-cut-first
 clause is spent and this paragraph is deleted; the composition test is the kit's and stays.
+
+**The 2026-09-06 no-cut ruling on `native-gate-port-remaining-corpus` reached
+the right conclusion from a ground the disjunction above does not bear —
+annotated 2026-09-07 by the operator, answered in a lead session and relayed by
+the lead, under the fourth act at the head of this file.** That ruling reads
+*empty-column, both fire*, and it is clause (8) on the entry, where its own text
+stands unedited. **The first limb is false, and its falsity did not age into
+place — the same members were held on the day the ruling was taken.** The
+reachable column is not empty; what is true of its members is that every one is
+**held** by a stated precondition in its owning section, which is a different
+fact with a different consequence — a held column can be emptied by one ruling,
+an absent one cannot. No figure is carried here for the reason the paragraph
+below already gives: run the oracle. **The second limb fires alone**, and it
+carries the conclusion by itself: the port's next act is
+`powershell-installer-surface`, an own-iteration leg. **So the ruling's
+conclusion is unchanged** — the disjunction asks for one limb, no cut was
+takeable, and the window was the deferred pool's, exactly as ruled.
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
