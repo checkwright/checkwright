@@ -72,6 +72,12 @@
   **Cost while deferred:** the Windows leg stays continue-on-error and unassertable — that
   iteration explicitly declined to assert it green — so every later round re-buys a verdict whose
   operand cannot be read. Blocks no stage entry and no push.
+  **PROPOSED AT SCOPE AND TAKEN 2026-09-07 — `lead, own-authority`, relayed in this session's
+  dispatch**, on the product-class ground and same-surface with the two installer entries beside
+  it. It also carries the iteration's sequencing weight: `install-smoke-windows` is the file's only
+  `continue-on-error: true` leg (`gates.yml:207`), so while this arm cannot state a readable
+  verdict the Windows leg cannot be asserted — the ground on which the same ruling gave this window
+  to deferred entries rather than to `powershell-installer-surface`.
   Filed 2026-09-06 by the same close, off Windows round 15's own log rather than off a stage
   surface; no stage of `index-runner-hold-release-and-windows-smoke-comparison` could drain it, so
   it carried into this iteration's scope intake and is promoted here one iteration late.
@@ -3749,6 +3755,11 @@
   **Cost while deferred:** an unverified assertion in the log is indistinguishable from a
   measurement, and close's own triage is chartered to promote it into a doc-owner edit — which
   is the channel by which a wrong number reaches a canonical surface with a citation on it.
+  **AT THRESHOLD 2026-09-07 AND TAKEN IN PART — `lead, own-authority`, relayed in dispatch: the
+  DRAIN-SIDE AXIS ONLY**, the one above needing no design ruling because the argument transfers
+  verbatim from the sibling channel's already-mandatory re-verification. **The capture-side question
+  is UNTOUCHED and this entry is NOT spent** — the measured-vs-estimated call stays
+  `[design-pending]` and returns by the conserved route.
   Filed 2026-08-09 by close, from its own knowledge-friction triage.
 
 - **knob-default-accessor-singularity** [design-pending] — the missing check class
@@ -5639,28 +5650,28 @@
   **ANSWERED 2026-08-19 at scope: the clause is GENERAL, not entry-specific** — a
   threshold-recurrence routing rule every recurrence-carrying entry inherits, not prose belonging
   to the entry whose subject (guard-kit rule 14) is resolved. Ruled by the iteration lead as a
-  routing call rather than a fresh envelope one: the 2026-08-17 operator ruling delegated the home
-  decision to scope, so recording the answer here **discharges** that delegation. Grounds: the
-  clause completes the scope contract's own threshold paragraph, which already puts a
-  threshold collision "in front of the authority this stage already escalates to" and stops short
-  of saying where that authority changes. Exercised again at this very scope, which is the
-  evidence rather than the argument: `stage-stamp-ordering-unenforced`, since landed and retired,
-  stood at three recurrences and its last two declines were the operator's, not a lead's.
+  routing call, not a fresh envelope one: the 2026-08-17 operator ruling delegated the home decision
+  to scope, so recording the answer here **discharges** it. Grounds: the clause completes the scope
+  contract's own threshold paragraph, which already puts a collision "in front of the authority
+  this stage already escalates to" and stops short
+  of saying where that authority changes. Its exercising instance,
+  `stage-stamp-ordering-unenforced`, has since landed and retired — recover it from git history.
+  **THE TWO-STEP READING IS SETTLED — `lead, own-authority` 2026-09-07 at scope, derived from the
+  surfaces and not from precedent:** the scope contract's "regardless of theme" governs the
+  PROPOSAL step, TRAJECTORY.md §PRIORITY DIRECTIVE's joining ground the PROMOTION step.
   **What is NOT decided here, deliberately.** The clause is not landed in lifecycle-kit's scope
   contract by this stage or this iteration; that stays a feature-shaped unit for a later one, and
   this entry stays its carrier meanwhile.
   **Two homes were probed and refused at build**, and the refusals are not rejections of the
-  options — recorded that way so a later reader does not mistake one for the other. A live queue
-  entry was blocked at that build because the candidate host stood at zero lines of headroom under
-  `check-queue-entry-budget`; **that host has since closed and left the live tree**, so the option
-  is now absent rather than full — a stronger refusal on a different ground, corrected 2026-08-24
-  at close rather than left reading as a cap problem a later reflow could solve.
-  TRAJECTORY.md is refused by CLAUDE.md's own scoping sentence, which admits
-  **closed** operator rulings while this one is explicitly open — choosing it means amending
-  that sentence, a governance edit rather than a move. lifecycle-kit's scope contract was
-  refused as envelope-class: that was a **build session correctly declining an envelope call it
-  had no authority to make**, and with the general/entry-specific question now answered it is the
-  live candidate home rather than a closed one.
+  options. A live queue entry was blocked at that build because the candidate host stood at zero
+  headroom under `check-queue-entry-budget`; **that host has since closed and left the live tree**,
+  so the option is absent rather than full — a stronger refusal on a different ground, corrected
+  2026-08-24 at close rather than left reading as a cap problem a reflow could solve.
+  TRAJECTORY.md is refused by CLAUDE.md's own scoping sentence, which admits **closed** operator
+  rulings while this one is explicitly open — choosing it means amending that sentence, a governance
+  edit rather than a move. lifecycle-kit's scope contract was refused as envelope-class: a **build
+  session correctly declining an envelope call it had no authority to make**, and with the
+  general/entry-specific question answered it is the live candidate home rather than a closed one.
   **DISTINCT from `waiting-rule-fourth-firing-post-fix`**, which is Done: that entry owned the
   residency rule's enforcement and got it; this owns where its escalation-routing clause lives,
   which the Done move is what puts at risk.
@@ -8657,13 +8668,12 @@
 - **amendment-roster-omission-detection** [design-pending] — an amendment's `## Existing sections
   updated` roster can be short by a surface, and only a grep finds the missing one.
   **Returned from the icebox 2026-08-29 on a recurrence that broke the cost line it was iceboxed
-  under.** That cost said the class is bounded and self-limiting because "the miss is caught by the
-  next reader who greps". This iteration it was not: guard-kit's rule-19 insertion renumbered rules
-  19-23 to 20-24, the sweep's roster held the kit and not the queue, and **six cross-corpus
-  citations shipped stale** — five of the scratch-execution rule and one on
+  under.** That cost said the class is bounded because "the miss is caught by the next reader who
+  greps". This iteration it was not: guard-kit's rule-19 insertion renumbered rules 19-23 to 20-24,
+  the sweep's roster held the kit and not the queue, and **six cross-corpus citations shipped
+  stale** — five of the scratch-execution rule and one on
   `guard-rule-number-not-citable-outside-kit`, the entry whose own subject is that decay. Nothing
-  caught them until this close's `internal-identifier-restatement` audit, a full stage after the
-  landing. A shipped miss is a different cost from a caught one.
+  caught them until that close's `internal-identifier-restatement` audit, a full stage later.
   **Three of four amendments this iteration shipped a short roster, and the misses are not one
   shape.** The edge-sum amendment missed three surfaces (a `.gate` spec line, a smoke comment, a
   Rust help string). The wait unit's renumber needed four site classes a `rule <N>` grep does not
@@ -8671,10 +8681,9 @@
   (`rules 14, 15 and 22`), and ordinal prose (`seventeen rules earlier`). The anchor amendment
   missed six roster gaps. So the deriving grep is not merely unrun — for a renumber it is not
   expressible as one pattern, which the entry's literal-substitution slice did not anticipate.
-  **The align-stage rule is doing part of the job, measured.** Align found and fixed one real
-  roster omission this iteration (three README surfaces stale on a deleted shell driver), so the
-  step works where the amendment names a literal. It did not reach the renumber, whose evidence is
-  a numeric relation rather than a literal.
+  **The align-stage rule does part of the job, measured:** it found and fixed one real roster
+  omission this iteration where the amendment named a literal, and did not reach the renumber,
+  whose evidence is a numeric relation rather than a literal.
   **The converse of a retired entry, and the distinction is load-bearing.**
   `amendment-update-target-coverage` owned a roster *entry* naming no owning delta — a listed
   target with no claim. This owns a *target with no entry*, which no scan over the amendment alone
@@ -8682,25 +8691,27 @@
   **Why it stays design-pending:** the general form is not gateable — deciding which surfaces an
   amendment *should* have listed is the semantics of the change. The narrow slice that might be is
   a **literal-substitution** amendment, checkable by grepping the tree for survivors of the old
-  literal not named in the roster; the cost is a new amendment-grammar field every amendment pays
-  whether or not it substitutes anything. What this iteration adds is a second slice the first does
-  not cover: a **renumber**, where the old and new values are a relation over a range and the
-  citations do not share a spelling. Whether one mechanism covers both is the open question.
+  literal not named in the roster, at the cost of a new amendment-grammar field every amendment
+  pays. The second slice is a **renumber**, where old and new are a relation over a range and the
+  citations share no spelling. Whether one mechanism covers both is the open question.
   **FIVE-FOR-FIVE 2026-09-06, every batch of one iteration, and the run is the datum.** Batch 1's
   stale `lifecycle-kit/SPEC.md` §templates/lead.md sentence; batch 2's `spec-pointer-boundary-
   legality` grounding case; batch 2's own gap bullet dangled by its amendment's deletion; batch 3's
-  second `-printf` site in `installer/lib/init.sh`, which the amendment recorded DORMANT and delta 5
-  needed live; and the `gates.yml:229-233` non-Linux over-claim. **Every one was found by grep and
-  none was named by the roster** — so a five-batch run with no roster hit is not a sampling
-  accident, and the entry's own "the deriving grep is not merely unrun" line is now measured rather
-  than argued. What it does NOT show is a detection failure: see
+  second `-printf` site in `installer/lib/init.sh`, recorded DORMANT where delta 5 needed it live;
+  and the `gates.yml:229-233` non-Linux over-claim. **Every one was found by grep and none named by
+  the roster** — a five-batch run with no roster hit is not a sampling accident, so "the deriving
+  grep is not merely unrun" is now measured. It does NOT show a detection failure: see
   `removal-propagation-site-argued-out-of-scope`, where the fifth was found and then dispositioned
-  away, which is a different defect and files as one.
+  away, a different defect that files as one.
   **Cost while deferred:** revised upward from the iceboxing. A short roster now ships, and the
   reader who eventually greps is a later stage or a later iteration, so the stale sentence is
   live in the tree for the whole of that gap.
-  **AT THRESHOLD 2026-09-06 AND ANSWERED — deferred `lead, own-authority` on WINDOW CAPACITY
-  ALONE; class UNSETTLED, NOT machinery: did those six guard-kit citations ever ship tagged?**
+  **THAT DEFERRAL'S OPEN FACT IS PROBED — 2026-09-07 at scope on the lead's instruction: THEY NEVER
+  SHIPPED TAGGED** (renumber `1a23be6c` 2026-08-29, last tag `v0.25.0` 2026-08-23,
+  `git tag --contains` empty), so it stays deferred on the lead's disposition for that branch.
+  **LIMIT:** they missed an adopter only because the release is 1118 commits deferred, so the
+  ATTESTED INSTANCE is settled and the CLASS is not — "would witness" and the not-inherited
+  instruction stand.
   recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06
   Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned
   2026-08-29 by close, the six stale citations verified against guard-kit/SPEC.md at HEAD.
@@ -9476,6 +9487,11 @@
   →icebox failed on the live trigger — first-install is the one path with no operator watching.
   **Cost while deferred:** zero until a printed arm is renamed, then one adopter's failed install
   with no oracle between the rename and them.
+  **TAKEN INTO THE ITERATION 2026-09-07, `lead, own-authority` relayed at scope** — the same
+  product-class ground as its two neighbours, and same-surface with both.
+  The `→fix` refusal above does not survive this window: it failed because close could not buy a
+  validate re-run, and an iteration provides one. Premise re-probed at HEAD — `init.sh:426-428`
+  prints exactly two commands under a `next:` banner and the consumer smoke references neither.
   Filed 2026-09-05 to the gap inbox at build; promoted 2026-09-05 by close.
 
 - **run-validate-child-env-knob-leak** [design-pending] — `--run-validate` passes its whole ambient
@@ -10110,6 +10126,15 @@
   page names — the near-miss the fixed findutils defect identified before it landed.
   **Cost while deferred:** the equality holds only while two hand-maintained lists agree, and the
   reader who notices the disagreement is a macOS adopter rather than a gate.
+  **PROPOSED AT SCOPE 2026-09-07 AND CUT FROM THE SET — scope's own sizing call under the economic
+  composition test, which the lead expressly left to this stage.** Fifth member of a set the window
+  would not hold, and the one cut because it is the only member whose SHAPE is unsettled: the gate
+  needs a floor-member-to-brew-formula mapping surface that does not exist, as the paragraph above
+  says in its own words. **A sizing cut, never a merit one** — its trigger is the sharpest of the
+  five, the leg being BINDING (`gates.yml:434` carries no `continue-on-error`), so it is first back
+  in at the next window. Recorded with the correction it forces: its same-surface pairing with
+  `gnu-ism-on-adopter-install-path-ungated` is weaker than it reads, since the two share a TRIGGER
+  and not a mechanism — one is a blocklist over a named corpus, this is package-set parity.
   Filed 2026-09-06 by build as one of two enforcement-first gaps the macOS leg surfaced; promoted
   here at the 2026-09-06 close drain.
 
@@ -10134,6 +10159,14 @@
   **Cost while deferred:** a GNU-ism reaching the path is invisible until a macOS or BSD adopter
   meets it, or until the macOS leg's next run does — and that leg is binding now, so that run reds
   `master`.
+  **TAKEN 2026-09-07 on the port-first run's product-class-with-a-live-trigger ground —
+  `lead, own-authority`, relayed at scope.** The adopter install
+  path is the witness under TRAJECTORY.md's 2026-08-30 discriminator and the binding macOS leg is
+  the live trigger. Premises re-probed at HEAD rather than inherited — `find -printf` is gone from
+  `installer/lib`, surviving only inside two `# spec:` comments explaining why it is not used,
+  while `sort -V` (`installer/lib/init.sh:70`) and `realpath --relative-to`
+  (`gate-sdk/bin/gen-pre-commit.sh:33`, `gate-sdk/lib/gate.sh:563,575,616`) are live and inside the
+  documented exemption set, so the declared-not-accidental claim above is exact.
   Filed 2026-09-06 by build as the second of two enforcement-first gaps the macOS leg surfaced;
   promoted here at the 2026-09-06 close drain.
 
