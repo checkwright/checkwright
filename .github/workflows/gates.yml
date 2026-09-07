@@ -618,15 +618,20 @@ jobs:
           New-Item -ItemType Directory -Force -Path (Join-Path $root 'scripts') | Out-Null
           $src = (Join-Path $f "payload/artifact/$target/$binname")
           $digest = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant()
+          # The dest name is DERIVED from the artifact name the setup step resolved,
+          # never spelled again here: gate_exe_suffix owns the suffix, and a literal
+          # twin beside a derivation is what double-suffixed this repo's other
+          # Windows leg until it was found by hand.
+          $dest = "scripts/$binname"
           $r = Invoke-Bootstrap $f @('--install','place-artifact','--root',$root,'--src',$src,
-                                     '--dest','scripts/checkwright-gates.exe',
+                                     '--dest',$dest,
                                      '--seam','scripts/gate-sdk-config.sh',
                                      '--target',$target,'--digest',$digest)
           Check "a real --install place-artifact performs a placement and emits its two verbs" `
-                ($r.Code -eq 0 -and $r.Out -match 'own\tscripts/checkwright-gates.exe' -and $r.Out -match 'own\tscripts/gate-sdk-config.sh') `
+                ($r.Code -eq 0 -and $r.Out -match ("own\t" + [regex]::Escape($dest)) -and $r.Out -match 'own\tscripts/gate-sdk-config.sh') `
                 "exit $($r.Code): out=$($r.Out) err=$($r.Err)"
           Check "the placement actually wrote the artifact" `
-                (Test-Path -LiteralPath (Join-Path $root 'scripts/checkwright-gates.exe')) "nothing was written"
+                (Test-Path -LiteralPath (Join-Path $root $dest)) "nothing was written"
 
           Write-Host "== verdict =="
           Write-Host "This leg asserts the five bootstrap steps. It does NOT assert that a"
