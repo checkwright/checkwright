@@ -12,6 +12,175 @@
 
 ## New Features
 
+- **consumer-smoke-manifest-verdict-outruns-its-report** [spec: SPEC-verdict-witness.md] — the
+  manifest arm's `malformed` flag is run-wide while its report samples the first disagreeing path,
+  so the entry earning the exit-2 verdict is by construction one the report never prints.
+  **The witness.** Windows round 15 (run `34054512420`, head `bf1fc722`) exited 2 naming a
+  malformed operand while both sampled entries printed `want`/`got`/`reread`/`own`/`raw` as one
+  byte-identical clean 40-hex, with the `%q` byte rendering unquoted on all ten values. The defect
+  follows from the arm's shape, not from that host.
+  **What the SPEC claims.** installer/README.md §The consumer smoke states the refusal "fires after
+  the report, not at the first bad value, because diagnosing that value is exactly what the report
+  exists for" — and on this evidence it does not diagnose it. Any one of that round's 476
+  disagreements sets the run-wide flag; `manifest_report` samples the first disagreeing path plus
+  the artifact row, and neither is required to be the entry that set it.
+  **RULED AT SPEC 2026-09-07 and the amendment holds the grounds:** carry the malformed entry into
+  the sample set as a WITNESS the flag records, keeping the sampler's other two members; the wider
+  re-shaping of the arm's verdict is refused, since an arm reports through one exit code and the
+  section already refuses refusing early. What that option was right about is kept — a run-wide
+  flag recording only THAT something tripped it is the defect.
+  **The diagnostic series this arm was built for is CLOSED**, which is what makes the next unit on
+  this leg a repair rather than another observation: round 15 read `want` equal to `got`
+  byte-equal, the truth table's fifth row, so the defect is the pairing `bad_hash` records and no
+  further round narrows it.
+  **Cost while deferred:** the Windows leg stays continue-on-error and unassertable — that
+  iteration explicitly declined to assert it green — so every later round re-buys a verdict whose
+  operand cannot be read. Blocks no stage entry and no push.
+  **PROPOSED AT SCOPE AND TAKEN 2026-09-07 — `lead, own-authority`, relayed in this session's
+  dispatch**, on the product-class ground and same-surface with the two installer entries beside
+  it. It also carries the iteration's sequencing weight: `install-smoke-windows` is the file's only
+  `continue-on-error: true` leg (`gates.yml:207`), so while this arm cannot state a readable
+  verdict the Windows leg cannot be asserted — the ground on which the same ruling gave this window
+  to deferred entries rather than to `powershell-installer-surface`.
+  Filed 2026-09-06 by the same close, off Windows round 15's own log rather than off a stage
+  surface; no stage of `index-runner-hold-release-and-windows-smoke-comparison` could drain it, so
+  it carried into this iteration's scope intake and is promoted here one iteration late.
+  Promoted 2026-09-07 by spec, the authoring being the promotion; nothing on this entry needed
+  correcting — both premises re-probed clean at `run-smoke.sh:319-336` and `:197-268`.
+
+- **gnu-ism-on-adopter-install-path-ungated** [spec: SPEC-portability-floor.md] — no gate keeps a
+  GNU-only shell
+  construct off the adopter install path; the live one was found by a hand survey.
+  **The attested instance.** `find -printf` in `installer/lib/init.sh`, both sites, on the path
+  since the loop was written and found only by a spec-stage hand survey 2026-09-06. Fixed the same
+  iteration by the findutils rider; nothing catches the next one entering.
+  **What remains live is DECLARED, not accidental.** `sort -V` and `realpath --relative-to` are
+  named in `docs/install.md` §Requirements — they are the exemption set a gate would carry, not
+  the violations it would find.
+  **The corpus is small and named**, which is what makes this buildable — and spec corrected both
+  halves of the sentence that used to sit here. It is FIVE roots, not four: `installer/lib`,
+  `installer/bin`, `gate-sdk/lib/gate.sh`, `gate-sdk/bin/gen-pre-commit.sh` and
+  `context-kit/lib/toolfloor.sh`, which `installer/lib/doctor.sh:9` runs off the payload and which
+  carries a live `sort -V` — so the four-root roster was short under this entry's own reachability
+  criterion. And guard-kit ships NO blocklist-roster mechanism and no gate at all; the precedent is
+  gate-sdk's `check-commit-msg`/`check-tree-terms` pair over `GATE_SDK_MSG_PATTERN_FILES`.
+  **Open before it can be built:** the blocklist's own membership. A construct list is a vocabulary,
+  and a kit literal spelling one publishes it — so it is consumer config on the
+  `check-graph`/`scripts/graph-vocab.sh` pattern, never a kit array.
+  **DISTINCT from `macos-leg-brew-set-vs-documented-requirements`**, which holds a package set equal
+  to a documented list. This one keeps a construct class off a code path, and it is not
+  macOS-specific: any BSD userland meets it.
+  **Cost while deferred:** a GNU-ism reaching the path is invisible until a macOS or BSD adopter
+  meets it, or until the macOS leg's next run does — and that leg is binding now, so that run reds
+  `master`.
+  **TAKEN 2026-09-07 on the port-first run's product-class-with-a-live-trigger ground —
+  `lead, own-authority`, relayed at scope.** The adopter install
+  path is the witness under TRAJECTORY.md's 2026-08-30 discriminator and the binding macOS leg is
+  the live trigger. Premises re-probed at HEAD rather than inherited — `find -printf` is gone from
+  `installer/lib`, surviving only inside two `# spec:` comments explaining why it is not used,
+  while `sort -V` (`installer/lib/init.sh:70`) and `realpath --relative-to`
+  (`gate-sdk/bin/gen-pre-commit.sh:33`, `gate-sdk/lib/gate.sh:563,575,616`) are live and inside the
+  documented exemption set, so the declared-not-accidental claim above is exact.
+  Filed 2026-09-06 by build as the second of two enforcement-first gaps the macOS leg surfaced;
+  promoted here at the 2026-09-06 close drain.
+  Promoted 2026-09-07 by spec as `check-portability-floor`, born native, vocabulary and corpus both
+  consumer config on the `check-graph` pattern with a per-site declaration valve; the census behind
+  the corrected corpus is in `.workflow/survey-record.md`.
+
+- **installer-printed-followup-commands-uncovered** [spec: SPEC-printed-followup.md] — `init`
+  prints two commands
+  an adopter is told to run next, and no gate in either substrate checks that either resolves.
+  **Probed rather than assumed.** `installer/lib/init.sh` prints both with `printf` and runs
+  neither; `installer/README.md` narrates the same pair. `installer/consumer-smoke/` carries zero
+  references to either arm, so nothing exercises the printed strings, and `check-docs-cmd` cannot
+  reach them either — its subject is a FENCED invoked repo-relative `.sh` path and these are
+  format strings in shell source, not fences.
+  **The exposure is concrete and this iteration moved one of the two.** The hooks cut renamed the
+  opt-in behind one of the printed commands; the cut re-spelled both strings by hand and they are
+  correct today. What is uncovered is the NEXT such move — an adopter follows a command that no
+  longer exists, at the moment they are least able to diagnose it: first install, fresh clone.
+  **DISTINCT from the `check-docs-cmd` fence-scope wording fixed in gate-sdk/SPEC.md §The port
+  candidate criteria's dispatch table at this same close, and not a re-filing of it.** That was a
+  claim about UNFENCED MARKDOWN reading as coverage; this is a printed command inside INSTALLER
+  SHELL SOURCE that no gate's corpus reaches in any form. Rewording the claim settles nothing
+  here, and covering a printf string needs a different oracle.
+  **The fix, named so the entry is takeable:** one assertion in the consumer smoke that each
+  command `init` printed resolves against the payload it just installed — the smoke already
+  captures `init`'s output, so the assertion is short.
+  →fix failed on where the fix has to live: the consumer smoke is an 853-line acceptance harness
+  that builds the crate, packs a tarball and installs it per profile, so adding to it needs a
+  validate re-run this close cannot buy, and that suite already carries a held-constant red.
+  →icebox failed on the live trigger — first-install is the one path with no operator watching.
+  **Cost while deferred:** zero until a printed arm is renamed, then one adopter's failed install
+  with no oracle between the rename and them.
+  **TAKEN INTO THE ITERATION 2026-09-07, `lead, own-authority` relayed at scope** — the same
+  product-class ground as its two neighbours, and same-surface with both.
+  The `→fix` refusal above does not survive this window: it failed because close could not buy a
+  validate re-run, and an iteration provides one. Premise re-probed at HEAD — `init.sh:426-428`
+  prints exactly two commands under a `next:` banner and the consumer smoke references neither.
+  Filed 2026-09-05 to the gap inbox at build; promoted 2026-09-05 by close.
+  **Promoted 2026-09-07 by spec, which corrected one premise and found a second exposure.** The
+  amendment refuses the hand-kept expected pair and takes its operand from `init`'s captured output
+  (`run-smoke.sh:278-280`), so a rename moves the string and the assertion follows it. The second
+  exposure: `installer/README.md:184-189` narrates the pair as `run-gates.sh --install-hooks`
+  where the script prints `bash gate-sdk/bin/run-gates.sh --install-hooks`, so the prose and the
+  print have drifted already, on the doc side, before any rename.
+
+- **kfric-capture-unverified-assertion** [spec: SPEC-kfric-drain.md] — the knowledge-friction
+  channel has
+  no oracle, so it captures whatever a session asserts and the next reader reads it as measured.
+  **Self-witnessed this iteration, with both halves in the log at once.** A build batch stamped
+  the consumer smoke's cost as "~50-60 minutes" and reasoned from it that the run serializes
+  against all tracked editing for that window. Validate measured it twice independently at
+  **227s** and superseded the entry in place rather than deleting it, so the log now carries the
+  mis-derivation beside its correction — which is what makes this filable rather than anecdotal.
+  **The mis-derivation is the more interesting artifact.** The figure was disprovable from
+  evidence already in front of every reader: the reporting batch's own total session runtime
+  was ~26 minutes, so a 50-60 minute sub-step could not have fitted inside it. It was relayed
+  onward unchecked and shaped two sessions' scheduling before validate measured it.
+  Distinct from `kfric-empty-log-ambiguity`, retired, which is about an *empty* log's two readings;
+  this is about a populated one whose entries carry no distinction between a measurement and an
+  estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
+  sweep *cites*; this covers what a session captures about its own work.
+  recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
+  **THIRD INSTANCE, 2026-09-06, and it is a wrong OWNERSHIP claim rather than a wrong fact.** The
+  capture's fact — `run-gates.sh` refuses a working directory outside a checkout — is true; what is
+  false is the clause beside it, "no gate-sdk/SPEC.md section states it". That section had stated it
+  since `121e76cb`, 2026-09-04, landed by *this same triage loop* two days earlier. The axis this
+  adds: a capture's ownership clause is what routes the drain's remediation, so a false one buys a
+  duplicate home for a fact that already had one — the shape the star topology exists to refuse.
+  **SECOND INSTANCE, 2026-08-28, and it is a wrong MECHANISM rather than a wrong number.** A kfric
+  stamped at spec asserted that `check-stage-entry` assertion C's component dir is a directory
+  holding `LIFECYCLE_KIT_ROSTER_BASENAME`, so `installer/` and `native/` are not components; close's
+  remediation wrote that into `lifecycle-kit/SPEC.md` §check-stage-entry as a definition. It is
+  false against `native/src/gates/stage_entry.rs`: the roster is consulted as a predicate at exactly
+  one site, :185; the multi-file arm returns at :147 on `amend_dirs.len() >= 2` with no roster test;
+  and the single-amendment arm seeds `comps` with `dir(af)` unconditionally at :172. Corrected in
+  the same close. So the harm this entry's cost line predicts is now attested on a governed kit
+  SPEC, not only on a scratch log.
+  **That instance opens a SECOND deliverable axis, on the DRAIN rather than on capture.**
+  `drift-kit/templates/close-knowledge.md` tells close to remediate each entry as a doc-owner edit
+  and never to re-verify the entry's claim, while lifecycle-kit/SPEC.md §The committed gap inbox
+  makes exactly that re-verification mandatory for the other frictionless capture channel, on an
+  argument that transfers verbatim — capture is deliberately cheap, so nothing upstream established
+  the claim. Two channels, one property, one guard.
+  **Deliverable, and the capture-side design question this amendment leaves unruled:** whether the
+  affordance should carry a measured-vs-estimated distinction at all. The whole value of
+  the `--emit-kfric` affordance is that stamping is cheaper than deferring, so a field that slows
+  capture buys accuracy with the capture rate the loop depends on. A convention may beat a flag.
+  **Cost while deferred:** an unverified assertion in the log is indistinguishable from a
+  measurement, and close's own triage is chartered to promote it into a doc-owner edit — which
+  is the channel by which a wrong number reaches a canonical surface with a citation on it.
+  **AT THRESHOLD 2026-09-07 AND TAKEN IN PART — `lead, own-authority`, relayed in dispatch: the
+  DRAIN-SIDE AXIS ONLY**, the one above needing no design ruling because the argument transfers
+  verbatim from the sibling channel's already-mandatory re-verification. **The capture-side question
+  is UNTOUCHED and this entry is NOT spent** — the measured-vs-estimated call is unruled and returns
+  by the conserved route, so the terminal move at merge is a DEMOTION and never a `## Done` move.
+  Filed 2026-08-09 by close, from its own knowledge-friction triage.
+  Promoted 2026-09-07 by spec on the drain axis alone. The amendment adds the limb the sibling's
+  rule has no reason to name: a capture's SURFACE field is an ownership claim, it is what routes the
+  remediation, and the 2026-09-06 instance is the case where the fact held and that clause did not.
+
 ## Technical Debt
 
 ## Deferred
@@ -48,39 +217,6 @@
   Filed 2026-09-06 by the close of `index-runner-hold-release-and-windows-smoke-comparison` into
   the gap inbox, which no stage of that iteration could drain; carried into this iteration's scope
   intake and promoted here, so the record is late and says so.
-
-- **consumer-smoke-manifest-verdict-outruns-its-report** [design-pending] — the manifest arm's
-  `malformed` flag is run-wide while its report samples the first disagreeing path, so the entry
-  earning the exit-2 verdict is by construction one the report never prints.
-  **The witness.** Windows round 15 (run `34054512420`, head `bf1fc722`) exited 2 naming a
-  malformed operand while both sampled entries printed `want`/`got`/`reread`/`own`/`raw` as one
-  byte-identical clean 40-hex, with the `%q` byte rendering unquoted on all ten values. The defect
-  follows from the arm's shape, not from that host.
-  **What the SPEC claims.** installer/README.md §The consumer smoke states the refusal "fires after
-  the report, not at the first bad value, because diagnosing that value is exactly what the report
-  exists for" — and on this evidence it does not diagnose it. Any one of that round's 476
-  disagreements sets the run-wide flag; `manifest_report` samples the first disagreeing path plus
-  the artifact row, and neither is required to be the entry that set it.
-  **Why `[design-pending]`:** two shapes, not obviously one. (a) Carry the malformed entry into the
-  sample set so the verdict's own row is always printed — cheap, and it keeps the sampler's other
-  two members. (b) Ask whether a run-wide flag is the right instrument at all when the report is
-  per-entry, which is the wider ruling and re-shapes the arm's verdict rather than its sampler.
-  **The diagnostic series this arm was built for is CLOSED**, which is what makes the next unit on
-  this leg a repair rather than another observation: round 15 read `want` equal to `got`
-  byte-equal, the truth table's fifth row, so the defect is the pairing `bad_hash` records and no
-  further round narrows it.
-  **Cost while deferred:** the Windows leg stays continue-on-error and unassertable — that
-  iteration explicitly declined to assert it green — so every later round re-buys a verdict whose
-  operand cannot be read. Blocks no stage entry and no push.
-  **PROPOSED AT SCOPE AND TAKEN 2026-09-07 — `lead, own-authority`, relayed in this session's
-  dispatch**, on the product-class ground and same-surface with the two installer entries beside
-  it. It also carries the iteration's sequencing weight: `install-smoke-windows` is the file's only
-  `continue-on-error: true` leg (`gates.yml:207`), so while this arm cannot state a readable
-  verdict the Windows leg cannot be asserted — the ground on which the same ruling gave this window
-  to deferred entries rather than to `powershell-installer-surface`.
-  Filed 2026-09-06 by the same close, off Windows round 15's own log rather than off a stage
-  surface; no stage of `index-runner-hold-release-and-windows-smoke-comparison` could drain it, so
-  it carried into this iteration's scope intake and is promoted here one iteration late.
 
 - **measured-marker-cannot-sit-mid-paragraph** [design-pending] — `check-measured-claim` binds its
   marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
@@ -3710,57 +3846,6 @@
   worse than none — and it is the first command a cautious adopter runs, which is the same
   first-contact surface the profile work is being bought to improve.
   Filed 2026-08-09 by close, draining the build stage's bullet.
-
-- **kfric-capture-unverified-assertion** [design-pending] — the knowledge-friction channel has
-  no oracle, so it captures whatever a session asserts and the next reader reads it as measured.
-  **Self-witnessed this iteration, with both halves in the log at once.** A build batch stamped
-  the consumer smoke's cost as "~50-60 minutes" and reasoned from it that the run serializes
-  against all tracked editing for that window. Validate measured it twice independently at
-  **227s** and superseded the entry in place rather than deleting it, so the log now carries the
-  mis-derivation beside its correction — which is what makes this filable rather than anecdotal.
-  **The mis-derivation is the more interesting artifact.** The figure was disprovable from
-  evidence already in front of every reader: the reporting batch's own total session runtime
-  was ~26 minutes, so a 50-60 minute sub-step could not have fitted inside it. It was relayed
-  onward unchecked and shaped two sessions' scheduling before validate measured it.
-  Distinct from `kfric-empty-log-ambiguity`, retired, which is about an *empty* log's two readings;
-  this is about a populated one whose entries carry no distinction between a measurement and an
-  estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
-  sweep *cites*; this covers what a session captures about its own work.
-  recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
-  **THIRD INSTANCE, 2026-09-06, and it is a wrong OWNERSHIP claim rather than a wrong fact.** The
-  capture's fact — `run-gates.sh` refuses a working directory outside a checkout — is true; what is
-  false is the clause beside it, "no gate-sdk/SPEC.md section states it". That section had stated it
-  since `121e76cb`, 2026-09-04, landed by *this same triage loop* two days earlier. The axis this
-  adds: a capture's ownership clause is what routes the drain's remediation, so a false one buys a
-  duplicate home for a fact that already had one — the shape the star topology exists to refuse.
-  **SECOND INSTANCE, 2026-08-28, and it is a wrong MECHANISM rather than a wrong number.** A kfric
-  stamped at spec asserted that `check-stage-entry` assertion C's component dir is a directory
-  holding `LIFECYCLE_KIT_ROSTER_BASENAME`, so `installer/` and `native/` are not components; close's
-  remediation wrote that into `lifecycle-kit/SPEC.md` §check-stage-entry as a definition. It is
-  false against `native/src/gates/stage_entry.rs`: the roster is consulted as a predicate at exactly
-  one site, :185; the multi-file arm returns at :147 on `amend_dirs.len() >= 2` with no roster test;
-  and the single-amendment arm seeds `comps` with `dir(af)` unconditionally at :172. Corrected in
-  the same close. So the harm this entry's cost line predicts is now attested on a governed kit
-  SPEC, not only on a scratch log.
-  **That instance opens a SECOND deliverable axis, on the DRAIN rather than on capture.**
-  `drift-kit/templates/close-knowledge.md` tells close to remediate each entry as a doc-owner edit
-  and never to re-verify the entry's claim, while lifecycle-kit/SPEC.md §The committed gap inbox
-  makes exactly that re-verification mandatory for the other frictionless capture channel, on an
-  argument that transfers verbatim — capture is deliberately cheap, so nothing upstream established
-  the claim. Two channels, one property, one guard.
-  **Deliverable, and the design question that makes it `[design-pending]`:** whether the
-  affordance should carry a measured-vs-estimated distinction at all. The whole value of
-  the `--emit-kfric` affordance is that stamping is cheaper than deferring, so a field that slows
-  capture buys accuracy with the capture rate the loop depends on. A convention may beat a flag.
-  **Cost while deferred:** an unverified assertion in the log is indistinguishable from a
-  measurement, and close's own triage is chartered to promote it into a doc-owner edit — which
-  is the channel by which a wrong number reaches a canonical surface with a citation on it.
-  **AT THRESHOLD 2026-09-07 AND TAKEN IN PART — `lead, own-authority`, relayed in dispatch: the
-  DRAIN-SIDE AXIS ONLY**, the one above needing no design ruling because the argument transfers
-  verbatim from the sibling channel's already-mandatory re-verification. **The capture-side question
-  is UNTOUCHED and this entry is NOT spent** — the measured-vs-estimated call stays
-  `[design-pending]` and returns by the conserved route.
-  Filed 2026-08-09 by close, from its own knowledge-friction triage.
 
 - **knob-default-accessor-singularity** [design-pending] — the missing check class
   behind two knob-default re-spellings drained this iteration.
@@ -9462,38 +9547,6 @@
   invisible once green, since nothing compares the two interpreters.
   Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
 
-- **installer-printed-followup-commands-uncovered** [design-pending] — `init` prints two commands
-  an adopter is told to run next, and no gate in either substrate checks that either resolves.
-  **Probed rather than assumed.** `installer/lib/init.sh` prints both with `printf` and runs
-  neither; `installer/README.md` narrates the same pair. `installer/consumer-smoke/` carries zero
-  references to either arm, so nothing exercises the printed strings, and `check-docs-cmd` cannot
-  reach them either — its subject is a FENCED invoked repo-relative `.sh` path and these are
-  format strings in shell source, not fences.
-  **The exposure is concrete and this iteration moved one of the two.** The hooks cut renamed the
-  opt-in behind one of the printed commands; the cut re-spelled both strings by hand and they are
-  correct today. What is uncovered is the NEXT such move — an adopter follows a command that no
-  longer exists, at the moment they are least able to diagnose it: first install, fresh clone.
-  **DISTINCT from the `check-docs-cmd` fence-scope wording fixed in gate-sdk/SPEC.md §The port
-  candidate criteria's dispatch table at this same close, and not a re-filing of it.** That was a
-  claim about UNFENCED MARKDOWN reading as coverage; this is a printed command inside INSTALLER
-  SHELL SOURCE that no gate's corpus reaches in any form. Rewording the claim settles nothing
-  here, and covering a printf string needs a different oracle.
-  **The fix, named so the entry is takeable:** one assertion in the consumer smoke that each
-  command `init` printed resolves against the payload it just installed — the smoke already
-  captures `init`'s output, so the assertion is short.
-  →fix failed on where the fix has to live: the consumer smoke is an 853-line acceptance harness
-  that builds the crate, packs a tarball and installs it per profile, so adding to it needs a
-  validate re-run this close cannot buy, and that suite already carries a held-constant red.
-  →icebox failed on the live trigger — first-install is the one path with no operator watching.
-  **Cost while deferred:** zero until a printed arm is renamed, then one adopter's failed install
-  with no oracle between the rename and them.
-  **TAKEN INTO THE ITERATION 2026-09-07, `lead, own-authority` relayed at scope** — the same
-  product-class ground as its two neighbours, and same-surface with both.
-  The `→fix` refusal above does not survive this window: it failed because close could not buy a
-  validate re-run, and an iteration provides one. Premise re-probed at HEAD — `init.sh:426-428`
-  prints exactly two commands under a `next:` banner and the consumer smoke references neither.
-  Filed 2026-09-05 to the gap inbox at build; promoted 2026-09-05 by close.
-
 - **run-validate-child-env-knob-leak** [design-pending] — `--run-validate` passes its whole ambient
   `GATE_SDK_KNOB_*` family down to every suite child, and the crate's own battery arm already
   rules the opposite discipline one section over.
@@ -10137,38 +10190,6 @@
   and not a mechanism — one is a blocklist over a named corpus, this is package-set parity.
   Filed 2026-09-06 by build as one of two enforcement-first gaps the macOS leg surfaced; promoted
   here at the 2026-09-06 close drain.
-
-- **gnu-ism-on-adopter-install-path-ungated** [design-pending] — no gate keeps a GNU-only shell
-  construct off the adopter install path; the live one was found by a hand survey.
-  **The attested instance.** `find -printf` in `installer/lib/init.sh`, both sites, on the path
-  since the loop was written and found only by a spec-stage hand survey 2026-09-06. Fixed the same
-  iteration by the findutils rider; nothing catches the next one entering.
-  **What remains live is DECLARED, not accidental.** `sort -V` and `realpath --relative-to` are
-  named in `docs/install.md` §Requirements — they are the exemption set a gate would carry, not
-  the violations it would find.
-  **The corpus is small and named**, which is what makes this buildable: `installer/lib`,
-  `installer/bin`, `gate-sdk/lib/gate.sh` and `gate-sdk/bin/gen-pre-commit.sh`, the files `init`
-  actually reaches. guard-kit already ships blocklist-roster mechanism, so the shape is a blocklist
-  gate over that corpus with the documented constructs exempted.
-  **Open before it can be built:** the blocklist's own membership. A construct list is a vocabulary,
-  and a kit literal spelling one publishes it — so it is consumer config on the
-  `check-graph`/`scripts/graph-vocab.sh` pattern, never a kit array.
-  **DISTINCT from `macos-leg-brew-set-vs-documented-requirements`**, which holds a package set equal
-  to a documented list. This one keeps a construct class off a code path, and it is not
-  macOS-specific: any BSD userland meets it.
-  **Cost while deferred:** a GNU-ism reaching the path is invisible until a macOS or BSD adopter
-  meets it, or until the macOS leg's next run does — and that leg is binding now, so that run reds
-  `master`.
-  **TAKEN 2026-09-07 on the port-first run's product-class-with-a-live-trigger ground —
-  `lead, own-authority`, relayed at scope.** The adopter install
-  path is the witness under TRAJECTORY.md's 2026-08-30 discriminator and the binding macOS leg is
-  the live trigger. Premises re-probed at HEAD rather than inherited — `find -printf` is gone from
-  `installer/lib`, surviving only inside two `# spec:` comments explaining why it is not used,
-  while `sort -V` (`installer/lib/init.sh:70`) and `realpath --relative-to`
-  (`gate-sdk/bin/gen-pre-commit.sh:33`, `gate-sdk/lib/gate.sh:563,575,616`) are live and inside the
-  documented exemption set, so the declared-not-accidental claim above is exact.
-  Filed 2026-09-06 by build as the second of two enforcement-first gaps the macOS leg surfaced;
-  promoted here at the 2026-09-06 close drain.
 
 ## Icebox
 
