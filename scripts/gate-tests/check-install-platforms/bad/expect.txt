@@ -1,0 +1,5 @@
+declared `joined` but no live line in targets.list: x86_64-unknown-linux-gnu
+declared `held` with no precondition: aarch64-apple-darwin
+declared `held` but carries a live line in targets.list: x86_64-apple-darwin
+a live line in targets.list that install.md declares nowhere: i686-unknown-linux-gnu
+omitted on each held platform: aarch64-apple-darwin omits 2 member(s)

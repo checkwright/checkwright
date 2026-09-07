@@ -105,6 +105,7 @@ leaves its section absent.
 | [site-kit](site-kit/index.md) | check-docs-render-fidelity | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | (consumer) | check-install-toolchain | precommit |
+| (consumer) | check-install-platforms | precommit |
 | [canon-kit](canon-kit/index.md) | check-install-claim | precommit |
 | [canon-kit](canon-kit/index.md) | check-payload-claim | precommit |
 | (consumer) | check-installer-no-deps | precommit |

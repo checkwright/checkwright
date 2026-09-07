@@ -221,12 +221,17 @@ recoverable:
   regardless of state, since a platform that is never built is a platform that
   can never stop being held; and `check-install-platforms`, which holds the block
   and the roster in lockstep in both directions and is what mechanizes
-  gate-sdk/SPEC.md §Consumer payload's first bound. **That gate is owed rather
-  than landed** — the block is the earlier half of a two-unit sequence and this
-  row is written with it, so until the gate arrives the lockstep is discipline,
-  which is the whole of what the gate is being authored to end. Two readers of
-  one grammar is the shape `scripts/gates.list` already ships (a bash reader and
-  a compiled one), not a duplication to collapse.
+  gate-sdk/SPEC.md §Consumer payload's first bound. **That gate has landed**, a
+  born-native repo-root member at `precommit` tier, so the lockstep is
+  machine-held rather than discipline: a `joined` declaration with no roster
+  line reds, a roster line no bullet declares `joined` reds, and a hold reds on
+  an empty precondition or on a roster line it should not have. It carries a
+  fourth arm that asserts nothing and reports instead — per held platform, the
+  count of registry members a host with no published artifact loses, printed on
+  the clean line as well as the red one, which is the standing instrument
+  gate-sdk/SPEC.md §The port-candidate criteria's aggregate cost names. Two
+  readers of one grammar is the shape `scripts/gates.list` already ships (a bash
+  reader and a compiled one), not a duplication to collapse.
 
 **A derived surface earns a row here only when it has a reader who cannot run
 the emitter** — a public page, a file a fresh clone needs before its tooling

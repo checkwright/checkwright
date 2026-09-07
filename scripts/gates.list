@@ -79,6 +79,7 @@ check-docs-cname-parity
 check-docs-render-fidelity
 check-docs-cmd
 check-install-toolchain
+check-install-platforms
 check-install-claim
 check-payload-claim
 check-installer-no-deps

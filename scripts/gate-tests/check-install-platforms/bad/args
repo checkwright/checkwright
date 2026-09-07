@@ -1,0 +1,6 @@
+# One violation per arm: a `joined` declaration with no roster line (A), a
+# roster line the page declares nowhere (B), a hold with no precondition and a
+# hold that is nonetheless published (C, both halves). Arm D still reports, on
+# the red path as well as the clean one.
+install.md
+targets.list

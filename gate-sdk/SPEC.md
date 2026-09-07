@@ -3699,6 +3699,22 @@ that answers each is the one whose corpus matches its question.
    not a discharge**, and citing the per-member reading as one is the defect this
    half exists to name.
 
+   **That instrument is per-cohort and event-triggered; the standing one is
+   `check-install-platforms`' fourth arm.** The binary-less leg fires when a cohort
+   lands and reads the residual of that one batch. The fourth arm rides **every**
+   battery invocation and is keyed to the platform declaration's `held` triples
+   (docs/install.md §Requirements) rather than to a landing cohort, printing per
+   held platform the count of registry members that resolve to a `.gate`
+   descriptor — what a host with no published artifact loses. It prints on the
+   clean line as well as the red one, so a pile that grows *between* cohorts is
+   visible before the next batch's own smoke would reach it. Its honest limit is
+   its corpus, and it is an over-read rather than a disagreement: it counts the
+   tree's **own** registry, which carries members no `init` seeds (§The install
+   disposition) and members that ride no payload at all, so it is a standing upper
+   bound on the leg's number and never a second measurement of it. A cohort still
+   records the leg's figure; what this arm ends is the interval in which nothing
+   reads the pile at all.
+
    **When the instrument rides the same iteration as the cohort, the measurement
    waits for it.** The binary-less leg is what prints the roster, so a cohort
    landing in an iteration that is also repairing that leg measures its price
@@ -7609,7 +7625,12 @@ in two places to hold the two-place problem down. This repo's instance is
 `docs/install.md` §Requirements' `platforms:begin` block, whose grammar and
 holder are its own (`docs/site-architecture.md`); the *shape* is kit mechanism
 and *which* platforms are declared is the project's own support commitment, the
-same split the roster file itself takes.
+same split the roster file itself takes. **A declared block is what makes the
+bound checkable, and this repo's is checked**: `check-install-platforms` reds on
+a roster line the block does not declare `joined` and on the converse, so the
+bound is discharged at the commit that would break it rather than by whoever
+remembers to open the page. A consumer without such a gate still holds the bound
+— it is a rule about the roster, not about any gate — and holds it by discipline.
 
 **Removing a blocker is not the granting of a permission, and the bound is
 unchanged by an unblocking.** Work that makes a target *possible* — the crate

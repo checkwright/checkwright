@@ -1,0 +1,2 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §The port-candidate criteria — fixture descriptor in a kit root, proving arm D's count spans the resolve set rather than the gates dir alone

@@ -1,0 +1,5 @@
+# Hermetic fixture roster. `x86_64-apple-darwin` is published while the page
+# declares it held, and `i686-unknown-linux-gnu` is published while the page
+# declares it nowhere at all — the roster exceeding the documentation, arm B.
+x86_64-apple-darwin
+i686-unknown-linux-gnu

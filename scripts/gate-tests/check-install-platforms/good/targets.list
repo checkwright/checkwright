@@ -1,0 +1,5 @@
+# Hermetic fixture roster — one live line, and it is the one triple the page
+# declares `joined`. The commented triple below proves a comment is not a live
+# line, so arm B does not read it as an undeclared publication.
+# aarch64-apple-darwin
+x86_64-unknown-linux-gnu

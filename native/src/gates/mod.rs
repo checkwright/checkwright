@@ -40,6 +40,7 @@ pub mod enforcement_fresh;
 pub mod evidence_baseline;
 pub mod evidence_manifest;
 pub mod footprint_fresh;
+pub mod install_platforms;
 pub mod install_toolchain;
 pub mod installer_no_deps;
 pub mod kit_ref_liveness;
@@ -1180,6 +1181,17 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         "-",
         &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §The port-candidate criteria — arm D counts the registry members
+    // that dispatch to the binary, so it reads the gates dir and the kit roots the resolve set is
+    // built from; both operands stay positional and neither is a knob.
+    (
+        "check-install-platforms",
+        install_platforms::run,
+        &[],
+        &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_REL"],
+        "-",
+        &[],
     ),
     (
         "check-installer-no-deps",

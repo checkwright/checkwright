@@ -1,0 +1,5 @@
+# Hermetic fixture registry — both members resolve to a `.gate` descriptor, so
+# arm D's binary-less residual is two whichever way the live tree's own registry
+# moves.
+check-ported
+check-vendored

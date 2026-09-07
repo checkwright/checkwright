@@ -176,48 +176,6 @@
   Admitted as the iteration's lead unit `lead, own-authority` 2026-09-07; promoted at spec
   2026-09-08 by authoring the amendment, which is the same act.
 
-- **born-native-omission-accumulation** [spec: SPEC-platform-coverage.md]
-  — the born-native flip attaches criterion 5's omission to every future gate, and nothing
-  measures the pile.
-  **This is the costed residue of a closed ruling, not a challenge to it.** `TRAJECTORY.md`:277-291
-  records the 2026-08-14 flip and states in the same breath that "the ruling does not widen the
-  roster; the residue is costed as `born-native-omission-accumulation`". This entry discharges that
-  costing and re-opens nothing.
-  **THE INSTRUMENT IS RULED at spec 2026-09-08, in-envelope: a BOUND MADE REDDENABLE, with the
-  measurement riding it.** The entry left three options — a measurement, a bound, or nothing beyond
-  the exception rule. "Nothing" fails on the entry's own words, that nothing would redden if the
-  pile grew without bound: an exception rule governs whether a new gate may be shell and never
-  reads the roster. A measurement alone is a number no run acts on, which is exactly how
-  `native/targets.list`'s header drifted while its owner retired. A NUMERIC ceiling is a literal
-  de-literalization refuses and answers the wrong question — the pile is bad because a supported
-  platform is uncovered, not because it is large.
-  **THE BOUND IS STRUCTURAL: zero uncovered supported platforms and no uncaused hold.** Every
-  platform the install documentation declares supported is either in the roster or explicitly
-  HELD with the run that would join it, and the omitted-member count rides along as what a reader
-  needs to weigh a hold.
-  **IT IS GREEN ON LANDING, and that is a design fact rather than a state to wait out.** Under the
-  operator's 2026-09-07 ruling the roster is still one line when this gate arrives and macOS is
-  documented supported, so a gate bounding on "in the roster" would red at its own landing commit.
-  The held state is what makes the bound satisfiable that day while staying a real bound: a hold
-  is cause-bearing and cannot be granted silently, because arm C reds on an empty cause.
-  **Four deltas, work-classed inline:** `check-install-platforms`, a born-native repo-root gate
-  taking positional operands with layout defaults exactly as its sibling `check-install-toolchain`
-  does and minting NO knob; its `# graph:` manifest and the regenerated hook; criterion 5 gaining
-  the pointer to the arm that finally computes the binary-less residual it has always named; and
-  the parity-contract roster gaining its row.
-  **Arm B is the load-bearing one beyond this entry's own subject:** it mechanizes
-  `gate-sdk/SPEC.md` §Consumer payload's FIRST bound — a roster line may not exceed what the
-  install documentation states — which today is held by prose and by whoever remembers to read it.
-  **SEQUENCED BEHIND its sibling and the dependency is stated, not assumed:** the gate's corpus is
-  the platform declaration block `SPEC-platform-evidence.md` delta 1 authors, so it cannot land
-  before that block exists or it exits 2 at its own landing commit. Ordering is
-  declaration-then-gate.
-  **Cost while deferred:** an adopter class the project has never observed installing silently
-  loses more of the battery every iteration, and the first evidence of how much would arrive from
-  a macOS preview adopter rather than from the tree.
-  Joined same-surface `lead, own-authority` 2026-09-07; ruled feature-class at spec 2026-09-08 and
-  promoted there by authoring the amendment, authoring and promotion being one act.
-
 - **smoke-manifest-read-appends-carriage-return** [spec: SPEC-stream-witness.md]
   — the Windows consumer smoke compares no manifest entry as a hash, because every `want` reaches
   the comparison carrying a trailing carriage return, and after eighteen rounds nobody has seen a
@@ -10375,5 +10333,7 @@
 - **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
 
 ## Done
+
+- born-native-omission-accumulation
 
 ## Lessons Learned

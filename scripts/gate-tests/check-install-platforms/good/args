@@ -1,0 +1,6 @@
+# Lockstep case: one `joined` triple that is a live roster line, one `held`
+# triple with a stated precondition and no roster line. Two args steer the gate
+# onto hermetic fixture copies of the install page and the target roster; arm D
+# counts against the hermetic registry in this case dir's own `scripts/`.
+install.md
+targets.list

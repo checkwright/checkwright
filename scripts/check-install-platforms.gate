@@ -1,0 +1,2 @@
+# graph: couples=docs/install.md,native/targets.list,native/src/gates/install_platforms.rs,native/src/fresh.rs dir=bi valve=none tier=precommit
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — docs/install.md's Requirements platform declaration and native/targets.list hold lockstep both directions: a `joined` triple is a live roster line, a live roster line is a declared `joined`, a `held` triple carries a stated precondition and no roster line, and each held platform's omitted-member count is printed clean as well as red
