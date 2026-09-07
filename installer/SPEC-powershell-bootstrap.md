@@ -148,9 +148,9 @@ with argv forwarded verbatim, evidenced by a real `--install place-artifact` cal
 placement and emits its two stdout verbs.
 
 **All five are reachable today, and the mechanism is already in the tree rather than minted
-here.** `.github/workflows/gates.yml`:395-408 steers the existing Windows leg's roster to
-`rustc -vV`'s host triple and packs an msvc artifact for it, under a comment that calls the
-steering "measurement scaffolding and not a fix". This leg takes the same re-entry —
+here.** `.github/workflows/gates.yml`:384-408 steers the existing Windows leg's roster to
+`rustc -vV`'s host triple and packs an msvc artifact for it, under a comment at `:384-385` that
+calls the steering "measurement scaffolding and not a fix". This leg takes the same re-entry —
 `GATE_SDK_NATIVE_TARGETS_FILE` — for the same reason and with the same standing: it exercises the
 bootstrap against a real, locally built, digest-verified artifact **while the published payload
 still commits only to what `native/targets.list` declares**. The steering is not a roster

@@ -135,6 +135,12 @@ leaves the matcher as the only remaining subject. Neither outcome is asserted he
 of the variables it read; the other three are re-reads**". It becomes two held and four re-read,
 and the split's rationale is unchanged — a held value and a re-read may never wear one label.
 
+**The count's own echo inside the tool moves with it, not only the doc's.** `run-smoke.sh:212`
+prints `read the five values below against the truth table in installer/README.md §The consumer
+smoke` immediately before the per-sample loop this delta extends; the literal becomes `six` in
+this same delta, so the tool's own prompt and the truth table's own count cannot drift apart from
+each other the moment either lands.
+
 ### (4) The truth table gains the rows that read the *instrument*, and the byte-rendering promise is corrected
 
 `installer/README.md` §The consumer smoke's truth table gains three rows whose subject is the
@@ -163,6 +169,16 @@ control character and is **not** in general a byte rendering; the octet dump is 
 carries the byte claim, and the two are printed together so a disagreement between them is
 visible rather than assumed away. `:1517-1518`'s "rendered byte-exactly" moves onto the octet
 dump, which is the line that can carry it.
+
+**One existing row makes the identical assumption and is corrected in place, not left as a fourth
+survivor of the same falsified promise.** `:1561`'s `got != reread` row reads "`got`'s byte
+rendering names the stray byte" — the same claim on `%q`'s bare output that round 17 falsifies for
+the shape row two lines below it, and the new `%q`-renders-bare row above corrects generally. It
+is rewritten to name `octets` rather than the bare rendering, the same reading the new `want !=
+wantalt` row already gives its own pipeline-mangling case: `got != reread` → the two octet dumps
+name the byte and its position. Grepped for every other row and prose sentence naming `%q`'s
+output a byte rendering or byte-exact so no further survivor of the same claim is left uncorrected
+by this delta.
 
 ### (5) The refusal states what it knows, rather than asserting the operand's shape
 
@@ -246,14 +262,17 @@ its owner doc, `installer/consumer-smoke/run-smoke.sh` riding no payload and rea
 
 - `installer/README.md` §The consumer smoke — the *Five values per sampled path* block's
   introduction and its bullet list, which becomes six values with two held and four re-read
-  (deltas 1, 2 and 3); the truth table, which gains three instrument-reading rows and whose
-  existing shape row is qualified by the first of them (delta 4); the byte-rendering paragraph at
-  `:1565-1567` and the "rendered byte-exactly" clause at `:1517-1518`, corrected onto the octet
-  dump (delta 4); the malformed-operand exit-class paragraph at `:1569-1591`, which gains the
-  second ground for the 2 and the refusal's new text (delta 5).
+  (deltas 1, 2 and 3); the truth table, which gains three instrument-reading rows, whose existing
+  shape row is qualified by the first of them, and whose existing `got != reread` row at `:1561`
+  is corrected onto the octet dump alongside it, the same survivor-of-the-falsified-promise the
+  shape row was (delta 4); the byte-rendering paragraph at `:1565-1567` and the "rendered
+  byte-exactly" clause at `:1517-1518`, corrected onto the octet dump (delta 4); the
+  malformed-operand exit-class paragraph at `:1569-1591`, which gains the second ground for the 2
+  and the refusal's new text (delta 5).
 - `installer/consumer-smoke/run-smoke.sh` — `hash_probe` at `:167-176` and `held_probe` at
   `:179-183`, which gain the length, octet and decomposition lines (deltas 1 and 2);
-  `manifest_report()`'s per-sample loop at `:257-265`, which gains `wantalt` (delta 3);
+  `manifest_report()`'s per-sample loop at `:257-265`, which gains `wantalt`, and its own
+  five-values count literal at `:212`, which becomes six (delta 3);
   `malformed_operands()` at `:197-203` and the `blocked` call at `:413-414`, whose text and
   decomposed report change (delta 5); and each touched function's own `# spec:` header sentence,
   which states what that function promises and must move with it (all deltas).
