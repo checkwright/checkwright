@@ -12,59 +12,6 @@
 
 ## New Features
 
-- **manifest-shape-predicate-and-rendering-disagree** [spec: SPEC-shape-witness.md]
-  — the Windows install-smoke leg's manifest arm refuses a value as "not 40 lowercase hex" while
-  its own byte rendering of that same variable shows 40 lowercase hex, for every entry.
-  **OBSERVED at round 17** (run `34108112152`, job `101697744618`), the first round under the
-  verdict-witness repair. On the deciding entry `gate-sdk/README.md` all five values are one
-  identical string, `f2fe8f746a92641c73fa7ab7d75756ed3c44a5fc`, `printf %q` quotes NONE of them,
-  and the run still refuses *the `want` operand … is not 40 lowercase hex*, 493 of 493.
-  **NOT the pairing defect round 15 closed on:** the shape test reads ONE variable, so there is no
-  second operand to mis-pair. `installer/README.md` §The consumer smoke OWNS the round record,
-  cited and not restated; the series is recorded reopened there.
-  **THE SUBJECT IS NAMED, at spec 2026-09-07, and it is not any operand:** the disagreement is
-  between TWO SUBSYSTEMS reading one variable — bash's `printf` and the platform's
-  `regcomp`/`regexec` behind `[[ =~ ]]` — so a report rendering through only one of them cannot
-  adjudicate it by construction. That is why seventeen rounds of value-side reading could not
-  close it.
-  **ALL THREE candidate directions are TAKEN, `lead, own-authority` 2026-09-07 through this
-  iteration's dispatch relay**, because each alone leaves round 18 non-terminal: an octet dump
-  without a decomposed predicate shows bytes and not the verdict that refused them; a decomposed
-  predicate without an octet dump still reads its operand through bash's own formatter; and
-  neither separates a mangling introduced by the manifest pipeline from one introduced elsewhere.
-  Together they partition every hypothesis round 17 leaves open.
-  **THE DECIDER DOES NOT MOVE, and that is the load-bearing refusal.** The composite `=~` still
-  selects the exit code; the decomposition is an OBSERVATION, never a verdict. Moving it now would
-  green the leg on a hypothesis before any round showed which subsystem is faulty, and would
-  destroy the disagreement that IS the evidence — the same trap §The consumer smoke's
-  anti-normalization rule closes, reached from a new direction.
-  **A FALSIFIED PROMISE RIDES IN, found at spec:** `installer/README.md`:1517-1518 and :1565-1567
-  call `printf '%q'` a BYTE rendering. It is a SHELL-QUOTING rendering that coincides with
-  byte-exactness for the carriage-return class that motivated it. Round 17 separates them, so
-  rounds 12-17's "bare rendering" readings establish quoting, not bytes.
-  **ASSERTED:** all five deltas, each tree-verifiable at validate. **NOT ASSERTED:** a green leg,
-  round 18's content, and any claim about which subsystem is at fault — asserting the third would
-  assert the very thing the instrument is built to find out. Landed-but-unobservable, not
-  unstarted.
-  **The binding legs are the check a build must actually run:** `install-smoke` and
-  `install-smoke-macos` are NOT `continue-on-error`. Every delta adds failure-branch-only code and
-  touches no arm header, so neither leg can move on a tree whose manifest agrees — verified, not
-  assumed.
-  **Product-class with a live trigger** under TRAJECTORY.md's 2026-08-30 discriminator: the witness
-  is the adopter-facing Windows install path, which this leg exists to attest.
-  **DISTINCT from `consumer-smoke-manifest-verdict-outruns-its-report`**, which landed and IS the
-  instrument that made this readable, and from `init-vendor-staging-argv-overflow`, whose subject
-  is one `git` invocation's argv width.
-  **Cost while promoted-but-unobservable:** the leg is `continue-on-error`, so it greens master
-  either way — the whole reason this survived seventeen rounds — and while the arm cannot state a
-  readable verdict the Windows install claim has no oracle behind it.
-  **IN THIS ITERATION'S UNIT SET — ruled 2026-09-07 by the operator**, through the AskUserQuestion
-  channel in a lead session and relayed by the lead, joined to `powershell-installer-surface` on
-  the product-class-with-a-live-trigger ground.
-  Surfaced 2026-09-07 in the gap inbox by the `adopter-install-path-asserted-not-narrated` close;
-  carried into this iteration's scope intake one iteration late. Promoted here by spec 2026-09-07,
-  the authoring being the promotion.
-
 ## Technical Debt
 
 ## Deferred
@@ -10287,6 +10234,7 @@
 
 ## Done
 
+- manifest-shape-predicate-and-rendering-disagree
 - init-vendor-staging-argv-overflow
 
 ## Lessons Learned

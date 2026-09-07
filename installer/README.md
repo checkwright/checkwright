@@ -1647,11 +1647,12 @@ artifact row in particular is the discriminating case the binary-conversion
 argument above rests on. A sampler narrowed to the verdict's row alone would buy
 the verdict's legibility with the discriminating case.
 
-**Five values per sampled path, and the truth table that reads them.** Each is
-labelled, printed plain and rendered byte-exactly beside it, with the call that
-produced it and that call's standard error. **Two of the five are the operands
-the failing comparison used, printed out of the variables it read; the other
-three are re-reads**, and the split is the block's whole architecture rather
+**Six values per sampled path, and the truth table that reads them.** Each is
+labelled, printed plain, rendered twice — by `printf '%q'` and as an **octet
+dump** beside its own length — and judged by the decomposed shape test, with the
+call that produced it and that call's standard error. **Two of the six are the
+operands the failing comparison used, printed out of the variables it read; the
+other four are re-reads**, and the split is the block's whole architecture rather
 than a presentational choice — a value that reaches the comparison mangled and
 re-reads clean is invisible to a report that asks again, and that is not a
 hypothetical: the first form of this report re-read `want`, and saw nothing on a
@@ -1679,47 +1680,111 @@ leg where every entry disagreed.
   bytes with the attribute mechanism removed. `--no-filters` ignores attributes
   entirely, so this value depends on no repository, which is what makes it the
   fixed point the other re-reads are measured against.
+- **`wantalt`** — a re-read, and the only one that reads the *manifest*.
+  `jq -r --arg p "P" '.files[$p]' "$LOCK"`: the same key out of the same lock,
+  straight into a command substitution. `want` was the one value in the block
+  with no independent producer — `got` already has three — and it arrives through
+  a `jq` line render, a tab delimiter and a `read` split, any of which could
+  mangle it. This control shares none of them, so `want != wantalt` places the
+  defect in that pipeline and the two octet dumps name the byte, while
+  `want == wantalt` with identical dumps exonerates the pipeline outright and
+  leaves the matcher as the only remaining subject.
 
 Two values cannot separate *one side filtered* from *the bytes changed*, and no
 number of re-reads alone can separate either from *the comparison was handed
-something else*; five can, and the reading rule lives here rather than with
+something else*; six can, and the reading rule lives here rather than with
 whoever reads the log next. The first three rows read the **hashing**, the next
-two read the **comparison**, and the last is the catch-all on any value's shape:
+two read the **comparison**, the sixth is the catch-all on any value's shape,
+and the last three read the **instrument** rather than the operand:
 
 | observation | reading |
 | --- | --- |
 | `want == own == raw` and `reread != raw` | the read side's context applies a filter the write side's does not; the defect is at `run-smoke.sh`'s call site and the two-call-site narrowing is confirmed |
 | `want == own == reread` | the hashes agree and the arm could not have failed on this path — the disagreement is in the comparison, not in the hashing (whether they also equal `raw` says only *why* they agree: equal, no context filters at all; unequal, both contexts filter identically — neither changes the reading) |
 | `own == reread == raw` and `want != raw` | the bytes on disk are not the bytes `init` hashed; the porcelain below and the artifact control say which |
-| `got != reread` | the value the comparison used is not the value the same call yields now, so the mangling happens at capture time inside the loop; `got`'s byte rendering names the stray byte |
+| `got != reread` | the value the comparison used is not the value the same call yields now, so the mangling happens at capture time inside the loop; the two octet dumps name the byte and its position |
 | `want == got`, byte-equal, both held | the comparison received two equal values and reported them unequal, which bash cannot do — so the pairing is wrong and `bad_hash` associated one entry's `want` with another entry's `got`; read the sampled path against the loop's own echo order |
-| any of the five is not 40 lowercase hex | the value is not a hash — a stray byte, a truncation or a refusal; the byte rendering shows which and the captured standard error names the refusal. The arm acts on this row too, and that is the one row it acts on: a malformed operand makes the run **exit 2** rather than 1. Read it with the header's count: **one** entry failing the shape test is a statement about the sampled path, **all** of them a statement about the capture step every entry runs through |
+| any of the six fails the shape test | a stray byte, a truncation or a refusal will each do it and the value is then not a hash; the octet dump shows which and the captured standard error names the refusal. Read it against the row below first, which is the one case where that reading does not hold. The arm acts on this row too, and that is the one row it acts on: a refused operand makes the run **exit 2** rather than 1. Read it with the header's count: **one** entry failing the shape test is a statement about the sampled path, **all** of them a statement about the capture step every entry runs through |
+| `shape` fails while `len40` and `class` are both clean | two matchers in one shell disagree about one variable — the ERE engine or its locale is the subject, not the value; the operand is a hash and the harness refused it anyway |
+| `%q` renders bare while `octets` shows a byte outside `0-9a-f` | `printf '%q'` is not a byte rendering on this host, so **every** prior round's "bare rendering" reading is weakened to what quoting alone establishes; re-read rounds 12 to 17 against the octet dump before citing them |
+| `want != wantalt` | the manifest pipeline mangles between the lock and the comparison — the `jq` line render, the tab, or `read`'s splitting; the two octet dumps name the byte and the position |
 
-The byte rendering is not decoration and not optional: a value carrying a
-trailing carriage return compares unequal and *prints* equal, and no other line
-in the report can see it.
+The instrument rows exist because a report rendered through one subsystem cannot
+adjudicate a disagreement between two, and every row above them reads the
+operand — which is why seventeen rounds of value-side reading could not close
+this leg's series.
 
-**A malformed operand is a precondition of this harness, so it exits 2 — never
+**Two renderings, and only one of them can carry a byte claim.** `printf '%q'`
+is a **shell-quoting** renderer: it emits a string bash can re-read to the same
+value. For the class that motivated it — a value carrying a trailing carriage
+return, which compares unequal and *prints* equal — quoting and byte-exactness
+coincide, `$'…\r'`, and that is still exactly why the rendering is neither
+decoration nor optional. They are not the same property. A rendering that quotes
+nothing establishes that bash's formatter found nothing worth quoting, and
+**not** that the value holds forty bytes drawn from `0-9a-f`. The `octets` line
+is the one that carries the byte claim: the value's bytes in hexadecimal,
+produced by piping it through `od` with no interpretation and through no
+construct that could itself normalize — no `echo`, whose escape handling is
+shell-dependent, and no re-quoting. Both are printed, because a disagreement
+between them is itself a finding and because every round from 12 through 17 is
+recorded in `%q`'s terms, so dropping it would make that record unreproducible
+against a later run.
+
+**The shape test's parts print beside the value they judged, and the class half
+deliberately uses a different matcher.** The `tests` line carries `len40` —
+whether `${#v}` is exactly 40 — `class`, and `shape`. `class` is computed by
+`leftover="${v//[0-9a-f]/}"`, the residue after deleting every acceptable
+character, which is exactly the offending set; where it is non-empty the line
+names that residue and the **zero-based index of the first offending character**,
+so the reader gets a position and not only a set. `shape` is the composite
+`[[ "$v" =~ ^[0-9a-f]{40}$ ]]` verdict itself. The class test is a parameter
+expansion over a **glob bracket expression** while the composite is an **ERE**
+evaluated by the platform's `regcomp`/`regexec` — two independent
+implementations of "is this character acceptable" — and that is the whole
+mechanism: using `=~` for the decomposition would inherit whatever the composite
+suffers and print an agreement that means nothing.
+
+*The decomposition is an observation and never a verdict, and that refusal is
+load-bearing.* The composite `=~` stays the thing that selects the exit code.
+Moving the decider onto the decomposed test would green this leg on a
+**hypothesis** — that the ERE engine is the faulty subsystem — before any round
+has shown which subsystem is faulty, and it would destroy the disagreement that
+is the entire evidence. It is the same trap the anti-normalization rule below
+closes, reached from a new direction: normalizing the operand and swapping in a
+matcher that happens to accept it are one move under two spellings.
+
+**A refused operand is a precondition of this harness, so it exits 2 — never
 the manifest verdict at 1.** `starter: N of N manifest entries disagree with the
 tree` at exit 1 is a statement *about the consumer*: the tree `init` wrote no
 longer matches what `init` recorded. If instead a value reached the comparison
 malformed, nothing about the consumer has been established and the honest code
 is the harness-precondition one — the code every preflight refusal in this
 script already takes, from a missing tool to a crate that will not compile,
-reached one step inward to the arm's own operands.
+reached one step inward to the arm's own operands. **The 2 rests on a second
+ground as well, and it has to be said rather than left to the first.** A matcher
+that refuses a well-formed hash is a harness precondition every bit as much as a
+mangled operand is, and it is likewise no finding about the consumer's tree — so
+the code is the same 2 in both cases, and the refusal below is what tells the two
+apart.
 The arm therefore shape-tests both operands on the failure branch, and after the
-report has printed it routes a malformed one through `blocked` at exit 2 instead
+report has printed it routes a refused one through `blocked` at exit 2 instead
 of `fail` at exit 1. **It fires after the report, not at the first bad value**,
 because diagnosing that value is exactly what the report exists for; refusing
 early would trade the report for the verdict and lose the more valuable half.
 That ordering argument assumed all along that the report the refusal points at
 contains the refusal's subject, and the witness sample above is what makes it
 true rather than hoped for. The refusal itself names that subject: the path, which
-of `want` and `got` failed the shape test (or both), and how many disagreements
-failed it — so the verdict is readable from the last line alone, by a reader who
-never scrolls up.
+of `want` and `got` the shape test refused (or both), how many disagreements it
+refused, and the **decomposed verdict for each refused operand** — so the verdict
+is readable from the last line alone, by a reader who never scrolls up.
+*It reports the test's verdict, and never declares the operand malformed*, because
+those are different claims and the second can be false while the first is true:
+where the decomposition reads `len40=yes class=clean`, the operand **is** a hash
+and what happened is that this harness's matcher refused one. The last line
+carries the decomposition precisely so its reader can tell those apart instead of
+taking away a statement about the value that no one observed.
 This does not make the shape row above redundant: that row tells a **reader**
-what a bad rendering means, and this makes the **arm** act on it. A report a
+what a refusal means, and this makes the **arm** act on it. A report a
 human reads and a verdict a suite reads are two consumers, and deleting either
 for the other is the mistake.
 
@@ -1810,7 +1875,7 @@ existed.*
 - **Rounds 13, 14 and 15 printed identical values on both samples** — the `.md`
   and `scripts/checkwright-gates.exe`, which is in the disagreeing set every
   round and is what all three sampled as the artifact row — every value a clean
-  40-hex with nothing in its byte rendering.
+  40-hex that `%q` rendered unquoted.
   `reread == own` retires the process-context asymmetry that was this leg's
   standing narrowing; `raw` equal to the rest retires every end-of-line
   hypothesis about the file's content; and the artifact control read
@@ -1818,8 +1883,10 @@ existed.*
   `init` published. Round 14 adds `want` **as the loop held it** to that set and
   round 15 adds `got`, so in round 15 all five values on both samples are one
   string — `affdbceb…d982` on `gate-sdk/README.md`, `4159af89…f942e` on the
-  `.exe` — and `%q` renders every one of the ten unquoted, which is the whole of
-  what a byte rendering can say.
+  `.exe` — and `%q` renders every one of the ten unquoted. *Read that last clause
+  under the bound the two-renderings paragraph above now states: it establishes
+  what quoting alone can, and no round before 18 held an octet dump to establish
+  more.*
 - **The consumer's `git status --porcelain` printed nothing**, so the tree holds
   what `init` committed, and no round carries a `fatal` line from any hash
   call, so no per-path refusal is open. Round 14's only `fatal` lines are the
@@ -1869,12 +1936,10 @@ built for: the verdict's own row is printed, the refusal names it, and the repor
 says so in as many words — *the witness row `gate-sdk/README.md` is one of the
 samples already chosen, so the verdict row and that sample coincide*. What that
 row then shows is the reopening. **All five values on it are the same
-40-lowercase-hex string, and `printf '%q'` quotes none of them**, so no byte
-differs and nothing is hiding in the rendering — the carriage-return candidate
-stays falsified. Yet the same run refuses at the harness precondition, *the
-`want` operand on `gate-sdk/README.md` is not 40 lowercase hex*, and counts **493
-of 493** disagreeing entries failing that test. Every entry in the profile, not a
-subset.
+40-lowercase-hex string, and `printf '%q'` quotes none of them.** Yet the same
+run refuses at the harness precondition, *the `want` operand on
+`gate-sdk/README.md` is not 40 lowercase hex*, and counts **493 of 493**
+disagreeing entries failing that test. Every entry in the profile, not a subset.
 
 That is a stronger and different fact than round 15's. Round 15 saw one equality
 test contradict its operands and read it as a pairing defect. Round 17 has the
@@ -1882,9 +1947,33 @@ test contradict its operands and read it as a pairing defect. Round 17 has the
 entry the verdict is about, for the whole manifest at once. A wrong pairing
 cannot produce it: `[[ "$want" =~ ^[0-9a-f]{40}$ ]]` reads one variable, so there
 is no second operand to mis-pair, and the value it read is the value printed
-beside it. The next round's question is therefore about what `read -r want`
-holds on this host versus what `%q` renders of it, not about which entry got
-compared with which.
+beside it. The next round's question is therefore about that one variable — what
+`read -r want` put in it, and what each subsystem that reads it then makes of it
+— and not about which entry got compared with which.
+
+*The consequence round 17 has for every round before it.* The observation is not
+about any operand — it is a disagreement between **two subsystems reading one
+variable**, bash's `printf` on one side and the platform's `regcomp`/`regexec`
+behind `[[ =~ ]]` on the other. That is what a report rendering through only one
+of them cannot adjudicate, and it is why seventeen rounds of value-side reading
+could not close the series. It also weakens the record above rather than only
+extending it: rounds 12 through 17 read a bare `%q` rendering as evidence that no
+byte was out of place, and `%q` is a shell-quoting renderer, so what those
+readings establish is that bash's formatter found nothing worth quoting. The
+carriage-return candidate stays falsified — quoting and byte-exactness do
+coincide for exactly that class — but *no round before 18 carries an octet dump*,
+so no round before 18 has established what bytes any of those values held.
+
+*What round 18 must show to be terminal, stated before it is read so the reading
+cannot be shaped to fit.* The block now prints, per value, an octet dump beside
+the `%q` rendering, `len40` and `class` beside the composite `shape` verdict, and
+`wantalt` beside `want`. Three partitions follow, and between them they cover
+every hypothesis round 17 leaves open: an octet outside `0-9a-f` names a mangled
+value and the round is about the pipeline or the producer; `len40` and `class`
+clean with `shape` failing names the matcher, and the subject is the ERE engine
+or its locale; and `want` against `wantalt` separates a mangling introduced by
+the manifest pipeline from one introduced anywhere else. Which of them the round
+actually shows is not predicted here, and nothing above claims the leg passes.
 
 *Who reads the next round, and the trap that would otherwise swallow it.*
 `install-smoke-windows` is a job of the `gates` workflow, which runs on every

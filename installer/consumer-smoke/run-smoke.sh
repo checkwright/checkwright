@@ -163,23 +163,47 @@ consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
     printf '%s' "$c"
 }
 
-# spec: installer/README.md §The consumer smoke — one RE-READ value of the manifest report's five-value block: the plain value, the same value rendered byte-exactly because a hash carrying a trailing carriage return compares unequal and prints equal and no other line can see it, the call that produced it rather than a hand-written description of the call, and that call's standard error so a refusal is named instead of showing as an empty value
+# spec: installer/README.md §The consumer smoke — the shape test's independently observable parts, computed once here because the report line and the refusal line both read them and a second producer could disagree with the first; the class half is a GLOB-BRACKET parameter expansion and never the ERE the composite uses, so the two matchers stay independent implementations of "is this character acceptable" and a disagreement between them on one variable is observable instead of absorbed, and the composite is printed as the observation it is rather than consulted as a decider
+shape_verdict() {   # $1 = the value -> 'len40=<yes|no> class=<clean|dirty[...]> shape=<pass|fail>'
+    local v="$1" leftover before len40 class shape
+    leftover="${v//[0-9a-f]/}"
+    before="${v%%[!0-9a-f]*}"
+    [[ "${#v}" -eq 40 ]] && len40=yes || len40=no
+    [[ -z "$leftover" ]] && class=clean \
+        || class="dirty[residue=$(printf '%q' "$leftover") first=${#before}]"
+    [[ "$v" =~ ^[0-9a-f]{40}$ ]] && shape=pass || shape=fail
+    printf 'len40=%s class=%s shape=%s' "$len40" "$class" "$shape"
+}
+
+# spec: installer/README.md §The consumer smoke — the two renderings of one value printed together, because their DISAGREEMENT is itself the finding and one of the two cannot lie about bytes: %q is a shell-quoting renderer whose output coincides with byte-exactness only for the class that motivated it, so the octet dump carries the byte claim and is produced through no construct that could normalize — no echo, whose escape handling is shell-dependent, and no re-quoting. A dump that comes back empty for a value that is not is SAID rather than printed blank, since a blank byte line reads as an empty value and this is the one line that must not mislead about bytes
+value_probe() {   # $1 = the value to render and judge
+    local v="$1" dump
+    dump="$(printf '%s' "$v" | od -An -tx1 | tr '\n' ' ' | tr -s ' ')"
+    dump="${dump# }"; dump="${dump% }"
+    [[ -n "$v" && -z "$dump" ]] && dump='<no octet dump: od produced nothing on this host>'
+    printf '            bytes  %s\n' "$(printf '%q' "$v")"
+    printf '            len    %s\n' "${#v}"
+    printf '            octets %s\n' "$dump"
+    printf '            tests  %s\n' "$(shape_verdict "$v")"
+}
+
+# spec: installer/README.md §The consumer smoke — one RE-READ value of the manifest report's six-value block: the plain value, the two renderings and the decomposed shape verdict value_probe owns, the call that produced it rather than a hand-written description of the call, and that call's standard error so a refusal is named instead of showing as an empty value
 hash_probe() {   # $1 = label, $2.. = the command whose stdout is the value
     local label="$1"; shift
     local val err e="$SCRATCH/manifest-report.err"
     val="$("$@" 2>"$e")"
     err="$(<"$e")"
-    printf '    %-6s %s\n' "$label" "${val:-<empty>}"
-    printf '           bytes  %s\n' "$(printf '%q' "$val")"
-    printf '           call   %s\n' "$*"
-    [[ -z "$err" ]] || printf '           stderr %s\n' "$err"
+    printf '    %-7s %s\n' "$label" "${val:-<empty>}"
+    value_probe "$val"
+    printf '            call   %s\n' "$*"
+    [[ -z "$err" ]] || printf '            stderr %s\n' "$err"
 }
 
 # spec: installer/README.md §The consumer smoke — one HELD value of that block, printed out of the variable the failing comparison read instead of by re-running the call that produced it, which is what lets a value that reaches the comparison mangled and re-reads clean still be seen; its call line names where the loop got the value, since a command a reader could re-run is exactly what this print refuses to be
 held_probe() {   # $1 = label, $2 = the value the comparison held, $3 = where the loop got it
-    printf '    %-6s %s\n' "$1" "${2:-<empty>}"
-    printf '           bytes  %s\n' "$(printf '%q' "$2")"
-    printf '           call   %s\n' "$3"
+    printf '    %-7s %s\n' "$1" "${2:-<empty>}"
+    value_probe "$2"
+    printf '            call   %s\n' "$3"
 }
 
 # spec: installer/README.md §The consumer smoke — one attribute lookup of the manifest report, printed as three distinguishable outcomes rather than one blob: the attributes a repository reports, git's refusal where the path is outside the repository asked and no attribute chain is reachable from it, and a clean silence where the path simply carries none
@@ -193,12 +217,12 @@ attr_probe() {   # $1 = the repository to ask, $2 = which repository that is, $3
     [[ -n "$out" || -n "$err" ]] || printf '      <no attribute reported>\n'
 }
 
-# spec: installer/README.md §The consumer smoke — the refusal names its operand, so it reads the witness tuple with the same three-field split manifest_report uses rather than minting a second grammar, and reports which of the two operands the shape test rejected; both failing is a distinct reading from either alone, so it is spelled out rather than collapsed to the first
-malformed_operands() {   # $1 = the '<path><TAB><want><TAB><got>' witness the shape test recorded
+# spec: installer/README.md §The consumer smoke — the refusal names its operand AND what the decomposition saw of it, because "the operand is not 40 lowercase hex" is a claim about the value while what the arm observed is that its shape test refused the value, and where len40 and class both read clean those are different statements and only the second is true; it reads the witness tuple with the same three-field split manifest_report uses rather than minting a second grammar, and both operands failing is a distinct reading from either alone, so it is spelled out rather than collapsed to the first
+malformed_operands() {   # $1 = the '<path><TAB><want><TAB><got>' witness the shape test recorded -> the refused operand(s), each with its decomposed verdict
     local rest="${1#*$'\t'}" w g which=""
     w="${rest%%$'\t'*}"; g="${rest#*$'\t'}"
-    [[ "$w" =~ ^[0-9a-f]{40}$ ]] || which="want"
-    [[ "$g" =~ ^[0-9a-f]{40}$ ]] || which="${which:+$which and }got"
+    [[ "$w" =~ ^[0-9a-f]{40}$ ]] || which="want ($(shape_verdict "$w"))"
+    [[ "$g" =~ ^[0-9a-f]{40}$ ]] || which="${which:+$which and }got ($(shape_verdict "$g"))"
     printf '%s' "$which"
 }
 
@@ -209,7 +233,7 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
     local target digest_want art seam entry p w g rest r out found
 
     printf '  == manifest report: %s, %s of %s entries disagree ==\n' "$profile" "$mismatch" "$checked"
-    printf '  read the five values below against the truth table in installer/README.md §The consumer smoke\n'
+    printf '  read the six values below against the truth table in installer/README.md §The consumer smoke\n'
     if [[ ${#bad[@]} -eq 0 ]]; then
         printf '  every disagreement is a path the manifest names and the tree does not hold, so there is no hash to compare\n'
         return 0
@@ -262,6 +286,8 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
         hash_probe reread git hash-object -- "$C/$p"
         hash_probe own git -C "$C" hash-object -- "$p"
         hash_probe raw git hash-object --no-filters -- "$C/$p"
+        # spec: installer/README.md §The consumer smoke — want is the one value in the block with no independent producer, so its control reads the same key out of the same lock through a channel that shares nothing with the manifest pipeline: no jq line render, no tab, no read splitting, which is what makes want != wantalt a statement about that pipeline and want == wantalt an exoneration of it
+        hash_probe wantalt jq -r --arg p "$p" '.files[$p]' "$LOCK"
     done
 
     printf '  -- the consumer worktree, the witness for a tree that has diverged from what init committed\n'
@@ -409,9 +435,9 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
     # spec: installer/README.md §The consumer smoke — the report runs while the disagreeing consumer is still on disk and immediately before the verdict, so a leg that reds here says what it found rather than only how many, and it takes the witness as a named operand so the sample set contains the row the verdict below is about
     [[ "$mismatch" -eq 0 ]] \
         || manifest_report "$profile" "$C" "$LOCK" "$mismatch" "$checked" "$malformed_first" "$malformed_n" ${bad_hash[@]+"${bad_hash[@]}"}
-    # spec: installer/README.md §The consumer smoke — the malformed operand is refused AFTER the report, not at the first bad value, because the report is exactly what diagnoses it and the report is now required to contain the entry this refusal names, so pointing at it is a direction rather than a hope; and it refuses at the harness-precondition code rather than the manifest verdict, since an operand that is not a hash says nothing about whether the tree matches what init recorded
+    # spec: installer/README.md §The consumer smoke — the refused operand is reported AFTER the report, not at the first bad value, because the report is exactly what diagnoses it and the report is now required to contain the entry this refusal names, so pointing at it is a direction rather than a hope; the line states the shape test's VERDICT and the decomposition beside it rather than declaring the operand malformed, since a reader who never scrolls up takes the last line away and a matcher refusing a well-formed hash would make that claim false; and it refuses at the harness-precondition code on either ground, since neither a mangled operand nor a matcher that will not accept a hash says anything about whether the tree matches what init recorded
     [[ "$mismatch" -eq 0 || -z "$malformed_first" ]] \
-        || blocked "$profile: the $(malformed_operands "$malformed_first") operand on ${malformed_first%%$'\t'*} is not 40 lowercase hex, and $malformed_n of $mismatch disagreeing entries fail that test — the report above samples that entry and renders its values byte-exactly. That is this harness's own precondition, not a finding about the consumer."
+        || blocked "$profile: the shape test refused the $(malformed_operands "$malformed_first") operand on ${malformed_first%%$'\t'*}, and refused $malformed_n of $mismatch disagreeing entries — the report above samples that entry and prints each value's octet dump beside its shell-quoted rendering. Read the decomposition in the parentheses: len40=no or class=dirty says the operand is not a hash, while len40=yes with class=clean says this harness's matcher refused one. That is this harness's own precondition either way, not a finding about the consumer."
     [[ "$mismatch" -eq 0 ]] || fail "$profile: $mismatch of $checked manifest entries disagree with the tree"
     [[ "$checked" -gt 0 ]] || fail "$profile: the manifest records no file"
     mapfile -t lock_kits < <(jq -r '.kits[]' "$LOCK")
