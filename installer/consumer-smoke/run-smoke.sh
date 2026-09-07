@@ -6,7 +6,7 @@ set -uo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO="$(dirname "$REPO")"
 
-# spec: installer/README.md §The consumer smoke — INSTALLER_SMOKE_TMP_DIR is the only knob; everything the smoke writes lands under it, so a run leaves the worktree untouched
+# spec: installer/README.md §The consumer smoke — INSTALLER_SMOKE_TMP_DIR is the scratch knob; everything the smoke writes lands under it, so a run leaves the worktree untouched
 BASE="${INSTALLER_SMOKE_TMP_DIR:-${TMPDIR:-/tmp}}"
 [[ -d "$BASE" ]] || { echo "INSTALLER-SMOKE: scratch base not a directory: $BASE" >&2; exit 2; }
 SCRATCH="$(mktemp -d "$BASE/installer-smoke.XXXXXX")" || exit 2
@@ -18,8 +18,15 @@ say() { printf '  %s\n' "$*"; }
 fail() { printf 'INSTALLER-SMOKE: FAIL — %s\n' "$*"; exit 1; }
 blocked() { printf 'INSTALLER-SMOKE: %s\n' "$*" >&2; exit 2; }
 
-# spec: installer/README.md §The consumer smoke — cargo and rustc join the preflight because the smoke builds the binary the main payload carries; they refuse here with every other missing tool, since a machine that cannot compile the crate has not falsified the install path
-for tool in npm node jq git tar sha256sum cargo rustc; do
+# spec: installer/README.md §The consumer smoke — INSTALLER_SMOKE_ARTIFACTS_DIR is the hand-off knob: a caller that already holds a producer's artifact directory points this at it and the smoke installs those bytes instead of building its own, which is the whole difference between a run that exercises a release-shaped artifact and one that exercises a harness stand-in
+PREBUILT_DIR="${INSTALLER_SMOKE_ARTIFACTS_DIR:-}"
+[[ -z "$PREBUILT_DIR" || -d "$PREBUILT_DIR" ]] \
+    || { echo "INSTALLER-SMOKE: artifact hand-off not a directory: $PREBUILT_DIR" >&2; exit 2; }
+
+# spec: installer/README.md §The consumer smoke — cargo and rustc join the preflight because the smoke builds the binary the main payload carries; they refuse here with every other missing tool, since a machine that cannot compile the crate has not falsified the install path. The relaxation is on the hand-off path ALONE: a host handed a prebuilt artifact was never asked to compile anything, so refusing it for a missing compiler would refuse the exact case the knob exists to serve
+SMOKE_TOOLS=(npm node jq git tar sha256sum)
+[[ -n "$PREBUILT_DIR" ]] || SMOKE_TOOLS+=(cargo rustc)
+for tool in "${SMOKE_TOOLS[@]}"; do
     command -v "$tool" >/dev/null 2>&1 || blocked "$tool not found on PATH — the smoke cannot run."
 done
 [[ -z "$(git -C "$REPO" status --porcelain)" ]] \
@@ -34,38 +41,67 @@ native() {   # $@ = a gate-sdk accessor and its arguments, resolved against the 
 }
 NATIVE_BIN="$(native gate_native_bin)"; NATIVE_BIN="${NATIVE_BIN##*/}"
 NATIVE_CRATE="$(native gate_native_crate)"
+# spec: installer/README.md §The consumer smoke — rustc answers the host triple wherever rustc is present, and on the hand-off path where it is not, the sole target directory in the artifact directory answers it: those bytes were produced FOR a host, so the hand-off carries the fact the toolchain would otherwise have been asked for. Two directories and no rustc is refused rather than guessed, because picking one would exercise an artifact for a platform this machine is not
+HOST_TARGET="$(rustc -vV 2>/dev/null | awk '/^host:/{print $2}')"
+if [[ -z "$HOST_TARGET" && -n "$PREBUILT_DIR" ]]; then
+    handed=()
+    for d in "$PREBUILT_DIR"/*/; do
+        [[ -d "$d" ]] || continue
+        d="${d%/}"; handed+=("${d##*/}")
+    done
+    [[ ${#handed[@]} -eq 1 ]] \
+        || blocked "no rustc on PATH and $PREBUILT_DIR carries ${#handed[@]} target directory/ies — which platform this run exercises cannot be told from that."
+    HOST_TARGET="${handed[0]}"
+fi
+[[ -n "$HOST_TARGET" ]] || blocked "rustc reported no host target — the arm cannot tell which roster line this machine satisfies."
+# spec: installer/README.md §The consumer smoke — the smoke steers its own roster at this host by default, so pack's all-targets demand is satisfied by construction rather than by every caller knowing to narrow it; a caller that already set the knob keeps it, which is what leaves the override branch a live path rather than a fixture-only one
+if [[ -z "${GATE_SDK_NATIVE_TARGETS_FILE:-}" ]]; then
+    GATE_SDK_NATIVE_TARGETS_FILE="$SCRATCH/host-targets.list"
+    export GATE_SDK_NATIVE_TARGETS_FILE
+    printf '%s\n' "$HOST_TARGET" > "$GATE_SDK_NATIVE_TARGETS_FILE" \
+        || blocked "could not write the one-line host roster this smoke steers itself at."
+    say "roster: no caller knob set, so this run is steered at $HOST_TARGET alone"
+fi
 ROSTER_FILE="$(native gate_native_targets_file)"
 [[ "$ROSTER_FILE" == /* ]] || ROSTER_FILE="$REPO/$ROSTER_FILE"
 mapfile -t ROSTER < <(native gate_native_targets)
 [[ ${#ROSTER[@]} -gt 0 ]] \
     || blocked "no declared target at $ROSTER_FILE — there is no platform set to build for."
-HOST_TARGET="$(rustc -vV 2>/dev/null | awk '/^host:/{print $2}')"
-[[ -n "$HOST_TARGET" ]] || blocked "rustc reported no host target — the arm cannot tell which roster line this machine satisfies."
 # spec: installer/README.md §The consumer smoke — pack refuses a roster target no leg built, so a host build satisfies --artifacts only while the roster is this host alone; the moment it declares a second target the smoke blocks here naming its own remedy rather than packing a payload with a hole in it
 [[ ${#ROSTER[@]} -eq 1 && "${ROSTER[0]}" == "$HOST_TARGET" ]] \
     || blocked "the roster declares ${ROSTER[*]} and this host is $HOST_TARGET — a host build no longer satisfies pack's all-targets demand. Steer this smoke's pack at the host alone with GATE_SDK_NATIVE_TARGETS_FILE, or give the build leg a cross-compiling build."
 
-# spec: installer/README.md §The consumer smoke — the binary is built rather than fabricated with a matching digest: a stand-in would drive the same placement code while leaving the one thing most likely to break — the real build's digest agreeing with what init verifies before writing — covered by nothing
-ART="$SCRATCH/artifacts/$HOST_TARGET"
-mkdir -p "$ART"
-build_out="$(cd "$REPO" && bash gate-sdk/bin/build-native.sh 2>&1)" \
-    || { printf '%s\n' "$build_out" >&2; blocked "the crate would not compile for $HOST_TARGET."; }
-BUILT="$REPO/$NATIVE_CRATE/target/release/$NATIVE_BIN"
-[[ -x "$BUILT" ]] || blocked "cargo reported success but there is no executable at $BUILT."
-cp "$BUILT" "$ART/$NATIVE_BIN" || fail "could not stage the built binary for packing"
-# spec: gate-sdk/SPEC.md §Consumer payload — the digest is emitted once, here, where the bytes are produced: pack re-verifies this sidecar and init verifies it again before writing, so both readers check a value neither of them computed
-( cd "$ART" && sha256sum "$NATIVE_BIN" > "$NATIVE_BIN.sha256" ) \
-    || fail "could not emit the digest sidecar beside the built binary"
-[[ -z "$(git -C "$REPO" status --porcelain)" ]] \
-    || fail "the build leg left the worktree dirty — the crate's output must land in gitignored build space and the artifact directory in the smoke's own scratch"
-say "built $NATIVE_BIN for $HOST_TARGET with the sidecar this leg emitted"
+if [[ -n "$PREBUILT_DIR" ]]; then
+    # spec: gate-sdk/SPEC.md §Consumer payload — on the hand-off path the bytes and their sidecar are MOVED and never re-derived: a second sha256sum on this side is exactly what lets a published digest and an installed digest diverge while both look computed, so the artifact directory is adopted as it arrived
+    ART="$PREBUILT_DIR/$HOST_TARGET"
+    PACK_ARTIFACTS="$PREBUILT_DIR"
+    [[ -f "$ART/$NATIVE_BIN" && -f "$ART/$NATIVE_BIN.sha256" ]] \
+        || blocked "$PREBUILT_DIR carries no $NATIVE_BIN and .sha256 sidecar for $HOST_TARGET — the hand-off this run was pointed at is not a producer's output for this host."
+    say "adopted $NATIVE_BIN for $HOST_TARGET from the hand-off, sidecar and all — nothing rebuilt, nothing rehashed"
+else
+    # spec: installer/README.md §The consumer smoke — the binary is built rather than fabricated with a matching digest: a stand-in would drive the same placement code while leaving the one thing most likely to break — the real build's digest agreeing with what init verifies before writing — covered by nothing
+    ART="$SCRATCH/artifacts/$HOST_TARGET"
+    PACK_ARTIFACTS="$SCRATCH/artifacts"
+    mkdir -p "$ART"
+    build_out="$(cd "$REPO" && bash gate-sdk/bin/build-native.sh 2>&1)" \
+        || { printf '%s\n' "$build_out" >&2; blocked "the crate would not compile for $HOST_TARGET."; }
+    BUILT="$REPO/$NATIVE_CRATE/target/release/$NATIVE_BIN"
+    [[ -x "$BUILT" ]] || blocked "cargo reported success but there is no executable at $BUILT."
+    cp "$BUILT" "$ART/$NATIVE_BIN" || fail "could not stage the built binary for packing"
+    # spec: gate-sdk/SPEC.md §Consumer payload — the digest is emitted once, here, where the bytes are produced: pack re-verifies this sidecar and init verifies it again before writing, so both readers check a value neither of them computed
+    ( cd "$ART" && sha256sum "$NATIVE_BIN" > "$NATIVE_BIN.sha256" ) \
+        || fail "could not emit the digest sidecar beside the built binary"
+    [[ -z "$(git -C "$REPO" status --porcelain)" ]] \
+        || fail "the build leg left the worktree dirty — the crate's output must land in gitignored build space and the artifact directory in the smoke's own scratch"
+    say "built $NATIVE_BIN for $HOST_TARGET with the sidecar this leg emitted"
+fi
 
 printf 'pack\n'
 VERSION="$(git -C "$REPO" describe --tags --abbrev=0 2>/dev/null)"; VERSION="${VERSION#v}"
 [[ -n "$VERSION" ]] || VERSION="0.0.0-smoke"
 # spec: installer/README.md §The consumer smoke — --root "$REPO" is what makes the packed tree and the asserted tree the same tree by construction: $REPO is script-path-derived, so without it the current directory selects what gets packed and a run from a second checkout greens while asserting nothing about the tree under test
 PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" \
-    --version "$VERSION" --out "$SCRATCH" --artifacts "$SCRATCH/artifacts" 2>&1)" \
+    --version "$VERSION" --out "$SCRATCH" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
@@ -73,6 +109,20 @@ tarballs=("$SCRATCH"/*.tgz)
 shopt -u nullglob
 [[ ${#tarballs[@]} -eq 1 ]] || fail "expected exactly one tarball, found ${#tarballs[@]}"
 TARBALL="${tarballs[0]}"
+
+# spec: installer/README.md §The consumer smoke — steering the roster at this host alone removes pack's declared-target-with-no-artifact refusal from every ordinary path in this smoke, so the case is PLANTED rather than left with no witness: that refusal is the one reader here whose verdict reds on FINDING a target instead of on finding none, so a narrowing that removes its subject cannot be cleared by inspection the way the others can
+PLANT_OUT="$SCRATCH/planted-pack"
+mkdir -p "$PLANT_OUT" || fail "could not make the planted pack's output directory"
+printf '%s\nother-%s\n' "$HOST_TARGET" "${HOST_TARGET#*-}" > "$SCRATCH/planted-targets.list" \
+    || fail "could not write the planted roster"
+plant_out="$(GATE_SDK_NATIVE_TARGETS_FILE="$SCRATCH/planted-targets.list" \
+    INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" \
+    --version "$VERSION" --out "$PLANT_OUT" --artifacts "$PACK_ARTIFACTS" 2>&1)"; plant_rc=$?
+[[ "$plant_rc" -ne 0 ]] \
+    || fail "pack accepted a roster declaring a target the artifact directory has nothing for — a broken payload packed as a narrower one"
+grep -q 'has no artifact directory' <<<"$plant_out" \
+    || { printf '%s\n' "$plant_out" >&2; fail "pack refused the planted roster, but for something other than the declared target it had no artifact for"; }
+say "pack: a declared target with no artifact directory refused, not packed narrower"
 
 # spec: installer/README.md §The consumer smoke — the install is from the packed tarball with --offline, which is what proves the claim the install page makes: a one-shot vendoring installer resolves nothing from a registry, so the payload must already be inside the tarball
 printf 'install (from the tarball, --offline)\n'

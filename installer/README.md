@@ -608,8 +608,13 @@ an artifact-less host nothing, because on that host it never ran. Two
 consequences follow for the steps that are not:
 
 - **Relocating the *unconditional* remainder of `init` is sequenced behind the
-  artifact roster covering every supported platform** — the ground
-  `platform-support-ci-matrix` covers and `native/targets.list` declares.
+  artifact roster covering every supported platform** — the set
+  `docs/install.md` §Requirements declares in its platform block, against what
+  `native/targets.list` carries. The sequencing points at that declaration
+  rather than at whichever task happens to own the widening, because a task is
+  a lifetime that ends and a live precondition pointed at one goes stale the
+  day it retires — which is exactly what happened to the entry this clause used
+  to name.
 - **`digest-unverifiable` must become a refusal rather than an omission** at the
   same moment, because step 4 of the bootstrap is irreducible: a host that
   cannot hash cannot verify, and verifying before executing is the whole of the
@@ -2436,19 +2441,45 @@ with a hole in it.
 directory, while the publishing path still never builds, so a locally built
 binary can still never substitute for a released one.
 
-*The honest limit, recorded because it is a fact about today's roster rather
-than a property of the design.* A single host build satisfies `--artifacts` only
-while `native/targets.list` declares this host alone — pack refuses a roster
-target no leg built, and refusing is right, because a payload missing a declared
-target is broken rather than narrower. The moment the roster declares a second
-target the build step blocks rather than passing, naming its own re-entry: steer
-its pack at a narrowed roster through `GATE_SDK_NATIVE_TARGETS_FILE`
-(gate-sdk/SPEC.md §Layout and configuration) so the smoke commits to the host
-alone while the published payload still commits to all of them, or give the step
-a cross-compiling build. Neither is built ahead of the second target. Note where
-that block now falls: the build precedes the main pack, so a second declared
-target stops the whole smoke rather than only its last arm — which is the honest
-consequence of the main payload carrying the artifact, not a regression.
+**The smoke steers its own roster, and that is what a second roster line stopped
+costing.** A single host build satisfies `--artifacts` only while the roster
+declares this host alone — pack refuses a roster target no leg built, and
+refusing is right, because a payload missing a declared target is broken rather
+than narrower. Two exits from that were on the table once the roster was about
+to grow: narrow the smoke's roster through `GATE_SDK_NATIVE_TARGETS_FILE`
+(gate-sdk/SPEC.md §Layout and configuration), or give the build step a
+cross-compiling build. **The steering is built and the cross-build is refused**,
+and the refusal is on grounds already in the tree rather than on cost:
+`native/targets.list` refuses a cross-build because it would publish an artifact
+no run has ever executed, which is the same bound the roster's own join
+predicate rests on.
+
+So the smoke derives a one-line roster from this host's triple and points that
+knob at it **unless the caller has already set it**. Three consequences, each
+stated because the cheap reading loses one of them. A caller that steers
+explicitly keeps its own roster, so the override branch stays a live path rather
+than a fixture-only one. A local `bash installer/consumer-smoke/run-smoke.sh`
+survives a multi-line shipped roster instead of blocking on it, which is what
+made the second roster line affordable at all. And the *incidental* assertion
+the unsteered Linux leg used to carry — that the shipped roster is packable,
+true only by the coincidence that its one line was that leg's host — is gone;
+what replaces it is stronger and deliberate, the `native-artifacts` producer
+building every declared platform on every run, so the shipped roster's
+producibility is asserted directly.
+
+**The narrowing removes one reader's subject, and that reader gets a planted
+witness rather than an argument.** Pack's refusal of a *declared target no leg
+built* is the one verdict here that reds on finding a target instead of on
+finding none, so a roster narrowed to the host makes it unreachable on every
+ordinary path — where every other affected reader is monotone under the
+narrowing and clears by inspection. The pack arm therefore plants that case
+explicitly, packing against a roster carrying a second target the artifact
+directory has nothing for, and asserts both the refusal and its cause; its log
+line is `pack: a declared target with no artifact directory refused, not packed
+narrower`. Read it as distinct from the artifact arm's `declared target with no
+artifact: refused, not omitted`, which is `init` refusing a broken *payload*
+after the pack succeeded — same shape of mistake, two different verbs, two
+witnesses.
 
 **A platform leg's steered roster makes the artifact branch live on that host,
 and that is the fact a dormancy argument gets wrong.** A per-platform
@@ -2460,14 +2491,31 @@ maps the leg's host to a triple — so the roster comparison matches and
 dormant *because the shipped roster carries no such line* is therefore false on
 every platform leg, and a site costed dormant on that ground is a live site.
 
-Its only knob is `INSTALLER_SMOKE_TMP_DIR`, and it writes nothing inside the
-worktree: the crate's build output lands in gitignored build space and the
-artifact directory it assembles lives under the smoke's own scratch, so the
-clean-worktree precondition keeps its meaning. It needs that clean worktree,
-because the pack step refuses to stamp a commit the payload does not match. It
-needs `cargo` and `rustc` too, alongside the tools every other arm needs, and
-refuses at the same preflight when either is missing — a machine that cannot
-compile the crate has not falsified the install path.
+It takes two knobs. `INSTALLER_SMOKE_TMP_DIR` is the scratch base, and the smoke
+writes nothing inside the worktree: the crate's build output lands in gitignored
+build space and the artifact directory it assembles lives under that scratch, so
+the clean-worktree precondition keeps its meaning. It needs that clean worktree,
+because the pack step refuses to stamp a commit the payload does not match.
+
+`INSTALLER_SMOKE_ARTIFACTS_DIR` is the **artifact hand-off**, and it is the
+difference between a run that exercises a release-shaped artifact and one that
+exercises a harness stand-in. Set it to a `<dir>/<target>/` tree a producer
+already filled and the smoke installs *those* bytes: it builds nothing, and it
+recomputes nothing — the sidecar that arrives is the sidecar the producer
+emitted beside the bytes, so gate-sdk/SPEC.md §Consumer payload's one-producer
+rule reaches across the new hop unbroken. Its live setter is the macOS
+install-smoke leg in `.github/workflows/gates.yml`, a deployed configuration
+rather than a test-only one; everywhere else it is unset and the smoke's
+behaviour is what it always was.
+
+`cargo` and `rustc` join the preflight alongside the tools every other arm
+needs, and refuse there when either is missing — a machine that cannot compile
+the crate has not falsified the install path. That refusal relaxes **on the
+hand-off path alone**: a host handed a prebuilt artifact was never asked to
+compile anything, so refusing it for a missing compiler would refuse the exact
+case the knob exists to serve. Where `rustc` is absent, the sole target
+directory in the hand-off answers the host triple `rustc` would have; two
+directories and no `rustc` is refused rather than guessed.
 
 **What it costs to run, because the precondition above is only expensive if you
 know that.** Re-measured 2026-08-13 on one developer machine, against
