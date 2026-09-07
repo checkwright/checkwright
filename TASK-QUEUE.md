@@ -670,55 +670,55 @@
   Filed 2026-08-30 by close from the gap inbox, attested by that session while
   recovering from the loop this describes.
 
-- **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
-  forks are RULED and both are ANSWERED into installer/README.md §The install boundary**, cited and
-  not restated: fork 2 (operator, 2026-08-26) two hand-kept bootstraps with parity held by a
-  per-BOOTSTRAP leg and the generated-twins alternative refused; fork 1 (merged 2026-08-25) the
-  five bootstrap steps, one retirement (`jq`), everything else `behind-invoke` by default. What
-  remains is the work: the PowerShell half, and the relocation (this entry's since
-  `install-step-relocation` retired as mooted, re-scoped 2026-08-24). The per-step roster, the
-  sibling surfaces and the `--install <op>` seam are all read off that section against `init.sh`
-  rather than off a second copy here. **Ordered by the trajectory pivot 2026-08-03** — objectives
-  2 and 6, TRAJECTORY.md's. The Windows leg that ordered ahead shipped with
-  `platform-support-ci-matrix`, retired 2026-09-06, so nothing orders first and the named adopter
-  is live. The two source blockers that routed here on 2026-08-26 have MOVED OUT, operator-ruled
-  the same day, and the 2026-08-26 native-runner measurements that retire both `-x` assumptions are
-  carried into this iteration's amendment, whose merge lands them in that same section.
+- **powershell-installer-surface** [design-pending] — a native Windows install path. **Both forks
+  are RULED and ANSWERED into installer/README.md §The install boundary**, cited not restated:
+  fork 2 (operator, 2026-08-26) two hand-kept bootstraps, parity by a per-BOOTSTRAP leg, generated
+  twins refused; fork 1 (2026-08-25) the five steps, `jq` retired, all else `behind-invoke` by
+  default. The per-step roster, sibling surfaces and `--install <op>` seam read off that section
+  against `init.sh`, never a copy here. What remains: the PowerShell half and the relocation (this
+  entry's, re-scoped 2026-08-24). **Ordered by the trajectory pivot 2026-08-03** — objectives 2
+  and 6. Nothing orders ahead since `platform-support-ci-matrix` retired 2026-09-06; the named
+  adopter is live; the two 2026-08-26 source blockers moved out; that date's native-runner `-x`
+  measurements ride this iteration's amendment, whose merge lands them in that section.
   **THIS ITERATION TAKES THE POWERSHELL BOOTSTRAP HALF ONLY — ruled 2026-09-07 by the operator,
   through the AskUserQuestion channel in a lead session and relayed by the lead.** The RELOCATION
   half stays deferred and stays this entry's; the roster widening it waits on is filed as
   `gate-binary-roster-covers-supported-platforms`. Joined by `init-vendor-staging-argv-overflow`
   (same-surface) and by a new Windows manifest entry (product-class, live trigger).
-  **THIS NARROWS THE SAME DAY'S TAKE-WHOLE RULING, on new evidence — that ruling was not wrong.**
-  It was taken on a unit-set proposal that did not carry the relocation's precondition; a spec
-  probe surfaced it. The ground is `doctrine-kit/SPEC.md`:213-216, the OPERATOR's own ruling of
-  2026-09-03 on this identical precondition, where a member was "dropped from that iteration's unit
-  set rather than ported, because the relocation's own precondition forbids it today". The
-  precondition is `installer/README.md`:528-530 — the unconditional remainder is sequenced behind
-  the artifact roster covering every supported platform — and `native/targets.list` carries ONE
-  triple against a supported set of at least Linux and macOS.
-  **THE CONSEQUENCE WAS STATED AND ACCEPTED: THE OWED COLUMN DOES NOT MOVE THIS ITERATION.**
-  Recorded so a later reader does not flag it as a failure of the port-first run. It is not one:
-  that rule binds "while the ruled composer can reach one", and this boundary's survey established
-  no cut is takeable — all 14 non-packer owed files wait on the relocation, verified at source and
-  re-verified at spec. §The install boundary rules that a whole-bootstrap file DECLARES rather than
-  ports, so the PowerShell half leaves the owed count unchanged BY CONSTRUCTION, not by shortfall.
-  **THE HALVES INTERACT, and this iteration's output widens what the other half owes.** Shipping
-  the PowerShell bootstrap makes native Windows a SUPPORTED PLATFORM, which widens the relocation's
-  own precondition from {Linux, macOS} to {Linux, macOS, native Windows}. Whatever entry takes the
-  roster widening inherits a wider target than it has today. Stated here because it is a fact about
-  this iteration's output and a later reader can only recover it from here.
-  It is FEATURE-class, so spec authors its amendment and the authoring is the promotion; the
-  amendment delivers ONE INCREMENT of a two-half deliverable, so this entry DEMOTES at merge rather
-  than reaching Done (canon-kit/SPEC.md §Merging an amendment step 4).
-  **`installer/README.md`:442 rides this entry's amendment — `lead, own-authority` 2026-09-07**
-  through this iteration's dispatch relay: it cites the retired `platform-support-ci-matrix` as the
-  owner of the PowerShell leg, an ORDERING claim this half discharges. That slug's three
-  precondition-bearing cites ride `gate-binary-roster-covers-supported-platforms` instead.
+  **NARROWING ONE — of the SAME-DAY take-whole ruling, on 2026-09-03 grounds; that ruling was not
+  wrong.** It was taken on a unit-set proposal that did not carry the relocation's precondition; a
+  spec probe surfaced it. Ground: `doctrine-kit/SPEC.md`:213-216, the OPERATOR's 2026-09-03 ruling
+  on this identical precondition, dropping a member from that iteration's unit set "because the
+  relocation's own precondition forbids it today". The precondition itself is
+  `installer/README.md`:528-530 against `native/targets.list`'s ONE triple.
+  **THE OWED COLUMN DOES NOT MOVE THIS ITERATION — stated and accepted.** Not a failure of the
+  port-first run, which binds only "while the ruled composer can reach one": this boundary's survey
+  established no cut is takeable, all 14 non-packer owed files waiting on the relocation. §The
+  install boundary makes a whole-bootstrap file DECLARE rather than port, so the PowerShell half
+  leaves the count unchanged BY CONSTRUCTION, not by shortfall.
+  **THE HALVES INTERACT:** shipping this bootstrap makes native Windows a SUPPORTED PLATFORM,
+  widening the relocation's precondition from {Linux, macOS} to {Linux, macOS, native Windows}, so
+  `gate-binary-roster-covers-supported-platforms` inherits a wider target than it has today.
+  **NARROWING TWO — of the 2026-08-26 ORACLE, ruled 2026-09-07 by the operator**, same channel:
+  the PowerShell leg asserts the FIVE BOOTSTRAP STEPS, and PAYLOAD-END-TO-END IS OWED WITH THE
+  RELOCATION AND STAYS THIS ENTRY'S, recorded as owed rather than dropped. **DISTINCT from
+  narrowing one — do not collapse them:** different ruling, different ground, different half.
+  Ground: the drift that ruling guards is between the two BOOTSTRAPS, and "end to end" adds
+  PAYLOAD coverage rather than PARITY coverage — conflated because both halves were assumed to
+  land together. Probed: the binary carries no `init` arm (`native/src/install.rs`:12,
+  `OPS = ["place-artifact"]`), so no full install completes through PowerShell until the relocation
+  lands. Shipping the bootstrap with NO leg was put and REFUSED — the very drift it prevents.
+  FEATURE-class, so the authoring is the promotion; the amendment delivers ONE INCREMENT of a
+  two-half deliverable, so this entry DEMOTES at merge rather than reaching Done (canon-kit/SPEC.md
+  §Merging an amendment step 4).
+  **`installer/README.md`:442 rides this entry's amendment — `lead, own-authority` 2026-09-07**,
+  same relay: it names the retired `platform-support-ci-matrix` as owner of the PowerShell leg, an
+  ORDERING claim this half discharges. That slug's three precondition-bearing cites ride
+  `gate-binary-roster-covers-supported-platforms`.
   **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
   names that no current path reaches, and every install-path change is authored bash-first.
-  Filed 2026-08-03 by spec; re-scoped 2026-08-24; fork 1 merged and demoted 2026-08-25; the two
-  source blockers re-scoped out 2026-08-26, all by operator ruling.
+  Filed 2026-08-03 by spec; re-scoped 08-24; fork 1 merged and demoted 08-25; source blockers
+  re-scoped out 08-26, all by operator ruling.
 
 - **gate-binary-roster-covers-supported-platforms** [design-pending] — `native/targets.list`
   carries ONE triple, `x86_64-unknown-linux-gnu`, against a supported set of at least Linux and
