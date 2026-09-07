@@ -12,6 +12,64 @@
 
 ## New Features
 
+- **amendment-roster-omission-detection** [spec: SPEC-retired-spellings.md]
+  — an amendment's `## Existing sections updated` roster can be short by a surface, and only a grep
+  finds the missing one; nothing obliges that grep and nothing records having run it.
+  **ADMITTED AS A FULL UNIT — ruled by the OPERATOR 2026-09-07, through the lead's question relay
+  in a lead session and lead-relayed**, on the third threshold recurrence below, and with the design
+  question expressly left open: whether ONE mechanism covers both the literal-substitution slice and
+  the renumber slice. That admission answers the 2026-09-06 lead deferral taken on window capacity
+  and the 2026-09-07 probe that settled the ATTESTED INSTANCE and expressly not the CLASS (the six
+  stale citations never shipped tagged: renumber `1a23be6c`, last tag `v0.25.0`).
+  **THE OPEN QUESTION IS NOW CLOSED — NO, AND THE GROUND IS DECIDABILITY RATHER THAN EFFORT.**
+  Ruled at spec 2026-09-08, `lead, own-authority`, under the bounding the admission itself delegated
+  to this stage. A literal substitution leaves the retired and the replacing spellings in DISJOINT
+  token spaces, so every surviving occurrence of the old literal is either a site the change should
+  have reached or one deliberately left, and the roster is the discriminator. A renumber leaves them
+  in the SAME token space: after guard-kit's rule 19 was inserted and 19-23 became 20-24, a site
+  reading `rule 19` is either a stale citation to old-19 or a correct citation to the newly inserted
+  19, and no scanner can tell which — the two are byte-identical. The correct post-change sites are
+  DENSE in the renumbered range, so a survivor scan over a renumber returns a hit set dominated by
+  non-violations, which is the cry-wolf shape canon-kit already refused a stronger arm for.
+  **SO THE RENUMBER SLICE IS A STATED NON-TARGET, ROUTED RATHER THAN DUPLICATED.**
+  `guard-rule-number-not-citable-outside-kit` already owns it, and its second disposition — a rule
+  number is not a citable identifier outside the kit, so a cross-corpus reference names the rule —
+  DISSOLVES the slice instead of detecting it: a citation naming its referent has no numeric
+  relation left to decay. A gap bullet carries the cross-reference so close lands it on that entry's
+  own surface rather than this unit editing an entry outside its batch.
+  **WHAT SHIPS: a mandatory `## Retired spellings` block and `check-amendment-retired-spelling`.**
+  Six deltas, work-classed inline in the amendment — the grammar plus the template section; the
+  born-native canon-kit gate with three arms (grammar, survivor reconciliation against the roster,
+  dangling citation); the exclusion knob with an EMPTY kit default on the provenance seam; the
+  manifest and generated-projection fan-out; the DoD checkbox rewritten to cite the block; and the
+  align rule narrowed to the residue it still holds.
+  **WHY A DECLARATION, WHEN THE ROSTER'S OWN OMISSION IS WHAT FAILED.** The roster has no negative
+  form — a short roster and a complete one are the same document, so there is no line an author
+  fails to write and nothing for a gate to miss. The block has one, and it is mandatory, so a
+  skipped section reds. What stays uncaught is an author who declares the section and names no
+  spelling: real, and strictly smaller than what is uncaught today.
+  **THE OBLIGATION IS NOT NEW, which is what pays for the per-amendment cost.** The shipped
+  template's DoD already carries "Removals propagated — grepped every spec for names this change
+  retired". That grep is owed on every amendment already; nothing records the run, nothing checks
+  the result, and the checkbox's stated corpus is narrower than where the attested misses landed.
+  **PROBED AT HEAD, correcting an inference this stage nearly shipped:** `spec_amendments` does NOT
+  prune this repo's own kit directories, so an amendment written under `canon-kit/` IS scanned —
+  demonstrated by `check-amendment-queue` reding on the new file before its entry existed. The
+  backfill is therefore the gate's own first run over every amendment live at that commit, this
+  unit's own amendment included, and it is authored carrying the block it specifies.
+  **FIVE-FOR-FIVE 2026-09-06 stands as the attesting evidence and is not re-measured here:** every
+  batch of one iteration shipped a roster miss found by grep and named by no roster — batch 1's
+  stale `lifecycle-kit/SPEC.md` sentence, batch 2's `spec-pointer-boundary-legality` grounding case,
+  batch 2's own gap bullet dangled by its amendment's deletion, batch 3's second `-printf` site in
+  `installer/lib/init.sh`, and the `gates.yml:229-233` non-Linux over-claim.
+  **DISTINCT from the retired `amendment-update-target-coverage`**, which owned a roster *entry*
+  naming no owning delta — a listed target with no claim. This owns a *surface with no entry*, whose
+  evidence is in the tree rather than in the document.
+  recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06 2026-09-07
+  Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned 2026-08-29
+  by close, the six stale citations verified against guard-kit/SPEC.md at HEAD. Promoted at spec
+  2026-09-08 by authoring the amendment and closing its open question, one act.
+
 - **manifest-report-launders-the-value-it-prints** [spec: SPEC-witness-fidelity.md]
   — the Windows smoke's manifest report and its verdict decompose the SAME recorded string and
   print different answers, and the report asserts they are one row.
@@ -8769,57 +8827,6 @@
   the class of session most likely to be auditing an upgrade path in the first place.
   Filed 2026-08-29 by close, from its vacuous-assertion sweep's byproduct notes, the guard read at
   its source before the finding was accepted.
-
-- **amendment-roster-omission-detection** [design-pending] — an amendment's `## Existing sections
-  updated` roster can be short by a surface, and only a grep finds the missing one.
-  **Returned from the icebox 2026-08-29 on a recurrence that broke the cost line it was iceboxed
-  under.** That cost said the class is bounded because "the miss is caught by the next reader who
-  greps". This iteration it was not: guard-kit's rule-19 insertion renumbered rules 19-23 to 20-24,
-  the sweep's roster held the kit and not the queue, and **six cross-corpus citations shipped
-  stale** — five of the scratch-execution rule and one on
-  `guard-rule-number-not-citable-outside-kit`, the entry whose own subject is that decay. Nothing
-  caught them until that close's `internal-identifier-restatement` audit, a full stage later.
-  **Three of four amendments this iteration shipped a short roster, and the misses are not one
-  shape.** The edge-sum amendment missed three surfaces (a `.gate` spec line, a smoke comment, a
-  Rust help string). The wait unit's renumber needed four site classes a `rule <N>` grep does not
-  reach at all: markdown ordinals, parenthesized placement citations, a comma-list roster
-  (`rules 14, 15 and 22`), and ordinal prose (`seventeen rules earlier`). The anchor amendment
-  missed six roster gaps. So the deriving grep is not merely unrun — for a renumber it is not
-  expressible as one pattern, which the entry's literal-substitution slice did not anticipate.
-  **The align-stage rule does part of the job, measured:** it found and fixed one real roster
-  omission this iteration where the amendment named a literal, and did not reach the renumber,
-  whose evidence is a numeric relation rather than a literal.
-  **The converse of a retired entry, and the distinction is load-bearing.**
-  `amendment-update-target-coverage` owned a roster *entry* naming no owning delta — a listed
-  target with no claim. This owns a *target with no entry*, which no scan over the amendment alone
-  can see, because the evidence is in the tree rather than in the document.
-  **Why it stays design-pending:** the general form is not gateable — deciding which surfaces an
-  amendment *should* have listed is the semantics of the change. The narrow slice that might be is
-  a **literal-substitution** amendment, checkable by grepping the tree for survivors of the old
-  literal not named in the roster, at the cost of a new amendment-grammar field every amendment
-  pays. The second slice is a **renumber**, where old and new are a relation over a range and the
-  citations share no spelling. Whether one mechanism covers both is the open question.
-  **FIVE-FOR-FIVE 2026-09-06, every batch of one iteration, and the run is the datum.** Batch 1's
-  stale `lifecycle-kit/SPEC.md` §templates/lead.md sentence; batch 2's `spec-pointer-boundary-
-  legality` grounding case; batch 2's own gap bullet dangled by its amendment's deletion; batch 3's
-  second `-printf` site in `installer/lib/init.sh`, recorded DORMANT where delta 5 needed it live;
-  and the `gates.yml:229-233` non-Linux over-claim. **Every one was found by grep and none named by
-  the roster** — a five-batch run with no roster hit is not a sampling accident, so "the deriving
-  grep is not merely unrun" is now measured. It does NOT show a detection failure: see
-  `removal-propagation-site-argued-out-of-scope`, where the fifth was found and then dispositioned
-  away, a different defect that files as one.
-  **Cost while deferred:** revised upward from the iceboxing. A short roster now ships, and the
-  reader who eventually greps is a later stage or a later iteration, so the stale sentence is
-  live in the tree for the whole of that gap.
-  **ADMITTED AS A FULL UNIT OF THIS ITERATION — ruled by the OPERATOR 2026-09-07, through the
-  lead's question relay in a lead session and lead-relayed**, on the
-  third threshold recurrence below. This ANSWERS the 2026-09-06 lead deferral taken on window
-  capacity and the 2026-09-07 probe that settled the ATTESTED INSTANCE and expressly not the
-  CLASS (the six stale citations never shipped tagged: renumber `1a23be6c`, last tag `v0.25.0`).
-  **Spec owns bounding the design question; this admission does not settle it.**
-  recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06 2026-09-07
-  Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned
-  2026-08-29 by close, the six stale citations verified against guard-kit/SPEC.md at HEAD.
 
 - **harness-project-dir-fold-dialect-unresolved** [design-pending] — the harness project-dir
   derivation `check-memory-off` and its two shell twins share folds a repo root's `/` and `.` to
