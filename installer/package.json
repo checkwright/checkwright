@@ -9,7 +9,8 @@
   },
   "homepage": "https://checkwright.dev",
   "bin": {
-    "checkwright": "bin/checkwright.sh"
+    "checkwright": "bin/checkwright.sh",
+    "checkwright-pwsh": "bin/checkwright.ps1"
   },
   "files": [
     "bin/",

@@ -25,10 +25,14 @@ vendored keeps working — it needs nothing from a package registry again.
 
 Bash, up to the boundary §The install boundary rules: the verbs are bash, and
 what the bootstrap hands to the verified gate binary is Rust the same section
-names. npm is the delivery vehicle, never the implementation: the `bin` entry is
-a bash script, so a reader reviewing what they are about to run reads source
-rather than a build product, and the linter that governs every other script in
-the repository governs these too.
+names. The one exception is the second bootstrap, which is PowerShell, because
+the host it exists for may run no POSIX shell at all — it is a `bin` entry beside
+the bash one and not a rewrite of it. npm is the delivery vehicle, never the
+implementation: **both** `bin` entries are scripts, so a reader reviewing what
+they are about to run reads source rather than a build product, and the linter
+that governs every other script in the repository governs the bash ones — the
+PowerShell half has no such linter here and its oracle is its own install-smoke
+leg instead, which is the trade §The install boundary's parity ruling accepts.
 
 ## Requirements
 
@@ -64,6 +68,14 @@ corrected, not a fact newly discovered.
 ## Layout
 
 - `bin/checkwright.sh` — the verb dispatcher, and the package's `bin` entry.
+- `bin/checkwright.ps1` — the PowerShell bootstrap (§The install boundary), the
+  second `bin` entry, named `checkwright-pwsh` there. The name is not cosmetic:
+  npm generates `<name>.cmd` and `<name>.ps1` shims itself, so a second entry
+  also called `checkwright` would collide with the shim npm writes for the bash
+  target. **Its `#!/usr/bin/env pwsh` line is load-bearing rather than
+  decorative** — npm's shim generator reads the target's shebang to pick the
+  interpreter, and without one it writes a shim that invokes the `.ps1`
+  directly, which is precisely what a Windows host cannot do.
 - `lib/` — one file per verb; the dispatcher's roster is this directory.
 - `lib/common/` — modules the verbs share. The dispatcher's roster is the
   `*.sh` files directly under `lib/`, and that glob does not descend, so a
@@ -71,7 +83,12 @@ corrected, not a fact newly discovered.
   these is reachable at an installed `PKG_ROOT` is `package.json`'s `files`
   roster, not this directory** — a helper sourced from the consumer smoke
   resolves only because `lib/` is on that roster, so a module added here is
-  shipped by that entry and by nothing in this layout.
+  shipped by that entry and by nothing in this layout. The same holds for `bin/`,
+  and it is worth stating because the natural repair looks different: a `bin`
+  entry whose target is not published ships a broken package, but the roster's
+  entries are **directories**, so both bootstraps are already published by
+  `bin/` and neither is named on the roster individually. Adding one would be a
+  second declaration of what the directory entry already carries.
 - `payload/` — the vendored kit source, assembled at pack time from the
   repository's own kit roots. It exists in the published tarball only, never in
   the source tree, so no second copy of any kit is checked in.
@@ -444,14 +461,68 @@ is wrong.
 **The two bootstraps are hand-kept, and parity is held by running, not by
 generation — ruled 2026-08-26.** Each half is authored in its own language
 against the five steps above, and the oracle that holds them equal is a
-per-**bootstrap** install-smoke leg, each exercising the payload end to end on
-the host that bootstrap is for. **Count those legs by bootstrap and never by
+per-**bootstrap** install-smoke leg. **Count those legs by bootstrap and never by
 platform.** `.github/workflows/gates.yml` carries three install-smoke jobs —
 Linux, native Windows and macOS — and all three drive the *bash* half, the
-Windows one through Git-for-Windows bash. So a reader counting platforms
-concludes this ruling's oracle is in place when it is not: the PowerShell half's
-leg is owed with that half itself, under `platform-support-ci-matrix`, and no
-other leg substitutes for it. The alternative refused is one declaration
+Windows one through Git-for-Windows bash; a fourth drives the PowerShell half
+under `pwsh`. So a reader counting platforms reads three legs as covering two
+bootstraps, which they never did. The PowerShell leg ships with the PowerShell
+half, and **no other leg substitutes for it**, because the other three drive the
+other bootstrap.
+
+**That oracle has two parts, and only one of them is in place — read this before
+reading the leg as short of its own ruling.** The ruling above asks for a leg
+*exercising the payload end to end*, and that phrase carries two distinct
+assertions:
+
+- **Bootstrap parity** — that the two halves answer the five steps the same way.
+  The PowerShell leg discharges this for its half.
+- **Payload coverage** — that a whole `checkwright init` completes through that
+  bootstrap. This is **owed**, not dropped, and it is owed **with the
+  relocation**: the binary carries no `init` arm, so step 5's verbatim argv
+  forwarding hands `init` to a program that does not implement it. No leg can
+  assert a completion that no code path can reach.
+
+The two were conflated because both halves were assumed to land together. The
+drift the 2026-08-26 ruling guards is between the two **bootstraps**, and *end to
+end* adds **payload** coverage rather than **parity** coverage — which is why the
+first part can ship alone and the second must wait. **The shortened oracle is not
+the whole one**, and a later reader must not take it for the whole one: until the
+relocation lands, a green PowerShell leg says the five steps agree, and says
+nothing whatever about an install completing.
+
+**What a reader compares when the two legs disagree.** Parity held by running
+tells you *that* the halves differ and never *where*, and with two hand-kept
+halves a red on one leg beside a green on the other is the routine case rather
+than the exceptional one. So the comparison has a stated order — the five steps,
+in sequence, each with the observable that distinguishes it — and a session
+arriving at a divergence walks it rather than diffing two languages:
+
+| step | what to compare | the observable that settles it |
+| --- | --- | --- |
+| 1 payload directory | the resolved package root, after the symlink chain | the path each half prints when the payload is absent |
+| 2 host triple | the triple each half maps this host to | one half's empty string against the other's triple |
+| 3 selection | which of the three outcomes each half reached | omit-and-declare vs. verify vs. refuse, never the exit status alone |
+| 4 digest | the hex compared, and its case | a mismatch on identical bytes is a case fold, not a corrupt artifact |
+| 5 execution | the argv the artifact actually received | the binary's own usage refusal, which echoes what it was handed |
+
+Step 4 is the row that most often reads as a defect and is not one: `Get-FileHash`
+returns upper-case hex where the sidecar carries `sha256sum`'s lower case, so the
+halves agree on the digest and disagree on its spelling. Step 3 is the row where
+reading the exit status alone misleads, because two of the three outcomes are not
+failures. This is the same economy the truth table in §The consumer smoke buys,
+stated once here rather than rediscovered per divergence.
+
+**Two host assumptions this bootstrap rests on are measured rather than assumed.**
+Both were measured on a native Windows runner: `[[ -x ]]` **holds** on a freshly
+`chmod +x`'d shebang script, which executes directly despite
+`core.filemode=false`; and it **holds** on npm's extension-less bin shim, written
+mode `-rwxr-xr-x` beside its `.cmd` and `.ps1` siblings. So neither `-x` test
+needs a Windows special case and neither bootstrap carries a mode-detection
+branch. They are recorded here because a later reader meeting either test will
+otherwise ask the question again, and the answer cost a runner to buy.
+
+The alternative refused is one declaration
 generating both halves. Its
 grounds: at five steps the generator is a third artifact — a template language,
 a freshness gate and a projection-roster row — maintained for a surface small
@@ -557,7 +628,9 @@ select itself, so something must resolve the platform, verify the artifact, and
 place it. Each step is deliberately small enough to be written twice, in bash
 and in PowerShell.
 
-**Platform resolution is derived and never stored.** `target_of_host()` maps
+**Platform resolution is derived and never stored.** This paragraph describes the
+**bash** half; the PowerShell half answers the same question from its own runtime
+and is described at the end of it. `target_of_host()` maps
 `uname -s` and `uname -m` to one Rust target triple, and to the empty string on
 a host that maps to none. It runs once per `init`, after the profile's kit set
 resolves and before anything is written. The result stays a local: a stored copy
@@ -586,6 +659,18 @@ Whether an msvc-built binary runs on an arbitrary Windows host is a question no
 run has answered, and withholding that answer until one has is that join bound
 doing its job.
 
+**The PowerShell half reads the runtime instead, and reaches the same triple.**
+It asks the .NET runtime for the OS platform and the OS architecture rather than
+shelling out to `uname`, because the host this half exists for need carry no
+POSIX shell and therefore need carry no `uname` — the standing obligation is to
+assume none. On a native Windows x64 host it resolves `x86_64-pc-windows-msvc`,
+the same triple the bash half's `MINGW*`/`MSYS*`/`CYGWIN*` arm produces and for
+the same stated reason: the map answers *which published artifact fits this
+host*. **Its verdict is unchanged today for the same reason the bash arm's is** —
+`native/targets.list` does not carry that triple, so selection still resolves
+`substrate-unavailable`. Shipping this half is not a platform claim, and
+§Requirements still says what it says.
+
 **Selection has three outcomes, and collapsing any two is the defect.** The
 payload carries the target roster verbatim beside the artifacts
 (gate-sdk/SPEC.md §Consumer payload), and `init` reads it rather than inferring
@@ -607,6 +692,18 @@ one place this path fails an install, and it belongs there: a missing artifact
 for a **declared** target is a defect the adopter cannot act on and must not
 inherit silently.
 
+**Both bootstraps owe this table all three rows, and the PowerShell half's first
+row reads differently without collapsing into another.** On the bash half
+*omit and declare* proceeds — there is a whole install behind it to perform. The
+PowerShell half has nothing behind it yet: what proceeds on the bash half is
+conditional install logic, which sits `behind-invoke` and does not exist. So that
+half declares the omission and stops, at the bash half's own exit status for the
+same outcome, and the two agree on everything an adopter can observe at this
+point. It is still the **first** row and not the third: the third refuses and
+says the payload is broken, this one reports that the platform is not in the
+support roster. A twin that returned the same status for both would be
+collapsing them, which is the defect this table exists to name.
+
 **The digest is verified before anything is written.** `init` computes the
 artifact's SHA-256 and compares it against the sidecar that travelled with it,
 and only then writes. The ordering is the whole of it: a consumer who cannot
@@ -619,6 +716,18 @@ second and not the first. When **neither** resolves the install proceeds and the
 artifact is omitted rather than written unverified. Both halves are load-bearing:
 never write what was not verified, and never fail an install over something the
 adopter did not choose.
+
+**That hasher resolution is the bash half's, and the PowerShell half has none of
+it — a ruling, not an omission.** PowerShell carries `Get-FileHash`, so on that
+half there is no hasher to resolve between, no `sha256sum`/`shasum` fallback and
+**no `digest-unverifiable` outcome at all**: the branch is vacuous there, which is
+the same fact the relocation's precondition already records from the other
+direction. This is the one step where the twin is simpler than the original
+rather than parallel to it, and it is stated because a reader holding the two
+halves side by side will otherwise read a missing branch as a defect. The one
+asymmetry it does introduce is spelling, not logic: `Get-FileHash` returns
+upper-case hex against a lower-case sidecar, so that half folds case before
+comparing.
 
 **The artifact is the one path the changed-file protection does not cover, and
 that is what makes the digest actionable.** Everywhere else `init` writes, a file

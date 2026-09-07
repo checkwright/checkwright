@@ -416,6 +416,214 @@ jobs:
           echo "exercises none. See this job's header for what stands between the two."
           exit "$rc"
 
+  # The fourth install-smoke leg, and the second BOOTSTRAP's own. Count these legs
+  # by bootstrap and never by platform (installer/README.md §The install boundary):
+  # the three above are three platforms driving ONE bootstrap — the Windows one
+  # through Git-for-Windows bash — so a reader counting platforms has been reading
+  # three legs as covering two halves, which they never did. No other leg
+  # substitutes for this one.
+  #
+  # **What it asserts, and what it deliberately does not.** It asserts the five
+  # bootstrap steps that section specifies, each on its own observable, including
+  # all three selection outcomes and a real `--install place-artifact` that
+  # performs a placement. It does NOT assert that a `checkwright init` completes
+  # through PowerShell, and the reason is structural rather than incidental: the
+  # binary carries no `init` arm, so step 5's verbatim forwarding would hand `init`
+  # to a program that does not implement it. Payload-end-to-end is owed WITH THE
+  # RELOCATION and is recorded as owed rather than dropped — read the absence as
+  # sequencing, not as an oversight to quietly fill in.
+  #
+  # **The continue-on-error posture is chosen here, not inherited from the sibling
+  # above.** That job's non-binding status is what let a manifest defect survive
+  # seventeen unread rounds, and acquiring the same posture by proximity would
+  # repeat the cost, so it is argued instead: the bootstrap this job drives has
+  # never executed anywhere, because the repository that authored it has no
+  # PowerShell to run it on, so this job's first run is that code's first run and a
+  # binding red would spend a watched push on the very defect the leg exists to
+  # surface. That is a one-run reason with an expiry. **Drop this line on the first
+  # run it is observed green, and not before.** Until then read it JOB-KEYED: a
+  # continue-on-error job concludes `failure` while its workflow concludes
+  # `success`, which is exactly how the sibling above went unread.
+  #
+  # **The setup steps are bash and that is not a breach of the standing "assume no
+  # POSIX shell" obligation**, which binds the BOOTSTRAP and not the publisher.
+  # Assembling a payload is the packer's job and the packer is bash (§The packer).
+  # What must run on a host with no POSIX shell is the step that invokes
+  # checkwright.ps1 — and that step is pwsh, reading only the packed tarball.
+  install-smoke-powershell:
+    runs-on: windows-latest
+    continue-on-error: true
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      # Before the checkout, for the reason the sibling leg states: every digest
+      # comparison below assumes the tree the rest of this repository assumes.
+      - name: check the tree out with LF line endings
+        shell: bash
+        run: git config --global core.autocrlf false
+
+      # fetch-depth: 0 — the pack step stamps its version from `git describe
+      # --tags`, and a shallow checkout carries none.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+
+      # The same roster steering the Windows leg above takes, for the same reason
+      # and with the same standing: MEASUREMENT SCAFFOLDING, NOT A ROSTER WIDENING.
+      # It packs a locally built, digest-verified artifact for this host while the
+      # published payload still commits only to what native/targets.list declares.
+      # This leg performs no join and no surface claims native Windows support on
+      # the strength of it.
+      - name: build an artifact and pack a payload for this host
+        shell: bash
+        run: |
+          set -uo pipefail
+          source gate-sdk/lib/gate.sh
+          tmp="$(cygpath -u "$RUNNER_TEMP" 2>/dev/null || printf '%s' "$RUNNER_TEMP")"
+          [[ -d "$tmp" ]] || { echo "scratch base did not resolve: $RUNNER_TEMP -> $tmp"; exit 2; }
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
+          echo "host triple: $host"
+          crate="$(gate_native_crate)"
+          bin="$(gate_native_bin)"; bin="${bin##*/}"
+          art="$tmp/artifacts/$host"
+          mkdir -p "$art"
+          bash gate-sdk/bin/build-native.sh || { echo "the crate would not build on this host"; exit 2; }
+          cp "$crate/target/release/$bin" "$art/$bin" || exit 2
+          # The sidecar is emitted once, where the bytes are produced; pack
+          # re-verifies it and the bootstrap verifies it again before executing.
+          ( cd "$art" && sha256sum "$bin" > "$bin.sha256" ) || exit 2
+          roster="$tmp/targets.list"
+          printf '%s\n' "$host" > "$roster"
+          version="$(git describe --tags --abbrev=0 2>/dev/null)"; version="${version#v}"
+          [[ -n "$version" ]] || version="0.0.0-pwsh-smoke"
+          GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_PACK_TMP_DIR="$tmp" \
+            bash scripts/pack-installer.sh --root "$PWD" --version "$version" \
+              --out "$tmp" --artifacts "$tmp/artifacts" || exit 2
+          shopt -s nullglob
+          tarballs=("$tmp"/*.tgz)
+          shopt -u nullglob
+          [[ ${#tarballs[@]} -eq 1 ]] || { echo "expected one tarball, found ${#tarballs[@]}"; exit 2; }
+          mkdir -p "$tmp/pkg"
+          tar -xzf "${tarballs[0]}" -C "$tmp/pkg" || exit 2
+          # Handed on in WINDOWS spelling: everything below this step is pwsh
+          # reading real paths, not MSYS bash reading translated ones.
+          {
+            echo "PWSH_PKG=$(cygpath -w "$tmp/pkg/package")"
+            echo "PWSH_SCRATCH=$(cygpath -w "$tmp")"
+            echo "PWSH_TARGET=$host"
+            echo "PWSH_BIN=$bin"
+          } >> "$GITHUB_ENV"
+
+      # The leg proper. Each of the five steps is asserted on an observable that
+      # distinguishes IT rather than on the run merely succeeding, because a
+      # bootstrap that failed step 2 and one that failed step 4 both exit non-zero.
+      # The fixtures are minimal packages — the bootstrap reads bin/ and
+      # payload/artifact/ and nothing else, so a kit tree would be cost with no
+      # assertion behind it.
+      - name: drive the PowerShell bootstrap through its five steps
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pkg = $env:PWSH_PKG
+          $scratch = $env:PWSH_SCRATCH
+          $target = $env:PWSH_TARGET
+          $binname = $env:PWSH_BIN
+          $script:fails = 0
+          function Check([string] $label, [bool] $cond, [string] $detail) {
+              if ($cond) { Write-Host "ok   $label" }
+              else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
+          }
+          # A minimal package: the real bootstrap, and an artifact tree the caller
+          # may then break in exactly one way.
+          function New-Fixture([string] $name) {
+              $root = Join-Path $scratch $name
+              if (Test-Path $root) { Remove-Item -Recurse -Force $root }
+              New-Item -ItemType Directory -Force -Path (Join-Path $root 'bin') | Out-Null
+              Copy-Item (Join-Path $pkg 'bin/checkwright.ps1') (Join-Path $root 'bin/checkwright.ps1')
+              $src = Join-Path $pkg "payload/artifact"
+              $dst = Join-Path $root "payload/artifact"
+              New-Item -ItemType Directory -Force -Path $dst | Out-Null
+              Copy-Item -Recurse -Force (Join-Path $src '*') $dst
+              return $root
+          }
+          function Invoke-Bootstrap([string] $root, [string[]] $bootArgs) {
+              $out = Join-Path $scratch 'out.txt'
+              $err = Join-Path $scratch 'err.txt'
+              $p = Start-Process -FilePath 'pwsh' -PassThru -Wait -NoNewWindow `
+                   -ArgumentList (@('-NoProfile','-File',(Join-Path $root 'bin/checkwright.ps1')) + $bootArgs) `
+                   -RedirectStandardOutput $out -RedirectStandardError $err
+              return [pscustomobject]@{
+                  Code = $p.ExitCode
+                  Out  = (Get-Content -Raw -LiteralPath $out -ErrorAction SilentlyContinue)
+                  Err  = (Get-Content -Raw -LiteralPath $err -ErrorAction SilentlyContinue)
+              }
+          }
+
+          Write-Host "== the host this leg's step-2 assertion is written against =="
+          Check "the runner's own rustc host triple is x86_64-pc-windows-msvc" `
+                ($target -eq 'x86_64-pc-windows-msvc') `
+                "it is '$target' — step 2's expected answer moved and this assertion must be re-read, not re-greened"
+
+          Write-Host "== step 1: the package's own payload directory =="
+          $f = New-Fixture 'fx-nopayload'
+          Remove-Item -Recurse -Force (Join-Path $f 'payload')
+          $r = Invoke-Bootstrap $f @()
+          Check "a package with no payload is named as such" `
+                ($r.Code -eq 2 -and $r.Err -match 'carries no payload') "exit $($r.Code): $($r.Err)"
+
+          Write-Host "== step 2 and step 3, outcome 1: a host off the roster omits and declares =="
+          $f = New-Fixture 'fx-offroster'
+          Set-Content -LiteralPath (Join-Path $f 'payload/artifact/targets.list') -Value 'nosuch-triple-for-any-host'
+          $r = Invoke-Bootstrap $f @()
+          Check "a triple the roster does not carry is declared substrate-unavailable and proceeds" `
+                ($r.Code -eq 0 -and $r.Err -match 'substrate-unavailable') "exit $($r.Code): $($r.Err)"
+
+          Write-Host "== step 3, outcome 3: a declared target with half a pair refuses =="
+          $f = New-Fixture 'fx-halfpair'
+          Remove-Item -Force (Join-Path $f "payload/artifact/$target/$binname.sha256")
+          $r = Invoke-Bootstrap $f @()
+          Check "a declared target with no complete artifact refuses, and is not omitted" `
+                ($r.Code -eq 1 -and $r.Err -match 'no complete artifact') "exit $($r.Code): $($r.Err)"
+
+          Write-Host "== step 4: the SHA-256 is verified against the sidecar =="
+          $f = New-Fixture 'fx-tampered'
+          Add-Content -LiteralPath (Join-Path $f "payload/artifact/$target/$binname") -Value 'tamper'
+          $r = Invoke-Bootstrap $f @()
+          Check "an artifact that does not match its sidecar refuses before executing" `
+                ($r.Code -eq 1 -and $r.Err -match 'does not match its published digest') "exit $($r.Code): $($r.Err)"
+
+          Write-Host "== step 5: the verified artifact is executed with argv forwarded verbatim =="
+          $f = New-Fixture 'fx-run'
+          # A token carrying spaces and a quote, echoed back by the binary's own
+          # parse refusal: PowerShell's default binder splits and re-quotes, so a
+          # half that forwarded loosely reports 'a' here and not the whole token.
+          $r = Invoke-Bootstrap $f @('--install','place-artifact','a b "c"')
+          Check "the artifact ran and received the caller's token unaltered" `
+                ($r.Code -eq 2 -and $r.Err -match [regex]::Escape("got 'a b ""c""'")) "exit $($r.Code): $($r.Err)"
+
+          $root = Join-Path $scratch 'consumer'
+          New-Item -ItemType Directory -Force -Path (Join-Path $root 'scripts') | Out-Null
+          $src = (Join-Path $f "payload/artifact/$target/$binname")
+          $digest = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant()
+          $r = Invoke-Bootstrap $f @('--install','place-artifact','--root',$root,'--src',$src,
+                                     '--dest','scripts/checkwright-gates.exe',
+                                     '--seam','scripts/gate-sdk-config.sh',
+                                     '--target',$target,'--digest',$digest)
+          Check "a real --install place-artifact performs a placement and emits its two verbs" `
+                ($r.Code -eq 0 -and $r.Out -match 'own\tscripts/checkwright-gates.exe' -and $r.Out -match 'own\tscripts/gate-sdk-config.sh') `
+                "exit $($r.Code): out=$($r.Out) err=$($r.Err)"
+          Check "the placement actually wrote the artifact" `
+                (Test-Path -LiteralPath (Join-Path $root 'scripts/checkwright-gates.exe')) "nothing was written"
+
+          Write-Host "== verdict =="
+          Write-Host "This leg asserts the five bootstrap steps. It does NOT assert that a"
+          Write-Host "'checkwright init' completes through PowerShell: the binary carries no init"
+          Write-Host "arm, so payload-end-to-end is owed with the behind-invoke relocation."
+          if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
+          Write-Host "the PowerShell bootstrap answered all five steps"
+
   # The macOS sibling, and the second non-Linux host this repository runs on.
   # **It is binding: its red fails this workflow.** Read that as a different
   # assertion from the Linux leg's rather than the same one spelled twice — the
