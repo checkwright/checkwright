@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# arm 1: a construct with no valve anywhere near it
+newest() { printf '%s\n' "$@" | sort -V | tail -n1; }

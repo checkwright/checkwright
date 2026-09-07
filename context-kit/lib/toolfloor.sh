@@ -48,6 +48,7 @@ tool_floor_check() {   # $1 = roster element, $2 = probed banner ("" when absent
     [[ -n "$TOOL_FLOOR_MIN" ]] || { printf 'ok'; return 0; }
     found="$(tool_floor_version "$banner")"
     [[ -n "$found" ]] || { printf 'uncomparable'; return 0; }
+    # portability-declared: docs/install.md §Requirements declares a GNU sort for the install path itself — this predicate is what `checkwright doctor` runs off the payload copy, so a stock BSD userland fails the check that exists to diagnose it
     sorted="$(printf '%s\n%s\n' "$TOOL_FLOOR_MIN" "$found" | sort -V 2>/dev/null)" \
         || { printf 'uncomparable'; return 0; }
     if [[ "${sorted%%$'\n'*}" != "$TOOL_FLOOR_MIN" ]]; then

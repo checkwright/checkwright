@@ -65,6 +65,7 @@ pub mod memory_off;
 pub mod merge_attrs;
 pub mod path_dialect;
 pub mod payload_claim;
+pub mod portability_floor;
 pub mod producer_liveness;
 pub mod prose_enum;
 pub mod prose_tells;
@@ -1672,6 +1673,19 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_MSG_PATTERN_FILES_LOCAL",
             "GATE_PRUNE_DIRS",
         ],
+        "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-portability-floor — no walk root: the corpus is
+    // `git ls-files` over the configured pathspecs, which §check-reads-couples rules outside the
+    // walk class, and a pathspec roster is a knob's value rather than a root a registry can name.
+    // spec: gate-sdk/SPEC.md §check-portability-floor — the knob pair is this member's alone,
+    // deliberately not the leak ban's
+    (
+        "check-portability-floor",
+        portability_floor::run,
+        &[],
+        &["GATE_PORTABILITY_PATTERNS", "GATE_PORTABILITY_PATHS"],
         "gate-sdk",
         &[("git", "")],
     ),

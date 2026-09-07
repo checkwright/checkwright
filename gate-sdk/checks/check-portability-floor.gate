@@ -1,0 +1,3 @@
+# graph: couples=scripts/portability-patterns.list dir=one valve=none tier=precommit trigger=*
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-portability-floor — no file on the configured install-path corpus uses a banned non-portable construct without a declared valve (the roster and the corpus are both consumer config; the pattern files and their templates are self-exempt)

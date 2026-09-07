@@ -65,6 +65,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-hook-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-tree-terms | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-portability-floor | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-root-tiering | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-workflow-tiering | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-pinning | precommit |

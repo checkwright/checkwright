@@ -12,45 +12,6 @@
 
 ## New Features
 
-- **gnu-ism-on-adopter-install-path-ungated** [spec: SPEC-portability-floor.md] — no gate keeps a
-  GNU-only shell
-  construct off the adopter install path; the live one was found by a hand survey.
-  **The attested instance.** `find -printf` in `installer/lib/init.sh`, both sites, on the path
-  since the loop was written and found only by a spec-stage hand survey 2026-09-06. Fixed the same
-  iteration by the findutils rider; nothing catches the next one entering.
-  **What remains live is DECLARED, not accidental.** `sort -V` and `realpath --relative-to` are
-  named in `docs/install.md` §Requirements — they are the exemption set a gate would carry, not
-  the violations it would find.
-  **The corpus is small and named**, which is what makes this buildable — and spec corrected both
-  halves of the sentence that used to sit here. It is FIVE roots, not four: `installer/lib`,
-  `installer/bin`, `gate-sdk/lib/gate.sh`, `gate-sdk/bin/gen-pre-commit.sh` and
-  `context-kit/lib/toolfloor.sh`, which `installer/lib/doctor.sh:9` runs off the payload and which
-  carries a live `sort -V` — so the four-root roster was short under this entry's own reachability
-  criterion. And guard-kit ships NO blocklist-roster mechanism and no gate at all; the precedent is
-  gate-sdk's `check-commit-msg`/`check-tree-terms` pair over `GATE_SDK_MSG_PATTERN_FILES`.
-  **Open before it can be built:** the blocklist's own membership. A construct list is a vocabulary,
-  and a kit literal spelling one publishes it — so it is consumer config on the
-  `check-graph`/`scripts/graph-vocab.sh` pattern, never a kit array.
-  **DISTINCT from `macos-leg-brew-set-vs-documented-requirements`**, which holds a package set equal
-  to a documented list. This one keeps a construct class off a code path, and it is not
-  macOS-specific: any BSD userland meets it.
-  **Cost while deferred:** a GNU-ism reaching the path is invisible until a macOS or BSD adopter
-  meets it, or until the macOS leg's next run does — and that leg is binding now, so that run reds
-  `master`.
-  **TAKEN 2026-09-07 on the port-first run's product-class-with-a-live-trigger ground —
-  `lead, own-authority`, relayed at scope.** The adopter install
-  path is the witness under TRAJECTORY.md's 2026-08-30 discriminator and the binding macOS leg is
-  the live trigger. Premises re-probed at HEAD rather than inherited — `find -printf` is gone from
-  `installer/lib`, surviving only inside two `# spec:` comments explaining why it is not used,
-  while `sort -V` (`installer/lib/init.sh:70`) and `realpath --relative-to`
-  (`gate-sdk/bin/gen-pre-commit.sh:33`, `gate-sdk/lib/gate.sh:563,575,616`) are live and inside the
-  documented exemption set, so the declared-not-accidental claim above is exact.
-  Filed 2026-09-06 by build as the second of two enforcement-first gaps the macOS leg surfaced;
-  promoted here at the 2026-09-06 close drain.
-  Promoted 2026-09-07 by spec as `check-portability-floor`, born native, vocabulary and corpus both
-  consumer config on the `check-graph` pattern with a per-site declaration valve; the census behind
-  the corrected corpus is in `.workflow/survey-record.md`.
-
 - **kfric-capture-unverified-assertion** [spec: SPEC-kfric-drain.md] — the knowledge-friction
   channel has
   no oracle, so it captures whatever a session asserts and the next reader reads it as measured.
@@ -10219,5 +10180,6 @@
 
 - consumer-smoke-manifest-verdict-outruns-its-report
 - installer-printed-followup-commands-uncovered
+- gnu-ism-on-adopter-install-path-ungated
 
 ## Lessons Learned

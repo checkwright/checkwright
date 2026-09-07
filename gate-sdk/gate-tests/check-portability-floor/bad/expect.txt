@@ -1,0 +1,4 @@
+use a banned non-portable construct
+tree/empty-reason-verb:5:relativize() { realpath --relative-to="$PWD" "$1"; }
+tree/too-far-verb:5:manifest() { find "$1" -type f -printf '%P\n'; }
+tree/undeclared-verb:3:newest() { printf '%s\n' "$@" | sort -V | tail -n1; }

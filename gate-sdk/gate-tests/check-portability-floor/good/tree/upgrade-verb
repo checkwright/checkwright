@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# a corpus member whose construct is declared on the line above the site
+compare_versions() {
+    # portability-declared: docs/install.md §Requirements — the upgrade path's version compare
+    printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1
+}
+relativize() { realpath --relative-to="$PWD" "$1"; }  # portability-declared: the same-line window

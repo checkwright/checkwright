@@ -1,0 +1,4 @@
+# banned-construct fixture (POSIX ERE, one per line; '#' + blank ignored)
+sort -V
+realpath [^|;]*--
+find [^|;]*-printf

@@ -104,7 +104,11 @@ your `PATH`, and the note says what breaks without it:
   `sort` is the member standing for that family. The binding construct is
   `realpath --relative-to` in the gate library every check sources; the release,
   drift and usage tooling reach for `sort -V`, `date -d` and `stat -c` besides.
-  No BSD equivalent carries those flags.
+  No BSD equivalent carries those flags. A construct named here is what a
+  `# portability-declared:` marker cites at the site that uses it, so the
+  declaration and the enforcement are one fact with one owner rather than two
+  lists that agree by habit — `check-portability-floor` reds a new undeclared
+  use before it reaches this page.
 - `shellcheck` — an **adopter** requirement and not merely a contributor one,
   which is why it carries no audience token where `cargo` below does. You
   inherit the battery: the `check-shellcheck` meta-gate runs
@@ -184,6 +188,9 @@ claim them.
   qualifies, in the same way the thing it diagnoses would fail. So the GNU-first
   instruction above is the install path's requirement too, not the battery's
   alone. It narrows on its own once these steps move behind a compiled binary.
+  Both sites carry a `# portability-declared:` marker naming this section, and
+  `check-portability-floor` holds the pair: a seventh site on the install path is
+  a red until its author has been here.
 - **`sha256sum` or `shasum`.** `init` verifies a prebuilt gate binary against
   its published digest before writing it, and it will take either hasher —
   `shasum` is there because stock macOS ships it instead. Neither present is not
@@ -209,8 +216,8 @@ that has to resolve your platform before any binary can run. It is deliberately
 small enough to exist twice, which is what would make a native Windows path
 possible where the roster above can only offer WSL.
 
-<!-- measured: ported-gate-members=108 -->
-That direction is now underway rather than announced: 108 gates in the battery
+<!-- measured: ported-gate-members=109 -->
+That direction is now underway rather than announced: 109 gates in the battery
 dispatch to the compiled binary today, which is every member the battery
 registers. The requirements above are still what those gates invoke. A gate whose
 rule *is* an external program keeps spawning it whatever the gate is written in,

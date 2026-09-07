@@ -128,6 +128,7 @@ check-action-permissions
 check-commit-msg
 check-commit-subject
 check-tree-terms
+check-portability-floor
 check-template-copy-parity
 check-template-registry-parity
 ```

@@ -1,0 +1,50 @@
+# portability-patterns.list — this repo's banned-construct roster for
+# check-portability-floor (gate-sdk default template, gate-sdk/SPEC.md
+# §check-portability-floor). One POSIX ERE per line; '#' comments and blank lines
+# ignored. The corpus it scans is GATE_SDK_PORTABILITY_PATHS in
+# scripts/gate-sdk-config.sh — the files an adopter's machine actually executes.
+# Files named portability-patterns* are self-exempt from the scan.
+#
+# A live site is marked '# portability-declared: <reason>' on that line or the one
+# above, and the reason names docs/install.md §Requirements, where the dependency
+# is declared to adopters. The roster is generic portability knowledge and carries
+# no project term, which is what lets it ship tracked.
+
+# find(1) primaries GNU-only: BSD find has neither.
+find [^|;]*-printf
+-regextype
+
+# sed(1): GNU takes a bare -i and spells ERE -r; BSD -i requires a backup suffix
+# and spells ERE -E.
+sed -i
+sed -r
+
+# Date arithmetic and path canonicalization: BSD date has no -d, BSD has no
+# realpath long options, and readlink -f is GNU-only.
+date -d
+readlink -f
+realpath [^|;]*--
+
+# Version sort, PCRE grep, and the GNU-only flags of cp/mktemp/stat/xargs/base64.
+sort -V
+grep -P
+cp --parents
+mktemp -p
+stat -c
+xargs -r
+base64 -w
+
+# gawk extension functions — absent from the one-true-awk a BSD userland ships.
+gensub
+asort
+strtonum
+systime
+
+# echo -e is not portable at all (the shell builtin's behaviour is
+# implementation-defined); printf is the portable spelling.
+echo -e
+
+# Coreutils programs a BSD userland may not carry under these names.
+(^|[^[:alnum:]_.-])seq[[:space:]]
+(^|[^[:alnum:]_.-])nproc([^[:alnum:]_.-]|$)
+(^|[^[:alnum:]_.-])tac([^[:alnum:]_.-]|$)

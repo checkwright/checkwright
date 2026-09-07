@@ -1777,11 +1777,16 @@ diagnostic is reproduced, and none was reproducible on either substrate.
 
 Invariant: every full-line comment on a governed source is one of — a
 machine directive (a comment a tool parses: `graph:`, `shellcheck`,
-`contract:`, `install:`, `smoke-unregistered:` — the last two read off a kit's
+`contract:`, `install:`, `smoke-unregistered:`, `portability-declared:` — the
+middle two read off a kit's
 vendored source, `install:` by the installer's recipe module and
 `check-install-disposition`, `smoke-unregistered:` by `run-consumer-smoke.sh`
 off `smoke/install.sh`, gate-sdk/SPEC.md §The install disposition and
-§Consumer smoke), a reason directive (a spec pointer, usage synopsis, or
+§Consumer smoke; `portability-declared: <reason>` is read at its own site by
+`check-portability-floor`, and it joins the built-in roster rather than a
+consumer's extras for the reason the others do — the directive is kit mechanism,
+minted by the gate-sdk section that owns the gate, gate-sdk/SPEC.md
+§check-portability-floor), a reason directive (a spec pointer, usage synopsis, or
 positional justification: `spec:`, `usage:`, `exception-list:`,
 `no-fixture:`, `no-port:`, `port-until:`, `assertion`, `permanent:`, `TODO(task:`,
 `TODO(spec-ambiguity)`, which blesses a bounded window — its own line plus

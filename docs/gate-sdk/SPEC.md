@@ -65,6 +65,10 @@ override with `GATE_SDK_GATES_DIR`) holding:
   `check-tree-terms` (generic patterns; copy `templates/msg-patterns.list`);
   `msg-patterns.local.list` — its gitignored companion for private terms, which
   must never be tracked (tracking the banned terms would itself be the leak).
+- `portability-patterns.list` — optional banned-construct roster for
+  `check-portability-floor` (copy `templates/portability-patterns.list`), read
+  together with the corpus knob that gate's section owns; absent, the assertion
+  is disabled rather than failed closed (see there).
 
 Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`; the
 crate names no gates directory anywhere, the owner sentinel `-` standing in its
@@ -149,6 +153,15 @@ bridge can carry them to the compiled member (see there),
 fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
 `<gates-dir>/msg-patterns.local.list`; gitignored, skipped when absent so a
 fresh clone without the operator's private list still commits),
+`GATE_SDK_PORTABILITY_PATTERNS` (default
+`<gates-dir>/portability-patterns.list`; space-separated banned-construct
+rosters for `check-portability-floor`, each **optional** — an absent file
+disables the assertion where a present-but-unreadable one is exit 2, see there),
+`GATE_SDK_PORTABILITY_PATHS` (default **empty**; space-separated pathspecs
+naming that gate's install-path corpus. Empty is the shipped default because the
+kit cannot know any consumer's install path, and an empty corpus disables the
+assertion rather than failing it closed — the degradation and its honest limit
+are §check-portability-floor's),
 `GATE_SDK_COMMIT_TYPES` (default
 `feat fix refactor perf docs test build ci chore style`; the shared
 commit-type roster — see §check-commit-subject — resolved onto the knob's own
@@ -16094,7 +16107,16 @@ resolved arrays — through the same two helpers, which the sibling module expor
 rather than this one re-deriving. `gate_msg_pattern_files` is one function in the
 shell precisely so the two halves of the leak ban cannot drift apart, and a
 second compiled copy of that resolution would reinstate the drift the shared
-helper exists to prevent. **No pattern is baked into the crate**: the roster is
+helper exists to prevent. **The *shape* now has a third consumer while the
+*roster* still has two**, and keeping the two facts apart is the whole of it:
+§check-portability-floor resolves its own pattern files the same way and imports
+this pair's `is_pattern` rather than re-deriving it — which is this paragraph's
+rule discharging on its first outside caller — but it carries a **separate knob
+pair**, because folding a portability construct into `msg-patterns.list` would
+make a `master`-reddening leak and a BSD incompatibility indistinguishable in one
+file, on one corpus, under one verdict. So a sentence about *this* pattern
+source feeding two readers stays exactly true; a sentence about the mechanism
+having two consumers does not. **No pattern is baked into the crate**: the roster is
 consumer config on the §check-graph pattern, and a kit literal carrying a
 consumer's vocabulary publishes it (CLAUDE.md §The provenance seam).
 
@@ -16233,6 +16255,157 @@ on that ground. Criterion 4 orders a port and prices it; it has never made a
 member un-takeable, five members having bound it and ported by widening their
 pairs, so a field whose meaning is *not takeable now* is the wrong instrument for
 a fixture widening.
+
+### check-portability-floor
+
+`checks/check-portability-floor.gate` (`precommit`, binary-dispatched).
+Invariant: no file on the configured **install-path corpus** matches a
+configured banned-construct pattern, except at a site carrying a
+`# portability-declared: <reason>` valve. It runs over `git ls-files` under the
+configured pathspecs, at `tier=precommit` with `trigger=*` so it fires on every
+commit — any edit to the install path can add a construct, not only an edited
+roster. Exit 1 on a matching site with no valve, reporting `path:lineno:line`
+and the pattern that matched. Exit 2 on the fail-closed set: a corpus member
+that is not readable, a pattern file that is present and not readable, and a
+pattern the ERE engine refuses at compile — the same compile-time refusal
+§check-tree-terms takes, so a GNU escape (`\b`, `\s`, `\w`) in a *portability*
+blocklist is itself refused, which is the joke this gate has to survive rather
+than make. Any file whose basename begins `portability-patterns` is self-exempt,
+on §check-tree-terms' precedent: a roster of banned constructs necessarily
+spells them, and the shipped template and a `.local` sibling are exempt beside
+the file itself.
+
+**What a green run buys, stated in the gate's own section so it cannot be read
+as more.** A blocklist is a roster of what someone thought to name. This gate
+buys **the next instance of a named construct**, never portability: a construct
+nobody listed passes, and no verdict here says or implies that the install path
+runs on a non-GNU userland. It landed green on this tree and was **purely
+preventive** — the census over its corpus found six live sites and every one was
+already declared — which is what enforcement-first asks for on a unit that
+shipped its fix without its guard.
+
+**Both the vocabulary and the corpus are consumer config, and absent config
+*disables* the assertion rather than failing it closed.** `GATE_SDK_PORTABILITY_PATTERNS`
+names the pattern files and `GATE_SDK_PORTABILITY_PATHS` the corpus pathspecs
+(§Layout and configuration owns both defaults); the kit ships
+`templates/portability-patterns.list` as a copyable starting roster on
+`templates/msg-patterns.list`'s model, and ships **no corpus at all**. This
+diverges from the sibling deliberately: `check-commit-msg`'s tracked pattern file
+is *required* and missing it is exit 2, while here an absent pattern file or an
+empty corpus makes the gate assert nothing and exit clean, naming the absence in
+its detail line — the §check-graph / `graph-vocab.sh` degradation, which is the
+pattern CLAUDE.md §The provenance seam names for exactly this case. The ground is
+that the kit cannot know any consumer's install path, so a fail-closed default
+would red every adopter's first commit on a roster only their project can write.
+**The honest limit, stated because the degradation is the whole risk:** an
+adopter who deletes the roster silently disables the gate, and no gate catches
+that. What bounds it is the detail line — a clean verdict saying *no corpus is
+configured* is a different sentence from one saying *no violation was found*, and
+a reader of a passing battery can tell them apart. **Absence and unreadability
+are different facts**: absence is how a consumer declines the gate, an unreadable
+*present* file is a machine that cannot answer, and only the second is exit 2.
+
+**This is the provenance-seam ruling for the member, stated rather than
+implied.** A construct list is a vocabulary; a kit literal spelling one publishes
+it, and a kit literal spelling *this* project's install path publishes the layout
+too. **Kit mechanism** is the scanner, the valve grammar, the resolution and the
+two knobs; **consumer config** is the pattern roster and the corpus roster; and
+nothing here is private rule content — a construct name is not an identity, so
+this repo's roster is generic portability knowledge and ships tracked, with no
+`.local` sibling minted.
+
+**A declared construct is marked at its site, not remembered.** A corpus line
+matching a banned pattern is clean when it carries a
+`# portability-declared: <reason>` marker
+on that line or the one above, and **the reason is mandatory** — an
+empty one is a violation rather than a pass, because the field's only reader is
+the human reviewing the diff that adds a valve, and a valve nobody has to justify
+is a valve everybody uses. The window and the mandatory reason are the
+conventions `update-target-exempt` and `comment-tier-exempt` already use; nothing
+new is invented, and the token joins canon-kit's built-in directive roster as kit
+mechanism (canon-kit/SPEC.md §check-comment-tier) so a full-line valve is a
+directive rather than an unblessed comment.
+
+**The cheap alternative is refused, and naming it is what says what the gate is
+*for*.** Leaving the declared constructs out of the blocklist entirely would make
+nothing match, need no valve, and still catch a new `find -printf`. It buys the
+smaller half: a **new** use of a declared construct in a file that never had one
+would pass silently, and the declaring prose and the code would drift apart with
+nothing between them — the two-hand-maintained-lists shape. With the valve the
+declared constructs stay *in* the blocklist, every live site carries a marker
+naming the declaring surface, and adding a seventh site is a red until its author
+has been to that surface. The declaration becomes a coupling instead of a memory.
+
+**The corpus is `git ls-files` over the pathspecs and deliberately not a
+directory walk**, which is a ruling rather than an evasion of §check-reads-couples'
+analyzed class. What an adopter's machine executes is what the payload carries,
+and the payload is assembled from **tracked** files, so an untracked file under a
+corpus root is not on the install path and scanning it would red on a construct
+nobody ships. The narrowing that section names as the cost of enumeration —
+losing sight of the untracked file a walk would see — is here the definition of
+the corpus rather than a loss. The member therefore declares **no walk root**, as
+§check-tree-terms does and for the same reason; a pathspec roster is a knob's
+value, which no registry could name as a root anyway. A **binary** corpus member
+is skipped and **counted** in the clean line: a construct is a spelling a shell
+runs, so a match inside a compiled artifact names no line to edit and no command
+an adopter executes.
+
+**The `couples=` names the pattern file and never the corpus.** Corpus membership
+is a knob a consumer may legitimately empty, and §check-graph's coupling assertion
+reds on a `couples=` glob matching nothing — so coupling the corpus would red a
+consumer for having declined the gate. The trigger is `trigger=*` regardless, so
+nothing is lost: the member runs on every commit either way.
+
+**A coverage-floor assertion is refused, and on the same point.** The tempting
+second arm — *every corpus root resolves to at least one file* — reds on a **zero
+count** and is therefore non-monotone: a consumer legitimately narrowing their
+install path to one file would go red for having narrowed it. This member's own
+verdict is monotone in the violation set — a narrower corpus can only remove
+violations, and it can be cleared by inspection — which is what makes narrowing
+safe here and unsafe there. The gate asserts the decidable half and leaves roster
+completeness to review, the line `check-amendment-update-target` draws for its own
+roster (canon-kit/SPEC.md §check-amendment-update-target).
+
+**Reuse rather than a new resolver.** The pattern-file resolution is
+`gate_msg_pattern_files`' shape, and the module reads the resolved arrays across
+the config bridge exactly as `native/src/gates/tree_terms.rs` does — the
+pattern-line filter itself is that sibling's `is_pattern`, imported rather than
+re-derived. What is **not** shared is the roster: a separate knob pair, because
+the two answer different questions — one is a privacy leak-ban over every tracked
+file, this is a portability floor over a named execution path — and folding a
+portability pattern into `msg-patterns.list` would make a `master`-reddening leak
+and a BSD incompatibility indistinguishable in one file, on one corpus, under one
+verdict.
+
+**Born native, no shell form authored.** A crate-carrying tree births a gate
+native by default and none of the exception classes at §The port-candidate
+criteria applies. **Criterion 4 clears**: the corpus is the configured pathspecs,
+none of them a `.gate` descriptor or a `native/src/gates/*.rs` module, so it
+reaches no gate declaration path — the same reading `check-amendment-update-target`
+gives its own corpus, and *not* `check-tree-terms`, whose corpus is `git ls-files`
+over the whole tracked tree and which is the register's widest **bound** instance
+under this criterion.
+
+The `good/`+`bad/` pair is the oracle and each case carries a stated job. `good/`
+holds a corpus member with a declared construct under its valve in both window
+positions, a member with none, a pattern file with comments and blanks, and the
+self-exempt roster itself — spelling every construct it bans, so its skip is
+proved by **greenness** rather than by absence. `bad/` holds an undeclared
+construct, a declared construct whose valve carries an empty reason, and a valve
+one line too far away, so each arm has an executable statement rather than a
+shared one. `check-portability-floor.test.sh` holds what a one-pair harness
+cannot spell: the two disabled-by-absent-config cleans and the sentence that
+tells them from a nothing-found one, the same knob path finding the violation
+once set, the GNU-escape compile refusal, the unreadable-pattern-file
+fail-close, the binary skip-and-count, and the record order each `expect.txt`
+line being an independent substring test.
+
+Producer of nothing but a verdict; its consumers are the committing session
+through the output contract, on the generated pre-commit hook, `run-gates.sh` and
+CI, and the `--run-gate-tests` arm through the fixture pair. Its inputs are the
+two knobs, whose producer is `lib/gate.sh`'s resolution and whose enabling
+configuration this repo actually sets, so the gate is live in this tree and not
+only in fixtures.
 
 ### check-template-copy-parity
 

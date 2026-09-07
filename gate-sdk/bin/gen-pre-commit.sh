@@ -30,6 +30,7 @@ mapfile -t CHECKS < <(gates_list_members "$LIST")
 
 REL_DIRS=("$GATES_DIR")
 while IFS= read -r k; do
+    # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; the emitted hook must carry repo-relative check dirs, not this machine's absolute ones
     REL_DIRS+=("$(realpath --relative-to="$REPO_ROOT" "$k")/checks")
 done < <(gate_kit_roots)
 

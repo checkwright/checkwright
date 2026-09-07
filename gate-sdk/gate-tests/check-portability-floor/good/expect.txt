@@ -1,0 +1,1 @@
+PORTABILITY-FLOOR: clean (2 install-path file(s) scanned under 1 configured pathspec(s), 0 binary member(s) skipped; none uses one of the 3 banned construct(s) undeclared)

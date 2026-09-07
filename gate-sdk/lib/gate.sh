@@ -76,6 +76,18 @@ for _gmp in ${GATE_SDK_MSG_PATTERN_FILES_LOCAL:-$GATE_SDK_GATES_DIR/msg-patterns
     GATE_MSG_PATTERN_FILES_LOCAL+=("$_gmp")
 done
 unset _gmp
+# spec: gate-sdk/SPEC.md §check-portability-floor — the portability roster and the install-path corpus as arrays, resolved here on the cause the pattern-file pair above states: a whitespace scalar feeding an array earns a spelling of its own, and a default the bridge's `declare -p` cannot find is its undeclared-knob refusal. The corpus default is EMPTY, which is what disables the assertion for a consumer who has not named their install path — the kit cannot know one, and a fail-closed default would red every adopter's first commit on a roster only their project can write.
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+GATE_PORTABILITY_PATTERNS=()
+for _gpp in ${GATE_SDK_PORTABILITY_PATTERNS:-$GATE_SDK_GATES_DIR/portability-patterns.list}; do
+    GATE_PORTABILITY_PATTERNS+=("$_gpp")
+done
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+GATE_PORTABILITY_PATHS=()
+for _gpp in ${GATE_SDK_PORTABILITY_PATHS:-}; do
+    GATE_PORTABILITY_PATHS+=("$_gpp")
+done
+unset _gpp
 # spec: gate-sdk/SPEC.md §check-core-files — the same resolution for that member's manifest path, on the cause the knobs above state: a default the bridge's `declare -p` cannot find is its undeclared-knob refusal. Rides GATE_SDK_GATES_DIR's resolved value; an absent manifest is the gate's own optional-config branch, not a refusal.
 [[ -v GATE_SDK_CORE_FILES_FILE ]] || GATE_SDK_CORE_FILES_FILE="$GATE_SDK_GATES_DIR/core-files.list"
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the four knobs the fifth batch's members declare, resolved here for the cause the roster above states: a default written inline at a use site or inside a helper's body is invisible to the bridge's `declare -p`, which is its undeclared-knob refusal on the member's first post-port run. Each keeps the `:-` semantics its use site had (an empty value takes the default), and the identity manifest and tests dir ride GATE_SDK_GATES_DIR's resolved value above so the pair stays one value by construction. An absent identity manifest is the gate's own optional-config branch and an absent tests dir the coverage gate's own no-pair branch, not a refusal.
@@ -560,6 +572,7 @@ while IFS= read -r _gkr; do
     if [[ "$_gkr" == "$PWD"/* ]]; then
         GATE_KIT_ROOTS_HERE+=("${_gkr#"$PWD"/}")
     elif [[ "$_gkr" == /* ]]; then
+        # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; relativizing an absolute kit root against the cwd is what keeps a bridged value out of the tracked hook
         GATE_KIT_ROOTS_HERE+=("$(realpath --relative-to="$PWD" "$_gkr" 2>/dev/null || printf '%s' "$_gkr")")
     else
         GATE_KIT_ROOTS_HERE+=("$_gkr")
@@ -572,6 +585,7 @@ GATE_SDK_ROOT_HERE="$(gate_sdk_root)"
 if [[ "$GATE_SDK_ROOT_HERE" == "$PWD"/* ]]; then
     GATE_SDK_ROOT_HERE="${GATE_SDK_ROOT_HERE#"$PWD"/}"
 elif [[ "$GATE_SDK_ROOT_HERE" == /* ]]; then
+    # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; the kit's own root takes GATE_KIT_ROOTS_HERE's relativization for its reason
     GATE_SDK_ROOT_HERE="$(realpath --relative-to="$PWD" "$GATE_SDK_ROOT_HERE" 2>/dev/null \
         || printf '%s' "$GATE_SDK_ROOT_HERE")"
 fi
@@ -613,6 +627,7 @@ _gate_kit_roots_rel_ensure_cache() {
         if [[ "$root" == "$anchor"/* ]]; then
             root="${root#"$anchor"/}"
         elif [[ "$root" == /* ]]; then
+            # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; this is the exotic-root fork the cache-fill above pays for at most once
             root="$(realpath --relative-to="$anchor" "$root" 2>/dev/null || printf '%s' "$root")"
         fi
         _gate_kit_roots_rel_cache+=("$root")

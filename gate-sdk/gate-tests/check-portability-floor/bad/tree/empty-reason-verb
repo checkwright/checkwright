@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# arm 2: a valve whose reason is empty — the field's only reader is the human
+# reviewing the diff, so nothing to read is a violation rather than a pass
+# portability-declared:
+relativize() { realpath --relative-to="$PWD" "$1"; }

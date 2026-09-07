@@ -22,6 +22,7 @@ check-install-disposition
 check-graph
 check-commit-msg
 check-tree-terms
+check-portability-floor
 check-assertion-strength
 check-commit-subject
 check-core-files

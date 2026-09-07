@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# arm 3: a valve one line too far away — the window is the line or the one above
+# portability-declared: docs/install.md §Requirements — but two lines up
+
+manifest() { find "$1" -type f -printf '%P\n'; }

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# a corpus member using none of the banned constructs
+list_files() {
+    find "$1" -type f -print | sort -u
+}

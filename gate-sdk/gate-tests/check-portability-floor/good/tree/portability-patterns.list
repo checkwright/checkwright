@@ -1,0 +1,5 @@
+# the self-exempt roster itself: it spells every construct it bans, and its skip is
+# proved by GREENNESS rather than by absence — a scanned roster would red this case.
+sort -V
+realpath [^|;]*--
+find [^|;]*-printf
