@@ -277,13 +277,18 @@ malformed_operands() {   # $1 = the '<path><TAB><want><TAB><got>' witness the sh
 }
 
 # spec: installer/README.md §The consumer smoke — the manifest arm's failure report, in the arm because this script mktemps its scratch under a cleanup trap and nothing after the run can open the disagreeing consumer; it is a straight-line sequence of prints with no branch that can change the verdict the caller goes on to fail with, every value it prints has a named reader in that section's truth table, and the entry that earns the exit-2 verdict is carried in as an operand so the sample set is required to contain it BY ITS BYTES and not only by its path
-manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 = mismatch count, $5 = checked count, $6 = the malformed witness tuple, empty where no disagreement failed the shape test, $7 = how many disagreements failed it, $8.. = one '<path><TAB><the want the loop held><TAB><the got the loop held>' per hash disagreement, in the order the loop found them
-    local profile="$1" C="$2" LOCK="$3" mismatch="$4" checked="$5" mal_first="$6" mal_n="$7"; shift 7
+manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 = mismatch count, $5 = checked count, $6 = the malformed witness tuple, empty where no disagreement failed the shape test, $7 = how many disagreements failed it, $8 = the first raw line of the .files stream, $9 = the raw line of the first disagreeing entry, empty where no hash disagreement was found, $10.. = one '<path><TAB><the want the loop held><TAB><the got the loop held>' per hash disagreement, in the order the loop found them
+    local profile="$1" C="$2" LOCK="$3" mismatch="$4" checked="$5" mal_first="$6" mal_n="$7" raw_first="$8" raw_bad="$9"; shift 9
     local -a bad=("$@") samples=() roles=()
     local target digest_want art seam entry p w g rest r out found pathmate i role
 
     printf '  == manifest report: %s, %s of %s entries disagree ==\n' "$profile" "$mismatch" "$checked"
     printf '  read the values below against the truth table in installer/README.md §The consumer smoke\n'
+    # spec: installer/README.md §The consumer smoke — the two RAW STREAM LINES, carried in as named operands rather than re-read, since a value re-read is a second observation and cannot testify about the first; the first line is unconditional on any comparison, which is what makes it the cheapest possible statement about the channel, and the disagreeing entry's line is the one want's own decomposition is read against. Their shape verdict is not a finding — a raw line is a path, a tab and a hash, so it fails the hash shape test by construction — and the octet dump is what they are printed for
+    printf '  -- the raw manifest stream, as the loop read it and before any split\n'
+    held_probe stream1 "$raw_first" 'the first line the .files stream delivered, whatever it is, held before the split'
+    [[ -z "$raw_bad" ]] \
+        || held_probe badline "$raw_bad" 'the raw line of the first disagreeing entry, held before the split that produced its want'
     if [[ ${#bad[@]} -eq 0 ]]; then
         printf '  every disagreement is a path the manifest names and the tree does not hold, so there is no hash to compare\n'
         return 0
@@ -431,7 +436,7 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
 # shared helper rather than a branch inside it: every covered-platform leg passes the green
 # expectation it asserts today, and the binary-less leg passes the refusal its install actually earns
 assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery expectation: green | unavailable
-    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked malformed_first malformed_n path want got target seam bin list k m line omitted want_omitted n_omitted q_seam q_bin
+    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line omitted want_omitted n_omitted q_seam q_bin
     local -a bad_hash=() lock_kits=() want_kits=()
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
@@ -477,20 +482,25 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
         || fail "$profile: manifest records version $(jq -r '.version' "$LOCK"), packed $VERSION"
     [[ "$(jq -r '.commit' "$LOCK")" =~ ^[0-9a-f]{40}$ ]] || fail "$profile: manifest records no 40-hex commit"
     [[ "$(jq -r '.profile' "$LOCK")" == "$profile" ]] || fail "$profile: manifest records the wrong profile"
-    mismatch=0; checked=0; malformed_first=""; malformed_n=0
-    while IFS=$'\t' read -r path want; do
+    mismatch=0; checked=0; malformed_first=""; malformed_n=0; raw_first=""; raw_bad=""
+    # spec: installer/README.md §The consumer smoke — the line is read WHOLE and split by parameter expansion, so the bytes the stream delivered exist in a variable the report can print: reading with IFS=$'\t' would make the split the same operation that consumes the evidence, and tab is IFS WHITESPACE, so that read also collapses tab runs and strips trailing ones — normalizing an anomalous line out of existence before anything can observe it. On the two-field, single-tab line the producer emits the two agree byte for byte, CR included, so this buys the witness and moves no value
+    while IFS= read -r line; do
         checked=$((checked + 1))
+        [[ -n "$raw_first" ]] || raw_first="$line"
+        path="${line%%$'\t'*}"; want="${line#*$'\t'}"
         [[ -f "$C/$path" ]] || { echo "  manifest names a file that is not there: $path"; mismatch=$((mismatch + 1)); continue; }
         got="$(git hash-object -- "$C/$path")"
-        # spec: installer/README.md §The consumer smoke — the shape test sits on the failure branch beside the tuple it diagnoses, over BOTH operands, because a value that is not a hash makes the disagreement a statement about this harness rather than about the consumer's tree, and the verdict below has to be able to say which; it records the FIRST offending entry as a whole tuple in bad_hash's own spelling and counts every one, since a run-wide flag recording only THAT something tripped it hands the reader a verdict and withholds its subject
+        # spec: installer/README.md §The consumer smoke — the shape test sits on the failure branch beside the tuple it diagnoses, over BOTH operands, because a value that is not a hash makes the disagreement a statement about this harness rather than about the consumer's tree, and the verdict below has to be able to say which; it records the FIRST offending entry as a whole tuple in bad_hash's own spelling and counts every one, since a run-wide flag recording only THAT something tripped it hands the reader a verdict and withholds its subject, and it keeps the RAW LINE of the first disagreeing entry beside that tuple because a value re-read is a second observation and cannot testify about the first
         [[ "$got" == "$want" ]] \
-            || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1)); bad_hash+=("$path"$'\t'"$want"$'\t'"$got")
+            || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1))
+                 [[ ${#bad_hash[@]} -gt 0 ]] || raw_bad="$line"
+                 bad_hash+=("$path"$'\t'"$want"$'\t'"$got")
                  [[ "$want" =~ ^[0-9a-f]{40}$ && "$got" =~ ^[0-9a-f]{40}$ ]] \
                      || { malformed_n=$((malformed_n + 1)); [[ -n "$malformed_first" ]] || malformed_first="$path"$'\t'"$want"$'\t'"$got"; }; }
     done < <(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")
-    # spec: installer/README.md §The consumer smoke — the report runs while the disagreeing consumer is still on disk and immediately before the verdict, so a leg that reds here says what it found rather than only how many, and it takes the witness as a named operand so the sample set contains the row the verdict below is about
+    # spec: installer/README.md §The consumer smoke — the report runs while the disagreeing consumer is still on disk and immediately before the verdict, so a leg that reds here says what it found rather than only how many, and it takes the witness and the two raw stream lines as named operands so the sample set contains the row the verdict below is about and the report can state what the channel delivered
     [[ "$mismatch" -eq 0 ]] \
-        || manifest_report "$profile" "$C" "$LOCK" "$mismatch" "$checked" "$malformed_first" "$malformed_n" ${bad_hash[@]+"${bad_hash[@]}"}
+        || manifest_report "$profile" "$C" "$LOCK" "$mismatch" "$checked" "$malformed_first" "$malformed_n" "$raw_first" "$raw_bad" ${bad_hash[@]+"${bad_hash[@]}"}
     # spec: installer/README.md §The consumer smoke — the refused operand is reported AFTER the report, not at the first bad value, because the report is exactly what diagnoses it and the report is now required to contain the entry this refusal names, so pointing at it is a direction rather than a hope; the line states the shape test's VERDICT and the decomposition beside it rather than declaring the operand malformed, since a reader who never scrolls up takes the last line away and a matcher refusing a well-formed hash would make that claim false; and it refuses at the harness-precondition code on either ground, since neither a mangled operand nor a matcher that will not accept a hash says anything about whether the tree matches what init recorded
     [[ "$mismatch" -eq 0 || -z "$malformed_first" ]] \
         || blocked "$profile: on ${malformed_first%%$'\t'*} the shape test refused $(malformed_operands "$malformed_first"), and it refused $malformed_n of $mismatch disagreeing entries. The report above samples that entry and prints each value's octet dump beside its shell-quoted rendering. Read the decomposition in the parentheses: len40=no or class=dirty says the operand is not a hash, while len40=yes with class=clean says this harness's matcher refused one. That is this harness's own precondition either way, not a finding about the consumer."

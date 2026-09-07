@@ -1681,9 +1681,10 @@ re-reads clean is invisible to a report that asks again, and that is not a
 hypothetical: the first form of this report re-read `want`, and saw nothing on a
 leg where every entry disagreed.
 
-- **`want`** — **held.** `files[P]` as the arm's own loop holds it: the value
-  `IFS=$'\t' read -r path want` gave it off the manifest stream, which is one of
-  the two values the failing comparison actually used. It is deliberately **not**
+- **`want`** — **held.** `files[P]` as the arm's own loop holds it: the loop
+  reads the manifest line whole with `IFS= read -r line` and takes `want` off it
+  by parameter expansion, so this is what that split produced and one of the two
+  values the failing comparison actually used. It is deliberately **not**
   re-read through a second channel.
 - **`got`** — **held.** The value the arm's own
   `got="$(git hash-object -- "$C/P")"` assigned, carried out of the loop on the
@@ -1727,6 +1728,43 @@ coincidence outcome above, where it is checked. A re-read value's `call` line is
 untouched by this rule: it prints the command that produced the value, which a
 reader can re-run, and it asserts nothing beyond that.
 
+**The manifest line is read whole and split in the shell, which is what makes
+the stream itself observable.** The loop reads with `IFS= read -r line` and
+derives `path` and `want` by parameter expansion, so the bytes the channel
+delivered exist in a variable before anything splits them. Reading with
+`IFS=$'\t' read -r path want` makes the split the same operation that consumes
+the evidence: there is then no point at which the delivered line is a value the
+report could print, and eighteen rounds read the *value* side because nothing
+ever held the *stream* side.
+
+*The split is not merely equivalent to the read it replaces — it is less
+normalizing, which is the second reason to take it.* Tab is an **IFS
+whitespace** character, so `IFS=$'\t' read` collapses runs of tabs and strips
+trailing ones. Probed rather than reasoned about: on the line `a\t\tb\t` the
+read yields `path=a want=b` while the expansion yields `path=a want=$'\tb\t'`.
+For the two-field, single-tab line `jq -r '"\(.key)\t\(.value)"'` actually emits
+the two agree byte for byte — including on a CR-terminated line, where neither
+strips the CR, and on a path carrying a space, which `IFS=$'\t'` leaves alone.
+Where they differ is on an **anomalous** line, and there the read normalizes the
+anomaly away before anything can observe it. That is the anti-normalization rule
+below, reached at the read.
+
+**Two raw stream lines, printed once per report rather than once per sampled
+path.** The **first line of the stream**, whatever it is, and the **raw line of
+the first disagreeing entry**. Both, because they answer different questions:
+the first says whether the channel delivers CRLF at all and is unconditional on
+any comparison, which makes it the cheapest possible statement about the stream;
+the second says whether *this* entry's bytes are what the verdict claims, which
+is the question the verdict is actually about. Carrying only one of the two
+buys half the witness for the same round. They are facts about the run and not
+about a path, so they sit outside the per-path block for the reason the worktree
+and config witnesses do, and they ride as **named operands** rather than being
+re-read, for the reason a held value exists at all: a value re-read is a second
+observation and cannot testify about the first. Their `tests` line is not a
+finding — a raw line is a path, a tab and a hash, so it fails the hash shape test
+by construction — and the `octets` line, produced through no construct that
+could normalize, is what they are printed for.
+
 Two values cannot separate *one side filtered* from *the bytes changed*, and no
 number of re-reads alone can separate either from *the comparison was handed
 something else*; six can, and the reading rule lives here rather than with
@@ -1745,6 +1783,8 @@ and the last three read the **instrument** rather than the operand:
 | `shape` fails while `len40` and `class` are both clean | two matchers in one shell disagree about one variable — the ERE engine or its locale is the subject, not the value; the operand is a hash and the harness refused it anyway |
 | `%q` renders bare while `octets` shows a byte outside `0-9a-f` | `printf '%q'` is not a byte rendering on this host, so **every** prior round's "bare rendering" reading is weakened to what quoting alone establishes; re-read rounds 12 to 17 against the octet dump before citing them |
 | `want != wantalt` | the manifest pipeline mangles between the lock and the comparison — the `jq` line render, the tab, or `read`'s splitting; the two octet dumps name the byte and the position |
+| the first stream line's `octets` end `0d 0a`, or `0d` once the newline is stripped | the channel delivers CRLF into the manifest stream at all, before any entry is compared. This is the one row that reads the **stream** rather than a value, and the decision rule below names what each dump selects |
+| the disagreeing entry's raw line against that same entry's `want` | separates *the carriage return arrived in the stream* from *it was introduced at the split*: a `0d` in both puts it in the stream, a `0d` in `want` alone puts it at or after the split, and neither carrying one puts the fault in the verdict's decomposition rather than in the value |
 | the coincidence outcome reads **path-equal, bytes differ** | the report's witness row and an earlier sample carry one path and two different tuples, so one recorded entry has two decompositions and they disagree. The subject is **this harness**, not the consumer: no reading of the consumer's tree may be taken from that run's manifest arm, and the two blocks printed under that path are the evidence. Read every other row of this table as suspended for that run |
 
 The instrument rows exist because a report rendered through one subsystem cannot
@@ -1858,6 +1898,13 @@ disagreement observable instead of absorbed. Unifying the two splits would
 delete the only signal that anything is wrong while changing nothing about the
 value that reaches the comparison — normalizing an operand and unifying the
 readings that disagree about it are one move under two spellings.
+
+*And it reaches the **read**, which is where it was needed longest without being
+stated.* A read that collapses tab runs and strips trailing tabs deletes a class
+of anomaly before any probe can see it, so the arm would be normalizing its own
+input while refusing to normalize its operands — the rule held on one side of
+the split and not the other. The loop therefore reads the line whole and splits
+it in the shell, as the manifest arm's description above states.
 
 Once per failing profile, and outside the per-path block because each is a fact
 about the run rather than about a path, the report also prints the consumer's
@@ -2056,15 +2103,50 @@ this.* `wantalt` reads the same key with a standalone `jq` call against the lock
 and comes back **clean**, so the value *stored in the manifest* is a clean
 40-hex string and the manifest pipeline is excluded. What differs is the read:
 the loop takes its entries from a process substitution,
-`while IFS=$'\t' read -r path want; do … done < <(jq -r '.files | to_entries[]…')`,
-and `read` strips the newline but not a preceding `\r`. A `jq` writing CRLF into
-that stream therefore appends a carriage return to **every** `want`, which is
-why the count is **493 of 493** rather than a subset — a whole-manifest count is
-the signature of a suffix on the reader, never of real hash divergence. The two
-operands were never compared as hashes at all. This last step is an inference
-from the tree and the log rather than an observation of `jq`'s output mode; the
-cheap witness for whoever takes it is one octet dump of a raw line off that
-stream, on the runner.
+`while … read …; do … done < <(jq -r '.files | to_entries[]…')`, and `read`
+strips the newline but not a preceding `\r`. A carriage return arriving in that
+stream therefore reaches **every** `want`, which is why the count is **493 of
+493** rather than a subset — a whole-manifest count is the signature of a suffix
+on the reader, never of real hash divergence. The two operands were never
+compared as hashes at all.
+
+*Where it comes from is open, and `wantalt` is a control that was never read as
+one.* The reading that named `jq`'s output mode is an inference from the tree
+and the log rather than an observation, and the same run carries evidence
+**against** it: `wantalt` re-reads the same key with a standalone `jq` through a
+**command substitution**, which strips trailing newlines and would *preserve* a
+carriage return, and it came back clean — forty octets, no `0d`, `printf '%q'`
+unquoted. Same host, same run, same binary, same stdout-to-a-pipe. That points
+away from `jq` and at the process-substitution channel the loop reads through,
+or at something after the read. What settles it is the thing eighteen rounds
+never bought: one octet dump of a raw line off that stream, on the runner, which
+the two raw operands above now carry.
+
+*The witness is sequenced behind the report's own fidelity, deliberately.* Until
+the coincidence check below replaced the report's unverifiable identity claim,
+any dump this stream witness bought would have been printed by the very
+instrument that was contradicting itself, so the dump was worth the round only
+after that repair landed.
+
+**What the next red round's dump selects, pinned ahead of the round so the
+reading cannot be shaped to fit.** Three outcomes, each naming its repair and
+the coverage that repair buys:
+
+- **The raw line ends `0d 0a`, or ends `0d` once the newline is stripped** — the
+  carriage return is in the stream, so the repair is at **production or at the
+  channel**, and it covers every reader of that stream rather than this one read.
+  The channel is then discriminated from the producer by the control already
+  present: a clean `wantalt` beside a CR-bearing raw line implicates the process
+  substitution `< <(…)`, and a CR-bearing `wantalt` implicates `jq`.
+- **The raw line carries no `0d`, yet `want` does** — the carriage return is
+  introduced at or after the split, so the repair is at **the read**, and its
+  coverage is correctly narrow.
+- **Neither carries a `0d`** — the verdict's decomposition is wrong rather than
+  the value, which is the coincidence check's subject and not the stream's.
+
+Whoever reads the next red round executes against this list rather than
+re-deriving it. Which outcome the round shows is not predicted here, and nothing
+above claims the leg passes.
 
 *And round 18 exposed a second defect the series was not looking for.* The report
 printed that same `want` as `len40=yes class=clean shape=pass` while the verdict

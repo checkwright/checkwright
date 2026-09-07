@@ -130,45 +130,6 @@
   Admitted as the iteration's lead unit `lead, own-authority` 2026-09-07; promoted at spec
   2026-09-08 by authoring the amendment, which is the same act.
 
-- **smoke-manifest-read-appends-carriage-return** [spec: SPEC-stream-witness.md]
-  — the Windows consumer smoke compares no manifest entry as a hash, because every `want` reaches
-  the comparison carrying a trailing carriage return, and after eighteen rounds nobody has seen a
-  single raw byte of the stream `want` is read from.
-  **Round 18 closed the series and the full record is `installer/README.md` §The consumer smoke's,
-  cited and not restated here.** Observed 2026-09-07 at close, run `34142337941`, job
-  `install-smoke-windows`, read JOB-KEYED, and failing again at `68cc1ea5` on run `34144326458`.
-  The READ is localized, at `run-smoke.sh`:425 and :434, where `read -r path want` strips the
-  newline but not a preceding CR; a whole-manifest count of 493 of 493 is the signature of a
-  suffix on the reader, never of real hash divergence.
-  **THIS SHIPS THE WITNESS, NOT THE REPAIR — `lead, own-authority` 2026-09-07**, on this stage's
-  escalation, and on three grounds rather than one. FIRST, the entry's own sequencing bar: the
-  octet dump must be bought BEFORE choosing between stripping the CR at the read and repairing the
-  producer, because the two differ in what else they cover. SECOND, found at spec 2026-09-08 and
-  weakening the entry's one remaining inference: `wantalt` re-reads the same key through a COMMAND
-  SUBSTITUTION, which would PRESERVE a CR, and in run `34142337941` it came back clean — forty
-  octets, no `0d`, `%q` unquoted — same host, same run, same binary. That is evidence AGAINST "jq
-  emits CRLF" and points at the process-substitution channel or at something after the read.
-  THIRD, and why this unit is sequenced at all: until `SPEC-witness-fidelity.md` lands, any dump
-  this unit buys is printed by the very instrument that is self-contradicting.
-  **THIS ENTRY DEMOTES RATHER THAN DONES, decided at spec and not discovered at merge.** The
-  `[spec:]` tag drops, the deferred section's own tag is restored, and it returns there with
-  its open question narrowed from WHERE THE CR COMES FROM to WHICH REPAIR THE OBSERVED DUMP
-  SELECTS — canon-kit's route for an entry whose amendment delivered one increment of a corpus.
-  **Four deltas, work-classed inline:** the loop reading the raw line and splitting it in-shell,
-  which is also LESS NORMALIZING and probed as such (tab is IFS whitespace, so today's read
-  collapses tab runs and strips trailing ones — on `a\t\tb\t` the read yields `want=b` while the
-  split yields `want=$'\tb\t'`; on the single-tab line the producer emits they agree byte for
-  byte, CR included); both the first stream line and the disagreeing entry's raw line carried into
-  the report as named operands; the decision rule pinned with three outcomes each naming its
-  repair AND its coverage, so the next red round needs no design turn; and the record carrying the
-  sequencing and the control that was never read as one.
-  **Product-class under the 2026-08-30 witness discriminator:** the smoke asserts the payload an
-  adopter receives, so the manifest's integrity claim is unasserted on the Windows install path.
-  **Cost while deferred:** the leg is `continue-on-error`, so this red never reaches a workflow
-  conclusion, and every run of it re-buys the same diagnosis.
-  Joined same-surface `lead, own-authority` 2026-09-07; the witness rides the CI round the roster
-  unit buys regardless. Promoted at spec 2026-09-08 by authoring the amendment.
-
 ## Technical Debt
 
 - **drain-order-retroactive-debt-sweep** — apply the 2026-08-30 drain-order ruling to the pool it
@@ -229,6 +190,36 @@
 
 ## Deferred
 
+
+- **smoke-manifest-read-appends-carriage-return** [design-pending] — the Windows consumer smoke
+  compares no manifest entry as a hash, because every `want` reaches the comparison carrying a
+  trailing carriage return; the witness that says where the CR enters now rides, and which repair
+  it selects is what remains open.
+  **The full record is `installer/README.md` §The consumer smoke's, cited and not restated here.**
+  Round 18, run `34142337941`, job `install-smoke-windows`, read JOB-KEYED; failing again at
+  `68cc1ea5` on run `34144326458`. A whole-manifest count of 493 of 493 is the signature of a
+  suffix on the reader, never of real hash divergence.
+  **THE WITNESS LANDED AT BUILD 2026-09-08 AND THE REPAIR WAS DELIBERATELY NOT CHOSEN** — `lead,
+  own-authority` 2026-09-07, on the spec stage's escalation. The manifest loop now reads the line
+  whole and splits it in the shell, which is also less normalizing than the read it replaced, and
+  the report carries two raw stream lines as named operands with their octet dumps: the first line
+  of the stream, and the raw line of the first disagreeing entry.
+  **Why still `[design-pending]`: the question is NARROWED, not answered.** It is no longer WHERE
+  THE CR COMES FROM but WHICH REPAIR THE OBSERVED DUMP SELECTS, and the three-outcome decision rule
+  that answers it is pinned in that same section — a CR in the stream buys a repair at production
+  or at the channel, covering every reader of that stream; a CR in `want` alone buys one at the
+  read, whose coverage is correctly narrow; and neither carrying one puts the fault in the
+  verdict's decomposition rather than in the value. `wantalt` discriminates the channel from the
+  producer. NO DESIGN TURN IS OWED. What is owed is one red round of `install-smoke-windows`, read
+  JOB-KEYED, and then the repair that list names.
+  **Product-class under the 2026-08-30 witness discriminator:** the smoke asserts the payload an
+  adopter receives, so the manifest's integrity claim is unasserted on the Windows install path.
+  **Cost while deferred:** the leg is `continue-on-error`, so this red never reaches a workflow
+  conclusion, and every run of it re-buys the same diagnosis — now against a pinned decision rule,
+  so the next round costs a reading rather than a diagnosis.
+  Filed 2026-09-07 into the gap inbox by the close of `windows-install-path-behind-the-invoke`;
+  joined same-surface `lead, own-authority` 2026-09-07; promoted at spec 2026-09-08 and DEMOTED
+  here at build 2026-09-08, its amendment having delivered one increment of the corpus.
 
 - **overhead-meter-resolves-the-newest-transcript-not-its-own** [design-pending] — a bare
   `--emit overhead-meter` resolves the NEWEST candidate transcript, so any session that delegates
