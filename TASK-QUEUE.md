@@ -58,6 +58,57 @@
   Joined same-surface, `lead, own-authority` 2026-09-07; promoted at spec 2026-09-07 by authoring
   the amendment, which is the same act.
 
+- **gate-binary-roster-covers-supported-platforms** [spec: SPEC-platform-evidence.md]
+  — `native/targets.list` carries ONE triple against a documented supported set of Linux and
+  macOS, the widening is owned by a retired entry, and fifteen of the sixteen files the port
+  oracle calls `owed` chain to this one precondition.
+  **THE JOIN BOUND IS DISCHARGED BY A RELEASE-SHAPED PRODUCER — ruled by the OPERATOR 2026-09-07,
+  through the lead's question relay in a lead session and lead-relayed.** A `native-artifacts`
+  matrix job in `gates.yml` mirrors `publish.yml`'s build leg and uploads the binary with its
+  `.sha256` sidecar; the platform smoke consumes that upload instead of building from the host it
+  runs on. `gates.yml`:790-801 **stands unamended** — its verdict is untouched, and what licenses a
+  line is a NEW predicate naming two jobs rather than a reinterpretation of that paragraph.
+  **THE ALTERNATIVE READING WAS PUT AND REFUSED, grounds recorded so it is not re-argued.** The
+  textual case for joining on the existing binding macOS green is real — the join bound at
+  `gate-sdk/SPEC.md`:7580-7586 carries no "released" qualifier and the stand-in clause at
+  :7638-7646 sits inside the pack/publish passage — and was refused anyway, because that paragraph
+  was authored one day before the reading it pre-refuses. THE TEXT IS NOT WHAT LOST; THE REVERSAL
+  IS. A later session finding the textual case persuasive is reading a settled question.
+  **THE TARGET SET IS NARROWED, correcting a false premise — `lead, own-authority` 2026-09-07.**
+  Asserted joined: `x86_64-unknown-linux-gnu` alone. Owed with named preconditions:
+  `aarch64-apple-darwin` and `x86_64-apple-darwin` (the latter needing its own Intel leg, since
+  `macos-latest` is arm64), and `x86_64-pc-windows-msvc`, whose precondition is
+  `docs/install.md` §Requirements documenting native Windows as supported — WHICH IT DOES NOT.
+  This entry's own claim that shipping the PowerShell half made native Windows supported is FALSE
+  at HEAD and is contradicted by that half's own amendment (`bd633f51`): "This amendment ships the
+  bootstrap, not the platform claim."
+  **THE ROSTER LINE IS NOT ASSERTED BY THE AMENDMENT, and the arithmetic is stated rather than
+  left to be rediscovered.** The licence is a green that must PRECEDE the write, so the first
+  watched push buys it (deltas 1-6) and the line can ride the second — the whole budget with no
+  slack. A red on the first spends the second re-buying it, in which case this entry's terminal
+  move is a DEMOTION rather than a Done, its precondition narrowed to the observed green. Delta 4's
+  default self-steering is what makes a second push cheap enough to attempt at all: without it the
+  roster line would have to steer the binding Linux leg in the same unwatched write that widens
+  the roster.
+  **Seven deltas, work-classed inline in the amendment:** a `platforms:begin` marker-block platform
+  declaration on the install page (the surface that makes §Consumer payload's documentation bound
+  mechanizable); `native/runners.list` with one map and two readers; the `native-artifacts`
+  producer; `INSTALLER_SMOKE_ARTIFACTS_DIR` plus default host self-steering, which RULES steering
+  and REFUSES the cross-build on `native/targets.list`:21-23's own grounds; the macOS leg
+  consuming the upload; the roster header discharging the retired owner; and the roster write
+  specified mechanically so it needs no second design turn.
+  **THREE discharge sites, not four** — `installer/README.md`:611-612, `native/targets.list`:31 and
+  :51-52. This entry's claimed fourth at `installer/README.md`:442 and further one at :530 do not
+  survive the file, which carries exactly one occurrence of the retired slug. Verified by content
+  at spec 2026-09-08.
+  **Cost while deferred is unchanged and now dated:** the port's completion predicate cannot
+  approach zero by any cut — `--emit port-blockers --tree` reads 16 owed at this stage, oracle-run
+  not restated — every macOS adopter silently loses more of the battery each iteration a
+  born-native gate lands, and three governed surfaces point at a retired entry as the owner of
+  live work.
+  Admitted as the iteration's lead unit `lead, own-authority` 2026-09-07; promoted at spec
+  2026-09-08 by authoring the amendment, which is the same act.
+
 ## Technical Debt
 
 ## Deferred
@@ -700,55 +751,6 @@
   half met — the bootstrap runs on native Windows, no install completes there.
   Filed 2026-08-03 by spec; re-scoped 08-24; fork 1 merged and demoted 08-25; source blockers
   re-scoped out 08-26; PowerShell half merged and demoted 09-07 — all by operator ruling.
-
-- **gate-binary-roster-covers-supported-platforms** [design-pending] — `native/targets.list`
-  carries ONE triple, `x86_64-unknown-linux-gnu`, against a supported set of at least Linux and
-  macOS, and the gap is now owned by no live entry.
-  **FILED 2026-09-07 by spec on the operator's Q1 ruling** (AskUserQuestion channel in a lead
-  session, lead-relayed), which took `powershell-installer-surface`'s PowerShell half only and
-  directed the widening filed separately.
-  **ADMITTED AS THE LEAD UNIT OF `supported-platform-roster-widening` — `lead, own-authority`
-  2026-09-07**, on that iteration's scope escalation. Port-critical and un-nestable: the scope
-  sweep read FIFTEEN of the sixteen owed files chaining to this one precondition, so it cannot
-  ride inside a cut and is its own iteration.
-  **THE OWNER RETIRED AHEAD OF THE PROMOTION CONDITION.** `platform-support-ci-matrix`, retired
-  2026-09-06, owned the CI leg and — since 2026-08-27 — the widening itself.
-  `gate-binary-target-roster-widening` shipped WITHOUT widening the roster, deliberately: an
-  iteration named *unblock* removes a blocker, it does not grant a permission. So the widening has
-  no owner. `TASK-QUEUE.md`'s `born-native-omission-accumulation` records the same orphaning from
-  the battery side; this entry owns the roster itself.
-  **WHAT IT BLOCKS, and this is why it is not merely tidy:** `installer/README.md`:610-612
-  sequences the installer's behind-invoke RELOCATION behind "the artifact roster covering every
-  supported platform". So this entry is the stated precondition of the relocation, which is in turn
-  the stated precondition of every non-packer `owed` file in `--emit port-blockers --tree` — the
-  count is the oracle's to state and is not carried here, because it moves whenever an owed file
-  lands or is added, as one was this iteration. The port's owed column cannot fall until this
-  lands. Verified at source at spec 2026-09-07; the literal count it carried was corrected at that
-  iteration's close, having aged within its own iteration.
-  **THE TARGET IS WIDER THAN IT LOOKS, and it widened this iteration.** Shipping
-  `powershell-installer-surface`'s PowerShell half makes native Windows a supported platform, so
-  this entry inherits {Linux, macOS, native Windows} rather than {Linux, macOS}.
-  **WHAT IS GENUINELY OPEN, and why it is `[design-pending]` rather than debt.** The macOS leg
-  `install-smoke-macos` is BINDING and does a cold `cargo` build, so green evidence for
-  `aarch64-apple-darwin` — produced and exercised — plausibly exists today; but `macos-latest` is
-  arm64, and that job's own comment refuses reading one green arm64 run as a macOS claim, so Intel
-  macOS is a separate leg. And `native/targets.list`:43-48 prices a second roster line beyond the
-  publish half: the consumer smoke builds its artifact from the host it runs on and refuses a
-  roster naming a platform that host is not, wanting steering or a cross-build. The steering knob
-  EXISTS and is in use — `GATE_SDK_NATIVE_TARGETS_FILE`, `.github/workflows/gates.yml`:408 on the
-  Windows leg — so the shape is reachable; which of steering or a cross-build the roster takes is
-  the design ruling this owes.
-  **IT CARRIES THE THREE PRECONDITION-BEARING CITATIONS OF THE RETIRED SLUG — ruled `lead,
-  own-authority` 2026-09-07** through this iteration's dispatch relay: `installer/README.md`:530
-  and `native/targets.list`:31 and :51-52 each name `platform-support-ci-matrix` as the OWNER of
-  this live, undischarged precondition, and they are made true again only by this discharge, so no
-  other entry can honestly carry them. (`installer/README.md`:442 is a fourth, ordering rather than
-  precondition-bearing, and rides `powershell-installer-surface`'s amendment.) None of the four
-  reds: `check-queue-slug-liveness` resolves only the bold-code membership form and all four are
-  in-prose single-backtick citations — so a green battery is not evidence against this.
-  **Cost while deferred:** the port's completion predicate cannot approach zero by ANY cut, every
-  macOS adopter silently loses more of the battery each iteration a born-native gate lands, and
-  three governed surfaces keep pointing at a retired entry as the owner of live work.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
