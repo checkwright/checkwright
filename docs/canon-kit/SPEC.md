@@ -2377,6 +2377,13 @@ filing was syntactically fine, and only a registry could have contradicted it.
 What is decidable from the tree alone is the consistency half — two surfaces
 cannot name different primary transports — and that is the whole of what runs.
 
+**The corpus is the governed-doc set, and a package manifest is not in it.** The
+walk is `governed_docs` and the declarations are read out of what that returns,
+so `files[]` arrays, `bin` maps and lockfiles are outside the scan however
+plainly they name a transport. The gate's name reads as though it graded the
+package manifest, which is why the negative is stated here rather than left to be
+re-derived off the module.
+
 The claim's machine-readable owner is a full-line
 `<!-- install-primary: <transport-id> -->` HTML comment. A marker rather than a
 visible sentence, because the reader-facing form of this claim already exists as

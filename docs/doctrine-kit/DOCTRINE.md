@@ -279,6 +279,16 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     relaying an unverified premise, so holding the general rule is what failed to
     prevent the outbound instance. That is why the case is named here rather than
     left to be derived from the rule.
+    **A probe that ran can still fail to settle the claim, and its silence reads
+    exactly like an answer.** A keyword sweep cannot find prose that describes a
+    thing without naming it, and a bounded window (`grep -A`, a line range) says
+    nothing about the lines past its edge — neither reports its own coverage.
+    Attested twice on one long page within an hour: a `PowerShell|pwsh` grep
+    cleared a passage that said "small enough to exist twice", and a `-A 40`
+    window ruled on a section whose relevant subsection began a hundred lines
+    below it. So a probe's *coverage* is checked before its silence is read as a
+    negative — a second sweep on a paraphrase, or the section's real extent
+    against the window.
     *Under agent work:* an agent's prose reads identically whether it was
     measured or inferred, so an unprobed premise enters the record
     indistinguishable from a verified one and is inherited downstream as settled

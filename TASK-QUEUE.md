@@ -542,7 +542,7 @@
   stamping for real at exit 0 with no simulate prefix. Cause pinned by reading and it is
   arm-independent: `:152` honours the flag at argv[0] only and `:389` has no arity check, while the
   sibling `:169`'s `rename()` tests `rest.len() != 1` and refuses. Five arms, one parse.
-  recurrence: enter-stage-flag-position-silently-ignored 2026-09-05 2026-09-06
+  recurrence: enter-stage-flag-position-silently-ignored 2026-09-05 2026-09-06 2026-09-07
   Filed 2026-08-30 by close from the gap inbox, attested by the filing session
   upon itself.
 
@@ -630,7 +630,7 @@
   iteration named *unblock* removes a blocker, it does not grant a permission. So the widening has
   no owner. `TASK-QUEUE.md`'s `born-native-omission-accumulation` records the same orphaning from
   the battery side; this entry owns the roster itself.
-  **WHAT IT BLOCKS, and this is why it is not merely tidy:** `installer/README.md`:528-530
+  **WHAT IT BLOCKS, and this is why it is not merely tidy:** `installer/README.md`:610-612
   sequences the installer's behind-invoke RELOCATION behind "the artifact roster covering every
   supported platform". So this entry is the stated precondition of the relocation, which is in turn
   the stated precondition of all 14 non-packer `owed` files in `--emit port-blockers --tree`. The
@@ -8881,41 +8881,41 @@
   which is this entry's. **The deliverable that made the template wrong is DISCHARGED** — the
   premise is amended, its slug retired, and what survives is the standing measurement the landing
   did not moot. Split `lead, own-authority 2026-09-05`.
-  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, sixteen points and
-  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10. The
+  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, seventeen points and
+  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8. The
   threshold is a third such iteration and is ANSWERED; the posture flips on no single point.
-  **THE FOURTEENTH WAS ONE, the minimum, and its shape was what the number cannot carry:** the lead
-  ROUTED rather than ruled, so a low count read TOWARD the posture. The fifteenth inverted that at 5
-  (spec raised three, the lead ruled all three alone), one datum cutting back: a CI-leg escalation.
-  **THE SIXTEENTH IS TEN, the series' second-highest, and it is the first point whose shape is
-  STRUCTURAL rather than an accident of the iteration.** Scope's block contributed 5, spec's 4, one
-  build batch 1; align, two build batches and validate contributed none. Two more routed to the
-  OPERATOR (a ruling's stale ground; the attribution of TRAJECTORY.md's new fourth act). **ZERO
-  went to the intent oracle, and that is not a lapse: under the Split posture the intent-oracle
-  route is DEGENERATE for scope's own escalation.** The oracle IS the scope session (template
-  §The lead model), so when scope escalates, oracle and escalator are one party and every intent
-  question falls straight through the routing rule's first move (§The escalation protocol) to its
-  fallback — answering off the governed surfaces, which is exactly the limb the template says the
-  split converts relays into. FIVE OF THE TEN are that single structural case.
+  **THE FOURTEENTH WAS ONE**, the minimum, and its shape was what the number cannot carry: the lead
+  ROUTED rather than ruled. The fifteenth inverted that at 5, one datum cutting back.
+  **THE SIXTEENTH WAS TEN, the series' second-highest and its first STRUCTURAL point.** Scope's
+  block gave 5, spec's 4, one build batch 1, and ZERO went to the intent oracle — argued there as
+  DEGENERACY, since the oracle IS the scope session (template §The lead model), so when SCOPE
+  escalates oracle and escalator are one party. Five of its ten were that single case.
+  **THE SEVENTEENTH IS EIGHT, and it NARROWS that claim rather than repeating it.** Ruled alone:
+  the kfric threshold disposition, three of four gap-bullet dispositions, the retired-slug citation
+  split, the port owed-count +1, the PowerShell leg's non-binding first run, the hotfix minimality
+  — eight at the sixteenth's own per-question granularity. Four went to the OPERATOR (the
+  port-first clause reading and its unit set, the half-only envelope, the parity oracle, the
+  uninstall hotfix). **ONE went to the intent oracle, the first non-zero on that limb**, and it is
+  the datum: it came from BUILD, not scope, so oracle and escalator were DISTINCT and the route was
+  live and taken. Degeneracy belongs to scope's own escalation, never to the posture.
   **THE READING, STATED AND DELIBERATELY NOT ACTED ON:** "consistently several", so the limb is LIVE
   for this posture on this iteration. Per the binding one iteration is one point and the threshold
   is a third such iteration: the posture is NOT flipped, and this point reads against the series.
   **CHARACTER THE COUNT CANNOT SEE, recorded because by design the count cannot.** At the thirteenth
   two of seven ruled the lead WRONG or ruled WHERE THIS SERIES LIVES; it recurred twice at the
-  fifteenth — a build batch refused the lead's relayed `owed lines=53` figure and was right, another
-  killed a false safety claim in its own draft. A lead instruction is not a governed surface.
+  fifteenth. A lead instruction is not a governed surface.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
   4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** of mid-close unlowered ceilings. **NOT
-  APPENDED at the fourteenth, fifteenth OR sixteenth**, one ground all three: the closing session's
-  own row is still growing, so any ratio it reads is a ceiling. Three declines say the rule has no
-  satisfiable moment inside close; that limb is `cost-series-limb-unreadable-inside-close`.
+  APPENDED at the fourteenth through SEVENTEENTH**, one ground all four: the closing session's own
+  row still grows, so any ratio is a ceiling. Limb: `cost-series-limb-unreadable-inside-close`.
   **THE COUNTER-EVIDENCE IS NINE INSTANCES OF ONE SHAPE — a claim verified at one surface and read
-  as covering a wider one**, eight the lead's own, the ninth on a stage session's carry. **NEITHER a
-  counter nor a refused premise NETS against it**: the count measures whether an escalation was
-  answered off a governed surface, never whether its grounds held. Nine at sixteen.
-  **ALIGN READING SIX STANDS, NOT RE-TAKEN AT THE SIXTEENTH.** The revert signal fired once, at the
-  sixth, on a missed spec defect surfacing as a build round-trip — recorded, not acted on, and
-  two-sided, that run also catching three real defects an Opus spec shipped.
+  as covering a wider one**, eight the lead's own; a counter never NETS against the count.
+  **ALIGN READING SEVEN, TAKEN AT THE SEVENTEENTH.** align ran on Sonnet, returned no escalation,
+  found three real drift findings, disproved one audit false positive, and caused NO build
+  round-trip — the revert signal did not fire. It fired once in seven, at the sixth, and two-sided.
+  Priced on the bare `align` rows' `cr` column: 11.76M against a 10.52M median over the last thirty
+  (range 5.24M-32.01M). **All 132 bare-align rows are Sonnet**, so this is a within-tier trend and
+  nothing in the log prices the Opus counterfactual.
   **Cost while deferred:** the posture runs unjudged, so a tier assignment wrong on the character
   limb costs every iteration and shows up as nothing — the count is the only instrument reporting
   it, and an unread one reads like a healthy one. The cost series decays too, its re-derivation
@@ -10231,6 +10231,7 @@
 - **post-build-instrument-edit-unowned** [design-pending] — No stage owns a post-build tree edit.
 - **dod-size-figure-stales-in-iteration** [design-pending] — Spec's promotion ages its own DoD size.
 - **portability-count-on-two-surfaces** [design-pending] — Hand-spelled census; both true today.
+- **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
 
 ## Done
 

@@ -257,8 +257,8 @@ which is small enough to be written twice. Everything conditional belongs on
 the far side of that invoke, and today most of it is not there yet — the
 measurement is recorded with the tail sequence below. Two standing obligations
 follow, and they bind every unit that touches the install path: **add no new
-shell-only install step**, and assume no POSIX shell. Designing the Windows
-half and moving the remaining conditional steps behind the invoke are both
+shell-only install step**, and assume no POSIX shell. The Windows half shipped
+2026-09-07; moving the remaining conditional steps behind the invoke is still
 `powershell-installer-surface`'s — one entry owns the whole bootstrap.
 
 **Opacity is taken on deliberately, and it carries an obligation.** A consumer
@@ -423,10 +423,10 @@ the left-owed set on an **edit-seam** ground the vocabulary question never asked
 
 **The two bootstraps are hand-kept, held in parity by a per-bootstrap install-smoke leg —
 ruled 2026-08-26 by the operator**, closing `powershell-installer-surface`'s fork 2. The
-mechanism and the refused generated-twins alternative are owned at `installer/README.md`
-§The install boundary, which also says why the legs are counted by bootstrap and not by
-platform — three platforms run one of the two halves, so a platform count reads this
-ruling's oracle as in place while it is still owed.
+mechanism, the refused generated-twins alternative, why the legs are counted by bootstrap
+and not by platform, and the oracle's own two-part split — bootstrap parity, which the
+PowerShell leg discharges for its half, against payload coverage, which is owed with the
+relocation — are all owned at `installer/README.md` §The install boundary.
 
 **The port's completion predicate is literal — `--tree`'s owed count reaching zero, over the whole
 derived corpus, with no contributor-side subtraction — ruled 2026-08-28 by the operator**,
@@ -649,6 +649,22 @@ the kit phrasing under-determines. Nothing is owed in lifecycle-kit/SPEC.md: the
 project's reading of its own default, and the provenance seam keeps it here.
 Discharge: with the 2026-08-30 machinery default it qualifies.
 ruling: the machinery-class icebox default over a live trigger
+
+**A hotfix's "minimal" is measured against the failure modes the change itself creates, never
+against the smallest diff — ruled `lead, own-authority` 2026-09-07, through the lead's message
+channel at that iteration's build.** The operator-ruled hotfix carve-out admits a fix that is
+"minimal and test-and-doc-complete in one commit" (CLAUDE.md §Delivery doctrine, scope-gated
+intake). The uninstall argv hotfix reached past its two named call sites, moving one of them to a
+file-mediated read so its exit status survives, and that reach is INSIDE the carve-out. **The
+ground is specific and licenses no convenient extra:** batching that site alone would have
+introduced a silent PARTIAL-roster case the single-invocation defect cannot produce — one
+invocation is all-or-nothing, while an early batch succeeding and a later one failing stages
+part of the set just as silently — so reading a real status there repairs a failure mode it would
+otherwise have created. **Refused:** taking the two sites literally and shipping that case, which
+would have made the hotfix's own diff the source of a new defect. Recorded at the close because
+it was ruled after batch A returned and batch B held the shared index.
+Discharge: none — it reads a standing carve-out rather than directing an act.
+ruling: the hotfix-minimality reach
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 

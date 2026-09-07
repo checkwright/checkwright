@@ -233,7 +233,7 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
     local target digest_want art seam entry p w g rest r out found
 
     printf '  == manifest report: %s, %s of %s entries disagree ==\n' "$profile" "$mismatch" "$checked"
-    printf '  read the six values below against the truth table in installer/README.md §The consumer smoke\n'
+    printf '  read the values below against the truth table in installer/README.md §The consumer smoke\n'
     if [[ ${#bad[@]} -eq 0 ]]; then
         printf '  every disagreement is a path the manifest names and the tree does not hold, so there is no hash to compare\n'
         return 0

@@ -1385,7 +1385,12 @@ Three concentric tiers, each an outer backstop for the one inside it:
   catching drift in the single commit that perturbs it. Bypassable by design
   (`git commit --no-verify` is a valve, not a hole, once an outer tier exists).
 - **pre-push / full battery** (opt-in, per-clone, fuller) — `run-gates.sh`
-  whole-tree before the work leaves the machine.
+  whole-tree before the work leaves the machine. **"Whole-tree" means the
+  index**: a member walking `git ls-files` cannot see a file that has never been
+  `git add`ed, so a green battery run *before* staging a new file is vacuous for
+  exactly the members that file most needs. *The battery is green* and *the
+  battery examined my change* are different claims, and only staging first makes
+  them the same one.
 - **CI** (server-side, authoritative) — `run-gates.sh` + its `--run-gate-tests`
   arm on every push, with branch protection making a merge conditional on them.
   The copy-out is `templates/gates-workflow.yml` (see there); only this tier is
