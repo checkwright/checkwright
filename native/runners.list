@@ -1,0 +1,30 @@
+# Checkwright's target-to-runner map — gate-sdk/SPEC.md §Layout and configuration.
+# One `<target> <runner>` pair per live line; `#`-comments and blank lines are
+# stripped, the same line grammar scripts/gates.list and native/targets.list use.
+# Read through gate_native_runner (gate-sdk/lib/gate.sh) and never inlined at a
+# call site.
+#
+# It is a RUNNER SELECTION and not a support commitment, which is why it is a
+# separate file from native/targets.list rather than a second column on it: a
+# mapping may name a platform the roster deliberately may not. Both of the
+# darwin lines below are exactly that case — neither triple is on the roster,
+# and both must be buildable anyway, because the whole point of the
+# `native-artifacts` job is to measure a platform BEFORE it joins.
+#
+# Two readers, one map. .github/workflows/publish.yml's roster job derives the
+# release build matrix from it, and .github/workflows/gates.yml's
+# `native-artifacts` job derives the CI producer's matrix from it. Each fails
+# loudly on a target with no entry here rather than building somewhere wrong;
+# the release refusal is the older of the two and its wording is unchanged by
+# the move off an inline `declare -A`.
+#
+# The macOS labels are PROBED, not remembered: actions/runner-images' own
+# available-images table, read 2026-09-08, carries no `macos-13` at all — the
+# label a session working from memory reaches for first. The live GitHub-hosted
+# x64 macOS labels there are `macos-15-intel` and `macos-26-intel`, beside the
+# paid `-large` variants; `macos-latest` resolves to an arm64 image. Re-probe
+# that table rather than trusting this paragraph if a leg ever fails to find a
+# runner: an unmatched label does not fail fast, it queues.
+x86_64-unknown-linux-gnu  ubuntu-latest
+aarch64-apple-darwin      macos-latest
+x86_64-apple-darwin       macos-15-intel

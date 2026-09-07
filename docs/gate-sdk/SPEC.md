@@ -230,7 +230,19 @@ set (§Consumer payload). And `GATE_SDK_NATIVE_TARGETS_FILE` (default **derived*
 from `GATE_SDK_NATIVE_CRATE` as `<crate>/targets.list`, exactly as
 `GATE_SDK_NATIVE_SRC`'s default is, so the crate's location keeps one owner; the
 target roster §Consumer payload rules the platform-support surface, read through
-`gate_native_targets` — see §lib/gate.sh). And
+`gate_native_targets` — see §lib/gate.sh). And `GATE_SDK_NATIVE_RUNNERS_FILE`
+(default **derived** from `GATE_SDK_NATIVE_CRATE` as `<crate>/runners.list`, the
+same derivation and for the same reason; one `<target> <runner>` pair per live
+line in the roster's own line grammar, read through `gate_native_runner` — see
+§lib/gate.sh). The map is a **runner selection and not a support commitment**,
+which is why it is a file of its own rather than a second column on the roster:
+a build needs a host for every platform it *measures*, and a project measures
+platforms it has not yet committed to — so this map may name a triple the roster
+deliberately may not, and the two files would fight if they were one. It is a
+file rather than an inline table in one workflow because a project with both a
+release path and a CI producer has **two** readers for it, and two copies is how
+a release comes to build a target on one runner class while CI measured it on
+another. And
 `GATE_SDK_NATIVE_PUBLISH_WORKFLOW` (default `.github/workflows/publish.yml`; the
 workflow §check-gate-substrate-parity assertion F holds roster-derived and
 one-producer-per-digest — a consumer whose release rides elsewhere points the
@@ -7590,6 +7602,20 @@ it. A build leg written and never run discharges nothing: *produced and
 exercised* is a fact about a run that happened, which is why the bound survives
 contact with a plan that looks certain.
 
+**The first bound wants a surface a reader can compare against, and prose is not
+one.** Held by prose alone it is discharged by whoever remembers to open the
+install page, which is the state in which a roster and a page drift without
+either looking wrong. A consumer that wants it mechanized declares its supported
+platforms **on the page that already states them** — one marker block per page,
+each entry a target triple and a join state, `joined` for a triple the roster
+carries and `held` with a named precondition for one it does not — rather than
+minting a second file asserting platform support, which would put the commitment
+in two places to hold the two-place problem down. This repo's instance is
+`docs/install.md` §Requirements' `platforms:begin` block, whose grammar and
+holder are its own (`docs/site-architecture.md`); the *shape* is kit mechanism
+and *which* platforms are declared is the project's own support commitment, the
+same split the roster file itself takes.
+
 **Removing a blocker is not the granting of a permission, and the bound is
 unchanged by an unblocking.** Work that makes a target *possible* — the crate
 compiling for it, an installer host-map answering for it, an artifact name
@@ -7612,7 +7638,24 @@ naming a platform that host is not, so the second roster line blocks such a
 smoke until it is steered at a narrowed roster through
 `GATE_SDK_NATIVE_TARGETS_FILE` (§Layout and configuration) or given a
 cross-compiling build. installer/README.md §The consumer smoke owns that
-re-entry and records which of the two is built.
+re-entry and records which of the two is built: **the steering is built and the
+cross-build is refused**, the smoke deriving a one-line host roster for itself
+unless its caller has already set that knob. The refusal takes the roster's own
+ground rather than a cost argument — a cross-built artifact is one no run has
+executed, which is the join bound arriving one layer out.
+
+**A join needs a producer the smoke is not, and a consumer smoke cannot be
+both.** The stand-in clause below exempts a host-built smoke from the
+never-from-a-working-tree rule; it does not promote that smoke's green into the
+*produced and exercised* the bound wants, and reading it as if it did is the
+standing way a roster widens on a plan. What discharges a join is a **pair**: a
+release-shaped producer, whose build command, sidecar format and directory
+layout are the release path's own, and a platform smoke that **consumed that
+producer's upload** — the artifact hand-off of installer/README.md §The consumer
+smoke — and reached its artifact-present branch. Neither half alone is the
+predicate, and the consumer's own project states the pair concretely beside its
+roster, since which jobs and which log line spell it are that project's CI and
+not kit mechanism.
 
 **One payload carries every declared target, not one payload per target**, and
 that is exactly why the packed **artifact name is derived per roster line from
@@ -8425,6 +8468,17 @@ reader needs outlive the refactor that renames a helper:
   `gate_native_crate` is the third, holding `GATE_SDK_NATIVE_CRATE`'s default and
   its trailing-slash stripping in one place now that the knob has three shell
   readers rather than one.
+- `gate_native_runner <target>` is the **target-to-runner map's single reader**,
+  beside the roster's and sharing its line grammar: it prints the runner one
+  target is built on and **returns 1 emitting nothing** for a target the map does
+  not name, so a caller refuses that target loudly rather than picking a host for
+  it — the failure a silent default produces is a build landing on the wrong
+  platform, which is invisible until the artifact behaves differently from the
+  one that was exercised. An absent map returns 1 for every target, which is the
+  same refusal reached one step earlier rather than a second outcome to handle.
+  `gate_native_runners_file` is its path accessor, on the pattern the roster's
+  own takes. The map's *separation* from the roster is §Layout and
+  configuration's ruling, not this helper's.
 - `gate_exe_suffix [<triple>]` is the **executable suffix's single owner**, and no
   other surface in any kit spells `.exe`. It is the tree's existing
   dialect-dispatching helper, and §The path-dialect contract is what it dispatches

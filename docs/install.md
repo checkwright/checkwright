@@ -75,6 +75,41 @@ resolves, so a Mac carrying Homebrew coreutils that is not `PATH`-ordered
 reports below contract — correctly, since BSD `sort` is what the gates would
 invoke.
 
+Those are the platforms the **battery** runs on. A second and narrower fact sits
+beside them: whether a **prebuilt gate binary** is published for a platform,
+which is what decides whether the gates that dispatch to that binary arrive with
+your install or are omitted and declared (§The gate binary in the installer's
+README). The block below declares it per supported platform — the Rust target
+triple `init` resolves a host to, and one of two join states. The state `joined`
+means the triple is a live line in `native/targets.list`, so a release publishes
+an artifact for it. The state `held: <precondition>` means the platform is
+supported and carries no artifact yet, and names the run that would join it; the
+predicate that run has to satisfy is stated in full in `native/targets.list`'s
+own header.
+
+<!-- platforms:begin -->
+
+- `x86_64-unknown-linux-gnu` (joined) — Linux on x86-64. A Windows-through-WSL
+  install resolves to this triple too, so WSL is served by the line above rather
+  than by one of its own.
+- `aarch64-apple-darwin` (held: a green `native-artifacts` leg consumed by a macOS install-smoke leg) — Apple
+  silicon Macs. The gates workflow builds this target on every run; what it does
+  not yet have is a smoke leg that installs the result and reaches its
+  artifact-present branch.
+- `x86_64-apple-darwin` (held: that same predicate on an Intel macOS leg of its own) — Intel
+  Macs. `macos-latest` is arm64, so the macOS smoke leg measures Apple silicon
+  and asserts nothing here; an Intel leg is a separate green.
+
+<!-- platforms:end -->
+
+A platform this page does not state as supported is **absent** from that block
+rather than held, because a held entry is still a support claim. Native Windows
+is the standing instance: the paragraph above routes it through WSL, so
+`x86_64-pc-windows-msvc` appears nowhere above even though the crate compiles for
+it. A roster line may not exceed what this page states (gate-sdk/SPEC.md
+§Consumer payload), and this block is the surface that makes that bound readable
+rather than a matter of who remembered to check.
+
 The battery leans on a small command-line toolchain; each tool below must be on
 your `PATH`, and the note says what breaks without it:
 

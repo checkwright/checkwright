@@ -6,13 +6,41 @@
 # copy of it to tell "this platform was never committed to" (omit and declare)
 # from "committed to, artifact missing" (a broken payload).
 #
+# WHAT LICENSES A LINE HERE, stated mechanically so the session that observes
+# the green executes rather than re-derives. A target <T> joins when ONE run,
+# at or after this paragraph's landing commit, carries BOTH of:
+#
+#   1. `native-artifacts` green for <T> in .github/workflows/gates.yml — its
+#      binary and .sha256 sidecar produced by the release's own build command
+#      and uploaded; and
+#   2. a platform install-smoke leg green having CONSUMED that upload —
+#      INSTALLER_SMOKE_ARTIFACTS_DIR pointed at the downloaded directory — and
+#      having reached the artifact-present branch, which its log states as
+#      `artifact: <T> verified in place at <bin>, recorded with the seam,
+#      nothing omitted`.
+#
+# That is *produced and exercised* with no host-built stand-in anywhere in it.
+# On that observation, three edits and nothing else: this file gains <T>'s line,
+# native/runners.list already names its runner, and docs/install.md
+# §Requirements' platform declaration flips <T> from `held` to `joined`. Those
+# three move together or not at all.
+#
+# **Ruled by the OPERATOR 2026-09-07**, through the lead's question relay in a
+# lead session and lead-relayed. The alternative — reading one green macOS
+# install-smoke leg as sufficient — was put and refused, on the ground that the
+# leg's own header pre-refuses exactly that reading. A later session finding the
+# textual case persuasive is reading a settled question.
+#
+# THE OWNER OF THE WIDENING IS THE PREDICATE ABOVE, not a queue entry. An entry
+# is a lifetime that ends; pointing a live precondition at one is what left this
+# file naming `platform-support-ci-matrix` for weeks after that entry retired.
+#
 # It ships one target, and the ground is evidence rather than capability. The
 # two are easy to conflate here, and conflating them is what makes a roster
 # widen on a plan instead of on a run:
-#   - x86_64-unknown-linux-gnu is the only platform this repo has green evidence
-#     for at all: every gate run, fixture suite, consumer smoke and CI leg is
-#     Linux. §Consumer payload's join bound is exactly that evidence, so no
-#     other triple qualifies however reachable it looks.
+#   - x86_64-unknown-linux-gnu is the only platform with a discharged
+#     precondition: the run above is what §Consumer payload's join bound asks
+#     for, and no other triple has one yet however reachable it looks.
 #   - Runner availability is not the constraint. This repository is public, so
 #     macOS and arm64-Linux hosted runners are already available to it; what is
 #     missing is a run bought on one, not a machine to buy it on. Measured
@@ -20,16 +48,19 @@
 #     would be reading a fact about this repo as a fact about the world.
 #   - Cross-compiling a target from the Linux runner is refused for the reason
 #     the bound gives rather than on cost: it would publish an artifact no run
-#     has ever executed.
+#     has ever executed. `native-artifacts` therefore builds each target on that
+#     target's own platform (native/runners.list) and never with `--target`
+#     pointed off the host.
 #   - WSL is Linux and resolves to this same target, so docs/install.md
 #     §Requirements' Windows-through-WSL claim is served exactly as far as that
 #     page already claims and no further. Native Windows is no longer
 #     *impossible*: the crate now compiles for x86_64-pc-windows-msvc, held
 #     there by the cross-check step in .github/workflows/gates.yml's `gates`
-#     job. Compiling is not the join bound. The msvc triple stays off this
-#     roster until a run has produced AND EXERCISED its artifact, which is
-#     `platform-support-ci-matrix`'s promotion condition, unchanged. An
-#     iteration named *unblock* removes a blocker; it does not grant a
+#     job. Compiling is not the join bound, and neither is the run above on its
+#     own: that triple fails the FIRST of §Consumer payload's two bounds, since
+#     docs/install.md §Requirements states Windows as running through WSL and
+#     not natively, so the platform declaration there does not carry it at all.
+#     An iteration named *unblock* removes a blocker; it does not grant a
 #     permission, and a reader taking the one for the other widens this roster
 #     on a plan.
 #
@@ -37,17 +68,15 @@
 # and this roster is the tree. A one-target roster makes the omit-and-declare
 # path the normal path for a macOS adopter on day one, which ships that path
 # exercised rather than as the dead code the vacuous-green class exists to
-# refuse. A target joins only when a green run has produced and exercised its
-# artifact, and never beyond what docs/install.md §Requirements already states.
+# refuse. A target joins only on the observation above, and never beyond what
+# docs/install.md §Requirements already states.
 #
 # What a second line costs, in full rather than the publish half alone: one
-# runner mapping beside the publish matrix, and then the consumer smoke, which
-# builds its artifact from the host it runs on and therefore refuses a roster
-# naming a platform that host is not — steering or a cross-compiling build,
-# neither built ahead of the second target. "One line here plus one runner
-# mapping" is the publish half and not the bill.
+# runner mapping in native/runners.list, and then the consumer smoke — which no
+# longer blocks on it, because the smoke steers itself at its own host by
+# default and takes a producer's artifact directory through
+# INSTALLER_SMOKE_ARTIFACTS_DIR when a caller hands it one. That is the re-entry
+# this file used to record as unbuilt, and it is built.
 # gate-sdk/SPEC.md §Consumer payload owns both halves;
-# installer/README.md §The consumer smoke owns the smoke's own re-entry. The
-# widening trigger is `platform-support-ci-matrix` producing a green run on a
-# platform, never the leg merely landing.
+# installer/README.md §The consumer smoke owns the smoke's own side of it.
 x86_64-unknown-linux-gnu

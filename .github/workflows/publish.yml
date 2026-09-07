@@ -46,22 +46,27 @@ jobs:
       # mapping is a runner selection, so it may name a platform where the matrix
       # declaration may not, and a target it has no entry for fails the release
       # here rather than building somewhere wrong.
+      #
+      # The map is a tracked file read through gate_native_runner rather than an
+      # inline `declare -A` here, because it has a second reader: the
+      # `native-artifacts` producer in .github/workflows/gates.yml derives its
+      # matrix from the same file. Two workflows each carrying their own copy is
+      # how a release comes to build a target on one runner class while CI
+      # measured it on another — invisible until a published artifact behaves
+      # differently from the one that was exercised. The refusal below is
+      # unchanged by the move; only where the pair comes from changed.
       - name: derive the build legs from the target roster
         id: legs
         run: |
           set -euo pipefail
           source gate-sdk/lib/gate.sh
-          declare -A runner=(
-            [x86_64-unknown-linux-gnu]=ubuntu-latest
-          )
           legs='[]'
           while IFS= read -r target; do
-            host="${runner[$target]:-}"
-            if [ -z "$host" ]; then
+            host="$(gate_native_runner "$target")" || {
               echo "target '$target' is in the roster with no runner mapping —" >&2
-              echo "add one here, or drop the target from the roster." >&2
+              echo "add one to $(gate_native_runners_file), or drop the target from the roster." >&2
               exit 1
-            fi
+            }
             legs="$(jq -c --arg t "$target" --arg r "$host" \
               '. + [{target: $t, runner: $r}]' <<<"$legs")"
           done < <(gate_native_targets)

@@ -638,6 +638,158 @@ jobs:
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "the PowerShell bootstrap answered all five steps"
 
+  # The RELEASE-SHAPED PRODUCER, and its whole reason for existing is that no leg
+  # which builds from the host it runs on can ever discharge a roster join.
+  # gate-sdk/SPEC.md §Consumer payload admits a triple to native/targets.list only
+  # on a green run that PRODUCED AND EXERCISED its artifact, and it classifies a
+  # consumer smoke's host build as a harness stand-in rather than that rule
+  # relaxing — so the macOS leg below could go green forever and license nothing.
+  # **Ruled by the operator 2026-09-07**, through the lead's question relay in a
+  # lead session and lead-relayed: buy a release-shaped producer first. This job
+  # is that producer. The build command, the sidecar's format and the directory
+  # layout are .github/workflows/publish.yml's build leg's, so what CI exercises
+  # is what a release would publish; a job that built the binary a different way
+  # would measure a different artifact and discharge nothing.
+  #
+  # **The matrix is the DECLARATION, not the roster.** It derives from
+  # docs/install.md §Requirements' `platforms:begin` block — joined and held
+  # platforms alike. Deriving it from native/targets.list would build only what is
+  # already joined and measure nothing, which is the whole point of the job. CI
+  # measures every documented platform; publish builds only the joined ones, and
+  # that asymmetry is the mechanism by which a held platform can ever stop being
+  # held. What licenses the write it feeds is native/targets.list's own header.
+  #
+  # **Nothing here cross-compiles.** Every leg's runner is that target's own
+  # platform (native/runners.list), so `--target` names the host triple and
+  # `rustup target add` is a no-op — native/targets.list refuses a cross-build
+  # because it would publish an artifact no run has ever executed, and a producer
+  # that cross-built would hand that same artifact to the smoke.
+  native-artifacts-roster:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      legs: ${{ steps.legs.outputs.legs }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      # The declaration block's line grammar is owned by docs/site-architecture.md
+      # §Generated projections and their freshness gates, and this awk is one of
+      # its two readers — the other being the gate that holds the block and the
+      # roster in lockstep. Same shape scripts/gates.list already ships: one
+      # grammar with one owner, read from bash here and from the binary there.
+      - name: derive the producer legs from the platform declaration
+        id: legs
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          legs='[]'
+          while IFS=$'\t' read -r target state; do
+            case "$state" in
+              joined) held=false ;;
+              held:*) held=true ;;
+              *)
+                echo "platform '$target' declares state '$state', which is neither" >&2
+                echo "'joined' nor 'held: <precondition>' — see docs/site-architecture.md." >&2
+                exit 1
+                ;;
+            esac
+            runner="$(gate_native_runner "$target")" || {
+              echo "platform '$target' is declared on the install page with no runner" >&2
+              echo "mapping — add one to $(gate_native_runners_file), or stop declaring it." >&2
+              exit 1
+            }
+            legs="$(jq -c --arg t "$target" --arg r "$runner" --argjson h "$held" \
+              '. + [{target: $t, runner: $r, held: $h}]' <<<"$legs")"
+          done < <(awk '
+            /^<!-- platforms:begin -->$/ { inb = 1; next }
+            /^<!-- platforms:end -->$/   { inb = 0; next }
+            inb && /^- `/ {
+              if (!match($0, /`[^`]+`/)) next
+              t = substr($0, RSTART + 1, RLENGTH - 2)
+              rest = substr($0, RSTART + RLENGTH)
+              s = ""
+              if (match(rest, /^ \([^)]*\)/)) s = substr(rest, RSTART + 2, RLENGTH - 3)
+              print t "\t" s
+            }
+          ' docs/install.md)
+          if [ "$legs" = '[]' ]; then
+            echo "the platform declaration resolved to no platform — the block is" >&2
+            echo "absent or empty, and a producer with no leg measures nothing." >&2
+            exit 1
+          fi
+          echo "legs=$legs" >> "$GITHUB_OUTPUT"
+          echo "producer legs: $legs"
+
+  # **A joined leg is binding; a held leg is a measurement.** A red on a joined
+  # platform fails this workflow, because the consumer smoke's default host
+  # steering gave up the incidental assertion that the SHIPPED roster is packable
+  # and this job is what replaces it — directly rather than by coincidence. A red
+  # on a held platform is the reason that platform stays held, not a reason master
+  # goes red: a held triple is on no roster, so nothing ships on its strength. It
+  # is also where the runner label is likeliest to be stale, and an unmatched
+  # label does not fail fast, it queues — hence the timeout beside it.
+  native-artifacts:
+    needs: native-artifacts-roster
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.native-artifacts-roster.outputs.legs) }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.held }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      # `shell: bash` for the reason publish.yml's build leg states: this job's
+      # `runs-on` is an expression, so no tree-local reader can state its runner,
+      # and the day a Windows target is declared the default `run:` shell there is
+      # pwsh. Stays a bash `run:` on the runner's preinstalled cargo (no
+      # setup-rust action) to keep this workflow's checkout+bash tamper floor.
+      - name: build the gate binary for ${{ matrix.target }}
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          crate="$(gate_native_crate)"
+          binary="$(gate_native_bin)"
+          binary="${binary##*/}"
+
+          rustup target add "$TARGET"
+          bash gate-sdk/bin/build-native.sh --target "$TARGET"
+
+          # The one digest computation for this artifact anywhere in this run:
+          # every later hop moves the file, so the digest the smoke verifies
+          # against cannot diverge from the one produced beside the bytes. The
+          # hasher is resolved rather than named, because stock macOS ships
+          # `shasum` and not `sha256sum` and this job is the first build leg to
+          # run off Linux; both spell the same `<hex>  <bare name>` sidecar that
+          # `sha256sum -c` reads wherever a later reader puts the two files.
+          out="$RUNNER_TEMP/artifact/$TARGET"
+          mkdir -p "$out"
+          cp "$crate/target/$TARGET/release/$binary" "$out/$binary"
+          if command -v sha256sum >/dev/null 2>&1; then
+            ( cd "$out" && sha256sum "$binary" > "$binary.sha256" )
+          else
+            ( cd "$out" && shasum -a 256 "$binary" > "$binary.sha256" )
+          fi
+          echo "built $TARGET: $(cat "$out/$binary.sha256")"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          # Named for its target and carrying the target directory, so a
+          # `pattern:` download lands exactly the layout pack-installer.sh reads
+          # once the artifact-name prefix is stripped — the same naming
+          # publish.yml's build leg uses, since the consumers are the same shape.
+          name: gate-binary-${{ matrix.target }}
+          path: ${{ runner.temp }}/artifact/${{ matrix.target }}/
+          if-no-files-found: error
+          retention-days: 7
+
   # The macOS sibling, and the second non-Linux host this repository runs on.
   # **It is binding: its red fails this workflow.** Read that as a different
   # assertion from the Linux leg's rather than the same one spelled twice — the
@@ -653,7 +805,14 @@ jobs:
   # The consequence is that `macos-latest` is **arm64**, so this leg measures
   # arm64 and nothing else. Do not read one green arm64 run as a macOS claim: an
   # Intel leg is a separate job this one neither buys nor blocks.
+  #
+  # **It no longer builds the artifact it exercises.** `needs: native-artifacts`
+  # and the download below are what make this leg one half of the join predicate
+  # native/targets.list's header states, rather than an adopter-path measurement
+  # that licenses nothing: the bytes it installs are the release-shaped
+  # producer's, moved and never re-derived.
   install-smoke-macos:
+    needs: native-artifacts
     runs-on: macos-latest
     # Measured, not predicted: this leg took **20m12s** on run `34038127178`, over
     # a cold Homebrew install and a cold `cargo` build — which is exactly the case
@@ -777,6 +936,42 @@ jobs:
           git status --porcelain | head -n 40
           exit 0
 
+      # The artifact this leg installs is the `native-artifacts` producer's, not
+      # this host's. Downloaded by PATTERN rather than by name because a name
+      # would have to spell this host's triple in the workflow, and a platform
+      # literal in CI is a second spelling of the support commitment
+      # native/targets.list is supposed to be the only surface for.
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: gate-binary-*
+          path: ${{ runner.temp }}/native-artifacts
+
+      # A `pattern:` download lands one directory per artifact name, so the
+      # prefix comes off to leave `<artifacts>/<target>/` — the layout
+      # pack-installer.sh reads and the one INSTALLER_SMOKE_ARTIFACTS_DIR is
+      # specified against. Nothing is rehashed on the way: the sidecar that
+      # arrives is the sidecar the producer emitted beside the bytes, which is
+      # what keeps one producer per digest across this new hop.
+      - name: normalize the producer's upload onto the layout pack reads
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          art="$RUNNER_TEMP/native-artifacts"
+          binary="$(gate_native_bin)"; binary="${binary##*/}"
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] || { echo "rustc reported no host triple"; exit 2; }
+          for d in "$art"/gate-binary-*; do
+            [[ -d "$d" ]] || continue
+            mv "$d" "$art/${d##*/gate-binary-}"
+          done
+          ls -lR "$art"
+          [[ -f "$art/$host/$binary" && -f "$art/$host/$binary.sha256" ]] || {
+            echo "the producer uploaded no complete $host artifact — this leg"
+            echo "exercises a release-shaped artifact and has none to exercise."
+            exit 1
+          }
+          echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
+
       # The suite itself, under one steering that is **measurement scaffolding and
       # not a fix**, exactly as the Windows sibling's is. It is a precondition
       # rather than a preference: `native/targets.list` carries one line,
@@ -802,6 +997,13 @@ jobs:
       - name: install smoke on a macOS host
         run: |
           set +e
+          # The explicit steering below is now REDUNDANT with the smoke's own
+          # default, which derives the same one-line roster when the caller sets
+          # no knob (installer/README.md §The consumer smoke). It is kept rather
+          # than dropped because it is the tree's one live witness for the
+          # caller-override branch: the Linux leg exercises the default, this one
+          # exercises the override, and neither path is then reached only in a
+          # fixture.
           host="$(rustc -vV | awk '/^host:/{print $2}')"
           [[ -n "$host" ]] \
             || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
@@ -810,6 +1012,7 @@ jobs:
           printf '%s\n' "$host" > "$roster"
           log="$RUNNER_TEMP/installer-smoke-macos.log"
           GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$RUNNER_TEMP" \
+            INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
             bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
           rc="${PIPESTATUS[0]}"
           echo "== verdict =="

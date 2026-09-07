@@ -198,6 +198,36 @@ recoverable:
   untrusted input, so the reader that lints the array must not be made to execute
   the file it reads.
 
+- **The install-platforms parity contract** — `docs/install.md`'s Requirements
+  section carries a **second** marker block, `<!-- platforms:begin -->`, and this
+  row is where a reader looks for what holds it, exactly as the row above is for
+  the first. It is hand-authored, like its neighbour; what it declares is one
+  entry per **supported platform**, and the grammar is deliberately its
+  neighbour's so one positional reader shape serves both: `` - `<triple>` ``
+  followed by a parenthetical carrying the **join state**, then an em dash and
+  free prose. Two states and no third — `(joined)`, meaning the triple is a live
+  line in `native/targets.list`; and `(held: <precondition>)`, meaning the
+  platform is documented as supported, is **not** in the roster, and carries the
+  named run that would join it. A hold with no stated cause is how a pile grows
+  silently, so the precondition is mandatory rather than conventional. The
+  parenthetical is read to its first `)` and the triple is the line's first
+  backticked run, so neither may carry a nested parenthesis and the state must
+  sit on the bullet's own first line; continuation lines are prose and are not
+  read. A platform the page does not state as supported is **absent** rather than
+  held — a held entry is still a support claim — which is why native Windows
+  appears in neither state while the page routes it through WSL.
+  Two readers: `.github/workflows/gates.yml`'s `native-artifacts` roster step,
+  which derives the producer's build matrix from **every** declared triple
+  regardless of state, since a platform that is never built is a platform that
+  can never stop being held; and `check-install-platforms`, which holds the block
+  and the roster in lockstep in both directions and is what mechanizes
+  gate-sdk/SPEC.md §Consumer payload's first bound. **That gate is owed rather
+  than landed** — the block is the earlier half of a two-unit sequence and this
+  row is written with it, so until the gate arrives the lockstep is discipline,
+  which is the whole of what the gate is being authored to end. Two readers of
+  one grammar is the shape `scripts/gates.list` already ships (a bash reader and
+  a compiled one), not a duplication to collapse.
+
 **A derived surface earns a row here only when it has a reader who cannot run
 the emitter** — a public page, a file a fresh clone needs before its tooling
 works. Derivation-first is satisfied by deriving on demand otherwise, and a

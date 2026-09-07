@@ -121,6 +121,7 @@ GATE_SDK_NATIVE_CRATE="${GATE_SDK_NATIVE_CRATE%/}"
 # spec: gate-sdk/SPEC.md §Layout and configuration — the three crate-adjacent knobs resolved here rather than at their read sites, because the config bridge reads a declared knob through `declare -p` and an inline `${KNOB:-default}` is invisible to it. GATE_SDK_NATIVE_TARGETS_FILE keeps riding GATE_SDK_NATIVE_CRATE's already-normalized value, so the crate's location keeps one owner.
 [[ -n "${GATE_SDK_NATIVE_SRC:-}" ]] || GATE_SDK_NATIVE_SRC="$GATE_SDK_NATIVE_CRATE/src"
 [[ -n "${GATE_SDK_NATIVE_TARGETS_FILE:-}" ]] || GATE_SDK_NATIVE_TARGETS_FILE="$GATE_SDK_NATIVE_CRATE/targets.list"
+[[ -n "${GATE_SDK_NATIVE_RUNNERS_FILE:-}" ]] || GATE_SDK_NATIVE_RUNNERS_FILE="$GATE_SDK_NATIVE_CRATE/runners.list"
 [[ -n "${GATE_SDK_NATIVE_PUBLISH_WORKFLOW:-}" ]] || GATE_SDK_NATIVE_PUBLISH_WORKFLOW=".github/workflows/publish.yml"
 # spec: gate-sdk/SPEC.md §Layout and configuration — the fourth crate-adjacent knob, resolved here for the cause the three above state and riding the same already-normalized GATE_SDK_NATIVE_CRATE, which is the derivation §Layout already described. A case dir setting it is sourced by the config seam above these lines, so a fixture's redirection out of the tree still wins.
 [[ -n "${GATE_SDK_CARGO_TARGET_DIR:-}" ]] || GATE_SDK_CARGO_TARGET_DIR="$GATE_SDK_NATIVE_CRATE/target"
@@ -538,6 +539,27 @@ gate_native_targets() {
     f="$(gate_native_targets_file)"
     [[ -f "$f" ]] || return 1
     gates_list_members "$f"
+}
+
+# spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_RUNNERS_FILE, defaulted off GATE_SDK_NATIVE_CRATE beside the roster's own so the crate's location keeps one owner
+gate_native_runners_file() {
+    printf '%s\n' "$GATE_SDK_NATIVE_RUNNERS_FILE"
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the target-to-runner map's single reader: it prints the runner one target is built on and returns 1 emitting nothing for a target the map does not name, so a caller refuses that target rather than picking a host for it. An absent map returns 1 for every target, which is the same refusal reached one step earlier.
+gate_native_runner() {
+    local target="$1" f line
+    f="$(gate_native_runners_file)"
+    [[ -f "$f" ]] || return 1
+    while IFS= read -r line; do
+        [[ "${line%%[[:space:]]*}" == "$target" ]] || continue
+        line="${line#"$target"}"
+        line="${line#"${line%%[![:space:]]*}"}"
+        [[ -n "$line" ]] || return 1
+        printf '%s\n' "${line%%[[:space:]]*}"
+        return 0
+    done < <(gates_list_members "$f")
+    return 1
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the shipped kit set, by the checks/-or-smoke/ predicate alone: what a tree *contains*, before GATE_SDK_KIT_DIRS narrows what a battery scans
