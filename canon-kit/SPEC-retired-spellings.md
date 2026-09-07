@@ -140,8 +140,11 @@ Three arms:
   §Why a declaration turns on, and it is the arm B and C depend on.
 - **B — the survivor reconciliation.** For each declared spelling, scan the reconciliation corpus and
   red on every occurrence at a path no `## Existing sections updated` bullet names. A roster bullet
-  names a path by its leading backticked token, which is the form the roster already uses in
-  practice. The amendment file itself is never its own violation.
+  names a path by its **leading backticked token** — measured rather than assumed: sixteen roster
+  bullets across the four amendments live at authoring time, sixteen leading backticked paths, no
+  bullet opening with a bare section mark, a bare path or prose (`.workflow/survey-record.md`,
+  2026-09-08, with its witness). The convention is written down nowhere else, so this delta is also
+  where it becomes contract rather than habit. The amendment file itself is never its own violation.
 - **C — the dangling citation.** Red when a bullet cites an `<N>` no `### (<N>)` heading defines,
   `all deltas` in an amendment defining none included. Without C, A and B both pass on a block whose
   bullets cite deltas that were renumbered out from under them — the same failure arm C of
