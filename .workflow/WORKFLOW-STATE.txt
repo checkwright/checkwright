@@ -7,3 +7,4 @@
 supported-platform-roster-widening scope ac035e4d 2026-09-07 68cc1ea5
 supported-platform-roster-widening spec ae624a50 2026-09-07 880c98a5
 supported-platform-roster-widening spec ae6f8870 2026-09-08 4fcf631c
+supported-platform-roster-widening align adaba590 2026-09-08 11b1350d
