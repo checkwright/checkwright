@@ -17,6 +17,65 @@
 ## Deferred
 
 
+- **overhead-meter-resolves-the-newest-transcript-not-its-own** [design-pending] — a bare
+  `--emit overhead-meter` resolves the NEWEST candidate transcript, so any session that delegates
+  and then meters measures its child; the close stage is that session by construction.
+  **Measured, not inferred.** Run 2026-09-06 while a dispatched grandchild was live, the bare arm
+  resolved a session whose id prefixes the live GRANDCHILD's agent id — total=171739, 54 per cent
+  governance — rather than the metering close session's. Passing the close session's transcript
+  explicitly then measured total=1605018, 76 per cent governance: a 22-point spread on the one
+  number the health triad's third member reads.
+  **The SPEC and the implementation disagree.** drift-kit/SPEC.md §The overhead meter says a bare
+  invocation resolves "the transcript the invoking session is itself running in", and that "a
+  delegated session resolves its own subagent transcript rather than its lead's". The implemented
+  rule is the two-tier scan's NEWEST CANDIDATE WINS, and a live child is always newer than its
+  parent, so the two readings coincide only where nothing was delegated.
+  **The close stage loses that race by construction:** the housekeeping binding tells it to meter
+  itself, and delegation is pre-authorized for the sweeps it runs first.
+  **Why `[design-pending]`:** two shapes, and they are not one. (a) Teach the resolver
+  session-ancestry — exclude a transcript whose agent id descends from the invoking session — which
+  needs a descendant test the two-tier scan does not have. (b) Rule the bare invocation
+  under-determined at a delegating session and make the transcript operand required there, which is
+  cheap and moves the burden onto every caller. The SPEC sentence changes either way, so the
+  amendment is the unit rather than a wording fix beside a patch.
+  **Cost while deferred:** `kpi-overhead`'s trailing window silently absorbs subagent rows in place
+  of close rows, and TRAJECTORY.md's 2026-09-05 health triad reads its third member off a
+  population it was not defined over. Honest limit: only this one firing is measured, so whether
+  every prior close metered itself correctly is unread.
+  **Product-class under the 2026-08-30 witness discriminator, not machinery-class:** drift-kit
+  ships the meter, so an adopter who delegates and then meters receives the same wrong number off
+  the same SPEC sentence — the payload witnesses it, wherever the fix lands.
+  Filed 2026-09-06 by the close of `index-runner-hold-release-and-windows-smoke-comparison` into
+  the gap inbox, which no stage of that iteration could drain; carried into this iteration's scope
+  intake and promoted here, so the record is late and says so.
+
+- **consumer-smoke-manifest-verdict-outruns-its-report** [design-pending] — the manifest arm's
+  `malformed` flag is run-wide while its report samples the first disagreeing path, so the entry
+  earning the exit-2 verdict is by construction one the report never prints.
+  **The witness.** Windows round 15 (run `34054512420`, head `bf1fc722`) exited 2 naming a
+  malformed operand while both sampled entries printed `want`/`got`/`reread`/`own`/`raw` as one
+  byte-identical clean 40-hex, with the `%q` byte rendering unquoted on all ten values. The defect
+  follows from the arm's shape, not from that host.
+  **What the SPEC claims.** installer/README.md §The consumer smoke states the refusal "fires after
+  the report, not at the first bad value, because diagnosing that value is exactly what the report
+  exists for" — and on this evidence it does not diagnose it. Any one of that round's 476
+  disagreements sets the run-wide flag; `manifest_report` samples the first disagreeing path plus
+  the artifact row, and neither is required to be the entry that set it.
+  **Why `[design-pending]`:** two shapes, not obviously one. (a) Carry the malformed entry into the
+  sample set so the verdict's own row is always printed — cheap, and it keeps the sampler's other
+  two members. (b) Ask whether a run-wide flag is the right instrument at all when the report is
+  per-entry, which is the wider ruling and re-shapes the arm's verdict rather than its sampler.
+  **The diagnostic series this arm was built for is CLOSED**, which is what makes the next unit on
+  this leg a repair rather than another observation: round 15 read `want` equal to `got`
+  byte-equal, the truth table's fifth row, so the defect is the pairing `bad_hash` records and no
+  further round narrows it.
+  **Cost while deferred:** the Windows leg stays continue-on-error and unassertable — that
+  iteration explicitly declined to assert it green — so every later round re-buys a verdict whose
+  operand cannot be read. Blocks no stage entry and no push.
+  Filed 2026-09-06 by the same close, off Windows round 15's own log rather than off a stage
+  surface; no stage of `index-runner-hold-release-and-windows-smoke-comparison` could drain it, so
+  it carried into this iteration's scope intake and is promoted here one iteration late.
+
 - **measured-marker-cannot-sit-mid-paragraph** [design-pending] — `check-measured-claim` binds its
   marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
   goes stale unwatched; TRAJECTORY.md's port figures are the attested instance.
