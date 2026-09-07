@@ -1628,12 +1628,30 @@ and an artifact row that is not in the disagreeing set.
 The third is the **witness for the exit-2 verdict** — the first disagreeing
 entry whose `want` or `got` failed the operand shape test, carried out of the
 loop as the same `<path><TAB><want><TAB><got>` tuple every disagreement is
-recorded as. It is appended last and deduplicated against the two above, so a
-run cannot exit 2 on an entry this report did not print. Where it coincides with
-a sample already chosen the report **says so** rather than collapsing the two
-silently — the same shape the artifact row already uses, because the reader's
-question is the same one ("is this the row the verdict is about?") and a silent
-collapse answers it wrongly. The header states **how many** disagreements failed
+recorded as. It is appended last and deduplicated **on the whole tuple**, so a
+run cannot exit 2 on an entry whose *bytes* this report did not print. The
+artifact row above it dedups on the same predicate for the same reason: a path
+is what a reader looks a row up by, and bytes are what the verdict was computed
+on, so a path match is no evidence that the two rows are one row.
+
+Whether the witness coincides with a sample already chosen is therefore a
+**check this report performs and prints**, never a claim it makes, and it has
+three outcomes:
+
+- **byte-equal** — the witness row is one of the samples already chosen. The
+  report says so, in the shape the artifact row already uses, because the
+  reader's question is the same one ("is this the row the verdict is about?")
+  and a silent collapse answers it wrongly. Under the tuple predicate that
+  sentence is now earned rather than asserted.
+- **path-equal, bytes differ** — both blocks are printed, the witness block
+  labelled as the row the verdict below is computed from, and the report states
+  plainly that two decompositions of one recorded entry disagree. That is a
+  statement about **this harness** and not about the consumer's tree.
+- **absent** — the witness row is not among the samples, and joins them.
+
+Under the former path-only predicate the middle outcome was indistinguishable
+from the first, and it is the outcome the attested round-18 run silently took.
+The header states **how many** disagreements failed
 that test, and that count is what says whether the one printed witness row is
 representative: one malformed entry out of hundreds is a statement about that
 path, all of them a statement about the capture step every entry runs through,
@@ -1695,6 +1713,20 @@ leg where every entry disagreed.
   `want == wantalt` with identical dumps exonerates the pipeline outright and
   leaves the matcher as the only remaining subject.
 
+*A held value's `call` line states where the value was read from, and is
+permitted to state nothing more.* It names the variable and the read that
+assigned it. It may **not** assert that the value is the one the failing
+comparison used and not a second read of it: that is an identity between two
+decompositions of one recorded string, no call site can check it, and the round
+that exposed the defect printed exactly that assertion beside a value the
+verdict decomposed differently. An unverifiable assertion there is worse than
+none, because the `call` line is what licenses a reader to treat the report as
+adjudicating the verdict — it converts a live defect into positive evidence of
+health, which is how the series read clean. The identity claim lives in the
+coincidence outcome above, where it is checked. A re-read value's `call` line is
+untouched by this rule: it prints the command that produced the value, which a
+reader can re-run, and it asserts nothing beyond that.
+
 Two values cannot separate *one side filtered* from *the bytes changed*, and no
 number of re-reads alone can separate either from *the comparison was handed
 something else*; six can, and the reading rule lives here rather than with
@@ -1713,6 +1745,7 @@ and the last three read the **instrument** rather than the operand:
 | `shape` fails while `len40` and `class` are both clean | two matchers in one shell disagree about one variable — the ERE engine or its locale is the subject, not the value; the operand is a hash and the harness refused it anyway |
 | `%q` renders bare while `octets` shows a byte outside `0-9a-f` | `printf '%q'` is not a byte rendering on this host, so **every** prior round's "bare rendering" reading is weakened to what quoting alone establishes; re-read rounds 12 to 17 against the octet dump before citing them |
 | `want != wantalt` | the manifest pipeline mangles between the lock and the comparison — the `jq` line render, the tab, or `read`'s splitting; the two octet dumps name the byte and the position |
+| the coincidence outcome reads **path-equal, bytes differ** | the report's witness row and an earlier sample carry one path and two different tuples, so one recorded entry has two decompositions and they disagree. The subject is **this harness**, not the consumer: no reading of the consumer's tree may be taken from that run's manifest arm, and the two blocks printed under that path are the evidence. Read every other row of this table as suspended for that run |
 
 The instrument rows exist because a report rendered through one subsystem cannot
 adjudicate a disagreement between two, and every row above them reads the
@@ -1813,6 +1846,18 @@ such a green fails to distinguish *the tree matches* from *the tree matches once
 the arm discards whatever reached it*. The refusal above is the honest form of the
 same observation: an operand that is not a hash stops the run instead of being
 repaired into one.
+
+*The same rule reaches the report's own **decompositions**, and not only a
+value's two renderings.* Where two independent readings of one recorded string
+disagree, the disagreement is printed and named — never resolved in favour of
+either. The obvious repair for the round-18 divergence below was one
+decomposition helper that both the report and the verdict call, and it is
+**refused** on the ground the shape test's own two matchers already stand on:
+two independent implementations reading one variable are what make their
+disagreement observable instead of absorbed. Unifying the two splits would
+delete the only signal that anything is wrong while changing nothing about the
+value that reaches the comparison — normalizing an operand and unifying the
+readings that disagree about it are one move under two spellings.
 
 Once per failing profile, and outside the per-path block because each is a fact
 about the run rather than about a path, the report also prints the consumer's
@@ -2024,11 +2069,29 @@ stream, on the runner.
 *And round 18 exposed a second defect the series was not looking for.* The report
 printed that same `want` as `len40=yes class=clean shape=pass` while the verdict
 printed it dirty — one value, one entry, one run, two decompositions that
-disagree. The report's own `call` field asserts the value is "the value the
-failing comparison used and not a second read of it", and that assertion is
-false. This is a fresh instance of the class `manifest-shape-predicate-and-rendering-disagree`
+disagree. The report's own `call` field asserted the value is "the value the
+failing comparison used and not a second read of it", and that assertion was
+unverifiable and, on that row, false. This is a fresh instance of the class
+`manifest-shape-predicate-and-rendering-disagree`
 was closed for, arriving after that fix landed, so it is a new defect rather
 than a reopening of the old one.
+
+*What was bought against that second defect, and what stays open.* The `call`
+line states where the value was read from and stops there, under the permission
+the held-value rule above sets, and the coincidence check standing where the
+claim stood prints such a divergence in-band instead of leaving a reader to
+reconstruct it from two contradictory blocks. On the
+attested run the check's answer is **path-equal, bytes differ**, which is the
+row this section's table now carries. *The mechanism is not asserted:* the
+suspect this finding was first filed against — the witness tuple's round trip,
+built in the loop and re-split inside the report across a
+`${bad_hash[@]+"${bad_hash[@]}"}` argv expansion — was reproduced under a local
+harness with a CR-suffixed `want`, and **both decompositions agreed** (`len=41`,
+`dirty[residue=$'\r' first=40]`) with an argv census showing the tuple crossing
+at full length and its `0d` intact. The round trip does not reproduce the
+divergence, so that suspect is exonerated and the divergence is unexplained on
+the code as written. What the next red round buys is the answer named in-band by
+the check, rather than a nineteenth reconstruction.
 
 *The free log read is gated on the run, not on the job, and the way past that is
 a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still

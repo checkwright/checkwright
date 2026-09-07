@@ -249,8 +249,8 @@ hash_probe() {   # $1 = label, $2.. = the command whose stdout is the value
     [[ -z "$err" ]] || printf '            stderr %s\n' "$err"
 }
 
-# spec: installer/README.md §The consumer smoke — one HELD value of that block, printed out of the variable the failing comparison read instead of by re-running the call that produced it, which is what lets a value that reaches the comparison mangled and re-reads clean still be seen; its call line names where the loop got the value, since a command a reader could re-run is exactly what this print refuses to be
-held_probe() {   # $1 = label, $2 = the value the comparison held, $3 = where the loop got it
+# spec: installer/README.md §The consumer smoke — one HELD value of that block, printed out of the variable the loop assigned instead of by re-running the call that produced it, which is what lets a value that reaches the comparison mangled and re-reads clean still be seen; its call line states WHERE THE VALUE WAS READ FROM and asserts nothing further, since a command a reader could re-run is exactly what this print refuses to be and an identity between this value and the one the verdict computed on is a claim this print cannot check — the coincidence outcome above checks it and states it there
+held_probe() {   # $1 = label, $2 = the value the loop assigned, $3 = the variable and the read it came off
     printf '    %-7s %s\n' "$1" "${2:-<empty>}"
     value_probe "$2"
     printf '            call   %s\n' "$3"
@@ -276,11 +276,11 @@ malformed_operands() {   # $1 = the '<path><TAB><want><TAB><got>' witness the sh
     printf '%s' "$which"
 }
 
-# spec: installer/README.md §The consumer smoke — the manifest arm's failure report, in the arm because this script mktemps its scratch under a cleanup trap and nothing after the run can open the disagreeing consumer; it is a straight-line sequence of prints with no branch that can change the verdict the caller goes on to fail with, every value it prints has a named reader in that section's truth table, and the entry that earns the exit-2 verdict is carried in as an operand so the sample set is required to contain it
+# spec: installer/README.md §The consumer smoke — the manifest arm's failure report, in the arm because this script mktemps its scratch under a cleanup trap and nothing after the run can open the disagreeing consumer; it is a straight-line sequence of prints with no branch that can change the verdict the caller goes on to fail with, every value it prints has a named reader in that section's truth table, and the entry that earns the exit-2 verdict is carried in as an operand so the sample set is required to contain it BY ITS BYTES and not only by its path
 manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 = mismatch count, $5 = checked count, $6 = the malformed witness tuple, empty where no disagreement failed the shape test, $7 = how many disagreements failed it, $8.. = one '<path><TAB><the want the loop held><TAB><the got the loop held>' per hash disagreement, in the order the loop found them
     local profile="$1" C="$2" LOCK="$3" mismatch="$4" checked="$5" mal_first="$6" mal_n="$7"; shift 7
-    local -a bad=("$@") samples=()
-    local target digest_want art seam entry p w g rest r out found
+    local -a bad=("$@") samples=() roles=()
+    local target digest_want art seam entry p w g rest r out found pathmate i role
 
     printf '  == manifest report: %s, %s of %s entries disagree ==\n' "$profile" "$mismatch" "$checked"
     printf '  read the values below against the truth table in installer/README.md §The consumer smoke\n'
@@ -290,7 +290,7 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
     fi
     # spec: installer/README.md §The consumer smoke — the count is what says whether the one printed witness row is representative: one malformed entry out of hundreds is a statement about that path, all of them a statement about the capture step every entry runs through, and those two readings send a reader to different places
     printf '  %s of those %s carry an operand that is not 40 lowercase hex; the samples below are the first disagreeing path, the artifact row and the first such entry, deduplicated\n' "$mal_n" "$mismatch"
-    samples=("${bad[0]}")
+    samples=("${bad[0]}"); roles=("")
 
     target="$(jq -r '.artifact.target // ""' "$LOCK")"
     art=""
@@ -308,31 +308,37 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
         for entry in "${bad[@]}"; do [[ "${entry%%$'\t'*}" == "$art" ]] && { found="$entry"; break; }; done
         if [[ -z "$found" ]]; then
             printf '  the artifact row %s is not in the disagreeing set, so the sample is the first path alone\n' "$art"
-        elif [[ "$art" == "${bad[0]%%$'\t'*}" ]]; then
+        elif [[ "$found" == "${bad[0]}" ]]; then
             printf '  the artifact row %s is also the first disagreeing path, so the two samples coincide\n' "$art"
         else
-            samples+=("$found")
+            samples+=("$found"); roles+=("")
         fi
     fi
 
-    # spec: installer/README.md §The consumer smoke — the verdict's own row joins the sample set last and deduplicated, so no run can exit 2 on an entry this report did not print; a coincidence with a sample already chosen is stated in the shape the artifact row already uses rather than silently collapsed, because the reader's question is the same one and a silent collapse answers it wrongly
+    # spec: installer/README.md §The consumer smoke — the verdict's own row joins the sample set last, deduplicated ON THE WHOLE TUPLE, so no run can exit 2 on an entry whose BYTES this report did not print; the coincidence claim is a check this report performs and prints in three outcomes, because a path-equal pair whose bytes differ is two decompositions of one recorded entry disagreeing — a finding about this harness — and collapsing it into the coincidence sentence asserts an identity nothing checked
     if [[ -z "$mal_first" ]]; then
         printf '  no disagreeing entry failed the operand shape test, so the verdict below is the manifest one and the samples are the %s path(s) above\n' "${#samples[@]}"
     else
-        found=""
-        for entry in "${samples[@]}"; do [[ "${entry%%$'\t'*}" == "${mal_first%%$'\t'*}" ]] && { found="$entry"; break; }; done
+        found=""; pathmate=""
+        for entry in "${samples[@]}"; do
+            [[ "$entry" == "$mal_first" ]] && { found="$entry"; break; }
+            [[ -z "$pathmate" && "${entry%%$'\t'*}" == "${mal_first%%$'\t'*}" ]] && pathmate="$entry"
+        done
         if [[ -n "$found" ]]; then
-            printf '  the witness row %s is one of the samples already chosen, so the verdict row and that sample coincide\n' "${mal_first%%$'\t'*}"
+            printf '  the witness row %s is one of the samples already chosen, byte for byte, so the verdict row and that sample coincide\n' "${mal_first%%$'\t'*}"
         else
-            samples+=("$mal_first")
+            samples+=("$mal_first"); roles+=(" — the witness row the exit-2 verdict below is computed from")
+            [[ -z "$pathmate" ]] \
+                || printf '  the witness row %s is path-equal to a sample already chosen and its bytes DIFFER, so both blocks are printed below: two decompositions of one recorded entry disagree, which is a statement about this harness and not about the consumer tree, and no reading of the consumer tree may be taken from this run manifest arm\n' "${mal_first%%$'\t'*}"
         fi
     fi
 
-    for entry in "${samples[@]}"; do
+    for i in "${!samples[@]}"; do
+        entry="${samples[$i]}"; role="${roles[$i]}"
         p="${entry%%$'\t'*}"; rest="${entry#*$'\t'}"; w="${rest%%$'\t'*}"; g="${rest#*$'\t'}"
-        printf '  -- %s\n' "$p"
-        held_probe want "$w" 'read off the arm own jq stream of .files, which is the value the failing comparison used and not a second read of it'
-        held_probe got "$g" 'the value the arm own command substitution assigned, carried out of the loop, which is the other operand the failing comparison used and not a second read of it'
+        printf '  -- %s%s\n' "$p" "$role"
+        held_probe want "$w" 'the want variable, as the manifest loop read left it and carried it out on the failure branch'
+        held_probe got "$g" 'the got variable, as the git hash-object command substitution left it in that same loop'
         hash_probe reread git hash-object -- "$C/$p"
         hash_probe own git -C "$C" hash-object -- "$p"
         hash_probe raw git hash-object --no-filters -- "$C/$p"

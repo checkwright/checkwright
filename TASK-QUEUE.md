@@ -79,52 +79,6 @@
   by close, the six stale citations verified against guard-kit/SPEC.md at HEAD. Promoted at spec
   2026-09-08 by authoring the amendment and closing its open question, one act.
 
-- **manifest-report-launders-the-value-it-prints** [spec: SPEC-witness-fidelity.md]
-  — the Windows smoke's manifest report and its verdict decompose the SAME recorded string and
-  print different answers, and the report asserts they are one row.
-  **RE-READ AT SOURCE at spec 2026-09-07, not taken from the deferred record.** Run
-  `34142337941`, job `install-smoke-windows`, head `1369bf21` — and
-  `installer/consumer-smoke/run-smoke.sh` is BYTE-IDENTICAL between that head and this one, so the
-  code read is the code that ran. On `gate-sdk/README.md` the report's six values — `want`, `got`,
-  `reread`, `own`, `raw`, `wantalt` — all render `len 40`, forty octets, `%q` unquoted, one
-  identical hash; the verdict prints that same path's `want` as `len40=no
-  class=dirty[residue=$'\r' first=40] shape=fail`. A census of the whole job log finds `len    41`
-  zero times, an octets line carrying `0d` zero times, a `%q` rendering opening `$'` zero times.
-  So the report's row describes a comparison that could not have failed.
-  **THE ENTRY'S OWN SUSPECT IS EXONERATED, and that is spec's deliverable rather than a caveat.**
-  The prescribed local harness was built and run: it constructs the tuple as the loop does with a
-  CR-suffixed `want`, crosses the same guarded `${bad_hash[@]+"${bad_hash[@]}"}` argv expansion and
-  applies both re-splits. BOTH DECOMPOSITIONS AGREE, and an argv census shows the tuple crossing at
-  full length with its `0d` intact. The round trip does not reproduce the divergence.
-  **THE FALSE ASSERTION IS THE LOAD-BEARING PART**, which is why this is not cosmetic: the
-  report's `call` field asserts its `want` is the value the failing comparison used and not a
-  second read of it, and that assertion is what licenses a reader to treat the report as
-  adjudicating the verdict. A report that launders the defect out of the value it prints converts
-  a live defect into positive evidence of health.
-  **THE DECIDER DOES NOT MOVE and the disagreement is NOT collapsed** — the obvious repair, one
-  decomposition helper both callers share, is refused on this smoke's own standing rule that two
-  independent implementations reading one variable make their disagreement observable instead of
-  absorbed. Unifying the splits would delete the only signal while changing nothing that reaches
-  the comparison.
-  **Four deltas, work-classed inline in the amendment:** the verdict's own witness row printed
-  rather than deduplicated away against a PATH match; the coincidence claim made a performed check
-  with a third outcome for path-equal-bytes-differ; the `call` field stripped of provenance it
-  cannot verify; and the record carrying the exoneration and the new truth-table row.
-  **ASSERTED:** the four deltas, each tree-verifiable at validate. **NOT ASSERTED:** a mechanism
-  for the divergence — it is unexplained on the code as written — and no green
-  `install-smoke-windows`, which stays red on the carriage return until its own entry lands.
-  **The binding legs are the check a build must run:** `install-smoke` and `install-smoke-macos`
-  are NOT `continue-on-error`; every delta adds failure-branch-only code and touches no arm
-  header, so neither can move on a tree whose manifest agrees.
-  **Product-class under the 2026-08-30 witness discriminator:** a diagnostic the install path
-  prints about the payload it verified is an adopter-facing claim.
-  **DISTINCT from `smoke-manifest-read-appends-carriage-return`**, which owns the CR's arrival at
-  the read. This owns the report's fidelity to the value it claims to print, and stands against
-  any malformed value whatever. Spec found it is also UPSTREAM of that entry: until the report's
-  fidelity is repaired, that entry's own evidence base is unsound.
-  Joined same-surface, `lead, own-authority` 2026-09-07; promoted at spec 2026-09-07 by authoring
-  the amendment, which is the same act.
-
 - **gate-binary-roster-covers-supported-platforms** [spec: SPEC-platform-evidence.md]
   — `native/targets.list` carries ONE triple against a documented supported set of Linux and
   macOS, the widening is owned by a retired entry, and fifteen of the sixteen files the port
@@ -10335,5 +10289,6 @@
 ## Done
 
 - born-native-omission-accumulation
+- manifest-report-launders-the-value-it-prints
 
 ## Lessons Learned
