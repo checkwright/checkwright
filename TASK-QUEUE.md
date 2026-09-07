@@ -52,11 +52,14 @@
   template's DoD already carries "Removals propagated — grepped every spec for names this change
   retired". That grep is owed on every amendment already; nothing records the run, nothing checks
   the result, and the checkbox's stated corpus is narrower than where the attested misses landed.
-  **PROBED AT HEAD, correcting an inference this stage nearly shipped:** `spec_amendments` does NOT
-  prune this repo's own kit directories, so an amendment written under `canon-kit/` IS scanned —
-  demonstrated by `check-amendment-queue` reding on the new file before its entry existed. The
-  backfill is therefore the gate's own first run over every amendment live at that commit, this
-  unit's own amendment included, and it is authored carrying the block it specifies.
+  **PROBED TO TWO LEVELS, because the first answer misled:** an amendment written under `canon-kit/`
+  IS scanned here — `check-amendment-queue` red on the new file before its entry existed — but NOT
+  because the finder spares a kit directory. Both substrates prune a kit root that is a strict
+  descendant of the scan root, and `canon-kit` is one; it is scanned because
+  `scripts/canon-config.sh` sets `CANON_KIT_SCAN_KIT_ROOTS=1`, this repo's dogfooding knob. A
+  consumer at the default would have such an amendment fall silently out of the corpus. The backfill
+  is therefore the gate's own first run over every amendment live at that commit, this unit's own
+  included, and it is authored carrying the block it specifies.
   **FIVE-FOR-FIVE 2026-09-06 stands as the attesting evidence and is not re-measured here:** every
   batch of one iteration shipped a roster miss found by grep and named by no roster — batch 1's
   stale `lifecycle-kit/SPEC.md` sentence, batch 2's `spec-pointer-boundary-legality` grounding case,

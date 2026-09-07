@@ -172,13 +172,25 @@ with no citation, an unreconciled survivor and a dangling citation — so each a
 statement; `good/` exercises the negative form, a wrapped citation, the valve, and a survivor at a
 path the roster does name.
 
-**The backfill is the gate's own first run, and it includes this file.** Probed at HEAD rather than
-assumed: `spec_amendments` does **not** prune this repo's own kit directories — an amendment written
-to `canon-kit/` is scanned, which `check-amendment-queue` demonstrated by reding on this very file
-before its queue entry existed. So arm A reds on every amendment live at the landing commit, this one
-included if it is still on disk then. It is therefore authored below carrying the block it specifies
-— self-exemplifying rather than exempt, which also gives the build session a worked instance of the
-grammar to copy.
+**The backfill is the gate's own first run, and it includes this file — but only because this
+consumer configures it so.** Probed to two levels rather than one, because the first answer was
+misleading. An amendment written to `canon-kit/` **is** scanned here, which `check-amendment-queue`
+demonstrated by reding on this very file before its queue entry existed. The reason is **not** that
+the finder spares a kit directory: both substrates prune a kit root that is a strict descendant of
+the scan root (`canon-kit/lib/spec.sh`'s `_spec_prune_kit_roots`, `native/src/spec.rs`'s
+`prune_kit_roots`), and `canon-kit` is one of this repo's derived kit roots. It is scanned because
+`scripts/canon-config.sh` sets `CANON_KIT_SCAN_KIT_ROOTS=1` — the dogfooding knob, since this repo's
+kits are its own governed content rather than a dependency's.
+
+**That is a consumer-config fact and it is stated here so a kit reader does not generalize it.** A
+consumer leaving that knob at its default and vendoring canon-kit would place an amendment in a kit
+directory and have it silently fall out of the corpus — no gate, no pairing, no verdict. Nothing in
+this unit changes that, and the amendment's own placement relies on the knob rather than on a
+guarantee.
+
+So arm A reds on every amendment live at the landing commit, this one included if it is still on disk
+then. It is therefore authored below carrying the block it specifies — self-exemplifying rather than
+exempt, which also gives the build session a worked instance of the grammar to copy.
 
 ### (3) The exclusion knob, and why its kit default is empty
 
