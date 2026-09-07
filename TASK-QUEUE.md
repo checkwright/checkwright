@@ -14,6 +14,43 @@
 
 ## Technical Debt
 
+- **init-vendor-staging-argv-overflow** — `installer/lib/init.sh` stages the whole
+  vendored file set as one `git` argv, and on a host with a low `ARG_MAX` that is E2BIG, so a
+  full-profile install cannot complete.
+  **OBSERVED on a real runner, not predicted.** Run `33799627871`, job `install-smoke-windows`,
+  step `read one manifest disagreement in place`: its `init.log` reads
+  `lib/init.sh: line 380: /mingw64/bin/git: Argument list too long` followed by
+  `checkwright init: could not stage the vendored files`, and `init` never completed.
+  **It is profile-size-dependent, which is the whole finding.** In the same job on the same runner
+  minutes apart, the smoke's `init` on the STARTER profile completed and wrote a 477-entry lock,
+  while the diagnostic's `init` on the FULL profile did not. Whether the two are one defect or two
+  is not settled by anything printed.
+  **It blinded the round's instrument, which is how it was found.** The manifest diagnostic that
+  round bought printed none of the five things it existed to print — no `want`, no `got`, neither
+  `git hash-object` run, no `core.autocrlf` origin, no `git check-attr` output — because it bailed
+  at its own early guard before reaching a `checkwright.lock`. NO CAUSE IS CLAIMED HERE for the
+  477-of-477 manifest mismatch; this entry owns the staging defect alone.
+  **Two forks, and they are not the same work. THE FIRST IS DISCHARGED 2026-09-05 at build** —
+  `windows-leg-manifest-cause-read` moved the report into the smoke's own manifest arm, which runs
+  inside whichever profile failed, and DELETED the `read one manifest disagreement in place` step
+  the bullets above cite; that deletion repairs no part of this entry, which still owns batching
+  the staging call so no host's `ARG_MAX` is the ceiling. Only the second was ever this entry's.
+  **Cost of carrying it:** a native-Windows adopter on the full profile cannot install, and the
+  named adopter the 2026-08-26 operator ruling ordered the Windows leg for is exactly that
+  population — an install-path claim witnesses it, so it is product-class outright.
+  **DISTINCT from `platform-support-ci-matrix`, retired 2026-09-06**, whose subject was the leg and
+  the manifest mismatch; this is one `git` invocation's argv width, and its retirement leaves this
+  standing untouched.
+  **PROMOTED AS DEBT 2026-09-07 by scope**, on the operator's ruling of this iteration's unit set
+  (AskUserQuestion channel in a lead session, lead-relayed): joined to
+  `powershell-installer-surface` as **same-surface** — the file it repairs is the one that unit's
+  behind-invoke relocation
+  restructures, so the repair is authored once whichever side of the invoke it ends up on. Debt and
+  not a feature by the new-names litmus: batching one `git` invocation adds no name to any governed
+  surface and converges behavior on names `installer/README.md` §init already carries.
+  Surfaced 2026-09-03 at the close of `capture-and-meter-cuts-with-windows-manifest-diagnostic`;
+  drained at the next boundary into Deferred, promoted here.
+
 ## Deferred
 
 
@@ -591,35 +628,36 @@
   `platform-support-ci-matrix`, retired 2026-09-06, so nothing orders first now and the named
   adopter is live: the trigger is no longer dormant. **Ordered by the trajectory pivot 2026-08-03**
   — objectives 2 and 6, TRAJECTORY.md's.
-  **THE TWO SOURCE BLOCKERS THAT ROUTED HERE ON 2026-08-26 HAVE MOVED OUT, operator-ruled the
-  same day**: `BN_ART` and `target_of_host()` joined the Windows blocker unit at
-  `gate-binary-target-roster-widening`, which shipped both repairs and reached `## Done` — cleared
-  from it since, so recover it from git history and not that section (corrected 2026-08-30 at
-  scope, which found this pointing at an empty `## Done`).
-  The amendment's own record was retired 2026-09-03 as spent, its destination unit having shipped
-  and left the queue; recover its grounds from git history, as with the clearance above.
-  `target_of_host` is still bootstrap step 2 wherever the bootstrap is built —
-  what moved is the one-line repair, never the design, which stays this entry's whole.
-  **MEASURED 2026-08-26 at close on a native Windows runner** (`platform-support-ci-matrix` round
-  2; that entry retired 2026-09-06, so recover its harvest from git history, as above). Two
-  assumptions this bootstrap makes are now facts rather than
-  hopes: `[[ -x ]]` HOLDS on a freshly `chmod +x`'d shebang script and it executes directly, despite
-  `core.filemode=false`; and it HOLDS on npm's extension-less bin shim, which is written mode
-  `-rwxr-xr-x` beside its `.cmd` and `.ps1` siblings and executes. So neither `-x` test needs a
-  Windows special case.
-  The 2026-08-26 routing ruling refused two alternatives on the table, a new entry and widening
-  `platform-support-ci-matrix`; the operator's amendment above supersedes only where it sent the
-  two blockers, and reopens neither refusal.
+  **THE TWO SOURCE BLOCKERS THAT ROUTED HERE ON 2026-08-26 HAVE MOVED OUT, operator-ruled the same
+  day**: `BN_ART` and `target_of_host()` shipped with `gate-binary-target-roster-widening`, whose
+  record and that ruling's two refusals (a new entry, widening the Windows leg) are retired to git
+  history. `target_of_host` is still bootstrap step 2 wherever the bootstrap is built; the one-line
+  repair moved, the design never did, and it stays this entry's whole.
+  **MEASURED 2026-08-26 at close on a native Windows runner** (harvest in git history, as above).
+  Two assumptions this bootstrap makes are now facts rather than hopes: `[[ -x ]]` HOLDS on a
+  freshly `chmod +x`'d shebang script, which executes directly despite `core.filemode=false`; and it
+  HOLDS on npm's extension-less bin shim, written mode `-rwxr-xr-x` beside its `.cmd` and `.ps1`
+  siblings. So neither `-x` test needs a Windows special case.
+  **THIS ITERATION TAKES IT WHOLE — ruled 2026-09-07 by the operator, through the AskUserQuestion
+  channel in a lead session and relayed by the lead**, joined by `init-vendor-staging-argv-overflow`
+  (same-surface) and by a new Windows manifest entry (product-class, live trigger). Scope proposed
+  it on a hold structure verified at source, not inherited: every one of the 14 non-packer owed
+  files waits on the behind-invoke relocation THIS entry owns, so no cut can move the owed column
+  until it lands. The size risk — the PowerShell half plus a ~350-line relocation may overrun one
+  build window — was stated and accepted. **If the halves are sequenced inside the unit, the
+  RELOCATION half is the one that discharges those 14 files**: `installer/README.md` §The install
+  boundary rules that a file whose whole body is bootstrap steps DECLARES rather than ports, so the
+  PowerShell half alone leaves the owed count unchanged. The clause reading that makes an
+  own-iteration leg schedulable at all is TRAJECTORY.md §PRIORITY DIRECTIVE's, same date and
+  channel. It is FEATURE-class, so spec authors its amendment and the authoring is the promotion.
   The bootstrap is bash end to end. The `--install <op>` seam both bootstraps call is specified
   there and the first cut is taken — `--install place-artifact`, the artifact placement and the
   config-seam write, on the rule that a step is takeable only if it already runs when an artifact
   was selected: a relocated step is unreachable on the platforms criterion 5 leaves with no binary
-  (gate-sdk/SPEC.md §Porting a gate to the binary substrate). **The per-step roster is no longer
-  restated here** — fork 1's merge put the assigning rule and the five bootstrap steps in
-  installer/README.md §The install boundary and made `behind-invoke` that section's stated default,
-  so any step's disposition is read off the rule against `init.sh` top to bottom rather than off a
-  second copy pinned to a stale commit (the table was that copy; deleted 2026-08-26 at build under
-  queue-kit/SPEC.md §check-queue-entry-budget's compress-by-answering rule).
+  (gate-sdk/SPEC.md §Porting a gate to the binary substrate). **The per-step roster is not restated
+  here**: fork 1's merge put the assigning rule and the five steps in that same section and made
+  `behind-invoke` its stated default, so a step's disposition is read off the rule against `init.sh`
+  top to bottom rather than off a second copy pinned to a stale commit.
   Every sibling surface is `behind-invoke` whole — `doctor.sh`, `diff.sh`, `uninstall.sh`,
   `update.sh`, all of `lib/common/` — bar `digest.sh`'s hasher resolution, re-implemented rather
   than called because step 4 needs it first; `bin/checkwright.sh` collapses into the bootstrap.
@@ -3690,6 +3728,14 @@
   lifecycle-kit/SPEC.md §The committed gap inbox has **already refused both obvious shapes** for
   the sibling channel, a filing-time prompt and a fact-versus-inference grammar, so a proposal
   here argues against a recorded refusal or finds a third shape.
+  **AT THRESHOLD AND ANSWERED, STAYS DEFERRED — `lead, own-authority` 2026-09-07, ruled through the
+  lead's message channel on this scope's escalation.** It was the ONE member of the eight-entry
+  threshold cohort still owed an escalation — the other seven are spent under the propose-once
+  ground — and the route is now spent for it too. Grounds: machinery-class by the 2026-08-30
+  discriminator (its only demand witness is this repo's own capture tool); the drain-side half
+  landed 2026-09-07; and what remains argues against a recorded refusal, which is design work rather
+  than a takeable unit. Icebox was REFUSED with it — burying an entry the threshold has just
+  surfaced discards a judged recurrence.
   recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
   **Three attested instances, each falling on a different limb.** A build batch stamped the
   consumer smoke's cost as "~50-60 minutes" and reasoned that the run serializes against all
@@ -8982,36 +9028,6 @@
   themselves; this is the declaration grammar every registry member shares.
   Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
 
-- **init-vendor-staging-argv-overflow** [design-pending] — `installer/lib/init.sh` stages the whole
-  vendored file set as one `git` argv, and on a host with a low `ARG_MAX` that is E2BIG, so a
-  full-profile install cannot complete.
-  **OBSERVED on a real runner, not predicted.** Run `33799627871`, job `install-smoke-windows`,
-  step `read one manifest disagreement in place`: its `init.log` reads
-  `lib/init.sh: line 380: /mingw64/bin/git: Argument list too long` followed by
-  `checkwright init: could not stage the vendored files`, and `init` never completed.
-  **It is profile-size-dependent, which is the whole finding.** In the same job on the same runner
-  minutes apart, the smoke's `init` on the STARTER profile completed and wrote a 477-entry lock,
-  while the diagnostic's `init` on the FULL profile did not. Whether the two are one defect or two
-  is not settled by anything printed.
-  **It blinded the round's instrument, which is how it was found.** The manifest diagnostic that
-  round bought printed none of the five things it existed to print — no `want`, no `got`, neither
-  `git hash-object` run, no `core.autocrlf` origin, no `git check-attr` output — because it bailed
-  at its own early guard before reaching a `checkwright.lock`. NO CAUSE IS CLAIMED HERE for the
-  477-of-477 manifest mismatch; this entry owns the staging defect alone.
-  **Two forks, and they are not the same work. THE FIRST IS DISCHARGED 2026-09-05 at build** —
-  `windows-leg-manifest-cause-read` moved the report into the smoke's own manifest arm, which runs
-  inside whichever profile failed, and DELETED the `read one manifest disagreement in place` step
-  the bullets above cite; that deletion repairs no part of this entry, which still owns batching
-  the staging call so no host's `ARG_MAX` is the ceiling. Only the second was ever this entry's.
-  **Cost while deferred:** a native-Windows adopter on the full profile cannot install, and the
-  named adopter the 2026-08-26 operator ruling ordered the Windows leg for is exactly that
-  population — an install-path claim witnesses it, so it is product-class outright.
-  **DISTINCT from `platform-support-ci-matrix`, retired 2026-09-06**, whose subject was the leg and
-  the manifest mismatch; this is one `git` invocation's argv width, and its retirement leaves this
-  standing untouched.
-  Surfaced 2026-09-03 at the close of `capture-and-meter-cuts-with-windows-manifest-diagnostic`;
-  drained here at the next boundary.
-
 - **pre-grammar-disposition-authority-ambiguity** [design-pending] — a disposition filed before the
   `ruled:` grammar existed can name its authority two ways in one sentence, and nothing states how
   such a sentence is read.
@@ -9272,13 +9288,11 @@
 - **audit-roster-row-carry-unruled** [design-pending] — every close appends its sweep reading to
   the audit-roster row it swept and nothing ever compacts one, so the file has grown past the
   point where the close step that must read it can.
-  **Re-measured at this drain rather than carried.** `wc -c .workflow/audit-roster.txt` reads
-  **270392** bytes over 11 lines — larger than the filing bullet's 266418 two commits earlier.
-  Seven of those lines are data rows, one row per line, at 10991 / 25427 / 28291 / 36186 / 47746 /
-  54797 / 65785 bytes. The Read tool refuses the whole file at a 256KB cap, so the close skill's
-  mandated **Audit-roster review** sub-step (`.claude/commands/close.md:36`) can now only reach a
-  row through hand-built substring probes — it reads the slug, `due:` and `last:` while
-  structurally NOT reading the accumulated body those fields exist to be judged against.
+  **Why the read is degraded, not merely long.** The Read tool refuses the whole file at a 256KB
+  cap, so the close skill's mandated **Audit-roster review** sub-step
+  (`.claude/commands/close.md:36`) can only reach a row through hand-built substring probes — it
+  reads the slug, `due:` and `last:` while structurally NOT reading the accumulated body those
+  fields exist to be judged against.
   **The design question this waits on, and why no session may just pick one.** Three shapes are
   visible and none is costed: compact each row to its current standing reading and let git history
   hold the retired ones; split one row per file under a roster directory; or cap a row and force
@@ -9299,26 +9313,29 @@
   "no named event waiting to promote it" test fails here, and the machinery-class default
   (TRAJECTORY.md, 2026-08-30) is defeated on the tier's own eligibility rule rather than ignored.
   **NOT ASSERTED:** nobody has measured how much of a row's body a later judge actually uses.
-  **Second data point, 2026-09-04 at the next scope, re-measured there rather than forecast** —
-  the sentence above stays as the dated attestation it is. `wc -c` now reads **280394** bytes,
-  still 11 lines: plus 10002 over one close, ABOVE the roughly 7KB the cost line forecasts, so
-  that forecast is understated rather than generous. The Read tool refused the file at its cap
-  again and the mandated review again ran on hand-built substring probes.
-  **And this bears on WHICH of the three shapes is right, which is why it is not just a bigger
-  number.** Those 10KB are one close's appends to FIVE rows that came due at once, and they came
-  due because that iteration deleted a shell file and recorded a ruling. So a row's append size is
-  driven by ITERATION SHAPE rather than by the row — which means capping a row per close, the
-  third shape, would truncate hardest in exactly the case the roster exists for.
-  **The FIRST shape has now been run by accident, and it lost a mandatory field — measured
-  2026-09-05.** A close compressed the `internal-identifier-restatement` row from 72073 to 2588
-  characters and the header-mandated `due:` field went with the prose, leaving the row's due-ness
-  unreadable until the same close restored it (the field sits 43311 characters into the row at
-  `b2cedcd3`). So "compact each row" is not safe unattended: a compression pass reads an accreted
-  row as prose, and the roster's grammar is graded by nothing.
-  **THIRD POINT 2026-09-06: 214955 bytes over 12 lines, 65KB BELOW the second** — growth is not
-  monotone once a compaction lands, so the cost line prices appends rather than the file.
+  **The measured series, each point taken at its own boundary and none forecast:** 270392 bytes /
+  11 lines at this drain; **280394 / 11 on 2026-09-04**, plus 10002 over one close and ABOVE the
+  roughly 7KB the cost line forecasts, so that forecast is understated rather than generous;
+  **214955 / 12 on 2026-09-06**, 65KB BELOW it, so growth is not monotone once a compaction lands
+  and the cost line prices appends rather than the file; **231607 / 11 on 2026-09-07**, one row's
+  single line at 65680 characters, about 80k tokens to read whole.
+  **The second point bears on WHICH shape is right, not merely on size.** Those 10KB were one
+  close's appends to FIVE rows that came due at once, and they came due because that iteration
+  deleted a shell file and recorded a ruling. So append size is driven by ITERATION SHAPE rather
+  than by the row, and capping a row per close — the third shape — would truncate hardest in
+  exactly the case the roster exists for.
+  **The FIRST shape has been run by accident and it lost a mandatory field — 2026-09-05.** A close
+  compressed the `internal-identifier-restatement` row from 72073 to 2588 characters and the
+  header-mandated `due:` field went with the prose, unreadable until the same close restored it
+  (the field sat 43311 characters into the row, at `b2cedcd3`). So "compact each row" is not safe
+  unattended: a compression pass reads an accreted row as prose, and the grammar is graded by
+  nothing.
+  recurrence: audit-roster-row-carry-unruled 2026-09-07
   Surfaced 2026-09-04 in the gap inbox by the `usage-verdict-cut` close's own later steps and
   drained at the next iteration's scope entry, which is why its disposition is dated after it.
+  RE-FILED 2026-09-07 as a fresh gap bullet by that iteration's close — same subject, no new axis —
+  and drained here as a `recurrence:` stamp with the figure refreshed rather than as a second entry
+  (`lead, own-authority` 2026-09-07, on this scope's escalation).
 - **upgrade-smoke-producer-leaks-worktrees-on-signal** [design-pending] — the upgrade-smoke arm
   removes its worktrees on its own exit paths and traps no signal, so a run killed from outside
   leaks every checkout it created.
@@ -10120,6 +10137,47 @@
   refused (choosing among the three candidates is design work an amendment owes) and →icebox
   refused on the adopter witness above.
 
+- **manifest-shape-predicate-and-rendering-disagree** [design-pending] — the Windows install-smoke
+  leg's manifest arm refuses a value as "not 40 lowercase hex" while its own byte rendering of that
+  same variable shows 40 lowercase hex, for every entry in the profile.
+  **OBSERVED at round 17** (run `34108112152`, job `101697744618`), the first round under the
+  verdict-witness repair, read at the push the close already watches.
+  **THE REPAIR WORKED and that is what makes this legible:** the verdict's row is printed, the
+  refusal names its operand, and the report states that the witness row and a sample coincide.
+  **The contradiction, on the deciding entry `gate-sdk/README.md`.** All five values — `want`,
+  `got`, `reread`, `own`, `raw` — are one identical string,
+  `f2fe8f746a92641c73fa7ab7d75756ed3c44a5fc`,
+  and `printf %q` quotes NONE of them, so no byte differs and the carriage-return candidate stays
+  falsified; yet the run refuses with *the `want` operand on `gate-sdk/README.md` is not 40
+  lowercase hex* and counts 493 of 493 disagreeing entries failing that test.
+  **NOT the pairing defect round 15 closed the series on.** That shape test reads ONE variable, so
+  there is no second operand to mis-pair, and the value it read is the value printed beside it by
+  the same function. The disagreement is between the shape predicate and `%q`'s rendering of one
+  variable, on one host, for the whole manifest at once. The round log in `installer/README.md` was
+  corrected in place at that close and the series recorded REOPENED.
+  **Why `[design-pending]` and feature-class.** The next round's question is what `read -r want`
+  holds on MSYS bash versus what `%q` renders of it, and the three candidate directions each edit a
+  documented contract rather than converging on it: render with `od -c` instead of `%q` at the
+  refusal site; test the operand's LENGTH separately from its character class so the two failure
+  modes come apart; or compare against a value produced without the jq-into-read pipeline. The
+  refusal's truth table and its byte-rendering promise are stated in `installer/README.md` §The
+  consumer smoke, so any of the three owes an amendment.
+  **Product-class with a live trigger** under TRAJECTORY.md's 2026-08-30 discriminator: the witness
+  is the adopter-facing Windows install path, which this leg exists to attest.
+  **DISTINCT from `consumer-smoke-manifest-verdict-outruns-its-report`**, which landed and IS the
+  instrument that made this readable, and from `init-vendor-staging-argv-overflow`, whose subject is
+  one `git` invocation's argv width.
+  **Cost while deferred:** the leg is `continue-on-error`, so it greens master either way — which is
+  the whole reason this has survived seventeen rounds — and while the arm cannot state a readable
+  verdict the Windows install claim has no oracle behind it.
+  **IN THIS ITERATION'S UNIT SET — ruled 2026-09-07 by the operator**, through the AskUserQuestion
+  channel in a lead session and relayed by the lead, joined to `powershell-installer-surface` on the
+  product-class-with-a-live-trigger ground. Spec authors its amendment and promotes it; the
+  authoring is the promotion.
+  Surfaced 2026-09-07 in the gap inbox by the `adopter-install-path-asserted-not-narrated` close,
+  which read the round it had bought; no stage of that iteration could drain it, so it carried into
+  this iteration's scope intake and is filed here one iteration late.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -10219,6 +10277,7 @@
 - **cost-series-limb-unreadable-inside-close** [design-pending] — Close cannot price its open row.
 - **post-build-instrument-edit-unowned** [design-pending] — No stage owns a post-build tree edit.
 - **dod-size-figure-stales-in-iteration** [design-pending] — Spec's promotion ages its own DoD size.
+- **portability-count-on-two-surfaces** [design-pending] — Hand-spelled census; both true today.
 
 ## Done
 

@@ -629,6 +629,27 @@ relocation, not a reversal of anything closed:** what is closed is the ruling's 
 date and their channel, and those stand exactly as recorded above.
 ruling: the lead-invocation open grant
 
+**Where this project's own class default and the close template's icebox trigger test appear to
+disagree, the class default governs — ruled `lead, own-authority` 2026-09-07, through the lead's
+message channel at that iteration's close.** So a machinery-class gap bullet takes the icebox
+disposition **even when it names a live trigger**. First applied to the stale-DoD-arithmetic bullet,
+which became the icebox entry `dod-size-figure-stales-in-iteration` — that entry is the ruling's
+first application and not its content. **The ground is not the one the escalating session
+offered**, and recording the weak form would invite the counter that retires it: *the default is
+the more specific rule* fails, because a default is ordinarily the yielding rule and a live trigger
+would then outrank it. What settles it is the 2026-08-30 ruling's own text. Its witness
+discriminator was recorded **precisely because** the role clause above it "proved to
+under-determine it in a repo that dogfoods its own kits" — this case, not an analogue of it — and
+its test is **conjunctive**: machinery-class by the discriminator, blocks no stage entry, blocks no
+push. There is no live-trigger limb in it at all, so a bullet whose trigger fired satisfies the
+conjunction on its own terms and the default applies without outranking anything. The template's
+"naming no live trigger" is kit-generic phrasing that stays true for a consumer that does **not**
+dogfood its own kits, so the two never collide once the class ruling is read as answering the case
+the kit phrasing under-determines. Nothing is owed in lifecycle-kit/SPEC.md: the rule is this
+project's reading of its own default, and the provenance seam keeps it here.
+Discharge: with the 2026-08-30 machinery default it qualifies.
+ruling: the machinery-class icebox default over a live trigger
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
@@ -734,6 +755,21 @@ triaged after the port, as one iteration** that iceboxes by class and retires wh
 or a closed ruling has mooted; joining units under the grounds above is work on the pool, not that
 triage. Discharge event: the oracle's owed count reads zero, at which point the port-cut-first
 clause is spent and this paragraph is deleted; the composition test is the kit's and stays.
+
+**The whole-window clause describes what fills an iteration composed AROUND a cut; scheduling an
+own-iteration leg as the iteration is what that phrase names — ruled 2026-09-07 by the operator,
+through the AskUserQuestion channel in a lead session and relayed by the lead.** The clause above
+sends the whole window to deferred entries when "the port's next act is an own-iteration leg", and
+read as barring the leg itself the clause would make its own discharge event unreachable — the owed
+count cannot fall while the one unit every held file waits on is unschedulable. It is a reading of
+the clause and **not** a reversal of the 2026-09-06 application on that entry's clause (8), which
+stands for that iteration. Two passages carry it and are recorded together because weighing one
+without the other is what makes this re-derivable: the port-critical ground above says such a unit
+"is its own iteration only when it cannot" ride inside a cut, **naming the Windows and macOS legs**
+as the instances — that is the text the reading stands on; and the refusal of the port-only run
+warns that its reachable column is "one more window, after which every iteration is an own-iteration
+leg or another exception paragraph", which is not repealed here and bounds how often this reading
+may be reached for. Discharge: with the port-cut-first clause above, which this reads.
 
 **The 2026-09-06 no-cut ruling on `native-gate-port-remaining-corpus` reached
 the right conclusion from a ground the disjunction above does not bear —
