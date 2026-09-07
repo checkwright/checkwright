@@ -111,9 +111,15 @@ gate prints its own command on red. This delta is the roster's work, not a judge
 {design-bearing}.
 
 Criterion 5 already prices the omission "per member and paid per cohort" and names the aggregate —
-"a cohort's aggregate cost is the **binary-less residual**". What it has never had is anything that
-computes it. Arm D is that, and the criterion cites it rather than restating the count, so the one
-place a porting session meets this cost is the place that says where the number comes from.
+"a cohort's aggregate cost is the **binary-less residual**" — and already has one instrument for it:
+`installer_smoke`'s binary-less leg, which asserts a cohort's own residual against the tree at that
+cohort's landing, event-triggered and scoped to that one batch. **What it has never had is a
+standing one** — a count that rides every battery invocation rather than firing only when a cohort
+lands, and that reads per **held platform** rather than per port batch. Arm D is that: it prints on
+the clean line as well as the red one, keyed to the declaration block's `held` triples rather than to
+a landing cohort, so a pile that grows between cohorts is visible before the next port batch's own
+smoke would catch it. The criterion cites arm D rather than restating the count, so the one place a
+porting session meets this cost is the place that says where the number comes from.
 
 ### (4) The parity contract joins the roster of what holds the install page
 
@@ -163,7 +169,8 @@ touched by any delta.
 ## Existing sections updated
 
 - `gate-sdk/SPEC.md` §The port-candidate criteria, criterion 5 — its aggregate-cost paragraph,
-  which names the binary-less residual and has never had anything that computes it (delta 3).
+  which names the binary-less residual and, beyond the per-cohort instrument it already cites, has
+  never had a standing, per-platform one (delta 3).
 - `docs/site-architecture.md` §Generated projections and their freshness gates — the parity-contract
   roster, which today carries the install-toolchain contract alone (delta 4), and the generated-hook
   fan-out a new gate stales (delta 2).
