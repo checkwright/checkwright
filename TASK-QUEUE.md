@@ -122,43 +122,6 @@
 
 ## Technical Debt
 
-- **init-vendor-staging-argv-overflow** — `installer/lib/init.sh` stages the whole
-  vendored file set as one `git` argv, and on a host with a low `ARG_MAX` that is E2BIG, so a
-  full-profile install cannot complete.
-  **OBSERVED on a real runner, not predicted.** Run `33799627871`, job `install-smoke-windows`,
-  step `read one manifest disagreement in place`: its `init.log` reads
-  `lib/init.sh: line 380: /mingw64/bin/git: Argument list too long` followed by
-  `checkwright init: could not stage the vendored files`, and `init` never completed.
-  **It is profile-size-dependent, which is the whole finding.** In the same job on the same runner
-  minutes apart, the smoke's `init` on the STARTER profile completed and wrote a 477-entry lock,
-  while the diagnostic's `init` on the FULL profile did not. Whether the two are one defect or two
-  is not settled by anything printed.
-  **It blinded the round's instrument, which is how it was found.** The manifest diagnostic that
-  round bought printed none of the five things it existed to print — no `want`, no `got`, neither
-  `git hash-object` run, no `core.autocrlf` origin, no `git check-attr` output — because it bailed
-  at its own early guard before reaching a `checkwright.lock`. NO CAUSE IS CLAIMED HERE for the
-  477-of-477 manifest mismatch; this entry owns the staging defect alone.
-  **Two forks, and they are not the same work. THE FIRST IS DISCHARGED 2026-09-05 at build** —
-  `windows-leg-manifest-cause-read` moved the report into the smoke's own manifest arm, which runs
-  inside whichever profile failed, and DELETED the `read one manifest disagreement in place` step
-  the bullets above cite; that deletion repairs no part of this entry, which still owns batching
-  the staging call so no host's `ARG_MAX` is the ceiling. Only the second was ever this entry's.
-  **Cost of carrying it:** a native-Windows adopter on the full profile cannot install, and the
-  named adopter the 2026-08-26 operator ruling ordered the Windows leg for is exactly that
-  population — an install-path claim witnesses it, so it is product-class outright.
-  **DISTINCT from `platform-support-ci-matrix`, retired 2026-09-06**, whose subject was the leg and
-  the manifest mismatch; this is one `git` invocation's argv width, and its retirement leaves this
-  standing untouched.
-  **PROMOTED AS DEBT 2026-09-07 by scope**, on the operator's ruling of this iteration's unit set
-  (AskUserQuestion channel in a lead session, lead-relayed): joined to
-  `powershell-installer-surface` as **same-surface** — the file it repairs is the one that unit's
-  behind-invoke relocation
-  restructures, so the repair is authored once whichever side of the invoke it ends up on. Debt and
-  not a feature by the new-names litmus: batching one `git` invocation adds no name to any governed
-  surface and converges behavior on names `installer/README.md` §init already carries.
-  Surfaced 2026-09-03 at the close of `capture-and-meter-cuts-with-windows-manifest-diagnostic`;
-  drained at the next boundary into Deferred, promoted here.
-
 ## Deferred
 
 
@@ -10340,5 +10303,7 @@
 - **portability-count-on-two-surfaces** [design-pending] — Hand-spelled census; both true today.
 
 ## Done
+
+- init-vendor-staging-argv-overflow
 
 ## Lessons Learned
