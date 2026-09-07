@@ -2793,7 +2793,7 @@ be a POSIX shell at all, so **every value it needs arrives as argv** and it
 resolves no knob and no kit config. A bridged install arm would be resolved by
 `gate_command` — a bash front-end sourcing each owning kit's `lib/*.sh` — and
 would therefore be unreachable from the PowerShell half of that boundary. Its
-named caller is `installer/lib/init.sh` today and its PowerShell twin after,
+named callers are `installer/lib/init.sh` and its PowerShell twin, both live,
 and its grammar, channels and exit statuses are
 installer/README.md §The install boundary's. It owes no descriptor,
 registration or fixture pair, like every other member; what it is asserted by is
