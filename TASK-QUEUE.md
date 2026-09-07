@@ -109,6 +109,48 @@
   Admitted as the iteration's lead unit `lead, own-authority` 2026-09-07; promoted at spec
   2026-09-08 by authoring the amendment, which is the same act.
 
+- **born-native-omission-accumulation** [spec: SPEC-platform-coverage.md]
+  — the born-native flip attaches criterion 5's omission to every future gate, and nothing
+  measures the pile.
+  **This is the costed residue of a closed ruling, not a challenge to it.** `TRAJECTORY.md`:277-291
+  records the 2026-08-14 flip and states in the same breath that "the ruling does not widen the
+  roster; the residue is costed as `born-native-omission-accumulation`". This entry discharges that
+  costing and re-opens nothing.
+  **THE INSTRUMENT IS RULED at spec 2026-09-08, in-envelope: a BOUND MADE REDDENABLE, with the
+  measurement riding it.** The entry left three options — a measurement, a bound, or nothing beyond
+  the exception rule. "Nothing" fails on the entry's own words, that nothing would redden if the
+  pile grew without bound: an exception rule governs whether a new gate may be shell and never
+  reads the roster. A measurement alone is a number no run acts on, which is exactly how
+  `native/targets.list`'s header drifted while its owner retired. A NUMERIC ceiling is a literal
+  de-literalization refuses and answers the wrong question — the pile is bad because a supported
+  platform is uncovered, not because it is large.
+  **THE BOUND IS STRUCTURAL: zero uncovered supported platforms and no uncaused hold.** Every
+  platform the install documentation declares supported is either in the roster or explicitly
+  HELD with the run that would join it, and the omitted-member count rides along as what a reader
+  needs to weigh a hold.
+  **IT IS GREEN ON LANDING, and that is a design fact rather than a state to wait out.** Under the
+  operator's 2026-09-07 ruling the roster is still one line when this gate arrives and macOS is
+  documented supported, so a gate bounding on "in the roster" would red at its own landing commit.
+  The held state is what makes the bound satisfiable that day while staying a real bound: a hold
+  is cause-bearing and cannot be granted silently, because arm C reds on an empty cause.
+  **Four deltas, work-classed inline:** `check-install-platforms`, a born-native repo-root gate
+  taking positional operands with layout defaults exactly as its sibling `check-install-toolchain`
+  does and minting NO knob; its `# graph:` manifest and the regenerated hook; criterion 5 gaining
+  the pointer to the arm that finally computes the binary-less residual it has always named; and
+  the parity-contract roster gaining its row.
+  **Arm B is the load-bearing one beyond this entry's own subject:** it mechanizes
+  `gate-sdk/SPEC.md` §Consumer payload's FIRST bound — a roster line may not exceed what the
+  install documentation states — which today is held by prose and by whoever remembers to read it.
+  **SEQUENCED BEHIND its sibling and the dependency is stated, not assumed:** the gate's corpus is
+  the platform declaration block `SPEC-platform-evidence.md` delta 1 authors, so it cannot land
+  before that block exists or it exits 2 at its own landing commit. Ordering is
+  declaration-then-gate.
+  **Cost while deferred:** an adopter class the project has never observed installing silently
+  loses more of the battery every iteration, and the first evidence of how much would arrive from
+  a macOS preview adopter rather than from the tree.
+  Joined same-surface `lead, own-authority` 2026-09-07; ruled feature-class at spec 2026-09-08 and
+  promoted there by authoring the amendment, authoring and promotion being one act.
+
 ## Technical Debt
 
 ## Deferred
@@ -1160,51 +1202,6 @@
   behind it, the one failure the manifest exists to make impossible.
   Filed 2026-08-18 by close, draining the gap inbox; the harness's env handling probed directly
   rather than inferred from the bullet.
-
-- **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
-  criterion 5's omission to every future gate, and nothing measures the pile.
-  **This is the costed residue of a closed ruling, not a challenge to it.** TRAJECTORY.md
-  §The closed rulings records the 2026-08-14 flip to native-by-default; this entry exists
-  because that ruling's own cost has no owner, and the gap-disposition rule forbids
-  flagging it and moving on.
-  **The mechanism, from the surfaces that already state it.** gate-sdk/SPEC.md §The
-  port-candidate criteria, criterion 5: a `.gate`-declared member is **omitted** from the
-  `gates.list` of a consumer whose host the roster carries no artifact for, arriving as a
-  declared absence rather than a broken battery. For a *port* that trade is neutral, since
-  the shell form is deleted either way. For a born-native gate it is "a real subtraction
-  against the alternative of shipping shell" — the SPEC's own words, written when
-  born-native was the exception.
-  **What changes under the flip, and it is a rate rather than an event.** Every new gate is
-  now born native unless an exception is argued, so the omitted set on an uncovered host
-  grows monotonically at the rate the battery grows. `native/targets.list` ships **one**
-  target, `x86_64-unknown-linux-gnu`, and states its own grounds: it is the only platform
-  this repo holds green evidence for, runner availability explicitly NOT being the
-  constraint. So the uncovered set today is not a hypothetical Windows adopter — it is
-  **every macOS adopter**, for whom omit-and-declare is already the normal path on day one.
-  **Why the existing entries do not cover it.** `platform-support-ci-matrix`, retired 2026-09-06,
-  owned the CI leg and, since 2026-08-27, the widening itself: `gate-binary-target-roster-widening`
-  shipped **without widening the roster**, and deliberately — `native/targets.list`'s own header
-  rules the msvc triple stays off until a run has produced AND EXERCISED its artifact, which is that
-  leg's promotion condition. An iteration named *unblock* removes a blocker; it does not grant
-  a permission. So *closing* the gap is now owned by no live entry at all — the leg's owner having
-  retired ahead of its promotion condition. Nothing owns the *accumulation*
-  the flip creates while it stays open, and nothing would redden if it grew without bound.
-  **What is genuinely open:** whether the right instrument is a measurement (a count of
-  omitted members per uncovered target, so the pile is visible), a bound (a policy ceiling
-  on how far the omitted set may grow before widening is forced), or nothing beyond the
-  exception rule the flip's own amendment must state — in which case this entry closes
-  against that amendment rather than shipping.
-  **JOINED SAME-SURFACE TO `supported-platform-roster-widening` — ruled `lead, own-authority`
-  2026-09-07**, beside `gate-binary-roster-covers-supported-platforms`. Same
-  `native/targets.list` single triple and the same criterion-5 section, and the widening moves
-  the very uncovered set this entry measures — so whether the instrument is a measurement, a
-  bound, or nothing beyond the flip's own amendment is decidable only once the roster has moved.
-  **Cost while deferred:** an adopter class the project has never observed installing
-  silently loses more of the battery every iteration, and the first evidence of how much
-  would arrive from a macOS preview adopter rather than from the tree — the exact
-  order the launch readiness rule exists to avoid.
-  Filed 2026-08-14 at scope, dispositioning the criterion-5 consequence of the same
-  session's born-native ruling, under the gap-disposition rule.
 
 - **instruction-surface-bash-focus** [design-pending] — the always-loaded surfaces assume bash.
   `CLAUDE.md` and the instruction surfaces beside it are written around a shell battery:
