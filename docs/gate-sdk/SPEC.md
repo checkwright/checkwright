@@ -10111,6 +10111,14 @@ inside the command substitution rather than with `env`, because `env` cannot
 invoke a shell function and — more to the point — a bridged knob is resolved
 when the **argv** is built, so an override set around the binary would arrive
 after the value it was meant to change had already been read.
+**And the consumer config seam is resolved earlier still — at the moment
+`lib/gate.sh` is *sourced*, against that shell's working directory
+(§Layout and configuration).** A bespoke test that `cd`s into a case dir in a
+subshell therefore does **not** pick up that case's own
+`<gates-dir>/gate-sdk-config.sh`, and must set the knob with `gate_env`; the
+`--run-gate-tests` arm does read the case's seam, because it enters the case dir
+before the source. The asymmetry is stated here because the source-time half is
+invisible at the call site that suffers from it.
 
 **A `*.test.sh` may also be a *scenario* runner rather than a gate driver, and
 one that compares substrates asserts exactly where a dispatch exists.** A bespoke

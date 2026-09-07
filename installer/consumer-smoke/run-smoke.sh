@@ -349,8 +349,8 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
 # shared helper rather than a branch inside it: every covered-platform leg passes the green
 # expectation it asserts today, and the binary-less leg passes the refusal its install actually earns
 assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery expectation: green | unavailable
-    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked malformed_first malformed_n path want got target seam bin list k m line omitted want_omitted n_omitted
-    local -a bad_hash=()
+    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked malformed_first malformed_n path want got target seam bin list k m line omitted want_omitted n_omitted q_seam q_bin
+    local -a bad_hash=() lock_kits=() want_kits=()
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }

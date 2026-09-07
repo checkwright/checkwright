@@ -6341,6 +6341,14 @@
   surface, single-backtick form, and `check-queue-slug-liveness`' corpus does not reach it — so the
   false-positive budget question the entry owes now has two instances to size against, both on
   surfaces whose whole purpose is outliving the queue.
+  **THE FALSE-POSITIVE BUDGET IS NOW MEASURED, 2026-09-07 at close over `--emit queue-edges`.** Its
+  retired block ranks 84 retired slugs across 182 citing lines, 152 distinct (citer, retired-slug)
+  pairs. Exactly ONE of the 84 is a live registered gate name — `check-spec-pointer`, whose slug
+  once headed an entry — so the rate is 1/84, but that single false positive HEADS the ranking at 15
+  inbound, ahead of every true positive. A ranker must therefore filter against `scripts/gates.list`
+  before it reads the block at all; the budget is cheap and the ORDERING is what the collision
+  breaks. Of the 152 pairs, most already spell "retired" inline and are correct prose; the drain's
+  own corrective reach is this iteration's own retirements, which is what a close can honestly hold.
   recurrence: retired-slug-live-pointer-citation 2026-09-06
 
 - **queue-status-parenthetical-liveness** [design-pending] — a queue cross-citation's section-status
@@ -8667,7 +8675,7 @@
   **LIMIT:** they missed an adopter only because the release is 1118 commits deferred, so the
   ATTESTED INSTANCE is settled and the CLASS is not — "would witness" and the not-inherited
   instruction stand.
-  recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06
+  recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06 2026-09-07
   Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned
   2026-08-29 by close, the six stale citations verified against guard-kit/SPEC.md at HEAD.
 
@@ -8828,53 +8836,53 @@
 
 - **lead-split-posture-limb-unjudged** [design-pending] — this repo runs the Split posture and has
   never judged which of the two limbs its own posture sits on. The template
-  (`lifecycle-kit/templates/lead.md` §Economics) now states both limbs and the method for taking
-  the reading; what stays local is the threshold, in `.claude/commands/lead.md`, and every reading,
+  (`lifecycle-kit/templates/lead.md` §Economics) states both limbs and the method for taking the
+  reading; what stays local is the threshold, in `.claude/commands/lead.md`, and every reading,
   which is this entry's. **The deliverable that made the template wrong is DISCHARGED** — the
   premise is amended, its slug retired, and what survives is the standing measurement the landing
   did not moot. Split `lead, own-authority 2026-09-05`.
-  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, fifteen points and
-  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5. The
+  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, sixteen points and
+  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10. The
   threshold is a third such iteration and is ANSWERED; the posture flips on no single point.
-  **THE FOURTEENTH WAS ONE, the series' minimum, and its shape was what the number cannot carry:**
-  the lead ROUTED rather than ruled — scope raised four questions, three went to the operator, and
-  every later stage raised zero — so a low count read TOWARD the posture rather than against it.
-  **THE FIFTEENTH IS FIVE AND ITS SHAPE IS THE EXACT INVERSE.** Scope raised four and the lead ruled
-  ONE alone (no port cut takeable, off the ruling record's own escape clause); spec raised three and
-  the lead ruled ALL THREE alone; a build batch's packer-cut escalation is the fifth. Only the unit
-  set went up. **One datum cuts the other way and belongs on the same series:** the lead ESCALATED
-  whether the CI leg's `continue-on-error` drop could land post-build rather than ruling it. Two
-  consecutive points of opposite shape, at 1 and 5; neither is a flip.
+  **THE FOURTEENTH WAS ONE, the minimum, and its shape was what the number cannot carry:** the lead
+  ROUTED rather than ruled, so a low count read TOWARD the posture. The fifteenth inverted that at 5
+  (spec raised three, the lead ruled all three alone), one datum cutting back: a CI-leg escalation.
+  **THE SIXTEENTH IS TEN, the series' second-highest, and it is the first point whose shape is
+  STRUCTURAL rather than an accident of the iteration.** Scope's block contributed 5, spec's 4, one
+  build batch 1; align, two build batches and validate contributed none. Two more routed to the
+  OPERATOR (a ruling's stale ground; the attribution of TRAJECTORY.md's new fourth act). **ZERO
+  went to the intent oracle, and that is not a lapse: under the Split posture the intent-oracle
+  route is DEGENERATE for scope's own escalation.** The oracle IS the scope session (template
+  §The lead model), so when scope escalates, oracle and escalator are one party and every intent
+  question falls straight through the routing rule's first move (§The escalation protocol) to its
+  fallback — answering off the governed surfaces, which is exactly the limb the template says the
+  split converts relays into. FIVE OF THE TEN are that single structural case.
+  **THE READING, STATED AND DELIBERATELY NOT ACTED ON:** "consistently several", so the limb is LIVE
+  for this posture on this iteration. Per the binding one iteration is one point and the threshold
+  is a third such iteration: the posture is NOT flipped, and this point reads against the series.
   **CHARACTER THE COUNT CANNOT SEE, recorded because by design the count cannot.** At the thirteenth
   two of seven ruled the lead WRONG or ruled WHERE THIS SERIES LIVES; it recurred twice at the
   fifteenth — a build batch refused the lead's relayed `owed lines=53` figure and was right, another
   killed a false safety claim in its own draft. A lead instruction is not a governed surface.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
-  4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** — every earlier point was a mid-close
-  unlowered ceiling, which is why this entry and the binding once disagreed. **NOT APPENDED at the
-  fourteenth OR the fifteenth**, same ground both times: the closing session's own row is still
-  growing, so any ratio it reads is a ceiling. Two consecutive declines say the appending rule has
-  no satisfiable moment inside close; that limb is `cost-series-limb-unreadable-inside-close`.
+  4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** of mid-close unlowered ceilings. **NOT
+  APPENDED at the fourteenth, fifteenth OR sixteenth**, one ground all three: the closing session's
+  own row is still growing, so any ratio it reads is a ceiling. Three declines say the rule has no
+  satisfiable moment inside close; that limb is `cost-series-limb-unreadable-inside-close`.
   **THE COUNTER-EVIDENCE IS NINE INSTANCES OF ONE SHAPE — a claim verified at one surface and read
-  as covering a wider one.** Eight are the lead's own, the ninth on a stage session's carry.
-  **NEITHER a counter nor a refused premise NETS against the count**, which measures whether an
-  escalation was answered off a governed surface, never whether its grounds held. Nine at fifteen.
-  **ALIGN READING SIX, AND THE REVERT SIGNAL FIRED — first firing in six readings.** Bare `align`
-  reads cr=13.78M, upper-mid of a 6.1M–32.0M band. The signal is a missed spec defect surfacing as a
-  build round-trip and both halves are present: align was handed the packer cut's reachability
-  premise AS a named audit target, reported it verified off `publish.yml:110→182`, and those lines
-  sit on opposite sides of a job boundary — `pack:` is a separate job from `build:` with no build
-  step. Build blocked, escalated, and the delta left as a deferred entry. **Recorded, not acted on,
-  and two-sided:** the same run caught three real defects an Opus spec shipped, and the tier lives
-  in ruling-config while this entry holds only readings.
-  **Cost while deferred:** the posture is run unjudged, so a tier assignment wrong on the character
-  limb costs every iteration and shows up as nothing — the count is the only instrument that reports
-  it, and an unread instrument is indistinguishable from a healthy one. The cost series' 2026-09-05
-  correction also decays: re-deriving it re-runs the meter over six receding iterations.
+  as covering a wider one**, eight the lead's own, the ninth on a stage session's carry. **NEITHER a
+  counter nor a refused premise NETS against it**: the count measures whether an escalation was
+  answered off a governed surface, never whether its grounds held. Nine at sixteen.
+  **ALIGN READING SIX STANDS, NOT RE-TAKEN AT THE SIXTEENTH.** The revert signal fired once, at the
+  sixth, on a missed spec defect surfacing as a build round-trip — recorded, not acted on, and
+  two-sided, that run also catching three real defects an Opus spec shipped.
+  **Cost while deferred:** the posture runs unjudged, so a tier assignment wrong on the character
+  limb costs every iteration and shows up as nothing — the count is the only instrument reporting
+  it, and an unread one reads like a healthy one. The cost series decays too, its re-derivation
+  re-running the meter over six receding iterations.
   **NO `recurrence:` line, deliberately** — the three dated re-filings belonged to the discharged
-  deliverable; the deferred-age clock reads off `Surfaced`.
-  Surfaced 2026-09-02. Filed 2026-09-05 by build, splitting the measurement half off the amendment
-  it was riding.
+  deliverable, so the deferred-age clock reads off `Surfaced`. Surfaced 2026-09-02; filed 2026-09-05
+  by build, splitting the measurement half off its amendment.
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
   name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
@@ -9485,9 +9493,9 @@
   **The candidate oracle is cheap and derivable:** diff the tracked `*/bin/*.sh` set between the
   newest released tag and the release commit, and require every disappeared path to appear in the
   pending note's declaration-bearing sections.
-  **DISTINCT from `installer-printed-followup-commands-uncovered`**, promoted at that same close:
-  that owns a printed command inside installer shell source with no gate corpus reaching it, and
-  this owns the coupling between a REMOVAL and a NOTE — a different surface, a different oracle.
+  **DISTINCT from the printed-follow-up unit LANDED 2026-09-07** (installer/README.md §The consumer
+  smoke): that owned a printed command inside installer shell source with no gate corpus reaching
+  it, and this owns the coupling between a REMOVAL and a NOTE — another surface, another oracle.
   **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator**, which is what keeps it
   off the one-line icebox tier: it blocks no stage entry and no push, but its demand witness is an
   adopter upgrade rather than this repo's own accounting.
@@ -10055,11 +10063,62 @@
   needs a floor-member-to-brew-formula mapping surface that does not exist, as the paragraph above
   says in its own words. **A sizing cut, never a merit one** — its trigger is the sharpest of the
   five, the leg being BINDING (`gates.yml:434` carries no `continue-on-error`), so it is first back
-  in at the next window. Recorded with the correction it forces: its same-surface pairing with
-  `gnu-ism-on-adopter-install-path-ungated` is weaker than it reads, since the two share a TRIGGER
-  and not a mechanism — one is a blocklist over a named corpus, this is package-set parity.
+  in at the next window. Recorded with the correction it forces: its same-surface pairing with the
+  blocklist unit — LANDED 2026-09-07 as `check-portability-floor`, gate-sdk/SPEC.md
+  §check-portability-floor — was weaker than it read, the two sharing a TRIGGER and not a mechanism:
+  that one is a blocklist over a named corpus, this is package-set parity.
   Filed 2026-09-06 by build as one of two enforcement-first gaps the macOS leg surfaced; promoted
   here at the 2026-09-06 close drain.
+
+- **directive-minting-delta-roster-obligation** [design-pending] — a delta that mints a machine
+  comment directive obliges canon-kit's built-in directive roster, and nothing in the amendment
+  lifecycle prompts the author to list that surface.
+  **The instance is measured.** The portability-floor amendment's `## Existing sections updated`
+  roster missed the `native/src/gates/comment_tier.rs` + canon-kit/SPEC.md §check-comment-tier row
+  through spec AND align, and align had already corrected two other completeness gaps in the same
+  roster. Build closed it in-session only because delta 3's own grammar forced it: two of the six
+  valve sites sit on line-continuation statements that carry no trailing comment, so the marker had
+  to be a full-line one, which `check-comment-tier` governs.
+  **Why the gate cannot see it.** canon-kit/SPEC.md §check-amendment-update-target asserts the
+  decidable half by design — every LISTED target is owned — and says so in as many words, leaving
+  roster completeness to align. Arm B catches a target listed and unowned, never one never listed.
+  The amendment is deleted on merge, so no later reader catches the omission either.
+  **Why this is a THIRD narrow slice and not a re-file.** `amendment-roster-omission-detection` owns
+  the general class and names two candidate gateable slices, literal-substitution and renumber, with
+  "whether one mechanism covers both" as its open question. This is a slice neither reaches and the
+  only one whose evidence is IN the amendment: a delta body minting a `<word>:` token absent from
+  the directive rosters is decidable without reading the tree. That entry is at its 50-line cap,
+  which is why the slice lands here rather than inside it; its recurrence date carries the instance.
+  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator** — canon-kit ships the
+  amendment lifecycle and `check-comment-tier`, so an adopter minting a directive in their own
+  amendment meets the same silent omission and their own gate's verdict witnesses it.
+  **Cost while deferred:** one roster row per directive-minting delta, caught by a later grep or not
+  at all; directives are rare, so the class is low-frequency and silent rather than loud.
+  Filed 2026-09-07 by build batch B to the gap inbox; promoted here at this iteration's close drain,
+  →fix refused (a prose nudge with no gate is the move §check-amendment-update-target already
+  refused) and →icebox refused on the live trigger and the product witness above.
+
+- **portability-floor-adopter-on-ramp-unstated** [design-pending] — a vendored consumer gets
+  `check-portability-floor` registered and permanently disabled, and nothing tells them that naming
+  their install path is what turns it on.
+  **Probed, not inferred.** `installer/lib/common/recipe.sh:78-79` seeds `templates/msg-patterns.
+  list` into an adopter's gates dir and seeds no portability roster; a grep for the roster name
+  across `installer/` returns nothing. `GATE_SDK_PORTABILITY_PATHS` defaults empty, so the gate's
+  clean line reports the disabled-and-unconfigured state on every run and nobody reads it as a cue.
+  **The not-seeding is ruled and is NOT the gap.** Build ruled it deliberate — a roster with no
+  corpus scans nothing, and the kit cannot know an adopter's install path — and gate-sdk/SPEC.md
+  §check-portability-floor states the degradation with its honest limit. What is unclosed is the
+  on-ramp: neither `init`, `doctor` nor the docs name the knob as the thing to set.
+  **Three candidate answers, none costed here:** seed the roster with an empty corpus; have `doctor`
+  report the disabled-and-unconfigured state; or a paragraph under docs/install.md §Requirements.
+  The second is the only one that reaches an adopter who never opens the SPEC.
+  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator** — the install path is a
+  named witness, and the whole subject is what an adopter's tree does after `init`.
+  **Cost while deferred:** every adopter who vendors gate-sdk carries a registered gate asserting
+  nothing, and the failure mode is silence rather than a red.
+  Filed 2026-09-07 by build batch B; promoted here at this iteration's close drain, with →fix
+  refused (choosing among the three candidates is design work an amendment owes) and →icebox
+  refused on the adopter witness above.
 
 ## Icebox
 
@@ -10159,11 +10218,8 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 - **cost-series-limb-unreadable-inside-close** [design-pending] — Close cannot price its open row.
 - **post-build-instrument-edit-unowned** [design-pending] — No stage owns a post-build tree edit.
+- **dod-size-figure-stales-in-iteration** [design-pending] — Spec's promotion ages its own DoD size.
 
 ## Done
-
-- consumer-smoke-manifest-verdict-outruns-its-report
-- installer-printed-followup-commands-uncovered
-- gnu-ism-on-adopter-install-path-ungated
 
 ## Lessons Learned

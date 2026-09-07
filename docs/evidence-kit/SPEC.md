@@ -217,7 +217,12 @@ The parser adapters map a captured log — and, for `exit-code`, the suite's exi
 status — to `<scenario> <pass|fail|ignore>` lines: `libtest` reads per-test
 result lines (a Rust `cargo test` suite), `exit-code` emits one scenario per
 suite keyed off the suite command's exit. Any other value is a consumer command
-run on the log.
+run on the log. **`exit-code` is the only adapter the suite's exit status reaches
+at all**, and the consequence is worth stating positively rather than leaving to
+be inferred from that clause: under `libtest` or a consumer command, two distinct
+non-zero exits are indistinguishable in the row, so a suite that means to
+separate *failed* from *could-not-run* must say so **in its log**, where its
+parser can read it.
 
 **`libtest` shipping is not `libtest` being owed, and the refusal is recorded
 here because the adapter already exists — a later reader would otherwise read the
