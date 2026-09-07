@@ -189,8 +189,8 @@
   **(6) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER THE BLOCKER-RETIRING OVERRIDE, AND
   THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING STAGE RUNS, 2026-09-05 (lead)** —
   both owned by gate-sdk/SPEC.md §The first cohort.
-  **(8) NO CUT TAKEABLE 2026-09-06 `lead, own-authority`: 15 held by their owning sections and the
-  16th, `pack-installer.sh`, by `pack-installer-cut-to-a-non-gate-arm`; empty-column, both fire.**
+  **(8) NO CUT TAKEABLE 2026-09-06 `lead, own-authority`: 14 held by their owning sections and the
+  15th, `pack-installer.sh`, by `pack-installer-cut-to-a-non-gate-arm`; empty-column, both fire.**
   **(7) `demo/run-demo.sh` PORTED, its residue-class `# no-port:` route DECLINED — operator
   2026-09-06 (lead-relay), DISCHARGED same day behind a separate `# spec:` re-home. Fork closed.**
   **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
@@ -628,7 +628,8 @@
   `target_of_host` is still bootstrap step 2 wherever the bootstrap is built —
   what moved is the one-line repair, never the design, which stays this entry's whole.
   **MEASURED 2026-08-26 at close on a native Windows runner** (`platform-support-ci-matrix` round
-  2, which owns the full harvest). Two assumptions this bootstrap makes are now facts rather than
+  2; that entry retired 2026-09-06, so recover its harvest from git history, as above). Two
+  assumptions this bootstrap makes are now facts rather than
   hopes: `[[ -x ]]` HOLDS on a freshly `chmod +x`'d shebang script and it executes directly, despite
   `core.filemode=false`; and it HOLDS on npm's extension-less bin shim, which is written mode
   `-rwxr-xr-x` beside its `.cmd` and `.ps1` siblings and executes. So neither `-x` test needs a
@@ -651,9 +652,6 @@
   than called because step 4 needs it first; `bin/checkwright.sh` collapses into the bootstrap.
   **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
   names that no current path reaches, and every install-path change is authored bash-first.
-  **It no longer stops `platform-support-ci-matrix` closing**: that promoted entry wants an
-  artifact produced AND exercised, and every blocker stopping a Windows host from selecting one
-  sat at `gate-binary-target-roster-widening` rather than here — shipped now, and `## Done`.
   Filed 2026-08-03 by spec; re-scoped 2026-08-24 at scope; fork 1 merged and demoted 2026-08-25;
   the two source blockers re-scoped out 2026-08-26 by operator ruling.
 
