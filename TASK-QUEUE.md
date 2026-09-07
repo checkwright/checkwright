@@ -17,6 +17,62 @@
 ## Deferred
 
 
+- **smoke-manifest-read-appends-carriage-return** [design-pending] — the Windows consumer smoke
+  compares no manifest entry as a hash, because every `want` reaches the comparison carrying a
+  trailing carriage return.
+  **Round 18 closed the series and the full record is `installer/README.md` §The consumer smoke's,
+  cited and not restated here.** Observed 2026-09-07 at close, run `34142337941`, job
+  `install-smoke-windows`, read JOB-KEYED — the workflow concluded success while the job concluded
+  failure — and failing again at `68cc1ea5` on run `34144326458`.
+  **LOCALIZED RATHER THAN GUESSED:** the `wantalt` operand added for exactly this reads the same
+  key by a standalone `jq` call and comes back clean, which excludes the manifest and the producer;
+  what differs is the READ, at `installer/consumer-smoke/run-smoke.sh`:425 and :434, where `read -r
+  path want` strips the newline but not a preceding CR. A whole-manifest count of 493 of 493 is the
+  signature of a suffix on the reader, never of real hash divergence.
+  **Why it is still `[design-pending]`: ONE inference remains** — that `jq` emits CRLF into that
+  stream on this runner. No command on a Linux box settles it. The cheap witness is one octet dump
+  of a raw line off that stream ON the runner, and it must be bought BEFORE choosing between
+  stripping the CR at the read and changing how the stream is produced, because the two repairs
+  differ in what else they cover.
+  **Product-class under the 2026-08-30 witness discriminator:** the smoke asserts the payload an
+  adopter receives, so the manifest's integrity claim is unasserted on the Windows install path —
+  the payload witnesses it, wherever the fix lands.
+  **Cost while deferred:** the leg is `continue-on-error`, so this red never reaches a workflow
+  conclusion, and every run of it re-buys the same diagnosis.
+  Filed 2026-09-07 into the gap inbox by the close of `windows-install-path-behind-the-invoke`,
+  whose own stages could not drain it; dispositioned at this iteration's scope intake, so the
+  finding is one iteration older than the record of it.
+
+- **manifest-report-launders-the-value-it-prints** [design-pending] — the Windows smoke's manifest
+  report and its verdict decompose the SAME value differently, and the report's own assertion that
+  they are one value is false as printed.
+  **A FRESH INSTANCE OF A CLOSED CLASS, not a reopening.** `manifest-shape-predicate-and-rendering-
+  disagree`'s fix landed and reached Done last iteration; this arrived after it, so it files as a
+  new defect. The record is `installer/README.md` §The consumer smoke's, cited not restated.
+  **Observed 2026-09-07 at close in run `34142337941` — one value, one entry, one run.** The report
+  printed `want` on `gate-sdk/README.md` as `len40=yes class=clean shape=pass`; the verdict printed
+  that same path `len40=no class=dirty[residue=CR first=40] shape=fail`. Both call `shape_verdict`,
+  so the predicate is shared and the divergence is in what each was handed.
+  **THE FALSE ASSERTION IS THE LOAD-BEARING PART**, which is why this is not cosmetic: the report's
+  `call` field asserts its `want` is the value the failing comparison used and not a second read of
+  it, and that assertion is what licenses a reader to treat the report as adjudicating the verdict.
+  A report that launders the defect out of the value it prints converts a live defect into positive
+  evidence of health, and that is what let this series read clean for six rounds.
+  **The suspect is named and the witness is cheap:** the value reaches the report through the
+  `malformed_first` tuple built at `installer/consumer-smoke/run-smoke.sh`:433 and split again
+  inside `manifest_report`, so the round trip is the suspect rather than either probe. Build the
+  tuple with a CR-suffixed `want` in a local harness and print both decompositions — no Windows
+  host needed.
+  **DISTINCT from `smoke-manifest-read-appends-carriage-return`**, which owns the CR's arrival at
+  the read. This owns the report's fidelity to the value it claims to print, and stands against any
+  malformed value whatever.
+  **Product-class under the 2026-08-30 witness discriminator:** a diagnostic the install path
+  prints about the payload it verified is an adopter-facing claim.
+  **Cost while deferred:** every future round of this leg's diagnosis reads a report that may be
+  adjudicating a value the comparison never used.
+  Filed 2026-09-07 by that same close as the second of its two consumer-smoke bullets; taken at
+  this iteration's scope intake, the disposition landing an iteration after the finding.
+
 - **overhead-meter-resolves-the-newest-transcript-not-its-own** [design-pending] — a bare
   `--emit overhead-meter` resolves the NEWEST candidate transcript, so any session that delegates
   and then meters measures its child; the close stage is that session by construction.
@@ -10142,6 +10198,13 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
+- **always-loaded-baseline-freshness** [design-pending] — A close may skip the re-baseline; no gate.
+- **stage-economics-log-redates-rows** [design-pending] — Re-running the meter re-dates live rows.
+- **battery-timing-file-overwritten-by-only-run** [design-pending] — A filtered run reports as all.
+- **audit-roster-row-body-unbounded-growth** [design-pending] — Row bodies never compress.
+- **worktree-dispatch-rebuilds-the-gate-binary** [design-pending] — Each dispatch pays a cold build.
+- **committed-grant-fallthrough-unexplained** [design-pending] — Three bare grants fell through.
+- **derived-count-literal-in-queue-unscanned** [design-pending] — No corpus reaches the queue file.
 - **audit-roster-grammar-ungated** [design-pending] — Row fields ungraded; waits on the format.
 - **bridged-arm-spawned-program-set-unheld** [design-pending] — Declared set unheld; shape ships.
 - **icebox-drops-a-bought-census** [design-pending] — No dormant home for a measured payload.
