@@ -244,11 +244,10 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
 bash "$cw/package/bin/checkwright.sh" init  # from your repository root
 ```
 
-`init` ends by printing the commands that finish the setup, one per line with its
-reason beside it. They are not copied here on purpose: what `init` prints is
-`init`'s to say, and a second copy on this page is a string a rename has to be
-remembered to move (installer/README.md §init states the rule and the consumer
-smoke asserts the printed block rather than a copy of it).
+`init` ends by printing the commands that finish the setup, each with its reason.
+They are deliberately not copied here: what `init` prints is `init`'s to say, and
+a second copy is a string a rename has to be remembered to move
+(installer/README.md §init).
 
 Unpack outside the repository rather than inside it. `init` refuses a worktree
 that is not clean, and an extracted `package/` sitting in your root is untracked
