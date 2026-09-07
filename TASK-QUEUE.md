@@ -60,11 +60,17 @@
   consumer at the default would have such an amendment fall silently out of the corpus. The backfill
   is therefore the gate's own first run over every amendment live at that commit, this unit's own
   included, and it is authored carrying the block it specifies.
-  **FIVE-FOR-FIVE 2026-09-06 stands as the attesting evidence and is not re-measured here:** every
-  batch of one iteration shipped a roster miss found by grep and named by no roster — batch 1's
-  stale `lifecycle-kit/SPEC.md` sentence, batch 2's `spec-pointer-boundary-legality` grounding case,
-  batch 2's own gap bullet dangled by its amendment's deletion, batch 3's second `-printf` site in
-  `installer/lib/init.sh`, and the `gates.yml:229-233` non-Linux over-claim.
+  **FIVE-FOR-FIVE 2026-09-06 stands as the attesting evidence, and spec CLASSIFIED the whole record
+  rather than re-asserting it.** Census over the nine attested cases, recovered from git history
+  because amendments are deleted on merge, filed with its witness: the split is **L 4 / R 2 / N 3**.
+  So the gate covers four of nine, `guard-rule-number-not-citable-outside-kit` dissolves two, and
+  three stay with the align stage — which is what delta 6 says, now measured rather than assumed.
+  **TWO CORRECTIONS TO THIS ENTRY'S OWN EVIDENCE, from that census.** The rule-19 renumber and the
+  "wait unit's renumber needing four site classes" are the SAME event (`1a23be6c`), counted here as
+  two; and the fourth site class named, ordinal prose `seventeen rules earlier`, appears nowhere in
+  the tree or its history outside this entry's description of it — illustrative, not attested. The
+  other three site classes are attested in that commit's own diff and the ruling above does not rest
+  on the fourth.
   **DISTINCT from the retired `amendment-update-target-coverage`**, which owned a roster *entry*
   naming no owning delta — a listed target with no claim. This owns a *surface with no entry*, whose
   evidence is in the tree rather than in the document.

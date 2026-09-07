@@ -42,12 +42,24 @@ scan over a renumber returns a hit set dominated by non-violations. That is prec
 shape `canon-kit/SPEC.md` §check-amendment-update-target already refused a stronger arm for, on
 `gate-sdk/SPEC.md` §When a gate earns its place.
 
-The entry adds a second, independent obstruction which this ruling does not need but which points
-the same way: the renumber's stale sites "share no spelling" — markdown ordinals, parenthesized
-placement citations, a comma-list roster (`rules 14, 15 and 22`), ordinal prose (`seventeen rules
-earlier`) — so even a regex generalization of the declaration reaches only some of them. Recorded
-because a later reader will reach for "declare a pattern instead of a literal" as the obvious repair,
-and it is worth knowing that the repair fails on two grounds and not one.
+**The collision is not hypothetical — the tree carries a live instance of it.** Measured over the
+renumbered span (`.workflow/survey-record.md`, 2026-09-08): six cross-corpus `rule <N>` citations at
+HEAD fall in [19, 24], and all six are currently correct. One of them cites **`rule 19` meaning the
+newly inserted rule**. Had any of the five originally-stale citations survived reading `rule 19`
+instead of being corrected, a grep would have returned it beside that correct one, and
+disambiguating would have required reading each site's *subject matter* against guard-kit's current
+rule 19 — a semantic judgment, which is the thing this class is already ruled to leave to a human.
+
+The entry adds a second obstruction, which this ruling does not need and which the census partly
+undercuts: the renumber's stale sites "share no spelling" — markdown ordinals, parenthesized
+placement citations, a comma-list roster (`rules 14, 15 and 22`) — so even a regex generalization of
+the declaration reaches only some of them. Three of those four site classes are attested in the
+renumber commit's own diff; the fourth the entry names, ordinal prose (`seventeen rules earlier`),
+is **unrecoverable** — it appears nowhere in the tree or its history outside the entry's own
+description of it, so it reads as illustrative rather than attested and is not relied on here.
+Recorded because a later reader will reach for "declare a pattern instead of a literal" as the
+obvious repair, and because a second ground stated at full strength when it is only three-quarters
+attested is how an argument decays into a citation nobody rechecks.
 
 **So the renumber slice is a stated non-target here, and its durable fix is not a gate.** The queue
 already carries the entry that owns it: `guard-rule-number-not-citable-outside-kit`, whose second
@@ -85,10 +97,18 @@ spelling, and does not name it — real, and strictly smaller than what is uncau
 **And the obligation is not new.** `canon-kit/templates/SPEC-amendment.md`'s Definition of Done
 already carries **Removals propagated** — "grepped every spec for names this change retired; nothing
 dangles". Every amendment is already obliged to run this grep; nothing has ever recorded the run or
-checked its result, and the checkbox's stated corpus (`every spec`) is narrower than the surfaces the
-attested misses landed on. So the declaration does not add a duty. It writes down a duty that exists,
-in a form a gate can re-execute — the enforcement-first move, where the fix and the gate that catches
-it land in one unit.
+checked its result. So the declaration does not add a duty. It writes down a duty that exists, in a
+form a gate can re-execute — the enforcement-first move, where the fix and the gate that catches it
+land in one unit.
+
+**The checkbox's stated corpus is also too narrow to discharge honestly, and that is measured rather
+than asserted.** A census over the nine attested cases, recovered from history because amendments are
+deleted on merge (`.workflow/survey-record.md`, 2026-09-08, with its witness), splits them
+**L 4 / R 2 / N 3**. Of the four literal-substitution cases, **three have a missed surface outside the
+`*/SPEC.md` corpus the checkbox names**, and **five of the eleven individually-named missed sites are
+outside it**: a `.gate` descriptor, a shell comment, a Rust `println!` string, a `README.md` and a
+queue entry. An author who ran the checkbox's grep exactly as written would have discharged it
+honestly and shipped the miss anyway. Delta 5 is that finding's repair.
 
 ## What changes
 
@@ -155,6 +175,13 @@ exclusion.** Tracked files only, so an untracked scratch file is not a violation
 before staging is vacuous for exactly the file it most needs to see — the property
 `gate-sdk/SPEC.md` §Enforcement tiers states of the whole battery, restated nowhere and inherited
 here.
+
+**Two registration consequences of that corpus choice, named so build does not rediscover them.**
+`git ls-files` is a precedented corpus for a canon-kit member rather than a novelty — `check-tree-terms`
+already resolves its corpus that way — and it carries the same two obligations: the member declares
+a `git` **tool dependency** in the crate's registry, and it declares **no walk root**, because
+`gate-sdk/SPEC.md` §check-reads-couples rules a `git ls-files` corpus outside the walk class. A
+descriptor that declares a walk root here would put this member in a class its corpus is not in.
 
 **Fail-closed (exit 2):** a scan root that is not a directory; an **unwalkable** scan root; an
 amendment carrying `## Retired spellings` but no `## What changes`, where no bullet *can* be owned
