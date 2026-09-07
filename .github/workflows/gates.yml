@@ -526,6 +526,13 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          # Pinned on the CALLER too, not only inside the bootstrap: this step is the
+          # thing standing in for an adopter's shim, so if it re-quoted the tokens it
+          # hands over, the step-5 assertion would never reach the bootstrap intact.
+          # The second pin keeps a native non-zero exit a STATUS rather than a thrown
+          # exception, which is what lets the refusal assertions read $LASTEXITCODE.
+          if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
           $pkg = $env:PWSH_PKG
           $scratch = $env:PWSH_SCRATCH
           $target = $env:PWSH_TARGET
@@ -548,14 +555,18 @@ jobs:
               Copy-Item -Recurse -Force (Join-Path $src '*') $dst
               return $root
           }
+          # The call operator and NOT Start-Process. Start-Process joins -ArgumentList
+          # into one string and re-quotes it, so the step-5 assertion below would be
+          # measuring Start-Process's quoting rather than the bootstrap's forwarding —
+          # it could fail on a correct bootstrap, or pass on a broken one. `&` under
+          # the Standard passing mode pinned above hands each element across as its
+          # own argument, which is the path an adopter's shim actually takes.
           function Invoke-Bootstrap([string] $root, [string[]] $bootArgs) {
               $out = Join-Path $scratch 'out.txt'
               $err = Join-Path $scratch 'err.txt'
-              $p = Start-Process -FilePath 'pwsh' -PassThru -Wait -NoNewWindow `
-                   -ArgumentList (@('-NoProfile','-File',(Join-Path $root 'bin/checkwright.ps1')) + $bootArgs) `
-                   -RedirectStandardOutput $out -RedirectStandardError $err
+              & pwsh -NoProfile -File (Join-Path $root 'bin/checkwright.ps1') @bootArgs 1> $out 2> $err
               return [pscustomobject]@{
-                  Code = $p.ExitCode
+                  Code = $LASTEXITCODE
                   Out  = (Get-Content -Raw -LiteralPath $out -ErrorAction SilentlyContinue)
                   Err  = (Get-Content -Raw -LiteralPath $err -ErrorAction SilentlyContinue)
               }
