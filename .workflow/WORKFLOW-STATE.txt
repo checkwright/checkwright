@@ -5,3 +5,4 @@
 ---
 
 adopter-install-path-asserted-not-narrated scope acaba422 2026-09-07 daf82d3c
+adopter-install-path-asserted-not-narrated spec a6453a97 2026-09-07 2ab80d72
