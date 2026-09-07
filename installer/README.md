@@ -1055,6 +1055,19 @@ is a no-op rather than an error: it left the roster when it left the tree.
 `--force` removes what would otherwise be kept, meaning here exactly what §init
 says it means there — overwrite what `init` would otherwise protect.
 
+**A removal is not bounded by the host's argv width either**, on §init's rule and
+for the same reason: this verb names the whole recorded roster to `git` twice, to
+ask which of those paths the repository tracks and then to stage them, and a
+large profile's roster overflows the command line a host will accept. Both calls
+are issued in batches. The first of them is additionally read through a file
+rather than a process substitution, because **its status has to survive**: every
+file is already off the worktree by then, so a read that failed and returned
+nothing would stage the manifest alone and commit it under a message announcing
+the removal, leaving the deletions unstaged and unmentioned. That failure was
+silent before it was bounded, and batching widens it from total failure to
+partial, which is why the status is now captured and refused on rather than
+discarded.
+
 The gate binary needs no special case. `init` records it as an ordinary `files`
 row *and* under the separate `artifact` key; the roster walk removes it like any
 other row, because `artifact` is identity rather than ownership.

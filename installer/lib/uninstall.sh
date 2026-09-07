@@ -7,6 +7,8 @@ set -uo pipefail
 
 INSTALLER="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PAYLOAD="$INSTALLER/payload"
+# shellcheck source=./common/argv.sh
+source "$INSTALLER/lib/common/argv.sh"
 # shellcheck source=./common/lock.sh
 source "$INSTALLER/lib/common/lock.sh"
 # spec: installer/README.md §What init seeds — sourced for the consumer-layout names, so the agent file this verb trims is the one init wrote rather than a second spelling of the path
@@ -183,11 +185,17 @@ fi
 
 # spec: installer/README.md §uninstall — the staged set is the removals and the manifest disposition, and a kept file is never among them: staging a file left for the adopter is the same defect init's written-set/roster split exists to prevent, and it stays one when the write is a removal
 STAGE=()
-while IFS= read -r -d '' p; do STAGE+=("$p"); done < <(git -C "$ROOT" ls-files -z -- "${REMOVE[@]}")
+# spec: installer/README.md §init — the roster goes to git in batches, so a large profile's removal is not bounded by the host's argv width any more than its install is
+# spec: installer/README.md §uninstall — and it is read through a file rather than a process substitution because the status must survive: every file above is already deleted from the worktree, so a read that failed and returned nothing would stage the manifest alone and commit it under a message claiming the removal, leaving the deletions unstaged. Batching makes that reachable by partial failure as well as by total failure, which is why the status is captured here rather than discarded
+argv_batched git -C "$ROOT" ls-files -z -- "${REMOVE[@]}" > "$LOCK.staged" \
+    || { rm -f "$LOCK.staged"; die "could not read which of the removed files this repository tracks" \
+        "nothing was staged and the removal is not committed; the files are gone from the worktree and 'git status' shows them, so stage and commit that yourself, or 'git restore' them to undo." 1; }
+while IFS= read -r -d '' p; do STAGE+=("$p"); done < "$LOCK.staged"
+rm -f "$LOCK.staged"
 if [[ -f "$LOCK" ]] || git -C "$ROOT" ls-files --error-unmatch -- "$CHECKWRIGHT_LOCK_FILE" >/dev/null 2>&1; then
     STAGE+=("$CHECKWRIGHT_LOCK_FILE")
 fi
-[[ ${#STAGE[@]} -gt 0 ]] && { git -C "$ROOT" add -- "${STAGE[@]}" || die "could not stage the removal"; }
+[[ ${#STAGE[@]} -gt 0 ]] && { argv_batched git -C "$ROOT" add -- "${STAGE[@]}" || die "could not stage the removal"; }
 
 if [[ ${#KEEP[@]} -gt 0 ]]; then
     printf '\n%d file(s) have changed since init wrote them and were kept:\n' "${#KEEP[@]}"
