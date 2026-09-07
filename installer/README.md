@@ -1727,7 +1727,31 @@ that justifies it. **That finding is drained** into the witness sample and the
 operand-naming refusal above: the arm now carries the deciding entry into the
 report and names it in the refusal, so a round after this repair reads its own
 verdict's row. Nothing else about rounds 12 to 15 moves — what they measured is
-what is recorded here, and the diagnostic series stays closed on the pairing.
+what is recorded here.
+
+*Round 17 is the first round under that repair, and it REOPENS the series rather
+than confirming the pairing.* Run `34108112152`, job `101697744618`, read by
+close at the push it already watches. The repair delivered exactly what it was
+built for: the verdict's own row is printed, the refusal names it, and the report
+says so in as many words — *the witness row `gate-sdk/README.md` is one of the
+samples already chosen, so the verdict row and that sample coincide*. What that
+row then shows is the reopening. **All five values on it are the same
+40-lowercase-hex string, and `printf '%q'` quotes none of them**, so no byte
+differs and nothing is hiding in the rendering — the carriage-return candidate
+stays falsified. Yet the same run refuses at the harness precondition, *the
+`want` operand on `gate-sdk/README.md` is not 40 lowercase hex*, and counts **493
+of 493** disagreeing entries failing that test. Every entry in the profile, not a
+subset.
+
+That is a stronger and different fact than round 15's. Round 15 saw one equality
+test contradict its operands and read it as a pairing defect. Round 17 has the
+**shape** test contradicting the same variable's own `%q` rendering, on the very
+entry the verdict is about, for the whole manifest at once. A wrong pairing
+cannot produce it: `[[ "$want" =~ ^[0-9a-f]{40}$ ]]` reads one variable, so there
+is no second operand to mis-pair, and the value it read is the value printed
+beside it. The next round's question is therefore about what `read -r want`
+holds on this host versus what `%q` renders of it, not about which entry got
+compared with which.
 
 *Who reads the next round, and the trap that would otherwise swallow it.*
 `install-smoke-windows` is a job of the `gates` workflow, which runs on every
