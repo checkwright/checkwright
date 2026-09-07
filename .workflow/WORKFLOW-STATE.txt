@@ -4,4 +4,4 @@
 
 ---
 
-— scope ac035e4d 2026-09-07 68cc1ea5
+supported-platform-roster-widening scope ac035e4d 2026-09-07 68cc1ea5
