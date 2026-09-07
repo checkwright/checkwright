@@ -213,8 +213,14 @@ The direction: the battery moves off shell onto compiled gates. Those gates ship
 prebuilt rather than built on your machine, and the floor they aim at is **git
 alone** — git shelled out, never embedded. What survives is one small bootstrap
 that has to resolve your platform before any binary can run. It is deliberately
-small enough to exist twice, which is what would make a native Windows path
-possible where the roster above can only offer WSL.
+small enough to exist twice, and it now does: a PowerShell half ships beside the
+bash one, exercised by its own CI leg.
+
+**That is the interpreter half of a native Windows path, not the whole of one.**
+The prebuilt binaries are published for a declared set of platforms, and that set
+carries no Windows entry. A Windows host therefore resolves to no artifact, and
+the roster above still sends you through WSL. What stands in the way is the
+published platform set rather than the interpreter.
 
 <!-- measured: ported-gate-members=109 -->
 That direction is now underway rather than announced: 109 gates in the battery
