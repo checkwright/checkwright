@@ -102,12 +102,10 @@ set; this stage authors, it does not re-triage.
 **Amendment text for a governed surface says whether it is landed, on the
 passage itself.** This stage authors and build lands, so replacement text is a
 proposal by default — but a stage authorized to land an in-unit edit produces
-both kinds in one document, and a report claiming an edit is applied when only
-its text exists reads as a settled fact to every later session. Mark the
-pending ones (**Not yet applied**) at the passage, not in the report: a reader
-who never opens the report still needs the answer, and the reviewer's own
-verification (delegation-kit/templates/agent-execution.md — *a child's citation
-is a pointer to verify*) is the second line of defence rather than the first.
+both kinds in one document, and a report claiming an edit applied when only its
+text exists reads as settled fact to every later session. Mark the pending ones
+**Not yet applied** at the passage, never only in the report, which a later
+reader may never open.
 
 Close by **recommending the next stage**: the trigger-gated audit stage when one
 of its triggers fired this session (an amendment changing ≥2 components'
