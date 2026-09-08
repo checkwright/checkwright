@@ -12,41 +12,6 @@
 
 ## New Features
 
-- **gate-binary-roster-covers-supported-platforms** [spec: SPEC-macos-roster-join.md] — the
-  roster's second line, the release path that line would otherwise break, and the Intel leg that
-  makes a third line buyable on the next run.
-  **The design is `SPEC-macos-roster-join.md`'s and is not restated here:** the licence verified
-  job-keyed at this stage, seven deltas with their work classes, the seam ruling, and the bounded
-  authorization delta 7 rides.
-  **ADMITTED AS THIS ITERATION'S UNIT, OPTION (b) — ruled by the OPERATOR 2026-09-08**, asked and
-  answered in a `/lead` session and lead-relayed: the `aarch64-apple-darwin` join plus an Intel
-  `install-smoke` leg of its own. The leg's cost was put explicitly and accepted — a new job name,
-  and doubled macOS minutes on every push. The aarch64 half is the floor and lands whatever the
-  Intel leg does; the Intel line itself is NOT written here, its consumer half being the run this
-  unit buys rather than one it has.
-  **PROMOTED at spec 2026-09-08 by authoring the amendment**, which is the act the operator ruling
-  above made feature-class: the Intel leg adds a name, so the unit needed an amendment before it
-  could be picked.
-  **WHAT THE AMENDMENT FOUND THAT NO BULLET HAD.** `.github/workflows/publish.yml`'s build leg
-  carries no macOS bash floor and calls `sha256sum` unconditionally, while the CI producer that
-  claims to mirror it carries both — so the roster line alone would fail the first release after
-  it, on a path nothing exercises until a tag. The release path has never run on macOS. That
-  repair is the amendment's delta 3, and it is why this unit is larger than the three-edit write
-  `native/targets.list`'s header describes.
-  **DELTA 3 STAYS IN-UNIT AND ITS OVERRUN WAS PUT EXPLICITLY — ruled by the OPERATOR 2026-09-08**,
-  asked and answered in a `/lead` session and lead-relayed, on this stage's escalation: it exceeds
-  the cost admitted above, and was accepted on the ground that a roster line is a release
-  commitment. A second ruling on the same channel and date authorizes delta 7's narrow arithmetic
-  repair to a recorded ruling's weighed cost figure — bounded to that figure, and the amendment
-  states the bound rather than the entry.
-  **The port's completion predicate is unmoved by this unit and that is expected:** `--emit
-  port-blockers --tree` reads 16 owed at this stage, oracle-run and not restated. The blocker is
-  the roster against the documented supported set, and Intel macOS and native Windows are both
-  still outside it.
-  Filed 2026-09-07 by spec; admitted as the lead unit 09-07; amendment merged and entry demoted
-  2026-09-08 by build on an observation rather than a forced join; re-promoted at spec 2026-09-08
-  on the run that observation was waiting for.
-
 ## Technical Debt
 
 - **smoke-manifest-read-appends-carriage-return** — the Windows consumer smoke
@@ -87,41 +52,6 @@
   Filed 2026-09-07 into the gap inbox by the close of `windows-install-path-behind-the-invoke`;
   joined same-surface `lead, own-authority` 2026-09-07; promoted at spec 2026-09-08 and DEMOTED
   here at build 2026-09-08, its amendment having delivered one increment of the corpus.
-
-- **gates-yml-macos-leg-ground-stale-and-self-contradicting** — the workflow now
-  states both that its macOS smoke leg builds its own artifact and that it does not, and the
-  operator-ruled paragraph carrying the false half may not be edited.
-  **Two passages, both stale, both re-read at HEAD by this drain rather than taken from the
-  bullets.** `.github/workflows/gates.yml`:1036-1040 argues that a zero on that leg licenses no
-  line in `native/targets.list` on the ground that "the smoke builds its artifact **from the host
-  it runs on**"; the precondition paragraph at :1022-1024 rests on the same premise. Delta 5 has
-  landed: the leg downloads the producer's upload (:988-991), normalizes it (:999-1017) and runs
-  the smoke against it (:1058-1059), and the job header at :853-857 says so in as many words —
-  "It no longer builds the artifact it exercises."
-  **So the file contradicts itself** — :853 says it no longer builds, :1036 says it builds. The
-  licensing paragraph's VERDICT is unaffected and stays correct: the licence never came from that
-  leg alone, it names two jobs. Only its stated GROUND has gone false.
-  **Why it WAS filed and not fixed.** That paragraph was UNAMENDABLE by operator ruling 2026-09-07
-  relayed through the lead, and `de662aca`'s body records that it was deliberately left untouched
-  under that ruling. Repairing its ground while the ruling stood would have done by edit what the
-  ruling refused by relay, so the fix was operator-class.
-  **RELEASED FOR THIS REPAIR AND NO WIDER — ruled by the OPERATOR 2026-09-08**, asked and answered
-  in a `/lead` session and lead-relayed, on scope's escalation that the sibling unit
-  `gate-binary-roster-covers-supported-platforms` writes the very `native/targets.list` line this
-  paragraph appears to forbid, turning a reader-facing staleness into a live hazard on the
-  iteration's own path. **What is released is the paragraph, not the ruling's subject:** the
-  VERDICT is untouched and stays correct — the licence names two jobs, never that leg alone — and
-  what may be repaired is the false GROUND sentence, "the smoke builds its artifact from the host
-  it runs on", against `:853`'s "It no longer builds the artifact it exercises". A later session
-  reading this release as licence to revisit the verdict is reading it wider than it was given.
-  **What the drain adds to the two bullets that filed it.** They were filed independently by spec
-  and by build, neither citing the other, and both carry line numbers that no longer resolve —
-  the licensing sentence now sits at :1029. Neither noticed the internal contradiction, and
-  neither noticed the second stale passage at :1022-1024.
-  **Cost while deferred:** low and reader-facing, but with a bad failure mode — a later session
-  resolving the contradiction in the wrong direction would make the honest header agree with the
-  stale paragraph rather than the reverse.
-  Filed 2026-09-08 by close from the gap inbox, merging two bullets that were one finding.
 
 ## Deferred
 
@@ -10234,5 +10164,8 @@
 - **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
 
 ## Done
+
+- gate-binary-roster-covers-supported-platforms
+- gates-yml-macos-leg-ground-stale-and-self-contradicting
 
 ## Lessons Learned
