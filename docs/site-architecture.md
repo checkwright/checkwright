@@ -232,6 +232,17 @@ recoverable:
   gate-sdk/SPEC.md §The port-candidate criteria's aggregate cost names. Two
   readers of one grammar is the shape `scripts/gates.list` already ships (a bash
   reader and a compiled one), not a duplication to collapse.
+  **The state word now decides a binding posture on both sides of the artifact
+  hand-off, and that is a wider consequence than "which platforms get built".**
+  The roster step publishes what it derives twice — as the producer matrix, and
+  as an object keyed by triple — and that second output is read at *job* level by
+  the Intel `install-smoke` leg, whose `runs-on` and `continue-on-error` both
+  resolve from it. So flipping a bullet from `held:` to `joined` makes that
+  triple's **producer** leg binding and its **consumer** leg binding, in one
+  edit, with no workflow change and nobody remembering to make it so. Read the
+  state word as a support commitment taking effect rather than as documentation:
+  the legs are green at the moment of a flip, so nothing reds at the landing, and
+  the cost arrives the first time that platform breaks.
 
 **A derived surface earns a row here only when it has a reader who cannot run
 the emitter** — a public page, a file a fresh clone needs before its tooling

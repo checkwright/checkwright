@@ -462,13 +462,16 @@ is wrong.
 generation — ruled 2026-08-26.** Each half is authored in its own language
 against the five steps above, and the oracle that holds them equal is a
 per-**bootstrap** install-smoke leg. **Count those legs by bootstrap and never by
-platform.** `.github/workflows/gates.yml` carries three install-smoke jobs —
-Linux, native Windows and macOS — and all three drive the *bash* half, the
-Windows one through Git-for-Windows bash; a fourth drives the PowerShell half
-under `pwsh`. So a reader counting platforms reads three legs as covering two
-bootstraps, which they never did. The PowerShell leg ships with the PowerShell
-half, and **no other leg substitutes for it**, because the other three drive the
-other bootstrap.
+platform.** `.github/workflows/gates.yml` carries an install-smoke job for each
+platform it measures — Linux, native Windows, and each macOS architecture — and
+every one of them drives the *bash* half, the Windows one through
+Git-for-Windows bash; exactly one further job drives the PowerShell half under
+`pwsh`. The platform side is deliberately not given a number here: it moves
+whenever the platform declaration does, and a reader counting platforms would
+read a growing set of legs as covering a growing set of bootstraps, which they
+never did. **The bootstrap count is two and only that number is load-bearing.**
+The PowerShell leg ships with the PowerShell half, and **no other leg
+substitutes for it**, because every other leg drives the other bootstrap.
 
 **That oracle has two parts, and only one of them is in place — read this before
 reading the leg as short of its own ruling.** The ruling above asks for a leg
@@ -2187,8 +2190,12 @@ the check, rather than a nineteenth reconstruction.
 a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still
 in progress; logs will be available when it is complete` even when the Windows
 job itself has finished, so a close reading a job-keyed leg would otherwise wait
-on the slowest sibling — `install-smoke-macos`, which this leg has no dependency
-on. `gh api repos/<owner>/<repo>/actions/jobs/<job-id>/logs` answers for a
+on whichever macOS sibling finishes last — `install-smoke-macos` or
+`install-smoke-macos-intel`, neither of which this leg has any dependency on.
+The sibling is deliberately not named singly here: the run's tail is whichever
+macOS leg is slowest on the day, and a second one arriving is exactly how a
+named-sibling claim goes quietly wrong.
+`gh api repos/<owner>/<repo>/actions/jobs/<job-id>/logs` answers for a
 finished job while its run is still going, and that is the call to make; the job
 id comes from `gh run view <id> --json jobs`. Measured at round 15.
 
@@ -2656,10 +2663,13 @@ exercises a harness stand-in. Set it to a `<dir>/<target>/` tree a producer
 already filled and the smoke installs *those* bytes: it builds nothing, and it
 recomputes nothing — the sidecar that arrives is the sidecar the producer
 emitted beside the bytes, so gate-sdk/SPEC.md §Consumer payload's one-producer
-rule reaches across the new hop unbroken. Its live setter is the macOS
-install-smoke leg in `.github/workflows/gates.yml`, a deployed configuration
-rather than a test-only one; everywhere else it is unset and the smoke's
-behaviour is what it always was.
+rule reaches across the new hop unbroken. Its live setters are the macOS
+install-smoke legs in `.github/workflows/gates.yml` — one per macOS
+architecture, each a deployed configuration rather than a test-only one; outside
+those legs it is unset and the smoke's behaviour is what it always was. Read the
+setter set as "the legs consuming the producer's upload" rather than as a named
+leg: a platform joining or leaving the declaration moves it, and the hand-off is
+what those legs have in common.
 
 `cargo` and `rustc` join the preflight alongside the tools every other arm
 needs, and refuse there when either is missing — a machine that cannot compile

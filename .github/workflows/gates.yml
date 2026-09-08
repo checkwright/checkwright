@@ -680,6 +680,14 @@ jobs:
       contents: read
     outputs:
       legs: ${{ steps.legs.outputs.legs }}
+      # The same two facts `legs` already carries, indexed by target instead of
+      # listed. It exists because a GitHub Actions expression can index an object
+      # and cannot filter an array, and a job outside this matrix — the Intel
+      # install-smoke leg below — needs one platform's runner and held-ness at
+      # JOB level, where no matrix context exists. Nothing derives it separately:
+      # it is written in the same loop from the same values, so the two outputs
+      # cannot disagree about a platform.
+      index: ${{ steps.legs.outputs.index }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
@@ -694,6 +702,7 @@ jobs:
           set -euo pipefail
           source gate-sdk/lib/gate.sh
           legs='[]'
+          index='{}'
           while IFS=$'\t' read -r target state; do
             case "$state" in
               joined) held=false ;;
@@ -711,6 +720,8 @@ jobs:
             }
             legs="$(jq -c --arg t "$target" --arg r "$runner" --argjson h "$held" \
               '. + [{target: $t, runner: $r, held: $h}]' <<<"$legs")"
+            index="$(jq -c --arg t "$target" --arg r "$runner" --argjson h "$held" \
+              '. + {($t): {runner: $r, held: $h}}' <<<"$index")"
           done < <(awk '
             /^<!-- platforms:begin -->$/ { inb = 1; next }
             /^<!-- platforms:end -->$/   { inb = 0; next }
@@ -729,7 +740,9 @@ jobs:
             exit 1
           fi
           echo "legs=$legs" >> "$GITHUB_OUTPUT"
+          echo "index=$index" >> "$GITHUB_OUTPUT"
           echo "producer legs: $legs"
+          echo "declaration index: $index"
 
   # **A joined leg is binding; a held leg is a measurement.** A red on a joined
   # platform fails this workflow, because the consumer smoke's default host
@@ -1046,4 +1059,227 @@ jobs:
           echo "installer_smoke on macOS exited $rc"
           echo "This leg is binding: a non-zero here fails the workflow."
           echo "A zero here is not a roster join: see this step's header for why."
+          exit "$rc"
+
+  # The INTEL macOS sibling, and the second half of `x86_64-apple-darwin`'s join
+  # predicate. `native-artifacts` already produces that triple's artifact on its
+  # own `macos-15-intel` leg; what has never existed is a consumer that installs
+  # THAT upload on THAT host. This job is it, and it is the whole reason the
+  # index above exists.
+  #
+  # **Its posture is DERIVED, and that is the load-bearing property.** Both
+  # `runs-on` and `continue-on-error` are read out of `native-artifacts-roster`'s
+  # per-target index at this leg's own triple, so the platform declaration in
+  # docs/install.md §Requirements decides them and nothing here does. A held
+  # platform's leg is `continue-on-error` for the reason `native-artifacts`'
+  # header already gives — a red on a held platform is why it stays held, not a
+  # reason master goes red — and the day that page flips this triple to
+  # `joined`, this leg becomes binding with nobody remembering to make it so. A
+  # hard-coded `continue-on-error: true` is the maintained copy that goes wrong
+  # exactly once, silently, in the direction of a joined platform whose smoke red
+  # reds nothing.
+  #
+  # **It therefore mints no new instance of the deferred
+  # `held-ci-leg-failure-reddens-a-binding-one` entry.** That entry is about a
+  # HELD producer defeating held-ness through a BINDING consumer; this consumer
+  # is held exactly while its producer is, so the pair moves together.
+  #
+  # **The triple spelled below is the only platform literal anywhere in this
+  # workflow's declaration-derived half, and it is a READ of the declaration
+  # rather than a second assertion of support.** The download-by-pattern rule the
+  # sibling states avoids *asserting* a platform in CI; this expression *reads*
+  # one, at job-resolution time, where no matrix context exists. If the triple
+  # ever leaves the declaration the index yields nothing, this job cannot resolve
+  # a runner, and the workflow reds — loudly, which is the right direction for a
+  # support retraction that forgot its leg. Do not read that as the only triple
+  # in the file: the Windows legs spell `x86_64-pc-windows-msvc` outright, and
+  # they are a different case rather than a counter-example — the declaration
+  # carries native Windows in neither state, so those legs cannot read a support
+  # commitment that does not exist and assert their own platform instead.
+  #
+  # **What this leg cannot do, stated so no reader expects it.** It cannot join
+  # its own target: criterion 1 is `native-artifacts`' and criterion 2 is this
+  # leg's, and the write into native/targets.list is a later session's on a run
+  # that carries both. Its first green is that run's second half.
+  #
+  # **Every step below names `shell: bash`, and the derived runner is why.** A
+  # `runs-on` that is an expression cannot be read by any tree-local reader, so
+  # nothing can state this job's shell dialect from the file — the same argument
+  # `native-artifacts` and publish.yml's build leg already carry, arriving here
+  # for a job whose runner is derived rather than matrixed. It is enforced:
+  # check-action-run-shell refuses to lint a `run:` whose dialect it cannot
+  # derive, so an unnamed shell here is a red rather than a silence.
+  install-smoke-macos-intel:
+    needs: [native-artifacts, native-artifacts-roster]
+    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-apple-darwin'].runner }}
+    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-apple-darwin'].held }}
+    # Carried from the arm64 sibling rather than re-derived: same suite, same
+    # cold Homebrew and cold cargo build, and no Intel measurement exists yet to
+    # narrow against. That sibling's timeout header owns why widening beats
+    # narrowing, and it is not restated here.
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
+      # --tags`, for the reason the Linux leg states.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+
+      # The adopter action docs/install.md §Requirements documents for a Mac,
+      # performed rather than read — the arm64 sibling's step header owns the
+      # whole argument, including why this package set and §Requirements' list
+      # are held equal in BOTH directions and why `findutils` is not here. This
+      # is a SECOND copy of that claim on a second host, which is the point: the
+      # page names no architecture, so a remedy proved on arm64 alone is proved
+      # on half the Macs it is written for.
+      #
+      # It never fails, for the sibling's reason: a brew that did not land is
+      # read off the probe below rather than truncating the job.
+      - name: install the GNU userland docs/install.md names, and PATH-order it
+        shell: bash
+        run: |
+          set +e
+          brew install bash coreutils gawk shellcheck
+          echo "brew exited $?"
+          prefix="$(brew --prefix)"
+          # gnubin carries the members under their unprefixed names, which is what
+          # `PATH`-ordering means for a page that asks for `sort` and `awk` and not
+          # for `gsort` and `gawk`.
+          {
+            echo "$prefix/opt/coreutils/libexec/gnubin"
+            echo "$prefix/opt/gawk/libexec/gnubin"
+            echo "$prefix/bin"
+          } >> "$GITHUB_PATH"
+          exit 0
+
+      # Reporting only, never fails, and it runs AFTER the install so what it
+      # reports is the `PATH` an adopter following §Requirements actually has —
+      # the arm64 sibling's probe header owns both reasons. Read this step first
+      # when the leg goes red.
+      #
+      # `uname -m` earns its place on THIS leg specifically: it is the one line
+      # that says whether the Intel runner label actually delivered an Intel
+      # host, and a leg silently running under Rosetta or on arm64 hardware would
+      # measure the platform it was built to distinguish itself from.
+      - name: probe the runner
+        shell: bash
+        run: |
+          set +e
+          echo "== interpreter =="
+          echo "BASH_VERSION=$BASH_VERSION"
+          echo "command -v bash: $(command -v bash)"
+          uname -a
+          uname -m
+          sw_vers
+          echo "== toolchain, by what PATH actually resolves =="
+          for t in bash git jq awk gawk sed grep sort find realpath sha256sum \
+                   shasum tar npm node cargo rustc rustup shellcheck ruby brew; do
+            printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
+          done
+          echo "== flavours, against the GNU-first floor docs/install.md asserts =="
+          for t in awk sed sort grep find tar; do
+            printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
+          done
+          echo "== the install path's own GNU-only constructs, probed not reasoned about =="
+          printf '1.2.3\n1.10.0\n' | sort -V; echo "sort -V exited $?"
+          realpath --relative-to=/ /usr/bin; echo "realpath --relative-to exited $?"
+          echo "== rust =="
+          rustc -vV
+          echo "== git =="
+          for k in core.autocrlf core.symlinks core.longpaths core.filemode; do
+            printf '%-16s %s\n' "$k" "$(git config --get "$k" || echo '<unset>')"
+          done
+          echo "-- porcelain on a fresh checkout; empty is what every pack step demands --"
+          git status --porcelain | head -n 40
+          echo "== scratch =="
+          echo "RUNNER_TEMP=$RUNNER_TEMP"
+          echo "TMPDIR=${TMPDIR:-<unset>}"
+          exit 0
+
+      # Reporting only, and probed alone before the suite that depends on it for
+      # the reason the arm64 and Windows siblings state: a build that dies inside
+      # the suite makes every later step's silence unreadable.
+      - name: probe the crate build
+        shell: bash
+        run: |
+          set +e
+          bash gate-sdk/bin/build-native.sh
+          echo "build-native exited $?"
+          ls -l native/target/release/ 2>&1 | head -n 20
+          echo "-- porcelain after a release build; the smoke asserts this is empty --"
+          git status --porcelain | head -n 40
+          exit 0
+
+      # By PATTERN and not by name, for the reason the arm64 sibling states: a
+      # name would spell this host's triple in a workflow step, and a platform
+      # literal in CI is a second spelling of the support commitment
+      # native/targets.list is supposed to be the only surface for. The job-level
+      # expression above is a read of the declaration and is a different thing.
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: gate-binary-*
+          path: ${{ runner.temp }}/native-artifacts
+
+      # Strips the artifact-name prefix to leave `<artifacts>/<target>/`, the
+      # layout pack-installer.sh reads and INSTALLER_SMOKE_ARTIFACTS_DIR is
+      # specified against. The host triple is derived from `rustc -vV` and never
+      # spelled, so this step asserts nothing about which platform it is on — it
+      # demands only that the producer uploaded a complete artifact for whatever
+      # host it woke up on, which on this leg is the assertion that matters.
+      - name: normalize the producer's upload onto the layout pack reads
+        shell: bash
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          art="$RUNNER_TEMP/native-artifacts"
+          binary="$(gate_native_bin)"; binary="${binary##*/}"
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] || { echo "rustc reported no host triple"; exit 2; }
+          for d in "$art"/gate-binary-*; do
+            [[ -d "$d" ]] || continue
+            mv "$d" "$art/${d##*/gate-binary-}"
+          done
+          ls -lR "$art"
+          [[ -f "$art/$host/$binary" && -f "$art/$host/$binary.sha256" ]] || {
+            echo "the producer uploaded no complete $host artifact — this leg"
+            echo "exercises a release-shaped artifact and has none to exercise."
+            exit 1
+          }
+          echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
+
+      # The suite, steered exactly as the arm64 sibling steers it — that step's
+      # header owns the whole argument for the steering and for what a zero here
+      # does and does not license, and none of it is restated. Two facts are this
+      # leg's own.
+      #
+      # The steering is not the tree's override witness here: the sibling already
+      # is one, and this leg copies it rather than diverging, because a
+      # gratuitous divergence that reds would cost the NEXT iteration the join
+      # this leg exists to buy.
+      #
+      # And the verdict wording differs from the sibling's on purpose: this leg
+      # is held, so a non-zero does not fail the workflow. Read a red here as the
+      # reason `x86_64-apple-darwin` is still absent from native/targets.list.
+      - name: install smoke on an Intel macOS host
+        shell: bash
+        run: |
+          set +e
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] \
+            || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
+          echo "host triple: $host"
+          roster="$RUNNER_TEMP/targets.list"
+          printf '%s\n' "$host" > "$roster"
+          log="$RUNNER_TEMP/installer-smoke-macos-intel.log"
+          GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$RUNNER_TEMP" \
+            INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
+            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+          rc="${PIPESTATUS[0]}"
+          echo "== verdict =="
+          echo "installer_smoke on Intel macOS exited $rc"
+          echo "This leg's posture is derived from the platform declaration, so while"
+          echo "$host is held a non-zero here does NOT fail the workflow."
+          echo "A zero here is criterion 2 only: see this job's header for the rest."
           exit "$rc"
