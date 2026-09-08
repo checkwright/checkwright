@@ -135,6 +135,13 @@ if [[ "$(grep -c "^— align aabbccdd " "$ess")" -ne 1 ]]; then
     echo "smoke(enter-stage): idempotent re-entry duplicated the align stamp" >&2; exit 1
 fi
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a surplus argument after the stage is a refusal, never a silent drop: an unread trailing --simulate turns a read-only probe into a real stamp, and only an end-to-end run proves the stamp did not land
+cp "$esq" "$es/q.before"; cp "$ess" "$es/s.before"
+es_rc=0; es_run build --simulate >/dev/null 2>&1 || es_rc=$?
+[[ "$es_rc" -eq 2 ]] || { echo "smoke(enter-stage): a trailing --simulate must be a usage refusal (exit 2), got $es_rc" >&2; exit 1; }
+cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): a trailing --simulate stamped for real" >&2; exit 1; }
+cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): a trailing --simulate wrote the queue" >&2; exit 1; }
+
 grep -v '^## Iteration:' "$esq" > "$es/q.headerless"; cp "$es/q.headerless" "$esq"
 cp "$esq" "$es/q.before"; cp "$ess" "$es/s.before"
 if es_run build >/dev/null 2>&1; then echo "smoke(enter-stage): should refuse a headerless queue" >&2; exit 1; fi

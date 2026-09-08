@@ -2198,6 +2198,22 @@ status survives the front-end because it `exec`s the binary, so the arm's status
 the arms whose verdict a session reads rather than the decline-with-0 posture of
 a harness-integration arm.
 
+**A surplus argument is refused, never dropped, and the ground is that this
+tool's only flag is position-sensitive.** `<stage>` takes exactly one operand
+and `--rename` exactly one `<name>`; anything after it exits 2 naming the
+surplus token, and a trailing `--simulate` is named specially with the
+flag-first spelling because that is the misuse the refusal exists to catch.
+Silently ignoring it fails open on precisely the input a caller got wrong: the
+dropped token is the only thing separating a read-only probe from a real stamp,
+and at the first stage of an iteration from a boundary reset that truncates the
+evidence file and every `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member. Permissiveness
+— reading the flag in any position — was refused as the weaker half: it repairs
+the one spelling anybody has typed and leaves every other unparsed argument
+being discarded in silence, where the refusal covers the class. Making the mode
+an environment knob was refused as well, on a different ground: it mints a
+config surface to express what an argument already expresses, and a knob is
+carried into every child of a bridged arm where an argument is not.
+
 **The declared roster is the prefix family `LIFECYCLE_KIT_*`, plus three names
 outside it.** The family is a derivation rather than a transcription: this arm
 resolves its own knobs *and* bridges the declared rosters of the two gates it
@@ -3497,6 +3513,23 @@ On the live file, `none` on a newly introduced stamp is a **red**, and that is
 what keeps the inertness from being a disarm. The residual is `git rm --cached`
 of the state file, which would restore condition (c): the same class as
 `--no-verify`, and closed by neither.
+
+**The recovery names the delete, and the reason is the newly-introduced
+definition rather than a case split.** Every stamp this assertion reports is
+uncommitted — a line already in `HEAD`'s version of the state file carries a
+matching pair and is skipped — so re-running `--enter-stage` alone can never
+clear the red: the arm *appends*, so the fresh line lands beside the stale one
+and the assertion, which scans every data line rather than the last, reddens on
+the stale one again with a byte-identical message. The recovery is therefore
+**delete the stale line, then re-enter and commit the fresh stamp on its own**,
+and the delete loses nothing precisely because the line was never committed. A
+help text prescribing only the re-run sends an already-off-script session round
+a loop with no exit, which is measured rather than predicted — it was followed
+twice in a row and resolved only by a hand delete the text never mentioned.
+**The purity assertion's recovery is its own** and is stated with it, because
+one help text serving both classes is wrong for whichever it was not written
+for: a surplus staged path is unstaged and committed separately, the stamp
+itself being sound.
 
 **The stamp-commit purity assertion.** The provenance assertion alone is
 defeated by a session that writes the stamp and its work into **one** commit:

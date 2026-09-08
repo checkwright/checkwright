@@ -346,7 +346,8 @@ pub fn run(args: &[String]) -> i32 {
             for e in &v {
                 println!("  {}", e);
             }
-            println!("  help: re-run the stage skill's first step (bash gate-sdk/bin/run-gates.sh --enter-stage <stage>) — it appends a fresh stamp at the current HEAD, which is a same-stage re-entry and in contract; then commit that stamp on its own (lifecycle-kit/SPEC.md §check-stage-evidence)");
+            println!("  help: every stamp named above is UNCOMMITTED by construction — the assertion skips any line already in HEAD's version of {} — so re-running --enter-stage cannot clear this on its own: the fresh line lands BESIDE the stale one and this refusal repeats verbatim. For a stale-head or 'none' stamp: delete that line from {} (it was never committed, so nothing is lost), then run 'bash gate-sdk/bin/run-gates.sh --enter-stage <stage>' and commit the fresh stamp on its own.", state, state);
+            println!("  help: for an 'also stages' issue the stamp itself is sound — unstage the named path ('git restore --staged <path>') and commit it separately from the stamp commit (lifecycle-kit/SPEC.md §check-stage-evidence)");
             return 1;
         }
         Ok(_) => {}

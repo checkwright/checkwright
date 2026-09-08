@@ -385,7 +385,30 @@ fn fields_two_to_last(text: &str) -> Vec<String> {
         .collect()
 }
 
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the surplus-argument refusal; the '--simulate'
+// branch names the flag-first spelling because that is the misuse the refusal exists to catch
+fn surplus_refusal(rest: &[String]) -> Option<String> {
+    let surplus = rest.get(1)?;
+    Some(if surplus == "--simulate" {
+        "enter-stage: '--simulate' is read before the stage, never after it — spell it \
+         '--enter-stage --simulate <stage>'. Nothing written."
+            .to_string()
+    } else {
+        format!(
+            "enter-stage: unexpected argument '{}' after the stage name — nothing written.",
+            surplus
+        )
+    })
+}
+
 fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — refuse before parsing anything, so the
+    // fail-closed rule reaches the argument the tool cannot act on rather than dropping it
+    if let Some(msg) = surplus_refusal(rest) {
+        eprintln!("{}", msg);
+        eprintln!("{}", usage(&c.stages));
+        return Ok(2);
+    }
     let stage = match rest.first() {
         Some(s) if !s.is_empty() => s.clone(),
         _ => {
@@ -1829,6 +1852,20 @@ mod tests {
         assert!(!is_slug("Upper-Case"));
         assert!(!is_slug("-leading-dash"));
         assert!(!is_slug(UNNAMED));
+    }
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a surplus argument is refused rather than
+    // dropped, and the refusal reaches the stamp path the sibling --rename arity check never did
+    #[test]
+    fn a_surplus_argument_after_the_stage_is_refused_by_name() {
+        assert!(surplus_refusal(&[]).is_none());
+        assert!(surplus_refusal(&["build".to_string()]).is_none());
+        let trailing = surplus_refusal(&["build".to_string(), "--simulate".to_string()])
+            .expect("a trailing --simulate must refuse");
+        assert!(trailing.contains("--enter-stage --simulate <stage>"), "{}", trailing);
+        let other = surplus_refusal(&["build".to_string(), "extra".to_string()])
+            .expect("any surplus argument must refuse");
+        assert!(other.contains("'extra'"), "{}", other);
     }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — `--simulate`'s contract is that it runs
