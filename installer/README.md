@@ -1798,7 +1798,7 @@ and the last three read the **instrument** rather than the operand:
 | `want != wantalt` | the manifest pipeline mangles between the lock and the comparison — the `jq` line render, the tab, or `read`'s splitting; the two octet dumps name the byte and the position |
 | the first stream line's `octets` end `0d 0a`, or `0d` once the newline is stripped | the channel delivers CRLF into the manifest stream at all, before any entry is compared. This is the one row that reads the **stream** rather than a value, and the decision rule below names what each dump selects |
 | the disagreeing entry's raw line against that same entry's `want` | separates *the carriage return arrived in the stream* from *it was introduced at the split*: a `0d` in both puts it in the stream, a `0d` in `want` alone puts it at or after the split, and neither carrying one puts the fault in the verdict's decomposition rather than in the value |
-| the coincidence outcome reads **path-equal, bytes differ** | the report's witness row and an earlier sample carry one path and two different tuples, so one recorded entry has two decompositions and they disagree. The subject is **this harness**, not the consumer: no reading of the consumer's tree may be taken from that run's manifest arm, and the two blocks printed under that path are the evidence. Read every other row of this table as suspended for that run |
+| the coincidence outcome reads **path-equal, bytes differ** | the report's witness row and an earlier sample carry one path and two different tuples, so one recorded entry has two decompositions and they disagree. The subject is **this harness**, not the consumer, and the two blocks printed under that path are the evidence. What it suspends is bounded, because the disagreeing blocks are exactly the ones carried in through the trailing `${bad_hash[@]+…}` operand: every row read off a **sample block's** `want` or `got` is suspended for that run, while `stream1`, `badline`, the witness row and the header's counts arrive as scalar operands and `reread`, `own`, `raw` and `wantalt` are commands the report re-runs — none of those is implicated, and a sample whose probes returned a hash at all proves its own path field crossed intact. A repair chosen off the unimplicated operands is sound; one chosen off a sample block's tuple is not |
 
 The instrument rows exist because a report rendered through one subsystem cannot
 adjudicate a disagreement between two, and every row above them reads the
@@ -1918,6 +1918,21 @@ of anomaly before any probe can see it, so the arm would be normalizing its own
 input while refusing to normalize its operands — the rule held on one side of
 the split and not the other. The loop therefore reads the line whole and splits
 it in the shell, as the manifest arm's description above states.
+
+*The one byte the read does own is the line **terminator**, and the exception is
+stated rather than assumed.* A terminator is a property of the channel a record
+travels over and not of the record, so a line delivered CRLF carries a byte that
+was never in the manifest — and the values on that line are hashes `init` took
+from `git`, which cannot end in one. The loop therefore drops **one** trailing
+carriage return before it splits, keeps the raw line unstripped for the two
+evidence operands the report prints, and **declares the count** it dropped, on
+the green path as well as the red. That declaration is what separates this from
+the repair the rule closes the arm to: trimming an operand to its 40-hex core
+deletes the evidence and reports nothing, while a per-line terminator strip that
+prints how many of how many lines carried one leaves a value that genuinely
+ended in a carriage return visible as a count that does not fit the channel's
+shape. Exactly one is taken, so a doubled carriage return still reaches the
+shape test and still fails it.
 
 Once per failing profile, and outside the per-path block because each is a fact
 about the run rather than about a path, the report also prints the consumer's
@@ -2148,9 +2163,13 @@ the coverage that repair buys:
 - **The raw line ends `0d 0a`, or ends `0d` once the newline is stripped** — the
   carriage return is in the stream, so the repair is at **production or at the
   channel**, and it covers every reader of that stream rather than this one read.
-  The channel is then discriminated from the producer by the control already
-  present: a clean `wantalt` beside a CR-bearing raw line implicates the process
-  substitution `< <(…)`, and a CR-bearing `wantalt` implicates `jq`.
+  **The discriminator this bullet used to name is refuted, and re-running it is
+  the mistake to avoid:** a clean `wantalt` beside a CR-bearing raw line was read
+  as implicating the process substitution `< <(…)`, and round 20 measured that it
+  implicates nothing — a single-value capture holds only the one terminator that
+  capture itself consumes, so it comes back clean whichever end of the stream put
+  the byte there. Nothing this harness holds discriminates the producer from the
+  channel, which is why the repair moved to the read.
 - **The raw line carries no `0d`, yet `want` does** — the carriage return is
   introduced at or after the split, so the repair is at **the read**, and its
   coverage is correctly narrow.
@@ -2215,6 +2234,67 @@ are all untouched; only the pipe the bytes travel over is. Whoever
 reads the next `install-smoke-windows` job reads whether the channel was in fact
 the culprit — that reading is close's, at the push it already watches, and is not
 predicted here.
+
+**Round 20 read that job, and the answer is that the channel was not the culprit
+and the discriminator that chose it never discriminated — read 2026-09-08 off run
+`34245261556`, job `102125490177`, head `3d0a6cab`, the first round to run *with*
+`aa5013f4`.** `git diff` reports `run-smoke.sh` byte-identical between that head
+and the head this round's repair lands on, so every line cited here is the line
+that ran.
+
+*What the two rounds measure together, which neither measures alone.* Round 19
+counted **493 of 493**; round 20 counts **492 of 493**, over the same 493 checked
+entries, with the channel swap as the only change on that path. Exactly one line
+stopped carrying the carriage return, and it is the one whose terminator the
+capture itself consumes — a command substitution takes the trailing line ending
+off where a process substitution hands it to `read`. That single-entry delta is
+the measurement no round of value-side reading could buy: it prices the capture's
+effect on the **terminator** directly, and it prices it at one line.
+
+*Which is what refutes the decision rule's discriminator.* `wantalt` reads one
+value, so its capture holds exactly one terminator and always consumes it. A
+clean `wantalt` is therefore what a CRLF-emitting producer yields just as readily
+as a CR-free one; it never separated the producer from the channel, and reading
+it as though it did is what sent round 19's repair at the channel. Nothing this
+harness holds makes that separation, so the producer's identity stays **open** and
+no claim about `jq`'s output mode is made here or acted on.
+
+*What the round does establish about the consumer, taken only from operands the
+coincidence outcome leaves unimplicated.* On `gate-sdk/README.md` the value the
+lock records (`wantalt`) and the tree's hash through all three `git hash-object`
+contexts are one clean 40-hex string, and the artifact control's recorded and
+recomputed SHA-256 are equal. Only the loop's `want` carries the `0d`, and
+`stream1` and `badline` carry it on the line itself, before any split. **The
+consumer's tree agrees with its manifest, and the disagreement is manufactured by
+the read.** That is a conclusion off scalar operands and re-run probes, which is
+the reading the coincidence row above permits.
+
+*Which repair that selects.* Production and channel are both out of reach — the
+producer is unidentified and the channel has now been swapped once to no effect —
+so the repair lands where the byte is unambiguously not part of the record. The
+read drops one trailing carriage return as a terminator before it splits, holds
+the raw line unstripped for the two evidence operands, and declares the count it
+dropped. The terminator exception stated with the anti-normalization rule above
+owns why that is not the trimming repair this arm is closed to.
+
+*What stays open, named so the next reader does not re-buy it.* The coincidence
+outcome's mechanism is still unexplained. The sample blocks carried in through
+the trailing array operand render a clean two-field tuple where the scalar
+witness of the same entry renders the CR-bearing three-field one. The argv round
+trip was reproduced again on bash 5.3 against a CRLF stream — including with
+`IFS` set to a carriage return, since `${bad_hash[@]+"${bad_hash[@]}"}` honours
+its inner quotes and does not split — and both decompositions agreed. The suspect
+stays exonerated, the divergence stays host-specific, and settling it needs a
+round that prints `printf '%q'` of `bad[0]` beside the witness. That is a separate
+unit and it blocks nothing here.
+
+*What the next red round selects, pinned ahead of it.* The manifest arm passing
+and the leg reddening later says the carriage return was the whole of this class
+and whatever follows is a new subject. The arm still reddening with the strip
+reporting 492 of 493 says the strip did not reach the operands and the read is not
+where the byte enters. The arm reddening with the strip reporting **0** says the
+stream stopped carrying the byte and the red has an unrelated cause. Nothing here
+predicts which, and nothing here claims the leg passes.
 
 *The free log read is gated on the run, not on the job, and the way past that is
 a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still
