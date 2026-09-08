@@ -4,10 +4,4 @@
 
 ---
 
-intel-macos-roster-join scope aa9709af 2026-09-08 01c16919
-intel-macos-roster-join spec a81f4515 2026-09-08 f67bd050
-intel-macos-roster-join align aae4ca1e 2026-09-08 e9786fe6
-intel-macos-roster-join build ad03f68e 2026-09-08 0d972afc
-intel-macos-roster-join build a4c475d4 2026-09-08 acbf32e8
-intel-macos-roster-join validate af9cb71f 2026-09-08 7cfd2e51
-intel-macos-roster-join close aedacbf8 2026-09-08 ca44ff44
+— scope a104dc4a 2026-09-08 a806f094
