@@ -17,6 +17,172 @@
 ## Deferred
 
 
+- **gates-yml-macos-leg-ground-stale-and-self-contradicting** [design-pending] — the workflow now
+  states both that its macOS smoke leg builds its own artifact and that it does not, and the
+  operator-ruled paragraph carrying the false half may not be edited.
+  **Two passages, both stale, both re-read at HEAD by this drain rather than taken from the
+  bullets.** `.github/workflows/gates.yml`:1036-1040 argues that a zero on that leg licenses no
+  line in `native/targets.list` on the ground that "the smoke builds its artifact **from the host
+  it runs on**"; the precondition paragraph at :1022-1024 rests on the same premise. Delta 5 has
+  landed: the leg downloads the producer's upload (:988-991), normalizes it (:999-1017) and runs
+  the smoke against it (:1058-1059), and the job header at :853-857 says so in as many words —
+  "It no longer builds the artifact it exercises."
+  **So the file contradicts itself** — :853 says it no longer builds, :1036 says it builds. The
+  licensing paragraph's VERDICT is unaffected and stays correct: the licence never came from that
+  leg alone, it names two jobs. Only its stated GROUND has gone false.
+  **Why this is filed and not fixed.** That paragraph is UNAMENDABLE by operator ruling 2026-09-07
+  relayed through the lead, and `de662aca`'s body records that it was deliberately left untouched
+  under that ruling. Repairing its ground while the ruling stands would do by edit what the ruling
+  refused by relay, so any fix is operator-class.
+  **What the drain adds to the two bullets that filed it.** They were filed independently by spec
+  and by build, neither citing the other, and both carry line numbers that no longer resolve —
+  the licensing sentence now sits at :1029. Neither noticed the internal contradiction, and
+  neither noticed the second stale passage at :1022-1024.
+  **Cost while deferred:** low and reader-facing, but with a bad failure mode — a later session
+  resolving the contradiction in the wrong direction would make the honest header agree with the
+  stale paragraph rather than the reverse.
+  Filed 2026-09-08 by close from the gap inbox, merging two bullets that were one finding.
+
+- **queue-citation-line-number-stales-within-its-own-session** [design-pending] — a line number
+  cited into a file the citing session is itself editing is stale before that session ends, and
+  nothing reads it.
+  **Measured twice in one iteration, not argued.** Scope's own `f73c7f86` inserted lines at the
+  head of the Deferred section, shifting every later line by exactly 56 — verified at that commit
+  and its parent on both cited strings. Two gap bullets filed earlier in that same session carried
+  pre-shift numbers and both resolved to unrelated prose; a lead spot-check found two of three
+  ranges wrong. The correction bullet that recorded it then went half-stale itself inside the same
+  iteration, when one of its two re-resolved targets left the queue entirely.
+  **DISTINCT from the citation-liveness family already filed.** `retired-slug-live-pointer-citation`
+  owns a pointer to a slug that has left; `queue-status-parenthetical-liveness` owns a stale
+  section-status parenthetical; the iceboxed `doctrine-rule-number-citation-liveness` owns a
+  renumber staling rule numbers in another corpus. This one's subject is a NUMERIC offset into a
+  file the citing session itself mutates, so it is stale on write rather than on some later edit.
+  **Why it is not obviously gateable.** A scanner would have to resolve the citation against the
+  post-commit file and judge whether the landing line is plausibly the referent, which is semantic.
+  The cheap half is decidable — a citation whose own commit changes the cited file above the cited
+  line — and its false-positive budget is unmeasured.
+  **The alternative that needs no gate:** cite by content, never by number, which is what every
+  attested correction did to repair itself.
+  **Cost while deferred:** paid per session that cites its own file by number, and each instance
+  costs a later reader a wrong resolution — twice this iteration, a spot-check to find.
+  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because no gate exists
+  and the shape needs a false-positive budget; promoted rather than iceboxed because the trigger is
+  live and dated, having fired twice inside the iteration that filed it.
+
+- **post-scope-admission-has-no-promotion-route** [design-pending] — a unit admitted after scope has
+  ended, which then proves debt-class, can be promoted by no stage, and the hole was closed this
+  iteration by a lead ruling rather than by a mechanism.
+  **All three prongs verified at source 2026-09-08.** Scope owns debt promotion and its stage is
+  over; spec owns feature promotion by way of authoring and cannot reach a unit that mints no
+  governed name; and re-entering scope is DESTRUCTIVE rather than merely expensive —
+  `lifecycle-kit/SPEC.md`:236-240 has the first stage's entry truncate the evidence file at the
+  iteration boundary, :567-568 names `LIFECYCLE_KIT_FIRST_STAGE` as the stage whose entry is that
+  boundary, and CLAUDE.md has the same boundary wiping `.tmp/`. A one-move re-entry would take the
+  whole iteration's stage trail with it.
+  **Attested, with the ruling that stood in for the route.** `drain-order-retroactive-debt-sweep`
+  was admitted by the operator 2026-09-07 after scope had ended, ruled debt-class at spec, and
+  promoted into Technical Debt by spec on a `lead, own-authority` ruling of 2026-09-08 because no
+  route existed. The arm's own simulate mode confirms the shape: it returns an iteration-boundary
+  entry whose help directs a gap drain, an inbox truncation and a re-run.
+  **Three candidate dispositions, none costed and none ruled:** a non-boundary re-entry arm for a
+  single queue move; a rule letting the authoring stage promote debt when the admission postdates
+  scope; or accepting the lead ruling as the standing route and saying so in the state machine.
+  **DISTINCT from the argv-parsing entries that retired alongside it** — their subject is how the
+  arm parses its arguments, this one's is which stage may perform a promotion, and it stands
+  whatever that parse does.
+  **Cost while deferred:** paid once per post-scope admission, and paid as a lead ruling that has
+  to be re-derived each time because no surface records it as the route.
+  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because choosing among
+  the three candidates is a lead or operator disposition, not a drain call; promoted rather than
+  iceboxed because the trigger fired this iteration.
+
+- **substrate-parity-audits-one-producer-of-two** [design-pending] — the parity gate's release-path
+  assertions read a single named workflow, and the tree now has two workflows that build and hash a
+  published-shaped artifact.
+  **Verified at source 2026-09-08.** `native/src/gates/gate_substrate_parity.rs`:696 resolves
+  `GATE_SDK_NATIVE_PUBLISH_WORKFLOW` as a SCALAR, defaulted to the publish workflow, and both of
+  assertion F's checks sit inside the block guarded by that one path — the roster-derived-matrix
+  check at :706 and the one-producer-per-digest check at :711-713. `.github/workflows/gates.yml`
+  is never opened.
+  **What is unaudited, measured rather than asserted.** That workflow now carries a roster-derived
+  matrix (:737) and TWO digest-computing sites in different jobs, :494 and :819-822 — the filing
+  bullet said one. The assertions' stated subject is the publish path; the tree has two paths of
+  that shape and one of them is audited.
+  **Cheapest candidate shape, unpriced:** widen the knob from a scalar to a workflow SET rather
+  than adding a second gate. **Why that is not a small edit:** a knob's arity is an adopter-facing
+  contract, so the change reaches the kit's shell default, both SPEC declarations, the crate
+  registry, the member itself and both fixture trees' config files.
+  **Cost while deferred:** a second release-shaped producer can drift from the parity contract with
+  no verdict, and the gate reads green while covering half the corpus its own assertions name.
+  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because a knob-arity
+  change is adopter-facing design; promoted rather than iceboxed because the second producer is
+  live in the tree today.
+
+- **icebox-default-reach-over-the-cost-opener-limb-unruled** [design-pending] — whether the
+  machinery-class icebox default governs the eligibility rule's COST-OPENER limb, as a lead ruling
+  made it govern the TRIGGER limb, is unruled and is operator-class.
+  **NOT RULED HERE, and the decline is the record.** The lead declined it 2026-09-08 on its own
+  authority as operator-class and routed it to this drain to be surfaced rather than decided; this
+  close surfaces it and does not decide it either. Disapplying a limb of a recorded eligibility
+  rule is an operator move whatever the grounds look like.
+  **What it would dispose of, and nothing else.** Four entries kept at build 2026-09-08 for want of
+  this answer and for no other reason: `declaration-shape-outside-header-unreadable`,
+  `inline-interpreter-substrate-census`, `entry-compression-contract-unenforced` and
+  `boundary-preserve-covers-names-not-lifetimes`. It RE-FILES none of them — each keeps its own
+  body, its own cost and its own candidate shapes, and a ruling either way changes where they LIVE
+  and changes nothing about what any of them says.
+  **The reading FOR, quoted rather than paraphrased.** `TRAJECTORY.md`:643-645 states the test is
+  conjunctive and adds "There is no live-trigger limb in it at all, so a bullet whose trigger fired
+  satisfies the conjunction on its own terms and the default applies without outranking anything."
+  There is no cost-opener limb in it either, so the identical sentence reads across.
+  **The counter-consideration AGAINST, which is why it is not self-answering.** The default at
+  `TRAJECTORY.md`:470 cites `queue-kit/SPEC.md` §The icebox tier's GRAMMAR — the lead-line shape —
+  and not the eligibility rule; and the 2026-09-07 ruling governed a machinery-class GAP BULLET,
+  new intake at close where nothing is being evicted and eligibility never arises. These four are
+  existing deferred entries standing at the eligibility gate, which `queue-kit/SPEC.md`:220 makes
+  explicit is judged at the closing stage.
+  **SCALE, which is why the lead declined it.** `TRAJECTORY.md`:463-465 measures the machinery class
+  at roughly three deferred entries in five, so disapplying one limb across the majority of the
+  pool demotes that rule rather than applying it.
+  **NOT at issue:** re-authoring a prose cost opener to a class word to unblock an eviction stays
+  refused by `queue-kit/SPEC.md`:250-255, and nothing here reopens it.
+  **The population moved inside this close, and a ruling should see it.** This drain judged a
+  recurrence on `entry-compression-contract-unenforced` and landed a dated `recurrence:` line,
+  which `queue-kit/SPEC.md`:224 makes a live promotion trigger — so that entry now fails the
+  eligibility limb on its own, and the population is THREE rather than four.
+  **Cost while deferred:** four entries carry full bodies a ruling either way would compress to one
+  line each, and every close re-reads them to reach the same undecided answer.
+  Filed 2026-09-08 by close from the gap inbox, on the lead's 2026-09-08 own-authority routing.
+
+- **held-ci-leg-failure-reddens-a-binding-one** [design-pending] — a held producer leg's failure
+  fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the
+  binding leg's measurement goes to zero rather than degrading.
+  **Every premise verified at HEAD 2026-09-08 and measured on a live run.** `native-artifacts`
+  carries `continue-on-error: ${{ matrix.held }}` over a derived matrix
+  (`.github/workflows/gates.yml`:737, :739); `install-smoke-macos` at :858 needs it and is binding,
+  stated twice (:838 "It is binding: its red fails this workflow", and again at :1064). The
+  coupling is the normalize step at :1012-1016, which exits 1 when the host's artifact is absent —
+  and it aborts BEFORE the smoke runs, so a down producer yields no measurement at all rather than
+  a degraded one. Measured on run `34200226768`, where that step printed "the producer uploaded no
+  complete aarch64-apple-darwin artifact" and those legs were the run's only failures.
+  **Second cost, in the same shape.** The leg used to buy an adopter-path measurement from a host
+  build; after delta 5 it consumes the producer's upload and buys nothing when the producer is down.
+  **Deliberately left open by the hotfix, which is the discriminator against its sibling bullet.**
+  The operator was offered the wider option that also decouples a held producer's failure from the
+  binding smoke and chose the narrow bootstrap fix over it, so `de662aca` removes the observed
+  TRIGGER and leaves this COUPLING untouched and filed.
+  **Why the smallest mechanical shape is not the answer.** Falling back to a host build when the
+  upload is absent would void criterion 2 of the join predicate `native/targets.list`'s header
+  states — a platform install-smoke leg green having CONSUMED that upload, with no host-built
+  stand-in anywhere in it — so the six-line edit trades away the evidence the leg exists to buy.
+  Whether the leg should degrade or stay binding on its producer is an envelope question no surface
+  settles.
+  **Cost while deferred:** every future held platform inherits it, so widening the roster widens
+  the coupling, and a red master traceable to a leg nobody declared binding costs a fresh diagnosis.
+  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because it is an
+  envelope question the operator has already declined once in its wider form; promoted rather than
+  iceboxed because it is reddening master today.
+
 - **smoke-manifest-read-appends-carriage-return** [design-pending] — the Windows consumer smoke
   compares no manifest entry as a hash, because every `want` reaches the comparison carrying a
   trailing carriage return; the witness that says where the CR enters now rides, and which repair
@@ -456,6 +622,16 @@
   2026-08-30 at scope). That entry proposed re-pricing the cap. This
   one's subject is the enforceability of the relief the spec ALREADY rules
   correct, which stays live precisely because those three were refused.
+  **FIRST ATTESTED INSTANCE OF THE CANDIDATE ARM'S OWN SHAPE, judged a recurrence at the
+  2026-09-08 drain and verified by diff rather than inferred.** At `fcf51555` the entry
+  `amendment-roster-omission-detection` carried its propose-once record verbatim; `40477bdb`
+  compressed it out while that same commit added ruling lines, and `40477bdb`'s own body states
+  the mechanism ("the ruling lines are paid for by compress-by-answering rather than by
+  widening"). The consequence was measured at the next scope, which had to recover the spent
+  route from git to avoid re-escalating an answered member. **The instance is now moot and the
+  class is not** — the compressed entry has since left Deferred, so the dangling antecedent is
+  gone with it; what the arm would have caught is unchanged.
+  recurrence: entry-compression-contract-unenforced 2026-09-07
   **Cost while deferred:** every mandated write onto a saturated entry pays
   the same unenforced honour-system compression, and the queue's most-ruled
   entries are exactly the ones paying it.
@@ -4686,11 +4862,11 @@
   That last cost is smaller than it looks — the default's domain is exactly the crate-carrying
   tree — but making the shape consumer-safe is design work it has not had, and that work is
   what holds this entry at `[design-pending]`.
-  **DISTINCT from `born-native-omission-accumulation`**, which owns criterion 5's omission pile
-  and would not redden if the flip were enforced perfectly. This entry owns whether the flip is
-  enforced at all. The two refused shapes stay refused on their own grounds (a maintained
-  baseline roster rots at every cohort; the per-gate header becomes cheap only once the residue
-  is small, which is its own revisit condition).
+  **DISTINCT from `born-native-omission-accumulation`** (retired 2026-09-08), which owned
+  criterion 5's omission pile and would not redden if the flip were enforced perfectly. This
+  entry owns whether the flip is enforced at all. The two refused shapes stay refused on their
+  own grounds (a maintained baseline roster rots at every cohort; the per-gate header becomes
+  cheap only once the residue is small, which is its own revisit condition).
   **Cost while deferred:** every gate authored while the port runs is a coin flip against a
   rule nothing reads — though the failure is no longer invisible, since the awaiting-port
   population reaching zero (above) makes a shell gate born after the flip distinguishable on
@@ -5673,9 +5849,9 @@
   **DISTINCT from `survey-oracle-liveness-unasserted`** above, whose subject is the `oracle:`
   field naming a boundary-wiped path — a witness that fails loudly when run. This one's subject is
   the `corpus:` field, and its witness passes.
-  **Same fail-open family as `enter-stage-flag-position-silently-ignored`:** a tool composing a
-  command out of input it does not validate and then reporting success. Recorded as a family
-  resemblance, not a merge — different arm, different input, no shared fix.
+  **Same fail-open family as `enter-stage-flag-position-silently-ignored`** (retired 2026-09-08):
+  a tool composing a command out of input it does not validate and then reporting success.
+  Recorded as a family resemblance, not a merge — different arm, different input, no shared fix.
   **Candidate shapes, none ruled:** refuse a corpus whose leading token is not an existing path;
   or warn at file time and record the block anyway; or drop the composed witness and record the
   corpus as prose only, which is honest and loses the affordance the record was minted for.
@@ -6328,6 +6504,16 @@
   nobody has costed; or state in guard-kit/SPEC.md that a rule number is not a citable identifier
   outside the kit and have every cross-corpus reference name the rule — the way rule 21 already
   cites DOCTRINE.md by name rather than number, for exactly this reason.
+  **A SECOND entry's slice now routes to that second disposition — recorded here 2026-09-08, the
+  inbound half of a routing whose outbound half already exists.** `canon-kit/SPEC.md` §The two
+  slices rules the RENUMBER slice of `amendment-roster-omission-detection` a stated non-target on
+  a decidability ground: after a renumber the retired and the replacing spellings occupy the SAME
+  token space, so a survivor scan cannot discriminate. It routes that slice's durable fix here,
+  and `canon-kit/SPEC.md`:362 carries the outbound pointer. So this entry's second disposition —
+  a cross-corpus citation naming its referent rather than its number — **dissolves that slice
+  instead of detecting it**, and discharges two entries' work rather than one. This entry's own
+  open question (whether a bare `rule N` outside the kit is gateable at all, and at what
+  false-positive budget) is untouched by the routing and is not answered by it.
   **Recurred 2026-08-29, and this entry's own citation was one of the six that rotted.** Rule 19's
   insertion pushed rules 19-23 to 20-24; the renumber sweep held guard-kit but not this file, so
   five citations of the scratch-execution rule by its pre-insertion number, and this entry's own
@@ -8657,26 +8843,25 @@
   never judged which of the two limbs its own posture sits on. The template
   (`lifecycle-kit/templates/lead.md` §Economics) states both limbs and the method for taking the
   reading; what stays local is the threshold, in `.claude/commands/lead.md`, and every reading,
-  which is this entry's. **The deliverable that made the template wrong is DISCHARGED** — the
-  premise is amended, its slug retired, and what survives is the standing measurement the landing
-  did not moot. Split `lead, own-authority 2026-09-05`.
-  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, seventeen points and
-  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8. The
+  which is this entry's. **The deliverable that made the template wrong is DISCHARGED** — premise
+  amended, slug retired, the standing measurement survives. Split `lead, own-authority 2026-09-05`.
+  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, eighteen points and
+  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16. The
   threshold is a third such iteration and is ANSWERED; the posture flips on no single point.
-  **THE FOURTEENTH WAS ONE**, the minimum, and its shape was what the number cannot carry: the lead
-  ROUTED rather than ruled. The fifteenth inverted that at 5, one datum cutting back.
-  **THE SIXTEENTH WAS TEN, the series' second-highest and its first STRUCTURAL point.** Scope's
-  block gave 5, spec's 4, one build batch 1, and ZERO went to the intent oracle — argued there as
-  DEGENERACY, since the oracle IS the scope session (template §The lead model), so when SCOPE
-  escalates oracle and escalator are one party. Five of its ten were that single case.
-  **THE SEVENTEENTH IS EIGHT, and it NARROWS that claim rather than repeating it.** Ruled alone:
-  the kfric threshold disposition, three of four gap-bullet dispositions, the retired-slug citation
-  split, the port owed-count +1, the PowerShell leg's non-binding first run, the hotfix minimality
-  — eight at the sixteenth's own per-question granularity. Four went to the OPERATOR (the
-  port-first clause reading and its unit set, the half-only envelope, the parity oracle, the
-  uninstall hotfix). **ONE went to the intent oracle, the first non-zero on that limb**, and it is
-  the datum: it came from BUILD, not scope, so oracle and escalator were DISTINCT and the route was
-  live and taken. Degeneracy belongs to scope's own escalation, never to the posture.
+  **THE FOURTEENTH WAS ONE**, the minimum: the lead ROUTED rather than ruled; the fifteenth inverted
+  that at 5. **THE SIXTEENTH WAS TEN** and argued its five scope-escalations away as DEGENERACY —
+  the oracle IS the scope session (template §The lead model), so when SCOPE escalates, oracle and
+  escalator are one party. **THE SEVENTEENTH WAS EIGHT** and narrowed that: its one intent-oracle
+  route came from BUILD, so the two were DISTINCT and the route was live and taken; degeneracy
+  belongs to scope's own escalation, never to the posture.
+  **THE EIGHTEENTH IS SIXTEEN — the series' HIGHEST, a third above the prior high of 12.** Counted
+  at the sixteenth's per-question granularity off the lead's own ruling headings: six before build
+  (unit-set baseline, spec's section move, the spec batch split, Q2, Q3, the debt-class promotion
+  route) and ten across build (the batch cut, B1's five, B2's one, B4's two, B5's one). **SEVEN
+  went to the OPERATOR, also a series high, and ZERO to the intent oracle** — which returns that
+  limb to the sixteenth's reading one iteration after the seventeenth first moved it off zero.
+  **THE CONFOUND, stated because the number cannot see it:** this was a SIX-BATCH build under a
+  live lead, the widest window in the series, so volume alone predicts a high count.
   **THE READING, STATED AND DELIBERATELY NOT ACTED ON:** "consistently several", so the limb is LIVE
   for this posture on this iteration. Per the binding one iteration is one point and the threshold
   is a third such iteration: the posture is NOT flipped, and this point reads against the series.
@@ -8685,16 +8870,17 @@
   fifteenth. A lead instruction is not a governed surface.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
   4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** of mid-close unlowered ceilings. **NOT
-  APPENDED at the fourteenth through SEVENTEENTH**, one ground all four: the closing session's own
+  APPENDED at the fourteenth through EIGHTEENTH**, one ground all five: the closing session's own
   row still grows, so any ratio is a ceiling. Limb: `cost-series-limb-unreadable-inside-close`.
   **THE COUNTER-EVIDENCE IS NINE INSTANCES OF ONE SHAPE — a claim verified at one surface and read
   as covering a wider one**, eight the lead's own; a counter never NETS against the count.
-  **ALIGN READING SEVEN, TAKEN AT THE SEVENTEENTH.** align ran on Sonnet, returned no escalation,
-  found three real drift findings, disproved one audit false positive, and caused NO build
-  round-trip — the revert signal did not fire. It fired once in seven, at the sixth, and two-sided.
-  Priced on the bare `align` rows' `cr` column: 11.76M against a 10.52M median over the last thirty
-  (range 5.24M-32.01M). **All 132 bare-align rows are Sonnet**, so this is a within-tier trend and
-  nothing in the log prices the Opus counterfactual.
+  **ALIGN READING EIGHT, TAKEN AT THE EIGHTEENTH.** align ran on Sonnet, returned no escalation,
+  found ONE real drift finding, ruled out three false-positive leads plus one agent-flagged
+  candidate, and caused NO build round-trip. Priced on the bare `align` rows' `cr` column: 14.83M
+  against a 10.51M median over the last thirty (range 5.24M-32.01M), rank 24 of 30 — **inverting
+  reading seven's yield shape**, three findings at 11.76M then against one now: cost up, yield down.
+  **The last FORTY bare-align rows are Sonnet** (seven said all 132 were, false — the 133-row
+  series spans four tiers), so this is a within-tier trend and nothing prices the Opus alternative.
   **Cost while deferred:** the posture runs unjudged, so a tier assignment wrong on the character
   limb costs every iteration and shows up as nothing — the count is the only instrument reporting
   it, and an unread one reads like a healthy one. The cost series decays too, its re-derivation
@@ -9928,6 +10114,7 @@
 - **audit-roster-grammar-ungated** [design-pending] — Row fields ungraded; waits on the format.
 - **bridged-arm-spawned-program-set-unheld** [design-pending] — Declared set unheld; shape ships.
 - **icebox-drops-a-bought-census** [design-pending] — No dormant home for a measured payload.
+- **surplus-arg-drop-in-six-emit-arms** [design-pending] — Six emit arms drop surplus args at 0.
 - **inline-source-literal-ungateable** [design-pending] — Fence-only oracle; no rename pending.
 - **turn-end-refusal-used-as-a-busy-wait** [design-pending] — Sessions busy-wait via the stop hook.
 - **site-health-probe-no-retry-on-transient** [design-pending] — A single non-200 files an issue.
