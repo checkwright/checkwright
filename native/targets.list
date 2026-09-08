@@ -85,27 +85,17 @@
 # declared-and-held platform restores the other half. A target joins only on
 # the observation above, and never beyond what that section already states.
 #
-# What a second line costs, now that one has landed and the figure is paid
-# rather than estimated: one runner mapping in native/runners.list; the consumer
-# smoke, which never blocked on it, because the smoke steers itself at its own
-# host by default and takes a producer's artifact directory through
-# INSTALLER_SMOKE_ARTIFACTS_DIR when a caller hands it one — the re-entry this
-# file used to record as unbuilt, and it is built; and the item this accounting
-# did not carry until the RELEASE path was read against it. A second line puts a
-# second leg into .github/workflows/publish.yml's roster-derived build matrix,
-# and that leg needed a platform floor and a resolved hasher the first one never
-# did. Both now live in scripts/ci-macos-floor.sh and scripts/ci-build-artifact.sh,
-# called by the release leg and the CI producer alike.
-#
-# What a THIRD line costs is measured rather than predicted, and it is less
-# than a second line cost: zero new surface on the release path, the runner
-# mapping included, because that mapping was already tracked and the release
-# matrix is roster-derived. The floor and the hasher above carried the second
-# macOS host class with no edit either — ci-macos-floor.sh resolves every path
-# it writes through `brew --prefix` rather than hard-coding one host class's
-# prefix, and the publish leg guards that step on the runner's OS. So a further
-# line on a platform class those two already bootstrap costs nothing on that
-# path, and one on a class they do not costs its own floor first.
+# What a further line costs is measured rather than predicted, twice over now:
+# one runner mapping in native/runners.list, and nothing else. The consumer smoke
+# never blocked on it — it steers itself at its own host and takes a producer's
+# artifact directory through INSTALLER_SMOKE_ARTIFACTS_DIR — and the release path
+# takes no new surface, its build matrix being roster-derived. The one-time items
+# a second line did buy are paid and they generalize: the platform floor and the
+# resolved hasher, at scripts/ci-macos-floor.sh and scripts/ci-build-artifact.sh,
+# resolve every path they write through `brew --prefix` rather than hard-coding
+# one host class's prefix, and so carried a second macOS class with no edit. A
+# further line on a platform class those two already bootstrap therefore costs
+# nothing on that path, and one on a class they do not costs its own floor first.
 # gate-sdk/SPEC.md §Consumer payload owns both halves;
 # installer/README.md §The consumer smoke owns the smoke's own side of it.
 x86_64-unknown-linux-gnu
