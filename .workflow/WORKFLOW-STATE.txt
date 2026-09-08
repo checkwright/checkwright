@@ -14,3 +14,4 @@ supported-platform-roster-widening build a515eb27 2026-09-08 ce671bfe
 supported-platform-roster-widening build a13f2435 2026-09-08 5fd03634
 supported-platform-roster-widening build a3ac78fb 2026-09-08 127edcb3
 supported-platform-roster-widening build ad1de5ed 2026-09-08 a6f4c5b2
+supported-platform-roster-widening validate a59ea32e 2026-09-08 de662aca
