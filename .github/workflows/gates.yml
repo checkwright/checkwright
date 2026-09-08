@@ -74,11 +74,17 @@ jobs:
   # `gates` because it asserts a different thing — that an adopter's install
   # works, not that this tree is clean — and because the per-platform siblings
   # join here as further jobs. Both are below, and each one's own header says what
-  # it asserts rather than this comment: the native Windows leg is an instrument
-  # whose product is its log, the macOS leg is binding on its own exit status, and
-  # this job is binding against a recorded baseline — three postures, not one.
-  # Nothing in tree owes a leg on a fourth platform; one is bought by the entry
-  # that wants it, not implied by this group.
+  # it asserts rather than this comment: the postures genuinely differ per leg —
+  # an instrument whose product is its log, a leg binding on its own exit status,
+  # a leg held non-binding while its platform's join predicate is still open, and
+  # this job binding against a recorded baseline.
+  # **Read a posture off its own leg, never off a count here.** This comment used
+  # to enumerate them and went stale twice doing it — once when the PowerShell leg
+  # landed and once when a second macOS leg did, at which point "the macOS leg"
+  # stopped naming a unique job and the two macOS legs no longer shared a posture.
+  # A count restated where the headers already own it is the second spelling this
+  # group has no reader for. A leg on a further platform is bought by the entry
+  # that wants it, never implied by this group.
   #
   # Not a matrix, and specifically **not derived from native/targets.list**. That
   # roster is the artifact commitment, and a smoke leg on a platform is exactly
