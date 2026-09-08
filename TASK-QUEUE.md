@@ -16,8 +16,8 @@
   roster's second line, the release path that line would otherwise break, and the Intel leg that
   makes a third line buyable on the next run.
   **The design is `SPEC-macos-roster-join.md`'s and is not restated here:** the licence verified
-  job-keyed at this stage, six deltas with their work classes, the seam ruling, and the one edit
-  the amendment deliberately does not authorize.
+  job-keyed at this stage, seven deltas with their work classes, the seam ruling, and the bounded
+  authorization delta 7 rides.
   **ADMITTED AS THIS ITERATION'S UNIT, OPTION (b) — ruled by the OPERATOR 2026-09-08**, asked and
   answered in a `/lead` session and lead-relayed: the `aarch64-apple-darwin` join plus an Intel
   `install-smoke` leg of its own. The leg's cost was put explicitly and accepted — a new job name,
@@ -33,6 +33,12 @@
   it, on a path nothing exercises until a tag. The release path has never run on macOS. That
   repair is the amendment's delta 3, and it is why this unit is larger than the three-edit write
   `native/targets.list`'s header describes.
+  **DELTA 3 STAYS IN-UNIT AND ITS OVERRUN WAS PUT EXPLICITLY — ruled by the OPERATOR 2026-09-08**,
+  asked and answered in a `/lead` session and lead-relayed, on this stage's escalation: it exceeds
+  the cost admitted above, and was accepted on the ground that a roster line is a release
+  commitment. A second ruling on the same channel and date authorizes delta 7's narrow arithmetic
+  repair to a recorded ruling's weighed cost figure — bounded to that figure, and the amendment
+  states the bound rather than the entry.
   **The port's completion predicate is unmoved by this unit and that is expected:** `--emit
   port-blockers --tree` reads 16 owed at this stage, oracle-run and not restated. The blocker is
   the roster against the documented supported set, and Intel macOS and native Windows are both

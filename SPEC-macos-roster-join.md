@@ -19,6 +19,21 @@ that discharges it does not exist yet. Writing both lines here would be the exac
   2026-09-08, asked and answered in a `/lead` session and lead-relayed. The leg's cost was put
   explicitly and accepted: **a new job name, and doubled macOS minutes on every push**. The aarch64
   half is the floor and lands whatever the Intel leg does.
+- **Delta 3 stays in this unit, and its overrun was put explicitly** — ruled by the OPERATOR
+  2026-09-08, asked and answered in a `/lead` session and lead-relayed, on this stage's escalation.
+  Delta 3 exceeds the cost admitted above: it adds two tracked scripts and edits
+  `.github/workflows/publish.yml`, neither of which is a job name or a macOS minute. It was accepted
+  on the ground this amendment states — **a roster line is a release commitment, and without delta 3
+  the first tagged release fails on a path nothing exercises until the tag**. The ground is recorded
+  beside the ruling because it is what makes the overrun legible at close: a unit that grew is a
+  finding, and a unit that grew for a stated reason the operator weighed is a decision.
+- **The recorded cost figure in `TRAJECTORY.md` may be repaired, and nothing else about that ruling
+  may** — ruled by the OPERATOR 2026-09-08, same session and same relay, on this stage's escalation.
+  Delta 7 below is that repair and its whole extent. **Read the authorization no wider than it was
+  given:** what is released is the *figure the ruling was weighed against*, not the ruling, not its
+  verdict, and not the grounds that carry it. A later session reading this as licence to edit a
+  recorded ruling is reading it wider than it was given — the same boundary, and for the same
+  reason, as the release the debt unit carries on the licensing paragraph.
 - **The join predicate itself is not reopened.** `native/targets.list`'s header owns it and this
   amendment quotes no part of it. The 2026-09-07 operator ruling behind it — that one green macOS
   install-smoke leg licenses nothing on its own — is untouched and is what the aarch64 join
@@ -178,6 +193,27 @@ because the roster still names a platform that host is not. The sentence is de-l
 that rather than to say a number, which is the repair the queue's own
 `queue-citation-line-number-stales-within-its-own-session` finding generalizes.
 
+### (7) The born-native ruling's weighed cost is corrected to the post-join arithmetic
+
+`TRAJECTORY.md`'s 2026-08-14 ruling that a new gate is born native unless a stated cause says
+otherwise records the cost it was weighed against, and delta 1 falsifies both halves of it: *"that
+roster is one target, so the flip attaches that omission to **every macOS adopter** for every new
+gate"* {design-bearing}. The roster stops being one target, and the omitted set narrows from every
+macOS adopter to Intel Macs plus the hosts the declaration does not carry at all.
+
+**The extent of this delta is one figure**, and it is written down because a bounded authorization
+that is not written down is an unbounded one by the time it is read. What changes is the *cost the
+ruling was weighed against*. What does not change, and what no part of this delta reaches: the
+ruling's verdict, its stated grounds, its date, and the sentence's own closing point — that the cost
+was recorded so it is not re-argued, which stays true of the corrected figure exactly as it was of
+the original. **The ruling gets cheaper than it was costed at; it does not get weaker, and it is not
+reversed, demoted or re-scoped.**
+
+The label is `{design-bearing}` rather than `{mechanical}` deliberately, and against the delta's
+apparent size: the arithmetic is one sentence, but what this delta actually demands is holding a
+boundary on the recorded-ruling surface, and a cheaper class applying a bounded edit to that surface
+is the wrong economy however small the diff looks.
+
 ## Where this amendment abuts the promoted debt unit
 
 `gates-yml-macos-leg-ground-stale-and-self-contradicting` owns the repair of a **false ground** in
@@ -192,27 +228,26 @@ below delta 6's sentence, so a batch holding both must keep the ruling's boundar
 view: the released repair is that paragraph's ground sentence, never its verdict, and never a wider
 reading of the paragraph.
 
-## The one edit this amendment does not authorize
+## The edit this amendment routed rather than took
 
-`TRAJECTORY.md`'s 2026-08-14 ruling that a new gate is born native unless a stated cause says
-otherwise records the cost it was weighed against, in a sentence that ends "recorded so it is not
-re-argued": *a `.gate`-declared member is omitted on a platform `native/targets.list` carries no
-artifact for, and that roster is one target, so the flip attaches that omission to **every macOS
-adopter** for every new gate.*
+**The caution stands even though the edit is now authorized**, and the section is kept rather than
+deleted because what it records is the *routing*, which a later reader needs more than the outcome.
 
-**Delta 1 falsifies both halves of that ground** — the roster stops being one target, and the
-omitted set stops being every macOS adopter, narrowing to Intel Macs and to the hosts the
-declaration does not carry at all. The ruling itself is untouched and, if anything, cheaper than it
-was costed at. But the sentence is a recorded ruling's stated grounds, and CLAUDE.md routes a change
-to one to the operator **however well-grounded the finding and however plainly the arithmetic has
-moved** — the strength of the case is not a reason to skip the routing, which is the whole point of
-the rule. So this amendment states the finding and authorizes no edit to that file.
+The same arithmetic — a roster of one target, an omitted set of every macOS adopter — sits on two
+surfaces, and they are not the same kind of surface. On `gate-sdk/SPEC.md` §The port-candidate
+criteria's criterion-5 bullet it is a **live claim in a governed spec**, which a stale fact simply
+makes wrong; delta 1 owns its repair on that ground alone. On `TRAJECTORY.md` it is a **recorded
+ruling's weighed cost**, and CLAUDE.md routes a change to one to the operator **however
+well-grounded the finding and however plainly the arithmetic has moved** — the strength of the case
+being the reason the routing exists, not a reason to skip it. So this stage authored the finding,
+took neither edit, and escalated the second.
 
-It does repair the same arithmetic where it appears as a **live claim in a governed spec** rather
-than as a record: `gate-sdk/SPEC.md` §The port-candidate criteria's criterion-5 bullet, listed
-below under delta 1. Until the escalation is answered the two surfaces disagree, and that is the
-honest state rather than a defect to paper over — a spec states what is true now, a ruling record
-states what was weighed then.
+**It was answered: OPTION (a), a narrow arithmetic repair, ruled by the OPERATOR 2026-09-08, asked
+and answered in a `/lead` session and lead-relayed.** Delta 7 is that repair and states its own
+extent. Both repairs are therefore **pending build and neither is applied** — the surfaces do not
+disagree with each other, they are both stale in the same direction, and one amendment now carries
+both. A reader of this section who takes it as licence to edit a ruling record is reading an
+authorization that was given for one figure as though it had been given for the surface.
 
 ## What is kit mechanism, what is this project's own, and what is config
 
@@ -318,16 +353,18 @@ subject rather than less. Its planted witness in the consumer smoke is untouched
   "`native/targets.list` shipping one target, so the uncovered set is every macOS adopter rather
   than a narrow hypothetical", and delta 1 halves that set: Apple-silicon adopters stop being in
   it and Intel ones remain. The mechanism is untouched; the arithmetic narrows, and this is the
-  surface where that number is a live claim rather than a record (delta 1).
+  surface where that number is a live claim rather than a record. **Not yet applied** — like every
+  target on this roster it is authored here and landed by build (delta 1).
 - `gate-sdk/SPEC.md`'s host-derived-artifact-name passage — it justifies a per-line derivation
   "with the roster still one line", a present-tense count delta 1 falsifies while leaving the
   derivation itself correct (delta 1).
 - The generated `docs/` mirrors of the kit SPECs — regenerated, never hand-edited, and stale the
   moment any delta touching a kit SPEC lands (all deltas).
 
-<!-- update-target-exempt: escalated to the lead at this stage's close and unresolved here — TRAJECTORY.md is the recorded-ruling surface, and CLAUDE.md routes a change to a ruling's recorded grounds to the operator however well-grounded the finding, so no delta of this amendment may claim it -->
-- `TRAJECTORY.md`'s 2026-08-14 born-native-default ruling, its weighed-cost sentence — see §The one
-  edit this amendment does not authorize.
+- `TRAJECTORY.md`'s 2026-08-14 born-native-default ruling, its weighed-cost sentence — the same
+  arithmetic as the criterion-5 bullet above, on the recorded-ruling surface rather than in a
+  governed spec, and repairable only inside the bounded authorization §The edit this amendment
+  routed rather than took records (delta 7).
 
 ## Retired spellings
 
