@@ -1030,11 +1030,20 @@ jobs:
       # granting of a permission — naming this exact misreading, that an iteration
       # making a target *possible* invites its next reader to read the removal of
       # a blocker as the arrival of a permission. This leg is that iteration. The
-      # discriminator is sharper still: the smoke builds its artifact **from the
-      # host it runs on**, which §Consumer payload already classifies as a harness
-      # stand-in and not that rule relaxing. So a green here proves the adopter
-      # path works on macOS and proves nothing about a released macOS artifact,
-      # because no released artifact was involved.
+      # discriminator is sharper still, and it is the **PAIR**: §Consumer payload
+      # admits a triple only on ONE run carrying a release-shaped producer AND a
+      # consumer that installed that producer's upload, so this job is one half of
+      # the predicate and can never be the whole of it. A green here proves the
+      # consumer half held on this host; the producer half is `native-artifacts`'
+      # leg for the same triple on the same run, and a line is licensed by the two
+      # together or by nothing.
+      #
+      # **Read the repair no wider than it was made.** What was corrected here is
+      # this paragraph's stated GROUND, which had gone false: it argued from the
+      # smoke building its artifact from the host it runs on, and this leg stopped
+      # doing that when it started consuming the producer's upload — the job header
+      # above says so in as many words. The VERDICT above it never depended on that
+      # ground and is untouched.
       - name: install smoke on a macOS host
         run: |
           set +e
