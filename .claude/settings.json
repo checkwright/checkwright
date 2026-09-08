@@ -29,6 +29,7 @@
       "Bash(bash installer/consumer-smoke/run-smoke.sh *)",
       "Bash(: > .workflow/prompt-friction.log)",
       "Bash(: > .workflow/knowledge-friction.log)",
+      "Bash(cat >> .tmp/*)",
       "Bash(rm .tmp/*)",
       "Bash(rm -f .tmp/*)",
       "Bash(rm -rf .tmp/*)",
