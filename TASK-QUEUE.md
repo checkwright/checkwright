@@ -14,10 +14,46 @@
 
 ## Technical Debt
 
-## Deferred
+- **smoke-manifest-read-appends-carriage-return** — the Windows consumer smoke
+  compares no manifest entry as a hash, because every `want` reaches the comparison carrying a
+  trailing carriage return; the witness that says where the CR enters now rides, and which repair
+  it selects is what remains open.
+  **The full record is `installer/README.md` §The consumer smoke's, cited and not restated here.**
+  Round 18, run `34142337941`, job `install-smoke-windows`, read JOB-KEYED; failing again at
+  `68cc1ea5` on run `34144326458`. A whole-manifest count of 493 of 493 is the signature of a
+  suffix on the reader, never of real hash divergence.
+  **THE WITNESS LANDED AT BUILD 2026-09-08 AND THE REPAIR WAS DELIBERATELY NOT CHOSEN** — `lead,
+  own-authority` 2026-09-07, on the spec stage's escalation. The manifest loop now reads the line
+  whole and splits it in the shell, which is also less normalizing than the read it replaced, and
+  the report carries two raw stream lines as named operands with their octet dumps: the first line
+  of the stream, and the raw line of the first disagreeing entry.
+  **The question was NARROWED, never open — which is what makes this promotable rather than
+  design-owing.** It is not WHERE THE CR COMES FROM but WHICH REPAIR THE OBSERVED DUMP SELECTS, and
+  the three-outcome decision rule that answers it is pinned in that same section — three possible
+  dumps selecting three different repair sites, with `wantalt` discriminating the channel from the
+  producer. Enumerating those outcomes here is the restatement the lead line above already
+  disclaims, so they stay with their owner. NO DESIGN TURN IS OWED. What was owed is one red round
+  of `install-smoke-windows`, read JOB-KEYED, and then the repair that list names.
+  **Product-class under the 2026-08-30 witness discriminator:** the smoke asserts the payload an
+  adopter receives, so the manifest's integrity claim is unasserted on the Windows install path.
+  **JOINED AND PROMOTED — `lead, own-authority` 2026-09-08**, derivable from the governed surfaces
+  rather than escalated: it meets two of the port-first ruling's three joining grounds at once —
+  product-class with a live trigger, and same-surface with the iteration's roster unit.
+  **THE OWED ROUND IS ALREADY BOUGHT, FREE — read at scope 2026-09-08.** `gates` run `34212264301`
+  at `dd6dcf54`, job `102015768120`, `install-smoke-windows` red under `continue-on-error`. The
+  raw-stream witness `3a3a6a2c` is an ancestor of that commit, so its dump rides: the stream "as
+  the loop read it and before any split" ends `... 61 35 66 63 0d`, so the CR is on the manifest
+  line the loop reads, ahead of any split, while `raw` and `wantalt` both read a clean 40-hex.
+  493 of 493 carry a non-hex operand — the suffix signature, not hash divergence. So the
+  three-outcome rule is read against a real dump and this entry owes no push to get one.
+  **Cost while deferred:** the leg is `continue-on-error`, so this red never reaches a workflow
+  conclusion, and every run of it re-buys the same diagnosis — now against a pinned decision rule,
+  so the next round costs a reading rather than a diagnosis.
+  Filed 2026-09-07 into the gap inbox by the close of `windows-install-path-behind-the-invoke`;
+  joined same-surface `lead, own-authority` 2026-09-07; promoted at spec 2026-09-08 and DEMOTED
+  here at build 2026-09-08, its amendment having delivered one increment of the corpus.
 
-
-- **gates-yml-macos-leg-ground-stale-and-self-contradicting** [design-pending] — the workflow now
+- **gates-yml-macos-leg-ground-stale-and-self-contradicting** — the workflow now
   states both that its macOS smoke leg builds its own artifact and that it does not, and the
   operator-ruled paragraph carrying the false half may not be edited.
   **Two passages, both stale, both re-read at HEAD by this drain rather than taken from the
@@ -30,10 +66,19 @@
   **So the file contradicts itself** — :853 says it no longer builds, :1036 says it builds. The
   licensing paragraph's VERDICT is unaffected and stays correct: the licence never came from that
   leg alone, it names two jobs. Only its stated GROUND has gone false.
-  **Why this is filed and not fixed.** That paragraph is UNAMENDABLE by operator ruling 2026-09-07
+  **Why it WAS filed and not fixed.** That paragraph was UNAMENDABLE by operator ruling 2026-09-07
   relayed through the lead, and `de662aca`'s body records that it was deliberately left untouched
-  under that ruling. Repairing its ground while the ruling stands would do by edit what the ruling
-  refused by relay, so any fix is operator-class.
+  under that ruling. Repairing its ground while the ruling stood would have done by edit what the
+  ruling refused by relay, so the fix was operator-class.
+  **RELEASED FOR THIS REPAIR AND NO WIDER — ruled by the OPERATOR 2026-09-08**, asked and answered
+  in a `/lead` session and lead-relayed, on scope's escalation that the sibling unit
+  `gate-binary-roster-covers-supported-platforms` writes the very `native/targets.list` line this
+  paragraph appears to forbid, turning a reader-facing staleness into a live hazard on the
+  iteration's own path. **What is released is the paragraph, not the ruling's subject:** the
+  VERDICT is untouched and stays correct — the licence names two jobs, never that leg alone — and
+  what may be repaired is the false GROUND sentence, "the smoke builds its artifact from the host
+  it runs on", against `:853`'s "It no longer builds the artifact it exercises". A later session
+  reading this release as licence to revisit the verdict is reading it wider than it was given.
   **What the drain adds to the two bullets that filed it.** They were filed independently by spec
   and by build, neither citing the other, and both carry line numbers that no longer resolve —
   the licensing sentence now sits at :1029. Neither noticed the internal contradiction, and
@@ -42,6 +87,10 @@
   resolving the contradiction in the wrong direction would make the honest header agree with the
   stale paragraph rather than the reverse.
   Filed 2026-09-08 by close from the gap inbox, merging two bullets that were one finding.
+
+## Deferred
+
+
 
 - **queue-citation-line-number-stales-within-its-own-session** [design-pending] — a line number
   cited into a file the citing session is itself editing is stale before that session ends, and
@@ -189,34 +238,6 @@
   envelope question the operator has already declined once in its wider form; promoted rather than
   iceboxed because the coupling is structural and inherited, which no single green run retires.
 
-- **smoke-manifest-read-appends-carriage-return** [design-pending] — the Windows consumer smoke
-  compares no manifest entry as a hash, because every `want` reaches the comparison carrying a
-  trailing carriage return; the witness that says where the CR enters now rides, and which repair
-  it selects is what remains open.
-  **The full record is `installer/README.md` §The consumer smoke's, cited and not restated here.**
-  Round 18, run `34142337941`, job `install-smoke-windows`, read JOB-KEYED; failing again at
-  `68cc1ea5` on run `34144326458`. A whole-manifest count of 493 of 493 is the signature of a
-  suffix on the reader, never of real hash divergence.
-  **THE WITNESS LANDED AT BUILD 2026-09-08 AND THE REPAIR WAS DELIBERATELY NOT CHOSEN** — `lead,
-  own-authority` 2026-09-07, on the spec stage's escalation. The manifest loop now reads the line
-  whole and splits it in the shell, which is also less normalizing than the read it replaced, and
-  the report carries two raw stream lines as named operands with their octet dumps: the first line
-  of the stream, and the raw line of the first disagreeing entry.
-  **Why still `[design-pending]`: the question is NARROWED, not answered.** It is no longer WHERE
-  THE CR COMES FROM but WHICH REPAIR THE OBSERVED DUMP SELECTS, and the three-outcome decision rule
-  that answers it is pinned in that same section — three possible dumps selecting three different
-  repair sites, with `wantalt` discriminating the channel from the producer. Enumerating those
-  outcomes here is the restatement the lead line above already disclaims, so they stay with their
-  owner. NO DESIGN TURN IS OWED. What is owed is one red round of `install-smoke-windows`, read
-  JOB-KEYED, and then the repair that list names.
-  **Product-class under the 2026-08-30 witness discriminator:** the smoke asserts the payload an
-  adopter receives, so the manifest's integrity claim is unasserted on the Windows install path.
-  **Cost while deferred:** the leg is `continue-on-error`, so this red never reaches a workflow
-  conclusion, and every run of it re-buys the same diagnosis — now against a pinned decision rule,
-  so the next round costs a reading rather than a diagnosis.
-  Filed 2026-09-07 into the gap inbox by the close of `windows-install-path-behind-the-invoke`;
-  joined same-surface `lead, own-authority` 2026-09-07; promoted at spec 2026-09-08 and DEMOTED
-  here at build 2026-09-08, its amendment having delivered one increment of the corpus.
 
 - **overhead-meter-resolves-the-newest-transcript-not-its-own** [design-pending] — a bare
   `--emit overhead-meter` resolves the NEWEST candidate transcript, so any session that delegates
@@ -726,37 +747,38 @@
   this entry stood active, and the entry could not be disposed without a green: a circularity
   neither a `--no-verify` stamp (barred, lifecycle-kit/SPEC.md §The state machine) nor close's
   drain (refused, `check-stage-entry` assertion B's drain-successor backstop) can break.
-  **WHAT THE RUN SHOWED — `gates` run `34200226768` at `fcaf3b74`, the first watched push, read
-  from the legs' logs and not from the run's checkmark.** Both `native-artifacts` darwin legs died
-  at their first executed line, before any compile: `gate-sdk/lib/gate.sh: line 43: conditional
-  binary operator expected`. That line is `[[ -v GATE_SDK_REGISTRY_DOC ]]`, a bash >= 4.2 unary,
-  and the step ran on macOS's stock `/bin/bash`. The producer job in
-  `.github/workflows/gates.yml` declares `shell: bash` with NO GNU-bash bootstrap, where its
-  sibling `install-smoke-macos` installs `bash coreutils gawk shellcheck` and PATH-orders gnubin —
-  the same run measured `BASH_VERSION=5.3.15` there. So the producer runs below the bash floor
-  `docs/install.md` §Requirements itself declares, the first of the two bounds is unmet for both
-  darwin triples, and NO target joined.
-  **A HELD LEG'S FAILURE REDDENED A BINDING ONE, which is worth more than the typo above.**
-  `install-smoke-macos` is binding and needs the producer, whose darwin legs are held
-  (`continue-on-error`). Its normalize step exits 1 when the host's artifact is absent, so a held
-  leg's failure fails the workflow — and that leg also lost the adopter-path measurement it used
-  to buy from a host build. Whether it should degrade or stay binding is an envelope question this
-  entry does not settle.
-  **PRECONDITION, narrowed to exactly what is owed, and its FIRST limb has since LANDED.**
-  `aarch64-apple-darwin` and `x86_64-apple-darwin`: the producer job's GNU-bash bootstrap landed at
-  `de662aca` (`.github/workflows/gates.yml`:771-786), so what is still owed is the second limb
-  alone — one run carrying both bounds of the predicate `native/targets.list`'s own header states
-  verbatim, the Intel triple on its own Intel leg. `x86_64-pc-windows-msvc`: untouched by this run
-  and unchanged — `docs/install.md` §Requirements does not document native Windows as supported, so
-  its FIRST bound fails independently of any leg.
+  **ADMITTED AS THIS ITERATION'S UNIT, OPTION (b) — ruled by the OPERATOR 2026-09-08, asked and
+  answered in a `/lead` session and lead-relayed.** The aarch64 join plus an Intel `install-smoke`
+  leg of its own, so `x86_64-apple-darwin`'s second limb becomes buyable at the close push. The
+  leg's cost was put explicitly and accepted: a new job name, which makes the unit feature-class
+  and its amendment `/spec`'s, and doubled macOS minutes on every push. The aarch64 half is the
+  floor and lands whatever the Intel leg does.
+  **THE OBSERVATION HAS FIRED FOR `aarch64-apple-darwin`, read at scope 2026-09-08 off a finished
+  run for free.** `gates` run `34212264301` at `dd6dcf54` is green and postdates `d917d4ca`, where
+  the licensing paragraph landed, and it carries BOTH bounds: `native-artifacts` green for that
+  triple on `macos-latest` with binary and `.sha256` uploaded, and `install-smoke-macos` green on
+  `macos-26-arm64` at `host: aarch64-apple-darwin`, having downloaded that upload, run under
+  `INSTALLER_SMOKE_ARTIFACTS_DIR`, logged "adopted checkwright-gates for aarch64-apple-darwin from
+  the hand-off, sidecar and all — nothing rebuilt, nothing rehashed", and emitted its
+  `INSTALLER-SMOKE: clean` completion assertion. Produced and exercised, no host-built stand-in.
+  **A FOURTH EDIT THE HEADER DERIVES RATHER THAN STATES:** `docs/install.md`'s state word feeds
+  `native-artifacts-roster` (`.github/workflows/gates.yml`:689-690), so `joined` flips that
+  producer leg from `continue-on-error` to BINDING on master.
+  **`x86_64-apple-darwin`'s SECOND LIMB IS UNMEETABLE UNTIL THE LEG EXISTS — which is the unit.**
+  Its limb 1 is green too, on `macos-15-intel`. But the workflow has one macOS install-smoke leg
+  and its normalize step keys on `rustc -vV`'s host triple (:1005-1016), so it exercises the host
+  artifact and no other; no entry owned that absence before this one. `x86_64-pc-windows-msvc` is
+  unchanged — `docs/install.md` §Requirements does not document native Windows as supported, so its
+  FIRST bound fails independently of any leg. The held-producer coupling this entry used to restate
+  is `held-ci-leg-failure-reddens-a-binding-one`'s.
   **The refused alternative reading is not re-argued here** — its grounds are the rewritten header
   of `native/targets.list`, and a later session finding the textual case persuasive is reading a
   settled question.
-  **Cost while deferred**, dated 2026-09-08 and one item larger than it was: the port's completion
-  predicate cannot approach zero by any cut (`--emit port-blockers --tree` read 16 owed at spec,
-  oracle-run not restated); every macOS adopter silently loses more of the battery each iteration a
-  born-native gate lands; and master's `gates` workflow is RED at `fcaf3b74` until the bootstrap
-  lands, a cost every later push pays rather than this entry alone.
+  **Cost while deferred**, re-dated 2026-09-08 and now one item smaller: the port's completion
+  predicate cannot approach zero by any cut (`--emit port-blockers --tree` read 16 owed at scope,
+  oracle-run not restated), and every macOS adopter silently loses more of the battery each
+  iteration a born-native gate lands. The red-master item is RETIRED as an aged fact — the
+  bootstrap landed at `de662aca` and `dd6dcf54`'s run is green, so that cost is no longer owed.
   Filed 2026-09-07 by spec; admitted as the lead unit 09-07; amendment merged and entry demoted
   2026-09-08 by build on the run above rather than on a forced join — a roster line is a public
   support commitment, and writing one this run does not carry is worse than the unit not landing.
@@ -5994,6 +6016,12 @@
   a human audit on the roster because judging live-vs-historical prose is a session act; this is
   the mechanical half underneath it — does the cited path exist at all — which is decidable and
   today only half-scanned. Landing it narrows what that audit must read; it does not retire it.
+  **THIS ENTRY AND `stale-identifier-after-retirement` ARE THE (C) SLICE of
+  `citation-liveness-family-convergence`** — grounds relocated here 2026-09-08 from that hub under
+  `check-queue-entry-budget`'s rule that an unanswered ground moves to the entry already owning its
+  subject, this one having already held the open ruling. The slice widens `check-docs-cmd` from
+  fenced-only to inline spans and is priced at likely ONE ticket for the pair; the open ruling is
+  which gate holds it. Two of the family's 37 inbound edges land here.
   **Cost while deferred:** measured, recurring, and it lands exactly when the tree is most
   trusted — a green 104/104 battery over prose that names files the same commit deleted.
   Surfaced 2026-08-18. Filed by close 2026-08-18, discharging the gap generalization owed by
@@ -6531,6 +6559,12 @@
   **Why `[design-pending]`:** the second is a one-paragraph boundary note plus a sweep of unknown
   size, and whether a bare "rule N" outside the kit is gateable at all needs a false-positive
   budget nobody has measured.
+  **THIS ENTRY AND ITS `guard-rule-number-intra-kit-citations-ungated` SIBLING ARE THE (D) ISLAND
+  of `citation-liveness-family-convergence`, and its LONG POLE rather than an equal quarter** —
+  grounds relocated here 2026-09-08 from that hub, under `check-queue-entry-budget`'s rule that an
+  unanswered ground moves to the entry already owning its subject. Slices (A)-(C) widen gates that
+  already resolve citations; (D) has no gate to widen and an unmeasured false-positive budget over
+  111 intra-kit citations. Never average it into that family's size floor.
   **Cost while deferred:** a reader follows the number to the wrong rule and reasons from it.
   recurrence: guard-rule-number-not-citable-outside-kit 2026-08-29
   Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the
@@ -7496,17 +7530,14 @@
   behind it was re-run here rather than taken on the relay.
 
 - **citation-liveness-family-convergence** [design-pending] — the citation-liveness deferred family
-  is FOUR gate-touch points, not one resolver and not fourteen tickets; this entry is where that
-  measurement lives.
-  **Why the entry carries the survey rather than pointing at it.** It was bought at the 2026-08-25
-  scope into `.workflow/survey-record.md`, which the next first-stage entry destroys, and
-  `check-scratch-citation` reds a permanent surface pointing into that set. Members are by slug.
-  **The witness — re-run 2026-08-27, and again 2026-08-31 at close.** corpus `TASK-QUEUE.md ##
-  Deferred + ## Icebox`, `scripts/gates.list`, `native/src/gates/`; oracle
-  `bash gate-sdk/bin/run-gates.sh --emit queue-edges` plus `grep -n` for citation/cite/liveness; rev
-  `457148bd2a5681a9630c4a73b1358e35c170aa2d`. Named gates are native. Re-run before citing.
-  **The finding.** Thirteen live members, eleven Deferred and two Icebox; none blocks on an
-  operator-class fork. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
+  is FOUR gate-touch points, not one resolver and not fourteen tickets; the measurement lives here.
+  **Why the survey lives here:** `.workflow/survey-record.md` is boundary-truncated and
+  `check-scratch-citation` reds a permanent pointer into it. **Witness re-run at scope 2026-09-08,
+  all sixteen named slugs LIVE:** corpus the two design-pending sections, `scripts/gates.list` and
+  `native/src/gates/`; oracle `--emit queue-edges` plus a citation grep; rev `f2308550`.
+  **The finding.** Thirteen live members, eleven Deferred and two Icebox, none blocking on an
+  operator-class fork; **size floor** four touch points, eight to ten assertions, two reports, all
+  native modules. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
   `unqualified-section-citation-liveness`, `link-wrapped-section-citation-liveness` and
   `spec-pointer-self-section-citation` as ONE resolves-to-nothing predicate — those entries say the
   guard WINDOW, not the citation form, is the variable — plus `spec-section-title-collision` and
@@ -7515,31 +7546,34 @@
   `check-queue-slug-liveness` takes about two assertions for `retired-slug-live-pointer-citation`
   and `queue-status-parenthetical-liveness`, plus ONE report-only deliverable riding
   the queue-edges arm's resolution — `done-slug-ownership-citation-report`, report-not-gate under
-  the SPEC's reference-vs-membership ruling; its twin `dead-queue-citation-report` has shipped. (C)
-  `check-docs-cmd` widens from fenced-only to inline spans for `cited-script-path-liveness-inline`
-  and `stale-identifier-after-retirement`, likely one ticket, though which gate holds it is an open
-  ruling in the second entry. (D) `guard-rule-number-not-citable-outside-kit` and
-  `guard-rule-number-intra-kit-citations-ungated` are an island and **are the long pole rather than
-  an equal quarter**: (A)-(C) widen gates that already resolve citations, while (D) has no gate to
-  widen and an unmeasured false-positive budget over 111 intra-kit citations. Never average it in.
-  **Two members are unverified:** Icebox's `false-ground-citation-propagation` is still title-only,
-  and `doctrine-rule-number-citation-liveness` is a forward bet — a 2026-08-27 probe found
-  DOCTRINE.md carrying **zero** `rule N` forms, so the only measured corpus is (D)'s.
-  **Excluded with cause:** `scratch-citation-skill-surface-reach` (self-disclaims, a glob-coverage
-  gap), `kit-ref-liveness-stem-token-hole` (env-knob tokens, already checked),
+  the SPEC's reference-vs-membership ruling; its twin `dead-queue-citation-report` has shipped.
+  (C) is `cited-script-path-liveness-inline` plus `stale-identifier-after-retirement`, likely one
+  ticket, and (D) the two `guard-rule-number-*` entries, an island and the long pole rather than an
+  equal quarter — BOTH slices' grounds RELOCATED 2026-09-08 to the entries already owning them.
+  **Two members are content-unverified though both re-verified live above:** Icebox's
+  `false-ground-citation-propagation` is title-only, and `doctrine-rule-number-citation-liveness` a
+  forward bet — a 2026-08-27 probe found DOCTRINE.md carrying ZERO `rule N` forms. Both are iceboxed
+  one-liners with nowhere to hold a ground, which is why these stay here and (D)'s did not.
+  **Excluded with cause:** `scratch-citation-skill-surface-reach` (self-disclaims, glob-coverage),
+  `kit-ref-liveness-stem-token-hole` (env-knob tokens, already checked),
   `fixture-assertion-liveness`, `survey-oracle-liveness-unasserted`. **Adjacent, unfolded:**
   `amendment-landing-citation-assertions` and `amendment-owner-position-citation` ride
-  `check-amendment-queue` over a corpus deleted at merge. **A FIFTH touch point**, filed after the
-  rev: `scratch-citation-introducer-form-reach`, on `check-scratch-citation` — fold or exclude it.
-  **Size floor:** four touch points, eight to ten assertions, two reports, all native modules.
-  **THE 2026-08-30 WITNESS DISCRIMINATOR, APPLIED 2026-08-31 BY CLOSE. Machinery-class HOLDS — the
-  family's only demand witness is this repo's own delivery process — and the class eviction still
-  DOES NOT LAND.** Only two members reach the icebox worklist at all; every other opens its cost
-  field in PROSE, which queue-kit/SPEC.md §The icebox tier reads as not-low and whose substance
-  bears that out. Of the two, one names an EXTERNAL live slug. So the blocking limb is COST, not
-  the intra-cluster citation this iteration's self-citing clause neutralises, and that clause never
-  fires here. Zero inbound edges keep this hub off every ranking, which is why the sweep is
-  close's; what a costed look owes first is re-authoring the cost fields that can honestly open low.
+  `check-amendment-queue` over a corpus deleted at merge. **Fold-or-exclude, both filed after the
+  rev:** a FIFTH touch point `scratch-citation-introducer-form-reach` on `check-scratch-citation`,
+  and an EIGHTEENTH member, `queue-citation-line-number-stales-within-its-own-session`.
+  **THE 2026-08-30 WITNESS DISCRIMINATOR, APPLIED 2026-08-31 BY CLOSE: machinery-class HOLDS** (the
+  family's only demand witness is this repo's delivery process) **and the class eviction still does
+  NOT land** — only two members reach the icebox worklist, one naming an EXTERNAL live slug, and
+  every other opens its cost field in PROSE, not-low under queue-kit/SPEC.md §The icebox tier. So
+  the blocking limb is COST, and a costed look owes first the cost fields that can honestly open
+  low.
+  **NOT THIS WINDOW — `lead, own-authority` 2026-09-08:** the admitted units fill it and this family
+  meets none of the three joining grounds. **The zero-inbound RANKING ground this entry carried is
+  FALSIFIED and is deleted rather than left standing:** summed at scope 2026-09-08 the family
+  carries **37 inbound over seventeen live members** against the hub's 1, four times the largest
+  single entry. **THE HEALTH TRIAD'S QUEUE LIMB READS THE WRONG WAY** — 301 Deferred + 101 Icebox
+  here against 292 + 84 on 2026-09-05 — so (A)+(B)+(C), nine entries over three gate widenings, is
+  the largest lever the pool offers on it.
   **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
   first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
   a read of four gate sources — the re-derivation the survey record exists to prevent.
