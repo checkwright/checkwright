@@ -779,6 +779,24 @@ or a closed ruling has mooted; joining units under the grounds above is work on 
 triage. Discharge event: the oracle's owed count reads zero, at which point the port-cut-first
 clause is spent and this paragraph is deleted; the composition test is the kit's and stays.
 
+**`citation-liveness-family-convergence` is carved out of the machinery-class icebox-by-default bar
+in the paragraph above — ruled 2026-09-08 by the operator, answered directly in a lead session and
+relayed by the lead.** The bar stands for the class; this one member leaves it.
+**What the carve-out buys is admissibility at a future scope and nothing more, and reading it as an
+admission is reading past its own limit.** The operator answered that same boundary's unit-set
+question separately and did not admit this family to that window. So the carve-out removes a
+standing bar; it composes no iteration and outranks no composition test.
+**It is a carve-out from the bar rather than a fourth joining ground**, and the distinction is
+load-bearing: the lead's 2026-09-08 reading that the family meets none of the three grounds was put
+to the operator and not overruled, so a scope still has to find the entry a ground on the day it
+proposes it. Minting a fourth would have made every machinery-class entry arguable, which is the
+outcome the 2026-08-30 discriminator exists to prevent.
+**The grounds are the entry's own and are not restated here** — it carries the bought survey, its
+four gate touch points, its measured inbound sum and its cost field, and a copy here would be a
+second reading of one fact aging on its own clock.
+discharge: citation-liveness-family-carve-out grep -L citation-liveness-family-convergence TASK-QUEUE.md
+ruling: citation-liveness-family-carve-out
+
 **The whole-window clause describes what fills an iteration composed AROUND a cut; scheduling an
 own-iteration leg as the iteration is what that phrase names — ruled 2026-09-07 by the operator,
 through the AskUserQuestion channel in a lead session and relayed by the lead.** The clause above
