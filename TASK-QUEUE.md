@@ -8212,7 +8212,7 @@
   498 fall-throughs; head `python3 -` heredocs at 61x, `cat >>` second at 24x — down from 50x, so
   the earlier GROWING read tracked the command word, not the class. A THIRD word takes the head
   across four samples while the SHAPE never moves: partitioning by shape is what the samples buy.
-  recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03
+  recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03 2026-09-08
   **THIRD MEASUREMENT, 2026-09-03, ANSWERED by the fourth and kept only for what it adds:** a gap
   bullet re-derived the finding without finding this entry, naming the first DISTINCT sibling and
   missing the owner; its one novel half, a bare-command journal-append affordance, is the SECOND
@@ -8226,8 +8226,8 @@
   sub-case** — ten `GATE_SDK_VERBOSE=1` calls read as a missing-`env`-word steer were all piped into
   `grep`, so the prefix changes nothing — and moved the ungrantable rows from tail to head.
   Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close; promoted 2026-08-27 by the
-  next scope. Also ruled on: lead 2026-09-04 (own-authority). Fifth re-derivation drained here
-  2026-09-06 at scope — discarded as a ranking finding, its instrument half kept above.
+  next scope. Also ruled on: lead 2026-09-04 (own-authority). Fifth and SIXTH re-derivations
+  drained at scope 2026-09-06 and 2026-09-08, each discarded, the instrument half kept above.
 
 - **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — the remedy
   `artifact-digest-mismatch-remedy-inert` shipped — `init` rewriting a gate binary whose bytes no
