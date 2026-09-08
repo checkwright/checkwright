@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+supported-platform-roster-widening gates sha256=0e17183db0daadd66676e54d086535de1450d9af1835443877a9484f012a6ee2 pass=111 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening canon_kit sha256=e0780e41e810cbac5bb0be8cbace64fd320c84899e0272c315453780c9dd6455 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening guard_kit sha256=8745aafc1908d64352c326c2e02750ea926728f29f9e0eb3ef0e3a036d029497 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening guard_tests sha256=ec9e4732f5a48d8f828776b25ea5eb17fb9089d4efcea531f3a0ef5a625e3965 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening demo sha256=bcc61086438f9b4a5c6903f7558d1d3062fb3c53621811ab2d026307279c7d1f pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening installer_smoke sha256=d7e2817b98da21fca5d474efd039154fefb712b411892d95bb1d1ffdae902854 pass=13 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening consumer_smoke sha256=283e269f0e8909d2dd588d25c8b58db1da079ce4817a52a2aa991c24dc495116 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening upgrade sha256=cb54b5382309ee092280b729789e82d30d1716f5471314cada2891629bb6d467 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening agents_md_smoke sha256=c034b7d96f03f4fbff79a1e53e0b908ef3689d1e06c4727fde1b21ede00e17e0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening index_tests sha256=9e9e77093cb0e99295e11b076057098221a0d5837e32559f90936cce747bc153 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+supported-platform-roster-widening native_crate sha256=96a4acfcd14d309635ba4ab9413d0a02e21b2e282cc80b9658cdb5877b3b37e9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
