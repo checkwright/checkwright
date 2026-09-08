@@ -1014,13 +1014,14 @@ jobs:
 
       # The suite itself, under one steering that is **measurement scaffolding and
       # not a fix**, exactly as the Windows sibling's is. It is a precondition
-      # rather than a preference: `native/targets.list` carries one line,
-      # `x86_64-unknown-linux-gnu`, and gate-sdk/SPEC.md §Consumer payload rules
-      # that a consumer smoke building its artifact from the host it runs on
-      # cannot satisfy a roster naming a platform that host is not. An unsteered
-      # smoke here therefore fails on the roster before it reaches anything this
-      # leg is measuring — a failure that looks exactly like the platform finding
-      # this leg exists to collect.
+      # rather than a preference: `native/targets.list` names platforms this host
+      # is not — the condition stated rather than counted, so it does not have to
+      # be re-read every time the roster widens — and gate-sdk/SPEC.md §Consumer
+      # payload rules that a consumer smoke building its artifact from the host it
+      # runs on cannot satisfy a roster naming a platform that host is not. An
+      # unsteered smoke here therefore fails on the roster before it reaches
+      # anything this leg is measuring — a failure that looks exactly like the
+      # platform finding this leg exists to collect.
       #
       # **A zero here licenses NO line in `native/targets.list`**, and the clause
       # is quoted here rather than left in the SPEC to be found. §Consumer payload
