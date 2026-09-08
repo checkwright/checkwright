@@ -12,57 +12,6 @@
 
 ## New Features
 
-- **gate-binary-roster-covers-supported-platforms** [spec: SPEC-platform-evidence.md]
-  — `native/targets.list` carries ONE triple against a documented supported set of Linux and
-  macOS, the widening is owned by a retired entry, and fifteen of the sixteen files the port
-  oracle calls `owed` chain to this one precondition.
-  **THE JOIN BOUND IS DISCHARGED BY A RELEASE-SHAPED PRODUCER — ruled by the OPERATOR 2026-09-07,
-  through the lead's question relay in a lead session and lead-relayed.** A `native-artifacts`
-  matrix job in `gates.yml` mirrors `publish.yml`'s build leg and uploads the binary with its
-  `.sha256` sidecar; the platform smoke consumes that upload instead of building from the host it
-  runs on. `gates.yml`:790-801 **stands unamended** — its verdict is untouched, and what licenses a
-  line is a NEW predicate naming two jobs rather than a reinterpretation of that paragraph.
-  **THE ALTERNATIVE READING WAS PUT AND REFUSED, grounds recorded so it is not re-argued.** The
-  textual case for joining on the existing binding macOS green is real — the join bound at
-  `gate-sdk/SPEC.md`:7580-7586 carries no "released" qualifier and the stand-in clause at
-  :7638-7646 sits inside the pack/publish passage — and was refused anyway, because that paragraph
-  was authored one day before the reading it pre-refuses. THE TEXT IS NOT WHAT LOST; THE REVERSAL
-  IS. A later session finding the textual case persuasive is reading a settled question.
-  **THE TARGET SET IS NARROWED, correcting a false premise — `lead, own-authority` 2026-09-07.**
-  Asserted joined: `x86_64-unknown-linux-gnu` alone. Owed with named preconditions:
-  `aarch64-apple-darwin` and `x86_64-apple-darwin` (the latter needing its own Intel leg, since
-  `macos-latest` is arm64), and `x86_64-pc-windows-msvc`, whose precondition is
-  `docs/install.md` §Requirements documenting native Windows as supported — WHICH IT DOES NOT.
-  This entry's own claim that shipping the PowerShell half made native Windows supported is FALSE
-  at HEAD and is contradicted by that half's own amendment (`bd633f51`): "This amendment ships the
-  bootstrap, not the platform claim."
-  **THE ROSTER LINE IS NOT ASSERTED BY THE AMENDMENT, and the arithmetic is stated rather than
-  left to be rediscovered.** The licence is a green that must PRECEDE the write, so the first
-  watched push buys it (deltas 1-6) and the line can ride the second — the whole budget with no
-  slack. A red on the first spends the second re-buying it, in which case this entry's terminal
-  move is a DEMOTION rather than a Done, its precondition narrowed to the observed green. Delta 4's
-  default self-steering is what makes a second push cheap enough to attempt at all: without it the
-  roster line would have to steer the binding Linux leg in the same unwatched write that widens
-  the roster.
-  **Seven deltas, work-classed inline in the amendment:** a `platforms:begin` marker-block platform
-  declaration on the install page (the surface that makes §Consumer payload's documentation bound
-  mechanizable); `native/runners.list` with one map and two readers; the `native-artifacts`
-  producer; `INSTALLER_SMOKE_ARTIFACTS_DIR` plus default host self-steering, which RULES steering
-  and REFUSES the cross-build on `native/targets.list`:21-23's own grounds; the macOS leg
-  consuming the upload; the roster header discharging the retired owner; and the roster write
-  specified mechanically so it needs no second design turn.
-  **THREE discharge sites, not four** — `installer/README.md`:611-612, `native/targets.list`:31 and
-  :51-52. This entry's claimed fourth at `installer/README.md`:442 and further one at :530 do not
-  survive the file, which carries exactly one occurrence of the retired slug. Verified by content
-  at spec 2026-09-08.
-  **Cost while deferred is unchanged and now dated:** the port's completion predicate cannot
-  approach zero by any cut — `--emit port-blockers --tree` reads 16 owed at this stage, oracle-run
-  not restated — every macOS adopter silently loses more of the battery each iteration a
-  born-native gate lands, and three governed surfaces point at a retired entry as the owner of
-  live work.
-  Admitted as the iteration's lead unit `lead, own-authority` 2026-09-07; promoted at spec
-  2026-09-08 by authoring the amendment, which is the same act.
-
 ## Technical Debt
 
 ## Deferred
@@ -579,6 +528,54 @@
   half met — the bootstrap runs on native Windows, no install completes there.
   Filed 2026-08-03 by spec; re-scoped 08-24; fork 1 merged and demoted 08-25; source blockers
   re-scoped out 08-26; PowerShell half merged and demoted 09-07 — all by operator ruling.
+
+- **gate-binary-roster-covers-supported-platforms** [design-pending] — `native/targets.list` still
+  carries ONE triple, `x86_64-unknown-linux-gnu`, and fifteen of the sixteen files the port oracle
+  calls `owed` chain to this one precondition. The evidence machinery landed; the roster line did
+  not, and the reason is an observation rather than an open design.
+  **DEMOTED ON THE OBSERVATION — `lead, own-authority` 2026-09-08**, executing the operator ruling
+  below rather than settling anything it left open. `SPEC-platform-evidence.md`'s seven deltas all
+  landed in `supported-platform-roster-widening` and the amendment merged, so the entry outlives it
+  (canon-kit/SPEC.md §Merging an amendment). What did not land is the roster line, which is
+  licensed by a run and never by a plan.
+  **PUSH NOW, DISPOSE ON THE OBSERVATION — ruled by the OPERATOR 2026-09-08, through the lead's
+  question relay in a lead session and lead-relayed.** `check-stage-entry` refused `validate` while
+  this entry stood active, and the entry could not be disposed without a green: a circularity
+  neither a `--no-verify` stamp (barred, lifecycle-kit/SPEC.md §The state machine) nor close's
+  drain (refused, `check-stage-entry` assertion B's drain-successor backstop) can break.
+  **WHAT THE RUN SHOWED — `gates` run `34200226768` at `fcaf3b74`, the first watched push, read
+  from the legs' logs and not from the run's checkmark.** Both `native-artifacts` darwin legs died
+  at their first executed line, before any compile: `gate-sdk/lib/gate.sh: line 43: conditional
+  binary operator expected`. That line is `[[ -v GATE_SDK_REGISTRY_DOC ]]`, a bash >= 4.2 unary,
+  and the step ran on macOS's stock `/bin/bash`. The producer job in
+  `.github/workflows/gates.yml` declares `shell: bash` with NO GNU-bash bootstrap, where its
+  sibling `install-smoke-macos` installs `bash coreutils gawk shellcheck` and PATH-orders gnubin —
+  the same run measured `BASH_VERSION=5.3.15` there. So the producer runs below the bash floor
+  `docs/install.md` §Requirements itself declares, the first of the two bounds is unmet for both
+  darwin triples, and NO target joined.
+  **A HELD LEG'S FAILURE REDDENED A BINDING ONE, which is worth more than the typo above.**
+  `install-smoke-macos` is binding and needs the producer, whose darwin legs are held
+  (`continue-on-error`). Its normalize step exits 1 when the host's artifact is absent, so a held
+  leg's failure fails the workflow — and that leg also lost the adopter-path measurement it used
+  to buy from a host build. Whether it should degrade or stay binding is an envelope question this
+  entry does not settle.
+  **PRECONDITION, narrowed to exactly what is owed.** `aarch64-apple-darwin` and
+  `x86_64-apple-darwin`: the producer job bootstraps GNU bash on its macOS runners, and one run
+  then carries both bounds of the predicate `native/targets.list`'s own header states verbatim —
+  the Intel triple on its own Intel leg. `x86_64-pc-windows-msvc`: untouched by this run and
+  unchanged — `docs/install.md` §Requirements does not document native Windows as supported, so
+  its FIRST bound fails independently of any leg.
+  **The refused alternative reading is not re-argued here** — its grounds are the rewritten header
+  of `native/targets.list`, and a later session finding the textual case persuasive is reading a
+  settled question.
+  **Cost while deferred**, dated 2026-09-08 and one item larger than it was: the port's completion
+  predicate cannot approach zero by any cut (`--emit port-blockers --tree` read 16 owed at spec,
+  oracle-run not restated); every macOS adopter silently loses more of the battery each iteration a
+  born-native gate lands; and master's `gates` workflow is RED at `fcaf3b74` until the bootstrap
+  lands, a cost every later push pays rather than this entry alone.
+  Filed 2026-09-07 by spec; admitted as the lead unit 09-07; amendment merged and entry demoted
+  2026-09-08 by build on the run above rather than on a forced join — a roster line is a public
+  support commitment, and writing one this run does not carry is worse than the unit not landing.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
