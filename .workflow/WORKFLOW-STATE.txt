@@ -4,4 +4,4 @@
 
 ---
 
-— scope aa9709af 2026-09-08 01c16919
+intel-macos-roster-join scope aa9709af 2026-09-08 01c16919
