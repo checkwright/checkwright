@@ -100,30 +100,35 @@ jobs:
       # `pwsh`. `shell: bash` is what keeps the body below running as written,
       # and it selects Git-for-Windows bash there, as the Windows leg of
       # .github/workflows/gates.yml already does.
+      #
+      # **The day a macOS target was declared arrived before that Windows day,
+      # and this leg had nothing ready for it.** The paragraph above reasoned
+      # about the shell a future runner would pick and not about the userland it
+      # would ship: a `macos-latest` runner's `bash` is 3.2, `gate-sdk/lib/gate.sh`
+      # sources with a bash 4.2 unary in its knob defaults, and stock macOS has
+      # `shasum` and no `sha256sum`. So this leg would have died on its first
+      # executed line, having compiled nothing — a failure reachable only from a
+      # tag, which is the worst place to find one. The floor step below is what
+      # closes it, and it is the CI producer's own step body rather than a copy.
+      - name: install the bash floor and GNU userland this leg's path needs
+        if: runner.os == 'macOS'
+        shell: bash
+        run: bash scripts/ci-macos-floor.sh
+
+      # The body is `scripts/ci-build-artifact.sh`, and
+      # .github/workflows/gates.yml's `native-artifacts` producer calls the same
+      # script with the same two arguments. That producer exists to measure what
+      # a release would publish, so the two legs sharing one body is what makes
+      # its claim structural instead of a promise two copies had to keep — and
+      # they had already stopped keeping it, which is what the floor step above
+      # records. The digest the script emits is this artifact's only computation
+      # anywhere in the release; every later hop moves the file, so a published
+      # digest and an installed digest cannot diverge.
       - name: build the gate binary for ${{ matrix.target }}
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
-        run: |
-          set -euo pipefail
-          source gate-sdk/lib/gate.sh
-          crate="$(gate_native_crate)"
-          binary="$(gate_native_bin)"
-          binary="${binary##*/}"
-
-          rustup target add "$TARGET"
-          bash gate-sdk/bin/build-native.sh --target "$TARGET"
-
-          # The one digest computation for this artifact anywhere in the release.
-          # Every later hop moves this file; nothing re-derives its contents, so
-          # the digest the Release publishes and the digest the installer verifies
-          # against cannot diverge. The bare filename inside it is what makes
-          # `sha256sum -c` work wherever a reader puts the two files.
-          out="$RUNNER_TEMP/artifact/$TARGET"
-          mkdir -p "$out"
-          cp "$crate/target/$TARGET/release/$binary" "$out/$binary"
-          ( cd "$out" && sha256sum "$binary" > "$binary.sha256" )
-          echo "built $TARGET: $(cat "$out/$binary.sha256")"
+        run: bash scripts/ci-build-artifact.sh "$TARGET" "$RUNNER_TEMP/artifact"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

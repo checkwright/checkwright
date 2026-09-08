@@ -651,6 +651,16 @@ jobs:
   # is what a release would publish; a job that built the binary a different way
   # would measure a different artifact and discharge nothing.
   #
+  # **That ground is true by construction, and the surface that makes it so is
+  # named here rather than left to inspection.** `scripts/ci-build-artifact.sh`
+  # is the artifact body and `scripts/ci-macos-floor.sh` the runner floor; both
+  # workflows call both. Before they were scripts the claim above was a promise
+  # two copies had to keep, and they had already stopped keeping it: the release
+  # leg carried no macOS floor at all and hashed with a bare `sha256sum`, which
+  # stock macOS does not ship. Read a second copy of either body here as the
+  # defect, not as a convenience — it is how a release comes to publish an
+  # artifact CI never measured.
+  #
   # **The matrix is the DECLARATION, not the roster.** It derives from
   # docs/install.md §Requirements' `platforms:begin` block — joined and held
   # platforms alike. Deriving it from native/targets.list would build only what is
@@ -761,67 +771,40 @@ jobs:
       # deliberately absent: nothing this job runs invokes it (both files carry
       # `# shellcheck` directives and no call), and the sibling installs it
       # because `init` refuses without it on an install path this job never
-      # walks. Adding it here would state a claim this job does not make.
+      # walks. Adding it here would state a claim this job does not make. The
+      # package set now lives in `scripts/ci-macos-floor.sh`, shared with
+      # publish.yml's build leg, which owes the same prerequisite for the same
+      # reason and had none — and the install-smoke leg's step is deliberately
+      # NOT folded in, because those two package sets answer to different
+      # surfaces and a merge would make one of them stop answering.
       #
       # Measured on run 34200226768 rather than predicted, because the cold-brew
       # cost is the one this step could plausibly break: the sibling's install of
-      # four formulae — one more than this step's three — took **7 seconds** on
+      # four formulae — one more than the floor script's set — took **7 seconds** on
       # `macos-latest`, against this job's 30-minute ceiling and a 43-second
       # crate build. The ceiling is left alone on that measurement.
       - name: install the bash floor and GNU userland this job's path needs
         if: runner.os == 'macOS'
         shell: bash
-        run: |
-          set -euo pipefail
-          brew install bash coreutils gawk
-          prefix="$(brew --prefix)"
-          # gnubin carries the members under their unprefixed names, ahead of
-          # /usr/bin, which is what PATH-ordering means for a path calling
-          # `sort` and `awk` rather than `gsort` and `gawk`.
-          {
-            echo "$prefix/opt/coreutils/libexec/gnubin"
-            echo "$prefix/opt/gawk/libexec/gnubin"
-            echo "$prefix/bin"
-          } >> "$GITHUB_PATH"
+        run: bash scripts/ci-macos-floor.sh
 
       # `shell: bash` for the reason publish.yml's build leg states: this job's
       # `runs-on` is an expression, so no tree-local reader can state its runner,
       # and the day a Windows target is declared the default `run:` shell there is
       # pwsh. Stays a bash `run:` on the runner's preinstalled cargo (no
       # setup-rust action) to keep this workflow's checkout+bash tamper floor.
+      #
+      # The body is `scripts/ci-build-artifact.sh` and publish.yml's build leg
+      # calls the same script with the same two arguments, which is what makes
+      # this job's header claim structural. It takes the target and an output
+      # directory rather than reading `RUNNER_TEMP`, so the body a tag will run
+      # is runnable — and is run — on a developer machine before the push. The
+      # digest it emits is this artifact's only computation anywhere in the run.
       - name: build the gate binary for ${{ matrix.target }}
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
-        run: |
-          set -euo pipefail
-          source gate-sdk/lib/gate.sh
-          crate="$(gate_native_crate)"
-          binary="$(gate_native_bin)"
-          binary="${binary##*/}"
-
-          rustup target add "$TARGET"
-          bash gate-sdk/bin/build-native.sh --target "$TARGET"
-
-          # The one digest computation for this artifact anywhere in this run:
-          # every later hop moves the file, so the digest the smoke verifies
-          # against cannot diverge from the one produced beside the bytes. The
-          # hasher is resolved rather than named, and which arm runs here is
-          # settled by the bootstrap step above: it PATH-orders coreutils, so
-          # `sha256sum` resolves on every leg and the `shasum` arm is the
-          # fallback for a host that reaches this step without it. Both spell the
-          # same `<hex>  <bare name>` sidecar that `sha256sum -c` reads wherever a
-          # later reader puts the two files, so the arm taken changes nothing
-          # downstream — which is why the bootstrap is free to change it.
-          out="$RUNNER_TEMP/artifact/$TARGET"
-          mkdir -p "$out"
-          cp "$crate/target/$TARGET/release/$binary" "$out/$binary"
-          if command -v sha256sum >/dev/null 2>&1; then
-            ( cd "$out" && sha256sum "$binary" > "$binary.sha256" )
-          else
-            ( cd "$out" && shasum -a 256 "$binary" > "$binary.sha256" )
-          fi
-          echo "built $TARGET: $(cat "$out/$binary.sha256")"
+        run: bash scripts/ci-build-artifact.sh "$TARGET" "$RUNNER_TEMP/artifact"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

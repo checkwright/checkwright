@@ -7670,7 +7670,18 @@ workflow that holds it there), and it is **not** on the roster.
 **Widening is cheap on the publish path and not free elsewhere**, and both
 halves are stated because the cheap one alone reads as the whole cost and is
 not. Cheap: the build matrix is roster-derived, so a new platform is one roster
-line plus one runner mapping, never a workflow rewrite. Not free: a consumer
+line plus one runner mapping, never a workflow rewrite. **Cheap is not free even
+there**, and the exception is structural rather than incidental: a roster-derived
+matrix widens the *set of hosts* the build body runs on, and a build body only
+runs unchanged on a host whose image already meets the declared floor. The first
+platform whose image does not — an interpreter below the floor, a userland
+missing a program the body calls by its GNU name — costs a bootstrap step on the
+publish path, and that step is reachable **only from a tag**. Which is why the
+release leg and the release-shaped producer the join bound below asks for
+**share one build body and one bootstrap** rather than each carrying a copy: two
+copies make "what CI exercises is what a release would publish" a promise both
+must keep, and the copy nothing exercises until a tag is the one that stops
+keeping it. Not free: a consumer
 smoke that builds its artifact from the host it runs on cannot satisfy a roster
 naming a platform that host is not, so the second roster line blocks such a
 smoke until it is steered at a narrowed roster through
