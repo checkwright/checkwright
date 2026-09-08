@@ -18,6 +18,183 @@
 
 
 
+- **ruling-record-prose-staleness-unreachable** [design-pending] — the ruling-staleness probe
+  reaches backtick-named slugs and declared discharge conditions, so TRAJECTORY.md's undated prose
+  rulings go unchecked, and the manual re-read that would cover them has now been deferred by two
+  consecutive closes with the deferral recorded nowhere a stage's intake reads.
+  **The deferral was real, costed, and invisible.** The close of `macos-roster-join` deferred a full
+  manual re-read of TRAJECTORY.md's closed-rulings section with a named cost, recording it only
+  inside `.workflow/audit-roster.txt`'s own row prose; the next close's audit sweep re-derived the
+  same deferral and did not perform the read either. Verified 2026-09-08 at close: a grep over
+  TASK-QUEUE.md and the gap inbox found no carrier. Filing it is what discharges the
+  flagged-and-skipped shape the Gap-disposition doctrine forbids — a deferred gap is costed AND
+  filed.
+  **What the probe reaches and what it does not** — lifecycle-kit/SPEC.md §The ruling-staleness
+  probe resolves declared `ruling:` names and runs declared `discharge:` oracles, and existing
+  rulings are deliberately not back-filled, so a ruling carrying neither declaration is a hole the
+  probe reports rather than inherits. Most of the section predates both declarations.
+  **Why `[design-pending]`:** the candidate shapes differ in kind and none is costed — back-filling
+  declarations onto the aged rulings; a sampling protocol reading a bounded slice per close; or
+  accepting the hole and retiring the audit row that keeps promising a read nobody performs.
+  **Cost while deferred:** every close either buys the full read or defers it again, and twice now
+  it has deferred; a spent ruling left standing misdirects the next session that meets it, which is
+  the harm the completion-time contract exists to prevent. Filed 2026-09-08 to the gap inbox by the
+  close of `intel-macos-roster-join`, which no stage of that iteration could drain; promoted
+  2026-09-09 at this iteration's scope intake, so the record is late and says so.
+
+- **close-surface-reclaim-uncoupled-from-read** [design-pending] — the close-surface roster
+  declares a `reclaim=` per capture-tier row and `check-close-surfaces` asserts the reclaim EXISTS,
+  but nothing observes that the row was read before the reclaim fired.
+  **The instance is this project's own, self-caught and self-reported 2026-09-08.** That close read
+  the first 3 of 222 lines of `.workflow/subagent-stop-liveness.log` — all `live=no verdict=green
+  decision=allow` — and then executed the row's reclaim, `: > .workflow/subagent-stop-liveness.log`.
+  A single `live=yes` or `decision=deny` row in the unread 219 was the whole of the signal that
+  surface carries, and it was never looked for. The file is gitignored, so the truncation is
+  unrecoverable and that iteration's liveness evidence is gone unaudited. **That half is a loss and
+  not work** — nothing recovers it, and it is recorded here only so no later session hunts for it.
+  **The general half is this entry.** A reclaim is a destructive act licensed by a read that no
+  surface records, which is exactly the subject of the `close-surface-actually-read` audit row and
+  exactly why that row is un-gateable today and carries a PARTIAL stamp rather than a clean one.
+  **A cheap half is decidable, which is why this is filed rather than iceboxed:** a reclaim that
+  truncates a surface the session never opened is observable from the session's own tool record,
+  which drift-kit's overhead meter already parses. Whether that is the right oracle is unruled, and
+  the false-positive budget of a sampled-versus-read distinction is unmeasured.
+  **Cost while deferred:** every close may destroy the evidence it was supposed to read, and the
+  loss is silent by construction — the surface is empty afterwards either way. Filed 2026-09-08 to
+  the gap inbox by the close of `intel-macos-roster-join`, which no stage of that iteration could
+  drain; promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
+
+- **smoke-harness-mapfile-inherits-host-line-terminator** [design-pending] — the smoke harness's
+  second multi-line reader of the manifest `jq` stream never got the terminator handling round 20's
+  repair gave the first, and it is what reddens the Windows leg today.
+  **Measured, not predicted — round 21, run 34267324532, job 102199861062.** The round-20 read
+  repair WORKS: 492 of 493 carriage returns stripped, mismatch 0, the manifest hash class closing
+  after 493 then 492 then 0. The leg's red moved FORWARD to the next unrepaired reader of the same
+  stream, `installer/consumer-smoke/run-smoke.sh`:521's `mapfile -t lock_kits < <(jq -r '.kits[]'
+  "$LOCK")`, whose element carries the CR and fails the kits-roster assertion at :524 as "manifest
+  kits (gate-sdk CR) differ from the profile roster (gate-sdk)".
+  **DISTINCT from `installer-prior-files-inherits-host-line-terminator`**, which owns the
+  INSTALLER's four reader sites in `init.sh`, `uninstall.sh` and `diff.sh`: this is the SMOKE
+  HARNESS's own second copy, on a different builtin, and unlike that entry it is observed rather
+  than latent. Distinct too from `smoke-report-array-carrier-mangling-unexplained`, whose subject is
+  :515's report array and the two candidate mechanisms no finished run discriminates.
+  **The discriminator twenty rounds lacked, worth carrying:** a multi-line capture through a process
+  substitution carries the byte where a single-value capture never can, which establishes COVERAGE
+  without naming the producer.
+  **THE WORK:** every multi-line reader of that stream takes the repaired loop's terminator
+  handling, with its own CRLF test coverage the way the round-20 repair had; :521 is the one
+  blocking today. No host this repo can reach reproduces the byte, which is why the read was close's
+  to buy and the repair is not. `install-smoke-windows` is `continue-on-error: true`
+  (`.github/workflows/gates.yml` :213), so this reddens no master — and that leg's first green is,
+  by its own comment, the roster's join condition for a native Windows target.
+  **Cost while deferred:** the Windows leg cannot go green, so `native/targets.list` cannot join a
+  native Windows target and the pivot's OS-reach objective stays half met. Filed 2026-09-08 to the
+  gap inbox by the close of `intel-macos-roster-join`, which no stage of that iteration could drain;
+  promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
+
+- **binding-intel-leg-failed-one-run-in-two** [design-pending] — a leg this project made binding
+  failed one of its first two runs, non-deterministically, in a way no finished run can diagnose;
+  master is green and nothing needs reverting.
+  **Read the resolution first.** Master went red at `adb7379f` and GREEN again at `7329b319`, the
+  very next commit, with `install-smoke-macos-intel` PASSING the second time on the same code path
+  and the same three declared targets. What is left is the leg, not a fire.
+  **What failed.** In run 34267324532 (job 102200720560), the upgrade arm's pack step:
+  `scripts/pack-installer.sh` exited non-zero in 1.6 seconds having printed NOTHING —
+  `run-smoke.sh`:877 echoes `PACK_OUT` to stderr and `PACK_OUT` was empty. Every other arm on that
+  leg passed (main, toolchain-free, jq-less), and the SIBLING arm64 leg ran the same upgrade arm on
+  the same commit with the same three declared targets and finished clean.
+  **No cause is asserted.** Regression, a host condition of the `macos-15-intel` runner, and a
+  transient are all open. The leg was green on the immediately prior run 34245261556 at `held=true`,
+  so the failure itself is new; the roster count cannot be the cause, since both macOS legs carry
+  the identical count and only one failed.
+  **UNTESTED HYPOTHESIS with a cheap witness, offered as a hypothesis and not a finding:** the Intel
+  runner is markedly slower and reaches the upgrade arm 30 minutes in with several full payloads
+  already in SCRATCH, so scratch exhaustion would produce exactly a fast silent non-zero; a `df` and
+  a `du` in that leg before the upgrade pack would settle it for nothing.
+  **Ruled 2026-09-08 by the lead, own-authority: CARRY it, do not unbind** — unbinding would reverse
+  this iteration's own delivered predicate on a single sample, and the sibling-leg control already
+  excludes the roster count as the cause.
+  **DISTINCT in subject from `pack-step-dirty-tree-predicate-unscoped`**, whose subject is the pack
+  step's silence; this entry's is a red binding leg and what to do about it. That silence is what
+  made the red unreadable from a finished run, and its firing here is the recurrence that entry now
+  carries.
+  **Cost while deferred:** a re-run is the only diagnosis available, and the next firing costs
+  another one. Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join`, which no
+  stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the
+  record is late and says so.
+
+- **iceboxed-recurrence-judgment-unrecordable** [design-pending] — a judged recurrence against an
+  iceboxed entry cannot be stamped at the moment it is judged and cannot be stamped later either, so
+  the one tier where the stamp carries most information is the one tier that forecloses it.
+  **Two rules compose to the loss, neither defective alone.** queue-kit/SPEC.md §The icebox tier is
+  one line each and `check-queue-wrap` holds every line to 100 columns, so an iceboxed entry has no
+  slot for a `recurrence: <slug> <date>` declaration. lifecycle-kit/SPEC.md rules that stamp
+  SANCTIONED AND OBLIGED for any session that judges a recurrence, attaching the obligation to the
+  judgment rather than to the channel it arrived through, and it forecloses backfilling: no later
+  session may add a date an earlier session declined to stamp.
+  **The instance is not hypothetical.** At the 2026-09-08 close the pack step's silent non-zero
+  fired on a binding leg and made a red master unreadable from a finished run — a recurrence of
+  `pack-step-dirty-tree-predicate-unscoped`, then a one-line iceboxed entry. The judgment had to be
+  written into a gap-inbox bullet's prose instead, which is the discharge shape the spec gives a
+  LEAD who may not write the queue at all, borrowed by a session that COULD write it and still had
+  nowhere to put it.
+  **The counter worth pricing before designing:** iceboxing means dormant, and an entry recurring
+  often enough to stamp was arguably mis-iceboxed. It does not dispose of this — the 2026-09-08
+  instance was correctly iceboxed and recurred anyway.
+  **Three candidate shapes, none ruled and none costed:** a recurrence sidecar keyed by slug outside
+  the tier's line budget; a second line permitted on an iceboxed entry for this declaration alone;
+  or ruling that a judged recurrence IS the eviction trigger, which lands the stamp in Deferred
+  where there is room. This scope intake took the third route on the instance above, which is one
+  exercise of it and not a ruling on the class.
+  **Same family as `icebox-standing-ineligibility-unrecordable`**, the eviction worklist having no
+  slot for a standing not-eligible ruling, and as `icebox-eviction-line-budget-squeeze`, the
+  one-liner's line budget at the moment of writing an eviction. All three are the icebox tier's
+  one-line grammar meeting a declaration it has no room for.
+  **Cost while deferred:** every recurrence judged against an iceboxed entry is lost at the moment
+  it is judged, permanently, and the loss is invisible to every later reader.
+  Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join` on the lead's
+  instruction, having been held back one turn while a question it sat on was still open; promoted
+  2026-09-09 at scope intake, so the record is late and says so.
+
+- **pack-step-dirty-tree-predicate-unscoped** [design-pending] — `scripts/pack-installer.sh`
+  refuses on a whole-tree dirty check, so a dirty path the payload never reads aborts the pack and
+  with it validate's battery.
+  **RETURNED FROM THE ICEBOX 2026-09-09 at scope, on the recurrence judged at the 2026-09-08 close**
+  — the round trip queue-kit/SPEC.md §The icebox tier conserves, its body restored verbatim from the
+  evicting commit `0b6545d7`. The judging close had nowhere to stamp the date, the tier being one
+  line each; this eviction is what gives the judgment a home, and
+  `iceboxed-recurrence-judgment-unrecordable` owns the general defect that made the detour
+  necessary.
+  **The recurrence's grounds, and they are not a citation.** The silence FIRED: at the 2026-09-08
+  close the pack step exited non-zero in 1.6 seconds having printed nothing, on the newly binding
+  `install-smoke-macos-intel` leg, and that is what made a red master unreadable from a finished run
+  and forced a re-run to learn anything. That is the cost this entry predicted, arriving.
+  **Measured, not inferred.** At the filing iteration's validate, `scripts/pack-installer.sh:71`
+  gated on `git status --porcelain` with no path scoping; the sole dirty path was one uncommitted
+  `.workflow/gap-inbox.md` bullet — the exact artifact CLAUDE.md tells every mid-iteration session
+  to file — and `run-validate.sh` aborted at exit 1 before writing
+  `.workflow/validate-evidence.txt`, after 16 of 22 suites had already run clean.
+  **The predicate is wider than its own stated reason.** Line 70's `spec:` comment grounds the
+  refusal in the payload's commit stamp — a dirty tree would stamp a commit that does not describe
+  the payload. The payload is assembled out of tree from this repo's kit roots and writes nothing
+  in-tree, so a dirty path outside that set cannot make the stamp wrong.
+  **DISTINCT from `gap-inbox-commit-ownership`**, and not a re-filing of it: that entry owns the
+  open question of who *commits* a gap-inbox bullet, while this is a second defect in a different
+  file whose narrow fix lands without that question being answered at all.
+  **Why `[design-pending]`:** three candidate shapes, and choosing is design rather than repair —
+  scope the pack step's refusal to the paths the payload is assembled from; or rule gap-inbox commit
+  ownership so the file is never dirty across a stage boundary; or state the pre-flight valve as the
+  sanctioned response. Only the first is narrow, and it still needs a governed statement of which
+  paths constitute the payload, because a wrong scoping silently under-refuses on a genuinely dirty
+  one — the failure the refusal exists to prevent.
+  **Cost while deferred — CORRECTED 2026-09-09, the iceboxing read having gone false.** It was filed
+  as "low and loud: one aborted battery per occurrence". The 2026-09-08 firing was neither: the
+  refusal is loud in one place and silent everywhere else, and where it is silent it costs a whole
+  diagnosis and a re-run of a CI leg.
+  recurrence: pack-step-dirty-tree-predicate-unscoped 2026-09-08
+  Filed 2026-09-01 by close's gap drain, promoted from a lead-filed bullet; iceboxed 2026-09-06 at
+  `0b6545d7` under the port-only run; returned 2026-09-09 at scope on the judged recurrence above.
+
 - **installer-prior-files-inherits-host-line-terminator** [design-pending] — the installer's own
   manifest read carries the exposure round 20 measured and repaired in the smoke harness's copy of
   it, across four reader sites, and no leg that is green today reaches any of them.
@@ -10303,7 +10480,6 @@
 - **delta-citation-unresolvable** [design-pending] — A delta number names no openable file.
 - **scratch-grant-backtick-declined** [design-pending] — Rule 17's own clause voids its use case.
 - **walk-entry-model-unstated** [design-pending] — Walk drops symlinks unstated; tree has none.
-- **pack-step-dirty-tree-predicate-unscoped** [design-pending] — Unscoped dirty check aborts a pack.
 - **prune-set-matches-walk-root-ancestors** [design-pending] — A leaf above the root prunes it all.
 - **evidence-baseline-orphan-suite-row** [design-pending] — A row for a retired suite is unread.
 - **port-archaeology-restatement-residue** [design-pending] — Prose narrates deleted shell forms.

@@ -669,6 +669,29 @@ project's reading of its own default, and the provenance seam keeps it here.
 Discharge: with the 2026-08-30 machinery default it qualifies.
 ruling: the machinery-class icebox default over a live trigger
 
+**The same default governs close's OWN captures, not only the bullets it drains — ruled `lead,
+own-authority` 2026-09-08, relayed in-session on a close-stage escalation. It EXTENDS the ruling
+above to a second template clause and decides nothing new.** The close template's *Where close's own
+captures file* clause reads Deferred always; where it and this project's machinery-class
+icebox-by-default appear to disagree, the class default governs, so a close's own machinery-class
+capture takes the icebox disposition.
+**The ground is the paragraph above's, deliberately and not by economy:** CLAUDE.md's class default
+is stated unqualified and scopes to the finding's CLASS rather than to the draining act, so the
+2026-08-30 conjunctive test reads across to this clause exactly as it reads across to the trigger
+clause. **A second and sound ground was offered and is NOT recorded as the ground** — that consumer
+policy overriding a generic kit default is the provenance seam working, which is true on the facts
+and is why no kit change is owed here either. Recorded as *the* ground it would re-expose the flank
+the paragraph above deliberately closed, being a specificity argument in different clothes. Nothing
+is owed in lifecycle-kit: its close template is kit mechanism shipped generic and this repo's
+close-command file is only a binding shim naming it.
+**Why both paragraphs stand rather than one, and it is a finding about this record rather than about
+either session:** the escalating session and the lead each reached this answer without the paragraph
+above being cited. This record is searchable by ruling name and by discharge oracle, and neither
+index reaches *which surface wins when the close template and the class default conflict* — so the
+extension sits beside its sibling, which is the cheapest repair a record with no third index has.
+Discharge: with the 2026-08-30 machinery default, as above.
+ruling: the machinery-class icebox default over close's own captures
+
 **A hotfix's "minimal" is measured against the failure modes the change itself creates, never
 against the smallest diff — ruled `lead, own-authority` 2026-09-07, through the lead's message
 channel at that iteration's build.** The operator-ruled hotfix carve-out admits a fix that is
