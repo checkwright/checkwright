@@ -872,16 +872,20 @@
   that reason; `9ad9538c` records its first CI run on `34142337941` and drops the hold, so
   `.github/workflows/gates.yml`:452-456 carries none today. Read it JOB-KEYED, never off the
   workflow conclusion — the habit the hold was for outlives the hold.
-  **BLOCKED ON THE ROSTER ENTRY, and the block got WIDER by shipping the other half.** The
-  relocation's precondition is that an uncovered platform must still install, against whatever
-  `native/targets.list` carries — cited as the roster and never as a count, the count here having
-  staled on the very next join. A native Windows install path now exists, so the supported
-  set that roster must cover is {Linux, macOS, native Windows} and the blocker inherits a wider
-  target than it had when filed. Known and accepted when the split was ruled. NARROWING ONE took
-  that split on this same ground (`doctrine-kit/SPEC.md`:213-216) and is now SPENT — recorded
-  only so a reader does not re-derive it. That blocker also carries the three
-  precondition-bearing citations of the retired `platform-support-ci-matrix`; the ORDERING
-  citation this half owned was discharged at the merge.
+  **NO LONGER BLOCKED — corrected 2026-09-09 at scope, the block having gone false on 2026-09-08.**
+  The blocker this entry named only in prose is `gate-binary-roster-covers-supported-platforms`,
+  recovered by `git log -S` over this file because no slug was ever written here; it reached Done at
+  `23bcfed1` in the iteration that closed the day before this correction, and it is absent from this
+  file at HEAD. `native/targets.list`'s header has since taken ownership of the widening away from
+  any entry — "an entry is a lifetime that ends; pointing a live precondition at one is what left
+  this file naming `platform-support-ci-matrix` for weeks after that entry retired" — so the
+  precondition now reads off that header rather than off a slug. What survives is a REQUIREMENT on
+  the work, not a block before it: an uncovered platform must still install, against whatever the
+  roster carries — cited as the roster and never as a count, the count having staled on the very
+  next join. The PowerShell half widened it, since a native Windows install path now exists and the
+  supported set the roster must cover is {Linux, macOS, native Windows}; that widening was known and
+  accepted when the split was ruled. NARROWING ONE took the split on this same ground
+  (`doctrine-kit/SPEC.md`:213-216) and is SPENT, recorded only so a reader does not re-derive it.
   **`digest-unverifiable` must become a refusal in the same motion** — step 4 is irreducible and
   a host that cannot hash cannot verify. Vacuous on Windows, so the cost lands on a POSIX host
   carrying neither `sha256sum` nor `shasum`.
