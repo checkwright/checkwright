@@ -14,7 +14,7 @@ and repairs the surfaces that argue from a hold the line ends.
 unit rather than an accident of it. The producer leg, the consumer leg, the runner mapping, the
 release build body and its macOS floor were all bought by the two iterations before this one, so the
 executable half is two file edits and a rebuild. What is left is that roughly a dozen sentences
-across five surfaces are *arguments from a held remainder*, and the remainder goes to zero here.
+across six surfaces are *arguments from a held remainder*, and the remainder goes to zero here.
 
 ## The licence, verified at this stage rather than relayed
 
@@ -179,6 +179,48 @@ the argument along with the hold that motivated it. The sibling `install-smoke-m
 verdict wording is the shape to converge on; the deliberate divergence the comment records was a
 divergence *from a held posture*, and its ground goes with the hold.
 
+### (6) `TRAJECTORY.md`'s weighed-cost figure is de-literalized, without ceasing to be a record
+
+The figure currently tracks the roster by naming its members, so every join owes it a correction —
+this join is the second, which is the recurrence the ruling ends {design-bearing}. **This delta
+exists on an operator ruling and not on this stage's own reading**; §The escalation this stage
+raised, and the ruling that answered it carries the ruling, its authority, and the one premise of
+the escalation that the ruling refuted. Read that section before executing this delta, because the
+refuted premise is the persuasive one.
+
+**The obligation that bounds the wording: the sentence must still say what the ruling was weighed
+against.** De-literalizing a *record* is not the same act as de-literalizing a live claim. The
+complement formulation may not quietly become a statement about today's roster; the 2026-08-14
+weighing is the thing recorded, and it has to survive the edit intact and legible as a past
+weighing.
+
+**And the authority goes in the surface this time.** The prior correction's authority and extent
+live only in `7f8f7a3c`'s commit message, so this amendment had to read a commit to learn that the
+authorization was bounded — captured as knowledge friction at this stage, and **discharged here**:
+the replacement states who ruled, when, through what channel, and to what extent, in
+`TRAJECTORY.md` itself.
+
+**Proposed replacement — Not yet applied.** The paragraph's cost sentence, from "It was weighed at"
+to the end of the paragraph:
+
+> **It was weighed at every macOS adopter, the roster then being one target** — that is the figure
+> the 2026-08-14 decision rested on, and it does not move. What the omission attaches to at any
+> later moment is **that roster's complement**, which narrows as the roster widens: stated as the
+> complement rather than as a fresh count, so this record keeps tracking the weighing instead of
+> owing a correction on every join. The verdict, its grounds and its date stand, the ruling got
+> cheaper than it was costed at rather than weaker, and recording the cost still does the thing it
+> was recorded to do.
+>
+> **This restatement is the `operator`'s, 2026-09-08, asked and answered in a `/lead` session and
+> lead-relayed**, and its extent is the cost sentence's *form* and nothing else — no verdict, no
+> ground, no date. It is recorded here rather than in a commit message so that a reader of this
+> paragraph can see what was authorized without reading history.
+
+**One constraint the build stage must hold that the battery will not catch at authoring time.**
+`TRAJECTORY.md` is in the governed manifest, so `check-manifest-temporal`'s marker set binds this
+passage. The text above is written clear of it deliberately; a build session rewording toward a
+more natural past tense can red the gate on a phrase this draft avoided on purpose.
+
 ## What this join makes binding
 
 Stated as a risk this amendment accepts rather than as a change to notice.
@@ -210,30 +252,26 @@ consumer, and a binding producer failing a binding consumer is that pair working
 coupling exactly as the entry says. The finding is recorded here so the entry's next reader knows
 which half moved, and a change to the entry itself is a queue decision this stage does not take.
 
-## The one edit this amendment does not authorize
+## The escalation this stage raised, and the ruling that answered it
 
-`TRAJECTORY.md`'s 2026-08-14 born-native-default ruling records the cost it was weighed against, and
-that recorded figure currently reads: *with `aarch64-apple-darwin` joined the set is Intel Macs plus
-the hosts the platform declaration does not carry at all.* **Delta 1 falsifies the "Intel Macs"
-half**, leaving only the undeclared hosts.
+This amendment reached the spec stage authorizing no edit to `TRAJECTORY.md` and escalating the
+question instead. **The escalation is answered and delta 6 is the answer**, so nothing here is
+outstanding; the routing is recorded because the delta's shape follows from it.
 
-**The prior correction's authorization was bounded and is spent, and where each half of that fact
-lives matters.** The figure was corrected once already. `TRAJECTORY.md` itself records only the
-*extent* — "Only that figure is corrected — the verdict, its grounds and its date stand". That the
-correction was **operator-authorized, and authorized for that one figure and explicitly for nothing
-else**, is recorded in the landing commit's message and on no governed surface, which is why this
-amendment had to read a commit to learn it (captured as knowledge friction at this stage).
+**The ruling.** `TRAJECTORY.md`'s 2026-08-14 born-native-default ruling's weighed-cost figure is
+**de-literalized** — restated as the roster's complement — **ruled by the `operator`, 2026-09-08,
+asked and answered in a `/lead` session and lead-relayed.**
 
-A bounded authorization is not a standing licence for the figure to track the roster: writing the
-extent into the surface was that correction's own requirement precisely so a later reader could not
-read it as one. So the second correction needs its own routing, and CLAUDE.md sends a change to a
-recorded ruling's grounds to the operator **however plainly the arithmetic has moved** — the
-strength of the arithmetic is the reason the routing exists, not a reason to skip it.
-
-**No delta of this amendment may touch that file.** The finding is escalated at this stage's close.
-Until it is answered, `TRAJECTORY.md`'s recorded figure and the tree disagree, and that is the
-honest state rather than a defect to paper over: a spec states what is true now, a ruling record
-states what was weighed then.
+**One premise this stage argued from was wrong, and the delta is not written on it.** The
+escalation's evidence held that de-literalization was the move already ruled correct for this
+arithmetic, on the strength of `7f8f7a3c` having applied it to `gate-sdk/SPEC.md`'s criterion-5
+bullet. That commit treated the two surfaces differently **on purpose**: the SPEC bullet was
+de-literalized because it carries the arithmetic as a live claim in a governed spec, which a stale
+fact simply makes wrong, while `TRAJECTORY.md` took a bounded *literal* correction because it
+carries the same arithmetic as a **record of what a ruling was weighed against**. So
+de-literalization was declined for this surface rather than ruled correct for it, and the operator
+has now ruled the other way. Delta 6 executes the operator's ruling and takes no support from the
+refuted premise.
 
 ## What is kit mechanism, what is this project's own, and what is config
 
@@ -250,8 +288,10 @@ The seam ruling this stage's exit condition asks for:
   arguments. gate-sdk/SPEC.md already rules that which jobs and which log line spell the pair are
   that project's CI and not kit mechanism, and this amendment adds nothing to a kit that would name
   one.
-- **New consumer config: none.** No delta introduces a `<KIT>_<KNOB>`, and none is warranted: the
-  arm-D conditional is a verdict-line repair inside an existing gate, not a new configurable.
+- **New consumer config: none.** No delta introduces a `<KIT>_<KNOB>`, and none is warranted.
+- **Provenance stays where the seam puts it.** Delta 6 restates a dated operator stamp and a
+  weighed cost inside `TRAJECTORY.md`, which is the surface that owns this project's provenance, and
+  moves none of it toward a kit. A kit SPEC states its rule undated; that split is untouched here.
 - **Private rule content: none crosses.** The private brief was read and holds no unit-specific
   design memory for this join; nothing from it is quoted, paraphrased or cited here.
 
@@ -290,9 +330,9 @@ job-resolution time, before any of its steps run; `check-install-platforms` arms
 human reading the page. No new field is added to the index and none is removed: its two fields,
 `runner` and `held`, keep the two readers the predecessor amendment named.
 
-**No new interface, no new event, no new message, and no delta narrows a corpus.** Deltas 2, 3, 4
-and 5 are prose repairs on surfaces whose readers are unchanged, and delta 4 explicitly declines the
-one code edit it considered. Point 5's red-condition enumeration
+**No new interface, no new event, no new message, and no delta narrows a corpus.** Deltas 2 to 6
+are prose repairs on surfaces whose readers are unchanged, and delta 4 explicitly declines the one
+code edit it considered. Point 5's red-condition enumeration
 is not owed: every delta widens — a roster line, a declaration state, a build-matrix leg, a binding
 posture — and the one reader whose verdict is non-monotone under a narrowing,
 `pack-installer.sh`'s refusal of a declared target with no artifact directory, is handed **more**
@@ -315,15 +355,14 @@ subject rather than less. Arm D's report is not an assertion and cannot red in e
 - The generated `docs/` mirrors of the kit SPECs — regenerated, never hand-edited, and stale the
   moment any delta touching a kit SPEC lands (all deltas).
 
-<!-- update-target-exempt: escalated at this stage's close and unresolved here — TRAJECTORY.md is the recorded-ruling surface, the prior correction's authorization was bounded to that one correction and is spent, and CLAUDE.md routes a change to a recorded ruling's grounds to the operator however plainly the arithmetic has moved, so no delta of this amendment may claim it -->
-- `TRAJECTORY.md`'s 2026-08-14 born-native-default ruling, its weighed-cost figure — see §The one
-  edit this amendment does not authorize.
+- `TRAJECTORY.md`'s 2026-08-14 born-native-default ruling, its weighed-cost figure and the
+  authority line the restatement adds beside it (delta 6).
 
 ## Retired spellings
 
 - None — no delta of this amendment retires a spelling. Delta 1 flips a declaration's **state word**
   between two values the grammar keeps (`held:` stays live for the next declared-and-held platform);
-  deltas 2, 3, 4 and 5 rewrite prose arguments under existing names; and no file, knob, job, script or
+  deltas 2 to 6 rewrite prose arguments under existing names; and no file, knob, job, script or
   contract name is removed or renamed anywhere in the set.
 
 ## Definition of Done

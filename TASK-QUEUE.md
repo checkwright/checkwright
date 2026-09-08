@@ -15,8 +15,8 @@
 - **intel-macos-roster-join** [spec: SPEC-intel-roster-join.md] — the roster's third line, and the
   sentences across five surfaces that argue from a hold that line ends.
   **The design is `SPEC-intel-roster-join.md`'s and is not restated here:** the licence verified
-  job-keyed at this stage, five deltas with their work classes, the seam ruling, what the join makes
-  binding, and the one edit the amendment deliberately does not authorize.
+  job-keyed at this stage, six deltas with their work classes, the seam ruling, and what the join
+  makes binding.
   **ADMITTED AS THIS ITERATION'S FEATURE HALF — `operator`, 2026-09-08, answered directly in a
   `/lead` session and relayed by the lead**, beside the debt half
   `windows-smoke-manifest-cr-survives-repair`. **Promotion IS the authoring**, which is the act
@@ -45,6 +45,12 @@
   the first time. The legs are green today, so nothing reds at the landing and the cost arrives at
   the first Intel-macOS breakage. The debt half edits the script all three platform smoke legs run,
   so a batch holding both wants that posture in view.
+  **A SIXTH DELTA WAS ADDED AFTER THE ESCALATION CAME BACK — `operator`, 2026-09-08, asked and
+  answered in a `/lead` session and lead-relayed:** `TRAJECTORY.md`'s born-native ruling's
+  weighed-cost figure is de-literalized to the roster's complement, keeping the 2026-08-14 weighing
+  legible as a weighing and carrying its own authority line so the next reader need not read a
+  commit. The amendment records that the de-literalization was declined for that surface once and
+  that this ruling reverses that, so the delta rests on the ruling and not on precedent.
   Promoted at spec 2026-09-08 by authoring the amendment.
 
 ## Technical Debt
