@@ -4525,8 +4525,8 @@
   **Self-demonstrating instance, found at this close:** the queue carried two entries for one
   finding — `icebox-worklist-roadmap-blind` (filed 2026-08-09) and
   `icebox-candidate-roadmap-filter` (filed 2026-08-13) — with the *same* three-row measurement in
-  both bodies. Merged at this close into the elder slug, which is the one carrying an inbound
-  citation.
+  both bodies. Merged at this close into the elder slug, which was the one carrying an inbound
+  citation; both have since retired.
   **The shape generalizes past that step.** Any close-stage sweep that files from a *recurring*
   worklist will re-file on the next iteration unless something checks; the eviction worklist is
   simply the sweep that recurs most reliably, because its input is stable by construction.
@@ -5060,7 +5060,8 @@
   return exit 0 through `scripts/bash-guard.sh`, while the compound launch-and-wait form returns
   exit 2. Coverage is partial and honest rather than absent.
   **Founding-instance argument.** The attested instance recorded beside
-  `waiter-predicate-self-match` is build batch A running two such waiters, plausibly the
+  `waiter-predicate-self-match` (retired — recover it from git history) is build batch A running
+  two such waiters, plausibly the
   standalone shape — so the enforcement half landed 2026-08-15 may not cover the failure that
   motivated it.
   **Proposed predicate:** also fire when the `pgrep`/`pkill -f` segment sits in loop-condition
@@ -6416,11 +6417,17 @@
   outside the kit and have every cross-corpus reference name the rule — the way rule 21 already
   cites DOCTRINE.md by name rather than number, for exactly this reason.
   **A SECOND entry's slice now routes to that second disposition — recorded here 2026-09-08, the
-  inbound half of a routing whose outbound half already exists.** `canon-kit/SPEC.md` §The two
-  slices rules the RENUMBER slice of `amendment-roster-omission-detection` a stated non-target on
-  a decidability ground: after a renumber the retired and the replacing spellings occupy the SAME
-  token space, so a survivor scan cannot discriminate. It routes that slice's durable fix here,
-  and `canon-kit/SPEC.md`:362 carries the outbound pointer. So this entry's second disposition —
+  inbound half of a routing whose outbound half already exists.** `canon-kit/SPEC.md`
+  §check-amendment-retired-spelling rules the RENUMBER slice — the retired
+  `amendment-roster-omission-detection`'s second candidate slice — a stated non-target on a
+  decidability ground: after a renumber the retired and the replacing spellings occupy the SAME
+  token space, so a survivor scan cannot discriminate. That section states the durable fix in its
+  own words ("a cross-corpus citation that names its referent rather than its number has no numeric
+  relation left to decay, which dissolves the slice instead of detecting it"), which is the outbound
+  half. **Its citation here was wrong on BOTH halves until this close** — there is no
+  §The two slices in that SPEC, and its line 362 is about config seeding and carries no pointer;
+  re-read at 2026-09-08 and corrected to the section that owns the ruling. So this entry's second
+  disposition —
   a cross-corpus citation naming its referent rather than its number — **dissolves that slice
   instead of detecting it**, and discharges two entries' work rather than one. This entry's own
   open question (whether a bare `rule N` outside the kit is gateable at all, and at what
@@ -9613,8 +9620,8 @@
   **The removals have a SHAPE, and it is the census's durable half.** They concentrate on entries
   hosting SEVERAL rulings of one authority across different dates: the newest instance was restated
   inline and the older co-located ones were not. The pool's two densest hosts,
-  `platform-support-ci-matrix` and `native-gate-port-remaining-corpus`, are the two largest
-  instances. Two elements go, not one — usually the channel, but on `kpi-cost-per-unit` and
+  `platform-support-ci-matrix` (since retired) and `native-gate-port-remaining-corpus`, are the two
+  largest instances. Two elements go, not one — usually the channel, but on `kpi-cost-per-unit` and
   `kit-spec-provenance-seam-sweep` (retired 2026-09-05) it is the authority.
   **Three classifications were spot-verified by hand**, so the numbers stand on reads rather than a
   sweep's word: the 27-slug count off the diff, `kit-library-port-residue` (its two surviving
@@ -9908,8 +9915,8 @@
   than around who caused the falsity.
   **This refines a five-for-five run, and the refinement is the finding.** Across five build batches
   of one iteration a removal's propagation site was missed every time, and every one was found by
-  grep. `amendment-roster-omission-detection` owns that half. The fifth instance shows the half it
-  does not own: **detection was never the failing step.**
+  grep. `amendment-roster-omission-detection` (retired) owned that half. The fifth instance shows
+  the half it did not: **detection was never the failing step.**
   **The witness, 2026-09-06.** The session grepped, FOUND the `gates.yml:229-233` non-Linux
   over-claim, and then filed it instead of fixing it on two grounds — it sat inside a ringfenced
   job, and it was already false at HEAD before that batch's own cut. Both true; neither carries.
@@ -9925,8 +9932,9 @@
   is already the fix/icebox/promote order; the build stage template's session ritual, where the
   disposition is actually taken; or the amendment grammar's own definition of done, which is where a
   ringfence gets drawn in the first place.
-  **DISTINCT from `amendment-roster-omission-detection`** — that entry's subject is a roster short
-  by a surface and its candidate fix is a deriving grep. This one's subject is what happens AFTER
+  **DISTINCT from `amendment-roster-omission-detection`, retired** — that entry's subject was a
+  roster short by a surface and its candidate fix a deriving grep. This one's subject is what
+  happens AFTER
   the grep succeeds, and a perfect roster would not touch it.
   **Cost while deferred:** the ringfence argument is cheap, plausible and self-serving under time
   pressure, and it converts a found defect into a filed one at exactly the moment the fix is
@@ -9976,12 +9984,13 @@
   decidable half by design — every LISTED target is owned — and says so in as many words, leaving
   roster completeness to align. Arm B catches a target listed and unowned, never one never listed.
   The amendment is deleted on merge, so no later reader catches the omission either.
-  **Why this is a THIRD narrow slice and not a re-file.** `amendment-roster-omission-detection` owns
-  the general class and names two candidate gateable slices, literal-substitution and renumber, with
-  "whether one mechanism covers both" as its open question. This is a slice neither reaches and the
-  only one whose evidence is IN the amendment: a delta body minting a `<word>:` token absent from
-  the directive rosters is decidable without reading the tree. That entry is at its 50-line cap,
-  which is why the slice lands here rather than inside it; its recurrence date carries the instance.
+  **Why this is a THIRD narrow slice and not a re-file.** `amendment-roster-omission-detection`
+  (retired) owned the general class and named two candidate gateable slices, literal-substitution
+  and renumber, with "whether one mechanism covers both" as its open question. This is a slice
+  neither reaches and the only one whose evidence is IN the amendment: a delta body minting a
+  `<word>:` token absent from the directive rosters is decidable without reading the tree. That
+  entry was at its 50-line cap when it retired, which is why the slice landed here rather than
+  inside it; its recurrence date carries the instance.
   **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator** — canon-kit ships the
   amendment lifecycle and `check-comment-tier`, so an adopter minting a directive in their own
   amendment meets the same silent omission and their own gate's verdict witnesses it.
