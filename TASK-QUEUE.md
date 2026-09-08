@@ -13,7 +13,7 @@
 ## New Features
 
 - **intel-macos-roster-join** [spec: SPEC-intel-roster-join.md] — the roster's third line, and the
-  sentences across five surfaces that argue from a hold that line ends.
+  sentences across six surfaces that argue from a hold that line ends.
   **The design is `SPEC-intel-roster-join.md`'s and is not restated here:** the licence verified
   job-keyed at this stage, six deltas with their work classes, the seam ruling, and what the join
   makes binding.
