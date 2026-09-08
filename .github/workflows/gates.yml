@@ -743,6 +743,47 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
+      # A macOS runner's stock `/bin/bash` is 3.2 and the step below sources
+      # `gate-sdk/lib/gate.sh`, whose knob defaults use `[[ -v ]]` — a bash 4.2
+      # unary. Without this step both darwin legs die on their first executed
+      # line with `conditional binary operator expected`, having compiled
+      # nothing, which is what run 34200226768 measured. The floor is not new:
+      # docs/install.md §Requirements already declares `bash (>= 4.3)`, so this
+      # installs the declared floor rather than working around its absence.
+      #
+      # **Read this as scaffolding, which is what separates it from the macOS
+      # install-smoke leg's brew step below.** That step's package set IS an
+      # adopter claim and is held equal to §Requirements' list in both
+      # directions; this one is the producer's own prerequisite and is held to
+      # what this job's path executes — bash for the library's defaults, and the
+      # GNU userland for `gate.sh`'s `realpath`, `comm` and `sort` and for
+      # `build-native.sh`'s `grep -aoEhf -` and `sort -u`. `shellcheck` is
+      # deliberately absent: nothing this job runs invokes it (both files carry
+      # `# shellcheck` directives and no call), and the sibling installs it
+      # because `init` refuses without it on an install path this job never
+      # walks. Adding it here would state a claim this job does not make.
+      #
+      # Measured on run 34200226768 rather than predicted, because the cold-brew
+      # cost is the one this step could plausibly break: the sibling's install of
+      # four formulae — one more than this step's three — took **7 seconds** on
+      # `macos-latest`, against this job's 30-minute ceiling and a 43-second
+      # crate build. The ceiling is left alone on that measurement.
+      - name: install the bash floor and GNU userland this job's path needs
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew install bash coreutils gawk
+          prefix="$(brew --prefix)"
+          # gnubin carries the members under their unprefixed names, ahead of
+          # /usr/bin, which is what PATH-ordering means for a path calling
+          # `sort` and `awk` rather than `gsort` and `gawk`.
+          {
+            echo "$prefix/opt/coreutils/libexec/gnubin"
+            echo "$prefix/opt/gawk/libexec/gnubin"
+            echo "$prefix/bin"
+          } >> "$GITHUB_PATH"
+
       # `shell: bash` for the reason publish.yml's build leg states: this job's
       # `runs-on` is an expression, so no tree-local reader can state its runner,
       # and the day a Windows target is declared the default `run:` shell there is
@@ -765,10 +806,13 @@ jobs:
           # The one digest computation for this artifact anywhere in this run:
           # every later hop moves the file, so the digest the smoke verifies
           # against cannot diverge from the one produced beside the bytes. The
-          # hasher is resolved rather than named, because stock macOS ships
-          # `shasum` and not `sha256sum` and this job is the first build leg to
-          # run off Linux; both spell the same `<hex>  <bare name>` sidecar that
-          # `sha256sum -c` reads wherever a later reader puts the two files.
+          # hasher is resolved rather than named, and which arm runs here is
+          # settled by the bootstrap step above: it PATH-orders coreutils, so
+          # `sha256sum` resolves on every leg and the `shasum` arm is the
+          # fallback for a host that reaches this step without it. Both spell the
+          # same `<hex>  <bare name>` sidecar that `sha256sum -c` reads wherever a
+          # later reader puts the two files, so the arm taken changes nothing
+          # downstream — which is why the bootstrap is free to change it.
           out="$RUNNER_TEMP/artifact/$TARGET"
           mkdir -p "$out"
           cp "$crate/target/$TARGET/release/$binary" "$out/$binary"
