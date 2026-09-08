@@ -12,6 +12,35 @@
 
 ## New Features
 
+- **gate-binary-roster-covers-supported-platforms** [spec: SPEC-macos-roster-join.md] — the
+  roster's second line, the release path that line would otherwise break, and the Intel leg that
+  makes a third line buyable on the next run.
+  **The design is `SPEC-macos-roster-join.md`'s and is not restated here:** the licence verified
+  job-keyed at this stage, six deltas with their work classes, the seam ruling, and the one edit
+  the amendment deliberately does not authorize.
+  **ADMITTED AS THIS ITERATION'S UNIT, OPTION (b) — ruled by the OPERATOR 2026-09-08**, asked and
+  answered in a `/lead` session and lead-relayed: the `aarch64-apple-darwin` join plus an Intel
+  `install-smoke` leg of its own. The leg's cost was put explicitly and accepted — a new job name,
+  and doubled macOS minutes on every push. The aarch64 half is the floor and lands whatever the
+  Intel leg does; the Intel line itself is NOT written here, its consumer half being the run this
+  unit buys rather than one it has.
+  **PROMOTED at spec 2026-09-08 by authoring the amendment**, which is the act the operator ruling
+  above made feature-class: the Intel leg adds a name, so the unit needed an amendment before it
+  could be picked.
+  **WHAT THE AMENDMENT FOUND THAT NO BULLET HAD.** `.github/workflows/publish.yml`'s build leg
+  carries no macOS bash floor and calls `sha256sum` unconditionally, while the CI producer that
+  claims to mirror it carries both — so the roster line alone would fail the first release after
+  it, on a path nothing exercises until a tag. The release path has never run on macOS. That
+  repair is the amendment's delta 3, and it is why this unit is larger than the three-edit write
+  `native/targets.list`'s header describes.
+  **The port's completion predicate is unmoved by this unit and that is expected:** `--emit
+  port-blockers --tree` reads 16 owed at this stage, oracle-run and not restated. The blocker is
+  the roster against the documented supported set, and Intel macOS and native Windows are both
+  still outside it.
+  Filed 2026-09-07 by spec; admitted as the lead unit 09-07; amendment merged and entry demoted
+  2026-09-08 by build on an observation rather than a forced join; re-promoted at spec 2026-09-08
+  on the run that observation was waiting for.
+
 ## Technical Debt
 
 - **smoke-manifest-read-appends-carriage-return** — the Windows consumer smoke
@@ -732,56 +761,6 @@
   half met — the bootstrap runs on native Windows, no install completes there.
   Filed 2026-08-03 by spec; re-scoped 08-24; fork 1 merged and demoted 08-25; source blockers
   re-scoped out 08-26; PowerShell half merged and demoted 09-07 — all by operator ruling.
-
-- **gate-binary-roster-covers-supported-platforms** [design-pending] — `native/targets.list` still
-  carries ONE triple, `x86_64-unknown-linux-gnu`, and fifteen of the sixteen files the port oracle
-  calls `owed` chain to this one precondition. The evidence machinery landed; the roster line did
-  not, and the reason is an observation rather than an open design.
-  **DEMOTED ON THE OBSERVATION — `lead, own-authority` 2026-09-08**, executing the operator ruling
-  below rather than settling anything it left open. `SPEC-platform-evidence.md`'s seven deltas all
-  landed in `supported-platform-roster-widening` and the amendment merged, so the entry outlives it
-  (canon-kit/SPEC.md §Merging an amendment). What did not land is the roster line, which is
-  licensed by a run and never by a plan.
-  **PUSH NOW, DISPOSE ON THE OBSERVATION — ruled by the OPERATOR 2026-09-08, through the lead's
-  question relay in a lead session and lead-relayed.** `check-stage-entry` refused `validate` while
-  this entry stood active, and the entry could not be disposed without a green: a circularity
-  neither a `--no-verify` stamp (barred, lifecycle-kit/SPEC.md §The state machine) nor close's
-  drain (refused, `check-stage-entry` assertion B's drain-successor backstop) can break.
-  **ADMITTED AS THIS ITERATION'S UNIT, OPTION (b) — ruled by the OPERATOR 2026-09-08, asked and
-  answered in a `/lead` session and lead-relayed.** The aarch64 join plus an Intel `install-smoke`
-  leg of its own, so `x86_64-apple-darwin`'s second limb becomes buyable at the close push. The
-  leg's cost was put explicitly and accepted: a new job name, which makes the unit feature-class
-  and its amendment `/spec`'s, and doubled macOS minutes on every push. The aarch64 half is the
-  floor and lands whatever the Intel leg does.
-  **THE OBSERVATION HAS FIRED FOR `aarch64-apple-darwin`, read at scope 2026-09-08 off a finished
-  run for free.** `gates` run `34212264301` at `dd6dcf54` is green and postdates `d917d4ca`, where
-  the licensing paragraph landed, and it carries BOTH bounds: `native-artifacts` green for that
-  triple on `macos-latest` with binary and `.sha256` uploaded, and `install-smoke-macos` green on
-  `macos-26-arm64` at `host: aarch64-apple-darwin`, having downloaded that upload, run under
-  `INSTALLER_SMOKE_ARTIFACTS_DIR`, logged "adopted checkwright-gates for aarch64-apple-darwin from
-  the hand-off, sidecar and all — nothing rebuilt, nothing rehashed", and emitted its
-  `INSTALLER-SMOKE: clean` completion assertion. Produced and exercised, no host-built stand-in.
-  **A FOURTH EDIT THE HEADER DERIVES RATHER THAN STATES:** `docs/install.md`'s state word feeds
-  `native-artifacts-roster` (`.github/workflows/gates.yml`:689-690), so `joined` flips that
-  producer leg from `continue-on-error` to BINDING on master.
-  **`x86_64-apple-darwin`'s SECOND LIMB IS UNMEETABLE UNTIL THE LEG EXISTS — which is the unit.**
-  Its limb 1 is green too, on `macos-15-intel`. But the workflow has one macOS install-smoke leg
-  and its normalize step keys on `rustc -vV`'s host triple (:1005-1016), so it exercises the host
-  artifact and no other; no entry owned that absence before this one. `x86_64-pc-windows-msvc` is
-  unchanged — `docs/install.md` §Requirements does not document native Windows as supported, so its
-  FIRST bound fails independently of any leg. The held-producer coupling this entry used to restate
-  is `held-ci-leg-failure-reddens-a-binding-one`'s.
-  **The refused alternative reading is not re-argued here** — its grounds are the rewritten header
-  of `native/targets.list`, and a later session finding the textual case persuasive is reading a
-  settled question.
-  **Cost while deferred**, re-dated 2026-09-08 and now one item smaller: the port's completion
-  predicate cannot approach zero by any cut (`--emit port-blockers --tree` read 16 owed at scope,
-  oracle-run not restated), and every macOS adopter silently loses more of the battery each
-  iteration a born-native gate lands. The red-master item is RETIRED as an aged fact — the
-  bootstrap landed at `de662aca` and `dd6dcf54`'s run is green, so that cost is no longer owed.
-  Filed 2026-09-07 by spec; admitted as the lead unit 09-07; amendment merged and entry demoted
-  2026-09-08 by build on the run above rather than on a forced join — a roster line is a public
-  support commitment, and writing one this run does not carry is worse than the unit not landing.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
