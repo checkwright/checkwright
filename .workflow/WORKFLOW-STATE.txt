@@ -11,3 +11,4 @@ supported-platform-roster-widening align adaba590 2026-09-08 11b1350d
 supported-platform-roster-widening build a13fb36d 2026-09-08 9547a2af
 supported-platform-roster-widening build a56ddb9f 2026-09-08 fb2c1eb0
 supported-platform-roster-widening build a515eb27 2026-09-08 ce671bfe
+supported-platform-roster-widening build a13f2435 2026-09-08 5fd03634
