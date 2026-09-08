@@ -17,7 +17,6 @@
 ## Deferred
 
 
-
 - **ruling-record-prose-staleness-unreachable** [design-pending] — the ruling-staleness probe
   reaches backtick-named slugs and declared discharge conditions, so TRAJECTORY.md's undated prose
   rulings go unchecked, and the manual re-read that would cover them has now been deferred by two
@@ -866,26 +865,27 @@
   PowerShell asserts PAYLOAD coverage, and no code path reaches it while the binary carries no
   `init` arm (`native/src/install.rs`, `OPS = ["place-artifact"]`). The relocation is what mints
   that arm, so the leg's extension and this half land together or not at all.
-  **THE SHIPPED LEG HAS NOW RUN AND IS BINDING — corrected 2026-09-08 at close, the claim having
-  gone false at the previous close.** It was authored against the five steps and merged
-  unexercised, nothing here being able to execute PowerShell, and was held `continue-on-error` for
-  that reason; `9ad9538c` records its first CI run on `34142337941` and drops the hold, so
-  `.github/workflows/gates.yml`:452-456 carries none today. Read it JOB-KEYED, never off the
-  workflow conclusion — the habit the hold was for outlives the hold.
-  **NO LONGER BLOCKED — corrected 2026-09-09 at scope, the block having gone false on 2026-09-08.**
-  The blocker this entry named only in prose is `gate-binary-roster-covers-supported-platforms`,
-  recovered by `git log -S` over this file because no slug was ever written here; it reached Done at
-  `23bcfed1` in the iteration that closed the day before this correction, and it is absent from this
-  file at HEAD. `native/targets.list`'s header has since taken ownership of the widening away from
-  any entry — "an entry is a lifetime that ends; pointing a live precondition at one is what left
-  this file naming `platform-support-ci-matrix` for weeks after that entry retired" — so the
-  precondition now reads off that header rather than off a slug. What survives is a REQUIREMENT on
-  the work, not a block before it: an uncovered platform must still install, against whatever the
-  roster carries — cited as the roster and never as a count, the count having staled on the very
-  next join. The PowerShell half widened it, since a native Windows install path now exists and the
-  supported set the roster must cover is {Linux, macOS, native Windows}; that widening was known and
-  accepted when the split was ruled. NARROWING ONE took the split on this same ground
-  (`doctrine-kit/SPEC.md`:213-216) and is SPENT, recorded only so a reader does not re-derive it.
+  **THE SHIPPED LEG IS BINDING and carries no hold today** (`.github/workflows/gates.yml`:452-456,
+  the hold dropped at `9ad9538c` on its first CI run). Read it JOB-KEYED, never off the workflow
+  conclusion — the habit the hold was for outlives the hold.
+  **NO LONGER BLOCKED — corrected 2026-09-09 at scope, the block having gone false 2026-09-08.**
+  The blocker was `gate-binary-roster-covers-supported-platforms`, named here in prose with no slug;
+  it reached Done at `23bcfed1` and is absent from this file at HEAD. `native/targets.list`'s header
+  has since taken ownership of the widening away from any entry, so the precondition reads off that
+  header. What survives is a REQUIREMENT on the work, not a block before it: an uncovered platform
+  must still install against whatever the roster carries — cited as the roster, never as a count.
+  The PowerShell half widened the set to {Linux, macOS, native Windows}, known and accepted when the
+  split was ruled on this same ground (`doctrine-kit/SPEC.md`:213-216).
+  **TAKEN AS THIS ITERATION'S UNIT — `lead, own-authority` 2026-09-09**, on the governed surfaces
+  alone: the PRIORITY DIRECTIVE, its 2026-09-07 sanction for scheduling an own-iteration leg AS the
+  iteration, the discharged block above, and the oracle. It stands ALONE; joining the smoke
+  harness's CR repair was declined because `installer/consumer-smoke/run-smoke.sh` reads `no-port`,
+  so it buys no port progress — the same-surface ground itself is untouched and stays available to
+  spec if the relocation under-fills.
+  **THE 2026-09-07 READING WAS REACHED FOR HERE, recorded so its bound is countable rather than
+  re-derived.** TRAJECTORY.md keeps live the warning that the reachable column is "one more window,
+  after which every iteration is an own-iteration leg or another exception paragraph", and states
+  that this bounds how often the own-iteration-leg reading may be reached for. This is one reach.
   **`digest-unverifiable` must become a refusal in the same motion** — step 4 is irreducible and
   a host that cannot hash cannot verify. Vacuous on Windows, so the cost lands on a POSIX host
   carrying neither `sha256sum` nor `shasum`.
@@ -7659,51 +7659,51 @@
   is FOUR gate-touch points, not one resolver and not fourteen tickets; the measurement lives here.
   **Why the survey lives here:** `.workflow/survey-record.md` is boundary-truncated and
   `check-scratch-citation` reds a permanent pointer into it. **Witness re-run at scope 2026-09-08,
-  all sixteen named slugs LIVE:** corpus the two design-pending sections, `scripts/gates.list` and
-  `native/src/gates/`; oracle `--emit queue-edges` plus a citation grep; rev `f2308550`.
+  all sixteen named slugs LIVE** — corpus the two design-pending sections, `scripts/gates.list` and
+  `native/src/gates/`; oracle `--emit queue-edges` and a citation grep; rev `f2308550`.
   **The finding.** Thirteen live members, eleven Deferred and two Icebox, none blocking on an
   operator-class fork; **size floor** four touch points, eight to ten assertions, two reports, all
   native modules. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
   `unqualified-section-citation-liveness`, `link-wrapped-section-citation-liveness` and
   `spec-pointer-self-section-citation` as ONE resolves-to-nothing predicate — those entries say the
   guard WINDOW, not the citation form, is the variable — plus `spec-section-title-collision` and
-  `qualified-pointer-section-ownership` as two harder separate predicates on the same gate, the
-  latter self-declaring an honest not-buildable as a permitted outcome. (B)
-  `check-queue-slug-liveness` takes about two assertions for `retired-slug-live-pointer-citation`
-  and `queue-status-parenthetical-liveness`, plus ONE report-only deliverable riding
-  the queue-edges arm's resolution — `done-slug-ownership-citation-report`, report-not-gate under
-  the SPEC's reference-vs-membership ruling; its twin `dead-queue-citation-report` has shipped.
-  (C) is `cited-script-path-liveness-inline` plus `stale-identifier-after-retirement`, likely one
-  ticket, and (D) the two `guard-rule-number-*` entries, an island and the long pole rather than an
-  equal quarter — BOTH slices' grounds RELOCATED 2026-09-08 to the entries already owning them.
+  `qualified-pointer-section-ownership` as two harder predicates on the same gate, the latter
+  self-declaring an honest not-buildable as a permitted outcome. (B) `check-queue-slug-liveness`
+  takes about two assertions for `retired-slug-live-pointer-citation` and
+  `queue-status-parenthetical-liveness`, plus ONE report-only deliverable riding the queue-edges
+  arm's resolution, `done-slug-ownership-citation-report` — report-not-gate under the SPEC's
+  reference-vs-membership ruling, its twin `dead-queue-citation-report` shipped. (C) is
+  `cited-script-path-liveness-inline` plus `stale-identifier-after-retirement`, likely one ticket.
+  **(D), the two `guard-rule-number-*` entries, is ANSWERED and out**, both slices' grounds having
+  relocated 2026-09-08 to the entries already owning them.
   **Two members are content-unverified though both re-verified live above:** Icebox's
-  `false-ground-citation-propagation` is title-only, and `doctrine-rule-number-citation-liveness` a
-  forward bet — a 2026-08-27 probe found DOCTRINE.md carrying ZERO `rule N` forms. Both are iceboxed
-  one-liners with nowhere to hold a ground, which is why these stay here and (D)'s did not.
+  `false-ground-citation-propagation` is title-only and `doctrine-rule-number-citation-liveness` a
+  forward bet, a 2026-08-27 probe having found DOCTRINE.md carrying ZERO `rule N` forms — both
+  one-liners with nowhere to hold a ground, which is why these stay and (D)'s did not.
   **Excluded with cause:** `scratch-citation-skill-surface-reach` (self-disclaims, glob-coverage),
-  `kit-ref-liveness-stem-token-hole` (env-knob tokens, already checked),
-  `fixture-assertion-liveness`, `survey-oracle-liveness-unasserted`. **Adjacent, unfolded:**
+  `kit-ref-liveness-stem-token-hole` (env-knob tokens), `fixture-assertion-liveness`,
+  `survey-oracle-liveness-unasserted`. **Adjacent, unfolded:**
   `amendment-landing-citation-assertions` and `amendment-owner-position-citation` ride
   `check-amendment-queue` over a corpus deleted at merge. **Fold-or-exclude, both filed after the
-  rev:** a FIFTH touch point `scratch-citation-introducer-form-reach` on `check-scratch-citation`,
-  and an EIGHTEENTH member, `queue-citation-line-number-stales-within-its-own-session`.
-  **THE 2026-08-30 WITNESS DISCRIMINATOR, APPLIED 2026-08-31 BY CLOSE: machinery-class HOLDS** (the
-  family's only demand witness is this repo's delivery process) **and the class eviction still does
-  NOT land** — only two members reach the icebox worklist, one naming an EXTERNAL live slug, and
-  every other opens its cost field in PROSE, not-low under queue-kit/SPEC.md §The icebox tier. So
-  the blocking limb is COST, and a costed look owes first the cost fields that can honestly open
-  low.
-  **NOT THIS WINDOW — `lead, own-authority` 2026-09-08:** the admitted units fill it and this family
-  meets none of the three joining grounds. **The zero-inbound RANKING ground this entry carried is
-  FALSIFIED and is deleted rather than left standing:** summed at scope 2026-09-08 the family
-  carries **37 inbound over seventeen live members** against the hub's 1, four times the largest
-  single entry. **THE HEALTH TRIAD'S QUEUE LIMB READS THE WRONG WAY** — 301 Deferred + 101 Icebox
-  here against 292 + 84 on 2026-09-05 — so (A)+(B)+(C), nine entries over three gate widenings, is
-  the largest lever the pool offers on it.
+  rev:** a FIFTH point `scratch-citation-introducer-form-reach`, an EIGHTEENTH member
+  `queue-citation-line-number-stales-within-its-own-session`.
+  **MACHINERY-class HOLDS by the 2026-08-30 discriminator** — the family's only demand witness is
+  this repo's delivery process — **but the class bar is ANSWERED, the operator having carved this
+  entry out 2026-09-08**, so COST alone blocks and a costed look owes the honestly-low fields first.
+  **NOT THIS WINDOW, TWICE, AND THE CARVE-OUT'S REACH IS SETTLED — `lead, own-authority` 2026-09-08,
+  then operator 2026-09-09 (AskUserQuestion in a lead session, lead-relayed): the carve-out buys
+  ADMISSIBILITY, never admission.** The three joining grounds apply unchanged and this family waits
+  for a cut sharing its surface; 2026-09-09's, the behind-invoke relocation, shares none of the four
+  points above. Answered, so no boundary carries the reach forward as open.
+  **The zero-inbound RANKING ground this entry carried is FALSIFIED and deleted rather than left
+  standing:** summed 2026-09-08 the family carries **37 inbound over seventeen live members**
+  against the hub's 1, four times the largest single entry. **THE HEALTH TRIAD'S QUEUE LIMB READS
+  THE WRONG WAY** — 301 Deferred + 101 Icebox against 292 + 84 on 2026-09-05 — so (A)+(B)+(C), nine
+  entries over three gate widenings, is the largest lever the pool offers on it.
   **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
   first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
-  a read of four gate sources — the re-derivation the survey record exists to prevent.
-  Filed 2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
+  a read of four gate sources — the re-derivation the survey record exists to prevent. Filed
+  2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
 
 - **wait-record-self-deadlock** [design-pending] — a backgrounded **wait** that registers itself as
   a producer makes its own exit condition unsatisfiable, and blocks every concurrent session's
@@ -8339,13 +8339,11 @@
   narrowed to its residue in the same commit that recorded the ruling closing its first half.
 
 - **prompt-ranking-ungrantable-shape-class** [design-pending] — the friction ranking's unit mixes
-  rows an allowlist entry could retire with rows no entry can ever match, so each close re-triages
-  a class no action retires.
-  **Measured at the windows-artifact-proof close:** of 208 prompting calls across 52 patterns,
-  fourteen redirect-shaped rows are ungrantable *by construction*. **The guard says so in its own
-  refusal text**, which makes this structural rather than a tuning complaint: a `Bash(...)` entry
-  matches a bare command, so any chaining, redirect or expansion breaks the match and the call is
-  decided out of band whatever the allowlist holds.
+  rows an allowlist entry could retire with rows no entry can ever match, so each close re-triages a
+  class no action retires.
+  **The structural ground, and it is why this is not a tuning complaint** — the guard says so in its
+  own refusal text: a `Bash(...)` entry matches a bare command, so any chaining, redirect or
+  expansion breaks the match and the call is decided out of band whatever the allowlist holds.
   **All three of the triage's dispositions are wrong for these rows.** An allowlist entry cannot
   reach them; a guard steer already covers the read shapes while the write shapes are legitimate
   journal and scratch appends, which guard rule 17 now auto-allows outright; and a habit change
@@ -8356,38 +8354,39 @@
   from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed at all —
   its guard-steer shape retires these rows by changing behaviour, where this entry asks what the
   ranking should say while it has not.
-  **Why `[design-pending]`:** the three candidate shapes buy different things. Partitioning the
-  ranked output as it already partitions overlay-covered rows is most legible and moves the KPI's
-  denominator; grading each row against the allowlist's own matching rule is most accurate and
-  duplicates that rule; a guard-kit/SPEC.md note is cheapest, buys least.
-  **THE INSTRUMENT IS CONTAMINATED and every measurement above is a MULTI-WINDOW read until it is
+  **The design question is ANSWERED by the fourth measurement below — partition the ranked output by
+  SHAPE**, as it already partitions overlay-covered rows. Grading each row against the allowlist's
+  own matching rule was more accurate and duplicated that rule; a guard-kit/SPEC.md note was
+  cheapest and bought least. What stays open is only where the partition lands.
+  **THE INSTRUMENT IS CONTAMINATED and every measurement here is a MULTI-WINDOW read until it is
   cleared — 2026-09-06, probed at scope.** `.workflow/prompt-friction.log` still carried a PRIOR
-  iteration's close calls verbatim, so no emitted figure denominates one window. A fifth gap bullet
-  re-derived this diagnosis off that log, again without citing this entry, and reported a head row
-  and total irreconcilable with the fourth measurement of the SAME close — the contamination
-  showing, not a disagreement about the class. Clearing the log is a precondition of the next one.
+  iteration's close calls verbatim, so no emitted figure denominates one window. Clearing the log is
+  a precondition of the next measurement.
   **Cost while deferred:** one re-triage of the same unretireable rows per close, on the surface a
   close reads to decide where friction is; the top row is always one of them.
-  **FOURTH MEASUREMENT 2026-09-05, and it ANSWERS the design question.** 126 calls, 27 patterns,
-  498 fall-throughs; head `python3 -` heredocs at 61x, `cat >>` second at 24x — down from 50x, so
-  the earlier GROWING read tracked the command word, not the class. A THIRD word takes the head
-  across four samples while the SHAPE never moves: partitioning by shape is what the samples buy.
+  **FOURTH MEASUREMENT 2026-09-05, and it ANSWERS the design question.** 126 calls, 27 patterns, 498
+  fall-throughs; head `python3 -` heredocs at 61x, `cat >>` second at 24x — down from 50x, so the
+  earlier GROWING read tracked the command word, not the class. A THIRD word takes the head across
+  four samples while the SHAPE never moves: partitioning by shape is what the samples buy.
   recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03 2026-09-08
-  **THIRD MEASUREMENT, 2026-09-03, ANSWERED by the fourth and kept only for what it adds:** a gap
-  bullet re-derived the finding without finding this entry, naming the first DISTINCT sibling and
-  missing the owner; its one novel half, a bare-command journal-append affordance, is the SECOND
-  sibling's.
-  **THRESHOLD 2026-09-03, twice declined (lead, own-authority); deferred 2026-09-05 (operator,
-  lead-relay) under the port-only run. THAT GROUND IS SPENT** — the port-first ruling superseded it
-  the same day, so the deferral rests on its successor: MACHINERY-class by the 2026-08-30
-  discriminator, meeting none of the three joining grounds. Re-composed at scope 2026-09-05.
-  **SECOND MEASUREMENT, 2026-08-28**, another gap bullet re-deriving this diagnosis without finding
-  this entry: a different head, the same class, 63 of 64 calls composed. It **falsified a tempting
-  sub-case** — ten `GATE_SDK_VERBOSE=1` calls read as a missing-`env`-word steer were all piped into
-  `grep`, so the prefix changes nothing — and moved the ungrantable rows from tail to head.
-  Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close; promoted 2026-08-27 by the
-  next scope. Also ruled on: lead 2026-09-04 (own-authority). Fifth and SIXTH re-derivations
-  drained at scope 2026-09-06 and 2026-09-08, each discarded, the instrument half kept above.
+  **THE ROUTING AXIS IS ANSWERED FOR GOOD — operator 2026-09-09, AskUserQuestion in a lead session,
+  lead-relayed: a newly judged recurrence does NOT restart the port-first run's proposed-once
+  clause.** The third date landed after the 2026-09-05 deferral and moves nothing, since reading a
+  fresh date as a reset defeats the clause that exists to stop a member cycling. **That spends the
+  whole threshold history** — 2026-09-03, twice declined (lead, own-authority), deferred 2026-09-05
+  (operator, lead-relay), re-composed at scope onto MACHINERY-class by the 2026-08-30 discriminator,
+  meeting none of the three joining grounds — so no later boundary re-walks the sequence.
+  **THE `cat >> .tmp/*` GRANT WAS GRANTED THE SAME DAY AND IS NOT LANDED HERE:** it edits
+  `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
+  authorization, so it was routed back. The limit it was granted on, recorded here because JSON
+  carries no comment: the glob is a PREFIX match, reaching any path under `.tmp/`.
+  **THE SECOND AND THIRD MEASUREMENTS (2026-08-28, 2026-09-03) ARE ANSWERED by the fourth**, each a
+  gap bullet re-deriving this diagnosis without finding this entry. One live residue survives them:
+  the second **falsified a tempting sub-case** — ten `GATE_SDK_VERBOSE=1` calls read as a
+  missing-`env`-word steer were all piped into `grep`, so the prefix changes nothing. Filed
+  2026-08-27 to the gap inbox by the windows-artifact-proof close; promoted 2026-08-27 by the next
+  scope. Also ruled on: lead 2026-09-04 (own-authority). Fifth and SIXTH re-derivations drained at
+  scope 2026-09-06 and 2026-09-08, each discarded, the instrument half kept above.
 
 - **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — the remedy
   `artifact-digest-mismatch-remedy-inert` shipped — `init` rewriting a gate binary whose bytes no
@@ -8464,13 +8463,13 @@
   **The live instance, re-verified 2026-08-28 at this boundary.**
   `threshold-recurrence-routing-residency` carries an explicit not-icebox-eligible paragraph with
   grounds — the cost line prices the CARRY and never the eviction, and eviction would delete the
-  verbatim clause the 2026-08-17 operator ruling filed the entry to preserve — and
-  `run-gates.sh --emit queue-index --icebox-candidates` ranked it the sole eligible row again
-  today, the other ten rows all excluded.
+  verbatim clause the 2026-08-17 operator ruling filed the entry to preserve — and `run-gates.sh
+  --emit queue-index --icebox-candidates` ranked it the sole eligible row again today, the other ten
+  rows all excluded.
   **The mechanism has exactly three exclusion causes and no fourth.**
-  `native/src/emit/queue_index.rs`'s `ineligibility()` reads a roadmap tag on the lead line, a
-  dated `recurrence:` body line, and a body naming a live slug. Nothing anywhere reads a standing
-  ruling. The eligibility rule those three implement is queue-kit/SPEC.md §The icebox tier's.
+  `native/src/emit/queue_index.rs`'s `ineligibility()` reads a roadmap tag on the lead line, a dated
+  `recurrence:` body line, and a body naming a live slug. Nothing anywhere reads a standing ruling.
+  The eligibility rule those three implement is queue-kit/SPEC.md §The icebox tier's.
   **Why `[design-pending]`, a real and unruled fork:** a `not-icebox-eligible:` body declaration on
   the entry — one line against `check-queue-entry-budget`'s cap, mechanically readable, and a fourth
   cause of the same shape as the three — versus the emitter reading a prose marker already in the
@@ -8482,29 +8481,32 @@
   from the running. Distinct also from `icebox-eviction-line-budget-squeeze`, the one-liner's line
   budget at the moment of writing an eviction, and from `close-eviction-refiles-without-checking`,
   close re-filing a duplicate entry — both downstream of this row.
-  **THREE LIVE INSTANCES AT THE 2026-09-05 DRAIN, and the newest is a MEASUREMENT STORE rather
-  than a ruling.** `candidate-list-anchors-a-sweep-obligation` is the third: it carries an explicit
+  **THREE LIVE INSTANCES AT THE 2026-09-05 DRAIN, and the newest is a MEASUREMENT STORE rather than
+  a ruling.** `candidate-list-anchors-a-sweep-obligation` is the third: it carries an explicit
   **Why not icebox** paragraph naming a live recurring trigger, and the worklist ranked it anyway.
   `lead-split-posture-limb-unjudged` carries a thirteen-point series close appends to each
-  iteration. Two of the three narrowing conditions are already met — no roadmap tag, no live
-  slug, no dated `recurrence:` (and its own paragraph argues that omission is correct rather than an
-  oversight). Its ONLY protection is that its cost field opens in prose, so one author tidying that
-  opener to a class word compresses thirteen iterations of measurement into one line. The 2026-08-31
-  ruling bars re-authoring an opener to UNBLOCK an eviction; nothing bars the same edit made for
-  tidiness, which is the hole. A `not-icebox-eligible:` declaration — candidate (a) above, verbatim
-  — closes it, so this instance sharpens the fork rather than widening the entry.
-  **The filer's premise FELL at this drain.** The bullet held that the class-word gate
-  queue-kit:248 names was "filed 2026-08-23 into the gap inbox and still undrained". It was drained
-  the same day: `deferred-cost-class-opener-vocabulary` owns it, promoted 2026-08-23 at that scope
-  intake. The gate is owed, not unfiled.
+  iteration, and meets two of the three narrowing conditions — no roadmap tag, no live slug, no
+  dated `recurrence:`, its own paragraph arguing that omission correct. Its ONLY protection is a
+  cost field opening in prose, so one author tidying that opener to a class word compresses thirteen
+  iterations of measurement into one line. The 2026-08-31 ruling bars re-authoring an opener to
+  UNBLOCK an eviction; nothing bars the same edit made for tidiness, which is the hole. A
+  `not-icebox-eligible:` declaration — candidate (a) above, verbatim — closes it, so this instance
+  sharpens the fork rather than widening the entry.
+  **The filer's premise FELL and is answered:** the class-word gate is owed rather than unfiled, and
+  `deferred-cost-class-opener-vocabulary` has owned it since 2026-08-23.
   recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05 2026-09-08
+  **AT THRESHOLD AND ANSWERED, STAYS DEFERRED — `lead, own-authority` 2026-09-09**, on the first
+  proposal this entry has had: it reached the threshold 2026-09-08 carrying no answer at all, which
+  is why scope surfaced it. MACHINERY-class by the 2026-08-30 discriminator, meeting none of the
+  port-first run's three joining grounds against an installer-and-crate cut, and the window's unit
+  fills it. Written in the shape its six threshold siblings carry. No re-escalation is owed.
   **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
   close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
   the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
   non-load-bearing, which bounds the harm to the review list rather than the disposition, and is why
-  this is filed rather than built.
-  Surfaced 2026-08-28 by the close of `installer-trial-lifecycle-repair`, which filed it to the gap
-  inbox; promoted 2026-08-28 by scope, whose own emitter re-run reproduced the sole-candidate row.
+  this is filed rather than built. Surfaced 2026-08-28 by the close of
+  `installer-trial-lifecycle-repair`, which filed it to the gap inbox; promoted 2026-08-28 by scope,
+  whose own emitter re-run reproduced the sole-candidate row.
 
 - **wait-primitive-and-record-compose-to-false-completion** [design-pending] — the mandated in-turn
   wait and the mandated launch-liveness record compose into a waiter that reports success while its
