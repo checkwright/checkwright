@@ -65,62 +65,6 @@
 
 ## Technical Debt
 
-- **drain-order-retroactive-debt-sweep** — apply the 2026-08-30 drain-order ruling to the pool it
-  was measured against: the ten entries the last drain promoted, none of which was tried against
-  →fix or →icebox before it was written.
-  **Operator-directed at the 2026-08-30 consult, filed directly under CLAUDE.md §Housekeeping's
-  sanctioned exception.** The ruling (TRAJECTORY.md, lifecycle-kit/SPEC.md §The committed gap
-  inbox) orders the drain fix → icebox → promote for new intake; this unit runs the same triage
-  once over the entries already promoted, so the ruling is tested on the fortnight's evidence
-  rather than only on what arrives next.
-  **The cohort, by the 2026-08-30 drain commit `40ff7930`:** `kit-config-template-port-disposition`,
-  `harness-template-port-disposition`, `declaration-shape-outside-header-unreadable`,
-  `inline-interpreter-substrate-census`, `entry-compression-contract-unenforced`,
-  `no-port-cause-validation-scoped-to-registry`, `boundary-preserve-covers-names-not-lifetimes`,
-  `stage-journal-absence-caught-only-downstream`, `enter-stage-flag-position-silently-ignored`,
-  `stamp-provenance-remedy-loops-when-uncommitted`. **Four of the ten are landed and retired, and
-  they are named rather than counted**, because a bare count leaves a reader unable to tell which
-  six are still owed: `kit-config-template-port-disposition`, `harness-template-port-disposition`,
-  `no-port-cause-validation-scoped-to-registry` and `stage-journal-absence-caught-only-downstream`.
-  **RE-PROBED AT PROMOTION and the arithmetic holds**: exactly six of the ten survive as entries at
-  HEAD, every one in `## Deferred` and every one carrying the tag — the four named above are absent.
-  **Deliverable:** every one of the ten takes exactly one of three exits, stated per slug in the
-  landing commit — **fixed** (debt-shaped by the interstitial litmus, test-and-doc-complete, its
-  slug on a bare `## Done` line), **iceboxed** (machinery finding blocking no entry or push,
-  compressed to the one-line grammar), or **kept** with the one sentence saying which of the two
-  it failed. Two are known defects with a fix the entry already names —
-  `enter-stage-flag-position-silently-ignored` (a trailing `--simulate` performs a real stamp)
-  and `stamp-provenance-remedy-loops-when-uncommitted` (a gate's help prescribes a remedy that
-  does not clear its red) — and the planning assumption is that those two fix,
-  the two port-disposition entries are two of the four retired above, and the rest icebox.
-  **ADMITTED AS A FULL UNIT OF `supported-platform-roster-widening` — ruled by the OPERATOR
-  2026-09-07, through the lead's question relay in a lead session and lead-relayed.** It
-  qualifies on none of the port-first run's three joining grounds; the operator admitted it
-  anyway, on the escalation that put that fact in front of them rather than around it.
-  **IT DISPOSES OF `enter-stage-flag-position-silently-ignored`, WHICH IS THEREFORE NOT COUNTED
-  TWICE** — that entry is one of the ten named above and the no-double-count rule is its own.
-  **PROMOTED AS DEBT BY SPEC — ruled `lead, own-authority` 2026-09-08**, on spec's escalation that
-  the unit is debt-class and therefore unreachable by the route that owns it. It mints no name on
-  any governed surface, so it fails canon-kit/SPEC.md's new-names litmus: its three exits are
-  fixed, iceboxed and kept, none of them `promote`, and the fixed exit is defined by this entry's
-  own text as debt-shaped. scope owns debt promotion and had ended its stage; spec owns feature
-  promotion by authoring and could not reach this. The lead probed the re-entry route and refused
-  it as destructive — scope's entry is an iteration boundary that resets the evidence surfaces —
-  so the promotion landed here. **The routing hole itself is filed to the gap inbox as machinery
-  debt**, because a lead ruling disposed of this instance and mechanized nothing.
-  **ONE EXIT AMONG THE THREE IS FEATURE-SHAPED, and build meets it knowing so.** The candidate
-  fixes for `enter-stage-flag-position-silently-ignored` are: refuse any argument after the stage
-  name; accept the flag in any position; or make the mode an env knob so position cannot express
-  it. **The third mints a config knob and is therefore feature-class**, needing an amendment this
-  unit does not carry. The first is smallest and stays debt-shaped. If build reaches for the third,
-  that slug leaves this sweep rather than the sweep changing class.
-  **What it buys, which is why it was not dropped:** each close under the new order files new
-  intake correctly while the measured backlog keeps its old shape, so the `qnet` the ruling's
-  discharge event reads stays flattered by nothing this unit would have retired.
-  Per-slug exits are judgments the unit makes at build; recovery of each body is mandatory before
-  ruling on it.
-  Filed 2026-08-30 by the consult session, operator-directed; promoted at spec 2026-09-08.
-
 ## Deferred
 
 
@@ -10086,5 +10030,6 @@
 - enter-stage-flag-position-silently-ignored
 - enter-stage-arg-position-silent-drop
 - stamp-provenance-remedy-loops-when-uncommitted
+- drain-order-retroactive-debt-sweep
 
 ## Lessons Learned
