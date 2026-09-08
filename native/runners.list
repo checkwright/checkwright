@@ -6,10 +6,15 @@
 #
 # It is a RUNNER SELECTION and not a support commitment, which is why it is a
 # separate file from native/targets.list rather than a second column on it: a
-# mapping may name a platform the roster deliberately may not. Both of the
-# darwin lines below are exactly that case — neither triple is on the roster,
-# and both must be buildable anyway, because the whole point of the
-# `native-artifacts` job is to measure a platform BEFORE it joins.
+# mapping may name a platform the roster deliberately may not. What the
+# separateness holds open is a PERMISSION and not a standing exception: it is
+# what lets the next probed platform be built and measured BEFORE it may be
+# declared, which is the whole point of the `native-artifacts` job. Read it off
+# the permission rather than off whichever line happens to be off the roster —
+# both darwin lines below are the attested path through that sequence, each
+# mapped and built here while off the roster and each joined only once one run
+# carried both halves of the predicate. A mapped triple that is also a roster
+# line is that sequence finished, not the property lapsing.
 #
 # Two readers, one map. .github/workflows/publish.yml's roster job derives the
 # release build matrix from it, and .github/workflows/gates.yml's

@@ -1125,10 +1125,22 @@ jobs:
   # carries native Windows in neither state, so those legs cannot read a support
   # commitment that does not exist and assert their own platform instead.
   #
-  # **What this leg cannot do, stated so no reader expects it.** It cannot join
-  # its own target: criterion 1 is `native-artifacts`' and criterion 2 is this
-  # leg's, and the write into native/targets.list is a later session's on a run
-  # that carries both. Its first green is that run's second half.
+  # **The predicate this leg was built for is discharged, and the mechanism
+  # above is what discharged it.** This leg could never join its own target —
+  # criterion 1 is `native-artifacts`' and criterion 2 is this leg's, and the
+  # write into native/targets.list was a later session's on a run that carried
+  # both. That run happened, that write landed, and the flip to `joined` made
+  # this leg and its producer binding with no edit anywhere in this file. The
+  # derived posture is therefore demonstrated rather than argued, which is the
+  # reason to keep reading `runs-on` and `continue-on-error` out of the
+  # declaration rather than a reason the hold is missed.
+  #
+  # **So what a zero here licenses has changed with it.** While the triple was
+  # held, a zero was criterion 2 of a join predicate and licensed nothing on
+  # its own. That predicate is spent: a zero is now this workflow's standing
+  # assertion that the published Intel artifact still installs on an Intel
+  # host, and a red is a support commitment broken rather than a platform that
+  # has not joined yet.
   #
   # **Every step below names `shell: bash`, and the derived runner is why.** A
   # `runs-on` that is an expression cannot be read by any tree-local reader, so
@@ -1287,9 +1299,16 @@ jobs:
       # gratuitous divergence that reds would cost the NEXT iteration the join
       # this leg exists to buy.
       #
-      # And the verdict wording differs from the sibling's on purpose: this leg
-      # is held, so a non-zero does not fail the workflow. Read a red here as the
-      # reason `x86_64-apple-darwin` is still absent from native/targets.list.
+      # And the verdict now carries the sibling's binding reading. The old
+      # divergence was a divergence from a HELD posture — a non-zero that did
+      # not fail the workflow, read as the reason the triple was still absent
+      # from native/targets.list — and its ground went with the hold when the
+      # declaration flipped. What the verdict does NOT copy from the sibling is
+      # a flat "this leg is binding": that leg's posture is hard-coded and this
+      # one's is derived, so stating the binding outcome flatly here would mint
+      # exactly the maintained copy this job's header refuses. It states the
+      # rule instead, conditioned on the join state, and so cannot go stale
+      # against a declaration that moves back.
       - name: install smoke on an Intel macOS host
         shell: bash
         run: |
@@ -1307,7 +1326,8 @@ jobs:
           rc="${PIPESTATUS[0]}"
           echo "== verdict =="
           echo "installer_smoke on Intel macOS exited $rc"
-          echo "This leg's posture is derived from the platform declaration, so while"
-          echo "$host is held a non-zero here does NOT fail the workflow."
-          echo "A zero here is criterion 2 only: see this job's header for the rest."
+          echo "This leg's posture is derived from the platform declaration, so what a"
+          echo "non-zero does is decided there and not by this text: while $host is"
+          echo "joined the leg is binding and a non-zero here fails the workflow."
+          echo "A zero here is not a roster join: see this job's header for why."
           exit "$rc"

@@ -97,9 +97,11 @@ own header.
   the producer's own upload, nothing rebuilt on the smoke's host — and reaches
   its artifact-present branch. That pair on one run is what
   `native/targets.list`'s header asks for, and it is what this line rests on.
-- `x86_64-apple-darwin` (held: that same predicate on an Intel macOS leg of its own) — Intel
-  Macs. `macos-latest` is arm64, so the macOS smoke leg measures Apple silicon
-  and asserts nothing here; an Intel leg is a separate green.
+- `x86_64-apple-darwin` (joined) — Intel Macs. `macos-latest` is arm64, so the
+  leg above measures Apple silicon and asserts nothing here; this line rests on
+  an Intel leg of its own, which installs the Intel producer's upload on an
+  Intel host and reaches the same artifact-present branch. The same pair on one
+  run, asked for by the same header.
 
 <!-- platforms:end -->
 

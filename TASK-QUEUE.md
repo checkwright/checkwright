@@ -12,47 +12,6 @@
 
 ## New Features
 
-- **intel-macos-roster-join** [spec: SPEC-intel-roster-join.md] — the roster's third line, and the
-  sentences across six surfaces that argue from a hold that line ends.
-  **The design is `SPEC-intel-roster-join.md`'s and is not restated here:** the licence verified
-  job-keyed at this stage, six deltas with their work classes, the seam ruling, and what the join
-  makes binding.
-  **ADMITTED AS THIS ITERATION'S FEATURE HALF — `operator`, 2026-09-08, answered directly in a
-  `/lead` session and relayed by the lead**, beside the debt half
-  `windows-smoke-manifest-cr-survives-repair`. **Promotion IS the authoring**, which is the act
-  scope ruled feature-class: a triple joining `native/targets.list` and `docs/install.md`
-  §Requirements mints governed names, so the unit could not be picked before its amendment existed.
-  **THE LICENCE, read off a round already bought and costing no push.** Run `34245261556`, job
-  `102126302115`, carries both limbs of the predicate on one run: `native-artifacts` green for the
-  triple on `macos-15-intel` with binary and `.sha256` sidecar uploaded, and the Intel
-  `install-smoke` leg green having consumed that upload under
-  `INSTALLER_SMOKE_ARTIFACTS_DIR`, reached the artifact-present branch, emitted
-  `INSTALLER-SMOKE: clean` and exited 0.
-  **THE EXECUTABLE HALF IS TWO FILE EDITS AND A REBUILD** — the producer leg, the consumer leg, the
-  runner mapping and the shared release build body were all bought by the two iterations before this
-  one. `native/runners.list` already maps the triple and takes no edit; the roster edit owes
-  `build-native.sh` because the file is in the crate's stamped source set.
-  **WHAT THE SWEEP FOUND THAT NO BULLET HAD.** `native/targets.list`'s standing-case bullet asserts
-  that no single run has yet carried both halves — false at HEAD, before this unit lands anything,
-  and repaired here rather than filed because that sentence exists to say why the line is absent.
-  And the join takes the platform declaration to **zero held platforms**, which empties the subject
-  of `check-install-platforms`' arm D and falsifies `docs/site-architecture.md`'s claim that the arm
-  is a standing instrument. `gate-sdk/SPEC.md` §The port-candidate criteria was checked and does
-  **not** go stale — its uncovered set is already de-literalized to the roster's complement.
-  **WHAT IT MAKES BINDING, which is the whole real cost.** At the landing commit every
-  `native-artifacts` leg and every platform `install-smoke` leg except the Windows one is binding on
-  master, with no workflow edit — the derived-posture mechanism working as designed, exercised for
-  the first time. The legs are green today, so nothing reds at the landing and the cost arrives at
-  the first Intel-macOS breakage. The debt half edits the script all three platform smoke legs run,
-  so a batch holding both wants that posture in view.
-  **A SIXTH DELTA WAS ADDED AFTER THE ESCALATION CAME BACK — `operator`, 2026-09-08, asked and
-  answered in a `/lead` session and lead-relayed:** `TRAJECTORY.md`'s born-native ruling's
-  weighed-cost figure is de-literalized to the roster's complement, keeping the 2026-08-14 weighing
-  legible as a weighing and carrying its own authority line so the next reader need not read a
-  commit. The amendment records that the de-literalization was declined for that surface once and
-  that this ruling reverses that, so the delta rests on the ruling and not on precedent.
-  Promoted at spec 2026-09-08 by authoring the amendment.
-
 ## Technical Debt
 
 - **windows-smoke-manifest-cr-survives-repair** — the manifest-CR class
@@ -10364,5 +10323,7 @@
 - **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
 
 ## Done
+
+- intel-macos-roster-join
 
 ## Lessons Learned

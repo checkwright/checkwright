@@ -285,17 +285,24 @@ The mechanism — the exception criterion that makes "with cause" operable — i
 form each, and is not restated here. The cost it was weighed against, recorded
 so it is not re-argued: a `.gate`-declared member is *omitted* on a platform
 `native/targets.list` carries no artifact for, so the flip attaches that
-omission to every new gate for whatever that roster does not carry. It was
-weighed at **every macOS adopter**, the roster then being one target; with
-`aarch64-apple-darwin` joined the set is Intel Macs plus the hosts the platform
-declaration does not carry at all. **Only that figure is corrected** — the
-verdict, its grounds and its date stand, the ruling got cheaper than it was
-costed at rather than weaker, and recording the cost still does the thing it was
-recorded to do.
+omission to every new gate for whatever that roster does not carry.
+**It was weighed at every macOS adopter, the roster then being one target** —
+that is the figure the 2026-08-14 decision rested on, and it does not move. What
+the omission attaches to at any later moment is **that roster's complement**,
+which narrows as the roster widens: stated as the complement rather than as a
+fresh count, so this record keeps tracking the weighing instead of owing a
+correction on every join. The verdict, its grounds and its date stand, the ruling
+got cheaper than it was costed at rather than weaker, and recording the cost
+still does the thing it was recorded to do.
 The ruling does not widen the roster; that residue was costed as a queue entry
 and is now **discharged** by a landed gate (2026-09-08), and the roster's own
 widening trigger — the produced-and-exercised predicate stated at
 `native/targets.list` — is unchanged **by this ruling**.
+**This restatement is the `operator`'s, 2026-09-08, asked and answered in a
+`/lead` session and lead-relayed**, and its extent is the cost sentence's *form*
+and nothing else — no verdict, no ground, no date. It is recorded here rather
+than in a commit message so that a reader of this paragraph can see what was
+authorized without reading history.
 
 **The release policy's security-or-supply-chain trigger reads narrowly — ruled
 2026-08-05.** It fires on a vulnerability or a compromised artifact. An

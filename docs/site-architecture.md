@@ -228,8 +228,15 @@ recoverable:
   an empty precondition or on a roster line it should not have. It carries a
   fourth arm that asserts nothing and reports instead — per held platform, the
   count of registry members a host with no published artifact loses, printed on
-  the clean line as well as the red one, which is the standing instrument
-  gate-sdk/SPEC.md §The port-candidate criteria's aggregate cost names. Two
+  the clean line as well as the red one. **That arm carries two limits, and it
+  is not the standing instrument a reader looking for the aggregate cost
+  wants.** Its subject is the held set, so it reports only *while* something is
+  held: a join that empties the block of holds silences it — the state the
+  declaration is in with `x86_64-apple-darwin` joined — and a report with no
+  subject is the arm working rather than a gap. And the aggregate cost
+  gate-sdk/SPEC.md §The port-candidate criteria names has a different
+  instrument, the **binary-less leg**; that section owns how the two relate and
+  why this arm is not a second measurement of it. Two
   readers of one grammar is the shape `scripts/gates.list` already ships (a bash
   reader and a compiled one), not a duplication to collapse.
   **The state word now decides a binding posture on both sides of the artifact
@@ -243,6 +250,14 @@ recoverable:
   state word as a support commitment taking effect rather than as documentation:
   the legs are green at the moment of a flip, so nothing reds at the landing, and
   the cost arrives the first time that platform breaks.
+  **The mechanism has a worked instance now, and it is the first one.**
+  `x86_64-apple-darwin`'s flip to `joined` made that triple's producer leg and
+  its Intel `install-smoke` consumer leg binding on master at the landing
+  commit, and the diff that did it edits `.github/workflows/gates.yml` nowhere
+  — a roster line and a state word are the whole of it. That leaves the Windows
+  `install-smoke` leg as the only non-binding platform leg in that workflow,
+  and its posture is hard-coded rather than derived, because the page declares
+  native Windows in neither state and so hands that leg no commitment to read.
 
 **A derived surface earns a row here only when it has a reader who cannot run
 the emitter** — a public page, a file a fresh clone needs before its tooling
