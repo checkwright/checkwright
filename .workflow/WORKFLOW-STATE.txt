@@ -8,3 +8,4 @@ intel-macos-roster-join scope aa9709af 2026-09-08 01c16919
 intel-macos-roster-join spec a81f4515 2026-09-08 f67bd050
 intel-macos-roster-join align aae4ca1e 2026-09-08 e9786fe6
 intel-macos-roster-join build ad03f68e 2026-09-08 0d972afc
+intel-macos-roster-join build a4c475d4 2026-09-08 acbf32e8
