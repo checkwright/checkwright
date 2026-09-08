@@ -14,65 +14,6 @@
 
 ## Technical Debt
 
-- **windows-smoke-manifest-cr-survives-repair** — the manifest-CR class
-  recurs on the same surface its repair landed on, post-fix, and the diagnostic arm
-  reporting it contradicts its own sample.
-  **JOINED AND PROMOTED — `operator`, 2026-09-08, answered directly in a `/lead` session and
-  relayed by the lead.** The window's unit set is this entry beside `intel-macos-roster-join`,
-  the roster join being the feature half whose amendment `/spec` authors and whose promotion
-  IS that authoring. The joining ground is the port-first ruling's **same-surface** limb, not a
-  new classifier: `installer/consumer-smoke/run-smoke.sh` and the platform legs in
-  `.github/workflows/gates.yml` are what both halves edit, so the ceremony and the context are
-  paid once. Read this pairing rather than re-deriving it.
-  **THE ROUTING FACT.** `.github/workflows/gates.yml:415` runs
-  `installer/consumer-smoke/run-smoke.sh` in the `install-smoke-windows` leg, so the leg
-  exercises the exact script `aa5013f4` repaired. The sibling-surface reading is wrong on
-  the mechanics, and the leg's own "this leg reports; it does not judge" verdict text
-  (`:419-422`) is what makes the unrelated-precondition reading attractive rather than
-  evidence for it.
-  **THE TIMING FACT.** `aa5013f4` is not an ancestor of `dd6dcf54` by `git merge-base
-  --is-ancestor`, so run 34212264301 ran WITHOUT the repair and run 34245261556 ran WITH it,
-  and the leg is red on both. Calling the red merely pre-existing is true about the push and
-  misses what matters: it postdates the fix that was supposed to clear it, which the pre-fix
-  round could not show.
-  **THE EVIDENCE**, read job-keyed off run 34245261556 job 102125490177, free from a round
-  already bought and costing no new push. Post-repair the raw manifest stream line still
-  terminates in octet `0d` — the stream1 and badline dumps both read 60 bytes ending `0d`,
-  held before any split — which is the signature `aa5013f4`'s own message named as its
-  ground for implicating the process substitution. That repair swapped a process
-  substitution for a command substitution feeding a here-string, which changes the channel
-  and preserves a CR already present in the upstream output, so this round does not support
-  the channel premise.
-  **AN INTERNAL CONTRADICTION IN THE REPORT, recorded because it bounds what may be
-  concluded.** For the sampled entry `gate-sdk/README.md` all six decompositions read
-  len40=yes class=clean shape=pass and carry one identical value, yet the entry counts as a
-  disagreement and the summary asserts that 492 of 492 carry an operand that is not 40
-  lowercase hex. Two decompositions of one recorded entry disagree, which is a statement
-  about that harness. So the arm cannot presently be read as testimony about the loop, and
-  this entry does NOT assert the repair is wrong — only that it did not clear the leg and
-  that its stated ground is unsupported by this round.
-  **WHAT THE BUILD OWES, and the order is not free.** The diagnostic arm's self-contradiction
-  is settled FIRST, because until it is, no dump it prints can be read as testimony about the
-  loop and a repair chosen off one would be chosen off an instrument that disagrees with
-  itself. Only then is the CR's entry point named and the repair taken.
-  **DISTINCT from the retired slug** `smoke-manifest-read-appends-carriage-return`, and
-  deliberately not a re-filing of it: that unit's deliverable was the channel repair and it
-  landed. This entry's subject is that the red survived it on the same surface, plus a
-  diagnostic arm whose summary contradicts its own sample — a new defect after a fix, which
-  files as one rather than as a recurrence of the fixed entry.
-  **NOT STAGE-BLOCKING:** the leg is `continue-on-error: true` at
-  `.github/workflows/gates.yml:213`, the prior run concluded success with it red, and
-  nothing here blocks a stage entry or a push today. That is unchanged by the promotion and
-  is why the roster join beside it is not held behind this repair.
-  **SAME-SURFACE with any platform-leg work**, which is the ground the operator joined it on:
-  `run-smoke.sh` is what the macOS and Intel-macOS legs run too, and the Intel leg
-  becomes binding the day `x86_64-apple-darwin` joins the target roster.
-  **Cost while deferred:** a standing red on a platform leg whose only reader is a session
-  that already knows to discount it, and a diagnostic arm nobody can quote.
-  Surfaced 2026-09-08 by the `macos-roster-join` close as its last gap bullet, filed there;
-  promoted to Deferred 2026-09-08 at this scope's drain and to Technical Debt in the same
-  session on the ruling above.
-
 ## Deferred
 
 
@@ -10325,5 +10266,6 @@
 ## Done
 
 - intel-macos-roster-join
+- windows-smoke-manifest-cr-survives-repair
 
 ## Lessons Learned
