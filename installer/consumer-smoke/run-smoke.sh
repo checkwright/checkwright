@@ -91,9 +91,12 @@ else
     # spec: gate-sdk/SPEC.md §Consumer payload — the digest is emitted once, here, where the bytes are produced: pack re-verifies this sidecar and init verifies it again before writing, so both readers check a value neither of them computed
     ( cd "$ART" && sha256sum "$NATIVE_BIN" > "$NATIVE_BIN.sha256" ) \
         || fail "could not emit the digest sidecar beside the built binary"
+    # spec: gate-sdk/SPEC.md §Consumer payload — the mode loss is PLANTED, because this path is the one that cannot produce it: a local build stages an already-executable binary, so without this line pack is never asked to restore a mode and the restoration is witnessed only on a host whose artifact crossed the real wire. After the sidecar deliberately: a mode is not a content write, and emitting the digest first is what says so. A red here is init failing to execute the payload artifact, exactly as an adopter would
+    chmod 644 "$ART/$NATIVE_BIN" \
+        || fail "could not plant the artifact transport's mode loss on the staged binary"
     [[ -z "$(git -C "$REPO" status --porcelain)" ]] \
         || fail "the build leg left the worktree dirty — the crate's output must land in gitignored build space and the artifact directory in the smoke's own scratch"
-    say "built $NATIVE_BIN for $HOST_TARGET with the sidecar this leg emitted"
+    say "built $NATIVE_BIN for $HOST_TARGET with the sidecar this leg emitted, staged non-executable so pack must restore the mode the transport drops"
 fi
 
 printf 'pack\n'

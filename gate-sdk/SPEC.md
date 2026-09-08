@@ -7584,6 +7584,28 @@ needs:
   the arm moved into the bespoke `.test.sh`, which ships too and constructs the
   link at run time (§check-tree-terms).
 
+**A payload file's executable mode is transport-lost, so the packer sets it.**
+That is the bullet above's clause — payload content is bound by what the
+payload's transport can carry — reaching a second property. The prebuilt binary
+is payload content, and the artifact transport between a build leg and
+`scripts/pack-installer.sh` does not preserve mode: GitHub's artifact upload
+flattens every uploaded file to `0644`. **Measured rather than reasoned about:**
+a producer leg's own `ls -l` shows the built binary executable and the consuming
+job's `ls -lR` shows the same bytes at `0644`, on every target in the same run;
+the adopter meets it as a `Permission denied` when `init` runs the payload
+artifact to place it. Both readers of the target roster are exposed, because
+both move the binary over that transport.
+
+**So the mode is restored once, in the packer, and never in a workflow.** A
+per-workflow `chmod` puts the payload's shape in two places, and it greens one
+transport while the other keeps shipping a binary the adopter cannot run — which
+is worse than the red it clears, because it spends the signal that the defect
+exists. The packer is the one seam both transports reach, and restoring a mode
+is not a content write, so the one-digest rule this section states elsewhere is
+untouched: the sidecar the build leg emitted still describes the bytes the
+packer copied. The mode is set absolutely rather than added, because who packs
+must not decide what an adopter receives.
+
 **The target roster is the surface that asserts platform support.** One Rust
 target triple per live line in the file `GATE_SDK_NATIVE_TARGETS_FILE` names
 (§Layout and configuration), with one owner and three readers: the publish

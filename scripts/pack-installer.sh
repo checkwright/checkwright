@@ -165,6 +165,8 @@ if [[ -n "$ARTIFACTS" ]]; then
         }
         mkdir -p "$ASM/payload/artifact/$target" || exit 2
         cp "$src/$binary" "$src/$binary.sha256" "$ASM/payload/artifact/$target/" || exit 2
+        # spec: gate-sdk/SPEC.md §Consumer payload — restore the executable mode here and in no workflow: this is the one seam both artifact transports reach, and neither carries the mode across. Set absolutely rather than with `+x`, so the packer's umask cannot decide what an adopter receives; it is a mode and not a content write, so the sidecar verified above still describes these bytes
+        chmod 755 "$ASM/payload/artifact/$target/$binary" || exit 2
         artifacts=$((artifacts + 1))
     done
     # spec: gate-sdk/SPEC.md §Consumer payload — the roster's one publication, copied verbatim, never regenerated or filtered
