@@ -11,3 +11,4 @@ macos-roster-join build a2290e8a 2026-09-08 b881c4b0
 macos-roster-join build aa22c4e5 2026-09-08 c479abb2
 macos-roster-join build a5142439 2026-09-08 23bcfed1
 macos-roster-join validate a6261070 2026-09-08 aa5013f4
+macos-roster-join close ac411593 2026-09-08 d122bf4c
