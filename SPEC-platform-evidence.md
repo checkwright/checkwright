@@ -216,7 +216,11 @@ operator's ruling bought.
 
 On that observation, three edits and nothing else: the roster gains `<T>`'s line; `native/runners.list`
 already names its runner (delta 2); and delta 1's block flips `<T>` from `held` to `joined`. The
-sibling unit's gate holds those three in lockstep, so a partial write reds at pre-commit.
+sibling unit's gate holds **two** of those surfaces in lockstep — the declaration block and the
+roster — so a partial write across that pair reds at pre-commit. `native/runners.list` is
+deliberately outside the lockstep on its own header's grounds (`native/runners.list`:7-12): it is a
+runner selection and not a support commitment, so a mapping may name a platform the roster
+deliberately may not.
 
 ### Why the roster line is not asserted here
 
