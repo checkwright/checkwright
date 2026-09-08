@@ -8767,8 +8767,8 @@
   never judged which of the two limbs its own posture sits on. `lifecycle-kit/templates/lead.md`
   §Economics states both limbs and the method; local are the threshold (`.claude/commands/lead.md`)
   and every reading — this entry's. Split `lead` 2026-09-05.
-  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, nineteen points and
-  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16, 9.
+  **THE COUNT SERIES, TOTAL escalations reaching the lead, decomposed only from point 16, nineteen
+  points, OPEN**, one per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16, 9.
   Threshold: a third such iteration, ANSWERED; no single point flips the posture. Points one to
   seventeen keep VALUES only; narratives in git history. **THE EIGHTEENTH IS SIXTEEN**, the series'
   HIGH, SEVEN to the OPERATOR and ZERO to the intent oracle, confounded by the series' widest
@@ -10074,6 +10074,128 @@
   Filed 2026-09-08 by build to the gap inbox and promoted at this close's drain: →fix refused, since
   choosing between extraction and a gate is design work and delta 3 already refused the extraction
   half once; →icebox refused on the adopter witness above.
+
+- **wait-form-unallowlistable-by-construction** [design-pending] — the wait primitive the
+  standing dispatch policy mandates cannot be reached by any allowlist entry, and it is now
+  the largest single source of out-of-band permission decisions in this tree.
+  **MEASURED at the `macos-roster-join` close's tooling-friction triage:** `--emit
+  scan-prompts` ranks 186 prompting calls across 32 patterns; the top two are the liveness
+  loop at 91x and the journal append at 34x — together 67 per cent of the whole surface.
+  **Both are structurally unallowlistable rather than merely ungranted.** A `Bash(...)`
+  entry matches a bare command, so a chained call, a redirect or an expansion falls off the
+  match path whatever the allowlist holds; the mandated wait is a loop over a recorded pid
+  with a redirect inside it, and `scripts/bash-guard.sh` refuses every expansion by design.
+  No glob can ever match either shape.
+  **SELF-DEMONSTRATING, twice.** The first attempt to file the originating bullet was
+  refused by that guard for naming the expansion inside quoted prose, and this scope session
+  was refused again on the same rule while summing a family's inbound edges.
+  **DIAGNOSED FIRST** per guard-kit/templates/close-triage.md: every other ranked pattern
+  that could be granted already is — `grep`, `git status`, `git add`, `python3 -`, `pgrep`
+  and `run-gates.sh` are committed in `.claude/settings.json` and rank only because a
+  chained or redirected call breaks the bare match. Those are habit-change findings, and
+  adding coverage for them buys nothing.
+  **Candidate shape, not costed:** an arm owning the loop internally, so a waiting session
+  makes one allowlisted call against a recorded pid instead of an unmatchable shell loop.
+  `check-producer-liveness` and the `<key>.run` record convention already supply the
+  predicate and the input, and `native/src/emit/wait_probe.rs` already stands waiters up.
+  **THE COUNTERWEIGHT, and it is why this is `[design-pending]` rather than a build.**
+  delegation-kit/SPEC.md §bin/wait-probe retains the shell wait body precisely because it
+  *is* the artifact under measurement — a compiled loop would measure a form no session ever
+  runs. An arm owning the loop changes what that instrument measures, so the two are
+  designed together or not at all.
+  **DISTINCT from** `scratch-auto-allow-no-decoration-steer`, whose subject is a chained
+  write losing the steer; this one's subject is a form no grant can reach at all, chained or
+  not. Distinct from `prompt-ranking-ungrantable-shape-class`, which owns what the ranking
+  should *say* about such rows while they exist; this owns whether the mandated form has to
+  stay unreachable at all.
+  **Machinery-class** on TRAJECTORY.md's 2026-08-30 discriminator: no stage entry and no
+  push is blocked, and the whole cost lands on session throughput.
+  **Cost while deferred:** two thirds of every session's out-of-band permission decisions,
+  forever, on the one act the delivery protocol makes mandatory — and a friction ranking
+  whose head row can never be retired by the mechanism that ranking exists to drive.
+  Surfaced 2026-09-08 by the close of `macos-roster-join`, which filed it to the gap inbox;
+  promoted 2026-09-08 at this scope's drain, the first of that drain's three promotions.
+
+- **icebox-trigger-blind-to-retired-carrier** [design-pending] — the icebox-candidate
+  worklist's trigger test goes blind when a trigger's carrier SLUG retires while the
+  mechanism that slug shipped keeps running, and it produced a false-eligible.
+  **The mechanism.** `native/src/emit/queue_index.rs`'s `ineligibility()` has three causes:
+  a roadmap tag on the lead line, a dated `recurrence:` body line, and a body **naming a
+  live slug**. A trigger whose carrier left the queue satisfies none, so an entry a live CI
+  job protects reads as trigger-absent — the heuristic tests a name's queue membership where
+  the question is a mechanism's liveness in the tree.
+  **The live instance, re-verified at this scope.** `--emit queue-index --icebox-candidates`
+  returns 28 rows, 26 ineligible with a stated reason and 2 eligible. One of the two,
+  `harness-project-dir-fold-dialect-unresolved`, argues its own live trigger in its own
+  prose — the Windows install-smoke leg, which `platform-support-ci-matrix` shipped before
+  retiring 2026-09-06. That leg is still there and still fires:
+  `.github/workflows/gates.yml:208` declares `install-smoke-windows` and `:9-12` runs the
+  workflow on every push to master.
+  **The harm is an eviction, not a mis-ranking.** That entry survived only because its prose
+  says so and a reader read it; a session working the worklist mechanically would have
+  evicted a body whose deliverable waits on an observation that leg alone can supply.
+  **DISTINCT from** `icebox-standing-ineligibility-unrecordable`, whose subject is that a
+  standing not-eligible RULING has no machine-readable home, so the worklist re-proposes a
+  ruled entry. This entry's subject is the eligibility TEST returning the wrong answer
+  because a live mechanism's name left the queue — a defect in the predicate rather than a
+  missing fourth cause. They share a candidate remedy and are not the same finding, which is
+  why that remedy has to be designed against both. Distinct also from
+  `retired-slug-live-pointer-citation`, the reader-side class in governed prose; this is a
+  tool's own predicate.
+  **Machinery-class** on TRAJECTORY.md's 2026-08-30 discriminator, with a further bound:
+  queue-kit/SPEC.md §The queue-index arm rules both worklist filters non-load-bearing, so
+  the harm reaches the review list rather than the disposition.
+  **Cost while deferred:** one false-eligible per close on a list a session is invited to
+  work mechanically, and the entries it mis-selects are exactly those whose triggers
+  outlived their carriers — the longest-lived bodies in the pool.
+  Surfaced 2026-09-08 at that same `macos-roster-join` close, filed there to the gap inbox;
+  promoted 2026-09-08 at this scope's drain, the second of that drain's three promotions.
+
+- **windows-smoke-manifest-cr-survives-repair** [design-pending] — the manifest-CR class
+  recurs on the same surface its repair landed on, post-fix, and the diagnostic arm
+  reporting it contradicts its own sample.
+  **THE ROUTING FACT.** `.github/workflows/gates.yml:415` runs
+  `installer/consumer-smoke/run-smoke.sh` in the `install-smoke-windows` leg, so the leg
+  exercises the exact script `aa5013f4` repaired. The sibling-surface reading is wrong on
+  the mechanics, and the leg's own "this leg reports; it does not judge" verdict text
+  (`:419-422`) is what makes the unrelated-precondition reading attractive rather than
+  evidence for it.
+  **THE TIMING FACT.** `aa5013f4` is not an ancestor of `dd6dcf54` by `git merge-base
+  --is-ancestor`, so run 34212264301 ran WITHOUT the repair and run 34245261556 ran WITH it,
+  and the leg is red on both. Calling the red merely pre-existing is true about the push and
+  misses what matters: it postdates the fix that was supposed to clear it, which the pre-fix
+  round could not show.
+  **THE EVIDENCE**, read job-keyed off run 34245261556 job 102125490177, free from a round
+  already bought and costing no new push. Post-repair the raw manifest stream line still
+  terminates in octet `0d` — the stream1 and badline dumps both read 60 bytes ending `0d`,
+  held before any split — which is the signature `aa5013f4`'s own message named as its
+  ground for implicating the process substitution. That repair swapped a process
+  substitution for a command substitution feeding a here-string, which changes the channel
+  and preserves a CR already present in the upstream output, so this round does not support
+  the channel premise.
+  **AN INTERNAL CONTRADICTION IN THE REPORT, recorded because it bounds what may be
+  concluded.** For the sampled entry `gate-sdk/README.md` all six decompositions read
+  len40=yes class=clean shape=pass and carry one identical value, yet the entry counts as a
+  disagreement and the summary asserts that 492 of 492 carry an operand that is not 40
+  lowercase hex. Two decompositions of one recorded entry disagree, which is a statement
+  about that harness. So the arm cannot presently be read as testimony about the loop, and
+  this entry does NOT assert the repair is wrong — only that it did not clear the leg and
+  that its stated ground is unsupported by this round.
+  **DISTINCT from the retired slug** `smoke-manifest-read-appends-carriage-return`, and
+  deliberately not a re-filing of it: that unit's deliverable was the channel repair and it
+  landed. This entry's subject is that the red survived it on the same surface, plus a
+  diagnostic arm whose summary contradicts its own sample — a new defect after a fix, which
+  files as one rather than as a recurrence of the fixed entry.
+  **NOT STAGE-BLOCKING:** the leg is `continue-on-error: true` at
+  `.github/workflows/gates.yml:213`, the prior run concluded success with it red, and
+  nothing here blocks a stage entry or a push today.
+  **SAME-SURFACE with any platform-leg work**, which is the ground on which it would join a
+  window: `run-smoke.sh` is what the macOS and Intel-macOS legs run too, and the Intel leg
+  becomes binding the day `x86_64-apple-darwin` joins the target roster.
+  **Cost while deferred:** a standing red on a platform leg whose only reader is a session
+  that already knows to discount it, and a diagnostic arm nobody can quote.
+  Surfaced 2026-09-08 by the `macos-roster-join` close as its last gap bullet, filed there;
+  promoted 2026-09-08 at this scope's drain, the third of that drain's three promotions.
 
 ## Icebox
 
