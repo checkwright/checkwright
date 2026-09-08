@@ -30,6 +30,13 @@
   `PRIOR_FILES` empty, and the Windows leg has never reached the idempotent-re-run, upgrade or diff
   arms where a CR-bearing prior hash makes every recorded file read as changed. No host this repo
   can reach today exhibits it.
+  **STRENGTHENED at close 2026-09-08 by round 21's measurement, which postdates this filing.** The
+  exposure is no longer latent-by-analogy: `:80` is a MULTI-line command substitution, the exact
+  shape round 20 measured at 492 of 493 — such a capture consumes only the trailing terminator, so
+  every interior line keeps its `\r`. Round 21 then showed a multi-line capture through a process
+  substitution carrying the byte where a single-value capture reads clean, which establishes that
+  every multi-line reader of that stream is exposed. This is one of them, by the same mechanism
+  rather than by resemblance.
   **DISTINCT from `windows-smoke-manifest-cr-survives-repair`**, which is Done: that unit's subject
   is the SMOKE HARNESS's manifest read and the anti-normalization rule governing it. This is the
   installer's install path — a different surface with a different consequence, a silently wrong
@@ -8309,7 +8316,7 @@
   queue-kit:248 names was "filed 2026-08-23 into the gap inbox and still undrained". It was drained
   the same day: `deferred-cost-class-opener-vocabulary` owns it, promoted 2026-08-23 at that scope
   intake. The gate is owed, not unfiled.
-  recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05
+  recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05 2026-09-08
   **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
   close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
   the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
