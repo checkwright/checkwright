@@ -643,7 +643,7 @@
   workflow conclusion — the habit the hold was for outlives the hold.
   **BLOCKED ON THE ROSTER ENTRY, and the block got WIDER by shipping the other half.** The
   relocation's precondition is that an uncovered platform must still install, against
-  `native/targets.list`'s ONE triple. A native Windows install path now exists, so the supported
+  `native/targets.list`'s TWO triples. A native Windows install path now exists, so the supported
   set that roster must cover is {Linux, macOS, native Windows} and the blocker inherits a wider
   target than it had when filed. Known and accepted when the split was ruled. NARROWING ONE took
   that split on this same ground (`doctrine-kit/SPEC.md`:213-216) and is now SPENT — recorded
@@ -9495,14 +9495,14 @@
   **Owner surface:** `installer/README.md` §The packer, authored 2026-09-06 — it carries the port
   disposition, the negative sequencing sentence, and the reachability obligation a cut owes.
   **Size, read off the oracle** rather than counted by hand: `--emit port-blockers --tree` reports
-  `scripts/pack-installer.sh owed lines=196`.
-  **THE BLOCKER, probed 2026-09-06 at build and re-probed by the lead before ruling.**
-  `.github/workflows/publish.yml` `pack:` (`:132`) is a SEPARATE JOB from `build:` (`:75`): its own
-  `actions/checkout` (`:138`), its own `runs-on: ubuntu-latest` (`:134`), a download-artifact
-  (`:140`) and the assemble step (`:145-183`) — and NOTHING between them builds. `needs: build`
+  `scripts/pack-installer.sh owed lines=198`.
+  **THE BLOCKER, probed 2026-09-06 at build, re-probed by the lead, citations re-resolved 09-08.**
+  `.github/workflows/publish.yml` `pack:` (`:142`) is a SEPARATE JOB from `build:` (`:80`): its own
+  `actions/checkout` (`:148`), its own `runs-on: ubuntu-latest` (`:144`), a download-artifact
+  (`:150`) and the assemble step (`:155-225`) — and NOTHING between them builds. `needs: build`
   orders jobs; it does not share a workspace, so `native/target/release/` does not exist there.
-  The smoke half holds: `run-smoke.sh:51-53` builds and asserts the executable before its pack
-  call sites at `:67`, `:511`, `:681` and `:759`.
+  The smoke half holds: `run-smoke.sh:86-89` builds and asserts the executable before its pack
+  call sites at `:106`, `:122`, `:701`, `:871` and `:949`.
   **BOTH ROUTES WERE NAMED AND NEITHER TAKEN — `lead, own-authority` 2026-09-06**, on the build
   session's escalation and with the lead re-running the probe rather than relaying it. The grounds
   are written down here so a later session does not re-derive them:
