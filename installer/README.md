@@ -1445,6 +1445,14 @@ holding the downloaded per-target artifacts and no built binary. So a cut must
 make the binary reachable in that job — by building it there, or by resolving
 `GATE_SDK_NATIVE_BIN` onto the artifact the build legs already produced — and
 that lands in the same unit as the cut rather than after it.
+**Both of those routes are currently refused, which is a sequencing fact this
+section owes a reader and did not carry.** `pack-installer-cut-to-a-non-gate-arm`
+records the refusals — building in that job against the workflow's tag-only
+trigger, and resolving onto a produced artifact against its checkout-plus-bash
+tamper floor — so the obligation above is what a cut owes, not work a cut can
+take today. A composer selecting by stated contract reads this section; without
+this sentence it scored the file takeable, which is the shape
+`doctrine-kit/SPEC.md` already writes for its own single owed member.
 
 **The disposition is stated here rather than in a kit SPEC, and the ground is
 the provenance seam.** gate-sdk is a kit, vendored into every adopter's tree. A

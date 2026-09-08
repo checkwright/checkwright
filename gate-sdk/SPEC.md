@@ -15570,7 +15570,7 @@ workflow, which is exit 1 — and unlike a refusal it names a remedy the author 
 take. §Fail-closed contract is untouched: nothing is captured and read as clean.
 The class is not hypothetical and its in-tree instance is the one that mattered:
 `.github/workflows/publish.yml`'s `build` job is `runs-on: ${{ matrix.runner }}`,
-resolved at runtime from the roster job's hand-kept runner map, so on the day a
+resolved at runtime from the consumer's runner-mapping file, so on the day a
 Windows target joins `native/targets.list` that leg's bash bodies would run under
 `pwsh` while this gate reported them clean. Its step names `shell: bash`, which is
 both the line that clears the finding and the line that keeps the release working.

@@ -286,9 +286,10 @@ form each, and is not restated here. The cost it was weighed against, recorded
 so it is not re-argued: a `.gate`-declared member is *omitted* on a platform
 `native/targets.list` carries no artifact for, and that roster is one target, so
 the flip attaches that omission to **every macOS adopter** for every new gate.
-The ruling does not widen the roster; the residue is costed as
-`born-native-omission-accumulation`, and the roster's own widening trigger
-(stated at `native/targets.list`) is unchanged.
+The ruling does not widen the roster; that residue was costed as a queue entry
+and is now **discharged** by a landed gate (2026-09-08), and the roster's own
+widening trigger — the produced-and-exercised predicate stated at
+`native/targets.list` — is unchanged **by this ruling**.
 
 **The release policy's security-or-supply-chain trigger reads narrowly — ruled
 2026-08-05.** It fires on a vulnerability or a compromised artifact. An

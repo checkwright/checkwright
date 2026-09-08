@@ -198,11 +198,10 @@
   of the stream, and the raw line of the first disagreeing entry.
   **Why still `[design-pending]`: the question is NARROWED, not answered.** It is no longer WHERE
   THE CR COMES FROM but WHICH REPAIR THE OBSERVED DUMP SELECTS, and the three-outcome decision rule
-  that answers it is pinned in that same section — a CR in the stream buys a repair at production
-  or at the channel, covering every reader of that stream; a CR in `want` alone buys one at the
-  read, whose coverage is correctly narrow; and neither carrying one puts the fault in the
-  verdict's decomposition rather than in the value. `wantalt` discriminates the channel from the
-  producer. NO DESIGN TURN IS OWED. What is owed is one red round of `install-smoke-windows`, read
+  that answers it is pinned in that same section — three possible dumps selecting three different
+  repair sites, with `wantalt` discriminating the channel from the producer. Enumerating those
+  outcomes here is the restatement the lead line above already disclaims, so they stay with their
+  owner. NO DESIGN TURN IS OWED. What is owed is one red round of `install-smoke-windows`, read
   JOB-KEYED, and then the repair that list names.
   **Product-class under the 2026-08-30 witness discriminator:** the smoke asserts the payload an
   adopter receives, so the manifest's integrity claim is unasserted on the Windows install path.
@@ -683,10 +682,12 @@
   PowerShell asserts PAYLOAD coverage, and no code path reaches it while the binary carries no
   `init` arm (`native/src/install.rs`, `OPS = ["place-artifact"]`). The relocation is what mints
   that arm, so the leg's extension and this half land together or not at all.
-  **THE SHIPPED LEG HAS NEVER RUN.** Nothing in this repository can execute PowerShell, so the
-  bootstrap was authored against the five steps and merged unexercised; the leg is
-  `continue-on-error` for exactly that reason, with the flip condition stated on the job. Its
-  first CI run is that code's first run — read it JOB-KEYED, never off the workflow conclusion.
+  **THE SHIPPED LEG HAS NOW RUN AND IS BINDING — corrected 2026-09-08 at close, the claim having
+  gone false at the previous close.** It was authored against the five steps and merged
+  unexercised, nothing here being able to execute PowerShell, and was held `continue-on-error` for
+  that reason; `9ad9538c` records its first CI run on `34142337941` and drops the hold, so
+  `.github/workflows/gates.yml`:452-456 carries none today. Read it JOB-KEYED, never off the
+  workflow conclusion — the habit the hold was for outlives the hold.
   **BLOCKED ON THE ROSTER ENTRY, and the block got WIDER by shipping the other half.** The
   relocation's precondition is that an uncovered platform must still install, against
   `native/targets.list`'s ONE triple. A native Windows install path now exists, so the supported
@@ -735,11 +736,12 @@
   leg's failure fails the workflow — and that leg also lost the adopter-path measurement it used
   to buy from a host build. Whether it should degrade or stay binding is an envelope question this
   entry does not settle.
-  **PRECONDITION, narrowed to exactly what is owed.** `aarch64-apple-darwin` and
-  `x86_64-apple-darwin`: the producer job bootstraps GNU bash on its macOS runners, and one run
-  then carries both bounds of the predicate `native/targets.list`'s own header states verbatim —
-  the Intel triple on its own Intel leg. `x86_64-pc-windows-msvc`: untouched by this run and
-  unchanged — `docs/install.md` §Requirements does not document native Windows as supported, so
+  **PRECONDITION, narrowed to exactly what is owed, and its FIRST limb has since LANDED.**
+  `aarch64-apple-darwin` and `x86_64-apple-darwin`: the producer job's GNU-bash bootstrap landed at
+  `de662aca` (`.github/workflows/gates.yml`:771-786), so what is still owed is the second limb
+  alone — one run carrying both bounds of the predicate `native/targets.list`'s own header states
+  verbatim, the Intel triple on its own Intel leg. `x86_64-pc-windows-msvc`: untouched by this run
+  and unchanged — `docs/install.md` §Requirements does not document native Windows as supported, so
   its FIRST bound fails independently of any leg.
   **The refused alternative reading is not re-argued here** — its grounds are the rewritten header
   of `native/targets.list`, and a later session finding the textual case persuasive is reading a
@@ -10207,13 +10209,5 @@
 - **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
 
 ## Done
-
-- born-native-omission-accumulation
-- manifest-report-launders-the-value-it-prints
-- amendment-roster-omission-detection
-- enter-stage-flag-position-silently-ignored
-- enter-stage-arg-position-silent-drop
-- stamp-provenance-remedy-loops-when-uncommitted
-- drain-order-retroactive-debt-sweep
 
 ## Lessons Learned

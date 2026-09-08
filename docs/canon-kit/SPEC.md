@@ -42,7 +42,12 @@ directory) is the delta artifact for a designed-but-unimplemented change:
 it describes only what is added or changed, is named after the feature
 (`SPEC-sqlite.md`, never `SPEC-PHASE3-SQLITE.md`), and is a transition
 artifact — merged into the canonical spec and deleted when the work
-completes; an amendment never outlives its implementation. The one
+completes; an amendment never outlives its implementation. **Whether a kit
+directory is in the amendment corpus at all is consumer config, not a kit
+guarantee**: both substrates prune a vendored kit root under the scan root
+unless `CANON_KIT_SCAN_KIT_ROOTS=1` (§Layout and configuration), so an
+amendment placed in one falls out of the amendment set at the default —
+silently, with no pairing gate and no verdict, rather than as a red. The one
 sanctioned copy exemption: an amendment may embed a wire-contract delta
 (e.g. a fenced proto block) until merge, because it is the design home for
 a contract that does not exist yet; the canonical spec cites the contract

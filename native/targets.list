@@ -15,9 +15,8 @@
 #      and uploaded; and
 #   2. a platform install-smoke leg green having CONSUMED that upload —
 #      INSTALLER_SMOKE_ARTIFACTS_DIR pointed at the downloaded directory — and
-#      having reached the artifact-present branch, which its log states as
-#      `artifact: <T> verified in place at <bin>, recorded with the seam,
-#      nothing omitted`.
+#      having reached the artifact-present branch, whose completion assertion
+#      installer/consumer-smoke/run-smoke.sh owns and emits.
 #
 # That is *produced and exercised* with no host-built stand-in anywhere in it.
 # On that observation, three edits and nothing else: this file gains <T>'s line,
