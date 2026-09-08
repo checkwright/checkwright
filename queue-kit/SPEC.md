@@ -1787,7 +1787,16 @@ queue tag, not an HTML comment, so it survives the hygiene gate).
 
 Calibration: the trigger set (`QUEUE_KIT_PRECONDITION_REGEX`) is deliberately
 narrow — forward-looking phrasing only, past-tense narration stripped before
-matching — and scoped to the active sections (the deferred section uses
+matching, and **the queue's own `design-pending` tag name stripped in its
+unbracketed spelling too**. That third rewrite exists because the tag name ends
+in a trigger word: the bracket rewrite reaches `[design-pending]` and nothing
+reached a prose mention of the same governed token, so an entry narrating a
+demotion route or an amendment-pairing rule reddened for using the queue's own
+vocabulary. It is stripped in the member's source rather than excluded in the
+regex for two reasons — POSIX ERE has no lookbehind, so a preceding hyphen
+cannot be guarded against in-pattern; and the trigger set is consumer config,
+where a kit-generic defect does not belong. The gate is scoped to the active
+sections (the deferred section uses
 "revisit when" as normal vocabulary and is exempt, and the icebox inherits that
 exemption for the same reason: forward-looking phrasing is what a parked entry
 is *for*). FP-bearing by

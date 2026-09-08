@@ -3,12 +3,13 @@
 use crate::ere::Ere;
 use crate::queue;
 
-// spec: queue-kit/SPEC.md §check-queue-prose-precondition — the two rewrites, patterns baked
+// spec: queue-kit/SPEC.md §check-queue-prose-precondition — the three rewrites, patterns baked
 // literally into this member's own source rather than resolved from consumer config: bracket tags
-// and links come out of the prose, then past-tense narration does
+// and links, then past-tense narration, then the queue's own tag name spelled unbracketed
 const BRACKET_RE_SRC: &str = "\\[[^]]*\\]";
 const PAST_TENSE_RE_SRC: &str =
     "(once|when|after)[^.,;]*(landed|shipped|merged|resolved|completed|was [a-z]+ed)";
+const TAG_WORD_RE_SRC: &str = "design-pending";
 
 // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — awk's `gsub`, as a caller-side loop over the
 // engine's leftmost-longest `find`, which *is* gsub's match rule; the recorded promotion trigger
@@ -86,6 +87,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .map_err(|e| format!("the bracket pattern failed to compile: {}", e))?;
     let past_tense = Ere::compile(PAST_TENSE_RE_SRC)
         .map_err(|e| format!("the past-tense pattern failed to compile: {}", e))?;
+    let tag_word = Ere::compile(TAG_WORD_RE_SRC)
+        .map_err(|e| format!("the tag-name pattern failed to compile: {}", e))?;
 
     let file = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
@@ -105,6 +108,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let b = e.body.to_ascii_lowercase();
         let b = replace_all(&bracket, &b, " ")?;
         let b = replace_all(&past_tense, &b, " ")?;
+        let b = replace_all(&tag_word, &b, " ")?;
         if trig.is_match(&b) && !e.hasblock {
             findings.push((e.startln, e.lead));
         }

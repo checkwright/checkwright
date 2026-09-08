@@ -11,6 +11,7 @@
 ## Technical Debt
 
 - **tidy-logs** — collapse the duplicated log lines.
+- **narrate-the-tag** — describe the design-pending tag and the design-pending work it marks.
 
 ## Deferred
 
