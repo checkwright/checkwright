@@ -512,6 +512,13 @@ consequences:
   context is actually common; split where the model tier changes or a
   delegation-kit split trigger fires — per-batch model tiering is the dominant
   window lever, not token counts.
+  **Shared surface groups a batch and does not order one, so a cut owes a second
+  read.** Neither a shared surface nor shared derived context expresses a
+  *producer/consumer* edge between deltas: where one delta's output is another's
+  input, a cut separating them dispatches the consumer against an input that does
+  not exist yet, and that batch fails on a defect the amendment never carried.
+  Read the deltas for those edges before cutting, and keep a producer with its
+  consumer whatever surface the two sit on.
   The set being batched is **every unit the iteration promoted** — every
   top-level entry in the configured active queue sections, debt units as much as
   feature units — never the amendment set. A debt unit converges an

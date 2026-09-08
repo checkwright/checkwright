@@ -7770,7 +7770,11 @@ attaches, because every later hop moves the file rather than re-deriving its
 contents. A second `sha256sum` on a later job is exactly what lets a published
 digest and an installed digest diverge while both look computed, so the rule is
 held mechanically by §check-gate-substrate-parity assertion F rather than by
-review. Per-artifact sidecars rather than a combined `SHA256SUMS` or a JSON
+review — **within that assertion's reach, which is the publish workflow's own
+text.** A tree that factors its build body out into a called script moves the
+emission outside what the assertion reads, and the invariant then rests on the
+shared body being the single producer: stronger by construction, weaker by
+enforcement. Per-artifact sidecars rather than a combined `SHA256SUMS` or a JSON
 manifest, because an attestation's subject list is `{name, digest}` pairs: a
 sidecar maps onto a subject one-to-one and a build attestation can later land
 *beside* these files with no migration and no digest value changing, where a
@@ -15609,8 +15613,9 @@ construct the gate cannot process; here the gate processed the file perfectly an
 found a step whose dialect nothing in the tree states. That is a property of the
 workflow, which is exit 1 — and unlike a refusal it names a remedy the author can
 take. §Fail-closed contract is untouched: nothing is captured and read as clean.
-The class is not hypothetical and its in-tree instance is the one that mattered:
-`.github/workflows/publish.yml`'s `build` job is `runs-on: ${{ matrix.runner }}`,
+The class is not hypothetical and it has more than one in-tree instance; the one
+that mattered is
+`.github/workflows/publish.yml`'s `build` job, `runs-on: ${{ matrix.runner }}`,
 resolved at runtime from the consumer's runner-mapping file, so on the day a
 Windows target joins `native/targets.list` that leg's bash bodies would run under
 `pwsh` while this gate reported them clean. Its step names `shell: bash`, which is

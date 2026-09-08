@@ -24,6 +24,14 @@
 # §Requirements' platform declaration flips <T> from `held` to `joined`. Those
 # three move together or not at all.
 #
+# ONE MECHANICAL CONSEQUENCE THE THREE DO NOT CARRY, and it is not a fourth
+# edit to this roster but an obligation the first one incurs: the binary's
+# source stamp is git's content identity for EVERY tracked file under the crate
+# root (check-gate-binary-fresh, via git ls-files), and this file is one of
+# them. So a line added here reds that gate with no Rust touched at all, and the
+# commit owes `bash gate-sdk/bin/build-native.sh` beside the three above.
+# native/runners.list is in the same set for the same reason.
+#
 # **Ruled by the OPERATOR 2026-09-07**, through the lead's question relay in a
 # lead session and lead-relayed. The alternative — reading one green macOS
 # install-smoke leg as sufficient — was put and refused, on the ground that the

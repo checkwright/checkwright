@@ -145,7 +145,12 @@ footnote to it:** a citation resolving to a slug that was once live and is not
 now points at *disposed* work, so an entry arguing from one is arguing from a
 premise that has already been settled or shipped — and it reads exactly like a
 live one until the block names it. That is the failure this stage is on record
-for committing, against its own survey. The
+for committing, against its own survey. **One class in that block is not a
+disposed premise, and discounting it is the opposite error:** where a retired
+slug's *name* shipped as live mechanism — a check, a knob, a script the tree now
+carries — its inbound edges cite that mechanism and are current, however large
+the block says the target is. Tell the two apart by resolving the name in the
+tree rather than in the queue. The
 promotion dividend lives in the total and in no single entry, which is also why
 splitting an entry is safe only against that total: a split scatters an entry's
 weight across siblings, and the sum is what puts it back together.

@@ -1441,8 +1441,10 @@ authored against this section.
 **A cut owes the binary's reachability at both callers, and the two are not in
 the same position.** `consumer-smoke/run-smoke.sh` builds the gate binary before
 it reaches any of its pack call sites, on the host it runs on, so a compiled
-form is already reachable there — the macOS install-smoke leg included, since
-that leg builds from its own host before it packs. The release publish
+form is already reachable there — the macOS install-smoke legs included, though
+not by building: since the platform-evidence merge those consume the build
+legs' artifacts through `INSTALLER_SMOKE_ARTIFACTS_DIR` and adopt a compiled
+binary from the hand-off. The release publish
 workflow is not: it packs in a job with its own checkout and no build step,
 holding the downloaded per-target artifacts and no built binary. So a cut must
 make the binary reachable in that job — by building it there, or by resolving
@@ -2641,6 +2643,14 @@ and the refusal is on grounds already in the tree rather than on cost:
 `native/targets.list` refuses a cross-build because it would publish an artifact
 no run has ever executed, which is the same bound the roster's own join
 predicate rests on.
+**That guard is unconditional where its stated ground is not, and a reader owes
+the difference.** It refuses a roster wider than this host *before* reaching the
+artifact hand-off branch and without consulting it, so a run pointed at a
+complete producer hand-off — which could satisfy `--artifacts` for every
+declared target — refuses byte-identically to one holding nothing, naming a
+host-build remedy that does not describe the hand-off path. The guard is
+therefore stricter than the reason it gives. Nothing is blocked by it today:
+every caller either steers at its own host or lets the smoke self-steer.
 
 So the smoke derives a one-line roster from this host's triple and points that
 knob at it **unless the caller has already set it**. Three consequences, each

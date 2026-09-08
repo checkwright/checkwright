@@ -3225,54 +3225,53 @@
   Filed 2026-08-07 by close, carried from build batch 4.
 
 - **align-checklist-fanout-calibration** [design-pending] — align converges at zero divergence
-  while build finds the defects it should have caught.
-  **Read this entry as calibration, not as the revert signal.** The standing align tiering ruling
-  names one live revert trigger, a missed spec defect surfacing as a build ROUND-TRIP; nothing here
-  is grounds to revert the tier, and conflating the two is the misreading this entry prevents.
-  **First reading, `native-cohort-activation`.** Align passed all four amendments at zero
-  divergence; the four build batches then found **ten** real defects, six of one shape — a section
-  the amendment's update roster failed to name. **That half is ANSWERED and needs no re-arguing:**
-  the mechanical fan-out check over an amendment's roster was filed, merged and retired. **What
-  REMAINS `[design-pending]`** is how much is a checklist edit to align's template, how much a
-  further gate, and whether a "keeps" list stands as an input at all — the sharp one, since a
-  "keeps" list is the author's claim about what a change does not touch, so align reading it as a
-  boundary inherits the blind spot that produced the miss.
-  **Second and third readings** (`consumer-cohort-completion-and-wait-enforcement`,
-  `leak-guard-and-assertion-meta-gate-port`): five real defects each, nothing spurious escalated, so
-  zero divergence did not recur — while every batch found its amendment's stated tree *behaviour*
-  wrong and its *ruling* right, each settled by one probe.
-  **The two point opposite ways and the entry keeps both.** The revert signal AS DEFINED — a missed
-  spec defect surfacing as a build ROUND-TRIP — has never fired, build absorbing every one
-  in-session. Whether in-session absorption counts against the tier is the judgment this calibrates.
-  **FOURTH READING, 2026-09-05, the COST half at its MAXIMUM.** Bare `align` read cr=32.0M / 7.96,
-  the highest bare-align cache-read in the log against a recent median near 11M; scored against no
-  scale proxy, amendment count having been retired as one on 2026-09-04. The verdict was NOT
-  zero-divergence — eight in-envelope repairs, zero escalations — so it cuts AGAINST the first
-  reading's thesis while sharpening the cost field. Its best find was CROSS-amendment and no
-  per-amendment pass could have reached it: all four amendments falsely claimed a
-  `check-measured-claim` red on `tree-shell-owed`, three contradicting themselves in their own text.
-  **FIFTH READING, 2026-09-06, the cost half at its MEDIAN.** Bare `align` reads cr=9.35M / 2.83,
-  mid-pack against the twelve prior bare rows (median ≈9.2M, range 6.1M–32.0M). Three real count
-  defects found, NO build round-trip, so the revert signal has not fired in five readings.
-  **That comparison crosses a grammar change, stated rather than hidden:** the fold landed THIS
-  iteration, so a split stage's row now SUMS its sessions where it carried one session's draw
-  before. Bare `align` was single-session in all five, so the column is fold-neutral by inspection —
-  but an earlier split align would have logged low and the log alone cannot exclude one. The COUNTER
-  below is neither spent nor preserved: nothing here records a claim align passed that reading alone
-  could have falsified.
-  **THE COUNTER, recorded as TESTABLE rather than settled.** Four design-bearing amendment claims
-  survived align and died at build. Declined as a miss on one ground — each needed EXECUTION to
-  falsify, build's instrument and not align's. That ground is falsifiable: the first align that
-  passes a claim it could have falsified by READING spends the excuse.
+  while build finds the defects it should have caught. **Read this entry as calibration, not as the
+  revert signal.** The standing align tiering ruling names one live revert trigger, a missed spec
+  defect surfacing as a build ROUND-TRIP; nothing here is grounds to revert the tier, and conflating
+  the two is the misreading this entry prevents. **The live judgment**, unchanged across six
+  readings: that signal has never fired, build absorbing every miss in-session, and whether
+  in-session absorption counts against the tier is what nothing rules. **What REMAINS
+  `[design-pending]`**, the first reading's residue: how much is a checklist edit to align's
+  template, how much a further gate, and whether a "keeps" list stands as an input at all — the
+  sharp one, since a "keeps" list is the author's claim about what a change does not touch, so align
+  reading it as a boundary inherits the blind spot that produced the miss. Its other half is
+  ANSWERED: ten real defects at `native-cohort-activation`, six of one shape (a section the update
+  roster failed to name), the fan-out check over it filed, merged and retired.
+  **READINGS TWO THROUGH FIVE.** Two and three: five real defects each, nothing spurious escalated,
+  so zero divergence did not recur — while every batch found its amendment's stated tree *behaviour*
+  wrong and its *ruling* right, each settled by one probe. FOUR (2026-09-05) is the COST half at its
+  MAXIMUM, cr=32.0M / 7.96 against a recent median near 11M and no scale proxy (amendment count
+  retired as one on 2026-09-04); NOT zero-divergence — eight in-envelope repairs, zero escalations —
+  so it cuts AGAINST the first reading's thesis, and its best find was CROSS-amendment where no
+  per-amendment pass could reach: all four amendments falsely claiming a `check-measured-claim` red
+  on `tree-shell-owed`, three self-contradicting. FIVE (2026-09-06) is that half at its MEDIAN,
+  cr=9.35M / 2.83, three real count defects, no round-trip; its grammar caveat is ANSWERED by
+  inspection — bare `align` was single-session in all five, so the split-stage row fold that landed
+  then leaves the column fold-neutral, only an unobservable earlier split align disturbing that.
+  **THE COUNTER IS SPENT AT THE SIXTH READING, 2026-09-08 (`macos-roster-join`).** The counter was
+  four design-bearing amendment claims that survived align and died at build, declined as a miss on
+  one ground — each needed EXECUTION to falsify, build's instrument and not align's — with that
+  ground recorded as itself falsifiable: the first align passing a claim it could have falsified by
+  READING spends the excuse. This is that align. It returned **zero divergence**, the first
+  reading's shape recurring after three in which it did not, and reasons delta 6's ground clause
+  sound on the theory that it cites §Consumer payload's GENERAL rule, an unsteered smoke producing
+  only its own triple. Build batch 2 RAN the smoke and falsified exactly that: the refusal is no
+  consequence of host-building, the roster-cardinality guard at
+  `installer/consumer-smoke/run-smoke.sh:71-72` firing before the artifact hand-off branch at `:74`
+  opens, unconditionally and byte-identically whether or not a complete hand-off is held. **Four
+  lines apart on one screen — this needed no run**, so the declining ground is gone and the next
+  align is judged without the excuse.
   recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
+  **NOT THE REVERT SIGNAL, which still has not fired in six.** No build round-trip: batch 2 absorbed
+  it in-batch inside its own debt unit's envelope, so the two stay separate records. Nothing here
+  touches the align tiering ruling in any direction. Discharge `lead, own-authority 2026-09-08`.
   **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
-  stage's signal value decays toward zero while its cost does not.
-  **THRESHOLD ROUTING 2026-09-04 (lead, own-authority); deferred 2026-09-05 (operator, lead-relay)
-  under the port-only run. THAT GROUND IS SPENT** — the successor port-first rule legislates
-  threshold members itself, and this is MACHINERY-class by the 2026-08-30 discriminator (its demand
-  witness is this repo's own align stage), meeting none of the three joining grounds. Re-composed at
-  scope 2026-09-05, `lead, own-authority`.
-  Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
+  stage's signal value decays toward zero while its cost does not. **THRESHOLD ROUTING 2026-09-04
+  (lead, own-authority); deferred 2026-09-05 (operator, lead-relay) under the port-only run. THAT
+  GROUND IS SPENT** — the successor port-first rule legislates threshold members itself, and this is
+  MACHINERY-class by the 2026-08-30 discriminator (its demand witness is this repo's own align
+  stage), meeting none of the three joining grounds. Re-composed at scope 2026-09-05, `lead,
+  own-authority`. Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
   check belongs in the release procedure is unplaced; the diagnosis itself is now settled.
@@ -8758,54 +8757,54 @@
   is escalated rather than closed by this session.
 
 - **lead-split-posture-limb-unjudged** [design-pending] — this repo runs the Split posture and has
-  never judged which of the two limbs its own posture sits on. The template
-  (`lifecycle-kit/templates/lead.md` §Economics) states both limbs and the method for taking the
-  reading; what stays local is the threshold, in `.claude/commands/lead.md`, and every reading,
-  which is this entry's. **The deliverable that made the template wrong is DISCHARGED** — premise
-  amended, slug retired, the standing measurement survives. Split `lead, own-authority 2026-09-05`.
-  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, eighteen points and
-  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16. The
-  threshold is a third such iteration and is ANSWERED; the posture flips on no single point.
-  **THE FOURTEENTH WAS ONE**, the minimum: the lead ROUTED rather than ruled; the fifteenth inverted
-  that at 5. **THE SIXTEENTH WAS TEN** and argued its five scope-escalations away as DEGENERACY —
-  the oracle IS the scope session (template §The lead model), so when SCOPE escalates, oracle and
-  escalator are one party. **THE SEVENTEENTH WAS EIGHT** and narrowed that: its one intent-oracle
-  route came from BUILD, so the two were DISTINCT and the route was live and taken; degeneracy
-  belongs to scope's own escalation, never to the posture.
-  **THE EIGHTEENTH IS SIXTEEN — the series' HIGHEST, a third above the prior high of 12.** Counted
-  at the sixteenth's per-question granularity off the lead's own ruling headings: six before build
-  (unit-set baseline, spec's section move, the spec batch split, Q2, Q3, the debt-class promotion
-  route) and ten across build (the batch cut, B1's five, B2's one, B4's two, B5's one). **SEVEN
-  went to the OPERATOR, also a series high, and ZERO to the intent oracle** — which returns that
-  limb to the sixteenth's reading one iteration after the seventeenth first moved it off zero.
-  **THE CONFOUND, stated because the number cannot see it:** this was a SIX-BATCH build under a
-  live lead, the widest window in the series, so volume alone predicts a high count.
-  **THE READING, STATED AND DELIBERATELY NOT ACTED ON:** "consistently several", so the limb is LIVE
-  for this posture on this iteration. Per the binding one iteration is one point and the threshold
-  is a third such iteration: the posture is NOT flipped, and this point reads against the series.
-  **CHARACTER THE COUNT CANNOT SEE, recorded because by design the count cannot.** At the thirteenth
-  two of seven ruled the lead WRONG or ruled WHERE THIS SERIES LIVES; it recurred twice at the
-  fifteenth. A lead instruction is not a governed surface.
+  never judged which of the two limbs its own posture sits on. `lifecycle-kit/templates/lead.md`
+  §Economics states both limbs and the method; local are the threshold (`.claude/commands/lead.md`)
+  and every reading — this entry's. Split `lead` 2026-09-05.
+  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, nineteen points and
+  OPEN**, one appended per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16, 9.
+  Threshold: a third such iteration, ANSWERED; no single point flips the posture. Points one to
+  seventeen keep VALUES only; narratives in git history. **THE EIGHTEENTH IS SIXTEEN**, the series'
+  HIGH, SEVEN to the OPERATOR and ZERO to the intent oracle, confounded by the series' widest
+  (SIX-BATCH) window.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
-  4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** of mid-close unlowered ceilings. **NOT
-  APPENDED at the fourteenth through EIGHTEENTH**, one ground all five: the closing session's own
-  row still grows, so any ratio is a ceiling. Limb: `cost-series-limb-unreadable-inside-close`.
-  **THE COUNTER-EVIDENCE IS NINE INSTANCES OF ONE SHAPE — a claim verified at one surface and read
-  as covering a wider one**, eight the lead's own; a counter never NETS against the count.
-  **ALIGN READING EIGHT, TAKEN AT THE EIGHTEENTH.** align ran on Sonnet, returned no escalation,
-  found ONE real drift finding, ruled out three false-positive leads plus one agent-flagged
-  candidate, and caused NO build round-trip. Priced on the bare `align` rows' `cr` column: 14.83M
-  against a 10.51M median over the last thirty (range 5.24M-32.01M), rank 24 of 30 — **inverting
-  reading seven's yield shape**, three findings at 11.76M then against one now: cost up, yield down.
-  **The last FORTY bare-align rows are Sonnet** (seven said all 132 were, false — the 133-row
-  series spans four tiers), so this is a within-tier trend and nothing prices the Opus alternative.
+  4.4, 9.1**, derived 2026-09-05 replacing accreted mid-close ceilings; NOT appended at the
+  fourteenth through nineteenth, on `cost-series-limb-unreadable-inside-close`'s ground.
+  **COUNTER-EVIDENCE: NINE INSTANCES** of a claim verified at one surface read as covering a wider
+  one, eight the lead's own; a counter never NETS.
+  **THE NINETEENTH IS NINE**, at the established per-question granularity: six before build (scope
+  Q1 operator, Q2 ALONE, Q3 operator, Q4 ALONE, spec Q1 and Q2 operator) and three across build, all
+  batch 1 (E1 delta 4/5 ordering ALONE, E2 the new scripts' port disposition operator, E3 two
+  falsified queue figures ALONE); batches 2, 3 and validate escalated NOTHING. **Five OPERATOR, four
+  ALONE, ZERO intent oracle** — that limb back at zero, matching the sixteenth and unmatching the
+  seventeenth. **Confound, opposite to the eighteenth's:** a THREE-batch build against that point's
+  six, so volume predicts a LOWER count; nine still lands mid-to-upper without that excuse.
+  **DEGENERACY, neither reading picked:** the sixteenth introduced it, the oracle BEING the scope
+  session (template §The lead model), so oracle and escalator are one party; the seventeenth
+  narrowed it to scope's own escalation, its one intent-oracle route coming from BUILD. Scope
+  contributed four of this nine and two of the four ALONE, so that narrowing leaves FIVE live and
+  TWO live-alone.
+  **THE CHARACTER LIMB, which by design the count cannot see.** At the thirteenth two of seven ruled
+  the lead WRONG or ruled WHERE THIS SERIES LIVES, recurring twice at the fifteenth; a lead
+  instruction is not a governed surface. The nineteenth adds a shape: none of its nine ruled the
+  lead wrong, but ONE — E1, the batch cut splitting a producer/consumer edge between deltas 4 and 5
+  — was the LEAD'S OWN error caught downstream by the batch it mis-cut, not a stage ruling on a
+  governed surface, and the count cannot tell the two apart. Rule bought: that template's §Economics
+  — a cut owes a dependency read over the deltas. **ALIGN READINGS EIGHT AND NINE**, on the bare
+  `align` rows' `cr` column against a 10.51M median over the last thirty (range 5.24M-32.01M), all
+  Sonnet so within-tier: EIGHT (eighteenth) 14.83M, rank 24 of 30, ONE drift finding; NINE
+  (nineteenth) **6.20M / $1.99**, **rank 4 of 30**, cheapest quartile, **zero divergence**. Neither
+  caused a round-trip. Eight inverted seven's yield shape (three findings at 11.76M), cost up /
+  yield down, and falsified seven's claim that all 132 bare rows were Sonnet — four tiers; nine
+  inverts again, cost DOWN, yield nil. Nine's qualitative half, unholdable by the `cr` column or
+  that log's 134 comment-free rows: this align PASSED a claim it could have falsified by READING,
+  spending `align-checklist-fanout-calibration`'s COUNTER at its sixth reading — a discharge, NOT
+  the revert signal, recorded there.
   **Cost while deferred:** the posture runs unjudged, so a tier assignment wrong on the character
   limb costs every iteration and shows up as nothing — the count is the only instrument reporting
-  it, and an unread one reads like a healthy one. The cost series decays too, its re-derivation
-  re-running the meter over six receding iterations.
-  **NO `recurrence:` line, deliberately** — the three dated re-filings belonged to the discharged
-  deliverable, so the deferred-age clock reads off `Surfaced`. Surfaced 2026-09-02; filed 2026-09-05
-  by build, splitting the measurement half off its amendment.
+  it, and an unread one reads healthy. The cost series decays too. **NO `recurrence:` line,
+  deliberately** — the three dated re-filings belonged to the discharged deliverable, so the
+  deferred-age clock reads off `Surfaced`. Surfaced 2026-09-02; filed 2026-09-05 by build, splitting
+  the measurement half off its amendment.
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
   name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
@@ -10014,6 +10013,59 @@
   refused (choosing among the three candidates is design work an amendment owes) and →icebox
   refused on the adopter witness above.
 
+- **substrate-parity-digest-assertion-stops-at-the-workflow-text** [design-pending] — assertion F
+  reads the publish workflow's own text for the digest producer, and the producer moved out into a
+  called script.
+  **Re-probed at this drain, and it fell harder than it was filed.** `grep -n sha256sum
+  .github/workflows/publish.yml` returns one hit, `:209`, and that is the release job's **tarball**
+  digest rather than the gate binary's; `grep -n sha256sum scripts/ci-build-artifact.sh` returns
+  `:44-45`. So the build job's per-job `computes_digest` count
+  (`native/src/gates/gate_substrate_parity.rs:285-299`, read at `:708-715`) is now **0** and not 1 —
+  which means the case the assertion used to catch, a second emission added beside the first at
+  1→2, is now 0→1 and passes clean. The filed bullet said the case was no longer caught; the count
+  is why.
+  **The honest half landed at this close and is NOT what stays deferred.** gate-sdk/SPEC.md
+  §Consumer payload claimed the rule was "held mechanically by §check-gate-substrate-parity
+  assertion F rather than by review" and stopped there; that clause now states the assertion's
+  reach and what factoring a build body out into a called script does to it. What stays open is the
+  ENFORCEMENT: widen assertion F to follow a `run:` line's called script, so a shared body sits
+  inside the corpus that holds one-producer-per-digest.
+  **Why the landed coverage limit is not the fix.** A stated limit on a gate whose whole subject is
+  a supply-chain invariant puts that invariant back on review, which is the thing the section's own
+  sentence says it is not on.
+  **Cost while deferred:** the one-producer rule holds by construction — one shared body, one
+  emission — and by nothing else, so a workflow step re-adding an emission beside the call, or a
+  second `sha256sum` inside the script, ships green.
+  Filed 2026-09-08 by build to the gap inbox; promoted here at this iteration's close drain, →fix
+  taking only the overclaim clause (the widening is a Rust change owing a `good/`+`bad/` fixture
+  pair, which a close cannot land test-and-doc-complete) and →icebox refused on the live trigger.
+
+- **macos-adopter-package-set-copied-per-leg** [design-pending] — the adopter-claim brew set now
+  exists twice in gates.yml and nothing holds either copy equal to the page it claims to mirror.
+  **Re-probed at this drain, and the census is three-way rather than the filed two-way.**
+  `grep -n 'brew install' .github/workflows/*.yml scripts/ci-macos-floor.sh`: gates.yml `:899` and
+  `:1166` both run `brew install bash coreutils gawk shellcheck` — the two install-smoke legs'
+  adopter claim — while `scripts/ci-macos-floor.sh:16` runs `brew install bash coreutils gawk`, a
+  DIFFERENT set with no shellcheck, which is the build legs' runner floor and not an adopter claim
+  at all. So a reader comparing copies must first know which two of the three are meant to agree,
+  and no surface says.
+  **The step's own header rules the set an adopter claim held equal to docs/install.md §Requirements
+  IN BOTH DIRECTIONS**, so the drift that matters is the silent one: a leg quietly gaining or losing
+  a formula goes green over an adopter path that stayed broken.
+  **Not a delta-5 omission.** The amendment's delta 3 names a third `scripts/ci-*` body as the thing
+  not to create, and mirroring the sibling leg is what it specified.
+  **Two shapes, and they are not equivalent.** Extract the shared adopter step into one script both
+  legs call, accepting the third body delta 3 refused; or gate the package set against
+  §Requirements' list. The second is enforcement-first and reaches the page as well as the legs,
+  which the first does not.
+  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator** — the subject is what a
+  documented adopter host needs, and a §Requirements list gone wrong is an adopter's own witness.
+  **Cost while deferred:** two copies and a near-copy, none of them held; the failure mode is a
+  green leg over a broken install page.
+  Filed 2026-09-08 by build to the gap inbox and promoted at this close's drain: →fix refused, since
+  choosing between extraction and a gate is design work and delta 3 already refused the extraction
+  half once; →icebox refused on the adopter witness above.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -10123,11 +10175,8 @@
 - **dod-size-figure-stales-in-iteration** [design-pending] — Spec's promotion ages its own DoD size.
 - **portability-count-on-two-surfaces** [design-pending] — Hand-spelled census; both true today.
 - **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
+- **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
 
 ## Done
-
-- gate-binary-roster-covers-supported-platforms
-- gates-yml-macos-leg-ground-stale-and-self-contradicting
-- smoke-manifest-read-appends-carriage-return
 
 ## Lessons Learned
