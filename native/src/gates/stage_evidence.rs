@@ -52,6 +52,27 @@ fn git_blob(args: &[&str]) -> Option<String> {
     Some(String::from_utf8_lossy(b).into_owned())
 }
 
+// spec: lifecycle-kit/SPEC.md §check-stage-evidence — the recovery names the delete, because every
+// reported stamp is uncommitted by construction and a bare re-entry appends beside the stale line;
+// the purity class gets its own line, one text serving both being wrong for whichever it missed
+fn provenance_help(state: &str) -> Vec<String> {
+    vec![
+        format!(
+            "help: every stamp named above is UNCOMMITTED by construction — the assertion skips \
+             any line already in HEAD's version of {} — so re-running --enter-stage cannot clear \
+             this on its own: the fresh line lands BESIDE the stale one and this refusal repeats \
+             verbatim. For a stale-head or 'none' stamp: delete that line from {} (it was never \
+             committed, so nothing is lost), then run 'bash gate-sdk/bin/run-gates.sh \
+             --enter-stage <stage>' and commit the fresh stamp on its own.",
+            state, state
+        ),
+        "help: for an 'also stages' issue the stamp itself is sound — unstage the named path \
+         ('git restore --staged <path>') and commit it separately from the stamp commit \
+         (lifecycle-kit/SPEC.md §check-stage-evidence)"
+            .to_string(),
+    ]
+}
+
 // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the stamp-provenance and
 // stamp-commit-purity assertions. `Ok(empty)` is clean AND every inertness condition;
 // `Err` is a spawn failure the caller reports as exit 2 rather than as a clean run.
@@ -346,8 +367,9 @@ pub fn run(args: &[String]) -> i32 {
             for e in &v {
                 println!("  {}", e);
             }
-            println!("  help: every stamp named above is UNCOMMITTED by construction — the assertion skips any line already in HEAD's version of {} — so re-running --enter-stage cannot clear this on its own: the fresh line lands BESIDE the stale one and this refusal repeats verbatim. For a stale-head or 'none' stamp: delete that line from {} (it was never committed, so nothing is lost), then run 'bash gate-sdk/bin/run-gates.sh --enter-stage <stage>' and commit the fresh stamp on its own.", state, state);
-            println!("  help: for an 'also stages' issue the stamp itself is sound — unstage the named path ('git restore --staged <path>') and commit it separately from the stamp commit (lifecycle-kit/SPEC.md §check-stage-evidence)");
+            for l in provenance_help(&state) {
+                println!("  {}", l);
+            }
             return 1;
         }
         Ok(_) => {}
@@ -364,6 +386,19 @@ pub fn run(args: &[String]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the recovery must name the delete: a help
+    // prescribing only the re-run sends an already-off-script session round a loop with no exit,
+    // attested twice in a row with a byte-identical message
+    #[test]
+    fn the_provenance_help_names_the_delete_and_not_only_the_re_entry() {
+        let h = provenance_help(".workflow/WORKFLOW-STATE.txt");
+        let joined = h.join(" ");
+        assert!(joined.contains("delete that line from .workflow/WORKFLOW-STATE.txt"), "{}", joined);
+        assert!(joined.contains("UNCOMMITTED by construction"), "{}", joined);
+        assert!(joined.contains("unstage the named path"), "{}", joined);
+        assert!(h.iter().all(|l| l.starts_with("help: ")), "{}", joined);
+    }
 
     #[test]
     fn the_stamp_date_is_shape_checked_not_calendar_checked() {

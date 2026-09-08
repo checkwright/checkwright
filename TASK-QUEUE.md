@@ -598,91 +598,6 @@
   Filed 2026-08-30 by close from the gap inbox; the config line was re-read at
   the drain.
 
-- **enter-stage-flag-position-silently-ignored** [design-pending] — the entry
-  tool's read-only mode is recognised only as the first positional argument,
-  and a mis-ordered flag is dropped in silence rather than refused, so a probe
-  performs a real state write.
-  **Attested on itself 2026-08-30 at this close.** Passing the flag after the
-  stage name leaves it in position two, which nothing reads. The mode is
-  silently off: the tool stamped the workflow-state file for real, printed its
-  ordinary success line with no simulate prefix, and exited 0. The session
-  intended a read-only probe.
-  **The caller was wrong and the tool is still at fault**, settled by in-repo precedent rather
-  than left arguable: `run-gates.sh` refuses an unrecognised option by name and prints usage,
-  asserted by its own consumer smoke, while the entry tool accepts a surplus argument and ignores
-  it. No harm landed on the first firing — luck rather than design, and it ran out below.
-  **Candidate shapes, none costed:** refuse any argument after the stage name; or accept the flag
-  in any position; or make the mode an env knob so position cannot express it. First is smallest.
-  **Cost while deferred:** the read-only mode is specifically the LEAD's
-  instrument, gating an expensive dispatch on a cheap probe — so the caller
-  most likely to probe rather than enter is the one a mis-ordered flag
-  silently converts into a stamping session, and the stamp IS the cursor.
-  **DISTINCT from every entry about what the entry gate ASSERTS**: this one's
-  subject is argument parsing, and it stands whatever those assertions say.
-  **SECOND DATED ATTESTATION 2026-09-05**, judged a recurrence by the lead and
-  stamped at that close's drain: spec ran `--enter-stage build --simulate`, the
-  trailing flag went unread, a real build stamp landed and had to be hand-reverted
-  with `git checkout --`. Same shape as the 2026-08-30 attestation, one iteration
-  of the arm's port later, so the port did not carry the defect away.
-  **AND IT IS ONE DEFECT WITH `enter-stage-arg-position-silent-drop`, judged at
-  that same drain and NOT ruled upstream.** Same arm, same flag, same positional
-  parse (`native/src/emit/enter_stage.rs` tests argument one and shifts), same
-  silent-accept failure, same candidate fixes. Nothing in the pool asserted them
-  distinct — the "DISTINCT from" line two entries down pairs a different two. Both
-  are kept rather than merged, because both sit inside
-  `drain-order-retroactive-debt-sweep`'s named ten and that unit disposes of them
-  together; whichever fix lands discharges both, and neither may be counted twice
-  when the sweep costs its ten.
-  **THE ROUTE WAS NOT SPENT — a THIRD threshold recurrence (2026-09-07) routed to the OPERATOR,
-  who ruled 2026-09-07, lead-relayed from a lead session, that the routing clause GOVERNS over
-  propose-once.** That supersedes the 2026-09-06 lead deferral. **DISPOSED OF BY
-  `drain-order-retroactive-debt-sweep`, admitted the same day — NOT counted twice, per below.**
-  **THIRD, FOURTH AND FIFTH ATTESTATIONS, ALL 2026-09-06, across two iterations.** Third: a lead
-  session in Split posture, where the write is also a posture violation. Fourth: a build session's
-  probe stamped a `validate` entry, moving the cursor a WHOLE STAGE AHEAD while that session still
-  ran — the blast radius that takes this off a single argv nit's icebox-class default. Fifth: a
-  scope session, both spellings run back-to-back at one HEAD, `--enter-stage spec --simulate`
-  stamping for real at exit 0 with no simulate prefix. Cause pinned by reading and it is
-  arm-independent: `:152` honours the flag at argv[0] only and `:389` has no arity check, while the
-  sibling `:169`'s `rename()` tests `rest.len() != 1` and refuses. Five arms, one parse.
-  recurrence: enter-stage-flag-position-silently-ignored 2026-09-05 2026-09-06 2026-09-07
-  Filed 2026-08-30 by close from the gap inbox, attested by the filing session
-  upon itself.
-
-- **stamp-provenance-remedy-loops-when-uncommitted** [design-pending] — the
-  stamp-provenance refusal's help text prescribes a recovery that does not
-  clear the red when the offending stamp is uncommitted, so a session
-  following it literally loops with no exit.
-  **The help says** to re-run the entry tool, which appends a fresh stamp at
-  the current head, then commit that stamp on its own. That is correct when
-  the offending stamp is already COMMITTED: the appended line becomes the
-  operative cursor and history carries both.
-  **It is wrong when the stale stamp is still in the working tree**, because
-  the gate scans every stamp line in the file rather than the last. Re-running
-  appends a good line BESIDE the bad one, and the gate reds on the bad one
-  again, identically, with the help repeating the instruction that just
-  failed.
-  **Attested 2026-08-30 at this close**, twice in a row with a byte-identical
-  message, and resolved only by deleting the stale uncommitted line by hand —
-  an action the help never mentions.
-  **The precipitating mistake is ordinary and will recur**: the session
-  stamped, then committed a piece of preceding work, so the head moved
-  underneath an uncommitted stamp.
-  **Candidate shapes, none costed:** branch the help on whether the offending
-  stamp is committed and name the delete for the uncommitted case; or have the
-  entry tool REPLACE rather than append a same-iteration same-stage stamp not
-  yet committed, which makes the existing help true as written; or scope the
-  provenance assertion to committed stamps only. The second fixes the text by
-  fixing the behaviour.
-  **DISTINCT from `enter-stage-flag-position-silently-ignored`**, filed the
-  same day: that one is a flag never taking effect, this one is a recovery
-  instruction that is conditionally wrong. Neither fix implies the other.
-  **Cost while deferred:** this is the recovery path for a state reached by an
-  easy ordering mistake, and as written it sends an already-off-script session
-  round a loop with no exit.
-  Filed 2026-08-30 by close from the gap inbox, attested by that session while
-  recovering from the loop this describes.
-
 - **powershell-installer-surface** [design-pending]
   — the behind-invoke RELOCATION half: move `init`'s conditional install logic to the far side
   of the gate binary's invoke, so it is written once in Rust rather than twice by hand.
@@ -2855,53 +2770,6 @@
   one measured miss cost a full iteration of a governed SPEC contradicting itself in public
   — gate-sdk/SPEC.md is mirrored to the docs site, so the contradiction shipped.
   Filed 2026-08-04 at close; the instances it would have caught were fixed the same session.
-
-- **enter-stage-arg-position-silent-drop** [design-pending] — `--simulate` after the stage
-  is silently dropped, and the read-only preflight runs the destructive reset instead.
-  recurrence: enter-stage-arg-position-silent-drop 2026-08-07
-  the `--enter-stage` arm parses the flag positionally — it tests the first argument for
-  `--simulate` and shifts — so `--enter-stage scope --simulate` leaves the stage in
-  place, never sets the
-  simulate bit, and treats the flag as a trailing argument nothing reads. Nothing refuses
-  the extra argument and nothing in the output says the flag was ignored.
-  **Why this one argument's position is not an ordinary usage nit.** The dropped token is
-  the only thing separating a read-only preflight from an iteration-boundary reset. The
-  real run truncates `.workflow/WORKFLOW-STATE.txt`, rewrites the queue header to `—`,
-  truncates every `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member — including the release
-  disposition a close just wrote — and wipes `.tmp` past the keep-list. So the failure mode
-  of a typo'd read-only command is destroying the iteration state the command was being run
-  to inspect, and the one unrecoverable casualty is `.tmp`: the boundary wipe is not a git
-  operation, so a session journal goes with it while the tracked half restores clean.
-  **Measured 2026-08-04 at this close**, on the close session's own verification step. Every
-  tracked write was reverted from the index and the close's state restored; the wiped `.tmp`
-  journals were not, and were not needed because the work was already committed. That
-  recovery depended on the run happening with a clean tree — the same mistake with
-  uncommitted work in the tree loses it.
-  **Deliverable, and why the obvious fix is not the whole fix:** accept the flag in any
-  position, which is a two-line change. But permissiveness is the weaker half — the
-  load-bearing part is that an argument the script does not recognize must be a **refusal**,
-  not a silent ignore, which is this repo's own fail-closed rule applied to its own tooling.
-  A tool that silently discards what it cannot parse fails open on exactly the input a user
-  got wrong.
-  **Why `[design-pending]`:** whether the refusal belongs in this arm alone or as a shared
-  argument contract across the bridged arms is the open call — and the class reading is the
-  one that held: `file-gap.sh` had the same symptom (`capture-affordance-help-flag`, it filed
-  `--help` as a gap), and that closed 2026-08-13 as a shared `bin/` argument-shape contract over
-  five tools rather than as a fix to one script. The shared-contract half is now a question about
-  the crate: `lifecycle-kit/bin/` was deleted whole at the 2026-09-04 port, so there is no shell
-  directory left over which to unify.
-  Related and worth reading together: `enter-stage-simulate-no-write-fixture` (icebox) pins
-  the no-write guard with a fixture, and would **not** have caught this — a fixture written
-  the documented way puts the flag first and passes.
-  **ONE DEFECT WITH `enter-stage-flag-position-silently-ignored`, judged 2026-09-05 at close's
-  drain.** That entry re-filed this same positional parse from a later attestation, and carries
-  the two later dates; both are kept rather than merged because
-  `drain-order-retroactive-debt-sweep` names that one among its ten and disposes of the pair
-  together. Whichever fix lands discharges both, and the sweep may not cost them twice.
-  **Cost while deferred:** every session that reaches for the preflight can destroy the
-  state it meant to inspect, and the sessions most likely to run it are stage sessions at a
-  boundary, which is exactly when the state is most valuable and least reconstructible.
-  Filed 2026-08-04 at close, from the close session's own misfire.
 
 - **guard-steer-grant-mismatch** [design-pending] — the guard steers sessions onto forms the
   committed allowlist does not grant, so obeying it costs a prompt.
@@ -10215,5 +10083,8 @@
 - born-native-omission-accumulation
 - manifest-report-launders-the-value-it-prints
 - amendment-roster-omission-detection
+- enter-stage-flag-position-silently-ignored
+- enter-stage-arg-position-silent-drop
+- stamp-provenance-remedy-loops-when-uncommitted
 
 ## Lessons Learned
