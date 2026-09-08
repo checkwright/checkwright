@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+macos-roster-join gates sha256=52f70d25112f901117c8906852bc8f25c20f5744d5c1b13b7873133cccfd9b96 pass=111 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join canon_kit sha256=e0780e41e810cbac5bb0be8cbace64fd320c84899e0272c315453780c9dd6455 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join guard_kit sha256=8745aafc1908d64352c326c2e02750ea926728f29f9e0eb3ef0e3a036d029497 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join guard_tests sha256=ec9e4732f5a48d8f828776b25ea5eb17fb9089d4efcea531f3a0ef5a625e3965 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join demo sha256=25c3dc10b4bb5ec2b341cde3cab81d31a9d81b68ee4dd78f5dbe04766e90b7bb pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join installer_smoke sha256=082ac35e7656cfce75ba519b3b4c04e51b968d120790bee7b3a9897cd2264b41 pass=13 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join consumer_smoke sha256=c29d0e14dbcde09cd00411ae2a9c9638f826dcfd36bd5d6f5b93d24713c32526 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join upgrade sha256=57dca3101731c362a6f1b13a24d3bf918dc91d164c2562ae40f1c462ea5f73db pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join agents_md_smoke sha256=eb72db88e64623ddcb77e6678cd466b07651e1b341ede5e832881c1b3d6a84a5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join index_tests sha256=9e9e77093cb0e99295e11b076057098221a0d5837e32559f90936cce747bc153 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
+macos-roster-join native_crate sha256=f9b9c1db00f8e1cdc3a0b1a2e8d036d16a6c2f8fa22d8c0a5f4c2e0ff1535474 pass=1 fail=0 ignore=0 verdict=clean 2026-09-08
