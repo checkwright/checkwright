@@ -179,9 +179,15 @@
   settles.
   **Cost while deferred:** every future held platform inherits it, so widening the roster widens
   the coupling, and a red master traceable to a leg nobody declared binding costs a fresh diagnosis.
+  **ITS OBSERVED TRIGGER CLEARED HOURS AFTER FILING, and the correction is recorded rather than
+  left to rot.** Run `34209082851` at `d433fd4a` has BOTH darwin producer legs green, so the
+  normalize step passes and the coupling is dormant at HEAD; `install-smoke-macos` is red on a
+  different, downstream defect. What the run does NOT show is the coupling repaired — it shows the
+  one trigger that had fired going away. The entry stays deferred on the structural ground its
+  cost field states, that every future held platform inherits it, and NOT on a red master.
   Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because it is an
   envelope question the operator has already declined once in its wider form; promoted rather than
-  iceboxed because it is reddening master today.
+  iceboxed because the coupling is structural and inherited, which no single green run retires.
 
 - **smoke-manifest-read-appends-carriage-return** [design-pending] — the Windows consumer smoke
   compares no manifest entry as a hash, because every `want` reaches the comparison carrying a
