@@ -34,12 +34,15 @@
 # is a lifetime that ends; pointing a live precondition at one is what left this
 # file naming `platform-support-ci-matrix` for weeks after that entry retired.
 #
-# It ships one target, and the ground is evidence rather than capability. The
-# two are easy to conflate here, and conflating them is what makes a roster
-# widen on a plan instead of on a run:
-#   - x86_64-unknown-linux-gnu is the only platform with a discharged
-#     precondition: the run above is what §Consumer payload's join bound asks
-#     for, and no other triple has one yet however reachable it looks.
+# Every line here is evidence rather than capability, and the roster's size
+# argues nothing either way. The two are easy to conflate here, and conflating
+# them is what makes a roster widen on a plan instead of on a run:
+#   - A line means a discharged precondition and nothing weaker: the run above
+#     is what §Consumer payload's join bound asks for, and a triple without one
+#     stays off this file however reachable it looks. x86_64-apple-darwin is the
+#     standing case — its producer half is green on every run and its consumer
+#     leg now exists — and it is still not a line here, because no single run
+#     has yet carried both halves.
 #   - Runner availability is not the constraint. This repository is public, so
 #     macOS and arm64-Linux hosted runners are already available to it; what is
 #     missing is a run bought on one, not a machine to buy it on. Measured
@@ -64,18 +67,28 @@
 #     on a plan.
 #
 # This is not a narrowing of the trajectory — the objectives are the direction
-# and this roster is the tree. A one-target roster makes the omit-and-declare
-# path the normal path for a macOS adopter on day one, which ships that path
-# exercised rather than as the dead code the vacuous-green class exists to
-# refuse. A target joins only on the observation above, and never beyond what
-# docs/install.md §Requirements already states.
+# and this roster is the tree. What keeps the omit-and-declare path the normal
+# path — rather than the dead code the vacuous-green class exists to refuse —
+# is the HELD REMAINDER and not the roster's size: Intel macOS is still held,
+# native Windows is not declared at all, and every host outside docs/install.md
+# §Requirements' declaration block still meets that path on day one. A target
+# joins only on the observation above, and never beyond what that section
+# already states.
 #
-# What a second line costs, in full rather than the publish half alone: one
-# runner mapping in native/runners.list, and then the consumer smoke — which no
-# longer blocks on it, because the smoke steers itself at its own host by
-# default and takes a producer's artifact directory through
-# INSTALLER_SMOKE_ARTIFACTS_DIR when a caller hands it one. That is the re-entry
-# this file used to record as unbuilt, and it is built.
+# What a second line costs, now that one has landed and the figure is paid
+# rather than estimated: one runner mapping in native/runners.list; the consumer
+# smoke, which never blocked on it, because the smoke steers itself at its own
+# host by default and takes a producer's artifact directory through
+# INSTALLER_SMOKE_ARTIFACTS_DIR when a caller hands it one — the re-entry this
+# file used to record as unbuilt, and it is built; and the item this accounting
+# did not carry until the RELEASE path was read against it. A second line puts a
+# second leg into .github/workflows/publish.yml's roster-derived build matrix,
+# and that leg needed a platform floor and a resolved hasher the first one never
+# did. Both now live in scripts/ci-macos-floor.sh and scripts/ci-build-artifact.sh,
+# called by the release leg and the CI producer alike, so a further line on a
+# platform class those two already bootstrap costs a runner mapping again — and
+# one on a class they do not costs its own floor first.
 # gate-sdk/SPEC.md §Consumer payload owns both halves;
 # installer/README.md §The consumer smoke owns the smoke's own side of it.
 x86_64-unknown-linux-gnu
+aarch64-apple-darwin

@@ -7712,8 +7712,8 @@ that line's own target** — `gate_exe_suffix "$target"` appended to the strippe
 binary basename, inside the roster loop rather than once before it
 (§lib/gate.sh). A single host-derived name is correct only while every roster
 line is the host's platform class, which is a landmine that fires on the commit
-widening the roster and nowhere before it; it is fixed here, with the roster
-still one line, for that reason.
+widening the roster and nowhere before it; it is fixed ahead of that commit, for
+that reason.
 
 **`pack_tracked` is fail-closed on content it cannot vendor.** The tracked-set
 copy is `git archive <commit> -- <root> | tar -x`, so the packed kit is only as

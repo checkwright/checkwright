@@ -92,10 +92,11 @@ own header.
 - `x86_64-unknown-linux-gnu` (joined) — Linux on x86-64. A Windows-through-WSL
   install resolves to this triple too, so WSL is served by the line above rather
   than by one of its own.
-- `aarch64-apple-darwin` (held: a green `native-artifacts` leg consumed by a macOS install-smoke leg) — Apple
-  silicon Macs. The gates workflow builds this target on every run; what it does
-  not yet have is a smoke leg that installs the result and reaches its
-  artifact-present branch.
+- `aarch64-apple-darwin` (joined) — Apple silicon Macs. The gates workflow builds
+  this target on every run, and a macOS install-smoke leg installs that build —
+  the producer's own upload, nothing rebuilt on the smoke's host — and reaches
+  its artifact-present branch. That pair on one run is what
+  `native/targets.list`'s header asks for, and it is what this line rests on.
 - `x86_64-apple-darwin` (held: that same predicate on an Intel macOS leg of its own) — Intel
   Macs. `macos-latest` is arm64, so the macOS smoke leg measures Apple silicon
   and asserts nothing here; an Intel leg is a separate green.
