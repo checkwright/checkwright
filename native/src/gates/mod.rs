@@ -5,6 +5,7 @@ pub mod action_permissions;
 pub mod action_pinning;
 pub mod action_run_shell;
 pub mod amendment_queue;
+pub mod amendment_retired_spelling;
 pub mod amendment_update_target;
 pub mod agent_tier_explicit;
 pub mod assertion_strength;
@@ -751,6 +752,22 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_KIT_ROOTS_HERE",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_AMENDMENT_GLOB",
+        ],
+        "canon-kit",
+        &[("git", "")],
+    ),
+    // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — the amendment finder is the
+    // walk behind the cohort's `?`; the `git ls-files` corpus adds the dependency, not a root
+    (
+        "check-amendment-retired-spelling",
+        amendment_retired_spelling::run,
+        &[("?", "")],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_AMENDMENT_GLOB",
+            "CANON_KIT_RETIRED_SPELLING_EXCLUDE",
         ],
         "canon-kit",
         &[("git", "")],

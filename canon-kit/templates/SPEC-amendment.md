@@ -60,6 +60,25 @@
      home for a contract that does not exist yet. The canonical spec cites the
      contract file, never re-embeds it. -->
 
+## Retired spellings
+
+<!-- MANDATORY on every amendment, and one of exactly two forms. The roster above
+     has no negative form — a short roster and a complete one are the same
+     document — so this is where a change's removals get a line an author can
+     fail to write and a gate can therefore miss.
+
+     Negative:  - None — <reason>            (a single bullet; the reason is required)
+     Positive:  - `<spelling>` — <prose> (delta <N>)
+
+     A positive bullet opens with the BACKTICKED retired spelling and cites the
+     delta that retired it, in the same citation grammar the roster above uses.
+     For a spelling whose survivors are deliberate mentions rather than missed
+     sites, tag `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first
+     line or the one above — the reason is mandatory, and an exempt bullet leaves
+     the declared count as well as the finding. Checked by
+     check-amendment-retired-spelling, which re-runs each declared spelling
+     against the tracked tree and reds on every surface no roster bullet names. -->
+
 ## Definition of Done
 
 - [ ] **Causal completeness** — every new state/event/interface has a named,
@@ -70,8 +89,10 @@
       coherent document a reader who never saw the amendment can use alone.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
       component (`ls <component>/SPEC-*.md`).
-- [ ] **Removals propagated** — grepped every spec for names this change
-      retired; nothing dangles.
+- [ ] **Removals propagated** — every name this change retired is declared in
+      `## Retired spellings` above, and `check-amendment-retired-spelling` runs
+      each declaration against the whole tracked tree, not against the specs
+      alone.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).

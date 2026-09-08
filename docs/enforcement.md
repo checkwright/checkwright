@@ -97,6 +97,7 @@ leaves its section absent.
 | [queue-kit](queue-kit/index.md) | check-roadmap-fresh | precommit |
 | [canon-kit](canon-kit/index.md) | check-amendment-queue | precommit |
 | [canon-kit](canon-kit/index.md) | check-amendment-update-target | precommit |
+| [canon-kit](canon-kit/index.md) | check-amendment-retired-spelling | precommit |
 | [canon-kit](canon-kit/index.md) | check-spec-embedded-source | precommit |
 | [canon-kit](canon-kit/index.md) | check-spec-fence-balance | precommit |
 | [canon-kit](canon-kit/index.md) | check-md-refs | precommit |

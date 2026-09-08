@@ -257,8 +257,8 @@ carries no Windows entry. A Windows host therefore resolves to no artifact, and
 the roster above still sends you through WSL. What stands in the way is the
 published platform set rather than the interpreter.
 
-<!-- measured: ported-gate-members=110 -->
-That direction is now underway rather than announced: 110 gates in the battery
+<!-- measured: ported-gate-members=111 -->
+That direction is now underway rather than announced: 111 gates in the battery
 dispatch to the compiled binary today, which is every member the battery
 registers. The requirements above are still what those gates invoke. A gate whose
 rule *is* an external program keeps spawning it whatever the gate is written in,

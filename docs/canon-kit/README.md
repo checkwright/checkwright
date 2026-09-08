@@ -32,6 +32,7 @@ reads the tag syntax [queue-kit](https://github.com/checkwright/checkwright/tree
    ```
    check-amendment-queue        # needs a task queue
    check-amendment-update-target # every update target cites a delta the amendment defines
+   check-amendment-retired-spelling # declared retired spellings survive only where the roster names
    check-spec-dod-singleton     # needs canonical specs
    check-spec-derivable-section # needs canonical specs
    check-spec-embedded-source   # needs canonical specs + tracked source

@@ -1,0 +1,8 @@
+amendments carrying no retired-spelling block
+SPEC-nosection.md: no '## Retired spellings' section
+block bodies matching neither form
+SPEC-thing.md:19: - `oldthing` — retired, and citing no delta at all.
+declared spellings surviving where no roster bullet names the path
+SPEC-thing.md:20: staleterm survives at surface/two.md:3, named by no roster bullet
+citations naming a delta the amendment does not define
+SPEC-thing.md:22: cites delta 7, which no '### (7)' heading defines

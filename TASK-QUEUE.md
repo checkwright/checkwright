@@ -12,73 +12,6 @@
 
 ## New Features
 
-- **amendment-roster-omission-detection** [spec: SPEC-retired-spellings.md]
-  — an amendment's `## Existing sections updated` roster can be short by a surface, and only a grep
-  finds the missing one; nothing obliges that grep and nothing records having run it.
-  **ADMITTED AS A FULL UNIT — ruled by the OPERATOR 2026-09-07, through the lead's question relay
-  in a lead session and lead-relayed**, on the third threshold recurrence below, and with the design
-  question expressly left open: whether ONE mechanism covers both the literal-substitution slice and
-  the renumber slice. That admission answers the 2026-09-06 lead deferral taken on window capacity
-  and the 2026-09-07 probe that settled the ATTESTED INSTANCE and expressly not the CLASS (the six
-  stale citations never shipped tagged: renumber `1a23be6c`, last tag `v0.25.0`).
-  **THE OPEN QUESTION IS NOW CLOSED — NO, AND THE GROUND IS DECIDABILITY RATHER THAN EFFORT.**
-  Ruled at spec 2026-09-08, `lead, own-authority`, under the bounding the admission itself delegated
-  to this stage. A literal substitution leaves the retired and the replacing spellings in DISJOINT
-  token spaces, so every surviving occurrence of the old literal is either a site the change should
-  have reached or one deliberately left, and the roster is the discriminator. A renumber leaves them
-  in the SAME token space: after guard-kit's rule 19 was inserted and 19-23 became 20-24, a site
-  reading `rule 19` is either a stale citation to old-19 or a correct citation to the newly inserted
-  19, and no scanner can tell which — the two are byte-identical. The correct post-change sites are
-  DENSE in the renumbered range, so a survivor scan over a renumber returns a hit set dominated by
-  non-violations, which is the cry-wolf shape canon-kit already refused a stronger arm for.
-  **SO THE RENUMBER SLICE IS A STATED NON-TARGET, ROUTED RATHER THAN DUPLICATED.**
-  `guard-rule-number-not-citable-outside-kit` already owns it, and its second disposition — a rule
-  number is not a citable identifier outside the kit, so a cross-corpus reference names the rule —
-  DISSOLVES the slice instead of detecting it: a citation naming its referent has no numeric
-  relation left to decay. A gap bullet carries the cross-reference so close lands it on that entry's
-  own surface rather than this unit editing an entry outside its batch.
-  **WHAT SHIPS: a mandatory `## Retired spellings` block and `check-amendment-retired-spelling`.**
-  Six deltas, work-classed inline in the amendment — the grammar plus the template section; the
-  born-native canon-kit gate with three arms (grammar, survivor reconciliation against the roster,
-  dangling citation); the exclusion knob with an EMPTY kit default on the provenance seam; the
-  manifest and generated-projection fan-out; the DoD checkbox rewritten to cite the block; and the
-  align rule narrowed to the residue it still holds.
-  **WHY A DECLARATION, WHEN THE ROSTER'S OWN OMISSION IS WHAT FAILED.** The roster has no negative
-  form — a short roster and a complete one are the same document, so there is no line an author
-  fails to write and nothing for a gate to miss. The block has one, and it is mandatory, so a
-  skipped section reds. What stays uncaught is an author who declares the section and names no
-  spelling: real, and strictly smaller than what is uncaught today.
-  **THE OBLIGATION IS NOT NEW, which is what pays for the per-amendment cost.** The shipped
-  template's DoD already carries "Removals propagated — grepped every spec for names this change
-  retired". That grep is owed on every amendment already; nothing records the run, nothing checks
-  the result, and the checkbox's stated corpus is narrower than where the attested misses landed.
-  **PROBED TO TWO LEVELS, because the first answer misled:** an amendment written under `canon-kit/`
-  IS scanned here — `check-amendment-queue` red on the new file before its entry existed — but NOT
-  because the finder spares a kit directory. Both substrates prune a kit root that is a strict
-  descendant of the scan root, and `canon-kit` is one; it is scanned because
-  `scripts/canon-config.sh` sets `CANON_KIT_SCAN_KIT_ROOTS=1`, this repo's dogfooding knob. A
-  consumer at the default would have such an amendment fall silently out of the corpus. The backfill
-  is therefore the gate's own first run over every amendment live at that commit, this unit's own
-  included, and it is authored carrying the block it specifies.
-  **FIVE-FOR-FIVE 2026-09-06 stands as the attesting evidence, and spec CLASSIFIED the whole record
-  rather than re-asserting it.** Census over the nine attested cases, recovered from git history
-  because amendments are deleted on merge, filed with its witness: the split is **L 4 / R 2 / N 3**.
-  So the gate covers four of nine, `guard-rule-number-not-citable-outside-kit` dissolves two, and
-  three stay with the align stage — which is what delta 6 says, now measured rather than assumed.
-  **TWO CORRECTIONS TO THIS ENTRY'S OWN EVIDENCE, from that census.** The rule-19 renumber and the
-  "wait unit's renumber needing four site classes" are the SAME event (`1a23be6c`), counted here as
-  two; and the fourth site class named, ordinal prose `seventeen rules earlier`, appears nowhere in
-  the tree or its history outside this entry's description of it — illustrative, not attested. The
-  other three site classes are attested in that commit's own diff and the ruling above does not rest
-  on the fourth.
-  **DISTINCT from the retired `amendment-update-target-coverage`**, which owned a roster *entry*
-  naming no owning delta — a listed target with no claim. This owns a *surface with no entry*, whose
-  evidence is in the tree rather than in the document.
-  recurrence: amendment-roster-omission-detection 2026-08-29 2026-09-06 2026-09-07
-  Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned 2026-08-29
-  by close, the six stale citations verified against guard-kit/SPEC.md at HEAD. Promoted at spec
-  2026-09-08 by authoring the amendment and closing its open question, one act.
-
 - **gate-binary-roster-covers-supported-platforms** [spec: SPEC-platform-evidence.md]
   — `native/targets.list` carries ONE triple against a documented supported set of Linux and
   macOS, the widening is owned by a retired entry, and fifteen of the sixteen files the port
@@ -10281,5 +10214,6 @@
 
 - born-native-omission-accumulation
 - manifest-report-launders-the-value-it-prints
+- amendment-roster-omission-detection
 
 ## Lessons Learned

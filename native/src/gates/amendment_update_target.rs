@@ -29,120 +29,6 @@ enum Sec {
     Other,
 }
 
-// spec: canon-kit/SPEC.md §check-amendment-update-target — arm A's grammar: `### (<N>) <title>`,
-// `<N>` a positive decimal integer written without a leading zero, `<title>` non-empty. A
-// heading under `## What changes` that this returns `None` for is the arm-A violation.
-fn delta_number(heading: &str) -> Option<usize> {
-    let rest = heading.strip_prefix("### ")?.trim_start();
-    let rest = rest.strip_prefix('(')?;
-    let close = rest.find(')')?;
-    let num = &rest[..close];
-    if num.is_empty() || !num.bytes().all(|b| b.is_ascii_digit()) {
-        return None;
-    }
-    if num.len() > 1 && num.starts_with('0') {
-        return None;
-    }
-    let n: usize = num.parse().ok()?;
-    if n == 0 {
-        return None;
-    }
-    if rest[close + 1..].trim().is_empty() {
-        return None;
-    }
-    Some(n)
-}
-
-fn is_word_byte(b: u8) -> bool {
-    b.is_ascii_alphanumeric() || b == b'_'
-}
-
-fn bounded_at(b: &[u8], at: usize, word: &[u8]) -> bool {
-    if !b[at..].starts_with(word) {
-        return false;
-    }
-    if at > 0 && is_word_byte(b[at - 1]) {
-        return false;
-    }
-    let end = at + word.len();
-    end == b.len() || !is_word_byte(b[end])
-}
-
-fn skip_sp(b: &[u8], mut i: usize) -> usize {
-    while i < b.len() && (b[i] == b' ' || b[i] == b'\t') {
-        i += 1;
-    }
-    i
-}
-
-// spec: canon-kit/SPEC.md §check-amendment-update-target — a citation's integer list: the first
-// integer, then any further integer reached through a comma, the word `and`, or both; a trailing
-// possessive closes an integer without closing the list
-fn integer_list(b: &[u8], start: usize, out: &mut Vec<(usize, usize)>) {
-    let mut i = start;
-    loop {
-        let s = i;
-        while i < b.len() && b[i].is_ascii_digit() {
-            i += 1;
-        }
-        if i == s {
-            return;
-        }
-        match std::str::from_utf8(&b[s..i]).ok().and_then(|d| d.parse().ok()) {
-            Some(n) => out.push((n, s)),
-            None => return,
-        }
-        if i < b.len() && b[i] == b'\'' {
-            i += 1;
-            if i < b.len() && b[i] == b's' {
-                i += 1;
-            }
-        }
-        let mut j = skip_sp(b, i);
-        let mut sep = false;
-        if j < b.len() && b[j] == b',' {
-            sep = true;
-            j = skip_sp(b, j + 1);
-        }
-        if bounded_at(b, j, b"and") {
-            sep = true;
-            j = skip_sp(b, j + 3);
-        }
-        if !sep || j >= b.len() || !b[j].is_ascii_digit() {
-            return;
-        }
-        i = j;
-    }
-}
-
-// spec: canon-kit/SPEC.md §check-amendment-update-target — the citation grammar over one
-// whitespace-normalized entry: `delta`/`deltas` plus an integer list, case-insensitively, and
-// the literal `all deltas` standing for every delta the amendment defines
-fn citations(text: &str) -> (Vec<(usize, usize)>, Option<usize>) {
-    let lower = text.to_ascii_lowercase();
-    let b = lower.as_bytes();
-    let mut nums: Vec<(usize, usize)> = Vec::new();
-    let mut all: Option<usize> = None;
-    let mut i = 0usize;
-    while i < b.len() {
-        if all.is_none() && bounded_at(b, i, b"all deltas") {
-            all = Some(i);
-        }
-        let word: &[u8] = if bounded_at(b, i, b"deltas") {
-            b"deltas"
-        } else if bounded_at(b, i, b"delta") {
-            b"delta"
-        } else {
-            i += 1;
-            continue;
-        };
-        let after = skip_sp(b, i + word.len());
-        integer_list(b, after, &mut nums);
-        i += word.len();
-    }
-    (nums, all)
-}
-
 struct Entry {
     line: usize,
     exempt: bool,
@@ -200,7 +86,7 @@ fn scan(text: &str) -> Scan {
         match sec {
             Sec::What => {
                 if raw.starts_with("### ") {
-                    match delta_number(raw) {
+                    match spec::delta_number(raw) {
                         Some(n) => out.deltas.push((n, i + 1)),
                         None => out.malformed.push((i + 1, raw.trim_end().to_string())),
                     }
@@ -309,7 +195,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 continue;
             }
             targets += 1;
-            let (nums, all) = citations(&e.flat.text);
+            let (nums, all) = spec::citations(&e.flat.text);
             if nums.is_empty() && all.is_none() {
                 uncited.push(format!("  {}:{}: {}", f, e.line, lead(&e.flat.text)));
                 continue;
@@ -389,37 +275,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
 mod tests {
     use super::*;
 
-    #[test]
-    fn the_delta_heading_grammar_is_a_parenthesised_positive_integer_and_a_title() {
-        assert_eq!(delta_number("### (1) The grammar"), Some(1));
-        assert_eq!(delta_number("### (12) x"), Some(12));
-        assert_eq!(delta_number("### (1) `code` title"), Some(1));
-        assert_eq!(delta_number("### A1. bold-ish"), None);
-        assert_eq!(delta_number("### (i) roman"), None);
-        assert_eq!(delta_number("### (0) zero is not positive"), None);
-        assert_eq!(delta_number("### (01) leading zero"), None);
-        assert_eq!(delta_number("### (2)"), None);
-        assert_eq!(delta_number("### (3) "), None);
-        assert_eq!(delta_number("#### (1) wrong level"), None);
-    }
-
-    // spec: canon-kit/SPEC.md §check-amendment-update-target — the citation grammar, including
-    // the plural, the comma/`and` list, the possessive and the whole-amendment literal
-    #[test]
-    fn a_citation_is_the_word_plus_an_integer_list() {
-        let n = |s: &str| -> Vec<usize> { citations(s).0.into_iter().map(|(n, _)| n).collect() };
-        assert_eq!(n("… (delta 1)."), vec![1]);
-        assert_eq!(n("… (deltas 2, 3)."), vec![2, 3]);
-        assert_eq!(n("… (deltas 1, 2 and 3)."), vec![1, 2, 3]);
-        assert_eq!(n("… (deltas 4 and 5)."), vec![4, 5]);
-        assert_eq!(n("per delta 5's table (delta 5)."), vec![5, 5]);
-        assert_eq!(n("Delta 7 capitalised."), vec![7]);
-        assert!(n("no delta claims this target.").is_empty());
-        assert!(n("the deltas above.").is_empty());
-        assert!(citations("… (all deltas).").1.is_some());
-        assert!(citations("… (delta 1).").1.is_none());
-    }
-
     // spec: canon-kit/SPEC.md §check-amendment-update-target — the entry window is the bullet
     // plus its indented continuation, so a wrapped citation is still one subject, and a fenced
     // block reads as neither a heading nor a target
@@ -430,8 +285,8 @@ mod tests {
         assert_eq!(s.deltas.len(), 1);
         assert!(s.malformed.is_empty());
         assert_eq!(s.entries.len(), 2);
-        assert_eq!(citations(&s.entries[0].flat.text).0.len(), 1);
-        assert!(citations(&s.entries[1].flat.text).0.is_empty());
+        assert_eq!(spec::citations(&s.entries[0].flat.text).0.len(), 1);
+        assert!(spec::citations(&s.entries[1].flat.text).0.is_empty());
         assert!(s.has_what && s.has_updated);
     }
 

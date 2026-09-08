@@ -74,14 +74,22 @@ opening with `.`, and the tool being modelled read a leading `["k"]` as an array
 literal rather than an index — a three-way disagreement that passed authoring and
 this audit and was caught by the first differential run at build.
 
-**The `## Existing sections updated` roster is checked from the tree, not from
-the amendment.** A roster entry with no delta is visible on the document; a
-*surface with no entry* is not, because the evidence is in the tree. When a delta
-replaces a literal — a version, a floor, a policy phrase — grep the tree for the
-old one and reconcile every survivor against the roster. Attested twice in one
-iteration, both times a documentation surface reading as commentary that the
-grep found and the amendment did not name (`amendment-roster-omission-detection`
-owns whether any of this is gateable).
+**The `## Existing sections updated` roster is checked from the tree, and the
+half that stays yours is the larger one.** A roster entry with no delta is
+visible on the document; a *surface with no entry* is not, because the evidence
+is in the tree. The **literal-substitution** half of that is mechanized: an
+amendment declares what it retires in its `## Retired spellings` block and the
+battery re-runs each declaration against the tracked tree, reconciling every
+survivor against the roster — so do not hand-grep a replaced literal, run the
+gate. What is left is the residue no scanner reaches: a stale prose sentence, a
+semantic over-claim, a cross-reference dangled by a deletion rather than a
+substitution, and the **renumber** case, where the retired and the replacing
+spellings are byte-identical and telling a stale citation from a correct one is
+a reading of the site's subject matter. That case is routed rather than gated —
+a cross-corpus citation naming its referent instead of its number has no numeric
+relation left to decay. Attested twice in one iteration, both times a
+documentation surface reading as commentary that the grep found and the amendment
+did not name.
 
 **Every amendment's "wires cleanly against the current tree" is a hypothesis,
 and the align audit is its first test.** Authoring a producer silently asserts

@@ -324,9 +324,23 @@ so the pack step stops comparing the shipped roster against the host.
   looks for what holds it (delta 1).
 - `docs/install.md` §Requirements — the page that gains the block, whose prose already states the
   supported set the block declares (delta 1).
+- `native/targets.list` — the roster file whose header delta 6 rewrites, which is where the
+  retired slug's surviving mention lives (delta 6). Added by the retired-spellings unit's build
+  batch, whose gate found this roster short by exactly this surface on its first run.
 
 <!-- update-target-exempt: the sibling unit born-native-omission-accumulation authors check-install-platforms against delta 1's block; the gate is that unit's deliverable and no delta here defines it, so citing a delta of this amendment for it would be a claim this amendment does not make -->
 - `SPEC-platform-coverage.md` — the sibling amendment, which reads delta 1's block.
+
+## Retired spellings
+
+<!-- Backfilled, not authored, by the `amendment-roster-omission-detection` build batch: the
+     section is mandatory from that unit's landing commit and every amendment live at it gains
+     the block as the gate's own first run. -->
+
+- `platform-support-ci-matrix` — delta 6, which repoints the three sites citing that retired
+  queue entry as the owner of a live precondition. Its one surviving occurrence is
+  `native/targets.list`'s own rewritten header narrating the defect, which is why that file is
+  named in the roster above rather than valved here.
 
 ## Definition of Done
 

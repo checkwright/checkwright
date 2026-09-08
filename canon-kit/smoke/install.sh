@@ -10,6 +10,7 @@ cat >> scripts/gates.list <<'EOF'
 # canon-kit (check-surface-duplication omitted — needs a glossary)
 check-amendment-queue
 check-amendment-update-target
+check-amendment-retired-spelling
 check-spec-dod-singleton
 check-spec-derivable-section
 check-spec-embedded-source

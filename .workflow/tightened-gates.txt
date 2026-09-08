@@ -10,3 +10,4 @@ check-gate-substrate-parity
 check-stage-skill-coverage
 check-skill-binding
 check-portability-floor
+check-amendment-retired-spelling

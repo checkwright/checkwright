@@ -55,6 +55,10 @@ CANON_KIT_TEMPORAL_MARKERS_EXTRA=(
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_COMMENT_WHITELIST=("reserve/*")
 
+# comment-tier-exempt: this repo's history-bearing surfaces, held out of check-amendment-retired-spelling's reconciliation corpus — which surfaces record what a change retired rather than carrying it live is a consumer fact, so no kit default can name them: the work queue and the ruling record narrate retirements by name, .workflow/ holds the audit and survey records that do the same, and a gate-tests/ tree is fixture text a live-tree finding must never be read out of
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_RETIRED_SPELLING_EXCLUDE=("TASK-QUEUE.md" "TRAJECTORY.md" ".workflow/*" "*/gate-tests/*")
+
 # comment-tier-exempt: this repo's install transports and the sections they are held over — the vocabulary is consumer config because a kit literal spelling a transport would publish one project's distribution model; the section regex is anchored so a heading merely mentioning a script name (### install-hooks) never selects, and the posts valve keeps a published release note immutable the same way CANON_KIT_TEMPORAL_EXEMPT_PATHS already does
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_INSTALL_TRANSPORTS_CMD="bash scripts/install-transports.sh"

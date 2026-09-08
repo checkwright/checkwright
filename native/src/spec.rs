@@ -1150,6 +1150,132 @@ pub fn flatten_para(para: &Para) -> FlatPara {
     FlatPara { text, line_of }
 }
 
+// spec: canon-kit/SPEC.md §The amendment lifecycle — arm A's delta grammar: `### (<N>) <title>`,
+// `<N>` a positive decimal integer written without a leading zero, `<title>` non-empty. A heading
+// under `## What changes` that this returns `None` for is the arm-A violation.
+pub fn delta_number(heading: &str) -> Option<usize> {
+    let rest = heading.strip_prefix("### ")?.trim_start();
+    let rest = rest.strip_prefix('(')?;
+    let close = rest.find(')')?;
+    let num = &rest[..close];
+    if num.is_empty() || !num.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    if num.len() > 1 && num.starts_with('0') {
+        return None;
+    }
+    let n: usize = num.parse().ok()?;
+    if n == 0 {
+        return None;
+    }
+    if rest[close + 1..].trim().is_empty() {
+        return None;
+    }
+    Some(n)
+}
+
+fn is_word_byte(b: u8) -> bool {
+    b.is_ascii_alphanumeric() || b == b'_'
+}
+
+fn bounded_at(b: &[u8], at: usize, word: &[u8]) -> bool {
+    if !b[at..].starts_with(word) {
+        return false;
+    }
+    if at > 0 && is_word_byte(b[at - 1]) {
+        return false;
+    }
+    let end = at + word.len();
+    end == b.len() || !is_word_byte(b[end])
+}
+
+fn skip_sp(b: &[u8], mut i: usize) -> usize {
+    while i < b.len() && (b[i] == b' ' || b[i] == b'\t') {
+        i += 1;
+    }
+    i
+}
+
+// spec: canon-kit/SPEC.md §The amendment lifecycle — a citation's integer list: the first
+// integer, then any further integer reached through a comma, the word `and`, or both; a trailing
+// possessive closes an integer without closing the list
+fn integer_list(b: &[u8], start: usize, out: &mut Vec<(usize, usize)>) {
+    let mut i = start;
+    loop {
+        let s = i;
+        while i < b.len() && b[i].is_ascii_digit() {
+            i += 1;
+        }
+        if i == s {
+            return;
+        }
+        match std::str::from_utf8(&b[s..i]).ok().and_then(|d| d.parse().ok()) {
+            Some(n) => out.push((n, s)),
+            None => return,
+        }
+        if i < b.len() && b[i] == b'\'' {
+            i += 1;
+            if i < b.len() && b[i] == b's' {
+                i += 1;
+            }
+        }
+        let mut j = skip_sp(b, i);
+        let mut sep = false;
+        if j < b.len() && b[j] == b',' {
+            sep = true;
+            j = skip_sp(b, j + 1);
+        }
+        if bounded_at(b, j, b"and") {
+            sep = true;
+            j = skip_sp(b, j + 3);
+        }
+        if !sep || j >= b.len() || !b[j].is_ascii_digit() {
+            return;
+        }
+        i = j;
+    }
+}
+
+// spec: canon-kit/SPEC.md §The amendment lifecycle — the citation grammar over one
+// whitespace-normalized entry, one owner for both blocks that cite a delta
+pub fn citations(text: &str) -> (Vec<(usize, usize)>, Option<usize>) {
+    let lower = text.to_ascii_lowercase();
+    let b = lower.as_bytes();
+    let mut nums: Vec<(usize, usize)> = Vec::new();
+    let mut all: Option<usize> = None;
+    let mut i = 0usize;
+    while i < b.len() {
+        if all.is_none() && bounded_at(b, i, b"all deltas") {
+            all = Some(i);
+        }
+        let word: &[u8] = if bounded_at(b, i, b"deltas") {
+            b"deltas"
+        } else if bounded_at(b, i, b"delta") {
+            b"delta"
+        } else {
+            i += 1;
+            continue;
+        };
+        let after = skip_sp(b, i + word.len());
+        integer_list(b, after, &mut nums);
+        i += word.len();
+    }
+    (nums, all)
+}
+
+// spec: canon-kit/SPEC.md §check-amendment-retired-spelling — a bullet's leading backticked
+// token: the roster's path convention and the retired-spelling block's spelling convention are
+// one extraction, so a bullet opening in anything else names nothing rather than naming prose
+pub fn leading_backticked(text: &str) -> Option<String> {
+    let rest = text.strip_prefix("- ")?.trim_start();
+    let rest = rest.strip_prefix('`')?;
+    let close = rest.find('`')?;
+    if close == 0 {
+        return None;
+    }
+    Some(rest[..close].to_string())
+}
+
 // spec: canon-kit/SPEC.md §lib/spec.sh — the default-statement grammar's one crate-side owner,
 // so both readers of a SPEC's stated default read it identically; the knob-name predicate is the
 // caller's, since each gate derives its own prefix vocabulary
@@ -1260,5 +1386,56 @@ mod tests {
         assert_eq!(cardinal_word_value("one"), None);
         assert_eq!(cardinal_word_value("hundred"), None);
     }
-}
 
+    // spec: canon-kit/SPEC.md §The amendment lifecycle — the delta-heading grammar, tested where
+    // it now lives rather than beside one of its two readers
+    #[test]
+    fn the_delta_heading_grammar_is_a_parenthesised_positive_integer_and_a_title() {
+        assert_eq!(delta_number("### (1) The grammar"), Some(1));
+        assert_eq!(delta_number("### (12) x"), Some(12));
+        assert_eq!(delta_number("### (1) `code` title"), Some(1));
+        assert_eq!(delta_number("### A1. bold-ish"), None);
+        assert_eq!(delta_number("### (i) roman"), None);
+        assert_eq!(delta_number("### (0) zero is not positive"), None);
+        assert_eq!(delta_number("### (01) leading zero"), None);
+        assert_eq!(delta_number("### (2)"), None);
+        assert_eq!(delta_number("### (3) "), None);
+        assert_eq!(delta_number("#### (1) wrong level"), None);
+    }
+
+    // spec: canon-kit/SPEC.md §The amendment lifecycle — the citation grammar, including the
+    // plural, the comma/`and` list, the possessive and the whole-amendment literal
+    #[test]
+    fn a_citation_is_the_word_plus_an_integer_list() {
+        let n = |s: &str| -> Vec<usize> { citations(s).0.into_iter().map(|(n, _)| n).collect() };
+        assert_eq!(n("… (delta 1)."), vec![1]);
+        assert_eq!(n("… (deltas 2, 3)."), vec![2, 3]);
+        assert_eq!(n("… (deltas 1, 2 and 3)."), vec![1, 2, 3]);
+        assert_eq!(n("… (deltas 4 and 5)."), vec![4, 5]);
+        assert_eq!(n("per delta 5's table (delta 5)."), vec![5, 5]);
+        assert_eq!(n("Delta 7 capitalised."), vec![7]);
+        assert!(n("no delta claims this target.").is_empty());
+        assert!(n("the deltas above.").is_empty());
+        assert!(citations("… (all deltas).").1.is_some());
+        assert!(citations("… (delta 1).").1.is_none());
+    }
+
+    // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — the leading-backticked-token
+    // extraction both blocks read: a path in the roster, a spelling in the retired block, and
+    // nothing at all where a bullet opens in bold or in prose
+    #[test]
+    fn a_bullet_names_its_subject_by_its_leading_backticked_token() {
+        assert_eq!(
+            leading_backticked("- `canon-kit/SPEC.md` §One — prose (delta 1)."),
+            Some("canon-kit/SPEC.md".to_string())
+        );
+        assert_eq!(
+            leading_backticked("- `a-retired-slug` — retired by delta 6."),
+            Some("a-retired-slug".to_string())
+        );
+        assert_eq!(leading_backticked("- **component/SPEC.md §One** — bold, not backticked."), None);
+        assert_eq!(leading_backticked("- prose opening the bullet, then `a/path.md`."), None);
+        assert_eq!(leading_backticked("- `` — an empty span names nothing."), None);
+        assert_eq!(leading_backticked("not a bullet at all"), None);
+    }
+}

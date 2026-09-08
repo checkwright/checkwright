@@ -116,6 +116,45 @@ string and stop either changing without the other. Stated as a non-target so a
 later reader does not read the silence as an omission. Enforced by
 `check-amendment-update-target`.
 
+**The `## Retired spellings` block.** Every amendment carries a
+`## Retired spellings` section, and its body is one of two forms:
+
+- **The negative form** — a single bullet whose first word is `None`
+  (case-insensitive), an em dash, and a non-empty reason:
+  `- None — no delta of this amendment retires a spelling.`
+- **The positive form** — one or more bullets, each opening with a **backticked
+  spelling** and carrying a **delta citation** in the citation grammar above.
+  That grammar is reused rather than restated, so the two blocks cannot drift
+  into two dialects of one token, and a bullet's subject is its **leading
+  backticked token** on the same convention the update-target roster names a
+  path by.
+
+A bullet's entry is the bullet line plus its indented continuation — the same
+wrap-straddling boundary `check-amendment-update-target` crosses, for the same
+reason: a citation that wrapped across a newline is still one subject. The valve
+is `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first line or the
+one above, riding the shared exempt window (§lib/spec.sh) with a mandatory
+reason; an exempt bullet leaves the declared-spelling count as well as the
+finding, so a reader of the clean line is never looking at a count that silently
+shrank. The **work-class tag** is outside this grammar for the reason it is
+outside the delta-ID grammar above.
+
+**Why a declaration, when the roster's own omission is what failed.** The
+objection to answer first is that a declaration has the same hole as the roster
+it repairs — an author who forgot a surface will equally forget a spelling — and
+the block's shape is the answer to it. **The roster has no negative form**: a
+short roster and a complete one are the same document, so there is no line an
+author fails to write and nothing for a gate to miss. A retired-spelling block
+does have one, and it is mandatory, so an author who skips the section is
+writing an amendment that reds — a caught error class where the short roster was
+not. What stays uncaught is an author who declares the section, retires a
+spelling and does not name it: real, and strictly smaller than what is uncaught
+without the block. And the obligation is not new — the shipped template's
+Definition of Done already owes the grep on every amendment; nothing has ever
+recorded the run or checked its result, so the block writes down an existing
+duty in a form a gate can re-execute. Enforced by
+`check-amendment-retired-spelling`.
+
 An amendment file is **outside the governed manifest**: `CANON_KIT_MANIFEST_FILES`
 globs `*/SPEC.md`, which `SPEC-<name>.md` does not match, so the prose and knob
 gates never scan one. Their obligations attach at the merge rather than at the
@@ -382,6 +421,19 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs:
 - `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
   `check-md-refs` skips (a consumer's generated documentation whose links a
   build tool owns).
+- `CANON_KIT_RETIRED_SPELLING_EXCLUDE` — array of globs, default empty: tracked
+  paths held out of `check-amendment-retired-spelling`'s reconciliation corpus.
+  Which surfaces are **history-bearing** is a consumer fact, not a kit one — a
+  work queue, a ruling record and a scratch directory are named by that
+  consumer's own configuration, and a retired spelling survives in all three
+  legitimately, because that is what a history surface is for. A kit default
+  naming them would be a kit literal carrying one project's layout, which the
+  provenance seam refuses. **The empty default is the conservative one, not a
+  fail-open**: the exclusion can only ever remove findings, so a consumer that
+  configures nothing gets a noisier gate rather than a blinder one — worth
+  stating because the reflex on reading "defaults to empty" is to look for the
+  hole. This repo holds out its queue, its ruling record, its workflow directory
+  and every kit's `gate-tests/` tree.
 - `CANON_KIT_COUNT_COLLECTIONS` — array of collection-noun plurals
   `check-manifest-count` treats as growing governed sets, default
   `("gates" "meta-gates" "checks" "kits" "stages" "rules" "KPIs")` (a consumer
@@ -899,10 +951,17 @@ one now would be a knob whose only reader is §check-knob-citation.
 **Deliberately not asserted: roster completeness.** The gate cannot check that
 the update-target roster names every surface the change obliges a write to —
 that is a claim about the world, not about the file, and no scanner reaches it.
-It asserts the decidable half (every listed target is owned) and the align stage
-keeps the other half, whose duty is unchanged: arm B catches a target that was
-*listed and unowned*, never one that was never listed at all. Two stronger arms
-were weighed and refused. Requiring **every delta to be cited by some target** is
+It asserts the decidable half (every listed target is owned): arm B catches a
+target that was *listed and unowned*, never one that was never listed at all.
+**One narrow slice of the other half is now mechanized**, by
+§check-amendment-retired-spelling rather than by a fourth arm here — a change
+that retires a *literal* leaves the retired and the replacing spellings in
+disjoint token spaces, so a survivor scan reconciles against this roster and the
+roster becomes the discriminator. What is left with the align stage is the
+residue that slice does not reach: a stale prose sentence, a semantic over-claim,
+a cross-reference dangled by a deletion, and the renumber case, where the two
+spellings occupy the *same* token space and no scanner can tell a stale citation
+from a correct one. Two stronger arms were weighed and refused. Requiring **every delta to be cited by some target** is
 false — a delta adding a wholly new section legitimately touches no existing one.
 Requiring **every path or `§` reference in a delta body to appear in the roster**
 would be high-false-positive, because a delta body names many surfaces for
@@ -925,6 +984,118 @@ the output contract, on the generated pre-commit hook, `run-gates.sh` and CI, an
 the `--run-gate-tests` arm through the fixture pair. Its input is `spec_amendments`'
 output — an existing producer with an existing enabling path, so nothing new must
 be configured for the gate to see a live corpus. `precommit` tier.
+
+### check-amendment-retired-spelling
+
+Invariant: every amendment on disk carries a `## Retired spellings` block in one
+of the two forms §The amendment lifecycle pins, and every spelling that block
+declares survives in the tree only at a path the same amendment's
+`## Existing sections updated` roster names.
+
+The failure it closes is the roster's own omission, whose evidence is in the tree
+rather than in the document: an amendment's roster can be short by a surface, and
+only a grep finds the missing one — a grep the template's Definition of Done
+already owes, that nothing obliges and nothing records having run.
+
+**Why only this slice.** Deciding which surfaces an amendment *should* have
+listed is the semantics of the change, and §check-amendment-update-target already
+refuses it. What is decidable is the **literal-substitution** slice: after a
+delta replaces literal `X` with literal `Y`, every remaining occurrence of `X` is
+either a site the change should have reached or one deliberately left standing,
+and the roster is the existing discriminator between them. The **renumber** slice
+is not decidable and is a stated non-target — inserting a rule and shifting the
+numbers after it leaves the retired and the replacing spellings in the *same*
+token space, so a site reading `rule 19` is either a stale citation to the old
+19 or a correct one to the new, the two are byte-identical, and the correct
+post-change sites are dense in the renumbered range rather than rare in it. A
+survivor scan there returns a hit set dominated by non-violations, which is the
+cry-wolf shape §check-amendment-update-target already refused a stronger arm for
+(gate-sdk/SPEC.md §When a gate earns its place). Its durable fix is not a gate at
+all: a cross-corpus citation that names its referent rather than its number has
+no numeric relation left to decay, which dissolves the slice instead of detecting
+it. Recorded here because "declare a pattern instead of a literal" is the obvious
+repair a later reader reaches for, and it reaches only some of the renumber's
+site classes — markdown ordinals, parenthesized placement citations and a
+comma-list roster are three different spellings of one shifted number.
+
+**Three arms and a valve.**
+
+- **A — the grammar.** Red (exit 1) when an amendment carrying `## What changes`
+  has no `## Retired spellings` section, when that section carries no bullet,
+  when its body is neither the negative form nor bullets each carrying a
+  backticked spelling and a citation, and when the negative form carries an empty
+  reason. This is the arm that closes the omission hole the roster has no shape
+  for, and the arm B and C depend on.
+- **B — the survivor reconciliation.** For each declared spelling, scan the
+  reconciliation corpus and red on every **surface** carrying an occurrence at a
+  path no `## Existing sections updated` bullet of that same amendment names. A
+  roster bullet names a path by its **leading backticked token**, which is where
+  that convention becomes contract rather than habit; the finding's subject is
+  the surface rather than the occurrence, so one line per surface is reported and
+  not one per hit — a second hit in a file the author must open anyway adds no
+  worklist item and buries the ones that do. The amendment set is out of the
+  corpus, so an amendment is never its own violation.
+- **C — the dangling citation.** Red when a bullet cites an `<N>` no
+  `### (<N>)` heading defines, `all deltas` in an amendment defining none
+  included. Without C, A and B both pass on a block whose bullets cite deltas
+  renumbered out from under them — the same failure arm C of
+  §check-amendment-update-target closes, reached through the second block.
+- **Valve** — `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first
+  line or the one above, riding the shared exempt window (§lib/spec.sh), reason
+  mandatory per the `comment-tier-exempt:` convention. An exempt bullet leaves
+  the declared-spelling count as well as the finding.
+
+A fenced block is skipped whole, on the ground §The amendment lifecycle gives the
+fence: an embedded wire-contract delta is grammar being shown rather than a
+bullet being declared.
+
+**The reconciliation corpus is `git ls-files` minus the amendment set, minus
+`CANON_KIT_RETIRED_SPELLING_EXCLUDE`.** Tracked files only, so an untracked
+scratch file is not a violation and a green run before staging is vacuous for
+exactly the file it most needs to see — the property gate-sdk/SPEC.md
+§Enforcement tiers states of the whole battery and this gate inherits. The
+`git ls-files` corpus is precedented for a canon-kit member rather than a novelty
+(§check-tree-terms in gate-sdk resolves its corpus the same way) and it carries
+the `git` **tool dependency** the crate's registry declares. **It carries no walk
+root, and the member still declares one**: gate-sdk/SPEC.md §check-reads-couples
+rules a `git ls-files` corpus outside the walk class, so the corpus adds no root
+— but this member *also* resolves the amendment set through the shared finder,
+which is a walk, so the registry declares the `?` its cohort declares for a scan
+root that is the member's own first argument. The distinction is worth stating
+because reading the corpus rule as the member's whole read-set would declare an
+empty root set that the crate's observed-roots-⊆-declared assertion reds on.
+
+**Fail-closed (exit 2):** a scan root that is not a directory; an **unwalkable**
+scan root; an amendment carrying `## Retired spellings` but no `## What changes`,
+where no bullet *can* cite a delta and no arm could say which to blame; a file
+the reader cannot read; and a failure to enumerate the reconciliation corpus
+(a non-repository cwd included). The unwalkable-root posture follows
+§check-amendment-update-target and **not** §check-amendment-queue: an empty
+amendment set here hides every violation silently, where the queue gate can
+afford one because its other direction contradicts it. That asymmetry is owned at
+§lib/spec.sh.
+
+**Output.** On clean, the amendments scanned, the spellings declared, and how
+many took the negative form — a count on the clean line and not only on the red
+one, so the block's uptake is readable without a failure. On red, each finding as
+`<amendment>:<line>: <spelling> survives at <path>:<line>, named by no roster
+bullet`.
+
+**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears** for
+the reason it clears for its sibling: the corpus is `spec_amendments` plus the
+tracked tree, neither of which reaches a gate declaration path. **Born native**,
+no shell form authored. Its `good/`+`bad/` pair is its oracle — `bad/` carries a
+missing section, a positive bullet with no citation, an unreconciled survivor and
+a dangling citation, so each arm has an executable statement, while `good/`
+exercises the negative form, a wrapped citation, the valve, and a survivor at a
+path the roster does name.
+
+Producer of nothing but a verdict; its consumers are the committing session
+through the output contract on the generated pre-commit hook, `run-gates.sh` and
+CI, the `--run-gate-tests` arm through the fixture pair, and the **align stage**,
+whose roster duty is now defined as the complement of what arm B covers.
+`precommit` tier, `trigger=*` — a survivor can appear in any tracked file, so any
+tree edit is a trigger.
 
 ### check-spec-dod-singleton
 
