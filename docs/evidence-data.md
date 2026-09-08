@@ -149,3 +149,4 @@
 | windows-install-path-behind-the-invoke | sc sp a b v c | 4f/5d | 2 · ≤0d | 20s clean | 109 |
 | supported-platform-roster-widening | sc sp a b v c | 11f/6d | 5 · ≤1d | 20s clean | 111 |
 | macos-roster-join | sc sp a b v c | 4f/5d | 1 · ≤0d | 20s clean | 111 |
+| intel-macos-roster-join | sc sp a b v c | 3f/1d | 1 · ≤0d | 20s clean | 111 |

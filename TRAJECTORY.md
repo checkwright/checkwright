@@ -26,6 +26,11 @@ an escalation. A ruling whose subject is finished directed something that has
 already happened, so deleting the record decides nothing. Reversal is the other
 act — making a closed ruling stop being the rule — and it stays operator-class.
 
+**A figure recorded here is a dated record of what a decision was weighed
+against, never a live claim.** The same arithmetic in a governed spec is repaired
+by de-literalization; the figure here is corrected under bounded operator
+authority instead. Different kinds, different repairs — one commit may owe both.
+
 **Who may record a ruling here.** A session **records** a ruling the operator
 closed; it never **authors** one. The authority is the ruling's existence, not
 the recording session's role — so no roster of permitted writers is maintained,

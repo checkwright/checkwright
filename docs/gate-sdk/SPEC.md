@@ -3648,9 +3648,11 @@ that answers each is the one whose corpus matches its question.
    the criterion is met rather than merely ruled**: `v0.22.0` published the binary
    and its digest sidecar as Release assets, so a vendored consumer whose host the
    roster carries an artifact for resolves, verifies and runs the ported member.
-   The criterion is satisfied **per target, not globally** — one declared triple has
-   a published artifact today, and a host with none is omitted-and-declared rather
-   than dispatched into an absent binary.
+   The criterion is satisfied **per target, not globally** — a host whose triple the
+   roster carries no *published* artifact for is omitted-and-declared rather than
+   dispatched into an absent binary. Stated as that complement rather than as a count
+   of covered triples, for the reason criterion 5 gives below: a count here moves on
+   a roster join *and* on the next release, and it has gone stale once already.
 
    **What that branch governs is what an uncovered host is *told*, rather than
    whether its battery still runs.** Every registered member dispatches to the

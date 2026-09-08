@@ -18,6 +18,53 @@
 
 
 
+- **installer-prior-files-inherits-host-line-terminator** [design-pending] — the installer's own
+  manifest read carries the exposure round 20 measured and repaired in the smoke harness's copy of
+  it, across four reader sites, and no leg that is green today reaches any of them.
+  **Verified at source 2026-09-08 during close's drain, not taken from the bullet's prose.**
+  `installer/lib/init.sh`:80 captures `.files` as a multi-line `jq` stream into `PRIOR_FILES`, and
+  four sites split it with a tab-IFS `read -r p h` — `init.sh`:166 and :333, `uninstall.sh`:70,
+  `diff.sh`:40. A recorded hash therefore inherits whatever terminator the host's `jq` left on the
+  line, which is exactly the read `installer/consumer-smoke/run-smoke.sh` repaired at `2ac0a91c`.
+  **Latent rather than observed, and that is why it is not a fix.** A first `init` leaves
+  `PRIOR_FILES` empty, and the Windows leg has never reached the idempotent-re-run, upgrade or diff
+  arms where a CR-bearing prior hash makes every recorded file read as changed. No host this repo
+  can reach today exhibits it.
+  **DISTINCT from `windows-smoke-manifest-cr-survives-repair`**, which is Done: that unit's subject
+  is the SMOKE HARNESS's manifest read and the anti-normalization rule governing it. This is the
+  installer's install path — a different surface with a different consequence, a silently wrong
+  upgrade diff rather than a loud misreported assertion — and repairing it needs its own terminator
+  exception under installer/README.md §The install boundary rather than the smoke's.
+  **Cost while deferred:** zero on every platform the roster covers; on a CRLF host it is a wrong
+  upgrade and a wrong diff, which is worse than the smoke's red because nothing announces it.
+  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because the repair is
+  four code sites plus a governed rule extension plus smoke coverage — a unit, not a two-word
+  correction — and is unverifiable without a Windows round; promoted rather than iceboxed because
+  the trigger is live and named: the first Windows leg that reaches the re-run arm.
+
+- **smoke-report-array-carrier-mangling-unexplained** [design-pending] — the Windows manifest
+  report's two decompositions of one recorded entry disagree, the array carrier is implicated, and
+  no finished run discriminates the two candidate mechanisms.
+  **Recorded in prose only until now, which is why it is filed here.** `installer/README.md`'s Round
+  20 block states the residual and calls it available to whoever scopes next, but scope's intake
+  reads this queue and the gap inbox, never a spec's narrative, so as recorded it sat outside the
+  intake path entirely. Verified 2026-09-08 at close: neither surface named it.
+  **What is bounded and what is not.** The disagreement is confined to the ARRAY-sourced sample
+  blocks, carried in through `run-smoke.sh`:515's trailing array operand; the scalar operands are
+  mutually consistent and are what round 20's repair was chosen off. Two mechanisms fit the log
+  identically — the element truncated at the CR, or the CR excised from it — and local reproduction
+  on bash 5.3, including with `IFS` set to a carriage return, reproduces neither.
+  **The witness is already written and needs no new design:** a Windows round printing a `%q` of
+  `bad[0]` beside the witness row. That is the whole deliverable.
+  **DISTINCT from `windows-smoke-manifest-cr-survives-repair`**, which is Done: that unit repaired
+  the line-terminator read and explicitly declined to make this mechanism a deliverable, bounding it
+  instead so the repair could be chosen off operands the bound does not touch.
+  **Cost while deferred:** paid by every later session reading that report — the sample blocks
+  cannot be read as testimony, so a real defect surfacing there is unreadable.
+  Filed 2026-09-08 by close, from a finding the lead handed it at dispatch. Promoted rather than
+  fixed because settling it needs a Windows round this session cannot buy; promoted rather than
+  iceboxed because the trigger is live — the next Windows round is the witness.
+
 - **queue-citation-line-number-stales-within-its-own-session** [design-pending] — a line number
   cited into a file the citing session is itself editing is stale before that session ends, and
   nothing reads it.
@@ -642,8 +689,9 @@
   `.github/workflows/gates.yml`:452-456 carries none today. Read it JOB-KEYED, never off the
   workflow conclusion — the habit the hold was for outlives the hold.
   **BLOCKED ON THE ROSTER ENTRY, and the block got WIDER by shipping the other half.** The
-  relocation's precondition is that an uncovered platform must still install, against
-  `native/targets.list`'s TWO triples. A native Windows install path now exists, so the supported
+  relocation's precondition is that an uncovered platform must still install, against whatever
+  `native/targets.list` carries — cited as the roster and never as a count, the count here having
+  staled on the very next join. A native Windows install path now exists, so the supported
   set that roster must cover is {Linux, macOS, native Windows} and the blocker inherits a wider
   target than it had when filed. Known and accepted when the split was ruled. NARROWING ONE took
   that split on this same ground (`doctrine-kit/SPEC.md`:213-216) and is now SPENT — recorded
@@ -3740,6 +3788,14 @@
   weighing for the friction log, and the two should probably be decided together.
   **Cost while deferred:** a wrong finding is cited with the record's authority by
   the exact sessions it was written to save work for.
+  **FOURTH instance, 2026-09-08, and it moves the class off the `finding` field.** The scope
+  recurrence survey's `edges:` recorded `prompt-ranking-ungrantable-shape-class 1`; the real inbound
+  count is TWO, at that survey's own cited rev and at HEAD. So a *derived* field is wrong the same
+  way the free-text ones were — `--emit file-survey` takes `edges` as a hand-typed argument rather
+  than deriving it, which no candidate deliverable above addresses. The survey's headline finding is
+  unaffected (it reads `recurrence:` dates, not this figure). Judged a recurrence at close after
+  re-running the count; not corrected in the record, which the next first-stage entry truncates.
+  recurrence: survey-record-claim-reliability 2026-09-08
   Filed 2026-08-10 by close, on operator direction after the third error.
 
 - **kit-ref-liveness-stem-token-hole** [design-pending] — a typo'd knob name under
@@ -8767,45 +8823,44 @@
   never judged which of the two limbs its own posture sits on. `lifecycle-kit/templates/lead.md`
   §Economics states both limbs and the method; local are the threshold (`.claude/commands/lead.md`)
   and every reading — this entry's. Split `lead` 2026-09-05.
-  **THE COUNT SERIES, TOTAL escalations reaching the lead, decomposed only from point 16, nineteen
-  points, OPEN**, one per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16, 9.
+  **THE COUNT SERIES, TOTAL escalations reaching the lead, decomposed only from point 16, TWENTY
+  points, OPEN**, one per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16,
+  9, 8.
   Threshold: a third such iteration, ANSWERED; no single point flips the posture. Points one to
-  seventeen keep VALUES only; narratives in git history. **THE EIGHTEENTH IS SIXTEEN**, the series'
-  HIGH, SEVEN to the OPERATOR and ZERO to the intent oracle, confounded by the series' widest
-  (SIX-BATCH) window.
+  eighteen keep VALUES only; narratives in git history.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
   4.4, 9.1**, derived 2026-09-05 replacing accreted mid-close ceilings; NOT appended at the
   fourteenth through nineteenth, on `cost-series-limb-unreadable-inside-close`'s ground.
   **COUNTER-EVIDENCE: NINE INSTANCES** of a claim verified at one surface read as covering a wider
   one, eight the lead's own; a counter never NETS.
-  **THE NINETEENTH IS NINE**, at the established per-question granularity: six before build (scope
-  Q1 operator, Q2 ALONE, Q3 operator, Q4 ALONE, spec Q1 and Q2 operator) and three across build, all
-  batch 1 (E1 delta 4/5 ordering ALONE, E2 the new scripts' port disposition operator, E3 two
-  falsified queue figures ALONE); batches 2, 3 and validate escalated NOTHING. **Five OPERATOR, four
-  ALONE, ZERO intent oracle** — that limb back at zero, matching the sixteenth and unmatching the
-  seventeenth. **Confound, opposite to the eighteenth's:** a THREE-batch build against that point's
-  six, so volume predicts a LOWER count; nine still lands mid-to-upper without that excuse.
+  **THE NINETEENTH IS NINE** — five OPERATOR, four ALONE, ZERO intent oracle, against a THREE-batch
+  build; the per-question decomposition is in git history.
+  **THE TWENTIETH IS EIGHT** — scope 4, spec 2, build batch 2 two; align, build batch 1 and validate
+  escalated ZERO. **THREE OPERATOR** (scope's unit set, its citation-liveness relay, spec's cost
+  figure), **FIVE ALONE, ZERO intent oracle** — that limb at zero a THIRD straight point. All five
+  ALONE were ruled off a governed surface: TRAJECTORY.md's port-first-run composition test, this
+  entry's own text three times, and `run-smoke.sh`'s report call shape. So the limb test reads FIVE
+  OF EIGHT surface-ruled rather than a turn set dominated by tail work. **Confound:** a TWO-unit,
+  two-batch iteration, so volume predicts a LOW count and eight still lands mid-series.
   **DEGENERACY, neither reading picked:** the sixteenth introduced it, the oracle BEING the scope
   session (template §The lead model), so oracle and escalator are one party; the seventeenth
   narrowed it to scope's own escalation, its one intent-oracle route coming from BUILD. Scope
-  contributed four of this nine and two of the four ALONE, so that narrowing leaves FIVE live and
-  TWO live-alone.
+  contributed FOUR of this eight and TWO of the five ALONE, so that narrowing leaves FOUR live and
+  THREE live-alone — the nineteenth's shape at a lower count, so the degeneracy is not shrinking
+  with the series.
   **THE CHARACTER LIMB, which by design the count cannot see.** At the thirteenth two of seven ruled
   the lead WRONG or ruled WHERE THIS SERIES LIVES, recurring twice at the fifteenth; a lead
-  instruction is not a governed surface. The nineteenth adds a shape: none of its nine ruled the
-  lead wrong, but ONE — E1, the batch cut splitting a producer/consumer edge between deltas 4 and 5
-  — was the LEAD'S OWN error caught downstream by the batch it mis-cut, not a stage ruling on a
-  governed surface, and the count cannot tell the two apart. Rule bought: that template's §Economics
-  — a cut owes a dependency read over the deltas. **ALIGN READINGS EIGHT AND NINE**, on the bare
-  `align` rows' `cr` column against a 10.51M median over the last thirty (range 5.24M-32.01M), all
-  Sonnet so within-tier: EIGHT (eighteenth) 14.83M, rank 24 of 30, ONE drift finding; NINE
-  (nineteenth) **6.20M / $1.99**, **rank 4 of 30**, cheapest quartile, **zero divergence**. Neither
-  caused a round-trip. Eight inverted seven's yield shape (three findings at 11.76M), cost up /
-  yield down, and falsified seven's claim that all 132 bare rows were Sonnet — four tiers; nine
-  inverts again, cost DOWN, yield nil. Nine's qualitative half, unholdable by the `cr` column or
-  that log's 134 comment-free rows: this align PASSED a claim it could have falsified by READING,
-  spending `align-checklist-fanout-calibration`'s COUNTER at its sixth reading — a discharge, NOT
-  the revert signal, recorded there.
+  instruction is not a governed surface. The nineteenth added a shape the count cannot tell from a
+  stage ruling — the LEAD'S OWN mis-cut caught downstream by the batch it mis-cut — and bought a
+  rule for it at that template's §Economics. **The twentieth adds the converse:** both of build
+  batch 2's escalations were the lead RATIFYING a stage's reading off surfaces it re-read
+  independently, which is the count's healthiest cell and is equally invisible to it.
+  **ALIGN READINGS EIGHT THROUGH TEN**, bare `align` `cr` against a 10.51M median over the last
+  thirty (range 5.24M-32.01M), all thirty Sonnet so within-tier: EIGHT 14.83M, rank 24 of 30, ONE
+  drift finding; NINE **6.20M / $1.99**, rank 4 of 30, zero divergence; TEN **6.93M / $2.01**, rank
+  5 of 30, zero divergence and ZERO escalations. None caused a round-trip. Nine's cost-DOWN,
+  yield-NIL inversion of eight now REPEATS at ten rather than reverting — this sub-series' first
+  two-point shape, and the first align cheap AND silent twice running.
   **Cost while deferred:** the posture runs unjudged, so a tier assignment wrong on the character
   limb costs every iteration and shows up as nothing — the count is the only instrument reporting
   it, and an unread one reads healthy. The cost series decays too. **NO `recurrence:` line,
@@ -10160,6 +10215,8 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
+- **survey-record-filed-after-the-fact** [design-pending] — Order to the work goes wholly unread.
+- **amendment-prose-misnumbers-its-delta** [design-pending] — Cites Delta 3 for delta 4's subject.
 - **always-loaded-baseline-freshness** [design-pending] — A close may skip the re-baseline; no gate.
 - **stage-economics-log-redates-rows** [design-pending] — Re-running the meter re-dates live rows.
 - **battery-timing-file-overwritten-by-only-run** [design-pending] — A filtered run reports as all.
@@ -10264,8 +10321,5 @@
 - **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
 
 ## Done
-
-- intel-macos-roster-join
-- windows-smoke-manifest-cr-survives-repair
 
 ## Lessons Learned
