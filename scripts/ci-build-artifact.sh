@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §Consumer payload — one artifact body for the release build leg and the CI producer, so what CI exercises is what a release publishes by construction rather than by inspection
+# no-port: ruled 2026-09-08 by the operator, asked and answered in a `/lead` session and lead-relayed. This body IS the build of the gate binary, so a ported arm would be a subcommand of the artifact it produces and would have to exist before it was built. That is the contributor-side irreducible gate-sdk/bin/build-native.sh's own disposition records, met here on the release path instead of on a fresh clone; this script is that script's caller and inherits the constraint rather than restating it. The cause is this file's and never a class: nothing else may cite it, and a second builder is a new file with its own disposition.
 # usage: ci-build-artifact.sh <target-triple> <output-dir>
 #   Run from the repo root. Reads no CI variable, so a developer machine runs it
 #   unchanged — which is how this body is verified before it reaches a tag.
