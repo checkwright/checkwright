@@ -2194,6 +2194,12 @@ one; the installer's own copies are filed separately. That work is routed to the
 gap inbox rather than taken at this close — the read was close's to buy and the
 repair is not, and no host this repo can reach reproduces the byte.
 
+*Reproduced, which is why the numbers above are not one run's accident.* Run
+`34270944900`, job `102212080750`, head `7329b319` — an independent job on the next
+commit — reports the same **492 of 493**, the same absent disagreement report, and
+the same kits-roster failure. Two runs agreeing is what licenses reading the count
+as a property of the host rather than of a round.
+
 *What the next red round selects, pinned ahead of it.* The kits assertion passing
 with the leg reddening further on means another unrepaired multi-line reader, and
 the next one is found the same way. The kits assertion still reddening after a
