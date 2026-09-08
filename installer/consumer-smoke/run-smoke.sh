@@ -439,7 +439,7 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
 # shared helper rather than a branch inside it: every covered-platform leg passes the green
 # expectation it asserts today, and the binary-less leg passes the refusal its install actually earns
 assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery expectation: green | unavailable
-    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line omitted want_omitted n_omitted q_seam q_bin
+    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line omitted want_omitted n_omitted q_seam q_bin files_raw
     local -a bad_hash=() lock_kits=() want_kits=()
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
@@ -487,20 +487,24 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
     [[ "$(jq -r '.profile' "$LOCK")" == "$profile" ]] || fail "$profile: manifest records the wrong profile"
     mismatch=0; checked=0; malformed_first=""; malformed_n=0; raw_first=""; raw_bad=""
     # spec: installer/README.md §The consumer smoke — the line is read WHOLE and split by parameter expansion, so the bytes the stream delivered exist in a variable the report can print: reading with IFS=$'\t' would make the split the same operation that consumes the evidence, and tab is IFS WHITESPACE, so that read also collapses tab runs and strips trailing ones — normalizing an anomalous line out of existence before anything can observe it. On the two-field, single-tab line the producer emits the two agree byte for byte, CR included, so this buys the witness and moves no value
-    while IFS= read -r line; do
-        checked=$((checked + 1))
-        [[ -n "$raw_first" ]] || raw_first="$line"
-        path="${line%%$'\t'*}"; want="${line#*$'\t'}"
-        [[ -f "$C/$path" ]] || { echo "  manifest names a file that is not there: $path"; mismatch=$((mismatch + 1)); continue; }
-        got="$(git hash-object -- "$C/$path")"
-        # spec: installer/README.md §The consumer smoke — the shape test sits on the failure branch beside the tuple it diagnoses, over BOTH operands, because a value that is not a hash makes the disagreement a statement about this harness rather than about the consumer's tree, and the verdict below has to be able to say which; it records the FIRST offending entry as a whole tuple in bad_hash's own spelling and counts every one, since a run-wide flag recording only THAT something tripped it hands the reader a verdict and withholds its subject, and it keeps the RAW LINE of the first disagreeing entry beside that tuple because a value re-read is a second observation and cannot testify about the first
-        [[ "$got" == "$want" ]] \
-            || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1))
-                 [[ ${#bad_hash[@]} -gt 0 ]] || raw_bad="$line"
-                 bad_hash+=("$path"$'\t'"$want"$'\t'"$got")
-                 [[ "$want" =~ ^[0-9a-f]{40}$ && "$got" =~ ^[0-9a-f]{40}$ ]] \
-                     || { malformed_n=$((malformed_n + 1)); [[ -n "$malformed_first" ]] || malformed_first="$path"$'\t'"$want"$'\t'"$got"; }; }
-    done < <(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")
+    # spec: installer/README.md §The consumer smoke — round 19's dump put the CR on the raw stream line itself, ahead of any split, while wantalt — the same key re-read through a standalone jq command substitution — came back clean; that is the rule's channel discriminator, so the repair is the channel and not jq. The loop therefore no longer reads through a process substitution: it captures jq's output through the same kind of channel wantalt's own control already reads clean through, and feeds the captured text to the split with a here-string
+    files_raw="$(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")"
+    if [[ -n "$files_raw" ]]; then
+        while IFS= read -r line; do
+            checked=$((checked + 1))
+            [[ -n "$raw_first" ]] || raw_first="$line"
+            path="${line%%$'\t'*}"; want="${line#*$'\t'}"
+            [[ -f "$C/$path" ]] || { echo "  manifest names a file that is not there: $path"; mismatch=$((mismatch + 1)); continue; }
+            got="$(git hash-object -- "$C/$path")"
+            # spec: installer/README.md §The consumer smoke — the shape test sits on the failure branch beside the tuple it diagnoses, over BOTH operands, because a value that is not a hash makes the disagreement a statement about this harness rather than about the consumer's tree, and the verdict below has to be able to say which; it records the FIRST offending entry as a whole tuple in bad_hash's own spelling and counts every one, since a run-wide flag recording only THAT something tripped it hands the reader a verdict and withholds its subject, and it keeps the RAW LINE of the first disagreeing entry beside that tuple because a value re-read is a second observation and cannot testify about the first
+            [[ "$got" == "$want" ]] \
+                || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1))
+                     [[ ${#bad_hash[@]} -gt 0 ]] || raw_bad="$line"
+                     bad_hash+=("$path"$'\t'"$want"$'\t'"$got")
+                     [[ "$want" =~ ^[0-9a-f]{40}$ && "$got" =~ ^[0-9a-f]{40}$ ]] \
+                         || { malformed_n=$((malformed_n + 1)); [[ -n "$malformed_first" ]] || malformed_first="$path"$'\t'"$want"$'\t'"$got"; }; }
+        done <<< "$files_raw"
+    fi
     # spec: installer/README.md §The consumer smoke — the report runs while the disagreeing consumer is still on disk and immediately before the verdict, so a leg that reds here says what it found rather than only how many, and it takes the witness and the two raw stream lines as named operands so the sample set contains the row the verdict below is about and the report can state what the channel delivered
     [[ "$mismatch" -eq 0 ]] \
         || manifest_report "$profile" "$C" "$LOCK" "$mismatch" "$checked" "$malformed_first" "$malformed_n" "$raw_first" "$raw_bad" ${bad_hash[@]+"${bad_hash[@]}"}

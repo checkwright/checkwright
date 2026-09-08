@@ -2186,6 +2186,34 @@ divergence, so that suspect is exonerated and the divergence is unexplained on
 the code as written. What the next red round buys is the answer named in-band by
 the check, rather than a nineteenth reconstruction.
 
+**Round 19 selected the first partition, on the round already bought rather than
+a new one — read 2026-09-08, run `34212264301`, job `102015768120`, an ancestor
+of commit `dd6dcf54`, inheriting the raw-stream witness from `3a3a6a2c`.** `stream1`
+and `badline` — the first line of the stream and the raw line of the first
+disagreeing entry, both `gate-sdk/README.md` — end `... 61 35 66 63 0d`: the
+carriage return is on the manifest line as the loop reads it, before any split.
+The coincidence check read **path-equal, bytes differ** on that same path, so the
+witness row's own `want` prints in a second block, and there it carries the same
+`\r` (`len=41`, `class=dirty[residue=$'\r' first=40]`) while `got`, `reread`,
+`own`, `raw` and `wantalt` are all a clean 40-hex. 493 of 493 disagreements fail
+the shape test, the whole-manifest signature this table already reads as a suffix
+on the reader rather than real hash divergence.
+
+*Which repair the dump selects.* The raw line itself carries the `0d`, which is
+this rule's first partition: the carriage return is in the stream, so the repair
+is at production or at the channel. `wantalt` is the discriminator the rule
+names, and it reads clean — a control sharing no process substitution, no tab and
+no `read` split with the loop — which implicates the process substitution
+`< <(…)`, not `jq`. The repair therefore lands on the channel and nothing else:
+the loop reads through the same kind of channel `wantalt`'s own control already
+reads clean through — a command substitution into a variable — and feeds that
+variable to the unchanged split with a here-string, in place of the process
+substitution. The read itself, the anti-normalization rule above and the report
+are all untouched; only the pipe the bytes travel over is. Whoever
+reads the next `install-smoke-windows` job reads whether the channel was in fact
+the culprit — that reading is close's, at the push it already watches, and is not
+predicted here.
+
 *The free log read is gated on the run, not on the job, and the way past that is
 a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still
 in progress; logs will be available when it is complete` even when the Windows

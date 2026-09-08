@@ -14,45 +14,6 @@
 
 ## Technical Debt
 
-- **smoke-manifest-read-appends-carriage-return** — the Windows consumer smoke
-  compares no manifest entry as a hash, because every `want` reaches the comparison carrying a
-  trailing carriage return; the witness that says where the CR enters now rides, and which repair
-  it selects is what remains open.
-  **The full record is `installer/README.md` §The consumer smoke's, cited and not restated here.**
-  Round 18, run `34142337941`, job `install-smoke-windows`, read JOB-KEYED; failing again at
-  `68cc1ea5` on run `34144326458`. A whole-manifest count of 493 of 493 is the signature of a
-  suffix on the reader, never of real hash divergence.
-  **THE WITNESS LANDED AT BUILD 2026-09-08 AND THE REPAIR WAS DELIBERATELY NOT CHOSEN** — `lead,
-  own-authority` 2026-09-07, on the spec stage's escalation. The manifest loop now reads the line
-  whole and splits it in the shell, which is also less normalizing than the read it replaced, and
-  the report carries two raw stream lines as named operands with their octet dumps: the first line
-  of the stream, and the raw line of the first disagreeing entry.
-  **The question was NARROWED, never open — which is what makes this promotable rather than
-  design-owing.** It is not WHERE THE CR COMES FROM but WHICH REPAIR THE OBSERVED DUMP SELECTS, and
-  the three-outcome decision rule that answers it is pinned in that same section — three possible
-  dumps selecting three different repair sites, with `wantalt` discriminating the channel from the
-  producer. Enumerating those outcomes here is the restatement the lead line above already
-  disclaims, so they stay with their owner. NO DESIGN TURN IS OWED. What was owed is one red round
-  of `install-smoke-windows`, read JOB-KEYED, and then the repair that list names.
-  **Product-class under the 2026-08-30 witness discriminator:** the smoke asserts the payload an
-  adopter receives, so the manifest's integrity claim is unasserted on the Windows install path.
-  **JOINED AND PROMOTED — `lead, own-authority` 2026-09-08**, derivable from the governed surfaces
-  rather than escalated: it meets two of the port-first ruling's three joining grounds at once —
-  product-class with a live trigger, and same-surface with the iteration's roster unit.
-  **THE OWED ROUND IS ALREADY BOUGHT, FREE — read at scope 2026-09-08.** `gates` run `34212264301`
-  at `dd6dcf54`, job `102015768120`, `install-smoke-windows` red under `continue-on-error`. The
-  raw-stream witness `3a3a6a2c` is an ancestor of that commit, so its dump rides: the stream "as
-  the loop read it and before any split" ends `... 61 35 66 63 0d`, so the CR is on the manifest
-  line the loop reads, ahead of any split, while `raw` and `wantalt` both read a clean 40-hex.
-  493 of 493 carry a non-hex operand — the suffix signature, not hash divergence. So the
-  three-outcome rule is read against a real dump and this entry owes no push to get one.
-  **Cost while deferred:** the leg is `continue-on-error`, so this red never reaches a workflow
-  conclusion, and every run of it re-buys the same diagnosis — now against a pinned decision rule,
-  so the next round costs a reading rather than a diagnosis.
-  Filed 2026-09-07 into the gap inbox by the close of `windows-install-path-behind-the-invoke`;
-  joined same-surface `lead, own-authority` 2026-09-07; promoted at spec 2026-09-08 and DEMOTED
-  here at build 2026-09-08, its amendment having delivered one increment of the corpus.
-
 ## Deferred
 
 
@@ -10167,5 +10128,6 @@
 
 - gate-binary-roster-covers-supported-platforms
 - gates-yml-macos-leg-ground-stale-and-self-contradicting
+- smoke-manifest-read-appends-carriage-return
 
 ## Lessons Learned
