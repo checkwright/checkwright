@@ -8,3 +8,4 @@ macos-roster-join scope a035122c 2026-09-08 dd6dcf54
 macos-roster-join spec ae981591 2026-09-08 bd259c95
 macos-roster-join align a3e1f754 2026-09-08 6e98bac1
 macos-roster-join build a2290e8a 2026-09-08 b881c4b0
+macos-roster-join build aa22c4e5 2026-09-08 c479abb2
