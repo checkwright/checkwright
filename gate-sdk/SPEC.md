@@ -4476,9 +4476,12 @@ must not apply the parity criterion to a member that has no second substrate:
   for, so on an uncovered platform a born-native gate does not run *where a shell
   gate would have*. For a port that trade is neutral — the shell form is deleted
   either way; for a born-native gate it is a real subtraction against the
-  alternative of shipping shell, and it is what the flip weighed —
-  in its corrected form, `native/targets.list` shipping one target, so the
-  uncovered set is every macOS adopter rather than a narrow hypothetical. Under
+  alternative of shipping shell, and it is what the flip weighed: the uncovered
+  set is `native/targets.list`'s complement — every adopter on a platform class
+  the roster carries no artifact for — which is a real population and not a
+  narrow hypothetical. It is stated as that complement rather than as a count,
+  because a count here has gone stale on a roster join once already and would
+  again on the next one. Under
   the flipped default that subtraction attaches to **every** new gate, which is
   why it is exception class (b)'s subject below and why its accumulation *rate*
   is owned elsewhere rather than here. The

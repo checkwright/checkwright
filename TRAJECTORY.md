@@ -284,8 +284,14 @@ The mechanism — the exception criterion that makes "with cause" operable — i
 **delivered** at that same section as closed classes with a stated cause
 form each, and is not restated here. The cost it was weighed against, recorded
 so it is not re-argued: a `.gate`-declared member is *omitted* on a platform
-`native/targets.list` carries no artifact for, and that roster is one target, so
-the flip attaches that omission to **every macOS adopter** for every new gate.
+`native/targets.list` carries no artifact for, so the flip attaches that
+omission to every new gate for whatever that roster does not carry. It was
+weighed at **every macOS adopter**, the roster then being one target; with
+`aarch64-apple-darwin` joined the set is Intel Macs plus the hosts the platform
+declaration does not carry at all. **Only that figure is corrected** — the
+verdict, its grounds and its date stand, the ruling got cheaper than it was
+costed at rather than weaker, and recording the cost still does the thing it was
+recorded to do.
 The ruling does not widen the roster; that residue was costed as a queue entry
 and is now **discharged** by a landed gate (2026-09-08), and the roster's own
 widening trigger — the produced-and-exercised predicate stated at
