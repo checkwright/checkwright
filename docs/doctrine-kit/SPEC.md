@@ -183,11 +183,16 @@ Four behaviors the round-trip fixes:
   finding still reaches whoever ran it.
 
 **The honest bound.** The block is generated, and the declared trim is the only
-customization preserved across a run. An unsanctioned edit *inside* the span — a
-reworded bullet, an added line — is reverted by design, and would red
-§check-doctrine-registration assertion C independently; everything *outside* the
-markers is the adopter's and is never read or written. Stating the bound is what
-makes the preserved case a contract rather than an accident.
+customization preserved across a run. An unsanctioned edit *inside* the span is
+reverted by design, and reds §check-doctrine-registration independently: an added
+or renamed bullet on assertions B and C, a **reworded** one on assertion F.
+Naming F here rather than C is a correction rather than a refinement — C reads
+bullet *names*, so before F existed the commonest edit of all, extending a
+bullet's summary in place under its own name, left every assertion green while
+the next run silently discarded the wording. Everything *outside* the markers is
+the adopter's and is never read or written, which is where a consumer's own
+elaboration of a rule belongs. Stating the bound is what makes the preserved case
+a contract rather than an accident.
 
 **The removal mode.** `--install-doctrine --remove [agent-file]` is the insert
 path reversed over the same marker pair, riding the marker module's `remove_block`
@@ -256,12 +261,12 @@ have gone quietly false and dropped the step out of that phase altogether.
 
 ## check-doctrine-registration
 
-Invariant, in five assertions: the configured agent file (A) carries a markdown
-link to the configured doctrine file and (B, C) holds its methodology-rule digest
-in per-rule lockstep with the doctrine, and the doctrine's two registers tag
-every rule with exactly one per-rule trailer — the craft register with a
-stage-routing trailer (D), the methodology register with the digest trailer its
-bullet is generated from (E). The digest is the surface the
+Invariant, in six assertions: the configured agent file (A) carries a markdown
+link to the configured doctrine file and (B, C, F) holds its methodology-rule
+digest in per-rule lockstep with the doctrine by name and by text, and the
+doctrine's two registers tag every rule with exactly one per-rule trailer — the
+craft register with a stage-routing trailer (D), the methodology register with the
+digest trailer its bullet is generated from (E). The digest is the surface the
 always-loaded-shape rule requires, and a re-vendored `DOCTRINE.md` that adds or
 renames a methodology-maintenance rule staling every consumer's digest *by
 construction* — on the exact path the kit advertises as its upgrade story — is
@@ -316,6 +321,23 @@ already couples the agent file and the doctrine file).
   against. D and E run one walk over a register's numbered rules, parameterized
   by the trailer name and by how its value is graded, so the two registers cannot
   drift apart in how a rule is read.
+- **Assertion F (bullet text → trailer).** Every digest bullet whose name owns a
+  methodology rule carries that rule's `*Digest:*` value **verbatim** as its
+  summary — the text past the bold name and the em dash, read off the same walk E
+  grades so a rule's summary has one reader. It is B and C's missing axis: those
+  two hold the bullet *set* in lockstep and say nothing about a bullet's body, so
+  the edit that actually happens — a consumer extending a bullet in place, under
+  its own name, with local elaboration — passed every assertion while
+  §install-doctrine's next run discarded it. That is the drift-prone surface with
+  a *silent* failure the enforcement-first weighing asks for: the loss is invisible
+  from the tree, and the remedy is a rule about where the elaboration belongs
+  (outside the markers) rather than a judgment call. A rule whose trailer is
+  unreadable — absent, doubled, or empty — is assertion E's finding and is skipped
+  here, so one defect is never reported twice; and the trim marker is untouched,
+  a trimmed rule having no bullet to compare. The honest limit it inherits from C:
+  the assertion is scoped to the *digest section*, which the heading bounds and
+  the markers do not, so an adopter's prose under that heading is graded exactly
+  when it is written as a bullet naming a rule.
 
 Section resolution fails closed. The digest section is the agent-file heading
 named by `DOCTRINE_KIT_DIGEST_SECTION` (Layout and configuration); a configured
@@ -335,8 +357,9 @@ unresolved section, or an errored capture (fail-closed); a `good/`+`bad/`
 fixture pair under `gate-tests/` — the pair carries the lockstep-clean and the
 digest-missing-a-rule cases (both craft-tagged so assertion D passes there), and
 a sibling `*.test.sh` drives the extra-line, declared-trim, link-absent,
-craft-untagged, craft-malformed, and four fail-closed cases the one-pair harness
-cannot hold (fixture-pair); and registration in this repo's `gates.list` where
+craft-untagged, craft-malformed, digest-trailer, divergent-bullet-text, and four
+fail-closed cases the one-pair harness cannot hold (fixture-pair); and
+registration in this repo's `gates.list` where
 its own always-loaded file is the scan target (self-lint). Positional form
 `check-doctrine-registration [agent-file [doctrine-file]]` lets the fixtures
 point at a synthetic agent and doctrine file.

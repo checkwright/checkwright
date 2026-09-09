@@ -55,6 +55,18 @@ fn digest_name(line: &str) -> String {
     bold_run(line.strip_prefix("- **").unwrap_or(line)).to_string()
 }
 
+// spec: doctrine-kit/SPEC.md §check-doctrine-registration — assertion F's read of a bullet's
+// summary: the text past the bold name and the em dash the installer writes between them
+fn digest_body(line: &str) -> String {
+    let rest = line.strip_prefix("- **").unwrap_or(line);
+    let after = match rest.find("**") {
+        Some(at) => &rest[at + 2..],
+        None => "",
+    };
+    let t = after.trim_matches(spacey);
+    t.strip_prefix('—').unwrap_or(t).trim_matches(spacey).to_string()
+}
+
 // spec: doctrine-kit/SPEC.md §check-doctrine-registration — a declared trim names its rule between
 // the marker and the em dash that opens its reason
 fn trim_name(line: &str) -> String {
@@ -99,6 +111,7 @@ struct Trailered {
     name: String,
     count: usize,
     bad: bool,
+    value: String,
 }
 
 // spec: doctrine-kit/SPEC.md §check-doctrine-registration — assertions D and E share one walk over
@@ -116,10 +129,12 @@ fn trailer_walk(lines: &[&str], sect: &str, trailer: &str, stages: bool) -> Opti
                 name: rule_name(body[item.start]),
                 count: 0,
                 bad: false,
+                value: String::new(),
             };
             for line in &body[item.start..item.end] {
                 if let Some(val) = trailer_value(line, trailer) {
                     rec.count += 1;
+                    rec.value = val.to_string();
                     if stages {
                         if !stages_well_formed(val) {
                             rec.bad = true;
@@ -151,9 +166,11 @@ fn rule_names(lines: &[&str], sect: &str) -> Option<Vec<String>> {
     Some(out)
 }
 
-// spec: doctrine-kit/SPEC.md §check-doctrine-registration — the digest side: bullet names and
-// declared trims off one walk, a bullet carrying the marker reading as a bullet
-fn digest_entries(lines: &[&str], sect: &str) -> Option<(Vec<String>, Vec<String>)> {
+type Bullet = (String, String);
+
+// spec: doctrine-kit/SPEC.md §check-doctrine-registration — the digest side: bullet names, their
+// summaries and declared trims off one walk, a bullet carrying the marker reading as a bullet
+fn digest_entries(lines: &[&str], sect: &str) -> Option<(Vec<Bullet>, Vec<String>)> {
     let found = section::sections(lines, sect);
     if found.is_empty() {
         return None;
@@ -162,7 +179,7 @@ fn digest_entries(lines: &[&str], sect: &str) -> Option<(Vec<String>, Vec<String
     for sec in &found {
         for line in &lines[sec.start..sec.end] {
             if line.starts_with("- **") {
-                bullets.push(digest_name(line));
+                bullets.push((digest_name(line), digest_body(line)));
             } else if line.contains("doctrine-digest-trim:") {
                 trims.push(trim_name(line));
             }
@@ -247,7 +264,7 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     };
 
-    let Some((digest_names, trims)) = digest_entries(&agent_lines, &digest_section) else {
+    let Some((digest_bullets, trims)) = digest_entries(&agent_lines, &digest_section) else {
         eprintln!(
             "check-doctrine-registration: no heading matches DOCTRINE_KIT_DIGEST_SECTION in {}: '{}'",
             agent_file, digest_section
@@ -288,8 +305,9 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
+    let meth = trailer_walk(&doctrine_lines, METH_SECTION, "Digest", false).unwrap_or_default();
     let mut digest_findings: Vec<String> = Vec::new();
-    for r in trailer_walk(&doctrine_lines, METH_SECTION, "Digest", false).unwrap_or_default() {
+    for r in &meth {
         if r.count != 1 {
             digest_findings.push(format!(
                 "methodology rule carries {} *Digest:* trailer(s), want exactly one: {}",
@@ -303,7 +321,30 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    let named: Vec<&String> = digest_names.iter().filter(|n| !n.is_empty()).collect();
+    // spec: doctrine-kit/SPEC.md §check-doctrine-registration — assertion F. A rule whose trailer
+    // is not readable is assertion E's finding and is skipped here rather than reported twice.
+    let mut text_findings: Vec<String> = Vec::new();
+    for (name, body) in &digest_bullets {
+        if name.is_empty() {
+            continue;
+        }
+        let Some(rule) = meth.iter().find(|r| &r.name == name) else {
+            continue;
+        };
+        if rule.count != 1 || rule.bad || &rule.value == body {
+            continue;
+        }
+        text_findings.push(format!(
+            "digest bullet's text is not its rule's *Digest:* trailer: {}",
+            name
+        ));
+    }
+
+    let named: Vec<&String> = digest_bullets
+        .iter()
+        .map(|(n, _)| n)
+        .filter(|n| !n.is_empty())
+        .collect();
     let trimmed: Vec<&String> = trims.iter().filter(|n| !n.is_empty()).collect();
     let mut rule_count = 0usize;
     let mut in_doctrine: Vec<&String> = Vec::new();
@@ -324,11 +365,12 @@ pub fn run(args: &[String]) -> i32 {
         && orphans.is_empty()
         && craft_findings.is_empty()
         && digest_findings.is_empty()
+        && text_findings.is_empty()
     {
         println!(
             "DOCTRINE-REGISTRATION: clean ({} links {}; {} methodology rule(s) in per-rule \
-             digest lockstep, {} declared trim(s), each carrying one *Digest:* trailer; {} \
-             craft rule(s) each carry one *Stages:* trailer)",
+             digest lockstep by name and text, {} declared trim(s), each carrying one *Digest:* \
+             trailer; {} craft rule(s) each carry one *Stages:* trailer)",
             agent_file,
             doctrine_file,
             rule_count,
@@ -380,6 +422,19 @@ pub fn run(args: &[String]) -> i32 {
         println!("  help: every methodology rule owns exactly one non-empty '*Digest:* <one-line summary>'");
         println!("        trailer — the --install-doctrine arm derives that rule's digest bullet from it, so an");
         println!("        untrailered rule would ship every consumer a digest one rule short.");
+    }
+    if !text_findings.is_empty() {
+        println!(
+            "check-doctrine-registration: a digest bullet's text is not the doctrine's summary in {}:",
+            agent_file
+        );
+        for f in &text_findings {
+            println!("  {}", f);
+        }
+        println!("  help: the digest block is generated — --install-doctrine copies each rule's '*Digest:*'");
+        println!("        summary verbatim, so a hand-edited bullet is silently reverted on the next run.");
+        println!("        Restore the bullet (bash gate-sdk/bin/run-gates.sh --install-doctrine), or move the");
+        println!("        local wording outside the doctrine-kit marker span, where it is never rewritten.");
     }
     1
 }
@@ -455,7 +510,28 @@ mod tests {
         let text = "## D\n- **Kept** — x\n<!-- doctrine-digest-trim: Dropped — why -->\n";
         let lines = section::split_lines(text);
         let (bullets, trims) = digest_entries(&lines, "## D").expect("section absent");
-        assert_eq!(bullets, vec!["Kept".to_string()]);
+        assert_eq!(bullets, vec![("Kept".to_string(), "x".to_string())]);
         assert_eq!(trims, vec!["Dropped".to_string()]);
+    }
+
+    // spec: doctrine-kit/SPEC.md §check-doctrine-registration — assertion F compares a bullet's
+    // summary against its rule's trailer, so the body read has to drop the em dash the installer
+    // writes and the padding around it, and yield the empty string for a bullet with no summary
+    #[test]
+    fn a_digest_bullet_body_is_the_text_past_its_name_and_em_dash() {
+        assert_eq!(digest_body("- **Name** — the summary."), "the summary.");
+        assert_eq!(digest_body("- **Name** —  padded  "), "padded");
+        assert_eq!(digest_body("- **Name**"), "");
+        assert_eq!(digest_body("- **Name** no dash"), "no dash");
+    }
+
+    // spec: doctrine-kit/SPEC.md §check-doctrine-registration — assertion F reads its comparand
+    // off the same walk assertion E grades, so a rule's summary has exactly one reader
+    #[test]
+    fn the_walk_carries_each_rules_trailer_value_for_the_text_comparison() {
+        let text = "## Methodology-maintenance rules\n1. **A** x\n   *Digest:* a summary.\n";
+        let lines = section::split_lines(text);
+        let got = trailer_walk(&lines, METH_SECTION, "Digest", false).expect("section absent");
+        assert_eq!(got[0].value, "a summary.");
     }
 }

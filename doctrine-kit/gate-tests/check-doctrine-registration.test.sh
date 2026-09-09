@@ -6,7 +6,9 @@
 # (assertion C), the declared-trim case (assertion B satisfied by a trim marker),
 # the link-absent case (assertion A), the craft-trailer cases (assertion D:
 # untagged and malformed), the digest-trailer cases (assertion E: untrailered,
-# doubled and empty), and the four fail-closed exits.
+# doubled and empty), the bullet-text cases (assertion F: a hand-edited summary,
+# and the rule assertion E already owns being skipped rather than double-reported),
+# and the four fail-closed exits.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -279,9 +281,52 @@ cat >"$e/DOCTRINE.md" <<'EOF'
 EOF
 check_case "meth-empty-trailer" "$e" 1 "*Digest:* value is empty"
 
+# --- digest-text-diverges: a bullet whose name is right and whose text was hand-extended
+# (assertion F). The attested defect: the name-only assertions stay green while the next
+# --install-doctrine run reverts the wording, so the local edit is lost without a red.
+v="$SANDBOX/divergent"; mkdir -p "$v"; write_doctrine "$v"
+cat >"$v/AGENT.md" <<'EOF'
+# Agent (fixture)
+
+## Delivery doctrine
+
+Rules live in [DOCTRINE.md](DOCTRINE.md) — re-vendor to upgrade.
+
+- **Content-tiering / SSOT** — one tier per surface.
+- **Enforcement-first** — fix and gate in one unit.
+- **De-literalization** — prose cites names, and this clause was hand-added locally.
+EOF
+check_case "digest-text-diverges" "$v" 1 "digest bullet's text is not its rule's *Digest:* trailer: De-literalization"
+
+# --- untrailered-text-not-double-reported: assertion E owns a rule whose trailer is
+# unreadable, so F skips it rather than reporting the same rule twice.
+p="$SANDBOX/skipped"; mkdir -p "$p"
+cat >"$p/DOCTRINE.md" <<'EOF'
+# DOCTRINE.md — fixture doctrine
+
+## Methodology-maintenance rules
+
+1. **Content-tiering / SSOT.** One content tier per surface.
+   *Digest:* one tier per surface.
+2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* fix and gate in one unit.
+3. **De-literalization.** Untrailered — no *Digest:* line to compare against.
+
+## Engineering-craft rules
+
+4. **Rename is a full-surface sweep.** Behind the link — never digested.
+   *Stages:* build
+EOF
+write_full_agent "$p"
+out="$(cd "$p" && gate_run check-doctrine-registration "$DIR/checks" AGENT.md DOCTRINE.md 2>&1)"
+if grep -qF "digest bullet's text is not its rule's" <<<"$out"; then
+    echo "  FAIL [untrailered-text-not-double-reported]: assertion F reported a rule E already owns:"
+    printf '    %s\n' "$out"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-doctrine-registration.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-doctrine-registration.test.sh: clean (extra-line + declared-trim + link-absent + craft-untagged + craft-malformed + meth-untrailered + meth-double-trailer + meth-empty-trailer + 4 fail-closed, 12 cases)"
+echo "check-doctrine-registration.test.sh: clean (extra-line + declared-trim + link-absent + craft-untagged + craft-malformed + meth-untrailered + meth-double-trailer + meth-empty-trailer + digest-text-diverges + untrailered-text-not-double-reported + 4 fail-closed, 14 cases)"
 exit 0

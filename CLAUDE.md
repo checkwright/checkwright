@@ -100,10 +100,15 @@ an engineering-craft section behind the link:
 - **Widest-true-tier placement** — the widest tier true for every reader of it.
 - **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
 - **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
-- **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped; close's drain tries fix, then icebox, then promote (lifecycle-kit/SPEC.md §The committed gap inbox), and a finding about the delivery machinery that blocks no stage entry or push is icebox-class by default — the class, its conjunctive test and its witness discriminator are TRAJECTORY.md's, 2026-08-30.
+- **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped.
 - **Scope-gated intake** — a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope — or through an operator-ruled hotfix of an impacting failure, minimal and test-and-doc-complete in one commit.
 - **Probe-before-assertion** — a claim one cheap command would settle is probed before it is asserted; relaying an unverified premise is asserting it.
 <!-- doctrine-kit:end -->
+
+**Gap disposition, repo-local** (outside the generated span, which the installer rewrites) —
+close's drain tries fix, then icebox, then promote (lifecycle-kit/SPEC.md §The committed gap
+inbox), and a delivery-machinery finding blocking no stage entry or push is icebox-class by
+default — that class and its witness discriminator are TRAJECTORY.md's, 2026-08-30.
 
 ## Conventions established in gate-sdk (keep every kit consistent)
 
