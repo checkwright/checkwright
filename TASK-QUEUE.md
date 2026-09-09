@@ -56,9 +56,7 @@
   rewrote exactly such a block, whose stated cause named three unprovisioned floor members where
   the run had one. No adopter witnesses it and it blocks no stage entry or push, so it takes the
   2026-08-30 discriminator's machinery default.
-  Surfaced by the operator mid-round while reviewing a `gates.yml` comment edit; filed 2026-09-09
-  by the lead on the operator's direction, in a lead session. Moved out of the gap inbox in the
-  same motion, so the inbox bullet is retired rather than duplicated.
+  Filed 2026-09-09 by the lead on the operator's direction, in a lead session.
 
 - **consult-rulings-outside-the-authority-roster** [design-pending] — CLAUDE.md admits exactly two
   ruling authorities, `operator` and `lead`. A third has been ruling in practice: a
