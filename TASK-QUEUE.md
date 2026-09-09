@@ -10485,8 +10485,5 @@
 
 ## Done
 
-- powershell-installer-surface
-- installer-prior-files-inherits-host-line-terminator
-- kit-library-port-residue
 
 ## Lessons Learned
