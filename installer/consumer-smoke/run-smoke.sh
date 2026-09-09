@@ -1233,8 +1233,19 @@ for f in "${SEAM_FILES[@]}"; do
 done
 [[ "$narrow_checked" -gt 0 ]] \
     || fail "the narrowed manifest records none of [${SEAM_FILES[*]}] — the arm has no seam path to resolve"
-[[ "$narrow_shadowed" -gt 0 ]] \
-    || fail "no vendored fixture shadows any checked seam basename — the arm would pass without asserting"
+# spec: installer/README.md §The consumer smoke — the vacuity refusal carries the roster it searched and not just its verdict, because the two things that produce this zero are indistinguishable from a count: a manifest that legitimately carries no shadowing fixture, and a search that looked for the wrong string. The first is a fact about the payload and the second is a defect in this arm, and a reader handed `0` alone has to buy a round to tell them apart — which is exactly what the round that first hit this on Windows had to do
+[[ "$narrow_shadowed" -gt 0 ]] || {
+    printf '  narrowed manifest: %s key(s), kits %s -> %s\n' \
+        "$(jq -r '.files | length' "$NARROW_LOCK")" "$wide_kits" "$narrow_kits"
+    for f in "${SEAM_FILES[@]}"; do
+        printf '  recorded %-28s %s\n' "$f" "$(jq -r --arg f "$f" '.files | has($f)' "$NARROW_LOCK")"
+        printf '  keys sharing its basename: %s\n' \
+            "$(jq -r --arg b "/${f##*/}" '[.files | keys[] | select(endswith($b))] | join(" ")' "$NARROW_LOCK")"
+    done
+    printf '  a sample of the roster, to show the separator and depth it actually carries:\n'
+    jq -r '.files | keys[]' "$NARROW_LOCK" | head -n 5 | sed 's/^/    /'
+    fail "no vendored fixture shadows any checked seam basename — the arm would pass without asserting"
+}
 
 out="$( cd "$NC2" && "$CW" doctor 2>&1 )"; rc=$?
 [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "doctor exited $rc on the narrowed consumer"; }
