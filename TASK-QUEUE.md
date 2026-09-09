@@ -87,6 +87,39 @@
   replaces.
   Filed 2026-09-09 by the consult session on the operator's ruling, AskUserQuestion channel.
 
+- **instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set** [design-pending] — an
+  instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running
+  green ONCE, so widening the leg afterwards re-creates, silently, the never-run condition the
+  exemption existed for.
+  **ATTESTED, and the cost was the exact one the exemption was written to avoid.**
+  `install-smoke-powershell` carried the expiry "drop this line on the run it is first observed
+  green and not before". It fired on an EIGHT-check leg; a later delta rewrote the leg to THIRTEEN,
+  so five brand-new assertions executed for the first time anywhere on a leg that was by then
+  BINDING. Two defects in the thirteenth reddened master at `ab676c7b`. The exemption's own stated
+  ground was that "its first run was that code's first run and a binding red would have spent a
+  watched push on the very defect the leg exists to surface" — and it spent precisely that push,
+  against a one-to-two-push iteration budget.
+  **BOTH DEFECTS ARE FIXED and this entry is deliberately the residue.** `74d94c94` provisioned the
+  leg to the floor and cast the bare `-match` whose `System.Object[]` killed the step;
+  `install-smoke-powershell` is SUCCESS at `273a9d76` in run `34346492761`, re-verified at this
+  scope. Master is green and nothing needs reverting — what survives is the keying.
+  **Why `[design-pending]`, a real fork with no obviously right limb:** an expiry keyed to *the
+  assertion set unchanged* needs a stable identity for that set, which the live leg spells as
+  inline PowerShell rather than as anything a scanner can count; a re-arm obligation on the
+  widening session is a prose rule no gate reads and the same class this tree keeps refusing; and
+  the third reading — that widening a binding leg is simply owed a rehearsal round like any other
+  new code — costs a push per widening, which the budget above is what bounds. The shape reaches
+  every `continue-on-error` instrument leg in `.github/workflows/gates.yml`, not this one.
+  **DISTINCT from `binding-intel-leg-failed-one-run-in-two`**, which owns a leg already binding
+  failing non-deterministically with no cause a finished run can reach; this owns the transition
+  INTO binding being keyed to the wrong predicate.
+  **Cost while deferred:** every widening of a leg that has already expired its exemption is an
+  unrehearsed binding assertion set, and the failure mode is a spent watched push — the scarcest
+  resource an iteration has.
+  Filed 2026-09-09 to the gap inbox by the close of `behind-invoke-relocation`, which no stage of
+  that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the record
+  is late and says so.
+
 - **queue-provenance-restates-git-history** [design-pending] — a queue entry's provenance statement
   narrates the entry's own route through the project's surfaces, which git history already answers
   and spec-over-precedent puts there. The mandated write is ONE attribution — CLAUDE.md's "who
@@ -263,10 +296,22 @@
   truncates a surface the session never opened is observable from the session's own tool record,
   which drift-kit's overhead meter already parses. Whether that is the right oracle is unruled, and
   the false-positive budget of a sampled-versus-read distinction is unmeasured.
+  **THE FALSE-POSITIVE BUDGET ABOVE IS NOW MEASURED RATHER THAN REASONED, 2026-09-09 at close.**
+  That close read all **452** rows of the same surface instead of sampling: 399 `verdict=green`,
+  and **53** `live=yes verdict=red records=1 decision=refuse` rows carrying five distinct run keys
+  (gates-watch 24, run-validate 8, batchB-smoke 8, batteryB..F 13). A three-row head sample would
+  have shown all-green — the near-miss above, reproduced. So the signal this surface carries is a
+  **fifth of its rows**, not rare noise, and a sampled read is wrong roughly whenever a producer
+  ran; a sampled-versus-read distinction therefore has a real discriminand rather than a
+  hypothetical one. Zero `unavailable` and zero corrupt rows appeared, so
+  `liveness-verdict-table-has-no-spawn-failure-row`'s fail-open did not fire here — every refusal
+  in that 53 is the mechanism working.
   **Cost while deferred:** every close may destroy the evidence it was supposed to read, and the
   loss is silent by construction — the surface is empty afterwards either way. Filed 2026-09-08 to
   the gap inbox by the close of `intel-macos-roster-join`, which no stage of that iteration could
   drain; promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
+  The measurement above was filed 2026-09-09 to the gap inbox by the close of
+  `behind-invoke-relocation`, whose own drain had already run, and landed here at this scope.
 
 - **smoke-harness-mapfile-inherits-host-line-terminator** [design-pending] — the smoke harness's
   second multi-line reader of the manifest `jq` stream never got the terminator handling round 20's
@@ -5538,6 +5583,15 @@
   limit and this entry owns the fix: the class no longer distinguishes a survey that engaged
   nothing from a lead that engaged thoroughly, so a mechanism landed under (1) or (2) should
   attribute the residue to its author rather than only capture it.
+  **OPTION (1)'s SUBJECT IS NOW PARTLY BUILT, measured 2026-09-09 at close, and the entry said
+  otherwise.** `.workflow/survey-record.md`'s `edges:` field carries per-candidate inbound counts
+  from `--emit queue-edges`, and that boundary's recurrence-threshold survey engaged six of seven
+  threshold members on their own recorded answer paragraphs. The `survey-engagement` audit row
+  stamped PERFORMED on that basis for the first time, so the durable-residue hole the entry was
+  filed against is narrower than filed. **What that does NOT close is the residue above,
+  sharpened:** those fields are hand-typed by the surveying session, so what survives a boundary
+  is a session's CLAIM that it engaged rather than a mechanical trace that it did — weaker than
+  any of the three candidate fixes aimed at, and exactly the *reliably* auditable gap.
   **Cost while deferred:** the stamp now rests on whichever session happened to write its
   reasoning down, so the audit reads cleanest exactly when a diligent lead masks an incurious
   survey — the failure it cannot see is the one it was built for.
