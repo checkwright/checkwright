@@ -14210,11 +14210,13 @@ body is held to the glob grammar but not to the vocabulary or hook-parity — th
 gate it describes is unbuilt, so its coupled surface may itself be design-ahead;
 parity re-fires through the normal registry path once the gate lands.
 
-**The interpreter assertion D spawns is resolved, not named.** It was the
-crate's only resolved spawn until the toolchain floor's probes took the same
-mechanism for the same cause on a different member — context-kit/SPEC.md
-§bin/env-probe owns that reader, including the one way it departs, which is that
-a floor probe falls back to the bare name where this one refuses.
+**The interpreter assertion D spawns is resolved, not named**, and it was the
+crate's first such spawn rather than its only one. Two others take the same
+mechanism, each on its own witnessed red and never on a sweep: the vendored-script
+funnel behind `init`, which the bare name sent to the launcher below rather than
+to a shell, and the toolchain floor's probes — context-kit/SPEC.md §bin/env-probe
+owns that reader, including the one way it departs, which is that a floor probe
+falls back to the bare name where these two refuse.
 `GATE_SDK_PROGRAM_FLOOR` guarantees that a
 `bash` is *present* on an adopter's host; it never guaranteed that the bare name
 `bash` reaches it (§The port-candidate criteria, criterion 7), and on Windows it

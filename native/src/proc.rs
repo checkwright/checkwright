@@ -225,9 +225,9 @@ fn resolve_outside_system_dir<F: Fn(&std::path::Path) -> bool>(
 // spec: gate-sdk/SPEC.md §check-graph — the interpreter a spawn runs, resolved to a path rather
 // than named: `GATE_SDK_PROGRAM_FLOOR` guarantees a `bash` exists on the host, never that a bare
 // name reaches it, and on Windows the bare name reaches System32's WSL launcher instead.
-// spec: gate-sdk/SPEC.md §check-graph — its one reader is `gates::graph::generator_emit`. The
-// crate's other bare-`"bash"` spawn sites are deliberately NOT re-pointed by this repair and are
-// open work under the gap filed beside it; meeting this here is no licence to sweep them.
+// spec: gate-sdk/SPEC.md §check-graph — two readers, each pointed on its own witnessed red:
+// `gates::graph::generator_emit` and `installer::init::run_vendored`. Every other bare-`"bash"`
+// spawn site stays unpointed under its queue entry; a witness is what points one, never a sweep.
 pub fn resolve_interpreter(program: &str) -> Result<String, String> {
     #[cfg(windows)]
     let (pathext, system_root) = (

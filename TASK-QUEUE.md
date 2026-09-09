@@ -9059,22 +9059,31 @@
   `hook/budget.rs`, `hook/stop_liveness.rs`, `emit/port_blockers.rs`, `emit/upgrade_smoke.rs`
   (three), `emit/kpi/always_loaded.rs`, `emit/kpi/prompt_friction.rs`, `emit/pub_index.rs` and
   `emit/lesson_sink.rs`.
-  **The repair exists and is deliberately unpointed.** `native/src/proc.rs`'s `resolve_interpreter`
-  is what these would take; its own doc comment names `gates::graph::generator_emit` as its one
-  reader and says in terms that the rest are not re-pointed, so the residue is legible at the
-  source and not only here.
-  **Why it was not taken with the hotfix.** The lead ruled that envelope narrow: a resolver over
-  twenty sites triages as a feature, a feature is a yield, and the run then standing admitted the
-  hotfix as its single exception. Filing is not promotion, `## Deferred` being no active section;
-  under the port-first run that superseded it, a promotion turns on the three joining grounds.
+  **THE CENSUS MISSED A SHIPPED SITE, and the miss is dated rather than sloppy.**
+  `installer/init.rs:716` — `run_vendored`, the single funnel every vendored-script spawn goes
+  through, `init`'s included — matches the oracle above and is named nowhere in the eleven. It
+  landed at `348cf865`, THIS iteration's own behind-invoke relocation, so each taking of the count
+  was accurate when taken and the iteration then invalidated its own close-time re-derivation. Read
+  the four figures above as of their date and re-run the oracle rather than trusting them; the
+  recorded total is not maintained here, deliberately.
+  **That site is now WITNESSED and POINTED, on the same terms the `check-graph` hotfix took.** The
+  PowerShell leg reached it the moment the toolchain floor was met: `init` refused at exit 2 with
+  `Windows Subsystem for Linux has no installed distributions`, in UTF-16 — the WSL launcher's own
+  words, from the spawn this entry predicted. Predicted cost paid as observed cost inside one
+  iteration. `run_vendored` now takes `proc::resolve_interpreter`, so the repair has two readers
+  and the rest of the residue stays unpointed: a witness points a site, a sweep does not.
+  **The repair exists and stays deliberately unpointed for the remainder.** The lead ruled that
+  envelope narrow: a resolver over the whole residue triages as a feature, a feature is a yield,
+  and the run then standing admitted the hotfix as its single exception. Filing is not promotion,
+  `## Deferred` being no active section; a promotion turns on the three joining grounds.
   **Why `[design-pending]`:** the shape is unruled — one holder with a governed name, a call-site
   sweep, or a lint that reds a bare interpreter name — and the choice interacts with
   `registry-needs-conflates-requirement-and-spawn`, which is what a resolved spawn breaks.
-  **Cost while deferred:** each of the eleven shipped sites is a wrong-interpreter spawn on a
-  native Windows host, and the Windows leg is a named objective — an adopter's gate verdict
-  witnesses this, so it sits on the product side of the 2026-08-30 discriminator rather than
-  taking that ruling's machinery default.
-  Filed at spec and re-filed at build 2026-09-03; drained here with the count re-verified.
+  **Cost while deferred, no longer an argument:** every remaining shipped site is a
+  wrong-interpreter spawn on a native Windows host, which TRAJECTORY.md §The objectives names as an
+  objective, and one of them has now spent a CI round proving it. Product side of the 2026-08-30
+  discriminator, and the discriminator is discharged rather than reasoned.
+  Filed at spec and re-filed at build 2026-09-03; census corrected and one site pointed 2026-09-09.
 
 - **docs-cmd-invariant-inline-scope-imprecise** [design-pending] — `check-docs-cmd`'s invariant
   sentence promises that inline-backticked `.sh` paths are scanned while its own assertion (A)
