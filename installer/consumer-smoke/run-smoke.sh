@@ -1221,8 +1221,9 @@ narrow_shadowed=0
 for f in "${SEAM_FILES[@]}"; do
     [[ "$(jq -r --arg f "$f" '.files | has($f)' "$NARROW_LOCK")" == "true" ]] || continue
     narrow_checked=$((narrow_checked + 1))
-    shadow="$(jq -r --arg b "/${f##*/}" --arg own "$f" \
-        '.files | keys | map(select(endswith($b) and . != $own)) | length' "$NARROW_LOCK")"
+    # spec: installer/README.md §The consumer smoke — the separator is concatenated INSIDE jq and never passed in as the head of an argument, because an argument that looks like an absolute POSIX path is rewritten into a host path on its way to a native Windows program: `/gates.list` arrives as something under the interpreter's own install root, `endswith` then matches nothing, and the arm reports a manifest carrying no shadow rather than a query that was never asked. Both the value and the defect are invisible in the verdict, which is why the rule is to hand a native program a RELATIVE operand and let the filter build the rest
+    shadow="$(jq -r --arg b "${f##*/}" --arg own "$f" \
+        '.files | keys | map(select(endswith("/" + $b) and . != $own)) | length' "$NARROW_LOCK")"
     [[ "$shadow" -gt 0 ]] && narrow_shadowed=$((narrow_shadowed + 1))
     got="$(lock_own_file "$NARROW_LOCK" "$f")"
     [[ "$got" == "$f" ]] \
@@ -1240,10 +1241,14 @@ done
     for f in "${SEAM_FILES[@]}"; do
         printf '  recorded %-28s %s\n' "$f" "$(jq -r --arg f "$f" '.files | has($f)' "$NARROW_LOCK")"
         printf '  keys sharing its basename: %s\n' \
-            "$(jq -r --arg b "/${f##*/}" '[.files | keys[] | select(endswith($b))] | join(" ")' "$NARROW_LOCK")"
+            "$(jq -r --arg b "${f##*/}" '[.files | keys[] | select(endswith("/" + $b))] | join(" ")' "$NARROW_LOCK")"
+        # spec: installer/README.md §The consumer smoke — the operand is echoed back THROUGH the same program the query goes to, because that is the only way to see an argument a host rewrote in transit: a value printed by the shell is the value the shell holds, not the one the native program was handed, and the two came apart here once already
+        printf '  that basename as jq received it: %s\n' \
+            "$(jq -rn --arg b "${f##*/}" '$b')"
     done
     printf '  a sample of the roster, to show the separator and depth it actually carries:\n'
-    jq -r '.files | keys[]' "$NARROW_LOCK" | head -n 5 | sed 's/^/    /'
+    # spec: installer/README.md §The consumer smoke — the sample is bounded inside jq rather than by closing a pipe under it, so the diagnostic does not print a write error of its own beside the failure it is explaining
+    jq -r '[limit(5; .files | keys[])] | .[]' "$NARROW_LOCK" | sed 's/^/    /'
     fail "no vendored fixture shadows any checked seam basename — the arm would pass without asserting"
 }
 

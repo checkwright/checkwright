@@ -2366,6 +2366,30 @@ answer, which is the cheap order to do it in.* The probe added beside the arm's
 repair reports `ln -s COPIED: 4378456 bytes`. MSYS deep-copies, measured rather
 than held.
 
+*Round 28 bought a rule rather than a repair, and the round before it bought the
+rule's own precondition.* Round 27 stopped at the narrowing arm's vacuity guard
+— *no vendored fixture shadows any checked seam basename* — and nothing in that
+log explained the zero. Round 28 carried an **instrument instead of a guess**:
+the refusal was made to print the roster it searched. It answered outright.
+`narrowed manifest: 1210 key(s), kits 12 -> 1`, both seam paths `recorded ...
+true`, `keys sharing its basename:` empty for both, and a roster sample of plain
+forward-slash keys. A manifest that records `scripts/gates.list` while no key in
+it ends in `/gates.list` is not a fact about a payload; it is a query that was
+never asked.
+
+*The rule: hand a native program a **relative** operand and let the filter build
+the rest.* An argument that looks like an absolute POSIX path is rewritten into a
+host path on its way to a native Windows executable, so `--arg b "/gates.list"`
+reaches `jq.exe` as something under the interpreter's own install root and
+`endswith` matches nothing. The discriminator was in the same output all along
+and is worth keeping for its shape: the sibling `--arg f "scripts/gates.list"` on
+the *same manifest in the same loop* answered `true`, and it differs only in not
+beginning with a slash. Two call sites carried the leading slash, both in this
+arm, and a sweep of the tree finds no third; both now concatenate the separator
+inside the filter. The diagnostic also echoes the operand back **through jq**,
+because a value printed by the shell is the value the shell holds and not the one
+the program was handed — which is exactly the distinction that hid this.
+
 *THE PRODUCER, NAMED AT LAST — round 26. Twenty-one rounds asked whose byte it
 is, and one arm's own two declarations answer it.* Run `34374380337`, job `102544260473`. The seam arm reached its
 byte-identity assertion and printed, immediately above the failure:
