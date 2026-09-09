@@ -18,6 +18,30 @@ say() { printf '  %s\n' "$*"; }
 fail() { printf 'INSTALLER-SMOKE: FAIL — %s\n' "$*"; exit 1; }
 blocked() { printf 'INSTALLER-SMOKE: %s\n' "$*" >&2; exit 2; }
 
+# spec: installer/README.md §The consumer smoke — the terminator handling the .files read owns, factored into the ONE owner every other multi-line reader of the manifest stream goes through: a `mapfile -t` splits on newline alone, so on a host whose stream ends its lines with CRLF every element keeps the carriage return and reaches an assertion as part of the value. Exactly one trailing CR is dropped per line so a doubled one still shows, the strips are counted, and the count is DECLARED rather than swallowed — which is what keeps a value that genuinely ended in a CR visible as a count instead of vanishing into an array element. The .files read keeps its own copy of the strip rather than calling here because it holds each line UNSTRIPPED as an evidence operand, which an array of stripped values cannot carry
+CRLF_DECLARED=""
+read_stream() {   # $1 = destination array name, $2 = what a declaration calls this stream; stdin = the stream
+    local -n _rs_dst="$1"
+    local _rs_line _rs_crlf=0
+    _rs_dst=(); CRLF_DECLARED=""
+    while IFS= read -r _rs_line || [[ -n "$_rs_line" ]]; do
+        [[ "${_rs_line%$'\r'}" == "$_rs_line" ]] || _rs_crlf=$((_rs_crlf + 1))
+        _rs_dst+=("${_rs_line%$'\r'}")
+    done
+    [[ "$_rs_crlf" -eq 0 ]] || {
+        CRLF_DECLARED="$2: the stream delivered $_rs_crlf of ${#_rs_dst[@]} line(s) ending in a carriage return, each dropped as a line terminator"
+        say "$CRLF_DECLARED"
+    }
+}
+# spec: installer/README.md §The consumer smoke — no host this repository can reach emits the byte, so the reader above is exercised against a SYNTHETIC stream here rather than left to the one platform that produces it: a repair witnessed only on the host that motivated it is covered by nothing on every host that runs this smoke, and this arm reds on the LF hosts too. It asserts the declaration as well as the strip, because a strip that stops declaring is the normalization the manifest arm below stays closed to. Silent and header-less by construction — the say is swallowed and nothing prints on the green path, so this buys no scenario in the parsed roster below
+_rs_probe=()
+read_stream _rs_probe "self-test" < <(printf 'a\r\nb\nc\r\n') > /dev/null
+[[ "${_rs_probe[*]}" == "a b c" ]] \
+    || blocked "the stream reader left a carriage return in [${_rs_probe[*]}] — every multi-line manifest read below would inherit that byte."
+[[ "$CRLF_DECLARED" == "self-test: the stream delivered 2 of 3 line(s)"* ]] \
+    || blocked "the stream reader dropped carriage returns without declaring the count: [$CRLF_DECLARED]"
+unset _rs_probe
+
 # spec: installer/README.md §The consumer smoke — INSTALLER_SMOKE_ARTIFACTS_DIR is the hand-off knob: a caller that already holds a producer's artifact directory points this at it and the smoke installs those bytes instead of building its own, which is the whole difference between a run that exercises a release-shaped artifact and one that exercises a harness stand-in
 PREBUILT_DIR="${INSTALLER_SMOKE_ARTIFACTS_DIR:-}"
 [[ -z "$PREBUILT_DIR" || -d "$PREBUILT_DIR" ]] \
@@ -541,7 +565,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
         || blocked "$profile: on ${malformed_first%%$'\t'*} the shape test refused $(malformed_operands "$malformed_first"), and it refused $malformed_n of $mismatch disagreeing entries. The report above samples that entry and prints each value's octet dump beside its shell-quoted rendering. Read the decomposition in the parentheses: len40=no or class=dirty says the operand is not a hash, while len40=yes with class=clean says this harness's matcher refused one. That is this harness's own precondition either way, not a finding about the consumer."
     [[ "$mismatch" -eq 0 ]] || fail "$profile: $mismatch of $checked manifest entries disagree with the tree"
     [[ "$checked" -gt 0 ]] || fail "$profile: the manifest records no file"
-    mapfile -t lock_kits < <(jq -r '.kits[]' "$LOCK")
+    read_stream lock_kits "manifest kits" < <(jq -r '.kits[]' "$LOCK")
     mapfile -t want_kits < <(profile_kits "$profile")
     [[ "${lock_kits[*]}" == "${want_kits[*]}" ]] \
         || fail "$profile: manifest kits (${lock_kits[*]}) differ from the profile roster (${want_kits[*]})"
@@ -1087,7 +1111,7 @@ say "seam: ${SEAM_EDITED[*]} preserved, reported and still recorded at init's ha
 # spec: installer/README.md §The consumer smoke — the protection branch chains onto this arm rather than the reversal arm, because an adopter edit is exactly the case tree-object equality cannot host: this consumer already carries two edited, committed vendored files, which is the case that reaches uninstall's keep branch and the residual manifest behind it
 declare -A SEAM_KEPT=()
 for f in "${SEAM_EDITED[@]}"; do SEAM_KEPT["$f"]=1; done
-mapfile -t SEAM_ROSTER < <(jq -r '.files | keys[]' "$SEAM_LOCK")
+read_stream SEAM_ROSTER "the seam manifest's roster" < <(jq -r '.files | keys[]' "$SEAM_LOCK")
 [[ ${#SEAM_ROSTER[@]} -gt ${#SEAM_EDITED[@]} ]] \
     || fail "the seam manifest records ${#SEAM_ROSTER[@]} file(s), so the protection chain has nothing whose removal it can assert beside the two it keeps"
 
@@ -1118,10 +1142,10 @@ done
 got="$(jq -r 'keys | join(" ")' "$SEAM_LOCK")"
 [[ "$got" == "files schema" ]] \
     || fail "the residual manifest carries [$got] where an install that no longer exists may assert only its schema and the files it still owns"
-got="$(jq -r '.files | keys[]' "$SEAM_LOCK")"
-want="$(printf '%s\n' "${SEAM_EDITED[@]}" | LC_ALL=C sort)"
-[[ "$got" == "$want" ]] \
-    || fail "the residual roster is [${got//$'\n'/ }] where the survivors are [${want//$'\n'/ }]"
+read_stream SEAM_RESIDUAL "the residual roster" < <(jq -r '.files | keys[]' "$SEAM_LOCK")
+mapfile -t SEAM_SURVIVORS < <(printf '%s\n' "${SEAM_EDITED[@]}" | LC_ALL=C sort)
+[[ "${SEAM_RESIDUAL[*]}" == "${SEAM_SURVIVORS[*]}" ]] \
+    || fail "the residual roster is [${SEAM_RESIDUAL[*]}] where the survivors are [${SEAM_SURVIVORS[*]}]"
 for f in "${SEAM_EDITED[@]}"; do
     [[ "$(jq -r --arg f "$f" '.files[$f]' "$SEAM_LOCK")" == "${SEAM_INIT_HASH[$f]}" ]] \
         || fail "the residual manifest records $f at a hash other than the one init wrote there — the next init would find it unchanged and claim it"

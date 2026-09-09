@@ -1964,6 +1964,21 @@ ended in a carriage return visible as a count that does not fit the channel's
 shape. Exactly one is taken, so a doubled carriage return still reaches the
 shape test and still fails it.
 
+*And the handling has one owner, which the reader after this loop is what
+forced.* A `mapfile -t` splits on newline alone, so on a CRLF stream every
+element keeps the byte and reaches an assertion as part of the value — which is
+what the kits-roster assertion measured once this loop was repaired and the leg's
+red moved forward to it. Every multi-line reader of the manifest stream therefore
+goes through `read_stream`: the same one strip per line, the same count, the same
+declaration on the same channel. Only the loop above keeps a copy of the strip,
+and the reason is the one thing the owner cannot do — it holds each line
+**unstripped** as an evidence operand, which an array of stripped values cannot
+carry. No host this repository can reach emits the byte, so the owner is
+exercised against a **synthetic** CRLF stream in the preflight rather than
+against a platform: it asserts the strip and the declaration together, so it reds
+on the LF hosts too, and it prints nothing on the green path, so it buys no
+scenario in the parsed roster.
+
 Once per failing profile, and outside the per-path block because each is a fact
 about the run rather than about a path, the report also prints the consumer's
 `git status --porcelain` and `git log -1 --stat`, truncated — the direct witness
@@ -2218,11 +2233,15 @@ it and invisible to every single-value capture.** That is a statement about
 coverage, and it is established. It is *not* a producer claim: nothing here
 separates `jq`'s output mode from the channel, and none is asserted.
 
-*What is owed, and it is not owed here.* Every multi-line reader of that stream
-needs the same terminator handling the repaired loop got. The kits read above is
-one; the installer's own copies are filed separately. That work is routed to the
-gap inbox rather than taken at this close — the read was close's to buy and the
-repair is not, and no host this repo can reach reproduces the byte.
+*What was owed, and where it was taken.* Every multi-line reader of that stream
+needed the same terminator handling the repaired loop got. That work is taken
+rather than routed: the handling has the one owner named above, and the kits
+read, the seam manifest's roster read and the residual roster read all go through
+it, with the synthetic CRLF arm standing in for the host no machine here can
+reach. The installer's own copies were filed separately and are **discharged
+rather than fixed** — the behind-invoke relocation replaced their
+`jq`-into-multi-line-capture pipeline with a structural parse, which leaves no
+line-oriented reader for a terminator to survive in.
 
 *Reproduced, which is why the numbers above are not one run's accident.* Run
 `34270944900`, job `102212080750`, head `7329b319` — an independent job on the next
