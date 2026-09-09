@@ -17,6 +17,38 @@
 ## Deferred
 
 
+- **install-smoke-leg-names-mix-two-axes** [design-pending] — the five `install-smoke` legs in
+  `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
+  surfaces now carry prose whose only job is to undo the misreading that produces.
+  **The naming, read off the workflow.** Three legs take a PLATFORM suffix
+  (`install-smoke-windows`, `install-smoke-macos`, `install-smoke-macos-intel`), the Linux leg
+  takes none as the baseline, and `install-smoke-powershell` takes a BOOTSTRAP suffix while
+  running on `windows-latest` — so it reads as a second Windows platform leg, and a reader
+  counting platforms off the leg names counts wrong.
+  **The cost is attested rather than predicted:** `.github/workflows/gates.yml` and
+  `installer/README.md` each carry a paragraph whose whole job is to say that a reader counting
+  platforms has been reading three legs as covering two halves, which they never did. A name
+  needing a paragraph to be read correctly is the defect; the paragraph is the receipt.
+  **WHETHER IS RULED, so only the scheme is open.** The operator ruled 2026-09-09, in the lead
+  session and through the lead channel, that intuitive design is the aim — which retires the
+  correct-but-underexplained disposition, a name a reader must be corrected about not being
+  intuitive however well the correction is written. Closing this as no-mechanism is therefore not
+  available to a later drain.
+  **Why `[design-pending]`:** two schemes are live and unranked — bootstrap-first
+  (`install-smoke-bash-<platform>` alongside `install-smoke-powershell`), or
+  platform-suffix-preserving (rename only the odd leg so it names its bootstrap unambiguously) —
+  and the blast radius has to be priced with the scheme rather than discovered after it.
+  **The blast radius is why this is scope work and not a drain fix.** Five tracked surfaces
+  (`.github/workflows/gates.yml`, `installer/README.md`, `TASK-QUEUE.md`,
+  `docs/site-architecture.md`, `docs/install.md`) plus the branch-protection required-check names
+  in `OPS.local.md`'s desired state — and that last one breaks SILENTLY: nothing reds, because a
+  required check that never reports is invisible until a merge is attempted.
+  **Cost while deferred:** two surfaces keep paying a correcting paragraph at every read, and
+  every new reader of the CI matrix starts from a miscount the prose then walks back.
+  Filed 2026-09-10 by close from the gap inbox, promoted rather than fixed because the rename
+  reaches a surface outside the tree, and rather than iceboxed because the operator's ruling makes
+  the current naming a defect to close rather than a state to accept.
+
 - **toolchain-floor-spawn-on-native-windows** [design-pending] — a compiled gate binary should not
   need a GNU userland on the host at all, and the floor roster it advertises is wider than the set
   it actually spawns.

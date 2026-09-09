@@ -151,3 +151,4 @@
 | macos-roster-join | sc sp a b v c | 4f/5d | 1 · ≤0d | 20s clean | 111 |
 | intel-macos-roster-join | sc sp a b v c | 3f/1d | 1 · ≤0d | 20s clean | 111 |
 | behind-invoke-relocation | sc sp a b v c | 2f/3d | 1 · ≤0d | 20s clean | 111 |
+| native-windows-join | sc · · b v c | 3f/15d | 0 | 20s clean | 111 |
