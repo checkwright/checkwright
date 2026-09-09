@@ -93,7 +93,7 @@ landing-surfaces slot states the same test from the recording side. One
 authoring convention follows and is what makes the next application cheap: a
 ruling able to name its own discharge event says so in its own text, so the
 session that meets the event deletes rather than judges.
-discharge: ruling-record-admission-test grep -L ruling-record-shrink-to-bau TASK-QUEUE.md
+discharge: ruling-record-admission-test  grep -L ruling-record-shrink-to-bau TASK-QUEUE.md
 ruling: ruling-record-admission-test  the admission test
 
 **Two body-line declarations make that convention resolvable rather than merely
@@ -188,7 +188,7 @@ the same clause that grounds it: the ruling is stated *for* `preview`, so the
 channel flip at `v1.0.0` reopens it rather than inheriting it. Nothing here
 narrows the operator direction trigger, which stays available for exactly the
 urgent case this ruling declines to automate.
-discharge: release-trigger-reads-narrowly grep -F 'Release channel: **stable**' docs/install.md
+discharge: release-trigger-reads-narrowly  grep -F 'Release channel: **stable**' docs/install.md
 ruling: the security-or-supply-chain trigger reads narrowly  the release policy's narrow trigger
 
 **No gate is permanently shell, and a spawned program is a dependency, never a port
