@@ -140,6 +140,20 @@
   the third reading — that widening a binding leg is simply owed a rehearsal round like any other
   new code — costs a push per widening, which the budget above is what bounds. The shape reaches
   every `continue-on-error` instrument leg in `.github/workflows/gates.yml`, not this one.
+  **A FOURTH LIMB, ATTESTED RATHER THAN PROPOSED — `lead, own-authority` 2026-09-09 through the
+  lead's message channel.** An exemption whose posture is DERIVED — `continue-on-error` read out of
+  a per-target roster index rather than hand-carried — makes the binding transition happen on the
+  run that licenses it with no edit, and is rehearsed by construction, the green run licensing the
+  join being the same assertion set. Witness: `install-smoke-windows` carried verbatim the expiry
+  this entry indicts; this iteration's build replaced it with the derived read, and run 34394922502
+  shows `native-artifacts (x86_64-pc-windows-msvc, windows-latest, false)` with both Windows legs
+  binding and no hand edit. **Its BOUND, where the limb is weaker than it looks:** the derived
+  posture needs a roster carrying a held/joined axis. Platform-target legs have one; an instrument
+  leg with no target roster — the PowerShell bootstrap leg among them — does not, so the limb may
+  resolve the platform subset and leave the shape stated above only partly answered. It is also the
+  limb doctrine favours on its face, derivation-first. **Next step, filed and NOT started:**
+  re-measure the remaining `continue-on-error` legs against this limb — which have a roster to
+  derive from. That is a survey, so scope-gated intake puts pricing it in scope's hands.
   **DISTINCT from `binding-intel-leg-failed-one-run-in-two`**, which owns a leg already binding
   failing non-deterministically with no cause a finished run can reach; this owns the transition
   INTO binding being keyed to the wrong predicate.
@@ -465,9 +479,22 @@
   instead so the repair could be chosen off operands the bound does not touch.
   **Cost while deferred:** paid by every later session reading that report — the sample blocks
   cannot be read as testimony, so a real defect surfacing there is unreadable.
+  **THE TRIGGER IS DEAD, and the clause below is corrected in place rather than left standing —
+  `lead, own-authority` 2026-09-09 through the lead's message channel, on this iteration's
+  terminator repair.** The witness row rides `manifest_report`, which fires only on a MISMATCH, and
+  round 27's manifest arm passed at all six installs, so no ordinary Windows round reaches those
+  sample blocks now. The deliverable above is unchanged and still needs no design to WRITE; what
+  died is the reachability — nothing now EXECUTES the block that would print it, so obtaining the
+  witness needs design, a planted mismatch, which the lead refused to invent rather than re-scope an
+  entry that says it needs none. The subject is untouched: the two decompositions still disagree and
+  the mechanism is still unexplained. Only the route to a witness changed.
+  **Disposition is next scope's, and icebox is now the live default.** CLAUDE.md §Delivery doctrine
+  makes a machinery finding blocking no stage entry and no push icebox-class by default, and the
+  live trigger was the only stated counterweight. Section motion belongs to a scope stage, so it
+  stays in Deferred until one takes it.
   Filed 2026-09-08 by close, from a finding the lead handed it at dispatch. Promoted rather than
   fixed because settling it needs a Windows round this session cannot buy; promoted rather than
-  iceboxed because the trigger is live — the next Windows round is the witness.
+  iceboxed on a live trigger the paragraph above retires.
 
 - **queue-citation-line-number-stales-within-its-own-session** [design-pending] — a line number
   cited into a file the citing session is itself editing is stale before that session ends, and
