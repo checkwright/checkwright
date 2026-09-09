@@ -8904,53 +8904,53 @@
 
 - **lead-split-posture-limb-unjudged** [design-pending] — this repo runs the Split posture and has
   never judged which of the two limbs its own posture sits on. `lifecycle-kit/templates/lead.md`
-  §Economics states both limbs and the method; local are the threshold (`.claude/commands/lead.md`)
-  and every reading — this entry's. Split `lead` 2026-09-05.
-  **THE COUNT SERIES, TOTAL escalations reaching the lead, decomposed only from point 16, TWENTY
+  §Economics states both limbs and the method; local are the threshold and every reading — this
+  entry's. Split `lead` 2026-09-05.
+  **THE COUNT SERIES, TOTAL escalations reaching the lead, decomposed only from point 16, TWENTY-ONE
   points, OPEN**, one per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16,
-  9, 8.
+  9, 8, 6.
   Threshold: a third such iteration, ANSWERED; no single point flips the posture. Points one to
-  eighteen keep VALUES only; narratives in git history.
+  twenty keep VALUES only; narratives in git history.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
-  4.4, 9.1**, derived 2026-09-05 replacing accreted mid-close ceilings; NOT appended at the
-  fourteenth through nineteenth, on `cost-series-limb-unreadable-inside-close`'s ground.
+  4.4, 9.1**, not appended at the 14th-19th on `cost-series-limb-unreadable-inside-close`'s ground.
   **COUNTER-EVIDENCE: NINE** one-surface claims read as wider, eight the lead's own; never NETS.
-  **THE NINETEENTH IS NINE** — 5 OPERATOR, 4 ALONE, 0 intent oracle, three batches; detail in git.
+  **NINETEENTH: NINE** — 5 OPERATOR, 4 ALONE, 0 oracle. **TWENTIETH: EIGHT** — 3 OPERATOR, 5 ALONE,
+  0 oracle, all five surface-ruled on a two-unit iteration that confounds the volume read.
   **CONSULT 2026-09-09 (`consult, own-authority`): nothing decides yet — 19 and 20 are two "such"
   points, this iteration the candidate third, read at close; a third reads the limb LIVE, which
   CONFIRMS the lead's judgment tier (the split is by session, not tier) and closes this entry.**
-  **THE TWENTIETH IS EIGHT** — scope 4, spec 2, build batch 2 two; align, build batch 1 and validate
-  escalated ZERO. **THREE OPERATOR** (scope's unit set, its citation-liveness relay, spec's cost
-  figure), **FIVE ALONE, ZERO intent oracle** — that limb at zero a THIRD straight point. All five
-  ALONE were ruled off a governed surface: TRAJECTORY.md's port-first-run composition test, this
-  entry's own text three times, and `run-smoke.sh`'s report call shape. So the limb test reads FIVE
-  OF EIGHT surface-ruled rather than a turn set dominated by tail work. **Confound:** a TWO-unit,
-  two-batch iteration, so volume predicts a LOW count and eight still lands mid-series.
-  **DEGENERACY, neither reading picked:** the sixteenth introduced it, the oracle BEING the scope
-  session (template §The lead model), so oracle and escalator are one party; the seventeenth
-  narrowed it to scope's own escalation, its one intent-oracle route coming from BUILD. Scope
-  contributed FOUR of this eight and TWO of the five ALONE, so that narrowing leaves FOUR live and
-  THREE live-alone — the nineteenth's shape at a lower count, so the degeneracy is not shrinking
-  with the series.
-  **THE CHARACTER LIMB, which by design the count cannot see.** At the thirteenth two of seven ruled
-  the lead WRONG or ruled WHERE THIS SERIES LIVES, recurring twice at the fifteenth; a lead
-  instruction is not a governed surface. The nineteenth added a shape the count cannot tell from a
-  stage ruling — the LEAD'S OWN mis-cut caught downstream by the batch it mis-cut — and bought a
-  rule for it at that template's §Economics. **The twentieth adds the converse:** both of build
-  batch 2's escalations were the lead RATIFYING a stage's reading off surfaces it re-read
-  independently, which is the count's healthiest cell and is equally invisible to it.
-  **ALIGN READINGS EIGHT THROUGH TEN**, bare `align` `cr` against a 10.51M median over the last
-  thirty (range 5.24M-32.01M), all thirty Sonnet so within-tier: EIGHT 14.83M, rank 24 of 30, ONE
-  drift finding; NINE **6.20M / $1.99**, rank 4 of 30, zero divergence; TEN **6.93M / $2.01**, rank
-  5 of 30, zero divergence and ZERO escalations. None caused a round-trip. Nine's cost-DOWN,
-  yield-NIL inversion of eight now REPEATS at ten rather than reverting — this sub-series' first
-  two-point shape, and the first align cheap AND silent twice running.
+  **THE TWENTY-FIRST IS SIX — the candidate THIRD point, and a "such" point on every limb.**
+  **FOUR OPERATOR** (dispatch-under-budget, the /consult routing plus a settings grant, a carve-out,
+  the ratification-plus-revert pair), **TWO ALONE, ZERO oracle** — that limb at zero a FOURTH
+  straight point; both ALONE surface-ruled off TRAJECTORY.md and this entry. TWO OF SIX is the
+  series' LOWEST surface-ruled fraction, against a count in its bottom quartile — the two move
+  together, which is a genuinely light supervision load rather than a starved one.
+  **THE THIRD POINT LANDED AND ITS CLOSURE IS HELD — close 2026-09-09, same hold and same ground as
+  `ruling-accretion-outgrows-the-entry-cap`'s.** Recording the reading decides nothing; closing the
+  entry is terminal, and the ruling directing it is `consult, own-authority`, which CLAUDE.md's
+  roster does not name. Escalated as ONE class question rather than answered twice.
+  **DEGENERACY, neither reading picked** (16th introduced, 17th narrowed to scope's own escalation):
+  scope gave 4 of the 20th's 8 and 3 of the 21st's 6, so it is live at both and NOT shrinking.
+  **THE CHARACTER LIMB, which by design the count cannot see.** Prior shapes: the lead ruled WRONG
+  (13th, 15th); the lead's own mis-cut caught by the batch it mis-cut (19th, which bought a rule at
+  that template's §Economics); the lead RATIFYING a stage's reading off re-read surfaces (20th).
+  **The twenty-first adds a third shape: a stage session DECLINING a relayed instruction and running
+  the oracle instead, which corrected the lead. It reads as one FEWER escalation.**
+  **ALIGN READINGS EIGHT THROUGH ELEVEN**, bare `align` `cr` against a 10.51M median over the last
+  thirty, all Sonnet so within-tier: EIGHT 14.83M rank 24/30 one drift finding; NINE 6.20M rank 4/30
+  and TEN 6.93M rank 5/30, both zero-divergence and zero-escalation.
+  **ELEVEN BREAKS THAT SHAPE and is the sub-series' strongest datum FOR the sonnet reading:** zero
+  escalations AND a real causal-completeness gap the amendment's own caller census missed (a crate
+  roster literal read by two callers, a `.gate` `couples=`, six doc surfaces), one grep false
+  positive caught and discarded. **Its bound, and it is the reading's weakness:** twelve deltas over
+  seven directories WIDENS the calibrated range rather than confirming inside it. No round-trip.
+  **BUILD'S PER-BATCH SONNET ARM NEVER TRIGGERED at the twenty-first** — 9 `{design-bearing}` to 3
+  `{mechanical}` deltas, each mechanical one coupled into a design-bearing commit rather than
+  separable. A rule with no occasion reports nothing; recorded as an absence, never as a pass.
   **Cost while deferred:** the posture runs unjudged, so a tier assignment wrong on the character
-  limb costs every iteration and shows up as nothing — the count is the only instrument reporting
-  it, and an unread one reads healthy. The cost series decays too. **NO `recurrence:` line,
-  deliberately** — the three dated re-filings belonged to the discharged deliverable, so the
-  deferred-age clock reads off `Surfaced`. Surfaced 2026-09-02; filed 2026-09-05 by build, splitting
-  the measurement half off its amendment.
+  limb costs every iteration and shows up as nothing — the count is the only instrument, and an
+  unread one reads healthy. **NO `recurrence:` line, deliberately** — the three dated re-filings
+  belonged to the discharged deliverable. Surfaced 2026-09-02; filed 2026-09-05 by build.
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
   name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
