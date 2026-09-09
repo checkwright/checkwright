@@ -7745,9 +7745,18 @@ it.
 
 The artifacts are never produced from a working
 tree: the pack step takes them
-from the run artifacts the build legs uploaded and builds nothing itself, so a
+from the run artifacts the build legs uploaded and builds none of them itself, so a
 locally-built binary can never substitute for a released one — the same reasoning
-the vendoring ruling applied to the crate source, arriving one layer out. **The
+the vendoring ruling applied to the crate source, arriving one layer out.
+**The subject is the payload artifacts throughout, and the predicate reaches no
+further.** It is not a bar on the pack job building a gate binary for its own
+tooling use, and the discriminator is whether built bytes can reach the payload:
+the packer copies payload content only out of the artifacts directory its caller
+names, so a binary built anywhere else in that job has no path in and can
+substitute for nothing. The bound is stated because an unqualified predicate
+reads as categorical, and read that way it forbids a build the rule's own purpose
+clause does not reach — while the packer's own `# spec:` line has bound this
+section narrowly all along, saying the script never builds *one*. **The
 consumer smoke's host-built artifact is a harness stand-in, not this rule
 relaxing**: it builds from a working tree because it has no Release to draw on,
 and hands `pack-installer.sh` a directory it did not produce, exactly as a build

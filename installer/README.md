@@ -1474,14 +1474,20 @@ holding the downloaded per-target artifacts and no built binary. So a cut must
 make the binary reachable in that job — by building it there, or by resolving
 `GATE_SDK_NATIVE_BIN` onto the artifact the build legs already produced — and
 that lands in the same unit as the cut rather than after it.
-**Both of those routes are currently refused, which is a sequencing fact this
-section owes a reader and did not carry.** `pack-installer-cut-to-a-non-gate-arm`
-records the refusals — building in that job against the workflow's tag-only
-trigger, and resolving onto a produced artifact against its checkout-plus-bash
-tamper floor — so the obligation above is what a cut owes, not work a cut can
-take today. A composer selecting by stated contract reads this section; without
-this sentence it scored the file takeable, which is the shape
-`doctrine-kit/SPEC.md` already writes for its own single owed member.
+**Of those two routes the first is the one a cut takes, and the second is
+refused.** A cut builds the binary in that job. `gate-sdk/SPEC.md` §Consumer
+payload's *builds nothing itself* is bounded to the payload artifacts and does
+not reach a binary built there for tooling; a `cargo build` in `pack:` compiles
+bytes that job checked out at the tag, so it leaves intact the
+checkout-plus-bash tamper floor the workflow's own header states; and
+build-then-pack in one job is rehearsed on every CI run rather than first
+exercised by a real publish. Resolving `GATE_SDK_NATIVE_BIN` onto a downloaded
+artifact is refused instead: nothing in the tree digest-verifies against an
+independent source, so it would make the one job that assembles and stamps the
+published tarball execute bytes it did not check out.
+`pack-installer-cut-to-a-non-gate-arm` carries the disposition, the cost and
+the grounds. So the obligation above is work a cut can take, and what remains
+between here and a cut is scheduling rather than a blocker.
 
 **The disposition is stated here rather than in a kit SPEC, and the ground is
 the provenance seam.** gate-sdk is a kit, vendored into every adopter's tree. A

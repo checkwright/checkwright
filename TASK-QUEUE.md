@@ -9965,52 +9965,51 @@
   (TRAJECTORY.md §PRIORITY DIRECTIVE); no run has ever barred a Deferred filing.
 
 - **pack-installer-cut-to-a-non-gate-arm** [design-pending] — the packer's lines are the largest
-  single item in the owed port column and their owning boundary now exists, but the cut cannot
-  land until the release path can reach a gate binary.
-  **Owner surface:** `installer/README.md` §The packer, authored 2026-09-06 — it carries the port
-  disposition, the negative sequencing sentence, and the reachability obligation a cut owes.
+  single item in the owed port column, and the release path can now reach a gate binary, so what
+  stands between here and a cut is scheduling rather than a blocker.
+  **Owner surface:** `installer/README.md` §The packer — it carries the port disposition, the
+  route a cut takes, and the reachability obligation a cut owes.
   **Size, read off the oracle** rather than counted by hand: `--emit port-blockers --tree` reports
   `scripts/pack-installer.sh owed lines=198`.
-  **THE BLOCKER, probed 2026-09-06 at build, re-probed by the lead, citations re-resolved 09-08 and
-  again 09-09.** `.github/workflows/publish.yml` `pack:` (`:142`) is a SEPARATE JOB from `build:`
-  (`:80`): its own `actions/checkout` (`:148`), its own `runs-on: ubuntu-latest` (`:144`), a
-  download-artifact (`:150`) and the assemble step (`:155-224`) — and NOTHING between them builds.
-  `needs: build` orders jobs; it does not share a workspace, so the path
-  `gate-sdk/lib/gate.sh` defaults `GATE_SDK_NATIVE_BIN` to does not exist there.
-  The smoke half holds: `run-smoke.sh:86-89` builds and asserts the executable before its pack
-  call sites at `:106`, `:122`, `:723`, `:924` and `:1002`.
-  **BOTH ROUTES WERE NAMED AND NEITHER TAKEN — `lead, own-authority` 2026-09-06**, on the build
-  session's escalation and with the lead re-running the probe rather than relaying it. The grounds
-  are written down here so a later session does not re-derive them:
-  - ROUTE 1, build the crate inside the `pack` job. REFUSED ON THE TRIGGER, not on minutes:
-    `publish.yml:26-29` fires only on a version tag, so new release-path wiring is first exercised
-    by a real publish. The release is deferred, so the untested window is open-ended, and a cargo
-    build newly introduced into the signing path is worst discovered on release day.
-  - ROUTE 2, resolve `GATE_SDK_NATIVE_BIN` onto a downloaded artifact. REFUSED ON A STATED
-    SURFACE: `publish.yml`'s build-leg header names the checkout+bash tamper floor as why that leg
-    stays bash on preinstalled cargo, and the `pack` job today executes only bytes it checked out.
-    This would make the one job that assembles and stamps the published tarball execute bytes it
-    did not produce, cutting across the once-computed-digest grain the workflow's own header, its
-    macOS-floor step and its tag-version proof each state — cited by NAME from 2026-09-09, all
-    three line citations having drifted at once behind `3550f340`'s inserted macOS-floor step.
-  **RE-VERIFIED AT SCOPE 2026-09-09 — the blocker HOLDS unchanged, and two grounds moved.** (a)
-  ROUTE 1's refusal is materially WEAKER: build-then-pack in one job is now rehearsed on every CI
-  run — `gates.yml`'s PowerShell leg calls `build-native.sh` then `pack-installer.sh --artifacts`,
-  and `run-smoke.sh` does the same on ubuntu — so the open-ended untested window covers only
-  `publish.yml`'s job wiring, never the shape. (b) ROUTE 1 gained a SECOND obstacle this entry
-  never cited, and it OUTRANKS the workflow comment it does: gate-sdk/SPEC.md §Consumer payload
-  states the pack step takes the build legs' uploaded artifacts and "builds nothing itself".
-  Its subject is payload artifacts and its predicate is unqualified — an ambiguity in a governing
-  surface, so which it binds is operator-class and no session may pick. (c) ROUTE 2's ground is
-  UNCHANGED: nothing in the tree digest-verifies against an independent source. NO THIRD ROUTE —
-  `pack:` is the sole producer of the release tarball and the packer refuses a dirty tree and
-  stamps HEAD, so no pre-pack exists; and `# port-until:` is refused for this file by name at
-  gate-sdk/SPEC.md §Porting a gate to the binary substrate.
-  **The front-end-reachability dependency is DISCHARGED, 2026-09-06 at close:** gate-sdk/SPEC.md
-  §The non-gate arm states the correlated convention and a bare-flag `Arm::Run` is reachable.
-  **Cost while deferred:** the owed column keeps its largest reachable member, so the port track's
-  completion predicate cannot reach zero; and the packer stays shell while its own owning section
-  states the port obligation, which is a standing disagreement between a surface and the tree.
+  **THE DESIGN CALL IS RULED — ROUTE 1, build the crate inside the `pack` job. Ruled by the
+  operator on 2026-09-09 through the AskUserQuestion channel, in an operator-directed consult
+  session**; the lead put the fork and named the consulting session's recommendation as such. It
+  reverses the `lead, own-authority` refusal of 2026-09-06 this entry recorded. Two parts on two
+  surfaces: the mechanism reading landed undated at gate-sdk/SPEC.md §Consumer payload, and the
+  direction is to wire `gate-sdk/bin/build-native.sh` into `publish.yml`'s `pack:` job — which also
+  discharges the reachability obligation, spending the 2026-09-06 front-end-reachability note.
+  **What settled it:** `scripts/pack-installer.sh`'s own `# spec:` line, the pointer binding the
+  file to §Consumer payload, already restated that section's "builds nothing itself" as *the script
+  never builds one* — the purpose clause verbatim, its elided object a payload-riding gate binary.
+  The SPEC sentence's subject is "The artifacts", so the predicate was never the ambiguity recorded
+  here; and the packer copies payload content only from `--artifacts`, so nothing else can reach it.
+  **THE THREE REFUSED ALTERNATIVES, with the grounds they were refused on:**
+  - ROUTE 1's OWN EARLIER REFUSAL on the tag-only trigger is REVERSED, not merely weakened:
+    build-then-pack in one job is rehearsed on every CI run, so the untested window covers that
+    workflow's job wiring and never the shape — and a `cargo build` there compiles bytes the job
+    checked out at the tag, leaving the checkout-plus-bash tamper floor intact.
+  - ROUTE 2, resolve `GATE_SDK_NATIVE_BIN` onto a downloaded artifact. REFUSED, ground unchanged:
+    nothing in the tree digest-verifies against an independent source, so it would make the one job
+    that assembles and stamps the published tarball execute bytes it did not check out. Its honest
+    qualification, recorded so it is not re-argued: that property is `publish.yml`'s and not
+    tree-wide, since `gates.yml`'s macOS install-smoke leg already adopts and executes a downloaded
+    build-leg artifact — the refusal rests on the release path being the higher-stakes context.
+  - ROUTE 3, rule the packer `# no-port:`. REFUSED on permanence: that field declares a permanent
+    disposition, and gate-sdk/SPEC.md §The port-candidate criteria refuses a marker conflating
+    permanent with temporarily-held, which "would drop members that will port, replacing the
+    remainder's over-count with an under-count". This blocker was a sequencing fact and the owner
+    surface said so. `scripts/ci-build-artifact.sh`'s shape does not transfer: that body *is* the
+    binary's build, so its arm would predate itself, where the packer packs rather than builds.
+  - DEFERRING the fork unresolved. REFUSED: it gates no stage and blocks no push, so it was a real
+    fourth answer and was offered as one, declined because the probe removed the obstacle.
+  **THE WORK OWED IS A LATER ITERATION's UNIT — the operator ruled the scheduling with the route.**
+  Wire the build into `publish.yml`'s `pack:` job and cut the packer to a MEDIUM `Arm::Run` non-gate
+  arm in one unit — `sha256.rs`, `json.rs`, `proc.rs`, `walk.rs` and the five installer verbs, `jq`
+  eliminable via `serde_json`, `npm pack` and `git archive | tar` staying spawns. The design
+  question is closed, so the entry is promotion-ready and stays here only because scope moves it.
+  **Cost while deferred:** the owed column keeps its only member, so the port track's completion
+  predicate cannot reach zero — `--tree` reads 71 scanned, 70 no-port, 0 held, 1 owed, and this
+  file is the 1, the whole of what stands between the tree and Objective 2.
   Filed 2026-09-06 by build on the lead's deferral of the cut; the same amendment's other deltas
   landed and closed `pack-installer-no-owning-spec-section`.
 
