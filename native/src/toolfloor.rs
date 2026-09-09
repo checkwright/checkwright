@@ -121,7 +121,8 @@ fn first_word(banner: &str) -> String {
 // `-V`*, which no in-process comparison can reach, and the golden pins that cause.
 pub fn floor_met(min: &str, found: &str) -> Option<bool> {
     let body = format!("{}\n{}\n", min, found);
-    let out = proc::run_streamed("sort", &["-V"], body.as_bytes(), proc::Stderr::Discard).ok()?;
+    let sort = proc::resolve_floor_tool("sort");
+    let out = proc::run_streamed(&sort, &["-V"], body.as_bytes(), proc::Stderr::Discard).ok()?;
     if out.code() != 0 {
         return None;
     }

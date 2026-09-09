@@ -676,20 +676,31 @@ jobs:
           # toolchain floor an adopter is told to have. Provisioning the runner up to
           # that floor is this leg's job and hiding a shortfall is not.
           #
-          # **`windows-latest` falls short in one place, and it reports as three.**
-          # The image ships Git bash on PATH but resolves `sort` to System32's, which
-          # has no `-V`. The floor comparator spawns exactly that (`floor_met` in
-          # native/src/toolfloor.rs, kept as a spawn precisely so a `sort` without
-          # `-V` is reachable), so ONE missing implementation reports as `sort`
-          # wrong-impl AND as every versioned member being uncomparable. Git's
-          # `usr/bin` carries the coreutils one and must precede System32, which is
-          # why this prepend is unconditional rather than guarded on `bash` resolving:
-          # bash already resolved on the run that failed. `shellcheck` the image does
-          # not ship at all and is the only genuine addition.
+          # **`windows-latest` falls short in one place and it reports as two**, and a
+          # PATH prepend alone was measured NOT to fix it. The image ships Git bash
+          # and GNU awk, both of which resolve; `sort` does not, because it is the one
+          # roster member the platform ships a homonym for. Windows searches the
+          # system directory BEFORE PATH, so the floor comparator's spawn
+          # (`floor_met` in native/src/toolfloor.rs, kept as a spawn precisely so a
+          # `sort` without `-V` is reachable) reached that homonym whatever PATH said,
+          # and ONE missing implementation reported as `sort` wrong-impl AND as every
+          # versioned member being uncomparable. The repair is in the crate — the
+          # floor probes resolve outside that directory, context-kit/SPEC.md
+          # §bin/env-probe — and this prepend remains its precondition, since the
+          # resolver walks PATH and reaches nothing PATH never carried.
+          # `shellcheck` the image does not ship at all and is the only genuine
+          # addition.
           $env:PATH = "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin;$env:PATH"
           if (-not (Get-Command shellcheck -ErrorAction SilentlyContinue)) {
               choco install shellcheck -y --no-progress | Out-Null
           }
+          # Printed rather than asserted, and printed unconditionally: the resolution
+          # order above is a claim about this image that no local host can check, so a
+          # round that greens must still leave behind what it greened ON, and a round
+          # that reds must not owe another one to learn where `sort` actually lives.
+          Write-Host "== every sort this image offers, in resolution order =="
+          Get-Command sort -All -ErrorAction SilentlyContinue |
+              ForEach-Object { Write-Host "  $($_.CommandType) $($_.Source)" }
           # The floor's roster is the binary's and never this file's, so the assertion
           # asks `doctor` rather than enumerating members here — a second copy would
           # drift the moment the roster moves. Asserting it BEFORE init also puts the

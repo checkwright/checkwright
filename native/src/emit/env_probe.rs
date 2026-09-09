@@ -30,7 +30,12 @@ this box; resolve names with `getent hosts` or a DoH `curl`.
 // prints a banner for most tools but is an ordinary flag for some (GNU sort's version-sort), so a
 // tool rejecting `--version` would otherwise fall through to a `-V` that hangs on inherited stdin.
 fn banner(tool: &str, flag: &str) -> String {
-    match proc::run_streamed(tool, &[flag], b"", proc::Stderr::Discard) {
+    match proc::run_streamed(
+        &proc::resolve_floor_tool(tool),
+        &[flag],
+        b"",
+        proc::Stderr::Discard,
+    ) {
         Ok(out) => String::from_utf8_lossy(out.stdout())
             .trim_end_matches('\n')
             .to_string(),

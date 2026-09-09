@@ -31,8 +31,9 @@ fn probe_banner(tool: &str) -> String {
     if !proc::on_path(tool) {
         return String::new();
     }
+    let resolved = proc::resolve_floor_tool(tool);
     for flag in ["--version", "-V"] {
-        if let Ok(c) = proc::run_with_stdin(tool, &[flag], b"") {
+        if let Ok(c) = proc::run_with_stdin(&resolved, &[flag], b"") {
             let raw = c
                 .stdout()
                 .map(|o| String::from_utf8_lossy(o).into_owned())

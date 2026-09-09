@@ -248,6 +248,37 @@ pub fn resolve_interpreter(program: &str) -> Result<String, String> {
     )
 }
 
+// spec: context-kit/SPEC.md §bin/env-probe — the floor probe's own resolution, sharing the
+// interpreter's mechanism above for the same cause on a different member: Windows searches the
+// system directory before `PATH`, where the spawn's `which` walks `PATH` and nothing else.
+// spec: context-kit/SPEC.md §bin/env-probe — a host offering the tool nowhere outside the system
+// directory falls back to the bare name rather than refusing: the verdict is then the roster's own
+// absent or wrong-impl, which is the true reading of such a host and the fail-closed direction.
+#[cfg(windows)]
+pub fn resolve_floor_tool(program: &str) -> String {
+    let dirs: Vec<std::path::PathBuf> = std::env::var_os("PATH")
+        .map(|p| std::env::split_paths(&p).collect())
+        .unwrap_or_default();
+    let pathext = std::env::var("PATHEXT").unwrap_or_default();
+    let system_root = std::env::var("SystemRoot").ok();
+    resolve_outside_system_dir(
+        program,
+        &dirs,
+        Some(pathext.as_str()),
+        system_root.as_deref(),
+        is_executable,
+    )
+    .unwrap_or_else(|_| program.to_string())
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the name passes through where the platform has no
+// system-directory homonym: a POSIX spawn already searches `PATH` and nothing else, and resolving
+// here would swap the spawned literal for an absolute path on every host the battery runs on.
+#[cfg(not(windows))]
+pub fn resolve_floor_tool(program: &str) -> String {
+    program.to_string()
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the crate's one executability predicate, in
 // the two forms the platform admits: an execute bit on unix, mere file-ness where the filesystem
 // carries none
@@ -1000,6 +1031,39 @@ mod tests {
                 err
             );
         }
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the floor probe's case, which the interpreter's
+    // does not cover: `sort` is on `PATH` in both directories and the resolution must reach the
+    // coreutils one, System32's being the line sorter that has no `-V` for the floor to compare with
+    #[test]
+    fn the_floor_probe_resolves_sort_past_the_system_directorys_line_sorter() {
+        let dirs = vec![
+            std::path::PathBuf::from(r"C:\Windows\System32"),
+            std::path::PathBuf::from(r"C:\Program Files\Git\usr\bin"),
+        ];
+        let got = resolve_outside_system_dir(
+            "sort",
+            &dirs,
+            Some(""),
+            Some(r"C:\Windows"),
+            |p: &Path| folded(&p.to_string_lossy()).ends_with("/sort.exe"),
+        )
+        .expect("nothing resolved on a PATH whose second entry holds a sort");
+        assert_eq!(
+            folded(&got),
+            "c:/program files/git/usr/bin/sort.exe",
+            "the resolution took System32's sort, which cannot version-compare"
+        );
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the passthrough arm, asserted on the host that
+    // compiles it: resolving on POSIX would change the spawned literal every registry declaration
+    // is compared against, so the name must come back unaltered
+    #[cfg(not(windows))]
+    #[test]
+    fn a_posix_floor_tool_is_spawned_under_its_bare_name() {
+        assert_eq!(resolve_floor_tool("sort"), "sort");
     }
 
     // spec: gate-sdk/SPEC.md §check-graph — the arm every host the battery runs on takes: no

@@ -14210,8 +14210,12 @@ body is held to the glob grammar but not to the vocabulary or hook-parity — th
 gate it describes is unbuilt, so its coupled surface may itself be design-ahead;
 parity re-fires through the normal registry path once the gate lands.
 
-**The interpreter assertion D spawns is resolved, not named**, and this is the
-crate's only resolved spawn today. `GATE_SDK_PROGRAM_FLOOR` guarantees that a
+**The interpreter assertion D spawns is resolved, not named.** It was the
+crate's only resolved spawn until the toolchain floor's probes took the same
+mechanism for the same cause on a different member — context-kit/SPEC.md
+§bin/env-probe owns that reader, including the one way it departs, which is that
+a floor probe falls back to the bare name where this one refuses.
+`GATE_SDK_PROGRAM_FLOOR` guarantees that a
 `bash` is *present* on an adopter's host; it never guaranteed that the bare name
 `bash` reaches it (§The port-candidate criteria, criterion 7), and on Windows it
 does not — the installed binary is a native Windows process, so the bare name
@@ -14224,7 +14228,10 @@ walks `PATH` in the operating system's own order over the `PATHEXT` candidate se
 (§Fail-closed contract owns both), with **one rejection**: a candidate directory
 resolving inside the Windows system directory — `%SystemRoot%\System32` and its
 `SysWOW64` and `Sysnative` views — is skipped, because that directory holds
-nothing else the payload wants. The comparison is **case- and separator-folded**,
+nothing else the payload wants. That ground was stated for one member and holds
+for the roster: `sort` is the second homonym the platform ships there, and it is
+a line sorter with no `-V` rather than any coreutils.
+The comparison is **case- and separator-folded**,
 since `c:/windows/system32` names the same directory as `C:\Windows\System32` and
 a comparison that missed that would pass on every developer host and fail on the
 one host the rejection exists for. On every other target the rejection is inert:

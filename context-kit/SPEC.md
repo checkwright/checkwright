@@ -545,6 +545,25 @@ lane asserts this directly rather than trusting the reading: it puts a `sort`
 that rejects `-V` on `PATH` and requires `uncomparable` from both holders, a
 condition a canned corpus cannot express.
 
+**Every floor probe resolves its member to a path before spawning it, and only
+where the platform has a system-directory homonym.** Windows searches that
+directory *before* `PATH`, so a bare program name reaches whatever the platform
+ships under it rather than the implementation `PATH` offers — `sort` is the
+worked case, the shipped one being a line sorter with no `-V`. The presence
+probe walks `PATH` and the spawn does not, so the two disagree about a single
+tool, and one absent implementation renders as *two* symptoms: that member
+`wrong-impl`, and every **versioned** member `uncomparable`, the numeric
+comparison above being that same spawn. Both probes therefore resolve the member
+outside the system directory first, through the resolver gate-sdk/SPEC.md
+§check-graph already states for an interpreter — one mechanism, two readers, and
+the rejection covers every view the platform shows that directory through. A
+host offering the member nowhere else falls back to the bare name rather than
+refusing, because the roster's own `absent` or `wrong-impl` is then the true
+reading. Elsewhere the name passes through unaltered: a POSIX spawn already
+searches `PATH` and nothing else, and resolving there would swap the spawned
+literal for an absolute path on every host the battery runs on, which is what a
+registry declaration is compared against.
+
 **The rendered verdict.** Each toolchain bullet carries the probed banner and,
 for a constrained member, the constraint and its verdict — `` (floor 4.3, ok) ``,
 `` (requires GNU — below contract) ``, `` (floor 4.3 — unverified) ``; an
