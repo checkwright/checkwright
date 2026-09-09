@@ -545,7 +545,17 @@ jobs:
           $target = $env:PWSH_TARGET
           $binname = $env:PWSH_BIN
           $script:fails = 0
-          function Check([string] $label, [bool] $cond, [string] $detail) {
+          # `$cond` is [object] and not [bool] on cause, not taste. PowerShell's
+          # `-match` returns a bool for a scalar left operand and the FILTERED
+          # COLLECTION for a collection one, so a call site whose subject came back
+          # empty hands this function an `Object[]` — which a [bool] parameter refuses
+          # with a binding exception, killing the leg mid-run. That is the reverse of
+          # fail-closed: the assertion that would have named the cause never prints,
+          # and neither does the verdict block. `if` treats an empty collection as
+          # false and a populated one as true, which is the reading every call site
+          # already means. Attested: run 34335610469 died at the follow-up-block
+          # assertion after the BAD line above it had already printed the diagnosis.
+          function Check([string] $label, [object] $cond, [string] $detail) {
               if ($cond) { Write-Host "ok   $label" }
               else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
           }
@@ -662,18 +672,34 @@ jobs:
           # would route around the very rule this half must agree with the other on.
           Write-Host "== payload coverage: a whole checkwright init completes through this bootstrap =="
           # init spawns `bash` once, for the hook generator that does not port
-          # (installer/README.md §The install boundary). bash is a declared member of
-          # the toolchain floor an adopter is told to have, so provisioning the runner
-          # up to that floor is this leg's job and hiding a missing one is not: the
-          # Check below states the resolution rather than assuming it, so a runner
-          # image that stopped shipping Git bash reds by name instead of surfacing as
-          # an opaque init failure three assertions later.
-          if (-not (Get-Command bash -ErrorAction SilentlyContinue)) {
-              $env:PATH = "C:\Program Files\Git\bin;$env:PATH"
+          # (installer/README.md §The install boundary), and `doctor` holds the whole
+          # toolchain floor an adopter is told to have. Provisioning the runner up to
+          # that floor is this leg's job and hiding a shortfall is not.
+          #
+          # **`windows-latest` falls short in one place, and it reports as three.**
+          # The image ships Git bash on PATH but resolves `sort` to System32's, which
+          # has no `-V`. The floor comparator spawns exactly that (`floor_met` in
+          # native/src/toolfloor.rs, kept as a spawn precisely so a `sort` without
+          # `-V` is reachable), so ONE missing implementation reports as `sort`
+          # wrong-impl AND as every versioned member being uncomparable. Git's
+          # `usr/bin` carries the coreutils one and must precede System32, which is
+          # why this prepend is unconditional rather than guarded on `bash` resolving:
+          # bash already resolved on the run that failed. `shellcheck` the image does
+          # not ship at all and is the only genuine addition.
+          $env:PATH = "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin;$env:PATH"
+          if (-not (Get-Command shellcheck -ErrorAction SilentlyContinue)) {
+              choco install shellcheck -y --no-progress | Out-Null
           }
-          $bashAt = (Get-Command bash -ErrorAction SilentlyContinue)
-          Check "bash resolves for the one behind-invoke step that spawns it" `
-                ($null -ne $bashAt) "no bash on PATH, and the hook generator init runs is a bash script"
+          # The floor's roster is the binary's and never this file's, so the assertion
+          # asks `doctor` rather than enumerating members here — a second copy would
+          # drift the moment the roster moves. Asserting it BEFORE init also puts the
+          # diagnosis where a reader needs it: a runner image that stops shipping a
+          # member reds by name with doctor's own table inline, instead of surfacing
+          # one assertion later as an opaque init refusal.
+          $dout = (& pwsh -NoProfile -File (Join-Path $pkg 'bin/checkwright.ps1') doctor 2>&1) -join "`n"
+          $dcode = $LASTEXITCODE
+          Check "the runner meets the toolchain floor doctor holds" `
+                ($dcode -eq 0) "doctor exit $dcode -- $dout"
           $consumer = Join-Path $scratch 'init-consumer'
           if (Test-Path $consumer) { Remove-Item -Recurse -Force $consumer }
           New-Item -ItemType Directory -Force -Path $consumer | Out-Null
