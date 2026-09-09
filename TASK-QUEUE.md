@@ -17,6 +17,48 @@
 ## Deferred
 
 
+- **queue-provenance-restates-git-history** [design-pending] — a queue entry's provenance statement
+  narrates the entry's own route through the project's surfaces, which git history already answers
+  and spec-over-precedent puts there. The mandated write is ONE attribution — CLAUDE.md's "who
+  ruled, when and through what channel" — and everything past it is restatement against a cap.
+  **MEASURED, and the measurement refuses the obvious remedy.** Census over `## Deferred`, 312
+  entries and 10,456 lines: 290 carry a provenance statement, mean 2.07 lines; 109 second-hop route
+  clauses across 100 entries, 65 of them bare. Confident out-of-bounds: **~40 lines, 0.4% of the
+  section**, ~0.13 lines per entry against a 50-line cap. Incidence is near-universal and cost is
+  negligible — wide and shallow, which is the opposite of what a cap-displacement argument needs.
+  **RULED BY THE OPERATOR 2026-09-09**, AskUserQuestion channel in a lead session, lead-relayed:
+  `from the gap inbox` is a SURFACE and not the mandated channel, the channel being the AUTHORITY
+  channel — an AskUserQuestion, a lead relay, a consult. That adds **98 occurrences, ~17 lines** to
+  the class. It was the one limb the corpus could not settle: no owner doc reads
+  `Filed <date> by <stage>`, which queue-kit/SPEC.md §The queue format lists among the conventions
+  no gate reads.
+  **NO MECHANISM OWED, ruled in the same motion**, on grounds measured rather than asserted. The
+  violation is CLAUSE-level — it rides as a trailing clause on the line whose FIRST clause is the
+  protected write — so a line-granularity gate has nothing to red. A clause-level one
+  false-positives at **40%** here: 44 of 109 hits are Gap-disposition costings CLAUDE.md mandates
+  or probe-before-assertion evidence marks. Narrowing the token set to fix that guards ~33 lines
+  and is **defeated by appending words** — a route clause that grows a `because` limb goes quiet
+  while the entry grows, so the gate pays against the very cap it protects.
+  **The structural proxy is worse rather than safer.** Capping the provenance statement's span is
+  ungameable, but the 18 entries above span 3 are long BECAUSE they carry a recorded operator
+  ruling with its grounds. The cap reds the protected class hardest, which is the failure
+  check-queue-entry-budget's own invariant names on its third side.
+  **Two precedents refuse a gate ahead of this entry.** `check-queue-prose-precondition` paid a
+  defect to STRIP route vocabulary from its trigger set for this exact collision (queue-kit/SPEC.md
+  §check-queue-prose-precondition). And `entry-compression-contract-unenforced` carries a consult
+  ruling on a structurally identical classifier — it "reds the correct act as often as the defect",
+  and the lever it names is content tiering, never prose.
+  **DISTINCT from both neighbours.** `entry-compression-contract-unenforced` owns what LEAVES an
+  entry, where this owns what should never have entered. `ruling-accretion-outgrows-the-entry-cap`
+  is MOOTED and operator-ratified wontfix, and owns ruling VOLUME against a fixed cap.
+  **The deliverable is a sweep and not a gate:** the ~40 lines of route narration plus the 98
+  surface phrases the ruling above adds, entering through scope like any unit.
+  **Cost while deferred:** 0.4% of the section, which is the honest number and is why this takes
+  the 2026-08-30 discriminator's machinery default rather than arguing for promotion. What recurs
+  is not the lines but the QUESTION — reaching this answer cost a delegated census, and a session
+  without it reaches for a gate that two prior rulings already refused.
+  Filed 2026-09-09 by the lead, operator-directed through the AskUserQuestion channel.
+
 - **comment-tier-surface-excludes-ci-workflows** [design-pending] — the CI workflow files' comments
   are ungoverned by construction; the exclusion is in the corpus, not the gate's style dispatch.
   `native/src/spec.rs`'s `comment_surface` builds the governed set from
@@ -56,7 +98,7 @@
   rewrote exactly such a block, whose stated cause named three unprovisioned floor members where
   the run had one. No adopter witnesses it and it blocks no stage entry or push, so it takes the
   2026-08-30 discriminator's machinery default.
-  Filed 2026-09-09 by the lead on the operator's direction, in a lead session.
+  Filed 2026-09-09 by the lead, operator-directed in a lead session's own message channel.
 
 - **consult-rulings-outside-the-authority-roster** [design-pending] — CLAUDE.md admits exactly two
   ruling authorities, `operator` and `lead`. A third has been ruling in practice: a
