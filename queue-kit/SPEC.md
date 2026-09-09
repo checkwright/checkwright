@@ -1657,6 +1657,11 @@ changes what the count includes, never the number, and it is unconditional —
 no entry claims it by being exceptional. Widening it to one line of each grammar
 keeps both properties, since a grammar either is one the format defines or is
 not, which is a property of the format rather than of the entry claiming it.
+**Monotonic ruling accretion is not a further exception, and it is the case that
+asks:** an entry whose rulings outgrow its budget takes compression by answering
+and the self-served relocation, never an allowance, because the three shapes it
+would want are already refused above — the discount widened to a whole block, a
+cap conditional on carrying rulings, and ruling-count as a split signal.
 
 **A ruling the operator restates from memory is filed in the moment.** The
 compression rule above is an authoring contract, so a break in it is silent, and

@@ -194,7 +194,7 @@
   and the lever it names is content tiering, never prose.
   **DISTINCT from both neighbours.** `entry-compression-contract-unenforced` owns what LEAVES an
   entry, where this owns what should never have entered. `ruling-accretion-outgrows-the-entry-cap`
-  is MOOTED and operator-ratified wontfix, and owns ruling VOLUME against a fixed cap.
+  is Done — wontfix, operator-ratified — and owned ruling VOLUME against a fixed cap.
   **The deliverable is a sweep and not a gate:** the ~40 lines of route narration plus the 98
   surface phrases the ruling above adds, entering through scope like any unit.
   **Cost while deferred:** 0.4% of the section, which is the honest number and is why this takes
@@ -253,8 +253,9 @@
   operator-RATIFIED 2026-09-09, case-by-case, and since RETIRED at close as discharged.
   (2) `ruling-accretion-outgrows-the-entry-cap` and (3) `lead-split-posture-limb-unjudged` — each
   carried a consult ruling directing a TERMINAL move, both held by close 2026-09-09 for want of
-  authority, both operator-RATIFIED 2026-09-09 in the same motion that filed this entry, executing
-  at the next close. (4) `TRAJECTORY.md:890-893` carries a `consult, own-authority` reading with
+  authority, both operator-RATIFIED 2026-09-09 in the same motion that filed this entry. (2)
+  EXECUTED at the 2026-09-10 close and is Done; (3) is escalated, its point count contested.
+  (4) `TRAJECTORY.md:890-893` carries a `consult, own-authority` reading with
   **NO ratification at all** — the live unratified instance, and the reason this entry is
   design-pending rather than a note.
   **THE CLASS FIX WAS OFFERED TWICE AND DECLINED TWICE** (operator, 2026-09-09, AskUserQuestion
@@ -1000,10 +1001,10 @@
   what it cannot decide is the semantic half, so it reds a shape rather than a
   judgment.
   **This SUPERSEDES rather than re-files `ruling-accretion-outgrows-the-entry-cap`**,
-  whose three shapes were all refused by the owning spec and which was dropped
-  from the UNIT SET by operator ruling 2026-08-30 — the entry itself stays live
-  in this section, and the bare "dropped" here read as retired (corrected
-  2026-08-30 at scope). That entry proposed re-pricing the cap. This
+  whose three shapes were all refused by the owning spec and which is now Done —
+  wontfix, operator-ratified 2026-09-09, executed at the 2026-09-10 close, its
+  boundary note landed in queue-kit/SPEC.md §check-queue-entry-budget and its
+  grounds recoverable from git history. That entry proposed re-pricing the cap. This
   one's subject is the enforceability of the relief the spec ALREADY rules
   correct, which stays live precisely because those three were refused.
   **FIRST ATTESTED INSTANCE OF THE CANDIDATE ARM'S OWN SHAPE, judged a recurrence at the
@@ -8866,56 +8867,6 @@
   the gap inbox there; promoted 2026-08-29 by scope at this boundary's drain, the gate's assertion
   set re-read at its SPEC section.
 
-- **ruling-accretion-outgrows-the-entry-cap** [design-pending] — ruling content accretes
-  monotonically on a deferred entry while `QUEUE_KIT_ENTRY_LINE_CAP` is fixed, so the entries that
-  attract rulings pay for each one by evicting the grounds the ruling answers.
-  **Measured 2026-08-29; the class is no longer hypothetical.** A 17-entry saturated band at or one
-  line under the cap, populated by the most-ruled entries in the file: density and contention
-  correlate, so the cap binds hardest where the reasoning is most contested. The band is
-  re-derivable from the gate's own headroom line, which is its authority.
-  **Two live hits 2026-08-29, first-hand rather than inferred.** A demotion landed
-  `native-gate-port-remaining-corpus` at 51/50 with no line left for the next ruling; a recurrence
-  judged onto `batch-split-stamp-ownership` at 50/50 cost six lines of compression on that entry's
-  own premise-correction block first. Survivable — what went was narration — but nothing
-  distinguished that from evicting grounds, and no gate would have.
-  **Why the eviction is invisible where it lands** is `entry-compression-contract-unenforced`'s
-  ground, stated there once.
-  **ALL THREE CANDIDATE SHAPES ARE ALREADY REFUSED BY THE OWNING SPEC, AND THIS ENTRY IS DROPPED
-  FROM THE UNIT SET ON THAT READING — operator-ruled 2026-08-30.** The owner is
-  queue-kit/SPEC.md §check-queue-entry-budget, and it ruled every shape before this entry was even
-  filed: widening the `ruled:` discount to the whole block is the grammar-wide exemption it refuses
-  at "one line per grammar"; raising the cap for entries carrying rulings is refused at "Why the cap
-  is not widened for exceptional content", conditional caps included; and ruling-count as the split
-  signal is refused **by name** as "a symptom shared by both classes", the ruled criterion being
-  **dispositionability**, under which an entry accreting further grounds for ONE deliverable is not
-  a split candidate however hard it collides. Ordering is the point: `b1f3bee0` and `bbed56a5` both
-  precede this entry's own 2026-08-29 filing at `d452e90d`.
-  **The premise that displacement is unpriced is false**, corrected rather than deleted: bounding
-  what the cap may displace is that gate's invariant's own THIRD SIDE, and a ruling recorded onto
-  the entry it rules is one of its two named **mandated writes**, with a self-served relocation
-  relief. The 2026-08-30 instance that read as a new failure mode — a composer ruling landing on
-  the smoke class's own (since-retired) owner, not a zero-headroom sibling — is the relief working.
-  **The measurement survives, the analysis does not.** The one residue the spec concedes rather
-  than answers — the compression contract has no oracle — is NEW work, filed separately.
-  **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is pool-level eviction pressure
-  across entries; this is one entry's internal budget spent by a content class that only grows.
-  **Cost while deferred:** the queue's most-ruled entries degrade toward a list of dispositions
-  with their reasoning evicted — the failure the "why (b) was never available" text on
-  `native-gate-port-remaining-corpus` exists to prevent, and that text is itself one of the lines
-  that consumed the last of an entry's budget.
-  **MOOTED — ruled in consult 2026-09-09 (`consult, own-authority`, operator-convened,
-  lead-relayed):** its three shapes are refused by the owning spec, its measurement lives on that
-  gate's headroom line, and its one residue is `entry-compression-contract-unenforced`'s — two
-  entries on one subject are two readings of one fact. Close takes the wontfix exit (the 2026-08-23
-  ruling's bare Done line).
-  **HELD FOR WANT OF AUTHORITY (close 2026-09-09), NOW RATIFIED (operator, 2026-09-09,
-  AskUserQuestion channel in a lead session, lead-relayed):** the wontfix exit is authorized and the
-  NEXT CLOSE executes the Done move. **The ratification is the authority; the consult reading
-  supplies only the grounds.** Case-by-case a second time — the class fix was offered and DECLINED
-  knowing the count had reached three — so the class stays open on
-  `consult-rulings-outside-the-authority-roster`.
-  Filed 2026-08-29 by the lead, landed by close; dropped from the unit set 2026-08-30 by spec.
-
 - **design-pending-boilerplate-reds-its-own-promotion** [design-pending] — the standard explanatory
   line that names the `[design-pending]` token in prose is legal in the deferred section and
   forbidden in an active one, so it reds the battery on the very entry it explains, at the moment
@@ -9210,8 +9161,11 @@
   together, which is a genuinely light supervision load rather than a starved one.
   **THE THIRD POINT LANDED; close 2026-09-09 held its closure for want of authority, and the hold is
   RATIFIED (operator, 2026-09-09, AskUserQuestion channel in a lead session, lead-relayed) — the
-  NEXT CLOSE executes the terminal move.** Same motion and grounds as
-  `ruling-accretion-outgrows-the-entry-cap`'s, which holds the reasoning.
+  NEXT CLOSE executes the terminal move.** Same motion as
+  `ruling-accretion-outgrows-the-entry-cap`'s, now Done — its grounds are in git history.
+  **ESCALATED at the 2026-09-10 close, unexecuted:** the dispatching lead read this iteration as the
+  SECOND such point and directed no flip, against this entry's own record of a third that landed.
+  Nothing is written here until that is ruled; the close held rather than picked.
   **DEGENERACY, neither reading picked** (16th introduced, 17th narrowed to scope's own escalation):
   scope gave 4 of the 20th's 8 and 3 of the 21st's 6, so it is live at both and NOT shrinking.
   **THE CHARACTER LIMB, which by design the count cannot see.** Prior shapes: the lead ruled WRONG
@@ -9219,14 +9173,11 @@
   that template's §Economics); the lead RATIFYING a stage's reading off re-read surfaces (20th).
   **The twenty-first adds a third shape: a stage session DECLINING a relayed instruction and running
   the oracle instead, which corrected the lead. It reads as one FEWER escalation.**
-  **ALIGN READINGS EIGHT THROUGH ELEVEN**, bare `align` `cr` against a 10.51M median over the last
-  thirty, all Sonnet so within-tier: EIGHT 14.83M rank 24/30 one drift finding; NINE 6.20M rank 4/30
-  and TEN 6.93M rank 5/30, both zero-divergence and zero-escalation.
-  **ELEVEN BREAKS THAT SHAPE and is the sub-series' strongest datum FOR the sonnet reading:** zero
-  escalations AND a real causal-completeness gap the amendment's own caller census missed (a crate
-  roster literal read by two callers, a `.gate` `couples=`, six doc surfaces), one grep false
-  positive caught and discarded. **Its bound, and it is the reading's weakness:** twelve deltas over
-  seven directories WIDENS the calibrated range rather than confirming inside it. No round-trip.
+  **ALIGN READINGS EIGHT THROUGH ELEVEN**, bare `align` `cr` against a 10.51M median over thirty,
+  all Sonnet: 14.83M rank 24/30 (one drift finding), 6.20M and 6.93M ranks 4/30 and 5/30 (both
+  zero-divergence, zero-escalation). ELEVEN is the strongest datum FOR the sonnet reading — zero
+  escalations AND a real causal-completeness gap the amendment's own caller census missed —
+  bounded by twelve deltas over seven directories WIDENING the calibrated range. No round-trip.
   **BUILD'S PER-BATCH SONNET ARM NEVER TRIGGERED at the twenty-first** — 9 `{design-bearing}` to 3
   `{mechanical}` deltas, each mechanical one coupled into a design-bearing commit rather than
   separable. A rule with no occasion reports nothing; recorded as an absence, never as a pass.
@@ -10086,8 +10037,8 @@
   `## Deferred` deliberately: the census IS the payload, the icebox's one-line grammar cannot carry
   it, and a Done exit drops the slug out of the live namespace so the next session asking this
   re-buys the whole measurement — the exact harm this re-characterization exists to prevent.
-  **DISTINCT from `ruling-accretion-outgrows-the-entry-cap`**, a body outgrowing the cap; this
-  records what a deliberate compression removed.
+  **DISTINCT from `ruling-accretion-outgrows-the-entry-cap`** (Done, wontfix), a body outgrowing
+  the cap; this records what a deliberate compression removed.
   **Cost while deferred:** low and non-rotting — a bought measurement in the live namespace, read
   rather than re-derived. Not carrying it costs one re-run of a 27-slug whole-entry census plus the
   wrong conclusion it produced the first time.
@@ -10793,5 +10744,6 @@
 - smoke-harness-mapfile-inherits-host-line-terminator
 - windows-roster-join
 - ruling-record-shrink-to-bau
+- ruling-accretion-outgrows-the-entry-cap
 
 ## Lessons Learned
