@@ -64,9 +64,9 @@
   the half that survives.
   **Its "blocks `windows-roster-join`'s leg going green" sequencing is FALSE and is deleted rather
   than left standing beside a correction.** That leg's floor is met — its own run resolves `sort`
-  to GNU coreutils and scaffolds shellcheck — and the single assertion reddening it belongs to
-  `smoke-harness-mapfile-inherits-host-line-terminator`, measured at this scope off the finished
-  run's free log.
+  to GNU coreutils and scaffolds shellcheck — and the single assertion reddening it belonged to
+  `smoke-harness-mapfile-inherits-host-line-terminator`, since Done, measured at this scope off
+  the finished run's free log.
   **WHAT SURVIVES IS THE PRODUCT READING, and it is objective 1's rather than Windows'.** A binary
   requiring GNU `sort`, `date` and `stat` on the host is bash-era residue the pivot exists to
   collapse; the roster should shrink to what the binary's gates actually spawn, and on a native
@@ -1940,10 +1940,10 @@
   the expanded couples plus the gate's own source. Nothing new to maintain, and
   `check-graph` already gates the manifest's freshness.
   **Opening question, to be answered rather than assumed:**
-  **`docs-renderer-batch-contract`** ruled a content-hash cache *out* inside its
-  own scope 2026-08-01. Whether that reasoning generalises from one renderer to
-  the battery is this entry's first work — inherit it or overturn it on evidence,
-  never ignore it.
+  **`docs-renderer-batch-contract`** (retired — recover it from git history) ruled
+  a content-hash cache *out* inside its own scope 2026-08-01. Whether that
+  reasoning generalises from one renderer to the battery is this entry's first
+  work — inherit it or overturn it on evidence, never ignore it.
   **The risk is invalidation, not speed.** A gate whose real inputs exceed its
   declared couples would be skipped while stale — a false green, the exact
   failure class the battery exists to prevent. `check-reads-couples` is the
@@ -2407,8 +2407,8 @@
   consumer profile for when the specs Checkwright gates were written by a second
   toolkit's workflow, not by this one's `spec` stage. It cashes the claim below.
   **The design is already decided and is not what this entry holds.** Two
-  rulings on record settle it: `prose-profile` rules that a profile ships as an
-  adapter delivered as optional consumer config and never as a kit literal, and
+  rulings on record settle it: `prose-profile` (retired) ruled that a profile ships
+  as an adapter delivered as optional consumer config and never as a kit literal, and
   `heterogeneous-agent-delegation` rules that a kit literal naming a vendor
   crosses the provenance seam outright. So the shape is a consumer-side profile
   over a declared artifact layout — the `check-graph` / `graph-vocab` pattern —
@@ -2834,8 +2834,8 @@
   `installer/README.md` §Requirements, which carries no such bullet at all. Per the
   false-positive carve-out this becomes a stated manual duty whose cadence event is the
   align stage — which already performs this tree-verification by hand.
-  Also in the class: `gate-payload-disclosure-ruling`'s crate-path knob was credited to
-  `native-gate-vendoring-model`, which declares no such knob.
+  Also in the class: the retired `gate-payload-disclosure-ruling`'s crate-path knob was credited
+  to `native-gate-vendoring-model`, which declares no such knob.
   **Deliverable:** assertions (1) and (2) inside `check-amendment-queue` — extending beats
   adding, and its `couples=` already reach `TASK-QUEUE.md` and the amendment glob — plus
   (3) written into the align stage template as a named duty.
@@ -4952,7 +4952,8 @@
   entry past its own step.** `leak-guard-and-assertion-meta-gate-port`'s close filed two gap
   bullets that each re-derived a live entry, and withdrew both once an audit sweep surfaced the
   owners. One came from the eviction step, re-filing `icebox-candidate-eligibility-unapplied`
-  with the same roadmap-tag measurement for the FOURTH time across four closes. The other came
+  (since retired) with the same roadmap-tag measurement for the FOURTH time across four
+  closes. The other came
   from the PROMPT-FRICTION triage, re-deriving `guard-read-steer-tool-coverage`'s awk question
   from the log — which is the paragraph above confirmed rather than merely restated: the shape
   is any close-stage sweep whose input recurs, and the eviction step is only its most reliable
@@ -6809,8 +6810,9 @@
   2026-08-22 ruled KEEP on real grounds — `guard_rule_rm_tracked` steers every tracked-file
   deletion into it, so narrowing it would tax a mandated mechanic — and that ruling evaporated.
   **NOT a re-filing of `settings-allow-intended-breadth-declaration`**, which shipped the knob and
-  is closed: the knob does exactly what its own spec says. The gap is that `guard-grant-review`'s
-  corpus (the committed set) and the knob's corpus (the overlay) were never the same corpus, which
+  is closed: the knob does exactly what its own spec says. The gap is that the retired
+  `guard-grant-review`'s corpus (the committed set) and the knob's corpus (the overlay)
+  were never the same corpus, which
   nothing noticed until a committed-glob keep-ruling needed a home.
   **Three dispositions, none ruled:** state in guard-kit/SPEC.md that the knob is
   local-overlay-scoped by design and give committed-glob keep-rulings a different home; widen the
