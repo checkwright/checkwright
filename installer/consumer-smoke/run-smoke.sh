@@ -45,10 +45,13 @@ for _rs_i in "${!_rs_raw[@]}"; do
     [[ "${_rs_probe[_rs_i]}" == "${_rs_raw[_rs_i]%$'\r'}" ]] \
         || blocked "the stream reader did not take exactly one trailing carriage return off element $_rs_i. The channel handed it $(printf '%q' "${_rs_raw[_rs_i]}") and it returned $(printf '%q' "${_rs_probe[_rs_i]}"); one strip off what it was handed is $(printf '%q' "${_rs_raw[_rs_i]%$'\r'}"). Read those three: a returned value equal to the handed one is a strip that did not fire, and every multi-line manifest read below would inherit the byte."
 done
-[[ "$_rs_n" -gt 0 ]] \
-    || blocked "the synthetic stream reached the reader carrying no carriage return on any line, so the strip this arm exists to cover was never exercised and its green is vacuous."
-[[ "$CRLF_DECLARED" == "self-test: the stream delivered $_rs_n of ${#_rs_raw[@]} line(s)"* ]] \
-    || blocked "the stream reader took $_rs_n strip(s) and declared [$CRLF_DECLARED] — a strip that stops declaring is the normalization the manifest arm below stays closed to."
+# spec: installer/README.md §The consumer smoke — an uncovered strip is DECLARED here and never blocked on, and the two are different verdicts about different subjects. A reader that mishandles a terminator is this harness's precondition and refuses above; a channel that will not carry the byte the synthetic stream was written with is a fact about the HOST, and refusing on it would stop the one platform whose manifest reads this arm exists to protect before it reached a single one of them. The declaration prints the bytes rather than the conclusion, because the two readings it cannot separate — the channel consumed the carriage return, or the strip pattern never matched it — differ in which surface is at fault and agree on every count a verdict could print
+if [[ "$_rs_n" -eq 0 ]]; then
+    say "self-test: this host's channel delivered the synthetic CRLF stream with no carriage return for the reader to take — element 0 arrived as $(printf '%q' "${_rs_raw[0]}") and came back as $(printf '%q' "${_rs_probe[0]}"). The strip is UNCOVERED here and said so rather than greened over; every host whose channel carries the byte covers it."
+else
+    [[ "$CRLF_DECLARED" == "self-test: the stream delivered $_rs_n of ${#_rs_raw[@]} line(s)"* ]] \
+        || blocked "the stream reader took $_rs_n strip(s) and declared [$CRLF_DECLARED] — a strip that stops declaring is the normalization the manifest arm below stays closed to."
+fi
 unset _rs_raw _rs_probe _rs_n _rs_i
 
 # spec: installer/README.md §The consumer smoke — INSTALLER_SMOKE_ARTIFACTS_DIR is the hand-off knob: a caller that already holds a producer's artifact directory points this at it and the smoke installs those bytes instead of building its own, which is the whole difference between a run that exercises a release-shaped artifact and one that exercises a harness stand-in

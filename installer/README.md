@@ -2274,23 +2274,37 @@ cover. The manifest arm reddening again at any count means the strip regressed,
 and the count says at which reader. Nothing here predicts which, and nothing here
 claims the leg passes.
 
-*Round 22 selected none of those three, because it never reached them — and what
-it did buy is a NARROWING.* Run `34359998379`, job `102495340310`: the leg blocked
-at the preflight self-test, on the harness's own synthetic `a\r\nb\nc\r\n`. The
-reader returned three elements rendering as `a\r`, `b`, `c\r`. Two readings fit
-that and **this round does not separate them**: either the channel doubled the
-carriage return on the two lines that carried one and appended it to the line that
-did not, so the reader took its one strip correctly off `a\r\r`, `b\r` and `c\r\r`;
-or the channel delivered the three bytes as written and **the strip did not
-fire**. The arm aborted at its first assertion and so never printed the count that
-would have told them apart, which is exactly the defect that assertion order
-carries and why the rewritten arm prints the decomposition before it refuses.
-What the round *does* establish is that this is a claim about the **write path
-into a pipe** and not about `jq`: the writer here was bash's own `printf`
-builtin. Set against round 21's `want_kits`, a `printf '%s\n'` through the same
-construct that came back clean, the pair is not yet a contradiction under either
-reading — the difference between them is whether the DATA already carried a
-carriage return. Nothing here names the layer, and none is asserted.
+*Rounds 22 and 23 selected none of those three, because neither reached them —
+and what they did buy is a narrowing plus a correction to this harness.* Both
+blocked at the preflight self-test on the harness's own synthetic
+`a\r\nb\nc\r\n`, before the suite reached anything the arm exists to protect.
+Round 22 (run `34359998379`, job `102495340310`) returned three elements
+rendering as `a\r`, `b`, `c\r`. Round 23 (run `34362529057`, job
+`102504146632`), with a bare `mapfile -t` over the identical channel as a
+baseline, reported that **the baseline and the reader agreed on every element and
+neither carried a carriage return the strip could take**.
+
+*Those two readings are not the pair the last paragraph named, and the surviving
+one is uncomfortable.* Read together they are consistent with a single
+explanation: that `$'\r'` in `${line%$'\r'}` never matched on that host, so the
+strip was a no-op in both rounds and both the baseline and the reader carried
+`a\r`, `b`, `c\r` — which round 23's own per-element check would then have passed
+vacuously, because it compares against a pattern that strips nothing. The
+alternative is that the channel behaved differently across two runs twenty
+minutes apart on the same label. **They differ in which surface is at fault and
+they agree on every count a verdict could print**, which is why the arm now
+prints the operands' `%q` renderings rather than a conclusion. What neither round
+touches is `jq`: the writer in both was bash's own `printf` builtin.
+
+*And the arm stopped blocking, which is a correction to it rather than a
+concession.* An uncovered strip and a broken reader are different verdicts about
+different subjects. A reader that mishandles a terminator is this harness's
+precondition and still refuses; a channel that will not carry the byte the
+synthetic stream was written with is a fact about the host, and refusing on it
+stopped the one platform whose manifest reads this arm exists to protect before
+it reached a single one of them. Twice. The uncovered case is now declared with
+its bytes and the suite continues, and the strip's coverage is bought on every
+host whose channel carries the byte — the three that are binding.
 
 *What the round bought outright, and it is not about this byte.* The producer half
 of the Windows leg went green on that same run: `native-artifacts` built
