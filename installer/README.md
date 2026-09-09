@@ -363,9 +363,14 @@ is read there, never inferred from a kit's full roster or from this repo's own
 `zero-config` (gate-sdk/SPEC.md §The install disposition). It carries no gate
 name of its own, which `check-install-disposition`'s third assertion holds it to,
 so a kit that adds a zero-config gate is picked up with no edit
-there. One function unions the result over a profile's kits, and both the
-registry `init` writes and the consumer
-smoke's monotonicity assertion read that one derivation. No disposition varies on
+there. One function unions the result over a profile's kits, and it has exactly
+one caller: the registry `init` writes. The consumer smoke's monotonicity
+assertion reads **that registry** rather than calling the function — it drives
+this package as a black box and holds no second copy of the derivation. So the
+two still share one derivation and the smoke reads it *across* the package
+boundary instead of inside it, which strengthens the claim rather than loosening
+it: containment is asserted over the roster an adopter of each profile actually
+receives, not over what a recipe said they would. No disposition varies on
 the profile today; the argument is the seam, so a roster that does vary becomes a
 change to one gate rather than to a signature and every caller of it.
 
@@ -618,6 +623,17 @@ reads this one across the package boundary instead of inside it (§The consumer
 smoke). Minting a contract for that reader was refused — the op takes this
 family's existing grammar, channels and exit statuses, so the seam the
 bootstraps already call is the seam the smoke calls.
+
+**The five verbs are not ops of this family, and the reason is a channel conflict
+rather than taste.** This family specifies stdout as a *wire* — tab-separated
+records, one per line — while `init`'s stdout carries the adopter-facing
+follow-up block whose grammar §init states and whose reader is the consumer
+smoke's follow-up arm. One of the two contracts would have had to yield. So the
+verbs are top-level `--`-prefixed arms resolved before the registry lookup
+(§The verbs), and this family keeps the wire it was given for a caller that is a
+program in two languages. The line is not where a step *runs* — every verb is
+behind the invoke exactly as an op is — but which **channel contract** its output
+answers to.
 
 **The relocation's own precondition, and how it was discharged.** A step could
 move behind the invoke only where the binary is reachable on every platform that

@@ -12,43 +12,6 @@
 
 ## New Features
 
-- **powershell-installer-surface** [spec: SPEC-behind-invoke.md]
-  — the behind-invoke RELOCATION half: `init`'s conditional install logic, and every other verb's,
-  moves to the far side of the gate binary's invoke, so it is written once in Rust rather than twice
-  by hand. The amendment is `installer/SPEC-behind-invoke.md`; its twelve deltas, their work
-  classes, the non-monotone reader set and the update-target roster are its own, not restated here.
-  **RULED `bootstrap-one-success-path`** — the bootstrap has one success path;
-  `substrate-unavailable` and `digest-unverifiable` BOTH become refusals; all FIVE verbs move behind
-  the invoke, the bootstrap branchless and the binary owning the verb roster; `installer/lib/`
-  empties; `--toolfloor-parity` retires with its second holder. Grounds, three refused alternatives
-  and two bounds are TRAJECTORY.md's.
-  **AUTHORITY, and both facts belong here.** The reading is the consult session's own
-  (`consult, own-authority` 2026-09-09, in the consult the operator directed be convened rather than
-  rule in the lead session); the OPERATOR then RATIFIED it as their own 2026-09-09, AskUserQuestion
-  channel in a lead session, lead-relayed — put to them on the ground that `consult` sits outside
-  CLAUDE.md's `operator`/`lead` authority roster. So it is an operator-ratified ruling standing on a
-  consult's reasoning. Discharge: `test ! -e installer/lib`.
-  **THE POWERSHELL HALF SHIPPED 2026-09-07 at build and this entry DEMOTED rather than reaching
-  Done** — one increment of a two-half deliverable (canon-kit/SPEC.md §Merging an amendment step 4).
-  **PAYLOAD-END-TO-END IS OWED WITH THIS HALF** — the live residue of NARROWING TWO (operator,
-  2026-09-07, AskUserQuestion channel in a lead session, lead-relayed): the shipped leg asserts the
-  five BOOTSTRAP steps, a completed `checkwright init` through PowerShell asserts PAYLOAD coverage,
-  and the arm the relocation mints is what makes one reachable. The leg's extension and this half
-  land together or not at all.
-  **THE SHIPPED LEG IS BINDING and carries no hold** (the hold dropped at `9ad9538c` on its first CI
-  run). Read it JOB-KEYED, never off the workflow conclusion — the habit the hold was for outlives
-  the hold itself.
-  **TAKEN AS THIS ITERATION'S UNIT — `lead, own-authority` 2026-09-09**, standing ALONE; joining the
-  smoke harness's CR repair was declined because `installer/consumer-smoke/run-smoke.sh` reads
-  `no-port`, so it buys no port progress. The same-surface ground stays available on under-fill, and
-  the unit does not under-fill: it reaches 15 of the 16 files the port oracle reports owed, leaving
-  `scripts/pack-installer.sh` alone and held elsewhere.
-  **THE 2026-09-07 READING WAS REACHED FOR HERE, and this is the last reach** — the leg is the
-  sequence's final member (consult 2026-09-09, on that paragraph).
-  Filed 2026-08-03 by spec; re-scoped 08-24; fork 1 merged and demoted 08-25; source blockers
-  re-scoped out 08-26; PowerShell half merged and demoted 09-07 — all by operator ruling; promoted
-  2026-09-09 at spec, which is where writing the amendment IS the promotion.
-
 ## Technical Debt
 
 ## Deferred
@@ -10509,5 +10472,7 @@
 - **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
 
 ## Done
+
+- powershell-installer-surface
 
 ## Lessons Learned

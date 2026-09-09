@@ -9718,11 +9718,14 @@ failing or erroring member prints its `===== <name> =====` banner and its
 captured output verbatim, always — the red path is the feedback channel and
 never quiets.
 
-**A declared omission is what keeps that tripwire honest.** A member the
-installer omitted because no verified binary reached this platform is recorded
-in the registry as `# omitted: <name> <reason>` (installer/README.md §The gate
-binary) — a comment line, so `gates_list_members` strips it and N shrinks
-legitimately. The runner counts those lines and prints the count and its remedy
+**A declared omission is what keeps that tripwire honest.** A member a consumer
+omits from their own registry is recorded there as `# omitted: <name> <reason>`
+— a comment line, so `gates_list_members` strips it and N shrinks legitimately.
+The class is **reason-agnostic** and belongs to any consumer who omits a member
+for any cause of their own; it is not the installer's, whose own selection
+outcome retires with the tokens it wrote (installer/README.md §The gate binary).
+Reading the class out of existence with them would publish an installer decision
+as a kit narrowing. The runner counts those lines and prints the count and its remedy
 beside the summary, one line per reason token present, so a declared omission
 stays distinguishable from the regression the tripwire exists to catch. **The
 line is separate from the summary and carries none of its text**, and that is
