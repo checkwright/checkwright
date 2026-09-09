@@ -72,10 +72,14 @@
   stream, `installer/consumer-smoke/run-smoke.sh`:521's `mapfile -t lock_kits < <(jq -r '.kits[]'
   "$LOCK")`, whose element carries the CR and fails the kits-roster assertion at :524 as "manifest
   kits (gate-sdk CR) differ from the profile roster (gate-sdk)".
-  **DISTINCT from `installer-prior-files-inherits-host-line-terminator`**, which owns the
-  INSTALLER's four reader sites in `init.sh`, `uninstall.sh` and `diff.sh`: this is the SMOKE
-  HARNESS's own second copy, on a different builtin, and unlike that entry it is observed rather
-  than latent. Distinct too from `smoke-report-array-carrier-mangling-unexplained`, whose subject is
+  **This is now the surviving half of the class.**
+  `installer-prior-files-inherits-host-line-terminator` owned the INSTALLER's four reader sites and
+  reached Done 2026-09-09 discharged rather than fixed:
+  the behind-invoke relocation replaced the `jq`-into-multi-line-capture pipeline with a structural
+  `serde_json` parse (`native/src/installer/lock.rs`), which has no line-oriented reader for a
+  terminator to survive in. This entry's subject — the SMOKE HARNESS's own second copy, on a
+  different builtin — is untouched by that, and unlike the retired entry it is observed rather than
+  latent. Distinct too from `smoke-report-array-carrier-mangling-unexplained`, whose subject is
   :515's report array and the two candidate mechanisms no finished run discriminates.
   **The discriminator twenty rounds lacked, worth carrying:** a multi-line capture through a process
   substitution carries the byte where a single-value capture never can, which establishes COVERAGE
@@ -193,37 +197,6 @@
   recurrence: pack-step-dirty-tree-predicate-unscoped 2026-09-08
   Filed 2026-09-01 by close's gap drain, promoted from a lead-filed bullet; iceboxed 2026-09-06 at
   `0b6545d7` under the port-only run; returned 2026-09-09 at scope on the judged recurrence above.
-
-- **installer-prior-files-inherits-host-line-terminator** [design-pending] — the installer's own
-  manifest read carries the exposure round 20 measured and repaired in the smoke harness's copy of
-  it, across four reader sites, and no leg that is green today reaches any of them.
-  **Verified at source 2026-09-08 during close's drain, not taken from the bullet's prose.**
-  `installer/lib/init.sh`:80 captures `.files` as a multi-line `jq` stream into `PRIOR_FILES`, and
-  four sites split it with a tab-IFS `read -r p h` — `init.sh`:166 and :333, `uninstall.sh`:70,
-  `diff.sh`:40. A recorded hash therefore inherits whatever terminator the host's `jq` left on the
-  line, which is exactly the read `installer/consumer-smoke/run-smoke.sh` repaired at `2ac0a91c`.
-  **Latent rather than observed, and that is why it is not a fix.** A first `init` leaves
-  `PRIOR_FILES` empty, and the Windows leg has never reached the idempotent-re-run, upgrade or diff
-  arms where a CR-bearing prior hash makes every recorded file read as changed. No host this repo
-  can reach today exhibits it.
-  **STRENGTHENED at close 2026-09-08 by round 21's measurement, which postdates this filing.** The
-  exposure is no longer latent-by-analogy: `:80` is a MULTI-line command substitution, the exact
-  shape round 20 measured at 492 of 493 — such a capture consumes only the trailing terminator, so
-  every interior line keeps its `\r`. Round 21 then showed a multi-line capture through a process
-  substitution carrying the byte where a single-value capture reads clean, which establishes that
-  every multi-line reader of that stream is exposed. This is one of them, by the same mechanism
-  rather than by resemblance.
-  **DISTINCT from `windows-smoke-manifest-cr-survives-repair`**, which is Done: that unit's subject
-  is the SMOKE HARNESS's manifest read and the anti-normalization rule governing it. This is the
-  installer's install path — a different surface with a different consequence, a silently wrong
-  upgrade diff rather than a loud misreported assertion — and repairing it needs its own terminator
-  exception under installer/README.md §The install boundary rather than the smoke's.
-  **Cost while deferred:** zero on every platform the roster covers; on a CRLF host it is a wrong
-  upgrade and a wrong diff, which is worse than the smoke's red because nothing announces it.
-  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because the repair is
-  four code sites plus a governed rule extension plus smoke coverage — a unit, not a two-word
-  correction — and is unverifiable without a Windows round; promoted rather than iceboxed because
-  the trigger is live and named: the first Windows leg that reaches the re-run arm.
 
 - **smoke-report-array-carrier-mangling-unexplained** [design-pending] — the Windows manifest
   report's two decompositions of one recorded entry disagree, the array carrier is implicated, and
@@ -459,49 +432,6 @@
   Filed 2026-09-04 by the close of `enter-stage-cut-and-file-authoring-act` into the gap inbox,
   which no stage of that iteration could drain; carried into this iteration's scope intake and
   promoted here, so the record is late and says so.
-
-- **kit-library-port-residue** [design-pending]
-  — the kit `lib/*.sh` members the 2026-08-30 class ruling deliberately leaves owed, filed
-  rather than absorbed at its boundary. **What the ruling settled and what it did not.**
-  gate-sdk/SPEC.md §The kit-library port
-  disposition rules a library permanently shell when it is the config bridge's **sole resolver**
-  for its kit's knobs. The discriminator is content, not directory, so two kinds of member fall
-  outside it: a file that rides the bridge's flat `lib/*.sh` glob while resolving no bridged knob,
-  and a file one directory deeper that the glob never reaches. Both are **owed, not undecided** —
-  each already carries a sentence in its own SPEC section naming this entry.
-  **The members still owed** — the roster is durable, the sizes are not, so read those off
-  `--emit port-blockers --tree`: `gate-sdk/lib/inject.sh` and `context-kit/lib/toolfloor.sh`.
-  Measured 2026-09-03 at build they read 80 / 58.
-  **Four of the original six are DISCHARGED.** Two are `context-kit/lib/pub-lang/{rust,ts}.sh`,
-  the bundled members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate;
-  they waited on the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of
-  `pub-index` is it (context-kit/SPEC.md §Index-first reading). The third is
-  `gate-sdk/lib/declaration.sh`: the library, its parity arm and both harnesses deleted, the
-  grammar left with its one compiled holder (gate-sdk/SPEC.md §lib/declaration.sh). The fourth is
-  `gate-sdk/lib/test-hermetic.sh`, and it leaves this roster as a **delivery**: the second
-  `GATE_SDK_NATIVE_BIN` default that kept it undeclarable is gone, and the file now carries a
-  stated `# no-port:` on a two-limb ground of its own (gate-sdk/SPEC.md §lib/test-hermetic.sh).
-  Nothing about the member is left owed, so it is not an *unblocked and takeable* correction.
-  So this entry **demotes** rather than reaching Done — its deliverable is a corpus, and the next
-  cut re-promotes with a fresh amendment (canon-kit/SPEC.md §Merging an amendment). Its hostings
-  differ in ground: 2026-09-01 delivered two members; 2026-09-02 delivered **none** and discharged
-  one member's blocker; 2026-09-03 took that unblocked member, which is the delivery ground.
-  **Each remaining member is owed on its own ground, and they do not resolve together** — which is
-  why this is one entry owning a residue rather than one cut:
-  `inject.sh` has ONE shell sourcer left — `doctrine-kit/bin/install-doctrine.sh` — itself owed, so
-  it moves behind that one. It is NOT unblocked: 2026-09-03's two cuts took the other two, and the
-  survivor is sequenced by an operator ruling at doctrine-kit/SPEC.md §install-doctrine.
-  `toolfloor.sh`'s roster is read on the installer path and by `check-install-toolchain`'s parity
-  assertion, so it is sequenced behind the installer's behind-invoke relocation rather than by
-  anything in this class. Both slugs that carried that sequencing were ruled wontfix by the
-  operator in the 2026-08-31 consult and left the queue, so the sequencing now reads off the
-  rulings' own home, installer/README.md §The install boundary — `behind-invoke` is a port
-  obligation that keeps a file owed until the step moves behind the invoke — and the live entry
-  owning that relocation is `powershell-installer-surface`.
-  **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
-  is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
-  work, not the argument.
-  Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
@@ -1294,7 +1224,7 @@
   **The install-ownership contract this must package against already exists:**
   `checkwright.lock`, written by the installer's `init` and specified at
   installer/README.md §The manifest — its schema owner is
-  `installer/lib/common/lock.sh`. A marketplace package that installs kits
+  `native/src/installer/lock.rs`. A marketplace package that installs kits
   without writing that manifest would be a second install model with no upgrade
   or uninstall story, which is the sequencing risk this entry has always
   flagged; the named contract replaces the re-derivation it used to imply.
@@ -5699,6 +5629,7 @@
   Filed 2026-08-17 into the gap inbox by the `post-close-intake-and-index-port` close, from its
   capability-pendency audit; promoted 2026-08-17 at scope, the disposition landing one iteration
   after the finding.
+  recurrence: stale-identifier-after-retirement 2026-09-09
 
 - **queue-lib-dead-derivation** [design-pending] — three derivations in `queue-kit/lib/queue.sh`
   outlived the shell tool that read them, and their only surviving reader is a gate-test.
@@ -7797,7 +7728,7 @@
   tightens two gates in an adopter's tree, and no surface says which release section owns it or
   who may declare it once the landing stage is gone.
   `3763bc3e` added an account-identification pattern to `gate-sdk/templates/msg-patterns.list`,
-  the config template `installer/lib/init.sh` seeds into a consumer's gates dir. **The gate code
+  the config template the installer's `init` seeds into a consumer's gates dir. **The gate code
   did not change** — that commit's `native/src/gates/commit_msg.rs` diff is entirely inside
   `mod tests`, so the whole tightening is data. `.workflow/tightened-gates.txt` carries neither
   `check-commit-msg` nor `check-tree-terms`.
@@ -7812,8 +7743,8 @@
   stage is not build, so `3763bc3e`'s tightening stays undeclared until a producer exists and
   surfaces at the next release tag as an adopter meeting a red the note never named.
   **The adopter split the ruling rests on.** `claim()`
-  (`installer/lib/init.sh:172`) rewrites a seeded path whose recorded hash still matches, so an
-  adopter who never edited their copy TAKES the new pattern on upgrade and both gates can red on
+  (`native/src/installer/init.rs:123`) rewrites a seeded path whose recorded hash still matches, so
+  an adopter who never edited their copy TAKES the new pattern on upgrade and both gates can red on
   a clean run — the Tightened-gates allowed-red set's subject exactly. An adopter who did edit it
   keeps their copy and diverges, which docs/install.md folds into Behavior changes by name:
   "a template you have copied out that then changed *is* depended-on behavior diverging from your
@@ -8397,9 +8328,10 @@
   substitutes the binary and then uninstalls without an intervening `init` gets it KEPT, left on
   disk as if they had authored it, under a ground the same document now denies.
   **Verified at the drain against the implementation, not only the prose.**
-  `installer/lib/uninstall.sh` carries no artifact special case: its removal walk is the hash test
-  and the keep/report branch, and nothing in it reads `artifact`. The prose and the code agree with
-  each other and disagree with §The gate binary.
+  `native/src/installer/uninstall.rs` carries no artifact special case: its removal walk is the hash
+  test and the keep/report branch, and nothing in it reads `artifact`. The prose and the code agree
+  with each other and disagree with §The gate binary. **The behind-invoke relocation PRESERVED this
+  exactly and settled nothing** — re-verified at the 2026-09-09 drain; the fork below stays open.
   **The window is narrow and the direction is conservative**, which is why this is a consistency
   gap rather than a data-loss one: any `init` in between re-records the hash, and the smoke's
   uninstall arm removes all and keeps 0.
@@ -8416,7 +8348,7 @@
   compiled artifact ever yours", so an adopter reading either one alone reads a contract the other
   contradicts.
   Filed to the gap inbox 2026-08-28 by build batch 1 off the docs alone; promoted the same day at
-  close, once the keep-and-report mechanism was re-verified against `installer/lib/uninstall.sh`.
+  close, once the keep-and-report mechanism was re-verified against the `uninstall` verb.
 
 - **icebox-standing-ineligibility-unrecordable** [design-pending] — the eviction worklist has no
   slot for a standing not-eligible ruling, so an entry a ruling already removed from the running is
@@ -10046,19 +9978,21 @@
   drains proposed a standing grant on the ground that `.claude/settings.json` "grants no form of"
   the append. Probed at this scope rather than relayed: guard rule 17, *Auto-allow a write to a
   gitignored target* (guard-kit/SPEC.md §Consumer rules rule 17, `guard-kit/lib/guard.sh:838-874`),
-  exists for exactly this append and has since `10d538da` (2026-09-04). It is fixture-attested on
-  the exact `cat >> .tmp/journal.md <<'EOF'` spelling (`guard-kit/guard-tests/cases.tsv`), and a
-  hand-built payload plus all three live log records replayed through `scripts/bash-guard.sh`
-  return `permissionDecision: allow`.
+  exists for exactly this append and has since `10d538da` (2026-09-04) — fixture-attested on the
+  exact `cat >> .tmp/journal.md <<'EOF'` spelling (`guard-kit/guard-tests/cases.tsv`), and every
+  live log record replayed through `scripts/bash-guard.sh` returns `permissionDecision: allow`.
   **BOTH CANDIDATE GRANT SHAPES ARE ANSWERED BY THE TREE, so neither is the work.** A path-scoped
   `Bash(cat >> .tmp/*)` is INOPERATIVE, not merely inferior — rule 17's own text states the harness
   checks a redirect TARGET as a file write, so a `Bash(...)` entry grants the command and never the
   target; it would also pass `check-settings-paths` vacuously, that gate filtering on a `.sh`
   command token before its `*` rule is reached, so no oracle would report that it bought nothing.
-  A dedicated `--emit` arm needs NO settings entry either: `.claude/settings.json`'s
-  `Bash(bash gate-sdk/bin/run-gates.sh *)` already covers any arm name, attested by `file-gap`,
-  `file-survey` and `kfric` carrying no per-arm entry and by `65e22a28` REMOVING a settings line
-  when two affordances ported onto the binary.
+  A dedicated `--emit` arm needs NO settings entry either: `Bash(bash gate-sdk/bin/run-gates.sh *)`
+  already covers any arm name — attested by `file-gap`, `file-survey` and `kfric` carrying no
+  per-arm entry, and by `65e22a28` REMOVING a settings line when two affordances ported.
+  **THE INOPERATIVE CLAIM WAS MEASURED AND HELD, 2026-09-09.** `61d57d70` landed that grant anyway,
+  on the premise this entry had already falsified and relayed to the operator with a prefix-match
+  limit rather than this inoperative one; the lead's post-grant `cat >> .tmp/` appends then logged
+  as fall-throughs, which `guard_allow` cannot produce. Reverted at `373c444e`, operator-directed.
   **WHAT SURVIVES, and it is two things.** (1) Three `cat >> .tmp/*-journal.md <<'EOF'` calls
   written AFTER rule 17 landed sit in `.workflow/prompt-friction.log` as genuine declines —
   `guard_allow` exits, so a logged line is never an allowed call also logged — and every record is
@@ -10073,10 +10007,9 @@
   say about rows no entry can match; this owns why a row that IS covered by a standing grant still
   falls through, and it is the first instance where the answer is a live decline rather than an
   ungrantable shape.
-  **Why `[design-pending]`:** the two survivors want different shapes — widening the log record
-  (or recording the declining clause id beside it) against re-pointing the operative template at
-  `Write` — and which is right depends on whether a Bash append is sanctioned at all, which is
-  unruled.
+  **Why `[design-pending]`:** the two survivors want different shapes — widening the log record (or
+  recording the declining clause id beside it) against re-pointing the operative template at
+  `Write` — and which wins depends on whether a Bash append is sanctioned at all, which is unruled.
   **Cost while deferred:** the top friction row every close is a decline nobody can diagnose, so
   each close re-triages it and each remedy is a guess. Directed 2026-09-06 (operator, relayed by
   the lead session) as *"Add the useful grant"*; the directive's own premise is what this entry
@@ -10086,8 +10019,7 @@
   shapes are answered by the tree, so NO WORK WAS OWED: a directive answering a proposal is
   discharged when the proposal's premise measures false, and neither survivor folds into the
   iteration. Recorded here so a later session reading only the directive does not re-derive it.
-  Surfaced 2026-09-06 by the `always-loaded-cut-and-seam-slice` close; drained here at the
-  2026-09-06 scope boundary, promoted after the fix was refused as operator-class.
+  Surfaced 2026-09-06; promoted after the fix was refused as operator-class.
 
 - **port-created-failure-mode-refusal-unruled** [design-pending] — whether a port may add a refusal
   covering a failure mode the port itself created is unruled, and the one instance that raised the
@@ -10210,10 +10142,12 @@
 - **portability-floor-adopter-on-ramp-unstated** [design-pending] — a vendored consumer gets
   `check-portability-floor` registered and permanently disabled, and nothing tells them that naming
   their install path is what turns it on.
-  **Probed, not inferred.** `installer/lib/common/recipe.sh:78-79` seeds `templates/msg-patterns.
-  list` into an adopter's gates dir and seeds no portability roster; a grep for the roster name
-  across `installer/` returns nothing. `GATE_SDK_PORTABILITY_PATHS` defaults empty, so the gate's
-  clean line reports the disabled-and-unconfigured state on every run and nobody reads it as a cue.
+  **Probed, not inferred; RE-PROBED against the port 2026-09-09 and unchanged.**
+  `native/src/installer/recipe.rs:159-167` seeds `templates/msg-patterns.list` into an adopter's
+  gates dir and seeds no portability roster; a grep for the roster name across the five ported
+  verbs returns nothing, so `doctor` still reports nothing about the disabled state either.
+  `GATE_SDK_PORTABILITY_PATHS` defaults empty, so the gate's clean line reports the
+  disabled-and-unconfigured state on every run and nobody reads it as a cue.
   **The not-seeding is ruled and is NOT the gap.** Build ruled it deliberate — a roster with no
   corpus scans nothing, and the kit cannot know an adopter's install path — and gate-sdk/SPEC.md
   §check-portability-floor states the degradation with its honest limit. What is unclosed is the
@@ -10358,6 +10292,43 @@
   Surfaced 2026-09-08 at that same `macos-roster-join` close, filed there to the gap inbox;
   promoted 2026-09-08 at this scope's drain, the second of that drain's three promotions.
 
+- **liveness-verdict-table-has-no-spawn-failure-row** [design-pending] — the turn-end liveness
+  hook's verdict table names a reader that never resolved and a reader that ran and answered
+  wrong, and nothing for one that resolved and failed to start, so a failed spawn allows.
+  **The filed symptom was the flake; the finding underneath is the fail-open.** `check-crate-arms`
+  is flaky through `native/src/hook/stop_liveness.rs`'s own 18 tests — MEASURED at build, not
+  inferred: ~1 red in 5 runs of that module alone, 6 of 6 green at `--test-threads=1`, the module
+  byte-identical to HEAD, so it is pre-existing rather than this iteration's.
+  **Re-verified at the 2026-09-09 drain against the spec rather than the code alone**, and that
+  re-verification is what moves the subject. `read_liveness` (`native/src/hook/stop_liveness.rs`)
+  maps a spawn `Err` to `None`, and its own `spec:` comment cites the contract for it — so the
+  behaviour is specified, not a slip. But read the table it cites: `unavailable` is *"no reading at
+  all: an **override** that resolves to nothing spawnable — the default always resolves"*, and
+  `error` is *"a configured reader that **ran** and did not answer"*. A reader that RESOLVES and
+  then fails to SPAWN — `ETXTBSY`, `EPERM`, `ENOMEM` — is neither, and there is no third row. It
+  falls to `unavailable`, which logs and exits 0. The table's own basis, *the default always
+  resolves*, answers resolution and is silent on spawn, so it does not reach the case.
+  **Why this is a live adopter exposure and not a harness artifact.** The flake is one producer of
+  the shape and the structural suspect there is a write-then-exec race (`Scratch::stub` writes the
+  reader stub, sets its exec bit, and `fire()` spawns it immediately, racing `ETXTBSY` against a
+  sibling test thread's write fd). The errno was NOT isolated — `read_liveness` swallows the `Err`,
+  so confirming it needs a probe nobody has bought. But the swallow is the point: on any machine,
+  a reader that cannot start is indistinguishable from one that was never configured, and the hook
+  allows either way.
+  **Why `[design-pending]` and not a fix.** Closing it means adding a verdict row to
+  delegation-kit/SPEC.md's contract table — user-facing hook semantics, which is envelope-class and
+  outside a close session's ruling class. Two candidate shapes, neither ruled: distinguish the
+  spawn error into a reporting verdict (which also removes the fail-open), or rule the fail-open
+  intended and say so in the table so the third case stops reading as an omission. Fixing the
+  harness race alone was declined at the drain: it removes the symptom and masks the finding.
+  **DISTINCT from `wait-primitive-and-record-compose-to-false-completion`**, whose subject is a
+  waiter's own loop polarity; this is the reader's verdict mapping under a spawn that never ran.
+  **Cost while deferred:** the commit-time obligation is flaky about one commit in five, and a
+  session meeting it reads a green-on-retry as noise rather than as the fail-open's signature —
+  so the cost is not the retry, it is that the retry teaches the wrong lesson.
+  Filed 2026-09-09 to the gap inbox by build batch A; promoted at this close's drain. →fix was
+  tried and failed on the envelope; →icebox was refused because the trigger is live and measured.
+
 
 ## Icebox
 
@@ -10474,5 +10445,7 @@
 ## Done
 
 - powershell-installer-surface
+- installer-prior-files-inherits-host-line-terminator
+- kit-library-port-residue
 
 ## Lessons Learned
