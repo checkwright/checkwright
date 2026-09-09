@@ -14,44 +14,6 @@
 
 ## Technical Debt
 
-- **windows-roster-join** — join `x86_64-pc-windows-msvc` to `native/targets.list`
-  on the predicate that file's header states: one run carrying a green `native-artifacts` upload for
-  the triple AND the `install-smoke-windows` leg green having consumed that upload and reached the
-  artifact-present branch. Objective 2 of the pivot (TRAJECTORY.md §The objectives) names native
-  Windows outright, and the port-first run names "the Windows and macOS legs" as the own-iteration
-  port-critical instances — both macOS legs got their iteration (`macos-roster-join`,
-  `intel-macos-roster-join`); this is the Windows one, and until 2026-09-09 nothing in the queue
-  owned it. The declaration half landed with this filing: `docs/install.md` §Requirements now
-  declares the triple `held` with this predicate, so `check-install-platforms` counts what a
-  Windows host is refused today.
-  **THE WORK, in the order the leg fails:** (1) `native-artifacts` produces the windows-msvc binary
-  and sidecar on a Windows runner (`native/runners.list` gains the mapping; the build body's floor
-  step is the first cost a non-GNU image incurs, gate-sdk/SPEC.md §Consumer payload); (2) the leg
-  consumes it through `INSTALLER_SMOKE_ARTIFACTS_DIR` and loses its hard-coded `continue-on-error`
-  once it can go green; (3) the ONE remaining red ahead of green,
-  `smoke-harness-mapfile-inherits-host-line-terminator`, is inside this unit's cut or sequenced
-  before it; (4) on the observed green, the three lockstep edits the roster header names, plus
-  `build-native.sh` for the source stamp.
-  **THE LEG IS ONE ASSERTION FROM GREEN — measured at scope 2026-09-09 off the finished run's free
-  log, not predicted.** It builds the msvc binary, packs, installs from the tarball offline, holds
-  the profile invariant, runs `init` and prints "battery: All 12 gates passed" natively, then fails
-  on a single line: `manifest kits (gate-sdk<CR>) differ from the profile roster (gate-sdk)`. Two
-  premises this entry filed with are therefore corrected here. The floor is MET on that leg — its
-  own run resolves `sort` to GNU coreutils 8.32 and scaffolds shellcheck — so the second red it
-  named, `toolchain-floor-spawn-on-native-windows`, never applied to it and was in any case fixed
-  at `d9c7a004` before this entry was filed; that entry is re-scoped to its surviving objective-1
-  reading. What is untouched work is the PRODUCER half: `native/runners.list` carries no
-  windows-msvc mapping, so `native-artifacts` builds no Windows binary at all, and
-  `scripts/ci-build-artifact.sh` strips the knob-resolved binary name to a bare stem with no
-  executable suffix, which fails the copy on a Windows runner.
-  **Sequencing:** port-critical, its own iteration, scoped before the port oracle reads zero owed —
-  a port declared complete with objective 2 unmet is the front-door false claim §What the objectives
-  are not forbids.
-  **Cost while deferred:** the pivot's OS-reach objective stays half met while every other surface
-  reads the port as one file from done, and the Windows leg burns a runner per push for a red
-  nobody is scheduled to fix.
-  Filed 2026-09-09 by the consult session on the operator's Windows ruling, AskUserQuestion channel.
-
 - **ruling-record-shrink-to-bau** — `TRAJECTORY.md` grew from its birth size to
   six times that in five weeks, half of it in the last week, and almost none of it is port-bound:
   the consult binding sent every closed ruling there unqualified, so process rulings with no
@@ -10803,5 +10765,6 @@
 ## Done
 
 - smoke-harness-mapfile-inherits-host-line-terminator
+- windows-roster-join
 
 ## Lessons Learned
