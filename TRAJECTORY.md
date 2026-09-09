@@ -15,98 +15,68 @@ generator, so hand-authored content placed inside it is destroyed. Read them
 together: the objectives here are what the queue's ordering is trying to buy.
 
 **How to read a ruling recorded here.** A recorded operator ruling is closed,
-and a session that meets one **does not re-litigate it** — reversing, demoting
-or re-scoping one is operator-class, and a finding that appears to contradict an
-objective is an escalation rather than a stage-level or lead-level decision,
-however well-grounded. Only the operator reopens a closed ruling.
-
-**Retiring a spent ruling is not reversing it**, and that distinction is what
-lets the completion-time contract below be a session's ordinary work rather than
-an escalation. A ruling whose subject is finished directed something that has
-already happened, so deleting the record decides nothing. Reversal is the other
-act — making a closed ruling stop being the rule — and it stays operator-class.
+and a session that meets one **does not re-litigate it**. A finding that appears
+to contradict an objective is an escalation rather than a stage-level or a
+lead-level decision, however well-grounded. Only the operator may reopen a
+closed ruling.
 
 **A figure recorded here is a dated record of what a decision was weighed
-against, never a live claim.** The same arithmetic in a governed spec is repaired
-by de-literalization; the figure here is corrected under bounded operator
-authority instead. Different kinds, different repairs — one commit may owe both.
+against, never a live claim.** The same arithmetic in a governed spec is
+repaired by de-literalization; the figure here is corrected under the first act
+below. Different kinds, different repairs — one commit may owe both.
 
-**Who may record a ruling here.** A session **records** a ruling a ruling
+**Who may record may retire.** A session **records** a ruling that a ruling
 authority closed — the operator, or the lead on its own authority, the two
-CLAUDE.md §Housekeeping names — and it never **authors** one. The authority is
-the ruling's existence, not the recording session's role — so no roster of
-permitted writers is maintained, and none needs to be. A recording names the
-ruling's date, its authority and its channel, and where the mechanism has a
-canonical home it points there rather than restating it.
+CLAUDE.md §Housekeeping names — and never **authors** one; what licenses a
+retirement is the ruling's discharge. Neither turns on the session's role, so no
+roster of permitted writers or retirers is kept, and none is needed. A recording
+names the ruling's date, its authority and its channel. **The honest limit:**
+this is an authoring contract and not a gate. Nothing mechanizes *the operator
+closed this*, and nothing should — the alternative is a session attesting to its
+own consent, which is worth less than the rule.
 
-**The session that may record may retire.** Recording and retirement are the two
-ends of one authority, and for the same reason: neither decides anything. What
-licenses a recording is the ruling's existence; what licenses a retirement is
-its discharge. Neither turns on the session's role, so a roster of permitted
-retirers is as unneeded as the roster of writers. What a retirement may never do
-is re-decide. Reversing, demoting or re-scoping a recorded ruling stays
-operator-class, unchanged. The honest limit: this is an authoring contract, not
-a gate. Nothing mechanizes *the operator closed this*, and nothing should — the
-alternative is a session attesting to its own consent, which is worth less than
-the rule.
-
-**The third act is correction, and the line between it and reversal is the one
-the rules above leave undrawn** — ruled 2026-09-06 by the operator, relayed
-by the lead session: "/close can correct invalid or remove obsolete data from
-TRAJECTORY". Three acts, named and separated:
+**Four acts, named and separated** — the first three ruled 2026-09-06 by the
+operator, the fourth 2026-09-07:
 
 - **Correcting an aged fact** — a slug the queue has retired, a count the tree
-  has moved, a pointer whose target does not carry the claim, a condition
-  naming a unit or a gate that does not exist. The fact is wrong *about the
-  world*, so correcting it decides nothing, and the completion-time contract
-  below already directs that it be corrected where it stands. **Session-class,
-  including inside the text of a ruling that is still in force.**
+  has moved, a pointer whose target does not carry the claim. **Session-class,
+  including inside the text of a ruling still in force**, and bounded by a test
+  rather than by a category: it qualifies only where an oracle settles the fact.
+  **If the repair would change what the ruling directs, it is not a repair.**
 - **Retiring a spent ruling** — it directed something that has already happened,
-  so deleting the record decides nothing. **Session-class**, as above.
+  so deleting the record decides nothing. **Session-class.** A ruling is tested
+  by **mood** before it is tested by completion: one that DIRECTED WORK is spent
+  when the work lands, and one that ESTABLISHES A RULE is never spent while the
+  rule governs, however completely the mechanism that prompted it has shipped.
+  Where such a rule's home changes it **relocates** to the surface owning that
+  mechanism, which is a third disposition beside delete and keep.
+- **Annotating a false ground** — where a closed ruling's stated **ground** was
+  false when the ruling was taken and the ruling's **conclusion is unchanged**,
+  the ground is annotated beside the ruling and the ruling's own text is left
+  standing. **Session-class**, on the correction test: what the ruling directs
+  does not move. A ruling whose conclusion does not survive is not annotated —
+  that is the act below.
 - **Reversing, demoting or re-scoping** — making a closed ruling stop being the
   rule, narrowing what it reaches, or moving it down a priority order.
-  **Operator-class, unchanged**, however well-grounded the finding and however
-  urgent the fix.
+  **Operator-class**, however well-grounded the finding and however urgent the
+  fix.
 
-**What makes the first act safe is that it is decidable against the tree, and
-that is the test rather than the category.** A correction qualifies only where the
-aged fact is one an oracle settles — a slug's presence in the live set, a count
-re-derivable by a command, a pointer's target. A "fact" that is really a judgment
-about whether the ruling still ought to govern is a reversal wearing a
-correction's clothes, and the sentence separating them is the one worth writing:
-**if the repair would change what the ruling directs, it is not a repair.** The
-honest limit is the one stated above, unchanged — an authoring contract, not a
-gate. What the boundary buys is that a session meeting an aged fact inside a live
-ruling now has an answer other than stopping, and a session tempted to re-decide
-still has to write down that it is only correcting.
+**A correction is never appended**, and a superseded sentence is never left
+standing beside the sentence that corrects it: two readings of one fact is the
+defect, whichever of them wears the label *current*. The annotation act is the
+one bounded exception, and it is bounded to a ground whose conclusion survives
+it — correcting such a ground in place would lose the only record that it was
+ever wrong.
 
-**The fourth act is annotation, and it is the one the three above leave
-unnamed — ruled 2026-09-07 by the operator, answered in a lead session and
-relayed by the lead.** Where a closed ruling's stated **ground** turns out to
-have been false when the ruling was taken, and the ruling's **conclusion is
-unchanged**, the ground is annotated beside the ruling and the ruling's own text
-is left standing. **Session-class**, on the same test as correction: it decides
-nothing, since what the ruling directs does not move. Both alternatives were
-weighed and refused. Repairing the ground where it stands rewrites a closed
-ruling and hides that the ground was ever wrong — which is what a later reader
-judging that ruling needs most. Leaving it unannotated is refused too, because
-the next composing session re-derives the same finding and re-escalates a
-question already answered.
-
-**Why this does not contradict the never-append rule below, and the price it
-accepts.** That rule governs a fact that has **aged**: the world moved, the old
-reading is simply wrong now, and correcting it in place loses nothing. A ground
-that was wrong at its writing is the other case, and correcting it in place
-loses the only record that it was. The price is real and is the one that rule
-names — two readings of one fact, which is why this act is bounded to a ground
-whose conclusion survives it. A ruling whose **conclusion** does not survive is
-not annotated: that is reversal, and the bullet above owns it.
-
-**Where the grounds live.** A ruling whose mechanism already has a canonical
-home is registered here with a pointer to that home rather than restated —
-one owner per fact, as everywhere else. What this file *owns* is what has no
-other durable home: the objectives, the rulings named below without a pointer,
-and the sequence.
+**A retirement's blast radius is derived, never rostered.** No surface owns a
+list of what cites this file and none should — a maintained roster would be one
+more copy to stale — so a retirement greps for its own citations, over the
+declared names below. Two properties make it non-obvious enough to write down.
+`docs/` is a **generated mirror**, so every kit-SPEC citation appears twice and
+only the source is editable; regenerate rather than hand-edit the second. And
+the majority citation shape names no file at all and carries only the ruling's
+proper noun, so a probe over citation *targets* reaches almost none of them. The
+design of both halves: lifecycle-kit/SPEC.md §The ruling-staleness probe.
 
 **What this file admits — ruled 2026-09-09 by the operator in consult.** This
 record accompanies a pivot and shrinks as the pivot lands; it is never a growing
@@ -119,62 +89,25 @@ project's reading of a kit template in the command binding that names the
 template; a standing rule in CLAUDE.md as one line pointing at its mechanism;
 and who ruled, when, through what channel, and what was refused, in the landing
 commit's message — git history is the archive. The consult binding's
-landing-surfaces slot states the same test from the recording side. Refused
-with it: keeping the file as an open-ended ruling record under brevity rules
-alone, which bounds each paragraph and never the count; and retiring the file
-at the port's completion, which discards a mechanism the methodology offers and
-a future pivot would re-mint. Two directed acts, one queue unit
-(`ruling-record-shrink-to-bau`): every port-bound paragraph below gains a
-`discharge:` line on the port oracle, and every paragraph failing the test
-relocates to its home or is deleted. That sentence is spent when the unit lands;
-the test stands.
+landing-surfaces slot states the same test from the recording side. One
+authoring convention follows and is what makes the next application cheap: a
+ruling able to name its own discharge event says so in its own text, so the
+session that meets the event deletes rather than judges.
 discharge: ruling-record-admission-test grep -L ruling-record-shrink-to-bau TASK-QUEUE.md
-ruling: ruling-record-admission-test the admission test
-
-That is the authoring-time half. The completion-time half is two triggers — but
-a ruling is tested by **mood** before it is tested by completion, and taking
-those in the wrong order is what makes the newest rulings the most dangerous to
-judge. A ruling that **directed work** is spent when the work lands. A ruling
-that **establishes a rule** is never spent while the rule governs, however
-completely the mechanism that prompted it has shipped — and such a ruling looks
-retirable under a naive subject-finished read at exactly the moment its landing
-commits make a retirement sweep due. The mood question costs one question and is
-the one a completion test cannot ask itself.
-
-**Relocation is a third disposition beside delete and keep.** Where a
-rule-establishing ruling's content belongs when its home changes, it is retired
-from here and its content **relocates** to the surface that owns the mechanism —
-which is not what the completion trigger below describes, and naming it is what
-stops a later session reading a relocation as a loss.
-
-The two triggers, and they are the whole rule:
-
-- **A ruling whose subject is finished is deleted outright.** Not distilled to a
-  line, and not annotated as finished. Git history holds the obsolete text and
-  the motivation behind it, and the cost of going there to retrieve it is the
-  accepted cost.
-- **A fact that has aged is corrected where it stands.** A correction is never
-  appended, and a superseded sentence is never left standing beside the sentence
-  that corrects it: two readings of one fact is the defect, whichever of them
-  wears the label *current*.
-
-One authoring convention follows, and it is what makes the next application
-cheap: **a ruling able to name its own discharge event says so in its own
-text**, so the session that meets the event deletes rather than judges.
+ruling: ruling-record-admission-test  the admission test
 
 **Two body-line declarations make that convention resolvable rather than merely
-followed.** Both are declarations and not tags — a tag marks a move across a
-pending/ready boundary and these mark none — and both are hand-written by the
-session recording or retiring the ruling, at the moment it writes it, on the
-self-naming discipline every body-line declaration inherits:
+followed**, both hand-written by the session recording or retiring the ruling, at
+the moment it writes it. Neither is a **tag**: a tag marks a move across a
+pending/ready boundary and these mark none.
 
 - `ruling: <name>[ <name>…]` — the ruling's own proper noun, in the words other
   surfaces use for it, plus each variant a surface has actually used. **One or
-  more, appended and never rewritten.** The plural is not generosity: the largest
-  measured cohort of stale citations shared exactly one invariant, the ruling's
-  proper noun in a present-tense claim anchored to no file, and one site in that
-  same cohort survived its own repair by writing the noun a single word
-  differently. A single declared name is insufficient by construction.
+  more, appended and never rewritten.** A single declared name is insufficient by
+  construction: the largest measured cohort of stale citations shared exactly one
+  invariant, the proper noun in a present-tense claim anchored to no file, and
+  one site in that same cohort survived its own repair by writing the noun a
+  single word differently.
 - `discharge: <name> <oracle>` — for a ruling conditioned on a future event: the
   ruling's declared name and a **command** whose output settles whether the event
   has fired, never a predicate a reader interprets. A non-zero exit, or a clean
@@ -186,24 +119,7 @@ self-naming discipline every body-line declaration inherits:
 
 **No gate demands a declaration** — a scanner cannot demand one written under
 judgment. A ruling carrying none is simply one the citing-side report cannot
-reach, and the probe reports that hole instead of inheriting it
-(lifecycle-kit/SPEC.md §The ruling-staleness probe). Port-bound rulings are
-back-filled by the unit the admission test above directs; nothing else is.
-
-**A retirement's blast radius is derived, never rostered**, and stating that here
-is what stops each retiring session re-discovering it. No surface owns a list of
-what cites this file and none should — a maintained roster would be one more copy
-to stale — so a retirement greps for its own citations, and the declared names
-above are what that grep is run over. Two properties make it non-obvious enough
-to write down. `docs/` is a **generated mirror**, so every
-kit-SPEC citation appears twice and only the source is editable; regenerate rather
-than hand-edit the second. And the citation shape to grep for is **not** the one
-the pointer suggests: a citation naming a surviving **section** still resolves
-after the ruling inside it is deleted, so the grep finds the pointer while no gate
-finds the staleness — but measured against a real cohort that shape is the
-minority, and the majority name no file at all and carry only the ruling's proper
-noun. The design of both halves lives at lifecycle-kit/SPEC.md §The
-ruling-staleness probe.
+reach, and the probe reports that hole instead of inheriting it.
 
 ## The objectives
 
@@ -252,91 +168,6 @@ every later session as one the project does not intend.
 
 ## The closed rulings
 
-**The substrate language is Rust — ruled 2026-08-02, final.** The alternative
-weighed and refused is Go. The refusal grounds, and why binary size is not a
-matter of taste under objective 4, are recorded at
-gate-sdk/SPEC.md §The decisions this substrate already closed, which owns them
-because the component that depends on them must be readable alone.
-
-**A bash portability floor was costed and rejected — closed, not deferred.**
-What was costed, what the blast radius was, and why the floor cannot deliver
-the reach it would be bought for are recorded in the same section. The figures
-there are a dated measurement rather than a live claim: a recount is a step
-toward re-deciding.
-
-**git is the sole runtime dependency, and it is shelled out rather than
-embedded.** This is the concrete content of objective 1 and the claim that
-must not weaken into a statement about the *build*. "Buildable from source,
-needing only git" is a different and weaker claim, about what a contributor
-needs; the ruling is about what a consumer's machine must carry at run time.
-
-**The payload ships a prebuilt gate binary, selected by platform. The consumer
-builds nothing, installs no toolchain, and receives no gate implementation
-source.** The condition this satisfies and the mechanism it satisfies it by are
-owned by gate-sdk/SPEC.md §Porting a gate to the binary substrate (criterion 5)
-and gate-sdk/SPEC.md §Consumer payload.
-
-**Building from vendored crate source at install time is void.** It was ruled
-once and is recorded here rather than deleted, so the next session reaching for
-the cheap answer finds it already costed: it adds a Rust toolchain to the
-dependency floor objective 1 is collapsing, it is unreachable for the
-non-technical adopter objective 5 admits, and it ships the very source
-objective 3 wants withheld.
-
-**The interpreter policy.** Something outside the binary must run first,
-because the binary cannot select itself — that bootstrap is the irreducible
-interpreter surface. Objective 6 binds its *shape* rather than its existence:
-its whole job is resolve the platform, place the matching binary, invoke it,
-which is small enough to be written twice. Everything conditional belongs on
-the far side of that invoke, and as of 2026-09-09 it is: `installer/lib/` is
-deleted and both bootstraps do nothing but resolve, place and invoke. Two
-standing obligations survive the landing, and they bind every unit that touches
-the install path: **add no new shell-only install step**, and assume no POSIX
-shell.
-
-**Opacity is taken on deliberately, and it carries an obligation.** A consumer
-who cannot read the gate has only the publisher's word for what it does, so the
-integrity story stops being garnish and becomes the whole of what replaced
-reading the source. *Ruled: ship the achievable floor and claim nothing beyond
-it.* The floor is a published per-target digest verified before the artifact is
-written. A genuinely reproducible build is a larger program and the queue holds
-its ground as `tarball-build-attestation`; the pivot changes what that entry is
-worth rather than what it says. The bound this puts on prose is exact and is
-not a hedge to be softened later: a governed surface may say *verified against
-a published digest* and may **not** say *reproducible*. What opacity buys, what
-it does not extend to, and why the claim is raised cost of analysis rather than
-confidentiality are owned by gate-sdk/SPEC.md §Consumer payload.
-
-**New gates are born native by default; shell is the exception, and it needs a
-stated cause — ruled 2026-08-14.** This reverses the default recorded at
-gate-sdk/SPEC.md §The port-candidate criteria, where a born-native gate was "a
-design ruling rather than a default", and it is the only measure taken so far
-that acts on the port's *denominator* rather than its remainder: under the prior
-default every gate landed while the port ran added shell the port then owed.
-The mechanism — the exception criterion that makes "with cause" operable — is
-**delivered** at that same section as closed classes with a stated cause
-form each, and is not restated here. The cost it was weighed against, recorded
-so it is not re-argued: a `.gate`-declared member is *omitted* on a platform
-`native/targets.list` carries no artifact for, so the flip attaches that
-omission to every new gate for whatever that roster does not carry.
-**It was weighed at every macOS adopter, the roster then being one target** —
-that is the figure the 2026-08-14 decision rested on, and it does not move. What
-the omission attaches to at any later moment is **that roster's complement**,
-which narrows as the roster widens: stated as the complement rather than as a
-fresh count, so this record keeps tracking the weighing instead of owing a
-correction on every join. The verdict, its grounds and its date stand, the ruling
-got cheaper than it was costed at rather than weaker, and recording the cost
-still does the thing it was recorded to do.
-The ruling does not widen the roster; that residue was costed as a queue entry
-and is now **discharged** by a landed gate (2026-09-08), and the roster's own
-widening trigger — the produced-and-exercised predicate stated at
-`native/targets.list` — is unchanged **by this ruling**.
-**This restatement is the `operator`'s, 2026-09-08, asked and answered in a
-`/lead` session and lead-relayed**, and its extent is the cost sentence's *form*
-and nothing else — no verdict, no ground, no date. It is recorded here rather
-than in a commit message so that a reader of this paragraph can see what was
-authorized without reading history.
-
 **The release policy's security-or-supply-chain trigger reads narrowly — ruled
 2026-08-05.** It fires on a vulnerability or a compromised artifact. An
 **install-path data-loss repair does not fire it**, however severe, and however
@@ -349,67 +180,16 @@ still does not fire. The reason is the channel. `docs/install.md` §Versioning
 declares it `preview` with an audience it describes as internal iteration, so
 *reaching users late* — the entire cost that trigger exists to avoid — has no
 measured population to land on.
-
-The asymmetry the ruling rests on: a wrong deferral is corrected by rewriting
-one line, and a wrong tag is public.
-
-**The honest limit.** This narrows a criterion, so it can only be wrong in one
-direction — an install-path defect that genuinely does reach users late will now
-read as not-firing, and no gate catches that. What bounds it is the same clause
-that grounds it: the ruling is stated *for* `preview`, so the flip to `stable` at
-`v1.0.0` reopens it rather than inheriting it. Nothing here narrows the operator
-direction trigger, which remains available for exactly the urgent case this
-paragraph declines to automate.
-
-**Objective 4 constrains the adopter's dependency set, never the crate's build
-graph — ruled 2026-08-14, and it was never otherwise.** The two sets are
-different things and reading them as one is what made a prohibition appear that
-had never been stated: the adopter's set is what they install and can uninstall,
-which is git plus pre-compiled binaries; the crate's build graph is resolved and
-compiled by contributors and CI, and no consumer ever receives, resolves or
-compiles it (install-time builds from vendored source are void under objectives
-1, 2 and 5). So the `native/` crate is under **no** no-external-dependencies
-prohibition and never was. What the ruling does **not** touch:
-the dependency **bar** the crate applies to a candidate dependency is
-engineering judgment owned by gate-sdk/SPEC.md, and nothing here loosens it.
-
-**The allowlist narrows on security grounds only — ruled 2026-08-20 by the operator.** Breadth is
-kept wherever it is safe, because an allow match short-circuits the permission classifier outright,
-so a broad rule actively *saves* model calls rather than merely avoiding a prompt — which is the
-opposite of the premise the 2026-08-13 breadth ruling was taken on. Narrowing is warranted only
-where a destructive form sits inside a blanket grant: `reset --hard`, `clean`, `push --force`, and
-a bare `checkout --`. The disposition pair a narrowing chooses between — narrow the glob, or record
-that the breadth is intended — is owned by guard-kit/SPEC.md §compare-settings-allow and is not
-restated here.
-
-The standing declarations live in `scripts/guard-config.sh`'s `GUARD_KIT_BREADTH_DECLARED`, one
-per glob with its grounds; the criterion above is what a future narrowing question is decided
-against.
-
-**A permission-settings edit is operator-class work, and scope never promotes one — ruled
-2026-08-22 by the operator.** An edit to `.claude/settings.json` is not build work and is not
-queue work: it is applied by the operator, out of band, or it is not applied. A stage session may
-*prepare* one — derive the diff, state its security grounds, record both on the entry — and there
-its remit ends.
-
-**The grounds are that the work is not executable where the lifecycle dispatches it**, which is
-stronger than a preference about who should do it. Two independent mechanisms refuse the edit: the
-auto-mode classifier denies it, and a dispatched stage session's own definition forbids changing
-permission settings on any agent's say-so. So an operator ruling that resolves to "edit the
-allowlist" cannot be discharged by the session sent to discharge it — it is promoted, scoped,
-dispatched, and then stalls at build having spent the whole pipeline to reach a wall.
-
-**The rejected alternative is recorded because it is the tempting one.** The build session offered
-to hand its prepared diff to the supervising session to apply. That was refused: a supervising
-session performing an edit its child was denied is permission laundering, and it converts the
-operator's permission boundary into a formality. A session that meets the refusal and stops has
-behaved correctly, and re-deferring the unlandable half is the outcome, not a failure.
-**One class is carved out — ruled 2026-08-29 and widened 2026-09-05 by the operator, lead-relayed,
-recorded on `native-gate-port-remaining-corpus` (2):** a grant whose target a ruled port cut deletes
-is dropped by build in the deleting commit, in-cut and unconfirmed — a pure narrowing, scoped to
-decommissioning bash and to nothing else — with nothing left to reach once the port oracle reads
-zero owed. Registered here because that entry demotes at build and retires with the port, while this ruling
-outlives both.
+The asymmetry it rests on: a wrong deferral is corrected by rewriting one line,
+and a wrong tag is public. **The honest limit** is that narrowing a criterion can
+only be wrong in one direction — an install-path defect that genuinely does reach
+users late now reads as not-firing, and no gate catches that. What bounds it is
+the same clause that grounds it: the ruling is stated *for* `preview`, so the
+channel flip at `v1.0.0` reopens it rather than inheriting it. Nothing here
+narrows the operator direction trigger, which stays available for exactly the
+urgent case this ruling declines to automate.
+discharge: release-trigger-reads-narrowly grep -F 'Release channel: **stable**' docs/install.md
+ruling: the security-or-supply-chain trigger reads narrowly  the release policy's narrow trigger
 
 **No gate is permanently shell, and a spawned program is a dependency, never a port
 exclusion — ruled 2026-08-23 by the operator.** The "permanently shell" class (gate-sdk/SPEC.md
@@ -435,6 +215,8 @@ adopter — `installer/consumer-smoke/`, the declared `scripts/` class — takes
 disposition when reached. That disposition is a **disjunction, not a default**: its branches are a
 declaration and a port, and the adoption walkthrough took the porting one (2026-09-06) where
 `installer/consumer-smoke/run-smoke.sh` took the declaring one.
+discharge: no-gate-is-permanently-shell  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: no gate is permanently shell  what port complete means
 
 **That predicate has an oracle, and it is not the one that measures the battery.**
 `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` reports the port disposition of every tracked non-test
@@ -443,21 +225,7 @@ script either carries a stated cause or is gone. The registry arms beside it wal
 answer for the gate battery alone — so a session reading zero owed **there** is reading a finished
 battery and not a finished port, which is the misreading this predicate invited for as long as it
 had no evaluator of its own. Mechanism and bounds: gate-sdk/SPEC.md §port-blockers.
-
-**The deferred pool's exits are close's to take — ruled 2026-08-23 by the operator, on a measured
-8:1 intake-to-exit ratio.** Three things change, each owned where its mechanism lives: the icebox
-age floor drops to seven days (`scripts/queue-config.sh`); a finding whose cost opens in the low
-class and names no live trigger may be filed **directly** as a one-line icebox entry, and a trigger
-that is launch-gated counts as dormant rather than live (queue-kit/SPEC.md §The icebox tier); and
-close's existing wontfix disposition — the bare `## Done` line — is the ordinary exit for an entry
-a landed unit or a closed ruling has mooted, taken by close under those two criteria rather than
-escalated. The icebox compresses and the wontfix line retires; neither needs a new section. What
-stays operator-class is reversing a `[roadmap:]`-tagged entry, which no drain may retire.
-
-**`check-crate-arms` stays whole and caches — ruled 2026-08-23.** The alternative, clippy at
-commit and tests at validate, was refused: CI runs the battery and the fixture suites, not
-validate, so the narrowing would have moved the test arm out of CI's reach. The source-stamp
-cache is owned at gate-sdk/SPEC.md §check-crate-arms.
+discharge: the-port-predicates-oracle  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
 
 **`scripts/`'s `# no-port:` class generalises on its vocabulary half alone — ruled 2026-08-24 by
 the operator**, and recorded here at the 2026-08-31 drain because the causes that cite this ruling
@@ -473,13 +241,8 @@ kept here — each declaring file's `# no-port:` cause states its own instance a
 the port oracle's answer. Untouched by the 2026-08-30 config-seam ruling, which reaches part of
 the left-owed set on an **edit-seam** ground the vocabulary question never asked; gate-sdk/SPEC.md
 §The config-seam port disposition states the two grounds as cumulative.
-
-**The two bootstraps are hand-kept, held in parity by a per-bootstrap install-smoke leg —
-ruled 2026-08-26 by the operator**, closing `powershell-installer-surface`'s fork 2. The
-mechanism, the refused generated-twins alternative, why the legs are counted by bootstrap
-and not by platform, and the oracle's own two-part split — bootstrap parity, which the
-PowerShell leg discharges for its half, against payload coverage, which is owed with the
-relocation — are all owned at `installer/README.md` §The install boundary.
+discharge: scripts-no-port-vocabulary-half  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: the vocabulary half generalises  the scripts no-port class
 
 **The port's completion predicate is literal — `--tree`'s owed count reaching zero, over the whole
 derived corpus, with no contributor-side subtraction — ruled 2026-08-28 by the operator**,
@@ -506,6 +269,8 @@ defensible content is already the corpus rule (the `*.test.sh` suffix and the pr
 gate-sdk/SPEC.md §port-blockers), and widening the exclusion would let *port complete* be claimed
 while a full-profile adopter's vendored tree still runs bash — a false claim at the front door, the
 cost §What the objectives are not names.
+discharge: the-ports-completion-predicate-is-literal  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: the port's completion predicate is literal  no contributor-side subtraction
 
 **The deferred pool's intake is triaged at the drain, and machinery findings are dormant by
 default — ruled 2026-08-30 by the operator in a consult, on a re-measured pool.** The 2026-08-23
@@ -542,24 +307,9 @@ gate can honestly run, and the icebox default reaches the same end with a mechan
 already exists. **The pool's net motion is stated at every close** rather than re-derived at a
 consult — the `qnet` figure, owned by drift-kit/SPEC.md `kpi-queue-net-delta`, is written into
 the drain's commit message; an enforcing gate on it was refused, grounds at the lifecycle-kit
-section above. Discharge event for this paragraph: three consecutive closes each reading
-`qnet` at or below zero, at which point the ordering is habit and the record is retired.
-
-**A queue entry cites the gap inbox and the survey record as provenance, never as a locator —
-ruled 2026-09-02 by the operator in consult.** Both surfaces are drained or truncated by the
-lifecycle, so a pointer into either as a fact's current home is broken by the next boundary; the
-rule, its resolves-after-the-next-drain test and the refused gate are owned at lifecycle-kit/SPEC.md
-§The committed gap inbox. The alternative refused: banning every mention, which would strip filing
-provenance from most of the deferred pool to remove a class measured at two instances.
-
-**A dated attestation freezes the claim, never the locator — ruled 2026-09-03 by the operator,
-lead-relayed from a consult.** A `path:line` in queue prose is live whatever date stands beside it,
-and a dated measurement is history whatever moved since; the rule, its test and its consequence for
-the pendency sweeps are owned at lifecycle-kit/SPEC.md §The committed gap inbox, beside the
-2026-09-02 ruling it generalises. The alternatives refused: reading the date as freezing the locator
-too, which licenses rotting anchors, and reading the locator's drift as falsifying the dated claim,
-which would have every dated figure in this file re-counted — the step toward re-deciding the
-bash-floor ruling above forbids.
+section above. When the condition below fires the ordering is habit and the record is retired.
+discharge: machinery-class-icebox-default  manual three consecutive closes each reading qnet at or below zero
+ruling: the machinery-class icebox default  the witness discriminator  machinery-class by default
 
 **A section is a cut's outer bound, never its minimum — ruled 2026-09-03 by the operator,
 lead-relayed from a consult.** A reading of the composer recorded on `native-gate-port-remaining-corpus`,
@@ -568,6 +318,8 @@ own text sequences one member behind a named unit cuts its unblocked remainder b
 amendment, the sequenced member staying owed rather than held. Refused with it: whole-section-or-nothing,
 a hold declaration on the remainder (a held file leaves the owed column), and re-homing the remainder's
 `# spec:` to make the section a singleton.
+discharge: a-section-is-a-cuts-outer-bound  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: a section is a cut's outer bound
 
 **A consumer's plugin on a kit seam is owed like any file; ruling (1) reaches the seam alone — ruled
 2026-09-03 by the operator, lead-relayed from a consult.** The composer's ruling (1) protects an
@@ -577,6 +329,8 @@ resolves, so the literal predicate above governs it unopposed. Owned with its gr
 gate-sdk/SPEC.md §Porting a gate to the binary substrate. Refused with it: reading ruling (1) as a
 contributor-side exemption under another name, and a seam-citing `# no-port:` on files holding no
 seam content class.
+discharge: a-plugin-on-a-kit-seam-is-owed  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: a consumer's plugin on a kit seam is owed like any file
 
 **A port cut is sized to fill one build window, never to a unit count — ruled 2026-09-03 by the
 operator in consult, on measured overhead.** The mechanism is owned at gate-sdk/SPEC.md §The first
@@ -592,6 +346,8 @@ eight members in one iteration — was the cheapest per member and the dearest i
 is bought inside the cut first; what fills the window's remainder is the port-first run's below.
 The cost-per-unit meter that would let the next sizing be read rather than judged is queue work
 filed from this consult.
+discharge: a-port-cut-is-sized-to-one-build-window  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: a port cut is sized to fill one build window
 
 **A kit SPEC carries mechanism only; this project's provenance never ships — ruled 2026-09-03 by
 the operator in consult.** A dated operator stamp (`ruled <date> by the operator`), a pointer into
@@ -614,25 +370,9 @@ iteration ran and joined it, and a second joined it again — and its same-surfa
 it, gate-sdk being swept. **Re-grounded 2026-09-06 by the operator on product-class with a live
 trigger alone**, the accretion being self-attesting: the class grows from cuts that never touch
 provenance. Scope sizes it against the window and may split it by kit. Discharge event: that entry
-lands whole, its gate included, at which point this paragraph is deleted.
-
-**No governed file is exempt from brevity; the close pass walks every file that grew — ruled
-2026-09-05 by the operator in consult.** The close-stage brevity pass had measured `CLAUDE.md` alone
-and exempted on-demand files by its own text, so it reported green through a month in which the
-queue, the ruling record and the kit SPECs multiplied while `CLAUDE.md` grew seven lines. The
-exemption was never the operator's. Mechanism: context-kit/SPEC.md §The always-loaded meter's
-`--growth` arm and §The close-stage brevity pass; doctrine-kit/DOCTRINE.md rule 5 states the
-principle. Refused: a gate reddening a close on net growth, on the 2026-08-30 grounds that the exits
-are judgments; the figure is stated at every close and read at the consult.
-
-**The queue's `ruled:` declaration line is retired; a ruling's provenance is stated inline —
-ruled 2026-09-05 by the operator in consult.** Mechanism at queue-kit/SPEC.md §The tag algebra and
-§check-queue-entry-budget assertion (D). The ground: the line had no reader but the budget gate's
-own one-line discount, the entry body already carried authority, date and channel inline, and on
-the host entry five of six such lines were counted against the cap that had just forced a
-compression — provenance restated in a second tier, displacing the task it annotated. Refused:
-keeping the line as an audit record, which no auditor reads in preference to the sentence beside
-it; and a validity gate for it, which would have gated a grammar worth deleting.
+lands whole, its gate included, and this paragraph is deleted with it.
+discharge: kit-spec-provenance-seam  grep -L kit-spec-provenance-seam-sweep-remainder TASK-QUEUE.md
+ruling: a kit SPEC carries mechanism only  this project's provenance never ships
 
 **A stated cause reaches only the members it names, and an always-loaded manifest is never a
 cut boundary — ruled 2026-09-05 by the operator in consult.** Mechanism at gate-sdk/SPEC.md
@@ -643,36 +383,8 @@ subject as one cut under CLAUDE.md §Housekeeping, which is averaging grounds un
 that owns no mechanism. Re-homing a `# spec:` that points at a manifest is a defect correction
 and not the re-homing the 2026-09-03 ruling refused, which was a re-pointing away from a SPEC
 section that already owned the file.
-
-**The "add the useful grant" directive is discharged by falsification, and no grant was owed —
-ruled 2026-09-06 by the operator, relayed by the lead session.** The directive answered a proposal
-whose premise measures false: the standing prompt-guard rule has granted the resume-journal append
-since 2026-09-04, and both shapes the remaining residue could take are already answered by the tree,
-so no work was owed and neither survivor folds into an iteration. What earns the line is the general
-form — a directive answering a proposal is discharged when the proposal's premise measures false,
-and such a discharge leaves no landed unit and no queue trace, so a later session reading only the
-directive re-derives the whole investigation that falsified it. The surviving two-shape residue
-stays queued and deferred on `append-grant-decline-cause-unlogged`, which owns the measurement.
-ruling: add the useful grant
-
-**The lead's invocation is itself the open authorization, and one invocation grants exactly one
-iteration — ruled 2026-09-06 by the operator, in a direct in-session reply to a lead session's
-authorization ask.** Verbatim: *"when I issue `/lead undirected` I grant you the right to open one
-iteration. Not two, not three, but one."* Two limbs, separate and both load-bearing. **The
-invocation is the grant** — a lead that has been invoked holds its authorization already and asks
-for nothing further: an invocation is explicit without being separate. **The grant is bounded at
-one open** — the iteration after it takes a fresh invocation, and the bound belongs to the
-**grant** rather than to the closing boundary.
-
-The ground is a measured failure and not a preference: a lead opened a second iteration on one
-grant, and the instruction surface is what let it — it named no channel by which authorization
-arrives and no cardinality at all. The operator directed the correction with the ruling — *"Correct
-your instructions if not clear"* — and the mechanism has relocated to its two tiers: the generic
-half at `lifecycle-kit/templates/lead.md` §Opening an iteration, the consumer half as the
-`open-authorization-channel` binding in `.claude/commands/lead.md`, a slot minted for it (ruled
-`lead, own-authority` 2026-09-06 on the spec session's escalation, `ruling-config` declaring a
-different subject). What is closed is the two limbs, their date and their channel.
-ruling: the lead-invocation open grant
+discharge: a-stated-cause-reaches-only-the-members-it-names  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: a stated cause reaches only the members it names
 
 **Where this project's own class default and the close template's icebox trigger test appear to
 disagree, the class default governs — ruled `lead, own-authority` 2026-09-07, through the lead's
@@ -692,7 +404,7 @@ conjunction on its own terms and the default applies without outranking anything
 dogfood its own kits, so the two never collide once the class ruling is read as answering the case
 the kit phrasing under-determines. Nothing is owed in lifecycle-kit/SPEC.md: the rule is this
 project's reading of its own default, and the provenance seam keeps it here.
-Discharge: with the 2026-08-30 machinery default it qualifies.
+discharge: icebox-default-over-a-live-trigger  manual with the machinery-class icebox default above, whose condition it shares
 ruling: the machinery-class icebox default over a live trigger
 
 **The same default governs close's OWN captures, not only the bullets it drains — ruled `lead,
@@ -715,24 +427,8 @@ either session:** the escalating session and the lead each reached this answer w
 above being cited. This record is searchable by ruling name and by discharge oracle, and neither
 index reaches *which surface wins when the close template and the class default conflict* — so the
 extension sits beside its sibling, which is the cheapest repair a record with no third index has.
-Discharge: with the 2026-08-30 machinery default, as above.
+discharge: icebox-default-over-closes-own-captures  manual with the machinery-class icebox default above, whose condition it shares
 ruling: the machinery-class icebox default over close's own captures
-
-**A hotfix's "minimal" is measured against the failure modes the change itself creates, never
-against the smallest diff — ruled `lead, own-authority` 2026-09-07, through the lead's message
-channel at that iteration's build.** The operator-ruled hotfix carve-out admits a fix that is
-"minimal and test-and-doc-complete in one commit" (CLAUDE.md §Delivery doctrine, scope-gated
-intake). The uninstall argv hotfix reached past its two named call sites, moving one of them to a
-file-mediated read so its exit status survives, and that reach is INSIDE the carve-out. **The
-ground is specific and licenses no convenient extra:** batching that site alone would have
-introduced a silent PARTIAL-roster case the single-invocation defect cannot produce — one
-invocation is all-or-nothing, while an early batch succeeding and a later one failing stages
-part of the set just as silently — so reading a real status there repairs a failure mode it would
-otherwise have created. **Refused:** taking the two sites literally and shipping that case, which
-would have made the hotfix's own diff the source of a new defect. Recorded at the close because
-it was ruled after batch A returned and batch B held the shared index.
-Discharge: none — it reads a standing carve-out rather than directing an act.
-ruling: the hotfix-minimality reach
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 
@@ -740,56 +436,19 @@ ruling: the hotfix-minimality reach
 the native gate port, ASAP.** Everything portable ports — the gates, the runners
 and the install-lifecycle scripts alike. Surviving shell is **residue justified
 case by case, never a protected category**, so "it is orchestration" is not by
-itself an answer for a script that stays.
-
-**Two grounds, and the second is the stronger one.** First, permanent dual
-maintenance: two spellings of every gate is a cost with no end date, and a
-cross-substrate parity gate earns its keep during a *transition* while as a
-steady state it only protects a duplicate that should not exist. Second,
-**cross-platform cost** — a shell dependency means Windows support is bought by
-maintaining PowerShell duplicates, the same dual-maintenance tax paid again
-along a different axis, where a native binary is one implementation across every
-platform. The second ground is load-bearing precisely because it does not depend
-on any timing measurement being right: the port's wall-clock win is small, and
-`native-gate-port-remaining-corpus` records it measured rather than assumed.
-
-**The known irreducible, recorded so it is not mistaken for non-compliance.**
-Something has to run before the binary exists on the machine, and fetching and
-executing the first artifact cannot itself be that artifact. So the **bootstrap**
-— in shell, or absorbed by the transport, since the payload already ships as an
-npm package and a Release tarball and npm can carry per-platform binaries — is
-the one place a shell dependency may be unavoidable in the strict sense. This
-records the residue; designing it is the unit's work, not this file's.
-
-**This supersedes the 2026-08-03/06 per-profile-coherence sequencing rule for the
-port's scope.** What that rule refused was a *roster-census* justification; the
-case that carries here is different in kind, the elimination of a permanent
-duplicate. **No port-candidate criterion survives as an eligibility gate**
-(gate-sdk/SPEC.md §The port-candidate criteria): the problems those criteria
-name are engineering work the port owes, not exclusions it may take.
-
-**Both install paths ship, and the disclosure boundary is untouched.** An adopter
-takes a **pre-compiled binary**, or builds from source — where *from source*
-means a developer clones the **public repository** and builds it there. Source
-does not enter the installer payload. Objective 3 therefore stands, so does the
-closed ruling below it voiding a build from vendored crate source at install
-time, and so does `check-gate-substrate-parity` assertion E, which structurally
-refuses an implementation source inside a vendoring kit root. **Operator-answered
-2026-08-09**, against the reading that the second path reopens any of the three:
-it reopens none, because what a developer builds from is the artifact that is
-public already. Recorded because the question is worth asking once and expensive
-to ask twice — the two paths sound like a disclosure change and are not one.
-
-**The port's tail — ruled 2026-08-23.** This names the **sequence** `battery-runner-port`,
-`shell-gate-tail-port`, then the bootstrap, and nothing else. **All three landed, the last
-2026-09-09**; the sequence is spent, and it was never the port's completion predicate — that is
-`--tree`'s owed count reaching zero, ruled 2026-08-28 and recorded above.
-Its honest size, measured 2026-08-24 and kept as the frozen attestation it was: the "resolve the
-platform, place the binary, invoke it" shape was roughly eighty lines of the bootstrap, and the
-roughly three hundred and fifty beside it — kit-source vendoring, manifest and lock I/O, registry
-and queue seeding, the commit flow — were conditional install logic that has since moved behind
-the invoke. After the port: **one deferred-pool triage iteration**, then
-`companion-toolkit-profile`.
+itself an answer for a script that stays. The load-bearing ground is
+cross-platform cost rather than the port's wall-clock win, which is small: a
+shell dependency buys Windows support by maintaining PowerShell duplicates,
+paying the dual-maintenance tax along a second axis, where a native binary is one
+implementation on every platform. **This supersedes the 2026-08-03/06
+per-profile-coherence sequencing rule for the port's scope** — what that rule
+refused was a *roster-census* justification, and the elimination of a permanent
+duplicate is different in kind. **No port-candidate criterion survives as an
+eligibility gate** (gate-sdk/SPEC.md §The port-candidate criteria): the problems
+those criteria name are engineering work the port owes, not exclusions it may
+take.
+discharge: complete-the-native-gate-port  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: complete the native gate port  the port track's top priority  the 2026-08-09 directive
 
 **The port-first run — ruled 2026-09-05 by the operator in consult, superseding the 2026-08-31
 port-only run and the three paragraphs that qualified it.** The port stays the track's top
@@ -840,6 +499,8 @@ triaged after the port, as one iteration** that iceboxes by class and retires wh
 or a closed ruling has mooted; joining units under the grounds above is work on the pool, not that
 triage. Discharge event: the oracle's owed count reads zero, at which point the port-cut-first
 clause is spent and this paragraph is deleted; the composition test is the kit's and stays.
+discharge: port-first-run  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: the port-first run  the port-cut-first clause  port-first
 
 **`citation-liveness-family-convergence` is carved out of the machinery-class icebox-by-default bar
 in the paragraph above — ruled 2026-09-08 by the operator, answered directly in a lead session and
@@ -876,7 +537,8 @@ may be reached for. **That bound was reached for once, by `behind-invoke-relocat
 and once is all it holds** — read in consult that day, `consult, own-authority`: the leg it schedules
 is the sequence's last member, so no own-iteration leg remains to reach for, and a later reach is
 the exception paragraph the warning named rather than a second use of this reading.
-Discharge: with the port-cut-first clause above, which this reads.
+discharge: own-iteration-leg-reading  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: the own-iteration-leg reading  the whole-window clause
 
 **The 2026-09-06 no-cut ruling on `native-gate-port-remaining-corpus` reached
 the right conclusion from a ground the disjunction above does not bear —
@@ -894,6 +556,8 @@ carries the conclusion by itself: the port's next act is
 `powershell-installer-surface`, an own-iteration leg. **So the ruling's
 conclusion is unchanged** — the disjunction asks for one limb, no cut was
 takeable, and the window was the deferred pool's, exactly as ruled.
+discharge: no-cut-ruling-ground-annotation  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: the 2026-09-06 no-cut ruling's annotated ground
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
@@ -904,8 +568,5 @@ neither absorbs the other: the sequence is what is ordered next, the owed count 
 oracle. The corpus behind that count and its decomposition are
 `native-gate-port-remaining-corpus`'s, which is why the sequence's last member being blocked
 never means the port has nothing to do.
-
-`instruction-surface-bash-focus` unblocks on a threshold rather than a date,
-per its own queue entry. Surge-channel launch stays gated behind the private
-brief's readiness rule, and launch-comms execution runs on its own clock under
-the surface that owns distribution.
+discharge: sequence-remainder-is-not-a-finished-port  bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree | grep -F ', 0 owed'
+ruling: a sequence remainder of one is not a finished port

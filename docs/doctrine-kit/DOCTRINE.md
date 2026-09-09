@@ -237,7 +237,11 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    landed in-session when the operator rules it a hotfix. The valve is bounded
    three ways: the operator rules, never the session; the fix is minimal and
    ships with its test and its owner-doc correction in the same commit, so the
-   hotfix is not a second content tier waiting for the iteration to catch up;
+   hotfix is not a second content tier waiting for the iteration to catch up —
+   and *minimal* is measured against the failure modes the change itself
+   creates, never against the smallest diff, so a fix reaching one site further
+   to avoid introducing a failure mode its own diff would create is inside the
+   valve rather than outside it;
    and the queue entry is **deleted in that commit, never moved to the done
    section** — the ruling and the entry's slug go in the commit message, which
    is the disposition. The done section is the closing iteration's ledger, and

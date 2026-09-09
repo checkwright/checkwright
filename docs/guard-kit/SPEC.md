@@ -1798,6 +1798,29 @@ as redundancy: the report names the local glob and the one probe that witnesses
 its breadth, and the operator disposes — narrow the glob, or record that the
 breadth is intended.
 
+**Which way that disposition goes has a criterion, and the criterion is security
+rather than tidiness.** Breadth is kept wherever it is safe, because an allow
+match short-circuits the permission classifier outright — a broad rule actively
+*saves* model calls rather than merely avoiding a prompt, so narrowing one costs
+something on every call it stops matching. Narrowing is warranted only where a
+**destructive form sits inside a blanket grant**: a hard reset, a working-tree
+clean, a force push, a bare `checkout --` discarding local changes. A glob broad
+only in a harmless direction is declared intended, never trimmed.
+
+**Applying the disposition is the ruling authority's, out of band, and no
+delegated session may take it.** A finding here is neither queue work nor build
+work: a session may *prepare* the edit — derive the diff, state its security
+grounds, record both — and there its remit ends. The ground is not a preference
+about who should do it but that the work is not executable where a delegated
+session runs: a permission classifier denies the edit, and a dispatched session's
+own definition forbids changing permission settings on any agent's say-so. So a
+finding resolving to *edit the allowlist* cannot be discharged by the session
+sent to discharge it, and a pipeline that plans one spends itself reaching a
+wall. The tempting alternative is refused with it: a session handing its prepared
+diff to a supervising session to apply is permission laundering, and it converts
+the permission boundary into a formality. A session that meets the refusal and
+stops has behaved correctly.
+
 The probe set is consumer config (`GUARD_KIT_BREADTH_PROBES`, §Layout and
 configuration), and it is **probes rather than a roster**: each entry is a single
 witness whose auto-allowance would be bad, not a member of a set claimed

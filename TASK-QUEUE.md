@@ -14,41 +14,6 @@
 
 ## Technical Debt
 
-- **ruling-record-shrink-to-bau** — `TRAJECTORY.md` grew from its birth size to
-  six times that in five weeks, half of it in the last week, and almost none of it is port-bound:
-  the consult binding sent every closed ruling there unqualified, so process rulings with no
-  discharge event accreted beside the pivot they were meant to accompany, and the file grew a
-  charter about editing itself. The admission test is now ruled and recorded at TRAJECTORY.md
-  §What this file admits; this unit is the sweep that brings the record under it. Three acts:
-  (1) **back-fill** — every port-bound paragraph gains a `discharge:` line whose oracle is
-  `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` reading zero owed, so the oracle-zero
-  close retires them through the ruling-staleness probe rather than by a judgment sweep the last two
-  closes deferred (`ruling-record-prose-staleness-unreachable` is its witness); (2) **relocate** —
-  every paragraph failing the test moves to its business-as-usual home undated (mechanism to the
-  owning kit SPEC, a template reading to its `.claude/commands/` binding, a standing rule to one
-  CLAUDE.md line), its provenance and refused alternatives to the relocating commit's message, and
-  every citation of the moved ruling is repointed by the derived-blast-radius rule the file states;
-  (3) **compress the head** to the reading rule, the three acts, the two declarations and the
-  admission test, the grounds behind each going to git history. The objectives section stays: it is
-  the pivot's ground and discharges with the pivot. Test: every surviving paragraph either carries a
-  `discharge:` line or reverses a recorded ruling, and the probe reports no undeclared hole.
-  **Sequencing:** scoped before the final port cut, so the oracle-zero close finds a record it can
-  retire mechanically. Product-class on the 2026-08-30 witness discriminator: the ruling-record
-  mechanism ships in lifecycle-kit and this record is its only dogfood.
-  **ONE PARAGRAPH THIS SWEEP MUST NOT REPAIR, recorded at scope 2026-09-09 so the sweeping session
-  meets it knowing rather than discovers it under pressure.** The 2026-09-07 own-iteration-leg
-  reading closes on "no own-iteration leg remains to reach for", and that ground is false:
-  `windows-roster-join` was filed seven hours later on the operator's own Windows ruling. The
-  operator ruled 2026-09-09 through the AskUserQuestion channel that the clause is NOT REACHED by
-  this iteration's composition, which leaves the false ground standing deliberately rather than by
-  oversight. Repairing it would re-open a second reach, so it changes what the ruling directs —
-  reversal wearing a correction's clothes, operator-class under the file's own third act. Back-fill
-  and compress around that sentence; do not rewrite it.
-  **Cost while deferred:** every consult and lead escalation until it lands reads the whole record
-  to find the rulings that govern, and the oracle-zero close inherits the judgment sweep this unit
-  replaces.
-  Filed 2026-09-09 by the consult session on the operator's ruling, AskUserQuestion channel.
-
 ## Deferred
 
 
@@ -276,10 +241,10 @@
   Filed 2026-09-09 by the lead on the operator's direction (AskUserQuestion channel in a lead
   session); the direction was to FILE, not to rule the fork.
 
-- **lead-ruling-reopen-authority-unstated** [design-pending] — `TRAJECTORY.md:17-21` says a recorded
-  ruling is closed and only the OPERATOR reopens one. It is silent on rulings the LEAD recorded on
-  its own authority, of which six now exist. So the surface answers who reopens an operator ruling
-  and answers nothing about the class it also sanctions.
+- **lead-ruling-reopen-authority-unstated** [design-pending] — TRAJECTORY.md's reading rule says a
+  recorded ruling is closed and only the OPERATOR reopens one. It is silent on rulings the LEAD
+  recorded on its own authority, of which six now exist. So the surface answers who reopens an
+  operator ruling and answers nothing about the class it also sanctions.
   **Why this is not merely pedantic.** The lead escalates rather than reverses a recorded ruling,
   and reversal is operator-class — that much is stated. What is unstated is whether a lead may
   reverse its OWN recorded ruling, and the two readings diverge in practice: if yes, a
@@ -584,18 +549,18 @@
   `boundary-preserve-covers-names-not-lifetimes`. It RE-FILES none of them — each keeps its own
   body, its own cost and its own candidate shapes, and a ruling either way changes where they LIVE
   and changes nothing about what any of them says.
-  **The reading FOR, quoted rather than paraphrased.** `TRAJECTORY.md`:643-645 states the test is
+  **The reading FOR, quoted rather than paraphrased.** The 2026-09-07 ruling states the test is
   conjunctive and adds "There is no live-trigger limb in it at all, so a bullet whose trigger fired
   satisfies the conjunction on its own terms and the default applies without outranking anything."
   There is no cost-opener limb in it either, so the identical sentence reads across.
-  **The counter-consideration AGAINST, which is why it is not self-answering.** The default at
-  `TRAJECTORY.md`:470 cites `queue-kit/SPEC.md` §The icebox tier's GRAMMAR — the lead-line shape —
+  **The counter-consideration AGAINST, which is why it is not self-answering.** The default in
+  `TRAJECTORY.md` cites `queue-kit/SPEC.md` §The icebox tier's GRAMMAR — the lead-line shape —
   and not the eligibility rule; and the 2026-09-07 ruling governed a machinery-class GAP BULLET,
   new intake at close where nothing is being evicted and eligibility never arises. These four are
   existing deferred entries standing at the eligibility gate, which `queue-kit/SPEC.md`:220 makes
   explicit is judged at the closing stage.
-  **SCALE, which is why the lead declined it.** `TRAJECTORY.md`:463-465 measures the machinery class
-  at roughly three deferred entries in five, so disapplying one limb across the majority of the
+  **SCALE, which is why the lead declined it.** `TRAJECTORY.md` measures the machinery class at
+  roughly three deferred entries in five, so disapplying one limb across the majority of the
   pool demotes that rule rather than applying it.
   **NOT at issue:** re-authoring a prose cost opener to a class word to unblock an eviction stays
   refused by `queue-kit/SPEC.md`:250-255, and nothing here reopens it.
@@ -712,10 +677,10 @@
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
-  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
-  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md §Porting
-  a gate to the binary substrate and §Consumer payload. **Each closed cut's record — members,
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds and its scope
+  are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's and both install paths gate-sdk/SPEC.md
+  §Consumer payload's, not restated; this entry is the work, bootstrap design included, inheriting
+  gate-sdk/SPEC.md §Porting a gate to the binary substrate. **Each closed cut's record — members,
   counts, holds, grounds, price — lives in the contract section that cut selected**, so this entry
   states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md §Consumer
   smoke, *The port disposition*).
@@ -732,12 +697,12 @@
   seam keeps its resolution, direct execution and env contract, only bundled members move in-crate;
   ground and worked case at drift-kit/SPEC.md §The extensibility contract, never analogy.
   **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a grant whose target a
-  RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing — and build drops the dead
-  lines IN THE SAME COMMIT AS THE DELETE. Scope is the files THAT COMMIT deletes, never a path
-  prefix — probe the count, one kit's quadrupled. **WIDENED 2026-09-05 (operator, in-session prompt,
-  lead-relayed): build EDITS `.claude/settings.json` ITSELF, in-cut, NO confirmation, no out-of-band
-  step** — scoped to DECOMMISSIONING BASH GATES, never a licence over that file; every settings edit
-  outside that scope stays operator-class under 2026-08-22.
+  RULED PORT CUT DELETES is OUTSIDE the permission-settings bar — a pure narrowing — and build drops
+  the dead lines IN THE SAME COMMIT AS THE DELETE. Scope is the files THAT COMMIT deletes, never a
+  path prefix — probe the count, one kit's quadrupled. **WIDENED 2026-09-05 (operator, in-session
+  prompt, lead-relayed): build EDITS `.claude/settings.json` ITSELF, in-cut, NO confirmation, no
+  out-of-band step** — scoped to DECOMMISSIONING BASH GATES, never a licence over that file; every
+  settings edit outside that scope stays operator-class under that bar.
   **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
   — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
   WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
@@ -1098,10 +1063,11 @@
   this tree's own crate, none of them reaching the network or a foreign repo.
   **Why `[design-pending]`:** what is open is not whether the four are safe but **which
   surface should carry them**. A committed `.claude/settings.json` grant is the obvious
-  answer and is **operator-class** under the 2026-08-22 ruling (TRAJECTORY.md §The closed
-  rulings), so no stage session can land it; a guard-kit rule is landable but would encode a
-  Rust toolchain's command shapes into a kit whose ruleset admits **no project's toolchain**
-  by its own stated clause. That tension is the design question, and neither horn is costed.
+  answer and is **operator-class** (CLAUDE.md §Housekeeping, grounds at guard-kit/SPEC.md
+  §compare-settings-allow), so no stage session can land it; a guard-kit rule is landable but
+  would encode a Rust toolchain's command shapes into a kit whose ruleset admits **no
+  project's toolchain** by its own stated clause. That tension is the design question, and
+  neither horn is costed.
   **Distinct from the parent**, whose subject is a redirect target no settings rule can
   express, and from `guard-grant-review`, retired, whose subject is narrowing grants that already
   exist rather than minting ones that do not.
@@ -2635,7 +2601,7 @@
   that the substrate is a parameter.
   **Boundary against the two questions already settled, so this one does not sprawl:**
   how a compiled gate *arrives* and what it *discloses* are both ruled and recorded
-  (TRAJECTORY.md §The closed rulings; gate-sdk/SPEC.md §Consumer payload). What stays
+  (gate-sdk/SPEC.md §Consumer payload, which owns both). What stays
   open is what a gate *is* independent of substrate, and that is this entry alone. The
   distinction it supplies outlived those rulings and is why it was worth keeping — a
   descriptor discloses a gate's **shape** without its **predicate**, which is the line
@@ -5148,10 +5114,10 @@
 
 - **born-native-flip-enforcement-gate** [design-pending] — the born-native default is held by
   discipline alone, and the cheapest enforcing shape is now priced rather than refused.
-  **This is the enforcement residue of a closed ruling, not a challenge to it.** TRAJECTORY.md
-  §The closed rulings records the 2026-08-14 flip; gate-sdk/SPEC.md §The port-candidate
-  criteria states the ground as **cost rather than impossibility** and files the disposition
-  here rather than flagging and skipping it.
+  **This is the enforcement residue of a closed ruling, not a challenge to it.**
+  gate-sdk/SPEC.md §The port-candidate criteria records the born-native flip and states the
+  ground as **cost rather than impossibility**, filing the disposition here rather than
+  flagging and skipping it.
   **What changed at the merge, and it was measured rather than reasoned.** The shape was first
   refused on the ground that no discriminator exists while the port runs — a newly authored
   shell gate being indistinguishable from one still awaiting its port. A build session probed
@@ -6659,7 +6625,8 @@
   **The filter under-selects silently rather than mis-selecting**, which is why no gate ever
   reddened on it: an entry whose cost is genuinely low but whose field opens "the" is invisible
   to the eviction worklist forever, and nothing distinguishes that from a costly entry. So the
-  2026-08-23 ruling lowering the age floor to seven days bought less than it looks — the age
+  ruling lowering the age floor to seven days (`scripts/queue-config.sh`) bought less than it
+  looks — the age
   axis widened while the cost axis stayed shut over most of the rows.
   **Enforcement-first shape, unruled:** a controlled opener vocabulary gated over the
   `## Deferred` section, plus a one-time reclassification sweep of the existing fields. Class:
@@ -6674,7 +6641,7 @@
   printing its cause rather than dropping it (queue-kit/SPEC.md §The queue-index arm). This is
   the *cost* predicate producing too few rows to mark; one surface, and neither subsumes the other.
   **Cost while deferred:** the eviction worklist derives from about a sixth of the pool, so the
-  8:1 intake-to-exit ratio the 2026-08-23 ruling acted on has no lever reaching the rest.
+  8:1 intake-to-exit ratio that ruling acted on has no lever reaching the rest.
   Filed 2026-08-23 by the consult held after `leak-guard-and-assertion-meta-gate-port` closed,
   and promoted out of the gap inbox at the following scope intake on the same date.
 
@@ -7308,8 +7275,8 @@
   guard-kit/SPEC.md §The generic ruleset rules 16 and 17 and §scan-prompts, not restated here.
   **WHAT KEEPS THIS ENTRY ALIVE IS TWO THINGS, and neither is design this project can self-serve.**
   **(1) A PREPARED SETTINGS DIFF AWAITS OUT-OF-BAND OPERATOR APPLICATION**, recorded here under
-  TRAJECTORY.md §The closed rulings (2026-08-22), which lets a stage session derive a diff and
-  state its grounds and ends its remit there. Six committed `permissions.allow` entries:
+  guard-kit/SPEC.md §compare-settings-allow, which lets a session derive a diff and state its
+  grounds and ends its remit there. Six committed `permissions.allow` entries:
   `Bash(date *)`, `Bash(find *)`, `Bash(git merge-base *)`, `Bash(git config *)`, `Bash(mkdir *)`,
   and `Bash(: > .workflow/subagent-stop-liveness.log)`. SECURITY GROUNDS: the first five are
   read-only or scratch-creating, take no path outside the tree that a `*` does not already reach in
@@ -8312,8 +8279,8 @@
   so blessing the ungranted spelling would bless a form the repo has already chosen against. The
   shape is the existing bash-guard steers for decorated allowlisted commands
   (`scripts/bash-guard.sh` over guard-kit's generic ruleset). Because the deliverable is guard-kit
-  rule code rather than an edit to `.claude/settings.json`, TRAJECTORY.md §The closed rulings'
-  2026-08-22 bar on scope promoting a permission-settings edit does not reach it — stated here so
+  rule code rather than an edit to `.claude/settings.json`, the permission-settings bar
+  (CLAUDE.md §Housekeeping) does not reach it — stated here so
   a later reader does not re-derive the question.
   **Why `[design-pending]`:** whether the steer is a rule 6 narrowing, a new generic rule, or a
   consumer-side rule is unruled, and rule 15's consumer-vocabulary refusal bears on the choice.
@@ -9449,19 +9416,19 @@
   — TRAJECTORY.md's recording rule does not merely permit the provenance class the seam sweep
   removes; at least once it POSITIVELY ASSIGNS a closed ruling's ownership to a kit SPEC, which
   is the class's stated cause rather than one of its instances.
-  **The attested instance, read verbatim at spec 2026-09-05.** TRAJECTORY.md:118-130 records
-  the Rust-versus-Go refusal and the bash-portability-floor costing as "recorded at
-  gate-sdk/SPEC.md §The decisions this substrate already closed, **which owns them because the
-  component that depends on them must be readable alone**", and gate-sdk/SPEC.md:2251-2253
-  states the arrangement from the other side. It is a deliberate, reasoned, two-sided
-  assignment — not drift.
-  **The general rule behind it is TRAJECTORY.md:43-47:** "a ruling whose mechanism already has
-  a canonical home is registered here with a pointer to that home rather than restated". That
-  is one-owner-per-fact applied to rulings, and it is right about mechanism; what it does not
-  say is that a ruling's DATE, AUTHORITY and REFUSAL GROUNDS may not follow the mechanism into
-  a payload-facing file. Sessions read the silence as licence, which
-  `kit-spec-provenance-seam-sweep` recorded as how the whole class arrived; that slug retired
-  2026-09-05 and `kit-spec-provenance-seam-sweep-remainder` is the surviving surface.
+  **BOTH ANCHORS ARE RETIRED BY `ruling-record-shrink-to-bau`, 2026-09-09, and the entry is
+  corrected rather than left pointing at deleted prose.** The attested instance was the ruling
+  record's two pointer paragraphs — the Rust-versus-Go refusal and the bash-portability-floor
+  costing, assigned to gate-sdk/SPEC.md §The decisions this substrate already closed "because
+  the component that depends on them must be readable alone". That sweep deleted both, the home
+  carrying them unchanged, so the assignment stands while the paragraph asserting it is gone.
+  **The general rule it quoted went with them**: "a ruling whose mechanism already has a
+  canonical home is registered here with a pointer to that home rather than restated" was the
+  §Where the grounds live sentence, and the admission test that replaced it splits mechanism
+  from provenance in terms — mechanism to the owning kit SPEC with its engineering grounds and
+  undated, and date, authority, channel and refusals to the landing commit. What this entry
+  asked for is therefore ANSWERED IN THE RULE and open only in the tree; whether that is enough
+  is the doctrine call below, and the entry's disposition is next scope's.
   **Why `[design-pending]`:** the shape is a doctrine call with at least three candidates — the
   rule gains a clause splitting mechanism from provenance; or a kit SPEC may host a ruling's
   mechanism while TRAJECTORY.md keeps its stamp; or the readable-alone objection is answered
@@ -9676,9 +9643,9 @@
   **Why `[design-pending]`, and it is why this is not fix-shaped.** `native/src/` carries no
   signal handling anywhere and `native/Cargo.toml:14-16` lists one dependency, `serde_json` — so a
   SIGTERM trap costs either a new dependency or raw unsafe `sigaction`, and the crate's dependency
-  BAR is engineering judgment gate-sdk/SPEC.md owns (TRAJECTORY.md's 2026-08-14 ruling removes the
-  prohibition, never the bar). Two further undecided shapes: whether cleanup belongs to the
-  producer at all rather than to a reaper the boundary check already implies, and whether the
+  BAR is engineering judgment gate-sdk/SPEC.md owns, which removes the no-dependency prohibition
+  without touching that bar. Two further undecided shapes: whether cleanup belongs to the producer
+  at all rather than to a reaper the boundary check already implies, and whether the
   consumer-smoke library owes the same trap.
   **Deferred rather than active BY RULING, not by ranking.** Under the port-first run that
   superseded the port-only one it meets none of the three joining grounds, and no run has ever
@@ -10793,5 +10760,6 @@
 
 - smoke-harness-mapfile-inherits-host-line-terminator
 - windows-roster-join
+- ruling-record-shrink-to-bau
 
 ## Lessons Learned

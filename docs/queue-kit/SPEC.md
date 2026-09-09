@@ -173,6 +173,12 @@ ruling that did. Both routes are instances and neither is a class needing its
 own state. They are enumerated because the criteria are phrased as supersession,
 so a session holding a duplicate merge will not recognise itself in them.
 
+**One entry is outside every exit above: a `[roadmap:]`-tagged one.** Reversing
+it stays the ruling authority's, and no drain may retire it — not by the done
+exit, not by the icebox, not as a wontfix. The tag is a standing statement about
+direction rather than a property of the work, so a session judging the work
+finished or unnecessary is judging the wrong thing.
+
 **Distinct from this tier, which is the reason a merged duplicate does not land
 here.** The icebox holds *unbuilt* work that stays promotable and dormant. An
 absorbed duplicate is not dormant, it is redundant: there is nothing to promote

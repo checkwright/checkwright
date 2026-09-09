@@ -172,6 +172,11 @@ load behind that trigger, so they are not resident here.
   assume the operator. Never as a `ruled:` declaration line, which is retired
   (queue-kit/SPEC.md §The tag algebra owns the form, lifecycle-kit/SPEC.md
   §The state machine the timing).
+- **A permission-settings edit is the operator's, applied out of band** — never
+  build work, never queue work, and never promoted by scope; a session prepares
+  the diff and states its security grounds and stops there. Criterion, grounds
+  and the refused hand-it-up alternative: guard-kit/SPEC.md
+  §compare-settings-allow.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit; its chrome, page-authoring rules,
   generated projections and docs gate roster live in the load-triggered

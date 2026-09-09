@@ -94,8 +94,8 @@ release-sweep first, its boundary-only sub-procedure) when any of:
 - **A security or supply-chain fix** in the batch. Reaching users late is the
   whole cost being avoided.
 - **Explicit operator direction**, recorded in the disposition line's basis.
-- **The channel's audience arriving** — the launch TRAJECTORY.md gates behind
-  the private brief's readiness rule. The accumulated `deferred:` floor ships as
+- **The channel's audience arriving** — the launch the private brief's own
+  readiness rule gates. The accumulated `deferred:` floor ships as
   one release there rather than as a backfilled run of tags nobody read.
 
 Otherwise stamp the disposition line's deferral form (lifecycle-kit/SPEC.md

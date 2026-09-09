@@ -409,15 +409,22 @@ roster is what each caller derives.
 
 One part of an install must be written in whatever language the host already
 runs: the bootstrap that resolves, verifies and executes the gate binary.
-Everything else is **conditional install logic**, and
-TRAJECTORY.md's interpreter policy (§The closed rulings) rules that everything
-conditional belongs on the far side of that invoke — written once, in Rust,
-rather than twice, in bash and in the PowerShell half a native Windows install
-needs. **That relocation has landed**: the bootstrap below is the whole of the
+Everything else is **conditional install logic**, and the **interpreter policy**
+rules that everything conditional belongs on the far side of that invoke —
+written once, in Rust, rather than twice, in bash and in the PowerShell half a
+native Windows install needs. The policy binds the bootstrap's *shape* rather
+than its existence: its whole job is resolve the platform, place the matching
+binary, invoke it, which is small enough to be written twice. **That relocation
+has landed**: the bootstrap below is the whole of the
 shell, and every verb is an arm of the binary it invokes. This
 section states the bootstrap's job, the disposition every install step carries,
 and the test that assigns one, so a step's side of the line is read off a rule
 rather than re-argued per step.
+
+**Two standing obligations survive the relocation**, and they bind every unit
+that touches the install path: **add no new shell-only install step**, and
+**assume no POSIX shell**. Both are the policy's, not this section's, and they
+outlive the landing that discharged the relocation itself.
 
 **The bootstrap's job is the whole of what is written twice:**
 
@@ -458,7 +465,9 @@ moment*:
 **How the port oracle reads those three values — ruled 2026-08-31 by the
 operator in consult, so a cut can cite this section as its stated contract.**
 The section is a two-sided port disposition. `bootstrap` is the port's
-irreducible (TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence). A
+irreducible, and it is irreducible in the strict sense: something must run
+before the binary exists on the machine, and fetching and executing the first
+artifact cannot itself be that artifact. A
 file whose *whole* body is bootstrap steps declares `# no-port:` citing this paragraph, and that is the
 only `no-port` cause `installer/` may carry. `behind-invoke` is a **port
 obligation**: a file carrying any such step stays `owed` in

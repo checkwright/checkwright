@@ -2278,10 +2278,9 @@ Two questions behind the port are settled. Both are recorded here because the
 only surface that ever held them was a queue entry, a compression dropped each,
 and each was then restated from memory rather than read — so this subsection is
 the two of them landing where the component that depends on them can be read
-alone. Reading them does not reopen them. The project-wide register of closed
-rulings is TRAJECTORY.md, which points here for these two rather than restating
-them; the authoring rule that would have prevented both losses is stated where
-it belongs, queue-kit/SPEC.md §check-queue-entry-budget, rather than here.
+alone. Reading them does not reopen them, and this section is their only home;
+the authoring rule that would have prevented both losses is stated where it
+belongs, queue-kit/SPEC.md §check-queue-entry-budget, rather than here.
 
 **The substrate language is Rust — ruled 2026-08-02, final.** The alternative
 weighed and refused is **Go**, on three grounds: larger binaries, poorer memory
@@ -7804,6 +7803,27 @@ attestation is the outstanding ground: the checksum proves transfer only.
 Withholding the sources changes what that attestation is worth rather than what
 it says — while sources shipped it was a supply-chain nicety, and with sources
 withheld it is the consumer's only remaining basis for trust.
+
+**The bound that puts on prose is exact and is not a hedge to be softened
+later:** a governed surface may say *verified against a published digest* and
+may **not** say *reproducible*. Those are claims about two different properties,
+and the weaker of them is the only one this floor earns.
+
+**Building from vendored crate source at install time is void**, and it is
+recorded as void rather than left merely unimplemented, so a session reaching for
+the cheap answer finds it already costed. It adds a Rust toolchain to the very
+dependency floor the prebuilt payload exists to collapse, it is unreachable for
+a non-technical adopter, and it ships the implementation source the payload
+withholds.
+
+**Both install paths ship, and the second leaves the disclosure boundary
+untouched.** An adopter takes a **pre-compiled binary**, or builds from source —
+where *from source* means a developer clones the **public repository** and builds
+it there. Source never enters the installer payload, so the second path reopens
+neither the withholding above nor §check-gate-substrate-parity assertion E, which
+structurally refuses an implementation source inside a vendoring kit root: what a
+developer builds from is the artifact that is public already. Stated because the
+two paths sound like a disclosure change and are not one.
 
 **The rule is held by structure, not by discipline.** It is violated
 structurally — a ported gate's implementation source reaching the vendoring set,
