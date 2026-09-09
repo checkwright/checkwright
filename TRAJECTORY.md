@@ -261,12 +261,11 @@ because the binary cannot select itself — that bootstrap is the irreducible
 interpreter surface. Objective 6 binds its *shape* rather than its existence:
 its whole job is resolve the platform, place the matching binary, invoke it,
 which is small enough to be written twice. Everything conditional belongs on
-the far side of that invoke, and today most of it is not there yet — the
-measurement is recorded with the tail sequence below. Two standing obligations
-follow, and they bind every unit that touches the install path: **add no new
-shell-only install step**, and assume no POSIX shell. The Windows half shipped
-2026-09-07; moving the remaining conditional steps behind the invoke is still
-`powershell-installer-surface`'s — one entry owns the whole bootstrap.
+the far side of that invoke, and as of 2026-09-09 it is: `installer/lib/` is
+deleted and both bootstraps do nothing but resolve, place and invoke. Two
+standing obligations survive the landing, and they bind every unit that touches
+the install path: **add no new shell-only install step**, and assume no POSIX
+shell.
 
 **Opacity is taken on deliberately, and it carries an obligation.** A consumer
 who cannot read the gate has only the publisher's word for what it does, so the
@@ -708,48 +707,6 @@ it was ruled after batch A returned and batch B held the shared index.
 Discharge: none — it reads a standing carve-out rather than directing an act.
 ruling: the hotfix-minimality reach
 
-**The bootstrap has one success path: `substrate-unavailable` becomes a refusal with the
-relocation, all five verbs move behind the invoke, and omit-and-declare retires at install — ruled
-2026-09-09 in the consult session the operator convened for the question (an AskUserQuestion in a
-lead session, answered "put it to /consult", lead-relayed). The reading is the consult's own,
-`consult, own-authority` under that direction, and was not an answer the operator gave when it was
-first recorded here. **The operator has since RATIFIED it as their own, 2026-09-09, through the
-AskUserQuestion channel in a lead session and lead-relayed** — put to them on the ground that
-`consult` names no authority in CLAUDE.md's `operator`/`lead` roster, so the reading needed one. It
-therefore stands as an operator ruling resting on a consult's reasoning, and both facts are load-
-bearing: the reasoning is answerable to the consult, the standing is the operator's. The operator
-reopens it like any ruling here.** The relocation's precondition (installer/README.md §The install
-boundary) sequenced the unconditional remainder of `init` behind the roster covering every
-**supported** platform, and at HEAD it does — the platform block declares three triples, all
-`joined`, none `held` — so the population that precondition protected, a supported platform with no
-artifact, is empty; and docs/install.md §Requirements now states that an unsupported platform is
-absent rather than held, because a held entry is a support claim. The only host omit-and-declare
-still reaches is one the project declares no support for, and refusing it an install is not refusing
-an install the project promised. **Native Windows is that host, and the ruling makes it no worse**:
-the PowerShell bootstrap already declares and stops there with nothing behind it, at exit 0 — a
-silent non-install this turns into an honest refusal — and the unit's own obligation, a
-`checkwright init` completing through PowerShell, is what the `x86_64-pc-windows-msvc` join waits
-on, since `native/targets.list`'s predicate wants a leg that reached the artifact-present completion
-and the PowerShell leg's own verdict block owes that to this relocation. The relocation is a
-precondition of serving native Windows, never its consequence. Three alternatives were refused.
-**The same cut sequenced behind publishing the Windows artifact first** is circular through the leg
-that matters and needs an operator support claim on docs/install.md before any run could count, so
-it holds the port's last member behind a decision no iteration can take, and empties this one.
-**Omit-and-declare surviving** keeps a second install implementation in bash beside the Rust one —
-the permanent dual maintenance the PRIORITY DIRECTIVE's first ground names — leaves `installer/lib/`
-owed for as long as it lives, and so makes the 2026-08-28 literal completion predicate unreachable
-by construction. **Narrowing the unit to steps already behind artifact selection** measures as
-near-empty and discharges neither the payload-coverage obligation nor the interpreter policy's. Two
-bounds on the reach. The selection table keeps three outcomes, told apart by message and remedy and
-not by exit status alone — an undeclared host and a broken payload stay different answers. And
-the vocabulary spans two mechanisms: the installer's selection outcome, which retires with both
-reason tokens, and gate-sdk's reason-agnostic `# omitted:` registry class, kit mechanism that stays;
-the amendment must not conflate them. The mechanism — the one-success-path bootstrap, the verb
-roster owned by the binary, `--toolfloor-parity` retiring with its second holder — is
-installer/README.md's to state, undated.
-discharge: bootstrap-one-success-path test ! -e installer/lib && echo relocated
-ruling: bootstrap-one-success-path substrate-unavailable-refusal
-
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
@@ -797,15 +754,15 @@ public already. Recorded because the question is worth asking once and expensive
 to ask twice — the two paths sound like a disclosure change and are not one.
 
 **The port's tail — ruled 2026-08-23.** This names the **sequence** `battery-runner-port`,
-`shell-gate-tail-port`, then the bootstrap, and nothing else: the first two landed, so the
-sequence's remainder is **one** member, `powershell-installer-surface`, whose Windows half
-shipped 2026-09-07 and whose remainder is the relocation of every conditional install step behind
-the invoke. Its honest size,
-measured 2026-08-24: the "resolve the platform, place the binary, invoke it" shape is roughly
-eighty lines of `installer/lib/init.sh`, and the roughly three hundred and fifty beside it —
-kit-source vendoring, manifest and lock I/O, registry and queue seeding, the commit flow — are
-conditional install logic not yet behind the invoke. After the port: **one deferred-pool triage
-iteration**, then `companion-toolkit-profile`.
+`shell-gate-tail-port`, then the bootstrap, and nothing else. **All three landed, the last
+2026-09-09**; the sequence is spent, and it was never the port's completion predicate — that is
+`--tree`'s owed count reaching zero, ruled 2026-08-28 and recorded above.
+Its honest size, measured 2026-08-24 and kept as the frozen attestation it was: the "resolve the
+platform, place the binary, invoke it" shape was roughly eighty lines of the bootstrap, and the
+roughly three hundred and fifty beside it — kit-source vendoring, manifest and lock I/O, registry
+and queue seeding, the commit flow — were conditional install logic that has since moved behind
+the invoke. After the port: **one deferred-pool triage iteration**, then
+`companion-toolkit-profile`.
 
 **The port-first run — ruled 2026-09-05 by the operator in consult, superseding the 2026-08-31
 port-only run and the three paragraphs that qualified it.** The port stays the track's top
