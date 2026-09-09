@@ -105,10 +105,9 @@ an engineering-craft section behind the link:
 - **Probe-before-assertion** — a claim one cheap command would settle is probed before it is asserted; relaying an unverified premise is asserting it.
 <!-- doctrine-kit:end -->
 
-**Gap disposition, repo-local** (outside the generated span, which the installer rewrites) —
-close's drain tries fix, then icebox, then promote (lifecycle-kit/SPEC.md §The committed gap
-inbox), and a delivery-machinery finding blocking no stage entry or push is icebox-class by
-default — that class and its witness discriminator are TRAJECTORY.md's, 2026-08-30.
+**Gap disposition, repo-local** (outside the generated span, which the installer rewrites) — a
+delivery-machinery finding that blocks no stage entry or push is icebox-class by default; the
+class and its witness discriminator are TRAJECTORY.md's, 2026-08-30.
 
 ## Conventions established in gate-sdk (keep every kit consistent)
 

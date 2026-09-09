@@ -3184,17 +3184,16 @@ ruling: <name>[  <name>…]
 discharge: <name>  <oracle>
 ```
 
-**The operand separator is a two-space run in both grammars, and it is stated in
-words because the fence cannot show it.** A ruling's name carries single spaces
-by construction — it is the noun other surfaces use — so only a doubled space can
-end one, and a `ruling:` list written with single spaces parses as one long name
-rather than as the list its author meant. `discharge:` falls back to a single
-space when no doubled one is present, which is a convenience for a one-word slug
-and *not* a second grammar: a multi-word name written that way takes the fallback
-and silently surrenders its own tail to the oracle. The malformed band's messages
-spell the same two-space run, so a declaration that trips the reader is told the
-rule; a declaration that parses wrongly is told nothing, which is why the
-rendering above being ambiguous was worth correcting rather than annotating.
+**The operand separator is a two-space run in both grammars, stated in words
+because the fence cannot show it.** A ruling's name carries single spaces by
+construction — it is the noun other surfaces use — so only a doubled space can end
+one, and a `ruling:` list written with single spaces parses as one long name
+rather than the list its author meant. `discharge:` falls back to a single space
+when no doubled one is present, a convenience for a one-word slug and *not* a
+second grammar: a multi-word name written that way takes the fallback and
+surrenders its own tail to the oracle. Neither mistake reports — both parse —
+which is why the run is spelled here and in the malformed band's messages rather
+than left to a rendering.
 
 `ruling:` names the ruling in the words other surfaces use for it — **one or
 more names, appended and never rewritten** — and exists for the *citing* side.
