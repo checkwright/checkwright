@@ -869,7 +869,11 @@ C="$(consumer jq-less)" || fail "could not build a scratch consumer for the jq-l
 # spec: installer/README.md §init — init is the one verb here that DOES refuse, and not for a reason of its own: jq is a consumer-audience member of the toolchain floor, so a jq-less machine is below contract and init's last precondition is doctor's verdict. The refusal an adopter meets on this machine is therefore the floor's, delivered before anything is written, rather than a JSON reader's
 assert_jq_blocked() {   # $1 = a label for the message, $2 = consumer dir, $3.. = the verb and its argv
     local label="$1" dir="$2"; shift 2
-    local out rc
+    local out rc before status lock_before lock_after
+    # spec: installer/README.md §init — "nothing written" is asserted as a DIFFERENCE across the refusal and never as the absence of a manifest, because this arm asserts the same refusal against a tree that already carries one: an absence test passes by accident on the first call and reds on the second for a manifest an earlier install wrote, which is a fact about the arm's ordering rather than about the refusal
+    before="$(git -C "$dir" rev-parse 'HEAD^{tree}')"
+    status="$(git -C "$dir" status --porcelain)"
+    lock_before=""; [[ ! -f "$dir/checkwright.lock" ]] || lock_before="$(digest_of "$dir/checkwright.lock")"
     out="$( cd "$dir" && PATH="$JQ_PATH" "${ENTRY[@]}" "$@" 2>&1 )"; rc=$?
     [[ "$rc" -eq 1 ]] \
         || { printf '%s\n' "$out" >&2; fail "$label exited $rc on a jq-less machine, not the 1 doctor's below-contract verdict carries into it"; }
@@ -877,9 +881,10 @@ assert_jq_blocked() {   # $1 = a label for the message, $2 = consumer dir, $3.. 
         || { printf '%s\n' "$out" >&2; fail "$label refused on a jq-less machine without naming the toolchain floor as the reason — it found some other objection ahead of the precondition an adopter must actually fix"; }
     grep -qE '^  jq +NOT FOUND' <<<"$out" \
         || { printf '%s\n' "$out" >&2; fail "$label refused on the floor without rendering the report that names jq as the missing member, so an adopter is told to fix a floor and not which part of it"; }
-    [[ ! -f "$dir/checkwright.lock" ]] \
-        || fail "$label refused on the toolchain floor and left a manifest behind — the verdict is a precondition, so nothing is written"
-    say "$label: blocked by doctor's floor verdict naming jq, nothing written, exit 1"
+    lock_after=""; [[ ! -f "$dir/checkwright.lock" ]] || lock_after="$(digest_of "$dir/checkwright.lock")"
+    [[ "$(git -C "$dir" rev-parse 'HEAD^{tree}')" == "$before" && "$(git -C "$dir" status --porcelain)" == "$status" && "$lock_before" == "$lock_after" ]] \
+        || fail "$label refused on the toolchain floor and changed the consumer — the verdict is a precondition, so the refusal writes nothing"
+    say "$label: blocked by doctor's floor verdict naming jq, consumer unchanged, exit 1"
 }
 
 # spec: installer/README.md §init — on a tree with no manifest there is nothing yet to read, so this is the case that isolates the floor refusal from every manifest question
