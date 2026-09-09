@@ -876,23 +876,40 @@ printf 'jq-less arm (%s, jq absent from the verbs'\'' PATH)\n' "$PROFILE_MIN"
 JQFARM="$SCRATCH/jqfarm"
 mkdir -p "$JQFARM"
 IFS=: read -ra jq_path_dirs <<<"$PATH"
+# spec: installer/README.md §The consumer smoke — a directory is FARMED only when it actually carries a jq, and every other one is kept on the arm's PATH verbatim. Farming the whole of PATH was correct where a link is a link and free, and it is neither on a host whose `ln -s` deep-copies: it copies every executable on the system PATH into scratch, and the copies are then the only thing on PATH, so a relocated binary looks for the runtime library beside it and does not find it. Keeping the untouched directories removes both at once and takes nothing away from the mask, because a directory with no jq in it cannot put jq back
+# spec: installer/README.md §The consumer smoke — one rule decides both the skip and the farm's exclusion, spelled once here, because a detector that disagreed with the excluder would farm a directory and then link its jq straight back in. The rule is the STEM, case-folded, and never the bare name: on a host carrying an executable suffix a literal `jq` matches no file, and the suffix is not one value to strip — the shell resolves `.exe` where the crate's own PATH search reads `PATHEXT` and would find a `.cmd` this arm had left behind. Stripping at the first dot covers every member of that set without this surface naming any of them, which is also why no suffix accessor is read here: the question is not what THIS host appends to an artifact
+jq_is_jq() {   # $1 = a file name -> 0 when it names the jq program under any extension this or any host resolves
+    local n="${1##*/}"
+    n="${n%%.*}"
+    [[ "${n,,}" == jq ]]
+}
+JQ_KEEP=()
 for jq_d in "${jq_path_dirs[@]}"; do
     [[ -d "$jq_d" ]] || continue
+    jq_here=0
+    for jq_f in "$jq_d"/*; do
+        jq_is_jq "$jq_f" || continue
+        jq_here=1; break
+    done
+    if [[ "$jq_here" -eq 0 ]]; then JQ_KEEP+=("$jq_d"); continue; fi
     for jq_f in "$jq_d"/*; do
         jq_b="${jq_f##*/}"
-        [[ "$jq_b" == jq ]] && continue
+        jq_is_jq "$jq_f" && continue
         [[ -x "$jq_f" && ! -d "$jq_f" ]] || continue
         [[ -e "$JQFARM/$jq_b" ]] && continue
         ln -s "$jq_f" "$JQFARM/$jq_b" 2>/dev/null
     done
 done
+# spec: installer/README.md §The consumer smoke — the kept directories go AFTER the farm rather than before, so a program present in both resolves to the original the host installed and not to the farm's stand-in for it. That ordering is free here because the mask does not depend on it: jq is absent from the farm by construction and from every kept directory by the test above, so no order can put it back
 JQ_PATH="$JQFARM"
+for jq_d in ${JQ_KEEP[@]+"${JQ_KEEP[@]}"}; do JQ_PATH="$JQ_PATH:$jq_d"; done
 # spec: installer/README.md §The consumer smoke — the mask is proved in both directions, for the reason the other two masks are proved in one: a PATH that failed to drop jq would assert nothing while passing, and a farm that failed to populate would make every verb fail for the wrong reason and pass this arm on a refusal that has nothing to do with jq. So jq must be gone and a control program must still resolve
 [[ -z "$( PATH="$JQ_PATH" bash -c 'command -v jq' 2>/dev/null )" ]] \
     || fail "the mask did not take: jq still resolves under the arm's PATH"
-[[ -n "$( PATH="$JQ_PATH" bash -c 'command -v git' 2>/dev/null )" ]] \
-    || fail "the jq-less farm resolves no git — it did not populate, so every verb below would refuse for a reason that is not jq"
-say "mask: jq resolves to nothing, and the farm still resolves git"
+# spec: installer/README.md §The consumer smoke — the control RUNS its program rather than resolving it, because `command -v` is a stat and the failure it has to catch is a PATH whose entries resolve and will not execute. A farm of relocated binaries satisfies a stat and dies on exec, and the arm would then red four assertions later at a verb, naming jq for a fault that has nothing to do with jq — which is the exact misattribution this control exists to prevent
+PATH="$JQ_PATH" git --version >/dev/null 2>&1 \
+    || fail "the jq-less farm's git will not run — the arm's PATH resolves entries this host cannot execute, so every verb below would refuse for a reason that is not jq"
+say "mask: jq resolves to nothing, and the farm's git still runs"
 
 # spec: installer/README.md §The consumer smoke — the JSON-reading verbs are asserted to SUCCEED here, which is the whole inversion: a verb that still shelled out to jq would fail on this PATH, and one that reads the manifest in-process cannot tell the difference. The label is carried so a red names which verb reached for a program that is not there
 assert_jq_free() {   # $1 = a label for the message, $2 = consumer dir, $3.. = the verb and its argv

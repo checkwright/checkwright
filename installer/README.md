@@ -2328,6 +2328,39 @@ that upload, normalized it and handed it to the smoke through
 and MSYS's runtime accepts it — measured, and the reason no `cygpath` guard was
 added there on the way past.
 
+*Round 25 closed the terminator question on the only host that asks it.* Run
+`34368000890`, job `102522579646`: the leg ran **34 minutes** against two to four
+on every round before it, and the kits read declared and PASSED at every profile
+and hop — `1 of 1`, `8 of 8`, `2 of 2`, and `12 of 12` three times. The count
+fires and the stored value is stripped, which is what no earlier round could get
+both of. The class this section has tracked since round 19 is closed on
+measurement rather than on argument.
+
+*It closed by getting far enough to find the next one, which is the shape of this
+leg and not a surprise.* Nine of the suite's fourteen arms ran, and the tenth —
+the **jq-less arm** — failed at its own mask: `the mask did not take: jq still
+resolves under the arm's PATH`. The farm excluded a basename equal to the literal
+`jq`, and the program on that host is `jq.exe`, so the farm linked it in and the
+shell's suffix resolution handed it back. Read that beside the two shim masks,
+which passed: those PREPEND a directory and win on lookup order whatever the real
+program is called, where this one REPLACES `PATH` and is wrong the moment its
+exclusion misses. It is the only one of the three whose correctness depends on a
+name matching a file that already exists.
+
+*The repair changes what the exclusion matches and what gets farmed at all, and
+the second of those was not visible from the failure.* The exclusion becomes the case-folded
+**stem** — which covers `.exe` and equally the `.cmd` the shell would not resolve
+but the crate's own `PATHEXT` search would, without this surface naming any
+suffix. And a directory is farmed **only when it carries a jq**, every other one
+staying on the arm's `PATH` verbatim: farming all of `PATH` is free where a link
+is a link, and on a host whose `ln -s` deep-copies it relocates every executable
+on the system into scratch, leaving those copies unable to find the runtime
+library that used to sit beside them. The control that should have caught that
+was a `command -v`, which is a stat and is satisfied by an entry that will not
+execute; it now RUNS its program, so a farm of unusable entries reds immediately
+and by name instead of surfacing four assertions later as a verb that appears to
+want jq.
+
 *The free log read is gated on the run, not on the job, and the way past that is
 a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still
 in progress; logs will be available when it is complete` even when the Windows

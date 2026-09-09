@@ -333,6 +333,19 @@ jobs:
           shim="$probe/host/node_modules/.bin/probe-cli"
           if [[ -x "$shim" ]]; then echo "[[ -x ]] holds on the shim"; else echo "[[ -x ]] FAILS on the shim"; fi
           "$shim" || echo "the shim would not execute — installer/bin/checkwright.sh is unreachable this way"
+          # `ln -s` is what the jq-less arm's mask farm is built out of, and MSYS is
+          # widely held to deep-copy rather than link. The arm no longer depends on
+          # the answer — it keeps every jq-free PATH directory on PATH instead of
+          # relocating it — but the answer is a standing unknown that costs a round
+          # to buy later and nothing to buy here, and a COPY is what makes a farmed
+          # binary unable to find its runtime library beside it.
+          echo "== ln -s, which the jq-less mask farm is made of =="
+          ln -s "$(command -v git)" "$probe/git-link" 2>&1
+          if [[ -L "$probe/git-link" ]]; then
+            echo "ln -s creates a real symlink"
+          else
+            echo "ln -s COPIED: $(wc -c < "$probe/git-link" 2>/dev/null || echo '<absent>') bytes"
+          fi
           echo "== the tracked symlink the payload carries =="
           link="$(git ls-files -s | awk '$1 == "120000" { print $4; exit }')"
           echo "tracked symlink: ${link:-<none>}"
