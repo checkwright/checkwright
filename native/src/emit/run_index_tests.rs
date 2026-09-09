@@ -76,13 +76,10 @@ fn execute(update: bool) -> Result<i32, String> {
         harness: 0,
     };
 
-    // spec: context-kit/SPEC.md §Testing — the golden-held checks in the shell driver's order,
-    // the still-shell sibling among them spawned exactly as a ported arm is: a spawn is a process
-    // boundary, which is that section's own discriminator.
+    // spec: context-kit/SPEC.md §Testing — the golden-held checks in the shell driver's order.
     let sample_md = format!("{}/sample.md", corpus);
     let sample_rs = format!("{}/sample.rs", corpus);
     let sample_ts = format!("{}/sample.ts", corpus);
-    let cases = format!("{}/index-tests/toolfloor-cases.sh", kit);
     r.check("md-index", "md-index.txt", &["--emit", "md-index", &sample_md], &[])?;
     r.check(
         "md-section",
@@ -97,7 +94,6 @@ fn execute(update: bool) -> Result<i32, String> {
         &["--emit", "pub-index", &sample_ts],
         &[],
     )?;
-    r.spawn_check("toolfloor", "toolfloor.txt", &cases, &[], &[])?;
     // spec: context-kit/SPEC.md §Testing — the extractor seam's end-to-end proof: the scratch
     // `rust.sh` reaches disk and `CONTEXT_KIT_CONFIG_FILE` is passed into the *child*, never
     // resolved here.

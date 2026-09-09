@@ -6,7 +6,6 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 const DEFAULT_INSTALL_MD: &str = "docs/install.md";
-const DEFAULT_ROSTER: &str = crate::toolfloor::ROSTER;
 const BEGIN: &str = "<!-- toolchain:begin -->";
 const END: &str = "<!-- toolchain:end -->";
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the floor
@@ -130,15 +129,30 @@ fn render(quad: &str) -> String {
     }
 }
 
+// spec: context-kit/SPEC.md §bin/env-probe — the roster is the crate's own, so the second
+// positional is an *override* rather than the ordinary path to it: a hermetic fixture needs a
+// roster it can author, or the divergence cases are unreachable without editing the kit's own.
+fn elements_of(roster: Option<&String>) -> Result<(Vec<String>, String), String> {
+    let Some(path) = roster else {
+        return Ok((
+            crate::toolfloor::PROBE_SET.iter().map(|e| e.to_string()).collect(),
+            crate::toolfloor::ROSTER.to_string(),
+        ));
+    };
+    if !Path::new(path).is_file() {
+        return Err(format!("roster file not found: {}", path));
+    }
+    let text = fresh::read_captured(path)?;
+    let elements = crate::toolfloor::probe_set(&text)
+        .ok_or_else(|| format!("no PROBE_SET=(...) array in {}", path))?;
+    Ok((elements, path.clone()))
+}
+
 fn rule(args: &[String]) -> Result<i32, String> {
     let install_md = fresh::positional(args, 0, DEFAULT_INSTALL_MD);
-    let roster = fresh::positional(args, 1, DEFAULT_ROSTER);
 
     if !Path::new(install_md).is_file() {
         return Err(format!("install page not found: {}", install_md));
-    }
-    if !Path::new(roster).is_file() {
-        return Err(format!("roster file not found: {}", roster));
     }
     let install_text = fresh::read_captured(install_md)?;
     if !install_text.contains(BEGIN) {
@@ -156,9 +170,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         ));
     }
 
-    let roster_text = fresh::read_captured(roster)?;
-    let elements = crate::toolfloor::probe_set(&roster_text)
-        .ok_or_else(|| format!("no PROBE_SET=(...) array in {}", roster))?;
+    let (elements, roster) = elements_of(args.get(1))?;
     if elements.is_empty() {
         return Err(format!("PROBE_SET array is empty in {}", roster));
     }

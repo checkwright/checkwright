@@ -2,9 +2,10 @@
 # One Rust target triple per line; `#`-comments and blank lines are stripped,
 # the same line grammar scripts/gates.list uses. This file is the single surface
 # asserting which platforms a released gate binary is built for: the publish
-# workflow derives its build matrix from it, and the installer reads the payload
-# copy of it to tell "this platform was never committed to" (omit and declare)
-# from "committed to, artifact missing" (a broken payload).
+# workflow derives its build matrix from it, and the bootstrap reads the payload
+# copy of it to tell "this platform was never committed to" (a refusal that names
+# the platform and asks nothing of the adopter) from "committed to, artifact
+# missing" (a refusal that names a broken payload). Both refuse; neither proceeds.
 #
 # WHAT LICENSES A LINE HERE, stated mechanically so the session that observes
 # the green executes rather than re-derives. A target <T> joins when ONE run,
@@ -73,17 +74,22 @@
 #     on a plan.
 #
 # This is not a narrowing of the trajectory — the objectives are the direction
-# and this roster is the tree. What keeps the omit-and-declare path the normal
+# and this roster is the tree. What keeps the UNROSTERED-HOST refusal the normal
 # path — rather than the dead code the vacuous-green class exists to refuse —
 # is the UNDECLARED COMPLEMENT and not the roster's size: native Windows is not
 # declared at all, and every host outside docs/install.md §Requirements'
-# declaration block meets that path on day one. That block carries no HELD
-# platform at present, so the complement is the whole of the ground and
-# omit-and-declare is exercised only by hosts the page never declared. This is
-# a narrower ground than a held remainder gave, and it is said as narrower
-# rather than papered over: it is still a real population, and the next
-# declared-and-held platform restores the other half. A target joins only on
-# the observation above, and never beyond what that section already states.
+# declaration block meets that refusal on day one. That block carries no HELD
+# platform at present, so the complement is the whole of the ground and the
+# refusal is reached only by hosts the page never declared. This is a narrower
+# ground than a held remainder gave, and it is said as narrower rather than
+# papered over: it is still a real population, and the next declared-and-held
+# platform restores the other half. A target joins only on the observation
+# above, and never beyond what that section already states.
+#
+# The behind-invoke relocation changed what that population MEETS and not how
+# large it is: an unrostered host is refused outright rather than served a
+# smaller battery, because nothing remains behind the invoke for it to proceed
+# into (installer/README.md §The gate binary).
 #
 # What a further line costs is measured rather than predicted, twice over now:
 # one runner mapping in native/runners.list, and nothing else. The consumer smoke

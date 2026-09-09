@@ -217,7 +217,7 @@ pub fn run(args: &[String]) -> i32 {
         );
         println!("  {}", doctrine_file);
         println!("  help: install the doctrine reference block into the always-loaded agent file —");
-        println!("        bash doctrine-kit/bin/install-doctrine.sh — so a session that loads it");
+        println!("        bash gate-sdk/bin/run-gates.sh --install-doctrine — so a session that loads it");
         println!("        follows the link to the delivery doctrine. Override the paths with");
         println!("        DOCTRINE_KIT_AGENT_FILE / DOCTRINE_KIT_DOCTRINE_FILE.");
         return 1;
@@ -378,7 +378,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("  {}", f);
         }
         println!("  help: every methodology rule owns exactly one non-empty '*Digest:* <one-line summary>'");
-        println!("        trailer — install-doctrine.sh derives that rule's digest bullet from it, so an");
+        println!("        trailer — the --install-doctrine arm derives that rule's digest bullet from it, so an");
         println!("        untrailered rule would ship every consumer a digest one rule short.");
     }
     1

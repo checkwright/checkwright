@@ -349,13 +349,20 @@ sixteen to one and whose completion predicate is satisfied downward.
 
 ## Existing sections updated
 
-- `installer/README.md` — the whole of it that describes the prior flow:
-  §Implementation's *the verbs are bash*, §Requirements' verb-`jq` claim and its
+- `installer/README.md` — the whole of it that describes the prior flow. The
+  clause above is the binding one and the list below is illustrative rather than
+  exhaustive, which a build census confirmed by finding eight live passages the
+  first enumeration missed: §Implementation's *the verbs are bash*,
+  §Requirements' verb-`jq` claim and its
   `doctor` exception, §Layout's dispatcher and `lib/` roster, §The verbs' derived
   roster, §init's four preconditions, §The install boundary's port disposition,
-  step 5, and both consequences of the now-discharged precondition, §The gate
+  step 5, its payload-coverage half, and both consequences of the
+  now-discharged precondition, §The gate
   binary's selection table and its omission vocabulary, §doctor's omitted-gates
-  block, and §The consumer smoke's three affected arms (all deltas).
+  block, §What init seeds' and §Profiles' citations of the shell derivation
+  modules, §The manifest's whole schema-owner narrative, and §The consumer
+  smoke's three affected arms and its diagnostic arm's hashing citations
+  (all deltas).
 - `installer/bin/checkwright.sh` — becomes the bash bootstrap, twin of the
   PowerShell half, and stops dispatching to `lib/` (deltas 2 and 3).
 - `installer/bin/checkwright.ps1` — the omit branch becomes a refusal and the
@@ -387,6 +394,31 @@ sixteen to one and whose completion predicate is satisfied downward.
 - `native/src/install.rs` — `--install`'s op set gains the read op delta 8 needs
   (deltas 3 and 8).
 - `native/src/runner.rs` — the two named reason arms go, the class stays (delta 7).
+- `gate-sdk/gate-tests/run-arm-contract.test.sh` — wears `substrate-unavailable`
+  as an arbitrary example reason and exact-matches the named-reason message the
+  arm above deletes; the token is installer-independent after (delta 7).
+- `native/src/marker.rs` — gains the removal half `install-doctrine` needs, and
+  its header stops naming a shell library that no longer exists (delta 6).
+- `native/src/installer/` — the new module tree the five arms live in: the
+  manifest schema, the profile rosters, the install recipe and one file per verb
+  (deltas 3, 4).
+- `native/src/doctrine.rs`, `native/src/emit/mod.rs` — the relocated doctrine
+  installer and its `--install-doctrine` registration (delta 6).
+- `native/src/install.rs` — its private `lock_hash` de-duplicates onto the
+  schema module's, and `place` widens so `--init` calls the op in-process
+  (deltas 3, 6).
+- `native/src/emit/upgrade_smoke.rs` — its doctrine step guards on a shell entry
+  point this cut deletes, so the guard would go quietly false and drop the step
+  (delta 6).
+- `native/src/gates/doctrine_registration.rs` — the printed adopter remedy names
+  the deleted script (delta 6).
+- `native/src/emit/run_index_tests.rs`, `context-kit/index-tests/expected/toolfloor.txt`
+  — the toolfloor index-test case and its golden retire with the library
+  (delta 5).
+- `doctrine-kit/smoke/install.sh` — drives the deleted installer eight times as
+  its whole mechanism; it repoints at the arm (delta 6).
+- `doctrine-kit/README.md`, `docs/doctrine-kit/index.md`, `README.md` — each
+  names the deleted installer as the live install command (delta 6).
 - `native/src/gates/install_disposition.rs` — the second-copy assertion's holder
   (delta 12).
 - `native/targets.list` — its header rests omit-and-declare's non-vacuity on the
@@ -406,14 +438,26 @@ sixteen to one and whose completion predicate is satisfied downward.
   paragraph's second site, both stale once the file that grounds them is deleted
   (delta 5).
 - `context-kit/SPEC.md` — the sequencing sentence for `lib/toolfloor.sh` and
-  `index-tests/toolfloor-cases.sh`, and §Testing's parity coupling (delta 5).
+  `index-tests/toolfloor-cases.sh`, and §Testing's parity coupling. The live span
+  is materially larger than that sentence: §bin/env-probe's whole *roster and its
+  floor axis* block describes a sourceable library and a consumer-shadowable
+  roster, its two-holders paragraph rests on the installer's `doctor` sourcing a
+  payload copy, and §Testing's owed-to-the-port narrative is replaced by deletion
+  rather than by a port (delta 5).
 - `context-kit/lib/toolfloor.sh`, `context-kit/index-tests/toolfloor-cases.sh` —
   deleted (delta 5).
 - `context-kit/gate-tests/toolfloor-parity.test.sh` — retires with its arm (delta 5).
 - `gate-sdk/SPEC.md` — §The non-gate arm's roster gains five members and loses
   `--toolfloor-parity`; §check-install-disposition's third assertion; and its own
-  three mentions of `context-kit/lib/toolfloor.sh` as the probe roster's home
-  (deltas 3, 5, 12).
+  mentions of `context-kit/lib/toolfloor.sh` as the probe roster's home. Also,
+  and not enumerated by the first pass: §lib/inject.sh's own section **content**,
+  whose owed-to-the-port narrative the cut discharges — the heading survives on
+  §lib/declaration.sh's recorded precedent, so the crate's citations of it stay
+  valid; §The install disposition's second citation of the shell recipe;
+  §The non-gate arm's `--emit-env-probe` paragraph, which rests that arm's
+  spawn set on a roster a consumer can shadow in a file; and the standing-oracle
+  instance recording the floor predicate's two holders
+  (deltas 3, 5, 6, 7, 12).
 - `gate-sdk/README.md` — the sentence holding `docs/install.md` to
   `context-kit/lib/toolfloor.sh` "the roster's owner" (delta 5).
 - `gate-sdk/lib/inject.sh`, `doctrine-kit/bin/install-doctrine.sh` — moved

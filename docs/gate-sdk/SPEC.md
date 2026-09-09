@@ -331,7 +331,7 @@ is a state the tree already carries, so this ruling resolves one rather than
 creating an exception.
 
 **Two mechanisms here already treat the class as an edit surface, and they are
-cited as evidence rather than as argument.** `installer/lib/init.sh` claims a
+cited as evidence rather than as argument.** The installer's `init` claims a
 rewritten file before writing it, comparing the file's on-disk hash against the
 hash `init` recorded for it, so an adopter's edit is reported rather than
 clobbered on a re-run — the seam is a file the installer *expects* to have been
@@ -490,7 +490,7 @@ the corpus's three families source three different libraries and two resolve the
 root before sourcing anything at all, so a shared helper buys a cross-kit
 dependency to save a one-line idiom, against the provenance seam and for no error
 class `check-path-dialect` does not already catch. The idiom needs no name:
-`scripts/pack-installer.sh` and `installer/lib/init.sh` both write it
+`scripts/pack-installer.sh` and the installer's own bootstrap both write it
 already, neither as a dialect measure, which is the evidence that it is the shape
 a shell author reaches for unprompted.
 
@@ -511,9 +511,9 @@ question at a call site is never *where did this root come from* but *what is do
 with it* — provenance is a chase across components, and consumption is local
 **within a file** rather than always at the call site itself: a root handed to a
 shared helper is judged at the helper, not re-derived at every site that reaches
-it through one. `installer/lib/common/lock.sh`'s `lock_path()` concatenates
-whatever root it is handed and is the sole exposure path for
-`installer/lib/update.sh`, whose only use of its own root is to pass it there — so
+it through one. The installer's manifest-path helper concatenates
+whatever root it is handed and is the sole exposure path for its `update` arm,
+whose only use of its own root is to pass it there — so
 the site that matters for that root's audit is the helper, not the caller. An
 exposed site is not thereby broken: exposure says its value must have reached it
 through a crosser, and the two halves are judged separately.
@@ -1251,8 +1251,8 @@ as §check-tree-terms recording which arms a case dir is structurally unable to
 reach.
 
 **The pair is shipping-side, and under §Consumer payload it is the consumer's
-whole verification oracle.** It vendors already — `installer/lib/init.sh`
-enumerates a kit's payload with an unfiltered `find . -type f`, so the pair
+whole verification oracle.** It vendors already — `init`
+enumerates a kit's payload without filtering, so the pair
 arrives whole. What the ruling changes is its weight rather than its delivery:
 with the predicate withheld it is **the only thing a consumer can independently
 check**, where alongside readable source it was a convenience. The pair plus
@@ -1694,7 +1694,7 @@ be unbuilt to generalize.
 use.** Shipped members declare this way — `check-action-pinning` and
 `check-action-gh-repo` among them — so the format below is specified against
 shipping files rather than against an intended one. Its reason does
-not expire with the port that introduced it: `installer/lib/init.sh` runs
+not expire with the port that introduced it: the installer's `init` runs
 `gen-pre-commit.sh --write` in the *consumer* tree, so the manifest must stay
 readable **with no build and no execution**, and that constraint only
 strengthens as more gates port.
@@ -1724,7 +1724,7 @@ tractable: a descriptor discloses a gate's *shape* without its *predicate*.
 
 Two shapes were refused, each on a constraint rather than on taste. **The binary
 emitting its own manifest** would make hook generation depend on executing the
-binary, but `installer/lib/init.sh` runs `gen-pre-commit.sh --write` in the
+consumer's own binary, but `init` runs `gen-pre-commit.sh --write` in the
 *consumer* tree; keeping the manifest as tracked text is what makes the seam
 payload-neutral by construction. **A shell stub carrying the manifest and
 exec'ing the binary** would stay inside the `*.sh` corpora of `check-shellcheck`,
@@ -1836,7 +1836,7 @@ project's tree layout, which no kit may ship. The path a gate reads stays where
 it already lives — the gate's own configured knob.
 
 **The installer's per-kit roster is derived from these declarations, not
-maintained.** `recipe_gates` in the installer's `lib/common/recipe.sh`
+maintained.** The recipe's gate derivation
 (installer/README.md §What init seeds) is every `checks/` member of a kit — both
 declaration spellings — whose disposition is `zero-config`. It carries no gate
 name of its own, which is what `check-install-disposition` assertion C holds.
@@ -2171,11 +2171,13 @@ averaging grounds across sections, and nothing in it obliges a cut to take every
 owed file the section holds. A section whose own text sequences one member
 behind a named unit may cut the unblocked remainder behind that section's
 amendment and carry a second amendment when the sequenced member frees.
-context-kit/SPEC.md is the instance that grounds it, because it states both
-shapes in one file: §Layout and configuration sequences `lib/toolfloor.sh` behind
-the installer's behind-invoke relocation and says nothing of the kind about
-`bin/env-probe.sh`, where §Testing sequences two named members behind that same
-relocation and rules a third — the AGENTS.md smoke — unblocked on its own ground.
+context-kit/SPEC.md is the instance that grounds it, because it stated both
+shapes in one file: §Layout and configuration sequenced its toolfloor library
+behind the installer's behind-invoke relocation and said nothing of the kind about
+`bin/env-probe.sh`, where §Testing sequenced two named members behind that same
+relocation and ruled a third — the AGENTS.md smoke — unblocked on its own ground.
+That relocation has since landed and every sequenced member left by deletion, so
+what follows is the shape's record rather than a live sequencing.
 So the owner doc has already said which of its groups cuts whole and which cuts
 in part, and spec-over-precedent reads it there. Four things bind the shape. The sequenced
 member stays **owed**: it takes no `# port-until:`, because a held file leaves
@@ -2185,10 +2187,9 @@ sequencing is prose in the section, at no cost. The cut record lands in the
 section, as every closed cut's does. The `--group` trailer's *still owed* against
 *takeable at this cut* is already a per-member reading, and §The port-candidate
 criteria already has a cohort sequence a member without declaring it held. And a
-port that must read the sequenced member's content — env-probe sources
-toolfloor's roster and floor predicate — keeps one owner where the crate already
-reads the file (`native/src/gates/install_toolchain.rs` parses the roster off
-`lib/toolfloor.sh`) and holds a predicate twice only under criterion 6's *unless*
+port that must read the sequenced member's content — env-probe read toolfloor's
+roster and floor predicate — keeps one owner where the crate already reads it, and
+holds a predicate twice only under criterion 6's *unless*
 clause with a parity test, evidence-kit/SPEC.md §lib/evidence.sh's shape. Three
 alternatives were refused. *Whole section or nothing* is the over-read the
 packaging ruling refused for one-cut-per-iteration, contradicts the
@@ -2345,8 +2346,9 @@ have to move first is that **assignment**, not this section.
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--knobs`, `--source-stamp`, `--queue-parity`,
-`--toolfloor-parity`, `--guard-lib-parity` and
-`--install`, plus the
+`--guard-lib-parity`, `--install`, `--help`, and the installer's five adopter
+verbs — `--init`, `--doctor`, `--diff`, `--update` and `--uninstall`
+(installer/README.md §The verbs) — plus the
 `--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
 `--emit-queue-edges`; `--emit-md-index`,
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
@@ -2437,10 +2439,9 @@ A **non-gate arm** is specified by three properties:
 - **It owes a named caller instead.** A gate's reader is the battery; a non-gate
   arm has to name the caller that reads its output and the transition where it
   is read, or it is dead weight. Every member above satisfies this —
-  `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity`,
-  `--toolfloor-parity` and `--guard-lib-parity` by their
-  parity harnesses (the second holding context-kit's floor predicate to
-  `lib/toolfloor.sh`, whose shell caller is the installer's `doctor`; the third
+  `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity` and
+  `--guard-lib-parity` by their
+  parity harnesses (the second
   holding guard-kit's splitter, normalizer and redirect scan to `lib/guard.sh`,
   whose callers are rules inside that same file — so it is the member whose
   second holder cannot empty even in principle, the property
@@ -2513,13 +2514,11 @@ heaviest set in the class** and is named because a reader sizing the gap below
 should meet the worst case rather than infer it: `git`, `bash`, `cargo`, `tar` and
 floor utilities, the middle two off `GATE_SDK_PROGRAM_FLOOR` and both ruled a
 requirement on that suite rather than on an adopter (§upgrade-smoke).
-**`--emit-env-probe` is the class's first member whose set a consumer can
-change**, and it belongs beside that worst case for the same reason: `uname`,
-`date`, `sort`, and every element of a roster the consumer may shadow, since
-`PROBE_SET` lives in a file rather than in the crate (context-kit/SPEC.md
-§bin/env-probe).
-**`--emit-always-loaded` is the second such member**, and its changeable element
-is a whole command rather than a roster entry: `bash`, plus `git` for the baseline
+**`--emit-env-probe`'s set is bounded but not short**: `uname`, `date`, `sort`,
+and every element of the probe roster, which is the crate's own and carries no
+knob a consumer could widen it with (context-kit/SPEC.md §bin/env-probe).
+**`--emit-always-loaded` is the class's one member whose set a consumer can
+change**, and its changeable element is a whole command rather than a roster entry: `bash`, plus `git` for the baseline
 commit and the growth diff,
 plus whatever program the consumer's `CONTEXT_KIT_HOOK_CMD` names — the knob being
 a command seam the port deliberately keeps spawned (context-kit/SPEC.md §The
@@ -2815,7 +2814,8 @@ be a POSIX shell at all, so **every value it needs arrives as argv** and it
 resolves no knob and no kit config. A bridged install arm would be resolved by
 `gate_command` — a bash front-end sourcing each owning kit's `lib/*.sh` — and
 would therefore be unreachable from the PowerShell half of that boundary. Its
-named callers are `installer/lib/init.sh` and its PowerShell twin, both live,
+named callers are the `--init` arm, which reaches it in-process, and the two
+bootstraps that reach the arm; all live,
 and its grammar, channels and exit statuses are
 installer/README.md §The install boundary's. It owes no descriptor,
 registration or fixture pair, like every other member; what it is asserted by is
@@ -4045,22 +4045,23 @@ that answers each is the one whose corpus matches its question.
    pid predicate alone would have left the reader dual undischarged, and the same
    caller-set reading is what later told this instance it was over.
 
-   **The floor predicate is the fourth instance, and it is the first whose
-   surviving shell consumer sits *behind the install boundary* rather than in the
-   battery.** `context-kit/lib/toolfloor.sh`'s `tool_floor_parse` and
-   `tool_floor_check` gained compiled twins when the env-probe member ported
-   (context-kit/SPEC.md §bin/env-probe), and the caller that keeps the shell side
-   live is `installer/lib/doctor.sh`, reading its own **payload copy** of the
-   library rather than a tracked one. That placement matters to a later port
-   sizing this road: the caller-set enumeration this instance's predecessor
+   **The floor predicate is the fourth instance, and the only one that has since
+   ended — which is why it is kept rather than deleted.** context-kit's toolfloor
+   library gained compiled twins when the env-probe member ported
+   (context-kit/SPEC.md §bin/env-probe), and the caller that kept the shell side
+   live was the installer's own `doctor`, reading its **payload copy** of the
+   library rather than a tracked one. That placement is what a later port should
+   read off this instance: the caller-set enumeration this instance's predecessor
    demands has to reach the installer's payload, where a grep over the tracked
-   battery would report an empty set and licence a deletion that breaks `init`.
-   The lane is `context-kit/gate-tests/toolfloor-parity.test.sh`, in the shape
-   the three above take. What it adds is an assertion no canned corpus can carry:
-   one arm of the verdict set is reachable only through an **environmental**
-   condition — a `sort` without `-V` — so the lane shims such a `sort` onto
-   `PATH` and requires both holders to answer `uncomparable`, which is what stops
-   the compiled holder quietly narrowing a fail-closed arm.
+   battery reports an empty set and licences a deletion that breaks `init`.
+   The lane was `context-kit/gate-tests/toolfloor-parity.test.sh`, in the shape
+   the three above take, and what it added was an assertion no canned corpus can
+   carry: one arm of the verdict set is reachable only through an
+   **environmental** condition, a `sort` without `-V`. **The behind-invoke
+   relocation put `doctor` in the crate, which emptied that caller set**, so the
+   library, its golden and the lane all retired together on §The non-gate arm's
+   rule that a parity arm's caller is its second holder. The environmental
+   assertion survives as a unit test of the one holder left.
 
    **guard-kit's three primitives are the fifth instance, and the first where
    *both* of the holder's `no-port` grounds are about something other than the
@@ -4074,7 +4075,7 @@ that answers each is the one whose corpus matches its question.
    off this instance is that a holder's `no-port` grounds are checked **against
    the twinned predicates**, not against the file — a file can be permanently
    shell for reasons that leave a predicate inside it perfectly portable, which is
-   the same shape `lib/toolfloor.sh` and `lib/queue.sh` already carry. It is also
+   the same shape `lib/queue.sh` already carries. It is also
    the instance where the shell caller set cannot empty even in principle: the
    surviving callers are rules that are themselves functions in the same
    permanently-shell file, so the disposition-choosing question above — *does the
@@ -5657,9 +5658,8 @@ carries a case for it, so the distinction is checkable rather than asserted.
 **The jq dividend, and the boundary no reader may take it past.**
 `port-blockers.sh`'s criterion-7 report over the scanned members named
 `check-memory-off` the battery's only remaining `jq` consumer, so the port
-subtracts `jq` from **the gate battery's** dependency floor. It retires `jq` from nothing else: `installer/lib/`
-shells to it on the shipped install path and refuses naming the program where it
-is absent (installer/README.md §Requirements), and guard-kit, the delegation-kit
+subtracts `jq` from **the gate battery's** dependency floor. It retires `jq` from nothing else: the installer
+shelled to it on the shipped install path at the time, and guard-kit, the delegation-kit
 templates, drift-kit and `scripts/` carry their own uses. *"The batch retires
 jq"* is false in every direction but the battery's — §The settings cohort's
 honest-claim paragraph is the model this one is written to.
@@ -6866,10 +6866,11 @@ exclusion does not rest on it.
 **The honest claim about `jq`, which is the one this cohort must not overstate.**
 After the cohort, `jq` is retired from the battery **but for those two members**,
 both with named owners; after §The third budget batch, but for
-`check-installer-no-deps` alone. It is **not** retired from the shipped install path at
-all — `installer/lib/` shells to it. *"The cohort retires jq"* is false in both
-directions. On a machine without it the verbs **refuse, naming the program**
-(installer/README.md §Requirements); silent degradation on that path is closed.
+`check-installer-no-deps` alone. It was **not** retired from the shipped install
+path by that cohort either — the installer shelled to it then. *"The cohort
+retires jq"* was false in both directions. The install path has since stopped
+reading JSON with it altogether (installer/README.md §Requirements), which is a
+later cut's doing and not this one's.
 
 **The enforcement-map port later closed one of those two**, and it is recorded
 here rather than beside the port because this is where the claim is stated. That
@@ -7575,7 +7576,7 @@ things ship, each because withholding it would break something the product
 needs:
 
 - **The `.gate` descriptor**, because its manifest readers must work with no
-  build and no execution — `installer/lib/init.sh` runs `gen-pre-commit.sh
+  build and no execution — the installer's `init` runs `gen-pre-commit.sh
   --write` in the consumer tree (§The `# graph:` manifest).
 - **The `# spec:` pointer and its SPEC section**, because a gate that goes red
   without an explicable invariant is an unactionable block, and an unactionable
@@ -8558,7 +8559,7 @@ reader needs outlive the refactor that renames a helper:
   the machine resolving it; `bin/build-native.sh`'s `BN_ART` and
   `scripts/pack-installer.sh`'s per-roster-line artifact name take the **target**
   form, because both name an artifact built *for* a triple that need not be the
-  host's (§build-native, §Consumer payload). `installer/lib/init.sh`'s
+  host's (§build-native, §Consumer payload). The bootstrap's
   `select_artifact` deliberately takes **neither**: it discovers the artifact name
   with `find … -maxdepth 1 -type f ! -name '*.sha256'` and asserts exactly one, so
   it is already name-agnostic and a `.exe` satisfies it unchanged — named here
@@ -9213,82 +9214,70 @@ its own kit's section can state for it, which is the position context-kit's
 
 ### lib/inject.sh
 
-The marker-bounded span mechanics every kit's agent-file injector shares — three
+The marker-bounded span mechanics every kit's agent-file injector shares — four
 functions over one notion of a well-formed block.
 
-**It is owed to the port, not dispositioned by §The kit-library port
-disposition.** It rides the bridge's `lib/*.sh` glob and resolves no knob, so
-that ruling's ground does not reach it; what sequences it instead is its sourcer
-set, every member of which is itself owed — **one of them**,
-`doctrine-kit/bin/install-doctrine.sh`, the other two having ported at
-§bin/install-lifecycle.sh's cut and at context-kit/SPEC.md §bin/env-probe's.
-**One remaining is not unblocked**: `install-doctrine.sh` sits behind the
-installer's behind-invoke relocation, recorded in its own section, so this
-library is no more takeable than it was. Stated because a reader who
-remembers the three-sourcer roster will read the departure of two as the
-discharge of the sequencing.
+**This section's name is a path the tree does not carry, and that is
+deliberate**, on §lib/declaration.sh's own ground: the citations that name it are
+the mechanism's, not the file's, and renaming the heading would strand every one
+of them. What the section owns is the notion of a well-formed block; where it
+lives is `native/src/marker.rs`.
 
-**A compiled counterpart exists, and it is a divergence rather than a
-translation.** `native/src/marker.rs` carries a read half and a write half for
-the crate's own block consumers: the read half is the single implementation the
-value-rollup comparator and the value-rollup generator both use, extracted from
-the comparator's private copy when the writer landed. The write half matches this
-library on a marker hit — markers matched whole-line, content between them
-replaced, the file otherwise byte-untouched — and **tightens it on a miss**:
-where `inject_marker_block` appends a fresh block when the begin marker is
-absent, the compiled writer **refuses**, and likewise on an unbalanced or
-reversed pair. The refusal direction is deliberate, because the failure it
-prevents is the expensive one: a generator that appends when it cannot find its
-markers corrupts a hand-authored page, and the freshness gate then reports the
-corruption as staleness rather than as damage.
+**The shell library retired when its sourcer set emptied.** It rode the bridge's
+`lib/*.sh` glob and resolved no knob, so §The kit-library port disposition's
+ground never reached it; what sequenced it was its sourcer set, and its last
+member — doctrine-kit's own installer — moved in-crate with the installer's
+behind-invoke relocation. Two had ported before that, at §bin/install-lifecycle.sh's
+cut and at context-kit/SPEC.md §bin/env-probe's. Deleting a library because its
+callers left, rather than porting it, is the road §The port-candidate criteria
+prefers, and this is the instance where it was reached last.
 
-**This library is not retired by that, and the duplication is the ordinary
-transitional state.** Its append-on-absent behaviour is still correct for its own
-callers — doctrine-kit's installer among them — which are shell and unported. So
-the same miss reads two ways depending on
-which implementation reaches it, until each remaining caller ports in turn;
-retiring `lib/inject.sh` belongs to whichever unit ports its last one. Recorded
-so a later reader does not take the two halves for copies of each other.
+**The compiled module is a divergence rather than a translation**, and the
+divergence is what a later reader most needs. It carries a read half — the single
+implementation the value-rollup comparator and generator both use — and **two
+writers**. `marker::write_block` is the *generator* half: it matches markers
+whole-line, replaces the content between them, leaves the file otherwise
+byte-untouched, and **refuses** an absent, unbalanced or reversed pair. That
+refusal is the deliberate tightening, because the failure it prevents is the
+expensive one: a generator that appends when it cannot find its markers corrupts
+a hand-authored page, and the freshness gate then reports the corruption as
+staleness rather than as damage.
 
-**The compiled side carries the append-on-absent writer too, and that is two
-writers by design rather than by drift.** `marker::install_block` is the
-*installer* half — it appends a fresh block when the begin marker is absent,
-exactly as `inject_marker_block` does, because a seeding installer legitimately
-writes into a file that has never carried a block; `marker::write_block` is the
-*generator* half and refuses that same miss, for the reason above. The two
-misses are the whole difference and each has its own caller class, so a porting
-session picks by what the caller is rather than by which function it met first.
-One divergence from the shell original is deliberate and stated: the installer
-writer's marker-presence test is **whole-line**, this module's own documented
-rule, where the shell gated a whole-line `awk` replace on a substring `grep` — so
-a marker occurring inside prose sent the shell down a replace path that matched
-nothing and still reported `replaced`. Spec-over-precedent decides it against the
-implementation quirk.
+**`marker::install_block` is the *installer* half, and two writers is by design
+rather than by drift.** It appends a fresh block on an absent begin marker,
+because a seeding installer legitimately writes into a file that has never
+carried one. The two misses are the whole difference and each has its own caller
+class, so a session picks by what the caller is rather than by which function it
+met first. `marker::remove_block` is the third writer and takes the removal's own
+disposition: an absent begin marker is a no-op rather than a refusal, because a
+removal has nothing to guess at.
 
-`inject_marker_block <file> <begin> <end>` takes the inner block content on
-stdin. It writes `<begin>` + the piped content + `<end>` into
-the target: replacing the span between an existing marker pair (inclusive) in
-place, or appending a fresh block when the markers are absent, so a re-run
-never duplicates. A begin marker without its end is a malformed target — it
-refuses (exit 2) rather than guess the bounds; a missing target file is exit
-2. On success it echoes the action taken (`appended`|`replaced`) for the
-caller to report.
+**One divergence from the shell original is deliberate and stated**: the
+installer writer's marker-presence test is **whole-line**, this module's own
+documented rule, where the shell gated a whole-line `awk` replace on a substring
+`grep` — so a marker occurring inside prose sent the shell down a replace path
+that matched nothing and still reported `replaced`. Spec-over-precedent decides
+it against the implementation quirk.
 
-`read_marker_block <file> <begin> <end>` is the retrieval half: it prints the
-existing block's inner content (markers exclusive) on stdout, prints nothing
-and exits 0 when the marker pair is absent, and refuses on the same two
-malformed targets its sibling refuses on — a begin marker without its end, and
-a missing file, both exit 2.
+`marker::install_block(file, begin, end, body)` writes `<begin>` + the body +
+`<end>` into the target: replacing the span between an existing marker pair
+(inclusive) in place, or appending a fresh block when the markers are absent, so a
+re-run never duplicates. A begin marker without its end is a malformed target — it
+refuses rather than guess the bounds. On success it returns the action taken
+(`appended`|`replaced`) for the caller to report.
 
-`remove_marker_block <file> <begin> <end>` is the third: it deletes the marker
-pair and everything between it (inclusive), leaves the rest of the file
-byte-identical, and echoes `removed` when it removed one. An **absent begin
-marker is a no-op that exits 0 and prints nothing**, not a refusal — the caller
-is a path reversing an installation, which cannot know whether the block was
-ever written there, so a second removal must be as quiet as the first. It
-refuses on the same two malformed targets its siblings refuse on, both exit 2.
+`marker::read_block(text, begin, end)` is the retrieval half: it returns the
+existing block's inner content (markers exclusive), and the empty string when the
+marker pair is absent.
 
-All three agreeing on what a malformed target is, in one module, is the point of
+`marker::remove_block(file, begin, end)` deletes the marker pair and everything
+between it (inclusive), leaves the rest of the file byte-identical, and returns
+whether it removed one. An **absent begin marker is a no-op reporting `false`**,
+not a refusal — the caller is a path reversing an installation, which cannot know
+whether the block was ever written there, so a second removal must be as quiet as
+the first. It refuses on the same malformed target its siblings refuse on.
+
+All of them agreeing on what a malformed target is, in one module, is the point of
 keeping them together: a caller that reads a block before rewriting it, or
 removes one it may never have written, must not meet three different answers to
 the same question.
@@ -9298,15 +9287,14 @@ Block content *generation* stays with the caller (the lifecycle roster, the doct
 digest), and so does any rule about what to *preserve* out of a block that was
 read — doctrine-kit's declared-trim round-trip (doctrine-kit/SPEC.md
 §install-doctrine) is read-compute-emit in that installer, not a preserve rule
-pushed down here. A preservation parameter on `inject_marker_block` would ship
+pushed down here. A preservation parameter on the installer writer would ship
 one kit's marker vocabulary to every consumer of a generic injector, which is
 the provenance seam this split keeps intact; the caller-side shape is the one
 `bin/gen-pre-commit.sh` already uses for its `gen=manual` regions. So a second
-injector adds no second copy of the awk replace logic — every marker-bounded
-projection in the tree rides them or their compiled half,
-`doctrine-kit/bin/install-doctrine.sh` and the `--install-lifecycle` arm among
-them. A sourced library, not
-a gate: exercised end-to-end wherever an installer that rides it runs
+injector adds no second copy of the replace logic — every marker-bounded
+projection in the tree rides this module, the `--install-doctrine` and
+`--install-lifecycle` arms among
+them. No gate surface of its own: exercised end-to-end wherever an installer that rides it runs
 (doctrine-kit's `smoke/install.sh`) — that smoke covers the
 read half through the trim round-trip its acceptor drives, and the removal half
 through a `--remove`/reinstall round trip beside it. lifecycle-kit's own
@@ -10165,9 +10153,9 @@ shipped form is the literal per-case transcription.
 **The port does not discharge gate-sdk, and the section says so because a reader
 will assume otherwise from the kit's short owed column.** This section's whole
 owed set is this one member, so the cut and the section coincide; what is left
-owed to gate-sdk is `lib/inject.sh` (§lib/inject.sh) alone, behind
-`doctrine-kit/bin/install-doctrine.sh` under the sequencing
-doctrine-kit/SPEC.md §install-doctrine states.
+owed to gate-sdk is **nothing**: its one remaining member, the marker library
+(§lib/inject.sh), left by deletion when the installer's behind-invoke relocation
+took its last sourcer in-crate.
 
 **The one deliberate narrowing, stated because it is unobservable.** The shell
 form's `args=($(grep -v '^#' "$casedir/args"))` was unquoted, so bash applied
@@ -12481,7 +12469,7 @@ text, so it was the floor's remaining live holder — and the shell tail's
 port retired it, the last registered member of that unit, leaving the residue
 empty
 (site-kit/SPEC.md §check-docs-render-fidelity). What is *not* changed here is the published requirement:
-`awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
+`awk (GNU)` is an element of `native/src/toolfloor.rs`'s probe roster held to
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
 user-facing requirement is not this port's to rule. The narrowing is filed rather
 than taken.
@@ -15922,7 +15910,7 @@ no gawk extension at
 all. That emptied the residue **this file named**, not the floor:
 §check-docs-render-fidelity held it after them, and §check-gate-assertions records
 the probe's scope. Its port emptied the floor's live set outright. What is *not* changed on that finding is the published requirement:
-`awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
+`awk (GNU)` is an element of `native/src/toolfloor.rs`'s probe roster held to
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
 user-facing requirement is filed rather than taken in passing
 (§check-gate-assertions).

@@ -1,13 +1,14 @@
 #!/usr/bin/env pwsh
-# spec: installer/README.md §The install boundary — the second hand-kept bootstrap, authored against that section's five steps in the one language a native Windows host runs without a POSIX shell; the bash half is installer/lib/init.sh's opening and this is its twin, not a transliteration of it
+# spec: installer/README.md §The install boundary — the second hand-kept bootstrap, authored against that section's five steps in the one language a native Windows host runs without a POSIX shell; installer/bin/checkwright.sh is its twin, not its original and not a transliteration of it
 #
 # usage: checkwright.ps1 [argv...]
-#   Resolves, verifies and executes this package's gate binary, forwarding argv verbatim.
+#   Resolves, verifies and executes this package's gate binary. A dashless leading token is prefixed
+#   with `--`; everything after it is forwarded verbatim.
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# spec: installer/README.md §The install boundary — step 5 forwards argv verbatim, so the two settings that would rewrite it are pinned rather than inherited: 'Standard' stops the binder re-quoting the caller's tokens, and the native-error preference would otherwise turn the artifact's own non-zero status into a thrown exception and lose it
+# spec: installer/README.md §The install boundary — step 5 forwards the caller's tokens through unrewritten, so the two settings that would rewrite them are pinned rather than inherited: 'Standard' stops the binder re-quoting the caller's tokens, and the native-error preference would otherwise turn the artifact's own non-zero status into a thrown exception and lose it
 if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
 if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
 
@@ -34,7 +35,7 @@ function Resolve-InstallerRoot {
     return (Split-Path -Parent (Split-Path -Parent $self))
 }
 
-# spec: installer/README.md §The gate binary — step 2: the twin of installer/lib/init.sh's target_of_host(). It reads the platform and architecture off the runtime rather than shelling out to uname, because the host this half exists for need carry no POSIX shell at all
+# spec: installer/README.md §The gate binary — step 2: the twin of installer/bin/checkwright.sh's target_of_host(). It reads the platform and architecture off the runtime rather than shelling out to uname, because the host this half exists for need carry no POSIX shell at all
 function Get-HostTarget {
     $rt = 'System.Runtime.InteropServices.RuntimeInformation' -as [type]
     if ($rt) {
@@ -59,12 +60,13 @@ function Get-HostTarget {
     return ''
 }
 
-# spec: installer/README.md §The gate binary — step 3: selection has three outcomes and collapsing any two is the defect, so the payload's own roster is read rather than a directory's presence inferred from — a platform never committed to and one whose artifact went missing are different answers
+# spec: installer/README.md §The gate binary — step 3: selection keeps three outcomes and only one of them proceeds, so the payload's own roster is read rather than a directory's presence inferred from — a platform never committed to and one whose artifact went missing are different answers, told apart by message and remedy
 function Select-Artifact {
     param([string] $Payload, [string] $Target)
+    $unrostered = 'the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take.'
     $dir = Join-Path $Payload 'artifact'
     if (-not (Test-Path -LiteralPath $dir -PathType Container)) {
-        return [pscustomobject]@{ Omit = 'substrate-unavailable' }
+        Die 'this host maps to no target this payload declares' $unrostered
     }
     $roster = Join-Path $dir 'targets.list'
     if (-not (Test-Path -LiteralPath $roster -PathType Leaf)) {
@@ -75,19 +77,19 @@ function Select-Artifact {
         Where-Object { $_ -notmatch '^\s*(#|$)' } |
         ForEach-Object { $_.Trim() })
     if (-not $Target -or $declared -notcontains $Target) {
-        return [pscustomobject]@{ Omit = 'substrate-unavailable' }
+        Die 'this host maps to no target this payload declares' $unrostered
     }
     $src = Join-Path $dir $Target
     $names = @(Get-ChildItem -LiteralPath $src -File -ErrorAction SilentlyContinue |
         Where-Object { $_.Name -notlike '*.sha256' } | Sort-Object Name)
     if ($names.Count -ne 1 -or -not (Test-Path -LiteralPath ($names[0].FullName + '.sha256') -PathType Leaf)) {
         Die "the payload declares $Target but carries no complete artifact for it" `
-            'a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on — refusing rather than installing a battery that silently shrank.' 1
+            'a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on — refusing rather than running a battery that silently shrank.' 1
     }
     return [pscustomobject]@{ Path = $names[0].FullName; Sidecar = $names[0].FullName + '.sha256' }
 }
 
-# spec: installer/README.md §The install boundary — step 4, and the one step where this half is simpler than the bash one rather than parallel to it: PowerShell carries Get-FileHash, so there is no hasher to resolve between and no digest-unverifiable outcome to reach
+# spec: installer/README.md §The install boundary — step 4, and the one step where this half is simpler than the bash one rather than parallel to it: PowerShell carries Get-FileHash, so there is no hasher to resolve between and this half reaches no refusal the bash one owes a resolution first
 function Test-ArtifactDigest {
     param([string] $Artifact, [string] $Sidecar)
     $want = (@(Get-Content -LiteralPath $Sidecar -TotalCount 1) -split '\s+')[0]
@@ -108,15 +110,12 @@ if (-not (Test-Path -LiteralPath $PAYLOAD -PathType Container)) {
 
 $selected = Select-Artifact -Payload $PAYLOAD -Target (Get-HostTarget)
 
-# spec: installer/README.md §The install boundary — the omit-and-declare outcome, which on this half declares and stops rather than declaring and proceeding: what proceeds on the bash half is conditional install logic, which sits behind the invoke and does not exist yet. The exit status is the bash half's for the same outcome, so the two agree on everything an adopter can observe here
-if ($selected.PSObject.Properties.Name -contains 'Omit') {
-    [Console]::Error.WriteLine("checkwright: omitting the prebuilt gate binary ($($selected.Omit))")
-    [Console]::Error.WriteLine('  help: this host maps to no target this payload declares, so there is nothing to verify or run here.')
-    exit 0
-}
-
 Test-ArtifactDigest -Artifact $selected.Path -Sidecar $selected.Sidecar
 
-# spec: installer/README.md §The install boundary — step 5 is execute and not install: the artifact runs in place out of the payload, where the step above just verified it, and argv is forwarded verbatim
-& $selected.Path @args
+# spec: installer/README.md §The install boundary — step 5 is execute and not install: the artifact runs in place out of the payload, where the step above just verified it, under one unconditional argv rule — a dashless leading token is prefixed with `--` and everything after it is forwarded verbatim. The rule introduces no verb table into either bootstrap, so the two halves agree on the verb word instead of one forwarding it and the other consuming it
+$forward = @($args)
+if ($forward.Count -gt 0 -and $forward[0] -notlike '-*') {
+    $forward[0] = '--' + $forward[0]
+}
+& $selected.Path @forward
 exit $LASTEXITCODE

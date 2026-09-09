@@ -33,7 +33,7 @@ mk_gate g_pass 0
 mk_gate g_fail 1
 # A declaration that resolves nowhere at run time, for the (unresolved) tail.
 { echo g_pass; echo g_fail; echo g_gone; } > "$scratch/gates.list"
-printf '# omitted: g_lost substrate-unavailable\n' >> "$scratch/gates.list"
+printf '# omitted: g_lost local-policy\n' >> "$scratch/gates.list"
 
 battery() {   # $@ = extra argv; env overrides come from the caller; streams kept apart
     GATE_SDK_GATES_DIR="$scratch" GATE_SDK_KIT_DIRS="$scratch" \
@@ -48,7 +48,7 @@ assert_has    contract '  PASS: g_pass'                                        "
 assert_has    contract '  FAIL: g_fail (exit 1)'                               "$out"
 assert_has    contract '  FAIL: g_gone (unresolved)'                           "$out"
 assert_has    contract '2 of 3 gates FAILED: g_fail g_gone'                    "$out"
-assert_has    contract '1 gate(s) omitted (substrate-unavailable)'             "$out"
+assert_has    contract '1 gate(s) omitted (local-policy)'                      "$out"
 # quiet green: a passing member's captured output is discarded unless the banner roll is on
 out="$(merged)"
 assert_absent contract 'g_pass: a line of its own output'                      "$out"
@@ -56,13 +56,16 @@ assert_absent contract 'g_pass: a line of its own output'                      "
 # the consumer smokes match the green phrase against this output
 assert_absent contract 'gates passed.'                                         "$out"
 
-# The green phrase, exact, with the omission line beside it and not inside it.
+# The green phrase, exact, with the omission line beside it and not inside it. The reason token is
+# the fixture's own and carries no remedy, which is the class's whole contract: `# omitted:` is
+# reason-agnostic and belongs to any consumer who omits a member for any cause, so a kit test wearing
+# an installer's vocabulary would assert a coupling the class does not have.
 { echo g_pass; } > "$scratch/gates.list"
-printf '# omitted: g_lost substrate-unavailable\n' >> "$scratch/gates.list"
+printf '# omitted: g_lost local-policy\n' >> "$scratch/gates.list"
 out="$(merged)"; rc=$?
 assert_rc  green "$rc" 0
 assert_has green 'All 1 gates passed.'                             "$out"
-assert_has green '1 gate(s) omitted (substrate-unavailable): no prebuilt gate binary is published for this platform.' "$out"
+assert_has green '1 gate(s) omitted (local-policy).' "$out"
 
 # ---- the front-end's refusals --------------------------------------------------
 { echo g_pass; echo g_fail; echo g_gone; } > "$scratch/gates.list"
@@ -101,7 +104,7 @@ assert_has for-note 'no coupled gate for the given path(s); nothing to run.'   "
 
 # ---- the determinism the pool owes ---------------------------------------------
 { echo g_pass; echo g_fail; echo g_gone; } > "$scratch/gates.list"
-printf '# omitted: g_lost substrate-unavailable\n' >> "$scratch/gates.list"
+printf '# omitted: g_lost local-policy\n' >> "$scratch/gates.list"
 GATE_SDK_VERBOSE=1 merged > "$scratch/par1.txt"
 GATE_SDK_VERBOSE=1 merged > "$scratch/par2.txt"
 GATE_SDK_VERBOSE=1 GATE_SDK_JOBS=1 merged > "$scratch/ser.txt"

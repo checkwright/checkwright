@@ -589,17 +589,10 @@ fn report_omissions(list_text: &str) {
     while i < reasons.len() {
         let r = reasons[i];
         let n = reasons[i..].iter().take_while(|x| **x == r).count();
-        match r {
-            "substrate-unavailable" => println!(
-                "{} gate(s) omitted ({}): no prebuilt gate binary is published for this platform.",
-                n, r
-            ),
-            "digest-unverifiable" => println!(
-                "{} gate(s) omitted ({}): install sha256sum or shasum, then re-run checkwright init.",
-                n, r
-            ),
-            _ => println!("{} gate(s) omitted ({}).", n, r),
-        }
+        // spec: gate-sdk/SPEC.md §run-gates — the class is reason-agnostic and belongs to any
+        // consumer omitting a member for any cause, so the reason is reported as written and no
+        // remedy is invented for it (installer/README.md §The gate binary).
+        println!("{} gate(s) omitted ({}).", n, r);
         i += n;
     }
 }

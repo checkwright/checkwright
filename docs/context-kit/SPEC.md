@@ -397,20 +397,19 @@ made.
 (first present of an ordered detection walk over the known managers); each
 roster member's version and its floor verdict (below); the absent-tools list
 (roster members `PATH` does not resolve); and the below-contract list. The
-roster itself is owned by `lib/toolfloor.sh` and never restated here. Its
-spawned programs are `uname`, `date`, `sort`, and every roster member it probes
-— the first arm of its class whose spawn set a consumer can change, since
-`PROBE_SET` is a file a consumer can shadow.
+roster itself is owned by `native/src/toolfloor.rs` and never restated here. Its
+spawned programs are `uname`, `date`, `sort`, and every roster member it probes.
+The roster is the kit's own and a consumer cannot shadow it, which is what keeps
+this set bounded by the paragraph below rather than by a consumer's file.
 
-**The roster and its floor axis (`lib/toolfloor.sh`).** The roster lives in a
-sourceable library rather than in a member that does its work on execution: a
-reader cannot obtain the roster by running such a member, which
-is why the parity gate greps the array out of a file instead of sourcing it, and
-why a reader that runs before any consumer file exists — an installer's `doctor`
-reading its own payload copy — needs an owner it can source. The compiled holder
-below reads the same array as text, for the reason that gate does: a fixture path
-is untrusted input. The library defines
-the array `PROBE_SET` and the predicate below and executes nothing else. It
+**The roster and its floor axis (`native/src/toolfloor.rs`).** The roster lives
+beside the predicate that reads it, in the module the whole crate resolves it
+through, so the probe arm, `check-install-toolchain` and the installer's `doctor`
+read one array rather than three copies of it. That module still carries the
+*parser* for an array read out of a file, because a gate fixture needs a roster it
+can author and a fixture path is untrusted input — a reader takes the array as
+text and never sources it. It
+defines `PROBE_SET` and the predicate below and nothing else. It
 carries no knob, deliberately: the roster is the kit's own dependency set, and a
 consumer who could override it could only make the contract lie.
 
@@ -434,10 +433,10 @@ verdict set is: the only declarable value is `contributor`, meaning *a
 contributor-side floor with no install-time role*. The unmarked case is not
 spelled — declaring the complement on every other member would be a roster
 maintained against itself — so the emptiness rule above carries it: an empty or
-omitted audience means every audience. `tool_floor_consumer_side <element>`
+omitted audience means every audience. The audience predicate
 answers the one question a consumer-side reader asks, and exists so no such
 reader re-implements that rule against a value set it does not own. A
-consumer-side reader — `installer/lib/doctor.sh`, whose exit status is `init`'s
+consumer-side reader — the installer's `doctor`, whose exit status is `init`'s
 last precondition — filters its roster walk through that predicate and does not
 probe, render or fail on a member the predicate excludes. A contributor-side
 reader — the env-probe arm — walks the roster whole and marks the audience
@@ -530,19 +529,16 @@ the fail-closed arm: a banner the predicate cannot parse, or a `sort` without
 gate-sdk/SPEC.md §The gate model requires of a gate, applied to a probe that is
 not one.
 
-**The predicate has two holders, and a standing oracle is what licenses that.**
-`installer/lib/doctor.sh` calls the shell library off its own payload copy, so
-the shell caller set does not empty and the deletion road
-gate-sdk/SPEC.md §The port-candidate criteria prefers is unavailable; criterion
-6's *unless* clause applies instead, and what discharges it is an executed
-cross-substrate comparison in the shape evidence-kit/SPEC.md §lib/evidence.sh
-established. `gate-tests/toolfloor-parity.test.sh` drives one canned corpus of
-`(element, banner)` pairs through both holders and compares **classification** —
-the parse's four fields and the verdict's own words — with **no committed
-expected file**, because the failure it exists to catch is one holder edited
-without the other and a golden would be a third copy to drift. The existing
-golden is not retired: §Testing's `index-tests/toolfloor-cases.sh` remains the
-**shell** holder's own oracle, the one `installer/lib/doctor.sh` still runs.
+**The predicate has one holder, and the road there was the deletion road.** It
+had two while the installer's `doctor` was bash and sourced the shell library off
+its own payload copy; the behind-invoke relocation put `doctor` in the crate
+(installer/README.md §The install boundary), which emptied that caller set and
+made the road gate-sdk/SPEC.md §The port-candidate criteria prefers available
+after all. The shell library, its golden and the cross-substrate parity harness
+that stood in for the deletion all retired together, on §The non-gate arm's own
+rule that a parity arm's caller is its second holder: one holder cannot be held
+equal to itself, and a harness that can only skip is the unreachable code that
+rule exists to refuse.
 
 **`sort -V` is preserved in the compiled holder rather than replaced by a native
 comparison.** The `uncomparable` verdict is fail-closed for two conditions, and
@@ -1128,7 +1124,6 @@ no bare collection total.
 ```
 context-kit/
   lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
-  lib/toolfloor.sh               # sourceable owner: the probe roster + the floor predicate
   checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
@@ -1142,7 +1137,6 @@ context-kit/
   gate-tests/check-brevity.test.sh      # the unmatched-section axis the pair cannot hold
   gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold
   gate-tests/check-settings-pins.test.sh # the refusal axis the pair cannot hold
-  gate-tests/toolfloor-parity.test.sh   # the floor predicate's two holders, classification compared
   index-tests/                   # fixture corpus + expected outputs
   templates/session-context.sh   # consumer copy: marked consumer sections
   templates/settings-sessionstart.json
@@ -1152,14 +1146,12 @@ context-kit/
   smoke/violation.sh
 ```
 
-**The one library member beside `lib/context.sh` is owed to the port** —
-gate-sdk/SPEC.md §The kit-library port disposition does not reach it, so the
-silence here is not an undecided class. `lib/toolfloor.sh` rides the config
-bridge's `lib/*.sh` glob and resolves no bridged knob (`PROBE_SET` carries no kit
-prefix); what sequences it is that its roster is read on the **installer** path
-and by `check-install-toolchain`'s parity assertion, so it moves behind the
-installer's own behind-invoke relocation and is sequenced there rather than in
-this section. The `lib/pub-lang/` extractors that sat beside it are
+**`lib/context.sh` is now the kit's only library member, and that is a
+discharge rather than a silence.** The one that sat beside it, the sourceable
+owner of the probe roster and the floor predicate, was read on the **installer**
+path and by `check-install-toolchain`; the installer's behind-invoke relocation
+put both readers in the crate, which emptied its caller set and let it be deleted
+rather than ported (§bin/env-probe). The `lib/pub-lang/` extractors that sat beside it are
 **discharged**: they were the bundled members of the registry `pub-index`
 resolves, and they moved in-crate behind the surviving seam in the cut that
 ported that resolver (§Index-first reading).
@@ -1203,8 +1195,8 @@ member receives its knobs this way whatever the binary carries.
 **Which is also why it is permanently shell, and it declares so in its own
 header**: being the bridge's sole resolver for the `CONTEXT_KIT_*` knobs is
 exactly the property above, read as a port disposition — gate-sdk/SPEC.md §The
-kit-library port disposition rules the class. The ruling reaches this file alone
-among the kit's libraries; `lib/toolfloor.sh` is owed and its sequencing is below.
+kit-library port disposition rules the class. The ruling reaches this file alone,
+which after the roster's move is also the whole of what the kit's `lib/` carries.
 
 **Every default here is repo-relative, and that is a bridge requirement rather
 than a style.** A bridged value is baked verbatim into the tracked pre-commit
@@ -1384,12 +1376,13 @@ A consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
 whose `rust.sh` emits a marker row: it is the extractor seam's **end-to-end
 proof**, the consumer-first resolution order and the `bash` spawn that executes a
 consumer extractor both exercised, with the shadow's output rather than the
-built-in grammar's recorded in the golden. **The sequencing behind the
-installer's behind-invoke relocation reaches `index-tests/toolfloor-cases.sh` and
-`lib/toolfloor.sh`, and it is stated with its mechanism so a later reader can
-re-run the test rather than inherit the verdict**: `index-tests/toolfloor-cases.sh`
-*sources* `lib/toolfloor.sh`, so the case table is a projection of that library's
-own verdict set and the two move together. The driver above was once bound into
+built-in grammar's recorded in the golden. **The installer's behind-invoke relocation reached
+`index-tests/toolfloor-cases.sh` and the shell library it sourced, and the
+mechanism is stated so a later reader can re-run the test rather than inherit the
+verdict**: the case table *sourced* that library, so it was a projection of that
+library's own verdict set and the two moved together — into deletion rather than
+into a port, once the relocation emptied the library's caller set
+(§bin/env-probe). The driver above was once bound into
 that pair too, on the strength of a shared section and a shared subject — a
 co-location claim wearing a coupling claim's words. It sourced neither the runner
 nor the library; its only contact with the sequenced library was a `bash`
@@ -1402,32 +1395,23 @@ members it names (gate-sdk/SPEC.md §Porting a gate to the binary substrate). Th
 smoke declared the same section, sourced neither, and its own header called it a
 standalone validate suite, so it was unblocked and has since cut; the driver was
 released on the same test and has since cut too (below). **Releasing the driver
-released nothing else**: `index-tests/toolfloor-cases.sh` stays owed and is still
-spawned, now by the compiled arm. `bin/always-loaded.sh` (§The always-loaded
+released nothing else** at the time. `bin/always-loaded.sh` (§The always-loaded
 meter) was a different section's owed file, correctly homed and takeable as a
 singleton on its own, and it has since cut too — its golden is the arm's parity
-oracle, held byte-for-byte over an unedited expectation file (below). What stays
-owed to context-kit is `index-tests/toolfloor-cases.sh` and `lib/toolfloor.sh`
-behind that same installer relocation and nothing else — a later session may not
-quietly add a member this section does not name, and the roster's oracle is
+oracle, held byte-for-byte over an unedited expectation file (below). **Nothing
+is owed to context-kit now**: the last two members left by deletion rather than
+by a port, and a later session may not quietly add one this section does not
+name. The roster's oracle is
 `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` rather than a count
 maintained here.
-The floor predicate rides the same arm rather than a fixture pair —
-it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
-`lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed
-verdict set, the spellings of an unconstrained member, and the
-`uncomparable` fail-closed arm are asserted against a golden rather than assumed.
-**That golden's scope is the shell holder alone**, and saying so is the point: a
-compiled holder now exists (§bin/env-probe), and it is held to this one by
-`gate-tests/toolfloor-parity.test.sh` rather than by this golden. Pointing the
-compiled holder at the same file would make the verdict set a third copy, which
-is what evidence-kit/SPEC.md §lib/evidence.sh's *no committed golden* rule
-refuses for a two-holder comparison.
-The audience axis is pinned in a second table in the same file, printing the
-parsed field and the consumer-side predicate per element rather than a verdict,
-because no verdict reads that field: its present, empty and omitted forms are
-each a case, the emptiness rule being the part of the grammar a reader is
-likeliest to get wrong.
+**The floor predicate's golden retired with the shell holder it was the oracle
+for**, and the reason is worth keeping: it printed one line per (element, banner)
+pair so the closed verdict set, the spellings of an unconstrained member and the
+`uncomparable` fail-closed arm were asserted rather than assumed — of the *shell*
+holder alone. With one holder left those assertions are the crate's own unit
+tests, where a golden would be a second copy to drift; the audience axis, whose
+present, empty and omitted forms are each a case, is asserted there for the same
+reason.
 The arm registers as its own evidence-kit validate suite
 (`index_tests`, the `demo` precedent, read by exit code): the golden the refactor
 leans on now

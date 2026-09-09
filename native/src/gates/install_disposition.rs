@@ -10,7 +10,7 @@ use std::path::Path;
 // else. The help line's alternation is joined from this set rather than spelled twice.
 const VOCAB: &[&str] = &["zero-config", "on-surface", "never"];
 const ZERO_CONFIG: &str = "zero-config";
-const RECIPE: &str = "installer/lib/common/recipe.sh";
+const RECIPE: &str = "native/src/installer/recipe.rs";
 const DECL: &str = "# install:";
 
 fn basename(p: &str) -> &str {
@@ -224,9 +224,9 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    // assertion C: the installer's recipe carries no literal gate name. The file is absent in a
-    // vendored consumer, which has no installer, so its absence is a skip reported on the clean
-    // line and never a finding.
+    // spec: gate-sdk/SPEC.md §check-install-disposition — assertion C, whose holder moved in-crate
+    // with the recipe rather than retiring with it: the subject is the derivation, not the language.
+    // The file is still absent in a vendored consumer, so its absence is a skip and never a finding.
     let recipe = format!("{}/{}", root, RECIPE);
     let mut recipe_checked = "no";
     if Path::new(&recipe).is_file() {

@@ -23,16 +23,21 @@ vendored keeps working — it needs nothing from a package registry again.
 
 ## Implementation
 
-Bash, up to the boundary §The install boundary rules: the verbs are bash, and
-what the bootstrap hands to the verified gate binary is Rust the same section
-names. The one exception is the second bootstrap, which is PowerShell, because
-the host it exists for may run no POSIX shell at all — it is a `bin` entry beside
-the bash one and not a rewrite of it. npm is the delivery vehicle, never the
-implementation: **both** `bin` entries are scripts, so a reader reviewing what
-they are about to run reads source rather than a build product, and the linter
-that governs every other script in the repository governs the bash ones — the
-PowerShell half has no such linter here and its oracle is its own install-smoke
-leg instead, which is the trade §The install boundary's parity ruling accepts.
+Bash, up to the boundary §The install boundary rules — and that boundary is now
+the **bootstrap itself**. The two bootstraps are the whole of the shell: one bash,
+one PowerShell, twins rather than an original and a rewrite, because the host the
+second exists for may run no POSIX shell at all. Everything they hand to the
+verified gate binary is Rust, every verb included, so an install is written once
+in one language instead of twice by hand in two.
+
+npm is the delivery vehicle, never the implementation: **both** `bin` entries are
+scripts, so a reader reviewing what they are about to run reads source rather than
+a build product, and the linter that governs every other script in the repository
+governs the bash one — the PowerShell half has no such linter here and its oracle
+is its own install-smoke leg instead, which is the trade §The install boundary's
+parity ruling accepts. What the two scripts amount to is small and fixed by that
+section's five steps: resolve, select, verify, execute. There is no third thing a
+reader has to review before running an install.
 
 ## Requirements
 
@@ -45,29 +50,31 @@ delivery-path tool joins the toolchain roster, and the manual vendoring path
 documented on the site needs neither. The toolchain the battery does assert,
 with its version floors, is on the install page.
 
-**The verbs themselves need `jq`.** `init`, `diff` and `uninstall` read JSON —
-this package's own version stamp and the `checkwright.lock` manifest — and they
-read it with `jq`, so every one of them refuses without it, naming the program
-and the remedy (§The manifest). This is a claim about *these verbs*, separate
-from the install page's toolchain block, which names `jq` for the gates in the
-battery being vendored: different programs' users, and a machine can satisfy
-either without the other, though a machine missing `jq` is below both.
+**The verbs themselves need no `jq`.** They read JSON — this package's own
+version stamp and the `checkwright.lock` manifest — and behind the invoke they
+read it with the crate's own parser, so none of them refuses for want of an
+external one. The install page's toolchain block still names `jq`, and that claim
+is about the **gates in the battery being vendored**: a different program's users,
+and the one that survives.
 
-`doctor` is the exception by design, and the exception is that it **reaches its
-diagnosis** rather than that it is content: it reports a toolchain instead of
-refusing before it can report one, so on a machine with no `jq` it renders its
-whole report, names `jq` as missing, and tells you that is also why the manifest
-could not be read. Its verdict is still **below contract**, because `jq` is a
-consumer-audience member of the toolchain floor and the battery being vendored
-needs it too. So the installer always knew about this dependency and `doctor`
-always said so — what was wrong is that `init` runs `doctor` *last*, after the
-JSON reads that need `jq`, so the one verdict that named the program was ordered
-behind the refusals that could not. The precondition above is that ordering
-corrected, not a fact newly discovered.
+**A `jq`-less machine is still refused an install, and by a better message.** `jq`
+is a consumer-audience member of the toolchain floor, so `doctor` — which runs as
+`init`'s last precondition, still before any file is written — blocks the install
+naming the floor the battery needs. What is lost is a refusal that named a verb's
+own dependency; what replaces it is the one that names the adopter's actual
+problem.
+
+`doctor` is the verb that **reaches its diagnosis** rather than refusing before it
+can report one: it renders its whole report, names every floor member that is
+missing or below its floor, and only then returns the verdict. That is why it is
+the precondition `init` gates on, and why its ordering — last, after the manifest
+and the profile are resolved — keeps a bad manifest from being reported as a
+toolchain fault.
 
 ## Layout
 
-- `bin/checkwright.sh` — the verb dispatcher, and the package's `bin` entry.
+- `bin/checkwright.sh` — the bash bootstrap (§The install boundary), and the
+  package's `bin` entry.
 - `bin/checkwright.ps1` — the PowerShell bootstrap (§The install boundary), the
   second `bin` entry, named `checkwright-pwsh` there. The name is not cosmetic:
   npm generates `<name>.cmd` and `<name>.ps1` shims itself, so a second entry
@@ -76,19 +83,16 @@ corrected, not a fact newly discovered.
   decorative** — npm's shim generator reads the target's shebang to pick the
   interpreter, and without one it writes a shim that invokes the `.ps1`
   directly, which is precisely what a Windows host cannot do.
-- `lib/` — one file per verb; the dispatcher's roster is this directory.
-- `lib/common/` — modules the verbs share. The dispatcher's roster is the
-  `*.sh` files directly under `lib/`, and that glob does not descend, so a
-  shared module cannot be advertised as a verb. **What decides whether one of
-  these is reachable at an installed `PKG_ROOT` is `package.json`'s `files`
-  roster, not this directory** — a helper sourced from the consumer smoke
-  resolves only because `lib/` is on that roster, so a module added here is
-  shipped by that entry and by nothing in this layout. The same holds for `bin/`,
-  and it is worth stating because the natural repair looks different: a `bin`
-  entry whose target is not published ships a broken package, but the roster's
-  entries are **directories**, so both bootstraps are already published by
-  `bin/` and neither is named on the roster individually. Adding one would be a
-  second declaration of what the directory entry already carries.
+  **There is no `lib/`.** Every verb lives behind the invoke, in the gate binary
+  the payload carries, so the package ships two bootstraps and a payload and
+  nothing between them. **What decides whether a file is reachable at an installed
+  `PKG_ROOT` is `package.json`'s `files` roster, not the directory listing** — and
+  the roster's entries are **directories**, so both bootstraps are published by
+  `bin/` and neither is named on it individually. Adding one would be a second
+  declaration of what the directory entry already carries. That rule is why the
+  deletion of the verb tree is spelled on the roster as well as on disk: a
+  directory that stops existing has to stop being published, and the two are
+  separate edits.
 - `payload/` — the vendored kit source, assembled at pack time from the
   repository's own kit roots. It exists in the published tarball only, never in
   the source tree, so no second copy of any kit is checked in.
@@ -96,10 +100,13 @@ corrected, not a fact newly discovered.
 
 ## The verbs
 
-`init` makes an install; the rest manage one after it exists. The roster itself
-is derived — a verb is advertised because its implementation is present under
-`lib/`, so `checkwright --help` lists the directory rather than a list beside it
-— and what follows is what each verb is *for*.
+`init` makes an install; the rest manage one after it exists. Each is a
+`--`-prefixed arm of the gate binary, reached through the bootstrap's one argv
+rule (§The install boundary, step 5), and **the roster's owner is the binary**: a
+verb is advertised because the artifact carries it, so `checkwright --help` cannot
+promise a verb this build does not implement and an unknown verb is refused by the
+binary's own usage arm rather than by a roster beside it. What follows is what
+each verb is *for*.
 
 | verb | asks | reads |
 | --- | --- | --- |
@@ -161,26 +168,12 @@ and checked against a published digest before it is written, which is what makes
 zero build step a property of `init` itself rather than of which profile you
 picked (gate-sdk/SPEC.md §Porting a gate to the binary substrate, criterion 5).
 
-Four preconditions, and all of them **refuse** rather than warn — a partial
+Three preconditions, and all of them **refuse** rather than warn — a partial
 install is the outcome none of them may produce, so every one is checked before
 a single file is written:
 
 - **You are inside a git work tree.** The vendored source is meant to be
   committed; that is what makes it auditable rather than merely present.
-- **`jq` is installed.** It sits immediately before the first JSON read rather
-  than at the very top of the verb, because that is where *before the first
-  read* falls: the two preconditions either side of it are about the package and
-  the repository and are answerable without `jq`, while every refusal after it
-  is one a `jq`-less machine would otherwise meet as a misdiagnosis. That is the
-  whole of what this precondition buys, and it is worth stating as the
-  deliverable rather than leaving it to be read as a side effect: the refusals
-  below it — *this package carries no version stamp*, and *`checkwright.lock`
-  carries a schema this build does not know* — **keep their exact text and
-  recover their accuracy**. Each is the right message for the condition it
-  names, and each was only ever wrong as the message a `jq`-less machine
-  received, reached by a path that had nothing to do with what it said. After
-  this precondition, meeting one of them means the condition it names is
-  actually true.
 - **The worktree is clean.** `init` makes one commit, and a dirty tree would
   fold your work into it, leaving a reviewer's diff wider than what was
   actually vendored. It is also what makes a run's own residue attributable:
@@ -197,6 +190,13 @@ a single file is written:
   not below it. A machine that *is* below it blocks *before* any partial
   install, rather than halfway through one, which is why `doctor` ships in the
   same phase as `init` rather than as a later convenience.
+
+  **This is the precondition that carries the whole toolchain refusal**, and it
+  is worth saying so where a reader meets the list: every refusal `init` makes
+  about the machine it is running on is this one. The refusals below it — *this
+  package carries no version stamp*, and *`checkwright.lock` carries a schema
+  this build does not know* — are about the package and the manifest, are reached
+  by the crate's own JSON reader, and each means exactly the condition it names.
 
 It writes the selected profile's kit directories, a `gates.list` seeded with
 each kit's starting gates, the config seam files those kits need, and the
@@ -349,21 +349,22 @@ the block is read on day one rather than sitting resident. lifecycle-kit's is
 not, because nothing `init` registers would read it: seeding it would put
 always-loaded instruction for a stage machine into your agent file and charge
 every session's context for machinery nothing yet enforces. The rule is also
-what keeps `recipe_needs_agent_file` from being a seeding roster — the predicate
+what keeps the agent-file *membership* predicate from being a seeding roster — it
 asks whether the agent file must *exist* for a kit's starting gates, which
 context-kit answers yes to while writing nothing into it; the seeding arms ask
 the narrower question of which kit writes into it.
 
-**The roster is derived from the gates themselves.**
-`recipe_gates(kit-payload-dir, profile)` in `lib/common/recipe.sh` is the
+**The roster is derived from the gates themselves.** The recipe's per-kit gate
+derivation, behind the invoke with everything else, is the
 **whole** of a fresh consumer's registry — what a tree `init` just made will run
 is read there, never inferred from a kit's full roster or from this repo's own
 `gates.list` — and what it reads is each shipped gate's own
 `# install: <disposition>` header line, taking every member a kit declares
 `zero-config` (gate-sdk/SPEC.md §The install disposition). It carries no gate
-name of its own, so a kit that adds a zero-config gate is picked up with no edit
-here. One function unions the result over a profile's kits, `profile_gates` in
-`lib/common/profile.sh`, and both the registry `init` writes and the consumer
+name of its own, which `check-install-disposition`'s third assertion holds it to,
+so a kit that adds a zero-config gate is picked up with no edit
+there. One function unions the result over a profile's kits, and both the
+registry `init` writes and the consumer
 smoke's monotonicity assertion read that one derivation. No disposition varies on
 the profile today; the argument is the seam, so a roster that does vary becomes a
 change to one gate rather than to a signature and every caller of it.
@@ -377,8 +378,8 @@ expressible, since the moment it is armed anywhere it is owed to `full`, and
 once it is owed to `full` it is simply `zero-config`. `starter` sits below every
 profile for the mirror reason, so no profile may **drop** a gate-sdk
 `zero-config` member either; and subtraction in the band between them has
-nothing to derive from, because §The consumer smoke's own rule forbids
-`lib/common/recipe.sh` a literal gate name and no gate declares
+nothing to derive from, because `check-install-disposition` forbids the recipe
+a literal gate name and no gate declares
 profile-varying reachability. So the parameter is **additively inert** and
 subtractively undeclarable, which is why a cohort of gates a narrow profile
 should receive arrives as a disposition correction on each gate instead. The
@@ -401,13 +402,14 @@ roster is what each caller derives.
 
 ## The install boundary
 
-`init` is bash today, and one part of it must stay whatever language the host
-already runs: the bootstrap that resolves, verifies and executes the gate
-binary. Everything else is **conditional install logic**, and
+One part of an install must be written in whatever language the host already
+runs: the bootstrap that resolves, verifies and executes the gate binary.
+Everything else is **conditional install logic**, and
 TRAJECTORY.md's interpreter policy (§The closed rulings) rules that everything
 conditional belongs on the far side of that invoke — written once, in Rust,
 rather than twice, in bash and in the PowerShell half a native Windows install
-needs. This
+needs. **That relocation has landed**: the bootstrap below is the whole of the
+shell, and every verb is an arm of the binary it invokes. This
 section states the bootstrap's job, the disposition every install step carries,
 and the test that assigns one, so a step's side of the line is read off a rule
 rather than re-argued per step.
@@ -419,7 +421,19 @@ rather than re-argued per step.
 3. read the payload's target roster and resolve the artifact and its sidecar,
    refusing a declared target whose pair is incomplete;
 4. verify the artifact's SHA-256 against that sidecar;
-5. execute the verified artifact, forwarding argv verbatim.
+5. execute the verified artifact, under one unconditional argv rule: a dashless
+   leading token is prefixed with `--`, and everything after it is forwarded
+   verbatim.
+
+Step 5's rule is the only conditional shape either bootstrap carries, and it is
+unconditional in the sense that matters — it branches on the *shape* of the first
+token and never on which verb it is, so no verb table is maintained in two
+languages. `checkwright init --profile starter` reaches the artifact as
+`--init --profile starter`; `checkwright --help` is forwarded unchanged. Two
+consequences follow, and both are improvements rather than costs: the verb
+roster's owner moves from the filesystem to the binary (§The verbs), and the two
+halves stop disagreeing about the verb word, which one used to forward and the
+other to consume.
 
 **Every step's disposition takes one of three values**, and the test that
 assigns one is *what the step needs that the binary cannot supply at that
@@ -433,7 +447,8 @@ moment*:
   reason drawn from the previous bullet and no other.
 - **`retired`** — the step exists only to serve a dependency the relocation
   removes, and ceases to exist rather than moving. `init`'s `jq` preflight is
-  the worked case: nothing behind the invoke reads JSON with `jq`.
+  the worked case: nothing behind the invoke reads JSON with `jq`, because the
+  crate reads it with `serde_json`.
 
 **How the port oracle reads those three values — ruled 2026-08-31 by the
 operator in consult, so a cut can cite this section as its stated contract.**
@@ -443,9 +458,10 @@ file whose *whole* body is bootstrap steps declares `# no-port:` citing this par
 only `no-port` cause `installer/` may carry. `behind-invoke` is a **port
 obligation**: a file carrying any such step stays `owed` in
 `--emit port-blockers --tree` until the step is relocated behind the invoke and
-the shell that ran it is deleted. `retired` steps are deleted, not declared. So
-today no `installer/lib/` or `installer/bin/` file declares, and none should
-until the relocation lands — the owed column is reading this section correctly.
+the shell that ran it is deleted. `retired` steps are deleted, not declared. **The relocation has landed, so the
+obligation is discharged**: what `installer/` still carries is two bootstraps
+whose whole bodies are the steps above, each declaring `# no-port:` citing this
+paragraph, and nothing else.
 `scripts/pack-installer.sh` is outside this section's reach and its disposition
 is §The packer's, so a reader hunting the packer's port standing here is in the
 wrong section.
@@ -481,18 +497,18 @@ assertions:
 - **Bootstrap parity** — that the two halves answer the five steps the same way.
   The PowerShell leg discharges this for its half.
 - **Payload coverage** — that a whole `checkwright init` completes through that
-  bootstrap. This is **owed**, not dropped, and it is owed **with the
-  relocation**: the binary carries no `init` arm, so step 5's verbatim argv
-  forwarding hands `init` to a program that does not implement it. No leg can
-  assert a completion that no code path can reach.
+  bootstrap. This was owed rather than dropped, and it was owed **with the
+  relocation**: while the binary carried no `init` arm, step 5 handed `init` to a
+  program that did not implement it, and no leg could assert a completion no code
+  path could reach. The relocation minted that arm, so a completion is reachable
+  and the leg asserts one.
 
 The two were conflated because both halves were assumed to land together. The
 drift the 2026-08-26 ruling guards is between the two **bootstraps**, and *end to
 end* adds **payload** coverage rather than **parity** coverage — which is why the
-first part can ship alone and the second must wait. **The shortened oracle is not
-the whole one**, and a later reader must not take it for the whole one: until the
-relocation lands, a green PowerShell leg says the five steps agree, and says
-nothing whatever about an install completing.
+first part shipped alone and the second waited. Both are in place now, and the
+distinction is kept because a later reader sizing a new leg needs to know which
+of the two it is adding.
 
 **What a reader compares when the two legs disagree.** Parity held by running
 tells you *that* the halves differ and never *where*, and with two hand-kept
@@ -505,7 +521,7 @@ arriving at a divergence walks it rather than diffing two languages:
 | --- | --- | --- |
 | 1 payload directory | the resolved package root, after the symlink chain | the path each half prints when the payload is absent |
 | 2 host triple | the triple each half maps this host to | one half's empty string against the other's triple |
-| 3 selection | which of the three outcomes each half reached | omit-and-declare vs. verify vs. refuse, never the exit status alone |
+| 3 selection | which of the three outcomes each half reached | unrostered vs. verify vs. broken payload, by message and remedy, never the exit status alone |
 | 4 digest | the hex compared, and its case | a mismatch on identical bytes is a case fold, not a corrupt artifact |
 | 5 execution | the argv the artifact actually received | the binary's own usage refusal, which echoes what it was handed |
 
@@ -552,9 +568,9 @@ The step is consequently neither droppable nor portable. It is **not** stuck:
 the compiled substrate already spawns `bash <emitter>` for exactly this
 generator from `check-graph`'s own assertion, the port criteria clear that spawn
 explicitly because `bash` is on `GATE_SDK_PROGRAM_FLOOR`
-(gate-sdk/SPEC.md §lib/gate.sh) — the payload's own assumed-program set, not
-`context-kit/lib/toolfloor.sh`'s consumer-audience probe roster that `bash` also
-happens to sit on — and the arm declares it. So the step moves behind the invoke
+(gate-sdk/SPEC.md §lib/gate.sh) — the payload's own assumed-program set, not the
+consumer-audience probe roster that `bash` also
+happens to sit on (context-kit/SPEC.md §bin/env-probe) — and the arm declares it. So the step moves behind the invoke
 as a declared spawn, and the *bootstrap* — which is what the interpreter
 policy's standing "assume no POSIX shell" obligation binds — spawns nothing.
 Recorded because the natural reading is that this step is a third class that
@@ -586,62 +602,55 @@ specified on the family rather than on the op, so an op that *can* refuse
 something the adopter can act on has a status to refuse with rather than minting
 one.
 
-**The relocation's own precondition: an uncovered platform must still install.**
-A step may move behind the invoke only where the binary is reachable on every
-platform that step runs on today, and today it is not. §The gate binary's
-selection table has three outcomes and two of them leave `init` with no binary —
-a host whose triple the payload's roster does not carry
-(`substrate-unavailable`), and a host with no SHA-256 hasher
-(`digest-unverifiable`). Both **proceed**, omitting the compiled gates and
-declaring the omission in the consumer's `gates.list`. That branch does not keep a
-battery alive on an uncovered platform: every registered member dispatches to the
-binary, so an artifact-less install retains no live member and its battery
-refuses. What the branch delivers is the
-**install and its disclosure**: the vendored kits, the manifest and every seeded
-surface land, every lost member is recorded, and `doctor` says the battery cannot
-run here at all (§doctor). Once
-conditional install logic sits behind the invoke, the same branch has nothing to
-run at all: the failure mode the relocation introduces is **not a smaller
-battery but no install**, and nothing in tree asserts that a relocated step
-still runs on an artifact-less host.
+**The relocation's own precondition, and how it was discharged.** A step could
+move behind the invoke only where the binary is reachable on every platform that
+step ran on, and it was not: §The gate binary's selection table has three
+outcomes, and two of them once left `init` with no binary — a host whose triple
+the payload's roster does not carry, and a host with no SHA-256 hasher. Both
+**proceeded**, omitting the compiled gates and declaring the omission in the
+consumer's `gates.list`.
 
-**The rule that yields, and it is what selects each cut:** a step is takeable
-now iff it *already* runs only when an artifact was selected. Such a step costs
-an artifact-less host nothing, because on that host it never ran. Two
-consequences follow for the steps that are not:
+That branch never kept a battery alive on an uncovered platform: every registered
+member dispatches to the binary, so an artifact-less install retained no live
+member and its battery refused. What it delivered was the install and its
+disclosure. Once every step of an install sits behind the invoke, the same branch
+has nothing to run at all — the failure the relocation would otherwise introduce
+is **not a smaller battery but a silent non-install**.
 
-- **Relocating the *unconditional* remainder of `init` is sequenced behind the
-  artifact roster covering every supported platform** — the set
-  `docs/install.md` §Requirements declares in its platform block, against what
-  `native/targets.list` carries. The sequencing points at that declaration
-  rather than at whichever task happens to own the widening, because a task is
-  a lifetime that ends and a live precondition pointed at one goes stale the
-  day it retires — which is exactly what happened to the entry this clause used
-  to name.
-- **`digest-unverifiable` must become a refusal rather than an omission** at the
-  same moment, because step 4 of the bootstrap is irreducible: a host that
-  cannot hash cannot verify, and verifying before executing is the whole of the
-  integrity claim. On Windows the branch is vacuous — PowerShell carries
-  `Get-FileHash` — so the cost lands on a POSIX host missing both `sha256sum`
-  and `shasum`.
+**So both outcomes became bootstrap refusals**, which is the honest form of what
+those hosts were already getting:
+
+- **An unrostered host is refused, naming the platform.** There is no adopter
+  action, and saying so is better than writing a tree whose battery cannot run.
+- **A POSIX host carrying neither `sha256sum` nor `shasum` is refused** rather
+  than served an unverified artifact, because step 4 of the bootstrap is
+  irreducible: a host that cannot hash cannot verify, and verifying before
+  executing is the whole of the integrity claim. On the PowerShell half the branch
+  was always vacuous — `Get-FileHash` — which is the same fact this section
+  records from the other direction.
+
+**The digest question dissolves behind the invoke rather than moving.** The binary
+hashes in-process, so nothing past step 5 needs an external hasher at all; what
+survives is the bootstrap's own step 4, and it survives because it cannot use the
+binary to verify the binary.
 
 ## The gate binary
 
 A gate whose implementation is a compiled subcommand needs that binary on disk
-before it can run, and `init` is what puts it there. It **selects, verifies and
-places** — it never builds, and it never fetches. Everything below sits inside
-the irreducible bootstrap the vendoring ruling leaves outside the binary
-(gate-sdk/SPEC.md §Porting a gate to the binary substrate): the binary cannot
-select itself, so something must resolve the platform, verify the artifact, and
-place it. Each step is deliberately small enough to be written twice, in bash
-and in PowerShell.
+before it can run, and `init` is what puts it there. Selecting and verifying it
+is the **bootstrap's** job, because the binary cannot select itself; placing it
+in the consumer's tree is `init`'s, behind the invoke. Nothing builds and nothing
+fetches. The selection and verification steps below sit inside the irreducible
+bootstrap the vendoring ruling leaves outside the binary
+(gate-sdk/SPEC.md §Porting a gate to the binary substrate), and each is
+deliberately small enough to be written twice, in bash and in PowerShell.
 
 **Platform resolution is derived and never stored.** This paragraph describes the
 **bash** half; the PowerShell half answers the same question from its own runtime
 and is described at the end of it. `target_of_host()` maps
 `uname -s` and `uname -m` to one Rust target triple, and to the empty string on
-a host that maps to none. It runs once per `init`, after the profile's kit set
-resolves and before anything is written. The result stays a local: a stored copy
+a host that maps to none. It runs once per invocation, before anything else
+happens. The result stays a local: a stored copy
 would be a second source for a fact the host already answers, and it is stale
 the first time a vendored tree moves between machines — the case that matters
 most, since a vendored tree is shared by construction. Two fields rather than
@@ -658,7 +667,7 @@ that host's own `rustc` reports as its host triple, `x86_64-pc-windows-msvc`.
 Before this arm those hosts matched nothing and the function returned empty.
 **The arm's verdict is unchanged today, stated rather than left to be
 discovered**: its reader is `select_artifact`'s roster comparison, live on every
-install, and that comparison still fails because `native/targets.list` does not
+invocation, and that comparison still fails because `native/targets.list` does not
 name the triple — a target joins the roster only on a run that produced and
 exercised its artifact (gate-sdk/SPEC.md §Consumer payload), and none has. It is
 reachable **now** for testing through `GATE_SDK_NATIVE_TARGETS_FILE`, the same
@@ -675,60 +684,59 @@ assume none. On a native Windows x64 host it resolves `x86_64-pc-windows-msvc`,
 the same triple the bash half's `MINGW*`/`MSYS*`/`CYGWIN*` arm produces and for
 the same stated reason: the map answers *which published artifact fits this
 host*. **Its verdict is unchanged today for the same reason the bash arm's is** —
-`native/targets.list` does not carry that triple, so selection still resolves
-`substrate-unavailable`. Shipping this half is not a platform claim, and
+`native/targets.list` does not carry that triple, so selection still refuses the
+host as unrostered. Shipping this half is not a platform claim, and
 §Requirements still says what it says.
 
-**Selection has three outcomes, and collapsing any two is the defect.** The
+**Selection keeps three outcomes, and collapsing any two is the defect. What
+changed with the relocation is that only one of them proceeds.** The
 payload carries the target roster verbatim beside the artifacts
-(gate-sdk/SPEC.md §Consumer payload), and `init` reads it rather than inferring
-support from a directory's presence:
+(gate-sdk/SPEC.md §Consumer payload), and the bootstrap reads it rather than
+inferring support from a directory's presence:
 
 | the host resolves to | the payload holds | outcome |
 | --- | --- | --- |
-| a target **not** in the roster | — | **omit and declare** — a supported outcome, not a failure |
-| a target **in** the roster | its binary and sidecar | verify, then write |
+| a target **not** in the roster | — | **refuse** — this platform is not in the support roster; there is no adopter action |
+| a target **in** the roster | its binary and sidecar | verify, then execute |
 | a target **in** the roster | nothing, or half the pair | **refuse** — the payload is broken |
 
-The third row is the whole reason the roster is read. Without it `init` cannot
+The three stay told apart by **message and remedy**, never by exit status alone:
+an undeclared host and a broken payload remain different answers to an adopter,
+and collapsing them is the same defect this table has always named. The third row
+is the whole reason the roster is read. Without it the bootstrap cannot
 tell a platform that was never committed to from a platform that was committed
 to and whose artifact went missing, and reading the second as the first turns a
 publisher defect into a silently smaller green battery. A payload assembled with
 no artifacts at all carries no `artifact/` directory, so it reads as the first
-row and never as a payload whose every target went missing. The refusal is the
-one place this path fails an install, and it belongs there: a missing artifact
-for a **declared** target is a defect the adopter cannot act on and must not
-inherit silently.
+row and never as a payload whose every target went missing.
 
-**Both bootstraps owe this table all three rows, and the PowerShell half's first
-row reads differently without collapsing into another.** On the bash half
-*omit and declare* proceeds — there is a whole install behind it to perform. The
-PowerShell half has nothing behind it yet: what proceeds on the bash half is
-conditional install logic, which sits `behind-invoke` and does not exist. So that
-half declares the omission and stops, at the bash half's own exit status for the
-same outcome, and the two agree on everything an adopter can observe at this
-point. It is still the **first** row and not the third: the third refuses and
-says the payload is broken, this one reports that the platform is not in the
-support roster. A twin that returned the same status for both would be
-collapsing them, which is the defect this table exists to name.
+**Why the first row refuses rather than omitting.** Once every step of an install
+is on the far side of the invoke, an artifact-less host has no code path at all,
+so *omit and declare* has nothing to declare into and nothing to proceed with
+(§The install boundary). A refusal that names the platform is the honest form of
+what that host was already getting. **Both bootstraps owe this table all three
+rows and now answer them identically**, which is a parity defect closed rather
+than one introduced: the PowerShell half used to declare-and-stop where the bash
+half declared-and-proceeded.
 
-**The digest is verified before anything is written.** `init` computes the
-artifact's SHA-256 and compares it against the sidecar that travelled with it,
-and only then writes. The ordering is the whole of it: a consumer who cannot
-read the gate has nothing else standing between them and a substituted binary,
-and a post-write check has already put it on disk. A mismatch refuses — never a
-warning, never a write.
+
+**The digest is verified before anything is executed.** The bootstrap computes
+the artifact's SHA-256 and compares it against the sidecar that travelled with
+it, and only then runs it. The ordering is the whole of it: a consumer who cannot
+read the gate has nothing else standing between them and a substituted binary. A
+mismatch refuses — never a warning, never a run.
 
 `sha256sum` is tried first, then `shasum -a 256`, because stock macOS ships the
-second and not the first. When **neither** resolves the install proceeds and the
-artifact is omitted rather than written unverified. Both halves are load-bearing:
-never write what was not verified, and never fail an install over something the
-adopter did not choose.
+second and not the first. When **neither** resolves the bootstrap **refuses**:
+nothing unverified is ever executed, and there is no path here that skips the
+check. This is the only step an external hasher is still needed for — behind the
+invoke the binary hashes in-process, so the placement `init` performs verifies
+without one.
 
 **That hasher resolution is the bash half's, and the PowerShell half has none of
 it — a ruling, not an omission.** PowerShell carries `Get-FileHash`, so on that
 half there is no hasher to resolve between, no `sha256sum`/`shasum` fallback and
-**no `digest-unverifiable` outcome at all**: the branch is vacuous there, which is
+no refusal to reach: the branch is vacuous there, which is
 the same fact the relocation's precondition already records from the other
 direction. This is the one step where the twin is simpler than the original
 rather than parallel to it, and it is stated because a reader holding the two
@@ -765,42 +773,22 @@ copy. On a payload carrying no artifact that file is therefore never written and
 is not a `files` entry at all — so a verb reasoning about the surfaces `init`
 rewrites on every run must not assume it is present.
 
-**Omission is declared and counted.** An omitted member rides the registry
-rather than a new file: `init` writes `# omitted: <name> <reason>` into the
-consumer's `gates.list` in place of the member's name — a comment line the
-runner already strips from the live set. The record then sits in the consumer's
-tracked history where a reviewer reads it, instead of scrolling past in
-install-time stdout, and a re-run on a machine that has since gained a hasher
-converts it back into a live member with no hand edit. Two reason tokens,
-because there are two remedies:
+**The install-time omission retired with the bootstrap's one success path.**
+`init` once wrote `# omitted: <name> <reason>` into the consumer's `gates.list` in
+place of a member it could not install, with two reason tokens for two remedies.
+Neither reason can arise any more: an unrostered host and a hasher-less host are
+both refused before an install begins (§The install boundary), so an install that
+happens at all installs the whole starting roster.
 
-- `substrate-unavailable` — this host's platform has no declared artifact. There
-  is no adopter action; the platform is not in the support roster.
-- `digest-unverifiable` — an artifact exists but no hasher does. Install
-  `sha256sum` or `shasum` and re-run `init`.
+**What did not retire is gate-sdk's registry class.** `# omitted: <name> <reason>`
+is a comment line the runner strips from the live set and reports beside its
+summary (gate-sdk/SPEC.md §run-gates), and it is **reason-agnostic**: it belongs
+to any consumer who omits a member for any cause of their own. Two mechanisms
+shared one vocabulary, and only the installer's outcome retired — reading the
+class's two best-known values out of existence with it would publish an installer
+decision as a kit narrowing. `doctor` reports whatever reason it finds there and
+invents no remedy for it (§doctor).
 
-**Where every member is omitted, the count is not the whole story and `doctor`
-says the rest.** The per-reason counts read identically whether an install lost
-two members or all of them, and the second is the case where an adopter's battery
-cannot run at all. So `doctor` emits one further line exactly when no live member
-survives, naming that consequence and its remedy — a line `init` deliberately does
-not turn into a refusal: refusing there would cost an uncovered platform the
-vendored kits, the manifest and every seeded surface along with the battery, which
-is a worse install than an honest one that declares what it lost.
-
-A third token would need a third remedy to earn its place, and one was
-**proposed and refused on exactly that rule**: splitting `substrate-unavailable`
-into *host-unmapped* (the `uname` pair maps to no triple) and
-*target-not-published* (it maps to one the roster does not carry), which
-`select_artifact` collapses into a single token today. Both cases have the
-**same** remedy — there is no adopter action, the platform is not in the support
-roster — so no token is minted and the collapse stands. Which members are
-affected is derived from the payload, never maintained here: a starting-roster
-gate the payload declares as `<kit>/checks/<name>.gate` — and does not also ship
-as a shell script — is one that dispatches to the binary. `run-gates.sh` reports
-the count and remedy on a line of its own beside its summary
-(gate-sdk/SPEC.md §run-gates), and `doctor` reports it against the reason that
-caused it.
 
 **Placement is one call, and the bootstrap makes it.** Steps 1 to 4 above are
 the bootstrap's; placing the artifact is conditional install logic, so it sits
@@ -875,9 +863,9 @@ Every row of the table above runs under an oracle rather than a
 hand-verification with a date on it, and the rows are split across §The consumer
 smoke's arms by which install can show them. The **verify-then-write** row is the
 main loop's, on every profile, because the payload it packs carries a binary this
-run built; the **omit-and-declare** row is the binary-less leg's and the artifact
-arm's undeclared-host leg's; the **refusal** row is the artifact arm's alone,
-against a payload it mutated after extraction. Nothing here changes for that —
+run built; the **unrostered-host** row is the binary-less leg's and the artifact
+arm's undeclared-host leg's; the **broken-payload** row is the artifact arm's
+alone, against a payload it mutated after extraction. Nothing here changes for that —
 the behavior this section specifies is what those arms assert, not something they
 added.
 
@@ -907,8 +895,10 @@ anywhere, it reports the toolchain verdict. Run inside a repository that has
 been vendored into, it additionally reads `checkwright.lock` and reports the
 installed release, the upstream commit it came from, the profile, and the kit
 set — plus, where one was installed, the gate binary's target re-verified
-against its recorded digest **in place**, and any omitted members against the
-reason that caused them (§The gate binary).
+against its recorded digest **in place**, and any member the registry records as
+omitted, against whatever reason it carries. `doctor` invents no remedy for that
+reason: the class is reason-agnostic and the two install-time tokens that once had
+one are retired (§The gate binary).
 
 Those last two **report without setting the exit status**, and the asymmetry is
 deliberate rather than lenient. The status is the toolchain contract, and `init`
@@ -931,13 +921,14 @@ otherwise say nothing at all about which one it inspected. A recorded registry
 missing from disk is named as such, and a manifest recording none says so — both
 with the same remedy, a re-run of `init`.
 
-`doctor` defines no floor of its own. It sources the toolchain roster out of
-its own `payload/` and renders whatever verdict that roster's predicate
+`doctor` defines no floor of its own. It reads the toolchain roster from the
+module that also holds the floor predicate (context-kit/SPEC.md §bin/env-probe)
+and renders whatever verdict that predicate
 returns, so the contract keeps one owner and this stays a display of it. Which
 members are consumer-audience — and so which absences set the verdict — is read
 off that roster, never listed here; §Requirements works the one case a reader
 arrives with, `jq`, and says why it is below contract rather than outside it. The
-payload copy is the one it reads, never a copy in the tree it is inspecting:
+roster is the binary's own rather than a copy in the tree it is inspecting:
 at `init` time nothing has been vendored there yet, so a tree copy would not
 exist at the moment the answer is needed.
 
@@ -947,7 +938,7 @@ what `uninstall` leaves over files you had edited (§uninstall) — and `version
 is the field an install always has and a residue never does, so its absence is
 the discriminator. On that reading `doctor` reports how many files remain and
 that they are yours, and prints **no** identity block, no artifact check and no
-omitted-member report: every one of those is a per-install reading with nothing
+registry report: every one of those is a per-install reading with nothing
 left to describe. Blank identity fields would be uninformative rather than
 wrong, but printing them beside a residue message is the same mixed-verdict
 shape the exit-status carve-out above already refuses.
@@ -959,12 +950,10 @@ what stops `DOCTOR: clean` from being read as a claim about the tree's contents.
 A third exit status, `2`, means the question could not be answered rather than
 that the answer was bad: the package carries no payload, or the manifest
 carries a schema key this build does not know. A build refuses an unfamiliar
-manifest rather than guessing at the shape behind it. **A missing program is that
-same status by derivation rather than by a new code** — a verb refusing because
-`jq` is absent has not judged the tree, the package or the manifest, which is
-what `1` is reserved for; it could not answer. It is also the status the
-misdiagnosing refusals already exited with, so no caller's exit-code handling
-changes and only the message does.
+manifest rather than guessing at the shape behind it. **A usage error is that
+same status by derivation rather than by a new code** — a verb refusing an
+unknown argument has not judged the tree, the package or the manifest, which is
+what `1` is reserved for; it could not answer.
 
 ## update
 
@@ -995,12 +984,12 @@ to it rather than being misreported as an absent manifest.
 most of what you see comes from `init` and says so. The one refusal `update`
 owns is prefixed `checkwright update:`; every other refusal — not a git work
 tree, an unknown schema, a dirty worktree, a stale downgrade, a below-contract
-toolchain, an absent `jq` — arrives prefixed **`checkwright init:`**, and the
+toolchain — arrives prefixed **`checkwright init:`**, and the
 success path
-reports `INIT:`, because that is literally which verb produced the line. The
-`jq` refusal inherits this without a second rule: it is raised from `lock.sh` but
-surfaces through the calling verb's own `die`, so it carries that verb's prefix,
-its `help:` line and its exit code rather than a separate idiom. This is
+reports `INIT:`, because that is literally which verb produced the line. A
+refusal raised inside a shared module inherits this without a second rule: it
+surfaces through the calling verb's own refusal shape, so it carries that verb's
+prefix, its `help:` line and its exit code rather than a separate idiom. This is
 honest rather than untidy: the prefix names the operation that actually ran, and
 renaming it cosmetically would hide exactly the delegation that makes these two
 verbs one. It is written down here so that a `checkwright init:` line answering
@@ -1169,36 +1158,31 @@ first, and the file records the criterion behind each membership beside it.
 `full` is derived instead: it is every kit root the payload carries, resolved
 at run time, never a list to maintain. The **shape** is derived too — the order,
 its bounds, and the monotonicity above are computed from the rosters and the
-payload by `lib/common/profile.sh`, so a membership row and a declared parent
-can never disagree.
+payload by the profile module behind the invoke, so a membership row and a
+declared parent can never disagree.
 
 ## The manifest
 
 `init` writes `checkwright.lock` at the root of the repository it vendors into,
-and that file is tracked like everything else it writes. It is JSON, read with
-`jq`, and it is the install-ownership record: what was installed, from which
-upstream state, and which files this installer owns. `lib/common/lock.sh` is
-its schema owner — the wire key, the accessors, the hash rule and the emitter
-live there, so the two verbs that write a manifest and the verbs that read one
+and that file is tracked like everything else it writes. It is JSON and it is
+the install-ownership record: what was installed, from which
+upstream state, and which files this installer owns. One module behind the invoke
+is its schema owner — the wire key, the accessors, the hash rule and the emitter
+live there, so the arm that writes a manifest and the arms that read one
 cannot drift apart. Being the single writer is what makes the shape a contract
 rather than a convention: keys are sorted at every nesting level, and a field is
 present exactly when its writer supplied one, so an omission leaves the key
 **absent** rather than null or blank. `commit` is the field that rule most
 recently had to be applied to: a package with no commit stamp leaves it out of
 the manifest rather than writing it empty, on the same conditional footing the
-`artifact` key already sat on. Until the `jq` precondition landed ahead of it, an
-empty `commit` was ambiguous between *no stamp* and *no `jq`* and was masked by
-statement order alone; with `jq`'s absence refused up front the field is
-decidable, and the writer's existing omission rule settles it with no new one.
+`artifact` key already sat on.
 
-Reading it needs `jq`, and that is a dependency of the verbs rather than of the
-file: `lock.sh` declares it once, beside the wire format it is a fact about, and
-each JSON-reading verb calls that declaration before its first read. So a machine
-without `jq` is told which program is missing, instead of being told the package
-has no version stamp or the manifest has an unknown schema — refusals that are
-correct for the conditions they name and were never correct for this one.
+**Reading it needs no external program.** The crate parses it with `serde_json`,
+so a refusal an adopter meets here — *this package carries no version stamp*, or
+*the manifest carries a schema this build does not know* — means exactly the
+condition it names and is never a misdiagnosed missing tool.
 
-The wire key is versioned (`checkwright-lock v1`, in `CHECKWRIGHT_LOCK_SCHEMA`)
+The wire key is versioned (`checkwright-lock v1`)
 and a build that meets a key it does not know refuses rather than guessing at
 the shape behind it.
 
@@ -1216,8 +1200,8 @@ the shape behind it.
 `doctor` and `uninstall` both need to know which `gates.list` — or which
 `gate-sdk-config.sh` — is *yours*, because the vendored kits carry fixture trees
 holding files of the same name. `files` already answers it: it records the
-repo-relative path `init` wrote, and `lib/common/recipe.sh` owns the gates-dir
-constant `init` wrote it under, so `lock_own_file` asks whether the manifest
+repo-relative path `init` wrote, and the layout constants live beside the recipe
+that wrote it under them, so the resolver asks whether the manifest
 records that exact path and returns it or nothing. A tail match cannot answer it,
 and **no predicate over the recorded kit set repairs a tail match**: `files`
 outlives `kits` by design, so a re-run at a narrower profile leaves the dropped
@@ -1332,8 +1316,8 @@ the manifest's integrity story stays inside the toolchain that contract already
 covers.
 
 **It is a *filtered* `git hash-object`, and that is the definition rather than a
-spelling.** `lock_hash` calls the command with no `--no-filters`, so the value it
-records is the hash of the content *after* whatever `text`/`eol` attribute and
+spelling.** The recorded-hash helper calls the command with no `--no-filters`, so
+the value it records is the hash of the content *after* whatever `text`/`eol` attribute and
 `core.autocrlf` setting the path's own attribute chain selects. Moving the call
 to `--no-filters` would therefore not be a spelling fix. A filtered hash and a
 raw hash disagree about exactly one population — an adopter whose edit is a
@@ -1347,7 +1331,7 @@ is, and a cause read carries no authority to change what a `files` hash means.
 
 **The command has two call sites and they do not run from the same working
 directory**, which is the first thing a cause read reaches for and which no
-surface owned. `lock_hash` writes the recorded value; the consumer smoke's
+surface owned. The manifest writer records one value; the consumer smoke's
 comparison value is hashed from its own scratch root (§The consumer smoke).
 Neither passes `--no-filters`. Whether that difference is what a disagreement
 measures is not settled here — §The consumer smoke's three-way probe exists to
@@ -1492,8 +1476,7 @@ the two that ship to no adopter and declined to turn that ground into a
 *class*; this is a per-file disposition under the case-by-case residue rule that
 ruling left standing, and it mints no class. The declaration sits in the file's
 own header and cites this paragraph. What it does **not** say: nothing here
-reaches `installer/lib/` or `installer/bin/`, whose disposition §The install
-boundary states.
+reaches `installer/bin/`, whose disposition §The install boundary states.
 
 **The smoke packs the tree it lives in, by construction — the current directory
 does not select it.** The script resolves that tree from its own path and hands
@@ -1711,8 +1694,8 @@ leg where every entry disagreed.
   that a held value and a re-read of the same call can never be read as one
   thing — a single label covering both is how the asymmetry hid.
 - **`own`** — a re-read. `git -C "$C" hash-object -- "P"`: the same command in
-  the repository context `lock_hash` runs in, which is the only thing the two
-  call sites differ by.
+  the repository context the installer's own recorded-hash helper runs in, which
+  is the only thing the two call sites differ by.
 - **`raw`** — a re-read. `git hash-object --no-filters -- "$C/P"`: the file's
   bytes with the attribute mechanism removed. `--no-filters` ignores attributes
   entirely, so this value depends on no repository, which is what makes it the
@@ -1956,8 +1939,8 @@ consumer alone.
 
 **The artifact digest is a filter-free control on the content question.** When
 the manifest records an `artifact` key, the report recomputes the artifact's
-SHA-256 from the tree — through `lib/common/digest.sh`, which owns which hasher
-this host has — and prints it beside the recorded `artifact.digest`. It costs
+SHA-256 from the tree — with `sha256sum`, already one of its own preflight
+tools — and prints it beside the recorded `artifact.digest`. It costs
 nothing new and settles the content question outright, because SHA-256 over the
 file is taken by no git filter and in no repository context: equal digests mean
 the artifact's bytes are exactly the bytes `init` published, so a `files`-row
@@ -2260,7 +2243,7 @@ sentences: some profile catches the defect at all, and some profile *below* the
 payload-derived maximum catches it. The second is the load-bearing one — a
 defect only `full` catches is not value an adopter can choose, it is value they
 have to take everything for. Neither sentence names a gate: naming one would be
-a second roster to maintain beside `recipe_gates`, and the claim is about the
+a second roster to maintain beside the recipe's own derivation, and the claim is about the
 battery rather than about a member of it. Nor does either name a profile, for
 the same reason the lattice assertions do not — which profiles catch a prose
 defect follows from the rosters, and spelling it here would be that derivation
@@ -2304,7 +2287,7 @@ payload; the derived order has **exactly one minimum and exactly one maximum**,
 so the lattice is bounded; that maximum is the payload-derived profile; and
 **gate rosters are monotone** — for every comparable pair, the smaller profile's
 gate set is contained in the larger's. The fourth is the one that earns
-`recipe_gates`' profile argument: what you experience is the battery, not the
+the recipe derivation's profile argument: what you experience is the battery, not the
 directory list, so "moving up only ever adds" is a claim about gates, and
 kit-set containment stops implying it the moment a roster varies by profile.
 Nothing here counts profiles; a fourth is admitted exactly when it fits.
@@ -2438,8 +2421,8 @@ version higher, installs `starter` from the first, has the adopter edit and
 commit two vendored files, then runs the second package's `init` with no flags at
 all. What only that reaches: the manifest's version comparison falling *through*
 in the upgrade direction rather than refusing, the profile re-read from the
-manifest when none is passed, and `claim()` re-applying the payload around a file
-that has changed since `init` wrote it — left alone, reported, and still the
+manifest when none is passed, and the ownership claim re-applying the payload
+around a file that has changed since `init` wrote it — left alone, reported, and still the
 adopter's afterwards. The roster is asserted directly rather than only through
 that effect, because two different manifests leave the same intact file on this
 hop and neither survives the next: an entry dropped altogether reads as *never
@@ -2521,7 +2504,7 @@ never a licence to drop the assertion.
 **The seam arm** covers the two surfaces `init` rewrites on every run — a
 `templates/*-config.sh` destination and gate-sdk's `msg-patterns.list` — which no
 arm above reaches. That is not an oversight in those arms: the upgrade arm's
-subject is an ordinary vendored file on the plain `copy_in`/`claim` path, so they
+subject is an ordinary vendored file on the plain claim-and-copy path, so they
 exercise a different file class and stay true without covering this one. This arm
 re-runs at the **same version with no flags**, which is the whole point — the
 class needs no upgrade and no `--force`, so an arm that only ran across versions

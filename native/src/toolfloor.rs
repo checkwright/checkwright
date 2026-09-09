@@ -3,10 +3,22 @@
 // roster keeps exactly one crate-side parser and the gate and the arm cannot disagree about it.
 use crate::proc;
 
-// spec: context-kit/SPEC.md §bin/env-probe — the roster is *read* from the library that owns it,
-// never restated: baking the elements into Rust would ship one project's dependency set as a kit
-// literal, and the file is consumer-visible precisely so a second reader can obtain it.
-pub const ROSTER: &str = "context-kit/lib/toolfloor.sh";
+// spec: context-kit/SPEC.md §bin/env-probe — the roster itself, beside the predicate that reads it.
+// It carries no knob and never did, on that section's own ground, so holding it here rather than in
+// a sourceable file loses no affordance the kit ever offered.
+pub const PROBE_SET: &[&str] = &[
+    "bash:4.3",
+    "git",
+    "jq",
+    "awk::GNU",
+    "sort::coreutils",
+    "shellcheck",
+    "cargo:1.71::contributor",
+];
+
+// spec: context-kit/SPEC.md §bin/env-probe — the roster's home, named for the reports that cite
+// where a verdict came from; a caller handed no override reads `PROBE_SET` above directly.
+pub const ROSTER: &str = "native/src/toolfloor.rs";
 
 // spec: context-kit/SPEC.md §bin/env-probe — `<name>[:<min-version>[:<impl-token>[:<audience>]]]`,
 // positional, an empty field meaning unconstrained on that axis exactly as an omitted trailing one
@@ -107,7 +119,7 @@ fn first_word(banner: &str) -> String {
 // spec: context-kit/SPEC.md §bin/env-probe — numeric comparison is `sort -V`, kept as a spawn
 // rather than replaced by a native comparator: `uncomparable`'s second cause is *a `sort` without
 // `-V`*, which no in-process comparison can reach, and the golden pins that cause.
-fn floor_met(min: &str, found: &str) -> Option<bool> {
+pub fn floor_met(min: &str, found: &str) -> Option<bool> {
     let body = format!("{}\n{}\n", min, found);
     let out = proc::run_streamed("sort", &["-V"], body.as_bytes(), proc::Stderr::Discard).ok()?;
     if out.code() != 0 {

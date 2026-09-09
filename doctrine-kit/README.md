@@ -12,7 +12,7 @@ markdown link to the vendored doctrine, and re-vendoring the kit *is* the
 doctrine upgrade. See [SPEC.md](SPEC.md#the-doctrine-deliverable) for why that
 reference-not-copy boundary is the mechanism.
 
-The installer — `bin/install-doctrine.sh` — inserts or replaces the reference
+The installer — the gate binary's `--install-doctrine` arm — inserts or replaces the reference
 block between fixed markers, idempotently. It does not carry the digest: each
 bullet is derived from the summary its rule states in a `*Digest:*` trailer, so
 the digest names every methodology rule by construction and a rule cannot land
@@ -43,7 +43,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 1. Install the reference block — with your always-loaded agent file present:
 
    ```
-   bash doctrine-kit/bin/install-doctrine.sh
+   bash gate-sdk/bin/run-gates.sh --install-doctrine
    ```
 
    It writes (or updates) the `## Delivery doctrine` block in `CLAUDE.md`,

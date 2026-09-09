@@ -243,9 +243,9 @@ fn comparable(block: &str) -> String {
 
 pub fn emit(_args: &[String]) -> Result<String, String> {
     let file = crate::walk::knob_scalar("CONTEXT_KIT_ENV_PROFILE_FILE")?;
-    let roster_text = crate::fresh::read_captured(toolfloor::ROSTER)?;
-    let roster = toolfloor::probe_set(&roster_text)
-        .ok_or_else(|| format!("no PROBE_SET=(...) array in {}", toolfloor::ROSTER))?;
+    // spec: context-kit/SPEC.md §bin/env-probe — the roster is the crate's own, read from the
+    // module that also holds the floor predicate, so the probe and the verdict share one owner.
+    let roster: Vec<String> = toolfloor::PROBE_SET.iter().map(|e| e.to_string()).collect();
 
     let date = proc::run("date", &["+%F"])
         .ok()

@@ -10,10 +10,10 @@ GATE_SDK_GRAPH_ARTIFACT="docs/check-graph.html"
 # shellcheck disable=SC2034  # read by gate-sdk/checks/check-graph.sh after sourcing
 GATE_SDK_GRAPH_EXTERNAL_REFS="https://checkwright.dev https://github.com/checkwright"
 
-# spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships bash under no kit root: the installer's dispatcher, its verbs, the modules those verbs share, and the runnable adoption walkthrough; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
+# spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships bash under no kit root: the installer's two bootstraps, its consumer smoke, and the runnable adoption walkthrough; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
 # shellcheck disable=SC2034  # resolved by gate-sdk/lib/gate.sh onto GATE_LINT_EXTRA_DIRS and read by check-shellcheck across the config bridge
-GATE_SDK_LINT_EXTRA_DIRS="installer/bin installer/lib installer/lib/common installer/consumer-smoke demo"
+GATE_SDK_LINT_EXTRA_DIRS="installer/bin installer/consumer-smoke demo"
 
-# spec: gate-sdk/SPEC.md §check-portability-floor — this repo's install-path corpus: the files an adopter's machine actually executes. `installer/lib` and `installer/bin` are the dispatcher and its verbs; `gate-sdk/lib/gate.sh` and `gate-sdk/bin/gen-pre-commit.sh` are what `init` leaves behind and runs; `context-kit/lib/toolfloor.sh` is on the list because `installer/lib/doctor.sh` sets FLOOR to the payload's copy and runs it — a corpus drawn by directory rather than by reachability is what let a GNU-only primary sit unseen. The vocabulary rides the knob's own default, scripts/portability-patterns.list
+# spec: gate-sdk/SPEC.md §check-portability-floor — this repo's install-path corpus: the files an adopter's machine actually executes. After the behind-invoke relocation that is `installer/bin` — the two bootstraps, and the whole of the install path written in a shell — plus `gate-sdk/lib/gate.sh` and `gate-sdk/bin/gen-pre-commit.sh`, which are what `init` leaves behind and runs. Everything else an install performs is Rust and reaches no shell dialect at all. A corpus drawn by directory rather than by reachability is what let a GNU-only primary sit unseen. The vocabulary rides the knob's own default, scripts/portability-patterns.list
 # shellcheck disable=SC2034  # resolved by gate-sdk/lib/gate.sh onto GATE_PORTABILITY_PATHS and read by check-portability-floor across the config bridge
-GATE_SDK_PORTABILITY_PATHS="installer/lib installer/bin gate-sdk/lib/gate.sh gate-sdk/bin/gen-pre-commit.sh context-kit/lib/toolfloor.sh"
+GATE_SDK_PORTABILITY_PATHS="installer/bin gate-sdk/lib/gate.sh gate-sdk/bin/gen-pre-commit.sh"

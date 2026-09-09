@@ -1,6 +1,6 @@
-// spec: gate-sdk/SPEC.md §lib/inject.sh — the crate's marker-block half: one reader shared by
-// every block consumer, and a writer that replaces a block in place. The shell library keeps its
-// own copy for its remaining shell callers; this is the compiled counterpart, not its retirement.
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the marker-block module: one reader shared by every block
+// consumer, a writer that replaces a block in place, an installer that appends when absent, and a
+// remover. It is the whole of the mechanism; nothing holds a second copy.
 use crate::fresh;
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — whole-line equality on each marker, the lines strictly
@@ -143,12 +143,67 @@ pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<S
     Ok("replaced".to_string())
 }
 
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the removal half beside its two siblings: the marker pair
+// and everything between it go, the rest of the file byte-identical. An absent begin marker is a
+// no-op reporting `false`; a begin without its end is malformed on the writers' own terms.
+pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
+    let text = fresh::read_captured(path)?;
+    let lines = fresh::file_lines(&text);
+    if !lines.contains(&begin) {
+        return Ok(false);
+    }
+    if !lines.contains(&end) {
+        return Err(format!(
+            "{}: begin marker present but end marker missing — refusing to guess the block bounds",
+            path
+        ));
+    }
+    let mut out = String::new();
+    let mut skip = false;
+    for line in &lines {
+        if *line == begin {
+            skip = true;
+            continue;
+        }
+        if *line == end {
+            skip = false;
+            continue;
+        }
+        if !skip {
+            out.push_str(line);
+            out.push('\n');
+        }
+    }
+    std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
+    Ok(true)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     const B: &str = "<!-- x:begin -->";
     const E: &str = "<!-- x:end -->";
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — the removal is idempotent and leaves the rest of the
+    // file alone; a begin marker without its end refuses rather than guessing the bounds.
+    #[test]
+    fn a_removal_is_idempotent_and_refuses_a_half_open_pair() {
+        let p = std::env::temp_dir()
+            .join(format!("cw-marker-remove-{}.md", std::process::id()))
+            .display()
+            .to_string();
+        std::fs::write(&p, format!("head\n{}\na\n{}\ntail\n", B, E)).expect("cannot seed");
+        assert_eq!(remove_block(&p, B, E), Ok(true));
+        assert_eq!(
+            std::fs::read_to_string(&p).expect("cannot read back"),
+            "head\ntail\n"
+        );
+        assert_eq!(remove_block(&p, B, E), Ok(false));
+        std::fs::write(&p, format!("head\n{}\na\n", B)).expect("cannot seed");
+        assert!(remove_block(&p, B, E).is_err());
+        std::fs::remove_file(&p).ok();
+    }
 
     #[test]
     fn the_block_is_the_lines_strictly_between_whole_line_markers() {

@@ -18,7 +18,7 @@ a consumer's always-loaded agent file gains a one-line-per-rule digest and a
 markdown link to the vendored doctrine, and re-vendoring the kit *is* the
 doctrine upgrade. A copied doctrine drifts; a linked one cannot.
 
-The installer — `install-doctrine.sh` — inserts or replaces that reference block
+The installer — the gate binary's `--install-doctrine` arm — inserts or replaces that reference block
 between fixed markers, so a re-run is idempotent and a harness-less consumer can
 paste the block by hand.
 
@@ -36,7 +36,7 @@ rule content crosses the provenance seam.
 ## Install
 
 Vendor the `doctrine-kit/` directory into your repo, run
-`bash doctrine-kit/bin/install-doctrine.sh` to write the reference block into
+`bash gate-sdk/bin/run-gates.sh --install-doctrine` to write the reference block into
 your always-loaded agent file, and register `check-doctrine-registration` in
 `gates.list`. Point `DOCTRINE_KIT_AGENT_FILE` / `DOCTRINE_KIT_DOCTRINE_FILE` at
 your own paths if they differ from the defaults.

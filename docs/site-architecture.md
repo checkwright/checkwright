@@ -183,7 +183,7 @@ recoverable:
 - **The install-toolchain parity contract** — `docs/install.md`'s Requirements
   section holds the toolchain list to the probe roster:
   `check-install-toolchain` asserts whole-element parity between its
-  `<!-- toolchain:begin -->` bullets and `context-kit/lib/toolfloor.sh`'s
+  `<!-- toolchain:begin -->` bullets and `native/src/toolfloor.rs`'s
   `PROBE_SET` array both directions — name, version floor, implementation
   token, and audience, since each bullet's parenthetical renders its roster
   element verbatim
@@ -194,9 +194,10 @@ recoverable:
   positional, so an axis with no sigil would be indistinguishable from the
   implementation token. Elements are derivable, purpose
   clauses hand prose, so a roster edit reds the docs list without an emitter
-  handshake. The gate greps the roster and never sources it: a fixture path is
-  untrusted input, so the reader that lints the array must not be made to execute
-  the file it reads.
+  handshake. The roster the gate reads by default is the crate's own constant; a
+  hermetic fixture may steer it onto a roster file instead, and that file is
+  **parsed and never sourced** — a fixture path is untrusted input, so the reader
+  that lints the array must not be made to execute the file it reads.
 
 - **The install-platforms parity contract** — `docs/install.md`'s Requirements
   section carries a **second** marker block, `<!-- platforms:begin -->`, and this

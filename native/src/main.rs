@@ -5,6 +5,7 @@ mod actions;
 mod bashscan;
 mod declaration;
 mod diff;
+mod doctrine;
 mod emit;
 mod ere;
 mod evidence;
@@ -14,6 +15,7 @@ mod guard;
 mod history;
 mod hook;
 mod install;
+mod installer;
 mod json;
 #[cfg(test)]
 mod knobenv;
@@ -130,47 +132,6 @@ fn stages_lib_parity(args: &[String]) -> i32 {
     }
 }
 
-// spec: context-kit/SPEC.md §bin/env-probe — the floor predicate's second holder reporting its
-// *classification* over a canned corpus, `--queue-parity`'s own rule: the parse's four
-// fields and the verdict's own words, never a rendered profile line.
-fn toolfloor_parity(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --toolfloor-parity parse <element>... | --toolfloor-parity check <element> <banner>...";
-    match args.first().map(String::as_str) {
-        Some("parse") => {
-            for e in &args[1..] {
-                let p = toolfloor::parse(e);
-                println!("parse\t{}\t{}\t{}\t{}\t{}", e, p.name, p.min, p.imp, p.audience);
-            }
-            0
-        }
-        // spec: context-kit/SPEC.md §Testing — the corpus is `(element, banner)` *pairs*, so an odd
-        // tail is a malformed corpus rather than a banner-less element: refusing it is what keeps a
-        // silently-shortened comparison from reading as agreement.
-        Some("check") => {
-            let rest = &args[1..];
-            if rest.len() % 2 != 0 {
-                eprintln!("checkwright-gates: --toolfloor-parity check takes (element, banner) pairs and got an odd count — the classification could not be reported; treating as failure (not clean)");
-                eprintln!("{}", usage);
-                return 2;
-            }
-            for pair in rest.chunks(2) {
-                println!(
-                    "check\t{}\t{}\t{}",
-                    pair[0],
-                    pair[1],
-                    toolfloor::check(&pair[0], &pair[1]).rendered()
-                );
-            }
-            0
-        }
-        _ => {
-            eprintln!("checkwright-gates: --toolfloor-parity needs a mode — the classification could not be reported; treating as failure (not clean)");
-            eprintln!("{}", usage);
-            2
-        }
-    }
-}
-
 // spec: guard-kit/SPEC.md §The guard framework — the holder's four classes, so both sides take one
 // spelling; `hd`/`hdq` carry nothing here because the branch reading them is unreachable, and a
 // token outside the four is a malformed corpus rather than a silent no-class.
@@ -277,13 +238,19 @@ fn guard_lib_parity(args: &[String]) -> i32 {
 // spec: gate-sdk/SPEC.md §run-gates — the arms that live in `main` rather than in either lookup
 // table, rostered because the normalization below must know an arm name when it sees one.
 const TOP_LEVEL_FLAGS: &[&str] = &[
+    "--help",
+    "-h",
     "--source-stamp",
     "--list",
     "--queue-parity",
-    "--toolfloor-parity",
     "--stages-lib-parity",
     "--guard-lib-parity",
     "--install",
+    "--init",
+    "--doctor",
+    "--diff",
+    "--update",
+    "--uninstall",
     "--reads",
     "--needs",
     "--knobs",
@@ -323,6 +290,21 @@ fn normalize(argv: Vec<String>) -> Vec<String> {
     argv
 }
 
+// spec: installer/README.md §The verbs — the roster is read off the verb table rather than restated.
+// The harness line sits beside it because one binary answers to both audiences: the adopter who
+// reached it through the bootstrap, and the battery dispatching a registry member through it.
+fn adopter_usage() {
+    println!("usage: checkwright <verb> [args...]\n");
+    println!("Vendors pinned Checkwright kit source into your repository and commits it.");
+    println!("Nothing is fetched after this package itself.\n");
+    println!("verbs:");
+    for (flag, _) in installer::VERBS {
+        println!("  {}", flag.trim_start_matches('-'));
+    }
+    println!("\nRun with no arguments for the gate-harness usage.");
+    println!("\nhttps://checkwright.dev");
+}
+
 fn main() {
     let argv: Vec<String> = normalize(std::env::args().skip(1).collect());
 
@@ -330,11 +312,20 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --toolfloor-parity <mode> <arg>... | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  adopter verbs: {}", installer::VERBS.iter().map(|(f, _)| f.trim_start_matches('-')).collect::<Vec<_>>().join(", "));
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
     };
+
+    // spec: installer/README.md §The verbs — the adopter's help, answered here because the roster's
+    // owner is the binary: the bootstrap forwards `--help` unchanged under its one argv rule, so
+    // this arm is what keeps it from promising a verb the artifact does not carry.
+    if first == "--help" || first == "-h" {
+        adopter_usage();
+        exit(0);
+    }
 
     // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the baked stamp's only reader. A top-
     // level flag, never a registry member: check-gate-substrate-parity assertion B equates the
@@ -385,13 +376,6 @@ fn main() {
         exit(0);
     }
 
-    // spec: context-kit/SPEC.md §bin/env-probe — the standing oracle criterion 6's *unless* clause
-    // owes the floor predicate's second holder: this module's classification of one canned corpus,
-    // for the harness holding it against `lib/toolfloor.sh`. A top-level flag, like its sibling.
-    if first == "--toolfloor-parity" {
-        exit(toolfloor_parity(&argv[1..]));
-    }
-
     // spec: lifecycle-kit/SPEC.md §lib/stages.sh — the standing oracle criterion 6's *unless*
     // clause owes a comparator wherever a library stays shell while its readers compile.
     if first == "--stages-lib-parity" {
@@ -409,6 +393,13 @@ fn main() {
     // resolved here before the registry lookup and absent from `--list` like the arms around it.
     if first == "--install" {
         exit(install::run(&argv[1..]));
+    }
+
+    // spec: installer/README.md §The verbs — the five adopter verbs, resolved before the registry
+    // lookup and absent from `--list` like the arms around them. Each takes every value as argv and
+    // reads no knob: the caller is the bootstrap, not assumed to be a POSIX shell.
+    if let Some(verb) = installer::VERBS.iter().find(|(flag, _)| *flag == first) {
+        exit(verb.1(&argv[1..]));
     }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — one line per walk root and nothing else: a

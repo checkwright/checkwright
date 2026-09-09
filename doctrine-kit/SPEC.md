@@ -43,8 +43,8 @@ canon-kit doc gates like any governed page.
 
 ## install-doctrine
 
-`bin/install-doctrine.sh` writes the reference block into the always-loaded
-agent file, idempotently. The block is bounded by fixed marker lines
+The gate binary's `--install-doctrine` arm writes the reference block into the
+always-loaded agent file, idempotently. The block is bounded by fixed marker lines
 (`<!-- doctrine-kit:begin -->` … `<!-- doctrine-kit:end -->`); a run replaces
 the content between the markers when they are present and appends the block when
 they are not, so re-running never duplicates and a marker set left in place is
@@ -52,11 +52,11 @@ updated where it sits. A begin marker without its end is a malformed target: the
 installer refuses (exit 2) rather than guess the block bounds. The agent file
 must already exist — the installer edits an always-loaded file, it does not mint
 one — so a missing target is exit 2. The marker insert/replace itself is not
-this installer's code: it rides gate-sdk's shared `lib/inject.sh` helpers
-(`inject_marker_block` to write, `read_marker_block` to read the block as it
-stands), the single copy `lifecycle-kit`'s injector also uses;
-`install-doctrine.sh` supplies the block content (the digest) on stdin and owns
-every rule about what survives from one run to the next.
+this installer's code: it rides gate-sdk's shared marker module
+(`install_block` to write, `read_block` to read the block as it
+stands), the single copy `lifecycle-kit`'s injector also uses
+(gate-sdk/SPEC.md §lib/inject.sh); this arm supplies the block content (the
+digest) and owns every rule about what survives from one run to the next.
 
 The block is the always-loaded shape applied to the doctrine itself: a one-line
 digest of the methodology-maintenance rules plus a markdown link to the doctrine
@@ -125,7 +125,7 @@ bullet generate rather than have to be hand-written and kept in step.
 rewritten would revoke that right on the next run — and revoke it *silently*,
 because a trim the installer restores to a bullet leaves an agent file whose
 hash matches what the installer last recorded. So the run is read-compute-emit
-rather than emit: `read_marker_block` returns the block as it stands, the
+rather than emit: the marker module's reader returns the block as it stands, the
 installer harvests every
 `<!-- doctrine-digest-trim: <rule name> — <reason> -->` line out of it, and each
 digest rule is emitted as **either** its bullet **or** — when that rule's name is
@@ -172,8 +172,8 @@ reworded bullet, an added line — is reverted by design, and would red
 markers is the adopter's and is never read or written. Stating the bound is what
 makes the preserved case a contract rather than an accident.
 
-**The removal mode.** `install-doctrine.sh --remove [agent-file]` is the insert
-path reversed over the same marker pair, riding gate-sdk's `remove_marker_block`
+**The removal mode.** `--install-doctrine --remove [agent-file]` is the insert
+path reversed over the same marker pair, riding the marker module's `remove_block`
 exactly as the insert path rides its sibling — so the marker strings keep their
 one writer and a caller reversing an installation needs no copy of them. It
 harvests no trims and emits no digest: a removal has nothing to carry forward,
@@ -191,7 +191,7 @@ reference block and nothing else — everything outside the markers is the
 adopter's, on the same terms the honest bound above states for a rewrite.
 
 The round-trip's acceptor is `smoke/install.sh`, per the coverage tier
-gate-sdk/SPEC.md §lib/inject.sh sets for a sourced library with no gate surface:
+gate-sdk/SPEC.md §lib/inject.sh sets for a module with no gate surface of its own:
 it declares a trim in the block the installer just emitted, re-runs the
 installer, and holds that the marker survived in the trimmed bullet's position,
 that the bullet is gone, and that the gate is green across the re-run. The same
@@ -206,44 +206,36 @@ message names the offending rule, and that the agent file is byte-unchanged.
 That last assertion is the one worth having: an installer that refuses after
 writing has failed closed in its exit status only.
 
-Positional overrides `install-doctrine.sh [agent-file [doctrine-file]]` let a
+Positional overrides `--install-doctrine [agent-file [doctrine-file]]` let a
 smoke or a fixture point both paths at a scratch tree without touching consumer
 config; unset, they fall to the knob defaults.
 
-**The port disposition: owed, and sequenced behind the installer's behind-invoke
-relocation — ruled 2026-09-03 by the operator, lead-relayed, on a spec session's
-probe.** This member was selected as a stated-contract cut and **dropped from that
-iteration's unit set** rather than ported, because the relocation's own
-precondition forbids it today. `installer/README.md` §The install boundary states
-the selecting rule as *a step is takeable now iff it already runs only when an
-artifact was selected*, and names what breaks otherwise: two of §The gate binary's
-three selection outcomes leave `init` with no artifact and both **proceed** today,
-so a step that becomes artifact-dependent turns a smaller battery into **no
-install**. Two adopter-path call sites drive this installer and neither gates on
-artifact selection — `init` seeds the reference block through it (the block being
-this installer's to write, so `init` calls it rather than restating it), and
-`uninstall` trims the block through it and **refuses outright** without a payload
-copy, so the marker strings keep their one writer. Both gate on doctrine-kit being
-in the kit set, which an artifact-less host satisfies.
+**The port disposition: discharged, with the installer's behind-invoke
+relocation.** The member was once sequenced behind that relocation rather than
+ported — a stated-contract cut dropped from an iteration's unit set, because the
+relocation's own precondition forbade it. `installer/README.md` §The install
+boundary stated the selecting rule as *a step is takeable now iff it already runs
+only when an artifact was selected*, and named what broke otherwise: two of §The
+gate binary's three selection outcomes left `init` with no artifact and both
+**proceeded**, so a step that became artifact-dependent turned a smaller battery
+into **no install**.
 
-The member therefore stays **`owed`**: it takes no `# port-until:`, because a held
-file leaves §port-blockers' owed column and the 2026-08-28 completion predicate
-(TRAJECTORY.md §The closed rulings) admits no contributor-side subtraction. Its
-sequencing is this paragraph, at no cost, on the shape gate-sdk/SPEC.md §Porting a
-gate to the binary substrate sanctions for a section whose member is sequenced
-behind a named unit; the live entry owning that relocation is
-`powershell-installer-surface`. **This section holds exactly one owed file**, so
-the 2026-09-03 *a section is a cut's outer bound, never its minimum* ruling leaves
-an empty remainder here — there is no partial cut to take, which is why the whole
-cut dropped rather than narrowing. **Written here so no future composer
-re-selects it**: the file reads `owed` with no declared cause, which is exactly
-what a stated-contract composer scores as takeable. A further coupling a porting
-session will meet: the crate's `--upgrade-smoke` arm spawns this script **by path**
-inside the vendored consumer tree, where the FROM ref legitimately still holds the
-shell form. **What reopens it** is the precondition itself — an `init` that can
-reach the binary on every platform it runs on, or a ruling that accepts the
-artifact-less host losing its reference block on criterion 5's accept-and-declare
-terms, which was weighed and not taken.
+**The relocation retired that precondition rather than satisfying it**: both
+outcomes became bootstrap refusals, so an install that happens at all happens with
+a verified binary in hand, and every step is artifact-dependent by construction.
+The two adopter-path call sites moved with it — `init` seeds the reference block
+and `uninstall` trims it, both now arms of the binary reaching this module
+in-process — so the marker strings keep their one writer and neither call site
+needs a payload copy of a shell script any more.
+
+What the installer became is an `Arm::Run` on `--install-lifecycle`'s precedent
+(gate-sdk/SPEC.md §The non-gate arm): it mutates one file, emits no document, and
+resolves the two knobs an unbridged arm could not. Its named callers are the
+adopter's own install step, this kit's consumer smoke, and the `--init` arm.
+**One coupling a later reader will meet**: the crate's `--upgrade-smoke` arm ran
+this installer by path inside the vendored consumer tree, and now guards on the
+*kit* being vendored and drives the arm — a guard still naming the script would
+have gone quietly false and dropped the step out of that phase altogether.
 
 ## check-doctrine-registration
 
@@ -372,7 +364,7 @@ it resolves, `DOCTRINE_KIT_DOCTRINE_FILE`, which crosses the config bridge by
 `lib/doctrine.sh` being sourced: a hardcoded top-level flag would resolve a
 platform default and silently ignore every consumer override. The
 `[doctrine-file]` positional is **kept** rather than dropped as a config
-redirection, because the sibling surfaces it exists to match — `install-doctrine.sh
+redirection, because the sibling surfaces it exists to match — `--install-doctrine
 [agent-file [doctrine-file]]` and the gate — still take theirs, and dropping it
 here alone would break the symmetry this section states in one sentence with
 them; the arm reads the knob when it is absent and the positional when present,
@@ -448,7 +440,7 @@ elsewhere) overrides any knob; defaults fill what the consumer left unset. Knobs
   gate asserts, default `doctrine-kit/DOCTRINE.md`.
 - `DOCTRINE_KIT_DIGEST_SECTION` — the agent-file heading whose bullet list the
   gate reads as the methodology-rule digest (assertions B and C), default
-  `## Delivery doctrine`. The default is `install-doctrine.sh`'s installed block
+  `## Delivery doctrine`. The default is the installer arm's installed block
   heading, so a zero-config consumer that installed via the tool is green out of
   the box; a consumer that renamed the heading repoints this knob (a rename that
   leaves it stale exits 2 rather than passing an empty set).

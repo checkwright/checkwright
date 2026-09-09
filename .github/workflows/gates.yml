@@ -169,9 +169,9 @@ jobs:
   # exercised* the artifact. The three SOURCE facts that once said this leg could
   # not do that at all have all shipped, and are recorded as discharged so a
   # later session does not re-derive them as live:
-  #   - `installer/lib/init.sh`'s `target_of_host()` now maps `MINGW*`, `MSYS*`
-  #     and `CYGWIN*` on x86_64 to `x86_64-pc-windows-msvc`, so a Windows host
-  #     selects the artifact instead of taking the omit-and-declare branch.
+  #   - `installer/bin/checkwright.sh`'s `target_of_host()` now maps `MINGW*`,
+  #     `MSYS*` and `CYGWIN*` on x86_64 to `x86_64-pc-windows-msvc`, so a Windows
+  #     host selects the artifact instead of being refused as unrostered.
   #   - `GATE_SDK_NATIVE_BIN`'s default derives its suffix from
   #     `gate_exe_suffix`, so the knob names the artifact cargo actually emits
   #     inside an installed consumer and not only on this tree.
@@ -354,7 +354,7 @@ jobs:
           exit 0
 
       # `shellcheck` is an ADOPTER floor member (docs/install.md §Requirements,
-      # context-kit/lib/toolfloor.sh's PROBE_SET, where it carries no audience
+      # native/src/toolfloor.rs's PROBE_SET, where it carries no audience
       # token) and windows-latest ships without it — so `checkwright init`
       # refuses the toolchain and the suite never reaches the artifact. That is
       # what round 3 measured on 2026-08-27, and it is a real adopter-facing
@@ -946,9 +946,9 @@ jobs:
           echo "== the install path's own GNU-only constructs, probed not reasoned about =="
           printf '1.2.3\n1.10.0\n' | sort -V; echo "sort -V exited $?"
           realpath --relative-to=/ /usr/bin; echo "realpath --relative-to exited $?"
-          # The construct this unit removed from installer/lib/init.sh, kept here
-          # as the measurement that says whether removing it was necessary on this
-          # host. A non-zero is the BSD refusal the fix was for; a zero means this
+          # The construct the install path refuses to use — `installer/bin/checkwright.sh`
+          # strips the starting-point prefix in the loop instead — kept here as the
+          # measurement that says whether refusing it was necessary on this host. A non-zero is the BSD refusal the fix was for; a zero means this
           # runner carries GNU findutils and the fix was owed to adopters rather
           # than to this leg.
           find . -maxdepth 1 -type f -printf '%P\n' >/dev/null 2>&1

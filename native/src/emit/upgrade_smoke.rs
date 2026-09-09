@@ -657,9 +657,12 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
         ))));
     }
 
-    if Path::new(&format!("{}/doctrine-kit/bin/install-doctrine.sh", consumer)).is_file() {
+    // spec: doctrine-kit/SPEC.md §install-doctrine — the guard asks whether the *kit* is vendored
+    // rather than whether a shell entry point is on disk: one naming the relocated script would go
+    // quietly false and drop this step out of phase A altogether.
+    if Path::new(&format!("{}/doctrine-kit/DOCTRINE.md", consumer)).is_file() {
         let doctrine = bash(
-            r#"cd "$1" && exec bash doctrine-kit/bin/install-doctrine.sh >/dev/null"#,
+            r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --install-doctrine >/dev/null"#,
             &[consumer],
             Stderr::Inherit,
         )?;

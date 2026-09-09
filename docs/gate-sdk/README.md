@@ -143,7 +143,7 @@ check-template-registry-parity
 
 The toolchain contract lives in `docs/install.md` §Requirements: the roster,
 each pinned floor, and the construct that forces it. `check-install-toolchain`
-holds that page to `context-kit/lib/toolfloor.sh`, the roster's owner, so the
+holds that page to `native/src/toolfloor.rs`, the roster's owner, so the
 requirement has one statement and no copy.
 
 ## License

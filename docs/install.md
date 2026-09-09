@@ -63,8 +63,8 @@ per kit, so the adoption decision weighs a number rather than a guess.
 Checkwright is **Unix-first**, and specifically **GNU-first**: the engine is
 portable to any Unix that presents a GNU userland on `PATH`, which Linux
 distributions do out of the box. Windows runs it through WSL (Windows Subsystem
-for Linux), not natively — the battery's entry points and both generated git
-hooks run under bash and no native-Windows shell path exists.
+for Linux) rather than natively, because the battery's entry points and its
+generated git hooks all run under bash and no native-Windows shell path exists.
 
 macOS runs it too, but as an adopter action rather than something the stock
 system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort`,
@@ -77,10 +77,12 @@ invoke.
 
 Those are the platforms the **battery** runs on. A second and narrower fact sits
 beside them: whether a **prebuilt gate binary** is published for a platform,
-which is what decides whether the gates that dispatch to that binary arrive with
-your install or are omitted and declared (§The gate binary in the installer's
+which is what decides whether an install is possible there at all. A platform the
+roster does not carry is **refused** — the bootstrap verifies and runs that binary,
+and every step of an install is behind it, so there is nothing to proceed into and
+no adopter action to take (§The gate binary in the installer's
 README). The block below declares it per supported platform — the Rust target
-triple `init` resolves a host to, and one of two join states. The state `joined`
+triple the bootstrap resolves a host to, and one of two join states. The state `joined`
 means the triple is a live line in `native/targets.list`, so a release publishes
 an artifact for it. The state `held: <precondition>` means the platform is
 supported and carries no artifact yet, and names the run that would join it; the
@@ -169,9 +171,9 @@ your `PATH`, and the note says what breaks without it:
   committing** — `cargo test` compiles a different artifact and does not
   discharge it; CI builds, lints and tests the crate every run. Installing
   Checkwright never builds it and never will. The binary reaches an adopter as a
-  prebuilt Release asset for a declared target, digest-verified before `init`
-  writes it, and where no asset matches your host `init` omits the ported gates
-  from your registry and records why — so no install path asks you for Rust. That
+  prebuilt Release asset for a declared target and is digest-verified before it
+  is run. Where no asset matches your host the install is refused outright, since
+  every step of one is behind that binary — so no install path asks you for Rust. That
   publish path builds and attaches those assets from the tag itself, so what any
   one release carries is read off its own Release page rather than asserted here.
   A gate on that substrate shells out to git at runtime and embeds nothing.
@@ -191,7 +193,7 @@ member out of its verdict entirely, so an unmarked bullet is the whole floor an
 adopter's machine is held to.
 
 Nor are the bullets maintained beside the code. The roster lives in
-`context-kit/lib/toolfloor.sh`; this block renders it, and
+`native/src/toolfloor.rs`, beside the floor predicate that reads it. This block renders it, and
 `check-install-toolchain` holds the two in whole-element parity — floor,
 implementation token and audience included — so the page cannot drift from what
 the gates require.
@@ -218,22 +220,23 @@ transport delivered it — and they are stated here for the same reason: they ar
 not what the battery asserts, so the roster above would be the wrong place to
 claim them.
 
-- **A GNU `sort`.** `init`'s upgrade path compares two versions with `sort -V`,
-  and `context-kit/lib/toolfloor.sh` uses the same flag inside the floor
-  predicate — which is what `checkwright doctor` runs, on the install path, off
-  its own payload copy. The second is the sharper edge: a stock BSD or macOS
-  userland can fail the check that exists to tell you whether your box
-  qualifies, in the same way the thing it diagnoses would fail. So the GNU-first
-  instruction above is the install path's requirement too, not the battery's
-  alone. It narrows on its own once these steps move behind a compiled binary.
-  Both sites carry a `# portability-declared:` marker naming this section, and
-  `check-portability-floor` holds the pair: a seventh site on the install path is
-  a red until its author has been here.
-- **`sha256sum` or `shasum`.** `init` verifies a prebuilt gate binary against
-  its published digest before writing it, and it will take either hasher —
-  `shasum` is there because stock macOS ships it instead. Neither present is not
-  a failed install: the affected gates are omitted and declared rather than
-  written unverified, and `init` tells you which and why.
+- **A GNU `sort`.** The floor predicate compares two versions with `sort -V`,
+  and `checkwright doctor` runs that predicate on the install path. A stock BSD or
+  macOS userland can therefore fail the check that exists to tell you whether your
+  box qualifies, in the same way the thing it diagnoses would fail. So the
+  GNU-first instruction above is the install path's requirement too, not the
+  battery's alone. **It narrowed when the install steps moved behind the compiled
+  binary** and now has one site rather than two: the comparison is the crate's,
+  and the only shell left on the path is the bootstrap.
+  `check-portability-floor` holds it: a new site on the install path is a red
+  until its author has been here.
+- **`sha256sum` or `shasum`.** The bootstrap verifies the prebuilt gate binary
+  against its published digest before it runs it, and it will take either hasher —
+  `shasum` is there because stock macOS ships it instead. **Neither present is a
+  refusal** rather than a smaller install. Nothing unverified is ever executed,
+  and this is the one step that cannot use the binary to verify the binary.
+  Behind the invoke the binary hashes in-process, so no external hasher is
+  reached again.
 
 Publishing a docs site is an optional wider tier. A consumer that registers
 site-kit's render-fidelity gate — which re-renders every page through the

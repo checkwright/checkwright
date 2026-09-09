@@ -544,6 +544,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(install_lifecycle::run),
         install_lifecycle::KNOBS,
     ),
+    // spec: doctrine-kit/SPEC.md §install-doctrine — an `Arm::Run` on the member above's own
+    // precedent, and it resolves two knobs the unbridged `--install <op>` family could not. Its
+    // callers are the adopter's install step, the kit's smoke, and `--init`, in-process.
+    (
+        "--install-doctrine",
+        Arm::Run(crate::doctrine::run),
+        crate::doctrine::KNOBS,
+    ),
     // spec: gate-sdk/SPEC.md §install-hooks — an `Arm::Run` because `check-identity`'s 1 surfaces
     // through this member's own status; it also declines the `--install <op>` family, whose
     // unbridged contract could resolve neither of the two knobs this one reads from kit config

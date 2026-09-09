@@ -1,7 +1,11 @@
 // spec: installer/README.md §The install boundary — the `--install <op>` arm family: the seam
 // both bootstraps call, so the bash caller and its PowerShell twin issue byte-identical argv.
 // spec: gate-sdk/SPEC.md §The non-gate arm — the class's first deliberately unbridged member.
-use crate::{proc, sha256};
+use crate::sha256;
+// spec: installer/README.md §The manifest — the recorded hash has one owner, the schema module's
+// own `hash`, so this op and the `--init` arm that shares its claim rule cannot disagree about
+// which identity a `files` entry carries.
+use crate::installer::lock::hash as lock_hash;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
@@ -78,14 +82,14 @@ impl Argv {
 // spec: installer/README.md §The install boundary — the manifest a previous run left: the hash
 // recorded against a path about to be claimed, and the target and digest recorded against the
 // artifact. Absent on a first install, which is why `--lock` is optional.
-struct Recorded {
+pub struct Recorded {
     files: Value,
     target: String,
     digest: String,
 }
 
 impl Recorded {
-    fn none() -> Self {
+    pub fn none() -> Self {
         Recorded {
             files: Value::Null,
             target: String::new(),
@@ -93,7 +97,7 @@ impl Recorded {
         }
     }
 
-    fn read(path: &Path) -> Result<Self, String> {
+    pub fn read(path: &Path) -> Result<Self, String> {
         if !path.is_file() {
             return Ok(Recorded::none());
         }
@@ -122,19 +126,6 @@ impl Recorded {
             .unwrap_or_default()
             .to_string()
     }
-}
-
-// spec: installer/README.md §The install boundary — installer/lib/common/lock.sh's `lock_hash`,
-// spawned rather than reimplemented: the manifest records git's object hash, and a second
-// computation of it would be a second identity for the caller and the op to disagree about.
-fn lock_hash(file: &Path) -> Result<String, String> {
-    let path = file.to_string_lossy().into_owned();
-    let out = proc::run("git", &["hash-object", "--", &path])?;
-    let text = out
-        .stdout()
-        .map(|o| String::from_utf8_lossy(o).into_owned())
-        .ok_or_else(|| format!("git hash-object could not hash {}", path))?;
-    Ok(text.trim().to_string())
 }
 
 // spec: installer/README.md §The install boundary — the non-destructive re-run, which is the
@@ -226,21 +217,21 @@ fn write_atomically(file: &Path, body: &str) -> Result<(), String> {
 
 // spec: installer/README.md §The install boundary — the op's argv after resolution, carried as one
 // value so the two paths a placement takes read against the same resolved inputs.
-struct Placement<'a> {
-    root: PathBuf,
-    src: &'a str,
-    dest: &'a str,
-    seam: &'a str,
-    target: &'a str,
-    digest: &'a str,
-    force: bool,
-    dry: bool,
+pub struct Placement<'a> {
+    pub root: PathBuf,
+    pub src: &'a str,
+    pub dest: &'a str,
+    pub seam: &'a str,
+    pub target: &'a str,
+    pub digest: &'a str,
+    pub force: bool,
+    pub dry: bool,
 }
 
 // spec: installer/README.md §The install boundary — the two stdout verbs, each with one reader in
 // the caller: `own` is a path it records and stages, `kept` a path it leaves alone and carries
 // forward at the hash the manifest already holds.
-fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> {
+pub fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> {
     let mut records = Vec::new();
     let dest_path = p.root.join(p.dest);
 
