@@ -215,8 +215,8 @@ recoverable:
   backticked run, so neither may carry a nested parenthesis and the state must
   sit on the bullet's own first line; continuation lines are prose and are not
   read. A platform the page does not state as supported is **absent** rather than
-  held — a held entry is still a support claim — which is why native Windows
-  appears in neither state while the page routes it through WSL.
+  held — a held entry is still a support claim, so absence is the state for a
+  platform nothing has been promised about.
   Two readers: `.github/workflows/gates.yml`'s `native-artifacts` roster step,
   which derives the producer's build matrix from **every** declared triple
   regardless of state, since a platform that is never built is a platform that
@@ -251,14 +251,15 @@ recoverable:
   state word as a support commitment taking effect rather than as documentation:
   the legs are green at the moment of a flip, so nothing reds at the landing, and
   the cost arrives the first time that platform breaks.
-  **The mechanism has a worked instance now, and it is the first one.**
-  `x86_64-apple-darwin`'s flip to `joined` made that triple's producer leg and
-  its Intel `install-smoke` consumer leg binding on master at the landing
-  commit, and the diff that did it edits `.github/workflows/gates.yml` nowhere
-  — a roster line and a state word are the whole of it. That leaves the Windows
-  `install-smoke` leg as the only non-binding platform leg in that workflow,
-  and its posture is hard-coded rather than derived, because the page declares
-  native Windows in neither state and so hands that leg no commitment to read.
+  **The mechanism has worked instances now, and the second is what makes it a
+  mechanism rather than one file's arrangement.** `x86_64-apple-darwin`'s flip to
+  `joined` made that triple's producer leg and its Intel `install-smoke` consumer
+  leg binding on master at the landing commit, and the diff that did it edits
+  `.github/workflows/gates.yml` nowhere — a roster line and a state word are the
+  whole of it. `x86_64-pc-windows-msvc` then took the same route, and its
+  `install-smoke-windows` leg reads its `runs-on` and `continue-on-error` off the
+  roster step's keyed output exactly as the Intel leg does, so no platform leg's
+  posture is hard-coded any more.
 
 **A derived surface earns a row here only when it has a reader who cannot run
 the emitter** — a public page, a file a fresh clone needs before its tooling

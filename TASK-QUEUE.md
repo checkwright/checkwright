@@ -10741,9 +10741,4 @@
 
 ## Done
 
-- smoke-harness-mapfile-inherits-host-line-terminator
-- windows-roster-join
-- ruling-record-shrink-to-bau
-- ruling-accretion-outgrows-the-entry-cap
-
 ## Lessons Learned
