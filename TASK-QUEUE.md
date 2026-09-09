@@ -17,6 +17,32 @@
 ## Deferred
 
 
+- **ruling-record-shrink-to-bau** [design-pending] — `TRAJECTORY.md` grew from its birth size to
+  six times that in five weeks, half of it in the last week, and almost none of it is port-bound:
+  the consult binding sent every closed ruling there unqualified, so process rulings with no
+  discharge event accreted beside the pivot they were meant to accompany, and the file grew a
+  charter about editing itself. The admission test is now ruled and recorded at TRAJECTORY.md
+  §What this file admits; this unit is the sweep that brings the record under it. Three acts:
+  (1) **back-fill** — every port-bound paragraph gains a `discharge:` line whose oracle is
+  `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` reading zero owed, so the oracle-zero
+  close retires them through the ruling-staleness probe rather than by a judgment sweep the last two
+  closes deferred (`ruling-record-prose-staleness-unreachable` is its witness); (2) **relocate** —
+  every paragraph failing the test moves to its business-as-usual home undated (mechanism to the
+  owning kit SPEC, a template reading to its `.claude/commands/` binding, a standing rule to one
+  CLAUDE.md line), its provenance and refused alternatives to the relocating commit's message, and
+  every citation of the moved ruling is repointed by the derived-blast-radius rule the file states;
+  (3) **compress the head** to the reading rule, the three acts, the two declarations and the
+  admission test, the grounds behind each going to git history. The objectives section stays: it is
+  the pivot's ground and discharges with the pivot. Test: every surviving paragraph either carries a
+  `discharge:` line or reverses a recorded ruling, and the probe reports no undeclared hole.
+  **Sequencing:** scoped before the final port cut, so the oracle-zero close finds a record it can
+  retire mechanically. Product-class on the 2026-08-30 witness discriminator: the ruling-record
+  mechanism ships in lifecycle-kit and this record is its only dogfood.
+  **Cost while deferred:** every consult and lead escalation until it lands reads the whole record
+  to find the rulings that govern, and the oracle-zero close inherits the judgment sweep this unit
+  replaces.
+  Filed 2026-09-09 by the consult session on the operator's ruling, AskUserQuestion channel.
+
 - **queue-provenance-restates-git-history** [design-pending] — a queue entry's provenance statement
   narrates the entry's own route through the project's surfaces, which git history already answers
   and spec-over-precedent puts there. The mandated write is ONE attribution — CLAUDE.md's "who

@@ -161,7 +161,9 @@ load behind that trigger, so they are not resident here.
 - [`TRAJECTORY.md`](TRAJECTORY.md) is the hand-authored ruling record — the
   objectives, the closed operator rulings, and the port sequence; a recorded
   ruling is closed, so escalate rather than reverse one, and retiring a spent
-  ruling is not reversing it.
+  ruling is not reversing it. It admits only a ruling naming its discharge
+  event or reversing a recorded one (its §What this file admits); every other
+  ruling lands undated on its business-as-usual surface.
 - **The ruling authorities are `operator` and `lead`** — the kit ships the slot,
   never the vocabulary. A session landing a ruling in the queue states who
   ruled, when and through what channel inline beside the ruling's content, in

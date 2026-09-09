@@ -108,6 +108,29 @@ one owner per fact, as everywhere else. What this file *owns* is what has no
 other durable home: the objectives, the rulings named below without a pointer,
 and the sequence.
 
+**What this file admits — ruled 2026-09-09 by the operator in consult.** This
+record accompanies a pivot and shrinks as the pivot lands; it is never a growing
+authoritative surface, and business-as-usual runs on the tooling the kits already
+ship. A paragraph is admitted here only if it **names its own discharge event**
+(an oracle, or `manual` with the condition) or **reverses a recorded ruling**.
+Everything else has a business-as-usual home and lands there, undated: a ruling
+about mechanism in the owning kit SPEC with its engineering grounds; this
+project's reading of a kit template in the command binding that names the
+template; a standing rule in CLAUDE.md as one line pointing at its mechanism;
+and who ruled, when, through what channel, and what was refused, in the landing
+commit's message — git history is the archive. The consult binding's
+landing-surfaces slot states the same test from the recording side. Refused
+with it: keeping the file as an open-ended ruling record under brevity rules
+alone, which bounds each paragraph and never the count; and retiring the file
+at the port's completion, which discards a mechanism the methodology offers and
+a future pivot would re-mint. Two directed acts, one queue unit
+(`ruling-record-shrink-to-bau`): every port-bound paragraph below gains a
+`discharge:` line on the port oracle, and every paragraph failing the test
+relocates to its home or is deleted. That sentence is spent when the unit lands;
+the test stands.
+discharge: ruling-record-admission-test grep -L ruling-record-shrink-to-bau TASK-QUEUE.md
+ruling: ruling-record-admission-test the admission test
+
 That is the authoring-time half. The completion-time half is two triggers — but
 a ruling is tested by **mood** before it is tested by completion, and taking
 those in the wrong order is what makes the newest rulings the most dangerous to
@@ -161,10 +184,11 @@ self-naming discipline every body-line declaration inherits:
   can settle takes the literal operand `manual` followed by the prose condition,
   which reports as owed to judgment rather than being silently skipped.
 
-**Existing rulings are not back-filled and no gate demands a declaration** — a
-scanner cannot demand one written under judgment. A ruling carrying none is
-simply one the citing-side report cannot reach, and the probe reports that hole
-instead of inheriting it (lifecycle-kit/SPEC.md §The ruling-staleness probe).
+**No gate demands a declaration** — a scanner cannot demand one written under
+judgment. A ruling carrying none is simply one the citing-side report cannot
+reach, and the probe reports that hole instead of inheriting it
+(lifecycle-kit/SPEC.md §The ruling-staleness probe). Port-bound rulings are
+back-filled by the unit the admission test above directs; nothing else is.
 
 **A retirement's blast radius is derived, never rostered**, and stating that here
 is what stops each retiring session re-discovering it. No surface owns a list of
