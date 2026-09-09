@@ -30,6 +30,12 @@
 # paid `-large` variants; `macos-latest` resolves to an arm64 image. Re-probe
 # that table rather than trusting this paragraph if a leg ever fails to find a
 # runner: an unmatched label does not fail fast, it queues.
+#
+# The windows label needs no such probe and is the one line here attested by this
+# repository's own runs: `windows-latest` is what both Windows install-smoke legs
+# in .github/workflows/gates.yml have been running on for rounds, so it resolves
+# to a live image by measurement rather than by a table read.
 x86_64-unknown-linux-gnu  ubuntu-latest
 aarch64-apple-darwin      macos-latest
 x86_64-apple-darwin       macos-15-intel
+x86_64-pc-windows-msvc    windows-latest

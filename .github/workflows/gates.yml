@@ -150,10 +150,14 @@ jobs:
           bash gate-sdk/bin/run-gates.sh --diff-baseline installer_smoke "$log" "$rc"
 
   # The native Windows sibling, and the first thing this repository has ever run
-  # on a non-Linux host. Its product is the log: whether the crate builds and the
-  # vendored battery runs under Git for Windows' bash is unmeasured, so this leg
-  # is an instrument before it is an assertion and is shaped to answer as many
-  # questions per run as one run can carry.
+  # on a non-Linux host. It was shaped as an instrument before an assertion,
+  # answering as many questions per run as one run can carry, because whether the
+  # crate built and the vendored battery ran under Git for Windows' bash was
+  # unmeasured. **Both are now measured**: round 21 (run 34267324532) built the
+  # binary, packed, installed from the tarball offline, held the profile invariant
+  # and printed `battery: All 12 gates passed` natively. The reporting-only probe
+  # steps below are kept on that history rather than on a live unknown — each is
+  # a question this leg would otherwise buy a round to re-ask the day it reds.
   #
   # **It does not ride the baseline diff the Linux leg above uses, deliberately.**
   # That baseline's `installer_smoke` rows are per-arm and were recorded from a
@@ -198,6 +202,24 @@ jobs:
   # way. PRODUCED is discharged; EXERCISED is what is owed, and placing the
   # artifact in a consumer that then invokes zero gates is not exercising it.
   #
+  # **It now installs the producer's upload rather than a stand-in it built here,
+  # which is what makes a green readable against the join predicate at all.**
+  # §Consumer payload admits a triple on ONE run carrying a release-shaped
+  # producer AND a consumer that installed that producer's own bytes. Until this
+  # rewiring the leg built the binary on the host it ran on, so its green could
+  # only ever have been half of a predicate whose other half nothing connected to
+  # it — the same shape the two macOS legs were repaired into, arriving here.
+  #
+  # **Its posture is DERIVED, for the reason the Intel macOS sibling's header
+  # states in full and this one does not restate.** `runs-on` and
+  # `continue-on-error` are read out of `native-artifacts-roster`'s per-target
+  # index at this leg's triple, so docs/install.md §Requirements' declaration
+  # decides both. That replaces a hard-coded `continue-on-error: true` carrying a
+  # standing instruction to remember to drop it — the maintained copy that goes
+  # wrong exactly once, silently, in the direction of a joined platform whose
+  # smoke red reds nothing. The day the declaration flips this triple to
+  # `joined`, this leg becomes binding with nobody remembering to make it so.
+  #
   # **Every `run:` names `shell: bash`.** GitHub's default `run:` shell on a
   # Windows runner is `pwsh`, so a step here that omitted the key would run
   # PowerShell over a bash body. check-action-run-shell now *requires* the key on
@@ -206,11 +228,9 @@ jobs:
   # mechanism: `shell: bash` selects Git-for-Windows bash and keeps the runner
   # and the gate agreeing on what this text is.
   install-smoke-windows:
-    runs-on: windows-latest
-    # The instrument runs to its end and reports; it does not decide this
-    # workflow. Drop this line on the run it is first observed green and not
-    # before — that same observation is the roster's join condition.
-    continue-on-error: true
+    needs: [native-artifacts, native-artifacts-roster]
+    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-pc-windows-msvc'].runner }}
+    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-pc-windows-msvc'].held }}
     # MSYS emulates fork on every process spawn and this suite spawns thousands,
     # so the 272 seconds it takes on a Linux developer machine
     # (installer/README.md §The consumer smoke) is not the number to plan from.
@@ -387,6 +407,48 @@ jobs:
             || echo "SCAFFOLDING FAILED — shellcheck is still absent, so a doctor refusal below is THIS step's failure and not a new finding"
           exit 0
 
+      # By PATTERN and not by name, for the reason the macOS siblings state: a
+      # name would spell this host's triple in a workflow step, and a platform
+      # literal in CI is a second spelling of the support commitment
+      # native/targets.list is supposed to be the only surface for. The job-level
+      # expression above is a read of the declaration and is a different thing.
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: gate-binary-*
+          path: ${{ runner.temp }}/native-artifacts
+
+      # Strips the artifact-name prefix to leave `<artifacts>/<target>/`, the
+      # layout pack-installer.sh reads and INSTALLER_SMOKE_ARTIFACTS_DIR is
+      # specified against — the macOS siblings' step, on the one host where its
+      # base path cannot be `$RUNNER_TEMP` directly: that arrives in Windows
+      # spelling and every glob and `mv` below is MSYS bash's, so the already
+      # translated `$SMOKE_TMP` is what this walks. The download action is handed
+      # the untranslated form because it is not bash.
+      #
+      # The host triple is derived from `rustc -vV` and never spelled, so this
+      # step asserts nothing about which platform it is on — it demands only that
+      # the producer uploaded a complete artifact for whatever host it woke up on.
+      - name: normalize the producer's upload onto the layout pack reads
+        shell: bash
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          art="${SMOKE_TMP:?the scratch base did not resolve}/native-artifacts"
+          binary="$(gate_native_bin)"; binary="${binary##*/}"
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] || { echo "rustc reported no host triple"; exit 2; }
+          for d in "$art"/gate-binary-*; do
+            [[ -d "$d" ]] || continue
+            mv "$d" "$art/${d##*/gate-binary-}"
+          done
+          ls -lR "$art"
+          [[ -f "$art/$host/$binary" && -f "$art/$host/$binary.sha256" ]] || {
+            echo "the producer uploaded no complete $host artifact — this leg"
+            echo "exercises a release-shaped artifact and has none to exercise."
+            exit 1
+          }
+          echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
+
       # The suite itself, under one steering that is **measurement scaffolding
       # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
       # this host, and this host is not the one declared triple. The re-entry is
@@ -395,6 +457,11 @@ jobs:
       # to what it commits to. pack-installer.sh copies the steered file verbatim
       # into the payload, so the packed roster is this host's and no second copy
       # is read anywhere downstream.
+      #
+      # The verdict states the join RULE conditioned on the declaration rather
+      # than a flat reading of this leg's posture, for the Intel sibling's reason:
+      # the posture is derived, so a flat sentence here would be the maintained
+      # copy the job header refuses.
       - name: install smoke on a native Windows host
         shell: bash
         run: |
@@ -412,15 +479,17 @@ jobs:
           printf '%s\n' "$host" > "$roster"
           log="$tmp/installer-smoke-windows.log"
           GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$tmp" \
+            INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
             bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
           rc="${PIPESTATUS[0]}"
           echo "== verdict =="
           echo "installer_smoke on native Windows exited $rc"
-          echo "This leg reports; it does not judge. The log above is the measurement."
-          echo "A zero here is not a roster join on its own: gate-sdk/SPEC.md §Consumer payload"
-          echo "wants an artifact produced AND exercised, and this leg builds the binary it"
-          echo "installs on the host it runs on, which is a harness stand-in rather than a"
-          echo "released one. See this job's header for what stands between the two."
+          echo "This leg installs the producer's own upload, so a zero is criterion 2 of"
+          echo "gate-sdk/SPEC.md §Consumer payload's join predicate while this triple is"
+          echo "held — criterion 1 is native-artifacts' leg for the same triple on the same"
+          echo "run, and a native/targets.list line is licensed by the two together or by"
+          echo "nothing. Once the declaration flips this triple to joined that predicate is"
+          echo "spent and a red here is a support commitment broken."
           exit "$rc"
 
   # The fourth install-smoke leg, and the second BOOTSTRAP's own. Count these legs
@@ -1222,18 +1291,21 @@ jobs:
   # HELD producer defeating held-ness through a BINDING consumer; this consumer
   # is held exactly while its producer is, so the pair moves together.
   #
-  # **The triple spelled below is the only platform literal anywhere in this
-  # workflow's declaration-derived half, and it is a READ of the declaration
-  # rather than a second assertion of support.** The download-by-pattern rule the
-  # sibling states avoids *asserting* a platform in CI; this expression *reads*
-  # one, at job-resolution time, where no matrix context exists. If the triple
-  # ever leaves the declaration the index yields nothing, this job cannot resolve
-  # a runner, and the workflow reds — loudly, which is the right direction for a
-  # support retraction that forgot its leg. Do not read that as the only triple
-  # in the file: the Windows legs spell `x86_64-pc-windows-msvc` outright, and
-  # they are a different case rather than a counter-example — the declaration
-  # carries native Windows in neither state, so those legs cannot read a support
-  # commitment that does not exist and assert their own platform instead.
+  # **The triple spelled below is a READ of the declaration rather than a second
+  # assertion of support.** The download-by-pattern rule the sibling states avoids
+  # *asserting* a platform in CI; this expression *reads* one, at job-resolution
+  # time, where no matrix context exists. If the triple ever leaves the
+  # declaration the index yields nothing, this job cannot resolve a runner, and
+  # the workflow reds — loudly, which is the right direction for a support
+  # retraction that forgot its leg.
+  #
+  # It is no longer the only such read: `install-smoke-windows` takes its own
+  # posture from the same index at `x86_64-pc-windows-msvc`, on the same argument,
+  # since that triple joined the declaration as `held`. The remaining bare
+  # spellings of it — the `gates` job's cross-check and the PowerShell leg's host
+  # assertion — are a different case rather than a counter-example: neither reads
+  # or writes a roster commitment. One names the target it compiles for and the
+  # other asserts the host it woke up on.
   #
   # **The predicate this leg was built for is discharged, and the mechanism
   # above is what discharged it.** This leg could never join its own target —
