@@ -2361,6 +2361,51 @@ execute; it now RUNS its program, so a farm of unusable entries reds immediately
 and by name instead of surfacing four assertions later as a verb that appears to
 want jq.
 
+*Round 26 settled the `ln -s` question the same round it stopped depending on the
+answer, which is the cheap order to do it in.* The probe added beside the arm's
+repair reports `ln -s COPIED: 4378456 bytes`. MSYS deep-copies, measured rather
+than held.
+
+*THE PRODUCER, NAMED AT LAST — round 26. Twenty-one rounds asked whose byte it
+is, and one arm's own two declarations answer it.* Run `34374380337`, job `102544260473`. The seam arm reached its
+byte-identity assertion and printed, immediately above the failure:
+
+    the seam manifest's roster: the stream delivered 1210 of 1210 line(s) ending in a carriage return
+    the residual roster: the stream delivered 2 of 2 line(s) ending in a carriage return
+
+**Every line. Both streams.** And the assertion that then failed is the only one
+in the suite that compares `jq`'s stdout against a FILE's bytes — a file the
+crate wrote with `fs::write`, which translates nothing. So the two sides differ
+in their line terminator and nowhere else, and the side carrying the byte is
+`jq`'s.
+
+*That is the claim this account has refused to make since round 19, and what
+licenses it now is a count that could not have been produced any other way.*
+`1210 of 1210` through a **process** substitution beside `492 of 493` through a
+**command** substitution is one mechanism seen twice: `jq.exe` writes CRLF to its
+stdout on this host, and `$( )` consumes exactly the last terminator while `<( )`
+consumes none. The off-by-one that took rounds 19 and 20 to price is the whole
+difference between the two numbers. No third explanation is needed and none is
+offered. The earlier exoneration stands unchanged and is now explained rather
+than merely observed: a single-value capture comes back clean because its one
+terminator is the one `$( )` eats.
+
+*What it does not reach.* This is a statement about `jq` on this host writing to
+a pipe, not about the installed consumer: nothing behind the invoke reads JSON
+with `jq` at all — the crate parses with `serde_json` — which is the same fact
+the jq-less arm asserts from the other direction. The adopter is untouched; the
+harness is what had to learn it.
+
+*And the byte-identity assertion is read through the terminator owner rather than
+with `cmp`.* A `cmp` between `jq`'s stdout and a crate-written file is a
+comparison of channels, and it fails wherever they differ however canonical the
+writer is. Line-wise after the one declared strip keeps every axis the assertion
+is about — the key order at every nesting level, which is what `-S` tests, the
+indentation, the line count, and any trailing byte that is not exactly one
+carriage return — and gives up only the axis the channel owns. That is the
+terminator exception this section already rules, applied to the one comparison
+written before the ruling existed.
+
 *The free log read is gated on the run, not on the job, and the way past that is
 a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still
 in progress; logs will be available when it is complete` even when the Windows

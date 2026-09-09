@@ -1189,8 +1189,13 @@ done
 # spec: installer/README.md §The manifest — the residual shape is asserted on the object itself and not through an accessor, because that is the class of drift an accessor cannot catch: a missing key and a present-but-null key both read back as the empty string, so only has() tells an omitted artifact apart from a null one, and only re-sorting the captured text proves the sort reached every nesting level rather than the top one
 jq -e 'has("artifact") | not' "$SEAM_LOCK" >/dev/null \
     || fail "the residual manifest carries an artifact key — an omitted field leaves the key absent, never null"
-jq -S . "$SEAM_LOCK" | cmp -s - "$SEAM_LOCK" \
-    || fail "the residual manifest is not byte-identical to its own recursive sort — the one writer of the wire shape emitted an order its second writer could not reproduce"
+# spec: installer/README.md §The consumer smoke — the two sides are compared through the terminator owner rather than with `cmp` over jq's raw stdout, and the reason is measured on this arm's own two declarations rather than assumed: `jq` delivered 1210 of 1210 and 2 of 2 lines carrying a carriage return here, where the manifest it is re-rendering was written by the crate and carries none. A `cmp` between those two is a comparison of CHANNELS, and it fails on a host where they differ however canonical the writer is. Reading it line-wise after the one declared strip keeps every axis this assertion is about — the key order at every nesting level, which is what `-S` tests, the indentation, the line count, and any trailing byte that is not exactly one carriage return — and gives up only the axis the channel owns, which is the terminator exception this harness already rules on
+_seam_sorted=(); _seam_stored=()
+read_stream _seam_sorted "the residual manifest's recursive sort" < <(jq -S . "$SEAM_LOCK")
+read_stream _seam_stored "the residual manifest as the crate wrote it" < "$SEAM_LOCK"
+[[ "${_seam_sorted[*]}" == "${_seam_stored[*]}" ]] \
+    || fail "the residual manifest does not match its own recursive sort — the one writer of the wire shape emitted an order its second writer could not reproduce"
+unset _seam_sorted _seam_stored
 say "protection: ${SEAM_EDITED[*]} kept and reported, $(( ${#SEAM_ROSTER[@]} - ${#SEAM_EDITED[@]} )) recorded file(s) removed, manifest narrowed to schema + the survivors at init's hashes"
 
 # spec: installer/README.md §The manifest — the narrowing arm, and it is the only arm that moves a consumer *down* the lattice: every other re-run holds the profile fixed, so none reaches the state where files[] outlives kits. That state is not exotic — it is the ordinary consequence of the carry-forward rule, which keeps every once-vendored path on the roster while the recorded kit set shrinks
