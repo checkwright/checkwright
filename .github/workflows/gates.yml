@@ -395,15 +395,15 @@ jobs:
       # states the adopter's own stake in this member and where each platform
       # takes it from.
       #
-      # **This step is measurement scaffolding and not a support claim**, the
-      # same class as the roster steering below and declared for the same
-      # reason. docs/install.md sends a Windows adopter through WSL, where this
-      # member comes from the distribution — and this runner is deliberately
-      # NATIVE Windows, because the native path is precisely what is unmeasured.
-      # So there is no documented native route to mirror here yet; chocolatey is
-      # this host's own package manager, already the source of its `jq`. When a
-      # native Windows path is supported, this step's route is what that
-      # section has to name, or the leg goes back to measuring nobody's path.
+      # **This step stopped being scaffolding on the day the triple joined, and
+      # is now the ADOPTER's own step performed.** It used to carry a standing
+      # obligation — "when a native Windows path is supported, this step's route
+      # is what that section has to name, or the leg goes back to measuring
+      # nobody's path" — and that obligation is discharged: docs/install.md
+      # §Requirements' `shellcheck` bullet names Chocolatey for native Windows,
+      # citing this leg as what measures it. Read it the way the macOS legs'
+      # `brew` step is read: the package set is an adopter claim, held equal to
+      # what that section states, and not a convenience for CI.
       - name: install the one adopter floor member this runner lacks
         shell: bash
         run: |

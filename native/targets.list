@@ -47,9 +47,10 @@
 #   - A line means a discharged precondition and nothing weaker: the run above
 #     is what §Consumer payload's join bound asks for, and a triple without one
 #     stays off this file however reachable it looks. x86_64-pc-windows-msvc is
-#     the worked case — the crate compiles for it, which is the capability, and
-#     it is not a line here, because compiling is not the bound. The WSL bullet
-#     below owns the rest of that triple's standing.
+#     the worked case carried all the way through: it compiled for months, which
+#     was the capability and never the bound, and it stayed off this file for
+#     exactly that long. It joined on 2026-09-09 when one run carried both halves
+#     and not on the day it became reachable. Every line here has that shape.
 #   - Runner availability is not the constraint. This repository is public, so
 #     macOS and arm64-Linux hosted runners are already available to it; what is
 #     missing is a run bought on one, not a machine to buy it on. Measured
@@ -61,15 +62,15 @@
 #     target's own platform (native/runners.list) and never with `--target`
 #     pointed off the host.
 #   - WSL is Linux and resolves to this same target, so docs/install.md
-#     §Requirements' Windows-through-WSL route is served by the Linux line.
-#     Native Windows is DECLARED AND HELD there: the crate compiles for
-#     x86_64-pc-windows-msvc, held by the cross-check step in
-#     .github/workflows/gates.yml's `gates` job, and the PowerShell bootstrap
-#     resolves it, so the first of §Consumer payload's two bounds is met and
-#     the second — the run above — is what the triple waits on. Compiling is
-#     not the join bound. An iteration named *unblock* removes a blocker; it
-#     does not grant a permission, and a reader taking the one for the other
-#     widens this roster on a plan.
+#     §Requirements' Windows-through-WSL route is served by the Linux line and
+#     keeps being served by it. That route is a CHOICE beside native Windows
+#     rather than a substitute for it, now that the native line is here.
+#   - The windows line rests on run 34389015132: `native-artifacts` built the
+#     binary and its sidecar on `windows-latest`, and the Windows install-smoke
+#     leg installed THAT upload — `adopted checkwright-gates.exe ... from the
+#     hand-off, sidecar and all — nothing rebuilt, nothing rehashed` — reached
+#     the artifact-present branch at every profile and finished
+#     `INSTALLER-SMOKE: clean`. Both halves, one run, no host-built stand-in.
 #
 # This is not a narrowing of the trajectory — the objectives are the direction
 # and this roster is the tree. What keeps the UNROSTERED-HOST refusal the normal
@@ -102,3 +103,4 @@
 x86_64-unknown-linux-gnu
 aarch64-apple-darwin
 x86_64-apple-darwin
+x86_64-pc-windows-msvc
