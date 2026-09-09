@@ -9903,13 +9903,14 @@
   disposition, the negative sequencing sentence, and the reachability obligation a cut owes.
   **Size, read off the oracle** rather than counted by hand: `--emit port-blockers --tree` reports
   `scripts/pack-installer.sh owed lines=198`.
-  **THE BLOCKER, probed 2026-09-06 at build, re-probed by the lead, citations re-resolved 09-08.**
-  `.github/workflows/publish.yml` `pack:` (`:142`) is a SEPARATE JOB from `build:` (`:80`): its own
-  `actions/checkout` (`:148`), its own `runs-on: ubuntu-latest` (`:144`), a download-artifact
-  (`:150`) and the assemble step (`:155-225`) — and NOTHING between them builds. `needs: build`
-  orders jobs; it does not share a workspace, so `native/target/release/` does not exist there.
+  **THE BLOCKER, probed 2026-09-06 at build, re-probed by the lead, citations re-resolved 09-08 and
+  again 09-09.** `.github/workflows/publish.yml` `pack:` (`:142`) is a SEPARATE JOB from `build:`
+  (`:80`): its own `actions/checkout` (`:148`), its own `runs-on: ubuntu-latest` (`:144`), a
+  download-artifact (`:150`) and the assemble step (`:155-224`) — and NOTHING between them builds.
+  `needs: build` orders jobs; it does not share a workspace, so the path
+  `gate-sdk/lib/gate.sh` defaults `GATE_SDK_NATIVE_BIN` to does not exist there.
   The smoke half holds: `run-smoke.sh:86-89` builds and asserts the executable before its pack
-  call sites at `:106`, `:122`, `:701`, `:871` and `:949`.
+  call sites at `:106`, `:122`, `:723`, `:924` and `:1002`.
   **BOTH ROUTES WERE NAMED AND NEITHER TAKEN — `lead, own-authority` 2026-09-06**, on the build
   session's escalation and with the lead re-running the probe rather than relaying it. The grounds
   are written down here so a later session does not re-derive them:
@@ -9918,14 +9919,27 @@
     by a real publish. The release is deferred, so the untested window is open-ended, and a cargo
     build newly introduced into the signing path is worst discovered on release day.
   - ROUTE 2, resolve `GATE_SDK_NATIVE_BIN` onto a downloaded artifact. REFUSED ON A STATED
-    SURFACE: `publish.yml:87-97` names the checkout+bash tamper floor as why the build leg stays
-    bash on preinstalled cargo, and the `pack` job today executes only bytes it checked out. This
-    would make the one job that assembles and stamps the published tarball execute bytes it did
-    not produce, cutting across the once-computed-digest grain at `:18-21`, `:112-116`, `:194-198`.
-  **THE BLOCKING DEPENDENCY IS DISCHARGED, 2026-09-06 at close.** `gate-sdk/SPEC.md` §The non-gate
-  arm no longer claims only an `--emit-<name>` spelling is front-end reachable; it states the
-  correlated convention (`Arm::Emit` => `--emit-<name>`, `Arm::Run` => bare flag, both reachable),
-  verified against `run-gates.sh:60-61`'s fall-through and all 51 members (33 Emit, 18 Run).
+    SURFACE: `publish.yml`'s build-leg header names the checkout+bash tamper floor as why that leg
+    stays bash on preinstalled cargo, and the `pack` job today executes only bytes it checked out.
+    This would make the one job that assembles and stamps the published tarball execute bytes it
+    did not produce, cutting across the once-computed-digest grain the workflow's own header, its
+    macOS-floor step and its tag-version proof each state — cited by NAME from 2026-09-09, all
+    three line citations having drifted at once behind `3550f340`'s inserted macOS-floor step.
+  **RE-VERIFIED AT SCOPE 2026-09-09 — the blocker HOLDS unchanged, and two grounds moved.** (a)
+  ROUTE 1's refusal is materially WEAKER: build-then-pack in one job is now rehearsed on every CI
+  run — `gates.yml`'s PowerShell leg calls `build-native.sh` then `pack-installer.sh --artifacts`,
+  and `run-smoke.sh` does the same on ubuntu — so the open-ended untested window covers only
+  `publish.yml`'s job wiring, never the shape. (b) ROUTE 1 gained a SECOND obstacle this entry
+  never cited, and it OUTRANKS the workflow comment it does: gate-sdk/SPEC.md §Consumer payload
+  states the pack step takes the build legs' uploaded artifacts and "builds nothing itself".
+  Its subject is payload artifacts and its predicate is unqualified — an ambiguity in a governing
+  surface, so which it binds is operator-class and no session may pick. (c) ROUTE 2's ground is
+  UNCHANGED: nothing in the tree digest-verifies against an independent source. NO THIRD ROUTE —
+  `pack:` is the sole producer of the release tarball and the packer refuses a dirty tree and
+  stamps HEAD, so no pre-pack exists; and `# port-until:` is refused for this file by name at
+  gate-sdk/SPEC.md §Porting a gate to the binary substrate.
+  **The front-end-reachability dependency is DISCHARGED, 2026-09-06 at close:** gate-sdk/SPEC.md
+  §The non-gate arm states the correlated convention and a bare-flag `Arm::Run` is reachable.
   **Cost while deferred:** the owed column keeps its largest reachable member, so the port track's
   completion predicate cannot reach zero; and the packer stays shell while its own owning section
   states the port obligation, which is a standing disagreement between a surface and the tree.
