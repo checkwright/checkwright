@@ -253,8 +253,8 @@
   operator-RATIFIED 2026-09-09, case-by-case, and since RETIRED at close as discharged.
   (2) `ruling-accretion-outgrows-the-entry-cap` and (3) `lead-split-posture-limb-unjudged` — each
   carried a consult ruling directing a TERMINAL move, both held by close 2026-09-09 for want of
-  authority, both operator-RATIFIED 2026-09-09 in the same motion that filed this entry. (2)
-  EXECUTED at the 2026-09-10 close and is Done; (3) is escalated, its point count contested.
+  authority, both operator-RATIFIED 2026-09-09 in the same motion that filed this entry. BOTH
+  EXECUTED at the 2026-09-10 close and both Done; (3)'s conclusion is in .claude/commands/lead.md.
   (4) `TRAJECTORY.md:890-893` carries a `consult, own-authority` reading with
   **NO ratification at all** — the live unratified instance, and the reason this entry is
   design-pending rather than a note.
@@ -8663,10 +8663,10 @@
   **THREE LIVE INSTANCES AT THE 2026-09-05 DRAIN, and the newest is a MEASUREMENT STORE rather than
   a ruling.** `candidate-list-anchors-a-sweep-obligation` is the third: it carries an explicit
   **Why not icebox** paragraph naming a live recurring trigger, and the worklist ranked it anyway.
-  `lead-split-posture-limb-unjudged` carries a thirteen-point series close appends to each
-  iteration, and meets two of the three narrowing conditions — no roadmap tag, no live slug, no
-  dated `recurrence:`, its own paragraph arguing that omission correct. Its ONLY protection is a
-  cost field opening in prose, so one author tidying that opener to a class word compresses thirteen
+  `lead-split-posture-limb-unjudged` (now Done) carried thirteen close-appended points and met
+  two of the three narrowing conditions — no roadmap tag, no live slug, no dated `recurrence:`,
+  its own paragraph arguing that omission correct. Its ONLY protection was a cost field opening
+  in prose, so one author tidying that opener to a class word would have compressed thirteen
   iterations of measurement into one line. The 2026-08-31 ruling bars re-authoring an opener to
   UNBLOCK an eviction; nothing bars the same edit made for tidiness, which is the hole. A
   `not-icebox-eligible:` declaration — candidate (a) above, verbatim — closes it, so this instance
@@ -9137,56 +9137,6 @@
   close on instances 3 and 4, which postdate the eviction. Both fell on one calendar day, so the
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
   is escalated rather than closed by this session.
-
-- **lead-split-posture-limb-unjudged** [design-pending] — this repo runs the Split posture and has
-  never judged which of the two limbs its own posture sits on. `lifecycle-kit/templates/lead.md`
-  §Economics states both limbs and the method; local are the threshold and every reading — this
-  entry's. Split `lead` 2026-09-05.
-  **THE COUNT SERIES, TOTAL escalations reaching the lead, decomposed only from point 16, TWENTY-ONE
-  points, OPEN**, one per close: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7, 1, 5, 10, 8, 16,
-  9, 8, 6.
-  Threshold: a third such iteration, ANSWERED; no single point flips the posture. Points one to
-  twenty keep VALUES only; narratives in git history.
-  **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
-  4.4, 9.1**, not appended at the 14th-19th on `cost-series-limb-unreadable-inside-close`'s ground.
-  **COUNTER-EVIDENCE: NINE** one-surface claims read as wider, eight the lead's own; never NETS.
-  **NINETEENTH: NINE** — 5 OPERATOR, 4 ALONE, 0 oracle. **TWENTIETH: EIGHT** — 3 OPERATOR, 5 ALONE,
-  0 oracle, all five surface-ruled on a two-unit iteration that confounds the volume read.
-  **CONSULT 2026-09-09 (`consult, own-authority`): nothing decides yet — 19 and 20 are two "such"
-  points, this iteration the candidate third, read at close; a third reads the limb LIVE, which
-  CONFIRMS the lead's judgment tier (the split is by session, not tier) and closes this entry.**
-  **THE TWENTY-FIRST IS SIX — the candidate THIRD point, and a "such" point on every limb.**
-  **FOUR OPERATOR** (dispatch-under-budget, the /consult routing plus a settings grant, a carve-out,
-  the ratification-plus-revert pair), **TWO ALONE, ZERO oracle** — that limb at zero a FOURTH
-  straight point; both ALONE surface-ruled off TRAJECTORY.md and this entry. TWO OF SIX is the
-  series' LOWEST surface-ruled fraction, against a count in its bottom quartile — the two move
-  together, which is a genuinely light supervision load rather than a starved one.
-  **THE THIRD POINT LANDED; close 2026-09-09 held its closure for want of authority, and the hold is
-  RATIFIED (operator, 2026-09-09, AskUserQuestion channel in a lead session, lead-relayed) — the
-  NEXT CLOSE executes the terminal move.** Same motion as
-  `ruling-accretion-outgrows-the-entry-cap`'s, now Done — its grounds are in git history.
-  **ESCALATED at the 2026-09-10 close, unexecuted:** the dispatching lead read this iteration as the
-  SECOND such point and directed no flip, against this entry's own record of a third that landed.
-  Nothing is written here until that is ruled; the close held rather than picked.
-  **DEGENERACY, neither reading picked** (16th introduced, 17th narrowed to scope's own escalation):
-  scope gave 4 of the 20th's 8 and 3 of the 21st's 6, so it is live at both and NOT shrinking.
-  **THE CHARACTER LIMB, which by design the count cannot see.** Prior shapes: the lead ruled WRONG
-  (13th, 15th); the lead's own mis-cut caught by the batch it mis-cut (19th, which bought a rule at
-  that template's §Economics); the lead RATIFYING a stage's reading off re-read surfaces (20th).
-  **The twenty-first adds a third shape: a stage session DECLINING a relayed instruction and running
-  the oracle instead, which corrected the lead. It reads as one FEWER escalation.**
-  **ALIGN READINGS EIGHT THROUGH ELEVEN**, bare `align` `cr` against a 10.51M median over thirty,
-  all Sonnet: 14.83M rank 24/30 (one drift finding), 6.20M and 6.93M ranks 4/30 and 5/30 (both
-  zero-divergence, zero-escalation). ELEVEN is the strongest datum FOR the sonnet reading — zero
-  escalations AND a real causal-completeness gap the amendment's own caller census missed —
-  bounded by twelve deltas over seven directories WIDENING the calibrated range. No round-trip.
-  **BUILD'S PER-BATCH SONNET ARM NEVER TRIGGERED at the twenty-first** — 9 `{design-bearing}` to 3
-  `{mechanical}` deltas, each mechanical one coupled into a design-bearing commit rather than
-  separable. A rule with no occasion reports nothing; recorded as an absence, never as a pass.
-  **Cost while deferred:** the posture runs unjudged, so a tier assignment wrong on the character
-  limb costs every iteration and shows up as nothing — the count is the only instrument, and an
-  unread one reads healthy. **NO `recurrence:` line, deliberately** — the three dated re-filings
-  belonged to the discharged deliverable. Surfaced 2026-09-02; filed 2026-09-05 by build.
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
   name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
@@ -10742,5 +10692,7 @@
 - **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
 
 ## Done
+
+- lead-split-posture-limb-unjudged
 
 ## Lessons Learned

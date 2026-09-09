@@ -20,14 +20,23 @@ receipt.** The template's stated premise for splitting — what it takes the lea
 turns to be, and why they should therefore stop paying judgment-tier prices — is
 the template's own §Economics (*Split the lead where the tail dominates*).
 
-**The method is the template's** — §Economics' character limb states how the
-count is taken. **What is set here is the threshold:** a third such iteration.
-One iteration is one point; do not flip on it either way.
+**The method is the template's** — §Economics' character limb states how the count
+is taken. The threshold set here was a third such iteration, and **the measurement
+is now CLOSED**: twenty-one points, one per close, the third such iteration reached
+2026-09-09, and the terminal move executed at the 2026-09-10 close under an
+operator ratification (2026-09-09, AskUserQuestion channel in a lead session,
+lead-relayed). **The reading is that the judgment tier is confirmed — the split
+here is by session, not by tier**, which is what the `supervision` row was the
+receipt for.
 
-**Every reading is the entry's, not this file's.** The cost series, the ruled-alone
-counts, the counters and the refused premises live on
-`lead-split-posture-limb-unjudged`; close records each iteration's reading there,
-and this file carries no datum.
+**What settled it was the limb the count cannot see.** Twice consecutively, at the
+last two closes, a stage session declined a relayed lead instruction, ran the
+oracle, and corrected the lead — the second time against an instruction more
+specific than the first's. A shape seen twice on the limb no count reaches is
+stronger evidence than the counts were, and it confirms the tier from the direction
+the counts were never able to reach. No later close records a reading, here or
+anywhere; the series, its every reading and its refused premises are in git history
+with `lead-split-posture-limb-unjudged`. Nothing re-opens this on one point.
 
 - **`validate`** — the lead dispatches it with a `model: sonnet` override.
   validate's batches are uniformly *mechanical oracle-running* (run the battery,
@@ -49,8 +58,8 @@ and this file carries no datum.
   The revert signal is a missed spec defect surfacing as a build round-trip. The
   trend is judged on the `cr` column of the bare `align` rows in
   `.metric/stage-economics-log.txt`, never on `cost` and never mixed with the
-  `align+fanout` family; the readings and their conclusions live on the entry
-  named above.
+  `align+fanout` family; the readings taken to date are in git history with the
+  retired `lead-split-posture-limb-unjudged`.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
