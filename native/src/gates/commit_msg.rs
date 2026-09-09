@@ -14,6 +14,20 @@ pub(super) fn is_pattern(line: &str) -> bool {
     !rest.is_empty() && !rest.starts_with('#')
 }
 
+// spec: gate-sdk/SPEC.md §check-commit-msg — one helper both commit-msg-tier gates print, so the
+// remedy cannot drift apart between two refusals that fire at the same moment
+pub(super) const REISSUE_REMEDY: [&str; 3] = [
+    "  next: re-issue `git commit` — NOT `git commit --amend`. This hook refuses",
+    "        before your commit object exists, so an amend rewrites the commit",
+    "        already at HEAD, which under a shared index may be another session's.",
+];
+
+pub(super) fn print_reissue_remedy() {
+    for line in REISSUE_REMEDY {
+        println!("{}", line);
+    }
+}
+
 // spec: gate-sdk/SPEC.md §check-commit-msg — `gate_msg_pattern_files` with no positional: every
 // required file must exist and be readable, and each local one joins where it does
 pub(super) fn resolve_files() -> Result<Vec<String>, String> {
@@ -125,6 +139,7 @@ pub fn run(args: &[String]) -> i32 {
         println!("  help: rewrite the message to remove the leaked term; the pattern set is");
         println!("        GATE_SDK_MSG_PATTERN_FILES (+ the local list). The Co-Authored-By");
         println!("        trailer is a footer convention, not a leak — do not ban it.");
+        print_reissue_remedy();
         return 1;
     }
 
@@ -149,6 +164,16 @@ mod tests {
         assert!(!is_pattern("   \t "));
         assert!(!is_pattern("# a comment"));
         assert!(!is_pattern("\t  # an indented comment"));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-commit-msg — the remedy names re-issuing and refuses the
+    // amend, which is the reflex a message-shaped refusal invites
+    #[test]
+    fn the_shared_remedy_names_re_issue_and_names_amend_only_to_refuse_it() {
+        let text = REISSUE_REMEDY.join("\n");
+        assert!(text.contains("re-issue `git commit`"));
+        assert!(text.contains("NOT `git commit --amend`"));
+        assert!(!text.contains("run `git commit --amend`"));
     }
 
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the live pattern shapes this gate ships

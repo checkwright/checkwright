@@ -100,6 +100,9 @@ pub fn run(args: &[String]) -> i32 {
     println!("        (e.g. 'feat(scope): …'); the roster is GATE_SDK_COMMIT_TYPES");
     println!("        (default: {}). git's own Merge/Revert/fixup!/squash! forms are", roster);
     println!("        carve-outs — do not reword them.");
+    // spec: gate-sdk/SPEC.md §check-commit-msg — the sibling exports the remedy rather than this
+    // module re-deriving it, the same cannot-drift-apart ground as the pattern-file resolver
+    super::commit_msg::print_reissue_remedy();
     1
 }
 
