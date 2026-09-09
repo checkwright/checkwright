@@ -17,6 +17,48 @@
 ## Deferred
 
 
+- **comment-tier-surface-excludes-ci-workflows** [design-pending] — the CI workflow files' comments
+  are ungoverned by construction, and the exclusion is in the corpus rather than in the gate's
+  style dispatch. `native/src/spec.rs`'s `comment_surface` builds the governed set from
+  `find_files(root, ["sh", "gate", "rs"])` plus the `GATE_SDK_WORKFLOW_DIR` tracked tier;
+  `.github/workflows/*.yml` is on neither. `comment_tier.rs`'s `classify` would already style them
+  right — its fall-through arm is `Style::Hash`, which is a YAML comment — so nothing but the
+  corpus stands between the gate and the surface.
+  **MEASURED, not estimated.** `CANON_KIT_COMMENT_SURFACE` pointed at the three tracked workflows
+  returns **866 violations against 928 full-line comments**: `gates.yml` 710 comment lines of 1443,
+  `publish.yml` 120 of 332, `site-health.yml` 98 of 322. That is effectively the whole comment
+  corpus, so this is a surface question and not a backlog of stragglers.
+  **What the number changes, and why it is not merely a size.** The run cap is three physical
+  comment lines per directive, so conformance at ~49% comment density needs on the order of 240
+  directives in one file. A workflow's comments are load-bearing CI narrative — a leg's measured
+  cause, an expiry argument, a refuted hypothesis — which reads closer to a doc's prose tier than
+  to code's WHAT/WHY split. The count is therefore evidence about which tier the surface belongs
+  to, and a reader taking it as a sweep's size has skipped the prior question.
+  **A coupling that constrains two of the three answers.** `comment_surface` is SHARED with
+  `check-spec-pointer`, whose only caller discriminator is its `with_templates` bool. Widening the
+  primitive widens BOTH gates, so the workflows would owe spec pointers too. A widening meant for
+  this gate alone needs a second tier or a caller-keyed surface, never an extension appended to the
+  shared list.
+  **The fork, unruled:** (a) widen and sweep, relocating the narrative to
+  `installer/README.md` §The consumer smoke, which already owns the Windows legs' measurement
+  record, and leaving pointers; (b) widen and ride `CANON_KIT_COMMENT_WHITELIST` with an `# until:`
+  drain task — the gate's own sanctioned route for a not-yet-swept component, which catches every
+  NEW workflow file and turns a structural silence into a visible ledger entry, at the price of
+  changing nothing about the three files today; (c) rule the exclusion in canon-kit/SPEC.md
+  §check-comment-tier with its ground, that a CI workflow's comments sit at the doc tier and not
+  the code tier, so a reader stops inferring the gate covers every source.
+  **Why `[design-pending]`:** (a), (b) and (c) differ on what tier the surface IS, which
+  canon-kit/SPEC.md §check-comment-tier owns, and not on how much work each costs.
+  **Cost while deferred:** the workflows are where a CI cause is recorded for the next rider and
+  they carry the tree's heaviest prose, and nothing budgets or stales any of it — so a spent
+  argument survives indefinitely beside the live one. Witnessed rather than argued: this iteration
+  rewrote exactly such a block, whose stated cause named three unprovisioned floor members where
+  the run had one. No adopter witnesses it and it blocks no stage entry or push, so it takes the
+  2026-08-30 discriminator's machinery default.
+  Surfaced by the operator mid-round while reviewing a `gates.yml` comment edit; filed 2026-09-09
+  by the lead on the operator's direction, in a lead session. Promoted here from the gap inbox in
+  the same motion, so the inbox bullet is retired rather than duplicated.
+
 - **consult-rulings-outside-the-authority-roster** [design-pending] — CLAUDE.md admits exactly two
   ruling authorities, `operator` and `lead`. A third has been ruling in practice: a
   `consult`-convened session, whose readings now sit in `TRAJECTORY.md` and on two queue entries
