@@ -8586,40 +8586,34 @@
 - **ruling-accretion-outgrows-the-entry-cap** [design-pending] — ruling content accretes
   monotonically on a deferred entry while `QUEUE_KIT_ENTRY_LINE_CAP` is fixed, so the entries that
   attract rulings pay for each one by evicting the grounds the ruling answers.
-  **Measured 2026-08-29 at this close; the class is no longer hypothetical.** Across 270 deferred
-  entries, **8 sit at 51 physical / 50 counted lines — the cap exactly** — and 9 more sit at 50.
-  The saturated band is 17 entries and it is populated by the most-ruled entries in the file,
-  `native-gate-port-remaining-corpus` among them: density and contention correlate, so the cap
-  binds hardest exactly where the reasoning is most contested.
-  **Two live hits this iteration, both first-hand rather than inferred.** Build's demotion landed
-  `native-gate-port-remaining-corpus` at 51/50, with no line left for the next ruling. This close
-  then judged a recurrence onto `batch-split-stamp-ownership`, itself at 50/50: recording the
-  judgment cost six lines of compression on that entry's own premise-correction block before the
-  five-line datum would fit. The compression was survivable — what went was narration of how the
-  correction was found — but nothing distinguished that from evicting grounds, and no gate would
-  have.
+  **Measured 2026-08-29; the class is no longer hypothetical.** A 17-entry saturated band at or one
+  line under the cap, populated by the most-ruled entries in the file: density and contention
+  correlate, so the cap binds hardest where the reasoning is most contested. The band is
+  re-derivable from the gate's own headroom line, which is its authority.
+  **Two live hits 2026-08-29, first-hand rather than inferred.** A demotion landed
+  `native-gate-port-remaining-corpus` at 51/50 with no line left for the next ruling; a recurrence
+  judged onto `batch-split-stamp-ownership` at 50/50 cost six lines of compression on that entry's
+  own premise-correction block first. Survivable — what went was narration — but nothing
+  distinguished that from evicting grounds, and no gate would have.
   **Why the eviction is invisible where it lands** is `entry-compression-contract-unenforced`'s
   ground, stated there once.
   **ALL THREE CANDIDATE SHAPES ARE ALREADY REFUSED BY THE OWNING SPEC, AND THIS ENTRY IS DROPPED
   FROM THE UNIT SET ON THAT READING — operator-ruled 2026-08-30.** The owner is
   queue-kit/SPEC.md §check-queue-entry-budget, and it ruled every shape before this entry was even
   filed: widening the `ruled:` discount to the whole block is the grammar-wide exemption it refuses
-  at "one line per grammar, not a grammar-wide exemption"; raising the cap for entries carrying
-  rulings is refused at "Why the cap is not widened for exceptional content", conditional caps
-  included; and ruling-count as the split signal is refused **by name** as "a symptom shared by both
-  classes", the ruled criterion being **dispositionability**, under which an entry accreting further
-  grounds for ONE deliverable is explicitly not a split candidate however hard it collides.
-  Ordering is the point: `b1f3bee0` 2026-08-16 and `bbed56a5` 2026-08-23 both precede this entry's
-  own 2026-08-29 filing at `d452e90d`.
+  at "one line per grammar"; raising the cap for entries carrying rulings is refused at "Why the cap
+  is not widened for exceptional content", conditional caps included; and ruling-count as the split
+  signal is refused **by name** as "a symptom shared by both classes", the ruled criterion being
+  **dispositionability**, under which an entry accreting further grounds for ONE deliverable is not
+  a split candidate however hard it collides. Ordering is the point: `b1f3bee0` and `bbed56a5` both
+  precede this entry's own 2026-08-29 filing at `d452e90d`.
   **The premise that displacement is unpriced is false**, corrected rather than deleted: bounding
   what the cap may displace is that gate's invariant's own THIRD SIDE, and a ruling recorded onto
   the entry it rules is one of its two named **mandated writes**, with a self-served relocation
   relief. The 2026-08-30 instance that read as a new failure mode — a composer ruling landing on
-  the smoke class's own owner rather than on a zero-headroom
-  `native-gate-port-remaining-corpus` — is that relief working. (That owner's slug has retired.)
-  **The measurement survives, the analysis does not;** the saturated band is re-derivable from the
-  gate's own headroom line, which is its authority. The one residue the spec concedes rather than
-  answers — the compression contract has no oracle — is NEW work, filed separately.
+  the smoke class's own (since-retired) owner, not a zero-headroom sibling — is the relief working.
+  **The measurement survives, the analysis does not.** The one residue the spec concedes rather
+  than answers — the compression contract has no oracle — is NEW work, filed separately.
   **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is pool-level eviction pressure
   across entries; this is one entry's internal budget spent by a content class that only grows.
   **Cost while deferred:** the queue's most-ruled entries degrade toward a list of dispositions
@@ -8631,6 +8625,12 @@
   gate's headroom line, and its one residue is `entry-compression-contract-unenforced`'s — two
   entries on one subject are two readings of one fact. Close takes the wontfix exit (the 2026-08-23
   ruling's bare Done line).
+  **THE EXIT IS HELD, NOT DECLINED — close 2026-09-09.** The grounds above were re-read and they
+  hold; what is missing is authority. `consult` names none in CLAUDE.md's `operator`/`lead` roster,
+  and the operator ratified only the ONE other consult ruling of that day, case-by-case, while
+  declining the variant that would have added `consult` to the roster. A Done move is terminal —
+  the body evaporates with the tags — and this entry blocks nothing, so close took the reversible
+  branch and escalated. The next close executes on an answer rather than re-deriving this.
   Filed 2026-08-29 by the lead, landed by close; dropped from the unit set 2026-08-30 by spec.
 
 - **design-pending-boilerplate-reds-its-own-promotion** [design-pending] — the standard explanatory
@@ -10328,6 +10328,47 @@
   so the cost is not the retry, it is that the retry teaches the wrong lesson.
   Filed 2026-09-09 to the gap inbox by build batch A; promoted at this close's drain. →fix was
   tried and failed on the envelope; →icebox was refused because the trigger is live and measured.
+
+- **rationale-located-by-reading-not-by-grep** [design-pending] — locating a rationale in governed
+  prose by grepping for it fails on a one-word difference, and nothing tells a stage session that
+  reading the candidate section is the instrument that works.
+  **Four instances in one iteration, and naming them together is the point** — the shape a session
+  keeps meeting is *a fact present in the tree but not connectable from where the session stands*.
+  (i) A queue entry asserted a block in prose naming no slug; recovering the subject cost a
+  `git log -S`. (ii) The spec stage read both governing files and still drew the bound as
+  "undeclared platforms" generically, without noticing the set's most load-bearing member was its
+  own unit's objective. (iii) Build batch B's first grep for a delta's rationale returned nothing
+  and it nearly filed the rationale as missing — the text is present **verbatim** in the owning
+  §Requirements and differs from the amendment by ONE WORD (*a* verb's own dependency, not *the*).
+  (iv) A `kfric` capture recorded `check-comment-tier`'s window rule as re-derived friction; the
+  rule is stated in canon-kit/SPEC.md AND in the gate's own red, which is the text the session was
+  reading when it re-derived it.
+  **The shape does NOT reduce to one mechanism, and a filing that treated it as one would be a
+  slogan.** (i) is structural — a description matches nothing, by construction — and is already
+  fixed: queue-kit/SPEC.md §The queue-edges arm now states that a block naming no slug is no edge
+  and that the authoring rule is the whole remedy. (ii) is inferential and no mechanism reaches it.
+  (iv) is attention, not a documentation hole; the correction is recorded and no edit was owed.
+  **Only (iii) is both actionable and unowned, and that is this entry's subject.** Two of batch B's
+  three real rationale gaps were found by **reading candidate sections**, not by grepping — the
+  method that worked is not written anywhere a stage session loads. Grep is exact-match over prose
+  a human paraphrased, so it answers *is this string here* and never *is this rationale here*,
+  and its false negative is silent: an empty result reads as absence.
+  **Three candidate shapes, none costed here.** A line in the build and align stage templates
+  naming section-reading as the instrument for a rationale-completeness question; a mechanized
+  candidate-section lister (the components a delta touches → their owning SPEC sections), which
+  turns judgment into a worklist; or a rule that an amendment delta cites its rationale's section
+  by name so no search is needed at all — the dearest to author and the only one that removes the
+  search rather than improving it.
+  **DISTINCT from `prose-filename-citation-liveness`** and the citation-liveness family, whose
+  subject is a citation that resolves to nothing. Here every citation resolves and the text is
+  present; what fails is the act of finding it.
+  **Cost while deferred:** a rationale-completeness check is the step canon-kit's merge procedure
+  gates a Done move on, and it is currently performed with an instrument whose failure mode is a
+  false "missing". The near-miss this iteration was caught by the session's own second attempt,
+  which is not a control.
+  Filed 2026-09-09 by close, from build batch B's reported method note plus three sibling
+  instances close judged as one shape. Filed rather than fixed because the three candidates differ
+  in kind and cost, and choosing between them is a scope decision.
 
 
 ## Icebox
