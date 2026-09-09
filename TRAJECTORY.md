@@ -245,7 +245,10 @@ install time.
 **What the objectives are not.** They are the direction, not a claim about the
 tree. No user-facing surface may state the dependency floor they aim at as
 though it were reached — a requirements page claiming git-only today is false,
-and the front door is where a false claim costs the most.
+and the front door is where a false claim costs the most. The converse is also
+a defect: a platform an objective names is declared as **held** with the run
+that joins it, never left undeclared, because an undeclared platform reads to
+every later session as one the project does not intend.
 
 ## The closed rulings
 

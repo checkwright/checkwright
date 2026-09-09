@@ -61,30 +61,25 @@
 #     target's own platform (native/runners.list) and never with `--target`
 #     pointed off the host.
 #   - WSL is Linux and resolves to this same target, so docs/install.md
-#     §Requirements' Windows-through-WSL claim is served exactly as far as that
-#     page already claims and no further. Native Windows is no longer
-#     *impossible*: the crate now compiles for x86_64-pc-windows-msvc, held
-#     there by the cross-check step in .github/workflows/gates.yml's `gates`
-#     job. Compiling is not the join bound, and neither is the run above on its
-#     own: that triple fails the FIRST of §Consumer payload's two bounds, since
-#     docs/install.md §Requirements states Windows as running through WSL and
-#     not natively, so the platform declaration there does not carry it at all.
-#     An iteration named *unblock* removes a blocker; it does not grant a
-#     permission, and a reader taking the one for the other widens this roster
-#     on a plan.
+#     §Requirements' Windows-through-WSL route is served by the Linux line.
+#     Native Windows is DECLARED AND HELD there: the crate compiles for
+#     x86_64-pc-windows-msvc, held by the cross-check step in
+#     .github/workflows/gates.yml's `gates` job, and the PowerShell bootstrap
+#     resolves it, so the first of §Consumer payload's two bounds is met and
+#     the second — the run above — is what the triple waits on. Compiling is
+#     not the join bound. An iteration named *unblock* removes a blocker; it
+#     does not grant a permission, and a reader taking the one for the other
+#     widens this roster on a plan.
 #
 # This is not a narrowing of the trajectory — the objectives are the direction
 # and this roster is the tree. What keeps the UNROSTERED-HOST refusal the normal
 # path — rather than the dead code the vacuous-green class exists to refuse —
-# is the UNDECLARED COMPLEMENT and not the roster's size: native Windows is not
-# declared at all, and every host outside docs/install.md §Requirements'
-# declaration block meets that refusal on day one. That block carries no HELD
-# platform at present, so the complement is the whole of the ground and the
-# refusal is reached only by hosts the page never declared. This is a narrower
-# ground than a held remainder gave, and it is said as narrower rather than
-# papered over: it is still a real population, and the next declared-and-held
-# platform restores the other half. A target joins only on the observation
-# above, and never beyond what that section already states.
+# is the DECLARED-AND-HELD platform plus the UNDECLARED COMPLEMENT, never the
+# roster's size: a native Windows host meets the refusal as a held platform
+# whose artifact is not yet published, and every host outside docs/install.md
+# §Requirements' declaration block meets it as one the page never declared. A
+# target joins only on the observation above, and never beyond what that
+# section already states.
 #
 # The behind-invoke relocation changed what that population MEETS and not how
 # large it is: an unrostered host is refused outright rather than served a

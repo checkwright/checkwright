@@ -17,6 +17,50 @@
 ## Deferred
 
 
+- **windows-roster-join** [design-pending] — join `x86_64-pc-windows-msvc` to `native/targets.list`
+  on the predicate that file's header states: one run carrying a green `native-artifacts` upload for
+  the triple AND the `install-smoke-windows` leg green having consumed that upload and reached the
+  artifact-present branch. Objective 2 of the pivot (TRAJECTORY.md §The objectives) names native
+  Windows outright, and the port-first run names "the Windows and macOS legs" as the own-iteration
+  port-critical instances — both macOS legs got their iteration (`macos-roster-join`,
+  `intel-macos-roster-join`); this is the Windows one, and until 2026-09-09 nothing in the queue
+  owned it. The declaration half landed with this filing: `docs/install.md` §Requirements now
+  declares the triple `held` with this predicate, so `check-install-platforms` counts what a
+  Windows host is refused today.
+  **THE WORK, in the order the leg fails:** (1) `native-artifacts` produces the windows-msvc binary
+  and sidecar on a Windows runner (`native/runners.list` gains the mapping; the build body's floor
+  step is the first cost a non-GNU image incurs, gate-sdk/SPEC.md §Consumer payload); (2) the leg
+  consumes it through `INSTALLER_SMOKE_ARTIFACTS_DIR` and loses its hard-coded `continue-on-error`
+  once it can go green; (3) the two known reds ahead of green —
+  `smoke-harness-mapfile-inherits-host-line-terminator` and the toolchain-floor spawn filed as
+  `toolchain-floor-spawn-on-native-windows` — are inside this unit's cut or sequenced before it;
+  (4) on the observed green, the three lockstep edits the roster header names, plus
+  `build-native.sh` for the source stamp.
+  **Sequencing:** port-critical, its own iteration, scoped before the port oracle reads zero owed —
+  a port declared complete with objective 2 unmet is the front-door false claim §What the objectives
+  are not forbids.
+  **Cost while deferred:** the pivot's OS-reach objective stays half met while every other surface
+  reads the port as one file from done, and the Windows leg burns a runner per push for a red
+  nobody is scheduled to fix.
+  Filed 2026-09-09 by the consult session on the operator's Windows ruling, AskUserQuestion channel.
+
+- **toolchain-floor-spawn-on-native-windows** [design-pending] — the floor probe
+  (`native/src/toolfloor.rs`) spawns each floor tool by bare name and compares its version; on
+  native Windows a bare name resolves through System32 before PATH, so `sort` reaches the system
+  tool whatever PATH carries, and the floor reads unmeetable however the runner is provisioned.
+  Observed across the Windows leg's rounds and hypothesised in the last lead journal; the
+  discriminating probe (`Get-Command sort -All` beside the effective PATH) has not been run.
+  **Two readings, and the second is the product one.** As a provisioning defect, the fix is a
+  resolver that honours PATH order or the calling binary's own directory. As a product finding, a
+  compiled gate binary needing GNU `sort`, `date` and `stat` on the host at all is bash-era residue
+  objective 1 collapses: the floor roster should shrink to what the binary's gates actually spawn,
+  and on a native host that may be git alone. Decide which before writing the resolver.
+  **Sequencing:** blocks `windows-roster-join`'s leg going green, so it rides inside that cut or
+  precedes it.
+  **Cost while deferred:** the Windows leg cannot green and the floor check advertises a
+  requirement the pivot exists to remove.
+  Filed 2026-09-09 by the consult session beside `windows-roster-join`, on the same ruling.
+
 - **ruling-record-shrink-to-bau** [design-pending] — `TRAJECTORY.md` grew from its birth size to
   six times that in five weeks, half of it in the last week, and almost none of it is port-bound:
   the consult binding sent every closed ruling there unqualified, so process rulings with no
