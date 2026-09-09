@@ -1326,8 +1326,8 @@
   **Why it is design-pending:** the rewrite is not a find-and-replace. An always-loaded
   surface is costed per session, so the question is which bash specifics stay resident
   because they are still the common case, which move behind a load trigger, and which are
-  deleted — and that depends on how far the port has actually got, which makes the trigger
-  a threshold rather than a date.
+  deleted — and that depends on how far the port has actually got (`--emit port-blockers --tree`'s
+  owed count), which makes the trigger a threshold rather than a date.
   **Cost while deferred:** every session is oriented by a surface describing the substrate
   the project is moving off, and the correction is paid per session in re-derivation rather
   than once in an edit.
@@ -6033,7 +6033,7 @@
   blocked yet mechanically pickable. The `blocked-by` tag must name a real queue slug
   (queue-kit/SPEC.md §The tag algebra), which is a scope write and not a lead's. The
   `precondition-ok` opt-out asserts the opposite of the truth. Re-verified at the drain: the
-  gate is registered at `scripts/gates.list:64`, the tag grammar at queue-kit/SPEC.md:264.
+  gate is registered in `scripts/gates.list`, the tag grammar at that section (line refs retired).
   **So the observed default is to hold the block in prompts** — which
   `lifecycle-kit/templates/lead.md` already forbids in principle (the message thread is transport,
   never a store) while offering no mechanism in practice.
