@@ -14,38 +14,6 @@
 
 ## Technical Debt
 
-- **smoke-harness-mapfile-inherits-host-line-terminator** — the smoke harness's
-  second multi-line reader of the manifest `jq` stream never got the terminator handling round 20's
-  repair gave the first, and it is what reddens the Windows leg today.
-  **Measured, not predicted — round 21, run 34267324532, job 102199861062.** The round-20 read
-  repair WORKS: 492 of 493 carriage returns stripped, mismatch 0, the manifest hash class closing
-  after 493 then 492 then 0. The leg's red moved FORWARD to the next unrepaired reader of the same
-  stream, `installer/consumer-smoke/run-smoke.sh`:521's `mapfile -t lock_kits < <(jq -r '.kits[]'
-  "$LOCK")`, whose element carries the CR and fails the kits-roster assertion at :524 as "manifest
-  kits (gate-sdk CR) differ from the profile roster (gate-sdk)".
-  **This is now the surviving half of the class.**
-  `installer-prior-files-inherits-host-line-terminator` owned the INSTALLER's four reader sites and
-  reached Done 2026-09-09 discharged rather than fixed:
-  the behind-invoke relocation replaced the `jq`-into-multi-line-capture pipeline with a structural
-  `serde_json` parse (`native/src/installer/lock.rs`), which has no line-oriented reader for a
-  terminator to survive in. This entry's subject — the SMOKE HARNESS's own second copy, on a
-  different builtin — is untouched by that, and unlike the retired entry it is observed rather than
-  latent. Distinct too from `smoke-report-array-carrier-mangling-unexplained`, whose subject is
-  :515's report array and the two candidate mechanisms no finished run discriminates.
-  **The discriminator twenty rounds lacked, worth carrying:** a multi-line capture through a process
-  substitution carries the byte where a single-value capture never can, which establishes COVERAGE
-  without naming the producer.
-  **THE WORK:** every multi-line reader of that stream takes the repaired loop's terminator
-  handling, with its own CRLF test coverage the way the round-20 repair had; :521 is the one
-  blocking today. No host this repo can reach reproduces the byte, which is why the read was close's
-  to buy and the repair is not. `install-smoke-windows` is `continue-on-error: true`
-  (`.github/workflows/gates.yml` :213), so this reddens no master — and that leg's first green is,
-  by its own comment, the roster's join condition for a native Windows target.
-  **Cost while deferred:** the Windows leg cannot go green, so `native/targets.list` cannot join a
-  native Windows target and the pivot's OS-reach objective stays half met. Filed 2026-09-08 to the
-  gap inbox by the close of `intel-macos-roster-join`, which no stage of that iteration could drain;
-  promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
-
 - **windows-roster-join** — join `x86_64-pc-windows-msvc` to `native/targets.list`
   on the predicate that file's header states: one run carrying a green `native-artifacts` upload for
   the triple AND the `install-smoke-windows` leg green having consumed that upload and reached the
@@ -10834,5 +10802,6 @@
 
 ## Done
 
+- smoke-harness-mapfile-inherits-host-line-terminator
 
 ## Lessons Learned
