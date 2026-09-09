@@ -1975,9 +1975,26 @@ and the reason is the one thing the owner cannot do — it holds each line
 **unstripped** as an evidence operand, which an array of stripped values cannot
 carry. No host this repository can reach emits the byte, so the owner is
 exercised against a **synthetic** CRLF stream in the preflight rather than
-against a platform: it asserts the strip and the declaration together, so it reds
-on the LF hosts too, and it prints nothing on the green path, so it buys no
-scenario in the parsed roster.
+against a platform: it reds on the LF hosts too, and it prints nothing on the
+green path, so it buys no scenario in the parsed roster.
+
+*Its expectation is DERIVED and never a literal, and the first Windows round is
+what taught that.* The arm shipped asserting `a b c` against a hand-written
+`a\r\nb\nc\r\n`, and it blocked on the Windows leg at the preflight — before the
+suite reached anything it was there to measure. A literal makes the arm assert
+what the **channel** delivered rather than what the **reader** did, and this is
+the one host measured putting a carriage return on a stream every other host
+delivers clean. So the arm now reads the identical channel twice — once with a
+bare `mapfile -t`, once through the owner — and asserts the reader's own
+contract against that baseline: `mapfile -t` minus exactly one trailing carriage
+return per element, counted, and declared at that count. That is
+host-independent by construction. Its vacuity guard is the strip having fired at
+all, since a channel delivering no carriage return anywhere covers nothing, and
+its refusal prints the handed value, the returned value and one-strip-off-the-
+handed-value side by side — because *a returned value equal to the handed one*
+is a strip that did not fire, and *a returned value equal to the baseline* is a
+channel that added a byte, and no verdict that prints only a count tells those
+two apart.
 
 Once per failing profile, and outside the per-path block because each is a fact
 about the run rather than about a path, the report also prints the consumer's
@@ -2256,6 +2273,33 @@ terminator-aware read means the byte reaches somewhere this account does not
 cover. The manifest arm reddening again at any count means the strip regressed,
 and the count says at which reader. Nothing here predicts which, and nothing here
 claims the leg passes.
+
+*Round 22 selected none of those three, because it never reached them — and what
+it did buy is a NARROWING.* Run `34359998379`, job `102495340310`: the leg blocked
+at the preflight self-test, on the harness's own synthetic `a\r\nb\nc\r\n`. The
+reader returned three elements rendering as `a\r`, `b`, `c\r`. Two readings fit
+that and **this round does not separate them**: either the channel doubled the
+carriage return on the two lines that carried one and appended it to the line that
+did not, so the reader took its one strip correctly off `a\r\r`, `b\r` and `c\r\r`;
+or the channel delivered the three bytes as written and **the strip did not
+fire**. The arm aborted at its first assertion and so never printed the count that
+would have told them apart, which is exactly the defect that assertion order
+carries and why the rewritten arm prints the decomposition before it refuses.
+What the round *does* establish is that this is a claim about the **write path
+into a pipe** and not about `jq`: the writer here was bash's own `printf`
+builtin. Set against round 21's `want_kits`, a `printf '%s\n'` through the same
+construct that came back clean, the pair is not yet a contradiction under either
+reading — the difference between them is whether the DATA already carried a
+carriage return. Nothing here names the layer, and none is asserted.
+
+*What the round bought outright, and it is not about this byte.* The producer half
+of the Windows leg went green on that same run: `native-artifacts` built
+`checkwright-gates.exe` and its sidecar on `windows-latest`, the leg downloaded
+that upload, normalized it and handed it to the smoke through
+`INSTALLER_SMOKE_ARTIFACTS_DIR`. So `$RUNNER_TEMP`'s Windows spelling reaches
+`scripts/ci-build-artifact.sh`'s `mkdir -p`, `cd` and `cp` without translation
+and MSYS's runtime accepts it — measured, and the reason no `cygpath` guard was
+added there on the way past.
 
 *The free log read is gated on the run, not on the job, and the way past that is
 a different endpoint.* `gh run view <id> --log` refuses with `run <id> is still
