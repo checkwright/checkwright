@@ -19,14 +19,19 @@ fail() { printf 'INSTALLER-SMOKE: FAIL — %s\n' "$*"; exit 1; }
 blocked() { printf 'INSTALLER-SMOKE: %s\n' "$*" >&2; exit 2; }
 
 # spec: installer/README.md §The consumer smoke — the terminator handling the .files read owns, factored into the ONE owner every other multi-line reader of the manifest stream goes through: a `mapfile -t` splits on newline alone, so on a host whose stream ends its lines with CRLF every element keeps the carriage return and reaches an assertion as part of the value. Exactly one trailing CR is dropped per line so a doubled one still shows, the strips are counted, and the count is DECLARED rather than swallowed — which is what keeps a value that genuinely ended in a CR visible as a count instead of vanishing into an array element. The .files read keeps its own copy of the strip rather than calling here because it holds each line UNSTRIPPED as an evidence operand, which an array of stripped values cannot carry
+# spec: installer/README.md §The consumer smoke — the byte gets a NAME and the strip gets a single spelling, because rounds 22 to 24 measured `${x%$'\r'}` behaving inconsistently across contexts on the Windows host — stripping where the count is computed and not where the value is stored, in adjacent lines of one function. No mechanism for that is established and none is asserted; what is chosen here is the construct that removes the context-dependence outright, since a `printf`-built variable in a quoted suffix pattern is one expansion with one reading everywhere. The strip is taken ONCE into a named scalar and both the count and the stored value read that scalar, so the two can no longer disagree whatever the cause was
+CR="$(printf '\r')"
+[[ "${#CR}" -eq 1 ]] \
+    || blocked "the carriage return this harness strips by came out ${#CR} byte(s) long — every terminator assertion below would be measuring the wrong byte."
 CRLF_DECLARED=""
 read_stream() {   # $1 = destination array name, $2 = what a declaration calls this stream; stdin = the stream
     local -n _rs_dst="$1"
-    local _rs_line _rs_crlf=0
+    local _rs_line _rs_field _rs_crlf=0
     _rs_dst=(); CRLF_DECLARED=""
     while IFS= read -r _rs_line || [[ -n "$_rs_line" ]]; do
-        [[ "${_rs_line%$'\r'}" == "$_rs_line" ]] || _rs_crlf=$((_rs_crlf + 1))
-        _rs_dst+=("${_rs_line%$'\r'}")
+        _rs_field="${_rs_line%"$CR"}"
+        [[ "$_rs_field" == "$_rs_line" ]] || _rs_crlf=$((_rs_crlf + 1))
+        _rs_dst+=("$_rs_field")
     done
     [[ "$_rs_crlf" -eq 0 ]] || {
         CRLF_DECLARED="$2: the stream delivered $_rs_crlf of ${#_rs_dst[@]} line(s) ending in a carriage return, each dropped as a line terminator"
@@ -41,18 +46,19 @@ read_stream _rs_probe "self-test" < <(printf 'a\r\nb\nc\r\n') > /dev/null
 [[ "${#_rs_probe[@]}" -eq "${#_rs_raw[@]}" ]] \
     || blocked "the stream reader returned ${#_rs_probe[@]} element(s) where the same channel delivered ${#_rs_raw[@]} line(s) — it is losing or splitting records, not just terminators."
 for _rs_i in "${!_rs_raw[@]}"; do
+    _rs_cut="${_rs_raw[_rs_i]%"$CR"}"
     [[ "${_rs_raw[_rs_i]}" == "${_rs_probe[_rs_i]}" ]] || _rs_n=$((_rs_n + 1))
-    [[ "${_rs_probe[_rs_i]}" == "${_rs_raw[_rs_i]%$'\r'}" ]] \
-        || blocked "the stream reader did not take exactly one trailing carriage return off element $_rs_i. The channel handed it $(printf '%q' "${_rs_raw[_rs_i]}") and it returned $(printf '%q' "${_rs_probe[_rs_i]}"); one strip off what it was handed is $(printf '%q' "${_rs_raw[_rs_i]%$'\r'}"). Read those three: a returned value equal to the handed one is a strip that did not fire, and every multi-line manifest read below would inherit the byte."
+    [[ "${_rs_probe[_rs_i]}" == "$_rs_cut" ]] \
+        || blocked "the stream reader did not take exactly one trailing carriage return off element $_rs_i. The channel handed it $(printf '%q' "${_rs_raw[_rs_i]}") and it returned $(printf '%q' "${_rs_probe[_rs_i]}"); one strip off what it was handed is $(printf '%q' "$_rs_cut"). Read those three: a returned value equal to the handed one is a strip that did not fire, and every multi-line manifest read below would inherit the byte."
 done
 # spec: installer/README.md §The consumer smoke — an uncovered strip is DECLARED here and never blocked on, and the two are different verdicts about different subjects. A reader that mishandles a terminator is this harness's precondition and refuses above; a channel that will not carry the byte the synthetic stream was written with is a fact about the HOST, and refusing on it would stop the one platform whose manifest reads this arm exists to protect before it reached a single one of them. The declaration prints the bytes rather than the conclusion, because the two readings it cannot separate — the channel consumed the carriage return, or the strip pattern never matched it — differ in which surface is at fault and agree on every count a verdict could print
 if [[ "$_rs_n" -eq 0 ]]; then
-    say "self-test: this host's channel delivered the synthetic CRLF stream with no carriage return for the reader to take — element 0 arrived as $(printf '%q' "${_rs_raw[0]}") and came back as $(printf '%q' "${_rs_probe[0]}"). The strip is UNCOVERED here and said so rather than greened over; every host whose channel carries the byte covers it."
+    say "self-test: this host's channel delivered the synthetic CRLF stream with no carriage return for the reader to take — element 0 arrived as $(printf '%q' "${_rs_raw[0]}") and came back as $(printf '%q' "${_rs_probe[0]}"), and the reader's own declaration was [$CRLF_DECLARED]. The strip is UNCOVERED here and said so rather than greened over; every host whose channel carries the byte covers it. A NON-EMPTY declaration beside two identical operands is not an uncovered strip at all — it is a reader whose count and whose stored value disagree, and it is what rounds 22 to 24 were reading."
 else
     [[ "$CRLF_DECLARED" == "self-test: the stream delivered $_rs_n of ${#_rs_raw[@]} line(s)"* ]] \
         || blocked "the stream reader took $_rs_n strip(s) and declared [$CRLF_DECLARED] — a strip that stops declaring is the normalization the manifest arm below stays closed to."
 fi
-unset _rs_raw _rs_probe _rs_n _rs_i
+unset _rs_raw _rs_probe _rs_n _rs_i _rs_cut
 
 # spec: installer/README.md §The consumer smoke — INSTALLER_SMOKE_ARTIFACTS_DIR is the hand-off knob: a caller that already holds a producer's artifact directory points this at it and the smoke installs those bytes instead of building its own, which is the whole difference between a run that exercises a release-shaped artifact and one that exercises a harness stand-in
 PREBUILT_DIR="${INSTALLER_SMOKE_ARTIFACTS_DIR:-}"

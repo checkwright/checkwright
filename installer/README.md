@@ -2284,17 +2284,30 @@ rendering as `a\r`, `b`, `c\r`. Round 23 (run `34362529057`, job
 baseline, reported that **the baseline and the reader agreed on every element and
 neither carried a carriage return the strip could take**.
 
-*Those two readings are not the pair the last paragraph named, and the surviving
-one is uncomfortable.* Read together they are consistent with a single
-explanation: that `$'\r'` in `${line%$'\r'}` never matched on that host, so the
-strip was a no-op in both rounds and both the baseline and the reader carried
-`a\r`, `b`, `c\r` — which round 23's own per-element check would then have passed
-vacuously, because it compares against a pattern that strips nothing. The
-alternative is that the channel behaved differently across two runs twenty
-minutes apart on the same label. **They differ in which surface is at fault and
-they agree on every count a verdict could print**, which is why the arm now
-prints the operands' `%q` renderings rather than a conclusion. What neither round
-touches is `jq`: the writer in both was bash's own `printf` builtin.
+*Round 24 printed the operands, and what they say is not what either earlier
+reading predicted.* Run `34365172990`, job `102512903319`, with the arm declaring
+rather than blocking: `element 0 arrived as $'a\r' and came back as $'a\r'`. **The channel
+carries the byte and the reader gave it back.** So the channel is not consuming
+anything, and round 23's "no carriage return anywhere" was the arm's own
+`${x%$'\r'}` failing to strip in the position that computes it. That same run
+went on to reach the kits assertion — the read declared `manifest kits: the
+stream delivered 1 of 1 line(s) ending in a carriage return, each dropped as a
+line terminator`, and the assertion below it still failed on `manifest kits
+(gate-sdk\r)`.
+
+*Read those two lines together, because they are the finding.* The **count** was
+computed from a strip that fired and the **stored value** kept the byte, from
+adjacent lines of one function expanding one identical `${_rs_line%$'\r'}`. That
+is incoherent for a single shell and no mechanism for it is established here.
+What *is* established is that no verdict phrased as a count can be trusted to
+mean the value was stripped, which is why the strip now has one spelling and one
+site: a `printf`-built `CR` variable, a quoted suffix pattern, taken **once**
+into a named scalar that both the count and the stored element read, so the two
+cannot disagree whatever the cause was. The `.files` loop is deliberately left
+on `$'\r'` as the **control** — it is the one spelling measured working on that
+host across four rounds, and changing it on an unestablished mechanism would
+destroy the comparison the next round gets for free. What no round touches is
+`jq`: the writer in the self-test was bash's own `printf` builtin.
 
 *And the arm stopped blocking, which is a correction to it rather than a
 concession.* An uncovered strip and a broken reader are different verdicts about
