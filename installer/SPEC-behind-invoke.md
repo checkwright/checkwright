@@ -137,6 +137,27 @@ same door `--declaration-parity` left by, and the census discipline the same
 section asks for — *which other helpers' caller sets does this cut empty* — is
 what surfaced it.
 
+**The same census, run a second time over the roster's *storage path* rather
+than its caller, surfaces one more site the first pass did not reach.**
+`native/src/toolfloor.rs`'s `ROSTER` constant is the literal string
+`"context-kit/lib/toolfloor.sh"`, read at runtime — not sourced as shell, parsed
+as data — by two callers neither of which is `doctor`: `check-install-toolchain`
+(`native/src/gates/install_toolchain.rs`, `DEFAULT_ROSTER`) and the `env-probe`
+emit arm (`native/src/emit/env_probe.rs`, which reads it for the `PROBE_SET`
+array underlying docs/install.md §Requirements' toolchain list). Deleting the
+file without repointing
+either breaks both at first run. "The floor roster ... move[s] in-crate" above
+already covers this by design — the roster text moves beside the predicate it
+already shares a home with — so this is enumeration, not a new decision: both
+callers repoint at the in-crate roster in the same commit as the deletion.
+`scripts/check-install-toolchain.gate`'s own `couples=` line names the same path
+and narrows with it, the same shape delta 12 already gives
+`check-install-disposition`'s `couples=`. The prose asserting today's file as the
+roster's home lives at `gate-sdk/README.md`, `docs/install.md` and
+`docs/site-architecture.md`'s freshness-gate roster, plus their generated
+mirrors and `gate-sdk/SPEC.md`'s own mentions (the last two already rostered
+below for other delta-5 reasons).
+
 ### (6) `doctrine-kit/bin/install-doctrine.sh` and `gate-sdk/lib/inject.sh` move in-crate
 
 Both follow their own stated sequencing rather than a fresh judgement.
@@ -313,6 +334,13 @@ for.
 - the `installer_smoke` validate baseline — reds on a **scenario-roster
   difference**. Delta 9 rewords parsed arm headers, so
   `.workflow/validate-baseline.txt` moves in the same commit.
+- `check-install-toolchain` — the same **comparison against a holder that no
+  longer exists** shape named for `check-install-disposition` above, reached a
+  second way: its `couples=` names `context-kit/lib/toolfloor.sh` directly, and
+  its own default roster argument (`native/src/toolfloor.rs`'s `ROSTER`)
+  resolves to that same deleted path at runtime. Both the `.gate` file's
+  `couples=` and the constant move to the roster's in-crate home in the same
+  commit as the deletion (delta 5).
 
 **Monotone — clearable by inspection:** `check-comment-tier`,
 `check-portability-floor`'s per-file findings once its corpus is corrected,
@@ -363,15 +391,31 @@ sixteen to one and whose completion predicate is satisfied downward.
   (delta 12).
 - `native/targets.list` — its header rests omit-and-declare's non-vacuity on the
   undeclared complement, which delta 1 retires (delta 1).
+- `native/src/toolfloor.rs` — the `ROSTER` constant repoints from the deleted
+  shell file to the roster text moving in-crate beside it (delta 5).
+- `native/src/gates/install_toolchain.rs`, `native/src/emit/env_probe.rs` — each
+  reads the roster through `toolfloor::ROSTER` alone, so each moves with the
+  constant and owes no separate read-site edit (delta 5).
+- `scripts/check-install-toolchain.gate` — its `couples=` names the deleted path
+  and narrows with it, the shape delta 12 already gives
+  `check-install-disposition.gate`'s (delta 5).
 - `docs/install.md` — §Requirements' platform block prose, now that an
-  undeclared platform is refused rather than served a declared omission (delta 1).
+  undeclared platform is refused rather than served a declared omission (delta 1);
+  and, separately, the toolchain-roster-parity prose naming
+  `context-kit/lib/toolfloor.sh` as the probe roster's home, and the GNU-`sort`
+  paragraph's second site, both stale once the file that grounds them is deleted
+  (delta 5).
 - `context-kit/SPEC.md` — the sequencing sentence for `lib/toolfloor.sh` and
   `index-tests/toolfloor-cases.sh`, and §Testing's parity coupling (delta 5).
 - `context-kit/lib/toolfloor.sh`, `context-kit/index-tests/toolfloor-cases.sh` —
   deleted (delta 5).
 - `context-kit/gate-tests/toolfloor-parity.test.sh` — retires with its arm (delta 5).
 - `gate-sdk/SPEC.md` — §The non-gate arm's roster gains five members and loses
-  `--toolfloor-parity`; §check-install-disposition's third assertion (deltas 3, 5, 12).
+  `--toolfloor-parity`; §check-install-disposition's third assertion; and its own
+  three mentions of `context-kit/lib/toolfloor.sh` as the probe roster's home
+  (deltas 3, 5, 12).
+- `gate-sdk/README.md` — the sentence holding `docs/install.md` to
+  `context-kit/lib/toolfloor.sh` "the roster's owner" (delta 5).
 - `gate-sdk/lib/inject.sh`, `doctrine-kit/bin/install-doctrine.sh` — moved
   in-crate (delta 6).
 - `doctrine-kit/SPEC.md` — §The port disposition's sequencing, now discharged
@@ -382,11 +426,22 @@ sixteen to one and whose completion predicate is satisfied downward.
 - `scripts/git-hooks/pre-commit` — a generated projection, regenerated by its own command; it
   persists each member's emitted argv, so a retired arm survives there until it is (all deltas).
 - `docs/check-graph.html` — a generated projection, regenerated by its own command (all deltas).
+- `docs/site-architecture.md` — `check-install-toolchain`'s own freshness-gate
+  entry, which names `context-kit/lib/toolfloor.sh`'s `PROBE_SET` as one half of
+  the parity it holds (delta 5).
 - `docs/gate-sdk/SPEC.md` — the generated site mirror of `gate-sdk/SPEC.md` (all deltas).
 - `docs/context-kit/SPEC.md` — the generated site mirror of `context-kit/SPEC.md` (all deltas).
+- `docs/gate-sdk/README.md` — the generated site mirror of `gate-sdk/README.md`
+  (delta 5).
 <!-- update-target-exempt: a published dated release note is immutable by the same rule CANON_KIT_TEMPORAL_EXEMPT_PATHS and CANON_KIT_INSTALL_CLAIM_EXCLUDE already carry for docs/posts/*; it is named here so the retired-spelling reconciliation does not read an intentional historical mention as a missed site -->
 - `docs/posts/2026-08-06-checkwright-v0-22-0.md` — a historical mention of
   `installer/lib`, left standing.
+<!-- update-target-exempt: a published dated release note is immutable, same ground as the bullet above -->
+- `docs/posts/2026-07-26-checkwright-v0-16-0.md` — a historical mention of
+  `context-kit/lib/toolfloor.sh` (its introduction), left standing.
+<!-- update-target-exempt: a published dated release note is immutable, same ground as the bullet above -->
+- `docs/posts/2026-08-01-checkwright-v0-21-0.md` — a historical mention of
+  `context-kit/lib/toolfloor.sh` (a later floor bump), left standing.
 
 ## Retired spellings
 
@@ -401,6 +456,9 @@ sixteen to one and whose completion predicate is satisfied downward.
 - `--toolfloor-parity` — retires with its second holder, on gate-sdk/SPEC.md
   §The non-gate arm's own rule (delta 5).
 - `installer/lib` — the directory and every path under it (delta 3).
+- `context-kit/lib/toolfloor.sh` — the roster's storage path, not merely its
+  predicate's; the file is deleted and both the roster text and every literal
+  citation of this path move with it (delta 5).
 
 ## Definition of Done
 
