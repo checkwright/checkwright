@@ -949,6 +949,22 @@ jobs:
     permissions:
       contents: read
     steps:
+      # The Windows analogue of the macOS floor step below, and it lands before
+      # the checkout because that is what it is about. This repository pins no
+      # line endings in .gitattributes, and Git for Windows sets
+      # `core.autocrlf=true` in its system config — so a Windows leg's checkout
+      # writes CRLF into every tracked text file, and `bash
+      # scripts/ci-build-artifact.sh` then reads a script whose every line ends in
+      # a byte bash folds into the last word. It dies on `set -euo pipefail`,
+      # having compiled nothing. `--global` outranks the system config, which is
+      # why this is the spelling both Windows install-smoke legs above already
+      # use. Read it the way the floor step's own header asks to be read: a
+      # prerequisite of this job's path, not a support claim.
+      - name: check the tree out with LF line endings
+        if: runner.os == 'Windows'
+        shell: bash
+        run: git config --global core.autocrlf false
+
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       # A macOS runner's stock `/bin/bash` is 3.2 and the step below sources

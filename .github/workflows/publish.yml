@@ -87,6 +87,21 @@ jobs:
     permissions:
       contents: read
     steps:
+      # The Windows day the paragraph below anticipates, met with a step rather
+      # than with a reading — and it is the same lesson that paragraph already
+      # records against the macOS day: reasoning about the *shell* a future runner
+      # picks says nothing about the *tree* it checks out. This repository pins no
+      # line endings in .gitattributes and Git for Windows sets
+      # `core.autocrlf=true` in its system config, so a Windows leg's checkout
+      # writes CRLF into every tracked text file and the build body below reads a
+      # script whose every line ends in a byte bash folds into the last word. That
+      # is again a failure reachable only from a tag. The CI producer carries the
+      # identical step for the identical reason.
+      - name: check the tree out with LF line endings
+        if: runner.os == 'Windows'
+        shell: bash
+        run: git config --global core.autocrlf false
+
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       # Stays a bash `run:` on the runner's preinstalled cargo (no setup-rust
