@@ -73,7 +73,11 @@ interactive sweep; no pre-commit or session-context hook makes a network call.
   literal from here, never from memory:** the endpoint does not validate the
   parameter — an unknown state returns `[]` at exit 0, indistinguishable from a
   clean lane — so a misremembered literal is a silent fail-open the sweep cannot
-  feel.
+  feel. **That same signature has a second cause no literal fixes, and it is the
+  active account:** this lane is maintainer-only, so an unselected `gh` login
+  returns the identical empty array at exit 0. `OPS.local.md`'s release-account
+  step is the remedy and the rule behind it is stated there — run it before this
+  lane, not only before a write.
 
   This lane's items are secret, which is the whole of how it differs from its
   siblings: its dispositions are stated **on the advisory thread**, and until the

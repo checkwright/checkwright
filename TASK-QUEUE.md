@@ -14,10 +14,39 @@
 
 ## Technical Debt
 
-## Deferred
+- **smoke-harness-mapfile-inherits-host-line-terminator** — the smoke harness's
+  second multi-line reader of the manifest `jq` stream never got the terminator handling round 20's
+  repair gave the first, and it is what reddens the Windows leg today.
+  **Measured, not predicted — round 21, run 34267324532, job 102199861062.** The round-20 read
+  repair WORKS: 492 of 493 carriage returns stripped, mismatch 0, the manifest hash class closing
+  after 493 then 492 then 0. The leg's red moved FORWARD to the next unrepaired reader of the same
+  stream, `installer/consumer-smoke/run-smoke.sh`:521's `mapfile -t lock_kits < <(jq -r '.kits[]'
+  "$LOCK")`, whose element carries the CR and fails the kits-roster assertion at :524 as "manifest
+  kits (gate-sdk CR) differ from the profile roster (gate-sdk)".
+  **This is now the surviving half of the class.**
+  `installer-prior-files-inherits-host-line-terminator` owned the INSTALLER's four reader sites and
+  reached Done 2026-09-09 discharged rather than fixed:
+  the behind-invoke relocation replaced the `jq`-into-multi-line-capture pipeline with a structural
+  `serde_json` parse (`native/src/installer/lock.rs`), which has no line-oriented reader for a
+  terminator to survive in. This entry's subject — the SMOKE HARNESS's own second copy, on a
+  different builtin — is untouched by that, and unlike the retired entry it is observed rather than
+  latent. Distinct too from `smoke-report-array-carrier-mangling-unexplained`, whose subject is
+  :515's report array and the two candidate mechanisms no finished run discriminates.
+  **The discriminator twenty rounds lacked, worth carrying:** a multi-line capture through a process
+  substitution carries the byte where a single-value capture never can, which establishes COVERAGE
+  without naming the producer.
+  **THE WORK:** every multi-line reader of that stream takes the repaired loop's terminator
+  handling, with its own CRLF test coverage the way the round-20 repair had; :521 is the one
+  blocking today. No host this repo can reach reproduces the byte, which is why the read was close's
+  to buy and the repair is not. `install-smoke-windows` is `continue-on-error: true`
+  (`.github/workflows/gates.yml` :213), so this reddens no master — and that leg's first green is,
+  by its own comment, the roster's join condition for a native Windows target.
+  **Cost while deferred:** the Windows leg cannot go green, so `native/targets.list` cannot join a
+  native Windows target and the pivot's OS-reach objective stays half met. Filed 2026-09-08 to the
+  gap inbox by the close of `intel-macos-roster-join`, which no stage of that iteration could drain;
+  promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
 
-
-- **windows-roster-join** [design-pending] — join `x86_64-pc-windows-msvc` to `native/targets.list`
+- **windows-roster-join** — join `x86_64-pc-windows-msvc` to `native/targets.list`
   on the predicate that file's header states: one run carrying a green `native-artifacts` upload for
   the triple AND the `install-smoke-windows` leg green having consumed that upload and reached the
   artifact-present branch. Objective 2 of the pivot (TRAJECTORY.md §The objectives) names native
@@ -31,11 +60,22 @@
   and sidecar on a Windows runner (`native/runners.list` gains the mapping; the build body's floor
   step is the first cost a non-GNU image incurs, gate-sdk/SPEC.md §Consumer payload); (2) the leg
   consumes it through `INSTALLER_SMOKE_ARTIFACTS_DIR` and loses its hard-coded `continue-on-error`
-  once it can go green; (3) the two known reds ahead of green —
-  `smoke-harness-mapfile-inherits-host-line-terminator` and the toolchain-floor spawn filed as
-  `toolchain-floor-spawn-on-native-windows` — are inside this unit's cut or sequenced before it;
-  (4) on the observed green, the three lockstep edits the roster header names, plus
+  once it can go green; (3) the ONE remaining red ahead of green,
+  `smoke-harness-mapfile-inherits-host-line-terminator`, is inside this unit's cut or sequenced
+  before it; (4) on the observed green, the three lockstep edits the roster header names, plus
   `build-native.sh` for the source stamp.
+  **THE LEG IS ONE ASSERTION FROM GREEN — measured at scope 2026-09-09 off the finished run's free
+  log, not predicted.** It builds the msvc binary, packs, installs from the tarball offline, holds
+  the profile invariant, runs `init` and prints "battery: All 12 gates passed" natively, then fails
+  on a single line: `manifest kits (gate-sdk<CR>) differ from the profile roster (gate-sdk)`. Two
+  premises this entry filed with are therefore corrected here. The floor is MET on that leg — its
+  own run resolves `sort` to GNU coreutils 8.32 and scaffolds shellcheck — so the second red it
+  named, `toolchain-floor-spawn-on-native-windows`, never applied to it and was in any case fixed
+  at `d9c7a004` before this entry was filed; that entry is re-scoped to its surviving objective-1
+  reading. What is untouched work is the PRODUCER half: `native/runners.list` carries no
+  windows-msvc mapping, so `native-artifacts` builds no Windows binary at all, and
+  `scripts/ci-build-artifact.sh` strips the knob-resolved binary name to a bare stem with no
+  executable suffix, which fails the copy on a Windows runner.
   **Sequencing:** port-critical, its own iteration, scoped before the port oracle reads zero owed —
   a port declared complete with objective 2 unmet is the front-door false claim §What the objectives
   are not forbids.
@@ -44,24 +84,7 @@
   nobody is scheduled to fix.
   Filed 2026-09-09 by the consult session on the operator's Windows ruling, AskUserQuestion channel.
 
-- **toolchain-floor-spawn-on-native-windows** [design-pending] — the floor probe
-  (`native/src/toolfloor.rs`) spawns each floor tool by bare name and compares its version; on
-  native Windows a bare name resolves through System32 before PATH, so `sort` reaches the system
-  tool whatever PATH carries, and the floor reads unmeetable however the runner is provisioned.
-  Observed across the Windows leg's rounds and hypothesised in the last lead journal; the
-  discriminating probe (`Get-Command sort -All` beside the effective PATH) has not been run.
-  **Two readings, and the second is the product one.** As a provisioning defect, the fix is a
-  resolver that honours PATH order or the calling binary's own directory. As a product finding, a
-  compiled gate binary needing GNU `sort`, `date` and `stat` on the host at all is bash-era residue
-  objective 1 collapses: the floor roster should shrink to what the binary's gates actually spawn,
-  and on a native host that may be git alone. Decide which before writing the resolver.
-  **Sequencing:** blocks `windows-roster-join`'s leg going green, so it rides inside that cut or
-  precedes it.
-  **Cost while deferred:** the Windows leg cannot green and the floor check advertises a
-  requirement the pivot exists to remove.
-  Filed 2026-09-09 by the consult session beside `windows-roster-join`, on the same ruling.
-
-- **ruling-record-shrink-to-bau** [design-pending] — `TRAJECTORY.md` grew from its birth size to
+- **ruling-record-shrink-to-bau** — `TRAJECTORY.md` grew from its birth size to
   six times that in five weeks, half of it in the last week, and almost none of it is port-bound:
   the consult binding sent every closed ruling there unqualified, so process rulings with no
   discharge event accreted beside the pivot they were meant to accompany, and the file grew a
@@ -82,10 +105,87 @@
   **Sequencing:** scoped before the final port cut, so the oracle-zero close finds a record it can
   retire mechanically. Product-class on the 2026-08-30 witness discriminator: the ruling-record
   mechanism ships in lifecycle-kit and this record is its only dogfood.
+  **ONE PARAGRAPH THIS SWEEP MUST NOT REPAIR, recorded at scope 2026-09-09 so the sweeping session
+  meets it knowing rather than discovers it under pressure.** The 2026-09-07 own-iteration-leg
+  reading closes on "no own-iteration leg remains to reach for", and that ground is false:
+  `windows-roster-join` was filed seven hours later on the operator's own Windows ruling. The
+  operator ruled 2026-09-09 through the AskUserQuestion channel that the clause is NOT REACHED by
+  this iteration's composition, which leaves the false ground standing deliberately rather than by
+  oversight. Repairing it would re-open a second reach, so it changes what the ruling directs —
+  reversal wearing a correction's clothes, operator-class under the file's own third act. Back-fill
+  and compress around that sentence; do not rewrite it.
   **Cost while deferred:** every consult and lead escalation until it lands reads the whole record
   to find the rulings that govern, and the oracle-zero close inherits the judgment sweep this unit
   replaces.
   Filed 2026-09-09 by the consult session on the operator's ruling, AskUserQuestion channel.
+
+## Deferred
+
+
+- **toolchain-floor-spawn-on-native-windows** [design-pending] — a compiled gate binary should not
+  need a GNU userland on the host at all, and the floor roster it advertises is wider than the set
+  it actually spawns.
+  **RE-SCOPED 2026-09-09 at scope, `lead, own-authority` through the message channel, because the
+  entry's filed premise was ALREADY FALSE when it was written.** It was filed at 15:44 asserting
+  that `native/src/toolfloor.rs` spawns each floor tool by bare name, that a System32-first
+  resolution leaves the floor unmeetable however the runner is provisioned, and that "the
+  discriminating probe has not been run". `d9c7a004` landed at 14:01 the same day and is exactly
+  that fix: `proc::resolve_floor_tool` resolves outside the Windows system directory and is taken
+  by all three floor probes — the comparator, doctor's banner and the env-probe emitter — its
+  ground and its single fall-back stated at gate-sdk/SPEC.md §check-graph. The PowerShell leg went
+  green on it. So the provisioning reading is CLOSED rather than deferred, and the slug now names
+  the half that survives.
+  **Its "blocks `windows-roster-join`'s leg going green" sequencing is FALSE and is deleted rather
+  than left standing beside a correction.** That leg's floor is met — its own run resolves `sort`
+  to GNU coreutils and scaffolds shellcheck — and the single assertion reddening it belongs to
+  `smoke-harness-mapfile-inherits-host-line-terminator`, measured at this scope off the finished
+  run's free log.
+  **WHAT SURVIVES IS THE PRODUCT READING, and it is objective 1's rather than Windows'.** A binary
+  requiring GNU `sort`, `date` and `stat` on the host is bash-era residue the pivot exists to
+  collapse; the roster should shrink to what the binary's gates actually spawn, and on a native
+  host that may be git alone.
+  **Why `[design-pending]`:** the roster is a published adopter claim as well as a runtime
+  precondition, so narrowing it is an envelope change rather than a measurement — and what the
+  binary spawns is itself moving while the port's remainder lands, so choosing the corpus to
+  measure against is the design call.
+  **Cost while deferred:** the front door advertises a dependency floor objective 1 exists to
+  remove, which is the shape §What the objectives are not names as the front-door false claim.
+  Filed 2026-09-09 by the consult session beside `windows-roster-join`, on the same ruling;
+  re-scoped the same day at scope, its filed premise having been overtaken by a commit that
+  preceded the filing.
+
+- **propose-once-clause-leaks-into-the-proposal-step** [design-pending] — the port-first run's
+  propose-once clause is a PROMOTION-step rule under the reading this tree has already settled, and
+  eight deferred entries have written it into their own text as a PROPOSAL-step exemption instead.
+  **The settled reading it drifts across is `threshold-recurrence-routing-residency`'s**, ruled
+  `lead, own-authority` 2026-09-07 at scope and derived from the surfaces rather than from
+  precedent: the scope contract's "regardless of theme" governs the PROPOSAL step, and
+  TRAJECTORY.md §PRIORITY DIRECTIVE's joining ground governs the PROMOTION step. The propose-once
+  clause sits inside that joining ground, so on the settled reading it can bound what is promoted
+  and not what is listed.
+  **MEASURED at scope 2026-09-09 and the drift is total rather than partial.** Eight deferred
+  entries stand at or above the threshold and ALL EIGHT carry an answer paragraph; several say
+  outright that no re-escalation is owed, which is a proposal-step claim made by a promotion-step
+  clause. Zero carry a fresh recurrence after their answer, so no member of the cohort is currently
+  mis-served: the defect is LATENT, and what it will cost is a future threshold member skipped at
+  proposal by an author following eight worked examples.
+  **Why `[design-pending]`, a fork whose limbs differ in who may take them.** Either the eight
+  entries' phrasing is corrected to a promotion-step claim, which is eight edits against a cap and
+  leaves the clause where it is; or the clause is widened to reach the proposal step, which
+  reverses the 2026-09-07 reading and is operator-class; or the scope contract's unconditional
+  sentence gains the exemption, which is a kit-template change landing in lifecycle-kit rather than
+  here. That the three answer to three different authorities is why no session should pick one in
+  passing.
+  **DISTINCT from `threshold-recurrence-routing-residency`**, which owns WHERE the routing clause
+  lives and which drew the two-step boundary; this owns a second clause drifting ACROSS that
+  boundary. Distinct from `prompt-ranking-ungrantable-shape-class`, whose 2026-09-09 operator
+  ruling settled only whether a newly judged recurrence RESTARTS the clause, never which step it
+  reaches.
+  **Cost while deferred:** low and latent, paid once when it lands — a threshold member that ought
+  to reach the authority does not, and the omission is invisible precisely because every
+  neighbouring entry models it.
+  Filed 2026-09-09 at scope on the lead's ruling, `lead, own-authority` through the message
+  channel, out of the recurrence census this scope bought and filed to the survey record.
 
 - **instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set** [design-pending] — an
   instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running
@@ -312,38 +412,6 @@
   drain; promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
   The measurement above was filed 2026-09-09 to the gap inbox by the close of
   `behind-invoke-relocation`, whose own drain had already run, and landed here at this scope.
-
-- **smoke-harness-mapfile-inherits-host-line-terminator** [design-pending] — the smoke harness's
-  second multi-line reader of the manifest `jq` stream never got the terminator handling round 20's
-  repair gave the first, and it is what reddens the Windows leg today.
-  **Measured, not predicted — round 21, run 34267324532, job 102199861062.** The round-20 read
-  repair WORKS: 492 of 493 carriage returns stripped, mismatch 0, the manifest hash class closing
-  after 493 then 492 then 0. The leg's red moved FORWARD to the next unrepaired reader of the same
-  stream, `installer/consumer-smoke/run-smoke.sh`:521's `mapfile -t lock_kits < <(jq -r '.kits[]'
-  "$LOCK")`, whose element carries the CR and fails the kits-roster assertion at :524 as "manifest
-  kits (gate-sdk CR) differ from the profile roster (gate-sdk)".
-  **This is now the surviving half of the class.**
-  `installer-prior-files-inherits-host-line-terminator` owned the INSTALLER's four reader sites and
-  reached Done 2026-09-09 discharged rather than fixed:
-  the behind-invoke relocation replaced the `jq`-into-multi-line-capture pipeline with a structural
-  `serde_json` parse (`native/src/installer/lock.rs`), which has no line-oriented reader for a
-  terminator to survive in. This entry's subject — the SMOKE HARNESS's own second copy, on a
-  different builtin — is untouched by that, and unlike the retired entry it is observed rather than
-  latent. Distinct too from `smoke-report-array-carrier-mangling-unexplained`, whose subject is
-  :515's report array and the two candidate mechanisms no finished run discriminates.
-  **The discriminator twenty rounds lacked, worth carrying:** a multi-line capture through a process
-  substitution carries the byte where a single-value capture never can, which establishes COVERAGE
-  without naming the producer.
-  **THE WORK:** every multi-line reader of that stream takes the repaired loop's terminator
-  handling, with its own CRLF test coverage the way the round-20 repair had; :521 is the one
-  blocking today. No host this repo can reach reproduces the byte, which is why the read was close's
-  to buy and the repair is not. `install-smoke-windows` is `continue-on-error: true`
-  (`.github/workflows/gates.yml` :213), so this reddens no master — and that leg's first green is,
-  by its own comment, the roster's join condition for a native Windows target.
-  **Cost while deferred:** the Windows leg cannot go green, so `native/targets.list` cannot join a
-  native Windows target and the pivot's OS-reach objective stays half met. Filed 2026-09-08 to the
-  gap inbox by the close of `intel-macos-roster-join`, which no stage of that iteration could drain;
-  promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
 
 - **binding-intel-leg-failed-one-run-in-two** [design-pending] — a leg this project made binding
   failed one of its first two runs, non-deterministically, in a way no finished run can diagnose;
