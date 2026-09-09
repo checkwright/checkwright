@@ -528,9 +528,12 @@ arriving at a divergence walks it rather than diffing two languages:
 Step 4 is the row that most often reads as a defect and is not one: `Get-FileHash`
 returns upper-case hex where the sidecar carries `sha256sum`'s lower case, so the
 halves agree on the digest and disagree on its spelling. Step 3 is the row where
-reading the exit status alone misleads, because two of the three outcomes are not
-failures. This is the same economy the truth table in §The consumer smoke buys,
-stated once here rather than rediscovered per divergence.
+reading the exit status alone misleads, and it misleads in the other direction
+now: two of the three outcomes refuse, so a reader comparing statuses sees one
+answer where an adopter is owed two — a platform they can do nothing about, and a
+payload they fix by re-downloading. Compare the message and the remedy. This is
+the same economy the truth table in §The consumer smoke buys, stated once here
+rather than rediscovered per divergence.
 
 **Two host assumptions this bootstrap rests on are measured rather than assumed.**
 Both were measured on a native Windows runner: `[[ -x ]]` **holds** on a freshly
@@ -596,11 +599,25 @@ the boundary this section exists to make writable.
 - **`--dry-run` is owed by every mutating op**, on §The verbs' existing
   classifier: print the plan, write nothing, exit 0.
 
-`place-artifact` is the one op today and it produces no `1`: its only failures
-are a bad argv and a write it could not make, which are both `2`. The status is
+The family carries two ops and neither produces a `1`: `place-artifact`'s only
+failures are a bad argv and a write it could not make, and `queue-source` reads
+and writes nothing, so both refuse at `2`. The status is
 specified on the family rather than on the op, so an op that *can* refuse
 something the adopter can act on has a status to refuse with rather than minting
 one.
+
+**`queue-source` is a read op, and the family's grammar is what it costs.**
+`--install queue-source --payload <dir> --kits <kit>[,<kit>…]` answers which
+template a kit set's queue is seeded from — the derivation §What init seeds
+states — by emitting `queue-source<TAB><path>` when one is owed and **an empty
+wire** when none is. A caller's whole reading is therefore *nonempty means
+owed*, with no field to interpret. It exists because the derivation has a second
+reader outside the package: the consumer smoke asserts init's queue
+post-condition and must not carry a second copy of the rule to do it, so it
+reads this one across the package boundary instead of inside it (§The consumer
+smoke). Minting a contract for that reader was refused — the op takes this
+family's existing grammar, channels and exit statuses, so the seam the
+bootstraps already call is the seam the smoke calls.
 
 **The relocation's own precondition, and how it was discharged.** A step could
 move behind the invoke only where the binary is reachable on every platform that
@@ -1553,17 +1570,15 @@ command, in this order because each makes the next meaningful:
   as printed is then measured against. No refusal string is spelled in the smoke:
   the expected one is the control's own line with the sentinel substituted back.
 
-*On a payload that packed no artifact, the flag half is omitted and declared.*
-The battery expectation is a parameter of this arm for the same reason it is one
-of the arm below it: an install with no artifact has nothing for the front-end to
-dispatch to, so it refuses **every** arm before it judges argv at all — which is
-the binary-less leg's own asserted post-condition, not a finding. Asking that
-front-end whether a flag is one it accepts gets the absent-binary refusal
-whatever the flag is, so the answer would be an artifact of the leg rather than a
-fact about the flag. The block assertion and the target's own resolution still
-run there, and the omission is **said** rather than passed over — the same
-omitted-and-declared shape §The gate binary already rules for the queue arm's
-section floor on a host the payload carries no artifact for.
+*The flag half is unconditional, and the branch that once skipped it is gone.*
+It was a parameter of this arm while an install could complete with no artifact:
+asking a front-end with nothing to dispatch to whether a flag is one it accepts
+got the absent-binary refusal whatever the flag was, so the answer would have
+been an artifact of the leg rather than a fact about the flag. Selection has one
+success path now, so there is no such install left to make — every consumer this
+arm is handed was written by a verb that ran, and a verb runs only past a
+verified artifact. The parameter and its one non-green value retired together
+with the leg that passed it.
 
 *Which `init` invocation it rides, and why it is not the obvious one.* It rides
 the first `init --profile` call, never the idempotent re-run below: that re-run's
@@ -1615,11 +1630,14 @@ accident has a direction: round 12's first disagreeing path was a `.md`, so a
 report keyed on it would have shown the end-of-line-shaped case and never the
 one that kills it. The artifact row is the discriminating case precisely because
 git classifies its blob binary and converts a binary blob under no
-configuration. Where the payload carries no artifact — the binary-less leg
-installs exactly such a payload — the second sample is absent and the report
-says so rather than printing a blank, and so are the other two ways it can fail
-to resolve: a manifest recording an artifact no config seam names a path for,
-and an artifact row that is not in the disagreeing set.
+configuration. Where the manifest records no artifact key the second sample is
+absent and the report says so rather than printing a blank, and so are the other
+two ways it can fail to resolve: a manifest recording an artifact no config seam
+names a path for, and an artifact row that is not in the disagreeing set. No arm
+of this smoke now produces the first of those three — an install that ran placed
+a verified artifact — so it is kept as the report's own fail-soft rather than as
+a case with a witness, which is the honest standing for a branch whose subject
+the relocation removed.
 
 The third is the **witness for the exit-2 verdict** — the first disagreeing
 entry whose `want` or `got` failed the operand shape test, carried out of the
@@ -2252,34 +2270,27 @@ install page makes hardest to check: an install that is green, idempotent and
 reversible is still worth nothing until it catches something.
 
 That is the **coverage** claim, and it speaks only for a covered platform. What
-an adopter on an uncovered one gets is a different claim — **disclosure** — and
-it has its own leg, because folding the two into one verdict is what let a cohort
-of ports pass per member while emptying a value class for every binary-less
-install.
+an adopter on an uncovered one gets is a different claim — a **refusal** — because
+with every step of an install behind the invoke there is nothing left for an
+artifact-less host to proceed into. It has its own leg, since folding it into the
+coverage verdict is what let a cohort of ports pass per member while emptying a
+value class for every such install.
 
-**The binary-less leg** installs one profile from a payload packed with no
-artifact, and asserts that every member the install loses is recorded
-`# omitted: <name> <reason>` in the consumer's own `gates.list` — against the set
-that payload dispatches to a binary, derived rather than spelled — and that the
-count is **non-zero**. The count is the half that matters: without it the
-completeness assertion passes vacuously on a payload that dispatches nothing,
-which is exactly the reading under which N individually runnable members
-discharged a cohort that left such a consumer with no markdown-link governance at
-all (gate-sdk/SPEC.md §The port-candidate criteria, criterion 5). The leg
-deliberately does **not** assert that the planted defect goes uncaught: pinning a
-missing capability as expected behavior would make the hole permanent the moment
-it closes. **The battery expectation it passes is `unavailable` rather than
-green**, and that is the whole re-scope: with every registered member dispatching
-to the binary, this install retains no live member, so the honest post-condition
-is the front-end's absent-binary refusal at exit 2 naming the build remedy, plus
-`doctor`'s all-omitted line. The expectation is a **parameter** of the shared
-install assertion rather than a branch inside it — every covered-platform leg
-passes the green expectation it asserts today — because a helper that inferred
-which outcome to expect from some property of the install is how a leg silently
-stops asserting. It names a profile where the value claim above names none, and the
-difference is real — this is a scoping choice about which install to run, not a
-derivation of which profiles catch what. The profile it names is the one whose
-roster criterion the binary-gated class empties.
+**The artifact-less refusal leg** drives a payload the packer itself produced
+with no artifact directory, and that is what no other leg reaches: the artifact
+arm's two refusals are driven against a payload the smoke mutated by hand, so
+without this leg nothing asserts that the *publishing path's* own artifact-free
+output refuses rather than proceeding. It asserts a refusal that **wrote
+nothing** — the tampered leg's shape, and the assertion that tells a refusal apart
+from a warn-then-install — naming the platform and carrying the remedy line that
+tells this outcome from the broken-payload one. It then asserts the **same**
+refusal for `doctor`, for `diff` and for a bare invocation, because the refusal is
+the bootstrap's and precedes every verb: a leg asserting only `init` would pass on
+a bootstrap that had grown a per-verb branch, which is exactly what the branchless
+argv rule forbids. It names a profile where the value claim above names none, and
+the difference is real — this is a scoping choice about which invocation to make,
+not a derivation of which profiles catch what. That the refusal is reached before
+the profile is ever read is itself part of what the leg says.
 
 It also asserts the profile lattice
 against the installed payload, in four parts: every named kit resolves in the
@@ -2374,21 +2385,30 @@ knob, a knob that suppressed a roster member would be a second, test-only
 audience axis whose production behavior no adopter ever exercises, and a masked
 `PATH` is what a machine with no Rust toolchain actually is.
 
-**The `jq`-less arm** asserts what a machine without `jq` is told. It drives
-`init` on a tree with no manifest — the case that used to surface as *this
-package carries no version stamp* — then makes an ordinary install and drives
-`init`, `diff` and `uninstall` against it with `jq` gone, the cases that used to
-surface as *carries a schema this build does not know*. Each must refuse, **name
-`jq`**, carry a `help:` line and exit 2. Naming the program is the whole
-assertion, and asserting the exit status alone would have been worthless: these
-verbs already exited 2 before the precondition existed, so a status-only arm
-would have passed against the very defect being fixed. `doctor` is asserted on
-the other side of the boundary, and the boundary is *reaching the diagnosis*
-rather than the exit code: it must render its below-contract verdict, name `jq`
-as missing in the toolchain block, **and** say `jq` is why the manifest could not
-be read. Exit 1 is the correct verdict there, and asserting exit 0 would have
-been asserting the opposite of the contract — `jq` is a floor member, so a
-machine without it is below contract and `doctor` is the verb that says so.
+**The `jq`-less arm** asserts what a machine without `jq` is told, and the claim
+it makes is that the verbs **do not need `jq` at all**. Nothing behind the invoke
+reads JSON with it — the crate reads it with `serde_json` — so the arm's oracle is
+a verb that runs clean where a verb shelling out to `jq` fails: on this `PATH` the
+two are distinguishable and nowhere else are they. That is what the arm is for,
+and it is why the arm outlives the `jq` preflight it was built around.
+
+So the arm splits its verbs by what each one actually meets. `diff` and
+`uninstall --dry-run` run no `doctor` precondition, so on this machine they both
+read the manifest and reach their answer: each must **exit 0** and say nothing
+about `jq`, which is the arm's positive evidence that the read itself is
+`jq`-free. `init` is the one verb that still refuses, and not for a reason of its
+own — `jq` is a consumer-audience member of the toolchain floor, and `init`'s
+last precondition is `doctor`'s verdict. So it must exit 1, name **the toolchain
+floor** as the reason, render the report that says which member is missing, and
+leave no manifest behind: the refusal an adopter meets here is the floor's,
+delivered before anything is written, rather than a JSON reader's. That is
+asserted twice, on a tree with and without a manifest, because a verb that had
+grown a `jq`-shaped manifest read would answer differently in the two cases.
+`doctor` itself is asserted directly as well, and the difference is what each
+shows: `init`'s refusal proves the floor is a precondition, and `doctor`'s own run
+proves it **reaches its whole report** rather than refusing somewhere ahead of it.
+Exit 1 is the correct verdict there and asserting exit 0 would have been asserting
+the opposite of the contract.
 
 The gap that arm closes was total, and it is why this defect could be filed
 twice: the smoke's preflight requires `jq` and this harness reads every manifest
@@ -2457,22 +2477,31 @@ derived from the one packed before it and the arm refuses to run unless the
 derivation is strictly higher, so neither hop can quietly turn into a second test
 of the downgrade refusal.
 
-**The first hop's clean-worktree assertion carries a tripwire**, for the same
-reason the binary-less leg's disclosure count does: the assertion is evidence
-only over a hop that rewrote something. This arm's payload is artifact-free over
-the lattice minimum, and for as long as that kit set dispatched no member to the
-binary, `init` seeded no omission, the hop rewrote nothing beyond the manifest,
-and the assertion passed for a reason unrelated to correctness — which is how a
-defect leaving that very worktree dirty reached the tree under a green
-assertion. So the hop asserts a **non-zero** count of omission-declaring lines in
-the consumer's own registry *before* asserting the worktree is clean, reading the
-registry rather than the run's output because the registry is what a later run
-and a reviewer both read, and treating an absent registry as a count of zero
-rather than as a reason to abort. Its failure names the remedy — **re-scope the
-arm onto a profile whose kit set ships a member `init` seeds and dispatches to
-the binary, never drop the assertion.** Its scope is the first hop; the second
-hop's clean-worktree assertion carries no tripwire, and widening it is a separate
-judgment.
+**The first hop's clean-worktree assertion carries a tripwire**, because the
+assertion is evidence only over a hop that rewrote something. It once passed for
+a reason unrelated to correctness — the arm's payload was artifact-free over the
+lattice minimum, that kit set dispatched no member to the binary, and the hop
+rewrote nothing beyond the manifest — which is how a defect leaving that very
+worktree dirty reached the tree under a green assertion. **The tripwire's subject
+moved with the relocation and the tripwire did not.** It counted the omissions
+that artifact-free payload declared; every payload now carries a verified
+artifact, because a payload without one refuses at the bootstrap and these hops
+assert manifest behavior only a completed install reaches. So the hop asserts a
+**non-zero** count of *live* registry members and a **placed artifact** in the
+consumer's own manifest *before* asserting the worktree is clean — the same claim
+over the class delta the relocation left standing rather than the one it emptied,
+and a stronger reading, since those members are the ones that ran rather than the
+ones that could not. It reads the registry rather than the run's output because
+the registry is what a later run and a reviewer both read, and its failure names
+the remedy — **repair the hop, never drop the assertion.** Its scope is the first
+hop; the second hop's clean-worktree assertion carries no tripwire, and widening
+it is a separate judgment.
+
+**Every cross-version pack carries the artifact directory the main pack used**,
+for the same reason: an artifact-free payload does not install at all, so a hop
+that packed without one would assert a refusal where the arm needs a completion.
+The bytes are the ones the build step already staged, so the hops differ in
+version and in the relinquish this arm performs, and in nothing else.
 
 **The cross-version reversal arm** reverses a consumer that crossed all three of
 those versions, because every other reversal in the suite runs on a consumer
@@ -2571,13 +2600,11 @@ payload they install carries this run's artifact: the binary is written, an
 battery dispatches its `.gate` members through the placed path. That outcome is
 now the `--install place-artifact` op's rather than an inline branch of `init`,
 so the same arms are also what asserts the first relocated step behaves as the
-shell block it replaced — the assertions themselves did not move. The **omission**
-outcome is not thereby lost — it is what the binary-less leg above is for, and
-there the members recorded `# omitted:` are exactly the ones the consumer's own
-vendored tree implements as a binary subcommand. That set is derived rather than
-spelled, which is what keeps the assertion alive: a literal would read as green
-on a tree where nothing has ported and stop asserting on the first tree where
-something has.
+shell block it replaced — the assertions themselves did not move. What the
+**omission** outcome became is a refusal, and the leg that used to assert the
+omission asserts that refusal: an artifact-less payload is now told apart from a
+covered one before any verb runs, rather than after an install that silently kept
+none of its battery.
 
 **The binary is built rather than fabricated**, which is what makes the placement
 branch worth exercising at all. A stand-in with a matching digest would drive the
@@ -2591,16 +2618,19 @@ path and the seam on the manifest roster.
 **The artifact arm is what remains once the main payload carries the binary**:
 the outcomes a single install cannot show. It takes its own extraction of that
 same tarball and mutates the copy, rather than packing a second time — a host
-**off** the roster omits and declares and exits clean, a **tampered** artifact
-refuses with the consumer's tree object unchanged and no manifest written, and a
-**declared** target whose artifact is gone refuses rather than omitting. All
-three are bootstrap outcomes, decided before the invoke, so the arm is unmoved
-by the placement step going behind it: the two refusals are step 3's and step
-4's, and the omission is step 2's. The last
-two are what keep the three outcomes of §The gate binary's table from collapsing
-into each other. Mutating an extracted package rather than adding a flag to the
-publishing path is deliberate: it leaves the publisher no way to ship a payload
-with a hole in it.
+**off** the roster refuses naming the platform and offering no adopter action, a
+**tampered** artifact refuses with the consumer's tree object unchanged and no
+manifest written, and a **declared** target whose artifact is gone refuses as a
+publisher defect the adopter can act on. All three are bootstrap outcomes,
+decided before the invoke, so the arm is unmoved by the placement step going
+behind it. Two of the three now refuse, so the arm asserts each one's own
+**message and remedy** and then asserts that the two **differ** — the exit status
+is not what tells them apart, and an arm that read it alone would see one answer
+where an adopter must be given two: one they can do nothing about, and one they
+fix by re-downloading. That comparison is what keeps §The gate binary's three
+outcomes from collapsing into each other. Mutating an extracted package rather
+than adding a flag to the publishing path is deliberate: it leaves the publisher
+no way to ship a payload with a hole in it.
 
 `pack-installer.sh` gains nothing from this: the **smoke** builds and hands it a
 directory, while the publishing path still never builds, so a locally built

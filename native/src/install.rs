@@ -9,11 +9,12 @@ use crate::installer::lock::hash as lock_hash;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
-const USAGE: &str = "  usage: checkwright-gates --install place-artifact --root <dir> --src <file> --dest <path> --seam <path> --target <triple> --digest <sha256> [--lock <path>] [--force] [--dry-run]";
+const USAGE: &str = "  usage: checkwright-gates --install place-artifact --root <dir> --src <file> --dest <path> --seam <path> --target <triple> --digest <sha256> [--lock <path>] [--force] [--dry-run]
+         checkwright-gates --install queue-source --payload <dir> --kits <kit>[,<kit>…]";
 
 // spec: installer/README.md §The install boundary — the closed op set an unknown `<op>` is refused
 // against, so a caller's typo exits 2 rather than reading as a step that did nothing.
-const OPS: &[&str] = &["place-artifact"];
+const OPS: &[&str] = &["place-artifact", "queue-source"];
 
 fn usage_error(what: &str) -> i32 {
     eprintln!(
@@ -323,12 +324,47 @@ fn place_artifact(args: &[String]) -> i32 {
     }
 }
 
+// spec: installer/README.md §The install boundary — the family's one READ op: which template the
+// queue is seeded from is a derivation the package owns, so a caller outside the package boundary
+// reads it across this wire rather than carrying a second implementation of the rule.
+fn queue_source_records(payload: &str, kits: &str) -> Vec<String> {
+    let kits: Vec<String> = kits
+        .split(',')
+        .filter(|k| !k.is_empty())
+        .map(str::to_string)
+        .collect();
+    // spec: installer/README.md §What init seeds — a kit set owed no queue emits no record, so an
+    // empty wire is the answer rather than a record whose field a caller must then interpret.
+    match crate::installer::recipe::queue_source(Path::new(payload), &kits) {
+        Some(src) => vec![format!("queue-source\t{}", src)],
+        None => Vec::new(),
+    }
+}
+
+fn queue_source(args: &[String]) -> i32 {
+    let parsed = match parse(args, &["payload", "kits"], &[]) {
+        Ok(a) => a,
+        Err(e) => return usage_error(&format!("queue-source: {}", e)),
+    };
+    let resolved: Result<Vec<String>, String> =
+        ["payload", "kits"].iter().map(|k| parsed.required(k)).collect();
+    let resolved = match resolved {
+        Ok(v) => v,
+        Err(e) => return usage_error(&format!("queue-source: {}", e)),
+    };
+    for r in queue_source_records(&resolved[0], &resolved[1]) {
+        println!("{}", r);
+    }
+    0
+}
+
 // spec: installer/README.md §The install boundary — the family's entry point, resolved in `main`
 // before the registry lookup, and the family's exit statuses: 0 performed or planned, 1 an
 // adopter-actionable refusal, 2 usage or harness error.
 pub fn run(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("place-artifact") => place_artifact(&args[1..]),
+        Some("queue-source") => queue_source(&args[1..]),
         Some(op) => usage_error(&format!(
             "unknown op '{}' — this binary carries: {}",
             op,
@@ -344,6 +380,25 @@ pub fn run(args: &[String]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: installer/README.md §The install boundary — the read op's wire: one tab-separated record
+    // when the kit set is owed a queue and an EMPTY wire when it is not, so "nonempty means owed" is
+    // the caller's whole reading rather than a field it has to interpret.
+    #[test]
+    fn the_queue_source_op_emits_one_record_or_an_empty_wire() {
+        let dir = std::env::temp_dir().join(format!("cw-qs-op-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        std::fs::create_dir_all(dir.join("queue-kit/templates")).expect("cannot make the tree");
+        std::fs::write(dir.join("queue-kit/templates/TASK-QUEUE.md"), "# q\n")
+            .expect("cannot seed the template");
+        let p = dir.to_string_lossy().into_owned();
+        assert!(queue_source_records(&p, "gate-sdk").is_empty());
+        let owed = queue_source_records(&p, "gate-sdk,queue-kit");
+        assert_eq!(owed.len(), 1);
+        assert!(owed[0].starts_with("queue-source\t"));
+        assert!(owed[0].ends_with("queue-kit/templates/TASK-QUEUE.md"));
+        std::fs::remove_dir_all(&dir).ok();
+    }
 
     fn recorded(files: &str, target: &str, digest: &str) -> Recorded {
         Recorded {

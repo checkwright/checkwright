@@ -418,8 +418,9 @@ jobs:
           echo "installer_smoke on native Windows exited $rc"
           echo "This leg reports; it does not judge. The log above is the measurement."
           echo "A zero here is not a roster join on its own: gate-sdk/SPEC.md §Consumer payload"
-          echo "wants an artifact produced AND exercised, and an omit-and-declare install"
-          echo "exercises none. See this job's header for what stands between the two."
+          echo "wants an artifact produced AND exercised, and this leg builds the binary it"
+          echo "installs on the host it runs on, which is a harness stand-in rather than a"
+          echo "released one. See this job's header for what stands between the two."
           exit "$rc"
 
   # The fourth install-smoke leg, and the second BOOTSTRAP's own. Count these legs
@@ -429,15 +430,17 @@ jobs:
   # three legs as covering two halves, which they never did. No other leg
   # substitutes for this one.
   #
-  # **What it asserts, and what it deliberately does not.** It asserts the five
-  # bootstrap steps that section specifies, each on its own observable, including
-  # all three selection outcomes and a real `--install place-artifact` that
-  # performs a placement. It does NOT assert that a `checkwright init` completes
-  # through PowerShell, and the reason is structural rather than incidental: the
-  # binary carries no `init` arm, so step 5's verbatim forwarding would hand `init`
-  # to a program that does not implement it. Payload-end-to-end is owed WITH THE
-  # RELOCATION and is recorded as owed rather than dropped — read the absence as
-  # sequencing, not as an oversight to quietly fill in.
+  # **What it asserts.** Both halves of §The install boundary's two-part oracle.
+  # BOOTSTRAP PARITY: the five steps that section specifies, each on its own
+  # observable, including all three selection outcomes — two of which now refuse,
+  # told apart by message and remedy rather than by exit status — and a real
+  # `--install place-artifact` that performs a placement. PAYLOAD COVERAGE: a whole
+  # `checkwright init` completing through this bootstrap into a scratch consumer.
+  # The second half was owed WITH THE RELOCATION rather than dropped, and it is
+  # owed no longer: the relocation minted the `--init` arm, so step 5's dashless
+  # verb prefix now reaches a program that implements it and a completion is
+  # reachable for the first time. Read the two as distinct — a session sizing a new
+  # leg needs to know which of them it is adding.
   #
   # **This leg is BINDING, and it was non-binding for exactly one run.** The
   # continue-on-error it carried was argued rather than inherited: the bootstrap
@@ -526,7 +529,7 @@ jobs:
       # The fixtures are minimal packages — the bootstrap reads bin/ and
       # payload/artifact/ and nothing else, so a kit tree would be cost with no
       # assertion behind it.
-      - name: drive the PowerShell bootstrap through its five steps
+      - name: drive the PowerShell bootstrap through its five steps and a whole init
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -588,19 +591,32 @@ jobs:
           Check "a package with no payload is named as such" `
                 ($r.Code -eq 2 -and $r.Err -match 'carries no payload') "exit $($r.Code): $($r.Err)"
 
-          Write-Host "== step 2 and step 3, outcome 1: a host off the roster omits and declares =="
+          # Outcomes 1 and 3 both REFUSE now: selection keeps three outcomes and only
+          # one of them proceeds, because nothing remains behind the invoke for an
+          # artifact-less host to proceed into. So neither is asserted on its exit
+          # status alone — the pair below asserts each one's own message and remedy
+          # and then asserts that the two differ, which is the bound the bash half's
+          # own smoke leg asserts from the other side of the parity.
+          Write-Host "== step 2 and step 3, outcome 1: a host off the roster is refused =="
           $f = New-Fixture 'fx-offroster'
           Set-Content -LiteralPath (Join-Path $f 'payload/artifact/targets.list') -Value 'nosuch-triple-for-any-host'
-          $r = Invoke-Bootstrap $f @()
-          Check "a triple the roster does not carry is declared substrate-unavailable and proceeds" `
-                ($r.Code -eq 0 -and $r.Err -match 'substrate-unavailable') "exit $($r.Code): $($r.Err)"
+          $offroster = Invoke-Bootstrap $f @()
+          Check "a triple the roster does not carry is refused, naming the platform" `
+                ($offroster.Code -ne 0 -and $offroster.Err -match 'maps to no target this payload declares') `
+                "exit $($offroster.Code): $($offroster.Err)"
+          Check "the unrostered refusal says there is no adopter action to take" `
+                ($offroster.Err -match 'no adopter action to take') "$($offroster.Err)"
 
-          Write-Host "== step 3, outcome 3: a declared target with half a pair refuses =="
+          Write-Host "== step 3, outcome 3: a declared target with half a pair refuses, differently =="
           $f = New-Fixture 'fx-halfpair'
           Remove-Item -Force (Join-Path $f "payload/artifact/$target/$binname.sha256")
-          $r = Invoke-Bootstrap $f @()
-          Check "a declared target with no complete artifact refuses, and is not omitted" `
-                ($r.Code -eq 1 -and $r.Err -match 'no complete artifact') "exit $($r.Code): $($r.Err)"
+          $halfpair = Invoke-Bootstrap $f @()
+          Check "a declared target with no complete artifact refuses as a publisher defect" `
+                ($halfpair.Code -eq 1 -and $halfpair.Err -match 'no complete artifact') `
+                "exit $($halfpair.Code): $($halfpair.Err)"
+          Check "the two refusals are told apart by message and remedy, not by exit status" `
+                ($halfpair.Err -ne $offroster.Err -and $halfpair.Err -notmatch 'no adopter action to take') `
+                "offroster=$($offroster.Err) halfpair=$($halfpair.Err)"
 
           Write-Host "== step 4: the SHA-256 is verified against the sidecar =="
           $f = New-Fixture 'fx-tampered'
@@ -637,12 +653,69 @@ jobs:
           Check "the placement actually wrote the artifact" `
                 (Test-Path -LiteralPath (Join-Path $root $dest)) "nothing was written"
 
+          # Payload coverage, and it runs against the WHOLE extracted package rather
+          # than a New-Fixture minimal one: init vendors kit source out of payload/
+          # and seeds a consumer, so a fixture carrying only bin/ and
+          # payload/artifact/ has nothing for it to install. The invocation is
+          # dashless on purpose — `init`, not `--init` — because step 5's prefix rule
+          # is what makes the verb reachable and asserting the prefixed spelling
+          # would route around the very rule this half must agree with the other on.
+          Write-Host "== payload coverage: a whole checkwright init completes through this bootstrap =="
+          # init spawns `bash` once, for the hook generator that does not port
+          # (installer/README.md §The install boundary). bash is a declared member of
+          # the toolchain floor an adopter is told to have, so provisioning the runner
+          # up to that floor is this leg's job and hiding a missing one is not: the
+          # Check below states the resolution rather than assuming it, so a runner
+          # image that stopped shipping Git bash reds by name instead of surfacing as
+          # an opaque init failure three assertions later.
+          if (-not (Get-Command bash -ErrorAction SilentlyContinue)) {
+              $env:PATH = "C:\Program Files\Git\bin;$env:PATH"
+          }
+          $bashAt = (Get-Command bash -ErrorAction SilentlyContinue)
+          Check "bash resolves for the one behind-invoke step that spawns it" `
+                ($null -ne $bashAt) "no bash on PATH, and the hook generator init runs is a bash script"
+          $consumer = Join-Path $scratch 'init-consumer'
+          if (Test-Path $consumer) { Remove-Item -Recurse -Force $consumer }
+          New-Item -ItemType Directory -Force -Path $consumer | Out-Null
+          git -C $consumer init -q
+          git -C $consumer config user.email 'smoke@example.invalid'
+          git -C $consumer config user.name 'pwsh smoke'
+          $iout = Join-Path $scratch 'init-out.txt'
+          $ierr = Join-Path $scratch 'init-err.txt'
+          Push-Location $consumer
+          try {
+              & pwsh -NoProfile -File (Join-Path $pkg 'bin/checkwright.ps1') init --profile starter 1> $iout 2> $ierr
+              $icode = $LASTEXITCODE
+          } finally { Pop-Location }
+          $initOut = (Get-Content -Raw -LiteralPath $iout -ErrorAction SilentlyContinue)
+          $initErr = (Get-Content -Raw -LiteralPath $ierr -ErrorAction SilentlyContinue)
+          Check "the dashless verb reached the artifact as --init and the install completed" `
+                ($icode -eq 0 -and $initOut -match 'INIT: vendored \d+ kit') `
+                "exit $icode out=$initOut err=$initErr"
+          # The follow-up block is init's own last output, so its absence means the
+          # verb exited 0 somewhere short of its end.
+          Check "init printed the follow-up block an adopter reads next" `
+                ($initOut -match '(?m)^next:') "out=$initOut"
+          $lockPath = Join-Path $consumer 'checkwright.lock'
+          $lock = $null
+          if (Test-Path -LiteralPath $lockPath) { $lock = (Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json) }
+          # This is the payload-coverage assertion proper: the binary the bootstrap
+          # verified at step 4 is the one the install placed and recorded.
+          Check "the manifest records the artifact for the target this host resolved to" `
+                ($null -ne $lock -and $lock.artifact.target -eq $target) `
+                "manifest target '$(if ($null -ne $lock) { $lock.artifact.target } else { '<no manifest>' })' against host '$target'"
+          # init commits what it vendored, so a green here is also the Windows
+          # evidence for every git call behind the invoke — the batching included.
+          Check "init committed the vendoring and left the consumer worktree clean" `
+                ((git -C $consumer log --oneline -1) -match 'vendor Checkwright kits' -and -not (git -C $consumer status --porcelain)) `
+                "log=$(git -C $consumer log --oneline -1) status=$(git -C $consumer status --porcelain)"
+
           Write-Host "== verdict =="
-          Write-Host "This leg asserts the five bootstrap steps. It does NOT assert that a"
-          Write-Host "'checkwright init' completes through PowerShell: the binary carries no init"
-          Write-Host "arm, so payload-end-to-end is owed with the behind-invoke relocation."
+          Write-Host "This leg asserts both halves of the two-part oracle: the five bootstrap"
+          Write-Host "steps, and a whole 'checkwright init' completing through PowerShell into a"
+          Write-Host "scratch consumer. Nothing in that oracle is owed."
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
-          Write-Host "the PowerShell bootstrap answered all five steps"
+          Write-Host "the PowerShell bootstrap answered all five steps and carried an install end to end"
 
   # The RELEASE-SHAPED PRODUCER, and its whole reason for existing is that no leg
   # which builds from the host it runs on can ever discharge a roster join.

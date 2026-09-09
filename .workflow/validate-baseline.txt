@@ -93,7 +93,7 @@ installer_smoke build pass
 installer_smoke pack pass
 installer_smoke install pass
 installer_smoke profile-invariant pass
-installer_smoke binary-less-leg pass
+installer_smoke artifact-less-refusal-leg pass
 installer_smoke download-arm pass
 installer_smoke toolchain-free-arm pass
 installer_smoke jq-less-arm pass

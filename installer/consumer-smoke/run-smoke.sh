@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a binary-less leg installing one profile from an artifact-free payload and asserting disclosure — every lost member declared in the consumer's registry, at a non-zero count — a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero omission count in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that init, diff and uninstall each refuse naming jq at exit 2 while doctor still reports, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the undeclared host's omit-and-declare and the two refusals between it and placement; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff and uninstall run clean with no jq on PATH while init is blocked by doctor's floor verdict and doctor still reaches its whole report, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 # no-port: installer/README.md §The consumer smoke, The port disposition — ruled 2026-08-31 by the operator in consult. This is the repo's own acceptance harness for the installer and rides no payload: scripts/pack-installer.sh assembles the tarball and the npm package out of the kit roots and never out of installer/consumer-smoke/, so no adopter receives or runs it, and its only callers are the evidence-kit installer_smoke validate suite and the gates workflow. It is the same shape gate-sdk/SPEC.md §Consumer smoke, The port disposition declares on its leg 3 — a smoke executed by no adopter path — reached one step further, for a harness the payload does not even carry; and it drives cargo, the packer and init as black boxes across every profile, so a crate-side form would test the binary from inside the binary. Structural, not a sizing judgment: its size was measured at the ruling and is not the ground.
 set -uo pipefail
 
@@ -139,23 +139,82 @@ CW="$NODE_HOME/node_modules/.bin/checkwright"
 PKG_ROOT="$NODE_HOME/node_modules/checkwright"
 say "installed $(jq -r '.version' "$PKG_ROOT/package.json") from $(basename "$TARBALL")"
 
+# spec: installer/README.md §The consumer smoke — this smoke sources nothing out of the package it is testing, which is its own `# no-port:` header's declared ground rather than a consequence of the relocation: it drives the packer and init as BLACK BOXES, and sourcing the implementation under test was always in tension with that. Each fact it needs is re-hosted by one rule — a fact that is DATA is read as data, and a fact that is a DERIVATION is read from the package through the binary's own wire. So profiles.list and payload/*/ are read below as the data they are, checkwright.lock with the jq this script's preflight already requires, an artifact's identity with the sha256sum it already requires, and the one derivation left with a reader here — which template a kit set's queue is seeded from — through the --install queue-source read op
+# spec: installer/README.md §Profiles — reading the rows here rather than asking the installer for its kit set is what keeps every assertion below non-vacuous: each compares the installer's own answer against this independent second reading of the same data, where a smoke that asked the binary would be comparing a derivation against itself
+# spec: installer/README.md §The manifest — the two consumer-layout constants are spelled once here as the OPERANDS of assertions that red on a wrong value, never as a silent second copy: a wrong GATES_DIR makes the manifest arm's "records no gates.list" refusal fire on the first install and the narrowing arm's doctor assertion name a registry doctor never reports, and a wrong PROFILE_DERIVED puts a name in PROFILES that init refuses as unknown before the lattice assertion that compares it against the computed maximum is ever reached
+GATES_DIR=scripts
+PROFILE_DERIVED=full
+SEAM_FILES=("$GATES_DIR/gates.list" "$GATES_DIR/gate-sdk-config.sh")
+# spec: installer/README.md §Profiles — every install's own registry, keyed by profile, so the monotonicity assertion deferred out of the profile-invariant arm has the gate-set derivation's own output to run over
+declare -A REGISTRY=()
+
+lock_own_file() {   # $1 = manifest path, $2 = the repo-relative path init writes -> that path when the manifest records it, empty when it does not
+    jq -r --arg p "$2" '(.files // {}) | if has($p) then $p else "" end' "$1" 2>/dev/null
+}
+digest_of() {   # $1 = file -> its SHA-256 in hex; sha256sum is a preflight tool of this harness, so there is no hasher to resolve between
+    sha256sum -- "$1" 2>/dev/null | cut -d' ' -f1
+}
+payload_kits() {   # -> every kit root the installed payload carries, in directory order
+    local d
+    shopt -s nullglob
+    for d in "$PKG_ROOT"/payload/*/; do d="${d%/}"; printf '%s\n' "${d##*/}"; done
+    shopt -u nullglob
+}
+profile_rows() {   # -> the '<profile><TAB><kit>' rows of profiles.list, comments and blanks dropped; a '#' anywhere ends a line, which is what lets a row carry a trailing note
+    local line
+    [[ -f "$PKG_ROOT/profiles.list" ]] || return 0
+    while IFS= read -r line; do
+        line="${line%%#*}"
+        [[ -n "${line//[[:space:]]/}" ]] || continue
+        printf '%s\n' "$line"
+    done < "$PKG_ROOT/profiles.list"
+}
+profile_names() {   # -> every selectable profile, the payload-derived one last
+    local seen="" p
+    while IFS=$'\t' read -r p _; do
+        [[ -n "$p" && "$seen" != *"|$p|"* ]] || continue
+        seen="$seen|$p|"
+        printf '%s\n' "$p"
+    done < <(profile_rows)
+    printf '%s\n' "$PROFILE_DERIVED"
+}
+profile_kits() {   # $1 = profile -> its kit set in payload order, empty when the profile names none
+    local want="$1" p k members="" kit
+    if [[ "$want" == "$PROFILE_DERIVED" ]]; then payload_kits; return 0; fi
+    while IFS=$'\t' read -r p k; do
+        [[ "$p" == "$want" ]] && members="$members|$k|"
+    done < <(profile_rows)
+    [[ -n "$members" ]] || return 0
+    # spec: installer/README.md §Profiles — emit in payload order so a roster's line order never decides install order
+    while IFS= read -r kit; do
+        [[ "$members" == *"|$kit|"* ]] && printf '%s\n' "$kit"
+    done < <(payload_kits)
+}
+# spec: installer/README.md §Profiles — the order is derived from set inclusion over the kit rosters and never declared beside them: a declared parent and the kit sets could disagree, and then two surfaces would assert the containment again. The profiles form a lattice rather than a chain, so a pair comparing in neither direction is legitimate and simply absent from this output
+profile_order() {   # -> one '<a><TAB><b>' line per ordered pair of distinct profiles whose kit set is contained in the other's
+    local a b sub sup k ok
+    local -a names
+    mapfile -t names < <(profile_names)
+    for a in "${names[@]}"; do
+        sub="$(profile_kits "$a")"
+        for b in "${names[@]}"; do
+            [[ "$a" == "$b" ]] && continue
+            sup="$(profile_kits "$b")"
+            ok=1
+            while IFS= read -r k; do
+                [[ -n "$k" ]] || continue
+                grep -qxF "$k" <<<"$sup" || { ok=0; break; }
+            done <<<"$sub"
+            (( ok )) && printf '%s\t%s\n' "$a" "$b"
+        done
+    done
+}
+
 # spec: installer/README.md §Profiles — the invariant is asserted against the installed payload rather than the source tree, so it holds for what an adopter actually receives
 printf 'profile invariant\n'
-# shellcheck source=../lib/common/profile.sh
-source "$PKG_ROOT/lib/common/profile.sh"
-# shellcheck source=../lib/common/lock.sh
-source "$PKG_ROOT/lib/common/lock.sh"
-# spec: installer/README.md §The gate binary — which members an omission covers is derived from the payload, so the arm asserting the record reads that derivation out of the installed package rather than carrying a second copy of it
-# shellcheck source=../lib/common/recipe.sh
-source "$PKG_ROOT/lib/common/recipe.sh"
-# spec: installer/README.md §The consumer smoke — the manifest arm's failure report recomputes the artifact's SHA-256 as its content control, and which hasher this host has is a question digest.sh already owns, so the report asks it there rather than growing a second answer
-# shellcheck source=../lib/common/digest.sh
-source "$PKG_ROOT/lib/common/digest.sh"
-# spec: installer/README.md §The manifest — the two seam paths every verb asks the resolver for, spelled once from the installer's own GATES_DIR constant rather than at each call site: a literal here would be a second copy of the consumer layout the module already owns
-SEAM_FILES=("$GATES_DIR/gates.list" "$GATES_DIR/gate-sdk-config.sh")
-mapfile -t PAYLOAD_KITS < <(profile_payload_kits "$PKG_ROOT")
+mapfile -t PAYLOAD_KITS < <(payload_kits)
 [[ ${#PAYLOAD_KITS[@]} -gt 0 ]] || fail "the installed payload carries no kit"
-mapfile -t PROFILES < <(profile_names "$PKG_ROOT")
+mapfile -t PROFILES < <(profile_names)
 say "profiles: ${PROFILES[*]} (${#PAYLOAD_KITS[@]} kits in the payload)"
 
 resolves() { local k; for k in "${PAYLOAD_KITS[@]}"; do [[ "$k" == "$1" ]] && return 0; done; return 1; }
@@ -168,7 +227,7 @@ contains() {   # $1 = superset (newline list), $2 = the containment claim being 
 }
 # spec: installer/README.md §Profiles — assertion 1: every named kit resolves in the payload, which is what makes a roster a roster rather than a wish
 for p in "${PROFILES[@]}"; do
-    mapfile -t members < <(profile_kits "$PKG_ROOT" "$p")
+    mapfile -t members < <(profile_kits "$p")
     [[ ${#members[@]} -gt 0 ]] || fail "profile '$p' resolves to no kit in the payload"
     for k in "${members[@]}"; do
         resolves "$k" || fail "profile '$p' names $k, which the payload does not carry"
@@ -176,7 +235,7 @@ for p in "${PROFILES[@]}"; do
 done
 
 # spec: installer/README.md §Profiles — assertions 2 and 3: the lattice is bounded, so it has exactly one profile below every other and exactly one above every other, and the one above is the payload-derived profile by construction. A profile comparable to nothing, a second incomparable maximum, and two profiles resolving to the same kit set are all reds here — which is the contract the deleted "at most three profiles" bound was standing in for, stated as a shape instead of a count
-mapfile -t ORDER < <(profile_order "$PKG_ROOT")
+mapfile -t ORDER < <(profile_order)
 MINIMA=(); MAXIMA=()
 for p in "${PROFILES[@]}"; do
     below=0; above=0
@@ -197,12 +256,7 @@ done
 PROFILE_MIN="${MINIMA[0]}"
 say "order: ${#ORDER[@]} comparable pair(s), minimum $PROFILE_MIN, maximum $PROFILE_DERIVED"
 
-# spec: installer/README.md §Profiles — assertion 4, and it is what the profile argument on recipe_gates is for: the promise is not that a bigger profile vendors more directories but that moving up only ever adds to the battery, and kit-set containment stops implying gate-set containment the moment a roster varies by profile
-for pair in "${ORDER[@]}"; do
-    IFS=$'\t' read -r a b <<<"$pair"
-    contains "$(profile_gates "$PKG_ROOT" "$b")" "gate-roster monotonicity, $a ⊆ $b" "$(profile_gates "$PKG_ROOT" "$a")"
-done
-say "gate rosters are monotone across every comparable pair"
+# spec: installer/README.md §Profiles — assertion 4 is the one assertion this arm cannot make, and it is DEFERRED to after the per-profile loop rather than dropped. The promise is not that a bigger profile vendors more directories but that moving up only ever adds to the battery, and kit-set containment stops implying gate-set containment the moment a roster varies by profile. Unlike the three above, the gate set is a DERIVATION the installer owns rather than data the package carries, so the smoke reads it where that derivation's own output lands — the gates.list each install writes — instead of unioning the per-kit recipes a second time here
 
 consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
     local c
@@ -383,9 +437,9 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
 
 # spec: installer/README.md §init — the follow-up block's grammar is the operand, so this arm parses the pair out of what init PRINTED rather than comparing it against a second copy a rename would have to be remembered to move; the cheap form of this assertion is exactly the defect it exists to close
 # spec: installer/README.md §The consumer smoke — the flag probe runs in a throwaway copy of the consumer because the probe RUNS the printed command, and the live flag wires the clone's hooksPath: executing it in the consumer itself would put a pre-commit hook in front of every later arm's commit, including the value arm's planted defect, so the arm would decide what it is supposed to observe
-# spec: installer/README.md §The gate binary — the battery expectation is a PARAMETER here for the same reason it is one on assert_install: an install that packed no artifact has nothing for the front-end to dispatch to, so it refuses every arm BEFORE it judges argv and cannot say whether a flag is one it accepts. On that leg the flag probe is omitted-and-declared, exactly as the queue arm's section floor already is, while the block and the target's own resolution stay asserted
-assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = init's captured output, $4 = battery expectation: green | unavailable
-    local profile="$1" C="$2" out="$3" battery_want="$4" line target flag sentinel ctl expect probe sandbox i ti
+# spec: installer/README.md §The gate binary — the flag probe is unconditional here, where it was once skipped on a leg whose install had no binary for the front-end to dispatch a flag to. Selection has one success path, so there is no such install left to make: every consumer this arm is handed was written by a verb that ran, and a verb runs only past a verified artifact
+assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = init's captured output
+    local profile="$1" C="$2" out="$3" line target flag sentinel ctl expect probe sandbox i ti
     local -a cmds=() toks=() ctl_argv=()
 
     mapfile -t cmds < <(awk '$0 == "next:" { b = 1; next } b && /^[[:space:]]+[^[:space:]]/ { sub(/#.*$/, ""); sub(/^[[:space:]]+/, ""); sub(/[[:space:]]+$/, ""); print; next } b { exit }' <<<"$out")
@@ -393,12 +447,9 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
     [[ ${#cmds[@]} -gt 0 ]] \
         || { printf '%s\n' "$out" >&2; blocked "$profile: init printed no follow-up block matching the grammar installer/README.md §init states, so this arm has nothing to assert over."; }
 
-    sandbox=""
-    if [[ "$battery_want" != unavailable ]]; then
-        sandbox="$SCRATCH/followup-$profile"
-        rm -rf "$sandbox"
-        cp -Rp "$C" "$sandbox" || fail "$profile: could not copy the consumer for the follow-up probe"
-    fi
+    sandbox="$SCRATCH/followup-$profile"
+    rm -rf "$sandbox"
+    cp -Rp "$C" "$sandbox" || fail "$profile: could not copy the consumer for the follow-up probe"
 
     for line in "${cmds[@]}"; do
         read -r -a toks <<<"$line"
@@ -412,7 +463,6 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
         for (( i = ti + 1; i < ${#toks[@]}; i++ )); do
             flag="${toks[$i]}"
             [[ "$flag" == -* ]] || continue
-            [[ -n "$sandbox" ]] || continue
             # spec: installer/README.md §The consumer smoke — the negative control is what keeps the flag assertion from passing vacuously: it establishes that this target refuses an unknown flag BY NAME, and the refusal it prints is what the positive probe is then measured against, so no refusal string is spelled here
             sentinel="$flag--checkwright-smoke-unknown"
             ctl_argv=("${toks[@]}"); ctl_argv[$i]="$sentinel"
@@ -426,56 +476,28 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
         done
     done
 
-    if [[ -n "$sandbox" ]]; then
-        rm -rf "$sandbox"
-        say "follow-up: ${#cmds[@]} printed command(s), each resolving in the install with every flag it names accepted"
-    else
-        say "follow-up: ${#cmds[@]} printed command(s), each resolving in the install; the flag probe is omitted-and-declared, since this payload carries no artifact for the front-end to dispatch a flag to"
-    fi
+    rm -rf "$sandbox"
+    say "follow-up: ${#cmds[@]} printed command(s), each resolving in the install with every flag it names accepted"
 }
 
 # spec: installer/README.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
-# spec: installer/README.md §The gate binary — the expected battery outcome is a PARAMETER of this
-# shared helper rather than a branch inside it: every covered-platform leg passes the green
-# expectation it asserts today, and the binary-less leg passes the refusal its install actually earns
-assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery expectation: green | unavailable
-    local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf omitted want_omitted n_omitted q_seam q_bin files_raw
+# spec: installer/README.md §The gate binary — the battery expectation is no longer a parameter of this helper and the alternative it once carried is no longer a branch: selection has one success path, so an install that ran at all placed a verified artifact and a green battery is the only post-condition an install can earn. The refusals are asserted where they now occur — at the bootstrap, before any verb — by the artifact-less leg and the artifact arm
+assert_install() {   # $1 = profile, $2 = scratch consumer dir
+    local profile="$1" C="$2" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf n_omitted q_seam q_bin queue_src files_raw
     local -a bad_hash=() lock_kits=() want_kits=()
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }
     say "init: $(grep -m1 '^INIT:' <<<"$out")"
     # spec: installer/README.md §init — the arm rides THIS init invocation and never the idempotent re-run below, whose no-op branch prints no follow-up block at all: an arm placed there would assert over an empty block on every profile and pass by vacuity, which is the hole the emptiness assertion exists to close arriving through the back door
-    assert_followups "$profile" "$C" "$out" "$battery_want"
+    assert_followups "$profile" "$C" "$out"
 
     out="$( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh 2>&1 )"; rc=$?
-    case "$battery_want" in
-        green)
-            if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
-                printf '%s\n' "$out"
-                fail "the battery is not green on the $profile consumer init just made"
-            fi
-            say "battery: $(grep -E 'All [0-9]+ gates passed' <<<"$out")"
-            ;;
-        # spec: installer/README.md §The gate binary — an install that packed no artifact has nothing
-        # to dispatch to, so the honest post-condition is the front-end's own absent-binary refusal at
-        # exit 2 naming the build remedy, not a green battery over a registry with no live member
-        unavailable)
-            if [[ "$rc" -ne 2 ]] || ! grep -q 'is absent or not executable' <<<"$out" \
-                || ! grep -q 'bash gate-sdk/bin/build-native.sh' <<<"$out"; then
-                printf '%s\n' "$out"
-                fail "the $profile install packed no artifact, so its battery must refuse at exit 2 naming the build remedy — got exit $rc"
-            fi
-            if grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
-                printf '%s\n' "$out"
-                fail "the $profile install packed no artifact, yet its battery reported a pass"
-            fi
-            say "battery: declined — $(grep -m1 'dispatches to the native binary' <<<"$out")"
-            ;;
-        *)
-            fail "assert_install: '$battery_want' is not a battery expectation — the caller names 'green' or 'unavailable'"
-            ;;
-    esac
+    if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
+        printf '%s\n' "$out"
+        fail "the battery is not green on the $profile consumer init just made"
+    fi
+    say "battery: $(grep -E 'All [0-9]+ gates passed' <<<"$out")"
 
     # spec: installer/README.md §The manifest — the files[] hash is what init's changed-file detection reads, so a manifest that disagrees with the tree it describes would make the non-destructive re-run report on noise
     LOCK="$C/checkwright.lock"
@@ -519,33 +541,35 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
     [[ "$mismatch" -eq 0 ]] || fail "$profile: $mismatch of $checked manifest entries disagree with the tree"
     [[ "$checked" -gt 0 ]] || fail "$profile: the manifest records no file"
     mapfile -t lock_kits < <(jq -r '.kits[]' "$LOCK")
-    mapfile -t want_kits < <(profile_kits "$PKG_ROOT" "$profile")
+    mapfile -t want_kits < <(profile_kits "$profile")
     [[ "${lock_kits[*]}" == "${want_kits[*]}" ]] \
         || fail "$profile: manifest kits (${lock_kits[*]}) differ from the profile roster (${want_kits[*]})"
     say "manifest: $checked file(s) agree with the tree, ${#lock_kits[@]} kit(s) recorded"
 
     # spec: installer/README.md §What init seeds — the queue file is the one surface init seeds whose *content* has a format contract, and whether a profile gets one at all is a property of its kit set: the arm asks the same resolver init used rather than naming a profile, and asserts the same contract for both of its outcomes, since which arm wrote the file is exactly what the selection rule makes irrelevant. The section floor is on-surface, so it is absent from the battery just asserted above and is run here out of the installed payload — the only spelling that reaches a profile whose kit set reads the queue and carries no queue-kit
-    if [[ -n "$(recipe_queue_source "$PKG_ROOT/payload" "${want_kits[@]}")" ]]; then
+    # spec: installer/README.md §The install boundary — the resolver is reached through the --install queue-source read op rather than by sourcing the module that owns it: one derivation with two readers, and the smoke now reads it ACROSS the package boundary instead of inside it. The wire is the family's — nonempty stdout is the whole answer — and the op is invoked through $CW, which is the bootstrap of the package $PKG_ROOT names, so the arm reads the package it resolved its kit set from whichever transport's entry point this leg is exercising
+    queue_src="$( "$CW" --install queue-source --payload "$PKG_ROOT/payload" \
+        --kits "$(IFS=,; printf '%s' "${want_kits[*]}")" 2>&1 )"; rc=$?
+    [[ "$rc" -eq 0 ]] \
+        || { printf '%s\n' "$queue_src" >&2; fail "$profile: the --install queue-source read op exited $rc, so the queue post-condition has no resolver to assert against"; }
+    if [[ -n "$queue_src" ]]; then
         [[ -f "$C/$QUEUE_FILE" ]] \
             || fail "$profile: its kit set reads the queue file and init seeded none"
-        # spec: installer/README.md §The gate binary — the section floor ported to the binary substrate, so this arm resolves it through gate_command out of the payload exactly as a battery would, rather than naming a script path that no longer exists; the knobs resolve against the consumer's own config because the dispatch runs with the consumer as cwd
+        # spec: installer/README.md §The gate binary — the section floor ported to the binary substrate, so this arm resolves it through gate_command out of the payload exactly as a battery would, rather than naming a script path that no longer exists; the knobs resolve against the consumer's own config because the dispatch runs with the consumer as cwd. There is no omitted-and-declared branch to fall into: every install that reaches here placed a verified artifact, because the bootstrap refuses rather than proceeding without one
         q_seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.sh")"
         q_bin=""
         [[ -n "$q_seam" && -f "$C/$q_seam" ]] \
             && q_bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$q_seam" | head -n1)"
-        if [[ -n "$q_bin" && -x "$C/$q_bin" ]]; then
-            out="$( cd "$C" && PATH="$RUN_PATH" GATE_SDK_NATIVE_BIN="$C/$q_bin" bash -c '
-                source "$1/payload/gate-sdk/lib/gate.sh"
-                mapfile -t argv < <(gate_command check-queue-sections "$1/payload/queue-kit/checks") || exit 2
-                [[ ${#argv[@]} -gt 0 ]] || exit 2
-                exec "${argv[@]}" "$2"' _ "$PKG_ROOT" "$QUEUE_FILE" 2>&1 )"; rc=$?
-            [[ "$rc" -eq 0 ]] \
-                || { printf '%s\n' "$out" >&2; fail "$profile: the queue file init seeded does not satisfy the section contract queue-kit's own gate reads"; }
-            say "queue: $(grep -m1 '^QUEUE-SECTIONS:' <<<"$out")"
-        else
-            # spec: installer/README.md §The gate binary — a host the payload carries no artifact for has this member omitted-and-declared by the same selection the binary-less leg asserts, so the install carries no gate to read the contract with; the seeded file is still asserted to exist, and the omission is recorded rather than passed over silently
-            say "queue: seeded; the section floor dispatches to a binary this payload carries none of, so it is omitted-and-declared and asserts nothing here"
-        fi
+        [[ -n "$q_bin" && -x "$C/$q_bin" ]] \
+            || fail "$profile: the seam names no executable gate binary at '${q_bin:-<unset>}', so the section floor has nothing to dispatch to on an install the bootstrap let proceed"
+        out="$( cd "$C" && PATH="$RUN_PATH" GATE_SDK_NATIVE_BIN="$C/$q_bin" bash -c '
+            source "$1/payload/gate-sdk/lib/gate.sh"
+            mapfile -t argv < <(gate_command check-queue-sections "$1/payload/queue-kit/checks") || exit 2
+            [[ ${#argv[@]} -gt 0 ]] || exit 2
+            exec "${argv[@]}" "$2"' _ "$PKG_ROOT" "$QUEUE_FILE" 2>&1 )"; rc=$?
+        [[ "$rc" -eq 0 ]] \
+            || { printf '%s\n' "$out" >&2; fail "$profile: the queue file init seeded does not satisfy the section contract queue-kit's own gate reads"; }
+        say "queue: $(grep -m1 '^QUEUE-SECTIONS:' <<<"$out")"
     else
         [[ ! -f "$C/$QUEUE_FILE" ]] \
             || fail "$profile: no kit in its set reads the queue file, yet init seeded one"
@@ -561,48 +585,31 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
     [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "$profile: the re-run left the worktree dirty"
     say "re-run: tree unchanged"
 
-    # spec: installer/README.md §The gate binary — the arm takes whichever of the selection outcomes the payload and host produce, and the set init must omit is derived from the consumer's own vendored tree rather than spelled here: a literal would read as green on today's tree, where nothing dispatches to a binary, and stop asserting on the first tree where something does
+    # spec: installer/README.md §The gate binary — selection keeps three outcomes and only ONE of them proceeds, so an install that reached this line placed a verified artifact by construction: the branch that recorded no artifact and declared its omissions is not narrowed here, it is unreachable, because the bootstrap refuses before any verb runs. The three outcomes are still asserted, in the artifact arm, where the two refusals are driven directly and told apart by message and remedy
     target="$(jq -r '.artifact.target // ""' "$LOCK")"
     seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.sh")"
     list="$(lock_own_file "$LOCK" "$GATES_DIR/gates.list")"
     [[ -n "$list" ]] || fail "$profile: the manifest records no gates.list"
-    omitted="$(sed -n 's/^# omitted: \([^[:space:]]*\).*$/\1/p' "$C/$list" | sort)"
-    want_omitted="$(
-        for k in "${lock_kits[@]}"; do
-            while IFS= read -r m; do
-                [[ -n "$m" ]] || continue
-                [[ -f "$C/$k/checks/$m.gate" && ! -f "$C/$k/checks/$m.sh" ]] && printf '%s\n' "$m"
-            done < <(recipe_gates "$PKG_ROOT/payload/$k" "$profile")
-        done | sort
-    )"
-    n_omitted="$(grep -c . <<<"$omitted")"
-    # spec: installer/README.md §The consumer smoke — the count is published for the binary-less leg alone, which is the one caller that may not pass on an empty roster; it is not folded into any aggregate verdict, because a disclosure count read as a coverage verdict is the conflation this arm was split to remove
-    INSTALL_OMITTED="$n_omitted"
-    if [[ -n "$target" ]]; then
-        [[ -n "$seam" && -f "$C/$seam" ]] || fail "$profile: an artifact is recorded but no gate-sdk config seam names its path"
-        bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$seam" | head -n1)"
-        [[ -n "$bin" && -x "$C/$bin" ]] || fail "$profile: no executable gate binary at '${bin:-<unset>}'"
-        [[ "$(sha256sum "$C/$bin" | cut -d' ' -f1)" == "$(jq -r '.artifact.digest' "$LOCK")" ]] \
-            || fail "$profile: the installed gate binary does not match the digest the manifest recorded"
-        # spec: installer/README.md §The manifest — the binary and the seam are files init wrote, so both are on the roster it records: a path init created and did not record reads as "never installed" next run, which is the reading that lets the following install write straight through it
-        for path in "$bin" "$seam"; do
-            [[ "$(jq -r --arg f "$path" '.files | has($f)' "$LOCK")" == "true" ]] \
-                || fail "$profile: init wrote $path on the placement path but the manifest roster does not record it"
-        done
-        [[ "$n_omitted" -eq 0 ]] \
-            || fail "$profile: the artifact was placed, so nothing is omitted, yet the registry declares $n_omitted: $omitted"
-        say "artifact: $target verified in place at $bin, recorded with the seam, nothing omitted"
-    else
-        [[ -z "$seam" ]] || ! grep -q '^GATE_SDK_NATIVE_BIN=' "$C/$seam" \
-            || fail "$profile: no artifact was installed, yet the config seam points at a gate binary"
-        [[ "$omitted" == "$want_omitted" ]] \
-            || fail "$profile: the registry omits [${omitted//$'\n'/ }] where this payload dispatches [${want_omitted//$'\n'/ }] to the binary"
-        while IFS= read -r line; do
-            [[ -z "$line" || "$line" =~ ^#\ omitted:\ [^[:space:]]+\ [^[:space:]]+$ ]] \
-                || fail "$profile: malformed omission record '$line' — the record carries a member and the reason token naming its remedy"
-        done < <(grep '^# omitted:' "$C/$list")
-        say "artifact: none packed — $n_omitted member(s) omitted and declared, exactly the ones this payload dispatches to a binary"
-    fi
+    # spec: installer/README.md §Profiles — the registry this install wrote, kept for the monotonicity assertion the profile-invariant arm deferred: comment and blank lines dropped, so what is compared is the live membership an adopter of this profile actually receives
+    REGISTRY["$profile"]="$(grep -Ev '^[[:space:]]*(#|$)' "$C/$list" | LC_ALL=C sort -u)"
+    [[ -n "${REGISTRY[$profile]}" ]] \
+        || fail "$profile: the registry init wrote declares no member at all — every gate this profile's kits register went missing rather than being installed"
+    n_omitted="$(grep -c '^# omitted:' "$C/$list")"
+    [[ "$n_omitted" -eq 0 ]] \
+        || fail "$profile: the registry declares $n_omitted omitted member(s) on an install that placed a verified artifact — the installer writes no omission record at all now, so this is a producer that outlived the outcome it recorded"
+    [[ -n "$target" ]] \
+        || fail "$profile: the manifest records no artifact, yet the bootstrap ran a verb — the only outcome that proceeds is a verified artifact, so an install with none is a refusal that did not refuse"
+    [[ -n "$seam" && -f "$C/$seam" ]] || fail "$profile: an artifact is recorded but no gate-sdk config seam names its path"
+    bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$seam" | head -n1)"
+    [[ -n "$bin" && -x "$C/$bin" ]] || fail "$profile: no executable gate binary at '${bin:-<unset>}'"
+    [[ "$(digest_of "$C/$bin")" == "$(jq -r '.artifact.digest' "$LOCK")" ]] \
+        || fail "$profile: the installed gate binary does not match the digest the manifest recorded"
+    # spec: installer/README.md §The manifest — the binary and the seam are files init wrote, so both are on the roster it records: a path init created and did not record reads as "never installed" next run, which is the reading that lets the following install write straight through it
+    for path in "$bin" "$seam"; do
+        [[ "$(jq -r --arg f "$path" '.files | has($f)' "$LOCK")" == "true" ]] \
+            || fail "$profile: init wrote $path on the placement path but the manifest roster does not record it"
+    done
+    say "artifact: $target verified in place at $bin, recorded with the seam, $(grep -c . <<<"${REGISTRY[$profile]}") live member(s) and nothing omitted"
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
     [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "$profile: doctor exited $rc inside the installed consumer"; }
@@ -680,7 +687,7 @@ for profile in "${PROFILES[@]}"; do
     printf '%s\n' "$profile"
     C="$(consumer "$profile")" || fail "could not build a scratch consumer for $profile"
     SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
-    assert_install "$profile" "$C" green
+    assert_install "$profile" "$C"
     assert_value "$profile" "$C"
     [[ "$VALUE_VERDICT" == red ]] && VALUE_RED+=("$profile")
     assert_reversal "$profile" "$C" "$SEED"
@@ -695,41 +702,61 @@ for p in "${VALUE_RED[@]}"; do [[ "$p" != "$PROFILE_DERIVED" ]] && value_below_m
     || fail "only $PROFILE_DERIVED caught the planted prose defect — no profile short of everything delivers value on prose"
 say "value: caught by ${VALUE_RED[*]}, at least one of them below $PROFILE_DERIVED"
 
-# spec: installer/README.md §The consumer smoke — the binary-less leg, which is a named install rather than the shape the loop above used to fall into by accident. The loop packs a real artifact, so nothing there speaks for an adopter whose host the payload carries none for. This leg installs one profile from an artifact-free payload and asserts **disclosure**: every member the install loses is recorded in the consumer's own registry, and the count is non-zero, so the completeness assertion cannot hold vacuously on a payload that dispatches nothing — which is exactly how a cohort passed a per-member reading while emptying a class. Since every registered member now dispatches to the binary, that disclosure is total rather than partial, which is why the leg's battery expectation is `unavailable` and not a green run: an install with no live member left has no battery to be green. It deliberately does not assert that the planted defect goes uncaught: pinning a missing capability as expected behavior would make the hole permanent the moment it closes. Naming a profile here is a scoping choice about which install to run — not the derivation of which profiles catch what that the value claim above refuses to spell
+# spec: installer/README.md §Profiles — assertion 4, deferred out of the profile-invariant arm and made here over the registries the installs above actually wrote. The gate set is the installer's own derivation, so this reads its OUTPUT rather than unioning the per-kit recipes a second time, and the claim strengthens with the move: monotonicity now holds over what an adopter of each profile receives rather than over what a recipe said they would
+for pair in "${ORDER[@]}"; do
+    IFS=$'\t' read -r a b <<<"$pair"
+    [[ -n "${REGISTRY[$a]:-}" && -n "${REGISTRY[$b]:-}" ]] \
+        || fail "gate-roster monotonicity, $a ⊆ $b: the loop above recorded no installed registry for one of them, so the containment would hold by vacuity"
+    contains "${REGISTRY[$b]}" "gate-roster monotonicity, $a ⊆ $b" "${REGISTRY[$a]}"
+done
+say "gate rosters are monotone across every comparable pair of installed registries"
+
+# spec: installer/README.md §The consumer smoke — the artifact-less refusal leg, which was a named INSTALL until selection was given one success path. It drives the packer's own artifact-free output, and that is what no other leg reaches: the artifact arm's two refusals are driven against a payload this smoke mutated by hand, so without this leg nothing asserts that a payload the publishing path actually produces without artifacts refuses rather than proceeding. It asserts a refusal that wrote NOTHING — the shape the artifact arm's tampered leg already uses — and it asserts it on the FIRST verb an adopter would reach for, because the refusal is the bootstrap's and precedes every verb rather than belonging to one. Naming a profile here is a scoping choice about which invocation to make, and the refusal is reached before the profile is ever read, which is itself part of what the leg says
 resolves_profile() { local p; for p in "${PROFILES[@]}"; do [[ "$p" == "$1" ]] && return 0; done; return 1; }
 BARE_PROFILE=prose
 resolves_profile "$BARE_PROFILE" \
-    || fail "the binary-less leg is scoped to '$BARE_PROFILE' and the payload declares [${PROFILES[*]}] — re-scope it on the profile whose roster criterion the binary-gated class empties, never drop the leg"
-printf 'binary-less leg (%s, payload packed with no artifact)\n' "$BARE_PROFILE"
+    || fail "the artifact-less leg is scoped to '$BARE_PROFILE' and the payload declares [${PROFILES[*]}] — re-scope it on a declared profile, never drop the leg"
+printf 'artifact-less refusal leg (%s, payload packed with no artifact)\n' "$BARE_PROFILE"
 BARE="$SCRATCH/bare"
 mkdir -p "$BARE"
 PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$VERSION" --out "$BARE" 2>&1)" \
-    || { printf '%s\n' "$PACK_OUT" >&2; blocked "the binary-less pack step failed."; }
+    || { printf '%s\n' "$PACK_OUT" >&2; blocked "the artifact-less pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
 bare_tarballs=("$BARE"/*.tgz)
 shopt -u nullglob
-[[ ${#bare_tarballs[@]} -eq 1 ]] || fail "expected exactly one binary-less tarball, found ${#bare_tarballs[@]}"
-( cd "$BARE" && tar -xzf "${bare_tarballs[0]##*/}" ) || fail "tar could not extract the binary-less tarball"
-# spec: installer/README.md §The consumer smoke — the leg proves its own premise, because a payload that quietly gained an artifact would take the placement branch and the disclosure assertions would never run
+[[ ${#bare_tarballs[@]} -eq 1 ]] || fail "expected exactly one artifact-less tarball, found ${#bare_tarballs[@]}"
+( cd "$BARE" && tar -xzf "${bare_tarballs[0]##*/}" ) || fail "tar could not extract the artifact-less tarball"
+# spec: installer/README.md §The consumer smoke — the leg proves its own premise, because a payload that quietly gained an artifact would be selected and verified and the refusal assertions would never run
 [[ ! -e "$BARE/package/payload/artifact" ]] \
-    || fail "the binary-less payload carries an artifact directory — the leg would assert disclosure against an install with nothing to disclose"
+    || fail "the artifact-less payload carries an artifact directory — the leg would assert a refusal against a payload with something to run"
 
-ENTRY=(bash "$BARE/package/bin/checkwright.sh")
-RUN_PATH="$PATH"
-C="$(consumer binary-less)" || fail "could not build a scratch consumer for the binary-less leg"
-assert_install "$BARE_PROFILE" "$C" unavailable
-BARE_OMITTED="$INSTALL_OMITTED"
-[[ "$BARE_OMITTED" -gt 0 ]] \
-    || fail "the binary-less $BARE_PROFILE install omitted nothing, so the completeness assertion held vacuously — this payload dispatches no member to a binary and the leg proves no disclosure at all"
-say "disclosure: $BARE_OMITTED member(s) lost with the binary, each recorded in the consumer's own registry"
+C="$(consumer artifact-less)" || fail "could not build a scratch consumer for the artifact-less refusal leg"
+BARE_SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
+out="$( cd "$C" && bash "$BARE/package/bin/checkwright.sh" init --profile "$BARE_PROFILE" 2>&1 )"; rc=$?
+[[ "$rc" -ne 0 ]] \
+    || { printf '%s\n' "$out" >&2; fail "a payload the packer produced with no artifact directory installed anyway — selection has one success path, and this is not it"; }
+# spec: installer/README.md §The gate binary — the outcome is asserted by its MESSAGE and its remedy rather than by the exit status alone, which is delta 1's own bound: an unrostered host and a broken payload are different answers to an adopter and the status is not what tells them apart
+grep -q 'maps to no target this payload declares' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "the artifact-less payload refused without naming the platform as the thing it carries nothing for"; }
+grep -q 'no adopter action to take' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "the artifact-less refusal carries no remedy line, so an adopter cannot tell a platform they can do nothing about from a payload they should re-download"; }
+# spec: installer/README.md §The consumer smoke — the refusal is asserted on the CONSUMER and not only on the exit code: a refusal that wrote first and refused after would exit non-zero too, and only an untouched tree tells the two apart
+[[ "$(git -C "$C" rev-parse 'HEAD^{tree}')" == "$BARE_SEED" && -z "$(git -C "$C" status --porcelain)" && ! -f "$C/checkwright.lock" ]] \
+    || fail "the artifact-less refusal left the consumer changed — it refused after writing something, not before"
+say "artifact-less payload: refused naming the platform, with a remedy, and nothing written"
 
-# spec: installer/README.md §doctor — the consequence the omission counts do not carry: an adopter whose registry retains no live member reads the same per-reason lines as one who lost two, so doctor says the battery cannot run here at all. Asserted on this leg because it is the only install in the suite that produces the condition
-out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
-[[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "doctor exited $rc on the binary-less install"; }
-grep -q 'no gate survives here, so the battery cannot run at all on this platform' <<<"$out" \
-    || { printf '%s\n' "$out" >&2; fail "doctor reported omission counts on an install with no live member and never said the battery cannot run"; }
-say "doctor: names the all-omitted consequence and its remedy"
+# spec: installer/README.md §The install boundary — the refusal precedes the invoke, so it cannot be a property of one verb: the same package is driven with a second verb and with a bare invocation, and all three answer alike. A leg asserting only init would pass on a bootstrap that had grown a per-verb branch, which is exactly what the branchless argv rule forbids
+bare_probe() {   # $@ = the argv to hand the artifact-less package's bootstrap
+    local out rc
+    out="$( cd "$C" && bash "$BARE/package/bin/checkwright.sh" "$@" 2>&1 )"; rc=$?
+    [[ "$rc" -ne 0 ]] && grep -q 'maps to no target this payload declares' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "'checkwright $*' on the artifact-less payload answered differently from init — the refusal is the bootstrap's and precedes every verb"; }
+}
+bare_probe doctor
+bare_probe diff
+bare_probe
+say "the same refusal answers doctor, diff and a bare invocation — it is the bootstrap's, not a verb's"
 
 # spec: installer/README.md §The consumer smoke — the download transport, asserted rather than documented: verify the digest, extract with tar rather than npm, and drive the same post-conditions with node/npm masked, so a latent Node dependency reds here instead of passing on a host that happens to carry Node
 printf 'download arm (%s, node/npm masked)\n' "$PROFILE_DERIVED"
@@ -764,7 +791,7 @@ done
 say "mask: node, npm and npx resolve to failing shims"
 C="$(consumer "download")" || fail "could not build a scratch consumer for the download arm"
 SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
-assert_install "$PROFILE_DERIVED" "$C" green
+assert_install "$PROFILE_DERIVED" "$C"
 assert_reversal "$PROFILE_DERIVED" "$C" "$SEED"
 
 # spec: installer/README.md §The consumer smoke — the toolchain-free arm, and the reason it uses the mask the Node-free arm already proved rather than a knob: the preflight requires cargo and rustc off the artifact hand-off path, because there the smoke builds the binary the payload carries, so every arm above drives doctor and init on a machine that has them and none could observe an install path demanding them. INSTALLER_SMOKE_ARTIFACTS_DIR does relax that preflight, and it is still not this arm's instrument: it relaxes the whole run's build, where this arm needs a toolchain-free host underneath a payload the run built for itself. The payload it installs carries that prebuilt artifact, so this arm asserts the pre-compiled path end to end on a host that could not have compiled it. A masked PATH is what a machine with no Rust toolchain actually is, where a knob suppressing a roster member would be a second, test-only audience axis no adopter ever exercises
@@ -798,9 +825,9 @@ if grep -qE '^  (cargo|rustc) ' <<<"$out"; then
     fail "doctor rendered a contributor-audience member to an adopter — such a member is omitted from the consumer verdict, not reported as informational"
 fi
 say "doctor: clean with no Rust toolchain on PATH, and silent about the members that need one"
-assert_install "$PROFILE_DERIVED" "$C" green
+assert_install "$PROFILE_DERIVED" "$C"
 
-# spec: installer/README.md §The consumer smoke — the jq-less arm, and the gap it closes is total: this script's own preflight requires jq, so every arm above runs with it present and nothing in this tree has ever exercised a jq-less install. Masking is per-arm, and per-arm is load-bearing here for a reason the other two masks do not have — this harness reads every manifest assertion with jq itself, so a mask on the harness's own PATH would disarm the assertions rather than the installer. The mask rides the verb's PATH alone. The assertion is the **message**: the exit status was already 2 before the preflight existed, so an arm checking the status alone would have passed against the very defect being fixed
+# spec: installer/README.md §The consumer smoke — the jq-less arm, and what it asserts INVERTED when the verbs moved behind the invoke: nothing there reads JSON with jq any more, because the crate reads it with serde_json, so the claim is no longer that the verbs refuse naming jq but that they no longer need it at all. That is the stronger reading of the same arm and it is why the arm survives the relocation rather than retiring with the preflight it was built around. Masking is still per-arm, and per-arm is still load-bearing for a reason the other two masks do not have — this harness reads every manifest assertion with jq itself, so a mask on the harness's own PATH would disarm the assertions rather than the installer. The mask rides the verb's PATH alone
 # spec: installer/README.md §The consumer smoke — the mask is by ABSENCE, not by the failing shim the node and cargo arms use, and the difference is the question each arm asks rather than a style choice. Those arms ask whether the payload ever *reaches* a program, so a shim that fails loudly is exactly right. This arm asks what a machine *without* jq is told, and a shim is a jq that is present: `command -v jq` — the preflight's own predicate — resolves it and the preflight never fires, so a shim-masked arm would drive the verbs straight into the misdiagnosis it exists to catch. The farm is derived from the live PATH rather than from a maintained list of the programs the verbs use, so it cannot drift out of date the way such a list would
 printf 'jq-less arm (%s, jq absent from the verbs'\'' PATH)\n' "$PROFILE_MIN"
 JQFARM="$SCRATCH/jqfarm"
@@ -824,33 +851,49 @@ JQ_PATH="$JQFARM"
     || fail "the jq-less farm resolves no git — it did not populate, so every verb below would refuse for a reason that is not jq"
 say "mask: jq resolves to nothing, and the farm still resolves git"
 
-assert_jq_refusal() {   # $1 = a label for the message, $2 = consumer dir, $3.. = the verb and its argv
+# spec: installer/README.md §The consumer smoke — the JSON-reading verbs are asserted to SUCCEED here, which is the whole inversion: a verb that still shelled out to jq would fail on this PATH, and one that reads the manifest in-process cannot tell the difference. The label is carried so a red names which verb reached for a program that is not there
+assert_jq_free() {   # $1 = a label for the message, $2 = consumer dir, $3.. = the verb and its argv
     local label="$1" dir="$2"; shift 2
     local out rc
     out="$( cd "$dir" && PATH="$JQ_PATH" "${ENTRY[@]}" "$@" 2>&1 )"; rc=$?
-    [[ "$rc" -eq 2 ]] \
-        || { printf '%s\n' "$out" >&2; fail "$label exited $rc on a jq-less machine, not the 2 that means the question could not be answered"; }
+    [[ "$rc" -eq 0 ]] \
+        || { printf '%s\n' "$out" >&2; fail "$label exited $rc on a jq-less machine — nothing behind the invoke reads JSON with jq, so a verb that needs it is reaching for a program the relocation removed the dependency on"; }
     grep -q 'jq' <<<"$out" \
-        || { printf '%s\n' "$out" >&2; fail "$label refused on a jq-less machine without naming jq — it is blaming the package or the manifest for a program that is not installed"; }
-    grep -q '^  help: ' <<<"$out" \
-        || { printf '%s\n' "$out" >&2; fail "$label named jq but carries no help: line, so the remedy is still nowhere the adopter can read it"; }
-    say "$label: refuses naming jq, with a remedy, exit 2"
+        && { printf '%s\n' "$out" >&2; fail "$label ran on a jq-less machine but mentioned jq — the verb still has an opinion about a program it no longer uses"; }
+    say "$label: runs clean with no jq on PATH, exit 0"
 }
 
 ENTRY=("$CW")
 C="$(consumer jq-less)" || fail "could not build a scratch consumer for the jq-less arm"
-# spec: installer/README.md §init — on a tree with no manifest, init's first JSON read is the package's own version stamp, so this is the case that used to surface as "this package carries no version stamp"
-assert_jq_refusal "init (no manifest yet)" "$C" init --profile "$PROFILE_MIN"
+# spec: installer/README.md §init — init is the one verb here that DOES refuse, and not for a reason of its own: jq is a consumer-audience member of the toolchain floor, so a jq-less machine is below contract and init's last precondition is doctor's verdict. The refusal an adopter meets on this machine is therefore the floor's, delivered before anything is written, rather than a JSON reader's
+assert_jq_blocked() {   # $1 = a label for the message, $2 = consumer dir, $3.. = the verb and its argv
+    local label="$1" dir="$2"; shift 2
+    local out rc
+    out="$( cd "$dir" && PATH="$JQ_PATH" "${ENTRY[@]}" "$@" 2>&1 )"; rc=$?
+    [[ "$rc" -eq 1 ]] \
+        || { printf '%s\n' "$out" >&2; fail "$label exited $rc on a jq-less machine, not the 1 doctor's below-contract verdict carries into it"; }
+    grep -q 'the toolchain is below contract — refusing to install' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "$label refused on a jq-less machine without naming the toolchain floor as the reason — it found some other objection ahead of the precondition an adopter must actually fix"; }
+    grep -qE '^  jq +NOT FOUND' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "$label refused on the floor without rendering the report that names jq as the missing member, so an adopter is told to fix a floor and not which part of it"; }
+    [[ ! -f "$dir/checkwright.lock" ]] \
+        || fail "$label refused on the toolchain floor and left a manifest behind — the verdict is a precondition, so nothing is written"
+    say "$label: blocked by doctor's floor verdict naming jq, nothing written, exit 1"
+}
+
+# spec: installer/README.md §init — on a tree with no manifest there is nothing yet to read, so this is the case that isolates the floor refusal from every manifest question
+assert_jq_blocked "init (no manifest yet)" "$C" init --profile "$PROFILE_MIN"
 
 # spec: installer/README.md §The consumer smoke — this arm sets no RUN_PATH: its masked calls carry JQ_PATH explicitly and this one ordinary install runs under the ambient PATH, so nothing here reads RUN_PATH and the arms below reach their own assignments untouched. Left as a note rather than a defensive assignment because a dead assignment that looks load-bearing is what the next arm inserted here would copy
 out="$( cd "$C" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the jq-less arm could not make an ordinary install to run its manifest-reading verbs against"; }
-# spec: installer/README.md §init — with a manifest present, the read that comes first is the schema check every one of these verbs shares, so these are the cases that used to surface as "carries a schema this build does not know"
-assert_jq_refusal "init (manifest present)" "$C" init --profile "$PROFILE_MIN"
-assert_jq_refusal "diff" "$C" diff
-assert_jq_refusal "uninstall" "$C" uninstall --dry-run
+# spec: installer/README.md §init — with a manifest present the floor is still what init meets first, so the refusal is the same one and is asserted a second time against a tree that HAS a manifest: a verb that had grown a jq-shaped manifest read would answer differently here than it did above
+assert_jq_blocked "init (manifest present)" "$C" init --profile "$PROFILE_MIN"
+# spec: installer/README.md §The verbs — diff and uninstall run no doctor precondition, so on this machine they are the two verbs that both read the manifest and reach their answer: they are the arm's positive evidence that the JSON read itself no longer needs jq
+assert_jq_free "diff" "$C" diff
+assert_jq_free "uninstall --dry-run" "$C" uninstall --dry-run
 
-# spec: installer/README.md §doctor — doctor is the boundary this unit does not cross, and the boundary is *reaching the diagnosis*, never the exit code. jq is a consumer-audience member of the toolchain floor, so a machine without it is genuinely below contract and doctor saying so is correct rather than a defect. What separates doctor from the verbs above is that it renders its whole report first: the other verbs must refuse before their first read, where doctor keeps its own inline probe and gets as far as naming jq in the toolchain block *and* saying it is why the manifest could not be read. Asserting exit 0 here would have been asserting the opposite of the contract
+# spec: installer/README.md §doctor — doctor is asserted DIRECTLY as well as through init, and the difference is what each shows: init's refusal proves the floor is a precondition, and this proves doctor reaches its whole report rather than refusing somewhere ahead of it. jq is a consumer-audience member of the floor, so a machine without it is genuinely below contract and doctor saying so is correct rather than a defect; asserting exit 0 here would have been asserting the opposite of the contract
 out="$( cd "$C" && PATH="$JQ_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
 [[ "$rc" -eq 1 ]] \
     || { printf '%s\n' "$out" >&2; fail "doctor exited $rc with jq absent, not the 1 that means below contract — jq is a floor member the vendored battery needs, so a jq-less machine is below contract and doctor is the verb that says so"; }
@@ -858,9 +901,7 @@ grep -q '^DOCTOR: below contract' <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "doctor exited 1 on a jq-less machine without rendering its below-contract verdict — it refused somewhere ahead of the report instead of reaching it"; }
 grep -qE '^  jq +NOT FOUND' <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "doctor's toolchain block does not name jq as missing — the report an adopter reads to find out what to install is silent about the program that stopped every other verb"; }
-grep -q 'jq is absent, so it cannot be read' <<<"$out" \
-    || { printf '%s\n' "$out" >&2; fail "doctor reached its manifest branch without saying jq is why the manifest could not be read — that line is the idiom this whole unit generalized"; }
-say "doctor: reaches its full diagnosis, names jq missing and unreadable-manifest, verdict below contract"
+say "doctor: reaches its full diagnosis, names jq missing, verdict below contract"
 
 # spec: installer/README.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
 printf 'upgrade arm (two cross-version hops, %s profile — the lattice minimum, so the arm is the smallest install that carries the manifest behavior it asserts)\n' "$PROFILE_MIN"
@@ -873,7 +914,8 @@ upgrade_direction "$VERSION" "$UP_VERSION" \
     || fail "the arm derived $UP_VERSION from $VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
 UP="$SCRATCH/upgrade"
 mkdir -p "$UP"
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$UP_VERSION" --out "$UP" 2>&1)" \
+# spec: installer/README.md §The gate binary — every cross-version pack carries the artifact directory the main pack used, because selection has one success path: a payload packed without one refuses at the bootstrap, and these hops assert manifest behavior that only a completed install reaches. The bytes are the same ones the build leg staged, so the hops differ in version and in the relinquish this arm performs, and in nothing else
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$UP_VERSION" --out "$UP" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the upgrade pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
@@ -924,12 +966,12 @@ out="$( cd "$C" && bash "$UP/package/bin/checkwright.sh" init 2>&1 )" \
     || fail "the upgrade overwrote $EDITED, which the adopter had changed since init wrote it"
 grep -qF "$EDITED" <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "the upgrade left $EDITED alone but did not report it as changed"; }
-# spec: installer/README.md §The consumer smoke — the clean-worktree assertion below is only evidence over a hop that rewrote something, and this hop's payload is artifact-free over the lattice minimum: for years that kit set dispatched no member to a binary, so init seeded no omission, the hop rewrote nothing beyond the manifest and the assertion passed for a reason unrelated to correctness. Counting the omissions the consumer's own registry declares is what makes it non-vacuous, and the count is read off the registry rather than the run's output because the registry is what a later run and a reviewer both read. Its scope is this hop; the second hop below carries no tripwire, and widening it is a separate judgment
-UP_OMITTED=0
-[[ ! -f "$C/$GATES_DIR/gates.list" ]] || UP_OMITTED="$(grep -c '^# omitted:' "$C/$GATES_DIR/gates.list")"
-[[ "$UP_OMITTED" -gt 0 ]] \
-    || fail "the upgrade hop's $PROFILE_MIN registry declares no omitted member, so the clean-worktree assertion below holds over a hop that rewrote nothing — re-scope this arm onto a profile whose kit set ships a member init seeds and dispatches to the binary, never drop the assertion"
-say "tripwire: $UP_OMITTED member(s) omitted on this hop, so the clean-worktree assertion has something to be about"
+# spec: installer/README.md §The consumer smoke — the clean-worktree assertion below is only evidence over a hop that rewrote something, so the tripwire that keeps it non-vacuous is asserted first. Its SUBJECT moved with the relocation and the assertion did not: it used to count the omissions this hop's artifact-free payload declared, and every payload now carries a verified artifact, so what it counts is the live membership the hop installed and the artifact it placed. That is the same claim over the class delta 1 left standing rather than the one it emptied — and it is a stronger reading, because the members are the ones that ran rather than the ones that could not. Its scope is this hop; the second hop below carries no tripwire, and widening it is a separate judgment
+UP_LIVE=0
+[[ ! -f "$C/$GATES_DIR/gates.list" ]] || UP_LIVE="$(grep -Evc '^[[:space:]]*(#|$)' "$C/$GATES_DIR/gates.list")"
+[[ "$UP_LIVE" -gt 0 && "$(jq -r '.artifact.target // ""' "$LOCK")" != "" ]] \
+    || fail "the upgrade hop's $PROFILE_MIN install left $UP_LIVE live registry member(s) and $(jq -r 'if has("artifact") then "an" else "no" end' "$LOCK") artifact, so the clean-worktree assertion below holds over a hop that rewrote nothing — repair the hop, never drop the assertion"
+say "tripwire: $UP_LIVE live member(s) and a placed artifact on this hop, so the clean-worktree assertion has something to be about"
 [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "the upgrade left the worktree dirty"
 # spec: installer/README.md §The manifest — the roster is what carries the protection to the next hop, so it is asserted directly and not only through its effect: a dropped entry reads as "never installed" next run, and an entry recorded at the adopter's own hash reads as unchanged — both let the following init claim the path, so both are named apart
 [[ "$(jq -r --arg f "$EDITED" '.files | has($f)' "$LOCK")" == "true" ]] \
@@ -951,7 +993,7 @@ upgrade_direction "$UP_VERSION" "$UP2_VERSION" \
     || fail "the arm derived $UP2_VERSION from $UP_VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
 UP2="$SCRATCH/upgrade2"
 mkdir -p "$UP2"
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$UP2_VERSION" --out "$UP2" 2>&1)" \
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$UP2_VERSION" --out "$UP2" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the second upgrade pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
@@ -1143,7 +1185,7 @@ say "the packed payload carries $NATIVE_BIN for $HOST_TARGET with the sidecar th
 ENTRY=(bash "$ARTP/package/bin/checkwright.sh")
 RUN_PATH="$PATH"
 C="$(consumer artifact)" || fail "could not build a scratch consumer for the artifact arm"
-assert_install "$PROFILE_MIN" "$C" green
+assert_install "$PROFILE_MIN" "$C"
 LOCK="$C/checkwright.lock"
 # spec: installer/README.md §The gate binary — target resolution is asserted against what the toolchain says this host is, not against whatever init selected: the two derivations are independent (uname pair versus rustc's own triple) and only comparing them catches a mapping that resolves confidently to the wrong roster line
 [[ "$(jq -r '.artifact.target' "$LOCK")" == "$HOST_TARGET" ]] \
@@ -1151,15 +1193,21 @@ LOCK="$C/checkwright.lock"
 [[ "$(jq -r '.artifact.digest' "$LOCK")" == "$(awk 'NR==1{print $1}' "$ART/$NATIVE_BIN.sha256")" ]] \
     || fail "the manifest records a digest other than the one this arm's build leg emitted"
 
-# spec: installer/README.md §The gate binary — the third selection outcome, and the one the other two are told apart from: a host the payload never committed to omits and declares, so it must exit clean and write a registry rather than refuse the way a declared-but-absent target does
+# spec: installer/README.md §The gate binary — the first selection outcome, INVERTED: a host the payload never committed to used to omit and declare and proceed, and it is now refused, because once every step of an install sits behind the invoke that branch has nothing to run into and its outcome would be a silent non-install rather than a smaller battery. What it must NOT collapse into is the declared-but-absent refusal below — the two are different answers to an adopter and the assertion pair is what holds them apart
 printf '%s\n' "other-${HOST_TARGET#*-}" > "$PAY_ART/targets.list" \
     || fail "could not narrow the payload roster off this host"
 NC="$(consumer artifact-undeclared)" || fail "could not build a scratch consumer for the undeclared-host leg"
-out="$( cd "$NC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
-    || { printf '%s\n' "$out" >&2; fail "init refused a payload that simply does not commit to this platform — 'never declared' omits and declares, it does not fail the install"; }
-[[ "$(jq -r 'has("artifact")' "$NC/checkwright.lock")" == "false" ]] \
-    || fail "the payload declares no artifact for this host, yet the manifest records one"
-say "host off the payload roster: omitted and declared, install clean"
+NC_SEED="$(git -C "$NC" rev-parse 'HEAD^{tree}')"
+undeclared_out="$( cd "$NC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )"; rc=$?
+[[ "$rc" -ne 0 ]] \
+    || { printf '%s\n' "$undeclared_out" >&2; fail "init installed on a host the payload never committed to — omit-and-declare retired with the relocation, so this platform is refused rather than served an install whose battery cannot run"; }
+grep -q 'maps to no target this payload declares' <<<"$undeclared_out" \
+    || { printf '%s\n' "$undeclared_out" >&2; fail "the unrostered host was refused without being told that this platform is the thing the payload carries nothing for"; }
+grep -q 'no adopter action to take' <<<"$undeclared_out" \
+    || { printf '%s\n' "$undeclared_out" >&2; fail "the unrostered refusal names no remedy, so an adopter cannot tell it from the broken-payload one they are supposed to act on"; }
+[[ "$(git -C "$NC" rev-parse 'HEAD^{tree}')" == "$NC_SEED" && -z "$(git -C "$NC" status --porcelain)" && ! -f "$NC/checkwright.lock" ]] \
+    || fail "the unrostered refusal wrote into the consumer — a refusal that wrote first is a partial install, not a refusal"
+say "host off the payload roster: refused naming the platform, no adopter action, nothing written"
 cp "$ROSTER_FILE" "$PAY_ART/targets.list" || fail "could not restore the payload roster"
 
 # spec: installer/README.md §The gate binary — the verification is pre-write, so the assertion is on the consumer's tree and not only on the exit code: a warn-then-install would exit non-zero too, and only an untouched tree tells the two apart
@@ -1175,16 +1223,24 @@ say "tampered artifact: refused with nothing written"
 # spec: installer/README.md §The gate binary — a declared target whose artifact went missing is the outcome that must not collapse into the omission above: same host, same roster, and the only difference is the missing pair, so a run that omitted here would be reading a broken payload as a narrower one
 rm -f "$PAY_ART/$HOST_TARGET/$NATIVE_BIN" || fail "could not remove the declared target's binary"
 AC="$(consumer artifact-absent)" || fail "could not build a scratch consumer for the declared-but-absent leg"
-out="$( cd "$AC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )"; rc=$?
-[[ "$rc" -ne 0 ]] || { printf '%s\n' "$out" >&2; fail "the payload declares $HOST_TARGET and carries no artifact for it, and init installed anyway — a broken payload read as a narrower one"; }
+absent_out="$( cd "$AC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )"; rc=$?
+[[ "$rc" -ne 0 ]] || { printf '%s\n' "$absent_out" >&2; fail "the payload declares $HOST_TARGET and carries no artifact for it, and init installed anyway — a broken payload read as a narrower one"; }
+grep -q 'carries no complete artifact for it' <<<"$absent_out" \
+    || { printf '%s\n' "$absent_out" >&2; fail "the declared-but-absent target was refused without naming the incomplete artifact as the cause"; }
 [[ ! -f "$AC/checkwright.lock" && -z "$(git -C "$AC" status --porcelain)" ]] \
     || fail "the broken-payload refusal still wrote into the consumer"
-say "declared target with no artifact: refused, not omitted"
+say "declared target with no artifact: refused, and not with the unrostered host's answer"
+# spec: installer/README.md §The gate binary — delta 1's bound, asserted rather than assumed: the table keeps three outcomes and they stay told apart by MESSAGE AND REMEDY, never by exit status alone. Two of them now refuse, so an arm that checked only the status would read them as one answer — this compares the two refusals directly and reds if they ever converge on the same words
+[[ "$undeclared_out" != "$absent_out" ]] \
+    || { printf '%s\n' "$absent_out" >&2; fail "the unrostered host and the broken payload printed the same thing — two of the three selection outcomes refuse, and collapsing them tells an adopter with no action to take to go and act"; }
+grep -q 'no adopter action to take' <<<"$absent_out" \
+    && { printf '%s\n' "$absent_out" >&2; fail "the broken-payload refusal wears the unrostered host's remedy — it is the one refusal an adopter CAN act on, by re-downloading"; }
+say "the two refusals differ in message and remedy, which is what the exit status does not carry"
 
 # spec: installer/README.md §The consumer smoke — the hand-off arm adopts a producer's bytes and sidecar unchanged, so the marker states the binary's provenance rather than asserting this run built one
 PROVENANCE="the gate binary this run built"
 [[ -z "$PREBUILT_DIR" ]] || PROVENANCE="the gate binary adopted from the hand-off, unrebuilt"
 
 # spec: evidence-kit/SPEC.md §Layout and configuration — this line is the run's COMPLETION MARKER, derived positionally. A header printed after this line would silently become the marker and demote this one to an arm — the one hazard of that rule, and no gate catches it
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, each carrying %s, each put in front of a real prose defect (caught by %s) and each reversed back to its pre-init tree object, plus the binary-less %s leg declaring %d omitted member(s), the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting init, diff and uninstall each refuse naming jq at exit 2 while doctor still reaches its diagnosis, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the same-version seam arm and the protection branch chained onto it, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm driving the selection outcomes on a mutated copy of that payload)\n' "${#PROFILES[@]}" "$PROVENANCE" "${VALUE_RED[*]}" "$BARE_PROFILE" "$BARE_OMITTED"
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, each carrying %s, each put in front of a real prose defect (caught by %s) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less %s leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff and uninstall run clean with no jq on PATH while init is blocked by the toolchain floor verdict doctor renders, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the same-version seam arm and the protection branch chained onto it, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm driving the three selection outcomes on a mutated copy of that payload, with its two refusals asserted to differ in message and remedy)\n' "${#PROFILES[@]}" "$PROVENANCE" "${VALUE_RED[*]}" "$BARE_PROFILE"
 exit 0
