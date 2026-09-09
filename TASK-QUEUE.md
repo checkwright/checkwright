@@ -813,7 +813,14 @@
   route from git to avoid re-escalating an answered member. **The instance is now moot and the
   class is not** — the compressed entry has since left Deferred, so the dangling antecedent is
   gone with it; what the arm would have caught is unchanged.
-  recurrence: entry-compression-contract-unenforced 2026-09-07
+  **RULED IN CONSULT 2026-09-09 (`consult, own-authority`, operator-convened, lead-relayed): COSTED
+  AND FILED, NO MECHANISM OWED.** The candidate arm's shape — extent shrinks while a ruling line
+  lands — is also the shape of the relief the spec mandates (compress by answering), so it reds the
+  correct act as often as the defect: a classifier no gate can honestly run, the 2026-08-30 ground.
+  The lever is content tiering — a ruling lands on the entry as a pointer to TRAJECTORY.md or the
+  owning SPEC, never as prose — and this iteration's scope paid its rounds because four landed as
+  prose. Machinery-class by the witness discriminator, so icebox-class by default; close's exit.
+  recurrence: entry-compression-contract-unenforced 2026-09-07 2026-09-09
   **Cost while deferred:** every mandated write onto a saturated entry pays
   the same unenforced honour-system compression, and the queue's most-ruled
   entries are exactly the ones paying it.
@@ -872,8 +879,12 @@
   The blocker was `gate-binary-roster-covers-supported-platforms`, named here in prose with no slug;
   it reached Done at `23bcfed1` and is absent from this file at HEAD. `native/targets.list`'s header
   has since taken ownership of the widening away from any entry, so the precondition reads off that
-  header. What survives is a REQUIREMENT on the work, not a block before it: an uncovered platform
-  must still install against whatever the roster carries — cited as the roster, never as a count.
+  header. **THE REQUIREMENT THAT AN UNCOVERED PLATFORM STILL INSTALL IS RETIRED — ruled 2026-09-09
+  in the consult the operator convened for it (`consult, own-authority`, lead-relayed); grounds,
+  three refused alternatives and two bounds are TRAJECTORY.md's (`bootstrap-one-success-path`).**
+  `substrate-unavailable` and `digest-unverifiable` BOTH become bootstrap refusals; all FIVE verbs
+  move behind the invoke, the bootstrap branchless and the binary owning the verb roster;
+  `installer/lib/` empties; `--toolfloor-parity` retires with its second holder. Spec authors it.
   The PowerShell half widened the set to {Linux, macOS, native Windows}, known and accepted when the
   split was ruled on this same ground (`doctrine-kit/SPEC.md`:213-216).
   **TAKEN AS THIS ITERATION'S UNIT — `lead, own-authority` 2026-09-09**, on the governed surfaces
@@ -885,10 +896,8 @@
   **THE 2026-09-07 READING WAS REACHED FOR HERE, recorded so its bound is countable rather than
   re-derived.** TRAJECTORY.md keeps live the warning that the reachable column is "one more window,
   after which every iteration is an own-iteration leg or another exception paragraph", and states
-  that this bounds how often the own-iteration-leg reading may be reached for. This is one reach.
-  **`digest-unverifiable` must become a refusal in the same motion** — step 4 is irreducible and
-  a host that cannot hash cannot verify. Vacuous on Windows, so the cost lands on a POSIX host
-  carrying neither `sha256sum` nor `shasum`.
+  that this bounds how often the own-iteration-leg reading may be reached for. This is one reach,
+  and the last: the leg is the sequence's final member (consult 2026-09-09, on that paragraph).
   **Cost while deferred:** every install-path change is now authored twice by hand, which the
   parity leg turns into a red run rather than removes; and the pivot's OS-reach objective is only
   half met — the bootstrap runs on native Windows, no install completes there.
@@ -8705,10 +8714,8 @@
   five-line datum would fit. The compression was survivable — what went was narration of how the
   correction was found — but nothing distinguished that from evicting grounds, and no gate would
   have.
-  **Why the eviction is invisible where it lands.** A mid-build session reading a compressed entry
-  cannot tell that grounds it lacks were once written; the extent is the only artifact and reads
-  identical either way. `git log -p -S'<slug>' -- TASK-QUEUE.md` recovers the text, but nobody runs
-  it against an entry that looks complete.
+  **Why the eviction is invisible where it lands** is `entry-compression-contract-unenforced`'s
+  ground, stated there once.
   **ALL THREE CANDIDATE SHAPES ARE ALREADY REFUSED BY THE OWNING SPEC, AND THIS ENTRY IS DROPPED
   FROM THE UNIT SET ON THAT READING — operator-ruled 2026-08-30.** The owner is
   queue-kit/SPEC.md §check-queue-entry-budget, and it ruled every shape before this entry was even
@@ -8735,10 +8742,12 @@
   with their reasoning evicted — the failure the "why (b) was never available" text on
   `native-gate-port-remaining-corpus` exists to prevent, and that text is itself one of the lines
   that consumed the last of an entry's budget.
-  Filed 2026-08-29 to the gap inbox by the lead, raised by scope at this boundary and declined
-  there; landed in this section 2026-08-29 by close, the measurement re-run over the live pool
-  rather than carried from the bullet; dropped from the unit set 2026-08-30 by spec, which read the
-  three shapes against their owning spec and found each already refused.
+  **MOOTED — ruled in consult 2026-09-09 (`consult, own-authority`, operator-convened,
+  lead-relayed):** its three shapes are refused by the owning spec, its measurement lives on that
+  gate's headroom line, and its one residue is `entry-compression-contract-unenforced`'s — two
+  entries on one subject are two readings of one fact. Close takes the wontfix exit (the 2026-08-23
+  ruling's bare Done line).
+  Filed 2026-08-29 by the lead, landed by close; dropped from the unit set 2026-08-30 by spec.
 
 - **design-pending-boilerplate-reds-its-own-promotion** [design-pending] — the standard explanatory
   line that names the `[design-pending]` token in prose is legal in the deferred section and
@@ -9021,10 +9030,11 @@
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
   4.4, 9.1**, derived 2026-09-05 replacing accreted mid-close ceilings; NOT appended at the
   fourteenth through nineteenth, on `cost-series-limb-unreadable-inside-close`'s ground.
-  **COUNTER-EVIDENCE: NINE INSTANCES** of a claim verified at one surface read as covering a wider
-  one, eight the lead's own; a counter never NETS.
-  **THE NINETEENTH IS NINE** — five OPERATOR, four ALONE, ZERO intent oracle, against a THREE-batch
-  build; the per-question decomposition is in git history.
+  **COUNTER-EVIDENCE: NINE** one-surface claims read as wider, eight the lead's own; never NETS.
+  **THE NINETEENTH IS NINE** — 5 OPERATOR, 4 ALONE, 0 intent oracle, three batches; detail in git.
+  **CONSULT 2026-09-09 (`consult, own-authority`): nothing decides yet — 19 and 20 are two "such"
+  points, this iteration the candidate third, read at close; a third reads the limb LIVE, which
+  CONFIRMS the lead's judgment tier (the split is by session, not tier) and closes this entry.**
   **THE TWENTIETH IS EIGHT** — scope 4, spec 2, build batch 2 two; align, build batch 1 and validate
   escalated ZERO. **THREE OPERATOR** (scope's unit set, its citation-liveness relay, spec's cost
   figure), **FIVE ALONE, ZERO intent oracle** — that limb at zero a THIRD straight point. All five

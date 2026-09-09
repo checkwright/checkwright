@@ -31,11 +31,13 @@ against, never a live claim.** The same arithmetic in a governed spec is repaire
 by de-literalization; the figure here is corrected under bounded operator
 authority instead. Different kinds, different repairs — one commit may owe both.
 
-**Who may record a ruling here.** A session **records** a ruling the operator
-closed; it never **authors** one. The authority is the ruling's existence, not
-the recording session's role — so no roster of permitted writers is maintained,
-and none needs to be. A recording names the ruling's date, and where the
-mechanism has a canonical home it points there rather than restating it.
+**Who may record a ruling here.** A session **records** a ruling a ruling
+authority closed — the operator, or the lead on its own authority, the two
+CLAUDE.md §Housekeeping names — and it never **authors** one. The authority is
+the ruling's existence, not the recording session's role — so no roster of
+permitted writers is maintained, and none needs to be. A recording names the
+ruling's date, its authority and its channel, and where the mechanism has a
+canonical home it points there rather than restating it.
 
 **The session that may record may retire.** Recording and retirement are the two
 ends of one authority, and for the same reason: neither decides anything. What
@@ -376,6 +378,12 @@ to hand its prepared diff to the supervising session to apply. That was refused:
 session performing an edit its child was denied is permission laundering, and it converts the
 operator's permission boundary into a formality. A session that meets the refusal and stops has
 behaved correctly, and re-deferring the unlandable half is the outcome, not a failure.
+**One class is carved out — ruled 2026-08-29 and widened 2026-09-05 by the operator, lead-relayed,
+recorded on `native-gate-port-remaining-corpus` (2):** a grant whose target a ruled port cut deletes
+is dropped by build in the deleting commit, in-cut and unconfirmed — a pure narrowing, scoped to
+decommissioning bash and to nothing else — with nothing left to reach once the port oracle reads
+zero owed. Registered here because that entry demotes at build and retires with the port, while this ruling
+outlives both.
 
 **No gate is permanently shell, and a spawned program is a dependency, never a port
 exclusion — ruled 2026-08-23 by the operator.** The "permanently shell" class (gate-sdk/SPEC.md
@@ -626,26 +634,18 @@ iteration — ruled 2026-09-06 by the operator, in a direct in-session reply to 
 authorization ask.** Verbatim: *"when I issue `/lead undirected` I grant you the right to open one
 iteration. Not two, not three, but one."* Two limbs, separate and both load-bearing. **The
 invocation is the grant** — a lead that has been invoked holds its authorization already and asks
-for nothing further, so §Opening an iteration's *obtained explicitly and separately* is corrected
-by this: an invocation is explicit without being separate. **The grant is bounded at one open** —
-the iteration after it takes a fresh invocation, and the bound belongs to the **grant** rather than
-to the boundary that §Closing an iteration attaches it to today.
+for nothing further: an invocation is explicit without being separate. **The grant is bounded at
+one open** — the iteration after it takes a fresh invocation, and the bound belongs to the
+**grant** rather than to the closing boundary.
 
 The ground is a measured failure and not a preference: a lead opened a second iteration on one
-grant, and the instruction surface is what let it. §Opening names no channel by which authorization
-arrives and no cardinality at all, so a lead reads that its own invocation authorized nothing and
-learns the bound only an iteration later, at the far end. The operator directed the correction with
-the ruling — *"Correct your instructions if not clear"* — and it was owed rather than taken here
-because it is two edits on two tiers. **Both landed 2026-09-06 and this paragraph's mechanism has
-relocated to them, on the instruction this paragraph itself carried.** The generic half is
-`lifecycle-kit/templates/lead.md` §Opening an iteration; the consumer half is the
-**`open-authorization-channel`** binding in `.claude/commands/lead.md`, a **newly minted** slot and
-not the `ruling-config` one this sentence named while the mechanism was still owed — ruled `lead,
-own-authority` 2026-09-06 on the spec session's escalation, since `ruling-config` declares a
-different subject and policy binding the lead itself belongs to the template. **Correcting a
-mechanism sentence this paragraph had already marked transitional is the last act of the
-relocation, not a reversal of anything closed:** what is closed is the ruling's two limbs, their
-date and their channel, and those stand exactly as recorded above.
+grant, and the instruction surface is what let it — it named no channel by which authorization
+arrives and no cardinality at all. The operator directed the correction with the ruling — *"Correct
+your instructions if not clear"* — and the mechanism has relocated to its two tiers: the generic
+half at `lifecycle-kit/templates/lead.md` §Opening an iteration, the consumer half as the
+`open-authorization-channel` binding in `.claude/commands/lead.md`, a slot minted for it (ruled
+`lead, own-authority` 2026-09-06 on the spec session's escalation, `ruling-config` declaring a
+different subject). What is closed is the two limbs, their date and their channel.
 ruling: the lead-invocation open grant
 
 **Where this project's own class default and the close template's icebox trigger test appear to
@@ -708,6 +708,43 @@ it was ruled after batch A returned and batch B held the shared index.
 Discharge: none — it reads a standing carve-out rather than directing an act.
 ruling: the hotfix-minimality reach
 
+**The bootstrap has one success path: `substrate-unavailable` becomes a refusal with the
+relocation, all five verbs move behind the invoke, and omit-and-declare retires at install — ruled
+2026-09-09 in the consult session the operator convened for the question (an AskUserQuestion in a
+lead session, answered "put it to /consult", lead-relayed). The reading is the consult's own,
+`consult, own-authority` under that direction, and not an answer the operator gave; the operator
+reopens it like any ruling here.** The relocation's precondition (installer/README.md §The install
+boundary) sequenced the unconditional remainder of `init` behind the roster covering every
+**supported** platform, and at HEAD it does — the platform block declares three triples, all
+`joined`, none `held` — so the population that precondition protected, a supported platform with no
+artifact, is empty; and docs/install.md §Requirements now states that an unsupported platform is
+absent rather than held, because a held entry is a support claim. The only host omit-and-declare
+still reaches is one the project declares no support for, and refusing it an install is not refusing
+an install the project promised. **Native Windows is that host, and the ruling makes it no worse**:
+the PowerShell bootstrap already declares and stops there with nothing behind it, at exit 0 — a
+silent non-install this turns into an honest refusal — and the unit's own obligation, a
+`checkwright init` completing through PowerShell, is what the `x86_64-pc-windows-msvc` join waits
+on, since `native/targets.list`'s predicate wants a leg that reached the artifact-present completion
+and the PowerShell leg's own verdict block owes that to this relocation. The relocation is a
+precondition of serving native Windows, never its consequence. Three alternatives were refused.
+**The same cut sequenced behind publishing the Windows artifact first** is circular through the leg
+that matters and needs an operator support claim on docs/install.md before any run could count, so
+it holds the port's last member behind a decision no iteration can take, and empties this one.
+**Omit-and-declare surviving** keeps a second install implementation in bash beside the Rust one —
+the permanent dual maintenance the PRIORITY DIRECTIVE's first ground names — leaves `installer/lib/`
+owed for as long as it lives, and so makes the 2026-08-28 literal completion predicate unreachable
+by construction. **Narrowing the unit to steps already behind artifact selection** measures as
+near-empty and discharges neither the payload-coverage obligation nor the interpreter policy's. Two
+bounds on the reach. The selection table keeps three outcomes, told apart by message and remedy and
+not by exit status alone — an undeclared host and a broken payload stay different answers. And
+the vocabulary spans two mechanisms: the installer's selection outcome, which retires with both
+reason tokens, and gate-sdk's reason-agnostic `# omitted:` registry class, kit mechanism that stays;
+the amendment must not conflate them. The mechanism — the one-success-path bootstrap, the verb
+roster owned by the binary, `--toolfloor-parity` retiring with its second holder — is
+installer/README.md's to state, undated.
+discharge: bootstrap-one-success-path test ! -e installer/lib && echo relocated
+ruling: bootstrap-one-success-path substrate-unavailable-refusal
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
@@ -756,8 +793,9 @@ to ask twice — the two paths sound like a disclosure change and are not one.
 
 **The port's tail — ruled 2026-08-23.** This names the **sequence** `battery-runner-port`,
 `shell-gate-tail-port`, then the bootstrap, and nothing else: the first two landed, so the
-sequence's remainder is **one** member, `powershell-installer-surface`, which owns the Windows
-half and the relocation of every conditional install step behind the invoke. Its honest size,
+sequence's remainder is **one** member, `powershell-installer-surface`, whose Windows half
+shipped 2026-09-07 and whose remainder is the relocation of every conditional install step behind
+the invoke. Its honest size,
 measured 2026-08-24: the "resolve the platform, place the binary, invoke it" shape is roughly
 eighty lines of `installer/lib/init.sh`, and the roughly three hundred and fifty beside it —
 kit-source vendoring, manifest and lock I/O, registry and queue seeding, the commit flow — are
@@ -845,7 +883,11 @@ without the other is what makes this re-derivable: the port-critical ground abov
 as the instances — that is the text the reading stands on; and the refusal of the port-only run
 warns that its reachable column is "one more window, after which every iteration is an own-iteration
 leg or another exception paragraph", which is not repealed here and bounds how often this reading
-may be reached for. Discharge: with the port-cut-first clause above, which this reads.
+may be reached for. **That bound was reached for once, by `behind-invoke-relocation` (2026-09-09),
+and once is all it holds** — read in consult that day, `consult, own-authority`: the leg it schedules
+is the sequence's last member, so no own-iteration leg remains to reach for, and a later reach is
+the exception paragraph the warning named rather than a second use of this reading.
+Discharge: with the port-cut-first clause above, which this reads.
 
 **The 2026-09-06 no-cut ruling on `native-gate-port-remaining-corpus` reached
 the right conclusion from a ground the disjunction above does not bear —
