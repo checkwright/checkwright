@@ -193,12 +193,10 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path) -> Result<Vec<Seeded>, S
         // spec: doctrine-kit/SPEC.md §install-doctrine — the block is the kit's own installer's to
         // write, and that installer is this binary's `--install-doctrine` arm, called in-process.
         "doctrine-kit" => {
-            let agent = root.join(AGENT_FILE).to_string_lossy().into_owned();
-            let doctrine = root
-                .join("doctrine-kit/DOCTRINE.md")
-                .to_string_lossy()
-                .into_owned();
-            let report = crate::doctrine::install(&agent, &doctrine)
+            // spec: doctrine-kit/SPEC.md §install-doctrine — the consumer root goes over as the BASE
+            // and the two paths as consumer-relative spellings, because resolving them here would
+            // commit this machine's absolute path into the adopter's own agent file.
+            let report = crate::doctrine::install_in(root, AGENT_FILE, "doctrine-kit/DOCTRINE.md")
                 .map_err(|e| format!("could not seed {}: {}", AGENT_FILE, e))?;
             // spec: doctrine-kit/SPEC.md §install-doctrine — findings go to stderr, the one channel
             // the install path does not discard, so a reconciliation the consumer owes is never

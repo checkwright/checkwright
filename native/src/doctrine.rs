@@ -149,19 +149,32 @@ pub struct Report {
 }
 
 pub fn install(agent_file: &str, doctrine_file: &str) -> Result<Report, String> {
-    if !std::path::Path::new(agent_file).is_file() {
+    install_in(std::path::Path::new(""), agent_file, doctrine_file)
+}
+
+// spec: doctrine-kit/SPEC.md §install-doctrine — the two paths are the block's SPELLING as well as
+// its operands, so a caller installing into a tree it is not standing in passes the base separately
+// and the two spellings unresolved.
+pub fn install_in(
+    base: &std::path::Path,
+    agent_file: &str,
+    doctrine_file: &str,
+) -> Result<Report, String> {
+    let agent_at = base.join(agent_file).to_string_lossy().into_owned();
+    let doctrine_at = base.join(doctrine_file).to_string_lossy().into_owned();
+    if !std::path::Path::new(&agent_at).is_file() {
         return Err(format!(
             "agent file not found: {} — nothing to install into",
-            agent_file
+            agent_at
         ));
     }
-    if !std::path::Path::new(doctrine_file).is_file() {
+    if !std::path::Path::new(&doctrine_at).is_file() {
         return Err(format!(
             "doctrine file not found: {} — nothing to derive the digest from",
-            doctrine_file
+            doctrine_at
         ));
     }
-    let text = crate::fresh::read_captured(doctrine_file)?;
+    let text = crate::fresh::read_captured(&doctrine_at)?;
     let rules = walk_rules(&text).ok_or_else(|| {
         format!(
             "no '{}' section in {} — cannot derive the digest from an unreadable rule set",
@@ -187,7 +200,7 @@ pub fn install(agent_file: &str, doctrine_file: &str) -> Result<Report, String> 
     // spec: doctrine-kit/SPEC.md §install-doctrine — the round-trip's read half: the block as it
     // stands is the only record of what the consumer declared, so it is harvested before the
     // rewrite that would erase it.
-    let agent_text = crate::fresh::read_captured(agent_file)?;
+    let agent_text = crate::fresh::read_captured(&agent_at)?;
     let current = marker::read_block(&agent_text, BEGIN, END);
     let mut order: Vec<String> = Vec::new();
     let mut lines: Vec<(String, String)> = Vec::new();
@@ -236,7 +249,7 @@ pub fn install(agent_file: &str, doctrine_file: &str) -> Result<Report, String> 
         }
     }
 
-    let action = marker::install_block(agent_file, BEGIN, END, &format!("{}\n", block.join("\n")))?;
+    let action = marker::install_block(&agent_at, BEGIN, END, &format!("{}\n", block.join("\n")))?;
 
     // spec: doctrine-kit/SPEC.md §install-doctrine — findings go to stderr, the one channel the
     // install path does not discard, so a reconciliation the consumer owes is never silent.
@@ -376,6 +389,21 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
         std::fs::create_dir_all(&dir).expect("cannot make the scratch tree");
         dir
+    }
+
+    // spec: doctrine-kit/SPEC.md §install-doctrine — installing under a base renders the consumer's
+    // own relative link and never the installing machine's absolute path.
+    #[test]
+    fn installing_under_a_base_renders_the_relative_link_and_not_the_base() {
+        let dir = scratch("base");
+        std::fs::create_dir_all(dir.join("doctrine-kit")).expect("cannot make the kit dir");
+        std::fs::write(dir.join("doctrine-kit/DOCTRINE.md"), DOCTRINE).expect("cannot seed doctrine");
+        std::fs::write(dir.join("CLAUDE.md"), "# CLAUDE.md\n\nx\n").expect("cannot seed the agent file");
+        install_in(&dir, "CLAUDE.md", "doctrine-kit/DOCTRINE.md").expect("the install refused");
+        let got = std::fs::read_to_string(dir.join("CLAUDE.md")).expect("cannot read the agent file");
+        assert!(got.contains("[doctrine-kit/DOCTRINE.md](doctrine-kit/DOCTRINE.md)"));
+        assert!(!got.contains(&dir.to_string_lossy().into_owned()));
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     // spec: doctrine-kit/SPEC.md §install-doctrine — the walk reads a rule's name as assertion C

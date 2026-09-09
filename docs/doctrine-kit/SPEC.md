@@ -80,6 +80,18 @@ keep resident stays legal, but rides a declared-trim marker rather than a silent
 deletion: the gate asserts name-lockstep modulo declared trims (§check-doctrine-registration
 assertion B).
 
+**The two paths are the block's spelling as well as its operands.** The link the
+digest renders is the doctrine path *exactly as the caller handed it over*, and
+§check-doctrine-registration reads that link against a consumer-relative default.
+So a caller installing into a tree it is not standing in — `init`, vendoring into
+a consumer — hands over the consumer root as a separate **base** and the two paths
+as consumer-relative spellings, rather than resolving them first. Resolving them
+is the failure this rule exists to name: it writes an absolute path off the
+installing machine into the adopter's always-loaded agent file, where it fails the
+registration gate and outlives the machine that produced it. A caller standing in
+the tree passes no base and is unaffected, which is what the `--install-doctrine`
+arm's own adopter-facing argv does.
+
 **The digest is derived from the doctrine, one bullet per rule.** Each
 methodology rule carries a `*Digest:* <one-line summary>` trailer, and the
 installer emits that rule's bullet as `- **<name>** — <summary>`: the name read
