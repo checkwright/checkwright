@@ -62,10 +62,12 @@ per kit, so the adoption decision weighs a number rather than a guess.
 
 Checkwright is **Unix-first**, and specifically **GNU-first**: the engine is
 portable to any Unix that presents a GNU userland on `PATH`, which Linux
-distributions do out of the box. Windows runs it through WSL (Windows Subsystem
-for Linux) today. Native Windows is a declared platform, held below until a run
-publishes and exercises its artifact. The PowerShell bootstrap resolves it and the
-gate binary compiles for it; that run is what it still lacks.
+distributions do out of the box. Native Windows is a declared platform, held
+below until a run publishes and exercises its artifact: the PowerShell bootstrap
+resolves it and the gate binary compiles for it, so that run is the whole of what
+it still lacks. Windows through WSL (Windows Subsystem for Linux) is a route you
+may choose instead. The Linux line below serves it today and keeps serving it
+after native Windows joins.
 
 macOS runs it too, but as an adopter action rather than something the stock
 system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort`,
@@ -92,9 +94,9 @@ own header.
 
 <!-- platforms:begin -->
 
-- `x86_64-unknown-linux-gnu` (joined) — Linux on x86-64. A Windows-through-WSL
-  install resolves to this triple too, so WSL is served by the line above rather
-  than by one of its own.
+- `x86_64-unknown-linux-gnu` (joined) — Linux on x86-64. A Windows adopter who
+  chooses WSL resolves to this triple too, so that route is served by this line
+  rather than by one of its own.
 - `aarch64-apple-darwin` (joined) — Apple silicon Macs. The gates workflow builds
   this target on every run, and a macOS install-smoke leg installs that build —
   the producer's own upload, nothing rebuilt on the smoke's host — and reaches
@@ -109,7 +111,7 @@ own header.
   — Windows on x86-64, natively. The PowerShell bootstrap resolves this triple
   and the crate compiles for it; the Windows install-smoke leg runs and is red,
   so no run has yet produced and exercised an artifact here. A native Windows
-  host is refused until one does. WSL is the working route meanwhile.
+  host is refused until one does; WSL is the route you can choose meanwhile.
 
 <!-- platforms:end -->
 
@@ -165,9 +167,9 @@ your `PATH`, and the note says what breaks without it:
   before any partial install (see the three preconditions under `init` below),
   and a machine without ShellCheck is **refused rather than half-installed**.
   Nothing in the install supplies it: take it from your distribution on Linux,
-  from Homebrew on macOS, and on Windows from inside the WSL distribution this
-  section already sends you to, which is where a Windows adopter satisfies this
-  member.
+  from Homebrew on macOS, and on a Windows adopter's WSL distribution where that
+  is the chosen route; a native Windows install satisfies this member when its
+  held platform joins.
 - `cargo` (≥ 1.71, @contributor) — a **contributor** requirement with **no install-time role at
   all**: the `native/` crate carries the gate implementations that dispatch to a
   binary subcommand, and the floor is the highest MSRV in the crate's resolved
@@ -266,8 +268,8 @@ bash one, exercised by its own CI leg.
 **That is the interpreter half of a native Windows path, not the whole of one.**
 The prebuilt binaries are published for the roster's joined platforms, and native
 Windows is declared above as held, with the run that joins it. Before that run a
-Windows host resolves to no artifact and is refused. WSL is the working route
-meanwhile. What stands in the way is the run rather than the interpreter.
+Windows host resolves to no artifact and is refused; WSL is the route you can
+choose meanwhile. What stands in the way is the run rather than the interpreter.
 
 <!-- measured: ported-gate-members=111 -->
 That direction is now underway rather than announced: 111 gates in the battery
