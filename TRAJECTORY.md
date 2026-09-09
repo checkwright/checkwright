@@ -712,7 +712,12 @@ ruling: the hotfix-minimality reach
 relocation, all five verbs move behind the invoke, and omit-and-declare retires at install — ruled
 2026-09-09 in the consult session the operator convened for the question (an AskUserQuestion in a
 lead session, answered "put it to /consult", lead-relayed). The reading is the consult's own,
-`consult, own-authority` under that direction, and not an answer the operator gave; the operator
+`consult, own-authority` under that direction, and was not an answer the operator gave when it was
+first recorded here. **The operator has since RATIFIED it as their own, 2026-09-09, through the
+AskUserQuestion channel in a lead session and lead-relayed** — put to them on the ground that
+`consult` names no authority in CLAUDE.md's `operator`/`lead` roster, so the reading needed one. It
+therefore stands as an operator ruling resting on a consult's reasoning, and both facts are load-
+bearing: the reasoning is answerable to the consult, the standing is the operator's. The operator
 reopens it like any ruling here.** The relocation's precondition (installer/README.md §The install
 boundary) sequenced the unconditional remainder of `init` behind the roster covering every
 **supported** platform, and at HEAD it does — the platform block declares three triples, all
