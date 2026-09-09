@@ -12,6 +12,43 @@
 
 ## New Features
 
+- **powershell-installer-surface** [spec: SPEC-behind-invoke.md]
+  — the behind-invoke RELOCATION half: `init`'s conditional install logic, and every other verb's,
+  moves to the far side of the gate binary's invoke, so it is written once in Rust rather than twice
+  by hand. The amendment is `installer/SPEC-behind-invoke.md`; its twelve deltas, their work
+  classes, the non-monotone reader set and the update-target roster are its own, not restated here.
+  **RULED `bootstrap-one-success-path`** — the bootstrap has one success path;
+  `substrate-unavailable` and `digest-unverifiable` BOTH become refusals; all FIVE verbs move behind
+  the invoke, the bootstrap branchless and the binary owning the verb roster; `installer/lib/`
+  empties; `--toolfloor-parity` retires with its second holder. Grounds, three refused alternatives
+  and two bounds are TRAJECTORY.md's.
+  **AUTHORITY, and both facts belong here.** The reading is the consult session's own
+  (`consult, own-authority` 2026-09-09, in the consult the operator directed be convened rather than
+  rule in the lead session); the OPERATOR then RATIFIED it as their own 2026-09-09, AskUserQuestion
+  channel in a lead session, lead-relayed — put to them on the ground that `consult` sits outside
+  CLAUDE.md's `operator`/`lead` authority roster. So it is an operator-ratified ruling standing on a
+  consult's reasoning. Discharge: `test ! -e installer/lib`.
+  **THE POWERSHELL HALF SHIPPED 2026-09-07 at build and this entry DEMOTED rather than reaching
+  Done** — one increment of a two-half deliverable (canon-kit/SPEC.md §Merging an amendment step 4).
+  **PAYLOAD-END-TO-END IS OWED WITH THIS HALF** — the live residue of NARROWING TWO (operator,
+  2026-09-07, AskUserQuestion channel in a lead session, lead-relayed): the shipped leg asserts the
+  five BOOTSTRAP steps, a completed `checkwright init` through PowerShell asserts PAYLOAD coverage,
+  and the arm the relocation mints is what makes one reachable. The leg's extension and this half
+  land together or not at all.
+  **THE SHIPPED LEG IS BINDING and carries no hold** (the hold dropped at `9ad9538c` on its first CI
+  run). Read it JOB-KEYED, never off the workflow conclusion — the habit the hold was for outlives
+  the hold itself.
+  **TAKEN AS THIS ITERATION'S UNIT — `lead, own-authority` 2026-09-09**, standing ALONE; joining the
+  smoke harness's CR repair was declined because `installer/consumer-smoke/run-smoke.sh` reads
+  `no-port`, so it buys no port progress. The same-surface ground stays available on under-fill, and
+  the unit does not under-fill: it reaches 15 of the 16 files the port oracle reports owed, leaving
+  `scripts/pack-installer.sh` alone and held elsewhere.
+  **THE 2026-09-07 READING WAS REACHED FOR HERE, and this is the last reach** — the leg is the
+  sequence's final member (consult 2026-09-09, on that paragraph).
+  Filed 2026-08-03 by spec; re-scoped 08-24; fork 1 merged and demoted 08-25; source blockers
+  re-scoped out 08-26; PowerShell half merged and demoted 09-07 — all by operator ruling; promoted
+  2026-09-09 at spec, which is where writing the amendment IS the promotion.
+
 ## Technical Debt
 
 ## Deferred
@@ -855,54 +892,6 @@
   attestations.
   Filed 2026-08-30 by close from the gap inbox; the config line was re-read at
   the drain.
-
-- **powershell-installer-surface** [design-pending]
-  — the behind-invoke RELOCATION half: move `init`'s conditional install logic to the far side
-  of the gate binary's invoke, so it is written once in Rust rather than twice by hand.
-  **THE POWERSHELL HALF SHIPPED 2026-09-07 at build and this entry DEMOTED rather than reaching
-  Done** — one increment of a two-half deliverable (canon-kit/SPEC.md §Merging an amendment
-  step 4). `installer/bin/checkwright.ps1`, its two transports and its own install-smoke leg are
-  in tree. The five-steps and two-bootstraps rulings, the narrowed oracle, the twin's digest
-  asymmetry and the comparison order all live in `installer/README.md` §The install boundary and
-  §The gate binary, cited not restated; the 2026-08-26 native-runner `-x` measurements merged
-  into that section at the same commit and are no longer this entry's to carry.
-  **PAYLOAD-END-TO-END IS STILL OWED, AND IS OWED WITH THIS HALF** — the live residue of
-  NARROWING TWO (operator, 2026-09-07, AskUserQuestion channel in a lead session, lead-relayed).
-  The shipped leg asserts the five BOOTSTRAP steps; a completed `checkwright init` through
-  PowerShell asserts PAYLOAD coverage, and no code path reaches it while the binary carries no
-  `init` arm (`native/src/install.rs`, `OPS = ["place-artifact"]`). The relocation is what mints
-  that arm, so the leg's extension and this half land together or not at all.
-  **THE SHIPPED LEG IS BINDING and carries no hold today** (`.github/workflows/gates.yml`:452-456,
-  the hold dropped at `9ad9538c` on its first CI run). Read it JOB-KEYED, never off the workflow
-  conclusion — the habit the hold was for outlives the hold.
-  **NO LONGER BLOCKED — corrected 2026-09-09 at scope, the block having gone false 2026-09-08.**
-  The blocker was `gate-binary-roster-covers-supported-platforms`, named here in prose with no slug;
-  it reached Done at `23bcfed1` and is absent from this file at HEAD. `native/targets.list`'s header
-  has since taken ownership of the widening away from any entry, so the precondition reads off that
-  header. **THE REQUIREMENT THAT AN UNCOVERED PLATFORM STILL INSTALL IS RETIRED — ruled 2026-09-09
-  in the consult the operator convened for it (`consult, own-authority`, lead-relayed); grounds,
-  three refused alternatives and two bounds are TRAJECTORY.md's (`bootstrap-one-success-path`).**
-  `substrate-unavailable` and `digest-unverifiable` BOTH become bootstrap refusals; all FIVE verbs
-  move behind the invoke, the bootstrap branchless and the binary owning the verb roster;
-  `installer/lib/` empties; `--toolfloor-parity` retires with its second holder. Spec authors it.
-  The PowerShell half widened the set to {Linux, macOS, native Windows}, known and accepted when the
-  split was ruled on this same ground (`doctrine-kit/SPEC.md`:213-216).
-  **TAKEN AS THIS ITERATION'S UNIT — `lead, own-authority` 2026-09-09**, on the governed surfaces
-  alone: the PRIORITY DIRECTIVE, its 2026-09-07 sanction for scheduling an own-iteration leg AS the
-  iteration, the discharged block above, and the oracle. It stands ALONE; joining the smoke
-  harness's CR repair was declined because `installer/consumer-smoke/run-smoke.sh` reads `no-port`,
-  so it buys no port progress — the same-surface ground itself is untouched and stays available to
-  spec if the relocation under-fills.
-  **THE 2026-09-07 READING WAS REACHED FOR HERE, recorded so its bound is countable rather than
-  re-derived.** TRAJECTORY.md keeps live the warning that the reachable column is "one more window,
-  after which every iteration is an own-iteration leg or another exception paragraph", and states
-  that this bounds how often the own-iteration-leg reading may be reached for. This is one reach,
-  and the last: the leg is the sequence's final member (consult 2026-09-09, on that paragraph).
-  **Cost while deferred:** every install-path change is now authored twice by hand, which the
-  parity leg turns into a red run rather than removes; and the pivot's OS-reach objective is only
-  half met — the bootstrap runs on native Windows, no install completes there.
-  Filed 2026-08-03 by spec; re-scoped 08-24; fork 1 merged and demoted 08-25; source blockers
-  re-scoped out 08-26; PowerShell half merged and demoted 09-07 — all by operator ruling.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
