@@ -17,6 +17,58 @@
 ## Deferred
 
 
+- **consult-rulings-outside-the-authority-roster** [design-pending] — CLAUDE.md admits exactly two
+  ruling authorities, `operator` and `lead`. A third has been ruling in practice: a
+  `consult`-convened session, whose readings now sit in `TRAJECTORY.md` and on two queue entries
+  marked `consult, own-authority`. The kit ships the authority SLOT and never the vocabulary, so
+  admitting a name is this repo's own call — and the repo has not made it.
+  **THE COUNT IS FOUR, and the shape differs across them.** (1) `bootstrap-one-success-path` —
+  operator-RATIFIED 2026-09-09, case-by-case, and since RETIRED at close as discharged.
+  (2) `ruling-accretion-outgrows-the-entry-cap` and (3) `lead-split-posture-limb-unjudged` — each
+  carried a consult ruling directing a TERMINAL move, both held by close 2026-09-09 for want of
+  authority, both operator-RATIFIED 2026-09-09 in the same motion that filed this entry, executing
+  at the next close. (4) `TRAJECTORY.md:890-893` carries a `consult, own-authority` reading with
+  **NO ratification at all** — the live unratified instance, and the reason this entry is
+  design-pending rather than a note.
+  **THE CLASS FIX WAS OFFERED TWICE AND DECLINED TWICE** (operator, 2026-09-09, AskUserQuestion
+  channel in a lead session, lead-relayed) — the second time knowing the count. So the standing
+  disposition is deliberate: ratify case-by-case, do not widen the roster. That is a POSITION, not
+  an oversight, and this entry exists to hold it rather than to re-litigate it.
+  **The fork, unruled:** (a) leave it — every consult reading needs an operator ratification, which
+  is the status quo and costs one operator turn per reading; (b) admit `consult` to the roster with
+  a stated bound; (c) retire the `consult` marker and have the convening lead land such readings as
+  `lead, own-authority`, which is inside the roster and loses the fact that a second session
+  reasoned it. Cost of leaving it: the ratification turn recurs, and an unratified reading like (4)
+  reads as authoritative to a future session that does not check.
+  **Cost while deferred:** one operator turn per consult reading, forever — and the turn is the
+  cheap half. The expensive half is instance (4): an unratified `consult, own-authority` line reads
+  as authoritative to any session that does not check the roster, and nothing makes it check.
+  Filed 2026-09-09 by the lead on the operator's direction (AskUserQuestion channel in a lead
+  session); the direction was to FILE, not to rule the fork.
+
+- **lead-ruling-reopen-authority-unstated** [design-pending] — `TRAJECTORY.md:17-21` says a recorded
+  ruling is closed and only the OPERATOR reopens one. It is silent on rulings the LEAD recorded on
+  its own authority, of which six now exist. So the surface answers who reopens an operator ruling
+  and answers nothing about the class it also sanctions.
+  **Why this is not merely pedantic.** The lead escalates rather than reverses a recorded ruling,
+  and reversal is operator-class — that much is stated. What is unstated is whether a lead may
+  reverse its OWN recorded ruling, and the two readings diverge in practice: if yes, a
+  `lead, own-authority` ruling is a note the next lead session may overwrite silently; if no, it is
+  as immovable as an operator's and a lead spends an operator turn to undo its own reasoning.
+  Neither reading is absurd, which is why inspection has not settled it.
+  **The adjacent rule that does NOT settle it:** retiring a spent ruling is not reversing one, and
+  close exercised exactly that on `bootstrap-one-success-path` 2026-09-09. Retirement turns on the
+  ruling being DISCHARGED; it says nothing about reversing a live one.
+  **Independent of `consult-rulings-outside-the-authority-roster`** — that entry asks which names
+  may rule; this asks what a recorded ruling's permanence is once a name inside the roster has
+  ruled. Fixing either leaves the other exactly where it was.
+  **Cost while deferred:** nothing until the first attempt to move a `lead, own-authority` ruling,
+  at which point the session either spends an operator turn it may not owe or overwrites a recorded
+  ruling it may not may. Six such rulings are already recorded, so the exposure only grows.
+  Surfaced by close 2026-09-09 and by the consult of the same day. Filed 2026-09-09 by the lead,
+  operator-directed through the AskUserQuestion channel in a lead session — directed to FILE, and
+  the fork left unruled.
+
 - **ruling-record-prose-staleness-unreachable** [design-pending] — the ruling-staleness probe
   reaches backtick-named slugs and declared discharge conditions, so TRAJECTORY.md's undated prose
   rulings go unchecked, and the manual re-read that would cover them has now been deferred by two
@@ -8625,12 +8677,12 @@
   gate's headroom line, and its one residue is `entry-compression-contract-unenforced`'s — two
   entries on one subject are two readings of one fact. Close takes the wontfix exit (the 2026-08-23
   ruling's bare Done line).
-  **THE EXIT IS HELD, NOT DECLINED — close 2026-09-09.** The grounds above were re-read and they
-  hold; what is missing is authority. `consult` names none in CLAUDE.md's `operator`/`lead` roster,
-  and the operator ratified only the ONE other consult ruling of that day, case-by-case, while
-  declining the variant that would have added `consult` to the roster. A Done move is terminal —
-  the body evaporates with the tags — and this entry blocks nothing, so close took the reversible
-  branch and escalated. The next close executes on an answer rather than re-deriving this.
+  **HELD FOR WANT OF AUTHORITY (close 2026-09-09), NOW RATIFIED (operator, 2026-09-09,
+  AskUserQuestion channel in a lead session, lead-relayed):** the wontfix exit is authorized and the
+  NEXT CLOSE executes the Done move. **The ratification is the authority; the consult reading
+  supplies only the grounds.** Case-by-case a second time — the class fix was offered and DECLINED
+  knowing the count had reached three — so the class stays open on
+  `consult-rulings-outside-the-authority-roster`.
   Filed 2026-08-29 by the lead, landed by close; dropped from the unit set 2026-08-30 by spec.
 
 - **design-pending-boilerplate-reds-its-own-promotion** [design-pending] — the standard explanatory
@@ -8925,10 +8977,10 @@
   straight point; both ALONE surface-ruled off TRAJECTORY.md and this entry. TWO OF SIX is the
   series' LOWEST surface-ruled fraction, against a count in its bottom quartile — the two move
   together, which is a genuinely light supervision load rather than a starved one.
-  **THE THIRD POINT LANDED AND ITS CLOSURE IS HELD — close 2026-09-09, same hold and same ground as
-  `ruling-accretion-outgrows-the-entry-cap`'s.** Recording the reading decides nothing; closing the
-  entry is terminal, and the ruling directing it is `consult, own-authority`, which CLAUDE.md's
-  roster does not name. Escalated as ONE class question rather than answered twice.
+  **THE THIRD POINT LANDED; close 2026-09-09 held its closure for want of authority, and the hold is
+  RATIFIED (operator, 2026-09-09, AskUserQuestion channel in a lead session, lead-relayed) — the
+  NEXT CLOSE executes the terminal move.** Same motion and grounds as
+  `ruling-accretion-outgrows-the-entry-cap`'s, which holds the reasoning.
   **DEGENERACY, neither reading picked** (16th introduced, 17th narrowed to scope's own escalation):
   scope gave 4 of the 20th's 8 and 3 of the 21st's 6, so it is live at both and NOT shrinking.
   **THE CHARACTER LIMB, which by design the count cannot see.** Prior shapes: the lead ruled WRONG
