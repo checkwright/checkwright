@@ -1212,11 +1212,10 @@ the manifest rather than writing it empty, on the same conditional footing the
 
 **The consumer-layout constants have one owner, and it is behind the invoke.**
 Where the gates directory, the agent file and the queue file sit in a vendored
-tree are values the installer module owns as constants; nothing outside the
-package restates them. A reader outside the crate — a smoke harness, a consumer
-script — takes them from that module rather than spelling its own copy, because
-a second spelling is a second thing to stale. Named here, valued there: this is
-the pointer, not the roster.
+tree are constants the installer module owns. A reader outside the crate — a
+smoke harness, a consumer script — takes them from that module rather than
+spelling a copy, a second spelling being a second thing to stale. Named here,
+valued there: this is the pointer, not the roster.
 
 **Reading it needs no external program.** The crate parses it with `serde_json`,
 so a refusal an adopter meets here — *this package carries no version stamp*, or

@@ -351,13 +351,12 @@ corpus contains:
 - **`[blocked-by: <slug>]` is an edge too**, and the one already-structured
   class: including it makes an inbound set complete rather than merely
   prose-derived.
-- **A block that names no slug is no edge and no citation.** An entry asserting
-  it is held by something it only *describes* — "the roster entry", "the leg that
-  covers it" — is unreachable to this arm and to every grep a later session runs,
-  so recovering the subject costs a history search. The arm cannot close that: a
-  description matches nothing by construction. The authoring rule is the whole
-  remedy — a block worth a later session's reach names its subject, in the tag or
-  inline in the prose.
+- **A block that names no slug is no edge and no citation.** An entry held by
+  something it only *describes* — "the roster entry" — is unreachable to this arm
+  and to every grep, so recovering the subject costs a history search. The arm
+  cannot close that: a description matches nothing by construction, which leaves
+  the authoring rule as the whole remedy. A block worth a later session's reach
+  names its subject, in the tag or inline.
 
 **No relational vocabulary is declared, and that refusal is the design.** Prose
 phrases a relation many ways and keeps inventing more, so an enumerated verb set

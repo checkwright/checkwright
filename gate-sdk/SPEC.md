@@ -16115,18 +16115,16 @@ pre-commit hook. Subject *shape* is the sibling check-commit-subject's job:
 this gate stays the leak guard, that one the parse guarantee.
 
 **A commit-msg-tier refusal names the safe recovery, and one helper prints it
-for both gates.** This tier refuses *before* the commit object exists, so the
-message its author is looking at belongs to a commit that has not landed —
-while `git commit --amend`, the reflex repair for a message-shaped refusal,
-rewrites the commit already at HEAD, which under a shared index is not
-necessarily the same session's. Re-issuing `git commit` is the safe form, and
-both `commit-msg`-tier gates print it from the one function this module exports,
-on the same cannot-drift-apart ground as `gate_msg_pattern_files` below. The
-general rule the line discharges: a refusal whose message names no reachable
-remedy is what invites the mutating one. No gate asserts this — "every refusal
-names a remedy" is a judgment about prose, not a decidable property — so the
-contract is the shared helper, which makes the two callers structurally
-incapable of naming different remedies.
+for both gates.** This tier refuses *before* the commit object exists, so
+`git commit --amend` — the reflex repair for a message-shaped refusal — rewrites
+the commit already at HEAD, which under a shared index need not be the same
+session's. Re-issuing `git commit` is the safe form. Both `commit-msg`-tier
+gates print it from the one function this module exports, on the same
+cannot-drift-apart ground as `gate_msg_pattern_files` below; a refusal naming no
+reachable remedy is what invites the mutating one. No gate asserts the general
+rule — "every refusal names a remedy" is a judgment about prose, not a decidable
+property — so the shared helper *is* the contract, two callers being structurally
+unable to name different remedies.
 
 **The account-identification class bans a shape, not a name.** Public prose
 cites the *role* — "the account carrying `workflow` scope" — and never the
