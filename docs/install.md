@@ -604,7 +604,7 @@ front door. That trade was put to the operator in those terms and declined. It
 becomes the right call only once §Quick start stops promising a bare one-command
 install, or once a stable line exists to hold `latest` while preview moves off it.
 Neither holds today. Nothing forecloses the change either:
-`scripts/pack-installer.sh`'s version regex already admits a prerelease suffix.
+the pack arm's version regex already admits a prerelease suffix.
 
 **The same preference decides invariant C the other way, which is why the two
 sit side by side.** Both trades weigh an honest channel signal against a reader
@@ -729,7 +729,7 @@ holds only the floor.
 **The gate orders `<major>.<minor>.<patch>` and refuses anything else**, naming
 in its refusal the offending token, where that token came from, plus the grammar
 it failed. That is a guard rather than a closure. A prerelease or build-metadata
-suffix stays exactly as admissible as `scripts/pack-installer.sh` already leaves
+suffix stays exactly as admissible as the pack arm already leaves
 it; what is missing is an *ordering* for one, because the candidate rules
 disagree — `sort -V` puts `1.0.0` *before* `1.0.0-rc1` where semver puts it
 after. A gate whose subject is this section's one semver line must not pick

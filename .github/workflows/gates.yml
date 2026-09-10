@@ -431,8 +431,8 @@ jobs:
           path: ${{ runner.temp }}/native-artifacts
 
       # Strips the artifact-name prefix to leave `<artifacts>/<target>/`, the
-      # layout pack-installer.sh reads and INSTALLER_SMOKE_ARTIFACTS_DIR is
-      # specified against — the macOS siblings' step, on the one host where its
+      # layout the --pack-installer arm reads and INSTALLER_SMOKE_ARTIFACTS_DIR
+      # is specified against — the macOS siblings' step, on the one host where its
       # base path cannot be `$RUNNER_TEMP` directly: that arrives in Windows
       # spelling and every glob and `mv` below is MSYS bash's, so the already
       # translated `$SMOKE_TMP` is what this walks. The download action is handed
@@ -467,7 +467,7 @@ jobs:
       # this host, and this host is not the one declared triple. The re-entry is
       # the one installer/README.md §The consumer smoke records — steer this
       # smoke's pack at the host alone while the published payload still commits
-      # to what it commits to. pack-installer.sh copies the steered file verbatim
+      # to what it commits to. The pack arm copies the steered file verbatim
       # into the payload, so the packed roster is this host's and no second copy
       # is read anywhere downstream.
       #
@@ -588,7 +588,7 @@ jobs:
           version="$(git describe --tags --abbrev=0 2>/dev/null)"; version="${version#v}"
           [[ -n "$version" ]] || version="0.0.0-pwsh-smoke"
           GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_PACK_TMP_DIR="$tmp" \
-            bash scripts/pack-installer.sh --root "$PWD" --version "$version" \
+            bash gate-sdk/bin/run-gates.sh --pack-installer --root "$PWD" --version "$version" \
               --out "$tmp" --artifacts "$tmp/artifacts" || exit 2
           shopt -s nullglob
           tarballs=("$tmp"/*.tgz)
@@ -1036,7 +1036,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           # Named for its target and carrying the target directory, so a
-          # `pattern:` download lands exactly the layout pack-installer.sh reads
+          # `pattern:` download lands exactly the layout the pack arm reads
           # once the artifact-name prefix is stripped — the same naming
           # publish.yml's build leg uses, since the consumers are the same shape.
           name: gate-binary-${{ matrix.target }}
@@ -1202,7 +1202,7 @@ jobs:
 
       # A `pattern:` download lands one directory per artifact name, so the
       # prefix comes off to leave `<artifacts>/<target>/` — the layout
-      # pack-installer.sh reads and the one INSTALLER_SMOKE_ARTIFACTS_DIR is
+      # the --pack-installer arm reads and the one INSTALLER_SMOKE_ARTIFACTS_DIR is
       # specified against. Nothing is rehashed on the way: the sidecar that
       # arrives is the sidecar the producer emitted beside the bytes, which is
       # what keeps one producer per digest across this new hop.
@@ -1474,8 +1474,8 @@ jobs:
           path: ${{ runner.temp }}/native-artifacts
 
       # Strips the artifact-name prefix to leave `<artifacts>/<target>/`, the
-      # layout pack-installer.sh reads and INSTALLER_SMOKE_ARTIFACTS_DIR is
-      # specified against. The host triple is derived from `rustc -vV` and never
+      # layout the --pack-installer arm reads and INSTALLER_SMOKE_ARTIFACTS_DIR
+      # is specified against. The host triple is derived from `rustc -vV` and never
       # spelled, so this step asserts nothing about which platform it is on — it
       # demands only that the producer uploaded a complete artifact for whatever
       # host it woke up on, which on this leg is the assertion that matters.

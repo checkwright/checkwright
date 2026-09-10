@@ -209,7 +209,8 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    tag alone. It first **builds** one gate binary and one
    digest sidecar per target in the roster the build matrix is derived from
    (gate-sdk/SPEC.md §Consumer payload — no platform is spelled in the workflow).
-   It then **assembles** the package once with `scripts/pack-installer.sh`, which
+   It then **builds** the gate binary that job's assemble step dispatches to, and
+   **assembles** the package once with the binary's `--pack-installer` arm, which
    verifies each artifact against its sidecar before placing it. Two sibling jobs
    then consume that one artifact — `release` attaches the tarball, the per-target
    binaries and every `.sha256` to the GitHub Release (the primary channel), and
@@ -220,7 +221,7 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    tag pusher are one account and independent review is unavailable by
    construction. Expect the run to pause and to need your approval before the
    `npm` job starts. Nothing is published by hand, and
-   **there is no version to edit** — the pack script stamps the version from the
+   **there is no version to edit** — the pack arm stamps the version from the
    tag being packed and the job refuses a tarball whose stamp disagrees with it
    (docs/install.md §Versioning owns the one-semver-line rule this derives from).
    Watch **both** jobs to green (`gh run watch`) before continuing; a red publish

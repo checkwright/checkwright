@@ -2,7 +2,7 @@
 # spec: gate-sdk/SPEC.md §run-gates — the battery front-end, reduced to its residue: resolve the repo root, resolve one bridged environment, exec the binary. The argument grammar, the usage text, the selectors, the dispatch and the output contract are all the binary's `--run` arm's.
 # no-port: gate-sdk/SPEC.md §run-gates, The front-end's port disposition — this is the residue that stub cut left, and it stays shell on the config-seam cause gate-sdk/SPEC.md §The config-seam port disposition rules for lib/gate.sh itself: gate_knob_env is the config bridge's bash producer, the single place a knob's value is computed, so the one call below cannot be made from inside the binary it is resolving the environment for. An existing cause reached one step further, never a new class.
 #
-# usage: run-gates.sh [gates-dir] | --only <name>... [-- <arg>...] | --for <path>... | --emit <arm> [args...] | -h | --help
+# usage: run-gates.sh [gates-dir] | --only <name>... [-- <arg>...] | --for <path>... | --emit <arm> [args...] | --pack-installer [--version <semver>] [--out <dir>] [--artifacts <dir>] [--root <dir>] | -h | --help
 #        every arm, its refusals and the knobs print from the tool itself: run-gates.sh --help
 #   timings → $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/); a measurement, never committed
 set -uo pipefail

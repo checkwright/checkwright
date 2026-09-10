@@ -148,7 +148,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           # The artifact is named for its target and carries the target directory,
-          # so a merged download lands exactly the layout pack-installer.sh reads.
+          # so a merged download lands exactly the layout the pack arm reads.
           name: gate-binary-${{ matrix.target }}
           path: ${{ runner.temp }}/artifact/${{ matrix.target }}/
           if-no-files-found: error
@@ -167,6 +167,20 @@ jobs:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/artifact
 
+      # The assemble step below dispatches the payload assembler as a bridged arm
+      # of the gate binary, and this is the one job that had no build — the
+      # consumer smoke builds before it packs, and the macOS install-smoke legs
+      # adopt a compiled binary from the build legs' hand-off. So the binary is
+      # built here, on the runner's preinstalled cargo, which is the disposition
+      # the `build:` job's own comment above already records for this workflow.
+      # It compiles bytes this job checked out at the tag, so the
+      # checkout-plus-bash tamper floor is intact, and it is the tooling binary
+      # rather than a payload artifact: the payload still carries only what the
+      # `build:` matrix produced. installer/README.md §The packer owns the route
+      # and the refused alternative.
+      - name: build the gate binary this job's assemble step dispatches to
+        run: bash gate-sdk/bin/build-native.sh
+
       - name: assemble the package from the tagged tree
         env:
           TAG: ${{ github.ref_name }}
@@ -177,7 +191,7 @@ jobs:
           # A `pattern:` download lands each artifact in its own directory when
           # several match and directly in `path:` when exactly one does, so the
           # shape on disk is not something this workflow can assert. The roster
-          # is, and pack-installer.sh reads `<artifacts>/<target>/`, so normalize
+          # is, and the pack arm reads `<artifacts>/<target>/`, so normalize
           # onto that from whichever shape arrived. The unreachable case fails
           # loudly and prints the tree: packing a release with a binary silently
           # missing is the one outcome worse than a red run.
@@ -204,8 +218,8 @@ jobs:
           out="$RUNNER_TEMP/dist"
           mkdir -p "$out"
           INSTALLER_PACK_TMP_DIR="$RUNNER_TEMP" \
-            bash scripts/pack-installer.sh --version "$version" --out "$out" \
-              --artifacts "$art"
+            bash gate-sdk/bin/run-gates.sh --pack-installer \
+              --version "$version" --out "$out" --artifacts "$art"
 
           # The tag is the whole of the version derivation, so prove the packed
           # artifact carries it rather than trusting that the stamp ran.

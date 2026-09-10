@@ -30,7 +30,7 @@ outdir="$2"
 source gate-sdk/lib/gate.sh
 
 crate="$(gate_native_crate)"
-# spec: gate-sdk/SPEC.md §Consumer payload — the executable suffix is the TARGET's and never the host's, the same derivation gate-sdk/bin/build-native.sh and scripts/pack-installer.sh already take from the one owner: this job's runner is that target's own platform today, so a host-derived suffix agrees by coincidence rather than by construction, and the day one caller passes a triple the host is not, the copy below looks for a name cargo never emitted
+# spec: gate-sdk/SPEC.md §Consumer payload — the executable suffix is the TARGET's and never the host's, the same derivation gate-sdk/bin/build-native.sh takes from the one owner, and the same one gate-sdk/lib/gate.sh resolves into GATE_SDK_NATIVE_ARTIFACT_NAMES for the --pack-installer arm to read as a value: this job's runner is that target's own platform today, so a host-derived suffix agrees by coincidence rather than by construction, and the day one caller passes a triple the host is not, the copy below looks for a name cargo never emitted
 binary="$(gate_native_bin)"
 binary="${binary##*/}"
 binary="${binary%.exe}$(gate_exe_suffix "$target")"

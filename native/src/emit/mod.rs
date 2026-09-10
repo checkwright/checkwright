@@ -28,6 +28,7 @@ pub mod md_index;
 pub mod md_section;
 pub mod parse_gates_log;
 pub mod overhead_meter;
+pub mod pack_installer;
 pub mod parse_smoke_log;
 pub mod port_blockers;
 pub mod pub_index;
@@ -628,6 +629,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     // split of its exit status, which an emitting arm collapses, and a table member because the
     // vendoring and the binary placement both read the consumer's own knobs
     ("--run-demo", Arm::Run(demo::run), demo::KNOBS),
+    // spec: gate-sdk/SPEC.md §Consumer payload — the payload assembler, an `Arm::Run` because its
+    // product is a tarball plus a receipt rather than a document, and a table member because all
+    // four of its inputs are consumer-overridable where a hardcoded flag would ignore every one
+    (
+        "--pack-installer",
+        Arm::Run(pack_installer::run),
+        pack_installer::KNOBS,
+    ),
 ];
 
 // spec: gate-sdk/SPEC.md §run-gates — the child's declared knob environment, filtered out of the

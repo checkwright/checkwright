@@ -101,7 +101,7 @@ unset _gpp
 [[ -n "${GATE_SDK_GH_HOST:-}" ]] || GATE_SDK_GH_HOST="github.com"
 [[ -n "${GATE_SDK_TESTS_DIR:-}" ]] || GATE_SDK_TESTS_DIR="$GATE_SDK_GATES_DIR/gate-tests"
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the executable suffix has one owner and no other surface spells `.exe`: given a target triple it answers for that triple, given nothing (or an empty triple, which *is* the host triple — the shape `--target`-less cargo builds for) it answers for the host
-# shellcheck disable=SC2120  # the argument-passing callers are in other files (bin/build-native.sh, the consumer's packer), so a per-file analysis sees only the argument-less call below and cannot see that the parameter is optional by contract rather than unused
+# shellcheck disable=SC2120  # one argument-passing caller is in another file (bin/build-native.sh) and the in-file one is the artifact-names derivation far below, so an analyser reading top-down sees only the argument-less call on the next line and cannot see that the parameter is optional by contract rather than unused
 gate_exe_suffix() {
     local triple="${1:-}"
     if [[ -n "$triple" ]]; then
@@ -540,6 +540,16 @@ gate_native_targets() {
     [[ -f "$f" ]] || return 1
     gates_list_members "$f"
 }
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the per-roster-line artifact NAME as a bridgeable keyed value, one `<target>=<name>` element per line, computed here from gate_native_targets and gate_exe_suffix so the executable suffix keeps exactly one owner: a compiled reader is served the resolved name and derives nothing, which discharges the second-holder criterion by construction rather than by a Rust twin of the `*-windows-*` predicate. Computed after GATE_SDK_NATIVE_TARGETS_FILE resolves above, so a caller steering the roster knob in the arm's environment is served a value derived from the steered roster and not the default one.
+# shellcheck disable=SC2034  # read across the dispatch seam, never in this shell: the config bridge resolves it by name for a member that declares it
+GATE_SDK_NATIVE_ARTIFACT_NAMES=()
+while IFS= read -r _gan_target; do
+    [[ -n "$_gan_target" ]] || continue
+    _gan_name="$(gate_native_bin)"; _gan_name="${_gan_name##*/}"
+    GATE_SDK_NATIVE_ARTIFACT_NAMES+=("$_gan_target=${_gan_name%.exe}$(gate_exe_suffix "$_gan_target")")
+done < <(gate_native_targets)
+unset _gan_target _gan_name
 
 # spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_RUNNERS_FILE, defaulted off GATE_SDK_NATIVE_CRATE beside the roster's own so the crate's location keeps one owner
 gate_native_runners_file() {

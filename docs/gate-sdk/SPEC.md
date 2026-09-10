@@ -230,7 +230,16 @@ set (§Consumer payload). And `GATE_SDK_NATIVE_TARGETS_FILE` (default **derived*
 from `GATE_SDK_NATIVE_CRATE` as `<crate>/targets.list`, exactly as
 `GATE_SDK_NATIVE_SRC`'s default is, so the crate's location keeps one owner; the
 target roster §Consumer payload rules the platform-support surface, read through
-`gate_native_targets` — see §lib/gate.sh). And `GATE_SDK_NATIVE_RUNNERS_FILE`
+`gate_native_targets` — see §lib/gate.sh). And `GATE_SDK_NATIVE_ARTIFACT_NAMES`
+(array, default **derived** from that roster and `gate_exe_suffix`: one
+`<target>=<artifact-name>` element per roster line, resolved once in `lib/gate.sh`
+after the roster knob does, so a caller steering the roster is served a value
+derived from the steered one. It is a **carried value and not a rule** — the
+executable suffix keeps `gate_exe_suffix` as its single owner and a compiled
+reader derives nothing, which is what keeps a second holder of that one-line
+predicate from existing at all. Read across the bridge, never in shell; a
+consumer pinning it explicitly keeps its exact value — see §lib/gate.sh). And
+`GATE_SDK_NATIVE_RUNNERS_FILE`
 (default **derived** from `GATE_SDK_NATIVE_CRATE` as `<crate>/runners.list`, the
 same derivation and for the same reason; one `<target> <runner>` pair per live
 line in the roster's own line grammar, read through `gate_native_runner` — see
@@ -490,7 +499,7 @@ the corpus's three families source three different libraries and two resolve the
 root before sourcing anything at all, so a shared helper buys a cross-kit
 dependency to save a one-line idiom, against the provenance seam and for no error
 class `check-path-dialect` does not already catch. The idiom needs no name:
-`scripts/pack-installer.sh` and the installer's own bootstrap both write it
+the installer's own bootstrap and `bin/build-native.sh` both write it
 already, neither as a dialect measure, which is the evidence that it is the shape
 a shell author reaches for unprompted.
 
@@ -2098,6 +2107,18 @@ build-stage demotion. The demotion half has always been on the entry; the
 promotion half was derivable only from `git log -S` over the queue, which is a
 re-derivation every cut's scoping session paid.
 
+**The rule reads as *the composer entry always*, and the case it does not cover
+is a cut that has its own.** A cut deferred behind a design fork may already have
+been filed as an entry of its own — named by the composer's own text as what
+holds that file — and such a cut hosts **there**, carrying its `[spec:]` ref on
+that entry. The composer entry is the host for a cut with no other, which is what
+the rule was always for: it exists because a cut ordinarily has nowhere else to
+live, never as a claim that a dedicated host is wrong. A dedicated host also
+changes the terminal move, and it changes it in the direction the bullet below
+already distinguishes: an entry whose whole deliverable is that one cut is
+**done** when the cut lands, where the composer entry is demoted. Nothing about
+the composer's own demotion contract changes.
+
 **The rule above presumes one cut per iteration, and the resolution for an
 iteration holding more is stated here rather than re-derived.** Three facts, in
 the order they bind.
@@ -2396,8 +2417,11 @@ and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
 whose port **removes** a grant naming its own path rather than relocating one)
 `--run-gate-tests` (§run-gate-tests),
 `--run-guard-tests` (guard-kit/SPEC.md §Testing),
-`--agents-md-smoke` and `--run-index-tests` (context-kit/SPEC.md §Testing)
-and `--run-demo`, the adoption walkthrough (§Consumer smoke) —
+`--agents-md-smoke` and `--run-index-tests` (context-kit/SPEC.md §Testing),
+`--run-demo`, the adoption walkthrough (§Consumer smoke),
+and `--pack-installer`, the payload assembler (§Consumer payload; the route a
+consumer's release path invokes it by is that consumer's own surface and not a
+kit's — installer/README.md §The packer is this repo's) —
 and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
@@ -2542,6 +2566,20 @@ of the few places a port shrank a set rather than carrying it across. It is
 **not** a consumer-changeable set: no knob names a program here, which is the
 axis on which `--emit-always-loaded` and `--emit-env-probe` differ from it
 (§Consumer smoke).
+**`--pack-installer` is the class's first member whose port *shrank* the set on
+two independent axes**, and both are stated because each was a preflight
+refusal's subject: `git` — `archive`, `rev-parse`, `describe`, `ls-files` and
+`status` — plus `tar`, to extract the archive stream, and `npm`, to pack. `jq`
+left with the port, the version-and-commit stamp becoming a `serde_json` edit,
+and `sha256sum` left too, the sidecar verified in-crate; `mktemp` is the one
+utility spawn that stays, and `mkdir`, `cp`, `mv`, `chmod` and `rm` all became
+`std::fs` calls with the scratch teardown becoming the arm's own `Drop`.
+**The preflight tool check narrowed with the set** — the shell form refused
+unless `npm`, `jq`, `git` and `tar` were all on `PATH`, and the arm refuses on
+three, because a tool check naming a program nothing runs is the same defect as a
+documented flag that does nothing. `git archive | tar` and `npm pack` stay spawns
+deliberately: reproducing either in-crate is a second implementation of a format,
+not a port.
 **`--run-guard-tests` is the class's first member whose set is split between the
 arm and the subject it spawns**, and stating it that way is what keeps the port's
 dividend honest: `bash`, `git` and `mktemp` are the arm's own — one `bash` per
@@ -3638,7 +3676,7 @@ that answers each is the one whose corpus matches its question.
    `gates.list` and recorded there as an omitted member rather than dispatched
    into an absent binary. The producing half of that model is **built**: the
    publish workflow's roster-derived build matrix emits one binary and one digest
-   sidecar per declared target, `scripts/pack-installer.sh` verifies each against
+   sidecar per declared target, the `--pack-installer` arm verifies each against
    its sidecar and places them in the payload, and the Release publishes them
    (§Consumer payload). The placing half is **built** too: `init` resolves the host
    to a target, refuses on a digest mismatch rather than warning, and
@@ -6956,7 +6994,7 @@ whose whole subject is a semver line, while implementing semver instead is a rul
 change smuggled through a substrate change. Refusing is the only disposition that
 neither invents a rule nor ships a known-wrong one — §The POSIX ERE matcher's
 refusal shape applied to an ordering rather than to a parse. It forecloses
-nothing: the prerelease path stays exactly as open as `scripts/pack-installer.sh`
+nothing: the prerelease path stays exactly as open as the `--pack-installer` arm
 already leaves it, and docs/install.md §Versioning now names where the ordering
 ruling is owed. Measured against this tree, all 23 live `release:` keys are bare
 `vX.Y.Z` and the disposition file carries no data line, so the refusal is a guard
@@ -7597,8 +7635,8 @@ needs:
 **A payload file's executable mode is transport-lost, so the packer sets it.**
 That is the bullet above's clause — payload content is bound by what the
 payload's transport can carry — reaching a second property. The prebuilt binary
-is payload content, and the artifact transport between a build leg and
-`scripts/pack-installer.sh` does not preserve mode: GitHub's artifact upload
+is payload content, and the artifact transport between a build leg and the
+`--pack-installer` arm does not preserve mode: GitHub's artifact upload
 flattens every uploaded file to `0644`. **Measured rather than reasoned about:**
 a producer leg's own `ls -l` shows the built binary executable and the consuming
 job's `ls -lR` shows the same bytes at `0644`, on every target in the same run;
@@ -7619,7 +7657,7 @@ must not decide what an adopter receives.
 **The target roster is the surface that asserts platform support.** One Rust
 target triple per live line in the file `GATE_SDK_NATIVE_TARGETS_FILE` names
 (§Layout and configuration), with one owner and three readers: the publish
-workflow's roster job derives its build matrix from it, `scripts/pack-installer.sh`
+workflow's roster job derives its build matrix from it, the `--pack-installer` arm
 packs one artifact directory per line and copies the roster verbatim into the
 payload as its one publication, and the installer reads that payload copy to
 select the host's artifact. A hand-maintained platform list inside the workflow
@@ -7758,7 +7796,7 @@ clause does not reach — while the packer's own `# spec:` line has bound this
 section narrowly all along, saying the script never builds *one*. **The
 consumer smoke's host-built artifact is a harness stand-in, not this rule
 relaxing**: it builds from a working tree because it has no Release to draw on,
-and hands `pack-installer.sh` a directory it did not produce, exactly as a build
+and hands the arm a directory it did not produce, exactly as a build
 leg would (installer/README.md §The consumer smoke). The
 one-payload shape is ruled on the numbers: the *installed* footprint is one
 binary either way, since the installer writes only the matching target, so the
@@ -8557,7 +8595,7 @@ reader needs outlive the refactor that renames a helper:
   §Consumer payload's omit-and-declare path turns on. Its two path accessors,
   `gate_native_targets_file` and `gate_native_bin`, exist so each knob default has
   one home across the readers that gained one with the artifact path (the publish
-  workflow, `scripts/pack-installer.sh`, §check-gate-substrate-parity).
+  workflow, the `--pack-installer` arm, §check-gate-substrate-parity).
   `gate_native_crate` is the third, holding `GATE_SDK_NATIVE_CRATE`'s default and
   its trailing-slash stripping in one place now that the knob has three shell
   readers rather than one.
@@ -8585,10 +8623,19 @@ reader needs outlive the refactor that renames a helper:
   `MINGW*`, `MSYS*`, `CYGWIN*` and `Windows_NT`. Three readers take it and each
   picks its form from what it is naming: `GATE_SDK_NATIVE_BIN`'s default (§Layout
   and configuration) takes the **host** form, because the knob names a binary on
-  the machine resolving it; `bin/build-native.sh`'s `BN_ART` and
-  `scripts/pack-installer.sh`'s per-roster-line artifact name take the **target**
+  the machine resolving it; `bin/build-native.sh`'s `BN_ART` and this library's
+  own `GATE_SDK_NATIVE_ARTIFACT_NAMES` derivation take the **target**
   form, because both name an artifact built *for* a triple that need not be the
-  host's (§build-native, §Consumer payload). The bootstrap's
+  host's (§build-native, §Consumer payload). **The second of those two is how the
+  binary-side reader gets an artifact name without becoming a second owner of the
+  suffix**: the payload assembler needs a per-roster-line name, it runs compiled,
+  and the value crosses the bridge already resolved — so the `*-windows-*`
+  predicate is computed here and nowhere else, which is a stronger discharge than
+  a machine-held cross-substrate comparator (a parity arm whose second holder
+  could never empty). The other caller of the target form,
+  `bin/build-native.sh`, cannot take that road at all: its body *is* the binary's
+  build, so an arm for it would predate itself, and the shell holder is therefore
+  permanent by construction rather than by preference. The bootstrap's
   `select_artifact` deliberately takes **neither**: it discovers the artifact name
   with `find … -maxdepth 1 -type f ! -name '*.sha256'` and asserts exactly one, so
   it is already name-agnostic and a `.exe` satisfies it unchanged — named here
@@ -9039,6 +9086,22 @@ case a resolved global earns a spelling of its own, so it resolves to
 stays **relative**: the resolved argv is baked verbatim into the tracked
 pre-commit hook, and an absolute value would commit one machine's checkout path
 to a public file.
+
+**`GATE_SDK_NATIVE_ARTIFACT_NAMES` is the per-roster-line artifact *name* as a
+bridgeable value**, and it belongs beside the two roots below because it is the
+same move for a different quantity: a value a consumer can override is not
+derivable on the binary side, so it is resolved once here and carried. One
+`<target>=<artifact-name>` element per live roster line, computed from
+`gate_native_targets` and `gate_exe_suffix` **after** `GATE_SDK_NATIVE_TARGETS_FILE`
+resolves in this same file — so a caller that steers the roster knob in a bridged
+arm's environment is served a value derived from the steered roster rather than
+the default one. Its reader is the payload assembler, `--pack-installer` (§The
+non-gate arm), which reads both fields at one transition: the target selects the
+artifact directory and the name selects the binary and its sidecar inside it. No
+third field is added — the sidecar's name is the artifact's with a fixed suffix
+and needs no carrier. It costs one small file read per sourcing of this library,
+the same class of source-time cost `GATE_KIT_ROOTS_HERE`'s own resolution
+already carries.
 
 **`GATE_SDK_ROOT_HERE` is the kit's own root as a bridgeable value**, spelled
 relative to the current directory by `GATE_KIT_ROOTS_HERE`'s rule and for its
@@ -12781,7 +12844,8 @@ placement; and (H) a held declaration's ground reachable in one hop.
   one producer:** a step *computes* a digest when it invokes `sha256sum` without
   `-c`; no job may compute more than one, and a job that downloads a run artifact
   and uploads none may compute none at all. Verification (`sha256sum -c`) is
-  unrestricted — it is what `pack-installer.sh` and the installer do, and it is
+  unrestricted — it is what the installer does, and what the `--pack-installer`
+  arm now does in-crate rather than by spawning the program at all, and it is
   the opposite of the failure being prevented.
 
   Two absences are reported rather than red, and each for a stated reason. A

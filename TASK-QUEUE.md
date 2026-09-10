@@ -431,7 +431,8 @@
   very next commit, with `install-smoke-macos-intel` PASSING the second time on the same code path
   and the same three declared targets. What is left is the leg, not a fire.
   **What failed.** In run 34267324532 (job 102200720560), the upgrade arm's pack step:
-  `scripts/pack-installer.sh` exited non-zero in 1.6 seconds having printed NOTHING —
+  the packer as it then was, `scripts/pack-installer.sh`, exited non-zero in 1.6
+  seconds having printed NOTHING —
   `run-smoke.sh`:877 echoes `PACK_OUT` to stderr and `PACK_OUT` was empty. Every other arm on that
   leg passed (main, toolchain-free, jq-less), and the SIBLING arm64 leg ran the same upgrade arm on
   the same commit with the same three declared targets and finished clean.
@@ -6357,7 +6358,7 @@
   needs no deprecation marker, so that arm of the major-bump criterion is unreachable by design.
   **The instance, probed rather than assumed.** The `freshness-cohort-roadmap-hold-and-batch`
   iteration deleted `drift-kit/bin/trajectory.sh` and `queue-kit/bin/roadmap.sh`. Both shipped:
-  `scripts/pack-installer.sh` recursively copies each enumerated kit root into the payload, `bin/`
+  the `--pack-installer` arm recursively copies each enumerated kit root into the payload, `bin/`
   included, so a consumer who scripted a direct invocation now gets file-not-found. And
   `CANON_KIT_DEPRECATION_MARKERS` defaults empty in `canon-kit/lib/spec.sh`, so no marker ever
   rode either script and none could.
@@ -7231,7 +7232,7 @@
   config bridge is a single-producer surface and moving where a knob's value is computed for one
   caller is the criterion-6 question in miniature.
   **Cost while deferred:** a fixture-suite run leaves scratch inside a tracked fixture corpus,
-  which `pack-installer.sh` then vendors, breaking `checkwright init` at `git add` and reddening
+  which the pack arm then vendors, breaking `checkwright init` at `git add` and reddening
   `installer_smoke` for the WRONG reason — which is what masked a ruled scenario at this
   iteration's validate and cost a diagnosis.
   **The baseline row was NOT re-attributed to this entry, ruled 2026-08-24 and recorded so the
@@ -8391,12 +8392,12 @@
   `.github/workflows/gates.yml` installs or pins shellcheck, so CI takes whatever the runner image
   ships and that floats under this repo without a signal.
   **The finding was a true positive for the older analyser and a false positive for the code** —
-  `gate_exe_suffix`'s argument-passing callers live in `gate-sdk/bin/build-native.sh` and
-  `scripts/pack-installer.sh`, so a per-file analysis cannot tell an optional-by-contract parameter
-  from an unused one. Silenced inline with a justifying comment, the remedy the gate's own help
-  prescribes. **The class is not that finding.** It is that this member wraps an external analyser
-  whose rule set changes between releases, which makes 106/106 a claim about one machine; every
-  other member is deterministic given the tree.
+  `gate_exe_suffix`'s argument-passing callers then lived in `gate-sdk/bin/build-native.sh` and
+  `scripts/pack-installer.sh` alone, so a per-file analysis could not tell an optional-by-contract
+  parameter from an unused one. Silenced inline with a justifying comment, the remedy the gate's
+  own help prescribes. **The class is not that finding.** It is that this member wraps an
+  external analyser whose rule set changes between releases, which makes 106/106 a claim about
+  one machine; every other member is deterministic given the tree.
   **DISTINCT from any entry about the gate's own logic** — the gate behaved correctly and reported
   honestly on both hosts. **DISTINCT from the Windows-host inventory finding that shellcheck is
   ABSENT there**: absence is graded and visible, a version skew is silent and reverses a verdict.
@@ -8415,9 +8416,11 @@
   lands silently. Enforcement-first says an invariant and its gate ship together.
   **The filed sizing was a cheap literal scan with `lib/gate.sh` exempt, and the drain's
   re-verification did not survive it.** That scan is NOT clean at HEAD: `bin/build-native.sh`
-  and `scripts/pack-installer.sh` each spell the suffix in a parameter-expansion STRIP, and
-  both are correct — they strip before asking the owner for the right one — while the SPEC
-  section stating the invariant necessarily spells it in stating it. So the gate cannot be a
+  spells the suffix in a parameter-expansion STRIP and is correct — it strips before asking the
+  owner for the right one — while the SPEC section stating the invariant necessarily spells it in
+  stating it. The packer carried the second such strip until `pack-installer-cut-to-a-non-gate-arm`
+  moved it into `lib/gate.sh`, which the filed sizing already exempts, so the corpus shrank by one
+  file and the design question is untouched. So the gate cannot be a
   literal scan. It has to discriminate a strip from an emit, or carry a declared-exemption
   model, and that discrimination is the design question this entry actually owns.
   **The live neighbour that keeps it honest**: the crate's `PATHEXT`-derived candidate set

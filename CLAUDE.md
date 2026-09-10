@@ -193,8 +193,8 @@ load behind that trigger, so they are not resident here.
   tarball and the npm package), repo-root-governed, no owning kit; its layout is
   installer/README.md. Not a kit either, and must not become one — by the same
   predicate stated under `native/` above. Its payload is never committed; the
-  out-of-tree assembler is `scripts/pack-installer.sh`, whose boundary and port
-  disposition installer/README.md §The packer owns.
+  out-of-tree assembler is the gate binary's `--pack-installer` arm, whose
+  boundary and route installer/README.md §The packer owns.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns
   (off an implementation, a gate's source, a commit, or a prior/sibling
   deliverable)? stamp it in the moment with
