@@ -114,14 +114,19 @@ own header.
   nothing rebuilt on the smoke's host — reaching its artifact-present branch. The
   same pair on one run the two macOS lines rest on, asked for by the same header.
   WSL stays a route you may choose instead, served by the Linux line.
+- `aarch64-unknown-linux-gnu` (held: one `gates` run carrying both a `native-artifacts` green for this triple and a green `install-smoke-linux-arm64` that consumed that upload and reached its artifact-present branch)
+  — Linux on arm64. The installer's host detector already maps this host, so an
+  adopter on it reaches a refusal rather than a wrong artifact; what is missing
+  is the run.
 
 <!-- platforms:end -->
 
 A platform this page does not state as supported is **absent** from that block
-rather than held, because a held entry is still a support claim. No platform is
-held today — every declared one is joined — and the `held` state stays in the
-grammar because it is what lets the next platform be declared before it is
-published rather than appearing fully formed. A roster line may not exceed what
+rather than held, because a held entry is still a support claim. One platform is
+held today. The `held` state is in the grammar precisely so the next platform can
+be declared before it is published rather than appearing fully formed, and this
+is the first use of it: a held line is a stated precondition and an explicit
+*not yet*, never a support claim. A roster line may not exceed what
 this page states (gate-sdk/SPEC.md §Consumer payload), and this block is the
 surface that makes that bound readable rather than a matter of who remembered to
 check.

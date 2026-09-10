@@ -23,7 +23,12 @@
 # On that observation, three edits and nothing else: this file gains <T>'s line,
 # native/runners.list already names its runner, and docs/install.md
 # §Requirements' platform declaration flips <T> from `held` to `joined`. Those
-# three move together or not at all.
+# three move together or not at all. What that sentence does not say is what
+# lands FIRST, and a reader supplying the natural order gets it backwards: the
+# `held` DECLARATION is what creates <T>'s producer leg — gates.yml's roster job
+# parses docs/install.md and only then looks the runner up, refusing loudly on an
+# unmapped target — so the declaration and the runner mapping land in one commit,
+# well before the observation, and a runners.list line alone creates nothing.
 #
 # ONE OBLIGATION THE FIRST OF THOSE THREE INCURS. The binary's source stamp is
 # git's content identity for EVERY tracked file under the crate root
