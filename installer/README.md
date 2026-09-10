@@ -1443,12 +1443,92 @@ battery itself enumerates, so the shipped set cannot drift from the governed
 one, and the assembly happens under `INSTALLER_PACK_TMP_DIR` rather than in
 tree.
 
-**The payload is stamped with the commit it was packed from, so the tree must be
-clean.** That stamp is the whole of what makes a vendored tree resolvable to an
-upstream state, and a dirty tree would stamp a commit the payload does not
-describe — so the packer refuses instead of stamping one. The version stamped
-beside it comes from the newest reachable tag unless `--version` names one, and
-never from an edit to `installer/package.json`.
+**The payload is stamped with the commit it was packed from, and the refusal
+protecting that stamp asks about the payload's own footprint rather than about
+the whole worktree.** That stamp is the whole of what makes a vendored tree
+resolvable to an upstream state. The version stamped beside it comes from the
+newest reachable tag unless `--version` names one, and never from an edit to
+`installer/package.json`.
+
+**The footprint has three members, and it is derived rather than listed.** A
+scoped refusal is unstateable without one, and a wrong scoping under-refuses
+silently on a genuinely dirty path — the failure the refusal exists to prevent —
+so the pathspec is computed from the same two resolvers the pack loop itself
+runs and cannot drift from the packed set. A hand-maintained list here would be
+that under-refusal hazard reintroduced as a maintenance burden.
+
+- **The tracked set at the stamped commit**, under `installer/` and under each
+  root the kit-root resolver yields. Its bytes come from `git archive` at that
+  commit, so they are the *commit's* bytes and no worktree edit can reach them.
+  This is the member a reader is most likely to assume is at risk and the one
+  member that never is.
+- **The kit-root set itself**, decided in the worktree rather than in the
+  commit: the resolver admits a root by testing for a `checks/` or `smoke/`
+  directory on disk and the pack loop tests the root's own existence again, so a
+  tracked kit root deleted in the worktree is dropped from the payload while the
+  stamp names the commit that carries it. That is a real divergence between
+  payload and stamp and the sharpest reason the refusal is not simply redundant,
+  and it is why the pathspec deliberately does not apply the pack loop's own
+  `is_dir` filter — filtering by it would blind the check to exactly this case.
+- **The native target roster**, copied verbatim out of the worktree when
+  `--artifacts` is given, and a payload input only then. Where the roster knob
+  resolves **inside** the packed tree, its dirty bytes would ship under a stamp
+  that does not describe them; where it resolves outside — the Windows leg
+  steers it to a scratch file — no clean-tree check ever covered it and none
+  can.
+
+What is **not** a member: the `--artifacts` tree, which is outside the worktree
+by contract, and every other path in the repository, which the payload neither
+ships nor reads.
+
+**The refusal is that footprint's `git status --porcelain`.** A member resolving
+outside the packed tree is dropped from the pathspec rather than handed to git,
+which refuses a path outside the repository. Untracked-but-not-ignored paths
+inside the footprint still refuse: they do not ship and they cannot make the
+stamp wrong, so the conservative reading needs its own ground and has one — an
+untracked file under a packed root means the tree under test and the tree that
+will be packed differ, which is precisely what the consumer smoke exists to
+notice. Ignored paths stay invisible here as they always have, which is why the
+pack reproduces the tracked set with `git archive` rather than copying the
+directory. The diagnostic names the offending entries — bounded, with a total —
+beside the tree it checked, so a reader tells a shipping path from scratch
+without re-running `git status` by hand.
+
+**The refusal has two grounds, and stating only one is what let the predicate
+over-reach.** This section used to ground it in the stamp alone — *a dirty tree
+would stamp a commit the payload does not describe* — which is true of members
+two and three and **false of member one**, most of the packed set; the gap
+between the stated reason and the actual predicate is what let the predicate
+stay wider than anything it protected. The two grounds it actually has are the
+stamp, on the two members the worktree can reach, and the tree-under-test
+property, for the consumer smoke.
+
+**Two properties are preserved and one is dropped, deliberately.** Preserved:
+the stamp describes the payload, because the only two paths on which that could
+fail are members two and three and both are inside the pathspec. Preserved: the
+consumer smoke asserts on the tree it means, since an edit to a shipping path
+still refuses rather than being quietly replaced by the commit's bytes. Dropped:
+a dirty path the payload neither ships nor reads does not abort the pack. The
+attested instance is `.workflow/gap-inbox.md`, the one artifact this
+repository's always-loaded manifest instructs every mid-iteration session to
+write. **Its honest limit, because the narrowing does not reach as far as the
+instance:** that run aborted at §The consumer smoke's own whole-tree
+precondition, which every validate run reaches before any pack call site, so
+what this removes is the pack's share of the cost and not the smoke's. That
+precondition is a separate predicate on a separate surface and is untouched
+here.
+
+**Three alternatives are refused.** *Ruling gap-inbox commit ownership* so that
+file is never dirty across a stage boundary answers one dirty path and leaves
+the predicate wrong for every other one. *Stating the pre-flight valve as the
+sanctioned response* makes overriding a correct refusal the routine move, which
+is the habit that gets a genuinely dirty tree packed — a valve firing on every
+ordinary iteration stops being read. *Deriving the kit-root set from the stamped
+commit* instead of from the worktree would shrink the footprint to two members
+and make member two immune the way member one is, but the kit-root derivation is
+shared library mechanism the whole battery runs on, and a second, commit-scoped
+derivation inside the pack path would be a duplicate with nothing holding the
+two together; the scoped refusal covers the same divergence at no such cost.
 
 **The caller names the tree it means.** `--root` takes the work-tree top level
 to pack and stamp, and the value is validated to be one: silently promoting a

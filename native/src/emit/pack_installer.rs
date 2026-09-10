@@ -133,18 +133,19 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
         ));
     }
 
-    // spec: installer/README.md §The packer — a dirty tree would stamp a commit that does not
-    // describe the payload, and that stamp is what makes a vendored tree resolvable upstream
-    let dirty = git(&["status", "--porcelain"])?;
+    // spec: installer/README.md §The packer — the refusal asks about the payload's own footprint
+    // rather than the whole worktree, on both grounds that section states: the stamp, on the two
+    // members the worktree can reach, and the tree-under-test property across the whole footprint
+    let spec = footprint(&root, &f.artifacts)?;
+    let mut status: Vec<&str> = vec!["status", "--porcelain", "--"];
+    status.extend(spec.iter().map(String::as_str));
+    let dirty = git(&status)?;
     if !dirty.is_empty() {
         return Err(refuse_help(
-            format!(
-                "the worktree at {} is dirty — refusing to stamp a commit the payload does not match.",
-                root
-            ),
+            dirty_cause(&root, &dirty),
             &[
                 "this is checked once per invocation, against the tree as it is now — not as it was when your run started, so a concurrent edit during a long run trips it here rather than at the point you invoked the run.",
-                "commit or stash first; the stamp is what makes the vendoring auditable.",
+                "commit or stash first; a dirty path in this footprint is either one the stamp would misdescribe or one that makes the tree under test not the tree that gets packed.",
             ],
         ));
     }
@@ -264,6 +265,68 @@ fn resolve_version(given: &str) -> Result<String, Refusal> {
     Ok(version)
 }
 
+// spec: installer/README.md §The packer — the payload's tree footprint, DERIVED from the same two
+// resolvers the pack loop itself runs so the refusal's corpus cannot drift from the packed set;
+// the roster rides on `--artifacts`, which is what makes it a payload input at all
+fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
+    let mut spec = vec!["installer".to_string()];
+    // spec: installer/README.md §The packer — the pack loop's own on-disk `is_dir` test is
+    // deliberately NOT applied here: filtering the pathspec by it would blind the refusal to the
+    // one divergence only it can see
+    for kit in walk::kit_roots_rel().map_err(refuse)? {
+        if let Some(p) = inside(root, kit.trim_end_matches('/')) {
+            spec.push(p);
+        }
+    }
+    if !artifacts.is_empty() {
+        let roster = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE").map_err(refuse)?;
+        if let Some(p) = inside(root, &roster) {
+            spec.push(p);
+        }
+    }
+    Ok(spec)
+}
+
+// spec: installer/README.md §The packer — a member outside the packed tree is dropped rather than
+// handed to git, which refuses one; the test is lexical because a kit root deleted from the
+// worktree still belongs in the pathspec and cannot be canonicalized
+fn inside(root: &str, path: &str) -> Option<String> {
+    let root = root.trim_end_matches('/');
+    let rel = if path.starts_with('/') {
+        let tail = path.strip_prefix(root)?;
+        if !tail.is_empty() && !tail.starts_with('/') {
+            return None;
+        }
+        tail.trim_start_matches('/').to_string()
+    } else {
+        path.to_string()
+    };
+    if rel.split('/').any(|s| s == "..") {
+        return None;
+    }
+    Some(if rel.is_empty() { ".".to_string() } else { rel })
+}
+
+// spec: installer/README.md §The packer — the refusal names the entries it found, bounded and with
+// a total, so a reader tells a shipping path from scratch without re-running `git status` by hand
+const DIRTY_SHOWN: usize = 10;
+
+fn dirty_cause(root: &str, dirty: &str) -> String {
+    let entries: Vec<&str> = dirty.lines().collect();
+    let mut cause = format!(
+        "{} path(s) the payload is assembled from are dirty in the worktree at {}:",
+        entries.len(),
+        root
+    );
+    for e in entries.iter().take(DIRTY_SHOWN) {
+        cause.push_str(&format!("\n  {}", e));
+    }
+    if entries.len() > DIRTY_SHOWN {
+        cause.push_str(&format!("\n  (and {} more)", entries.len() - DIRTY_SHOWN));
+    }
+    cause
+}
+
 fn is_commit(c: &str) -> bool {
     c.len() == 40 && c.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
@@ -274,10 +337,13 @@ fn env_or(name: &str) -> Option<String> {
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — git's stdout is reachable only through the
 // accessor that read the status, so a failed probe cannot be read as an empty answer
+// spec: installer/README.md §The packer — trailing whitespace only: a porcelain entry's first two
+// bytes ARE its state code, so trimming both ends would re-column the one line the dirty
+// diagnostic prints first, and no other caller here reads a leading blank
 fn git(args: &[&str]) -> Result<String, Refusal> {
     let done = proc::run("git", args).map_err(refuse)?;
     match done.stdout() {
-        Some(o) => Ok(String::from_utf8_lossy(o).trim().to_string()),
+        Some(o) => Ok(String::from_utf8_lossy(o).trim_end().to_string()),
         None => Err(refuse(format!(
             "git {} failed — {}",
             args.join(" "),
@@ -585,5 +651,42 @@ mod tests {
     fn every_refusal_carries_the_prefix_and_exits_two() {
         assert_eq!(report(&refuse("cause")), 2);
         assert_eq!(report(&refuse_help("cause", &["do this"])), 2);
+    }
+
+    // spec: installer/README.md §The packer — a footprint member outside the packed tree is
+    // dropped rather than handed to git, and one inside it crosses as its repo-relative spelling.
+    #[test]
+    fn only_members_inside_the_packed_tree_enter_the_pathspec() {
+        assert_eq!(inside("/w", "gate-sdk"), Some("gate-sdk".to_string()));
+        assert_eq!(inside("/w", "/w/native/targets.list"), Some("native/targets.list".to_string()));
+        assert_eq!(inside("/w/", "/w/installer"), Some("installer".to_string()));
+        assert_eq!(inside("/w", "/tmp/host-targets.list"), None);
+        assert_eq!(inside("/w", "/w-other/targets.list"), None);
+        assert_eq!(inside("/w", "../outside"), None);
+        assert_eq!(inside("/w", "kits/../../outside"), None);
+    }
+
+    // spec: installer/README.md §The packer — a worktree-deleted kit root is exactly what the
+    // refusal must still see, so the whole tree is the pathspec when a member resolves to the root
+    // itself rather than the member being silently dropped.
+    #[test]
+    fn a_member_that_is_the_root_itself_spells_the_whole_tree() {
+        assert_eq!(inside("/w", "/w"), Some(".".to_string()));
+    }
+
+    // spec: installer/README.md §The packer — the diagnostic names the entries it found, bounded,
+    // and states the total so a truncated list is never read as the whole of it.
+    #[test]
+    fn the_diagnostic_is_bounded_and_states_the_total() {
+        let few = dirty_cause("/w", " M installer/README.md\n?? installer/x");
+        assert!(few.starts_with("2 path(s) the payload is assembled from are dirty in the worktree at /w:"));
+        assert!(few.contains("\n   M installer/README.md") && few.contains("\n  ?? installer/x"));
+        assert!(!few.contains("(and"));
+
+        let many: Vec<String> = (0..DIRTY_SHOWN + 3).map(|i| format!("?? installer/f{}", i)).collect();
+        let lots = dirty_cause("/w", &many.join("\n"));
+        assert!(lots.starts_with(&format!("{} path(s)", DIRTY_SHOWN + 3)));
+        assert_eq!(lots.matches("?? installer/f").count(), DIRTY_SHOWN);
+        assert!(lots.ends_with("(and 3 more)"));
     }
 }

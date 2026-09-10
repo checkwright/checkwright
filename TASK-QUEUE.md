@@ -42,45 +42,6 @@
   Filed 2026-09-06 by build on the lead's deferral of the cut, the same amendment's other deltas
   having landed and closed `pack-installer-no-owning-spec-section`; promoted 2026-09-10 at spec.
 
-- **pack-step-dirty-tree-predicate-unscoped** [spec: SPEC-pack-clean.md]
-  — the pack step refuses on a whole-tree dirty check, so a dirty path the payload never ships and
-  never reads aborts the pack and with it validate's battery. The amendment is
-  `installer/SPEC-pack-clean.md`; its four deltas, their work classes, the refused alternatives and
-  the update-target roster are its own and are not restated here.
-  **THE SHAPE IS CHOSEN AT THIS SPEC**, which is what the design-pending state was recording: scope
-  the refusal to the paths the payload is assembled from, with that footprint DERIVED from the two
-  resolvers the pack loop already runs rather than listed — a hand-listed pathspec is the
-  under-refusal hazard reintroduced as maintenance. The other two candidates are refused on the
-  amendment's own record, as is a fourth the authoring found.
-  **THE STATED REASON WAS WIDER THAN THE PREDICATE AND ALSO NARROWER, which the authoring settled.**
-  Payload CONTENT is reproduced from the stamped commit by `git archive`, so no worktree edit can
-  reach it; exactly two paths let the worktree diverge from the stamp — the kit-root SET, decided by
-  a directory test, and the target roster, copied verbatim — and both are inside the new pathspec.
-  **JOINED TO `packer-port-terminal-cut` ON SHARED SURFACE — `lead, own-authority` 2026-09-10,
-  through the lead's escalation reply to scope; NOT the operator's.** The join's ground is
-  producer/consumer rather than adjacency: this is a defect in the file
-  `pack-installer-cut-to-a-non-gate-arm` rewrites, so cutting first and deciding this predicate
-  later ports a known defect into the new arm. The cut lands first and this amendment is authored
-  against the arm it mints — an order that is PRICED rather than blocking, so it takes the valve
-  below rather than a blocker tag: a batch reaching this amendment first lands the same deltas in
-  the shell form and they move with it, at the cost of one rewrite.
-  [precondition-ok: the amendment prices the fallback if a batch reaches it first]
-  **ASSERTION C WILL FIRE at the stage after spec:** the cut's amendment spans `installer/`,
-  `native/`, `gate-sdk/` and `.github/workflows/` — four component dirs — so `check-stage-entry`
-  demands the audit stamp or a ruled waiver. Recorded here rather than left for align to discover.
-  **Measured, not inferred.** At the filing iteration's validate the check gated on an unscoped
-  `git status --porcelain`; the sole dirty path was one uncommitted `.workflow/gap-inbox.md`
-  bullet — the exact artifact CLAUDE.md tells every mid-iteration session to file — and the run
-  aborted at exit 1 before writing its evidence file, after 16 of 22 suites had run clean. The
-  judged recurrence's own firing is `binding-intel-leg-failed-one-run-in-two`'s record, not this
-  entry's.
-  **DISTINCT from `gap-inbox-commit-ownership`**: that entry owns who *commits* a gap-inbox bullet,
-  where this narrow fix lands without that question being answered at all.
-  recurrence: pack-step-dirty-tree-predicate-unscoped 2026-09-08
-  Filed 2026-09-01 by close's gap drain, promoted from a lead-filed bullet; iceboxed 2026-09-06 at
-  `0b6545d7` under the port-only run; returned 2026-09-09 at scope on the judged recurrence;
-  promoted 2026-09-10 at spec with its amendment.
-
 ## Technical Debt
 
 ## Deferred
@@ -447,10 +408,13 @@
   **Ruled 2026-09-08 by the lead, own-authority: CARRY it, do not unbind** — unbinding would reverse
   this iteration's own delivered predicate on a single sample, and the sibling-leg control already
   excludes the roster count as the cause.
-  **DISTINCT in subject from `pack-step-dirty-tree-predicate-unscoped`**, whose subject is the pack
-  step's silence; this entry's is a red binding leg and what to do about it. That silence is what
-  made the red unreadable from a finished run, and its firing here is the recurrence that entry now
-  carries.
+  **DISTINCT in subject from `pack-step-dirty-tree-predicate-unscoped`**, whose subject is that
+  refusal's SCOPE alone; this entry's is a red binding leg and what to do about it. The joined cut
+  answered the silence incidentally — one refusal formatter, so the arm has no exit path that
+  prints nothing — and the diagnosis of THIS firing stays here, because a signal-killed process
+  prints nothing whatever the code does. That silence is what made the red unreadable from a
+  finished run, and its firing here is still the recurrence that entry carries.
+  `lead, own-authority` 2026-09-10 by escalation reply, relayed by the lead, NOT the operator's.
   **Cost while deferred:** a re-run is the only diagnosis available, and the next firing costs
   another one. Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join`, which no
   stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the
@@ -10677,5 +10641,7 @@
 - **edges-retired-block-name-clash** [design-pending] — A live gate name inflates a retired slug.
 
 ## Done
+
+- pack-step-dirty-tree-predicate-unscoped
 
 ## Lessons Learned

@@ -10,7 +10,9 @@ REPO="$(dirname "$REPO")"
 BASE="${INSTALLER_SMOKE_TMP_DIR:-${TMPDIR:-/tmp}}"
 [[ -d "$BASE" ]] || { echo "INSTALLER-SMOKE: scratch base not a directory: $BASE" >&2; exit 2; }
 SCRATCH="$(mktemp -d "$BASE/installer-smoke.XXXXXX")" || exit 2
-cleanup() { rm -rf "$SCRATCH"; }
+# spec: installer/README.md §The packer — the footprint witness in the pack arm plants an untracked file INSIDE the worktree, the one thing this harness otherwise never does, so its removal joins the scratch teardown instead of resting on the line that removes it inline: a signal arriving between the plant and the pack would otherwise leave the tree dirty for every later run on this machine
+FOOT_PLANT=""
+cleanup() { rm -rf "$SCRATCH"; [[ -z "$FOOT_PLANT" ]] || rm -f "$FOOT_PLANT"; }
 trap cleanup EXIT
 
 # spec: evidence-kit/SPEC.md §Layout and configuration — the unindented arm headers below are a PARSED contract, not narration: the installer_smoke validate parser derives its scenario roster from these `printf` lines and names each scenario by the literal before the parenthetical, so rewording one renames a baseline scenario and changing the header's shape empties the roster
@@ -169,6 +171,35 @@ plant_out="$(cd "$REPO" && GATE_SDK_NATIVE_TARGETS_FILE="$SCRATCH/planted-target
 grep -q 'has no artifact directory' <<<"$plant_out" \
     || { printf '%s\n' "$plant_out" >&2; fail "pack refused the planted roster, but for something other than the declared target it had no artifact for"; }
 say "pack: a declared target with no artifact directory refused, not packed narrower"
+
+# spec: installer/README.md §The packer — the scoped refusal is WITNESSED rather than argued: the whole of the narrowing is a behavioural DIFFERENCE between two dirty trees, so no inspection can clear it and only a pair of plants can show it. The precondition at the top of this file already proved the tree clean, so each plant is the only dirty path while it stands, and it is removed before its verdict is read
+FOOT_OUT="$SCRATCH/footprint-pack"
+mkdir -p "$FOOT_OUT" || fail "could not make the footprint witness's output directory"
+footprint_pack() {   # $1 = a path to plant untracked; echoes the pack's output, returns its status
+    FOOT_PLANT="$1"
+    : > "$FOOT_PLANT" || fail "could not plant $FOOT_PLANT for the footprint witness"
+    local out rc
+    out="$(cd "$REPO" && INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh \
+        --pack-installer --root "$REPO" --version "$VERSION" --out "$FOOT_OUT" \
+        --artifacts "$PACK_ARTIFACTS" 2>&1)"; rc=$?
+    rm -f "$FOOT_PLANT" || fail "could not remove the footprint witness's plant at $FOOT_PLANT"
+    FOOT_PLANT=""
+    printf '%s\n' "$out"
+    return "$rc"
+}
+foot_out="$(footprint_pack "$REPO/.pack-footprint-witness")"; foot_rc=$?
+[[ "$foot_rc" -eq 0 ]] \
+    || { printf '%s\n' "$foot_out" >&2; fail "an untracked path OUTSIDE the payload's footprint aborted the pack — the refusal is still whole-tree, and a dirty path the payload neither ships nor reads still costs a validate battery"; }
+say "pack: a dirty path outside the footprint packs clean"
+foot_out="$(footprint_pack "$REPO/installer/.pack-footprint-witness")"; foot_rc=$?
+[[ "$foot_rc" -ne 0 ]] \
+    || fail "an untracked path INSIDE the payload's footprint packed clean — the narrowing dropped a path the refusal must still cover"
+grep -q 'the payload is assembled from are dirty' <<<"$foot_out" \
+    || { printf '%s\n' "$foot_out" >&2; fail "pack refused the footprint plant, but for something other than a dirty path inside the footprint"; }
+grep -q '\.pack-footprint-witness' <<<"$foot_out" \
+    || { printf '%s\n' "$foot_out" >&2; fail "the scoped refusal did not NAME the offending path, so a reader still has to re-run git status by hand"; }
+say "pack: a dirty path inside the footprint refuses, naming the path it found"
+rm -rf "$FOOT_OUT"
 
 # spec: installer/README.md §The consumer smoke — the install is from the packed tarball with --offline, which is what proves the claim the install page makes: a one-shot vendoring installer resolves nothing from a registry, so the payload must already be inside the tarball
 printf 'install (from the tarball, --offline)\n'

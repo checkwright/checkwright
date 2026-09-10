@@ -213,8 +213,10 @@ jobs:
             fi
           done < <(gate_native_targets)
 
-          # The pack step refuses a dirty worktree, so its scratch and its output
-          # both live outside the checkout.
+          # The pack step refuses a dirty path inside the payload's footprint —
+          # installer/, the kit roots, and the target roster it copies — so its
+          # scratch and its output both live outside the checkout rather than
+          # depending on where inside it they would have landed.
           out="$RUNNER_TEMP/dist"
           mkdir -p "$out"
           INSTALLER_PACK_TMP_DIR="$RUNNER_TEMP" \

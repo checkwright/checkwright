@@ -14,8 +14,9 @@ refused alternatives and the reachability obligation it discharges already sit i
 SPEC (CLAUDE.md §The provenance seam), so what follows is mechanism.
 
 **What this amendment does *not* decide.** The pack step's clean-tree predicate
-is the sibling amendment `installer/SPEC-pack-clean.md`'s, joined to this cut on
-shared surface. This one mints the arm; that one scopes the arm's refusal.
+was the sibling amendment's, joined to this cut on shared surface and since
+merged into `installer/README.md` §The packer. This one mints the arm; that one
+scoped the arm's refusal.
 
 **The seam this cut crosses, ruled here because the cut is the first thing to
 move mechanism from a repo-private script into an artifact every adopter
