@@ -226,7 +226,18 @@ recoverable:
   born-native repo-root member at `precommit` tier, so the lockstep is
   machine-held rather than discipline: a `joined` declaration with no roster
   line reds, a roster line no bullet declares `joined` reds, and a hold reds on
-  an empty precondition or on a roster line it should not have. It carries a
+  an empty precondition or on a roster line it should not have.
+  **The binding is four-way, not three-way, and the fourth and fifth surfaces
+  are the two host detectors** — `target_of_host` in
+  `installer/bin/checkwright.sh` and `Get-HostTarget` in
+  `installer/bin/checkwright.ps1`, whose extraction shapes installer/README.md
+  §The gate binary pins. Each detector's **emitted** triple set is held equal to
+  the block's **declared** set — equality rather than containment, because each
+  direction closes a distinct failure. A triple a detector emits that the block
+  does not declare is the attested case: detected by the installer while on no
+  roster, with nothing going red. A triple the block declares that no detector
+  emits is a support claim the installer can never honour, and it has no live
+  instance, which is exactly why it is asserted rather than assumed. It carries a
   fourth arm that asserts nothing and reports instead — per held platform, the
   count of registry members a host with no published artifact loses, printed on
   the clean line as well as the red one. **That arm carries two limits, and it

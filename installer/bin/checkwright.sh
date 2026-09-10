@@ -28,11 +28,20 @@ PAYLOAD="$INSTALLER/payload"
 [[ -d "$PAYLOAD" ]] || die "this package carries no payload" \
     "the bootstrap runs the gate binary out of the package's own payload/, assembled at pack time — run it from an installed package, not from a source checkout."
 
+# spec: installer/README.md §The gate binary — the detector's whole input, factored out so a refusal
+# can name what the host was detected AS rather than only that it mapped to nothing
+host_shape() {   # -> `<os>/<arch>` exactly as this host reports itself
+    printf '%s/%s' "$(uname -s 2>/dev/null)" "$(uname -m 2>/dev/null)"
+}
+
 # spec: installer/README.md §The gate binary — step 2: which published artifact fits this host. Two
 # fields rather than `uname -a` because that is the smallest input answering the question and the
 # one a PowerShell half can answer without parsing prose
+# spec: installer/README.md §The gate binary — every mapped triple here is the sole single-quoted
+# operand of a `printf` and appears nowhere else in this function, which is the shape
+# check-install-platforms extracts this detector's triple set from
 target_of_host() {   # -> the Rust target triple this host is, empty when it maps to none
-    case "$(uname -s 2>/dev/null)/$(uname -m 2>/dev/null)" in
+    case "$(host_shape)" in
         Linux/x86_64)               printf 'x86_64-unknown-linux-gnu' ;;
         Linux/aarch64|Linux/arm64)  printf 'aarch64-unknown-linux-gnu' ;;
         Darwin/x86_64)              printf 'x86_64-apple-darwin' ;;
@@ -45,6 +54,22 @@ target_of_host() {   # -> the Rust target triple this host is, empty when it map
     esac
 }
 
+# spec: installer/README.md §The gate binary — the libc question, answered beside the other refusals
+# rather than inside the detector: two questions, two places, and each verdict rests on a POSITIVE
+# signal, so an unidentifiable libc refuses rather than being read as glibc
+libc_flavour() {   # -> musl | gnu | unknown
+    local ld
+    for ld in /lib/ld-musl-*; do
+        [[ -e "$ld" ]] && { printf 'musl'; return; }
+    done
+    if getconf GNU_LIBC_VERSION >/dev/null 2>&1 \
+        || ldd --version 2>&1 | grep -qiE 'gnu libc|glibc'; then
+        printf 'gnu'
+        return
+    fi
+    printf 'unknown'
+}
+
 # spec: installer/README.md §The gate binary — step 3: selection keeps three outcomes and only one
 # of them proceeds, and they stay told apart by message and remedy rather than by exit status alone
 # — an undeclared host and a broken payload remain different answers to an adopter
@@ -55,14 +80,30 @@ select_artifact() {
     dir="$PAYLOAD/artifact"
     target="$(target_of_host)"
     if [[ ! -d "$dir" ]]; then
-        die "this host maps to no target this payload declares" \
+        die "this host, detected as $(host_shape), maps to no target this payload declares" \
             "the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
     fi
     roster="$dir/targets.list"
     [[ -f "$roster" ]] || die "this payload carries prebuilt gate binaries but no target roster" \
         "the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower."
+    # spec: installer/README.md §The gate binary — the one case where the roster grep cannot refuse
+    # for us: `uname` cannot tell glibc from musl, so a musl host resolves to a triple that IS on
+    # the roster and would be handed a binary that dies in the dynamic loader
+    if [[ "$target" == *-linux-gnu ]]; then
+        case "$(libc_flavour)" in
+            gnu) : ;;
+            musl)
+                die "this host, detected as $(host_shape), runs a musl C library, and every Linux artifact this payload carries is linked against glibc" \
+                    "musl and glibc are not interchangeable at the dynamic loader, so a glibc build would die there rather than run. This payload carries no musl artifact, so there is no adopter action to take."
+                ;;
+            *)
+                die "this host, detected as $(host_shape), did not identify its C library, and every Linux artifact this payload carries is linked against glibc" \
+                    "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib — so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
+                ;;
+        esac
+    fi
     if [[ -z "$target" ]] || ! grep -Ev '^[[:space:]]*(#|$)' "$roster" | grep -qxF "$target"; then
-        die "this host maps to no target this payload declares" \
+        die "this host, detected as $(host_shape), maps to no target this payload declares" \
             "the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
     fi
     src="$dir/$target"

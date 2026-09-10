@@ -11,5 +11,9 @@
 - `x86_64-apple-darwin` (held: a green producer leg consumed by a platform smoke leg) — held
   and yet a live roster line: the roster write whose declaration flip was
   forgotten, arm C's second half.
+- `aarch64-pc-windows-msvc` (held: a green producer leg consumed by a platform smoke leg) — held
+  with everything arms A through D ask for, and yet neither detector can ever
+  emit it: a support claim the installer could not honour if it wanted to, which
+  is arm E's reverse direction.
 
 <!-- platforms:end -->

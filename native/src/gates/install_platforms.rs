@@ -1,6 +1,6 @@
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the install
-// page's platform declaration block and native/targets.list hold lockstep both directions, a
-// `held` platform carries a stated precondition, and each one's omitted-member count is printed
+// page's platform declaration block, native/targets.list and both bootstraps' host detectors hold
+// lockstep, with each held platform's omitted count and each detector's triple count printed
 use crate::fresh;
 use crate::registry;
 use crate::walk;
@@ -11,6 +11,11 @@ const DEFAULT_INSTALL_MD: &str = "docs/install.md";
 // a read of GATE_SDK_NATIVE_TARGETS_FILE, whose value is a smoke's narrowed host roster: a bound
 // reading that would be discharged by the narrowing rather than by the declaration
 const DEFAULT_ROSTER: &str = "native/targets.list";
+// spec: installer/README.md §The gate binary — the two hand-kept host detectors, read as the
+// OWNERS of their triple sets rather than against a roster comment beside them, which would be the
+// second copy this whole binding exists to refuse
+const DEFAULT_BASH_BOOTSTRAP: &str = "installer/bin/checkwright.sh";
+const DEFAULT_PWSH_BOOTSTRAP: &str = "installer/bin/checkwright.ps1";
 const BEGIN: &str = "<!-- platforms:begin -->";
 const END: &str = "<!-- platforms:end -->";
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — two join
@@ -104,6 +109,93 @@ fn roster_triples(text: &str) -> Vec<String> {
         .collect()
 }
 
+// spec: installer/README.md §The gate binary — one detector, named by the function whose body owns
+// its triple set and by the verb whose sole single-quoted operand each mapped triple is
+struct Detector {
+    opener: &'static str,
+    label: &'static str,
+    verb: &'static str,
+}
+
+const BASH_DETECTOR: Detector = Detector {
+    opener: "target_of_host()",
+    label: "target_of_host",
+    verb: "printf",
+};
+
+const PWSH_DETECTOR: Detector = Detector {
+    opener: "function Get-HostTarget",
+    label: "Get-HostTarget",
+    verb: "return",
+};
+
+// spec: installer/README.md §The gate binary — the pinned shape: the verb's SOLE single-quoted
+// operand, so only whitespace may sit between the two. The empty operand is PowerShell's
+// no-mapping arm rather than a triple, and is dropped by the caller
+fn sole_quoted_after<'a>(line: &'a str, verb: &str) -> Option<&'a str> {
+    let at = line.find(verb)?;
+    let rest = &line[at + verb.len()..];
+    let open = rest.find('\'')?;
+    let gap = &rest[..open];
+    if gap.is_empty() || !gap.chars().all(char::is_whitespace) {
+        return None;
+    }
+    let body = &rest[open + 1..];
+    let close = body.find('\'')?;
+    Some(&body[..close])
+}
+
+// spec: installer/README.md §The gate binary — every failure here is a check that could not run and
+// never a pass: the function absent or renamed, its body unbounded, zero triples extracted, or the
+// file unreadable. An extraction that silently degrades to nothing is the one way a lockstep
+// assertion reports agreement it never tested
+fn detector_triples(path: &str, d: &Detector) -> Result<Vec<String>, String> {
+    if !Path::new(path).is_file() {
+        return Err(format!("host detector not found: {}", path));
+    }
+    let text = fresh::read_captured(path)?;
+    detector_triples_in(&text, path, d)
+}
+
+fn detector_triples_in(text: &str, path: &str, d: &Detector) -> Result<Vec<String>, String> {
+    let mut lines = text.lines();
+    if !lines.any(|l| l.trim_start().starts_with(d.opener)) {
+        return Err(format!(
+            "no `{}` in {} — the detector this gate reads is absent or renamed, so nothing was compared",
+            d.label, path
+        ));
+    }
+    let mut out: Vec<String> = Vec::new();
+    let mut closed = false;
+    for l in lines {
+        if l == "}" {
+            closed = true;
+            break;
+        }
+        if l.trim_start().starts_with('#') {
+            continue;
+        }
+        if let Some(q) = sole_quoted_after(l, d.verb) {
+            if !q.is_empty() && !out.iter().any(|e| e == q) {
+                out.push(q.to_string());
+            }
+        }
+    }
+    if !closed {
+        return Err(format!(
+            "`{}` in {} has no closing `}}` at column 0, so its body could not be bounded",
+            d.label, path
+        ));
+    }
+    if out.is_empty() {
+        return Err(format!(
+            "`{}` in {} extracted no triple — the pinned `{} '<triple>'` shape stopped matching",
+            d.label, path, d.verb
+        ));
+    }
+    Ok(out)
+}
+
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — arm D's corpus: the registry members that
 // resolve to a `.gate` descriptor are exactly what a host with no published artifact loses, so the
 // binary-less residual is a count over the live registry rather than a number carried in prose
@@ -144,6 +236,8 @@ fn omitted_report(held: &[&str]) -> String {
 fn rule(args: &[String]) -> Result<i32, String> {
     let install_md = fresh::positional(args, 0, DEFAULT_INSTALL_MD);
     let roster = fresh::positional(args, 1, DEFAULT_ROSTER);
+    let bash_path = fresh::positional(args, 2, DEFAULT_BASH_BOOTSTRAP);
+    let pwsh_path = fresh::positional(args, 3, DEFAULT_PWSH_BOOTSTRAP);
 
     if !Path::new(install_md).is_file() {
         return Err(format!("install page not found: {}", install_md));
@@ -169,6 +263,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let roster_text = fresh::read_captured(roster)?;
     let listed = roster_triples(&roster_text);
+
+    let detected = [
+        (bash_path, detector_triples(bash_path, &BASH_DETECTOR)?),
+        (pwsh_path, detector_triples(pwsh_path, &PWSH_DETECTOR)?),
+    ];
 
     let mut findings: Vec<String> = Vec::new();
     let mut held: Vec<&str> = Vec::new();
@@ -223,6 +322,37 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
+    // spec: installer/README.md §The gate binary — arm E, EQUALITY rather than containment
+    // because each direction closes a distinct failure: a triple a detector emits that nobody
+    // declares, and a declared triple no detector emits
+    for (path, set) in &detected {
+        for t in set {
+            if !decls.iter().any(|d| d.triple == *t) {
+                findings.push(format!(
+                    "{} detects {} and {} declares it nowhere",
+                    path, t, install_md
+                ));
+            }
+        }
+        for d in &decls {
+            if !set.contains(&d.triple) {
+                findings.push(format!(
+                    "{} declares {} and {} can never detect it",
+                    install_md, d.triple, path
+                ));
+            }
+        }
+    }
+
+    // spec: installer/README.md §The gate binary — the count rides the clean line on the same
+    // vacuous-pass ground arm D stands on: a source scan whose extraction quietly stops matching
+    // reports an empty set as agreement, and a number is what makes that visible without an audit
+    let detector_report = detected
+        .iter()
+        .map(|(p, s)| format!("{} emits {}", p, s.len()))
+        .collect::<Vec<String>>()
+        .join(", ");
+
     // spec: gate-sdk/SPEC.md §The port-candidate criteria — arm D rides the red line as well as
     // the clean one: a number that appears only when something is already broken is a post-mortem
     // rather than an instrument
@@ -230,7 +360,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if !findings.is_empty() {
         println!(
-            "check-install-platforms: {}'s platform declaration and {} are not in lockstep:",
+            "check-install-platforms: {}'s platform declaration, {} and the two host detectors are not in lockstep:",
             install_md, roster
         );
         for f in &findings {
@@ -239,22 +369,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if !held.is_empty() {
             println!("  omitted on each held platform: {}", per_held);
         }
+        println!("  detected triples: {}", detector_report);
         println!("  help: every declared platform is `(joined)` — a live line in the roster — or");
         println!("        `(held: <precondition>)` naming the run that would join it and absent");
         println!("        from the roster, and every roster line is a declared `joined`. Flip the");
         println!("        declaration and write the roster line together, or drop the roster line.");
+        println!("        Each detector's emitted triple set equals the declared set: a triple it");
+        println!("        detects is declared, and a triple declared is one it can reach.");
         return Ok(1);
     }
 
     println!(
-        "INSTALL-PLATFORMS: clean ({} declared platform(s) in {}, {} joined in lockstep with {} both directions, {} held with a stated precondition{}{}; omitted count is the registry members dispatching to the gate binary)",
+        "INSTALL-PLATFORMS: clean ({} declared platform(s) in {}, {} joined in lockstep with {} both directions, {} held with a stated precondition{}{}; both host detectors emit exactly the declared set — {}; omitted count is the registry members dispatching to the gate binary)",
         decls.len(),
         install_md,
         joined,
         roster,
         held.len(),
         if held.is_empty() { "" } else { " — " },
-        per_held
+        per_held,
+        detector_report
     );
     Ok(0)
 }
@@ -306,6 +440,67 @@ mod tests {
         assert_eq!(d.len(), 2);
         assert!(matches!(d[0].state, State::Unreadable(_)));
         assert!(matches!(d[1].state, State::Unreadable(_)));
+    }
+
+    // spec: installer/README.md §The gate binary — the SOLE single-quoted operand, so a triple
+    // reached through a variable or sitting beside another operand is not extracted and the
+    // detector's own shape stays the pin rather than a loose quote scan
+    #[test]
+    fn only_the_verbs_sole_single_quoted_operand_is_a_triple() {
+        assert_eq!(
+            sole_quoted_after("        Linux/x86_64)   printf 'x86_64-unknown-linux-gnu' ;;", "printf"),
+            Some("x86_64-unknown-linux-gnu")
+        );
+        assert_eq!(
+            sole_quoted_after("        '^linux/x64$' { return 'x86_64-unknown-linux-gnu' }", "return"),
+            Some("x86_64-unknown-linux-gnu")
+        );
+        assert_eq!(sole_quoted_after("    return ''", "return"), Some(""));
+        assert_eq!(sole_quoted_after("    printf \"$t\"", "printf"), None);
+        assert_eq!(sole_quoted_after("    printf-ish'x'", "printf"), None);
+    }
+
+    // spec: installer/README.md §The gate binary — the two halves' pinned shapes, read off the
+    // function body and bounded by its own closing brace, so a triple spelled outside it is not
+    // this detector's
+    #[test]
+    fn each_half_yields_exactly_its_functions_mapped_triples() {
+        let sh = "target_of_host() {\n    case \"$(host_shape)\" in\n        Linux/x86_64) printf 'x86_64-unknown-linux-gnu' ;;\n        # printf 'never-extracted-from-a-comment'\n        *) : ;;\n    esac\n}\nother() { printf 'outside-the-body'; }\n";
+        assert_eq!(
+            detector_triples_in(sh, "f", &BASH_DETECTOR).unwrap(),
+            vec!["x86_64-unknown-linux-gnu".to_string()]
+        );
+        let ps = "function Get-HostTarget {\n    switch -Regex (Get-HostShape) {\n        '^linux/x64$' { return 'x86_64-unknown-linux-gnu' }\n    }\n    return ''\n}\n";
+        assert_eq!(
+            detector_triples_in(ps, "f", &PWSH_DETECTOR).unwrap(),
+            vec!["x86_64-unknown-linux-gnu".to_string()]
+        );
+    }
+
+    // spec: installer/README.md §The gate binary — every one of these is a check that could not
+    // run, reaching exit 2 through `rule`'s error path rather than reporting the agreement an
+    // empty extraction would otherwise look like
+    #[test]
+    fn a_degraded_extraction_is_a_refusal_and_never_a_pass() {
+        let renamed = "resolve_host() {\n    printf 'x86_64-unknown-linux-gnu'\n}\n";
+        assert!(detector_triples_in(renamed, "f", &BASH_DETECTOR)
+            .unwrap_err()
+            .contains("absent or renamed"));
+
+        let unbounded = "target_of_host() {\n    printf 'x86_64-unknown-linux-gnu'\n";
+        assert!(detector_triples_in(unbounded, "f", &BASH_DETECTOR)
+            .unwrap_err()
+            .contains("no closing"));
+
+        let shape_moved = "target_of_host() {\n    printf \"$t\"\n}\n";
+        assert!(detector_triples_in(shape_moved, "f", &BASH_DETECTOR)
+            .unwrap_err()
+            .contains("extracted no triple"));
+
+        let only_the_empty_arm = "function Get-HostTarget {\n    return ''\n}\n";
+        assert!(detector_triples_in(only_the_empty_arm, "f", &PWSH_DETECTOR)
+            .unwrap_err()
+            .contains("extracted no triple"));
     }
 
     // spec: gate-sdk/SPEC.md §Consumer payload — the roster's line grammar, so a commented triple

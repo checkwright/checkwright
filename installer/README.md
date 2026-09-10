@@ -503,6 +503,19 @@ never did. **The bootstrap count is two and only that number is load-bearing.**
 The PowerShell leg ships with the PowerShell half, and **no other leg
 substitutes for it**, because every other leg drives the other bootstrap.
 
+**That running oracle is structurally blind to one region, so a static binding
+over it is complementary to this ruling rather than a substitute for it.** The
+PowerShell leg runs on `windows-latest` and only there, so `Get-HostTarget`'s
+`linux/x64` and `linux/arm64` arms have never been executed by any run this
+repository has bought and no run it could buy today would execute them.
+`check-install-platforms` therefore asserts each detector's emitted triple set
+statically, covering exactly the region the running oracle cannot reach and
+leaving the region it does reach to it. Nothing there generates either half and
+nothing there retires this oracle — the concession two paragraphs below, that
+parity held by running tells you *that* the halves differ and never *where*, is
+this record's own and is what makes a field-level assertion complementary rather
+than contested.
+
 **That oracle has two parts, and only one of them is in place — read this before
 reading the leg as short of its own ruling.** The ruling above asks for a leg
 *exercising the payload end to end*, and that phrase carries two distinct
@@ -700,6 +713,27 @@ most, since a vendored tree is shared by construction. Two fields rather than
 is what a PowerShell half can answer without parsing prose. Nothing reads the
 kernel version, so nothing collects it.
 
+**Each half's mapped triple set is machine-read, so each half's shape is
+pinned.** The triples are owned by the `case` and `switch` arms themselves —
+de-literalization forbids a second copy in a roster comment beside them, which
+would be exactly the drift `check-install-platforms` exists to catch,
+reintroduced one line lower. So the gate reads the owner, and the owner's shape
+is stated here rather than guessed at:
+
+- **bash** — inside `target_of_host`'s body, every mapped triple is the **sole
+  single-quoted operand of a `printf`** and appears nowhere else in the function.
+- **PowerShell** — inside `Get-HostTarget`'s body, every mapped triple is the
+  **sole single-quoted operand of a `return`**, and the empty `return ''` is the
+  no-mapping arm rather than a triple. The `switch -Regex` patterns are also
+  single-quoted, which is why the pin is on `return` and not on quoting.
+
+Each body is bounded by its own closing brace at column 0. Every way that
+extraction can degrade is **fail-closed (exit 2)**, because this arm's failure
+mode is silence: the named function absent or renamed, its body unbounded, zero
+triples extracted, or either file unreadable. Each is a check that could not run
+and never a pass — an extraction that silently degrades to nothing is the one way
+a lockstep assertion reports agreement it never tested.
+
 **The map answers "which published artifact fits this host", which is why a
 MinGW, MSYS or Cygwin `uname` maps to `x86_64-pc-windows-msvc`.** Those `uname`
 strings report the *shell environment* — the measured runner answers
@@ -730,17 +764,60 @@ host*. **Its verdict is unchanged today for the same reason the bash arm's is** 
 host as unrostered. Shipping this half is not a platform claim, and
 §Requirements still says what it says.
 
+**Neither input answers the libc question, and that is the one place the
+platform contract's own promise was broken.** `uname -s`/`uname -m` cannot tell
+glibc from musl, and neither can `OSPlatform`/`OSArchitecture`: an Alpine x86_64
+host resolves to `x86_64-unknown-linux-gnu`, which **is** on the roster, so the
+selection step's roster comparison never fires and the host is handed a binary
+that dies in the dynamic loader. `native/targets.list` promises *"Both refuse;
+neither proceeds"* and this was its only violation. It is answered **at the
+selection step and not inside the detector**, and the placement is load-bearing
+rather than stylistic: the detector answers *which published artifact fits this
+host's OS and architecture*, the libc gate answers *is this host's C library the
+one that artifact was linked against*. Two questions, two places — and folding
+the second into the `case` arms would also destroy the extraction shape pinned
+above. pwsh runs on Linux, so this half's Linux arms are reachable and it
+carries the same discriminator against the same signals, hand-kept on the
+2026-08-26 ruling's terms.
+
 **Selection keeps three outcomes, and collapsing any two is the defect. What
 changed with the relocation is that only one of them proceeds.** The
 payload carries the target roster verbatim beside the artifacts
 (gate-sdk/SPEC.md §Consumer payload), and the bootstrap reads it rather than
 inferring support from a directory's presence:
 
-| the host resolves to | the payload holds | outcome |
-| --- | --- | --- |
-| a target **not** in the roster | — | **refuse** — this platform is not in the support roster; there is no adopter action |
-| a target **in** the roster | its binary and sidecar | verify, then execute |
-| a target **in** the roster | nothing, or half the pair | **refuse** — the payload is broken |
+| the host resolves to | its libc | the payload holds | outcome |
+| --- | --- | --- | --- |
+| a target **not** in the roster | — | — | **refuse** — this platform is not in the support roster; there is no adopter action |
+| a `*-linux-gnu` target | **musl**, or unidentifiable | — | **refuse** — no published artifact fits this host's C library; there is no adopter action |
+| a target **in** the roster | glibc, or not a Linux question | its binary and sidecar | verify, then execute |
+| a target **in** the roster | glibc, or not a Linux question | nothing, or half the pair | **refuse** — the payload is broken |
+
+**Four inputs, still three outcomes.** The libc row is a *second way to reach the
+first outcome* rather than a fourth answer: an adopter meets the same
+unsupported-host refusal, and the refusal names the libc verdict that fired it so
+they can tell it from an unsupported architecture. Three outcomes are what the
+two halves are held equal on, so the count is the load-bearing number and the
+input count is not. The libc verdict is **`musl`**, **`gnu`** or **`unknown`**,
+each on a positive signal — a musl loader under `/lib` for the first, glibc
+identifying itself through `getconf GNU_LIBC_VERSION` or `ldd --version` for the
+second — and `unknown` refuses. That exchange is stated plainly: a working glibc
+host with neither probe is refused and told exactly which probe failed, where the
+alternative is that every unidentifiable host receives an artifact that dies with
+a dynamic-linker error and no explanation. A refusal an adopter can read beats an
+exec failure they cannot. **An override knob is refused** — `INSTALLER_ASSUME_LIBC`
+or any spelling of it would be a fail-open valve added in the same change that
+closes a fail-open, and its only reader would be an adopter guessing at the
+question the probe just failed to answer. If the `unknown` population is ever
+measured as non-trivial, the fix is a better probe.
+
+**Every refusal here names what the host was detected AS.** The message carries
+the detected `<os>/<arch>`, and the libc verdict where that gate fired. Without
+it an adopter cannot tell an unsupported architecture from an unsupported libc
+from a `uname` that answered nothing, and neither can a maintainer reading their
+bug report; a refusal message is a documented surface, which is
+gate-sdk/SPEC.md §Fail-closed contract's own rule for the wrapper class applied
+to this boundary's refusals.
 
 The three stay told apart by **message and remedy**, never by exit status alone:
 an undeclared host and a broken payload remain different answers to an adopter,

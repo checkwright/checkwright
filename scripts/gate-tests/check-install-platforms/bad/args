@@ -1,6 +1,11 @@
 # One violation per arm: a `joined` declaration with no roster line (A), a
 # roster line the page declares nowhere (B), a hold with no precondition and a
-# hold that is nonetheless published (C, both halves). Arm D still reports, on
-# the red path as well as the clean one.
+# hold that is nonetheless published (C, both halves), and arm E in BOTH
+# directions — each detector emits `aarch64-unknown-linux-gnu` while the page
+# declares it nowhere, and the page declares `aarch64-pc-windows-msvc` while
+# neither detector can ever emit it. Arm D still reports, on the red path as
+# well as the clean one.
 install.md
 targets.list
+checkwright.sh
+checkwright.ps1

@@ -1,6 +1,10 @@
 # Lockstep case: one `joined` triple that is a live roster line, one `held`
-# triple with a stated precondition and no roster line. Two args steer the gate
-# onto hermetic fixture copies of the install page and the target roster; arm D
-# counts against the hermetic registry in this case dir's own `scripts/`.
+# triple with a stated precondition and no roster line, and two host detectors
+# whose emitted triple sets equal the declared set in both directions. Four args
+# steer the gate onto hermetic fixture copies of the install page, the target
+# roster and both bootstraps; arm D counts against the hermetic registry in this
+# case dir's own `scripts/`.
 install.md
 targets.list
+checkwright.sh
+checkwright.ps1

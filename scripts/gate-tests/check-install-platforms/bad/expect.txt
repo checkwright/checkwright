@@ -2,4 +2,9 @@ declared `joined` but no live line in targets.list: x86_64-unknown-linux-gnu
 declared `held` with no precondition: aarch64-apple-darwin
 declared `held` but carries a live line in targets.list: x86_64-apple-darwin
 a live line in targets.list that install.md declares nowhere: i686-unknown-linux-gnu
+checkwright.sh detects aarch64-unknown-linux-gnu and install.md declares it nowhere
+checkwright.ps1 detects aarch64-unknown-linux-gnu and install.md declares it nowhere
+install.md declares aarch64-pc-windows-msvc and checkwright.sh can never detect it
+install.md declares aarch64-pc-windows-msvc and checkwright.ps1 can never detect it
 omitted on each held platform: aarch64-apple-darwin omits 2 member(s)
+detected triples: checkwright.sh emits 4, checkwright.ps1 emits 4

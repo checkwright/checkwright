@@ -329,7 +329,7 @@ if staged_matches 'docs/install.md' 'native/src/toolfloor.rs' 'native/src/gates/
     run_gate check-install-toolchain native/target/release/checkwright-gates check-install-toolchain
 fi
 
-if staged_matches 'docs/install.md' 'native/targets.list' 'native/src/gates/install_platforms.rs' 'native/src/fresh.rs'; then
+if staged_matches 'docs/install.md' 'native/targets.list' 'installer/bin/checkwright.sh' 'installer/bin/checkwright.ps1' 'native/src/gates/install_platforms.rs' 'native/src/fresh.rs'; then
     run_gate check-install-platforms env GATE_SDK_KNOB_GATE_SDK_GATES_DIR=scripts $'GATE_SDK_KNOB_GATE_KIT_ROOTS_REL=gate-sdk\tcanon-kit\tcontext-kit\tdelegation-kit\tdoctrine-kit\tdrift-kit\tevidence-kit\tguard-kit\tlifecycle-kit\tqueue-kit\tsite-kit' native/target/release/checkwright-gates check-install-platforms
 fi
 

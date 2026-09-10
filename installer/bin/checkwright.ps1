@@ -35,8 +35,8 @@ function Resolve-InstallerRoot {
     return (Split-Path -Parent (Split-Path -Parent $self))
 }
 
-# spec: installer/README.md §The gate binary — step 2: the twin of installer/bin/checkwright.sh's target_of_host(). It reads the platform and architecture off the runtime rather than shelling out to uname, because the host this half exists for need carry no POSIX shell at all
-function Get-HostTarget {
+# spec: installer/README.md §The gate binary — the detector's whole input, factored out so a refusal can name what the host was detected AS rather than only that it mapped to nothing; the twin of installer/bin/checkwright.sh's host_shape()
+function Get-HostShape {
     $rt = 'System.Runtime.InteropServices.RuntimeInformation' -as [type]
     if ($rt) {
         $p = [System.Runtime.InteropServices.OSPlatform]
@@ -50,7 +50,13 @@ function Get-HostTarget {
         $os = 'windows'
         $arch = $env:PROCESSOR_ARCHITECTURE
     }
-    switch -Regex ("$os/$arch") {
+    return "$os/$arch"
+}
+
+# spec: installer/README.md §The gate binary — step 2: the twin of installer/bin/checkwright.sh's target_of_host(). It reads the platform and architecture off the runtime rather than shelling out to uname, because the host this half exists for need carry no POSIX shell at all
+# spec: installer/README.md §The gate binary — every mapped triple here is the sole single-quoted operand of a `return` and the empty `return ''` is the no-mapping arm, which is the shape check-install-platforms extracts this detector's triple set from
+function Get-HostTarget {
+    switch -Regex (Get-HostShape) {
         '^windows/(x64|amd64)$' { return 'x86_64-pc-windows-msvc' }
         '^linux/x64$'           { return 'x86_64-unknown-linux-gnu' }
         '^linux/arm64$'         { return 'aarch64-unknown-linux-gnu' }
@@ -60,24 +66,53 @@ function Get-HostTarget {
     return ''
 }
 
+# spec: installer/README.md §The gate binary — the libc question, answered beside the other refusals rather than inside the detector: the detector answers which published artifact fits this host's OS and architecture, this answers whether the host's C library is the one that artifact was linked against. pwsh runs on Linux, so this half's Linux arms are reachable and owe the same discriminator against the same signals. Each verdict rests on a POSITIVE signal, so an unidentifiable libc is 'unknown' and refuses rather than being read as glibc
+function Get-LibcFlavour {
+    if (@(Get-ChildItem -Path '/lib' -Filter 'ld-musl-*' -ErrorAction SilentlyContinue).Count -gt 0) {
+        return 'musl'
+    }
+    foreach ($probe in @(@('getconf', 'GNU_LIBC_VERSION'), @('ldd', '--version'))) {
+        # comment-tier-exempt: the probe is absent on exactly the hosts this discriminator exists to refuse, and under $ErrorActionPreference='Stop' an absent one is a terminating CommandNotFoundException rather than a verdict — so presence is tested and the invocation is caught, leaving an unanswerable probe as no signal instead of a crash
+        if (-not (Get-Command $probe[0] -CommandType Application -ErrorAction SilentlyContinue)) { continue }
+        try { $out = (& $probe[0] $probe[1] 2>&1 | Out-String) } catch { continue }
+        if ($out -match '(?i)gnu libc|glibc') { return 'gnu' }
+    }
+    return 'unknown'
+}
+
 # spec: installer/README.md §The gate binary — step 3: selection keeps three outcomes and only one of them proceeds, so the payload's own roster is read rather than a directory's presence inferred from — a platform never committed to and one whose artifact went missing are different answers, told apart by message and remedy
 function Select-Artifact {
     param([string] $Payload, [string] $Target)
+    $shape = Get-HostShape
     $unrostered = 'the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take.'
     $dir = Join-Path $Payload 'artifact'
     if (-not (Test-Path -LiteralPath $dir -PathType Container)) {
-        Die 'this host maps to no target this payload declares' $unrostered
+        Die "this host, detected as $shape, maps to no target this payload declares" $unrostered
     }
     $roster = Join-Path $dir 'targets.list'
     if (-not (Test-Path -LiteralPath $roster -PathType Leaf)) {
         Die 'this payload carries prebuilt gate binaries but no target roster' `
             'the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower.'
     }
+    # spec: installer/README.md §The gate binary — the one case where the roster comparison cannot refuse for us: .NET's OSPlatform and OSArchitecture cannot tell glibc from musl any more than uname can, so a musl host resolves to a triple that IS on the roster and would be handed a binary that dies in the dynamic loader. This is the second way to reach the unsupported-host refusal, and it fires before the roster comparison because the reason is the same one — no published artifact fits this host
+    if ($Target -like '*-linux-gnu') {
+        switch (Get-LibcFlavour) {
+            'gnu' { }
+            'musl' {
+                Die "this host, detected as $shape, runs a musl C library, and every Linux artifact this payload carries is linked against glibc" `
+                    'musl and glibc are not interchangeable at the dynamic loader, so a glibc build would die there rather than run. This payload carries no musl artifact, so there is no adopter action to take.'
+            }
+            default {
+                Die "this host, detected as $shape, did not identify its C library, and every Linux artifact this payload carries is linked against glibc" `
+                    "neither 'getconf GNU_LIBC_VERSION' nor 'ldd --version' identified a GNU libc here, and no musl loader was found under /lib — so nothing establishes that a glibc build would run, and this refuses rather than handing you one that may die in the loader. Install GNU libc's getconf or ldd so the probe can answer."
+            }
+        }
+    }
     $declared = @(Get-Content -LiteralPath $roster |
         Where-Object { $_ -notmatch '^\s*(#|$)' } |
         ForEach-Object { $_.Trim() })
     if (-not $Target -or $declared -notcontains $Target) {
-        Die 'this host maps to no target this payload declares' $unrostered
+        Die "this host, detected as $shape, maps to no target this payload declares" $unrostered
     }
     $src = Join-Path $dir $Target
     $names = @(Get-ChildItem -LiteralPath $src -File -ErrorAction SilentlyContinue |
