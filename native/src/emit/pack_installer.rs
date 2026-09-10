@@ -290,9 +290,12 @@ fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
 // spec: installer/README.md §The packer — a member outside the packed tree is dropped rather than
 // handed to git, which refuses one; the test is lexical because a kit root deleted from the
 // worktree still belongs in the pathspec and cannot be canonicalized
+// spec: gate-sdk/SPEC.md §The path-dialect contract — absoluteness is a TWO-dialect question and
+// `walk::path_root` is its single owner, asked here rather than re-implemented; a foreign
+// backslash spelling never reaches this site, the contract crossing dialect once at the producer
 fn inside(root: &str, path: &str) -> Option<String> {
     let root = root.trim_end_matches('/');
-    let rel = if path.starts_with('/') {
+    let rel = if walk::path_root(path).is_some() {
         let tail = path.strip_prefix(root)?;
         if !tail.is_empty() && !tail.starts_with('/') {
             return None;
@@ -664,6 +667,21 @@ mod tests {
         assert_eq!(inside("/w", "/w-other/targets.list"), None);
         assert_eq!(inside("/w", "../outside"), None);
         assert_eq!(inside("/w", "kits/../../outside"), None);
+    }
+
+    // spec: gate-sdk/SPEC.md §The path-dialect contract — a drive-rooted path is absolute too and
+    // a leading-slash test answers false on it; both sides are pinned because only the pair
+    // separates the fix from a test that drops every drive-lettered member.
+    #[test]
+    fn a_drive_rooted_member_is_judged_by_the_same_two_dialect_rule() {
+        assert_eq!(inside("D:/w", "D:/_temp/targets.list"), None);
+        assert_eq!(
+            inside("D:/w", "D:/w/native/targets.list"),
+            Some("native/targets.list".to_string())
+        );
+        assert_eq!(inside("D:/w", "D:/w-other/targets.list"), None);
+        assert_eq!(inside("D:/w", "D:/w"), Some(".".to_string()));
+        assert_eq!(inside("D:/w", "gate-sdk"), Some("gate-sdk".to_string()));
     }
 
     // spec: installer/README.md §The packer — a worktree-deleted kit root is exactly what the

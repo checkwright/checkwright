@@ -343,7 +343,7 @@ pub fn canonicalize(p: impl AsRef<Path>) -> Option<String> {
 // spec: gate-sdk/SPEC.md §The path-dialect contract — absoluteness is a two-dialect question, and
 // this is its single owner: `Some("")` is separator-rooted, `Some("D:")` drive-rooted, `None`
 // relative.
-fn path_root(p: &str) -> Option<&str> {
+pub fn path_root(p: &str) -> Option<&str> {
     let b = p.as_bytes();
     match b.first() {
         Some(b'/') | Some(b'\\') => return Some(""),
