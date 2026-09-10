@@ -12,6 +12,45 @@
 
 ## New Features
 
+- **pack-step-dirty-tree-predicate-unscoped** [spec: SPEC-pack-clean.md]
+  — the pack step refuses on a whole-tree dirty check, so a dirty path the payload never ships and
+  never reads aborts the pack and with it validate's battery. The amendment is
+  `installer/SPEC-pack-clean.md`; its four deltas, their work classes, the refused alternatives and
+  the update-target roster are its own and are not restated here.
+  **THE SHAPE IS CHOSEN AT THIS SPEC**, which is what the design-pending state was recording: scope
+  the refusal to the paths the payload is assembled from, with that footprint DERIVED from the two
+  resolvers the pack loop already runs rather than listed — a hand-listed pathspec is the
+  under-refusal hazard reintroduced as maintenance. The other two candidates are refused on the
+  amendment's own record, as is a fourth the authoring found.
+  **THE STATED REASON WAS WIDER THAN THE PREDICATE AND ALSO NARROWER, which the authoring settled.**
+  Payload CONTENT is reproduced from the stamped commit by `git archive`, so no worktree edit can
+  reach it; exactly two paths let the worktree diverge from the stamp — the kit-root SET, decided by
+  a directory test, and the target roster, copied verbatim — and both are inside the new pathspec.
+  **JOINED TO `packer-port-terminal-cut` ON SHARED SURFACE — `lead, own-authority` 2026-09-10,
+  through the lead's escalation reply to scope; NOT the operator's.** The join's ground is
+  producer/consumer rather than adjacency: this is a defect in the file
+  `pack-installer-cut-to-a-non-gate-arm` rewrites, so cutting first and deciding this predicate
+  later ports a known defect into the new arm. The cut lands first and this amendment is authored
+  against the arm it mints — an order that is PRICED rather than blocking, so it takes the valve
+  below rather than a blocker tag: a batch reaching this amendment first lands the same deltas in
+  the shell form and they move with it, at the cost of one rewrite.
+  [precondition-ok: the amendment prices the fallback if a batch reaches it first]
+  **ASSERTION C WILL FIRE at the stage after spec:** the cut's amendment spans `installer/`,
+  `native/`, `gate-sdk/` and `.github/workflows/` — four component dirs — so `check-stage-entry`
+  demands the audit stamp or a ruled waiver. Recorded here rather than left for align to discover.
+  **Measured, not inferred.** At the filing iteration's validate the check gated on an unscoped
+  `git status --porcelain`; the sole dirty path was one uncommitted `.workflow/gap-inbox.md`
+  bullet — the exact artifact CLAUDE.md tells every mid-iteration session to file — and the run
+  aborted at exit 1 before writing its evidence file, after 16 of 22 suites had run clean. The
+  judged recurrence's own firing is `binding-intel-leg-failed-one-run-in-two`'s record, not this
+  entry's.
+  **DISTINCT from `gap-inbox-commit-ownership`**: that entry owns who *commits* a gap-inbox bullet,
+  where this narrow fix lands without that question being answered at all.
+  recurrence: pack-step-dirty-tree-predicate-unscoped 2026-09-08
+  Filed 2026-09-01 by close's gap drain, promoted from a lead-filed bullet; iceboxed 2026-09-06 at
+  `0b6545d7` under the port-only run; returned 2026-09-09 at scope on the judged recurrence;
+  promoted 2026-09-10 at spec with its amendment.
+
 ## Technical Debt
 
 ## Deferred
@@ -418,54 +457,6 @@
   Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join` on the lead's
   instruction, having been held back one turn while a question it sat on was still open; promoted
   2026-09-09 at scope intake, so the record is late and says so.
-
-- **pack-step-dirty-tree-predicate-unscoped** [design-pending] — `scripts/pack-installer.sh`
-  refuses on a whole-tree dirty check, so a dirty path the payload never reads aborts the pack and
-  with it validate's battery.
-  **RETURNED FROM THE ICEBOX 2026-09-09 at scope, on the recurrence judged at the 2026-09-08 close**
-  — the round trip queue-kit/SPEC.md §The icebox tier conserves, its body restored verbatim from the
-  evicting commit `0b6545d7`. The judging close had nowhere to stamp the date, the tier being one
-  line each; this eviction is what gives the judgment a home, and
-  `iceboxed-recurrence-judgment-unrecordable` owns the general defect that made the detour
-  necessary.
-  **The recurrence's grounds, and they are not a citation.** The silence FIRED: at the 2026-09-08
-  close the pack step exited non-zero in 1.6 seconds having printed nothing, on the newly binding
-  `install-smoke-macos-intel` leg, and that is what made a red master unreadable from a finished run
-  and forced a re-run to learn anything. That is the cost this entry predicted, arriving.
-  **Measured, not inferred.** At the filing iteration's validate, `scripts/pack-installer.sh:71`
-  gated on `git status --porcelain` with no path scoping; the sole dirty path was one uncommitted
-  `.workflow/gap-inbox.md` bullet — the exact artifact CLAUDE.md tells every mid-iteration session
-  to file — and `run-validate.sh` aborted at exit 1 before writing
-  `.workflow/validate-evidence.txt`, after 16 of 22 suites had already run clean.
-  **The predicate is wider than its own stated reason.** Line 70's `spec:` comment grounds the
-  refusal in the payload's commit stamp — a dirty tree would stamp a commit that does not describe
-  the payload. The payload is assembled out of tree from this repo's kit roots and writes nothing
-  in-tree, so a dirty path outside that set cannot make the stamp wrong.
-  **DISTINCT from `gap-inbox-commit-ownership`**, and not a re-filing of it: that entry owns the
-  open question of who *commits* a gap-inbox bullet, while this is a second defect in a different
-  file whose narrow fix lands without that question being answered at all.
-  **Why `[design-pending]`:** three candidate shapes, and choosing is design rather than repair —
-  scope the pack step's refusal to the paths the payload is assembled from; or rule gap-inbox commit
-  ownership so the file is never dirty across a stage boundary; or state the pre-flight valve as the
-  sanctioned response. Only the first is narrow, and it still needs a governed statement of which
-  paths constitute the payload, because a wrong scoping silently under-refuses on a genuinely dirty
-  one — the failure the refusal exists to prevent.
-  **Cost while deferred — CORRECTED 2026-09-09, the iceboxing read having gone false.** It was filed
-  as "low and loud: one aborted battery per occurrence". The 2026-09-08 firing was neither: the
-  refusal is loud in one place and silent everywhere else, and where it is silent it costs a whole
-  diagnosis and a re-run of a CI leg.
-  **JOINED TO `packer-port-terminal-cut` ON SHARED SURFACE — `lead, own-authority` 2026-09-10,
-  through the lead's escalation reply to scope; NOT the operator's.** The join's ground is
-  producer/consumer rather than adjacency: this is a defect in `scripts/pack-installer.sh`, the file
-  `pack-installer-cut-to-a-non-gate-arm` rewrites, so cutting first and deciding this predicate
-  later ports a known defect into the new arm. `/spec` authors both amendments and promotes both.
-  **ASSERTION C WILL FIRE at the stage after spec:** the cut's amendment spans `installer/`,
-  `native/`, `gate-sdk/` and `.github/workflows/` — four component dirs — so `check-stage-entry`
-  demands the audit stamp or a ruled waiver. Recorded here so spec reads it rather than align
-  discovering it.
-  recurrence: pack-step-dirty-tree-predicate-unscoped 2026-09-08
-  Filed 2026-09-01 by close's gap drain, promoted from a lead-filed bullet; iceboxed 2026-09-06 at
-  `0b6545d7` under the port-only run; returned 2026-09-09 at scope on the judged recurrence above.
 
 - **smoke-report-array-carrier-mangling-unexplained** [design-pending] — the Windows manifest
   report's two decompositions of one recorded entry disagree, the array carrier is implicated, and
