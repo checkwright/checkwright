@@ -317,3 +317,22 @@ four gate touch points, its measured inbound sum and its cost field, and a copy 
 second reading of one fact aging on its own clock.
 discharge: citation-liveness-family-carve-out grep -L citation-liveness-family-convergence TASK-QUEUE.md
 ruling: citation-liveness-family-carve-out
+
+**`host-resolution-fail-open-cut` is authorized THREE watched pushes — ruled 2026-09-10 by the
+operator through AskUserQuestion in the lead session, relayed by that lead.** One at build to buy
+the Windows observation, one at close, one for the release tag. This is an **iteration-scoped
+departure** from CLAUDE.md §This repo is governed by its own kits' one-to-two budget, not a
+change to it: that line stands unedited and governs every other iteration, and recording the
+departure here rather than there is what keeps the standing rule readable as standing.
+**The ground is that the iteration's units are jointly unobservable on the host that builds
+them.** Every core unit's completion predicate is an observation of a Windows CI leg — the
+`observation-predicate-entry-cannot-drain-in-its-own-iteration` shape, whose own text records that
+under the two-push budget the drain gate sits upstream of the push that would justify the drain.
+Master is red at `7c7e3a1f` on exactly the two legs that would carry that observation, so the
+first push buys the fix's verification and the standing red's clearance in one run. Without the
+third push the aarch64 roster join and the Windows observation compete for the same run, which is
+why the rider could be ruled in only once the budget moved.
+**What it does not license:** drip-pushing. Commits still accumulate locally and ride a watched
+push, and the three are three *occasions*, not a per-commit allowance.
+discharge: three-push-grant-host-resolution-cut  grep -L 'Iteration: host-resolution-fail-open-cut' TASK-QUEUE.md
+ruling: the three-push grant  host-resolution-fail-open-cut's push budget
