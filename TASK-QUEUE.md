@@ -12,6 +12,36 @@
 
 ## New Features
 
+- **pack-installer-cut-to-a-non-gate-arm** [spec: SPEC-packer-arm.md]
+  — the port's TERMINAL cut: `scripts/pack-installer.sh` is the last file in the owed column, and
+  this unit moves it in-crate as a bridged `Arm::Run` non-gate arm. The amendment is
+  `installer/SPEC-packer-arm.md`; its nine deltas, their work classes, the non-monotone reader set
+  and the update-target roster are its own and are not restated here.
+  **Owner surface:** `installer/README.md` §The packer — the port disposition, the route a cut
+  takes and the reachability obligation it owes are all there, undated, and the cut is authored
+  against that section.
+  **THE ROUTE IS THE OPERATOR'S — ROUTE 1, build the crate inside `publish.yml`'s `pack:` job,
+  ruled 2026-09-09 through the AskUserQuestion channel** in an operator-directed consult session,
+  reversing a `lead, own-authority` refusal of 2026-09-06. Its three refused alternatives and their
+  grounds sit on the owner surface and are not restated here either.
+  **RATIFIED INTO `packer-port-terminal-cut`, joined by `pack-step-dirty-tree-predicate-unscoped`;
+  `lead, own-authority` 2026-09-10 by escalation reply, NOT the operator's.**
+  **WHAT THE AUTHORING BOUGHT that the ruling did not hand down**, each carried on the amendment's
+  own record: the cut mints a SECOND HOLDER of the executable-suffix rule unless the per-target
+  artifact NAME crosses the bridge as a value rather than the rule crossing as code — criterion 6's
+  discharge by construction, since the one shell holder left cannot move in-crate at all; the
+  front-end resolves the binary and the bridged environment against the CWD, so the five smoke call
+  sites must pin a directory as well as `--root`, which was one decision before the cut and is two
+  after it; and THIRTEEN `TRAJECTORY.md` paragraphs — not one — share the `, 0 owed` discharge
+  oracle this cut fires, with no gate behind any of them and only a reporting arm to find them.
+  **Size, read off the oracle** rather than counted by hand: `--emit port-blockers --tree` reads 71
+  scanned, 70 no-port, 0 held, 1 owed, and this file is the 1 — the whole of what stands between
+  the tree and Objective 2.
+  **Terminal move is `## Done`**, not a demotion: this entry's deliverable is one cut rather than an
+  increment of a corpus, and the composer entry's own demotion contract is that entry's.
+  Filed 2026-09-06 by build on the lead's deferral of the cut, the same amendment's other deltas
+  having landed and closed `pack-installer-no-owning-spec-section`; promoted 2026-09-10 at spec.
+
 - **pack-step-dirty-tree-predicate-unscoped** [spec: SPEC-pack-clean.md]
   — the pack step refuses on a whole-tree dirty check, so a dirty path the payload never ships and
   never reads aborts the pack and with it validate's battery. The amendment is
@@ -9822,56 +9852,6 @@
   entry read as undated and the age filter never reached it — corrected at the 2026-09-05 drain.)
   Deferred, never promoted — it meets none of the three joining grounds the port-first run states
   (TRAJECTORY.md §PRIORITY DIRECTIVE); no run has ever barred a Deferred filing.
-
-- **pack-installer-cut-to-a-non-gate-arm** [design-pending] — the packer's lines are the largest
-  single item in the owed port column, and the release path can now reach a gate binary, so what
-  stands between here and a cut is scheduling rather than a blocker.
-  **Owner surface:** `installer/README.md` §The packer — it carries the port disposition, the
-  route a cut takes, and the reachability obligation a cut owes.
-  **Size, read off the oracle** rather than counted by hand: `--emit port-blockers --tree` reports
-  `scripts/pack-installer.sh owed lines=198`.
-  **THE DESIGN CALL IS RULED — ROUTE 1, build the crate inside the `pack` job. Ruled by the
-  operator on 2026-09-09 through the AskUserQuestion channel, in an operator-directed consult
-  session**; the lead put the fork and named the consulting session's recommendation as such. It
-  reverses the `lead, own-authority` refusal of 2026-09-06 this entry recorded. Two parts on two
-  surfaces: the mechanism reading landed undated at gate-sdk/SPEC.md §Consumer payload, and the
-  direction is to wire `gate-sdk/bin/build-native.sh` into `publish.yml`'s `pack:` job — which also
-  discharges the reachability obligation, spending the 2026-09-06 front-end-reachability note.
-  **What settled it:** `scripts/pack-installer.sh`'s own `# spec:` line, the pointer binding the
-  file to §Consumer payload, already restated that section's "builds nothing itself" as *the script
-  never builds one* — the purpose clause verbatim, its elided object a payload-riding gate binary.
-  The SPEC sentence's subject is "The artifacts", so the predicate was never the ambiguity recorded
-  here; and the packer copies payload content only from `--artifacts`, so nothing else can reach it.
-  **THE THREE REFUSED ALTERNATIVES, with the grounds they were refused on:**
-  - ROUTE 1's OWN EARLIER REFUSAL on the tag-only trigger is REVERSED, not merely weakened:
-    build-then-pack in one job is rehearsed on every CI run, so the untested window covers that
-    workflow's job wiring and never the shape — and a `cargo build` there compiles bytes the job
-    checked out at the tag, leaving the checkout-plus-bash tamper floor intact.
-  - ROUTE 2, resolve `GATE_SDK_NATIVE_BIN` onto a downloaded artifact. REFUSED, ground unchanged:
-    nothing in the tree digest-verifies against an independent source, so it would make the one job
-    that assembles and stamps the published tarball execute bytes it did not check out. Its honest
-    qualification, recorded so it is not re-argued: that property is `publish.yml`'s and not
-    tree-wide, since `gates.yml`'s macOS install-smoke leg already adopts and executes a downloaded
-    build-leg artifact — the refusal rests on the release path being the higher-stakes context.
-  - ROUTE 3, rule the packer `# no-port:`. REFUSED on permanence: that field declares a permanent
-    disposition, and gate-sdk/SPEC.md §The port-candidate criteria refuses a marker conflating
-    permanent with temporarily-held, which "would drop members that will port, replacing the
-    remainder's over-count with an under-count". This blocker was a sequencing fact and the owner
-    surface said so. `scripts/ci-build-artifact.sh`'s shape does not transfer: that body *is* the
-    binary's build, so its arm would predate itself, where the packer packs rather than builds.
-  - DEFERRING the fork unresolved. REFUSED: it gates no stage and blocks no push, so it was a real
-    fourth answer and was offered as one, declined because the probe removed the obstacle.
-  **THE WORK OWED IS A LATER ITERATION's UNIT — the operator ruled the scheduling with the route.**
-  Wire the build into `publish.yml`'s `pack:` job and cut the packer to a MEDIUM `Arm::Run` non-gate
-  arm in one unit — `sha256.rs`, `json.rs`, `proc.rs`, `walk.rs` and the five installer verbs, `jq`
-  eliminable via `serde_json`, `npm pack` and `git archive | tar` staying spawns.
-  **RATIFIED INTO `packer-port-terminal-cut`, joined by `pack-step-dirty-tree-predicate-unscoped`;
-  `lead, own-authority` 2026-09-10 by escalation reply, NOT the operator's. `/spec` authors both.**
-  **Cost while deferred:** the owed column keeps its only member, so the port track's completion
-  predicate cannot reach zero — `--tree` reads 71 scanned, 70 no-port, 0 held, 1 owed, and this
-  file is the 1, the whole of what stands between the tree and Objective 2.
-  Filed 2026-09-06 by build on the lead's deferral of the cut; the same amendment's other deltas
-  landed and closed `pack-installer-no-owning-spec-section`.
 
 - **spec-pointer-boundary-legality** [design-pending] — `check-spec-pointer` grades that a `# spec:`
   target resolves, never that the target is a surface a cut may be bounded against.
