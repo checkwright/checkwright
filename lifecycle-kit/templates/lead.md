@@ -597,18 +597,27 @@ consequences:
   so the lossy compact has a lead crash's bounded blast radius; the lead holds
   pointers, not state. Verify the spend afterward with delegation-kit's
   usage-verdict rather than assuming forgiveness.
-- **Suggest a compact at the paying acceptance boundaries.** After a stage
-  session's work is accepted — its commits verified, its rulings landed in
-  governed surfaces — and before the next dispatch, the lead *suggests* a
-  compact to the operator. Compaction is operator-invoked; the lead can only
-  recommend (the honest limit), so the suggestion is one line in the lead's
-  acceptance message, never a new mechanism. Suggest where it pays, not
-  blanket: a compact pays when the remaining cold wakes times the compressible
-  residue exceed one context re-read — the early acceptance boundaries, with
-  the most residue accreted and the most wakes still ahead, pay, while the
-  late ones do not warrant the operator interruption. This is the rule, not a
-  stage roster; a consumer derives its own paying boundaries from its stage
-  set. The keep-instruction is the handoff bullet's, unchanged.
+- **Write the lead journal at every stage completion.** The lead's own durable state has one home
+  and one cadence: on each stage session's completion notification — the one event a lead already
+  blocks on by contract — append to the lead's **own** resume journal whatever a compact would
+  otherwise lose, the batch roster and its tiering rationale, findings carried between batches,
+  rulings made or relayed, and anything the next dispatch would have to re-derive. The trigger is
+  an event that already exists rather than a forecast of when a compact looms, which is what makes
+  the cadence checkable. This discharges the durability rule delegation-kit's agent-execution
+  contract names the lead in, and it is **self-executing**: a lead writes its journal unilaterally,
+  where the compact below depends on an operator act the lead can only recommend. It is a scratch
+  artifact, swept with the rest at the iteration boundary (delegation-kit/SPEC.md §Resume journal —
+  agent writes, scratch reset sweeps).
+- **Then, optionally, suggest a compact at the paying acceptance boundaries.** After a stage
+  session's work is accepted — its commits verified, its rulings landed in governed surfaces — the
+  lead may *suggest* a compact to the operator, one line in the acceptance message and never a new
+  mechanism. It comes second and it is a convenience: compaction is operator-invoked, so the lead
+  can only recommend, which is why the journal above and not this carries the durability
+  obligation. Suggest where it pays, not blanket — a compact pays when the remaining cold wakes
+  times the compressible residue exceed one context re-read, so the early boundaries pay and the
+  late ones do not warrant the interruption. This is the rule, not a stage roster; a consumer
+  derives its own paying boundaries from its stage set. The keep-instruction is the handoff
+  bullet's, unchanged.
 
 Cache-keepalive pinging is ruled out: at batched escalation rates the idle
 re-warm pings cost more than the cold reads they avoid, burn the shared budget

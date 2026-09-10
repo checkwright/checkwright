@@ -628,7 +628,7 @@
   cheap and moves the burden onto every caller. The SPEC sentence changes either way, so the
   amendment is the unit rather than a wording fix beside a patch.
   **Cost while deferred:** `kpi-overhead`'s trailing window silently absorbs subagent rows in place
-  of close rows, and TRAJECTORY.md's 2026-09-05 health triad reads its third member off a
+  of close rows, and `.claude/commands/close.md`'s health triad reads its third member off a
   population it was not defined over. Honest limit: only this one firing is measured, so whether
   every prior close metered itself correctly is unread.
   **Product-class under the 2026-08-30 witness discriminator, not machinery-class:** drift-kit
@@ -1315,9 +1315,9 @@
   shape selection in lifecycle-kit/SPEC.md. Debt: no governed name added.
   **Cost while deferred:** low per instance and mostly silent — a bullet outside git until some
   later session notices, lost outright if the tree is reset, and the one class the inbox's
-  merge=union answer cannot cover. **Corrected 2026-09-01 by measurement:** one such bullet aborted
-  `run-validate.sh` after 16 of 22 suites ran clean, through the predicate
-  `pack-step-dirty-tree-predicate-unscoped` owns — loud there, silent everywhere else.
+  merge=union answer cannot cover. **Corrected 2026-09-01, re-attributed 2026-09-10:** one bullet
+  aborted `run-validate.sh` after 16 of 22 clean suites — through the consumer smoke's own unscoped
+  preflight, not the pack arm's predicate (`smoke-whole-tree-precondition-unscoped` owns it now).
   **FIVE ATTESTED FIRINGS, all ANSWERED by the ruling above and kept only as its evidence base.**
   2026-08-18 re-tiered this entry out of the icebox; three inside one iteration, judged a recurrence
   2026-08-31, were the third shape running in production and failing silently whenever a dispatch
@@ -4696,7 +4696,19 @@
 - **lead-state-durable-home** [design-pending] — the lead template forbids the lead from writing
   lifecycle state and gives lead state no durable home either, so it lives only in the
   conversation.
-  recurrence: lead-state-durable-home 2026-08-14
+  recurrence: lead-state-durable-home 2026-08-14 2026-09-10
+  **Third firing, 2026-09-10, and HALF OF IT IS NOW DISCHARGED — the entry stays open on the other
+  half.** The operator directed, twice on one day through the lead, that a lead write everything
+  which must survive a compact to its own resume journal rather than suggesting a keep/drop compact
+  to the operator, and that the write be CADENCED on every stage completion rather than left to the
+  lead's forecast of when a compact looms. Both halves landed at this close in
+  `lifecycle-kit/templates/lead.md` §Economics, stated undated as kit mechanism: the journal bullet
+  now carries the durability obligation and the compact suggestion is demoted to an optional
+  convenience beneath it. The recurrence is stamped rather than the entry merely re-read because
+  the practice had to be directed AGAIN, a lead having written no journal until asked.
+  **What still has no home, and why this stays `[design-pending]`:** the template now names `.tmp/`,
+  which the scope boundary sweeps — right for per-iteration state and still wrong for anything
+  crossing the boundary. That is this entry's remaining subject.
   **Re-attested 2026-08-14, and sharpened from a missing feature to a defect.** The absence is
   not merely unprovided-for: delegation-kit/templates/agent-execution.md binds its durability
   rule to whoever holds findings they will act on and closes the role loophole in its own
@@ -9272,8 +9284,8 @@
   **IT BELONGS IN `Deferred`, NEVER `Done`, AND IT DEMOTES AT BUILD, NEVER AT CLOSE** (`lead,
   own-authority`, 2026-09-06): the deliverable is a corpus, so the next cut re-promotes with its
   own amendment (canon-kit/SPEC.md §Merging an amendment), and `check-stage-entry` assertion B
-  refuses a validate entry on a non-empty active queue. TRAJECTORY.md §PRIORITY DIRECTIVE grants
-  scope the by-kit split, so a slice needs no waiver.
+  refuses a validate entry on a non-empty active queue. TRAJECTORY.md §The closed rulings'
+  `kit-spec-provenance-seam` grants scope the by-kit split, so a slice needs no waiver.
   **OWED ON A RE-GROUNDED BASIS, 2026-09-06 — operator, direct answer to the lead session's ask,
   lead-relayed:** the 2026-09-03 standing direction is SPENT and the operator chose RE-GROUNDING
   over renewing it, so what carries this now is product-class with a live trigger on its own
@@ -10495,6 +10507,109 @@
   Filed 2026-09-09 by close, from build batch B's reported method note plus three sibling
   instances close judged as one shape. Filed rather than fixed because the three candidates differ
   in kind and cost, and choosing between them is a scope decision.
+
+- **smoke-whole-tree-precondition-unscoped** [design-pending] — the consumer smoke gates its WHOLE
+  suite on an unscoped clean-tree check, so a dirty path the payload never reads still costs the
+  full `installer_smoke` suite.
+  **Where it actually sits — re-verified at this drain against the file, not against the filing.**
+  `installer/consumer-smoke/run-smoke.sh` `blocked`s on `git -C "$REPO" status --porcelain` in its
+  preflight, seventy-odd lines before the first `--pack-installer` call site, so the 2026-09-08
+  gap-inbox abort fired THERE and not in the arm. The bullet named lines 74 and 139; the file now
+  carries those predicates at 76 and 141, which is why this entry cites the predicates instead.
+  **RULED `lead, own-authority` 2026-09-10, escalation reply in the lead session, relayed by the
+  lead and NOT the operator's: leave it filed.** Options B (narrow the preflight) and C (rule the
+  preflight correct) were both refused at build, so scope ranks this without re-litigating them.
+  **Why B is not a one-liner:** the post-build assertion that the worktree is clean is sound only
+  because the preflight established a clean tree first, so narrowing the preflight turns it into a
+  false red on any dirty out-of-footprint path and the pair must move together. That is design work
+  owed its own amendment — and the merged `pack-step-dirty-tree-predicate-unscoped` amendment
+  enumerated the smoke's readers and declared them untouched, so touching it is an envelope change.
+  **Why C is live and unauthored:** the smoke is an acceptance harness asserting over the very tree
+  it packs, so its precondition may be correct on independent grounds. Ruling that at build would
+  have closed a design fork on evidence nobody had written.
+  **Nothing is over-claimed and no regression is carried.** installer/README.md §The packer records
+  the honest limit rather than a fix it does not deliver, and a dirty gap inbox costs the same
+  battery today as before the narrowing — the arm's own share of the cost is genuinely gone.
+  **DISTINCT from `gap-inbox-commit-ownership`**, which owns who COMMITS an inbox bullet; this owns
+  which paths a clean-tree predicate asks about, and neither answer needs the other.
+  **Cost while deferred:** every mid-iteration `--emit file-gap` capture taken while a validate
+  battery is pending costs that battery — a capture channel taxing the stage that drains it.
+  Filed 2026-09-10 by close, draining the gap inbox; build filed rather than fixed because the fix
+  is an envelope change against a merged amendment, which no build session may take.
+
+- **post-port-deferred-pool-triage** [design-pending] — one iteration triaging the whole deferred
+  pool now that the port's owed column reads zero: icebox by class, retire what a landed unit or a
+  closed ruling has mooted.
+  **RULED BY THE OPERATOR, 2026-09-05, consult channel, relayed by the lead.** Recorded here rather
+  than on the ruling record because it is an iteration's worth of WORK, and the queue is work's
+  business-as-usual surface. The marking is the point: this is a standing operator direction, not a
+  session-filed gap, and it is not to be ranked away as if it were one.
+  **Its former home retired with the port.** The direction lived inside the ruling record's
+  port-first paragraph, deleted 2026-09-10 once `--emit port-blockers --tree` read `0 owed`, which
+  left the direction undischarged with no surface holding it. Restoring it to the ruling record as
+  its own paragraph was refused there: the record would then carry a work item, against its own
+  content tiering.
+  **Already relied on:** `deferred-entry-iteration-name` records its own disposition as deferred to
+  this triage.
+  **Cost while deferred:** the pool runs past three hundred Deferred entries and a hundred iceboxed
+  ones (`--emit queue-counts` derives both) and grows every iteration, and every scope survey
+  re-reads it — so the triage's absence is a per-iteration tax on ranking, not a one-off.
+  Filed 2026-09-10 by close, draining the gap inbox; build filed rather than queue-editing
+  mid-iteration, and rather than starting work that is scope-gated.
+
+- **port-first-deferral-grounds-unresolvable** [design-pending] — a cohort of Deferred entries
+  states its deferral GROUND as the retired port-first run, so each one's recorded reason now
+  resolves to nothing, and re-grounding one decides whether it is composable.
+  **RULED `lead, own-authority` 2026-09-10 — escalation reply in the lead session, lead-relayed,
+  NOT the operator's: option (a), the NEXT SCOPE re-grounds them**, off this entry and against
+  scope's own economic composition test, which the retired run's last clause preserved.
+  Not build's and not close's: rewriting an entry's deferral reason is a re-scope, and doing a
+  fifth of the pool silently under cover of a citation sweep was refused.
+  **The roster is DERIVED, never carried — a line number ages the moment the queue moves.** Run
+  `--emit ruling-staleness 'the port-first run' 'port-first'` and read its `== citing sites ==`
+  block. The trap: run BARE, that arm sweeps only what FIRES, and nothing fires once the paragraphs
+  are gone — so a bare run reports nothing to sweep and looks clean.
+  **The split already taken:** the two sub-cases carrying known targets and no judgment content — a
+  `health triad` pointer and a by-kit-split pointer, both aimed at deleted headings — were repaired
+  at the 2026-09-10 close, a pointer at a deleted heading being false rather than undecided.
+  **Cost while deferred:** each entry in the cohort reads to a ranking survey as deferred on a
+  stated ground that cannot be checked, and the failure is silent — an unresolvable citation reads
+  exactly like a resolvable one.
+  **DISTINCT from `native-gate-port-remaining-corpus`**, the port work itself, which took its
+  terminal move at that same close: this owns the deferral grounds OTHER entries rested on the run
+  that sequenced it.
+  Filed 2026-09-10 by close, draining the gap inbox.
+
+- **stage-journal-path-unsourced-mid-stage** [design-pending] — a stage session dispatched into an
+  ALREADY-ENTERED stage has no mechanical source for that stage's journal path, so it invents a
+  discriminated filename and the successor's entry assertion then refuses.
+  **Attested 2026-09-10:** `--enter-stage validate` refused entry because `.tmp/build-journal.md`
+  carried only its opening line, while build's three lead-cut batch sessions had written
+  `-batch1-`, `-batch2-` and `-batch3-` journals, each ending `DONE`.
+  **Not a cardinality defect — that first reading was corrected the same day.**
+  lifecycle-kit/SPEC.md §The state machine already rules the multi-session case: one journal per
+  stage, every session appending under a heading naming itself, and the entry assertion satisfied
+  by ANY session of the predecessor having written. `--enter-stage`'s journal open appends and
+  never overwrites for exactly that reason, so nothing is owed on that axis.
+  **What IS owed is the seam:** the canonical path is printed by `--enter-stage` alone, and the
+  second or third batch of an already-entered stage never runs that arm.
+  **Re-verified at this drain, and the re-verification moves the answer.** The cheapest candidate
+  shape — oblige the batch-dispatching lead to grant the derived path — IS ALREADY IN THE TEMPLATE,
+  and has been since 2026-08-25: lifecycle-kit/templates/lead.md §Channel design says the lead
+  "still spells it out in the dispatch prompt" and refuses a per-batch filename by name. Three
+  batch sessions violated it anyway. That shape is therefore a FAILED CONTROL rather than a
+  candidate, and the hand-escape the lead paid this iteration was a symptom of the same gap.
+  **Why `[design-pending]`:** the surviving shapes differ in kind and none is costed — a read-only
+  `--emit stage-journal-path` arm any session can run without stamping; the same obligation moved
+  into the stage-session agent contract, where a non-entering session actually reads it; or a
+  detection half, now that the prompt-side rule is measured not to hold. Choosing is scope's.
+  **DISTINCT from the concurrency limit the same SPEC paragraph files** (two sessions of one stage
+  appending at once, untested and not claimed safe): this is a sequential session that does not
+  know the path at all.
+  **Cost while deferred:** the failure lands on the NEXT stage's entry, cold, holding only whatever
+  escape was written down — a session that did nothing wrong pays for one that did.
+  Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
+  the obvious cheap fix is already landed, and already failed.
 
 
 ## Icebox
