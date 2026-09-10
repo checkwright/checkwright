@@ -10489,6 +10489,12 @@
   which paths a clean-tree predicate asks about, and neither answer needs the other.
   **Cost while deferred:** every mid-iteration `--emit file-gap` capture taken while a validate
   battery is pending costs that battery — a capture channel taxing the stage that drains it.
+  **NOT ICEBOX-ELIGIBLE on the COST FIELD, never on the trigger** — `lead, own-authority`
+  2026-09-10, escalation reply in the lead session, lead-relayed, NOT the operator's. The cost
+  field above opens in prose, so it declares no class token and queue-kit/SPEC.md §The icebox
+  tier's eligibility clause reads it as not-low; that opener is not re-authored to unblock an
+  eviction, the blocking being the rule working. The drain commit's stated ground — a live trigger
+  — is FORECLOSED: the machinery-class default's test is conjunctive and carries no trigger limb.
   Filed 2026-09-10 by close, draining the gap inbox; build filed rather than fixed because the fix
   is an envelope change against a merged amendment, which no build session may take.
 
@@ -10509,6 +10515,12 @@
   **Cost while deferred:** the pool runs past three hundred Deferred entries and a hundred iceboxed
   ones (`--emit queue-counts` derives both) and grows every iteration, and every scope survey
   re-reads it — so the triage's absence is a per-iteration tax on ranking, not a one-off.
+  **NOT ICEBOX-ELIGIBLE, and the disqualifying limb is the cost field rather than the trigger** —
+  ruled `lead, own-authority` 2026-09-10, escalation reply in the lead session and lead-relayed,
+  never the operator's. The cost line above begins in prose rather than with a class token, and
+  queue-kit/SPEC.md §The icebox tier therefore reads it as not-low; rewriting that opener to
+  unblock an eviction is refused outright. Independently sufficient here: the machinery-class
+  default governs a FINDING, and a standing operator direction is directed work rather than one.
   Filed 2026-09-10 by close, draining the gap inbox; build filed rather than queue-editing
   mid-iteration, and rather than starting work that is scope-gated.
 
@@ -10533,6 +10545,15 @@
   **DISTINCT from `native-gate-port-remaining-corpus`**, the port work itself, which took its
   terminal move at that same close: this owns the deferral grounds OTHER entries rested on the run
   that sequenced it.
+  **NOT ICEBOX-ELIGIBLE, though this IS the clean machinery-class case and the default does route
+  it to that tier** — ruled `lead, own-authority` 2026-09-10, escalation reply in the lead session,
+  lead-relayed and never the operator's. Routing a finding to a tier does not exempt it from what
+  the tier requires: the cost line above begins in prose rather than with a class token, which
+  queue-kit/SPEC.md §The icebox tier reads as not-low, and rewriting an opener to unblock an
+  eviction is refused. The drain commit's stated ground, a live trigger, is FORECLOSED — that
+  default's test is conjunctive and has no trigger limb at all. Nor would this entry's derivation
+  command have been a reason to decline: an icebox line is a summary written to be dropped, and
+  the narrative recovers through `git log -p -S` over the queue.
   Filed 2026-09-10 by close, draining the gap inbox.
 
 - **stage-journal-path-unsourced-mid-stage** [design-pending] — a stage session dispatched into an
@@ -10563,6 +10584,12 @@
   know the path at all.
   **Cost while deferred:** the failure lands on the NEXT stage's entry, cold, holding only whatever
   escape was written down — a session that did nothing wrong pays for one that did.
+  **NOT ICEBOX-ELIGIBLE, on the cost field first and on the conjunction second** — ruled `lead,
+  own-authority` 2026-09-10, escalation reply in the lead session, lead-relayed and never the
+  operator's. The cost line above begins in prose rather than with a class token, which
+  queue-kit/SPEC.md §The icebox tier reads as not-low, and that opener is not rewritten to unblock
+  an eviction. Sufficient on its own besides: the machinery-class default's test is conjunctive,
+  and this finding BLOCKED A STAGE ENTRY, attested above, so the conjunction fails outright.
   Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
   the obvious cheap fix is already landed, and already failed.
 
