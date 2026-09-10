@@ -71,8 +71,7 @@ shell needs a cause from the live exception classes, stated in the gate's
 own SPEC section (gate-sdk/SPEC.md §The port-candidate criteria) — no gate is
 permanently shell, that section's retired exception class (a). The port
 oracle (gate-sdk/SPEC.md §port-blockers) answers on **two** axes: its registry
-arms for the battery, `--tree` for the project, and only `--tree`'s owed count
-is the completion predicate. Either
+arms for the battery, `--tree` for the project. Either
 substrate ships with a `good/`+`bad/` fixture pair; the four contracts (output,
 fail-closed, fixture-pair, self-lint) are specified in
 [gate-sdk/SPEC.md](gate-sdk/SPEC.md) and enforced by the meta-gates — a red gate
