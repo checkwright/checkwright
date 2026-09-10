@@ -10682,8 +10682,4 @@
 
 ## Done
 
-- native-gate-port-remaining-corpus
-- pack-step-dirty-tree-predicate-unscoped
-- pack-installer-cut-to-a-non-gate-arm
-
 ## Lessons Learned
