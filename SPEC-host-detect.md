@@ -242,9 +242,9 @@ that unit first. No edge to SPEC-run.md or SPEC-interp.md, which touch the crate
   `check-install-platforms` row — the binding is four-way and bidirectional, and the two detectors
   join the surfaces named (deltas 1 and 2).
 - `installer/README.md` §The gate binary, step 2 — the two detectors' extraction shape pinned, and
-  the note that the PowerShell half *"reads the platform and architecture off the runtime rather
-  than shelling out to uname"* extended with the libc question that neither input answers
-  (deltas 2 and 3).
+  the note that the PowerShell half *"asks the .NET runtime for the OS platform and the OS
+  architecture rather than shelling out to `uname`"* extended with the libc question that neither
+  input answers (deltas 2 and 3).
 - `installer/README.md` §The install boundary, step 3 — the selection step's three outcomes become
   four inputs to three outcomes: the libc gate is a second way to reach the unsupported-host
   refusal, and the section states which refusal an adopter meets and why (deltas 3 and 4).

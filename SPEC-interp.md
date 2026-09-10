@@ -40,9 +40,9 @@ lint that reds a bare interpreter name."*
 - **The call-site sweep is refused on a measurement.** The same census counted the whole
   bare-literal shipped-path spawn population: `git` **111** sites, `bash` 24, `date` 7, `mktemp` 5,
   `jq` 2, and one each of `uname`, `tar`, `npm`, `curl`, `cp`, `ps`. A sweep over that is not a
-  shape anyone can cost. It is also what the recorded doctrine already rules out —
-  *"a witness points a site, a sweep does not"* — and the measurement is now the second,
-  independent reason.
+  shape anyone can cost. It is also what the recorded doctrine already rules out — §check-graph's
+  two prior adoptions each landed *"on its own witnessed red and never on a sweep"* — and the
+  measurement is now the second, independent reason.
 - **A lint that reds a bare interpreter name is refused on its own terms**, and this is the
   non-obvious one. Under the funnel the call sites **keep** spawning the literal `"bash"`, correctly
   — resolution is the owner's job and the literal is what the registry declaration is compared
@@ -183,8 +183,8 @@ suppressed on any path grep.
   compares that record against `gates/mod.rs`'s declared requirement — the reader whose exact-match
   comparison is failing today.
 - **Existing integration prose describing the prior flow** is updated in three places, listed below;
-  the important one is §check-graph's *"a witness points a site, a sweep does not"* passage, which
-  describes a flow this amendment ends.
+  the important one is §check-graph's *"each on its own witnessed red and never on a sweep"*
+  passage, which describes a flow this amendment ends.
 
 **Producer/consumer edges inside batch A, for the lead's batch cut.** This unit **consumes**
 SPEC-run.md's funnel (delta 2 there) and cannot land before it. It has no edge to SPEC-host-detect.md
@@ -194,8 +194,8 @@ crate's spawn path. **No edge crosses to batch B.**
 ## Existing sections updated
 
 - `gate-sdk/SPEC.md` §check-graph, the paragraph beginning *"The interpreter assertion D spawns is
-  resolved, not named"* — its two-pointed-readers roster and its *"a witness points a site, a sweep
-  does not"* clause describe the flow deltas 1 and 2 replace. Rewritten to state the roster and the
+  resolved, not named"* — its two-pointed-readers roster and its *"each on its own witnessed red and
+  never on a sweep"* clause describe the flow deltas 1 and 2 replace. Rewritten to state the roster and the
   funnel (deltas 1 and 2). **This is a rewrite a later reader could mistake for a reversal, so it
   carries its own sentence saying it is not:** the recorded ruling narrowed an envelope *"a resolver
   over the whole residue triages as a feature, a feature is a yield"* and left the residue unpointed

@@ -24,8 +24,9 @@
   **What discovering it cost:** three pushes against a budgeted one to two, by operator ruling, and
   the headline entry still deferred with its PRODUCED half discharged.
   **The amendment's finding, and it is why none of the five recorded shapes was ever costed:** the
-  class has no name the machine can read. `run-observed` occurs three times in the tracked tree,
-  all three prose, its one live use an opaque reason string on a since-retired entry. Every shape
+  class has no name the machine can read. `run-observed` occurred three times in the tracked tree
+  at authoring, all prose — this same promotion compressing this entry to the one survivor above —
+  its one live use before that an opaque reason string on a since-retired entry. Every shape
   was therefore a policy about a set no surface enumerates, and a policy's cost is dominated by who
   must notice membership. That is the 2026-08-31 recurrence judgment restated as a fix: the miss
   was FILING-VISIBILITY rather than analysis, and naming the class is what visibility means here.

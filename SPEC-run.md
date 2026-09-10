@@ -122,7 +122,7 @@ funnel takes that arm verbatim. Every POSIX verdict is byte-identical.
 today and today's error text is what a caller sees. So the delta is monotone: no gate can newly red
 on it, and no adopter meets a refusal that did not already exist. This is `resolve_floor_tool`'s
 posture, not `resolve_interpreter`'s, and the two are kept apart deliberately — the refusing
-resolver's ground is a *system-directory homonym*, which is delta 3 of SPEC-interp.md and not this
+resolver's ground is a *system-directory homonym*, which is delta 1 of SPEC-interp.md and not this
 unit's business.
 
 **It resolves AFTER `recorder::note(program)`, and that placement is the whole reason it is safe.**
@@ -235,8 +235,13 @@ in `gates/graph.rs` and `installer/init.rs` is only correct once the funnel exis
 - `gate-sdk/SPEC.md` §Fail-closed contract, the wrapper-contract preamble — `run`'s `Err` arm is
   described as *"the backstop for a program that vanishes between the probe and the spawn"*, which
   is now the only case it backstops rather than one of two (delta 2).
-- `installer/README.md` §The packer, the preflight tool set — `mktemp` joins the named set, and the
-  section's note that the set *"narrows with the spawned set"* gains its converse (delta 4).
+- `installer/README.md` §The packer gains the preflight tool set's documentation for the first
+  time — `mktemp` joins `npm`, `git` and `tar` as a probed member, and the section states the
+  converse gap this delta closes. **Align-found, not this delta's own drift:**
+  `native/src/emit/pack_installer.rs:119`'s `# spec:` comment already cites this section for a
+  *"the preflight tool set narrows with the spawned set"* note that installer/README.md has never
+  actually carried; this delta is what finally lands the text the comment has been promising
+  (delta 4).
 - `native/src/proc.rs`'s own `# spec:` comments on `exe_candidates`, `which`, and each `run*` helper
   — the resolution step is a directive a reader of the spawn needs at the spawn (deltas 1 and 2).
 - `native/src/proc.rs`'s unit tests `a_populated_pathext_is_read_rather_than_the_fallback`,

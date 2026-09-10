@@ -15,8 +15,11 @@ rules a sixth that none of the five could reach.
 ## Why no shape could be costed, which is the finding the five shapes were missing
 
 **The class has no name the machine can read.** Probed at HEAD rather than assumed: the string
-`run-observed` occurs exactly three times in the tracked tree, all three in `TASK-QUEUE.md`, and
-all three are prose. Its one live use was as the opaque `<reason>` field of
+`run-observed` occurred exactly three times in the tracked tree at authoring, all three in
+`TASK-QUEUE.md` and all three prose — this same session's own promotion then compressed this
+entry's body and left one survivor, in the paragraph above. Even the term's own historical record
+does not survive a single commit intact, which is a demonstration of the finding rather than a
+correction to it. Its one live use, before that entry existed, was as the opaque `<reason>` field of
 `[precondition-ok: run-observed]` on `platform-support-ci-matrix`, an entry since retired.
 `[precondition-ok:]` is a per-entry opt-out valve for `check-queue-prose-precondition`, that gate is
 its only reader, and it treats the reason as an opaque string it never inspects.
@@ -76,12 +79,16 @@ lifecycle-kit/SPEC.md gains one rule, stated over the tag and over no count {des
 > An iteration whose promoted set carries any `[observed-by:]` entry places its **first** push at or
 > before the stage that lands that entry's work — never at the closing stage.
 
-The arithmetic that makes this the cheap shape is **already ruled and already on the entry**: a
-finished run is read for free, and the commits that record the reading accumulate locally and ride
-the close push, which the 2026-09-01 lead ruling establishes costs no push of its own. So the rule
-**re-places an existing push rather than buying one**, and the observation arrives *between* the
-iteration's two pushes — early enough to be read, committed, and drained before the drain gate is
-reached. The entry's own 2026-09-05 correction derived exactly this and left it as a property of
+The arithmetic that makes this the cheap shape is **already ruled**, though this same session's own
+promotion of the entry above is what compressed the ruling's text out of the tracked queue, so it is
+restated here rather than left to a dangling reference: **ruled `lead, own-authority` 2026-09-01, in
+the lead's own close-stage commit message, against an option set priced on a false dichotomy — that
+landing a finding is not the same as pushing it.** A finished run is read for free, and the commits
+that record the reading accumulate locally and ride the close push, which that ruling establishes
+costs no push of its own. So the rule **re-places an existing push rather than buying one**, and the
+observation arrives *between* the iteration's two pushes — early enough to be read, committed, and
+drained before the drain gate is reached. The entry's own 2026-09-05 finding — also since
+compressed, and restated here on the same ground — derived exactly this and left it as a property of
 the budget; this delta makes it an obligation keyed to a tag.
 
 **The seam is held deliberately.** The *number* of pushes an iteration may spend is consumer
@@ -189,14 +196,23 @@ state file, and no new emitted event.
   belongs to the observation rather than to the declaration, and would be a field with no reader at
   the moment it is minted.
 - **Readers surveyed across the whole component set, not a hand-picked subset.** The survey ran over
-  every tracked surface for `run-observed` (three hits, all prose, all `TASK-QUEUE.md`) and over
+  every tracked surface for `run-observed` (three hits at authoring, one surviving this session's own
+  promotion compression, all prose, all `TASK-QUEUE.md`) and over
   `queue-kit/SPEC.md` §The tag algebra for every existing reader of every tag, with no stderr
   suppressed on any path grep. No cross-component reader exists today, because the class has no
   token today — which is delta 1's whole premise.
 
-**No producer/consumer edge crosses into this iteration's other batch.** Deltas 1–5 touch
-`queue-kit`, `lifecycle-kit` and this repo's queue; the platform batch touches `native/`,
-`installer/` and `gate-sdk/`. Nothing either batch emits is the other's input.
+**No producer/consumer edge crosses into this iteration's other batch, with one spelling-only
+exception the platform batch already names from its side.** Deltas 1–5 touch `queue-kit`,
+`lifecycle-kit` and this repo's queue; the platform batch touches `native/`, `installer/` and
+`gate-sdk/`. Nothing either batch emits is the other's input in the causal sense — no value crosses
+— but three of the platform batch's own queue entries (`windows-bare-name-spawn-fails-open-past-its-preflight`,
+`crate-interpreter-resolution-residue`, `gate-binary-platform-roster-holes`) already carry the
+`[observed-by: gates]` tag **spelling** ahead of delta 1 formalizing it into `check-tag-lead-line`'s
+governed set — the same one-directional, spelling-only dependency SPEC-arm64-linux.md's own
+producers-and-consumers section already records ("the one thing this unit consumes from batch B is
+a tag spelling, not a value"). Delta 1 validates those three existing usages retroactively; it
+changes what they enforce, never what they mean, and neither batch reads a value the other computes.
 
 ## Existing sections updated
 
@@ -218,8 +234,9 @@ state file, and no new emitted event.
 
 ## Retired spellings
 
-- None — no delta of this amendment retires a spelling. `run-observed` survives in three
-  `TASK-QUEUE.md` passages that describe the class historically, and delta 1 **adds** a token rather
+- None — no delta of this amendment retires a spelling. `run-observed` survives in one
+  `TASK-QUEUE.md` passage (three before this same promotion compressed the entry) describing the
+  class historically, and delta 1 **adds** a token rather
   than replacing one: `run-observed` was never a formal spelling, only an opaque reason string on a
   retired entry, so there is nothing for a sweep to chase.
 
