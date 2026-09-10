@@ -2429,6 +2429,15 @@ that one exists or what it costs. Each arm's own `spec:` comment explains that
 arm's placement to whoever is already reading it; none of them can reach the
 session that has not started.
 
+**Which of a shell tool's environment reads may be DECLARED on a bridged arm's
+knob roster is decided by the knob's own name, never by the arm porting it.** The
+config bridge attributes a declared knob from that name and resolves it by
+sourcing exactly one kit's library, exiting 2 on a knob the library does not
+define (§lib/gate.sh). A name carrying neither a kit prefix nor a kit-library
+home therefore cannot be declared at all, and the arm reads it off the process
+environment exactly as the shell tool did. A port author composing a roster
+applies that rule per name rather than re-deriving it per name.
+
 A **non-gate arm** is specified by three properties:
 
 - **It is a top-level `--`-prefixed flag, resolved in `main` before the
@@ -9664,6 +9673,16 @@ checkout — a hermetic `mktemp` sandbox — is unreachable through
 invocation rather than as a boundary. Such a caller reaches the binary through
 `gate_native_bin`, the same binary-level path a substrate-parity harness takes
 (§check-gate-substrate-parity).
+
+**Resolving the root is a `cd`, and that gives a tree-argument arm two
+independent selectors where the shell tool it replaced had one.** The front-end
+changes directory to the git toplevel of the **current** directory before it
+resolves the binary and the bridged environment. So an arm taking a tree operand
+such as `--root` has that operand selecting which tree it works on while the
+invoking cwd separately selects whose checkout supplies the tooling; run from a
+second checkout the two diverge silently, each half correct on its own terms. A
+caller that needs them to be one tree pins both, which is why a smoke asserting
+over the very tree it packs passes the tree operand and a `cd` together.
 
 **The front-end kept a shell dispatch loop for one branch until the stub cut, and
 the admission is preserved as closed history rather than deleted.** A host the

@@ -3272,6 +3272,15 @@ moment it matters, since the session asking what would go stale is asking
 operand the report covers exactly the fired conditions, which is the close-stage
 step's reading.
 
+**Run bare AFTER a retirement has landed, the citing-side report is vacuous and
+reads as clean.** A retired paragraph fires nothing, so the subject set is empty
+and the run says there is nothing to sweep — at the one moment a session most
+wants the citing sites, the retirement being what stranded them. The tail answers
+that after case as well as the before one, and what to pass is the ruling's
+**names**: the declared-name lookup reads the live record, so a discharge slug
+that has just left it resolves to nothing and each operand degrades to a literal
+search over the corpus.
+
 **Escalation-only, and the refusal is the design.** The arm proposes no edit,
 retires nothing, and never says a citation is wrong. That boundary answers this
 kit's own standing objection to mechanizing this class (§The committed gap
