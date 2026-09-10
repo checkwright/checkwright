@@ -88,6 +88,21 @@ the budget; this delta makes it an obligation keyed to a tag.
 content — `CLAUDE.md` owns it here — and this rule names no number. It constrains only **where** the
 first one falls, which is mechanism about an ordering the state machine already owns.
 
+**This delta's envelope was contested and is settled — `operator 2026-09-11`, ruled through
+AskUserQuestion in the lead session and relayed by that lead.** The authoring stage escalated
+whether a *standing* obligation in shipped kit mechanism may constrain where an operator-owned
+resource falls, offered three dispositions — confirm as authored, soften to a recommendation the
+scope stage weighs, or relay — and recommended the first. The operator took it: **the placement rule
+is inside this amendment's envelope and the authored form stands.**
+
+The record is here rather than only in the thread that carried it because the adjacency is the whole
+reason the question was operator-class and not the lead's to self-clear: the push budget had been
+ruled on the day before, and `CLAUDE.md`'s standing one-to-two line was deliberately left unedited
+so it would keep reading as standing. A later session meeting this rule with no such record finds a
+standing push constraint and no evidence that anyone holding the authority to place it agreed —
+which is the state this paragraph exists to prevent. Nothing above was rewritten in consequence; the
+ruling confirmed the text rather than changing it.
+
 ### (3) The branch the placement cannot reach, decided at scope where the unit set is bounded
 
 Where `<producer>` is the **release run** — tag-triggered, so no mid-iteration push can fire it —
