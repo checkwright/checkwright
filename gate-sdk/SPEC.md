@@ -1081,7 +1081,10 @@ in `proc.rs` so a cohort of wrappers buys them once:
   whatever it was. A refusal message is a
   documented surface — a session debugging its PATH reads the message, not the
   exit code. `run`'s `Err` arm stays the backstop for a program that vanishes
-  between the probe and the spawn. **Two platform axes decide whether it answers
+  between the probe and the spawn, and since the resolution below that is now the
+  *only* case it backstops rather than one of two: it used to catch a probe and a
+  spawn disagreeing about the same present program, which is a defect and not a
+  race. **Two platform axes decide whether it answers
   at all, and getting either wrong makes it report a program the host has as
   absent** — a wrapper refusing on an installed program, the exact false verdict
   the class exists to prevent. The **separator** is `std::env::split_paths`'s,
@@ -1097,7 +1100,14 @@ in `proc.rs` so a cohort of wrappers buys them once:
   *installed* program may be named, not what a *built artifact* is named — which
   is why the two substrates hold separate single owners rather than one. The bare
   name stays a candidate, so a caller naming `cargo.exe` and a Unix host both
-  resolve through the same loop. The resolution is therefore a **pure function of
+  resolve through the same loop — but it is the **last** candidate, not the first.
+  Windows resolves a typed name through `PATHEXT` and will not execute an
+  extensionless file, so a bare-first order is the POSIX rule applied on the one
+  platform that does not use it, and it is what let an extensionless `npm` sh
+  script beat the `npm.cmd` shim that Node's own Windows install ships beside it.
+  A Unix host passes no `PATHEXT` at all, whose arm returns the bare name alone
+  and has no ordering to change, so the reordering moves no verdict on any
+  platform the battery runs on. The resolution is therefore a **pure function of
   (PATH, PATHEXT, an existence predicate)**: its Windows arms cannot execute on the
   host that develops them, so a fake predicate is the only oracle a unit test here
   has. The separator has none even so — `split_paths` compiles to the host's rule,
@@ -1108,6 +1118,59 @@ in `proc.rs` so a cohort of wrappers buys them once:
   shape and the same paired vacuity control, differing only in that its decision
   *is* behaviourally reachable once the input is injected and so owes no source
   scan. The mechanism is stated here and cited there rather than restated.
+- **The spawn resolves through the same function the probe resolves through**, and
+  stating only the probe's half is what let the two diverge. Every `proc::run*`
+  helper resolves its program through `which` before `Command::new`, on Windows
+  only, falling back to the bare name where nothing resolves. The invariant that
+  buys, and it is the whole of the rule: **on every host, if `on_path(P)` answers
+  true then the spawn of `P` reaches the file `which(P)` named** — one resolution
+  serves both, so the two cannot disagree. Without it the probe walked the
+  `PATHEXT` candidate set and the platform walked its own rules, and a wrapper
+  passed its preflight and then refused at the spawn on a program the host has,
+  which is the fail-open the probe exists to prevent. Three properties are
+  load-bearing. It is a **pass-through off Windows** on `resolve_floor_tool`'s own
+  ground — resolving there would swap the spawned literal for an absolute path on
+  every host the battery runs on — so every POSIX verdict is byte-identical. It
+  **falls back rather than refusing**, spawning the bare name and yielding today's
+  error text where nothing resolves, so the change is monotone: no gate can newly
+  red on it and no adopter meets a refusal that did not already exist. That is
+  deliberately `resolve_floor_tool`'s posture and not §check-graph's refusing
+  resolver, whose ground is a system-directory homonym rather than a naming
+  dialect. And it resolves **after** the spawn recorder's note, which is what
+  leaves every `# graph:` requirement declaration matching the recorded name by
+  construction — a call site that resolves first hands the recorder a path and
+  breaks that comparison, which is the second reason the resolution belongs to the
+  owner rather than to a caller. `dispatch` is outside the funnel and needs no
+  place in it: its `argv[0]` is a resolved binary or script **path** its caller
+  computed, never a name for the platform to search.
+- **What `Command::new` does with a resolved `.cmd` is an observation, so the
+  repair is a ladder and a Windows run selects its rung.** Rung 1 is the funnel's
+  own spawn, `Command::new(<resolved path>)`, and for a resolved `.exe` or `.com`
+  it is settled. For a resolved `.cmd` or `.bat` it is not: `std`'s handling of
+  batch files changed across releases and the argument-escaping repair for
+  CVE-2024-24576 landed in **1.77.2**, above the crate's `rust-version` pin, and
+  what that pin's `std` does with a `.cmd` is not derivable on a Linux host. The
+  oracle is the Windows install-smoke leg — a green leg means rung 1 suffices and
+  rung 2 is never built; a red leg naming a bad executable format means rung 2 is
+  owed, and the leg's own log says which. **Rung 2 is specified here so a red run
+  costs no design round:** a named helper invoking the resolved batch file through
+  the command processor, taken by a call site that **opts in** rather than by the
+  funnel. Opt-in precisely because of the CVE class — composing a command
+  processor's command line is where argument injection lives, and the pin's `std`
+  does not escape for it — so the helper is restricted to a call site whose argv is
+  a compile-time literal set with no caller-supplied string, and an argv carrying
+  interpolated data cannot reach it by accident because reaching it is an edit. **A
+  knob naming which rung to take is refused**: its only reader would be a human
+  guessing at a platform question the run already answers, and it would let a host
+  silently take the wrong rung. **Raising the pin to 1.77.2 is the third option and
+  it is declined on this SPEC's own two grounds**: it would raise a toolchain floor
+  the objectives exist to collapse (§build-native declines `trim-paths` on that
+  same axis), and an MSRV bump un-suppresses clippy against unchanged code —
+  §The settings cohort, and the crate's first dependency records the 1.56→1.71
+  move surfacing four findings in modules the cohort never edited, by controlled
+  experiment rather than by inference — so a
+  floor move is its own unit with its own clippy budget rather than a Windows spawn
+  fix's passenger.
 - **`run_merged` and `Merged`** — the `2>&1` capture a wrapper's shell form takes.
   `Completed` withholds stdout unless the status succeeded, which is right for a
   reader and wrong for a wrapper: for a linter the **non-zero** run is the one

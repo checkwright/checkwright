@@ -1437,6 +1437,22 @@ reach it through the front-end,
 its boundary, the route this repository's release path invokes it by, and the
 contracts its own `# spec:` pointers cite.
 
+**The arm's first act is a preflight over the external programs it spawns, and
+the probed set tracks the spawned set in both directions.** `npm`, `git`, `tar`
+and `mktemp` are each probed on `PATH` before any of them is reached, so an
+absent one is the arm's own named refusal — *`<tool>` not found on PATH — the
+pack step cannot run.* — rather than a generic spawn failure from wherever the
+program happened to be needed. That is what gate-sdk/SPEC.md §Fail-closed
+contract's wrapper contract buys, and the set tracks the spawned one in both
+directions: a program the pack does not reach stays out, because probing it
+would refuse on something nothing runs — which is why `jq` is absent from it —
+and a program the pack does reach is in. `mktemp` is the second case: the
+scratch assembly spawns it, so leaving it unprobed reports the absence in the
+middle of the pack rather than at the front of it, which is exactly the
+asymmetry the wrapper contract exists to remove. A member added to the pack's
+spawned set joins this list in the same change; the refusal text is
+parameterised by the tool name, so nothing else moves.
+
 **Nothing is written inside the worktree, and no second copy of any kit is ever
 checked in.** The payload's kit set is derived at pack time from the roots the
 battery itself enumerates, so the shipped set cannot drift from the governed

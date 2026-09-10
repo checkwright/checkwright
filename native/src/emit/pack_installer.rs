@@ -116,9 +116,10 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
         .map_err(|e| refuse(format!("cannot enter the work tree at {}: {}", root, e)))?;
     let root = walk::cwd().map_err(refuse)?;
 
-    // spec: installer/README.md §The packer — the preflight tool set narrows with the spawned set:
-    // `jq` is no longer reached, so naming it here would refuse on a program nothing runs
-    for tool in ["npm", "git", "tar"] {
+    // spec: installer/README.md §The packer — the preflight tool set tracks the spawned set in
+    // both directions: `jq` is unreached, so probing it would refuse on a program nothing runs,
+    // and `mktemp` is reached, so omitting it reported a generic spawn failure
+    for tool in ["npm", "git", "tar", "mktemp"] {
         if !proc::on_path(tool) {
             return Err(refuse(format!(
                 "{} not found on PATH — the pack step cannot run.",

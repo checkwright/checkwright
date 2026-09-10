@@ -67,7 +67,7 @@ impl Completed {
 pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program);
-    let out = Command::new(program).args(args).output().map_err(|e| {
+    let out = Command::new(spawn_target(program).as_ref()).args(args).output().map_err(|e| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
             program, e
@@ -110,23 +110,42 @@ const PATHEXT_DEFAULT: &str = ".COM;.EXE;.BAT;.CMD";
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the crate's single owner of what an *installed*
 // program may be named; `None` is a platform with no such question, so no caller appends an
 // extension of its own and the two substrates stop disagreeing
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the bare name is the LAST candidate: Windows
+// will not execute an extensionless file, so a bare-first order was the POSIX rule applied on
+// the one platform that does not use it
 fn exe_candidates(program: &str, pathext: Option<&str>) -> Vec<String> {
-    let mut out = vec![program.to_string()];
     let Some(raw) = pathext else {
-        return out;
+        return vec![program.to_string()];
     };
     let raw = if raw.trim().is_empty() {
         PATHEXT_DEFAULT
     } else {
         raw
     };
-    out.extend(
-        raw.split(';')
-            .map(str::trim)
-            .filter(|e| !e.is_empty())
-            .map(|e| format!("{}{}", program, e)),
-    );
+    let mut out: Vec<String> = raw
+        .split(';')
+        .map(str::trim)
+        .filter(|e| !e.is_empty())
+        .map(|e| format!("{}{}", program, e))
+        .collect();
+    out.push(program.to_string());
     out
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the spawn's own resolution, the same `which` the
+// probe answers from, so `on_path(P)` true means the spawn of `P` reaches the file `which(P)`
+// named; it runs AFTER `recorder::note`, which leaves every registry declaration matching
+#[cfg(windows)]
+fn spawn_target(program: &str) -> std::borrow::Cow<'_, str> {
+    which(program).map_or(std::borrow::Cow::Borrowed(program), std::borrow::Cow::Owned)
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the pass-through arm, `resolve_floor_tool`'s own
+// ground: resolving here would swap the spawned literal for an absolute path on every host the
+// battery runs on
+#[cfg(not(windows))]
+fn spawn_target(program: &str) -> std::borrow::Cow<'_, str> {
+    std::borrow::Cow::Borrowed(program)
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the resolution as a pure function of its three
@@ -358,7 +377,7 @@ pub fn run_merged_in(
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
     let err = out.try_clone().map_err(spawn_err)?;
-    let mut cmd = Command::new(program);
+    let mut cmd = Command::new(spawn_target(program).as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
@@ -388,7 +407,7 @@ pub fn run_merged_in(
 pub fn run_bounded(program: &str, args: &[&str], secs: u64) -> Result<Option<i32>, String> {
     #[cfg(test)]
     recorder::note(program);
-    let mut child = Command::new(program)
+    let mut child = Command::new(spawn_target(program).as_ref())
         .args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
@@ -438,7 +457,7 @@ pub fn run_bounded_capture(
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
-    let mut child = Command::new(program)
+    let mut child = Command::new(spawn_target(program).as_ref())
         .args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
@@ -492,7 +511,7 @@ pub fn run_with_env_in(
 ) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program);
-    let mut cmd = Command::new(program);
+    let mut cmd = Command::new(spawn_target(program).as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -529,7 +548,7 @@ pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Comp
             program, e
         )
     };
-    let mut child = Command::new(program)
+    let mut child = Command::new(spawn_target(program).as_ref())
         .args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -609,7 +628,7 @@ pub fn run_streamed(
             return Err(io_err(e));
         }
     };
-    let mut cmd = Command::new(program);
+    let mut cmd = Command::new(spawn_target(program).as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::from(feed))
         .stdout(std::process::Stdio::from(sink));
@@ -687,7 +706,7 @@ pub fn run_to_env(
             program, e
         )
     };
-    let mut cmd = Command::new(program);
+    let mut cmd = Command::new(spawn_target(program).as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -898,11 +917,11 @@ mod tests {
             assert_eq!(
                 exe_candidates("cargo", Some(raw)),
                 vec![
-                    "cargo".to_string(),
                     "cargo.COM".to_string(),
                     "cargo.EXE".to_string(),
                     "cargo.BAT".to_string(),
                     "cargo.CMD".to_string(),
+                    "cargo".to_string(),
                 ],
                 "a blank PATHEXT ({:?}) did not take the fallback set",
                 raw
@@ -917,12 +936,52 @@ mod tests {
         assert_eq!(
             exe_candidates("cargo", Some(".EXE; .PS1 ;;.CMD")),
             vec![
-                "cargo".to_string(),
                 "cargo.EXE".to_string(),
                 "cargo.PS1".to_string(),
                 "cargo.CMD".to_string(),
+                "cargo".to_string(),
             ]
         );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the ordering the defect turned on, injected
+    // on a host that cannot execute it: Node's Windows install leaves an extensionless `npm` sh
+    // script beside its `npm.cmd` shim, and `CreateProcessW` can run only the second
+    #[test]
+    fn a_pathext_shim_beats_the_extensionless_file_beside_it() {
+        let path = std::env::join_paths(["/opt/nodejs"]).expect("cannot join a PATH");
+        let both_exist =
+            |p: &Path| p == Path::new("/opt/nodejs/npm") || p == Path::new("/opt/nodejs/npm.CMD");
+        assert_eq!(
+            resolve_on_path("npm", Some(&path), Some(""), both_exist),
+            Some("/opt/nodejs/npm.CMD".to_string()),
+            "the extensionless sh script beat the .CMD shim beside it, which is the resolution \
+             CreateProcessW cannot run"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the bare name survives as a candidate and is
+    // reached where no PATHEXT variant exists, which is the half the reordering must not break
+    #[test]
+    fn the_bare_name_is_still_reached_where_no_variant_exists() {
+        let path = std::env::join_paths(["/opt/bin"]).expect("cannot join a PATH");
+        assert_eq!(
+            resolve_on_path("cargo", Some(&path), Some(""), |p: &Path| p
+                == Path::new("/opt/bin/cargo")),
+            Some("/opt/bin/cargo".to_string()),
+            "the bare name stopped being a candidate, so a caller naming cargo.exe and a Unix \
+             host no longer resolve through the same loop"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the funnel's pass-through arm, on
+    // `a_posix_floor_tool_is_spawned_under_its_bare_name`'s shape: resolving on POSIX would swap
+    // the spawned literal for an absolute path on every host the battery runs on
+    #[cfg(not(windows))]
+    #[test]
+    fn a_posix_spawn_reaches_the_bare_name_the_caller_passed() {
+        assert_eq!(spawn_target("bash"), "bash");
+        assert_eq!(spawn_target("checkwright-no-such-program"), "checkwright-no-such-program");
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the defect in full: a program installed only
