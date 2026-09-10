@@ -6390,8 +6390,9 @@
 
 - **iteration-scoping-clause-date-ambiguity** [design-pending] — a clause scoping a ruling to one
   iteration by DATE cannot name it, because this tree opens several iterations a day.
-  **The instance, measured rather than argued.** `native-gate-port-remaining-corpus` carries "the
-  PRIORITY DIRECTIVE yields ... for the 2026-08-22 iteration alone". Two iterations scoped on
+  **The instance, measured rather than argued.** A retired priority ruling scoped its yield "for
+  the 2026-08-22 iteration alone"; the carrier entry left the queue 2026-09-10, so that wording is
+  now recoverable from git history and not from the pool. Two iterations scoped on
   2026-08-22 — `substrate-claim-and-update-target-coverage` and
   `hold-ground-oracle-and-takeable-holds` — probed at this drain against the stamp HISTORY, since
   `.workflow/WORKFLOW-STATE.txt` is boundary-truncated and only `git show` reaches the earlier one.
@@ -6457,8 +6458,8 @@
   reader of any kind and no ruling behind them, so the question is the opposite one: whether they
   are surface at all.
   **DISTINCT from `in-crate-module-coupling-derivation`** (descriptors under-declaring their
-  couples) and from `native-gate-port-remaining-corpus` (what the port still owes, not what it
-  leaves behind unread).
+  couples) and from `native-gate-port-remaining-corpus`, retired 2026-09-10 at zero owed (what the
+  port owed, not what it leaves behind unread).
   **Cost while deferred:** the port keeps generating this residue at the rate it lands members,
   and every reader who wonders re-runs the same grep to learn the same thing.
   Filed into the gap inbox 2026-08-19 by the `budget-batch-and-account-identity-kind` close, at
@@ -9847,7 +9848,7 @@
   **The removals have a SHAPE, and it is the census's durable half.** They concentrate on entries
   hosting SEVERAL rulings of one authority across different dates: the newest instance was restated
   inline and the older co-located ones were not. The pool's two densest hosts,
-  `platform-support-ci-matrix` (since retired) and `native-gate-port-remaining-corpus`, are the two
+  `platform-support-ci-matrix` and `native-gate-port-remaining-corpus` (both since retired), are the
   largest instances. Two elements go, not one — usually the channel, but on `kpi-cost-per-unit` and
   `kit-spec-provenance-seam-sweep` (retired 2026-09-05) it is the authority.
   **Three classifications were spot-verified by hand**, so the numbers stand on reads rather than a
@@ -10310,6 +10311,10 @@
   **MEASURED at the `macos-roster-join` close's tooling-friction triage:** `--emit
   scan-prompts` ranks 186 prompting calls across 32 patterns; the top two are the liveness
   loop at 91x and the journal append at 34x — together 67 per cent of the whole surface.
+  **RE-MEASURED at the `packer-port-terminal-cut` close: 124 calls across 35 patterns from 530
+  fall-throughs.** The class still leads — the journal append at 25x plus the wait machinery at
+  16x — but its share of the surface halved, 33 per cent against 67. The diagnosis re-held
+  unchanged: every other ranked pattern is already committed and ranks only on a broken match.
   **Both are structurally unallowlistable rather than merely ungranted.** A `Bash(...)`
   entry matches a bare command, so a chained call, a redirect or an expansion falls off the
   match path whatever the allowlist holds; the mandated wait is a loop over a recorded pid
