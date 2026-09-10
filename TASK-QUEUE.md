@@ -10690,6 +10690,7 @@
 - **portability-count-on-two-surfaces** [design-pending] — Hand-spelled census; both true today.
 - **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
 - **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
+- **edges-retired-block-name-clash** [design-pending] — A live gate name inflates a retired slug.
 
 ## Done
 
