@@ -54,7 +54,7 @@ everything else to
 <!-- roadmap:begin -->
 ### now
 
-- **`native-gate-port-remaining-corpus`** *(reliability)* — The gate battery becomes a native binary — precompiled, or built from source.
+_Nothing is queued under this horizon._
 
 ### next
 

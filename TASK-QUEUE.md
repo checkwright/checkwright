@@ -671,56 +671,6 @@
   which no stage of that iteration could drain; carried into this iteration's scope intake and
   promoted here, so the record is late and says so.
 
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds and its scope
-  are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's and both install paths gate-sdk/SPEC.md
-  §Consumer payload's, not restated; this entry is the work, bootstrap design included, inheriting
-  gate-sdk/SPEC.md §Porting a gate to the binary substrate. **Each closed cut's record — members,
-  counts, holds, grounds, price — lives in the contract section that cut selected**, so this entry
-  states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md §Consumer
-  smoke, *The port disposition*).
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
-  only `--tree` is the predicate, both are run; that misreading and the bounds are §port-blockers'.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed files
-  behind one specification section, ported behind the one amendment that section needs; size- and
-  kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING, 2026-08-30
-  (operator, lead-relay):** those clauses make ONE cut well-formed; how many an iteration holds is
-  owned elsewhere. Refused with it — three cohorts as ONE cut (failing *one* section / *the one*
-  amendment, and averaging grounds all three entries forbid, shared setup being logistics); and one
-  cut per iteration, an over-read paying three iteration floors for no added decision quality.
-  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT** — a consumer-facing plugin or config
-  seam keeps its resolution, direct execution and env contract, only bundled members move in-crate;
-  ground and worked case at drift-kit/SPEC.md §The extensibility contract, never analogy.
-  **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a grant whose target a
-  RULED PORT CUT DELETES is OUTSIDE the permission-settings bar — a pure narrowing — and build drops
-  the dead lines IN THE SAME COMMIT AS THE DELETE. Scope is the files THAT COMMIT deletes, never a
-  path prefix — probe the count, one kit's quadrupled. **WIDENED 2026-09-05 (operator, in-session
-  prompt, lead-relayed): build EDITS `.claude/settings.json` ITSELF, in-cut, NO confirmation, no
-  out-of-band step** — scoped to DECOMMISSIONING BASH GATES, never a licence over that file; every
-  settings edit outside that scope stays operator-class under that bar.
-  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
-  — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
-  WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
-  per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
-  **(6) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER THE BLOCKER-RETIRING OVERRIDE, AND
-  THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING STAGE RUNS, 2026-09-05 (lead)** —
-  both owned by gate-sdk/SPEC.md §The first cohort.
-  **(8) NO CUT TAKEABLE 2026-09-06 `lead, own-authority`: 14 held by their owning sections and the
-  15th, `pack-installer.sh`, by `pack-installer-cut-to-a-non-gate-arm`; empty-column, both fire.**
-  **(7) `demo/run-demo.sh` PORTED, its residue-class `# no-port:` route DECLINED — operator
-  2026-09-06 (lead-relay), DISCHARGED same day behind a separate `# spec:` re-home. Fork closed.**
-  **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
-  lifecycle layer; relaxation is closed at §The port-candidate criteria, `gate-battery-result-cache`
-  unsubsumed. **THE PORT-FIRST RUN, ruled 2026-09-05 (operator, consult), supersedes the 2026-08-31
-  port-only run: a port cut leads every iteration while the composer reaches one, and deferred units
-  fill the window's remainder on three grounds, port-critical (inside the cut it unblocks, else its
-  own iteration), same-surface, product-class — TRAJECTORY.md §PRIORITY DIRECTIVE owns them.**
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
-  Also ruled: lead 2026-09-01 (own-authority).
-
 - **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
   the front-end shape that answer takes should be a named convention rather than each consumer's
@@ -10727,6 +10677,7 @@
 
 ## Done
 
+- native-gate-port-remaining-corpus
 - pack-step-dirty-tree-predicate-unscoped
 - pack-installer-cut-to-a-non-gate-arm
 
