@@ -134,6 +134,24 @@ suffix beside one with an architecture suffix, where before there was one Linux 
 of a suffix meant "the baseline". That is the strongest new argument the naming entry has and it is
 this unit's own doing, so it is stated here as a promotion trigger a later scope reads.
 
+**Ruled by the OPERATOR 2026-09-11, through AskUserQuestion in the lead session and lead-relayed.**
+The authoring stage escalated whether the sixth leg may be minted while the scheme is unsettled —
+an ambiguity only precedent decides, which is why it was not this stage's to take — offering three
+dispositions: mint under the status quo, promote `install-smoke-leg-names-mix-two-axes` into this
+iteration and settle the scheme first, or hold the arm64 leg for a later iteration. The operator
+took the first with all three on the table.
+
+**Two costs were put to the operator and only one of them was this stage's.** The authoring stage
+measured the naming entry's blast radius and found its scariest limb false — it claims the rename
+reaches branch-protection required-check names out of tree and breaks silently, and no surface
+outside the tracked tree names any leg, this repository running no required checks at all. That
+measurement made the settle-the-scheme-first option look cheap. The lead supplied the cost that
+measurement does not see: settling it first is a **post-scope admission, and no stage can promote
+one** — `TASK-QUEUE.md`'s `post-scope-admission-has-no-promotion-route` records all three prongs
+verified at source, that scope owns debt promotion and its stage is over, that spec reaches only
+what it can author, and that re-entering scope is destructive rather than merely expensive. The
+radius is cheap and the route is not, and the operator chose with both stated.
+
 ### (4) The correcting paragraph is corrected, being already wrong before this unit touched it
 
 `.github/workflows/gates.yml`'s comment above `install-smoke-powershell` {mechanical}.

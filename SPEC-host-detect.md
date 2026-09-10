@@ -36,6 +36,24 @@ and no run it could buy today would execute them. A static binding over the trip
 **complementary** to the ruling rather than a substitute for it: it covers exactly the region the
 running oracle cannot reach, and the region the running oracle does reach is left to it.
 
+**The record concedes its own oracle's limit, which is the stronger ground and it is the record's
+own.** installer/README.md:527-529: *"Parity held by running tells you that the halves differ and
+never where, and with two hand-kept halves a red on one leg beside a green on the other is the
+routine case rather than the exceptional one."* So the static arm is complementary **on the
+ruling's own testimony** and not merely on this amendment's argument — an oracle that says *that*
+and never *where* has conceded the region a field-level assertion occupies.
+
+**Ruled `lead, own-authority` 2026-09-11, through the lead's message channel.** The authoring stage
+escalated whether a static assertion over one field of both hand-kept halves contests the
+2026-08-26 parity ruling, offered three dispositions — author as designed, narrow the arm to the
+bash half, or relay — and recommended the first. The lead re-read installer/README.md rather than
+ruling off the summary and took it: the 2026-08-26 ruling is scoped at :491-492 to **generation**,
+this amendment generates neither half, and the concession at :527-529 above settles the rest.
+Narrowing to the bash half was refused on this stage's own ground, that it reproduces the entry's
+defect one surface over. Recorded here rather than only in the thread that carried it, because a
+later reader meeting a static parity assertion beside a hand-kept-parity ruling has no other way to
+learn the two were reconciled deliberately.
+
 ## What changes
 
 ### (1) The binding becomes four-way and bidirectional, and both directions have a defect behind them

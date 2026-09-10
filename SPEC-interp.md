@@ -202,6 +202,22 @@ crate's spawn path. **No edge crosses to batch B.**
   *"under its queue entry"*. That entry is promoted as a feature at this iteration's scope, which is
   the route the ruling itself named. The ruling is **discharged, not reversed**, and no delta here
   reopens it.
+
+  **Whose ruling is being discharged, stated because the answer changes who may discharge it.** It
+  is the **lead's**, not the operator's — `TASK-QUEUE.md`'s own record of it reads *"The lead ruled
+  the envelope narrow"*. A later reader looking for an operator ruling behind this rewrite will find
+  none and should stop looking; there never was one. The operator-class carve-out on reversing a
+  recorded ruling therefore never reached this question, and it is a discharge besides — CLAUDE.md's
+  own line is that retiring a spent ruling is not reversing one.
+
+  **Ruled `lead, own-authority` 2026-09-11, through the lead's message channel.** The authoring
+  stage escalated the discharge-or-reversal judgment anyway rather than acting on it unrouted,
+  offering three dispositions — discharge as authored, treat it as a reversal and relay to the
+  operator, or narrow to one further pointed site — and recommended the first. The lead verified the
+  route against the recorded wording and took it, noting that routing a possible reversal is the
+  right instinct even where the answer is that it is not one. The narrowing option was refused on
+  measurement: the shipped bare-literal spawn population is `git` 111 sites, `bash` 24 and nine
+  other programs, so pointing one further site closes nothing.
 - `context-kit/SPEC.md` §bin/env-probe, the clause recording that a floor probe *"falls back to the
   bare name where these two refuse"* — the departure is now a roster **disposition** rather than a
   property of one function, and the clause says so while keeping its ground verbatim (delta 1).

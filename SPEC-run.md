@@ -150,6 +150,14 @@ The unit lands **rung 1** and names the oracle that decides whether rung 2 is ow
 - **The oracle.** The next `gates` run on `install-smoke-windows`. A green leg means rung 1 is
   sufficient and rung 2 is never built. A red leg naming a bad executable format means rung 2 is
   owed, and the leg's own log says which.
+- **The push that produces it is already granted and is not a new placement.** TRAJECTORY.md's
+  iteration-scoped three-push grant (operator, 2026-09-10) allocates them by purpose in its own
+  words — *"One at build to buy the Windows observation, one at close, one for the release tag."*
+  So the build-stage push this rung selection waits on **is** the grant's first push. Nothing here
+  asks for a new authorization and nothing here is a fresh ruling; this bullet records the standing
+  grant applying, which is what a later reader needs in order not to re-buy the question. It is
+  also, independently, what SPEC-obs-drain.md's placement rule would ask of an `[observed-by:]`
+  iteration, so the two agree and neither is load-bearing on the other.
 - **Rung 2, specified now so a red run does not cost a design round.** A named helper that invokes
   the resolved batch file through the command processor, taken by a call site that **opts in**
   rather than by the funnel. It is opt-in precisely because of the CVE class: composing a command
