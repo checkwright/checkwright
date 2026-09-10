@@ -17,6 +17,34 @@ SPEC (CLAUDE.md §The provenance seam), so what follows is mechanism.
 is the sibling amendment `installer/SPEC-pack-clean.md`'s, joined to this cut on
 shared surface. This one mints the arm; that one scopes the arm's refusal.
 
+**The seam this cut crosses, ruled here because the cut is the first thing to
+move mechanism from a repo-private script into an artifact every adopter
+receives.** The arm's *mechanism* ships — it lives in the binary the payload
+carries — while no adopter path invokes it, which is a combination this repo has
+not had before, so the three-way split is stated rather than left to inference.
+
+- **Kit mechanism, and it ships:** assembling a payload out of a repository's own
+  kit roots and its `installer/` directory, verifying each declared target's
+  artifact against the sidecar its build leg emitted, restoring the executable
+  mode the transports drop, and stamping a version and a commit. Every one of
+  those is already `gate-sdk/SPEC.md` §Consumer payload's contract, generic over
+  any consumer that redistributes kits, and the arm carries no term list, no
+  coupling vocabulary and no product constant. Delta 2's new value is kit
+  mechanism on the same test — a derived name, not a name of this project's.
+- **Repo-private, and it stays out of every kit SPEC:** the *disposition* — that
+  this repository's release path is what invokes the arm, from which job, and
+  under which ruling. That is `installer/README.md` §The packer's, which is
+  repo-root-governed with no owning kit, exactly the placement its own seam
+  ruling reached for the shell form. Delta 7 re-subjects that section rather
+  than relocating it into a kit, and the `gate-sdk/SPEC.md` edits delta 1 and
+  delta 2 make are the arm's roster membership and its knob, never its purpose
+  here.
+- **Consumer config, unchanged in width:** every input the tool reads stays a
+  knob. The four declared names keep their existing contracts and the scratch
+  base keeps its spelling, so nothing an adopter or a workflow could set before
+  the cut becomes a crate literal after it — the property that distinguishes a
+  port from a narrowing.
+
 ## What changes
 
 ### (1) `scripts/pack-installer.sh` becomes `--pack-installer`, a bridged `Arm::Run`

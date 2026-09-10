@@ -16,6 +16,15 @@ way, and the one place the ordering matters is named at §Producers and consumer
 recording.** The entry named three; delta 2 takes the first and records why the
 other two are refused.
 
+**The seam, ruled so the reading is not left to the merge.** Nothing here becomes
+kit mechanism: the footprint statement and the refusal it grounds are properties
+of *this repository's* release assembly, so they land in `installer/README.md`
+§The packer, which is repo-root-governed with no owning kit, and no kit SPEC
+gains a sentence. Nothing becomes consumer config either — the pathspec is
+computed from knobs that already exist and mints none. What the sibling
+amendment ships as kit mechanism is the arm; what this one adds is the arm's
+refusal corpus, which is one repository's.
+
 ## What changes
 
 ### (1) §The packer states the payload's tree footprint, and it is derived rather than listed
