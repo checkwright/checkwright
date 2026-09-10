@@ -1268,11 +1268,13 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
     argv.push(state.to_string());
 
     let args: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
-    let merged = run_merged_with_env(&argv[0], &args, &env)?;
-    if merged.0 {
+    let merged = proc::run_merged_in(&argv[0], &args, &env, None)?;
+    if merged.succeeded() {
         Ok(GateRun::Passed)
     } else {
-        Ok(GateRun::Refused(merged.1))
+        Ok(GateRun::Refused(
+            String::from_utf8_lossy(merged.output()).into_owned(),
+        ))
     }
 }
 
@@ -1299,29 +1301,11 @@ fn run_preflight_command(
     let mut args: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
     args.push(queue);
     args.push(state);
-    let (ok, text) = run_merged_with_env(&argv[0], &args, &[])?;
-    Ok(PreflightOut { ok, text })
-}
-
-fn run_merged_with_env(
-    program: &str,
-    args: &[&str],
-    env: &[(String, String)],
-) -> Result<(bool, String), String> {
-    let mut cmd = std::process::Command::new(program);
-    cmd.args(args);
-    for (k, v) in env {
-        cmd.env(k, v);
-    }
-    let out = cmd.output().map_err(|e| {
-        format!(
-            "cannot run {}: {} — the entry could not be pre-flighted; nothing written.",
-            program, e
-        )
-    })?;
-    let mut text = String::from_utf8_lossy(&out.stdout).into_owned();
-    text.push_str(&String::from_utf8_lossy(&out.stderr));
-    Ok((out.status.success(), text))
+    let merged = proc::run_merged_in(&argv[0], &args, &[], None)?;
+    Ok(PreflightOut {
+        ok: merged.succeeded(),
+        text: String::from_utf8_lossy(merged.output()).into_owned(),
+    })
 }
 
 enum Class {

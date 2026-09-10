@@ -1,6 +1,6 @@
-// spec: gate-sdk/SPEC.md §Fail-closed contract — the crate's one spawn site, so the
-// captured-emptiness false-green has no spelling in a gate module: a failed spawn is the
-// `Err` arm and stdout is reachable only through an accessor that read the exit status
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the crate's one shipped spawn site outside the
+// one declared `spawn-funnel-exempt:` shape, so the captured-emptiness false-green has no
+// spelling elsewhere and no spawn goes around the Windows resolution below
 use std::process::Command;
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a child that ran. Constructing one is the
@@ -67,7 +67,8 @@ impl Completed {
 pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program);
-    let out = Command::new(spawn_target(program).as_ref()).args(args).output().map_err(|e| {
+    let target = spawn_target(program)?;
+    let out = Command::new(target.as_ref()).args(args).output().map_err(|e| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
             program, e
@@ -136,16 +137,58 @@ fn exe_candidates(program: &str, pathext: Option<&str>) -> Vec<String> {
 // probe answers from, so `on_path(P)` true means the spawn of `P` reaches the file `which(P)`
 // named; it runs AFTER `recorder::note`, which leaves every registry declaration matching
 #[cfg(windows)]
-fn spawn_target(program: &str) -> std::borrow::Cow<'_, str> {
-    which(program).map_or(std::borrow::Cow::Borrowed(program), std::borrow::Cow::Owned)
+fn spawn_target(program: &str) -> Result<std::borrow::Cow<'_, str>, String> {
+    let dirs: Vec<std::path::PathBuf> = std::env::var_os("PATH")
+        .map(|p| std::env::split_paths(&p).collect())
+        .unwrap_or_default();
+    let pathext = std::env::var("PATHEXT").unwrap_or_default();
+    let system_root = std::env::var("SystemRoot").ok();
+    spawn_resolution(
+        program,
+        &dirs,
+        Some(pathext.as_str()),
+        system_root.as_deref(),
+        is_executable,
+    )
+    .map(std::borrow::Cow::Owned)
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the pass-through arm, `resolve_floor_tool`'s own
 // ground: resolving here would swap the spawned literal for an absolute path on every host the
 // battery runs on
 #[cfg(not(windows))]
-fn spawn_target(program: &str) -> std::borrow::Cow<'_, str> {
-    std::borrow::Cow::Borrowed(program)
+fn spawn_target(program: &str) -> Result<std::borrow::Cow<'_, str>, String> {
+    Ok(std::borrow::Cow::Borrowed(program))
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — the funnel's decision as a pure function of its inputs,
+// `resolve_on_path`'s own shape: the roster picks which face resolves, and a host that cannot
+// execute the Windows arm still asserts it by injecting the three
+#[cfg_attr(not(windows), allow(dead_code))]
+fn spawn_resolution<F: Fn(&std::path::Path) -> bool>(
+    program: &str,
+    dirs: &[std::path::PathBuf],
+    pathext: Option<&str>,
+    system_root: Option<&str>,
+    exists: F,
+) -> Result<String, String> {
+    // spec: gate-sdk/SPEC.md §check-graph — an argv[0] carrying a separator is a path the caller
+    // already resolved, never a name for the platform to search, so it passes through untouched
+    if program.contains('/') || program.contains('\\') {
+        return Ok(program.to_string());
+    }
+    let disposition = homonym_disposition(program);
+    // spec: gate-sdk/SPEC.md §check-graph — the system-directory rejection is program-class-
+    // specific: a name the roster does not carry has no homonym there and earns no rejection
+    let root = match disposition {
+        Some(_) => system_root,
+        None => None,
+    };
+    match resolve_outside_system_dir(program, dirs, pathext, root, exists) {
+        Ok(p) => Ok(p),
+        Err(e) if disposition == Some(NoResolution::Refuse) => Err(e),
+        Err(_) => Ok(program.to_string()),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the resolution as a pure function of its three
@@ -185,6 +228,35 @@ fn resolve_on_path<F: Fn(&std::path::Path) -> bool>(
 // through; all three reach the same WSL launcher, so rejecting `System32` alone leaves a PATH
 // spelled with either of its siblings walking straight around the rejection
 const WINDOWS_SYSTEM_DIR_VIEWS: [&str; 3] = ["System32", "SysWOW64", "Sysnative"];
+
+// spec: gate-sdk/SPEC.md §check-graph — what a host offering only the system directory's homonym
+// earns. `Refuse` is `resolve_interpreter`'s face and `FallBack` is `resolve_floor_tool`'s, so the
+// roster below picks the face rather than a call site picking it by which function it calls
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[cfg_attr(not(windows), allow(dead_code))]
+enum NoResolution {
+    Refuse,
+    FallBack,
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — the governed roster: a name belongs here when the Windows
+// system directory ships a program of that name that is NOT the program the payload wants. It is a
+// fact about the platform, never about a consumer, so no knob widens it
+#[cfg_attr(not(windows), allow(dead_code))]
+const SYSTEM_DIR_HOMONYMS: &[(&str, NoResolution)] = &[
+    ("bash", NoResolution::Refuse),
+    ("sort", NoResolution::FallBack),
+];
+
+// spec: gate-sdk/SPEC.md §check-graph — the roster's one lookup, by exact match against the
+// unresolved program name the caller passed
+#[cfg_attr(not(windows), allow(dead_code))]
+fn homonym_disposition(program: &str) -> Option<NoResolution> {
+    SYSTEM_DIR_HOMONYMS
+        .iter()
+        .find(|(name, _)| *name == program)
+        .map(|(_, d)| *d)
+}
 
 // spec: gate-sdk/SPEC.md §check-graph — a directory folded the way Windows compares one, case and
 // separator both: `c:/windows/system32` and `C:\Windows\System32` are one directory, and a
@@ -244,9 +316,10 @@ fn resolve_outside_system_dir<F: Fn(&std::path::Path) -> bool>(
 // spec: gate-sdk/SPEC.md §check-graph — the interpreter a spawn runs, resolved to a path rather
 // than named: `GATE_SDK_PROGRAM_FLOOR` guarantees a `bash` exists on the host, never that a bare
 // name reaches it, and on Windows the bare name reaches System32's WSL launcher instead.
-// spec: gate-sdk/SPEC.md §check-graph — two readers, each pointed on its own witnessed red:
-// `gates::graph::generator_emit` and `installer::init::run_vendored`. Every other bare-`"bash"`
-// spawn site stays unpointed under its queue entry; a witness is what points one, never a sweep.
+// spec: gate-sdk/SPEC.md §check-graph — the `Refuse` face of `SYSTEM_DIR_HOMONYMS`, reached
+// through the funnel rather than pointed at a call site: the roster owns which names take it, so
+// no site chooses a disposition by choosing which resolver it calls
+#[cfg_attr(not(windows), allow(dead_code))]
 pub fn resolve_interpreter(program: &str) -> Result<String, String> {
     #[cfg(windows)]
     let (pathext, system_root) = (
@@ -267,9 +340,9 @@ pub fn resolve_interpreter(program: &str) -> Result<String, String> {
     )
 }
 
-// spec: context-kit/SPEC.md §bin/env-probe — the floor probe's own resolution, sharing the
-// interpreter's mechanism above for the same cause on a different member: Windows searches the
-// system directory before `PATH`, where the spawn's `which` walks `PATH` and nothing else.
+// spec: context-kit/SPEC.md §bin/env-probe — the `FallBack` face of `SYSTEM_DIR_HOMONYMS`, and a
+// REPORTING resolver besides: its value is rendered in doctor's banner and the env-probe emitter,
+// which is the identity the funnel cannot absorb and why it keeps its own callers
 // spec: context-kit/SPEC.md §bin/env-probe — a host offering the tool nowhere outside the system
 // directory falls back to the bare name rather than refusing: the verdict is then the roster's own
 // absent or wrong-impl, which is the true reading of such a host and the fail-closed direction.
@@ -377,7 +450,7 @@ pub fn run_merged_in(
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
     let err = out.try_clone().map_err(spawn_err)?;
-    let mut cmd = Command::new(spawn_target(program).as_ref());
+    let mut cmd = Command::new(spawn_target(program)?.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
@@ -407,7 +480,7 @@ pub fn run_merged_in(
 pub fn run_bounded(program: &str, args: &[&str], secs: u64) -> Result<Option<i32>, String> {
     #[cfg(test)]
     recorder::note(program);
-    let mut child = Command::new(spawn_target(program).as_ref())
+    let mut child = Command::new(spawn_target(program)?.as_ref())
         .args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
@@ -457,7 +530,7 @@ pub fn run_bounded_capture(
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
-    let mut child = Command::new(spawn_target(program).as_ref())
+    let mut child = Command::new(spawn_target(program)?.as_ref())
         .args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
@@ -511,7 +584,7 @@ pub fn run_with_env_in(
 ) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program);
-    let mut cmd = Command::new(spawn_target(program).as_ref());
+    let mut cmd = Command::new(spawn_target(program)?.as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -548,7 +621,7 @@ pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Comp
             program, e
         )
     };
-    let mut child = Command::new(spawn_target(program).as_ref())
+    let mut child = Command::new(spawn_target(program)?.as_ref())
         .args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -628,7 +701,7 @@ pub fn run_streamed(
             return Err(io_err(e));
         }
     };
-    let mut cmd = Command::new(spawn_target(program).as_ref());
+    let mut cmd = Command::new(spawn_target(program)?.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::from(feed))
         .stdout(std::process::Stdio::from(sink));
@@ -706,7 +779,7 @@ pub fn run_to_env(
             program, e
         )
     };
-    let mut cmd = Command::new(spawn_target(program).as_ref());
+    let mut cmd = Command::new(spawn_target(program)?.as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -980,8 +1053,11 @@ mod tests {
     #[cfg(not(windows))]
     #[test]
     fn a_posix_spawn_reaches_the_bare_name_the_caller_passed() {
-        assert_eq!(spawn_target("bash"), "bash");
-        assert_eq!(spawn_target("checkwright-no-such-program"), "checkwright-no-such-program");
+        assert_eq!(spawn_target("bash").as_deref(), Ok("bash"));
+        assert_eq!(
+            spawn_target("checkwright-no-such-program").as_deref(),
+            Ok("checkwright-no-such-program")
+        );
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the defect in full: a program installed only
@@ -1125,6 +1201,73 @@ mod tests {
         assert_eq!(resolve_floor_tool("sort"), "sort");
     }
 
+    // spec: gate-sdk/SPEC.md §check-graph — the half no resolver case reaches: that a BARE-NAME
+    // spawn now takes the refusing resolution, which is what deltas 1 and 2 change and what
+    // leaves no trace in the twenty-three call sites that spawn `"bash"` before and after
+    #[test]
+    fn a_funnelled_refuse_member_refuses_on_a_system_directory_only_path() {
+        let dirs = vec![std::path::PathBuf::from(r"C:\Windows\System32")];
+        let err = spawn_resolution(
+            "bash",
+            &dirs,
+            Some(""),
+            Some(r"C:\Windows"),
+            a_bash_in_every_directory,
+        )
+        .expect_err("a funnelled bare `bash` accepted the WSL launcher");
+        assert!(
+            err.contains("WSL launcher") && err.contains("not clean"),
+            "the funnel's refusal did not name its cause fail-closed: {}",
+            err
+        );
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the roster's other disposition through the same
+    // funnel: a `FallBack` member on the same PATH yields the bare name, so the verdict is the
+    // floor roster's own absent-or-wrong-impl rather than a refusal the probe cannot report
+    #[test]
+    fn a_funnelled_fallback_member_yields_the_bare_name_on_the_same_path() {
+        let dirs = vec![std::path::PathBuf::from(r"C:\Windows\System32")];
+        assert_eq!(
+            spawn_resolution("sort", &dirs, Some(""), Some(r"C:\Windows"), |p: &Path| {
+                folded(&p.to_string_lossy()).ends_with("/sort.exe")
+            }),
+            Ok("sort".to_string()),
+            "a FallBack member refused instead of falling back to the bare name"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-graph — a name the roster does not carry earns no
+    // system-directory rejection: the homonym question is program-class-specific, so a
+    // System32-only PATH still resolves `npm` there
+    #[test]
+    fn a_name_off_the_roster_earns_no_system_directory_rejection() {
+        let dirs = vec![std::path::PathBuf::from(r"C:\Windows\System32")];
+        let got = spawn_resolution("npm", &dirs, Some(""), Some(r"C:\Windows"), |p: &Path| {
+            folded(&p.to_string_lossy()).ends_with("/npm.cmd")
+        })
+        .expect("an off-roster name refused, which only a roster member may do");
+        assert_eq!(
+            folded(&got),
+            "c:/windows/system32/npm.cmd",
+            "an off-roster name was denied the system directory, which is a rejection it never \
+             earned and a resolution it needs"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-graph — an argv[0] the caller already resolved passes
+    // through: `dispatch`'s and the floor probe's callers hand paths, not names
+    #[test]
+    fn a_resolved_path_passes_through_the_funnel_untouched() {
+        let none: Vec<std::path::PathBuf> = Vec::new();
+        assert_eq!(
+            spawn_resolution("/opt/bin/bash", &none, Some(""), Some(r"C:\Windows"), |_: &Path| {
+                false
+            }),
+            Ok("/opt/bin/bash".to_string())
+        );
+    }
+
     // spec: gate-sdk/SPEC.md §check-graph — the arm every host the battery runs on takes: no
     // system root, so nothing is rejected and the first match wins exactly as it did before
     #[test]
@@ -1158,32 +1301,123 @@ mod tests {
         );
     }
 
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the shipped half of a module: a
+    // `#[cfg(test)]`-gated item is dropped, so a bridge helper's own spawn is not a shipped one.
+    // rustfmt's shape is the boundary — the gated item ends at a `}` in the attribute's column
+    fn shipped_scope(text: &str) -> String {
+        let lines: Vec<&str> = text.lines().collect();
+        let mut keep = vec![true; lines.len()];
+        let mut i = 0usize;
+        while i < lines.len() {
+            if lines[i].trim() != "#[cfg(test)]" {
+                i += 1;
+                continue;
+            }
+            let indent = lines[i].len() - lines[i].trim_start().len();
+            let closer = format!("{}}}", " ".repeat(indent));
+            keep[i] = false;
+            let mut j = i + 1;
+            // spec: gate-sdk/SPEC.md §Fail-closed contract — the item's head line decides its
+            // extent: one that closes on `;` with its braces balanced is the whole item, and any
+            // other opens a body ending at the closer
+            let single = lines.get(j).is_some_and(|h| {
+                h.trim_end().ends_with(';')
+                    && h.matches('{').count() == h.matches('}').count()
+            });
+            while j < lines.len() {
+                keep[j] = false;
+                if single || lines[j] == closer {
+                    break;
+                }
+                j += 1;
+            }
+            i = j + 1;
+        }
+        lines
+            .iter()
+            .zip(keep)
+            .map(|(l, k)| if k { *l } else { "" })
+            .collect::<Vec<&str>>()
+            .join("\n")
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the tracker is asserted rather than trusted:
+    // a gated `mod` with no brace, a gated braced item, and shipped code on the far side of both
+    #[test]
+    fn the_shipped_scope_drops_a_cfg_test_item_and_keeps_what_follows() {
+        let src = "#[cfg(test)]\nmod usage_tests;\nfn shipped() {}\n#[cfg(test)]\nmod tests {\n    fn hidden() {}\n}\nfn also_shipped() {}\n";
+        let out = shipped_scope(src);
+        assert!(!out.contains("usage_tests"), "a gated `mod x;` survived: {}", out);
+        assert!(!out.contains("hidden"), "a gated `mod tests` body survived: {}", out);
+        assert!(out.contains("fn shipped()"), "shipped code between two gates was dropped: {}", out);
+        assert!(out.contains("also_shipped"), "shipped code after a gated body was dropped: {}", out);
+    }
+
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the routing half, in the roster shape
     // §check-reads-couples' unit test B uses for filesystem walks; that section owns the
-    // corpus this scans and why the bridge helpers sit outside it
+    // corpus this scans and the one exception class it declares
     #[test]
-    fn no_gate_module_constructs_a_subprocess_itself() {
+    fn no_module_outside_proc_constructs_a_subprocess_itself() {
         walk::bridge_declared_knobs(&crate::knobenv::lock());
-        let gates = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/gates");
-        let files = walk::find_files(&gates, &["rs"]).expect("cannot enumerate the gate modules");
-        assert!(!files.is_empty(), "no gate module found to scan");
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
+        assert!(!files.is_empty(), "no module found to scan");
+        let root = std::fs::read_to_string(src.join("main.rs")).expect("cannot read main.rs");
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — a module `main.rs` declares under
+        // `#[cfg(test)]` is test-only in whole and carries no file-level marker saying so, so
+        // the declaration is the roster rather than a second list here
+        let test_only: Vec<String> = root
+            .lines()
+            .collect::<Vec<&str>>()
+            .windows(2)
+            .filter(|w| w[0].trim() == "#[cfg(test)]")
+            .filter_map(|w| {
+                w[1].trim()
+                    .strip_prefix("mod ")
+                    .and_then(|m| m.strip_suffix(';'))
+                    .map(|m| format!("{}.rs", m))
+            })
+            .collect();
         let mut offenders: Vec<String> = Vec::new();
         for f in &files {
+            let leaf = f.file_name().unwrap_or_default().to_string_lossy().into_owned();
+            if leaf == "proc.rs" || test_only.contains(&leaf) {
+                continue;
+            }
             let text = std::fs::read_to_string(f)
                 .unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
             // spec: gate-sdk/SPEC.md §Fail-closed contract — the roster is the *code*
             // spellings a construction needs, never the bare word: a gate's own remedy text
             // may name `core.sshCommand`, and a detector that fires on prose gets muted
-            if ["Command::", "process::Command"].iter().any(|sp| text.contains(sp)) {
-                offenders.push(f.display().to_string());
+            let shipped = shipped_scope(&text);
+            let lines: Vec<&str> = shipped.lines().collect();
+            for (n, line) in lines.iter().enumerate() {
+                // spec: gate-sdk/SPEC.md §Fail-closed contract — an import names the type and
+                // constructs nothing, so `use …::CommandExt` is not a spawn site
+                if line.trim_start().starts_with("use ") {
+                    continue;
+                }
+                if !["Command::", "process::Command"].iter().any(|sp| line.contains(sp)) {
+                    continue;
+                }
+                // spec: gate-sdk/SPEC.md §Fail-closed contract — the declared exception class,
+                // on the tree's own valve convention: a named cause above the site, so the next
+                // reader meets a decision rather than an oversight
+                let window = &lines[n.saturating_sub(4)..n];
+                if window.iter().any(|l| l.contains("spawn-funnel-exempt:")) {
+                    continue;
+                }
+                offenders.push(format!("{}:{}", f.display(), n + 1));
             }
         }
         assert!(
             offenders.is_empty(),
-            "a gate module builds its own subprocess ({:?}) — `Ok` from `Command::output()` \
+            "a shipped module builds its own subprocess ({:?}) — `Ok` from `Command::output()` \
              means the spawn succeeded, never that the child did, so reading stdout there \
-             reproduces the captured-emptiness false-green. Route it through proc::run, and \
-             widen proc.rs if the call needs something proc::run does not carry",
+             reproduces the captured-emptiness false-green, and it goes around the Windows \
+             resolution `proc::run*` applies. Route it through proc::run, widen proc.rs if the \
+             call needs something proc::run does not carry, or declare the shape it cannot with \
+             a `spawn-funnel-exempt:` cause above the site",
             offenders
         );
     }

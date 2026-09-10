@@ -559,12 +559,18 @@ probe walks `PATH` and the spawn does not, so the two disagree about a single
 tool, and one absent implementation renders as *two* symptoms: that member
 `wrong-impl`, and every **versioned** member `uncomparable`, the numeric
 comparison above being that same spawn. Both probes therefore resolve the member
-outside the system directory first, through the resolver gate-sdk/SPEC.md
-§check-graph already states for an interpreter — one mechanism, two readers, and
-the rejection covers every view the platform shows that directory through. A
-host offering the member nowhere else falls back to the bare name rather than
-refusing, because the roster's own `absent` or `wrong-impl` is then the true
-reading. Elsewhere the name passes through unaltered: a POSIX spawn already
+outside the system directory first, through the governed homonym roster
+gate-sdk/SPEC.md §check-graph owns — one roster, and the rejection covers every
+view the platform shows that directory through. **A host offering the member
+nowhere else falls back to the bare name rather than refusing, and that is now
+the member's own roster disposition rather than a property of the function that
+happens to resolve it**, because the floor roster's own `absent` or `wrong-impl`
+is then the true reading. Stating it per name is what stops the two dispositions
+diverging: before, a call site chose refuse-or-fall-back by choosing which
+resolver it called, so a third member could be added to one and forgotten in the
+other. The floor probe's resolver keeps its own callers even so — it is a
+**reporting** resolver, its value rendered in the banner below and in doctor's,
+not only spawned. Elsewhere the name passes through unaltered: a POSIX spawn already
 searches `PATH` and nothing else, and resolving there would swap the spawned
 literal for an absolute path on every host the battery runs on, which is what a
 registry declaration is compared against.

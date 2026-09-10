@@ -713,12 +713,10 @@ fn run_vendored(
     let script_path = root.join(script).to_string_lossy().into_owned();
     let mut argv: Vec<&str> = vec![&script_path];
     argv.extend_from_slice(args);
-    // spec: gate-sdk/SPEC.md §check-graph — the interpreter is resolved and not named, for the
-    // cause that section states: the bare name reaches the Windows system directory's `bash.exe`,
-    // which is the WSL launcher and refuses with no installed distribution rather than running.
-    let sh = crate::proc::resolve_interpreter("bash")
-        .map_err(|e| refuse(format!("{} failed: {}", script, e), "", 2))?;
-    let out = crate::proc::run_merged_in(&sh, &argv, &[], Some(root))
+    // spec: gate-sdk/SPEC.md §check-graph — the bare name is spawned and `proc::run*` resolves it
+    // off the homonym roster; resolving here would hand `proc::recorder` a path, which is the
+    // disagreement a call-site resolution produces and the owner's cannot
+    let out = crate::proc::run_merged_in("bash", &argv, &[], Some(root))
         .map_err(|e| refuse(format!("{} failed: {}", script, e), "", 2))?;
     if !out.succeeded() {
         eprintln!("{}", String::from_utf8_lossy(out.output()));

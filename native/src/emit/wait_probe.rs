@@ -242,6 +242,9 @@ fn recorded_pid(record: &str) -> Option<String> {
 #[cfg(unix)]
 fn exec_wait_body(argv: &[&str]) -> Result<i32, String> {
     use std::os::unix::process::CommandExt;
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — spawn-funnel-exempt: `exec` replaces this
+    // process image rather than spawning a child, the one shape `proc::run*` cannot carry, since
+    // a funnel that returned would have no image to return into
     let mut cmd = std::process::Command::new("bash");
     cmd.arg("-c").arg(WAIT_BODY).args(argv);
     Err(format!("cannot exec the wait body: {}", cmd.exec()))

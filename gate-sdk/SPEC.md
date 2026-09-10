@@ -994,7 +994,8 @@ above it. The helper itself is tested directly by
 well-formed `awk` cannot be crashed on present input).
 
 **On the binary substrate the defect is closed by construction, not by review.**
-A ported member spawns nothing itself: the crate's one spawn site is
+A ported member spawns nothing itself: the crate's one shipped spawn site, the
+declared exception below aside, is
 `native/src/proc.rs`, whose `run` returns `Err` for a **spawn** failure — in the
 same "could not run" words above — and a `Completed` otherwise, and `Completed`
 hands out stdout only through an accessor that has already read the exit status.
@@ -1006,18 +1007,29 @@ pair can reach these arms: unit tests over a spawn that never happened, a child
 that exited non-zero, one that succeeded, and the two branches the report below
 exists for — a child that failed writing **only to stdout**, and one that failed
 writing to **neither** stream. A further test holds the routing — the
-`Command` spelling is asserted absent from every module under
-`native/src/gates/`, the roster shape §check-reads-couples' unit test B uses for
-filesystem walks — so each new spawning member inherits the property instead of
-re-buying it. That corpus is the gate modules and stops there: the `#[cfg(test)]`
-helpers bridging to the shell library from `walk.rs` and `main.rs` check their
-own status already, and pulling them in would make the production wrapper carry
-a cwd and an env nothing in production reads. `native/src/actions.rs` is shared
-gate mechanism sitting **outside** that corpus by construction and is named here
-because the move that put it there is the easiest reader to miss: it spawns
-nothing, and the property is preserved not by the roster test but by the
-single-spawn-site rule above — `proc.rs` is where a spawn would have to be added,
-and adding one there is what the corpus test is watching. Widening `proc.rs` is how a member
+`Command` spelling is asserted absent from **every shipped module in
+`native/src` except `proc.rs` itself**, the roster shape §check-reads-couples'
+unit test B uses for filesystem walks — so each new spawning member inherits the
+property instead of re-buying it. **The corpus is the whole crate because the
+funnel is only a funnel if nothing goes around it**: a scope of one directory
+holds the false-green half of the property and says nothing about the Windows
+resolution every `proc::run*` applies, and a spawn added anywhere else escapes
+both. Two boundaries make that corpus scannable and each is derived rather than
+listed. **Test scope is dropped** — a `#[cfg(test)]`-gated item, and a module
+`main.rs` declares under `#[cfg(test)]`, are read out of the source rather than
+named here, so the bridge helpers in `walk.rs` and `main.rs` stay outside for the
+reason they always had: they check their own status already, and pulling them in
+would make the production wrapper carry a cwd and an env nothing in production
+reads. And **one exception class is declared rather than silently excluded** — a
+shape `proc::run*` genuinely cannot carry names itself with a
+`spawn-funnel-exempt: <cause>` comment above the site, on the tree's own valve
+convention, so the next reader meets a decision. Its single member is the
+`CommandExt::exec` in the wait probe, which replaces this process image rather
+than spawning a child, so a funnel that returned would have no image to return
+into. `native/src/actions.rs` is shared gate mechanism that spawns nothing and
+sits **inside** the corpus like every other module, which is the reader this
+widening spares: its property rests on the assertion rather than on a boundary
+argument. Widening `proc.rs` is how a member
 that needs more of the child's result gets it; building its own `Command` is what
 the test refuses. `Completed::failure_report` is the widening, and it exists
 because a wrapper that reports "the child failed" and drops what the child said
@@ -1120,8 +1132,12 @@ in `proc.rs` so a cohort of wrappers buys them once:
   scan. The mechanism is stated here and cited there rather than restated.
 - **The spawn resolves through the same function the probe resolves through**, and
   stating only the probe's half is what let the two diverge. Every `proc::run*`
-  helper resolves its program through `which` before `Command::new`, on Windows
-  only, falling back to the bare name where nothing resolves. The invariant that
+  helper resolves its program before `Command::new`, on Windows only, falling back
+  to the bare name where nothing resolves — through `which` for an ordinary name,
+  and through §check-graph's homonym roster for a name that carries a
+  system-directory twin, which is the one class where falling back is the wrong
+  answer. An `argv[0]` carrying a path separator is a value its caller already
+  resolved and passes through untouched. The invariant that
   buys, and it is the whole of the rule: **on every host, if `on_path(P)` answers
   true then the spawn of `P` reaches the file `which(P)` named** — one resolution
   serves both, so the two cannot disagree. Without it the probe walked the
@@ -1134,9 +1150,10 @@ in `proc.rs` so a cohort of wrappers buys them once:
   **falls back rather than refusing**, spawning the bare name and yielding today's
   error text where nothing resolves, so the change is monotone: no gate can newly
   red on it and no adopter meets a refusal that did not already exist. That is
-  deliberately `resolve_floor_tool`'s posture and not §check-graph's refusing
-  resolver, whose ground is a system-directory homonym rather than a naming
-  dialect. And it resolves **after** the spawn recorder's note, which is what
+  deliberately the naming-dialect half's posture: §check-graph's refusing
+  resolver answers a different question — a system-directory homonym rather than
+  a naming dialect — and the roster is what keeps the two apart per name rather
+  than per call site. And it resolves **after** the spawn recorder's note, which is what
   leaves every `# graph:` requirement declaration matching the recorded name by
   construction — a call site that resolves first hands the recorder a path and
   breaks that comparison, which is the second reason the resolution belongs to the
@@ -14385,13 +14402,50 @@ body is held to the glob grammar but not to the vocabulary or hook-parity — th
 gate it describes is unbuilt, so its coupled surface may itself be design-ahead;
 parity re-fires through the normal registry path once the gate lands.
 
-**The interpreter assertion D spawns is resolved, not named**, and it was the
-crate's first such spawn rather than its only one. Two others take the same
-mechanism, each on its own witnessed red and never on a sweep: the vendored-script
-funnel behind `init`, which the bare name sent to the launcher below rather than
-to a shell, and the toolchain floor's probes — context-kit/SPEC.md §bin/env-probe
-owns that reader, including the one way it departs, which is that a floor probe
-falls back to the bare name where these two refuse.
+**The interpreter assertion D spawns is resolved, not named** — and it is
+resolved by the **owner**, not by the call site. Assertion D spawns the bare
+literal `bash` exactly as every other spawn in the crate does; `proc::run*`
+resolves it. The name-to-treatment question lives in one governed **roster** in
+`proc.rs`, `SYSTEM_DIR_HOMONYMS`, whose rows are a program **name** and a
+**disposition** — what a host offering that program nowhere but the system
+directory earns. `bash` **refuses**, by name, saying what was skipped and why,
+because a shell that is not a shell is worse than not running; `sort` **falls
+back** to the bare name, because the verdict is then the floor roster's own
+absent-or-wrong-impl, which context-kit/SPEC.md §bin/env-probe owns and which is
+the true reading of such a host. **A name belongs on the roster when the Windows
+system directory ships a program of that name that is not the program the
+payload wants** — a fact about the platform and not about a consumer, which is
+why no knob widens it, on `WINDOWS_SYSTEM_DIR_VIEWS`'s own ground. The two
+dispositions are implemented by `proc::resolve_interpreter` and
+`proc::resolve_floor_tool`, which the funnel selects between by the roster rather
+than a call site selecting one by which function it calls. `resolve_floor_tool`
+additionally keeps its own callers, because it is a **reporting** resolver whose
+value is rendered in doctor's banner and the env-probe emitter rather than only
+spawned — the one identity the funnel cannot absorb.
+
+**Why the owner and not the call sites, which is the part a sweep would get
+wrong.** A call site that resolves first hands `proc::recorder::note` a path,
+and `every_registry_member_declares_the_programs_it_spawns` compares that record
+against the registry's declared requirement by **exact equality** — so a pointed
+repair is observably harmful in exactly the place it looks tidiest. Resolving
+inside the owner, after the note, leaves every declaration matching by
+construction. And a sweep is refused on measurement rather than on taste: the
+shipped bare-literal spawn population is `git` and `bash` at two and three orders
+of magnitude past what a call-site sweep can be costed at, with nine other
+programs behind them. A lint forbidding the bare literal is refused on its own
+terms for the same reason — under the funnel the literal is **correct**, and such
+a lint would red every correct site and push each into the call-site resolution
+that broke the comparison. What enforcement-first is owed against instead is a
+different predicate, and it is §Fail-closed contract's widened
+no-subprocess-outside-`proc.rs` assertion.
+
+**This rewrite is a discharge and not a reversal, and it says so because a later
+reader could take it for one.** The recorded ruling narrowed an envelope — *"a
+resolver over the whole residue triages as a feature, a feature is a yield"* —
+and left the residue unpointed *"under its queue entry"*. That entry is promoted
+as a feature, which is the route the ruling itself names, so it is discharged
+rather than overturned and nothing here reopens it.
+
 `GATE_SDK_PROGRAM_FLOOR` guarantees that a
 `bash` is *present* on an adopter's host; it never guaranteed that the bare name
 `bash` reaches it (§The port-candidate criteria, criterion 7), and on Windows it
@@ -14405,9 +14459,12 @@ walks `PATH` in the operating system's own order over the `PATHEXT` candidate se
 (§Fail-closed contract owns both), with **one rejection**: a candidate directory
 resolving inside the Windows system directory — `%SystemRoot%\System32` and its
 `SysWOW64` and `Sysnative` views — is skipped, because that directory holds
-nothing else the payload wants. That ground was stated for one member and holds
-for the roster: `sort` is the second homonym the platform ships there, and it is
-a line sorter with no `-V` rather than any coreutils.
+nothing else the payload wants. **The rejection is program-class-specific**: it
+applies to a roster member and to nothing else, since a name with no homonym
+there has no reason to be denied a directory that may legitimately hold it. That
+is also why `sort`'s membership needs no second argument — the system directory's
+`sort` is a line sorter with no `-V` rather than any coreutils, which is the
+membership criterion applied, not an extension of it.
 The comparison is **case- and separator-folded**,
 since `c:/windows/system32` names the same directory as `C:\Windows\System32` and
 a comparison that missed that would pass on every developer host and fail on the
