@@ -14,6 +14,63 @@
 
 ## Technical Debt
 
+- **dogfooding-line-invites-a-false-doctrine-conflict**
+  — `CLAUDE.md`'s dogfooding-is-day-one sentence reads as an obligation to register every shipped
+  gate on this tree, and it is not one; the sentence gains a clause saying so.
+  **The governing operator principle, ruled 2026-09-10 through the consult channel in a lead
+  session and relayed by that lead.** This project aims to produce checkwright, a toolset the
+  customer tunes to their need, and that does not mean the checkwright development project is
+  forced to use all check types: registration is a tuning decision here as for any consumer.
+  **Deliverable.** One clause on `CLAUDE.md`'s dogfooding sentence, landed undated on that surface
+  and marked `operator 2026-09-10` — and NOT in `TRAJECTORY.md`, which admits no ruling naming no
+  discharge event. Debt rather than a feature: no governed name is added, and the ruling the clause
+  records is already taken.
+  **Precedent it rests on, measured rather than assumed:** 113 gates shipped, 111 registered, with
+  `check-surface-duplication` and `check-producer-liveness` already declined. The cost the clause
+  answers is attested — the sentence's opposite reading sent a lead hunting a doctrine conflict
+  that was never there.
+  **Watch the brevity budget:** the surface is always-loaded and `always-loaded-brevity-reach`
+  records it already sitting well above its committed baseline, so the clause is authored to
+  replace words rather than to add a line where it can.
+  Filed 2026-09-10 by scope out of `packer-port-terminal-cut`'s gap inbox; promoted 2026-09-10 at
+  scope into `host-resolution-fail-open-cut`, ruled in by the operator through AskUserQuestion in
+  the lead session, relayed by the lead.
+
+- **gap-inbox-commit-ownership**
+  — the filing session commits its own bullet, and what is left is landing that rule where a filer
+  reads it. Until then a filed bullet reaches the next iteration uncommitted and is carried by
+  whichever session happens to stage next.
+  **The distinction the gap turns on:** committing a bullet is not its disposition — the drain
+  contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one, promoted,
+  fixed inline or discarded, and none is "committed". A surface named *the committed gap inbox*
+  whose filer never commits is the gap in one phrase; the affordance makes no `git` call.
+  **THE SHAPE IS RULED — 2026-09-06 by the operator, through an interactive prompt in the lead
+  session, relayed by the lead rather than ruled by it: a session that files a gap-inbox bullet
+  COMMITS IT ITSELF, at the first moment the git index is free of stage-session work**, on the
+  ground that an uncommitted gap-inbox is prone to be lost. That selects the second shape and
+  refutes the third. The first — `--emit file-gap` committing its own bullet — is unruled, and the
+  index-free precondition argues against it since a capture affordance cannot judge index freeness.
+  **That precondition is NEW material:** the standing objection to shape one was index contention,
+  and the ruling answers it with a timing test rather than by rejecting committing.
+  **THE DELIVERABLE, with its target named.** `lifecycle-kit/templates/lead.md` says every
+  lifecycle-state write happens in the stage session and never in the lead, while its own §Stamps
+  are authoritative sanctions the lead writing this surface with `--emit file-gap` and omits commits
+  from its enumeration — so a lead reading the prohibition literally writes the bullet and does not
+  commit it. One clause carving that commit out of the prohibition with its precondition, plus the
+  shape selection in lifecycle-kit/SPEC.md. Debt: no governed name added.
+  **FIVE ATTESTED FIRINGS, all ANSWERED by the ruling above and kept only as its evidence base.**
+  2026-08-18 re-tiered this entry out of the icebox; three inside one iteration, judged a recurrence
+  2026-08-31, were the third shape running in production and failing silently whenever a dispatch
+  omitted its instruction line; 2026-09-06 took it to threshold and carried the ruling.
+  **Batch it with `lead-state-durable-home` and keep both off the `proc.rs` surface** — the two
+  share `lifecycle-kit/templates/lead.md` and the lead write-authority boundary, which is the
+  amortization argument the operator took when ruling this window. That sibling is a FEATURE and
+  stays deferred until its amendment is authored, so only this half is pickable today.
+  Filed 2026-07-25 by close draining its own gap inbox, born in the icebox rather than demoted to
+  it; promoted 2026-09-10 at scope into `host-resolution-fail-open-cut` on its recurrence reaching
+  threshold, ruled in by the operator through AskUserQuestion in the lead session, relayed by the
+  lead.
+
 ## Deferred
 
 
@@ -261,26 +318,6 @@
   how many gates move and whether the format change is owed.
   Surfaced 2026-09-10 as above; the full probed body via
   `git log -p -S'GATES MUST NOT BIND TO DOCUMENT TYPES' -- .workflow/gap-inbox.md`.
-
-- **dogfooding-line-invites-a-false-doctrine-conflict** [design-pending] — `CLAUDE.md`'s
-  dogfooding-is-day-one sentence reads as an obligation to register every shipped gate on this tree,
-  and it is not one; the sentence gains a clause saying so.
-  **The governing operator principle, ruled 2026-09-10 through the consult channel in a lead session
-  and relayed by that lead — it outranks every specific under it.** This project aims to produce
-  checkwright, a toolset the customer tunes to their need, and that does not mean the checkwright
-  development project is forced to use all check types: registration is a tuning decision here as
-  for any consumer.
-  **Precedent already exists, measured rather than assumed:** 113 gates shipped, 111 registered,
-  with `check-surface-duplication` and `check-producer-liveness` already declined.
-  **Why it is filed rather than merely known.** `CLAUDE.md`'s dogfooding sentence invites the
-  opposite reading, and that is what sent a lead hunting a doctrine conflict that was never there —
-  the finding is the cost. The clause lands undated on `CLAUDE.md`, marked operator 2026-09-10, and
-  NOT in `TRAJECTORY.md`, which admits no ruling naming no discharge event.
-  **Cost while deferred: low** — one clause on an always-loaded surface, against its brevity budget.
-  It is a precondition for reading the wrap theme's gate-design half correctly, since that half
-  turns on which gates this repo chooses to register.
-  Surfaced 2026-09-10 as above; its full probed body via
-  `git log -p -S'registration is a tuning decision' -- .workflow/gap-inbox.md`.
 
 - **install-smoke-leg-names-mix-two-axes** [design-pending] — the five `install-smoke` legs in
   `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
@@ -687,42 +724,6 @@
   Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join` on the lead's
   instruction, having been held back one turn while a question it sat on was still open; promoted
   2026-09-09 at scope intake, so the record is late and says so.
-
-- **smoke-report-array-carrier-mangling-unexplained** [design-pending] — the Windows manifest
-  report's two decompositions of one recorded entry disagree, the array carrier is implicated, and
-  no finished run discriminates the two candidate mechanisms.
-  **Recorded in prose only until now, which is why it is filed here.** `installer/README.md`'s Round
-  20 block states the residual and calls it available to whoever scopes next, but scope's intake
-  reads this queue and the gap inbox, never a spec's narrative, so as recorded it sat outside the
-  intake path entirely. Verified 2026-09-08 at close: neither surface named it.
-  **What is bounded and what is not.** The disagreement is confined to the ARRAY-sourced sample
-  blocks, carried in through `run-smoke.sh`:515's trailing array operand; the scalar operands are
-  mutually consistent and are what round 20's repair was chosen off. Two mechanisms fit the log
-  identically — the element truncated at the CR, or the CR excised from it — and local reproduction
-  on bash 5.3, including with `IFS` set to a carriage return, reproduces neither.
-  **The witness is already written and needs no new design:** a Windows round printing a `%q` of
-  `bad[0]` beside the witness row. That is the whole deliverable.
-  **DISTINCT from `windows-smoke-manifest-cr-survives-repair`**, which is Done: that unit repaired
-  the line-terminator read and explicitly declined to make this mechanism a deliverable, bounding it
-  instead so the repair could be chosen off operands the bound does not touch.
-  **Cost while deferred:** paid by every later session reading that report — the sample blocks
-  cannot be read as testimony, so a real defect surfacing there is unreadable.
-  **THE TRIGGER IS DEAD, and the clause below is corrected in place rather than left standing —
-  `lead, own-authority` 2026-09-09 through the lead's message channel, on this iteration's
-  terminator repair.** The witness row rides `manifest_report`, which fires only on a MISMATCH, and
-  round 27's manifest arm passed at all six installs, so no ordinary Windows round reaches those
-  sample blocks now. The deliverable above is unchanged and still needs no design to WRITE; what
-  died is the reachability — nothing now EXECUTES the block that would print it, so obtaining the
-  witness needs design, a planted mismatch, which the lead refused to invent rather than re-scope an
-  entry that says it needs none. The subject is untouched: the two decompositions still disagree and
-  the mechanism is still unexplained. Only the route to a witness changed.
-  **Disposition is next scope's, and icebox is now the live default.** CLAUDE.md §Delivery doctrine
-  makes a machinery finding blocking no stage entry and no push icebox-class by default, and the
-  live trigger was the only stated counterweight. Section motion belongs to a scope stage, so it
-  stays in Deferred until one takes it.
-  Filed 2026-09-08 by close, from a finding the lead handed it at dispatch. Promoted rather than
-  fixed because settling it needs a Windows round this session cannot buy; promoted rather than
-  iceboxed on a live trigger the paragraph above retires.
 
 - **queue-citation-line-number-stales-within-its-own-session** [design-pending] — a line number
   cited into a file the citing session is itself editing is stale before that session ends, and
@@ -1502,57 +1503,6 @@
   in exactly the case a consumer is most likely to hit.
   Found 2026-08-18 by this iteration's scope at its own entry, from the surviving directory rather
   than from a reading of the code; filed under scope-gated intake rather than fixed in-session.
-
-- **gap-inbox-commit-ownership** [design-pending] — the filing session commits its own bullet, and
-  what is left is landing that rule where a filer reads it. Until then a filed bullet reaches the
-  next iteration uncommitted and is carried by whichever session happens to stage next.
-  **THE `[design-pending]` TAG IS NOT STALE AND CANNOT BE: it is section membership, not design
-  pendency, and `check-amendment-queue` couples it BOTH WAYS** — a deferred entry lacking it reds,
-  an active entry carrying it reds. Every entry here wears it, so it discriminates nothing, and the
-  only way to drop it is to promote: the decision itself. Probed 2026-09-06 by taking the red.
-  **The distinction the gap turns on:** committing a bullet is not its disposition — the drain
-  contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one, promoted,
-  fixed inline or discarded, and none is "committed". A surface named *the committed gap inbox*
-  whose filer never commits is the gap in one phrase; the affordance makes no `git` call.
-  **THE SHAPE IS RULED — 2026-09-06 by the operator, through an interactive prompt in the lead
-  session, relayed by the lead rather than ruled by it: a session that files a gap-inbox bullet
-  COMMITS IT ITSELF, at the first moment the git index is free of stage-session work**, on the
-  ground that an uncommitted gap-inbox is prone to be lost. That selects the second shape and
-  refutes the third. The first — `--emit file-gap` committing its own bullet — is unruled, and the
-  index-free precondition argues against it since a capture affordance cannot judge index freeness.
-  **That precondition is NEW material:** the standing objection to shape one was index contention,
-  and the ruling answers it with a timing test rather than by rejecting committing.
-  **THE DELIVERABLE, with its target named.** `lifecycle-kit/templates/lead.md` says every
-  lifecycle-state write happens in the stage session and never in the lead, while its own §Stamps
-  are authoritative sanctions the lead writing this surface with `--emit file-gap` and omits commits
-  from its enumeration — so a lead reading the prohibition literally writes the bullet and does not
-  commit it. One clause carving that commit out of the prohibition with its precondition, plus the
-  shape selection in lifecycle-kit/SPEC.md. Debt: no governed name added.
-  **Cost while deferred:** low per instance and mostly silent — a bullet outside git until some
-  later session notices, lost outright if the tree is reset, and the one class the inbox's
-  merge=union answer cannot cover. **Corrected 2026-09-01, re-attributed 2026-09-10:** one bullet
-  aborted `run-validate.sh` after 16 of 22 clean suites — through the consumer smoke's own unscoped
-  preflight, not the pack arm's predicate (`smoke-whole-tree-precondition-unscoped` owns it now).
-  **FIVE ATTESTED FIRINGS, all ANSWERED by the ruling above and kept only as its evidence base.**
-  2026-08-18 re-tiered this entry out of the icebox; three inside one iteration, judged a recurrence
-  2026-08-31, were the third shape running in production and failing silently whenever a dispatch
-  omitted its instruction line; 2026-09-06 took it to threshold and carried the ruling.
-  **AT THRESHOLD AND DELIBERATELY NOT PROMOTED — `lead, own-authority` 2026-09-06, off the
-  port-first run's own text.** Its third joining ground is *product-class with a live trigger*,
-  which roadmap-tagged and threshold entries are named as satisfying: the relative clause attaches
-  to the TRIGGER, never to the class, so threshold membership supplies a trigger and not a class.
-  This entry is MACHINERY-class and the counterfactual clause does not rescue it — `--enter-stage`
-  reads the inbox from the WORKING TREE, so an uncommitted bullet still counts and no gate verdict,
-  install path or payload goes wrong. Machinery findings stay icebox-by-default.
-  **A same-surface argument was made for it and was WRONG; recorded because the error recurs.**
-  Ground 2 is "it edits a kit or SPEC section THE CUT edits", and the adjacency claimed was to a
-  JOINED unit, not the cut. Read that way the ground is transitive, and a window growing by
-  transitive closure is what the composition test exists to stop. **Nothing is lost by waiting:**
-  the ruling is durable here and operative now whenever the doc clause lands, and the entry returns
-  by the conserved route with its shape already selected.
-  recurrence: gap-inbox-commit-ownership 2026-08-31 2026-09-06
-  Filed 2026-07-25 by close draining its own gap inbox, born in the icebox rather than demoted to
-  it — `git log -S` over the slug returns that one commit, the whole of its history before the move.
 
 - **crate-test-cwd-process-global-race** [design-pending] — the crate's test guard covers the knob
   environment and nothing else, while a second process-global is written by a test and read by
@@ -9199,6 +9149,17 @@
   run that can observe it, and the migration that just landed made every *other* producer
   dialect-correct, so these three are now the tree's recorded exception rather than part of a
   uniform unfixed background.
+  **STANDING NOT-ICEBOX-ELIGIBLE, and this clause exists so the next worklist pass READS it rather
+  than re-deriving it — `lead, own-authority` 2026-09-10 through the lead's message channel, at
+  `host-resolution-fail-open-cut`'s scope.** This entry's trigger is the CI leg
+  `install-smoke-windows`, LIVE and running on every push to master, while the slug that shipped it,
+  `platform-support-ci-matrix`, retired 2026-09-06. `--emit queue-index --icebox-candidates` reads
+  the slug and not the mechanism, so it scores this entry false-eligible —
+  `icebox-trigger-blind-to-retired-carrier` owns that predicate defect and was DECLINED as a rider
+  this window, with the exposure accepted in writing here rather than silently. A session meeting
+  this entry on an eviction worklist does not evict it. Recorded as prose because
+  `icebox-standing-ineligibility-unrecordable` owns the absent slot; when that slot exists this
+  clause moves into it.
   **Owner is context-kit, not gate-sdk.** The rule's home is context-kit/SPEC.md §Layout and
   configuration; the dialect contract is gate-sdk's. It is that seam, not a migration defect.
   **Pre-existing, not a regression** — the fold is already wrong on a backslash-spelled root
@@ -10975,6 +10936,7 @@
 - **edges-retired-block-name-clash** [design-pending] — A live gate name inflates a retired slug.
 - **class-default-reach-gated-by-cost-opener** [design-pending] — Wording, not class, sets reach.
 - **lead-report-is-an-ungated-terminal-act** [design-pending] — May close holding unfiled work.
+- **smoke-report-array-carrier-mangling-unexplained** [design-pending] — Witness now needs design.
 
 ## Done
 
