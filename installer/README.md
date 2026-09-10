@@ -476,9 +476,9 @@ the shell that ran it is deleted. `retired` steps are deleted, not declared. **T
 obligation is discharged**: what `installer/` still carries is two bootstraps
 whose whole bodies are the steps above, each declaring `# no-port:` citing this
 paragraph, and nothing else.
-`scripts/pack-installer.sh` is outside this section's reach and its disposition
-is §The packer's, so a reader hunting the packer's port standing here is in the
-wrong section.
+The `--pack-installer` arm is outside this section's reach and its disposition is
+§The packer's, so a reader hunting the packer's standing here is in the wrong
+section.
 Two readings were refused with it, so the next cut does not re-argue them:
 *`behind-invoke` alone is the obligation and `bootstrap` is silent* — refused
 because it leaves the one shell surface the trajectory sanctions with no cause
@@ -1428,11 +1428,14 @@ right about what `uninstall` has to reverse. The distinction is the one every
 
 ## The packer
 
-`scripts/pack-installer.sh` assembles the payload both transports ship — the
-Release tarball and the npm package — out of this repo's own kit roots, and
-npm-packs it in a scratch directory outside the worktree. This section owns that
-file: its boundary, its port disposition, and the contracts its own `# spec:`
-pointers cite.
+`--pack-installer`, the gate binary's bridged `Arm::Run` payload assembler
+(gate-sdk/SPEC.md §The non-gate arm), assembles the payload both transports
+ship — the Release tarball and the npm package — out of this repo's own kit
+roots, and npm-packs it in a scratch directory outside the worktree. Callers
+reach it through the front-end,
+`bash gate-sdk/bin/run-gates.sh --pack-installer …`. This section owns that arm:
+its boundary, the route this repository's release path invokes it by, and the
+contracts its own `# spec:` pointers cite.
 
 **Nothing is written inside the worktree, and no second copy of any kit is ever
 checked in.** The payload's kit set is derived at pack time from the roots the
@@ -1454,63 +1457,70 @@ exists to remove, since without it the current directory selects a tree the
 caller never named. Absent `--root`, the git toplevel of the current directory
 is what gets packed.
 
-**The flag roster has exactly one tier and it is the tool itself.** `--help`
-prints it on stdout at exit 0, so no doc carries a second copy to drift. Help is
-adopted here on its own merits and does not extend gate-sdk/SPEC.md §The
-bin/-tool contract to this repo's `scripts/`: with a flag surface this wide, an
-unknown-argument refusal is too thin a discovery route to be a caller's only
-one.
+**The cut split that one decision into two, and a caller must pin both.** The
+front-end resolves the gate binary and the bridged environment relative to the
+git toplevel of the **current directory**, so after the cut the cwd selects whose
+tooling and configuration run while `--root` selects which tree is packed and
+stamped. A caller that already pinned `--root` and let the current directory fall
+where it may was pinning one of two decisions, which is why every pack call site
+in this repo now names a directory as well.
 
-**The port disposition is a plain obligation, and the sequencing sentence is
-that nothing sequences it.** The packer carries no `bootstrap` step — §The
-install boundary's three dispositions apply to the steps of an install, and the
-packer runs no install but assembles the artifact an install later consumes, so
-that section's behind-invoke hold does not reach it. It ships to no adopter: the
-packed set is `installer/` plus the enumerated kit roots, `scripts/` is neither,
-and no adopter receives or executes this file. Nothing holds it either: its
-lines sit in the reachable column of `--emit port-blockers --tree`, and a cut is
-authored against this section.
+**The single-tier flag-roster rule is retired, not quietly dropped.** While the
+packer was its own script the roster had exactly one tier and it was the tool
+itself: `--help` printed it at exit 0, adopted on its own merits because with a
+flag surface that wide an unknown-argument refusal was too thin a discovery
+route to be a caller's only one. A bridged arm's usage lives in
+`gate-sdk/bin/run-gates.sh`'s own help and in this section's prose instead. The
+arm keeps the unknown-argument refusal and gains the front-end's help, so the
+discoverability that rule bought is preserved, and its one-tier claim — which
+the file's deletion makes false — does not stand.
 
-**A cut owes the binary's reachability at both callers, and the two are not in
-the same position.** `consumer-smoke/run-smoke.sh` builds the gate binary before
-it reaches any of its pack call sites, on the host it runs on, so a compiled
-form is already reachable there — the macOS install-smoke legs included, though
-not by building: since the platform-evidence merge those consume the build
-legs' artifacts through `INSTALLER_SMOKE_ARTIFACTS_DIR` and adopt a compiled
-binary from the hand-off. The release publish
-workflow is not: it packs in a job with its own checkout and no build step,
-holding the downloaded per-target artifacts and no built binary. So a cut must
-make the binary reachable in that job — by building it there, or by resolving
-`GATE_SDK_NATIVE_BIN` onto the artifact the build legs already produced — and
-that lands in the same unit as the cut rather than after it.
-**Of those two routes the first is the one a cut takes, and the second is
-refused.** A cut builds the binary in that job. `gate-sdk/SPEC.md` §Consumer
-payload's *builds nothing itself* is bounded to the payload artifacts and does
-not reach a binary built there for tooling; a `cargo build` in `pack:` compiles
-bytes that job checked out at the tag, so it leaves intact the
-checkout-plus-bash tamper floor the workflow's own header states; and
-build-then-pack in one job is rehearsed on every CI run rather than first
-exercised by a real publish. Resolving `GATE_SDK_NATIVE_BIN` onto a downloaded
-artifact is refused instead: nothing in the tree digest-verifies against an
-independent source, so it would make the one job that assembles and stamps the
-published tarball execute bytes it did not check out.
-`pack-installer-cut-to-a-non-gate-arm` carries the disposition, the cost and
-the grounds. So the obligation above is work a cut can take, and what remains
-between here and a cut is scheduling rather than a blocker.
+**The cut is taken, and the route it took is recorded here.** The packer was the
+last file in the reachable column of `--emit port-blockers --tree`; it is now
+`native/src/emit/pack_installer.rs`, reached by the bare flag `--pack-installer`
+off the bridged-arm table. Its four inputs — the packed kit set, the target
+roster, the binary's name and the per-target artifact names — all cross the
+config bridge, so nothing an adopter or a workflow could set before the cut
+became a crate literal after it.
+
+**The reachability obligation the cut owed is discharged, and the route is
+ROUTE 1.** `consumer-smoke/run-smoke.sh` builds the gate binary before it
+reaches any of its pack call sites, on the host it runs on, and the macOS
+install-smoke legs adopt a compiled binary from the build legs' hand-off through
+`INSTALLER_SMOKE_ARTIFACTS_DIR`, so neither of those callers was ever the gap.
+The release publish workflow was: it packs in a job with its own checkout and no
+build step, holding the downloaded per-target artifacts and no built binary. So
+`publish.yml`'s `pack:` job runs `bash gate-sdk/bin/build-native.sh` ahead of its
+assemble step, on the runner's preinstalled cargo — the disposition the sibling
+`build:` job's own comment already records for that workflow.
+**The alternative is refused and stays refused**: resolving `GATE_SDK_NATIVE_BIN`
+onto a downloaded artifact would make the one job that assembles and stamps the
+published tarball execute bytes it did not check out, and nothing in the tree
+digest-verifies against an independent source. What ROUTE 1 costs instead is
+bounded and stated: gate-sdk/SPEC.md §Consumer payload's *builds nothing itself*
+is about the payload artifacts and does not reach a binary built there for
+tooling; a `cargo build` in `pack:` compiles bytes that job checked out at the
+tag, so the checkout-plus-bash tamper floor the workflow's own header states is
+intact; and build-then-pack in one job is rehearsed on every CI run rather than
+first exercised by a real publish. Ruled by the operator 2026-09-09 through the
+AskUserQuestion channel, reversing a `lead, own-authority` refusal of 2026-09-06.
 
 **The disposition is stated here rather than in a kit SPEC, and the ground is
-the provenance seam.** gate-sdk is a kit, vendored into every adopter's tree. A
-kit SPEC section governing the disposition of a file that lives in this repo's
-`scripts/` — a file no adopter receives, and whose existence no adopter can
-verify — inverts the kit/consumer layering and publishes a rule about a private
-tool as kit mechanism. Independently, gate-sdk/SPEC.md §Consumer payload bounds
-its own reach to what a gate ships, and a port disposition for a release
-assembler is not a disclosure rule; the payload-content rules that section
-states about the packer stay exactly where they are, because already describing
-a file is not owning it. This surface is repo-root-governed with no owning kit,
-which is the governance class the packer is in, and it already hosts this shape
-for the harness §The consumer smoke governs — a repo-private tool that rides no
-payload, whose non-shipping status is established by citing the packer. Ruled
+the provenance seam.** The cut splits three ways and the split is what keeps the
+seam uncrossed. The arm's *mechanism* is kit mechanism and it ships — assembling
+a payload out of a repository's kit roots, verifying each declared target's
+artifact against its sidecar, restoring the mode the transports drop, stamping a
+version and a commit — and gate-sdk/SPEC.md §Consumer payload already owns every
+one of those, generic over any consumer that redistributes kits. Its *inputs*
+stay consumer config, unchanged in width. What is repo-private is the
+**disposition**: that this repository's release path is what invokes the arm,
+from which job, and under which ruling. A kit SPEC governing that would publish a
+rule about one project's release path as kit mechanism, and gate-sdk/SPEC.md
+§Consumer payload bounds its own reach to what a gate ships in any case — a
+route disposition for a release assembler is not a disclosure rule. This surface
+is repo-root-governed with no owning kit, and it already hosts this shape for the
+harness §The consumer smoke governs — a repo-private tool that rides no payload,
+whose non-shipping status is established by citing the packed set. Ruled
 `lead, own-authority` 2026-09-06, the seam ground primary.
 
 ## The consumer smoke
@@ -1521,7 +1531,7 @@ validate rather than a discovery at announcement.
 
 **The port disposition — `run-smoke.sh` is declared `no-port`, ruled 2026-08-31
 by the operator in consult.** It is this repo's acceptance harness and rides no
-payload: `scripts/pack-installer.sh` assembles both transports out of the kit
+payload: the `--pack-installer` arm assembles both transports out of the kit
 roots and never out of `installer/consumer-smoke/`, so no adopter receives it
 and no adopter path executes it — the ground gate-sdk/SPEC.md §Consumer smoke,
 *The port disposition* declares the kit `smoke/` class on at its leg 3, reached
@@ -1535,13 +1545,21 @@ reaches `installer/bin/`, whose disposition §The install boundary states.
 
 **The smoke packs the tree it lives in, by construction — the current directory
 does not select it.** The script resolves that tree from its own path and hands
-it to `scripts/pack-installer.sh --root` at every one of its pack call sites, so
-the packed tree and the asserted tree are the same tree whatever directory you
-invoke from. A clone's copy invoked by absolute path, a second
-checkout, a linked worktree: all pack the tree the script belongs to. What
-`--root` promises the caller, and the packer's single-tier flag roster, are
-§The packer's — this section cites that contract rather than hosting a copy of
-it.
+it to `--pack-installer --root` at every one of its pack call sites, so the
+packed tree and the asserted tree are the same tree whatever directory you invoke
+from. A clone's copy invoked by absolute path, a second checkout, a linked
+worktree: all pack the tree the script belongs to. What `--root` promises the
+caller is §The packer's — this section cites that contract rather than hosting a
+copy of it.
+
+*Two mechanisms hold that property, not one.* §The packer's split gives `--root`
+a partner: the front-end resolves the binary and the bridged environment against
+the current directory. So each of the five call sites runs the front-end in a
+subshell whose current directory is that same script-derived root, and keeps
+`--root` naming it. **This is not the retired invocation requirement below** —
+that rule bound the smoke's *caller*, where this is the smoke pinning a directory
+it derives from its own path, the shape it already uses one screen earlier to
+source the gate library. The caller's directory still selects nothing.
 
 *The former invocation requirement is retired, not merely unstated.* Until
 `--root` existed, this section carried a standing rule — "run it with the
@@ -2470,7 +2488,7 @@ this leg's *dependence* on the full profile, not the defect.
 **The payload every profile installs carries a real gate binary**, because the
 value claim is a claim about the product an adopter receives. The smoke compiles
 the crate for the host target, emits the digest sidecar beside it and hands the
-pair to `pack-installer.sh --artifacts` before the loop starts, so each profile's
+pair to `--pack-installer --artifacts` before the loop starts, so each profile's
 battery is the battery a covered platform actually gets. It was not always so,
 and the accident is worth naming rather than quietly fixed: a main loop packing
 no artifact makes *every* profile an uncovered-platform install, so a value
@@ -2483,8 +2501,9 @@ it stands beside is cited.* gate-sdk/SPEC.md §Consumer payload rules that the
 payload carries a prebuilt binary per declared target, *built by the release and
 never from a working tree*. The smoke builds from a working tree because it has
 no Release to draw on. That is a liberty this harness takes, not the payload rule
-relaxing: the publishing path still cannot build, and `pack-installer.sh` is
-still handed a directory it did not produce.
+relaxing: the publishing path still cannot build a *payload artifact* — what its
+`pack:` job builds is the tooling binary the arm runs as, never a binary the
+payload carries — and the arm is still handed a directory it did not produce.
 
 **The value claim is asserted over the loop, not inside it**, and it is two
 sentences: some profile catches the defect at all, and some profile *below* the
@@ -2747,7 +2766,7 @@ upgrade — against a roster three versions old, and the tree object must come
 back to the one the consumer had before its first `init`.
 
 *What that reaches is narrower than a recorded hash moving, and the limit is the
-harness's rather than the assertion's.* `pack-installer.sh` assembles every
+harness's rather than the assertion's.* The arm assembles every
 version from one worktree, so no vendored path's content differs between hops
 and the arm does not exercise a hash that changed under a path that stayed; the
 shape changes it does cross are path additions and removals. What
@@ -2862,9 +2881,9 @@ outcomes from collapsing into each other. Mutating an extracted package rather
 than adding a flag to the publishing path is deliberate: it leaves the publisher
 no way to ship a payload with a hole in it.
 
-`pack-installer.sh` gains nothing from this: the **smoke** builds and hands it a
-directory, while the publishing path still never builds, so a locally built
-binary can still never substitute for a released one.
+The arm gains nothing from this: the **smoke** builds and hands it a directory,
+while the publishing path still never builds a payload artifact, so a locally
+built binary can still never substitute for a released one.
 
 **The smoke steers its own roster, and that is what a second roster line stopped
 costing.** A single host build satisfies `--artifacts` only while the roster

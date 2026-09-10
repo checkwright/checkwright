@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # spec: installer/README.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff and uninstall run clean with no jq on PATH while init is blocked by doctor's floor verdict and doctor still reaches its whole report, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
-# no-port: installer/README.md §The consumer smoke, The port disposition — ruled 2026-08-31 by the operator in consult. This is the repo's own acceptance harness for the installer and rides no payload: scripts/pack-installer.sh assembles the tarball and the npm package out of the kit roots and never out of installer/consumer-smoke/, so no adopter receives or runs it, and its only callers are the evidence-kit installer_smoke validate suite and the gates workflow. It is the same shape gate-sdk/SPEC.md §Consumer smoke, The port disposition declares on its leg 3 — a smoke executed by no adopter path — reached one step further, for a harness the payload does not even carry; and it drives cargo, the packer and init as black boxes across every profile, so a crate-side form would test the binary from inside the binary. Structural, not a sizing judgment: its size was measured at the ruling and is not the ground.
+# no-port: installer/README.md §The consumer smoke, The port disposition — ruled 2026-08-31 by the operator in consult. This is the repo's own acceptance harness for the installer and rides no payload: the --pack-installer arm assembles the tarball and the npm package out of the kit roots and never out of installer/consumer-smoke/, so no adopter receives or runs it, and its only callers are the evidence-kit installer_smoke validate suite and the gates workflow. It is the same shape gate-sdk/SPEC.md §Consumer smoke, The port disposition declares on its leg 3 — a smoke executed by no adopter path — reached one step further, for a harness the payload does not even carry; and it drives cargo, the packer and init as black boxes across every profile, so a crate-side form would test the binary from inside the binary. Structural, not a sizing judgment: its size was measured at the ruling and is not the ground.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -145,7 +145,8 @@ printf 'pack\n'
 VERSION="$(git -C "$REPO" describe --tags --abbrev=0 2>/dev/null)"; VERSION="${VERSION#v}"
 [[ -n "$VERSION" ]] || VERSION="0.0.0-smoke"
 # spec: installer/README.md §The consumer smoke — --root "$REPO" is what makes the packed tree and the asserted tree the same tree by construction: $REPO is script-path-derived, so without it the current directory selects what gets packed and a run from a second checkout greens while asserting nothing about the tree under test
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" \
+# spec: installer/README.md §The consumer smoke — the cd is the second half of that same pinning, and it is owed at every one of these five call sites: the front-end resolves the gate binary and the bridged environment against the git toplevel of the CURRENT DIRECTORY, so --root alone now selects only which tree is packed and the cwd selects whose tooling runs
+PACK_OUT="$(cd "$REPO" && INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh --pack-installer --root "$REPO" \
     --version "$VERSION" --out "$SCRATCH" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
@@ -160,8 +161,8 @@ PLANT_OUT="$SCRATCH/planted-pack"
 mkdir -p "$PLANT_OUT" || fail "could not make the planted pack's output directory"
 printf '%s\nother-%s\n' "$HOST_TARGET" "${HOST_TARGET#*-}" > "$SCRATCH/planted-targets.list" \
     || fail "could not write the planted roster"
-plant_out="$(GATE_SDK_NATIVE_TARGETS_FILE="$SCRATCH/planted-targets.list" \
-    INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" \
+plant_out="$(cd "$REPO" && GATE_SDK_NATIVE_TARGETS_FILE="$SCRATCH/planted-targets.list" \
+    INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh --pack-installer --root "$REPO" \
     --version "$VERSION" --out "$PLANT_OUT" --artifacts "$PACK_ARTIFACTS" 2>&1)"; plant_rc=$?
 [[ "$plant_rc" -ne 0 ]] \
     || fail "pack accepted a roster declaring a target the artifact directory has nothing for — a broken payload packed as a narrower one"
@@ -762,7 +763,7 @@ resolves_profile "$BARE_PROFILE" \
 printf 'artifact-less refusal leg (%s, payload packed with no artifact)\n' "$BARE_PROFILE"
 BARE="$SCRATCH/bare"
 mkdir -p "$BARE"
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$VERSION" --out "$BARE" 2>&1)" \
+PACK_OUT="$(cd "$REPO" && INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh --pack-installer --root "$REPO" --version "$VERSION" --out "$BARE" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the artifact-less pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
@@ -980,7 +981,7 @@ upgrade_direction "$VERSION" "$UP_VERSION" \
 UP="$SCRATCH/upgrade"
 mkdir -p "$UP"
 # spec: installer/README.md §The gate binary — every cross-version pack carries the artifact directory the main pack used, because selection has one success path: a payload packed without one refuses at the bootstrap, and these hops assert manifest behavior that only a completed install reaches. The bytes are the same ones the build leg staged, so the hops differ in version and in the relinquish this arm performs, and in nothing else
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$UP_VERSION" --out "$UP" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
+PACK_OUT="$(cd "$REPO" && INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh --pack-installer --root "$REPO" --version "$UP_VERSION" --out "$UP" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the upgrade pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
@@ -1058,7 +1059,7 @@ upgrade_direction "$UP_VERSION" "$UP2_VERSION" \
     || fail "the arm derived $UP2_VERSION from $UP_VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
 UP2="$SCRATCH/upgrade2"
 mkdir -p "$UP2"
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$UP2_VERSION" --out "$UP2" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
+PACK_OUT="$(cd "$REPO" && INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh --pack-installer --root "$REPO" --version "$UP2_VERSION" --out "$UP2" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the second upgrade pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
