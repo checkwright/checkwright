@@ -254,8 +254,15 @@ same pointers the script did.
 
 Thirteen paragraphs of the ruling record carry the identical discharge oracle
 *the port oracle's `--tree` trailer reads zero owed*. This cut is the event all
-thirteen were written to await, so all thirteen retire in the commit that lands
-it. {design-bearing}
+thirteen were written to await.
+
+**The retirement's sequencing is ruled, not left to land beside the cut —
+`lead, own-authority`, 2026-09-10, by escalation reply: this delta rides its
+own build batch, landing only after the cut's own batch (deltas 1–7 and 9) has
+merged and a fresh `--emit port-blockers --tree` actually reads zero owed,
+rather than in the commit that lands the cut itself.** The oracle's zero is
+this delta's own precondition, not a byproduct it may assume ahead of a
+witnessed run. {design-bearing}
 
 **All thirteen, not the one ostensibly about the packer**, and the count is read
 off the record rather than estimated: each names the same oracle in its own
