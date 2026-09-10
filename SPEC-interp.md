@@ -1,14 +1,20 @@
 # SPEC amendment: interp
 
-**Nothing in this amendment is applied.** Every passage below is a proposal for the build stage to
-land; where replacement wording is given it is marked **Not yet applied** at the passage itself.
-`spec` authors, build lands, and a reader arriving mid-iteration must not read a quoted sentence as
-one already in the tree.
+**APPLIED at `e65b893a` by build batch 1 of `host-resolution-fail-open-cut`.** Every delta below is
+in the tree, and the per-passage **Not yet applied** markers are superseded by this line rather than
+edited one by one — read a quoted replacement sentence as one the tree now carries, not as a
+proposal. **Nothing in this amendment's own Definition of Done is outstanding:** the census was
+re-run at `e65b893a` rather than inherited and is filed as a survey record, and the registry
+assertion passes green with `check-graph`'s declaration unchanged. What remains is the terminal
+move alone — this file's deletion and the queue's Done move — which batch 2 owns, held to that
+batch because canon-kit/SPEC.md §Merging an amendment step 3 makes the none-remain assertion
+unsatisfiable while sibling amendments for this component are still in flight. Ruled
+`lead, own-authority` 2026-09-11, through the lead's message channel.
 
-**This amendment depends on SPEC-run.md's delta 2 and has nothing to attach to without it.** That
-delta funnels every `proc::run*` spawn through one resolution on Windows; this one decides what
-that resolution does for a name class the funnel alone cannot serve. The two land in one build
-batch, or SPEC-run.md's first.
+**This amendment depended on SPEC-run.md's delta 2 and the ordering was honoured:** that delta
+funnels every `proc::run*` spawn through one resolution on Windows, and this one decides what that
+resolution does for a name class the funnel alone cannot serve. Both landed in one build batch,
+SPEC-run.md's first at `5961ea8e`.
 
 ## The census is re-run at this stage, and it supersedes the entry's own numbers *and* its file list
 

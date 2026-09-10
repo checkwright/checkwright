@@ -1,9 +1,15 @@
 # SPEC amendment: run
 
-**Nothing in this amendment is applied.** Every passage below is a proposal for the build stage to
-land; where replacement wording is given it is marked **Not yet applied** at the passage itself.
-`spec` authors, build lands, and a reader arriving mid-iteration must not read a quoted sentence as
-one already in the tree.
+**APPLIED at `5961ea8e` by build batch 1 of `host-resolution-fail-open-cut`.** Every delta below is
+in the tree, and the per-passage **Not yet applied** markers are superseded by this line rather than
+edited one by one — read a quoted replacement sentence as one the tree now carries, not as a
+proposal. **One item is outstanding and it is why this file still exists:** delta 3's rung is
+selected by an actual `install-smoke-windows` result, and no push has bought that leg yet. Rung 1 is
+what landed; whether rung 2 is owed is what the leg answers. Batch 2 owns the reading, the record on
+the entry, this file's deletion, and the queue's Done move — held to that batch because
+canon-kit/SPEC.md §Merging an amendment step 3 makes the none-remain assertion unsatisfiable while
+sibling amendments for this component are still in flight. Ruled `lead, own-authority` 2026-09-11,
+through the lead's message channel.
 
 **The basename is short on purpose.** The entry's slug is 53 characters and the promotion writes two
 lead-line tags beside it, which leaves nineteen columns inside `QUEUE_KIT_WRAP_BUDGET`. A shorter
