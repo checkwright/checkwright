@@ -1615,11 +1615,11 @@ payload: the `--pack-installer` arm assembles both transports out of the kit
 roots and never out of `installer/consumer-smoke/`, so no adopter receives it
 and no adopter path executes it — the ground gate-sdk/SPEC.md §Consumer smoke,
 *The port disposition* declares the kit `smoke/` class on at its leg 3, reached
-one step further here for a harness the payload does not even carry. The 2026-08-28
-predicate ruling (TRAJECTORY.md §The closed rulings) named this file as one of
-the two that ship to no adopter and declined to turn that ground into a
-*class*; this is a per-file disposition under the case-by-case residue rule that
-ruling left standing, and it mints no class. The declaration sits in the file's
+one step further here for a harness the payload does not even carry. **Shipping to
+no adopter is not a class** — that ground was weighed as one and declined, this
+file being one of only two it would have covered — so what stands here is a
+per-file disposition of the kind surviving shell takes case by case, and it
+mints no class. The declaration sits in the file's
 own header and cites this paragraph. What it does **not** say: nothing here
 reaches `installer/bin/`, whose disposition §The install boundary states.
 

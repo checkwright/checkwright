@@ -6088,7 +6088,7 @@ auditor. On a binary-less host the corpus is now unguarded at install — a clas
 emptied, which is exactly the aggregate cost this criterion forbids landing
 unpriced. It lands anyway, on the terms that criterion states: the loss is
 *declared* in the consumer's own registry rather than arriving as a broken battery,
-the 2026-08-09 directive ports the whole corpus, and the subtraction shrinks as
+the whole corpus ports, and the subtraction shrinks as
 targets are published rather than being repaired by the cut that caused it. That
 cohort's grounding sentence is corrected where it lives, since nothing gates it and
 it would otherwise stand as a false claim.
@@ -6509,8 +6509,8 @@ a second `spec_canonical_specs` implementation, which is the exact duplication
 this cohort's criterion-6 discharge exists by removing, and enforcement-first
 ranks removal above gating it; a binary-gated declaration the adopter receives is
 what the omit path already is. The honest limit rides with the ruling — this is a
-real subtraction for an uncovered host, it lands because the 2026-08-09 directive
-ports the whole corpus, and it shrinks as targets are published rather than being
+real subtraction for an uncovered host, it lands because the whole corpus
+ports, and it shrinks as targets are published rather than being
 repaired by the cohort that caused it.
 
 ### The POSIX ERE matcher

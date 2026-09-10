@@ -69,7 +69,7 @@ gate stales; each freshness gate prints its own command on red.
 New gates here are **born native** — a Rust module plus a `.gate` descriptor;
 shell needs a cause from the live exception classes, stated in the gate's
 own SPEC section (gate-sdk/SPEC.md §The port-candidate criteria) — no gate is
-permanently shell (TRAJECTORY.md §The closed rulings, 2026-08-23). The port
+permanently shell, that section's retired exception class (a). The port
 oracle (gate-sdk/SPEC.md §port-blockers) answers on **two** axes: its registry
 arms for the battery, `--tree` for the project, and only `--tree`'s owed count
 is the completion predicate. Either
@@ -163,7 +163,7 @@ load behind that trigger, so they are not resident here.
   `[roadmap:]` tags — never hand-edit its marker block; it is rostered with its
   trigger and regen command like every other generated projection.
 - [`TRAJECTORY.md`](TRAJECTORY.md) is the hand-authored ruling record — the
-  objectives, the closed operator rulings, and the port sequence; a recorded
+  objectives and the closed operator rulings; a recorded
   ruling is closed, so escalate rather than reverse one, and retiring a spent
   ruling is not reversing it. It admits only a ruling naming its discharge
   event or reversing a recorded one (its §What this file admits); every other
