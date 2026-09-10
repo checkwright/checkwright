@@ -6,3 +6,4 @@
 
 host-resolution-fail-open-cut scope a3d1fcec 2026-09-10 d7baa6ae
 host-resolution-fail-open-cut spec a2827c2f 2026-09-11 fb7e3e6d
+host-resolution-fail-open-cut spec a30e26f3 2026-09-11 79304801
