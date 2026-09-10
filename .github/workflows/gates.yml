@@ -1561,15 +1561,18 @@ jobs:
   # page flips the triple to `joined`, both become binding with nobody remembering
   # to make it so.
   #
-  # **It carries no platform-floor step, and that absence is a MEASUREMENT this leg
-  # is being bought to take.** The baseline Linux leg needs none because
-  # `ubuntu-latest` ships the floor docs/install.md §Requirements declares. The
-  # arm64 image is a different image and whether it does likewise is not derivable
-  # from this tree, so this leg's first run is the probe. A red here on a missing
-  # floor member is that measurement arriving, not a defect: the fix is a floor
-  # step of the shape `scripts/ci-macos-floor.sh` already has, which
-  # native/targets.list's header has already priced ("one on a class they do not
-  # costs its own floor first").
+  # **It carries no platform-floor step, and that is now a MEASUREMENT rather than
+  # an open question.** The baseline Linux leg needs none because `ubuntu-latest`
+  # ships the floor docs/install.md §Requirements declares; the arm64 image is a
+  # different image and whether it does likewise was not derivable from this tree,
+  # so this leg's first run was bought as the probe. Run 34543644528 answered it:
+  # the probe step below reported no `<MISSING>` member — GNU awk, sed, sort, grep,
+  # find and realpath, plus bash, git, jq, tar, npm, node, cargo, rustc, rustup,
+  # shellcheck and both hashers — so `ubuntu-24.04-arm` ships the declared floor
+  # and no step of `scripts/ci-macos-floor.sh`'s shape is owed here. That is the
+  # cheap outcome native/targets.list's header priced the other side of ("one on a
+  # class they do not costs its own floor first"); re-read the probe rather than
+  # this paragraph if the image ever changes under the pinned label.
   #
   # **The name is minted under the convention already in this file and that is a
   # deliberate NON-decision.** `install-smoke-leg-names-mix-two-axes` records two
@@ -1637,6 +1640,25 @@ jobs:
           rustc -vV
           echo "== scratch =="
           echo "RUNNER_TEMP=$RUNNER_TEMP"
+          exit 0
+
+      # Reporting only, and probed alone before the suite for the siblings' reason:
+      # a build that dies inside the suite makes every later step's silence
+      # unreadable. **It is also load-bearing and not only a probe**, measured on
+      # this leg's own first run (34543644528, job 103092038391): the suite adopts
+      # the producer's artifact rather than building one, so nothing else on this
+      # leg leaves a host binary in `native/target/release/`, and the pack step's
+      # dispatch then finds no binary to run. The siblings pay for that binary here
+      # too — this leg reproduced their shape without this step and died at `pack`.
+      - name: probe the crate build
+        shell: bash
+        run: |
+          set +e
+          bash gate-sdk/bin/build-native.sh
+          echo "build-native exited $?"
+          ls -l native/target/release/ 2>&1 | head -n 20
+          echo "-- porcelain after a release build; the smoke asserts this is empty --"
+          git status --porcelain | head -n 40
           exit 0
 
       # By PATTERN and not by name, for the reason the siblings state: a name would
