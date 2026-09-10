@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: packer-port-terminal-cut
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -454,6 +454,15 @@
   as "low and loud: one aborted battery per occurrence". The 2026-09-08 firing was neither: the
   refusal is loud in one place and silent everywhere else, and where it is silent it costs a whole
   diagnosis and a re-run of a CI leg.
+  **JOINED TO `packer-port-terminal-cut` ON SHARED SURFACE — `lead, own-authority` 2026-09-10,
+  through the lead's escalation reply to scope; NOT the operator's.** The join's ground is
+  producer/consumer rather than adjacency: this is a defect in `scripts/pack-installer.sh`, the file
+  `pack-installer-cut-to-a-non-gate-arm` rewrites, so cutting first and deciding this predicate
+  later ports a known defect into the new arm. `/spec` authors both amendments and promotes both.
+  **ASSERTION C WILL FIRE at the stage after spec:** the cut's amendment spans `installer/`,
+  `native/`, `gate-sdk/` and `.github/workflows/` — four component dirs — so `check-stage-entry`
+  demands the audit stamp or a ruled waiver. Recorded here so spec reads it rather than align
+  discovering it.
   recurrence: pack-step-dirty-tree-predicate-unscoped 2026-09-08
   Filed 2026-09-01 by close's gap drain, promoted from a lead-filed bullet; iceboxed 2026-09-06 at
   `0b6545d7` under the port-only run; returned 2026-09-09 at scope on the judged recurrence above.
@@ -9864,8 +9873,9 @@
   **THE WORK OWED IS A LATER ITERATION's UNIT — the operator ruled the scheduling with the route.**
   Wire the build into `publish.yml`'s `pack:` job and cut the packer to a MEDIUM `Arm::Run` non-gate
   arm in one unit — `sha256.rs`, `json.rs`, `proc.rs`, `walk.rs` and the five installer verbs, `jq`
-  eliminable via `serde_json`, `npm pack` and `git archive | tar` staying spawns. The design
-  question is closed, so the entry is promotion-ready and stays here only because scope moves it.
+  eliminable via `serde_json`, `npm pack` and `git archive | tar` staying spawns.
+  **RATIFIED INTO `packer-port-terminal-cut`, joined by `pack-step-dirty-tree-predicate-unscoped`;
+  `lead, own-authority` 2026-09-10 by escalation reply, NOT the operator's. `/spec` authors both.**
   **Cost while deferred:** the owed column keeps its only member, so the port track's completion
   predicate cannot reach zero — `--tree` reads 71 scanned, 70 no-port, 0 held, 1 owed, and this
   file is the 1, the whole of what stands between the tree and Objective 2.
