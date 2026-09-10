@@ -43,6 +43,40 @@
   into `host-resolution-fail-open-cut` on its recurrence reaching threshold, ruled in by the
   operator through AskUserQuestion in the lead session, relayed by the lead.
 
+- **lead-state-durable-home** [spec: SPEC-lead-journal.md]
+  — the lead template gave the lead's own state no durable home, so it lived only in the
+  conversation. **BOTH PREMISES OF THE OPEN QUESTION ARE FALSE AT HEAD, probed at spec rather than
+  inherited, and that is what bounded the unit.** The template does NOT name a swept home:
+  `scripts/lifecycle-config.sh:11` preserves `lead-journal.md` across the boundary wipe and
+  §Closing an iteration already calls it one of the two scratch artifacts that survive. And a
+  tracked home does NOT collide with the write-authority invariant, which enumerates stamps, queue
+  writes and evidence files — the same template directs the lead to write the committed gap inbox.
+  recurrence: lead-state-durable-home 2026-08-14 2026-09-10
+  **WHAT IS ACTUALLY LEFT, none of it a siting question.** (1) `lead.md` contradicts itself in one
+  file: §Economics still says the journal is "swept with the rest at the iteration boundary", the
+  direct negation of §Closing an iteration seven hundred words away. (2) Durability is CONSUMER
+  CONFIG — `LIFECYCLE_KIT_BOUNDARY_PRESERVE` defaults empty, so every adopter of the kit's
+  `lead.md` inherits the obligation and none of the protection. (3) Preserving is not draining:
+  the config comment concedes "one stale journal carries across a boundary crossed with no lead
+  live", and an unread journal loses a finding exactly as a deleted one does.
+  **The attested loss the entry rests on.** At `packer-port-terminal-cut`'s close the journal was
+  the only home for an operator design consult and two platform findings, all one boundary reset
+  from destruction and rescued only because the operator asked. The second-order instance is the
+  part that survives preservation: the lead recorded THAT defect in the same journal, so the
+  file's disposability swallows the record that would prevent the next occurrence.
+  **What the amendment rules:** the home is right and stays; survival becomes kit mechanism
+  (a scalar `LIFECYCLE_KIT_LEAD_JOURNAL_FILE` spared beside `.gitkeep`, on this SPEC's own
+  replaced-not-merged argument against an array default); the lead disposes of its journal at
+  close and the boundary prints an undisposed one as an advisory, refusal declined because the
+  entering session cannot discharge another lead's disposition; and the journal is transport for a
+  durable finding, never its store — the clause §Stamps already applies to the message thread.
+  **Batched with `gap-inbox-commit-ownership` and it is a PRODUCER/CONSUMER edge, not just a shared
+  surface:** the routing rule presumes the lead commits what it files, which is that entry's ruled
+  deliverable. A cut separating them dispatches this one against an input that does not exist yet.
+  Filed 2026-08-13 by close draining the gap inbox; promoted 2026-09-11 at spec into
+  `host-resolution-fail-open-cut` on its recurrence reaching threshold, ruled in by the operator
+  through AskUserQuestion in the lead session, relayed by the lead.
+
 ## Technical Debt
 
 - **dogfooding-line-invites-a-false-doctrine-conflict**
@@ -4891,56 +4925,6 @@
   **Cost while deferred:** every session that reasons about the allowlist or the guard re-derives
   the mode by probe, and a mode drift costs hours before it presents as anything legible.
   Filed 2026-08-13 by close, draining the gap inbox; filed by the lead and re-verified here.
-
-- **lead-state-durable-home** [design-pending] — the lead template forbids the lead from writing
-  lifecycle state and gives lead state no durable home either, so it lives only in the
-  conversation.
-  recurrence: lead-state-durable-home 2026-08-14 2026-09-10
-  **Third firing, 2026-09-10, and HALF OF IT IS NOW DISCHARGED — the entry stays open on the other
-  half.** The operator directed, twice on one day through the lead, that a lead write everything
-  which must survive a compact to its own resume journal rather than suggesting a keep/drop compact
-  to the operator, and that the write be CADENCED on every stage completion. Both halves landed at
-  that close in `lifecycle-kit/templates/lead.md` §Economics, undated as kit mechanism. The
-  recurrence is stamped rather than the entry merely re-read because the practice had to be
-  directed AGAIN, a lead having written no journal until asked.
-  **THE SHARPEST WITNESS THE ENTRY HAS, attached at this scope's gap-inbox drain and NOT stamped
-  as a fourth firing** — the 2026-09-10 firing above is already recorded and this is evidence
-  attached to it. At `packer-port-terminal-cut`'s close the lead journal was the ONLY home for
-  three substantial findings — an operator design consult spanning wrap, gate-to-document
-  coupling, queue entry shape and slug format, plus two platform-coverage findings — and every one
-  of them was one `--enter-stage` boundary reset away from being destroyed. They were rescued only
-  because the operator asked whether they had been filed. This is materially worse than the
-  2026-08-14 loss, which was unreachability after a compaction: here the state was reachable and
-  simply scheduled for deletion by the project's own mechanism, and the deletion is CORRECT
-  behaviour by that mechanism rather than a bug in it. **The second-order instance is the part
-  worth keeping:** the lead then recorded the defect ITSELF in the same disposable journal, which
-  the operator ALSO had to catch — so the journal's disposability silently swallows the very
-  record that would prevent the next occurrence, and a lead cannot bootstrap a lesson out of a
-  file swept before that lesson's next occasion. A durability argument no earlier attestation
-  reached.
-  **Re-attested 2026-08-14, and sharpened from a missing feature to a defect.** The absence is
-  not merely unprovided-for: delegation-kit/templates/agent-execution.md binds its durability
-  rule to whoever holds findings they will act on and closes the role loophole in its own
-  words — *"Neither the supervising role nor a session running outside any dispatch is
-  exempt: the axis is what the session can do at this moment, never what it is"* — and a lead
-  can commit. So the rule **names** the lead and hands it no discharge path, which is a
-  broken obligation rather than an unbuilt convenience. Re-verified end to end at the 2026-08-13
-  and 2026-08-14 drains: `lifecycle-kit/templates/lead.md` assigns the resume journal to the
-  *stage* session and rules out every lifecycle write, and nothing anywhere mints, requires or
-  checks a lead-side one. Measured cost that iteration: six operator rulings, three stage returns
-  and an operator-corrected premise carried with nothing durable behind them, with one stage
-  session made unreachable by name through a compaction.
-  **What has no home:** the batch roster and its tiering rationale, findings carried between
-  batches, operator items awaiting a ruling, and anything learned mid-iteration no stage owns.
-  **Why `[design-pending]`, and this is the entry's whole remaining subject:** the cadence half is
-  discharged and the *home* is not. The template now names `.tmp/`, which the scope boundary
-  sweeps — right for per-iteration state, wrong for anything crossing it — while a tracked home
-  collides with the invariant that the lead writes no governed state. Distinct from the gap inbox
-  and the survey record, capture channels a *stage* drains rather than a lead's working state.
-  **Cost while deferred:** compounding with session length — every lead compaction degrades or
-  loses state, and the loss is silent, since a degraded roster reads exactly like a short one.
-  Filed 2026-08-13 by close, draining the gap inbox; a lead filing, re-verified at the drain by
-  reading the template end to end, the search an absence claim needs.
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
   "the segment leads with this binary", but leading with a roster binary does not make the
