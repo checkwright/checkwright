@@ -12,6 +12,37 @@
 
 ## New Features
 
+- **observation-predicate-entry-cannot-drain-in-its-own-iteration** [spec: SPEC-obs-drain.md]
+  — an entry whose completion predicate is an OBSERVATION of a remote run rather than a tree state
+  structurally cannot complete in the iteration that buys it, because the drain gate sits upstream
+  of the push that would justify the drain.
+  **The bind, probed with `--simulate` at both stages 2026-08-27 and re-probed at this spec.**
+  `check-stage-entry` assertion B refuses a drain-stage entry on a non-empty active queue.
+  A `drain-exempt` tag skips an entry at the drain stage's own entry, but assertion B re-runs
+  with NO exemption at every drain SUCCESSOR, and this tree's predecessor map makes close one, so
+  no valve reaches close. A standing property of the state machine, not a quirk of one entry.
+  **What discovering it cost:** three pushes against a budgeted one to two, by operator ruling, and
+  the headline entry still deferred with its PRODUCED half discharged.
+  **The amendment's finding, and it is why none of the five recorded shapes was ever costed:** the
+  class has no name the machine can read. `run-observed` occurs three times in the tracked tree,
+  all three prose, its one live use an opaque reason string on a since-retired entry. Every shape
+  was therefore a policy about a set no surface enumerates, and a policy's cost is dominated by who
+  must notice membership. That is the 2026-08-31 recurrence judgment restated as a fix: the miss
+  was FILING-VISIBILITY rather than analysis, and naming the class is what visibility means here.
+  **What the amendment rules:** name the class with `[observed-by: <producer>]`; place the
+  iteration's FIRST push at or before the stage that lands such an entry's work, which buys no push
+  because a finished run reads for free and the reading rides the close push; split at scope only
+  the residue whose producer is the release run. The two-iteration protocol and the standing extra
+  push are declined on their arithmetic; demote-at-build survives as the fallback; the
+  landed-but-unobservable marker is declined as a marker for a state the ruling stops producing.
+  **Not enforceable end to end, and the amendment says so rather than leaving it to be found:** a
+  push's timing is no tree state, so the placement and split rules are prompt-carried obligations
+  and only the tag hygiene is gated. What the drain refusal gains is a message naming its own cause.
+  recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
+  Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close; promoted 2026-09-11 at spec
+  into `host-resolution-fail-open-cut` on its recurrence reaching threshold, ruled in by the
+  operator through AskUserQuestion in the lead session, relayed by the lead.
+
 ## Technical Debt
 
 - **dogfooding-line-invites-a-false-doctrine-conflict**
@@ -8575,57 +8606,6 @@
   **Cost while deferred:** one batch per iteration is plausibly invisible, and a roster a
   later audit reads as complete is not.
   Filed 2026-08-27 by build, promoted 2026-08-27 by close.
-
-- **observation-predicate-entry-cannot-drain-in-its-own-iteration** [design-pending] — an
-  entry whose completion predicate is an OBSERVATION of a remote run rather than a tree state
-  — the run-observed precondition shape — structurally cannot complete in the
-  iteration that buys it under the normal one-push-at-close budget.
-  **The bind, probed with `--simulate` at both stages 2026-08-27.** `check-stage-entry`
-  refuses close while the active queue is non-empty, drain-exempt entries included, so the drain
-  gate sits UPSTREAM of the push that would justify the drain: the close push produces the
-  observation the entry needed in order to be drained before that push was permitted. This is
-  a standing property of the state machine, not a quirk of `windows-artifact-proof`.
-  **What this iteration paid to discover it:** three pushes against a budgeted one to two, by
-  operator ruling, and the headline entry still deferred with its PRODUCED half discharged.
-  **Why `[design-pending]`:** no shape is costed and each candidate costs something real — a
-  two-iteration protocol for these entries, a standing extra push, or splitting each into
-  a produce half and an observe half at scope.
-  **A FOURTH SHAPE, ruled and exercised 2026-08-31, cheaper than all three and a workaround rather
-  than a fix.** DEMOTE the entry at build once its work has landed — taken on
-  `platform-support-ci-matrix` (`lead 2026-08-30 own-authority`, landed 08-31) so it could enter
-  validate. Its price is legibility: the grammar cannot mark a unit landed-but-unobservable, so
-  a demoted entry reads as unstarted and the next rider of this shape re-buys the same wedge.
-  **RECURRENCE JUDGED 2026-08-31 by close, a sharper datum than the instance.**
-  `platform-support-ci-matrix` carried the `precondition-ok: run-observed` tag this entry's lead
-  line uses and was undrainable from the moment it entered the unit set, so the miss is
-  FILING-VISIBILITY rather than analysis and sharpening would not have helped.
-  **Machinery-class, but NOT icebox-class by default**: TRAJECTORY.md's 2026-08-30 discriminator is
-  conjunctive and the second conjunct fails — this DID block validate's entry until a lead cleared.
-  **THE FOUR SHAPES ALL ADDRESS THE DRAIN SIDE; A FIFTH FOR THE RECORD SIDE HAD ITS PREMISE
-  FALSIFIED.** Writing a post-push outcome onto the entry was priced as spending a second push;
-  **LEAD-RULED 2026-09-01 on the close that actually did it: it spends NONE**, because commits
-  accumulate locally and ride one watched push at close. The gap that survives is narrower and
-  still real: the four shapes each answer *when the entry may be drained*, none for an observation
-  the drain gate sits upstream of.
-  **THE LIVE HALF IS *WHICH* PUSH PRODUCES THE OBSERVATION — derived 2026-09-05 at spec, drained
-  onto this entry at that close.** The wedge as recorded holds only where the CLOSE push produces
-  it. Under the one-to-two push budget an iteration may spend a FIRST push mid-iteration, and the
-  observation then arrives BETWEEN the two — early enough to be read, committed locally, and
-  carried out on the close push, which the ruling above already establishes costs no push of its
-  own. This CORRECTS the recorded wedge's reach; it re-attests nothing, so no `recurrence:` date
-  joins, and a later reader must not count it as an instance.
-  **Cost while deferred:** every entry of this shape either overruns its push budget or
-  defers, and the deferral is invisible until the close that cannot drain it.
-  recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
-  **REACHED THRESHOLD 2026-09-01; declined on the run, never on merit; OPERATOR-RULED 2026-09-05
-  (lead-relay) TO STAY DEFERRED under the run. THAT GROUND IS SPENT** — the port-first ruling
-  superseded the run the same day and legislates threshold members itself, so the deferral rests on
-  the successor rule: MACHINERY-class by the 2026-08-30 discriminator, which meets none of the
-  port-first run's three joining grounds. Re-composed 2026-09-05 at scope, `lead, own-authority`.
-  The 2026-09-02 batch DID reach the operator, who
-  took `subagent-liveness-log-unattributed-refusal` as the run's exception and left this deferred;
-  2026-09-01, 2026-09-03 and 2026-09-04 were a lead's (own-authority). No re-escalation is owed.
-  Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
 
 - **boundary-sweep-github-write-skips-identity-step** [design-pending] — the account-selection step
   is bound to push work, and the boundary sweep writes to GitHub without it.
