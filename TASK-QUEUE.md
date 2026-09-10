@@ -17,6 +17,271 @@
 ## Deferred
 
 
+- **windows-bare-name-spawn-fails-open-past-its-preflight** [design-pending] — the packer arm's tool
+  PREFLIGHT is dialect-aware and its SPAWN is not, so on Windows the probe says a program is present
+  and the spawn then says it is not. A fail-open preflight, and it reds master today.
+  **MEASURED at gates run 34522661342 on 7c7e3a1f, and RE-VERIFIED at this scope.**
+  `install-smoke-windows` and `install-smoke-powershell` are that run's only two failures, both with
+  `pack-installer: cannot run npm: program not found` — which is the SPAWN's text, not the
+  preflight's (`npm not found on PATH - the pack step cannot run`), so we know the probe passed.
+  **The asymmetry, read from source.** `proc.rs:93` `which()` reads `PATHEXT` under a
+  `cfg(windows)` arm and the packer's preflight reaches it through `on_path`, so the probe resolves
+  SOMETHING. But `proc.rs:113` `exe_candidates` builds `vec![program]` FIRST and appends the
+  `PATHEXT` variants after it, and `resolve_on_path:157-160` takes the FIRST existing candidate per
+  PATH directory, while on Windows `is_executable` is the `cfg(not(unix))` arm — `p.is_file()`
+  alone. So an extensionless file named exactly `npm` BEATS `npm.CMD`, and one exists on the runner:
+  the leg's own MSYS `command -v` probe prints npm's sh script beside `npm.cmd`. Established from
+  the failing job's log rather than by buying a push.
+  **This RULES OUT the obvious fix.** Resolving the spawn through `which()` does not work — it
+  returns the extensionless sh script, which `CreateProcessW` cannot run — so that change moves the
+  error message and nothing else. A working fix must ALSO make the `PATHEXT` variants beat the bare
+  name on Windows, and that ordering is SPECIFIED at `gate-sdk/SPEC.md`: "The bare name stays a
+  candidate, so a caller naming `cargo.exe` and a Unix host both resolve through the same loop." So
+  the unit amends a stated contract in a resolver every gate spawns through, which is why the narrow
+  call-site fix in the packer is not obviously the cheaper of the two sites.
+  **MUST BE PROBED ON A WINDOWS HOST before either site is chosen.** Spawning a `.cmd`/`.bat`
+  through `std::process::Command` changed across Rust versions and is argument-escaping sensitive
+  (CVE-2024-24576, Rust 1.77.2), while `native/Cargo.toml` pins `rust-version = "1.71"` BELOW that.
+  What `Command::new` does with a resolved `npm.cmd` is an OBSERVATION owed on a Windows host, not a
+  fact derivable on Linux — which is what makes this a run-observed entry rather than a one-liner.
+  **Cost while deferred, framed honestly rather than inflated.** `publish.yml`'s
+  `--pack-installer` step runs on `ubuntu-latest`, so the RELEASE PATH DOES NOT PACK ON WINDOWS:
+  this blocks no release and reaches no adopter through the packer. The real cost is that master
+  stays RED, so the next iteration's first watched push cannot tell its own regressions from this
+  standing one — the whole value a watched push buys. The shared-resolver half is the part that
+  would reach an adopter.
+  **DISTINCT from `harness-project-dir-fold-dialect-unresolved`**, whose subject is a project-dir
+  NAME FOLD disagreeing across two substrates; this owns a program-name resolution disagreeing
+  between a probe and a spawn INSIDE one substrate, and neither answer needs the other.
+  Surfaced 2026-09-10 by `packer-port-terminal-cut`'s close on the lead's direction, the fix held
+  pending an escalation; promoted at this scope. Full body via
+  `git log -p -S'dialect-aware and its SPAWN is not' -- .workflow/gap-inbox.md`.
+
+- **stop-liveness-test-module-order-dependent** [design-pending] — the crate's
+  `hook::stop_liveness::tests` MODULE is order- or concurrency-dependent under the full parallel
+  suite, and the commit-time battery inherits the flake because `check-crate-arms` runs the crate's
+  test arm.
+  **The measurement, and it is the filer's own same-day CORRECTION of a narrower first claim.**
+  Roughly twelve full `cargo test --release` runs over `native/`: THREE failures on TWO DIFFERENT
+  cases — `each_refusing_arm_names_its_own_finding_and_remedy` and
+  `unresolved_allows_once_the_harness_is_already_continuing` — with every other full run reporting
+  666 passed 0 failed, and the module passing 18 of 18 in ISOLATION every time. Two distinct cases
+  failing and the module always clean alone is what moves the subject from a test to the MODULE.
+  Rate roughly one full run in four, not one observation. Not re-measured at this scope: repeating
+  twelve release-mode suite runs to re-confirm a rate already taken is not a probe worth its cost,
+  and the finding is relayed with its filer's attribution rather than as this session's measurement.
+  **Why it matters rather than being noise.** A flaky member of a commit-time gate teaches sessions
+  to re-run rather than to read a red, which is the habit the fail-closed contract exists to
+  prevent: a red that clears on a re-run is indistinguishable from a red that was fixed.
+  **Class, judged rather than assumed, and this is the entry's one contestable call.** Machinery by
+  subject, but the 2026-08-30 default's test is CONJUNCTIVE and its second limb fails: at one run in
+  four the crate's test arm reds the `gates` workflow, and the push budget is one to two watched
+  pushes an iteration, so a flake of this rate can consume the budget a push exists to spend. Filed
+  Deferred on that limb rather than iceboxed; a ruling that the limb is not met sends it to the
+  icebox with no other change.
+  **Candidate cause, unproven and deliberately not asserted:** the module's cases exercise a hook
+  that writes a log line and reads a record set, so a shared path, log or environment variable
+  between concurrent cases is the shape to look at first. One run under `--test-threads=1` would
+  discriminate it cheaply.
+  **DISTINCT from `check-test-hermetic`**, a gate over test SOURCES asserting they do not reach
+  outside their fixtures; this is observed RUNTIME interference between cases that may each be
+  hermetic by that gate's reading.
+  **Cost while deferred:** low per instance and corrosive in aggregate — one in four commit-time
+  batteries reds for no cause, and every such red trains the re-run habit.
+  Surfaced 2026-09-10 by `packer-port-terminal-cut`'s close during an operator-ruled hotfix whose
+  scope was minimal, so it was filed rather than chased; promoted at this scope.
+
+- **installer-host-detector-ungated-and-musl-fails-open** [design-pending] — the installer's
+  host-to-triple detector is bound by NO gate, and one of its cases FAILS OPEN rather than
+  refusing — the single place the platform contract's own promise is broken.
+  **First defect, the ungated surface.** `check-install-platforms` binds `docs/install.md` against
+  `native/targets.list` and nothing else, so the third surface in that triangle —
+  `target_of_host` in `installer/bin/checkwright.sh:34-46`, which maps `uname` output to a triple —
+  is held by nothing. The three can disagree pairwise and only one pair is checked, which is how a
+  triple came to be DETECTED BY THE INSTALLER WHILE ON NO ROSTER with nothing going red. The fix
+  shape is to widen the existing gate to a three-way binding rather than to write a new one, since
+  the roster it would read is the one `check-install-platforms` already reads.
+  **Second defect, and it is a CONTRACT VIOLATION rather than a coverage gap.** `uname -s`/`uname
+  -m` cannot distinguish glibc from musl, so an Alpine x86_64 host resolves to
+  `x86_64-unknown-linux-gnu` and is handed a binary that WILL NOT RUN — a dynamic-linker failure at
+  exec time, on a host the project never claimed to support. `native/targets.list` promises "Both
+  refuse; neither proceeds", and this is the only case violating it: every other unsupported
+  platform receives a clean refusal that names itself, and this one receives an artifact.
+  **Verified at this scope, and the verification NARROWS the filing rather than confirming it
+  whole.** `select_artifact:64` greps the payload roster, so the ARM-Linux case its sibling entry
+  owns refuses CLEANLY — the detector naming an unrostered triple is a coverage gap, not a
+  fail-open. `Linux/x86_64` maps unconditionally to the gnu triple, which IS on the roster, so the
+  refusal never fires. musl is the whole of the fail-open, and the sibling bullet's severity
+  language is corrected here rather than inherited.
+  **Cost while deferred: low** for the musl refusal — one libc probe (`ldd --version`, or the
+  presence of the musl loader) gating the gnu mapping, and an unrecognised libc refusing by name
+  like every other unsupported case; **bounded** for the three-way gate widening, which extends a
+  gate that already parses both other surfaces. The two are filed together because they share a
+  subject and a fix site, and because the first is WHY the second went unnoticed: nothing reads
+  `target_of_host` against anything.
+  **PRODUCT-class** by the 2026-08-30 witness discriminator — the install path is adopter-facing.
+  **DISTINCT from `gate-binary-platform-roster-holes`**, whose subject is which triples the project
+  should BUILD; this owns whether the detector is checked at all and whether an unsupported host
+  refuses as promised. A roster with two more triples on it would leave both defects exactly where
+  they are.
+  Surfaced 2026-09-10 by the iteration lead at the operator's ask, out of a gitignored journal into
+  `packer-port-terminal-cut`'s gap inbox; promoted at this scope, its musl severity narrowed by a
+  fresh read of `select_artifact`.
+
+- **gate-binary-platform-roster-holes** [design-pending] — the shipped platform roster holds four
+  joined triples and two more the installed base plainly wants.
+  **PRODUCT-class** by the 2026-08-30 witness discriminator — the install path is adopter-facing,
+  so the machinery-class icebox default does not reach this and it is ordinary scope intake.
+  **The roster, read from `native/targets.list` at this scope:** `x86_64-unknown-linux-gnu`,
+  `aarch64-apple-darwin`, `x86_64-apple-darwin`, `x86_64-pc-windows-msvc`, with `docs/install.md`
+  stating that no platform is held today — so every gap below is an ABSENCE, not a held state.
+  **First, `aarch64-unknown-linux-gnu` is DETECTED BUT UNBUILT.** `installer/bin/checkwright.sh:37`
+  maps Linux with `aarch64` or `arm64` to that triple, yet it sits on no roster and in NO support
+  state, neither joined nor held. This is the largest hole by installed base — ARM Linux is the
+  default shape of a cloud runner and of a Raspberry-class device.
+  **Second, `aarch64-pc-windows-msvc` is ABSENT ENTIRELY**, which is the operator's specific ask:
+  Qualcomm X-class machines are gaining traction, and the cost shape is one this project already
+  pays — `docs/install.md` shows `macos-latest` is arm64, so the Intel Mac leg is ALREADY a
+  cross-compile rather than a native runner, and it is a SHRINKING platform while ARM Windows is a
+  growing one. Before costing it, check whether GitHub's ARM Windows runners have reached general
+  availability, which would make the leg native and cheaper than the Intel Mac leg already carried.
+  **The join bar is MECHANICAL and the roster header owns it**, not this entry: a triple joins when
+  ONE run carries BOTH a `native-artifacts` green for it AND a platform install-smoke leg green
+  that CONSUMED that upload. So each addition is a workflow leg plus a smoke leg, never a roster
+  line — the roster is the receipt, not the decision.
+  **Cost while deferred: bounded per triple, repeated twice**, being one build leg and one smoke
+  leg each. The roster header states the measured marginal cost as "one runner mapping in
+  `native/runners.list`, and nothing else", and records that runner availability is NOT the
+  constraint for arm64-Linux — what is missing is a run bought on one. The ARM Windows leg may
+  additionally need a runner decision that is the operator's rather than a session's, and a
+  platform floor if the two existing bootstrap scripts do not already carry its class.
+  **DISTINCT from `binding-intel-leg-failed-one-run-in-two`**, whose subject is the RELIABILITY of
+  a leg already joined, and from `toolchain-floor-spawn-on-native-windows`, whose subject is what a
+  compiled gate binary may spawn on a Windows host; this owns which hosts get a binary at all.
+  Surfaced 2026-09-10 by the iteration lead at the operator's ask — rescued out of a gitignored
+  journal into `packer-port-terminal-cut`'s gap inbox, and promoted here on a fresh roster read.
+
+- **markdown-hard-wrap-unowned-and-ungated** [design-pending] — this repo's markdown hard-wrapping
+  convention is unowned, bimodal and load-bearing for a gate whose manifest does not say so, and
+  under enforcement-first the unwrap and its oracle land in one unit or neither does.
+  **Measured at 2026-09-10 and RE-VERIFIED at this scope's HEAD.** `TRAJECTORY.md` is ungated —
+  `check-queue-wrap`'s manifest reads `couples=TASK-QUEUE.md` and nothing else — and it is bimodal:
+  46 lines at 79-81 columns, 94 at 92-100, 5 over 100, of 319. Two conventions inside one file.
+  **The gate's real load is written nowhere, and that is the defect under the formatting one.**
+  `check-queue-wrap`'s stated ground (so a runaway never reflows to column 0) is the weak one; its
+  actual load is being the DENOMINATOR of `check-queue-entry-budget`, which measures an entry's
+  extent in LINES against `QUEUE_KIT_ENTRY_LINE_CAP`. Nothing records that coupling, so a session
+  reads the weak ground, judges it thin, and deregisters a gate holding up a sibling.
+  **Six arms measure in lines and all six re-unit to CODE POINTS**, which is the precondition for
+  dropping any cap: `always_loaded.rs`, `overhead_meter.rs`, `scan_prompts.rs`, `footprint.rs`,
+  `port_blockers.rs`, `queue_entry_budget.rs`. `md_index.rs` counts lines CORRECTLY — navigation,
+  not measurement — and is left alone. Unit ruled `lead, own-authority` 2026-09-10: code points,
+  because `cplen` in `queue_wrap.rs` is the in-tree precedent, bytes penalise the em-dashes and
+  section marks this prose is full of, and words need a tokenizer decision.
+  **The `.metric/` history BREAKS on the unit change** — record the discontinuity and re-baseline in
+  the same unit, or the first post-change close reads a tenfold phantom win.
+  **`check-tag-lead-line` is a PURE COMPENSATOR for wrapping** and becomes deletable rather than
+  merely deregisterable once an entry is one line, every governed tag sitting on the only line its
+  readers scan. The `recurrence:` declaration is then the last line-led construct (`ruled:` is
+  already retired), and the operator's move is to convert it to a bracketed tag beside
+  `blocked-by`, `roadmap`, `spec` and `precondition-ok`, all of which `queue.rs` already scans
+  positionally — after which nothing in the queue is line-scoped by design.
+  **The new gate is the INVERSE of `check-queue-wrap`** — red when a prose paragraph is broken
+  across lines — and both ship, each consumer registering the one it wants. That also answers the
+  fixture-rot exposure. Enforcement-first is the operator's own correction here, and it corrected
+  the lead: a convention with no oracle is the shape this repo refuses, so stop-maintaining-wrap is
+  not a free half.
+  **Cost while deferred:** not low, and deliberately not claimed to be — this step alone rewrites
+  every governed markdown file in the tree and ships a new gate.
+  Surfaced 2026-09-10 by the operator through the consult channel in a lead session, relayed by that
+  lead into the gap inbox of `packer-port-terminal-cut`'s close and promoted at this scope. The full
+  probed body is recoverable: `git log -p -S'bimodal, and load-bearing' -- .workflow/gap-inbox.md`.
+
+- **queue-entry-shape-slugs-headings-links** [design-pending] — the operator's queue-shape sequence:
+  ratchet slug length, make each task a third-level heading, then make every cross-task reference a
+  real link and retire the bold-code typographic convention. Steps two through five of the
+  2026-09-10 sequence, whose ORDER IS BINDING.
+  blocked-by: markdown-hard-wrap-unowned-and-ungated
+  **Slug length first, and step two MUST precede step four**, because once slugs are anchors every
+  rename is a breaking change. Measured 2026-09-10: 419 slugs spanning 17 to 64 characters, only 2
+  at or below 20, 234 in the 31-to-40 band, 83 over 40. Ruled `lead, own-authority` 2026-09-10 on
+  the operator's delegation: KEEP KEBAB and cap the length, moving the description to the body —
+  the heading becomes the anchor and GitHub manufactures the kebab form anyway, so heading, anchor
+  and `blocked-by` target become ONE STRING IN THREE ROLES with zero transformation, and
+  `is_slug_head`/`is_slug_byte` already parse kebab. A prose title is the two-sources defect in
+  friendlier clothes. **A RATCHET, NOT A CAP:** red on a NEW or RENAMED slug over 30 and grandfather
+  the rest — a hard cap would evict 317 of 419.
+  **Third-level headings, operator 2026-09-10.** That heading level is unused in `TASK-QUEUE.md`, 0
+  occurrences, the title being one hash and sections two. Slugs are already one global unique
+  namespace across active, deferred, icebox and sub-tasks, gated by `check-task-names`, and the Done
+  line carries the slug verbatim — so a fragment reference becomes a PERMANENT ANCHOR surviving
+  every section move, Done included. **Constraint:** the heading is the BARE slug with tags on the
+  body, because GitHub derives anchors from heading TEXT and a tag inside the heading breaks the
+  anchor the moment the tag changes. **Buys:** `--emit md-index` over the queue becomes a derived
+  roster for free, `check-md-refs` gains roughly 420 verifiable anchor targets, and the icebox
+  tier's no-subsections rule goes MOOT rather than violated — its ground was that grouping is
+  presentation, and under this change the heading is identity.
+  **References as links, operator 2026-09-10.** `check-md-refs` already validates that internal
+  links resolve; nothing demands that a reference BE one. `check-queue-slug-liveness` detects
+  references by TYPOGRAPHY — the bold-code form — and `ENV.local.md` carries a hand-written
+  workaround because a BINARY NAME could not wear that markup without redding the gate: the attested
+  cost of overloading prose markup as a reference marker. Demanding a clickable link separates prose
+  from references and retires the convention.
+  **Cost while deferred:** bounded and mechanical but wide — everything keying on the column-zero
+  moves to heading detection: `is_top_level_bullet`, `is_bullet`, `live_slugs`, the section
+  scanners, `check-task-conservation`, `queue-index`, `queue-counts`, `icebox-candidates` and the
+  roadmap walk.
+  Surfaced 2026-09-10 as above; full body via
+  `git log -p -S'TASKS BECOME THIRD-LEVEL HEADINGS' -- .workflow/gap-inbox.md`.
+
+- **gates-must-not-bind-to-document-paths** [design-pending] — a gate may know a document's SHAPE
+  and never its PATH; path is always config. The discriminator is the operator's, ruled 2026-09-10,
+  and it REPLACES the lead's earlier one.
+  **The lead's refused reading, recorded because it is the trap.** The lead's discriminator was that
+  a grammar-reading gate belongs to its document — which quietly licensed freezing a consumer's
+  filename into a gate manifest. The operator's is that grammar-coupling justifies knowing the
+  shape, never the path.
+  **The worked case.** `check-queue-wrap`'s logic knows nothing about queues — `cplen`, `is_fence`,
+  `is_table_row` — and reaches `queue::` only for config, so it is generic mechanism MISFILED in
+  queue-kit and should be a `check-line-length` over a configurable target with a configurable
+  budget. `check-brevity` is ALREADY that lego (`CONTEXT_KIT_BREVITY_FILE` plus an argument
+  override) and the AGENTS.md adapter is ALREADY built and smoke-tested in `agents_md_smoke.rs`,
+  which converts and then asserts always-loaded and footprint both measure `AGENTS.md`. A lead claim
+  that `check-brevity` was correctly coupled to `CLAUDE.md` was FALSE and is corrected here.
+  **The real defect is the GRAPH FORMAT.** `couples=` tokens must be syntactically valid glob or
+  path — literals, globs, a `kit:` prefix, no knob indirection — so a configurable-target gate is
+  FORCED to freeze one consumer's filename in its manifest. Cheap fix is
+  `couples=CLAUDE.md,AGENTS.md`; the principled fix is knob indirection in the format.
+  **The survey arm is the entry's first deliverable, and the class is larger than the two members
+  the discriminator has been applied to.** Probed at this scope over every `.gate` manifest:
+  `CLAUDE.md` appears in 14 `couples=` token positions, `TASK-QUEUE.md` in 23, `docs/install.md` in
+  3, `.workflow/WORKFLOW-STATE.txt` in 4, `scripts/gates.list` in 5, beside further per-file
+  literals. Apply the operator's discriminator across that corpus rather than case by case.
+  **Cost while deferred:** bounded for the survey; unbounded until it runs, since its own output
+  how many gates move and whether the format change is owed.
+  Surfaced 2026-09-10 as above; the full probed body via
+  `git log -p -S'GATES MUST NOT BIND TO DOCUMENT TYPES' -- .workflow/gap-inbox.md`.
+
+- **dogfooding-line-invites-a-false-doctrine-conflict** [design-pending] — `CLAUDE.md`'s
+  dogfooding-is-day-one sentence reads as an obligation to register every shipped gate on this tree,
+  and it is not one; the sentence gains a clause saying so.
+  **The governing operator principle, ruled 2026-09-10 through the consult channel in a lead session
+  and relayed by that lead — it outranks every specific under it.** This project aims to produce
+  checkwright, a toolset the customer tunes to their need, and that does not mean the checkwright
+  development project is forced to use all check types: registration is a tuning decision here as
+  for any consumer.
+  **Precedent already exists, measured rather than assumed:** 113 gates shipped, 111 registered,
+  with `check-surface-duplication` and `check-producer-liveness` already declined.
+  **Why it is filed rather than merely known.** `CLAUDE.md`'s dogfooding sentence invites the
+  opposite reading, and that is what sent a lead hunting a doctrine conflict that was never there —
+  the finding is the cost. The clause lands undated on `CLAUDE.md`, marked operator 2026-09-10, and
+  NOT in `TRAJECTORY.md`, which admits no ruling naming no discharge event.
+  **Cost while deferred: low** — one clause on an always-loaded surface, against its brevity budget.
+  It is a precondition for reading the wrap theme's gate-design half correctly, since that half
+  turns on which gates this repo chooses to register.
+  Surfaced 2026-09-10 as above; its full probed body via
+  `git log -p -S'registration is a tuning decision' -- .workflow/gap-inbox.md`.
+
 - **install-smoke-leg-names-mix-two-axes** [design-pending] — the five `install-smoke` legs in
   `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
   surfaces now carry prose whose only job is to undo the misreading that produces.
@@ -2098,13 +2363,16 @@
   needs no budget at all and makes the growth visible where it happens.
   **The series, against the same unmoved baseline: 197 (+25) → 213 (+41) → 213 (+41).**
   The middle reading advanced 16 lines and looked like compounding drift. The third,
-  at `native-cohort-activation`'s close, is the first that did **not** advance — and
-  the mechanism is worth more than the number: the iteration added exactly one line to
-  the surface and that close's pass recovered exactly that one line, both times from
-  the same `native/` bullet restating what gate-sdk's SPEC owns. So a pass-shaped fix
-  holds the line **only** against a pass-shaped increment. It recovered one of
-  forty-one when the growth was unit-shaped, and one of one when it was not. The
-  baseline stays unstamped through all three.
+  at `native-cohort-activation`'s close, is the first that did **not** advance, and the
+  mechanism outweighs the number: the iteration added exactly one line and that close's
+  pass recovered exactly that one, both times from the same `native/` bullet restating
+  what gate-sdk's SPEC owns. So a pass-shaped fix holds the line **only** against a
+  pass-shaped increment — one of forty-one when the growth was unit-shaped, one of one
+  when it was not. The baseline stays unstamped through all three.
+  **Operator direction 2026-09-10, widening this entry's subject rather than opening a new one
+  — consult channel in a lead session, relayed by that lead.** Brevity must reach
+  **on-demand-loaded** surfaces too, so unjustified growth behind a load trigger is caught as
+  well; the ratchet below is the candidate for both.
   **Cost while deferred:** compounding directly in the tier the whole methodology
   is trying to hold down, and paid by every session in this repo and every
   consumer that vendors context-kit. The detector is a close-stage read, so it is
@@ -4650,45 +4918,44 @@
   **Third firing, 2026-09-10, and HALF OF IT IS NOW DISCHARGED — the entry stays open on the other
   half.** The operator directed, twice on one day through the lead, that a lead write everything
   which must survive a compact to its own resume journal rather than suggesting a keep/drop compact
-  to the operator, and that the write be CADENCED on every stage completion rather than left to the
-  lead's forecast of when a compact looms. Both halves landed at this close in
-  `lifecycle-kit/templates/lead.md` §Economics, stated undated as kit mechanism: the journal bullet
-  now carries the durability obligation and the compact suggestion is demoted to an optional
-  convenience beneath it. The recurrence is stamped rather than the entry merely re-read because
-  the practice had to be directed AGAIN, a lead having written no journal until asked.
-  **What still has no home, and why this stays `[design-pending]`:** the template now names `.tmp/`,
-  which the scope boundary sweeps — right for per-iteration state and still wrong for anything
-  crossing the boundary. That is this entry's remaining subject.
+  to the operator, and that the write be CADENCED on every stage completion. Both halves landed at
+  that close in `lifecycle-kit/templates/lead.md` §Economics, undated as kit mechanism. The
+  recurrence is stamped rather than the entry merely re-read because the practice had to be
+  directed AGAIN, a lead having written no journal until asked.
+  **THE SHARPEST WITNESS THE ENTRY HAS, attached at this scope's gap-inbox drain and NOT stamped
+  as a fourth firing** — the 2026-09-10 firing above is already recorded and this is evidence
+  attached to it. At `packer-port-terminal-cut`'s close the lead journal was the ONLY home for
+  three substantial findings — an operator design consult spanning wrap, gate-to-document
+  coupling, queue entry shape and slug format, plus two platform-coverage findings — and every one
+  of them was one `--enter-stage` boundary reset away from being destroyed. They were rescued only
+  because the operator asked whether they had been filed. This is materially worse than the
+  2026-08-14 loss, which was unreachability after a compaction: here the state was reachable and
+  simply scheduled for deletion by the project's own mechanism, and the deletion is CORRECT
+  behaviour by that mechanism rather than a bug in it. **The second-order instance is the part
+  worth keeping:** the lead then recorded the defect ITSELF in the same disposable journal, which
+  the operator ALSO had to catch — so the journal's disposability silently swallows the very
+  record that would prevent the next occurrence, and a lead cannot bootstrap a lesson out of a
+  file swept before that lesson's next occasion. A durability argument no earlier attestation
+  reached.
   **Re-attested 2026-08-14, and sharpened from a missing feature to a defect.** The absence is
   not merely unprovided-for: delegation-kit/templates/agent-execution.md binds its durability
   rule to whoever holds findings they will act on and closes the role loophole in its own
   words — *"Neither the supervising role nor a session running outside any dispatch is
   exempt: the axis is what the session can do at this moment, never what it is"* — and a lead
   can commit. So the rule **names** the lead and hands it no discharge path, which is a
-  broken obligation rather than an unbuilt convenience. Re-verified at the 2026-08-14 drain:
-  the four `journal` mentions in `lifecycle-kit/templates/lead.md` are all the *stage
-  session's* journal, and nothing anywhere mints, requires or checks a lead-side one.
-  Measured cost that iteration: six operator rulings, three stage returns and an
-  operator-corrected premise carried with nothing durable behind them, and no journal existed
-  until the operator asked at the fourth stage boundary — by which point a compaction had
-  made one stage session unreachable by name. That loss is worse than the 2026-08-13
-  attestation's and is why the recurrence is stamped rather than the entry merely re-read.
-  `lifecycle-kit/templates/lead.md` §Channel design assigns the **resume journal** to the *stage
-  session* — the lead reads it and is forbidden to delete it — and §Stamps are authoritative
-  rules out every lifecycle write. Re-verified at the 2026-08-13 drain by reading the template
-  end to end: across 438 lines there is no lead-side journal, state file, or capture obligation
-  of any kind. The claim is about an absence and that read is what settles it.
+  broken obligation rather than an unbuilt convenience. Re-verified end to end at the 2026-08-13
+  and 2026-08-14 drains: `lifecycle-kit/templates/lead.md` assigns the resume journal to the
+  *stage* session and rules out every lifecycle write, and nothing anywhere mints, requires or
+  checks a lead-side one. Measured cost that iteration: six operator rulings, three stage returns
+  and an operator-corrected premise carried with nothing durable behind them, with one stage
+  session made unreachable by name through a compaction.
   **What has no home:** the batch roster and its tiering rationale, findings carried between
-  batches, operator items awaiting a ruling, and anything learned mid-iteration that no stage
-  owns. Measured, not inferred: a full investigation's findings existed nowhere but a transcript
-  until the operator prompted the lead to write them down — after that session's second
-  compaction.
-  **Why `[design-pending]`:** the fix shape is a lead-journal obligation with a stated cadence
-  (on dispatch, on completion notification, on any ruling or finding), but its *home* is the open
-  question: `.tmp/` is swept at the scope boundary, which is right for per-iteration state and
-  wrong for anything crossing it, and a tracked home collides with the invariant that the lead
-  writes no governed state. Distinct from the gap inbox and the survey record, which are capture
-  channels for findings a *stage* will drain, not a place a lead's own working state persists.
+  batches, operator items awaiting a ruling, and anything learned mid-iteration no stage owns.
+  **Why `[design-pending]`, and this is the entry's whole remaining subject:** the cadence half is
+  discharged and the *home* is not. The template now names `.tmp/`, which the scope boundary
+  sweeps — right for per-iteration state, wrong for anything crossing it — while a tracked home
+  collides with the invariant that the lead writes no governed state. Distinct from the gap inbox
+  and the survey record, capture channels a *stage* drains rather than a lead's working state.
   **Cost while deferred:** compounding with session length — every lead compaction degrades or
   loses state, and the loss is silent, since a degraded roster reads exactly like a short one.
   Filed 2026-08-13 by close, draining the gap inbox; a lead filing, re-verified at the drain by
@@ -10706,6 +10973,8 @@
 - **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
 - **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
 - **edges-retired-block-name-clash** [design-pending] — A live gate name inflates a retired slug.
+- **class-default-reach-gated-by-cost-opener** [design-pending] — Wording, not class, sets reach.
+- **lead-report-is-an-ungated-terminal-act** [design-pending] — May close holding unfiled work.
 
 ## Done
 
