@@ -6,3 +6,4 @@
 
 crate-arms-flake-sources scope ad9158f8 2026-09-11 0607218f
 crate-arms-flake-sources spec a2e56238 2026-09-11 bee8480c
+crate-arms-flake-sources align a71c5d9c 2026-09-11 7d911457
