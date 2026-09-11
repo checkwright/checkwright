@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-command-classification
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -796,26 +796,24 @@
   single mistyped path inside a grant every session uses for routine scratch cleanup.
   Filed 2026-08-22 by build, split out of `guard-grant-review` on the lead's ruling that choosing
   the mechanism is design work and scope-gated intake makes it a costed Deferred entry by default.
+  **Leads the `guard-command-classification` set — operator direction, 2026-09-11, lead-relayed.**
 
 - **grant-path-traversal-exposure** [design-pending] [cost: event/low] [surface: guard-kit] — the committed script-runner globs match a
-  traversing path, and whether that is in the narrowing ruling's scope is unsettled.
+  traversing path, a code-execution class the grant narrowing now covers.
   **The exposure, stated plainly:** `Bash(bash */checks/check-*.sh)` matches
   `bash ../../evil/checks/check-x.sh`, because a Bash rule's `*` spans `/`. Its siblings carry the
   same shape — `bash */bin/run-*-tests.sh`, `bash */gate-tests/*.test.sh` and
   `bash */smoke/install.sh`. Verified at build 2026-08-22; the `drift-kit/kpis/*.sh` pair was
   listed here too and was retired with the 2026-08-29 KPI port, leaving four live globs.
-  **Ruled OUT of scope for the 2026-08-20 narrowing, by the lead 2026-08-22**, on the reading that
-  that ruling is scoped to data-loss forms and that declining to widen a recorded ruling is the
-  conservative move. Recorded here so the exposure is not lost along with the decision.
   **Why it is genuinely weaker than a data-loss finding:** reaching a destructive script needs a
   second precondition the allowlist cannot evidence — a hostile script must already exist at a
   matching path. `scripts/bash-guard.sh` also blocks `bash .tmp/…` outright, closing the one path a
   session may write to freely, and routes it through the `--scratch-run` arm, which resolves the
   real path and refuses anything outside the scratch dir.
-  **Why [design-pending]:** whether "destructive form" covers a code-execution class at all is a
-  question about the 2026-08-20 ruling's own scope, and only the operator may widen it. The
-  engineering question — whether these globs can be re-spelled without breaking the battery they
-  exist to run — is untouched and unbought.
+  **Widened in, and joins the `guard-command-classification` unit set — operator direction,
+  2026-09-11, lead-relayed:** the 2026-08-20 narrowing (data-loss forms) now covers this
+  code-execution class. **Why [design-pending]:** whether these globs can be re-spelled without
+  breaking the battery they exist to run is untouched and unbought.
   **Cost while deferred:** low and precondition-bound, but it spans the whole script-runner
   surface rather than one grant, so a later change making a matching path writable would arm the
   whole family at once, and would do it without a signal anyone reads.
@@ -1410,6 +1408,7 @@
   Only the tier label is corrected here; the entry's substantive claims were not re-examined.
   Filed 2026-08-01 by close's prompt-friction triage; tier corrected 2026-08-13 by close from the
   gap-inbox drain, after the operator ruled the entry out of that iteration's unit set.
+  **Unit set `guard-command-classification`, prefix strip — operator direction, 2026-09-11.**
 
 
 - **companion-toolkit-profile** [design-pending] [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
@@ -2420,6 +2419,7 @@
   never see, because the roster reads as a list of safe programs.
   Filed 2026-08-13 by close, draining the gap inbox; every allow/fall verdict above re-probed
   against HEAD at the drain rather than taken from the bullet.
+  **Unit set `guard-command-classification`, write forms — operator direction, 2026-09-11.**
 
 - **guard-ruleset-registration-lockstep** [design-pending] [cost: event/low] [surface: guard-kit] — guard-kit's generic ruleset exists in
   three places and nothing holds them in lockstep.
@@ -3004,6 +3004,7 @@
   tool, spends a ToolSearch, and re-derives the allowlisted bare form.
   Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, in its tooling-friction
   triage; promoted from the gap inbox at this iteration's scope.
+  **Unit set `guard-command-classification`, steer text — operator direction, 2026-09-11.**
 
 - **deferred-entry-defer-date-unasserted** [design-pending] [cost: iteration/low] [surface: queue-kit] — a deferred entry whose provenance
   date is malformed reads as **undated**, and no gate reds on it.
@@ -3151,10 +3152,9 @@
   which-steer clause above more strongly than any single reading argues for one target, and it
   proposes no new deliverable. **No `recurrence:` date joins:** the finding did not re-fire, a
   measurement the entry carries was superseded.
-  **FOURTH MEASUREMENT 2026-08-24, and it CONFIRMS the iteration-shaped reading rather than
-  superseding it: 72 line-range `NR>=` against 22 section-pattern, in a SPEC-and-source-heavy
-  iteration exactly as the hypothesis predicts. No `recurrence:` date joins, on this entry's own
-  third-measurement precedent — a further measurement of a carried quantity is not a firing.**
+  **FOURTH MEASUREMENT 2026-08-24 CONFIRMS the iteration-shaped reading:** 72 line-range `NR>=`
+  against 22 section-pattern in a SPEC-and-source-heavy iteration, as predicted. No `recurrence:`
+  date joins, per the third's precedent: a further measurement of a carried quantity is no firing.
   **Measured 2026-08-19 off the log:** 22 `awk` calls, 19 the exact `awk 'NR>=X && NR<=Y' <file>`
   shape, and every one of the 22 read a FILE rather than transformed a stream — which is the whole
   premise, and it is the shape the guard already steers `cat` and `sed` away from.
@@ -3182,6 +3182,7 @@
   the tree, while the guard reads as though it covers the class.
   Filed 2026-08-19 into the gap inbox by the `budget-batch-and-account-identity-kind` close's
   prompt-friction triage; promoted at the following scope's drain, both neighbours re-read there.
+  **Unit set `guard-command-classification`, awk read steer — operator direction, 2026-09-11.**
 
 - **spec-lib-dead-derivation** [design-pending] [cost: event/low] [surface: canon-kit] — three section-builder regexes in
   `canon-kit/lib/spec.sh` have no reader left in the tree, and nothing rules what they are.
@@ -3486,6 +3487,7 @@
   a commit can be taken beside a live producer that never announced itself.
   Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
   the filing and read `guard_advise` to establish that it never blocks.
+  **Unit set `guard-command-classification`, rule-15 floor — operator direction, 2026-09-11.**
 
 - **guard-rule-number-intra-kit-citations-ungated** [design-pending] [cost: event/low] [surface: guard-kit] — guard-kit cites its own
   rule numbers everywhere and nothing holds a single citation to the ruleset.
@@ -3536,6 +3538,7 @@
   once learns to read past it, which is the erosion that makes an unenforced rule cheap.
   Filed 2026-08-23 by build; drained at that iteration's close, which read the span walk to
   confirm the limit is structural rather than a detection bug.
+  **Unit set `guard-command-classification`, rule-15 exemption — operator direction, 2026-09-11.**
 
 
 - **bespoke-test-path-knob-pinning** [design-pending] [cost: event/high] [surface: gate-sdk] — a bespoke gate-test's cwd sandbox is
