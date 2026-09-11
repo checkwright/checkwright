@@ -4,11 +4,4 @@
 
 ---
 
-guard-command-classification scope afb178d5 2026-09-11 98157e89
-guard-command-classification spec a2a13fb6 2026-09-11 a4fa49f6
-guard-command-classification align a75aa67c 2026-09-11 b6c19a9a
-guard-command-classification build a3a1abd7 2026-09-11 d82cf0fd
-guard-command-classification build a68c2595 2026-09-11 1f166a06
-guard-command-classification build a2e994a0 2026-09-11 51bdadfe
-guard-command-classification validate a63ee7d2 2026-09-11 7da47092
-guard-command-classification close a8f0489e 2026-09-11 3da92cdc
+— scope ad9158f8 2026-09-11 0607218f
