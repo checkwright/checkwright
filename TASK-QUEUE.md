@@ -78,58 +78,6 @@
   `host-resolution-fail-open-cut` on its recurrence reaching threshold, ruled in by the operator
   through AskUserQuestion in the lead session, relayed by the lead.
 
-- **gate-binary-platform-roster-holes** [spec: SPEC-arm64-linux.md] [observed-by: gates]
-  — the shipped platform roster holds four joined triples and two more the installed base plainly
-  wants. **SCOPE NARROWED at spec to the `aarch64-unknown-linux-gnu` leg alone**; the
-  `aarch64-pc-windows-msvc` half stays on this entry, unpriced and unprejudged, its cost turning on
-  an ARM Windows runner decision that is the operator's rather than a session's.
-  **PRODUCT-class** by the 2026-08-30 witness discriminator — the install path is adopter-facing.
-  **The hole:** `installer/bin/checkwright.sh` and its PowerShell twin both map Linux arm64 to
-  `aarch64-unknown-linux-gnu`, yet it sits in NO support state, neither joined nor held. Largest
-  hole by installed base — ARM Linux is the default shape of a cloud runner.
-  **THE CAUSALITY IS THE REVERSE OF WHAT THE ROSTER HEADER IMPLIES, probed at spec.**
-  `native-artifacts-roster` derives its producer legs by parsing `docs/install.md`'s
-  `platforms:begin` block — its own comment says "The matrix is the DECLARATION, not the roster" —
-  and only then looks the runner label up in `native/runners.list`, refusing loudly on an unmapped
-  target. So a runners.list line ALONE creates nothing; the `held:` DECLARATION is what creates the
-  producer leg, and the two land in one commit. The header's three-join-edits sentence is not false
-  but is silent on this ordering, and gains one clause.
-  **`continue-on-error` derives from the `held` bit**, so a held platform's producer and smoke legs
-  are both non-blocking — which is the mechanism that lets this land on a red-averse master, and
-  the reason it is safe to land before the observation it waits for.
-  **Runner label PROBED 2026-09-11** against actions/runner-images' own table, the discipline
-  `native/runners.list`'s header imposes: `ubuntu-24.04-arm` and `ubuntu-22.04-arm` Ready,
-  `ubuntu-26.04-arm` Preview. There is no `ubuntu-latest`-shaped arm64 label, so this line carries a
-  PINNED label that ages — the same cost both macOS lines already pay.
-  **THE JOIN IS NOT THIS UNIT'S.** No delta writes `native/targets.list`. The roster header's own
-  words are the reason: "an iteration named unblock invites its next reader to read the removal of
-  a blocker as the arrival of a permission, and a roster widened on that reading is widened on a
-  plan." This unit builds the producer and the consumer; the run they produce is what joins.
-  **The sixth `install-smoke` leg is minted under the status quo and that is a NON-decision.**
-  No name is stable under both live schemes, so minting under the convention already in the file
-  presupposes neither; blocking instead would hold a PRODUCT-class hole behind a machinery-class
-  prose entry. What it owes `install-smoke-leg-names-mix-two-axes` is recorded: a second Linux leg
-  makes the baseline's unsuffixed name actively ambiguous, which is the strongest new argument that
-  entry has and is this unit's own doing.
-  **DISTINCT from `binding-intel-leg-failed-one-run-in-two`**, whose subject is a joined leg's
-  RELIABILITY; this owns which hosts get a binary at all.
-  Surfaced 2026-09-10 by the iteration lead at the operator's ask — rescued out of a gitignored
-  journal into `packer-port-terminal-cut`'s gap inbox, promoted 2026-09-10 at scope on a fresh
-  roster read, and specified 2026-09-11 at spec with its scope narrowed to one leg.
-  **THE ARM64 INCREMENT IS BUILT AND ITS OBSERVATION IS DRAINED — run 34543644528 on `cff1fcad`.**
-  The probed runner label resolved and `native-artifacts (aarch64-unknown-linux-gnu,
-  ubuntu-24.04-arm, true)` went green first try. `install-smoke-linux-arm64` red, non-blocking
-  because held, and the cause was NOT the floor question the amendment left open: the suite adopts
-  the producer's artifact rather than building one, so no host binary was left for the pack arm to
-  dispatch to — the siblings pay for it in a `probe the crate build` step this leg omitted.
-  Repaired at `644547a6`, whose verification rides the next push. **The floor question is answered
-  the cheap way:** the probe reported no `<MISSING>` member on `ubuntu-24.04-arm`, so no step of
-  `scripts/ci-macos-floor.sh`'s shape is owed here.
-  **THE ROSTER LINE IS STILL NOT WRITTEN** and `native/targets.list` is unchanged — confirmed, not
-  assumed. The join wants one run carrying both halves and the consumer half has not been green.
-  **The terminal move is escalated rather than taken**, and the amendment is held on disk for the
-  same reason; its preamble carries the question and the evidence.
-
 ## Technical Debt
 
 - **dogfooding-line-invites-a-false-doctrine-conflict**
@@ -225,6 +173,46 @@
   batteries reds for no cause, and every such red trains the re-run habit.
   Surfaced 2026-09-10 by `packer-port-terminal-cut`'s close during an operator-ruled hotfix whose
   scope was minimal, so it was filed rather than chased; promoted at this scope.
+
+- **gate-binary-platform-roster-holes** [design-pending] — the shipped platform roster held four
+  joined triples and two more the installed base plainly wants; **one of the two is discharged and
+  this entry is what is left of it.**
+  **PRODUCT-class** by the 2026-08-30 witness discriminator — the install path is adopter-facing,
+  so the machinery-class icebox default does not reach this and it stays ordinary scope intake.
+  **DISCHARGED 2026-09-11 at `52b4b96a`, leg repaired at `644547a6`: `aarch64-unknown-linux-gnu`
+  is DECLARED HELD**, with its probed runner mapping and an `install-smoke-linux-arm64` consumer
+  leg. Its roster line is deliberately unwritten — the join is the roster header's own predicate
+  and never a queue entry's — and every mechanic that unit probed now lives where it belongs
+  rather than here: the declaration-before-mapping ordering in `native/targets.list`'s header, the
+  pinned-label cost in `native/runners.list`'s, and the answered floor question in the leg's own
+  job header.
+  **WHAT REMAINS IS `aarch64-pc-windows-msvc` ALONE**, and it is the operator's specific ask.
+  Unpriced and unprejudged: its cost turns on whether GitHub's ARM Windows runners have reached
+  general availability — re-probe actions/runner-images' table rather than trusting any paragraph
+  — and on a runner decision that is the operator's rather than a session's.
+  **THE ROUTE IS WORKED NOW, which is what the discharged half bought this one.** A platform is
+  declared `held` FIRST: the declaration is what creates its producer leg, the runner mapping is
+  only looked up once a declared target exists, and `continue-on-error` derives from the `held`
+  bit so both legs land non-blocking on a red-averse master. Whoever takes this half copies
+  `52b4b96a`'s shape; nothing in it was arm64-Linux-specific but the label and the floor probe.
+  **The `observed-by` tag is DROPPED and the drop is a judgment, not a lapse.** That tag declares
+  a completion predicate that is an observation of a remote run rather than a tree state, and its
+  one reader of the value is a scope stage at promotion. This half's completion is a TREE state —
+  declare, map, add the leg, which is exactly what the discharged half landed green before any run
+  existed — and no `gates` run produces it until that work exists, so the producer field would be
+  unreadable for its only named reader.
+  **DISTINCT from `binding-intel-leg-failed-one-run-in-two`**, whose subject is a joined leg's
+  RELIABILITY; this owns which hosts get a binary at all.
+  **Cost while deferred: bounded, and one leg now rather than two** — one build leg and one smoke
+  leg, plus a platform floor if the ARM Windows image does not carry the class the two bootstrap
+  scripts already bootstrap. Runner availability is the open question here rather than the known
+  non-blocker it was for arm64 Linux.
+  Surfaced 2026-09-10 by the iteration lead at the operator's ask — rescued out of a gitignored
+  journal into `packer-port-terminal-cut`'s gap inbox, promoted 2026-09-10 at scope on a fresh
+  roster read, specified 2026-09-11 at spec with its scope narrowed to one leg, and demoted
+  2026-09-11 at build on canon-kit/SPEC.md:239-250's corpus-versus-increment test — ruled `lead,
+  own-authority` 2026-09-11 through the lead's message channel, that lead reversing its own Done
+  instruction of the same date after verifying the grounds at source.
 
 - **markdown-hard-wrap-unowned-and-ungated** [design-pending] — this repo's markdown hard-wrapping
   convention is unowned, bimodal and load-bearing for a gate whose manifest does not say so, and
