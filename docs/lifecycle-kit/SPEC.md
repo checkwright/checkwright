@@ -1155,11 +1155,11 @@ recount the freeze forbids. A scanner gate over anchors is refused on the
 grounds the paragraph above already gives.
 
 **The drain's dispositions are ordered, and promotion is last, on a measured
-drain rather than on a preference.** The disposition set is fix, icebox,
-promote, discard; the drain tries them in that order per bullet and a promotion
-states in the close commit message which earlier disposition it failed and why.
+drain rather than on a preference.** The disposition set is fix, promote,
+discard; the drain tries them in that order per bullet and a promotion states in
+the close commit message why the fix disposition failed.
 The measurement: with the set listed promotion-first, fifteen consecutive drained
-bullets over two closes were promoted and none fixed or iceboxed, on a pool whose
+bullets over two closes were promoted and none fixed, on a pool whose
 intake had outrun its exits three to one for a fortnight — so the unordered set
 was read as a promotion default, and a three-line defect cost a thirty-line
 entry plus the iteration that would one day build it. **A bullet is fix-shaped
@@ -1170,9 +1170,11 @@ criterion is minted. Fixing in the drain is not the refused hotfix track: it
 contends on no live stage surface (the closing stage holds the index), and
 what it admits is exactly what that refusal said a hotfix is not — debt-shaped
 work. It is also not an intake violation: scope gates *initiatives*, and a
-defect the drain fixes in one commit adds nothing for scope to weigh. A bullet
-is icebox-shaped on queue-kit/SPEC.md §The icebox tier's eligibility, read at
-the drain. The alternative refused alongside the ordering: a gate reddening a
+defect the drain fixes in one commit adds nothing for scope to weigh. **The
+icebox is not a drain disposition**: the tier takes deferred entries that aged
+without recurring, and a bullet drained today has no such age (queue-kit/SPEC.md
+§The icebox tier); a bullet not worth carrying is a discard with cause. The
+alternative refused alongside the ordering: a gate reddening a
 close on net pool growth. Enforcement-first would prefer it, but the refusal ground is
 that the exits are judgments — a forced exit is a fake one — so the figure is
 surfaced instead: drift-kit's `kpi-queue-net-delta` already computes it, and

@@ -23,7 +23,8 @@ always-loaded delta with the `--growth` figure, and `kpi-overhead`'s share — w
 cause when one moves the wrong way. **The three are read against a stated
 expectation, and it is the operator's:** `qnet` at or below zero, governed prose
 flat or shrinking, the share falling. A gate enforcing them stays refused on the
-grounds TRAJECTORY.md §The closed rulings' machinery-class default owns, and the
+grounds lifecycle-kit/SPEC.md §The committed gap inbox states for the net-growth
+gate — the exits are judgments — and the
 shape is reopened only where none of the three has moved over five closes.
 The roster step above already names which surfaces to read; what
 this binding adds is the procedure each row routes to — the prompt-friction row

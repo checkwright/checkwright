@@ -126,8 +126,11 @@ mix the two kinds reorders it freely.
 The deferred pool has an intake asymmetry the delivery doctrine itself creates:
 gap disposition and scope-gated intake make filing mandatory and cheap, while
 the only exit is *building* the entry. The icebox is the missing exit — a third
-**live** task section holding entries whose own cost field says they are
-dormant, each compressed to its lead line.
+**live** task section holding **deferred entries that went dormant**: filed,
+carried, and neither recurred nor promoted for the age the tier's knob sets,
+each compressed to its lead line. Dormancy is evidence of age, so the tier has
+**one entry route, deferred → icebox at the closing stage's eviction**; a newly
+filed finding has no such evidence and never lands here directly (below).
 
 close-surface: TASK-QUEUE.md#Deferred advisory
 
@@ -228,9 +231,12 @@ removed rather than added.
   or ruling a build has subsumed one, is judged against the recovered body.
   Ruling off the line alone is ruling off a summary written to be dropped.
 
-**Eligibility**, judged at the closing stage: the entry's cost field opens in
-the low class; it carries no `[roadmap:]` tag; and it has **no live promotion
-trigger**. **What counts as live is deliberately narrow**, and it was narrowed
+**Eligibility**, judged at the closing stage over the deferred section: the
+entry's defer date is at least `QUEUE_KIT_ICEBOX_AGE_DAYS` old; its cost field
+opens in the low class; it carries no `[roadmap:]` tag; and it has **no live
+promotion trigger**. The age limb is what makes the tier a demotion on evidence
+rather than a filing preference: an entry younger than the knob has not had the
+chance to recur. **What counts as live is deliberately narrow**, and it was narrowed
 against a measured pool where the prior reading let almost nothing qualify: a live
 trigger is a **live, unbuilt queue slug** the entry names, a dated `recurrence:`
 line, or a `[roadmap:]` tag. A trigger that is itself gated on launch — a first
@@ -284,15 +290,17 @@ because the cost limb blocks first and the clause's own antecedent — *where a
 consumer classifies a set dormant as a class* — never obtains. A second limb
 does not fail by being unreached; that is the clause working as written.
 
-**Direct filing into the icebox is permitted on one condition, reversing an
-earlier rule.** That prior rule held that nothing files
-directly into the icebox because a newly filed finding has never been triaged.
-What changed is who triages: the closing stage's drain *is* the triage, and a
-drained bullet whose cost opens in the low class and names no live trigger may
-land as a one-line icebox entry without first being written as a deferred body
-that the next close compresses. The net-delta KPI stays honest because the arm
-counts the tier on the way in. A mid-iteration filing still goes through the
-gap inbox; what this permits is the drain landing it one tier lower.
+**Nothing files directly into the icebox — not a gap-inbox bullet at the
+drain, not a closing stage's own capture.** A direct route was once permitted on
+the ground that the drain is itself a triage; it was withdrawn because the
+tier's evidence is age without recurrence, which a bullet triaged on the day it
+is drained cannot carry, and because the route made the tier a cheap sink: the
+pool it produced was dormant by class rather than by evidence and was re-read by
+every triage regardless. A drained bullet the drain judges not worth carrying is
+a **discard with cause**, which the drain already has; one worth carrying is a
+deferred entry, which the next eligible close evicts if it stays dormant. What
+fixes a pool that fills faster than it drains is the scoping stage's ranking
+(lifecycle-kit/templates/stages/scope.md), not a lower landing tier.
 
 **Position is a contract, not a preference.** The read order is pickable →
 parked → dormant → history, and a cross-kit reader depends on the tier sitting
