@@ -75,49 +75,6 @@
   allow now attaches only when the rewritten command is allowlisted and passes rule 24's bound,
   else it blocks with the corrective (the amendment's delta 12).
 
-- **ro-bins-write-option-bypass** [spec: SPEC-command-classify.md] — `GUARD_KIT_RO_BINS`
-  membership is tested as
-  "the segment leads with this binary", but leading with a roster binary does not make the
-  invocation read-only, and the read-only-pipeline rule's safety argument assumes it does. The rule
-  is named rather than numbered here: guard-kit renumbers on insertion, and this citation had gone
-  stale twice over before close 2026-08-22 corrected it.
-  **Probed through the live hook at close, not reasoned:** `grep foo a.md | sort -o out.txt` and
-  `sort -o tracked.md tracked.md | head` are both auto-allowed today, and each overwrites a named
-  file. That rule's redirect check inspects `>`/`>>` targets only, so a write expressed as a
-  binary's own option is invisible to it. `sort` is the shipped instance.
-  **The `xargs` half of this finding is already discharged and must not be re-filed**: the
-  guard-context-matching unit landed `_guard_is_ro_xargs` (guard-kit/lib/guard.sh), and the same
-  close probe confirms `find . -type f | xargs rm -rf` and `grep -rln foo src | xargs sed -i …`
-  now fall through rather than auto-allow, while `find . -name '*.sh' | xargs grep -l foo` still
-  allows. What survives is the general predicate the discriminator solved case-by-case.
-  **Distinct from `guard-command-prefix-wrapper`** (transparent prefixes for allowlist matching)
-  and from the two consumer-side guard entries below: this is the roster knob's own predicate
-  being weaker than the grant that reads it.
-  **Fix shape: an exploration direction, NOT a ruling, open to revision at scope or spec on
-  further facts** — operator-agreed 2026-09-11 by typed message in the lead session, relayed by
-  that lead, which first mislabeled it ruled and corrected that the same day; timing
-  operator-stated: not before the next iteration. The candidate: the guard parses each roster
-  binary's argv rather than trusting the segment's leading binary; every `GUARD_KIT_RO_BINS`
-  member declares its write and execute forms (possibly none) and the auto-allow is withheld on
-  a declared form; an option or positional count the parse cannot classify falls through to the
-  prompt, so a missed form costs a prompt and never a hole; block-with-steer only where a
-  dedicated tool owns the act (`sed -i` to Edit); a gate refuses a member added undeclared; the
-  parser may ride the gate binary as a native arm. Candidate objections to other shapes, equally
-  open: a harness grant cannot tell read from write, a write option having many spellings;
-  warn-only fires after the auto-allow; block-by-default refuses an approvable write; a
-  substituted tool diverges the executed command from the reasoned one. Against the old pair: a
-  pure denylist fails open, while a declaration generalizes the `xargs` discriminator.
-  **Widened witnesses, lead-probed 2026-09-11; roster membership re-verified at close:**
-  `sort --output=` and bundled `-uo`; `uniq`'s second positional argument is its output file;
-  `find`'s `-delete`, `-exec`, `-execdir`, `-ok`, `-okdir`, `-fprint`, `-fprint0`, `-fprintf` and
-  `-fls`; `rg --pre=COMMAND` runs a program.
-  **Cost while deferred:** a standing auto-allow that overwrites tracked files with no prompt —
-  the narrowest live hole in the permission surface, and the one a reviewer of the roster would
-  never see, because the roster reads as a list of safe programs.
-  Filed 2026-08-13 by close, draining the gap inbox; every allow/fall verdict above re-probed
-  against HEAD at the drain rather than taken from the bullet.
-  **Unit set `guard-command-classification`, write forms — operator direction, 2026-09-11.**
-
 - **backgrounded-shell-child-run-record-unenforced** [spec: SPEC-command-classify.md] — the
   launch-time liveness record is advised and never required.
   recurrence: backgrounded-shell-child-run-record-unenforced 2026-08-28
@@ -5493,5 +5450,6 @@
 - guard-command-prefix-wrapper
 - guard-read-steer-tool-coverage
 - guard-steer-names-absent-tool
+- ro-bins-write-option-bypass
 
 ## Lessons Learned

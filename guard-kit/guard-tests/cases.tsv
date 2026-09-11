@@ -167,6 +167,10 @@ fallthrough	git rev-parse HEAD
 #           arm lives in background-cases.tsv.
 advise	bash worker.sh &
 fallthrough	bash worker.sh & printf 'pid=1 run=worker\n' > .tmp/worker.run
+# exemption (3) reads rule 18's declared forms: a backgrounded pipeline writing
+# through a member's own option owns work a commit could corrupt
+advise	grep -rn foo src | sort -o out.txt &
+fallthrough	grep -rn foo src | head &
 
 # rule 16 — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
@@ -229,6 +233,25 @@ fallthrough	find . -type f | xargs rm -rf
 fallthrough	grep -rln foo src | xargs sed -i s/a/b/
 block	ls | xargs chmod 777
 block	ls | xargs xargs rm
+# declared forms: a roster member is read-only only in none of its declared write
+# and execute forms (the kit's table here; a consumer's entries are the knob
+# test's lane). Each refusing row is a write the leads-with test alone granted:
+# an option in its long, abbreviated, clustered and quoted spellings, uniq's output
+# positional, find's write predicates, rg's preprocessor, and the command xargs runs
+fallthrough	grep foo a.md | sort -o out.txt
+fallthrough	grep foo a.md | sort --output=out.txt
+fallthrough	grep foo a.md | sort --outp=out.txt
+fallthrough	grep foo a.md | sort -uo out.txt
+fallthrough	grep foo a.md | sort '-o' out.txt
+allow	grep foo a.md | sort -u
+fallthrough	sort a.txt | uniq -c in.txt out.txt
+allow	sort a.txt | uniq -c
+fallthrough	find . -type f -fprint out.txt
+fallthrough	find . -type f -fprint out.txt | head
+fallthrough	rg --pre=cat foo src | head
+allow	rg foo src | head
+fallthrough	find . -type f | xargs sort -o out.txt
+fallthrough	find . -name '*.txt' | xargs uniq
 
 # rule 19 — bounded in-turn wait auto-allowed. The grant rows are the two of the
 #           four measured calls this rule is shaped to cover, both compounds; the
@@ -262,6 +285,10 @@ fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; git commit -m d
 fallthrough	until grep -q DONE `cat .tmp/f`; do sleep 5; done
 # a non-inert redirect on the loop itself is a write, and a grant may not bless one
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done > out.txt
+# clauses (c) and (d) take rule 18's declared forms over the whole call, so a
+# condition or a tail writing through a roster member's own option is refused
+fallthrough	while sort -c -o out.txt data.txt; do sleep 5; done
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; sort -o out.txt .tmp/smoke.log
 
 # rule 20 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases

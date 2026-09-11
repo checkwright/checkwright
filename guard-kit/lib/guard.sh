@@ -31,6 +31,7 @@ declare -p GUARD_KIT_SCRATCH_DIRS >/dev/null 2>&1 || GUARD_KIT_SCRATCH_DIRS=(".t
 declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(
     grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls xargs
 )
+declare -p GUARD_KIT_RO_FORMS >/dev/null 2>&1 || declare -A GUARD_KIT_RO_FORMS=()
 declare -p GUARD_KIT_APPEND_BINS >/dev/null 2>&1 || GUARD_KIT_APPEND_BINS=(cat printf echo)
 declare -p GUARD_KIT_SEARCH_TOOLS >/dev/null 2>&1 || GUARD_KIT_SEARCH_TOOLS=(Glob Grep)
 declare -p GUARD_KIT_SCRIPT_INTERPRETERS >/dev/null 2>&1 || GUARD_KIT_SCRIPT_INTERPRETERS=(
@@ -623,11 +624,20 @@ _guard_is_cat_read() {
     [[ "$operands" == 1 ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
-_guard_is_ro_xargs() {
-    local seg="${1#"${1%%[![:space:]]*}"}" tok want_arg=0 cmdtok='' b i n
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's roster membership test on one command word
+_guard_on_ro_roster() {
+    local b
+    for b in "${GUARD_KIT_RO_BINS[@]}"; do
+        [[ "$1" == "$b" ]] && return 0
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's xargs option walk: prints the index of the word naming the command xargs runs, nothing for a bare xargs, and returns non-zero on an option the walk does not recognize
+_guard_xargs_command_index() {
+    local tok want_arg=0 i n
     local -a toks
-    read -ra toks <<<"$seg"
+    read -ra toks <<<"$1"
     [[ "${toks[0]:-}" == xargs ]] || return 1
     n=${#toks[@]}
     for ((i = 1; i < n; i++)); do
@@ -639,24 +649,30 @@ _guard_is_ro_xargs() {
             -[0ILnPsEdae]*) ;;
             --*=*) ;;
             -*) return 1 ;;
-            *) cmdtok="$tok"; break ;;
+            *) printf '%s' "$i"; return 0 ;;
         esac
     done
-    [[ -z "$cmdtok" ]] && return 0
-    [[ "$cmdtok" == xargs ]] && return 1
-    case "$cmdtok" in echo | printf) return 0 ;; esac
-    for b in "${GUARD_KIT_RO_BINS[@]}"; do
-        [[ "$cmdtok" == "$b" ]] && return 0
-    done
-    return 1
+    return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — one segment is a bare find listing: leads with find, carries no action predicate
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
+_guard_is_ro_xargs() {
+    local seg="${1#"${1%%[![:space:]]*}"}" idx cmdtok
+    local -a toks
+    idx="$(_guard_xargs_command_index "$seg")" || return 1
+    [[ -z "$idx" ]] && return 0
+    read -ra toks <<<"$seg"
+    cmdtok="${toks[idx]}"
+    [[ "$cmdtok" == xargs ]] && return 1
+    case "$cmdtok" in echo | printf) return 0 ;; esac
+    _guard_on_ro_roster "$cmdtok"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — one segment is a bare find listing: leads with find and carries none of find's declared write and execute forms, so the action roster has one literal
 _guard_is_find_listing() {
     local seg="${1#"${1%%[![:space:]]*}"}"
     [[ "${seg%%[[:space:]]*}" == find ]] || return 1
-    grep -qE '\-(execdir|exec|okdir|ok|delete|fls|fprintf|fprint0|fprint)\b' <<<"$seg" && return 1
-    return 0
+    _guard_ro_invocation_clear find "${seg#find}" "$(_guard_segment_core "${seg#find}")"
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — a ';'-compound skeleton is a batched read when every segment is a bare read (the passed predicate) or a literal banner, and at least one is a read; the caller has already bailed on every non-';' separator, so guard_split_compound sees only ';' sequencing
@@ -937,16 +953,96 @@ _guard_redirect_targets() {
         | sed -E 's/^[0-9]*>>?[[:space:]]*//'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the read-only-segment test rules 15 and 18 share, xargs discriminator included because xargs runs a command rather than filtering text
+# spec: guard-kit/SPEC.md §The generic ruleset — the read-only-segment test rules 15, 18 and 19 share, xargs discriminator included because xargs runs a command rather than filtering text; the roster-membership half only, the declared forms being _guard_ro_forms_clear's
 _guard_is_ro_segment() {
-    local seg="${1#"${1%%[![:space:]]*}"}" first b
+    local seg="${1#"${1%%[![:space:]]*}"}" first
     first="${seg%%[[:space:]]*}"
     [[ -n "$first" ]] || return 1
     [[ "$first" == xargs ]] && { _guard_is_ro_xargs "$seg" || return 1; }
-    for b in "${GUARD_KIT_RO_BINS[@]}"; do
-        [[ "$first" == "$b" ]] && return 0
+    _guard_on_ro_roster "$first"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's kit declaration table for the default roster, in the declaration grammar; a binary absent here is undeclared
+_guard_ro_forms_kit() {
+    case "$1" in
+        sort) printf '%s' '-o --output --compress-program' ;;
+        uniq) printf '%s' 'pos:2' ;;
+        find) printf '%s' '-delete -exec -execdir -ok -okdir -fprint -fprint0 -fprintf -fls' ;;
+        rg) printf '%s' '--pre' ;;
+        grep | egrep | fgrep | head | tail | cat | wc | cut | tr | nl | rev | tac | paste | comm | column | diff | jq | ls | xargs)
+            printf 'none' ;;
+        *) return 1 ;;
+    esac
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's declared-forms test on one invocation: the consumer's GUARD_KIT_RO_FORMS entry else the kit table, option tokens against the dequoted words and pos:N against the skeleton core's words; non-zero on a matched form, an undeclared member, or any pos:N under xargs (the fourth argument), since xargs appends operands the segment does not show
+_guard_ro_invocation_clear() {
+    local bin="$1" forms tok w need pos
+    local -a decl=() words=() skel=()
+    if [[ -n "${GUARD_KIT_RO_FORMS[$bin]+x}" ]]; then
+        forms="${GUARD_KIT_RO_FORMS[$bin]}"
+    else
+        forms="$(_guard_ro_forms_kit "$bin")" || return 1
+    fi
+    read -ra decl <<<"$forms"
+    [[ "${#decl[@]}" -ge 1 ]] || return 1
+    read -ra words <<<"${2//\\/}"
+    read -ra skel <<<"${3:-}"
+    for tok in "${decl[@]}"; do
+        case "$tok" in
+            none) ;;
+            pos:*)
+                need="${tok#pos:}"
+                [[ "$need" =~ ^[1-9][0-9]*$ && "${4:-}" != xargs ]] || return 1
+                pos=0
+                for w in ${skel[@]+"${skel[@]}"}; do
+                    case "$w" in -?*) ;; *) pos=$((pos + 1)) ;; esac
+                done
+                [[ "$pos" -lt "$need" ]] || return 1 ;;
+            --?*)
+                for w in ${words[@]+"${words[@]}"}; do
+                    w="${w%%=*}"
+                    [[ "$w" == --?* && "${tok#--}" == "${w#--}"* ]] && return 1
+                done ;;
+            -[[:alnum:]])
+                for w in ${words[@]+"${words[@]}"}; do
+                    [[ "$w" == -[!-]* && "$w" == *"${tok#-}"* ]] && return 1
+                done ;;
+            -?*)
+                for w in ${words[@]+"${words[@]}"}; do
+                    [[ "$w" == "$tok" ]] && return 1
+                done ;;
+            *) return 1 ;;
+        esac
     done
-    return 1
+    return 0
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's one declared-forms reader, called by rules 15 (exemption 3), 18 and 19 (clauses c and d) once their segment tests pass; reads the dequoted view aligned segment-for-segment with the skeleton, and withholds where the two cannot be aligned
+_guard_ro_forms_clear() {
+    local raw="$1" s="$2" v i cw dcw bin core idx xcmd
+    local -a segs=() dsegs=() dtoks=()
+    v="$(_guard_dequoted_view "$raw" "$s")" || return 1
+    mapfile -t segs < <(guard_split_compound "$s")
+    mapfile -t dsegs < <(guard_split_compound "$v")
+    [[ "${#segs[@]}" == "${#dsegs[@]}" ]] || return 1
+    for ((i = 0; i < ${#segs[@]}; i++)); do
+        cw="$(_guard_command_word "${segs[i]}")"
+        bin="${cw%%[[:space:]]*}"
+        if [[ -z "$bin" ]] || ! _guard_on_ro_roster "$bin"; then continue; fi
+        dcw="$(_guard_command_word "${dsegs[i]}")"
+        core="$(_guard_segment_core "$cw")"
+        _guard_ro_invocation_clear "$bin" "${dcw#"$bin"}" "${core#"$bin"}" || return 1
+        [[ "$bin" == xargs ]] || continue
+        idx="$(_guard_xargs_command_index "$dcw")" || return 1
+        [[ -n "$idx" ]] || continue
+        read -ra dtoks <<<"$dcw"
+        xcmd="${dtoks[idx]//\\/}"
+        case "$xcmd" in echo | printf) continue ;; esac
+        _guard_on_ro_roster "$xcmd" || continue
+        _guard_ro_invocation_clear "$xcmd" "${dtoks[*]:idx+1}" "" xargs || return 1
+    done
+    return 0
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 15's shell arm: a statement-ending bare '&' in the skeleton, never the '&&' operator and never a redirect's fd-dup
@@ -968,7 +1064,7 @@ _guard_writes_run_record() {
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 15's exemption 3: a child that writes nothing has nothing for a later commit to corrupt, so it owes no record
 _guard_is_ro_background() {
-    local s="$1" tgt seg reads=0
+    local raw="$1" s="$2" tgt seg reads=0
     while read -r tgt; do
         case "$tgt" in
             /dev/null | '&'[0-9]*) ;;
@@ -982,7 +1078,7 @@ _guard_is_ro_background() {
         _guard_is_ro_segment "$seg" || return 1
         reads=$((reads + 1))
     done < <(guard_split_compound "$s")
-    [[ "$reads" -ge 1 ]]
+    [[ "$reads" -ge 1 ]] && _guard_ro_forms_clear "$raw" "$s"
 }
 
 guard_rule_background_no_record() {
@@ -997,7 +1093,7 @@ guard_rule_background_no_record() {
     while read -r depth cmdpos tok; do
         [[ "$depth" -ge 1 ]] && return 0
     done <<<"$span"
-    _guard_is_ro_background "$s" && return 0
+    _guard_is_ro_background "$raw" "$s" && return 0
     guard_advise "this call backgrounds a child and writes no liveness record — write one at the launch, in the same command: a single line 'pid=<n> run=<key>' in a '<key>.run' file under your gitignored scratch dir (e.g. ${GUARD_KIT_SCRATCH_DIRS[0]}/<key>.run), naming the PID you just backgrounded. The record buys two things nothing else does: it is what gives the tracked-tree-mutation rule its reach, so a commit taken while this child is still writing is refused rather than silently taken; and it is what lets the next arrival tell whether the producer is still writing instead of guessing at a process table. Delete it once the producer has exited, and not before — a record naming a dead pid blocks nothing, and one deleted early buys the harm back. A backgrounded wait loop and a backgrounded read-only pipeline own no work a commit could corrupt and owe no record."
 }
 
@@ -1105,10 +1201,6 @@ guard_rule_ro_pipeline() {
             *) return 0 ;;
         esac
     done < <(_guard_redirect_targets "$s")
-    if grep -qE '(^|[[:space:]])find([[:space:]]|$)' <<<"$s" \
-        && grep -qE '\-(exec|execdir|ok|delete)\b' <<<"$s"; then
-        return 0
-    fi
     local -a segs
     mapfile -t segs < <(guard_split_compound "$s")
     local seg i reads=0
@@ -1127,6 +1219,7 @@ guard_rule_ro_pipeline() {
         reads=$((reads + 1))
     done
     [[ "$reads" -ge 1 ]] || return 0
+    _guard_ro_forms_clear "$raw" "$s" || return 0
     guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
 }
 
@@ -1224,6 +1317,7 @@ guard_rule_bounded_wait() {
         [[ -z "$seg" ]] && continue
         _guard_is_wait_tail_segment "$seg" || return 0
     done < <(guard_split_compound "$tail")
+    _guard_ro_forms_clear "$raw" "$s" || return 0
 
     guard_allow "bounded in-turn wait (${GUARD_NAME:-guard} auto-allow)"
 }

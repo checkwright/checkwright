@@ -37,9 +37,34 @@ want() {  # $1=label $2=config $3=rule $4=command $5=want-rc
     }
 }
 
+grants() {  # $1=label $2=config $3=command $4=want (allow|withheld), asked of rule 18
+    checks=$((checks + 1))
+    local out got=withheld
+    out="$(run_rule "$2" guard_rule_ro_pipeline "$3" 2>/dev/null)"
+    [[ "$out" == *'"permissionDecision":"allow"'* ]] && got=allow
+    [[ "$got" == "$4" ]] || {
+        echo "  FAIL [$1]: '$3' under ${2##*/} was $got, want $4"
+        fails=$((fails + 1))
+    }
+}
+
 : >"$tmp/defaults.sh"
 printf 'GUARD_KIT_SEARCH_TOOLS=()\n' >"$tmp/no-search-tools.sh"
 printf 'GUARD_KIT_SEARCH_TOOLS=(Grep)\n' >"$tmp/grep-only.sh"
+printf 'GUARD_KIT_RO_BINS=(grep md5sum)\ndeclare -A GUARD_KIT_RO_FORMS=([md5sum]=none)\n' >"$tmp/ro-declared.sh"
+printf 'GUARD_KIT_RO_BINS=(grep md5sum)\n' >"$tmp/ro-undeclared.sh"
+printf 'GUARD_KIT_RO_BINS=(grep md5sum)\ndeclare -A GUARD_KIT_RO_FORMS=([md5sum]=)\n' >"$tmp/ro-empty.sh"
+printf 'declare -A GUARD_KIT_RO_FORMS=([head]=-n)\n' >"$tmp/ro-override.sh"
+
+# --- GUARD_KIT_RO_FORMS: a roster member a consumer adds is granted only once it is declared, since
+#     an undeclared member is withheld, and an empty declaration is undeclared rather than 'none'
+grants "ro-declared"      "$tmp/ro-declared.sh"   "grep foo a.md | md5sum" allow
+grants "ro-undeclared"    "$tmp/ro-undeclared.sh" "grep foo a.md | md5sum" withheld
+grants "ro-empty"         "$tmp/ro-empty.sh"      "grep foo a.md | md5sum" withheld
+
+# --- a consumer entry for a default member replaces the kit's declaration rather than adding to it
+grants "ro-kit-head"      "$tmp/defaults.sh"      "grep foo a.md | head -n 5" allow
+grants "ro-override-head" "$tmp/ro-override.sh"   "grep foo a.md | head -n 5" withheld
 
 # --- GUARD_KIT_SEARCH_TOOLS: the kit default names both tools, so both steers fire
 want "default-find"       "$tmp/defaults.sh"        guard_rule_find_glob "find lib -type f" 2
@@ -73,5 +98,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "guard-config-knobs.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules 9 and 11 on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback)"
+echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules 9 and 11 on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration)"
 exit 0

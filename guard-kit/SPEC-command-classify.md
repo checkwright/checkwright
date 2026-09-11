@@ -1,7 +1,7 @@
 # SPEC amendment: command-classify
 
-**Deltas 1 to 4 and 6 are applied, with the parts of deltas 10 and 11 that belong to them; every
-other passage is still a proposal for the build stage to land.** Where replacement wording is given it is marked **Not yet applied** at the passage itself.
+**Deltas 1 to 6 are applied, with the parts of deltas 10 and 11 that belong to them; every other
+passage is still a proposal for the build stage to land.** Where replacement wording is given it is marked **Not yet applied** at the passage itself.
 
 This amendment serves the eight entries of the `guard-command-classification` unit set, which point
 at it together:
@@ -242,7 +242,10 @@ would make the empty value wrong there.
 
 A new associative knob, `GUARD_KIT_RO_FORMS`, maps a roster binary to its declared **write and
 execute forms**. A segment led by that binary is read-only only when its words carry none of them
-{design-bearing}. **Not yet applied.**
+{design-bearing}. **Applied**, including rule 15's exemption (3) wording that delta 8 lists, with
+three calibrations stated in rule 18: a `--long` token also matches its abbreviations, a `pos:N`
+token under `xargs` withholds, and the declaration is applied by one whole-command reader rather
+than inside `_guard_is_ro_segment`.
 
 **The declaration grammar** is space-separated tokens, each decidable from its own shape:
 

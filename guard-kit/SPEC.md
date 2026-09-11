@@ -693,9 +693,9 @@ that harness exists would be designing against no case.
    the steer to the harness's Glob tool (the same shape as rule 8's `sed`
    read-steer: a better tool exists, and Glob returns paths registered for a
    later Read). Fires on the conjunction no allowlist glob can express: every
-   segment leads with `find` and carries **no action predicate**
-   (`-exec`/`-execdir`/`-ok`/`-okdir`/`-delete`/`-fls`/`-fprint`/`-fprint0`/
-   `-fprintf` — find(1) mechanism, a lib literal), with **no composition** — no
+   segment leads with `find` and carries **none of `find`'s declared write and
+   execute forms** — rule 18's declaration for `find`, so the action roster has
+   one literal — with **no composition** — no
    pipe, `&&`/`||` chain, background, or redirect. A lone listing fires, and so
    does a **`;`-sequence of listings**: a `;`-compound is not composition but a
    batch of independent listings, exactly what the Glob steer collapses into one
@@ -956,9 +956,10 @@ that harness exists would be designing against no case.
     advisory and rule 19 to withhold a grant, and a wait exempted here goes on to
     meet rule 19's own clauses rather than falling through unexamined.
     (3) *The call is a read-only pipeline* — every segment leads with a
-    `GUARD_KIT_RO_BINS` member and every redirect target is `/dev/null` or an
-    fd-dup, rule 18's own test, since a child that writes nothing has nothing for
-    a later commit to corrupt.
+    `GUARD_KIT_RO_BINS` member invoked in none of its declared write and execute
+    forms and every redirect target is `/dev/null` or an fd-dup, rule 18's own
+    test with its declared-forms reader, since a child that writes nothing has
+    nothing for a later commit to corrupt.
     **Advises rather than blocks, and the refusal of a block is reasoned rather
     than hedged.** The guard cannot tell a producer from a trivial child — a
     backgrounded `printf` and a backgrounded gate battery are the same shape at
@@ -1125,11 +1126,12 @@ that harness exists would be designing against no case.
     clause (0) draws is the one rule 19 draws beside it.
 18. **Auto-allow read-only pipeline** — granted silently when every pipe
     segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
-    grep/head/cat/find/jq family) and every redirect target is `/dev/null`
-    or an fd-dup. Declares `sq dq hd`. Conservative by construction:
+    grep/head/cat/find/jq family) invoked in none of its declared write and
+    execute forms, and every redirect target is `/dev/null` or an fd-dup.
+    Declares `sq dq hd`. Conservative by construction:
     command/process substitution, a leftover quote after normalization, any
-    statement separator, a non-`/dev/null` redirect, or a `find` with a write
-    action all refuse and fall through. **`xargs` is on the roster but is not
+    statement separator, or a non-`/dev/null` redirect all refuse and fall
+    through. **`xargs` is on the roster but is not
     a text filter — it executes a command** — so it carries a discriminator
     rather than riding the leads-with test: an `xargs` segment counts read-only
     only when the command it runs is itself a roster binary (or absent, since
@@ -1137,10 +1139,67 @@ that harness exists would be designing against no case.
     silently grant `find . -type f | xargs rm -rf` and
     `grep -rln foo src | xargs sed -i s/a/b/`. Unrecognized `xargs` options and
     a nested `xargs` decline rather than guess. The discriminator makes an
-    `xargs` segment exactly as safe as the segment it runs and no safer, which
-    is the honest bound: roster membership does not by itself prove an
-    *invocation* read-only (`sort -o` writes a file), and that weaker predicate
-    is a separate, already-filed gap this rule inherits rather than introduces.
+    `xargs` segment exactly as safe as the segment it runs and no safer.
+    **Leading with a roster binary does not make an invocation read-only**
+    (`sort -o <file>` overwrites the file), **so every member declares its write
+    and execute forms**, and a segment is read-only only when its words carry
+    none of them. A declaration is space-separated tokens, each decidable from
+    its own shape:
+    - `none` — nothing: the member has no write or execute form.
+    - `--long` — `--long` and `--long=…`, and any abbreviation of it (`--lo`,
+      `--lo=…`), because a getopt-style parser accepts an unambiguous prefix of
+      a long option: `sort --outp=<file>` writes the file.
+    - `-x`, one letter — `-x` standalone and any short cluster carrying `x`
+      (`-uo`).
+    - `-word`, a dash and two or more letters — that exact word (`find`'s
+      predicates).
+    - `pos:N` — the segment carries `N` or more non-option words.
+
+    Option tokens are matched against the words as the shell passes them, read
+    from rule 8's dequoted view with backslashes removed, so a quoted `'-o'` is
+    the option it is. `pos:N` counts the skeleton's words with the segment's
+    redirects removed, so a quoted word counts as positional whatever it holds.
+    An option's argument or a quoted option can therefore over-count, which
+    withholds and never grants. Where the dequoted view cannot be aligned with
+    the skeleton, the segment is withheld.
+    **The lookup reads three tiers:** the consumer's `GUARD_KIT_RO_FORMS` entry
+    for the binary when one is set; else the kit's table below; else
+    **undeclared**, and an undeclared member is withheld: its segment is not
+    read-only, and the call falls through to the harness's own decision. An
+    empty declaration is undeclared, not `none`. A missed form therefore costs
+    a prompt and never a hole. A gate refusing a member added undeclared is not
+    built, on that ground: this kit registers no gates, and withholding at call
+    time delivers the property without minting the kit's first registered
+    surface over a consumer config file.
+    **The kit's table for the default roster** is a `lib/guard.sh` literal,
+    tool mechanism of the same class as rule 9's steer targets, so it crosses
+    no seam:
+    - `sort`: `-o --output --compress-program`.
+    - `uniq`: `pos:2`, since its second positional is its output file.
+    - `find`: `-delete -exec -execdir -ok -okdir -fprint -fprint0 -fprintf
+      -fls`.
+    - `rg`: `--pre`, which runs a program.
+    - `xargs`: `none` for its own options.
+    - Every other default member — `grep egrep fgrep head tail cat wc cut tr nl
+      rev tac paste comm column diff jq ls` — `none`.
+
+    Two stated non-forms: `sort -T` writes transient temporary files, and
+    `rg -z` runs fixed decompressors. Neither writes a named file or runs a
+    named program.
+    **One reader, four sites.** `_guard_ro_forms_clear` applies the declaration
+    over the whole command, to every segment whose command word is a roster
+    member. This rule, rule 15's exemption (3) and rule 19's clauses (c) and (d)
+    each call it once their own segment tests pass, so the four narrow together.
+    For an `xargs` segment it also applies the declaration of the command
+    `xargs` runs to that command's words, and there a `pos:N` token withholds
+    outright, since `xargs` appends operands the segment does not show;
+    `echo`/`printf` under `xargs` take no declaration, being the stdout-only
+    emitters the discriminator already admits. Rule 9's listing test reads
+    `find`'s declaration as well, so `find`'s action roster has one literal.
+    **The honest limit.** The grant is exactly as safe as the member's option
+    surface as declared. A binary that gains a write option in a later release
+    is a hole until its declaration is widened, and a platform whose spelling
+    differs is a hole until it is declared too.
     Two carve-outs widen the grant, and
     neither widens it past what the segment-by-segment safety argument already
     covers:
@@ -1202,7 +1261,8 @@ that harness exists would be designing against no case.
     - **(c) The loop condition is read-only.** The condition runs once per
       iteration, unboundedly often, so it is held to the same test rule 18
       applies to a pipeline: every segment leads with a `GUARD_KIT_RO_BINS`
-      member and every redirect target is inert (`/dev/null` or an fd-dup). Two
+      member invoked in none of its declared write and execute forms, and every
+      redirect target is inert (`/dev/null` or an fd-dup). Two
       condition forms are admitted in their own right rather than by roster
       membership, because each is read-only without being a filter: the shell
       tests (`[ … ]`, `[[ … ]]`, `test`), and `kill -0 <pid>`, which asks a PID a
@@ -1218,7 +1278,8 @@ that harness exists would be designing against no case.
       does once the wait ends — and a grant admitting only a lone loop statement
       would cover **none** of them. Unlike rule 18 the tail is not required to
       carry a read: the loop is the call's work, and a tail of pure banners
-      writes only to stdout.
+      writes only to stdout. Rule 18's declared-forms reader runs once over the
+      whole call, so the condition and the tail are held to it alike.
     - **(e) Conservative decline on anything unmodelled** — a command or process
       substitution or a backtick anywhere in the **raw** command, and a quote
       surviving normalization. The auto-allow band's carve-out, adopted
@@ -2239,6 +2300,19 @@ Knobs (this repo's layout as defaults):
 - `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 18); default the
   grep/head/cat/find/jq family, plus `xargs`, whose membership is qualified by
   rule 18's discriminator rather than granting on the leads-with test alone.
+  Every member also takes a declaration of its write and execute forms, from
+  `GUARD_KIT_RO_FORMS` or the kit's table, and an undeclared member is withheld.
+- `GUARD_KIT_RO_FORMS` — associative array mapping a roster binary to its
+  declaration of write and execute forms, in rule 18's grammar; default empty,
+  in which case the kit's table declares the default roster and nothing else.
+  Its reader is `_guard_ro_forms_clear`, at rule 15's exemption (3), rule 18 and
+  rule 19's clauses (c) and (d), plus rule 9's listing test for `find`, one
+  lookup per roster-led segment. A consumer adding a member to
+  `GUARD_KIT_RO_BINS` declares it here or the member is withheld; an entry for a
+  default member replaces the kit's declaration rather than adding to it.
+  **Associative on `GUARD_KIT_BREADTH_DECLARED`'s ground**: the key is a binary
+  name held verbatim and unique by construction. No bridged arm declares it, so
+  no crate reader exists and no second resolver is owed.
 - `GUARD_KIT_APPEND_BINS` — the emitter roster of rule 17's write grant, which
   covers the create case as well as the append the name was minted for;
   default `(cat printf echo)`. A knob rather than a kit literal on
@@ -2575,7 +2649,11 @@ row through one sandbox whose config it never varies, so no
 verdict in a subshell, as the rule-14 test does. For `GUARD_KIT_SEARCH_TOOLS` the
 cases are: rules 9 and 11 firing under the default, each firing on its own member
 alone, both inert when the knob is empty, and each firing corrective naming its
-bare fallback. The decision table keeps the default-valued rows, which is why the
+bare fallback. For `GUARD_KIT_RO_FORMS` they are: a consumer roster addition
+carrying a declaration granted by rule 18, the same addition undeclared withheld,
+an empty declaration withheld, and a consumer entry for a default member replacing
+the kit's declaration rather than adding to it. The decision table keeps the
+default-valued rows, the kit's own declaration table among them, which is why the
 two lanes do not overlap.
 
 A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a

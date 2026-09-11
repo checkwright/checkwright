@@ -60,13 +60,17 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 Configuration follows the established kit pattern — override any knob in
 `guard-config.sh` (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
-`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`, `GUARD_KIT_SEARCH_TOOLS`,
-`GUARD_KIT_BREADTH_PROBES`, `GUARD_KIT_BREADTH_DECLARED`); defaults are this
+`GUARD_KIT_RO_BINS`, `GUARD_KIT_RO_FORMS`, `GUARD_KIT_SCRATCH_DIRS`,
+`GUARD_KIT_SEARCH_TOOLS`, `GUARD_KIT_BREADTH_PROBES`,
+`GUARD_KIT_BREADTH_DECLARED`); defaults are this
 repo's layout, and the probe set and the declaration map both default to empty
 because their contents are your project's vocabulary, not the kit's. Drop a tool
 from `GUARD_KIT_SEARCH_TOOLS` (guard-kit/SPEC.md §Layout and configuration) when
 your harness build does not carry it, so the `find` and `git grep` steers never
-name a tool that is not there.
+name a tool that is not there. A member you add to `GUARD_KIT_RO_BINS` also
+takes a `GUARD_KIT_RO_FORMS` declaration of its write and execute forms
+(guard-kit/SPEC.md §The generic ruleset, rule 18), or the read-only pipeline
+grant withholds it.
 
 ## Use
 
