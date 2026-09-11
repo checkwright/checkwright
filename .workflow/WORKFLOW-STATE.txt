@@ -8,3 +8,4 @@ instruction-surface-tier scope a40cc8a1 2026-09-11 701985b3
 instruction-surface-tier spec ad9f5aeb 2026-09-12 8a77ed51
 instruction-surface-tier align a38a9677 2026-09-12 a288018c
 instruction-surface-tier build a1508030 2026-09-12 b1607330
+instruction-surface-tier validate a85cae18 2026-09-12 57006703
