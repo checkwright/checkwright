@@ -63,48 +63,44 @@
 
 
 - **stop-liveness-test-module-order-dependent** [design-pending] — the crate's
-  `hook::stop_liveness::tests` MODULE is order- or concurrency-dependent under the full parallel
-  suite, and the commit-time battery inherits the flake because `check-crate-arms` runs the crate's
-  test arm.
-  **The measurement, and it is the filer's own same-day CORRECTION of a narrower first claim.**
-  Roughly twelve full `cargo test --release` runs over `native/`: THREE failures on TWO DIFFERENT
-  cases — `each_refusing_arm_names_its_own_finding_and_remedy` and
-  `unresolved_allows_once_the_harness_is_already_continuing` — with every other full run reporting
-  666 passed 0 failed, and the module passing 18 of 18 in ISOLATION every time. Two distinct cases
-  failing and the module always clean alone is what moves the subject from a test to the MODULE.
-  Rate roughly one full run in four, not one observation. Not re-measured at this scope: repeating
-  twelve release-mode suite runs to re-confirm a rate already taken is not a probe worth its cost,
-  and the finding is relayed with its filer's attribution rather than as this session's measurement.
+  `hook::stop_liveness::tests` MODULE reds intermittently under the full parallel suite, and the
+  commit-time battery inherits the flake because `check-crate-arms` runs the crate's test arm.
+  **Two filings' measurements, merged here.** 2026-09-05: five full `cargo test` runs, TWO failed,
+  on `each_reader_exit_class_takes_its_own_verdict_arm` (`left: 0 right: 2`, the `red` case) and
+  on `unresolved_allows_once_the_harness_is_already_continuing`. 2026-09-10: about twelve full
+  `cargo test --release` runs, THREE failed, on `each_refusing_arm_names_its_own_finding_and_remedy`
+  and that same `unresolved_allows...` case; the module passed 18 of 18 in ISOLATION every time.
+  Distinct cases failing and the module always clean alone make the subject the MODULE; the rate
+  sits between one full run in four and two in five.
   **Why it matters rather than being noise.** A flaky member of a commit-time gate teaches sessions
   to re-run rather than to read a red, which is the habit the fail-closed contract exists to
   prevent: a red that clears on a re-run is indistinguishable from a red that was fixed.
-  **Class, judged rather than assumed, and this is the entry's one contestable call.** Machinery by
-  subject, but the 2026-08-30 default's test is CONJUNCTIVE and its second limb fails: at one run in
-  four the crate's test arm reds the `gates` workflow, and the push budget is one to two watched
-  pushes an iteration, so a flake of this rate can consume the budget a push exists to spend. Filed
-  Deferred on that limb rather than iceboxed; a ruling that the limb is not met sends it to the
-  icebox with no other change.
-  **Candidate cause, unproven and deliberately not asserted:** the module's cases exercise a hook
-  that writes a log line and reads a record set, so a shared path, log or environment variable
-  between concurrent cases is the shape to look at first. One run under `--test-threads=1` would
-  discriminate it cheaply.
-  **A SECOND, SHARPER CANDIDATE, from two 2026-09-11 observations of the `unresolved_allows...`
-  case alone.** Its red-reader leg asserts `g.code == 2` and gets `0`. What fits: the reader
-  stub timed out on a loaded machine, so the verdict became `unresolved`, and `unresolved`
-  under a CONTINUING payload allows (`0`) rather than refusing (`2`). That makes a wall-clock
-  bound inside the liveness hook decide a verdict the case means to decide by exit code, which
-  is load-dependence rather than inter-case interference and would reproduce under
-  `--test-threads=1`. The two candidates are not exclusive and the cheap run above
-  discriminates them together. Both observations came from a batch whose only crate change was
-  a POSIX-identical pass-through, and the case spawns its stub by absolute path, so neither
-  observation dates the flake to that batch.
+  **Class: machinery by subject, and still NOT icebox, because the 2026-08-30 conjunction's push
+  limb fails.** CI runs the whole battery, so at this rate the arm reds the `gates` workflow and
+  can consume the push budget a watched push exists to spend. Mitigation while deferred is a
+  workflow re-run, which costs no push.
+  **The shipped path is RULED CORRECT and is not the defect.** `read_liveness` maps a spawn error
+  to `None` and `fire` maps `None` to `unavailable`, then `allow`, exit 0 — exactly the observed
+  `left: 0`, because a spawn that never started is `unavailable`, not `error`.
+  **Three candidate causes, none proven and none asserted.** (1) Inter-case interference: the cases
+  write a log line and read a record set, so a shared path, log or environment variable is the
+  first shape to look at. (2) Load-dependence: the `unresolved...` red-reader leg asserts
+  `g.code == 2` and gets `0`, which fits a reader stub timing out on a loaded machine, so the
+  verdict becomes `unresolved`, which allows under a CONTINUING payload. (3) The `ETXTBSY` race:
+  `Scratch::stub` writes a fresh executable and execs it at once inside a forking multithreaded
+  process. One run under `--test-threads=1` is the cheap first discriminator; nothing cheap
+  separates (3) from any other spawn failure, because the error is discarded at `Err(_)`.
+  **Why `[design-pending]`: the fork is real.** A test-side retry weakens the assertion the test
+  exists to make; a shipped-side retry on a transient spawn error is a behaviour change to a
+  refusing hook and owes an amendment; carrying the spawn error into the record first is what makes
+  either diagnosable.
   **DISTINCT from `check-test-hermetic`**, a gate over test SOURCES asserting they do not reach
   outside their fixtures; this is observed RUNTIME interference between cases that may each be
   hermetic by that gate's reading.
-  **Cost while deferred:** low per instance and corrosive in aggregate — one in four commit-time
-  batteries reds for no cause, and every such red trains the re-run habit.
-  Surfaced 2026-09-10 by `packer-port-terminal-cut`'s close during an operator-ruled hotfix whose
-  scope was minimal, so it was filed rather than chased; promoted at this scope.
+  **Cost while deferred:** low per instance and corrosive in aggregate — up to two in five
+  commit-time batteries red for no cause, and every such red trains the re-run habit.
+  Surfaced 2026-09-05 by build batches, filed as `stop-liveness-stub-spawn-flake` and merged here by
+  the 2026-09-11 pool triage; surfaced again 2026-09-10 by `packer-port-terminal-cut`'s close.
   recurrence: stop-liveness-test-module-order-dependent 2026-09-11
 
 - **gate-binary-platform-roster-holes** [design-pending] — the shipped platform roster held four
@@ -9905,36 +9901,6 @@
   bounded is that an amendment is align's evidence, so a wrong count is audited AS evidence.
   Surfaced 2026-09-05 by build batch C, which filed it rather than acting in-batch; drained here.
 
-- **stop-liveness-stub-spawn-flake** [design-pending] — `check-crate-arms` reds intermittently
-  because the `hook::stop_liveness` tests write a reader stub and immediately exec it inside a
-  multithreaded test process, and a spawn that loses that race is scored as `allow`.
-  **MEASURED AT THIS DRAIN, and the filing's icebox ground FELL.** Five consecutive full `cargo
-  test` runs over the 595-test crate: TWO failed, on TWO DIFFERENT tests —
-  `each_reader_exit_class_takes_its_own_verdict_arm` (`native/src/hook/stop_liveness.rs:433`,
-  `left: 0 right: 2` on the `red` case) and `unresolved_allows_once_the_harness_is_already_-
-  continuing`. So the subject is the MODULE's stub pattern rather than one test, and the rate is
-  about two in five full runs rather than "once".
-  **`check-crate-arms` is in `scripts/gates.list` and CI runs the whole battery**
-  (`.github/workflows/gates.yml`), so "blocks no stage entry and no push" — the 2026-08-30
-  icebox-by-default ground the filing claimed — is false as written. It threatens every commit and
-  every watched push. Mitigation while deferred is a workflow re-run, which costs no push.
-  **The shipped path is RULED CORRECT and is not the defect.** `read_liveness` maps a spawn error
-  to `None` (`Err(_) => None`) and `fire` maps `None` to `unavailable` → `allow` → exit 0, which is
-  exactly the observed `left: 0`; the source states the ground, that a spawn which never started is
-  `unavailable` and not `error`. The fault is a TEST manufacturing a spawn that cannot start.
-  **The mechanism is a HYPOTHESIS and is carried openly rather than as a finding:** write-then-exec
-  of a fresh executable inside a forking multithreaded process is the classic `ETXTBSY` race, and
-  `Scratch::stub` does exactly that. It was not isolated, and no cheap command distinguishes
-  `ETXTBSY` from any other spawn failure, because the error is discarded at `Err(_)`.
-  **Why `[design-pending]`:** the fork is real. A test-side retry weakens the assertion the test
-  exists to make; a shipped-side retry on a transient spawn error is a behaviour change to a
-  refusing hook and owes an amendment; and the discard at `Err(_)` is what makes either
-  undiagnosable, so a third candidate is to carry the spawn error into the record first.
-  **Cost while deferred:** two in five full crate runs red on a commit-time obligation, which
-  teaches the one lesson this tree can least afford — that a red arm may be re-run, not fixed.
-  Surfaced 2026-09-05 by build batches B (an unnamed red, never reproduced) and C (the named test);
-  drained here with both merged, the rate measured and the icebox ground refuted.
-
 - **composition-test-scores-a-section-cut-as-one-unit** [design-pending] — the economic composition
   test counts a port cut as ONE unit however many SPEC sections it spans, so a window is
   pre-committed before any composition choice is made and the test then runs on the residue.
@@ -10637,5 +10603,6 @@
 
 - port-first-deferral-grounds-unresolvable
 - icebox-default-reach-over-the-cost-opener-limb-unruled
+- stop-liveness-stub-spawn-flake
 
 ## Lessons Learned
