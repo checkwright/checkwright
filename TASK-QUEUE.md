@@ -12,6 +12,155 @@
 
 ## New Features
 
+- **instruction-motivation-owner** [spec: SPEC-instruction-tier.md]
+  — the what-vs-why rule for instruction
+  surfaces has an owner for *restatements* and no owner for original motivation.
+  **Two halves of this were already answered and this entry does not re-ask them**, corrected at
+  close 2026-08-13 against the source: the general rule is delegation-kit/SPEC.md §Operative
+  residency — (a) unreachable trigger, (b) imperative only, (c) adjacent citation — and that same
+  SPEC already **rules it owes no gate**, with the structural reason stated so a later session does
+  not try to build one that cannot exist.
+  **The residual is a reach gap, verified by reading the rule's own scope.** §Operative residency
+  opens *"A rule may be restated as an imperative in a surface that does not own it"*, so it
+  presupposes an owner elsewhere. Original motivation authored **in** a surface that owns no rule
+  falls outside it: there is nothing being restated, and (b)'s "the reasoning stays with the owner"
+  has no owner to name. That is the exact shape operator ruling 2026-08-13 corrected by hand in
+  `delegation-kit/templates/agent-execution.md`, where the fix was to *create* the owner
+  (delegation-kit/SPEC.md §The delegation model) and then point at it.
+  **Nothing applies (b)/(c) at authoring time either.** Both conditions are read by an author or a
+  reviewer, and no stage, template or roster puts that read in front of anyone authoring a template
+  surface — so the conditions are correct and unfired.
+  **Deliverable, and why design-pending:** widen the rule to reach original motivation, or state
+  in the SPEC why the two cases stay separate, and give (b)/(c) an authoring-time reader. What is
+  open is which surface owns the widened rule, since the failure spans kits while §Operative
+  residency is delegation-kit's.
+  **No gate is owed and that is settled, not deferred** — the line above rules it, and this entry
+  inherits the ruling rather than reopening it.
+  **Unit set `instruction-surface-tier`, the sweep's blocker, whose reach question /spec rules
+  first — operator direction, 2026-09-11.** The sweep's blocking edge on this entry stays.
+  **Cost while deferred:** every template surface authored keeps accreting motivation the owning
+  SPEC should hold, and the corrected instance is one file out of a corpus of twenty — a corpus
+  grown from 2020 to 2920 lines since filing (re-measured 2026-09-12 at scope).
+  Filed 2026-08-13 by close, draining the gap inbox; the bullet's own claim that the rule and its
+  gateability were unfiled is false on both halves and is corrected here rather than inherited.
+  Iceboxed 2026-09-11 in pool triage; returned 2026-09-12 by scope, body recovered from that commit.
+  **Specified 2026-09-12 at spec** (SPEC-instruction-tier.md): the rule joins the doctrine's
+  Content-tiering rule, stated beside §Operative residency rather than widening it.
+
+- **instruction-surface-sweep** [blocked-by: instruction-motivation-owner] [spec: SPEC-sweep.md]
+  — one full pass applying the what-vs-why rule across the instruction-file corpus, once.
+  **Operator-ruled 2026-08-13**, and deliberately moved out of that session's scope into close's
+  filing rather than started mid-iteration.
+  **The corpus is derived, never carried:** `git ls-files "*/templates/*.md" ".claude/agents/*.md"`
+  minus the `gate-tests` fixture copies — **20 files, 2020 lines** at 2026-08-13, re-derived at
+  filing time. Re-derive it at promotion; the command is the roster, the numbers are a dated
+  measurement.
+  **What the sweep applies** is the rule as ruled: an instruction surface carries the operative
+  instruction, not the reasoning that justified it. The already-worked example is commit `bdfaed3e`
+  on `agent-execution.md`, which is the calibration for how much a section loses — lead-ins,
+  dispositions and commands stay; the grounds move to the owning SPEC.
+  **The move is relocation, not deletion, and not annotation.** Grounds go to the surface that owns
+  the mechanism; a `spec:` or exempt tag that keeps the prose in place blesses the restatement,
+  which is itself the defect (CLAUDE.md §This repo is governed by its own kits).
+  **Deliverable:** every one of the twenty read against the rule, each violation either relocated to
+  a named owning section or explicitly ruled compliant, with the compliant calls stated so the next
+  differential sweep inherits a baseline rather than re-deciding.
+  **Operator direction 2026-09-11, typed message in the lead session, relayed by that lead:** skill
+  templates carry instructions only; the history they hold (attested incidents, dated
+  measurements, which session did what) lives in git, its preferred home, not in a template.
+  `lifecycle-kit/templates/lead.md` and `delegation-kit/templates/agent-execution.md` are skills
+  in this corpus. The lead's reading, not the operator's: history is deleted rather than relocated,
+  git already holding it, while mechanism grounds keep the owning-SPEC route above — refining the
+  relocation wording for the history class — and those two go first, the lead contract loading
+  them whole (685 and 491 lines at close; roughly 23k tokens, a fifth of the lead's context, as
+  the lead measured it). The direction may answer or narrow the blocker's open question. Its
+  priority is no separate directive: scope ranks it off its lead-line tags, landed 2026-09-11.
+  **Leads the `instruction-surface-tier` set — operator direction, 2026-09-11:** the edge above
+  stays, and `instruction-motivation-owner` joins the set so /spec rules its reach question first.
+  **Cost while deferred:** the rule is ruled and applied to one file, so the corpus is nineteen
+  files of unswept prose under a rule that already binds it.
+  Filed 2026-08-13 by close, on operator direction; blocked on the reach question above, because a
+  sweep for violations of a rule whose scope does not reach the corpus has no stated predicate.
+  **Specified 2026-09-12 at spec** (SPEC-sweep.md) against the census filed in
+  the survey record; compliant calls ride the landing commit's message.
+
+- **instruction-surface-bash-focus** [spec: SPEC-resident-substrate.md]
+  — the always-loaded surfaces assume bash.
+  `CLAUDE.md` and the instruction surfaces beside it are written around a shell battery:
+  the gate-authoring conventions, the fixture idiom, the housekeeping rules and the
+  delegation guidance all name bash mechanisms as the default case. Under the trajectory
+  pivot the default case becomes a native binary behind a minimal dual-implementable
+  bootstrap, so those surfaces teach a shape the project is leaving. No entry claims this
+  ground today.
+  **Ordered by the operator's trajectory pivot 2026-08-03**; the objective set is recorded
+  in TRAJECTORY.md, and objective 6 is what names this rewrite as needed without starting
+  it.
+  **Why it is design-pending:** the rewrite is not a find-and-replace. An always-loaded
+  surface is costed per session, so the question is which bash specifics stay resident
+  because they are still the common case, which move behind a load trigger, and which are
+  deleted — and that depends on how far the port has actually got (`--emit port-blockers --tree`'s
+  owed count), which makes the trigger a threshold rather than a date.
+  **Cost while deferred:** every session is oriented by a surface describing the substrate
+  the project is moving off, and the correction is paid per session in re-derivation rather
+  than once in an edit.
+  **Unit set `instruction-surface-tier`, the always-loaded half of the sweep's rewrite —
+  operator direction, 2026-09-11.** Its threshold trigger has fired: `--emit port-blockers
+  --tree` owes 0, with 70 files declared no-port (re-measured 2026-09-12 at scope).
+  Filed 2026-08-03 by spec; the pivot names this rewrite and does not start it.
+  **Specified 2026-09-12 at spec** (SPEC-resident-substrate.md): the premise is largely
+  discharged, so the rewrite is four CLAUDE.md passages, two restating bullets among them.
+
+- **align-checklist-fanout-calibration** [spec: SPEC-align-claims.md]
+  — align converges at zero divergence
+  while build finds the defects it should have caught. **Read this entry as calibration, not as the
+  revert signal.** The standing align tiering ruling names one live revert trigger, a missed spec
+  defect surfacing as a build ROUND-TRIP; nothing here is grounds to revert the tier, and conflating
+  the two is the misreading this entry prevents. **The live judgment**, unchanged across seven
+  readings: that signal has never fired, build absorbing every miss in-session, and whether
+  in-session absorption counts against the tier is what nothing rules. **What REMAINS
+  design-pending**, the first reading's residue: how much is a checklist edit to align's
+  template, how much a further gate, and whether a "keeps" list stands as an input at all — the
+  sharp one, since a "keeps" list is the author's claim about what a change does not touch, so align
+  reading it as a boundary inherits the blind spot that produced the miss. Its other half is
+  ANSWERED: ten real defects at `native-cohort-activation`, six of one shape (a section the update
+  roster failed to name), the fan-out check over it filed, merged and retired.
+  **READINGS TWO THROUGH SIX, each conclusion kept and its narration spent to history.** Two and
+  three: five real defects each, nothing spurious escalated, so zero divergence did not recur.
+  FOUR (2026-09-05) is the COST half at its MAXIMUM, cr=32.0M against a recent median near 11M
+  with no scale proxy, and it cuts AGAINST the first reading's thesis — eight in-envelope
+  repairs, zero escalations — its best find CROSS-amendment where no per-amendment pass could
+  reach. FIVE (2026-09-06) is that half at its MEDIAN, cr=9.35M, three real count defects, no
+  round-trip; its grammar caveat is ANSWERED by inspection, bare `align` having been
+  single-session throughout, so the split-stage row fold leaves the column fold-neutral.
+  SIX (2026-09-08) returned zero divergence and SPENT THE COUNTER: four amendment claims had
+  survived align and died at build, declined as misses on the ground that each needed EXECUTION
+  to falsify — a ground recorded as itself falsifiable by the first align passing a claim it
+  could have READ its way to. Build batch 2 falsified one from two guard lines four apart on one
+  screen, needing no run, so the excuse was spent and the next align fell to be judged without it.
+  **SEVEN (2026-09-11) IS THAT ALIGN AND IT SPLITS THE VERDICT.** Highest cost of the twelve-row
+  bare-`align` series, cr=16.56M against a prior-eleven mean near 9.6M, over the window's largest
+  amendment corpus. NOT zero divergence and not near it: eight real defects, one of them a
+  paraphrase presented as verbatim that the SPEC STAGE had passed twice. And a MISS of exactly
+  the shape six left no excuse for — an amendment asserting a gate applies a non-empty-value
+  check that gate does not apply, the assertion living in a different gate, falsifiable by
+  reading one line of the first gate's source and no execution at all. Build caught it in-band by
+  declining to merge the false sentence.
+  recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
+  **NOT THE REVERT SIGNAL, which still has not fired in SEVEN.** The trigger is a missed spec
+  defect surfacing as a build ROUND-TRIP and seven's miss cost none — build declined the sentence
+  in-band. What seven changes is this entry's own framing rather than the tier: the failure mode
+  is no longer zero divergence but high yield beside a readable miss, so the in-session-absorption
+  question the live judgment says nothing rules is now the whole of the question. Nothing here
+  touches the align tiering ruling in any direction. Discharge `lead, own-authority 2026-09-08`.
+  **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
+  stage's signal value decays toward zero while its cost does not.
+  **Joins the `instruction-surface-tier` set at threshold — operator direction, 2026-09-11:**
+  the set's sweep reads align's template. Earlier routings, and the same-day decline this
+  replaces, are in git history.
+  Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
+  **Specified 2026-09-12 at spec** (SPEC-align-claims.md): two checklist widenings and no
+  gate. Whether an in-session absorption counts against align's tier is outside it.
+
 ## Technical Debt
 
 ## Deferred
@@ -909,29 +1058,6 @@
   landing on top of the operator interrupt the first face already charges for the same boundary.
   Filed 2026-08-18 by close, draining the gap inbox; the first face stamped as a recurrence there.
 
-- **instruction-surface-bash-focus** [design-pending] [cost: session/low] [surface: CLAUDE.md] — the always-loaded surfaces assume bash.
-  `CLAUDE.md` and the instruction surfaces beside it are written around a shell battery:
-  the gate-authoring conventions, the fixture idiom, the housekeeping rules and the
-  delegation guidance all name bash mechanisms as the default case. Under the trajectory
-  pivot the default case becomes a native binary behind a minimal dual-implementable
-  bootstrap, so those surfaces teach a shape the project is leaving. No entry claims this
-  ground today.
-  **Ordered by the operator's trajectory pivot 2026-08-03**; the objective set is recorded
-  in TRAJECTORY.md, and objective 6 is what names this rewrite as needed without starting
-  it.
-  **Why it is design-pending:** the rewrite is not a find-and-replace. An always-loaded
-  surface is costed per session, so the question is which bash specifics stay resident
-  because they are still the common case, which move behind a load trigger, and which are
-  deleted — and that depends on how far the port has actually got (`--emit port-blockers --tree`'s
-  owed count), which makes the trigger a threshold rather than a date.
-  **Cost while deferred:** every session is oriented by a surface describing the substrate
-  the project is moving off, and the correction is paid per session in re-derivation rather
-  than once in an edit.
-  **Unit set `instruction-surface-tier`, the always-loaded half of the sweep's rewrite —
-  operator direction, 2026-09-11.** Its threshold trigger has fired: `--emit port-blockers
-  --tree` owes 0, with 70 files declared no-port (re-measured 2026-09-12 at scope).
-  Filed 2026-08-03 by spec; the pivot names this rewrite and does not start it.
-
 - **plugin-marketplace** [design-pending] [roadmap: later/ecosystem] [cost: once/low] [surface: installer] — harness plugin packaging.
   roadmap-summary: The stage skills and guards installable as a harness plugin.
   Harness plugin/marketplace packaging
@@ -1182,15 +1308,12 @@
   Every close's brevity pass is therefore the only detector, which is a
   session's attention standing in for a gate — the shape enforcement-first exists
   to refuse.
-  **What this close found and left.** Four bullets carry a doc pointer and then
-  restate what is behind it — the `.tmp/`/`.metric/`/`.workflow/` bullet (13
-  lines, mostly mechanism the owning SPECs own, with only the `*.local.md` roster
-  genuinely resident-worthy), the `installer/` bullet (8 lines naming
-  `installer/README.md` as layout owner then carrying packing mechanics and a
-  scratch knob), the `--run-demo` bullet (compresses a `README.md` paragraph), and
-  `reserve/` (2 lines guarding a mistake no session is near). Each needs content
-  *relocated*, not merely deleted, which is unit-shaped rather than pass-shaped —
-  filed here rather than done under release pressure.
+  **What this close found and left, re-read at spec 2026-09-12.** Of the four
+  restating bullets it named, the `--run-demo` one is gone (`08e6eb67`, on
+  load-trigger residency) and `reserve/` restates nothing, its crate readme
+  carrying no guard. The scratch-directory and `installer/` bullets remain; they
+  are deltas 3 and 4 of SPEC-resident-substrate.md, so this entry keeps the gate
+  half.
   **Why `[design-pending]`:** pointing the gate at the whole file needs a budget
   model it does not have. A single whole-file cap either strangles a legitimately
   dense file or is set so loose it never fires; per-section budgets need a section
@@ -1738,54 +1861,6 @@
   gate's own extraction logic rather than inferred; filed 2026-08-06 by close from the gap inbox.
 
 
-- **align-checklist-fanout-calibration** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — align converges at zero divergence
-  while build finds the defects it should have caught. **Read this entry as calibration, not as the
-  revert signal.** The standing align tiering ruling names one live revert trigger, a missed spec
-  defect surfacing as a build ROUND-TRIP; nothing here is grounds to revert the tier, and conflating
-  the two is the misreading this entry prevents. **The live judgment**, unchanged across seven
-  readings: that signal has never fired, build absorbing every miss in-session, and whether
-  in-session absorption counts against the tier is what nothing rules. **What REMAINS
-  `[design-pending]`**, the first reading's residue: how much is a checklist edit to align's
-  template, how much a further gate, and whether a "keeps" list stands as an input at all — the
-  sharp one, since a "keeps" list is the author's claim about what a change does not touch, so align
-  reading it as a boundary inherits the blind spot that produced the miss. Its other half is
-  ANSWERED: ten real defects at `native-cohort-activation`, six of one shape (a section the update
-  roster failed to name), the fan-out check over it filed, merged and retired.
-  **READINGS TWO THROUGH SIX, each conclusion kept and its narration spent to history.** Two and
-  three: five real defects each, nothing spurious escalated, so zero divergence did not recur.
-  FOUR (2026-09-05) is the COST half at its MAXIMUM, cr=32.0M against a recent median near 11M
-  with no scale proxy, and it cuts AGAINST the first reading's thesis — eight in-envelope
-  repairs, zero escalations — its best find CROSS-amendment where no per-amendment pass could
-  reach. FIVE (2026-09-06) is that half at its MEDIAN, cr=9.35M, three real count defects, no
-  round-trip; its grammar caveat is ANSWERED by inspection, bare `align` having been
-  single-session throughout, so the split-stage row fold leaves the column fold-neutral.
-  SIX (2026-09-08) returned zero divergence and SPENT THE COUNTER: four amendment claims had
-  survived align and died at build, declined as misses on the ground that each needed EXECUTION
-  to falsify — a ground recorded as itself falsifiable by the first align passing a claim it
-  could have READ its way to. Build batch 2 falsified one from two guard lines four apart on one
-  screen, needing no run, so the excuse was spent and the next align fell to be judged without it.
-  **SEVEN (2026-09-11) IS THAT ALIGN AND IT SPLITS THE VERDICT.** Highest cost of the twelve-row
-  bare-`align` series, cr=16.56M against a prior-eleven mean near 9.6M, over the window's largest
-  amendment corpus. NOT zero divergence and not near it: eight real defects, one of them a
-  paraphrase presented as verbatim that the SPEC STAGE had passed twice. And a MISS of exactly
-  the shape six left no excuse for — an amendment asserting a gate applies a non-empty-value
-  check that gate does not apply, the assertion living in a different gate, falsifiable by
-  reading one line of the first gate's source and no execution at all. Build caught it in-band by
-  declining to merge the false sentence.
-  recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
-  **NOT THE REVERT SIGNAL, which still has not fired in SEVEN.** The trigger is a missed spec
-  defect surfacing as a build ROUND-TRIP and seven's miss cost none — build declined the sentence
-  in-band. What seven changes is this entry's own framing rather than the tier: the failure mode
-  is no longer zero divergence but high yield beside a readable miss, so the in-session-absorption
-  question the live judgment says nothing rules is now the whole of the question. Nothing here
-  touches the align tiering ruling in any direction. Discharge `lead, own-authority 2026-09-08`.
-  **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
-  stage's signal value decays toward zero while its cost does not.
-  **Joins the `instruction-surface-tier` set at threshold — operator direction, 2026-09-11:**
-  the set's sweep reads align's template. Earlier routings, and the same-day decline this
-  replaces, are in git history.
-  Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
-
 - **amendment-refusal-acceptance-parity** [design-pending] [cost: event/low] [surface: canon-kit] — an amendment's refusal rationale can
   claim an acceptance criterion asserts something that criterion does not say.
   The `--dry-run` amendment refused a gate on the stated ground that the behavioral property was
@@ -2116,73 +2191,6 @@
   surfaces as behavior, not as a red.
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
 
-
-- **instruction-motivation-owner** [design-pending] [cost: event/high] [surface: delegation-kit] — the what-vs-why rule for instruction
-  surfaces has an owner for *restatements* and no owner for original motivation.
-  **Two halves of this were already answered and this entry does not re-ask them**, corrected at
-  close 2026-08-13 against the source: the general rule is delegation-kit/SPEC.md §Operative
-  residency — (a) unreachable trigger, (b) imperative only, (c) adjacent citation — and that same
-  SPEC already **rules it owes no gate**, with the structural reason stated so a later session does
-  not try to build one that cannot exist.
-  **The residual is a reach gap, verified by reading the rule's own scope.** §Operative residency
-  opens *"A rule may be restated as an imperative in a surface that does not own it"*, so it
-  presupposes an owner elsewhere. Original motivation authored **in** a surface that owns no rule
-  falls outside it: there is nothing being restated, and (b)'s "the reasoning stays with the owner"
-  has no owner to name. That is the exact shape operator ruling 2026-08-13 corrected by hand in
-  `delegation-kit/templates/agent-execution.md`, where the fix was to *create* the owner
-  (delegation-kit/SPEC.md §The delegation model) and then point at it.
-  **Nothing applies (b)/(c) at authoring time either.** Both conditions are read by an author or a
-  reviewer, and no stage, template or roster puts that read in front of anyone authoring a template
-  surface — so the conditions are correct and unfired.
-  **Deliverable, and why `[design-pending]`:** widen the rule to reach original motivation, or state
-  in the SPEC why the two cases stay separate, and give (b)/(c) an authoring-time reader. What is
-  open is which surface owns the widened rule, since the failure spans kits while §Operative
-  residency is delegation-kit's.
-  **No gate is owed and that is settled, not deferred** — the line above rules it, and this entry
-  inherits the ruling rather than reopening it.
-  **Unit set `instruction-surface-tier`, the sweep's blocker, whose reach question /spec rules
-  first — operator direction, 2026-09-11.** The sweep's blocking edge on this entry stays.
-  **Cost while deferred:** every template surface authored keeps accreting motivation the owning
-  SPEC should hold, and the corrected instance is one file out of a corpus of twenty — a corpus
-  grown from 2020 to 2920 lines since filing (re-measured 2026-09-12 at scope).
-  Filed 2026-08-13 by close, draining the gap inbox; the bullet's own claim that the rule and its
-  gateability were unfiled is false on both halves and is corrected here rather than inherited.
-  Iceboxed 2026-09-11 in pool triage; returned 2026-09-12 by scope, body recovered from that commit.
-
-- **instruction-surface-sweep** [design-pending] [blocked-by: instruction-motivation-owner] [cost: session/high] [surface: lifecycle-kit]
-  — one full pass applying the what-vs-why rule across the instruction-file corpus, once.
-  **Operator-ruled 2026-08-13**, and deliberately moved out of that session's scope into close's
-  filing rather than started mid-iteration.
-  **The corpus is derived, never carried:** `git ls-files "*/templates/*.md" ".claude/agents/*.md"`
-  minus the `gate-tests` fixture copies — **20 files, 2020 lines** at 2026-08-13, re-derived at
-  filing time. Re-derive it at promotion; the command is the roster, the numbers are a dated
-  measurement.
-  **What the sweep applies** is the rule as ruled: an instruction surface carries the operative
-  instruction, not the reasoning that justified it. The already-worked example is commit `bdfaed3e`
-  on `agent-execution.md`, which is the calibration for how much a section loses — lead-ins,
-  dispositions and commands stay; the grounds move to the owning SPEC.
-  **The move is relocation, not deletion, and not annotation.** Grounds go to the surface that owns
-  the mechanism; a `spec:` or exempt tag that keeps the prose in place blesses the restatement,
-  which is itself the defect (CLAUDE.md §This repo is governed by its own kits).
-  **Deliverable:** every one of the twenty read against the rule, each violation either relocated to
-  a named owning section or explicitly ruled compliant, with the compliant calls stated so the next
-  differential sweep inherits a baseline rather than re-deciding.
-  **Operator direction 2026-09-11, typed message in the lead session, relayed by that lead:** skill
-  templates carry instructions only; the history they hold (attested incidents, dated
-  measurements, which session did what) lives in git, its preferred home, not in a template.
-  `lifecycle-kit/templates/lead.md` and `delegation-kit/templates/agent-execution.md` are skills
-  in this corpus. The lead's reading, not the operator's: history is deleted rather than relocated,
-  git already holding it, while mechanism grounds keep the owning-SPEC route above — refining the
-  relocation wording for the history class — and those two go first, the lead contract loading
-  them whole (685 and 491 lines at close; roughly 23k tokens, a fifth of the lead's context, as
-  the lead measured it). The direction may answer or narrow the blocker's open question. Its
-  priority is no separate directive: scope ranks it off its lead-line tags, landed 2026-09-11.
-  **Leads the `instruction-surface-tier` set — operator direction, 2026-09-11:** the edge above
-  stays, and `instruction-motivation-owner` joins the set so /spec rules its reach question first.
-  **Cost while deferred:** the rule is ruled and applied to one file, so the corpus is nineteen
-  files of unswept prose under a rule that already binds it.
-  Filed 2026-08-13 by close, on operator direction; blocked on the reach question above, because a
-  sweep for violations of a rule whose scope does not reach the corpus has no stated predicate.
 
 - **close-differential-instruction-sweep** [design-pending] [blocked-by: instruction-surface-sweep] [cost: iteration/low] [surface: lifecycle-kit]
   — after the full sweep, close keeps the corpus swept differentially instead of re-reading it
