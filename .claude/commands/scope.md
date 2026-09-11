@@ -27,10 +27,11 @@ the promotion against the headroom a clean battery prints, not against the
 bullet's length. A discard's cause rides the commit message that truncates.
 
 **ritual** — read `BRIEF.local.md` (local-only brief). Read the override
-ledger, TRAJECTORY.md, **only while it holds a standing ruling**: one probe
-settles it (`grep -q 'None standing' TRAJECTORY.md` — true means skip), and the
-objectives it carries already reach this survey as the queue's `[roadmap:]`
-tags. **A ruling is closed — never re-litigate one; the operator reopens one
+ledger, TRAJECTORY.md, **only while it holds a standing ruling**: the native
+arm `bash gate-sdk/bin/run-gates.sh --emit ruling-staleness` settles it — a
+discharge report naming only the objectives' condition means none stands and
+the file is skipped — and the objectives it carries already reach this survey
+as the queue's `[roadmap:]` tags. **A ruling is closed — never re-litigate one; the operator reopens one
 through `/consult`.** Then run the GitHub
 boundary sweep (below); decide the unit's
 layout, config surface, and worklist; name the iteration after the unit. Hold
