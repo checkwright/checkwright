@@ -632,9 +632,24 @@ pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Comp
         .stdin
         .take()
         .ok_or_else(|| format!("cannot run {}: no stdin pipe — treating as failure (not clean)", program))?;
-    pipe.write_all(input).map_err(spawn_err)?;
-    drop(pipe);
-    let out = child.wait_with_output().map_err(spawn_err)?;
+    // comment-tier-exempt: the body is written while the output drains, so a child that answers as
+    // it reads cannot fill its stdout pipe and stall against a writer still blocked on its stdin
+    let (written, out) = std::thread::scope(|s| {
+        let writer = s.spawn(move || pipe.write_all(input));
+        let out = child.wait_with_output();
+        (writer.join(), out)
+    });
+    match written {
+        Ok(Ok(())) => {}
+        Ok(Err(e)) => return Err(spawn_err(e)),
+        Err(_) => {
+            return Err(format!(
+                "cannot run {}: the stdin writer panicked — treating as failure (not clean)",
+                program
+            ))
+        }
+    }
+    let out = out.map_err(spawn_err)?;
     Ok(Completed {
         status: out.status,
         stdout: out.stdout,

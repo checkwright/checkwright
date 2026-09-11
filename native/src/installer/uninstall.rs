@@ -138,14 +138,31 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     // that differs marks yours to keep, and a path already off the tree is a no-op.
     let (mut remove_set, mut keep, mut gone) = (Vec::new(), Vec::new(), Vec::new());
     let mut roster: BTreeSet<String> = BTreeSet::new();
-    for (p, h) in manifest.files() {
+    let entries: Vec<(String, String, bool)> = manifest
+        .files()
+        .into_iter()
+        .map(|(p, h)| {
+            let present = root.join(&p).is_file();
+            (p, h, present)
+        })
+        .collect();
+    let present: Vec<_> = if f.force {
+        Vec::new()
+    } else {
+        entries
+            .iter()
+            .filter(|e| e.2)
+            .map(|e| root.join(&e.0))
+            .collect()
+    };
+    let mut hashes = lock::hash_all(&present).into_iter();
+    for (p, h, present) in entries {
         roster.insert(p.clone());
-        let file = root.join(&p);
-        if !file.is_file() {
+        if !present {
             gone.push(p);
             continue;
         }
-        if f.force || lock::hash(&file).unwrap_or_default() == h {
+        if f.force || hashes.next().unwrap_or_default() == h {
             remove_set.push(p);
         } else {
             keep.push((p, h));

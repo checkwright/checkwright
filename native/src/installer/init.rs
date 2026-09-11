@@ -4,7 +4,7 @@
 use super::{lock, profile, recipe, refuse, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
 use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 struct Flags {
     profile: String,
@@ -121,6 +121,17 @@ impl Roster {
 // each caller: this is the single point where the roster would otherwise lose the path, and absence
 // of a key reads as "never installed" on the next run.
 fn claim(root: &Path, rel: &str, prior: &BTreeMap<String, String>, force: bool, r: &mut Roster) -> bool {
+    claim_known(root, rel, prior, force, None, r)
+}
+
+fn claim_known(
+    root: &Path,
+    rel: &str,
+    prior: &BTreeMap<String, String>,
+    force: bool,
+    known: Option<&str>,
+    r: &mut Roster,
+) -> bool {
     let Some(want) = prior.get(rel) else {
         return true;
     };
@@ -128,7 +139,11 @@ fn claim(root: &Path, rel: &str, prior: &BTreeMap<String, String>, force: bool, 
     if !file.is_file() {
         return true;
     }
-    if lock::hash(&file).unwrap_or_default() == *want || force {
+    let got = match known {
+        Some(h) => h.to_string(),
+        None => lock::hash(&file).unwrap_or_default(),
+    };
+    if got == *want || force {
         return true;
     }
     r.changed.push(rel.to_string());
@@ -141,10 +156,11 @@ fn copy_in(
     src: &Path,
     dest: &str,
     prior: &BTreeMap<String, String>,
+    known: Option<&str>,
     f: &Flags,
     r: &mut Roster,
 ) -> Result<(), Refusal> {
-    if !claim(root, dest, prior, f.force, r) {
+    if !claim_known(root, dest, prior, f.force, known, r) {
         return Ok(());
     }
     if !f.dry {
@@ -337,6 +353,20 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
 
     let mut r = Roster::new();
 
+    // spec: installer/README.md §The manifest — the kit files' hashes are taken before the first kit copy
+    let kit_prior: Vec<(String, PathBuf)> = prior
+        .keys()
+        .filter(|p| kits.iter().any(|k| p.starts_with(&format!("{}/", k))))
+        .map(|p| (p.clone(), root.join(p)))
+        .filter(|(_, file)| file.is_file())
+        .collect();
+    let kit_files: Vec<PathBuf> = kit_prior.iter().map(|(_, file)| file.clone()).collect();
+    let known: BTreeMap<String, String> = kit_prior
+        .into_iter()
+        .map(|(p, _)| p)
+        .zip(lock::hash_all(&kit_files))
+        .collect();
+
     for kit in &kits {
         let kit_payload = pkg.payload.join(kit);
         if !kit_payload.is_dir() {
@@ -358,7 +388,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             ));
         }
         for rel in files {
-            copy_in(&root, &kit_payload.join(&rel), &format!("{}/{}", kit, rel), &prior, f, &mut r)?;
+            let dest = format!("{}/{}", kit, rel);
+            let hashed = known.get(&dest).map(String::as_str);
+            copy_in(&root, &kit_payload.join(&rel), &dest, &prior, hashed, f, &mut r)?;
         }
     }
 
@@ -376,7 +408,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     for kit in &kits {
         let kit_payload = pkg.payload.join(kit);
         for (src, dest) in recipe::config_seam_plan(&kit_payload, GATES_DIR) {
-            copy_in(&root, Path::new(&src), &dest, &prior, f, &mut r)?;
+            copy_in(&root, Path::new(&src), &dest, &prior, None, f, &mut r)?;
         }
         // spec: installer/README.md §init — `--dry-run` resolves the same seam plan the real run
         // would, out of the same enumerator: the copy already writes nothing, so the plan needs no
@@ -423,7 +455,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                     }
                 }
                 recipe::Seeded::Plan(src, dest) => {
-                    copy_in(&root, Path::new(&src), &dest, &prior, f, &mut r)?
+                    copy_in(&root, Path::new(&src), &dest, &prior, None, f, &mut r)?
                 }
             }
         }
@@ -539,11 +571,24 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             e = e.ident("commit", &commit);
         }
         e = e.artifact(&pkg.target, &artifact_digest);
-        for p in &r.written {
+        let pending: Vec<bool> = r
+            .written
+            .iter()
+            .map(|p| f.dry && !root.join(p).is_file())
+            .collect();
+        let fresh: Vec<PathBuf> = r
+            .written
+            .iter()
+            .zip(&pending)
+            .filter(|(p, pend)| !r.carried.contains_key(*p) && !**pend)
+            .map(|(p, _)| root.join(p))
+            .collect();
+        let mut hashes = lock::hash_all(&fresh).into_iter();
+        for (p, pend) in r.written.iter().zip(&pending) {
             let h = match r.carried.get(p) {
                 Some(h) => h.clone(),
-                None if f.dry && !root.join(p).is_file() => "(pending)".to_string(),
-                None => lock::hash(&root.join(p)).unwrap_or_default(),
+                None if *pend => "(pending)".to_string(),
+                None => hashes.next().unwrap_or_default(),
             };
             e = e.file(p, &h);
         }

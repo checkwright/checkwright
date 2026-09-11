@@ -1464,6 +1464,20 @@ Neither passes `--no-filters`. Whether that difference is what a disagreement
 measures is not settled here — §The consumer smoke's three-way probe exists to
 answer it — but a reader holding two values is holding two invocations, not one.
 
+**A roster is hashed in one child, not one child per file.** `diff`, `uninstall`,
+`init`'s manifest write and `init`'s claims over the kit files hand their paths to a
+single `git hash-object --stdin-paths`, which reads each path through the same
+attribute chain and from the same working directory the one-file call does, so the
+recorded value does not move. One child per file made spawn cost the dominant term
+of an install on a host where a spawn is expensive, and native Windows is that host.
+The kit files' hashes are taken before the first kit file is copied, which is exact
+because each kit destination is written once and only after its own claim. `init`'s
+other claims keep the one-file call: they cover a handful of paths, and some are
+written before they are claimed, which a hash taken earlier would misread. A path
+the batch cannot carry — one holding a carriage return or line feed, or opening
+with the double quote git unquotes — and a batch that fails or answers short fall
+back to one call per file, so batching is never why a hash reads empty.
+
 **Two hash families, answering two questions, each stated where it is used.**
 The rule above is scoped to `files`, and the `artifact` digest is deliberately
 outside it — not because the two describe different files, but because they ask

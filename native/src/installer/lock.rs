@@ -32,6 +32,38 @@ pub fn hash(file: &Path) -> Result<String, String> {
     Ok(text.trim().to_string())
 }
 
+// spec: installer/README.md §The manifest — a roster is hashed in one `--stdin-paths` child
+pub fn hash_all(files: &[PathBuf]) -> Vec<String> {
+    if files.is_empty() {
+        return Vec::new();
+    }
+    let per_file = || files.iter().map(|f| hash(f).unwrap_or_default()).collect::<Vec<_>>();
+    let paths: Vec<String> = files.iter().map(|f| f.to_string_lossy().into_owned()).collect();
+    if paths
+        .iter()
+        .any(|p| p.contains('\n') || p.contains('\r') || p.starts_with('"'))
+    {
+        return per_file();
+    }
+    let mut body = paths.join("\n");
+    body.push('\n');
+    let Ok(out) = proc::run_with_stdin("git", &["hash-object", "--stdin-paths"], body.as_bytes())
+    else {
+        return per_file();
+    };
+    let Some(stdout) = out.stdout() else {
+        return per_file();
+    };
+    let hashes: Vec<String> = String::from_utf8_lossy(stdout)
+        .lines()
+        .map(|l| l.trim().to_string())
+        .collect();
+    if hashes.len() != files.len() || hashes.iter().any(String::is_empty) {
+        return per_file();
+    }
+    hashes
+}
+
 pub struct Manifest {
     doc: Value,
 }
@@ -232,6 +264,37 @@ mod tests {
         assert_eq!(m.file_count(), 1);
         std::fs::write(&p, "{\"schema\":\"other\"}").expect("cannot rewrite the scratch manifest");
         assert!(!Manifest::read(&p).expect("did not parse").schema_ok());
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/README.md §The manifest — the batch answers what one child per file answers
+    #[test]
+    fn the_batched_hash_answers_what_one_child_per_file_answers_in_order() {
+        let dir = std::env::temp_dir().join(format!("cw-lock-batch-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("sub")).expect("cannot make the scratch tree");
+        let crlf = dir.join("crlf.txt");
+        let spaced = dir.join("sub/with space.md");
+        let plain = dir.join("plain.txt");
+        std::fs::write(&crlf, "a\r\nb\r\n").expect("cannot write the scratch file");
+        std::fs::write(&spaced, "x\ny\n").expect("cannot write the scratch file");
+        std::fs::write(&plain, "q\n").expect("cannot write the scratch file");
+        let one_by_one = |files: &[PathBuf]| -> Vec<String> {
+            files.iter().map(|f| hash(f).unwrap_or_default()).collect()
+        };
+
+        assert!(hash_all(&[]).is_empty());
+
+        let present = vec![crlf.clone(), spaced.clone(), plain.clone()];
+        let batched = hash_all(&present);
+        assert_eq!(batched, one_by_one(&present));
+        assert!(batched.iter().all(|h| !h.is_empty()), "a present file hashed empty");
+
+        // comment-tier-exempt: a missing file fails the whole batch child, which is the fallback path
+        let with_gap = vec![crlf, dir.join("absent.txt"), plain];
+        let answered = hash_all(&with_gap);
+        assert_eq!(answered, one_by_one(&with_gap));
+        assert_eq!(answered[1], "");
+        assert!(!answered[0].is_empty() && !answered[2].is_empty());
         std::fs::remove_dir_all(&dir).ok();
     }
 }

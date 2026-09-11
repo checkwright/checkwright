@@ -59,11 +59,24 @@ fn compare() -> Result<i32, Refusal> {
     // path and rewrites it fresh, which is worth a warning before it happens rather than after.
     let (mut changed, mut missing) = (Vec::new(), Vec::new());
     let mut same = 0usize;
-    for (p, h) in manifest.files() {
-        let file = root.join(&p);
-        if !file.is_file() {
+    let entries: Vec<(String, String, bool)> = manifest
+        .files()
+        .into_iter()
+        .map(|(p, h)| {
+            let present = root.join(&p).is_file();
+            (p, h, present)
+        })
+        .collect();
+    let present: Vec<_> = entries
+        .iter()
+        .filter(|e| e.2)
+        .map(|e| root.join(&e.0))
+        .collect();
+    let mut hashes = lock::hash_all(&present).into_iter();
+    for (p, h, present) in entries {
+        if !present {
             missing.push(p);
-        } else if lock::hash(&file).unwrap_or_default() == h {
+        } else if hashes.next().unwrap_or_default() == h {
             same += 1;
         } else {
             changed.push(p);
