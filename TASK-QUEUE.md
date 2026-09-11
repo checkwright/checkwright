@@ -5816,9 +5816,12 @@
   routed to scope by the dispatch. →icebox refused on the operator's 2026-09-11 direction
   (AskUserQuestion, lead-relayed) that no inbox bullet enters the Icebox directly.
 
-- **scope-ranking-blind-to-deferral-cost-and-impact** [design-pending] — scope ranks no deferred
-  task by a high cost while deferred or a high impact, though the operator expects such tasks
-  picked first; token waste is one instance of the class.
+- **scope-ranking-blind-to-deferral-cost-and-impact** [design-pending] — scope's ranking rule
+  reads cost while deferred and impact off an entry's cost field, but no filer-written class word
+  makes the per-iteration cost class greppable, so the first rank tier is read by hand.
+  **The rule landed in consult** (lifecycle-kit/templates/stages/scope.md, the ranking paragraph:
+  per-iteration cost first, roadmap second, same-surface fill third); what stays owed is the
+  mechanism below.
   **Operator direction 2026-09-11 in the lead session, relayed by that lead** — by typed message: a
   deferred task whose cost is token waste is a high-priority fix, and scope's ranking, close's drain
   and icebox eligibility should join it to the current iteration where joining wastes no further
@@ -5829,9 +5832,10 @@
   ranking criterion — only the recurrence threshold forces entry, inbound edges inform the read,
   and the composition test is about batching; no token-waste marker exists on the queue,
   queue-kit/SPEC.md or lifecycle-kit/SPEC.md.
-  **Owed:** the ranking criterion at scope's owning passage, a filer-written way to read cost and
-  impact off an entry (a token-waste declaration its first instance), the join-now-or-next-iteration
-  test, and whether the class is barred from the Deferred-to-Icebox move.
+  **Owed:** a cost-class opener for the per-iteration class joining the existing
+  low/zero/bounded/cosmetic set (queue-kit/SPEC.md §The icebox tier), the `queue-index` arm
+  reading it, and the join-now test's re-spend criterion. The icebox question is answered: a
+  per-iteration opener is not the low class, so the entry is never eligible while it carries one.
   **Cost while deferred:** the class is its own cost — the dearest deferrals rank like any other,
   and every priority rides a hand relay.
   Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a ranking mechanism across two

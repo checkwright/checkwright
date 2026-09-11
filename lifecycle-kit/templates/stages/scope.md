@@ -105,6 +105,21 @@ escalates to. An automatic promotion would be a second intake path around
 scope-gated intake, and the failure this rule answers was never that the ruling
 went the wrong way — it was that the collision never reached anyone.
 
+**Rank the pool by what deferral costs and what landing buys, in this order,
+before composing.** First, an entry whose cost while deferred is paid **per
+iteration or per session** — token waste an always-loaded or every-stage
+surface re-buys, a gate or leg that reds every run, a fixed cost every stage
+walk pays — leads the unit set; where joining it to the current iteration
+re-spends nothing, it joins now, else it leads the next. Second, a `[roadmap:]`
+entry, or one whose landing advances a roadmap item. Third, the window fills
+with deferred entries sharing the lead unit's surface, under the composition
+test below. Recurrence-threshold entries ride the escalation above regardless of
+rank. What an entry is *about* — the delivery machinery or the product — is not
+a rank axis; its cost while deferred and its impact are, and an entry states
+both in its own cost field, which is what this ranking reads. A directive's
+theme bounds the survey and never outranks the first tier: a per-iteration cost
+is the theme's cost too.
+
 **Weigh the iteration's cost before opening it — the economic composition test.**
 A lone sub-threshold unit may not justify a whole iteration's fixed cost: either
 bundle related-surface deferred entries into the iteration, or argue the unit is
