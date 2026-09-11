@@ -7,3 +7,4 @@
 deferred-pool-triage scope a7a7f71f 2026-09-11 08e6eb67
 deferred-pool-triage build add9027e 2026-09-11 5affd5d4
 deferred-pool-triage validate a8ecb5fa 2026-09-11 6ed58207
+deferred-pool-triage close afd82c4d 2026-09-11 4872809f
