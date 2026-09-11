@@ -26,9 +26,10 @@ one: a kit literal carrying a private vocabulary publishes it.
 ## This repo is governed by its own kits
 
 The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree —
-dogfooding is day-one, not optional. Before committing, run the full battery
-(`bash gate-sdk/bin/run-gates.sh`) and the touched kit's fixture suite, whose
-per-kit runner lives in [README.md](README.md) §This repo, governed.
+dogfooding is day-one, not optional, though *which* gates register is a tuning
+decision here as for any consumer (`operator 2026-09-10`). Before committing, run
+the full battery (`bash gate-sdk/bin/run-gates.sh`) and the touched kit's fixture
+suite, whose per-kit runner is in [README.md](README.md) §This repo, governed.
 
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.

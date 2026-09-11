@@ -14,28 +14,6 @@
 
 ## Technical Debt
 
-- **dogfooding-line-invites-a-false-doctrine-conflict**
-  — `CLAUDE.md`'s dogfooding-is-day-one sentence reads as an obligation to register every shipped
-  gate on this tree, and it is not one; the sentence gains a clause saying so.
-  **The governing operator principle, ruled 2026-09-10 through the consult channel in a lead
-  session and relayed by that lead.** This project aims to produce checkwright, a toolset the
-  customer tunes to their need, and that does not mean the checkwright development project is
-  forced to use all check types: registration is a tuning decision here as for any consumer.
-  **Deliverable.** One clause on `CLAUDE.md`'s dogfooding sentence, landed undated on that surface
-  and marked `operator 2026-09-10` — and NOT in `TRAJECTORY.md`, which admits no ruling naming no
-  discharge event. Debt rather than a feature: no governed name is added, and the ruling the clause
-  records is already taken.
-  **Precedent it rests on, measured rather than assumed:** 113 gates shipped, 111 registered, with
-  `check-surface-duplication` and `check-producer-liveness` already declined. The cost the clause
-  answers is attested — the sentence's opposite reading sent a lead hunting a doctrine conflict
-  that was never there.
-  **Watch the brevity budget:** the surface is always-loaded and `always-loaded-brevity-reach`
-  records it already sitting well above its committed baseline, so the clause is authored to
-  replace words rather than to add a line where it can.
-  Filed 2026-09-10 by scope out of `packer-port-terminal-cut`'s gap inbox; promoted 2026-09-10 at
-  scope into `host-resolution-fail-open-cut`, ruled in by the operator through AskUserQuestion in
-  the lead session, relayed by the lead.
-
 ## Deferred
 
 
@@ -10701,5 +10679,6 @@
 - observation-predicate-entry-cannot-drain-in-its-own-iteration
 - gap-inbox-commit-ownership
 - lead-state-durable-home
+- dogfooding-line-invites-a-false-doctrine-conflict
 
 ## Lessons Learned
