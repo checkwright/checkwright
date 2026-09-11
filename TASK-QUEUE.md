@@ -6208,19 +6208,4 @@
 
 ## Done
 
-- port-first-deferral-grounds-unresolvable
-- icebox-default-reach-over-the-cost-opener-limb-unruled
-- stop-liveness-stub-spawn-flake
-- meta-gate-conservation-record-reach
-- propose-once-clause-leaks-into-the-proposal-step
-- consumer-smoke-per-kit-form-broken-on-partial-vendor
-- same-day-recurrence-date-multiplicity
-- audit-roster-decision-tier-and-findings-tier-share-one-line
-- settings-content-pin-report-absent
-- single-kit-smoke-precondition
-- consumer-smoke-targeted-mode-registrar-scope
-- consumer-guard-rule-verification-lane
-- macos-leg-brew-set-vs-documented-requirements
-- post-port-deferred-pool-triage
-
 ## Lessons Learned
