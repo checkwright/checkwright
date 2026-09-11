@@ -14,39 +14,6 @@
 
 ## Technical Debt
 
-- **close-watch-waits-on-slowest-smoke-leg** [observed-by: gates] — a close push waits about 48
-  minutes on the `gates` workflow, and one leg is almost all of it.
-  **Promoted 2026-09-11 at scope as debt — operator direction, 2026-09-11** (AskUserQuestion in
-  the lead session, lead-relayed), `rankable-deferred-board`'s second cluster.
-  **Envelope, scope's decision inside the operator's words below:** cut the slow legs' wall time,
-  Windows first, without dropping a leg or an assertion from the binding set. Probe first from a
-  finished run's log (`gh run view <id> --log`, which buys no push). Changing WHICH legs close
-  watches, or path-filtering a binding leg, changes CLAUDE.md's watch-to-green rule, so build
-  escalates that lever rather than choosing it; so too any lever that would mint a name, since
-  none is minted here and no amendment is owed.
-  **Observed, not merely built:** completion is a `gates` run showing the cut, so the push
-  placement rule (lifecycle-kit/SPEC.md §The state machine) puts this iteration's first push at or
-  before the stage landing this work — a re-placed push, not an extra one.
-  **Push placement — operator direction, 2026-09-11** (AskUserQuestion in the lead session,
-  lead-relayed): this iteration's first push rides the build that lands this entry, because that
-  commit's `gates` run is its done-witness; close pushes only if later commits need a second run.
-  This replaces the prior iteration's direction to push at close.
-  **Operator-stated 2026-09-11, lead session, typed message, relayed by that lead:** a close cannot
-  wait 40 minutes on one run; optimize `install-smoke-windows` and every other long leg.
-  **Re-verified at the drain on gates run 34553416908 (head 08e6eb67):** wall 48 minutes; `gates`
-  4.8, install-smoke 3.5, powershell 2.4, linux-arm64 3.6, each native-artifacts leg under 2,
-  macos 12.5, macos-intel 23.7, windows 46.0. Lead-measured, not re-probed: 44 of Windows' 46
-  minutes inside its smoke step, and five prior runs at 45 to 48. Close watches `gates` to green,
-  so it waits on the slowest leg. Not yet probed: which smoke phases take the Windows time.
-  **Candidate levers, none ruled:** cut the dominant Windows cost (per-process spawn under
-  Git-for-Windows bash is the usual suspect); let close watch the binding fast legs and read the
-  slow smokes later; path-filter or schedule the slow legs; cache what each leg rebuilds.
-  **DISTINCT from `close-red-push-ownership`** (icebox; who owns a red push),
-  `install-smoke-leg-names-mix-two-axes` and `held-ci-leg-failure-reddens-a-binding-one` (naming
-  and hold posture).
-  **Cost while deferred:** every close pays the wait.
-  Filed 2026-09-11 by close, draining the gap inbox.
-
 ## Deferred
 
 
@@ -6098,5 +6065,6 @@
 - deferred-cost-class-opener-vocabulary
 - deferred-surface-tag-for-bundling
 - scope-ranking-blind-to-deferral-cost-and-impact
+- close-watch-waits-on-slowest-smoke-leg
 
 ## Lessons Learned
