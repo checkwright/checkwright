@@ -31,13 +31,6 @@
   to that extent; that entry went to Done at this promotion, its named population lying wholly
   inside this triage. An entry held out of the icebox by a recorded ruling on a ground OTHER
   than its cost opener is outside the question as put: build escalates it rather than moving it.
-  **TOKEN-WASTE EXCLUSION, operator 2026-09-11, typed message in the lead session, lead-relayed:**
-  token-waste tasks are high-priority fixes, promoted or joined to the following iteration as soon
-  as possible, so an entry whose subject is token waste stays Deferred — the class rule above is
-  narrowed by it. **What counts as token waste is the lead's reading, lead, own-authority
-  2026-09-11, same relay:** a cost paid in session context or model tokens — prose loaded whole,
-  supervision overhead, redundant reads, re-derivation — and not wall-clock time or
-  permission-prompt friction. A borderline entry is escalated, never decided in-session.
   **EXECUTED AT BUILD, under this entry — lead, own-authority 2026-09-11.** Close's eligibility
   judgment governs its routine worklist, not a directed whole-pool unit.
   **Moves, each conserved (queue-kit/SPEC.md §The icebox tier):** Deferred → Icebox under the
