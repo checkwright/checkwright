@@ -12,45 +12,6 @@
 
 ## New Features
 
-- **instruction-surface-sweep** [spec: SPEC-sweep.md]
-  — one full pass applying the what-vs-why rule across the instruction-file corpus, once.
-  **Operator-ruled 2026-08-13**, and deliberately moved out of that session's scope into close's
-  filing rather than started mid-iteration.
-  **The corpus is derived, never carried:** `git ls-files "*/templates/*.md" ".claude/agents/*.md"`
-  minus the `gate-tests` fixture copies — **20 files, 2020 lines** at 2026-08-13, re-derived at
-  filing time. Re-derive it at promotion; the command is the roster, the numbers are a dated
-  measurement.
-  **What the sweep applies** is the rule as ruled: an instruction surface carries the operative
-  instruction, not the reasoning that justified it. The already-worked example is commit `bdfaed3e`
-  on `agent-execution.md`, which is the calibration for how much a section loses — lead-ins,
-  dispositions and commands stay; the grounds move to the owning SPEC.
-  **The move is relocation, not deletion, and not annotation.** Grounds go to the surface that owns
-  the mechanism; a `spec:` or exempt tag that keeps the prose in place blesses the restatement,
-  which is itself the defect (CLAUDE.md §This repo is governed by its own kits).
-  **Deliverable:** every one of the twenty read against the rule, each violation either relocated to
-  a named owning section or explicitly ruled compliant, with the compliant calls stated so the next
-  differential sweep inherits a baseline rather than re-deciding.
-  **Operator direction 2026-09-11, typed message in the lead session, relayed by that lead:** skill
-  templates carry instructions only; the history they hold (attested incidents, dated
-  measurements, which session did what) lives in git, its preferred home, not in a template.
-  `lifecycle-kit/templates/lead.md` and `delegation-kit/templates/agent-execution.md` are skills
-  in this corpus. The lead's reading, not the operator's: history is deleted rather than relocated,
-  git already holding it, while mechanism grounds keep the owning-SPEC route above — refining the
-  relocation wording for the history class — and those two go first, the lead contract loading
-  them whole (685 and 491 lines at close; roughly 23k tokens, a fifth of the lead's context, as
-  the lead measured it). The direction fed the reach question the blocker then ruled. Its
-  priority is no separate directive: scope ranks it off its lead-line tags, landed 2026-09-11.
-  **Leads the `instruction-surface-tier` set — operator direction, 2026-09-11:** the edge above
-  held, and `instruction-motivation-owner` joined the set so /spec ruled its reach question first.
-  That rule landed in the doctrine at build 2026-09-12 and the edge is discharged.
-  **Cost while deferred:** the rule is ruled and applied to one file, so the corpus is nineteen
-  files of unswept prose under a rule that already binds it.
-  Filed 2026-08-13 by close, on operator direction; it waited on the reach question above, because a
-  sweep for violations of a rule whose scope did not reach the corpus had no stated predicate. The
-  doctrine's instruction-surface sentence supplied that predicate at build 2026-09-12.
-  **Specified 2026-09-12 at spec** (SPEC-sweep.md) against the census filed in
-  the survey record; compliant calls ride the landing commit's message.
-
 - **instruction-surface-bash-focus** [spec: SPEC-resident-substrate.md]
   — the always-loaded surfaces assume bash.
   `CLAUDE.md` and the instruction surfaces beside it are written around a shell battery:
@@ -2166,9 +2127,11 @@
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
 
 
-- **close-differential-instruction-sweep** [design-pending] [blocked-by: instruction-surface-sweep] [cost: iteration/low] [surface: lifecycle-kit]
+- **close-differential-instruction-sweep** [design-pending] [cost: iteration/low] [surface: lifecycle-kit]
   — after the full sweep, close keeps the corpus swept differentially instead of re-reading it
-  whole.
+  whole. It waited on `instruction-surface-sweep`, which landed the full pass at build 2026-09-12;
+  that pass's compliant calls are in its landing commit's message, which the differential range
+  yields through `git log`.
   **Operator-ruled 2026-08-13** as the second half of the sweep shape: one full pass, then close
   runs differential passes in future iterations.
   **The worklist is mechanically derivable and the judgment is not**, and naming that split is the
@@ -5226,5 +5189,6 @@
 ## Done
 
 - instruction-motivation-owner
+- instruction-surface-sweep
 
 ## Lessons Learned

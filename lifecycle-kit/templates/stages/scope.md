@@ -101,9 +101,7 @@ a number to sanity-check first. It is scoped to deferred entries
 because promotion is the decision it forces; an entry already active is being
 built. **The collision is decided, not resolved in the theme's favour**: the rule
 does not promote, it puts the unit in front of the authority this stage already
-escalates to. An automatic promotion would be a second intake path around
-scope-gated intake, and the failure this rule answers was never that the ruling
-went the wrong way — it was that the collision never reached anyone.
+escalates to.
 
 **Rank the pool by what deferral costs and what landing buys, in this order,
 before composing.** The board's deferred rows carry each entry's `[cost:]` class
@@ -205,9 +203,8 @@ slug's *name* shipped as live mechanism — a check, a knob, a script the tree n
 carries — its inbound edges cite that mechanism and are current, however large
 the block says the target is. Tell the two apart by resolving the name in the
 tree rather than in the queue. The
-promotion dividend lives in the total and in no single entry, which is also why
-splitting an entry is safe only against that total: a split scatters an entry's
-weight across siblings, and the sum is what puts it back together.
+promotion dividend lives in the total and in no single entry, so splitting an
+entry is safe only against that total.
 
 When done, **set the iteration name without waiting for confirmation** and
 inform the user: run `bash gate-sdk/bin/run-gates.sh --enter-stage --rename <name>`,

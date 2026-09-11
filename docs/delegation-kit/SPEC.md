@@ -447,6 +447,13 @@ the attested survivors carried and which the auto-clean-is-best-effort reading
 above described without explaining. Reclamation is tied to the **child's own
 return**, not to the dispatching session's lifetime.
 
+**Whose pid the lock reason names is the harness's to decide, and that is why the
+trap is stated beside the reap step.** A harness writing its own supervising
+process's pid rather than the child's makes this the one record the protocol's
+standing instinct — distrust a pattern match, trust a recorded pid's liveness —
+reads as meaning something it does not, so the template states the limit where
+the reap is performed rather than leaving it to be re-derived.
+
 **The ruling stands, and stands on the ground that survived.** *A verdict surface
 may not own lifecycle* is untouched by any of this, and it alone refuses the
 dispatch-time sweep. What the falsified premise changes is what is now

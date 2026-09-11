@@ -49,7 +49,10 @@ a contract that does not exist yet; the canonical spec cites the contract
 file, never re-embeds it. A ruling with no owning component (governance,
 workflow, gates) is a **root-level amendment**: same lifecycle, lives at
 the repo root, merges into the consumer's rulebook instead of a component
-spec.
+spec. A component is any top-level directory owning a body of work, kit or
+not — said out rather than left to precedent, because the repo-root fallback
+otherwise reads as the default for anything not plainly a kit, and once two
+units answer the case differently neither precedent decides the third.
 
 ## The amendment lifecycle
 

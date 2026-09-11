@@ -4400,7 +4400,14 @@ trigger-gated authoring stage, the same class as the trigger-gated audit stage.
 The generic authoring how-to `spec.md` single-sources — causal completeness and
 canon-kit's bidirectional queue pairing — is the content `scope`'s conditional
 authoring step points at, so a default-roster `scope` that still authors reads it
-there.
+there. Its per-delta **work-class** label is written **inline** rather than
+rostered, a roster being a second copy that drifts the moment a delta is split or
+reordered while its one reader — the lead, at batch-cut — is scanning the deltas
+themselves; the label records the delta's *demand* and never a model name,
+a baked name being drift against a churning roster and a spec-time
+recommendation attaching to a batch not yet cut. The judgment is the authoring
+stage's because it knows what each delta demands where the lead knows only what
+the queue entry says.
 
 The directory holds the **stage-class** template set, not any one consumer's
 roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five,
@@ -4608,6 +4615,33 @@ disposition line's mechanical reader is `--enter-stage`'s boundary require-check
 (§bin/enter-stage.sh, `LIFECYCLE_KIT_BOUNDARY_REQUIRE`) when a consumer wires the
 file into that knob.
 
+The `close` template's **push-identity precondition** is per-push and not
+per-session, an identity selected at a session's start being no evidence about
+the moment a later push happens; no gate substitutes for it, since an identity
+check grades that a login exists and never which one is selected.
+
+The `align` template's surviving-surface rule and its read-site verification each
+carry a ground: an amendment is deleted at merge, so a correction written into one
+and removed by the commit that lands it leaves no trace a later reader can
+recover; and authoring a producer silently asserts a consumer read side that
+rarely already matches.
+
+The `build` template runs one fresh session per task because a fresh session
+rehydrates the governing docs and queue state at full fidelity from disk, where an
+in-session summary erodes the approved plan and the re-derived premises.
+
+The `scope` template's recurrence override **decides** the collision rather than
+resolving it in the theme's favour: an automatic promotion would be a second
+intake path around scope-gated intake, and the failure it answers was never a
+ruling that went the wrong way but a collision that reached nobody. Its split rule
+is safe only against the pool total, a split scattering an entry's weight across
+siblings that only the sum puts back together.
+
+The `validate` template commits a repair before the suite roster starts or
+resumes: a suite asserting a clean worktree against the real checkout reads an
+uncommitted repair as the failure of the leg it guards, whose failure text names
+that leg and so reads as a regression from the iteration's diff.
+
 ### templates/release-sweep.md
 
 A **boundary skill**, not a stage — which is why it sits at `templates/` root
@@ -4715,7 +4749,9 @@ re-scoping a recorded operator ruling or a stated objective is operator-class an
 is relayed, carved out of the derivable-from-the-governed-surfaces routing rule
 because a session holding contrary evidence reads the surface carrying the ruling
 as stale rather than as closed, the split-channel design (routine narration to the
-resume journal, escalations to the message channel), the compact economics —
+resume journal, escalations to the message channel — the journal path being
+derived per *stage*, a per-batch filename empties that derivation and the refusal
+lands cold on the **next** same-stage session), the compact economics —
 the split-where-the-tail-dominates rule in **two limbs**, its cost limb and a
 character limb naming what the enumeration of judgment-bearing turns omits (the
 escalations a lead rules alone off a governed surface, which the routing rule
@@ -4726,22 +4762,37 @@ consumer's, the unified posture's handoff compact,
 and operator-suggested compacts at the acceptance
 boundaries that pay under the cold-wakes-times-compressible-residue rule —
 with the dispatch-granularity rule (the roster derived from every unit the
-iteration promoted rather than from the amendment set, then batch units
+iteration promoted rather than from the amendment set, which a debt unit carries
+no `[spec:]` ref to join, then batch units
 sharing a kit or SPEC surface, split on a model-tier change or a
-delegation-kit split trigger) and
+delegation-kit split trigger — a shared surface groups a batch without ordering
+one, so a cut across a producer/consumer edge between deltas dispatches the
+consumer against an input that does not exist yet), the per-batch work-class
+tiering (judgment being what the tier buys, downgrading a design-bearing batch
+trades a large correctness risk for a small window saving, while a stage-uniform
+class is a collapsed default and not a bound roster) and
 the lead-owns-batching clause (an intra-stage batch split is N sibling stage
 sessions the lead dispatches and verifies — each a same-stage re-entry,
 §The state machine — and a stage session never dispatches a sibling stage
 session), and
 the stamps-authoritative invariant carried from §The state machine as the
-design's load-bearing rule — with its two corollaries: the lead never
+design's load-bearing rule — a batch directed not to stamp spends the
+per-session audit trail unrepairably, backdating falsifying the trail rather than
+restoring it — with its two corollaries: the lead never
 hand-derives prior-stage completeness from WORKFLOW-STATE or the git log (it
 dispatches and trusts `--enter-stage`'s fail-closed refusal, or gates an
 expensive dispatch with `--simulate`, and reads that same drain-entry verdict
 **before** declaring a stage's batches complete rather than after,
 §bin/enter-stage.sh), and a ruling
 whose acting session is not imminent is filed to a durable governed surface
-in the moment it is made. An earlier second assertion over the drain
+in the moment it is made.
+**Relay-never-assert and the checked-figure rule rest on one asymmetry.** A stage
+session writes lifecycle state under oracle-first, fixture pairs and a validate
+battery; the lead writes none and carries no verification discipline, yet its
+rulings steer what stage sessions land — so relaying an unverified duration or
+count into a dispatch converts one session's guess into standing instruction for
+every session after it, and nothing reds.
+An earlier second assertion over the drain
 assertion's own population is **ruled out** on record: a batching roster has
 dropped a promoted unit in practice and `check-stage-entry` named
 it at the refused entry, so the defect is detected late — at the price of one
@@ -4808,7 +4859,9 @@ legitimately holds no consultation.
 **What the template owns** is a landing contract: the session's exit condition is
 that every ruling the operator closed has reached a governed surface, every
 refused alternative is recorded with its grounds, and every always-loaded surface
-those rulings stale is corrected, flagged, or filed. Two mechanisms are what make
+those rulings stale is corrected, flagged, or filed — the failure it prevents
+being a strategy session whose conclusions the next session re-derives from
+memory or never recovers at all. Two mechanisms are what make
 that reachable rather than aspirational, and both are stated in the ritual. A
 ruling lands **at the moment it closes**, not at exit, so an interrupted session
 loses at most the ruling in flight rather than the session's whole output. And

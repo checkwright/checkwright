@@ -44,10 +44,7 @@ entering build session (lifecycle-kit/SPEC.md §check-stage-entry).
 naming inconsistencies, undocumented contracts, contradictions; name the
 entry grammar any backfill task filed from a finding is written against.>* Resolve every
 finding in the affected spec or amendment — never ad-hoc, never deferred.
-When both could hold it, **the surviving surface wins**: an amendment is deleted
-at merge, so a correction written into one and deleted in the same commit that
-lands it leaves no trace in history at all — the diff shows a file added and
-removed, and the reasoning is unrecoverable by any later reader. Land it in the
+When both could hold it, **the surviving surface wins**: land it in the
 canonical spec the amendment merges into, and let the amendment cite it.
 Commit all spec changes in a single `chore:` commit.
 
@@ -87,13 +84,10 @@ substitution, and the **renumber** case, where the retired and the replacing
 spellings are byte-identical and telling a stale citation from a correct one is
 a reading of the site's subject matter. That case is routed rather than gated —
 a cross-corpus citation naming its referent instead of its number has no numeric
-relation left to decay. Attested twice in one iteration, both times a
-documentation surface reading as commentary that the grep found and the amendment
-did not name.
+relation left to decay.
 
 **Every amendment's "wires cleanly against the current tree" is a hypothesis,
-and the align audit is its first test.** Authoring a producer silently asserts
-the consumer's read side already matches — it rarely does. Verify every
+and the align audit is its first test.** Verify every
 cross-component literal *at the read site*: grep the consumer's actual match
 arms, don't trust the amendment's prose. A **negative** existence claim ("no
 such harness/helper/gate exists yet") is the audit's weakest evidence shape: a

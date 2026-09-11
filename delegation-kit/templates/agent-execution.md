@@ -146,19 +146,16 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   stage, commits included. A **tier-split oracle** wants narrower *cost* — the
   fork inherits the dispatcher's model, which is exactly the split the posture
   exists to make (a lead posture that dispatches its own oracle is the named
-  instance). A **rule-injection dispatch** wants a *different* brief — attested
-  where five sibling forks each carried a line explaining that the roster's
-  agent definitions do not carry it, so fork was chosen to inject rules the
-  types lack and every one still paid to re-materialize its parent's context.
+  instance). A **rule-injection dispatch** wants a *different* brief — a fork
+  chosen to inject rules the agent types lack still pays to re-materialize its
+  parent's context.
   The boundary, stated honestly: a fork stays correct where the child does the
   **same job at the same authority** and only parallelism or isolation is
   wanted. The dispatch guard blocks there too, because a hook cannot read
   intent and no sanctioned fork use exists in this doctrine — the valve is
   unregistering the hook, never a per-dispatch knob, which would restore the
   honour system the rule replaced (delegation-kit/SPEC.md §The delegation
-  model). Grounds measured rather than asserted: in one audited iteration ten
-  of twenty-four dispatched agents were forks, carrying 20.90 USD of 158.70 USD
-  of priced burn.
+  model).
 - **A read-only claim is made by isolation, not by sentence.** A brief saying
   "read-only, no edits" makes no claim: a subagent inherits its toolset from its
   **type**, never from the instruction text. The claim is made by
@@ -192,10 +189,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   writes its own supervising process's pid there, not the dispatched agent's:
   that process is alive for as long as your session is and carries the same pid
   across every dispatch and across an iteration boundary, so probing it answers
-  *still in use* for a tree nobody holds. This is the one place the protocol's
-  own instinct — distrust a pattern match, trust a recorded pid's liveness —
-  reads a record that does not mean what that instinct assumes, which is why
-  the rule is written beside the reap rather than left to be re-derived. Judge
+  *still in use* for a tree nobody holds. Judge
   the tree by what it carries, a clean `git status --porcelain` inside it and
   nothing past its base, and by whether you know a dispatch is in flight; never
   by that pid.
@@ -213,13 +207,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   repair**: do not read it as a verdict, and **do not build the binary** — a build
   is a mutation, and it is exactly the mutation isolation was bought to prevent
   for an agent dispatched read-only. Name the gate that could not run, say why,
-  and return; the parent's checkout has the binary and can run it. Attested rather
-  than inferred: a fresh worktree checkout carries no build output, and an
-  isolated agent met with the turn-end liveness hook's refusal there **reported
-  building the binary to escape it**, a claim carried at the tier it arrived on
-  rather than verified. The behaviour is the point either way: a refusal whose
-  message names no reachable remedy invites a read-only agent to invent a
-  mutating one, so the limit is stated here with its lawful response attached.
+  and return; the parent's checkout has the binary and can run it.
   **One exception, and it is the consumer's to supply rather than yours to
   assume**: the **turn-end liveness reader** may already be resolved for you by
   the consumer's adapter (delegation-kit/SPEC.md §The turn-end liveness hook
@@ -233,10 +221,10 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   harness returns only a dispatched session's **last** assistant message, so any
   turn-end hook that speaks overwrites whatever you returned. Recovery: **resume
   the child by id and ask it to re-emit its report verbatim, telling it
-  explicitly not to re-run the work.** Two limits, both attested. It is **not
-  reliable** — an earlier resume answered that the session had just started, and
-  that sweep had to be re-run. And the usage block is **no signal either**: a
-  successful re-emit reported the *original* run's tool count and tokens, so the
+  explicitly not to re-run the work.** Two limits. It is **not
+  reliable** — a resume may answer that the session has just started, leaving the
+  sweep to be re-run. And the usage block is **no signal either**: a successful
+  re-emit can report the *original* run's tool count and tokens, so the
   zero-tool-use shape marks some resumes and not all. Still reachable from any
   consumer whose liveness adapter has not taken (4)'s exception, an adopter
   vendoring this kit today included.
@@ -285,12 +273,8 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   from a spent one by the work cursor and `git log`
   (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset
   sweeps). **Caveat — a journal write has been observed to fail, cause
-  unexplained.** A `run_in_background` agent was once unable to
-  `Write` to the granted path and silently fell back to returning findings in
-  its final message — which makes the journal mechanic non-functional exactly
-  when it matters (a long, interruptible run). Read it as one unexplained
-  observation, not as a property of isolation: a worktree-isolated agent granted
-  an absolute path in the main checkout **wrote it successfully**. So: for a **read-only fan-out**
+  unexplained.** Read it as one unexplained
+  observation, not as a property of isolation. So: for a **read-only fan-out**
   (audit, survey), the return value *is* the contract — don't rely on a journal.
   Reserve the **journal** for agents that **mutate files**, and for those grant
   the journal path explicitly before dispatch rather than assuming the write
@@ -299,17 +283,14 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   isolation*, which is the reading that licensed an unreviewed commit on the
   shared branch. A read-only fan-out takes isolation precisely *because* it is
   claimed read-only (the **A read-only claim is made by isolation, not by
-  sentence** rule above). A contract has two ends, though: the child owes
+  sentence** rule above). The child owes
   no journal, and the **parent** owes the durable landing of what it received
-  before acting on it (next bullet). The caveat is about a backgrounded child's
-  write failing silently, so it never licensed the parent — which has already
-  demonstrated it can write, being the session that granted the path.
-- **A child's only upward route is a durable artifact.** Probed, not assumed: a
-  child's sends to an invented dispatcher name and to its own agent type both
-  failed, only a send addressed to the **top-level session** arrived, and
-  neither level knows its own identity or its parent's. There is therefore no
-  address a child can use to reach the agent that dispatched it, and four
-  dispositions follow. **(1) A durable artifact, for anything mid-run** — the
+  before acting on it (next bullet).
+- **A child's only upward route is a durable artifact.** No address reaches the
+  agent that dispatched a child — its sends resolve to neither an invented
+  dispatcher name nor its own agent type, only a send addressed to the
+  **top-level session** arrives, and neither level knows its own identity or its
+  parent's. Four dispositions follow. **(1) A durable artifact, for anything mid-run** — the
   dispatcher mints a path, names it **absolute into the main checkout** in the
   prompt, and the child writes as it goes. That is already the journal rule
   above; it is now also the *only* upward route there is, and it is stronger
@@ -339,14 +320,10 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   carried, never by its name.** Resuming a returned agent to correct or extend
   its work is the cheap alternative to a cold re-dispatch, and it is the one
   that keeps the child's own reasoning instead of paying to rebuild it. The name
-  is not a durable address for that: measured here, a name live at dispatch
-  resolved to *no agent of that name is reachable* once the dispatching session
-  had been compacted, with the agent listing reporting none reachable at all,
-  while the task-id from the notification resumed the same child from its
-  transcript. Which of the two voids the name — the compaction, or the child
-  merely having finished — is untested; the task-id survived both, and the
-  notification states outright that it is the handle the child may notify under
-  again, so it is the address to hold. It is also the address to **write down**:
+  is not a durable address for that: a name live at dispatch stops resolving once
+  the dispatching session is compacted, while the task-id from the notification
+  resumes the same child from its transcript and is the handle the
+  notification states the child may notify under again. It is also the address to **write down**:
   the notification lives in the context that dies, so a dispatcher who may want
   that child later records the task-id under the durability rule below rather
   than trusting the scroll to still be there.
@@ -391,11 +368,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   returned `file:line` is not checked by confirming the range resolves: that
   catches a wrong number and misses a wrong spelling, a moved passage, and a
   sibling instance the sweep never reported. **Re-read the passage** in the parent
-  before acting on it. Both halves are attested here — a census that fabricated a
-  `file:line` and a negative claim, both false; and a re-verification of nineteen
-  agent-sourced cites that found no bad ranges yet still surfaced a marker cited
-  under a spelling the tree does not use, plus an entire family member the census
-  never mentioned. Quotation with attribution is precisely the signal a reader uses
+  before acting on it. Quotation with attribution is precisely the signal a reader uses
   to decide a claim has already been checked, so an unverified one defeats normal
   trust rather than merely being wrong.
 - **A return you did not receive is not a finding, and an identifier you did not
@@ -470,11 +443,10 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   needs — and it is **affirmative**: an unselected dispatch does not fall back
   to a cheap default, it **inherits the dispatcher's tier**, so declining to
   choose silently buys the most expensive tier in reach — and buys it precisely
-  for the read-only fan-outs that are the cheapest work you dispatch. That is
-  why a standing choice lands in a tracked agent-type definition rather than
-  per-dispatch habit, and why an omitted `model:` field there is not a neutral
-  default but the inherit default: the field is stated even when the answer is
-  to inherit.
+  for the read-only fan-outs that are the cheapest work you dispatch. A standing
+  choice lands in a tracked agent-type definition rather than per-dispatch habit,
+  and that definition states its `model:` field even when the answer is to
+  inherit.
 - **Never revert substantial completed work on your own design judgment** —
   especially an expensive delegated sweep. Surface the tension and wait for the
   explicit go-ahead before discarding it: a self-judged revert forfeits the

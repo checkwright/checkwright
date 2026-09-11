@@ -39,9 +39,7 @@ pre-flight valve admitted this entry, which rewrites the valve ledger in the
 same motion, so the two commit together (lifecycle-kit/SPEC.md
 §bin/enter-stage.sh).
 
-Build runs one fresh session per task: a fresh session rehydrates the
-governing docs + queue state at full fidelity from disk, where an in-session
-summary would lossily erode the approved plan and re-derived premises. Prefer
+Build runs one fresh session per task. Prefer
 a session reset at a task boundary; reach for mid-task summarization only as
 a fallback before a commit, never as the routine per-task reset.
 
@@ -88,10 +86,7 @@ whose witness fails narrows the dispatch to what moved. File the surveys you buy
 lands a new gate or makes an existing one stricter appends that gate's bare name
 to the tightened-gates declaration surface,
 `<workflow-dir>/tightened-gates.txt` (gate-sdk/SPEC.md §upgrade-smoke), in the
-same commit. Build is the only stage that knows what it tightened at the moment
-it tightens it, so the declaration is written from knowledge rather than
-reconstructed later from a red — and an assertion that discovers its own
-allowed-red set from the gate it was supposed to check is its own trigger. The
+same commit. The
 surface accumulates across the iterations batched into one release; the release
 step composes the note's Tightened-gates section from it and drains it at the
 tag, so nothing here loads the release runbook. Only gates a consumer's vendored

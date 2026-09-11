@@ -4,12 +4,6 @@ no `WORKFLOW-STATE.txt`, and can run in any session at a major. Exit condition:
 every deprecation marker in the tree has a disposition line stamped for this
 release, and the marked surfaces reflect the dispositions taken.
 
-Between majors, `check-deprecation-task` (canon-kit) already holds every
-deprecation marker bound to a live decommission task — this sweep forces the
-standing inventory to a decision at the boundary the deprecations were promised
-against, so a "remove after the next major" never silently rides into the major
-after that.
-
 ## Session ritual
 
 1. **Inventory the markers.** Walk every deprecation marker over the

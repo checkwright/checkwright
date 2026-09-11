@@ -7,10 +7,6 @@ surface, every alternative refused along the way is recorded with the grounds it
 was refused on, and every always-loaded surface those rulings stale is
 corrected, flagged, or filed as work.
 
-A consultation that ends with its rulings still in the transcript has not
-exited. That is the failure this skill exists to stop — a strategy session whose
-conclusions the next session re-derives from memory, or never recovers at all.
-
 The write authority this skill leans on is **not** the skill's to grant: it
 belongs to the ruling record itself, which states who may record a ruling there
 and under what condition. What this skill adds on top of that authority is

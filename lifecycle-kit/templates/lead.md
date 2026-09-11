@@ -67,24 +67,14 @@ there — it is not restated here.
 is a read of the committed evidence — never a re-run of the producer.** This is
 the lifecycle instance of delegation-kit's no-producer-re-run rule
 (delegation-kit/SPEC.md §Verify after every agent commit, which owns the generic
-rule and why re-running is safe for work and unsafe for evidence); only a stage
-roster knows which stage that is, which is why the instance lands here. Both
-misroutes are attested and the harm splits between them: re-running the whole
-gate battery writes nothing under the workflow directory, so it is inert on the
-evidence and merely wasted; re-running the evidence producer, the manifest's
-sole writer, mutates or duplicates the committed record. Read the manifest the
-stage committed and judge it.
+rule and the harm each misroute does). Read the manifest the stage committed and
+judge it.
 
 **Stage N+1 is dispatched on stage N's agent completion notification — never on
 its commit, its stamp, a clean tree, a green battery, or a cleared
 `--simulate`.** Completion is a fact about a *session*; every one of those others
 is a fact about an *artifact*, and no artifact distinguishes "finished" from
-"still writing". The attested failure is exactly that gap: a lead confirmed the
-validate stage's commit had landed with complete evidence, the tree clean, the
-battery green and a simulated close entry cleared — then dispatched close into a
-still-running validate spine. Every check passed mid-write, because the producer
-commits its evidence and keeps going, so the terminal commit existing is fully
-compatible with the process still executing.
+"still writing".
 
 **When the notification does not arrive, no single read distinguishes a
 finished-but-unreported session from a live one.** Delivery can fail, and the
@@ -140,12 +130,8 @@ them as one makes the pair unusable.** This one is a *gating* rule: *may stage
 N+1 proceed?* — a question about preconditions the machinery owns, which
 `--simulate` answers correctly and cheaply and which the lead must not re-derive
 by hand. The precondition is a *liveness* rule: *is stage N over?* — which no
-instantaneous read answers at all. The incident is the proof they are two
-questions rather than one stated twice: the lead followed this rule faithfully,
-ran `--simulate`, and the simulated entry cleared mid-write. A rule told to trust
-an instantaneous read is not at fault for failing to answer a question about
-duration; it was never asked. `--simulate` keeps its whole job. What it never
-was, and must now be said not to be, is evidence that the prior stage is over.
+instantaneous read answers at all. `--simulate` keeps its whole job; what it is
+not is evidence that the prior stage is over.
 
 One qualification, because `--simulate` runs every matching entry-preflight
 command: where a consumer wires a producer-liveness gate onto that hook,
@@ -158,12 +144,7 @@ about it goes undetected.
 
 **Relay, never assert.** The lead manages on *optimal* rather than extensive
 context, so on any topic it has not mastered it acknowledges and relays — it
-does not hand down a tree fact as a ruling. The asymmetry is the reason: a
-stage session writes lifecycle state and is held to oracle-first, fixture
-pairs and a validate battery, while the lead writes no state and so has no
-verification discipline, yet its rulings steer what stage sessions land. A
-claim reasoned from one narrow grep and delivered as instruction spends a
-stage session's work against it, and nothing reds. So a factual claim travels
+does not hand down a tree fact as a ruling. A factual claim travels
 as a claim with its provenance attached ("read off X, unverified"), leaving
 the stage session — which holds the oracle — to run it. What the lead rules
 alone is scope, envelope and priority: the things no gate can decide and no
@@ -220,22 +201,8 @@ grants an open, and the cardinality one grant on that channel carries — or the
 statement that this consumer binds no channel, leaving the ask-and-answer default
 above.>*
 
-**The ground is *scale*, and stating it is what makes the rule obeyable.**
-An open commits a boundary reset that truncates the evidence surfaces, a walk of
-the whole stage set, and a session per stage — and how much machinery to spend is
-the operator's to choose even where the work's *content* plainly routes through
-the lifecycle. That split is what hides the failure from inside: an instruction
-to fix filed work can be entirely correct about what should be done while saying
-nothing about how much should be spent doing it, so a lead reading it as
-authorization is reasoning soundly about content and silently about scale. The
-ambiguous case is therefore ruled by name — **an instruction to fix filed work is
-not an authorization to open an iteration, and the lead asks.**
-
-Read it as the twin of the one class §The escalation protocol carves out below.
-There the lead may not *reverse* a recorded ruling however well-grounded its
-evidence; here it may not *open* however plainly the work routes through the
-lifecycle. Both are classes where the lead's inference is locally sound and the
-decision is still not the lead's to make.
+**An instruction to fix filed work is not an authorization to open an iteration,
+and the lead asks.**
 
 The lead never selects the iteration's unit set. Selection is the **scope**
 stage's contract — the survey, the intake boundary sweep, and the
@@ -255,13 +222,8 @@ iteration carrying no theme looks like, and it is nothing more** — a missing
 theme is not a missing authorization, and it is not a second way in.
 
 **A directive that reaches scope through the lead is not evidence the open was
-authorized.** Authorization and directive are separate: the operator authorizes
-the open, and the theme may travel to the surveying stage by way of the lead,
-which is the relay this section already describes. The surveying stage cannot
-tell an authorized open from an unauthorized one and is not asked to — its
-contract is the survey, and an authorization check there would give one fact two
-holders, the second of them holding strictly less information. The obligation
-stays here, with the party that holds it.
+authorized.** The obligation stays here, with the party that holds it, and the
+surveying stage runs no authorization check.
 
 Scope's proposed unit set returns as an ordinary four-header escalation, and the
 lead routes it like any scope/queue change — ruled by the operator, or by the
@@ -277,20 +239,12 @@ the set, and a lead grading it would be the lead-authored judgment on the unit
 set this section refuses. Returning an escalation that carries no verdict
 selects nothing: it asks for the test's output before anyone rules on the set.
 
-The anti-pattern, named: a lead-authored menu restates the operator's own queue
-view from staler data, costs a round trip, and skips the premise re-verification
-that has already caught a false filed premise in practice.
-
 ## Closing an iteration
 
 When the iteration's final stage completes, the lead **stops and reports what it
-believes is owed**, and does not open the next one. This is not a second rule
-standing at a second end — it is the consequence of the first one: the grant that
-authorized this iteration is spent, §Opening an iteration states what a spent
-grant authorizes, and so the next open takes a fresh grant that the lead does not
-hold. One rule, attached to the grant and *met* here, which is why repairing the
-opening end can never leave this one standing on stale terms, and why the rule
-covers both postures — a spent grant is spent under either.
+believes is owed**, and does not open the next one — the grant that authorized
+this iteration is spent, and a further open takes a fresh grant the lead does not
+hold.
 
 Reporting is the lead's whole remaining act there — the state of the queue as the
 closing stage left it, whatever was filed for the next intake, and what the lead
@@ -306,17 +260,6 @@ an unread journal loses a finding exactly as a deleted one does, and the boundar
 entry announces an undisposed journal to the entering session rather than
 refusing it (lifecycle-kit/SPEC.md §bin/enter-stage.sh) — which is a prompt, not
 a substitute for doing this.
-
-**The boundary is exactly where the design seats a session most able to roll
-forward, which is why it is ruled rather than left to judgment.** The
-session-role marker and the lead's own resume journal are the scratch artifacts
-that survive the boundary reset, precisely so that a session live at the boundary
-can file a judgment there for the entering session's intake. So the design puts a
-session holding full context and preserved notes at the very moment the next
-iteration would open, and the rule is what it is handed. Under the **unified**
-posture that session *is* the previous scope session, whose situation has changed
-in nothing but a drained queue — the case likeliest to roll straight forward.
-Attaching the rule to the boundary covers both postures by construction.
 
 ## The escalation protocol
 
@@ -369,13 +312,7 @@ attention that ranks both.
 **One class the lead never rules, under either posture.** Reversing, demoting
 or re-scoping a **recorded operator ruling** or a stated objective is
 operator-class: the lead relays it, however well-grounded the escalating
-session's finding and however urgent the fix. It is carved out precisely
-because it reads as derivable — the ruling is written in a governed surface,
-so a session holding contrary evidence takes that surface for stale rather than
-for closed, and the routing rule above then hands the lead a decision it may not
-make. The escalating session is right to escalate and right about its evidence;
-what it may spend the evidence on is the operator's reconsideration, never the
-reversal itself.
+session's finding and however urgent the fix.
 
 ## Channel design
 
@@ -399,11 +336,7 @@ session computes for itself, not minting one. Two things follow for a lead
 splitting one stage across sessions: the batch discriminator belongs in a
 **heading inside** that stage's journal and never in its filename, and the
 lead therefore reads **one** pull channel per stage rather than one per
-dispatch. **The consequence of getting it wrong lands on someone else**, which
-is why the rule is stated here rather than left to taste: a per-batch filename
-leaves the derived path empty, so the *next* same-stage entry refuses on a
-journal that exists under a name it cannot compute — and that session meets the
-refusal cold, holding only the written escape.
+dispatch.
 
 ## A running session is asked, never instructed
 
@@ -416,10 +349,8 @@ session the lead never takes on its own authority: stopping it.
 did".** §The lead model already forbids the lead *itself* re-running the evidence
 producer; this is the same harm through the other actor. When the lead does not
 know what a session has run, the message is a **question** — *what have you run,
-and what did it report?* — never a command. Attested: a stage whose oracle had
-completed and written its evidence rows was told to run it again; the runner
-truncates its artifact on start, the rows were uncommitted, and they were lost
-and had to be regenerated. A question costs one turn and destroys nothing.
+and what did it report?* — never a command. A question costs one turn and
+destroys nothing.
 
 **A status-only turn is not evidence that a session is stuck.** Content-free
 turns are what a long foreground call looks like from outside, so reading two of
@@ -436,11 +367,9 @@ invocation, no backgrounding, no monitor, no pipe or redirect — and the dispat
 says nothing about how long it takes.
 
 **The root cause: a duration or a count reported by a subagent is checkable, so
-it is checked before anything is spent on it.** It is checkable against the tree,
-or against the reporting session's own metadata — a claimed sub-step longer than
-the whole session that reported it is disproved by arithmetic the lead already
-holds. Relaying an unverified figure into a dispatch is what converts one
-session's guess into standing instruction for every session after it.
+it is checked before anything is spent on it.** Check it against the tree, or
+against the reporting session's own metadata — a claimed sub-step longer than the
+whole session that reported it is disproved by arithmetic the lead already holds.
 
 **A completion notification's own usage block is a figure of that kind, and it
 counts the notifying turn rather than the run.** The same task id can notify more
@@ -449,10 +378,7 @@ a resume that only relays a finished report reads as zero tool uses over a large
 token count, which is the exact shape of an agent that read nothing. The two
 readings are indistinguishable from the notification alone, so the lead does not
 choose between them: it asks the dispatcher, which holds the resume history, or
-checks the claim against the tree. Attested, and the cost is the class's
-signature — a child's 14-entry survey was weighted down on a relayed
-`tool_uses: 0` whose run had recorded 48, and the receiving stage had to spend a
-tree probe to refute standing instruction.
+checks the claim against the tree.
 
 **A running session is never stopped on the lead's authority alone.** Stopping a
 background stage session, or any subagent it dispatched — the harness's stop or
@@ -509,8 +435,7 @@ suppress, and a sibling stamp naming a stage the cursor already sits on moves
 nothing — the stage skill owns that rule and its gate tolerance
 (lifecycle-kit/templates/stages/build.md). Directing a batch not to stamp is
 therefore not conflict-avoidance; it silently spends the per-session audit trail
-the stamp exists to provide, and no later session can repair it, because
-backdating a stamp falsifies the trail rather than restoring it.
+the stamp exists to provide, and no later session can repair it.
 
 **A recurrence you judge is still yours to record, and the gap inbox is how.**
 Every session that judges a recurrence is obliged to stamp the date onto that
@@ -543,54 +468,36 @@ a lost transcript costs nothing the tracked surfaces do not already hold.
 
 ## Economics — batch, and compact where it pays
 
-The prompt cache's short TTL means a sporadically questioned lead pays a full
-context re-warm on each cold question: stage sessions outlive the TTL and
-escalations arrive on their schedule, so the lead is nearly always cold. Two
-consequences:
+The lead is nearly always cold — stage sessions outlive the prompt cache's TTL
+and escalations arrive on their schedule. So:
 
-- **Batch dispatches by shared surface.** Both naive granularities are ruled
-  out: whole-queue-in-one rides past every split trigger the delegation protocol
-  names, and one-dispatch-per-task pays context setup times N while buying no
-  parallelism (committing agents serialize on the shared git index regardless).
-  Batch units that share a kit or SPEC surface into one dispatch, where derived
+- **Batch dispatches by shared surface.** Neither whole-queue-in-one nor
+  one-dispatch-per-task:
+  batch units that share a kit or SPEC surface into one dispatch, where derived
   context is actually common; split where the model tier changes or a
   delegation-kit split trigger fires — per-batch model tiering is the dominant
   window lever, not token counts.
   **Shared surface groups a batch and does not order one, so a cut owes a second
-  read.** Neither a shared surface nor shared derived context expresses a
-  *producer/consumer* edge between deltas: where one delta's output is another's
-  input, a cut separating them dispatches the consumer against an input that does
-  not exist yet, and that batch fails on a defect the amendment never carried.
-  Read the deltas for those edges before cutting, and keep a producer with its
-  consumer whatever surface the two sit on.
+  read.**
+  Read the deltas for a *producer/consumer* edge before cutting, and keep a
+  producer with its consumer whatever surface the two sit on.
   The set being batched is **every unit the iteration promoted** — every
   top-level entry in the configured active queue sections, debt units as much as
-  feature units — never the amendment set. A debt unit converges an
-  implementation on existing spec and mints no governed name, so it carries no
-  `[spec:]` ref; keying the roster on amendments makes exactly the
-  amendment-free half of the queue invisible, and it disappears silently because
-  the units that vanish are the ones that left no artifact to miss. Derive the
+  feature units — never the amendment set, which a debt unit carries no
+  `[spec:]` ref to join. Derive the
   roster from the queue, which is the record of what was promoted, and re-read
   it rather than carrying a count.
 - **Tier each batch to its work class.** The lead reads the **work-class**
   labels of the deltas in a batch — via the `[spec:]` amendments the batch's
   entries point at, where `/spec` emits one `{mechanical | design-bearing}` tag
   per delta — and tiers the batch by their aggregate. A batch whose deltas are
-  **all mechanical** (oracle-running: a fixed verification battery, a
-  rename/merge sweep, a mechanical pin — low generative judgment) is
+  **all mechanical** is
   **tier-downgradeable**: a cheaper model serves it, and the dispatcher pins the
   cheaper tier with a `model` override on that batch's dispatch. A batch carrying
-  **any design-bearing** delta (generative or verificational judgment — bounding
-  a unit set, authoring an amendment, cross-spec audit, non-obvious
-  implementation) **stays on the judgment tier**: the judgment is exactly what
-  the tier buys, and downgrading it trades a large correctness risk for a small
-  window saving. Class → live model is mapped at dispatch time, where the roster
-  dependency already belongs (agent-execution.md, same bullet). There is no
+  **any design-bearing** delta **stays on the judgment tier**. Class → live model
+  is mapped at dispatch time (agent-execution.md, same bullet). There is no
   standing per-stage classification to bind: the batch's labels decide at
-  dispatch time, so a stage-uniform class (validate, uniformly mechanical) is a
-  **collapsed default**, not a bound roster — while a stage whose batches diverge
-  (build — a one-line hermeticity pin beside a new KPI plugin) tiers each batch
-  from its deltas' labels, which a per-stage rule could not express. Re-judge
+  dispatch time. Re-judge
   every assignment when the harness model roster churns.
 - **An intra-stage batch split is the lead's to own.** When a stage's work
   splits into batches, those batches are **N sibling stage sessions the lead
@@ -607,25 +514,16 @@ consequences:
   do not, subject to the shared-index discipline.
 - **Batch escalations.** The decision shape makes batching natural — a stage
   session collects its open questions and sends them in one turn.
-- **Split the lead where the tail dominates.** Most of a lead's turns are
-  tail — dispatch, result ingestion, budget verdicts — and under the unified
-  posture each one re-reads a cache carrying scope's whole working context at
-  judgment-tier prices. The split posture moves that recurring cost to the
+- **Split the lead where the tail dominates.** The split posture moves the
+  recurring tail — dispatch, result ingestion, budget verdicts — to the
   routing tier and concentrates judgment-tier spend where it pays: scope
-  itself, plus one oracle turn per forwarded intent question — a cold context
-  re-warm at worst, bounded and per-question instead of per-turn. Assume the
-  oracle is cold: escalations arrive on the stages' schedule, so the TTL
-  arithmetic that leaves a lead nearly always cold (above) applies to the
-  oracle unchanged.
-  **That enumeration is incomplete, and the omission is what makes the split a
-  trade rather than a pure saving.** A lead's turn set also holds the
-  escalations it rules **alone off a governed surface** — neither scope nor a
-  forwarded question. Splitting does not make those cheaper; it converts them
-  into **relays**, because the routing rule (§The escalation protocol) sends an
-  intent-class question to the oracle or the operator as its first move and
-  answers off a governed surface only as the fallback. The saving is therefore
-  bought with a change in what the lead *does*, not only in what it costs, and a
-  consumer picking a posture measures that trade rather than assuming it away.
+  itself, plus one oracle turn per forwarded intent question. Assume the
+  oracle is cold.
+  **The saving is a trade rather than a pure one**: splitting converts the
+  escalations a lead rules **alone off a governed surface** into **relays**,
+  because the routing rule (§The escalation protocol) sends an intent-class
+  question to the oracle or the operator as its first move. A consumer picking a
+  posture measures that trade rather than assuming it away.
   **How to measure it:** over one iteration, count the escalations the lead
   ruled alone by reading a governed surface. Near zero and the tail premise
   covers the whole turn set; consistently several and this limb is live for that
@@ -636,39 +534,33 @@ consequences:
   queue entries, and before the first dispatch, `/compact` the lead's context
   with an instruction that **keeps** per-amendment rationale, rejected
   alternatives,
-  and the ruling-class roster, and **drops** tool output and file contents. The
-  tree is re-readable and everything ruled already lives in a governed surface,
-  so the lossy compact has a lead crash's bounded blast radius; the lead holds
-  pointers, not state. Verify the spend afterward with delegation-kit's
+  and the ruling-class roster, and **drops** tool output and file contents. Verify
+  the spend afterward with delegation-kit's
   usage-verdict rather than assuming forgiveness.
-- **Write the lead journal at every stage completion.** The lead's own durable state has one home
-  and one cadence: on each stage session's completion notification — the one event a lead already
+- **Write the lead journal at every stage completion.** On each stage session's completion
+  notification — the one event a lead already
   blocks on by contract — append to the lead's **own** resume journal whatever a compact would
-  otherwise lose, the batch roster and its tiering rationale, findings carried between batches,
-  rulings made or relayed, and anything the next dispatch would have to re-derive. The trigger is
-  an event that already exists rather than a forecast of when a compact looms, which is what makes
-  the cadence checkable. This discharges the durability rule delegation-kit's agent-execution
-  contract names the lead in, and it is **self-executing**: a lead writes its journal unilaterally,
+  otherwise lose: the batch roster and its tiering rationale, findings carried between batches,
+  rulings made or relayed, and anything the next dispatch would have to re-derive. This is
+  **self-executing**: a lead writes its journal unilaterally,
   where the compact below depends on an operator act the lead can only recommend.
-  **The journal is transport for a durable finding and never its store**, which partitions that
-  list by lifetime. Iteration-local working state — the batch roster and its tiering rationale,
+  **The journal is transport for a durable finding and never its store.**
+  Iteration-local working state — the batch roster and its tiering rationale,
   findings carried between batches, budget verdicts, what the next dispatch would re-derive — has
-  its home here and dies with the iteration, correctly, because it is *about* the iteration.
+  its home here and dies with the iteration.
   Anything that must **outlive** the iteration — a gap, a survey, a re-derived fact, a ruling — is
   filed to its committed channel in the moment it is found; the journal may carry a copy for your
-  own use and is never the only home. §Stamps are authoritative already rules this of the message
-  thread, and it is equally true here — the journal merely *reads* like a store.
+  own use and is never the only home.
   It is a scratch artifact with a **protected lifetime**: the iteration-boundary reset spares it by
-  kit invariant (lifecycle-kit/SPEC.md §bin/enter-stage.sh), for the reason §Closing an iteration
-  relies on — a session live at the boundary must be able to file a judgment there for the entering
-  session's intake. Protected is not permanent: the disposition step in §Closing an iteration is
+  kit invariant (lifecycle-kit/SPEC.md §bin/enter-stage.sh). Protected is not permanent: the
+  disposition step in §Closing an iteration is
   what keeps the file from becoming an accumulator nobody reads (delegation-kit/SPEC.md §Resume
   journal — agent writes, scratch reset sweeps).
 - **Then, optionally, suggest a compact at the paying acceptance boundaries.** After a stage
   session's work is accepted — its commits verified, its rulings landed in governed surfaces — the
   lead may *suggest* a compact to the operator, one line in the acceptance message and never a new
-  mechanism. It comes second and it is a convenience: compaction is operator-invoked, so the lead
-  can only recommend, which is why the journal above and not this carries the durability
+  mechanism — compaction is operator-invoked, so the lead can only recommend, which is why the
+  journal above and not this carries the durability
   obligation. Suggest where it pays, not blanket — a compact pays when the remaining cold wakes
   times the compressible residue exceed one context re-read, so the early boundaries pay and the
   late ones do not warrant the interruption. This is the rule, not a stage roster; a consumer
