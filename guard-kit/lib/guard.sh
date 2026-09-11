@@ -252,7 +252,7 @@ guard_skeleton() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 2/8/12/14/15/17/18/19/20/22, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 2/4/7/8/12/14/15/17/18/19/20/22/24, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
 guard_split_compound() {
     sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
 }
@@ -406,10 +406,12 @@ guard_rule_abs_script() {
     for g in "${GUARD_KIT_RO_SCRIPTS[@]}"; do
         # shellcheck disable=SC2053  # intentional glob match: $g is a pattern, not a literal
         if [[ "$base" == $g || "$rest" == $g ]]; then
-            guard_rewrite "$relcmd" "abs repo read-only script normalized to relative (${GUARD_NAME:-guard})"
+            _guard_rewrite_granted "$relcmd" \
+                && guard_rewrite "$relcmd" "abs repo read-only script normalized to relative (${GUARD_NAME:-guard})"
+            break
         fi
     done
-    guard_block "use the repo-relative form '$rest' (cwd is the repo root) — it's allowlisted and resolves on the match; the absolute spelling matches nothing and costs an out-of-band permission decision. If you truly need the absolute path, run it yourself with !<command>."
+    guard_block "use the repo-relative form '$rest' (cwd is the repo root) — an allowlist entry is written against the relative spelling, so it is the one that can resolve on the match; the absolute spelling matches nothing and costs an out-of-band permission decision. If you truly need the absolute path, run it yourself with !<command>."
 }
 
 guard_rule_abs_prefix() {
@@ -444,8 +446,11 @@ guard_rule_brace_glyph() {
     resid="${sqstripped//"$ph"/}"
     case "$resid" in
         *'{'* | *'}'*) ;;   # a non-placeholder brace remains: fall to the blocks
-        *) guard_rewrite "${cmd//"$ph"/"$q"}" \
-               "bare {} placeholder single-quoted so the harness matcher passes it (${GUARD_NAME:-guard})" ;;
+        *)
+            _guard_rewrite_granted "${cmd//"$ph"/"$q"}" \
+                && guard_rewrite "${cmd//"$ph"/"$q"}" \
+                    "bare {} placeholder single-quoted so the harness matcher passes it (${GUARD_NAME:-guard})"
+            guard_block "quote each bare {} placeholder yourself, spelling it '{}' — the harness's matcher refuses a bare '{' glyph, and this guard rewrites the placeholder silently only when the rewritten command is allowlisted and stays inside its grant's path slots, which this one does not. The quoted spelling passes the same literal {} to the command, and the call then reaches the harness's own permission decision. If you genuinely need the bare form, run it yourself with !<command>." ;;
     esac
     if grep -qF '@{' <<<"$sqstripped"; then
         guard_block "spell out the git-ref shorthand '@{...}' — the harness's matcher refuses the '{' glyph, so the call costs an out-of-band permission decision. Use 'origin/<branch>..HEAD' for '@{u}..', or the resolved ref/hash for a reflog form."
@@ -1543,6 +1548,207 @@ guard_rule_script_interpreter() {
     done < <(sed -E 's/\|\||&&|;/\n/g' <<<"$s")
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 24's regex literal for one run of a committed pattern: every metacharacter bracketed or escaped, so no pattern text reaches the regex engine as syntax
+_guard_ere_literal() {
+    local s="$1" out='' c k
+    for ((k = 0; k < ${#s}; k++)); do
+        c="${s:k:1}"
+        case "$c" in
+            '\') out+='[\]' ;;
+            '^') out+='\^' ;;
+            ']') out+='[]]' ;;
+            '[' | '.' | '(' | ')' | '{' | '}' | '$' | '|' | '?' | '+' | '*') out+="[$c]" ;;
+            *) out+="$c" ;;
+        esac
+    done
+    printf '%s' "$out"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 24's cleanness test on one word: the full word carries no '..' component, and the text opening the path does not begin with '/' or '~'; prints what the word reaches past
+_guard_unclean_word() {
+    case "/$1/" in */../*) printf "'%s', which carries a '..' component" "$1"; return 0 ;; esac
+    case "$2" in
+        /*) printf "'%s', an absolute path" "$1"; return 0 ;;
+        '~'*) printf "'%s', a home-relative path" "$1"; return 0 ;;
+    esac
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 24 on one path-slot capture of the sentinel view: the first word is tested in the full shell word carrying it, and every later non-option word must re-match the slot's own token and be clean itself; prints the reach
+_guard_slot_capture() {
+    local sv="$1" off="$2" len="$3" token="$4" start="$5" right="$6"
+    local cap firstw pre post word lead rest ext w
+    local -a later=()
+    cap="${sv:off:len}"
+    firstw="${cap%%[[:space:]]*}"
+    pre="${sv:0:off}"
+    pre="${pre##*[[:space:]]}"
+    post="${sv:off}"
+    post="${post%%[[:space:]]*}"
+    word="$pre$post"
+    word="${word//$'\x01'/ }"
+    word="${word//$'\x02'/$'\t'}"
+    lead="$firstw"
+    [[ -z "$lead" && "$start" == 1 ]] && lead="$right"
+    _guard_unclean_word "$word" "$lead" && return 0
+    rest="${cap:${#firstw}}"
+    if [[ "$rest" == *[![:space:]]* && "$rest" != *[[:space:]] ]]; then
+        ext="${sv:off+len}"
+        rest+="${ext%%[[:space:]]*}"
+    fi
+    read -ra later <<<"$rest"
+    for w in ${later[@]+"${later[@]}"}; do
+        case "$w" in -*) continue ;; esac
+        w="${w//$'\x01'/ }"
+        w="${w//$'\x02'/$'\t'}"
+        if ! guard_allow_match "$w" "$token"; then
+            printf "'%s', a second operand outside the slot" "$w"
+            return 0
+        fi
+        _guard_unclean_word "$w" "$w" && return 0
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 24 on one segment, reading the caller's inners: the skeleton's words say which words are redirects, the dequoted words aligned one-for-one carry the content, the harness view strips the wrappers, and each matching committed pattern carrying a path slot is parsed leftmost-greedy; prints the reach and returns 0, 1 when clean, 2 when the segment cannot be decided
+_guard_slot_segment() {
+    local k n sv rv inner pat j c lit left right re g off len reach nstars
+    local -a sw=() dw=() kept=() caps=() slot=() token=() start=() rlit=() litlen=()
+    read -ra sw <<<"$1"
+    read -ra dw <<<"$2"
+    [[ "${#sw[@]}" == "${#dw[@]}" ]] || return 2
+    n=${#sw[@]}
+    for ((k = 0; k < n; k++)); do
+        case "${sw[k]}" in
+            '<<<' | '>' | '>>' | '<' | '&>' | '&>>' | '>&' | [0-9]'>' | [0-9]'>>' | [0-9]'<' | [0-9]'>&')
+                k=$((k + 1))
+                continue ;;
+            *'<<'?*) [[ "${sw[k]}" == '<<<'?* ]] && continue; return 2 ;;
+            '>'?* | '<'?* | '&>'?* | [0-9]'>'?* | [0-9]'<'?*) continue ;;
+        esac
+        kept+=("${dw[k]}")
+    done
+    [[ "${#kept[@]}" -ge 1 ]] || return 1
+    sv="$(_guard_harness_view "${kept[*]}")"
+    sv="${sv//\\/}"
+    rv="${sv//$'\x01'/ }"
+    rv="${rv//$'\x02'/$'\t'}"
+    for inner in "${inners[@]}"; do
+        pat="${inner//:\*/\*}"
+        case "$pat" in *'*'*) ;; *) continue ;; esac
+        case "$pat" in *'?'* | *'['*) continue ;; esac
+        guard_allow_match "$rv" "$pat" || continue
+        re='^'
+        lit=''
+        slot=() token=() start=() rlit=() litlen=()
+        for ((j = 0; j < ${#pat}; j++)); do
+            c="${pat:j:1}"
+            if [[ "$c" != '*' ]]; then
+                lit+="$c"
+                continue
+            fi
+            re+="$(_guard_ere_literal "$lit")(.*)"
+            litlen+=("${#lit}")
+            lit=''
+            left="${pat:0:j}"
+            left="${left##*[[:space:]]}"
+            right="${pat:j+1}"
+            right="${right%%[[:space:]]*}"
+            token+=("$left*$right")
+            if [[ "$left*$right" == */* ]]; then slot+=(1); else slot+=(0); fi
+            if [[ -z "$left" ]]; then start+=(1); else start+=(0); fi
+            rlit+=("${right%%\**}")
+        done
+        re+="$(_guard_ere_literal "$lit")\$"
+        [[ "$rv" =~ $re ]] || continue
+        caps=("${BASH_REMATCH[@]:1}")
+        nstars=${#slot[@]}
+        off=0
+        for ((g = 0; g < nstars; g++)); do
+            off=$((off + litlen[g]))
+            len=${#caps[g]}
+            if [[ "${slot[g]}" == 1 ]] \
+                && reach="$(_guard_slot_capture "$sv" "$off" "$len" "${token[g]}" "${start[g]}" "${rlit[g]}")"; then
+                printf "'Bash(%s)' matches this command only through a path slot that reaches %s" "$inner" "$reach"
+                return 0
+            fi
+            off=$((off + len))
+        done
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 24's test, a block for rule 24 and a predicate for rules 4 and 7: prints the reach and returns 0, returns 1 when every matching slot is clean, 2 when the command cannot be decided; 'predicate' reads a segment carrying a quoted statement separator whole rather than skipping it
+_guard_slot_reach() {
+    local raw="$1" mode="${2:-}" live s v i dseg rc undecided=0
+    local -a inners=() segs=() dsegs=()
+    live="$(guard_skeleton "$raw" sq hdq)"
+    case "$live" in *'$'* | *'<('* | *'>('*) return 2 ;; esac
+    case "$raw" in *'`'*) return 2 ;; esac
+    mapfile -t inners < <(_guard_allow_inners)
+    [[ "${#inners[@]}" -ge 1 ]] || return 1
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    v="$(_guard_dequoted_view "$raw" "$s")" || return 2
+    mapfile -t segs < <(guard_split_compound "$s")
+    mapfile -t dsegs < <(guard_split_compound "$v")
+    [[ "${#segs[@]}" == "${#dsegs[@]}" ]] || return 2
+    for ((i = 0; i < ${#segs[@]}; i++)); do
+        dseg="${dsegs[i]}"
+        if [[ "$dseg" == *[$'\x03\x04\x05']* ]]; then
+            if [[ "$mode" != predicate ]]; then
+                undecided=1
+                continue
+            fi
+            dseg="${dseg//$'\x03'/;}"
+            dseg="${dseg//$'\x04'/|}"
+            dseg="${dseg//$'\x05'/&}"
+        fi
+        rc=0
+        _guard_slot_segment "${segs[i]}" "$dseg" || rc=$?
+        [[ "$rc" == 0 ]] && return 0
+        [[ "$rc" == 2 ]] && undecided=1
+    done
+    [[ "$undecided" == 1 ]] && return 2
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rules 4 and 7's grant test on a rewritten command: every segment of its dequoted view matches a committed allow pattern, and rule 24's test finds no reach and can decide; a failed settings read, an unalignable view or an undecidable bound fails, so a rewrite never turns a missing read into an allow
+_guard_rewrite_granted() {
+    local cmd="$1" s v seg inner hit rc=0
+    local -a inners=()
+    mapfile -t inners < <(_guard_allow_inners)
+    [[ "${#inners[@]}" -ge 1 ]] || return 1
+    s="$(guard_skeleton "$cmd" sq dq hd)"
+    v="$(_guard_dequoted_view "$cmd" "$s")" || return 1
+    while IFS= read -r seg; do
+        seg="${seg//$'\x01'/ }"
+        seg="${seg//$'\x02'/$'\t'}"
+        seg="${seg//$'\x03'/;}"
+        seg="${seg//$'\x04'/|}"
+        seg="${seg//$'\x05'/&}"
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        seg="${seg%"${seg##*[![:space:]]}"}"
+        [[ -z "$seg" ]] && continue
+        hit=0
+        for inner in "${inners[@]}"; do
+            if guard_allow_match "$seg" "$inner"; then
+                hit=1
+                break
+            fi
+        done
+        [[ "$hit" == 1 ]] || return 1
+    done < <(guard_split_compound "$v")
+    _guard_slot_reach "$cmd" predicate >/dev/null || rc=$?
+    [[ "$rc" == 1 ]]
+}
+
+guard_rule_grant_path_slot() {
+    local reach
+    case "$1" in */*) ;; *) return 0 ;; esac
+    reach="$(_guard_slot_reach "$1")" || return 0
+    guard_block "don't reach past a committed grant's path slot — $reach. A Bash rule's '*' spans '/', '..' and whole words, so a grant written for one directory reaches paths its author never named. Spell the path inside the pattern's reach, or, if you genuinely need this command, run it yourself with !<command>."
+}
+
 guard_generic_rules() {
     local cmd="$1"
     guard_rule_cd_compound "$cmd"
@@ -1568,4 +1774,5 @@ guard_generic_rules() {
     guard_rule_git_rewrite "$cmd"
     guard_rule_rm_tracked "$cmd"
     guard_rule_script_interpreter "$cmd"
+    guard_rule_grant_path_slot "$cmd"
 }

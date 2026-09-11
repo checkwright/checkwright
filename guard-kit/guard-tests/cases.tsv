@@ -27,10 +27,16 @@ fallthrough	file /usr/bin/time
 block	some-runner 2> op.err
 fallthrough	some-runner 2> .tmp/op.err
 
-# rule 4 — absolute-path read-only repo script (rewrite) vs other script (block)
+# rule 4 — absolute-path read-only repo script (rewrite) vs other script (block).
+#          The rewrite emits allow, so it attaches only when the rewritten command
+#          is allowlisted (the sandbox carries both script globs) and stays inside
+#          rule 24's path slots; otherwise the corrective block fires, for an
+#          unallowlisted scratch script and for a runner glob reached past its slot
 rewrite	bash @ROOT@/scripts/check-foo.sh
 rewrite	@ROOT@/scripts/check-env.sh --list
 block	bash @ROOT@/scripts/gen-configs.sh
+block	bash @ROOT@/.tmp/check-evil.sh
+block	bash @ROOT@/../evil/checks/check-x.sh
 
 # rule 5 — repo-root absolute prefix (non-script) steered; foreign path untouched.
 #          The rule declares 'sq dq hd', so a path merely *named* — quoted either
@@ -62,7 +68,14 @@ advise	git commit -F - <<'MSG'@NL@names a $(cmd) in the body@NL@MSG
 #          'sq dq hd': '{' is a matcher glyph, not an expansion, so a
 #          double-quoted quantifier and a heredoc-body brace are both inert —
 #          the corrective (spell the members) is inapplicable to either.
-rewrite	find . -exec rm {} \;
+#          The placeholder rewrite emits allow, so it attaches only when the
+#          rewritten command is allowlisted and stays inside rule 24's path slots;
+#          an unallowlisted and an unbounded placeholder block with the quoted-
+#          spelling corrective instead
+block	find . -exec rm {} \;
+block	ls | xargs -I{} rm {}
+rewrite	find .tmp/x -exec cat {} +
+block	find .tmp/../x -exec cat {} +
 block	git log @{u}..
 block	echo {1..5}
 block	mkdir -p a/{b,c}
@@ -363,5 +376,21 @@ fallthrough	printf 'print(1)' | python3
 fallthrough	python3 tools/gen.py
 fallthrough	bash gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh
 
-# rule 24 — anything else falls through to the friction log
+# rule 24 — a committed grant matched only by reaching past its path slot. The
+#           sandbox carries a scratch 'rm -rf .tmp/*' grant and a
+#           '*/checks/check-*.sh' runner glob: a '..' component, an absolute path,
+#           a second operand outside the slot and a reach behind a stripped wrapper
+#           each block, while a clean slot, a dropped redirect and a declined
+#           backtick fall through. Targets are untracked, so rule 22 never answers
+block	rm -rf .tmp/../scratch.txt
+block	rm -rf .tmp/x scratch.txt
+block	bash ../../evil/checks/check-x.sh
+block	bash /elsewhere/checks/check-x.sh
+block	timeout 5 rm -rf .tmp/../scratch.txt
+fallthrough	rm -rf .tmp/x .tmp/y
+fallthrough	rm -rf .tmp/x 2>/dev/null
+fallthrough	bash guard-kit/checks/check-x.sh
+fallthrough	rm -rf .tmp/`printf x`/y
+
+# rule 25 — anything else falls through to the friction log
 fallthrough	make build

@@ -85,8 +85,7 @@ exactly the *firing after this advisory ships* that rule 15 names as the atteste
 
 ### (1) The harness view: one helper models the matcher's wrapper strip, with a compiled twin
 
-**Applied**, except one clause: §The guard framework's duplication paragraph does not yet name the
-helper's shell caller, because that caller is rule 24 and merges with delta 7.
+**Applied**, the duplication paragraph's rule-24 caller clause included.
 
 A new `lib/guard.sh` helper, `_guard_harness_view <segment>`, returns the segment as the permission
 matcher reads it: with the leading wrappers the matcher strips removed, repeatedly, from the head
@@ -321,7 +320,10 @@ data loss.
 
 A new rule sits immediately before fall-through logging. It **blocks** a segment that a committed
 `Bash(…)` allow pattern matches, when that pattern's **path slot** absorbs text reaching outside the
-path the pattern names {design-bearing}. **Not yet applied.**
+path the pattern names {design-bearing}. **Applied**, with calibrations stated in rule 24: redirects
+are dropped by the skeleton's words, a quoted blank stays inside its word, the first word is tested
+in the full shell word carrying it, a token-opening slot's empty capture opens the path with the
+next literal, and any live `$` declines.
 
 **The path slot.** A `*` in a committed pattern is a path slot when the whitespace-delimited token
 of the pattern containing it also contains a `/`. In `rm -rf .tmp/*` and `bash */checks/check-*.sh`
@@ -488,9 +490,11 @@ regardless. No number moves.
 
 The decision table, the knob test and the parity corpus take every behavioral change above
 {mechanical}. §Testing's non-monotone rule binds throughout: every row whose expected column a delta
-could move is re-derived, never assumed. **Not yet applied**, except the parts for deltas 1 to 4 and
-6: the rule 2, rule 8 and rule 22 force-arm rows, the `GUARD_KIT_SEARCH_TOOLS` cases of the knob
-test, the `harness-view` parity corpus, and the `scan_prompts` key test.
+could move is re-derived, never assumed. **Applied**, except the parts for deltas 8 and 9: the rule
+19 arm (B) rows, the rows whose trailing `&` flips from advise to block, and the background table's
+flipped and canonical-launch rows. The sandbox allowlist grew to eight entries: the rule 4 script
+globs, a scratch `rm -rf` slot grant, a `*/checks/check-*.sh` runner glob, and a
+`find .tmp/* -exec cat {} +` pattern for rule 7's granted and unbounded placeholder rows.
 
 - **`guard-tests/cases.tsv`:**
   - Firing and non-firing rows for rule 2's arms (b) and (c) (delta 2), rule 8's two `awk` shapes and
@@ -524,9 +528,9 @@ test, the `harness-view` parity corpus, and the `scan_prompts` key test.
 ### (11) The renumber, the knob surfaces and the mirror
 
 Fall-through logging renumbers from 24 to 25, and the knob and mirror surfaces follow the deltas
-above {mechanical}. **Not yet applied**, except the parts for deltas 1 to 4: the
-`GUARD_KIT_SEARCH_TOOLS` layout bullet, template line and README sentence, the knob test's layout
-line, and the mirror regenerated for them.
+above {mechanical}. **Applied**: the renumber at its three sites and the dispatch line, both knobs'
+layout bullets, template lines and README naming, the knob test's layout line, and the mirror
+regenerated for them.
 
 - **The renumber has three sites:** the ruleset's own list, `cases.tsv`'s section comment, and
   §scan-prompts' `(rule 24)`, which becomes `(rule 25)`. `lib/guard.sh`'s `guard_generic_rules` gains
@@ -542,8 +546,9 @@ line, and the mirror regenerated for them.
 
 A `guard_rewrite` emits `permissionDecision: allow`, so a rewrite is a grant, and rules 4 and 7 each
 issue one unconditionally {design-bearing}. Both keep their rewrite and attach it only when the
-**rewritten** command passes two tests; otherwise each **blocks** with its corrective. **Not yet
-applied.**
+**rewritten** command passes two tests; otherwise each **blocks** with its corrective. **Applied**; taken
+as a predicate, rule 24's test fails closed, reading a segment carrying a quoted statement separator
+whole and failing on every other decline.
 
 - **The allowlist test.** Every segment of the rewritten command, split as §The guard framework's
   splitter splits it, matches a committed `Bash(…)` pattern through `guard_allow_match` on

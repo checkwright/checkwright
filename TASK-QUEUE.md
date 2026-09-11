@@ -12,69 +12,6 @@
 
 ## New Features
 
-- **grant-argument-bounding-mechanism** [spec: SPEC-command-classify.md] — two committed grants
-  reach a destructive form and no allow-glob narrowing can stop either.
-  **Both findings are verified rather than surmised**, at build 2026-08-22 by a read-only worktree
-  sweep over all 105 committed `Bash(` entries.
-  **(1) The `.tmp/` rm family escapes the scratch dir.** `Bash(rm .tmp/*)`, `Bash(rm -f .tmp/*)`
-  and `Bash(rm -rf .tmp/*)` each match `rm -rf .tmp/../.git`, and reach any irreplaceable untracked
-  local file — `BRIEF.local.md`, `OPS.local.md`, `ENV.local.md`. `guard_rule_rm_tracked` fires only
-  on a TRACKED target, so nothing in the guard covers this.
-  **(2) `Bash(git rm -q *)` reaches `git rm -q -f <modified file>`**, destroying uncommitted work
-  irrecoverably; the sweep demonstrated it in a scratch repo rather than reasoning about it. No
-  guard rule covers that either — `guard_rule_rm_tracked` matches a bare `rm` only.
-  **That grant is LOAD-BEARING, which is what makes this hard.** `guard_rule_rm_tracked` STEERS
-  every tracked-file deletion INTO `git rm -q`, so narrowing the grant taxes a mechanic the guard
-  itself mandates. It is not a grant anyone may simply delete.
-  **Why no allow-glob fixes it.** A Bash rule's `*` "matches any sequence of characters including
-  spaces" (vendor permissions doc), so it spans `/` and `..` and cannot bound an argument. That
-  same doc warns outright that "Bash permission patterns that try to constrain command arguments
-  are fragile", and offers exactly two remedies: deny rules, or a PreToolUse hook.
-  **Candidate shapes, none costed:** a committed `deny` list, which outranks allow but inherits the
-  fragility the doc names; extend the guard's rules, the vendor's own remedy and the one this repo
-  already owns the hook for; or accept and declare, recording the reach rather than removing it.
-  **Why design-pending:** the three trade differently against a boundary this repo has never
-  used — `.claude/settings.json` carries no `deny` list at all today — and the first is an
-  operator-class edit besides, so the mechanism choice decides who may even land it.
-  **Cost while deferred:** two live paths to irrecoverable data loss, one of them reachable by a
-  single mistyped path inside a grant every session uses for routine scratch cleanup.
-  Filed 2026-08-22 by build, split out of `guard-grant-review` on the lead's ruling that choosing
-  the mechanism is design work and scope-gated intake makes it a costed Deferred entry by default.
-  **Leads the `guard-command-classification` set — operator direction, 2026-09-11, lead-relayed.**
-  **Promoted 2026-09-11 by spec** into `guard-kit/SPEC-command-classify.md`, with seven siblings.
-  The mechanism chosen is a guard rule that bounds each committed grant's path slot, and
-  `git rm` loses its force flag; a committed deny list stays an operator-optional backstop.
-  **Widened to rule 7's `{}` rewrite — operator direction, 2026-09-11, lead-relayed.** That rewrite
-  emits allow, so it silently grants `find . -type f -exec rm -rf {} \;`. The allow now attaches
-  only when the rewritten command is allowlisted and passes rule 24's bound, else it blocks with
-  the corrective (the amendment's delta 12).
-
-- **grant-path-traversal-exposure** [spec: SPEC-command-classify.md] — the committed script-runner
-  globs match a traversing path, a code-execution class the grant narrowing now covers.
-  **The exposure, stated plainly:** `Bash(bash */checks/check-*.sh)` matches
-  `bash ../../evil/checks/check-x.sh`, because a Bash rule's `*` spans `/`. Its siblings carry the
-  same shape — `bash */bin/run-*-tests.sh`, `bash */gate-tests/*.test.sh` and
-  `bash */smoke/install.sh`. Verified at build 2026-08-22; the `drift-kit/kpis/*.sh` pair was
-  listed here too and was retired with the 2026-08-29 KPI port, leaving four live globs.
-  **Why it is genuinely weaker than a data-loss finding:** reaching a destructive script needs a
-  second precondition the allowlist cannot evidence — a hostile script must already exist at a
-  matching path. `scripts/bash-guard.sh` also blocks `bash .tmp/…` outright, closing the one path a
-  session may write to freely, and routes it through the `--scratch-run` arm, which resolves the
-  real path and refuses anything outside the scratch dir.
-  **Widened in, and joins the `guard-command-classification` unit set — operator direction,
-  2026-09-11, lead-relayed:** the 2026-08-20 narrowing (data-loss forms) now covers this
-  code-execution class. **Why design-pending:** whether these globs can be re-spelled without
-  breaking the battery they exist to run is untouched and unbought.
-  **Cost while deferred:** low and precondition-bound, but it spans the whole script-runner
-  surface rather than one grant, so a later change making a matching path writable would arm the
-  whole family at once, and would do it without a signal anyone reads.
-  Filed 2026-08-22 by build on the lead's ruling; surfaced by the same sweep that produced
-  `grant-argument-bounding-mechanism`, which is the data-loss half of the one audit.
-  **Widened to rule 4's absolute-path rewrite — operator direction, 2026-09-11, lead-relayed.** That
-  rewrite emits allow, so it silently grants `bash <root>/.tmp/check-evil.sh` ahead of rule 23. The
-  allow now attaches only when the rewritten command is allowlisted and passes rule 24's bound,
-  else it blocks with the corrective (the amendment's delta 12).
-
 - **backgrounded-shell-child-run-record-unenforced** [spec: SPEC-command-classify.md] — the
   launch-time liveness record is advised and never required.
   recurrence: backgrounded-shell-child-run-record-unenforced 2026-08-28
@@ -5451,5 +5388,7 @@
 - guard-read-steer-tool-coverage
 - guard-steer-names-absent-tool
 - ro-bins-write-option-bypass
+- grant-argument-bounding-mechanism
+- grant-path-traversal-exposure
 
 ## Lessons Learned

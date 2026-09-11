@@ -266,7 +266,14 @@ fn build_sandbox() -> Result<Sandbox, String> {
     mkdir(&at(".claude"))?;
     write(
         &at(".claude/settings.json"),
-        "{ \"permissions\": { \"allow\": [\"Bash(git status)\", \"Bash(ls)\", \"Bash(printf:*)\"] } }\n",
+        concat!(
+            "{ \"permissions\": { \"allow\": [",
+            "\"Bash(git status)\", \"Bash(ls)\", \"Bash(printf:*)\", ",
+            "\"Bash(bash scripts/check-*.sh)\", \"Bash(scripts/check-*.sh *)\", ",
+            "\"Bash(rm -rf .tmp/*)\", \"Bash(bash */checks/check-*.sh)\", ",
+            "\"Bash(find .tmp/* -exec cat {} +)\"",
+            "] } }\n"
+        ),
     )?;
     Ok(sandbox)
 }

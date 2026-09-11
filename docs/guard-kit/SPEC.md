@@ -179,8 +179,9 @@ Primitives a consumer guard composes; each emits the harness's
 - `guard_split_compound <skeleton>` — the compound splitter: emits one segment
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
   `|`). Also not a hook primitive — the single implementation every **shell**
-  consumer that reasons *per segment* shares (rules 2/8/12/14/15/17/18/19/20/22 and
-  the read-compound carve-out of rules 9/10), so the harness's
+  consumer that reasons *per segment* shares (rules
+  2/4/7/8/12/14/15/17/18/19/20/22/24 and the read-compound carve-out of rules
+  9/10), so the harness's
   per-segment matching surface is modelled in exactly one place **on this
   substrate**. Across both substrates it is modelled in **two** places — the
   `scan-prompts` ranker's grant test reasons per segment through the compiled
@@ -281,10 +282,12 @@ literal must not acquire one.
 
 **The duplication is permanent rather than transitional**, which is what makes
 the machine-held disposition the right one instead of a concession: the shell
-caller set for the four cannot empty. For the first three the live callers are rules
-2/8/12/14/15/17/18/19/20/22 and the read-compound carve-out of rules 9/10; for
-`guard_allow_match` it is rule 20's silent-grant guard — and all of them are
-functions in this same permanently-shell file. So the comparator
+caller set for the five cannot empty. For the first three the live callers are
+rules 2/4/7/8/12/14/15/17/18/19/20/22/24 and the read-compound carve-out of rules
+9/10; for `guard_allow_match` they are rule 20's silent-grant guard, rules 4 and
+7's rewrite grant test and rule 24's slot parse; for `_guard_harness_view` it is
+rule 24's view — and all of them are functions in this same permanently-shell
+file. So the comparator
 does not retire either, and the arm it answers on is durable by construction.
 This is what distinguishes these modes from `--declaration-parity`, retired
 when its second holder went.
@@ -314,8 +317,8 @@ stays live, which is the conservative direction. And the normalizer models **quo
 shell semantics**: a construct that survives its scan and is not one of the three
 classes is treated as live, the fail-toward-matching direction and the one a
 guard should err in. That bound is why the command/process-substitution and
-backtick tests in rules 9, 10, 11, 12, 13, 14, 15, 18, 19 and 22 read the **raw**
-command rather than
+backtick tests in rules 9, 10, 11, 12, 13, 14, 15, 18, 19, 22 and 24 read the
+**raw** command rather than
 a skeleton and must keep doing so — a `"$(…)"` inside double quotes still
 executes, so a rule that declared `dq` inert for *that* test would hand an
 auto-allow to a command substitution it could not see. Those tests are
@@ -333,6 +336,13 @@ still sees every substitution the roster's members see, and stops declining on
 the one region where the spelling is inert — the same asymmetry rule 6 already
 draws for `hdq` against `dq`, applied to a backtick instead of a `$`. A rule
 declining on `hd` here *would* be a hole, which is why the mode is `hdq`.
+
+**Rule 24 splits the two tests, and the split is safe in both of its uses.** Its
+backtick test reads the raw command, as the roster does. Its expansion and
+process-substitution test reads the `sq hdq` view, because a single-quoted span
+cannot expand any more than a quoted-delimiter heredoc body can, while `dq` stays
+live. As a block the rule loses nothing by declining; where rules 4 and 7 take its
+test as a grant predicate, every decline fails the grant.
 
 **Rule 12 is the one rule that reaches its verdict off the raw command, and the
 exception is forced rather than chosen.** Its predicate is *the pattern literal
@@ -583,7 +593,20 @@ that harness exists would be designing against no case.
    rewritten to the repo-relative form via `guard_rewrite` (the relative
    spelling is what allowlist globs match). The roster is the
    `GUARD_KIT_RO_SCRIPTS` globs (default `check-*.sh`). Any other
-   absolute repo-script spelling gets a corrective block. **Placed before**
+   absolute repo-script spelling gets a corrective block.
+   **The rewrite is a grant, so it attaches only when the rewritten command is
+   granted and bounded.** `guard_rewrite`'s envelope carries
+   `permissionDecision: allow`, so the rewrite attaches only when every segment
+   of the relative command, split as §The guard framework's splitter splits it
+   over the dequoted view, matches a committed `Bash(…)` pattern through
+   `guard_allow_match`, and the command passes rule 24's test taken as a
+   predicate. A missing `jq`, a missing settings file or a parse error fails the
+   first test, so a grant resting on a settings read never turns a missing file
+   into an allow, which is rule 18's contract for its own read. Otherwise the
+   corrective block fires, and the re-issued relative command meets every later
+   rule, rule 23's scratch-body refusal included: `bash <root>/.tmp/check-evil.sh`
+   now blocks rather than being granted ahead of rule 23. The shared test is
+   `_guard_rewrite_granted`, which rule 7 calls too. **Placed before**
    rule 5, which would otherwise steer the same command less precisely.
 5. **Repo-root absolute prefix (non-script)** — any other command carrying
    the literal repo-root prefix is steered to the repo-relative spelling.
@@ -621,7 +644,20 @@ that harness exists would be designing against no case.
    `xargs -I{}`), when every residual brace is exactly `{}`, is rewritten
    via `guard_rewrite` — each `{}` single-quoted to `'{}'`,
    behavior-preserving (the shell passes a literal `{}` either way) and
-   invisible to the matcher on the same premise as rule 6's strip. Every
+   invisible to the matcher on the same premise as rule 6's strip. **That
+   rewrite is a grant too, so it attaches on rule 4's test** — the rewritten
+   command allowlisted segment by segment and bounded by rule 24, through
+   `_guard_rewrite_granted` — and otherwise **blocks**, with a corrective naming
+   the quoted `'{}'` spelling for the session to write itself, so the call
+   reaches the harness's own decision. `find . -type f -exec rm -rf {} \;` and
+   `ls | xargs -I{} rm {}` block wherever that command is not allowlisted.
+   **A block and not a fall-through**, because an unrewritten `{}` meets the
+   matcher's brace refusal and the harness documents no `updatedInput` carried
+   without a decision, so a fall-through cannot deliver the rewrite; the
+   corrective hands the session the same behavior-preserving respelling without
+   the grant. The cost is stated: a placeholder call whose command is not
+   allowlisted now takes a block and a re-issue where it was granted silently,
+   the price of the grant having been unconditional. Every
    expanding form is **blocked** with the written-out corrective:
    git-ref shorthand (`@{u}`, `@{-n}`, `<ref>@{n}`) names the explicit
    spelling (`origin/<branch>..HEAD`, or the resolved ref/hash);
@@ -1484,11 +1520,84 @@ that harness exists would be designing against no case.
     **backtick** is deliberately *not* declined on, since it is the one
     body-source spelling rule 6 does not reach and declining there would ship the
     hole the rule exists to close.
-    **Placed last, immediately before fall-through logging.** It grants nothing,
-    so it inherits no auto-allow ordering argument; and a command reaching it has
+    **Placed at the tail, immediately before rule 24.** It grants nothing, so it
+    inherits no auto-allow ordering argument; and a command reaching it has
     already been declined by every steer and every grant above, which is exactly
-    the population whose body source is worth resolving.
-24. **Fall-through logging** — anything neither blocked nor auto-allowed is
+    the population whose body source is worth resolving. Rule 24 grants nothing
+    either, so the order of the two decides only which block a command meeting
+    both receives.
+24. **A committed grant matched only by reaching past its path slot** — a
+    segment a committed `Bash(…)` allow pattern matches is **blocked** when that
+    pattern's **path slot** absorbs text reaching outside the path the pattern
+    names. A `*` in a committed pattern is a path slot when the
+    whitespace-delimited token of the pattern carrying it also carries a `/`: in
+    `rm -rf .tmp/*` and `bash */checks/check-*.sh` every `*` is one, and in
+    `git add *` and `bash gate-sdk/bin/run-gates.sh *` none is. The slot is what
+    the pattern's author wrote, so no knob and no vocabulary are needed, and a
+    consumer's `Bash(rm -rf build/*)` is bounded exactly as a scratch-dir grant
+    is. The test, per segment:
+    - **(1) Read the harness view.** The segment's dequoted text — rule 8's
+      dequoted view, quote characters removed and content kept, split on the
+      `sq dq hd` skeleton — with its redirects dropped and its backslashes
+      removed, through `_guard_harness_view`. The skeleton's words say which
+      words are redirects and the dequoted words carry the content, aligned one
+      for one, so a quoted `>` is an operand and a quoted blank stays inside its
+      word.
+    - **(2) Parse the matching pattern.** Each committed pattern that
+      `guard_allow_match` finds matching the view is translated into an anchored
+      regular expression, each `*` a capture group, and the leftmost-greedy parse
+      is taken.
+    - **(3) Test each path slot's capture.** Its first word must be clean, read
+      in the full shell word carrying it; every later non-option word must
+      re-match the slot's own token and be clean itself. A clean word carries no
+      `..` component and does not begin with `/` or `~`. At a slot opening its
+      token, an empty capture opens the path with the literal after the `*`, so
+      `bash /checks/check-x.sh` reads as absolute.
+    - **(4) Decide.** Any unclean word blocks, and the message names the
+      pattern, the word, and what it reaches past — a `..` component, an absolute
+      or home-relative path, or a second operand outside the slot. The corrective
+      is to spell the path inside the pattern's reach or to run the command
+      through `!<command>`. A match with every slot clean declines, and the
+      harness grants correctly.
+
+    **Declines**, in this ruleset's established directions: an expansion,
+    substitution or backtick anywhere in the command, any live `$` included,
+    since the matcher refuses every expansion; a pattern carrying `?` or a
+    bracket class, which is skipped; a segment whose dequoted text carries a
+    quoted statement separator, which is skipped; a heredoc-bearing command,
+    whose dequoted view cannot be aligned; and no `jq`, no settings file, or a
+    parse error, on `_guard_allow_inners`' fail-open read.
+    **It closes two reaches without re-spelling a grant.** `rm -rf .tmp/../<file>`
+    and `rm -rf .tmp/x <file>` block against a scratch-dir `rm` grant, and
+    `bash ../../evil/checks/check-x.sh` and `bash /elsewhere/checks/check-x.sh`
+    block against a script-runner glob, while the committed globs stay exactly
+    as they are.
+    **Why a guard rule and not a committed deny list.** A deny list matches per
+    subcommand and outranks a hook's allow, which makes it the one
+    harness-enforced layer. It has three disqualifying properties: a deny glob
+    cannot express *a second operand outside the directory*; it inherits the
+    fragility the harness's permission reference names for patterns that
+    constrain arguments; and it is a permission-settings edit, which a consumer
+    may reserve to its operator, so choosing it can decide that no session lands
+    the fix. The rule is derived from the settings it bounds, is testable in the
+    decision table, and lands with the kit. A deny list stays available as a
+    harness-enforced backstop an operator may add independently.
+    **Placed immediately before fall-through logging.** No auto-allow above it
+    grants a rule-24 subject: rule 16 truncates only, rule 17's emitter bound
+    refuses `rm` and `bash`, rule 18's roster carries neither, and rule 19's loop
+    body is `sleep` only. Rules 4 and 7 run ahead of it and each emit a rewrite
+    whose envelope carries an allow, so both apply this rule's test as a
+    predicate before that allow attaches, and no rewrite grants a rule-24 subject
+    either. **Taken as a predicate the test fails closed**: it reads a segment
+    carrying a quoted statement separator whole rather than skipping it, and
+    every other decline fails the grant.
+    **Honest limits.** The test is lexical, so a symlink under the slot reaches
+    past it undetected. The leftmost-greedy parse is one parse of a pattern that
+    may admit several. A wrapper option the harness view declines to strip hides
+    a reach the matcher would grant. And a command the rule declines — a
+    heredoc-bearing one among them — is left to the harness's own decision,
+    grant included.
+25. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 **Nothing above claims the sleep half was already enforced.** Before rule 13, no
@@ -1875,7 +1984,7 @@ it needs to know the bite was measured rather than assumed.
 **This instrument cannot size the population its neighbouring rules already
 admit, and that is a property of the grant boundary rather than a gap in the
 sweep.** `guard_log_fallthrough` runs only after every rule has declined
-(rule 24), so a granted call is never a log line. Two consequences a reader of
+(rule 25), so a granted call is never a log line. Two consequences a reader of
 this ranking has to carry. First, a question of the form *how often does the
 shape rule 17 grants actually occur* has **no answer in this log** — a zero here
 is zero by design, not zero by finding, and any sizing of that population needs a
@@ -2442,7 +2551,13 @@ keeping its specified behavior:
   splits on tracked versus not), a `.tmp/dead-producer.run` carrying a dead PID
   beside a `.tmp/notes.txt` that is not a record (so every mutating-git row
   asserts rule 14's decline arm rather than the vacuous absence of any record),
-  and a `.claude/settings.json` carrying the three-entry allowlist. A sandbox the
+  and a `.claude/settings.json` carrying the eight-entry allowlist — three bare
+  or `:*` entries for rules 18 and 20, rule 4's two script globs so its rewrite
+  rows keep asserting the grant, a scratch `rm -rf .tmp/*` slot grant and a
+  `*/checks/check-*.sh` runner glob for rule 24's rows to bound, and a
+  `find .tmp/* -exec cat {} +` pattern for rule 7's granted and unbounded
+  placeholder rows. Rule 18's allowlisted-lead widening and rule 20 read the
+  same file, so their rows are re-derived whenever it grows. A sandbox the
   arm could not build is exit 2, the harness-precondition code — the shell form
   would have cascaded it into verdict mismatches naming the wrong cause, which is
   the same reasoning as the `jq` refusal below.
