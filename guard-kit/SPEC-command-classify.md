@@ -1,7 +1,8 @@
 # SPEC amendment: command-classify
 
-**Deltas 1 to 6 are applied, with the parts of deltas 10 and 11 that belong to them; every other
-passage is still a proposal for the build stage to land.** Where replacement wording is given it is marked **Not yet applied** at the passage itself.
+**Deltas 1 to 7 and 12 are applied, with the parts of deltas 10 and 11 that belong to them, rule
+15's exemption (3) wording in delta 8 among them; deltas 8 and 9 are otherwise still a proposal for
+the build stage to land.** Where replacement wording is given it is marked **Not yet applied** at the passage itself.
 
 This amendment serves the eight entries of the `guard-command-classification` unit set, which point
 at it together:
