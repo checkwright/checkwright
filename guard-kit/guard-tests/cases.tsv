@@ -320,8 +320,11 @@ fallthrough	bash worker.sh > .tmp/worker.log 2>&1 & echo "pid=$! run=worker" > .
 fallthrough	bash ../../evil/checks/check-x.sh > .tmp/x.log 2>&1 & echo "pid=$! run=x" > .tmp/x.run; wait
 block	bash .tmp/checks/check-x.sh > .tmp/x.log 2>&1 & echo "pid=$! run=x" > .tmp/x.run; wait; rm -f .tmp/x.run
 block	git rm -q -f tracked.md & echo "pid=$! run=x" > .tmp/x.run; wait
-# (B2) a launch writing a tracked target
+# (B2) a launch writing a tracked target, through every redirect operator that writes one
 fallthrough	bash scripts/check-foo.sh > tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
+fallthrough	bash scripts/check-foo.sh &> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
+fallthrough	bash scripts/check-foo.sh &>> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
+fallthrough	bash scripts/check-foo.sh <> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
 # (B3) an expansion besides the record's own; rule 24's predicate declines a live '$'
 # in the launch too, so this row pins the verdict rather than the clause alone
 fallthrough	scripts/check-foo.sh $1 > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait

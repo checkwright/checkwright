@@ -85,7 +85,9 @@ batch-specific pointers such as the journal path.
   `<key>.run` in repo-local `.tmp/` in the main checkout, never a temporary
   worktree and never a system temp dir — and your wait is a loop on that recorded
   PID's liveness, never a pattern match, whoever started the
-  producer. Leave the record behind when you go: `check-producer-liveness
+  producer. Launch and record in one call, in the spelling guard-kit's rule
+  *Backgrounded launch that records no producer* grants
+  (guard-kit/SPEC.md §The generic ruleset). Leave the record behind when you go: `check-producer-liveness
   <record>` reads it unchanged and `check-producer-liveness .tmp` reads the whole
   set, so whoever arrives next can still tell whether your orphan is writing.
   **Delete it once its producer has exited, and not before** — while it names a
