@@ -2425,6 +2425,16 @@
   **Deliverable:** every one of the twenty read against the rule, each violation either relocated to
   a named owning section or explicitly ruled compliant, with the compliant calls stated so the next
   differential sweep inherits a baseline rather than re-deciding.
+  **Operator direction 2026-09-11, typed message in the lead session, relayed by that lead:** skill
+  templates carry instructions only; the history they hold (attested incidents, dated
+  measurements, which session did what) lives in git, its preferred home, not in a template.
+  `lifecycle-kit/templates/lead.md` and `delegation-kit/templates/agent-execution.md` are skills
+  in this corpus. The lead's reading, not the operator's: history is deleted rather than relocated,
+  git already holding it, while mechanism grounds keep the owning-SPEC route above — refining the
+  relocation wording for the history class — and those two go first, the lead contract loading
+  them whole (685 and 491 lines at close; roughly 23k tokens, a fifth of the lead's context, as
+  the lead measured it). The direction may answer or narrow the blocker's open question. Its
+  priority is no separate directive: `scope-ranking-blind-to-deferral-cost-and-impact`.
   **Cost while deferred:** the rule is ruled and applied to one file, so the corpus is nineteen
   files of unswept prose under a rule that already binds it.
   Filed 2026-08-13 by close, on operator direction; blocked on the reach question above, because a
@@ -2576,8 +2586,24 @@
   **Distinct from `guard-command-prefix-wrapper`** (transparent prefixes for allowlist matching)
   and from the two consumer-side guard entries below: this is the roster knob's own predicate
   being weaker than the grant that reads it.
-  **Fix shape, uncosted:** either a per-binary write-option denylist, or generalize the
-  executor-shaped discriminator into the membership test itself.
+  **Fix shape: an exploration direction, NOT a ruling, open to revision at scope or spec on
+  further facts** — operator-agreed 2026-09-11 by typed message in the lead session, relayed by
+  that lead, which first mislabeled it ruled and corrected that the same day; timing
+  operator-stated: not before the next iteration. The candidate: the guard parses each roster
+  binary's argv rather than trusting the segment's leading binary; every `GUARD_KIT_RO_BINS`
+  member declares its write and execute forms (possibly none) and the auto-allow is withheld on
+  a declared form; an option or positional count the parse cannot classify falls through to the
+  prompt, so a missed form costs a prompt and never a hole; block-with-steer only where a
+  dedicated tool owns the act (`sed -i` to Edit); a gate refuses a member added undeclared; the
+  parser may ride the gate binary as a native arm. Candidate objections to other shapes, equally
+  open: a harness grant cannot tell read from write, a write option having many spellings;
+  warn-only fires after the auto-allow; block-by-default refuses an approvable write; a
+  substituted tool diverges the executed command from the reasoned one. Against the old pair: a
+  pure denylist fails open, while a declaration generalizes the `xargs` discriminator.
+  **Widened witnesses, lead-probed 2026-09-11; roster membership re-verified at close:**
+  `sort --output=` and bundled `-uo`; `uniq`'s second positional argument is its output file;
+  `find`'s `-delete`, `-exec`, `-execdir`, `-ok`, `-okdir`, `-fprint`, `-fprint0`, `-fprintf` and
+  `-fls`; `rg --pre=COMMAND` runs a program.
   **Cost while deferred:** a standing auto-allow that overwrites tracked files with no prompt —
   the narrowest live hole in the permission surface, and the one a reviewer of the roster would
   never see, because the roster reads as a list of safe programs.
@@ -2695,7 +2721,8 @@
   `check-install-disposition` to run the full accounting for every disposition, or move the
   accounting out of `consumer_smoke` into a precommit member — the second buys the coverage but may
   re-buy smoke cost at every commit, which is the trade nothing here settles.
-  **Distinct from `consumer-smoke-targeted-mode-registrar-scope`**, whose axis is the targeted
+  **Distinct from `consumer-smoke-targeted-mode-registrar-scope`** (merged 2026-09-11 into the
+  iceboxed `consumer-smoke-subset-accounting-verdict`), whose axis is the targeted
   single-kit mode severing a cross-kit registrar. This one is about which TIER holds the accounting
   at all, and it fires on the untargeted run that neighbour reports clean.
   **Cost while deferred:** one stage of latency on a mechanical zero-judgement condition a precommit
@@ -5766,6 +5793,161 @@
   Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
   the obvious cheap fix is already landed, and already failed.
   recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
+
+- **iteration-scoped-grant-home-unstated** [design-pending] — an iteration-scoped operator grant
+  has no stated home, and the ruling record it was first filed in was the wrong one.
+  **Operator direction 2026-09-11 through AskUserQuestion in the lead session, confirmed in the
+  same session and relayed by that lead — a direction, not a ruling, rulings being applied via
+  /consult:** such a grant lives in the lead's own resume journal, is relayed with its authority
+  and channel in the dispatch prompt of each stage that spends it, and is archived in the spending
+  commit's message, never in TRAJECTORY.md. With no lead running the operator is in the stage
+  session directly. Applied to the record it would narrow the 2026-09-09 admission test
+  (TRAJECTORY.md §What this file admits), which is /consult's to do. Grounds as relayed:
+  lifecycle-kit/templates/lead.md §Economics already partitions lead state by lifetime and sends
+  iteration-local state to the journal, and the record route misfired.
+  **Owed:** one clause stating the rule in lifecycle-kit/templates/lead.md, with its owning SPEC
+  passage if it is an amendment, and the admission-test change taken through /consult.
+  **Not owed:** the instance's spent paragraph was retired at close step 7 on 2026-09-11, a lead
+  decision under that step's session-class authority, once its `grep -L` discharge oracle, which
+  could never fire, was rewritten.
+  **Cost while deferred:** the next iteration-scoped grant has only precedent to route by, and the
+  precedent is the misfiled one.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: kit text in the lead contract,
+  routed to scope by the dispatch. →icebox refused on the operator's 2026-09-11 direction
+  (AskUserQuestion, lead-relayed) that no inbox bullet enters the Icebox directly.
+
+- **scope-ranking-blind-to-deferral-cost-and-impact** [design-pending] — scope ranks no deferred
+  task by a high cost while deferred or a high impact, though the operator expects such tasks
+  picked first; token waste is one instance of the class.
+  **Operator direction 2026-09-11 in the lead session, relayed by that lead** — by typed message: a
+  deferred task whose cost is token waste is a high-priority fix, and scope's ranking, close's drain
+  and icebox eligibility should join it to the current iteration where joining wastes no further
+  tokens, else promote it into the next iteration as soon as possible; by AskUserQuestion: scope is
+  expected already to pick first a task with a high cost while deferred and a high impact, which is
+  why the `instruction-surface-sweep` priority was no separate directive.
+  **Re-verified at the drain:** lifecycle-kit/templates/stages/scope.md carries no cost or impact
+  ranking criterion — only the recurrence threshold forces entry, inbound edges inform the read,
+  and the composition test is about batching; no token-waste marker exists on the queue,
+  queue-kit/SPEC.md or lifecycle-kit/SPEC.md.
+  **Owed:** the ranking criterion at scope's owning passage, a filer-written way to read cost and
+  impact off an entry (a token-waste declaration its first instance), the join-now-or-next-iteration
+  test, and whether the class is barred from the Deferred-to-Icebox move.
+  **Cost while deferred:** the class is its own cost — the dearest deferrals rank like any other,
+  and every priority rides a hand relay.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a ranking mechanism across two
+  kits. →icebox refused on the operator's 2026-09-11 direction that no inbox bullet enters the
+  Icebox directly.
+
+- **composition-verdict-unrecorded-at-unit-set-ruling** [design-pending] — scope's economic
+  composition test leaves no artifact that it ran, so a lone-unit iteration opens with it unapplied.
+  **The instance, 2026-09-11:** `deferred-pool-triage` opened on one promoted unit. The test
+  (lifecycle-kit/templates/stages/scope.md, the economic composition test) says a lone unit bundles
+  related-surface deferred entries or argues it stands alone; scope's unit-set escalation offered
+  three single cuts and no bundle, and the lead recommended the lone unit without applying it
+  either. The operator stated 2026-09-11 (lead session, typed message, relayed by that lead) that
+  few-unit iterations make little economic sense under the governance-overhead objective.
+  **Re-verified at the drain:** the test is template prose with no verdict field, and lead.md
+  carries no ruling step reading one.
+  **Owed:** a recorded composition verdict inside scope's unit-set escalation, and a lead step that
+  refuses a unit set carrying none.
+  **DISTINCT from `composition-test-scores-a-section-cut-as-one-unit`** (icebox; the test's input
+  when it runs) and `kpi-cost-per-unit` (icebox; the width figure). A mid-iteration join has no
+  route (`post-scope-admission-has-no-promotion-route`, icebox), so the correction lands at a scope.
+  **Cost while deferred:** token waste — every extra iteration re-buys the stage walk's fixed cost.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a scope and lead contract change.
+  →icebox refused on the operator's 2026-09-11 direction that no inbox bullet enters the Icebox
+  directly.
+
+- **lead-cancel-running-work-unforbidden** [design-pending] — no instruction forbids a lead from
+  stopping running work whose loss wastes tokens.
+  **Operator expectation, 2026-09-11, lead session, typed message, relayed by that lead:** a lead
+  never stops a background stage session or its subagents (TaskStop or an equivalent kill)
+  without the operator's explicit confirmation or an explicit per-iteration grant.
+  **Re-verified at the drain:** TaskStop, cancel, kill, abort and interrupt over lead.md,
+  agent-execution.md, the stage-session agent, lifecycle-kit/SPEC.md and CLAUDE.md find liveness
+  polling and agent-execution's note that an interrupt destroys uncommitted work — the cost is
+  stated and the act never forbidden.
+  **Owed:** one clause in lifecycle-kit/templates/lead.md naming the act, its two authorizations
+  (operator confirmation, or a per-iteration grant held where `iteration-scoped-grant-home-unstated`
+  puts grants) and the uncommitted-work cost as grounds, plus the owning SPEC passage if needed.
+  **Cost while deferred:** token waste — a cancelled session's uncommitted unit is re-bought, and
+  only the harness's general confirm-before-irreversible default stands in the way.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: lead-contract kit text, routed
+  to scope by the dispatch. →icebox refused on the operator's 2026-09-11 direction that no inbox
+  bullet enters the Icebox directly.
+
+- **close-watch-waits-on-slowest-smoke-leg** [design-pending] — a close push waits about 48
+  minutes on the `gates` workflow, and one leg is almost all of it.
+  **Operator-stated 2026-09-11, lead session, typed message, relayed by that lead:** a close cannot
+  wait 40 minutes on one run; optimize `install-smoke-windows` and every other long leg.
+  **Re-verified at the drain on gates run 34553416908 (head 08e6eb67):** wall 48 minutes; `gates`
+  4.8, install-smoke 3.5, powershell 2.4, linux-arm64 3.6, each native-artifacts leg under 2,
+  macos 12.5, macos-intel 23.7, windows 46.0. Lead-measured, not re-probed: 44 of Windows' 46
+  minutes inside its smoke step, and five prior runs at 45 to 48. Close watches `gates` to green,
+  so it waits on the slowest leg. Not yet probed: which smoke phases take the Windows time.
+  **Candidate levers, none ruled:** cut the dominant Windows cost (per-process spawn under
+  Git-for-Windows bash is the usual suspect); let close watch the binding fast legs and read the
+  slow smokes later; path-filter or schedule the slow legs; cache what each leg rebuilds.
+  **DISTINCT from `close-red-push-ownership`** (icebox; who owns a red push),
+  `install-smoke-leg-names-mix-two-axes` and `held-ci-leg-failure-reddens-a-binding-one` (naming
+  and hold posture).
+  **Cost while deferred:** every close pays the wait.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a probe, a workflow change and a
+  decision on which legs close watches. →icebox refused on the operator's 2026-09-11 direction
+  that no inbox bullet enters the Icebox directly.
+
+- **landing-moots-live-entries-undetected** [design-pending] — no stage step asks which live
+  entries a landed unit moots, so obsolete entries linger until a whole-pool triage.
+  **Operator question 2026-09-11, lead session, typed message, relayed by that lead:** obsolete
+  tasks must leave the queue via Done.
+  **The exit exists and the detection does not.** queue-kit/SPEC.md §The icebox tier sanctions the
+  move to Done for a mooted entry; build owns Done only for its own units; the queue-edges retired
+  block catches pointers at slugs already disposed; `--icebox-candidates` reads age and cost only.
+  **Witness corrected at the drain:** the bullet named `spec-prune-normalisation-shell-oracle`, but
+  `canon-kit/lib/spec.sh` still ships `_spec_prune_kit_roots` and that entry carries the residual,
+  so it is not wholly moot. The class is witnessed instead by the pool triage's three mooted exits
+  (`meta-gate-conservation-record-reach`, `propose-once-clause-leaks-into-the-proposal-step`,
+  `same-day-recurrence-date-multiplicity`), found only by that one-off read.
+  **Owed:** a build or close step listing, per landed unit, the live entries naming surfaces its
+  diff removed and moving the mooted ones to Done, plus the queue-kit/SPEC.md passage.
+  **DISTINCT from `survey-record-supersede-invisible`** (icebox; survey blocks, not entries).
+  **Cost while deferred:** token waste — every ranking survey and triage re-reads stale entries.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a template step plus a spec
+  clause. →icebox refused on the same operator direction as the entries above, no inbox bullet
+  entering the tier directly.
+
+- **ruling-versus-direction-undefined** [design-pending] — nothing separates a binding ruling from
+  an agreed direction, so a relay can label the second as the first.
+  **The instance, 2026-09-11:** a lead relayed an operator-agreed fix direction for
+  `ro-bins-write-option-bypass` as ruled and corrected it the same day.
+  **Operator statements 2026-09-11 in the lead session (typed message, then AskUserQuestion),
+  relayed by that lead:** a ruling changes project trajectory and comes only via /consult; it is
+  not open to challenge, including by validating its facts; it may override current instructions
+  until they are updated; rulings go to TRAJECTORY.md and leave once obsolete; an agreed direction
+  is not a ruling, and scope or spec may revise it.
+  **Tensions, lead-probed and open:** (1) TRAJECTORY.md §What this file admits sends every ruling
+  that neither names its discharge nor reverses another to a business-as-usual home, so
+  rulings-go-there widens it; (2) the record's annotate-a-false-ground act, and a directive
+  discharged by falsifying its premise (`append-grant-decline-cause-unlogged`, icebox), conflict
+  with not-challengeable-by-facts; (3) spec-over-precedent makes the owner doc ground truth and no
+  surface says whether an overriding ruling outranks it; (4) CLAUDE.md names `operator` and `lead`
+  as ruling authorities with a `lead, own-authority` form, and `.claude/commands/consult.md` pins
+  no model, so no consult-only binding exists; (5) the lead template and stage-session agent carry
+  no relay class for a direction.
+  **A conflict named for /consult, unresolved at this close:** the operator directed 2026-09-11
+  (AskUserQuestion, lead-relayed) that no inbox bullet enters the Icebox — the tier holds deferred
+  tasks gone dormant for want of recurrence, entered only from Deferred. TRAJECTORY.md's
+  machinery-class icebox default (2026-08-30) and its two lead extensions (over a live trigger,
+  2026-09-07; over close's own captures, 2026-09-08) route inbox bullets there, as does the close
+  template's own →icebox drain disposition. This close followed the direction and left those
+  paragraphs unedited.
+  **Owed:** /consult on the tensions and the conflict, then the definition at its owning surface,
+  the relay vocabulary in both contracts, and the admission test and icebox default as ruled.
+  **DISTINCT from `iteration-scoped-grant-home-unstated`**: a grant is not a steering decision.
+  **Cost while deferred:** a relayed direction binds later sessions as closed, and the drain's
+  icebox route reads two ways.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: /consult is owed first.
+  →icebox refused on the direction above.
 
 
 ## Icebox
