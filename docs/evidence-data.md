@@ -155,3 +155,4 @@
 | packer-port-terminal-cut | sc sp a b v c | 1f/2d | 2 · ≤0d | 20s clean | 111 |
 | host-resolution-fail-open-cut | sc sp a b v c | 5f/6d | 6 · ≤0d | 20s clean | 111 |
 | deferred-pool-triage | sc · · b v c | 0f/0d | 0 | 20s clean | 111 |
+| rankable-deferred-board | sc sp a b v c | 7f/1d | 4 · ≤0d | 20s clean | 112 |

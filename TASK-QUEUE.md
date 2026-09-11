@@ -2497,7 +2497,7 @@
   relocation wording for the history class — and those two go first, the lead contract loading
   them whole (685 and 491 lines at close; roughly 23k tokens, a fifth of the lead's context, as
   the lead measured it). The direction may answer or narrow the blocker's open question. Its
-  priority is no separate directive: `scope-ranking-blind-to-deferral-cost-and-impact`.
+  priority is no separate directive: scope ranks it off its lead-line tags, landed 2026-09-11.
   **Cost while deferred:** the rule is ruled and applied to one file, so the corpus is nineteen
   files of unswept prose under a rule that already binds it.
   Filed 2026-08-13 by close, on operator direction; blocked on the reach question above, because a
@@ -3852,7 +3852,7 @@
   false-positive budget yet.
   **DISTINCT from `session-mechanic-grants-uncommitted`**, whose subject was an out-of-band
   permission decision on the journal-append write path — a grant question, not this enforcement
-  one. That entry closed this iteration and its subject shipped as guard-kit/SPEC.md §The generic
+  one. That entry closed 2026-08-23 and its subject shipped as guard-kit/SPEC.md §The generic
   ruleset rule 17, which is the adjacent surface; nothing of it is re-filed here.
   **Cost while deferred:** rule 14's reach stays opt-in on the launching session's diligence, so
   a commit can be taken beside a live producer that never announced itself.
@@ -5789,15 +5789,65 @@
   know the path at all.
   **Cost while deferred:** the failure lands on the NEXT stage's entry, cold, holding only whatever
   escape was written down — a session that did nothing wrong pays for one that did.
-  **NOT ICEBOX-ELIGIBLE, on the cost field first and on the conjunction second** — ruled `lead,
-  own-authority` 2026-09-10, escalation reply in the lead session, lead-relayed and never the
-  operator's. The cost line above begins in prose rather than with a class token, which
-  queue-kit/SPEC.md §The icebox tier reads as not-low, and that opener is not rewritten to unblock
-  an eviction. Sufficient on its own besides: the machinery-class default's test is conjunctive,
-  and this finding BLOCKED A STAGE ENTRY, attested above, so the conjunction fails outright.
+  **NOT ICEBOX-ELIGIBLE on its `[cost:]` class:** `event/high` is outside the low class
+  queue-kit/SPEC.md §The icebox tier admits. The 2026-09-10 lead decision read the since-retired
+  prose opener and machinery-class conjunction; the class carries the same verdict now.
   Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
   the obvious cheap fix is already landed, and already failed.
   recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
+- **icebox-standing-cause-truncated-on-board** [design-pending] [cost: iteration/low] [surface: queue-kit]
+  — `--icebox-candidates` prints about three characters of a standing row's grounds.
+  An ineligible row's reason is capped at `CAUSE_CAP`, 48 characters
+  (native/src/emit/queue_index.rs), and the fixed prefix `[standing] not-icebox-eligible <date> — `
+  spends 44 of them, so a declared row shows its date, three characters and an ellipsis.
+  **Re-verified at close:** both standing rows on the 2026-09-11 worklist render `— evi…` and
+  `— liv…`. The cap no longer touches any cost text: an eligible row prints its `[cost:]` class
+  whole, so only the ineligibility reasons are cut.
+  **Candidate repairs, unranked:** a shorter fixed prefix, the `✗` mark already saying ineligible;
+  or exempting the grounds tail from the cap. Either changes the printed format queue-kit/SPEC.md
+  §The queue-index arm owns, which is why close did not fix it inline.
+  **Cost while deferred:** a close reviewing the standing declarations pays one anchored grep per
+  declared row to read grounds the worklist was meant to show, growing with the declarations.
+  Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the printed-format ground.
+- **prose-enum-common-word-tag-members** [design-pending] [cost: event/low] [surface: canon-kit]
+  — check-prose-enum reads two adjacent ordinary words as a partial list of the queue's task tags.
+  The consumer set `queue-task-tag` (native/src/emit/enum_sets.rs) now carries two task tags
+  whose names are common English words, beside `spec`. canon-kit/SPEC.md §check-prose-enum
+  matches a member bare or bracketed and chains members separated by whitespace, so prose that
+  happens to put the two words side by side reads as a hand list and reds on every omitted tag.
+  **Re-verified at close:** the first instance is in range, a historical release post exempted by
+  a `prose-enum-exempt:` comment when the tags landed.
+  **The obvious fix is not free.** Requiring the bracketed or backticked spelling for common-word
+  members would stop the gate reading the one surface its attested drift lives on: README.md's
+  queue-kit row spells the tag algebra bare and slash-joined. A per-member match mode is also a
+  change to the set grammar, which that section keeps at two fields and refuses a third.
+  **Cost while deferred:** an occasional false red on unrelated prose, each remedied by an
+  exemption comment that dilutes the exemption set.
+  Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the set-grammar ground.
+- **install-smoke-slow-leg-residue** [design-pending] [cost: iteration/high] [surface: installer]
+  — the native Windows install smoke, still the slowest leg, sets every close watch.
+  **Measured at close off the first run carrying the roster hash batch:** install-smoke-windows took
+  31m46s against 42m48s to 45m58s over the five runs before it; macOS Intel took 13m59s and the
+  rest of the workflow under eight minutes. Three terms remain, each with a design question.
+  **1. The harness still hashes each recorded file with its own `git hash-object` child**
+  (installer/consumer-smoke/run-smoke.sh, the manifest assertion's `got`). That is deliberate: the
+  loop is the independent second reading of the recorded value and installer/README.md §The
+  manifest names the smoke's comparison as its own invocation, so batching it re-authors that
+  operand and has to decide whether a `--stdin-paths` reading still discriminates. The filer's
+  measure, not re-run at close: about 250 s of the Windows leg.
+  **2. The arms run serially on one core** while the Windows and macOS runners carry several.
+  Ordering is load-bearing: the printed arm headers are the `installer_smoke` scenario roster
+  (evidence-kit/SPEC.md §Layout and configuration); `ENTRY`, `RUN_PATH` and `VALUE_RED` are
+  globals each arm reassigns; the cross-version reversal arm consumes the payload path the upgrade
+  arm relinquishes. The cheapest concurrent shape that keeps the roster and every assertion is not
+  designed.
+  **3. Two large terms are unprofiled, carried as the filer's claim:** the vendored battery (about
+  63 s per 40-gate run, several per profile and twice in the value arm) and the non-hash work of a
+  full-profile init (about 60 s). No spawn count exists for either, so neither has a known lever;
+  a profile is the prerequisite.
+  **Cost while deferred:** the slowest smoke leg sets the watch wait on every push, every term
+  scales with the profile count, and Windows pays each spawn at MSYS fork cost.
+  Filed 2026-09-11 by close, draining three gap-inbox bullets left by the smoke-leg hash batch.
 
 ## Icebox
 
