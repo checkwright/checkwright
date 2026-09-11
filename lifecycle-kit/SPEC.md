@@ -4516,6 +4516,38 @@ is recorded on the record as a closed-ruling line, because such a discharge leav
 no landed unit and no queue trace, so a later session reading only the directive
 re-derives the whole investigation that falsified it.
 
+The `close` template carries a **moot sweep** ahead of its Clear-Done step: it
+asks which live entries the iteration's landings mooted and moves them to the
+done section, the exit queue-kit/SPEC.md §The icebox tier sanctions for an entry
+a landed unit has mooted. Without it nothing asks, and an obsolete entry lingers
+until a whole-pool triage reads it. **The sweep sits at close and not at build,
+on four grounds.** Close holds the iteration's whole exit set and whole commit
+range at once, where a build batch sees only its own landing, so a moot two
+batches produce jointly is visible to neither. The done section still holds the
+exits in one place until close clears it, so the sweep reads them where they
+sit. Close already writes the deferred pool through its gap drain and its
+eviction, while build's queue authority is the Done move for its own units, which
+a build step moving *other* entries would widen. And a build step repeats per
+batch, sweeping the same pool again each time, where close sweeps it once.
+
+**The candidates are derived, and each source is chosen for what it reaches.**
+Entries citing a done slug cost no second run: the drain step's retired-citation
+read already invokes queue-kit's inbound-citation arm, whose retired block lists
+each cited done slug above its citing entries, and the two steps read those rows
+to different ends — the drain asks whether a citing line is a stale pointer, the
+sweep whether the citing *entry* is still open. A path the range deleted is taken
+without exclusion. A removed heading is read only from files the range
+*modified*, because a deleted file's headings are template scaffolding, an
+amendment's, that no entry cites. **The honest limit:** the set reaches a
+referent removed at path or heading granularity, and an entry citing landed work
+by slug. A referent edited away below a heading — a clause, a paragraph — falls
+outside it, and so does a supersession landed outside the range, such as a
+consult between iterations; the pool-wide triage stays the backstop for both.
+Whether an entry is mooted is semantic, so no gate judges the sweep; the battery
+judges only that a move stranded no pointer. The gates reading a slug reference
+red on one that *left* the live set, so a move adds their violations rather than
+clearing any, which is why the sweep runs the battery before its commit.
+
 The `close` template carries a **release-disposition step**: every close
 dispositions the iteration at the release boundary — reading the consumer's
 `release-policy` slot and either executing its release procedure or stamping an

@@ -151,7 +151,10 @@ that is the whole design:
   for a ruled wontfix, **or for an entry a landed unit or a closed ruling has
   mooted**. The added route is conserved like the rest — the slug stays visible
   in the file, on a bare done line — which is why the claim above is
-  strengthened by it rather than disturbed.
+  strengthened by it rather than disturbed. A landing's moots are looked for at
+  the closing stage's moot sweep (lifecycle-kit/templates/stages/close.md,
+  step 5), over the iteration's exits and commit range. A closed ruling's moots
+  are found by the session that reads the ruling, because no range contains them.
 - **One namespace, one parse.** `check-task-names` keeps slug uniqueness and
   `[blocked-by:]` resolution across the whole pool; an iceboxed slug is a legal
   blocker target, because it is unbuilt.

@@ -12,31 +12,6 @@
 
 ## New Features
 
-- **landing-moots-live-entries-undetected** [spec: SPEC-moot-sweep.md] — no stage step asks which
-  live entries a landed unit moots, so obsolete entries linger until a whole-pool triage.
-  **Operator question 2026-09-11, lead session, typed message, relayed by that lead:** obsolete
-  tasks must leave the queue via Done.
-  **The exit exists and the detection does not.** queue-kit/SPEC.md §The icebox tier sanctions the
-  move to Done for a mooted entry; build owns Done only for its own units; the queue-edges retired
-  block catches pointers at slugs already disposed; `--icebox-candidates` reads age and cost only.
-  **Witness corrected at the drain:** the bullet named `spec-prune-normalisation-shell-oracle`, but
-  `canon-kit/lib/spec.sh` still ships `_spec_prune_kit_roots` and that entry carries the residual,
-  so it is not wholly moot. The class is witnessed instead by the pool triage's three mooted exits
-  (`meta-gate-conservation-record-reach`, `propose-once-clause-leaks-into-the-proposal-step`,
-  `same-day-recurrence-date-multiplicity`), found only by that one-off read.
-  **Owed:** a build or close step listing, per landed unit, the live entries naming surfaces its
-  diff removed and moving the mooted ones to Done, plus the queue-kit/SPEC.md passage.
-  **DISTINCT from `survey-record-supersede-invisible`** (icebox; survey blocks, not entries).
-  **Cost while deferred:** token waste — every ranking survey and triage re-reads stale entries.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a template step plus a spec
-  clause. →icebox refused on the same operator direction as the entries above, no inbox bullet
-  entering the tier directly.
-  **Operator direction, 2026-09-11 (consult):** bundle with
-  `deferred-cost-class-opener-vocabulary` at the next scope — one surface, what scope re-reads.
-  **Operator direction, 2026-09-11 (lead session, lead-relayed), bundled as directed:** a feature
-  of `rankable-deferred-board` — the per-landing listing is a contract build or close must honor;
-  spec authors it.
-
 - **composition-verdict-unrecorded-at-unit-set-ruling** [spec: SPEC-comp-verdict.md] — scope's
   economic composition test leaves no artifact that it ran, so a lone-unit iteration opens with it
   unapplied.
@@ -6301,5 +6276,6 @@
 
 - ruling-versus-direction-undefined
 - iteration-scoped-grant-home-unstated
+- landing-moots-live-entries-undetected
 
 ## Lessons Learned

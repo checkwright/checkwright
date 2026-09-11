@@ -166,7 +166,29 @@ session.
    *<housekeeping: your housekeeping sweeps beyond the roster: deprecation scan,
    gate-runtime budget check, backlog-aging / premise-rot review, and the
    per-surface triage procedures the roster's rows route to.>*
-5. **Clear Done.**
+5. **Retire what this iteration's landings mooted, then clear Done.** The inputs
+   are the done section's slugs and the iteration's commit range. The range runs
+   from the head recorded on the first-stage stamp (the first data line of
+   `.workflow/WORKFLOW-STATE.txt`) to HEAD. Derive the candidates rather than
+   recalling them:
+   (a) the live entries citing a done slug, which are the retired-block rows for
+   those slugs in the inbound-citation output step 2 already produced;
+   (b) the live entries naming a path the range deleted
+   (`git diff --name-only --diff-filter=D`);
+   (c) the live entries citing a markdown heading the range removed from a file
+   it kept (`git diff --diff-filter=M` over `*.md`, its removed heading lines).
+   Read each candidate against the landing it cites. An entry whose question the
+   landing answered, or whose referent it removed, moves to the done section as a
+   bare slug in this stage's queue commit, and that commit's message names, per
+   moved slug, the landing that mooted it. A `[roadmap:]` entry is outside every
+   exit (queue-kit/SPEC.md §The icebox tier) and stays. A candidate still open
+   stays too, with any stale pointer in it corrected inline, the way step 2's
+   retired-citation read corrects one. Before moving an entry, relocate anything
+   in its body worth more than the entry to the surface that owns it, because the
+   done line keeps only the slug. Run the battery before committing. A red naming
+   a moved slug is a pointer the move stranded, and it is corrected in that same
+   commit. Then clear Done. Why the sweep sits here and not in build, and the
+   moots its candidates cannot reach: lifecycle-kit/SPEC.md §templates/stages/.
 6. Review top-level docs for staleness (*is it still true?*). Same
    gap-generalization obligation as step 1, per staleness actually found:
    name the check class that should have caught it, and file the missing
