@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe end-to-end through a sandboxed enter-stage: the iteration-boundary entry deletes the scratch dir's members, keeps the .gitkeep kit invariant and every LIFECYCLE_KIT_BOUNDARY_PRESERVE basename at any depth, names the wiped set in its report, and a non-boundary entry touches no scratch at all
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe end-to-end through a sandboxed enter-stage: the iteration-boundary entry deletes the scratch dir's members, keeps the .gitkeep and lead-journal kit invariants and every LIFECYCLE_KIT_BOUNDARY_PRESERVE basename at any depth, names the wiped set in its report, raises the undisposed-journal advisory without blocking, and a non-boundary entry touches no scratch at all
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -48,6 +48,13 @@ EOF
     printf 'stale\n'  >"$sb/scratch/doomed.log"
     printf 'stale\n'  >"$sb/scratch/doomed-sub/nested.txt"
     printf 'live\n'   >"$sb/scratch/mixed-sub/keep-me"
+    cat >"$sb/scratch/lead-journal.md" <<'EOF'
+# lead journal
+
+## batch roster and tiering
+
+prose the next lead would have to re-derive
+EOF
 }
 
 run_enter() {  # $1=sandbox subdir  $2=stage
@@ -74,6 +81,12 @@ grep -qF 'boundary-wiped from scratch' <<<"$out" || note report "the boundary re
 grep -qF 'doomed.log' <<<"$out"                  || note report-member "the report does not name the wiped file: $out"
 grep -qF 'scratch/keep-me' <<<"$out"             && note report-kept "the report names a kept member as wiped: $out"
 
+# the lead journal is a kit invariant this consumer's keep-list never names, and an undisposed
+# one is announced with its headings rather than refused
+[[ -f "$bnd/scratch/lead-journal.md" ]]          || note lead-journal-invariant "the lead journal was deleted though no keep-list names it"
+grep -qF 'lead-journal.md' <<<"$out"             || note lead-journal-advisory "no undisposed-journal advisory: $out"
+grep -qF '## batch roster and tiering' <<<"$out" || note lead-journal-headings "the advisory printed no headings: $out"
+
 # --- a non-boundary entry touches no scratch ---
 non="$SANDBOX/nonboundary"
 seed "$non"
@@ -92,7 +105,17 @@ out="$(run_enter "$def" scope)"; rc=$?
 [[ "$rc" -eq 0 ]] || note default-entry "want exit 0, got $rc -- $out"
 [[ -f "$def/scratch/.gitkeep" ]] || note default-invariant ".gitkeep was deleted under an empty keep-list"
 [[ -e "$def/scratch/keep-me" ]]  && note default-wipe "an unset keep-list spared a member anyway"
+[[ -f "$def/scratch/lead-journal.md" ]] || note default-lead-journal "the lead journal was deleted under an empty keep-list (kit invariant, not config)"
+
+# --- a disposed journal survives and raises nothing ---
+dis="$SANDBOX/disposed"
+seed "$dis"
+printf 'DISPOSED\n' >>"$dis/scratch/lead-journal.md"
+out="$(run_enter "$dis" scope)"; rc=$?
+[[ "$rc" -eq 0 ]] || note disposed-entry "want exit 0, got $rc -- $out"
+[[ -f "$dis/scratch/lead-journal.md" ]] || note disposed-kept "a disposed lead journal was deleted"
+grep -qF '## batch roster and tiering' <<<"$out" && note disposed-advisory "a disposed journal still raised the advisory: $out"
 
 [[ "$fails" -eq 0 ]] || { echo "boundary-scratch-wipe.test: $fails assertion(s) failed"; exit 1; }
-echo "boundary-scratch-wipe.test: clean (boundary wipe keeps .gitkeep and every PRESERVE basename at any depth, reports the wiped set, and leaves non-boundary entries untouched)"
+echo "boundary-scratch-wipe.test: clean (boundary wipe keeps .gitkeep, the lead journal and every PRESERVE basename at any depth, reports the wiped set, announces an undisposed journal without blocking, and leaves non-boundary entries untouched)"
 exit 0

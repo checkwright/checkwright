@@ -61,6 +61,9 @@ declare -p LIFECYCLE_KIT_SHIM_DEDUP_CORPUS &>/dev/null || LIFECYCLE_KIT_SHIM_DED
     || LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN="${GATE_SDK_TMP_DIR:-.tmp}/<stage>-journal.md"
 [[ -v LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE ]] || LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE=0
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lead journal's basename, spared by the boundary wipe as a kit invariant beside .gitkeep; a scalar rather than a BOUNDARY_PRESERVE default because a defaulted array is replaced and not merged, and the kit may name it because templates/lead.md mints the artifact
+[[ -v LIFECYCLE_KIT_LEAD_JOURNAL_FILE ]] || LIFECYCLE_KIT_LEAD_JOURNAL_FILE="lead-journal.md"
+
 # spec: lifecycle-kit/SPEC.md §The state machine — the one expansion every reader shares: a dispatcher granting the path, a stage session writing it, and the entry asserting its predecessor's must name one file or the assertion reads a file nobody wrote
 lifecycle_stage_journal() {
     printf '%s\n' "${LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN//<stage>/$1}"
@@ -191,6 +194,7 @@ _lc_errs=()
 [[ -n "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_LESSON_EVIDENCE_FILE is empty")
 [[ -n "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_GAP_INBOX_FILE is empty")
 [[ -n "$LIFECYCLE_KIT_SURVEY_RECORD_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_SURVEY_RECORD_FILE is empty")
+[[ -n "$LIFECYCLE_KIT_LEAD_JOURNAL_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_LEAD_JOURNAL_FILE is empty")
 [[ "$LIFECYCLE_KIT_SHIM_NGRAM" =~ ^[1-9][0-9]*$ ]] \
     || _lc_errs+=("LIFECYCLE_KIT_SHIM_NGRAM '$LIFECYCLE_KIT_SHIM_NGRAM' is not a positive integer")
 [[ "$LIFECYCLE_KIT_RECURRENCE_THRESHOLD" =~ ^[1-9][0-9]*$ ]] \

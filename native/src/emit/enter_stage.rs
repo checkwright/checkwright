@@ -50,6 +50,7 @@ struct Cfg {
     gap_inbox: String,
     lesson_evidence: String,
     survey_record: String,
+    lead_journal: String,
     boundary_truncate: Vec<String>,
     boundary_preserve: Vec<String>,
     boundary_require: Vec<String>,
@@ -71,6 +72,7 @@ fn cfg() -> Result<Cfg, String> {
         gap_inbox: walk::knob_scalar("LIFECYCLE_KIT_GAP_INBOX_FILE")?,
         lesson_evidence: walk::knob_scalar("LIFECYCLE_KIT_LESSON_EVIDENCE_FILE")?,
         survey_record: walk::knob_scalar("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?,
+        lead_journal: walk::knob_scalar("LIFECYCLE_KIT_LEAD_JOURNAL_FILE")?,
         boundary_truncate: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_TRUNCATE")?,
         boundary_preserve: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_PRESERVE")?,
         boundary_require: walk::knob_array("LIFECYCLE_KIT_BOUNDARY_REQUIRE")?,
@@ -995,9 +997,11 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe, distinct from
     // the truncate above. Runs last so this run's own temporaries are already gone and never
-    // candidates. '.gitkeep' is the kit invariant LIFECYCLE_KIT_BOUNDARY_PRESERVE cannot unset.
+    // candidates; '.gitkeep' and the lead journal are the invariants a keep-list cannot unset.
     if first && Path::new(&c.tmpdir).is_dir() {
-        wiped = wipe(&c.tmpdir, &c.boundary_preserve);
+        let mut keep = c.boundary_preserve.clone();
+        keep.push(c.lead_journal.clone());
+        wiped = wipe(&c.tmpdir, &keep);
     }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the journal open runs after the boundary
@@ -1095,7 +1099,39 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
             }
         }
     }
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the undisposed-journal advisory: the lead
+    // journal survives the wipe, so the boundary makes an undisposed one loud and never blocking
+    // (the entering session cannot discharge a disposition it has no context to judge).
+    if first {
+        let lj = format!("{}/{}", c.tmpdir.trim_end_matches('/'), c.lead_journal);
+        if Path::new(&lj).is_file() && !disposed(&lj) {
+            println!(
+                "  note: {} crossed this boundary carrying no '{}' line — the prior lead's journal \
+                 is undisposed. Anything in it that must outlive the iteration belongs in a \
+                 committed channel (a gap bullet, a survey block, a knowledge-friction line); \
+                 these are its headings:",
+                lj, DISPOSITION_MARK
+            );
+            for h in read_headings(&lj) {
+                println!("    {}", h);
+            }
+        }
+    }
     Ok(0)
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the disposition mark is a presence marker on
+// the file's last non-empty line, the stage journal's `DONE` shape with a disposition semantic
+pub const DISPOSITION_MARK: &str = "DISPOSED";
+
+fn disposed(path: &str) -> bool {
+    read(path)
+        .lines()
+        .rev()
+        .find(|l| !l.trim().is_empty())
+        .map(|l| l.trim() == DISPOSITION_MARK)
+        .unwrap_or(false)
 }
 
 struct Valve {
@@ -1885,6 +1921,7 @@ mod tests {
             gap_inbox: String::new(),
             lesson_evidence: String::new(),
             survey_record: String::new(),
+            lead_journal: "lead-journal.md".into(),
             boundary_truncate: vec![],
             boundary_preserve: vec![],
             boundary_require: vec![],

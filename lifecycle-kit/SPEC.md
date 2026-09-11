@@ -726,9 +726,23 @@ the clause's reader is a human or agent rather than a gate.
   unset-knob consumer gets a clean wipe of an already-disposable surface.
   Boundary-only, and paired with the scratch dir it reads (`GATE_SDK_TMP_DIR`)
   rather than adding a directory knob of its own. **The tier split matters:** the
-  `.gitkeep` exemption is a kit invariant this knob cannot unset, and this knob
-  is the consumer keep-list layered on top — a reader who takes the knob for the
-  wipe's only keep rule would reintroduce the tracked-file deletion.
+  `.gitkeep` exemption and the lead journal below are kit invariants this knob
+  cannot unset, and this knob is the consumer keep-list layered on top — a reader
+  who takes the knob for the wipe's only keep rule would reintroduce the
+  tracked-file deletion.
+- `LIFECYCLE_KIT_LEAD_JOURNAL_FILE` — the lead's own resume journal; default
+  `lead-journal.md`, a **basename** resolved inside the scratch dir that
+  `GATE_SDK_TMP_DIR` names. The boundary
+  wipe spares it as a kit invariant beside `.gitkeep`, and the boundary entry
+  reads it for the disposition mark (§bin/enter-stage.sh). Same tier split as the
+  knob above, and a **scalar** for the reason stated there: an assignment
+  overrides one value and cannot silently drop a second it never mentioned,
+  where a defaulted array is replaced wholesale. The kit may name this basename
+  because `templates/lead.md` mints the artifact and is the only surface that
+  writes it — the `LIFECYCLE_KIT_GAP_INBOX_FILE` posture, as against
+  `LIFECYCLE_KIT_RULING_RECORD`, which defaults empty precisely because a ruling
+  record is a *consumer's* artifact the kit must not presume. Stated so a later
+  reader does not "correct" this default to empty by false analogy with that one.
 - `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — array of repo-relative files each of which
   must carry a data line naming the closing iteration before the iteration
   boundary may be crossed (§bin/enter-stage.sh); a missing member is a
@@ -2356,7 +2370,8 @@ entry, which is why the boundary behavior is exercised end-to-end in
 `gate-tests/` rather than reasoned about.
 
 The boundary reset additionally **wipes the scratch dir** (`GATE_SDK_TMP_DIR`),
-deleting every member whose basename is neither `.gitkeep` nor a
+deleting every member whose basename is neither `.gitkeep`, nor
+`LIFECYCLE_KIT_LEAD_JOURNAL_FILE`, nor a
 `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entry — at any depth the wipe reaches — and
 naming the wiped set in its report the way it already names the truncated set.
 Truncate and wipe share the boundary trigger and the report line and **nothing
@@ -2388,6 +2403,41 @@ exemption. A
 git-aware "spare any tracked file" rule is **ruled out** too — it makes
 filesystem behavior git-dependent for one case, and it would spare any tracked
 file parked in scratch, re-opening the accumulation the wipe exists to close.
+
+**The lead journal is the second kit invariant, and it is a scalar knob for
+exactly the reason `.gitkeep` is not a default.** A lead session is live *at* the
+boundary — it files a boundary judgment there for the entering session's intake
+(§templates/lead.md) — so its journal has a live session's lifetime rather than
+the iteration's, and the kit that instructs a lead to store state in this
+directory must not be the thing that deletes it. The replaced-not-merged
+argument above applies unchanged and with an attested instance behind it: this
+project's array had to name the journal by hand, after a loss, and any adopter
+assigning the array for their own reasons would silently drop it again. A
+**scalar** default has no such failure mode — an assignment overrides one value
+and cannot drop a second it never mentioned — so the same reasoning that made
+`.gitkeep` an invariant makes this one, and `LIFECYCLE_KIT_LEAD_JOURNAL_FILE`
+exists only so a consumer who renames the file can say so.
+
+**Preserving is not draining, so the boundary entry also reports an undisposed
+journal.** When the lead journal exists and its last non-empty line is not the
+disposition mark `DISPOSED`, the boundary entry prints the file's `## ` headings
+as an advisory and **proceeds**. This is the survey record's read trigger reused
+rather than reinvented (§The survey record) — the same print over a different
+file, headings and never findings. The mark itself is a presence marker on the
+`DONE` marker's precedent, produced by the lead at its close
+(§templates/lead.md) and carrying no date and no author, because no reader would
+branch on either. **A refusal is declined, and the ground is the discriminator
+that separates this file from the gap inbox.** The gap inbox refuses at a
+close-skipped boundary because its bullets are *drainable by the entering
+session* — they are queue-shaped, and the entering first stage may write the
+queue. A lead journal holds another session's working prose, and the entering
+session cannot discharge a disposition it does not hold the context to judge; a
+refusal it could clear only by deleting the file would train deletion of the
+very artifact the invariant protects. So the boundary makes the state **loud**
+and never blocking. **Its honest limit:** the advisory can be read and ignored,
+and nothing here forces the lead's disposition step. What it buys is that the
+undisposed state stops being silent — the attested failure being three findings
+that survived only because the operator happened to ask.
 
 The scratch dir has a **second reclaimer, and the two do not overlap.**
 context-kit's session-context hook sweeps the same directory at *every* session
@@ -4613,8 +4663,17 @@ writing the session-role marker context-kit's hook reads
 reclaims, and that is one fact rather than two exceptions.** A lead session is
 live *at* the boundary — it files a boundary judgment there for the entering
 session's intake — so its session-role marker and its own resume journal alike
-have a live session's lifetime rather than the iteration's, and a consumer that
-names either keeps it on `LIFECYCLE_KIT_BOUNDARY_PRESERVE` (§bin/enter-stage.sh).
+have a live session's lifetime rather than the iteration's. **Their protection
+sits at different tiers, and the split is deliberate.** The journal's is a kit
+invariant (`LIFECYCLE_KIT_LEAD_JOURNAL_FILE`, §bin/enter-stage.sh): the kit
+mints the artifact, instructs the lead to store state in it, and therefore owes
+the protection rather than shipping the obligation and leaving the mechanism in
+one consumer's config file. The marker's lifetime is context-kit's, so a
+consumer that wants it kept names it on `LIFECYCLE_KIT_BOUNDARY_PRESERVE`
+(§bin/enter-stage.sh) — genuinely that consumer's declaration to make. The
+journal's protected lifetime is **not permanence**: the lead's disposition step
+and the boundary's undisposed advisory are what keep the file from becoming an
+accumulator nobody reads.
 The contrast with §templates/consult.md is deliberate and reached from the
 opposite direction: a consult session may span the boundary too and still takes
 **no** preserve entry, because its rulings are discharged into a commit as each

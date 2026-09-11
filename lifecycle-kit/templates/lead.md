@@ -288,6 +288,16 @@ closing stage left it, whatever was filed for the next intake, and what the lead
 would recommend doing about it, offered as information for a decision and never
 as a decision taken.
 
+**Dispose of your journal before you report.** Every finding in it that must
+outlive the iteration goes to the committed channel that owns it — a gap bullet,
+a survey block, a knowledge-friction line — and a ruling goes to its governed
+surface; then append `DISPOSED` as the file's last line. The journal survives the
+boundary reset (§Economics), so this is what separates *preserved* from *drained*:
+an unread journal loses a finding exactly as a deleted one does, and the boundary
+entry announces an undisposed journal to the entering session rather than
+refusing it (lifecycle-kit/SPEC.md §bin/enter-stage.sh) — which is a prompt, not
+a substitute for doing this.
+
 **The boundary is exactly where the design seats a session most able to roll
 forward, which is why it is ruled rather than left to judgment.** The
 session-role marker and the lead's own resume journal are the scratch artifacts
@@ -613,9 +623,21 @@ consequences:
   an event that already exists rather than a forecast of when a compact looms, which is what makes
   the cadence checkable. This discharges the durability rule delegation-kit's agent-execution
   contract names the lead in, and it is **self-executing**: a lead writes its journal unilaterally,
-  where the compact below depends on an operator act the lead can only recommend. It is a scratch
-  artifact, swept with the rest at the iteration boundary (delegation-kit/SPEC.md §Resume journal —
-  agent writes, scratch reset sweeps).
+  where the compact below depends on an operator act the lead can only recommend.
+  **The journal is transport for a durable finding and never its store**, which partitions that
+  list by lifetime. Iteration-local working state — the batch roster and its tiering rationale,
+  findings carried between batches, budget verdicts, what the next dispatch would re-derive — has
+  its home here and dies with the iteration, correctly, because it is *about* the iteration.
+  Anything that must **outlive** the iteration — a gap, a survey, a re-derived fact, a ruling — is
+  filed to its committed channel in the moment it is found; the journal may carry a copy for your
+  own use and is never the only home. §Stamps are authoritative already rules this of the message
+  thread, and it is equally true here — the journal merely *reads* like a store.
+  It is a scratch artifact with a **protected lifetime**: the iteration-boundary reset spares it by
+  kit invariant (lifecycle-kit/SPEC.md §bin/enter-stage.sh), for the reason §Closing an iteration
+  relies on — a session live at the boundary must be able to file a judgment there for the entering
+  session's intake. Protected is not permanent: the disposition step in §Closing an iteration is
+  what keeps the file from becoming an accumulator nobody reads (delegation-kit/SPEC.md §Resume
+  journal — agent writes, scratch reset sweeps).
 - **Then, optionally, suggest a compact at the paying acceptance boundaries.** After a stage
   session's work is accepted — its commits verified, its rulings landed in governed surfaces — the
   lead may *suggest* a compact to the operator, one line in the acceptance message and never a new

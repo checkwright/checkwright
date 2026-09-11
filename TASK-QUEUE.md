@@ -12,40 +12,6 @@
 
 ## New Features
 
-- **lead-state-durable-home** [spec: SPEC-lead-journal.md]
-  — the lead template gave the lead's own state no durable home, so it lived only in the
-  conversation. **BOTH PREMISES OF THE OPEN QUESTION ARE FALSE AT HEAD, probed at spec rather than
-  inherited, and that is what bounded the unit.** The template does NOT name a swept home:
-  `scripts/lifecycle-config.sh:11` preserves `lead-journal.md` across the boundary wipe and
-  §Closing an iteration already calls it one of the two scratch artifacts that survive. And a
-  tracked home does NOT collide with the write-authority invariant, which enumerates stamps, queue
-  writes and evidence files — the same template directs the lead to write the committed gap inbox.
-  recurrence: lead-state-durable-home 2026-08-14 2026-09-10
-  **WHAT IS ACTUALLY LEFT, none of it a siting question.** (1) `lead.md` contradicts itself in one
-  file: §Economics still says the journal is "swept with the rest at the iteration boundary", the
-  direct negation of §Closing an iteration seven hundred words away. (2) Durability is CONSUMER
-  CONFIG — `LIFECYCLE_KIT_BOUNDARY_PRESERVE` defaults empty, so every adopter of the kit's
-  `lead.md` inherits the obligation and none of the protection. (3) Preserving is not draining:
-  the config comment concedes "one stale journal carries across a boundary crossed with no lead
-  live", and an unread journal loses a finding exactly as a deleted one does.
-  **The attested loss the entry rests on.** At `packer-port-terminal-cut`'s close the journal was
-  the only home for an operator design consult and two platform findings, all one boundary reset
-  from destruction and rescued only because the operator asked. The second-order instance is the
-  part that survives preservation: the lead recorded THAT defect in the same journal, so the
-  file's disposability swallows the record that would prevent the next occurrence.
-  **What the amendment rules:** the home is right and stays; survival becomes kit mechanism
-  (a scalar `LIFECYCLE_KIT_LEAD_JOURNAL_FILE` spared beside `.gitkeep`, on this SPEC's own
-  replaced-not-merged argument against an array default); the lead disposes of its journal at
-  close and the boundary prints an undisposed one as an advisory, refusal declined because the
-  entering session cannot discharge another lead's disposition; and the journal is transport for a
-  durable finding, never its store — the clause §Stamps already applies to the message thread.
-  **Batched with `gap-inbox-commit-ownership` and it is a PRODUCER/CONSUMER edge, not just a shared
-  surface:** the routing rule presumes the lead commits what it files, which is that entry's ruled
-  deliverable. A cut separating them dispatches this one against an input that does not exist yet.
-  Filed 2026-08-13 by close draining the gap inbox; promoted 2026-09-11 at spec into
-  `host-resolution-fail-open-cut` on its recurrence reaching threshold, ruled in by the operator
-  through AskUserQuestion in the lead session, relayed by the lead.
-
 ## Technical Debt
 
 - **dogfooding-line-invites-a-false-doctrine-conflict**
@@ -10734,5 +10700,6 @@
 - crate-interpreter-resolution-residue
 - observation-predicate-entry-cannot-drain-in-its-own-iteration
 - gap-inbox-commit-ownership
+- lead-state-durable-home
 
 ## Lessons Learned
