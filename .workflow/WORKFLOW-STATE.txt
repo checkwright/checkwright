@@ -10,3 +10,4 @@ guard-command-classification align a75aa67c 2026-09-11 b6c19a9a
 guard-command-classification build a3a1abd7 2026-09-11 d82cf0fd
 guard-command-classification build a68c2595 2026-09-11 1f166a06
 guard-command-classification build a2e994a0 2026-09-11 51bdadfe
+guard-command-classification validate a63ee7d2 2026-09-11 7da47092
