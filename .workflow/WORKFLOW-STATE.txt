@@ -4,4 +4,4 @@
 
 ---
 
-— scope ad9158f8 2026-09-11 0607218f
+crate-arms-flake-sources scope ad9158f8 2026-09-11 0607218f

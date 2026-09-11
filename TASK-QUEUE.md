@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: crate-arms-flake-sources
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -145,6 +145,8 @@
   hermetic by that gate's reading.
   **Cost while deferred:** low per instance and corrosive in aggregate — up to two in five
   commit-time batteries red for no cause, and every such red trains the re-run habit.
+  **Unit set `crate-arms-flake-sources`, the flake a spawn-error verdict makes diagnosable —
+  operator direction, 2026-09-11, lead-relayed.**
   Surfaced 2026-09-05 by build batches, filed as `stop-liveness-stub-spawn-flake` and merged here by
   the 2026-09-11 pool triage; surfaced again 2026-09-10 by `packer-port-terminal-cut`'s close.
   recurrence: stop-liveness-test-module-order-dependent 2026-09-11
@@ -956,6 +958,10 @@
   **The honest limit on the attribution:** neither witness read the failing test's NAME, so the tie
   to *this* mechanism rests on the symptom matching this entry's own cost line and on no competing
   entry claiming a flaky `check-crate-arms` — not on a culprit read off a log.
+  **Unit set `crate-arms-flake-sources`, the second flake source — operator direction,
+  2026-09-11, lead-relayed.** Its knobenv charter amendment is a second component, taken
+  knowingly. Scope probe: `pack()` in `native/src/emit/pack_installer.rs` also calls
+  `set_current_dir`; whether its tests reach it is unprobed.
   recurrence: crate-test-cwd-process-global-race 2026-09-06
   Filed 2026-08-18 by close, draining the gap inbox; re-verified by probe, not by prose.
 
@@ -3424,10 +3430,10 @@
   the split evidence-kit/SPEC.md §Baseline manifest now rules generally, which is where the ruling
   was landed rather than left as this instance's precedent. This entry's cost line above is where
   the masking diagnosis belongs. The loop has since retired and that row now reads pass.
-  Filed 2026-08-24 to the gap inbox by validate, with an explicit distinct declaration; promoted
-  2026-08-24 at `shell-gate-tail-port-and-completion-oracle`'s close, which deleted the
-  regenerated instance in the same commit; the attribution question its recurrence put to
-  `execution-control-reach-and-turn-end-blocking`'s close was ruled there.
+  **Routed to close to re-verify, then retire — operator direction, 2026-09-11, lead-relayed.**
+  Filed 2026-08-24 to the gap inbox by validate, declared distinct; promoted that day at
+  `shell-gate-tail-port-and-completion-oracle`'s close, deleting the regenerated instance; its
+  recurrence's attribution was ruled at `execution-control-reach-and-turn-end-blocking`'s close.
 
 - **dispatch-claim-evidentiary-tier-unmarked** [design-pending] [cost: event/high] [surface: lifecycle-kit] — a dispatch prompt can upgrade an
   inference into a finding, and the receiving session cannot see the evidence base to discount it.
@@ -4948,6 +4954,7 @@
   **Cost while deferred:** the commit-time obligation is flaky about one commit in five, and a
   session meeting it reads a green-on-retry as noise rather than as the fail-open's signature —
   so the cost is not the retry, it is that the retry teaches the wrong lesson.
+  **Leads the `crate-arms-flake-sources` set — operator direction, 2026-09-11, lead-relayed.**
   Filed 2026-09-09 to the gap inbox by build batch A; promoted at this close's drain. →fix was
   tried and failed on the envelope; →icebox was refused because the trigger is live and measured.
 
