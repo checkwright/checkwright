@@ -12,6 +12,301 @@
 
 ## New Features
 
+- **grant-argument-bounding-mechanism** [spec: SPEC-command-classify.md] — two committed grants
+  reach a destructive form and no allow-glob narrowing can stop either.
+  **Both findings are verified rather than surmised**, at build 2026-08-22 by a read-only worktree
+  sweep over all 105 committed `Bash(` entries.
+  **(1) The `.tmp/` rm family escapes the scratch dir.** `Bash(rm .tmp/*)`, `Bash(rm -f .tmp/*)`
+  and `Bash(rm -rf .tmp/*)` each match `rm -rf .tmp/../.git`, and reach any irreplaceable untracked
+  local file — `BRIEF.local.md`, `OPS.local.md`, `ENV.local.md`. `guard_rule_rm_tracked` fires only
+  on a TRACKED target, so nothing in the guard covers this.
+  **(2) `Bash(git rm -q *)` reaches `git rm -q -f <modified file>`**, destroying uncommitted work
+  irrecoverably; the sweep demonstrated it in a scratch repo rather than reasoning about it. No
+  guard rule covers that either — `guard_rule_rm_tracked` matches a bare `rm` only.
+  **That grant is LOAD-BEARING, which is what makes this hard.** `guard_rule_rm_tracked` STEERS
+  every tracked-file deletion INTO `git rm -q`, so narrowing the grant taxes a mechanic the guard
+  itself mandates. It is not a grant anyone may simply delete.
+  **Why no allow-glob fixes it.** A Bash rule's `*` "matches any sequence of characters including
+  spaces" (vendor permissions doc), so it spans `/` and `..` and cannot bound an argument. That
+  same doc warns outright that "Bash permission patterns that try to constrain command arguments
+  are fragile", and offers exactly two remedies: deny rules, or a PreToolUse hook.
+  **Candidate shapes, none costed:** a committed `deny` list, which outranks allow but inherits the
+  fragility the doc names; extend the guard's rules, the vendor's own remedy and the one this repo
+  already owns the hook for; or accept and declare, recording the reach rather than removing it.
+  **Why design-pending:** the three trade differently against a boundary this repo has never
+  used — `.claude/settings.json` carries no `deny` list at all today — and the first is an
+  operator-class edit besides, so the mechanism choice decides who may even land it.
+  **Cost while deferred:** two live paths to irrecoverable data loss, one of them reachable by a
+  single mistyped path inside a grant every session uses for routine scratch cleanup.
+  Filed 2026-08-22 by build, split out of `guard-grant-review` on the lead's ruling that choosing
+  the mechanism is design work and scope-gated intake makes it a costed Deferred entry by default.
+  **Leads the `guard-command-classification` set — operator direction, 2026-09-11, lead-relayed.**
+  **Promoted 2026-09-11 by spec** into `guard-kit/SPEC-command-classify.md`, with seven siblings.
+  The mechanism chosen is a guard rule that bounds each committed grant's path slot, and
+  `git rm` loses its force flag; a committed deny list stays an operator-optional backstop.
+
+- **grant-path-traversal-exposure** [spec: SPEC-command-classify.md] — the committed script-runner
+  globs match a traversing path, a code-execution class the grant narrowing now covers.
+  **The exposure, stated plainly:** `Bash(bash */checks/check-*.sh)` matches
+  `bash ../../evil/checks/check-x.sh`, because a Bash rule's `*` spans `/`. Its siblings carry the
+  same shape — `bash */bin/run-*-tests.sh`, `bash */gate-tests/*.test.sh` and
+  `bash */smoke/install.sh`. Verified at build 2026-08-22; the `drift-kit/kpis/*.sh` pair was
+  listed here too and was retired with the 2026-08-29 KPI port, leaving four live globs.
+  **Why it is genuinely weaker than a data-loss finding:** reaching a destructive script needs a
+  second precondition the allowlist cannot evidence — a hostile script must already exist at a
+  matching path. `scripts/bash-guard.sh` also blocks `bash .tmp/…` outright, closing the one path a
+  session may write to freely, and routes it through the `--scratch-run` arm, which resolves the
+  real path and refuses anything outside the scratch dir.
+  **Widened in, and joins the `guard-command-classification` unit set — operator direction,
+  2026-09-11, lead-relayed:** the 2026-08-20 narrowing (data-loss forms) now covers this
+  code-execution class. **Why design-pending:** whether these globs can be re-spelled without
+  breaking the battery they exist to run is untouched and unbought.
+  **Cost while deferred:** low and precondition-bound, but it spans the whole script-runner
+  surface rather than one grant, so a later change making a matching path writable would arm the
+  whole family at once, and would do it without a signal anyone reads.
+  Filed 2026-08-22 by build on the lead's ruling; surfaced by the same sweep that produced
+  `grant-argument-bounding-mechanism`, which is the data-loss half of the one audit.
+
+- **ro-bins-write-option-bypass** [spec: SPEC-command-classify.md] — `GUARD_KIT_RO_BINS`
+  membership is tested as
+  "the segment leads with this binary", but leading with a roster binary does not make the
+  invocation read-only, and the read-only-pipeline rule's safety argument assumes it does. The rule
+  is named rather than numbered here: guard-kit renumbers on insertion, and this citation had gone
+  stale twice over before close 2026-08-22 corrected it.
+  **Probed through the live hook at close, not reasoned:** `grep foo a.md | sort -o out.txt` and
+  `sort -o tracked.md tracked.md | head` are both auto-allowed today, and each overwrites a named
+  file. That rule's redirect check inspects `>`/`>>` targets only, so a write expressed as a
+  binary's own option is invisible to it. `sort` is the shipped instance.
+  **The `xargs` half of this finding is already discharged and must not be re-filed**: the
+  guard-context-matching unit landed `_guard_is_ro_xargs` (guard-kit/lib/guard.sh), and the same
+  close probe confirms `find . -type f | xargs rm -rf` and `grep -rln foo src | xargs sed -i …`
+  now fall through rather than auto-allow, while `find . -name '*.sh' | xargs grep -l foo` still
+  allows. What survives is the general predicate the discriminator solved case-by-case.
+  **Distinct from `guard-command-prefix-wrapper`** (transparent prefixes for allowlist matching)
+  and from the two consumer-side guard entries below: this is the roster knob's own predicate
+  being weaker than the grant that reads it.
+  **Fix shape: an exploration direction, NOT a ruling, open to revision at scope or spec on
+  further facts** — operator-agreed 2026-09-11 by typed message in the lead session, relayed by
+  that lead, which first mislabeled it ruled and corrected that the same day; timing
+  operator-stated: not before the next iteration. The candidate: the guard parses each roster
+  binary's argv rather than trusting the segment's leading binary; every `GUARD_KIT_RO_BINS`
+  member declares its write and execute forms (possibly none) and the auto-allow is withheld on
+  a declared form; an option or positional count the parse cannot classify falls through to the
+  prompt, so a missed form costs a prompt and never a hole; block-with-steer only where a
+  dedicated tool owns the act (`sed -i` to Edit); a gate refuses a member added undeclared; the
+  parser may ride the gate binary as a native arm. Candidate objections to other shapes, equally
+  open: a harness grant cannot tell read from write, a write option having many spellings;
+  warn-only fires after the auto-allow; block-by-default refuses an approvable write; a
+  substituted tool diverges the executed command from the reasoned one. Against the old pair: a
+  pure denylist fails open, while a declaration generalizes the `xargs` discriminator.
+  **Widened witnesses, lead-probed 2026-09-11; roster membership re-verified at close:**
+  `sort --output=` and bundled `-uo`; `uniq`'s second positional argument is its output file;
+  `find`'s `-delete`, `-exec`, `-execdir`, `-ok`, `-okdir`, `-fprint`, `-fprint0`, `-fprintf` and
+  `-fls`; `rg --pre=COMMAND` runs a program.
+  **Cost while deferred:** a standing auto-allow that overwrites tracked files with no prompt —
+  the narrowest live hole in the permission surface, and the one a reviewer of the roster would
+  never see, because the roster reads as a list of safe programs.
+  Filed 2026-08-13 by close, draining the gap inbox; every allow/fall verdict above re-probed
+  against HEAD at the drain rather than taken from the bullet.
+  **Unit set `guard-command-classification`, write forms — operator direction, 2026-09-11.**
+
+- **guard-command-prefix-wrapper** [spec: SPEC-command-classify.md] — a transparent prefix
+  displaces the token the guard matches on, so an already-allowlisted read-only
+  command prompts anyway. Two shapes, one mechanism, measured at this close's
+  prompt-friction triage as **35 of 108 prompting calls (~32%) — the largest
+  class by a wide margin**: `time bash <allowlisted-script>` and
+  `/usr/bin/time -f '<fmt>' bash <allowlisted-script>` (31), where the leading
+  token is `time` rather than `bash`; and `git -c core.pager=cat <subcommand>`
+  (4+), where the read-only-subcommand recognition reads `-c` instead of
+  `status`/`log`/`tag`.
+  **Why a guard rule and not an allowlist entry** — the triage criterion's own
+  test. `Bash(time *)` would grant *anything* under `time`, which is the guard
+  defeated rather than configured; the decision needs logic no static glob can
+  express (strip the wrapper, then re-test the *wrapped* command against the
+  committed allowlist with the matcher the guard already has).
+  **Deliverable:** a generic-ruleset rule in `guard-kit/lib/guard.sh` that
+  strips a recognized transparent prefix and re-tests via `guard_allow_match`,
+  plus a `guard-tests/cases.tsv` pair and its SPEC rule entry. The `scan-prompts`
+  ranker already has half of it — its `strip_decoration` handles `sudo `/`timeout `
+  for ranking purposes only, so the hook and the ranker disagree about what is
+  covered, which is its own small defect.
+  **Why design-pending:** the wrapper roster is the design question. `time`
+  and `git -c` are safe because they are transparent, but `env VAR=v <cmd>`,
+  `nice`, `nohup`, and `xargs` are not uniformly so (`env` can replace `PATH`),
+  so the rule needs a stated closed roster and a reason for its boundary rather
+  than a "strip anything that looks like a wrapper" heuristic.
+  **Cost while deferred:** roughly a third of all permission prompts in an
+  iteration, all of them on commands the operator already blessed — the pure
+  interruption cost this loop exists to retire, and it grows with profiling work
+  (this iteration was a performance iteration, which is why `time` dominated).
+  **Tier: feature, owing an amendment — corrected 2026-08-13 at close.** The entry long carried
+  "Debt: … adds no governed name to a shipped surface"; that self-declaration is false against
+  the tree. guard-kit's generic ruleset is a numbered SPEC roster backed by named
+  `guard_rule_*` functions in `lib/guard.sh`, so a new rule adds a name to a
+  governed surface, a contract consumers honour, and a closed transparent-prefix roster.
+  Only the tier label is corrected here; the entry's substantive claims were not re-examined.
+  Filed 2026-08-01 by close's prompt-friction triage; tier corrected 2026-08-13 by close from the
+  gap-inbox drain, after the operator ruled the entry out of that iteration's unit set.
+  **Unit set `guard-command-classification`, prefix strip — operator direction, 2026-09-11.**
+  **Two premises above are stale, corrected at spec 2026-09-11 from the vendor permissions
+  reference.** The matcher itself strips `time`, `timeout`, `nice`, `nohup` and `stdbuf` before
+  it matches, so only `/usr/bin/time` and `git -c` survive as shapes. And `git -c` is not
+  transparent: a `-c` key can name a program the subcommand runs. The amendment steers both.
+
+- **guard-read-steer-tool-coverage** [spec: SPEC-command-classify.md] — the bash-guard's
+  read-steer covers `cat`
+  and `sed` and not `awk`, so a line-range read of a tracked file is decided out of band.
+  recurrence: guard-read-steer-tool-coverage 2026-08-23
+  **FIRST RECURRENCE, 2026-08-23, and the DOMINANT SHAPE FLIPPED — which redirects the design.**
+  22 `awk` programs in that log: **8** line-range, **12** section-pattern (`/^## <title>/,/^## /`),
+  2 genuine stream transforms, against 19-of-22 line-range below. So the majority then wanted a
+  DIFFERENT target — the section extractor, `--emit md-section` since the 2026-09-01 port — and a
+  steer built to the earlier measurement would have sent it to `Read`'s offset/limit, the wrong
+  tool. What the unit owns grows by one: the parser must also decide WHICH steer to emit.
+  **THIRD MEASUREMENT, 2026-08-23 at `battery-runner-port`'s close — the dominant shape flipped
+  BACK, so the mix is ITERATION-SHAPED rather than trending.** Of the 25 file-reading `awk` calls
+  in that log, **23** are the line-range form and 2 the section-pattern one, with about 5 further
+  genuine stream transforms beside them — so `Read`'s offset/limit is the majority's right target
+  again and the section extractor is the minority answer. Read the three together — 19-of-22
+  line-range on 2026-08-19, 8-of-20 earlier on 2026-08-23, 23-of-25 now: a queue-and-survey-heavy
+  iteration reads sections and a SPEC-and-source-heavy one reads line ranges. That argues for the
+  which-steer clause above more strongly than any single reading argues for one target, and it
+  proposes no new deliverable. **No `recurrence:` date joins:** the finding did not re-fire, a
+  measurement the entry carries was superseded.
+  **FOURTH MEASUREMENT 2026-08-24 CONFIRMS the iteration-shaped reading:** 72 line-range `NR>=`
+  against 22 section-pattern in a SPEC-and-source-heavy iteration, as predicted. No `recurrence:`
+  date joins, per the third's precedent: a further measurement of a carried quantity is no firing.
+  **Measured 2026-08-19 off the log:** 22 `awk` calls, 19 the exact `awk 'NR>=X && NR<=Y' <file>`
+  shape, and every one of the 22 read a FILE rather than transformed a stream — which is the whole
+  premise, and it is the shape the guard already steers `cat` and `sed` away from.
+  **It CORRECTED a proposal `session-mechanic-grants-uncommitted` carried**, and that entry has
+  since moved to Done, so the contest has no live holder and this entry is its only survivor. That
+  one listed `awk` among the absent grants to put to the operator, its disposition (a); on this
+  measurement the right disposition is (b), the steer. Granting it would bless the form the tree is
+  retiring — the masking `guard-kit/templates/close-triage.md`'s criterion warns of.
+  **A third disposition, added 2026-08-23 at close:** (c) rule the steer spelling-shaped by design
+  and say so in the rule's own honest-limit paragraph, so a later triage stops re-deriving this.
+  It is the cheapest of the three and the only one that costs no parser; it is also the only one
+  that leaves the out-of-band decisions standing, which is what the choice trades.
+  **Distinct from both steer-defect neighbours**, re-read here rather than assumed:
+  `guard-steer-grant-mismatch` is a steer whose target form nothing grants;
+  `guard-steer-names-absent-tool` is a steer naming a tool that is not there. This is a read form
+  with **no steer at all**.
+  **Why design-pending, and why it is not a one-liner.** The `sed` steer is a dedicated
+  segment parser (`guard-kit/lib/guard.sh`, `_guard_sed_segment`) separating the script argument
+  from file operands through `sed`'s own option grammar. `awk`'s grammar differs — `-F`, `-v`,
+  `-f`, and the first non-option word is the program unless `-f` is given — so it needs its own
+  parser plus a `guard-read-path.test.sh` arm. What the unit owns is whether a third per-tool
+  parser is the right shape, or whether the three want one "first-word-is-the-program,
+  rest-are-operands" abstraction.
+  **Cost while deferred:** an out-of-band decision per range read, on the busiest read shape in
+  the tree, while the guard reads as though it covers the class.
+  Filed 2026-08-19 into the gap inbox by the `budget-batch-and-account-identity-kind` close's
+  prompt-friction triage; promoted at the following scope's drain, both neighbours re-read there.
+  **Unit set `guard-command-classification`, awk read steer — operator direction, 2026-09-11.**
+  **The cost line above is stale since 2026-08-30**, when the committed `Bash(awk *)` grant landed:
+  an `awk` read no longer costs an out-of-band decision. The steer stays, on tool hygiene.
+
+- **guard-steer-names-absent-tool** [spec: SPEC-command-classify.md] — a guard refusal steers
+  the session onto
+  a harness tool its own toolset does not carry, so the remedy it names is unreachable.
+  **PROBED at the 2026-08-18 close and re-probed at this scope entry.** `guard-kit/lib/guard.sh`
+  emits two such steers: the bare-`find` refusal says "use the Glob tool" and the `git grep`
+  refusal says "use the Grep tool". A dispatched stage session's toolset is
+  Agent/Artifact/Bash/Edit/Read/Skill/ToolSearch/Write plus the deferred set, and
+  `ToolSearch 'select:Grep,Glob'` matches nothing — neither tool exists to reach. The `cat` and
+  `sed` steers name the Read tool and are correct, which is why the class reads as ordinary
+  friction rather than as a defect.
+  **The bullet undercounted the surface, and the correction is what widens this.** It named
+  `scripts/bash-guard.sh` and the Grep steer alone; the text lives in **guard-kit's generic
+  ruleset** and Glob has the identical shape. So the reach is every vendoring consumer whose
+  agent shape lacks those tools, not this repo's own steer vocabulary.
+  **NOT a permission-coverage defect and NOT an allowlist widening.** Bare `grep` and `find`
+  are already committed grants, so the working form was available all along; only the named
+  remedy is wrong.
+  **DISTINCT from `guard-steer-grant-mismatch`**, which is a steer whose target form the
+  allowlist does not grant. Here the grant exists and the *tool* does not — the same surface's
+  opposite half, worth designing together, neither subsuming the other.
+  **Why design-pending:** the guard cannot see a caller's toolset, so a conditional message
+  has no input to condition on. The candidate shapes are naming the fallback in the text ("use
+  the Grep tool, or bare `grep`, which is allowlisted") or making the steered-to tool a
+  consumer-config line, and which one holds is a guard-kit steering-message contract question
+  rather than an edit.
+  **Cost while deferred:** small and paid per search — a session follows the steer, finds no
+  tool, spends a ToolSearch, and re-derives the allowlisted bare form.
+  Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, in its tooling-friction
+  triage; promoted from the gap inbox at this iteration's scope.
+  **Unit set `guard-command-classification`, steer text — operator direction, 2026-09-11.**
+
+- **backgrounded-shell-child-run-record-unenforced** [spec: SPEC-command-classify.md] — the
+  launch-time liveness record is advised and never required.
+  recurrence: backgrounded-shell-child-run-record-unenforced 2026-08-28
+  **FIRST RECURRENCE, and it is a SHARPER SHAPE that narrows the design fork below.** Attested at
+  `installer-trial-lifecycle-repair`'s close: `stage-economics.sh` exceeded its foreground timeout
+  and **the harness backgrounded it**, leaving a live producer writing `.metric/` with no `.run`
+  record — and no session act could have written one, because the launch was never a session act.
+  Rule 15 fires on the *write* side of an explicit backgrounding and this path never reaches it,
+  so the first of the two candidate detection shapes recorded below is not merely
+  text-shaped-limited here, it is structurally unreachable. The second — a session-end check over
+  the scratch dir — is the only candidate that sees this instance at all, which is a real
+  narrowing of an otherwise even fork.
+  **The drain corrected this finding's premise.** It was filed claiming "prompts request, guards
+  enforce, and here only the prompt exists". guard-kit generic rule 15
+  (`guard_rule_background_no_record`) had landed the day before, on 2026-08-22, and does fire on
+  the write side — but what it calls is `guard_advise`, additional context at exit 0, never
+  `guard_block`. The gap is an advisory that is not a floor, not an absent rule.
+  **Attested this iteration:** the align stage session backgrounded two full gate-battery runs
+  and wrote no `.run` record for either, self-reporting the omission afterward. No harm resulted
+  — it awaited each completion notification before any git-writing command — but the omission was
+  invisible to every other actor: the lead, reading the scratch dir for liveness at that moment,
+  could not distinguish a finished producer from one that never registered. Generic rule 14's
+  block on index/worktree/ref-writing git commands is a no-op against a producer that never
+  announced itself.
+  **Why design-pending:** promoting the advisory to a block needs a detection shape a guard
+  can hold — it cannot read whether a command *will* write the record without inspecting its
+  text, the same text-shaped limit `wait-loop-exemption-blind-behind-a-script-name` records on
+  the exemption side. A session-end check over the scratch dir is the other candidate and has no
+  false-positive budget yet.
+  **DISTINCT from `session-mechanic-grants-uncommitted`**, whose subject was an out-of-band
+  permission decision on the journal-append write path — a grant question, not this enforcement
+  one. That entry closed 2026-08-23 and its subject shipped as guard-kit/SPEC.md §The generic
+  ruleset rule 17, which is the adjacent surface; nothing of it is re-filed here.
+  **Cost while deferred:** rule 14's reach stays opt-in on the launching session's diligence, so
+  a commit can be taken beside a live producer that never announced itself.
+  Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
+  the filing and read `guard_advise` to establish that it never blocks.
+  **Unit set `guard-command-classification`, rule-15 floor — operator direction, 2026-09-11.**
+  **Spec 2026-09-11 designs the explicit-launch half** (a block, plus a grant that makes the record
+  cost nothing). A scratch-dir check cannot see the moved-on-timeout half; the only view of it is
+  the turn-end payload's `background_tasks` array, so that half is routed to the lead.
+
+- **wait-loop-exemption-blind-behind-a-script-name** [spec: SPEC-command-classify.md] —
+  guard rule 15's wait-loop
+  exemption is command-text-shaped, so a wait loop inside a script draws the advisory anyway.
+  **Measured 2026-08-23 at build:** eight backgrounded arms of the wait-primitive probe's
+  waiter (delegation-kit/SPEC.md §bin/wait-probe) — whose body *is*
+  `until <cond>; do sleep 1; done`
+  — each drew the recording advisory, whose own closing sentence says a backgrounded wait loop
+  "owns no work a commit could corrupt and owes no record".
+  **Why:** the exemption is detected by the `do … done` span walk
+  `guard_rule_background_no_record` performs over the skeletonized command text; at `PreToolUse`
+  the script body is not readable, so the span walk cannot see it. That is the honest limit of a
+  text-shaped predicate rather than a bug — but the population is not marginal: a reusable wait
+  helper is exactly the shape a methodology that mandates in-turn waiting will grow, and every
+  invocation of one pays an advisory saying the opposite of what the rule means.
+  **Why design-pending:** the two candidate dispositions are uncosted and point opposite ways
+  — widen the exemption to a leading roster member whose name the consumer declares, which rule
+  15 explicitly refuses as consumer vocabulary; or accept the limit and say so in the rule's own
+  honest-limit paragraph so the next reader does not re-derive it.
+  **DISTINCT from `backgrounded-shell-child-run-record-unenforced`**: that entry is the false
+  negative — the advisory is not a floor — and this one the false positive, where the exemption
+  cannot see through a script name. One text-shaped predicate, two opposite failures, two fixes.
+  **Cost while deferred:** the advisory's credibility decays — a session that meets it wrongly
+  once learns to read past it, which is the erosion that makes an unenforced rule cheap.
+  Filed 2026-08-23 by build; drained at that iteration's close, which read the span walk to
+  confirm the limit is structural rather than a detection bug.
+  **Unit set `guard-command-classification`, rule-15 exemption — operator direction, 2026-09-11.**
+
 ## Technical Debt
 
 ## Deferred
@@ -768,58 +1063,6 @@
   Filed 2026-08-30 by close from the gap inbox; both of the owning spec's
   concessions were re-read at the drain.
 
-- **grant-argument-bounding-mechanism** [design-pending] [cost: session/high] [surface: guard-kit] — two committed grants reach a destructive
-  form and no allow-glob narrowing can stop either.
-  **Both findings are verified rather than surmised**, at build 2026-08-22 by a read-only worktree
-  sweep over all 105 committed `Bash(` entries.
-  **(1) The `.tmp/` rm family escapes the scratch dir.** `Bash(rm .tmp/*)`, `Bash(rm -f .tmp/*)`
-  and `Bash(rm -rf .tmp/*)` each match `rm -rf .tmp/../.git`, and reach any irreplaceable untracked
-  local file — `BRIEF.local.md`, `OPS.local.md`, `ENV.local.md`. `guard_rule_rm_tracked` fires only
-  on a TRACKED target, so nothing in the guard covers this.
-  **(2) `Bash(git rm -q *)` reaches `git rm -q -f <modified file>`**, destroying uncommitted work
-  irrecoverably; the sweep demonstrated it in a scratch repo rather than reasoning about it. No
-  guard rule covers that either — `guard_rule_rm_tracked` matches a bare `rm` only.
-  **That grant is LOAD-BEARING, which is what makes this hard.** `guard_rule_rm_tracked` STEERS
-  every tracked-file deletion INTO `git rm -q`, so narrowing the grant taxes a mechanic the guard
-  itself mandates. It is not a grant anyone may simply delete.
-  **Why no allow-glob fixes it.** A Bash rule's `*` "matches any sequence of characters including
-  spaces" (vendor permissions doc), so it spans `/` and `..` and cannot bound an argument. That
-  same doc warns outright that "Bash permission patterns that try to constrain command arguments
-  are fragile", and offers exactly two remedies: deny rules, or a PreToolUse hook.
-  **Candidate shapes, none costed:** a committed `deny` list, which outranks allow but inherits the
-  fragility the doc names; extend the guard's rules, the vendor's own remedy and the one this repo
-  already owns the hook for; or accept and declare, recording the reach rather than removing it.
-  **Why [design-pending]:** the three trade differently against a boundary this repo has never
-  used — `.claude/settings.json` carries no `deny` list at all today — and the first is an
-  operator-class edit besides, so the mechanism choice decides who may even land it.
-  **Cost while deferred:** two live paths to irrecoverable data loss, one of them reachable by a
-  single mistyped path inside a grant every session uses for routine scratch cleanup.
-  Filed 2026-08-22 by build, split out of `guard-grant-review` on the lead's ruling that choosing
-  the mechanism is design work and scope-gated intake makes it a costed Deferred entry by default.
-  **Leads the `guard-command-classification` set — operator direction, 2026-09-11, lead-relayed.**
-
-- **grant-path-traversal-exposure** [design-pending] [cost: event/low] [surface: guard-kit] — the committed script-runner globs match a
-  traversing path, a code-execution class the grant narrowing now covers.
-  **The exposure, stated plainly:** `Bash(bash */checks/check-*.sh)` matches
-  `bash ../../evil/checks/check-x.sh`, because a Bash rule's `*` spans `/`. Its siblings carry the
-  same shape — `bash */bin/run-*-tests.sh`, `bash */gate-tests/*.test.sh` and
-  `bash */smoke/install.sh`. Verified at build 2026-08-22; the `drift-kit/kpis/*.sh` pair was
-  listed here too and was retired with the 2026-08-29 KPI port, leaving four live globs.
-  **Why it is genuinely weaker than a data-loss finding:** reaching a destructive script needs a
-  second precondition the allowlist cannot evidence — a hostile script must already exist at a
-  matching path. `scripts/bash-guard.sh` also blocks `bash .tmp/…` outright, closing the one path a
-  session may write to freely, and routes it through the `--scratch-run` arm, which resolves the
-  real path and refuses anything outside the scratch dir.
-  **Widened in, and joins the `guard-command-classification` unit set — operator direction,
-  2026-09-11, lead-relayed:** the 2026-08-20 narrowing (data-loss forms) now covers this
-  code-execution class. **Why [design-pending]:** whether these globs can be re-spelled without
-  breaking the battery they exist to run is untouched and unbought.
-  **Cost while deferred:** low and precondition-bound, but it spans the whole script-runner
-  surface rather than one grant, so a later change making a matching path writable would arm the
-  whole family at once, and would do it without a signal anyone reads.
-  Filed 2026-08-22 by build on the lead's ruling; surfaced by the same sweep that produced
-  `grant-argument-bounding-mechanism`, which is the data-loss half of the one audit.
-
 - **config-bridge-resolution-cost** [design-pending] [cost: session/high] [surface: gate-sdk] — the array-knob config bridge still costs
   about 640 ms on every invocation that resolves it, and no entry owns the residue.
   **RE-SCOPED 2026-08-23 at `battery-runner-port`'s close, on a lead ruling: correcting a false
@@ -1370,46 +1613,6 @@
   failed against a lead that had it in context. That is the second half of the fork's own argument.
   recurrence: batch-split-stamp-ownership 2026-08-29
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
-
-- **guard-command-prefix-wrapper** [design-pending] [cost: session/high] [surface: guard-kit] — a transparent prefix
-  displaces the token the guard matches on, so an already-allowlisted read-only
-  command prompts anyway. Two shapes, one mechanism, measured at this close's
-  prompt-friction triage as **35 of 108 prompting calls (~32%) — the largest
-  class by a wide margin**: `time bash <allowlisted-script>` and
-  `/usr/bin/time -f '<fmt>' bash <allowlisted-script>` (31), where the leading
-  token is `time` rather than `bash`; and `git -c core.pager=cat <subcommand>`
-  (4+), where the read-only-subcommand recognition reads `-c` instead of
-  `status`/`log`/`tag`.
-  **Why a guard rule and not an allowlist entry** — the triage criterion's own
-  test. `Bash(time *)` would grant *anything* under `time`, which is the guard
-  defeated rather than configured; the decision needs logic no static glob can
-  express (strip the wrapper, then re-test the *wrapped* command against the
-  committed allowlist with the matcher the guard already has).
-  **Deliverable:** a generic-ruleset rule in `guard-kit/lib/guard.sh` that
-  strips a recognized transparent prefix and re-tests via `guard_allow_match`,
-  plus a `guard-tests/cases.tsv` pair and its SPEC rule entry. The `scan-prompts`
-  ranker already has half of it — its `strip_decoration` handles `sudo `/`timeout `
-  for ranking purposes only, so the hook and the ranker disagree about what is
-  covered, which is its own small defect.
-  **Why `[design-pending]`:** the wrapper roster is the design question. `time`
-  and `git -c` are safe because they are transparent, but `env VAR=v <cmd>`,
-  `nice`, `nohup`, and `xargs` are not uniformly so (`env` can replace `PATH`),
-  so the rule needs a stated closed roster and a reason for its boundary rather
-  than a "strip anything that looks like a wrapper" heuristic.
-  **Cost while deferred:** roughly a third of all permission prompts in an
-  iteration, all of them on commands the operator already blessed — the pure
-  interruption cost this loop exists to retire, and it grows with profiling work
-  (this iteration was a performance iteration, which is why `time` dominated).
-  **Tier: feature, owing an amendment — corrected 2026-08-13 at close.** The entry long carried
-  "Debt: … adds no governed name to a shipped surface"; that self-declaration is false against
-  the tree. guard-kit's generic ruleset is a numbered SPEC roster backed by named
-  `guard_rule_*` functions in `lib/guard.sh`, so a new rule adds a name to a
-  governed surface, a contract consumers honour, and a closed transparent-prefix roster.
-  Only the tier label is corrected here; the entry's substantive claims were not re-examined.
-  Filed 2026-08-01 by close's prompt-friction triage; tier corrected 2026-08-13 by close from the
-  gap-inbox drain, after the operator ruled the entry out of that iteration's unit set.
-  **Unit set `guard-command-classification`, prefix strip — operator direction, 2026-09-11.**
-
 
 - **companion-toolkit-profile** [design-pending] [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
   roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.
@@ -2379,48 +2582,6 @@
   third population added 2026-08-14 by close from the same rostered sweep, which declined again.
 
 
-- **ro-bins-write-option-bypass** [design-pending] [cost: session/high] [surface: guard-kit] — `GUARD_KIT_RO_BINS` membership is tested as
-  "the segment leads with this binary", but leading with a roster binary does not make the
-  invocation read-only, and the read-only-pipeline rule's safety argument assumes it does. The rule
-  is named rather than numbered here: guard-kit renumbers on insertion, and this citation had gone
-  stale twice over before close 2026-08-22 corrected it.
-  **Probed through the live hook at close, not reasoned:** `grep foo a.md | sort -o out.txt` and
-  `sort -o tracked.md tracked.md | head` are both auto-allowed today, and each overwrites a named
-  file. That rule's redirect check inspects `>`/`>>` targets only, so a write expressed as a
-  binary's own option is invisible to it. `sort` is the shipped instance.
-  **The `xargs` half of this finding is already discharged and must not be re-filed**: the
-  guard-context-matching unit landed `_guard_is_ro_xargs` (guard-kit/lib/guard.sh), and the same
-  close probe confirms `find . -type f | xargs rm -rf` and `grep -rln foo src | xargs sed -i …`
-  now fall through rather than auto-allow, while `find . -name '*.sh' | xargs grep -l foo` still
-  allows. What survives is the general predicate the discriminator solved case-by-case.
-  **Distinct from `guard-command-prefix-wrapper`** (transparent prefixes for allowlist matching)
-  and from the two consumer-side guard entries below: this is the roster knob's own predicate
-  being weaker than the grant that reads it.
-  **Fix shape: an exploration direction, NOT a ruling, open to revision at scope or spec on
-  further facts** — operator-agreed 2026-09-11 by typed message in the lead session, relayed by
-  that lead, which first mislabeled it ruled and corrected that the same day; timing
-  operator-stated: not before the next iteration. The candidate: the guard parses each roster
-  binary's argv rather than trusting the segment's leading binary; every `GUARD_KIT_RO_BINS`
-  member declares its write and execute forms (possibly none) and the auto-allow is withheld on
-  a declared form; an option or positional count the parse cannot classify falls through to the
-  prompt, so a missed form costs a prompt and never a hole; block-with-steer only where a
-  dedicated tool owns the act (`sed -i` to Edit); a gate refuses a member added undeclared; the
-  parser may ride the gate binary as a native arm. Candidate objections to other shapes, equally
-  open: a harness grant cannot tell read from write, a write option having many spellings;
-  warn-only fires after the auto-allow; block-by-default refuses an approvable write; a
-  substituted tool diverges the executed command from the reasoned one. Against the old pair: a
-  pure denylist fails open, while a declaration generalizes the `xargs` discriminator.
-  **Widened witnesses, lead-probed 2026-09-11; roster membership re-verified at close:**
-  `sort --output=` and bundled `-uo`; `uniq`'s second positional argument is its output file;
-  `find`'s `-delete`, `-exec`, `-execdir`, `-ok`, `-okdir`, `-fprint`, `-fprint0`, `-fprintf` and
-  `-fls`; `rg --pre=COMMAND` runs a program.
-  **Cost while deferred:** a standing auto-allow that overwrites tracked files with no prompt —
-  the narrowest live hole in the permission surface, and the one a reviewer of the roster would
-  never see, because the roster reads as a list of safe programs.
-  Filed 2026-08-13 by close, draining the gap inbox; every allow/fall verdict above re-probed
-  against HEAD at the drain rather than taken from the bullet.
-  **Unit set `guard-command-classification`, write forms — operator direction, 2026-09-11.**
-
 - **guard-ruleset-registration-lockstep** [design-pending] [cost: event/low] [surface: guard-kit] — guard-kit's generic ruleset exists in
   three places and nothing holds them in lockstep.
   The numbered roster in `guard-kit/SPEC.md` §The generic ruleset, the set of named
@@ -2976,36 +3137,6 @@
   are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
   adopted close's own refusal to take the envelope change alone.
 
-- **guard-steer-names-absent-tool** [design-pending] [cost: event/low] [surface: guard-kit] — a guard refusal steers the session onto
-  a harness tool its own toolset does not carry, so the remedy it names is unreachable.
-  **PROBED at the 2026-08-18 close and re-probed at this scope entry.** `guard-kit/lib/guard.sh`
-  emits two such steers: the bare-`find` refusal says "use the Glob tool" and the `git grep`
-  refusal says "use the Grep tool". A dispatched stage session's toolset is
-  Agent/Artifact/Bash/Edit/Read/Skill/ToolSearch/Write plus the deferred set, and
-  `ToolSearch 'select:Grep,Glob'` matches nothing — neither tool exists to reach. The `cat` and
-  `sed` steers name the Read tool and are correct, which is why the class reads as ordinary
-  friction rather than as a defect.
-  **The bullet undercounted the surface, and the correction is what widens this.** It named
-  `scripts/bash-guard.sh` and the Grep steer alone; the text lives in **guard-kit's generic
-  ruleset** and Glob has the identical shape. So the reach is every vendoring consumer whose
-  agent shape lacks those tools, not this repo's own steer vocabulary.
-  **NOT a permission-coverage defect and NOT an allowlist widening.** Bare `grep` and `find`
-  are already committed grants, so the working form was available all along; only the named
-  remedy is wrong.
-  **DISTINCT from `guard-steer-grant-mismatch`**, which is a steer whose target form the
-  allowlist does not grant. Here the grant exists and the *tool* does not — the same surface's
-  opposite half, worth designing together, neither subsuming the other.
-  **Why `[design-pending]`:** the guard cannot see a caller's toolset, so a conditional message
-  has no input to condition on. The candidate shapes are naming the fallback in the text ("use
-  the Grep tool, or bare `grep`, which is allowlisted") or making the steered-to tool a
-  consumer-config line, and which one holds is a guard-kit steering-message contract question
-  rather than an edit.
-  **Cost while deferred:** small and paid per search — a session follows the steer, finds no
-  tool, spends a ToolSearch, and re-derives the allowlisted bare form.
-  Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, in its tooling-friction
-  triage; promoted from the gap inbox at this iteration's scope.
-  **Unit set `guard-command-classification`, steer text — operator direction, 2026-09-11.**
-
 - **deferred-entry-defer-date-unasserted** [design-pending] [cost: iteration/low] [surface: queue-kit] — a deferred entry whose provenance
   date is malformed reads as **undated**, and no gate reds on it.
   recurrence: deferred-entry-defer-date-unasserted 2026-08-24
@@ -3132,57 +3263,6 @@
   Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
   whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
 
-
-- **guard-read-steer-tool-coverage** [design-pending] [cost: session/high] [surface: guard-kit] — the bash-guard's read-steer covers `cat`
-  and `sed` and not `awk`, so a line-range read of a tracked file is decided out of band.
-  recurrence: guard-read-steer-tool-coverage 2026-08-23
-  **FIRST RECURRENCE, 2026-08-23, and the DOMINANT SHAPE FLIPPED — which redirects the design.**
-  22 `awk` programs in that log: **8** line-range, **12** section-pattern (`/^## <title>/,/^## /`),
-  2 genuine stream transforms, against 19-of-22 line-range below. So the majority then wanted a
-  DIFFERENT target — the section extractor, `--emit md-section` since the 2026-09-01 port — and a
-  steer built to the earlier measurement would have sent it to `Read`'s offset/limit, the wrong
-  tool. What the unit owns grows by one: the parser must also decide WHICH steer to emit.
-  **THIRD MEASUREMENT, 2026-08-23 at `battery-runner-port`'s close — the dominant shape flipped
-  BACK, so the mix is ITERATION-SHAPED rather than trending.** Of the 25 file-reading `awk` calls
-  in that log, **23** are the line-range form and 2 the section-pattern one, with about 5 further
-  genuine stream transforms beside them — so `Read`'s offset/limit is the majority's right target
-  again and the section extractor is the minority answer. Read the three together — 19-of-22
-  line-range on 2026-08-19, 8-of-20 earlier on 2026-08-23, 23-of-25 now: a queue-and-survey-heavy
-  iteration reads sections and a SPEC-and-source-heavy one reads line ranges. That argues for the
-  which-steer clause above more strongly than any single reading argues for one target, and it
-  proposes no new deliverable. **No `recurrence:` date joins:** the finding did not re-fire, a
-  measurement the entry carries was superseded.
-  **FOURTH MEASUREMENT 2026-08-24 CONFIRMS the iteration-shaped reading:** 72 line-range `NR>=`
-  against 22 section-pattern in a SPEC-and-source-heavy iteration, as predicted. No `recurrence:`
-  date joins, per the third's precedent: a further measurement of a carried quantity is no firing.
-  **Measured 2026-08-19 off the log:** 22 `awk` calls, 19 the exact `awk 'NR>=X && NR<=Y' <file>`
-  shape, and every one of the 22 read a FILE rather than transformed a stream — which is the whole
-  premise, and it is the shape the guard already steers `cat` and `sed` away from.
-  **It CORRECTED a proposal `session-mechanic-grants-uncommitted` carried**, and that entry has
-  since moved to Done, so the contest has no live holder and this entry is its only survivor. That
-  one listed `awk` among the absent grants to put to the operator, its disposition (a); on this
-  measurement the right disposition is (b), the steer. Granting it would bless the form the tree is
-  retiring — the masking `guard-kit/templates/close-triage.md`'s criterion warns of.
-  **A third disposition, added 2026-08-23 at close:** (c) rule the steer spelling-shaped by design
-  and say so in the rule's own honest-limit paragraph, so a later triage stops re-deriving this.
-  It is the cheapest of the three and the only one that costs no parser; it is also the only one
-  that leaves the out-of-band decisions standing, which is what the choice trades.
-  **Distinct from both steer-defect neighbours**, re-read here rather than assumed:
-  `guard-steer-grant-mismatch` is a steer whose target form nothing grants;
-  `guard-steer-names-absent-tool` is a steer naming a tool that is not there. This is a read form
-  with **no steer at all**.
-  **Why `[design-pending]`, and why it is not a one-liner.** The `sed` steer is a dedicated
-  segment parser (`guard-kit/lib/guard.sh`, `_guard_sed_segment`) separating the script argument
-  from file operands through `sed`'s own option grammar. `awk`'s grammar differs — `-F`, `-v`,
-  `-f`, and the first non-option word is the program unless `-f` is given — so it needs its own
-  parser plus a `guard-read-path.test.sh` arm. What the unit owns is whether a third per-tool
-  parser is the right shape, or whether the three want one "first-word-is-the-program,
-  rest-are-operands" abstraction.
-  **Cost while deferred:** an out-of-band decision per range read, on the busiest read shape in
-  the tree, while the guard reads as though it covers the class.
-  Filed 2026-08-19 into the gap inbox by the `budget-batch-and-account-identity-kind` close's
-  prompt-friction triage; promoted at the following scope's drain, both neighbours re-read there.
-  **Unit set `guard-command-classification`, awk read steer — operator direction, 2026-09-11.**
 
 - **spec-lib-dead-derivation** [design-pending] [cost: event/low] [surface: canon-kit] — three section-builder regexes in
   `canon-kit/lib/spec.sh` have no reader left in the tree, and nothing rules what they are.
@@ -3450,45 +3530,6 @@
   Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the
   bullet had named the wrong slug and located the real entry before dispositioning.
 
-- **backgrounded-shell-child-run-record-unenforced** [design-pending] [cost: event/high] [surface: guard-kit] — the launch-time liveness
-  record is advised and never required.
-  recurrence: backgrounded-shell-child-run-record-unenforced 2026-08-28
-  **FIRST RECURRENCE, and it is a SHARPER SHAPE that narrows the design fork below.** Attested at
-  `installer-trial-lifecycle-repair`'s close: `stage-economics.sh` exceeded its foreground timeout
-  and **the harness backgrounded it**, leaving a live producer writing `.metric/` with no `.run`
-  record — and no session act could have written one, because the launch was never a session act.
-  Rule 15 fires on the *write* side of an explicit backgrounding and this path never reaches it,
-  so the first of the two candidate detection shapes recorded below is not merely
-  text-shaped-limited here, it is structurally unreachable. The second — a session-end check over
-  the scratch dir — is the only candidate that sees this instance at all, which is a real
-  narrowing of an otherwise even fork.
-  **The drain corrected this finding's premise.** It was filed claiming "prompts request, guards
-  enforce, and here only the prompt exists". guard-kit generic rule 15
-  (`guard_rule_background_no_record`) had landed the day before, on 2026-08-22, and does fire on
-  the write side — but what it calls is `guard_advise`, additional context at exit 0, never
-  `guard_block`. The gap is an advisory that is not a floor, not an absent rule.
-  **Attested this iteration:** the align stage session backgrounded two full gate-battery runs
-  and wrote no `.run` record for either, self-reporting the omission afterward. No harm resulted
-  — it awaited each completion notification before any git-writing command — but the omission was
-  invisible to every other actor: the lead, reading the scratch dir for liveness at that moment,
-  could not distinguish a finished producer from one that never registered. Generic rule 14's
-  block on index/worktree/ref-writing git commands is a no-op against a producer that never
-  announced itself.
-  **Why `[design-pending]`:** promoting the advisory to a block needs a detection shape a guard
-  can hold — it cannot read whether a command *will* write the record without inspecting its
-  text, the same text-shaped limit `wait-loop-exemption-blind-behind-a-script-name` records on
-  the exemption side. A session-end check over the scratch dir is the other candidate and has no
-  false-positive budget yet.
-  **DISTINCT from `session-mechanic-grants-uncommitted`**, whose subject was an out-of-band
-  permission decision on the journal-append write path — a grant question, not this enforcement
-  one. That entry closed 2026-08-23 and its subject shipped as guard-kit/SPEC.md §The generic
-  ruleset rule 17, which is the adjacent surface; nothing of it is re-filed here.
-  **Cost while deferred:** rule 14's reach stays opt-in on the launching session's diligence, so
-  a commit can be taken beside a live producer that never announced itself.
-  Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
-  the filing and read `guard_advise` to establish that it never blocks.
-  **Unit set `guard-command-classification`, rule-15 floor — operator direction, 2026-09-11.**
-
 - **guard-rule-number-intra-kit-citations-ungated** [design-pending] [cost: event/low] [surface: guard-kit] — guard-kit cites its own
   rule numbers everywhere and nothing holds a single citation to the ruleset.
   **Measured at the rule-17 insertion, 2026-08-23**, which shifted rules 17-21 to 18-22: the
@@ -3513,33 +3554,6 @@
   which is exactly how the raw-vs-skeleton one survived.
   Filed 2026-08-23 by build; drained at that iteration's close, which re-counted the citations
   and confirmed no gate matches them.
-
-- **wait-loop-exemption-blind-behind-a-script-name** [design-pending] [cost: event/low] [surface: guard-kit] — guard rule 15's wait-loop
-  exemption is command-text-shaped, so a wait loop inside a script draws the advisory anyway.
-  **Measured 2026-08-23 at build:** eight backgrounded arms of the wait-primitive probe's
-  waiter (delegation-kit/SPEC.md §bin/wait-probe) — whose body *is*
-  `until <cond>; do sleep 1; done`
-  — each drew the recording advisory, whose own closing sentence says a backgrounded wait loop
-  "owns no work a commit could corrupt and owes no record".
-  **Why:** the exemption is detected by the `do … done` span walk
-  `guard_rule_background_no_record` performs over the skeletonized command text; at `PreToolUse`
-  the script body is not readable, so the span walk cannot see it. That is the honest limit of a
-  text-shaped predicate rather than a bug — but the population is not marginal: a reusable wait
-  helper is exactly the shape a methodology that mandates in-turn waiting will grow, and every
-  invocation of one pays an advisory saying the opposite of what the rule means.
-  **Why `[design-pending]`:** the two candidate dispositions are uncosted and point opposite ways
-  — widen the exemption to a leading roster member whose name the consumer declares, which rule
-  15 explicitly refuses as consumer vocabulary; or accept the limit and say so in the rule's own
-  honest-limit paragraph so the next reader does not re-derive it.
-  **DISTINCT from `backgrounded-shell-child-run-record-unenforced`**: that entry is the false
-  negative — the advisory is not a floor — and this one the false positive, where the exemption
-  cannot see through a script name. One text-shaped predicate, two opposite failures, two fixes.
-  **Cost while deferred:** the advisory's credibility decays — a session that meets it wrongly
-  once learns to read past it, which is the erosion that makes an unenforced rule cheap.
-  Filed 2026-08-23 by build; drained at that iteration's close, which read the span walk to
-  confirm the limit is structural rather than a detection bug.
-  **Unit set `guard-command-classification`, rule-15 exemption — operator direction, 2026-09-11.**
-
 
 - **bespoke-test-path-knob-pinning** [design-pending] [cost: event/high] [surface: gate-sdk] — a bespoke gate-test's cwd sandbox is
   isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
