@@ -1878,12 +1878,9 @@ tests fork children of their own. A sibling that forks while a stub's write
 descriptor is open hands its child a copy of that descriptor, and the copy lives
 until the child's `exec` — `O_CLOEXEC` closes it at the `exec`, not at the `fork` —
 so a stub spawned inside that window fails with `ETXTBSY`. A test process that
-never opens the stub for writing has no descriptor to hand on. **Measured before
-the fix, not inferred:** the module alone went red in 8 of 30 runs at default
-parallelism; every red run finished in about 105 ms, so the 10-second reader bound
-cannot have fired; the red cases' lines read `verdict=unavailable decision=allow`
-over a stub reader that had resolved; and all five failing cases had just written
-their stub. The errno itself was not read — no syscall tracer was available — and
+never opens the stub for writing has no descriptor to hand on. **The cause is
+inferred from measurement, never traced:** the reds were too fast for the reader
+bound and fell only on freshly written stubs, but the errno was never read, and
 `spawn` is what names it at the first residual red. Two alternatives are refused:
 a retry on `ETXTBSY`, which in a test weakens the assertion the test exists to
 make and in the hook changes a refusing hook's behavior; and a lock, which cannot

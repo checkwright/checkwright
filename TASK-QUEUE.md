@@ -5209,8 +5209,4 @@
 
 ## Done
 
-- liveness-verdict-table-has-no-spawn-failure-row
-- stop-liveness-test-module-order-dependent
-- crate-test-cwd-process-global-race
-
 ## Lessons Learned

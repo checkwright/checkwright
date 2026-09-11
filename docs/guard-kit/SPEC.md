@@ -977,7 +977,10 @@ that harness exists would be designing against no case.
     `<command> [<redirects>] & echo "pid=$! run=<key>" > <scratch-dir>/<key>.run; wait; rm -f <scratch-dir>/<key>.run`
 
     The `wait` keeps a harness-backgrounded call alive until the child exits, so
-    the completion notification means the producer finished. The trailing
+    the completion notification means the producer finished — never that it
+    passed: a bare `wait` and `rm -f` both exit 0, so the call's status is 0
+    whatever the producer returned, and its verdict is read off its own output.
+    The trailing
     `rm -f` retracts the record at exactly that moment, delegation-kit's *delete
     once exited, and not before* rule taken mechanically rather than remembered.
     The corrective states that rule 19's arm (B) grants the spelling for an
