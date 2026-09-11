@@ -5571,16 +5571,4 @@
 
 ## Done
 
-- ruling-versus-direction-undefined
-- iteration-scoped-grant-home-unstated
-- landing-moots-live-entries-undetected
-- composition-verdict-unrecorded-at-unit-set-ruling
-- lead-cancel-running-work-unforbidden
-- icebox-standing-ineligibility-unrecordable
-- deferred-cost-class-opener-vocabulary
-- deferred-surface-tag-for-bundling
-- scope-ranking-blind-to-deferral-cost-and-impact
-- close-watch-waits-on-slowest-smoke-leg
-- class-default-reach-gated-by-cost-opener
-
 ## Lessons Learned
