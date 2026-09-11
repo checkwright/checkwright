@@ -4913,35 +4913,6 @@
   own corrective reach is this iteration's own retirements, which is what a close can honestly hold.
   recurrence: retired-slug-live-pointer-citation 2026-09-06
 
-- **queue-status-parenthetical-liveness** [design-pending] — a queue cross-citation's section-status
-  parenthetical goes stale when the cited entry moves section, and nothing reads it.
-  **The instance, found 2026-08-22 by two independent close audits.** The
-  internal-identifier-restatement and capability-pendency sweeps reached
-  `amendment-roster-omission-detection` by different heuristics and returned the same line —
-  `amendment-update-target-coverage` tagged `(icebox)`, written while that entry was iceboxed and
-  left behind when this iteration promoted, built and closed it. Fixed in place by dropping the
-  status and naming the landed gate, which is what queue-kit/SPEC.md §check-queue-slug-liveness
-  already prescribes for prose about landed work. Both sweeps proposed keeping a status tag; that
-  would have been stale again within the hour, since the same close cleared the Done section.
-  **Why this slice IS gateable where its neighbour is not.** `retired-slug-live-pointer-citation`
-  needs a false-positive budget because gate names share the slug grammar and dominate the token
-  population. This one needs none: the trigger is a closed vocabulary of section names in
-  parentheses immediately after a backticked token, in the queue's own file, and the queue's own
-  sections are the oracle. Resolution is single-file and total, with no cross-corpus reach.
-  **DISTINCT from `retired-slug-live-pointer-citation`** above, whose subject is a slug cited as a
-  live pointer after retirement. Here the slug is cited correctly as an instance and only the
-  status beside it is false — the reader is told the work is unbuilt while the gate it names runs.
-  **Why `[design-pending]`:** the open question is the vocabulary's edges rather than the scan. A
-  second live citation — `enter-stage-simulate-no-write-fixture` tagged `(icebox)`, verified
-  accurate at this same drain — uses the bare section name; whether a richer spelling should be
-  admitted, rejected or normalized, and what a status tag on a NON-slug token means, decides
-  whether this is one more assertion on `check-queue-slug-liveness` or a member of its own.
-  **Cost while deferred:** low frequency and silent, but it INVERTS the reader's conclusion rather
-  than blurring it — a stale `(icebox)` says the work is not done, which is the opposite of true —
-  and the population is small enough that hand sweeps keep finding it one instance at a time.
-  Filed 2026-08-22 by close, discharging its staleness review's gap-generalization obligation: the
-  fix landed inline and the scanner that would have caught it did not, so it is filed not forfeited.
-
 - **settings-hook-command-path-gate** [design-pending] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
   fails silently at run time.
@@ -4963,50 +4934,6 @@
   happening — the failure mode with no red anywhere and no user-visible symptom.
   Filed 2026-08-22 at spec while surveying context-kit's settings gates; drained at that
   iteration's close, which re-verified the claim and found the enforcement-map reader it missed.
-
-- **breadth-declaration-stale-listing** [design-pending] — a `GUARD_KIT_BREADTH_DECLARED` entry can
-  outlive its subject with nothing noticing: the knob records a ruling about one glob and never
-  verifies that glob is still in the local allowlist, still over-broad, or still real.
-  **Probed at the drain:** the declaration lookup sits *inside* the local-allow-by-breadth-probe
-  loop (the `compare-settings-allow` arm), so a declaration keyed on an entry that has
-  left the overlay is never looked up — it is not reported stale, it is not reported at all.
-  **A stale-declaration *red* was already weighed and refused** inside the amendment that shipped
-  the knob, because it would print every declaration naming a committed glob as stale. The cheap
-  true form is a **listing** rather than a red — the conclusion
-  `done-slug-ownership-citation-report` reached for its own class; the remedy shape is borrowed,
-  the finding is not.
-  **DISTINCT from `breadth-declaration-committed-glob-home`**, the same loop's other face: that
-  entry asks where a *committed* glob's keep-ruling lives at all, this one asks what happens to a
-  *local* declaration once its subject leaves. Settling that entry bounds this one's corpus.
-  **Why `[design-pending]`:** whether the listing rides `compare-settings-allow`'s existing
-  advisory output or earns its own arm is unsettled, and so is whether a listing nobody reads
-  beats nothing at all.
-  **Cost while deferred:** a spent ruling reads as live and silences nothing visibly.
-  Filed 2026-08-22 at spec; drained at that iteration's close, which re-verified the loop scoping.
-
-- **breadth-declaration-committed-glob-home** [design-pending] — a keep-the-breadth ruling about a
-  **committed** allow glob has nowhere durable to live: `GUARD_KIT_BREADTH_DECLARED` cannot hold
-  it, because `compare-settings-allow`'s breadth loop iterates the **local overlay** only, so a
-  declaration keyed on a committed glob is a key nothing ever reads — the shape guard-kit/SPEC.md
-  itself refuses when it says a field with no named reader is removed rather than shipped.
-  **The concrete casualty:** `Bash(git rm -q *)` is a committed glob whose breadth build
-  2026-08-22 ruled KEEP on real grounds — `guard_rule_rm_tracked` steers every tracked-file
-  deletion into it, so narrowing it would tax a mandated mechanic — and that ruling evaporated.
-  **NOT a re-filing of `settings-allow-intended-breadth-declaration`**, which shipped the knob and
-  is closed: the knob does exactly what its own spec says. The gap is that the retired
-  `guard-grant-review`'s corpus (the committed set) and the knob's corpus (the overlay)
-  were never the same corpus, which
-  nothing noticed until a committed-glob keep-ruling needed a home.
-  **Three dispositions, none ruled:** state in guard-kit/SPEC.md that the knob is
-  local-overlay-scoped by design and give committed-glob keep-rulings a different home; widen the
-  breadth question to the committed set, which the iteration lead has ruled a closed reading and
-  would have to re-open; or accept that a committed glob's breadth is ruled by the fact that it is
-  committed and reviewed, and record nothing.
-  **Why `[design-pending]`:** the three differ in what they assert about the committed set's
-  reviewability, which is a security-posture call and not a mechanism choice.
-  **Cost while deferred:** a security review of the committed set produces keep-rulings that
-  evaporate — the exact failure mode `guard-grant-review` was re-filed to stop.
-  Filed 2026-08-22 by build; drained at that iteration's close, which re-verified the loop.
 
 - **guard-rule-number-not-citable-outside-kit** [design-pending] — a guard-kit rule number is a
   stable-looking identifier that is not stable: rules renumber on every insertion, and the
@@ -5056,27 +4983,6 @@
   recurrence: guard-rule-number-not-citable-outside-kit 2026-08-29
   Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the
   bullet had named the wrong slug and located the real entry before dispositioning.
-
-- **criterion-4-two-spellings-disagree** [design-pending] — one port criterion is stated in two
-  spellings that give opposite verdicts on the same member.
-  **Both sentences sit inside gate-sdk/SPEC.md §The port-candidate criteria, criterion 4.** One
-  binds where "a registry member's declaration path lies inside the corpus the gate scans as
-  content"; the other where the corpus reaches "the gate's own declaration path". Under the
-  first, `check-gate-assertions` bound today, pre-port, in every configuration — eight of its
-  nine live enumerated contracts already resolved their markers out of `native/src/gates/*.rs`.
-  Under the second it cleared, because §check-gate-assertions carries no
-  count-word-plus-labelled-span and so its own heading is filtered out.
-  **The eighth cut settled the member and deliberately did not settle the criterion** — it took
-  the conservative binding verdict and ended the member's contingent immunity by making it
-  self-auditing; widening the spine past the ruled unit set was refused, and §The port-candidate
-  criteria records the non-reconciliation in its own prose, citing this slug.
-  **Why `[design-pending]`:** picking a spelling changes that section's own rule with reach
-  across every registry member, so the deliverable is the reconciliation plus a re-read of every
-  member's criterion-4 verdict under the chosen spelling — the re-read is the unsized half.
-  **Cost while deferred:** the divergence outlives the cut, and the next gate-source auditor
-  meets a criterion that answers its own question two ways.
-  Filed 2026-08-23 by the lead on spec's finding; drained at that iteration's close, which
-  re-read both spellings in place and confirmed the SPEC still cites this slug as the filing.
 
 - **backgrounded-shell-child-run-record-unenforced** [design-pending] — the launch-time liveness
   record is advised and never required.
@@ -5283,71 +5189,6 @@
   escalated the ruling and did not take it; ruled by the operator the same day and recorded here by
   that same scope, which authored no part of the ruling it records.
 
-- **relayed-rule-role-scope-unchecked** [design-pending] — a rule relayed through a dispatch can be
-  scoped to the RELAYER's role and bind nobody it is relayed to, and nothing in the relay path
-  checks that.
-  **Two attested instances, both from `battery-runner-port` and both the lead's own self-report.**
-  (1) A dispatch instructed a stage to write `recurrence:` stamps in a shape queue-kit/SPEC.md
-  forbids that stage to write. (2) A dispatch told validate not to re-run `run-validate.sh` — a
-  LEAD-SIDE verification rule, the lead's job being to check the evidence rather than regenerate it
-  and the stage's being the opposite.
-  **The second cost something measurable rather than merely being wrong:** it produced a spliced
-  evidence manifest the lead then had to reject, and the correct manifest needed a second full
-  spine run. The failure mode is that a role-scoped rule relayed as a general one makes the
-  receiving session do the wrong thing CONFIDENTLY — a rule arriving through the dispatch channel
-  reads as authoritative by construction.
-  **The generalization, in the lead's own words:** before relaying a rule, check whose role it
-  binds.
-  **Why `[design-pending]`:** the home is nameable — lifecycle-kit/templates/lead.md, whose relay
-  duties the rule would qualify — but it is a kit template binding every consumer, so the wording is
-  an envelope change. The harder half is whether anything can CHECK it: a dispatch prompt is prose
-  and the roles are defined across three surfaces (lead.md, the stage templates, each kit's SPEC),
-  so a scanner would have to resolve a relayed sentence to a role, which is not obviously decidable.
-  The cheaper shape is a stated relay discipline naming the surfaces a lead consults before
-  relaying, which costs a template line and buys no detection.
-  **DISTINCT from three neighbours, all re-read at the promotion.**
-  `lead-specifies-constraint-not-mechanism` is a lead handing down a MECHANISM where a constraint
-  was its remit; `dispatch-claim-evidentiary-tier-unmarked` is a lead handing down a CLAIM whose
-  evidentiary tier was silently upgraded in transit; this is a lead handing down a RULE that was
-  never its to hand down. `relayed-ruling-provenance-unrecorded`, retired, is a relayed ruling's
-  authorization channel being untraceable, not whom the rule binds. The first two share this
-  entry's home and its envelope-change reasoning, so a scope ruling any of the three should rule
-  all three — and a MERGE of the three was asked for at the 2026-08-24 drain and DECLINED with
-  cause, each carrying independently attested evidence near the entry cap.
-  **Cost while deferred:** low frequency, high per occurrence, and invisible from the receiving end
-  — a stage that follows a mis-scoped relayed rule produces work that looks compliant and is wrong,
-  and only the relayer can tell.
-  Filed 2026-08-23 to the gap inbox at `battery-runner-port`'s close, on the lead's self-report and
-  deliberately not written into the template there; promoted 2026-08-23 at the next iteration's
-  scope drain.
-
-- **substrate-parity-assertion-c-reach-unannounced** [design-pending] —
-  `check-gate-substrate-parity` assertion C is one-directional by design, so its derived set can
-  shrink to a fraction of its former reach with a green battery and nothing anywhere says so.
-  **Measured at `shell-gate-tail-port`'s cut, in clean checkouts of both sides** (`git worktree` at
-  the pre-unit head and at the unit's HEAD), with the derivation validated against the gate's own
-  clean line before it was believed: the substrate-sensitive set falls from 29 members to 9.
-  Twenty left; none entered. The record and its cost are at gate-sdk/SPEC.md §Meta-gate
-  conservation for the binary substrate.
-  **The cause is one thing.** Every departing member was selected by a `*.sh`-shaped `couples`
-  token — `kit:*.sh`, `scripts/*.sh`, `gate-sdk/checks/*.sh`, `kit:*/*.sh` — and the unit emptied
-  the tree of shell gate declarations, so no `*.sh` glob covers a declaration path any more.
-  **The gap.** Assertion C reds on a derived member with no disposition and never on a disposition
-  for a member no longer derived, so a shrinking set can never red. A later meta-gate author
-  reaching for `kit:*.sh` — before this cut the commonest route into the derived set — now
-  receives NO assertion-C coverage and no signal saying so. That is precisely the
-  silent-end-of-an-assertion failure the conservation section exists to prevent, arriving through
-  the derivation's own input rather than through a port.
-  **Why `[design-pending]`:** the repair is a change to the derivation, and choosing among the
-  candidates widens a shipped gate's asserted behaviour. Derive over both declaration spellings
-  regardless of which the tree currently holds; or report the set's size and its movement so a
-  fall is visible; or assert the converse direction against a recorded-not-derived marker.
-  **Cost while deferred:** silent and forward-looking — nothing is wrong today, and the first
-  thing that goes wrong is a new meta-gate over gate source landing with no disposition and no
-  red, the precise event the section was built to make impossible.
-  Filed 2026-08-24 to the gap inbox by build; promoted 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close.
-
 - **bridged-knob-case-tmp-dir-override-inert** [design-pending] — `run-gate-tests.sh`'s
   `CASE_TMP_DIR` absolutization protects a SHELL-dispatched gate only, so a bridged/native gate
   writes its scratch into the tracked fixture corpus it is the oracle for.
@@ -5449,38 +5290,6 @@
   Filed 2026-08-24 to the gap inbox by build and again by the lead; promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
   filing put to it.
-
-- **promotion-commitment-stamp-latency** [design-pending] — between a promotion commitment and the
-  boundary that pays it, an at-ceiling entry accrues firings only prose can hold.
-  **The case, and the ceiling's stated remedy does not cover it.** queue-kit/SPEC.md §The tag
-  algebra rules that a `recurrence:` declaration reaching `check-queue-wrap`'s 100 columns resolves
-  to **promotion** and never to a wider `QUEUE_KIT_WRAP_BUDGET`. At
-  `shell-gate-tail-port-and-completion-oracle`'s close two entries hit that ceiling at once —
-  `turn-end-chokepoint-and-wait-primitive` and `scratch-execution-control-is-bash-only`, each 96
-  columns, each 107 with one more date — and **both were already promotion-committed**. The
-  prescribed remedy had been applied and the undercount persisted, because promotion is a future
-  act and the stamp is owed now.
-  **The window is now measured rather than predicted, which the filing bullet could not do.**
-  Both commitments were paid at this boundary: turn-end committed 2026-08-22 and paid 2026-08-24
-  across two unstampable judged firings; scratch-execution committed 2026-08-23 and paid 2026-08-24
-  across one. So the observed latency is two days and three firings, and `kpi-incident-recurrence`
-  undercounted by three for its duration. The window is short and the loss inside it is total.
-  **Why `[design-pending]`:** three candidates trading different properties. Stamping into the
-  promoted entry at promotion time from a carried record keeps the count honest and needs a carrier
-  the boundary can read. A KPI-side annotation for a declared-at-ceiling entry costs nothing and
-  detects nothing. Accepting the latency and saying so at the tag algebra costs one line and stops
-  a later close re-deriving this — which is the outcome this entry may correctly reach.
-  **The prose fallback is itself capped**, which is what makes doing nothing expensive:
-  `scratch-execution-control-is-bash-only` sat at **0 lines of headroom** under
-  `check-queue-entry-budget` and had to compress to record its own seventh measurement.
-  **DISTINCT from `recurrence-obligation-residency`** (where the stamp obligation lives across
-  stages), from `threshold-recurrence-routing-residency` (routing an entry that reaches the
-  promotion threshold), and from `queue-entry-grammar-single-owner`. It adds no recurrence date to
-  any of them and re-files none.
-  **Cost while deferred:** paid only when an at-ceiling entry is promotion-committed, and paid then
-  as a silent KPI undercount on exactly the entries the project has already judged most recurrent.
-  Filed 2026-08-24 to the gap inbox by that same close, from its recurrence-stamp attempt;
-  promoted 2026-08-24 at this iteration's scope intake, with the window measured above.
 
 - **file-authoring-act-ungoverned** [design-pending] — the file-authoring writes no glob can reach,
   and a prepared settings diff no stage session may apply.
@@ -5667,41 +5476,6 @@
   Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
   re-read the v0.25.0 Release body directly rather than trusting the issue text.
 
-- **recurrence-threshold-counts-dates-not-incidences** [design-pending] — the pre-emption threshold
-  reads a date count as an incidence count, so two incidences in one day count as one and the
-  rule fires late.
-  **The two halves, both read at this close rather than cited.** lifecycle-kit/SPEC.md's knob
-  roster says the threshold is read against the DATE COUNT of an entry's `recurrence:`
-  declaration, and glosses it as "two recorded re-filings is a third incidence of the same
-  finding" — an incidence claim resting on a date count. The same file rules stamping
-  **idempotent per (slug, date)**, and rules it deliberately, on the ground that the day is the
-  only resolution the bullet's grammar has and that a finer one would claim precision the
-  channel does not carry.
-  **NOT A REVERSAL of that ruling, and deliberately not a proposal to date more finely.** The
-  ruling governs what the CAPTURE channel may claim. This entry is about what a DOWNSTREAM
-  READER may infer from what the channel recorded — which that ruling does not address and
-  which no surface states.
-  **The residual is measurable rather than theoretical, and this repo is its worst case.**
-  Iterations here routinely close several to a calendar day — three on 2026-08-24 alone — so
-  two independent incidences in two separate iterations collapse to one date. An entry at
-  genuine incidence three can read as date count two or one, and the scope stage's pre-emption
-  rule, which admits a threshold entry regardless of the standing directive's theme, simply
-  does not fire.
-  **Attested at this close rather than hypothesised.** Three entries were dispositioned against
-  this exact edge here: one stamp taken, and two declined partly because the entry already
-  carried, or would have had to carry, the same calendar day as its own filing.
-  **Why `[design-pending]`:** the candidates differ in kind and none is obviously right. Read
-  the count against an ITERATION named beside each date, which the grammar does not carry
-  today; or state the limit on the threshold — a date count is a LOWER BOUND on incidences —
-  and leave the number alone, which costs one line and buys no detection; or leave it and
-  record that same-day collapse is accepted. The first mints grammar, the second is a hedge,
-  the third is a ruling.
-  **Cost while deferred:** the one rule that promotes work on evidence rather than theme
-  under-reads its evidence, silently and in the direction of doing nothing, and no gate can see
-  it — the count is a judgment record and is not re-derivable by any predicate. Filed
-  2026-08-24 by close from its own surface triage rather than from the gap inbox, after an
-  owner grep over the queue found the class unowned; both SPEC halves were read first-hand.
-
 - **precondition-gate-direction-blindness** [design-pending] — `check-queue-prose-precondition`
   reds an entry whose prose says the entry IS the blocker, and three of the four remedies it
   prints are false for that shape.
@@ -5769,30 +5543,6 @@
   Filed 2026-08-24 by build while landing the exit-class unit; DISPOSITIONED BY OPERATOR-CLASS
   RULING at the 2026-08-25 close — the lead ruled it STAYS DEFERRED on CLAUDE.md's
   scope-gated-intake rule, and directed it be promoted as a filing rather than started as work.
-
-- **same-stage-journal-append-uncoordinated** [design-pending] — one journal path per stage means
-  two CONCURRENT sessions of one stage append to one file with no coordination.
-  **The premise re-read at this drain.** lifecycle-kit/SPEC.md §The state machine now derives the
-  journal path from the stage and rules that every session of that stage appends to it, which is
-  what makes the predecessor assertion computable. Nothing in the tree tests the concurrent case,
-  and the coordination is whatever atomicity a single append happens to give.
-  **Sequential batches are unaffected and are the attested shape** — this iteration's own build
-  stage split into three batches that ran one after another, each appending cleanly.
-  **This is a consequence the derivation CREATED, so it is not a re-filing of the unit that
-  landed it.** Before the path became a function of the stage there was no shared file to contend
-  on. Distinct too from `batch-split-stamp-ownership`, which asks who writes the per-session
-  STAMP and is about the evidence file; the two share a trigger — a stage split across sessions —
-  and share no fix.
-  **Deliverable — rule one of three:** the append takes a lock (evidence-kit already owns a
-  create-exclusive claim idiom); or a per-session temp-then-concat; or the honest answer is that
-  concurrent same-stage dispatch is itself out of contract and
-  `lifecycle-kit/templates/lead.md` says so, which costs one line and buys the same safety.
-  **Cost while deferred:** low and bounded to a lead that runs same-stage sessions in parallel —
-  the failure mode is an interleaved or truncated journal block, which degrades the pull channel
-  and the cold-read recovery record rather than any gated surface, and it stays invisible until
-  someone reads the file.
-  Filed 2026-08-25 by build while landing the stage-journal contract; drained and promoted
-  2026-08-25 at close.
 
 - **amendment-update-target-overcount-undetected** [design-pending] — an amendment's
   `## Existing sections updated` roster is unchecked in the OVER-count direction, so a rostered
@@ -6162,36 +5912,6 @@
   one letter, and nobody reading the SPEC learns that — the section's stated scope reads as
   complete.
   Filed 2026-08-26 by close, triaging a build finding relayed through the lead.
-
-- **survey-engagement-trigger-narrower-than-its-class** [design-pending] — the `survey-engagement`
-  audit row fires on "every **scope** survey that ranks or recommends against an entry", and the
-  behaviour the class audits is not scope-specific, so a qualifying survey bought by any other
-  stage is invisible to it.
-  **The gap fired 2026-08-26 and the row had to decline on wording, which is how it was found.**
-  That close read both of the iteration's surveys rather than counting them. Scope's — "Is the
-  native port's tail actually blocked, and what does unblocking it cost?" — ranks no cohort and
-  recommends against no entry; its direction is the opposite, arguing an entry is LESS blocked
-  than believed. Build's — "What would a per-platform CI leg cost, and can any triple beyond
-  x86_64-unknown-linux-gnu satisfy the roster's join criterion today?" — recommends against
-  sharply and with its oracle written down: *zero triples satisfy the join criterion today*,
-  because no green run has produced or exercised an artifact anywhere else. So the class's own
-  subject occurred, in a durable tracked record, and the row could not reach it.
-  **Deliverable:** one word — `due:` reads "every survey that ranks or recommends against an
-  entry". The audit itself is unchanged; only which surveys enter its corpus moves.
-  **Why `[design-pending]` for a one-word edit, and this is the whole of it:** a `due:` trigger is
-  a STANDING OBLIGATION on every later close, so widening it is a scope decision rather than an
-  edit slipped in after a stamped close. Lead-ruled 2026-08-26 on exactly that ground. The
-  reserved call is whether the widening should be unqualified or should name the stages that can
-  buy a survey, since a trigger that admits every stage also admits stages whose surveys are
-  routinely costing rather than ranking.
-  **Cost while deferred:** two parts, and the second is the one a scope should price. Per
-  iteration, a qualifying non-scope survey goes unaudited and the row records a decline where the
-  class actually fired — already true once, with the evidence sitting in that row. And on landing,
-  the widening imposes an audit-cost delta on every future close: the corpus grows from scope's
-  surveys to all of them, which is more reading per close, forever. Nothing is lost meanwhile —
-  the 2026-08-26 decline is recorded WITH CAUSE in the row itself, which is the exact surface a
-  promoting scope reads.
-  Filed 2026-08-26 by close, on the lead's ruling, from the close's own audit-roster review.
 
 - **shipped-config-tightening-undeclared** [design-pending] — a kit-shipped pattern-list change
   tightens two gates in an adopter's tree, and no surface says which release section owns it or
@@ -8863,6 +8583,16 @@
 - **amendment-deletion-content-completeness** [design-pending] — Merges can drop rationale unheld.
 - **template-registry-population-predicate** [design-pending] — A name collision would red parity.
 - **lead-line-parser-conformance** [design-pending] — Eight lead-line holders; no conformance.
+- **queue-status-parenthetical-liveness** [design-pending] — Stale status tags beside cited slugs.
+- **breadth-declaration-stale-listing** [design-pending] — Spent breadth declarations stay silent.
+- **breadth-declaration-committed-glob-home** [design-pending] — Glob keep-rulings have no home.
+- **criterion-4-two-spellings-disagree** [design-pending] — Criterion 4 reads two ways.
+- **relayed-rule-role-scope-unchecked** [design-pending] — Relayed rules may bind the wrong role.
+- **substrate-parity-assertion-c-reach-unannounced** [design-pending] — C can shrink unannounced.
+- **promotion-commitment-stamp-latency** [design-pending] — At-ceiling stamps wait on promotion.
+- **recurrence-threshold-counts-dates-not-incidences** [design-pending] — Same-day firings merge.
+- **same-stage-journal-append-uncoordinated** [design-pending] — Parallel appends share one file.
+- **survey-engagement-trigger-narrower-than-its-class** [design-pending] — Trigger is scope-only.
 
 ## Done
 
