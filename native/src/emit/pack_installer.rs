@@ -112,6 +112,8 @@ fn parse(args: &[String]) -> Result<Flags, Refusal> {
 fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     let f = parse(args)?;
     let root = resolve_root(&f.root)?;
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — cwd-write-exempt: the arm's own process enters
+    // the tree it packs, and no test reaches `pack()`
     std::env::set_current_dir(&root)
         .map_err(|e| refuse(format!("cannot enter the work tree at {}: {}", root, e)))?;
     let root = walk::cwd().map_err(refuse)?;

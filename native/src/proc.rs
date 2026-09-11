@@ -1440,4 +1440,53 @@ mod tests {
             offenders
         );
     }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the working-directory pin beside the spawn
+    // roster, on its window and valve convention and with the opposite scope rule: test scope is
+    // kept, because a test is the writer it exists to catch
+    #[test]
+    fn no_crate_source_writes_the_working_directory_in_process() {
+        walk::bridge_declared_knobs(&crate::knobenv::lock());
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
+        assert!(!files.is_empty(), "no module found to scan");
+        let spelling = concat!("set_current_dir", "(");
+        let mut offenders: Vec<String> = Vec::new();
+        let mut valved: Vec<String> = Vec::new();
+        for f in &files {
+            let text = std::fs::read_to_string(f)
+                .unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
+            let lines: Vec<&str> = text.lines().collect();
+            for (n, line) in lines.iter().enumerate() {
+                if !line.contains(spelling) {
+                    continue;
+                }
+                let site = format!("{}:{}", f.display(), n + 1);
+                let window = &lines[n.saturating_sub(4)..n];
+                if window.iter().any(|l| l.contains("cwd-write-exempt:")) {
+                    valved.push(site);
+                } else {
+                    offenders.push(site);
+                }
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "crate source changes the process's own working directory ({:?}) — every relative \
+             path a sibling test on another thread resolves reads it, and no guard can cover a \
+             reader that does not know it reads it. Set the directory on the spawn \
+             (proc::run_merged_in's cwd), or declare a site no test reaches with a \
+             `cwd-write-exempt:` cause above it",
+            offenders
+        );
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — the red runs in both directions, so a valve
+        // left behind by a deleted site moves with it rather than outliving it
+        assert_eq!(
+            valved.len(),
+            1,
+            "the valved working-directory writes are {:?}, not the one `pack()` site — a valve \
+             removed or added moves this count with it",
+            valved
+        );
+    }
 }

@@ -1991,39 +1991,32 @@ mod tests {
         walk::bridge_declared_knobs(&env);
         let mut cases_run = 0usize;
         let mut roots_observed = 0usize;
-        for (name, f, declared, _, _, _) in REGISTRY {
+        for (name, _, declared, _, _, _) in REGISTRY {
             // spec: gate-sdk/SPEC.md §check-reads-couples — resolved through `knobs`, not off the
             // tuple, so a member declaring the union sentinel is bridged the expansion the
             // dispatcher would bridge rather than the sentinel itself
             let member_knobs = knobs(name).unwrap_or(&[]);
             for case in walk::fixture_case_dirs(name) {
-                let args = case_args(&case);
                 // spec: gate-sdk/SPEC.md §run-gate-tests — the member's knobs are bridged from
                 // the case dir before it runs, or a bridged member exits 2 on an unresolved
                 // knob and this test asserts over a run that never reached its rule
                 walk::bridge_case_knobs(&env, &case, name, member_knobs);
-                let prev = walk::cwd().expect("cannot read cwd");
-                // spec: gate-sdk/SPEC.md §check-reads-couples — the case is entered exactly
-                // as the --run-gate-tests arm enters it, so an observed root is the same string the
-                // gate would walk from the repo root in the battery.
-                std::env::set_current_dir(&case)
-                    .unwrap_or_else(|e| panic!("cannot enter {}: {}", case.display(), e));
-                walk::recorder::start();
-                let rc = (*f)(&args);
-                let observed = walk::recorder::stop();
-                std::env::set_current_dir(&prev).expect("cannot restore cwd");
+                // spec: gate-sdk/SPEC.md §check-reads-couples — the case is set on the observer's
+                // spawn as the --run-gate-tests arm sets it, so an observed root is the same string
+                // the gate would walk from the repo root in the battery.
+                let run = observe_in_case(name, &case);
                 assert_ne!(
-                    rc, 2,
+                    run.rc, 2,
                     "{} errored on {} — an observation taken from a run that never walked \
                      would pass this test by being empty",
                     name,
                     case.display()
                 );
-                if let Err(e) = declaration_covers("walked", declared, &observed) {
+                if let Err(e) = declaration_covers("walked", declared, &run.walked) {
                     panic!("{} on {}: {}", name, case.display(), e);
                 }
                 cases_run += 1;
-                roots_observed += observed.len();
+                roots_observed += run.walked.len();
             }
         }
         assert!(cases_run > 0, "no fixture case found for any registry member");
@@ -2045,26 +2038,19 @@ mod tests {
         walk::bridge_declared_knobs(&env);
         let mut cases_run = 0usize;
         let mut offenders: Vec<String> = Vec::new();
-        for (name, f, _, _, _, declared) in REGISTRY {
+        for (name, _, _, _, _, declared) in REGISTRY {
             let member_knobs = knobs(name).unwrap_or(&[]);
             for case in walk::fixture_case_dirs(name) {
-                let args = case_args(&case);
                 walk::bridge_case_knobs(&env, &case, name, member_knobs);
-                let prev = walk::cwd().expect("cannot read cwd");
-                std::env::set_current_dir(&case)
-                    .unwrap_or_else(|e| panic!("cannot enter {}: {}", case.display(), e));
-                crate::proc::recorder::start();
-                let rc = (*f)(&args);
-                let observed = crate::proc::recorder::stop();
-                std::env::set_current_dir(&prev).expect("cannot restore cwd");
+                let run = observe_in_case(name, &case);
                 assert_ne!(
-                    rc, 2,
+                    run.rc, 2,
                     "{} errored on {} — an observation taken from a run that never spawned \
                      would pass this test by being empty",
                     name,
                     case.display()
                 );
-                if let Err(e) = declaration_covers("spawned", declared, &observed) {
+                if let Err(e) = declaration_covers("spawned", declared, &run.spawned) {
                     offenders.push(format!("{} on {}: {}", name, case.display(), e));
                 }
                 cases_run += 1;
@@ -2077,6 +2063,120 @@ mod tests {
              would under-report what a consumer's machine has to carry:\n  {}",
             offenders.join("\n  ")
         );
+    }
+
+    const OBSERVER_MARKER: &str = "CHECKWRIGHT_REGISTRY_OBSERVER";
+    const OBSERVER_MEMBER: &str = "CHECKWRIGHT_REGISTRY_OBSERVER_MEMBER";
+    const OBSERVER_SENTINEL: &str = "checkwright-registry-observer";
+
+    struct Observation {
+        rc: i32,
+        walked: Vec<String>,
+        spawned: Vec<String>,
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a case directory is set on a spawn and never entered,
+    // so the member runs in a child of this test binary whose working directory is the case
+    fn observe_in_case(name: &str, case: &std::path::Path) -> Observation {
+        let exe = std::env::current_exe().expect("a running test has an executable");
+        let exe = exe.display().to_string();
+        let module = module_path!()
+            .split_once("::")
+            .map_or(module_path!(), |(_, rest)| rest);
+        let observer = format!("{}::a_registry_member_run_inside_its_case_dir", module);
+        let env = vec![
+            (OBSERVER_MARKER.to_string(), "1".to_string()),
+            (OBSERVER_MEMBER.to_string(), name.to_string()),
+        ];
+        let merged = crate::proc::run_merged_in(
+            &exe,
+            &[&observer, "--exact", "--ignored", "--nocapture"],
+            &env,
+            Some(case),
+        )
+        .unwrap_or_else(|e| panic!("{} on {}: {}", name, case.display(), e));
+        let output = String::from_utf8_lossy(merged.output());
+        assert_eq!(
+            merged.code(),
+            Some(0),
+            "the observer child for {} on {} did not pass:\n{}",
+            name,
+            case.display(),
+            output
+        );
+        let prefix = format!("{}\t", OBSERVER_SENTINEL);
+        let mut rcs: Vec<i32> = Vec::new();
+        let mut walked: Vec<String> = Vec::new();
+        let mut spawned: Vec<String> = Vec::new();
+        for line in output.lines() {
+            let Some(rest) = line.strip_prefix(&prefix) else {
+                continue;
+            };
+            match rest.split_once('\t') {
+                Some(("walked", root)) => walked.push(root.to_string()),
+                Some(("spawned", program)) => spawned.push(program.to_string()),
+                Some(("exit", code)) => rcs.push(
+                    code.parse()
+                        .unwrap_or_else(|_| panic!("unparseable exit line: {}", line)),
+                ),
+                _ => panic!("unparseable observation line: {}", line),
+            }
+        }
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — a filter matching no test exits 0 and prints
+        // nothing, so the exit line is what proves the observer ran at all
+        assert_eq!(
+            rcs.len(),
+            1,
+            "the observer child for {} on {} printed {} exit lines, not one:\n{}",
+            name,
+            case.display(),
+            rcs.len(),
+            output
+        );
+        Observation {
+            rc: rcs[0],
+            walked,
+            spawned,
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the child `observe_in_case` spawns inside one fixture
+    // case; ignored so a plain run skips it, and refusing without the marker so a run including
+    // ignored cases cannot execute it in the test binary's own working directory
+    #[test]
+    #[ignore = "the registry coverage tests' child, run inside a fixture case"]
+    fn a_registry_member_run_inside_its_case_dir() {
+        assert!(
+            std::env::var_os(OBSERVER_MARKER).is_some(),
+            "this case runs only as the registry coverage tests' child — in-process it would \
+             observe a member in the test binary's working directory rather than a fixture case"
+        );
+        let name = std::env::var(OBSERVER_MEMBER).expect("the parent names the member to run");
+        let entry = REGISTRY
+            .iter()
+            .find(|entry| entry.0 == name)
+            .unwrap_or_else(|| panic!("no registry member named {}", name));
+        let args = case_args(std::path::Path::new("."));
+        walk::recorder::start();
+        crate::proc::recorder::start();
+        let rc = (entry.1)(&args);
+        let spawned = crate::proc::recorder::stop();
+        let walked = walk::recorder::stop();
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — the block opens on a newline, so a member's
+        // unterminated last line cannot absorb the first sentinel
+        let mut block = String::from("\n");
+        for root in walked {
+            block.push_str(&format!("{}\twalked\t{}\n", OBSERVER_SENTINEL, root));
+        }
+        for program in spawned {
+            block.push_str(&format!("{}\tspawned\t{}\n", OBSERVER_SENTINEL, program));
+        }
+        block.push_str(&format!("{}\texit\t{}\n", OBSERVER_SENTINEL, rc));
+        use std::io::Write;
+        let mut out = std::io::stdout().lock();
+        out.write_all(block.as_bytes())
+            .and_then(|_| out.flush())
+            .expect("cannot write the observation block");
     }
 
     // spec: gate-sdk/SPEC.md §run-gate-tests — the case's `args` file on the runner's own
