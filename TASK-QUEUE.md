@@ -243,6 +243,9 @@
   **WHAT STILL MAKES IT SCOPE WORK, on the corrected radius.** Not reach: the unranked
   schemes. Five files renamed under a scheme nobody chose is a rename done twice, and the
   ranking is the deliverable a drain fix cannot supply.
+  **Folded 2026-09-11 from `host-resolution-fail-open-cut`'s close inbox:** the rename lands
+  with a check that every backticked `install-smoke-<suffix>` literal in tracked prose names a
+  gates.yml job key; free-prose leg descriptions stay beyond its reach, its honest limit.
   **Cost while deferred:** two surfaces keep paying a correcting paragraph at every read, and
   every new reader of the CI matrix starts from a miscount the prose then walks back.
   Filed 2026-09-10 by close from the gap inbox, on a reach premise this drain falsified;
@@ -3701,9 +3704,9 @@
   **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
   stage's signal value decays toward zero while its cost does not. **THRESHOLD ROUTING 2026-09-04
   (lead, own-authority); deferred 2026-09-05 (operator, lead-relay) under the port-only run. THAT
-  GROUND IS SPENT** — the successor port-first rule legislates threshold members itself, and this is
-  MACHINERY-class by the 2026-08-30 discriminator (its demand witness is this repo's own align
-  stage), meeting none of the three joining grounds. Re-composed at scope 2026-09-05, `lead,
+  GROUND IS SPENT** — both runs have retired, and this is MACHINERY-class by the 2026-08-30
+  discriminator (its demand witness is this repo's own align stage), kept deferred on scope's
+  composition test (re-grounded 2026-09-11). Re-composed at scope 2026-09-05, `lead,
   own-authority`. Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
@@ -8592,9 +8595,9 @@
   recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05 2026-09-08
   **AT THRESHOLD AND ANSWERED, STAYS DEFERRED — `lead, own-authority` 2026-09-09**, on the first
   proposal this entry has had: it reached the threshold 2026-09-08 carrying no answer at all, which
-  is why scope surfaced it. MACHINERY-class by the 2026-08-30 discriminator, meeting none of the
-  port-first run's three joining grounds against an installer-and-crate cut, and the window's unit
-  fills it. Written in the shape its six threshold siblings carry. No re-escalation is owed.
+  is why scope surfaced it. MACHINERY-class by the 2026-08-30 discriminator, sharing no
+  surface with that window's installer-and-crate cut, whose unit filled it; re-grounded 2026-09-11.
+  Written in the shape its six threshold siblings carry. No re-escalation is owed.
   **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
   close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
   the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
@@ -9025,8 +9028,8 @@
   one stage this iteration.
   recurrence: record-stamp-encoding-compression 2026-09-03
   Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception, staged and
-  committed in one motion. FILED AND NOT BUILT: it rides no cut and meets none of the three joining
-  grounds the port-first run that superseded the port-only one states, and this is no hotfix.
+  committed in one motion. FILED AND NOT BUILT: it rides no cut, no iteration since has shared its
+  surface (scope's composition test, re-grounded 2026-09-11), and this is no hotfix.
 
 - **editor-diagnostic-unruled** [design-pending] — the harness LSP channel contradicts the tree's
   own oracles on crate-touching commits, and no surface rules that channel out as an oracle.
@@ -9477,11 +9480,9 @@
   without touching that bar. Two further undecided shapes: whether cleanup belongs to the producer
   at all rather than to a reaper the boundary check already implies, and whether the
   consumer-smoke library owes the same trap.
-  **Deferred rather than active BY RULING, not by ranking.** Under the port-first run that
-  superseded the port-only one it meets none of the three joining grounds, and no run has ever
-  barred a Deferred filing (TRAJECTORY.md §PRIORITY DIRECTIVE); the icebox tier cannot take it
-  either, because it blocks an
-  iteration-boundary entry and the machinery-class default is conjunctive.
+  **Deferred, not active, on scope's composition test** (re-grounded 2026-09-11): no iteration
+  since its filing has shared its surface. The icebox tier cannot take it either, because it
+  blocks an iteration-boundary entry and the machinery-class default is conjunctive.
   **Cost while deferred:** every externally killed validate spine converts one lost run into a
   refused iteration boundary for the next session, and the remedy is a two-`--force` reap that
   session has to be told about.
@@ -9545,11 +9546,9 @@
   upgrade: an `Inst::Save`, per-thread slot vectors, and a STATED POSIX leftmost-longest
   subexpression rule — the sub-match rule is the half POSIX specifies and ordinary leftmost-first
   engines get wrong — against a governed matcher carrying its own acceptance oracle.
-  **Deferred by ruling rather than by ranking.** It meets none of the three joining grounds the
-  port-first run states, that run having superseded the port-only one, and no run has ever barred
-  a Deferred filing (TRAJECTORY.md §PRIORITY
-  DIRECTIVE); the icebox tier cannot take it either, the trigger being live — every stage entry
-  runs the path.
+  **Deferred on scope's composition test** (re-grounded 2026-09-11): no iteration since its filing
+  has shared its surface. The icebox tier cannot take it either, the trigger being live — every
+  stage entry runs the path.
   **Cost while deferred:** one bash spawn per iteration-boundary worktree row, and a divergence
   invisible once green, since nothing compares the two interpreters.
   Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
@@ -9632,8 +9631,8 @@
   nobody is obliged to run, and the failure surfaces in an adopter's tree rather than in ours.
   Filed 2026-09-05 to the gap inbox by the close of `evidence-runner-trend-and-install-hooks-cuts`;
   promoted here at this iteration's scope, →fix refused (a new gate is build work, not scope's) and
-  →icebox refused on the product witness above. Deferred and not active: it meets none of the three
-  joining grounds the port-first run states (TRAJECTORY.md §PRIORITY DIRECTIVE).
+  →icebox refused on the product witness above. Deferred and not active on scope's composition
+  test, re-grounded 2026-09-11: no iteration since has shared its surface.
 
 - **fail-open-arm-status-second-source** [design-pending] — the stub holds the bridged arms'
   unavailable exit status as a two-name shell test, and nothing holds that set in lockstep with
@@ -9662,8 +9661,8 @@
   **Cost while deferred:** the set is two names and correct today, so the whole cost is future — a
   divergence lands silently and is found by an adopter rather than by the battery.
   Filed 2026-09-05 to the gap inbox at spec and again at build's batch 3; promoted at this close.
-  Deferred and not active: it meets none of the three joining grounds the port-first run states
-  (TRAJECTORY.md §PRIORITY DIRECTIVE).
+  Deferred and not active on scope's composition test, re-grounded 2026-09-11: no iteration
+  since has shared its surface.
 
 - **audit-depth-measure-degrades-under-fanout** [design-pending] — the two artifact-grounded
   audit-depth numbers a lead's dispatch asked align and build to journal are not comparable across
@@ -9689,8 +9688,8 @@
   the instruction dies with the dispatches carrying it — a later judge inherits an incomparable
   pair and no way to extend the series.
   Captured 2026-09-05 by close, which was handed the keep-or-file decision and made it.
-  Filed to Deferred and not promoted: it meets none of the three joining grounds the port-first run
-  states (TRAJECTORY.md §PRIORITY DIRECTIVE), and no run has ever barred a Deferred filing.
+  Filed to Deferred and not promoted; re-grounded 2026-09-11 on scope's composition test, no
+  iteration since having shared its surface.
 
 - **candidate-list-anchors-a-sweep-obligation** [design-pending] — a dispatch handing a
   grep-derived candidate list where the obligation is a whole-tree sweep anchors the sweeper on the
@@ -9715,8 +9714,8 @@
   Filed 2026-09-05 by close, relayed by the lead as a lesson about its own dispatch shape.
   (`Captured` was the original verb; the defer-date reader takes `Surfaced`/`Filed` only, so the
   entry read as undated and the age filter never reached it — corrected at the 2026-09-05 drain.)
-  Deferred, never promoted — it meets none of the three joining grounds the port-first run states
-  (TRAJECTORY.md §PRIORITY DIRECTIVE); no run has ever barred a Deferred filing.
+  Deferred, never promoted; re-grounded 2026-09-11 on scope's composition test, no iteration since
+  having shared its surface.
 
 - **spec-pointer-boundary-legality** [design-pending] — `check-spec-pointer` grades that a `# spec:`
   target resolves, never that the target is a surface a cut may be bounded against.
@@ -9956,7 +9955,7 @@
   Surfaced 2026-09-05 by the `test-harness-cut-seam-sweep` close, which was assigned the judgment
   and filed it; drained here at the 2026-09-06 scope boundary. →fix refused: the deliverable is a
   kit template's and the three shapes are unruled. →icebox refused: the trigger is live and fires at
-  every multi-section cut, which the port-first run makes every iteration.
+  every multi-section cut, a live shape though the port run that made every iteration one retired.
   (The filing bullet cited `TRAJECTORY.md:621-622`; the commit that filed it deleted that paragraph
   on its own discharge condition, so the anchor resolves to nothing; `:601` carries the sentence.)
 
@@ -10491,38 +10490,6 @@
   Filed 2026-09-10 by close, draining the gap inbox; build filed rather than queue-editing
   mid-iteration, and rather than starting work that is scope-gated.
 
-- **port-first-deferral-grounds-unresolvable** [design-pending] — a cohort of Deferred entries
-  states its deferral GROUND as the retired port-first run, so each one's recorded reason now
-  resolves to nothing, and re-grounding one decides whether it is composable.
-  **RULED `lead, own-authority` 2026-09-10 — escalation reply in the lead session, lead-relayed,
-  NOT the operator's: option (a), the NEXT SCOPE re-grounds them**, off this entry and against
-  scope's own economic composition test, which the retired run's last clause preserved.
-  Not build's and not close's: rewriting an entry's deferral reason is a re-scope, and doing a
-  fifth of the pool silently under cover of a citation sweep was refused.
-  **The roster is DERIVED, never carried — a line number ages the moment the queue moves.** Run
-  `--emit ruling-staleness 'the port-first run' 'port-first'` and read its `== citing sites ==`
-  block. The trap: run BARE, that arm sweeps only what FIRES, and nothing fires once the paragraphs
-  are gone — so a bare run reports nothing to sweep and looks clean.
-  **The split already taken:** the two sub-cases carrying known targets and no judgment content — a
-  `health triad` pointer and a by-kit-split pointer, both aimed at deleted headings — were repaired
-  at the 2026-09-10 close, a pointer at a deleted heading being false rather than undecided.
-  **Cost while deferred:** each entry in the cohort reads to a ranking survey as deferred on a
-  stated ground that cannot be checked, and the failure is silent — an unresolvable citation reads
-  exactly like a resolvable one.
-  **DISTINCT from `native-gate-port-remaining-corpus`**, the port work itself, which took its
-  terminal move at that same close: this owns the deferral grounds OTHER entries rested on the run
-  that sequenced it.
-  **NOT ICEBOX-ELIGIBLE, though this IS the clean machinery-class case and the default does route
-  it to that tier** — ruled `lead, own-authority` 2026-09-10, escalation reply in the lead session,
-  lead-relayed and never the operator's. Routing a finding to a tier does not exempt it from what
-  the tier requires: the cost line above begins in prose rather than with a class token, which
-  queue-kit/SPEC.md §The icebox tier reads as not-low, and rewriting an opener to unblock an
-  eviction is refused. The drain commit's stated ground, a live trigger, is FORECLOSED — that
-  default's test is conjunctive and has no trigger limb at all. Nor would this entry's derivation
-  command have been a reason to decline: an icebox line is a summary written to be dropped, and
-  the narrative recovers through `git log -p -S` over the queue.
-  Filed 2026-09-10 by close, draining the gap inbox.
-
 - **stage-journal-path-unsourced-mid-stage** [design-pending] — a stage session dispatched into an
   ALREADY-ENTERED stage has no mechanical source for that stage's journal path, so it invents a
   discriminated filename and the successor's entry assertion then refuses.
@@ -10684,5 +10651,7 @@
 - **smoke-report-array-carrier-mangling-unexplained** [design-pending] — Witness now needs design.
 
 ## Done
+
+- port-first-deferral-grounds-unresolvable
 
 ## Lessons Learned
