@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: rankable-deferred-board
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,56 @@
 ## New Features
 
 ## Technical Debt
+
+- **close-watch-waits-on-slowest-smoke-leg** [observed-by: gates] — a close push waits about 48
+  minutes on the `gates` workflow, and one leg is almost all of it.
+  **Promoted 2026-09-11 at scope as debt — operator direction, 2026-09-11** (AskUserQuestion in
+  the lead session, lead-relayed), `rankable-deferred-board`'s second cluster.
+  **Envelope, scope's decision inside the operator's words below:** cut the slow legs' wall time,
+  Windows first, without dropping a leg or an assertion from the binding set. Probe first from a
+  finished run's log (`gh run view <id> --log`, which buys no push). Changing WHICH legs close
+  watches, or path-filtering a binding leg, changes CLAUDE.md's watch-to-green rule, so build
+  escalates that lever rather than choosing it; so too any lever that would mint a name, since
+  none is minted here and no amendment is owed.
+  **Observed, not merely built:** completion is a `gates` run showing the cut, so the push
+  placement rule (lifecycle-kit/SPEC.md §The state machine) puts this iteration's first push at or
+  before the stage landing this work — a re-placed push, not an extra one.
+  **Operator-stated 2026-09-11, lead session, typed message, relayed by that lead:** a close cannot
+  wait 40 minutes on one run; optimize `install-smoke-windows` and every other long leg.
+  **Re-verified at the drain on gates run 34553416908 (head 08e6eb67):** wall 48 minutes; `gates`
+  4.8, install-smoke 3.5, powershell 2.4, linux-arm64 3.6, each native-artifacts leg under 2,
+  macos 12.5, macos-intel 23.7, windows 46.0. Lead-measured, not re-probed: 44 of Windows' 46
+  minutes inside its smoke step, and five prior runs at 45 to 48. Close watches `gates` to green,
+  so it waits on the slowest leg. Not yet probed: which smoke phases take the Windows time.
+  **Candidate levers, none ruled:** cut the dominant Windows cost (per-process spawn under
+  Git-for-Windows bash is the usual suspect); let close watch the binding fast legs and read the
+  slow smokes later; path-filter or schedule the slow legs; cache what each leg rebuilds.
+  **DISTINCT from `close-red-push-ownership`** (icebox; who owns a red push),
+  `install-smoke-leg-names-mix-two-axes` and `held-ci-leg-failure-reddens-a-binding-one` (naming
+  and hold posture).
+  **Cost while deferred:** every close pays the wait.
+  Filed 2026-09-11 by close, draining the gap inbox.
+
+- **lead-cancel-running-work-unforbidden** — no instruction forbids a lead from stopping running
+  work whose loss wastes tokens.
+  **A debt rider on `rankable-deferred-board`'s lead-contract surface, promoted 2026-09-11 at
+  scope — operator direction, 2026-09-11** (AskUserQuestion in the lead session, lead-relayed).
+  It adds no name: the act, the grant class (lifecycle-kit/SPEC.md §The steering vocabulary) and
+  the uncommitted-work cost are all named already, so no amendment is owed.
+  **Operator expectation, 2026-09-11, lead session, typed message, relayed by that lead:** a lead
+  never stops a background stage session or its subagents (TaskStop or an equivalent kill)
+  without the operator's explicit confirmation or an explicit per-iteration grant.
+  **Re-verified at the drain, and again at scope 2026-09-11 over lead.md:** TaskStop, cancel,
+  kill, abort and interrupt over lead.md, agent-execution.md, the stage-session agent,
+  lifecycle-kit/SPEC.md and CLAUDE.md find liveness polling and agent-execution's note that an
+  interrupt destroys uncommitted work — the cost is stated and the act never forbidden.
+  **Owed:** one clause in lifecycle-kit/templates/lead.md naming the act, its two authorizations
+  (operator confirmation, or a per-iteration grant where lifecycle-kit/SPEC.md §The steering
+  vocabulary puts grants) and the uncommitted-work cost as grounds, plus the owning SPEC passage
+  if needed.
+  **Cost while deferred:** token waste — a cancelled session's uncommitted unit is re-bought, and
+  only the harness's general confirm-before-irreversible default stands in the way.
+  Filed 2026-09-11 by close, draining the gap inbox; routed to scope by the dispatch.
 
 ## Deferred
 
@@ -758,7 +808,8 @@
   correct act as often as the defect: a classifier no gate can honestly run, the 2026-08-30 ground.
   The lever is content tiering — a ruling lands on the entry as a pointer to TRAJECTORY.md or the
   owning SPEC, never as prose — and this iteration's scope paid its rounds because four landed as
-  prose. Machinery-class by the witness discriminator, so icebox-class by default; close's exit.
+  prose. **Declined at threshold at scope — operator direction, 2026-09-11 (lead-relayed):** no
+  mechanism is owed, so nothing is takeable.
   recurrence: entry-compression-contract-unenforced 2026-09-07 2026-09-09
   **Cost while deferred:** every mandated write onto a saturated entry pays
   the same unenforced honour-system compression, and the queue's most-ruled
@@ -1905,8 +1956,8 @@
   the bare name — correctly — and the one-line remedy a consumer needs had no route from build to
   the composing session. Two witnesses, both landing on "name plus prose versus bare names", is the
   open design question above asked twice rather than a second question.
-  **PROPOSED AT THRESHOLD 2026-09-06 AND ANSWERED — deferred (`lead, own-authority`), on this
-  deliverable's machinery shape displacing a product unit, plus window capacity. Route SPENT.**
+  **At threshold, declined again at scope — operator direction, 2026-09-11 (lead-relayed):** the
+  release-note surface is unshared, its design question open on purpose, and releases deferred.
   recurrence: behavior-change-surface 2026-08-25 2026-09-06
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
 
@@ -2057,12 +2108,11 @@
   question the live judgment says nothing rules is now the whole of the question. Nothing here
   touches the align tiering ruling in any direction. Discharge `lead, own-authority 2026-09-08`.
   **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
-  stage's signal value decays toward zero while its cost does not. **THRESHOLD ROUTING 2026-09-04
-  (lead, own-authority); deferred 2026-09-05 (operator, lead-relay) under the port-only run. THAT
-  GROUND IS SPENT** — both runs have retired, and this is MACHINERY-class by the 2026-08-30
-  discriminator (its demand witness is this repo's own align stage), kept deferred on scope's
-  composition test (re-grounded 2026-09-11). Re-composed at scope 2026-09-05, `lead,
-  own-authority`. Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
+  stage's signal value decays toward zero while its cost does not.
+  **At threshold again and declined at scope — operator direction, 2026-09-11, lead-relayed:** the
+  revert signal still has not fired; align's template shares no surface with this iteration.
+  Earlier routings (2026-09-04, 2026-09-05) are in git history.
+  Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **amendment-refusal-acceptance-parity** [design-pending] — an amendment's refusal rationale can
   claim an acceptance criterion asserts something that criterion does not say.
@@ -2313,14 +2363,9 @@
   lifecycle-kit/SPEC.md §The committed gap inbox has **already refused both obvious shapes** for
   the sibling channel, a filing-time prompt and a fact-versus-inference grammar, so a proposal
   here argues against a recorded refusal or finds a third shape.
-  **AT THRESHOLD AND ANSWERED, STAYS DEFERRED — `lead, own-authority` 2026-09-07, ruled through the
-  lead's message channel on this scope's escalation.** It was the ONE member of the eight-entry
-  threshold cohort still owed an escalation — the other seven are spent under the propose-once
-  ground — and the route is now spent for it too. Grounds: machinery-class by the 2026-08-30
-  discriminator (its only demand witness is this repo's own capture tool); the drain-side half
-  landed 2026-09-07; and what remains argues against a recorded refusal, which is design work rather
-  than a takeable unit. Icebox was REFUSED with it — burying an entry the threshold has just
-  surfaced discards a judged recurrence.
+  **Threshold decline at scope, 2026-09-11 — operator direction (lead-relayed):** the
+  drain-side half landed 2026-09-07 and what remains argues against a recorded refusal, which is
+  design work rather than a takeable unit; drift-kit shares no surface with this iteration.
   recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
   **Three attested instances, each falling on a different limb.** A build batch stamped the
   consumer smoke's cost as "~50-60 minutes" and reasoned that the run serializes against all
@@ -4853,13 +4898,12 @@
   earlier GROWING read tracked the command word, not the class. A THIRD word takes the head across
   four samples while the SHAPE never moves: partitioning by shape is what the samples buy.
   recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03 2026-09-08
-  **THE ROUTING AXIS IS ANSWERED FOR GOOD — operator 2026-09-09, AskUserQuestion in a lead session,
-  lead-relayed: a newly judged recurrence does NOT restart the port-first run's proposed-once
-  clause.** The third date landed after the 2026-09-05 deferral and moves nothing, since reading a
-  fresh date as a reset defeats the clause that exists to stop a member cycling. **That spends the
-  whole threshold history** — 2026-09-03, twice declined (lead, own-authority), deferred 2026-09-05
-  (operator, lead-relay), re-composed at scope onto MACHINERY-class by the 2026-08-30 discriminator,
-  meeting none of the three joining grounds — so no later boundary re-walks the sequence.
+  **THE ROUTING AXIS IS ANSWERED — operator direction, 2026-09-09, lead-relayed: a newly judged
+  recurrence does NOT restart the port-first run's proposed-once clause**, since reading a fresh
+  date as a reset defeats the clause that stops a member cycling; the threshold history before
+  it (2026-09-03 to 2026-09-05) is in git. **Declined again at scope — operator direction,
+  2026-09-11 (lead-relayed):** that direction stands, and the friction ranking shares no surface
+  with this iteration.
   **THE `cat >> .tmp/*` GRANT WAS GRANTED THE SAME DAY AND IS NOT LANDED HERE:** it edits
   `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
   authorization, so it was routed back. The limit it was granted on, recorded here because JSON
@@ -4980,11 +5024,9 @@
   **The filer's premise FELL and is answered:** the class-word gate is owed rather than unfiled, and
   `deferred-cost-class-opener-vocabulary` has owned it since 2026-08-23.
   recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05 2026-09-08
-  **AT THRESHOLD AND ANSWERED, STAYS DEFERRED — `lead, own-authority` 2026-09-09**, on the first
-  proposal this entry has had: it reached the threshold 2026-09-08 carrying no answer at all, which
-  is why scope surfaced it. MACHINERY-class by the 2026-08-30 discriminator, sharing no
-  surface with that window's installer-and-crate cut, whose unit filled it; re-grounded 2026-09-11.
-  Written in the shape its six threshold siblings carry. No re-escalation is owed.
+  **At threshold, promoted into `rankable-deferred-board`'s unit set as a feature — operator
+  direction, 2026-09-11 (lead session, lead-relayed)**: it shares the icebox arm the cost tag
+  touches. The 2026-09-09 deferral's ground was that window's unshared surface; git holds it.
   **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
   close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
   the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
@@ -5886,6 +5928,8 @@
   Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a ranking mechanism across two
   kits. →icebox refused on the operator's 2026-09-11 direction that no inbox bullet enters the
   Icebox directly.
+  **Operator direction, 2026-09-11 (lead session, lead-relayed):** in `rankable-deferred-board`'s
+  unit set as a feature; its mechanism rides the lead-line cost tag's amendment, which spec authors.
 
 - **composition-verdict-unrecorded-at-unit-set-ruling** [design-pending] — scope's economic
   composition test leaves no artifact that it ran, so a lone-unit iteration opens with it unapplied.
@@ -5906,45 +5950,8 @@
   Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a scope and lead contract change.
   →icebox refused on the operator's 2026-09-11 direction that no inbox bullet enters the Icebox
   directly.
-
-- **lead-cancel-running-work-unforbidden** [design-pending] — no instruction forbids a lead from
-  stopping running work whose loss wastes tokens.
-  **Operator expectation, 2026-09-11, lead session, typed message, relayed by that lead:** a lead
-  never stops a background stage session or its subagents (TaskStop or an equivalent kill)
-  without the operator's explicit confirmation or an explicit per-iteration grant.
-  **Re-verified at the drain:** TaskStop, cancel, kill, abort and interrupt over lead.md,
-  agent-execution.md, the stage-session agent, lifecycle-kit/SPEC.md and CLAUDE.md find liveness
-  polling and agent-execution's note that an interrupt destroys uncommitted work — the cost is
-  stated and the act never forbidden.
-  **Owed:** one clause in lifecycle-kit/templates/lead.md naming the act, its two authorizations
-  (operator confirmation, or a per-iteration grant where lifecycle-kit/SPEC.md §The steering
-  vocabulary puts grants) and the uncommitted-work cost as grounds, plus the owning SPEC passage
-  if needed.
-  **Cost while deferred:** token waste — a cancelled session's uncommitted unit is re-bought, and
-  only the harness's general confirm-before-irreversible default stands in the way.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: lead-contract kit text, routed
-  to scope by the dispatch. →icebox refused on the operator's 2026-09-11 direction that no inbox
-  bullet enters the Icebox directly.
-
-- **close-watch-waits-on-slowest-smoke-leg** [design-pending] — a close push waits about 48
-  minutes on the `gates` workflow, and one leg is almost all of it.
-  **Operator-stated 2026-09-11, lead session, typed message, relayed by that lead:** a close cannot
-  wait 40 minutes on one run; optimize `install-smoke-windows` and every other long leg.
-  **Re-verified at the drain on gates run 34553416908 (head 08e6eb67):** wall 48 minutes; `gates`
-  4.8, install-smoke 3.5, powershell 2.4, linux-arm64 3.6, each native-artifacts leg under 2,
-  macos 12.5, macos-intel 23.7, windows 46.0. Lead-measured, not re-probed: 44 of Windows' 46
-  minutes inside its smoke step, and five prior runs at 45 to 48. Close watches `gates` to green,
-  so it waits on the slowest leg. Not yet probed: which smoke phases take the Windows time.
-  **Candidate levers, none ruled:** cut the dominant Windows cost (per-process spawn under
-  Git-for-Windows bash is the usual suspect); let close watch the binding fast legs and read the
-  slow smokes later; path-filter or schedule the slow legs; cache what each leg rebuilds.
-  **DISTINCT from `close-red-push-ownership`** (icebox; who owns a red push),
-  `install-smoke-leg-names-mix-two-axes` and `held-ci-leg-failure-reddens-a-binding-one` (naming
-  and hold posture).
-  **Cost while deferred:** every close pays the wait.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a probe, a workflow change and a
-  decision on which legs close watches. →icebox refused on the operator's 2026-09-11 direction
-  that no inbox bullet enters the Icebox directly.
+  **Operator direction, 2026-09-11 (lead session, lead-relayed):** a rider feature of
+  `rankable-deferred-board` — the verdict field is a scope-to-lead contract; spec authors it.
 
 - **landing-moots-live-entries-undetected** [design-pending] — no stage step asks which live
   entries a landed unit moots, so obsolete entries linger until a whole-pool triage.
@@ -5967,6 +5974,9 @@
   entering the tier directly.
   **Operator direction, 2026-09-11 (consult):** bundle with
   `deferred-cost-class-opener-vocabulary` at the next scope — one surface, what scope re-reads.
+  **Operator direction, 2026-09-11 (lead session, lead-relayed), bundled as directed:** a feature
+  of `rankable-deferred-board` — the per-landing listing is a contract build or close must honor;
+  spec authors it.
 
 - **deferred-cost-class-opener-vocabulary** [design-pending] — the cost field is free prose, so
   neither reader that ranks on it can read it without the body: the icebox worklist reads only
@@ -6002,6 +6012,8 @@
   recurrence: deferred-cost-class-opener-vocabulary 2026-09-11
   Filed 2026-08-23 by the consult held after `leak-guard-and-assertion-meta-gate-port` closed,
   promoted out of the gap inbox at the following scope intake the same date.
+  **Operator direction, 2026-09-11 (lead session, lead-relayed):** the lead feature of
+  `rankable-deferred-board`; spec authors the one amendment it shares with the surface tag.
 
 - **deferred-surface-tag-for-bundling** [design-pending] — scope's third rank tier fills the
   window with deferred entries sharing the lead unit's surface, and no machine-readable input
@@ -6025,6 +6037,8 @@
   Filed 2026-09-11 by consult on operator direction, bundled with
   `deferred-cost-class-opener-vocabulary` and `landing-moots-live-entries-undetected` for the
   next scope.
+  **Operator direction, 2026-09-11, lead-relayed:** promoted with the cost tag into
+  `rankable-deferred-board` as a feature, riding that tag's amendment.
 
 
 ## Icebox
