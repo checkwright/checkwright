@@ -2085,7 +2085,12 @@
   than deriving it, which no candidate deliverable above addresses. The survey's headline finding is
   unaffected (it reads `recurrence:` dates, not this figure). Judged a recurrence at close after
   re-running the count; not corrected in the record, which the next first-stage entry truncates.
-  recurrence: survey-record-claim-reliability 2026-09-08
+  **FIFTH instance, 2026-09-11, and the wrong finding travelled into a direction.** The scope
+  survey called `bridged-knob-case-tmp-dir-override-inert`'s premise STALE: the shell harness was
+  gone and the native arm absolutizes the case scratch. Scope routed the entry to close to retire.
+  The close re-ran the entry's own reproduction and the residue regenerated, because the arm's pin
+  misses the knob form a bridged gate reads. The survey never ran the reproduction the entry names.
+  recurrence: survey-record-claim-reliability 2026-09-08 2026-09-11
   Filed 2026-08-10 by close, on operator direction after the third error.
 
 - **kit-ref-liveness-stem-token-hole** [design-pending] [cost: event/high] [surface: canon-kit] — a typo'd knob name under
@@ -3302,9 +3307,9 @@
   escalated the ruling and did not take it; ruled by the operator the same day and recorded here by
   that same scope, which authored no part of the ruling it records.
 
-- **bridged-knob-case-tmp-dir-override-inert** [design-pending] [cost: session/high] [surface: gate-sdk] — `run-gate-tests.sh`'s
-  `CASE_TMP_DIR` absolutization protects a SHELL-dispatched gate only, so a bridged/native gate
-  writes its scratch into the tracked fixture corpus it is the oracle for.
+- **bridged-knob-case-tmp-dir-override-inert** [design-pending] [cost: session/high] [surface: gate-sdk] — the `--run-gate-tests`
+  arm's case scratch pin protects no bridged gate, so a bridged/native gate writes its scratch into
+  the tracked fixture corpus it is the oracle for.
   recurrence: bridged-knob-case-tmp-dir-override-inert 2026-08-25
   **FIRST RECURRENCE, 2026-08-25 at close, and it re-fired in the ATTESTED shape rather than a
   variant.** A battery run regenerated the scratch, and the next `installer_smoke` run died at
@@ -3318,12 +3323,12 @@
   rather than merely upheld: because the baseline row still names the standing cause, deleting the
   transient one exposed the real red immediately instead of leaving a re-attributed row that would
   have read as satisfied.
-  **The mechanism, measured.** `gate-sdk/bin/run-gate-tests.sh` resolves a bridged gate's knobs
-  through `gate_command`'s `mapfile` at line 50 — BEFORE the `GATE_SDK_TMP_DIR="$CASE_TMP_DIR"`
-  override at line 84 ever applies. A native gate reads `GATE_SDK_KNOB_GATE_SDK_TMP_DIR`, which
-  `_gate_knob_emit` bakes from the ambient, un-overridden shell variable at that line-50 call, so
-  the line-84 override is inert for every bridged member. It only ever protected `.sh`-dispatched
-  gates.
+  **The mechanism, re-measured 2026-09-11 after the harness port.** The `--run-gate-tests` arm
+  resolves a case's argv by running `gate_command` inside the case dir, which bakes the ambient,
+  repo-relative `GATE_SDK_KNOB_GATE_SDK_TMP_DIR=.tmp` into its `env` prefix. The arm's scratch pin
+  sets the bare `GATE_SDK_TMP_DIR`, which no native gate reads, so `.tmp` resolves inside the case
+  dir. Probed on the resolved argv, and one clean `gate_sdk` fixture-suite run regenerated the
+  residue. The shell harness this entry first measured had the same shape.
   **Reproduced live rather than reasoned.** `check-crate-arms` ported from `.sh` to `.gate` plus a
   crate module this iteration, which silently reopened exactly the corpus-pollution class
   `c1375e99`/`80d74291` closed. With both fixture `.tmp` dirs deleted, a plain `gate_sdk`
@@ -3333,14 +3338,13 @@
   `cp -R` filter gap is the VENDORING symptom; this is the cache-pollution CAUSE, in the harness
   itself, for every future native-ported gate that declares the `GATE_SDK_TMP_DIR` knob against a
   tracked fixture pair — not only this one member.
-  **Why `[design-pending]`:** the candidate fix is to put the case-scoped `CASE_TMP_DIR` in scope
-  at `gate_command`'s own `mapfile` call rather than only at line 84's inert `env` prefix, but the
-  config bridge is a single-producer surface and moving where a knob's value is computed for one
-  caller is the criterion-6 question in miniature.
-  **Cost while deferred:** a fixture-suite run leaves scratch inside a tracked fixture corpus,
-  which the pack arm then vendors, breaking `checkwright init` at `git add` and reddening
-  `installer_smoke` for the WRONG reason — which is what masked a ruled scenario at this
-  iteration's validate and cost a diagnosis.
+  **Why `[design-pending]`:** the candidate fix is to pin the case scratch in the knob form the
+  member reads rather than only the bare name, but the config bridge is a single-producer surface
+  and moving where a knob's value is computed for one caller is the criterion-6 question in
+  miniature.
+  **Cost while deferred:** a fixture-suite run leaves ignored scratch inside a tracked fixture
+  corpus. The packer now archives the tracked set alone, so the vendoring that cost the diagnoses
+  above no longer follows from it; any other reader of that corpus that walks ignored paths does.
   **The baseline row was NOT re-attributed to this entry, ruled 2026-08-24 and recorded so the
   next validate does not re-litigate it.** While the loop was shell, that `installer_smoke` row
   kept `binary-less-dispatch-loop-retirement` as the standing unpaid price it held visible, and
@@ -3348,7 +3352,8 @@
   the split evidence-kit/SPEC.md §Baseline manifest now rules generally, which is where the ruling
   was landed rather than left as this instance's precedent. This entry's cost line above is where
   the masking diagnosis belongs. The loop has since retired and that row now reads pass.
-  **Routed to close to re-verify, then retire — operator direction, 2026-09-11, lead-relayed.**
+  **Re-verified at close and kept.** Operator direction, 2026-09-11, lead-relayed: re-verify, then
+  retire. It was routed on a survey reading the premise stale; the re-run held it, so no retire.
   Filed 2026-08-24 to the gap inbox by validate, declared distinct; promoted that day at
   `shell-gate-tail-port-and-completion-oracle`'s close, deleting the regenerated instance; its
   recurrence's attribution was ruled at `execution-control-reach-and-turn-end-blocking`'s close.
