@@ -27,9 +27,9 @@ baseline is actionable.
    list names with the same two questions, and state the growth figure in the
    close commit beside the delta.
 5. **Re-baseline and commit.** Finish with
-   `bash gate-sdk/bin/run-gates.sh --emit always-loaded --update-baseline` and
-   commit the baseline file, so next iteration's delta and growth measure from
-   this close.
+   `bash gate-sdk/bin/run-gates.sh --emit always-loaded --update-baseline` (it
+   also lowers armed ratchet ceilings) and commit the baseline and ceiling files,
+   so next iteration measures from this close.
 
 Goal: every governed prose file grows only where the growth earns its cost, and
 every session pays for context that is still true and still terse.

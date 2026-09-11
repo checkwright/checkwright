@@ -6,6 +6,18 @@ set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the ratchet is driven through gate_command, the way a consumer's own battery does, because it is exercised without being registered (below)
+# shellcheck source=../../gate-sdk/lib/gate.sh
+source "$SDK/lib/gate.sh"
+
+kit_gate() {   # $1=gate-name  $2.. = gate args — dispatch a vendored context-kit gate by name
+    local g="$1"; shift
+    local -a argv=()
+    mapfile -t argv < <(gate_command "$g" "$SMOKE_KIT_ROOT/checks")
+    [[ ${#argv[@]} -gt 0 ]] || return 2
+    "${argv[@]}" "$@"
+}
+
 cat >> scripts/gates.list <<'EOF'
 # context-kit
 check-brevity
@@ -63,3 +75,20 @@ if [[ ! -f .workflow/always-loaded-baseline.txt ]]; then
     echo "context-kit/smoke/install.sh: always-loaded --update-baseline wrote no baseline" >&2
     exit 1
 fi
+
+# spec: context-kit/SPEC.md §Testing — the ratchet's three states in order: armed by `--ceiling` it is clean, a grown surface reds it, and a second `--ceiling` makes that growth the new floor. It is exercised unregistered and disarmed again at the end, because a ceiling left standing here would be stamped against a half-installed consumer that every co-vendored kit installing after context-kit still grows.
+bash "$SDK/bin/run-gates.sh" --emit always-loaded --ceiling >/dev/null
+ratchet() {  # $1=want-rc  $2=label
+    local rc=0
+    kit_gate check-surface-ratchet >/dev/null 2>&1 || rc=$?
+    if [[ "$rc" -ne "$1" ]]; then
+        echo "context-kit/smoke/install.sh: check-surface-ratchet $2: want exit $1, got $rc" >&2
+        exit 1
+    fi
+}
+ratchet 0 "on a freshly stamped ceiling"
+printf '\n- **Grown:** one more resident line nobody priced.\n' >> CLAUDE.md
+ratchet 1 "on a surface grown past its row"
+bash "$SDK/bin/run-gates.sh" --emit always-loaded --ceiling >/dev/null
+ratchet 0 "after the growth was deliberately re-stamped"
+rm -f .workflow/surface-ceiling.txt

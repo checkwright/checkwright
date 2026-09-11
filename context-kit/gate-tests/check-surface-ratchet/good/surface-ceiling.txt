@@ -1,0 +1,4 @@
+# contract: context-kit/SPEC.md §The surface ratchet
+3 CLAUDE.md
+9 templates/held.md
+40 templates/retired.md

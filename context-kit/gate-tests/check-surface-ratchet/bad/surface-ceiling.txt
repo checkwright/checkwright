@@ -1,0 +1,2 @@
+# contract: context-kit/SPEC.md §The surface ratchet
+3 CLAUDE.md

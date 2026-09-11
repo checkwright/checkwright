@@ -136,6 +136,7 @@ leaves its section absent.
 | [delegation-kit](delegation-kit/index.md) | check-rule-citation | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-agent-tier-explicit | precommit |
 | [context-kit](context-kit/index.md) | check-brevity | precommit |
+| [context-kit](context-kit/index.md) | check-surface-ratchet | precommit |
 | [context-kit](context-kit/index.md) | check-settings-pins | precommit |
 | [context-kit](context-kit/index.md) | check-settings-paths | precommit |
 | [context-kit](context-kit/index.md) | check-memory-off | precommit |

@@ -123,8 +123,9 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    No tier is free: an on-demand doc pays at every open, and one a stage opens
    each iteration is always-loaded in effect, so brevity binds every governed
    file and the close pass walks each one that grew.
-   *Enforced by:* the brevity budget in
-   [context-kit/SPEC.md](../context-kit/SPEC.md) §The brevity gate.
+   *Enforced by:* the brevity budget and the per-file growth ratchet in
+   [context-kit/SPEC.md](../context-kit/SPEC.md) §The brevity gate and
+   §The surface ratchet.
    *Digest:* one line per rule here; the mechanism behind the pointer.
 
 6. **Load-trigger residency.** The always-loaded file earns a rule only when no

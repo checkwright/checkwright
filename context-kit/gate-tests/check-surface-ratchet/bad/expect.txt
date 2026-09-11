@@ -1,0 +1,2 @@
+CLAUDE.md — 5 lines, above its committed ceiling of 3
+templates/ungoverned.md — 3 lines, no ceiling row

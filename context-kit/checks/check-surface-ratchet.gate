@@ -1,0 +1,3 @@
+# graph: couples=.workflow/surface-ceiling.txt,CLAUDE.md,kit:templates/*.md,lifecycle-kit/templates/stages/*.md,.claude/agents/*.md,.claude/commands/*.md,native/src/gates/surface_ratchet.rs,native/src/emit/always_loaded.rs dir=one valve=none tier=precommit
+# install: on-surface
+# spec: context-kit/SPEC.md §The surface ratchet — no governed surface above its committed ceiling, and a newly governed one with no row is growth from nothing

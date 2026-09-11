@@ -34,6 +34,7 @@ hook approximation and the session-context template also expect
    <!-- gate-roster:begin -->
    ```
    check-brevity
+   check-surface-ratchet
    check-settings-pins
    check-settings-paths
    check-memory-off
@@ -53,7 +54,11 @@ hook approximation and the session-context template also expect
    reads the same settings file and holds every allow-list grant naming a
    literal `.sh` path against the tree. `check-footprint-fresh` byte-gates a committed
    `docs/footprint.md` against the footprint emitter it calls in-process;
-   register it when you publish that projection.
+   register it when you publish that projection. `check-surface-ratchet` arms
+   once you stamp its ceilings —
+   `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`, committed —
+   and reds thereafter on a governed surface that grew past its row without a
+   deliberate re-stamp (SPEC.md §The surface ratchet).
 
 2. Wire the session-start hook — copy `templates/session-context.sh` into your
    gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism),

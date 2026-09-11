@@ -110,6 +110,7 @@ check-gate-tamper
 check-rule-citation
 check-agent-tier-explicit
 check-brevity
+check-surface-ratchet
 check-settings-pins
 check-settings-paths
 check-memory-off

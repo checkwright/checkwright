@@ -4,21 +4,25 @@
 use crate::proc;
 use crate::walk;
 
-// spec: context-kit/SPEC.md §The always-loaded meter — the four knobs `lib/context.sh` defines and
-// the bridge resolves by sourcing it; the two `GATE_SDK_*` names it already rides into these are
+// spec: context-kit/SPEC.md §The always-loaded meter — the knobs `lib/context.sh` defines and the
+// bridge resolves by sourcing it; the two `GATE_SDK_*` names it already rides into these are
 // deliberately absent, since declaring either would resolve one fact twice.
 pub const KNOBS: &[&str] = &[
     "CONTEXT_KIT_SURFACES",
     "CONTEXT_KIT_HOOK_CMD",
     "CONTEXT_KIT_BASELINE_FILE",
     "CONTEXT_KIT_GROWTH_PATHS",
+    "CONTEXT_KIT_CEILING_FILE",
+    "CONTEXT_KIT_RATCHET_PATHS",
 ];
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the usage an unrecognized mode operand
 // prints, the half of the bin/-tool contract that does not retire to the front-end.
-const USAGE: &str = "usage: --emit always-loaded [--growth | --update-baseline]\n  bare: the total, its per-part split and the delta since the baseline; --growth: per-file net growth since the baseline commit; --update-baseline: rewrite the baseline row";
+const USAGE: &str = "usage: --emit always-loaded [--growth | --update-baseline | --ceiling]\n  bare: the total, its per-part split and the delta since the baseline; --growth: per-file net growth since the baseline commit; --update-baseline: rewrite the baseline row; --ceiling: rewrite the ceiling file to current sizes";
 
 const BASELINE_HEADER: &str = "# contract: context-kit/SPEC.md §The always-loaded meter";
+
+pub const CEILING_HEADER: &str = "# contract: context-kit/SPEC.md §The surface ratchet";
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the measurement: every field is one the
 // rendered line already carried, read by the arm and by `kpi-always-loaded`. The baseline row's
@@ -89,6 +93,83 @@ fn hook_lines(cmd: &str) -> u64 {
         return 0;
     }
     body.matches('\n').count() as u64 + 1
+}
+
+// spec: context-kit/SPEC.md §The surface ratchet — the governed set is the configured surfaces plus
+// every *tracked* file the ratchet pathspecs match, so an untracked scratch copy of a template
+// never enters it; `git ls-files` resolves the pathspecs rather than a walk re-implementing them.
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a `git` that could not list is an error rather
+// than an empty match, which would silently shrink the governed set to the surfaces alone.
+pub fn governed() -> Result<Vec<(String, u64)>, String> {
+    let mut paths = walk::knob_array("CONTEXT_KIT_SURFACES")?;
+    let specs = walk::knob_array("CONTEXT_KIT_RATCHET_PATHS")?;
+    let specs: Vec<&str> = specs.iter().map(String::as_str).filter(|s| !s.is_empty()).collect();
+    if !specs.is_empty() {
+        let mut args: Vec<&str> = vec!["ls-files", "--"];
+        args.extend(specs);
+        let done = proc::run("git", &args)?;
+        let listed = done
+            .stdout()
+            .ok_or_else(|| "git ls-files could not list the ratchet pathspecs".to_string())?;
+        paths.extend(String::from_utf8_lossy(listed).lines().map(String::from));
+    }
+    paths.sort();
+    paths.dedup();
+    // spec: context-kit/SPEC.md §The surface ratchet — size is the newline count, the meter's own
+    // measure; a governed name that is not a readable file contributes nothing, which is what
+    // `measure` above does with an absent surface.
+    let mut out: Vec<(String, u64)> = Vec::new();
+    for p in paths {
+        if p.is_empty() || !std::path::Path::new(&p).is_file() {
+            continue;
+        }
+        if let Ok(b) = std::fs::read(&p) {
+            out.push((p, b.iter().filter(|&&c| c == b'\n').count() as u64));
+        }
+    }
+    Ok(out)
+}
+
+// spec: context-kit/SPEC.md §The surface ratchet — the ceiling file: a `# contract:` header, then
+// `<lines> <path>` per governed file. An unparsable row is exit 2 for every reader, because a row
+// silently dropped is a surface silently ungoverned.
+pub fn ceiling_rows(path: &str) -> Result<Vec<(u64, String)>, String> {
+    let text = std::fs::read_to_string(path)
+        .map_err(|e| format!("cannot read the ceiling file {}: {}", path, e))?;
+    let mut rows: Vec<(u64, String)> = Vec::new();
+    for (n, line) in text.lines().enumerate() {
+        let t = trim_space(line);
+        if t.is_empty() || t.starts_with('#') {
+            continue;
+        }
+        let bad = || format!("{}:{}: unparsable ceiling row: {}", path, n + 1, t);
+        let (size, rest) = t.split_at(t.find([' ', '\t']).ok_or_else(bad)?);
+        let file = trim_space(rest);
+        let size: u64 = size.parse().map_err(|_| bad())?;
+        if file.is_empty() {
+            return Err(bad());
+        }
+        rows.push((size, file.to_string()));
+    }
+    Ok(rows)
+}
+
+// spec: context-kit/SPEC.md §The surface ratchet — the writer: every row rewritten to the current
+// size, so one act raises a grown file and locks a cut made beside it. Rows come out sorted by
+// path because the governed set is. The write is checked, the baseline arm's own refusal shape.
+pub fn write_ceiling(path: &str) -> Result<String, String> {
+    let rows = governed()?;
+    let mut body = String::from(CEILING_HEADER);
+    body.push('\n');
+    for (file, lines) in &rows {
+        body.push_str(&format!("{} {}\n", lines, file));
+    }
+    std::fs::write(path, body).map_err(|e| format!("cannot write {}: {}", path, e))?;
+    Ok(format!(
+        "surface ceiling updated: {} governed file(s) in {}\n",
+        rows.len(),
+        path
+    ))
 }
 
 pub fn measure() -> Result<Measurement, String> {
@@ -207,6 +288,15 @@ fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
 // `<total> <surface> <commit>` row and a consumer's trailing extra fields carried verbatim; the
 // write is checked, so no confirmation line can report a rewrite that did not happen.
 fn update_baseline(m: &Measurement, baseline_file: &str) -> Result<String, String> {
+    // spec: context-kit/SPEC.md §The surface ratchet — close lowers an armed ratchet's ceilings in
+    // the same act, and only where the file already exists: seeding one here would arm the gate on
+    // a consumer that never asked for it.
+    let ceiling_file = walk::knob_scalar("CONTEXT_KIT_CEILING_FILE")?;
+    let ceiling = if std::path::Path::new(&ceiling_file).is_file() {
+        Some(write_ceiling(&ceiling_file)?)
+    } else {
+        None
+    };
     let commit = proc::run("git", &["rev-parse", "HEAD"])
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
@@ -220,9 +310,10 @@ fn update_baseline(m: &Measurement, baseline_file: &str) -> Result<String, Strin
     std::fs::write(baseline_file, format!("{}\n{}\n", BASELINE_HEADER, row))
         .map_err(|e| format!("cannot write {}: {}", baseline_file, e))?;
     Ok(format!(
-        "always-loaded baseline updated: {} @ {}\n",
+        "always-loaded baseline updated: {} @ {}\n{}",
         parts(m),
-        short(&commit)
+        short(&commit),
+        ceiling.unwrap_or_default()
     ))
 }
 
@@ -235,7 +326,7 @@ fn mode(args: &[String]) -> Result<Option<&str>, String> {
         if a.is_empty() {
             continue;
         }
-        if a != "--growth" && a != "--update-baseline" {
+        if a != "--growth" && a != "--update-baseline" && a != "--ceiling" {
             return Err(format!("unrecognized mode: {}\n{}", a, USAGE));
         }
         if chosen.is_none() {
@@ -252,6 +343,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     match selected {
         Some("--growth") => growth(&m, &baseline_file),
         Some("--update-baseline") => update_baseline(&m, &baseline_file),
+        Some("--ceiling") => write_ceiling(&walk::knob_scalar("CONTEXT_KIT_CEILING_FILE")?),
         _ => Ok(format!("always-loaded: {}\n", line(&m))),
     }
 }
@@ -281,6 +373,41 @@ mod tests {
             mode(&argv(&["--growth"])).expect("a legitimate mode was refused"),
             Some("--growth")
         );
+        assert_eq!(
+            mode(&argv(&["--ceiling"])).expect("the ratchet's writing mode was refused"),
+            Some("--ceiling")
+        );
+    }
+
+    // spec: context-kit/SPEC.md §The surface ratchet — the ceiling file's grammar: a `# contract:`
+    // header and blank lines carry no row, and a row the reader cannot parse is an error rather
+    // than a row dropped, which would leave a governed surface silently ungoverned
+    #[test]
+    fn the_ceiling_file_parses_its_rows_and_refuses_one_it_cannot_read() {
+        let dir = std::env::temp_dir().join(format!("ck-ceiling-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("cannot make the scratch dir");
+        let path = dir.join("surface-ceiling.txt");
+        let p = path.to_string_lossy().to_string();
+
+        std::fs::write(&path, format!("{}\n\n194 CLAUDE.md\n 40\tkit/templates/a.md \n", CEILING_HEADER))
+            .expect("cannot write the scratch ceiling file");
+        assert_eq!(
+            ceiling_rows(&p).expect("a well-formed ceiling file was refused"),
+            vec![
+                (194u64, "CLAUDE.md".to_string()),
+                (40u64, "kit/templates/a.md".to_string()),
+            ]
+        );
+
+        for bad in ["CLAUDE.md\n", "x CLAUDE.md\n", "194\n", "194 \n"] {
+            std::fs::write(&path, format!("{}\n{}", CEILING_HEADER, bad))
+                .expect("cannot write the scratch ceiling file");
+            let err = ceiling_rows(&p)
+                .expect_err("an unparsable ceiling row was absorbed rather than refused");
+            assert!(err.contains("unparsable"), "the refusal named no cause: {}", err);
+        }
+
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     // spec: context-kit/SPEC.md §The always-loaded meter — the baseline row's fourth field is the

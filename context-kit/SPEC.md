@@ -629,9 +629,10 @@ context economics and the *report* is drift reporting — drift-kit's
 it.
 
 **It is the `--emit-always-loaded` bridged arm, and both halves of that are forced
-rather than chosen.** It is a **table member** because it resolves four consumer
-knobs — `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_HOOK_CMD`, `CONTEXT_KIT_BASELINE_FILE`
-and `CONTEXT_KIT_GROWTH_PATHS` — which a hardcoded top-level flag would receive none
+rather than chosen.** It is a **table member** because it resolves the consumer knobs
+`CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_HOOK_CMD`, `CONTEXT_KIT_BASELINE_FILE`,
+`CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE` and
+`CONTEXT_KIT_RATCHET_PATHS` — which a hardcoded top-level flag would receive none
 of, the difference between working and appearing to. `GATE_SDK_WORKFLOW_DIR` and
 `GATE_SDK_GATES_DIR` are deliberately **not** declared: §lib/context.sh already rides
 them into the baseline path's and the hook command's own resolved values, so
@@ -648,11 +649,11 @@ them, and `kpi-always-loaded` reads the same figures in process. That is what en
 the undeclared cross-kit output contract the KPI used to keep, parsing the rendered
 line back apart for a leading total and a marked delta.
 
-**The three modes arrive as operands, never composed into the flag** —
-`--emit always-loaded`, `--emit always-loaded --growth`,
-`--emit always-loaded --update-baseline` — the shape `--hook` and `--wait-probe`
-already carry for their own subcommand words. Composing three flag spellings is
-refused for the reason that shape exists: three spellings would be three rows
+**The modes arrive as operands, never composed into the flag** —
+`--emit always-loaded`, then `--growth`, `--update-baseline` or `--ceiling` — the
+shape `--hook` and `--wait-probe` already carry for their own subcommand words.
+Composing a flag spelling per mode is
+refused for the reason that shape exists: each spelling would be another row
 publishing one knob roster, and the front-end's grammar would carry a second copy of
 a decision the bridged-arm table already holds.
 
@@ -677,7 +678,11 @@ golden exists to prove.
 
 - **Default invocation** prints one line: total, per-part breakdown, and
   the delta against the baseline when one exists.
-- **`--update-baseline`** rewrites the baseline file — a close-stage act,
+- **`--ceiling`** — rewrite the ceiling file (§The surface ratchet) to current
+  sizes, creating it if absent; the baseline row stays. Checked write; exit 2
+  names the path.
+- **`--update-baseline`** rewrites the baseline file, and the ceiling file where
+  one exists — a close-stage act,
   because the brevity pass reacts to the *delta*, not the level (close is
   net-additive by design; only growth since the iteration started is
   actionable). The write is checked and a failure names the path at exit 2, the
@@ -789,6 +794,33 @@ is one instance of it, so the superset matches every such pointer. Ships with
 a `good/`+`bad/` fixture pair and registers in the
 consumer's `gates.list` (this repo's included).
 
+## The surface ratchet
+
+`check-surface-ratchet` — no governed surface above its committed ceiling.
+
+- **Governed:** `CONTEXT_KIT_SURFACES`, plus tracked files matching
+  `CONTEXT_KIT_RATCHET_PATHS`; size = newline count, the meter's measure.
+- **Ceilings:** `CONTEXT_KIT_CEILING_FILE` — a `# contract:` header, then
+  `<lines> <path>` per governed file, sorted by path.
+- **Red:** a file above its row, or a governed file with no row (a new surface
+  grows from nothing). The report names file, size and ceiling, and prints
+  `--emit always-loaded --ceiling`, committed with the growth.
+- **Clean:** otherwise. A row for a deleted or ungoverned file is ignored, so
+  narrowing never reds.
+- **Exit 2:** ceiling file absent, a row unparsable, a knob unresolved.
+- **Writers:** never the gate — `--ceiling` in the growing commit,
+  `--update-baseline` at close where the file exists.
+- **Why a ratchet:** no budget to calibrate; growth shows in the commit that
+  causes it. A re-stamp makes it deliberate, not justified; close judges.
+- **Why these files, per file:** a trigger loads each whole. A SPEC is read by
+  section; close's growth walk reads it.
+- **Why its own file:** `--update-baseline` rewrites the baseline as one row, and
+  that row anchors close's growth read.
+- **Why `on-surface`:** `init` writes no ceiling file; `--ceiling` arms the gate.
+- **Outside:** the hook body — consumer state, not authored text.
+- **Limit:** pathspecs outside the descriptor's static `couples=` are held by the
+  battery, not the hook.
+
 ## The close-stage brevity pass
 
 `templates/close-brevity.md` is the recurring close-stage step a consumer
@@ -803,7 +835,7 @@ goes to git history, not to a "formerly…" note); **no file is exempt** — an
 on-demand doc pays at every open, and a SPEC a stage opens each iteration is
 always-loaded in effect, the always-loaded tier being only the one that pays
 most often; finish with `--emit always-loaded --update-baseline` and commit the
-baseline.
+baseline and ceiling files (§The surface ratchet).
 
 The lexical share of this narration judgment — a fixed set of `formerly…`-class
 markers in the manifest set — is a blocking gate
@@ -1145,16 +1177,19 @@ no bare collection total.
 context-kit/
   lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
   checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
+  checks/check-surface-ratchet.gate # hermetic, binary-dispatched: every governed surface at or below its committed ceiling
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
   checks/check-memory-off.gate   # local-environment, binary-dispatched: memory dir + local overrides
   checks/check-footprint-fresh.gate # hermetic, binary-dispatched: docs/footprint.md byte-fresh vs the emitter it calls in-process
   gate-tests/check-brevity/{good,bad}/
+  gate-tests/check-surface-ratchet/{good,bad}/
   gate-tests/check-settings-pins/{good,bad}/
   gate-tests/check-settings-paths/{good,bad}/
   gate-tests/check-memory-off/{good,bad}/
   gate-tests/check-footprint-fresh/{good,bad}/
   gate-tests/check-brevity.test.sh      # the unmatched-section axis the pair cannot hold
+  gate-tests/check-surface-ratchet.test.sh # the refusal axis the pair cannot hold
   gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold
   gate-tests/check-settings-pins.test.sh # the refusal axis the pair cannot hold
   index-tests/                   # fixture corpus + expected outputs
@@ -1343,6 +1378,19 @@ spelling, and there the absolute answer is the honest one.
 - `CONTEXT_KIT_GROWTH_PATHS` — array of git pathspecs the meter's `--growth`
   arm measures; default `("*.md")`. A consumer excludes generated mirrors and
   fixture copies here, since a copy's growth is its source's.
+- `CONTEXT_KIT_CEILING_FILE` — the ratchet's committed ceilings
+  (§The surface ratchet); default
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/surface-ceiling.txt`. Its own file rather
+  than a row in the baseline, because `--update-baseline` rewrites that file as
+  one row and would erase a ceiling at every close.
+- `CONTEXT_KIT_RATCHET_PATHS` — array of git pathspecs naming the
+  load-triggered surfaces the ratchet governs beside `CONTEXT_KIT_SURFACES`;
+  default **empty** (the always-loaded files alone). Empty here means *no
+  load-triggered surface*, not *derive it*: which files a harness loads whole is
+  the adopter's own layout, and a default spelling the kits' own template paths
+  would red an adopter's re-vendor commit for growth the kit shipped. This
+  repo's own copy names its kit templates, agent definitions and binding shims,
+  and excludes the gate-test fixture corpus.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
 - `CONTEXT_KIT_BREVITY_SECTION` — heading of the budgeted bullet section;
   default `## Shared conventions`.
@@ -1437,7 +1485,7 @@ The arm registers as its own evidence-kit validate suite
 leans on now
 has an automated validate-stage consumer. The footprint emitter is advisory the same way, but its
 projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds
-`docs/footprint.md` against `--emit`. `check-brevity`, `check-settings-pins`,
+`docs/footprint.md` against `--emit`. `check-brevity`, `check-surface-ratchet`, `check-settings-pins`,
 `check-memory-off`, and `check-footprint-fresh` are gates and carry the standard
 fixture pair; the footprint pair drives the hermetic two-argument mode
 (`<projection> <emit>`), the `check-trajectory-fresh` precedent. Both
@@ -1460,6 +1508,13 @@ fixes the holds-vs-mismatch axis (exit 0 vs exit 1) alone, so a pin outside
 the documented path grammar — a jq filter, an iteration, a slice, an array
 literal — needs its own case to prove the refusal is exit 2, loud and naming
 the pin, the knob and the construct, never a silent clean verdict.
+`check-surface-ratchet.test.sh` holds its member's refusal axis on the same
+reading — an absent ceiling file and an unparsable row are each exit 2, which
+the pair's own well-formed file cannot express — plus the ignored stale row. Its
+sandbox is outside any git repository, so every case leaves
+`CONTEXT_KIT_RATCHET_PATHS` empty and the tracked-pathspec arm stays the pair's,
+whose cases run inside the repo and drive it from their own case-dir config
+(the memory-off pair's shape, and here it is what makes `git ls-files` resolve).
 
 `smoke/install.sh` copies the templates into the scratch consumer (config
 into the gates dir, hook wiring into the harness settings), runs the hook
@@ -1467,7 +1522,16 @@ end-to-end asserting it exits zero (and, when queue-kit is co-vendored,
 emits the queue index — the installer assumes only gate-sdk, so the queue
 integration is exercised only alongside queue-kit), and runs
 `run-gates.sh --emit always-loaded --update-baseline` asserting the baseline
-file appears.
+file appears. It then exercises the ratchet's three states in order —
+`--ceiling` then clean, a grown surface then red, a second `--ceiling` then
+clean again (§The surface ratchet) — **unregistered, through `gate_command`, and
+disarmed again by deleting the ceiling file**. Registering it and leaving a
+ceiling standing would stamp a half-installed consumer: context-kit installs
+second, and every kit after it grows the agent file, so the stamp would be stale
+by construction before the green-battery assertion runs. Unregistered is the
+accounted state for it — the disposition is `on-surface`, so the registration
+accounting's own probe exempts it (gate-sdk/SPEC.md §Consumer smoke) and no
+`# smoke-unregistered:` reason is owed.
 `smoke/violation.sh` crafts an over-budget pointered bullet in the scratch
 consumer's brevity file and asserts the battery reddens via
 `check-brevity`. It inserts the bullet inside the budgeted section rather than

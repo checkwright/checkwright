@@ -101,6 +101,7 @@ pub mod stage_entry;
 pub mod stage_evidence;
 pub mod stage_skill_coverage;
 pub mod surface_duplication;
+pub mod surface_ratchet;
 pub mod survey_record;
 pub mod tag_lead_line;
 pub mod task_conservation;
@@ -1344,6 +1345,21 @@ pub const REGISTRY: &[GateEntry] = &[
             "CONTEXT_KIT_BREVITY_BUDGET",
             "CONTEXT_KIT_BREVITY_SECTION",
             "CONTEXT_KIT_BREVITY_POINTER_RE",
+        ],
+        "context-kit",
+        &[("git", "")],
+    ),
+    // spec: context-kit/SPEC.md §The surface ratchet — born native beside the meter whose writer
+    // it reads: named files and one `git ls-files` over the ratchet pathspecs, so the declared
+    // walk-root set is empty and `git` is the one declared program.
+    (
+        "check-surface-ratchet",
+        surface_ratchet::run,
+        &[],
+        &[
+            "CONTEXT_KIT_CEILING_FILE",
+            "CONTEXT_KIT_SURFACES",
+            "CONTEXT_KIT_RATCHET_PATHS",
         ],
         "context-kit",
         &[("git", "")],

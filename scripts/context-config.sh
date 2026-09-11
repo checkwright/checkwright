@@ -17,3 +17,7 @@ CONTEXT_KIT_HOOK_CMD="bash gate-sdk/bin/run-gates.sh --emit queue-index --collap
 # comment-tier-exempt: docs/ is the generated SPEC mirror and gate-tests/ holds fixtures — both are copies, so their growth is the source's, counted once at the source
 # shellcheck disable=SC2034  # consumed by the --emit-always-loaded arm's --growth mode through the config bridge after sourcing
 CONTEXT_KIT_GROWTH_PATHS=('*.md' ':(exclude)docs/' ':(exclude)*/gate-tests/')
+
+# comment-tier-exempt: this repo's load-triggered surfaces — the kit templates a skill shim pulls in whole, the agent definitions and the binding shims; the gate-tests exclusion keeps the ratchet's own fixture corpus out of the governed set it fixtures
+# shellcheck disable=SC2034  # consumed by check-surface-ratchet and the --emit-always-loaded arm's --ceiling mode through the config bridge after sourcing
+CONTEXT_KIT_RATCHET_PATHS=('*/templates/*.md' '.claude/agents/*.md' '.claude/commands/*.md' ':(exclude)*/gate-tests/*')
