@@ -5965,6 +5965,43 @@
   Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a template step plus a spec
   clause. →icebox refused on the same operator direction as the entries above, no inbox bullet
   entering the tier directly.
+  **Operator direction, 2026-09-11 (consult):** bundle with
+  `deferred-cost-class-opener-vocabulary` at the next scope — one surface, what scope re-reads.
+
+- **deferred-cost-class-opener-vocabulary** [design-pending] — the cost field is free prose, so
+  neither reader that ranks on it can read it without the body: the icebox worklist reads only
+  its opening token, and scope's cost-first ranking reads every deferred body.
+  **Censused 2026-08-23** and recorded at `.workflow/survey-record.md`: 238 `Cost while
+  deferred:` fields, about 40 opening with a token the `--icebox-candidates` arm recognizes
+  (`low` 35, `zero` 5); the rest open with prose (`the` 44, `every` 35, `a` 32, `paid` 12).
+  queue-kit/SPEC.md names the recognized set (`low`, `zero`, `bounded`, `cosmetic`).
+  **The filter under-selects silently rather than mis-selecting**, so no gate reddens: a
+  genuinely low entry whose field opens "the" is invisible to the eviction worklist forever, and
+  the 2026-08-23 age-floor ruling widened the age axis while the cost axis stayed shut.
+  **Iced 2026-09-11 as machinery-class and returned the same day by consult**, because the
+  scope ranking rule landed that day (cost while deferred leads the unit set) made the field
+  load-bearing for a second reader: the session board prints lead lines only, so scope cannot
+  rank from it and reads the Deferred section whole — 169 entries, roughly 500 KB.
+  **Operator direction, 2026-09-11: the class is a lead-line tag with a closed value set**, on
+  the `[cost: <value>]` shape. Grounds: a lead-line tag rides the board the session hook
+  already prints, so scope ranks from the index and reads bodies only for a shortlist; the
+  icebox arm reads a declared class instead of parsing prose; `check-tag-lead-line`'s class
+  table takes a new member at one row; and the tag costs no line against the entry budget.
+  Refused, with grounds: a head token on the cost field (every field becomes a migration, and
+  the opener-not-re-authored rule makes each rewrite contestable); a `cost-class:` body
+  declaration (a line per entry against the 50-line cap, and invisible on the board).
+  **Open for spec:** the value set must serve both readers — the icebox arm's low class and
+  scope's first rank tier, cost paid per iteration or per session — so the values encode
+  recurrence class before magnitude, and the `queue-index` arm prints the tag on the board.
+  Class: a new tag is a governed name, so this is a **feature** and an amendment is owed at
+  promotion (queue-kit/SPEC.md §The tag algebra, canon-kit/SPEC.md §The amendment lifecycle).
+  **Bundle:** `landing-moots-live-entries-undetected` shares the surface (what scope re-reads)
+  and rides the same operator direction into the next scope.
+  **Cost while deferred:** token waste, paid per scope session: the ranking survey reads every
+  deferred body, and the eviction worklist derives from about a sixth of the pool.
+  recurrence: deferred-cost-class-opener-vocabulary 2026-09-11
+  Filed 2026-08-23 by the consult held after `leak-guard-and-assertion-meta-gate-port` closed,
+  promoted out of the gap inbox at the following scope intake the same date.
 
 
 ## Icebox
@@ -6204,7 +6241,6 @@
 - **stage-completion-unattested** [design-pending] — Entry stamps cannot show completion.
 - **deferred-entry-time-deixis-rot** [design-pending] — Relative deixis rots in deferred bodies.
 - **iteration-scoping-clause-date-ambiguity** [design-pending] — Date scoping names no iteration.
-- **deferred-cost-class-opener-vocabulary** [design-pending] — Most cost openers name no class.
 - **assertion-strength-exit-header-reach** [design-pending] — The gate now reaches no script.
 - **audit-depth-measure-degrades-under-fanout** [design-pending] — Fan-out depth is self-reported.
 - **candidate-list-anchors-a-sweep-obligation** [design-pending] — A relayed list anchors a sweep.
