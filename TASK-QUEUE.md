@@ -3962,9 +3962,9 @@
   the wedge reached the turn-end path too, not only the poll. Three consumers, one record.
   **The distinction the rule does not draw, and one surface already draws it.** A *producer* writes
   artifacts a reader must not race and owes a record; an *observer* writes nothing and owes none.
-  `guard-kit/lib/guard.sh`'s own advisory says exactly that, while
-  `delegation-kit/templates/agent-execution.md`'s launch-liveness rule reads as unconditional for
-  any backgrounded shell child — and that is the wording the attested instance followed.
+  Guard-kit's backgrounded-launch rule now exempts an inline wait loop from its record block, so
+  the attested spelling owes none; a wait behind a script name still does, and the agent-execution
+  template draws the split only by pointing at that rule — the attested instance followed no split.
   **Why `[design-pending]`, three candidate fixes differing in kind:** state the producer/observer
   split in the agent-execution rule so a wait never registers; have `check-producer-liveness` ignore
   a record whose run key names the stage being entered; or refuse the self-naming record at write
@@ -5316,14 +5316,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- guard-command-prefix-wrapper
-- guard-read-steer-tool-coverage
-- guard-steer-names-absent-tool
-- ro-bins-write-option-bypass
-- grant-argument-bounding-mechanism
-- grant-path-traversal-exposure
-- backgrounded-shell-child-run-record-unenforced
-- wait-loop-exemption-blind-behind-a-script-name
 
 ## Lessons Learned
