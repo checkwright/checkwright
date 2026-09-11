@@ -44,6 +44,26 @@
   `align-checklist-fanout-calibration`, `kfric-capture-unverified-assertion`,
   `prompt-ranking-ungrantable-shape-class` and `icebox-standing-ineligibility-unrecordable`; their
   `recurrence:` lines also keep them outside the class rule.
+  **EIGHTEEN HELD AT BUILD 2026-09-11 AND ANSWERED THE SAME DAY, each ruling with its authority.**
+  (1) STAY DEFERRED, each held by a recorded operator ruling or direction on a ground other than
+  its cost: `threshold-recurrence-routing-residency`, `citation-liveness-family-convergence`,
+  `always-loaded-brevity-reach`, `instruction-surface-bash-focus`,
+  `markdown-hard-wrap-unowned-and-ungated`, `queue-entry-shape-slugs-headings-links`,
+  `instruction-surface-sweep`, `close-differential-instruction-sweep`,
+  `validate-tier-premise-mechanical-only`, `site-health-issue-venue-unwanted`,
+  `consult-tier-declaration` and `session-model-identity-verification` — lead, own-authority
+  2026-09-11, through the lead's message channel: the class rule does not reach them, and keeping
+  them reverses nothing. (2) ICED: `run-validate-child-env-knob-leak` and
+  `append-grant-decline-cause-unlogged` — operator 2026-09-11, AskUserQuestion in the lead
+  session, lead-relayed: their rulings read as spent or as answering a different question, the
+  port reading 70 scanned, 70 no-port, 0 owed that day. (3) STAY DEFERRED, the permission-surface
+  carriers `grant-argument-bounding-mechanism`, `grant-path-traversal-exposure`,
+  `file-authoring-act-ungoverned` and `crate-toolchain-grant-uncommitted` — lead, own-authority
+  2026-09-11, same channel. (4) CONFIRMED, the class reading build applied — lead, own-authority
+  2026-09-11, same channel: a wrong verdict, decision, advisory or refusal text from a shipped
+  gate, guard or tool, or a published SPEC or docs defect, is product and stays; a process gap or
+  missing capability over the delivery machinery's own artifacts is machinery; an ambiguous
+  entry stays Deferred.
   **Already relied on:** `deferred-entry-iteration-name` records its disposition as deferred to
   this triage.
   **Done when:** every Deferred entry has been read against the class rule and the mooted test,
@@ -5462,55 +5482,6 @@
   invisible once green, since nothing compares the two interpreters.
   Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
 
-- **run-validate-child-env-knob-leak** [design-pending] — `--run-validate` passes its whole ambient
-  `GATE_SDK_KNOB_*` family down to every suite child, and the crate's own battery arm already
-  rules the opposite discipline one section over.
-  **The instance was patched; the class is live, and an impact test run naively reads it dead.**
-  `native/src/emit/run_validate.rs`'s `spawn()` lets every bridged env var survive into a suite
-  child by ordinary OS inheritance — the arm needs the knob in its own env to read
-  `EVIDENCE_KIT_SUITES`, and nothing strips it before spawning. That poisoned
-  `check-evidence-baseline.test.sh`'s case H, whose whole subject is knob-ABSENCE: the case
-  strips its own constructed argv element and the ambient one answered in its place, so a
-  fail-closed assertion silently resolved the real roster instead of erroring. Fixed 2026-09-05 by
-  unsetting that one knob in that one subshell, which MASKS the leak and closes nothing — the
-  class stays live for any future fail-closed-on-absent-knob assertion under `--run-validate`, in
-  any suite in any kit. The symptom is gone by construction, so absence of a red is not evidence
-  about this entry.
-  **THE STRUCTURAL FIX IS NOT NEW DESIGN — the discipline is already ruled, one arm over.**
-  gate-sdk/SPEC.md §run-gates states of the battery's own child dispatch that the arm *strips
-  every inherited `GATE_SDK_KNOB_*` from a child and re-adds only the ones that member's registry
-  entry declares*, and gives the ground: one shared environment means a member reading a knob it
-  never declared would succeed, which is the bridge's does-not-define refusal failing in the
-  direction nothing catches. `run_validate.rs` is a second compiled arm spawning children and does
-  not follow it. So the work is applying a stated discipline to a second arm, not inventing one —
-  with the re-add half empty, a validate suite being a consumer-configured command that has no
-  registry entry to declare anything.
-  **The unknown that shape carried is DISCHARGED at this drain.** No configured suite relies on
-  inheriting an ambient `GATE_SDK_KNOB_*` value: every configured suite command is a fresh
-  front-end or `cargo test` invocation that re-derives its knobs from config, and a tree-wide grep
-  for readers of that family finds only gate-tests that set their own.
-  **Why it was not taken at the drain.** The structural fix was refused for this run on the
-  port-only directive rather than on merit, and close is still that run, so taking it here would
-  reverse a recorded ruling rather than apply one.
-  **The missing check class, per the gap-generalization rule:** a scan asserting that every crate
-  arm which spawns a child strips the inherited bridged family before invoking it — buildable over
-  `native/src/` and cheap, the strip having one spelling.
-  **DISTINCT from `bespoke-test-path-knob-pinning`** — the same theme, ambient env leaking into a
-  bespoke test that assumes its own knob absent, on a different mechanism (the `GATE_SDK_KNOB_*`
-  bridged scalars, not the `GATE_SDK_TMP_DIR` / `GATE_SDK_WORKFLOW_DIR` path knobs) and a
-  different exposed test, not among that entry's enumerated seven.
-  **Cost while deferred:** every future bridged-arm port that spawns children re-buys this
-  debugging, and the next occurrence presents as a fail-closed assertion silently passing rather
-  than as a red — the expensive direction.
-  →fix failed on the recorded refusal above; →icebox failed on the live per-port trigger.
-  **PORT-CRITICAL, INSIDE-THE-CUT SHAPE — RULED 2026-09-05 (operator, consult):** the strip
-  lands inside the next cut that ports a child-spawning arm, TRAJECTORY.md §PRIORITY DIRECTIVE.
-  **IT DOES NOT RIDE `front-end-stub-and-gate-caller-cuts` — ruled 2026-09-05 (lead), probed.** That
-  cut ports no child-spawning arm: the spawn site is in-crate already at `run_validate.rs:346`, and
-  the front-end's shell loop RETIRES rather than porting — a retirement is no port. Stays deferred.
-  Filed 2026-09-05 to the gap inbox at validate and amended there the same day; promoted
-  2026-09-05 by close.
-
 - **release-note-removal-declaration-uncoupled** [design-pending] — no oracle couples a removed
   adopter-facing entry point to its release-note declaration, so a note that omits one passes
   green and the adopter meets the omission as a broken invocation at upgrade time.
@@ -5661,56 +5632,6 @@
   vendors the copy. Product-class.
   Surfaced 2026-09-05 by build batch A's provenance census, which flagged both and deliberately
   edited neither; drained here with both instances re-verified live.
-
-- **append-grant-decline-cause-unlogged** [design-pending] — the mandated resume-journal append IS
-  granted and still declines on real calls, and the fall-through log truncates at exactly the point
-  that would say why.
-  **THE FILING PREMISE IS FALSIFIED, and that is this entry's first deliverable.** The bullet this
-  drains proposed a standing grant on the ground that `.claude/settings.json` "grants no form of"
-  the append. Probed at this scope rather than relayed: guard rule 17, *Auto-allow a write to a
-  gitignored target* (guard-kit/SPEC.md §Consumer rules rule 17, `guard-kit/lib/guard.sh:838-874`),
-  exists for exactly this append and has since `10d538da` (2026-09-04) — fixture-attested on the
-  exact `cat >> .tmp/journal.md <<'EOF'` spelling (`guard-kit/guard-tests/cases.tsv`), and every
-  live log record replayed through `scripts/bash-guard.sh` returns `permissionDecision: allow`.
-  **BOTH CANDIDATE GRANT SHAPES ARE ANSWERED BY THE TREE, so neither is the work.** A path-scoped
-  `Bash(cat >> .tmp/*)` is INOPERATIVE, not merely inferior — rule 17's own text states the harness
-  checks a redirect TARGET as a file write, so a `Bash(...)` entry grants the command and never the
-  target; it would also pass `check-settings-paths` vacuously, that gate filtering on a `.sh`
-  command token before its `*` rule is reached, so no oracle would report that it bought nothing.
-  A dedicated `--emit` arm needs NO settings entry either: `Bash(bash gate-sdk/bin/run-gates.sh *)`
-  already covers any arm name — attested by `file-gap`, `file-survey` and `kfric` carrying no
-  per-arm entry, and by `65e22a28` REMOVING a settings line when two affordances ported.
-  **THE INOPERATIVE CLAIM WAS MEASURED AND HELD, 2026-09-09.** `61d57d70` landed that grant anyway,
-  on the premise this entry had already falsified and relayed to the operator with a prefix-match
-  limit rather than this inoperative one; the lead's post-grant `cat >> .tmp/` appends then logged
-  as fall-throughs, which `guard_allow` cannot produce. Reverted at `373c444e`, operator-directed.
-  **WHAT SURVIVES, and it is two things.** (1) Three `cat >> .tmp/*-journal.md <<'EOF'` calls
-  written AFTER rule 17 landed sit in `.workflow/prompt-friction.log` as genuine declines —
-  `guard_allow` exits, so a logged line is never an allowed call also logged — and every record is
-  truncated at exactly 500 chars by `guard_log_fallthrough`, which drops the heredoc terminator and
-  everything past it, so the declining clause is UNRECOVERABLE from the record. (2) The operative
-  instruction an agent loads names a different mechanism entirely:
-  `delegation-kit/templates/agent-execution.md` says the agent **`Write`s** the journal, while
-  `delegation-kit/SPEC.md` §Resume journal obliges an ARTIFACT and no mechanism — so a session
-  appending through Bash at all may be departing from the template, which would make the whole
-  measured friction self-inflicted and the remedy a steer rather than a grant.
-  **DISTINCT from `prompt-ranking-ungrantable-shape-class`**, which owns what the RANKING should
-  say about rows no entry can match; this owns why a row that IS covered by a standing grant still
-  falls through, and it is the first instance where the answer is a live decline rather than an
-  ungrantable shape.
-  **Why `[design-pending]`:** the two survivors want different shapes — widening the log record (or
-  recording the declining clause id beside it) against re-pointing the operative template at
-  `Write` — and which wins depends on whether a Bash append is sanctioned at all, which is unruled.
-  **Cost while deferred:** the top friction row every close is a decline nobody can diagnose, so
-  each close re-triages it and each remedy is a guess. Directed 2026-09-06 (operator, relayed by
-  the lead session) as *"Add the useful grant"*; the directive's own premise is what this entry
-  falsifies, so it was escalated rather than discharged.
-  **THE DIRECTIVE IS DISCHARGED BY THE FALSIFICATION AND THIS ENTRY STAYS DEFERRED — operator,
-  2026-09-06, relayed by the lead session.** Rule 17 already grants the append and both candidate
-  shapes are answered by the tree, so NO WORK WAS OWED: a directive answering a proposal is
-  discharged when the proposal's premise measures false, and neither survivor folds into the
-  iteration. Recorded here so a later session reading only the directive does not re-derive it.
-  Surfaced 2026-09-06; promoted after the fix was refused as operator-class.
 
 - **directive-minting-delta-roster-obligation** [design-pending] — a delta that mints a machine
   comment directive obliges canon-kit's built-in directive roster, and nothing in the amendment
@@ -6158,6 +6079,8 @@
 - **icebox-trigger-blind-to-retired-carrier** [design-pending] — Blind to retired carriers.
 - **rationale-located-by-reading-not-by-grep** [design-pending] — Grep misses paraphrases.
 - **smoke-whole-tree-precondition-unscoped** [design-pending] — Any dirty path blocks the smoke.
+- **run-validate-child-env-knob-leak** [design-pending] — Suite children inherit bridged knobs.
+- **append-grant-decline-cause-unlogged** [design-pending] — Decline cause truncated from the log.
 
 ## Done
 
