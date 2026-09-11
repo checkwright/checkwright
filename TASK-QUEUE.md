@@ -78,116 +78,6 @@
   `host-resolution-fail-open-cut` on its recurrence reaching threshold, ruled in by the operator
   through AskUserQuestion in the lead session, relayed by the lead.
 
-- **windows-bare-name-spawn-fails-open-past-its-preflight** [spec: SPEC-run.md] [observed-by: gates]
-  — the packer's tool preflight is dialect-aware and its spawn is not, so on Windows the probe says
-  a program is present and the spawn then says it is not. A fail-open preflight, and it reds master
-  today.
-  **MEASURED at gates run 34522661342 on 7c7e3a1f.** `install-smoke-windows` and
-  `install-smoke-powershell` are that run's only two failures, both with `pack-installer: cannot run
-  npm: program not found` — the SPAWN's text, not the preflight's, so the probe demonstrably passed.
-  `exe_candidates` puts the bare name FIRST and Windows `is_executable` is `p.is_file()` alone, so
-  the extensionless `npm` sh script beats the `npm.cmd` shim Node's own Windows install ships beside
-  it, and `CreateProcessW` cannot run what the probe found.
-  **THE FIX SITE IS SETTLED FROM THE SPECS, and the answer is neither radius the filing framed.**
-  §Fail-closed contract says the candidate set is "owned by `exe_candidates` alone so no call site
-  spells an extension", so the narrow packer-local fix is already forbidden; §check-graph says the
-  shared mechanism is adopted "each on its own witnessed red and never on a sweep". Mechanism in
-  `proc.rs`, adoption at the one witnessed site. No escalation was owed and none was taken.
-  **THE FRAMING WAS WRONG BECAUSE `npm` IS ONE OF SEVEN.** Censused at spec: seven shipped modules
-  call `on_path(X)` and then spawn `X` bare — `evidence.rs` ps, `queue_edges.rs` git, `hook/poll.rs`
-  curl, `pack_installer.rs` git+tar+npm, and three const-mediated ones the literal oracle cannot see
-  (`crate_arms.rs` cargo, `shellcheck.rs` and `action_run_shell.rs` shellcheck). The whole shipped
-  bare-literal population is git 111, bash 24, date 7, mktemp 5, jq 2 and one each of six others,
-  which is what refuses a call-site sweep on measurement rather than on doctrine. The pattern done
-  right already exists three times: `installer/doctor.rs`, `toolfloor.rs`, `emit/env_probe.rs`.
-  **What the amendment rules:** the PATHEXT variants beat the bare name on Windows, which narrows
-  §Fail-closed contract's stated sentence without disturbing either ground it gives; every
-  `proc::run*` resolves through the same function the probe uses, on Windows only, falling back to
-  the bare name and resolving AFTER `recorder::note` so no registry declaration moves; and what
-  `Command::new` does with a resolved `.cmd` under the crate's 1.71 pin is a LADDER whose rung the
-  next Windows leg selects. Raising the pin to 1.77.2 is declined on the SPEC's own two grounds —
-  it raises a floor the objectives exist to collapse, and an MSRV bump un-suppresses clippy against
-  unchanged code, measured at four findings on the last one.
-  Surfaced 2026-09-10 by `packer-port-terminal-cut`'s close on the lead's direction, which held
-  the fix back until an escalation was answered; promoted 2026-09-10 at scope, specified at spec.
-
-- **installer-host-detector-ungated-and-musl-fails-open** [spec: SPEC-host-detect.md]
-  — the installer's host-to-triple detector is bound by NO gate, and one of its cases FAILS OPEN
-  rather than refusing — the single place the platform contract's own promise is broken.
-  **THE FILING NAMED THREE SURFACES AND THERE ARE FOUR, found at spec by surveying the whole
-  component set rather than the two files named.** `installer/bin/checkwright.ps1`'s
-  `Get-HostTarget` is the twin of `target_of_host`, its own `# spec:` comment says so, and it maps
-  the same `linux/x64` and `linux/arm64` shapes to the same gnu triples. Both defects exist in both
-  bootstraps and the musl fail-open is two fail-opens. Widening to four is the filing's own rule
-  applied completely, not a wider envelope: a three-way binding leaving the twin out reproduces the
-  defect one surface over.
-  **First defect, the ungated surface.** `check-install-platforms` binds `docs/install.md` against
-  `native/targets.list` and nothing else, which is how a triple came to be DETECTED BY THE INSTALLER
-  WHILE ON NO ROSTER with nothing going red. The binding becomes four-way and bidirectional, each
-  direction closing a distinct failure — an emitted triple nobody declares, and a declared triple no
-  detector can ever produce, which is a support claim the installer cannot honour.
-  **Second defect, a CONTRACT VIOLATION rather than a coverage gap.** Neither `uname` nor .NET's
-  `OSArchitecture` distinguishes glibc from musl, so an Alpine x86_64 host resolves to a rostered
-  triple, the roster grep never fires, and the adopter is handed a binary that dies in the dynamic
-  linker. `native/targets.list` promises "Both refuse; neither proceeds" and this is its only
-  violation. The libc gate lands at the SELECTION step rather than in the detector, which keeps the
-  detector's triple set machine-readable and the two questions apart.
-  **The oracle that does not exist is stated rather than assumed green.** No leg runs on musl, and
-  the PowerShell half's Linux arms are unreachable by every leg this repo has, that leg running on
-  `windows-latest` alone. So the running-parity oracle the 2026-08-26 ruling installs is
-  structurally blind here, which is what makes a static binding complementary to that ruling
-  rather than a substitute for it. What the gate asserts is that the guard is WIRED, never
-  that it is right; buying the rest is a musl leg and a Linux pwsh leg, priced and out of scope.
-  **NO `[observed-by:]` tag, and the omission is a judgment.** Its completion predicate is a tree
-  state — the widened gate green against a corrected declaration block. The one run that could add
-  anything is the one the paragraph above records as unbuyable.
-  **PRODUCT-class** by the 2026-08-30 witness discriminator, the witness being an adopter handed
-  an artifact that cannot exec on their own machine.
-  **BATCH CONSTRAINT:** the widened arm reds against HEAD until `gate-binary-platform-roster-holes`
-  declares `aarch64-unknown-linux-gnu` held. One commit, or that unit first.
-  Surfaced 2026-09-10 by the iteration lead at the operator's ask, out of a gitignored journal into
-  `packer-port-terminal-cut`'s gap inbox; promoted 2026-09-10 at scope, its musl severity narrowed
-  by a fresh read of `select_artifact`, and specified 2026-09-11 at spec on a four-surface survey.
-
-- **crate-interpreter-resolution-residue** [spec: SPEC-interp.md] [observed-by: gates]
-  — the crate spawns the bare program name `bash` at sites the `check-graph` hotfix deliberately
-  left alone, and each reaches System32's WSL launcher on a native Windows host exactly as that one
-  did.
-  **THE CENSUS IS RE-RUN AT SPEC AND SUPERSEDES THE RECORDED ONE IN KIND, not only in count.**
-  The entry's own oracle at HEAD returns **33 sites across 16 files, 25 shipped and 8 test-only**
-  against the recorded 20/15/11/9 — and four of the eleven files the old roster NAMED as shipped
-  hold no `"bash"` literal at all today, with `emit/always_loaded.rs` (live) beside
-  `emit/kpi/always_loaded.rs` (stale) as a same-basename trap. The two pointed repairs hold:
-  `installer/init.rs` and `gates/graph.rs` are confirmed absent from the oracle. No roster is
-  copied into the queue or the amendment — the oracle is the roster and build re-runs it.
-  **ALL THREE RECORDED SHAPES ARE WRONG AND THE CENSUS PRODUCED A FOURTH.** The call-site sweep is
-  refused on the measurement (the whole shipped bare-literal population is git 111, bash 24, and
-  nine other programs). A lint reding a bare interpreter name is refused on its own terms: under a
-  funnel the call sites KEEP spawning the literal, correctly, and such a lint would red 24 correct
-  sites and push each into the call-site resolution that broke `declaration_covers`. What survives
-  is one holder — realised as a governed ROSTER of homonym names and their no-resolution
-  dispositions, `bash` refusing and `sort` falling back, both grounds carried over verbatim from
-  the two SPECs that already argued them.
-  **The funnel closes 25 shipped sites with ZERO call-site edits**, which is the yield none of the
-  three shapes reaches, and 23 of them change no bytes at all — which is why the amendment owes an
-  assertion rather than a diff.
-  **IT REPAIRS `registry-needs-conflates-requirement-and-spawn`'s live half as a consequence.**
-  `recorder::note` records the argument AS PASSED, so resolving inside `proc::run*` leaves every
-  declaration matching; the recorded disagreement exists precisely because the two pointed repairs
-  resolve at the CALL SITE. Reverting them onto the funnel repairs it. That entry's contract
-  question (REQUIREMENT or literal argv[0]) and its vacuity half are NOT answered here and stay its
-  own — under the funnel the question simply has no live instance either way.
-  **The ruling is DISCHARGED, not reversed.** The lead ruled the envelope narrow — "a resolver over
-  the whole residue triages as a feature, a feature is a yield" — and left the residue unpointed
-  "under its queue entry". That entry is promoted as a feature, which is the route the ruling named.
-  The §check-graph passage this rewrites carries a sentence saying so, so a later reader does not
-  read the rewrite as a reversal.
-  **Enforcement-first:** the bypass lint's corpus widens from `src/gates` to the crate minus
-  `proc.rs`, which is what catches the two shipped `Command::new` survivors — one a declared
-  `CommandExt` exception, one a private duplicate of `proc::run_merged_in`.
-  Filed at spec and re-filed at build 2026-09-03; census corrected and one site pointed 2026-09-09;
-  promoted 2026-09-10 at scope and specified 2026-09-11 at spec on a re-run census.
-
 - **gate-binary-platform-roster-holes** [spec: SPEC-arm64-linux.md] [observed-by: gates]
   — the shipped platform roster holds four joined triples and two more the installed base plainly
   wants. **SCOPE NARROWED at spec to the `aarch64-unknown-linux-gnu` leg alone**; the
@@ -226,6 +116,19 @@
   Surfaced 2026-09-10 by the iteration lead at the operator's ask — rescued out of a gitignored
   journal into `packer-port-terminal-cut`'s gap inbox, promoted 2026-09-10 at scope on a fresh
   roster read, and specified 2026-09-11 at spec with its scope narrowed to one leg.
+  **THE ARM64 INCREMENT IS BUILT AND ITS OBSERVATION IS DRAINED — run 34543644528 on `cff1fcad`.**
+  The probed runner label resolved and `native-artifacts (aarch64-unknown-linux-gnu,
+  ubuntu-24.04-arm, true)` went green first try. `install-smoke-linux-arm64` red, non-blocking
+  because held, and the cause was NOT the floor question the amendment left open: the suite adopts
+  the producer's artifact rather than building one, so no host binary was left for the pack arm to
+  dispatch to — the siblings pay for it in a `probe the crate build` step this leg omitted.
+  Repaired at `644547a6`, whose verification rides the next push. **The floor question is answered
+  the cheap way:** the probe reported no `<MISSING>` member on `ubuntu-24.04-arm`, so no step of
+  `scripts/ci-macos-floor.sh`'s shape is owed here.
+  **THE ROSTER LINE IS STILL NOT WRITTEN** and `native/targets.list` is unchanged — confirmed, not
+  assumed. The join wants one run carrying both halves and the consumer half has not been green.
+  **The terminal move is escalated rather than taken**, and the amendment is held on disk for the
+  same reason; its preamble carries the question and the evidence.
 
 ## Technical Debt
 
@@ -10904,5 +10807,9 @@
 - **smoke-report-array-carrier-mangling-unexplained** [design-pending] — Witness now needs design.
 
 ## Done
+
+- windows-bare-name-spawn-fails-open-past-its-preflight
+- installer-host-detector-ungated-and-musl-fails-open
+- crate-interpreter-resolution-residue
 
 ## Lessons Learned

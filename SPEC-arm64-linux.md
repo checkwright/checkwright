@@ -1,9 +1,28 @@
 # SPEC amendment: arm64-linux
 
-**Nothing in this amendment is applied.** Every passage below is a proposal for the build stage to
-land; where replacement wording is given it is marked **Not yet applied** at the passage itself.
-`spec` authors, build lands, and a reader arriving mid-iteration must not read a quoted sentence as
-one already in the tree.
+**APPLIED at `52b4b96a` by build batch 2 of `host-resolution-fail-open-cut`, with delta 3's leg
+repaired at `644547a6`.** Every delta below is in the tree, and the per-passage **Not yet applied**
+markers are superseded by this line rather than edited one by one — read a quoted replacement
+sentence as one the tree now carries, not as a proposal. Delta 3's one open question is answered:
+run 34543644528 measured no missing floor member on `ubuntu-24.04-arm`, so no floor step is owed.
+Delta 1's non-target holds — `native/targets.list` is unchanged and the join is still a later act.
+
+**One item is outstanding and it is why this file still exists: the queue entry's TERMINAL MOVE,
+which is escalated to the lead rather than taken.** The lead ruled Done for all four of this
+batch's entries (`lead, own-authority`, 2026-09-11, through the lead's message channel) and asked
+each batch to apply canon-kit/SPEC.md:239-250's corpus-versus-increment test and report its
+reasoning. Applied to `gate-binary-platform-roster-holes` the test comes out **demotion**, not
+Done, and on this amendment's own words rather than on a fresh argument: its §Scope paragraph below
+says the entry *"names two holes"*, that *"this amendment discharges the `aarch64-unknown-linux-gnu`
+leg alone"*, and that `aarch64-pc-windows-msvc` *"stays deferred on the same entry, untouched"*.
+An entry that the amendment itself says it outlives is canon-kit's stated demotion case, and a Done
+move would drop the operator's specific ARM Windows ask out of the queue as a bare slug — which is
+exactly the loss canon-kit calls *"the uncatchable one"*, no gate behind either half.
+
+The oracle refuses the middle: `check-amendment-queue` requires every feature-section entry to
+carry a `spec` ref, so there is no legal state between Done and demotion, and this file is held on
+disk rather than the entry being parked tagless. That is the same shape batch 1 took at `1686c3ea`
+for the same reason. Whichever way the lead rules, this file is deleted in that commit.
 
 **Scope, narrowed at dispatch and stated here so the narrowing is not re-litigated.** The entry
 `gate-binary-platform-roster-holes` names two holes. This amendment discharges the
