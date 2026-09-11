@@ -92,7 +92,7 @@ landing-surfaces slot states the same test from the recording side. One
 authoring convention follows and is what makes the next application cheap: a
 ruling able to name its own discharge event says so in its own text, so the
 session that meets the event deletes rather than judges.
-discharge: ruling-record-admission-test  grep -L ruling-record-shrink-to-bau TASK-QUEUE.md
+discharge: ruling-record-admission-test  grep -q ruling-record-shrink-to-bau TASK-QUEUE.md || echo discharged
 ruling: ruling-record-admission-test  the admission test
 
 **Two body-line declarations make that convention resolvable rather than merely
@@ -252,7 +252,7 @@ it, gate-sdk being swept. **Re-grounded 2026-09-06 by the operator on product-cl
 trigger alone**, the accretion being self-attesting: the class grows from cuts that never touch
 provenance. Scope sizes it against the window and may split it by kit. Discharge event: that entry
 lands whole, its gate included, and this paragraph is deleted with it.
-discharge: kit-spec-provenance-seam  grep -L kit-spec-provenance-seam-sweep-remainder TASK-QUEUE.md
+discharge: kit-spec-provenance-seam  grep -q kit-spec-provenance-seam-sweep-remainder TASK-QUEUE.md || echo discharged
 ruling: a kit SPEC carries mechanism only  this project's provenance never ships
 
 **Where this project's own class default and the close template's icebox trigger test appear to
@@ -315,25 +315,5 @@ which is the outcome the 2026-08-30 discriminator exists to prevent.
 **The grounds are the entry's own and are not restated here** — it carries the bought survey, its
 four gate touch points, its measured inbound sum and its cost field, and a copy here would be a
 second reading of one fact aging on its own clock.
-discharge: citation-liveness-family-carve-out grep -L citation-liveness-family-convergence TASK-QUEUE.md
+discharge: citation-liveness-family-carve-out  grep -q citation-liveness-family-convergence TASK-QUEUE.md || echo discharged
 ruling: citation-liveness-family-carve-out
-
-**`host-resolution-fail-open-cut` is authorized THREE watched pushes — ruled 2026-09-10 by the
-operator through AskUserQuestion in the lead session, relayed by that lead.** One at build to buy
-the Windows observation, one at close, one for the release tag. This is an **iteration-scoped
-departure** from CLAUDE.md §This repo is governed by its own kits' one-to-two budget, not a
-change to it: that line stands unedited and governs every other iteration, and recording the
-departure here rather than there is what keeps the standing rule readable as standing.
-**The ground is that the iteration's units are jointly unobservable on the host that builds
-them.** Every core unit's completion predicate is an observation of a Windows CI leg — the
-`observation-predicate-entry-cannot-drain-in-its-own-iteration` shape (since retired), whose own
-text records that under the two-push budget the drain gate sits upstream of the push that would
-justify the drain. Master was red at `7c7e3a1f` on exactly the two legs that would carry that
-observation, and the first push bought the fix's verification and the standing red's clearance in
-one run — both legs green, the red cleared. Without the third push the aarch64 roster join and
-the Windows observation compete for the same run, which is why the rider could be ruled in only
-once the budget moved.
-**What it does not license:** drip-pushing. Commits still accumulate locally and ride a watched
-push, and the three are three *occasions*, not a per-commit allowance.
-discharge: three-push-grant-host-resolution-cut  grep -L 'Iteration: host-resolution-fail-open-cut' TASK-QUEUE.md
-ruling: the three-push grant  host-resolution-fail-open-cut's push budget
