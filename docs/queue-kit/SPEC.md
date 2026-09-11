@@ -1995,6 +1995,12 @@ target, because it is unbuilt. The non-bold indented bullet is the documented
 prose-note escape; done slugs are validated as tokens but not cross-checked
 against the live namespace. Help texts cite this SPEC.
 
+**A Done move fans out to every entry blocked on the moved slug, and the second
+step is the one that surprises:** the stranded `[blocked-by:]` reds here, and
+clearing it hands that entry's blocking prose to
+`check-queue-prose-precondition`, which has no tag left to honour. The same
+commit owes the dependent entry's precondition a past-tense rephrase.
+
 ### check-task-conservation
 
 Invariant: every live slug (active + deferred + icebox, sub-tasks included)

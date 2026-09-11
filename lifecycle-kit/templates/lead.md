@@ -88,10 +88,9 @@ a sharp edge worth stating rather than rediscovering: it is valid only as the
 journal's **last line**, so any out-of-order append silently invalidates it
 while leaving the marker plainly visible.
 
-**Any prompt-answered signal is a start signal, never a completion one.** The
-same lead read an operator's note about having just answered a stalled permission
-prompt as the stage being finished. It means the opposite: an approval prompt
-gates a command **starting**, so such a note timestamps a beginning. Stated here
+**Any prompt-answered signal is a start signal, never a completion one.** An
+approval prompt gates a command **starting**, so an operator's note about having
+just answered one timestamps a beginning. Stated here
 rather than left as incident lore, because the misreading is available to any
 lead on any harness that prompts, and it reads as good news at exactly the moment
 the lead wants good news.
@@ -591,8 +590,7 @@ a dispatch to learn from. Read it early and cheaply instead: the `--simulate`
 read §The lead model already names for gating an expensive dispatch, aimed at
 the drain stage, returns the same verdict with no session spent. Run it
 **before** declaring a stage's batches complete, not after — a simulate run
-that follows the declaration confirms the drop instead of preventing it, and a
-roster has already lost a promoted unit in practice. Keying the roster on the
+that follows the declaration confirms the drop instead of preventing it. Keying the roster on the
 wrong set is only one way to lose a unit: a plain miscount against the queue
 loses one just as quietly, and neither failure reddens on its own. That is why
 the rule is to re-read the queue rather than to key it differently.

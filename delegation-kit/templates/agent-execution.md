@@ -70,9 +70,8 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   liveness" literally gives `until kill -0 "$pid"`, whose condition is true while
   the producer is **alive** — so it exits at once. **The tell** is a waiter that
   exited **zero**, in milliseconds, with its producer still running and its
-  condition never met. Four attested instances read as evidence against this
-  primitive until they were measured and found to be this instead; neither keyword
-  costs anything at the guard, which reads the loop's span and not its keyword.
+  condition never met. Neither keyword costs anything at the guard, which reads
+  the loop's span and not its keyword.
   **What you wait *on* splits two ways, and the split is what makes the artifact
   reachable.** An **`Agent` dispatch** is awaited by its **completion
   notification** — that record is the harness's, not the session's — so never go
@@ -142,8 +141,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   nothing, so every narrowing survives only as a sentence in the prompt. Three
   dispatching contexts, each with its own grounds. A **read-only audit or
   survey** wants narrower *authority* — the fork carries the parent's full
-  reach, so the restriction is a request, and one such fork completed a whole
-  stage, commits included. A **tier-split oracle** wants narrower *cost* — the
+  reach, so the restriction is a request. A **tier-split oracle** wants narrower *cost* — the
   fork inherits the dispatcher's model, which is exactly the split the posture
   exists to make (a lead posture that dispatches its own oracle is the named
   instance). A **rule-injection dispatch** wants a *different* brief — a fork

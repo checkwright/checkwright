@@ -293,8 +293,10 @@ fn flush(file: &str, para: &mut Vec<(usize, String)>, out: &mut Vec<Cite>) {
         lstart.push(joined.len());
         if i > 0 {
             joined.push(' ');
+            joined.push_str(text.trim_start());
+        } else {
+            joined.push_str(text);
         }
-        joined.push_str(text);
     }
     let b = joined.as_bytes();
     let mut scan = 0usize;
