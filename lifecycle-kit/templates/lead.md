@@ -488,6 +488,14 @@ carries it into the entering session's intake, so a boundary-filed judgment
 reaches a judge rather than a refusal. What you must not do is leave the judgment
 unrecorded on the ground that you cannot stamp it.
 
+**And commit the bullet yourself**, at the first moment the git index is free of
+stage-session work. The invariant above enumerates stamps, queue writes and
+evidence files; a gap-inbox commit is none of them, and reading the omission as a
+ban is what leaves a bullet riding uncommitted into the next iteration, carried
+by whichever session happens to stage next. `--emit file-gap` makes no `git`
+call and cannot: judging index freeness is the filing session's, never a capture
+arm's (lifecycle-kit/SPEC.md §The committed gap inbox).
+
 An answer that
 amounts to a design ruling is landed **by the stage session**, in the governed
 surface it belongs to (the amendment, the queue entry), *before* the session

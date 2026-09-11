@@ -936,6 +936,25 @@ advisory tooling, not a gate — no fixture pair is owed; the raw append (a bull
 line into the inbox) stays a legal fallback, the grammar being the surface's
 contract, not the writer.
 
+**The filing session commits its own bullet**, at the first moment the git index
+is free of stage-session work. Committing is not *disposition* — the drain below
+gives a bullet exactly one (promoted, fixed inline, or discarded) and none of
+them is "committed" — it is what makes the surface's name true: a channel called
+the *committed* gap inbox whose filer never commits leaves a bullet reaching the
+next iteration uncommitted, carried by whichever session happens to stage next.
+Three shapes were weighed and the second is selected. Leaving the commit to the
+next session to stage is refused: that is the state above, and it fails silently
+whenever no dispatch instruction names it. The affordance committing its own
+bullet is **unruled** rather than refused, and the precondition argues against
+it — a capture arm cannot judge index freeness, so the timing test can only sit
+on the session. That precondition is also what answers the standing
+index-contention objection to committing at all: a *timing* test rather than a
+rejection, which is why the objection does not carry. Where the filing session is
+a supervising lead, the obligation is restated at the surface that session reads
+(§templates/lead.md), because the write-authority invariant there enumerates
+stamps, queue writes and evidence files, and a literal reader takes the omission
+of commits for a prohibition.
+
 **Taking that port did not discharge this section, and the residue is written
 rather than implied.** Three implementations carry this section's contract and
 only one of them is in-crate. The capture affordance above is compiled.

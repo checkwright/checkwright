@@ -70,41 +70,6 @@
   scope into `host-resolution-fail-open-cut`, ruled in by the operator through AskUserQuestion in
   the lead session, relayed by the lead.
 
-- **gap-inbox-commit-ownership**
-  — the filing session commits its own bullet, and what is left is landing that rule where a filer
-  reads it. Until then a filed bullet reaches the next iteration uncommitted and is carried by
-  whichever session happens to stage next.
-  **The distinction the gap turns on:** committing a bullet is not its disposition — the drain
-  contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one, promoted,
-  fixed inline or discarded, and none is "committed". A surface named *the committed gap inbox*
-  whose filer never commits is the gap in one phrase; the affordance makes no `git` call.
-  **THE SHAPE IS RULED — 2026-09-06 by the operator, through an interactive prompt in the lead
-  session, relayed by the lead rather than ruled by it: a session that files a gap-inbox bullet
-  COMMITS IT ITSELF, at the first moment the git index is free of stage-session work**, on the
-  ground that an uncommitted gap-inbox is prone to be lost. That selects the second shape and
-  refutes the third. The first — `--emit file-gap` committing its own bullet — is unruled, and the
-  index-free precondition argues against it since a capture affordance cannot judge index freeness.
-  **That precondition is NEW material:** the standing objection to shape one was index contention,
-  and the ruling answers it with a timing test rather than by rejecting committing.
-  **THE DELIVERABLE, with its target named.** `lifecycle-kit/templates/lead.md` says every
-  lifecycle-state write happens in the stage session and never in the lead, while its own §Stamps
-  are authoritative sanctions the lead writing this surface with `--emit file-gap` and omits commits
-  from its enumeration — so a lead reading the prohibition literally writes the bullet and does not
-  commit it. One clause carving that commit out of the prohibition with its precondition, plus the
-  shape selection in lifecycle-kit/SPEC.md. Debt: no governed name added.
-  **FIVE ATTESTED FIRINGS, all ANSWERED by the ruling above and kept only as its evidence base.**
-  2026-08-18 re-tiered this entry out of the icebox; three inside one iteration, judged a recurrence
-  2026-08-31, were the third shape running in production and failing silently whenever a dispatch
-  omitted its instruction line; 2026-09-06 took it to threshold and carried the ruling.
-  **Batch it with `lead-state-durable-home` and keep both off the `proc.rs` surface** — the two
-  share `lifecycle-kit/templates/lead.md` and the lead write-authority boundary, which is the
-  amortization argument the operator took when ruling this window. That sibling is a FEATURE and
-  stays deferred until its amendment is authored, so only this half is pickable today.
-  Filed 2026-07-25 by close draining its own gap inbox, born in the icebox rather than demoted to
-  it; promoted 2026-09-10 at scope into `host-resolution-fail-open-cut` on its recurrence reaching
-  threshold, ruled in by the operator through AskUserQuestion in the lead session, relayed by the
-  lead.
-
 ## Deferred
 
 
@@ -10768,5 +10733,6 @@
 - installer-host-detector-ungated-and-musl-fails-open
 - crate-interpreter-resolution-residue
 - observation-predicate-entry-cannot-drain-in-its-own-iteration
+- gap-inbox-commit-ownership
 
 ## Lessons Learned
