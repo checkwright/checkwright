@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+instruction-surface-tier release deferred:v0.26.0 — Tightened gates is non-empty (16 declarations since v0.25.0, check-surface-ratchet added this iteration), so the note derives a minor over v0.25.0; no cadence trigger fired — the elapsed-time limb is dormant while docs/install.md (release channel) reads preview (operator-ruled 2026-08-31), no decommission earns a major, no security or supply-chain fix rode the batch, no operator direction, and the launch audience has not arrived.

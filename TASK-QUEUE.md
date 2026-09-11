@@ -20,7 +20,7 @@
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
   **Split out of `backgrounded-shell-child-run-record-unenforced` — operator direction, 2026-09-11,
-  lead-relayed**, which keeps the explicit-launch block and the recorded-launch grant.
+  lead-relayed**, since landed, which kept the explicit-launch block and the recorded-launch grant.
   **Attested twice.** At `installer-trial-lifecycle-repair`'s close, `stage-economics.sh` exceeded
   its foreground timeout, the harness backgrounded it, and it kept writing `.metric/` with no `.run`
   record; no session act could have written one, since the launch was never a session act. Spec
@@ -407,7 +407,7 @@
   answered the silence incidentally — one refusal formatter, so the arm has no exit path that
   prints nothing — and the diagnosis of THIS firing stays here, because a signal-killed process
   prints nothing whatever the code does. That silence is what made the red unreadable from a
-  finished run, and its firing here is still the recurrence that entry carries.
+  finished run, and its firing here is the recurrence that retired entry carried.
   `lead, own-authority` 2026-09-10 by escalation reply, relayed by the lead, NOT the operator's.
   **Cost while deferred:** a re-run is the only diagnosis available, and the next firing costs
   another one. Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join`, which no
@@ -527,7 +527,7 @@
   neighbours do not. A sweep keyed on the figure rather than on that declaration is wrong.
   **Cost while deferred:** low as a carry — a stale port figure in the ruling record misleads the
   next session sizing a cut, and only a hand sweep finds it.
-  **NOT icebox-eligible, and the ground is the witness discriminator rather than the carry.**
+  not-icebox-eligible: measured-marker-cannot-sit-mid-paragraph 2026-09-12 witness discriminator.
   TRAJECTORY.md's own instance is machinery-class, but the contract limit is canon-kit's and ships:
   an adopter whose governed prose carries a mid-paragraph measured claim receives a gate that
   silently does not reach it, and a gate's verdict is a product witness under TRAJECTORY.md's
@@ -4268,6 +4268,7 @@
   most of the census — is unstated, and the answer sets the corpus before any member is fixed.
   **Cost while deferred:** one wrong answer instead of usage per session that probes a tool for its
   modes, and the attested shapes are silently-wrong rather than merely unhelpful.
+  not-icebox-eligible: bin-tool-help-arm-absent-tree-wide 2026-09-12 live per-session trigger.
   **The remainder is also owed to the port**, so a cut can apply the split per member — but only
   once the scope question is answered, since it decides which members owe an arm. `build-native.sh`,
   `gen-pre-commit.sh` and `run-consumer-smoke.sh` are declared `no-port` and will never ride a cut,
@@ -4789,6 +4790,58 @@
   scales with the profile count, and Windows pays each spawn at MSYS fork cost.
   Filed 2026-09-11 by close, draining three gap-inbox bullets left by the smoke-leg hash batch.
 
+- **align-in-session-absorption-tier-unruled** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+  — does a spec miss that build absorbs **in session** count against align's model tier?
+  **OPERATOR-CLASS, and that is the whole reason it is filed rather than answered.** Answering it
+  re-scopes a recorded tiering reading, which lifecycle-kit/SPEC.md §The steering vocabulary puts
+  with the operator through `/consult` and with no session, lead or stage.
+  **What is on the record and what is not.** The revert signal in the lead binding (ruling-config)
+  names only a **build round-trip** as align's tier evidence. Nothing rules on a miss build absorbs
+  without one, so the two readings — a silently-absorbed miss is align failing, or it is align
+  working at the tier it was bought at — are both consistent with every surface today.
+  **DISTINCT from `align-checklist-fanout-calibration`, Done 2026-09-12**, which closed on the
+  checklist residue and left this half out of SPEC-align-claims.md on purpose.
+  **Cost while deferred:** every align tier decision is taken on an unstated reading, and the two
+  readings recommend opposite moves when the next miss lands.
+  Filed 2026-09-12 at spec to the gap inbox; promoted here by close, →fix refused as operator-class.
+
+- **spec-growth-restraint-unstated-at-authoring-surfaces** [design-pending] [cost: iteration/low] [surface: canon-kit]
+  — operator direction, 2026-09-12: a SPEC is not expected to grow each iteration; a new feature or
+  an ambiguity is preferably handled by re-phrasing existing instructions for clarity and brevity,
+  adding text only where it adds value, and brief phrase-shaped instructions read better to an LLM
+  than verbose prose.
+  **The direction reached this iteration's five amendments and stops there.** The authoring surfaces
+  that decide the *next* merge carry no statement of it: canon-kit/SPEC.md §Merging an amendment
+  (step 2 says integrate rather than append, but prefers no re-phrasing over adding), the shipped
+  amendment template's Definition of Done, the spec and build stage templates, and
+  context-kit/templates/close-brevity.md, which accepts growth that earns its cost.
+  **Cost while deferred:** later authoring and later merges default to appending, which is the
+  behaviour the direction was given against, and each iteration's default compounds.
+  **The shape is a re-phrase, not an addition** — applying the direction to the surfaces that state
+  it is the first test of it, and a delta that grows those five files fails its own subject.
+  Filed 2026-09-12 at spec to the gap inbox; promoted here by close.
+
+- **instruction-sweep-grounds-residue-unrelocated** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+  — three grounds passages the 2026-09-12 instruction sweep's per-passage enumeration missed, which
+  the differential successor cannot reach because it derives its worklist from a git diff range and
+  these lines were never touched.
+  **The passages, verified present at 2026-09-12 close** (the close's own brevity pass took the
+  *history* half of the residue and left these): lifecycle-kit/templates/lead.md — the
+  prompt-answered-signal paragraph's stated-here-rather-than-incident-lore meta-ground, the
+  intra-stage-split bullet's nests-a-second-supervisor ground, and the
+  Lead-does-stamping-is-ruled-out grounds sentence under §Stamps are authoritative.
+  **Why close did not take them.** Each is a *ground*, so the doctrine rule
+  (doctrine-kit/DOCTRINE.md, Content-tiering) relocates it to the section owning the
+  mechanism rather than deleting it, and each needs a per-passage read of whether
+  lifecycle-kit/SPEC.md already
+  carries it — a spec-stage judgment, not a brevity-pass deletion.
+  **DISTINCT from `close-differential-instruction-sweep`**, the forward mechanism over future edits,
+  which is unchanged by this and cannot see these lines.
+  **Cost while deferred:** three grounds slabs ride the lead template at every dispatch, inside the
+  surface ratchet's ceiling for that file.
+  Filed 2026-09-12 at build to the gap inbox; promoted here by close after →fix took only the
+  history half.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -5061,11 +5114,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- align-checklist-fanout-calibration
-- always-loaded-brevity-reach
-- instruction-motivation-owner
-- instruction-surface-bash-focus
-- instruction-surface-sweep
 
 ## Lessons Learned

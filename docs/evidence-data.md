@@ -158,3 +158,4 @@
 | rankable-deferred-board | sc sp a b v c | 7f/1d | 4 · ≤0d | 20s clean | 112 |
 | guard-command-classification | sc sp a b v c | 7f/0d | 1 · ≤0d | 20s clean | 112 |
 | crate-arms-flake-sources | sc sp a b v c | 4f/0d | 2 · ≤0d | 20s clean | 112 |
+| instruction-surface-tier | sc sp a b v c | 1f/0d | 5 · ≤0d | 20s clean | 113 |
