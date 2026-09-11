@@ -9,3 +9,4 @@ host-resolution-fail-open-cut spec a2827c2f 2026-09-11 fb7e3e6d
 host-resolution-fail-open-cut spec a30e26f3 2026-09-11 79304801
 host-resolution-fail-open-cut align a6b94a72 2026-09-11 feb43dcc
 host-resolution-fail-open-cut build a296c1ce 2026-09-11 aedf0217
+host-resolution-fail-open-cut validate a64cefb5 2026-09-11 358956f6
