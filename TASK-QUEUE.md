@@ -183,27 +183,6 @@
   **Cost while deferred:** every close pays the wait.
   Filed 2026-09-11 by close, draining the gap inbox.
 
-- **lead-cancel-running-work-unforbidden** — no instruction forbids a lead from stopping running
-  work whose loss wastes tokens.
-  **A debt rider on `rankable-deferred-board`'s lead-contract surface, promoted 2026-09-11 at
-  scope — operator direction, 2026-09-11** (AskUserQuestion in the lead session, lead-relayed).
-  It adds no name: the act, the grant class (lifecycle-kit/SPEC.md §The steering vocabulary) and
-  the uncommitted-work cost are all named already, so no amendment is owed.
-  **Operator expectation, 2026-09-11, lead session, typed message, relayed by that lead:** a lead
-  never stops a background stage session or its subagents (TaskStop or an equivalent kill)
-  without the operator's explicit confirmation or an explicit per-iteration grant.
-  **Re-verified at the drain, and again at scope 2026-09-11 over lead.md:** TaskStop, cancel,
-  kill, abort and interrupt over lead.md, agent-execution.md, the stage-session agent,
-  lifecycle-kit/SPEC.md and CLAUDE.md find liveness polling and agent-execution's note that an
-  interrupt destroys uncommitted work — the cost is stated and the act never forbidden.
-  **Owed:** one clause in lifecycle-kit/templates/lead.md naming the act, its two authorizations
-  (operator confirmation, or a per-iteration grant where lifecycle-kit/SPEC.md §The steering
-  vocabulary puts grants) and the uncommitted-work cost as grounds, plus the owning SPEC passage
-  if needed.
-  **Cost while deferred:** token waste — a cancelled session's uncommitted unit is re-bought, and
-  only the harness's general confirm-before-irreversible default stands in the way.
-  Filed 2026-09-11 by close, draining the gap inbox; routed to scope by the dispatch.
-
 ## Deferred
 
 
@@ -6255,5 +6234,6 @@
 - iteration-scoped-grant-home-unstated
 - landing-moots-live-entries-undetected
 - composition-verdict-unrecorded-at-unit-set-ruling
+- lead-cancel-running-work-unforbidden
 
 ## Lessons Learned

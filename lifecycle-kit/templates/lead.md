@@ -409,7 +409,8 @@ refusal cold, holding only the written escape.
 
 A dispatched stage session is not a tool call the lead may re-issue. Three rules
 bind the lead here and each was paid for; the root cause under all three is one
-habit, stated last.
+habit, stated after them. The section closes on the one act against a running
+session the lead never takes on its own authority: stopping it.
 
 **An instruction to run something is destructive when the answer is "already
 did".** §The lead model already forbids the lead *itself* re-running the evidence
@@ -452,6 +453,20 @@ checks the claim against the tree. Attested, and the cost is the class's
 signature — a child's 14-entry survey was weighted down on a relayed
 `tool_uses: 0` whose run had recorded 48, and the receiving stage had to spend a
 tree probe to refute standing instruction.
+
+**A running session is never stopped on the lead's authority alone.** Stopping a
+background stage session, or any subagent it dispatched — the harness's stop or
+kill, whatever it is named — takes either the operator's explicit confirmation
+of that stop or a grant for this iteration that names the act. A grant lives in
+the lead's resume journal (lifecycle-kit/SPEC.md §The steering vocabulary), so
+the lead reads it there rather than recalling it. The ground is a cost already
+stated: an interrupt destroys the session's in-flight uncommitted unit
+(delegation-kit/templates/agent-execution.md, the one-commit-per-unit bullet),
+so a stop re-buys that unit's tokens, and how much spend to discard is the
+operator's to choose exactly as how much to spend is (§Opening an iteration).
+The stall a lead most often stops a session over is the one the rules above
+refuse to read off the channel, so a session that looks stuck is asked, and its
+artifact read, before a stop is proposed at all.
 
 ## Policy is config, not prose
 
