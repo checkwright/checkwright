@@ -5,3 +5,4 @@
 ---
 
 guard-command-classification scope afb178d5 2026-09-11 98157e89
+guard-command-classification spec a2a13fb6 2026-09-11 a4fa49f6
