@@ -6203,8 +6203,9 @@
   the moment one appears.
   **Distinct from `check-queue-prose-precondition`**, which closed one route and works as
   designed — the gap is the absence of an open route, not a defect in that gate. **Recurrence of
-  `lead-state-durable-home` declined at the drain:** that entry's axis is durability (lead state
-  dying with the conversation, fix shape a lead journal), and a lead journal would not fix this,
+  `lead-state-durable-home`, since retired, declined at the drain:** that entry's axis is
+  durability (lead state dying with the conversation, fix shape a lead journal), and a lead
+  journal would not fix this,
   because the session computing first-unblocked reads the *queue*. Adjacent, not the same finding.
   **Cost while deferred:** low frequency and silent, landing only when a lead session dies or
   hands off while holding a block — precisely when no one can recover the fact.
@@ -9165,8 +9166,8 @@
   **Cost while deferred:** `--needs` is the roster an adopter provisions from, so a member whose
   declaration silently stops matching its spawn under-reports it; that payload-facing claim is the
   witness, which puts this on the product side of the 2026-08-30 discriminator.
-  **DISTINCT from `crate-interpreter-resolution-residue`**, whose deliverable is the spawn sites
-  themselves; this is the declaration grammar every registry member shares.
+  **DISTINCT from `crate-interpreter-resolution-residue`, retired**, whose deliverable is the
+  spawn sites themselves; this is the declaration grammar every registry member shares.
   Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
 
 - **pre-grammar-disposition-authority-ambiguity** [design-pending] — a disposition filed before the
@@ -9810,8 +9811,9 @@
   **NEW, not a recurrence, and both nearby candidates were read before saying so.**
   `amendment-dod-sibling-dependence` is a DoD item whose satisfiability depends on SIBLING UNITS the
   amendment never names; there is no sibling here, and the dependence is on a config value.
-  `observation-predicate-entry-cannot-drain-in-its-own-iteration` is about WHETHER the observation
-  arrives before the drain; this is about the DoD naming the wrong stage for the drain at all, and
+  `observation-predicate-entry-cannot-drain-in-its-own-iteration`, retired, is about WHETHER
+  the observation arrives before the drain; this is about the DoD naming the wrong stage for
+  the drain at all, and
   it would have fired on an entry with no observation predicate.
   **Why `[design-pending]`:** the candidates differ in kind — an authoring clause in the spec stage
   template (a DoD's queue transition names the configured drain stage, never a literal), or an
@@ -10479,8 +10481,9 @@
   **Nothing is over-claimed and no regression is carried.** installer/README.md §The packer records
   the honest limit rather than a fix it does not deliver, and a dirty gap inbox costs the same
   battery today as before the narrowing — the arm's own share of the cost is genuinely gone.
-  **DISTINCT from `gap-inbox-commit-ownership`**, which owns who COMMITS an inbox bullet; this owns
-  which paths a clean-tree predicate asks about, and neither answer needs the other.
+  **DISTINCT from `gap-inbox-commit-ownership`, retired**, which owns who COMMITS an inbox
+  bullet; this owns which paths a clean-tree predicate asks about, and neither answer needs
+  the other.
   **Cost while deferred:** every mid-iteration `--emit file-gap` capture taken while a validate
   battery is pending costs that battery — a capture channel taxing the stage that drains it.
   **NOT ICEBOX-ELIGIBLE on the COST FIELD, never on the trigger** — `lead, own-authority`
