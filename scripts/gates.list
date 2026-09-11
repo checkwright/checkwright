@@ -62,6 +62,7 @@ check-queue-hygiene
 check-queue-wrap
 check-tag-lead-line
 check-queue-entry-budget
+check-deferred-board-tags
 check-task-names
 check-task-conservation
 check-queue-prose-precondition

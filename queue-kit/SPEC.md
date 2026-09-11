@@ -34,7 +34,9 @@ as `##` sections over column-0 bullets:
   `Filed <date> by <stage>` provenance line. Three are conventions no gate
   reads; **`Cost while deferred` is required** — the Gap-disposition rule's
   costing, held by `check-queue-entry-budget` (§check-queue-entry-budget),
-  which also caps the entry's total length. The field's bold lead-in is
+  which also caps the entry's total length. Its class rides the lead line's
+  `[cost:]` tag (§The tag algebra), and the field carries the prose that class
+  summarises. The field's bold lead-in is
   line-local like a tag: split across a reflow it is invisible to the scanner
   and the entry reads as uncosted.
 - **The icebox section** (optional, `QUEUE_KIT_ICEBOX_SECTION`, default
@@ -448,6 +450,60 @@ adoption step between landing it and reading it.
   producing, so minting it now buys a governed name almost no adopter exercises.
   If the demote fallback (lifecycle-kit/SPEC.md §Deviation transitions) is ever
   measured as the common path, that marker is the fix and this is the trigger.
+- `[cost: <recurrence>/<magnitude>]` — deferred cost class: when an entry's
+  cost while deferred is paid, then how much, so a reader ranks or selects the
+  pool off lead lines rather than bodies. `<recurrence>` is `session` (paid by
+  every session that loads or runs the affected surface — an always-loaded
+  token cost, a hook, a battery that reds at every commit), `iteration` (paid at
+  least once by every iteration's stage walk — a re-read at every scope or
+  close, a wait at every close, a leg on every push), `event` (paid when a named
+  event other than a stage walk occurs — a release, an adopter's install, a
+  touch of the affected surface, an exposure being exercised) or `once` (a fixed
+  cost that does not grow while the entry is deferred). `<magnitude>` is `high`
+  or `low`, judged against the entry's own `Cost while deferred` prose: the class
+  is read from that prose, never from the word the prose happens to open with.
+  **The set is closed, and its two readers partition it**, each reading only its
+  own partition: the scoping stage's first rank tier is `session/*` and
+  `iteration/*`, `session` before `iteration` and `high` before `low`
+  (lifecycle-kit/templates/stages/scope.md), and the icebox's low class is
+  `event/low` and `once/low` (§The icebox tier) — so a first-tier value is never
+  icebox-eligible. **One tag with two slash-joined fields**, on `[roadmap:]`'s
+  precedent below: scope's first tier reads recurrence alone, no reader reads
+  magnitude alone and the icebox reads both, so the pair is one attribute and
+  splitting it would mint a tag no reader reads by itself. **Kit-fixed values,
+  not consumer-configured ones**, because both partitions are kit mechanism —
+  queue-kit owns icebox eligibility and lifecycle-kit's scope template owns the
+  rank tiers — so a configured set would need a configured partition, moving a
+  kit's eligibility rule into config; the values name recurrence classes rather
+  than any project's vocabulary. The tag carries the class and the
+  `Cost while deferred` field keeps the prose, still required
+  (§check-queue-entry-budget) and still where impact is read for a shortlist.
+  A field tag by canon-kit's attribute test
+  (canon-kit/SPEC.md §The amendment lifecycle), because its readers scan lead
+  lines alone. Every top-level
+  deferred entry carries exactly one and no active entry carries any
+  (§check-deferred-board-tags).
+- `[surface: <entry>]` — primary-surface marker: one top-level entry of the
+  repository root — a kit root, an owned root directory, a root file — naming
+  what the entry's work mainly changes, so a reader groups the pool by shared
+  surface off lead lines. The value is valid exactly when that entry exists in
+  the root's directory listing, so the consumer's own root is the value set's
+  configuration: no knob is added, and no kit literal presumes a layout. **The
+  axis is surface, not kit**, because a root directory that is not a kit — a
+  site, an installer, a crate, the command bindings — is a bundling key too.
+  **A multi-surface entry declares its primary surface only**, since bundling
+  wants one join key. **The listing, not a curated root roster:** gate-sdk's
+  `check-root-tiering` allowlist is the one roster of root entries a consumer
+  keeps, and reading it would couple a queue-kit gate to a gate-sdk consumer
+  file for a set the tree already yields — wherever that gate is green the two
+  sets coincide, and the one extra a listing admits, untracked root scratch, is
+  a value no filer names. The scoping stage's same-surface fill reads it
+  (lifecycle-kit/templates/stages/scope.md). **The iteration lead's
+  shared-surface batching is deliberately not a reader**
+  (lifecycle-kit/templates/lead.md §Economics — batch, and compact where it pays):
+  it cuts batches from promoted
+  entries whose amendments name the files they edit, and a root entry is coarser
+  than that. Carried where `[cost:]` is, by the same gate.
 - `[roadmap: <horizon>/<track>]` — public-projection marker: the entry is
   curated onto the generated roadmap page (§The roadmap arm), under `<horizon>`
   and labelled `<track>`. The tag's spelling is fixed mechanism; its two field
@@ -1766,6 +1822,40 @@ carries it. The gate cannot hold this either, for the same reason it cannot hold
 compression: nothing distinguishes a sentence that was recalled from one that
 was read.
 
+### check-deferred-board-tags
+
+Invariant: **every top-level deferred entry carries its cost class and its
+primary surface on its lead line, and no active entry carries either** — the two
+lead-line tags §The tag algebra defines, which let a reader rank and group the
+deferred pool off the board rather than off its bodies. Two assertions:
+
+- **(A) Presence and validity.** Every top-level deferred entry carries exactly
+  one `[cost:]` tag whose value parses in the closed `<recurrence>/<magnitude>`
+  grammar, and exactly one `[surface:]` tag whose value names an existing
+  top-level entry of the repository root. Both are spelled with one space after
+  the colon and no whitespace inside the value, the fixed spelling that bounds
+  their width (§check-queue-wrap).
+- **(B) Absent from the active sections.** No bullet lead line in an active
+  section carries either tag. A promotion drops both, as it drops
+  `[design-pending]`, and this assertion is the checksum on that move.
+
+**Not applied to the icebox:** an eviction drops both tags, and a one-line entry
+has no reader for either. A sub-task rides its parent's tags, the same scope
+§check-queue-entry-budget's assertion C gives the cost field.
+
+Calibration: the queue file is the first positional argument, defaulting to
+`QUEUE_KIT_QUEUE_FILE`, and the repository root the second, defaulting to the
+working directory the battery runs from. The surface value set is that root's
+one-level listing, with nothing configured (§The tag algebra). The scan reads the
+lead line alone, the line `check-tag-lead-line` pins every governed tag to.
+**Fail-closed:** an unreadable queue file or repository root exits 2.
+**Opt-in by registration:** a separate gate rather than a widened assertion on
+an existing one, so a consumer that registers it meets it on upgrade and one
+that does not sees no change. **It holds the tags' shape and never a class's
+truth:** whether an entry's cost really is `event/low` is the filing session's
+judgment against the entry's own prose, and it is reviewed where the class is
+read.
+
 ### check-queue-wrap
 
 Invariant: no line exceeds the `QUEUE_KIT_WRAP_BUDGET` gate floor (default
@@ -1773,18 +1863,48 @@ Invariant: no line exceeds the `QUEUE_KIT_WRAP_BUDGET` gate floor (default
 `- ` lead, so an unwrapped runaway that reflows to column 0 corrupts the
 parse; the tripwire fires before that lands.
 
+**The coupling it underwrites is the stronger ground.** `check-queue-entry-budget`
+bounds an entry by counting its **lines**, and a line cap bounds an entry's size
+only while lines are width-bounded, so this gate is that cap's denominator. A
+reading that finds the runaway ground thin and deregisters the gate unbounds the
+cap with it.
+
 Calibration: three exemptions mirror the wrapping convention — table rows,
 fenced-code blocks, and lines whose own longest token itself exceeds the budget
 (URL, path). That third one is narrower than "over budget because of one long
 token": a 101-column line whose longest token is 55 is **not** exempt, because
 the token still wraps. Width is Unicode code points, not bytes.
 
+**A deferred lead line's two board tags go uncounted.** On a top-level lead line
+in the deferred section the gate removes one `[cost:]` tag whose value parses
+and one `[surface:]` tag naming an existing top-level root entry, each with one
+adjacent space, and measures what remains. No other governed tag is discounted:
+`[blocked-by:]` repeats, so discounting every governed tag would let a lead line
+grow without bound, and `[drain-exempt:]`'s free-text reason is unbounded. These
+two are bounded — one of each, in a closed grammar — so the widest measured-clean
+deferred lead line is `QUEUE_KIT_WRAP_BUDGET`, plus 23 for the widest cost tag
+(`[cost: iteration/high]`) and its space, plus 12 and the length of the longest
+top-level root entry name for `[surface: ]` and its space. The discount reads
+only a tag meeting that bound — a malformed class or an absent entry is counted
+— so the bound holds whether or not `check-deferred-board-tags` is registered,
+and that gate reds the malformed tag where it is. The discount keeps the
+denominator: it widens only the one lead line, by a bounded amount, and every
+prose line still wraps at the budget. **Inheritance:** any later gate measuring
+the width or wrapping of queue lines inherits this discount for these two tags.
+
+Refused, with grounds: raising `QUEUE_KIT_WRAP_BUDGET` for the whole file — it
+loosens every line, prose included, and weakens the entry cap this gate
+underwrites; moving the surface tag into the body — it defeats the reason the
+tag rides the board; shorter spellings — once a slug and the tags an entry
+already carries sit on the line, no spelling of the two fits every entry.
+
 ### check-tag-lead-line
 
 Invariant: every **lead-line-scoped** tag sits on its bullet's lead line — the
 only line *its* readers scan; such a tag pushed to a continuation line by a
 reflow silently unblocks a task, masks a design-pending state, voids a drain
-exemption, or drops a lesson out of the attention block. Membership tracks reader semantics, not §The tag
+exemption, drops a deferred entry's class or surface off the board, or drops a
+lesson out of the attention block. Membership tracks reader semantics, not §The tag
 algebra: a tag is governed here when its readers scan lead lines alone, so the
 set is narrower than the algebra's and `[precondition-ok:]` is deliberately
 outside it — `check-queue-prose-precondition` honors that tag anywhere in the
@@ -1797,7 +1917,7 @@ that disarms itself exactly when the last user drains — the reverse of what a
 lead-line guard is for. The governed set and
 scanned surface both widen with the lesson channels: `[blocked-by:]` /
 `[spec:]` / `[design-pending]` / `[drain-exempt:]` / `[roadmap:]` /
-`[observed-by:]` in the task
+`[observed-by:]` / `[cost:]` / `[surface:]` in the task
 sections (active + deferred), plus
 `[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
 section — the section the `queue-index` arm now reads, which retires the old "parsed

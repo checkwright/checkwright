@@ -1,0 +1,6 @@
+untagged-idea — no [cost:] tag
+untagged-idea — no [surface:] tag
+[cost: weekly/high] is not <recurrence>/<magnitude>
+doubled-idea — 2 [cost:] tags
+[surface: no-such-kit] names no top-level entry
+promoted-feature — [cost:] on an active entry

@@ -203,6 +203,58 @@ pub fn blocked_by(line: &str) -> Vec<&str> {
     found
 }
 
+// spec: queue-kit/SPEC.md §The tag algebra — the cost tag's closed value set, recurrence before
+// magnitude; kit mechanism, because both partitions its readers take are kit rules
+pub const COST_RECURRENCES: &[&str] = &["session", "iteration", "event", "once"];
+pub const COST_MAGNITUDES: &[&str] = &["high", "low"];
+
+pub fn cost_class_valid(value: &str) -> bool {
+    match value.split_once('/') {
+        Some((r, m)) => COST_RECURRENCES.contains(&r) && COST_MAGNITUDES.contains(&m),
+        None => false,
+    }
+}
+
+// spec: queue-kit/SPEC.md §The tag algebra — a surface value names one top-level root entry, so a
+// path separator or a self-reference is never one
+pub fn surface_value_shaped(value: &str) -> bool {
+    !value.is_empty() && value != "." && value != ".." && !value.contains('/')
+}
+
+// spec: queue-kit/SPEC.md §The tag algebra — `value` is present only for the fixed spelling, one
+// space after the colon and no whitespace inside, which is what bounds the tag's width
+pub struct FieldTag<'a> {
+    pub start: usize,
+    pub end: usize,
+    pub raw: &'a str,
+    pub value: Option<&'a str>,
+}
+
+// spec: queue-kit/SPEC.md §lib/queue.sh — every `[<name>:…]` token on a line, in order; shared,
+// because the board-tags gate asserts on the tags and the wrap gate discounts them, and a second
+// parse is what would let the two disagree
+pub fn field_tags<'a>(line: &'a str, name: &str) -> Vec<FieldTag<'a>> {
+    let open = format!("[{}:", name);
+    let mut out: Vec<FieldTag<'a>> = Vec::new();
+    let mut from = 0usize;
+    while let Some(rel) = line[from..].find(&open) {
+        let start = from + rel;
+        let body = start + open.len();
+        let close = match line[body..].find(']') {
+            Some(c) => c,
+            None => break,
+        };
+        let end = body + close + 1;
+        let raw = &line[body..end - 1];
+        let value = raw
+            .strip_prefix(' ')
+            .filter(|v| !v.is_empty() && !v.contains(char::is_whitespace) && !v.contains('['));
+        out.push(FieldTag { start, end, raw, value });
+        from = end;
+    }
+    out
+}
+
 // spec: queue-kit/SPEC.md §The queue format — `^[[:space:]]*-[[:space:]]` (one space, no
 // `+`), the looser bullet test the section scanners use
 pub fn is_bullet(line: &str) -> bool {

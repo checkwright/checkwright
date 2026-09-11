@@ -16,6 +16,7 @@ check-task-conservation
 check-queue-prose-precondition
 check-roadmap-fresh
 check-queue-entry-budget
+check-deferred-board-tags
 check-queue-sections
 check-queue-slug-liveness
 EOF

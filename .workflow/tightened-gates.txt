@@ -13,3 +13,4 @@ check-portability-floor
 check-amendment-retired-spelling
 check-doctrine-registration
 check-tag-lead-line
+check-deferred-board-tags

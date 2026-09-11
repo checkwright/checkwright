@@ -90,6 +90,7 @@ leaves its section absent.
 | [queue-kit](queue-kit/index.md) | check-queue-wrap | precommit |
 | [queue-kit](queue-kit/index.md) | check-tag-lead-line | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-entry-budget | precommit |
+| [queue-kit](queue-kit/index.md) | check-deferred-board-tags | precommit |
 | [queue-kit](queue-kit/index.md) | check-task-names | precommit |
 | [queue-kit](queue-kit/index.md) | check-task-conservation | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-prose-precondition | precommit |

@@ -14,6 +14,7 @@ pub mod close_surfaces;
 pub mod comment_tier;
 pub mod commit_subject;
 pub mod doctrine_registration;
+pub mod deferred_board_tags;
 pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod gate_assertions;
@@ -193,7 +194,11 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-queue-wrap",
         queue_wrap::run,
         &[],
-        &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_WRAP_BUDGET"],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_WRAP_BUDGET",
+            "QUEUE_KIT_DEFERRED_SECTION",
+        ],
         "queue-kit",
         &[],
     ),
@@ -257,6 +262,21 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ENTRY_LINE_CAP",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+        ],
+        "queue-kit",
+        &[],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` for the one-level root listing, which is
+    // the member's second argument with a default; the queue itself is a named file, not a walk
+    (
+        "check-deferred-board-tags",
+        deferred_board_tags::run,
+        &[("?", "")],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ACTIVE_SECTIONS",
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",

@@ -16,7 +16,7 @@
 
 ### Later
 
-- **gamma-feature** — revisit when the alpha surface settles.
+- **gamma-feature** [cost: iteration/high] [surface: TASK-QUEUE.md] — revisit once the alpha surface settles and beta ships.
 
 ## Done
 

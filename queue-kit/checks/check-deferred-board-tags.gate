@@ -1,0 +1,3 @@
+# graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: on-surface
+# spec: queue-kit/SPEC.md §check-deferred-board-tags — every top-level deferred entry carries exactly one closed-grammar cost tag and one surface tag naming a top-level root entry on its lead line, and no active-section entry carries either

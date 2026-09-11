@@ -8,7 +8,8 @@ generated: true
 A git-native, agent-readable task tracker: one Markdown file where `##`
 sections are queues, bold kebab-case slugs are the task handles, and
 square-bracket tags (`[blocked-by:]`, `[design-pending]`, `[spec:]`,
-`[drain-exempt:]`, `[roadmap:]`, `[observed-by:]`, `[precondition-ok:]`, plus the
+`[drain-exempt:]`, `[roadmap:]`, `[observed-by:]`, `[cost:]`, `[surface:]`,
+`[precondition-ok:]`, plus the
 Lessons Learned
 channel's `[attend]` and the consumer-named harvest tags) are the state machine.
 Gates hold the grammar a coding agent selects work by, and four more arms of the
@@ -22,10 +23,11 @@ Why: an agent picks work by *parsing*, not reading — so everything selection
 trusts (section position, slugs, tags) must be grammar a gate can enforce, and
 everything a human writes freely (task prose) must stay off the parse path.
 Drift between what the prose says and what the parser sees is the failure mode;
-all but two of the gates each close one instance of it — a tag reflowed off its
+all but three of the gates each close one instance of it — a tag reflowed off its
 lead line, a duplicate slug, a lost task, a forward precondition stated in
-prose but never tagged. The two exceptions hold a different axis: projection
-freshness, and the deferred pool's per-entry budget. See [SPEC.md](SPEC.md) for
+prose but never tagged. The three exceptions hold a different axis: projection
+freshness, and the deferred pool's filing contract — its per-entry budget and
+its lead-line board tags. See [SPEC.md](SPEC.md) for
 the full contracts.
 
 ## Install
@@ -40,6 +42,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-queue-sections
    check-queue-wrap
    check-queue-entry-budget
+   check-deferred-board-tags
    check-tag-lead-line
    check-task-names
    check-task-conservation

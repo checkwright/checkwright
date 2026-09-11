@@ -13,6 +13,8 @@ pub const CLASSES: &[&str] = &[
     "drain-exempt:",
     "roadmap:",
     "observed-by:",
+    "cost:",
+    "surface:",
 ];
 
 // spec: queue-kit/SPEC.md §check-tag-lead-line — the terminator strip, held once in the module
@@ -162,6 +164,16 @@ mod tests {
             vec!["observed-by"]
         );
         assert!(classes_on("- x [observed-by]", &none).is_empty());
+    }
+
+    #[test]
+    fn the_deferred_board_tags_are_governed_classes() {
+        let none: Vec<String> = Vec::new();
+        assert_eq!(
+            classes_on("- x [cost: once/low] [surface: queue-kit]", &none),
+            vec!["cost", "surface"]
+        );
+        assert!(classes_on("- x cost: once/low", &none).is_empty());
     }
 
     #[test]

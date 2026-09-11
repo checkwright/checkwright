@@ -24,7 +24,7 @@ None.
 ## Behavior changes
 
 - **drift-kit/templates/economics.md** — the `/economics` narrative no longer
-  chains delegation-kit's usage-trend as a third cost surface. The chain narrows
+  chains delegation-kit's usage-trend as a third cost surface. The chain narrows <!-- prose-enum-exempt: "cost surface" is ordinary prose about economics surfaces, not an enumeration of the queue's task tags -->
   to `overhead-meter` → `stage-economics`, and `stage-economics` becomes the sole
   cost-attribution surface. The budget-% rate-window footprint is account-wide —
   confounded by overlapping sessions and by a second operator on the same account

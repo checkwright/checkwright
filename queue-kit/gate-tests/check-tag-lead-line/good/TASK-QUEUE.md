@@ -19,8 +19,9 @@
 
 ### Later
 
-- **gamma-feature** [design-pending] — revisit when the alpha surface settles.
+- **gamma-feature** [design-pending] [cost: once/low] [surface: queue-kit] — revisit when the alpha surface settles.
   a continuation mentioning [design-pending] is tolerated (lead carries it).
+  so is one mentioning [cost: once/low] or [surface: queue-kit] (lead carries both).
 
 ## Done
 
