@@ -154,6 +154,16 @@ recoverable:
   `check-graph` asserts fresh together. The hooks are never hand-edited;
   that rule is resident in `CLAUDE.md` because a session about to edit it is not
   looking at a red gate.
+- **The new-tag-class-member fan-out** — adding a member to
+  `check-tag-lead-line`'s class table is a one-line edit with a four-surface
+  wake, and it is invisible from the edit: `--emit enum-sets` derives the tag
+  members, so `check-prose-enum` reds every hand-written prose enumeration of
+  the queue's tag set — `README.md`, `queue-kit/README.md` and
+  `docs/queue-kit/index.md`, none of them generated, each repaired by hand. The
+  generated hooks bake that same derived roster verbatim and stale with it
+  (`bash gate-sdk/bin/gen-pre-commit.sh --write`, then the graph artifact the
+  row above pairs with them). The new-gate row is the fan-out this file already
+  rostered; this is the other one, and nothing derived it for the author.
 - **The new-gate fan-out** — the other wide trigger, and the one with no single
   owner elsewhere: `gate-sdk/SPEC.md`'s kit-landing checklist covers the kit-side
   obligations (SPEC section, `good/`+`bad/` fixture pair, the README's

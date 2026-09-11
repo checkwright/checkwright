@@ -43,6 +43,16 @@
   that writes a log line and reads a record set, so a shared path, log or environment variable
   between concurrent cases is the shape to look at first. One run under `--test-threads=1` would
   discriminate it cheaply.
+  **A SECOND, SHARPER CANDIDATE, from two 2026-09-11 observations of the `unresolved_allows...`
+  case alone.** Its red-reader leg asserts `g.code == 2` and gets `0`. What fits: the reader
+  stub timed out on a loaded machine, so the verdict became `unresolved`, and `unresolved`
+  under a CONTINUING payload allows (`0`) rather than refusing (`2`). That makes a wall-clock
+  bound inside the liveness hook decide a verdict the case means to decide by exit code, which
+  is load-dependence rather than inter-case interference and would reproduce under
+  `--test-threads=1`. The two candidates are not exclusive and the cheap run above
+  discriminates them together. Both observations came from a batch whose only crate change was
+  a POSIX-identical pass-through, and the case spawns its stub by absolute path, so neither
+  observation dates the flake to that batch.
   **DISTINCT from `check-test-hermetic`**, a gate over test SOURCES asserting they do not reach
   outside their fixtures; this is observed RUNTIME interference between cases that may each be
   hermetic by that gate's reading.
@@ -50,6 +60,7 @@
   batteries reds for no cause, and every such red trains the re-run habit.
   Surfaced 2026-09-10 by `packer-port-terminal-cut`'s close during an operator-ruled hotfix whose
   scope was minimal, so it was filed rather than chased; promoted at this scope.
+  recurrence: stop-liveness-test-module-order-dependent 2026-09-11
 
 - **gate-binary-platform-roster-holes** [design-pending] — the shipped platform roster held four
   joined triples and two more the installed base plainly wants; **one of the two is discharged and
@@ -192,14 +203,21 @@
   Surfaced 2026-09-10 as above; the full probed body via
   `git log -p -S'GATES MUST NOT BIND TO DOCUMENT TYPES' -- .workflow/gap-inbox.md`.
 
-- **install-smoke-leg-names-mix-two-axes** [design-pending] — the five `install-smoke` legs in
+- **install-smoke-leg-names-mix-two-axes** [design-pending] — the `install-smoke` legs in
   `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
   surfaces now carry prose whose only job is to undo the misreading that produces.
   **The naming, read off the workflow.** Three legs take a PLATFORM suffix
-  (`install-smoke-windows`, `install-smoke-macos`, `install-smoke-macos-intel`), the Linux leg
-  takes none as the baseline, and `install-smoke-powershell` takes a BOOTSTRAP suffix while
+  (`install-smoke-windows`, `install-smoke-macos`, `install-smoke-macos-intel`), the baseline
+  Linux leg takes none, and `install-smoke-powershell` takes a BOOTSTRAP suffix while
   running on `windows-latest` — so it reads as a second Windows platform leg, and a reader
   counting platforms off the leg names counts wrong.
+  **THE STRONGEST ARGUMENT IS NEW AND THE LEG THAT MADE IT RECORDED SO.**
+  `install-smoke-linux-arm64` landed 2026-09-11, and a SECOND Linux leg makes the baseline's
+  unsuffixed `install-smoke` actively ambiguous where the absence of a suffix used to mean
+  "the baseline" — the leg's own job header in `.github/workflows/gates.yml` states that it
+  owes this entry the point. The leg count is deliberately unwritten here for the reason
+  gates.yml's own correcting paragraph gives about platform counts: it moves, and a number
+  written in prose goes stale silently.
   **The cost is attested rather than predicted:** `.github/workflows/gates.yml` and
   `installer/README.md` each carry a paragraph whose whole job is to say that a reader counting
   platforms has been reading three legs as covering two halves, which they never did. A name
@@ -213,16 +231,24 @@
   (`install-smoke-bash-<platform>` alongside `install-smoke-powershell`), or
   platform-suffix-preserving (rename only the odd leg so it names its bootstrap unambiguously) —
   and the blast radius has to be priced with the scheme rather than discovered after it.
-  **The blast radius is why this is scope work and not a drain fix.** Five tracked surfaces
-  (`.github/workflows/gates.yml`, `installer/README.md`, `TASK-QUEUE.md`,
-  `docs/site-architecture.md`, `docs/install.md`) plus the branch-protection required-check names
-  in `OPS.local.md`'s desired state — and that last one breaks SILENTLY: nothing reds, because a
-  required check that never reports is invisible until a merge is attempted.
+  **THE BLAST RADIUS IS WHOLLY IN-TREE, and this entry asserted otherwise until 2026-09-11.**
+  It claimed the rename also reaches the branch-protection required-check names in the local
+  ops runbook's desired state, and that that surface breaks silently. Both halves are false
+  and were measured false at the drain: the runbook names no `install-smoke` leg at all, and
+  this repo's branch-protection desired state is deliberately none, so there are no required
+  checks to break. The radius is five tracked files — `.github/workflows/gates.yml`,
+  `installer/README.md`, `TASK-QUEUE.md`, `docs/site-architecture.md`, `docs/install.md` —
+  with no out-of-band step; other tracked files carry the literal descriptively or in
+  historical logs and are not rename targets.
+  **WHAT STILL MAKES IT SCOPE WORK, on the corrected radius.** Not reach: the unranked
+  schemes. Five files renamed under a scheme nobody chose is a rename done twice, and the
+  ranking is the deliverable a drain fix cannot supply.
   **Cost while deferred:** two surfaces keep paying a correcting paragraph at every read, and
   every new reader of the CI matrix starts from a miscount the prose then walks back.
-  Filed 2026-09-10 by close from the gap inbox, promoted rather than fixed because the rename
-  reaches a surface outside the tree, and rather than iceboxed because the operator's ruling makes
-  the current naming a defect to close rather than a state to accept.
+  Filed 2026-09-10 by close from the gap inbox, on a reach premise this drain falsified;
+  re-priced 2026-09-11 at close onto the scheme-ranking ground, which survives. Not iceboxed,
+  because the operator's ruling makes the current naming a defect to close rather than a
+  state to accept.
 
 - **toolchain-floor-spawn-on-native-windows** [design-pending] — a compiled gate binary should not
   need a GNU userland on the host at all, and the floor roster it advertises is wider than the set
@@ -9111,16 +9137,23 @@
   declares a member's HOST REQUIREMENT while the test guarding it compares that declaration
   against the literal program string a spawn used, so a member that resolves its interpreter is
   undeclarable by construction.
-  **It stopped being latent this iteration.** `native/src/gates/mod.rs` declares `check-graph`'s
-  requirement as bare `bash`; `graph.rs` now spawns `proc::resolve_interpreter("bash")`'s RESOLVED
-  ABSOLUTE PATH; and `declaration_covers` matches by EXACT equality with `?` the only wildcard. So
-  the declaration and the observation now disagree on every host — read at the source at this
-  drain rather than inferred from the filer's prose.
+  **THE SYMPTOM THAT MADE IT NON-LATENT IS GONE, and only the symptom.** It briefly stopped
+  being latent when `graph.rs` spawned `proc::resolve_interpreter("bash")`'s resolved absolute
+  path against a bare `bash` declaration that `declaration_covers` matches by EXACT equality.
+  `host-resolution-fail-open-cut` repaired that 2026-09-11: `native/src/gates/graph.rs` and
+  `native/src/installer/init.rs` no longer resolve at the call site, so the recorder observes
+  the bare literal `native/src/gates/mod.rs` declares and the guarding assertion matches again.
+  **THIS ENTRY IS NOT THEREBY CLOSED**, and the note exists so a later drain does not read a
+  vanished symptom as a vanished subject: the repair moved one member back into agreement and
+  changed nothing about the grammar, so the next member that resolves an interpreter is
+  undeclarable on exactly the same construction.
   **The assertion that would have said so cannot reach the spawn.** Both `check-graph` fixtures
   pass `--amend-only`, which returns before the generator arm, so the recorder observes nothing
   and `every_registry_member_declares_the_programs_it_spawns` passes VACUOUSLY on the one member
   the hotfix changed. The fixture's own comment states why the alternative is hard: the whole-tree
-  generator run anchors to the real repo root and is unfixturable.
+  generator run anchors to the real repo root and is unfixturable. The vacuity is UNTOUCHED by
+  the 2026-09-11 repair above — the assertion still cannot reach that spawn, so it would not
+  have caught the disagreement and will not catch the next one.
   **Two halves, and only the first is cheap.** The grammar half — teaching the comparison that a
   resolved path satisfies a declared program name — is a small change to a crate-wide test made on
   behalf of every registry member. The vacuity half needs a fixture that reaches the generator arm

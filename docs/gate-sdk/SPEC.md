@@ -13623,6 +13623,17 @@ cargo test --release --manifest-path "$CRATE/Cargo.toml" --target-dir "$TARGET_D
 `GATE_SDK_CARGO_TARGET_DIR`. Both arms run even when the first fails, so one
 commit-time report carries what a CI run would have said in two.
 
+**Two arms, and the absent third is a contract rather than an omission: there is
+no formatter arm**, so this gate makes no claim about the crate's formatting and
+a green here is not evidence that any formatter would leave the corpus alone.
+The consequence is worth stating where the arms are, because the natural
+inference runs the other way: a session that reaches for a formatter to satisfy
+this gate rewrites a corpus nothing asked it to rewrite, and the collateral is
+every other gate that reads the crate's source as *text* — a comment's binding
+to the line beneath it, a literal spanning a wrapped line. Match the surrounding
+formatting by hand instead. A consumer wanting the arm adds a formatter's own
+check-mode command to its battery, where its diff is its own to own.
+
 **The gap it closes was attested, not hypothetical.** Nothing in `gates.list` ran
 either arm and `bin/build-native.sh` only builds, so a contributor who ran the
 full battery **plus** `build-native.sh` had satisfied every documented commit-time

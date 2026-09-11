@@ -5,7 +5,14 @@
   change. Name it after the feature (SPEC-<feature>.md, e.g. SPEC-sqlite.md —
   never SPEC-PHASE3-SQLITE.md), place it in the owning component's directory
   (a governance/workflow ruling with no owning component lives at the repo
-  root), and pair it with a queue entry tagged [spec: SPEC-<feature>.md]. The
+  root), and pair it with a queue entry tagged [spec: SPEC-<feature>.md]. A
+  COMPONENT here is any top-level directory that owns a body of work, whether
+  or not it is a kit — so a unit landing in a non-kit component is sited in
+  that component's directory like any other, and only a unit spanning several
+  components takes the repo root. Say this out rather than leaving it to
+  precedent: the repo-root fallback reads as the default for anything not
+  plainly a kit, and once two units answer the case differently neither
+  precedent decides the third. The
   basename need not match that entry's slug: the ref resolves as a bare
   basename tree-wide, and swapping a long slug into the tag can push the
   entry's lead line past the queue's wrap budget — so a shorter basename than
