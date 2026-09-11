@@ -38,57 +38,6 @@
   **Specified 2026-09-12 at spec** (SPEC-resident-substrate.md): the premise is largely
   discharged, so the rewrite is four CLAUDE.md passages, two restating bullets among them.
 
-- **align-checklist-fanout-calibration** [spec: SPEC-align-claims.md]
-  — align converges at zero divergence
-  while build finds the defects it should have caught. **Read this entry as calibration, not as the
-  revert signal.** The standing align tiering ruling names one live revert trigger, a missed spec
-  defect surfacing as a build ROUND-TRIP; nothing here is grounds to revert the tier, and conflating
-  the two is the misreading this entry prevents. **The live judgment**, unchanged across seven
-  readings: that signal has never fired, build absorbing every miss in-session, and whether
-  in-session absorption counts against the tier is what nothing rules. **What REMAINS
-  design-pending**, the first reading's residue: how much is a checklist edit to align's
-  template, how much a further gate, and whether a "keeps" list stands as an input at all — the
-  sharp one, since a "keeps" list is the author's claim about what a change does not touch, so align
-  reading it as a boundary inherits the blind spot that produced the miss. Its other half is
-  ANSWERED: ten real defects at `native-cohort-activation`, six of one shape (a section the update
-  roster failed to name), the fan-out check over it filed, merged and retired.
-  **READINGS TWO THROUGH SIX, each conclusion kept and its narration spent to history.** Two and
-  three: five real defects each, nothing spurious escalated, so zero divergence did not recur.
-  FOUR (2026-09-05) is the COST half at its MAXIMUM, cr=32.0M against a recent median near 11M
-  with no scale proxy, and it cuts AGAINST the first reading's thesis — eight in-envelope
-  repairs, zero escalations — its best find CROSS-amendment where no per-amendment pass could
-  reach. FIVE (2026-09-06) is that half at its MEDIAN, cr=9.35M, three real count defects, no
-  round-trip; its grammar caveat is ANSWERED by inspection, bare `align` having been
-  single-session throughout, so the split-stage row fold leaves the column fold-neutral.
-  SIX (2026-09-08) returned zero divergence and SPENT THE COUNTER: four amendment claims had
-  survived align and died at build, declined as misses on the ground that each needed EXECUTION
-  to falsify — a ground recorded as itself falsifiable by the first align passing a claim it
-  could have READ its way to. Build batch 2 falsified one from two guard lines four apart on one
-  screen, needing no run, so the excuse was spent and the next align fell to be judged without it.
-  **SEVEN (2026-09-11) IS THAT ALIGN AND IT SPLITS THE VERDICT.** Highest cost of the twelve-row
-  bare-`align` series, cr=16.56M against a prior-eleven mean near 9.6M, over the window's largest
-  amendment corpus. NOT zero divergence and not near it: eight real defects, one of them a
-  paraphrase presented as verbatim that the SPEC STAGE had passed twice. And a MISS of exactly
-  the shape six left no excuse for — an amendment asserting a gate applies a non-empty-value
-  check that gate does not apply, the assertion living in a different gate, falsifiable by
-  reading one line of the first gate's source and no execution at all. Build caught it in-band by
-  declining to merge the false sentence.
-  recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
-  **NOT THE REVERT SIGNAL, which still has not fired in SEVEN.** The trigger is a missed spec
-  defect surfacing as a build ROUND-TRIP and seven's miss cost none — build declined the sentence
-  in-band. What seven changes is this entry's own framing rather than the tier: the failure mode
-  is no longer zero divergence but high yield beside a readable miss, so the in-session-absorption
-  question the live judgment says nothing rules is now the whole of the question. Nothing here
-  touches the align tiering ruling in any direction. Discharge `lead, own-authority 2026-09-08`.
-  **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
-  stage's signal value decays toward zero while its cost does not.
-  **Joins the `instruction-surface-tier` set at threshold — operator direction, 2026-09-11:**
-  the set's sweep reads align's template. Earlier routings, and the same-day decline this
-  replaces, are in git history.
-  Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
-  **Specified 2026-09-12 at spec** (SPEC-align-claims.md): two checklist widenings and no
-  gate. Whether an in-session absorption counts against align's tier is outside it.
-
 - **always-loaded-brevity-reach** [spec: SPEC-surface-ratchet.md]
   — `check-brevity` guards the
   tidiest section of the always-loaded surface while the section that actually
@@ -5188,6 +5137,7 @@
 
 ## Done
 
+- align-checklist-fanout-calibration
 - instruction-motivation-owner
 - instruction-surface-sweep
 

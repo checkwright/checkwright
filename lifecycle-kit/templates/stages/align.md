@@ -62,14 +62,10 @@ deliverable, so check it against what the deltas actually mandate rather than
 against the sentence it heads. And every `## Existing sections updated` entry
 must name the delta that owns it (canon-kit/templates/SPEC-amendment.md).
 
-**A grammar the amendment states about a tool's behaviour is run against that
-tool.** An amendment modelling something outside itself — a filter language, an
-option parser, a file format — is a *claim about a program*, and reading it is
-not testing it. One invocation settles it. Attested: an amendment specified a
-pin-path grammar admitting a leading bracket step, the gate refused any path not
-opening with `.`, and the tool being modelled read a leading `["k"]` as an array
-literal rather than an index — a three-way disagreement that passed authoring and
-this audit and was caught by the first differential run at build.
+**A claim about an existing program is checked against that program** — a
+modelled grammar, a check a gate applies, a refusal an arm makes: one invocation,
+or the implementing line where none is cheap. If the named program lacks the
+behaviour, find the one that holds it.
 
 **The `## Existing sections updated` roster is checked from the tree, and the
 half that stays yours is the larger one.** A roster entry with no delta is
@@ -89,8 +85,9 @@ relation left to decay.
 **Every amendment's "wires cleanly against the current tree" is a hypothesis,
 and the align audit is its first test.** Verify every
 cross-component literal *at the read site*: grep the consumer's actual match
-arms, don't trust the amendment's prose. A **negative** existence claim ("no
-such harness/helper/gate exists yet") is the audit's weakest evidence shape: a
+arms, don't trust the amendment's prose. A **negative** claim — "no such
+harness/helper/gate exists yet", or an amendment's list of what it keeps or
+leaves untouched, which bounds nothing — is the audit's weakest evidence shape: a
 literal-string grep proves only that the spellings you guessed are absent, and
 the thing you are about to build often already exists under a spelling you did
 not anticipate. Before asserting absence, search the *concept* two ways — the

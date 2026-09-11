@@ -4626,6 +4626,15 @@ and removed by the commit that lands it leaves no trace a later reader can
 recover; and authoring a producer silently asserts a consumer read side that
 rarely already matches.
 
+**`align`'s claim checks: scoped by subject, ungated.** A behaviour claim about a
+program is neither a modelled grammar nor a seam-crossing literal, so align checks
+it against the program, invocation first — claim verification, not the verdict
+prediction Oracle-first forbids. First earned by a pin-path grammar that the gate
+and the modelled tool each read differently, caught only by build's first
+differential run. A keeps list is the author's claim, read as negative claims,
+never as scope. No scanner decides whether prose describes a program, so the
+cadence is align itself (§check-stage-entry, assertion C).
+
 The `build` template runs one fresh session per task because a fresh session
 rehydrates the governing docs and queue state at full fidelity from disk, where an
 in-session summary erodes the approved plan and the re-derived premises.
