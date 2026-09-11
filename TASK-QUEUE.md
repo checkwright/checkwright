@@ -14,64 +14,6 @@
 
 ## Technical Debt
 
-- **post-port-deferred-pool-triage** — one iteration triaging the whole deferred pool now that the
-  port's owed column reads zero: icebox by class, retire what a landed unit or a closed ruling has
-  mooted.
-  **RULED BY THE OPERATOR, 2026-09-05, consult channel, relayed by the lead** — a standing
-  direction, not a session-filed gap; its former home, the ruling record's port-first paragraph,
-  was deleted 2026-09-10 once `--emit port-blockers --tree` read `0 owed`.
-  **PROMOTED 2026-09-11 at scope AS DEBT — operator, AskUserQuestion in the lead session,
-  lead-relayed.** It adds no name to a governed surface: every move below is one
-  queue-kit/SPEC.md §The icebox tier already sanctions, so no amendment is owed.
-  **THE CLASS RULE, operator 2026-09-11, same channel, lead-relayed:** a machinery-class entry
-  (TRAJECTORY.md's 2026-08-30 witness discriminator and its conjunctive test) carrying no
-  `recurrence:` line and no roadmap tag is iceboxed by class, whatever its cost field opens
-  with. **Its reach is this triage alone**, as the question was put, so routine close evictions
-  keep the cost-opener limb. It answers `icebox-default-reach-over-the-cost-opener-limb-unruled`
-  to that extent; that entry went to Done at this promotion, its named population lying wholly
-  inside this triage. An entry held out of the icebox by a recorded ruling on a ground OTHER
-  than its cost opener is outside the question as put: build escalates it rather than moving it.
-  **EXECUTED AT BUILD, under this entry — lead, own-authority 2026-09-11.** Close's eligibility
-  judgment governs its routine worklist, not a directed whole-pool unit.
-  **Moves, each conserved (queue-kit/SPEC.md §The icebox tier):** Deferred → Icebox under the
-  class rule, one lead line each, the body recovered before any ruling on it; Deferred → Done for
-  an entry a landed unit or a closed ruling has mooted, a merged duplicate included.
-  **Named merge, lead, own-authority 2026-09-11:** `stop-liveness-test-module-order-dependent` and
-  `stop-liveness-stub-spawn-flake` own one flake — keep one and Done the other; the fix itself
-  stays deferred.
-  **Out of the moves, lead, own-authority 2026-09-11:** the six threshold entries stay deferred —
-  `entry-compression-contract-unenforced`, `behavior-change-surface`,
-  `align-checklist-fanout-calibration`, `kfric-capture-unverified-assertion`,
-  `prompt-ranking-ungrantable-shape-class` and `icebox-standing-ineligibility-unrecordable`; their
-  `recurrence:` lines also keep them outside the class rule.
-  **EIGHTEEN HELD AT BUILD 2026-09-11 AND ANSWERED THE SAME DAY, each ruling with its authority.**
-  (1) STAY DEFERRED, each held by a recorded operator ruling or direction on a ground other than
-  its cost: `threshold-recurrence-routing-residency`, `citation-liveness-family-convergence`,
-  `always-loaded-brevity-reach`, `instruction-surface-bash-focus`,
-  `markdown-hard-wrap-unowned-and-ungated`, `queue-entry-shape-slugs-headings-links`,
-  `instruction-surface-sweep`, `close-differential-instruction-sweep`,
-  `validate-tier-premise-mechanical-only`, `site-health-issue-venue-unwanted`,
-  `consult-tier-declaration` and `session-model-identity-verification` — lead, own-authority
-  2026-09-11, through the lead's message channel: the class rule does not reach them, and keeping
-  them reverses nothing. (2) ICED: `run-validate-child-env-knob-leak` and
-  `append-grant-decline-cause-unlogged` — operator 2026-09-11, AskUserQuestion in the lead
-  session, lead-relayed: their rulings read as spent or as answering a different question, the
-  port reading 70 scanned, 70 no-port, 0 owed that day. (3) STAY DEFERRED, the permission-surface
-  carriers `grant-argument-bounding-mechanism`, `grant-path-traversal-exposure`,
-  `file-authoring-act-ungoverned` and `crate-toolchain-grant-uncommitted` — lead, own-authority
-  2026-09-11, same channel. (4) CONFIRMED, the class reading build applied — lead, own-authority
-  2026-09-11, same channel: a wrong verdict, decision, advisory or refusal text from a shipped
-  gate, guard or tool, or a published SPEC or docs defect, is product and stays; a process gap or
-  missing capability over the delivery machinery's own artifacts is machinery; an ambiguous
-  entry stays Deferred.
-  **Already relied on:** `deferred-entry-iteration-name` records its disposition as deferred to
-  this triage.
-  **Done when:** every Deferred entry has been read against the class rule and the mooted test,
-  the moves are committed, and the landing commit states `--emit queue-counts` before and after
-  with the pool's qnet.
-  Filed 2026-09-10 by close, draining the gap inbox; build filed rather than queue-editing
-  mid-iteration.
-
 ## Deferred
 
 
@@ -6097,5 +6039,6 @@
 - consumer-smoke-targeted-mode-registrar-scope
 - consumer-guard-rule-verification-lane
 - macos-leg-brew-set-vs-documented-requirements
+- post-port-deferred-pool-triage
 
 ## Lessons Learned
