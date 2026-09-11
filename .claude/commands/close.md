@@ -55,9 +55,10 @@ queue-kit/SPEC.md §The tag algebra.
     rule wontfix (the ruling lands as a one-line boundary note in the owning
     SPEC and the slug is **rewritten to a bare `- <slug>` line** under
     `## Done` — a relocated entry reds `check-task-conservation`), or keep it
-    in Deferred with the trigger that keeps it there. Eligibility and the
-    grammar are queue-kit/SPEC.md §The icebox tier; the worklist bounds how
-    much to read, it does not decide.
+    in Deferred with the trigger that keeps it there or, where no trigger keeps
+    it, with the `not-icebox-eligible:` declaration recording why. Eligibility
+    and the grammar are queue-kit/SPEC.md §The icebox tier; the worklist bounds
+    how much to read, it does not decide.
   - **Trajectory projection** — after the template's Clear-Done step lands the
     `close` stamp in history, regenerate the projection (`bash
     gate-sdk/bin/run-gates.sh --emit trajectory > docs/evidence-data.md`) and commit it

@@ -37,6 +37,13 @@
   recurrence: theta-idea 2026-01-05
   **Cost while deferred:** low.
 
+- **iota-idea** [design-pending] — seven extent lines against the same cap, one
+  of them the standing-exclusion declaration below, which the count discounts
+  as it discounts a recurrence line, so the entry lands exactly on the cap.
+  not-icebox-eligible: iota-idea 2026-01-07 a recorded decision keeps it deferred
+  **Cost while deferred:** low.
+  Filed 2026-01-07 by close.
+
 ## Icebox
 
 - **delta-idea** [design-pending] — dormant: cheap to carry, nothing waiting.

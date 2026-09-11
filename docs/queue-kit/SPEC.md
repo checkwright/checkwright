@@ -236,7 +236,8 @@ removed rather than added.
 
 **Eligibility**, judged at the closing stage over the deferred section: the
 entry's defer date is at least `QUEUE_KIT_ICEBOX_AGE_DAYS` old; its cost field
-opens in the low class; it carries no `[roadmap:]` tag; and it has **no live
+opens in the low class; it carries no `[roadmap:]` tag; it carries no
+`not-icebox-eligible:` declaration (§The tag algebra); and it has **no live
 promotion trigger**. The age limb is what makes the tier a demotion on evidence
 rather than a filing preference: an entry younger than the knob has not had the
 chance to recur. **What counts as live is deliberately narrow**, and it was narrowed
@@ -245,7 +246,9 @@ trigger is a **live, unbuilt queue slug** the entry names, a dated `recurrence:`
 line, or a `[roadmap:]` tag. A trigger that is itself gated on launch — a first
 external adopter, a preview cohort, an install count — is **dormant**: the entry
 waits in the icebox until the event occurs and returns on it, which is the round
-trip the tier already conserves.
+trip the tier already conserves. The `not-icebox-eligible:` limb stands beside the
+live-trigger limb rather than widening what counts as live, so that narrowing is
+untouched: the declaration records a fact no trigger carries.
 
 **A self-citing set does not manufacture its own liveness.** Where a consumer
 classifies a *set* of entries dormant as a class, citations from one member of
@@ -555,6 +558,43 @@ recurred.
 `recurrence:` has no presence gate, on the ground that a declaration written
 under judgment is not one a scanner can demand — which is also why the grammar
 landed with **no retrofit**: existing entries are not back-filled.
+
+An entry that must stay out of the icebox for a reason no trigger carries
+declares it on the same self-naming pattern,
+`not-icebox-eligible: <slug> <YYYY-MM-DD> <grounds>` — one indented body line
+naming the entry's own slug, the date the standing fact was recorded, and a
+non-empty grounds clause that states the fact in brief or points at the
+paragraph, ruling or decision holding it. It declares a **standing exclusion,
+not a promotion trigger**: the entry stays out of the icebox whatever its age
+and cost until the fact is withdrawn (§The icebox tier's eligibility rule), and
+the worklist prints it as the row's cause (§The queue-index arm). **At most one
+line per entry** — a second standing ground extends the grounds clause and keeps
+the first date, because a line per ground would grow an entry linearly against
+the cap, the refusal recorded above for a line per recurrence. It is a body
+declaration rather than a field tag by the attribute test: its one machine
+reader scans entry bodies, and no lead-line reader consumes it.
+
+**Who writes the line and who removes it.** The session recording the standing
+fact on the entry writes it in the same commit as the grounds — routinely a
+closing stage keeping a worklist row in Deferred for a reason no trigger
+carries, and equally any session landing a direction or decision that an entry
+stays deferred. Whoever may revise the fact removes it, by the classes of
+lifecycle-kit/SPEC.md §The steering vocabulary: a direction at a later scoping
+or authoring stage, a decision by the role that made it, a ruling only through
+the consult skill. A worklist row is never grounds for deleting the line.
+
+**It is a declared line, never a scan for a prose marker.** A standing fact
+argued in prose has no fixed spelling, so a phrase list misses the next
+spelling, and a matcher loose enough to catch it also matches prose that merely
+*discusses* eligibility. Nor is it the retired `ruled:` grammar (below)
+returning: that line's only machine reader was the discount that uncounted it,
+and it restated provenance the body already carried, while this line has a
+reader outside the gate discounting it — the worklist arm — and states a fact
+that arm cannot derive. **The honest limit:** nothing stops a session declaring
+every entry ineligible. The grounds clause is mandatory and the worklist row
+carries its date and the head of its grounds under the arm's cause cap — the
+whole line one anchored grep away — so the review starts on a row every close
+already reads. That review is the only check; no gate judges grounds.
 
 **A direction's class and date are stated inline beside its content, never as
 a declaration line.** The sentence recording it carries both —
@@ -947,9 +987,16 @@ Each row is led by the `•`/`✗` mark the index rendering already uses: `•` 
 entry §The icebox tier's eligibility rule admits, `✗` for one it excludes. An
 excluded row prints its **cause** in place of the cost opener, because the opener
 is inclusion evidence and decides nothing once a categorical exclusion has
-settled the row. The cause names the trigger class — the `[roadmap:]` tag, a
-dated `recurrence:` declaration, or the first live slug named in file order,
-which stands for the class rather than enumerating it. A slug counts as *named*
+settled the row. The cause names the exclusion class, decided in this order — the
+`[roadmap:]` tag; a `not-icebox-eligible:` declaration (§The tag algebra),
+printed as `[standing] not-icebox-eligible <date> — <grounds>`, a line with no
+date as `(undated)` and one with no grounds as `(ungrounded)`; a dated
+`recurrence:` declaration; or the first live slug named in file order, which
+stands for the class rather than enumerating it. A cause someone wrote about the
+entry outranks a trigger the arm infers, which is why the declaration precedes
+the two inferred triggers. Every cause prints under the same cap as the cost
+opener, so a long grounds clause shows its head, and the self-naming line is one
+anchored grep away. A slug counts as *named*
 only where it stands as a whole token, the neighbouring bytes falling outside the
 slug alphabet: a substring hit inside a longer slug is a different entry, and
 holding a row against it would invent a trigger nobody wrote.
@@ -1469,7 +1516,7 @@ assertions:
   the `queue-index` arm's `--extent` yields, so the range the gate measures is the
   range an eviction deletes. Its **count** is that extent less **at most one line
   of each declaration grammar the queue format defines** (§The tag algebra) —
-  today `recurrence:` alone, and any later grammar by construction rather
+  today `recurrence:` and `not-icebox-eligible:`, and any later grammar by construction rather
   than by a further edit here. Extent and count differ by those discounted lines
   and by nothing else, at most one per grammar, which is what
   keeps the equality above a statement about the *range* while the cap binds the

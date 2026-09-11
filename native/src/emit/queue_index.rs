@@ -481,6 +481,12 @@ fn ineligibility(e: &Pending, live: &[String]) -> Option<String> {
     if e.lead.contains("[roadmap:") {
         return Some("[roadmap] tag — not icebox-eligible".to_string());
     }
+    // spec: queue-kit/SPEC.md §The queue-index arm — a written standing cause outranks an inferred trigger
+    for line in e.body.lines() {
+        if let Some(rest) = line.trim_start().strip_prefix("not-icebox-eligible:") {
+            return Some(standing(rest));
+        }
+    }
     for line in e.body.lines() {
         let t = line.trim_start();
         if t.starts_with("recurrence:") && has_date(t) {
@@ -496,6 +502,16 @@ fn ineligibility(e: &Pending, live: &[String]) -> Option<String> {
         }
     }
     None
+}
+
+fn standing(rest: &str) -> String {
+    let fields: Vec<&str> = rest.split_whitespace().skip(1).collect();
+    let (date, grounds) = match fields.split_first() {
+        Some((d, g)) if d.len() == 10 && has_date(d) => (*d, g),
+        _ => ("(undated)", &fields[..]),
+    };
+    let grounds = if grounds.is_empty() { "(ungrounded)".to_string() } else { grounds.join(" ") };
+    format!("[standing] not-icebox-eligible {} — {}", date, grounds)
 }
 
 struct Pending {
@@ -770,6 +786,27 @@ mod tests {
         assert!(r.is_none(), "self-naming is narration, not a trigger: {:?}", r);
         let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject soon\n"), &live);
         assert!(r.is_none(), "an undated recurrence line is no re-filing: {:?}", r);
+    }
+
+    // spec: queue-kit/SPEC.md §The queue-index arm — the standing cause's place in the order and its
+    // printed form, an absent date or grounds appearing rather than vanishing.
+    #[test]
+    fn a_standing_declaration_is_decided_after_the_tag_and_before_the_recurrence_line() {
+        let live = vec!["other".to_string()];
+        let decl = "  not-icebox-eligible: subject 2026-08-17 eviction spends the clause\n";
+        let r = ineligibility(&pend("- **subject** — t.", decl), &live);
+        assert_eq!(r.unwrap(), "[standing] not-icebox-eligible 2026-08-17 — eviction spends the clause");
+        let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", decl), &live);
+        assert!(r.unwrap().starts_with("[roadmap]"));
+        let body = format!("  recurrence: subject 2026-08-01\n  waits on `other`.\n{}", decl);
+        let r = ineligibility(&pend("- **subject** — t.", &body), &live);
+        assert!(r.as_deref().unwrap_or("").starts_with("[standing]"), "{:?}", r);
+        let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject grounds only\n"), &live);
+        assert_eq!(r.unwrap(), "[standing] not-icebox-eligible (undated) — grounds only");
+        let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject 2026-08-17\n"), &live);
+        assert_eq!(r.unwrap(), "[standing] not-icebox-eligible 2026-08-17 — (ungrounded)");
+        let r = ineligibility(&pend("- **subject** — t.", "  prose naming not-icebox-eligible: mid-line.\n"), &live);
+        assert!(r.is_none(), "only a line led by the token declares: {:?}", r);
     }
 
     // spec: queue-kit/SPEC.md §The queue-index arm — the census is preserved: an excluded row

@@ -12,52 +12,6 @@
 
 ## New Features
 
-- **icebox-standing-ineligibility-unrecordable** [spec: SPEC-icebox-standing.md] — the eviction
-  worklist has no slot for a standing not-eligible ruling, so an entry a ruling already removed from
-  the running is re-proposed at every close.
-  **The live instance, re-verified 2026-08-28 at this boundary.**
-  `threshold-recurrence-routing-residency` carries an explicit not-icebox-eligible paragraph with
-  grounds — the cost line prices the CARRY and never the eviction, and eviction would delete the
-  verbatim clause the 2026-08-17 operator ruling filed the entry to preserve — and `run-gates.sh
-  --emit queue-index --icebox-candidates` ranked it the sole eligible row again today, the other ten
-  rows all excluded.
-  **The mechanism has exactly three exclusion causes and no fourth.**
-  `native/src/emit/queue_index.rs`'s `ineligibility()` reads a roadmap tag on the lead line, a dated
-  `recurrence:` body line, and a body naming a live slug. Nothing anywhere reads a standing ruling.
-  The eligibility rule those three implement is queue-kit/SPEC.md §The icebox tier's.
-  **The fork is ruled in `SPEC-icebox-standing.md`:** the `not-icebox-eligible:` body declaration,
-  whose line the entry budget discounts, over a scan of prose markers that already vary in spelling.
-  **DISTINCT from `deferred-cost-class-opener-vocabulary`**, which owns the cost axis
-  UNDER-selecting because most of the pool's cost fields open with an unrecognised token; this is
-  the opposite direction, an entry the filter correctly selects and a ruling has already removed
-  from the running. Distinct also from `icebox-eviction-line-budget-squeeze`, the one-liner's line
-  budget at the moment of writing an eviction, and from `close-eviction-refiles-without-checking`,
-  close re-filing a duplicate entry — both downstream of this row.
-  **THREE LIVE INSTANCES AT THE 2026-09-05 DRAIN, and the newest is a MEASUREMENT STORE rather than
-  a ruling.** `candidate-list-anchors-a-sweep-obligation` is the third: it carries an explicit
-  **Why not icebox** paragraph naming a live recurring trigger, and the worklist ranked it anyway.
-  `lead-split-posture-limb-unjudged` (now Done) carried thirteen close-appended points and met
-  two of the three narrowing conditions — no roadmap tag, no live slug, no dated `recurrence:`,
-  its own paragraph arguing that omission correct. Its ONLY protection was a cost field opening
-  in prose, so one author tidying that opener to a class word would have compressed thirteen
-  iterations of measurement into one line. The 2026-08-31 ruling bars re-authoring an opener to
-  UNBLOCK an eviction; nothing bars the same edit made for tidiness, which is the hole. A
-  `not-icebox-eligible:` declaration — the shape the amendment rules — closes it, so this instance
-  sharpens the fork rather than widening the entry.
-  **The filer's premise FELL and is answered:** the class-word gate is owed rather than unfiled, and
-  `deferred-cost-class-opener-vocabulary` has owned it since 2026-08-23.
-  recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05 2026-09-08
-  **At threshold, promoted into `rankable-deferred-board`'s unit set as a feature — operator
-  direction, 2026-09-11 (lead session, lead-relayed)**: it shares the icebox arm the cost tag
-  touches. The 2026-09-09 deferral's ground was that window's unshared surface; git holds it.
-  **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
-  close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
-  the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
-  non-load-bearing, which bounds the harm to the review list rather than the disposition, and is why
-  this is filed rather than built. Surfaced 2026-08-28 by the close of
-  `installer-trial-lifecycle-repair`, which filed it to the gap inbox; promoted 2026-08-28 by scope,
-  whose own emitter re-run reproduced the sole-candidate row.
-
 - **deferred-cost-class-opener-vocabulary** [spec: SPEC-board-tags.md] — the cost field is free
   prose, so neither reader that ranks on it can read it without the body: the icebox worklist reads
   only its opening token, and scope's cost-first ranking reads every deferred body.
@@ -3435,10 +3389,9 @@
   **Cost while deferred:** low while this entry exists and unbounded without it — the entry IS
   the carrier, so deferring the *home* decision costs only that a possibly-general rule reads
   as one parked entry's prose; not filing at all would have cost the clause to git history.
-  **NOT ICEBOX-ELIGIBLE, though the worklist keeps proposing it on that low cost line** — the
-  line prices the CARRY, never the eviction, and eviction deletes the body that holds the clause
-  verbatim, which is the 2026-08-17 ruling's refused attrition performed by procedure. It leaves
-  Deferred when a permanent home lands, not before.
+  **Out of the icebox until a permanent home lands:** the cost line prices the CARRY, never the
+  eviction, and eviction deletes the verbatim clause — the 2026-08-17 ruling's refused attrition.
+  not-icebox-eligible: threshold-recurrence-routing-residency 2026-08-17 eviction spends the clause
   Filed 2026-08-18 by close from the gap inbox on the 2026-08-17 operator ruling; the drain
   re-verified that no permanent surface carries the clause — the only hits were the inbox this
   drain truncates and the survey record the next first-stage entry truncates.
@@ -5156,17 +5109,12 @@
   run that can observe it, and the migration that just landed made every *other* producer
   dialect-correct, so these three are now the tree's recorded exception rather than part of a
   uniform unfixed background.
-  **STANDING NOT-ICEBOX-ELIGIBLE, and this clause exists so the next worklist pass READS it rather
-  than re-deriving it — `lead, own-authority` 2026-09-10 through the lead's message channel, at
-  `host-resolution-fail-open-cut`'s scope.** This entry's trigger is the CI leg
-  `install-smoke-windows`, LIVE and running on every push to master, while the slug that shipped it,
-  `platform-support-ci-matrix`, retired 2026-09-06. `--emit queue-index --icebox-candidates` reads
-  the slug and not the mechanism, so it scores this entry false-eligible —
-  `icebox-trigger-blind-to-retired-carrier` owns that predicate defect and was DECLINED as a rider
-  this window, with the exposure accepted in writing here rather than silently. A session meeting
-  this entry on an eviction worklist does not evict it. Recorded as prose because
-  `icebox-standing-ineligibility-unrecordable` owns the absent slot; when that slot exists this
-  clause moves into it.
+  **Standing exclusion — `lead, own-authority` 2026-09-10 through the lead's message channel, at
+  `host-resolution-fail-open-cut`'s scope:** the worklist reads the retired slug and not the live
+  CI leg `install-smoke-windows`, so it scores this entry false-eligible;
+  `icebox-trigger-blind-to-retired-carrier` owns that predicate defect, DECLINED as a rider then
+  with the exposure accepted in writing.
+  not-icebox-eligible: harness-project-dir-fold-dialect-unresolved 2026-09-10 live CI-leg trigger
   **Owner is context-kit, not gate-sdk.** The rule's home is context-kit/SPEC.md §Layout and
   configuration; the dialect contract is gate-sdk's. It is that seam, not a migration defect.
   **Pre-existing, not a regression** — the fold is already wrong on a backslash-spelled root
@@ -6235,5 +6183,6 @@
 - landing-moots-live-entries-undetected
 - composition-verdict-unrecorded-at-unit-set-ruling
 - lead-cancel-running-work-unforbidden
+- icebox-standing-ineligibility-unrecordable
 
 ## Lessons Learned

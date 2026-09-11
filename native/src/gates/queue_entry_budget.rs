@@ -35,7 +35,7 @@ fn is_iso_date(tok: &str) -> bool {
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — at most one line of EACH declaration
 // grammar the queue format defines is discounted, each matched by its own grammar: lead token,
 // slug, then at least one ISO date past the slug, with no entry-boundary or self-slug condition
-const DECLARATIONS: [(&str, usize); 1] = [("recurrence:", 3)];
+const DECLARATIONS: [(&str, usize); 2] = [("recurrence:", 3), ("not-icebox-eligible:", 3)];
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (D): a body line led by a
 // retired declaration token is refused, provenance being stated inline
