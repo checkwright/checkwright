@@ -420,6 +420,8 @@ Neither edge crosses a value.
 
 - `OPENER_CAP` — the worklist's opener truncation constant (delta 6).
 - `low_class` — the prose low-class matcher (delta 6).
+- `fn opener` — the cost-field opener parser, scoped to the function definition because the bare
+  word is ordinary prose across the tree (delta 6).
 
 ## Definition of Done
 
