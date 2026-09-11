@@ -490,8 +490,11 @@ and never rewritten. The initial filing is not a recurrence and is not listed, s
 the count is the number of dates. It is a declaration rather than a tag for the
 reasons the paragraph above gives: its readers scan a line of its own, and it
 marks no move across a pending/ready boundary, so it fails canon-kit's
-further-tag test. `check-tag-lead-line` does not govern it, and it cannot collide
-with the bracket scans.
+further-tag test — and no lead-line reader consumes it, so it fails the
+attribute test too (canon-kit/SPEC.md §The amendment lifecycle, the paragraph
+after the further-tag test, which is the admission rule for every field tag
+this algebra mints). `check-tag-lead-line` does not govern it, and it cannot
+collide with the bracket scans.
 
 The **self-naming slug field is mechanism, not decoration**, and it is the rule
 for *every* body-line declaration this format defines rather than for

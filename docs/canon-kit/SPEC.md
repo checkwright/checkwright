@@ -175,6 +175,19 @@ also the test a further tag has to pass: a tag marking a move that crosses no
 pending/ready boundary adds a state name without adding a caught error class,
 and is refused.
 
+That test admits **state** tags and is the wrong test for an **attribute**. An
+attribute a lead-line reader consumes — the session board, a ranking or
+eviction arm, anything that scans the `- ` line alone — is a field tag on the
+lead line, because a body declaration is invisible to that reader and the
+lead-line gate (queue-kit/SPEC.md §check-tag-lead-line) is what holds the
+value where the reader looks; the error class it adds is the reflow that
+strands the value on a continuation line. What no lead-line reader consumes
+stays a body declaration, which is why `recurrence:` is one: its readers scan
+a line of its own. The attribute's *value set* is a separate decision the
+minting amendment states — closed and consumer-configured on the roadmap
+tag's precedent, or a date — and a new field tag is a feature by the litmus
+below regardless of which test admitted it.
+
 The feature/debt litmus is **new names**: a task that adds any name to a
 governed surface — a script, a config knob, a file or directory convention,
 a tag, a contract another component must honor — is a feature and needs the
