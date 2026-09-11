@@ -3400,6 +3400,16 @@ condition:
   `LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT`. Reported as such and joined to neither
   other band.
 
+**Two oracle shapes sit in the not-fired band while their condition holds, and
+neither reports.** An absence test spelled `grep -L <x> <file>` prints the file
+and exits non-zero under GNU grep when `<x>` is absent, so it reads as not fired
+exactly when it should fire; spell absence as `grep -q <x> <file> || echo <evidence>`,
+and check it through `bash -c`, the arm's own dispatch, because an interactive
+shell may resolve `grep` to an implementation whose `-L` exits zero. A substring
+test for a slug is satisfied by any live citation of that slug, so a discharge
+keyed on an entry leaving its section anchors the match to the line that move
+writes — a bare done line under `grep -x` — never to the slug anywhere in the file.
+
 **A condition no command can settle takes the literal operand `manual`**,
 followed by the prose condition, and this is the case that forced the operand
 rather than an escape hatch: a record may carry a ruling whose condition resolves
