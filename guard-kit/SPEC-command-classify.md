@@ -1,7 +1,7 @@
 # SPEC amendment: command-classify
 
-**Deltas 1 to 4 are applied, with the parts of deltas 10 and 11 that belong to them; every other
-passage is still a proposal for the build stage to land.** Where replacement wording is given it is marked **Not yet applied** at the passage itself.
+**Deltas 1 to 4 and 6 are applied, with the parts of deltas 10 and 11 that belong to them; every
+other passage is still a proposal for the build stage to land.** Where replacement wording is given it is marked **Not yet applied** at the passage itself.
 
 This amendment serves the eight entries of the `guard-command-classification` unit set, which point
 at it together:
@@ -298,8 +298,9 @@ weaker predicate is a separate, already-filed gap this rule inherits* — is rep
 ### (6) Rule 22 widens to `git rm` carrying its force flag
 
 Rule 22 gains an arm: a `git rm` segment whose options carry `-f` or `--force`, standalone or in a
-short cluster (`-qf`, `-rf`), is **blocked** {mechanical}. The corrective names three exits. **Not
-yet applied.**
+short cluster (`-qf`, `-rf`), is **blocked** {mechanical}. The corrective names three exits.
+**Applied**, with an abbreviated long spelling (`--forc`) covered too, since git's option parser
+accepts one.
 
 - Drop the flag: `git rm` refuses a file with local modifications and says so.
 - Use `git rm --cached` to untrack the file and keep it.
@@ -484,9 +485,9 @@ regardless. No number moves.
 
 The decision table, the knob test and the parity corpus take every behavioral change above
 {mechanical}. §Testing's non-monotone rule binds throughout: every row whose expected column a delta
-could move is re-derived, never assumed. **Not yet applied**, except the parts for deltas 1 to 4:
-the rule 2 and rule 8 rows, the `GUARD_KIT_SEARCH_TOOLS` cases of the knob test, the `harness-view`
-parity corpus, and the `scan_prompts` key test.
+could move is re-derived, never assumed. **Not yet applied**, except the parts for deltas 1 to 4 and
+6: the rule 2, rule 8 and rule 22 force-arm rows, the `GUARD_KIT_SEARCH_TOOLS` cases of the knob
+test, the `harness-view` parity corpus, and the `scan_prompts` key test.
 
 - **`guard-tests/cases.tsv`:**
   - Firing and non-firing rows for rule 2's arms (b) and (c) (delta 2), rule 8's two `awk` shapes and

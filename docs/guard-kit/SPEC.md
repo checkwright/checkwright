@@ -1332,6 +1332,24 @@ that harness exists would be designing against no case.
     tracked *directory* under `rm -r` does not match `--error-unmatch` — each
     biases toward passing rather than a false steer. An untracked or gitignored
     target never matches, so scratch deletion is untouched.
+    **The steer's safety half: a `git rm` carrying its force flag is blocked
+    too.** A `git rm` segment whose options carry `-f` or `--force` is blocked,
+    its subcommand found by rule 14's `_guard_git_subcommand` walk read in that
+    walk's `args` mode. Every spelling git's option parser accepts fires:
+    standalone, in a short cluster (`-qf`, `-rf`), and as an abbreviation of
+    the long form (`--forc`, down to `--f`), since that parser takes any
+    unambiguous prefix of a long option. A word after `--` is a path and ends
+    the walk. The words are read from rule 8's dequoted view, so a quoted
+    `'-f'` is the flag the shell passes, and where that view cannot be aligned
+    the skeleton is read instead. The corrective names three exits: drop the
+    flag, since `git rm` refuses a file with local modifications and says so;
+    `git rm --cached` to untrack the file and keep it; and `!<command>` where
+    the loss is intended.
+    **Why this rule owns the arm.** This rule steers every tracked-path deletion
+    into `git rm -q`, and the force flag is the one spelling of that mandated
+    form that destroys uncommitted work. The arm fires whether or not a grant
+    matches, on rule 20's reasoning: ungranted, the call is decided out of band
+    anyway, and granted by a committed `git rm` glob it is silent data loss.
 23. **Script execution off a body the command string does not carry** — a
     command that invokes a script interpreter on a program body it takes from
     **outside** the command string is **blocked** when that body's source is a

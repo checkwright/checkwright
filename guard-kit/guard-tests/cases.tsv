@@ -289,6 +289,18 @@ block	rm tracked.md; ls
 fallthrough	rm scratch.txt
 fallthrough	rm untracked-nowhere.md
 fallthrough	git rm -q tracked.md
+# rule 22's force arm — a 'git rm' carrying its force flag is blocked whether or
+#           not a grant matches: standalone, in a short cluster, long, abbreviated
+#           as git's option parser accepts it, behind a global option, and quoted.
+#           A word after '--' is a path, and '--cached' keeps the file
+block	git rm -q -f tracked.md
+block	git rm -qf tracked.md
+block	git rm --force tracked.md
+block	git rm --forc tracked.md
+block	git -C . rm -rf sub
+block	git rm -q '-f' tracked.md
+fallthrough	git rm -q -- -f
+fallthrough	git rm --cached tracked.md
 
 # rule 23 — a script interpreter taking its program body from a scratch dir.
 #           The firing rows are delta 3's probe table promoted from evidence into

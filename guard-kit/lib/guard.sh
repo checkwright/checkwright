@@ -863,9 +863,13 @@ _guard_live_run_records() {
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 14's subcommand walk: git's global options are consumed so 'git -C dir commit' is reached, and any option this list does not recognize returns non-zero so the segment declines rather than guessing which token is the subcommand
 _guard_git_subcommand() {
-    local seg="$1" mode="${2:-}" tok first=1 expect_arg=0
+    local seg="$1" mode="${2:-}" tok first=1 expect_arg=0 found=0
     local -a globals=()
     for tok in $seg; do
+        if [[ "$found" == 1 ]]; then
+            printf '%s\n' "$tok"
+            continue
+        fi
         if [[ "$first" == 1 ]]; then
             [[ "$tok" == git ]] || return 1
             first=0
@@ -885,13 +889,18 @@ _guard_git_subcommand() {
                 # spec: guard-kit/SPEC.md §The generic ruleset — rule 2's reading of this same walk: 'globals' emits the global option words consumed before the subcommand, one per line, instead of the subcommand
                 if [[ "$mode" == globals ]]; then
                     printf '%s\n' ${globals[@]+"${globals[@]}"}
+                # spec: guard-kit/SPEC.md §The generic ruleset — rule 22's force arm reads this same walk: 'args' emits the subcommand and then every word after it, one per line
+                elif [[ "$mode" == args ]]; then
+                    printf '%s\n' "$tok"
+                    found=1
+                    continue
                 else
                     printf '%s' "$tok"
                 fi
                 return 0 ;;
         esac
     done
-    return 1
+    [[ "$found" == 1 ]]
 }
 
 guard_rule_git_mutation_under_producer() {
@@ -1282,9 +1291,27 @@ guard_rule_rm_tracked() {
     grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
     case "$raw" in *'`'*) return 0 ;; esac
     s="$(guard_skeleton "$raw" sq dq hd)"
-    local seg lead arg
+    local seg lead arg v cmdseg w i=0
+    local -a dsegs=() words=()
+    v="$(_guard_dequoted_view "$raw" "$s")" && mapfile -t dsegs < <(guard_split_compound "$v")
     while IFS= read -r seg; do
         seg="${seg#"${seg%%[![:space:]]*}"}"
+        cmdseg="$(_guard_command_word "${dsegs[i]:-$seg}")"
+        i=$((i + 1))
+        if [[ "${cmdseg%%[[:space:]]*}" == git ]]; then
+            mapfile -t words < <(_guard_git_subcommand "$cmdseg" args)
+            [[ "${words[0]:-}" == rm ]] || continue
+            for w in "${words[@]:1}"; do
+                w="${w//\\/}"
+                case "$w" in
+                    --) break ;;
+                    --f | --fo | --for | --forc | --force | -[!-]*f* | -f*) ;;
+                    *) continue ;;
+                esac
+                guard_block "don't force a 'git rm' with '$w' — the force flag is the one spelling of 'git rm' that destroys uncommitted work, silently when a committed grant matches it. Three exits: drop the flag, since 'git rm' refuses a file with local modifications and says so; use 'git rm --cached <path>' to untrack the file and keep it; or, where the loss is intended, run it yourself with !<command>."
+            done
+            continue
+        fi
         lead="${seg%%[[:space:]]*}"
         [[ "$lead" == "rm" ]] || continue
         for arg in ${seg#rm}; do
