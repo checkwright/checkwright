@@ -5,13 +5,19 @@ use crate::proc;
 use crate::queue::{self, is_top_level_bullet, Sections};
 
 const TITLE_CAP: usize = 64;
-const OPENER_CAP: usize = 48;
+const CAUSE_CAP: usize = 48;
+
+// spec: queue-kit/SPEC.md §The tag algebra — the board tags, in the order a deferred row re-echoes them
+const BOARD_TAGS: [&str; 2] = ["cost", "surface"];
+
+// spec: queue-kit/SPEC.md §The icebox tier — the low class, the icebox's partition of the cost set
+const LOW_CLASS: [&str; 2] = ["event/low", "once/low"];
 
 const USAGE: &str = "\
 usage: --emit queue-index [--collapse-deferred] [--extent <slug>] [--icebox-candidates] [queue-file]
-  default: header + active (• ready / ✗ blocked) + deferred titles + icebox tally;
+  default: header + active (• ready / ✗ blocked) + deferred titles and board tags + icebox tally;
   --collapse-deferred: per-### tally; --extent <slug>: \"<start> <end>\";
-  --icebox-candidates: eviction worklist (• eligible / ✗ excluded, cause in place of the cost)
+  --icebox-candidates: eviction worklist (• eligible / ✗ excluded, cause in place of the class)
 ";
 
 enum Mode {
@@ -280,7 +286,13 @@ fn index(text: &str, collapse: bool) -> Result<String, String> {
                                 tally.push((key.clone(), 1));
                             }
                         }
-                        deferred.push(joined(slug, &title(line)));
+                        let mut row = joined(slug, &title(line));
+                        for name in BOARD_TAGS {
+                            if let Some(t) = queue::field_tags(line, name).first() {
+                                row.push_str(&format!("   [{}: {}]", name, t.raw.trim()));
+                            }
+                        }
+                        deferred.push(row);
                     }
                 }
             }
@@ -379,46 +391,14 @@ fn age_cutoff() -> Result<String, String> {
     Ok(s)
 }
 
-// spec: queue-kit/SPEC.md §The queue-index arm — awk's `^.*\*\*Cost while deferred:?\*\*:?[ ]*`
-// with a greedy lead, so the rightmost lead-in wins; the truncation is the advisory's own ceiling.
-fn opener(line: &str) -> String {
-    const NEEDLE: &str = "**Cost while deferred";
-    let mut cut: Option<usize> = None;
-    let mut from = 0usize;
-    while let Some(rel) = line[from..].find(NEEDLE) {
-        let at = from + rel;
-        let mut p = at + NEEDLE.len();
-        let b = line.as_bytes();
-        if b.get(p) == Some(&b':') {
-            p += 1;
-        }
-        if line[p..].starts_with("**") {
-            p += 2;
-            if line.as_bytes().get(p) == Some(&b':') {
-                p += 1;
-            }
-            while matches!(line.as_bytes().get(p), Some(&c) if c == b' ' || c == b'\t') {
-                p += 1;
-            }
-            cut = Some(p);
-        }
-        from = at + 1;
-    }
-    let t = match cut {
-        Some(p) => &line[p..],
-        None => line,
-    };
-    let t = t.trim_end_matches([' ', '\t']);
-    if t.is_empty() {
-        return "(unstated)".to_string();
-    }
-    cap_chars(t)
-}
-
-// spec: queue-kit/SPEC.md §The queue-index arm — the low cost class is matched on the opener as
-// prose, an unacceptable heuristic in a gate and the right ceiling in an advisory worklist.
-fn low_class(t: &str) -> bool {
-    ["low", "zero", "bounded", "cosmetic"].iter().any(|p| t.starts_with(p))
+// spec: queue-kit/SPEC.md §The queue-index arm — the class is the lead line's first `[cost:]` value
+// that parses, through the shared adapter; a malformed value is no class and lists as unclassed.
+fn lead_class(line: &str) -> String {
+    queue::field_tags(line, "cost")
+        .iter()
+        .find_map(|t| t.value.filter(|v| queue::cost_class_valid(v)))
+        .unwrap_or("")
+        .to_string()
 }
 
 fn find_dated(line: &str, label: &str) -> Option<String> {
@@ -528,16 +508,16 @@ fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, live: &[String], out:
     let Some(e) = p.take() else { return };
     let d = if !e.surfaced.is_empty() { e.surfaced.as_str() } else { e.filed.as_str() };
     let dated_in = d.is_empty() || d < cutoff;
-    let costed_in = e.cost.is_empty() || low_class(&e.cost);
-    if dated_in && costed_in {
+    let classed_in = e.cost.is_empty() || LOW_CLASS.contains(&e.cost.as_str());
+    if dated_in && classed_in {
         let shown_date = if d.is_empty() { "(undated)" } else { d };
         // spec: queue-kit/SPEC.md §The queue-index arm — an ineligible row keeps its line and
-        // trades its cost opener for the reason: the opener is inclusion evidence, and it decides
+        // trades its class for the reason: the class is inclusion evidence, and it decides
         // nothing once a categorical exclusion has already settled the row.
         let (mark, tail) = match ineligibility(&e, live) {
             Some(r) => ('✗', cap_chars(&r)),
             None => {
-                let c = if e.cost.is_empty() { "(uncosted)" } else { e.cost.as_str() };
+                let c = if e.cost.is_empty() { "(unclassed)" } else { e.cost.as_str() };
                 ('•', c.to_string())
             }
         };
@@ -553,8 +533,8 @@ fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, live: &[String], out:
 }
 
 fn cap_chars(t: &str) -> String {
-    if t.chars().count() > OPENER_CAP {
-        let head: String = t.chars().take(OPENER_CAP - 1).collect();
+    if t.chars().count() > CAUSE_CAP {
+        let head: String = t.chars().take(CAUSE_CAP - 1).collect();
         return format!("{}…", head);
     }
     t.to_string()
@@ -586,7 +566,7 @@ fn candidates(text: &str) -> Result<String, String> {
                 start: n,
                 surfaced: String::new(),
                 filed: String::new(),
-                cost: String::new(),
+                cost: lead_class(line),
                 lead: line.to_string(),
                 body: String::new(),
             });
@@ -604,9 +584,6 @@ fn candidates(text: &str) -> Result<String, String> {
             if let Some(d) = find_dated(line, "Filed ") {
                 e.filed = d;
             }
-        }
-        if e.cost.is_empty() && line.contains("**Cost while deferred") {
-            e.cost = opener(line);
         }
     }
     flush(&mut pending, n + 1, &cutoff, &live, &mut out);
@@ -637,7 +614,7 @@ mod tests {
 
 ## Deferred
 
-- **def-tagged** [design-pending] — a tagged deferred entry.
+- **def-tagged** [design-pending] [cost: event/low] [surface: queue-kit] — a tagged deferred entry.
 - **def-alltag** [spec: some-kit/SPEC.md §A Long Pointer Section]
 
 ## Done
@@ -688,6 +665,19 @@ mod tests {
             "{}",
             out
         );
+    }
+
+    // spec: queue-kit/SPEC.md §The queue-index arm — a deferred row re-echoes its board tags after
+    // the title, cost first, and a row carrying neither echoes nothing.
+    #[test]
+    fn a_deferred_row_re_echoes_its_board_tags_after_the_title() {
+        let out = render(false, 3);
+        assert!(
+            out.contains("  def-tagged — a tagged deferred entry.   [cost: event/low]   [surface: queue-kit]\n"),
+            "{}",
+            out
+        );
+        assert!(out.contains("  def-alltag\n"), "{}", out);
     }
 
     #[test]
@@ -764,7 +754,7 @@ mod tests {
             start: 1,
             surfaced: String::new(),
             filed: String::new(),
-            cost: "low".to_string(),
+            cost: "event/low".to_string(),
             lead: lead.to_string(),
             body: body.to_string(),
         }
@@ -809,11 +799,21 @@ mod tests {
         assert!(r.is_none(), "only a line led by the token declares: {:?}", r);
     }
 
+    fn worklist(q: &str) -> String {
+        let knobs = crate::knobenv::lock();
+        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features");
+        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
+        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
+        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_AGE_DAYS", "7");
+        candidates(q).expect("candidates failed")
+    }
+
     // spec: queue-kit/SPEC.md §The queue-index arm — the census is preserved: an excluded row
-    // keeps its line and trades the cost opener for the cause.
+    // keeps its line and trades the class for the cause.
     #[test]
-    fn an_excluded_row_is_marked_and_carries_its_cause_instead_of_the_cost() {
-        let q = "\
+    fn an_excluded_row_is_marked_and_carries_its_cause_instead_of_the_class() {
+        let out = worklist(
+            "\
 ## Iteration: demo
 
 ## New Features
@@ -822,43 +822,69 @@ mod tests {
 
 ## Deferred
 
-- **keeper** [design-pending] — nothing holds it.
-  **Cost while deferred:** low and quiet.
+- **keeper** [design-pending] [cost: event/low] [surface: queue-kit] — nothing holds it.
+  **Cost while deferred:** paid when the surface is touched.
   Filed 2020-01-01 by close.
-- **tagged** [design-pending] [roadmap: now/x] — published.
-  **Cost while deferred:** low and quiet.
+- **tagged** [design-pending] [cost: event/low] [surface: queue-kit] [roadmap: now/x] — published.
+  **Cost while deferred:** paid when the surface is touched.
   Filed 2020-01-01 by close.
-- **held** [design-pending] — waits.
-  **Cost while deferred:** low and quiet.
+- **held** [design-pending] [cost: event/low] [surface: queue-kit] — waits.
+  **Cost while deferred:** paid when the surface is touched.
   Filed 2020-01-01 by close, and it waits on `live-one`.
 
 ## Lessons Learned
-";
-        let out = {
-            let knobs = crate::knobenv::lock();
-            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features");
-            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
-            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
-            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_AGE_DAYS", "7");
-            candidates(q).expect("candidates failed")
-        };
+",
+        );
         let lines: Vec<&str> = out.lines().collect();
         assert_eq!(lines.len(), 3, "every row is still listed: {}", out);
         assert!(lines[0].starts_with("• keeper"), "{}", out);
-        assert!(lines[0].contains("low and quiet."), "{}", out);
+        assert!(lines[0].ends_with("event/low"), "{}", out);
         assert!(lines[1].starts_with("✗ tagged"), "{}", out);
         assert!(lines[1].contains("[roadmap]"), "{}", out);
-        assert!(!lines[1].contains("low and quiet."), "{}", out);
+        assert!(!lines[1].contains("event/low"), "{}", out);
         assert!(lines[2].starts_with("✗ held"), "{}", out);
         assert!(lines[2].ends_with("[trigger] names live slug live-one"), "{}", out);
     }
 
+    // spec: queue-kit/SPEC.md §The queue-index arm — the class comes off the lead line and never the
+    // cost field's prose; only the low class is listed, and a missing or malformed class appears.
     #[test]
-    fn the_cost_opener_takes_the_rightmost_lead_in_and_reports_an_empty_one() {
-        assert_eq!(opener("  **Cost while deferred:** low and non-rotting."), "low and non-rotting.");
-        assert_eq!(opener("  **Cost while deferred**: zero today."), "zero today.");
-        assert_eq!(opener("  **Cost while deferred:**"), "(unstated)");
-        assert!(low_class("low and non-rotting."));
-        assert!(!low_class("high, paid every iteration."));
+    fn only_event_low_and_once_low_are_listed_and_an_absent_class_appears_unclassed() {
+        let out = worklist(
+            "\
+## Iteration: demo
+
+## New Features
+
+## Deferred
+
+- **ev-low** [design-pending] [cost: event/low] [surface: queue-kit] — t.
+  **Cost while deferred:** every iteration re-reads it.
+  Filed 2020-01-01 by close.
+- **once-low** [design-pending] [cost: once/low] [surface: queue-kit] — t.
+  **Cost while deferred:** fixed.
+  Filed 2020-01-01 by close.
+- **it-low** [design-pending] [cost: iteration/low] [surface: queue-kit] — t.
+  **Cost while deferred:** low and quiet.
+  Filed 2020-01-01 by close.
+- **ev-high** [design-pending] [cost: event/high] [surface: queue-kit] — t.
+  **Cost while deferred:** low and quiet.
+  Filed 2020-01-01 by close.
+- **untagged** [design-pending] — t.
+  **Cost while deferred:** low and quiet.
+  Filed 2020-01-01 by close.
+- **malformed** [design-pending] [cost: event/lo] [surface: queue-kit] — t.
+  **Cost while deferred:** low and quiet.
+  Filed 2020-01-01 by close.
+
+## Lessons Learned
+",
+        );
+        let lines: Vec<&str> = out.lines().collect();
+        assert_eq!(lines.len(), 4, "{}", out);
+        assert!(lines[0].starts_with("• ev-low") && lines[0].ends_with("event/low"), "{}", out);
+        assert!(lines[1].starts_with("• once-low") && lines[1].ends_with("once/low"), "{}", out);
+        assert!(lines[2].starts_with("• untagged") && lines[2].ends_with("(unclassed)"), "{}", out);
+        assert!(lines[3].starts_with("• malformed") && lines[3].ends_with("(unclassed)"), "{}", out);
     }
 }

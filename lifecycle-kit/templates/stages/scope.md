@@ -106,19 +106,27 @@ scope-gated intake, and the failure this rule answers was never that the ruling
 went the wrong way — it was that the collision never reached anyone.
 
 **Rank the pool by what deferral costs and what landing buys, in this order,
-before composing.** First, an entry whose cost while deferred is paid **per
-iteration or per session** — token waste an always-loaded or every-stage
-surface re-buys, a gate or leg that reds every run, a fixed cost every stage
-walk pays — leads the unit set; where joining it to the current iteration
-re-spends nothing, it joins now, else it leads the next. Second, a `[roadmap:]`
-entry, or one whose landing advances a roadmap item. Third, the window fills
-with deferred entries sharing the lead unit's surface, under the composition
-test below. Recurrence-threshold entries ride the escalation above regardless of
-rank. What an entry is *about* — the delivery machinery or the product — is not
-a rank axis; its cost while deferred and its impact are, and an entry states
-both in its own cost field, which is what this ranking reads. A directive's
-theme bounds the survey and never outranks the first tier: a per-iteration cost
-is the theme's cost too.
+before composing.** The board's deferred rows carry each entry's `[cost:]` class
+and `[surface:]` (queue-kit/SPEC.md §The tag algebra), so the ranking reads the
+board and opens bodies only for a shortlist. First, the rows whose class is
+`session` or `iteration` (token waste an always-loaded or every-stage surface
+re-buys, a gate or leg that reds every run, a fixed cost every stage walk pays),
+`session` before `iteration` and `high` before `low`; read bodies for that
+shortlist only. Its lead entry leads the unit set, and it joins the iteration
+being bounded only where joining re-spends nothing, which takes both of these:
+its surface is one the unit set already carries, and it triggers no stage the
+set does not already walk (a feature joining a debt-only set triggers the
+authoring stage, and a second component can trigger the audit stage). Otherwise
+it leads the next iteration's set, which its class arranges at that scope
+without a record. Second, a `[roadmap:]` entry, or one whose landing advances a
+roadmap item. Third, the window fills with rows whose `[surface:]` value matches
+the lead unit's, under the composition test below. Recurrence-threshold entries
+ride the escalation above regardless of rank. What an entry is *about* — the
+delivery machinery or the product — is not a rank axis; its cost while deferred
+and its impact are. The class rides the entry's `[cost:]` tag, and the impact
+rides its cost field's prose, which the shortlist's body read supplies. A
+directive's theme bounds the survey and never outranks the first tier: a
+per-iteration cost is the theme's cost too.
 
 **Weigh the iteration's cost before opening it — the economic composition test.**
 A lone sub-threshold unit may not justify a whole iteration's fixed cost: either

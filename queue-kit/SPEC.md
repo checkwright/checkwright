@@ -210,6 +210,10 @@ removed rather than added.
 - **No `###` subsections and no sub-tasks.** Grouping is presentation on a
   surface whose entire purpose is minimum residency, and a sub-task is a
   continuation line the shape rule rejects.
+- **An eviction drops the `[cost:]` and `[surface:]` tags.** Both are the
+  deferred board's (§The tag algebra), and a one-line entry has no reader for
+  either (§check-deferred-board-tags). A return to the deferred section on
+  recurrence declares both again, as any filing does.
 - **A `[roadmap:]`-tagged entry is not icebox-eligible**, and the rule needs no
   new code: the roadmap parse walks the live task sections, so the tier enters
   its walk, and `check-roadmap-fresh` then reds any `[roadmap:]` entry carrying
@@ -232,8 +236,9 @@ removed rather than added.
   Ruling off the line alone is ruling off a summary written to be dropped.
 
 **Eligibility**, judged at the closing stage over the deferred section: the
-entry's defer date is at least `QUEUE_KIT_ICEBOX_AGE_DAYS` old; its cost field
-opens in the low class; it carries no `[roadmap:]` tag; it carries no
+entry's defer date is at least `QUEUE_KIT_ICEBOX_AGE_DAYS` old; its `[cost:]`
+class is in the low class, `event/low` or `once/low` (§The tag algebra); it
+carries no `[roadmap:]` tag; it carries no
 `not-icebox-eligible:` declaration (§The tag algebra); and it has **no live
 promotion trigger**. The age limb is what makes the tier a demotion on evidence
 rather than a filing preference: an entry younger than the knob has not had the
@@ -261,29 +266,33 @@ the set and therefore untouched by this clause. Nothing here narrows a
 `[roadmap:]` tag or a dated `recurrence:` line, both of which stay live inside
 such a set exactly as they are outside one.
 
-The cost field's opening token is the class word the
-`--icebox-candidates` arm reads (`low`, `zero`, `bounded`, `cosmetic`), so a
-cost field that opens in prose has declared no class and is read as not-low;
-authoring the class word first is the contract, and the gate that holds it is
-owed.
+The class is the lead line's `[cost:]` tag and never the word the cost field
+opens with. An entry with no tag, or with a value outside the closed grammar,
+has declared no class and so is not in the low class; the `--icebox-candidates`
+arm still lists it, as `(unclassed)` (§The queue-index arm), so the missing
+input is seen and supplied from the prose rather than silently holding the entry
+off the tier. **A queue written against the retired opener vocabulary migrates
+by the prose, not by the word.** That vocabulary read the field's opening token:
+`low`, `zero` and `cosmetic` each map to a `*/low` class and `bounded` to
+`once/*`, the half the word does not give is read from the field's prose, and
+so is the whole class wherever that prose describes a cost the word understated.
 
-**That opener is not re-authored to unblock an eviction.** A session holding an
-entry whose prose opener
-keeps it off the `--icebox-candidates` worklist may not rewrite the field to
-read low. The opener is an honest signal, and re-authoring it makes an entry
-*look* evictable without making it dormant — emulating the oracle rather than
-running it, which is oracle-first stated as its inverse. An entry whose true
-cost is high is correctly blocked, and the blocking is this eligibility rule
-working rather than an obstacle to route around. Two alternatives were refused,
-with their grounds, so neither is re-argued at full cost. *Per-entry
-re-authoring with the true cost stated*: if the true cost is genuinely low the
-field was simply mis-authored and correcting it is ordinary repair needing no
-ruling, and if it is not low the re-authoring is the gaming this refuses — the
-option only has force in the case it is wrong for. *Waiting for the owed
-opener gate above*: that gate would enforce the opener's **shape** and never
-adjudicate a cost's truth, so it cannot answer this question and waiting on it
-defers indefinitely for no information. The measurement this rule turned on
-was the substance behind two such openers on a citation-liveness hub — 171
+**That class is not re-declared to unblock an eviction.** A session holding an
+entry whose `[cost:]` class keeps it off the `--icebox-candidates` worklist may
+not rewrite the tag to read low. The class is an honest signal, and re-declaring
+it makes an entry *look* evictable without making it dormant — emulating the
+oracle rather than running it, which is oracle-first stated as its inverse. An
+entry whose true cost is high is correctly blocked, and the blocking is this
+eligibility rule working rather than an obstacle to route around. Two
+alternatives were refused, with their grounds, so neither is re-argued at full
+cost. *Per-entry re-declaration with the true cost stated*: if the true cost is
+genuinely low the tag was simply mis-declared and correcting it is ordinary
+repair needing no ruling, and if it is not low the re-declaration is the gaming
+this refuses; the option only has force in the case it is wrong for. *Waiting on
+§check-deferred-board-tags*: that gate enforces the tag's **shape** and never
+adjudicates a cost's truth, so it cannot answer this question and waiting on it
+defers indefinitely for no information. The measurement this rule turned on was
+the substance behind two such cost fields on a citation-liveness hub — 171
 unqualified citations and 902 directive pointers, which are not low-cost
 carries.
 
@@ -418,9 +427,11 @@ adoption step between landing it and reading it.
   (done entries drop their lifecycle tags; every reader scans live task
   sections only). The lead-line reason is a terse marker, not the audit
   trail: `check-tag-lead-line` pins the tag to the lead line while
-  `check-queue-wrap` caps its width, so a long slug can squeeze the reason
-  to a few columns — keep it a keyword and carry the full exemption
-  rationale in the entry body.
+  `check-queue-wrap` caps its width. That gate's lead-line discount covers only
+  `[cost:]` and `[surface:]`, never this tag, whose free-text reason is
+  unbounded (§check-queue-wrap). So a long slug can squeeze the reason to a few
+  columns: keep it a keyword and carry the full exemption rationale in the
+  entry body.
 - `[precondition-ok: <reason>]` — per-entry opt-out valve for
   `check-queue-prose-precondition`.
 - `[observed-by: <producer>]` — observation-predicate marker: the entry's
@@ -482,7 +493,10 @@ adoption step between landing it and reading it.
   (canon-kit/SPEC.md §The amendment lifecycle), because its readers scan lead
   lines alone. Every top-level
   deferred entry carries exactly one and no active entry carries any
-  (§check-deferred-board-tags).
+  (§check-deferred-board-tags). The session filing a deferred entry writes
+  this tag and `[surface:]` together, whichever stage it runs in; a promotion
+  drops both (canon-kit/SPEC.md §The amendment lifecycle), and so does an
+  eviction (§The icebox tier).
 - `[surface: <entry>]` — primary-surface marker: one top-level entry of the
   repository root — a kit root, an owned root directory, a root file — naming
   what the entry's work mainly changes, so a reader groups the pool by shared
@@ -1008,7 +1022,11 @@ are stripped from the one-line title leaving no residue of the separator they
 sat beside, so an entry whose lead line is nothing but tags has no title and
 renders as the bare slug rather than a dangling `—`; `[blocked-by:]` and
 `[drain-exempt: <reason>]` are re-echoed after it — the two tags a picking
-session acts on without opening the entry body.
+session acts on without opening the entry body. A deferred row re-echoes
+`[cost:]` and then `[surface:]` after its title the same way: the two tags a
+ranking session reads the pool by (§The tag algebra). The session-context step
+prints the full deferred listing only at the scoping and closing stages, so the
+added tokens are paid there alone.
 `--extent <slug>` prints the inclusive line range of one entry's body (parent
 slug → whole subtree; boundary = next sibling-or-shallower bullet, heading,
 `---`, or EOF, including the trailing blank so a range deletion leaves no
@@ -1029,14 +1047,17 @@ icebox emits no line at all.
 
 `--icebox-candidates` prints the closing stage's eviction worklist over the
 deferred section: one line per entry whose defer date (§The queue format) is
-older than `QUEUE_KIT_ICEBOX_AGE_DAYS` **and** whose cost field opens in the low
-class, carrying the entry's line count and that opener. An entry with no defer
-date is listed as `(undated)` and an uncosted one as `(uncosted)` rather than
-filtered out — an absent input appears rather than vanishing.
+older than `QUEUE_KIT_ICEBOX_AGE_DAYS` **and** whose lead line's `[cost:]`
+class is in the low class (§The icebox tier), carrying the entry's line count
+and that class. An entry with no defer date is listed as `(undated)`, and one
+with no class (no tag, or a value outside the closed grammar) as `(unclassed)`,
+rather than filtered out — an absent input appears rather than vanishing. The
+class is read off the lead line alone, never off the `Cost while deferred`
+field, so the arm parses no prose to decide it.
 
 Each row is led by the `•`/`✗` mark the index rendering already uses: `•` for an
 entry §The icebox tier's eligibility rule admits, `✗` for one it excludes. An
-excluded row prints its **cause** in place of the cost opener, because the opener
+excluded row prints its **cause** in place of the class, because the class
 is inclusion evidence and decides nothing once a categorical exclusion has
 settled the row. The cause names the exclusion class, decided in this order — the
 `[roadmap:]` tag; a `not-icebox-eligible:` declaration (§The tag algebra),
@@ -1045,8 +1066,8 @@ date as `(undated)` and one with no grounds as `(ungrounded)`; a dated
 `recurrence:` declaration; or the first live slug named in file order, which
 stands for the class rather than enumerating it. A cause someone wrote about the
 entry outranks a trigger the arm infers, which is why the declaration precedes
-the two inferred triggers. Every cause prints under the same cap as the cost
-opener, so a long grounds clause shows its head, and the self-naming line is one
+the two inferred triggers. Every cause prints under one fixed character cap,
+so a long grounds clause shows its head, and the self-naming line is one
 anchored grep away. A slug counts as *named*
 only where it stands as a whole token, the neighbouring bytes falling outside the
 slug alphabet: a substring hit inside a longer slug is a different entry, and
@@ -1057,9 +1078,9 @@ in a projection tool, not a threshold in a gate, so miscalibration costs a
 longer or shorter review list and never a wrong disposition. That is what
 dissolves "an eviction age threshold needs a policy owner" — the *judgment* is
 the closing stage's, held to §The icebox tier's eligibility rule, and the
-worklist only bounds how much it must look at. Matching a cost-class opener on
-prose would be an unacceptable heuristic in a gate; in an advisory worklist it
-is exactly the right ceiling. **A pool younger than the age threshold yields an
+worklist only bounds how much it must look at. The class filter reads a
+declared tag, and whether the declaration is true stays the filing session's
+judgment: a mis-declared class shifts the list and never the ruling. **A pool younger than the age threshold yields an
 empty worklist**, which is correct and is not a reason to seed a tier by hand
 against the tool: eligibility is the rule, the worklist is the convenience.
 
@@ -1077,7 +1098,7 @@ zero precision is what makes the exclusions worth *reporting*, since a worklist
 whose rows are all re-adjudicated by hand pays that read at every close.
 
 **It prints them rather than filtering, which is this arm's own rule and not a
-new one.** `(undated)` and `(uncosted)` above already list an entry that fails an
+new one.** `(undated)` and `(unclassed)` above already list an entry that fails an
 input test instead of dropping it, and a categorical failure is the same case
 under the same sentence. Two further grounds hold in the same direction: dropping
 the row would turn an advisory projection into a silent disposition, which is

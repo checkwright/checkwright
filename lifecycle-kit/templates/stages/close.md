@@ -74,8 +74,9 @@ session.
    then **truncate the inbox to its `# contract:` header**. The disposition set,
    **tried in this order** (§The committed gap inbox owns the order and why):
    →fix (resolve it inline this session — the default for a debt-shaped bullet),
-   →promote (file a deferred `[design-pending]` queue entry — only what →fix
-   does not take), or →discard (state why in the close commit message — the
+   →promote (file a deferred `[design-pending]` queue entry carrying its
+   `[cost:]` and `[surface:]` tags, queue-kit/SPEC.md §The tag algebra — only
+   what →fix does not take), or →discard (state why in the close commit message — the
    bullet's own prose is the disposition body). The icebox is not a disposition
    here: it takes deferred entries that aged without recurring, at this stage's
    eviction step, never a bullet drained today (queue-kit/SPEC.md §The icebox

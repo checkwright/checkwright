@@ -12,96 +12,6 @@
 
 ## New Features
 
-- **deferred-cost-class-opener-vocabulary** [spec: SPEC-board-tags.md] — the cost field is free
-  prose, so neither reader that ranks on it can read it without the body: the icebox worklist reads
-  only its opening token, and scope's cost-first ranking reads every deferred body.
-  **Censused 2026-08-23** and recorded at `.workflow/survey-record.md`: 238 `Cost while
-  deferred:` fields, about 40 opening with a token the `--icebox-candidates` arm recognizes
-  (`low` 35, `zero` 5); the rest open with prose (`the` 44, `every` 35, `a` 32, `paid` 12).
-  queue-kit/SPEC.md names the recognized set (`low`, `zero`, `bounded`, `cosmetic`).
-  **The filter under-selects silently rather than mis-selecting**, so no gate reddens: a
-  genuinely low entry whose field opens "the" is invisible to the eviction worklist forever, and
-  the 2026-08-23 age-floor ruling widened the age axis while the cost axis stayed shut.
-  **Iced 2026-09-11 as machinery-class and returned the same day by consult**, because the
-  scope ranking rule landed that day (cost while deferred leads the unit set) made the field
-  load-bearing for a second reader: the session board prints lead lines only, so scope cannot
-  rank from it and reads the Deferred section whole — 169 entries, roughly 500 KB.
-  **Operator direction, 2026-09-11: the class is a lead-line tag with a closed value set**, on
-  the `cost: <value>` shape. Grounds: a lead-line tag rides the board the session hook
-  already prints, so scope ranks from the index and reads bodies only for a shortlist; the
-  icebox arm reads a declared class instead of parsing prose; `check-tag-lead-line`'s class
-  table takes a new member at one row; and the tag costs no line against the entry budget.
-  Refused, with grounds: a head token on the cost field (every field becomes a migration, and
-  the opener-not-re-authored rule makes each rewrite contestable); a `cost-class:` body
-  declaration (a line per entry against the 50-line cap, and invisible on the board).
-  **Open for spec:** the value set must serve both readers — the icebox arm's low class and
-  scope's first rank tier, cost paid per iteration or per session — so the values encode
-  recurrence class before magnitude, and the `queue-index` arm prints the tag on the board.
-  Class: a new tag is a governed name, so this is a **feature** and an amendment is owed at
-  promotion (queue-kit/SPEC.md §The tag algebra, canon-kit/SPEC.md §The amendment lifecycle).
-  **Bundle:** `landing-moots-live-entries-undetected` shares the surface (what scope re-reads)
-  and rides the same operator direction into the next scope.
-  **Cost while deferred:** token waste, paid per scope session: the ranking survey reads every
-  deferred body, and the eviction worklist derives from about a sixth of the pool.
-  recurrence: deferred-cost-class-opener-vocabulary 2026-09-11
-  Filed 2026-08-23 by the consult held after `leak-guard-and-assertion-meta-gate-port` closed,
-  promoted out of the gap inbox at the following scope intake the same date.
-  **Operator direction, 2026-09-11 (lead session, lead-relayed):** the lead feature of
-  `rankable-deferred-board`; spec authors the one amendment it shares with the surface tag.
-
-- **deferred-surface-tag-for-bundling** [spec: SPEC-board-tags.md] — scope's third rank tier fills
-  the window with deferred entries sharing the lead unit's surface, and no machine-readable input
-  feeds it: the board prints lead lines only, no deferred entry carries an amendment ref the owning
-  kit could be derived from, and the pool survey's clusters were hand-derived from full-body reads.
-  **Operator direction, 2026-09-11 (consult): a lead-line surface tag with a closed value
-  set**, so scope selects the top-cost entry of one surface from the board and fills the window
-  with same-surface entries without reading bodies. Three points directed for spec, not re-derived
-  there: the axis is *surface*, not kit, because `docs/`, `installer/`, `native/`, `scripts/`
-  and the command bindings are owned root surfaces that are not kits — the value set is the
-  kit roots plus the rostered root surfaces, derived from the tree, on the roadmap tag's
-  precedent of fixed spelling with consumer-configured values; a multi-surface entry declares
-  its primary surface only, since bundling wants one join key; and the tag rides the same
-  amendment as `deferred-cost-class-opener-vocabulary` — one class-table row each, one change
-  to the `queue-index` arm to print lead-line tags on the board, one reclassification sweep.
-  Class: a new tag is a governed name, so this is a **feature** and the amendment is owed at
-  promotion (queue-kit/SPEC.md §The tag algebra).
-  **Cost while deferred:** token waste, paid per scope session: same-surface composition is
-  re-clustered by hand over full-body reads at every boundary.
-  Filed 2026-09-11 by consult on operator direction, bundled with
-  `deferred-cost-class-opener-vocabulary` and `landing-moots-live-entries-undetected` for the
-  next scope.
-  **Operator direction, 2026-09-11, lead-relayed:** promoted with the cost tag into
-  `rankable-deferred-board` as a feature, riding that tag's amendment.
-
-
-- **scope-ranking-blind-to-deferral-cost-and-impact** [spec: SPEC-board-tags.md] — scope's ranking
-  rule reads cost while deferred and impact off an entry's cost field, but no filer-written class
-  word makes the per-iteration cost class greppable, so the first rank tier is read by hand.
-  **The rule landed in consult** (lifecycle-kit/templates/stages/scope.md, the ranking paragraph:
-  per-iteration cost first, roadmap second, same-surface fill third); what stays owed is the
-  mechanism below.
-  **Operator direction 2026-09-11 in the lead session, relayed by that lead** — by typed message: a
-  deferred task whose cost is token waste is a high-priority fix, and scope's ranking, close's drain
-  and icebox eligibility should join it to the current iteration where joining wastes no further
-  tokens, else promote it into the next iteration as soon as possible; by AskUserQuestion: scope is
-  expected already to pick first a task with a high cost while deferred and a high impact, which is
-  why the `instruction-surface-sweep` priority was no separate directive.
-  **Re-verified at the drain:** lifecycle-kit/templates/stages/scope.md carries no cost or impact
-  ranking criterion — only the recurrence threshold forces entry, inbound edges inform the read,
-  and the composition test is about batching; no token-waste marker exists on the queue,
-  queue-kit/SPEC.md or lifecycle-kit/SPEC.md.
-  **Owed:** a cost-class opener for the per-iteration class joining the existing
-  low/zero/bounded/cosmetic set (queue-kit/SPEC.md §The icebox tier), the `queue-index` arm
-  reading it, and the join-now test's re-spend criterion. The icebox question is answered: a
-  per-iteration opener is not the low class, so the entry is never eligible while it carries one.
-  **Cost while deferred:** the class is its own cost — the dearest deferrals rank like any other,
-  and every priority rides a hand relay.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a ranking mechanism across two
-  kits. →icebox refused on the operator's 2026-09-11 direction that no inbox bullet enters the
-  Icebox directly.
-  **Operator direction, 2026-09-11 (lead session, lead-relayed):** in `rankable-deferred-board`'s
-  unit set as a feature; its mechanism rides the lead-line cost tag's amendment, which spec authors.
-
 ## Technical Debt
 
 - **close-watch-waits-on-slowest-smoke-leg** [observed-by: gates] — a close push waits about 48
@@ -6185,5 +6095,8 @@
 - composition-verdict-unrecorded-at-unit-set-ruling
 - lead-cancel-running-work-unforbidden
 - icebox-standing-ineligibility-unrecordable
+- deferred-cost-class-opener-vocabulary
+- deferred-surface-tag-for-bundling
+- scope-ranking-blind-to-deferral-cost-and-impact
 
 ## Lessons Learned

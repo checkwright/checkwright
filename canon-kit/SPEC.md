@@ -70,7 +70,11 @@ queue tags whose syntax queue-kit defines:
   tag — all such work is design-pending by definition.
   The token names the *state*, not a promised artifact — a deferred **debt**
   entry promotes with the tag deleted rather than converted, and the tag has
-  to be true of that entry too.
+  to be true of that entry too. A promotion drops queue-kit's two deferred
+  board tags (queue-kit/SPEC.md §The tag algebra) along with the
+  design-pending tag: both are read off the deferred pool alone, and
+  where `check-deferred-board-tags` is registered its assertion B is the
+  checksum on the drop.
 - **Spec-ready** — the amendment exists; the entry sits in the feature
   section tagged `[spec: <ref>]`, eligible for selection.
 
@@ -272,6 +276,10 @@ supplies the checklist they invoke and the gate behind the promotion rule.
    promoting commit's own diff. No surface owns a demoted entry's position, so
    without this each demotion lands wherever the writer put it — and two batches
    demoting into one section in sequence reverse their prior relative order.
+   **Restore its `[cost:]` and `[surface:]` tags from the same diff**, where the
+   promotion dropped them: a deferred entry carries both (queue-kit/SPEC.md
+   §check-deferred-board-tags), and the diff that yields the position yields
+   their values too.
 5. Propagate removals (grep every spec for names the change retired), file
    discovered gaps as debt tasks, and commit the merge with the work.
 

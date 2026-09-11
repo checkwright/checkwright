@@ -51,7 +51,8 @@ queue-kit/SPEC.md §The tag algebra.
     §Methodology-maintenance rules).
   - **Backlog eviction** — the worklist is `bash gate-sdk/bin/run-gates.sh --emit
     queue-index --icebox-candidates`; disposition each row: evict (rewrite the lead line
-    as a self-contained sentence, delete the body, move it under `## Icebox`),
+    as a self-contained sentence dropping its `[cost:]` and `[surface:]` tags,
+    delete the body, move it under `## Icebox`),
     rule wontfix (the ruling lands as a one-line boundary note in the owning
     SPEC and the slug is **rewritten to a bare `- <slug>` line** under
     `## Done` — a relocated entry reds `check-task-conservation`), or keep it
