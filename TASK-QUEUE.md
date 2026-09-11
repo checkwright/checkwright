@@ -12,73 +12,6 @@
 
 ## New Features
 
-- **backgrounded-shell-child-run-record-unenforced** [spec: SPEC-command-classify.md] — the
-  launch-time liveness record is advised and never required.
-  recurrence: backgrounded-shell-child-run-record-unenforced 2026-08-28
-  **FIRST RECURRENCE, and it is a SHARPER SHAPE that narrows the design fork below.** Attested at
-  `installer-trial-lifecycle-repair`'s close: `stage-economics.sh` exceeded its foreground timeout
-  and **the harness backgrounded it**, leaving a live producer writing `.metric/` with no `.run`
-  record — and no session act could have written one, because the launch was never a session act.
-  Rule 15 fires on the *write* side of an explicit backgrounding and this path never reaches it,
-  so a detection shape reading the command text is not merely text-shaped-limited here, it is
-  structurally unreachable. **That half is split out — operator direction, 2026-09-11,
-  lead-relayed — into `harness-moved-background-task-unrecorded`**; this entry keeps the
-  explicit launch.
-  **The drain corrected this finding's premise.** It was filed claiming "prompts request, guards
-  enforce, and here only the prompt exists". guard-kit generic rule 15
-  (`guard_rule_background_no_record`) had landed the day before, on 2026-08-22, and does fire on
-  the write side — but what it calls is `guard_advise`, additional context at exit 0, never
-  `guard_block`. The gap is an advisory that is not a floor, not an absent rule.
-  **Attested this iteration:** the align stage session backgrounded two full gate-battery runs
-  and wrote no `.run` record for either, self-reporting the omission afterward. No harm resulted
-  — it awaited each completion notification before any git-writing command — but the omission was
-  invisible to every other actor: the lead, reading the scratch dir for liveness at that moment,
-  could not distinguish a finished producer from one that never registered. Generic rule 14's
-  block on index/worktree/ref-writing git commands is a no-op against a producer that never
-  announced itself.
-  **Why design-pending:** promoting the advisory to a block needs a detection shape a guard
-  can hold — it cannot read whether a command *will* write the record without inspecting its
-  text, the same text-shaped limit `wait-loop-exemption-blind-behind-a-script-name` records on
-  the exemption side.
-  **DISTINCT from `session-mechanic-grants-uncommitted`**, whose subject was an out-of-band
-  permission decision on the journal-append write path — a grant question, not this enforcement
-  one. That entry closed 2026-08-23 and its subject shipped as guard-kit/SPEC.md §The generic
-  ruleset rule 17, which is the adjacent surface; nothing of it is re-filed here.
-  **Cost while deferred:** rule 14's reach stays opt-in on the launching session's diligence, so
-  a commit can be taken beside a live producer that never announced itself.
-  Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
-  the filing and read `guard_advise` to establish that it never blocks.
-  **Unit set `guard-command-classification`, rule-15 floor — operator direction, 2026-09-11.**
-  **Spec 2026-09-11 designs the explicit-launch half** (a block, plus a grant that makes the record
-  cost nothing). The moved-on-timeout half is filed separately, per the split direction above.
-
-- **wait-loop-exemption-blind-behind-a-script-name** [spec: SPEC-command-classify.md] —
-  guard rule 15's wait-loop
-  exemption is command-text-shaped, so a wait loop inside a script draws the advisory anyway.
-  **Measured 2026-08-23 at build:** eight backgrounded arms of the wait-primitive probe's
-  waiter (delegation-kit/SPEC.md §bin/wait-probe) — whose body *is*
-  `until <cond>; do sleep 1; done`
-  — each drew the recording advisory, whose own closing sentence says a backgrounded wait loop
-  "owns no work a commit could corrupt and owes no record".
-  **Why:** the exemption is detected by the `do … done` span walk
-  `guard_rule_background_no_record` performs over the skeletonized command text; at `PreToolUse`
-  the script body is not readable, so the span walk cannot see it. That is the honest limit of a
-  text-shaped predicate rather than a bug — but the population is not marginal: a reusable wait
-  helper is exactly the shape a methodology that mandates in-turn waiting will grow, and every
-  invocation of one pays an advisory saying the opposite of what the rule means.
-  **Why design-pending:** the two candidate dispositions are uncosted and point opposite ways
-  — widen the exemption to a leading roster member whose name the consumer declares, which rule
-  15 explicitly refuses as consumer vocabulary; or accept the limit and say so in the rule's own
-  honest-limit paragraph so the next reader does not re-derive it.
-  **DISTINCT from `backgrounded-shell-child-run-record-unenforced`**: that entry is the false
-  negative — the advisory is not a floor — and this one the false positive, where the exemption
-  cannot see through a script name. One text-shaped predicate, two opposite failures, two fixes.
-  **Cost while deferred:** the advisory's credibility decays — a session that meets it wrongly
-  once learns to read past it, which is the erosion that makes an unenforced rule cheap.
-  Filed 2026-08-23 by build; drained at that iteration's close, which read the span walk to
-  confirm the limit is structural rather than a detection bug.
-  **Unit set `guard-command-classification`, rule-15 exemption — operator direction, 2026-09-11.**
-
 ## Technical Debt
 
 ## Deferred
@@ -5390,5 +5323,7 @@
 - ro-bins-write-option-bypass
 - grant-argument-bounding-mechanism
 - grant-path-traversal-exposure
+- backgrounded-shell-child-run-record-unenforced
+- wait-loop-exemption-blind-behind-a-script-name
 
 ## Lessons Learned

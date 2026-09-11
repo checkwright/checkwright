@@ -1099,7 +1099,7 @@ guard_rule_background_no_record() {
         [[ "$depth" -ge 1 ]] && return 0
     done <<<"$span"
     _guard_is_ro_background "$raw" "$s" && return 0
-    guard_advise "this call backgrounds a child and writes no liveness record — write one at the launch, in the same command: a single line 'pid=<n> run=<key>' in a '<key>.run' file under your gitignored scratch dir (e.g. ${GUARD_KIT_SCRATCH_DIRS[0]}/<key>.run), naming the PID you just backgrounded. The record buys two things nothing else does: it is what gives the tracked-tree-mutation rule its reach, so a commit taken while this child is still writing is refused rather than silently taken; and it is what lets the next arrival tell whether the producer is still writing instead of guessing at a process table. Delete it once the producer has exited, and not before — a record naming a dead pid blocks nothing, and one deleted early buys the harm back. A backgrounded wait loop and a backgrounded read-only pipeline own no work a commit could corrupt and owe no record."
+    guard_block "this call backgrounds a child and writes no liveness record — re-issue it with the record written at the launch, in this spelling: '<command> [<redirects>] & echo \"pid=\$! run=<key>\" > ${GUARD_KIT_SCRATCH_DIRS[0]}/<key>.run; wait; rm -f ${GUARD_KIT_SCRATCH_DIRS[0]}/<key>.run'. The 'wait' keeps the call alive until the child exits, so a backgrounded call's completion notification means the producer finished, and the trailing 'rm -f' retracts the record at exactly that moment. That spelling of an allowlisted command is granted outright, so complying costs no permission decision. The record buys two things nothing else does: it is what gives the tracked-tree-mutation rule its reach, so a commit taken while this child is still writing is refused rather than silently taken; and it is what lets the next arrival tell whether the producer is still writing instead of guessing at a process table. An inline wait loop and a read-only pipeline owe no record; a wait behind a script name cannot be read here and takes the record like any launch. If you genuinely need an unrecorded launch, run it yourself with !<command>."
 }
 
 guard_rule_truncate_scratch() {
@@ -1267,11 +1267,77 @@ _guard_is_wait_tail_segment() {
     _guard_is_ro_segment "$core"
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 19's arm (B), the recorded launch: true when the call is exactly the canonical launch-record-wait spelling and its launched command is granted, bounded and writes only gitignored or inert targets
+_guard_recorded_launch() {
+    local raw="$1" s live dollars launch ls lv words key path rmpath d tgt pair inner hit=0 rc=0 in_scratch=0
+    local -a inners=() targets=()
+    case "$raw" in *'run='*'.run'*) ;; *) return 1 ;; esac
+    local nl=$'\n'
+    local sep="[[:space:]]*[;$nl][[:space:]]*" word='[^[:space:];&|<>"'\''`$\\]+'
+    local tail="[[:space:]]+echo[[:space:]]+QUOTED[[:space:]]*>[[:space:]]*($word)${sep}wait[[:space:]]*(${sep}rm[[:space:]]+-f[[:space:]]+($word)[[:space:]]*)?;?[[:space:]]*\$"
+    local rre="^(.*[^&>])&${tail/QUOTED/\"pid=\\\$! run=([A-Za-z0-9._-]+)\"}"
+    local sre="^(.*[^&>])&${tail/QUOTED/DQ}"
+    [[ "$raw" =~ $rre ]] || return 1
+    launch="${BASH_REMATCH[1]}"
+    key="${BASH_REMATCH[2]}"
+    path="${BASH_REMATCH[3]}"
+    rmpath="${BASH_REMATCH[5]}"
+    [[ -z "$rmpath" || "$rmpath" == "$path" ]] || return 1
+    for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
+        [[ "$path" == "$d/$key.run" ]] && in_scratch=1
+    done
+    [[ "$in_scratch" == 1 ]] || return 1
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    grep -q "['\"]" <<<"$s" && return 1
+    [[ "$s" =~ $sre ]] || return 1
+    ls="$(guard_skeleton "$launch" sq dq hd)"
+    [[ "${BASH_REMATCH[1]}" == "$ls" && "${BASH_REMATCH[2]}" == "$path" ]] || return 1
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (B3): the one expansion admitted is statement 2's '$!', counted on the view where only a single-quoted '$' is inert
+    live="$(guard_skeleton "$raw" sq)"
+    dollars="${live//[^\$]/}"
+    [[ "${#dollars}" == 1 ]] || return 1
+    case "$ls" in *[\;\|$nl]* | *'<<'* | *'&&'*) return 1 ;; esac
+    _guard_shell_backgrounds "$ls" && return 1
+    grep -qE '>&[^0-9-]' <<<"$ls" && return 1
+    lv="$(_guard_dequoted_view "$launch" "$ls")" || return 1
+    words="$(_guard_unredirected_words "$ls" "$lv")" || return 1
+    words="${words//$'\x01'/ }"
+    words="${words//$'\x02'/$'\t'}"
+    words="${words//$'\x03'/;}"
+    words="${words//$'\x04'/|}"
+    words="${words//$'\x05'/&}"
+    mapfile -t inners < <(_guard_allow_inners)
+    for inner in ${inners[@]+"${inners[@]}"}; do
+        guard_allow_match "$words" "$inner" && { hit=1; break; }
+    done
+    [[ "$hit" == 1 ]] || return 1
+    _guard_slot_reach "$launch" predicate >/dev/null || rc=$?
+    [[ "$rc" == 1 ]] || return 1
+    _guard_rm_tracked_reach "$raw" >/dev/null && return 1
+    _guard_interpreter_reach "$raw" >/dev/null && return 1
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (B2), on rule 17's check-ignore predicate and inert carve-out; the record path takes the test too, so the grant never rests on a scratch dir being ignored
+    while IFS= read -r pair; do
+        [[ -z "$pair" ]] && continue
+        pair="${pair#"${pair%%[!0-9]*}"}"
+        tgt="${pair#>}"
+        tgt="${tgt#>}"
+        tgt="${tgt#"${tgt%%[![:space:]]*}"}"
+        case "$tgt" in /dev/null | '&'[0-9-]*) continue ;; esac
+        case "$tgt" in *SQ* | *DQ*) return 1 ;; esac
+        targets+=("$tgt")
+    done < <(_guard_redirect_pairs "$ls")
+    for tgt in ${targets[@]+"${targets[@]}"} "$path"; do
+        git check-ignore --quiet -- "$tgt" || return 1
+    done
+    return 0
+}
+
 guard_rule_bounded_wait() {
     local raw="$1" s view cond body tail seg
     # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out every auto-allow rule takes, adopted unchanged rather than reasoned about afresh
     grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
     case "$raw" in *'`'*) return 0 ;; esac
+    _guard_recorded_launch "$raw" && guard_allow "recorded launch of an allowlisted command (${GUARD_NAME:-guard} auto-allow)"
     s="$(guard_skeleton "$raw" sq dq hd)"
     grep -q "['\"]" <<<"$s" && return 0
     # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (0): a compound that launches something beside its wait is a producer, not a waiter, and that is rule 15's subject
@@ -1385,10 +1451,11 @@ guard_rule_git_rewrite() {
     fi
 }
 
-guard_rule_rm_tracked() {
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's test, a block for rule 22 and a predicate for rule 19's arm (B): prints the first refusal and returns 0, 1 when no segment force-removes with git rm or deletes a tracked path with rm
+_guard_rm_tracked_reach() {
     local raw="$1" s
-    grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
-    case "$raw" in *'`'*) return 0 ;; esac
+    grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 1
+    case "$raw" in *'`'*) return 1 ;; esac
     s="$(guard_skeleton "$raw" sq dq hd)"
     local seg lead arg v cmdseg w i=0
     local -a dsegs=() words=()
@@ -1407,7 +1474,8 @@ guard_rule_rm_tracked() {
                     --f | --fo | --for | --forc | --force | -[!-]*f* | -f*) ;;
                     *) continue ;;
                 esac
-                guard_block "don't force a 'git rm' with '$w' — the force flag is the one spelling of 'git rm' that destroys uncommitted work, silently when a committed grant matches it. Three exits: drop the flag, since 'git rm' refuses a file with local modifications and says so; use 'git rm --cached <path>' to untrack the file and keep it; or, where the loss is intended, run it yourself with !<command>."
+                printf '%s' "don't force a 'git rm' with '$w' — the force flag is the one spelling of 'git rm' that destroys uncommitted work, silently when a committed grant matches it. Three exits: drop the flag, since 'git rm' refuses a file with local modifications and says so; use 'git rm --cached <path>' to untrack the file and keep it; or, where the loss is intended, run it yourself with !<command>."
+                return 0
             done
             continue
         fi
@@ -1416,10 +1484,18 @@ guard_rule_rm_tracked() {
         for arg in ${seg#rm}; do
             case "$arg" in -* | '') continue ;; esac
             if git ls-files --error-unmatch -- "$arg" >/dev/null 2>&1; then
-                guard_block "don't delete the git-tracked path '$arg' with a bare 'rm' — use 'git rm -q $arg': it removes the file and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An 'rm' of an untracked or gitignored path is untouched. If you genuinely need rm, run it yourself with !<command>."
+                printf '%s' "don't delete the git-tracked path '$arg' with a bare 'rm' — use 'git rm -q $arg': it removes the file and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An 'rm' of an untracked or gitignored path is untouched. If you genuinely need rm, run it yourself with !<command>."
+                return 0
             fi
         done
     done < <(guard_split_compound "$s")
+    return 1
+}
+
+guard_rule_rm_tracked() {
+    local msg
+    msg="$(_guard_rm_tracked_reach "$1")" && guard_block "$msg"
+    return 0
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 23's interpreter classification: arm (a) is the bash/sh pair the runner already serves, arm (b) the GUARD_KIT_SCRIPT_INTERPRETERS roster, and a word on neither is not a script interpreter at all
@@ -1504,12 +1580,13 @@ _guard_block_interpreter() {
     guard_block "scratch execution is bash-only (guard-kit/SPEC.md §scratch-run) and '$word' is not bash: this call takes its program body from '$src' under a scratch dir, where no compensating control reaches it. Write the body as a shell script and run it through 'bash $runner <script> [args…]', which echoes the body as it executes; a script whose shebang names a non-bash interpreter is refused there too. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched, because the approver and the friction log both see it verbatim. If you genuinely need the direct run, run it yourself with !<command>."
 }
 
-guard_rule_script_interpreter() {
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's test, a block for rule 23 and a predicate for rule 19's arm (B): prints the first refusal as tab-separated arm, interpreter word and body source and returns 0, 1 when no interpreter takes its body from a scratch path
+_guard_interpreter_reach() {
     local raw="$1" s stmt seg word arm body src tok i j n
     local -a pipes=() ptoks=()
-    _guard_names_scratch "$raw" || return 0
+    _guard_names_scratch "$raw" || return 1
     # spec: guard-kit/SPEC.md §The generic ruleset — rule 23 declines on an expansion (rule 6 blocks those shapes already) but *not* on a backtick, which is the one body-source spelling rule 6 does not reach
-    grep -qE '\$\{|<\(|>\(|\$[A-Za-z_]' <<<"$raw" && return 0
+    grep -qE '\$\{|<\(|>\(|\$[A-Za-z_]' <<<"$raw" && return 1
     s="$(guard_skeleton "$raw" sq dq hd)"
     # spec: guard-kit/SPEC.md §The generic ruleset — rule 23 splits statements then pipes rather than calling guard_split_compound: what it needs is dataflow (which segment's stdout is the interpreter's stdin), and the shared splitter erases the separator that tells a pipe from a ';'
     while IFS= read -r stmt; do
@@ -1524,28 +1601,36 @@ guard_rule_script_interpreter() {
             case "$body" in
                 'file '*)
                     _guard_is_scratch_path "${body#file }" \
-                        && _guard_block_interpreter "$arm" "$word" "${body#file }"
+                        && { printf '%s\t%s\t%s' "$arm" "$word" "${body#file }"; return 0; }
                     ;;
                 stdin)
                     while read -r src; do
                         _guard_is_scratch_path "$src" \
-                            && _guard_block_interpreter "$arm" "$word" "$src"
+                            && { printf '%s\t%s\t%s' "$arm" "$word" "$src"; return 0; }
                     done < <(_guard_stdin_redirect "${pipes[i]}")
                     for ((j = 0; j < i; j++)); do
                         read -ra ptoks <<<"${pipes[j]}"
                         for tok in ${ptoks[@]+"${ptoks[@]}"}; do
                             _guard_is_scratch_path "$tok" \
-                                && _guard_block_interpreter "$arm" "$word" "$tok"
+                                && { printf '%s\t%s\t%s' "$arm" "$word" "$tok"; return 0; }
                         done
                     done
                     ;;
                 inline)
                     _guard_substitution_scratch "$raw" \
-                        && _guard_block_interpreter "$arm" "$word" "a command substitution"
+                        && { printf '%s\t%s\t%s' "$arm" "$word" "a command substitution"; return 0; }
                     ;;
             esac
         done
     done < <(sed -E 's/\|\||&&|;/\n/g' <<<"$s")
+    return 1
+}
+
+guard_rule_script_interpreter() {
+    local hit arm word src
+    hit="$(_guard_interpreter_reach "$1")" || return 0
+    IFS=$'\t' read -r arm word src <<<"$hit"
+    _guard_block_interpreter "$arm" "$word" "$src"
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 24's regex literal for one run of a committed pattern: every metacharacter bracketed or escaped, so no pattern text reaches the regex engine as syntax
@@ -1611,9 +1696,10 @@ _guard_slot_capture() {
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 24 on one segment, reading the caller's inners: the skeleton's words say which words are redirects, the dequoted words aligned one-for-one carry the content, the harness view strips the wrappers, and each matching committed pattern carrying a path slot is parsed leftmost-greedy; prints the reach and returns 0, 1 when clean, 2 when the segment cannot be decided
-_guard_slot_segment() {
-    local k n sv rv inner pat j c lit left right re g off len reach nstars
-    local -a sw=() dw=() kept=() caps=() slot=() token=() start=() rlit=() litlen=()
+# spec: guard-kit/SPEC.md §The generic ruleset — the words one segment keeps once its redirects are dropped, read by rule 24 and rule 19's arm (B): the skeleton's words say which words are redirects and the dequoted words aligned one for one carry the content; prints them space-joined, returns 1 when none remain and 2 when the two cannot be aligned or a heredoc opens
+_guard_unredirected_words() {
+    local k n
+    local -a sw=() dw=() kept=()
     read -ra sw <<<"$1"
     read -ra dw <<<"$2"
     [[ "${#sw[@]}" == "${#dw[@]}" ]] || return 2
@@ -1629,7 +1715,14 @@ _guard_slot_segment() {
         kept+=("${dw[k]}")
     done
     [[ "${#kept[@]}" -ge 1 ]] || return 1
-    sv="$(_guard_harness_view "${kept[*]}")"
+    printf '%s' "${kept[*]}"
+}
+
+_guard_slot_segment() {
+    local words sv rv inner pat j c lit left right re g off len reach nstars
+    local -a caps=() slot=() token=() start=() rlit=() litlen=()
+    words="$(_guard_unredirected_words "$1" "$2")" || return $?
+    sv="$(_guard_harness_view "$words")"
     sv="${sv//\\/}"
     rv="${sv//$'\x01'/ }"
     rv="${rv//$'\x02'/$'\t'}"

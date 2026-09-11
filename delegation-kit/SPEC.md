@@ -218,8 +218,14 @@ recorded**. The paragraph above rules that the record's write is structurally
 uncheckable — a session that skips the rule writes nothing, so there is no
 absence a check could have been told to expect — so a session that backgrounds
 without recording is invisible to rule 14 and to the entry preflight alike. It is
-now **advised at the launch**, and still not refused. This narrows the failure to
-that residue rather than closing it.
+now **refused at the launch**: guard-kit rule 15 blocks a backgrounding call that
+writes no record, and rule 19 grants the one canonical recorded launch of an
+allowlisted command, so the compliant spelling costs no permission decision. The
+write stays uncheckable after the fact; what the launch chokepoint reads is
+whether the call is going to write one. The residue left is a command the
+harness moves to the background on its timeout: it was a foreground call when
+the guard saw it, it writes no record, and no `PreToolUse` payload carries task
+state.
 
 **The record's *write* is now reached at the launch chokepoint, and the refusal
 that stood here is discharged.** The candidate was a rule firing on the
@@ -236,9 +242,9 @@ the two-arm rule the right build rather than a bigger one: **building only the
 `&` arm would have been worse than not building it** — every attested firing used
 the harness form, so a rule covering only the shell spelling would have blocked
 the form nobody uses and passed the one that fires, coverage in appearance and an
-assertion about nothing in fact. What ships is an **advisory**, not a block, on
-grounds guard-kit/SPEC.md §The generic ruleset states with the rule, and its
-re-opening condition is named there.
+assertion about nothing in fact. What ships is a **refusal** at the launch beside
+the grant that makes compliance cost nothing; guard-kit/SPEC.md §The generic
+ruleset states both, with rules 15 and 19, and states why the refusal is taken.
 
 **The guard interaction that produced it resolves without touching the guard.**
 The attested sequence: a session reached for the correct artifact wait, spelled
@@ -1657,8 +1663,10 @@ a reader must square. Read only this one, and the whole `runs` field would look
 like something already refused; it is not, and what makes it admissible is
 precisely that it mints no identity.
 
-**The residue is unchanged and is not closed here.** Two firings this hook cannot
-reach: an **unrecorded** launch (guard-kit rule 15's advisory residue), and the
+**The residue is not closed here.** Two firings this hook cannot reach: a launch
+the harness **moves to the background on its timeout**, which writes no record
+(guard-kit rule 15's stated residue, since that rule refuses every unrecorded
+launch a `PreToolUse` call can see), and the
 harness's own `background_tasks` view, which §What `background_tasks` carries
 established enumerates what was *launched* rather than what is *running* and so
 cannot substitute for the record set.
@@ -1851,8 +1859,8 @@ to tell one agent from another. §The turn-end liveness hook's
 decisive finding.** A producer detached from a foreground tool call, live
 throughout and carrying a `*.run` record the reader was concurrently reporting
 red, appeared in no firing. That is precisely the residue §The probe is
-asymmetric names as one of `live=no`'s three readings and guard-kit rule 15
-advises against without closing. So the blocking hook **cannot substitute** the
+asymmetric names as one of `live=no`'s three readings, unrecorded, and the class
+guard-kit rule 15 refuses at the launch. So the blocking hook **cannot substitute** the
 harness's view for the `*.run` record set: the two disagree exactly on the class
 the waiting rule exists for. Supplementing is the most it could do — and now that
 the hook refuses on the record set alone (§The turn-end liveness hook),
@@ -1877,8 +1885,9 @@ a live producer settles the unknown in that direction and the class stands.
 
 **No accumulation of `live=no` lines proves that it does.** `live=no` is equally
 consistent with *the harness deferred the stop*, *the session waited correctly*,
-and *the session recorded nothing* — the last being the residue guard-kit rule 15
-advises against and does not close. Passive accumulation therefore cannot return
+and *the session recorded nothing* — the last refused at an explicit launch by
+guard-kit rule 15 and still reachable through a call the harness moves to the
+background on its timeout. Passive accumulation therefore cannot return
 the finding that would dissolve the class, and anyone waiting for it waits forever
 and then reports the wrong thing.
 

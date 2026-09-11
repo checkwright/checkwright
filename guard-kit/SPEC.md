@@ -280,7 +280,7 @@ the machine-held disposition the right one instead of a concession: the shell
 caller set for the five cannot empty. For the first three the live callers are
 rules 2/4/7/8/12/14/15/17/18/19/20/22/24 and the read-compound carve-out of rules
 9/10; for `guard_allow_match` they are rule 20's silent-grant guard, rules 4 and
-7's rewrite grant test and rule 24's slot parse; for `_guard_harness_view` it is
+7's rewrite grant test, rule 19's recorded-launch grant and rule 24's slot parse; for `_guard_harness_view` it is
 rule 24's view — and all of them are functions in this same permanently-shell
 file. So the comparator
 does not retire either, and the arm it answers on is durable by construction.
@@ -956,15 +956,28 @@ that harness exists would be designing against no case.
     the session can follow; and rule 21 **advises** on `git commit --amend`, so
     a rewrite under a live producer would proceed with a re-verification steer
     instead of stopping.
-    **The bound this rule ships with is narrowed at the launch chokepoint, not
-    closed.** A session that backgrounds without recording is still invisible
-    here; rule 15 advises at the launch itself, which makes the omission visible
-    at the moment it is made without refusing it.
+    **The bound this rule ships with is closed at the launch chokepoint for every
+    launch a `PreToolUse` call can see.** A session that backgrounded without
+    recording would be invisible here, and rule 15 refuses that launch itself, so
+    the record this rule reads is owed at every explicit launch. What stays
+    invisible is a command the harness moves to the background on its timeout,
+    which is rule 15's stated residue.
 15. **Backgrounded launch that records no producer** — a backgrounding Bash call
     that neither writes a liveness record nor meets an exemption below is
-    **advised**: the message names the record, its grammar, its home, and the two
+    **blocked**. The message names the record, its grammar, its home, and the two
     things it buys — rule 14's reach, and the next arrival's ability to tell
-    whether the producer is still writing.
+    whether the producer is still writing — and it names one canonical spelling
+    that writes the record:
+
+    `<command> [<redirects>] & echo "pid=$! run=<key>" > <scratch-dir>/<key>.run; wait; rm -f <scratch-dir>/<key>.run`
+
+    The `wait` keeps a harness-backgrounded call alive until the child exits, so
+    the completion notification means the producer finished. The trailing
+    `rm -f` retracts the record at exactly that moment, delegation-kit's *delete
+    once exited, and not before* rule taken mechanically rather than remembered.
+    The corrective states that rule 19's arm (B) grants the spelling for an
+    allowlisted command, and closes on the two shapes that owe no record: an
+    inline wait loop and a read-only pipeline.
     **Two backgrounding forms, and both arms ship in one rule.** *Harness form* —
     `.tool_input.run_in_background` is `true`, read through `guard_input_field`
     (§The guard framework records the field and its shape). *Shell form* — the
@@ -979,45 +992,59 @@ that harness exists would be designing against no case.
     exist yet, so the only thing observable at this chokepoint is whether the
     launch is *going to* write one: the call writes a record when its skeleton
     carries a redirect whose target is a path under a `GUARD_KIT_SCRATCH_DIRS`
-    member ending in `.run`. That is the honest predicate, and it is part of why
-    the rule advises rather than refuses.
+    member ending in `.run`. That is the honest predicate, and the canonical
+    spelling's record write is shaped to meet it.
     **Three exemptions, each reusing machinery already in the lib.** (1) *The call
     writes a record* — the obligation is discharged inline. (2) *The call is a
     wait loop* — a backgrounded `until <cond>; do sleep N; done` is the sanctioned
     primitive rule 13 steers **toward**, a waiter rather than a producer, and
-    advising there would make the ruleset warn against the form its own corrective
+    refusing there would make the ruleset refuse the form its own corrective
     recommends; detected by the `do … done` span walk rule 13 already performs.
     With rule 19 in place this exemption is also what *lets* the grant be reached:
-    the two draw the same waiter/producer partition, this one to withhold an
-    advisory and rule 19 to withhold a grant, and a wait exempted here goes on to
+    the two draw the same waiter/producer partition, this one to withhold a
+    refusal and rule 19 to withhold a grant, and a wait exempted here goes on to
     meet rule 19's own clauses rather than falling through unexamined.
     (3) *The call is a read-only pipeline* — every segment leads with a
     `GUARD_KIT_RO_BINS` member invoked in none of its declared write and execute
     forms and every redirect target is `/dev/null` or an fd-dup, rule 18's own
     test with its declared-forms reader, since a child that writes nothing has
     nothing for a later commit to corrupt.
-    **Advises rather than blocks, and the refusal of a block is reasoned rather
-    than hedged.** The guard cannot tell a producer from a trivial child — a
-    backgrounded `printf` and a backgrounded gate battery are the same shape at
-    this chokepoint — so a block's false-fire population is every short-lived
-    backgrounded call in the tree, and this ruleset's established direction is to
-    bias toward passing. Rule 14 departs from that direction on an attested record
-    of failure; this rule has none to depart on: both attested firings produced
-    no orphan, so the harm is latent and a block is not warranted by a latent
-    harm when the reminder is what was missing. The harm already has a block — rule 14 refuses
-    the mutation — and this rule covers the **omission** that hides it, one step
-    upstream, where a second refusal buys a second stop rather than a second
-    catch. Both firings were a session that *knew* the rule and forgot it at the
-    call, which is exactly what an `additionalContext` note at the call fixes, at
-    the cost of one sentence rather than a stopped turn.
-    **The re-opening condition is named rather than left to judgment:** a firing
-    of the recording omission *after* this advisory ships is the attested record
-    rule 14's own departure required, and the block is then the next step.
-    **The honest limit.** An advisory does not refuse. A session determined to
-    background without recording still can, so rule 14's bound — *only for a
-    session that recorded* — is **narrowed rather than closed**. What closes at
-    this chokepoint is the silent case: the omission is now visible at the moment
-    it is made, to the only party that can fix it.
+    **Exemption (2) sees a wait loop only when it is spelled inline.** A wait
+    behind a script or binary name is invisible to the span walk, since at
+    `PreToolUse` the body is not readable, so it takes the record like any
+    launch. The record costs a waiter nothing it does not already carry: its only
+    effect is that rule 14 holds tracked-tree mutations for the waiter's
+    lifetime, which the producer it waits on already holds. A consumer-declared
+    roster of waiter names would lift the limit, and is refused on the seam
+    ground this rule's closing paragraph gives for a producer roster.
+    **Blocks, because the attested record a block required exists.** The guard
+    cannot tell a producer from a trivial child — a backgrounded `printf` and a
+    backgrounded gate battery are the same shape at this chokepoint — and this
+    ruleset's established direction is to bias toward passing, so the rule first
+    shipped as an advisory and named its own re-opening condition: a firing of
+    the recording omission after the advisory shipped, the attested record rule
+    14's own departure from that direction required. That firing is on record,
+    so the block is taken. The false-fire objection the advisory rested on is
+    answered by cost rather than denied. A launch of an allowlisted command
+    complies at no decision cost, through rule 19's arm (B). What remains is a
+    launch behind a name the exemptions cannot read and a launch of an ungranted
+    command, and each is one re-issue with the record, the second then meeting
+    the out-of-band decision it would have met anyway. The harm itself already
+    has a block, rule 14's refusal of the mutation, and this rule is what gives
+    that block its reach: rule 14 reads records, and an unrecorded launch leaves
+    it none.
+    **The honest limit.** The block closes the silent case at every launch a
+    `PreToolUse` call can see. It does not reach **a command the harness moves
+    to the background on its timeout**: that call was a foreground call at
+    `PreToolUse`, it writes no record, and no `PreToolUse` payload carries task
+    state. The one wired chokepoint holding any view of it is the turn end, whose
+    `SubagentStop` payload lists harness-launched shell tasks with a status.
+    delegation-kit rules that view a supplement to the record set and never a
+    substitute, because it misses a child detached with a shell `&`
+    (delegation-kit/SPEC.md §What `background_tasks` carries), and refusing a
+    turn end on a running harness task would widen that hook's refusal set,
+    which is not this rule's to take. The moved-on-timeout launch is therefore
+    this rule's stated residue.
     Conservative in this ruleset's established directions: an expansion or
     substitution anywhere in the command declines outright (rule 6 blocks those
     shapes already), an unbalanced `do`/`done` declines, and an absent
@@ -1028,10 +1055,12 @@ that harness exists would be designing against no case.
     auto-allow rules**, and the placement is required rather than tidy: a
     backgrounded read-only pipeline is granted outright by rule 18, so a rule
     sitting after the auto-allows would never run on the shapes it exists for.
+    Rule 19's arm (B) grants only what this rule's exemption (1) has already let
+    through, so a recorded launch meets this rule first and passes it.
     **No knob is minted, and that is a seam decision rather than an economy**: a
     producer roster — *which backgrounded commands are worth a record* — is
     exactly the consumer vocabulary the provenance seam keeps out of a kit, so the
-    rule recognizes shapes and advises, and a consumer wanting a narrower
+    rule recognizes shapes and blocks, and a consumer wanting a narrower
     population narrows the two knobs that already exist.
 16. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
     defeats the permission matcher, so it is always decided out of band. Granted
@@ -1260,15 +1289,17 @@ that harness exists would be designing against no case.
       exactly as it behaves without it. A grant that depends on a settings read
       must never turn a missing settings file into a grant, and declining is the
       only direction that cannot.
-19. **Auto-allow a bounded in-turn wait** — the mandated in-turn wait
-    (delegation-kit/SPEC.md §Operative residency) is a condition loop, so it is
-    decorated by construction and no `Bash(…)` allow entry can match it: a glob
-    matches a command word, and this form's distinguishing text is a loop
-    *condition*. Granted silently when **every** clause below holds, falling
-    through untouched otherwise. Every clause is a safety argument, because
+19. **Auto-allow a sanctioned wait** — two arms, each granted silently when
+    **every** one of its clauses holds, the call falling through untouched
+    otherwise. Every clause is a safety argument, because
     `permissionDecision: allow` blesses the *whole call* — so the rule bounds the
     command rather than merely recognizing the shape it keys on, which is rule
     17's stated discipline and this rule inherits it.
+    **Arm (A), the bounded in-turn wait.** The mandated in-turn wait
+    (delegation-kit/SPEC.md §Operative residency) is a condition loop, so it is
+    decorated by construction and no `Bash(…)` allow entry can match it: a glob
+    matches a command word, and this form's distinguishing text is a loop
+    *condition*.
     - **(0) No statement-ending `&` anywhere in the command.** A backgrounding
       launch is rule 15's subject, and a compound that *launches* something beside
       its wait is a producer, not a waiter. This clause refuses the attested
@@ -1277,11 +1308,12 @@ that harness exists would be designing against no case.
       not being an ordering accident. It is **indifferent to the harness's
       background flag**, which backgrounds the whole call without changing its
       text: a backgrounded wait is the mandated form, and rule 15 already exempts
-      it from the record advisory on the ground that a waiter is not a producer.
+      it from the record requirement on the ground that a waiter is not a producer.
       The asymmetry is deliberate and is the honest reading of what each signal
       says — the flag says *this call runs detached*, while a shell `&` says
       *this command text starts something and then does something else*, and only
-      the second is a launch this grant must not bless.
+      the second is a launch this arm must not bless; arm (B) grants one only in
+      its recorded spelling.
     - **(a) The first statement is a `while`/`until` loop with exactly one
       balanced `do … done` span**, detected with `_guard_loop_span` — the
       ruleset's single shell-keyword walk, already shared by rules 13 and 15. A
@@ -1344,19 +1376,74 @@ that harness exists would be designing against no case.
     `_guard_loop_span`, which is command-text-shaped, so a wait loop inside a
     script body is invisible to it exactly as it is to rule 15 — which makes that
     blindness a property of the shared walk rather than a rule-15 defect, and the
-    two are siblings on it.
+    two are siblings on it. Such a waiter's launch meets rule 15's block, and
+    spelled with its record it meets arm (B)'s grant.
+
+    **Arm (B), the recorded launch.** Rule 15's corrective names one canonical
+    spelling, and this arm grants it when **every** clause below holds:
+    - **(B0) The shape.** The call is exactly three or four statements: a launch
+      ending in a statement-ending `&`; `echo "pid=$! run=<key>" > <dir>/<key>.run`,
+      with `<dir>` a `GUARD_KIT_SCRATCH_DIRS` member, `<key>` matching
+      `[A-Za-z0-9._-]+`, and the filename key equal to the `run=` key; `wait`;
+      and optionally `rm -f` of that same record path. The statements after the
+      launch are separated by `;` or a newline. The shape is read on the raw
+      command and again on the `sq dq hd` skeleton, so the `&` is live and the
+      record's argument is a real double-quoted span, and the launch's own
+      skeleton must equal the skeleton's launch, so no quote is open across the
+      `&`.
+    - **(B1) The launched command is granted and bounded.** The launch carries
+      no pipe, statement separator, heredoc or second backgrounding `&`, and no
+      fd-dup onto a named file (`>&<file>`), which is a write the redirect scan
+      does not read. Its words, read as rule 24 reads them — the skeleton saying
+      which words are redirects and the dequoted words carrying the content —
+      match a committed allow pattern through `guard_allow_match` on
+      `_guard_allow_inners`' fail-open read, so a failed read grants nothing.
+      The launch passes rule 24's test as a predicate, and the whole call passes
+      rule 22's and rule 23's tests as predicates: each rule's finder answers
+      without blocking, so arm (B) grants nothing a later rule would refuse.
+    - **(B2) The call writes only gitignored or inert targets**, on rule 17's
+      exact `git check-ignore --quiet --` predicate and its inert-target
+      carve-out. The record path takes the test too, so the grant never rests on
+      a scratch dir being ignored.
+    - **(B3) Conservative decline** on a command or process substitution or a
+      backtick anywhere, or on any expansion other than the single `$!` inside
+      statement 2's double-quoted argument, counted on the view where only a
+      single-quoted `$` is inert.
+
+    **Why the grant is owed.** The record's builtin spelling carries `$!`. Rule
+    6's expansion match does not reach that special parameter, so the call
+    passes the guard, but the matcher refuses expansions: without this arm, rule
+    15's block would convert every compliant launch into an out-of-band
+    decision, and a floor whose corrective always costs a decision is the one
+    sessions learn to skip.
+    **The grant adds no capability.** The launched command is one the allowlist
+    already grants. The record write is the gitignored-target write rule 17
+    grants with an emitter it already rosters. `wait` is a builtin, and the
+    `rm -f` retracts the one file the same call created.
+    **delegation-kit's refusal of a tool to write the record stands**
+    (delegation-kit/SPEC.md §The delegation model). The write stays a shell
+    builtin, as that refusal requires. What changes is that the builtin's one
+    spelling is named in rule 15's corrective and costs no decision, which
+    narrows the refusal's stated cost — a hand-written record can be malformed —
+    without reversing it.
+    **The harness flag changes nothing.** A harness-backgrounded canonical
+    launch carries the same text, and its `wait` is what keeps the call alive
+    until the child exits.
 
     **Placed at the tail of the auto-allow band — after rule 18 and before rule
     20 — and each constraint was checked against the decision table rather than
     assumed.** It must sit **after rule 12** (the `pgrep`/`pkill` self-match
     block), or the attested launch-plus-poll row flips from `block` to `allow`
-    and a never-exiting waiter is blessed; clause (0) refuses that row
+    and a never-exiting waiter is blessed; arm (A)'s clause (0) refuses that row
     independently, and both holding is the intent. **After rules 8, 9, 10 and
     13**, each of which states in its own section that it is placed before every
     auto-allow rule. **After rule 15**, so a launch that owes a liveness record
-    still meets the advisory before anything grants it — the same partition rule
-    17's clause (0) draws. **Before rule 20**, which would otherwise block a
-    decorated loop first. Placement at the tail of the band rather than at its
+    meets the block before anything grants it — the same partition rule 17's
+    clause (0) draws — and arm (B) grants only what rule 15's exemption (1) has
+    already let through. **Before rule 20**, which would otherwise block a
+    decorated loop first; rule 20 does not block the canonical recorded launch,
+    whose lead carries the launch's `&` and its record, but arm (B) sits ahead of
+    it regardless. Placement at the tail of the band rather than at its
     head is also the cheap choice: it renumbers the rules below it rather than
     every rule in the band and every rule after it.
 20. **Decorated allowlisted command** — the leading command exactly matches a
@@ -1579,8 +1666,8 @@ that harness exists would be designing against no case.
     harness-enforced backstop an operator may add independently.
     **Placed immediately before fall-through logging.** No auto-allow above it
     grants a rule-24 subject: rule 16 truncates only, rule 17's emitter bound
-    refuses `rm` and `bash`, rule 18's roster carries neither, and rule 19's loop
-    body is `sleep` only. Rules 4 and 7 run ahead of it and each emit a rewrite
+    refuses `rm` and `bash`, rule 18's roster carries neither, rule 19's arm (A)
+    body is `sleep` only, and its arm (B) applies this rule's test as a predicate. Rules 4 and 7 run ahead of it and each emit a rewrite
     whose envelope carries an allow, so both apply this rule's test as a
     predicate before that allow attaches, and no rewrite grants a rule-24 subject
     either. **Taken as a predicate the test fails closed**: it reads a segment
@@ -2546,12 +2633,13 @@ keeping its specified behavior:
   splits on tracked versus not), a `.tmp/dead-producer.run` carrying a dead PID
   beside a `.tmp/notes.txt` that is not a record (so every mutating-git row
   asserts rule 14's decline arm rather than the vacuous absence of any record),
-  and a `.claude/settings.json` carrying the eight-entry allowlist — three bare
+  and a `.claude/settings.json` carrying the nine-entry allowlist — three bare
   or `:*` entries for rules 18 and 20, rule 4's two script globs so its rewrite
   rows keep asserting the grant, a scratch `rm -rf .tmp/*` slot grant and a
-  `*/checks/check-*.sh` runner glob for rule 24's rows to bound, and a
+  `*/checks/check-*.sh` runner glob for rule 24's rows to bound, a
   `find .tmp/* -exec cat {} +` pattern for rule 7's granted and unbounded
-  placeholder rows. Rule 18's allowlisted-lead widening and rule 20 read the
+  placeholder rows, and a `git rm -q *` grant, so rule 19's arm (B) has a
+  granted forced `git rm` for its rule-22 predicate row to refuse. Rule 18's allowlisted-lead widening and rule 20 read the
   same file, so their rows are re-derived whenever it grows. A sandbox the
   arm could not build is exit 2, the harness-precondition code — the shell form
   would have cascaded it into verdict mismatches naming the wrong cause, which is
@@ -2652,16 +2740,19 @@ precedent to rule 15's harness arm, and it is forced rather than tidy: the
 input is a **tool parameter**, so that arm cannot be written there at all and
 would otherwise ship untested — the coverage-in-appearance this rule's own design
 refuses. The runner feeds a Bash-shaped payload carrying the flag. Rows, each a
-firing/non-firing pair: harness-form background with no record → advise;
+firing/non-firing pair: harness-form background with no record → block;
 harness-form background writing a `.run` record → fallthrough; harness-form
-background of a wait loop → fallthrough; harness-form background of a read-only
-pipeline → the auto-allow it already earns; and a foreground call carrying
+background of a wait loop → the grant rule 19's arm (A) earns it; harness-form
+background of a read-only pipeline → the auto-allow it already earns; a
+harness-form canonical recorded launch of an allowlisted command → rule 19's arm
+(B) grant, the flag changing nothing in its text; and a foreground call carrying
 neither → fallthrough, which is what proves the rule inert off the backgrounding
 path. The shell-`&` arm *is* a command, so its firing and non-firing rows stay in
-`cases.tsv`. Rule 15 emits an **advise**, so it converts a `fallthrough` row into
-an `advise` row wherever it fires: every existing row whose command carries a
-trailing `&` has its expected column re-derived under the non-monotone rule
-above, never assumed still correct.
+`cases.tsv`, beside arm (B)'s grant rows and its refusing rows. Rule 15 emits a
+**block**, so it converts a `fallthrough` row into a `block` row wherever it
+fires: every existing row whose command carries a trailing `&` has its expected
+column re-derived under the non-monotone rule above, never assumed still
+correct.
 
 `smoke/install.sh` copies the templates into the scratch consumer (guard
 and config into the gates dir, hook wiring into `.claude/settings.json`,

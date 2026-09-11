@@ -174,15 +174,15 @@ fallthrough	git stash
 fallthrough	git -C . commit -m done
 fallthrough	git rev-parse HEAD
 
-# rule 15 — a backgrounded launch that records no producer is advised. The
+# rule 15 — a backgrounded launch that records no producer is blocked. The
 #           shell `&` arm lives here because it *is* command text; the harness
 #           flag is tool input and cannot be written in this grammar, so that
 #           arm lives in background-cases.tsv.
-advise	bash worker.sh &
+block	bash worker.sh &
 fallthrough	bash worker.sh & printf 'pid=1 run=worker\n' > .tmp/worker.run
 # exemption (3) reads rule 18's declared forms: a backgrounded pipeline writing
 # through a member's own option owns work a commit could corrupt
-advise	grep -rn foo src | sort -o out.txt &
+block	grep -rn foo src | sort -o out.txt &
 fallthrough	grep -rn foo src | head &
 
 # rule 16 — `: > file` truncation auto-allowed iff every target is gitignored
@@ -266,11 +266,12 @@ allow	rg foo src | head
 fallthrough	find . -type f | xargs sort -o out.txt
 fallthrough	find . -name '*.txt' | xargs uniq
 
-# rule 19 — bounded in-turn wait auto-allowed. The grant rows are the two of the
-#           four measured calls this rule is shaped to cover, both compounds; the
-#           refusing rows are one per clause, so no clause can be deleted without
-#           a red. The two named non-targets (`pgrep` and `gh` as conditions) are
-#           clause (c)'s refusals and are declined on purpose.
+# rule 19 — a sanctioned wait auto-allowed. Arm (A), the bounded in-turn wait: the
+#           grant rows are the two of the four measured calls it is shaped to
+#           cover, both compounds; the refusing rows are one per clause, so no
+#           clause can be deleted without a red. The two named non-targets (`pgrep`
+#           and `gh` as conditions) are clause (c)'s refusals and are declined on
+#           purpose. Arm (B), the recorded launch, follows arm (A)'s rows.
 allow	until grep -q DONE .tmp/smoke.log; do sleep 20; done; echo waited
 allow	until grep -q DONE .tmp/smoke.log 2>/dev/null; do sleep 30; done; grep -n ERR .tmp/smoke.log
 # the literal-PID liveness wait rule 13's corrective now spells, in both
@@ -302,6 +303,28 @@ fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done > out.txt
 # condition or a tail writing through a roster member's own option is refused
 fallthrough	while sort -c -o out.txt data.txt; do sleep 5; done
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; sort -o out.txt .tmp/smoke.log
+# arm (B) — the launch-record-wait spelling rule 15's corrective names, granted for an
+# allowlisted, bounded launch writing only gitignored targets, with and without the
+# trailing retraction
+allow	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
+allow	scripts/check-foo.sh --all > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
+# (B0) the shape: a record whose filename does not carry its key, and no wait
+fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/bar.run; wait
+fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run
+# (B1) a launch the allowlist does not grant reaches the harness's own decision
+fallthrough	bash worker.sh > .tmp/worker.log 2>&1 & echo "pid=$! run=worker" > .tmp/worker.run; wait; rm -f .tmp/worker.run
+# (B1) granted launches the later rules refuse, each taken as a predicate: a runner
+# glob reached past its slot (rule 24, which cannot decide the whole call and
+# declines), a scratch script body (rule 23) and a forced git rm (rule 22), the last
+# two then blocked at their own rule
+fallthrough	bash ../../evil/checks/check-x.sh > .tmp/x.log 2>&1 & echo "pid=$! run=x" > .tmp/x.run; wait
+block	bash .tmp/checks/check-x.sh > .tmp/x.log 2>&1 & echo "pid=$! run=x" > .tmp/x.run; wait; rm -f .tmp/x.run
+block	git rm -q -f tracked.md & echo "pid=$! run=x" > .tmp/x.run; wait
+# (B2) a launch writing a tracked target
+fallthrough	bash scripts/check-foo.sh > tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
+# (B3) an expansion besides the record's own; rule 24's predicate declines a live '$'
+# in the launch too, so this row pins the verdict rather than the clause alone
+fallthrough	scripts/check-foo.sh $1 > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
 
 # rule 20 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
