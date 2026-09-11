@@ -156,3 +156,4 @@
 | host-resolution-fail-open-cut | sc sp a b v c | 5f/6d | 6 · ≤0d | 20s clean | 111 |
 | deferred-pool-triage | sc · · b v c | 0f/0d | 0 | 20s clean | 111 |
 | rankable-deferred-board | sc sp a b v c | 7f/1d | 4 · ≤0d | 20s clean | 112 |
+| guard-command-classification | sc sp a b v c | 7f/0d | 1 · ≤0d | 20s clean | 112 |

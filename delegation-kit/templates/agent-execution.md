@@ -84,6 +84,11 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   agent writes, scratch reset sweeps** bullet below sends a journal, repo-local
   gitignored scratch in the main checkout, on that bullet's stated survivability
   grounds — widened here from the journal to any artifact a session waits on.
+  **Launch and record in one call, in the spelling the guard grants**: guard-kit's
+  rule *Backgrounded launch that records no producer* (guard-kit/SPEC.md §The
+  generic ruleset) owns it, along with the shapes that owe no record. It refuses
+  any other launch that writes no record, and a record written in any other
+  spelling costs a permission decision on its `$!`.
   That record *is* the wait target: loop on its PID's liveness —
   `while kill -0 "$pid" 2>/dev/null; do sleep N; done`, on the polarity rule above
   — and the loop ends when the PID stops answering. Write it at the launch, not after, and leave it
