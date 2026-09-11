@@ -474,30 +474,34 @@ pub fn run_merged_in(
     Ok(Merged { status, output })
 }
 
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the bounded call's failure is typed:
+// `Spawn` is a child that never started, carrying the operating system's own rendering, and `Wait`
+// is a child that started and could not be waited on
+pub enum BoundedError {
+    Spawn(String),
+    Wait,
+}
+
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — `run` under a wall-clock bound, the
 // one shape `run` cannot carry: a hook member calling a consumer-named reader must not hang a turn
 // on it. `Ok(None)` is the bound expiring, `timeout(1)`'s 124 without the optional program.
-pub fn run_bounded(program: &str, args: &[&str], secs: u64) -> Result<Option<i32>, String> {
+pub fn run_bounded(program: &str, args: &[&str], secs: u64) -> Result<Option<i32>, BoundedError> {
     #[cfg(test)]
     recorder::note(program);
-    let mut child = Command::new(spawn_target(program)?.as_ref())
+    let target = spawn_target(program).map_err(BoundedError::Spawn)?;
+    let mut child = Command::new(target.as_ref())
         .args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
         .spawn()
-        .map_err(|e| {
-            format!(
-                "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-                program, e
-            )
-        })?;
+        .map_err(|e| BoundedError::Spawn(e.to_string()))?;
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(secs);
     loop {
         match child.try_wait() {
             Ok(Some(status)) => return Ok(Some(exit_code(&status))),
             Ok(None) => {}
-            Err(e) => return Err(format!("cannot wait for {}: {}", program, e)),
+            Err(_) => return Err(BoundedError::Wait),
         }
         if std::time::Instant::now() >= deadline {
             let _ = child.kill();

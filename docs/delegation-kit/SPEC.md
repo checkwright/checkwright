@@ -999,7 +999,7 @@ future harness revision reshaping the event is drift no gate here can
 self-detect, and only re-reading the contract catches it. Recorded so the next
 reader does not mistake a fetched fact for a measured one.
 
-**The predicate is the reader's exit class, and it refuses on three of six arms.**
+**The predicate is the reader's exit class, and it refuses on three of seven arms.**
 Reader **exit 2 is read through two names**, chosen by the hook's own `*.run`
 count: `corrupt` over a non-empty record set, `unresolved` over an empty one.
 The count picks the **name**, never the decision — both refuse.
@@ -1010,8 +1010,19 @@ The count picks the **name**, never the decision — both refuse.
 | `red` | a live producer under a launch record | log, **exit 2** — the whole subject |
 | `corrupt` | reader exit 2 over a non-empty record set: a record that does not parse | log, **exit 2** — see below |
 | `unresolved` | reader exit 2 over an **empty** record set: a reader that could not run at all | log, **exit 2 once** — allows when `stop_hook_active` is true; see below |
-| `unavailable` | no reading at all: an **override** that resolves to nothing spawnable — the default always resolves | log, exit 0 |
+| `unavailable` | no reader resolved: an **override** that fails the resolution predicate — the default always resolves | log, exit 0 |
+| `unstarted` | a resolved reader the operating system would not start | log, exit 0 |
 | `error` | a configured reader that ran and did not answer | log, exit 0 |
+
+**`unstarted` is a reader whose argv resolved and whose spawn the operating system
+refused** — the default always resolves, and an override passed the
+executable-bit predicate — so `ETXTBSY`, `ENOENT` from an absent shebang
+interpreter, `EACCES`, `ENOEXEC`, `ENOMEM` or `EAGAIN`. **`unavailable` narrows to
+its name beside it.** The two are two cases with two fixes, a knob to correct
+and a reader or host that refused to start, and one name over both was a fail-open
+with no signature: a reader that cannot start was indistinguishable from one
+never configured. A distinct name rather than a wider `unavailable` row rests on
+the ground the exit-2 split already stands on — the fix is a different one.
 
 **`corrupt` refuses, and it diverges from guard-kit rule 14 on purpose.** Rule 14
 — tracked-tree mutation under a live producer — rules that a record which does not
@@ -1106,21 +1117,31 @@ vacuous — exit 2 genuinely occurs at zero records — but it still decides no
 refusal, only which of two refusing names the reading gets. Record count decides
 no refusal anywhere in this hook, on either arm.
 
-**`unavailable` and `error` allow on the degradation posture, not on leniency.**
-Both mean the hook obtained no reading — an **override** resolved to nothing
-spawnable, or a reader that ran failed to answer. Refusing there would refuse
-every turn end behind a mis-set knob or a broken reader, in a kit that ships this
-hook opt-in and inert. **This is
+**`unavailable`, `unstarted` and `error` allow on the degradation posture, not on
+leniency.** All three mean the hook obtained no reading — an **override** failed
+the resolution predicate, a resolved reader the operating system would not start,
+or a reader that ran failed to answer. Refusing there would refuse every turn end
+behind a mis-set knob, a refusing host or a broken reader, in a kit that ships
+this hook opt-in and inert. **This is
 where `unresolved` parts from them and the boundary is the reader's own contract,
-not a preference:** `unavailable` is a reader that never ran and `error` is one
-whose answer this hook does not map, while `unresolved` is a configured, readable
-reader that **ran and returned its own fail-closed verdict**. Taking that verdict
-is not refusing on an absent reading; second-guessing it would be the fail-open
-the reader's exit 2 exists against. It is
+not a preference:** `unavailable` and `unstarted` are a reader that never ran and
+`error` is one whose answer this hook does not map, while `unresolved` is a
+configured, readable reader that **ran and returned its own fail-closed verdict**.
+Taking that verdict is not refusing on an absent reading; second-guessing it would
+be the fail-open the reader's exit 2 exists against. It is
 guard-kit/SPEC.md §The guard framework's fail-open-but-loud posture for a
 deny-guard whose rule turns on an external reader, the same posture §The
-delegation model's dispatch guard already takes, and the `verdict=error` value in
-the grammar below is what supplies the "loud".
+delegation model's dispatch guard already takes, and the `verdict=error`,
+`verdict=unstarted` and `spawn` values in the grammar below are what supply the
+"loud".
+
+**`unstarted` keeps the fail-open and makes it countable; it does not refuse, not
+even once.** Refusing once under the `stop_hook_active` bound `unresolved` takes
+would close the fail-open, but only by widening a refusal set this section holds
+as separately authorized, and a spawn the host refused is no reading at all — the
+class of `unavailable` and `error`, not of the reader's own fail-closed verdict.
+What the arm buys is a degradation that is not silent: `unstarted` and its `spawn`
+value are a distinct line the close-stage triage counts.
 
 **An unreadable payload does not disable enforcement, and this is the one place
 this hook is strictly better off than its `PreToolUse` siblings.** The verdict
@@ -1140,7 +1161,12 @@ there because a reader that hung would have refused the turn end by accident —
 the blocking variant arrived at sideways. Now that the hook *is* the blocking
 variant, the bound is what keeps a hung **reader** from being read as a live
 **producer**: a timeout is an unmapped exit code, so it is `error` and it allows,
-and a refusal is only ever the reader's own verdict.
+and a refusal is only ever the reader's own verdict. **The bounded call's error is
+typed, so a child that never started and one that did are two cases, never one
+string.** A **spawn** failure — the spawn funnel refusing, or the operating system
+refusing the spawn — carries the operating system's own error and reads
+`unstarted`. A **wait** failure on a child that did start reads `error`: a reader
+that ran and did not answer, which is `error`'s definition word for word.
 
 **The liveness reading reuses `check-producer-liveness` and copies no grammar.**
 §The delegation model rules that the reading affordance which would genuinely
@@ -1207,7 +1233,7 @@ interpreter the kit chose for it.
 rather than caution.** `check-producer-liveness` is compiled into this binary and
 the gate table would hand back the function, so an in-process call is available and
 looks free. It is refused because this hook's whole predicate is *the reader's exit
-class* — the six-arm table above — and that table is written over a **child
+class* — the seven-arm table above — and that table is written over a **child
 process's** status, with "no reading at all" as an arm no return value can
 express. An in-process call yields an integer and can never yield that arm, so the
 default and an override would travel two code paths with two arm sets, and
@@ -1215,14 +1241,15 @@ default and an override would travel two code paths with two arm sets, and
 an override. One code path with two values of one argv keeps every row of the
 table true of both, which is the property the table's readers — the close-stage
 triage below and this hook's own refusal text — depend on. For the same reason a
-spawn that never started reads `unavailable` and not `error`: `error` names a
+spawn that never started reads `unstarted` and not `error`: `error` names a
 reader that **ran** and returned an unmapped code, so reporting it over a failed
 spawn would name a reading that was never taken.
 
 **`unavailable` is not retired by the default, and where it survives is stated**,
 because the obvious reading of a working default is that no firing can lack a
-reading again. An override naming a path that is absent, carries no executable bit,
-or cannot be spawned still yields no reading, so the arm keeps its producer. What
+reading again. An override naming a path that is absent or carries no executable
+bit still resolves to no reader, so the arm keeps its producer; one that resolves
+and then cannot be spawned reads `unstarted` instead. What
 it loses is the *unset knob* as a routine producer — precisely the fake-default
 degradation this section records as the reason the knob had no default at all.
 
@@ -1287,7 +1314,7 @@ only by re-dispatching fresh.
 timestamp:
 
 ```
-<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|unresolved|error|unavailable>  records=<n>  runs=<comma-separated run keys|->  decision=<refuse|allow>  keys=<comma-separated top-level payload keys>
+<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|unresolved|error|unavailable|unstarted>  spawn=<the spawn error, one token|->  records=<n>  runs=<comma-separated run keys|->  decision=<refuse|allow>  keys=<comma-separated top-level payload keys>
 ```
 
 Every field has a reader at a named transition, and no field is carried that this
@@ -1342,6 +1369,16 @@ list does not name one for:
   and `unresolved` at `records=0`, so a log line's `records` column is the only
   place a later reader can see which of the two it was, and the two want
   different fixes.
+- **`spawn`** — the operating system's own rendering of a spawn error, sanitized
+  to one token by the record's whitespace rule (for example
+  `Text_file_busy_(os_error_26)`), populated on `verdict=unstarted` alone and `-`
+  on every other firing, so it is never filled at a transition with no reader for
+  it. No errno table is kept: the value is derived and never transcribed. Its
+  named readers are the **close-stage triage** at the close-surface drain, asking
+  whether a firing's failure was **transient** (`ETXTBSY`, `EAGAIN`, `ENOMEM`: the
+  host, and a re-run clears it) or **persistent** (`ENOENT`, `EACCES`, `ENOEXEC`:
+  the override needs fixing), and this member's own case assertions, which print
+  the firing's line at a red so it names its cause.
 - **`runs`** — the **record set the decision was taken over**: the run dir's
   `*.run` basenames with the suffix stripped, sorted and comma-joined, `-` over an
   empty set. It is the same listing `records` is the length of, kept rather than
@@ -1378,7 +1415,8 @@ list does not name one for:
   paragraph below, which this field answers in part, and §Attribution was weighed
   and is not available, which it leaves standing.
 - **`verdict=error`** — a **configured** reader that ran and did not answer: an
-  unmapped exit code, or the `timeout` bound firing. Its named reader is the
+  unmapped exit code, the `timeout` bound firing, or a wait that failed on a child
+  that did start. Its named reader is the
   close-stage triage below, at the same transition, distinguishing *this tree's
   override resolves to nothing* (`unavailable`) from *this tree's enforcement is
   broken* (`error`). Before enforcement both meant "no reading" and the
@@ -1392,6 +1430,13 @@ list does not name one for:
   close-stage triage at the same transition. Unlike the other two it also
   **refuses**, so the triage reads it for a second question the others never
   raise: whether a refusal was diagnostic rather than about a real producer.
+- **`verdict=unstarted`** — the **fourth** state that triage tells apart: a
+  reader that resolved and that the operating system would not start. Its named
+  reader is the same close-stage triage at the same transition, asking whether
+  the reader is mis-configured (`unavailable`) or refused to start (`unstarted`),
+  with `spawn` beside it for whether the refusal was transient or persistent.
+  Without it a failed spawn would log `unavailable`, and a reader that could not
+  start would read as one never configured.
 - **`decision`** — `refuse` exactly when the hook exits 2, `allow` otherwise, on
   every firing including the allowing ones. Its named reader is the **close-stage
   triage** at the close-surface drain, where the log is read and cleared, and it
@@ -1456,7 +1501,8 @@ break. `keys` staying last is what keeps that true in practice, because a field
 added before it lands between two keyed fields and a field added after it would
 sit past the one free-ish value. **The openness was then spent as designed —
 `runs` landed as one table edit and moved no reader** — which is the contract
-working rather than a claim about it.
+working rather than a claim about it. `spawn` landed the same way, immediately
+after `verdict`, the one value it qualifies.
 
 **That open question is now answered in part, and the part that is closed is
 closed by a finding rather than by a choice.** Of its three candidates:
@@ -1823,6 +1869,30 @@ itself**: the unset knob resolving to the running executable and the gate name, 
 override resolving to itself with the run dir as its only argument, and an
 override without the executable bit resolving to no reader — the three readings a
 lane driving pre-resolved argv could not otherwise reach.
+
+**The compiled lane holds seven arms, and `unstarted` is pinned rather than left to
+a race.** Its case is an executable stub whose shebang names an interpreter that
+does not exist, so the spawn fails with `ENOENT` every time; it asserts
+`verdict=unstarted`, a `spawn` value that is not `-`, `decision=allow` and exit 0.
+Every assertion on a firing's exit code prints that firing's log line, so a red
+names its `verdict` and its `spawn` value rather than reporting `left: 0`.
+
+**A reader stub is written by a child process, and never by the test process
+that spawns it.** The module's cases run as threads of one process whose sibling
+tests fork children of their own. A sibling that forks while a stub's write
+descriptor is open hands its child a copy of that descriptor, and the copy lives
+until the child's `exec` — `O_CLOEXEC` closes it at the `exec`, not at the `fork` —
+so a stub spawned inside that window fails with `ETXTBSY`. A test process that
+never opens the stub for writing has no descriptor to hand on. **Measured before
+the fix, not inferred:** the module alone went red in 8 of 30 runs at default
+parallelism; every red run finished in about 105 ms, so the 10-second reader bound
+cannot have fired; the red cases' lines read `verdict=unavailable decision=allow`
+over a stub reader that had resolved; and all five failing cases had just written
+their stub. The errno itself was not read — no syscall tracer was available — and
+`spawn` is what names it at the first residual red. Two alternatives are refused:
+a retry on `ETXTBSY`, which in a test weakens the assertion the test exists to
+make and in the hook changes a refusing hook's behavior; and a lock, which cannot
+reach the forks of other modules' tests.
 
 ### What `background_tasks` carries
 
