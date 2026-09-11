@@ -13,3 +13,10 @@
 - rev: c839a9a88b6d5a2595dc54fa00b6ee58b57376a5
 - edges: none
 - finding: The oracle runs the newest compiled crate test binary's stop_liveness module alone, 30 times at default parallelism, counting reds and max wall ms. 8 of 30 module-alone runs red. Every red run finished in 104-106 ms, so the 10 s reader bound cannot have fired and the timeout cause is excluded. Captured log lines read verdict=unavailable decision=allow on a resolved stub reader, so the red is run_bounded's Err swallowed by read_liveness. Five distinct cases fail, all on a freshly written stub's spawn. The errno is unread (no strace); ETXTBSY is the only plausible spawn error on a present, chmodded stub. This is the validate baseline for the spawn-failure-verdict amendment.
+
+## 2026-09-11 spec — Which crate tests could observe a sibling test's in-process set_current_dir, and are there other process-global writers?
+- corpus: native/src
+- oracle: cargo test --manifest-path native/Cargo.toml -- --list
+- rev: ad981c592cc9f3edcd74ac8ee7bda234a172958d
+- edges: none
+- finding: 693 tests examined (grep count equals the cargo --list count). One test reaches cwd without the knobenv lock: drift_report.rs the_iteration_name_drops_its_stage_tag_and_an_absent_queue_derives_nothing, whose iteration_start spawns git log over the relative pathspec ./WORKFLOW-STATE.txt with no -C. Its pickaxe matches no commit from any directory inside the repo, so its assertion is cwd-invariant and the race is latent, not a live red. No lock-holding reader. No other process-global writer: set_var and remove_var only in knobenv.rs, no umask, no signal handler. set_current_dir has exactly three sites: the two registry coverage tests in gates/mod.rs and pack_installer.rs pack(), which no test reaches. Per-file tests exercise pure helpers; only the two REGISTRY coverage tests reach member dispatchers.

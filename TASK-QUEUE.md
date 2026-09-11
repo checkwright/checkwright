@@ -12,6 +12,48 @@
 
 ## New Features
 
+- **crate-test-cwd-process-global-race** [spec: SPEC-test-cwd-isolation.md] — the crate's test guard
+  covers the knob environment and nothing else, while a second process-global is written by a test
+  and read by production paths a sibling test may be running concurrently.
+  **Re-verified at this drain rather than taken from the bullet; all three sub-claims hold.**
+  `native/src/gates/mod.rs` calls `std::env::set_current_dir` per fixture case inside
+  `every_registry_member_declares_the_roots_it_walks`; `std::env::current_dir()` is read in
+  production paths of `walk.rs`, `spec.rs`, `emit/trajectory.rs`, `emit/docs_mirror.rs`,
+  `gates/docs_nav_reachable.rs`, `gates/assertion_strength.rs` and `gates/docs_link_convention.rs`;
+  and `native/src/knobenv.rs` declares `ENV_WRITE_APIS = ["set_var", "remove_var"]`, so the
+  machine-side roster names the knob environment alone.
+  **Why it is latent rather than live — and the count MOVED while this entry sat, which is the
+  argument rather than a correction to it.** Recounted 2026-09-02: there are now **two**
+  cwd-writing tests, not one, `every_registry_member_declares_the_programs_it_spawns` having
+  joined it, and each happens to take `knobenv::lock()` before its loop — so the existing guard
+  serializes both by accident of where the lock was taken. Nothing states that, and nothing
+  stopped the second test from arriving, exactly as nothing stops the next one taking no guard.
+  **Distinct from `crate-test-env-knob-race`, which landed this iteration**: that entry owned
+  the knob environment, and its fix (`f2701ff4`) landed the guard this entry calls too narrow. The
+  finding
+  is what the fix did not reach, so it files as a new defect rather than a recurrence.
+  **Deliverable, and why it needed design:** widening `knobenv` from "the knob environment" to
+  "process-global test state" renames the module's charter and its roster, and whether the roster
+  should enumerate APIs (`set_current_dir` joining the two) or assert over a class is the open
+  choice. A rename that outruns its assertion is the failure mode to avoid.
+  **Cost while deferred:** one more 1-in-N false red on `check-crate-arms`, paid by every port
+  commit — the same tax `crate-test-env-knob-race` was fixed to remove, re-armed on a second axis.
+  **That cost was PAID TWICE in one iteration, by two independent sessions**, which is what the date
+  below attests: a lead at scope-commit verification and a build batch at pre-commit, each a red
+  `cargo test` exit 101 that went green on an immediate standalone re-run of the same source.
+  **The honest limit on the attribution:** neither witness read the failing test's NAME, so the tie
+  to *this* mechanism rests on the symptom matching this entry's own cost line and on no competing
+  entry claiming a flaky `check-crate-arms` — not on a culprit read off a log.
+  **Unit set `crate-arms-flake-sources`, the second flake source — operator direction,
+  2026-09-11, lead-relayed.** Its knobenv charter amendment is a second component, taken
+  knowingly. Scope probe: `pack()` in `native/src/emit/pack_installer.rs` also calls
+  `set_current_dir`; whether its tests reach it is unprobed.
+  **Spec, 2026-09-11: knobenv's charter is not widened.** Working-directory readers are implicit, so
+  a lock cannot reach them; the tests set the case dir on a child instead, grounds at
+  SPEC-test-cwd-isolation.md delta 3.
+  recurrence: crate-test-cwd-process-global-race 2026-09-06
+  Filed 2026-08-18 by close, draining the gap inbox; re-verified by probe, not by prose.
+
 ## Technical Debt
 
 ## Deferred
@@ -925,45 +967,6 @@
   in exactly the case a consumer is most likely to hit.
   Found 2026-08-18 by this iteration's scope at its own entry, from the surviving directory rather
   than from a reading of the code; filed under scope-gated intake rather than fixed in-session.
-
-- **crate-test-cwd-process-global-race** [design-pending] [cost: session/high] [surface: native] — the crate's test guard covers the knob
-  environment and nothing else, while a second process-global is written by a test and read by
-  production paths a sibling test may be running concurrently.
-  **Re-verified at this drain rather than taken from the bullet; all three sub-claims hold.**
-  `native/src/gates/mod.rs` calls `std::env::set_current_dir` per fixture case inside
-  `every_registry_member_declares_the_roots_it_walks`; `std::env::current_dir()` is read in
-  production paths of `walk.rs`, `spec.rs`, `emit/trajectory.rs`, `emit/docs_mirror.rs`,
-  `gates/docs_nav_reachable.rs`, `gates/assertion_strength.rs` and `gates/docs_link_convention.rs`;
-  and `native/src/knobenv.rs` declares `ENV_WRITE_APIS = ["set_var", "remove_var"]`, so the
-  machine-side roster names the knob environment alone.
-  **Why it is latent rather than live — and the count MOVED while this entry sat, which is the
-  argument rather than a correction to it.** Recounted 2026-09-02: there are now **two**
-  cwd-writing tests, not one, `every_registry_member_declares_the_programs_it_spawns` having
-  joined it, and each happens to take `knobenv::lock()` before its loop — so the existing guard
-  serializes both by accident of where the lock was taken. Nothing states that, and nothing
-  stopped the second test from arriving, exactly as nothing stops the next one taking no guard.
-  **Distinct from `crate-test-env-knob-race`, which landed this iteration**: that entry owned
-  the knob environment, and its fix (`f2701ff4`) landed the guard this entry calls too narrow. The
-  finding
-  is what the fix did not reach, so it files as a new defect rather than a recurrence.
-  **Deliverable, and why `[design-pending]`:** widening `knobenv` from "the knob environment" to
-  "process-global test state" renames the module's charter and its roster, and whether the roster
-  should enumerate APIs (`set_current_dir` joining the two) or assert over a class is the open
-  choice. A rename that outruns its assertion is the failure mode to avoid.
-  **Cost while deferred:** one more 1-in-N false red on `check-crate-arms`, paid by every port
-  commit — the same tax `crate-test-env-knob-race` was fixed to remove, re-armed on a second axis.
-  **That cost was PAID TWICE in one iteration, by two independent sessions**, which is what the date
-  below attests: a lead at scope-commit verification and a build batch at pre-commit, each a red
-  `cargo test` exit 101 that went green on an immediate standalone re-run of the same source.
-  **The honest limit on the attribution:** neither witness read the failing test's NAME, so the tie
-  to *this* mechanism rests on the symptom matching this entry's own cost line and on no competing
-  entry claiming a flaky `check-crate-arms` — not on a culprit read off a log.
-  **Unit set `crate-arms-flake-sources`, the second flake source — operator direction,
-  2026-09-11, lead-relayed.** Its knobenv charter amendment is a second component, taken
-  knowingly. Scope probe: `pack()` in `native/src/emit/pack_installer.rs` also calls
-  `set_current_dir`; whether its tests reach it is unprobed.
-  recurrence: crate-test-cwd-process-global-race 2026-09-06
-  Filed 2026-08-18 by close, draining the gap inbox; re-verified by probe, not by prose.
 
 - **baseline-move-stales-evidence-line** [design-pending] [cost: iteration/low] [surface: evidence-kit] — promoting a task and moving a suite's
   baseline is not enough to close: the evidence line already recorded against the *old* baseline is
