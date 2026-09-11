@@ -319,39 +319,6 @@
   re-scoped the same day at scope, its filed premise having been overtaken by a commit that
   preceded the filing.
 
-- **propose-once-clause-leaks-into-the-proposal-step** [design-pending] — the port-first run's
-  propose-once clause is a PROMOTION-step rule under the reading this tree has already settled, and
-  eight deferred entries have written it into their own text as a PROPOSAL-step exemption instead.
-  **The settled reading it drifts across is `threshold-recurrence-routing-residency`'s**, ruled
-  `lead, own-authority` 2026-09-07 at scope and derived from the surfaces rather than from
-  precedent: the scope contract's "regardless of theme" governs the PROPOSAL step, and
-  TRAJECTORY.md §PRIORITY DIRECTIVE's joining ground governs the PROMOTION step. The propose-once
-  clause sits inside that joining ground, so on the settled reading it can bound what is promoted
-  and not what is listed.
-  **MEASURED at scope 2026-09-09 and the drift is total rather than partial.** Eight deferred
-  entries stand at or above the threshold and ALL EIGHT carry an answer paragraph; several say
-  outright that no re-escalation is owed, which is a proposal-step claim made by a promotion-step
-  clause. Zero carry a fresh recurrence after their answer, so no member of the cohort is currently
-  mis-served: the defect is LATENT, and what it will cost is a future threshold member skipped at
-  proposal by an author following eight worked examples.
-  **Why `[design-pending]`, a fork whose limbs differ in who may take them.** Either the eight
-  entries' phrasing is corrected to a promotion-step claim, which is eight edits against a cap and
-  leaves the clause where it is; or the clause is widened to reach the proposal step, which
-  reverses the 2026-09-07 reading and is operator-class; or the scope contract's unconditional
-  sentence gains the exemption, which is a kit-template change landing in lifecycle-kit rather than
-  here. That the three answer to three different authorities is why no session should pick one in
-  passing.
-  **DISTINCT from `threshold-recurrence-routing-residency`**, which owns WHERE the routing clause
-  lives and which drew the two-step boundary; this owns a second clause drifting ACROSS that
-  boundary. Distinct from `prompt-ranking-ungrantable-shape-class`, whose 2026-09-09 operator
-  ruling settled only whether a newly judged recurrence RESTARTS the clause, never which step it
-  reaches.
-  **Cost while deferred:** low and latent, paid once when it lands — a threshold member that ought
-  to reach the authority does not, and the omission is invisible precisely because every
-  neighbouring entry models it.
-  Filed 2026-09-09 at scope on the lead's ruling, `lead, own-authority` through the message
-  channel, out of the recurrence census this scope bought and filed to the survey record.
-
 - **instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set** [design-pending] — an
   instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running
   green ONCE, so widening the leg afterwards re-creates, silently, the never-run condition the
@@ -399,200 +366,6 @@
   that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the record
   is late and says so.
 
-- **queue-provenance-restates-git-history** [design-pending] — a queue entry's provenance statement
-  narrates the entry's own route through the project's surfaces, which git history already answers
-  and spec-over-precedent puts there. The mandated write is ONE attribution — CLAUDE.md's "who
-  ruled, when and through what channel" — and everything past it is restatement against a cap.
-  **MEASURED, and the measurement refuses the obvious remedy.** Census over `## Deferred`, 312
-  entries and 10,456 lines: 290 carry a provenance statement, mean 2.07 lines; 109 second-hop route
-  clauses across 100 entries, 65 of them bare. Confident out-of-bounds: **~40 lines, 0.4% of the
-  section**, ~0.13 lines per entry against a 50-line cap. Incidence is near-universal and cost is
-  negligible — wide and shallow, which is the opposite of what a cap-displacement argument needs.
-  **RULED BY THE OPERATOR 2026-09-09**, AskUserQuestion channel in a lead session, lead-relayed:
-  `from the gap inbox` is a SURFACE and not the mandated channel, the channel being the AUTHORITY
-  channel — an AskUserQuestion, a lead relay, a consult. That adds **98 occurrences, ~17 lines** to
-  the class. It was the one limb the corpus could not settle: no owner doc reads
-  `Filed <date> by <stage>`, which queue-kit/SPEC.md §The queue format lists among the conventions
-  no gate reads.
-  **NO MECHANISM OWED, ruled in the same motion**, on grounds measured rather than asserted. The
-  violation is CLAUSE-level — it rides as a trailing clause on the line whose FIRST clause is the
-  protected write — so a line-granularity gate has nothing to red. A clause-level one
-  false-positives at **40%** here: 44 of 109 hits are Gap-disposition costings CLAUDE.md mandates
-  or probe-before-assertion evidence marks. Narrowing the token set to fix that guards ~33 lines
-  and is **defeated by appending words** — a route clause that grows a `because` limb goes quiet
-  while the entry grows, so the gate pays against the very cap it protects.
-  **The structural proxy is worse rather than safer.** Capping the provenance statement's span is
-  ungameable, but the 18 entries above span 3 are long BECAUSE they carry a recorded operator
-  ruling with its grounds. The cap reds the protected class hardest, which is the failure
-  check-queue-entry-budget's own invariant names on its third side.
-  **Two precedents refuse a gate ahead of this entry.** `check-queue-prose-precondition` paid a
-  defect to STRIP route vocabulary from its trigger set for this exact collision (queue-kit/SPEC.md
-  §check-queue-prose-precondition). And `entry-compression-contract-unenforced` carries a consult
-  ruling on a structurally identical classifier — it "reds the correct act as often as the defect",
-  and the lever it names is content tiering, never prose.
-  **DISTINCT from both neighbours.** `entry-compression-contract-unenforced` owns what LEAVES an
-  entry, where this owns what should never have entered. `ruling-accretion-outgrows-the-entry-cap`
-  is Done — wontfix, operator-ratified — and owned ruling VOLUME against a fixed cap.
-  **The deliverable is a sweep and not a gate:** the ~40 lines of route narration plus the 98
-  surface phrases the ruling above adds, entering through scope like any unit.
-  **Cost while deferred:** 0.4% of the section, which is the honest number and is why this takes
-  the 2026-08-30 discriminator's machinery default rather than arguing for promotion. What recurs
-  is not the lines but the QUESTION — reaching this answer cost a delegated census, and a session
-  without it reaches for a gate that two prior rulings already refused.
-  Filed 2026-09-09 by the lead, operator-directed through the AskUserQuestion channel.
-
-- **comment-tier-surface-excludes-ci-workflows** [design-pending] — the CI workflow files' comments
-  are ungoverned by construction; the exclusion is in the corpus, not the gate's style dispatch.
-  `native/src/spec.rs`'s `comment_surface` builds the governed set from
-  `find_files(root, ["sh", "gate", "rs"])` plus the `GATE_SDK_WORKFLOW_DIR` tracked tier;
-  `.github/workflows/*.yml` is on neither. `comment_tier.rs`'s `classify` would already style them
-  right — its fall-through arm is `Style::Hash`, which is a YAML comment — so nothing but the
-  corpus stands between the gate and the surface.
-  **MEASURED, not estimated.** `CANON_KIT_COMMENT_SURFACE` pointed at the three tracked workflows
-  returns **866 violations against 928 full-line comments**: `gates.yml` 710 comment lines of 1443,
-  `publish.yml` 120 of 332, `site-health.yml` 98 of 322. That is effectively the whole comment
-  corpus, so this is a surface question and not a backlog of stragglers.
-  **RULED BY THE OPERATOR 2026-09-09**, in a lead session through that session's own message
-  channel and lead-relayed: **widen the surface and sweep.** The ground is stated as a general one
-  and reaches past this entry — every asset is covered by every gate that buys consistency and
-  predictability, rather than a known side effect being re-fought without gate control once per
-  iteration at a token cost. **NOT PROMOTED on that ruling**, deliberately: the iteration is closed,
-  admission is scope's act, and a ruling that settles a shape is not one that opens a unit.
-  **What the ruling settles that this entry's own terms could not.** The measured count was filed as
-  evidence about WHICH TIER the surface belongs to — ~240 directives in one file, on the reading
-  that a workflow's load-bearing CI narrative sits at the doc tier rather than code's WHAT/WHY
-  split. Under the ruling it is a sweep's size and nothing more. Two answers are refused and named
-  so neither returns as a fresh idea: riding `CANON_KIT_COMMENT_WHITELIST` with an `# until:` drain
-  task, and ruling the exclusion in canon-kit/SPEC.md §check-comment-tier.
-  **The coupling stops being an objection and becomes the shape.** `comment_surface` is SHARED with
-  `check-spec-pointer`, whose only caller discriminator is its `with_templates` bool, so widening
-  the primitive widens BOTH gates and the workflows owe spec pointers too. Under the ruling that is
-  intended: the primitive widens once rather than growing a second tier or a caller-keyed surface.
-  Scope should size `check-spec-pointer`'s own first reading of the widened surface, which is
-  unmeasured here and may be the larger half.
-  **The kit-generic constraint that shapes discovery.** The provenance seam forbids a kit literal
-  naming this repo's CI directory, so the surface is found by content or by a knob and never by a
-  hard-coded path. `check-action-run-shell` already carries the content predicate, `actions_shaped`
-  over `yml`/`yaml`, and reusing it beats minting a second answer to the same question.
-  **Cost while deferred:** the workflows are where a CI cause is recorded for the next rider and
-  they carry the tree's heaviest prose, and nothing budgets or stales any of it — so a spent
-  argument survives indefinitely beside the live one. Witnessed rather than argued: this iteration
-  rewrote exactly such a block, whose stated cause named three unprovisioned floor members where
-  the run had one. No adopter witnesses it and it blocks no stage entry or push, so it takes the
-  2026-08-30 discriminator's machinery default.
-  Filed 2026-09-09 by the lead, operator-directed in a lead session's own message channel.
-
-- **consult-rulings-outside-the-authority-roster** [design-pending] — CLAUDE.md admits exactly two
-  ruling authorities, `operator` and `lead`. A third has been ruling in practice: a
-  `consult`-convened session, whose readings now sit in `TRAJECTORY.md` and on two queue entries
-  marked `consult, own-authority`. The kit ships the authority SLOT and never the vocabulary, so
-  admitting a name is this repo's own call — and the repo has not made it.
-  **THE COUNT IS FOUR, and the shape differs across them.** (1) `bootstrap-one-success-path` —
-  operator-RATIFIED 2026-09-09, case-by-case, and since RETIRED at close as discharged.
-  (2) `ruling-accretion-outgrows-the-entry-cap` and (3) `lead-split-posture-limb-unjudged` — each
-  carried a consult ruling directing a TERMINAL move, both held by close 2026-09-09 for want of
-  authority, both operator-RATIFIED 2026-09-09 in the same motion that filed this entry. BOTH
-  EXECUTED at the 2026-09-10 close and both Done; (3)'s conclusion is in .claude/commands/lead.md.
-  (4) `TRAJECTORY.md:890-893` carries a `consult, own-authority` reading with
-  **NO ratification at all** — the live unratified instance, and the reason this entry is
-  design-pending rather than a note.
-  **THE CLASS FIX WAS OFFERED TWICE AND DECLINED TWICE** (operator, 2026-09-09, AskUserQuestion
-  channel in a lead session, lead-relayed) — the second time knowing the count. So the standing
-  disposition is deliberate: ratify case-by-case, do not widen the roster. That is a POSITION, not
-  an oversight, and this entry exists to hold it rather than to re-litigate it.
-  **The fork, unruled:** (a) leave it — every consult reading needs an operator ratification, which
-  is the status quo and costs one operator turn per reading; (b) admit `consult` to the roster with
-  a stated bound; (c) retire the `consult` marker and have the convening lead land such readings as
-  `lead, own-authority`, which is inside the roster and loses the fact that a second session
-  reasoned it. Cost of leaving it: the ratification turn recurs, and an unratified reading like (4)
-  reads as authoritative to a future session that does not check.
-  **Cost while deferred:** one operator turn per consult reading, forever — and the turn is the
-  cheap half. The expensive half is instance (4): an unratified `consult, own-authority` line reads
-  as authoritative to any session that does not check the roster, and nothing makes it check.
-  Filed 2026-09-09 by the lead on the operator's direction (AskUserQuestion channel in a lead
-  session); the direction was to FILE, not to rule the fork.
-
-- **lead-ruling-reopen-authority-unstated** [design-pending] — TRAJECTORY.md's reading rule says a
-  recorded ruling is closed and only the OPERATOR reopens one. It is silent on rulings the LEAD
-  recorded on its own authority, of which six now exist. So the surface answers who reopens an
-  operator ruling and answers nothing about the class it also sanctions.
-  **Why this is not merely pedantic.** The lead escalates rather than reverses a recorded ruling,
-  and reversal is operator-class — that much is stated. What is unstated is whether a lead may
-  reverse its OWN recorded ruling, and the two readings diverge in practice: if yes, a
-  `lead, own-authority` ruling is a note the next lead session may overwrite silently; if no, it is
-  as immovable as an operator's and a lead spends an operator turn to undo its own reasoning.
-  Neither reading is absurd, which is why inspection has not settled it.
-  **The adjacent rule that does NOT settle it:** retiring a spent ruling is not reversing one, and
-  close exercised exactly that on `bootstrap-one-success-path` 2026-09-09. Retirement turns on the
-  ruling being DISCHARGED; it says nothing about reversing a live one.
-  **Independent of `consult-rulings-outside-the-authority-roster`** — that entry asks which names
-  may rule; this asks what a recorded ruling's permanence is once a name inside the roster has
-  ruled. Fixing either leaves the other exactly where it was.
-  **Cost while deferred:** nothing until the first attempt to move a `lead, own-authority` ruling,
-  at which point the session either spends an operator turn it may not owe or overwrites a recorded
-  ruling it may not may. Six such rulings are already recorded, so the exposure only grows.
-  Surfaced by close 2026-09-09 and by the consult of the same day. Filed 2026-09-09 by the lead,
-  operator-directed through the AskUserQuestion channel in a lead session — directed to FILE, and
-  the fork left unruled.
-
-- **ruling-record-prose-staleness-unreachable** [design-pending] — the ruling-staleness probe
-  reaches backtick-named slugs and declared discharge conditions, so TRAJECTORY.md's undated prose
-  rulings go unchecked, and the manual re-read that would cover them has now been deferred by two
-  consecutive closes with the deferral recorded nowhere a stage's intake reads.
-  **The deferral was real, costed, and invisible.** The close of `macos-roster-join` deferred a full
-  manual re-read of TRAJECTORY.md's closed-rulings section with a named cost, recording it only
-  inside `.workflow/audit-roster.txt`'s own row prose; the next close's audit sweep re-derived the
-  same deferral and did not perform the read either. Verified 2026-09-08 at close: a grep over
-  TASK-QUEUE.md and the gap inbox found no carrier. Filing it is what discharges the
-  flagged-and-skipped shape the Gap-disposition doctrine forbids — a deferred gap is costed AND
-  filed.
-  **What the probe reaches and what it does not** — lifecycle-kit/SPEC.md §The ruling-staleness
-  probe resolves declared `ruling:` names and runs declared `discharge:` oracles, and existing
-  rulings are deliberately not back-filled, so a ruling carrying neither declaration is a hole the
-  probe reports rather than inherits. Most of the section predates both declarations.
-  **Why `[design-pending]`:** the candidate shapes differ in kind and none is costed — back-filling
-  declarations onto the aged rulings; a sampling protocol reading a bounded slice per close; or
-  accepting the hole and retiring the audit row that keeps promising a read nobody performs.
-  **Cost while deferred:** every close either buys the full read or defers it again, and twice now
-  it has deferred; a spent ruling left standing misdirects the next session that meets it, which is
-  the harm the completion-time contract exists to prevent. Filed 2026-09-08 to the gap inbox by the
-  close of `intel-macos-roster-join`, which no stage of that iteration could drain; promoted
-  2026-09-09 at this iteration's scope intake, so the record is late and says so.
-
-- **close-surface-reclaim-uncoupled-from-read** [design-pending] — the close-surface roster
-  declares a `reclaim=` per capture-tier row and `check-close-surfaces` asserts the reclaim EXISTS,
-  but nothing observes that the row was read before the reclaim fired.
-  **The instance is this project's own, self-caught and self-reported 2026-09-08.** That close read
-  the first 3 of 222 lines of `.workflow/subagent-stop-liveness.log` — all `live=no verdict=green
-  decision=allow` — and then executed the row's reclaim, `: > .workflow/subagent-stop-liveness.log`.
-  A single `live=yes` or `decision=deny` row in the unread 219 was the whole of the signal that
-  surface carries, and it was never looked for. The file is gitignored, so the truncation is
-  unrecoverable and that iteration's liveness evidence is gone unaudited. **That half is a loss and
-  not work** — nothing recovers it, and it is recorded here only so no later session hunts for it.
-  **The general half is this entry.** A reclaim is a destructive act licensed by a read that no
-  surface records, which is exactly the subject of the `close-surface-actually-read` audit row and
-  exactly why that row is un-gateable today and carries a PARTIAL stamp rather than a clean one.
-  **A cheap half is decidable, which is why this is filed rather than iceboxed:** a reclaim that
-  truncates a surface the session never opened is observable from the session's own tool record,
-  which drift-kit's overhead meter already parses. Whether that is the right oracle is unruled, and
-  the false-positive budget of a sampled-versus-read distinction is unmeasured.
-  **THE FALSE-POSITIVE BUDGET ABOVE IS NOW MEASURED RATHER THAN REASONED, 2026-09-09 at close.**
-  That close read all **452** rows of the same surface instead of sampling: 399 `verdict=green`,
-  and **53** `live=yes verdict=red records=1 decision=refuse` rows carrying five distinct run keys
-  (gates-watch 24, run-validate 8, batchB-smoke 8, batteryB..F 13). A three-row head sample would
-  have shown all-green — the near-miss above, reproduced. So the signal this surface carries is a
-  **fifth of its rows**, not rare noise, and a sampled read is wrong roughly whenever a producer
-  ran; a sampled-versus-read distinction therefore has a real discriminand rather than a
-  hypothetical one. Zero `unavailable` and zero corrupt rows appeared, so
-  `liveness-verdict-table-has-no-spawn-failure-row`'s fail-open did not fire here — every refusal
-  in that 53 is the mechanism working.
-  **Cost while deferred:** every close may destroy the evidence it was supposed to read, and the
-  loss is silent by construction — the surface is empty afterwards either way. Filed 2026-09-08 to
-  the gap inbox by the close of `intel-macos-roster-join`, which no stage of that iteration could
-  drain; promoted 2026-09-09 at this iteration's scope intake, so the record is late and says so.
-  The measurement above was filed 2026-09-09 to the gap inbox by the close of
-  `behind-invoke-relocation`, whose own drain had already run, and landed here at this scope.
-
 - **binding-intel-leg-failed-one-run-in-two** [design-pending] — a leg this project made binding
   failed one of its first two runs, non-deterministically, in a way no finished run can diagnose;
   master is green and nothing needs reverting.
@@ -627,92 +400,6 @@
   another one. Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join`, which no
   stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the
   record is late and says so.
-
-- **iceboxed-recurrence-judgment-unrecordable** [design-pending] — a judged recurrence against an
-  iceboxed entry cannot be stamped at the moment it is judged and cannot be stamped later either, so
-  the one tier where the stamp carries most information is the one tier that forecloses it.
-  **Two rules compose to the loss, neither defective alone.** queue-kit/SPEC.md §The icebox tier is
-  one line each and `check-queue-wrap` holds every line to 100 columns, so an iceboxed entry has no
-  slot for a `recurrence: <slug> <date>` declaration. lifecycle-kit/SPEC.md rules that stamp
-  SANCTIONED AND OBLIGED for any session that judges a recurrence, attaching the obligation to the
-  judgment rather than to the channel it arrived through, and it forecloses backfilling: no later
-  session may add a date an earlier session declined to stamp.
-  **The instance is not hypothetical.** At the 2026-09-08 close the pack step's silent non-zero
-  fired on a binding leg and made a red master unreadable from a finished run — a recurrence of
-  `pack-step-dirty-tree-predicate-unscoped`, then a one-line iceboxed entry. The judgment had to be
-  written into a gap-inbox bullet's prose instead, which is the discharge shape the spec gives a
-  LEAD who may not write the queue at all, borrowed by a session that COULD write it and still had
-  nowhere to put it.
-  **The counter worth pricing before designing:** iceboxing means dormant, and an entry recurring
-  often enough to stamp was arguably mis-iceboxed. It does not dispose of this — the 2026-09-08
-  instance was correctly iceboxed and recurred anyway.
-  **Three candidate shapes, none ruled and none costed:** a recurrence sidecar keyed by slug outside
-  the tier's line budget; a second line permitted on an iceboxed entry for this declaration alone;
-  or ruling that a judged recurrence IS the eviction trigger, which lands the stamp in Deferred
-  where there is room. This scope intake took the third route on the instance above, which is one
-  exercise of it and not a ruling on the class.
-  **Same family as `icebox-standing-ineligibility-unrecordable`**, the eviction worklist having no
-  slot for a standing not-eligible ruling, and as `icebox-eviction-line-budget-squeeze`, the
-  one-liner's line budget at the moment of writing an eviction. All three are the icebox tier's
-  one-line grammar meeting a declaration it has no room for.
-  **Cost while deferred:** every recurrence judged against an iceboxed entry is lost at the moment
-  it is judged, permanently, and the loss is invisible to every later reader.
-  Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join` on the lead's
-  instruction, having been held back one turn while a question it sat on was still open; promoted
-  2026-09-09 at scope intake, so the record is late and says so.
-
-- **queue-citation-line-number-stales-within-its-own-session** [design-pending] — a line number
-  cited into a file the citing session is itself editing is stale before that session ends, and
-  nothing reads it.
-  **Measured twice in one iteration, not argued.** Scope's own `f73c7f86` inserted lines at the
-  head of the Deferred section, shifting every later line by exactly 56 — verified at that commit
-  and its parent on both cited strings. Two gap bullets filed earlier in that same session carried
-  pre-shift numbers and both resolved to unrelated prose; a lead spot-check found two of three
-  ranges wrong. The correction bullet that recorded it then went half-stale itself inside the same
-  iteration, when one of its two re-resolved targets left the queue entirely.
-  **DISTINCT from the citation-liveness family already filed.** `retired-slug-live-pointer-citation`
-  owns a pointer to a slug that has left; `queue-status-parenthetical-liveness` owns a stale
-  section-status parenthetical; the iceboxed `doctrine-rule-number-citation-liveness` owns a
-  renumber staling rule numbers in another corpus. This one's subject is a NUMERIC offset into a
-  file the citing session itself mutates, so it is stale on write rather than on some later edit.
-  **Why it is not obviously gateable.** A scanner would have to resolve the citation against the
-  post-commit file and judge whether the landing line is plausibly the referent, which is semantic.
-  The cheap half is decidable — a citation whose own commit changes the cited file above the cited
-  line — and its false-positive budget is unmeasured.
-  **The alternative that needs no gate:** cite by content, never by number, which is what every
-  attested correction did to repair itself.
-  **Cost while deferred:** paid per session that cites its own file by number, and each instance
-  costs a later reader a wrong resolution — twice this iteration, a spot-check to find.
-  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because no gate exists
-  and the shape needs a false-positive budget; promoted rather than iceboxed because the trigger is
-  live and dated, having fired twice inside the iteration that filed it.
-
-- **post-scope-admission-has-no-promotion-route** [design-pending] — a unit admitted after scope has
-  ended, which then proves debt-class, can be promoted by no stage, and the hole was closed this
-  iteration by a lead ruling rather than by a mechanism.
-  **All three prongs verified at source 2026-09-08.** Scope owns debt promotion and its stage is
-  over; spec owns feature promotion by way of authoring and cannot reach a unit that mints no
-  governed name; and re-entering scope is DESTRUCTIVE rather than merely expensive —
-  `lifecycle-kit/SPEC.md`:236-240 has the first stage's entry truncate the evidence file at the
-  iteration boundary, :567-568 names `LIFECYCLE_KIT_FIRST_STAGE` as the stage whose entry is that
-  boundary, and CLAUDE.md has the same boundary wiping `.tmp/`. A one-move re-entry would take the
-  whole iteration's stage trail with it.
-  **Attested, with the ruling that stood in for the route.** `drain-order-retroactive-debt-sweep`
-  was admitted by the operator 2026-09-07 after scope had ended, ruled debt-class at spec, and
-  promoted into Technical Debt by spec on a `lead, own-authority` ruling of 2026-09-08 because no
-  route existed. The arm's own simulate mode confirms the shape: it returns an iteration-boundary
-  entry whose help directs a gap drain, an inbox truncation and a re-run.
-  **Three candidate dispositions, none costed and none ruled:** a non-boundary re-entry arm for a
-  single queue move; a rule letting the authoring stage promote debt when the admission postdates
-  scope; or accepting the lead ruling as the standing route and saying so in the state machine.
-  **DISTINCT from the argv-parsing entries that retired alongside it** — their subject is how the
-  arm parses its arguments, this one's is which stage may perform a promotion, and it stands
-  whatever that parse does.
-  **Cost while deferred:** paid once per post-scope admission, and paid as a lead ruling that has
-  to be re-derived each time because no surface records it as the route.
-  Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because choosing among
-  the three candidates is a lead or operator disposition, not a drain call; promoted rather than
-  iceboxed because the trigger fired this iteration.
 
 - **substrate-parity-audits-one-producer-of-two** [design-pending] — the parity gate's release-path
   assertions read a single named workflow, and the tree now has two workflows that build and hash a
@@ -952,67 +639,6 @@
   (the assertion the second bullet proposes reds a benign population); icebox second, refused
   because a gate's verdict on an adopter's host is adopter-facing.
 
-- **declaration-shape-outside-header-unreadable** [design-pending] — a
-  port-disposition string outside a file's header block is not a declaration,
-  but nothing distinguishes one for a human reader and a grep cannot.
-  **The rule**: gate-sdk/SPEC.md §The graph manifest rules each such field
-  "one optional header line", and `native/src/walk.rs` reads a header field
-  only. Everything else is inert text.
-  **CORRECTED AT THE 2026-08-30 DRAIN — the filing premise was already
-  stale.** The bullet said the oracle "reports that file owed" for
-  `gate-sdk/smoke/install.sh`. It does not any more: that file was declared
-  no-port at `fbaf3f06` under the smoke class ruling of the same day. **The
-  finding is sharper for it, not weaker.** That one file now carries a REAL
-  declaration in its header AND three fixture-writing heredoc literals further
-  down — including one whose text is verbatim the false premise a spec session
-  carried for a day and from which an operator cut selection was argued in
-  part. Real and inert now sit in one file and read identically to grep.
-  **A second family showed the same shape at this very close**:
-  `check-tag-lead-line` went red on a literal queue tag surviving inside prose
-  on a continuation line. Different vocabulary, same defect — a
-  declaration-shaped token in a non-declaration position that some reader
-  takes as live.
-  **Candidate shapes, none costed:** a gate arm reding a declaration-shaped
-  comment in a non-header position that is not inside a fixture-writing
-  heredoc; or a spelling convention for fixture declarations (an interpolated
-  prefix) so the literal never appears; or accept it and rely on
-  probe-before-assertion.
-  **Cost while deferred:** every port cut reads the corpus by grep, and a
-  fixture-planted literal reads as a live declaration to every reader but the
-  oracle.
-  Filed 2026-08-30 by close from the gap inbox, with the stale oracle premise
-  corrected at the drain.
-
-- **inline-interpreter-substrate-census** [design-pending] — whether the
-  recurring inline-interpreter computations are one-off scratch, or unported
-  tooling that belongs in the binary as subcommands.
-  **What this asks that no ruled entry did**: the 2026-08-30 grant settled
-  whether the shape is GRANTED. It never asked whether it is the right
-  SUBSTRATE. If a chunk of the fall-throughs re-derive the SAME computation
-  every iteration, those are unported tooling and the grant entrenches
-  re-deriving them at a terminal; if they are genuinely one-off, the grant is
-  right and no port is owed.
-  **FIRST CENSUS DATUM, measured at the 2026-08-30 drain, and the reason this
-  is filed rather than discarded.** `scan-prompts.sh` over this iteration's
-  log: **1 occurrence** of the inline-interpreter form in **556**
-  fall-throughs, against 144 prompting calls across 39 patterns. That is
-  evidence toward one-off rather than recurring — but it is ONE iteration, and
-  the entry that asked the question recorded that the prior log had been
-  wiped, so its own 8-and-109 figures were never re-verifiable. A second
-  sample does not yet exist. Start the next read from 1/556, not from zero.
-  **Re-verified at the drain**: the tree ships zero tracked Python, and the
-  interpreter appears only as one member of a generic interpreter list in
-  `guard-kit/lib/guard.sh`, beside
-  node, deno, ruby, perl, php and zsh. So it is kit mechanism recognising an
-  inline body, never a language dependency, and the claim that the inline form
-  is "the tree's standard scratch-computation form" is loose: it is the
-  standard form for SESSIONS computing at a terminal, and the tree has none.
-  **Cost while deferred:** the substrate question stays unasked while the
-  grant makes the terminal form frictionless, which is the condition under
-  which unported tooling accumulates unnoticed.
-  Filed 2026-08-30 by close from the gap inbox, carrying the first census
-  datum it asked for.
-
 - **design-pending-tag-restates-its-own-section** [design-pending] — the tag every deferred entry
   carries is derivable from section membership alone, which is the two-sources defect
   queue-kit/SPEC.md refuses by name for a challenger while exempting the incumbent.
@@ -1110,86 +736,6 @@
   entries are exactly the ones paying it.
   Filed 2026-08-30 by close from the gap inbox; both of the owning spec's
   concessions were re-read at the drain.
-
-- **boundary-preserve-covers-names-not-lifetimes** [design-pending] — the
-  iteration-boundary keep-list enumerates named members where the property it
-  means to protect is a LIFETIME, so each new session-lifetime artifact
-  re-buys the same omission.
-  **State at the 2026-08-30 drain**: the keep-list holds two named members,
-  `session-role` and the lead's journal, both session-lifetime artifacts,
-  neither expressed as a lifetime. This is shape 1's accepted weakness
-  LANDING, not a defect in it: the operator selected the narrow fix knowingly
-  on 2026-08-30.
-  **The two alternatives NOT refused are recorded here because their entry
-  went to Done and its text went with it**: (2) give the knob a lifetime
-  vocabulary instead of a name list, and (3) move a live session's journal out
-  of the wiped directory, which reopens where a journal is sent at all. Both
-  remain available; shape 1 was chosen over them, not against them.
-  **The fourth shape IS refused and stays refused** — moving the wipe into the
-  lead. The operator declined to override its three grounds on 2026-08-30, so
-  reopening it is operator-class and this entry does not.
-  **DISTINCT from `boundary-wipe-preserve-basename-reach`**, which owns the
-  matcher's anchoring and the basename-versus-path kit contract. This entry's
-  subject is which lifetimes the list must cover, and whether anything holds
-  it there.
-  **Cost while deferred:** one re-argument per new session-lifetime artifact,
-  and nothing holds the two current members — a keep-list entry deleted by a
-  later edit reds no gate, the wipe is silent about what it took, and the
-  directory is gitignored, which is exactly how this defect survived three
-  attestations.
-  Filed 2026-08-30 by close from the gap inbox; the config line was re-read at
-  the drain.
-
-- **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
-  minutes and no entry owns the sixteen of them that are not the gate battery.
-  **Measured 2026-08-23 from `.tmp/validate-*.log` mtimes:** five serial smoke suites carry
-  about 80% of the run — `installer_smoke` 5.6m, `consumer_smoke` 4.0m, `upgrade` 1.9m, `demo`
-  1.8m, `agents_md_smoke` 1.4m — against a 52s gate battery.
-  **`run-validate.sh` is serial by construction and says so**: its spine declares "run each
-  suite foreground" (evidence-kit/SPEC.md §bin/run-validate.sh) and the loop parses and diffs
-  each suite before the next starts. Nothing instruments per-suite cost either — the figures
-  above came from file mtimes, which is the tell.
-  **Why `[design-pending]`:** the spine's ordering is load-bearing in one direction and not the
-  other. The manifest fold is explicitly after the last suite, so evidence accumulation
-  parallelizes trivially; the pre-hook and any suite that writes the tree do not. Which suites
-  are genuinely independent is unmeasured, and a wrong answer corrupts evidence rather than
-  merely running slow.
-  **DISTINCT from the two battery entries, and from the arm already discharged.**
-  The two battery entries own the battery's own cost and never reached the suite roster;
-  `battery-runner-port` discharged `gate-battery-parallel-execution`, now Done, while
-  the other stays parked. `check-crate-arms`'s source-stamp cache is **landed** — the gate carries
-  its `.green` stamp today — and ruled at gate-sdk/SPEC.md §check-crate-arms, so the cargo half
-  of the original finding is discharged and this entry is the suites alone.
-  **Cost while deferred:** about sixteen minutes per validate, paid serially, on a stage every
-  iteration runs at least once.
-  Filed 2026-08-23 to the gap inbox by the post-close consult of
-  `leak-guard-and-assertion-meta-gate-port`, and promoted at the next scope intake the same day,
-  with the crate-arms half re-verified as landed and dropped from the entry.
-
-- **overlay-only-oracle-grants-uncommitted** [design-pending] — four oracles this tree runs
-  constantly are granted only by an untracked overlay, so a fresh clone re-buys every one.
-  **SPLIT from `session-mechanic-grants-uncommitted` on 2026-08-23 at spec, lead-authorized**,
-  as the first application of the split criterion `SPEC-entry-split.md` mints: that entry
-  carried a ruled design and this unruled half, two deliverables taking two dispositions on
-  one slug. Its ruled half promoted the same day; this one did not, which is the test.
-  **The set, unchanged from the parent and not to be re-derived:** `cargo test`,
-  `cargo build` / `clippy`, the release binary, and `gh auth` — each read-only or a build of
-  this tree's own crate, none of them reaching the network or a foreign repo.
-  **Why `[design-pending]`:** what is open is not whether the four are safe but **which
-  surface should carry them**. A committed `.claude/settings.json` grant is the obvious
-  answer and is **operator-class** (CLAUDE.md §Housekeeping, grounds at guard-kit/SPEC.md
-  §compare-settings-allow), so no stage session can land it; a guard-kit rule is landable but
-  would encode a Rust toolchain's command shapes into a kit whose ruleset admits **no
-  project's toolchain** by its own stated clause. That tension is the design question, and
-  neither horn is costed.
-  **Distinct from the parent**, whose subject is a redirect target no settings rule can
-  express, and from `guard-grant-review`, retired, whose subject is narrowing grants that already
-  exist rather than minting ones that do not.
-  **Cost while deferred:** every fresh clone and every dispatched session on one pays an
-  out-of-band decision per oracle, and the cost is invisible on the operator's own machine
-  because the overlay hides it there — which is the reading that makes it worth filing
-  rather than absorbing.
-  Filed 2026-08-23 at spec by the split above; never promoted, never held on merit.
 
 - **grant-argument-bounding-mechanism** [design-pending] — two committed grants reach a destructive
   form and no allow-glob narrowing can stop either.
@@ -1340,33 +886,6 @@
   **Cost while deferred:** a spec session pays for a census the build session must buy again, and
   the roster's authority runs inversely to its accuracy.
   Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close.
-
-- **close-triage-log-reclaim-loss-window** [design-pending] — the close-stage triage of a capture
-  log reads it and later truncates it as two separate acts, and anything appended between the two
-  is lost with no trace.
-  **The window is in the templates, not in one session's sequencing** — re-verified at this drain
-  by reading both: `guard-kit/templates/close-triage.md` step 5 and
-  `drift-kit/templates/close-knowledge.md` step 3 each prescribe a read-and-triage pass and then
-  name `: > .workflow/<log>` as the reclaim, with the whole triage in between.
-  **Measured, not predicted:** at the `wide-budget-batch-and-hold-declaration` close the
-  diagnosing sweep recorded `.workflow/prompt-friction.log` growing 688 -> 694 lines *while it
-  read*, so at least six fall-throughs from a concurrent session were then discarded by the
-  reclaim.
-  **DISTINCT from the gap inbox**, whose lifecycle-kit/SPEC.md §The committed gap inbox answer is
-  merge=union on a **committed** surface: these two logs are gitignored per-clone capture with no
-  merge semantics available to them, so union is not the fix and the shape of one does not
-  transfer. Distinct too from `scan-prompts-truncation-quote-desync`, a per-line 500-character
-  truncation defect in parsing the log rather than a loss of whole lines from it.
-  **Why `[design-pending]`:** three shapes and none ruled — truncate to the byte offset actually
-  read rather than to empty; rotate rather than truncate; or state in both templates that the
-  reclaim is lossy under concurrency and let the KPI carry the caveat, which is the cheapest and
-  buys the least.
-  **Cost while deferred:** a lower bound that is already declared a lower bound gets quietly
-  lower, and the loss is invisible — nothing records that a truncation discarded unread lines, so
-  the class cannot be measured after the fact, only prevented.
-  Surfaced 2026-08-18 at the `wide-budget-batch-and-hold-declaration` close's tooling-friction
-  triage and filed to the gap inbox there; promoted 2026-08-18 by the next iteration's scope,
-  draining that inbox.
 
 - **boundary-wipe-preserve-basename-reach** [design-pending] — the iteration-boundary scratch wipe
   matches its preserve list by **basename at any depth**, so one nested `.gitkeep` makes a whole
@@ -9819,6 +9338,21 @@
 - **always-loaded-baseline-restamp-unforced** [design-pending] — Nothing forces the meter restamp.
 - **drift-baseline-unnamed-iteration** [design-pending] — Scope-time KPIs baseline on old commit.
 - **dispatch-cited-evidence-unverified** [design-pending] — A sweep's quotations go unverified.
+- **queue-provenance-restates-git-history** [design-pending] — Provenance prose restates git log.
+- **comment-tier-surface-excludes-ci-workflows** [design-pending] — Workflow comments go ungated.
+- **consult-rulings-outside-the-authority-roster** [design-pending] — Consult readings lack a slot.
+- **lead-ruling-reopen-authority-unstated** [design-pending] — Who reopens a lead ruling is open.
+- **ruling-record-prose-staleness-unreachable** [design-pending] — Old rulings evade the probe.
+- **close-surface-reclaim-uncoupled-from-read** [design-pending] — Reclaim may wipe unread rows.
+- **iceboxed-recurrence-judgment-unrecordable** [design-pending] — No room for a recurrence stamp.
+- **queue-citation-line-number-stales-within-its-own-session** [design-pending] — Line cites stale.
+- **post-scope-admission-has-no-promotion-route** [design-pending] — Late debt has no promoter.
+- **declaration-shape-outside-header-unreadable** [design-pending] — Inert literals read as live.
+- **inline-interpreter-substrate-census** [design-pending] — Scratch computations may be tooling.
+- **boundary-preserve-covers-names-not-lifetimes** [design-pending] — Keep-list lists names only.
+- **validate-suite-wall-clock-unowned** [design-pending] — Serial smoke suites cost ~16 minutes.
+- **overlay-only-oracle-grants-uncommitted** [design-pending] — Oracle grants live off-tree.
+- **close-triage-log-reclaim-loss-window** [design-pending] — Truncate after read drops appends.
 
 ## Done
 
@@ -9826,5 +9360,6 @@
 - icebox-default-reach-over-the-cost-opener-limb-unruled
 - stop-liveness-stub-spawn-flake
 - meta-gate-conservation-record-reach
+- propose-once-clause-leaks-into-the-proposal-step
 
 ## Lessons Learned
