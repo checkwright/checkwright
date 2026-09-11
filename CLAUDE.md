@@ -67,16 +67,15 @@ the wide fan-outs in [docs/site-architecture.md](docs/site-architecture.md)
 §Generated projections and their freshness gates; each freshness gate prints its
 own command on red.
 
-New gates here are **born native** — a Rust module plus a `.gate` descriptor;
-shell needs a cause from the live exception classes, stated in the gate's
-own SPEC section (gate-sdk/SPEC.md §The port-candidate criteria) — no gate is
-permanently shell, that section's retired exception class (a). The port
-oracle (gate-sdk/SPEC.md §port-blockers) answers on **two** axes: its registry
-arms for the battery, `--tree` for the project. Either
-substrate ships with a `good/`+`bad/` fixture pair; the four contracts (output,
-fail-closed, fixture-pair, self-lint) are specified in
-[gate-sdk/SPEC.md](gate-sdk/SPEC.md) and enforced by the meta-gates — a red gate
-is fixed, never bypassed with `--no-verify` except as a one-off with cause.
+New gates here are **born native** — a Rust module, a `.gate` descriptor and a
+`good/`+`bad/` fixture pair; no gate is permanently shell, and a shell gate
+needs a cause from the live exception classes, stated in its own SPEC section
+(gate-sdk/SPEC.md §The port-candidate criteria). The four contracts (output,
+fail-closed, fixture-pair, self-lint) are
+[gate-sdk/SPEC.md](gate-sdk/SPEC.md)'s, enforced by the meta-gates, and the
+port oracle (gate-sdk/SPEC.md §port-blockers) answers for the battery and, with
+`--tree`, for the project. A red gate is fixed, never bypassed with
+`--no-verify` except as a one-off with cause.
 
 Comments are directives, else deleted — a passing `check-comment-tier` is the
 floor, not licence to keep a comment. Blessing a restatement (relocating prose
@@ -121,36 +120,29 @@ load behind that trigger, so they are not resident here.
 
 ## Housekeeping
 
-- `.tmp/` is gitignored, purely disposable scratch (gate timings, resume
-  journals, and the `<key>.run` launch-liveness records a backgrounding session
-  leaves), wiped at the scope boundary by `--enter-stage`'s boundary reset —
-  mechanized, not by hand; the keep-list is in `scripts/lifecycle-config.sh`
-  (lifecycle-kit/SPEC.md §bin/enter-stage.sh); `.metric/` is gitignored persistent
-  measurement trends — **never committed**,
-  account-bearing (drift-kit/SPEC.md §Layout and configuration); `.workflow/`
-  holds two tiers — tracked checked projections beside gitignored local capture
-  (gate-sdk/SPEC.md §The workflow directory). `BRIEF.local.md` (private brief),
-  `OPS.local.md` (private ops runbook — DNS, GitHub repo-settings desired state,
-  and the release account and push transport; consult it before any domain,
-  repo-settings, release or push work, and run its account step before **any
-  GitHub write**, because a write needing no permission succeeds silently under the
-  wrong account; that step is per-write, never
-  per-session), and `ENV.local.md` (context-kit's probed
-  machine profile plus hand-authored gotchas — context-kit/SPEC.md §bin/env-probe)
-  are gitignored, local-only.
+- `.tmp/` is gitignored disposable scratch — gate timings, resume journals,
+  `<key>.run` liveness records — that the scope boundary wipes (keep-list:
+  `scripts/lifecycle-config.sh`); `.metric/` is gitignored persistent,
+  account-bearing measurement, **never committed**; `.workflow/` holds tracked
+  projections beside gitignored capture
+  (gate-sdk/SPEC.md §The workflow directory).
+- Local-only and gitignored: `BRIEF.local.md` (private brief), `ENV.local.md`
+  (probed machine profile plus gotchas — context-kit/SPEC.md §bin/env-probe) and
+  `OPS.local.md` (DNS, repo settings, the release account and push transport).
+  Consult `OPS.local.md` before any domain, repo-settings, release or push work,
+  and run its account step before **any GitHub write**: a write needing no
+  permission succeeds silently under the wrong account, so the step is per-write,
+  never per-session.
 - `reserve/` holds the crates.io name-reservation placeholder — do not develop
   in it (the npm name is the `installer/` package below).
-- `native/` is the Rust crate off the shell substrate — one multi-call binary:
-  one subcommand per ported gate, **plus the non-gate arms** that ported emitters
-  and tools register in. **The binary is live**, so the commit-time obligation in
-  this tree is the battery — which runs the crate's lint and test arms through
-  `check-crate-arms` — **plus** `bash gate-sdk/bin/build-native.sh`, and neither
-  discharges the other. It is **not a kit** — no `checks/`, no `smoke/`, the
-  predicate that makes a root directory one; `check-gate-binary-fresh` holds the
-  binary's currency. Dispatch, descriptor format, port sequencing and the toolchain
-  floor: gate-sdk/SPEC.md §Porting a gate to the binary substrate; a non-gate port's
-  cost: gate-sdk/SPEC.md §The non-gate arm; the shipped install behavior:
-  installer/README.md §The gate binary.
+- `native/` is the gate binary's Rust crate — one multi-call binary, a
+  subcommand per gate plus the non-gate arms. The commit-time obligation is the
+  battery, which runs the crate's lint and test arms through `check-crate-arms`,
+  **plus** `bash gate-sdk/bin/build-native.sh`; neither discharges the other. It
+  is **not a kit** — no `checks/`, no `smoke/`, the predicate that makes a root
+  directory one — and `check-gate-binary-fresh` holds the binary's currency.
+  Dispatch, descriptors, port sequencing and the toolchain floor:
+  gate-sdk/SPEC.md §Porting a gate to the binary substrate.
 - The governed repo-meta pinned in `scripts/core-files.list` is tracked and gated
   like any doc; the fixture is the unit of contribution, so edit the guide, not
   GitHub UI settings.
@@ -174,13 +166,11 @@ load behind that trigger, so they are not resident here.
   `CNAME`), repo-root-governed, no owning kit; its chrome, page-authoring rules,
   generated projections and docs gate roster live in the load-triggered
   [docs/site-architecture.md](docs/site-architecture.md).
-- `installer/` is the published activation surface (bash up to the boundary its
-  README rules, shipped over two transports from one payload — the Release
-  tarball and the npm package), repo-root-governed, no owning kit; its layout is
-  installer/README.md. Not a kit either, and must not become one — by the same
-  predicate stated under `native/` above. Its payload is never committed; the
-  out-of-tree assembler is the gate binary's `--pack-installer` arm, whose
-  boundary and route installer/README.md §The packer owns.
+- `installer/` is the published activation surface — a bash and a PowerShell
+  bootstrap in front of the gate binary, shipped as a Release tarball and an npm
+  package from one payload; repo-root-governed, and not a kit by the predicate
+  under `native/` above. Its payload is never committed. Layout, boundary and
+  packing: installer/README.md.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns
   (off an implementation, a gate's source, a commit, or a prior/sibling
   deliverable)? stamp it in the moment with

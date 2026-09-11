@@ -12,32 +12,6 @@
 
 ## New Features
 
-- **instruction-surface-bash-focus** [spec: SPEC-resident-substrate.md]
-  — the always-loaded surfaces assume bash.
-  `CLAUDE.md` and the instruction surfaces beside it are written around a shell battery:
-  the gate-authoring conventions, the fixture idiom, the housekeeping rules and the
-  delegation guidance all name bash mechanisms as the default case. Under the trajectory
-  pivot the default case becomes a native binary behind a minimal dual-implementable
-  bootstrap, so those surfaces teach a shape the project is leaving. No entry claims this
-  ground today.
-  **Ordered by the operator's trajectory pivot 2026-08-03**; the objective set is recorded
-  in TRAJECTORY.md, and objective 6 is what names this rewrite as needed without starting
-  it.
-  **Why it is design-pending:** the rewrite is not a find-and-replace. An always-loaded
-  surface is costed per session, so the question is which bash specifics stay resident
-  because they are still the common case, which move behind a load trigger, and which are
-  deleted — and that depends on how far the port has actually got (`--emit port-blockers --tree`'s
-  owed count), which makes the trigger a threshold rather than a date.
-  **Cost while deferred:** every session is oriented by a surface describing the substrate
-  the project is moving off, and the correction is paid per session in re-derivation rather
-  than once in an edit.
-  **Unit set `instruction-surface-tier`, the always-loaded half of the sweep's rewrite —
-  operator direction, 2026-09-11.** Its threshold trigger has fired: `--emit port-blockers
-  --tree` owes 0, with 70 files declared no-port (re-measured 2026-09-12 at scope).
-  Filed 2026-08-03 by spec; the pivot names this rewrite and does not start it.
-  **Specified 2026-09-12 at spec** (SPEC-resident-substrate.md): the premise is largely
-  discharged, so the rewrite is four CLAUDE.md passages, two restating bullets among them.
-
 - **always-loaded-brevity-reach** [spec: SPEC-surface-ratchet.md]
   — `check-brevity` guards the
   tidiest section of the always-loaded surface while the section that actually
@@ -5139,6 +5113,7 @@
 
 - align-checklist-fanout-calibration
 - instruction-motivation-owner
+- instruction-surface-bash-focus
 - instruction-surface-sweep
 
 ## Lessons Learned
