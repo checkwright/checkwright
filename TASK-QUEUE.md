@@ -1118,51 +1118,6 @@
   **Cost while deferred:** zero — this is a service rather than tree mechanism,
   so nothing rots; the residue is that gate runs stay self-attested, which binds
   only when a party the committing agents cannot touch is asked to trust them.
-- **spec-internal-identifier-prefix-drift** [design-pending] [cost: event/low] [surface: doctrine-kit] — SPEC prose naming a
-  script's **internal** variable spelling where the public knob is the contract
-  name. Found by the config-seam-hardening close audit of the
-  `internal-identifier-restatement` roster class, and fixed there: seven sites in
-  delegation-kit/SPEC.md named locals of the then-shipped `bin/usage-verdict.sh`
-  which existed only as assignments from their `DELEGATION_KIT_`-prefixed env
-  knobs, while the same doc's §Layout roster had the prefixed spelling right —
-  prose-vs-roster drift *within one file*. That script left the tree at the
-  2026-09-04 port cut, so the founding instance is no longer readable; the class
-  and its live corpus below are what carry this entry.
-  **Cost while deferred:** the fix is a rename away from rotting — renaming the
-  local in the script silently falsifies the prose, and only the roster class's
-  audit cadence catches it, at iteration granularity.
-  **The manual fix is demonstrably incomplete — an eighth site surfaced
-  2026-07-19** and was fixed at that close. That is the demand evidence the entry
-  was waiting on: a hand sweep of one file missed one instance in eight, so the
-  audit cadence catches what review does not, and a ~20-line scan expressed the
-  whole class.
-  The parent class is on the audit roster precisely because it is **un-gateable**
-  (public contract names are legitimate citations). This entry is the narrower
-  sub-class that does look gateable: a backtick-quoted `^[A-Z][A-Z0-9_]*$` token
-  in a kit SPEC that appears in that kit's source *only* as a local assigned from
-  a `<KIT>_`-prefixed env var must be cited by its prefixed spelling. The
-  prefixed counterpart's existence is what bounds the false-positive surface — an
-  internal constant with no public counterpart never fires. Needs spec because
-  that boundary is the whole design: proving it is tight enough for a
-  low-false-positive gate is the open work, and if it is not, the honest outcome
-  is to record that here and leave the class to the audit cadence. Seam: the gate
-  is generic mechanism; the `<KIT>_` prefix is already each consumer's config.
-  **Premise updated 2026-07-20 by the `verdict-reader-honesty` close audit — two
-  corrections, both of which the next scope would otherwise re-derive.**
-  (1) *The class is currently clean.* The eighth site was fixed at this
-  iteration's scope, and a fresh mechanical sweep of every kit SPEC found zero
-  genuine hits. A gate built for this class today would land **greenfield** — it
-  proves the boundary rather than fixing a backlog, so the demand argument now
-  rests entirely on recurrence, not on outstanding drift.
-  (2) *The false-positive bound above is looser than stated.* The sweep produced
-  one hit — `GRAPH_VOCAB` at gate-sdk/SPEC.md:883 — which is **correct prose**:
-  it names the array a consumer declares inside `<gates-dir>/graph-vocab.sh`,
-  a public contract in its own right, while `GATE_SDK_GRAPH_VOCAB` is the
-  *separate* knob naming that file's path. So a `<KIT>_`-prefixed counterpart
-  can exist and denote a **different contract**, which the "prefixed counterpart
-  bounds the false positives" claim does not anticipate. The gate must therefore
-  also establish that the bare token and the prefixed one denote the *same*
-  contract — the discriminator the design pass actually owes.
 
 - **heterogeneous-agent-delegation** [design-pending] [roadmap: later/ecosystem] [cost: iteration/low] [surface: delegation-kit] — foreign agents.
   roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.
@@ -1259,39 +1214,6 @@
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
 
-- **lint-scope-hook-trigger** [design-pending] [cost: event/low] [surface: gate-sdk] — `GATE_SDK_LINT_EXTRA_DIRS` widens
-  what `check-shellcheck` scans but cannot widen when the generated hook fires
-  it. The hook's trigger is expanded from the gate's `# graph:` couples
-  (`scripts/*.sh,kit:*.sh`), and `kit:` resolves to kit roots — a set no
-  consumer knob joins — so a directory only the knob names is linted by the
-  full battery and by CI, never at commit time. gate-sdk/SPEC.md
-  §check-shellcheck now states this limit; this entry owns the fix.
-  **Deliverable:** a consumer-expandable `lint:` token beside the existing
-  `kit:` token in `gate_expand_couples`, expanded at hook-generation time from
-  `GATE_SDK_LINT_EXTRA_DIRS`, so a consumer's added lint directories reach the
-  generated hook without any kit literal naming them — the same shape the
-  `check-graph` / `graph-vocab.sh` pattern already uses to keep consumer
-  vocabulary out of kit source.
-  **Why deferred rather than taken with the knob:** it changes gate-sdk/SPEC.md
-  §The `# graph:` manifest — a gate-sdk contract the `activation-installer`
-  amendment's §Existing sections updated does not list, so it sits outside that
-  envelope. Scope-gated intake, not a batch side errand.
-  **Two cheaper-looking options are already dead; do not re-derive them.**
-  Widening the gate's `couples=` with entries like `kit:lib/*.sh` is a no-op:
-  the hook matches with a pattern comparison in which `*` spans `/`, so
-  `<kit>/*.sh` already reaches every subdirectory of every kit — measured, and
-  the reason the kit half of the originally-reported gap turned out not to
-  exist. Setting `trigger=*` works but costs the full gate on every commit:
-  `check-shellcheck` runs about five seconds, the second-slowest gate in the
-  battery behind `check-docs-render-fidelity`.
-  **Cost while deferred:** consumer-named lint directories — this repo's
-  installer scripts and its runnable walkthrough — are covered one tier later
-  than every other script in the tree. CI catches a lint regression there; the
-  commit does not, so the feedback arrives after the push rather than before
-  it. Non-rotting and bounded to directories the consumer chose to add.
-  Filed 2026-07-26 by build, on the lead's ruling during the `activation-path`
-  doctor + manifest batch, after measuring both the glob behavior and the
-  gate's runtime.
 
 - **gate-file-coverage-closure** [design-pending] [cost: event/high] [surface: delegation-kit] — the missing check class behind a
   hole this close fixed inline: nothing asserts that every gate script in the
@@ -1489,43 +1411,6 @@
   Filed 2026-08-01 by close's prompt-friction triage; tier corrected 2026-08-13 by close from the
   gap-inbox drain, after the operator ruled the entry out of that iteration's unit set.
 
-- **release-note-section-set-derivation** [design-pending] [cost: event/low] [surface: scripts] — the release note's
-  fixed-section set is held by `check-release-bump` as parallel
-  hardcoded calls, so a fifth section is added by copying a call rather than by
-  extending one roster, and **no gate asserts that the gate's set equals the
-  page's**.
-  **The disease this is the residue of.** The section *count* was hand-maintained
-  as a literal across `gate-sdk/bin/upgrade-smoke.sh`,
-  `check-tightened-gates-grammar`, `check-release-bump`'s spec
-  comment, `gate-sdk/SPEC.md` and several `docs/install.md` sentences, while the
-  set itself was separate hardcoded calls with no array and no length. Nothing
-  derived the number and nothing reddened when it was wrong — the test "if this
-  number were wrong tomorrow, does anything red?" answered no at every site. It
-  had already rotted: adding one section took a by-hand three-to-four edit at
-  every site, and align's census of those sites — itself a hand roster — omitted
-  `upgrade-smoke.sh`, which build's re-run caught. **The census only had to exist
-  because nothing derived it.** The prose half is closed: every count is gone and
-  the prose now names two *classes*, with `docs/install.md` §The upgrade contract
-  owning the roster by enumerating it.
-  **A ruling that must not be re-derived.** The obvious consolidation — put the
-  set in gate-sdk's own declaration holder (gate-sdk/SPEC.md §lib/declaration.sh),
-  beside the shared container — is **ruled
-  out**: those section names are consumer content, and a kit literal carrying one
-  project's release-note vocabulary crosses the provenance seam (CLAUDE.md §The
-  provenance seam), the same ground on which the note-parity gate stays out of
-  gate-sdk. So the unit is consumer-side: one rostered set in this repo's
-  `scripts/`, derived from or gated against the page.
-  **Why `[design-pending]`:** the seam ruling fixes *where*, not *how* — derive
-  the gate's set from the page at runtime, or hold both and gate the parity. The
-  two differ in fail-closed behavior when the page is unreadable, which is the
-  open call.
-  **Cost while deferred:** a fifth section is added by copy, and the gate's set
-  can silently diverge from the roster the page owns — the exact shape that
-  survived a dedicated audit stage once already.
-  Debt: converges a duplicated set onto one roster; adds no governed name unless
-  the parity arm becomes its own gate, which the promoting scope call settles.
-  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build
-  on an operator-raised doctrine check.
 
 - **companion-toolkit-profile** [design-pending] [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
   roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.
@@ -1999,23 +1884,6 @@
   Found at spec 2026-08-06 while sizing the verb rename's blast radius, verified against the
   gate's own extraction logic rather than inferred; filed 2026-08-06 by close from the gap inbox.
 
-- **release-asset-claim-class-owner** [design-pending] [cost: event/low] [surface: gate-sdk] — a reader-facing claim about what a
-  Release ships is maintained by hand, with no oracle.
-  `docs/install.md`'s cargo bullet asserts what a tagged release publishes. The descriptors unit
-  corrected the sentence and **ruled the gap accepted-ungated** rather than minting a gate:
-  the class has exactly one instance, and a registry for one member is the move the payload-claim
-  design refuses on its own axis. This entry carries that ruling's named trigger so it survives
-  the gap inbox's truncation.
-  **Why `[design-pending]`:** the open question is whether a release-asset claim is its own class
-  or a second axis of `check-payload-claim`'s vocabulary — one asks what a Release *ships*, the
-  other what a consumer *receives*, and collapsing them wrongly is harder to unwind than leaving
-  them apart.
-  **Cost while deferred:** one published claim about Release contents sits on the adoption path
-  held only by hand — the exact shape that produced `payload-disclosure-claim-owner` one claim
-  class over.
-  Trigger: a **second** release-asset claim appearing on any governed surface, at which point
-  both axes collapse into `check-payload-claim` rather than into a third gate.
-  Filed 2026-08-07 by close, promoting spec's gap-inbox filing at `06e379c`.
 
 - **align-checklist-fanout-calibration** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — align converges at zero divergence
   while build finds the defects it should have caught. **Read this entry as calibration, not as the
@@ -2110,24 +1978,6 @@
   Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was
   escalated as an envelope call and folded in here on the lead's ruling the same day.
 
-- **spec-pointer-self-section-citation** [design-pending] [cost: event/low] [surface: canon-kit] — a bare `(§Heading)` self-citation is
-  outside every citation gate's reach.
-  `check-spec-pointer`'s prose pass fires only on a **tracked path immediately followed by the
-  section mark**, so a citation naming a section of the file it already sits in — the ordinary
-  intra-SPEC form — is never resolved against that file's headings. A dead one survives
-  indefinitely and rides the docs mirror to the public site.
-  **Found live, not hypothesized.** `delegation-kit/SPEC.md` cited `§The staleness contract`,
-  a heading no file in the tree carries; the mirrored page published it and a queue entry had
-  copied it. Repointed at this close, so the instance is gone and the class is not.
-  **Why it looks cheaper than it is.** The candidate set is large and mostly correct, so the
-  design question is the resolution rule rather than the scan: a self-citation resolves against
-  the containing file's own headings, which is a different lookup from the path-qualified form
-  the gate already does, and the two must not be conflated in one pass. It sits on the same
-  extractor the deferred `check-spec-pointer` citation entries name — sequence it with them
-  rather than building a second scanner.
-  **Cost while deferred:** a dead intra-file pointer reads as a live one, and the mirror
-  publishes it, so the failure is silent on both the governed and the public tier.
-  Filed 2026-08-08 by close, generalizing the gap it drained.
 
 - **deferred-release-declaration-accumulation** [design-pending] [cost: iteration/high] [surface: RELEASING.md] — only one of the note's three
   sections survives a deferred release.
@@ -2344,32 +2194,6 @@
   on the drain axis alone — `lead, own-authority`, relayed in that iteration's dispatch — and
   demoted at merge with that axis landed and this one untaken.
 
-- **knob-default-accessor-singularity** [design-pending] [cost: event/low] [surface: canon-kit] — the missing check class
-  behind two knob-default re-spellings drained this iteration.
-  `check-knob-default-coupling` asserts that every literal site for one knob
-  carries the **same** literal (assertion 1 at canon-kit/SPEC.md
-  §check-knob-default-coupling) — an *agreement* assertion. Two identical spellings agree, so they
-  pass, and the gate has no *singularity* assertion at all. That is why both
-  `.github/workflows/publish.yml`'s crate resolution (`GATE_SDK_NATIVE_CRATE`) and
-  `check-reads-couples`' binary lookup (`GATE_SDK_NATIVE_BIN`) sat green
-  while open-coding a default whose accessor exists and whose `# spec:` comment
-  calls itself "the one home" of it. Both are fixed; the class is not.
-  **The check is buildable, which is why this is filed rather than argued away.**
-  When a knob has a designated accessor — a function whose body is the sole
-  `${KNOB:-…}` — any other literal default site for that knob is a defect even
-  when it agrees. The accessor set is derivable from `lib/*.sh` rather than
-  listed, so the gate ships no term list and the provenance seam holds.
-  **Why `[design-pending]`:** the scan corpus is the open question, not the
-  predicate. The existing gate walks `*.sh` under kit roots only, which is exactly
-  why the `publish.yml` site was unreachable to it; widening to workflow YAML and
-  other non-kit consumers is a corpus decision with its own false-positive
-  profile, and a consumer legitimately reading a knob with a fallback where no
-  accessor is in scope must not red.
-  **Cost while deferred:** every new reader of a knob that already has an accessor
-  can re-spell its default and stay green — and the two found this iteration were
-  both introduced by the port work that is still widening.
-  Filed 2026-08-10 by close as the gap-generalization owed by fixing the two
-  instances inline during the drain.
 
 - **survey-record-claim-reliability** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — the survey record carries
   unwitnessed mechanism claims and was wrong three times in one iteration.
@@ -2431,44 +2255,6 @@
   surfaces as behavior, not as a red.
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
 
-- **bin-argv-shape-residual-member** [design-pending] [cost: event/low] [surface: gate-sdk] — one `bin/` tool was left outside the
-  argument-shape contract this iteration landed, and it is the only member of its own class.
-  `SPEC-bin-argv.md` shipped the contract against a five-member census; gate-sdk's fixture runner
-  (then `bin/run-gate-tests.sh`, now the `--run-gate-tests` arm) is a sixth with the same
-  arity-only-not-shape defect, found at align and **deliberately not folded in** — expanding a
-  pending amendment's member count mid-align widens its deliverable past align's stage contract.
-  **THE SUBJECT HAS PORTED AND THE DEFECT CROSSED WITH IT.** The shell file is gone; the member is
-  the bridged `--run-gate-tests` arm, and `native/src/emit/run_gate_tests.rs` takes `args.first()`
-  straight into `tests_dir` with no `-h`, no `--` and no leading-`-` refusal. Reproduced at spec
-  2026-09-06: `--run-gate-tests --help` prints `run-gate-tests: no fixture tree at --help`, exit 2,
-  no usage. Still milder than the amendment's five and still deferrable — it writes nothing durable,
-  so a bad argument fails a directory check rather than corrupting a governed surface. That is
-  severity, not correctness.
-  **THE SIXTH-READER-INSTANCE QUESTION IS ANSWERED (b), YES, AND IT IS NOT A RULING** — determined
-  by the owner doc, so it needed no authority and none is claimed. Landed by spec 2026-09-06 on the
-  lead's dispatch, which delegated the question and recommended (b) without taking it.
-  gate-sdk/SPEC.md §The bin/-tool contract rules that the shape half OUTLIVES a member's port, and
-  all five enumerated reader instances are themselves ported members — so a ported free-text member
-  joining the enumeration is the clause read as written, not a widening of it. The prior sub-claim
-  that the deliverable is "ownerless" therefore falls: the owner is that contract.
-  **What earns it an enumeration slot rather than a bare tally, because five instances each carry a
-  distinguishing property:** it is the FIRST whose defect SURVIVED its own port. The five prior all
-  record a shell-form defect the port FIXED — "the port added all three behaviours the shell form
-  had none of, the clause working forward". This one ported intact, which is the finding.
-  **And where its usage goes is already settled, not open.** The "help arm retires to the
-  front-end" branch is UNAVAILABLE to this member: it holds no `case` arm and gets no named line or
-  paragraph in `run-gates.sh --help` — verified against that help text — so the narrower reading the
-  clause settled at its fifth instance binds, and usage lives at the member's own shape refusal.
-  **Deliverable, and why `[design-pending]` SURVIVES:** apply the contract to the sixth member —
-  now a mechanical delta, its three behaviours and their home all determined above — then answer the
-  half that is genuinely open. The census that found five and the sweep that found the sixth used
-  different screens, so what is open is whether `bin/` membership is derivable — a roster gate over
-  every kit's `bin/` — or stays a hand-curated set the next tool added silently escapes. That
-  question is the design residue, and it is the whole of what keeps the tag on.
-  **Cost while deferred:** the contract reads as roster-complete while one member fails it, which is
-  the shape a later session trusts rather than re-screens.
-  Filed 2026-08-13 by close, draining the gap inbox; found at align 2026-08-12, escalated to the
-  lead in the same session, and corroborated by a survey filed that session.
 
 - **instruction-surface-sweep** [design-pending] [blocked-by: instruction-motivation-owner] [cost: session/high] [surface: lifecycle-kit]
   — one full pass applying the what-vs-why rule across the instruction-file corpus, once.
@@ -2593,44 +2379,6 @@
   Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it;
   third population added 2026-08-14 by close from the same rostered sweep, which declined again.
 
-- **docs-corpus-derivation-manifest-divergence** [design-pending] [cost: event/low] [surface: site-kit] — two gates declare a
-  byte-identical `# graph:` couple and walk different corpora, so the manifest asserts a
-  sameness the code does not honour.
-  `check-docs-link-convention` derives its corpus with a bare `find` over
-  the docs root — a filesystem walk that sees **untracked** files, a shape its 2026-08-18 port
-  carried across the substrate deliberately rather than tidying — while
-  `check-docs-render-fidelity` derives its own from `git ls-files`, tracked only, plus an
-  underscore-directory exclusion and a `gate_path_pruned` filter the first gate has neither of.
-  **The byte-identity premise NO LONGER HOLDS, re-measured 2026-08-24, and the entry's subject
-  survives it.** Both once declared
-  `couples=docs/*.md,docs/*/index.md,docs/posts/*.md dir=one valve=none tier=precommit`,
-  identical to the byte. `shell-gate-tail-port`'s delta 8 ported render-fidelity, and each
-  descriptor now also couples its own crate module — `native/src/gates/docs_render_fidelity.rs`
-  against `native/src/gates/docs_link_convention.rs,native/src/fresh.rs` — so the two `couples=`
-  fields differ on their module suffixes and agree on the docs prefix. The **divergence** this
-  entry is about (find-over-untracked against `git ls-files` plus the exclusions) is untouched
-  and still live; what needs re-taking is the framing, since the manifests no longer assert
-  sameness outright and instead assert it over the corpus half alone.
-  **Demonstrated, not reasoned:** at the 2026-08-13 drain an isolated checkout gained one
-  untracked markdown page under the docs root; link-convention's page count went 70 → 71 and
-  render-fidelity's stayed at 70. An untracked page is inside one gate's corpus and outside the
-  other's with nothing in either manifest showing it.
-  **Why `[design-pending]`:** which derivation is *correct* is the substance, and both have a
-  live reason. Render-fidelity gates what the published site will contain, which is the tracked
-  set; link-convention gates authoring conventions, where catching a page before it is staged is
-  arguably the point. Converging them silently would weaken one gate; declaring the divergence in
-  the manifests needs a `# graph:` field that does not exist. Adjacent second finding from the
-  same read, reported as observed: link-convention calls bare `find` rather than the shared
-  `gate_find` wrapper, so it does not honour the SDK prune set — verified null in effect today
-  (no directory under the docs root matches the default prune set), a latent inconsistency
-  rather than a live symptom.
-  **Cost while deferred:** the graph artifact and the enforcement map both read `couples=`, so
-  two gates with materially different reach still present as interchangeable to every derived
-  projection over the docs half. The port-cohort bite is **spent** — both members are ported, and
-  their module suffixes now separate them, so no cohort selected on identical couples can merge
-  them; what remains is the projection reading, which the differing suffixes do not repair.
-  Filed 2026-08-13 by close, draining the gap inbox; surfaced by a scope census and re-verified
-  at the drain against both sources plus the empirical probe above.
 
 - **ro-bins-write-option-bypass** [design-pending] [cost: session/high] [surface: guard-kit] — `GUARD_KIT_RO_BINS` membership is tested as
   "the segment leads with this binary", but leading with a roster binary does not make the
@@ -2937,72 +2685,7 @@
   Filed 2026-08-15 by close, draining the gap inbox; mechanism re-derived against
   `gate-sdk/lib/gate.sh` at the drain and the bullet's account corrected here.
 
-- **consumer-gate-roster-unread** [design-pending] [cost: event/low] [surface: gate-sdk] — no roster reader covers a consumer-declared
-  gate, so one added to or deleted from the consumer gates dir drops out of nothing.
-  **Verified at the drain.** `check-readme-roster`'s corpus is `gate_kit_roots`, and it skips any
-  root carrying no `checks/` directory. The consumer gates dir is neither, so its members are
-  named by no README roster in either direction — the kit-README marker block that makes a kit's
-  own roster falsifiable has no counterpart for them.
-  **Re-verified 2026-08-15**, after the eleventh cohort emptied that dir of shell: it now holds
-  thirteen `.gate` members and no `check-*.sh` at all. The substrate moved, the predicate did
-  not — a `.gate` descriptor is exactly as unrostered as the script it replaced, so the entry's
-  corpus changed shape without changing size-of-gap, and the finding stands unaltered.
-  **What does cover them, and why none of it is a roster.** They register in `gates.list`, each
-  carries a `# graph:` manifest, and each owes a fixture pair. Every one of those is a
-  *mechanism* obligation discharged by a machine-readable artifact; none asserts that a
-  human-readable document names the gate, which is exactly what the marker block buys.
-  **Pre-existing rather than opened by the tenth cohort's port** — measured while surveying that
-  port's readers, and unchanged by it in either direction.
-  **DISTINCT from `consumer-gate-port-disposition`, landed, which owned porting these gates and
-  not their documentation coverage.** Porting all thirteen would leave this where it is: the corpus
-  predicate is the kit root, not the substrate, so a ported consumer gate is as unrostered as a
-  shell one.
-  **Why `[design-pending]`:** the roster's home is the open question, and it is a seam question.
-  A vendoring consumer has no kit README to hold the block and may have no README at all, so
-  widening `check-readme-roster`'s corpus to the gates dir needs a consumer-named document knob
-  — a kit gate acquiring a consumer-shaped surface. The alternative routes the coverage through
-  a *generated* projection instead: the enforcement map already enumerates every registered gate,
-  so a check over generated output would be freshness rather than parity, and derivation-first
-  reads that as the cheaper answer. Which is right turns on whether the roster is meant to be
-  *authored* — a claim a human can get wrong, and so worth gating — or merely *available*.
-  **Cost while deferred:** a consumer gate can be added or removed with no prose anywhere
-  noticing, so "what does this repo enforce beyond its kits" is answerable only by listing a
-  directory. Paid by every reader who asks it, and paid silently — there is no red.
-  Filed 2026-08-15 by close, draining the gap inbox.
 
-- **waiter-loop-condition-predicate-gap** [design-pending] [cost: event/low] [surface: guard-kit] — guard rule 12 declines on a
-  standalone loop-condition waiter, which is the shape its founding instance most likely took.
-  **Lead-ruled at build 2026-08-15 and filed with its cost and its conflict already stated; this
-  drain lands it as filed and does not re-open the ruling.** Rule 12 fires only when the
-  `pgrep`/`pkill -f` pattern literal recurs elsewhere in the same command, so a standalone waiter
-  issued as its own tool call falls through the recurrence test, and rule 13 declines on that
-  same command because the sleep sits inside a `do…done` span. **Both new rules miss it** —
-  re-verified by probe at this drain: the standalone `until`-form and the `while`-form both
-  return exit 0 through `scripts/bash-guard.sh`, while the compound launch-and-wait form returns
-  exit 2. Coverage is partial and honest rather than absent.
-  **Founding-instance argument.** The attested instance recorded beside
-  `waiter-predicate-self-match` (retired — recover it from git history) is build batch A running
-  two such waiters, plausibly the
-  standalone shape — so the enforcement half landed 2026-08-15 may not cover the failure that
-  motivated it.
-  **Proposed predicate:** also fire when the `pgrep`/`pkill -f` segment sits in loop-condition
-  position, between an `until`/`while` head and its `do`. Mechanically decidable off the token
-  walk the bare-sleep rule already performs, so the machinery exists and the cost is one clause
-  plus its firing and non-firing case in the decision table.
-  **Why `[design-pending]` — a conflict a later unit must resolve by ruling rather than ignore.**
-  The merged amendment states as a conservative direction that a `pgrep -f` whose pattern occurs
-  nowhere else in the command is a genuine query and is untouched, and loop-condition firing newly
-  blocks exactly that shape; and rule 12's own block message sanctions `kill -0` against a
-  recorded PID wherever liveness is the condition, a legitimate case the widened predicate would
-  reach. That message's clause was **widened 2026-08-16** by `waiting-rule-carrier-reach` — it now
-  covers a child the session backgrounded itself, which is the shape a self-backgrounding waiter
-  actually has, so the conflict this entry names got broader rather than narrower; the firing
-  predicate itself is untouched and stays this entry's subject.
-  **Cost while deferred:** the founding shape stays unblocked and its failure mode is silent —
-  nothing reds, the work finishes correctly, and the only symptom is the foreground cap absorbing
-  an unbounded wait, which reads from outside as a fixed cap-length wait.
-  Filed 2026-08-15 by close, draining the gap-inbox bullet build filed on the lead's ruling;
-  scope-gated intake, so it was filed costed rather than taken in flight.
 
 - **done-slug-ownership-citation-report** [design-pending] [cost: iteration/low] [surface: queue-kit] — governed prose says a queue slug
   "owns" an open question in the present tense, and nothing notices when that slug lands.
@@ -3158,38 +2841,6 @@
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
 
-- **crate-toolchain-grant-uncommitted** [design-pending] [cost: once/low] [surface: .claude] — one clone's overlay grants a hand-run
-  `cargo` path the sanctioned path never uses, so what is uncommitted is a widening nobody needs.
-  **The premise as filed was backwards, corrected 2026-08-20 against a fresh probe.** It read "a
-  session in a fresh clone meets a mandatory toolchain with nothing granting it". It does not: both
-  sanctioned paths are granted in the committed `settings.json` — `run-gates.sh` at lines 11-13 and
-  `build-native.sh` at 32-33. `check-crate-arms` *does* shell out to `cargo` directly
-  (`native/src/gates/crate_arms.rs`; the member was a shell check at `gate-sdk/checks/…:40,47`
-  when this was probed and ported at `shell-gate-tail-port`, the spawn surviving unchanged), and
-  that settles the question **toward** the
-  correction rather than against it, because the allowlist matches the top-level `Bash` call and
-  not its subprocesses. Verified behaviourally rather than reasoned: that gate is registered at
-  `scripts/gates.list:14`, so every `bash gate-sdk/bin/run-gates.sh` run this session executed it,
-  and not one prompted for `cargo`.
-  **What is true instead:** the committed file carries **107** `Bash(` entries and no `cargo` in
-  any form — the 115 first filed was a dated count — while `.claude/settings.local.json`
-  auto-allows `cargo build`, `cargo test` and `cargo clippy`, grants that reach only the
-  unsanctioned hand-run path, the obligation being discharged through the two wrappers.
-  **RULED — PRUNE THE OVERLAY AND GRANT NOTHING NEW; operator 2026-08-20, relayed by the lead.**
-  A pruning, not a widening, and the deliverable shrinks to match.
-  **The design question is ANSWERED by that ruling**, and it is why this was never a one-line
-  settings edit: the wrapper grant is the correct form, it already exists committed, and the direct
-  `cargo` entries are the habit to steer away from. Pruning is inside a session's own authority —
-  guard-kit's triage contract (guard-kit/templates/close-triage.md) lets a session prune the
-  overlay and forbids only widening its own auto-allow set.
-  **Cost while deferred:** small, and no longer clone-shaped — the corrected premise removes the
-  fresh-clone harm outright, both sanctioned paths being committed-granted. What remains is that
-  one clone's overlay silently permits a hand-run path the project does not sanction: a standing
-  grant nobody reviews, rather than friction anyone feels.
-  Class: mints no governed name and lands no gate, so canon-kit's litmus makes it **debt**.
-  Filed 2026-08-17 by close from its own tooling-friction triage; both allowlist sets were read
-  before the absence was asserted, and the overlay was confirmed carrying zero redundant and
-  zero over-broad entries by `compare-settings-allow.sh` at the same triage.
 
 - **stale-identifier-after-retirement** [design-pending] [cost: event/low] [surface: canon-kit] — governed prose citing a deleted path
   whose capability moved intact to a new holder: a class the close-stage audit roster does not
@@ -3480,29 +3131,6 @@
   Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
   whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
 
-- **prose-uniqueness-claim-unchecked** [design-pending] [cost: event/low] [surface: canon-kit] — no check reaches a prose UNIQUENESS
-  claim over a governed roster: a superlative selecting a predicate-defined subset of it.
-  **The instance, found 2026-08-19 at close's staleness read and fixed inline at `efd74265`.**
-  docs/site-architecture.md §Generated projections asserted the gate binary was the sole rostered
-  projection carrying a staging-order hazard. The generated pre-commit hook carries such a hazard
-  by another route: `check-prose-enum`'s enum-set emitter derives its `*-gate-test` members with
-  `git ls-files` (the `--emit-enum-sets` arm), so an untracked new `gate-tests/*.test.sh` sibling
-  passes a whole-tree battery and reds the hook at commit time on `git add`.
-  **Why the nearest gates do not reach it.** `check-manifest-count` refuses a bare cardinal
-  quantifying a governed collection noun; `check-prose-enum` holds an enumeration against a
-  derived set. Both read claims about the *members*. "The only X that Y" is a claim about the
-  **complement** — every member of the roster the predicate does not select — and neither gate
-  has any reading of the complement at all.
-  **Why `[design-pending]`: whether a scanner is buildable is the open question.** The selecting
-  predicate is prose ("carries a staging-order hazard"), so the derivable half may be only the
-  roster the claim quantifies over. If that is right the shape is a **marked-claim** class in
-  `check-measured-claim`'s lineage — the author declares the roster, the check holds the
-  superlative against it — rather than a scan that finds the claims itself.
-  **Cost while deferred:** a uniqueness claim is the shape a reader most reasonably stops reading
-  at, so a false one silently narrows the next session's search; and it goes false by the roster
-  growing, which is the one event nobody re-reads the prose for.
-  Filed 2026-08-19 into the gap inbox by the `budget-batch-and-account-identity-kind` close, whose
-  staleness read hit the instance; promoted at the following scope's drain of that inbox.
 
 - **guard-read-steer-tool-coverage** [design-pending] [cost: session/high] [surface: guard-kit] — the bash-guard's read-steer covers `cat`
   and `sed` and not `awk`, so a line-range read of a tracked file is decided out of band.
@@ -3909,28 +3537,6 @@
   Filed 2026-08-23 by build; drained at that iteration's close, which read the span walk to
   confirm the limit is structural rather than a detection bug.
 
-- **kit-spec-layout-tree-hand-maintained** [design-pending] [cost: event/low] [surface: canon-kit] — every kit SPEC's Layout tree block
-  is a hand-maintained roster of the kit's own filesystem, and no gate asserts it matches.
-  **Found 2026-08-23 at build** by a contract sweep before adding the wait-primitive probe
-  (delegation-kit/SPEC.md §bin/wait-probe): every `bin/`, `lib/`, `checks/`, `gate-tests/`,
-  `templates/` and `smoke/` member is listed by hand with an inline annotation, and a member
-  added without editing the block reds nothing. The population is the whole kit set, not
-  delegation-kit alone.
-  **This is a derivation-first defect by the doctrine's own words** — a roster is derivable, so
-  it is derived and freshness-gated, never maintained. What makes it worth an entry rather than
-  absorbing is the direction of the silent failure: an omitted member leaves the SPEC
-  *understating* what the kit ships, which is exactly the surface a vendoring consumer reads to
-  know what it got.
-  **Why `[design-pending]`:** the obvious shape is a marker-block projection emitted from the
-  filesystem with a byte-gate, as ROADMAP.md and the docs mirror already take — but the
-  annotations are hand-authored prose per line, so the emitter has to preserve them across a
-  regeneration. That is the design question and the reason this is not mechanical.
-  **DISTINCT from `check-readme-roster`**, whose subject is the README's gate roster and which
-  reaches no `bin/` or `templates/` member.
-  **Cost while deferred:** every kit-member addition re-buys a hand edit nothing checks, on the
-  surface a consumer trusts to enumerate what it vendored.
-  Filed 2026-08-23 by build; drained at that iteration's close, which confirmed no gate reads
-  the block.
 
 - **bespoke-test-path-knob-pinning** [design-pending] [cost: event/high] [surface: gate-sdk] — a bespoke gate-test's cwd sandbox is
   isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
@@ -4174,68 +3780,7 @@
   drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
   2026-09-04 within one iteration.
 
-- **expansion-rule-backtick-blind** [design-pending] [cost: event/low] [surface: guard-kit] — guard rule 6 blocks the modern
-  command-substitution spelling and passes the archaic one, so a session that meets the block learns
-  the spelling rather than the rule.
-  **Probed live at the drain through the consumer hook, not read off the regex.** The match at
-  `guard-kit/lib/guard.sh:352` has four alternatives — `${`, `$(`, `<(`, `$IDENT` — and no backtick.
-  A crafted PreToolUse payload spelling a command substitution with `$(…)` exits 2 with rule 6's
-  message; the IDENTICAL command spelled with backticks exits 0 and falls through.
-  **Under-coverage rather than style, on the rule's own stated grounds.** Rule 6 exists because the
-  harness's allowlist matcher refuses every expansion, and the matcher refuses a backtick
-  substitution exactly as it refuses `$(…)`. So the fall-through costs the out-of-band decision the
-  rule exists to pre-empt, while telling the session nothing.
-  **Why `[design-pending]` rather than a one-line regex edit — the entry's real content.**
-  Rule 23 is BUILT ON rule 6 not reaching backticks. guard-kit/SPEC.md §The generic ruleset rules
-  that rule 23 declines on every expansion because rule 6 blocks those shapes already, but
-  deliberately does NOT decline on a backtick "since it is the one body-source spelling rule 6 does
-  not reach and declining there would ship the hole the rule exists to close". Closing rule 6's hole
-  makes rule 23's backtick arm unreachable by dispatch order and stales three SPEC paragraphs that
-  argue from the current split. The unit is that re-argument, not the alternative.
-  **The mechanical half is small and known:** one alternative in the regex, a firing and a
-  non-firing case in `guard-kit/guard-tests/cases.tsv`, no message change. One interaction to watch:
-  a backtick is not a matcher glyph like the one rule 7 handles, and `guard_skeleton`'s `sq`/`hdq`
-  modes already strip the spans where a literal backtick could sit innocently.
-  **DISTINCT from every unit landed this iteration and it re-files none of them.** It was found
-  while probing `scratch-execution-control-is-bash-only`'s shape set, and that unit's rule covers
-  the substitution shape under its own body-source predicate in BOTH spellings — so this is about
-  rule 6's coverage of every OTHER command a backtick substitution can appear in. Adds no recurrence
-  date to anything.
-  **Cost while deferred:** one silent permission prompt per backtick substitution, plus the teaching
-  effect, which is the worse half — the guard's whole contract is that meeting a block teaches a
-  rule, and here it teaches a workaround.
-  Filed 2026-08-24 to the gap inbox by spec, after build deliberately left it alone for the blast
-  radius above; drained 2026-08-24 at this iteration's close, which re-probed both spellings at HEAD
-  and confirmed the rule-22 interaction in the SPEC.
 
-- **fixture-runner-checks-dir-fails-open** [design-pending] [cost: event/low] [surface: gate-sdk] — `run-gate-tests.sh` refuses a missing
-  tests dir by name and drops a missing checks dir in silence, so the wrong second argument reports
-  as a corpus-wide fixture defect.
-  **Probed at this close, not inferred.** `bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests
-  scripts/checks` emits `GATE-TESTS: 13 harness/fixture error(s) (malformed fixtures — could not
-  test)` and two `HARNESS: <gate> resolves in none of:` lines per gate, each with an EMPTY list
-  after the colon. Nothing in that output names the argument, and "malformed fixtures" points the
-  reader at the corpus, which is intact.
-  **The mechanism is a one-line asymmetry.** `$1` is guarded by
-  `[[ -d "$TESTS_DIR" ]] || { …; exit 2; }`. `${@:2}` REPLACES the `gate_check_dirs` default and is
-  filtered by `[[ -d "$d" ]] && resolved+=(…)`, so a non-existent member is dropped rather than
-  refused and an all-missing set resolves to empty. The filter is right for the DEFAULT set, where
-  an absent kit dir is normal; it is wrong for an EXPLICIT one, where the caller named it.
-  **Why `[design-pending]` and not a two-line patch.** The two sets need different strictness from
-  one code path, and which distinction to key on is the design: explicit-vs-default argv provenance,
-  or a `--strict` opt-in, or refusing only when the resolved set is empty. The third is cheapest and
-  the weakest — it still passes a run where three of four named dirs are typos. The runner is also
-  the oracle every kit's fixture suite rides, so a strictness change is felt by every consumer
-  invocation at once, including the vendored ones.
-  **This repo is the case that surfaces it**, because its consumer remainder keeps no `checks/`
-  directory since the port — so the roster's consumer line takes the tests dir alone while every
-  kit line takes two, and the natural generalization from a kit line is the failing form.
-  **Cost while deferred:** one session's diagnosis per occurrence, paid by whoever generalizes the
-  two-argument form; low frequency, and self-limiting once the SPEC paragraph above is found, which
-  is exactly what makes it a documented hazard rather than a fixed one.
-  Filed 2026-08-24 at this iteration's close, from the knowledge-friction triage that gave the fact
-  its home in gate-sdk/SPEC.md §run-gate-tests; filed rather than fixed under the scope-gated intake
-  rule, the harness being validate-critical and this close post-validate.
 
 - **kfric-obligation-residency** [design-pending] [cost: iteration/low] [surface: delegation-kit] — the knowledge-friction capture obligation is
   declared for "any session" and reaches no surface a kit-template session actually loads.
@@ -4686,35 +4231,6 @@
   the one act the rule names as retracting a statement that is still true.
   Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-26 at build, observing validate.
 
-- **enter-stage-refusal-help-contradicts-its-guard** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the entry tool's refusal
-  offers "perform the stamp by hand" as the deliberate override, and three other surfaces say that
-  is exactly what must not happen.
-  The `--enter-stage` arm's `HELP_PREFLIGHT` string is printed under BOTH pre-flight
-  refusals — the built-in `check-stage-entry` one and every `LIFECYCLE_KIT_ENTRY_PREFLIGHT` one —
-  and it reads "resolve the finding above, or (to override deliberately) perform the stamp by
-  hand."
-  **What contradicts it, all three checked first-hand.** The `workflow-state-guard` arm is a
-  `PreToolUse(Write|Edit)` hook that BLOCKS a hand edit of the state file outright, and its own
-  block text ends "If enter-stage refuses, that refusal is a gate verdict to resolve at its source,
-  not to write around." `lifecycle-kit/templates/stages/close.md`'s first step says "On a refusal,
-  **do not force the entry** — escalate ... a refused entry is a gate verdict to resolve at its
-  source, never to override." And the valve the same iteration shipped exists precisely so the one
-  sanctioned deadlock has an in-contract path instead of a hand stamp.
-  **It is a kit-side defect, not a consumer one.** A consumer without this repo's guard still has
-  the kit's own close template telling it the opposite of the kit's own help line, so the
-  contradiction ships.
-  **NOT the same as the two escapes the tool legitimately offers**, and the distinction is what
-  makes this narrow: writing a missing predecessor journal by hand is stated as evadable by design
-  on a DIFFERENT file, and arming the valve is a ledger write, not a stamp. Only the stamp itself
-  is the guarded surface.
-  **Why `[design-pending]`:** the wording is one line, but what the line should SAY is the open
-  call — name the valve and the escalation as the two recoveries, or say only "resolve the finding
-  at its source", or make the recovery text conditional on which pre-flight refused. The third is
-  the only one that stays true for a consumer wiring its own pre-flight commands.
-  **Cost while deferred:** the one help line a refused session actually reads points it at the act
-  a hook then blocks, so the tool's own recovery advice costs a round-trip and teaches the wrong
-  model of what a refusal means.
-  Filed 2026-08-26 by close from the knowledge-friction log; captured 2026-08-26 by validate.
 
 - **account-noun-plural-slips-the-shape** [design-pending] [cost: event/high] [surface: gate-sdk] — the account-identification pattern
   matches a singular account noun only, so the plural form passes both readers.
@@ -4866,75 +4382,7 @@
   scope. Also ruled on: lead 2026-09-04 (own-authority). Fifth and SIXTH re-derivations drained at
   scope 2026-09-06 and 2026-09-08, each discarded, the instrument half kept above.
 
-- **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] [cost: event/low] [surface: installer] — the remedy
-  `artifact-digest-mismatch-remedy-inert` shipped — `init` rewriting a gate binary whose bytes no
-  longer hash to the manifest's `artifact.digest`, rather than leaving it kept — has no oracle that
-  drives it over a real install. Its only assertion is a crate unit test,
-  `a_placement_owns_both_paths_and_a_bare_re_run_rewrites_nothing` in `native/src/install.rs`,
-  which exercises `place()` against a synthesised `Recorded` and never an installed tree.
-  **The deliverable, sized on the arm that already exists.**
-  `installer/consumer-smoke/run-smoke.sh`'s artifact arm installs a consumer at the minimum profile
-  and then drives the three SELECTION outcomes on a mutated copy of the packed payload — target and
-  digest recorded, a host off the roster omitted-and-declared, a tampered artifact refused
-  pre-write, a declared-but-absent target refused rather than omitted. What it never does is
-  put bytes over the
-  *already-installed* binary. The addition: substitute over that installed binary, assert `doctor`
-  names the digest finding while still exiting 0, re-run `init`, assert the binary hashes back to
-  the manifest's `artifact.digest` and does not appear in the changed-file report.
-  **The filing bullet's cost premise fell at the drain, and the drain's own correction has now
-  fallen too.** The bullet said the addition "mints a baseline scenario" and would therefore be
-  recorded `ignore`. It need not mint one at all — the arm's own consumer is already installed at
-  its head, so the assertions land under the existing `artifact arm` printf header and no new
-  parsed scenario appears. The 2026-08-28 drain then held the `ignore` conclusion by a second
-  route: the baseline carried `installer_smoke artifact-arm ignore` behind a binary-less leg that
-  `fail()`ed the run at `exit 1`, so the arm never executed. **That sequencing constraint is GONE,
-  re-measured 2026-09-05:** `.workflow/validate-baseline.txt` records every `installer_smoke` arm
-  `pass`, and validate measured `installer_smoke pass=13 fail=0 ignore=0 verdict=clean`. The arm
-  runs, so an assertion added to it is executed code the day it lands. The entry is CHEAPER than
-  filed rather than blocked, and nothing sequences it any more.
-  **DISTINCT from `binary-less-dispatch-loop-retirement`, which has since left the queue** — this
-  entry cited it only as that sequencing constraint, now discharged. That entry's subject was why a
-  binary-less payload leaves the prose registry naming no gates; this one's is an uncovered
-  behaviour on the payload that DOES carry a binary. Distinct too from
-  `artifact-digest-mismatch-remedy-inert`, which is done: that entry made the remedy real, this one
-  gives it an oracle.
-  **Cost while deferred:** the substitution remedy is a behaviour the installer's own end-to-end
-  suite cannot regress-detect, so a refactor of `place()` that reverts to keep-and-report stays
-  green in the smoke and is caught only by a unit test that never touches a tree.
-  Filed 2026-08-28 to the gap inbox by build batch 1; promoted 2026-08-28 at close, with the
-  baseline-minting premise corrected and the sequencing constraint re-measured.
 
-- **uninstall-artifact-ownership-asymmetry** [design-pending] [cost: event/low] [surface: installer] — `init` and `uninstall` disagree
-  about who owns a substituted gate binary, and the docs make the asymmetry visible.
-  `artifact-digest-mismatch-remedy-inert` established in installer/README.md §The gate binary that
-  no version of a compiled artifact is the adopter's, which is the ground for `init` rewriting one
-  that fails its recorded digest. §uninstall still runs the artifact row through the general
-  removal rule — "the roster walk removes it like any other row, because `artifact` is identity
-  rather than ownership" — and that rule keeps-and-reports on a hash mismatch. So an adopter who
-  substitutes the binary and then uninstalls without an intervening `init` gets it KEPT, left on
-  disk as if they had authored it, under a ground the same document now denies.
-  **Verified at the drain against the implementation, not only the prose.**
-  `native/src/installer/uninstall.rs` carries no artifact special case: its removal walk is the hash
-  test and the keep/report branch, and nothing in it reads `artifact`. The prose and the code agree
-  with each other and disagree with §The gate binary. **The behind-invoke relocation PRESERVED this
-  exactly and settled nothing** — re-verified at the 2026-09-09 drain; the fork below stays open.
-  **The window is narrow and the direction is conservative**, which is why this is a consistency
-  gap rather than a data-loss one: any `init` in between re-records the hash, and the smoke's
-  uninstall arm removes all and keeps 0.
-  **Why `[design-pending]` — the fork is real and unruled.** Either extend the artifact exemption
-  to the removal rule, so `uninstall` removes the artifact row unconditionally on the ground that a
-  compiled artifact is never the adopter's; or rule that removal is a different question from
-  rewriting — leaving a file behind costs an adopter nothing, while overwriting one is the act the
-  ownership contract exists to bound — and state in §uninstall why the artifact stays under the
-  general test. Whichever wins, the losing reading has to stop being derivable from the docs.
-  **DISTINCT from `artifact-digest-mismatch-remedy-inert`**, which is done and whose subject was
-  `init`'s refusal to perform the remedy `doctor` printed; this is the sibling surface that fix
-  deliberately did not widen to.
-  **Cost while deferred:** two adjacent sections of one document support opposite answers to "is a
-  compiled artifact ever yours", so an adopter reading either one alone reads a contract the other
-  contradicts.
-  Filed to the gap inbox 2026-08-28 by build batch 1 off the docs alone; promoted the same day at
-  close, once the keep-and-report mechanism was re-verified against the `uninstall` verb.
 
 - **readme-bin-roster-underived** [design-pending] [cost: event/low] [surface: gate-sdk] — every kit README's **gate** roster is held by a
   gate and its **`bin/` tool** roster is held by nothing, so a tool added, renamed or retired leaves
@@ -5962,7 +5410,6 @@
 - **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
 - **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
 - **edges-retired-block-name-clash** [design-pending] — A live gate name inflates a retired slug.
-- **class-default-reach-gated-by-cost-opener** [design-pending] — Wording, not class, sets reach.
 - **lead-report-is-an-ungated-terminal-act** [design-pending] — May close holding unfiled work.
 - **smoke-report-array-carrier-mangling-unexplained** [design-pending] — Witness now needs design.
 - **queue-entry-evidence-tier** [design-pending] — Nothing signals an entry was compressed.
@@ -6103,6 +5550,24 @@
 - **smoke-whole-tree-precondition-unscoped** [design-pending] — Any dirty path blocks the smoke.
 - **run-validate-child-env-knob-leak** [design-pending] — Suite children inherit bridged knobs.
 - **append-grant-decline-cause-unlogged** [design-pending] — Decline cause truncated from the log.
+- **spec-internal-identifier-prefix-drift** [design-pending] — SPECs cite internal names, not knobs.
+- **lint-scope-hook-trigger** [design-pending] — extra lint dirs skip the commit hook, CI-only.
+- **release-note-section-set-derivation** [design-pending] — release gate hand-lists note sections.
+- **release-asset-claim-class-owner** [design-pending] — a release-ships-an-asset claim has no gate.
+- **spec-pointer-self-section-citation** [design-pending] — same-file section cites go unchecked.
+- **knob-default-accessor-singularity** [design-pending] — no gate bars re-spelling a knob default.
+- **bin-argv-shape-residual-member** [design-pending] — one bin arm skips the argv-shape contract.
+- **docs-corpus-derivation-manifest-divergence** [design-pending] — two docs gate corpora diverge.
+- **consumer-gate-roster-unread** [design-pending] — no roster reads a consumer-declared gate.
+- **waiter-loop-condition-predicate-gap** [design-pending] — waiting rule misses a lone waiter loop.
+- **crate-toolchain-grant-uncommitted** [design-pending] — overlay keeps cargo grants ruled out.
+- **prose-uniqueness-claim-unchecked** [design-pending] — no gate checks a prose uniqueness claim.
+- **kit-spec-layout-tree-hand-maintained** [design-pending] — kit SPEC layout trees are hand-kept.
+- **expansion-rule-backtick-blind** [design-pending] — expansion rule misses backtick substitution.
+- **fixture-runner-checks-dir-fails-open** [design-pending] — bad checks-dir arg drops silently.
+- **enter-stage-refusal-help-contradicts-its-guard** [design-pending] — help contradicts its hook.
+- **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — untested end to end.
+- **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
 
@@ -6116,5 +5581,6 @@
 - deferred-surface-tag-for-bundling
 - scope-ranking-blind-to-deferral-cost-and-impact
 - close-watch-waits-on-slowest-smoke-leg
+- class-default-reach-gated-by-cost-opener
 
 ## Lessons Learned
