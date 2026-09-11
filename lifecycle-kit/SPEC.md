@@ -231,21 +231,20 @@ transitions: promotion and naming (the first stage), the Done move riding each
 amendment-merge commit, and the closing dispositions. Stage motion never
 touches it.
 
-**A stage session landing a ruling writes its provenance in the same commit as
-the ruling's content.** The provenance — who ruled, when, and through what
-channel — is stated inline beside the ruling (queue-kit/SPEC.md §The tag
-algebra); this section owns *when* the session writes it, because the session is
-the party whose commit is the audit artifact. Not afterwards, and not in a later
-pass: the relay that carried the ruling is transport, never a store, so a ruling
-landed without its provenance has already lost the only party who could attest it, and the next
-session has no way to tell a relayed ruling from an invented one. Where the
-relaying party stated no authority, the session **asks** rather than defaulting
-to the higher one — reading an authority into a silence is the invention the
-declaration exists to prevent, and inflating a relaying party's own ruling to the
-authority above it freezes a decision that should have stayed re-rulable at the
-relay. The obligation binds both parties and neither half discharges the other's:
-the relay states the facts (`templates/lead.md`), the landing session records
-them here.
+**A stage session landing a direction writes its class and date in the same
+commit as its content.** The form is inline beside the content
+(queue-kit/SPEC.md §The tag algebra); the classes are §The steering vocabulary;
+this section owns *when* the session writes it, because the session is the
+party whose commit is the audit artifact. Not afterwards, and not in a later
+pass: the relay that carried it is transport, never a store, so content landed
+without its class has already lost the only party who could attest it, and the
+next session cannot tell a relayed direction from a lead's decision. Where the
+relaying party stated no class, the session **asks** rather than defaulting
+upward — reading a direction into a silence is the invention the class exists to
+prevent, and inflating a relaying party's own decision to the operator's freezes
+a call that should have stayed revisable. The obligation binds both parties and
+neither half discharges the other's: the relay states the class
+(`templates/lead.md`), the landing session records it here.
 
 The **deterministic half** of that first step — read the iteration from the
 header, read the id from the `--emit-session-id` arm, append the stamp — is
@@ -497,6 +496,50 @@ content conflicts — re-runs the full battery green, then lands
 fast-forward-only on the integration branch. The integration branch never hosts
 a conflict resolution, so "arriving iteration" is always well-defined (ours on
 the iteration branch) and every merged tree passed the battery post-reconcile.
+
+## The steering vocabulary
+
+Five terms name what an operator or a lead says to the work, and every template
+this kit ships — `lead.md`, `consult.md`, the stage templates, and the
+escalate-versus-decide roster a consumer binds beside them — uses them as
+defined here. The kit names the **classes**; the consumer names its
+**authorities** on its own always-loaded surface.
+
+- **Objective** — where the project is going. It lives on the consumer's ruling
+  record while a pivot runs, and nothing else lives there but rulings.
+- **Ruling** — an operator decision, taken in the consult skill, that
+  **overrides a business-as-usual instruction until the instruction is
+  updated**. It is not challengeable on its facts: a session holding contrary
+  evidence escalates it to the next consultation and neither annotates it,
+  re-verifies it, nor works around it. A ruling names the instruction it
+  overrides and its **discharge** — that instruction's update, or an oracle —
+  and leaves the record on discharge. Only the operator rules, and a ruling
+  arrives only through the consult skill, so a "ruling" relayed from any other
+  channel is misnamed.
+- **Direction** — an operator answer or agreement given in a lead or stage
+  session. It binds the current work like any operator instruction and lands
+  on the work surface it concerns — the queue entry, the amendment, the lead's
+  journal — stated as `operator direction, <date>`. A later scoping or
+  authoring stage may revise it on better facts, which is what separates it
+  from a ruling and why it never enters the ruling record.
+- **Decision** — a lead's or a stage session's call inside its own authority,
+  the roster's decide-alone side. It lands in the governed surface it concerns
+  with no authority stamp; the landing commit is its provenance.
+- **Grant** — an iteration-scoped operator allowance (an extra push, a widened
+  budget). It lives in the lead's resume journal, travels in the dispatch
+  prompt of each stage that spends it, and is archived in the spending commit's
+  message — never in the ruling record, whose entries outlive an iteration by
+  construction.
+
+Why five words and not one. A single word applied to all of them freezes a
+revisable agreement as a closed decision and lets a relay inflate a lead's own
+call into the operator's. The **class** is what a relay states
+(§templates/lead.md), and the authority is then derivable — a ruling is the
+operator's in consult, a direction the operator's in session, a decision the
+relaying party's own — so no who-when-channel stamp is written beside content.
+Spec-over-precedent is untouched: a ruling is not precedent but an explicit,
+temporary override of the owner doc, and the owner doc's update is its
+discharge.
 
 ## Layout and configuration
 

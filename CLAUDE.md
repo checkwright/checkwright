@@ -156,20 +156,15 @@ load behind that trigger, so they are not resident here.
   GitHub UI settings.
 - `ROADMAP.md` is a generated root projection of this queue's curated
   `[roadmap:]` tags — never hand-edit its marker block.
-- [`TRAJECTORY.md`](TRAJECTORY.md) is the hand-authored ruling record — the
-  objectives and the closed operator rulings; a recorded
-  ruling is closed, so escalate rather than reverse one, and retiring a spent
-  ruling is not reversing it. It admits only a ruling naming its discharge
-  event or reversing a recorded one (its §What this file admits); every other
-  ruling lands undated on its business-as-usual surface.
-- **The ruling authorities are `operator` and `lead`** — the kit ships the slot,
-  never the vocabulary. A session landing a ruling in the queue states who
-  ruled, when and through what channel inline beside the ruling's content, in
-  the same commit — a lead's own ruling as `lead, own-authority`, never
-  unmarked; a relay states both facts, and where it did not, ask rather than
-  assume the operator. Never as a `ruled:` declaration line, which is retired
-  (queue-kit/SPEC.md §The tag algebra owns the form, lifecycle-kit/SPEC.md
-  §The state machine the timing).
+- [`TRAJECTORY.md`](TRAJECTORY.md) is the hand-authored **override ledger** —
+  the objectives of the running pivot and the operator's rulings, each naming
+  the instruction it overrides and its discharge, and leaving the file on
+  discharge. A ruling is closed: escalate it to `/consult`, never reverse,
+  annotate or re-verify it. **Only the operator rules, and only through
+  `/consult`**; what an operator says in a lead or stage session is a
+  direction, revisable at scope or spec, and lands on the work surface it
+  concerns as `operator direction, <date>`. The terms (objective, ruling,
+  direction, decision, grant): lifecycle-kit/SPEC.md §The steering vocabulary.
 - **A permission-settings edit is the operator's, applied out of band** — never
   build work, never queue work, and never promoted by scope; a session prepares
   the diff and states its security grounds and stops there. Criterion, grounds

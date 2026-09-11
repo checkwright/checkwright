@@ -97,7 +97,12 @@ release-sweep first, its boundary-only sub-procedure) when any of:
   under §Versioning (a decommission). A decommission waiting behind the cadence
   floor is a deprecation promise coming due late, so it releases immediately.
 - **A security or supply-chain fix** in the batch. Reaching users late is the
-  whole cost being avoided.
+  whole cost being avoided. It reads narrowly while the channel is `preview`: a
+  vulnerability or a compromised artifact fires it, an install-path data-loss
+  repair does not, however severe, because that channel declares an audience of
+  internal iteration and there is no user population to reach late. The channel
+  flip reopens the reading rather than inheriting it; the operator-direction
+  trigger below stays available for the urgent case this declines to automate.
 - **Explicit operator direction**, recorded in the disposition line's basis.
 - **The channel's audience arriving** — the launch the private brief's own
   readiness rule gates. The accumulated `deferred:` floor ships as

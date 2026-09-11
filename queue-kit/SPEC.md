@@ -545,14 +545,14 @@ recurred.
 under judgment is not one a scanner can demand — which is also why the grammar
 landed with **no retrofit**: existing entries are not back-filled.
 
-**A ruling's provenance is stated inline beside the ruling's content, never as
-a declaration line.** Who ruled, when, and through what channel are three facts
-the sentence recording the ruling already carries —
-`ruled <date> (<authority>, <channel>)` — and a party's own ruling names that
-party rather than going unmarked, because an absence otherwise reads as the highest authority and
-freezes a decision that should have stayed re-rulable. The authority vocabulary
-is the consumer's, named on its own always-loaded surface; the kit enumerates
-none. A `ruled: <slug> <authority> <date> <channel>` declaration grammar once
+**A direction's class and date are stated inline beside its content, never as
+a declaration line.** The sentence recording it carries both —
+`operator direction, <date>` — and a lead's own decision is marked as a
+decision rather than going unmarked, because an absence otherwise reads as the
+operator's word and freezes a call that should have stayed revisable. The
+classes are lifecycle-kit/SPEC.md §The steering vocabulary; the authority
+vocabulary is the consumer's, named on its own always-loaded surface, and the
+kit enumerates none. A `ruled: <slug> <authority> <date> <channel>` declaration grammar once
 shipped beside `recurrence:` and is **retired**: its only machine reader was
 §check-queue-entry-budget's own discount, the body already carried the same
 three facts inline, and the discount being one line per grammar meant every
@@ -561,9 +561,9 @@ second content tier growing against the record it duplicated. The lead token
 is refused by §check-queue-entry-budget assertion (D) so the grammar is not
 re-minted from habit; the inline form costs nothing and has the same reader,
 the auditing one — a later session or an operator at the moment a recorded
-ruling is relied on or re-ruled. What the inline statement buys is unchanged
+direction is relied on or revised. What the inline statement buys is unchanged
 by the form: it is the relaying party's own word about a channel the tracked
-record cannot reach, so it raises the cost of inventing a ruling and does not
+record cannot reach, so it raises the cost of inventing a direction and does not
 make an invented one detectable, and no governed surface may state it as
 verification.
 

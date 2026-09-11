@@ -26,11 +26,10 @@ deferred entry, and `check-queue-entry-budget`'s per-entry cap binds it — size
 the promotion against the headroom a clean battery prints, not against the
 bullet's length. A discard's cause rides the commit message that truncates.
 
-**ritual** — read `BRIEF.local.md` (local-only brief) and the tracked ruling
-record this survey ranks against, TRAJECTORY.md §The objectives plus
-TRAJECTORY.md §The closed rulings and its sequence directive; **a recorded
-operator ruling is closed — never re-litigate one; only the operator reopens
-one.** Then run the GitHub
+**ritual** — read `BRIEF.local.md` (local-only brief) and the override ledger
+this survey ranks against, TRAJECTORY.md — its objectives and any standing
+ruling; **a ruling is closed — never re-litigate one; the operator reopens one
+through `/consult`.** Then run the GitHub
 boundary sweep (below); decide the unit's
 layout, config surface, and worklist; name the iteration after the unit. Hold
 the provenance seam per CLAUDE.md §The provenance seam (never cross it) and

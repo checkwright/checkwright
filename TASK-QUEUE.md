@@ -5794,28 +5794,6 @@
   the obvious cheap fix is already landed, and already failed.
   recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
 
-- **iteration-scoped-grant-home-unstated** [design-pending] — an iteration-scoped operator grant
-  has no stated home, and the ruling record it was first filed in was the wrong one.
-  **Operator direction 2026-09-11 through AskUserQuestion in the lead session, confirmed in the
-  same session and relayed by that lead — a direction, not a ruling, rulings being applied via
-  /consult:** such a grant lives in the lead's own resume journal, is relayed with its authority
-  and channel in the dispatch prompt of each stage that spends it, and is archived in the spending
-  commit's message, never in TRAJECTORY.md. With no lead running the operator is in the stage
-  session directly. Applied to the record it would narrow the 2026-09-09 admission test
-  (TRAJECTORY.md §What this file admits), which is /consult's to do. Grounds as relayed:
-  lifecycle-kit/templates/lead.md §Economics already partitions lead state by lifetime and sends
-  iteration-local state to the journal, and the record route misfired.
-  **Owed:** one clause stating the rule in lifecycle-kit/templates/lead.md, with its owning SPEC
-  passage if it is an amendment, and the admission-test change taken through /consult.
-  **Not owed:** the instance's spent paragraph was retired at close step 7 on 2026-09-11, a lead
-  decision under that step's session-class authority, once its `grep -L` discharge oracle, which
-  could never fire, was rewritten.
-  **Cost while deferred:** the next iteration-scoped grant has only precedent to route by, and the
-  precedent is the misfiled one.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: kit text in the lead contract,
-  routed to scope by the dispatch. →icebox refused on the operator's 2026-09-11 direction
-  (AskUserQuestion, lead-relayed) that no inbox bullet enters the Icebox directly.
-
 - **scope-ranking-blind-to-deferral-cost-and-impact** [design-pending] — scope's ranking rule
   reads cost while deferred and impact off an entry's cost field, but no filer-written class word
   makes the per-iteration cost class greppable, so the first rank tier is read by hand.
@@ -5872,8 +5850,9 @@
   polling and agent-execution's note that an interrupt destroys uncommitted work — the cost is
   stated and the act never forbidden.
   **Owed:** one clause in lifecycle-kit/templates/lead.md naming the act, its two authorizations
-  (operator confirmation, or a per-iteration grant held where `iteration-scoped-grant-home-unstated`
-  puts grants) and the uncommitted-work cost as grounds, plus the owning SPEC passage if needed.
+  (operator confirmation, or a per-iteration grant where lifecycle-kit/SPEC.md §The steering
+  vocabulary puts grants) and the uncommitted-work cost as grounds, plus the owning SPEC passage
+  if needed.
   **Cost while deferred:** token waste — a cancelled session's uncommitted unit is re-bought, and
   only the harness's general confirm-before-irreversible default stands in the way.
   Filed 2026-09-11 by close, draining the gap inbox. →fix failed: lead-contract kit text, routed
@@ -5919,39 +5898,6 @@
   Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a template step plus a spec
   clause. →icebox refused on the same operator direction as the entries above, no inbox bullet
   entering the tier directly.
-
-- **ruling-versus-direction-undefined** [design-pending] — nothing separates a binding ruling from
-  an agreed direction, so a relay can label the second as the first.
-  **The instance, 2026-09-11:** a lead relayed an operator-agreed fix direction for
-  `ro-bins-write-option-bypass` as ruled and corrected it the same day.
-  **Operator statements 2026-09-11 in the lead session (typed message, then AskUserQuestion),
-  relayed by that lead:** a ruling changes project trajectory and comes only via /consult; it is
-  not open to challenge, including by validating its facts; it may override current instructions
-  until they are updated; rulings go to TRAJECTORY.md and leave once obsolete; an agreed direction
-  is not a ruling, and scope or spec may revise it.
-  **Tensions, lead-probed and open:** (1) TRAJECTORY.md §What this file admits sends every ruling
-  that neither names its discharge nor reverses another to a business-as-usual home, so
-  rulings-go-there widens it; (2) the record's annotate-a-false-ground act, and a directive
-  discharged by falsifying its premise (`append-grant-decline-cause-unlogged`, icebox), conflict
-  with not-challengeable-by-facts; (3) spec-over-precedent makes the owner doc ground truth and no
-  surface says whether an overriding ruling outranks it; (4) CLAUDE.md names `operator` and `lead`
-  as ruling authorities with a `lead, own-authority` form, and `.claude/commands/consult.md` pins
-  no model, so no consult-only binding exists; (5) the lead template and stage-session agent carry
-  no relay class for a direction.
-  **A conflict named for /consult, unresolved at this close:** the operator directed 2026-09-11
-  (AskUserQuestion, lead-relayed) that no inbox bullet enters the Icebox — the tier holds deferred
-  tasks gone dormant for want of recurrence, entered only from Deferred. TRAJECTORY.md's
-  machinery-class icebox default (2026-08-30) and its two lead extensions (over a live trigger,
-  2026-09-07; over close's own captures, 2026-09-08) route inbox bullets there, as does the close
-  template's own →icebox drain disposition. This close followed the direction and left those
-  paragraphs unedited.
-  **Owed:** /consult on the tensions and the conflict, then the definition at its owning surface,
-  the relay vocabulary in both contracts, and the admission test and icebox default as ruled.
-  **DISTINCT from `iteration-scoped-grant-home-unstated`**: a grant is not a steering decision.
-  **Cost while deferred:** a relayed direction binds later sessions as closed, and the drain's
-  icebox route reads two ways.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: /consult is owed first.
-  →icebox refused on the direction above.
 
 
 ## Icebox
@@ -6211,5 +6157,8 @@
 - **append-grant-decline-cause-unlogged** [design-pending] — Decline cause truncated from the log.
 
 ## Done
+
+- ruling-versus-direction-undefined
+- iteration-scoped-grant-home-unstated
 
 ## Lessons Learned

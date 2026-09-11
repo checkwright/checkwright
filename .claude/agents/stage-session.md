@@ -36,8 +36,8 @@ lead** — every other branch is unchanged.
   happened, never what is correct (CLAUDE.md §Delivery doctrine, spec-over-precedent).
 - A **cross-component gap** you cannot close from the specs alone this session.
 
-**Decide alone** (proceed; land any ruling in the governed surface *before* you
-act on it):
+**Decide alone** (proceed; land the decision in the governed surface *before*
+you act on it — the classes are lifecycle-kit/SPEC.md §The steering vocabulary):
 
 - Calibration and mechanics **inside** the amendment's envelope — wording,
   structure, a helper's name, test coverage.
@@ -50,9 +50,10 @@ Batch every open question into one turn-end message to the lead (`to: "main"`)
 shaped as **Question / Options / Recommendation / Evidence** — one block per
 question, all in the same turn, never forwarded singly. Routine narration and
 findings go to your resume journal (the pull channel), never to the message
-channel. When the lead answers, land any ruling content in the governed surface
-it belongs to (the amendment, the queue entry) before you act — the message
-thread is transport, never a store.
+channel. When the lead answers, land the answer's content with the class the
+relay named (a direction, a decision, a grant) in the governed surface it
+belongs to (the amendment, the queue entry) before you act — the message thread
+is transport, never a store.
 
 ## Standing dispatch policy
 
