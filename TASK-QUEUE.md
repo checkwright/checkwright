@@ -6003,6 +6003,29 @@
   Filed 2026-08-23 by the consult held after `leak-guard-and-assertion-meta-gate-port` closed,
   promoted out of the gap inbox at the following scope intake the same date.
 
+- **deferred-surface-tag-for-bundling** [design-pending] — scope's third rank tier fills the
+  window with deferred entries sharing the lead unit's surface, and no machine-readable input
+  feeds it: the board prints lead lines only, no deferred entry carries an amendment ref the
+  owning kit could be derived from, and the pool survey's clusters were hand-derived from
+  full-body reads.
+  **Operator direction, 2026-09-11 (consult): a lead-line surface tag with a closed value
+  set**, so scope selects the top-cost entry of one surface from the board and fills the window
+  with same-surface entries without reading bodies. Three points ruled for spec, not re-derived
+  there: the axis is *surface*, not kit, because `docs/`, `installer/`, `native/`, `scripts/`
+  and the command bindings are owned root surfaces that are not kits — the value set is the
+  kit roots plus the rostered root surfaces, derived from the tree, on the roadmap tag's
+  precedent of fixed spelling with consumer-configured values; a multi-surface entry declares
+  its primary surface only, since bundling wants one join key; and the tag rides the same
+  amendment as `deferred-cost-class-opener-vocabulary` — one class-table row each, one change
+  to the `queue-index` arm to print lead-line tags on the board, one reclassification sweep.
+  Class: a new tag is a governed name, so this is a **feature** and the amendment is owed at
+  promotion (queue-kit/SPEC.md §The tag algebra).
+  **Cost while deferred:** token waste, paid per scope session: same-surface composition is
+  re-clustered by hand over full-body reads at every boundary.
+  Filed 2026-09-11 by consult on operator direction, bundled with
+  `deferred-cost-class-opener-vocabulary` and `landing-moots-live-entries-undetected` for the
+  next scope.
+
 
 ## Icebox
 
