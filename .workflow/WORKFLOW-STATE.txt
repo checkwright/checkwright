@@ -5,3 +5,4 @@
 ---
 
 rankable-deferred-board scope a4314143 2026-09-11 56f56d81
+rankable-deferred-board spec ac04623c 2026-09-11 0fa13499
