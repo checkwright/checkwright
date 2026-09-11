@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: instruction-surface-tier
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -927,6 +927,9 @@
   **Cost while deferred:** every session is oriented by a surface describing the substrate
   the project is moving off, and the correction is paid per session in re-derivation rather
   than once in an edit.
+  **Unit set `instruction-surface-tier`, the always-loaded half of the sweep's rewrite —
+  operator direction, 2026-09-11.** Its threshold trigger has fired: `--emit port-blockers
+  --tree` owes 0, with 70 files declared no-port (re-measured 2026-09-12 at scope).
   Filed 2026-08-03 by spec; the pivot names this rewrite and does not start it.
 
 - **plugin-marketplace** [design-pending] [roadmap: later/ecosystem] [cost: once/low] [surface: installer] — harness plugin packaging.
@@ -1174,16 +1177,11 @@
   tidiest section of the always-loaded surface while the section that actually
   grows is outside its reach, so the tier ratchets with no oracle. The gate's
   target is a single named section (`CONTEXT_KIT_BREVITY_SECTION`, this repo's
-  conventions block, 17 lines); §Housekeeping is 59 of `CLAUDE.md`'s 189 lines —
-  31% of the surface — and no gate reads it. Measured at this close: the
-  always-loaded meter reads 197 lines against a committed baseline of 172,
-  **+25 (+14.5%)**, and the baseline stamp dates to `v0.8.0`, twelve releases
-  back. Every close's brevity pass is therefore the only detector, which is a
+  conventions block, 7 lines); §Housekeeping is 83 of `CLAUDE.md`'s 204 lines —
+  41% of the surface — and no gate reads it (re-measured 2026-09-12 at scope).
+  Every close's brevity pass is therefore the only detector, which is a
   session's attention standing in for a gate — the shape enforcement-first exists
   to refuse.
-  **Deliberately not reset.** Re-stamping the baseline at this close would clear
-  the drift signal by blessing the growth, which is the one thing the baseline is
-  for. It stays where it is until the ratchet is actually addressed.
   **What this close found and left.** Four bullets carry a doc pointer and then
   restate what is behind it — the `.tmp/`/`.metric/`/`.workflow/` bullet (13
   lines, mostly mechanism the owning SPECs own, with only the `*.local.md` roster
@@ -1200,18 +1198,18 @@
   **ratchet** assertion rather than a cap — red when the surface grows against its
   committed baseline without the baseline being deliberately re-stamped — which
   needs no budget at all and makes the growth visible where it happens.
-  **The series, against the same unmoved baseline: 197 (+25) → 213 (+41) → 213 (+41).**
-  The middle reading advanced 16 lines and looked like compounding drift. The third,
-  at `native-cohort-activation`'s close, is the first that did **not** advance, and the
-  mechanism outweighs the number: the iteration added exactly one line and that close's
-  pass recovered exactly that one, both times from the same `native/` bullet restating
-  what gate-sdk's SPEC owns. So a pass-shaped fix holds the line **only** against a
-  pass-shaped increment — one of forty-one when the growth was unit-shaped, one of one
-  when it was not. The baseline stays unstamped through all three.
+  **The drift series is spent; its finding is kept.** Close now re-baselines the meter
+  each iteration (`68cc1ea5`), so the baseline has moved: 216 against a meter reading of
+  212 at 2026-09-12 scope, the +25/+41/+41 readings against `v0.8.0` left to git history.
+  What they showed stands: a pass-shaped fix holds the line only against a pass-shaped
+  increment. A ratchet against a baseline close re-stamps each iteration reads one
+  iteration's growth, which the candidate above must account for.
   **Operator direction 2026-09-10, widening this entry's subject rather than opening a new one
   — consult channel in a lead session, relayed by that lead.** Brevity must reach
   **on-demand-loaded** surfaces too, so unjustified growth behind a load trigger is caught as
-  well; the ratchet below is the candidate for both.
+  well; the ratchet is the candidate for both.
+  **Unit set `instruction-surface-tier`, the gate half: the ratchet that holds what the sweep
+  cuts — operator direction, 2026-09-11.**
   **Cost while deferred:** compounding directly in the tier the whole methodology
   is trying to hold down, and paid by every session in this repo and every
   consumer that vendors context-kit. The detector is a close-stage read, so it is
@@ -1783,9 +1781,9 @@
   touches the align tiering ruling in any direction. Discharge `lead, own-authority 2026-09-08`.
   **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
   stage's signal value decays toward zero while its cost does not.
-  **At threshold again and declined at scope — operator direction, 2026-09-11, lead-relayed:** the
-  revert signal still has not fired; align's template shares no surface with this iteration.
-  Earlier routings (2026-09-04, 2026-09-05) are in git history.
+  **Joins the `instruction-surface-tier` set at threshold — operator direction, 2026-09-11:**
+  the set's sweep reads align's template. Earlier routings, and the same-day decline this
+  replaces, are in git history.
   Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **amendment-refusal-acceptance-parity** [design-pending] [cost: event/low] [surface: canon-kit] — an amendment's refusal rationale can
@@ -2091,6 +2089,9 @@
   The close re-ran the entry's own reproduction and the residue regenerated, because the arm's pin
   misses the knob form a bridged gate reads. The survey never ran the reproduction the entry names.
   recurrence: survey-record-claim-reliability 2026-09-08 2026-09-11
+  **Declined at threshold at scope:** its design pairs with `kfric-capture-unverified-assertion`'s
+  capture-side question, itself declined, and its cheapest part — deriving the `edges` slot
+  rather than taking it hand-typed — shares no surface with the `instruction-surface-tier` set.
   Filed 2026-08-10 by close, on operator direction after the third error.
 
 - **kit-ref-liveness-stem-token-hole** [design-pending] [cost: event/high] [surface: canon-kit] — a typo'd knob name under
@@ -2115,6 +2116,38 @@
   surfaces as behavior, not as a red.
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
 
+
+- **instruction-motivation-owner** [design-pending] [cost: event/high] [surface: delegation-kit] — the what-vs-why rule for instruction
+  surfaces has an owner for *restatements* and no owner for original motivation.
+  **Two halves of this were already answered and this entry does not re-ask them**, corrected at
+  close 2026-08-13 against the source: the general rule is delegation-kit/SPEC.md §Operative
+  residency — (a) unreachable trigger, (b) imperative only, (c) adjacent citation — and that same
+  SPEC already **rules it owes no gate**, with the structural reason stated so a later session does
+  not try to build one that cannot exist.
+  **The residual is a reach gap, verified by reading the rule's own scope.** §Operative residency
+  opens *"A rule may be restated as an imperative in a surface that does not own it"*, so it
+  presupposes an owner elsewhere. Original motivation authored **in** a surface that owns no rule
+  falls outside it: there is nothing being restated, and (b)'s "the reasoning stays with the owner"
+  has no owner to name. That is the exact shape operator ruling 2026-08-13 corrected by hand in
+  `delegation-kit/templates/agent-execution.md`, where the fix was to *create* the owner
+  (delegation-kit/SPEC.md §The delegation model) and then point at it.
+  **Nothing applies (b)/(c) at authoring time either.** Both conditions are read by an author or a
+  reviewer, and no stage, template or roster puts that read in front of anyone authoring a template
+  surface — so the conditions are correct and unfired.
+  **Deliverable, and why `[design-pending]`:** widen the rule to reach original motivation, or state
+  in the SPEC why the two cases stay separate, and give (b)/(c) an authoring-time reader. What is
+  open is which surface owns the widened rule, since the failure spans kits while §Operative
+  residency is delegation-kit's.
+  **No gate is owed and that is settled, not deferred** — the line above rules it, and this entry
+  inherits the ruling rather than reopening it.
+  **Unit set `instruction-surface-tier`, the sweep's blocker, whose reach question /spec rules
+  first — operator direction, 2026-09-11.** The sweep's blocking edge on this entry stays.
+  **Cost while deferred:** every template surface authored keeps accreting motivation the owning
+  SPEC should hold, and the corrected instance is one file out of a corpus of twenty — a corpus
+  grown from 2020 to 2920 lines since filing (re-measured 2026-09-12 at scope).
+  Filed 2026-08-13 by close, draining the gap inbox; the bullet's own claim that the rule and its
+  gateability were unfiled is false on both halves and is corrected here rather than inherited.
+  Iceboxed 2026-09-11 in pool triage; returned 2026-09-12 by scope, body recovered from that commit.
 
 - **instruction-surface-sweep** [design-pending] [blocked-by: instruction-motivation-owner] [cost: session/high] [surface: lifecycle-kit]
   — one full pass applying the what-vs-why rule across the instruction-file corpus, once.
@@ -2144,6 +2177,8 @@
   them whole (685 and 491 lines at close; roughly 23k tokens, a fifth of the lead's context, as
   the lead measured it). The direction may answer or narrow the blocker's open question. Its
   priority is no separate directive: scope ranks it off its lead-line tags, landed 2026-09-11.
+  **Leads the `instruction-surface-tier` set — operator direction, 2026-09-11:** the edge above
+  stays, and `instruction-motivation-owner` joins the set so /spec rules its reach question first.
   **Cost while deferred:** the rule is ruled and applied to one file, so the corpus is nineteen
   files of unswept prose under a rule that already binds it.
   Filed 2026-08-13 by close, on operator direction; blocked on the reach question above, because a
@@ -5145,7 +5180,6 @@
 - **headroom-check-ordering-unruled** [design-pending] — When to read cap headroom is unruled.
 - **dispatch-unreadable-target-fallback** [design-pending] — Blind sweeps echo the prompt as PASS.
 - **queue-write-side-verb** [design-pending] — The queue has no write-side verb.
-- **instruction-motivation-owner** [design-pending] — Original motivation has no owning rule.
 - **close-red-push-ownership** [design-pending] — No owner for a close blocked by a red push.
 - **expected-permission-mode-undeclared** [design-pending] — No surface states the expected mode.
 - **consumer-guard-rule-coverage** [design-pending] — Consumer-only guard rules are untested.
