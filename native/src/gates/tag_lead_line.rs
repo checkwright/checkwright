@@ -12,6 +12,7 @@ pub const CLASSES: &[&str] = &[
     "attend]",
     "drain-exempt:",
     "roadmap:",
+    "observed-by:",
 ];
 
 // spec: queue-kit/SPEC.md §check-tag-lead-line — the terminator strip, held once in the module
@@ -148,6 +149,19 @@ mod tests {
         assert_eq!(classes_on("- x [design-pending]", &none), vec!["design-pending"]);
         assert!(classes_on("- x [blocked-by]", &none).is_empty());
         assert!(classes_on("- x design-pending]", &none).is_empty());
+    }
+
+    // spec: queue-kit/SPEC.md §check-tag-lead-line — membership tracks reader semantics, so
+    // [observed-by:] is governed from the moment its reader scans lead lines, with or without a
+    // live instance in any one consumer's queue
+    #[test]
+    fn the_observation_producer_tag_is_a_governed_class() {
+        let none: Vec<String> = Vec::new();
+        assert_eq!(
+            classes_on("- x [observed-by: gates]", &none),
+            vec!["observed-by"]
+        );
+        assert!(classes_on("- x [observed-by]", &none).is_empty());
     }
 
     #[test]

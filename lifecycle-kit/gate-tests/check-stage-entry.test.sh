@@ -5,8 +5,10 @@
 # close cursor with no validate stamp); the harness admits only one
 # bad/ dir, so assertion B drives untagged residue at drain entry (exit 1),
 # [drain-exempt:] residue at drain entry (exit 0, reason echoed), an
-# empty-reason tag (exit 1), and tagged residue at the drain successor's
-# entry (exit 1 — the no-exemption backstop); assertion C drives four
+# empty-reason tag (exit 1), tagged residue at the drain successor's
+# entry (exit 1 — the no-exemption backstop), and [observed-by:] residue at
+# drain entry (exit 1, named separately and citing its own remedy);
+# assertion C drives four
 # cross-component build-entry scenarios (2-dir amendments ±waiver,
 # single-amendment cross-component body, single-component amendment).
 #
@@ -152,6 +154,29 @@ demo-iteration close eeeeeeee 2026-06-04 none
 EOF
 check_case "B4 tagged-residue-successor-entry" "$b4" 1 "[drain-exempt:] included"
 
+# B5 (bad): an [observed-by:] entry blocking the drain entry is named separately,
+# because landing its work does not drain it — the refusal cites its own remedy.
+b5="$SANDBOX/b5"
+mkdir -p "$b5"
+cat >"$b5/TASK-QUEUE.md" <<'EOF'
+# TASK-QUEUE.md
+
+## Iteration: demo-iteration
+
+---
+
+## New Features
+
+- **observed-feature** [observed-by: ci-run] — work landed; the run is unread
+
+## Technical Debt
+
+## Done
+EOF
+state_through_validate "$b5"
+check_case "B5 observed-by-residue-drain-entry" "$b5" 1 "observation of a remote run rather than a tree state"
+check_case "B5 observed-by-names-its-remedy" "$b5" 1 "splits at scope into a produce half and an observe half"
+
 # --- assertion C: a cross-component build entry demands an align (or waiver) stamp ---
 
 build_queue() {  # writes the name-axis-only TASK-QUEUE.md the build-entry cases share into $1
@@ -246,5 +271,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + assertion C cross-component align/waiver + templates-stub exclusion, 9 cases)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion, 10 scenarios)"
 exit 0

@@ -12,6 +12,8 @@
 
 - **tidy-logs** [drain-exempt: validate-half pending] — collapse the duplicated log lines.
   a continuation mentioning [drain-exempt: whatever] is tolerated (lead carries the class).
+- **watch-the-run** [observed-by: ci-run] — its completion predicate is an observation, not a tree state.
+  a continuation mentioning [observed-by: ci-run] is tolerated (lead carries the class).
 
 ## Deferred
 

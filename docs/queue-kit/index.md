@@ -12,7 +12,8 @@ work and its history from the same tree it commits to, with no credential and
 no network round-trip.
 
 queue-kit formalizes that file: one slug namespace, a small tag algebra
-(blocked-by, design-pending, spec, drain-exempt, roadmap) that encodes
+(blocked-by, design-pending, spec, drain-exempt, roadmap, observed-by) that
+encodes
 preconditions an agent can resolve
 mechanically, an index tool, a roadmap projector that renders the curated
 entries as a generated public page, and gates that hold the grammar a session

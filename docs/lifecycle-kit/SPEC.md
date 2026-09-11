@@ -81,6 +81,41 @@ The default motion is the linear stage walk; the gate-legal shapes for leaving
 it — abandon, split, reopen — are specified in §Deviation transitions, not
 improvised.
 
+**An iteration carrying an observation-predicate entry places its first push
+early.** Where a promoted entry carries `[observed-by: <producer>]`
+(queue-kit/SPEC.md §The tag algebra) its completion predicate is an *observation
+of a remote run* rather than a tree state, so landing the work does not complete
+the entry:
+
+> An iteration whose promoted set carries any `[observed-by:]` entry places its
+> **first** push at or before the stage that lands that entry's work — never at
+> the closing stage.
+
+The rule **re-places** a push rather than buying one, which is what makes it the
+cheap shape: a finished run is read for free, and the commits recording the
+reading accumulate locally and ride the closing push. So the observation arrives
+*between* the iteration's two pushes — early enough to be read, committed and
+drained before the drain gate is reached. Without it the entry meets a bind with
+no valve: §check-stage-entry assertion B refuses a drain-stage entry on a
+non-empty active queue, and `[drain-exempt:]` reaches the drain stage's own
+entry but never its successors', so an entry awaiting a run it cannot yet have
+observed simply cannot drain in the iteration that bought it.
+
+**The seam is held deliberately.** *How many* pushes an iteration may spend is
+consumer content and this rule names no number; it constrains only **where** the
+first one falls, which is an ordering this machine already owns. **And the rule
+is not enforceable** — a push's timing is no tree state, so no arm in this kit
+observes that a push was or was not spent. It is a session obligation carried by
+prompts, and calling it gated would be the false claim; what the machine
+contributes is a refusal that names it (§check-stage-entry).
+
+Where `<producer>` is a **release run** — tag-triggered, so no mid-iteration
+push can fire it — the placement is unsatisfiable, and the branch belongs to the
+scope stage, which splits such an entry at promotion into a produce half and an
+observe half rather than promoting it whole. The clause lives in scope's own
+template (§templates/stages/), because scope is the one moment the unit set is
+bounded and the one session that may write the queue.
+
 **A stage owes a resume journal, and the obligation is the stage's rather than
 the dispatch's.** delegation-kit owns the journal *contract* — what a session
 writes into it, when, and who may delete it (delegation-kit/SPEC.md §Resume
@@ -396,7 +431,12 @@ a deferred entry that still carries a spec ref, or an orphaned amendment left on
 disk. If the validate baseline carries a scenario keyed to the demoted entry,
 that scenario is re-scoped or removed in the same commit — a coverage-honesty
 obligation, not a gate one (`check-evidence-baseline`'s slug-liveness passes
-regardless, since a demoted entry stays a live queue task).
+regardless, since a demoted entry stays a live queue task). **For an
+`[observed-by:]` entry the ritual is the fallback and not the normal path**: it
+stays legal, but §The state machine's push placement makes the observation
+arrive in-iteration, so the ritual's price there — the grammar cannot mark a
+unit landed-but-unobservable, and a demoted entry reads as unstarted — is no
+longer paid on the normal path.
 
 **Abandon** ends an iteration without a close. Disposition every active entry
 explicitly — demote it (ritual above) or carry it (it stays active with its
@@ -3697,7 +3737,21 @@ successors) is refused fail-closed at config load (§lib/stages.sh's
 validator): an exemption with no reachable backstop would be permanent.
 Ruled-but-unpromoted work is never exempt residue — it files as Deferred
 `[design-pending]` for a later scope's promotion (deferred-filing is the model
-for designed-but-unscheduled work); and (C)
+for designed-but-unscheduled work). The blockers this assertion lists are
+**partitioned**: any carrying `[observed-by:]` (queue-kit/SPEC.md §The tag
+algebra) are named in a message of their own, because their remedy is not the
+one the ordinary message implies. An untagged blocker says *finish the work*; an
+observation-predicate blocker can have its work finished and still be
+undrainable, so its message cites §The state machine's push placement and the
+scope-stage split for a release-run producer. `[drain-exempt:]` still wins at
+drain-stage entry — an entry carrying both is exempt residue there and is
+partitioned into the observation message only at a successor's entry, where no
+exemption holds. **The honest limit, stated rather than left to be found:** this
+branch enforces nothing. A push's timing is not a tree state, so no arm here can
+observe that the placement rule was kept; what the branch buys is that the
+failure, when it happens, names its own remedy at the moment it fires instead of
+costing a fresh derivation. The enforceable half of this class is the tag's
+lead-line hygiene (queue-kit/SPEC.md §check-tag-lead-line); and (C)
 audit-trigger — an audit-entry-stage header carrying a cross-component
 amendment signal but no `<iter> <audit-stage>` stamp demands either that
 stamp or an explicit recorded waiver line, mechanizing the audit stage's
@@ -3764,9 +3818,10 @@ empty observation for this member and the scans' coverage rests on the
 behavioral test below and on the live battery.
 
 The good/bad pair covers
-assertion A; `gate-tests/check-stage-entry.test.sh` covers B and C over nine
+assertion A; `gate-tests/check-stage-entry.test.sh` covers B and C over ten
 sandbox scenarios (untagged residue red, tagged residue at drain entry green,
-empty-reason tag red, tagged residue at successor entry red; two-dir
+empty-reason tag red, tagged residue at successor entry red, `[observed-by:]`
+residue red and naming its own remedy; two-dir
 amendments ±waiver, a single-amendment cross-component body, a
 single-component amendment, and a `templates/` stub that must not fabricate a
 second component). Suite *runs* and other

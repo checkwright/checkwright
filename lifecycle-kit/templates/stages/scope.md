@@ -67,6 +67,20 @@ carry and needs no amendment. The tell for misfiling: a design ruling
 longer than a few lines drafted into a queue entry is an amendment inlined
 where no gate can see it — move it into one.
 
+**Read each promoted entry's `[observed-by: <producer>]` and take one of two
+branches.** The tag says the entry's completion predicate is an observation of a
+remote run rather than a tree state (queue-kit/SPEC.md §The tag algebra), and
+this stage is the `<producer>` field's only reader. If a **mid-iteration push**
+produces that run, nothing further is owed here: the push-placement rule
+governs (lifecycle-kit/SPEC.md §The state machine) and the observation arrives
+in time to be drained. If **only a release run** produces it, the placement is
+unsatisfiable — a release run is tag-triggered, so no mid-iteration push can
+fire it — and the entry **splits here**: promote the produce half now and file
+the observe half deferred, carrying the producer name, so the next iteration's
+first act is reading a run that already exists. Split at promotion rather than
+later because this is the one moment the unit set is bounded and the one session
+that may write the queue.
+
 **A standing directive is a theme, not a unit list.** A directive received from
 a lead or operator at iteration open bounds this survey — it names the theme,
 never the units. The intake sweep and the premise re-verification run regardless,

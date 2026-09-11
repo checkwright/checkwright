@@ -3,7 +3,8 @@
 A git-native, agent-readable task tracker: one Markdown file where `##`
 sections are queues, bold kebab-case slugs are the task handles, and
 square-bracket tags (`[blocked-by:]`, `[design-pending]`, `[spec:]`,
-`[drain-exempt:]`, `[roadmap:]`, `[precondition-ok:]`, plus the Lessons Learned
+`[drain-exempt:]`, `[roadmap:]`, `[observed-by:]`, `[precondition-ok:]`, plus the
+Lessons Learned
 channel's `[attend]` and the consumer-named harvest tags) are the state machine.
 Gates hold the grammar a coding agent selects work by, and four more arms of the
 same binary read the file: `queue-index` renders the compact selection surface,

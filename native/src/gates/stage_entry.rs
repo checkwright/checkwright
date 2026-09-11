@@ -290,6 +290,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut exempt_detail = String::new();
     if b_drain || b_successor {
         let (mut leftover, mut malformed) = (String::new(), String::new());
+        let mut observed = String::new();
         for (ln, text) in active_bullets(&qtext, &k.active_sections) {
             match drain_exempt_reason(text) {
                 Some("") => malformed.push_str(&format!("\n    {}: {}", ln, text)),
@@ -299,8 +300,20 @@ pub fn run(args: &[String]) -> i32 {
                     }
                     exempt_detail.push_str(&format!("{}: {}", ln, reason));
                 }
+                _ if text.contains("[observed-by:") => {
+                    observed.push_str(&format!("\n    {}: {}", ln, text))
+                }
                 _ => leftover.push_str(&format!("\n    {}: {}", ln, text)),
             }
+        }
+        // spec: lifecycle-kit/SPEC.md §check-stage-entry — an [observed-by:] blocker is named
+        // separately because its remedy is not "finish the work": the work can be done and the
+        // entry still undrainable, so the refusal cites the placement rule and the split branch
+        if !observed.is_empty() {
+            errors.push(format!(
+                "entering '{}' but the active queue holds [observed-by:] entr(ies) whose completion predicate is an observation of a remote run rather than a tree state — landing the work does not drain them. Place this iteration's FIRST push at or before the stage that lands such an entry's work rather than at the closing stage (lifecycle-kit/SPEC.md §The state machine); where only a release run produces the observation, that entry splits at scope into a produce half and an observe half:{}",
+                stage, observed
+            ));
         }
         if !leftover.is_empty() {
             if b_drain {

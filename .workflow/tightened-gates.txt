@@ -12,3 +12,4 @@ check-skill-binding
 check-portability-floor
 check-amendment-retired-spelling
 check-doctrine-registration
+check-tag-lead-line

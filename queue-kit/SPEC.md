@@ -407,6 +407,33 @@ adoption step between landing it and reading it.
   rationale in the entry body.
 - `[precondition-ok: <reason>]` — per-entry opt-out valve for
   `check-queue-prose-precondition`.
+- `[observed-by: <producer>]` — observation-predicate marker: the entry's
+  completion predicate is an **observation of a remote run** rather than a tree
+  state, and `<producer>` names the run that produces it. Lead-line-scoped, and
+  `<producer>` non-empty by grammar — an authoring rule with no gate behind it,
+  because the **value is opaque to every gate**: no arm branches on it and no
+  knob carries a producer roster. That is the same slot-not-vocabulary seam
+  `[roadmap:]`'s fields take, and for the sharper reason — a kit literal
+  spelling one project's CI run names would ship that project's pipeline layout
+  to every adopter. The value's one reader is a human at the **promotion**
+  transition (lifecycle-kit's scope template, selecting the push-placement
+  branch or the split), and no second field is minted for the run id: a run id
+  is produced after the tag is written, so it would have no reader at the moment
+  it was minted. Placement semantics are lifecycle-kit's, the same split
+  `[drain-exempt:]` takes: `check-stage-entry` assertion B reads the tag's
+  *presence* to select a refusal message, and the push-placement obligation the
+  tag turns on is lifecycle-kit/SPEC.md §The state machine's.
+  **Overloading `[precondition-ok:]` instead is refused, and the ground is
+  recorded so a later reader does not retire this tag as redundant.** That tag
+  is an opt-out for a *different* gate, it is deliberately not lead-line-scoped,
+  and its reason is contractually opaque — tying the class marker to it would
+  bind two independent conventions to one string and stop either changing
+  without the other, which is canon-kit's own argument for keeping the work-class
+  tag outside the delta-ID grammar. A companion `landed-but-unobservable`
+  marker is **also refused**: it would name a state the placement rule stops
+  producing, so minting it now buys a governed name almost no adopter exercises.
+  If the demote fallback (lifecycle-kit/SPEC.md §Deviation transitions) is ever
+  measured as the common path, that marker is the fix and this is the trigger.
 - `[roadmap: <horizon>/<track>]` — public-projection marker: the entry is
   curated onto the generated roadmap page (§The roadmap arm), under `<horizon>`
   and labelled `<track>`. The tag's spelling is fixed mechanism; its two field
@@ -1700,9 +1727,16 @@ exemption, or drops a lesson out of the attention block. Membership tracks reade
 algebra: a tag is governed here when its readers scan lead lines alone, so the
 set is narrower than the algebra's and `[precondition-ok:]` is deliberately
 outside it — `check-queue-prose-precondition` honors that tag anywhere in the
-entry, leaving it no lead-line requirement to enforce. The governed set and
+entry, leaving it no lead-line requirement to enforce. **A governed member needs
+no live instance**, which follows from that criterion rather than relaxing it:
+the set is a contract over *readers*, so a tag joins the moment its lead-line
+reader is named and the fixture pair exercises it, not when some consumer's
+queue happens to carry one. Membership keyed to instance count would be a set
+that disarms itself exactly when the last user drains — the reverse of what a
+lead-line guard is for. The governed set and
 scanned surface both widen with the lesson channels: `[blocked-by:]` /
-`[spec:]` / `[design-pending]` / `[drain-exempt:]` / `[roadmap:]` in the task
+`[spec:]` / `[design-pending]` / `[drain-exempt:]` / `[roadmap:]` /
+`[observed-by:]` in the task
 sections (active + deferred), plus
 `[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
 section — the section the `queue-index` arm now reads, which retires the old "parsed

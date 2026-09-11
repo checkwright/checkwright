@@ -9,6 +9,8 @@
 - **beta-feature** — the prerequisite groundwork.
 - **gamma-feature** — a drain-spanning surface whose exemption reflowed
   off the lead line: [drain-exempt: validate-half pending] no reader sees it.
+- **epsilon-feature** — a unit whose producer declaration reflowed off the
+  lead line: [observed-by: ci-run] so the promotion-time reader never sees it.
 
 ## Technical Debt
 

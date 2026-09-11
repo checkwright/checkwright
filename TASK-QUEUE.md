@@ -12,38 +12,6 @@
 
 ## New Features
 
-- **observation-predicate-entry-cannot-drain-in-its-own-iteration** [spec: SPEC-obs-drain.md]
-  — an entry whose completion predicate is an OBSERVATION of a remote run rather than a tree state
-  structurally cannot complete in the iteration that buys it, because the drain gate sits upstream
-  of the push that would justify the drain.
-  **The bind, probed with `--simulate` at both stages 2026-08-27 and re-probed at this spec.**
-  `check-stage-entry` assertion B refuses a drain-stage entry on a non-empty active queue.
-  A `drain-exempt` tag skips an entry at the drain stage's own entry, but assertion B re-runs
-  with NO exemption at every drain SUCCESSOR, and this tree's predecessor map makes close one, so
-  no valve reaches close. A standing property of the state machine, not a quirk of one entry.
-  **What discovering it cost:** three pushes against a budgeted one to two, by operator ruling, and
-  the headline entry still deferred with its PRODUCED half discharged.
-  **The amendment's finding, and it is why none of the five recorded shapes was ever costed:** the
-  class has no name the machine can read. `run-observed` occurred three times in the tracked tree
-  at authoring, all prose — this same promotion compressing this entry to the one survivor above —
-  its one live use before that an opaque reason string on a since-retired entry. Every shape
-  was therefore a policy about a set no surface enumerates, and a policy's cost is dominated by who
-  must notice membership. That is the 2026-08-31 recurrence judgment restated as a fix: the miss
-  was FILING-VISIBILITY rather than analysis, and naming the class is what visibility means here.
-  **What the amendment rules:** name the class with `[observed-by: <producer>]`; place the
-  iteration's FIRST push at or before the stage that lands such an entry's work, which buys no push
-  because a finished run reads for free and the reading rides the close push; split at scope only
-  the residue whose producer is the release run. The two-iteration protocol and the standing extra
-  push are declined on their arithmetic; demote-at-build survives as the fallback; the
-  landed-but-unobservable marker is declined as a marker for a state the ruling stops producing.
-  **Not enforceable end to end, and the amendment says so rather than leaving it to be found:** a
-  push's timing is no tree state, so the placement and split rules are prompt-carried obligations
-  and only the tag hygiene is gated. What the drain refusal gains is a message naming its own cause.
-  recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
-  Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close; promoted 2026-09-11 at spec
-  into `host-resolution-fail-open-cut` on its recurrence reaching threshold, ruled in by the
-  operator through AskUserQuestion in the lead session, relayed by the lead.
-
 - **lead-state-durable-home** [spec: SPEC-lead-journal.md]
   — the lead template gave the lead's own state no durable home, so it lived only in the
   conversation. **BOTH PREMISES OF THE OPEN QUESTION ARE FALSE AT HEAD, probed at spec rather than
@@ -10799,5 +10767,6 @@
 - windows-bare-name-spawn-fails-open-past-its-preflight
 - installer-host-detector-ungated-and-musl-fails-open
 - crate-interpreter-resolution-residue
+- observation-predicate-entry-cannot-drain-in-its-own-iteration
 
 ## Lessons Learned
