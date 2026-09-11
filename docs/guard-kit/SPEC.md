@@ -717,7 +717,9 @@ that harness exists would be designing against no case.
    **Fires only when `Glob` is a member of `GUARD_KIT_SEARCH_TOOLS`**, and is
    inert otherwise: a steer naming a tool the harness build does not carry is
    unfollowable, and the guard cannot see the toolset (§Layout and configuration
-   states why the knob is the input). The firing corrective adds the bare
+   states why the knob is the input). Inert, a bare listing reaches rule 18,
+   which grants it as a read-only segment — the working form the steer would
+   otherwise have displaced. The firing corrective adds the bare
    fallback beside the tool — keep `find` and pipe the listing into a read-only
    consumer, which rule 18 grants.
 10. **Bare single-file `cat`** — a `cat` read is blocked with the steer to the
