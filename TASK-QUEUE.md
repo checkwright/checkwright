@@ -12,6 +12,100 @@
 
 ## New Features
 
+- **landing-moots-live-entries-undetected** [spec: SPEC-moot-sweep.md] — no stage step asks which
+  live entries a landed unit moots, so obsolete entries linger until a whole-pool triage.
+  **Operator question 2026-09-11, lead session, typed message, relayed by that lead:** obsolete
+  tasks must leave the queue via Done.
+  **The exit exists and the detection does not.** queue-kit/SPEC.md §The icebox tier sanctions the
+  move to Done for a mooted entry; build owns Done only for its own units; the queue-edges retired
+  block catches pointers at slugs already disposed; `--icebox-candidates` reads age and cost only.
+  **Witness corrected at the drain:** the bullet named `spec-prune-normalisation-shell-oracle`, but
+  `canon-kit/lib/spec.sh` still ships `_spec_prune_kit_roots` and that entry carries the residual,
+  so it is not wholly moot. The class is witnessed instead by the pool triage's three mooted exits
+  (`meta-gate-conservation-record-reach`, `propose-once-clause-leaks-into-the-proposal-step`,
+  `same-day-recurrence-date-multiplicity`), found only by that one-off read.
+  **Owed:** a build or close step listing, per landed unit, the live entries naming surfaces its
+  diff removed and moving the mooted ones to Done, plus the queue-kit/SPEC.md passage.
+  **DISTINCT from `survey-record-supersede-invisible`** (icebox; survey blocks, not entries).
+  **Cost while deferred:** token waste — every ranking survey and triage re-reads stale entries.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a template step plus a spec
+  clause. →icebox refused on the same operator direction as the entries above, no inbox bullet
+  entering the tier directly.
+  **Operator direction, 2026-09-11 (consult):** bundle with
+  `deferred-cost-class-opener-vocabulary` at the next scope — one surface, what scope re-reads.
+  **Operator direction, 2026-09-11 (lead session, lead-relayed), bundled as directed:** a feature
+  of `rankable-deferred-board` — the per-landing listing is a contract build or close must honor;
+  spec authors it.
+
+- **composition-verdict-unrecorded-at-unit-set-ruling** [spec: SPEC-comp-verdict.md] — scope's
+  economic composition test leaves no artifact that it ran, so a lone-unit iteration opens with it
+  unapplied.
+  **The instance, 2026-09-11:** `deferred-pool-triage` opened on one promoted unit. The test
+  (lifecycle-kit/templates/stages/scope.md, the economic composition test) says a lone unit bundles
+  related-surface deferred entries or argues it stands alone; scope's unit-set escalation offered
+  three single cuts and no bundle, and the lead recommended the lone unit without applying it
+  either. The operator stated 2026-09-11 (lead session, typed message, relayed by that lead) that
+  few-unit iterations make little economic sense under the governance-overhead objective.
+  **Re-verified at the drain:** the test is template prose with no verdict field, and lead.md
+  carries no ruling step reading one.
+  **Owed:** a recorded composition verdict inside scope's unit-set escalation, and a lead step that
+  refuses a unit set carrying none.
+  **DISTINCT from `composition-test-scores-a-section-cut-as-one-unit`** (icebox; the test's input
+  when it runs) and `kpi-cost-per-unit` (icebox; the width figure). A mid-iteration join has no
+  route (`post-scope-admission-has-no-promotion-route`, icebox), so the correction lands at a scope.
+  **Cost while deferred:** token waste — every extra iteration re-buys the stage walk's fixed cost.
+  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a scope and lead contract change.
+  →icebox refused on the operator's 2026-09-11 direction that no inbox bullet enters the Icebox
+  directly.
+  **Operator direction, 2026-09-11 (lead session, lead-relayed):** a rider feature of
+  `rankable-deferred-board` — the verdict field is a scope-to-lead contract; spec authors it.
+
+- **icebox-standing-ineligibility-unrecordable** [spec: SPEC-icebox-standing.md] — the eviction
+  worklist has no slot for a standing not-eligible ruling, so an entry a ruling already removed from
+  the running is re-proposed at every close.
+  **The live instance, re-verified 2026-08-28 at this boundary.**
+  `threshold-recurrence-routing-residency` carries an explicit not-icebox-eligible paragraph with
+  grounds — the cost line prices the CARRY and never the eviction, and eviction would delete the
+  verbatim clause the 2026-08-17 operator ruling filed the entry to preserve — and `run-gates.sh
+  --emit queue-index --icebox-candidates` ranked it the sole eligible row again today, the other ten
+  rows all excluded.
+  **The mechanism has exactly three exclusion causes and no fourth.**
+  `native/src/emit/queue_index.rs`'s `ineligibility()` reads a roadmap tag on the lead line, a dated
+  `recurrence:` body line, and a body naming a live slug. Nothing anywhere reads a standing ruling.
+  The eligibility rule those three implement is queue-kit/SPEC.md §The icebox tier's.
+  **The fork is ruled in `SPEC-icebox-standing.md`:** the `not-icebox-eligible:` body declaration,
+  whose line the entry budget discounts, over a scan of prose markers that already vary in spelling.
+  **DISTINCT from `deferred-cost-class-opener-vocabulary`**, which owns the cost axis
+  UNDER-selecting because most of the pool's cost fields open with an unrecognised token; this is
+  the opposite direction, an entry the filter correctly selects and a ruling has already removed
+  from the running. Distinct also from `icebox-eviction-line-budget-squeeze`, the one-liner's line
+  budget at the moment of writing an eviction, and from `close-eviction-refiles-without-checking`,
+  close re-filing a duplicate entry — both downstream of this row.
+  **THREE LIVE INSTANCES AT THE 2026-09-05 DRAIN, and the newest is a MEASUREMENT STORE rather than
+  a ruling.** `candidate-list-anchors-a-sweep-obligation` is the third: it carries an explicit
+  **Why not icebox** paragraph naming a live recurring trigger, and the worklist ranked it anyway.
+  `lead-split-posture-limb-unjudged` (now Done) carried thirteen close-appended points and met
+  two of the three narrowing conditions — no roadmap tag, no live slug, no dated `recurrence:`,
+  its own paragraph arguing that omission correct. Its ONLY protection was a cost field opening
+  in prose, so one author tidying that opener to a class word would have compressed thirteen
+  iterations of measurement into one line. The 2026-08-31 ruling bars re-authoring an opener to
+  UNBLOCK an eviction; nothing bars the same edit made for tidiness, which is the hole. A
+  `not-icebox-eligible:` declaration — the shape the amendment rules — closes it, so this instance
+  sharpens the fork rather than widening the entry.
+  **The filer's premise FELL and is answered:** the class-word gate is owed rather than unfiled, and
+  `deferred-cost-class-opener-vocabulary` has owned it since 2026-08-23.
+  recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05 2026-09-08
+  **At threshold, promoted into `rankable-deferred-board`'s unit set as a feature — operator
+  direction, 2026-09-11 (lead session, lead-relayed)**: it shares the icebox arm the cost tag
+  touches. The 2026-09-09 deferral's ground was that window's unshared surface; git holds it.
+  **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
+  close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
+  the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
+  non-load-bearing, which bounds the harm to the review list rather than the disposition, and is why
+  this is filed rather than built. Surfaced 2026-08-28 by the close of
+  `installer-trial-lifecycle-repair`, which filed it to the gap inbox; promoted 2026-08-28 by scope,
+  whose own emitter re-run reproduced the sole-candidate row.
+
 ## Technical Debt
 
 - **close-watch-waits-on-slowest-smoke-leg** [observed-by: gates] — a close push waits about 48
@@ -27,6 +121,10 @@
   **Observed, not merely built:** completion is a `gates` run showing the cut, so the push
   placement rule (lifecycle-kit/SPEC.md §The state machine) puts this iteration's first push at or
   before the stage landing this work — a re-placed push, not an extra one.
+  **Push placement — operator direction, 2026-09-11** (AskUserQuestion in the lead session,
+  lead-relayed): this iteration's first push rides the build that lands this entry, because that
+  commit's `gates` run is its done-witness; close pushes only if later commits need a second run.
+  This replaces the prior iteration's direction to push at close.
   **Operator-stated 2026-09-11, lead session, typed message, relayed by that lead:** a close cannot
   wait 40 minutes on one run; optimize `install-smoke-windows` and every other long leg.
   **Re-verified at the drain on gates run 34553416908 (head 08e6eb67):** wall 48 minutes; `gates`
@@ -4986,55 +5084,6 @@
   Filed to the gap inbox 2026-08-28 by build batch 1 off the docs alone; promoted the same day at
   close, once the keep-and-report mechanism was re-verified against the `uninstall` verb.
 
-- **icebox-standing-ineligibility-unrecordable** [design-pending] — the eviction worklist has no
-  slot for a standing not-eligible ruling, so an entry a ruling already removed from the running is
-  re-proposed at every close.
-  **The live instance, re-verified 2026-08-28 at this boundary.**
-  `threshold-recurrence-routing-residency` carries an explicit not-icebox-eligible paragraph with
-  grounds — the cost line prices the CARRY and never the eviction, and eviction would delete the
-  verbatim clause the 2026-08-17 operator ruling filed the entry to preserve — and `run-gates.sh
-  --emit queue-index --icebox-candidates` ranked it the sole eligible row again today, the other ten
-  rows all excluded.
-  **The mechanism has exactly three exclusion causes and no fourth.**
-  `native/src/emit/queue_index.rs`'s `ineligibility()` reads a roadmap tag on the lead line, a dated
-  `recurrence:` body line, and a body naming a live slug. Nothing anywhere reads a standing ruling.
-  The eligibility rule those three implement is queue-kit/SPEC.md §The icebox tier's.
-  **Why `[design-pending]`, a real and unruled fork:** a `not-icebox-eligible:` body declaration on
-  the entry — one line against `check-queue-entry-budget`'s cap, mechanically readable, and a fourth
-  cause of the same shape as the three — versus the emitter reading a prose marker already in the
-  body, which costs no line and re-opens the class of prose-predicate scanners this tree keeps
-  refusing. Neither is obviously right.
-  **DISTINCT from `deferred-cost-class-opener-vocabulary`**, which owns the cost axis
-  UNDER-selecting because most of the pool's cost fields open with an unrecognised token; this is
-  the opposite direction, an entry the filter correctly selects and a ruling has already removed
-  from the running. Distinct also from `icebox-eviction-line-budget-squeeze`, the one-liner's line
-  budget at the moment of writing an eviction, and from `close-eviction-refiles-without-checking`,
-  close re-filing a duplicate entry — both downstream of this row.
-  **THREE LIVE INSTANCES AT THE 2026-09-05 DRAIN, and the newest is a MEASUREMENT STORE rather than
-  a ruling.** `candidate-list-anchors-a-sweep-obligation` is the third: it carries an explicit
-  **Why not icebox** paragraph naming a live recurring trigger, and the worklist ranked it anyway.
-  `lead-split-posture-limb-unjudged` (now Done) carried thirteen close-appended points and met
-  two of the three narrowing conditions — no roadmap tag, no live slug, no dated `recurrence:`,
-  its own paragraph arguing that omission correct. Its ONLY protection was a cost field opening
-  in prose, so one author tidying that opener to a class word would have compressed thirteen
-  iterations of measurement into one line. The 2026-08-31 ruling bars re-authoring an opener to
-  UNBLOCK an eviction; nothing bars the same edit made for tidiness, which is the hole. A
-  `not-icebox-eligible:` declaration — candidate (a) above, verbatim — closes it, so this instance
-  sharpens the fork rather than widening the entry.
-  **The filer's premise FELL and is answered:** the class-word gate is owed rather than unfiled, and
-  `deferred-cost-class-opener-vocabulary` has owned it since 2026-08-23.
-  recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05 2026-09-08
-  **At threshold, promoted into `rankable-deferred-board`'s unit set as a feature — operator
-  direction, 2026-09-11 (lead session, lead-relayed)**: it shares the icebox arm the cost tag
-  touches. The 2026-09-09 deferral's ground was that window's unshared surface; git holds it.
-  **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
-  close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
-  the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
-  non-load-bearing, which bounds the harm to the review list rather than the disposition, and is why
-  this is filed rather than built. Surfaced 2026-08-28 by the close of
-  `installer-trial-lifecycle-repair`, which filed it to the gap inbox; promoted 2026-08-28 by scope,
-  whose own emitter re-run reproduced the sole-candidate row.
-
 - **readme-bin-roster-underived** [design-pending] — every kit README's **gate** roster is held by a
   gate and its **`bin/` tool** roster is held by nothing, so a tool added, renamed or retired leaves
   a hand-authored list silently stale.
@@ -5930,53 +5979,6 @@
   Icebox directly.
   **Operator direction, 2026-09-11 (lead session, lead-relayed):** in `rankable-deferred-board`'s
   unit set as a feature; its mechanism rides the lead-line cost tag's amendment, which spec authors.
-
-- **composition-verdict-unrecorded-at-unit-set-ruling** [design-pending] — scope's economic
-  composition test leaves no artifact that it ran, so a lone-unit iteration opens with it unapplied.
-  **The instance, 2026-09-11:** `deferred-pool-triage` opened on one promoted unit. The test
-  (lifecycle-kit/templates/stages/scope.md, the economic composition test) says a lone unit bundles
-  related-surface deferred entries or argues it stands alone; scope's unit-set escalation offered
-  three single cuts and no bundle, and the lead recommended the lone unit without applying it
-  either. The operator stated 2026-09-11 (lead session, typed message, relayed by that lead) that
-  few-unit iterations make little economic sense under the governance-overhead objective.
-  **Re-verified at the drain:** the test is template prose with no verdict field, and lead.md
-  carries no ruling step reading one.
-  **Owed:** a recorded composition verdict inside scope's unit-set escalation, and a lead step that
-  refuses a unit set carrying none.
-  **DISTINCT from `composition-test-scores-a-section-cut-as-one-unit`** (icebox; the test's input
-  when it runs) and `kpi-cost-per-unit` (icebox; the width figure). A mid-iteration join has no
-  route (`post-scope-admission-has-no-promotion-route`, icebox), so the correction lands at a scope.
-  **Cost while deferred:** token waste — every extra iteration re-buys the stage walk's fixed cost.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a scope and lead contract change.
-  →icebox refused on the operator's 2026-09-11 direction that no inbox bullet enters the Icebox
-  directly.
-  **Operator direction, 2026-09-11 (lead session, lead-relayed):** a rider feature of
-  `rankable-deferred-board` — the verdict field is a scope-to-lead contract; spec authors it.
-
-- **landing-moots-live-entries-undetected** [design-pending] — no stage step asks which live
-  entries a landed unit moots, so obsolete entries linger until a whole-pool triage.
-  **Operator question 2026-09-11, lead session, typed message, relayed by that lead:** obsolete
-  tasks must leave the queue via Done.
-  **The exit exists and the detection does not.** queue-kit/SPEC.md §The icebox tier sanctions the
-  move to Done for a mooted entry; build owns Done only for its own units; the queue-edges retired
-  block catches pointers at slugs already disposed; `--icebox-candidates` reads age and cost only.
-  **Witness corrected at the drain:** the bullet named `spec-prune-normalisation-shell-oracle`, but
-  `canon-kit/lib/spec.sh` still ships `_spec_prune_kit_roots` and that entry carries the residual,
-  so it is not wholly moot. The class is witnessed instead by the pool triage's three mooted exits
-  (`meta-gate-conservation-record-reach`, `propose-once-clause-leaks-into-the-proposal-step`,
-  `same-day-recurrence-date-multiplicity`), found only by that one-off read.
-  **Owed:** a build or close step listing, per landed unit, the live entries naming surfaces its
-  diff removed and moving the mooted ones to Done, plus the queue-kit/SPEC.md passage.
-  **DISTINCT from `survey-record-supersede-invisible`** (icebox; survey blocks, not entries).
-  **Cost while deferred:** token waste — every ranking survey and triage re-reads stale entries.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a template step plus a spec
-  clause. →icebox refused on the same operator direction as the entries above, no inbox bullet
-  entering the tier directly.
-  **Operator direction, 2026-09-11 (consult):** bundle with
-  `deferred-cost-class-opener-vocabulary` at the next scope — one surface, what scope re-reads.
-  **Operator direction, 2026-09-11 (lead session, lead-relayed), bundled as directed:** a feature
-  of `rankable-deferred-board` — the per-landing listing is a contract build or close must honor;
-  spec authors it.
 
 - **deferred-cost-class-opener-vocabulary** [design-pending] — the cost field is free prose, so
   neither reader that ranks on it can read it without the body: the icebox worklist reads only
