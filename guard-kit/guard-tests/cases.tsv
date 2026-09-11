@@ -8,9 +8,20 @@
 block	cd deploy && ls
 fallthrough	cd deploy
 
-# rule 2 — git -C <repo-root> when cwd is the root
+# rule 2 — a prefix spelling that falls off the match path: (a) git -C <repo-root>
+#          when cwd is the root, (b) a git -c config override among git's global
+#          options, (c) an absolute spelling of a wrapper the matcher strips. A
+#          quoted mention and a wrapper path in argument position are not the command
 block	git -C @ROOT@ status --short
 fallthrough	git -C @ROOT@/sub status
+block	git -c core.pager=cat log --oneline -3
+block	git --no-pager -c color.ui=never diff
+fallthrough	git log --oneline -3
+fallthrough	git commit -m 'drop git -c core.pager=cat'
+block	/usr/bin/time -f %e make build
+block	make lint && /usr/bin/nice -n 5 make build
+fallthrough	time make build
+fallthrough	file /usr/bin/time
 
 # rule 3 — bare-name scratch redirect
 block	some-runner 2> op.err
@@ -61,11 +72,27 @@ allow	grep -rnE "^[a-z]{2,}" src
 allow	cat <<'EOF' > .tmp/note.md@NL@a brace {a,b} in prose@NL@EOF
 block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 
-# rule 8 — sed reading or rewriting a file directly; a piped-into sed is a filter
+# rule 8 — sed or awk reading a file, or sed rewriting one; a piped-into sed is a
+#          filter. awk fires on two read shapes, each with one file operand and no
+#          pipe into the segment — a line range (steered to Read) and a markdown
+#          heading range (steered to the section extractor); a transform, a
+#          single-regex filter, a program file, a non-.md range, a second operand
+#          and a piped-into awk all pass
 block	sed -n '1,60p' TASK-QUEUE.md
 block	sed -i 's/a/b/' notes.md
 fallthrough	sed -E 's/a/b/'
 fallthrough	grep foo file | sed -e s/a/b/
+block	awk 'NR>=10 && NR<=40' TASK-QUEUE.md
+block	awk -F: 'NR==5,NR==9 { print $0 }' notes.txt
+block	awk '/^## Layout/,/^## Testing/' SPEC.md
+block	awk 'NR<=5' notes.txt | head -3
+fallthrough	awk 'NR>=10 && NR<=40 {print $2}' notes.txt
+fallthrough	awk '/needle/' notes.txt
+fallthrough	awk '/^## Layout/,/^## Testing/' notes.txt
+fallthrough	awk -f prog.awk notes.txt
+fallthrough	awk 'NR<=5' a.txt b.txt
+fallthrough	grep -n foo notes.txt | awk 'NR<=5' notes.txt
+fallthrough	awk -W posix 'NR<=5' notes.txt
 
 # rule 9 — listing-only find steered to Glob, alone or as a ';'-batch of listings
 #          (a literal banner between them is fine); action-predicate / piped /

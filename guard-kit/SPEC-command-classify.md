@@ -1,7 +1,7 @@
 # SPEC amendment: command-classify
 
-**Nothing in this amendment is applied.** Every passage below is a proposal for the build stage to
-land. Where replacement wording is given it is marked **Not yet applied** at the passage itself.
+**Deltas 1 to 4 are applied, with the parts of deltas 10 and 11 that belong to them; every other
+passage is still a proposal for the build stage to land.** Where replacement wording is given it is marked **Not yet applied** at the passage itself.
 
 This amendment serves the eight entries of the `guard-command-classification` unit set, which point
 at it together:
@@ -85,6 +85,9 @@ exactly the *firing after this advisory ships* that rule 15 names as the atteste
 
 ### (1) The harness view: one helper models the matcher's wrapper strip, with a compiled twin
 
+**Applied**, except one clause: §The guard framework's duplication paragraph does not yet name the
+helper's shell caller, because that caller is rule 24 and merges with delta 7.
+
 A new `lib/guard.sh` helper, `_guard_harness_view <segment>`, returns the segment as the permission
 matcher reads it: with the leading wrappers the matcher strips removed, repeatedly, from the head
 {design-bearing}. The stripped set is the documented one, and each wrapper's arguments are walked by
@@ -154,7 +157,7 @@ already declares for the payload roster.
 
 Rule 2 becomes **a prefix spelling that falls off the match path, steered to the spelling that stays
 on it**, and gains two arms beside its `git -C <root>` arm {design-bearing}. Its title changes, and
-its number and placement do not. **Not yet applied.**
+its number and placement do not. **Applied.**
 
 - **(b) `git -c <key>=<value>`** among a git segment's global options, found by
   `_guard_git_subcommand`'s walk, is blocked. The corrective has three parts:
@@ -176,7 +179,7 @@ would bless the program reach above.
 ### (3) Rule 8 widens to `awk` reading a file, on one program-then-operands walk
 
 Rule 8 becomes **`sed` or `awk` reading a file, or `sed` rewriting one**, and its number and
-placement do not change {design-bearing}. **Not yet applied.**
+placement do not change {design-bearing}. **Applied.**
 
 **One walker, not a third per-tool parser.** `_guard_sed_segment`'s option walk generalizes into
 `_guard_program_operands <tool> <segment>`, which separates the program word from file operands
@@ -220,7 +223,7 @@ falsely. Rule 8's placement before the auto-allow band still guards that consume
 A new knob, `GUARD_KIT_SEARCH_TOOLS`, lists the dedicated search tools the consumer's harness build
 carries, with a default of `(Glob Grep)` {design-bearing}. Rule 9 fires only when `Glob` is a member,
 and rule 11 only when `Grep` is; with the member absent the rule is inert. Each firing corrective
-adds the allowlisted bare fallback: `find` for Glob, `grep -rn` for Grep. **Not yet applied.**
+adds the allowlisted bare fallback: `find` for Glob, `grep -rn` for Grep. **Applied.**
 
 **Why a knob, when the guard cannot see the toolset.** The payload's documented field set carries no
 toolset, and `agent_type` does not determine one. The absence of Grep and Glob is a property of the
@@ -481,7 +484,9 @@ regardless. No number moves.
 
 The decision table, the knob test and the parity corpus take every behavioral change above
 {mechanical}. §Testing's non-monotone rule binds throughout: every row whose expected column a delta
-could move is re-derived, never assumed. **Not yet applied.**
+could move is re-derived, never assumed. **Not yet applied**, except the parts for deltas 1 to 4:
+the rule 2 and rule 8 rows, the `GUARD_KIT_SEARCH_TOOLS` cases of the knob test, the `harness-view`
+parity corpus, and the `scan_prompts` key test.
 
 - **`guard-tests/cases.tsv`:**
   - Firing and non-firing rows for rule 2's arms (b) and (c) (delta 2), rule 8's two `awk` shapes and
@@ -515,7 +520,9 @@ could move is re-derived, never assumed. **Not yet applied.**
 ### (11) The renumber, the knob surfaces and the mirror
 
 Fall-through logging renumbers from 24 to 25, and the knob and mirror surfaces follow the deltas
-above {mechanical}. **Not yet applied.**
+above {mechanical}. **Not yet applied**, except the parts for deltas 1 to 4: the
+`GUARD_KIT_SEARCH_TOOLS` layout bullet, template line and README sentence, the knob test's layout
+line, and the mirror regenerated for them.
 
 - **The renumber has three sites:** the ruleset's own list, `cases.tsv`'s section comment, and
   §scan-prompts' `(rule 24)`, which becomes `(rule 25)`. `lib/guard.sh`'s `guard_generic_rules` gains
@@ -690,7 +697,7 @@ the block for an unallowlisted and for an unbounded rewrite, under §Testing's n
 - [ ] **The decision table, the knob test and the parity test are green**, with every row a delta
       could move re-derived rather than carried (§Testing's non-monotone rule).
 - [ ] **The KPI step is recorded** in §scan-prompts with its before and after readings.
-- [ ] **This repo's search-tool knob is probed before it lands**, in a main session.
+- [x] **This repo's search-tool knob is probed before it lands**, in a main session.
 - [ ] **Merged with no information lost** — each addition integrated into its proper canonical-spec
       section (not appended); the merged spec reads as one coherent document a reader who never saw
       the amendment can use alone, and no dated grounds from this file's evidence section land in a

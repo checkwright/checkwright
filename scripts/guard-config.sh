@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# spec: guard-kit/SPEC.md §Layout and configuration — this repo overrides one guard-kit knob; templates/guard-config.sh lists them and lib/guard.sh holds the defaults
+# spec: guard-kit/SPEC.md §Layout and configuration — this repo overrides the guard-kit knobs below; templates/guard-config.sh lists them and lib/guard.sh holds the defaults
 # no-port: CLAUDE.md §The provenance seam (never cross it) — operator-ruled 2026-08-24 for this repo's scripts/ config-and-vocabulary class, on the vocabulary half of scripts/measured-claims.sh's cause alone (scripts/ riding no installer payload is the half the ruling deliberately does NOT declare on). GUARD_KIT_BREADTH_DECLARED's values are this project's own operator rulings verbatim — its ops surface, its shipping transports, its release procedure — glossary bodies the seam bars a kit from carrying, so porting them would publish one project's ruling record in every adopter's binary.
 
 # spec: guard-kit/SPEC.md §compare-settings-allow — witnesses that a local-overlay glob is too broad; probes, not a roster, so no completeness is claimed
@@ -27,3 +27,7 @@ declare -A GUARD_KIT_BREADTH_DECLARED=(
     ["Bash(gh release *)"]="operator-ruled 2026-08-23 out of guard-grant-review, on the same review. This is the sharpest of the four — gh release delete destroys one of this project's two shipping transports — and it is declared rather than narrowed because the close stage cuts, edits and verifies releases itself (RELEASING.md steps 4-6) across subcommands no fixed glob enumerates"
     ["Bash(gh secret *)"]="operator-ruled 2026-08-23 out of guard-grant-review, on the same review. Secret rotation is the ops workflow it serves, and a rotation is a set-then-verify pair whose argument shape is the secret name, which is exactly what a glob cannot bound"
 )
+
+# spec: guard-kit/SPEC.md §Layout and configuration — this harness build carries no dedicated Glob or Grep tool in either session class, probed with a ToolSearch selecting both in a main and in a dispatched session, so rules 9 and 11 stay inert and bare find and grep stay the working forms
+# shellcheck disable=SC2034  # consumed by guard-kit/lib/guard.sh after sourcing
+GUARD_KIT_SEARCH_TOOLS=()

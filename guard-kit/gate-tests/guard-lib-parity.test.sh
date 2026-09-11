@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Cross-implementation parity for the four primitives guard-kit holds twice: `guard_split_compound`,
-# `guard_skeleton` and `_guard_redirect_pairs` after the scan-prompts cut, and `guard_allow_match`
-# after the settings-allow cut — in guard-kit/lib/guard.sh, and their compiled counterparts in
+# Cross-implementation parity for the five primitives guard-kit holds twice: `guard_split_compound`,
+# `guard_skeleton` and `_guard_redirect_pairs` after the scan-prompts cut, `guard_allow_match`
+# after the settings-allow cut, and `_guard_harness_view`, the matcher's wrapper strip the ranker
+# reads — in guard-kit/lib/guard.sh, and their compiled counterparts in
 # native/src/guard.rs. The library
 # is permanently shell on two grounds that reach neither the knob-resolution nor the
 # consumer-surface question for these three, and its shell caller set cannot empty — the rules
@@ -117,6 +118,74 @@ ALLOW_GLOBS=(
     "a"
 )
 
+# `_guard_harness_view`'s corpus covers every stripped wrapper in its separate and glued argument
+# spellings, nesting, an unrecognized option or an unwalkable argument stopping the strip at its
+# wrapper, a wrapper left with nothing to wrap, `command -v`/`-V` as a query, `xargs` with and
+# without a flag, an assignment run with and without a quoted value, and the spellings the matcher
+# does not strip (`sudo`, an absolute wrapper, `env`, `git -c`).
+HV_CORPUS=(
+    "git log"
+    ""
+    "   time git log"
+    $'time\tgit log'
+    "time -p git log"
+    "time -x git log"
+    "time"
+    "timeout 30 git log"
+    "timeout 1.5s git log"
+    "timeout .5 git log"
+    "timeout 5. git log"
+    "timeout -s KILL 30 git log"
+    "timeout -sKILL 30 git log"
+    "timeout --signal KILL 30 git log"
+    "timeout --signal=KILL 30 git log"
+    "timeout -k 5 30 git log"
+    "timeout -k5 30 git log"
+    "timeout --kill-after=5 30 git log"
+    "timeout --preserve-status --foreground -v 30 git log"
+    "timeout --bogus 30 git log"
+    "timeout abc git log"
+    "timeout 1.2.3 git log"
+    "timeout 30"
+    "timeout -s"
+    "nice git log"
+    "nice -n 5 git log"
+    "nice -n5 git log"
+    "nice -n -5 git log"
+    "nice -n+5 git log"
+    "nice --adjustment=5 git log"
+    "nice -10 git log"
+    "nice -n x git log"
+    "nice --5 git log"
+    "nohup bash run.sh"
+    "builtin echo hi"
+    "noglob ls *.md"
+    "stdbuf -o L grep foo"
+    "stdbuf -oL -e0 grep foo"
+    "stdbuf --output=L grep foo"
+    "stdbuf -x grep foo"
+    "stdbuf -o"
+    "command git status"
+    "command -v git"
+    "command -V git"
+    "command -p ls"
+    "xargs grep foo"
+    "xargs -0 grep foo"
+    "xargs"
+    "FOO=1 BAR=two git log"
+    "FOO='a b' git log"
+    "FOO=1"
+    "1FOO=x git log"
+    "nice -n 5 timeout 10 time -p git log"
+    "time timeout 5 nohup FOO=1 xargs grep x"
+    "sudo git log"
+    "sudo timeout 30 git log"
+    "/usr/bin/time -f %e git log"
+    "env FOO=1 git log"
+    "git -c core.pager=cat log"
+    "time git log  "
+)
+
 shell_side() {
     (
         # shellcheck source=../lib/guard.sh
@@ -151,6 +220,9 @@ shell_side() {
                 printf 'allow-match\t%s\t%s\t%s\n' "$s" "$g" "$r"
             done
         done
+        for c in "${HV_CORPUS[@]}"; do
+            printf 'harness-view\t%s\t%s\n' "$c" "$(_guard_harness_view "$c")"
+        done
     )
 }
 
@@ -166,6 +238,7 @@ native_side() {
     for s in "${ALLOW_STRINGS[@]}"; do
         "$BIN" --guard-lib-parity allow-match "$s" "${ALLOW_GLOBS[@]}" || return $?
     done
+    "$BIN" --guard-lib-parity harness-view "${HV_CORPUS[@]}" || return $?
 }
 
 checks=$((checks + 1))
@@ -230,6 +303,18 @@ have_line "allow-match-question"          "allow-match${T}Bash(git status)${T}Ba
 have_line "allow-match-bracket"           "allow-match${T}Bash(git statuz)${T}Bash(git statu[sz])${T}true"
 have_line "allow-match-bracket-negated"   "allow-match${T}Bash(git status)${T}Bash(git statu[!s])${T}false"
 have_line "allow-match-bracket-range"     "allow-match${T}Bash(git status)${T}Bash([a-z]it status)${T}true"
+have_line "harness-view-time-p"           "harness-view${T}time -p git log${T}git log"
+have_line "harness-view-timeout-glued"    "harness-view${T}timeout --signal=KILL 30 git log${T}git log"
+have_line "harness-view-nice-negative"    "harness-view${T}nice -n -5 git log${T}git log"
+have_line "harness-view-stdbuf-glued"     "harness-view${T}stdbuf -oL -e0 grep foo${T}grep foo"
+have_line "harness-view-nesting"          "harness-view${T}time timeout 5 nohup FOO=1 xargs grep x${T}grep x"
+have_line "harness-view-unrecognized"     "harness-view${T}timeout --bogus 30 git log${T}timeout --bogus 30 git log"
+have_line "harness-view-nothing-wrapped"  "harness-view${T}timeout 30${T}timeout 30"
+have_line "harness-view-command-query"    "harness-view${T}command -v git${T}command -v git"
+have_line "harness-view-xargs-bare"       "harness-view${T}xargs grep foo${T}grep foo"
+have_line "harness-view-xargs-flag"       "harness-view${T}xargs -0 grep foo${T}xargs -0 grep foo"
+have_line "harness-view-assignment-run"   "harness-view${T}FOO=1 BAR=two git log${T}git log"
+have_line "harness-view-sudo-unstripped"  "harness-view${T}sudo git log${T}sudo git log"
 
 # `hd` is inert on a newline-free command, and this is what says so rather than the comment
 # above: the same corpus under `sq,dq` and under `sq,dq,hd` classifies identically, so the
@@ -262,5 +347,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "guard-lib-parity.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-lib-parity.test: ok ($checks assertions; guard_split_compound, guard_skeleton, _guard_redirect_pairs and guard_allow_match held to their compiled twins over ${#CORPUS[@]} log-line shapes, ${#WANTS[@]} inert-class lists and ${#ALLOW_STRINGS[@]}x${#ALLOW_GLOBS[@]} permission-rule pairs)"
+echo "guard-lib-parity.test: ok ($checks assertions; guard_split_compound, guard_skeleton, _guard_redirect_pairs, guard_allow_match and _guard_harness_view held to their compiled twins over ${#CORPUS[@]} log-line shapes, ${#WANTS[@]} inert-class lists, ${#ALLOW_STRINGS[@]}x${#ALLOW_GLOBS[@]} permission-rule pairs and ${#HV_CORPUS[@]} wrapper spellings)"
 exit 0

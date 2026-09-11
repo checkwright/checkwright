@@ -1,6 +1,6 @@
-// spec: guard-kit/SPEC.md §The guard framework — the crate's holder of the three `lib/guard.sh`
-// primitives §scan-prompts is composed from, admitted by criterion 6's *unless* clause and held
-// equal by `--guard-lib-parity` (gate-sdk/SPEC.md §The port-candidate criteria).
+// spec: guard-kit/SPEC.md §The guard framework — the crate's holder of the twinned `lib/guard.sh`
+// primitives the compiled members are composed from, admitted by criterion 6's *unless* clause and
+// held equal by `--guard-lib-parity` (gate-sdk/SPEC.md §The port-candidate criteria).
 use crate::ere::{Ere, EreError};
 
 // spec: guard-kit/SPEC.md §The guard framework — the kit-relative shell library, with two readers:
@@ -60,6 +60,167 @@ pub struct NewlineInInput;
 
 fn is_space(c: u8) -> bool {
     matches!(c, b' ' | b'\t' | b'\n' | 0x0b | 0x0c | b'\r')
+}
+
+fn trim_start(s: &str) -> &str {
+    let i = s.bytes().position(|c| !is_space(c)).unwrap_or(s.len());
+    &s[i..]
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — the harness view's word cursor: `_guard_hv_pop`'s
+// head word and the blanks after it, over a slice that never carries leading blanks.
+struct Words<'a>(&'a str);
+
+impl<'a> Words<'a> {
+    fn peek(&self) -> Option<&'a str> {
+        if self.0.is_empty() {
+            return None;
+        }
+        let i = self.0.bytes().position(is_space).unwrap_or(self.0.len());
+        Some(&self.0[..i])
+    }
+
+    fn pop(&mut self) -> Option<&'a str> {
+        let w = self.peek()?;
+        self.0 = trim_start(&self.0[w.len()..]);
+        Some(w)
+    }
+}
+
+fn glued(w: &str, prefix: &str) -> bool {
+    w.len() > prefix.len() && w.starts_with(prefix)
+}
+
+fn is_digits(s: &str) -> bool {
+    !s.is_empty() && s.bytes().all(|c| c.is_ascii_digit())
+}
+
+fn is_int(w: &str) -> bool {
+    is_digits(w.strip_prefix(['+', '-']).unwrap_or(w))
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — `timeout`'s one duration word:
+// `^([0-9]+\.?[0-9]*|\.[0-9]+)[smhd]?$`.
+fn is_duration(w: &str) -> bool {
+    let n = w.strip_suffix(['s', 'm', 'h', 'd']).unwrap_or(w);
+    if let Some(frac) = n.strip_prefix('.') {
+        return is_digits(frac);
+    }
+    let int = n.bytes().take_while(u8::is_ascii_digit).count();
+    if int == 0 {
+        return false;
+    }
+    let rest = &n[int..];
+    let rest = rest.strip_prefix('.').unwrap_or(rest);
+    rest.is_empty() || is_digits(rest)
+}
+
+fn walk_timeout(cur: &mut Words) -> bool {
+    while let Some(w) = cur.peek() {
+        match w {
+            "--preserve-status" | "--foreground" | "-v" | "--verbose" => {
+                cur.pop();
+            }
+            "-s" | "-k" | "--signal" | "--kill-after" => {
+                cur.pop();
+                if cur.pop().is_none() {
+                    return false;
+                }
+            }
+            _ if glued(w, "-s") || glued(w, "-k") || glued(w, "--signal=")
+                || glued(w, "--kill-after=") =>
+            {
+                cur.pop();
+            }
+            _ => break,
+        }
+    }
+    cur.pop().is_some_and(is_duration)
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — `nice`'s glued adjustments:
+// `^(-n[+-]?|--adjustment=[+-]?|-)[0-9]+$`.
+fn walk_nice(cur: &mut Words) -> bool {
+    while let Some(w) = cur.peek() {
+        if w == "-n" {
+            cur.pop();
+            if !cur.pop().is_some_and(is_int) {
+                return false;
+            }
+        } else if w
+            .strip_prefix("-n")
+            .or_else(|| w.strip_prefix("--adjustment="))
+            .is_some_and(is_int)
+            || w.strip_prefix('-').is_some_and(is_digits)
+        {
+            cur.pop();
+        } else {
+            break;
+        }
+    }
+    true
+}
+
+fn walk_stdbuf(cur: &mut Words) -> bool {
+    while let Some(w) = cur.peek() {
+        match w {
+            "-i" | "-o" | "-e" => {
+                cur.pop();
+                if cur.pop().is_none() {
+                    return false;
+                }
+            }
+            _ if glued(w, "-i") || glued(w, "-o") || glued(w, "-e") || glued(w, "--input=")
+                || glued(w, "--output=") || glued(w, "--error=") =>
+            {
+                cur.pop();
+            }
+            _ => break,
+        }
+    }
+    true
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — a leading assignment:
+// `^[A-Za-z_][A-Za-z0-9_]*=[^"']*$`.
+fn is_assignment(w: &str) -> bool {
+    let Some((name, value)) = w.split_once('=') else {
+        return false;
+    };
+    let b = name.as_bytes();
+    !b.is_empty()
+        && (b[0].is_ascii_alphabetic() || b[0] == b'_')
+        && b.iter().all(|c| c.is_ascii_alphanumeric() || *c == b'_')
+        && !value.contains(['"', '\''])
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — `_guard_harness_view`: a segment as the permission
+// matcher reads it, its documented leading wrappers stripped from the head repeatedly. An option a
+// wrapper's walk does not recognize, or a wrapper left with nothing to wrap, stops the strip there.
+pub fn harness_view(seg: &str) -> &str {
+    let mut rest = trim_start(seg);
+    loop {
+        let mut cur = Words(rest);
+        let Some(head) = cur.pop() else { break };
+        let walked = match head {
+            "time" => {
+                if cur.peek() == Some("-p") {
+                    cur.pop();
+                }
+                true
+            }
+            "timeout" => walk_timeout(&mut cur),
+            "nice" => walk_nice(&mut cur),
+            "stdbuf" => walk_stdbuf(&mut cur),
+            "nohup" | "builtin" | "noglob" | "command" | "xargs" => true,
+            h => is_assignment(h),
+        };
+        match cur.peek() {
+            Some(w) if walked && !w.starts_with('-') => rest = cur.0,
+            _ => break,
+        }
+    }
+    rest
 }
 
 // spec: guard-kit/SPEC.md §The guard framework — `<<-?[[:space:]]*(<quoted>|<identifier>)`, the
@@ -309,6 +470,20 @@ mod tests {
     fn a_newline_bearing_command_is_out_of_contract_rather_than_normalized() {
         assert_eq!(skeleton("cat <<EOF\nbody\nEOF", SQDQ), Err(NewlineInInput));
         assert!(skeleton("cat <<EOF", SQDQ).is_ok());
+    }
+
+    // spec: guard-kit/SPEC.md §The guard framework — the strip walks each wrapper's own grammar,
+    // nests, and stops at the wrapper whose arguments it cannot walk or that wraps nothing
+    #[test]
+    fn the_harness_view_strips_the_documented_wrappers_and_stops_where_a_walk_fails() {
+        assert_eq!(harness_view("nice -n 5 timeout -s KILL 1.5s time -p git log"), "git log");
+        assert_eq!(harness_view("FOO=1 stdbuf -oL xargs grep x"), "grep x");
+        assert_eq!(harness_view("sudo git log"), "sudo git log");
+        assert_eq!(harness_view("command -v git"), "command -v git");
+        assert_eq!(harness_view("xargs -0 grep x"), "xargs -0 grep x");
+        assert_eq!(harness_view("timeout abc git log"), "timeout abc git log");
+        assert_eq!(harness_view("time"), "time");
+        assert_eq!(harness_view("FOO='a b' git log"), "FOO='a b' git log");
     }
 
     // spec: guard-kit/SPEC.md §The generic ruleset — operator and target together, fd-dups

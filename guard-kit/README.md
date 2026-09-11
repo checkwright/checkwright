@@ -55,10 +55,13 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
 Configuration follows the established kit pattern — override any knob in
 `guard-config.sh` (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
-`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`, `GUARD_KIT_BREADTH_PROBES`,
-`GUARD_KIT_BREADTH_DECLARED`); defaults are this repo's layout, and the probe set
-and the declaration map both default to empty because their contents are your
-project's vocabulary, not the kit's.
+`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`, `GUARD_KIT_SEARCH_TOOLS`,
+`GUARD_KIT_BREADTH_PROBES`, `GUARD_KIT_BREADTH_DECLARED`); defaults are this
+repo's layout, and the probe set and the declaration map both default to empty
+because their contents are your project's vocabulary, not the kit's. Drop a tool
+from `GUARD_KIT_SEARCH_TOOLS` (guard-kit/SPEC.md §Layout and configuration) when
+your harness build does not carry it, so the `find` and `git grep` steers never
+name a tool that is not there.
 
 ## Use
 

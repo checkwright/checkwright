@@ -155,8 +155,16 @@ fn parse_wants(spec: &str) -> Result<guard::Wants, String> {
 // owes for the three twinned primitives: this module's classification of one canned corpus,
 // reported as classification and never as an internal representation, `--queue-parity`'s own rule.
 fn guard_lib_parity(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --guard-lib-parity split <cmd>... | --guard-lib-parity skeleton <wants> <cmd>... | --guard-lib-parity redirect <cmd>... | --guard-lib-parity allow-match <string> <glob>...";
+    let usage = "  usage: checkwright-gates --guard-lib-parity split <cmd>... | --guard-lib-parity skeleton <wants> <cmd>... | --guard-lib-parity redirect <cmd>... | --guard-lib-parity allow-match <string> <glob>... | --guard-lib-parity harness-view <cmd>...";
     match args.first().map(String::as_str) {
+        // spec: guard-kit/SPEC.md §The guard framework — `_guard_harness_view`'s twin, reported as
+        // classification: each command beside the view the permission matcher reads.
+        Some("harness-view") => {
+            for c in &args[1..] {
+                println!("harness-view\t{}\t{}", c, guard::harness_view(c));
+            }
+            0
+        }
         // spec: guard-kit/SPEC.md §The guard framework — `guard_allow_match`'s twin, reported as
         // classification over (string, glob) pairs. The shell holder cannot empty: rule 20 calls it
         // from inside the same permanently-shell file, so this is criterion 6's *unless* clause.

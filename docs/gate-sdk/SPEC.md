@@ -2554,7 +2554,7 @@ A **non-gate arm** is specified by three properties:
   `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity` and
   `--guard-lib-parity` by their
   parity harnesses (the second
-  holding guard-kit's splitter, normalizer and redirect scan to `lib/guard.sh`,
+  holding guard-kit's twinned primitives to `lib/guard.sh`,
   whose callers are rules inside that same file — so it is the member whose
   second holder cannot empty even in principle, the property
   `--declaration-parity` lacked) — and stating it is what

@@ -32,6 +32,7 @@ declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(
     grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls xargs
 )
 declare -p GUARD_KIT_APPEND_BINS >/dev/null 2>&1 || GUARD_KIT_APPEND_BINS=(cat printf echo)
+declare -p GUARD_KIT_SEARCH_TOOLS >/dev/null 2>&1 || GUARD_KIT_SEARCH_TOOLS=(Glob Grep)
 declare -p GUARD_KIT_SCRIPT_INTERPRETERS >/dev/null 2>&1 || GUARD_KIT_SCRIPT_INTERPRETERS=(
     python python3 node deno ruby perl php zsh
 )
@@ -250,9 +251,69 @@ guard_skeleton() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 8/12/14/15/17/18/19/20/22, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 2/8/12/14/15/17/18/19/20/22, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
 guard_split_compound() {
     sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
+}
+
+# spec: guard-kit/SPEC.md §The guard framework — the harness view's word step: moves the head word of the caller's cur into its w and drops the blanks after it; non-zero when cur is empty
+_guard_hv_pop() {
+    [[ -n "$cur" ]] || return 1
+    w="${cur%%[[:space:]]*}"
+    cur="${cur:${#w}}"
+    cur="${cur#"${cur%%[![:space:]]*}"}"
+}
+
+# spec: guard-kit/SPEC.md §The guard framework — the harness view: a segment as the permission matcher reads it, its documented leading wrappers stripped from the head repeatedly; a classification view and never a grant view, held equal to its compiled twin by --guard-lib-parity
+_guard_harness_view() {
+    local rest="${1#"${1%%[![:space:]]*}"}" cur w head
+    local dur_re='^([0-9]+\.?[0-9]*|\.[0-9]+)[smhd]?$' int_re='^[+-]?[0-9]+$'
+    local nice_re='^(-n[+-]?|--adjustment=[+-]?|-)[0-9]+$' asg_re='^[A-Za-z_][A-Za-z0-9_]*=[^"'\'']*$'
+    while [[ -n "$rest" ]]; do
+        cur="$rest"
+        _guard_hv_pop
+        head="$w"
+        case "$head" in
+            time)
+                [[ "${cur%%[[:space:]]*}" == -p ]] && _guard_hv_pop ;;
+            timeout)
+                while :; do
+                    case "${cur%%[[:space:]]*}" in
+                        --preserve-status | --foreground | -v | --verbose) _guard_hv_pop ;;
+                        -s | -k | --signal | --kill-after) _guard_hv_pop; _guard_hv_pop || break 2 ;;
+                        -s?* | -k?* | --signal=?* | --kill-after=?*) _guard_hv_pop ;;
+                        *) break ;;
+                    esac
+                done
+                _guard_hv_pop && [[ "$w" =~ $dur_re ]] || break ;;
+            nice)
+                while :; do
+                    w="${cur%%[[:space:]]*}"
+                    if [[ "$w" == -n ]]; then
+                        _guard_hv_pop
+                        _guard_hv_pop && [[ "$w" =~ $int_re ]] || break 2
+                    elif [[ "$w" =~ $nice_re ]]; then
+                        _guard_hv_pop
+                    else
+                        break
+                    fi
+                done ;;
+            stdbuf)
+                while :; do
+                    case "${cur%%[[:space:]]*}" in
+                        -i | -o | -e) _guard_hv_pop; _guard_hv_pop || break 2 ;;
+                        -[ioe]?* | --input=?* | --output=?* | --error=?*) _guard_hv_pop ;;
+                        *) break ;;
+                    esac
+                done ;;
+            nohup | builtin | noglob | command | xargs) ;;
+            *)
+                [[ "$head" =~ $asg_re ]] || break ;;
+        esac
+        [[ -n "$cur" && "$cur" != -* ]] || break
+        rest="$cur"
+    done
+    printf '%s' "$rest"
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 18 and 19 share, so a missing jq or settings file emits nothing and every reader declines
@@ -300,11 +361,25 @@ guard_rule_cd_compound() {
 }
 
 guard_rule_git_c_root() {
-    local cmd
+    local cmd seg cmdseg w globals
     cmd="$(guard_skeleton "$1" sq dq hd)"
     if grep -qF "git -C $PWD " <<<"$cmd"; then
         guard_block "drop 'git -C $PWD ' — cwd is the repo root, so the bare 'git <subcommand>' form is allowlisted and resolves on the match; the absolute '-C' spelling matches nothing and costs an out-of-band permission decision. Reserve 'git -C <dir>' for a different repo."
     fi
+    case "$cmd" in *git*-c* | */time* | */nice* | */nohup* | */stdbuf*) ;; *) return 0 ;; esac
+    while IFS= read -r seg; do
+        cmdseg="$(_guard_command_word "$seg")"
+        w="${cmdseg%%[[:space:]]*}"
+        if [[ "$w" == git ]] && globals="$(_guard_git_subcommand "$cmdseg" globals)" \
+            && grep -qx -- -c <<<"$globals"; then
+            guard_block "drop the 'git -c <key>=<value>' override and run the bare 'git <subcommand>' — a pager or color override has no effect without a terminal, and the bare form is allowlisted and resolves on the match. A '-c' form is never granted: a '-c' key can name a program the subcommand runs (core.pager, core.fsmonitor, core.sshCommand, alias.*), which is also why the harness's matcher does not see through it. If you genuinely need the config override, run it yourself with !<command>."
+        fi
+        case "$w" in */*) ;; *) continue ;; esac
+        case "${w##*/}" in
+            time | timeout | nice | nohup | stdbuf)
+                guard_block "use the bare wrapper name '${w##*/}' rather than '$w' — the harness's matcher strips a bare '${w##*/}' before it matches, so the wrapped command resolves on its own allowlist entry, while an absolute spelling is matched as itself and costs an out-of-band permission decision. A format option only the binary takes ('/usr/bin/time -f') has no stripped spelling; if you genuinely need it, run it yourself with !<command>." ;;
+        esac
+    done < <(guard_split_compound "$cmd")
 }
 
 guard_rule_scratch_redirect() {
@@ -380,42 +455,153 @@ guard_rule_brace_glyph() {
     guard_block "quote the '{' if it's literal (an unquoted awk/sed program), or write it out if it expands — the harness's matcher refuses every bare '{' glyph before allowlist matching, so the call is decided out of band. A brace inside quotes of either kind, or in a heredoc body, is already inert and never reaches this block."
 }
 
-_guard_sed_segment() {
-    local seg="$1" tok skip=0 have_script=0
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's one program-then-operands walk: a per-tool option table separates a sed or awk segment's program word from its file operands, filling the caller's prog (empty when an option supplied the program), inplace and prog_operands; non-zero on an awk option the table does not carry, so the caller declines rather than guess
+_guard_program_operands() {
+    local tool="$1" tok skip='' ends=0 have_prog=0 amp='&'
     local -a toks
-    read -ra toks <<<"$seg"
-    for tok in "${toks[@]}"; do
-        if [[ "$skip" == 1 ]]; then skip=0; have_script=1; continue; fi
-        case "$tok" in
-            sed) ;;
-            -i | -i* | --in-place*)
-                guard_block "don't rewrite a file with 'sed -i' — use the Edit tool: it replaces an exact string, fails loudly when the match is missing or ambiguous, and keeps the harness's view of the file current. If you genuinely need the in-place edit, run it yourself with !<command>." ;;
-            -e | -f) skip=1 ;;
-            --expression=* | --file=*) have_script=1 ;;
-            --*) ;;
-            -[!-]*)
-                case "$tok" in
-                    *i*) guard_block "don't rewrite a file with 'sed -i' — use the Edit tool: it replaces an exact string, fails loudly when the match is missing or ambiguous, and keeps the harness's view of the file current. If you genuinely need the in-place edit, run it yourself with !<command>." ;;
-                esac ;;
-            *)
-                if [[ "$have_script" == 0 ]]; then
-                    have_script=1
-                else
-                    guard_block "don't read a file through 'sed' — use the Read tool (offset/limit for a line range): it returns numbered lines and registers the file for a later Edit. For a markdown section, the consumer's section extractor beats a line range. If you genuinely need sed, pipe into it or run it yourself with !<command>."
-                fi ;;
-        esac
+    read -ra toks <<<"$2"
+    prog='' inplace=0 prog_operands=()
+    for tok in ${toks[@]+"${toks[@]:1}"}; do
+        tok="${tok//$'\x01'/ }"
+        tok="${tok//$'\x02'/$'\t'}"
+        tok="${tok//$'\x03'/;}"
+        tok="${tok//$'\x04'/|}"
+        tok="${tok//$'\x05'/"$amp"}"
+        if [[ -n "$skip" ]]; then
+            [[ "$skip" == prog ]] && have_prog=1
+            skip=''
+            continue
+        fi
+        if [[ "$ends" == 0 ]]; then
+            case "$tool:$tok" in
+                sed:-i | sed:-i* | sed:--in-place*) inplace=1; continue ;;
+                sed:-e | sed:-f) skip=prog; continue ;;
+                sed:--expression=* | sed:--file=*) have_prog=1; continue ;;
+                sed:--*) continue ;;
+                sed:-[!-]*) [[ "$tok" == *i* ]] && inplace=1; continue ;;
+                awk:--) ends=1; continue ;;
+                awk:-F | awk:-v) skip=arg; continue ;;
+                awk:-f) skip=prog; continue ;;
+                awk:-F?* | awk:-v?*) continue ;;
+                awk:-f?*) have_prog=1; continue ;;
+                awk:-*) return 1 ;;
+            esac
+        fi
+        if [[ "$have_prog" == 0 ]]; then
+            prog="$tok"
+            have_prog=1
+        else
+            prog_operands+=("$tok")
+        fi
     done
+    return 0
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's dequoted view: the raw command walked in lockstep with its 'sq dq hd' skeleton, every region decision taken from the skeleton, quote characters removed and each quoted span's blanks and statement separators held as sentinels so a split or a word split cuts exactly where it cuts the skeleton; non-zero where the two cannot be aligned (a heredoc body, an unterminated span, a newline inside quotes)
+_guard_dequoted_view() {
+    local raw="$1" s="$2" out='' i=0 j=0 k rest chunk span c
+    local lit="[\"'\\\\]*" dqlit="[\"\\\\]*"
+    while ((j < ${#raw})); do
+        rest="${raw:j}"
+        chunk="${rest%%$lit}"
+        [[ "${s:i:${#chunk}}" == "$chunk" ]] || return 1
+        out+="$chunk"
+        ((i += ${#chunk}, j += ${#chunk}))
+        ((j < ${#raw})) || break
+        c="${raw:j:1}"
+        if [[ "$c" == '\' ]]; then
+            [[ "${s:i:2}" == "${raw:j:2}" ]] || return 1
+            out+="${raw:j:2}"
+            ((i += 2, j += 2))
+            continue
+        fi
+        if [[ "$c" == "'" ]]; then
+            [[ "${s:i:2}" == SQ ]] || return 1
+            rest="${raw:j+1}"
+            span="${rest%%\'*}"
+            [[ "$span" == "$rest" ]] && return 1
+            ((j += ${#span} + 2))
+        else
+            [[ "${s:i:2}" == DQ ]] || return 1
+            k=$((j + 1))
+            span=''
+            while :; do
+                rest="${raw:k}"
+                chunk="${rest%%$dqlit}"
+                [[ "$chunk" == "$rest" ]] && return 1
+                span+="$chunk"
+                ((k += ${#chunk}))
+                [[ "${raw:k:1}" == '\' ]] || break
+                span+="${raw:k:2}"
+                ((k += 2))
+            done
+            ((j = k + 1))
+        fi
+        ((i += 2))
+        [[ "$span" == *$'\n'* ]] && return 1
+        span="${span// /$'\x01'}"
+        span="${span//$'\t'/$'\x02'}"
+        span="${span//;/$'\x03'}"
+        span="${span//|/$'\x04'}"
+        span="${span//&/$'\x05'}"
+        out+="$span"
+    done
+    ((i == ${#s})) || return 1
+    printf '%s' "$out"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — the runner path rules 8 and 23 print: gate-sdk's front end, derived from the vendor root GUARD_KIT_LIB already names rather than hardcoded, so a relocated tree still prints a path that resolves
+_guard_front_end() {
+    local lib="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}" root
+    root="${lib%/lib/guard.sh}"
+    if [[ "$root" == */* ]]; then root="${root%/*}/"; else root=""; fi
+    printf '%sgate-sdk/bin/run-gates.sh' "$root"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's awk arm: a pipeline-head awk segment with exactly one file operand whose program is a line range (NR comparisons only) or a markdown heading range, with no action or the print-all one; the steer is chosen by the program's shape
+_guard_awk_read() {
+    local raw="$1" s="$2" v stmt seg prog inplace p
+    local -a pipes=() prog_operands=()
+    local cmp='NR(==|>=|<=|>|<)[0-9]+'
+    local conj="${cmp}(&&${cmp})*"
+    local nr_re="^${conj}(,${conj})?"'(\{print(\$0)?\})?$'
+    local hd_re='^[[:space:]]*/([^/\\]|\\.)+/[[:space:]]*,[[:space:]]*/([^/\\]|\\.)+/[[:space:]]*(\{[[:space:]]*print([[:space:]]+\$0)?[[:space:]]*\})?[[:space:]]*$'
+    case "$s" in *awk*) ;; *) return 0 ;; esac
+    v="$(_guard_dequoted_view "$raw" "$s")" || return 0
+    while IFS= read -r stmt; do
+        mapfile -t pipes < <(tr '|' '\n' <<<"$stmt")
+        seg="${pipes[0]:-}"
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        case "$seg" in awk[[:space:]]*) ;; *) continue ;; esac
+        _guard_program_operands awk "$seg" || continue
+        [[ -n "$prog" && "${#prog_operands[@]}" == 1 ]] || continue
+        case "${prog_operands[0]}" in - | /dev/stdin) continue ;; esac
+        p="${prog//[[:space:]]/}"
+        if [[ "$p" =~ $nr_re ]]; then
+            guard_block "don't read a line range through 'awk' — use the Read tool with offset/limit: it returns numbered lines and registers the file for a later Edit. An awk program carrying an action, read from a program file, given a second operand, or fed by a pipe is a transform or a filter and untouched. If you genuinely need awk, run it yourself with !<command>."
+        fi
+        if [[ "$prog" =~ $hd_re && "${prog_operands[0]}" == *.md ]]; then
+            guard_block "don't read a markdown section through an 'awk' range — use the section extractor: 'bash $(_guard_front_end) --emit md-section ${prog_operands[0]} \"<heading>\"' prints exactly the section under that heading, bounded by the next heading at its level. A range over a non-markdown file, a program carrying an action, or an awk fed by a pipe is untouched. If you genuinely need awk, run it yourself with !<command>."
+        fi
+    done < <(sed -E 's/\|\||&&|;/\n/g' <<<"$v")
 }
 
 guard_rule_sed_file() {
-    local cmd="$1" s seg
+    local cmd="$1" s seg prog inplace
+    local -a prog_operands=()
     s="$(guard_skeleton "$cmd" sq dq hd)"
     while IFS= read -r seg; do
         seg="${seg#"${seg%%[![:space:]]*}"}"
-        case "$seg" in
-            sed | sed[[:space:]]*) _guard_sed_segment "$seg" ;;
-        esac
+        case "$seg" in sed | sed[[:space:]]*) ;; *) continue ;; esac
+        _guard_program_operands sed "$seg"
+        if [[ "$inplace" == 1 ]]; then
+            guard_block "don't rewrite a file with 'sed -i' — use the Edit tool: it replaces an exact string, fails loudly when the match is missing or ambiguous, and keeps the harness's view of the file current. If you genuinely need the in-place edit, run it yourself with !<command>."
+        fi
+        if [[ "${#prog_operands[@]}" -ge 1 ]]; then
+            guard_block "don't read a file through 'sed' — use the Read tool (offset/limit for a line range): it returns numbered lines and registers the file for a later Edit. For a markdown section, the consumer's section extractor beats a line range. If you genuinely need sed, pipe into it or run it yourself with !<command>."
+        fi
     done < <(guard_split_compound "$s")
+    _guard_awk_read "$cmd" "$s"
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — a literal echo/printf banner segment: the natural separator of a batched read (no expansion survives here — rule 6 ran first, the caller bailed on substitution/backtick)
@@ -488,14 +674,24 @@ _guard_is_read_batch() {
     [[ "$reads" -ge 1 ]]
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rules 9 and 11 fire only toward a dedicated search tool GUARD_KIT_SEARCH_TOOLS declares the harness build carries
+_guard_has_search_tool() {
+    local t
+    for t in ${GUARD_KIT_SEARCH_TOOLS[@]+"${GUARD_KIT_SEARCH_TOOLS[@]}"}; do
+        [[ "$t" == "$1" ]] && return 0
+    done
+    return 1
+}
+
 guard_rule_find_glob() {
     local cmd="$1" s
+    _guard_has_search_tool Glob || return 0
     grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
     case "$cmd" in *'`'*) return 0 ;; esac
     s="$(guard_skeleton "$cmd" sq dq hd)"
     grep -qE '(&&|\|\||\||&|<|>)' <<<"$s" && return 0
     _guard_is_read_batch "$s" _guard_is_find_listing || return 0
-    guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) and needs no permission decision at all. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>."
+    guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) and needs no permission decision at all. If your toolset carries no Glob tool, keep 'find' and pipe the listing into a read-only consumer ('find <dir> -type f | sort'), which the read-only pipeline grant allows. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>."
 }
 
 guard_rule_cat_file() {
@@ -510,6 +706,7 @@ guard_rule_cat_file() {
 
 guard_rule_git_grep() {
     local cmd="$1" s tok i n positionals=0 want_arg=0 pat_opt=0 working_tree=0
+    _guard_has_search_tool Grep || return 0
     grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
     case "$cmd" in *'`'*) return 0 ;; esac
     s="$(guard_skeleton "$cmd" sq dq hd)"
@@ -537,7 +734,7 @@ guard_rule_git_grep() {
         [[ "$positionals" == 1 ]] && working_tree=1
     fi
     [[ "$working_tree" == 1 ]] || return 0
-    guard_block "don't search with 'git grep' over the working tree — use the Grep tool: it returns matching lines (files registered for a later Read) and needs no permission decision at all. A 'git grep' naming a revision, searching the index (--cached), or piped into a consumer is untouched — those reach beyond the working tree the Grep tool sees. If you genuinely need git grep, run it yourself with !<command>."
+    guard_block "don't search with 'git grep' over the working tree — use the Grep tool: it returns matching lines (files registered for a later Read) and needs no permission decision at all. If your toolset carries no Grep tool, bare 'grep -rn <pattern> <path>' searches the same working tree. A 'git grep' naming a revision, searching the index (--cached), or piped into a consumer is untouched — those reach beyond the working tree the Grep tool sees. If you genuinely need git grep, run it yourself with !<command>."
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 12's lead test: a leading shell keyword or negation does not change which binary the segment runs, so the loop-headed spelling the rule exists for is reached
@@ -666,7 +863,8 @@ _guard_live_run_records() {
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 14's subcommand walk: git's global options are consumed so 'git -C dir commit' is reached, and any option this list does not recognize returns non-zero so the segment declines rather than guessing which token is the subcommand
 _guard_git_subcommand() {
-    local seg="$1" tok first=1 expect_arg=0
+    local seg="$1" mode="${2:-}" tok first=1 expect_arg=0
+    local -a globals=()
     for tok in $seg; do
         if [[ "$first" == 1 ]]; then
             [[ "$tok" == git ]] || return 1
@@ -676,13 +874,21 @@ _guard_git_subcommand() {
         if [[ "$expect_arg" == 1 ]]; then expect_arg=0; continue; fi
         case "$tok" in
             -C | -c | --git-dir | --work-tree | --namespace | --exec-path | --config-env)
+                globals+=("$tok")
                 expect_arg=1 ;;
-            --git-dir=* | --work-tree=* | --namespace=* | --exec-path=* | --config-env=*) ;;
+            --git-dir=* | --work-tree=* | --namespace=* | --exec-path=* | --config-env=*) globals+=("$tok") ;;
             -p | -P | --paginate | --no-pager | --bare | --no-replace-objects | \
                 --literal-pathspecs | --no-literal-pathspecs | --glob-pathspecs | \
-                --noglob-pathspecs | --icase-pathspecs | --no-optional-locks) ;;
+                --noglob-pathspecs | --icase-pathspecs | --no-optional-locks) globals+=("$tok") ;;
             -*) return 1 ;;
-            *) printf '%s' "$tok"; return 0 ;;
+            *)
+                # spec: guard-kit/SPEC.md §The generic ruleset — rule 2's reading of this same walk: 'globals' emits the global option words consumed before the subcommand, one per line, instead of the subcommand
+                if [[ "$mode" == globals ]]; then
+                    printf '%s\n' ${globals[@]+"${globals[@]}"}
+                else
+                    printf '%s' "$tok"
+                fi
+                return 0 ;;
         esac
     done
     return 1
@@ -1162,12 +1368,10 @@ _guard_stdin_redirect() {
         | sed -E 's/^[^<]?<[[:space:]]*//'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both resolve the runner from GUARD_KIT_LIB so a consumer that vendors the kit elsewhere is told where its own copy is. The runner is a bridged arm of gate-sdk's front end, so what the steer composes is that front end's path, derived from the vendor root this kit's own location already names rather than hardcoded — a relocated tree still prints a path that resolves.
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both name the runner through _guard_front_end so a consumer that vendors the kit elsewhere is told where its own copy is
 _guard_block_interpreter() {
-    local arm="$1" word="$2" src="$3" runner="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}" root
-    root="${runner%/lib/guard.sh}"
-    if [[ "$root" == */* ]]; then root="${root%/*}/"; else root=""; fi
-    runner="${root}gate-sdk/bin/run-gates.sh --scratch-run"
+    local arm="$1" word="$2" src="$3" runner
+    runner="$(_guard_front_end) --scratch-run"
     if [[ "$arm" == a ]]; then
         guard_block "run a scratch script through the runner: 'bash $runner <script> [args…]' (guard-kit/SPEC.md §scratch-run). This call takes the program body for '$word' from '$src', which sits in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs. The runner is allowlistable and echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."
     fi

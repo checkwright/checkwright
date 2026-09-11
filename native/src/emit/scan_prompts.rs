@@ -51,19 +51,11 @@ fn trim(s: &str) -> &str {
     &s[..e]
 }
 
-// spec: guard-kit/SPEC.md §scan-prompts — the leading decoration the matcher looks through, the
-// holder's three parameter expansions in order: `sudo `, `timeout `, then a shortest `[0-9]* `,
-// which is one leading digit and everything to the first space.
+// spec: guard-kit/SPEC.md §scan-prompts — the leading decoration the matcher looks through is the
+// harness view, held once in `guard::harness_view`, so the grant test and the key strip exactly
+// the wrappers the matcher strips.
 fn strip_decoration(c: &str) -> &str {
-    let c = c.strip_prefix("sudo ").unwrap_or(c);
-    let c = c.strip_prefix("timeout ").unwrap_or(c);
-    match c.as_bytes().first() {
-        Some(f) if f.is_ascii_digit() => match c.find(' ') {
-            Some(i) => &c[i + 1..],
-            None => c,
-        },
-        _ => c,
-    }
+    guard::harness_view(c)
 }
 
 fn word(s: &str) -> (&str, &str) {
@@ -417,7 +409,18 @@ mod tests {
         assert_eq!(ranking_key("git status --short"), "git status");
         assert_eq!(ranking_key("make build"), "make");
         assert_eq!(ranking_key("python3 -"), "python3 -");
-        assert_eq!(ranking_key("sudo timeout 30 git log"), "git log");
+        assert_eq!(ranking_key("sudo timeout 30 git log"), "sudo");
+        assert_eq!(ranking_key("timeout 30 git log"), "git log");
+        assert_eq!(ranking_key("time -p nice -n 5 git log --oneline"), "git log");
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — the grant test reads the harness view: a stripped
+    // wrapper leaves the wrapped command to match, and an unstripped `sudo` does not
+    #[test]
+    fn the_grant_test_looks_through_exactly_the_wrappers_the_matcher_strips() {
+        assert!(granted("timeout 30 git status", &[], None));
+        assert!(granted("FOO=1 nice -n 5 ls", &["ls".to_string()], None));
+        assert!(!granted("sudo git status", &[], None));
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — the write-shape suffix: create and append split, the
