@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: deferred-pool-triage
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,44 @@
 ## New Features
 
 ## Technical Debt
+
+- **post-port-deferred-pool-triage** — one iteration triaging the whole deferred pool now that the
+  port's owed column reads zero: icebox by class, retire what a landed unit or a closed ruling has
+  mooted.
+  **RULED BY THE OPERATOR, 2026-09-05, consult channel, relayed by the lead** — a standing
+  direction, not a session-filed gap; its former home, the ruling record's port-first paragraph,
+  was deleted 2026-09-10 once `--emit port-blockers --tree` read `0 owed`.
+  **PROMOTED 2026-09-11 at scope AS DEBT — operator, AskUserQuestion in the lead session,
+  lead-relayed.** It adds no name to a governed surface: every move below is one
+  queue-kit/SPEC.md §The icebox tier already sanctions, so no amendment is owed.
+  **THE CLASS RULE, operator 2026-09-11, same channel, lead-relayed:** a machinery-class entry
+  (TRAJECTORY.md's 2026-08-30 witness discriminator and its conjunctive test) carrying no
+  `recurrence:` line and no roadmap tag is iceboxed by class, whatever its cost field opens
+  with. **Its reach is this triage alone**, as the question was put, so routine close evictions
+  keep the cost-opener limb. It answers `icebox-default-reach-over-the-cost-opener-limb-unruled`
+  to that extent; that entry went to Done at this promotion, its named population lying wholly
+  inside this triage. An entry held out of the icebox by a recorded ruling on a ground OTHER
+  than its cost opener is outside the question as put: build escalates it rather than moving it.
+  **EXECUTED AT BUILD, under this entry — lead, own-authority 2026-09-11.** Close's eligibility
+  judgment governs its routine worklist, not a directed whole-pool unit.
+  **Moves, each conserved (queue-kit/SPEC.md §The icebox tier):** Deferred → Icebox under the
+  class rule, one lead line each, the body recovered before any ruling on it; Deferred → Done for
+  an entry a landed unit or a closed ruling has mooted, a merged duplicate included.
+  **Named merge, lead, own-authority 2026-09-11:** `stop-liveness-test-module-order-dependent` and
+  `stop-liveness-stub-spawn-flake` own one flake — keep one and Done the other; the fix itself
+  stays deferred.
+  **Out of the moves, lead, own-authority 2026-09-11:** the six threshold entries stay deferred —
+  `entry-compression-contract-unenforced`, `behavior-change-surface`,
+  `align-checklist-fanout-calibration`, `kfric-capture-unverified-assertion`,
+  `prompt-ranking-ungrantable-shape-class` and `icebox-standing-ineligibility-unrecordable`; their
+  `recurrence:` lines also keep them outside the class rule.
+  **Already relied on:** `deferred-entry-iteration-name` records its disposition as deferred to
+  this triage.
+  **Done when:** every Deferred entry has been read against the class rule and the mooted test,
+  the moves are committed, and the landing commit states `--emit queue-counts` before and after
+  with the pool's qnet.
+  Filed 2026-09-10 by close, draining the gap inbox; build filed rather than queue-editing
+  mid-iteration.
 
 ## Deferred
 
@@ -701,42 +739,6 @@
   Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because a knob-arity
   change is adopter-facing design; promoted rather than iceboxed because the second producer is
   live in the tree today.
-
-- **icebox-default-reach-over-the-cost-opener-limb-unruled** [design-pending] — whether the
-  machinery-class icebox default governs the eligibility rule's COST-OPENER limb, as a lead ruling
-  made it govern the TRIGGER limb, is unruled and is operator-class.
-  **NOT RULED HERE, and the decline is the record.** The lead declined it 2026-09-08 on its own
-  authority as operator-class and routed it to this drain to be surfaced rather than decided; this
-  close surfaces it and does not decide it either. Disapplying a limb of a recorded eligibility
-  rule is an operator move whatever the grounds look like.
-  **What it would dispose of, and nothing else.** Four entries kept at build 2026-09-08 for want of
-  this answer and for no other reason: `declaration-shape-outside-header-unreadable`,
-  `inline-interpreter-substrate-census`, `entry-compression-contract-unenforced` and
-  `boundary-preserve-covers-names-not-lifetimes`. It RE-FILES none of them — each keeps its own
-  body, its own cost and its own candidate shapes, and a ruling either way changes where they LIVE
-  and changes nothing about what any of them says.
-  **The reading FOR, quoted rather than paraphrased.** The 2026-09-07 ruling states the test is
-  conjunctive and adds "There is no live-trigger limb in it at all, so a bullet whose trigger fired
-  satisfies the conjunction on its own terms and the default applies without outranking anything."
-  There is no cost-opener limb in it either, so the identical sentence reads across.
-  **The counter-consideration AGAINST, which is why it is not self-answering.** The default in
-  `TRAJECTORY.md` cites `queue-kit/SPEC.md` §The icebox tier's GRAMMAR — the lead-line shape —
-  and not the eligibility rule; and the 2026-09-07 ruling governed a machinery-class GAP BULLET,
-  new intake at close where nothing is being evicted and eligibility never arises. These four are
-  existing deferred entries standing at the eligibility gate, which `queue-kit/SPEC.md`:220 makes
-  explicit is judged at the closing stage.
-  **SCALE, which is why the lead declined it.** `TRAJECTORY.md` measures the machinery class at
-  roughly three deferred entries in five, so disapplying one limb across the majority of the
-  pool demotes that rule rather than applying it.
-  **NOT at issue:** re-authoring a prose cost opener to a class word to unblock an eviction stays
-  refused by `queue-kit/SPEC.md`:250-255, and nothing here reopens it.
-  **The population moved inside this close, and a ruling should see it.** This drain judged a
-  recurrence on `entry-compression-contract-unenforced` and landed a dated `recurrence:` line,
-  which `queue-kit/SPEC.md`:224 makes a live promotion trigger — so that entry now fails the
-  eligibility limb on its own, and the population is THREE rather than four.
-  **Cost while deferred:** four entries carry full bodies a ruling either way would compress to one
-  line each, and every close re-reads them to reach the same undecided answer.
-  Filed 2026-09-08 by close from the gap inbox, on the lead's 2026-09-08 own-authority routing.
 
 - **held-ci-leg-failure-reddens-a-binding-one** [design-pending] — a held producer leg's failure
   fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the
@@ -10464,32 +10466,6 @@
   Filed 2026-09-10 by close, draining the gap inbox; build filed rather than fixed because the fix
   is an envelope change against a merged amendment, which no build session may take.
 
-- **post-port-deferred-pool-triage** [design-pending] — one iteration triaging the whole deferred
-  pool now that the port's owed column reads zero: icebox by class, retire what a landed unit or a
-  closed ruling has mooted.
-  **RULED BY THE OPERATOR, 2026-09-05, consult channel, relayed by the lead.** Recorded here rather
-  than on the ruling record because it is an iteration's worth of WORK, and the queue is work's
-  business-as-usual surface. The marking is the point: this is a standing operator direction, not a
-  session-filed gap, and it is not to be ranked away as if it were one.
-  **Its former home retired with the port.** The direction lived inside the ruling record's
-  port-first paragraph, deleted 2026-09-10 once `--emit port-blockers --tree` read `0 owed`, which
-  left the direction undischarged with no surface holding it. Restoring it to the ruling record as
-  its own paragraph was refused there: the record would then carry a work item, against its own
-  content tiering.
-  **Already relied on:** `deferred-entry-iteration-name` records its own disposition as deferred to
-  this triage.
-  **Cost while deferred:** the pool runs past three hundred Deferred entries and a hundred iceboxed
-  ones (`--emit queue-counts` derives both) and grows every iteration, and every scope survey
-  re-reads it — so the triage's absence is a per-iteration tax on ranking, not a one-off.
-  **NOT ICEBOX-ELIGIBLE, and the disqualifying limb is the cost field rather than the trigger** —
-  ruled `lead, own-authority` 2026-09-10, escalation reply in the lead session and lead-relayed,
-  never the operator's. The cost line above begins in prose rather than with a class token, and
-  queue-kit/SPEC.md §The icebox tier therefore reads it as not-low; rewriting that opener to
-  unblock an eviction is refused outright. Independently sufficient here: the machinery-class
-  default governs a FINDING, and a standing operator direction is directed work rather than one.
-  Filed 2026-09-10 by close, draining the gap inbox; build filed rather than queue-editing
-  mid-iteration, and rather than starting work that is scope-gated.
-
 - **stage-journal-path-unsourced-mid-stage** [design-pending] — a stage session dispatched into an
   ALREADY-ENTERED stage has no mechanical source for that stage's journal path, so it invents a
   discriminated filename and the successor's entry assertion then refuses.
@@ -10653,5 +10629,6 @@
 ## Done
 
 - port-first-deferral-grounds-unresolvable
+- icebox-default-reach-over-the-cost-opener-limb-unruled
 
 ## Lessons Learned
