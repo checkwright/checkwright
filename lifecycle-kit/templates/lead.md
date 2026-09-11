@@ -578,11 +578,7 @@ consequences:
   nudge; CLAUDE.md §Agent execution). The batching *criteria* are the
   shared-surface rule above, unchanged; this adds only the owner — the lead
   serializes sibling batches that share a surface and may parallelize those that
-  do not, subject to the shared-index discipline. **Every batch in the split
-  writes the one journal the stage derives**, discriminated by a heading and
-  never by a filename — the rule and the refusal a per-batch filename hands the
-  next session are §Channel design's, and this bullet is where a lead splitting
-  a stage meets the case.
+  do not, subject to the shared-index discipline.
 - **Batch escalations.** The decision shape makes batching natural — a stage
   session collects its open questions and sends them in one turn.
 - **Split the lead where the tail dominates.** Most of a lead's turns are

@@ -5601,18 +5601,20 @@
   limit and this entry owns the fix: the class no longer distinguishes a survey that engaged
   nothing from a lead that engaged thoroughly, so a mechanism landed under (1) or (2) should
   attribute the residue to its author rather than only capture it.
-  **OPTION (1)'s SUBJECT IS NOW PARTLY BUILT, measured 2026-09-09 at close, and the entry said
-  otherwise.** `.workflow/survey-record.md`'s `edges:` field carries per-candidate inbound counts
-  from `--emit queue-edges`, and that boundary's recurrence-threshold survey engaged six of seven
-  threshold members on their own recorded answer paragraphs. The `survey-engagement` audit row
-  stamped PERFORMED on that basis for the first time, so the durable-residue hole the entry was
-  filed against is narrower than filed. **What that does NOT close is the residue above,
-  sharpened:** those fields are hand-typed by the surveying session, so what survives a boundary
-  is a session's CLAIM that it engaged rather than a mechanical trace that it did — weaker than
-  any of the three candidate fixes aimed at, and exactly the *reliably* auditable gap.
+  **OPTION (1)'s SUBJECT IS PARTLY BUILT AND THE PARTIALITY IS THE FINDING**, measured at two
+  closes. `.workflow/survey-record.md`'s `edges:` field carries per-candidate inbound counts from
+  `--emit queue-edges`, and on that basis the `survey-engagement` row stamped PERFORMED for the
+  first time 2026-09-09 (six of seven threshold members engaged on their own answer paragraphs),
+  so the hole is narrower than filed. 2026-09-11 stamped PERFORMED again on a survey that ranked
+  nine and engaged six — the three unengaged INCLUDING its own top-ranked member by recurrence
+  count, ranked out on a blanket class call the record cannot distinguish from entries nobody
+  read. So the widened class admits a partial engagement and the stamp does not move: the six
+  carry the three. And both stamps rest on hand-typed fields, which makes even the six a
+  session's CLAIM that it engaged rather than a trace that it did — weaker than any of the three
+  candidate fixes aimed at, and exactly the *reliably* auditable gap.
   **Cost while deferred:** the stamp now rests on whichever session happened to write its
   reasoning down, so the audit reads cleanest exactly when a diligent lead masks an incurious
-  survey — the failure it cannot see is the one it was built for.
+  survey — now seen once at partial scale without moving the verdict.
   Filed 2026-08-16 by close, from the audit it could not discharge; re-framed 2026-08-24 at close
   on the operator ruling, with one rejected option's ground re-probed and overturned.
 
@@ -6179,38 +6181,6 @@
   Judged and filed 2026-09-06 by the lead at build, own-authority, on the recurrence rather than
   on either sighting. Promoted 2026-09-06 by close after →fix failed (the shape is unruled and the
   change is crate work scope gates) and →icebox failed (a live per-filing trigger).
-
-- **lead-held-block-no-sanctioned-surface** [design-pending] — a lead-held block is invisible to
-  the queue and its gates, so the next session picks a latently-blocked entry as first-unblocked.
-  **The instance, and it did not bite.** This iteration the lead held two units blocked on an
-  operator decision about a permissions file, recorded the block in dispatch prompts and a
-  boundary-wiped `.tmp/` journal, and left both active entries carrying no blocked state. The
-  operator ruled before the block could cost anything, which is why it is filed rather than
-  forgotten.
-  **All three routes are closed, and the build session probed this rather than reasoning it.**
-  Stating the precondition in entry prose reds `check-queue-prose-precondition`, whose message
-  names the failure exactly — an active entry with a prose precondition and no tag is latently
-  blocked yet mechanically pickable. The `blocked-by` tag must name a real queue slug
-  (queue-kit/SPEC.md §The tag algebra), which is a scope write and not a lead's. The
-  `precondition-ok` opt-out asserts the opposite of the truth. Re-verified at the drain: the
-  gate is registered in `scripts/gates.list`, the tag grammar at that section (line refs retired).
-  **So the observed default is to hold the block in prompts** — which
-  `lifecycle-kit/templates/lead.md` already forbids in principle (the message thread is transport,
-  never a store) while offering no mechanism in practice.
-  **Candidate shapes, none ruled:** a `blocked-by` target that may name an operator decision
-  rather than a slug; a lead-writable block marker outside the queue that `check-stage-entry`
-  reads; or a ruling that a lead may not hold a block at all and must escalate it to a scope write
-  the moment one appears.
-  **Distinct from `check-queue-prose-precondition`**, which closed one route and works as
-  designed — the gap is the absence of an open route, not a defect in that gate. **Recurrence of
-  `lead-state-durable-home`, since retired, declined at the drain:** that entry's axis is
-  durability (lead state dying with the conversation, fix shape a lead journal), and a lead
-  journal would not fix this,
-  because the session computing first-unblocked reads the *queue*. Adjacent, not the same finding.
-  **Cost while deferred:** low frequency and silent, landing only when a lead session dies or
-  hands off while holding a block — precisely when no one can recover the fact.
-  Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox; a lead filing about the
-  lead's own conduct, re-verified here.
 
 - **stage-completion-unattested** [design-pending] — the stage stamp marks entry, so a stage that
   is entered and abandoned is indistinguishable in the tree from one that finished.
@@ -10556,9 +10526,10 @@
 - **stage-journal-path-unsourced-mid-stage** [design-pending] — a stage session dispatched into an
   ALREADY-ENTERED stage has no mechanical source for that stage's journal path, so it invents a
   discriminated filename and the successor's entry assertion then refuses.
-  **Attested 2026-09-10:** `--enter-stage validate` refused entry because `.tmp/build-journal.md`
-  carried only its opening line, while build's three lead-cut batch sessions had written
-  `-batch1-`, `-batch2-` and `-batch3-` journals, each ending `DONE`.
+  **Attested twice, 2026-09-10 and again 2026-09-11:** each time `--enter-stage validate` refused
+  because `.tmp/build-journal.md` carried only its opening line while build's lead-cut batch
+  sessions had written `-batchN-` journals, three the first time and four the second, and each
+  time a batch paid a hand-written stand-in to clear it.
   **Not a cardinality defect — that first reading was corrected the same day.**
   lifecycle-kit/SPEC.md §The state machine already rules the multi-session case: one journal per
   stage, every session appending under a heading naming itself, and the entry assertion satisfied
@@ -10566,12 +10537,15 @@
   never overwrites for exactly that reason, so nothing is owed on that axis.
   **What IS owed is the seam:** the canonical path is printed by `--enter-stage` alone, and the
   second or third batch of an already-entered stage never runs that arm.
-  **Re-verified at this drain, and the re-verification moves the answer.** The cheapest candidate
-  shape — oblige the batch-dispatching lead to grant the derived path — IS ALREADY IN THE TEMPLATE,
-  and has been since 2026-08-25: lifecycle-kit/templates/lead.md §Channel design says the lead
-  "still spells it out in the dispatch prompt" and refuses a per-batch filename by name. Three
-  batch sessions violated it anyway. That shape is therefore a FAILED CONTROL rather than a
-  candidate, and the hand-escape the lead paid this iteration was a symptom of the same gap.
+  **THE CHEAPEST CANDIDATE IS A MEASURED FAILED CONTROL, not an unbuilt option.** Obliging the
+  batch-dispatching lead to grant the derived path IS ALREADY IN THE TEMPLATE and has been since
+  2026-08-25: lifecycle-kit/templates/lead.md §Channel design says the lead "still spells it out
+  in the dispatch prompt" and refuses a per-batch filename by name. Seven batch sessions across
+  the two attestations violated it. The 2026-09-11 instance closes the last excuse available to
+  that shape — the dispatching lead RELAYED the resume-journal discipline into every prompt in
+  the same breath as naming the per-batch path, so the control did not fail for want of being
+  read, and a discoverability repair drafted at that close (a §Economics pointer to §Channel
+  design) was WITHDRAWN unlanded as an eighth instance of the same failing control.
   **Why `[design-pending]`:** the surviving shapes differ in kind and none is costed — a read-only
   `--emit stage-journal-path` arm any session can run without stamping; the same obligation moved
   into the stage-session agent contract, where a non-entering session actually reads it; or a
@@ -10589,6 +10563,7 @@
   and this finding BLOCKED A STAGE ENTRY, attested above, so the conjunction fails outright.
   Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
   the obvious cheap fix is already landed, and already failed.
+  recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
 
 
 ## Icebox
@@ -10599,6 +10574,7 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
+- **lead-held-block-no-sanctioned-surface** [design-pending] — No route records a lead-held block.
 - **survey-record-filed-after-the-fact** [design-pending] — Order to the work goes wholly unread.
 - **amendment-prose-misnumbers-its-delta** [design-pending] — Cites Delta 3 for delta 4's subject.
 - **always-loaded-baseline-freshness** [design-pending] — A close may skip the re-baseline; no gate.
