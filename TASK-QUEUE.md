@@ -17,6 +17,73 @@
 ## Deferred
 
 
+- **payload-withholds-kit-specs** [design-pending] — the customer payload packs every kit root
+  whole (`git archive` per root at `native/src/emit/pack_installer.rs`), so the kit SPECs ride
+  along as its bulk. **Operator ruling at consult, recorded in TRAJECTORY.md under this slug:**
+  the payload withholds each kit's SPEC and its `smoke/`, and a shipped gate's pointer resolves
+  to the site's per-kit SPEC mirror under docs/.
+  **Measured, not reasoned.** Tracked payload bytes: 4.51 MB. The eleven kit SPECs: 2.65 MB,
+  38,653 lines, 59% of it; gate-sdk's alone 1.2 MB and 17,224 lines, of which the porting section
+  is 5,406 and 50 of its 103 sections are cited by no shipped file (53 are; 73 more only from
+  the crate, which never ships). The smoke scripts refuse a bare invocation by their own header
+  and run only this repo's suites.
+  **Not load-bearing for a customer:** canon-kit's finders prune vendored kit roots, so the
+  spec-pointer gate never resolves a vendored gate's pointer; what explains a red offline is the
+  descriptor's one-line invariant, which ships. This tree keeps its SPECs; nothing here changes.
+  **Deliverable, five parts.** (a) A packer exclusion — kit-root SPEC and smoke, a declared shape
+  applied per root inside the tracked-set copy, never a per-kit list. (b) The amendment to
+  gate-sdk/SPEC.md §Consumer payload: the second member becomes the pointer, resolvable on the
+  published mirror, with the restatements at docs/install.md §What a gate discloses and
+  installer/README.md §What this package is corrected in the same unit. (c) Kit README links to
+  their own SPEC (gate-sdk 3, lifecycle-kit 11, canon-kit 1, delegation-kit 1) point at the site.
+  (d) The site keeps the mirror as an unlinked reference tier reached from a pointer, and its
+  front nav leads with install and the per-kit READMEs. (e) The consumer smoke asserts a
+  vendored tree carries no SPEC.
+  **Why [design-pending]: two shapes are open.** Whether the exclusion is a packer literal or a
+  per-kit declaration of non-shipping paths; and whether the pointer line gains a URL form or the
+  site resolves a kit path plus heading by convention.
+  **Refused, with grounds:** a generated extract of only the cited sections — offline reading for
+  a reader the site already serves, at a projection plus a freshness gate; keep shipping whole
+  SPECs — 59% of the payload for that same reader, and the seam-leak surface
+  `kit-spec-seam-content-half-unswept` and `kit-spec-consumer-config-literal` track stays
+  customer-visible.
+  **Cost while deferred:** every tarball and npm package ships its engineering record as its
+  bulk, and the seam-leak surface stays in customers' trees.
+  Filed 2026-09-11 by consult, an operator-directed direct entry.
+
+- **installer-readme-usage-tier-split** [design-pending] — `installer/README.md` is the
+  npm-visible package README and a 3,182-line, 216 KB design record, so the package page and the
+  tarball lead with mechanism grounds where usage belongs.
+  **Operator ruling at consult: split it.** A short README — requirements, quick start, the verbs
+  table, profiles, and where the design lives — and the design record renamed to the installer's
+  own SPEC. Seventeen files carry pointers into fourteen of its sections, a mechanical rename
+  sweep (delegable); CLAUDE.md §Housekeeping's layout pointer and docs/install.md's references
+  move with it.
+  **Why [design-pending]: the usage tier's owner.** docs/install.md already carries quick start
+  and the verbs, so the README either points at the site (content-tiering: point, never restate)
+  or carries the copy an offline npm reader needs; and an installer SPEC joins canon-kit's
+  governed spec set by name, which is right but changes which gates read it.
+  **Cost while deferred:** every npm page view and tarball reader meets a design record at the
+  activation surface's front door, against the time-to-first-value objective.
+  Filed 2026-09-11 by consult as a direct entry, beside `payload-withholds-kit-specs`.
+
+- **config-variant-battery-harness** [design-pending] — nothing shipped lets a customer run the
+  battery under a named config-seam variant and see what changes; the fixture pairs prove each
+  gate's arm against fixed trees, and the smoke scripts are this repo's harness legs.
+  **Operator ruling at consult: file it costed.** Deliverable: a shipped, bridged arm that takes a
+  scratch copy of the consumer's tree, applies a named variant of the config seam, runs the
+  battery, and prints the per-gate verdict diff against baseline — so an adopter sees which gates
+  a knob arms, disarms or reds before committing the knob.
+  **Why [design-pending]:** the variant's declaration form (an env file or a config-dir overlay),
+  whether the scratch copy is a worktree or a copy that carries untracked content, and whether
+  the diff or a full report is the product. Native, per the interpreter objective.
+  **Refused:** repurposing the smoke scripts, which are install recipes read as text by the
+  install-disposition gate and bound to this repo's harness; a shipped directory of shell tests,
+  which widens the interpreter surface the objectives shrink.
+  **Cost while deferred:** an adopter evaluating a knob edits the seam, commits, and learns from
+  the next red; the preview cohort's false-positive dispositions have no cheap rehearsal.
+  Filed 2026-09-11 by consult as a direct entry, the test gap the operator named there.
+
 - **stop-liveness-test-module-order-dependent** [design-pending] — the crate's
   `hook::stop_liveness::tests` MODULE reds intermittently under the full parallel suite, and the
   commit-time battery inherits the flake because `check-crate-arms` runs the crate's test arm.

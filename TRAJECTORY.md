@@ -57,4 +57,19 @@ ruling: the objectives  the substrate pivot  the project-trajectory pivot
 
 ## The rulings
 
-None standing.
+**The customer payload withholds every kit's `SPEC.md` and `smoke/`, and a
+shipped gate's `# spec:` pointer resolves to the site's SPEC mirror.** This
+overrides the second shipped member of gate-sdk/SPEC.md §Consumer payload — the
+SPEC section behind the pointer ships — and its restatements at docs/install.md
+§What a gate discloses and installer/README.md §What this package is. Grounds:
+the member's own reason, that a red gate must point at an explicable invariant,
+is met by a resolvable pointer and the descriptor's one-line invariant;
+canon-kit's finders prune vendored kit roots, so no consumer battery reads a
+vendored SPEC; and the SPECs are the majority of the packed bytes while being
+this repo's engineering record and its residual seam-leak surface. The work —
+the packer exclusion, the section's amendment, the site's reference tier and the
+README links — is the queue entry `payload-withholds-kit-specs`. Refused: a
+generated extract of only the cited sections, which buys offline reading for a
+reader the site already serves at the cost of a projection and a freshness gate.
+discharge: payload-withholds-kit-specs  grep -x -- '- payload-withholds-kit-specs' TASK-QUEUE.md
+ruling: the payload withholds kit SPECs  payload-withholds-kit-specs
