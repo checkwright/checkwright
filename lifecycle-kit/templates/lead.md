@@ -268,6 +268,15 @@ lead routes it like any scope/queue change — ruled by the operator, or by the
 lead only where the answer is derivable from the governed surfaces (the routing
 rule the escalation protocol below already states).
 
+A unit-set escalation whose Recommendation carries no `Composition:` line
+(lifecycle-kit/templates/stages/scope.md, the economic composition test) goes
+back to scope before it is routed: it is never relayed to the operator and never
+ruled, and a relay carries the verdict verbatim. The check is presence, not
+quality — whether a stands-alone argument persuades is for the party ruling on
+the set, and a lead grading it would be the lead-authored judgment on the unit
+set this section refuses. Returning an escalation that carries no verdict
+selects nothing: it asks for the test's output before anyone rules on the set.
+
 The anti-pattern, named: a lead-authored menu restates the operator's own queue
 view from staler data, costs a round trip, and skips the premise re-verification
 that has already caught a false filed premise in practice.

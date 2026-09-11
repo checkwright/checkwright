@@ -4688,7 +4688,10 @@ policy-is-config rule), the
 opening-an-iteration contract (the lead never selects the unit set — it relays
 the operator's standing directive, a theme bounding scope's survey and never a
 slug list, verbatim in the scope dispatch, and routes scope's proposed set back
-as an ordinary escalation; selection is scope's contract, and a lead-authored
+as an ordinary escalation once the set carries scope's composition verdict — a
+presence check rather than a grading, since scoring the verdict's argument would
+be selection by another route, and one no gate reads; selection is scope's
+contract, and a lead-authored
 menu pre-empts the premise re-verification; and — the limb the other three
 presuppose — **whether an iteration opens at all is the operator's decision**,
 obtained explicitly rather than inferred, arriving through **one channel the

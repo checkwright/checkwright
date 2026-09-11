@@ -129,6 +129,23 @@ lifecycle-kit/templates/lead.md §Economics and applied there to dispatch
 batching; scope applies the same principle one axis over, to iteration
 composition. Cite it and weigh it here; do not re-derive the economics.
 
+**Record the test's verdict in the unit-set escalation — on every proposed set,
+not only a lone unit.** The escalation's Recommendation carries one line in one
+of two forms: `Composition: bundled — <the deferred entries the set joins and
+the surface they share>`, or `Composition: stands alone — <why this unit
+justifies an iteration's fixed cost>`. Where the recommendation stands alone,
+Options also offers the bundle the test would have formed, so the party ruling
+on the set sees the cut it declines. The line is unconditional because the
+lone-unit case is itself a judgment: a requirement gated on it is skipped
+exactly when the judgment is, while a line on every set has no trigger to miss
+and costs a set that already bundles one sentence naming what it shares. The
+bundle rides Options because a stands-alone argument read with no bundle beside
+it cannot be weighed against anything. No gate reads the line — it travels on
+the message channel, which is transport and never a store — so under a lead the
+lead's refusal of a set carrying none is the whole enforcement
+(lifecycle-kit/templates/lead.md §Opening an iteration), and with no lead this
+sentence is.
+
 **Scope's censuses are the ones later stages most often re-buy, so record
 them.** A roster built by applying a criterion set to a corpus dies with this
 session's context unless it is written down, and the stage that needs it next

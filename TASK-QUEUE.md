@@ -12,29 +12,6 @@
 
 ## New Features
 
-- **composition-verdict-unrecorded-at-unit-set-ruling** [spec: SPEC-comp-verdict.md] — scope's
-  economic composition test leaves no artifact that it ran, so a lone-unit iteration opens with it
-  unapplied.
-  **The instance, 2026-09-11:** `deferred-pool-triage` opened on one promoted unit. The test
-  (lifecycle-kit/templates/stages/scope.md, the economic composition test) says a lone unit bundles
-  related-surface deferred entries or argues it stands alone; scope's unit-set escalation offered
-  three single cuts and no bundle, and the lead recommended the lone unit without applying it
-  either. The operator stated 2026-09-11 (lead session, typed message, relayed by that lead) that
-  few-unit iterations make little economic sense under the governance-overhead objective.
-  **Re-verified at the drain:** the test is template prose with no verdict field, and lead.md
-  carries no ruling step reading one.
-  **Owed:** a recorded composition verdict inside scope's unit-set escalation, and a lead step that
-  refuses a unit set carrying none.
-  **DISTINCT from `composition-test-scores-a-section-cut-as-one-unit`** (icebox; the test's input
-  when it runs) and `kpi-cost-per-unit` (icebox; the width figure). A mid-iteration join has no
-  route (`post-scope-admission-has-no-promotion-route`, icebox), so the correction lands at a scope.
-  **Cost while deferred:** token waste — every extra iteration re-buys the stage walk's fixed cost.
-  Filed 2026-09-11 by close, draining the gap inbox. →fix failed: a scope and lead contract change.
-  →icebox refused on the operator's 2026-09-11 direction that no inbox bullet enters the Icebox
-  directly.
-  **Operator direction, 2026-09-11 (lead session, lead-relayed):** a rider feature of
-  `rankable-deferred-board` — the verdict field is a scope-to-lead contract; spec authors it.
-
 - **icebox-standing-ineligibility-unrecordable** [spec: SPEC-icebox-standing.md] — the eviction
   worklist has no slot for a standing not-eligible ruling, so an entry a ruling already removed from
   the running is re-proposed at every close.
@@ -6277,5 +6254,6 @@
 - ruling-versus-direction-undefined
 - iteration-scoped-grant-home-unstated
 - landing-moots-live-entries-undetected
+- composition-verdict-unrecorded-at-unit-set-ruling
 
 ## Lessons Learned
