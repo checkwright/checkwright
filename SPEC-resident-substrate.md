@@ -186,6 +186,8 @@ The §Housekeeping bullet opening "`.tmp/` is gitignored" is replaced by two bul
       its red condition.
 - [ ] **Merged with no information lost** — each dropped clause is either owned by the section the
       bullet points to, or is transition narration; `ls SPEC-resident-substrate.md` fails after merge.
+- [ ] **Merged by re-phrasing** — each passage replaced in place, with no net growth of `CLAUDE.md`
+      (operator direction, 2026-09-12).
 - [ ] **Amendment deleted** — this file removed on merge.
 - [ ] **Removals propagated** — `check-amendment-retired-spelling` green.
 - [ ] **Gaps filed** — any gap discovered during the work filed through the gap inbox.

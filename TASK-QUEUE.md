@@ -161,6 +161,55 @@
   **Specified 2026-09-12 at spec** (SPEC-align-claims.md): two checklist widenings and no
   gate. Whether an in-session absorption counts against align's tier is outside it.
 
+- **always-loaded-brevity-reach** [spec: SPEC-surface-ratchet.md]
+  — `check-brevity` guards the
+  tidiest section of the always-loaded surface while the section that actually
+  grows is outside its reach, so the tier ratchets with no oracle. The gate's
+  target is a single named section (`CONTEXT_KIT_BREVITY_SECTION`, this repo's
+  conventions block, 7 lines); §Housekeeping is 83 of `CLAUDE.md`'s 204 lines —
+  41% of the surface — and no gate reads it (re-measured 2026-09-12 at scope).
+  Every close's brevity pass is therefore the only detector, which is a
+  session's attention standing in for a gate — the shape enforcement-first exists
+  to refuse.
+  **What this close found and left, re-read at spec 2026-09-12.** Of the four
+  restating bullets it named, the `--run-demo` one is gone (`08e6eb67`, on
+  load-trigger residency) and `reserve/` restates nothing, its crate readme
+  carrying no guard. The scratch-directory and `installer/` bullets remain; they
+  are deltas 3 and 4 of SPEC-resident-substrate.md, so this entry keeps the gate
+  half.
+  **Why design-pending:** pointing the gate at the whole file needs a budget
+  model it does not have. A single whole-file cap either strangles a legitimately
+  dense file or is set so loose it never fires; per-section budgets need a section
+  roster that is itself maintained. The candidate worth costing first is a
+  **ratchet** assertion rather than a cap — red when the surface grows against its
+  committed baseline without the baseline being deliberately re-stamped — which
+  needs no budget at all and makes the growth visible where it happens.
+  **The drift series is spent; its finding is kept.** Close now re-baselines the meter
+  each iteration (`68cc1ea5`), so the baseline has moved: 216 against a meter reading of
+  212 at 2026-09-12 scope, the +25/+41/+41 readings against `v0.8.0` left to git history.
+  What they showed stands: a pass-shaped fix holds the line only against a pass-shaped
+  increment. A ratchet against a baseline close re-stamps each iteration reads one
+  iteration's growth, which the candidate above must account for.
+  **Operator direction 2026-09-10, widening this entry's subject rather than opening a new one
+  — consult channel in a lead session, relayed by that lead.** Brevity must reach
+  **on-demand-loaded** surfaces too, so unjustified growth behind a load trigger is caught as
+  well; the ratchet is the candidate for both.
+  **Unit set `instruction-surface-tier`, the gate half: the ratchet that holds what the sweep
+  cuts — operator direction, 2026-09-11.**
+  **Cost while deferred:** compounding directly in the tier the whole methodology
+  is trying to hold down, and paid by every session in this repo and every
+  consumer that vendors context-kit. The detector is a close-stage read, so it is
+  as reliable as the attention of whoever runs it.
+  Debt: one gate widened or one assertion added; adds one knob if a budget lands.
+  Filed 2026-08-01 by close's brevity pass, which measured the ratchet it could
+  not close.
+  **Reach — operator direction, 2026-09-12:** the always-loaded files plus the files a trigger
+  loads whole (templates, agent definitions, binding shims); kit SPECs stay on close's growth
+  walk. SPECs are not expected to grow each iteration: re-phrase existing text for brevity, adding
+  only what adds value (its reach past this set is filed through the gap inbox).
+  **Specified 2026-09-12 at spec** (SPEC-surface-ratchet.md): a per-file ceiling ratchet beside
+  `check-brevity`, stamped after the sweep and the CLAUDE.md rewrite land.
+
 ## Technical Debt
 
 ## Deferred
@@ -1298,48 +1347,6 @@
   above; the `check-md-refs` blind spot and the `AGENTS.md` false-positive case
   were both verified against source before filing.
   recurrence: prose-filename-citation-liveness 2026-09-06
-
-- **always-loaded-brevity-reach** [design-pending] [cost: session/high] [surface: context-kit] — `check-brevity` guards the
-  tidiest section of the always-loaded surface while the section that actually
-  grows is outside its reach, so the tier ratchets with no oracle. The gate's
-  target is a single named section (`CONTEXT_KIT_BREVITY_SECTION`, this repo's
-  conventions block, 7 lines); §Housekeeping is 83 of `CLAUDE.md`'s 204 lines —
-  41% of the surface — and no gate reads it (re-measured 2026-09-12 at scope).
-  Every close's brevity pass is therefore the only detector, which is a
-  session's attention standing in for a gate — the shape enforcement-first exists
-  to refuse.
-  **What this close found and left, re-read at spec 2026-09-12.** Of the four
-  restating bullets it named, the `--run-demo` one is gone (`08e6eb67`, on
-  load-trigger residency) and `reserve/` restates nothing, its crate readme
-  carrying no guard. The scratch-directory and `installer/` bullets remain; they
-  are deltas 3 and 4 of SPEC-resident-substrate.md, so this entry keeps the gate
-  half.
-  **Why `[design-pending]`:** pointing the gate at the whole file needs a budget
-  model it does not have. A single whole-file cap either strangles a legitimately
-  dense file or is set so loose it never fires; per-section budgets need a section
-  roster that is itself maintained. The candidate worth costing first is a
-  **ratchet** assertion rather than a cap — red when the surface grows against its
-  committed baseline without the baseline being deliberately re-stamped — which
-  needs no budget at all and makes the growth visible where it happens.
-  **The drift series is spent; its finding is kept.** Close now re-baselines the meter
-  each iteration (`68cc1ea5`), so the baseline has moved: 216 against a meter reading of
-  212 at 2026-09-12 scope, the +25/+41/+41 readings against `v0.8.0` left to git history.
-  What they showed stands: a pass-shaped fix holds the line only against a pass-shaped
-  increment. A ratchet against a baseline close re-stamps each iteration reads one
-  iteration's growth, which the candidate above must account for.
-  **Operator direction 2026-09-10, widening this entry's subject rather than opening a new one
-  — consult channel in a lead session, relayed by that lead.** Brevity must reach
-  **on-demand-loaded** surfaces too, so unjustified growth behind a load trigger is caught as
-  well; the ratchet is the candidate for both.
-  **Unit set `instruction-surface-tier`, the gate half: the ratchet that holds what the sweep
-  cuts — operator direction, 2026-09-11.**
-  **Cost while deferred:** compounding directly in the tier the whole methodology
-  is trying to hold down, and paid by every session in this repo and every
-  consumer that vendors context-kit. The detector is a close-stage read, so it is
-  as reliable as the attention of whoever runs it.
-  Debt: one gate widened or one assertion added; adds one knob if a budget lands.
-  Filed 2026-08-01 by close's brevity pass, which measured the ratchet it could
-  not close.
 
 - **batch-split-stamp-ownership** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — who stamps the per-session
   audit trail when a live lead splits one stage across several batch sessions is

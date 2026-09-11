@@ -2,13 +2,18 @@
 
 **No delta is applied; every replacement passage below is Not yet applied.**
 
-This amendment serves `instruction-motivation-owner` and rules the reach question that entry leaves
-open. Its sibling `instruction-surface-sweep` (SPEC-sweep.md) applies the rule placed
-here across the instruction corpus, which is why that entry's blocked-by edge on this one stands and
-why this amendment's deltas land first.
+This amendment serves `instruction-motivation-owner` and settles the reach question that entry leaves
+open. Its sibling `instruction-surface-sweep` (SPEC-sweep.md) applies the rule placed here across the
+instruction corpus, which is why that entry's blocked-by edge on this one stands and this
+amendment's deltas land first.
 
-It is a root-level amendment because its deltas span four components: doctrine-kit, delegation-kit,
-lifecycle-kit and canon-kit.
+It is a root-level amendment: its deltas span doctrine-kit, delegation-kit, lifecycle-kit and
+canon-kit.
+
+**Every delta re-phrases or extends an existing sentence rather than appending a paragraph.** That
+follows operator direction, 2026-09-12: SPECs are not expected to grow each iteration, text is added
+only where it adds value, and brief, phrase-shaped instructions read better to an LLM than verbose
+ones.
 
 ## The grounds this design rests on
 
@@ -16,198 +21,150 @@ This section is amendment-only rationale and does not merge. Every claim in it w
 2026-09-12 at the commit that stamped this stage.
 
 **The reach gap holds at HEAD.** delegation-kit/SPEC.md §Operative residency opens *"A rule may be
-restated as an imperative in a surface that does not own it"*. That is a sanction for a copy. A
-template paragraph explaining why its own instruction is right is a copy of nothing. Condition (b)
-says the reasoning *stays with the owner*, and for such a paragraph there is no owner to name.
+restated as an imperative in a surface that does not own it"*, which is a sanction for a copy. A
+template paragraph explaining why its own instruction is right copies nothing. Condition (b) says the
+reasoning *stays with the owner*, and for that paragraph there is no owner to name.
 
 **The rule is stated beside the sanction, not by widening it.** Three grounds:
 
 1. The sanction is an exception to Content-tiering, keyed on a reader whose trigger never loads the
-   owner. Original motivation has no owner to be unreachable from. Widening the sanction would graft
-   a tier assignment onto an exception clause, and it would read as something permitted rather than
-   something required.
-2. The failure spans every kit that ships a template. The corpus derivation
-   (`git ls-files "*/templates/*.md" ".claude/agents/*.md"` minus fixture copies) returns files
-   under seven kit roots plus the consumer's agent definitions. §Operative residency belongs to
-   delegation-kit, and a delegation-kit rule governing lifecycle-kit's templates is a cross-kit reach.
-   The doctrine exists to own exactly that kind of rule.
+   owner. Original motivation has no owner to be unreachable from, so widening the sanction would
+   graft a tier assignment onto an exception, and it would read as permitted rather than required.
+2. The failure spans every kit that ships a template. The corpus derivation returns files under seven
+   kit roots plus this repo's agent definitions, and §Operative residency belongs to delegation-kit
+   alone. The doctrine owns cross-kit rules.
 3. The rule is Content-tiering's own shape — one content tier per surface — applied to a surface
-   class the rule's text does not yet name. Widest-true-tier placement lands it in the doctrine,
-   which is true for every consumer.
+   class the rule does not yet name. Widest-true-tier placement puts it in the doctrine.
 
-**History is removed; grounds relocate.** This adopts the lead's reading recorded on the sweep entry,
-with one bound. The operator direction on that entry (2026-09-11) makes version control the
-preferred home of a template's history, so an attested incident, a dated measurement, or a note of
-which session did what leaves the surface. A failure an instruction exists to prevent is different:
-it is the instruction's ground, not its history, and it relocates stated undated, as the provenance
-seam requires of a kit SPEC. §The delegation model already admits exactly that class — a failure
-surface, a calibration history, a bound that is correctness rather than preference. The discriminator
-is whether the instruction would stand unjustified without the passage.
+**History leaves; grounds relocate.** This adopts the lead's reading on the sweep entry, with one
+bound. The operator direction on that entry (2026-09-11) makes version control the home of a
+template's history. A failure an instruction exists to prevent is that instruction's ground, not its
+history, so it relocates, undated as the provenance seam requires. §The delegation model already
+admits that class.
 
-**The authoring-time readers, and their honest limit.**
+**The authoring-time readers, and their limit.** Build lands every template edit, feature and debt
+alike. The amendment template's Definition of Done reaches replacement text at authoring, at align,
+and at merge. Neither reaches a close-stage compression pass or an operator-ruled hotfix; the filed
+`close-differential-instruction-sweep` is the backstop for both. No gate is owed, which the entry
+records as settled.
 
-- Build lands every template edit, feature and debt alike, so its ritual reaches every landing.
-- The amendment template's Definition of Done reaches the replacement text an authoring stage
-  proposes, and is read again by align and at merge.
-- Neither reaches a close-stage compression pass or an operator-ruled hotfix. The filed
-  `close-differential-instruction-sweep` is the backstop for both once it lands.
-- No gate is owed. The entry records that as settled, and this amendment inherits it.
+**The Definition-of-Done item names the rule rather than linking it.** `installer/profiles.list` puts
+canon-kit in the `prose` profile, which vendors no doctrine-kit, so a link would dangle there.
 
-**Why the Definition-of-Done item cites the rule by name and not by path.** `installer/profiles.list`
-puts canon-kit in the `prose` profile, which vendors no doctrine-kit. A path into doctrine-kit would
-dangle in that consumer's vendored amendment template. A rule name cannot dangle.
+**Not widened into a general re-phrase-before-append rule.** The operator direction reaches authoring
+generally. This entry's envelope is the instruction surface's tier, so the wider reach is filed
+through the gap inbox and not folded in here.
 
 ## What changes
 
-### (1) Content-tiering gains the instruction-surface clause
+### (1) Content-tiering names the instruction surface
 
-`doctrine-kit/DOCTRINE.md` rule 1, **Content-tiering / SSOT**, gains a paragraph after its opening
-statement and before *Under agent work* {design-bearing}. **Not yet applied:**
+`doctrine-kit/DOCTRINE.md` rule 1, **Content-tiering / SSOT**, gains one sentence after its opening
+sentence {design-bearing}. **Not yet applied:**
 
-> An **instruction surface** — a skill or stage template, an agent definition, a binding shim — owns
-> the instruction tier: the operative instruction, its disposition and its command. The grounds that
-> justify an instruction belong to the mechanism it drives and live in the section owning that
-> mechanism; where no section owns it, the move creates one. The history behind an instruction — an
-> attested incident, a dated measurement, which session did what — belongs to version control and
-> leaves the surface. A failure an instruction exists to prevent is grounds rather than history, and
-> moves as grounds, stated undated.
+> An instruction surface — template, agent definition, binding shim — owns the instruction tier: its
+> grounds go to the section owning the mechanism (a failure it prevents included, undated), its
+> history to version control.
 
-Its *Enforced by:* line gains a sentence. **Not yet applied:**
+Its *Enforced by:* line gains a closing clause. **Not yet applied:**
 
-> The instruction-surface clause is not gateable — whether a sentence instructs or justifies is a
-> reading — so it is read at authoring, by the build stage's ritual
-> ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §templates/stages/) and by the amendment
-> template's Definition of Done ([canon-kit/SPEC.md](../canon-kit/SPEC.md) §The amendment
-> lifecycle).
+> ; the instruction-surface sentence is read at authoring — build's ritual, the amendment Definition
+> of Done — and is not gateable.
 
-The rule's `*Digest:*` trailer is unchanged. So is its name, which `check-doctrine-registration`
-assertions B and C read. The installed digest therefore does not move, and neither does this repo's
-agent-file block.
+The rule's name and `*Digest:*` trailer are unchanged. `check-doctrine-registration` assertions B, C
+and E read only those, so the installed digest and this repo's agent-file block do not move.
 
-### (2) §Operative residency states where its reach ends
+### (2) §Operative residency marks where its reach ends and names its readers
 
-`delegation-kit/SPEC.md` §Operative residency gains a paragraph directly after the one whose lead-in
-is **The anti-licence clause is part of the rule, not commentary.** {design-bearing}. **Not yet
-applied:**
-
-> **The sanction reaches restatements and nothing else.** Content an instruction surface authors
-> that no other surface owns — the grounds for its own instruction — is not a restatement, so
-> (a)–(c) never license it and (b)'s owner does not exist for it. Its placement is Content-tiering's
-> instruction-surface clause (doctrine-kit/DOCTRINE.md, Content-tiering / SSOT): the grounds go to
-> the section owning the mechanism, and where none exists the move creates it, as §The delegation
-> model was given the grounds of the template's worktree rules.
-
-The same section's reader paragraph names its authoring-time readers. Its first sentence is replaced
-{mechanical}. **Not yet applied:**
-
-> Each condition has a reader at a transition rather than being self-evident: (a) and (b) are read by
-> whoever authors a restatement, at authoring — a build session under its stage ritual, an authoring
-> stage under the amendment template's Definition of Done — and again by a reviewer or an authoring
-> stage assessing an existing one; (c) is the pointer any later reader — and any content-tiering
-> check — follows back to the owner.
-
-### (3) The build ritual carries the authoring-time read
-
-`lifecycle-kit/templates/stages/build.md` §Session ritual gains a paragraph directly after the
-build-time question triage {mechanical}. **Not yet applied:**
-
-> **An edit to an instruction surface lands the instruction only.** Its grounds land in the section
-> owning the mechanism, in the same commit; any history behind it goes in the commit message, not on
-> the surface (doctrine-kit/DOCTRINE.md, Content-tiering / SSOT).
-
-`lifecycle-kit/SPEC.md` §templates/stages/ gains a paragraph after the one on the last step
+The opening sentence of `delegation-kit/SPEC.md` §Operative residency gains a following sentence
 {design-bearing}. **Not yet applied:**
 
-> **The build template carries the instruction-surface read because build lands every edit.**
-> Content-tiering's instruction-surface clause (doctrine-kit/DOCTRINE.md) is read at authoring, and
-> build is the one stage every template edit passes — a feature's merge and a debt unit's direct edit
-> alike — so its ritual is the reader that reaches both. The step cites the doctrine rather than
-> restating the clause. A close-stage compression pass and an operator-ruled hotfix pass no build
-> session, and no reader here reaches them.
+> Grounds a surface authors for its own instruction are no restatement and take no sanction;
+> Content-tiering / SSOT places them (doctrine-kit/DOCTRINE.md).
 
-### (4) The amendment template's Definition of Done carries it too
+The section's reader sentence gains a parenthetical after *at authoring* {mechanical}. **Not yet
+applied:** *(a) and (b) are read by whoever authors a restatement, at authoring — build's ritual,
+the amendment Definition of Done — and again by a reviewer…*
 
-`canon-kit/templates/SPEC-amendment.md` §Definition of Done gains an item directly after
-**Causal completeness** {mechanical}. **Not yet applied:**
+### (3) The build ritual carries the read
 
-> - [ ] **Instruction surfaces carry instructions** — replacement text this amendment gives a
->       template, an agent definition or a binding shim is the instruction alone; a delta places its
->       grounds in the section owning the mechanism (the Content-tiering / SSOT rule's
->       instruction-surface clause).
+`lifecycle-kit/templates/stages/build.md` §Session ritual gains a two-line paragraph after the
+build-time question triage {mechanical}. **Not yet applied:**
 
-`canon-kit/SPEC.md` §The amendment lifecycle's closing sentence on the shipped template is replaced
-{mechanical}. **Not yet applied:**
+> **Instruction-surface edits carry the instruction only.** Grounds → the mechanism's owning section,
+> same commit; history → the commit message (doctrine-kit/DOCTRINE.md, Content-tiering / SSOT).
 
-> The shipped amendment template ends in a Definition-of-Done checklist that includes causal
-> completeness, instruction-only replacement text for instruction surfaces,
-> merged-with-no-information-lost, the file-deleted assertions, and gap filing. The instruction item
-> names the doctrine rule rather than linking it, because canon-kit ships in a profile that vendors
-> no doctrine-kit and a link would dangle there.
+In `lifecycle-kit/SPEC.md` §templates/stages/, the opening sentence's list of what the templates
+carry gains one item {mechanical}. **Not yet applied:** *…its stage-local doctrine, the
+instruction-surface read in `build` (the one stage every template edit passes), and the
+resume-journal last step…*
+
+### (4) The amendment template's Definition of Done carries it
+
+`canon-kit/templates/SPEC-amendment.md` §Definition of Done gains an item directly after **Causal
+completeness** {mechanical}. **Not yet applied:**
+
+> - [ ] **Instruction surfaces: instruction only** — replacement text for a template, agent
+>       definition or shim carries no grounds; a delta places them (the Content-tiering / SSOT rule).
+
+In `canon-kit/SPEC.md` §The amendment lifecycle, the closing sentence's checklist roster gains the
+item in place {mechanical}. **Not yet applied:** *…includes causal completeness, instruction-only
+replacement text (the doctrine rule named, not linked: the prose profile vendors no doctrine-kit),
+merged-with-no-information-lost, …*
 
 ## Producers and consumers
 
-- **The instruction-surface clause (delta 1).**
-  - Producer: `doctrine-kit/DOCTRINE.md`, vendored with doctrine-kit. It is reachable in this repo
-    through the agent file's doctrine link, and in every profile that vendors a stage template, since
-    each such profile vendors doctrine-kit.
-  - Consumers: a build session at every template edit, through the ritual paragraph (delta 3); an
-    authoring stage, align, and a merging build session at every amendment, through the
-    Definition-of-Done item (delta 4).
-  - Fields: none.
-- **The ritual paragraph (delta 3).**
-  - Producer: `build.md`, loaded by every build session through the consumer's build binding.
-  - Consumer: that session, at the edit.
-- **The Definition-of-Done item (delta 4).**
-  - Producer: the amendment template, copied when an amendment is authored.
-  - Consumers: the authoring stage writing replacement text; align auditing the amendment against
-    itself; build ticking the checklist at merge.
-- **Readers of the touched files, with each one's red condition.**
-  - `check-doctrine-registration` reds on a rule name absent from the digest, a digest name with no
-    rule, or a methodology rule without exactly one `*Digest:*` trailer. Delta 1 adds a paragraph
-    inside rule 1 and changes neither its name nor its trailer.
-  - `check-skill-binding` reds on a slot mismatch; delta 3 adds no slot to `build.md`.
-  - `check-stage-skill-coverage` reds when an executed stage surface lacks the resume-journal last
-    step; delta 3 leaves that step in place.
-  - `check-shim-restatement` reds on a span a binding shim copies from the template corpus. Delta 3
-    adds template text, so build runs the gate rather than inferring its verdict.
-  - `check-footprint-fresh` and `check-value-rollup-fresh` red on a stale byte-compare of pages that
-    count template lines. Deltas 3 and 4 move those counts.
-  - The canon-kit prose gates over `DOCTRINE.md` and the SPECs (links, section pointers, temporal
-    markers, bare counts) red on what the new text says. Every replacement passage is undated, names
-    its sections by heading, and states no bare count.
-- **Narrowing (point 5).** No delta narrows a corpus. Delta 2 replaces one sentence with a superset
-  of itself.
+- **The instruction-surface sentence (delta 1).**
+  - Producer: `doctrine-kit/DOCTRINE.md`. Every profile that vendors a stage template also vendors
+    doctrine-kit.
+  - Consumers: a build session at each template edit, through delta 3; an authoring stage, align and
+    a merging build session at each amendment, through delta 4.
+  - No field is introduced.
+- **The ritual paragraph (delta 3).** Producer: `build.md`, loaded through the consumer's build
+  binding. Consumer: that session, at the edit.
+- **The Definition-of-Done item (delta 4).** Producer: the amendment template, copied at authoring.
+  Consumers: the authoring stage, align, and build at merge.
+- **Readers of the touched files, with each one's red condition:**
+  - `check-doctrine-registration`: a rule name missing from the digest, a digest name with no rule,
+    or a rule without exactly one `*Digest:*` trailer. Delta 1 changes neither the name nor the
+    trailer.
+  - `check-skill-binding`: a slot mismatch. Delta 3 adds no slot.
+  - `check-stage-skill-coverage`: an executed stage surface without its journal last step. Delta 3
+    keeps it.
+  - `check-shim-restatement`: a span a shim copies from the template corpus. Deltas 3 and 4 add
+    text, so build runs the gate.
+  - `check-footprint-fresh`, `check-value-rollup-fresh`: a stale byte-compare of pages counting
+    template lines. Deltas 3 and 4 move those counts.
+  - canon-kit prose gates over `DOCTRINE.md` and the SPECs: every added phrase is undated, cites
+    sections by heading, and states no bare count.
+- **Narrowing (point 5).** No delta narrows a corpus.
 
 ## Existing sections updated
 
-- `doctrine-kit/DOCTRINE.md` rule 1, Content-tiering / SSOT — the statement and its *Enforced by:*
-  line (delta 1).
-- `delegation-kit/SPEC.md` §Operative residency — the reach paragraph and the reader sentence
+- `doctrine-kit/DOCTRINE.md` rule 1, Content-tiering / SSOT — its statement and *Enforced by:* line
+  (delta 1).
+- `delegation-kit/SPEC.md` §Operative residency — the opening sentence and the reader sentence
   (delta 2).
-- `lifecycle-kit/SPEC.md` §templates/stages/ — the paragraph on the build template's read (delta 3).
-- `canon-kit/SPEC.md` §The amendment lifecycle — the closing sentence on the Definition-of-Done
-  checklist (delta 4).
-- `docs/doctrine-kit/DOCTRINE.md`, `docs/delegation-kit/SPEC.md`, `docs/lifecycle-kit/SPEC.md` and
-  `docs/canon-kit/SPEC.md` — generated mirrors, regenerated by the command the mirror freshness gate
-  prints (all deltas).
+- `lifecycle-kit/SPEC.md` §templates/stages/ — the opening sentence (delta 3).
+- `canon-kit/SPEC.md` §The amendment lifecycle — the checklist sentence (delta 4).
+- `docs/doctrine-kit/DOCTRINE.md`, `docs/delegation-kit/SPEC.md`, `docs/lifecycle-kit/SPEC.md`,
+  `docs/canon-kit/SPEC.md` — generated mirrors, regenerated with the command the mirror freshness
+  gate prints (all deltas).
 - `docs/footprint.md` and `docs/value.md` — generated pages counting template lines (deltas 3
   and 4).
 
 ## Retired spellings
 
-- None — every delta adds text beside what stands, and delta 2's replaced sentence keeps every name
-  it carried.
+- None — every delta extends a sentence or adds an item; no name is removed.
 
 ## Definition of Done
 
-- [ ] **Causal completeness** — the clause, the ritual paragraph and the checklist item each have a
-      named producer and named consumers; no field is introduced.
-- [ ] **Instruction surfaces carry instructions** — deltas 3 and 4 add instruction text only; their
-      grounds are placed in §templates/stages/ and §The amendment lifecycle.
-- [ ] **Merged with no information lost** — each addition integrated into its section, not appended;
-      each merged section reads whole without this file.
-- [ ] **Amendment deleted** — this file removed on merge; no root-level `SPEC-instruction-tier.md`
-      remains.
+- [ ] **Causal completeness** — the sentence, the ritual paragraph and the checklist item each have a
+      named producer and consumers; no field is introduced.
+- [ ] **Instruction surfaces: instruction only** — deltas 3 and 4 add instruction only.
+- [ ] **Merged by re-phrasing** — each addition extends an existing sentence where one exists, and
+      each touched section grows by no more than the phrases above (operator direction, 2026-09-12).
+- [ ] **Merged with no information lost** — each merged section reads whole without this file.
+- [ ] **Amendment deleted** — no root-level `SPEC-instruction-tier.md` remains.
 - [ ] **Removals propagated** — `check-amendment-retired-spelling` green.
-- [ ] **Gaps filed** — any cross-component gap discovered during the work filed through the gap
-      inbox.
+- [ ] **Gaps filed** — any cross-component gap found during the work goes through the gap inbox.

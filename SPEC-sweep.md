@@ -71,6 +71,13 @@ records that ordering.
 in a kit SPEC. A relocated failure keeps its mechanism and loses its date, its session and its
 tallies. The canon-kit manifest gates judge the landed text.
 
+**Relocation re-phrases; it does not append.** Operator direction, 2026-09-12: SPECs are not
+expected to grow each iteration; re-phrase existing text for clarity and brevity, add only what
+adds value, and prefer brief phrase-shaped wording. A relocated ground therefore lands as the
+shortest phrase that keeps its instruction justified, folded into the owner's existing sentence
+on that mechanism where one exists. A ground its instruction stands without is deleted, not
+relocated. The landing commit states each destination SPEC's net line change.
+
 **Stage-template grounds land as paragraphs, not new headings.** lifecycle-kit/SPEC.md
 §templates/stages/ already carries per-template contract as paragraphs led "The `close` template
 carries…". New subsections would add headings for pointers to resolve, and no reader needs one.
@@ -115,7 +122,8 @@ or `.claude/agents/audit-sweep.md` restates, the carrier is updated in the same 
 ### (3) The stage templates' grounds move into §templates/stages/
 
 In each stage template, uncarried grounds relocate into lifecycle-kit/SPEC.md §templates/stages/ as
-paragraphs led "The `<stage>` template …", and carried grounds are deleted {design-bearing}. The
+brief phrases folded into an existing paragraph on that template, or a short paragraph led
+"The `<stage>` template …" where none exists, and carried grounds are deleted {design-bearing}. The
 paragraph and ritual line SPEC-instruction-tier.md delta 3 lands are left as landed.
 
 | Template | Relocate into §templates/stages/ | Delete |
@@ -225,6 +233,9 @@ prints {mechanical}.
       landing commit's message.
 - [ ] **Merged with no information lost** — every relocated ground reads whole in its section,
       undated; every deleted history passage remains reachable through `git log -p` on its file.
+- [ ] **Merged by re-phrasing** — each relocated ground is a brief phrase folded into existing
+      owner prose where one covers it; the landing commit states each destination SPEC's net
+      line change (operator direction, 2026-09-12).
 - [ ] **Amendment deleted** — this file removed on merge; no root-level `SPEC-sweep.md`
       remains.
 - [ ] **Removals propagated** — `check-amendment-retired-spelling` green; restated rules propagated to
