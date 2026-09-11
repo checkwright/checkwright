@@ -21,9 +21,9 @@ at it together:
 
 **Why one amendment rather than eight.** The entries share two helpers and one numbering plan. The
 argument bound (delta 7) reads the command through the harness view (delta 1). The recorded-launch
-grant (delta 9) applies the bound and the declared forms (delta 5). Only one rule is inserted, and
-only fall-through logging renumbers (delta 11). Two amendments would each carry a numbering plan
-the other can invalidate.
+grant (delta 9) applies the bound (delta 7), and rule 19's own pre-existing clauses narrow together
+with the declared forms (delta 5). Only one rule is inserted, and only fall-through logging renumbers
+(delta 11). Two amendments would each carry a numbering plan the other can invalidate.
 
 ## The grounds this design rests on
 
