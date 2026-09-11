@@ -39,9 +39,9 @@ request** — the PR channel is inbound-only, for external contributors. A maste
 push is verified against the remote oracle: watch the `gates` workflow
 to green (`gh run watch`) before calling the push done — and **budget one to two
 pushes per iteration**. A finished run is read for free with
-`gh run view <id> --log`, so a cause read over an observed round buys no push —
-a new round is owed only when the facts wanted were never printed. Commits accumulate locally and ride a single watched push
-at close; a release tag earns the second run (`publish`). Every push also costs a
+`gh run view <id> --log`, so a new round is owed only when the facts wanted were
+never printed. Commits accumulate locally and ride one watched push at close; a
+release tag earns the second run (`publish`). Every push also costs a
 `pages-build-deployment`, so drip-pushing re-buys one push's information at N
 times the wall-clock. Never hand-dispatch `site-health` — it runs on a schedule.
 
@@ -62,10 +62,10 @@ The state machine, its stamp protocol, and the per-stage contracts:
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and regenerate.
 Per-clone opt-in: `bash gate-sdk/bin/run-gates.sh --install-hooks`. Every generated
-projection, that hook included, is rostered with its trigger and regen command
-in [docs/site-architecture.md](docs/site-architecture.md) §Generated
-projections and their freshness gates, which also carries the full fan-out a new
-gate stales; each freshness gate prints its own command on red.
+projection, that hook included, is rostered with its trigger, its regen command and
+the wide fan-outs in [docs/site-architecture.md](docs/site-architecture.md)
+§Generated projections and their freshness gates; each freshness gate prints its
+own command on red.
 
 New gates here are **born native** — a Rust module plus a `.gate` descriptor;
 shell needs a cause from the live exception classes, stated in the gate's
@@ -137,8 +137,7 @@ load behind that trigger, so they are not resident here.
   `OPS.local.md` (private ops runbook — DNS, GitHub repo-settings desired state,
   and the release account and push transport; consult it before any domain,
   repo-settings, release or push work, and run its account step before **any
-  GitHub write** — an issue comment or close, a PR merge or review, an advisory
-  disposition — because a write needing no permission succeeds silently under the
+  GitHub write**, because a write needing no permission succeeds silently under the
   wrong account; that step is per-write, never
   per-session), and `ENV.local.md` (context-kit's probed
   machine profile plus hand-authored gotchas — context-kit/SPEC.md §bin/env-probe)
@@ -152,16 +151,15 @@ load behind that trigger, so they are not resident here.
   `check-crate-arms` — **plus** `bash gate-sdk/bin/build-native.sh`, and neither
   discharges the other. It is **not a kit** — no `checks/`, no `smoke/`, the
   predicate that makes a root directory one; `check-gate-binary-fresh` holds the
-  binary's currency. Dispatch, descriptor format, port sequencing and the
-  toolchain floor: gate-sdk/SPEC.md §Porting a gate to the binary substrate;
-  what a non-gate port costs: gate-sdk/SPEC.md §The non-gate arm; the shipped
-  install behavior: installer/README.md §The gate binary.
+  binary's currency. Dispatch, descriptor format, port sequencing and the toolchain
+  floor: gate-sdk/SPEC.md §Porting a gate to the binary substrate; a non-gate port's
+  cost: gate-sdk/SPEC.md §The non-gate arm; the shipped install behavior:
+  installer/README.md §The gate binary.
 - The governed repo-meta pinned in `scripts/core-files.list` is tracked and gated
   like any doc; the fixture is the unit of contribution, so edit the guide, not
   GitHub UI settings.
 - `ROADMAP.md` is a generated root projection of this queue's curated
-  `[roadmap:]` tags — never hand-edit its marker block; it is rostered with its
-  trigger and regen command like every other generated projection.
+  `[roadmap:]` tags — never hand-edit its marker block.
 - [`TRAJECTORY.md`](TRAJECTORY.md) is the hand-authored ruling record — the
   objectives and the closed operator rulings; a recorded
   ruling is closed, so escalate rather than reverse one, and retiring a spent
@@ -185,9 +183,6 @@ load behind that trigger, so they are not resident here.
   `CNAME`), repo-root-governed, no owning kit; its chrome, page-authoring rules,
   generated projections and docs gate roster live in the load-triggered
   [docs/site-architecture.md](docs/site-architecture.md).
-- `--run-demo` is the runnable adoption walkthrough (vendor → clean pass →
-  violation blocked → fix → green), the evidence-kit `demo` validate suite, so a
-  bit-rotted walkthrough is a red validate; gate-sdk/SPEC.md §Consumer smoke owns it.
 - `installer/` is the published activation surface (bash up to the boundary its
   README rules, shipped over two transports from one payload — the Release
   tarball and the npm package), repo-root-governed, no owning kit; its layout is
@@ -213,7 +208,6 @@ load behind that trigger, so they are not resident here.
   `bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"`;
   and before buying one, read the record and run its witness
   (lifecycle-kit/SPEC.md §The survey record).
-- No per-user memory files: durable guidance goes in tracked manifests (this
-  file, kit SPECs) or `BRIEF.local.md` (local-only private context). Harness
-  auto-memory is disabled and enforced off (`check-settings-pins`,
-  `check-memory-off`); doctrine: context-kit/SPEC.md §The memory-off doctrine.
+- No per-user memory files: durable guidance goes in tracked manifests (this file,
+  kit SPECs) or `BRIEF.local.md`. Harness auto-memory is enforced off; doctrine:
+  context-kit/SPEC.md §The memory-off doctrine.
