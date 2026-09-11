@@ -493,13 +493,14 @@ generation — ruled 2026-08-26.** Each half is authored in its own language
 against the five steps above, and the oracle that holds them equal is a
 per-**bootstrap** install-smoke leg. **Count those legs by bootstrap and never by
 platform.** `.github/workflows/gates.yml` carries an install-smoke job for each
-platform it measures — Linux, native Windows, and each macOS architecture — and
-every one of them drives the *bash* half, the Windows one through
-Git-for-Windows bash; exactly one further job drives the PowerShell half under
-`pwsh`. The platform side is deliberately not given a number here: it moves
-whenever the platform declaration does, and a reader counting platforms would
-read a growing set of legs as covering a growing set of bootstraps, which they
-never did. **The bootstrap count is two and only that number is load-bearing.**
+platform-and-architecture pair it measures, and every one of them drives the
+*bash* half, the Windows one through Git-for-Windows bash; exactly one further
+job drives the PowerShell half under `pwsh`. Neither the platform side nor the
+set of pairs is enumerated here, and the omission is load-bearing rather than
+lazy: both move whenever the platform declaration does — this sentence named
+three platform nouns until a second Linux architecture joined and falsified it —
+and a reader counting them would read a growing set of legs as covering a
+growing set of bootstraps, which they never did. **The bootstrap count is two and only that number is load-bearing.**
 The PowerShell leg ships with the PowerShell half, and **no other leg
 substitutes for it**, because every other leg drives the other bootstrap.
 
@@ -3128,13 +3129,14 @@ exercises a harness stand-in. Set it to a `<dir>/<target>/` tree a producer
 already filled and the smoke installs *those* bytes: it builds nothing, and it
 recomputes nothing — the sidecar that arrives is the sidecar the producer
 emitted beside the bytes, so gate-sdk/SPEC.md §Consumer payload's one-producer
-rule reaches across the new hop unbroken. Its live setters are the macOS
-install-smoke legs in `.github/workflows/gates.yml` — one per macOS
-architecture, each a deployed configuration rather than a test-only one; outside
-those legs it is unset and the smoke's behaviour is what it always was. Read the
-setter set as "the legs consuming the producer's upload" rather than as a named
-leg: a platform joining or leaving the declaration moves it, and the hand-off is
-what those legs have in common.
+rule reaches across the new hop unbroken. Its live setters are exactly the
+install-smoke legs in `.github/workflows/gates.yml` that consume the producer's
+upload, each a deployed configuration rather than a test-only one; outside them
+it is unset and the smoke's behaviour is what it always was. **Read the setter
+set by that predicate and never as a roster**, which this sentence learned the
+hard way: it named one platform's legs, was already wrong about a second, and a
+third joined. A platform joining or leaving the declaration moves the set, and
+consuming the hand-off is what its members have in common.
 
 `cargo` and `rustc` join the preflight alongside the tools every other arm
 needs, and refuse there when either is missing — a machine that cannot compile

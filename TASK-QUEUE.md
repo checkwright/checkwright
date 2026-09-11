@@ -3661,7 +3661,7 @@
   while build finds the defects it should have caught. **Read this entry as calibration, not as the
   revert signal.** The standing align tiering ruling names one live revert trigger, a missed spec
   defect surfacing as a build ROUND-TRIP; nothing here is grounds to revert the tier, and conflating
-  the two is the misreading this entry prevents. **The live judgment**, unchanged across six
+  the two is the misreading this entry prevents. **The live judgment**, unchanged across seven
   readings: that signal has never fired, build absorbing every miss in-session, and whether
   in-session absorption counts against the tier is what nothing rules. **What REMAINS
   `[design-pending]`**, the first reading's residue: how much is a checklist edit to align's
@@ -3670,33 +3670,33 @@
   reading it as a boundary inherits the blind spot that produced the miss. Its other half is
   ANSWERED: ten real defects at `native-cohort-activation`, six of one shape (a section the update
   roster failed to name), the fan-out check over it filed, merged and retired.
-  **READINGS TWO THROUGH FIVE.** Two and three: five real defects each, nothing spurious escalated,
-  so zero divergence did not recur — while every batch found its amendment's stated tree *behaviour*
-  wrong and its *ruling* right, each settled by one probe. FOUR (2026-09-05) is the COST half at its
-  MAXIMUM, cr=32.0M / 7.96 against a recent median near 11M and no scale proxy (amendment count
-  retired as one on 2026-09-04); NOT zero-divergence — eight in-envelope repairs, zero escalations —
-  so it cuts AGAINST the first reading's thesis, and its best find was CROSS-amendment where no
-  per-amendment pass could reach: all four amendments falsely claiming a `check-measured-claim` red
-  on `tree-shell-owed`, three self-contradicting. FIVE (2026-09-06) is that half at its MEDIAN,
-  cr=9.35M / 2.83, three real count defects, no round-trip; its grammar caveat is ANSWERED by
-  inspection — bare `align` was single-session in all five, so the split-stage row fold that landed
-  then leaves the column fold-neutral, only an unobservable earlier split align disturbing that.
-  **THE COUNTER IS SPENT AT THE SIXTH READING, 2026-09-08 (`macos-roster-join`).** The counter was
-  four design-bearing amendment claims that survived align and died at build, declined as a miss on
-  one ground — each needed EXECUTION to falsify, build's instrument and not align's — with that
-  ground recorded as itself falsifiable: the first align passing a claim it could have falsified by
-  READING spends the excuse. This is that align. It returned **zero divergence**, the first
-  reading's shape recurring after three in which it did not, and reasons delta 6's ground clause
-  sound on the theory that it cites §Consumer payload's GENERAL rule, an unsteered smoke producing
-  only its own triple. Build batch 2 RAN the smoke and falsified exactly that: the refusal is no
-  consequence of host-building, the roster-cardinality guard at
-  `installer/consumer-smoke/run-smoke.sh:71-72` firing before the artifact hand-off branch at `:74`
-  opens, unconditionally and byte-identically whether or not a complete hand-off is held. **Four
-  lines apart on one screen — this needed no run**, so the declining ground is gone and the next
-  align is judged without the excuse.
+  **READINGS TWO THROUGH SIX, each conclusion kept and its narration spent to history.** Two and
+  three: five real defects each, nothing spurious escalated, so zero divergence did not recur.
+  FOUR (2026-09-05) is the COST half at its MAXIMUM, cr=32.0M against a recent median near 11M
+  with no scale proxy, and it cuts AGAINST the first reading's thesis — eight in-envelope
+  repairs, zero escalations — its best find CROSS-amendment where no per-amendment pass could
+  reach. FIVE (2026-09-06) is that half at its MEDIAN, cr=9.35M, three real count defects, no
+  round-trip; its grammar caveat is ANSWERED by inspection, bare `align` having been
+  single-session throughout, so the split-stage row fold leaves the column fold-neutral.
+  SIX (2026-09-08) returned zero divergence and SPENT THE COUNTER: four amendment claims had
+  survived align and died at build, declined as misses on the ground that each needed EXECUTION
+  to falsify — a ground recorded as itself falsifiable by the first align passing a claim it
+  could have READ its way to. Build batch 2 falsified one from two guard lines four apart on one
+  screen, needing no run, so the excuse was spent and the next align fell to be judged without it.
+  **SEVEN (2026-09-11) IS THAT ALIGN AND IT SPLITS THE VERDICT.** Highest cost of the twelve-row
+  bare-`align` series, cr=16.56M against a prior-eleven mean near 9.6M, over the window's largest
+  amendment corpus. NOT zero divergence and not near it: eight real defects, one of them a
+  paraphrase presented as verbatim that the SPEC STAGE had passed twice. And a MISS of exactly
+  the shape six left no excuse for — an amendment asserting a gate applies a non-empty-value
+  check that gate does not apply, the assertion living in a different gate, falsifiable by
+  reading one line of the first gate's source and no execution at all. Build caught it in-band by
+  declining to merge the false sentence.
   recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
-  **NOT THE REVERT SIGNAL, which still has not fired in six.** No build round-trip: batch 2 absorbed
-  it in-batch inside its own debt unit's envelope, so the two stay separate records. Nothing here
+  **NOT THE REVERT SIGNAL, which still has not fired in SEVEN.** The trigger is a missed spec
+  defect surfacing as a build ROUND-TRIP and seven's miss cost none — build declined the sentence
+  in-band. What seven changes is this entry's own framing rather than the tier: the failure mode
+  is no longer zero divergence but high yield beside a readable miss, so the in-session-absorption
+  question the live judgment says nothing rules is now the whole of the question. Nothing here
   touches the align tiering ruling in any direction. Discharge `lead, own-authority 2026-09-08`.
   **Cost while deferred:** align keeps returning a clean verdict build then falsifies, so the
   stage's signal value decays toward zero while its cost does not. **THRESHOLD ROUTING 2026-09-04
@@ -10684,13 +10684,5 @@
 - **smoke-report-array-carrier-mangling-unexplained** [design-pending] — Witness now needs design.
 
 ## Done
-
-- windows-bare-name-spawn-fails-open-past-its-preflight
-- installer-host-detector-ungated-and-musl-fails-open
-- crate-interpreter-resolution-residue
-- observation-predicate-entry-cannot-drain-in-its-own-iteration
-- gap-inbox-commit-ownership
-- lead-state-durable-home
-- dogfooding-line-invites-a-false-doctrine-conflict
 
 ## Lessons Learned
