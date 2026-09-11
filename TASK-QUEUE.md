@@ -44,6 +44,10 @@
   **Promoted 2026-09-11 by spec** into `guard-kit/SPEC-command-classify.md`, with seven siblings.
   The mechanism chosen is a guard rule that bounds each committed grant's path slot, and
   `git rm` loses its force flag; a committed deny list stays an operator-optional backstop.
+  **Widened to rule 7's `{}` rewrite — operator direction, 2026-09-11, lead-relayed.** That rewrite
+  emits allow, so it silently grants `find . -type f -exec rm -rf {} \;`. The allow now attaches
+  only when the rewritten command is allowlisted and passes rule 24's bound, else it blocks with
+  the corrective (the amendment's delta 12).
 
 - **grant-path-traversal-exposure** [spec: SPEC-command-classify.md] — the committed script-runner
   globs match a traversing path, a code-execution class the grant narrowing now covers.
@@ -66,6 +70,10 @@
   whole family at once, and would do it without a signal anyone reads.
   Filed 2026-08-22 by build on the lead's ruling; surfaced by the same sweep that produced
   `grant-argument-bounding-mechanism`, which is the data-loss half of the one audit.
+  **Widened to rule 4's absolute-path rewrite — operator direction, 2026-09-11, lead-relayed.** That
+  rewrite emits allow, so it silently grants `bash <root>/.tmp/check-evil.sh` ahead of rule 23. The
+  allow now attaches only when the rewritten command is allowlisted and passes rule 24's bound,
+  else it blocks with the corrective (the amendment's delta 12).
 
 - **ro-bins-write-option-bypass** [spec: SPEC-command-classify.md] — `GUARD_KIT_RO_BINS`
   membership is tested as
@@ -246,10 +254,10 @@
   and **the harness backgrounded it**, leaving a live producer writing `.metric/` with no `.run`
   record — and no session act could have written one, because the launch was never a session act.
   Rule 15 fires on the *write* side of an explicit backgrounding and this path never reaches it,
-  so the first of the two candidate detection shapes recorded below is not merely
-  text-shaped-limited here, it is structurally unreachable. The second — a session-end check over
-  the scratch dir — is the only candidate that sees this instance at all, which is a real
-  narrowing of an otherwise even fork.
+  so a detection shape reading the command text is not merely text-shaped-limited here, it is
+  structurally unreachable. **That half is split out — operator direction, 2026-09-11,
+  lead-relayed — into `harness-moved-background-task-unrecorded`**; this entry keeps the
+  explicit launch.
   **The drain corrected this finding's premise.** It was filed claiming "prompts request, guards
   enforce, and here only the prompt exists". guard-kit generic rule 15
   (`guard_rule_background_no_record`) had landed the day before, on 2026-08-22, and does fire on
@@ -265,8 +273,7 @@
   **Why design-pending:** promoting the advisory to a block needs a detection shape a guard
   can hold — it cannot read whether a command *will* write the record without inspecting its
   text, the same text-shaped limit `wait-loop-exemption-blind-behind-a-script-name` records on
-  the exemption side. A session-end check over the scratch dir is the other candidate and has no
-  false-positive budget yet.
+  the exemption side.
   **DISTINCT from `session-mechanic-grants-uncommitted`**, whose subject was an out-of-band
   permission decision on the journal-append write path — a grant question, not this enforcement
   one. That entry closed 2026-08-23 and its subject shipped as guard-kit/SPEC.md §The generic
@@ -277,8 +284,7 @@
   the filing and read `guard_advise` to establish that it never blocks.
   **Unit set `guard-command-classification`, rule-15 floor — operator direction, 2026-09-11.**
   **Spec 2026-09-11 designs the explicit-launch half** (a block, plus a grant that makes the record
-  cost nothing). A scratch-dir check cannot see the moved-on-timeout half; the only view of it is
-  the turn-end payload's `background_tasks` array, so that half is routed to the lead.
+  cost nothing). The moved-on-timeout half is filed separately, per the split direction above.
 
 - **wait-loop-exemption-blind-behind-a-script-name** [spec: SPEC-command-classify.md] —
   guard rule 15's wait-loop
@@ -311,6 +317,30 @@
 
 ## Deferred
 
+
+- **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
+  harness moves to the background on its timeout is a live producer no liveness record names.
+  **Split out of `backgrounded-shell-child-run-record-unenforced` — operator direction, 2026-09-11,
+  lead-relayed**, which keeps the explicit-launch block and the recorded-launch grant.
+  **Attested twice.** At `installer-trial-lifecycle-repair`'s close, `stage-economics.sh` exceeded
+  its foreground timeout, the harness backgrounded it, and it kept writing `.metric/` with no `.run`
+  record; no session act could have written one, since the launch was never a session act. Spec
+  reproduced the move on 2026-09-11: the result reads "moved to the background (ID: …)", with its
+  output under the session scratchpad.
+  **Why no `PreToolUse` rule reaches it.** The call was a foreground call when the guard saw it, so
+  guard-kit rule 15 has no launch to refuse and rule 14 has no record to read. No `PreToolUse`
+  payload carries task state, and a search of that session's transcripts found no line recording
+  the move.
+  **Candidate, operator-class:** widen delegation-kit's turn-end hook to refuse while its payload's
+  `background_tasks` array shows a running harness `shell` task. §What `background_tasks` carries
+  rules that view a supplement to the record set and never a substitute, and it holds no pid; the
+  hook's refusal set took a separate authorization (§The turn-end liveness hook), so widening it is
+  the operator's to rule.
+  **Why design-pending:** whether a finished task leaves the array, and how often a running task at
+  an intermediate `SubagentStop` would refuse, are both unmeasured.
+  **Cost while deferred:** a harness-moved producer can outlive its session, and a commit can land
+  beside it; rule 14 and the stage-entry liveness check see neither, because nothing recorded it.
+  Filed 2026-09-11 by spec on the operator's split direction.
 
 - **payload-withholds-kit-specs** [design-pending] [cost: event/high] [surface: installer] — the customer payload packs every kit root
   whole (`git archive` per root at `native/src/emit/pack_installer.rs`), so the kit SPECs ride

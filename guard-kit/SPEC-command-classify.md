@@ -7,8 +7,9 @@ This amendment serves the eight entries of the `guard-command-classification` un
 at it together:
 
 - `grant-argument-bounding-mechanism` is the lead entry: two committed grants reach a destructive
-  form (deltas 6 and 7).
-- `grant-path-traversal-exposure`: the script-runner globs reach a traversing path (delta 7).
+  form (deltas 6 and 7), and rule 7's `{}` rewrite grants one silently (delta 12).
+- `grant-path-traversal-exposure`: the script-runner globs reach a traversing path (delta 7), and
+  rule 4's absolute-path rewrite grants a scratch script silently (delta 12).
 - `ro-bins-write-option-bypass`: roster membership stands in for a read-only invocation (delta 5).
 - `guard-command-prefix-wrapper`: a prefix displaces the token the matcher reads (deltas 1 and 2).
 - `guard-read-steer-tool-coverage`: `awk` reads a file with no steer (delta 3).
@@ -370,11 +371,9 @@ independently. It is not this unit's work and is not queued by it.
 - Rule 19's arm (A) body is `sleep` only, and its arm (B) applies this rule's test as a predicate
   (delta 9).
 
-**Open at spec, routed to the lead, and not closed by this amendment:** rules 4 and 7 emit
-`guard_rewrite`, whose envelope carries `permissionDecision: allow`, so each grants ahead of this
-rule. A rule-7 `{}` rewrite grants `find … -exec rm -rf {} \;`, and a rule-4 rewrite grants an
-absolute-path scratch `check-*.sh`. This rule's placement argument holds for every grant **except**
-those two rewrites, and says so.
+Rules 4 and 7 run ahead of this rule and each emit `guard_rewrite`, whose envelope carries
+`permissionDecision: allow`. Both apply this rule's test as a predicate before that allow attaches
+(delta 12), so no rewrite grants a rule-24 subject either.
 
 **Honest limits:**
 
@@ -429,9 +428,9 @@ The one wired chokepoint holding any view of it is the turn end. The `SubagentSt
 that this view may supplement the record set and never substitute for it, because it misses a child
 detached with a shell `&` (§What `background_tasks` carries).
 
-**Open at spec, routed to the lead:** refusing a turn end on a running harness shell task would
-widen delegation-kit's refusal set. This amendment does not take that widening on its own authority.
-It states the moved-on-timeout launch as rule 15's residue — the entry's recorded recurrence.
+Refusing a turn end on a running harness shell task would widen delegation-kit's refusal set, which
+is not this amendment's to take. The moved-on-timeout launch is therefore rule 15's stated residue,
+and its detector is queued separately as `harness-moved-background-task-unrecorded`.
 
 **Rule 15 keeps its number and its placement.** It sits before the auto-allow band, and rule 19's
 arm (B) grants only what rule 15's exemption (1) has already let through.
@@ -491,8 +490,9 @@ could move is re-derived, never assumed. **Not yet applied.**
     non-allowlisted launch declining (delta 9).
   - Every existing rule 18, 19 and 15 row carrying a roster binary re-derived (delta 5).
   - Every row whose command carries a trailing `&` re-derived, since advise becomes block (delta 8).
-- **The table's sandbox allowlist grows from three entries to five**, adding a scratch `rm -rf`
-  slot grant and a `*/checks/check-*.sh` runner grant, so rule 24's rows have a pattern to bound.
+- **The table's sandbox allowlist grows beyond its three entries.** It gains a scratch `rm -rf` slot
+  grant and a `*/checks/check-*.sh` runner grant, so rule 24's rows have a pattern to bound, plus the
+  entries delta 12's rewrite rows need.
   Rule 18's allowlisted-lead widening and rule 20 read the same file, so their rows are re-derived
   too.
 - **`guard-tests/background-cases.tsv`:** the harness-form no-record row flips from advise to block,
@@ -526,6 +526,44 @@ above {mechanical}. **Not yet applied.**
 - **`README.md`'s** knob sentence names both knobs.
 - **The on-site mirror** regenerates with
   `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`.
+
+### (12) Rules 4 and 7 attach allow to a rewrite only when the rewritten command is granted and bounded
+
+A `guard_rewrite` emits `permissionDecision: allow`, so a rewrite is a grant, and rules 4 and 7 each
+issue one unconditionally {design-bearing}. Both keep their rewrite and attach it only when the
+**rewritten** command passes two tests; otherwise each **blocks** with its corrective. **Not yet
+applied.**
+
+- **The allowlist test.** Every segment of the rewritten command, split as §The guard framework's
+  splitter splits it, matches a committed `Bash(…)` pattern through `guard_allow_match` on
+  `_guard_allow_inners`' read. A missing `jq`, a missing settings file or a parse error fails the
+  test, so the rule blocks rather than grants: a grant resting on a settings read never turns a
+  missing file into an allow, which is rule 18's contract for its own settings read.
+- **The bound.** Each segment passes rule 24's test (delta 7), taken as a predicate.
+
+**Rule 4.** The rewrite of an absolute repo-script spelling to its relative form attaches allow only
+when both tests hold. Otherwise the existing corrective block fires — use the repo-relative form —
+so the re-issued relative command meets every later rule, rule 23's scratch-body refusal included.
+`bash <root>/.tmp/check-evil.sh` now blocks.
+
+**Rule 7.** The bare `{}` placeholder rewrite attaches allow only when both tests hold. Otherwise it
+blocks, with a corrective naming the quoted `'{}'` spelling for the session to write itself, so the
+call reaches the harness's own decision. `find . -type f -exec rm -rf {} \;` and
+`ls | xargs -I{} rm {}` now block.
+
+**Why a block and not a fall-through.** An unrewritten `{}` meets the matcher's brace refusal, and
+the reference does not document an `updatedInput` carried without a decision, so a fall-through
+cannot deliver the rewrite. The corrective hands the session the spelling the rewrite would have
+produced: the same behavior-preserving respelling, without the grant.
+
+**What the narrowing costs.** A placeholder call whose command is not allowlisted, or an absolute
+script spelling whose relative form is not, now costs a block and a re-issue where it was granted
+silently. That is the price of the grant having been unconditional. An allowlisted, bounded call is
+unaffected.
+
+**The table.** Rule 4's rewrite row and rule 7's placeholder rows are re-derived. The sandbox
+allowlist gains the entries the rewrite rows need to keep asserting the grant, and firing rows assert
+the block for an unallowlisted and for an unbounded rewrite, under §Testing's non-monotone rule.
 
 ## The seam, ruled
 
@@ -576,6 +614,12 @@ above {mechanical}. **Not yet applied.**
   - Producer: the payload command.
   - Consumer: the harness, through `permissionDecision: allow`.
   - Deny and ask rules still apply on top of it, per the reference.
+- **Rules 4 and 7's conditional rewrite allow** (delta 12).
+  - Producer: the payload command, rewritten by each rule as today.
+  - Readers before the allow attaches: `_guard_allow_inners`' committed allowlist (a failed read
+    blocks) and rule 24's test taken as a predicate.
+  - Consumer: the harness, through `permissionDecision: allow` with `updatedInput` when both hold,
+    and otherwise the calling session, through `guard_block`'s stderr and exit 2.
 - **The canonical record** (deltas 8 and 9).
   - Producer: statement 2 of the launching command, at launch.
   - Readers, all unchanged and all reading the existing `pid=<n> run=<key>` grammar:
@@ -606,17 +650,18 @@ above {mechanical}. **Not yet applied.**
 - `guard-kit/SPEC.md` §The generic ruleset — rule 2 (delta 2); rule 8 (delta 3); rules 9 and 11
   (delta 4); rule 18, rule 9's action list and rule 19 (c)/(d) (delta 5); rule 22 (delta 6); the new
   rule 24 and the fall-through renumber (deltas 7 and 11); rule 15, its exemption (2) and (3), its
-  advisory-to-block paragraphs and its honest limit (deltas 5 and 8); rule 19 arm (B) (delta 9).
+  advisory-to-block paragraphs and its honest limit (deltas 5 and 8); rule 19 arm (B) (delta 9);
+  rules 4 and 7's conditional rewrite allow (delta 12).
 - `guard-kit/SPEC.md` §scan-prompts — the ranker's wrapper roster becomes the harness view, the KPI
   step is recorded, and `(rule 24)` becomes `(rule 25)` (deltas 1 and 11).
 - `guard-kit/SPEC.md` §Layout and configuration — the two knobs and the new test file (deltas 4, 5,
   10 and 11).
-- `guard-kit/SPEC.md` §Testing — the five-entry sandbox allowlist, the background table's flipped row
-  and the knob-test lane (deltas 7, 8 and 10).
+- `guard-kit/SPEC.md` §Testing — the grown sandbox allowlist, the background table's flipped row and
+  the knob-test lane (deltas 7, 8, 10 and 12).
 - `guard-kit/lib/guard.sh` — every helper and rule change, the kit declared-forms table, the two knob
-  defaults and the dispatch line (deltas 1, 2, 3, 4, 5, 6, 7, 8, 9 and 11).
+  defaults and the dispatch line (deltas 1, 2, 3, 4, 5, 6, 7, 8, 9, 11 and 12).
 - `guard-kit/guard-tests/cases.tsv` and `guard-kit/guard-tests/background-cases.tsv` — rows and the
-  renumbered section comment (deltas 10 and 11).
+  renumbered section comment (deltas 10, 11 and 12).
 - `guard-kit/gate-tests/guard-lib-parity.test.sh` — the `harness-view` corpus (deltas 1 and 10).
 - `guard-kit/templates/guard-config.sh` and `guard-kit/README.md` — the two knobs (deltas 4, 5 and
   11).
