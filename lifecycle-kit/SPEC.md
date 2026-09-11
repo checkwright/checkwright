@@ -4349,7 +4349,8 @@ compel a filer to answer the advisory, and the judgment itself is the drain's
 The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`) carry
 the generic stage spine — the stamp first step (performed by invoking
 `bash gate-sdk/bin/run-gates.sh --enter-stage <stage>` and stating in one line what it does), each stage's
-trigger/ordering rules, its stage-local doctrine, and the **resume-journal last
+trigger/ordering rules, its stage-local doctrine, the instruction-surface read in
+`build` (the one stage every template edit passes), and the **resume-journal last
 step** — with **named slots** where the consumer's rule content goes. The
 templates are the owned surface: this section states the contract a consumer
 skill must satisfy and never restates what a template carries.

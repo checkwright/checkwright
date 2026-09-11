@@ -72,6 +72,10 @@ widening asserted behavior, user-facing semantics) stops and surfaces to the
 user — never pick a "conservative alternative" silently. A *cross-component
 causal gap* is not a TODO: stop, resolve it this session, update the spec.
 
+**Instruction-surface edits carry the instruction only.** Grounds → the
+mechanism's owning section, same commit; history → the commit message
+(doctrine-kit/DOCTRINE.md, Content-tiering / SSOT).
+
 **Don't re-buy the roster the stage before you already bought.** Where
 implementing a task sends you across a corpus — every call site of a helper,
 every spec citing a name — read the survey record first: a block whose heading

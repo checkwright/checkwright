@@ -22,14 +22,19 @@ link — an application of the load-trigger residency rule to the doctrine itsel
 ## Methodology-maintenance rules
 
 1. **Content-tiering / SSOT.** Every governed surface owns exactly one content
-   tier and *points to* — never restates — a fact another surface owns. A
+   tier and *points to* — never restates — a fact another surface owns. An
+   instruction surface — template, agent definition, binding shim — owns the
+   instruction tier: its grounds go to the section owning the mechanism (a
+   failure it prevents included, undated), its history to version control. A
    parallel copy is the defect; the fix is one shape: replace the slab with a
    pointer to the owner, then a gate forbids it growing back.
    *Under agent work:* a restated fact drifts the moment one copy is edited and
    the other is not, and an agent reading the stale copy inherits the drift as
    ground truth. One owner means one thing to keep true.
    *Enforced by:* the anti-restatement gate family — the comment-tier and
-   manifest/prose gates in [canon-kit/SPEC.md](../canon-kit/SPEC.md).
+   manifest/prose gates in [canon-kit/SPEC.md](../canon-kit/SPEC.md); the
+   instruction-surface sentence is read at authoring — build's ritual, the
+   amendment Definition of Done — and is not gateable.
    *Digest:* one content tier per surface; point, never restate.
 
 2. **Enforcement-first.** On any fix or redundancy finding, name the defect

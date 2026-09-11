@@ -284,8 +284,9 @@ supplies the checklist they invoke and the gate behind the promotion rule.
    discovered gaps as debt tasks, and commit the merge with the work.
 
 The shipped amendment template ends in a Definition-of-Done checklist that
-includes causal completeness, merged-with-no-information-lost, the
-file-deleted assertions, and gap filing.
+includes causal completeness, instruction-only replacement text (the doctrine
+rule named, not linked: the prose profile vendors no doctrine-kit),
+merged-with-no-information-lost, the file-deleted assertions, and gap filing.
 
 ## Content tiering — the star topology
 

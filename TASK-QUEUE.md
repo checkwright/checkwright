@@ -12,42 +12,7 @@
 
 ## New Features
 
-- **instruction-motivation-owner** [spec: SPEC-instruction-tier.md]
-  — the what-vs-why rule for instruction
-  surfaces has an owner for *restatements* and no owner for original motivation.
-  **Two halves of this were already answered and this entry does not re-ask them**, corrected at
-  close 2026-08-13 against the source: the general rule is delegation-kit/SPEC.md §Operative
-  residency — (a) unreachable trigger, (b) imperative only, (c) adjacent citation — and that same
-  SPEC already **rules it owes no gate**, with the structural reason stated so a later session does
-  not try to build one that cannot exist.
-  **The residual is a reach gap, verified by reading the rule's own scope.** §Operative residency
-  opens *"A rule may be restated as an imperative in a surface that does not own it"*, so it
-  presupposes an owner elsewhere. Original motivation authored **in** a surface that owns no rule
-  falls outside it: there is nothing being restated, and (b)'s "the reasoning stays with the owner"
-  has no owner to name. That is the exact shape operator ruling 2026-08-13 corrected by hand in
-  `delegation-kit/templates/agent-execution.md`, where the fix was to *create* the owner
-  (delegation-kit/SPEC.md §The delegation model) and then point at it.
-  **Nothing applies (b)/(c) at authoring time either.** Both conditions are read by an author or a
-  reviewer, and no stage, template or roster puts that read in front of anyone authoring a template
-  surface — so the conditions are correct and unfired.
-  **Deliverable, and why design-pending:** widen the rule to reach original motivation, or state
-  in the SPEC why the two cases stay separate, and give (b)/(c) an authoring-time reader. What is
-  open is which surface owns the widened rule, since the failure spans kits while §Operative
-  residency is delegation-kit's.
-  **No gate is owed and that is settled, not deferred** — the line above rules it, and this entry
-  inherits the ruling rather than reopening it.
-  **Unit set `instruction-surface-tier`, the sweep's blocker, whose reach question /spec rules
-  first — operator direction, 2026-09-11.** The sweep's blocking edge on this entry stays.
-  **Cost while deferred:** every template surface authored keeps accreting motivation the owning
-  SPEC should hold, and the corrected instance is one file out of a corpus of twenty — a corpus
-  grown from 2020 to 2920 lines since filing (re-measured 2026-09-12 at scope).
-  Filed 2026-08-13 by close, draining the gap inbox; the bullet's own claim that the rule and its
-  gateability were unfiled is false on both halves and is corrected here rather than inherited.
-  Iceboxed 2026-09-11 in pool triage; returned 2026-09-12 by scope, body recovered from that commit.
-  **Specified 2026-09-12 at spec** (SPEC-instruction-tier.md): the rule joins the doctrine's
-  Content-tiering rule, stated beside §Operative residency rather than widening it.
-
-- **instruction-surface-sweep** [blocked-by: instruction-motivation-owner] [spec: SPEC-sweep.md]
+- **instruction-surface-sweep** [spec: SPEC-sweep.md]
   — one full pass applying the what-vs-why rule across the instruction-file corpus, once.
   **Operator-ruled 2026-08-13**, and deliberately moved out of that session's scope into close's
   filing rather than started mid-iteration.
@@ -73,14 +38,16 @@
   git already holding it, while mechanism grounds keep the owning-SPEC route above — refining the
   relocation wording for the history class — and those two go first, the lead contract loading
   them whole (685 and 491 lines at close; roughly 23k tokens, a fifth of the lead's context, as
-  the lead measured it). The direction may answer or narrow the blocker's open question. Its
+  the lead measured it). The direction fed the reach question the blocker then ruled. Its
   priority is no separate directive: scope ranks it off its lead-line tags, landed 2026-09-11.
   **Leads the `instruction-surface-tier` set — operator direction, 2026-09-11:** the edge above
-  stays, and `instruction-motivation-owner` joins the set so /spec rules its reach question first.
+  held, and `instruction-motivation-owner` joined the set so /spec ruled its reach question first.
+  That rule landed in the doctrine at build 2026-09-12 and the edge is discharged.
   **Cost while deferred:** the rule is ruled and applied to one file, so the corpus is nineteen
   files of unswept prose under a rule that already binds it.
-  Filed 2026-08-13 by close, on operator direction; blocked on the reach question above, because a
-  sweep for violations of a rule whose scope does not reach the corpus has no stated predicate.
+  Filed 2026-08-13 by close, on operator direction; it waited on the reach question above, because a
+  sweep for violations of a rule whose scope did not reach the corpus had no stated predicate. The
+  doctrine's instruction-surface sentence supplied that predicate at build 2026-09-12.
   **Specified 2026-09-12 at spec** (SPEC-sweep.md) against the census filed in
   the survey record; compliant calls ride the landing commit's message.
 
@@ -5257,5 +5224,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- instruction-motivation-owner
 
 ## Lessons Learned

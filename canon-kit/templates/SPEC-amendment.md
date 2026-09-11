@@ -91,6 +91,9 @@
 - [ ] **Causal completeness** — every new state/event/interface has a named,
       reachable producer and a named consumer; every new field has a named
       reader at a named transition.
+- [ ] **Instruction surfaces: instruction only** — replacement text for a
+      template, agent definition or shim carries no grounds; a delta places them
+      (the Content-tiering / SSOT rule).
 - [ ] **Merged with no information lost** — each addition integrated into its
       proper canonical-spec section (not appended); the merged spec reads as one
       coherent document a reader who never saw the amendment can use alone.

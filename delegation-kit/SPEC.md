@@ -741,10 +741,14 @@ when all three of these hold:
 - **(c) Adjacent citation.** The restatement names the owning surface beside
   itself, so the owner stays the single place the rule is explained and changed.
 
+Grounds a surface authors for its own instruction are no restatement and take no
+sanction; Content-tiering / SSOT places them (doctrine-kit/DOCTRINE.md).
+
 Each condition has a reader at a transition rather than being self-evident: (a)
-and (b) are read by whoever authors a restatement, at authoring, and again by a
-reviewer or an authoring stage assessing an existing one; (c) is the pointer any
-later reader — and any content-tiering check — follows back to the owner. The
+and (b) are read by whoever authors a restatement, at authoring — build's
+ritual, the amendment Definition of Done — and again by a reviewer or an
+authoring stage assessing an existing one; (c) is the pointer any later reader
+— and any content-tiering check — follows back to the owner. The
 reader the sanction exists for is the third and never inspects a condition at
 all: the bound actor, which receives the imperative at the tier it always loads,
 which is the whole point.
