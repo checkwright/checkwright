@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-deferred-pool-triage release deferred:v0.26.0 — the MINOR accumulated since v0.25.0 stays outstanding and this iteration adds nothing to it (queue and workflow surfaces only, tightened-gates unchanged, no behavior change); no cadence trigger fired: elapsed-time is dormant while the channel reads preview, no decommission, no security or supply-chain fix landed, no operator direction to release (the operator deferred even this close's push), no audience arrival
