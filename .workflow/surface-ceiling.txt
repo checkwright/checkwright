@@ -15,13 +15,13 @@
 194 CLAUDE.md
 105 canon-kit/templates/SPEC-amendment.md
 35 context-kit/templates/close-brevity.md
-468 delegation-kit/templates/agent-execution.md
+466 delegation-kit/templates/agent-execution.md
 60 delegation-kit/templates/dispatch-checklists.md
 40 drift-kit/templates/close-knowledge.md
 54 drift-kit/templates/economics.md
 67 guard-kit/templates/close-triage.md
 69 lifecycle-kit/templates/consult.md
-603 lifecycle-kit/templates/lead.md
+601 lifecycle-kit/templates/lead.md
 33 lifecycle-kit/templates/release-sweep.md
 103 lifecycle-kit/templates/stages/align.md
 109 lifecycle-kit/templates/stages/build.md
