@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+registry-roster-oracles gates sha256=12fbb94c25fad543f7caf8fb30f4d3c690d4c410451af4a0c7bad5e5542920ff pass=113 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles gate_sdk sha256=66a533f5aabd61861735228ab38d37160110c0bb5cf1faa6276fb232d8f64908 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles canon_kit sha256=e0780e41e810cbac5bb0be8cbace64fd320c84899e0272c315453780c9dd6455 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles guard_kit sha256=bec1c9c35372c4d6106471ec51071ee748b3187f02c6303efe7fbf6667cc7d0d pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles guard_tests sha256=d1df8069c9935679a05e36a5b9c6859bc81fa68434855f3791e0cbb5bb328dd3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles demo sha256=40004649edfbd62c4e819d264e2475540bb28692648c492dc6cae4ab04d807ae pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles installer_smoke sha256=d645f61f502233ba89bbc6fabda7ede85e7f2b1f73a8e95f1d8d6c22ae56cd81 pass=13 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles consumer_smoke sha256=0093eba07d98483552b93f82d08b5ceade212650d7930d102de3c67c1214a822 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles upgrade sha256=49bea072cdfa8ce99e95a2258688c585662db09eed73c94aa55d395579699ee7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles agents_md_smoke sha256=0049c5b5e53721fc150fa56b13f363117ba3d5571b45379c2b4fb9d2fc04ee09 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+registry-roster-oracles native_crate sha256=492258cf34faa68aabeff75a4df19aeb85fe776b4551dd73575b11818da38a42 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
