@@ -5485,11 +5485,4 @@
 
 ## Done
 
-- bridged-knob-case-tmp-dir-override-inert
-- reads-couples-skipped-set-has-no-census-oracle
-- crate-registry-battery-roster-divergence-unasserted
-- unknown-emit-arm-diagnostic-misdirects
-- prompt-ranking-ungrantable-shape-class
-- entry-compression-contract-unenforced
-
 ## Lessons Learned
