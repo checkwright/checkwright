@@ -606,7 +606,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-embedded-source",
         spec_embedded_source::run,
-        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", ""), (".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""), ("?", "", "", "dynamic@src/gates/spec_embedded_source.rs:147")],
+        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", ""), (".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""), ("?", "", "", "projection@src/gates/spec_embedded_source.rs:147")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -851,9 +851,6 @@ pub const REGISTRY: &[GateEntry] = &[
         "canon-kit",
         &[("git", "")],
     ),
-    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's
-    // own first argument with a default, the variable-first-argument shape the shell parser
-    // calls undecidable
     (
         "check-roadmap-fresh",
         roadmap_fresh::run,
@@ -1841,9 +1838,10 @@ pub const REGISTRY: &[GateEntry] = &[
     ),
 ];
 
-// spec: gate-sdk/SPEC.md §check-reads-couples — the two ground classes; a third is refused, since a
-// `?` that is a literal root or a positional with a literal default declares the root instead
-pub const GROUND_CLASSES: &[&str] = &["fallback", "dynamic"];
+// spec: gate-sdk/SPEC.md §check-reads-couples — the three ground classes, each named by what retires
+// its `?`; a fourth is refused, since a `?` on a literal or literal-default root whose filter the
+// field can express declares the root instead
+pub const GROUND_CLASSES: &[&str] = &["fallback", "dynamic", "projection"];
 
 const fn ground_opens_with(ground: &str, class: &str) -> bool {
     let (g, c) = (ground.as_bytes(), class.as_bytes());
@@ -1890,8 +1888,8 @@ const _: () = {
             let (r, f, p, g) = roots[j];
             assert!(
                 root_declaration_holds(r, f, p, g),
-                "a `?` walk root needs a ground `fallback@<path>:<line>` or `dynamic@<path>:<line>` \
-                 and no filter or prune, and any other root carries no ground \
+                "a `?` walk root needs a ground `<class>@<path>:<line>`, the class one of `fallback`, \
+                 `dynamic` or `projection`, and no filter or prune, and any other root carries no ground \
                  (gate-sdk/SPEC.md §check-reads-couples)"
             );
             j += 1;
@@ -3021,7 +3019,8 @@ mod tests {
         };
         seeded(&inm, format!("{}:999999", inm_path), "does not resolve");
         seeded(&inm, format!("{}:1", inm_path), "calls no root-entry roster member");
-        seeded(&inm, inm_loc.replacen("dynamic@", "static@", 1).replacen("fallback@", "static@", 1), "not a ground class");
+        let (_, inm_rest) = inm_loc.split_once('@').expect("a live locator has a class");
+        seeded(&inm, format!("static@{}", inm_rest), "not a ground class");
         seeded(&off, off_loc.to_string(), "carries no via clause");
         seeded(&inm, format!("{} via {}", inm_loc, off_via), "forbidden in-module");
         seeded(&off, format!("{} via {}::no_such_fn_seeded", off_loc, off_module), "has no definition");

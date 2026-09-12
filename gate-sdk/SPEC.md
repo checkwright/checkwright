@@ -15265,17 +15265,33 @@ tests (§Meta-gate conservation for the binary substrate).
 ground is un-omittable data like the root itself: a root declaration's fourth field
 is empty on a declared root and required on a `?`, and a `?` with no ground — or
 with a filter or prune, which is what keeps `--reads`' second column unambiguous —
-fails to compile, as does a declared root carrying one. Two classes are live, and a
-third is deliberately not offered:
+fails to compile, as does a declared root carrying one. A class names **what would
+retire the `?`**, which is the question the cadence review reading the ground asks.
+Three classes are live:
 
 - **`fallback`** — the kit-literal fallback branch of a runtime-selected corpus
-  helper, which the boundary passage above keeps `?`.
-- **`dynamic`** — a walk whose bound is computed at run time: a root no literal
-  names, or a filter projected out of a packed knob's elements, which the resolution
-  facts below place beyond the filter field's reach.
+  helper, which the boundary passage above keeps `?`. Retired when the semantics
+  question that passage names settles.
+- **`dynamic`** — a walk whose root no literal names: computed at run time from
+  state the registry cannot hold. Nothing at this altitude retires it.
+- **`projection`** — a walk whose root is statically resolvable but whose filter is
+  projected out of a knob whose elements pack several fields, which the resolution
+  facts below place beyond the filter field's reach. Retired when the filter grammar
+  gains a form that reaches such a projection, at which point the site declares its
+  root.
 
-A `?` that is in fact a hardcoded literal root or a positional with a literal
-default has no ground, because it should be declaring the root.
+A fourth class is deliberately not offered: a `?` that is in fact a hardcoded literal
+root or a positional with a literal default, and whose filter the field can express,
+has no ground, because it should be declaring the root.
+
+**`projection` is the one admitted exception to the refusal of `?` on a statically
+resolvable root, and it is bounded by its cause.** The only other honest spelling is
+the root with its filter omitted, which is a positive claim that the walk reads
+everything under the root — for a member reading only its knob-selected files, an
+over-demand that reds coverage falsely rather than a gap it would expose. So the
+admission holds exactly where the filter field cannot reach the member's filter, and
+for no other reason: a `projection` ground on a walk whose filter the field *can*
+express is the refused opt-out spelled as a class.
 
 **The ground is `<class>@<path>:<line>`, and a locator off its site's home module
 carries one `via` clause.** `<path>` is crate-relative and `<line>` is the line of
@@ -15309,8 +15325,8 @@ site count and its in-module, off-module and per-class partitions are reported f
 this enumeration, which is the one oracle for the site denominator.
 
 **What it decides is presence and placement — deliberately not the class, and not
-the chain.** Whether a walk is a fallback branch or a run-time computation no gate
-can decide, and the assertion reads the class no further than its spelling. It
+the chain.** Whether a walk is a fallback branch, a run-time computation or a
+packed-knob projection no gate can decide, and the assertion reads the class no further than its spelling. It
 resolves a `via` symbol and its first-hop reference, never the path from symbol to
 walk line, which would be a call-graph analysis: where a member's only fixture case
 steers it off the walk through a positional — `check-enforcement-fresh` and
@@ -15378,7 +15394,9 @@ a per-file exclusion list is a new question rather than a stretched prune.
 **Two alternatives are refused, recorded so a later port does not retry them.**
 Declaring `?` for a root that resolves statically is refused: `?` marks a root that
 cannot be *bounded statically*, and spelling one where the property holds would be the
-foreclosed opt-out moved into the registry. Re-implementing the scan over
+foreclosed opt-out moved into the registry. The `projection` ground class above is the
+one admission against this refusal, and it reaches no further than a filter the field
+cannot express. Re-implementing the scan over
 `git ls-files` to fall outside the analyzed class is refused for the same reason
 with a behavioral cost on top: enumeration is out of scope *because* it is not a
 walk, so using it to evade the assertion is opting out spelled in code, and it

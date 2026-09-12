@@ -399,10 +399,19 @@ locator assertion is a registry unit test with a seeded-bad sibling. Build ran t
 conversion rule over **every** site rather than the three the answers named, and it
 reached further, each by a rule this delta already states:
 
-- **Two more conversions out of the root set.** `check-shellcheck` expands each
-  derived directory one level through `walk::glob_entries`, which is neither a
-  roster member nor recorded; `check-docs-mirror-fresh`'s own walk is its declared
-  `docs` root, and its `?` stood for the mirror emitter's single `list_dir`.
+- **Two more conversions out of the root set, one a member and one a slot.**
+  `check-shellcheck` leaves it by **mechanism**: `walk::glob_entries("<dir>/*.sh")`
+  (`shellcheck.rs:63`) expands one directory level per pattern component — a
+  `read_dir` per metacharacter component and no globstar (`walk.rs:811-835`) — so
+  it is a bounded single-level expansion, outside the recursive class on the
+  one-level pathname-expansion precedent §check-gate-exemption-tasks already takes.
+  That the entry point is no root-entry roster member is **not** the ground: the
+  roster is a floor, and a recursive walk behind an unrostered entry point would
+  still owe a root. `check-docs-mirror-fresh` did **not** leave the root set — it
+  keeps its declared root, `docs` filtered by the `SPEC.md,README.md,DOCTRINE.md`
+  literal, for its own `find_with_prune` (`docs_mirror_fresh.rs:66`); what left is
+  its **second** `?`, which stood for the mirror emitter's single-level `list_dir`
+  (`docs_mirror.rs:192`).
 - **One conversion to a declared root.** `check-docs-kit-parity` globs
   `*/index.md` under the directory of a positional whose default is the literal
   `docs/kits.md`, so it declares `docs` with the kit literal as its filter. Unit
@@ -414,17 +423,27 @@ reached further, each by a rule this delta already states:
   partition a projection of the report rather than a second report. A `?` also
   refuses a filter or prune at compile time, which keeps `--reads`' second column
   unambiguous on a `?` line.
-- **One classification is escalated rather than settled.** `check-spec-embedded-source`'s
-  `?` walk has a static root (a positional defaulting to `.`) and a filter projected
-  out of `CANON_KIT_EMBED_LANGS`' packed elements — coverage that cannot be
-  expressed, so the `?` stands, but the walk is neither class as first written. It
-  lands as `dynamic`, with `dynamic` read as a walk whose *bound* is computed at run
-  time, and that reading is the lead's to confirm.
+- **One classification was escalated, and it is settled by a third class.**
+  `check-spec-embedded-source`'s `?` walk has a static root (a positional defaulting
+  to `.`) and a filter projected out of `CANON_KIT_EMBED_LANGS`' packed elements —
+  a filter the field cannot express, so the `?` stands, but the walk was neither
+  class as first written. It first landed as `dynamic`, read as a walk whose *bound*
+  is computed at run time; that reading separates nothing, since every knob filter's
+  bound is computed at run time. A class names what would retire its `?`, so the
+  site takes **`projection`**, retired when the filter grammar gains a form reaching
+  a packed-field projection, and `dynamic` narrows to a root no literal names.
+  §check-reads-couples admits `projection` as the one exception to the refusal of
+  `?` on a statically resolvable root, bounded by its cause. Every `dynamic` site
+  was then re-read against the narrowed definition: none but this one has a literal
+  or literal-default root — each is a knob, a positional falling back to a knob, the
+  kit roots, or a positional falling back to the git toplevel, which is not a
+  literal default because a case's working directory is not its toplevel — so
+  nineteen stay `dynamic` and none converts to a declared root.
 
 The figures, each from its own oracle at landing: the locator assertion enumerates
-**26** declaration sites — **17** in-module and **9** off-module; **20** `dynamic`
-and **6** `fallback` — and `--emit reads-census` prints **32** lines summing to
-**46** `?` root-lines.
+**26** declaration sites — **17** in-module and **9** off-module; **19** `dynamic`,
+**6** `fallback` and **1** `projection` — and `--emit reads-census` prints **32**
+lines summing to **46** `?` root-lines.
 
 ### (5) `check-gate-substrate-parity` assertion I joins the crate registry to the battery registration
 
@@ -688,8 +707,10 @@ diagnostic underneath an uncorrected one.
   not in the amendment as authored; build measured the three apart and the section
   carries it because conflating them is how the hand sweeps this arm replaces went
   wrong. **Applied.**
-- `gate-sdk/SPEC.md` §check-reads-couples (delta 4). The two ground values, the
-  refusal of a third, the locator's grammar with its `via` clause, the placement
+- `gate-sdk/SPEC.md` §check-reads-couples (delta 4). The three ground classes, each
+  named by what retires its `?`, the refusal of a fourth, the bounded admission of
+  `projection` against the refusal of `?` on a statically resolvable root, the
+  locator's grammar with its `via` clause, the placement
   rule citing the root-entry roster, and the conversion rule's reach to a `?`
   standing for a read outside the analyzed class. **Applied**, with the census's
   fourth column, the `--reads` `?` line's ground column, and the three denominators'
@@ -788,15 +809,21 @@ roster declares a retirement and this is the opposite.
       enumeration** at the landing commit, never transcribed from this amendment —
       no pre-landing oracle reports the site denominator, which is why none is
       written here.
-- [ ] **The ground partition is reported with both classes non-empty, or the
+- [ ] **Every `dynamic` site is re-read against the narrowed definition** — a site
+      whose root is in fact statically resolvable is re-grounded `projection` if its
+      filter is beyond the filter field's reach, and otherwise converted to a
+      declared root. Only `check-spec-embedded-source` is known to be the former; the
+      rest were grounded against the wider reading and are not assumed to survive it.
+- [ ] **The ground partition is reported with every class non-empty, or the
       landing states why.** Every site is the identical spelling today, so a pass
       returning every site in one class and none in the other is the bulk-authoring
-      signature rather than a result — §check-reads-couples names both classes as
+      signature rather than a result — §check-reads-couples names every class as
       live, and an empty one is a finding to resolve before landing, never a figure
-      to report. Both classes are reachable on the corpus as it stands, measured:
-      `COMMENT_SURFACE_ROOTS`' site is a kit-literal fallback branch, and
+      to report. Every class is reachable on the corpus as it stands, measured:
+      `COMMENT_SURFACE_ROOTS`' site is a kit-literal fallback branch,
       `check-memory-off`'s root set is computed from a knob's glob expansion with no
-      literal anywhere, so the guard is satisfiable rather than aspirational.
+      literal anywhere, and `check-spec-embedded-source`'s third walk is a
+      packed-knob projection, so the guard is satisfiable rather than aspirational.
 - [ ] **A `?` for a decidable root or an out-of-class read does not survive the
       pass** — each site is checked against §check-reads-couples' two decidable
       shapes (a hardcoded literal root, a positional with a literal default) and its
