@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: registry-roster-oracles
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -745,22 +745,15 @@
   which is what makes it a proxy for "a mandated write displaced grounds";
   what it cannot decide is the semantic half, so it reds a shape rather than a
   judgment.
-  **This SUPERSEDES rather than re-files `ruling-accretion-outgrows-the-entry-cap`**,
-  whose three shapes were all refused by the owning spec and which is now Done —
-  wontfix, operator-ratified 2026-09-09, executed at the 2026-09-10 close, its
-  boundary note landed in queue-kit/SPEC.md §check-queue-entry-budget and its
-  grounds recoverable from git history. That entry proposed re-pricing the cap. This
-  one's subject is the enforceability of the relief the spec ALREADY rules
-  correct, which stays live precisely because those three were refused.
-  **FIRST ATTESTED INSTANCE OF THE CANDIDATE ARM'S OWN SHAPE, judged a recurrence at the
-  2026-09-08 drain and verified by diff rather than inferred.** At `fcf51555` the entry
-  `amendment-roster-omission-detection` carried its propose-once record verbatim; `40477bdb`
-  compressed it out while that same commit added ruling lines, and `40477bdb`'s own body states
-  the mechanism ("the ruling lines are paid for by compress-by-answering rather than by
-  widening"). The consequence was measured at the next scope, which had to recover the spent
-  route from git to avoid re-escalating an answered member. **The instance is now moot and the
-  class is not** — the compressed entry has since left Deferred, so the dangling antecedent is
-  gone with it; what the arm would have caught is unchanged.
+  **It SUPERSEDES `ruling-accretion-outgrows-the-entry-cap`, and that is ANSWERED**: those three
+  shapes were refused, the entry is Done as a 2026-09-09 operator-ratified wontfix, and its
+  boundary note landed at queue-kit/SPEC.md §check-queue-entry-budget. This one's subject is the
+  enforceability of the relief the spec ALREADY rules correct, live because those three were not.
+  **THE FIRST ATTESTED INSTANCE IS MOOT AND ITS CLASS IS NOT.** At `fcf51555`
+  `amendment-roster-omission-detection` carried a propose-once record; `40477bdb` compressed it
+  out while adding ruling lines, and the next scope had to recover the spent route from git to
+  avoid re-escalating an answered member. That entry has since left Deferred, so the dangling
+  antecedent went with it; what the arm would have caught is unchanged.
   **RULED IN CONSULT 2026-09-09 (`consult, own-authority`, operator-convened, lead-relayed): COSTED
   AND FILED, NO MECHANISM OWED.** The candidate arm's shape — extent shrinks while a ruling line
   lands — is also the shape of the relief the spec mandates (compress by answering), so it reds the
@@ -769,6 +762,13 @@
   owning SPEC, never as prose — and this iteration's scope paid its rounds because four landed as
   prose. **Declined at threshold twice — operator direction, 2026-09-11 and 2026-09-12, both
   lead-relayed:** no mechanism is owed; the per-boundary re-surfacing is absorbed, not suppressed.
+  **THE 2026-09-09 CONSULT RULING ABOVE IS NOT REVERSED AND STANDS.** A second operator direction,
+  2026-09-12 lead-relayed, promotes this entry into unit set `registry-roster-oracles`, the same
+  day as and against the decline above it. The lead recorded that it could not relay the promotion
+  as a direction, a direction being unable to reverse a closed ruling where only `/consult` can;
+  the operator took it knowingly. So it proceeds **against an unreversed ruling** whose ground is
+  untouched, reversing that ruling still takes a `/consult`, and `/spec` authors against both —
+  this edit being the subject in miniature, funded by compressing two blocks above by answering.
   recurrence: entry-compression-contract-unenforced 2026-09-07 2026-09-09
   **Cost while deferred:** every mandated write onto a saturated entry pays
   the same unenforced honour-system compression, and the queue's most-ruled
@@ -1748,14 +1748,12 @@
   no such surface: RELEASING.md step 2 says the outstanding criteria are carried into the next
   qualifying note, and nothing carries them. A deferral therefore drops them unless a later
   session reconstructs them from `git log`.
-  **Already live, twice.** `installer-lifecycle-verbs` deferred on a minor earned by behavior
-  changes alone, so its declaration exists only in the basis clause of its disposition line.
-  The 2026-08-08 close deferred again with five behavior changes; its bullets are carried below
-  so the next qualifying note inherits them from a committed surface, not from session memory.
-  **The carried declarations, composed 2026-08-08**, to the grammar docs/install.md §The upgrade
-  contract owns. **2026-08-09: the carrier hit `check-queue-entry-budget`'s cap.** A third
-  deferral's declarations could not land here at all and ride its disposition line's basis
-  instead — the second alternative below, chosen by the cap rather than by design.
+  **Already live, three times, and the third is the closed case.** `installer-lifecycle-verbs`
+  deferred on behavior changes alone, its declaration surviving only in its disposition line's
+  basis clause; the 2026-08-08 close deferred again with five, carried verbatim below to the
+  grammar docs/install.md §The upgrade contract owns; and on 2026-08-09 this carrier hit
+  `check-queue-entry-budget`'s cap, so a third deferral's declarations could not land here at all
+  and rode the basis clause instead — the second alternative below, chosen by the cap, not design.
   *`lifecycle-kit/bin/file-gap.sh`* — the slug matcher no longer writes a verdict onto the
   bullet it files. Every filing gets one bullet shape; on a match the tool raises a stderr
   advisory *asking* the filer to say in the prose whether the bullet re-files the named entry or
@@ -1788,6 +1786,8 @@
   under-declares by however many iterations batched into it, which is the one section a consumer
   reconciles by reading. At the third deferral the carrier was capped and took nothing at all,
   so the evidence this entry needed is complete: the next scope ranks it on a closed case.
+  **PAIRED WITH `behavior-change-surface`** — lead decision 2026-09-12: both ask where a
+  deferral-surviving declaration accumulates, so whichever lands first states its reach over both.
   Filed 2026-08-08 by close, from the release-note obligation its own drain could not discharge.
 
 - **audit-class-corpus-attestation** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — an un-gateable-class audit stamps a
@@ -3234,15 +3234,15 @@
   **Cost while deferred:** a fixture-suite run leaves ignored scratch inside a tracked fixture
   corpus. The packer now archives the tracked set alone, so the vendoring that cost the diagnoses
   above no longer follows from it; any other reader of that corpus that walks ignored paths does.
-  **The baseline row was NOT re-attributed to this entry, ruled 2026-08-24 and recorded so the
-  next validate does not re-litigate it.** While the loop was shell, that `installer_smoke` row
-  kept `binary-less-dispatch-loop-retirement` as the standing unpaid price it held visible, and
-  this one was a transient masking cause stacked on top of it — exactly
-  the split evidence-kit/SPEC.md §Baseline manifest now rules generally, which is where the ruling
-  was landed rather than left as this instance's precedent. This entry's cost line above is where
-  the masking diagnosis belongs. The loop has since retired and that row now reads pass.
+  **The baseline row's non-re-attribution is ANSWERED, and compresses to its relocation:** the
+  2026-08-24 split now rules generally at evidence-kit/SPEC.md §Baseline manifest, and the shell
+  loop it turned on has retired with its row reading pass, so no validate can re-litigate it.
   **Re-verified at close and kept.** Operator direction, 2026-09-11, lead-relayed: re-verify, then
   retire. It was routed on a survey reading the premise stale; the re-run held it, so no retire.
+  **Unit set `registry-roster-oracles`, and it LEADS — operator direction, 2026-09-12.** It is the
+  tier-1 `session/high` entry whose deferral produces a wrong reading rather than a slow one, and
+  its open question — where a knob's value may be computed for one caller — is the contract the
+  set's other three assert against.
   Filed 2026-08-24 to the gap inbox by validate, declared distinct; promoted that day at
   `shell-gate-tail-port-and-completion-oracle`'s close, deleting the regenerated instance; its
   recurrence's attribution was ruled at `execution-control-reach-and-turn-end-blocking`'s close.
@@ -3933,20 +3933,20 @@
   **THE ROUTING AXIS IS ANSWERED — operator direction, 2026-09-09, lead-relayed: a newly judged
   recurrence does NOT restart the port-first run's proposed-once clause**, since reading a fresh
   date as a reset defeats the clause that stops a member cycling; the threshold history before
-  it (2026-09-03 to 2026-09-05) is in git. **Declined again at scope — operator direction,
-  2026-09-11 (lead-relayed):** that direction stands, and the friction ranking shares no surface
-  with this iteration.
+  it (2026-09-03 to 2026-09-05) is in git.
+  **Unit set `registry-roster-oracles` — operator direction, 2026-09-12, replacing the 2026-09-11
+  decline.** It joins on its recurrence count, the tree's highest at three, not on the set's
+  surface: the threshold clause routes a third recurrence to the operator rather than a third
+  decline, and both prior positions are directions no consult ruling stands over.
   **THE `cat >> .tmp/*` GRANT WAS GRANTED THE SAME DAY AND IS NOT LANDED HERE:** it edits
   `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
   authorization, so it was routed back. The limit it was granted on, recorded here because JSON
   carries no comment: the glob is a PREFIX match, reaching any path under `.tmp/`.
-  **THE SECOND AND THIRD MEASUREMENTS (2026-08-28, 2026-09-03) ARE ANSWERED by the fourth**, each a
-  gap bullet re-deriving this diagnosis without finding this entry. One live residue survives them:
-  the second **falsified a tempting sub-case** — ten `GATE_SDK_VERBOSE=1` calls read as a
-  missing-`env`-word steer were all piped into `grep`, so the prefix changes nothing. Filed
-  2026-08-27 to the gap inbox by the windows-artifact-proof close; promoted 2026-08-27 by the next
-  scope. Also ruled on: lead 2026-09-04 (own-authority). Fifth and SIXTH re-derivations drained at
-  scope 2026-09-06 and 2026-09-08, each discarded, the instrument half kept above.
+  **THE SECOND AND THIRD MEASUREMENTS ARE ANSWERED by the fourth**, as are the fifth and sixth
+  re-derivations discarded at scope; one live residue survives them, the second's falsification of
+  a tempting sub-case — ten `GATE_SDK_VERBOSE=1` calls read as a missing-`env`-word steer were all
+  piped into `grep`, so the prefix changes nothing.
+  Filed 2026-08-27 to the gap inbox by close; promoted 2026-08-27; ruled on by lead 2026-09-04.
 
 
 
@@ -5000,6 +5000,9 @@
   contract.
   **Cost while deferred:** any session needing the population pays a hand sweep that has never
   once been right, and a wrong population silently mis-sizes whatever it is sizing.
+  **Unit set `registry-roster-oracles`, the census half — operator direction, 2026-09-12.** It
+  joins on the composition test: the arm reads the same crate registry the set's other members
+  assert over, and it is the member that turns a hand sweep into an oracle.
   Filed 2026-09-12 by spec into the gap inbox at the lead's direction rather than started, because
   nobody ranked it; drained and promoted at this close.
 
@@ -5032,6 +5035,10 @@
   **Cost while deferred:** two members stay dispatchable and unrun with their causes stated only
   in prose no reader joins, and any future crate-side assertion inherits the same blind spot
   silently.
+  **Unit set `registry-roster-oracles`, the roster-join half — operator direction, 2026-09-12.**
+  It is the member that makes the other three's assertions reachable: nothing today joins the
+  crate's 115-member dispatch to the battery's 113-line registry, so every crate-side assertion
+  the set lands inherits a blind spot until this one does.
   Filed 2026-09-12 by build into the gap inbox rather than fixed, scope-gated intake refusing a
   mid-session initiative; drained and promoted at this close.
 
@@ -5178,6 +5185,10 @@
   been deleted.
   **Cost while deferred:** one diagnostic string plus a fixture pair, unspent, against a wrong
   roster printed at every mistyped arm.
+  **Unit set `registry-roster-oracles`, the arm-roster half — operator direction, 2026-09-12.**
+  The same binary holds two rosters, gates and arms, and this is where it hands a reader the
+  wrong one; the set's other members join rosters that exist, this one separates two that are
+  already conflated at the diagnostic.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on a mistyped arm at its
   own drain; drained and promoted at this iteration's scope.
 
