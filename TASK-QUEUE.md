@@ -1413,9 +1413,14 @@
   lost** — the hook's matcher spans `/`, so every path the coverage reader calls
   uncovered still fires the gate. An adopter gains a red gate, never a missing
   coupling.
-  **Five repair options were measured dead; do not re-buy them** — the
-  enumeration, each one's oracle and the fixture-pair death of the fifth are on
-  `.workflow/survey-record.md`, which is the surface that owns them.
+  **Five repair options were measured dead; do not re-buy them** (validate survey, 2026-09-12):
+  (1) per-descriptor depth enumeration — maintained, and the depths are one fixture's, not an
+  adopter's; (2) a shipped `CANON_KIT_COMMENT_SURFACE` default — the demo still fails, and adding a
+  `CANON_KIT_MANIFEST_FILES` default reds `check-spec-pointer` with 20 dangling pointers; (3) deeper
+  `kit:` expansion — reaches at most 49 of 151, the other 102 being plain-token `.gate`/`.rs`;
+  (4) an escape on provable inexpressibility — expressibility belongs to the corpus, not the
+  declaration; (5) keying the matcher off the filter kind — greens every adopter suite but flips
+  `check-reads-couples`' own `bad/` case and unit cases to exit 0, retiring its central assertion.
   **Blocked rather than rankable:** settling that field's semantics is the only
   thing that can move these 26 roots, so the floor has not moved.
   **Cost while deferred:** the 26 roots stay skipped-and-counted, so the coverage
@@ -2250,12 +2255,12 @@
   fixture pair, plus a ruling on the past-tense form — a sentence deliberately recording a
   *retired* row (both repaired sentences are now exactly that) must not red, so the predicate needs
   a tense or a citation convention to key on. That convention is the design question.
-  **A SECOND live instance was authored 2026-08-24, at this close's eviction review, and it is
-  recorded because it moved this entry out of eviction range.** Ruling the `installer_smoke` row's
-  attribution put a claim about that file's slug column into two governed surfaces at once —
-  `bridged-knob-case-tmp-dir-override-inert`'s body and evidence-kit/SPEC.md §Baseline manifest —
-  so the coupled prose is no longer one repaired sentence but a live pair, and the class now has a
-  reader that a future re-attribution would silently falsify. **No `recurrence:` date joins:** the
+  **A SECOND instance was authored 2026-08-24, at this close's eviction review.** Ruling the
+  `installer_smoke` row's attribution put a claim about that file's slug column into two governed
+  surfaces at once — `bridged-knob-case-tmp-dir-override-inert`'s body and evidence-kit/SPEC.md
+  §Baseline manifest. That pair is no longer live: the entry's body left the queue with its Done
+  move (2026-09-12), so the claim now sits on the SPEC section alone.
+  **No `recurrence:` date joins:** the
   entry names an unbuilt gate rather than a defect, so authoring a new instance of the class it
   would catch is the class recurring, not the finding re-firing.
   **Cost while deferred:** low and slow, but it recurs on exactly the readers who most need the
@@ -5088,6 +5093,127 @@
   session, with a probed remedy on record and unranked.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its
   release-transport read; drained and promoted at this iteration's scope.
+
+- **survey-edges-reader-arrives-after-truncation** [design-pending] [cost: iteration/low] [surface: lifecycle-kit]
+  — the survey record's `edges` field names a reader that can never read it.
+  lifecycle-kit/SPEC.md §The survey record assigns `edges` to "the next boundary's ranking",
+  but that boundary is `--enter-stage scope`, whose built-in truncation runs at the scope
+  template's first step, before the ranking that reads the field. Measured 2026-09-12: the
+  stamp wiped the prior scope's ranking block, and that scope re-derived the same partition
+  before recovering it from git.
+  **Why `[design-pending]`:** the truncation's own ground holds (a carried survey describes a
+  tree the arriving iteration never had), so the choice is between a ranking block's `edges`
+  half surviving the boundary, since an inbound sum ages with the queue rather than the tree,
+  and correcting the SPEC's named reader.
+  **Cost while deferred:** every scope re-derives the inbound sums its predecessor bought.
+  Filed 2026-09-12 by scope, from its ranking survey; drained and promoted 2026-09-13 at close.
+
+- **survey-locator-review-catches-after-loss** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+  — the provenance-never-locator rule for survey-record citations is held by review, and the
+  review arrives after the cited content is gone.
+  lifecycle-kit/SPEC.md §The committed gap inbox refuses a gate on a measured rate of two
+  inbox locators, both caught by one read. A third instance, a survey-record locator on
+  `couples-dynamic-root-resolution`, was caught only after the boundary truncation had
+  destroyed the five dead repair options it pointed at; they were recovered from git and
+  restated on that entry at `registry-roster-oracles`' close.
+  **Why `[design-pending]`:** whether that rate now buys a write-time refusal (for example the
+  scratch-citation scan's corpus widened to queue prose for the two truncated surfaces)
+  reopens a stated refusal, which is not a build call.
+  **Cost while deferred:** a locator on a highly ranked entry loses its content silently at the
+  next boundary.
+  Filed 2026-09-12 by scope, from a truncated locator; drained and promoted 2026-09-13 at close.
+
+- **lead-agent-id-compaction-defense** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+  — nothing tells a lead where a dispatched agent's id stays durable across a compaction.
+  A lead that reads an id back off the compaction summary, which is lossy and can drop a
+  character, gets an unreachable-agent error it can misread as the session being severed.
+  **Premise corrected at the drain:** the filing said lifecycle-kit/templates/lead.md tells a
+  lead to record subagent ids; `grep -n -i "task id\|agent id"` over that file finds no such
+  instruction, so the gap is the absence of one.
+  **Unverified claims carried openly:** that ids are fixed-width, that a listing shows only
+  running subagents, and that a failed send is evidence about the address, not the session.
+  **Why `[design-pending]`:** each claim needs a probe before it becomes a rule, and the home
+  (lead.md or delegation-kit's journal mechanics) is a tiering call.
+  **Cost while deferred:** a lead after compaction can abandon a live agent on a bad address.
+  Filed 2026-09-12 during build, after a compaction; drained and promoted 2026-09-13 at close.
+
+- **entry-history-reads-live-entries-only** [design-pending] [cost: event/low] [surface: queue-kit]
+  — `--emit entry-history` has no reader for an entry that has left the queue.
+  Verified: the arm run on `entry-compression-contract-unenforced` exits 2 with "the arm reads
+  a live entry", as queue-kit/SPEC.md §check-queue-entry-budget specifies. So the canon-kit
+  landing-commit sibling that section's durability clause cites, where prose leaves the queue
+  with the entry at its disposition, has no instrument at all: the same hole one scale up.
+  **Why `[design-pending]`:** a second walk mode searching back for the slug's last live
+  commit needs a bound nothing currently gives it.
+  **Cost while deferred:** what a disposition commit dropped from an entry is recoverable only
+  by hand-walking history.
+  Filed 2026-09-12 by build, outside its envelope; drained and promoted 2026-09-13 at close.
+
+- **config-seam-overrides-harness-pin** [design-pending] [cost: event/low] [surface: gate-sdk]
+  — the consumer config seam overrides a knob value the fixture harness pins, and nothing
+  closes it.
+  `gate-sdk/lib/gate.sh` sources the config seam with plain assignments (:6-20) ahead of its
+  `[[ -v ]]` resolutions (:43-55), and `_gate_knob_kit_emit` re-sources per case (:381-396),
+  so a case or invoker config assigning `GATE_SDK_TMP_DIR` beats the harness's pin.
+  gate-sdk/SPEC.md §run-gate-tests records it as a known hole with no sanction, so nothing
+  depends on it; the pin holds here only because no config in this tree assigns the knob. All
+  three line citations were re-verified at the drain.
+  **Standing intent:** the scope seam decision of 2026-09-12 held a case's sandbox location to
+  be the harness's own fact, never a choice. That is prescriptive, so the hole should close.
+  **Why `[design-pending]`:** closing it changes how the seam treats every knob, through an
+  env-preserving source form or a harness-pin tier above the seam;
+  `config-seam-static-format` would dissolve it as a side effect.
+  **Ranking this is operator-class:** it re-scopes a decision recorded this iteration, so no
+  stage or lead session ranks it.
+  **Cost while deferred:** a consumer config assigning a pinned knob silently redirects
+  fixture scratch into its own tree.
+  Filed 2026-09-12 by build, beside a SPEC re-grounding; promoted unranked 2026-09-13 at close.
+
+- **scan-prompts-grant-test-redirect-blind** [design-pending] [cost: event/low] [surface: guard-kit]
+  — `scan-prompts`' grant test and its reachability verdict disagree on a redirect call.
+  `granted()` runs `segment_granted` over `guard::allow_match`, a plain glob match on the raw
+  segment with no redirect model (`native/src/emit/scan_prompts.rs`, `native/src/guard.rs`).
+  So a committed `Bash(cat >> .tmp/*)` would read a write-redirect call as granted, although
+  guard-kit/SPEC.md rule 17 states no `Bash(...)` entry grants a redirect target. Such a grant
+  was committed once and reverted as inoperative.
+  **Why `[design-pending]`:** the fix is small, a redirect exclusion in `segment_granted` plus
+  a fixture, but it moves calls into the prompting count, a definitional step
+  guard-kit/SPEC.md §scan-prompts records with its pre-change reading.
+  DISTINCT from the Done `prompt-ranking-ungrantable-shape-class`, which partitions rows the
+  grant test already called prompting; this is the grant test upstream of that partition.
+  **Cost while deferred:** latent, since no committed glob has that shape today; the first one
+  would hide its calls from the prompting share.
+  Filed 2026-09-12 by build, from the ranker partition; drained and promoted 2026-09-13 at close.
+
+- **steered-fixture-walk-roots-unverified** [design-pending] [cost: event/low] [surface: gate-sdk]
+  — unit test A verifies nothing about a member whose every fixture case steers off its walk
+  through positionals, so that member's walk-root declaration is unproven.
+  Three members, re-verified at the drain and unchanged by this iteration's registry work:
+  `check-footprint-fresh` declares an empty root set (`native/src/gates/mod.rs`) while its
+  emitter calls `walk::glob_files` at `native/src/emit/footprint.rs:31` (a static
+  `*/SPEC.md` root at `.`) and :90, a false no-walk claim; `check-enforcement-fresh` and
+  `check-value-rollup-fresh` declare `?` citing `find_with_prune` at
+  `native/src/emit/enforcement_map.rs:336`, a chain no case observes. Every `good/` and
+  `bad/` case of all three passes the two positionals that steer off the emitter.
+  **Why `[design-pending]`:** the repair is a default-branch fixture case per member plus
+  `check-footprint-fresh`'s root declaration, and a default-branch case must stage a live
+  emitter corpus inside a fixture, a design call per member.
+  **Cost while deferred:** every no-walk or `?` claim on a steered member is unverifiable, and
+  a changed emitter walk passes unit test A unseen.
+  Filed 2026-09-12 by build, as three bullets; folded and promoted 2026-09-13 at close.
+
+- **packed-knob-projection-filter-form** [design-pending] [cost: event/low] [surface: gate-sdk]
+  — no filter-grammar form reaches a projection out of a knob whose elements pack several
+  fields, so gate-sdk/SPEC.md §check-reads-couples keeps its `projection` ground class.
+  Its one member is `check-spec-embedded-source`'s source-candidate walk over
+  `CANON_KIT_EMBED_LANGS`' `kind|fence-langs|file-globs` triples (`native/src/gates/mod.rs`,
+  the registry's `projection@` ground). The SPEC names the retirement condition, a form
+  reaching such a projection, and no entry owned it.
+  **Why `[design-pending]`:** the same SPEC (§gen-pre-commit) rules a packed knob "not a
+  pattern set", so a new form must be reconciled with that refusal rather than bolted on.
+  **Cost while deferred:** that walk stays `?`, skipped by `check-reads-couples` and outside
+  its coverage assertion.
+  Filed 2026-09-13 by build, beside the projection class; drained and promoted 2026-09-13 at close.
 
 ## Icebox
 

@@ -83,7 +83,8 @@ queue tags whose syntax queue-kit defines:
 
 The **bidirectional rule**: every feature entry in the active queue carries
 a `[spec:]` ref that resolves to a file on disk, and every amendment on
-disk has a queue entry pointing at it. Writing the amendment *is* promoting
+disk has at least one queue entry pointing at it — several entries may pair
+one amendment. Writing the amendment *is* promoting
 the deferred entry — without the pairing, design rationale and ruled-out
 alternatives get re-derived under build pressure. Technical debt needs no
 amendment (it fixes behavior to an existing spec); a debt task that needs a
@@ -1772,7 +1773,9 @@ with the roots read from `gate_kit_roots_rel` (gate-sdk/SPEC.md §lib/gate.sh) s
 the sets cannot enumerate a tree the battery does not. **Tracked is contract, not
 an implementation accident**: the listing comes from `git`, so an *untracked* new
 sibling does not enrol, and a walk of the filesystem would silently widen a set
-another surface reasons about. A new kit, lib or unit
+another surface reasons about. A battery run before `git add` of a new sibling
+therefore reads the old set and can turn red at the commit that stages it, so it
+is run after staging. A new kit, lib or unit
 test enrols with no edit, which is the property a hand correction per stale
 roster would not have. Members are basenames rather than paths because a
 basename matches prose spelling the file kit-relative, repo-relative or bare —

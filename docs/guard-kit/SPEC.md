@@ -985,7 +985,9 @@ that harness exists would be designing against no case.
     The `wait` keeps a harness-backgrounded call alive until the child exits, so
     the completion notification means the producer finished — never that it
     passed: a bare `wait` and `rm -f` both exit 0, so the call's status is 0
-    whatever the producer returned, and its verdict is read off its own output.
+    whatever the producer returned, and its verdict is read off its own output —
+    by its tail, never whole: a producer that redraws a terminal frame per refresh
+    (`gh run watch`) appends a full frame per tick to a redirected log.
     The trailing
     `rm -f` retracts the record at exactly that moment, delegation-kit's *delete
     once exited, and not before* rule taken mechanically rather than remembered.

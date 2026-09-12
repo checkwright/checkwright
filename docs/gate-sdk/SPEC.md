@@ -8256,6 +8256,16 @@ exempts is the inversion *The declaration valve* names as a finding. Recorded
 here because a reader finding an omission with no reason beside it will otherwise
 add one and redden the harness.
 
+**§check-gate-substrate-parity assertion I sees every kit vendored from the first
+leg on.** Its kit-vendored scope is a directory scan, and the harness copies every
+kit's tree before any `smoke/install.sh` registers a gate, so gate-sdk's leg — first,
+with only its own lines in the registry — scopes itself with `GATE_SDK_KIT_DIRS` for
+its own process. A member only a later leg registers (the `check-action-*` gates,
+which site-kit's leg registers beside the only Actions-shaped content any install
+writes) is declared `# unregistered:` by the earlier leg and retracted by the
+registering leg in the same edit, since a declaration beside its own registration
+is itself a red.
+
 **What a ported gate a `smoke/install.sh` does *not* register looks like.** Its
 descriptor vendors with the kit root and nothing dispatches to it, so both binary
 meta-gates read the live registry and report clean, naming the descriptor count
@@ -13802,7 +13812,9 @@ against the source it was built from. `gate_command` dispatches a
 freshness check, so editing a gate's Rust source, skipping the rebuild, and
 committing runs the descriptor-named gate **against the stale binary**, where it
 passes on the old implementation. A gate reporting clean on code that is not what
-is committed is the vacuous green the whole battery exists to refuse.
+is committed is the vacuous green the whole battery exists to refuse. So a battery
+reading taken while this gate is red is rebuilt and re-read, never interpreted:
+every other ported member in that run executed the same stale binary.
 
 **git is the hasher, and that is the ruling the design turns on.** Hashing is the
 classic place two implementations drift — a Rust digest and a shell digest over
