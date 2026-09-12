@@ -4551,6 +4551,14 @@
   unranked: a consumer-side trigger-extension knob the hook emitter reads, a `couples=` token that
   resolves a knob the way `kit:<glob>` resolves the kit set, or per-consumer descriptor shadowing.
   Picking one at a drain would settle a kit/consumer seam question by accident.
+  **Seam ruled at scope 2026-09-12, narrowing those three to one without authoring the amendment.**
+  Mechanism, kit-side: the `couples=` grammar extension and its resolver. Consumer config: the
+  widened corpus, which `CANON_KIT_MANIFEST_FILES` already holds — so the descriptor names the
+  knob and the knob's value stays the consumer's. That forecloses the other two rather than
+  ranking them: a second knob listing the same members is a second source for one roster
+  (derivation-first), and per-consumer descriptor shadowing hands every adopter eleven copies to
+  drift. No file name enters a kit literal either way, which is the seam's own requirement and not
+  a preference. What stays open for `spec` is the token's spelling and its resolution order.
   **Why NOT icebox:** the trigger is live and this iteration made it materially more expensive —
   close now holds ruling-record repair authority, so `TRAJECTORY.md` became a surface close writes
   routinely, and a routine writer of a file no doc gate fires on is the worst case for the class.
