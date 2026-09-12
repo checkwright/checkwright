@@ -122,11 +122,23 @@ would red it at this amendment's own authoring commit — before delta 1 exists.
 token is shown in prose and in bare `couples=` values instead. Recorded so a later
 reader does not read the absent example as an omission.
 
-### (4) A descriptor names every corpus knob its own walks are declared under
+### (4) A descriptor names every corpus knob its own walks are bounded by
 
-The obligation is a **rule over the declarations**, not a roster of members: wherever
-`SPEC-reads-root-default.md` delta 2 declares a walk under `knob:<NAME>`, that
-member's `couples=` gains `knob:<NAME>` {design-bearing}.
+The obligation is a **rule over the walks**, not a roster of members and not a rule
+over declarations: wherever a gate performs a walk whose filter argument takes its
+value from knob `<NAME>`, that gate's `couples=` carries `knob:<NAME>`
+{design-bearing}.
+
+**Keyed on the walk rather than on the sibling's declaration, and that is a correction
+with a reason.** An earlier draft keyed it on `SPEC-reads-root-default.md` delta 2's
+declarations, which made it inherit that delta's blind spots: a walk can be
+knob-bounded and still have no declarable root, and such a member then has no producer
+path to its token at all. `check-docs-cmd`, `check-md-refs` and
+`check-spec-fence-balance` are the attested case — each scans
+`CANON_KIT_MANIFEST_FILES` through a **hardcoded** root, so a declaration-keyed rule
+never reaches them however correct it is. Keyed on the filter argument the rule reaches
+them directly, with no dependency on the sibling's predicate landing.
+**A declaration is a proxy for a walk; the walk is the thing.**
 
 **This began as a roster of eleven and the roster was the defect.** An enumerated
 list of members is a maintained copy of a set the declarations already determine, which
@@ -139,29 +151,30 @@ Stating the rule closes that by construction; an audit of a roster can only clos
 members the roster happens to name.
 
 **Which knobs the rule reaches, measured rather than enumerated as policy.** Across
-the declarations delta 2 produces, seven distinct knobs appear:
+the walks this tree performs, eight distinct knobs appear:
 `CANON_KIT_MANIFEST_FILES` (eight members), `CANON_KIT_AMENDMENT_GLOB` (three),
 `CANON_KIT_SPEC_NAME` (two), `CANON_KIT_MEASURED_SURFACE_GLOBS` (two),
 `CANON_KIT_PROSE_TELL_GLOBS`, `QUEUE_KIT_PROSE_SURFACE_GLOBS`, and
-`CANON_KIT_COMMENT_SURFACE` (the runtime-selected cohort's configured branch). That
-count is this amendment's measurement and not part of the rule; a knob added later is
-reached by the rule without an edit here.
+`CANON_KIT_COMMENT_SURFACE` (the runtime-selected cohort's configured branch), and
+`CANON_KIT_DUP_SURFACES`. That enumeration is this amendment's **dated measurement and
+no part of the rule**; a knob added later is reached without an edit here, and a
+drifted count is stale measurement rather than a broken obligation.
 
 **The one judgement the rule must exclude, stated because it is the error it invites.**
 A knob that **narrows** a corpus is never a couples token. `CANON_KIT_MDREF_EXCLUDE`,
 `CANON_KIT_INSTALL_CLAIM_EXCLUDE` and their siblings remove members from a walk's set,
 so coupling them would trigger the gate on paths it deliberately does not scan — the
-inverse of this amendment's purpose. The rule reads a walk's **bounding** knob, which
-is the one delta 2's declaration names; an exclude knob never appears in a declaration
-and so never reaches the rule. This is why the delta is design-bearing rather than a
-sweep: the set is derived, but telling a bounding knob from an excluding one is a
-reading of each member.
+inverse of this amendment's purpose. The rule reads the knob a walk's **filter
+argument** takes its value from; an exclude knob is applied after that filter and is
+never a walk's bounding knob, which was checked against every `*_EXCLUDE` knob in the
+tree. This is why the delta is design-bearing rather than a sweep: the set is derived,
+but telling a bounding knob from an excluding one is a reading of each walk.
 
 **The appended token never rewrites an existing one**, and the descriptor set's shape
-makes that worth stating. Of the eight `CANON_KIT_MANIFEST_FILES` members plus the
-three manifest-corpus members that carry no literal-default root
-(`check-docs-cmd`, `check-md-refs`, `check-spec-fence-balance` — eleven in total for
-that knob), four carry exactly `couples=*SPEC*.md,*README.md,CLAUDE.md`
+makes that worth stating. Eleven members scan the `CANON_KIT_MANIFEST_FILES` corpus —
+eight through a statically resolvable root and three (`check-docs-cmd`,
+`check-md-refs`, `check-spec-fence-balance`) through a hardcoded one. Of those eleven,
+four carry exactly `couples=*SPEC*.md,*README.md,CLAUDE.md`
 (`check-manifest-count`, `check-manifest-temporal`, `check-md-refs`,
 `check-knob-citation`) and the other seven are supersets carrying further couples of
 their own — `check-spec-fence-balance` adds `TASK-QUEUE.md`, `check-spec-pointer` adds
