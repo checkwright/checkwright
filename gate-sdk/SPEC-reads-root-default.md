@@ -83,26 +83,43 @@ trigger the field exists to compute. So the root carries the optional second fie
 present grammar has no satisfying value for part of the corpus this amendment asserts
 over.**
 
-**The field's value space, and the one addition this delta makes.** A walk's file set
-is bounded by its root and its filter, and the field is **optional**, so three of the
-four cases below already exist — only `lit:` is new:
+**The field's value space has two axes, and conflating them is what the present
+grammar does.** A walk's file set is bounded by its root, by what it *selects*, and by
+how that selection is *matched*. The field today carries only a source (a bare knob
+name) and leaves the matching implicit, which is why it is read as a single basename
+pattern. It becomes `<kind>:<source>`:
+
+- **`<source>`** — where the selection comes from. `knob:<NAME>`, the value of a kit
+  knob, whose ground is §check-reads-couples' own: carrying the name rather than the
+  value keeps the value single-sourced and reuses the bridge's resolution path. Or
+  `lit:<comma-list>`, a **kit-generic literal** the crate owns at the walk site —
+  the form the corpus forced (below).
+- **`<kind>`** — how the member's own walker matches that selection: `name:` for a
+  literal basename, `glob:` for a path glob, `ext:` for an extension list. **The kind
+  is mandatory**, and the reason is measured rather than argued: the reader stands in
+  for a walk it cannot see, so the walker's discipline travels on the field or
+  nowhere. A kind-blind reader matching every selection as one basename pattern
+  produced roughly **nine hundred** findings that a kind-aware reader does not.
+
+And two cases sit outside the field entirely:
 
 - **The field omitted** — the walk is **unfiltered**, which §check-reads-couples
-  already rules ("a bare root's enumeration is unfiltered"). This is the base form and
-  it is already correct for a walk that filters nothing; `check-deferred-board-tags`
-  takes it, listing one directory level with no pattern at all.
-- **`knob:<NAME>`** — the filter is a knob's value. Today's form, whose bare spelling
-  keeps its present meaning unchanged; the tag is admitted beside it so a reader of
-  either sibling field meets one vocabulary. Its ground is §check-reads-couples' own:
-  carrying the name rather than the value keeps the value single-sourced and reuses
-  the resolution path the bridge already owns.
-- **`lit:<comma-list>`** — the filter is a **kit-generic literal** the crate owns at
-  the walk site. **The only addition**, and the one the corpus forced.
+  already rules ("a bare root's enumeration is unfiltered"). The base form, correct
+  for a walk that filters nothing.
 - **No declared root at all** — the member performs no walk in the analyzed sense.
-  `git ls-files` enumeration and single-file reads are already outside that class, so a
-  member doing only those has no root to declare, and `?` has been absorbing the case
-  while meaning something else. Already practiced: `check-root-tiering` carries the
-  root-argument idiom and correctly declares an empty root set.
+  `git ls-files` enumeration, single-file reads and a non-recursive directory listing
+  (delta 7) are outside that class, so a member doing only those has no root to
+  declare, and `?` has been absorbing the case while meaning something else. Already
+  practiced: `check-root-tiering` carries the root-argument idiom and correctly
+  declares an empty root set.
+
+**The two untagged declarations in the tree are migrated rather than defaulted.**
+`check-stage-entry`'s two filter knobs are literal basenames, so they become
+`name:knob:…` and nothing about their verdict changes. A *defaulting* kind was
+refused: it would hand an author who omits it the basename semantics silently, which
+is precisely the nine-hundred-finding wrongness above, and a silent wrong default is
+worse than a migration of two sites. No name is retired — every knob name survives
+and what changes is the form it sits in (§Retired spellings).
 
 **An unfiltered bare root can over-demand, and the absorption route already exists.**
 Declaring root `.` with no filter demands that couples cover every tracked path the
@@ -187,8 +204,17 @@ spelling of one idiom surfaced. Read delta 1's property; treat 29 as a lower bou
 **Classes by the one mechanical test that needs no judgement** — what the walk's
 filter argument is, followed one hop through a shared enumeration helper:
 
-- **Knob-bounded**, each naming the knob delta 2 wants. Eight reach
-  `CANON_KIT_MANIFEST_FILES`: six directly through `spec::manifest_files*`
+- **Knob-bounded**, each naming the knob delta 2 wants — and **a member may need
+  several declarations, because a helper may be bounded by several knobs across
+  several branches.** `spec::manifest_files` (`spec.rs:199-229`) is the case that
+  multiplies: `CANON_KIT_MANIFEST_FILES` globs when non-empty, **else** a kit-literal
+  default branch (`canonical_specs` on `CANON_KIT_SPEC_NAME`, plus `find_named` for
+  `README.md` and `CLAUDE.md`), **plus** `CANON_KIT_PROSE_SURFACE_GLOBS` additively and
+  always. So each manifest-family member needs roughly four declarations under delta 2's
+  twice-declared rule rather than one, and `CANON_KIT_PROSE_SURFACE_GLOBS` is a bounding
+  knob this measurement omitted. The rule reached it; the figure did not — which is the
+  third time a hand figure under-read a rule that was already correct.
+  Eight reach `CANON_KIT_MANIFEST_FILES`: six directly through `spec::manifest_files*`
   (`check-manifest-count`, `check-manifest-temporal`, `check-knob-citation`,
   `check-prose-enum`, `check-spec-pointer`, `check-tracking-claim`) and two through
   `spec::governed_docs`, which calls it (`check-install-claim`,
@@ -201,8 +227,12 @@ filter argument is, followed one hop through a shared enumeration helper:
   `check-measured-claim` and `check-unmarked-claim` on
   `CANON_KIT_MEASURED_SURFACE_GLOBS`, `check-prose-tells` on
   `CANON_KIT_PROSE_TELL_GLOBS`, `check-surface-duplication` on
-  `CANON_KIT_DUP_SURFACES` (zero-hop), and `check-amendment-queue` on
-  `CANON_KIT_AMENDMENT_GLOB` through `spec::amendments`.
+  **`CANON_KIT_SPEC_NAME`** through `spec::canonical_specs_sorted`, and
+  `check-amendment-queue` on `CANON_KIT_AMENDMENT_GLOB` through `spec::amendments`.
+  *(That attribution is corrected from `CANON_KIT_DUP_SURFACES`, which feeds
+  single-file reads at `surface_duplication.rs:281-285` and is outside the walk class
+  — the mechanical test decides, and the earlier figure was read off the knob array
+  rather than off the walk.)*
 - **Kit-literal-bounded**, the set with no knob to name and therefore the set that
   made delta 2's literal form necessary: the four `check-action-*` members on
   `["yml","yaml"]` and `check-graph` on `["md"]`.
@@ -304,7 +334,251 @@ rows that have already accreted across many closes. It does not reach appending 
 new row, which every close already does; this row will meet that question later,
 like every other row, and does not wait on it.
 
-## Producers and consumers
+### (5) `canonical_specs` prunes the generated docs mirror
+
+The canonical-spec finder excludes the generated `docs/<kit>/` mirror, so three prose
+gates stop grading output no author can fix at the file {design-bearing}.
+
+**Why this is a prerequisite and not a bystander.** It is a latent defect independent
+of this amendment — `canonical_specs` filters `templates/` and prunes kit roots but
+never excludes `docs/`, so it returns the mirror pages along with the real specs. It
+becomes a prerequisite because delta 1's refusal gives these members a declared root
+for the first time, and their first live coverage run surfaces it. **The assertion is
+correct and its first run lit up a pre-existing defect in a mechanism it asserts
+over** — which is neither a coverage gap the declaration failed to name nor something
+deferrable beside a banked unit, since a red gate is fixed and never bypassed.
+
+**The reasoning is already this tree's, stated for a sibling knob.**
+`scripts/canon-config.sh:97` rules the same exclusion for `CANON_KIT_PROSE_TELL_GLOBS`:
+*"the single-level `docs/*.md` glob deliberately excludes the generated kit mirror
+(`docs/<kit>/`) and the immutable dated posts (`docs/posts/`), since a prose gate
+forcing edits to generated or immutable pages contradicts them"*. A prose gate grading
+a generated page is unfixable at the file — the fix is to the source and the
+regeneration — so the finding can only be absorbed or ignored. That ground is the
+consumer's for its own knob; what this delta does is apply it inside the **kit
+mechanism**, where the mirror is excluded because it is generated, not because of any
+consumer's editorial scope. No consumer path enters a kit literal: the exclusion is of
+the mirror the kit's own emitter writes.
+
+**Measured behaviourally by toggling the prune**, not inferred:
+`check-spec-dod-singleton` 22 → 11 spec files, `check-spec-derivable-section` 22 → 11,
+`check-spec-embedded-source` 23 → 12 — exactly the eleven mirror pages gone from each.
+
+**Every reader of the narrowed corpus, with its red condition** — this is a corpus
+**narrowing**, so causal-completeness point 5 binds and the verdicts are enumerated
+rather than cleared by inspection. Four members read `canonical_specs` or
+`canonical_specs_sorted`:
+
+- `check-spec-dod-singleton` (`spec_dod_singleton.rs:22`) — **reds on an exact count**,
+  `"exactly-one" => n != 1`, and an exact count is one of the three shapes point 5 names
+  as non-monotone. It is nevertheless safe here, and the reason is that the count is
+  **per spec file**, not over the corpus: dropping a file drops its own check, so the
+  violation set can only shrink. Stated explicitly because the shape is the warned one
+  and a reader who stops at the shape would block.
+- `check-spec-derivable-section` (`spec_derivable_section.rs:37`) — reds on finding a
+  banned heading. Monotone.
+- `check-spec-embedded-source` (`spec_embedded_source.rs:168`) — reds on an embedded
+  source block. Monotone.
+- `check-surface-duplication` (`surface_duplication.rs:298`) — reds on a foreign
+  definition in a scanned surface. Monotone, and the narrowing is a correctness gain on
+  its own axis: the mirror is a byte copy of a kit SPEC, so scanning both made every
+  mirrored definition a duplicate by construction.
+
+No reader holds a minimum, a coverage floor, or reds on finding none over this corpus,
+which is the other half of point 5's test and the half that would have blocked.
+
+### (6) `comment_surface`'s knob branch honours every arm its default branch does
+
+The configured branch returns early past five narrowing arms, so setting the knob
+silently changes which files four gates scan {design-bearing}.
+
+`spec.rs:237-243` returns `glob_files(root, &globs)` directly when
+`CANON_KIT_COMMENT_SURFACE` is set, while the default branch below it applies five
+further narrowings. The asymmetry means the knob is not a corpus *selector* but a
+corpus *replacement* with silently different semantics. The five arms:
+
+1. the `with_templates` / `under_templates` filter (`spec.rs:246`);
+2. `prune_kit_roots` (`spec.rs:251`);
+3. the byte sort (`spec.rs:255`);
+4. **`workflow_tier`** (`spec.rs:256`) — the serious one on its own terms.
+   Configuring the knob today silently drops the entire `.workflow/` tracked tier from
+   `check-spec-pointer`, whose own `spec:` comment at `spec.rs:260-262` says the
+   section requires it;
+5. **the walker's own prune set.** The default branch uses `find_files`, which prunes
+   `GATE_PRUNE_DIRS`; the knob branch uses `glob_files`, which is bash-faithful and
+   prunes nothing.
+
+**Arm 5 is the cause, and the attribution is worth recording because it was wrong
+once.** The directory-shape explosion this asymmetry produces was attributed to arm 2,
+`prune_kit_roots`; build's measurement corrects it — arm 2 is a **no-op on this tree**
+because `CANON_KIT_SCAN_KIT_ROOTS=1`, so it cannot have been the cause. Arm 2 is
+still genuinely missing and still fixed here; it simply was not what the symptom came
+from. Recorded because a later reader inheriting the first attribution would fix the
+wrong arm and see no change.
+
+**The corpus equivalence is verified by the gates' own reports, not reasoned.** With
+all five arms honoured, `check-todo-task-liveness` reports **421 governed sources** and
+`check-spec-pointer` **3867 directive pointers**, identical with the knob set and
+unset. So this delta changes **no gate's corpus on this tree**, and nothing about it is
+owed to the operator as a behaviour change.
+
+**The consumer value ships as it is, and the fragility is stated rather than
+absorbed.** The value that achieves equivalence is depth-enumerated per extension —
+five depths × `sh|gate|rs`, fifteen globs — deliberately **not** `**`, because the
+filter matcher supports `**` and the **couples** matcher does not, so a `**` value
+would create a demand its own token could not cover. Three things follow:
+
+- It is **consumer config** in `scripts/canon-config.sh`, so the choice is this tree's
+  and no kit literal carries it.
+- The fragility is real: a depth-bounded enumeration is a maintained copy of "any
+  depth", and a source six levels deep escapes it **silently**. The corpus is depth
+  2–5, so there is one level of headroom.
+- **It is not a new fragility and that is why it ships.** This tree already reasons the
+  same way for the same mechanism: `CANON_KIT_MANIFEST_FILES`' own note
+  (`scripts/canon-config.sh:21`) records "single-level globs skip the `gate-tests/`
+  fixtures the finder pruned". Depth-bounded globbing is an established, reasoned
+  practice here, so treating this one value as exceptional would be arbitrary. What is
+  owed is a disposition on the **class**, not on the value, and it is filed rather
+  than flagged.
+
+**The matcher asymmetry underneath it is routed, not settled here.** That the filter
+matcher and the couples matcher disagree on `**` is one more face of
+`couples-glob-semantics-unowned`'s open question — *one semantics with stated
+exceptions, or a per-reader meaning declared per reader*. It belongs to that entry and
+this amendment settles nothing on its behalf.
+
+### (7) The analyzed class's `recursive` discriminator is explicit
+
+`§check-reads-couples`' invariant already says *recursive* walk, and the text must say
+what that excludes, because a reader took the boundary for a ruling {design-bearing}.
+
+The invariant reads "every **statically resolvable recursive walk**", and the section's
+ground for excluding `git ls-files` is "because it is **not a walk**" — a statement
+about mechanism, not about intent. `walk::list_dir` is a single `fs::read_dir` over
+immediate children, and its own `spec:` comment says so, so it is outside the analyzed
+class by the discriminator already written. This delta makes that explicit rather than
+changing it.
+
+**The evidence that the text under-states its own discriminator is that a careful
+reader read the exclusion as a boundary *move*.** That is the defect: a discriminator
+carried only by one adjective in an invariant and one parenthetical about a different
+mechanism is not stated, whatever it entails.
+
+**The discriminator lands in both places or neither**, which is where the tension
+actually sat. `list_dir` was in the walk-entry roster the refusal analyzer reads and
+in the recorder at `walk.rs:443`, so a member whose only listing is non-recursive
+redded the `&[]` that is now its correct declaration. The same test goes in both:
+`list_dir` leaves the refusal's root-entry roster and leaves the recorder.
+
+**Red conditions under this narrowing** (point 5). Narrowing the recorder's observed
+set narrows assertion A's input, and assertion A reds on **observed roots not a subset
+of declared** — monotone, so fewer observations can only remove violations. The
+non-monotone risk is the inverse and it is named: two members move to `&[]`
+(`check-deferred-board-tags`, `check-workflow-tiering`), and if either performed a
+*recursive* walk as well, `&[]` would be a false declaration — which assertion A itself
+catches, and does not, across 701 crate tests. Assertion B (no filesystem-walk API
+outside `walk.rs`) is untouched: `list_dir` stays in `walk.rs` and stays sanctioned;
+only its membership in the recursive class changes.
+
+### (8) A walk's declaration carries its narrowing
+
+A walk has three dimensions and the declaration has forms for two, so the resolver
+demands coverage of files the walk provably does not read {design-bearing}.
+
+**The blocker moved rather than shrank, and this is where it landed.** After delta 5
+the walk no longer reads the mirror, and thirty-three findings still stand, because the
+coverage demand is computed from the **declared filter over the declared root**, never
+from the walk: `name:knob:CANON_KIT_SPEC_NAME` resolves to basename `SPEC.md` over root
+`.` and selects every tracked `SPEC.md`, the mirror included. The finding text says so
+verbatim. This is no longer a seam question and no longer a couples gap — it is the
+resolver **over-approximating**.
+
+**Both absorptions are closed, so only precision is live.** §check-reads-couples offers
+exactly two: the covering sibling glob, which here means a `docs/` token in a canon-kit
+descriptor and is what the seam forecloses; and `# reads-couples-exempt:`, which the
+section deliberately withholds from a compiled member — *"a port ends this assertion by
+answering it, never by opting out of it"*. Neither is available, and an assertion
+shipping with a documented false-positive class and no disposition is the
+flagged-and-skipped shape the gap-disposition rule refuses.
+
+**The answer: a walk's root declaration carries its prune set, and the resolver honours
+it exactly as it already honours the global one.** A walk is bounded by three things —
+where it starts, where it refuses to descend, and which of the files it reaches it
+selects. The declaration has a form for the first and, after delta 2, a precise one for
+the third. It has none for the second, and the second is not a new dimension: the
+resolver **already models it**, because §check-reads-couples rules that a reported root
+"is filtered by the prune list exactly as a `gate_find` walk is", with the stated ground
+that a substrate honouring less "would scan a different tree than the shell". An
+assertion demanding coverage of files its own walk skips is that identical failure. What
+is missing is only that the prune set is sourced from two global knobs and a member
+cannot declare its own.
+
+**This is genuinely distinct from the fifth filter case delta 2 refuses, and the
+distinction is the dimension rather than the syntax.** Delta 2 refused a further
+*filter* form — another way of saying which files are selected — on the ground that the
+over-demand it was invoked for had an existing absorption. A prune says which subtrees
+are never entered. Spelling a prune as a filter-with-exclusion would put two dimensions
+in one field and leave the reader unable to tell a selection from a refusal, which is
+the same conflation delta 2 just split apart on the kind axis. **The empirical check
+settles it:** every narrowing in `canonical_specs` is a directory prune and none is a
+file-level exclusion — `under_templates`, `prune_kit_roots`, and delta 5's mirror
+exclusion. The form the corpus needs is a prune list, and the corpus says so.
+
+**The seam holds because the resolver learns nothing about canon-kit.** gate-sdk's
+resolver must not know that `canonical_specs` prunes `docs/`; the member declares it,
+and the resolver honours whatever prune a member declares exactly as it honours
+whatever filter a member declares. The kit boundary is not crossed, which is what
+reshapes build's coupling objection rather than defeating it.
+
+**The declaration is held to executed behaviour, and that is not optional.** A declared
+prune *narrows* the demand, so a member declaring a prune it does not apply would hide
+a real coverage gap — the precise failure this gate exists to catch, and the inverse of
+the root declaration's risk. The prune therefore rides the same mechanism the roots
+do: the sanctioned walk records the prune set it was invoked with, as it already records
+the root at `walk.rs:443,496,661`, and assertion A's subset test extends to it. The
+recorder is `#[cfg(test)]`-scoped and assertion A is a unit test, so this is the
+existing *registry-data-held-to-executed-behaviour* shape and not new machinery. **An
+unrecorded prune declaration is refused**: without the recording the form would be a
+self-certified narrowing, which is the unbound self-declaration §check-reads-couples
+exists to refuse.
+
+**The honest limit, stated rather than discovered.** This form reaches a narrowing
+expressible as a directory prune. A helper that narrowed by something else — a content
+predicate, a per-file exclusion list — is not covered, and the right answer there is a
+new question rather than a stretched prune. None exists in the corpus today; the limit
+is recorded so its first instance is recognised as new rather than forced into this
+form.
+
+### (9) The filter field's resolution is specified, not left to its one reader
+
+Three resolution facts the field's reader needs are unstated, and each produces a wrong
+verdict rather than a refusal {design-bearing}.
+
+The field today is read as a single `-name` pattern against the basename
+(`reads_couples.rs:209-214`), which is correct for the two scalar knobs that were its
+whole population and wrong for every array-valued path-glob knob delta 2 now puts
+through it. Three facts become contract:
+
+- **The value is tab-split and matched the way the member's own walker matches it.**
+  The bridge joins a knob's members with a tab, so a fifteen-glob knob arrives as one
+  string and matching it whole against a basename selects nothing. This is delta 2's
+  *"the interpretation is the walker's, never the field's"* made operational, and the
+  kind axis is what carries the discipline.
+- **An indexed knob resolves to its elements; a keyed knob resolves to its values.**
+  `check-evidence-baseline` is the live instance — a statically resolvable
+  `Path::new(".")` root at `evidence_baseline.rs:159` whose filter is
+  `EVIDENCE_KIT_SCENARIO_GLOBS`, read through `walk::knob_map`. This is mechanics of
+  the existing form rather than a further case, and it does **not** reopen delta 3's
+  recorded refusal: `CANON_KIT_EMBED_LANGS` packs `kind|fence-langs|file-globs` triples
+  into each *element*, so its pattern is a bespoke projection of a value rather than the
+  value, and that walk keeps `?`.
+- **"Unresolvable", "no filter" and "resolved empty" are three verdicts, not two.**
+  `reads_couples.rs:209` branches on `if !namepat.is_empty()`, so a declared filter
+  knob a consumer left empty reads as **unfiltered** and the whole root is demanded —
+  the widest possible demand produced by the narrowest possible configuration. An
+  absent bridge variable is already a refusal by the bridge's contract; a resolved-empty
+  filter must select **nothing**, because that is what the member's own walk does with
+  it. Sharing a verdict with "no filter" inverts the demand.
 
 - **The refusal of `?` for a literal-default root** (delta 1).
   - *Producer:* a crate-side assertion over the gate modules, run in the
@@ -350,6 +624,50 @@ like every other row, and does not wait on it.
   - *Reader of each field:* `due:` and `last:` are read by that sub-step and by
     `check-close-surfaces`' roster assertions; the row carries no field those two
     do not read.
+- **The pruned mirror** (delta 5).
+  - *Producer:* `spec::canonical_specs`, on every invocation — the shipped
+    configuration, not a test-only path.
+  - *Consumers:* the four members that call it or its sorted spelling, each at its
+    per-file assertion loop: `check-spec-dod-singleton`,
+    `check-spec-derivable-section`, `check-spec-embedded-source`,
+    `check-surface-duplication`.
+  - *Red conditions:* enumerated in the delta, because this is a narrowing. One is an
+    exact count and is cleared on the ground that the count is per-file.
+- **The symmetrical `comment_surface`** (delta 6).
+  - *Producer:* `spec::comment_surface`'s configured branch, reached whenever
+    `CANON_KIT_COMMENT_SURFACE` is non-empty — which no deployed configuration sets
+    today, so the delta's own first act is to set it and prove the corpus unchanged.
+  - *Consumers:* `check-comment-tier`, `check-spec-pointer`,
+    `check-deprecation-task`, `check-todo-task-liveness`.
+  - *Reader of the equivalence claim:* the two gates' own report lines — 421 governed
+    sources and 3867 directive pointers — read at the knob-set and knob-unset runs.
+    That pair is the delta's oracle and the reason nothing is owed to the operator.
+- **The `recursive` discriminator** (delta 7).
+  - *Producer:* the discriminator itself, applied in two places that must agree — the
+    refusal analyzer's root-entry roster and the recorder in `walk.rs`.
+  - *Consumer:* assertion A, at the fixture run, whose observed set narrows.
+  - *Readers:* `check-deferred-board-tags` and `check-workflow-tiering`, whose `&[]`
+    declarations become correct rather than refused.
+- **The declared prune set** (delta 8).
+  - *Producer:* the member's own registry root declaration, reported by the `--reads`
+    arm alongside the root and filter it already reports.
+  - *Consumer:* the coverage assertion's per-root loop, which subtracts the declared
+    prune from the root's tracked enumeration before demanding coverage — exactly where
+    it already subtracts the global prune set.
+  - *Reader that keeps it honest:* assertion A, extended to prunes. The sanctioned walk
+    records the prune set it was invoked with, as it records the root, and a declared
+    prune may name nothing the walk did not apply. **Without that reader the form is
+    refused**, because a self-certified narrowing is the unbound self-declaration the
+    section exists to refuse.
+  - *Field with no reader:* none. The prune is read at one transition by one assertion
+    and held by one test.
+- **The specified filter resolution** (delta 9).
+  - *Producer:* the bridge, which already joins knob members with a tab and already
+    distinguishes an indexed knob from a keyed one.
+  - *Consumer:* the filter field's sole reader, the per-root coverage loop.
+  - *Readers of the three verdicts:* that same loop. "Unresolvable" is the bridge's
+    existing refusal; "no filter" is the omitted field; "resolved empty" selects
+    nothing. Each carries a distinct demand, which is the point of separating them.
 - **Red conditions under a narrowing** (causal-completeness point 5). **No delta
   narrows a corpus** — delta 1 removes an available answer, deltas 2 and 3 move
   roots from unanalyzed to analyzed and widen couples, delta 4 adds a row. The
@@ -419,6 +737,40 @@ like every other row, and does not wait on it.
 - `.claude/commands/close.md`, the Audit-roster review sub-step (delta 4). No text
   change is expected — the step already reads every row — and the target is listed
   so build confirms rather than assumes. Not yet applied.
+- `canon-kit/SPEC.md` §lib/spec.sh, the `spec_canonical_specs` contract (delta 5). The
+  finder's corpus gains the generated-mirror exclusion and the ground for it — a prose
+  gate grading generated output is unfixable at the file. Not yet applied.
+- `canon-kit/SPEC.md` §lib/spec.sh, the `_spec_comment_surface` contract (delta 6). The
+  configured branch must state that it honours every narrowing the default branch
+  applies, and the five arms are named so a later reader can check rather than trust.
+  Not yet applied.
+- `canon-kit/SPEC.md` §check-spec-pointer (delta 6). Its own `spec:` comment already
+  says the section requires the `.workflow/` tracked tier; the section gains the
+  statement that the tier survives a configured `CANON_KIT_COMMENT_SURFACE`, which
+  before this change it did not. Not yet applied.
+- `gate-sdk/SPEC.md` §check-reads-couples, the tractable-class paragraph's **`recursive`
+  adjective** (delta 7). It gains the mechanism test it already implies: a single-level
+  directory listing is not a recursive walk, so it is outside the analyzed class beside
+  `git ls-files` enumeration and single-file reads. Listed separately from delta 1's
+  unit-of-account target because this one is about the class's *membership* rather than
+  its granularity. Not yet applied.
+- `gate-sdk/SPEC.md` §check-reads-couples, the declared-root field's grammar (deltas 2,
+  8 and 9). It gains the `<kind>:<source>` filter grammar, the declared **prune** as the
+  walk's third dimension, the tab-split and indexed-versus-keyed resolution, and the
+  three-way unresolvable/no-filter/resolved-empty verdict. Not yet applied.
+- `gate-sdk/SPEC.md` §check-reads-couples, *"A reported root is filtered by the prune
+  list exactly as a `gate_find` walk is"* (delta 8). The sentence is the precedent delta
+  8 extends, and it gains the per-member prune beside the two global knobs, with the
+  same stated ground — a substrate honouring less would scan a different tree.
+  Not yet applied.
+- `gate-sdk/SPEC.md` §Meta-gate conservation for the binary substrate, assertion A
+  (deltas 7 and 8). Its observed set narrows by the recursive discriminator and widens
+  by the recorded prune set, and both are properties of what it holds honest rather
+  than of its own rule. Not yet applied.
+- `scripts/canon-config.sh` (delta 6) — the consumer's `CANON_KIT_COMMENT_SURFACE` value
+  and the comment carrying its depth-enumeration ground and the stated fragility. A
+  consumer surface, so the value is this tree's and the delta states only that it must
+  carry its reasoning. Not yet applied.
 - `scripts/git-hooks/pre-commit` and `docs/check-graph.html` (deltas 1 and 3) — the
   generated projections, stale on a new gate and on every couples edit. Regenerate
   with `bash gate-sdk/bin/gen-pre-commit.sh --write`, then
@@ -432,13 +784,18 @@ like every other row, and does not wait on it.
 
 ## Retired spellings
 
-- None — no delta retires a name, and `?` is the one that reads as though it might.
-  It keeps its spelling, its meaning in the `--reads` grammar, and every walk whose
-  root is genuinely unresolvable declares it correctly; what delta 1 narrows is its *availability
-  for one shape*, which is a predicate rather than a spelling. Declaring it here
-  would be false in both directions: it would assert a removal that did not happen,
-  and it would put a one-character token through a whole-tree re-grep whose every
-  hit is an unrelated use.
+- None — no delta retires a name, and three things read as though they might.
+  **`?`** keeps its spelling, its meaning in the `--reads` grammar, and every walk whose
+  root is genuinely unresolvable declares it correctly; what delta 1 narrows is its
+  *availability for one shape*, which is a predicate rather than a spelling. Declaring
+  it would be false in both directions — asserting a removal that did not happen, and
+  putting a one-character token through a whole-tree re-grep whose every hit is an
+  unrelated use. **The filter field's untagged form** (delta 2) is a *value grammar*,
+  not a name: every knob name that sat in it survives, in the same field, under a
+  mandatory kind, and the two migrated sites are `check-stage-entry`'s.
+  **`list_dir`** (delta 7) keeps its spelling, its home in `walk.rs` and its sanction
+  under assertion B; only its membership in the recursive class changes, and a
+  membership is not a spelling either.
 
 ## Definition of Done
 
@@ -470,6 +827,21 @@ like every other row, and does not wait on it.
 - [ ] **The sibling lands with it** — `SPEC-knob-token.md`'s token is what
       makes the eleven canon-kit reds legally satisfiable. Neither amendment's
       merge leaves the tree green alone.
+- [ ] **Each prerequisite is proved by its own oracle, not by the battery going
+      green** — delta 5 by toggling the prune (22 → 11, 22 → 11, 23 → 12 spec files);
+      delta 6 by the two report lines identical knob-set and knob-unset (421 governed
+      sources, 3867 directive pointers); delta 7 by assertions A and B passing unchanged
+      with two members at `&[]`. A battery that is green because a corpus silently
+      shrank is the failure these three oracles exist to exclude.
+- [ ] **Delta 8's prune declaration does not land without its recorder** — the prune is
+      held to executed behaviour by assertion A or it is not admitted. A declared prune
+      narrows the demand, so an unheld one hides exactly the coverage gap this gate
+      exists to catch, and it is the one form in this amendment whose failure direction
+      is silent.
+- [ ] **The residual is read against its own measurement** — 1660 findings before the
+      three prerequisites and 33 after, the 33 being delta 8's subject. A residual that
+      is not one of those two numbers means a premise moved, and the response is to
+      re-measure rather than to widen a couples.
 - [ ] **The cadence row is reviewable on its first close** — `due:` names
       observable events, `last:` is stamped with this iteration, and the row's
       review act is stated on the row rather than only here.
