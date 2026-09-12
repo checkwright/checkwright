@@ -3208,25 +3208,22 @@
   baseline says it does. TWO READINGS THE RECURRENCE ADDS. First, the regeneration is not
   occasional — the producing gate runs in the battery, so ANY session that runs the battery before
   the installer suite meets the mask, which makes the masked reading the default ordering rather
-  than the unlucky one. Second, the 2026-08-24 attribution ruling was VINDICATED by this firing
-  rather than merely upheld: because the baseline row still names the standing cause, deleting the
-  transient one exposed the real red immediately instead of leaving a re-attributed row that would
-  have read as satisfied.
+  than the unlucky one. Second, the baseline row's non-re-attribution was VINDICATED by the same
+  firing and is now ANSWERED: the 2026-08-24 split rules generally at evidence-kit/SPEC.md
+  §Baseline manifest, and the shell loop it turned on has retired with its row reading pass.
   **The mechanism, re-measured 2026-09-11 after the harness port.** The `--run-gate-tests` arm
   resolves a case's argv by running `gate_command` inside the case dir, which bakes the ambient,
   repo-relative `GATE_SDK_KNOB_GATE_SDK_TMP_DIR=.tmp` into its `env` prefix. The arm's scratch pin
   sets the bare `GATE_SDK_TMP_DIR`, which no native gate reads, so `.tmp` resolves inside the case
   dir. Probed on the resolved argv, and one clean `gate_sdk` fixture-suite run regenerated the
   residue. The shell harness this entry first measured had the same shape.
-  **Reproduced live rather than reasoned.** `check-crate-arms` ported from `.sh` to `.gate` plus a
-  crate module this iteration, which silently reopened exactly the corpus-pollution class
-  `c1375e99`/`80d74291` closed. With both fixture `.tmp` dirs deleted, a plain `gate_sdk`
-  fixture-suite run — no manual invocation — regenerated
-  `gate-sdk/gate-tests/check-crate-arms/good/.tmp/crate-arms-<hash>.green`. Watched twice.
-  DISTINCT from `pack-installer-vendors-untracked-scratch`, retired, upstream of it. That entry's
-  `cp -R` filter gap is the VENDORING symptom; this is the cache-pollution CAUSE, in the harness
-  itself, for every future native-ported gate that declares the `GATE_SDK_TMP_DIR` knob against a
-  tracked fixture pair — not only this one member.
+  **Reproduced live rather than reasoned.** `check-crate-arms`' port to `.gate` plus a crate module
+  this iteration silently reopened the corpus-pollution class `c1375e99`/`80d74291` closed: with
+  both fixture `.tmp` dirs deleted, a plain `gate_sdk` fixture-suite run — no manual invocation —
+  regenerated `gate-sdk/gate-tests/check-crate-arms/good/.tmp/crate-arms-<hash>.green`, watched
+  twice. DISTINCT from the retired `pack-installer-vendors-untracked-scratch` downstream of it,
+  whose `cp -R` filter gap is the VENDORING symptom: this is the cache-pollution CAUSE in the
+  harness, for every future native-ported gate declaring `GATE_SDK_TMP_DIR` against a tracked pair.
   **Why `[design-pending]`:** the candidate fix is to pin the case scratch in the knob form the
   member reads rather than only the bare name, but the config bridge is a single-producer surface
   and moving where a knob's value is computed for one caller is the criterion-6 question in
@@ -3234,15 +3231,18 @@
   **Cost while deferred:** a fixture-suite run leaves ignored scratch inside a tracked fixture
   corpus. The packer now archives the tracked set alone, so the vendoring that cost the diagnoses
   above no longer follows from it; any other reader of that corpus that walks ignored paths does.
-  **The baseline row's non-re-attribution is ANSWERED, and compresses to its relocation:** the
-  2026-08-24 split now rules generally at evidence-kit/SPEC.md §Baseline manifest, and the shell
-  loop it turned on has retired with its row reading pass, so no validate can re-litigate it.
-  **Re-verified at close and kept.** Operator direction, 2026-09-11, lead-relayed: re-verify, then
-  retire. It was routed on a survey reading the premise stale; the re-run held it, so no retire.
-  **Unit set `registry-roster-oracles`, and it LEADS — operator direction, 2026-09-12.** It is the
-  tier-1 `session/high` entry whose deferral produces a wrong reading rather than a slow one, and
-  its open question — where a knob's value may be computed for one caller — is the contract the
-  set's other three assert against.
+  **Seam ruled at scope 2026-09-12, answering the criterion-6 question without authoring the
+  amendment.** Kit mechanism: the harness pins the case scratch in every spelling a member may
+  read, a fixture case's sandbox location being the harness's own fact and never a choice.
+  Consumer config: nothing new — `GATE_SDK_TMP_DIR` exists and its value stays the consumer's for
+  ordinary runs. Foreclosed rather than ranked: computing the pin at the MEMBER, a second producer
+  on a single-producer bridge, and a per-gate opt-out knob, a second source for one pin. No
+  consumer path enters a kit literal either way; spelling and entry point stay spec's.
+  **Unit set `registry-roster-oracles`, and it LEADS — operator direction, 2026-09-12**, which
+  supersedes 2026-09-11's lead-relayed re-verify-then-retire: that was routed on a survey reading
+  the premise stale, and the re-run answered it by holding. It is the tier-1 `session/high` entry
+  whose deferral produces a wrong reading rather than a slow one, and its open question — where a
+  knob's value may be computed for one caller — is the contract the other three assert against.
   Filed 2026-08-24 to the gap inbox by validate, declared distinct; promoted that day at
   `shell-gate-tail-port-and-completion-oracle`'s close, deleting the regenerated instance; its
   recurrence's attribution was ruled at `execution-control-reach-and-turn-end-blocking`'s close.
