@@ -312,16 +312,24 @@ and owns the cause in one line; neither prose site gains a restatement, and
 **Reproduced, not reasoned.** `normalize()` (`native/src/main.rs:283-289`) rewrites
 `--emit <name>` to `--emit-<name>` with no validity check; `emit::lookup` misses;
 control reaches `gates::lookup`, misses again, and lands in `no_such_gate`
-(`native/src/main.rs:42-50`), which prints the 113-name gate roster at exit 2.
-It is **byte-for-byte the same code path** a mistyped gate name takes — there is no
+(`native/src/main.rs:42-50`), which prints `gates::names_with_owners()` — the
+crate's own 115-member registry, **not** `scripts/gates.list`'s 113 registration
+lines; the two rosters delta 5 measures apart are conflated at this call site's
+fallback, and the fix below is scoped to the roster it actually prints. It is
+**byte-for-byte the same code path** a mistyped gate name takes — there is no
 arm diagnostic in the binary at all. A reader who typed `--emit` is handed the one
 roster that cannot contain what they meant.
 
 After this delta the emit path carries its own miss. `normalize` already knows the
 argv began with `--emit`, so the information needed to route the refusal is present
 at the point of failure and no new state is introduced. `no_such_arm` prints the
-33 live `--emit-` arm names, cites `gate-sdk/SPEC.md §The non-gate arm` as the
-roster's owner, prints **no gate roster**, and exits 2 unchanged.
+live `--emit-` arm names off `BRIDGED_ARMS` the same way `names()` already does —
+33 of them at this authoring, before this amendment's own delta 3
+(`--emit-reads-census`) and, where it lands in the same batch,
+`SPEC-compression-legibility.md` delta 2 (`--emit-entry-history`) each add one
+more; the count is never transcribed, so neither addition is a further edit here
+— cites `gate-sdk/SPEC.md §The non-gate arm` as the roster's owner, prints **no
+gate roster**, and exits 2 unchanged.
 
 **The exit code and the `help:` shape are unchanged**, so the output contract's
 existing assertions are untouched: this delta changes which roster a `help:` line
