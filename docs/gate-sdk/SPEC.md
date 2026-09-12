@@ -10488,7 +10488,7 @@ not the library a member calls but whether the crate **re-derives** what the
 library computes: that harness's *accounting* re-derives a resolution, while this
 runner only ever consumes `gate_command`'s answer. So the arm resolves each
 case's dispatch by spawning
-`bash -c 'export GATE_SDK_NATIVE_BIN="$1"; source "$2/lib/gate.sh"; shift 2; cd "$1"; shift; gate_command "$@"'`
+`bash -c 'export GATE_SDK_NATIVE_BIN="$1"; export GATE_SDK_TMP_DIR="$3"; source "$2/lib/gate.sh"; shift 3; cd "$1"; shift; gate_command "$@"'`
 and reading the resolved argv off stdout, one element per line, and it resolves
 the **default** gate-declaration dir set the same way, out of `gate_check_dirs`.
 Three properties of the shell form survive unchanged and each is why a cheaper
@@ -10670,8 +10670,38 @@ pointed at tracked content, and the case invocation is the only place this
 runner points one there. Pinning the knob per fixture instead would be one
 hand-remembered copy per scratch-writing gate, audited by nothing.
 
-The pin's **scope is the pair loop, never the runner's own process**, and that
-boundary is load-bearing rather than tidy. A bespoke `*.test.sh` runs at the
+**The pin enters the resolving shell, which is upstream of the config bridge
+rather than beside it, and that is what makes one pin serve both substrates.**
+Two processes read this knob on a case's behalf and they read two different
+spellings of it. A `.sh` member sources `lib/gate.sh` in its own process and reads
+the **bare** name, which the per-case child environment carries. A `.gate` member
+reads only the knob's `GATE_SDK_KNOB_`-prefixed spelling, which no caller sets
+directly: the bridge *derives* it, inside the resolving shell, from whatever bare
+value `lib/gate.sh` resolved there (§lib/gate.sh). So the pin is exported into that
+shell ahead of the source — the positional beside `GATE_SDK_NATIVE_BIN` in the
+script quoted above — and the bridge computes the prefixed spelling from it. The
+bare and prefixed spellings are therefore **one pin reaching two substrates**,
+not two pins to keep in step. Setting the prefixed name on the case child instead
+cannot work and the reason is worth stating, because it is the obvious repair: a
+bridged argv is `env <assignments> <binary> <name>`, so `env(1)` is argv[0] and
+its own assignment is applied *after* the environment the spawn built — the
+harness would be setting a variable the very next process overwrites. The value
+has to be corrected upstream of the bridge, never downstream of it. Because the
+correction sits at the knob's resolution rather than at a member, a gate ported
+tomorrow that declares `GATE_SDK_TMP_DIR` inherits it with no further edit;
+today `check-crate-arms` is the one member that declares it.
+
+**Per-case sandbox isolation is a deliberate non-target.** The pin resolves to the
+invoker's root, so every case shares one scratch directory; giving each case its
+own would additionally stop one case's cache greening another. That is a
+different property from the one the pin closes — a gate depositing state inside
+the corpus it is the oracle for — and this section already commits to
+invoker-root absolutization, so widening here would settle a question nothing
+asks. Recorded so a later reader does not read the absence as an oversight.
+
+The pin's **scope is the pair loop and the shell that resolves each case's argv,
+never the runner's own process**, and that boundary is load-bearing rather than
+tidy. A bespoke `*.test.sh` runs at the
 invoker's cwd (above) and builds its own sandbox trees off exactly this knob's
 relative default; a process-wide export replaces every one of those sandboxes
 with the invoker's live scratch, which is how

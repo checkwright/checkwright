@@ -464,7 +464,7 @@ diagnostic underneath an uncorrected one.
 - `gate-sdk/SPEC.md` §run-gate-tests, the scratch-pin passage at 10653-10661
   (delta 1). It states which process the pin enters and why that is upstream of the
   bridge rather than beside it, and records that the bare and prefixed spellings
-  are one pin reaching two substrates. **Not yet applied.**
+  are one pin reaching two substrates. **Applied.**
 - `gate-sdk/SPEC.md` §run-gate-tests, line 10577 (delta 2). The order is corrected
   to `source` before `cd`, matching the section's own quoted script at 10486.
   **Not yet applied.**
@@ -499,7 +499,7 @@ diagnostic underneath an uncorrected one.
 - `native/src/emit/run_gate_tests.rs`'s `# spec:` pointer at lines 91-93 (delta 1).
   It currently says the pin's scope "is the pair loop, never this process"; after
   delta 1 the pin also enters the resolving shell, which is a different and wider
-  claim. **Not yet applied.**
+  claim. **Applied**, and §run-gate-tests' own scope sentence corrected with it.
 - `scripts/git-hooks/pre-commit` and `docs/check-graph.html` (deltas 5, 6, 7) — the
   generated projections. Regenerate with
   `bash gate-sdk/bin/gen-pre-commit.sh --write`, then

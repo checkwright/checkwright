@@ -89,8 +89,8 @@ fn setup(args: &[String]) -> Result<Harness, String> {
     }
 
     // spec: gate-sdk/SPEC.md §run-gate-tests — the scratch dir absolutized for the mirror of that
-    // reason, and pinned on the case invocation alone: the pin's scope is the pair loop, never
-    // this process.
+    // reason, and pinned on the case invocation alone: the pin's scope is the pair loop and the
+    // shell that resolves a case's argv, never this process.
     let case_tmp = walk::abs_against(&here, &walk::knob_scalar("GATE_SDK_TMP_DIR")?);
 
     Ok(Harness {
@@ -416,10 +416,11 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
 // read out of a bash that sources the unchanged `lib/gate.sh` with the `cd` on the shell side,
 // before `gate_command` runs.
 fn resolve_argv(h: &Harness, gate: &str, casedir: &str) -> Option<Vec<String>> {
-    // spec: gate-sdk/SPEC.md §run-gate-tests — the binary is exported into the resolving shell,
-    // which is the shell form's process-wide export.
-    let script = r#"export GATE_SDK_NATIVE_BIN="$1"; source "$2/lib/gate.sh"; shift 2; cd "$1" || exit 2; shift; gate_command "$@""#;
-    let mut argv: Vec<&str> = vec!["-c", script, "bash", &h.bin, &h.sdk, casedir, gate];
+    // spec: gate-sdk/SPEC.md §run-gate-tests — the binary and the pinned scratch are exported into
+    // the resolving shell, which is the shell form's process-wide export; both exports precede the
+    // source, which is where that section's upstream-of-the-bridge argument bites.
+    let script = r#"export GATE_SDK_NATIVE_BIN="$1"; export GATE_SDK_TMP_DIR="$3"; source "$2/lib/gate.sh"; shift 3; cd "$1" || exit 2; shift; gate_command "$@""#;
+    let mut argv: Vec<&str> = vec!["-c", script, "bash", &h.bin, &h.sdk, &h.case_tmp, casedir, gate];
     argv.extend(h.gate_dirs.iter().map(String::as_str));
     // spec: gate-sdk/SPEC.md §run-gate-tests — a refusal is a status, not a parse: `gate_command`
     // names the refusal on stderr, which is inherited, and its status becomes the caller's

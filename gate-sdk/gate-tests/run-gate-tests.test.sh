@@ -151,11 +151,22 @@ assert_has no-help "no 'help:' remedy line" "$out"
 # must stay clean, and a bespoke *.test.sh must NOT inherit the pin — it runs at
 # the invoker's cwd and sandboxes its own trees off the relative default, so a
 # process-wide export hands it the invoker's live scratch instead.
+#
+# Both dispatch spellings are exercised, because the pin reaches them by two
+# different routes and a one-sided fix passes either row alone. A `.sh` member
+# reads the *bare* name out of the per-case child environment. A `.gate` member
+# reads only GATE_SDK_KNOB_GATE_SDK_TMP_DIR, which nothing sets directly — the
+# bridge derives it inside the argv-resolving shell from the bare value that
+# shell resolved, so the pin has to enter that shell rather than the case child.
+# Before the pin did, the bridged half baked the repo-relative default into the
+# `env` prefix and every .gate member wrote inside the case dir.
 mk_writer() {
-    local dir="$scratch/writer/stub-writer"
-    mkdir -p "$dir/good" "$dir/bad"
+    local dir="$scratch/writer/stub-writer" bdir="$scratch/writer/stub-bridged"
+    mkdir -p "$dir/good" "$dir/bad" "$bdir/good" "$bdir/bad"
     printf 'STUB-WRITER: clean (stub)\n' > "$dir/good/expect.txt"
     printf 'alpha fired\n' > "$dir/bad/expect.txt"
+    printf 'STUB-BRIDGED: clean (stub)\n' > "$bdir/good/expect.txt"
+    printf 'alpha fired\n' > "$bdir/bad/expect.txt"
     { printf '#!/usr/bin/env bash\n'
       printf 'printf "%%s\\n" "${GATE_SDK_TMP_DIR-<unset>}" > "%s/env-probe.seen"\n' "$scratch"
       printf 'exit 0\n'
@@ -173,19 +184,43 @@ mk_writer() {
   printf 'echo "STUB-WRITER: clean (stub)"\n'
 } > "$scratch/checks/stub-writer.sh"
 chmod +x "$scratch/checks/stub-writer.sh"
+# The .gate half needs a binary that knows the stub member, so the runner is
+# driven through a stand-in that answers --knobs and runs stub-bridged itself and
+# forwards every other argv — the arm's own included — to the real binary. That
+# keeps the row an end-to-end exercise of the live arm rather than a replay of
+# its resolver: the stand-in is what GATE_SDK_NATIVE_BIN names, so the runner
+# resolves the case through it exactly as it resolves a real .gate member.
+: >"$scratch/checks/stub-bridged.gate"
+{ printf '#!/usr/bin/env bash\n'
+  printf 'if [[ "$1" == --knobs && "$2" == stub-bridged ]]; then printf "GATE_SDK_TMP_DIR\\n"; exit 0; fi\n'
+  printf 'if [[ "$1" == stub-bridged ]]; then\n'
+  # The member reads the PREFIXED spelling and only that one, the way
+  # walk::knob_scalar does; falling back to the relative default is what makes an
+  # unpinned bridge observable as a write inside the case dir.
+  printf '    D="${GATE_SDK_KNOB_GATE_SDK_TMP_DIR:-.tmp}"\n'
+  printf '    mkdir -p "$D" && : >"$D/stub-bridged.marker"\n'
+  printf '    if [[ "$PWD" == */bad ]]; then echo "alpha fired"; echo "  help: stub remedy"; exit 1; fi\n'
+  printf '    echo "STUB-BRIDGED: clean (stub)"; exit 0\n'
+  printf 'fi\n'
+  printf 'exec "%s" "$@"\n' "$GATE_SDK_NATIVE_BIN"
+} > "$scratch/bridgedbin"
+chmod +x "$scratch/bridgedbin"
 t="$(mk_writer)"
 # gate_arm_run is a shell function, so the override is an `unset` inside the
 # subshell rather than an `env -u` prefix — the reason §run-gate-tests gives for
 # gate_env existing at all: env cannot invoke a shell function.
-out="$( cd "$scratch" && unset GATE_SDK_TMP_DIR && gate_arm_run --run-gate-tests "$t" "$scratch/checks" 2>&1 )"; rc=$?
+out="$( cd "$scratch" && unset GATE_SDK_TMP_DIR \
+    && GATE_SDK_NATIVE_BIN="$scratch/bridgedbin" gate_arm_run --run-gate-tests "$t" "$scratch/checks" 2>&1 )"; rc=$?
 assert_rc  writer "$rc" 0
-[[ -f "$scratch/.tmp/stub-writer.marker" ]] || {
-    echo "FAIL [writer]: the scratch write did not land at the invoker's root — the corpus assertion below would pass on a write that never happened"
-    fails=$((fails + 1))
-}
-for case_dir in "$t"/stub-writer/*/; do
+for marker in stub-writer stub-bridged; do
+    [[ -f "$scratch/.tmp/$marker.marker" ]] || {
+        echo "FAIL [writer]: $marker's scratch write did not land at the invoker's root — the corpus assertion below would pass on a write that never happened"
+        fails=$((fails + 1))
+    }
+done
+for case_dir in "$t"/stub-writer/*/ "$t"/stub-bridged/*/; do
     [[ -e "$case_dir/.tmp" ]] && {
-        echo "FAIL [writer]: $(basename "$case_dir")/ acquired a .tmp — the runner let a member write into the tracked corpus"
+        echo "FAIL [writer]: ${case_dir#"$t"/} acquired a .tmp — the runner let a member write into the tracked corpus"
         fails=$((fails + 1))
     }
 done
@@ -196,5 +231,5 @@ seen="$(cat "$scratch/env-probe.seen" 2>/dev/null)"
 }
 
 [[ "$fails" -eq 0 ]] || { echo "run-gate-tests.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gate-tests.test: clean (expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases; scratch writes land outside the case dir)"
+echo "run-gate-tests.test: clean (expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases; scratch writes land outside the case dir on both dispatch spellings)"
 exit 0
