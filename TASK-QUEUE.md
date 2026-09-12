@@ -12,6 +12,92 @@
 
 ## New Features
 
+- **manifest-family-couples-misses-the-consumer-widened-corpus** [spec: SPEC-knob-token.md] — eleven
+  gates read a consumer-configured doc corpus and none of them triggers on the members the consumer
+  added, so `couples=` under-covers its own runtime reads by construction rather than by omission.
+  **Measured 2026-09-06 with the selection oracle, and it is a CLASS rather than one file.**
+  `run-gates.sh --for TRAJECTORY.md` selects EIGHT gates, of which only `check-measured-claim` and
+  `check-unmarked-claim` read the file; `--for RELEASING.md` and `--for CONTRIBUTING.md` select the
+  identical eight. Meanwhile eleven canon-kit descriptors scan the whole of
+  `scripts/canon-config.sh`'s `CANON_KIT_MANIFEST_FILES`, which this consumer widened to add
+  `TRAJECTORY.md`, `RELEASING.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
+  `ROADMAP.md`, `doctrine-kit/DOCTRINE.md` and the `docs/` pages. Every one of those is scanned by
+  the citation, temporal, link and count gates and triggers none of them. That is a direct breach of
+  gate-sdk/SPEC.md §The `# graph:` manifest's stated authoring rule — `couples=` must
+  cover every path the gate reads at runtime, never a subset — and `check-reads-couples` cannot see
+  it, because the corpus arrives through a consumer array rather than a statically resolvable walk.
+  **The descriptor set's shape was rounded in this bullet and is corrected at spec:** FOUR of the
+  eleven carry exactly `couples=*SPEC*.md,*README.md,CLAUDE.md`; the other seven are supersets of
+  those three tokens. A sweep written against the triple would miss seven of its targets.
+  **The generated hook already carries the widened corpus one token from the trigger that misses
+  it** — measured at spec: `scripts/git-hooks/pre-commit` holds eleven
+  `GATE_SDK_KNOB_CANON_KIT_MANIFEST_FILES=…TRAJECTORY.md…` assignments, each on the same `run_gate`
+  line as a `staged_matches` guard reading the literal triple instead. No new config source is owed.
+  **Why it needed design, and why the drain's fix disposition FAILED.** The obvious
+  repair — write the consumer's file names into the eleven kit descriptors — puts consumer content
+  in a kit literal, which the provenance seam refuses (CLAUDE.md §The provenance seam). The kit's
+  default triple is CORRECT for the kit's default corpus; what was missing is a lever by which a
+  consumer that widens `CANON_KIT_MANIFEST_FILES` also widens the trigger.
+  **Seam ruled at scope 2026-09-12**, narrowing three live shapes to one: mechanism kit-side is the
+  `couples=` grammar extension and its resolver; the widened corpus is consumer config the knob
+  already holds, so the descriptor names the knob and the value stays the consumer's. That
+  foreclosed a second knob listing the same members (a second source for one roster) and
+  per-consumer descriptor shadowing (eleven copies per adopter to drift).
+  **Authored at spec: the token is `knob:<NAME>`, it unions with a descriptor's literals rather
+  than replacing them, and it resolves at bridge time through a derived knob-name union sentinel.**
+  Grounds, the refused alternatives and the resolution order at SPEC-couples-knob-token.md
+  deltas 1 and 2; the four prefix readers that must move together at delta 1's consumer list.
+  **Cost while deferred** was: every commit touching one of those members runs the two whole-corpus
+  claim gates and skips the four that grade its citations, links, temporal narration and counts —
+  silent, and paid at the moment the surface is least reviewed.
+  **This iteration's lead unit, with `couples-dynamic-root-resolution` — operator direction,
+  2026-09-12 (lead-relayed), naming the iteration `couples-resolver-reach`.** It leads on the
+  session-class ranking rule's first tier. The spanning cost was accepted with the choice: the pair
+  reaches canon-kit, gate-sdk and native, so `check-stage-entry` assertion C will demand the align
+  audit stamp. A direction, revisable at a later scope or spec.
+  Filed 2026-09-06 by close from the gap inbox, after re-verification widened the bullet: the bullet
+  said four gates trigger and the fix was three `couples=` triples; the oracle reads eight
+  triggering and the fix is not three triples at all. Promoted at this spec.
+
+- **couples-dynamic-root-resolution** [spec: SPEC-reads-root-default.md] — the skipped-and-counted
+  bucket is where trigger-drift hides, and its dominant subset is decidable.
+  **The substrate was corrected at spec, and the entry's own premise moved with it.** The bullet
+  described `check-reads-couples`' SHELL root resolver — a bare quoted literal, a KIT-prefixed and a
+  REPO_ROOT-prefixed token, nothing else — and that path is **dead on this corpus**: no gate script
+  remains in the tree, so all of the skips arrive on the registry path, from `("?", "")` tuples in
+  `native/src/gates/mod.rs`. Extending the shell parser would extend dead code. What survives
+  untouched is the substance: the decidable subset is still *a root that is an argument with a
+  literal default*, which is what `native/src/gates/mod.rs`'s own comment says the `?` population
+  is, and the crate spells it `args.first().map(String::as_str).unwrap_or(".")`.
+  **Re-measured at spec, because the bullet's figure was a month stale.** The gate reads
+  **2 resolvable walk(s) covered against 63 undecidable skipped-and-counted across 113 gates**,
+  where 2026-08-14 read 0 against 37 — so the unreviewed bucket grew by ~70% while nothing reviewed
+  it. The 63 sit across 59 members; both resolvable roots are `check-stage-entry`'s, declared as `.`
+  under two filter-knob names. **26 of the 59 carry the decidable shape**, uniform, one line each.
+  **The assertion-D instance LANDED and is verified still landed at spec**:
+  `check-gate-substrate-parity`'s descriptor reads `couples=…,native/*,…` and the generated hook
+  guards it with `staged_matches … 'native/*' …`, where bash `*` crosses `/`, so a crate-source edit
+  does re-fire the gate. Kept as a reading trap: the entry read as a live hole after it
+  closed.
+  **Authored at spec: `?` stops being an available answer for the literal-default shape**, as a
+  refusal rather than a source parser (the substrate answers, it may not answer `?` for a root it
+  can bound), each moved root declares the knob naming its scan pattern, and the 33-member remainder
+  takes an event-keyed row on `.workflow/audit-roster.txt` rather than a printed counter. Grounds,
+  the refused widening and the two set-aside cadences at SPEC-reads-root-default.md deltas 1 to 4.
+  **The two units are one mechanism, which is why neither lands alone:** once a canon-kit member
+  declares its root under `CANON_KIT_MANIFEST_FILES`, the coverage assertion demands its couples
+  cover that knob's members, and the only seam-legal way to satisfy that red is the sibling's
+  `knob:` token. This gate is what forces the token rather than merely permitting it.
+  **Cost while deferred** was: every gate whose walk root is undeclared is uncoupled and silently
+  under-triggered, with no way to tell which, and nothing reviews the bucket — so the next such hole
+  is found the way assertion D's was, by someone noticing.
+  **This iteration's unit set, with `manifest-family-couples-misses-the-consumer-widened-corpus` —
+  operator direction, 2026-09-12 (lead-relayed), naming the iteration `couples-resolver-reach`.**
+  The pair was chosen over the lead entry alone because both candidate fix sets extend the same
+  resolver, so one design pass answers both. A direction, revisable at a later scope or spec.
+  Filed 2026-08-03 at close from the gap inbox, merging the assertion-D instance into its
+  class; both found by build batch 2. Promoted at this spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -1441,46 +1527,6 @@
   the binary substrate records in its `check-gate-tamper` row.
   Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-09
   at scope.
-
-- **couples-dynamic-root-resolution** [design-pending] [cost: session/high] [surface: gate-sdk] — the skipped-and-counted bucket is
-  where trigger-drift hides, and its dominant subset is decidable.
-  Verified 2026-08-03: `check-reads-couples`' root resolver handles a bare quoted literal,
-  a KIT-prefixed token and a REPO_ROOT-prefixed token, and nothing else — so a walk root
-  held in a *variable* falls to skipped and is never checked.
-  **The assertion-D instance has since LANDED — corrected 2026-08-14 at scope**, which the
-  prose below claimed open and no longer does. `check-gate-substrate-parity`'s manifest now
-  reads `couples=…,native/*,…`; the generated hook guards it with `staged_matches …
-  'native/*' …`, and `staged_matches` compares with bash `[[ "$f" == $pat ]]`, where `*`
-  crosses `/` — so a crate-source edit **does** re-fire the gate. Assertion E's `couples=`
-  widening is evidently what paid it. Kept because a later reader meets the same trap: the
-  entry read as a live enforcement hole for an unknown period after the hole closed, and a
-  scope ranking off it ranks a fixed instance as currently-broken.
-  **The class is untouched and is now this entry's whole substance** — the resolver, not any
-  one gate. A pinning instance must therefore be chosen from the still-skipped set rather
-  than inherited from assertion D; which one is open, and enforcement-first still binds
-  whichever is chosen to the check that catches the class.
-  **The decidable subset, with no false-positive surface:** an assignment whose value is a
-  parameter expansion with a literal default — the universal kit idiom CLAUDE.md
-  §Conventions declares. Following one such assignment in the same file would have caught
-  assertion D.
-  **Deliverable:** that resolver extension, a pinning instance drawn from the still-skipped
-  set, and a named cadence for the residue.
-  **Why `[design-pending]`:** the residue is the open design. A truly dynamic root stays
-  undecidable, so per the enforcement-first false-positive carve-out it needs a named
-  cadence rather than a bare counter — and today the count is printed and nothing reviews
-  it. Whether that cadence is a roster class, a close step or a threshold is unruled.
-  **Cost while deferred:** every gate whose walk root is a variable is uncoupled and
-  silently under-triggered, with no way to tell which. Measured 2026-08-14: `check-reads-couples`
-  reports 0 resolvable walk(s) covered against 37 undecidable skipped-and-counted, and
-  nothing reviews the 37 — so the next such hole is found the way assertion D's was, by
-  someone noticing.
-  **This iteration's unit set, with `manifest-family-couples-misses-the-consumer-widened-corpus` —
-  operator direction, 2026-09-12 (lead-relayed), naming the iteration `couples-resolver-reach`.**
-  The pair was chosen over the lead entry alone because both candidate fix sets extend the same
-  resolver, so one design pass answers both. A direction, revisable at a later scope or spec.
-  Authoring is `spec`'s: this is a feature, and the roster splits authoring out of scope.
-  Filed 2026-08-03 at close from the gap inbox, merging the assertion-D instance into its
-  class; both found by build batch 2.
 
 - **amendment-owner-position-citation** [design-pending] [cost: iteration/low] [surface: queue-kit] — prose may cite a merged
   amendment as *settled history*, never as a live *owner*; today it does both.
@@ -4527,52 +4573,6 @@
   Filed 2026-09-05 to the gap inbox at spec and again at build's batch 3; promoted at this close.
   Deferred and not active on scope's composition test, re-grounded 2026-09-11: no iteration
   since has shared its surface.
-
-- **manifest-family-couples-misses-the-consumer-widened-corpus** [design-pending] [cost: session/high] [surface: canon-kit] — eleven gates
-  read a consumer-configured doc corpus and none of them triggers on the members the consumer
-  added, so `couples=` under-covers its own runtime reads by construction rather than by omission.
-  **Measured 2026-09-06 with the selection oracle, and it is a CLASS rather than one file.**
-  `run-gates.sh --for TRAJECTORY.md` selects EIGHT gates, of which only `check-measured-claim` and
-  `check-unmarked-claim` read the file; `--for RELEASING.md` and `--for CONTRIBUTING.md` select the
-  identical eight. Meanwhile eleven canon-kit descriptors declare
-  `couples=*SPEC*.md,*README.md,CLAUDE.md` and scan the whole of
-  `scripts/canon-config.sh`'s `CANON_KIT_MANIFEST_FILES`, which this consumer widened to add
-  `TRAJECTORY.md`, `RELEASING.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
-  `ROADMAP.md`, `doctrine-kit/DOCTRINE.md` and the `docs/` pages. Every one of those is scanned by
-  the citation, temporal, link and count gates and triggers none of them. That is a direct breach of
-  gate-sdk/SPEC.md §Porting a gate to the binary substrate's stated authoring rule — `couples=` must
-  cover every path the gate reads at runtime, never a subset — and `check-reads-couples` cannot see
-  it, because the corpus arrives through a consumer array rather than a statically resolvable walk.
-  **Why `[design-pending]`, and why the drain's fix disposition FAILED.** The obvious repair —
-  write the consumer's file names into the eleven kit descriptors — puts consumer content in a kit
-  literal, which the provenance seam refuses (CLAUDE.md §The provenance seam). The kit's default
-  triple is CORRECT for the kit's default corpus; what is missing is a lever by which a consumer
-  that widens `CANON_KIT_MANIFEST_FILES` also widens the trigger. Three shapes are live and
-  unranked: a consumer-side trigger-extension knob the hook emitter reads, a `couples=` token that
-  resolves a knob the way `kit:<glob>` resolves the kit set, or per-consumer descriptor shadowing.
-  Picking one at a drain would settle a kit/consumer seam question by accident.
-  **Seam ruled at scope 2026-09-12, narrowing those three to one without authoring the amendment.**
-  Mechanism, kit-side: the `couples=` grammar extension and its resolver. Consumer config: the
-  widened corpus, which `CANON_KIT_MANIFEST_FILES` already holds — so the descriptor names the
-  knob and the knob's value stays the consumer's. That forecloses the other two rather than
-  ranking them: a second knob listing the same members is a second source for one roster
-  (derivation-first), and per-consumer descriptor shadowing hands every adopter eleven copies to
-  drift. No file name enters a kit literal either way, which is the seam's own requirement and not
-  a preference. What stays open for `spec` is the token's spelling and its resolution order.
-  **Why NOT icebox:** the trigger is live and this iteration made it materially more expensive —
-  close now holds ruling-record repair authority, so `TRAJECTORY.md` became a surface close writes
-  routinely, and a routine writer of a file no doc gate fires on is the worst case for the class.
-  **Cost while deferred:** every commit touching one of those members runs the two whole-corpus
-  claim gates and skips the four that grade its citations, links, temporal narration and counts —
-  silent, and paid at the moment the surface is least reviewed.
-  **This iteration's lead unit, with `couples-dynamic-root-resolution` — operator direction,
-  2026-09-12 (lead-relayed), naming the iteration `couples-resolver-reach`.** It leads on the
-  session-class ranking rule's first tier. The spanning cost was accepted with the choice: the pair
-  reaches canon-kit, gate-sdk and native, so `check-stage-entry` assertion C will demand the align
-  audit stamp. A direction, revisable at a later scope or spec. Authoring is `spec`'s.
-  Filed 2026-09-06 by close from the gap inbox, after re-verification widened the bullet: the bullet
-  said four gates trigger and the fix was three `couples=` triples; the oracle reads eight
-  triggering and the fix is not three triples at all.
 
 - **dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — an
   amendment's definition of done names a stage for the entry's queue transition without reading the
