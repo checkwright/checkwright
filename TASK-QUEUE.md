@@ -17,6 +17,31 @@
 ## Deferred
 
 
+- **config-seam-static-format** [design-pending] [cost: event/high] [surface: gate-sdk] — the knob seam
+  is executable bash: a knob's value is computed by sourcing the owning kit's `lib/*.sh` and the
+  consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh), so the battery, hook
+  generation and every harness hook enter through bash before the binary runs.
+  **Operator ruling at consult: file it costed.** The `# no-port` audit of 2026-09-12 read the
+  oracle at 70 declared, 0 held, 0 owed, and found every declaration sound on its own ground;
+  34 of them — the config seam, the kit libraries and the three bridge front-ends — are one ground
+  restated: the seam's format. No ruling weighed the format itself. A static knob file the binary
+  parses (env or TOML) collapses those three classes and moves each kit's defaults in-crate.
+  **The tension it closes.** TRAJECTORY objective 6 rules a surviving script surface
+  dual-implementable, bash and PowerShell; the runtime bridge is neither and cannot be, since a
+  PowerShell twin is the second producer criterion 6 refuses. Native Windows therefore rides
+  Git-for-Windows bash for every battery run and tool call, while the PowerShell half covers
+  install alone. Measured: the bridge costs under a second per battery and 50 ms per guard
+  call, so the case is platform, never speed.
+  **Why [design-pending]:** the format must express arrays, keyed pairs and the seven `*_CMD`
+  command strings; the 92 fixture suites source `lib/test-hermetic.sh` in-shell; and the harness
+  guard's rule content, now bash, becomes data or stays the one shell hook.
+  **Refused:** a PowerShell twin of the bridge (second producer); porting the 34 files under the
+  present seam (each ruling's ground holds while the seam is bash); a generated knob projection
+  (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
+  **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
+  every native-Windows adopter carries a bash floor the install docs attribute to git alone.
+  Filed 2026-09-12 by consult, an operator-directed direct entry.
+
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
   **Split out of `backgrounded-shell-child-run-record-unenforced` — operator direction, 2026-09-11,
