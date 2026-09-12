@@ -12,68 +12,6 @@
 
 ## New Features
 
-- **prompt-ranking-ungrantable-shape-class** [spec: SPEC-ranking-shape.md]
-  — the friction ranking's unit mixes rows an allowlist entry could retire with rows no entry can
-  ever match, so each close re-triages a class no action retires.
-  **The structural ground, and it is why this is not a tuning complaint** — the guard says so in its
-  own refusal text: a `Bash(...)` entry matches a bare command, so any chaining, redirect or
-  expansion breaks the match and the call is decided out of band whatever the allowlist holds.
-  **All three of the triage's dispositions are wrong for these rows.** An allowlist entry cannot
-  reach them; a guard steer already covers the read shapes while the write shapes are legitimate
-  journal and scratch appends, which guard rule 17 now auto-allows outright; and a habit change
-  leaves the row ranking identically. The honest disposition is a fourth the ranking does not
-  offer: structurally ungrantable, retired from the actionable set.
-  **DISTINCT from `friction-key-segment-selection-unruled`**, whose axis is *which* segment of a
-  compound is keyed: it changes which name a row files under and leaves every row ranking. DISTINCT
-  from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed at all —
-  its guard-steer shape retires these rows by changing behaviour, where this entry asks what the
-  ranking should say while it has not.
-  **The design question is ANSWERED by the fourth measurement below — partition the ranked output by
-  SHAPE**, as it already partitions overlay-covered rows. Grading each row against the allowlist's
-  own matching rule was more accurate and duplicated that rule; a guard-kit/SPEC.md note was
-  cheapest and bought least. What stays open is only where the partition lands.
-  **THE INSTRUMENT IS CONTAMINATED and every measurement here is a MULTI-WINDOW read until it is
-  cleared — 2026-09-06, probed at scope.** `.workflow/prompt-friction.log` still carried a PRIOR
-  iteration's close calls verbatim, so no emitted figure denominates one window. Clearing the log is
-  a precondition of the next measurement.
-  **Cost while deferred** was: one re-triage of the same unretireable rows per close, on the
-  surface a close reads to decide where friction is; the top row is always one of them.
-  **AUTHORED AT SPEC: the partition lands on the RANKED ROWS, never on the denominator, and the
-  predicate is NARROWER than this entry states.** The headline stays a true prompt count and
-  `kpi-prompt-friction`'s two integers do not move — an overlay row is off the headline because it
-  DID NOT PROMPT, while an unreachable row prompts and always will. Two shapes qualify, each on a
-  rule's own stated ground: an expansion/substitution/backtick (rule 6) and a write redirect
-  (rule 16). **CHAINING IS EXCLUDED, correcting this entry's structural ground:** §The triage
-  criterion states the harness matches per SEGMENT of a compound and concludes chained tools are
-  themselves legitimate allowlist entries, and the ranker's own `granted()` already agrees.
-  Including it would have contradicted the function computing the partition. What the section
-  reports is which rows disposition (a) cannot reach; (b) and (c) stay live for every row.
-  Grounds at SPEC-ranking-shape.md deltas 1-3.
-  **FOURTH MEASUREMENT 2026-09-05, and it ANSWERS the design question.** 126 calls, 27 patterns, 498
-  fall-throughs; head `python3 -` heredocs at 61x, `cat >>` second at 24x — down from 50x, so the
-  earlier GROWING read tracked the command word, not the class. A THIRD word takes the head across
-  four samples while the SHAPE never moves: partitioning by shape is what the samples buy.
-  recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03 2026-09-08
-  **THE ROUTING AXIS IS ANSWERED — operator direction, 2026-09-09, lead-relayed: a newly judged
-  recurrence does NOT restart the port-first run's proposed-once clause**, since reading a fresh
-  date as a reset defeats the clause that stops a member cycling; the threshold history before
-  it (2026-09-03 to 2026-09-05) is in git.
-  **Unit set `registry-roster-oracles` — operator direction, 2026-09-12, replacing the 2026-09-11
-  decline.** It joins on its recurrence count, the tree's highest at three, not on the set's
-  surface: the threshold clause routes a third recurrence to the operator rather than a third
-  decline, and both prior positions are directions no consult ruling stands over.
-  **THE `cat >> .tmp/*` GRANT WAS GRANTED THE SAME DAY AND IS NOT LANDED HERE:** it edits
-  `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
-  authorization, so it was routed back. The limit it was granted on, recorded here because JSON
-  carries no comment: the glob is a PREFIX match, reaching any path under `.tmp/`.
-  **THE SECOND AND THIRD MEASUREMENTS ARE ANSWERED by the fourth**, as are the fifth and sixth
-  re-derivations discarded at scope; one live residue survives them, the second's falsification of
-  a tempting sub-case — ten `GATE_SDK_VERBOSE=1` calls read as a missing-`env`-word steer were all
-  piped into `grep`, so the prefix changes nothing.
-  Filed 2026-08-27 to the gap inbox by close; promoted 2026-08-27; ruled on by lead 2026-09-04.
-
-
-
 - **entry-compression-contract-unenforced** [spec: SPEC-compression-legibility.md] — the compression
   relief that queue-kit/SPEC.md §check-queue-entry-budget mandates most often
   is enforced by nothing, and the failure is invisible where it lands.
@@ -5064,12 +5002,24 @@
   the accepted price of the prescribed shape.
   **Why `[design-pending]`:** a guard rule that steers an append has to name the sanctioned
   destination set, and whether that set is kit-generic or consumer config is the seam question.
-  **SITS INSIDE `prompt-ranking-ungrantable-shape-class`' STRUCTURAL GROUND, and one fact there
-  qualifies this entry's allowlist claim:** that entry records a `cat >> .tmp/*` grant given
-  2026-09-09 and routed back unapplied, so a granted-but-unlanded allowlist entry does exist for
-  one prefix of the 27x shape — and it reaches `.tmp/` alone, leaving every append to a tracked or
-  `.workflow/` path where this entry found it. DISTINCT from that entry, which asks what the
-  RANKING should say about an unretireable row; this one asks for the steer that retires it.
+  **One grant record qualifies this entry's allowlist claim, and this entry is its home — operator
+  direction, 2026-09-12.**
+  **THE `cat >> .tmp/*` GRANT WAS GRANTED 2026-09-09 AND IS NOT LANDED HERE:** it edits
+  `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
+  authorization, so it was routed back. The limit it was granted on, recorded here because JSON
+  carries no comment: the glob is a PREFIX match, reaching any path under `.tmp/`.
+  So a granted-but-unlanded allowlist entry exists for one prefix of the 27x shape, and it reaches
+  `.tmp/` alone, leaving every append to a tracked or `.workflow/` path where this entry found it.
+  **An observation, not a verdict — the grant's standing stays the operator's:** the default
+  `GUARD_KIT_APPEND_BINS` roster (`guard-kit/lib/guard.sh`) already lets guard rule 17 auto-allow a
+  `cat >>` write whose every target is gitignored, and rule 17 states a `Bash(...)` entry cannot
+  grant a redirect target, so the grant would reach no `.tmp/` append the guard does not.
+  **One measured residue has no other home and survives here:** the second measurement's
+  falsification of a tempting sub-case — ten `GATE_SDK_VERBOSE=1` calls read as a
+  missing-`env`-word steer were all piped into `grep`, so the prefix changes nothing.
+  DISTINCT from the ranking's allowlist-unreachable section (guard-kit/SPEC.md §scan-prompts),
+  which says what the RANKING reports about an unretireable row; this one asks for the steer that
+  retires it.
   DISTINCT from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed
   at all — this is the append shape specifically, and its `bash -c` half is not an authoring act.
   **Cost while deferred:** the tree's two heaviest unmatchable shapes stay unaddressed while the
@@ -5475,5 +5425,6 @@
 - reads-couples-skipped-set-has-no-census-oracle
 - crate-registry-battery-roster-divergence-unasserted
 - unknown-emit-arm-diagnostic-misdirects
+- prompt-ranking-ungrantable-shape-class
 
 ## Lessons Learned

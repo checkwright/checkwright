@@ -1992,7 +1992,11 @@ each on a ground a rule already states in its own refusal text: an
 **expansion, substitution or backtick** — rule 6's "the harness's matcher refuses
 every expansion", with the output process substitution and the backtick it does
 not block — and a **write redirect**, which rule 16 says "defeats the permission
-matcher" and rule 17 says no `Bash(…)` entry can grant. The redirect test is the
+matcher" and rule 17 says no `Bash(…)` entry can grant. **Grading each row
+against the allowlist's own matching rule is refused** though it is more exact:
+it re-implements that rule in the ranker, where reading the grounds the ruleset
+already states adds no second copy — and a note in this section alone, the
+cheapest shape, changes nothing a close reads. The redirect test is the
 write-shape suffix's own scan over `_guard_redirect_pairs`' twin with **rule 17's
 own target test**, so a `/dev/null` target and an fd-dup, which rule 17 exempts as
 targets that are not files, do not qualify — the suffix still keys them, since the
