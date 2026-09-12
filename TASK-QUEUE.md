@@ -12,6 +12,307 @@
 
 ## New Features
 
+- **bridged-knob-case-tmp-dir-override-inert** [spec: SPEC-registry-rosters.md]
+  — the `--run-gate-tests` arm's case scratch pin protects no bridged gate, so a bridged/native
+  gate writes its scratch into the tracked fixture corpus it is the oracle for.
+  recurrence: bridged-knob-case-tmp-dir-override-inert 2026-08-25
+  **FIRST RECURRENCE, 2026-08-25 at close, and it re-fired in the ATTESTED shape rather than a
+  variant.** A battery run regenerated the scratch, and the next `installer_smoke` run died at
+  `checkwright init`'s `git add` on the ignored path — masking the ruled binary-less scenario
+  exactly as the cost line predicts. The masking cost a diagnosis a second time: only deleting the
+  regeneration and re-running showed the four profiles clean and the failure landing where the
+  baseline says it does. TWO READINGS THE RECURRENCE ADDS. First, the regeneration is not
+  occasional — the producing gate runs in the battery, so ANY session that runs the battery before
+  the installer suite meets the mask, which makes the masked reading the default ordering rather
+  than the unlucky one. Second, the baseline row's non-re-attribution was VINDICATED by the same
+  firing and is now ANSWERED: the 2026-08-24 split rules generally at evidence-kit/SPEC.md
+  §Baseline manifest, and the shell loop it turned on has retired with its row reading pass.
+  **The mechanism, re-measured 2026-09-11 after the harness port.** The `--run-gate-tests` arm
+  resolves a case's argv by running `gate_command` inside the case dir, which bakes the ambient,
+  repo-relative `GATE_SDK_KNOB_GATE_SDK_TMP_DIR=.tmp` into its `env` prefix. The arm's scratch pin
+  sets the bare `GATE_SDK_TMP_DIR`, which no native gate reads, so `.tmp` resolves inside the case
+  dir. Probed on the resolved argv, and one clean `gate_sdk` fixture-suite run regenerated the
+  residue. The shell harness this entry first measured had the same shape.
+  **Reproduced live rather than reasoned.** `check-crate-arms`' port to `.gate` plus a crate module
+  this iteration silently reopened the corpus-pollution class `c1375e99`/`80d74291` closed: with
+  both fixture `.tmp` dirs deleted, a plain `gate_sdk` fixture-suite run — no manual invocation —
+  regenerated `gate-sdk/gate-tests/check-crate-arms/good/.tmp/crate-arms-<hash>.green`, watched
+  twice. DISTINCT from the retired `pack-installer-vendors-untracked-scratch` downstream of it,
+  whose `cp -R` filter gap is the VENDORING symptom: this is the cache-pollution CAUSE in the
+  harness, for every future native-ported gate declaring `GATE_SDK_TMP_DIR` against a tracked pair.
+  **Why it needed design** was: the candidate fix is to pin the case scratch in the knob form the
+  member reads rather than only the bare name, but the config bridge is a single-producer surface
+  and moving where a knob's value is computed for one caller is the criterion-6 question in
+  miniature.
+  **Cost while deferred** was: a fixture-suite run leaves ignored scratch inside a tracked fixture
+  corpus. The packer now archives the tracked set alone, so the vendoring that cost the diagnoses
+  above no longer follows from it; any other reader of that corpus that walks ignored paths does.
+  **AUTHORED AT SPEC: the pin becomes an INPUT to the config bridge, not an override of its
+  output.** `resolve_argv` exports the already-absolutized value into the resolving shell, so
+  `lib/gate.sh` derives the prefixed spelling from it and both substrates are served by one pin —
+  the existing bare pin at `run_case` is live for a `.sh` member, not dead, so the defect was
+  one spelling of two. Spec ruled out pinning the prefixed name at `run_case`: `env(1)` is argv[0]
+  and its own assignment beats anything `Command::env` set, so the obvious repair cannot work.
+  Grounds, the foreclosed shapes and the per-case-sandbox non-target at SPEC-registry-rosters.md
+  delta 1. **Delta 2 is a second, unfiled defect spec found in the same section and folded in:**
+  gate-sdk/SPEC.md:10577 states `cd` before `source`, while the section's own quoted script and the
+  code both do `source` first — so the claim at :10677-10678 that a case config naming its own
+  scratch still wins is FALSE, and it promises the per-gate opt-out the seam ruling forecloses. It
+  is withdrawn rather than repaired.
+  **Seam ruled at scope 2026-09-12, answering the criterion-6 question without authoring the
+  amendment.** Kit mechanism: the harness pins the case scratch in every spelling a member may
+  read, a fixture case's sandbox location being the harness's own fact and never a choice.
+  Consumer config: nothing new — `GATE_SDK_TMP_DIR` exists and its value stays the consumer's for
+  ordinary runs. Foreclosed rather than ranked: computing the pin at the MEMBER, a second producer
+  on a single-producer bridge, and a per-gate opt-out knob, a second source for one pin. No
+  consumer path enters a kit literal either way; spelling and entry point stay spec's.
+  **Unit set `registry-roster-oracles`, and it LEADS — operator direction, 2026-09-12**, which
+  supersedes 2026-09-11's lead-relayed re-verify-then-retire: that was routed on a survey reading
+  the premise stale, and the re-run answered it by holding. It is the tier-1 `session/high` entry
+  whose deferral produces a wrong reading rather than a slow one, and its open question — where a
+  knob's value may be computed for one caller — is the contract the other three assert against.
+  Filed 2026-08-24 to the gap inbox by validate, declared distinct; promoted that day at
+  `shell-gate-tail-port-and-completion-oracle`'s close, deleting the regenerated instance; its
+  recurrence's attribution was ruled at `execution-control-reach-and-turn-end-blocking`'s close.
+
+- **reads-couples-skipped-set-has-no-census-oracle** [spec: SPEC-registry-rosters.md]
+  — the population of `check-reads-couples`' decidable skipped walk roots is hand-swept, and has
+  been wrong every time it was counted.
+  **Deliverable:** an `--emit` arm (or a gate) enumerating every member declaring `?` together
+  with its walk's root expression and filter argument, so the set is measured once by an oracle
+  rather than re-swept per session.
+  **Measured cost of its absence:** 26, then 27, then at least 29 across three sweeps in one spec
+  stage, against 39 when an oracle finally counted — each miss caused by another spelling of one
+  idiom (`unwrap_or`, `unwrap_or_else` with a closure, a `match` on `args.first().filter` with a
+  `None` arm, `args.get(N)` as well as `args.first()`, and a hardcoded literal root that is not
+  argument-based at all).
+  **Re-verified at the drain that the arm still does not exist.** The `--emit` arm set carries no
+  census member, and `checkwright-gates --reads` requires a gate name — it answers one member per
+  invocation, so a census is still a loop a session writes by hand.
+  **Why it is cheap:** gate-sdk/SPEC.md §check-reads-couples already owns the declared-roots
+  machinery the arm would read and the binary already answers `--reads` per member, so the arm is
+  a projection over data that exists — one emitter plus a fixture pair, no new config, no new
+  contract.
+  **Cost while deferred** was: any session needing the population pays a hand sweep that has never
+  once been right, and a wrong population silently mis-sizes whatever it is sizing.
+  **AUTHORED AT SPEC, AND THE ENTRY'S CHEAPNESS CLAIM IS CORRECTED.** Measured by oracle: 115
+  registry members, 36 declaring at least one `?`, 51 `?` root-lines. The population half IS a
+  projection over existing data and ships as `--emit reads-census` (SPEC-registry-rosters.md
+  delta 3). The root-expression and filter half is NOT: every `?` row is literally `("?", "", "")`
+  — both fields empty — so that data exists only in Rust source, and "no new contract" does not
+  hold for it. The shape that would make it registry data (a compile-enforced ground on every `?`,
+  51 sites) is designed at delta 4 and is **ESCALATED TO THE LEAD, NOT AUTHORIZED**: it is a new
+  registry contract outside this entry's declared cost class, and build lands it only on a recorded
+  ruling. The entry's "39" is a third quantity again — the decidable subset — reproducible by no
+  command in the tree today, so spec asserts it nowhere.
+  **Unit set `registry-roster-oracles`, the census half — operator direction, 2026-09-12.** It
+  joins on the composition test: the arm reads the same crate registry the set's other members
+  assert over, and it is the member that turns a hand sweep into an oracle.
+  Filed 2026-09-12 by spec into the gap inbox at the lead's direction rather than started, because
+  nobody ranked it; drained and promoted at this close.
+
+- **crate-registry-battery-roster-divergence-unasserted** [spec: SPEC-registry-rosters.md]
+  — nothing compares the crate's registry roster with the battery's, so a member can be asserted
+  on one side and invisible on the other in either direction.
+  **Re-measured at the drain:** the binary's dispatch carries **115** `check-*` members; a
+  non-comment line count of `scripts/gates.list` gives **113**. The residue is
+  `check-surface-duplication` and `check-producer-liveness`.
+  **What the drain corrected in the filing's own claim.** The bullet read the residue as
+  unaccounted; each absence in fact already carries a stated cause in prose —
+  canon-kit/README.md:34 (`check-surface-duplication` "needs a glossary (exits 2 without one)",
+  and this tree declares none for the provenance-seam reason) and scripts/lifecycle-config.sh:12
+  (a registered liveness gate "would red every validate run against its own lock"). So the
+  residue is deliberate and the entry's subject is narrower than filed, and it stands unchanged:
+  neither disposition is reachable by any crate-side assertion, because nothing joins the rosters.
+  **Why it bites:** a crate-side assertion over the registry asserts over a corpus strictly wider
+  than the one `check-reads-couples` scans, so a member can red a crate assertion while being
+  invisible to the gate that exists to catch it, and can satisfy the gate while being unasserted
+  crate-side. Attested this iteration — the static-root refusal's 39-member red set included
+  `check-surface-duplication`, which no battery run can reach.
+  **Candidate mechanism:** an assertion in `check-gate-substrate-parity`, which already equates
+  the descriptor set with the `--list` roster, extended to name the registered-but-unlisted
+  residue, each member taking a recorded disposition the way the meta-gate conservation table's
+  members do.
+  **DISTINCT from `couples-dynamic-root-resolution`**, which it only cites as its attestation:
+  that entry's subject is which walk roots resolve statically and how each is declared, this
+  one's is the *roster* the declarations are asserted over, and it would stand unchanged if every
+  root in the tree were already declared.
+  **Cost while deferred** was: two members stay dispatchable and unrun with their causes stated
+  only in prose no reader joins, and any future crate-side assertion inherits the same blind spot
+  silently.
+  **AUTHORED AT SPEC: assertion I, plus a declaration grammar the consumer's own file carries.**
+  Re-verified at authoring — 115 against 113, residue exactly the two, reverse direction EMPTY —
+  and confirmed at the code: `gate_substrate_parity.rs` derives both its operands in-process and
+  reads `scripts/gates.list` NOWHERE. The seam question the entry raised is answered by reusing
+  the established `# smoke-unregistered: <gate-name> — <reason>` grammar on a second roster: the
+  kit owns the grammar and the assertion, the consumer's own `gates.list` owns the cause, so no
+  consumer fact enters a kit literal. No knob is minted — `registry::list_path` already derives the
+  path and the descriptor already couples the file. Grounds at SPEC-registry-rosters.md deltas 5-7.
+  **Unit set `registry-roster-oracles`, the roster-join half — operator direction, 2026-09-12.**
+  It is the member that makes the other three's assertions reachable: nothing today joins the
+  crate's 115-member dispatch to the battery's 113-line registry, so every crate-side assertion
+  the set lands inherits a blind spot until this one does.
+  Filed 2026-09-12 by build into the gap inbox rather than fixed, scope-gated intake refusing a
+  mid-session initiative; drained and promoted at this close.
+
+- **unknown-emit-arm-diagnostic-misdirects** [spec: SPEC-registry-rosters.md]
+  — an unknown `--emit` arm name prints the binary's GATE subcommand roster instead of the arm set,
+  so the diagnostic confirms a wrong mental model instead of correcting it.
+  **THE ORIGINAL FILING'S CLAIM WAS WRONG AND IS DELETED RATHER THAN ANNOTATED.** The arm roster IS
+  owned and discoverable — gate-sdk/SPEC.md (the non-gate arm) lists every `--emit-<name>` across
+  every kit in one place, and `git log -L` shows that text predating the filing by many commits. So
+  the captured friction was a discovery-process miss, not absent documentation.
+  **What survives is narrower and sharper:** a reader who typed `--emit` wanted arms, and the
+  moment-of-miss diagnostic points at the wrong roster entirely.
+  **Why it needed design** was: the candidate is a diagnostic naming gate-sdk/SPEC.md's
+  non-gate-arm section and printing no gate roster at all, which decides whether a refusal may cite
+  a SPEC section — a coupling the gate-output contract does not currently carry.
+  **DISTINCT from the iceboxed `bin-tool-help-arm-absent-tree-wide`**, re-read at the drain: that
+  entry is about other `bin/` tools answering `-h`/`--help` wrong, and every tool it named has since
+  been deleted.
+  **Cost while deferred** was: one diagnostic string plus a fixture pair, unspent, against a wrong
+  roster printed at every mistyped arm.
+  **AUTHORED AT SPEC, AND THE ENTRY'S OWN FRAMING IS NARROWED.** Reproduced verbatim: an unknown
+  arm reaches `no_such_gate` by the byte-for-byte path a mistyped GATE name takes, so there is no
+  arm diagnostic in the binary at all. `no_such_arm` prints the 33 live arm names, cites §The
+  non-gate arm and prints no gate roster (delta 8). The entry called the SPEC-citation coupling one
+  "the gate-output contract does not currently carry" — true of the CONTRACT TEXT, false of the
+  PRACTICE: spec found it already taken in eight live refusal paths across both substrates, so
+  delta 9 states a rule the tree already keeps rather than minting one. **Delta 10 is an adjacent
+  line spec folded in on envelope grounds:** `gate_knob_env` prints "could not report what `--emit`
+  reads" — naming a token that is not the arm — immediately ABOVE the diagnostic this entry is
+  about, so fixing one and leaving the other ships a correction underneath a misdirection.
+  **Unit set `registry-roster-oracles`, the arm-roster half — operator direction, 2026-09-12.**
+  The same binary holds two rosters, gates and arms, and this is where it hands a reader the
+  wrong one; the set's other members join rosters that exist, this one separates two that are
+  already conflated at the diagnostic.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on a mistyped arm at its
+  own drain; drained and promoted at this iteration's scope.
+
+- **prompt-ranking-ungrantable-shape-class** [spec: SPEC-ranking-shape.md]
+  — the friction ranking's unit mixes rows an allowlist entry could retire with rows no entry can
+  ever match, so each close re-triages a class no action retires.
+  **The structural ground, and it is why this is not a tuning complaint** — the guard says so in its
+  own refusal text: a `Bash(...)` entry matches a bare command, so any chaining, redirect or
+  expansion breaks the match and the call is decided out of band whatever the allowlist holds.
+  **All three of the triage's dispositions are wrong for these rows.** An allowlist entry cannot
+  reach them; a guard steer already covers the read shapes while the write shapes are legitimate
+  journal and scratch appends, which guard rule 17 now auto-allows outright; and a habit change
+  leaves the row ranking identically. The honest disposition is a fourth the ranking does not
+  offer: structurally ungrantable, retired from the actionable set.
+  **DISTINCT from `friction-key-segment-selection-unruled`**, whose axis is *which* segment of a
+  compound is keyed: it changes which name a row files under and leaves every row ranking. DISTINCT
+  from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed at all —
+  its guard-steer shape retires these rows by changing behaviour, where this entry asks what the
+  ranking should say while it has not.
+  **The design question is ANSWERED by the fourth measurement below — partition the ranked output by
+  SHAPE**, as it already partitions overlay-covered rows. Grading each row against the allowlist's
+  own matching rule was more accurate and duplicated that rule; a guard-kit/SPEC.md note was
+  cheapest and bought least. What stays open is only where the partition lands.
+  **THE INSTRUMENT IS CONTAMINATED and every measurement here is a MULTI-WINDOW read until it is
+  cleared — 2026-09-06, probed at scope.** `.workflow/prompt-friction.log` still carried a PRIOR
+  iteration's close calls verbatim, so no emitted figure denominates one window. Clearing the log is
+  a precondition of the next measurement.
+  **Cost while deferred** was: one re-triage of the same unretireable rows per close, on the
+  surface a close reads to decide where friction is; the top row is always one of them.
+  **AUTHORED AT SPEC: the partition lands on the RANKED ROWS, never on the denominator, and the
+  predicate is NARROWER than this entry states.** The headline stays a true prompt count and
+  `kpi-prompt-friction`'s two integers do not move — an overlay row is off the headline because it
+  DID NOT PROMPT, while an unreachable row prompts and always will. Two shapes qualify, each on a
+  rule's own stated ground: an expansion/substitution/backtick (rule 6) and a write redirect
+  (rule 16). **CHAINING IS EXCLUDED, correcting this entry's structural ground:** §The triage
+  criterion states the harness matches per SEGMENT of a compound and concludes chained tools are
+  themselves legitimate allowlist entries, and the ranker's own `granted()` already agrees.
+  Including it would have contradicted the function computing the partition. What the section
+  reports is which rows disposition (a) cannot reach; (b) and (c) stay live for every row.
+  Grounds at SPEC-ranking-shape.md deltas 1-3.
+  **FOURTH MEASUREMENT 2026-09-05, and it ANSWERS the design question.** 126 calls, 27 patterns, 498
+  fall-throughs; head `python3 -` heredocs at 61x, `cat >>` second at 24x — down from 50x, so the
+  earlier GROWING read tracked the command word, not the class. A THIRD word takes the head across
+  four samples while the SHAPE never moves: partitioning by shape is what the samples buy.
+  recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03 2026-09-08
+  **THE ROUTING AXIS IS ANSWERED — operator direction, 2026-09-09, lead-relayed: a newly judged
+  recurrence does NOT restart the port-first run's proposed-once clause**, since reading a fresh
+  date as a reset defeats the clause that stops a member cycling; the threshold history before
+  it (2026-09-03 to 2026-09-05) is in git.
+  **Unit set `registry-roster-oracles` — operator direction, 2026-09-12, replacing the 2026-09-11
+  decline.** It joins on its recurrence count, the tree's highest at three, not on the set's
+  surface: the threshold clause routes a third recurrence to the operator rather than a third
+  decline, and both prior positions are directions no consult ruling stands over.
+  **THE `cat >> .tmp/*` GRANT WAS GRANTED THE SAME DAY AND IS NOT LANDED HERE:** it edits
+  `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
+  authorization, so it was routed back. The limit it was granted on, recorded here because JSON
+  carries no comment: the glob is a PREFIX match, reaching any path under `.tmp/`.
+  **THE SECOND AND THIRD MEASUREMENTS ARE ANSWERED by the fourth**, as are the fifth and sixth
+  re-derivations discarded at scope; one live residue survives them, the second's falsification of
+  a tempting sub-case — ten `GATE_SDK_VERBOSE=1` calls read as a missing-`env`-word steer were all
+  piped into `grep`, so the prefix changes nothing.
+  Filed 2026-08-27 to the gap inbox by close; promoted 2026-08-27; ruled on by lead 2026-09-04.
+
+
+
+- **entry-compression-contract-unenforced** [spec: SPEC-compression-legibility.md] — the compression
+  relief that queue-kit/SPEC.md §check-queue-entry-budget mandates most often
+  is enforced by nothing, and the failure is invisible where it lands.
+  **The concession is the spec's own, twice**, re-read at the 2026-08-30
+  drain: queue-kit/SPEC.md ("it sees an entry's current extent, and
+  judging whether a removed line was answered or discarded is semantic") and
+  again for the recording-in-the-moment rule it names. So the rule that
+  compression proceed by ANSWERING grounds, never by dropping them, has no
+  oracle at all.
+  **Why the failure is invisible**: extent is the only artifact, and a
+  compressed entry reads identically whether its missing grounds were answered
+  or silently discarded. A later reader cannot tell that grounds it lacks were
+  ever written.
+  **Candidate shape, unpriced and not started**: a gate arm reding a commit in
+  which a deferred entry's counted extent SHRINKS while that same commit adds
+  a ruling or recurrence line, unless the commit also carries the relocation
+  citation the section already specifies. Both halves are machine-readable,
+  which is what makes it a proxy for "a mandated write displaced grounds";
+  what it cannot decide is the semantic half, so it reds a shape rather than a
+  judgment.
+  **It SUPERSEDES `ruling-accretion-outgrows-the-entry-cap`, and that is ANSWERED**: those three
+  shapes were refused, the entry is Done as a 2026-09-09 operator-ratified wontfix, and its
+  boundary note landed at queue-kit/SPEC.md §check-queue-entry-budget. This one's subject is the
+  enforceability of the relief the spec ALREADY rules correct, live because those three were not.
+  **THE FIRST ATTESTED INSTANCE IS MOOT AND ITS CLASS IS NOT.** At `fcf51555`
+  `amendment-roster-omission-detection` carried a propose-once record; `40477bdb` compressed it
+  out while adding ruling lines, and the next scope had to recover the spent route from git to
+  avoid re-escalating an answered member. That entry has since left Deferred, so the dangling
+  antecedent went with it; what the arm would have caught is unchanged.
+  **RULED IN CONSULT 2026-09-09 (`consult, own-authority`, operator-convened, lead-relayed): COSTED
+  AND FILED, NO MECHANISM OWED.** The candidate arm's shape — extent shrinks while a ruling line
+  lands — is also the shape of the relief the spec mandates (compress by answering), so it reds the
+  correct act as often as the defect: a classifier no gate can honestly run, the 2026-08-30 ground.
+  The lever is content tiering — a ruling lands on the entry as a pointer to TRAJECTORY.md or the
+  owning SPEC, never as prose — and this iteration's scope paid its rounds because four landed as
+  prose. **Declined at threshold twice — operator direction, 2026-09-11 and 2026-09-12, both
+  lead-relayed:** no mechanism is owed; the per-boundary re-surfacing is absorbed, not suppressed.
+  **THE 2026-09-09 CONSULT RULING ABOVE IS NOT REVERSED AND STANDS.** A second operator direction,
+  2026-09-12 lead-relayed, promotes this entry into unit set `registry-roster-oracles`, the same
+  day as and against the decline above it. The lead recorded that it could not relay the promotion
+  as a direction, a direction being unable to reverse a closed ruling where only `/consult` can;
+  the operator took it knowingly. So it proceeds **against an unreversed ruling** whose ground is
+  untouched, reversing that ruling still takes a `/consult`, and `/spec` authors against both —
+  this edit being the subject in miniature, funded by compressing two blocks above by answering.
+  recurrence: entry-compression-contract-unenforced 2026-09-07 2026-09-09
+  **Cost while deferred** was: every mandated write onto a saturated entry pays
+  the same unenforced honour-system compression, and the queue's most-ruled
+  entries are exactly the ones paying it.
+  **AUTHORED AT SPEC, AND THE 2026-09-09 CONSULT RULING IS HELD RATHER THAN WORKED AROUND.** That
+  ruling refuses a classifier that REDS, and its ground is untouched: this amendment ships no
+  classifier and nothing in it reds, so reversing the ruling still takes a `/consult` and none is
+  asked for. The shape taken instead follows this entry's own statement of the harm, which is
+  LEGIBILITY and not classification — "a later reader cannot tell that grounds it lacks were ever
+  written". Two halves: the compression contract gains its missing durability clause, the sibling
+  of canon-kit's already-stated rule for the LANDING commit; and `--emit entry-history <slug>`
+  reports, on demand, the commits at which one entry's counted extent fell, judging nothing. Its
+  named reader has a real trigger — assertion A's failure text, read by the session about to
+  compress. Grounds and the bounded walk at SPEC-compression-legibility.md deltas 1-3.
+  Filed 2026-08-30 by close from the gap inbox; both of the owning spec's
+  concessions were re-read at the drain.
+
+
 ## Technical Debt
 
 ## Deferred
@@ -724,57 +1025,6 @@
   Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
   whether the tag earns its keep; the operator noted having proposed removal before and gave no
   ruling. Promoted 2026-09-06 by close — too wide to fix inline, live trigger bars the icebox.
-
-- **entry-compression-contract-unenforced** [design-pending] [cost: event/low] [surface: queue-kit] — the compression
-  relief that queue-kit/SPEC.md §check-queue-entry-budget mandates most often
-  is enforced by nothing, and the failure is invisible where it lands.
-  **The concession is the spec's own, twice**, re-read at the 2026-08-30
-  drain: queue-kit/SPEC.md ("it sees an entry's current extent, and
-  judging whether a removed line was answered or discarded is semantic") and
-  again for the recording-in-the-moment rule it names. So the rule that
-  compression proceed by ANSWERING grounds, never by dropping them, has no
-  oracle at all.
-  **Why the failure is invisible**: extent is the only artifact, and a
-  compressed entry reads identically whether its missing grounds were answered
-  or silently discarded. A later reader cannot tell that grounds it lacks were
-  ever written.
-  **Candidate shape, unpriced and not started**: a gate arm reding a commit in
-  which a deferred entry's counted extent SHRINKS while that same commit adds
-  a ruling or recurrence line, unless the commit also carries the relocation
-  citation the section already specifies. Both halves are machine-readable,
-  which is what makes it a proxy for "a mandated write displaced grounds";
-  what it cannot decide is the semantic half, so it reds a shape rather than a
-  judgment.
-  **It SUPERSEDES `ruling-accretion-outgrows-the-entry-cap`, and that is ANSWERED**: those three
-  shapes were refused, the entry is Done as a 2026-09-09 operator-ratified wontfix, and its
-  boundary note landed at queue-kit/SPEC.md §check-queue-entry-budget. This one's subject is the
-  enforceability of the relief the spec ALREADY rules correct, live because those three were not.
-  **THE FIRST ATTESTED INSTANCE IS MOOT AND ITS CLASS IS NOT.** At `fcf51555`
-  `amendment-roster-omission-detection` carried a propose-once record; `40477bdb` compressed it
-  out while adding ruling lines, and the next scope had to recover the spent route from git to
-  avoid re-escalating an answered member. That entry has since left Deferred, so the dangling
-  antecedent went with it; what the arm would have caught is unchanged.
-  **RULED IN CONSULT 2026-09-09 (`consult, own-authority`, operator-convened, lead-relayed): COSTED
-  AND FILED, NO MECHANISM OWED.** The candidate arm's shape — extent shrinks while a ruling line
-  lands — is also the shape of the relief the spec mandates (compress by answering), so it reds the
-  correct act as often as the defect: a classifier no gate can honestly run, the 2026-08-30 ground.
-  The lever is content tiering — a ruling lands on the entry as a pointer to TRAJECTORY.md or the
-  owning SPEC, never as prose — and this iteration's scope paid its rounds because four landed as
-  prose. **Declined at threshold twice — operator direction, 2026-09-11 and 2026-09-12, both
-  lead-relayed:** no mechanism is owed; the per-boundary re-surfacing is absorbed, not suppressed.
-  **THE 2026-09-09 CONSULT RULING ABOVE IS NOT REVERSED AND STANDS.** A second operator direction,
-  2026-09-12 lead-relayed, promotes this entry into unit set `registry-roster-oracles`, the same
-  day as and against the decline above it. The lead recorded that it could not relay the promotion
-  as a direction, a direction being unable to reverse a closed ruling where only `/consult` can;
-  the operator took it knowingly. So it proceeds **against an unreversed ruling** whose ground is
-  untouched, reversing that ruling still takes a `/consult`, and `/spec` authors against both —
-  this edit being the subject in miniature, funded by compressing two blocks above by answering.
-  recurrence: entry-compression-contract-unenforced 2026-09-07 2026-09-09
-  **Cost while deferred:** every mandated write onto a saturated entry pays
-  the same unenforced honour-system compression, and the queue's most-ruled
-  entries are exactly the ones paying it.
-  Filed 2026-08-30 by close from the gap inbox; both of the owning spec's
-  concessions were re-read at the drain.
 
 - **config-bridge-resolution-cost** [design-pending] [cost: session/high] [surface: gate-sdk] — the array-knob config bridge still costs
   about 640 ms on every invocation that resolves it, and no entry owns the residue.
@@ -3196,57 +3446,6 @@
   escalated the ruling and did not take it; ruled by the operator the same day and recorded here by
   that same scope, which authored no part of the ruling it records.
 
-- **bridged-knob-case-tmp-dir-override-inert** [design-pending] [cost: session/high] [surface: gate-sdk] — the `--run-gate-tests`
-  arm's case scratch pin protects no bridged gate, so a bridged/native gate writes its scratch into
-  the tracked fixture corpus it is the oracle for.
-  recurrence: bridged-knob-case-tmp-dir-override-inert 2026-08-25
-  **FIRST RECURRENCE, 2026-08-25 at close, and it re-fired in the ATTESTED shape rather than a
-  variant.** A battery run regenerated the scratch, and the next `installer_smoke` run died at
-  `checkwright init`'s `git add` on the ignored path — masking the ruled binary-less scenario
-  exactly as the cost line predicts. The masking cost a diagnosis a second time: only deleting the
-  regeneration and re-running showed the four profiles clean and the failure landing where the
-  baseline says it does. TWO READINGS THE RECURRENCE ADDS. First, the regeneration is not
-  occasional — the producing gate runs in the battery, so ANY session that runs the battery before
-  the installer suite meets the mask, which makes the masked reading the default ordering rather
-  than the unlucky one. Second, the baseline row's non-re-attribution was VINDICATED by the same
-  firing and is now ANSWERED: the 2026-08-24 split rules generally at evidence-kit/SPEC.md
-  §Baseline manifest, and the shell loop it turned on has retired with its row reading pass.
-  **The mechanism, re-measured 2026-09-11 after the harness port.** The `--run-gate-tests` arm
-  resolves a case's argv by running `gate_command` inside the case dir, which bakes the ambient,
-  repo-relative `GATE_SDK_KNOB_GATE_SDK_TMP_DIR=.tmp` into its `env` prefix. The arm's scratch pin
-  sets the bare `GATE_SDK_TMP_DIR`, which no native gate reads, so `.tmp` resolves inside the case
-  dir. Probed on the resolved argv, and one clean `gate_sdk` fixture-suite run regenerated the
-  residue. The shell harness this entry first measured had the same shape.
-  **Reproduced live rather than reasoned.** `check-crate-arms`' port to `.gate` plus a crate module
-  this iteration silently reopened the corpus-pollution class `c1375e99`/`80d74291` closed: with
-  both fixture `.tmp` dirs deleted, a plain `gate_sdk` fixture-suite run — no manual invocation —
-  regenerated `gate-sdk/gate-tests/check-crate-arms/good/.tmp/crate-arms-<hash>.green`, watched
-  twice. DISTINCT from the retired `pack-installer-vendors-untracked-scratch` downstream of it,
-  whose `cp -R` filter gap is the VENDORING symptom: this is the cache-pollution CAUSE in the
-  harness, for every future native-ported gate declaring `GATE_SDK_TMP_DIR` against a tracked pair.
-  **Why `[design-pending]`:** the candidate fix is to pin the case scratch in the knob form the
-  member reads rather than only the bare name, but the config bridge is a single-producer surface
-  and moving where a knob's value is computed for one caller is the criterion-6 question in
-  miniature.
-  **Cost while deferred:** a fixture-suite run leaves ignored scratch inside a tracked fixture
-  corpus. The packer now archives the tracked set alone, so the vendoring that cost the diagnoses
-  above no longer follows from it; any other reader of that corpus that walks ignored paths does.
-  **Seam ruled at scope 2026-09-12, answering the criterion-6 question without authoring the
-  amendment.** Kit mechanism: the harness pins the case scratch in every spelling a member may
-  read, a fixture case's sandbox location being the harness's own fact and never a choice.
-  Consumer config: nothing new — `GATE_SDK_TMP_DIR` exists and its value stays the consumer's for
-  ordinary runs. Foreclosed rather than ranked: computing the pin at the MEMBER, a second producer
-  on a single-producer bridge, and a per-gate opt-out knob, a second source for one pin. No
-  consumer path enters a kit literal either way; spelling and entry point stay spec's.
-  **Unit set `registry-roster-oracles`, and it LEADS — operator direction, 2026-09-12**, which
-  supersedes 2026-09-11's lead-relayed re-verify-then-retire: that was routed on a survey reading
-  the premise stale, and the re-run answered it by holding. It is the tier-1 `session/high` entry
-  whose deferral produces a wrong reading rather than a slow one, and its open question — where a
-  knob's value may be computed for one caller — is the contract the other three assert against.
-  Filed 2026-08-24 to the gap inbox by validate, declared distinct; promoted that day at
-  `shell-gate-tail-port-and-completion-oracle`'s close, deleting the regenerated instance; its
-  recurrence's attribution was ruled at `execution-control-reach-and-turn-end-blocking`'s close.
-
 - **dispatch-claim-evidentiary-tier-unmarked** [design-pending] [cost: event/high] [surface: lifecycle-kit] — a dispatch prompt can upgrade an
   inference into a finding, and the receiving session cannot see the evidence base to discount it.
   recurrence: dispatch-claim-evidentiary-tier-unmarked 2026-08-24
@@ -3898,57 +4097,6 @@
   a green remote one — is false for one member, and the failure mode is a burned push.
   Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; attested
   2026-08-27 by the `windows-adopter-unblock` close's own verifying push.
-
-- **prompt-ranking-ungrantable-shape-class** [design-pending] [cost: iteration/low] [surface: guard-kit] — the friction ranking's unit mixes
-  rows an allowlist entry could retire with rows no entry can ever match, so each close re-triages a
-  class no action retires.
-  **The structural ground, and it is why this is not a tuning complaint** — the guard says so in its
-  own refusal text: a `Bash(...)` entry matches a bare command, so any chaining, redirect or
-  expansion breaks the match and the call is decided out of band whatever the allowlist holds.
-  **All three of the triage's dispositions are wrong for these rows.** An allowlist entry cannot
-  reach them; a guard steer already covers the read shapes while the write shapes are legitimate
-  journal and scratch appends, which guard rule 17 now auto-allows outright; and a habit change
-  leaves the row ranking identically. The honest disposition is a fourth the ranking does not
-  offer: structurally ungrantable, retired from the actionable set.
-  **DISTINCT from `friction-key-segment-selection-unruled`**, whose axis is *which* segment of a
-  compound is keyed: it changes which name a row files under and leaves every row ranking. DISTINCT
-  from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed at all —
-  its guard-steer shape retires these rows by changing behaviour, where this entry asks what the
-  ranking should say while it has not.
-  **The design question is ANSWERED by the fourth measurement below — partition the ranked output by
-  SHAPE**, as it already partitions overlay-covered rows. Grading each row against the allowlist's
-  own matching rule was more accurate and duplicated that rule; a guard-kit/SPEC.md note was
-  cheapest and bought least. What stays open is only where the partition lands.
-  **THE INSTRUMENT IS CONTAMINATED and every measurement here is a MULTI-WINDOW read until it is
-  cleared — 2026-09-06, probed at scope.** `.workflow/prompt-friction.log` still carried a PRIOR
-  iteration's close calls verbatim, so no emitted figure denominates one window. Clearing the log is
-  a precondition of the next measurement.
-  **Cost while deferred:** one re-triage of the same unretireable rows per close, on the surface a
-  close reads to decide where friction is; the top row is always one of them.
-  **FOURTH MEASUREMENT 2026-09-05, and it ANSWERS the design question.** 126 calls, 27 patterns, 498
-  fall-throughs; head `python3 -` heredocs at 61x, `cat >>` second at 24x — down from 50x, so the
-  earlier GROWING read tracked the command word, not the class. A THIRD word takes the head across
-  four samples while the SHAPE never moves: partitioning by shape is what the samples buy.
-  recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03 2026-09-08
-  **THE ROUTING AXIS IS ANSWERED — operator direction, 2026-09-09, lead-relayed: a newly judged
-  recurrence does NOT restart the port-first run's proposed-once clause**, since reading a fresh
-  date as a reset defeats the clause that stops a member cycling; the threshold history before
-  it (2026-09-03 to 2026-09-05) is in git.
-  **Unit set `registry-roster-oracles` — operator direction, 2026-09-12, replacing the 2026-09-11
-  decline.** It joins on its recurrence count, the tree's highest at three, not on the set's
-  surface: the threshold clause routes a third recurrence to the operator rather than a third
-  decline, and both prior positions are directions no consult ruling stands over.
-  **THE `cat >> .tmp/*` GRANT WAS GRANTED THE SAME DAY AND IS NOT LANDED HERE:** it edits
-  `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
-  authorization, so it was routed back. The limit it was granted on, recorded here because JSON
-  carries no comment: the glob is a PREFIX match, reaching any path under `.tmp/`.
-  **THE SECOND AND THIRD MEASUREMENTS ARE ANSWERED by the fourth**, as are the fifth and sixth
-  re-derivations discarded at scope; one live residue survives them, the second's falsification of
-  a tempting sub-case — ten `GATE_SDK_VERBOSE=1` calls read as a missing-`env`-word steer were all
-  piped into `grep`, so the prefix changes nothing.
-  Filed 2026-08-27 to the gap inbox by close; promoted 2026-08-27; ruled on by lead 2026-09-04.
-
-
 
 - **readme-bin-roster-underived** [design-pending] [cost: event/low] [surface: gate-sdk] — every kit README's **gate** roster is held by a
   gate and its **`bin/` tool** roster is held by nothing, so a tool added, renamed or retired leaves
@@ -4980,68 +5128,6 @@
   expensive and where the session has no authority to narrow the assertion.
   Filed 2026-09-12 by spec into the gap inbox; drained and promoted at this close.
 
-- **reads-couples-skipped-set-has-no-census-oracle** [design-pending] [cost: session/low] [surface: gate-sdk]
-  — the population of `check-reads-couples`' decidable skipped walk roots is hand-swept, and has
-  been wrong every time it was counted.
-  **Deliverable:** an `--emit` arm (or a gate) enumerating every member declaring `?` together
-  with its walk's root expression and filter argument, so the set is measured once by an oracle
-  rather than re-swept per session.
-  **Measured cost of its absence:** 26, then 27, then at least 29 across three sweeps in one spec
-  stage, against 39 when an oracle finally counted — each miss caused by another spelling of one
-  idiom (`unwrap_or`, `unwrap_or_else` with a closure, a `match` on `args.first().filter` with a
-  `None` arm, `args.get(N)` as well as `args.first()`, and a hardcoded literal root that is not
-  argument-based at all).
-  **Re-verified at the drain that the arm still does not exist.** The `--emit` arm set carries no
-  census member, and `checkwright-gates --reads` requires a gate name — it answers one member per
-  invocation, so a census is still a loop a session writes by hand.
-  **Why it is cheap:** gate-sdk/SPEC.md §check-reads-couples already owns the declared-roots
-  machinery the arm would read and the binary already answers `--reads` per member, so the arm is
-  a projection over data that exists — one emitter plus a fixture pair, no new config, no new
-  contract.
-  **Cost while deferred:** any session needing the population pays a hand sweep that has never
-  once been right, and a wrong population silently mis-sizes whatever it is sizing.
-  **Unit set `registry-roster-oracles`, the census half — operator direction, 2026-09-12.** It
-  joins on the composition test: the arm reads the same crate registry the set's other members
-  assert over, and it is the member that turns a hand sweep into an oracle.
-  Filed 2026-09-12 by spec into the gap inbox at the lead's direction rather than started, because
-  nobody ranked it; drained and promoted at this close.
-
-- **crate-registry-battery-roster-divergence-unasserted** [design-pending] [cost: session/low] [surface: gate-sdk]
-  — nothing compares the crate's registry roster with the battery's, so a member can be asserted
-  on one side and invisible on the other in either direction.
-  **Re-measured at the drain:** the binary's dispatch carries **115** `check-*` members; a
-  non-comment line count of `scripts/gates.list` gives **113**. The residue is
-  `check-surface-duplication` and `check-producer-liveness`.
-  **What the drain corrected in the filing's own claim.** The bullet read the residue as
-  unaccounted; each absence in fact already carries a stated cause in prose —
-  canon-kit/README.md:34 (`check-surface-duplication` "needs a glossary (exits 2 without one)",
-  and this tree declares none for the provenance-seam reason) and scripts/lifecycle-config.sh:12
-  (a registered liveness gate "would red every validate run against its own lock"). So the
-  residue is deliberate and the entry's subject is narrower than filed, and it stands unchanged:
-  neither disposition is reachable by any crate-side assertion, because nothing joins the rosters.
-  **Why it bites:** a crate-side assertion over the registry asserts over a corpus strictly wider
-  than the one `check-reads-couples` scans, so a member can red a crate assertion while being
-  invisible to the gate that exists to catch it, and can satisfy the gate while being unasserted
-  crate-side. Attested this iteration — the static-root refusal's 39-member red set included
-  `check-surface-duplication`, which no battery run can reach.
-  **Candidate mechanism:** an assertion in `check-gate-substrate-parity`, which already equates
-  the descriptor set with the `--list` roster, extended to name the registered-but-unlisted
-  residue, each member taking a recorded disposition the way the meta-gate conservation table's
-  members do.
-  **DISTINCT from `couples-dynamic-root-resolution`**, which it only cites as its attestation:
-  that entry's subject is which walk roots resolve statically and how each is declared, this
-  one's is the *roster* the declarations are asserted over, and it would stand unchanged if every
-  root in the tree were already declared.
-  **Cost while deferred:** two members stay dispatchable and unrun with their causes stated only
-  in prose no reader joins, and any future crate-side assertion inherits the same blind spot
-  silently.
-  **Unit set `registry-roster-oracles`, the roster-join half — operator direction, 2026-09-12.**
-  It is the member that makes the other three's assertions reachable: nothing today joins the
-  crate's 115-member dispatch to the battery's 113-line registry, so every crate-side assertion
-  the set lands inherits a blind spot until this one does.
-  Filed 2026-09-12 by build into the gap inbox rather than fixed, scope-gated intake refusing a
-  mid-session initiative; drained and promoted at this close.
-
 - **depth-enumerated-glob-bound-unoracled** [design-pending] [cost: event/low] [surface: canon-kit]
   — a depth-enumerated glob value is a maintained copy of "any depth", and a file one level
   deeper than the enumeration reaches leaves the scanned corpus **silently**.
@@ -5167,30 +5253,6 @@
   ranking keeps re-surfacing them.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its prompt-friction
   triage; drained and promoted at this iteration's scope.
-
-- **unknown-emit-arm-diagnostic-misdirects** [design-pending] [cost: session/low] [surface: gate-sdk]
-  — an unknown `--emit` arm name prints the binary's GATE subcommand roster instead of the arm set,
-  so the diagnostic confirms a wrong mental model instead of correcting it.
-  **THE ORIGINAL FILING'S CLAIM WAS WRONG AND IS DELETED RATHER THAN ANNOTATED.** The arm roster IS
-  owned and discoverable — gate-sdk/SPEC.md (the non-gate arm) lists every `--emit-<name>` across
-  every kit in one place, and `git log -L` shows that text predating the filing by many commits. So
-  the captured friction was a discovery-process miss, not absent documentation.
-  **What survives is narrower and sharper:** a reader who typed `--emit` wanted arms, and the
-  moment-of-miss diagnostic points at the wrong roster entirely.
-  **Why `[design-pending]`:** the candidate is a diagnostic naming gate-sdk/SPEC.md's non-gate-arm
-  section and printing no gate roster at all, which decides whether a refusal may cite a SPEC
-  section — a coupling the gate-output contract does not currently carry.
-  **DISTINCT from the iceboxed `bin-tool-help-arm-absent-tree-wide`**, re-read at the drain: that
-  entry is about other `bin/` tools answering `-h`/`--help` wrong, and every tool it named has since
-  been deleted.
-  **Cost while deferred:** one diagnostic string plus a fixture pair, unspent, against a wrong
-  roster printed at every mistyped arm.
-  **Unit set `registry-roster-oracles`, the arm-roster half — operator direction, 2026-09-12.**
-  The same binary holds two rosters, gates and arms, and this is where it hands a reader the
-  wrong one; the set's other members join rosters that exist, this one separates two that are
-  already conflated at the diagnostic.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on a mistyped arm at its
-  own drain; drained and promoted at this iteration's scope.
 
 - **retired-block-admits-live-gate-name** [design-pending] [cost: session/low] [surface: queue-kit]
   — the `queue-edges` retired block admits a live GATE NAME as a retired queue slug, and that false
