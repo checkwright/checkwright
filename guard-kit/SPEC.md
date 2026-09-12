@@ -101,6 +101,12 @@ tools an agent habitually chains (`echo`, `wc`, `grep`, `ls`, `command -v`)
 are therefore themselves legitimate allowlist entries; allowlist them, or
 run the core command bare.
 
+A row the ranking marks **allowlist-unreachable** (§scan-prompts) admits two
+dispositions, not three: an allowlist entry is *unavailable* for it rather than
+unattractive, so resolve it by a guard rule or a habit change, or leave it
+standing as measured friction — a standing row is an honest outcome, not an
+unfinished triage.
+
 ## The guard framework (`lib/guard.sh`)
 
 Primitives a consumer guard composes; each emits the harness's
@@ -1956,13 +1962,60 @@ The friction log's fall-throughs split three ways:
 - **Prompting** — some segment nothing grants. The headline `<n> prompting
   call(s)`, grouped and ranked by pattern (leading binary, plus subcommand for
   the common multi-command binaries, plus the **write-shape suffix** below),
-  triaged at close by the criterion above.
+  triaged at close by the criterion above. Its rows are printed in **two
+  labelled sections** — *actionable*, then *allowlist-unreachable* (the
+  reachability verdict below) — and the headline gains one derived clause,
+  `<u> of them allowlist-unreachable`, the calls in the second section. The
+  partition is over **rows, never over the count**: `<n>`, `<m>` and
+  `kpi-prompt-friction`'s two integers are exactly what they were without it.
 - **Overlay-covered** — granted, but at least one segment relies on the
   uncommitted `GUARD_KIT_SETTINGS_LOCAL` overlay. It *did not prompt*, so it is
   excluded from the headline (the count is a true prompt count, not an upper
   bound), yet it is exactly the promote-or-prune candidate the close step must
   see — so it is ranked in a **separate, visibly-advisory section** below the
-  headline, never mixed into it.
+  headline, never mixed into it. **An allowlist-unreachable row is sectioned
+  the same way and kept on the headline, and the difference is the reason for
+  each exclusion**: an overlay row is off the count because it did not prompt,
+  while an unreachable row *did* prompt and will on every future call of its
+  shape — moving it off would make the count stop measuring what the KPI reads
+  it for.
+
+**The allowlist-reachability verdict, and why it is narrower than "anything the
+allowlist cannot fix".** A logged call is **allowlist-unreachable** when it
+carries a shape the permission matcher refuses outright, and two shapes qualify,
+each on a ground a rule already states in its own refusal text: an
+**expansion, substitution or backtick** — rule 6's "the harness's matcher refuses
+every expansion", with the output process substitution and the backtick it does
+not block — and a **write redirect**, which rule 16 says "defeats the permission
+matcher" and rule 17 says no `Bash(…)` entry can grant. The redirect test is the
+write-shape suffix's own scan over `_guard_redirect_pairs`' twin with **rule 17's
+own target test**, so a `/dev/null` target and an fd-dup, which rule 17 exempts as
+targets that are not files, do not qualify — the suffix still keys them, since the
+key's axis is the operator and the verdict's is the target. **Chaining is
+excluded**: §The triage criterion's per-segment rule makes the segments of a
+compound themselves legitimate allowlist entries, and `granted()` already models a
+compound as reachable when every segment is, so a chaining arm would contradict
+the function computing the partition and retire rows an allowlist can fix. The
+verdict reads **every segment** of the line, not the key's first one — one
+unmatched segment takes the whole line off the match path — on a view where a
+single-quoted span and a backslash-escaped byte are inert and a double-quoted span
+is live for expansion. **A heredoc body is not read**: the log flattens a call's
+newlines, so past the first heredoc opener the line cannot say where the body ends
+and which text is shell, and the scan stops there. **A key is reported unreachable
+only when every call under it is**, and both limits lean the same way on purpose:
+under-retiring leaves an unactionable row on the actionable list, which is visible,
+while over-retiring hides friction a reader could have fixed, which is silent. The
+expansion test is the ranker's own reading of the log rather than a twinned
+primitive — it decides a report section, not a call — so it adds no member for
+`--guard-lib-parity` to hold.
+
+**What the section claims is disposition (a) only.** It reports the rows an
+allowlist entry cannot reach, and makes no claim about a guard rule or a habit
+change: both stay available for every row, and a guard rule reaching shapes no glob
+can express is that disposition's stated reason for existing. The section is
+**advisory on the log's own terms** (§The close-stage triage step) and reds nothing.
+Because the partition moves no call between prompting and granted and re-keys no
+row, it is **not** a definitional step of the kind recorded below.
 
 **Every segment is read through the harness view before it is matched or
 keyed.** The grant test and the ranking key both take the segment through
@@ -2115,10 +2168,12 @@ dead weight once `kpi-prompt-friction` calls the counter in-crate instead.
 Its behavior
 — the three-way split, the per-segment matching, the true count, the
 argument-override in both orders, the
-write-shape suffix's create/append/fd-dup/first-segment cases, and the
+write-shape suffix's create/append/fd-dup/first-segment cases, the reachability
+partition's sections and headline clause, and the
 argv-shape refusal with its `--` escape — is pinned by
 `gate-tests/scan-prompts.test.sh`, which reaches the arm through the front-end
-so the end-to-end path keeps a holder; the key derivation is additionally pinned
+so the end-to-end path keeps a holder; the key derivation, the reachability
+verdict's shapes and exclusions, and the mixed-key rule are additionally pinned
 in-crate, where `check-crate-arms` runs it. What that test pins is the split,
 the count semantics and those cases; the key's granularity beyond them is not a
 contract, which is why an additive suffix leaves its substring assertions true.
@@ -2420,7 +2475,9 @@ reader — no new invocation point and no new schedule.
 The friction log is a capture-tier surface with no forcing function — nothing
 refuses a close that skips it — so it declares itself advisory on the
 close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster), naming
-the clear above as its reclaim path:
+the clear above as its reclaim path. The ranking's allowlist-unreachable section
+is advisory on those same terms and adds no obligation: it reds nothing, gates
+nothing, and leaves the roster line unchanged:
 
 close-surface: .workflow/prompt-friction.log advisory reclaim=: > .workflow/prompt-friction.log
 

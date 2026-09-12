@@ -15,6 +15,11 @@ by shape, as it already partitions overlay-covered rows — and leaves open only
 where the partition lands. This amendment lands it, and narrows the predicate the
 entry proposed, because the wider one contradicts the ranker's own model.
 
+**State at build: all four deltas are applied; this file's deletion and the
+entry's Done move are held** until the entry body's one record with no other
+governed home — the unlanded `cat >> .tmp/*` allowlist grant, which a live entry
+cites — has a disposition.
+
 ## What changes
 
 ### (1) The ranker computes an allowlist-reachability verdict per logged call
@@ -126,8 +131,11 @@ new obligation on close.
     (`guard-kit/lib/guard.sh:105-109`).
   - *Consumers:* the render pass, which places the row in one of two sections; and
     the headline's derived clause.
-  - *Inputs, all existing:* `guard::redirect_pairs` and the expansion/brace
-    predicates rules 6 and 7 already run. No new knob, no new kit literal, and
+  - *Inputs:* `guard::redirect_pairs` and `guard::skeleton`, both twinned. **Aged
+    premise, corrected at build:** rules 6 and 7's predicates have no compiled
+    twin, so the expansion test is a ranker-local scan (as `redirect_op` is), not a
+    guard primitive — and rule 17's target test exempts `/dev/null` as well as an
+    fd-dup, which the verdict follows. No new knob, no new kit literal, and
     nothing consumer-specific — the shapes are harness matcher facts, the same
     class §The generic ruleset already rules "public, documented, and shared by
     every consumer of that harness" and therefore outside the provenance seam.
@@ -168,7 +176,7 @@ new obligation on close.
   and 2). The **prompting** bullet gains its two-section partition and the
   statement that the partition is over rows, never over the count; the reason it
   differs from the overlay bullet's exclusion is stated at the overlay bullet
-  itself, which is where a reader meets the precedent. **Not yet applied.**
+  itself, which is where a reader meets the precedent. **Applied.**
 - `guard-kit/SPEC.md` §scan-prompts (delta 1). A new passage owns the
   reachability predicate: its two shapes with the rules whose grounds they are,
   the **exclusion of chaining** with §The triage criterion's per-segment rule as
@@ -176,14 +184,14 @@ new obligation on close.
   conservatism.
 - `guard-kit/SPEC.md` §The triage criterion, lines 80-102 (delta 3). The
   reachability limit and what a row admits when disposition (a) cannot reach it.
-  **Not yet applied.**
+  **Applied.**
 - `guard-kit/SPEC.md` §The close-stage triage step (delta 4). One clause recording
   that the new section is advisory on the log's existing terms and that the
   close-surface row is unchanged — so the addition is not read as a new forcing
   function.
 - `native/src/emit/scan_prompts.rs`'s header `// spec:` pointer (deltas 1 and 2).
   It currently says the fall-throughs "split three ways"; after this unit the
-  prompting share itself splits, which is a different claim. **Not yet applied.**
+  prompting share itself splits, which is a different claim. **Applied.**
 - `docs/guard-kit/SPEC.md` (all deltas) — the generated on-site mirror; regenerate
   with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`.
 

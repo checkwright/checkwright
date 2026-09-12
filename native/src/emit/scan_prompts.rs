@@ -1,6 +1,6 @@
-// spec: guard-kit/SPEC.md §scan-prompts — the ranker: the friction log's fall-throughs split three
-// ways against both settings files and the harness's read-only built-ins, the prompting share
-// grouped by the ranking key. A bridged arm, because it resolves three consumer knobs.
+// spec: guard-kit/SPEC.md §scan-prompts — the ranker: fall-throughs split three ways, the prompting
+// share grouped by the ranking key with its rows (never its count) partitioned by allowlist
+// reachability. A bridged arm, because it resolves three consumer knobs.
 use crate::guard;
 use crate::walk;
 use serde_json::Value;
@@ -154,11 +154,9 @@ fn granted(cmd: &str, allow: &[String], overlay: Option<&[String]>) -> bool {
 // spec: guard-kit/SPEC.md §scan-prompts — the key's write-shape suffix: the segment's own
 // write-redirect operator normalized to `>` or `>>`, the descriptor dropped and an fd-dup excluded
 // on rule 17's own target test, since an fd-dup is not a redirect to a file.
-fn redirect_op(c: &str) -> &'static str {
-    let pairs = match guard::redirect_pairs(c) {
-        Ok(p) => p,
-        Err(_) => return "",
-    };
+fn write_redirects(c: &str) -> Vec<(&'static str, String)> {
+    let pairs = guard::redirect_pairs(c).unwrap_or_default();
+    let mut out = Vec::new();
     for pair in pairs {
         let p = pair.trim_start_matches(|ch: char| ch.is_ascii_digit());
         let (op, tgt) = match p.strip_prefix(">>") {
@@ -169,9 +167,72 @@ fn redirect_op(c: &str) -> &'static str {
         if tgt.is_empty() || tgt.starts_with('&') {
             continue;
         }
-        return op;
+        out.push((op, tgt.to_string()));
     }
-    ""
+    out
+}
+
+fn redirect_op(c: &str) -> &'static str {
+    write_redirects(c).first().map_or("", |(op, _)| *op)
+}
+
+// spec: guard-kit/SPEC.md §scan-prompts — a flattened log line cannot say where a heredoc body ends,
+// so the reachability scans read only the text before the first opener; a here-string is no opener.
+fn before_heredoc(view: &str) -> &str {
+    let b = view.as_bytes();
+    let mut i = 0usize;
+    while i + 1 < b.len() {
+        if b[i] == b'<' && b[i + 1] == b'<' {
+            if b.get(i + 2) == Some(&b'<') {
+                i += 3;
+                continue;
+            }
+            return &view[..i];
+        }
+        i += 1;
+    }
+    view
+}
+
+// spec: guard-kit/SPEC.md §scan-prompts — rule 6's expansion shapes plus the backtick and output
+// process substitution it does not block, on a view where a single-quoted span and an escaped byte
+// are inert.
+fn carries_expansion(live: &str) -> bool {
+    let b = live.as_bytes();
+    let mut i = 0usize;
+    while i < b.len() {
+        match b[i] {
+            b'\\' => {
+                i += 2;
+                continue;
+            }
+            b'`' => return true,
+            b'$' if b
+                .get(i + 1)
+                .is_some_and(|c| matches!(c, b'{' | b'(' | b'_') || c.is_ascii_alphabetic()) =>
+            {
+                return true
+            }
+            b'<' | b'>' if b.get(i + 1) == Some(&b'(') => return true,
+            _ => {}
+        }
+        i += 1;
+    }
+    false
+}
+
+// spec: guard-kit/SPEC.md §scan-prompts — the allowlist-reachability verdict, per logged call over
+// every segment: an expansion, or a write redirect to a target rule 17's own test calls a file.
+fn allowlist_unreachable(line: &str) -> bool {
+    let live = guard::skeleton(line, guard::Wants { sq: true, dq: false });
+    let structural = guard::skeleton(line, guard::Wants { sq: true, dq: true });
+    let (Ok(live), Ok(structural)) = (live, structural) else {
+        return false;
+    };
+    carries_expansion(before_heredoc(&live))
+        || write_redirects(before_heredoc(&structural))
+            .iter()
+            .any(|(_, tgt)| tgt != "/dev/null")
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — a write redirect standing where a subcommand would is
@@ -209,10 +270,11 @@ pub fn ranking_key(line: &str) -> String {
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the three-way split's whole result: the prompting share,
-// the overlay-covered share, and the logged denominator. Committed-covered is on neither ranking
-// by construction — it is silently granted and reinforced.
+// the allowlist-unreachable calls within it per key, the overlay-covered share, and the logged
+// denominator. Committed-covered is on neither ranking by construction.
 pub struct Tally {
     pub prompting: Vec<(String, u64)>,
+    pub unreachable: Vec<(String, u64)>,
     pub overlay: Vec<(String, u64)>,
     pub total: u64,
     pub overlay_total: u64,
@@ -238,6 +300,7 @@ fn ranked(rows: &[(String, u64)]) -> Vec<&(String, u64)> {
 pub fn tally(log_text: &str, allow: &[String], overlay: &[String]) -> Tally {
     let mut t = Tally {
         prompting: Vec::new(),
+        unreachable: Vec::new(),
         overlay: Vec::new(),
         total: 0,
         overlay_total: 0,
@@ -266,9 +329,23 @@ pub fn tally(log_text: &str, allow: &[String], overlay: &[String]) -> Tally {
         } else {
             bump(&mut t.prompting, &key);
             t.total += 1;
+            if allowlist_unreachable(line) {
+                bump(&mut t.unreachable, &key);
+            }
         }
     }
     t
+}
+
+type Rows = Vec<(String, u64)>;
+
+// spec: guard-kit/SPEC.md §scan-prompts — the prompting rows as actionable then unreachable: a key is
+// unreachable only when EVERY call under it is, so a mixed key stays on the actionable list.
+fn partition(t: &Tally) -> (Rows, Rows) {
+    t.prompting
+        .iter()
+        .cloned()
+        .partition(|row| !t.unreachable.contains(row))
 }
 
 fn scan(log: &str, settings: &str, settings_local: &str) -> Tally {
@@ -312,6 +389,20 @@ fn overlay_section(t: &Tally, settings_local: &str, out: &mut String) {
     rank_section(&t.overlay, out);
 }
 
+// spec: guard-kit/SPEC.md §scan-prompts — the allowlist-unreachable rows: on the headline's count,
+// ranked apart and visibly advisory, and absent entirely when it is empty.
+fn unreachable_section(rows: &[(String, u64)], total: u64, out: &mut String) {
+    if rows.is_empty() {
+        return;
+    }
+    out.push('\n');
+    out.push_str("--- Allowlist-unreachable (advisory — every call carries an expansion or a write redirect,\n");
+    out.push_str("    which no allowlist entry can match: (a) is unavailable; resolve by (b) or (c), or leave\n");
+    out.push_str("    it standing as measured friction (guard-kit/SPEC.md §The triage criterion): ---\n");
+    out.push_str(&format!("{} call(s) across {} pattern(s).\n", total, rows.len()));
+    rank_section(rows, out);
+}
+
 fn render(log: &str, settings: &str, settings_local: &str, count_only: bool) -> String {
     // spec: guard-kit/SPEC.md §scan-prompts — an absent or empty log is not a clean tree with a
     // ranking of nothing: the count mode answers `0/0` and the report says the log is empty.
@@ -336,19 +427,27 @@ fn render(log: &str, settings: &str, settings_local: &str, count_only: bool) -> 
         overlay_section(&t, settings_local, &mut out);
         return out;
     }
+    let (actionable, unreachable) = partition(&t);
+    let unreachable_total: u64 = unreachable.iter().map(|(_, n)| n).sum();
     out.push_str("=== Prompt friction (advisory — triage at close, not a gate) ===\n");
     out.push_str(&format!(
-        "{} prompting call(s) across {} pattern(s), from {} logged fall-through(s).\n",
+        "{} prompting call(s) across {} pattern(s), from {} logged fall-through(s); {} of them allowlist-unreachable.\n",
         t.total,
         t.prompting.len(),
-        t.logged
+        t.logged,
+        unreachable_total
     ));
     out.push_str(&format!("log: {}\n\n", log));
-    rank_section(&t.prompting, &mut out);
+    out.push_str("--- Actionable (every disposition available): ---\n");
+    if actionable.is_empty() {
+        out.push_str("  (none — every prompting pattern is allowlist-unreachable)\n");
+    }
+    rank_section(&actionable, &mut out);
     out.push_str("\nTriage each by the criterion (guard-kit/SPEC.md §The triage criterion):\n");
     out.push_str("  (a) allowlist entry — safe & already in the form to reinforce,\n");
     out.push_str("  (b) guard rule — a better form exists (steer), or logic a glob can't express,\n");
     out.push_str("  (c) habit change — a true one-off.\n");
+    unreachable_section(&unreachable, unreachable_total, &mut out);
     overlay_section(&t, settings_local, &mut out);
     out.push_str(&format!("\nThen clear the log:  : > {}\n", log));
     out
@@ -483,6 +582,58 @@ mod tests {
         assert_eq!((t.overlay.len(), t.overlay_total), (1, 1));
         assert_eq!(t.overlay[0].0, "npm test");
         assert_eq!(t.logged, 4);
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — the two reachability shapes, and what is not one: a
+    // chained compound, an fd-dup, a `/dev/null` target, an inert span, or a heredoc body
+    #[test]
+    fn the_verdict_marks_an_expansion_or_a_file_write_and_nothing_else() {
+        for c in [
+            "cat >> .tmp/j.md <<'EOF'",
+            "sort -rn 2> err.txt",
+            "mkdir -p .tmp && cat > .tmp/c.md",
+            "echo `date`",
+            "echo \"$HOME\"",
+            "diff a >(sort)",
+        ] {
+            assert!(allowlist_unreachable(c), "{:?} was not marked unreachable", c);
+        }
+        for c in [
+            "ls && wc -l x",
+            "git status; grep -n x f | head",
+            "make build 2>&1",
+            "grep -rn x . 2>/dev/null",
+            "awk '{print $2}' f",
+            "grep \"a \\$b \\`c\\`\" f",
+            "echo 'a > b'",
+            "python3 - <<'PY' print(a > b) `x` $y PY",
+            "cat <<<\"here\"",
+        ] {
+            assert!(!allowlist_unreachable(c), "{:?} was marked unreachable", c);
+        }
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — a key is unreachable only when every call under it is,
+    // and the partition moves rows between sections, never calls off the headline
+    #[test]
+    fn a_mixed_key_stays_actionable_and_the_partition_never_moves_the_count() {
+        let log = "mkdir -p x\nmkdir -p .tmp && cat > .tmp/c.md\ncat >> .tmp/j.md\ncat >> .tmp/j.md\nmake build\n";
+        let t = tally(log, &[], &[]);
+        let (actionable, unreachable) = partition(&t);
+        let keys = |rows: &[(String, u64)]| rows.iter().map(|r| r.0.clone()).collect::<Vec<_>>();
+        assert_eq!(keys(&actionable), vec!["mkdir", "make"]);
+        assert_eq!(unreachable, vec![("cat >>".to_string(), 2)]);
+        assert_eq!((t.prompting.len(), t.total), (3, 5));
+        assert_eq!(actionable.len() + unreachable.len(), t.prompting.len());
+        let calls: u64 = actionable.iter().chain(&unreachable).map(|r| r.1).sum();
+        assert_eq!(calls, t.total);
+        let dir = std::env::temp_dir().join(format!("cw-partition-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("cannot make the fixture dir");
+        let p = dir.join("friction.log");
+        std::fs::write(&p, log).expect("cannot write the fixture log");
+        let settings = dir.join("settings.json").display().to_string();
+        assert_eq!(count(&p.display().to_string(), &settings, &settings), (3, 5));
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — occurrences descending, a tie broken by descending

@@ -101,6 +101,19 @@ assert_row shape-fd-dup 'make'   "$shape"
 assert_row     shape-first-segment 'mkdir' "$shape"
 assert_absent  shape-no-misattribution 'mkdir >' "$shape"
 
+# The reachability partition over the same log: every call carrying a write redirect
+# anywhere in the line is allowlist-unreachable — the downstream write included, so
+# 'mkdir' ranks there too — while the fd-dup is no file write and stays actionable.
+# The headline keeps all four calls and names the unreachable three.
+assert_has  reach-headline '4 prompting call(s) across 4 pattern(s)' "$shape"
+assert_has  reach-clause '3 of them allowlist-unreachable' "$shape"
+reach_body="${shape#*--- Allowlist-unreachable}"
+actionable_body="${shape%%--- Allowlist-unreachable*}"
+assert_row     reach-actionable 'make' "$actionable_body"
+assert_absent  reach-not-actionable 'cat >' "$actionable_body"
+assert_row     reach-unreachable-append 'cat >>' "$reach_body"
+assert_row     reach-unreachable-downstream 'mkdir' "$reach_body"
+
 # --count over the same log: four keys across four calls. The occurrence total is
 # what the axis never moves — splitting a key raises the numerator alone, which is
 # the definitional step the KPI row records.
@@ -141,5 +154,5 @@ escape_out="$(run --count -- -dash.log)"; escape_status=$?
     || { echo "FAIL [dash-escape]: expected 0/0 at exit 0, got '$escape_out' at $escape_status"; fails=$((fails + 1)); }
 
 [[ "$fails" -eq 0 ]] || { echo "scan-prompts.test: $fails assertion(s) failed"; exit 1; }
-echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
+echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; a write-redirect call ranks in the allowlist-unreachable section without leaving the headline; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
 exit 0
