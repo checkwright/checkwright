@@ -5,3 +5,4 @@
 ---
 
 registry-roster-oracles scope afcd4fbd 2026-09-12 3dee0701
+registry-roster-oracles spec acfcecf7 2026-09-12 e597f672
