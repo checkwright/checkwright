@@ -247,7 +247,7 @@ be declaring the root. Under this delta such a member does not compile, which is
 what converts the entry's recurring hand sweep into a build-time impossibility.
 
 **The ground carries a source locator, and that is the delta's own defence against
-being satisfied mechanically.** Each `?` declares `<class>@<module>:<line>` — the
+being satisfied mechanically.** Each `?` declares `<class>@<path>:<line>` — the
 class above, and the location of the walk the `?` stands for. The requirement
 exists because of a fact about the corpus this amendment measured: **all 51 `?`
 root-lines are the identical spelling `("?", "", "")` with zero counterexamples**,
@@ -264,10 +264,12 @@ A locator is what closes that, where a prose justification would not:
   of deciding which class it is. The evidence requirement and the classification
   become one act rather than two, the second of which is skippable.
 - **It is machine-checkable, where honesty is not.** A crate-side assertion holds
-  each locator to resolving, and to resolving **inside the declaring member's own
-  module**. That is presence and placement, which a gate can decide — deliberately
-  *not* whether the class is correct, which it cannot, and which is the shape
-  §check-queue-entry-budget's own refusals name as the standing failure.
+  each locator to resolving, and to resolving on a line that calls a member of the
+  root-entry roster §check-reads-couples keeps for its recursive-walk refusal —
+  wherever that line lives. That is presence and placement, which a gate can
+  decide — deliberately *not* whether the class is correct, which it cannot, and
+  which is the shape §check-queue-entry-budget's own refusals name as the standing
+  failure.
 - **It is a pointer, not prose.** One token per site, no restatement, no
   fifty-one-paragraph tier to maintain. Content-tiering applied to a registry
   field.
@@ -276,6 +278,34 @@ A locator is what closes that, where a prose justification would not:
   *points at* the expression instead of transcribing it, so no copy exists to
   drift. Derivation-first, and it retires the static-analyser route a previous
   iteration already measured wrong three times running.
+
+**A locator off its site's home module carries one `via` clause, and the grammar
+requires it.** A site's *home module* is the module of its member's registry
+dispatch function; a site inside a shared root const has none, the const being no
+one member's. The ground is `<class>@<path>:<line>` where the walk line lies in the
+home module, and `<class>@<path>:<line> via <symbol>` otherwise — `<symbol>` being
+the first `<module>::<fn>` the home module calls on the way to the walk line, or
+`const <NAME>` for a site inside that const. The clause is **forbidden** in-module,
+so each situation has one spelling. The locator assertion reds on a clause missing
+off-module or present in-module — its presence is a function of the locator path,
+so it is derived rather than trusted — on a `<module>::<fn>` with no definition or
+not referenced by the home module, and on a `const` site outside the named const's
+body.
+
+**Why required.** Placing the locator on the walk line ties it to a walk and no
+longer to its member; the `via` clause restores that tie on the first hop rather
+than the last, which keeps the placement rule exemption-free. For
+`check-enforcement-fresh` and `check-value-rollup-fresh` it is the only record of
+the call chain in the tree: their only fixture case steers the gate off the emitter
+through a positional, so unit test A observes no walk for them. **Its honest
+limit:** the assertion resolves the symbol and its first-hop reference, never the
+chain from symbol to walk line, which would be a call-graph analysis — so for those
+two members the clause records the chain rather than proving it.
+
+**Why the grammar and not the Definition of Done alone.** A Definition of Done item
+is checked once, at the landing commit, and leaves the next off-module `?` a later
+port adds unconstrained. In the grammar, the locator assertion holds every future
+site — the fix and the gate that catches it land in one unit.
 
 **Why this is the nearest satisfiable form of the entry rather than a widening.**
 The Deliverable as written cannot be satisfied at all — there is no root expression
@@ -292,11 +322,10 @@ nothing in the tree reproduces 39. Under delta 3 alone, an entry about census
 unreliability would keep an uncensused headline number; the ground partition is
 what finally produces a figure of the class 39 was meant to be.
 
-**Not yet applied — and build stopped deliberately rather than half-landing it.**
-The batch that landed deltas 2 and 3 measured this delta at the source before
-starting it, and stopped on what the measurement found. The measurement is
-recorded here so the next session neither re-buys it nor starts from the figures
-this section was authored against.
+**Measured at the source before it landed.** The batch that landed deltas 2 and 3
+measured this delta before starting it, and stopped on what the measurement found
+rather than half-landing it. The measurement stays recorded here, with the answers
+to its two findings below it and the landing after those.
 
 **The declaration unit is the source site, not the member** (lead-routed decision,
 revisable here). The per-member rule was written against 51, and 51 is a count of
@@ -319,34 +348,83 @@ tests). Call it 70 existing lines across three files, plus the ground emission o
 carries. Authoring the 31 grounds is **not** uniform: 13 sites are a one-line
 lookup because the declaring module holds exactly one walk; 15 require matching N
 `?` slots against M ≠ N walks and deciding which walk each `?` stands for; 3 are
-blocked below. Around 26 files are opened. The direction the per-source-site unit
-buys is real — 31 authored grounds rather than 51, the consts' walks read once
-rather than per use — but this is not a session's remainder.
+resolved below — one conversion out of the root set, and two off-module sites.
+Around 26 files are opened. The direction the per-source-site unit buys is real —
+31 authored grounds rather than 51, the consts' walks read once rather than per
+use — but this is not a session's remainder.
 
-**Two findings block it, and both are above a build session's class.** Neither is
-ruled here.
+**Both findings build recorded are answered, and neither answer is a ruling.**
 
-- **The locator's placement rule is unsatisfiable for 8 of the 31 sites as the
-  Definition of Done states it.** "Resolves inside the declaring member's own
-  module" cannot hold for the 6 const sites, whose walks live in `native/src/spec.rs`
-  — a shared helper that is no member's module — nor for `check-close-surfaces`'
-  2 **inline** sites, whose walk lives in `native/src/emit/close_surfaces.rs`. The
-  const half was anticipated when the declaration unit moved to the source site; the
-  inline cross-module site was not, and it is the one that matters, because the
-  placement rule is this delta's stated defence against bulk satisfaction. Widening
-  it to "or a module it transitively calls" makes placement near-vacuous, and
-  exempting the shared sites reintroduces the declared exemption this gate family
-  refuses. Which of those the rule takes decides how much the machine-checkable half
-  is still worth.
-- **Three `?` have no ground available under this delta's own two-value set.**
-  `check-value-rollup-fresh` and `check-enforcement-fresh` each take a positional
-  with a literal default naming a **file**, and walk nothing at all; `check-hook-exec-bit`
-  enumerates through `git ls-files` and has no walk line for a locator to name. The
-  Definition of Done says a decidable `?` is converted "to a declared root", but a
-  named-file reader has no root to declare — the registry's own precedent for that
-  shape is the empty root set, which `check-rule-citation` already takes for stated
-  reasons. Which of the two applies is a spec question, not a calibration, and it
-  must be settled before a locator can be written for any of the three.
+- **Placement: a locator lands on a line that calls a root-entry roster member,
+  wherever that line lives** — decision of the intent oracle (the scope session),
+  2026-09-12, lead-routed, revisable here. The member-module clause is dropped with
+  **no exemption list**. The roster is the one §check-reads-couples keeps for its
+  recursive-walk refusal, cited rather than restated, so a walk entry point added
+  there reaches this assertion with no second edit. Refused: "or a module it
+  transitively calls", which makes placement near-vacuous, and an exemption list for
+  the shared sites, which is the declared exemption this gate family refuses. What
+  the dropped clause carried — the tie from a locator to its member — moves to the
+  `via` clause above.
+- **Conversion: a `?` standing for a read outside the analyzed class leaves the root
+  set rather than taking a ground.** §check-reads-couples already rules that an
+  empty root set "means the member performs no walk in the analyzed sense", and that
+  `git ls-files` enumeration, single-file reads and a single-level listing each fall
+  outside that class. `check-hook-exec-bit` enumerates through `git ls-files -s` and
+  calls no root-entry roster member, so it converts to the empty root set, on the
+  precedent `check-rule-citation` already takes. It is not the re-scan-over-`ls-files`
+  evasion that section refuses: the member's subject is the index's mode bit, so the
+  index is its correct source. A `?` of `check-close-surfaces` whose only read is a
+  `list_dir` leaves that member's root set under the same rule.
+  **`check-enforcement-fresh` and `check-value-rollup-fresh` do not convert, and the
+  earlier finding misread them.** The positional with a literal default names the
+  projection they compare against, not their read set: on the default branch both
+  reach `find_with_prune` in `native/src/emit/enforcement_map.rs`, a recursive walk
+  rooted at the `GATE_SDK_ENFORCE_SCAN_DIR` knob. Their `?` is correct, their ground
+  is `dynamic`, and their locators are off-module sites. An empty root set for them
+  would be a false no-walk claim unit test A cannot catch, their only case steering
+  off that branch — the opt-out this gate family refuses, spelled as a declaration.
+
+**The answer text carried `check-footprint-fresh` as a second precedent for the
+empty root set, and build dropped it on a probe rather than landing it.** That
+member's emitter calls `walk::glob_files` — a root-entry roster member the recorder
+notes — at `native/src/emit/footprint.rs:31` and `:90`, and both of its fixture
+cases pass the two positionals that steer it off the emitter. Its `&[]` is
+therefore the same false no-walk claim the bullet above refuses for the enforcement
+pair, not a precedent for `check-hook-exec-bit`'s. Correcting that member's own
+declaration is outside this delta's sites and is escalated, not absorbed.
+
+**Applied.** Every `?` declaration site carries a ground in the locator grammar, a
+const assertion refuses a `?` with no classed ground at compile time, and the
+locator assertion is a registry unit test with a seeded-bad sibling. Build ran the
+conversion rule over **every** site rather than the three the answers named, and it
+reached further, each by a rule this delta already states:
+
+- **Two more conversions out of the root set.** `check-shellcheck` expands each
+  derived directory one level through `walk::glob_entries`, which is neither a
+  roster member nor recorded; `check-docs-mirror-fresh`'s own walk is its declared
+  `docs` root, and its `?` stood for the mirror emitter's single `list_dir`.
+- **One conversion to a declared root.** `check-docs-kit-parity` globs
+  `*/index.md` under the directory of a positional whose default is the literal
+  `docs/kits.md`, so it declares `docs` with the kit literal as its filter. Unit
+  test C missed it because `dirname` is none of the root wrappers it enumerates —
+  the floor that test's own honest limit names.
+- **Calibrations inside the envelope, written into §check-reads-couples.** A locator
+  path is **crate-relative** (`src/…`), so registry data carries no repo layout. The
+  census gains a **fourth column** carrying the grounds, which makes the class
+  partition a projection of the report rather than a second report. A `?` also
+  refuses a filter or prune at compile time, which keeps `--reads`' second column
+  unambiguous on a `?` line.
+- **One classification is escalated rather than settled.** `check-spec-embedded-source`'s
+  `?` walk has a static root (a positional defaulting to `.`) and a filter projected
+  out of `CANON_KIT_EMBED_LANGS`' packed elements — coverage that cannot be
+  expressed, so the `?` stands, but the walk is neither class as first written. It
+  lands as `dynamic`, with `dynamic` read as a walk whose *bound* is computed at run
+  time, and that reading is the lead's to confirm.
+
+The figures, each from its own oracle at landing: the locator assertion enumerates
+**26** declaration sites — **17** in-module and **9** off-module; **20** `dynamic`
+and **6** `fallback` — and `--emit reads-census` prints **32** lines summing to
+**46** `?` root-lines.
 
 ### (5) `check-gate-substrate-parity` assertion I joins the crate registry to the battery registration
 
@@ -519,15 +597,17 @@ diagnostic underneath an uncorrected one.
   - *No count line is emitted*, so no transcribed total can drift from the lines.
 - **The `?` ground and its locator** (delta 4).
   - *Producer:* the registry entry itself, compile-enforced. Reached in the
-    deployed configuration at the landing commit, since all 51 live `?` roots take
-    one.
-  - *Consumers:* `--reads`, on a `?` line; `--emit reads-census`, grouping by the
-    class and printing the locator as the column the Deliverable asked for.
+    deployed configuration at the landing commit, since every live `?` declaration
+    site takes one.
+  - *Consumers:* `--reads`, on a `?` line; `--emit reads-census`, printing the
+    grounds as a fourth column, from which the class partition is projected.
   - *Named reader of the refusal:* the compiler, at the member's registration —
     which is the point: a member with no ground cannot be added.
   - *Named reader of the locator:* a crate-side assertion, at the registry's
     unit-test pass, whose **red condition** is a locator that does not resolve or
-    that resolves outside the declaring member's own module. It does **not** red on
+    that resolves to a line calling no root-entry roster member, or whose `via`
+    clause is missing off-module, present in-module, or names a symbol that is
+    undefined or unreferenced by the home module. It does **not** red on
     a wrong class, which no gate can decide — stated so a later reader does not
     read the silence as coverage.
 - **Assertion I** (delta 5).
@@ -609,8 +689,22 @@ diagnostic underneath an uncorrected one.
   carries it because conflating them is how the hand sweeps this arm replaces went
   wrong. **Applied.**
 - `gate-sdk/SPEC.md` §check-reads-couples (delta 4). The two ground values, the
-  refusal of a third, the locator's grammar and its placement rule.
-  **Not yet applied.**
+  refusal of a third, the locator's grammar with its `via` clause, the placement
+  rule citing the root-entry roster, and the conversion rule's reach to a `?`
+  standing for a read outside the analyzed class. **Applied**, with the census's
+  fourth column, the `--reads` `?` line's ground column, and the three denominators'
+  figures re-run at landing; the `--reads` roster row in §Meta-gate conservation
+  for the binary substrate takes the ground in one clause.
+- `native/src/gates/mod.rs`, the four-member registry comment above
+  `check-hook-exec-bit` (delta 4). It grounds `?` in "a positional scan root the
+  shell parser calls undecidable"; after `check-hook-exec-bit` converts it is
+  **reworded, not deleted**, since it covers three other members. **Applied**, with
+  the comments over the other converted members — `check-close-surfaces`,
+  `check-shellcheck`, `check-docs-kit-parity` and `check-docs-mirror-fresh` —
+  reworded in the same pass.
+- `gate-sdk/gate-tests/reads-census.test.sh` (delta 4). Its `--reads` sweep counts
+  a `?` line by its opening column rather than as a whole line, and it asserts the
+  census's ground column against `--reads`. **Applied.**
 - `gate-sdk/SPEC.md` §The non-gate arm (deltas 3 and 8). `--emit-reads-census`
   joins the roster; the section is named as the roster `no_such_arm` cites, which
   is what makes it a governed surface rather than documentation. **Delta 8's half
@@ -681,32 +775,41 @@ roster declares a retirement and this is the opposite.
       reachable producer and a named consumer; every new field has a named reader
       at a named transition.
 - [ ] **Every `?` ground names its evidence, and the locator is checked by oracle** —
-      each of the **31 declaration sites** declares `<class>@<module>:<line>` (the
-      unit is the site, not the member and not the 51 member-expanded root-lines), a
-      crate-side assertion holds every locator to resolving, and a seeded bad locator
-      reds it. A ground with no locator does not compile, so the bulk pass cannot
-      skip the step that makes it a classification. **The placement half of that
-      assertion is unsettled** — "inside the declaring member's own module" is
-      unsatisfiable for 8 of the 31 sites, and the rule it takes instead is open
-      above; this item cannot be checked until it is.
+      every declaration site (the unit is the site, not the member and not the
+      member-expanded root-line; §check-reads-couples names the three denominators)
+      declares a ground in the locator grammar, its `via` clause included where the
+      site is off its home module. The locator assertion holds every site to
+      resolving on a line that calls a root-entry roster member, and reds on a
+      seeded locator of each bad kind: an unresolved line, a line calling no roster
+      member, a `via` missing off-module or present in-module, and a `via` symbol
+      undefined or unreferenced by the home module. A ground with no locator does not
+      compile, so the bulk pass cannot skip the step that makes it a classification.
+      The in-module and off-module counts are **reported from the assertion's own
+      enumeration** at the landing commit, never transcribed from this amendment —
+      no pre-landing oracle reports the site denominator, which is why none is
+      written here.
 - [ ] **The ground partition is reported with both classes non-empty, or the
-      landing states why.** All 31 sites are the identical spelling today, so a pass
-      returning 31 of one class and zero of the other is the bulk-authoring
+      landing states why.** Every site is the identical spelling today, so a pass
+      returning every site in one class and none in the other is the bulk-authoring
       signature rather than a result — §check-reads-couples names both classes as
       live, and an empty one is a finding to resolve before landing, never a figure
       to report. Both classes are reachable on the corpus as it stands, measured:
       `COMMENT_SURFACE_ROOTS`' site is a kit-literal fallback branch, and
       `check-memory-off`'s root set is computed from a knob's glob expansion with no
       literal anywhere, so the guard is satisfiable rather than aspirational.
-- [ ] **A `?` that should be a declared root does not survive the pass** — at least
-      one site is checked against the two shapes §check-reads-couples calls
-      decidable (a hardcoded literal root, a positional with a literal default),
-      and any found is converted rather than given a ground. **Three are already
-      found and their conversion target is open**: `check-value-rollup-fresh` and
-      `check-enforcement-fresh` are positionals with literal defaults naming a file
-      and walk nothing; `check-hook-exec-bit` enumerates through a subprocess and has
-      no walk at all. "Converted to a declared root" does not fit a reader with no
-      root, and the registry's own precedent for that shape is the empty root set.
+- [ ] **A `?` for a decidable root or an out-of-class read does not survive the
+      pass** — each site is checked against §check-reads-couples' two decidable
+      shapes (a hardcoded literal root, a positional with a literal default) and its
+      out-of-class reads, and each one found converts: **to a declared root** where
+      the member walks from a static root, and **out of the root set** where the
+      read is a `git ls-files` enumeration, a single-file read or a single-level
+      listing (§check-reads-couples, the empty-root-set passage).
+      `check-hook-exec-bit` converts to the empty root set; any `check-close-surfaces`
+      `?` whose only read is a `list_dir` leaves its root set the same way.
+      `check-enforcement-fresh` and `check-value-rollup-fresh` do **not** convert —
+      their `?` stands for the emitter's recursive walk and takes an off-module
+      ground. `--emit reads-census` is re-run after the conversions, and its line
+      count and column-2 sum replace every figure this amendment carries.
 - [ ] **The scratch fix is verified by the corpus, not by the diff** — delete
       `gate-sdk/gate-tests/check-crate-arms/good/.tmp/`, run the `gate_sdk` fixture
       suite, and confirm the directory does **not** reappear while the pinned
@@ -715,7 +818,7 @@ roster declares a retirement and this is the opposite.
       resolve the pinned scratch, so the fix is not silently one-sided in the other
       direction.
 - [ ] **The census figures are the oracle's** — §check-reads-couples' recorded
-      36/51 are re-run at the landing commit and corrected if the tree moved; a
+      figures are re-run at the landing commit and corrected if the tree moved; a
       figure that disagrees with the arm is the arm's to win.
 - [ ] **Assertion I reds on a seeded divergence** — a fixture pair in which a
       registered-but-unlisted member carries no declaration, and one in which a

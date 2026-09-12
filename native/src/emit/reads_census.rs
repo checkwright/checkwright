@@ -13,8 +13,12 @@ pub const KNOBS: &[&str] = &[];
 pub fn emit(_args: &[String]) -> Result<String, String> {
     let mut out = String::new();
     for (name, _, roots, _, _, _) in crate::gates::REGISTRY {
-        let undecidable = roots.iter().filter(|(r, _, _)| *r == "?").count();
-        if undecidable == 0 {
+        let grounds: Vec<&str> = roots
+            .iter()
+            .filter(|(r, _, _, _)| *r == "?")
+            .map(|(_, _, _, g)| *g)
+            .collect();
+        if grounds.is_empty() {
             continue;
         }
         // spec: gate-sdk/SPEC.md §check-reads-couples — the declared roots print their root column
@@ -22,15 +26,21 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         // `--reads <name>` is one command away for the field detail that would widen every line.
         let declared: Vec<&str> = roots
             .iter()
-            .filter(|(r, _, _)| *r != "?")
-            .map(|(r, _, _)| *r)
+            .filter(|(r, _, _, _)| *r != "?")
+            .map(|(r, _, _, _)| *r)
             .collect();
         let declared = if declared.is_empty() {
             "-".to_string()
         } else {
             declared.join(",")
         };
-        out.push_str(&format!("{}\t{}\t{}\n", name, undecidable, declared));
+        out.push_str(&format!(
+            "{}\t{}\t{}\t{}\n",
+            name,
+            grounds.len(),
+            declared,
+            grounds.join(",")
+        ));
     }
     Ok(out)
 }
@@ -46,9 +56,12 @@ mod tests {
         let mut seen = 0usize;
         for line in body.lines() {
             let cols: Vec<&str> = line.split('\t').collect();
-            assert_eq!(cols.len(), 3, "three columns per line: {}", line);
+            assert_eq!(cols.len(), 4, "four columns per line: {}", line);
             let roots = crate::gates::roots(cols[0]).expect("a census line names a live member");
-            let undecidable = roots.iter().filter(|(r, _, _)| *r == "?").count();
+            let undecidable = roots.iter().filter(|(r, _, _, _)| *r == "?").count();
+            let grounds: Vec<&str> =
+                roots.iter().filter(|(r, _, _, _)| *r == "?").map(|(_, _, _, g)| *g).collect();
+            assert_eq!(cols[3], grounds.join(","), "{}'s ground column is its grounds", cols[0]);
             assert!(undecidable > 0, "{} declares no ? yet is censused", cols[0]);
             assert_eq!(
                 cols[1].parse::<usize>().expect("column 2 is a count"),
@@ -56,7 +69,7 @@ mod tests {
                 "{}'s ? count is the registry's",
                 cols[0]
             );
-            let declared = roots.iter().filter(|(r, _, _)| *r != "?").count();
+            let declared = roots.iter().filter(|(r, _, _, _)| *r != "?").count();
             if declared == 0 {
                 assert_eq!(cols[2], "-", "{} declares nothing and prints -", cols[0]);
             } else {
@@ -71,7 +84,7 @@ mod tests {
         }
         let expected = crate::gates::REGISTRY
             .iter()
-            .filter(|(_, _, roots, _, _, _)| roots.iter().any(|(r, _, _)| *r == "?"))
+            .filter(|(_, _, roots, _, _, _)| roots.iter().any(|(r, _, _, _)| *r == "?"))
             .count();
         assert_eq!(seen, expected, "every member declaring a ? is censused");
     }
@@ -84,7 +97,7 @@ mod tests {
         let censused: Vec<&str> = body.lines().filter_map(|l| l.split('\t').next()).collect();
         let mut checked = 0usize;
         for (name, _, roots, _, _, _) in crate::gates::REGISTRY {
-            if roots.iter().any(|(r, _, _)| *r == "?") {
+            if roots.iter().any(|(r, _, _, _)| *r == "?") {
                 continue;
             }
             assert!(!censused.contains(name), "{} declares no ? but is censused", name);

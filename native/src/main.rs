@@ -431,8 +431,8 @@ fn main() {
     }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — one line per walk root and nothing else: a
-    // repo-relative directory or `?`, optionally followed by a tab and the name of the knob
-    // whose value filters it. No count line, because the count is derivable from the lines.
+    // repo-relative directory optionally followed by its filter and prune, or `?` followed by a tab
+    // and its ground. No count line, because the count is derivable from the lines.
     if first == "--reads" {
         let name = match argv.get(1) {
             Some(n) => n.as_str(),
@@ -447,8 +447,12 @@ fn main() {
                 // spec: gate-sdk/SPEC.md §check-reads-couples — a trailing empty field is omitted,
                 // so a root with no filter prints one column and a root with no declared prune
                 // prints two: every pre-existing line is byte-identical.
-                for (r, filter, prune) in roots {
+                for (r, filter, prune, ground) in roots {
                     let mut line = r.to_string();
+                    if !ground.is_empty() {
+                        line.push('\t');
+                        line.push_str(ground);
+                    }
                     if !filter.is_empty() || !prune.is_empty() {
                         line.push('\t');
                         line.push_str(filter);

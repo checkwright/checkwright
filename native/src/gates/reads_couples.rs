@@ -477,7 +477,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                     src, gname
                 )
             })?;
-            for (root, fspec, pspec) in roots {
+            for (root, fspec, pspec, _) in roots {
                 // spec: gate-sdk/SPEC.md §check-reads-couples — '?' is the substrate's own honesty
                 // marker, counted by the same skip counter the shell arm's unresolvable roots use
                 if *root == "?" {
