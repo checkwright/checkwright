@@ -8,3 +8,4 @@ registry-roster-oracles scope afcd4fbd 2026-09-12 3dee0701
 registry-roster-oracles spec acfcecf7 2026-09-12 e597f672
 registry-roster-oracles align a5f278f5 2026-09-12 8350d351
 registry-roster-oracles build a03bd772 2026-09-12 386928a8
+registry-roster-oracles validate a8c32ba5 2026-09-13 5c9014b4
