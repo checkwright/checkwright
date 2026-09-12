@@ -1442,6 +1442,40 @@
   Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-09
   at scope.
 
+- **couples-dynamic-root-resolution** [design-pending] [blocked-by: couples-glob-semantics-unowned] [cost: session/high] [surface: gate-sdk]
+  — the skipped-and-counted bucket is where trigger-drift hides, and its dominant
+  subset is decidable.
+  **DEMOTED at couples-resolver-reach 2026-09-12 after a partial landing, and the
+  cause is a WITHDRAWAL rather than an overrun.** Landed: `?` ended for a
+  statically resolvable walk root whose coverage the author can express, held by a
+  crate-side property assertion; the declared root carries a mandatory filter kind
+  and a per-walk prune, both held to executed behaviour by assertion A. Measured
+  **52 roots covered against 51 still `?`**, from 2 against 63.
+  **Withdrawn, and never deliverable here:** 26 of the 51 are the kit-literal
+  fallback branches of `spec::manifest_files` and `spec::comment_surface`. Their
+  roots DO resolve; their `?` stands because the coverage they would be held to is
+  the conservative authoring rule gate-sdk/SPEC.md §The `# graph:` manifest
+  **files as unsettled**, and a kit cannot demand an adopter satisfy it over a
+  tree the kit has never seen. The refusal was stated on the root half alone and
+  does not reach that far.
+  **A boundary found, not a shortfall.** The remaining third was never decidable
+  at this altitude; what the iteration converted is a latent asymmetry into a
+  measured class with a population and a cadence row. Severity: **no trigger is
+  lost** — the hook's matcher spans `/`, so every path the coverage reader calls
+  uncovered still fires the gate. An adopter gains a red gate, never a missing
+  coupling.
+  **Five repair options were measured dead; do not re-buy them** — the
+  enumeration, each one's oracle and the fixture-pair death of the fifth are on
+  `.workflow/survey-record.md`, which is the surface that owns them.
+  **Blocked rather than rankable:** settling that field's semantics is the only
+  thing that can move these 26 roots, so the floor has not moved.
+  **Cost while deferred:** the 26 roots stay skipped-and-counted, so the coverage
+  of their walks is unasserted and a genuine under-couple among them would read the
+  same as this withdrawal's deliberate one. That is strictly better than before —
+  they are now a named class on the cadence row with a stated review question
+  rather than an undifferentiated skip count — and strictly worse than a gate: the
+  row is reviewed at close by a session, and a session can defer.
+
 - **amendment-owner-position-citation** [design-pending] [cost: iteration/low] [surface: queue-kit] — prose may cite a merged
   amendment as *settled history*, never as a live *owner*; today it does both.
   recurrence: amendment-owner-position-citation 2026-08-06
@@ -5171,7 +5205,6 @@
 
 ## Done
 
-- couples-dynamic-root-resolution
 - manifest-family-couples-misses-the-consumer-widened-corpus
 - always-loaded-baseline-freshness
 

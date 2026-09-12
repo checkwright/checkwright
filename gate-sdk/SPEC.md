@@ -14965,20 +14965,39 @@ comes from is a property of the reader's own substrate: a shell reader invokes
 `"$GATE_SDK_NATIVE_BIN" --reads "<name>"` (§Layout and configuration), and the
 compiled reader calls the registry in process (below).
 
-**The substrate answers, and may not answer `?` for a root it can bound.** `?` stops
-being an available answer for **any walk whose root resolves statically** — the
-predicate is the *property*, does this walk's root resolve without running the gate,
-and nothing narrower. A crate-side assertion reds a `?` standing where a resolvable
-root could (§Meta-gate conservation for the binary substrate). The gate does not reach
-into a module to resolve what the registry declined to declare — the substrate ruling
-forbids that; what the refusal changes is that the registry has no licence to decline
-where the property holds. **The refusal cannot be partial**, because a resolvable walk exempted from it is the descriptor-level
-opt-out removed below, moved one layer down. Two shapes satisfy the property today — a
-hardcoded literal root, and a positional argument with a literal default, which the
-crate spells at least six ways — and they are **instances rather than the definition**:
-three hand sweeps over spellings during authoring produced three different populations,
-each missing one, and a seventh spelling is a module away. Read the property; treat any
-enumerated pattern as a floor.
+**The substrate answers, and may not answer `?` for a root it can bound — as far as the
+`couples=` semantics are settled, and no further.** `?` stops being an available answer
+for a walk whose root resolves statically **and whose coverage the author can then
+express**, and a crate-side assertion reds a `?` standing where such a root could
+(§Meta-gate conservation for the binary substrate). The gate does not reach into a module
+to resolve what the registry declined to declare — the substrate ruling forbids that;
+what the refusal changes is that the registry has no licence to decline where both halves
+hold. Two shapes satisfy the root half today — a hardcoded literal root, and a positional
+argument with a literal default, which the crate spells at least six ways — and they are
+**instances rather than the definition**: three hand sweeps over spellings during
+authoring produced three different populations, each missing one, and a seventh spelling
+is a module away. Read the property; treat any enumerated pattern as a floor.
+
+**The second half is the boundary, and it is a *withdrawal* rather than a narrowing.**
+The refusal was first stated on the root half alone, and it does not reach that far. A
+walk's coverage must satisfy the conservative authoring rule — globs never cross `/`
+(§The `# graph:` manifest) — and for the **kit-literal fallback** branch of a
+runtime-selected corpus helper no adopter can satisfy it: the kit would be demanding that
+an adopter's `couples=` enumerate the depth of a tree the kit has never seen, while that
+rule's own correctness is the thing that section records as unsettled and files as its own
+deliverable. So those branches keep `?`, and the cadence row carries them as a sub-class
+with its own review question — not *has this root become decidable*, which it already is,
+but *has the semantics question settled*.
+
+**Read that boundary as a deliverable rather than a shortfall, because the arithmetic
+invites the wrong reading.** The refusal covers 52 of the tree's declared roots and leaves
+51 at `?`, of which 26 are these fallback branches. That is not two thirds of a promise: it
+is the whole of what was decidable at this altitude, and the remaining third was never
+decidable here, because the rule it rests on had already been filed open. What this cost
+bought is that the open question now has a measured population and a named class instead of
+a latent asymmetry — and the measurement that settles its severity is that **no trigger is
+lost**: the hook's matcher spans `/`, so every path the coverage reader reports uncovered
+still fires the gate. An adopter gains a red gate, never a missing coupling.
 
 **The `--reads` report.** One line per walk root and nothing else — no count line
 and no header, because the count is derivable from the lines and a transcribed

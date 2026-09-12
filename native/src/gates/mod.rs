@@ -140,22 +140,23 @@ pub type GateEntry = (
     &'static [(&'static str, &'static str)],
 );
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec::manifest_files`' own branch set, declared once for
-// the eleven members that call it: the configured corpus, the kit-literal default the `else:` guard
-// selects when that knob is empty, and the prose surface it adds in either branch.
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec::manifest_files`' branch set: the configured corpus
+// and the prose surface it adds, declared once for the members that call it
+// spec: gate-sdk/SPEC.md §check-reads-couples — the kit-literal fallback keeps `?`, because the
+// conservative authoring rule it would be held to is the part of the `couples=` semantics that
+// section files as unsettled, and a kit cannot demand an adopter satisfy it over an unseen tree
 const MANIFEST_ROOTS: &[(&str, &str, &str)] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", ""),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*"),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md,CLAUDE.md", ""),
+    ("?", "", ""),
+    ("?", "", ""),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", ""),
 ];
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec::comment_surface`'s two runtime branches, both
-// declared: which one applies is a property of the consumer's configuration rather than of the
-// member, and the guard is what lets the resolver read that off the knob instead of the descriptor.
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec::comment_surface`'s two runtime branches: the
+// configured one declares, and the kit-literal fallback keeps `?` on the ground above
 const COMMENT_SURFACE_ROOTS: &[(&str, &str, &str)] = &[
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", ""),
-    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", ""),
+    ("?", "", ""),
 ];
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — `MANIFEST_ROOTS` and `COMMENT_SURFACE_ROOTS`
@@ -163,11 +164,11 @@ const COMMENT_SURFACE_ROOTS: &[(&str, &str, &str)] = &[
 // rather than per walk is what drops the second walk silently.
 const SPEC_POINTER_ROOTS: &[(&str, &str, &str)] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", ""),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*"),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md,CLAUDE.md", ""),
+    ("?", "", ""),
+    ("?", "", ""),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", ""),
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", ""),
-    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", ""),
+    ("?", "", ""),
 ];
 
 pub const REGISTRY: &[GateEntry] = &[
