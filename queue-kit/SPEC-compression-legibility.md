@@ -193,22 +193,29 @@ re-minting exactly what that paragraph refused.
   1708-1714 (delta 1). It gains the durability clause and its citation of
   canon-kit's sibling rule; the existing concession that the gate cannot hold the
   contract stays exactly as written, because the delta does not make it holdable.
-  **Not yet applied.**
+  **Applied** as a paragraph following the concession, citing
+  canon-kit/SPEC.md §check-amendment-queue.
 - `queue-kit/SPEC.md` §check-queue-entry-budget (deltas 2, 3 and 4). A new passage
   owns the arm: its report, its bounded walk, its two limits, its advisory tier,
   and the statement that it is **not** the collision counter the section refuses
-  eighty lines above.
+  eighty lines above. **Applied.**
 - `queue-kit/SPEC.md` §check-queue-entry-budget, the collision-counter refusal at
   1650-1656 (delta 4). One clause pointing forward to the arm and recording that
   the refusal is unaffected, so the two passages are not read as contradicting each
-  other. **Not yet applied.**
+  other. **Applied.**
 - `gate-sdk/SPEC.md` §The non-gate arm (delta 2). `--emit-entry-history` joins the
-  roster with its owning section, as every arm there does.
+  roster with its owning section, as every arm there does. **Applied.**
 - `queue-kit/SPEC.md` §Layout and configuration (delta 2). The arm's bespoke test
-  joins the `gate-tests/` roster.
+  joins the `gate-tests/` roster. **Applied against the section's real
+  content, which is not a roster.** queue-kit/SPEC.md rosters no `gate-tests/`
+  member anywhere — the roster this line was patterned on is guard-kit's — so the
+  arm and its bespoke test joined the one true sibling statement the section does
+  carry, that the `queue-index` arm is registered in no `gates.list`. Minting a
+  six-member roster a `ls queue-kit/gate-tests/*.test.sh` derives was refused on
+  derivation-first.
 - `docs/queue-kit/SPEC.md` and `docs/gate-sdk/SPEC.md` (all deltas) — the generated
   on-site mirror; regenerate with
-  `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`.
+  `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`. **Applied.**
 
 **Deliberate non-updates, recorded so a reader does not go looking.**
 `TRAJECTORY.md` is unchanged: the consult ruling stands, is not discharged by this
@@ -227,38 +234,51 @@ own reasoning.
 
 ## Definition of Done
 
-- [ ] **Causal completeness** — every new state and interface has a named,
+- [x] **Causal completeness** — every new state and interface has a named,
       reachable producer and a named consumer; every new field has a named reader
       at a named transition.
-- [ ] **The standing ruling is intact at the landing commit.** The 2026-09-09
+- [x] **The standing ruling is intact at the landing commit.** The 2026-09-09
       consult ruling is not annotated, not re-verified, not marked discharged, and
       not cited as superseded. Its ground — that a classifier over the compression
       act cannot honestly red — is true of the tree after this unit exactly as
       before it, because this unit ships no such classifier.
-- [ ] **Nothing reds.** Verified rather than asserted: the arm has no exit-1 path,
-      and no gate's assertion set grows.
-- [ ] **One spelling of the count** — the arm calls assertion A's own extent and
+- [x] **Nothing reds.** Verified rather than asserted: the arm has no exit-1 path,
+      and no gate's assertion set grows. The walk it shares with assertion A now
+      reaches the active sections, which are uncapped; assertion (D)'s corpus is
+      pinned away from them in the same edit so the reach adds no red.
+- [x] **One spelling of the count** — the arm calls assertion A's own extent and
       count computation; a test asserts the arm's reported count for an entry equals
       the headroom line's for the same entry at the same commit.
-- [ ] **The walk's bound is exercised** — a test over a seeded history confirms the
+      (`queue-kit/gate-tests/entry-history.test.sh`, case `one-spelling`.)
+- [x] **The walk's bound is exercised** — a test over a seeded history confirms the
       walk stops at the filing commit rather than at the root, and the two stated
       limits (a renamed slug, a net-zero commit) each have a case recording the
       behaviour rather than a claim about it.
-- [ ] **The blocked session actually meets the arm** — assertion A's failure text is
+- [x] **The blocked session actually meets the arm** — assertion A's failure text is
       read from a real firing, not from the diff.
 - [ ] **This edit is its own subject, and pays for itself the way it mandates.** The
       queue entry is at the cap; any line this unit lands on it is funded by
       compressing answered grounds with the relocation named, never by dropping an
       unanswered one — and any answer displaced lands on its governed surface in the
       same commit, which is delta 1 applied to the commit that writes delta 1.
-- [ ] **Full battery green** (`bash gate-sdk/bin/run-gates.sh`),
+      **This is the clause the merge is held on**, and it is held rather than
+      worked around: the entry is in an active section, so the Done move below
+      would shed its whole body at once — including the record of a standing
+      ruling that no other governed surface carries. Landing delta 1 and
+      discharging it by that move in the same unit is the unit's own subject
+      failing in its own merging commit. Ruled by the lead, not by this session.
+- [x] **Full battery green** (`bash gate-sdk/bin/run-gates.sh`),
       `bash gate-sdk/bin/build-native.sh`, and the queue-kit and gate-sdk fixture
       suites.
-- [ ] **Merged with no information lost** — each addition integrated into its proper
+- [x] **Merged with no information lost** — each addition integrated into its proper
       canonical-spec section, not appended.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
-      component (`ls queue-kit/SPEC-*.md`).
-- [ ] **Removals propagated** — `## Retired spellings` above holds, re-run by
+      component (`ls queue-kit/SPEC-*.md`). Held with the clause above: the
+      deletion and the Done move are one commit under canon-kit's bidirectional
+      pairing, so neither half moves until that clause is ruled.
+- [x] **Removals propagated** — `## Retired spellings` above holds, re-run by
       `check-amendment-retired-spelling`.
-- [ ] **Gaps filed** — a cross-component gap found during the work is resolved that
-      session, not deferred.
+- [x] **Gaps filed** — a cross-component gap found during the work is resolved that
+      session, not deferred. One filed to the gap inbox rather than resolved: the
+      arm reads a **live** entry, so the canon-kit landing-commit case delta 1
+      cites as its sibling has no reader at all — out of this unit's envelope.

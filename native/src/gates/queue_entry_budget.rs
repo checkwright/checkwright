@@ -15,11 +15,37 @@ struct Open {
     decls: u32,
 }
 
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — the active sections are uncapped, so no
+// assertion here reads `Active`; the walk still measures those entries because a reader of one
+// entry's history follows it across a promotion, and the alternative is a second walk
 #[derive(PartialEq, Clone, Copy)]
-enum Sec {
+pub enum Sec {
     Other,
+    Active,
     Deferred,
     Icebox,
+}
+
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — one closed entry as the walk measured it.
+// `count` is assertion A's own quantity, so the entry-history arm reads the cap's measure rather
+// than minting a second spelling of it.
+pub struct Closed {
+    pub slug: String,
+    pub start: usize,
+    pub ind: usize,
+    pub sec: Sec,
+    pub costed: bool,
+    pub nb: usize,
+    pub count: usize,
+    pub decls: u32,
+}
+
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — one pass answers both shapes the gate reads:
+// closed entries, which carry assertions (A)-(C), and the assertion-(D) lines, which are a property
+// of a *line* and not of an entry. Two passes would be two spellings of the same walk.
+pub struct Scan {
+    pub entries: Vec<Closed>,
+    pub retired: Vec<(usize, String, String)>,
 }
 
 fn is_iso_date(tok: &str) -> bool {
@@ -71,54 +97,12 @@ fn is_rule(line: &str) -> bool {
     }
 }
 
-pub fn run(args: &[String]) -> i32 {
-    let sec_cfg = match queue::Sections::active_and_deferred() {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("check-queue-entry-budget: {}", e);
-            return 2;
-        }
-    };
-    let cap_raw = match queue::knob_scalar("QUEUE_KIT_ENTRY_LINE_CAP") {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("check-queue-entry-budget: {}", e);
-            return 2;
-        }
-    };
-    let cap: usize = match cap_raw.parse() {
-        Ok(n) => n,
-        Err(_) => {
-            eprintln!(
-                "check-queue-entry-budget: QUEUE_KIT_ENTRY_LINE_CAP is not a positive integer: {}",
-                cap_raw
-            );
-            return 2;
-        }
-    };
-    let file = match args.first() {
-        Some(a) => a.clone(),
-        None => match queue::knob_scalar("QUEUE_KIT_QUEUE_FILE") {
-            Ok(v) => v,
-            Err(e) => {
-                eprintln!("check-queue-entry-budget: {}", e);
-                return 2;
-            }
-        },
-    };
-    let text = match std::fs::read_to_string(&file) {
-        Ok(t) => t,
-        Err(_) => {
-            eprintln!("check-queue-entry-budget: file not found: {}", file);
-            return 2;
-        }
-    };
-
-    let (mut size, mut cost, mut shape, mut retired) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
-    // spec: queue-kit/SPEC.md §check-queue-entry-budget — headroom is the size
-    // assertion's own count one subtraction away, collected for every closed
-    // Deferred entry regardless of cap outcome and surfaced only on the clean path
-    let mut headroom: Vec<(usize, String, usize)> = Vec::new();
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — the scan, split from the verdict so a reader
+// of the same quantity measures with the assertion's own walk rather than a second spelling of it;
+// entries come back in close order, which is the order the verdict's findings are reported in
+pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
+    let mut out: Vec<Closed> = Vec::new();
+    let mut retired: Vec<(usize, String, String)> = Vec::new();
     let mut open: Vec<Open> = Vec::new();
     let mut sec = Sec::Other;
     let mut bound;
@@ -136,37 +120,19 @@ pub fn run(args: &[String]) -> i32 {
                     break;
                 }
                 let o = open.pop().unwrap();
-                match o.sec {
-                    Sec::Deferred => {
-                        // spec: queue-kit/SPEC.md §check-queue-entry-budget — the count is the
-                        // extent less at most one line of each declaration grammar per entry
-                        let n = bound - o.start - o.decls.count_ones() as usize;
-                        if n > cap {
-                            size.push(format!(
-                                "{}:{}: {} — {} lines (cap {}){}",
-                                file,
-                                o.start,
-                                o.slug,
-                                n,
-                                cap,
-                                discounted(o.decls)
-                            ));
-                        }
-                        if o.ind == 0 && !o.costed {
-                            cost.push(format!("{}:{}: {}", file, o.start, o.slug));
-                        }
-                        headroom.push((o.start, o.slug.clone(), cap.saturating_sub(n)));
-                    }
-                    Sec::Icebox => {
-                        if o.nb > 1 {
-                            shape.push(format!(
-                                "{}:{}: {} — {} content lines; an icebox entry is exactly one",
-                                file, o.start, o.slug, o.nb
-                            ));
-                        }
-                    }
-                    Sec::Other => {}
-                }
+                // spec: queue-kit/SPEC.md §check-queue-entry-budget — the count is the extent less
+                // at most one line of each declaration grammar per entry
+                let count = bound - o.start - o.decls.count_ones() as usize;
+                out.push(Closed {
+                    slug: o.slug,
+                    start: o.start,
+                    ind: o.ind,
+                    sec: o.sec,
+                    costed: o.costed,
+                    nb: o.nb,
+                    count,
+                    decls: o.decls,
+                });
             }
         }};
     }
@@ -185,6 +151,8 @@ pub fn run(args: &[String]) -> i32 {
                 Sec::Deferred
             } else if sec_cfg.is_icebox(line) {
                 Sec::Icebox
+            } else if sec_cfg.is_task(line) {
+                Sec::Active
             } else {
                 Sec::Other
             };
@@ -232,10 +200,15 @@ pub fn run(args: &[String]) -> i32 {
         }
 
         if !open.is_empty() && !line.trim().is_empty() {
-            if let Some(tok) = line.split_whitespace().next() {
-                if RETIRED.contains(&tok) {
-                    let slug = open.last().map(|o| o.slug.clone()).unwrap_or_default();
-                    retired.push(format!("{}:{}: {} — retired declaration grammar {}", file, fnr, slug, tok));
+            // spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (D) binds the deferred
+            // and icebox tiers, the corpus it has always scanned; the walk's reach into the active
+            // sections is for measurement alone and must not widen an assertion's corpus with it
+            if sec != Sec::Active {
+                if let Some(tok) = line.split_whitespace().next() {
+                    if RETIRED.contains(&tok) {
+                        let slug = open.last().map(|o| o.slug.clone()).unwrap_or_default();
+                        retired.push((fnr, slug, tok.to_string()));
+                    }
                 }
             }
             let decl = declaration(line).map_or(0, |i| 1u32 << i);
@@ -252,6 +225,97 @@ pub fn run(args: &[String]) -> i32 {
     }
     bound = last + 1;
     close_to!(all);
+    Scan {
+        entries: out,
+        retired,
+    }
+}
+
+pub fn run(args: &[String]) -> i32 {
+    let sec_cfg = match queue::Sections::active_and_deferred() {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("check-queue-entry-budget: {}", e);
+            return 2;
+        }
+    };
+    let cap_raw = match queue::knob_scalar("QUEUE_KIT_ENTRY_LINE_CAP") {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("check-queue-entry-budget: {}", e);
+            return 2;
+        }
+    };
+    let cap: usize = match cap_raw.parse() {
+        Ok(n) => n,
+        Err(_) => {
+            eprintln!(
+                "check-queue-entry-budget: QUEUE_KIT_ENTRY_LINE_CAP is not a positive integer: {}",
+                cap_raw
+            );
+            return 2;
+        }
+    };
+    let file = match args.first() {
+        Some(a) => a.clone(),
+        None => match queue::knob_scalar("QUEUE_KIT_QUEUE_FILE") {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("check-queue-entry-budget: {}", e);
+                return 2;
+            }
+        },
+    };
+    let text = match std::fs::read_to_string(&file) {
+        Ok(t) => t,
+        Err(_) => {
+            eprintln!("check-queue-entry-budget: file not found: {}", file);
+            return 2;
+        }
+    };
+
+    let scan = walk(&text, &sec_cfg);
+    let (mut size, mut cost, mut shape) = (Vec::new(), Vec::new(), Vec::new());
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — headroom is the size
+    // assertion's own count one subtraction away, collected for every closed
+    // Deferred entry regardless of cap outcome and surfaced only on the clean path
+    let mut headroom: Vec<(usize, String, usize)> = Vec::new();
+    let retired: Vec<String> = scan
+        .retired
+        .iter()
+        .map(|(fnr, slug, tok)| format!("{}:{}: {} — retired declaration grammar {}", file, fnr, slug, tok))
+        .collect();
+    for o in &scan.entries {
+        match o.sec {
+            Sec::Deferred => {
+                let n = o.count;
+                if n > cap {
+                    size.push(format!(
+                        "{}:{}: {} — {} lines (cap {}){}",
+                        file,
+                        o.start,
+                        o.slug,
+                        n,
+                        cap,
+                        discounted(o.decls)
+                    ));
+                }
+                if o.ind == 0 && !o.costed {
+                    cost.push(format!("{}:{}: {}", file, o.start, o.slug));
+                }
+                headroom.push((o.start, o.slug.clone(), cap.saturating_sub(n)));
+            }
+            Sec::Icebox => {
+                if o.nb > 1 {
+                    shape.push(format!(
+                        "{}:{}: {} — {} content lines; an icebox entry is exactly one",
+                        file, o.start, o.slug, o.nb
+                    ));
+                }
+            }
+            Sec::Active | Sec::Other => {}
+        }
+    }
 
     if !size.is_empty() || !cost.is_empty() || !shape.is_empty() || !retired.is_empty() {
         println!("check-queue-entry-budget: deferred-pool entry budget violation(s):");
@@ -291,6 +355,13 @@ pub fn run(args: &[String]) -> i32 {
         println!("        mandated write; minting a NEW entry to hold it stays authorization-");
         println!("        gated (queue-kit/SPEC.md section check-queue-entry-budget, which");
         println!("        defines the class and owns the declaration-line discount above).");
+        // spec: queue-kit/SPEC.md §check-queue-entry-budget — the arm's named reader is this
+        // failure's reader, who is by construction the session about to compress; it is routed
+        // here because no other trigger reaches that session at that moment
+        println!("        Before compressing, read what has already left the entry:");
+        println!("        bash gate-sdk/bin/run-gates.sh --emit entry-history <slug> — the commits");
+        println!("        in which its counted extent fell. Advisory, no verdict: it is how you");
+        println!("        avoid re-answering an answered ground or dropping an unanswered one.");
         return 1;
     }
 

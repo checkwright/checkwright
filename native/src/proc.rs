@@ -661,6 +661,101 @@ pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Comp
     })
 }
 
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a child driven one request at a time rather than
+// in one shot: `run_with_stdin` resolves the whole stdout into memory, which a caller that means to
+// stop early cannot afford, so here the request and its drained answer alternate
+pub struct Piped {
+    program: String,
+    child: std::process::Child,
+    stdin: Option<std::process::ChildStdin>,
+    stdout: std::io::BufReader<std::process::ChildStdout>,
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the caller stops when its own walk is done, so the
+// child is closed at its stdin and reaped here rather than left for the process table
+impl Drop for Piped {
+    fn drop(&mut self) {
+        self.stdin.take();
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
+impl Piped {
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — one request line, flushed: a request left in
+    // the writer's buffer is a caller that then blocks forever on an answer it never asked for
+    pub fn ask(&mut self, request: &str) -> Result<(), String> {
+        use std::io::Write;
+        let pipe = self
+            .stdin
+            .as_mut()
+            .ok_or_else(|| format!("cannot run {}: stdin already closed", self.program))?;
+        pipe.write_all(request.as_bytes())
+            .and_then(|_| pipe.write_all(b"\n"))
+            .and_then(|_| pipe.flush())
+            .map_err(|e| self.broke(e))
+    }
+
+    pub fn read_line(&mut self) -> Result<String, String> {
+        use std::io::BufRead;
+        let mut line = String::new();
+        match self.stdout.read_line(&mut line) {
+            Ok(0) => Err(format!("cannot run {}: the answer stream ended early", self.program)),
+            Ok(_) => Ok(line),
+            Err(e) => Err(self.broke(e)),
+        }
+    }
+
+    pub fn read_exact(&mut self, n: usize) -> Result<Vec<u8>, String> {
+        use std::io::Read;
+        let mut buf = vec![0u8; n];
+        self.stdout.read_exact(&mut buf).map_err(|e| self.broke(e))?;
+        Ok(buf)
+    }
+
+    fn broke(&self, e: std::io::Error) -> String {
+        format!(
+            "cannot run {}: {} — the read could not complete; treating as failure (not clean)",
+            self.program, e
+        )
+    }
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — `run`'s spawn contract with both pipes kept open:
+// `Err` is a spawn failure and nothing else, exactly as there
+pub fn piped(program: &str, args: &[&str]) -> Result<Piped, String> {
+    #[cfg(test)]
+    recorder::note(program);
+    use std::process::Stdio;
+    let spawn_err = |e: std::io::Error| {
+        format!(
+            "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+            program, e
+        )
+    };
+    let mut child = Command::new(spawn_target(program)?.as_ref())
+        .args(args)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .map_err(spawn_err)?;
+    let stdin = child
+        .stdin
+        .take()
+        .ok_or_else(|| format!("cannot run {}: no stdin pipe — treating as failure (not clean)", program))?;
+    let stdout = child
+        .stdout
+        .take()
+        .ok_or_else(|| format!("cannot run {}: no stdout pipe — treating as failure (not clean)", program))?;
+    Ok(Piped {
+        program: program.to_string(),
+        child,
+        stdin: Some(stdin),
+        stdout: std::io::BufReader::new(stdout),
+    })
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a child fed a body on stdin whose stdout is
 // captured apart from its stderr; `code` is the pipeline element's own `$?`
 pub struct Streamed {

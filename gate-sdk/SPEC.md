@@ -2555,7 +2555,9 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 verbs — `--init`, `--doctor`, `--diff`, `--update` and `--uninstall`
 (installer/README.md §The verbs) — plus the
 `--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
-`--emit-queue-edges`; `--emit-md-index`,
+`--emit-queue-edges`; `--emit-entry-history`, queue-kit's advisory report of the
+commits at which one entry's counted extent fell
+(queue-kit/SPEC.md §check-queue-entry-budget); `--emit-md-index`,
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
 reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit's
 two survey-record affordances; `--emit-stage-rules`,

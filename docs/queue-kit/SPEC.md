@@ -719,7 +719,10 @@ The kit is vendored beside gate-sdk (conventionally at `queue-kit/`); its
 gates are registered in the consumer's `gates.list` by name and resolve
 through gate-sdk's multi-kit path. The `queue-index` arm is not among them: it
 is a non-gate arm of the binary, registered in no `gates.list` and carrying no
-`.gate` descriptor (§The queue-index arm).
+`.gate` descriptor (§The queue-index arm). Neither is the `entry-history` arm
+(§check-queue-entry-budget), which is outside `check-gate-fixture-coverage`'s
+derived set for the same reason and therefore takes a **bespoke** test,
+`gate-tests/entry-history.test.sh`, rather than a `good/`+`bad/` pair.
 
 Config follows lifecycle-kit's pattern: copy `templates/queue-config.sh`
 into the gates dir as `queue-config.sh` (or point `QUEUE_KIT_CONFIG_FILE`
@@ -1658,7 +1661,12 @@ displaced a mandated write would be a second measurement of a quantity this
 headroom line already prints, maintained by hand, against a criterion (the split
 test below) that reads an entry's *composition* rather than its collision
 history. What a firing count would have been evidence for, the split criterion
-decides directly.
+decides directly. **The `entry-history` arm below is not that counter and the
+refusal stands unaffected by it**, stated here because a reader who knows this
+refusal will reach for it there: the arm answers which commits reduced **one
+named entry**, on demand and computed at the asking, and it keeps no tally and
+counts nothing across the pool. An arm that later grew a pool-wide count would be
+re-minting exactly what this paragraph refuses.
 
 *Why a declaration line is discounted, and why exactly one of each grammar.* Such
 a line is
@@ -1717,6 +1725,27 @@ survives unanswered is relocated into a distinct linked entry. The gate cannot
 hold this: it sees an entry's current extent, and judging whether a removed line
 was answered or discarded is semantic. So the rule is a stated authoring
 contract — and that third relief is **two acts wearing one name**.
+
+**An answer is durable on a governed surface before the compressing commit.**
+The contract above says compress by *answering*; this is what answering obliges.
+Answering a ground means the ground is **resolved**, and a resolution the
+compressing commit leaves nowhere is one the next reader cannot use — which is
+indistinguishable from a discard by exactly the measure that makes the loss
+invisible, the entry's extent being its only artifact. So the answer lands in the
+surface that owns it *first*, and what the entry keeps is a pointer to it. **The
+rule is the missing sibling of one already stated for the adjacent act**, not a
+new obligation: canon-kit rules that prose worth more than the entry's own
+lifetime belongs in a governed surface before the *landing* commit, never on the
+entry as its permanent home (canon-kit/SPEC.md §check-amendment-queue). An entry
+leaving the queue and an entry shedding half its body are one information event
+at two scales, and only the first of them carried the rule. The **honest limit
+comes across with it**, for canon-kit's own reason: no gate reads this, because
+the loss is indistinguishable from an ordinary edit. And its routine discharge
+costs nothing, because the lever is content tiering, which this section's
+grammar already applies elsewhere — a ruling lands on the entry as a pointer to
+the record or specification that owns it, never as prose — so the answer was
+going to a governed surface anyway, and what this clause adds is that the
+pointer's target exists *first*.
 
 - **Relocating grounds** into an entry that **already exists and already owns the
   ground's subject** is self-served when, and only when, what the cap blocks is a
@@ -1839,6 +1868,62 @@ asks:** an entry whose rulings outgrow its budget takes compression by answering
 and the self-served relocation, never an allowance, because the three shapes it
 would want are already refused above — the discount widened to a whole block, a
 cap conditional on carrying rulings, and ruling-count as a split signal.
+
+**`--emit entry-history <slug>` — the commits at which one entry's counted
+extent fell.** The contract above is an authoring contract, so a break in it is
+silent; this arm is what makes a break **detectable after the fact** rather than
+enforced before it. It reports one row per commit in which the named entry's
+**counted** extent decreased — that commit, the count before it, the count after
+it, and that commit's subject — newest first. Every field has a reader at the
+moment the report is read: the commit is opened, the two counts size what left,
+and the subject decides whether opening it is worth it. There is no fourth field
+because there is no fourth reader, and in particular there is **no verdict
+column**.
+
+**It issues no verdict, and it has no red condition at all.** Whether a given
+fall was a legitimate compression, a relocation or a discard is left to the
+reader, who has the commit in hand — the judgment this section already concedes
+no gate can make, made by the party that can make it. The exit contract is
+two-valued: 0 with the report, and 2 on a usage error (an absent slug, or a slug
+the newest commit carries no entry for), which is the harness-error class and
+never a finding. The absence of a 1 is the member's whole point rather than an
+accident of its implementation, and it is why the arm is **advisory** — the tier
+a surface nothing refuses a close over already occupies (guard-kit/SPEC.md
+§escalation-guard). It is a non-gate arm of the binary (gate-sdk/SPEC.md §The
+non-gate arm), registered in no `gates.list` and carrying no `.gate` descriptor,
+and it is read when its reader asks.
+
+**Its reader has a real trigger, and that trigger is assertion A's own failure.**
+The one session that needs to know what has already been compressed out of an
+entry is the session the cap has just blocked — by construction the session about
+to compress. So the arm's invocation is named in that failure's help text beside
+the reliefs the text already routes to, and there is no new trigger, no new
+schedule and no new invocation point. Its second, discretionary consumer is the
+drain that ranks the deferred pool, the reader for whom a displaced ground is
+otherwise recoverable only from git.
+
+**It mints no second spelling of the count.** The extent is the range assertion A
+measures and the `queue-index` arm's `--extent` yields; the count is that extent
+less the declaration discount assertion A already applies. The arm **calls** that
+computation rather than reproducing it, so a change to what counts moves the cap
+and this report in one edit. It measures an entry wherever the walk finds it in a
+task section, so a report follows one entry across a promotion; a bare slug under
+the done section is not an entry the cap measures and reads as absence.
+
+**The walk is bounded, and the bound is stated.** Commits touching the queue file
+are walked newest-first, and the walk stops at the first one carrying no entry
+for the slug — the entry's filing commit — so the cost scales with the entry's
+age rather than the repository's. The blobs stream through **one**
+`git cat-file --batch` child driven request by request rather than a process per
+commit, which is what lets the walk stop early without having bought the answers
+it will not read.
+
+**Two honest limits, stated rather than discovered.** A fall is attributed to a
+**slug**, so an entry renamed mid-history reads as filed at its rename — as does
+one that spent a stretch outside the task sections. And a commit that compresses
+one part of an entry while growing another **nets out and does not appear**: the
+arm reports the counted total, which is the quantity the cap binds and therefore
+the quantity a displacement is measured against.
 
 **A ruling the operator restates from memory is filed in the moment.** The
 compression rule above is an authoring contract, so a break in it is silent, and

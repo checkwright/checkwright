@@ -56,6 +56,39 @@ pub fn added_from_log(log: &str) -> Vec<(String, String)> {
     out
 }
 
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — one `git cat-file --batch` child driven
+// request by request, so a walk that stops at an entry's filing commit never buys the blobs of the
+// commits older than it
+pub struct Blobs {
+    p: crate::proc::Piped,
+}
+
+impl Blobs {
+    pub fn open(top: &str) -> Result<Self, String> {
+        Ok(Blobs {
+            p: crate::proc::piped("git", &["-C", top, "cat-file", "--batch"])?,
+        })
+    }
+
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — a commit that does not carry the path
+    // answers `None`, which is the same answer as a commit carrying no entry for the slug: both
+    // mean "the walk has run past what it was measuring".
+    pub fn at(&mut self, rev: &str, path: &str) -> Result<Option<String>, String> {
+        self.p.ask(&format!("{}:{}", rev, path))?;
+        let header = self.p.read_line()?;
+        let size = match header.split_whitespace().nth(2) {
+            Some(n) => n,
+            None => return Ok(None),
+        };
+        let size: usize = size
+            .parse()
+            .map_err(|_| format!("git cat-file --batch: unreadable record header: {}", header.trim_end()))?;
+        let body = self.p.read_exact(size)?;
+        self.p.read_exact(1)?;
+        Ok(Some(String::from_utf8_lossy(&body).into_owned()))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::added_from_log;
