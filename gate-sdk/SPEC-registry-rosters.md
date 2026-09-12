@@ -189,9 +189,38 @@ the Deliverable's other half unserved.
 **The entry's "39" is a third quantity again, and it is unauditable today.** 39 is
 the *decidable* subset — the `?` roots that in fact resolve to a static literal,
 as against the kit-literal-fallback branches §check-reads-couples rules
-legitimately undecidable (`gate-sdk/SPEC.md:14992-15007`). Separating those needs
+legitimately undecidable (that section's *second half is the boundary* passage;
+this amendment first cited it by line number and the line number was already
+wrong, landing in §check-graph — which is the case against citing a moving file by
+line at all). Separating those needs
 exactly the classifier delta 4 would retire. No command in the tree reproduces 39,
 and this amendment does not assert it.
+
+**Build's measurement, and a fourth quantity this entry nearly shipped wrong.**
+The arm reproduces authoring's figures exactly — 36 members, 51 `?` root-lines,
+confirmed twice over by two independent routes, the arm itself and a per-member
+`--reads` sweep. But **three denominators are live over one population and they are
+not interchangeable**, and an entry whose whole subject is counts that were wrong
+every time must not add a fourth:
+
+- **51** `?` **root-lines**, member-expanded — a shared root const counted once per
+  member using it. 25 inline + 26 from the three consts (2×10, 1×3, 3×1).
+- **36** **members** declaring at least one `?` — 22 declaring inline, 14 using a
+  shared const, and the **overlap is exactly zero**: no member combines a const
+  with an inline `?`, and none uses two consts.
+- **31** textual **declaration sites** in the registry source — 25 inline plus 6
+  inside the consts — spread over 28 source lines, because three members carry two
+  inline `?` tuples on one line each (`check-close-surfaces`,
+  `check-shim-restatement`, `check-gate-substrate-parity`). 28 + 3 = 31 is the
+  self-consistency check.
+
+A count of *sites* is not a count of *members*, and adding one to the other is the
+category error that produces a phantom overlap. §check-reads-couples carries the
+warning so the next assertion over this population states which denominator it
+counts.
+
+**Applied.** The arm, its bridged-table registration, its two crate unit tests, its
+bespoke cross-oracle test, and both SPEC halves.
 
 ### (4) Every `?` declares its ground, and the ground names where the walk is
 
@@ -513,19 +542,28 @@ diagnostic underneath an uncorrected one.
 - `gate-sdk/SPEC.md` §run-gate-tests, the case-config claim (delta 2). Kept as
   fact, inverted in force: recorded as a known hole, unsanctioned and filed, with
   an explicit statement that it is not an extension point. **Applied.**
-- `gate-sdk/SPEC.md` §check-reads-couples (deltas 3 and 4). The section gains the
+- `gate-sdk/SPEC.md` §check-reads-couples (delta 3). The section gains the
   census arm as the answer to the population its cadence row asks for, and records
   the measured figures (36 members, 51 `?` roots) as of this authoring with the
   oracle that produces them, so a later reader re-runs rather than trusts. It also
-  gains the two ground values, the refusal of a third, the locator's grammar and
-  its placement rule (delta 4).
+  gains the **three-denominator warning** — that the member-expanded root-line
+  total, the member count and the textual declaration-site count are different
+  numbers over one population, and an assertion must say which it counts. That was
+  not in the amendment as authored; build measured the three apart and the section
+  carries it because conflating them is how the hand sweeps this arm replaces went
+  wrong. **Applied.**
+- `gate-sdk/SPEC.md` §check-reads-couples (delta 4). The two ground values, the
+  refusal of a third, the locator's grammar and its placement rule.
+  **Not yet applied.**
 - `gate-sdk/SPEC.md` §The non-gate arm (deltas 3 and 8). `--emit-reads-census`
   joins the roster; the section is named as the roster `no_such_arm` cites, which
   is what makes it a governed surface rather than documentation. **Delta 8's half
   applied**, in two paragraphs appended below the roster so the enumeration itself
   is untouched — it is the paragraph a sibling amendment's new arm edits, and a
   reworded enumeration would have turned two sequential edits into a conflict.
-  Delta 3's half is not yet applied. Delta 10's clause lands in the same passage.
+  **Delta 3's half applied**, as one clause inside the enumeration — the first edit
+  to take the sequential shape delta 8 left that paragraph in. Delta 10's clause
+  lands in the same passage.
 - `gate-sdk/SPEC.md` §check-gate-substrate-parity (delta 5). Assertion I is added
   beside B with its both-directions statement, its red conditions, and the note
   that it reads the registration file through the existing path derivation so no

@@ -2592,7 +2592,9 @@ and `--emit-scan-prompts`, guard-kit's friction-log ranker
 (guard-kit/SPEC.md §scan-prompts), and `--emit-compare-settings-allow`,
 guard-kit's settings-allowlist comparator (guard-kit/SPEC.md
 §compare-settings-allow), and `--emit-usage-trend`, delegation-kit's
-footprint trend reporter (delegation-kit/SPEC.md §Trend reporter); and
+footprint trend reporter (delegation-kit/SPEC.md §Trend reporter), and
+`--emit-reads-census`, this kit's own roster of the registry members declaring an
+undecidable walk root (§check-reads-couples); and
 drift-kit's two meters, `--emit-overhead-meter`, the
 governance-overhead byte proxy (drift-kit/SPEC.md §The overhead meter), and
 `--emit-stage-economics`, the stage × model × iteration spend pricer
@@ -15209,6 +15211,43 @@ lost**: the hook's matcher spans `/`, so every path the coverage reader reports 
 still fires the gate. An adopter gains a red gate, never a missing coupling. A consumer's
 own population belongs on that consumer's cadence row, never here, where it would rot on
 the next gate that joins the registry.
+
+**`--emit reads-census` is that population, measured by an oracle rather than
+swept.** The skip above has a population and the cadence row asks after it, and
+until this arm nothing in the tree answered the question: three hand sweeps in one
+stage landed on 26, then 27, then at least 29, each miss caused by another spelling
+of one idiom. The arm prints **one line per registry member declaring at least one
+`?`**, in registry order, in three tab-separated columns — the member's name, its
+`?` count, and the roots it *does* declare, comma-joined, or `-` where it declares
+none. The report keeps the rules `--reads` states above, for the same reasons:
+
+- **No count line**, because both totals are derivable from the lines — the member
+  population is the line count, the root population the sum of column 2 — and a
+  transcribed total is a second source for a number this section exists to stop
+  being wrong.
+- **The declared-root column prints the root expression alone**, not the filter
+  beside it. The census's question is *how much of a member is bounded*, which is
+  what tells a wholly-undecidable member from a partly-declared one; the field
+  detail is `--reads <name>` one command away, and carrying it here would widen
+  every line to answer a question the roster form is not asked.
+
+**What it reads is registry data and nothing else** — field 2, already answered per
+member by `--reads`, so the arm is the roster form of a question the binary
+answered one member at a time. It declares no knob, adds no registry field, and
+parses no source.
+
+**The figures, as of this writing and with the oracle that reproduces them.** 115
+registry members, **36** of which declare at least one `?`, across **51** `?`
+root-lines. Re-run `--emit reads-census` rather than trusting those two: where the
+arm and this paragraph disagree, the arm wins and this paragraph is stale. Three
+denominators are live over the same population and they are **not** interchangeable,
+which is stated because conflating them is how the hand sweeps went wrong: the
+**51** root-lines are member-expanded, so a shared root const is counted once per
+member using it; the **36** members are the census's line count; and the *textual*
+declaration sites in the registry source are **31**, because three consts
+(`MANIFEST_ROOTS`, `COMMENT_SURFACE_ROOTS`, `SPEC_POINTER_ROOTS`) hold 6 sites
+between them that 14 members share. An assertion over this population must say
+which of the three it counts.
 
 **The `--reads` report.** One line per walk root and nothing else — no count line
 and no header, because the count is derivable from the lines and a transcribed

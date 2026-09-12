@@ -37,6 +37,7 @@ pub mod pub_lang;
 pub mod queue_counts;
 pub mod queue_edges;
 pub mod queue_index;
+pub mod reads_census;
 pub mod scan_prompts;
 pub mod stage_economics;
 pub mod stage_rules;
@@ -367,6 +368,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-port-blockers",
         Arm::Emit(port_blockers::emit),
         port_blockers::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the `?` census, a projection over registry
+    // field 2. It reads no knob and is a table member anyway: the family the table keys is what
+    // `no_such_arm` prints, so an arm outside it is one a mistyped `--emit` cannot be steered to.
+    (
+        "--emit-reads-census",
+        Arm::Emit(reads_census::emit),
+        reads_census::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The report skeleton — the collator, a *bridged* arm rather than a
     // top-level flag: a hardcoded flag receives no consumer override, which for a kit whose whole
