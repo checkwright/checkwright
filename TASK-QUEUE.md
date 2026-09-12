@@ -767,8 +767,8 @@
   correct act as often as the defect: a classifier no gate can honestly run, the 2026-08-30 ground.
   The lever is content tiering — a ruling lands on the entry as a pointer to TRAJECTORY.md or the
   owning SPEC, never as prose — and this iteration's scope paid its rounds because four landed as
-  prose. **Declined at threshold at scope — operator direction, 2026-09-11 (lead-relayed):** no
-  mechanism is owed, so nothing is takeable.
+  prose. **Declined at threshold twice — operator direction, 2026-09-11 and 2026-09-12, both
+  lead-relayed:** no mechanism is owed; the per-boundary re-surfacing is absorbed, not suppressed.
   recurrence: entry-compression-contract-unenforced 2026-09-07 2026-09-09
   **Cost while deferred:** every mandated write onto a saturated entry pays
   the same unenforced honour-system compression, and the queue's most-ruled
@@ -1474,6 +1474,11 @@
   reports 0 resolvable walk(s) covered against 37 undecidable skipped-and-counted, and
   nothing reviews the 37 — so the next such hole is found the way assertion D's was, by
   someone noticing.
+  **This iteration's unit set, with `manifest-family-couples-misses-the-consumer-widened-corpus` —
+  operator direction, 2026-09-12 (lead-relayed), naming the iteration `couples-resolver-reach`.**
+  The pair was chosen over the lead entry alone because both candidate fix sets extend the same
+  resolver, so one design pass answers both. A direction, revisable at a later scope or spec.
+  Authoring is `spec`'s: this is a feature, and the roster splits authoring out of scope.
   Filed 2026-08-03 at close from the gap inbox, merging the assertion-D instance into its
   class; both found by build batch 2.
 
@@ -3330,6 +3335,8 @@
   **Cost while deferred:** one out-of-band decision per file authored outside the scratch set, plus
   the six ungranted entries above, and invisible to every gate — the friction log is advisory, so
   nothing reds however far the residue grows.
+  **Stays deferred — lead decision, 2026-09-12:** relayed upward and left here, because the
+  settings half is the operator's applied out of band and no stage may promote it.
   Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
   drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
   2026-09-04 within one iteration.
@@ -4550,6 +4557,11 @@
   **Cost while deferred:** every commit touching one of those members runs the two whole-corpus
   claim gates and skips the four that grade its citations, links, temporal narration and counts —
   silent, and paid at the moment the surface is least reviewed.
+  **This iteration's lead unit, with `couples-dynamic-root-resolution` — operator direction,
+  2026-09-12 (lead-relayed), naming the iteration `couples-resolver-reach`.** It leads on the
+  session-class ranking rule's first tier. The spanning cost was accepted with the choice: the pair
+  reaches canon-kit, gate-sdk and native, so `check-stage-entry` assertion C will demand the align
+  audit stamp. A direction, revisable at a later scope or spec. Authoring is `spec`'s.
   Filed 2026-09-06 by close from the gap inbox, after re-verification widened the bullet: the bullet
   said four gates trigger and the fix was three `couples=` triples; the oracle reads eight
   triggering and the fix is not three triples at all.
