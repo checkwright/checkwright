@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+couples-resolver-reach gates sha256=11b59327b4dc3af6fd1853e2459f1b9915f81ccb6628b1aef6c35bad29ceea8e pass=113 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach canon_kit sha256=e0780e41e810cbac5bb0be8cbace64fd320c84899e0272c315453780c9dd6455 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach guard_kit sha256=bec1c9c35372c4d6106471ec51071ee748b3187f02c6303efe7fbf6667cc7d0d pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach queue_kit sha256=2334582dd365a18ebe2f1daf9532d2acc25728fa9e04376e62f24f0c8a5a1788 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach guard_tests sha256=d1df8069c9935679a05e36a5b9c6859bc81fa68434855f3791e0cbb5bb328dd3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach demo sha256=f5370ceff1c3b5b633ac5bd7824d47f85fd7a8758f8fb899f5e03d757a34c600 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach installer_smoke sha256=f9cedd2e9577599ff8d1f50396d27171f60eaad6b4ceacbb8b4779d45bf9706d pass=13 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach consumer_smoke sha256=e50ea2438ef669bb6746a42222dffee847304ca39ef7c48030dfa0f23cbfd605 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach upgrade sha256=2d4e6d793dd27d7602958278d1334ccdc6255c1bb52ac1467cd98c192c3a0371 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach agents_md_smoke sha256=1a31b86cea8872e5f1d8a26eee022428090d42735df551bb8e258c58e034942d pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
+couples-resolver-reach native_crate sha256=82fb0d1ee5c7d0b83f6a56538c71b3c2b6cb4f6e44da1efd8cdb3a55b4bbff30 pass=1 fail=0 ignore=0 verdict=clean 2026-09-12
