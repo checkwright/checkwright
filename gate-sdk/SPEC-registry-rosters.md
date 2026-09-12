@@ -292,6 +292,62 @@ nothing in the tree reproduces 39. Under delta 3 alone, an entry about census
 unreliability would keep an uncensused headline number; the ground partition is
 what finally produces a figure of the class 39 was meant to be.
 
+**Not yet applied — and build stopped deliberately rather than half-landing it.**
+The batch that landed deltas 2 and 3 measured this delta at the source before
+starting it, and stopped on what the measurement found. The measurement is
+recorded here so the next session neither re-buys it nor starts from the figures
+this section was authored against.
+
+**The declaration unit is the source site, not the member** (lead-routed decision,
+revisable here). The per-member rule was written against 51, and 51 is a count of
+member-expanded root-lines; the authored population is the **31 textual declaration
+sites** — 25 inline plus 6 inside the three shared consts. Demanding ten separate
+grounds for one shared `MANIFEST_ROOTS` walk would have manufactured the
+fake-consideration failure the locator exists to prevent: ten authors writing ten
+grounds for one fact. The shared-const sites are already the `fallback` class
+§check-reads-couples names, so this aligns the declaration unit with a
+classification that section already carries — convergence, not widening.
+
+**Measured cost, at the source.** The arity change is the dominant term and it is
+larger than this section assumed: field 2's element type is spelled inline with no
+alias, so a fourth element respells it in 6 declaration sites and rewrites **64**
+tuple literals across 58 lines — not 51, because 33 ordinary rows with nothing to
+say must still be rewritten to say nothing. Six destructuring sites widen with it
+(`--reads`' emission loop, the gate's consumption loop, and four registry unit
+tests). Call it 70 existing lines across three files, plus the ground emission on a
+`?` line and a new locator-resolution assertion of the size unit test C already
+carries. Authoring the 31 grounds is **not** uniform: 13 sites are a one-line
+lookup because the declaring module holds exactly one walk; 15 require matching N
+`?` slots against M ≠ N walks and deciding which walk each `?` stands for; 3 are
+blocked below. Around 26 files are opened. The direction the per-source-site unit
+buys is real — 31 authored grounds rather than 51, the consts' walks read once
+rather than per use — but this is not a session's remainder.
+
+**Two findings block it, and both are above a build session's class.** Neither is
+ruled here.
+
+- **The locator's placement rule is unsatisfiable for 8 of the 31 sites as the
+  Definition of Done states it.** "Resolves inside the declaring member's own
+  module" cannot hold for the 6 const sites, whose walks live in `native/src/spec.rs`
+  — a shared helper that is no member's module — nor for `check-close-surfaces`'
+  2 **inline** sites, whose walk lives in `native/src/emit/close_surfaces.rs`. The
+  const half was anticipated when the declaration unit moved to the source site; the
+  inline cross-module site was not, and it is the one that matters, because the
+  placement rule is this delta's stated defence against bulk satisfaction. Widening
+  it to "or a module it transitively calls" makes placement near-vacuous, and
+  exempting the shared sites reintroduces the declared exemption this gate family
+  refuses. Which of those the rule takes decides how much the machine-checkable half
+  is still worth.
+- **Three `?` have no ground available under this delta's own two-value set.**
+  `check-value-rollup-fresh` and `check-enforcement-fresh` each take a positional
+  with a literal default naming a **file**, and walk nothing at all; `check-hook-exec-bit`
+  enumerates through `git ls-files` and has no walk line for a locator to name. The
+  Definition of Done says a decidable `?` is converted "to a declared root", but a
+  named-file reader has no root to declare — the registry's own precedent for that
+  shape is the empty root set, which `check-rule-citation` already takes for stated
+  reasons. Which of the two applies is a spec question, not a calibration, and it
+  must be settled before a locator can be written for any of the three.
+
 ### (5) `check-gate-substrate-parity` assertion I joins the crate registry to the battery registration
 
 A ninth assertion compares the crate's dispatch roster with `scripts/gates.list`
@@ -625,20 +681,32 @@ roster declares a retirement and this is the opposite.
       reachable producer and a named consumer; every new field has a named reader
       at a named transition.
 - [ ] **Every `?` ground names its evidence, and the locator is checked by oracle** —
-      each of the 51 sites declares `<class>@<module>:<line>`, a crate-side
-      assertion holds every locator to resolving inside its own declaring member's
-      module, and a seeded bad locator reds it. A ground with no locator does not
-      compile, so the bulk pass cannot skip the step that makes it a classification.
+      each of the **31 declaration sites** declares `<class>@<module>:<line>` (the
+      unit is the site, not the member and not the 51 member-expanded root-lines), a
+      crate-side assertion holds every locator to resolving, and a seeded bad locator
+      reds it. A ground with no locator does not compile, so the bulk pass cannot
+      skip the step that makes it a classification. **The placement half of that
+      assertion is unsettled** — "inside the declaring member's own module" is
+      unsatisfiable for 8 of the 31 sites, and the rule it takes instead is open
+      above; this item cannot be checked until it is.
 - [ ] **The ground partition is reported with both classes non-empty, or the
-      landing states why.** All 51 rows are the identical spelling today, so a pass
-      returning 51 of one class and zero of the other is the bulk-authoring
+      landing states why.** All 31 sites are the identical spelling today, so a pass
+      returning 31 of one class and zero of the other is the bulk-authoring
       signature rather than a result — §check-reads-couples names both classes as
       live, and an empty one is a finding to resolve before landing, never a figure
-      to report.
+      to report. Both classes are reachable on the corpus as it stands, measured:
+      `COMMENT_SURFACE_ROOTS`' site is a kit-literal fallback branch, and
+      `check-memory-off`'s root set is computed from a knob's glob expansion with no
+      literal anywhere, so the guard is satisfiable rather than aspirational.
 - [ ] **A `?` that should be a declared root does not survive the pass** — at least
       one site is checked against the two shapes §check-reads-couples calls
       decidable (a hardcoded literal root, a positional with a literal default),
-      and any found is converted to a declared root rather than given a ground.
+      and any found is converted rather than given a ground. **Three are already
+      found and their conversion target is open**: `check-value-rollup-fresh` and
+      `check-enforcement-fresh` are positionals with literal defaults naming a file
+      and walk nothing; `check-hook-exec-bit` enumerates through a subprocess and has
+      no walk at all. "Converted to a declared root" does not fit a reader with no
+      root, and the registry's own precedent for that shape is the empty root set.
 - [ ] **The scratch fix is verified by the corpus, not by the diff** — delete
       `gate-sdk/gate-tests/check-crate-arms/good/.tmp/`, run the `gate_sdk` fixture
       suite, and confirm the directory does **not** reappear while the pinned
