@@ -73,3 +73,21 @@ generated extract of only the cited sections, which buys offline reading for a
 reader the site already serves at the cost of a projection and a freshness gate.
 discharge: payload-withholds-kit-specs  grep -x -- '- payload-withholds-kit-specs' TASK-QUEUE.md
 ruling: the payload withholds kit SPECs  payload-withholds-kit-specs
+
+**The compression contract at queue-kit/SPEC.md §check-queue-entry-budget is
+held by authorship, and no gate that reds is owed for it.** Ruled at consult
+2026-09-09 — operator-convened, lead-relayed, on the operator's own authority —
+as costed and filed. This overrides the **Enforcement-first** delivery rule
+(doctrine-kit/DOCTRINE.md, always-loaded at CLAUDE.md §Delivery doctrine),
+under which a stated rule earns its gate in the unit that states it. Grounds:
+the contract's relief is *compress by answering*, and the only machine-readable
+shape a violation has — a deferred entry's counted extent falling in a commit
+that also lands a ruling line — is equally the shape of that relief, so an arm
+asserting it cannot tell the correct act from the defect. Recorded on this
+ledger because the queue entry that carried it, `entry-compression-contract-unenforced`,
+is closing, and a closed entry keeps its slug and nothing else. Refused: that
+classifier under any framing that gives it an exit 1 — the two classes are
+indistinguishable from the artifact, and a gate that cannot separate them
+spends the correct act to catch the defect.
+discharge: compression-contract-unenforceable  manual queue-kit/SPEC.md §check-queue-entry-budget records the refused classifier and its ground undated, giving the override a business-as-usual home
+ruling: the 2026-09-09 consult ruling  costed and filed, no mechanism owed  entry-compression-contract-unenforced
