@@ -13,15 +13,21 @@ A declared walk root whose value is the member's own first argument with a liter
 default is **statically known**, so `?` stops being an available answer for it
 {design-bearing}.
 
-`?` means *a root this member cannot bound statically*. For 26 of the 59 members
-reporting one, the root is bounded: the module reads
-`args.first().map(String::as_str).unwrap_or(".")` — the crate's spelling of the
-shell `${1:-default}` idiom — and the generated hook dispatches every one of them
+`?` means *a root this member cannot bound statically*. For 27 of the 59 members
+reporting one, the root is bounded: the module reads its root from a **positional
+argument with a literal default** — `args.first().map(String::as_str).unwrap_or(".")`
+in 25 of them and `args.get(<N>).…unwrap_or(".")` in the other two
+(`check-graph`, `check-amendment-queue`), the crate's spelling of the shell
+`${1:-default}` idiom — and the generated hook dispatches every one of them
 with no trailing argv, so the literal is the root at every real invocation.
+**Both index spellings are in the class and a sweep must match both**: a census
+pattern that matched only `first()` missed `check-amendment-queue` entirely during
+this amendment's authoring, and found `check-graph` only by accidentally matching its
+unrelated mode argument.
 §check-reads-couples already supplies the judgement this delta applies, about the
 filter axis: spelling `?` for a root that is *an argument with a default, where
 these are literal* would be "the foreclosed opt-out moved into the registry". This
-delta says the same thing on the root axis, where the population is 26 members
+delta says the same thing on the root axis, where the population is 27 members
 rather than one.
 
 **The extension is a refusal, not a parser, and the substrate ruling is why.** A
@@ -116,27 +122,35 @@ there. The outcome is backstopped before this amendment adds anything, which is 
 it can be admitted as a form rather than fenced with a new check.
 
 **Footing: this form is not generalised from one instance.** `check-stage-entry` is
-the only member with a *declared* resolvable root, which understates the case —
-ten further members already hold the knob half in their own source and declare `?`
-anyway, and four more hold both halves. The form fits fifteen members today; what
-is missing is permission to say so.
+the only member with a *declared* resolvable root, which understates the case badly —
+**seventeen** further members already hold the bounding knob in their own source and
+declare `?` anyway, and four more hold a knob for one of two runtime branches (one
+member is in both sets). The form fits **twenty-one** members today; what is missing
+is permission to say so, not a mechanism.
 
 ### (3) The decidable cohort declares, and the couples its declaration forces widen
 
-The 26 members take their declarations in delta 2's forms, and each member's
+The 27 members take their declarations in delta 2's forms, and each member's
 `couples=` widens to whatever its newly-asserted coverage demands {design-bearing}.
 
 **The partition is measured, and it is what delta 2's third form exists for.** By
 the one mechanical test that needs no judgement — what the walk's filter argument
 is, followed one hop through a shared enumeration helper:
 
-- **10 knob-bounded**, each naming the knob delta 2 wants: six through
-  `spec::manifest_files*` on `CANON_KIT_MANIFEST_FILES` (`check-manifest-count`,
-  `check-manifest-temporal`, `check-knob-citation`, `check-prose-enum`,
-  `check-spec-pointer`, `check-tracking-claim`), plus `check-queue-slug-liveness`
-  on `QUEUE_KIT_PROSE_SURFACE_GLOBS`, `check-measured-claim` and
-  `check-unmarked-claim` on `CANON_KIT_MEASURED_SURFACE_GLOBS`, and
-  `check-prose-tells` on `CANON_KIT_PROSE_TELL_GLOBS`.
+- **16 knob-bounded**, each naming the knob delta 2 wants. Eight reach
+  `CANON_KIT_MANIFEST_FILES`: six directly through `spec::manifest_files*`
+  (`check-manifest-count`, `check-manifest-temporal`, `check-knob-citation`,
+  `check-prose-enum`, `check-spec-pointer`, `check-tracking-claim`) and two through
+  `spec::governed_docs`, which calls it (`check-install-claim`,
+  `check-payload-claim`). Two reach `CANON_KIT_AMENDMENT_GLOB` through
+  `spec::amendments_strict` (`check-amendment-retired-spelling`,
+  `check-amendment-update-target`). Two reach `CANON_KIT_SPEC_NAME` through
+  `spec::canonical_specs_sorted` (`check-spec-dod-singleton`,
+  `check-spec-derivable-section`). The remaining four bound their walks directly:
+  `check-queue-slug-liveness` on `QUEUE_KIT_PROSE_SURFACE_GLOBS`,
+  `check-measured-claim` and `check-unmarked-claim` on
+  `CANON_KIT_MEASURED_SURFACE_GLOBS`, `check-prose-tells` on
+  `CANON_KIT_PROSE_TELL_GLOBS`.
 - **5 kit-literal-bounded**, which is the set with no knob to name and therefore the
   set that made delta 2's literal form necessary: the four `check-action-*` members
   on `["yml","yaml"]` and `check-graph` on `["md"]`.
@@ -145,29 +159,52 @@ is, followed one hop through a shared enumeration helper:
   `check-todo-task-liveness`), whose helper globs by `CANON_KIT_COMMENT_SURFACE`
   when a consumer set it and falls back to the kit literal `["sh","gate","rs"]`
   when they did not. These take delta 2's twice-declared form.
-- **The remainder is neither**, and build partitions it rather than assuming: one
-  member filters **after** the walk through a closure over a knob-derived set
-  (`check-spec-embedded-source`, over `CANON_KIT_EMBED_LANGS`), one has a
-  knob-valued **root** and no filter at all (`check-workflow-tiering`, on
-  `GATE_SDK_WORKFLOW_DIR`), and the rest locate no walk entry point and no
-  enumeration helper — which most likely puts them in delta 2's third form, since
-  `git ls-files` enumeration is already outside the analyzed class.
+- **2 named-other, and both are named rather than left in a residue.**
+  `check-workflow-tiering` has a knob-valued **root** (`GATE_SDK_WORKFLOW_DIR`) and
+  no filter at all, which is a different axis from every case above.
+  `check-spec-embedded-source` walks twice: its spec corpus is knob-bounded by
+  `CANON_KIT_SPEC_NAME` and `CANON_KIT_AMENDMENT_GLOB`, while its source-candidate
+  corpus is filtered by globs **projected out of** `CANON_KIT_EMBED_LANGS`, a keyed
+  knob whose elements are `kind|fence-langs|file-globs` triples. Its knob's *value*
+  is therefore not its pattern, so delta 2's `knob:` form would hand the reader the
+  triples. **It keeps `?` for that one walk and declares the other two**, which is
+  why delta 1's refusal is stated per-walk and not per-member; delta 4's cadence row
+  owns the undeclared walk.
 
-**The counts overlap by one**: `check-spec-pointer` is both knob-bounded through
+**17 + 5 + 4 + 2 is 28 against a corpus of 27, and the overlaps are named, not
+rounded away**: `check-spec-pointer` is both knob-bounded through
 `spec::manifest_files` and runtime-selected through `spec::comment_surface`, because
-it walks twice. It is the worked example for the twice-declared form and likely
-needs three declarations, not two. Named because a sweep keyed on one walk per
-member would silently drop its second.
+it walks twice. It is the worked example for the twice-declared form and needs three
+declarations, not two. **There is no leftover class** — every one of the 27 is in a
+named class above, and an earlier draft of this delta consigned six of them to a
+"rest" it described as having no walk entry point and no enumeration helper. That
+description was false: all six reach a knob one hop through a shared helper whose
+name that draft had guessed rather than derived. Recorded because the false framing
+is the more dangerous half — a build session reading it would stop looking.
 
 What is not uniform, and is where the judgement sits, is the consequence: each of
-the 26 has its couples coverage asserted **for the first time**, and a member whose
-couples under-covers its real scan pattern reds. For the eleven canon-kit members
-the shortfall is already measured — their corpus knob reaches `TRAJECTORY.md`,
-`RELEASING.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
-`ROADMAP.md`, `doctrine-kit/DOCTRINE.md` and the `docs/` pages, and their couples
-reach none of them. **For the rest the shortfall is unmeasured and cannot be
-measured before the refusal is built**, so the first act of this delta is to build
-the refusal and *read* the reds, before any couples is touched.
+the 27 has its couples coverage asserted **for the first time**, and a member whose
+couples under-covers its real scan pattern reds.
+
+**The measured shortfall is exactly the `CANON_KIT_MANIFEST_FILES` set, and it is a
+subset of the 17 above rather than a separate population.** Eight of the 27 bound
+their walks by that knob, and every one of them is also on
+`SPEC-knob-token.md` delta 4's measured instance — their corpus reaches
+`TRAJECTORY.md`, `RELEASING.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
+`SECURITY.md`, `ROADMAP.md`, `doctrine-kit/DOCTRINE.md` and the `docs/` pages, and
+their couples reach none of them. The sibling's instance lists eleven members
+because three of them (`check-docs-cmd`, `check-md-refs`,
+`check-spec-fence-balance`) scan that corpus without carrying this delta's
+literal-default root shape, so they are already triggered-but-uncovered rather than
+newly asserted. **The two counts differ for that reason and not by error**, stated
+because an earlier draft put `check-install-claim` and `check-payload-claim` in an
+unnamed residue while the same draft counted them inside the measured eleven — a
+self-contradiction no re-derivation would have caught, because the duty to
+re-measure covers the numbers and not the prose they are read against.
+
+**For the other 19 the shortfall is unmeasured and cannot be measured before the
+refusal is built**, so the first act of this delta is to build the refusal and
+*read* the reds, before any couples is touched.
 
 **This is where the sibling amendment becomes load-bearing rather than adjacent.**
 The eleven canon-kit reds are satisfiable in exactly one way: their couples must
@@ -183,7 +220,7 @@ and the token without this one is a spelling nothing demands.
 The roots that stay `?` join the consumer's close-stage audit roster as one
 reviewed class with event-keyed due-ness {design-bearing}.
 
-After delta 3, the remainder is 33 members whose roots are genuinely not bounded by
+After delta 3, the remainder is 32 members whose roots are genuinely not bounded by
 this delta's predicate — including the multi-hop case, a root resolved from a knob
 whose literal default sits two files away in a kit shell library, decidable in
 principle and outside the single-hop shape by design. The skip count is printed on
@@ -277,7 +314,7 @@ like every other row, and does not wait on it.
 
 - `gate-sdk/SPEC.md` §check-reads-couples, the paragraph refusing `?` for a root
   that is "an argument with a default, where these are literal" (delta 1). It
-  widens from the filter axis to the root axis, and the 26-member population is
+  widens from the filter axis to the root axis, and the 27-member population is
   what makes the widening worth stating rather than implying.
 - `gate-sdk/SPEC.md` §check-reads-couples, the tractable-class paragraph naming the
   three resolvable shapes and the skipped-and-counted rule (deltas 1 and 4). It
@@ -332,7 +369,7 @@ like every other row, and does not wait on it.
 ## Retired spellings
 
 - None — no delta retires a name, and `?` is the one that reads as though it might.
-  It keeps its spelling, its meaning in the `--reads` grammar, and a 33-member
+  It keeps its spelling, its meaning in the `--reads` grammar, and a 32-member
   population that declares it correctly; what delta 1 narrows is its *availability
   for one shape*, which is a predicate rather than a spelling. Declaring it here
   would be false in both directions: it would assert a removal that did not happen,
@@ -345,10 +382,10 @@ like every other row, and does not wait on it.
       reachable producer and a named consumer; delta 2 mints no field and delta 4's
       row carries no field the review step does not read.
 - [ ] **The reds are read before the couples are touched** — build lands the
-      refusal first, records what each of the 26 members reds on, and only then
+      refusal first, records what each of the 27 members reds on, and only then
       widens a couples. A couples widened ahead of its red is a guess, and for the
       15 members outside the canon-kit family no measurement exists yet.
-- [ ] **The decidable population is re-measured, not inherited** — the 26-member
+- [ ] **The decidable population is re-measured, not inherited** — the 27-member
       and 63-root figures are this amendment's authoring measurement at
       `af126eb7`; build re-runs the census before sweeping, because a gate added in
       between moves both.
@@ -379,7 +416,7 @@ like every other row, and does not wait on it.
 - [ ] **Queue transition at the merging build batch, not at close** — the drain
       stage is `validate`, whose entry refuses a non-empty active queue, so the
       batch that merges this amendment moves its entry in the same commit.
-      **Judge the terminal move:** if the 33-member remainder leaves the entry's
+      **Judge the terminal move:** if the 32-member remainder leaves the entry's
       corpus deliverable unfinished, the move is a demotion with `[cost:]` and
       `[surface:]` restored from the promoting diff, not a Done move.
       **A demotion states its cause on the entry, and the two causes are not

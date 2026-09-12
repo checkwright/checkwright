@@ -122,25 +122,50 @@ would red it at this amendment's own authoring commit — before delta 1 exists.
 token is shown in prose and in bare `couples=` values instead. Recorded so a later
 reader does not read the absent example as an omission.
 
-### (4) The eleven canon-kit manifest-corpus descriptors name their corpus knob
+### (4) A descriptor names every corpus knob its own walks are declared under
 
-Each of the eleven gates whose scanned corpus is `CANON_KIT_MANIFEST_FILES` gains
-`knob:CANON_KIT_MANIFEST_FILES` in its `couples=` {mechanical}.
+The obligation is a **rule over the declarations**, not a roster of members: wherever
+`SPEC-reads-root-default.md` delta 2 declares a walk under `knob:<NAME>`, that
+member's `couples=` gains `knob:<NAME>` {design-bearing}.
 
-The members, each keeping every literal token it carries today:
-`check-manifest-count`, `check-prose-enum`, `check-manifest-temporal`,
-`check-install-claim`, `check-payload-claim`, `check-docs-cmd`, `check-md-refs`,
-`check-tracking-claim`, `check-knob-citation`, `check-spec-fence-balance`,
-`check-spec-pointer`.
+**This began as a roster of eleven and the roster was the defect.** An enumerated
+list of members is a maintained copy of a set the declarations already determine, which
+the derivation-first rule refuses — and it drifted inside this amendment's own
+authoring: the eleven covered only the `CANON_KIT_MANIFEST_FILES` family, so four
+members bounded by `CANON_KIT_AMENDMENT_GLOB` or `CANON_KIT_SPEC_NAME` and four more
+bounded by three further knobs had no token at all, while delta 2 would have declared
+their roots and the coverage assertion would have redded them with no legal repair.
+Stating the rule closes that by construction; an audit of a roster can only close the
+members the roster happens to name.
 
-**The set's shape is more precise than the filing's summary, and the difference
-matters to the edit.** Four of the eleven carry exactly
-`couples=*SPEC*.md,*README.md,CLAUDE.md` (`check-manifest-count`,
-`check-manifest-temporal`, `check-md-refs`, `check-knob-citation`); the other seven
-are supersets of those three tokens, carrying further couples of their own —
-`check-spec-fence-balance` adds `TASK-QUEUE.md`, `check-spec-pointer` adds five more.
-So the edit appends one token per descriptor and rewrites none, and a sweep written
-against "the three-token triple" would miss seven of its targets.
+**Which knobs the rule reaches, measured rather than enumerated as policy.** Across
+the declarations delta 2 produces, seven distinct knobs appear:
+`CANON_KIT_MANIFEST_FILES` (eight members), `CANON_KIT_AMENDMENT_GLOB` (three),
+`CANON_KIT_SPEC_NAME` (two), `CANON_KIT_MEASURED_SURFACE_GLOBS` (two),
+`CANON_KIT_PROSE_TELL_GLOBS`, `QUEUE_KIT_PROSE_SURFACE_GLOBS`, and
+`CANON_KIT_COMMENT_SURFACE` (the runtime-selected cohort's configured branch). That
+count is this amendment's measurement and not part of the rule; a knob added later is
+reached by the rule without an edit here.
+
+**The one judgement the rule must exclude, stated because it is the error it invites.**
+A knob that **narrows** a corpus is never a couples token. `CANON_KIT_MDREF_EXCLUDE`,
+`CANON_KIT_INSTALL_CLAIM_EXCLUDE` and their siblings remove members from a walk's set,
+so coupling them would trigger the gate on paths it deliberately does not scan — the
+inverse of this amendment's purpose. The rule reads a walk's **bounding** knob, which
+is the one delta 2's declaration names; an exclude knob never appears in a declaration
+and so never reaches the rule. This is why the delta is design-bearing rather than a
+sweep: the set is derived, but telling a bounding knob from an excluding one is a
+reading of each member.
+
+**The appended token never rewrites an existing one**, and the descriptor set's shape
+makes that worth stating. Of the eight `CANON_KIT_MANIFEST_FILES` members plus the
+three manifest-corpus members that carry no literal-default root
+(`check-docs-cmd`, `check-md-refs`, `check-spec-fence-balance` — eleven in total for
+that knob), four carry exactly `couples=*SPEC*.md,*README.md,CLAUDE.md`
+(`check-manifest-count`, `check-manifest-temporal`, `check-md-refs`,
+`check-knob-citation`) and the other seven are supersets carrying further couples of
+their own — `check-spec-fence-balance` adds `TASK-QUEUE.md`, `check-spec-pointer` adds
+five more. A sweep written against "the three-token triple" would miss seven targets.
 
 ## Producers and consumers
 
@@ -178,10 +203,16 @@ against "the three-token triple" would miss seven of its targets.
   its red condition enumerated on that axis, and the claim is checked rather than
   assumed: delta 1 adds tokens to a trigger set, delta 3 admits a character a
   validator rejected, and delta 4 appends without rewriting. The one reader that
-  could be thought to narrow is `check-kit-enum`, which reads the **raw**
-  unexpanded field looking for the literal `kit:` spelling to catch a
-  hand-enumerated per-kit list; a `knob:` token is neither that list nor that
-  spelling, so its verdict is unchanged and it needs no edit.
+  could be thought to narrow is `check-kit-enum`, and its verdict is unchanged —
+  but **not** for the reason an earlier draft of this bullet gave. That draft said
+  the gate reads the raw field "looking for the literal `kit:` spelling"; it does
+  not, and no such prefix check exists in it. It splits each couples token on `/`,
+  **skips any token that has no `/`**, and groups the rest by known-kit-root
+  membership. A `knob:<NAME>` token carries no `/` — a knob name cannot — so the
+  same guard skips it before any grouping, and the gate needs no edit. The
+  conclusion survives the correction, which is exactly why the false mechanism was
+  worth removing rather than leaving beside a right answer: a later reader
+  extending this field would have built on it.
 
 ## Existing sections updated
 
@@ -209,10 +240,17 @@ against "the three-token triple" would miss seven of its targets.
 - `gate-sdk/SPEC.md` §gen-pre-commit (deltas 2 and 4). The emitted trigger set is
   now knob-derived for eleven members, so the section states that a knob edit
   stales the hook through the trigger as well as through the baked invocation.
-- `canon-kit/SPEC.md` §Layout and configuration, the `CANON_KIT_MANIFEST_FILES`
-  bullet (delta 4). It gains one clause: widening the array widens the eleven
-  gates' **triggers** as well as their scanned corpus, which before this change it
-  did not. Not yet applied.
+- `canon-kit/SPEC.md` §Layout and configuration, the corpus-knob bullets delta 4's
+  rule reaches (delta 4) — `CANON_KIT_MANIFEST_FILES`, `CANON_KIT_AMENDMENT_GLOB`,
+  `CANON_KIT_SPEC_NAME`, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
+  `CANON_KIT_PROSE_TELL_GLOBS`, `CANON_KIT_COMMENT_SURFACE`. Each gains one clause:
+  widening it widens the declaring gates' **triggers** as well as their scanned
+  corpus, which before this change it did not. Not yet applied.
+- `queue-kit/SPEC.md` §Layout and configuration, the
+  `QUEUE_KIT_PROSE_SURFACE_GLOBS` bullet (delta 4), for the same clause. **This
+  target exists only because delta 4 stopped being a roster** — the knob belongs to a
+  different kit than the eleven-member list reached, and an enumerated roster gave no
+  reason to look for it. Not yet applied.
 - `scripts/git-hooks/pre-commit` and `docs/check-graph.html` (all deltas) — the
   generated projections. Regenerate with `bash gate-sdk/bin/gen-pre-commit.sh --write`,
   then `bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`.
