@@ -676,6 +676,17 @@ pub fn lookup(arm: &str) -> Option<&'static Arm> {
         .map(|(_, f, _)| f)
 }
 
+// spec: gate-sdk/SPEC.md §The non-gate arm — the `--emit-` family's roster, read off the table
+// rather than maintained beside it; the filter is the family the `--emit <name>` operand composes,
+// which that section's refusal paragraph is why.
+pub fn emit_names() -> Vec<&'static str> {
+    BRIDGED_ARMS
+        .iter()
+        .map(|(a, _, _)| *a)
+        .filter(|a| a.starts_with("--emit-"))
+        .collect()
+}
+
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm's declared reads are its own roster with every
 // sentinel in it expanded, derived rather than maintained. One expansion for every member: the
 // `Arm` variant is not consulted at all.

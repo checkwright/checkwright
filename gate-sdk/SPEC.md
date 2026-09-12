@@ -955,6 +955,15 @@ restatement of the violation. A gate with multiple distinct failure classes
 gives each its own `help:` line. Exit codes: **0** clean, **1** violation,
 **2** harness/usage error.
 
+A `help:` line **may name the governing SPEC section that owns the remedy**, and
+the citation is a **pointer, never a restatement**. The rule is stated because
+the coupling is already taken across both substrates — the crate's own refusals,
+`lib/guard.sh`'s, `bin/build-native.sh`'s and `bin/run-consumer-smoke.sh`'s all
+cite a section — and a silent convention is one a later reader may read as an
+accident and remove. Pointer-not-restatement is the content-tiering rule applied
+to refusal text, and it is also what stops a message growing into a copy of the
+section it cites.
+
 Enforced **at runtime, on real output**, by the fixture runner: a `good/` case
 must emit the canonical clean line and a `bad/` case a `help:` line
 (§run-gate-tests owns the mechanism). That is the oracle for every fixtured
@@ -2589,6 +2598,29 @@ session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
 arm's placement to whoever is already reading it; none of them can reach the
 session that has not started.
+
+**This section is the roster a mistyped arm is sent to, which makes it a
+governed surface rather than documentation.** An unknown `--emit <name>` gets its
+own refusal — `no_such_arm` — printing the live `--emit-` family off the
+bridged-arm table, citing this section as the roster's owner, and printing **no
+gate roster at all**. The refusal is routed where `normalize` composes
+`--emit-<name>`, the one point that still knows the argv opened with `--emit`, so
+no state is added to carry the fact forward. Before it existed the miss fell
+through to the registry lookup and was answered by `no_such_gate`, byte for byte
+the path a mistyped *gate* name takes: the binary holds two rosters, and a reader
+who typed `--emit` was handed the one that cannot contain what they meant. The
+printed set is derived from the table and never transcribed, so an arm added
+below is in the refusal with no second edit; and the family filter is the one the
+`--emit <name>` operand composes, because naming a bare-flag `Arm::Run` member
+there would send the reader at a spelling that cannot work.
+
+**The bridge's knob-probe refusal names the arm's whole argv.** `gate_knob_env`
+(§lib/gate.sh) prints on the same mistyped invocation, one line *above* the
+refusal above, and it is handed the arm flag and its operand separately. It names
+both, because a two-token arm reported by its flag alone names something that is
+not the arm, at the one moment the reader is trying to learn what the arm set is —
+and a corrected diagnostic shipped underneath an uncorrected one is not a
+corrected diagnostic.
 
 **Which of a shell tool's environment reads may be DECLARED on a bridged arm's
 knob roster is decided by the knob's own name, never by the arm porting it.** The

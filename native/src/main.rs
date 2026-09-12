@@ -49,6 +49,19 @@ fn no_such_gate(name: &str) -> ! {
     exit(2);
 }
 
+// spec: gate-sdk/SPEC.md §The non-gate arm — the emit path's own miss. The binary holds two
+// rosters and a mistyped arm reaching the gate one is handed the roster that cannot contain what
+// it meant; this prints the arm roster, no gate name, and cites the section that owns it.
+fn no_such_arm(arm: &str) -> ! {
+    eprintln!(
+        "checkwright-gates: no such --emit arm: {} — the arm could not run; treating as failure (not clean)",
+        arm
+    );
+    eprintln!("  help: this binary carries: {}", emit::emit_names().join(", "));
+    eprintln!("  help: gate-sdk/SPEC.md §The non-gate arm owns the arm roster");
+    exit(2);
+}
+
 // spec: evidence-kit/SPEC.md §lib/evidence.sh — the arm reports *classification* and never an
 // internal representation, `--queue-parity`'s own rule: the two holders share no data shape, so a
 // comparison of derived literals would fail on a difference that is not a disagreement spec
@@ -282,7 +295,14 @@ fn normalize(argv: Vec<String>) -> Vec<String> {
     }
     if first == "--emit" {
         if let Some(name) = argv.get(1) {
-            let mut out = vec![format!("--emit-{}", name)];
+            let arm = format!("--emit-{}", name);
+            // spec: gate-sdk/SPEC.md §The non-gate arm — the miss is routed here rather than left
+            // to the registry fallback: this is the one point that still knows the argv opened
+            // with `--emit`, so no state is added to carry the fact forward.
+            if emit::lookup(&arm).is_none() {
+                no_such_arm(&arm);
+            }
+            let mut out = vec![arm];
             out.extend_from_slice(&argv[2..]);
             return out;
         }

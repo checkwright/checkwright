@@ -403,8 +403,13 @@ gate_knob_env() {
     bin="$(gate_native_bin)"
     knob_names="$("$bin" --knobs "$g" "$@" 2>&1)"; knob_status=$?
     if [[ "$knob_status" -ne 0 ]]; then
-        printf 'gate_command: %s --knobs %s exited %s — the config bridge could not ' "$bin" "$g" "$knob_status" >&2
-        printf 'report what %s reads; treating as failure (not clean)\n%s\n' "$g" "$knob_names" >&2
+        # spec: gate-sdk/SPEC.md §The non-gate arm — the refusal names the arm's WHOLE argv, because
+        # a two-token arm reported by its flag alone names something that is not the arm, at the one
+        # moment the reader is trying to learn what the arm set is
+        local subject="$g"
+        [[ "$#" -gt 0 ]] && subject="$g $*"
+        printf 'gate_command: %s --knobs %s exited %s — the config bridge could not ' "$bin" "$subject" "$knob_status" >&2
+        printf 'report what %s reads; treating as failure (not clean)\n%s\n' "$subject" "$knob_names" >&2
         return 2
     fi
     local -a names=()

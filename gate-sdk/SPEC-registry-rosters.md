@@ -480,7 +480,11 @@ diagnostic underneath an uncorrected one.
   its placement rule (delta 4).
 - `gate-sdk/SPEC.md` §The non-gate arm (deltas 3 and 8). `--emit-reads-census`
   joins the roster; the section is named as the roster `no_such_arm` cites, which
-  is what makes it a governed surface rather than documentation.
+  is what makes it a governed surface rather than documentation. **Delta 8's half
+  applied**, in two paragraphs appended below the roster so the enumeration itself
+  is untouched — it is the paragraph a sibling amendment's new arm edits, and a
+  reworded enumeration would have turned two sequential edits into a conflict.
+  Delta 3's half is not yet applied. Delta 10's clause lands in the same passage.
 - `gate-sdk/SPEC.md` §check-gate-substrate-parity (delta 5). Assertion I is added
   beside B with its both-directions statement, its red conditions, and the note
   that it reads the registration file through the existing path derivation so no
@@ -494,7 +498,7 @@ diagnostic underneath an uncorrected one.
   `# smoke-unregistered:` grammar now has a sibling on a second roster, so a reader
   editing one knows the other exists. **Not yet applied.**
 - `gate-sdk/SPEC.md` §Output contract (delta 9). The refusal-citation rule, with
-  its pointer-never-restatement limit.
+  its pointer-never-restatement limit. **Applied.**
 - `scripts/gates.list` (delta 7) — the two declarations.
 - `native/src/emit/run_gate_tests.rs`'s `# spec:` pointer at lines 91-93 (delta 1).
   It currently says the pin's scope "is the pair loop, never this process"; after

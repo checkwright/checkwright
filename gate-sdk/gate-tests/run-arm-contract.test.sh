@@ -172,6 +172,21 @@ assert_rc  only-widened-bound "$rc" 2
 assert_has only-widened-bound "run-gates: --only: 'g_unreg' is not registered in $scratch/gates.list" "$out"
 assert_absent only-widened-bound 'g_unreg saw:' "$out"
 
+# ---- a mistyped --emit arm is answered with the ARM roster ---------------------
+# The binary holds two rosters and the emit path used to fall through to the gate
+# one, so the moment-of-miss diagnostic confirmed a wrong mental model instead of
+# correcting it. Read rather than diffed: the roster printed must be the arm set,
+# the gate set must be absent from it entirely, the section that owns the roster
+# must be cited, and the knob-probe line above it must name the whole two-token
+# argv rather than the bare `--emit` that is not the arm.
+out="$(bash "$RUN" --emit no-such-arm-at-all 2>&1)"; rc=$?
+assert_rc     emit-miss "$rc" 2
+assert_has    emit-miss 'no such --emit arm: --emit-no-such-arm-at-all'          "$out"
+assert_has    emit-miss '--emit-docs-mirror'                                     "$out"
+assert_has    emit-miss 'gate-sdk/SPEC.md §The non-gate arm owns the arm roster' "$out"
+assert_absent emit-miss 'check-shellcheck'                                       "$out"
+assert_has    emit-miss 'report what --emit no-such-arm-at-all reads'            "$out"
+
 [[ "$fails" -eq 0 ]] || { echo "run-arm-contract.test: $fails assertion(s) failed"; exit 1; }
-echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the --only argv channel forwarded on a single-member selection and refused on a two-member one, the sole-name widening selected/refused/bounded, and two default runs and a serial run byte-identical)"
+echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the --only argv channel forwarded on a single-member selection and refused on a two-member one, the sole-name widening selected/refused/bounded, two default runs and a serial run byte-identical, and a mistyped --emit arm answered with the arm roster and no gate name)"
 exit 0
