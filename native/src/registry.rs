@@ -17,6 +17,34 @@ pub fn members(text: &str) -> Vec<String> {
         .collect()
 }
 
+// spec: gate-sdk/SPEC.md §Layout and configuration — the registration file's one declaration form,
+// `# unregistered: <name> — <reason>`: §Consumer smoke's grammar on a second roster, both fields
+// read, and invisible to `members` above because every reader of that one drops comment lines.
+pub fn unregistered_declarations(text: &str) -> Vec<(String, String)> {
+    let mut out: Vec<(String, String)> = Vec::new();
+    for l in fresh::file_lines(text) {
+        let Some(rest) = l.trim_start().strip_prefix('#') else {
+            continue;
+        };
+        let Some(rest) = rest.trim_start().strip_prefix("unregistered:") else {
+            continue;
+        };
+        let rest = rest.trim();
+        let (name, reason) = match rest.find(char::is_whitespace) {
+            Some(i) => (&rest[..i], &rest[i..]),
+            None => (rest, ""),
+        };
+        let reason = reason
+            .trim_start()
+            .trim_start_matches('—')
+            .trim_start_matches("--")
+            .trim_start_matches('-')
+            .trim();
+        out.push((name.to_string(), reason.to_string()));
+    }
+    out
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_resolve`: dirs consumer-first, `.sh` beating `.gate`
 // *within* a dir, so a consumer shadowing a ported member with its own shell script still wins
 pub fn resolve(name: &str, dirs: &[String]) -> Option<String> {

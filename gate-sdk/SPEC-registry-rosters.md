@@ -488,18 +488,26 @@ diagnostic underneath an uncorrected one.
 - `gate-sdk/SPEC.md` §check-gate-substrate-parity (delta 5). Assertion I is added
   beside B with its both-directions statement, its red conditions, and the note
   that it reads the registration file through the existing path derivation so no
-  knob is minted.
+  knob is minted. **Applied**, with two calibrations the amendment left open and
+  build ruled inside the envelope, both written into the section: the assertion
+  takes assertion B's **scope clause** (unscoped it demands a declaration per
+  unvendored member in any subset-vendoring consumer), and the **reverse arm** is
+  scoped to registrations that dispatch to the binary (unscoped it reds every
+  consumer's own shell gate). The entry's ground for the reverse arm — that
+  nothing would otherwise catch it — does **not** hold, and the section says so at
+  the passage: scoped correctly it reads the fault assertion B reads from the
+  descriptor side, neither subsuming the other.
 - `gate-sdk/SPEC.md` §Layout and configuration (deltas 6 and 7). The `gates.list`
   format gains the `# unregistered:` declaration, stated as reusing
   §Consumer smoke's grammar and pointing at it rather than restating it, and
   recording that both member readers already filter comments so no existing reader
-  moves.
+  moves. **Applied.**
 - `gate-sdk/SPEC.md` §Consumer smoke (delta 6). One clause: the
   `# smoke-unregistered:` grammar now has a sibling on a second roster, so a reader
-  editing one knows the other exists. **Not yet applied.**
+  editing one knows the other exists. **Applied.**
 - `gate-sdk/SPEC.md` §Output contract (delta 9). The refusal-citation rule, with
   its pointer-never-restatement limit. **Applied.**
-- `scripts/gates.list` (delta 7) — the two declarations.
+- `scripts/gates.list` (delta 7) — the two declarations. **Applied.**
 - `native/src/emit/run_gate_tests.rs`'s `# spec:` pointer at lines 91-93 (delta 1).
   It currently says the pin's scope "is the pair loop, never this process"; after
   delta 1 the pin also enters the resolving shell, which is a different and wider

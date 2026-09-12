@@ -16,7 +16,22 @@ The kit is vendored (or submoduled) into a consumer repo, conventionally at
 override with `GATE_SDK_GATES_DIR`) holding:
 
 - `gates.list` — the registry: one gate name per line (`#` comments and blank
-  lines ignored). A listed name resolves to `<gates-dir>/<name>.sh` first, then
+  lines ignored). One comment form is **read** rather than merely ignored:
+  `# unregistered: <name> — <reason>` declares a member the binary carries that
+  this consumer deliberately does not register, and
+  §check-gate-substrate-parity's assertion I is its reader. The grammar is
+  §Consumer smoke's `# smoke-unregistered:` on a second roster — same shape of
+  fact, a member deliberately absent from a roster with a stated cause, both
+  fields machine-read — and it points there rather than restating it so the two
+  cannot drift into two dialects. It adds no member and moves none: both readers
+  of this file drop comment lines already, the crate's and its shell twin, so a
+  declaration is invisible to every existing reader and the format is widened
+  additively. The **cause** lives here rather than in a kit table because why a
+  given consumer declines to register a given member is a fact about that
+  consumer's tree; a kit SPEC holding it would publish one adopter's
+  configuration as kit content and rot the moment a second adopter registered the
+  member. The kit owns the grammar and the assertion. A listed name resolves to
+  `<gates-dir>/<name>.sh` first, then
   `<gates-dir>/<name>.gate`, then each vendored kit's `checks/<name>.sh` and
   `checks/<name>.gate` — `.sh` beating `.gate` **within** a dir, dirs tried
   consumer-first. So any kit's shipped gates are
@@ -8512,7 +8527,10 @@ legitimate — a vacuous pass that is not real coverage is the honest case — t
 kit's `smoke/install.sh` carries `# smoke-unregistered: <gate-name> — <reason>`
 beside its registration block: kit-local, sitting where a reader looking at
 registration already is, and readable off the vendored copy the harness has in
-hand. Both fields are read, the name to match and the reason into the harness's
+hand. **This grammar now has a sibling on a second roster** —
+`# unregistered:` in the consumer's own `gates.list` (§Layout and
+configuration, read by §check-gate-substrate-parity's assertion I) — stated here
+so a reader editing one knows the other exists and keeps the two one dialect. Both fields are read, the name to match and the reason into the harness's
 report. Three shapes of stale valve are findings, all caught at the same
 transition because a declaration surface's failure mode is going stale: a
 declaration naming a gate that *is* registered; one naming a gate that kit does
@@ -12928,7 +12946,8 @@ steers the fixture pair onto hermetic copies of each surface. Eight assertions:
 (A) declaration uniqueness; (B) subcommand parity; (C) disposition coverage;
 (D) one writable home for the manifest; (E) no implementation source inside the
 vendoring set; (F) one owner for the target roster; (G) port-declaration
-placement; and (H) a held declaration's ground reachable in one hop.
+placement; (H) a held declaration's ground reachable in one hop; and (I) the
+crate's dispatch roster joined to the battery's registration.
 
 - **assertion A — declaration uniqueness.** Each `gates.list` member resolves to
   exactly one declaration. A dir carrying both `<name>.sh` and `<name>.gate` is
@@ -13441,6 +13460,60 @@ placement; and (H) a held declaration's ground reachable in one hop.
   would add one: a tree with no held member has nothing to ground, and a floor
   would red every consumer that never declared a hold. The anti-vacuity signal is
   the emitted count, not a refusal.
+- **assertion I — the crate's dispatch roster joined to the battery's
+  registration.** Assertion B equates the `.gate` descriptor set with the
+  subcommand roster, and this gate derives *both* of those in process — descriptors
+  by globbing the resolve dirs, the roster from the crate's own registry. **Neither
+  path reads the registration file at all**, so a member could be asserted
+  crate-side and invisible to the battery, or satisfy the battery and be unasserted
+  crate-side, and nothing joined the two. Assertion I is that join, in both
+  directions.
+
+  **The forward direction is the one that carries new information.** An in-scope
+  subcommand the registration file does not name is red unless that file declares
+  it, by the grammar §Layout and configuration gives `# unregistered:`. The
+  disposition is **required rather than the divergence merely reported**, because a
+  bare report leaves the cause wherever it already was — and where it already was,
+  in this tree, is two prose sites no reader joins. Requiring the declaration is
+  what moves the cause onto the surface the assertion reads. The count of declared
+  residue members is on the clean line, so a consumer sees the size of its own
+  residue without the gate ruling on it: how many members a consumer declines to
+  register is that consumer's business, and only the *undeclared* ones are the
+  gate's.
+
+  **Its scope clause is assertion B's, taken for assertion B's reason.** One binary
+  serves every adopter, so the unscoped equality is unsatisfiable the moment a
+  consumer vendors a subset of the kits the shared binary carries — it would demand
+  a declaration per unvendored member. A kit-owned subcommand is in scope iff this
+  tree vendored that kit, and a consumer-declared one iff this is the tree that
+  declared it. Stated here rather than left to be inferred from B, because an
+  assertion that reds on a correct subset-vendoring configuration is worse than no
+  assertion.
+
+  **The reverse direction is scoped to registrations that dispatch, and it overlaps
+  assertion B rather than adding a class B cannot see** — recorded, because the
+  entry that asked for this assertion read the reverse as something "nothing would
+  otherwise catch", and that does not hold. A registered name the binary does not
+  carry is only a fault where the registration *dispatches to the binary*: a
+  consumer's own `check-foo.sh` is registered, carried by no subcommand, and
+  entirely lawful, so an unscoped reverse arm would red every shell gate in every
+  consumer. Scoped that way it reads the same fault assertion B reads from the
+  descriptor side — and neither subsumes the other, because B's corpus is
+  descriptors on disk whether registered or not, while this one's is registrations
+  whatever else sits beside them. A stray descriptor beside a shell shadow is B's
+  alone; the two coincide only where a registration's own declaration path is the
+  descriptor.
+
+  **Two stale shapes are findings on the same accounting as every other declaration
+  surface here:** a declaration naming a member the file *does* register, and a
+  declaration missing either field. Both fields are read — the name joins the
+  rosters, the reason is what the assertion requires to be non-empty — and there is
+  no third field because there is no third reader.
+
+  **It costs no new configuration.** `registry::list_path` already derives the
+  registration file's path from the gates dir this gate resolves, and the
+  descriptor's `couples=` already carries `scripts/gates.list`, so the trigger is
+  correct and no manifest edit is owed.
 
 **It ported, and the argument it had stood on is a retired one.**
 The reading it held was *a gate that audits the port is not a gate the port may
@@ -13473,6 +13546,12 @@ one with no `# spec:` header field at all reds. The SPEC surface lives inside th
 case tree and each pointer is case-relative, so the pair proves the resolution
 rather than the live tree's accident of already being green. It also covers
 assertions C, D, E and F end to end, each over the case's own hermetic surfaces.
+Of **assertion I** the pair covers the two shapes a file can carry — a stale
+declaration naming a member the case's own `gates.list` registers, and one
+missing its reason — plus the reverse arm, on a registration whose declaration
+path is a descriptor no subcommand answers. Its **forward** arm needs a roster in
+a scope relationship no committed case can manufacture, and goes to the unit
+tests below for exactly the reason assertion B's matrix does.
 
 **Assertion G's tree half is proved in the bespoke test rather than in the pair,
 and the reason is the scope rule rather than the corpus.** The tempting statement
@@ -13529,6 +13608,15 @@ fixture-runner battery, and a roster held as a value is *more* legible than one
 held as a process. Recorded rather than left to be rediscovered, because a reader
 finding the old stub-binary cases gone and no adjudication would read a coverage
 loss where there is a relocation.
+
+**Assertion I's forward arm joins it there on the same argument**, and it is the
+same function shape over the two rosters, the declaration set and the two scope
+inputs. Its configurations are whole rosters too: an in-scope subcommand the
+registration omits with and without a declaration, the unvendored-kit member that
+owes none, both stale-declaration shapes, and the reverse arm's lawful shell gate
+beside its unlawful dispatching twin. The last of those is why the pair alone
+would under-assert: a case that only ever reds proves the finding, never the
+silence beside it.
 
 **Why those configurations are held in fixtures rather than assigned to live
 trees.** A coverage claim naming a tree is only as durable as that tree's

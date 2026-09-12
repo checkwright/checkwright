@@ -195,6 +195,61 @@ fn roster_parity(
     v
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I as a value rather than as a
+// walk, for assertion B's own reason: the rosters, the declarations and the two scope inputs are
+// everything it reads, so the divergences no committed fixture can manufacture are unit-testable.
+struct RegistrationVerdict {
+    declared: usize,
+    findings: Vec<String>,
+}
+
+fn registration_parity(
+    list: &str,
+    members: &[String],
+    dispatching_registration: &[String],
+    roster: &[(String, String)],
+    declarations: &[(String, String)],
+    kit_names: &[String],
+    publishing: bool,
+) -> RegistrationVerdict {
+    let mut v = RegistrationVerdict {
+        declared: 0,
+        findings: Vec::new(),
+    };
+    for (name, reason) in declarations {
+        if name.is_empty() || reason.is_empty() {
+            v.findings.push(format!("declaration missing a field: {} carries an '# unregistered:' line without both a gate name and a reason — both fields are read", list));
+            continue;
+        }
+        if members.iter().any(|m| m == name) {
+            v.findings.push(format!("stale unregistered declaration: {} declares '{}' unregistered and registers it — a declaration surface's failure mode is going stale", list, name));
+        }
+    }
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — scoped by assertion B's own test and
+    // for its reason: one binary serves every adopter, so a subcommand from a kit this tree did
+    // not vendor is out of scope rather than an undeclared residue member
+    for (s, owner) in roster {
+        if !subcommand_in_scope(owner, kit_names, publishing) || members.iter().any(|m| m == s) {
+            continue;
+        }
+        if declarations.iter().any(|(n, r)| n == s && !r.is_empty()) {
+            v.declared += 1;
+            continue;
+        }
+        v.findings.push(format!("registered nowhere: the binary carries '{}' and {} neither registers it nor declares it '# unregistered: {} — <reason>' — a dispatchable member the battery cannot reach records why in the file that would have reached it", s, list, s));
+    }
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the reverse arm takes the registrations
+    // that dispatch to the binary, because a consumer's own shell gate is registered, carried by no
+    // subcommand and entirely lawful; the caller's resolution is what tells the two apart
+    for m in dispatching_registration {
+        if roster.iter().any(|(n, _)| n == m) {
+            continue;
+        }
+        v.findings.push(format!("registration names no subcommand: {} registers '{}', which dispatches to the binary and the binary does not carry — a battery that cannot run its own registration", list, m));
+    }
+    v
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion G's report, one finding per
 // shape fault, in the gate's existing per-finding shape. One formatter for both corpora, so a
 // malformed declaration reads the same wherever it sits.
@@ -387,7 +442,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(&doc).is_file() {
         return Err(format!("conservation doc not found: {}", doc));
     }
-    let members = registry::members(&read(&list)?);
+    let list_text = read(&list)?;
+    let members = registry::members(&list_text);
     if members.is_empty() {
         return Err(format!("{} names no gates", list));
     }
@@ -584,6 +640,28 @@ fn rule(args: &[String]) -> Result<i32, String> {
     );
     ctx.findings.extend(verdict.findings);
 
+    // assertion I: the crate's dispatch roster against the battery's registration — the one pair
+    // of rosters nothing joined, so a member could be asserted crate-side and invisible to the
+    // battery. The residue takes a declaration in the consumer's own file, never a kit table.
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity
+    let declarations = registry::unregistered_declarations(&list_text);
+    let dispatching_registration: Vec<String> = members
+        .iter()
+        .filter(|m| registry::resolve(m, &resolve_dirs).is_some_and(|p| p.ends_with(".gate")))
+        .cloned()
+        .collect();
+    let reg = registration_parity(
+        &list,
+        &members,
+        &dispatching_registration,
+        &roster,
+        &declarations,
+        &kit_names,
+        publishing,
+    );
+    let unregistered_declared = reg.declared;
+    ctx.findings.extend(reg.findings);
+
     // assertion C: every derived substrate-sensitive member carries a disposition in
     // the conservation section — the anti-vacuity assertion, so a new meta-gate over
     // gate source reds until its disposition is recorded
@@ -727,7 +805,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow {wf_state} at {workflow}, {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest)",
+        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow {wf_state} at {workflow}, {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest)",
         ndesc = descriptors.len(),
         nsub = roster.len(),
         in_scope = verdict.in_scope,
@@ -828,6 +906,90 @@ mod tests {
     }
 
     const DISPOSITION: &str = "| `check-reference` | Reference-only — carried by the binary with no descriptor. |";
+
+    fn reg(
+        members: &[&str],
+        dispatching: &[&str],
+        roster: &[(&str, &str)],
+        decls: &[(&str, &str)],
+    ) -> RegistrationVerdict {
+        registration_parity(
+            "scripts/gates.list",
+            &strs(members),
+            &strs(dispatching),
+            &rows(roster),
+            &rows(decls),
+            &strs(&["kitroot"]),
+            false,
+        )
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's forward arm: a
+    // dispatchable member the battery cannot reach is a finding until the registration file it is
+    // missing from says why. The declared instance is counted rather than dropped silently.
+    #[test]
+    fn an_in_scope_subcommand_the_registration_omits_is_a_finding_until_it_is_declared() {
+        let v = reg(
+            &["check-listed"],
+            &["check-listed"],
+            &[("check-listed", "kitroot"), ("check-residue", "kitroot")],
+            &[],
+        );
+        assert_eq!(v.declared, 0);
+        assert_eq!(v.findings.len(), 1, "{:?}", v.findings);
+        assert!(v.findings[0].starts_with("registered nowhere: the binary carries 'check-residue'"));
+
+        let v = reg(
+            &["check-listed"],
+            &["check-listed"],
+            &[("check-listed", "kitroot"), ("check-residue", "kitroot")],
+            &[("check-residue", "this tree declares no glossary")],
+        );
+        assert!(v.findings.is_empty(), "{:?}", v.findings);
+        assert_eq!(v.declared, 1);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the scope clause is assertion B's, so
+    // a subcommand from a kit this tree did not vendor owes no declaration: the unscoped equality
+    // would demand one per unvendored member in every consumer of the shared binary.
+    #[test]
+    fn a_subcommand_from_an_unvendored_kit_owes_no_registration_declaration() {
+        let v = reg(&[], &[], &[("check-foreign", "otherkit")], &[]);
+        assert!(v.findings.is_empty(), "{:?}", v.findings);
+        assert_eq!(v.declared, 0);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the two stale shapes, which are what
+    // make the declaration a surface rather than a comment: a declaration naming a member that is
+    // in fact registered, and one missing a field neither reader can do without.
+    #[test]
+    fn a_stale_or_half_written_declaration_is_a_finding() {
+        let v = reg(
+            &["check-listed"],
+            &["check-listed"],
+            &[("check-listed", "kitroot")],
+            &[("check-listed", "a reason for a member that is registered")],
+        );
+        assert_eq!(v.findings.len(), 1, "{:?}", v.findings);
+        assert!(v.findings[0].starts_with("stale unregistered declaration:"));
+
+        let v = reg(&[], &[], &[], &[("check-residue", "")]);
+        assert_eq!(v.findings.len(), 1, "{:?}", v.findings);
+        assert!(v.findings[0].starts_with("declaration missing a field:"));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the reverse arm and its scope, both
+    // rows: the unlawful dispatching registration and the lawful shell gate beside it, because a
+    // rule asserted on one row alone is half-asserted.
+    #[test]
+    fn a_registration_the_binary_does_not_carry_reds_only_where_it_dispatches() {
+        let v = reg(&["check-gone"], &["check-gone"], &[], &[]);
+        assert_eq!(v.findings.len(), 1, "{:?}", v.findings);
+        assert!(v.findings[0].starts_with("registration names no subcommand:"));
+
+        let v = reg(&["check-shell"], &[], &[], &[]);
+        assert!(v.findings.is_empty(), "{:?}", v.findings);
+    }
 
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the subset vendoring: a subcommand
     // whose owning kit is absent is not a stranded implementation; it is out of scope, counted,

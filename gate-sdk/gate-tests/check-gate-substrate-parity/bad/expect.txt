@@ -17,3 +17,6 @@ digest recomputed: job 'build'
 digest computed by a consumer: job 'release'
 hold ground unreachable: scripts/check-nospec.sh
 hold ground not in the pointed-at section: scripts/check-ungrounded.sh
+stale unregistered declaration: scripts/gates.list declares 'check-alpha' unregistered and registers it
+declaration missing a field: scripts/gates.list carries an '# unregistered:' line
+registration names no subcommand: scripts/gates.list registers 'check-orphan'

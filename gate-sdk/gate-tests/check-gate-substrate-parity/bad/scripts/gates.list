@@ -7,3 +7,9 @@ check-orphan
 check-twice
 check-nospec
 check-ungrounded
+# assertion I's two file-shaped divergences: a declaration naming a member this
+# file does in fact register, and one missing its reason field. The undeclared-
+# residue arm needs a roster this fixture cannot manufacture and is seeded in the
+# crate's own unit tests instead, where assertion B's matrix already lives.
+# unregistered: check-alpha — registered above, so this declaration is stale
+# unregistered: check-noreason
