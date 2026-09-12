@@ -10760,7 +10760,12 @@ harness would be setting a variable the very next process overwrites. The value
 has to be corrected upstream of the bridge, never downstream of it. Because the
 correction sits at the knob's resolution rather than at a member, a gate ported
 tomorrow that declares `GATE_SDK_TMP_DIR` inherits it with no further edit;
-today `check-crate-arms` is the one member that declares it.
+today `check-crate-arms` is the one member that declares it. Pinning the case
+scratch in every spelling a member may read is kit mechanism, and two shapes of it
+are foreclosed rather than ranked: computing the pin **at the member**, a second
+producer on the single-producer bridge, and a **per-gate opt-out knob**, a second
+source for one pin. The consumer gains no config — the knob's value stays the
+consumer's for ordinary runs.
 
 **Per-case sandbox isolation is a deliberate non-target.** The pin resolves to the
 invoker's root, so every case shares one scratch directory; giving each case its
@@ -15325,7 +15330,9 @@ whose `via` clause is missing off-module or present in-module; whose `<module>::
 has no definition or is not referenced by the home module; or whose `via const`
 names a const the site is not inside. A seeded locator of each kind is refused by a
 test of its own. Placement is anchored on the roster rather than on a member's
-module, so an entry point added there reaches this assertion with no second edit. The
+module, so an entry point added there reaches this assertion with no second edit —
+and not on a member's module *or any module it transitively calls*, which would make
+placement near-vacuous. The
 site count and its in-module, off-module and per-class partitions are reported from
 this enumeration, which is the one oracle for the site denominator.
 
