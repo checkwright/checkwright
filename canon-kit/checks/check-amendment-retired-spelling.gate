@@ -1,3 +1,3 @@
-# graph: couples=SPEC-*.md,*/SPEC-*.md,native/src/gates/amendment_retired_spelling.rs,native/src/spec.rs dir=one valve=none tier=precommit trigger=*
+# graph: couples=SPEC-*.md,*/SPEC-*.md,native/src/gates/amendment_retired_spelling.rs,native/src/spec.rs,kit:templates/SPEC-*.md,knob:CANON_KIT_AMENDMENT_GLOB dir=one valve=none tier=precommit trigger=*
 # install: zero-config
 # spec: canon-kit/SPEC.md §check-amendment-retired-spelling — every amendment carries a mandatory `## Retired spellings` block, and each spelling it declares survives only at a path its `## Existing sections updated` roster names, so a roster short by a surface reds at the gate rather than being found by a grep nobody is obliged to run

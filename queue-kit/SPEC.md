@@ -752,6 +752,13 @@ disposition. Knobs:
   claim queue membership is the consumer's editorial posture — a kit literal
   would presume a docs layout — so the kit ships none; a bold-code token on a
   named surface is then a checked membership claim (§check-queue-slug-liveness).
+  **Widening it widens that gate's *trigger* as well as its scanned corpus**, which
+  before the `knob:<NAME>` couples token it did not: the descriptor carries
+  `knob:QUEUE_KIT_PROSE_SURFACE_GLOBS` rather than a transcription of the value, so
+  the kit names the knob and the value stays the consumer's (gate-sdk/SPEC.md §The
+  `# graph:` manifest). This knob is reached by the same rule canon-kit's corpus
+  knobs are, and it belongs to a different kit than they do — which is exactly why
+  that rule is stated over walks rather than as a roster of members.
 - `QUEUE_KIT_PRECONDITION_REGEX` — the forward-precondition trigger set for
   `check-queue-prose-precondition`, default = the shipped phrase set.
 - `QUEUE_KIT_REQUIRED_SECTIONS` — array of `##` headings that must each appear

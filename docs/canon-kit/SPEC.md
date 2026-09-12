@@ -391,7 +391,22 @@ the gates dir as `canon-config.sh` (or point `CANON_KIT_CONFIG_FILE`
 elsewhere) and override any knob; defaults fill what the consumer left
 unset, and the loader exits 2 on a malformed config. That template and the
 copy it seeds are **permanently shell**, each carrying the `# no-port:` cause of
-the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs:
+the class ruling at gate-sdk/SPEC.md §The config-seam port disposition.
+
+**A corpus knob below widens the declaring gates' *triggers* as well as their
+scanned corpus**, which before the `knob:<NAME>` couples token it did not: a gate
+whose walk a knob bounds carries `knob:<NAME>` in its `# graph: couples=`, so
+widening the knob widens what fires the gate (gate-sdk/SPEC.md §The `# graph:`
+manifest). The clause is stated once here rather than on each bullet it reaches —
+`CANON_KIT_SPEC_NAME`, `CANON_KIT_AMENDMENT_GLOB`, `CANON_KIT_MANIFEST_FILES`,
+`CANON_KIT_PROSE_SURFACE_GLOBS`, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
+`CANON_KIT_COMMENT_SURFACE` and `CANON_KIT_PROSE_TELL_GLOBS` — because it is one
+fact about the mechanism and not seven facts about seven knobs. Which knobs it
+reaches is derived from the walks rather than listed as policy, so a knob added
+later is reached with no edit here; **`CANON_KIT_DUP_SURFACES` is deliberately not
+among them**, and that is a verdict rather than an omission — its members are read
+as named files, which §check-reads-couples rules outside the walk class, so
+coupling it would trigger a gate on paths no walk of its reaches. Knobs:
 
 - `CANON_KIT_SPEC_NAME` — canonical spec filename, default `SPEC.md`.
 - `CANON_KIT_AMENDMENT_GLOB` — default `SPEC-*.md`.

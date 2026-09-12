@@ -237,10 +237,16 @@ mod tests {
             lib.display(),
             EVERY_COUPLES_KNOB
         );
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — run under the caller's own `set -euo pipefail`, which
+        // `gen-pre-commit.sh` sets: a derivation that aborts there returns *nothing* rather than
+        // failing, and an empty derivation bridges no knob and refuses every token. Attested.
         let shell = |snippet: &str| -> Vec<String> {
             let out = std::process::Command::new("bash")
                 .arg("-c")
-                .arg(format!(". gate-sdk/lib/gate.sh; {}", snippet))
+                .arg(format!(
+                    "set -euo pipefail; . gate-sdk/lib/gate.sh; {}",
+                    snippet
+                ))
                 .current_dir(&repo)
                 .output()
                 .expect("cannot run the shell library");
@@ -274,6 +280,23 @@ mod tests {
             "the two substrates read one descriptor corpus differently, so a member bridged by the \
              shell and a child bridged by the crate would see different knob sets"
         );
+        assert!(
+            !mine.is_empty(),
+            "the descriptor corpus names no knob token, so the agreement above held over nothing — \
+             read it as unverified rather than as clean"
+        );
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridge's own output for the derived set, so the
+        // path from a declared sentinel to an exported value is asserted end to end rather than in
+        // two halves that could each pass while the join between them produces nothing
+        let bridged = shell("_gate_couples_knob_bridge; env | grep '^GATE_SDK_KNOB_' | cut -d= -f1");
+        for k in &mine {
+            assert!(
+                bridged.contains(&format!("GATE_SDK_KNOB_{}", k)),
+                "the bridge resolved no value for {}, which a knob token names — an empty expansion \
+                 is the lost trigger the token exists to prevent",
+                k
+            );
+        }
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — each refusal the knob token carries: an

@@ -426,8 +426,12 @@ gate_knob_env_set() {
         # spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union sentinel's receiving half. A member that expands another member's couples= cannot name those knobs in its own compile-time entry, so it declares this one name and the bridge substitutes the set the descriptor corpus carries. Expanded here rather than in gate_knob_env, so the arity-one face and the battery front-end's union resolve it through the same substitution.
         if [[ "$_gkes_n" == "$GATE_SDK_COUPLES_KNOB_SENTINEL" ]]; then
             local -a _gkes_derived=()
-            mapfile -t _gkes_derived < <(_gate_couples_knob_names)
-            names+=(${_gkes_derived[@]+"${_gkes_derived[@]}"})
+            local _gkes_out
+            _gkes_out="$(_gate_couples_knob_names)"
+            if [[ -n "$_gkes_out" ]]; then
+                mapfile -t _gkes_derived <<<"$_gkes_out"
+                names+=("${_gkes_derived[@]}")
+            fi
             continue
         fi
         names+=("$_gkes_n")
@@ -696,14 +700,21 @@ _gate_kit_roots_rel_ensure_cache
 GATE_KIT_ROOTS_REL=("${_gate_kit_roots_rel_cache[@]}")
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — every knob name the descriptor corpus's couples=/trigger= fields carry in a knob:<NAME> token, derived from the surface the names are written on so a newly written token cannot be forgotten. One grep over the whole corpus rather than a field read per descriptor, because the set is wanted once per process and a fork per member would be paid on every battery run.
+# spec: gate-sdk/SPEC.md §The path-dialect contract — an unmatched glob is filtered by testing the path rather than by toggling `nullglob`: `shopt -p` exits non-zero when the option is unset, so saving and restoring it aborts this function under a caller's `set -e` and the derivation silently returns nothing.
 _gate_couples_knob_names() {
-    local line kv tok d saved
+    local line kv tok d f dirs
     local -a files=() names=() parts=()
-    saved="$(shopt -p nullglob)"
-    shopt -s nullglob
-    while IFS= read -r d; do files+=("$d"/*.gate "$d"/*.sh); done < <(gate_check_dirs)
-    eval "$saved"
+    dirs="$(gate_check_dirs)"
+    while IFS= read -r d; do
+        [[ -n "$d" ]] || continue
+        for f in "$d"/*.gate "$d"/*.sh; do
+            [[ -f "$f" ]] && files+=("$f")
+        done
+    done <<<"$dirs"
     [[ ${#files[@]} -gt 0 ]] || return 0
+    local manifests
+    manifests="$(grep -h '^# graph: ' "${files[@]}" 2>/dev/null || true)"
+    [[ -n "$manifests" ]] || return 0
     while IFS= read -r line; do
         for kv in ${line#\# graph: }; do
             case "$kv" in couples=*|trigger=*) ;; *) continue ;; esac
@@ -712,7 +723,7 @@ _gate_couples_knob_names() {
                 [[ "$tok" == knob:* ]] && names+=("${tok#knob:}")
             done
         done
-    done < <(grep -h '^# graph: ' "${files[@]}" 2>/dev/null || true)
+    done <<<"$manifests"
     [[ ${#names[@]} -gt 0 ]] || return 0
     printf '%s\n' "${names[@]}" | LC_ALL=C sort -u
 }
@@ -721,10 +732,11 @@ _gate_couples_knob_names() {
 _gate_couples_knob_bridge() {
     [[ -n "${_gate_couples_knob_bridged:-}" ]] && return 0
     _gate_couples_knob_bridged=1
-    local out line
+    local out line derived
     local -a names=()
-    mapfile -t names < <(_gate_couples_knob_names)
-    [[ ${#names[@]} -gt 0 ]] || return 0
+    derived="$(_gate_couples_knob_names)"
+    [[ -n "$derived" ]] || return 0
+    mapfile -t names <<<"$derived"
     out="$(gate_knob_env_set couples-expansion "${names[@]}")" || return 2
     while IFS= read -r line; do
         [[ -n "$line" ]] && export "${line?}"

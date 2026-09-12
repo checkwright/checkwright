@@ -11160,6 +11160,26 @@ byte-stable. **A `tier=commit-msg` member therefore ports with no new emitter
 arm** — both hooks resolve argv through the one `command_rel` → `gate_command`
 path — which the generated hook's own shell spelling reads against.
 
+**An emitted trigger set is knob-derived wherever a walk is, so a knob edit stales
+the hook through the trigger as well as through the baked invocation.** The
+obligation on the descriptor side is a rule over walks rather than a roster of
+members: **wherever a gate performs a walk whose filter argument takes its value
+from knob `<NAME>`, that gate's `couples=` carries `knob:<NAME>`**. Keyed on the
+walk and not on the member's declared read roots, because a walk can be
+knob-bounded and still have no declarable root — `check-docs-cmd`, `check-md-refs`
+and `check-spec-fence-balance` each scan a knob-bounded corpus through a
+**hardcoded** root, so a declaration-keyed rule would never reach them however
+correct it is. A declaration is a proxy for a walk; the walk is the thing. Two
+judgements the rule must keep, both of which an enumerated roster gets wrong:
+a knob that **narrows** a corpus is never a couples token, because coupling it
+would trigger the gate on paths it deliberately does not scan — the inverse of the
+token's purpose, and the reason the rule reads the knob a walk's *filter argument*
+takes its value from rather than any knob the module reads; and a knob whose
+elements **pack several fields** is not a pattern set, so a walk filtered by a
+projection out of one (`CANON_KIT_EMBED_LANGS`' `kind|fence-langs|file-globs`
+triples) is outside the form and takes no token. The set the rule reaches is
+therefore derived per walk, and a knob added later is reached with no edit here.
+
 **This generator does not port, and the cause is structural rather than a sizing
 judgment.** The hook bakes the **resolved** invocation argv verbatim — `env
 GATE_SDK_KNOB_…=… <binary> <name>` — and resolving a knob means sourcing the

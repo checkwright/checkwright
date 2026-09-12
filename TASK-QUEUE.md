@@ -12,53 +12,6 @@
 
 ## New Features
 
-- **manifest-family-couples-misses-the-consumer-widened-corpus** [spec: SPEC-knob-token.md] — eleven
-  gates read a consumer-configured doc corpus and none of them triggers on the members the consumer
-  added, so `couples=` under-covers its own runtime reads by construction rather than by omission.
-  **Measured 2026-09-06 with the selection oracle, and it is a CLASS rather than one file.**
-  `run-gates.sh --for TRAJECTORY.md` selects EIGHT gates, of which only `check-measured-claim` and
-  `check-unmarked-claim` read the file; `--for RELEASING.md` and `--for CONTRIBUTING.md` select the
-  identical eight. Meanwhile eleven canon-kit descriptors scan the whole of
-  `scripts/canon-config.sh`'s `CANON_KIT_MANIFEST_FILES`, which this consumer widened to add
-  `TRAJECTORY.md`, `RELEASING.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
-  `ROADMAP.md`, `doctrine-kit/DOCTRINE.md` and the `docs/` pages. Every one of those is scanned by
-  the citation, temporal, link and count gates and triggers none of them. That is a direct breach of
-  gate-sdk/SPEC.md §The `# graph:` manifest's stated authoring rule — `couples=` must
-  cover every path the gate reads at runtime, never a subset — and `check-reads-couples` cannot see
-  it, because the corpus arrives through a consumer array rather than a statically resolvable walk.
-  **The descriptor set's shape was rounded in this bullet and is corrected at spec:** FOUR of the
-  eleven carry exactly `couples=*SPEC*.md,*README.md,CLAUDE.md`; the other seven are supersets of
-  those three tokens. A sweep written against the triple would miss seven of its targets.
-  **The generated hook already carries the widened corpus one token from the trigger that misses
-  it** — measured at spec: `scripts/git-hooks/pre-commit` holds eleven
-  `GATE_SDK_KNOB_CANON_KIT_MANIFEST_FILES=…TRAJECTORY.md…` assignments, each on the same `run_gate`
-  line as a `staged_matches` guard reading the literal triple instead. No new config source is owed.
-  **Why it needed design, and why the drain's fix disposition FAILED.** The obvious
-  repair — write the consumer's file names into the eleven kit descriptors — puts consumer content
-  in a kit literal, which the provenance seam refuses (CLAUDE.md §The provenance seam). The kit's
-  default triple is CORRECT for the kit's default corpus; what was missing is a lever by which a
-  consumer that widens `CANON_KIT_MANIFEST_FILES` also widens the trigger.
-  **Seam ruled at scope 2026-09-12**, narrowing three live shapes to one: mechanism kit-side is the
-  `couples=` grammar extension and its resolver; the widened corpus is consumer config the knob
-  already holds, so the descriptor names the knob and the value stays the consumer's. That
-  foreclosed a second knob listing the same members (a second source for one roster) and
-  per-consumer descriptor shadowing (eleven copies per adopter to drift).
-  **Authored at spec: the token is `knob:<NAME>`, it unions with a descriptor's literals rather
-  than replacing them, and it resolves at bridge time through a derived knob-name union sentinel.**
-  Grounds, the refused alternatives and the resolution order at SPEC-couples-knob-token.md
-  deltas 1 and 2; the four prefix readers that must move together at delta 1's consumer list.
-  **Cost while deferred** was: every commit touching one of those members runs the two whole-corpus
-  claim gates and skips the four that grade its citations, links, temporal narration and counts —
-  silent, and paid at the moment the surface is least reviewed.
-  **This iteration's lead unit, with `couples-dynamic-root-resolution` — operator direction,
-  2026-09-12 (lead-relayed), naming the iteration `couples-resolver-reach`.** It leads on the
-  session-class ranking rule's first tier. The spanning cost was accepted with the choice: the pair
-  reaches canon-kit, gate-sdk and native, so `check-stage-entry` assertion C will demand the align
-  audit stamp. A direction, revisable at a later scope or spec.
-  Filed 2026-09-06 by close from the gap inbox, after re-verification widened the bullet: the bullet
-  said four gates trigger and the fix was three `couples=` triples; the oracle reads eight
-  triggering and the fix is not three triples at all. Promoted at this spec.
-
 - **couples-dynamic-root-resolution** [spec: SPEC-reads-root-default.md] — the skipped-and-counted
   bucket is where trigger-drift hides, and its dominant subset is decidable.
   **The substrate was corrected at spec, and the entry's own premise moved with it.** The bullet
@@ -5257,6 +5210,7 @@
 
 ## Done
 
+- manifest-family-couples-misses-the-consumer-widened-corpus
 - always-loaded-baseline-freshness
 
 ## Lessons Learned
