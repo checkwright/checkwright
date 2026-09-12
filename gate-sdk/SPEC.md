@@ -2109,7 +2109,7 @@ holds for the same reason it always did.
 | `check-shellcheck` | **Retired with cause, and the cause is per-member rather than about this gate.** For a `.gate`-dispatched member there is no shell file to lint, so this meta-gate makes no assertion about it; `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. Read as a statement about the *gate* the row would be false, and the distinction is worth the sentence: the gate is `zero-config`, an adopter cannot author a compiled gate, and a vendoring consumer's gate family is shell by construction — so what ends when a tree's last `.sh` leaves is that tree's registration, never the shipped gate (§check-shellcheck). **This member is itself `.gate`-dispatched **, ported as criterion 7's wrapper: its rule is an invocation of `shellcheck`, which stays a declared dependency the compiled form spawns and refuses at exit 2 without. Its own port moves nothing in the rule and one thing in its corpus — one fewer `.sh` to lint — which is this row's disposition measured rather than asserted. |
 | `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in the `--run-gate-tests` arm (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
 | `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and queue-kit's port landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — and the property is held crate-side rather than by review: the spawn wrapper and its unit tests (§Fail-closed contract) leave a gate module unable to construct a `Command` at all, and unable to reach stdout without the status having been read. Machine-held rather than remembered, which is the same answer the `check-reads-couples` row below gives to the same problem, and what keeps this retirement honest. |
-| `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, each case in a child whose working directory is the case (§lib/gate.sh), observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API, because a direct walk would be invisible to the recorder and unverify A. B's vendored half is held by an **allowlist over the resolved graph**: a spelling roster cannot catch a walker inside a dependency, so every crate in the tracked `Cargo.lock` — transitive included, since a transitive crate walks as visibly as a direct one — is admitted by name with the clause of the dependency bar it cleared (§The settings cohort, and the crate's first dependency), and the assertion reds both on an unadmitted crate and on an allowlist entry absent from the graph. Reading only the `[dependencies]` table would admit an entire subtree unexamined, which is why the lock is tracked rather than gitignored. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — a name the substrate does not carry, and an unresolvable filter knob — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). **This member is itself `.gate`-dispatched**, which is that closing clause discharging on the auditor: the compiled form reaches the read set in process rather than spawning the arm, so the absent-binary refusal is answered out of existence rather than retired, and the row now describes a ported member auditing ported members. What `--reads` verifies is unchanged and is worth restating because the natural reading is wrong: a member's declared roots are **registry data**, not a derivation from its Rust source, and the declaration-to-code link is held by unit test A. Both members ported alongside it with a non-empty root set carry `?` alone, and the auditor's own root set is empty and stays empty, so no self-assertion is lost. |
+| `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and three unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, each case in a child whose working directory is the case (§lib/gate.sh), observed roots a subset of declared **and declared prunes a subset of observed** — the two directions are not a symmetry to tidy: a root declaration widens the demand so an undeclared root is the fault, a prune declaration narrows it so an unapplied prune is, and a declared prune with no reader would be the self-certified narrowing this gate exists to refuse. A case that relocates a walk through its own positional argument, or whose guarded branch its configuration does not select, exercises no such walk and is held to nothing; the two halves each carry a global guard so neither can pass by holding over nothing. **B**, no module outside that walk implementation names a filesystem-walk API, because a direct walk would be invisible to the recorder and unverify A. **C**, no member answers a statically resolvable walk root with `?` — a property test over the gate modules' own source, whose honest limit is that it sees the root idioms it enumerates and a module may fall outside them; it is a floor the declaration rule is not. B's vendored half is held by an **allowlist over the resolved graph**: a spelling roster cannot catch a walker inside a dependency, so every crate in the tracked `Cargo.lock` — transitive included, since a transitive crate walks as visibly as a direct one — is admitted by name with the clause of the dependency bar it cleared (§The settings cohort, and the crate's first dependency), and the assertion reds both on an unadmitted crate and on an allowlist entry absent from the graph. Reading only the `[dependencies]` table would admit an entire subtree unexamined, which is why the lock is tracked rather than gitignored. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — a name the substrate does not carry, and an unresolvable filter knob — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). **This member is itself `.gate`-dispatched**, which is that closing clause discharging on the auditor: the compiled form reaches the read set in process rather than spawning the arm, so the absent-binary refusal is answered out of existence rather than retired, and the row now describes a ported member auditing ported members. What `--reads` verifies is unchanged and is worth restating because the natural reading is wrong: a member's declared roots are **registry data**, not a derivation from its Rust source, and the declaration-to-code link is held by unit test A. Both members ported alongside it with a non-empty root set carry `?` alone, and the auditor's own root set is empty and stays empty, so no self-assertion is lost. |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. **This member is itself `.gate`-dispatched**, and its port moved more than its own spelling: the section it audits gained an enumerated contract of its own, so the gate now reads **its own implementation module** and the contingent immunity that kept its own heading out of discovery is ended deliberately (§check-gate-assertions). Its fixture pair, not the live tree, is what proves those arms — the `check-comment-tier` sentence, inherited for the same reason. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. **This member is itself `.gate`-dispatched**, so the row describes a ported member reading ported members' declaration paths — and its own port changed nothing in the rule: what it globs is both declaration spellings, which a descriptor still is. |
 | `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: the shared primitive `comment_surface` carries `*.gate` **and `*.rs`** arms — widened once, for every caller (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. **This member is itself `.gate`-dispatched**, so it now audits its own declaration — which is why its trigger names `*.gate` and `*.rs` and why its fixture pair, not the live tree, is what proves those arms. |
@@ -14965,6 +14965,21 @@ comes from is a property of the reader's own substrate: a shell reader invokes
 `"$GATE_SDK_NATIVE_BIN" --reads "<name>"` (§Layout and configuration), and the
 compiled reader calls the registry in process (below).
 
+**The substrate answers, and may not answer `?` for a root it can bound.** `?` stops
+being an available answer for **any walk whose root resolves statically** — the
+predicate is the *property*, does this walk's root resolve without running the gate,
+and nothing narrower. A crate-side assertion reds a `?` standing where a resolvable
+root could (§Meta-gate conservation for the binary substrate). The gate does not reach
+into a module to resolve what the registry declined to declare — the substrate ruling
+forbids that; what the refusal changes is that the registry has no licence to decline
+where the property holds. **The refusal cannot be partial**, because a resolvable walk exempted from it is the descriptor-level
+opt-out removed below, moved one layer down. Two shapes satisfy the property today — a
+hardcoded literal root, and a positional argument with a literal default, which the
+crate spells at least six ways — and they are **instances rather than the definition**:
+three hand sweeps over spellings during authoring produced three different populations,
+each missing one, and a seventh spelling is a module away. Read the property; treat any
+enumerated pattern as a floor.
+
 **The `--reads` report.** One line per walk root and nothing else — no count line
 and no header, because the count is derivable from the lines and a transcribed
 total would be a second source for it. Each line is either a repo-relative
@@ -14977,21 +14992,63 @@ no third reader. The producer is the binary's `--reads` arm, printing the declar
 roots each registry member carries — data held to what the code actually walks by
 two crate-side unit tests (§Meta-gate conservation for the binary substrate).
 
-**A root line may carry one optional field: a tab and the name of the knob whose
-value is that walk's `-name` pattern** (`<root><TAB><knob-name>`). A bare root
-keeps its present meaning, unfiltered, so every existing declaration is unchanged.
-The field's producer is the same `--reads` arm printing the same registry data; its
-**only** consumer is this gate's consumption path, at exactly one transition — the
-per-root coverage assertion — where it resolves the named knob through the config
-bridge it already sources and forwards the resolved value where an unfiltered root
-passes the empty pattern. Resolution failure is **fail-closed**: a named knob the
-owning kit does not define is exit 2 naming it, never an empty filter silently
-widening the demand to the whole root.
+**A walk is bounded by three things, and the declaration has a field for each: where
+it starts, where it refuses to descend, and which of the files it reaches it
+selects.** A root line is `<root>`, `<root><TAB><filter>` or
+`<root><TAB><filter><TAB><prune>`, a trailing empty field omitted — so a root with no
+filter still prints one column and every pre-existing line is byte-identical. The
+fields' producer is the same `--reads` arm printing the same registry data; their
+**only** consumer is this gate's consumption path, at exactly one transition, the
+per-root coverage assertion.
+
+**The filter field is `<kind>:<source>`, and the kind is mandatory.** The *source* is
+`knob:<NAME>` for a knob's value or `lit:<comma-list>` for a kit-generic literal the
+crate owns at the walk site; the *kind* is `glob:`, `name:` or `ext:`, naming which of
+the crate's three matching disciplines the walk's own entry point applies —
+`glob_files`' root-relative component match, `find_named`/`-name`'s basename match, or
+`find_files`' extension test. **The kind does not default**, and that is measured
+rather than stylistic: read kind-blind, with one matcher guessing from a token's
+shape, the assertion produced some nine hundred spurious findings, and a defaulting
+kind would hand that to any author who omitted the tag. This is what makes the
+interpretation the member's own walker's — the reader stands for a walk it cannot see,
+so the walker's discipline travels on the field or nowhere. The field is **optional**
+and its omission is a *positive* declaration that the walk is unfiltered, which a bare
+root's enumeration already was.
+
+**Three resolution facts are contract, because each produces a wrong verdict rather
+than a refusal.** The value is **tab-split** before matching, since the bridge joins a
+knob's members with a tab and matching a fifteen-glob knob whole against a basename
+selects nothing. An **indexed** knob resolves to its elements and a **keyed** knob to
+its values — mechanics of the one form rather than a further case, and it does not
+reach a knob whose elements *pack* several fields, whose pattern is a bespoke
+projection of a value rather than the value. And **"unresolvable", "no filter" and
+"resolved empty" are three verdicts, not two**: an absent bridge variable is the
+bridge's own refusal, an omitted field is unfiltered, and a declared knob a consumer
+left empty selects **nothing** — because that is what the member's own walk does with
+it. Sharing a verdict between the last two inverts the demand, turning the narrowest
+configuration into the widest demand.
+
+**The prune field is a list of root-relative directory globs the walk refuses to
+descend into, and it is held to executed behaviour.** The resolver already models a
+prune — a reported root "is filtered by the prune list exactly as a `gate_find` walk
+is" (below) — and what was missing is only that the set came from two global knobs
+with no way for a member to declare its own. A declared prune **narrows** the demand,
+so its failure direction is the inverse of a root's: a member declaring a prune it
+does not apply would hide exactly the coverage gap this gate exists to catch. The
+prune therefore rides the recorder as the root does, and assertion A's subset test
+runs in the inverse direction for it — **declared ⊆ observed**, a member may only
+declare what its walk actually pruned (§Meta-gate conservation for the binary
+substrate). **An unrecorded prune declaration is refused**, because without that reader
+the form is a self-certified narrowing, which is the unbound self-declaration this
+section exists to refuse. A prune is not a filter with an exclusion: a filter says
+which files are *selected* and a prune says which subtrees are *never entered*, and
+spelling one as the other puts two dimensions in one field. The honest limit is that
+this form reaches a narrowing expressible as a directory prune; a content predicate or
+a per-file exclusion list is a new question rather than a stretched prune.
 
 **Two alternatives are refused, recorded so a later port does not retry them.**
-Declaring `?` for such a root is refused: `?` marks a root that cannot be
-*bounded statically*, and every member carrying it does so because its root is an
-argument with a default, where these are literal — spelling one `?` would be the
+Declaring `?` for a root that resolves statically is refused: `?` marks a root that
+cannot be *bounded statically*, and spelling one where the property holds would be the
 foreclosed opt-out moved into the registry. Re-implementing the scan over
 `git ls-files` to fall outside the analyzed class is refused for the same reason
 with a behavioral cost on top: enumeration is out of scope *because* it is not a
@@ -14999,14 +15056,45 @@ walk, so using it to evade the assertion is opting out spelled in code, and it
 silently narrows the scan to **tracked** files where the walk sees an untracked
 one too.
 
-**The filter is carried as a knob name and never as a literal pattern, and that is
-the load-bearing detail.** The walks this exists for select by *knob values* — which
-is exactly why the shell analyzer extracts nothing for them, since it discards a
-pattern containing `$`, so the shell member's exemption was the only channel it had
-rather than laziness. Spelling the pattern into the crate's registry to make the
-field static would be a second spelling of a knob's default, which
-de-literalization forbids. Carrying the name keeps the value single-sourced and
-reuses the resolution path the bridge already owns.
+**The filter's *source* is a knob name and never a transcribed pattern, and that is
+the load-bearing detail — narrowed to its own stated ground.** The walks this exists
+for select by *knob values*, which is why the shell analyzer extracts nothing for them:
+it discards a pattern containing `$`, so the shell member's exemption was the only
+channel it had rather than laziness. Transcribing a knob's value into the registry
+would be a second spelling of that knob's default, which de-literalization forbids.
+That ground is narrow and decisive, and it is what `lit:` does not breach: **a
+kit-generic literal that is nobody's knob has no default to second-spell.** `yml`/`yaml`
+and `md` carry no adopter-specific information, and minting a knob to hold them would
+manufacture consumer config out of kit mechanism, handing every adopter a knob whose
+only correct value is the one the kit already knows. The refusal keeps full force
+wherever a knob does exist.
+
+**An empty root set means the member performs no walk in the analyzed sense**, and `?`
+had been absorbing that case while meaning something else. `git ls-files` enumeration,
+single-file reads and a **single-level listing** are each outside the class, so a member
+doing only those declares no root at all. That is not an opt-out: assertion A requires
+observed roots to be a subset of declared, so a false no-walk claim reds there.
+
+**The analyzed class is *recursive*, and this states what that excludes.** The
+invariant above says "statically resolvable **recursive** walk", and the ground for
+excluding `git ls-files` is that it is not a walk — a statement about mechanism, not
+about intent. `walk::list_dir` is a single `read_dir` over immediate children and
+descends nothing, so it is outside the class by the discriminator already written.
+Stated explicitly because a discriminator carried only by one adjective in an invariant
+and one parenthetical about a different mechanism is not stated, whatever it entails —
+a careful reader took the exclusion for a boundary *move*. **The discriminator lands in
+both places or neither**: a non-recursive listing leaves the recorder *and* the
+root-entry roster the refusal reads, or a member whose only listing is non-recursive
+reds the empty declaration that is now its correct one.
+
+**A declaration, a refusal and a skip are each per walk, never per member.** A member
+may walk several times with different root shapes — one statically resolvable and one
+not — and such a member declares the resolvable ones and keeps `?` for the rest. A
+member whose corpus helper selects its file set at runtime declares its root **once
+per branch**, and may guard a branch with `else:<SELECTOR>:`, which the resolver reads
+at run time: a branch whose selector knob resolves non-empty is a walk this tree does
+not take, so it is neither analyzed nor skipped-and-counted. The guard names the knob
+and never the knob's state, so no kit descriptor carries a consumer's configuration.
 
 **The coverage assertion itself is unchanged; only the source of the roots
 differs** — a shell parse for a `.sh` member, the substrate's own report for a
@@ -15129,8 +15217,15 @@ check-shim-restatement bug). A walk whose root does not resolve is **skipped and
 counted** in the clean line: the gate claims only the resolvable class and says
 how much it left undecided. Only tracked files need coverage (couples exist to
 fire the hook on a tracked-path commit; a walk over `.tmp/` or generated state
-has no commit to couple to) and only walks are analyzed — single-file reads and
-`git ls-files` enumeration are out of scope.
+has no commit to couple to) and only **recursive** walks are analyzed — single-file
+reads, `git ls-files` enumeration and a single-level listing are out of scope.
+
+**That shell path is dead on a corpus carrying no gate scripts, and is retained for a
+vendoring consumer that still ships them.** No `.sh` gate declaration remains in this
+tree, so every undecidable root arrives on the registry path instead and
+`resolve_root`'s three token shapes fire only in fixtures. Recorded because a later
+reader meeting the shell spelling would extend dead code; the substance is unaffected,
+since the decidable subset was always "a root that resolves without running the gate".
 
 Over-demand is absorbed one of two ways, never by weakening the glob semantics
 to pass a near-miss: add the covering sibling glob (the correct fix), or mark
@@ -15139,7 +15234,11 @@ own line or the line directly above (the `comment-tier-exempt` precedent — loc
 to the walk it excuses, auditable in place; a trailing marker excuses only its
 own line). The marker's sole reader is this gate; the skip counter's sole reader
 is the clean-line parenthetical, its honesty label for the undecidable
-remainder. Manifest `tier=precommit trigger=*`: the unconditional trigger is
+remainder. **Neither absorption is available to a compiled member's over-demand** —
+the marker is deliberately withheld from one, and the covering glob is unavailable
+where the seam refuses the literal it would need — which is why the third dimension is
+a declared *prune* rather than a further absorption: the remaining fix is precision
+about what the walk reads, not a wider claim about what covers it. Manifest `tier=precommit trigger=*`: the unconditional trigger is
 load-bearing, not laziness — the invariant breaks two ways, a gate edit that
 changes a walk *or* a new subdirectory grown under a walked root, and no couple
 glob can name a directory that does not exist yet. Its own `couples=` names what

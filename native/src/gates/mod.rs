@@ -134,11 +134,41 @@ pub type GateFn = fn(&[String]) -> i32;
 pub type GateEntry = (
     &'static str,
     GateFn,
-    &'static [(&'static str, &'static str)],
+    &'static [(&'static str, &'static str, &'static str)],
     &'static [&'static str],
     &'static str,
     &'static [(&'static str, &'static str)],
 );
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec::manifest_files`' own branch set, declared once for
+// the eleven members that call it: the configured corpus, the kit-literal default the `else:` guard
+// selects when that knob is empty, and the prose surface it adds in either branch.
+const MANIFEST_ROOTS: &[(&str, &str, &str)] = &[
+    (".", "glob:knob:CANON_KIT_MANIFEST_FILES", ""),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*"),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md,CLAUDE.md", ""),
+    (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", ""),
+];
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec::comment_surface`'s two runtime branches, both
+// declared: which one applies is a property of the consumer's configuration rather than of the
+// member, and the guard is what lets the resolver read that off the knob instead of the descriptor.
+const COMMENT_SURFACE_ROOTS: &[(&str, &str, &str)] = &[
+    (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", ""),
+    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", ""),
+];
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — `MANIFEST_ROOTS` and `COMMENT_SURFACE_ROOTS`
+// together: this member walks twice, through both shared helpers, and a declaration per member
+// rather than per walk is what drops the second walk silently.
+const SPEC_POINTER_ROOTS: &[(&str, &str, &str)] = &[
+    (".", "glob:knob:CANON_KIT_MANIFEST_FILES", ""),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*"),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md,CLAUDE.md", ""),
+    (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", ""),
+    (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", ""),
+    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", ""),
+];
 
 pub const REGISTRY: &[GateEntry] = &[
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because each member's scan root is
@@ -147,7 +177,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-action-pinning",
         action_pinning::run,
-        &[("?", "")],
+        &[(".", "ext:lit:yml,yaml", "")],
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
         &[],
@@ -159,7 +189,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-action-run-shell",
         action_run_shell::run,
-        &[("?", "")],
+        &[(".", "ext:lit:yml,yaml", "")],
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
         &[("shellcheck", "")],
@@ -167,7 +197,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-action-gh-repo",
         action_gh_repo::run,
-        &[("?", "")],
+        &[(".", "ext:lit:yml,yaml", "")],
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
         &[],
@@ -175,7 +205,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-action-permissions",
         action_permissions::run,
-        &[("?", "")],
+        &[(".", "ext:lit:yml,yaml", "")],
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
         &[],
@@ -275,7 +305,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-deferred-board-tags",
         deferred_board_tags::run,
-        &[("?", "")],
+        &[],
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ACTIVE_SECTIONS",
@@ -309,7 +339,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-manifest-count",
         manifest_count::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -330,7 +360,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-prose-enum",
         prose_enum::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -351,7 +381,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-measured-claim",
         measured_claim::run,
-        &[("?", "")],
+        &[(".", "glob:knob:CANON_KIT_MEASURED_SURFACE_GLOBS", "")],
         &[
             "CANON_KIT_MEASURED_CLAIMS_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
@@ -370,7 +400,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-dod-singleton",
         spec_dod_singleton::run,
-        &[("?", "")],
+        &[(".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -385,7 +415,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-derivable-section",
         spec_derivable_section::run,
-        &[("?", "")],
+        &[(".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -404,7 +434,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-manifest-temporal",
         manifest_temporal::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -425,7 +455,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-claim",
         install_claim::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -450,7 +480,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-unmarked-claim",
         unmarked_claim::run,
-        &[("?", "")],
+        &[(".", "glob:knob:CANON_KIT_MEASURED_SURFACE_GLOBS", "")],
         &[
             "CANON_KIT_CLAIM_CLASSES_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
@@ -463,7 +493,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-payload-claim",
         payload_claim::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -486,7 +516,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-cmd",
         docs_cmd::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -505,7 +535,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-md-refs",
         md_refs::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -524,7 +554,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-tracking-claim",
         tracking_claim::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -564,13 +594,13 @@ pub const REGISTRY: &[GateEntry] = &[
         "gate-sdk",
         &[("git", "")],
     ),
-    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's own
-    // first argument with a default; the candidate walk, the canonical-spec find and the
-    // amendment find all anchor at that one root
+    // spec: gate-sdk/SPEC.md §check-reads-couples — three walks at one root, declared per walk: two
+    // name their bounding knobs, and the source-candidate walk keeps `?` because its filter is a
+    // *projection* out of `CANON_KIT_EMBED_LANGS`' packed elements rather than a knob's value
     (
         "check-spec-embedded-source",
         spec_embedded_source::run,
-        &[("?", "")],
+        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", ""), (".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*"), ("?", "", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -609,7 +639,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-prose-tells",
         prose_tells::run,
-        &[("?", "")],
+        &[(".", "glob:knob:CANON_KIT_PROSE_TELL_GLOBS", "")],
         &[
             "CANON_KIT_PROSE_TELL_GLOBS",
             "CANON_KIT_PROSE_TELL_PHRASES",
@@ -629,7 +659,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-knob-default-coupling",
         knob_default_coupling::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["GATE_PRUNE_DIRS", "GATE_KIT_ROOTS_REL", "CANON_KIT_SPEC_NAME"],
         "canon-kit",
         &[("git", "")],
@@ -640,7 +670,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-knob-citation",
         knob_citation::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -659,7 +689,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-fence-balance",
         spec_fence_balance::run,
-        &[("?", "")],
+        MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -680,7 +710,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-comment-tier",
         comment_tier::run,
-        &[("?", "")],
+        COMMENT_SURFACE_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -704,7 +734,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-pointer",
         spec_pointer::run,
-        &[("?", "")],
+        SPEC_POINTER_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -725,7 +755,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-todo-task-liveness",
         todo_task_liveness::run,
-        &[("?", "")],
+        COMMENT_SURFACE_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -746,7 +776,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-amendment-queue",
         amendment_queue::run,
-        &[("?", "")],
+        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -768,7 +798,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-amendment-update-target",
         amendment_update_target::run,
-        &[("?", "")],
+        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -783,7 +813,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-amendment-retired-spelling",
         amendment_retired_spelling::run,
-        &[("?", "")],
+        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -799,7 +829,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-deprecation-task",
         deprecation_task::run,
-        &[("?", "")],
+        COMMENT_SURFACE_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -841,7 +871,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-queue-slug-liveness",
         queue_slug_liveness::run,
-        &[("?", "")],
+        &[(".", "glob:knob:QUEUE_KIT_PROSE_SURFACE_GLOBS", "")],
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_PROSE_SURFACE_GLOBS",
@@ -884,7 +914,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-test-hermetic",
         test_hermetic::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
         &[],
@@ -892,7 +922,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-assertion-strength",
         assertion_strength::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
         &[],
@@ -903,7 +933,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-template-registry-parity",
         template_registry_parity::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
         &[("git", "")],
@@ -914,7 +944,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-stage-skill-coverage",
         stage_skill_coverage::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["LIFECYCLE_KIT_SKILLS_DIR", "LIFECYCLE_KIT_STAGES"],
         "lifecycle-kit",
         &[],
@@ -922,7 +952,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-skill-binding",
         skill_binding::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["LIFECYCLE_KIT_SKILLS_DIR"],
         "lifecycle-kit",
         &[],
@@ -970,7 +1000,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-evidence-baseline",
         evidence_baseline::run,
-        &[("?", "")],
+        &[(".", "glob:knob:EVIDENCE_KIT_SCENARIO_GLOBS", "")],
         &[
             "EVIDENCE_KIT_BASELINE_FILE",
             "EVIDENCE_KIT_QUEUE_FILE",
@@ -1013,8 +1043,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-stage-entry",
         stage_entry::run,
         &[
-            (".", "LIFECYCLE_KIT_ROSTER_BASENAME"),
-            (".", "LIFECYCLE_KIT_AMENDMENT_GLOB"),
+            (".", "name:knob:LIFECYCLE_KIT_ROSTER_BASENAME", ""),
+            (".", "name:knob:LIFECYCLE_KIT_AMENDMENT_GLOB", ""),
         ],
         &[
             "LIFECYCLE_KIT_QUEUE_FILE",
@@ -1039,7 +1069,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-close-surfaces",
         close_surfaces::run,
-        &[("?", ""), ("?", "")],
+        &[("?", "", ""), ("?", "", "")],
         &[
             "GATE_KIT_ROOTS_REL",
             "LIFECYCLE_KIT_ROSTER_BASENAME",
@@ -1096,7 +1126,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-shim-restatement",
         shim_restatement::run,
-        &[("?", ""), ("?", "")],
+        &[("?", "", ""), ("?", "", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_REL",
@@ -1114,7 +1144,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-scratch-citation",
         scratch_citation::run,
-        &[("?", "")],
+        &[(".", "glob:knob:LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS", "")],
         &[
             "LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS",
             "LIFECYCLE_KIT_STATE_FILE",
@@ -1152,7 +1182,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-bump",
         release_bump::run,
-        &[("?", "")],
+        &[("docs/posts", "glob:lit:*.md", "")],
         &[],
         "-",
         &[("git", "")],
@@ -1160,7 +1190,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-tightened-gates-grammar",
         tightened_gates_grammar::run,
-        &[("?", "")],
+        &[("docs/posts", "glob:lit:*.md", "")],
         &[],
         "-",
         &[],
@@ -1168,7 +1198,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-tightened-gates-note-parity",
         tightened_gates_note_parity::run,
-        &[("?", "")],
+        &[("docs/posts", "glob:lit:*.md", "")],
         &[],
         "-",
         &[("git", "")],
@@ -1179,7 +1209,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-kit-parity",
         docs_kit_parity::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &[
             "GATE_KIT_ROOTS_REL",
             "GATE_SDK_REGISTRY_DOC",
@@ -1194,10 +1224,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-mirror-fresh",
         docs_mirror_fresh::run,
-        // spec: gate-sdk/SPEC.md §check-reads-couples — **two** unbounded roots off the scan-root
-        // argument: the generator's source-set listing of `<root>`, and the orphan sweep over
-        // `<root>/docs`. The first was invisible while the generator was a subprocess.
-        &[("?", ""), ("?", "")],
+        &[("docs", "name:lit:SPEC.md,README.md,DOCTRINE.md", ""), ("?", "", "")],
         // spec: gate-sdk/SPEC.md §The non-gate arm — the generator it now calls in-process reads
         // the blob ref, so the comparator declares what its callee reads: a knob the bridge does
         // not carry is a knob the emission cannot resolve.
@@ -1208,7 +1235,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-nav-reachable",
         docs_nav_reachable::run,
-        &[("?", "")],
+        &[("docs", "name:lit:*.md", "")],
         &[],
         "-",
         &[("git", "")],
@@ -1255,7 +1282,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-npm-publish-spec",
         npm_publish_spec::run,
-        &[("?", "")],
+        &[(".github/workflows", "glob:lit:*.yml,*.yaml", "")],
         &[],
         "-",
         &[("git", "")],
@@ -1287,7 +1314,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-value-rollup-fresh",
         value_rollup_fresh::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -1319,7 +1346,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-enforcement-fresh",
         enforcement_fresh::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -1386,7 +1413,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-hook-exec-bit",
         hook_exec_bit::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["GATE_SDK_HOOKS_DIR"],
         "gate-sdk",
         &[("git", "")],
@@ -1394,7 +1421,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-agent-tier-explicit",
         agent_tier_explicit::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["DELEGATION_KIT_AGENT_DIR", "GATE_PRUNE_DIRS"],
         "delegation-kit",
         &[],
@@ -1413,7 +1440,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-workflow-tiering",
         workflow_tiering::run,
-        &[("?", "")],
+        &[],
         &["GATE_SDK_WORKFLOW_DIR"],
         "gate-sdk",
         &[("git", "")],
@@ -1432,7 +1459,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-readme-roster",
         readme_roster::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
         &[],
@@ -1443,7 +1470,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-memory-off",
         memory_off::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &[
             "CONTEXT_KIT_MEMORY_DIRS",
             "CONTEXT_KIT_SETTINGS_FILE",
@@ -1478,7 +1505,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-graph",
         graph::run,
-        &[("?", "")],
+        &[(".", "name:lit:SPEC-*.md", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_SDK_GATES_DIR",
@@ -1515,7 +1542,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-gate-substrate-parity",
         gate_substrate_parity::run,
-        &[("?", ""), ("?", "")],
+        &[("?", "", ""), ("?", "", "")],
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ROOT_HERE",
@@ -1608,7 +1635,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-shellcheck",
         shellcheck::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_KIT_ROOTS_HERE",
@@ -1623,7 +1650,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-disposition",
         install_disposition::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
         &[("git", "")],
@@ -1724,7 +1751,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-link-convention",
         docs_link_convention::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["CANON_KIT_LINK_ROOT"],
         "canon-kit",
         &[("git", "")],
@@ -1757,13 +1784,13 @@ pub const REGISTRY: &[GateEntry] = &[
         "gate-sdk",
         &[("git", "")],
     ),
-    // spec: canon-kit/SPEC.md §check-surface-duplication — one `?` for the positional scan root the
-    // canonical-spec walk starts from; the requirement set is empty because no program the shell
-    // form spawned survives the port at all, which that section states and measures.
+    // spec: canon-kit/SPEC.md §check-surface-duplication — the one walk is the canonical-spec find,
+    // so the bounding knob is the spec name and **not** `CANON_KIT_DUP_SURFACES`, whose members this
+    // member reads as named files rather than walking for
     (
         "check-surface-duplication",
         surface_duplication::run,
-        &[("?", "")],
+        &[(".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*")],
         &[
             "CANON_KIT_GLOSSARY_FILE",
             "CANON_KIT_DUP_SURFACES",
@@ -1792,7 +1819,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-path-dialect",
         path_dialect::run,
-        &[("?", "")],
+        &[("?", "", "")],
         &["GATE_SDK_NATIVE_SRC", "GATE_PRUNE_DIRS"],
         "gate-sdk",
         &[("git", "")],
@@ -1806,11 +1833,52 @@ pub fn lookup(name: &str) -> Option<GateFn> {
         .map(|(_, f, _, _, _, _)| *f)
 }
 
-pub fn roots(name: &str) -> Option<&'static [(&'static str, &'static str)]> {
+pub fn roots(name: &str) -> Option<&'static [(&'static str, &'static str, &'static str)]> {
     REGISTRY
         .iter()
         .find(|(n, _, _, _, _, _)| *n == name)
         .map(|(_, _, r, _, _, _)| *r)
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the optional kind prefix a declared filter field
+// carries, which is what makes the interpretation the member's own walker's: the reader stands for a
+// walk it cannot see, so the walker's matching discipline travels on the field or nowhere.
+pub const FILTER_KINDS: &[&str] = &["glob:", "name:", "ext:"];
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the else-guard prefix: `else:<SELECTOR>:` marks a
+// declaration the walk takes only where `<SELECTOR>` resolves empty. It names the knob and never the
+// knob's state, so a kit descriptor carries no consumer's configuration.
+pub const FILTER_ELSE: &str = "else:";
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — a declaration's guard, and the field without it: the
+// selector knob whose emptiness selects this branch, `None` for an unguarded declaration
+pub fn filter_guard(spec: &str) -> (Option<&str>, &str) {
+    match spec.strip_prefix(FILTER_ELSE).and_then(|r| r.split_once(':')) {
+        Some((sel, rest)) => (Some(sel), rest),
+        None => (None, spec),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the field with its guard and kind prefixes removed. A
+// field carrying neither keeps its original meaning, a basename pattern, so every pre-existing
+// declaration reads exactly as it did.
+pub fn filter_source(spec: &str) -> &str {
+    let (_, rest) = filter_guard(spec);
+    FILTER_KINDS
+        .iter()
+        .find_map(|k| rest.strip_prefix(k))
+        .unwrap_or(rest)
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the knob a declared filter field names, read from
+// here by both its readers: `None` for the two forms that name no knob, the omitted field (an
+// unfiltered walk) and `lit:<list>` (a kit literal the crate owns at the walk site)
+pub fn filter_knob(spec: &str) -> Option<&str> {
+    let src = filter_source(spec);
+    if src.is_empty() || src.starts_with("lit:") {
+        return None;
+    }
+    Some(src.strip_prefix("knob:").unwrap_or(src))
 }
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — the union sentinel a member declares when the
@@ -1824,10 +1892,17 @@ fn expanded_knobs() -> &'static [(&'static str, Vec<&'static str>)] {
     static EXPANDED: std::sync::OnceLock<Vec<(&'static str, Vec<&'static str>)>> =
         std::sync::OnceLock::new();
     EXPANDED.get_or_init(|| {
+        // spec: gate-sdk/SPEC.md §check-reads-couples — a guard's selector knob is read by the
+        // resolver exactly as the filter knob is, so the union carries both or a guarded declaration
+        // cannot be evaluated at all
         let mut filters: Vec<&'static str> = REGISTRY
             .iter()
-            .flat_map(|(_, _, roots, _, _, _)| roots.iter().map(|(_, k)| *k))
-            .filter(|k| !k.is_empty())
+            .flat_map(|(_, _, roots, _, _, _)| {
+                roots
+                    .iter()
+                    .flat_map(|(_, f, _)| [filter_knob(f), filter_guard(f).0])
+                    .flatten()
+            })
             .collect();
         filters.sort();
         filters.dedup();
@@ -2000,6 +2075,46 @@ mod tests {
         dir
     }
 
+    // spec: gate-sdk/SPEC.md §run-gate-tests — the case's own positional arguments, which are the
+    // only anchors a case may relocate a declared walk to. A flag is not an anchor.
+    fn relocations(args: &[String]) -> Vec<String> {
+        args.iter()
+            .filter(|a| !a.starts_with('-') && !a.is_empty())
+            .cloned()
+            .collect()
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `declaration_covers` with the case's relocation
+    // set: an observed root the case itself supplied as an anchor satisfies the declaration it
+    // relocates, so the assertion keeps its force — an undeclared root no case argument names
+    // still reds — without a `?` standing where a resolvable root could.
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the root/filter projection of a root declaration,
+    // because the arity rule is about roots and the prune is a third dimension held separately
+    fn two<'a>(declared: &'a [(&'a str, &'a str, &'a str)]) -> Vec<(&'a str, &'a str)> {
+        declared.iter().map(|(r, f, _)| (*r, *f)).collect()
+    }
+
+    fn declaration_covers_relocated(
+        verb: &str,
+        declared: &[(&str, &str, &str)],
+        observed: &[String],
+        relocations: &[String],
+    ) -> Result<(), String> {
+        if declared.iter().all(|(d, _, _)| *d != "?") && !relocations.is_empty() {
+            let kept: Vec<String> = observed
+                .iter()
+                .filter(|o| {
+                    !relocations
+                        .iter()
+                        .any(|r| *o == r || o.starts_with(&format!("{}/", r)))
+                })
+                .cloned()
+                .collect();
+            return declaration_covers(verb, &two(declared), &kept);
+        }
+        declaration_covers(verb, &two(declared), observed)
+    }
+
     // spec: gate-sdk/SPEC.md §check-reads-couples — unit test A: the declared roots are
     // held to what the code does, by running each member over its own fixture cases with
     // the walk recorder on. Nothing else makes a self-declared read set trustworthy.
@@ -2010,6 +2125,7 @@ mod tests {
         walk::bridge_declared_knobs(&env);
         let mut cases_run = 0usize;
         let mut roots_observed = 0usize;
+        let mut prunes_held = 0usize;
         for (name, _, declared, _, _, _) in REGISTRY {
             // spec: gate-sdk/SPEC.md §check-reads-couples — resolved through `knobs`, not off the
             // tuple, so a member declaring the union sentinel is bridged the expansion the
@@ -2031,8 +2147,55 @@ mod tests {
                     name,
                     case.display()
                 );
-                if let Err(e) = declaration_covers("walked", declared, &run.walked) {
+                // spec: gate-sdk/SPEC.md §check-reads-couples — a declared root names the *deployed*
+                // invocation's root, which the generated hook dispatches with no trailing argv; a
+                // case passing a positional relocates that same walk to a case-local anchor
+                let relocated = relocations(&case_args(&case));
+                // spec: gate-sdk/SPEC.md §The path-dialect contract — `./docs` and `docs` are one
+                // root, so both sides of the comparison are spelled the way a declaration spells it
+                let walked: Vec<String> =
+                    run.walked.iter().map(|r| normalize_root(r)).collect();
+                if let Err(e) =
+                    declaration_covers_relocated("walked", declared, &walked, &relocated)
+                {
                     panic!("{} on {}: {}", name, case.display(), e);
+                }
+                // spec: gate-sdk/SPEC.md §check-reads-couples — the prune half runs in the inverse
+                // direction to the roots': a declared prune narrows the demand, so the risk is
+                // declaring one the walk does not apply — **declared ⊆ observed**
+                for (r, fspec, pspec) in declared.iter() {
+                    // spec: gate-sdk/SPEC.md §check-reads-couples — a guarded branch the case's own
+                    // configuration does not select describes a walk that did not run, so it applied
+                    // no prune. The resolver skips such a declaration for the same reason.
+                    if filter_guard(fspec)
+                        .0
+                        .is_some_and(|sel| {
+                            std::env::var(format!("GATE_SDK_KNOB_{}", sel))
+                                .is_ok_and(|v| !v.is_empty())
+                        })
+                    {
+                        continue;
+                    }
+                    // spec: gate-sdk/SPEC.md §check-reads-couples — and a case that ran the walk is
+                    // the only case that can hold its prune: an invocation taking a file list instead
+                    // of a root walks nothing, so there is nothing to be held to
+                    if !walked.iter().any(|o| o == r) {
+                        continue;
+                    }
+                    for g in pspec.split(',').filter(|g| !g.is_empty()) {
+                        prunes_held += 1;
+                        assert!(
+                            run.pruned.iter().any(|o| o == g),
+                            "{} on {} declares root '{}' pruning '{}', but its walk applied no such \
+                             prune — a declared prune narrows the coverage demand, so an unapplied \
+                             one hides exactly the gap this gate exists to catch (observed: {:?})",
+                            name,
+                            case.display(),
+                            r,
+                            g,
+                            run.pruned
+                        );
+                    }
                 }
                 cases_run += 1;
                 roots_observed += run.walked.len();
@@ -2042,6 +2205,13 @@ mod tests {
         assert!(
             roots_observed > 0,
             "no member walked anything — the subset assertion above held over nothing"
+        );
+        // spec: gate-sdk/SPEC.md §check-reads-couples — the prune half cannot pass by holding over
+        // nothing: a declared prune is the one form here whose failure direction is under-demand
+        assert!(
+            prunes_held > 0,
+            "no declared prune was held to an executed walk — read the prune half as unverified \
+             rather than as clean, because an unheld narrowing is what it exists to refuse"
         );
     }
 
@@ -2092,6 +2262,7 @@ mod tests {
         rc: i32,
         walked: Vec<String>,
         spawned: Vec<String>,
+        pruned: Vec<String>,
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a case directory is set on a spawn and never entered,
@@ -2127,6 +2298,7 @@ mod tests {
         let mut rcs: Vec<i32> = Vec::new();
         let mut walked: Vec<String> = Vec::new();
         let mut spawned: Vec<String> = Vec::new();
+        let mut pruned: Vec<String> = Vec::new();
         for line in output.lines() {
             let Some(rest) = line.strip_prefix(&prefix) else {
                 continue;
@@ -2134,6 +2306,7 @@ mod tests {
             match rest.split_once('\t') {
                 Some(("walked", root)) => walked.push(root.to_string()),
                 Some(("spawned", program)) => spawned.push(program.to_string()),
+                Some(("pruned", glob)) => pruned.push(glob.to_string()),
                 Some(("exit", code)) => rcs.push(
                     code.parse()
                         .unwrap_or_else(|_| panic!("unparseable exit line: {}", line)),
@@ -2156,6 +2329,7 @@ mod tests {
             rc: rcs[0],
             walked,
             spawned,
+            pruned,
         }
     }
 
@@ -2180,6 +2354,7 @@ mod tests {
         crate::proc::recorder::start();
         let rc = (entry.1)(&args);
         let spawned = crate::proc::recorder::stop();
+        let pruned = walk::recorder::stop_prunes();
         let walked = walk::recorder::stop();
         // spec: gate-sdk/SPEC.md §lib/gate.sh — the block opens on a newline, so a member's
         // unterminated last line cannot absorb the first sentinel
@@ -2189,6 +2364,9 @@ mod tests {
         }
         for program in spawned {
             block.push_str(&format!("{}\tspawned\t{}\n", OBSERVER_SENTINEL, program));
+        }
+        for glob in pruned {
+            block.push_str(&format!("{}\tpruned\t{}\n", OBSERVER_SENTINEL, glob));
         }
         block.push_str(&format!("{}\texit\t{}\n", OBSERVER_SENTINEL, rc));
         use std::io::Write;
@@ -2212,5 +2390,314 @@ mod tests {
             .flat_map(str::split_whitespace)
             .map(String::from)
             .collect()
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — every entry point whose *first* argument is a
+    // **recursive** walk's root. `list_dir` is absent for the reason it is absent from the recorder:
+    // the invariant is over a recursive walk and a single-level listing descends nothing.
+    const ROOT_ENTRY_POINTS: &[&str] = &[
+        "find_files",
+        "find_named",
+        "find_with_prune",
+        "find_link_entries_with_prune",
+        "glob_files",
+        "manifest_files",
+        "manifest_files_sorted_stripped",
+        "canonical_specs",
+        "canonical_specs_sorted",
+        "amendments",
+        "amendments_strict",
+        "comment_surface",
+        "governed_docs",
+        "prune_kit_roots",
+    ];
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — value-preserving wrappers a root passes through
+    const ROOT_WRAPPERS: &[&str] = &[
+        "Path::new",
+        "PathBuf::from",
+        "fresh::strip_trailing_slash",
+        "strip_trailing_slash",
+        "spec::strip_dot_slash",
+        "strip_dot_slash",
+    ];
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — value-preserving method tails, same reason
+    const ROOT_TAILS: &[&str] = &[
+        ".as_str()",
+        ".to_string()",
+        ".clone()",
+        ".as_path()",
+        ".display().to_string()",
+        ".trim_end_matches('/')",
+        ".trim_start_matches(\"./\")",
+        ".to_owned()",
+    ];
+
+    fn ident_char(c: char) -> bool {
+        c.is_ascii_alphanumeric() || c == '_'
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — one expression's text: up to the first top-level
+    // comma, semicolon or unmatched closer, with string literals skipped so a comma inside one does
+    // not cut it. Shared by the call-argument reader and the `let`-binding reader.
+    fn first_arg(after_open: &str) -> Option<&str> {
+        let b = after_open.as_bytes();
+        let (mut depth, mut i, mut quote) = (0i32, 0usize, 0u8);
+        while i < b.len() {
+            let c = b[i];
+            if quote != 0 {
+                if c == b'\\' {
+                    i += 2;
+                    continue;
+                }
+                if c == quote {
+                    quote = 0;
+                }
+                i += 1;
+                continue;
+            }
+            match c {
+                b'"' | b'\'' => quote = c,
+                b'(' | b'[' | b'{' => depth += 1,
+                b')' | b']' | b'}' => {
+                    if depth == 0 {
+                        return Some(&after_open[..i]);
+                    }
+                    depth -= 1;
+                }
+                b',' | b';' if depth == 0 => return Some(&after_open[..i]),
+                _ => {}
+            }
+            i += 1;
+        }
+        None
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — a root spelled repo-relative the way a
+    // declaration spells it, so a resolved root and a declared one compare by equality
+    fn normalize_root(lit: &str) -> String {
+        let t = lit.trim_start_matches("./").trim_end_matches('/');
+        if t.is_empty() { ".".to_string() } else { t.to_string() }
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the first `let <id> …= <expr>;` binding in the
+    // module, at any depth: an identifier reaching a walk in one function is bound in another
+    fn bindings_of<'a>(id: &str, text: &'a str) -> Vec<&'a str> {
+        let mut out: Vec<&'a str> = Vec::new();
+        for pat in [format!("let {} ", id), format!("let mut {} ", id), format!("let {}:", id)] {
+            let mut from = 0usize;
+            while let Some(at) = text[from..].find(&pat) {
+                let start = from + at;
+                from = start + pat.len();
+                let Some(eq) = text[start..].find('=') else { continue };
+                let rest = &text[start + eq + 1..];
+                if let Some(end) = first_arg(rest) {
+                    out.push(end);
+                }
+            }
+        }
+        out
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — delta 1's predicate implemented as a *property*
+    // test: does this expression resolve to a literal path without running the gate? Every form it
+    // cannot evaluate answers `None`, which is why the assertion below cannot false-fire upward.
+    fn resolve_static(expr: &str, text: &str, depth: usize) -> Option<String> {
+        if depth > 8 {
+            return None;
+        }
+        // spec: gate-sdk/SPEC.md §check-reads-couples — a method chain broken across lines is one
+        // expression, so the space a line break leaves before its `.` is removed rather than kept
+        let flat = expr.split_whitespace().collect::<Vec<_>>().join(" ").replace(" .", ".");
+        let mut e = flat.trim().to_string();
+        while e.starts_with('&') || e.starts_with('*') {
+            e = e[1..].trim().to_string();
+        }
+        e = e.trim_end_matches('?').trim().to_string();
+        if e.len() >= 2 && e.starts_with('"') && e.ends_with('"') && !e[1..e.len() - 1].contains('"')
+        {
+            return Some(e[1..e.len() - 1].to_string());
+        }
+        for w in ROOT_WRAPPERS {
+            if let Some(rest) = e.strip_prefix(&format!("{}(", w)) {
+                return first_arg(rest).and_then(|a| resolve_static(a, text, depth + 1));
+            }
+        }
+        for t in ROOT_TAILS {
+            if let Some(head) = e.strip_suffix(t) {
+                return resolve_static(head, text, depth + 1);
+            }
+        }
+        // spec: gate-sdk/SPEC.md §check-reads-couples — the positional-root helper and the four
+        // hand-spelled argv idioms beside it: an argument whose default is a literal resolves to
+        // that literal, because the generated hook dispatches with no trailing argv
+        for p in ["fresh::positional(", "positional("] {
+            if let Some(rest) = e.strip_prefix(p) {
+                let mut args = rest;
+                for _ in 0..2 {
+                    let a = first_arg(args)?;
+                    args = &args[a.len() + 1..];
+                }
+                return first_arg(args).and_then(|d| resolve_static(d, text, depth + 1));
+            }
+        }
+        if e.contains("args.") || e.starts_with("match ") {
+            for tail in ["unwrap_or(", "unwrap_or_else(|| "] {
+                if let Some(at) = e.rfind(tail) {
+                    let inner = &e[at + tail.len()..];
+                    if let Some(a) = first_arg(inner) {
+                        if let Some(r) = resolve_static(a, text, depth + 1) {
+                            return Some(r);
+                        }
+                    }
+                }
+            }
+            if let Some(at) = e.find("None =>") {
+                let arm = &e[at + "None =>".len()..];
+                if let Some(a) = first_arg(arm) {
+                    if let Some(r) = resolve_static(a, text, depth + 1) {
+                        return Some(r);
+                    }
+                }
+            }
+            return None;
+        }
+        if let Some(rest) = e.strip_prefix("format!(") {
+            return resolve_format(rest, text, depth);
+        }
+        if !e.is_empty() && e.chars().all(ident_char) {
+            if let Some(c) = const_literal(&e, text) {
+                return Some(c);
+            }
+            for b in bindings_of(&e, text) {
+                if let Some(r) = resolve_static(b, text, depth + 1) {
+                    return Some(r);
+                }
+            }
+        }
+        None
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — a `const NAME: &str = "…";` the crate owns, which
+    // is as statically known as an inline literal
+    fn const_literal(name: &str, text: &str) -> Option<String> {
+        let at = text.find(&format!("const {}:", name))?;
+        let eq = text[at..].find('=')?;
+        let arg = first_arg(&text[at + eq + 1..])?;
+        let t = arg.trim();
+        if t.len() >= 2 && t.starts_with('"') && t.ends_with('"') {
+            return Some(t[1..t.len() - 1].to_string());
+        }
+        None
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — a root composed by `format!` resolves only when
+    // every operand does, which is what keeps a knob-valued path component out of the population
+    fn resolve_format(rest: &str, text: &str, depth: usize) -> Option<String> {
+        let tmpl = first_arg(rest)?.trim().to_string();
+        if !(tmpl.starts_with('"') && tmpl.ends_with('"')) {
+            return None;
+        }
+        let mut args = &rest[tmpl.len() + 1..];
+        let mut parts: Vec<String> = Vec::new();
+        while let Some(a) = first_arg(args) {
+            if a.trim().is_empty() {
+                break;
+            }
+            parts.push(resolve_static(a, text, depth + 1)?);
+            if args.len() <= a.len() {
+                break;
+            }
+            args = &args[a.len() + 1..];
+        }
+        let body = &tmpl[1..tmpl.len() - 1];
+        let mut out = String::new();
+        let mut used = 0usize;
+        for (i, seg) in body.split("{}").enumerate() {
+            if i > 0 {
+                out.push_str(parts.get(used)?);
+                used += 1;
+            }
+            out.push_str(seg);
+        }
+        Some(out)
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the module's own rule text, with its `#[cfg(test)]`
+    // block and its comments removed: a literal in either is not a root the deployed gate walks
+    fn rule_text(src: &str) -> String {
+        let body = match src.find("#[cfg(test)]\nmod tests {") {
+            Some(at) => &src[..at],
+            None => src,
+        };
+        body.lines()
+            .filter(|l| !l.trim_start().starts_with("//"))
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — every statically resolvable walk root in one
+    // module, per walk rather than per module: a member may walk several roots of different shapes
+    fn static_roots(text: &str) -> Vec<String> {
+        let mut out: Vec<String> = Vec::new();
+        for name in ROOT_ENTRY_POINTS {
+            let needle = format!("{}(", name);
+            let mut from = 0usize;
+            while let Some(at) = text[from..].find(&needle) {
+                let start = from + at;
+                from = start + needle.len();
+                if start > 0 && text[..start].chars().next_back().is_some_and(ident_char) {
+                    continue;
+                }
+                let Some(arg) = first_arg(&text[from..]) else { continue };
+                if let Some(lit) = resolve_static(arg, text, 0) {
+                    let r = normalize_root(&lit);
+                    if !out.contains(&r) {
+                        out.push(r);
+                    }
+                }
+            }
+        }
+        out.sort();
+        out
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — unit test C, the refusal: `?` is not an available
+    // answer for a walk whose root resolves statically. Per walk, never per member — a member with
+    // one resolvable and one unresolvable walk declares the first and keeps `?` for the second.
+    #[test]
+    fn no_member_answers_a_statically_resolvable_walk_root_with_a_question_mark() {
+        assert!(!REGISTRY.is_empty(), "no member to assert over");
+        let src_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/gates");
+        let mut offenders: Vec<String> = Vec::new();
+        let mut resolved = 0usize;
+        for (name, _, declared, _, _, _) in REGISTRY {
+            let module = src_dir.join(format!("{}.rs", name.trim_start_matches("check-").replace('-', "_")));
+            let raw = std::fs::read_to_string(&module)
+                .unwrap_or_else(|e| panic!("cannot read {}: {}", module.display(), e));
+            for root in static_roots(&rule_text(&raw)) {
+                resolved += 1;
+                if !declared.iter().any(|(d, _, _)| *d == root) {
+                    offenders.push(format!(
+                        "{} walks the statically resolvable root '{}' but its registry entry \
+                         declares {:?}",
+                        name, root, declared
+                    ));
+                }
+            }
+        }
+        assert!(
+            resolved > 0,
+            "no module resolved a static root — the refusal below held over nothing, so read it \
+             as unverified rather than as clean"
+        );
+        assert!(
+            offenders.is_empty(),
+            "'?' means a root that cannot be bounded statically, and a resolvable root claiming it \
+             is the foreclosed opt-out moved into the registry — declare the root (and the knob or \
+             kit literal that bounds its walk) instead:\n  {}",
+            offenders.join("\n  ")
+        );
     }
 }

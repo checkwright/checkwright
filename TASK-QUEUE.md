@@ -12,45 +12,6 @@
 
 ## New Features
 
-- **couples-dynamic-root-resolution** [spec: SPEC-reads-root-default.md] — the skipped-and-counted
-  bucket is where trigger-drift hides, and its dominant subset is decidable.
-  **The substrate was corrected at spec, and the entry's own premise moved with it.** The bullet
-  described `check-reads-couples`' SHELL root resolver — a bare quoted literal, a KIT-prefixed and a
-  REPO_ROOT-prefixed token, nothing else — and that path is **dead on this corpus**: no gate script
-  remains in the tree, so all of the skips arrive on the registry path, from `("?", "")` tuples in
-  `native/src/gates/mod.rs`. Extending the shell parser would extend dead code. What survives
-  untouched is the substance: the decidable subset is still *a root that is an argument with a
-  literal default*, which is what `native/src/gates/mod.rs`'s own comment says the `?` population
-  is, and the crate spells it `args.first().map(String::as_str).unwrap_or(".")`.
-  **Re-measured at spec, because the bullet's figure was a month stale.** The gate reads
-  **2 resolvable walk(s) covered against 63 undecidable skipped-and-counted across 113 gates**,
-  where 2026-08-14 read 0 against 37 — so the unreviewed bucket grew by ~70% while nothing reviewed
-  it. The 63 sit across 59 members; both resolvable roots are `check-stage-entry`'s, declared as `.`
-  under two filter-knob names. **26 of the 59 carry the decidable shape**, uniform, one line each.
-  **The assertion-D instance LANDED and is verified still landed at spec**:
-  `check-gate-substrate-parity`'s descriptor reads `couples=…,native/*,…` and the generated hook
-  guards it with `staged_matches … 'native/*' …`, where bash `*` crosses `/`, so a crate-source edit
-  does re-fire the gate. Kept as a reading trap: the entry read as a live hole after it
-  closed.
-  **Authored at spec: `?` stops being an available answer for the literal-default shape**, as a
-  refusal rather than a source parser (the substrate answers, it may not answer `?` for a root it
-  can bound), each moved root declares the knob naming its scan pattern, and the 33-member remainder
-  takes an event-keyed row on `.workflow/audit-roster.txt` rather than a printed counter. Grounds,
-  the refused widening and the two set-aside cadences at SPEC-reads-root-default.md deltas 1 to 4.
-  **The two units are one mechanism, which is why neither lands alone:** once a canon-kit member
-  declares its root under `CANON_KIT_MANIFEST_FILES`, the coverage assertion demands its couples
-  cover that knob's members, and the only seam-legal way to satisfy that red is the sibling's
-  `knob:` token. This gate is what forces the token rather than merely permitting it.
-  **Cost while deferred** was: every gate whose walk root is undeclared is uncoupled and silently
-  under-triggered, with no way to tell which, and nothing reviews the bucket — so the next such hole
-  is found the way assertion D's was, by someone noticing.
-  **This iteration's unit set, with `manifest-family-couples-misses-the-consumer-widened-corpus` —
-  operator direction, 2026-09-12 (lead-relayed), naming the iteration `couples-resolver-reach`.**
-  The pair was chosen over the lead entry alone because both candidate fix sets extend the same
-  resolver, so one design pass answers both. A direction, revisable at a later scope or spec.
-  Filed 2026-08-03 at close from the gap inbox, merging the assertion-D instance into its
-  class; both found by build batch 2. Promoted at this spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -5210,6 +5171,7 @@
 
 ## Done
 
+- couples-dynamic-root-resolution
 - manifest-family-couples-misses-the-consumer-widened-corpus
 - always-loaded-baseline-freshness
 

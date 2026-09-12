@@ -94,6 +94,14 @@ CANON_KIT_PROSE_SURFACE_GLOBS=(
     ".claude/agents/*.md"
 )
 
+# comment-tier-exempt: this repo's governed-source surface, set so the corpus arrives through the knob the descriptors couple to rather than through the kit's default branch — the globs are depth-enumerated per extension rather than spelled `**`, because the coverage reader's filter matcher supports `**` and the couples matcher does not, so a `**` value would demand coverage its own `knob:` token could not offer; the corpus is two to five segments deep, leaving one level of headroom, and a source six levels down would escape this value silently. That fragility is real and is not new: CANON_KIT_MANIFEST_FILES above reasons identically ("single-level globs skip the gate-tests/ fixtures the finder pruned"), so depth-bounded globbing is established practice here and what is owed is a disposition on the class rather than on this value. Verified corpus-identical to the kit default branch by both gates' own report lines (421 governed sources, 3883 directive pointers) with the knob set and unset, so setting it changes no gate's corpus
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_COMMENT_SURFACE=(
+    "*.sh" "*/*.sh" "*/*/*.sh" "*/*/*/*.sh" "*/*/*/*/*.sh"
+    "*.gate" "*/*.gate" "*/*/*.gate" "*/*/*/*.gate" "*/*/*/*/*.gate"
+    "*.rs" "*/*.rs" "*/*/*.rs" "*/*/*/*.rs" "*/*/*/*/*.rs"
+)
+
 # comment-tier-exempt: this repo's reader-facing prose surfaces for check-prose-tells — the hand-authored top-level docs living pages only; the single-level docs/*.md glob deliberately excludes the generated kit mirror (docs/<kit>/) and the immutable dated posts (docs/posts/), since a prose gate forcing edits to generated or immutable pages contradicts them; consumer editorial scope, never a kit literal (the provenance seam)
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_PROSE_TELL_GLOBS=(docs/*.md)

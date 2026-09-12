@@ -73,9 +73,12 @@ if grep -qF -- 'corpus/sub/other.txt' <<<"$out"; then
 fi
 
 # C — a root the member cannot bound statically. It is counted, never assumed empty: the clean
-# line reports it in the same skip counter the shell arm's unresolvable roots use.
-make_case unbounded check-action-pinning.gate "$MANIFEST_NARROW"
-run_case unbounded check-action-pinning.gate 0 '1 undecidable walk(s) skipped-and-counted'
+# line reports it in the same skip counter the shell arm's unresolvable roots use. The member named
+# here must be one whose root genuinely does not resolve: `check-path-dialect` walks the crate source
+# tree, whose location is a knob's value. It replaces `check-action-pinning`, which the
+# statically-resolvable-root refusal moved off `?` — a fixture whose premise the rule retired.
+make_case unbounded check-path-dialect.gate "$MANIFEST_NARROW"
+run_case unbounded check-path-dialect.gate 0 '1 undecidable walk(s) skipped-and-counted'
 
 # D — a descriptor claiming the removed opt-out. There is deliberately no descriptor-level
 # exemption, so the uncovered read is still a finding: the line buys nothing.

@@ -834,6 +834,31 @@ states the ground.
   source (§check-comment-tier). Which finder a gate uses is kit contract, not
   consumer config — a consumer wanting the old blanket exemption shadows the
   gate.
+  **The configured branch narrows exactly as the default branch does, and did not.**
+  When `CANON_KIT_COMMENT_SURFACE` is set the surface is drawn from that knob's globs
+  instead of the extension walk — but the knob selects which *files* the corpus is drawn
+  from and nothing else, so every narrowing past that point belongs to the corpus rather
+  than to one branch. Returning early from the configured branch skipped five of them:
+  the `templates/` rule and its parameter above, the kit-root prune, the byte sort, the
+  **workflow tier** — which §check-spec-pointer requires, so a consumer who set the knob
+  silently lost the whole `.workflow/` tracked tier — and **the walker's own prune set**,
+  because the glob walk is bash-faithful and prunes nothing where the extension walk
+  prunes `GATE_PRUNE_DIRS`. That last one is the cause of the directory-shape explosion
+  a configured value otherwise has to enumerate around, and it is worth naming because
+  the cause was first attributed to the kit-root prune — which cannot have been it, being
+  a no-op wherever `CANON_KIT_SCAN_KIT_ROOTS=1`. A later reader inheriting that
+  attribution would fix the wrong arm and see no change. The knob is a corpus
+  *selector*, never a corpus *replacement* with its own semantics.
+- **The canonical-spec finder prunes the generated on-site mirror**, as a directory
+  prune beside the `templates/` one it already applies. A prose gate grading a generated
+  page is unfixable at the file — the repair is to the source and the regeneration — so
+  the finding can only be absorbed or ignored, which is the reasoning this tree already
+  states for a sibling knob at `scripts/canon-config.sh`. Applied inside the kit
+  mechanism the ground is stronger than editorial scope: the mirror is excluded because
+  it is **generated**, and the generator is the kit's own. The two narrowings are one
+  prune list, read by the walk and by the member's registry declaration from one place,
+  because a declared prune narrows a coverage demand and two spellings could disagree
+  about it (gate-sdk/SPEC.md §check-reads-couples).
 - **The amendment finder** `spec_amendments`, the amendment-glob counterpart of
   `spec_canonical_specs` above. Its last shell caller left at §The sixth budget
   batch (gate-sdk/SPEC.md), and the function stays: the dead-twin disposition

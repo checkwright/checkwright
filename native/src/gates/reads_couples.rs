@@ -167,6 +167,153 @@ fn path_matches_glob(path: &str, glob: &str) -> bool {
 }
 
 
+// spec: gate-sdk/SPEC.md §check-reads-couples — a declared root's filter, resolved: the field
+// omitted is a *positive* declaration of an unfiltered walk, and a resolved-empty pattern set
+// selects nothing rather than everything
+enum Filter {
+    Unfiltered,
+    Patterns(Kind, Vec<String>),
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the three matching disciplines the crate's walk entry
+// points take, which is what the field's kind prefix names. No fourth, because there is no fourth
+// entry-point shape for one to stand for.
+enum Kind {
+    Glob,
+    Name,
+    Ext,
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — one filter token put to a file exactly as the walker
+// the kind names puts it: `glob_files`' root-relative component match, `find_named`/`-name`'s
+// basename match, or `find_files`' extension test
+fn filter_token_selects(kind: &Kind, tok: &str, root: &str, path: &str) -> bool {
+    match kind {
+        Kind::Ext => path.contains('.') && path.rsplit('.').next() == Some(tok),
+        Kind::Name => walk::pattern_match(tok, path.rsplit('/').next().unwrap_or(path)),
+        Kind::Glob => {
+            let rel = match root {
+                "." => path,
+                r => path.strip_prefix(&format!("{}/", r)).unwrap_or(path),
+            };
+            glob_path_match(tok, rel)
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the declared filter field resolved to its patterns:
+// omitted is unfiltered, `lit:<list>` is the kit's own literal, and a knob name is that knob's
+// members. An unsatisfied `else:` guard resolves to `None` — a walk this tree does not take.
+fn resolve_filter(
+    gname: &str,
+    root: &str,
+    spec: &str,
+) -> Result<Option<(Filter, String)>, String> {
+    if spec.is_empty() {
+        return Ok(Some((
+            Filter::Unfiltered,
+            format!("declared read root '{}', unfiltered (--reads)", root),
+        )));
+    }
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the guard is evaluated against the *resolved*
+    // selector, so which branch a consumer takes is read at run time and no descriptor carries it
+    if let (Some(sel), _) = gates::filter_guard(spec) {
+        let raw = std::env::var(format!("GATE_SDK_KNOB_{}", sel)).map_err(|_| {
+            format!(
+                "{} declares read root '{}' guarded by knob {}, which the config bridge could not \
+                 resolve — the branch could not be decided; treating as failure (not clean)",
+                gname, root, sel
+            )
+        })?;
+        if !raw.is_empty() {
+            return Ok(None);
+        }
+    }
+    let rest = gates::filter_guard(spec).1;
+    // spec: gate-sdk/SPEC.md §check-reads-couples — a field carrying no kind prefix is a basename
+    // pattern, the meaning the field had before the prefix existed
+    let kind = match rest.split_once(':').map(|(k, _)| k) {
+        Some("glob") => Kind::Glob,
+        Some("ext") => Kind::Ext,
+        _ => Kind::Name,
+    };
+    let Some(knob) = gates::filter_knob(spec) else {
+        let list = gates::filter_source(spec).trim_start_matches("lit:");
+        let pats: Vec<String> =
+            list.split(',').filter(|p| !p.is_empty()).map(String::from).collect();
+        return Ok(Some((
+            Filter::Patterns(kind, pats),
+            format!(
+                "declared read root '{}' filtered by the kit literal '{}' (--reads)",
+                root, list
+            ),
+        )));
+    };
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a named knob the bridge did not carry is exit 2,
+    // never an empty filter silently widening the demand to the whole root: "cannot resolve", "no
+    // filter" and "resolved empty" must not share a verdict
+    let raw = std::env::var(format!("GATE_SDK_KNOB_{}", knob)).map_err(|_| {
+        format!(
+            "{} declares read root '{}' filtered by knob {}, which the config bridge could not \
+             resolve — the coverage assertion could not run; treating as failure (not clean)",
+            gname, root, knob
+        )
+    })?;
+    let mut pats: Vec<String> = Vec::new();
+    if !raw.is_empty() {
+        let els: Vec<&str> = raw.split('\t').collect();
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridge's own discriminator for a keyed knob:
+        // every element is `<key>=<value>`, and it is the value that bounds the walk
+        let keyed = els.iter().all(|e| e.contains('='));
+        for e in els {
+            let v = if keyed { e.split_once('=').map(|(_, v)| v).unwrap_or(e) } else { e };
+            pats.extend(v.split_whitespace().map(String::from));
+        }
+    }
+    Ok(Some((
+        Filter::Patterns(kind, pats),
+        format!(
+            "declared read root '{}' filtered by {}='{}' (--reads)",
+            root, knob, raw
+        ),
+    )))
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — a tracked file sits under a declared prune when any
+// of its ancestor directories matches a prune glob, which is the same test the walk applies while
+// descending (`walk::dir_prune_matches`), read against the path instead of the directory
+fn under_declared_prune(root: &str, path: &str, prune_globs: &[String]) -> bool {
+    let rel = match root {
+        "." => path,
+        r => path.strip_prefix(&format!("{}/", r)).unwrap_or(path),
+    };
+    let comps: Vec<&str> = rel.split('/').collect();
+    (1..comps.len()).any(|n| {
+        let dir = comps[..n].join("/");
+        prune_globs.iter().any(|g| glob_path_match(g, &dir))
+    })
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — `walk::glob_files`' own component-wise match, `**`
+// included, so a declared glob selects exactly the files the walk it stands for selects
+fn glob_path_match(glob: &str, path: &str) -> bool {
+    let gs: Vec<&str> = glob.split('/').filter(|c| !c.is_empty()).collect();
+    let ps: Vec<&str> = path.split('/').filter(|c| !c.is_empty()).collect();
+    glob_walk(&gs, &ps)
+}
+
+fn glob_walk(gs: &[&str], ps: &[&str]) -> bool {
+    match (gs.first(), ps.first()) {
+        (None, None) => true,
+        (None, Some(_)) => false,
+        (Some(&"**"), _) => {
+            glob_walk(&gs[1..], ps) || (!ps.is_empty() && glob_walk(gs, &ps[1..]))
+        }
+        (Some(_), None) => false,
+        (Some(g), Some(p)) => walk::pattern_match(g, p) && glob_walk(&gs[1..], &ps[1..]),
+    }
+}
+
 struct Ctx {
     prune: Vec<String>,
     findings: Vec<String>,
@@ -177,7 +324,8 @@ struct Ctx {
 struct Demand<'a> {
     root: &'a str,
     prune: bool,
-    namepat: &'a str,
+    filter: &'a Filter,
+    declared_prune: &'a [String],
     gname: &'a str,
     where_: &'a str,
     globs: &'a [String],
@@ -188,8 +336,8 @@ impl Ctx {
     // spec: gate-sdk/SPEC.md §check-reads-couples — the per-root coverage assertion, shared by both
     // substrates: a root the parse resolved and a root the registry reported land here identically
     fn cover_root(&mut self, d: &Demand) -> Result<(), String> {
-        let (root, prune, namepat, gname, where_, globs, couples) =
-            (d.root, d.prune, d.namepat, d.gname, d.where_, d.globs, d.couples);
+        let (root, prune, gname, where_, globs, couples) =
+            (d.root, d.prune, d.gname, d.where_, d.globs, d.couples);
         let listing = if root == "." {
             proc::run("git", &["ls-files"])
         } else {
@@ -206,9 +354,13 @@ impl Ctx {
             if prune && walk::path_pruned(f, &self.prune) {
                 continue;
             }
-            if !namepat.is_empty() {
-                let base = f.rsplit('/').next().unwrap_or(f);
-                if !walk::pattern_match(namepat, base) {
+            // spec: gate-sdk/SPEC.md §check-reads-couples — a file under a declared-pruned directory
+            // is one the walk never reached, so it is not part of the demand
+            if !d.declared_prune.is_empty() && under_declared_prune(root, f, d.declared_prune) {
+                continue;
+            }
+            if let Filter::Patterns(kind, pats) = d.filter {
+                if !pats.iter().any(|t| filter_token_selects(kind, t, root, f)) {
                     continue;
                 }
             }
@@ -325,37 +477,30 @@ fn rule(args: &[String]) -> Result<i32, String> {
                     src, gname
                 )
             })?;
-            for (root, fknob) in roots {
+            for (root, fspec, pspec) in roots {
                 // spec: gate-sdk/SPEC.md §check-reads-couples — '?' is the substrate's own honesty
                 // marker, counted by the same skip counter the shell arm's unresolvable roots use
                 if *root == "?" {
                     skipped += 1;
                     continue;
                 }
-                let mut namepat = String::new();
-                let mut where_ = format!("declared read root '{}' (--reads)", root);
-                if !fknob.is_empty() {
-                    // spec: gate-sdk/SPEC.md §Fail-closed contract — a named knob the bridge did
-                    // not carry is exit 2, never an empty filter silently widening the demand to
-                    // the whole root: "cannot resolve" and "no filter" must not share a verdict
-                    namepat = std::env::var(format!("GATE_SDK_KNOB_{}", fknob)).map_err(|_| {
-                        format!(
-                            "{} declares read root '{}' filtered by knob {}, which the config \
-                             bridge could not resolve — the coverage assertion could not run; \
-                             treating as failure (not clean)",
-                            gname, root, fknob
-                        )
-                    })?;
-                    where_ = format!(
-                        "declared read root '{}' filtered by {}='{}' (--reads)",
-                        root, fknob, namepat
-                    );
-                }
+                // spec: gate-sdk/SPEC.md §check-reads-couples — a guarded branch the consumer's
+                // configuration does not select is not a walk this tree performs, so it is neither
+                // analyzed nor skipped-and-counted: there is nothing undecided about it
+                let Some((filter, where_)) = resolve_filter(&gname, root, fspec)? else {
+                    continue;
+                };
+                // spec: gate-sdk/SPEC.md §check-reads-couples — the member's own declared prune,
+                // honoured exactly as the global set is: a walk's third dimension is where it refuses
+                // to descend, and a demand over a subtree its own walk skips is that same failure
+                let declared_prune: Vec<String> =
+                    pspec.split(',').filter(|g| !g.is_empty()).map(String::from).collect();
                 analyzed += 1;
                 ctx.cover_root(&Demand {
                     root,
                     prune: true,
-                    namepat: &namepat,
+                    filter: &filter,
+                    declared_prune: &declared_prune,
                     gname: &gname,
                     where_: &where_,
                     globs: &globs,
@@ -377,11 +522,21 @@ fn rule(args: &[String]) -> Result<i32, String> {
             };
             analyzed += 1;
             let namepat = name_pattern(&w.raw);
+            // spec: gate-sdk/SPEC.md §check-reads-couples — the shell arm's extracted `-name` primary
+            // is one pattern where the registry arm's field is a set; both reach one matcher
+            let filter = if namepat.is_empty() {
+                Filter::Unfiltered
+            } else {
+                Filter::Patterns(Kind::Name, vec![namepat])
+            };
             let where_ = format!("recursive walk over '{}' (line {})", root, w.lno);
             ctx.cover_root(&Demand {
                 root: &root,
                 prune: w.prune,
-                namepat: &namepat,
+                filter: &filter,
+                // spec: gate-sdk/SPEC.md §check-reads-couples — the shell arm parses a walk rather
+                // than reading a declaration, so there is no declared prune to honour for it
+                declared_prune: &[],
                 gname: &gname,
                 where_: &where_,
                 globs: &globs,

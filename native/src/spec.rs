@@ -131,17 +131,19 @@ pub fn prune_kit_roots(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, 
         .collect())
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_canonical_specs`: the SPEC-name find,
-// `templates/`-filtered and kit-root pruned. Lifted out of `manifest_files`' default branch
-// below rather than written twice, so the two sets cannot disagree about which specs exist.
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_canonical_specs`: the SPEC-name find, directory-pruned
+// and kit-root pruned. Lifted out of `manifest_files`' default branch rather than written twice.
 pub fn canonical_specs(root: &str) -> Result<Vec<PathBuf>, String> {
     let spec_name = knob("CANON_KIT_SPEC_NAME")?;
-    let specs = walk::find_named(Path::new(root), &[spec_name.as_str()])?
-        .into_iter()
-        .filter(|p| !under_templates(&p.display().to_string()))
-        .collect();
+    let prune: Vec<String> = CANON_SPEC_PRUNE.iter().map(|s| s.to_string()).collect();
+    let specs = walk::find_named_pruning(Path::new(root), &[spec_name.as_str()], &prune)?;
     prune_kit_roots(root, specs)
 }
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — this walk's two narrowings, as the directory prune both of
+// them are: `templates/` stubs at any depth, and the generated on-site mirror one level under the
+// site directory. Read by both the walk and the member's registry declaration from here.
+pub const CANON_SPEC_PRUNE: &[&str] = &["**/templates", "docs/*"];
 
 // spec: canon-kit/SPEC.md §lib/spec.sh — `spec_amendments`: the amendment-glob find,
 // `templates/`-filtered and kit-root pruned, selecting by a glob on the basename where
@@ -231,17 +233,25 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
 // spec: canon-kit/SPEC.md §lib/spec.sh — `_spec_comment_surface`: the governed-source corpus
 // across all four of its arms, with `templates/` kept for the tier gate and pruned for the
 // three members that read it as placeholder-by-design
+// spec: canon-kit/SPEC.md §lib/spec.sh — the knob selects which *files* the corpus is drawn from and
+// nothing else, so every arm past that point is the corpus's definition rather than one branch's and
+// both branches pass through all five of them
 pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, String> {
     let rootp = Path::new(root);
     let globs = knob_array("CANON_KIT_COMMENT_SURFACE")?;
-    if !globs.is_empty() {
-        return Ok(walk::glob_files(rootp, &globs)?
+    let selected: Vec<PathBuf> = if globs.is_empty() {
+        walk::find_files(rootp, &["sh", "gate", "rs"])?
+    } else {
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — `glob_files` is bash-faithful and prunes
+        // nothing, so the prune set is applied to its result here rather than left to the glob: the
+        // two branches must reach one corpus, and a configured one that walked `target/` would not.
+        let prune = walk::prune_dirs()?;
+        walk::glob_files(rootp, &globs)?
             .into_iter()
-            .filter(|f| f.is_file())
-            .map(|f| f.display().to_string())
-            .collect());
-    }
-    let found: Vec<PathBuf> = walk::find_files(rootp, &["sh", "gate", "rs"])?
+            .filter(|f| f.is_file() && !walk::path_pruned(&f.display().to_string(), &prune))
+            .collect()
+    };
+    let found: Vec<PathBuf> = selected
         .into_iter()
         .filter(|p| with_templates || !under_templates(&p.display().to_string()))
         .collect();

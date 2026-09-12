@@ -399,7 +399,27 @@ pub fn pattern_match(pat: &str, s: &str) -> bool {
 // spec: canon-kit/SPEC.md §lib/spec.sh — the walk `gate_find <root> -name <n> -type f`
 // performs, for a finder selecting by whole filename rather than by extension
 pub fn find_named(root: &Path, names: &[&str]) -> Result<Vec<PathBuf>, String> {
-    let all = find_any(root)?;
+    find_named_pruning(root, names, &[])
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the same walk with a caller-declared prune set beside
+// the bridged one: root-relative directory globs, `**`-capable. The set is **recorded**, because an
+// unrecorded narrowing is the self-certification that section refuses.
+pub fn find_named_pruning(
+    root: &Path,
+    names: &[&str],
+    prune_globs: &[String],
+) -> Result<Vec<PathBuf>, String> {
+    #[cfg(test)]
+    recorder::note_prune(&root.display().to_string(), prune_globs);
+    let bridged = prune_dirs()?;
+    let rootstr = root.display().to_string();
+    let all = walk_pruned(
+        root,
+        &|n| bridged.iter().any(|d| d == n),
+        Links::Skip,
+        Some(&|dir: &Path| dir_prune_matches(&rootstr, dir, prune_globs)),
+    )?;
     Ok(all
         .into_iter()
         .filter(|p| {
@@ -409,6 +429,43 @@ pub fn find_named(root: &Path, names: &[&str]) -> Result<Vec<PathBuf>, String> {
                 .unwrap_or(false)
         })
         .collect())
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — a directory is pruned when its **root-relative**
+// path matches a declared glob, so the set is stated the way a declaration can carry it and the same
+// string means the same thing in the registry and in the walk
+pub fn dir_prune_matches(root: &str, dir: &Path, prune_globs: &[String]) -> bool {
+    if prune_globs.is_empty() {
+        return false;
+    }
+    let d = dir.display().to_string();
+    let rel = d
+        .strip_prefix(&format!("{}/", root))
+        .unwrap_or_else(|| d.strip_prefix("./").unwrap_or(&d));
+    if rel.is_empty() || rel == root {
+        return false;
+    }
+    prune_globs.iter().any(|g| dir_glob_match(g, rel))
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — component-wise with `**`, the discipline
+// `walk::glob_files` uses, so a declared prune glob reads as the walker reads a path
+fn dir_glob_match(glob: &str, path: &str) -> bool {
+    let gs: Vec<&str> = glob.split('/').filter(|c| !c.is_empty()).collect();
+    let ps: Vec<&str> = path.split('/').filter(|c| !c.is_empty()).collect();
+    dir_glob_walk(&gs, &ps)
+}
+
+fn dir_glob_walk(gs: &[&str], ps: &[&str]) -> bool {
+    match (gs.first(), ps.first()) {
+        (None, None) => true,
+        (None, Some(_)) => false,
+        (Some(&"**"), _) => {
+            dir_glob_walk(&gs[1..], ps) || (!ps.is_empty() && dir_glob_walk(gs, &ps[1..]))
+        }
+        (Some(_), None) => false,
+        (Some(g), Some(p)) => pattern_match(g, p) && dir_glob_walk(&gs[1..], &ps[1..]),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a directory that cannot be read is
@@ -438,9 +495,10 @@ fn find_any(root: &Path) -> Result<Vec<PathBuf>, String> {
 // spec: gate-sdk/SPEC.md §The workflow directory — a single-level listing, immediate children
 // only and both entry kinds, for a member that inspects one directory's own membership (tracked
 // vs ignored) rather than walking a tree beneath it
+// spec: gate-sdk/SPEC.md §check-reads-couples — deliberately **not** noted to the recorder, on the
+// same ground `glob_entries` is not: the invariant is over a *recursive* walk, and a single-level
+// listing descends nothing.
 pub fn list_dir(root: &Path) -> Result<Vec<(String, bool)>, String> {
-    #[cfg(test)]
-    recorder::note(&root.display().to_string());
     let rd = fs::read_dir(root)
         .map_err(|e| format!("cannot read directory {}: {}", root.display(), e))?;
     let mut out: Vec<(String, bool)> = Vec::new();
@@ -467,7 +525,7 @@ pub fn find_with_prune(
     root: &Path,
     prune: &dyn Fn(&str) -> bool,
 ) -> Result<Vec<PathBuf>, String> {
-    walk_pruned(root, prune, Links::Skip)
+    walk_pruned(root, prune, Links::Skip, None)
 }
 
 // spec: context-kit/SPEC.md §Index-first reading — `find`'s own entry model, which that section's
@@ -482,13 +540,18 @@ pub fn find_link_entries_with_prune(
     root: &Path,
     prune: &dyn Fn(&str) -> bool,
 ) -> Result<Vec<PathBuf>, String> {
-    walk_pruned(root, prune, Links::Entry)
+    walk_pruned(root, prune, Links::Entry, None)
 }
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the second prune is by *path* where the first is by
+// component name, because a declared prune is root-relative and a bridged one is a directory name
+type DirPrune<'a> = Option<&'a dyn Fn(&Path) -> bool>;
 
 fn walk_pruned(
     root: &Path,
     prune: &dyn Fn(&str) -> bool,
     links: Links,
+    dir_prune: DirPrune,
 ) -> Result<Vec<PathBuf>, String> {
     // spec: gate-sdk/SPEC.md §check-reads-couples — every walk passes here, so recording at
     // this one line is what makes unit test A's observation complete.
@@ -515,7 +578,7 @@ fn walk_pruned(
             let meta = fs::symlink_metadata(&p)
                 .map_err(|e| format!("cannot stat {}: {}", p.display(), e))?;
             if meta.is_dir() {
-                if prune(&name) {
+                if prune(&name) || dir_prune.is_some_and(|f| f(&p)) {
                     continue;
                 }
                 stack.push(p);
@@ -814,14 +877,23 @@ pub mod recorder {
 
     thread_local! {
         static OBSERVED: RefCell<Option<Vec<String>>> = const { RefCell::new(None) };
+        static PRUNED: RefCell<Option<Vec<String>>> = const { RefCell::new(None) };
     }
 
     pub fn start() {
         OBSERVED.with(|o| *o.borrow_mut() = Some(Vec::new()));
+        PRUNED.with(|o| *o.borrow_mut() = Some(Vec::new()));
     }
 
     pub fn stop() -> Vec<String> {
         OBSERVED.with(|o| o.borrow_mut().take()).unwrap_or_default()
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the prune set a walk was invoked with, recorded
+    // beside the root because a *declared* prune narrows the coverage demand: its failure direction
+    // is silent under-demand, so assertion A holds the declaration to this observation
+    pub fn stop_prunes() -> Vec<String> {
+        PRUNED.with(|o| o.borrow_mut().take()).unwrap_or_default()
     }
 
     pub fn note(root: &str) {
@@ -829,6 +901,19 @@ pub mod recorder {
             if let Some(v) = o.borrow_mut().as_mut() {
                 if !v.iter().any(|e| e == root) {
                     v.push(root.to_string());
+                }
+            }
+        });
+    }
+
+    pub fn note_prune(root: &str, globs: &[String]) {
+        note(root);
+        PRUNED.with(|o| {
+            if let Some(v) = o.borrow_mut().as_mut() {
+                for g in globs {
+                    if !v.iter().any(|e| e == g) {
+                        v.push(g.clone());
+                    }
                 }
             }
         });

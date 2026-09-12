@@ -424,12 +424,20 @@ fn main() {
         };
         match gates::roots(name) {
             Some(roots) => {
-                for (r, filter) in roots {
-                    if filter.is_empty() {
-                        println!("{}", r);
-                    } else {
-                        println!("{}\t{}", r, filter);
+                // spec: gate-sdk/SPEC.md §check-reads-couples — a trailing empty field is omitted,
+                // so a root with no filter prints one column and a root with no declared prune
+                // prints two: every pre-existing line is byte-identical.
+                for (r, filter, prune) in roots {
+                    let mut line = r.to_string();
+                    if !filter.is_empty() || !prune.is_empty() {
+                        line.push('\t');
+                        line.push_str(filter);
                     }
+                    if !prune.is_empty() {
+                        line.push('\t');
+                        line.push_str(prune);
+                    }
+                    println!("{}", line);
                 }
                 exit(0);
             }
