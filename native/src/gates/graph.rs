@@ -153,10 +153,13 @@ fn render_cap(emitted: &str) -> u64 {
     500
 }
 
-// spec: gate-sdk/SPEC.md §check-graph (assertion G) — a couples/trigger token's glob grammar; the
-// `kit:<glob>` couples form validates on its glob part
+// spec: gate-sdk/SPEC.md §check-graph (assertion G) — a couples/trigger token's glob grammar: one
+// optional prefix from `registry::COUPLES_PREFIXES` stripped, then the remainder validates as a glob
 fn valid_glob_token(tok: &str) -> bool {
-    let t = tok.strip_prefix("kit:").unwrap_or(tok);
+    let t = registry::COUPLES_PREFIXES
+        .iter()
+        .find_map(|p| tok.strip_prefix(p))
+        .unwrap_or(tok);
     !t.is_empty()
         && t.chars().all(|c| {
             c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '*' | '?' | '/' | '-')
@@ -524,9 +527,24 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 )),
             }
         }
-        couples = registry::expand_couples(&couples, &cfg.kit_roots_rel);
+        // spec: gate-sdk/SPEC.md §check-graph — the `knob:` token's admissibility rule, read against
+        // the binary's own `--knobs` answer: a token naming a knob the member does not declare is a
+        // finding, never a wider trigger
+        for field in [&couples, &trigger] {
+            for name in field.split(',').filter_map(|t| t.strip_prefix("knob:")) {
+                let declared = crate::gates::knobs(c).unwrap_or(&[]);
+                if !declared.contains(&name) {
+                    errors.push(format!(
+                        "MANIFEST: {} carries couples token 'knob:{}', but {} declares no such \
+                         knob — a knob token is admissible only for a knob the gate reads",
+                        script, name, c
+                    ));
+                }
+            }
+        }
+        couples = registry::expand_couples(&couples, &cfg.kit_roots_rel)?;
         if !trigger.is_empty() {
-            trigger = registry::expand_couples(&trigger, &cfg.kit_roots_rel);
+            trigger = registry::expand_couples(&trigger, &cfg.kit_roots_rel)?;
         }
         if dir != "bi" && dir != "one" {
             errors.push(format!(

@@ -176,7 +176,7 @@ pub fn projected_members(cfg: &Config) -> Result<Vec<Member>, String> {
         let f = registry::manifest_fields(man);
         out.push(Member {
             name,
-            couples: registry::expand_couples(&registry::field(&f, "couples"), &cfg.kit_roots_rel),
+            couples: registry::expand_couples(&registry::field(&f, "couples"), &cfg.kit_roots_rel)?,
             dir: registry::field(&f, "dir"),
             valve: registry::field(&f, "valve"),
         });

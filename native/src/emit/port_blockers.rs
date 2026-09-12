@@ -609,7 +609,7 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, String>
             let fields = registry::manifest_fields(registry::manifest_line(&text).unwrap_or(""));
             let tier = registry::field(&fields, "tier");
             let couples =
-                registry::expand_couples(&registry::field(&fields, "couples"), &reg.kit_roots_rel);
+                registry::expand_couples(&registry::field(&fields, "couples"), &reg.kit_roots_rel)?;
             let key = format!(
                 "libs={} globs={}",
                 dash_if_empty(&lib_key),

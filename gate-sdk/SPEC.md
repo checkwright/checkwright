@@ -1850,17 +1850,69 @@ The manifest grammar:
 # graph: couples=<globs> dir=bi|one valve=none|PROPOSED tier=precommit|align-only|commit-msg [mode=staged|whole-tree] [trigger=<globs>] [gen=manual]
 ```
 
-- `couples=` — the surfaces the gate binds (comma-separated globs). One token
-  is special: `kit:<glob>`, which the shared manifest reader in `lib/gate.sh`
-  (`gate_expand_couples_var`) expands to `<kit-root>/<glob>` —
-  repo-root-relative — for every `gate_kit_roots` member at read time; the same
-  reader feeds
-  `gen-pre-commit` (hook emission), `check-graph` (freshness + the HTML
-  projection), and `run-gates --for` (path-scoped selection §run-gates), so
-  emitter, checker, and selector cannot desync on the kit set. A
+- `couples=` — the surfaces the gate binds (comma-separated globs). **Two tokens
+  are special, `kit:<glob>` and `knob:<NAME>`**, and the closed prefix set is held
+  in one place — `registry::COUPLES_PREFIXES` — because the prefix is recognised by
+  exact literal match in four independent readers with no shared routine, and a
+  prefix one reader knows and another does not falls through as an inert literal
+  glob with the trigger silently lost. The four are `gate_expand_couples_var` in
+  `lib/gate.sh` (feeding `gen-pre-commit`'s hook emission),
+  `registry::expand_couples` (feeding `check-graph`, the graph emitter,
+  `check-gate-substrate-parity` assertion G, `port-blockers` and `run-gates --for`),
+  `check-reads-couples`' consumption path — which **calls the shared reader rather
+  than carrying its own copy**, the copy having been deleted rather than taught the
+  second prefix — and `check-graph`'s `valid_glob_token`, whose prefix set is the
+  same constant so the validator cannot admit a set the resolvers do not recognise.
+  `kit:<glob>` expands to `<kit-root>/<glob>` — repo-root-relative — for every
+  `gate_kit_roots` member at read time. A
   whole-tree gate writes `kit:*.sh` in place of a per-kit hand list; non-kit
   couples (`scripts/*.sh`, `.workflow/*.txt`, `scripts/gates.list`) stay
-  literal. Expansion over-approximates by design — a kit is coupled even where
+  literal.
+- **`knob:<NAME>` expands to the members of the kit knob `<NAME>`**, which is how a
+  gate whose scanned corpus *is* a knob's value declares its trigger without
+  transcribing that value. Where the value is the consumer's, transcribing it would
+  put consumer content in a kit literal, which the provenance seam refuses: the kit
+  descriptor names the **knob** and the value stays the consumer's. The spelling is
+  the tree's own word — the config bridge already spells these
+  `GATE_SDK_KNOB_<NAME>` on every emitted invocation. `env:` is refused: the value
+  arrives through the bridge rather than the ambient environment, and naming it
+  `env:` would invite a reader to set it in a shell and expect a verdict change.
+  The rules that govern it follow.
+  **The token is added beside a descriptor's literal globs, never in place of
+  them.** A knob's value and the kit's default corpus are *alternatives* at runtime
+  rather than a union — `manifest_files()` globs with the knob when it is non-empty
+  and derives its default set only when it is empty — so a descriptor that dropped
+  its literals would lose the trigger for the branch not taken. The union
+  over-triggers by exactly that branch, which is what the existing token's own
+  over-approximation rule already sanctions, and it is monotone-widening under
+  either of the two matchers above, so it settles nothing on the unowned
+  glob-semantics question.
+  **Admissibility is checkable, and the check is what makes the token honest.**
+  `knob:<NAME>` is admissible only where `<NAME>` is one of the knobs that gate
+  declares — the set the binary answers `--knobs <name>` with. Because the crate
+  declares only the knobs its own code reads (§lib/gate.sh), an admissible token is
+  *provably* a corpus the gate actually reads, so the hard authoring rule below
+  stops being an honour-system duty for this class. `check-graph`'s live-registry
+  manifest loop asserts it per member; a token naming an undeclared knob is a
+  finding, not a wider trigger.
+  **Resolution order is fixed, because an unstated order is a per-reader order.**
+  `knob:` expands first and `kit:` expands over the result, so a knob member spelled
+  `kit:<glob>` composes; each is **one pass**, so a knob member that is itself a
+  `knob:` token is a refusal, which bounds expansion without a cycle detector; a
+  knob member carrying a comma or whitespace is a refusal at expansion time, because
+  `couples=` is comma-separated and its manifest line splits on unquoted whitespace,
+  so such a member is unrepresentable after expansion and would truncate the trigger
+  silently. Fail-closed is inherited rather than authored: an absent bridge variable
+  is an error and an empty one is a resolved-empty set, so a `knob:` naming a knob
+  nothing bridged is exit 2 while a declared knob a consumer set empty expands to
+  nothing — correct, because the gate then scans nothing either.
+  **What the token does not do is add a matcher.** Each reader expands the token to
+  the knob's members and then applies the matching discipline it already applies;
+  the incompatible semantics this field carries are untouched. Pre-expanding the
+  token in the shell so the binary never sees it is refused: `check-graph` parses the
+  raw manifest line in the crate, so the binary *does* see the raw token, and hiding
+  it would mean generating the descriptor — making a hand-authored field a generated
+  surface with a second source. Expansion over-approximates by design — a kit is coupled even where
   the gate's subject is narrower, so an extra trigger runs a green gate while a
   missing one would skip a red — and `check-kit-enum` gates the residual
   hand-lists derivation cannot reach. The corollary is a hard authoring rule:
@@ -3033,13 +3085,16 @@ holds without asking what the arm returns. Recorded because the variant test and
 the sentinel look interchangeable and are not: the dispatcher hands each *child*
 its own slice, where the sentinel resolves a union the arm itself reads.
 
-**A sentinel is minted with its expansion, and there are two.**
+**A sentinel is minted with its expansion, and `knobs` expands two of the three.**
 `EVERY_REGISTERED_KNOB` expands to every knob the **tree's** registry declares,
 scoped by the arm's own `--gates-dir` argv; `EVERY_HOOK_KNOB` expands to one
 hook member's knobs where the arm's argv names a member and to the union over the
 hook table where it does not. Both live beside `knobs` rather than beside a
 member that spells one, because the expansion is the mechanism's and a member
-only declares it — and the two registry-scoped expansions that grew up beside
+only declares it. The third, `registry::EVERY_COUPLES_KNOB`, is deliberately *not*
+expanded here and is printed through untouched, because its expansion reads the
+descriptor corpus and belongs to the bridge (§lib/gate.sh) — which is why
+`is_sentinel` does not name it and an arm that declares it keeps it in its roster — and the two registry-scoped expansions that grew up beside
 their first callers collapsed to one when the second sentinel made the
 duplication unavoidable.
 
@@ -8841,6 +8896,30 @@ for every `.gate` member before emitting argv. That is the same
 makes an unread bridged knob impossible — the crate declares only the knobs its
 own code reads.
 
+**One declared name is a sentinel this library substitutes for, and it is the only
+sentinel whose expansion is the bridge's rather than the crate's.** A member that
+expands *another* member's `couples=` — `check-graph`, `check-reads-couples`,
+`check-gate-substrate-parity`, the graph emitter and the selector — needs the knobs
+those descriptors' `knob:` tokens name (§The `# graph:` manifest), and the bridge
+resolves only the fixed set a member itself declares: `check-graph` does not declare
+`CANON_KIT_MANIFEST_FILES`, so a naive token is unresolvable exactly where it must
+resolve. Such a member declares `registry::EVERY_COUPLES_KNOB` instead, and
+`gate_knob_env_set` replaces that one name with every knob name a `knob:` token
+carries anywhere in the descriptor corpus — derived from the surface the names are
+written on, so a newly written token cannot be forgotten. It is substituted in
+`gate_knob_env_set` rather than in `gate_knob_env`, so the arity-one face and the
+battery front-end's union resolve it through the same substitution. The expansion is
+the shell's because the descriptor corpus is reachable from the resolve dirs this
+library already computes, where `--knobs` runs with no bridged layout at all; the
+crate carries `registry::couples_knob_names` for the one path that needs it
+in-process — the dispatcher handing a child its own slice, which would otherwise
+filter the union by the sentinel's own name and hand the child nothing — and a unit
+test holds the two derivations and the two spellings of the literal together. A
+registry-wide union was refused on measurement rather than on taste: the tree's
+registry declares 190 distinct knobs against the eight the descriptor corpus names,
+so that carrier would grow one member's baked hook invocation more than tenfold and
+stale it on every knob edit anywhere.
+
 **So there is exactly one place a knob's value is computed — the owning kit's
 shell library — and the crate holds no default to drift from.** The rule is the
 mechanism above read as a rule, and it is stated here because the sites that rely
@@ -14485,6 +14564,24 @@ body is held to the glob grammar but not to the vocabulary or hook-parity — th
 gate it describes is unbuilt, so its coupled surface may itself be design-ahead;
 parity re-fires through the normal registry path once the gate lands.
 
+**The amendment-body glob grammar admits one optional special prefix, and the
+admitted set is `registry::COUPLES_PREFIXES` rather than a second spelling of it**
+(§The `# graph:` manifest). `valid_glob_token` strips at most one prefix from that
+constant and then holds the remainder to `[A-Za-z0-9._*?/-]`, so a prefix the
+resolvers recognise cannot be redded here and a prefix they do not cannot be
+admitted here. Held in one place because the alternative is a validator and four
+resolvers disagreeing about a closed set, which is how a token becomes an inert
+literal glob with its trigger silently lost.
+
+**The live-registry manifest loop asserts the `knob:` token's admissibility**, per
+member, against the binary's own `--knobs <name>` answer: a token naming a knob the
+member does not declare is a finding. That is the assertion that turns the hard
+authoring rule into an oracle for this class, because the crate declares only the
+knobs its own code reads, so an admissible token is provably a corpus the gate reads.
+**Couples-to-hook parity is unaffected by either token**, and the reason is
+structural rather than measured: both operands of that comparison pass through the
+same expansion, so they agree by construction whatever the token set is.
+
 **The interpreter assertion D spawns is resolved, not named** — and it is
 resolved by the **owner**, not by the call site. Assertion D spawns the bare
 literal `bash` exactly as every other spawn in the crate does; `proc::run*`
@@ -14981,6 +15078,15 @@ the **real** binary rather than a stub, so the grammar under test is the one the
 substrate actually emits; it is skipped and named in the test's own summary line
 when the binary is not built, because the file is hermetic and never builds one.
 Naming the skip is what keeps it from reading as a silent pass.
+
+**Its couples expansion is the shared reader's, called rather than copied.** A
+verbatim second copy of `registry::expand_couples` would let a token form applied to
+one and not the other diverge the coverage reader from every trigger reader
+silently, so the gate holds no copy: removing such a duplication outranks gating it.
+The member declares
+`registry::EVERY_COUPLES_KNOB` for the same reason `check-graph` does: it expands
+*another* member's field, so the knobs those tokens name are outside its own roster
+(§lib/gate.sh).
 
 This is check-graph's coverage sibling: check-graph
 proves editing a *coupled* surface fires the gate; check-reads-couples proves

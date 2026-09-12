@@ -278,6 +278,10 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "GRAPH_LAYERS",
             "GRAPH_LAYER_RULES",
             "GRAPH_LAYER_DEFAULT",
+            // spec: gate-sdk/SPEC.md §lib/gate.sh — this arm expands every member's `couples=`, so
+            // it needs the knobs those tokens name rather than only its own: the sentinel the bridge
+            // substitutes off the descriptor corpus.
+            crate::registry::EVERY_COUPLES_KNOB,
         ],
     ),
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a

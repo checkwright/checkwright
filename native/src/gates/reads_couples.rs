@@ -238,21 +238,6 @@ fn manifest_field(text: &str, key: &str) -> String {
     String::new()
 }
 
-fn expand_couples(field: &str, kit_roots_rel: &[String]) -> String {
-    let mut out: Vec<String> = Vec::new();
-    for tok in field.split(',') {
-        match tok.strip_prefix("kit:") {
-            Some(glob) => {
-                for r in kit_roots_rel {
-                    out.push(format!("{}/{}", r.trim_end_matches('/'), glob));
-                }
-            }
-            None => out.push(tok.to_string()),
-        }
-    }
-    out.join(",")
-}
-
 fn rule(args: &[String]) -> Result<i32, String> {
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
     let list = format!("{}/gates.list", gates_dir);
@@ -318,7 +303,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let text = std::fs::read(Path::new(src))
             .map(|b| String::from_utf8_lossy(&b).into_owned())
             .map_err(|e| format!("cannot read {}: {}", src, e))?;
-        let couples = expand_couples(&manifest_field(&text, "couples"), &kit_roots_rel);
+        // spec: gate-sdk/SPEC.md §check-reads-couples — one expansion, shared with every trigger
+        // reader rather than copied here: a token form one reader knows and the other does not
+        // diverges the coverage reader from the selector silently
+        let couples =
+            crate::registry::expand_couples(&manifest_field(&text, "couples"), &kit_roots_rel)?;
         let globs: Vec<String> = couples.split(',').map(String::from).collect();
 
         // spec: gate-sdk/SPEC.md §check-reads-couples — a `.gate` member's walks are unreadable to

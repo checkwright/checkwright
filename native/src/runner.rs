@@ -339,7 +339,12 @@ fn select_for(
         if trigger.is_empty() {
             trigger = couples;
         }
-        let trigger = registry::expand_couples(&trigger, kit_roots_rel);
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — an unresolvable couples token is exit 2,
+        // never a narrower selection: a silently lost trigger is a gate the selector stops running.
+        let trigger = registry::expand_couples(&trigger, kit_roots_rel).map_err(|e| {
+            eprintln!("{}: --for cannot expand {}'s trigger: {}", TOOL, name, e);
+            2
+        })?;
         let mode = registry::field(&f, "mode");
         let globs: Vec<&str> = trigger.split(',').filter(|g| !g.is_empty()).collect();
         if trigger == "*" {
@@ -448,9 +453,24 @@ fn select_only(
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the child's declared knob environment, built by *filtering*
 // the union the front-end resolved: a member receives the `GATE_SDK_KNOB_*` variables its own
 // registry entry declares and no others, which is what keeps the declared-knob discipline executed.
-fn child_knobs(declared: &[&str], union: &[(String, String)]) -> Vec<(String, String)> {
-    let mut out: Vec<(String, String)> = Vec::new();
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob sentinel substitutes here too: filtering
+// the union by the sentinel's own literal name would hand the child an empty set, and its expansion
+// would then refuse
+fn child_knobs(
+    declared: &[&str],
+    union: &[(String, String)],
+    couples_knobs: &[String],
+) -> Vec<(String, String)> {
+    let mut names: Vec<&str> = Vec::new();
     for d in declared {
+        if *d == registry::EVERY_COUPLES_KNOB {
+            names.extend(couples_knobs.iter().map(String::as_str));
+            continue;
+        }
+        names.push(d);
+    }
+    let mut out: Vec<(String, String)> = Vec::new();
+    for d in &names {
         match d.strip_suffix('*') {
             Some(stem) => {
                 let want = format!("GATE_SDK_KNOB_{}", stem);
@@ -477,6 +497,7 @@ struct Dispatch<'a> {
     list: &'a str,
     union: &'a [(String, String)],
     union_names: &'a [String],
+    couples_knobs: &'a [String],
     scratch: &'a Path,
 }
 
@@ -522,7 +543,7 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
         };
         (
             vec![d.self_exe.to_string(), sel.name.clone()],
-            child_knobs(declared, d.union),
+            child_knobs(declared, d.union, d.couples_knobs),
         )
     } else {
         (vec![src], Vec::new())
@@ -739,6 +760,17 @@ pub fn run(args: &[String]) -> i32 {
         .filter(|(k, _)| k.starts_with("GATE_SDK_KNOB_"))
         .collect();
     let union_names: Vec<String> = union.iter().map(|(k, _)| k.clone()).collect();
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — resolved once for the run rather than per child: the
+    // descriptor corpus cannot change mid-battery, and a refusal here is exit 2 because a child
+    // whose couples token goes unresolved is a gate that cannot compute its own trigger.
+    let couples_knobs = match registry::couples_knob_names(&resolve_dirs) {
+        Ok(n) => n,
+        Err(e) => {
+            eprintln!("{}: {}", TOOL, e);
+            let _ = std::fs::remove_dir_all(&scratch);
+            return 2;
+        }
+    };
 
     let d = Dispatch {
         resolve_dirs: &resolve_dirs,
@@ -746,6 +778,7 @@ pub fn run(args: &[String]) -> i32 {
         list: &list,
         union: &union,
         union_names: &union_names,
+        couples_knobs: &couples_knobs,
         scratch: &scratch,
     };
 
@@ -873,11 +906,33 @@ mod tests {
             ("GATE_SDK_KNOB_P_ONE".to_string(), "3".to_string()),
             ("GATE_SDK_KNOB_P_TWO".to_string(), "4".to_string()),
         ];
-        let got = child_knobs(&["A", "P_*"], &union);
+        let got = child_knobs(&["A", "P_*"], &union, &[]);
         let names: Vec<&str> = got.iter().map(|(k, _)| k.as_str()).collect();
         assert_eq!(
             names,
             vec!["GATE_SDK_KNOB_A", "GATE_SDK_KNOB_P_ONE", "GATE_SDK_KNOB_P_TWO"]
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob sentinel is substituted rather than
+    // looked up: filtering the union by the sentinel's own name would hand the child nothing, and an
+    // empty expansion is the lost trigger the token exists to prevent.
+    #[test]
+    fn the_couples_knob_sentinel_substitutes_the_corpus_names_it_stands_for() {
+        let union = vec![
+            ("GATE_SDK_KNOB_A".to_string(), "1".to_string()),
+            ("GATE_SDK_KNOB_CORPUS".to_string(), "x\ty".to_string()),
+        ];
+        let got = child_knobs(
+            &["A", registry::EVERY_COUPLES_KNOB],
+            &union,
+            &["CORPUS".to_string()],
+        );
+        let names: Vec<&str> = got.iter().map(|(k, _)| k.as_str()).collect();
+        assert_eq!(names, vec!["GATE_SDK_KNOB_A", "GATE_SDK_KNOB_CORPUS"]);
+        assert!(
+            child_knobs(&[registry::EVERY_COUPLES_KNOB], &union, &[]).is_empty(),
+            "a corpus naming no knob token bridges nothing, which is correct rather than a refusal"
         );
     }
 

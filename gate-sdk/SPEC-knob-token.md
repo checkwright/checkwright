@@ -232,24 +232,33 @@ five more. A sweep written against "the three-token triple" would miss seven tar
 - `gate-sdk/SPEC.md` §The `# graph:` manifest, the manifest grammar block and the
   `couples=` bullet (deltas 1 and 2). The bullet gains the second special token,
   its union rule, its admissibility rule, and the resolution order; its sentence
-  *"One token is special"* is re-phrased in place for two.
+  *"One token is special"* is re-phrased in place for two. **Applied.**
 - `gate-sdk/SPEC.md` §The `# graph:` manifest, the same bullet's claim that the
   shared reader in `lib/gate.sh` *"feeds `gen-pre-commit`, `check-graph` and
   `run-gates --for`, so emitter, checker and selector cannot desync"` (delta 1).
   That sentence is **stale for the crate and this delta is where it is corrected**:
   the prefix is recognised by exact literal match in four independent places with
-  no shared routine, and the token set is what they must agree on. Not yet applied.
+  no shared routine, and the token set is what they must agree on. **Applied** —
+  the sentence is replaced by the four-reader roster.
 - `gate-sdk/SPEC.md` §lib/gate.sh, the config-bridge passage owning
   `GATE_SDK_KNOB_<NAME>`, its absent-is-an-error / empty-is-resolved-empty rule, and
   the `--knobs` derivation (delta 2). It gains the knob-name union as a second
   sentinel case and cites §check-reads-couples as the precedent it reuses.
+  **Applied**, with one correction the build measured: the expansion is the
+  **bridge's**, not the crate's, because `--knobs` runs with no bridged layout and
+  so cannot reach the descriptor corpus. `registry::couples_knob_names` carries the
+  identical derivation for the in-process dispatch path alone, held to the shell's
+  by a unit test. §The non-gate arm's sentinel-count sentence is corrected in the
+  same motion: `knobs` expands two of three, this one passing through untouched.
 - `gate-sdk/SPEC.md` §check-graph (deltas 1, 2 and 3). Three additions: the
   amendment-body glob grammar's prefix set, the live-registry admissibility
   assertion against `--knobs`, and a note that couples-to-hook parity is unaffected
-  because both operands pass through one expansion.
+  because both operands pass through one expansion. **Applied.**
 - `gate-sdk/SPEC.md` §check-reads-couples (delta 1). Its private copy of the
   expansion is a named consumer of the new token, and the section records that the
-  copy must move with the shared one until the two are merged.
+  copy must move with the shared one until the two are merged. **Applied, and the
+  two are merged**: the copy is deleted rather than taught the second prefix, which
+  discharges the filed gap naming that duplication.
 - `gate-sdk/SPEC.md` §gen-pre-commit (deltas 2 and 4). The emitted trigger set is
   now knob-derived for eleven members, so the section states that a knob edit
   stales the hook through the trigger as well as through the baked invocation.

@@ -234,6 +234,9 @@ gate_resolve() {
     return 1
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union sentinel, spelled here and in the crate's `registry::EVERY_COUPLES_KNOB`; it crosses the dispatch seam because the binary declares it and this library substitutes for it, and a crate unit test asserts this file still carries the literal so the two cannot drift apart silently.
+GATE_SDK_COUPLES_KNOB_SENTINEL='@every-couples-knob'
+
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the owning kit of a bridged knob, derived from the knob's own `<KIT>_` prefix rather than from a maintained knob→kit roster: each gate_kit_roots member's basename, hyphens to underscores and upper-cased, is tried as a prefix. A knob matching no other kit's prefix is gate-sdk's own — the one kit every `.gate` dispatch already runs inside — never a parse error and never a third kit guessed at.
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the configured set is consulted first, then the shipped one: GATE_SDK_KIT_DIRS narrows which kits a battery *scans*, and reading it as the set of kits that *exist* would leave a narrowed run unable to attribute another kit's knob and fail-close on every member that declares one
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the candidates are read to EOF *before* the match loop, never streamed through a `while read` the first prefix hit returns out of: this runs under a stdout capture, so a producer left writing into a closed pipe reports the write error on stderr wherever SIGPIPE is ignored, which §run-gates' capture is what makes dispatch-fatal
@@ -417,7 +420,19 @@ gate_knob_env() {
 gate_knob_env_set() {
     local g="$1"
     shift
-    local -a names=("$@")
+    local -a names=()
+    local _gkes_n
+    for _gkes_n in "$@"; do
+        # spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union sentinel's receiving half. A member that expands another member's couples= cannot name those knobs in its own compile-time entry, so it declares this one name and the bridge substitutes the set the descriptor corpus carries. Expanded here rather than in gate_knob_env, so the arity-one face and the battery front-end's union resolve it through the same substitution.
+        if [[ "$_gkes_n" == "$GATE_SDK_COUPLES_KNOB_SENTINEL" ]]; then
+            local -a _gkes_derived=()
+            mapfile -t _gkes_derived < <(_gate_couples_knob_names)
+            names+=(${_gkes_derived[@]+"${_gkes_derived[@]}"})
+            continue
+        fi
+        names+=("$_gkes_n")
+    done
+    [[ ${#names[@]} -gt 0 ]] || return 0
     local -A kit_slice=()
     local -a kit_order=()
     local i knob kit
@@ -680,15 +695,81 @@ _gate_kit_roots_rel_ensure_cache
 # shellcheck disable=SC2034  # read across the dispatch seam, never in this shell: the config bridge resolves it by name for a member that declares it
 GATE_KIT_ROOTS_REL=("${_gate_kit_roots_rel_cache[@]}")
 
-# spec: gate-sdk/SPEC.md §check-graph — expand each kit:<glob> token in a comma-joined couples/trigger field to <kit-root>/<glob> for every gate_kit_roots_rel member; non-kit tokens pass through verbatim. Assigns into the caller's <outvar> by nameref rather than printing, so a per-manifest-line loop calls this directly (no `$(...)` fork) and the whole loop shares one _gate_kit_roots_rel_ensure_cache fill instead of paying it — and forking — once per line. gate_expand_couples below is the same expansion for a caller that still wants the stdout form.
+# spec: gate-sdk/SPEC.md §lib/gate.sh — every knob name the descriptor corpus's couples=/trigger= fields carry in a knob:<NAME> token, derived from the surface the names are written on so a newly written token cannot be forgotten. One grep over the whole corpus rather than a field read per descriptor, because the set is wanted once per process and a fork per member would be paid on every battery run.
+_gate_couples_knob_names() {
+    local line kv tok d saved
+    local -a files=() names=() parts=()
+    saved="$(shopt -p nullglob)"
+    shopt -s nullglob
+    while IFS= read -r d; do files+=("$d"/*.gate "$d"/*.sh); done < <(gate_check_dirs)
+    eval "$saved"
+    [[ ${#files[@]} -gt 0 ]] || return 0
+    while IFS= read -r line; do
+        for kv in ${line#\# graph: }; do
+            case "$kv" in couples=*|trigger=*) ;; *) continue ;; esac
+            IFS=',' read -ra parts <<<"${kv#*=}"
+            for tok in ${parts[@]+"${parts[@]}"}; do
+                [[ "$tok" == knob:* ]] && names+=("${tok#knob:}")
+            done
+        done
+    done < <(grep -h '^# graph: ' "${files[@]}" 2>/dev/null || true)
+    [[ ${#names[@]} -gt 0 ]] || return 0
+    printf '%s\n' "${names[@]}" | LC_ALL=C sort -u
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union resolved into this shell's own environment, once per process: a shell reader expands *another* member's couples= and so needs values outside its own declared set. A refusal anywhere in the slice fails the call, because a partially resolved environment is the fail-open an empty expansion would be.
+_gate_couples_knob_bridge() {
+    [[ -n "${_gate_couples_knob_bridged:-}" ]] && return 0
+    _gate_couples_knob_bridged=1
+    local out line
+    local -a names=()
+    mapfile -t names < <(_gate_couples_knob_names)
+    [[ ${#names[@]} -gt 0 ]] || return 0
+    out="$(gate_knob_env_set couples-expansion "${names[@]}")" || return 2
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && export "${line?}"
+    done <<<"$out"
+}
+
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — expand a comma-joined couples/trigger field in two passes in a fixed order: knob:<NAME> to that knob's bridged members, then kit:<glob> to <kit-root>/<glob> for every gate_kit_roots_rel member, so a knob member spelled kit:<glob> composes; anything else passes through verbatim. One pass each bounds the expansion without a cycle detector. Assigns into the caller's <outvar> by nameref rather than printing, so a per-manifest-line loop calls this directly (no `$(...)` fork) and the whole loop shares one _gate_kit_roots_rel_ensure_cache fill instead of paying it — and forking — once per line. gate_expand_couples below is the same expansion for a caller that still wants the stdout form.
+# spec: gate-sdk/SPEC.md §Fail-closed contract — every knob-token refusal returns non-zero having named the knob on stderr, never an expansion missing the token's members: a silently lost trigger is a gate the hook stops running.
 gate_expand_couples_var() {
     local -n _gate_expand_couples_out="$1"
     local field="$2"
-    local -a parts=() out=()
+    local -a parts=() once=() out=() members=()
     _gate_kit_roots_rel_ensure_cache
     IFS=',' read -ra parts <<<"$field"
-    local tok r glob
+    local tok r glob name var m
     for tok in "${parts[@]}"; do
+        if [[ "$tok" == knob:* ]]; then
+            name="${tok#knob:}"
+            var="GATE_SDK_KNOB_$name"
+            [[ -v "$var" ]] || _gate_couples_knob_bridge || return 2
+            if [[ ! -v "$var" ]]; then
+                printf 'gate_expand_couples: couples token knob:%s names a knob the config bridge could not carry — ' "$name" >&2
+                printf 'an empty expansion is a lost trigger; treating as failure (not clean)\n' >&2
+                return 2
+            fi
+            members=()
+            [[ -n "${!var}" ]] && IFS=$'\t' read -ra members <<<"${!var}"
+            for m in ${members[@]+"${members[@]}"}; do
+                case "$m" in
+                    knob:*)
+                        printf 'gate_expand_couples: knob:%s has the member %s, itself a knob token — ' "$name" "$m" >&2
+                        printf 'expansion is one pass each; treating as failure (not clean)\n' >&2
+                        return 2 ;;
+                    *,*|*[[:space:]]*)
+                        printf 'gate_expand_couples: knob:%s has the member %s, which carries a comma or whitespace — ' "$name" "$m" >&2
+                        printf 'it is unrepresentable after expansion; treating as failure (not clean)\n' >&2
+                        return 2 ;;
+                esac
+                once+=("$m")
+            done
+        else
+            once+=("$tok")
+        fi
+    done
+    for tok in ${once[@]+"${once[@]}"}; do
         if [[ "$tok" == kit:* ]]; then
             glob="${tok#kit:}"
             for r in "${_gate_kit_roots_rel_cache[@]}"; do out+=("${r%/}/$glob"); done
@@ -697,13 +778,13 @@ gate_expand_couples_var() {
         fi
     done
     local IFS=','
-    _gate_expand_couples_out="${out[*]}"
+    _gate_expand_couples_out="${out[*]+"${out[*]}"}"
 }
 
 # spec: gate-sdk/SPEC.md §check-graph — the gate_expand_couples_var expansion, printed to stdout for a `$(...)` caller; gate_expand_couples_var is the in-process form a hot per-line loop should call instead.
 gate_expand_couples() {
     local __gate_expand_couples_result
-    gate_expand_couples_var __gate_expand_couples_result "$1"
+    gate_expand_couples_var __gate_expand_couples_result "$1" || return 2
     printf '%s\n' "$__gate_expand_couples_result"
 }
 
