@@ -100,11 +100,19 @@
   projection over existing data and ships as `--emit reads-census` (SPEC-registry-rosters.md
   delta 3). The root-expression and filter half is NOT: every `?` row is literally `("?", "", "")`
   — both fields empty — so that data exists only in Rust source, and "no new contract" does not
-  hold for it. The shape that would make it registry data (a compile-enforced ground on every `?`,
-  51 sites) is designed at delta 4 and is **ESCALATED TO THE LEAD, NOT AUTHORIZED**: it is a new
-  registry contract outside this entry's declared cost class, and build lands it only on a recorded
-  ruling. The entry's "39" is a third quantity again — the decidable subset — reproducible by no
-  command in the tree today, so spec asserts it nowhere.
+  hold for it. **DECISION OF THE INTENT ORACLE (the scope session), 2026-09-12, lead-routed: ship
+  delta 3 AND delta 4** — a compile-enforced ground on every `?`, 51 sites. Recorded as a decision,
+  which a later session may revise; it is not a direction and not a consult ruling. Its grounds
+  reframe what delta 4 is: the Deliverable above is UNSATISFIABLE as written, there being no root
+  expression in the registry to enumerate, so delta 4 is the nearest satisfiable form of what this
+  entry already asked for and delta 3 alone is FURTHER from it, not cheaper along the same axis —
+  a partial landing leaving this entry live to be re-ranked while the iteration pays the fixed cost
+  anyway. Spec's own addition, inside its authority: the ground carries a resolvable source
+  locator, because all 51 rows are the identical spelling `("?", "", "")` with zero counterexamples
+  — one default replicated, not 51 considered declarations — and a locator cannot be written
+  without finding the walk, which is the classification act itself. The entry's "39" is a third
+  quantity again, the decidable subset, reproducible by no command in the tree today, so spec
+  asserts it nowhere; delta 4's partition is what finally produces a figure of that class.
   **Unit set `registry-roster-oracles`, the census half — operator direction, 2026-09-12.** It
   joins on the composition test: the arm reads the same crate registry the set's other members
   assert over, and it is the member that turns a hand sweep into an oracle.

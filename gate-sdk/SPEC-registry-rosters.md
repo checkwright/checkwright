@@ -145,8 +145,10 @@ projection over data that exists". For the population that is true. For the othe
 half it is not: every `?` row in the registry is literally `("?", "", "")` — the
 filter and prune fields are **empty**, because a member that could name them would
 not be declaring `?`. The root expression and the filter argument exist only in
-Rust source. Delta 4 is the shape that would make them registry data; this delta
-ships the half that is genuinely a projection.
+Rust source. **Delta 4 is what makes them reachable** — by a declared locator
+rather than by an extracted copy — and this delta is the half that is a projection
+over what the registry already holds. The two ship together: this one alone leaves
+the Deliverable's other half unserved.
 
 **The entry's "39" is a third quantity again, and it is unauditable today.** 39 is
 the *decidable* subset — the `?` roots that in fact resolve to a static literal,
@@ -155,15 +157,16 @@ legitimately undecidable (`gate-sdk/SPEC.md:14992-15007`). Separating those need
 exactly the classifier delta 4 would retire. No command in the tree reproduces 39,
 and this amendment does not assert it.
 
-### (4) Every `?` declares its ground — NOT RULED, escalated
+### (4) Every `?` declares its ground, and the ground names where the walk is
 
-A `?` root gains a required ground string, so the decidable/undecidable split is
-**declared** rather than re-derived by reading Rust source {design-bearing}.
+A `?` root gains a required ground and a resolvable source locator, so the
+decidable/undecidable split is **declared** rather than re-derived by reading Rust
+source {design-bearing}.
 
-**This delta is escalated to the iteration lead and is not authorized. Build lands
-it only on a recorded ruling; absent one, the amendment is deltas 1-3 and 5-10.**
-It is designed here rather than described, so the ruling is over a shape rather
-than an intention.
+**Decision of the intent oracle (the scope session), 2026-09-12, lead-routed:
+ship delta 3 and delta 4.** Recorded with its class, because a decision may be
+revised by a later session where a direction or a consult ruling may not, and
+writing it up as either would wrongly harden it.
 
 The shape: field 2's tuple gains a fourth element, the **ground** a `?` is
 declared on, and a member declaring `?` with an empty ground **fails to
@@ -178,18 +181,51 @@ literal or a positional with a literal default has no ground, because it should
 be declaring the root. Under this delta such a member does not compile, which is
 what converts the entry's recurring hand sweep into a build-time impossibility.
 
-**Why it is escalated rather than authored.** It is out of the entry's declared
-cost class in a way the entry's own text forecloses: `[cost: session/low]`, "one
-emitter plus a fixture pair, no new config, **no new contract**". A required
-registry field is a new contract, and it lands at 51 declaration sites. Choosing
-it silently would be a scope change made by the stage that was told to author
-inside one.
+**The ground carries a source locator, and that is the delta's own defence against
+being satisfied mechanically.** Each `?` declares `<class>@<module>:<line>` — the
+class above, and the location of the walk the `?` stands for. The requirement
+exists because of a fact about the corpus this amendment measured: **all 51 `?`
+root-lines are the identical spelling `("?", "", "")` with zero counterexamples**,
+which is one default replicated fifty-one times, not fifty-one considered
+declarations. Build authors all of them in one pass, and a ground written in bulk
+to satisfy a compiler reads as considered when it was mechanical — the failure
+class this tree already carries an open entry about on the audit roster's
+pre-stamp.
 
-**The trade, stated so the ruling is cheap to make.** Delta 3 alone fixes the
-*count* and leaves the classification a session re-derives. Delta 4 retires the
-class: the classification becomes a declaration a compiler enforces, and the
-entry's "wrong every time it was counted" cannot recur in either quantity. What it
-costs is the 51 sites and a registry contract every future member pays into.
+A locator is what closes that, where a prose justification would not:
+
+- **It cannot be written without performing the classification.** You cannot name
+  the line of the walk without finding the walk, and finding the walk *is* the act
+  of deciding which class it is. The evidence requirement and the classification
+  become one act rather than two, the second of which is skippable.
+- **It is machine-checkable, where honesty is not.** A crate-side assertion holds
+  each locator to resolving, and to resolving **inside the declaring member's own
+  module**. That is presence and placement, which a gate can decide — deliberately
+  *not* whether the class is correct, which it cannot, and which is the shape
+  §check-queue-entry-budget's own refusals name as the standing failure.
+- **It is a pointer, not prose.** One token per site, no restatement, no
+  fifty-one-paragraph tier to maintain. Content-tiering applied to a registry
+  field.
+- **It answers the Deliverable's other half better than an extractor would.** The
+  entry asks for each `?` "together with its walk's root expression"; a locator
+  *points at* the expression instead of transcribing it, so no copy exists to
+  drift. Derivation-first, and it retires the static-analyser route a previous
+  iteration already measured wrong three times running.
+
+**Why this is the nearest satisfiable form of the entry rather than a widening.**
+The Deliverable as written cannot be satisfied at all — there is no root expression
+or filter argument in the registry to enumerate, every `?` row being empty in both
+fields. So delta 3 alone is not the cheap version of this unit along the same axis;
+it is *further* from the Deliverable, and it leaves the entry live to be re-ranked
+at the next boundary while the iteration pays the fixed cost anyway. The envelope is
+"measured once by an oracle rather than re-swept per session", and a compiler is an
+oracle.
+
+**It also leaves the entry's own evidence verifiable.** The entry argues census
+unreliability from 26/27/29 against 39. This authoring measured 51 and 36, and
+nothing in the tree reproduces 39. Under delta 3 alone, an entry about census
+unreliability would keep an uncensused headline number; the ground partition is
+what finally produces a figure of the class 39 was meant to be.
 
 ### (5) `check-gate-substrate-parity` assertion I joins the crate registry to the battery registration
 
@@ -352,11 +388,19 @@ diagnostic underneath an uncorrected one.
     the `?` count are read at the cadence review; the declared roots are read
     beside them to tell a wholly-undecidable member from a partly-declared one.
   - *No count line is emitted*, so no transcribed total can drift from the lines.
-- **The `?` ground** (delta 4, unruled).
-  - *Producer:* the registry entry itself, compile-enforced.
-  - *Consumers:* `--reads`, on a `?` line; `--emit reads-census`, grouping by it.
+- **The `?` ground and its locator** (delta 4).
+  - *Producer:* the registry entry itself, compile-enforced. Reached in the
+    deployed configuration at the landing commit, since all 51 live `?` roots take
+    one.
+  - *Consumers:* `--reads`, on a `?` line; `--emit reads-census`, grouping by the
+    class and printing the locator as the column the Deliverable asked for.
   - *Named reader of the refusal:* the compiler, at the member's registration —
-    which is the point: a member with no honest ground cannot be added.
+    which is the point: a member with no ground cannot be added.
+  - *Named reader of the locator:* a crate-side assertion, at the registry's
+    unit-test pass, whose **red condition** is a locator that does not resolve or
+    that resolves outside the declaring member's own module. It does **not** red on
+    a wrong class, which no gate can decide — stated so a later reader does not
+    read the silence as coverage.
 - **Assertion I** (delta 5).
   - *Producer:* `check-gate-substrate-parity`, at its existing roster derivation;
     the registration file is reached through `registry::list_path`, already in the
@@ -423,8 +467,9 @@ diagnostic underneath an uncorrected one.
 - `gate-sdk/SPEC.md` §check-reads-couples (deltas 3 and 4). The section gains the
   census arm as the answer to the population its cadence row asks for, and records
   the measured figures (36 members, 51 `?` roots) as of this authoring with the
-  oracle that produces them, so a later reader re-runs rather than trusts. Under
-  delta 4 it also gains the two ground values and the refusal of a third.
+  oracle that produces them, so a later reader re-runs rather than trusts. It also
+  gains the two ground values, the refusal of a third, the locator's grammar and
+  its placement rule (delta 4).
 - `gate-sdk/SPEC.md` §The non-gate arm (deltas 3 and 8). `--emit-reads-census`
   joins the roster; the section is named as the roster `no_such_arm` cites, which
   is what makes it a governed surface rather than documentation.
@@ -479,9 +524,21 @@ roster declares a retirement and this is the opposite.
 - [ ] **Causal completeness** — every new state, event and interface has a named,
       reachable producer and a named consumer; every new field has a named reader
       at a named transition.
-- [ ] **Delta 4 is landed only on a recorded ruling.** Absent one, the amendment is
-      deltas 1-3 and 5-10, and delta 4's text is deleted at the merge rather than
-      carried forward as a proposal.
+- [ ] **Every `?` ground names its evidence, and the locator is checked by oracle** —
+      each of the 51 sites declares `<class>@<module>:<line>`, a crate-side
+      assertion holds every locator to resolving inside its own declaring member's
+      module, and a seeded bad locator reds it. A ground with no locator does not
+      compile, so the bulk pass cannot skip the step that makes it a classification.
+- [ ] **The ground partition is reported with both classes non-empty, or the
+      landing states why.** All 51 rows are the identical spelling today, so a pass
+      returning 51 of one class and zero of the other is the bulk-authoring
+      signature rather than a result — §check-reads-couples names both classes as
+      live, and an empty one is a finding to resolve before landing, never a figure
+      to report.
+- [ ] **A `?` that should be a declared root does not survive the pass** — at least
+      one site is checked against the two shapes §check-reads-couples calls
+      decidable (a hardcoded literal root, a positional with a literal default),
+      and any found is converted to a declared root rather than given a ground.
 - [ ] **The scratch fix is verified by the corpus, not by the diff** — delete
       `gate-sdk/gate-tests/check-crate-arms/good/.tmp/`, run the `gate_sdk` fixture
       suite, and confirm the directory does **not** reappear while the pinned
