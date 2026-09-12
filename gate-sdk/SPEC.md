@@ -1863,6 +1863,14 @@ The manifest grammar:
   than carrying its own copy**, the copy having been deleted rather than taught the
   second prefix — and `check-graph`'s `valid_glob_token`, whose prefix set is the
   same constant so the validator cannot admit a set the resolvers do not recognise.
+  **That fourth reader also fixes when a *third* prefix may first be written
+  down, and the answer is awkward enough to state:** `valid_glob_token` runs only
+  inside `validate_amend_manifest`, over a `# graph:` manifest embedded in a
+  `SPEC-*.md` amendment body, and it admits `[A-Za-z0-9._*?/-]` after stripping at
+  most one `COUPLES_PREFIXES` member — so an amendment *proposing* a new
+  colon-delimited token reds `check-graph` at its own authoring commit, before the
+  resolver the token needs exists. The prefix constant is therefore widened in the
+  delta that lands the resolver, never in the amendment that designs it.
   `kit:<glob>` expands to `<kit-root>/<glob>` — repo-root-relative — for every
   `gate_kit_roots` member at read time. A
   whole-tree gate writes `kit:*.sh` in place of a per-kit hand list; non-kit
@@ -1932,9 +1940,9 @@ The manifest grammar:
   the same slash-spanning matcher. So `native/src/*.rs` **does** fire the hook on
   `native/src/emit/mod.rs` while **not** covering a read there. Stated because the
   narrow reading alone, applied to a trigger, says a gate will not run when it
-  will: three independent readings in one iteration derived that from a `couples=`
-  line by eye and were wrong, and the remedy is to read the reach through
-  `gate_staged_matches` rather than off the field. **Do not "fix" the unquoting** —
+  will, and the field's own text cannot tell a reader which reader is asking — so
+  the remedy is to read the reach through `gate_staged_matches` rather than off the
+  field, every time, however obvious the field looks. **Do not "fix" the unquoting** —
   it is declared intent, and quoting it would break every trigger in the tree at
   once. Which of these semantics the field *should* have is not settled here and
   is filed as its own deliverable; what is settled is that the
@@ -8915,10 +8923,10 @@ crate carries `registry::couples_knob_names` for the one path that needs it
 in-process — the dispatcher handing a child its own slice, which would otherwise
 filter the union by the sentinel's own name and hand the child nothing — and a unit
 test holds the two derivations and the two spellings of the literal together. A
-registry-wide union was refused on measurement rather than on taste: the tree's
-registry declares 190 distinct knobs against the eight the descriptor corpus names,
-so that carrier would grow one member's baked hook invocation more than tenfold and
-stale it on every knob edit anywhere.
+registry-wide union was refused on measurement rather than on taste: a registry's knob
+count runs an order of magnitude past what any descriptor corpus names, so that carrier
+would grow one member's baked hook invocation far past the shape it needs and stale it on
+every knob edit anywhere.
 
 **So there is exactly one place a knob's value is computed — the owning kit's
 shell library — and the crate holds no default to drift from.** The rule is the
@@ -10910,6 +10918,15 @@ test were always TO's *committed* content while the binary was the host's
 binary. It is named as its own consequence because a reader who sees only the
 FROM half will restore the host-binary shortcut for TO on the ground that TO is
 usually `HEAD`.
+
+**Committed-at-their-ref is not the same as landed-on-master, and the difference
+is the one a session needs.** `GATE_SDK_UPGRADE_TO` takes any git-resolvable ref,
+so a throwaway commit on a scratch branch is a legitimate TO and the suite reads
+it exactly as it would read master. What makes a working-tree measurement invalid
+is the *default* of `HEAD`, never the contract — so "this cannot be sized until it
+lands" is a wrong reading of the paragraph above, and sizing a
+tightened-gates declaration before the push is one commit away rather than
+blocked.
 
 **What it does not cover.** The transition it proves is the *vendored kit
 directories* moving FROM→TO — phase A replaces them wholesale, in tree. It never
@@ -14974,9 +14991,9 @@ to resolve what the registry declined to declare — the substrate ruling forbid
 what the refusal changes is that the registry has no licence to decline where both halves
 hold. Two shapes satisfy the root half today — a hardcoded literal root, and a positional
 argument with a literal default, which the crate spells at least six ways — and they are
-**instances rather than the definition**: three hand sweeps over spellings during
-authoring produced three different populations, each missing one, and a seventh spelling
-is a module away. Read the property; treat any enumerated pattern as a floor.
+**instances rather than the definition**: a hand sweep over spellings under-reports, and
+the next spelling is always a module away. Read the property; treat any enumerated
+pattern as a floor.
 
 **The second half is the boundary, and it is a *withdrawal* rather than a narrowing.**
 The refusal was first stated on the root half alone, and it does not reach that far. A
@@ -14989,15 +15006,16 @@ deliverable. So those branches keep `?`, and the cadence row carries them as a s
 with its own review question — not *has this root become decidable*, which it already is,
 but *has the semantics question settled*.
 
-**Read that boundary as a deliverable rather than a shortfall, because the arithmetic
-invites the wrong reading.** The refusal covers 52 of the tree's declared roots and leaves
-51 at `?`, of which 26 are these fallback branches. That is not two thirds of a promise: it
-is the whole of what was decidable at this altitude, and the remaining third was never
-decidable here, because the rule it rests on had already been filed open. What this cost
-bought is that the open question now has a measured population and a named class instead of
+**Read that boundary as a deliverable rather than a shortfall, because the residue of
+`?` invites the wrong reading.** What a refusal bounded this way covers is the whole of
+what is decidable at its altitude; the fallback branches it leaves behind were never
+decidable there, because the rule they rest on was already filed open. What the bound
+buys is that the open question carries a measured population and a named class instead of
 a latent asymmetry — and the measurement that settles its severity is that **no trigger is
 lost**: the hook's matcher spans `/`, so every path the coverage reader reports uncovered
-still fires the gate. An adopter gains a red gate, never a missing coupling.
+still fires the gate. An adopter gains a red gate, never a missing coupling. A consumer's
+own population belongs on that consumer's cadence row, never here, where it would rot on
+the next gate that joins the registry.
 
 **The `--reads` report.** One line per walk root and nothing else — no count line
 and no header, because the count is derivable from the lines and a transcribed
@@ -15027,7 +15045,7 @@ the crate's three matching disciplines the walk's own entry point applies —
 `glob_files`' root-relative component match, `find_named`/`-name`'s basename match, or
 `find_files`' extension test. **The kind does not default**, and that is measured
 rather than stylistic: read kind-blind, with one matcher guessing from a token's
-shape, the assertion produced some nine hundred spurious findings, and a defaulting
+shape, the assertion produces spurious findings in bulk, and a defaulting
 kind would hand that to any author who omitted the tag. This is what makes the
 interpretation the member's own walker's — the reader stands for a walk it cannot see,
 so the walker's discipline travels on the field or nowhere. The field is **optional**
@@ -15239,12 +15257,10 @@ fire the hook on a tracked-path commit; a walk over `.tmp/` or generated state
 has no commit to couple to) and only **recursive** walks are analyzed — single-file
 reads, `git ls-files` enumeration and a single-level listing are out of scope.
 
-**That shell path is dead on a corpus carrying no gate scripts, and is retained for a
-vendoring consumer that still ships them.** No `.sh` gate declaration remains in this
-tree, so every undecidable root arrives on the registry path instead and
-`resolve_root`'s three token shapes fire only in fixtures. Recorded because a later
-reader meeting the shell spelling would extend dead code; the substance is unaffected,
-since the decidable subset was always "a root that resolves without running the gate".
+**That shell path is dead on a corpus carrying no gate scripts and is retained only for a
+vendoring consumer that still ships them** — where none remain, every undecidable root
+arrives on the registry path and `resolve_root`'s three token shapes fire in fixtures
+alone. Stated so a reader meeting the shell spelling does not extend dead code.
 
 Over-demand is absorbed one of two ways, never by weakening the glob semantics
 to pass a near-miss: add the covering sibling glob (the correct fix), or mark

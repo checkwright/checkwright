@@ -1,3 +1,6 @@
 # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
+couples-resolver-reach lesson rule doctrine-kit/DOCTRINE.md — a proxy standing in for a runnable test, five instances this iteration, wrong in one consistent direction every time; landed as Engineering-craft rule 26's statement
+couples-resolver-reach lesson rule doctrine-kit/DOCTRINE.md — check the frame, not just the answer: a reported "no legal form exists" may be an option set enumerated over the wrong axis, three firings; landed as Engineering-craft rule 26's corollary
+couples-resolver-reach lesson discard already owned — an oracle catches what reasoning passes (five attested) is Engineering-craft rule 24's corollary plus CLAUDE.md Oracle-first; "an assertion never run against a live instance is not yet an assertion" is rule 24's mutation clause verbatim; the attestation counts are this iteration's provenance and stay in git history per the provenance seam

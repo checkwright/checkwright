@@ -282,23 +282,16 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     skipped. It binds **outbound** claims too, and that reach does not follow
     from the inward examples: proposing that the operator file a report, open an
     issue, or escalate to a vendor asserts the thing is *unreported* — a claim
-    about the world the proposal presumes, and one search from settled. Attested:
-    a session drafted a complete vendor bug report and handed it over; the issue
-    was already documented upstream, with duplicates. The operator searched, the
-    session had not — and that same session had been corrected once that day for
-    relaying an unverified premise, so holding the general rule is what failed to
-    prevent the outbound instance. That is why the case is named here rather than
-    left to be derived from the rule.
+    about the world the proposal presumes, and one search from settled. The
+    outbound reach is stated rather than left to be derived, because holding the
+    general rule demonstrably does not produce it: the inward habit and the
+    outward one are learned separately.
     **A probe that ran can still fail to settle the claim, and its silence reads
     exactly like an answer.** A keyword sweep cannot find prose that describes a
     thing without naming it, and a bounded window (`grep -A`, a line range) says
-    nothing about the lines past its edge — neither reports its own coverage.
-    Attested twice on one long page within an hour: a `PowerShell|pwsh` grep
-    cleared a passage that said "small enough to exist twice", and a `-A 40`
-    window ruled on a section whose relevant subsection began a hundred lines
-    below it. So a probe's *coverage* is checked before its silence is read as a
-    negative — a second sweep on a paraphrase, or the section's real extent
-    against the window.
+    nothing about the lines past its edge — neither reports its own coverage. So a
+    probe's *coverage* is checked before its silence is read as a negative — a
+    second sweep on a paraphrase, or the section's real extent against the window.
     *Under agent work:* an agent's prose reads identically whether it was
     measured or inferred, so an unprobed premise enters the record
     indistinguishable from a verified one and is inherited downstream as settled
@@ -529,3 +522,36 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     surface is the queue's design-pending tier, where a mitigation's growing
     candidate list is the readable signal the corollary names.
     *Stages:* scope, spec, build
+
+26. **Read the subject, never a stand-in for it — a wrong stand-in is biased, not
+    noisy.** A measurement taken off a proxy for the thing that matters — a
+    module's knob list in place of the walk's filter argument, a declaration set
+    in place of the walks it declares, a hand sweep in place of a census an
+    oracle could run — errs in one consistent *direction*, because the
+    divergence is a property of the proxy rather than of the reading. So
+    independent readings converge on the **same** wrong answer, and agreement
+    between readers is not evidence: the fourth reader reproduces the first
+    reader's error for the first reader's reason. Name the subject, then name the
+    command that reads it; where an assertion's subject is a proxy, the assertion
+    is about the proxy. The corollary is the same substitution one level up, in
+    the option space rather than the measurement: when a session reports that
+    **no legal form exists**, the enumeration may have run over a stand-in axis,
+    so check the frame before accepting the impossibility — a reported dead end
+    is usually true inside a frame that is wrong.
+    *Under agent work:* an agent reaches for whatever is readable, and a proxy
+    gets chosen *because* it reads cleanly — which is also why review passes it:
+    a reviewer re-reads the same readable surface and inherits the bias instead
+    of catching it, so re-reading is the one remedy that cannot work. And an
+    agent reporting a dead end reports it from the option set it enumerated,
+    never from the one it did not see, so a confident "no legal repair" is the
+    shape most in need of a reframe rather than a ruling.
+    *Enforced by:* judgment, and honestly so — which surface a session read a
+    number off leaves no residue in the tree. What ships is the substitute for
+    the read rather than a check on it: an oracle per question (the `--emit`
+    arms and the `good/`+`bad/` fixture pair,
+    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The gate model) and rule 24's
+    printed set size, which catches a proxy that ranged over nothing but not one
+    that ranged over the wrong thing. Buildable and unbuilt: a census arm for
+    any population a session is asked to size, so the hand sweep has a cheaper
+    alternative at the moment it is tempting.
+    *Stages:* spec, build, validate

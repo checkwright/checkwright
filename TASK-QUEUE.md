@@ -2836,6 +2836,7 @@
 
 - **couples-glob-semantics-unowned** [design-pending] [cost: event/high] [surface: gate-sdk] — one manifest field, three readers, two
   incompatible glob semantics, and no surface owns which reader is entitled to which.
+  recurrence: couples-glob-semantics-unowned 2026-09-12
   **Probed at all three sources, not read off the bullet.** `check-gate-substrate-parity`
   assertion C matches with a bash `[[ p == g ]]`, where `*` crosses `/` — verified by execution:
   `gate-sdk/*.sh` matches `gate-sdk/checks/check-x.sh`. `check-reads-couples`' own couple matcher
@@ -2860,6 +2861,16 @@
   matcher, so the third semantics stops being undocumented and the port's own exposure closes.
   What remains is this entry's real question: one semantics with stated exceptions, or a
   per-reader meaning declared per reader.
+  **A FOURTH face, folded in at the couples-resolver-reach drain, and it reaches a second
+  field.** `check-reads-couples`' *filter* matcher supports `**` (`glob_walk`'s `**` arm,
+  `native/src/gates/reads_couples.rs:309`) where its *couples* matcher does not
+  (`path_matches_glob` requires equal segment count, `:157-167`, no `**` arm) — so a `**`
+  filter value states a coverage demand its own `knob:` couples token cannot express. That
+  is why this iteration's `CANON_KIT_COMMENT_SURFACE` is depth-enumerated per extension
+  rather than spelled `**` (`scripts/canon-config.sh:97` reasons it inline). Read in source,
+  not off prose. It widens the entry's subject from three couples readers to **which matcher
+  a field is entitled to**, the filter field included — and it is the same unruled question,
+  which is why it folded rather than minting a slug.
   Filed 2026-08-19 by close from the gap inbox; the drain executed all three matchers rather
   than reading them.
 
@@ -4935,6 +4946,111 @@
   Surfaced 2026-09-12 by the prior iteration's close into the gap inbox, which no stage of that
   iteration could drain; promoted here at the next scope, so the record is late and says so.
 
+
+- **causal-completeness-has-no-per-member-satisfiability-point** [design-pending] [cost: session/low] [surface: canon-kit]
+  — an amendment may assert a per-member obligation over an enumerable corpus part of which has
+  no satisfying value, and nothing catches it.
+  **Re-verified at the drain by reading the checklist, not the bullet.** canon-kit/SPEC.md:205-232
+  carries exactly five points — producer named and reachable, consumer named, existing integration
+  sections updated, every field has a named reader, each reader's red condition named under a
+  narrowing. None asks, for each member of the corpus a delta asserts over, what value satisfies
+  the obligation.
+  **Attested once, and caught out of band.** `SPEC-reads-root-default.md` delta 2 required every
+  member moved off `?` to declare the knob naming its scan pattern; five of the 26 (the four
+  `check-action-*` members and `check-graph`) bind their walk with a crate literal and have no
+  such knob. A member with no value to declare cannot declare, so build would have reached a stop
+  with no legal repair and no amount of reading would have said what to write. An oracle probe
+  found it; no gate and no checklist step did.
+  **Why `[design-pending]`:** the candidate is a sixth point, or a clause on point 4, owed only
+  where the asserted corpus is enumerable at authoring time — which is also the only time it is
+  answerable. Full gating is not claimed: evaluating the obligation per member means implementing
+  it, so the mechanism is a checklist obligation rather than a scanner, and that is the design
+  question rather than a detail of it.
+  **Cost while deferred:** every amendment asserting a per-member obligation over an enumerable
+  corpus carries the same unbounded stop risk, discovered at build where the repair is most
+  expensive and where the session has no authority to narrow the assertion.
+  Filed 2026-09-12 by spec into the gap inbox; drained and promoted at this close.
+
+- **reads-couples-skipped-set-has-no-census-oracle** [design-pending] [cost: session/low] [surface: gate-sdk]
+  — the population of `check-reads-couples`' decidable skipped walk roots is hand-swept, and has
+  been wrong every time it was counted.
+  **Deliverable:** an `--emit` arm (or a gate) enumerating every member declaring `?` together
+  with its walk's root expression and filter argument, so the set is measured once by an oracle
+  rather than re-swept per session.
+  **Measured cost of its absence:** 26, then 27, then at least 29 across three sweeps in one spec
+  stage, against 39 when an oracle finally counted — each miss caused by another spelling of one
+  idiom (`unwrap_or`, `unwrap_or_else` with a closure, a `match` on `args.first().filter` with a
+  `None` arm, `args.get(N)` as well as `args.first()`, and a hardcoded literal root that is not
+  argument-based at all).
+  **Re-verified at the drain that the arm still does not exist.** The `--emit` arm set carries no
+  census member, and `checkwright-gates --reads` requires a gate name — it answers one member per
+  invocation, so a census is still a loop a session writes by hand.
+  **Why it is cheap:** gate-sdk/SPEC.md §check-reads-couples already owns the declared-roots
+  machinery the arm would read and the binary already answers `--reads` per member, so the arm is
+  a projection over data that exists — one emitter plus a fixture pair, no new config, no new
+  contract.
+  **Cost while deferred:** any session needing the population pays a hand sweep that has never
+  once been right, and a wrong population silently mis-sizes whatever it is sizing.
+  Filed 2026-09-12 by spec into the gap inbox at the lead's direction rather than started, because
+  nobody ranked it; drained and promoted at this close.
+
+- **crate-registry-battery-roster-divergence-unasserted** [design-pending] [cost: session/low] [surface: gate-sdk]
+  — nothing compares the crate's registry roster with the battery's, so a member can be asserted
+  on one side and invisible on the other in either direction.
+  **Re-measured at the drain:** the binary's dispatch carries **115** `check-*` members; a
+  non-comment line count of `scripts/gates.list` gives **113**. The residue is
+  `check-surface-duplication` and `check-producer-liveness`.
+  **What the drain corrected in the filing's own claim.** The bullet read the residue as
+  unaccounted; each absence in fact already carries a stated cause in prose —
+  canon-kit/README.md:34 (`check-surface-duplication` "needs a glossary (exits 2 without one)",
+  and this tree declares none for the provenance-seam reason) and scripts/lifecycle-config.sh:12
+  (a registered liveness gate "would red every validate run against its own lock"). So the
+  residue is deliberate and the entry's subject is narrower than filed, and it stands unchanged:
+  neither disposition is reachable by any crate-side assertion, because nothing joins the rosters.
+  **Why it bites:** a crate-side assertion over the registry asserts over a corpus strictly wider
+  than the one `check-reads-couples` scans, so a member can red a crate assertion while being
+  invisible to the gate that exists to catch it, and can satisfy the gate while being unasserted
+  crate-side. Attested this iteration — the static-root refusal's 39-member red set included
+  `check-surface-duplication`, which no battery run can reach.
+  **Candidate mechanism:** an assertion in `check-gate-substrate-parity`, which already equates
+  the descriptor set with the `--list` roster, extended to name the registered-but-unlisted
+  residue, each member taking a recorded disposition the way the meta-gate conservation table's
+  members do.
+  **DISTINCT from `couples-dynamic-root-resolution`**, which it only cites as its attestation:
+  that entry's subject is which walk roots resolve statically and how each is declared, this
+  one's is the *roster* the declarations are asserted over, and it would stand unchanged if every
+  root in the tree were already declared.
+  **Cost while deferred:** two members stay dispatchable and unrun with their causes stated only
+  in prose no reader joins, and any future crate-side assertion inherits the same blind spot
+  silently.
+  Filed 2026-09-12 by build into the gap inbox rather than fixed, scope-gated intake refusing a
+  mid-session initiative; drained and promoted at this close.
+
+- **depth-enumerated-glob-bound-unoracled** [design-pending] [cost: event/low] [surface: canon-kit]
+  — a depth-enumerated glob value is a maintained copy of "any depth", and a file one level
+  deeper than the enumeration reaches leaves the scanned corpus **silently**.
+  **The class, not one value, and both instances are legitimate.**
+  `scripts/canon-config.sh` carries two: `CANON_KIT_MANIFEST_FILES`' single-level globs (reasoned
+  at :21, "single-level globs skip the gate-tests/ fixtures the finder pruned") and the
+  `CANON_KIT_COMMENT_SURFACE` value this iteration added, five depths per extension across
+  `sh|gate|rs` (reasoned at :97, because the couples matcher cannot express `**`). Both are
+  consumer editorial choices and neither is a kit defect. What no surface owns is that the depth
+  bound is an **unoracled literal**.
+  **Re-verified at the drain that the measured-claim mechanism cannot reach it.**
+  `scripts/canon-config.sh:80` sets `CANON_KIT_MEASURED_SURFACE_GLOBS` to
+  `CANON_KIT_MANIFEST_FILES` plus `.claude/commands/*.md` plus `TASK-QUEUE.md`; `scripts/*.sh` is
+  in none of them, so a `measured:` marker written in `canon-config.sh` is never read.
+  **Why `[design-pending]`:** two dispositions and they cost differently — widen the
+  measured-claim corpus to reach the config surface, or assert that no tracked governed source
+  lies deeper than the enumerations reach. The first makes one more surface measured forever; the
+  second is a shallow assertion with no reader outside itself.
+  **DISTINCT from `couples-glob-semantics-unowned`**, which is about which matcher a field is
+  entitled to, not about a value's depth bound.
+  **Cost while deferred:** the corpus is two to five segments deep with one level of headroom, so
+  the bound holds today and fails with no diagnostic on the day a governed source lands six
+  levels down.
+  Filed 2026-09-12 by build into the gap inbox; drained and promoted at this close.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -5204,8 +5320,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- manifest-family-couples-misses-the-consumer-widened-corpus
-- always-loaded-baseline-freshness
 
 ## Lessons Learned

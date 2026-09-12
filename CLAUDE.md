@@ -1,11 +1,9 @@
 # CLAUDE.md — Checkwright
 
-Checkwright packages a coding-agent-assisted delivery methodology as
-installable kits. The private companion brief — seam boundary,
-identity/namespace ownership, forward design memory behind the deferred-queue
-rungs — is `BRIEF.local.md`, which is **local-only and untracked** (it carries
-private context that must never be committed); consult it before roadmap/seam
-work. The kit map lives in [README.md](README.md).
+Checkwright packages a coding-agent-assisted delivery methodology as installable
+kits; the kit map is [README.md](README.md). The **local-only, untracked**
+companion brief `BRIEF.local.md` carries the seam boundary, identity/namespace
+ownership and forward design memory — read it before roadmap or seam work.
 
 This repo is public: no local paths, private repo/project names, accounts, or
 internal session/commit references in tracked files or commit messages —
@@ -61,6 +59,8 @@ The state machine, its stamp protocol, and the per-stage contracts:
 
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and regenerate.
+**Never read a `couples=` field's reach off the field** — four readers match it and
+two of their glob semantics disagree: gate-sdk/SPEC.md §The `# graph:` manifest.
 Per-clone opt-in: `bash gate-sdk/bin/run-gates.sh --install-hooks`. Every generated
 projection, that hook included, is rostered with its trigger, its regen command and
 the wide fan-outs in [docs/site-architecture.md](docs/site-architecture.md)

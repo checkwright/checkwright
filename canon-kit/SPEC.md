@@ -843,11 +843,10 @@ states the ground.
   **workflow tier** — which §check-spec-pointer requires, so a consumer who set the knob
   silently lost the whole `.workflow/` tracked tier — and **the walker's own prune set**,
   because the glob walk is bash-faithful and prunes nothing where the extension walk
-  prunes `GATE_PRUNE_DIRS`. That last one is the cause of the directory-shape explosion
-  a configured value otherwise has to enumerate around, and it is worth naming because
-  the cause was first attributed to the kit-root prune — which cannot have been it, being
-  a no-op wherever `CANON_KIT_SCAN_KIT_ROOTS=1`. A later reader inheriting that
-  attribution would fix the wrong arm and see no change. The knob is a corpus
+  prunes `GATE_PRUNE_DIRS`. **That last one is the cause of the directory-shape explosion**
+  a configured value otherwise has to enumerate around — named explicitly because the
+  kit-root prune is the arm that reads like the culprit and cannot be it, being a no-op
+  wherever `CANON_KIT_SCAN_KIT_ROOTS=1`. The knob is a corpus
   *selector*, never a corpus *replacement* with its own semantics.
 - **The canonical-spec finder prunes the generated on-site mirror**, as a directory
   prune beside the `templates/` one it already applies. A prose gate grading a generated

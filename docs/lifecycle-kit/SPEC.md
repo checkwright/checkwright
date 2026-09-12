@@ -2437,6 +2437,16 @@ disposable *by definition*; a consumer's persistent measurement trends live
 outside it by retention contract. A delete that fails because a preserved
 basename sits inside an otherwise-doomed subdirectory is noise, never an abort.
 
+**So scratch protects nothing, and a session holding verified-but-uncommitted
+work there holds one copy.** The wipe is the far end of it; the near end is that
+a three-way merge can drop a scratch artifact mid-iteration with no conflict to
+notice, because the file is outside git's view entirely. Between the two, a patch
+or an analyzer a session has *verified* and parked in scratch has no second copy
+unless the session makes one, and the only two that exist are a commit and a
+stash. Stated here rather than left to a session's judgment because the
+disposable-by-definition rule above is exactly what invites parking work there —
+the rule is sound and its corollary is not obvious from it.
+
 `.gitkeep` is a **kit invariant, not configuration** — the consumer cannot unset
 it. The kit must not delete a file the consumer tracks: doing so removes a
 tracked file at the boundary and dirties the tree at the very moment the
