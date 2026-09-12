@@ -48,41 +48,126 @@ literal default", which is what the registry's own comment says the `?` populati
 is — and only the substrate and the idiom's spelling move. Recorded here because a
 later reader meeting the entry's shell spelling would extend dead code.
 
-### (2) A declared root carries the knob naming the pattern it scans
+### (2) A declared root names what bounds its walk, in one of three forms
 
-Every member this delta moves off `?` declares its root **with** the knob its scan
-pattern comes from, because a bare root is an over-demand that no couples set can
-satisfy {design-bearing}.
+Every member this delta moves off `?` declares what bounds its walk — a knob's
+value, a kit-generic literal, or nothing because it performs no walk — because a
+bare root is an over-demand no couples set can satisfy {design-bearing}.
 
 A bare `.` root demands that the member's `couples=` cover every tracked file in
 the tree. That is not a tighter assertion, it is an unsatisfiable one, and
 absorbing it by widening couples to `*` would retire the trigger the field exists
-to compute. The root therefore carries the optional second field
-§check-reads-couples already defines — a root and the **name** of the knob whose
-value is that walk's pattern — whose ground is stated there and holds here
-unchanged: carrying the name rather than the pattern keeps the value single-sourced
-and reuses the resolution path the bridge already owns.
+to compute. So the root carries the optional second field §check-reads-couples
+already defines — and that field gains one form, because **the present grammar has
+no satisfying value for part of the corpus this amendment asserts over.**
 
-`check-stage-entry` is the proven instance rather than a special case: it is the
-sole member with a resolvable root today, and it has two, both declared as `.`
-under a filter-knob name. This delta generalises a mechanism that already ships and
-is already exercised.
+**The three forms, and why there are exactly three.** A walk's file set is bounded
+by its root and its filter, and a filter has exactly two possible sources:
+
+- **`knob:<NAME>`** — the filter is a knob's value. This is today's form, whose
+  bare spelling keeps its present meaning unchanged; the tag is admitted beside it
+  so a reader of either sibling field meets one vocabulary. Its ground is
+  §check-reads-couples' own: carrying the name rather than the value keeps the
+  value single-sourced and reuses the resolution path the bridge already owns.
+- **`lit:<comma-list>`** — the filter is a **kit-generic literal** the crate owns
+  at the walk site. New, and the form the corpus forced.
+- **no declared root at all** — the member performs no walk in the analyzed sense.
+  `git ls-files` enumeration and single-file reads are already outside the analyzed
+  class, so a member doing only those has no root to declare, and `?` has been
+  absorbing that case while meaning something else.
+
+**Why the literal form does not breach the refusal it appears to breach.**
+§check-reads-couples states that the filter "is carried as a knob name and **never**
+as a literal pattern", and states its ground in the same breath: spelling the
+pattern in would be "a second spelling of a knob's default, which
+de-literalization forbids". That ground is narrow and decisive — **a kit-generic
+literal that is nobody's knob has no default to second-spell.** `yml`/`yaml` and
+`md` carry no adopter-specific information; minting a knob to hold them would be
+the inverse of the error the provenance seam guards, manufacturing consumer config
+out of legitimate kit mechanism and handing every adopter a knob whose only correct
+value is the one the kit already knows. So this delta **narrows the refusal to its
+stated ground** rather than overturning it, and the refusal keeps full force
+wherever a knob does exist.
+
+**The interpretation of a literal is the walker's, never the field's.** The crate's
+walk entry points already take different filter kinds — extensions for one, globs
+for another — so a `lit:` list is read by whichever walker the member's walk uses.
+The field therefore mints no third matcher, on the same ground its sibling token
+mints none.
+
+**One walk may need two declarations, and that needs no new syntax.** A shared
+enumeration helper may take a knob's value when the consumer configured it and a
+kit literal when they did not, selecting at runtime — so which form applies is a
+property of the member **and the consumer's configuration**, not of the member
+alone, and no single static declaration is true of both consumers. Such a member
+declares its root **twice**, once per branch, and the coverage demand is their
+union. That is the same argument `SPEC-knob-token.md` delta 1 makes for the trigger
+— a knob's value and the kit's default corpus are alternatives at runtime, so
+couple both branches — and it reuses a mechanism that already ships rather than
+minting a union spelling: `check-stage-entry` already declares one root twice under
+two filter-knob names.
+
+**The third form is not an opt-out, and an existing assertion is why.** A member
+could try to escape coverage by declaring no root while still walking. Assertion A
+of the declared-roots pair (§Meta-gate conservation for the binary substrate) runs
+every member over its own fixture cases with root recording on and requires
+**observed roots to be a subset of declared roots**, so a false no-walk claim reds
+there. The outcome is backstopped before this amendment adds anything, which is why
+it can be admitted as a form rather than fenced with a new check.
+
+**Footing: this form is not generalised from one instance.** `check-stage-entry` is
+the only member with a *declared* resolvable root, which understates the case —
+ten further members already hold the knob half in their own source and declare `?`
+anyway, and four more hold both halves. The form fits fifteen members today; what
+is missing is permission to say so.
 
 ### (3) The decidable cohort declares, and the couples its declaration forces widen
 
-The 26 members take their root-and-knob declarations, and each member's `couples=`
-widens to whatever its newly-asserted coverage demands {design-bearing}.
+The 26 members take their declarations in delta 2's forms, and each member's
+`couples=` widens to whatever its newly-asserted coverage demands {design-bearing}.
 
-The declaration sweep itself is bounded and uniform. What is not uniform, and is
-where the judgement sits, is the consequence: each of the 26 has its couples
-coverage asserted **for the first time**, and a member whose couples under-covers
-its real scan pattern reds. For the eleven canon-kit members the shortfall is
-already measured — their corpus knob reaches `TRAJECTORY.md`, `RELEASING.md`,
-`CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `ROADMAP.md`,
-`doctrine-kit/DOCTRINE.md` and the `docs/` pages, and their couples reach none of
-them. **For the other 15 the shortfall is unmeasured and cannot be measured before
-the refusal is built**, so the first act of this delta is to build the refusal and
-*read* the reds, before any couples is touched.
+**The partition is measured, and it is what delta 2's third form exists for.** By
+the one mechanical test that needs no judgement — what the walk's filter argument
+is, followed one hop through a shared enumeration helper:
+
+- **10 knob-bounded**, each naming the knob delta 2 wants: six through
+  `spec::manifest_files*` on `CANON_KIT_MANIFEST_FILES` (`check-manifest-count`,
+  `check-manifest-temporal`, `check-knob-citation`, `check-prose-enum`,
+  `check-spec-pointer`, `check-tracking-claim`), plus `check-queue-slug-liveness`
+  on `QUEUE_KIT_PROSE_SURFACE_GLOBS`, `check-measured-claim` and
+  `check-unmarked-claim` on `CANON_KIT_MEASURED_SURFACE_GLOBS`, and
+  `check-prose-tells` on `CANON_KIT_PROSE_TELL_GLOBS`.
+- **5 kit-literal-bounded**, which is the set with no knob to name and therefore the
+  set that made delta 2's literal form necessary: the four `check-action-*` members
+  on `["yml","yaml"]` and `check-graph` on `["md"]`.
+- **4 runtime-selected, needing both** — the `spec::comment_surface` cohort
+  (`check-comment-tier`, `check-deprecation-task`, `check-spec-pointer`,
+  `check-todo-task-liveness`), whose helper globs by `CANON_KIT_COMMENT_SURFACE`
+  when a consumer set it and falls back to the kit literal `["sh","gate","rs"]`
+  when they did not. These take delta 2's twice-declared form.
+- **The remainder is neither**, and build partitions it rather than assuming: one
+  member filters **after** the walk through a closure over a knob-derived set
+  (`check-spec-embedded-source`, over `CANON_KIT_EMBED_LANGS`), one has a
+  knob-valued **root** and no filter at all (`check-workflow-tiering`, on
+  `GATE_SDK_WORKFLOW_DIR`), and the rest locate no walk entry point and no
+  enumeration helper — which most likely puts them in delta 2's third form, since
+  `git ls-files` enumeration is already outside the analyzed class.
+
+**The counts overlap by one**: `check-spec-pointer` is both knob-bounded through
+`spec::manifest_files` and runtime-selected through `spec::comment_surface`, because
+it walks twice. It is the worked example for the twice-declared form and likely
+needs three declarations, not two. Named because a sweep keyed on one walk per
+member would silently drop its second.
+
+What is not uniform, and is where the judgement sits, is the consequence: each of
+the 26 has its couples coverage asserted **for the first time**, and a member whose
+couples under-covers its real scan pattern reds. For the eleven canon-kit members
+the shortfall is already measured — their corpus knob reaches `TRAJECTORY.md`,
+`RELEASING.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`,
+`ROADMAP.md`, `doctrine-kit/DOCTRINE.md` and the `docs/` pages, and their couples
+reach none of them. **For the rest the shortfall is unmeasured and cannot be
+measured before the refusal is built**, so the first act of this delta is to build
+the refusal and *read* the reds, before any couples is touched.
 
 **This is where the sibling amendment becomes load-bearing rather than adjacent.**
 The eleven canon-kit reds are satisfiable in exactly one way: their couples must
@@ -145,14 +230,26 @@ like every other row, and does not wait on it.
     declaration and a first-argument-with-literal-default walk root in the same
     module. A root that is genuinely dynamic, a module with no walk, and a module
     that already declares its root are each silent.
-- **The root-and-knob declaration** (delta 2).
+- **The three-form root declaration** (delta 2).
   - *Producer:* each member's registry tuple, reported by the binary's `--reads`
-    arm — the existing producer of the existing field, with no new field minted.
+    arm — the existing producer of the existing field. **No new field is minted**;
+    one existing field gains a value kind, and the empty declaration is an existing
+    state this delta only gives a meaning.
   - *Consumer:* `check-reads-couples`' per-root coverage assertion, at the per-root
-    loop, where it resolves the named knob through the bridge it already sources
-    and filters the root's tracked enumeration by the resolved value.
-  - *Reader of the knob-name half:* that same loop and nothing else, which is the
-    field's existing contract; this amendment adds no second reader to it.
+    loop, which already resolves a named knob through the bridge it sources and
+    filters the root's tracked enumeration by the resolved value.
+  - *Reader of the new `lit:` value kind:* that same loop, at that same transition,
+    which is the field's existing sole reader — so the value kind adds no reader. It
+    passes the literal where it today passes a resolved knob value, and the
+    interpretation is the member's own walker's (extensions for one entry point,
+    globs for another), so no matcher is added either.
+  - *Reader of the twice-declared root:* the same loop, which already iterates roots
+    rather than members and so needs no change to take one root twice — the
+    `check-stage-entry` precedent is what proves this rather than an argument.
+  - *Reader of the empty declaration:* assertion A of the declared-roots pair, at
+    the fixture run, which requires observed roots to be a subset of declared. It is
+    the reader that makes the third form honest rather than an opt-out, and it
+    exists already.
 - **The widened couples** (delta 3).
   - *Producer:* the descriptor edits, whose trigger consequence is emitted by
     `gen-pre-commit.sh`.
@@ -191,9 +288,20 @@ like every other row, and does not wait on it.
   and gains the clause this delta turns on: the substrate answers, and may not
   answer `?` for a root it can bound.
 - `gate-sdk/SPEC.md` §check-reads-couples, the optional root filter-knob field and
-  its live-instance paragraph naming `check-stage-entry` (delta 2). The field's
-  population stops being one member, so the paragraph states the general rule and
-  keeps `check-stage-entry` as its first instance.
+  its live-instance paragraph naming `check-stage-entry` (delta 2). The field gains
+  the `lit:` form and the `knob:` tag beside its bare spelling, its population stops
+  being one member, and the paragraph states the general rule while keeping
+  `check-stage-entry` as its first instance.
+- `gate-sdk/SPEC.md` §check-reads-couples, *"The filter is carried as a knob name and
+  never as a literal pattern, and that is the load-bearing detail"* (delta 2). This
+  is the passage delta 2 narrows, and it is narrowed **to its own stated ground** —
+  a second spelling of a knob's default — rather than weakened. The paragraph keeps
+  that sentence for the case it was written about and gains the case it does not
+  reach: a kit-generic literal that is nobody's knob. Not yet applied.
+- `gate-sdk/SPEC.md` §check-reads-couples, the no-declared-root case (delta 2). The
+  section records that an empty root set means *performs no analyzed walk* and that
+  `?` had been absorbing it, citing assertion A as what keeps the empty declaration
+  honest. Not yet applied.
 - `gate-sdk/SPEC.md` §check-reads-couples, the shell-text tractable class and
   `resolve_root`'s three shapes (delta 1). The section records that this path is
   **dead on a corpus with no gate scripts** and is retained for a vendoring
@@ -244,6 +352,18 @@ like every other row, and does not wait on it.
       and 63-root figures are this amendment's authoring measurement at
       `af126eb7`; build re-runs the census before sweeping, because a gate added in
       between moves both.
+- [ ] **The partition is run by the mechanical test, never by reading a module for
+      intent** — the discriminator is what the walk's **filter argument** is, followed
+      one hop through a shared enumeration helper. Reading a module's knob list for
+      whether a knob "looks corpus-bounding" produced three wrong answers during
+      authoring, every one of them scoring a satisfiable member unsatisfiable; a
+      module may read six classification knobs and bound its walk through a seventh,
+      or read none and bound its walk inside a helper.
+- [ ] **A member may walk more than once** — the partition is keyed on walks, not on
+      members. `check-spec-pointer` is the worked case: it is knob-bounded through
+      `spec::manifest_files` *and* runtime-selected through `spec::comment_surface`,
+      so it needs more declarations than a one-walk-per-member sweep would give it,
+      and a sweep keyed on members drops its second walk silently.
 - [ ] **The sibling lands with it** — `SPEC-knob-token.md`'s token is what
       makes the eleven canon-kit reds legally satisfiable. Neither amendment's
       merge leaves the tree green alone.
@@ -262,6 +382,14 @@ like every other row, and does not wait on it.
       **Judge the terminal move:** if the 33-member remainder leaves the entry's
       corpus deliverable unfinished, the move is a demotion with `[cost:]` and
       `[surface:]` restored from the promoting diff, not a Done move.
+      **A demotion states its cause on the entry, and the two causes are not
+      interchangeable.** Firing on the remainder delta 4 gave a cadence to is an
+      *honest completion* — that remainder was out of scope from the moment it got a
+      cadence instead of a fix. Firing because a delta had no satisfying value for
+      part of the corpus it asserts over is *an authoring defect absorbed as a cost
+      overrun*, and a demotion that does not say so leaves the record showing a
+      correctly-sized unit that merely ran long. Name which, in the demoting commit
+      and on the entry.
 - [ ] **Removals propagated** — `## Retired spellings` above holds, re-run by
       `check-amendment-retired-spelling`.
 - [ ] **Gaps filed** — a cross-component gap found during the work is resolved
