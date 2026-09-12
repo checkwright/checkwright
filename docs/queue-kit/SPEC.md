@@ -1668,6 +1668,19 @@ named entry**, on demand and computed at the asking, and it keeps no tally and
 counts nothing across the pool. An arm that later grew a pool-wide count would be
 re-minting exactly what this paragraph refuses.
 
+**No arm reds on the compression act, and this line is where that refusal is
+recorded.** The one machine-readable shape a breach of the compression contract
+below has — a deferred entry's counted extent falling in a commit that also lands
+a ruling line — is equally the shape of that contract's own relief, *compress by
+answering*. An arm reding on that shape cannot tell the correct act from the
+defect, and a gate that cannot separate them spends the correct act to catch the
+defect, so no such arm is owed under any framing that gives it a red. **What the
+refusal binds is the verdict, never the instrument.** An instrument that reports
+the same commits and judges none of them asserts nothing, so it is outside the
+refusal — which is why the `entry-history` arm below, reporting exactly those
+falls with no verdict column and no red condition, stands beside it rather than
+reversing it.
+
 *Why a declaration line is discounted, and why exactly one of each grammar.* Such
 a line is
 **fixed-shape and width-bounded** — §The tag algebra rules its ceiling to be

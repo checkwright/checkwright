@@ -12,68 +12,6 @@
 
 ## New Features
 
-- **entry-compression-contract-unenforced** [spec: SPEC-compression-legibility.md] — the compression
-  relief that queue-kit/SPEC.md §check-queue-entry-budget mandates most often
-  is enforced by nothing, and the failure is invisible where it lands.
-  **The concession is the spec's own, twice**, re-read at the 2026-08-30
-  drain: queue-kit/SPEC.md ("it sees an entry's current extent, and
-  judging whether a removed line was answered or discarded is semantic") and
-  again for the recording-in-the-moment rule it names. So the rule that
-  compression proceed by ANSWERING grounds, never by dropping them, has no
-  oracle at all.
-  **Why the failure is invisible**: extent is the only artifact, and a
-  compressed entry reads identically whether its missing grounds were answered
-  or silently discarded. A later reader cannot tell that grounds it lacks were
-  ever written.
-  **Candidate shape, unpriced and not started**: a gate arm reding a commit in
-  which a deferred entry's counted extent SHRINKS while that same commit adds
-  a ruling or recurrence line, unless the commit also carries the relocation
-  citation the section already specifies. Both halves are machine-readable,
-  which is what makes it a proxy for "a mandated write displaced grounds";
-  what it cannot decide is the semantic half, so it reds a shape rather than a
-  judgment.
-  **It SUPERSEDES `ruling-accretion-outgrows-the-entry-cap`, and that is ANSWERED**: those three
-  shapes were refused, the entry is Done as a 2026-09-09 operator-ratified wontfix, and its
-  boundary note landed at queue-kit/SPEC.md §check-queue-entry-budget. This one's subject is the
-  enforceability of the relief the spec ALREADY rules correct, live because those three were not.
-  **THE FIRST ATTESTED INSTANCE IS MOOT AND ITS CLASS IS NOT.** At `fcf51555`
-  `amendment-roster-omission-detection` carried a propose-once record; `40477bdb` compressed it
-  out while adding ruling lines, and the next scope had to recover the spent route from git to
-  avoid re-escalating an answered member. That entry has since left Deferred, so the dangling
-  antecedent went with it; what the arm would have caught is unchanged.
-  **RULED IN CONSULT 2026-09-09 (`consult, own-authority`, operator-convened, lead-relayed): COSTED
-  AND FILED, NO MECHANISM OWED.** The candidate arm's shape — extent shrinks while a ruling line
-  lands — is also the shape of the relief the spec mandates (compress by answering), so it reds the
-  correct act as often as the defect: a classifier no gate can honestly run, the 2026-08-30 ground.
-  The lever is content tiering — a ruling lands on the entry as a pointer to TRAJECTORY.md or the
-  owning SPEC, never as prose — and this iteration's scope paid its rounds because four landed as
-  prose. **Declined at threshold twice — operator direction, 2026-09-11 and 2026-09-12, both
-  lead-relayed:** no mechanism is owed; the per-boundary re-surfacing is absorbed, not suppressed.
-  **THE 2026-09-09 CONSULT RULING ABOVE IS NOT REVERSED AND STANDS.** A second operator direction,
-  2026-09-12 lead-relayed, promotes this entry into unit set `registry-roster-oracles`, the same
-  day as and against the decline above it. The lead recorded that it could not relay the promotion
-  as a direction, a direction being unable to reverse a closed ruling where only `/consult` can;
-  the operator took it knowingly. So it proceeds **against an unreversed ruling** whose ground is
-  untouched, reversing that ruling still takes a `/consult`, and `/spec` authors against both —
-  this edit being the subject in miniature, funded by compressing two blocks above by answering.
-  recurrence: entry-compression-contract-unenforced 2026-09-07 2026-09-09
-  **Cost while deferred** was: every mandated write onto a saturated entry pays
-  the same unenforced honour-system compression, and the queue's most-ruled
-  entries are exactly the ones paying it.
-  **AUTHORED AT SPEC, AND THE 2026-09-09 CONSULT RULING IS HELD RATHER THAN WORKED AROUND.** That
-  ruling refuses a classifier that REDS, and its ground is untouched: this amendment ships no
-  classifier and nothing in it reds, so reversing the ruling still takes a `/consult` and none is
-  asked for. The shape taken instead follows this entry's own statement of the harm, which is
-  LEGIBILITY and not classification — "a later reader cannot tell that grounds it lacks were ever
-  written". Two halves: the compression contract gains its missing durability clause, the sibling
-  of canon-kit's already-stated rule for the LANDING commit; and `--emit entry-history <slug>`
-  reports, on demand, the commits at which one entry's counted extent fell, judging nothing. Its
-  named reader has a real trigger — assertion A's failure text, read by the session about to
-  compress. Grounds and the bounded walk at SPEC-compression-legibility.md deltas 1-3.
-  Filed 2026-08-30 by close from the gap inbox; both of the owning spec's
-  concessions were re-read at the drain.
-
-
 ## Technical Debt
 
 ## Deferred
@@ -5426,5 +5364,6 @@
 - crate-registry-battery-roster-divergence-unasserted
 - unknown-emit-arm-diagnostic-misdirects
 - prompt-ranking-ungrantable-shape-class
+- entry-compression-contract-unenforced
 
 ## Lessons Learned
