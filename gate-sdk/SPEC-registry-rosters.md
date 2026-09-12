@@ -15,13 +15,20 @@ premise that does not hold, the delta says so at the passage rather than
 building around it.
 
 **The seam is already ruled and is not re-opened** (scope, `e597f672`): pinning a
-fixture case's scratch in every spelling a member may read is **kit mechanism** —
-a case's sandbox location is the harness's own fact. Nothing becomes consumer
+fixture case's scratch in every spelling a member may read is **kit mechanism**.
+**One ground of that decision is corrected here and the decision itself stands.**
+It was stated as though descriptive — that a case's sandbox location *is* the
+harness's own fact, never a choice — and build measured that it is not: a case
+config assigning `GATE_SDK_TMP_DIR` overrides the harness's pin at the live code
+today (delta 2, with its reproduction). The decision is **prescriptive**. It
+refuses to *mint* a per-gate opt-out; it never claimed none existed, so finding one
+already live does not contradict it, and recording that one is not minting it.
+Nothing becomes consumer
 config; `GATE_SDK_TMP_DIR` already exists and its value stays the consumer's for
 ordinary runs. Two shapes are foreclosed rather than ranked: computing the pin at
 the **member** (a second producer on a single-producer bridge), and a **per-gate
 opt-out knob** (a second source for one pin). Delta 2 exists because the SPEC
-currently *promises* the second of those.
+currently presents the second of those as sanctioned behaviour.
 
 ## What changes
 
@@ -89,34 +96,63 @@ it is the oracle for), §run-gate-tests already commits to invoker-root
 absolutization, and widening here would settle a question no entry asks. Recorded
 so a later reader does not read the absence as an oversight.
 
-### (2) §run-gate-tests' `source`-before-`cd` order is corrected, and the case-config promise is withdrawn
+### (2) Three passages about one seam are re-grounded, and the live override is recorded as a hole
 
-The section states the opposite of its own quoted script and of the code, and the
-claim that rests on the mis-statement promises the shape the seam ruling
-forecloses {design-bearing}.
+One root defect — the consumer config seam's assignments landing ahead of the
+resolutions that would preserve an inherited value — has produced three wrong
+statements in §Layout and configuration and §run-gate-tests, and the section
+contradicts itself between two of them {design-bearing}.
 
-`gate-sdk/SPEC.md:10577` reads *"the `--run-gate-tests` arm does read the case's
-seam, because it enters the case dir before the source."* The section's **own**
-quoted script ninety lines earlier (`gate-sdk/SPEC.md:10486`) and the live code
-(`run_gate_tests.rs:421`) both run `source "$2/lib/gate.sh"` **before**
-`cd "$1"`. Verified by literal reproduction of the script against two directories
-each carrying a `scripts/gate-sdk-config.sh`: the config seam picked up the
-**pre-`cd`** directory's config every time, never the case's.
+**Authoring's premise was itself half wrong, and build measured it.** Authoring
+held that the arm reads the *invoker's* seam only, and concluded that the
+case-config claim was false and should be withdrawn. The `cd`-order half is right;
+the conclusion drawn from it is not. Literal reproduction of the resolution script
+against two directories each carrying a `scripts/gate-sdk-config.sh`, each logging
+its own `$PWD`, records **two** seam source events per resolution — the invoker's,
+then the **case's**. The second comes from `gate_command`'s knob resolution, which
+re-sources the owning kit's `lib/*.sh` in a subshell (`gate.sh:381-396`) that runs
+after the `cd`. So a case config naming its own scratch does win, at the live code,
+today.
 
-Two consequences, and the second is why this is a delta rather than a typo fix:
+The three passages and what each takes:
 
-- The section's claim at `gate-sdk/SPEC.md:10677-10678` that a case config naming
-  its own scratch **still wins** is false today, and this amendment does not make
-  it true.
-- It should not be made true. A case config naming its own scratch is precisely
-  the **per-gate opt-out** the seam ruling forecloses as a second source for one
-  pin. So the sentence is **withdrawn** rather than repaired: the harness's pin is
-  authoritative for the case invocation, and a case config's other knobs — which
-  the live fixtures do use, `GATE_SDK_NATIVE_CRATE` and
-  `GATE_SDK_CARGO_TARGET_DIR` among them — are unaffected, because they reach the
-  member through the argv the pre-`cd` source already resolved.
+- **`§Layout and configuration`, the seam's own precedence claim.** It reads *"Env
+  vars still win (the config file sets a default the invoking shell may
+  override)"*. False: the library `source`s the file plainly, so a bare
+  `NAME=value` assignment beats the environment. Measured — an exported
+  `GATE_SDK_GRAPH_ARTIFACT` does not survive this repo's own seam, and all ten live
+  consumer configs in this tree use bare assignment. **Corrected** to state that the
+  precedence is the config file's choice and not the seam's, with the consequence a
+  caller needs: a harness cannot make a knob authoritative by exporting one. This
+  passage is outside the two authoring named, and it is **forced** rather than
+  swept in: the §run-gate-tests hole below cites this section for the seam's
+  precedence and cannot cite a section stating the opposite.
+- **`§run-gate-tests`, the `cd`-order ground.** *"because it enters the case dir
+  before the source"* — backwards, against the section's own quoted script and
+  `run_gate_tests.rs:422`. The **conclusion is kept** (the arm does read the case's
+  seam) and the ground is replaced with the second source that actually produces it.
+- **`§run-gate-tests`, the case-config claim.** Its content is **true** and is
+  kept; its **normative force is inverted**. The sentence read as a sanctioned
+  behaviour — a case config naming its own scratch "still wins" — which is exactly
+  the per-gate opt-out the seam decision forecloses. It is rewritten as a **known
+  hole**: unsanctioned, unclosed, filed, and explicitly not an extension point.
 
-**Not yet applied.** Replacement text for both passages is build's to land.
+**Silence was the option to refuse, and the refusal is the reason this delta is
+shaped this way.** Withdrawing the sentence outright would have left the SPEC
+refusing to mint an opt-out while saying nothing about the one already live, and the
+natural reading of an undocumented live capability is that it is available — which
+is how a latent behaviour becomes a relied-on contract by attrition. Recording it
+with the opposite normative force satisfies the instruction not to resurrect the
+withdrawn promise: the withdrawn sentence promised the override as intended, and
+this records the same fact as unintended.
+
+**Closing the hole is not taken here.** It is a change to how the seam treats
+*every* knob, not this one, so it wants its own unit and is filed to the gap inbox
+rather than absorbed. A case config's other knobs — which the live fixtures do use,
+`GATE_SDK_NATIVE_CRATE` and `GATE_SDK_CARGO_TARGET_DIR` among them — are unaffected
+either way.
+
+**Applied.** All three passages landed.
 
 ### (3) `--emit reads-census`: the `?` population, measured once by an oracle
 
@@ -465,13 +501,18 @@ diagnostic underneath an uncorrected one.
   (delta 1). It states which process the pin enters and why that is upstream of the
   bridge rather than beside it, and records that the bare and prefixed spellings
   are one pin reaching two substrates. **Applied.**
-- `gate-sdk/SPEC.md` §run-gate-tests, line 10577 (delta 2). The order is corrected
-  to `source` before `cd`, matching the section's own quoted script at 10486.
-  **Not yet applied.**
-- `gate-sdk/SPEC.md` §run-gate-tests, lines 10677-10678 (delta 2). The
-  case-config-wins claim is **withdrawn**, with the seam ruling's foreclosure of a
-  per-gate opt-out as its ground, so the withdrawal reads as a decision rather than
-  a deletion. **Not yet applied.**
+- `gate-sdk/SPEC.md` §Layout and configuration, the seam's precedence claim
+  (delta 2). *"Env vars still win"* is corrected: precedence is the config file's
+  choice, not the seam's, with the consequence that a harness cannot make a knob
+  authoritative by exporting one. Cited by the §run-gate-tests hole below, which is
+  why it is corrected in the same unit rather than filed. **Applied.**
+- `gate-sdk/SPEC.md` §run-gate-tests, the `cd`-order ground (delta 2). The
+  conclusion is kept and the ground replaced: the case's seam is read at
+  `gate_command`'s knob-resolution re-source, which runs after the `cd`, not at the
+  arm's own source, which runs before it. **Applied.**
+- `gate-sdk/SPEC.md` §run-gate-tests, the case-config claim (delta 2). Kept as
+  fact, inverted in force: recorded as a known hole, unsanctioned and filed, with
+  an explicit statement that it is not an extension point. **Applied.**
 - `gate-sdk/SPEC.md` §check-reads-couples (deltas 3 and 4). The section gains the
   census arm as the answer to the population its cadence row asks for, and records
   the measured figures (36 members, 51 `?` roots) as of this authoring with the
@@ -528,10 +569,11 @@ different fact from why this tree does not register it.
 
 ## Retired spellings
 
-- `a case config naming its own scratch still wins` (delta 2) — the claim at
-  `gate-sdk/SPEC.md:10677-10678` is withdrawn rather than repaired, because the
-  shape it promises is the per-gate opt-out the seam ruling forecloses. No
-  identifier is retired with it; the spelling is a prose claim and the grep is over
+- `a case config naming its own scratch still wins` (delta 2) — the **spelling** is
+  retired because it reads as a sanctioned behaviour, which the per-gate opt-out the
+  seam decision forecloses is not. What it asserted is true and is **not** retired
+  with it: the same fact is re-stated in §run-gate-tests as a known hole. No
+  identifier is retired either; the spelling is a prose claim and the grep is over
   prose.
 
 Delta 8 adds a **sibling** refusal for the emit path; the existing gate-path
@@ -583,8 +625,10 @@ roster declares a retirement and this is the opposite.
       `bash gate-sdk/bin/build-native.sh`, and the gate-sdk, canon-kit and
       evidence-kit fixture suites.
 - [ ] **Merged with no information lost** — each addition integrated into its proper
-      canonical-spec section, not appended; the two stale §run-gate-tests passages
-      corrected and withdrawn in place rather than left beside their corrections.
+      canonical-spec section, not appended; the three stale seam passages (one in
+      §Layout and configuration, two in §run-gate-tests) re-grounded in place rather
+      than left beside their corrections, and the live override recorded as a hole
+      rather than deleted or promoted to a capability.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
       component (`ls gate-sdk/SPEC-*.md`). No sibling amendment is in flight for
       gate-sdk, so the none-remain half is satisfiable at this amendment's own

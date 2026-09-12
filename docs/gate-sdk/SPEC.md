@@ -311,8 +311,16 @@ through it as a `.gate` member: `GATE_SDK_CONFIG_FILE` when
 set — and a set-but-missing path exits 2 rather than silently running on
 defaults (an operator typo must not pass as clean) — else
 `<gates-dir>/gate-sdk-config.sh`, sourced only when the file exists — a
-zero-config consumer is unaffected. Env vars still win (the config file sets a
-default the invoking shell may override), but the file is how an override
+zero-config consumer is unaffected. **Which of the file and the environment wins
+is the file's own choice and not the seam's**, stated because the opposite is the
+natural assumption: the library `source`s the file plainly, so a knob written as a
+bare `NAME=value` assignment overrides whatever the invoking shell exported, while
+one written `: "${NAME:=…}"` yields to it. Bare assignment is what every consumer
+config in this tree uses, so here the file wins — measured rather than assumed, an
+exported `GATE_SDK_GRAPH_ARTIFACT` does not survive this repo's own seam. The
+consequence for a caller is the one worth carrying: **a harness that needs a knob's
+value to be authoritative cannot get that by exporting one**, and §run-gate-tests
+records the live instance. The file is in any case how an override
 *persists*: an env-only knob dies with the shell that exported it, so a
 consumer that must relocate a layout knob for every session sets it here. The
 one knob the file cannot set is `GATE_SDK_GATES_DIR`, which locates the file
@@ -10631,9 +10639,18 @@ after the value it was meant to change had already been read.
 (§Layout and configuration).** A bespoke test that `cd`s into a case dir in a
 subshell therefore does **not** pick up that case's own
 `<gates-dir>/gate-sdk-config.sh`, and must set the knob with `gate_env`; the
-`--run-gate-tests` arm does read the case's seam, because it enters the case dir
-before the source. The asymmetry is stated here because the source-time half is
-invisible at the call site that suffers from it.
+`--run-gate-tests` arm **does** read the case's seam. The asymmetry is stated here
+because the source-time half is invisible at the call site that suffers from it —
+and its **ground is not the `cd` order**, which runs the other way. The resolution
+script transcribed above sources *before* it `cd`s, so the arm's own outer source
+reads the **invoker's** seam, exactly as a bespoke test's does. The case's seam is
+reached by a **second** source: `gate_command` resolves a member's declared knobs
+by re-sourcing the owning kit's `lib/*.sh` in a subshell (§lib/gate.sh), and that
+subshell runs after the `cd`. Reproduced rather than reasoned — a config in each
+directory, each recording its own `$PWD`, logs two source events per resolution,
+the invoker's then the case's. The correction matters beyond tidiness: read off the
+`cd` order, the arm looks like it reads one seam, and every conclusion about which
+value survives is drawn from the wrong one.
 
 **A `*.test.sh` may also be a *scenario* runner rather than a gate driver, and
 one that compares substrates asserts exactly where a dispatch exists.** A bespoke
@@ -10761,8 +10778,27 @@ with the invoker's live scratch, which is how
 `.tmp/run-validate.lock` — comes to contend with a real `--run-validate` producer
 running in the same tree. Trading a write into the corpus for a write into live
 state is not a fix. Within the pair loop the pin stays one-directional: an
-already-absolute value passes through, and a case config naming its own scratch
-still wins, config being sourced ahead of the environment (§lib/gate.sh).
+already-absolute value passes through.
+
+**The pin is not authoritative, and that is a known hole rather than a
+capability.** Any `gate-sdk-config.sh` on the resolution path that assigns
+`GATE_SDK_TMP_DIR` overrides it — the **case's**, read at the post-`cd` re-source
+above, and the **invoker's**, read at the outer one — because the seam's
+assignments land ahead of the `[[ -v ]]` resolutions that would have preserved an
+inherited value, and which of the two wins is the config file's choice and not the
+seam's (§Layout and configuration). Measured on the live code: with the pin set and
+a case config naming its own scratch, the resolved argv carries the config's value,
+not the pin's. The pin is live in this tree only because no consumer config here
+assigns the knob.
+
+**Nothing sanctions a member using this.** A fixture case that names its own
+scratch is the per-gate opt-out a second source for one pin would be; it survives
+because the seam's assignment shape predates the pin, not because it was granted.
+Closing it is a change to how the seam treats **every** knob rather than this one,
+so it is filed rather than taken at the pin. This paragraph exists so that the next
+reader to discover the override meets a statement calling it unclosed instead of an
+undocumented behaviour to read as available — which is how a latent capability
+becomes a relied-on contract.
 `<tests-dir>/*.test.sh` unit tests run after the pairs; each must exit 0 — and
 each runs with the **invoker's** cwd (repo root in this repo's battery), so
 absent a pin a gate it drives silently inherits this repo's consumer config. The
