@@ -10,6 +10,10 @@ cat >> scripts/gates.list <<'EOF'
 # evidence-kit
 check-evidence-baseline
 check-evidence-manifest
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar,
+# a sibling of the `# smoke-unregistered:` line below on a second roster (§The install disposition)
+# unregistered: check-battery-roster — its subject is the configured runner doc's battery-roster block vs EVIDENCE_KIT_SUITES; the scratch consumer vendors no root README carrying that block
+# unregistered: check-producer-liveness — this consumer's own gates suite is the battery --run-validate itself invokes, so a registered liveness gate would red every validate run against its own lock
 EOF
 
 # smoke-unregistered: check-producer-liveness — entry-preflight only, never gates.list-registered: its subject is a producer-in-flight transition, not tree state, and a consumer battery that includes itself (this repo's does) would red every run against the lock run-validate just claimed (evidence-kit/SPEC.md §check-producer-liveness)

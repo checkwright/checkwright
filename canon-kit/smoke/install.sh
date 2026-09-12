@@ -33,6 +33,9 @@ check-spec-pointer
 check-todo-task-liveness
 check-tracking-claim
 check-unmarked-claim
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar,
+# a sibling of the `# smoke-unregistered:` line below on a second roster (§The install disposition)
+# unregistered: check-surface-duplication — this tree declares no glossary, for the provenance-seam reason, and the member exits 2 without one
 EOF
 
 # smoke-unregistered: check-surface-duplication — the glossary topology it reads (CANON_KIT_GLOSSARY_FILE, default GLOSSARY.md) is optional and this tree ships none, so its exit 2 is uncorroborated only because the invoking repo lacks the same optional surface, not because the gate is broken

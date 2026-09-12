@@ -6,6 +6,12 @@ set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
 
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar.
+# gate-sdk's own leg forward-declares the checks below, ahead of the Actions content only this
+# leg writes; retracting that placeholder here, in the same motion as the real registration, keeps it from ever reading stale.
+grep -v '^# unregistered: check-action-\(pinning\|run-shell\|gh-repo\|permissions\) —' scripts/gates.list > scripts/gates.list.new
+mv scripts/gates.list.new scripts/gates.list
+
 cat >> scripts/gates.list <<'EOF'
 # site-kit
 check-docs-cname-parity

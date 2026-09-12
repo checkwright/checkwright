@@ -38,6 +38,14 @@ check-lifecycle-registration
 check-survey-record
 check-gap-inbox-neutrality
 check-scratch-citation
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar
+# (§The install disposition's `# smoke-unregistered:` sibling on a second roster). These four
+# read LIFECYCLE_KIT_SKILLS_DIR (default .claude/commands); this script vendors no skill files
+# there, so each finds nothing rather than exercising real coverage.
+# unregistered: check-lesson-disposition — its subject is TASK-QUEUE.md's Lessons Learned entries at HEAD vs the worktree; the scratch consumer's seeded queue carries none
+# unregistered: check-shim-restatement — its subject is a binding shim under .claude/commands; the scratch consumer vendors no skill files there
+# unregistered: check-stage-skill-coverage — its subject is stage-to-skill coverage under .claude/commands; the scratch consumer vendors no skill files there
+# unregistered: check-skill-binding — its subject is a binding directive under .claude/commands; the scratch consumer vendors no skill files there
 EOF
 
 if [[ ! -f TASK-QUEUE.md ]]; then

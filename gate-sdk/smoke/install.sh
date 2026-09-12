@@ -6,6 +6,11 @@ set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 SDK="$SMOKE_KIT_ROOT"   # gate-sdk installs itself; its tools live here
 
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's kit-vendored scope is a raw
+# directory scan, and this harness copies every kit's tree into SCRATCH before any install.sh
+# registers a gate; exporting narrows every command below to the process's one installed kit.
+export GATE_SDK_KIT_DIRS="$SDK"
+
 mkdir -p scripts .workflow
 
 cat > scripts/gates.list <<'EOF'
@@ -38,6 +43,18 @@ check-template-copy-parity
 check-template-registry-parity
 check-test-hermetic
 check-workflow-tiering
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration
+# grammar (a sibling of §The install disposition's `# smoke-unregistered:`, on a second
+# roster): gate-sdk-owned subcommands this leg's minimal registry deliberately omits,
+# each read by name and reason so the residue is on the surface the assertion reads.
+# unregistered: check-gate-binary-fresh — its subject is the crate the binary was built from; GATE_SDK_NATIVE_CRATE is kept outside every kit root and a scratch consumer never rebuilds against a source checkout
+# unregistered: check-root-tiering — its subject is the consumer-curated root manifest, which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
+# unregistered: check-enforcement-fresh — compares docs/enforcement.md against its emitter; the scratch consumer vendors no docs/ site
+# unregistered: check-kit-registration — checks a root README kit-registry table and a fixture-runner doc; the scratch consumer vendors neither
+# unregistered: check-action-pinning — site-kit's own install writes the only Actions-shaped content any install here ever does and registers this gate there, retracting this placeholder in the same motion (see site-kit/smoke/install.sh)
+# unregistered: check-action-run-shell — site-kit's own install writes the only Actions-shaped content any install here ever does and registers this gate there, retracting this placeholder in the same motion (see site-kit/smoke/install.sh)
+# unregistered: check-action-gh-repo — site-kit's own install writes the only Actions-shaped content any install here ever does and registers this gate there, retracting this placeholder in the same motion (see site-kit/smoke/install.sh)
+# unregistered: check-action-permissions — site-kit's own install writes the only Actions-shaped content any install here ever does and registers this gate there, retracting this placeholder in the same motion (see site-kit/smoke/install.sh)
 EOF
 
 # smoke-unregistered: check-root-tiering — its subject is the consumer-curated root manifest GATE_SDK_ROOT_ALLOWLIST (default scripts/root-allowlist.list), which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
