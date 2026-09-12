@@ -4101,7 +4101,16 @@
   **Why `[design-pending]`:** the candidate shapes are unchanged and one of them is to do nothing
   — name the channel in the oracle-first rule as a non-oracle, or leave it to session judgment —
   so picking one is a doctrine call rather than a defect repair.
-  recurrence: editor-diagnostic-unruled 2026-09-01
+  **FOUR FURTHER INSTANCES, 2026-09-12, and TWO OF THEM ARE STRUCTURALLY IMPOSSIBLE rather than
+  merely stale** — which is new information, not a fifth repetition: across one iteration the
+  channel reported compile errors and dead code in `native/` on four separate occasions and
+  `bash gate-sdk/bin/build-native.sh` compiled clean in about thirteen seconds every time; one
+  report named a symbol that does not exist anywhere in the tree, another called a function missing
+  that is defined and read within the same module. A stale index explains a lag; it does not
+  manufacture a symbol. **The candidate surfaces named with them:** the agent-execution protocol's
+  verify-after-commit set, or CLAUDE.md's `native/` paragraph beside its
+  "neither discharges the other" rule — both narrower than the doctrine call above.
+  recurrence: editor-diagnostic-unruled 2026-09-01 2026-09-12
   Filed 2026-09-01 at scope's boundary drain and born in the icebox; re-tiered the same day by
   close on instances 3 and 4, which postdate the eviction. Both fell on one calendar day, so the
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
@@ -5050,6 +5059,251 @@
   the bound holds today and fails with no diagnostic on the day a governed source lands six
   levels down.
   Filed 2026-09-12 by build into the gap inbox; drained and promoted at this close.
+
+- **delegated-read-blind-to-gitignored-capture** [design-pending] [cost: session/low] [surface: delegation-kit]
+  — a worktree-isolated read-only agent cannot see any gitignored capture surface, so a delegated
+  close-surface read reports "absent" for a file that has content, and the delegation is mandated
+  rather than optional.
+  **MEASURED, same commit, main checkout against a fresh worktree:**
+  `.workflow/knowledge-friction.log` 18 lines against reported absent;
+  `.workflow/prompt-friction.log` 822 against 23;
+  `.workflow/subagent-stop-liveness.log` 561 against 1;
+  `.workflow/essay-harvest.md` 220 against absent.
+  **The mandate is what makes it a trap rather than a caveat.** `agent-dispatch-guard` refuses a
+  `DELEGATION_KIT_READONLY_TYPES` dispatch without `isolation: worktree`, and a fresh worktree
+  carries no gitignored file — so every one of the eleven close-surface roster rows that carries
+  content is unreachable by the only dispatch shape the guard permits. A close that trusted the
+  delegated numbers would have cleared nothing, dispositioned four surfaces as absent, and reported
+  clean.
+  **Why `[design-pending]`:** the candidate is a statement of the constraint at the point of
+  dispatch — by the roster emitter or by the dispatch guard — and which surface owns it decides
+  whether the reader is warned at the roster or refused at the guard.
+  **DISTINCT from `close-surface-row-absent-reads-as-empty`**, which is that the ROSTER prints empty
+  and absent identically; this one is that a delegated READER cannot tell content from absence at
+  all.
+  **Cost while deferred:** the failure is silent and reads as a clean result, so it costs a wrong
+  disposition rather than a diagnosis.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its close-surface
+  roster read; drained and promoted at this iteration's scope.
+
+- **audit-roster-last-stamp-author-unconstrained** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+  — the audit roster assigns each row's `last:` stamp to the CLOSE-STAGE review in its own header,
+  and any stage can write it with nothing refusing, so a row can read as close-audited when no
+  close audit ever ran.
+  **Attested at `couples-resolver-reach`.** The unresolvable-walk-root row left the build stage
+  carrying `last: couples-resolver-reach`, written by build at `8ac5e006`/`e4001f83`, and that
+  close found the row already stamped before performing its own verification. The verification
+  happened to hold — the live oracle reported 52 covered against 51 skipped, matching the row text
+  exactly — which is what makes the class invisible: a pre-stamp is indistinguishable from a
+  performed audit, and the one case where it is wrong looks identical to the many where it is right.
+  **NOT A VIOLATION BY BUILD in substance** — build had just moved the population and the row would
+  have been stale otherwise — so the open question is whether the roster should admit a non-close
+  stamp with an author field or refuse one outright.
+  **Why `[design-pending]`:** the candidates are a `<stage>` field beside `last:`, or a gate
+  asserting the stamping commit carries a close stamp in `.workflow/WORKFLOW-STATE.txt`. The first
+  adds a name to a governed grammar; the second is a shallow assertion. Either lands on the same
+  roster grammar `audit-roster-row-carry-unruled` opens, so one amendment plausibly answers both.
+  **Cost while deferred:** the roster's own header states an authority its rows cannot be held to.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its audit-roster
+  review; drained and promoted at this iteration's scope.
+
+- **ruling-staleness-header-reads-as-undeclared** [design-pending] [cost: session/low] [surface: lifecycle-kit]
+  — the `--emit ruling-staleness` probe reports the ruling record's own framing header as an
+  UNDECLARED CONDITION, so every reader of that section meets a permanent false positive.
+  **Reproduced live at this scope's ritual, not carried on the filing.** The arm prints
+  `== undeclared conditions ==` with one row, `TRAJECTORY.md:3`, which is the file's own "This file
+  carries two things and shrinks toward empty" paragraph — prose declaring the record's contract,
+  not a ruling, so it correctly carries no `discharge:` declaration. The probe partitions the file
+  into paragraphs and demands a declaration of each, with no way to tell a governing header from a
+  governed paragraph.
+  **The consequence is not noise alone.** The section exists to surface a ruling somebody forgot to
+  declare; a row that is always present trains the reader to skip the section, which is exactly the
+  one finding it would ever carry.
+  **Why `[design-pending]`:** the probe skipping paragraphs above the first `##` heading is a
+  boundary condition inside one reader; the record declaring its header exempt — the way it already
+  declares its own close-surface row inline at `TRAJECTORY.md:12` — puts the fact on the governed
+  surface instead. Which is right decides whether the record's shape is the probe's business.
+  **Cost while deferred:** one boundary condition plus a fixture pair, unspent, against a section
+  read at every close and at every scope ritual.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its ruling-record
+  read; drained here, and reproduced live at this scope's own ritual.
+
+- **append-and-wrapper-shapes-unsteered** [design-pending] [cost: session/low] [surface: guard-kit]
+  — two prompt-friction shapes rank at the top with no guard steering and no allowlist entry that
+  could ever match them, because both are composition rather than a command.
+  **Measured over 226 prompting calls across 49 patterns:** `cat >>` at 27x and `bash -c` at 20x.
+  The harness matcher refuses a composed form by construction, so an allowlist entry buys nothing
+  and the triage criterion lands both on GUARD RULE rather than allowlist.
+  **Each has a strictly better shipped form.** An append to a capture surface has the
+  `--emit kfric` / `file-gap` / `file-survey` arms; an append to a tracked file has Write and Edit.
+  `bash-guard` already steers the READ direction ("don't read files with a bare `cat`") and leaves
+  the APPEND direction unguarded, which is the asymmetry. `bash -c` wraps its payload so neither the
+  allowlist nor any guard rule can see the command inside, which makes it a steering target on its
+  own terms rather than a convenience.
+  **DIAGNOSED AGAINST THE COMMITTED ALLOWLIST rather than assumed:** `grep` 18x,
+  `bash gate-sdk/bin/run-gates.sh` 23x, `echo` 10x, `printf` 4x, `git status` and `git log` 2x each
+  are ALREADY GRANTED and fell through only on compounding or redirection, so those are
+  habit-change findings and covering them would read as a fix while buying nothing. The mandated
+  wait primitives (`while >` 24x, `until` 4x) are unmatchable by construction and their friction is
+  the accepted price of the prescribed shape.
+  **Why `[design-pending]`:** a guard rule that steers an append has to name the sanctioned
+  destination set, and whether that set is kit-generic or consumer config is the seam question.
+  **SITS INSIDE `prompt-ranking-ungrantable-shape-class`' STRUCTURAL GROUND, and one fact there
+  qualifies this entry's allowlist claim:** that entry records a `cat >> .tmp/*` grant given
+  2026-09-09 and routed back unapplied, so a granted-but-unlanded allowlist entry does exist for
+  one prefix of the 27x shape — and it reaches `.tmp/` alone, leaving every append to a tracked or
+  `.workflow/` path where this entry found it. DISTINCT from that entry, which asks what the
+  RANKING should say about an unretireable row; this one asks for the steer that retires it.
+  DISTINCT from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed
+  at all — this is the append shape specifically, and its `bash -c` half is not an authoring act.
+  **Cost while deferred:** the tree's two heaviest unmatchable shapes stay unaddressed while the
+  ranking keeps re-surfacing them.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its prompt-friction
+  triage; drained and promoted at this iteration's scope.
+
+- **unknown-emit-arm-diagnostic-misdirects** [design-pending] [cost: session/low] [surface: gate-sdk]
+  — an unknown `--emit` arm name prints the binary's GATE subcommand roster instead of the arm set,
+  so the diagnostic confirms a wrong mental model instead of correcting it.
+  **THE ORIGINAL FILING'S CLAIM WAS WRONG AND IS DELETED RATHER THAN ANNOTATED.** The arm roster IS
+  owned and discoverable — gate-sdk/SPEC.md (the non-gate arm) lists every `--emit-<name>` across
+  every kit in one place, and `git log -L` shows that text predating the filing by many commits. So
+  the captured friction was a discovery-process miss, not absent documentation.
+  **What survives is narrower and sharper:** a reader who typed `--emit` wanted arms, and the
+  moment-of-miss diagnostic points at the wrong roster entirely.
+  **Why `[design-pending]`:** the candidate is a diagnostic naming gate-sdk/SPEC.md's non-gate-arm
+  section and printing no gate roster at all, which decides whether a refusal may cite a SPEC
+  section — a coupling the gate-output contract does not currently carry.
+  **DISTINCT from the iceboxed `bin-tool-help-arm-absent-tree-wide`**, re-read at the drain: that
+  entry is about other `bin/` tools answering `-h`/`--help` wrong, and every tool it named has since
+  been deleted.
+  **Cost while deferred:** one diagnostic string plus a fixture pair, unspent, against a wrong
+  roster printed at every mistyped arm.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on a mistyped arm at its
+  own drain; drained and promoted at this iteration's scope.
+
+- **retired-block-admits-live-gate-name** [design-pending] [cost: session/low] [surface: queue-kit]
+  — the `queue-edges` retired block admits a live GATE NAME as a retired queue slug, and that false
+  positive is the block's LARGEST single target.
+  **Measured over the whole block:** 51 target slugs across 92 citing rows, of which
+  `check-spec-pointer` alone carries 14 — and `check-spec-pointer` is a registered gate
+  (`scripts/gates.list`, `canon-kit/checks/check-spec-pointer.gate` with its fixture pair), never a
+  queue entry that retired. All 51 targets were grepped against `gates.list` and against every
+  `*.gate` in the tree; it is the only hit, so the class is narrow and fully measured rather than
+  estimated.
+  **The consequence is specific to the reader the close contract creates.** Close is told to read
+  the retired block as a finding set and correct each citation inline, so 15 percent of the rows it
+  is sent to act on cite a live gate needing no correction at all — and the largest single target is
+  the one that is pure noise, which is where a reader spends the most attention.
+  **Why `[design-pending]`:** subtracting the registered gate roster from the retired-target set
+  makes the arm read `gates.list` for a second purpose, and whether a queue-kit arm may take a
+  gate-sdk registry as an input is the seam question; marking such a row with its own token instead
+  keeps the arm's inputs where they are and moves the judgment to the reader.
+  **DISTINCT from `retired-slug-live-pointer-citation`**, which is a citation pointing at genuinely
+  retired work; this one is that the target is not retired work at all.
+  **Cost while deferred:** every close reads a finding set 15 percent of which is noise, at its
+  most attention-expensive row.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its retired-block
+  read; drained and promoted at this iteration's scope.
+
+- **couples-caution-unreachable-by-pointer** [design-pending] [cost: event/low] [surface: gate-sdk]
+  — the `couples=` reader-divergence caution is unreachable by pointer from anywhere a descriptor
+  author starts, and that is a PLACEMENT finding rather than a request to restate it.
+  **The rule is stated and the error is attested anyway.** gate-sdk/SPEC.md (the `# graph:`
+  manifest) states the divergence and calls reading the field as universal a live error; the
+  attested count is at least FOUR independent readings that derived the trigger-versus-coverage
+  divergence off a `couples=` line by eye and got it wrong, one of which nearly shipped a matcher
+  change flipping `check-reads-couples`' own bad case to exit 0. The count lives in git history and
+  in this entry rather than on the kit surface, since a kit states its rule undated.
+  **PROBED rather than asserted.** The paragraph sits roughly 70 lines into the `couples=` bullet of
+  the long when-a-gate-earns-its-place section, with no sub-heading and no anchor; a live `.gate`
+  descriptor carries only its own `# graph:` and `# spec:` lines and points at neither the paragraph
+  nor the grammar block; gate-sdk/README.md has no `couples=` grammar section; and no
+  gate-authoring template exists. The only route to it is reading that one list item start to
+  finish.
+  **PARTLY REMEDIATED, and the residue is what is filed.** CLAUDE.md gained a one-line pointer
+  beside its edit-a-gate-manifest-and-regenerate sentence, which reaches a reader who opens the
+  always-loaded file and reaches nobody who opens a descriptor.
+  **Why `[design-pending]`:** the caution earning its own sub-heading makes it citable, moving the
+  descriptor grammar to a surface a gate author opens makes it findable, and a second `.gate`
+  `# spec:` pointer makes it reachable from the artifact — three different governed surfaces.
+  **RESTATING THE PARAGRAPH ANYWHERE IS REFUSED** — relocating prose behind a tag rather than making
+  it findable is the blessing-a-restatement defect.
+  **Cost while deferred:** the tree's most-misread field keeps its caution where only a
+  start-to-finish read of one list item reaches it.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its gate-manifest
+  pointer sweep; drained and promoted at this iteration's scope.
+
+- **always-loaded-bullets-restate-owned-spec** [design-pending] [cost: session/high] [surface: context-kit]
+  — the always-loaded surface carries four bullets whose bodies restate what the kit SPEC they
+  point at already owns.
+  **Measured at a close brevity pass, ranked by lines.** (1) The TRAJECTORY.md bullet, 9 lines
+  defining the ruling/direction/decision/grant vocabulary and the consult-only rule before pointing
+  at lifecycle-kit/SPEC.md §The steering vocabulary, which owns those definitions. (2) The `native/`
+  bullet, 8 lines on crate structure, the commit-time obligation and the not-a-kit predicate before
+  pointing at gate-sdk/SPEC.md §Porting a gate to the binary substrate. (3) The three capture
+  bullets at roughly 21 lines together, where the invocable commands MUST stay resident — they are
+  the invocation surface an agent needs every session — but the surrounding policy prose duplicates
+  the kit sections each bullet already cites. (4) The `.tmp`/`.metric`/`.workflow` bullet at 6
+  lines, mostly definitional.
+  **WHY A CLOSE COULD NOT TAKE IT, which is why it is filed rather than done.** The resident tier is
+  what every session of every stage reads, so a cut dropping a load-bearing clause is discovered as
+  a behaviour change in some later session with no gate between, and the surface sits at its
+  committed ceiling so the change cannot be validated by the ratchet moving. A close also has no
+  mandate to rewrite what sessions are instructed with.
+  **The pass paid for its own addition in-iteration:** two lines cut from the opening paragraph
+  funded a one-line `couples=` pointer, so the meter read 202l and +0 unchanged.
+  **Why `[design-pending]`:** what a resident bullet owes beyond its pointer is unruled, and the
+  answer is a rule about the always-loaded tier rather than four edits.
+  **Cost while deferred:** four restatements on the highest-blast-radius surface in the tree, each
+  re-read by every session of every stage.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its always-loaded
+  brevity pass; drained and promoted at this iteration's scope.
+
+- **doctrine-rule-body-length-unruled** [design-pending] [cost: session/low] [surface: doctrine-kit]
+  — two doctrine rule bodies are the longest in the deliverable and neither is narration, a count,
+  nor a seam violation, so a brevity pass finds them and can do nothing with them.
+  **Measured:** rule 11 Scope-gated intake at roughly 20 lines, of which the hotfix-valve paragraph
+  is three nested bounded-three-ways clauses each qualified further; and rule 2 Enforcement-first at
+  roughly 27 lines. The doctrine is load-triggered rather than resident, but every Engineering-craft
+  rule pays at each `--emit stage-rules` read and every methodology rule pays through its digest, so
+  length is a real cost here and not a neutral one.
+  **WHY A CLOSE DID NOT CUT THEM.** Each clause in rule 11 narrows a valve deciding whether work may
+  start mid-iteration, so compressing it changes what a session believes it is permitted to do — a
+  judgment wanting the rule's intent in view rather than a length target, and the close brevity
+  pass's licence is compression, not re-ruling. The same close DID cut this file where the class was
+  unambiguous: two attested-session-narration blocks out of rule 12, which the generalizable rule
+  already carried without them.
+  **Why `[design-pending]`:** the disposition is a rule about what a doctrine body owes its digest —
+  a rule whose digest is complete and whose body is three times its length is the readable signal —
+  or an explicit acceptance of the length as the price of a valve that must not be misread, said
+  once. Either way it is a ruling on the deliverable, not an edit.
+  **Cost while deferred:** two editorial reads unspent, against a surface every stage reads through
+  its digest.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on the
+  doctrine half of the same brevity pass; drained and promoted at this scope.
+
+- **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
+  — the pre-push account step is check-then-write, and the ops runbook's own open section measures
+  the active account re-arming between pushes inside one session, so the check narrows a window it
+  cannot close.
+  **Measured 2026-09-12, probed rather than reasoned:** the `GH_TOKEN` environment variable
+  overrides the keyring for `gh auth git-credential`, established by comparing the helper's answer
+  with and without the override — the tokens differed. A push can therefore name its identity
+  per-command while keeping the named remote, so `origin/master` still advances and the
+  stale-tracking-ref defect is not reintroduced, with no `-c credential.helper=` argument (which the
+  harness permission path refuses outright) and no credential in argv or a URL.
+  **Residual:** `bash-guard` refuses command substitution, so an agent reaches the form only through
+  `--scratch-run` or the operator's own shell.
+  **NOT SESSION-ACTIONABLE, and this entry does not ask for it to be.** The existing step is a
+  closed operator ruling (2026-08-27) and the runbook stating it is local-only, so superseding it is
+  a `/consult` and nothing else. What this entry asks for is a ranked decision on whether to take
+  the explicit form.
+  **Why `[design-pending]`:** the tracked half — a credential precondition at RELEASING.md — exists
+  only if the form is taken, so the design is downstream of a ruling no session may make.
+  **Cost while deferred:** the identity window the runbook measures stays open between pushes in one
+  session, with a probed remedy on record and unranked.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its
+  release-transport read; drained and promoted at this iteration's scope.
 
 ## Icebox
 
