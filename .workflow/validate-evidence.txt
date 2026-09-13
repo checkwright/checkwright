@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+resident-tier-restatement gates sha256=79fd63e64ebdb64362bd61d8f4a4b4aa66f7fd75c0a354dc83519896ddeeb830 pass=113 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement gate_sdk sha256=66a533f5aabd61861735228ab38d37160110c0bb5cf1faa6276fb232d8f64908 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement canon_kit sha256=e0780e41e810cbac5bb0be8cbace64fd320c84899e0272c315453780c9dd6455 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement guard_kit sha256=bec1c9c35372c4d6106471ec51071ee748b3187f02c6303efe7fbf6667cc7d0d pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement guard_tests sha256=d1df8069c9935679a05e36a5b9c6859bc81fa68434855f3791e0cbb5bb328dd3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement demo sha256=cb2f44e125f63121ea76ae980df6bb30118d57cd835361c2adb72e5514e97a82 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement installer_smoke sha256=c78bfbff8ef33b268a48b98e4b9fc3d324819a617bacfe570b234914cb3d00b2 pass=13 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement consumer_smoke sha256=6f3544cca3c566864e3e8b63847cc86754469502af36a944b99e45d4aa074194 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement upgrade sha256=43f91e3bd2d3f5bbfe233620ab575424df85aed66a128796b7726a91ddb3f427 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement agents_md_smoke sha256=f3a7d59b3b32eb501e45c4a4bd7a40075b8debfe97b2e1fc55e0994d9b8ea5c1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+resident-tier-restatement native_crate sha256=1eddaf5ce8eacd65482d5d1e9fb998a534dc9437053ce05a4131dee394484a0f pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
