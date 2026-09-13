@@ -5107,8 +5107,4 @@
 
 ## Done
 
-- cited-script-path-liveness-inline
-- stale-identifier-after-retirement
-- docs-cmd-invariant-inline-scope-imprecise
-
 ## Lessons Learned
