@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+static-config-seam gates sha256=d3bc4dba400a66b9a552e49705fe544923f4175ff0b936d36188bfb9893f4f54 pass=113 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam gate_sdk sha256=66a533f5aabd61861735228ab38d37160110c0bb5cf1faa6276fb232d8f64908 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam canon_kit sha256=e0780e41e810cbac5bb0be8cbace64fd320c84899e0272c315453780c9dd6455 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam guard_kit sha256=bec1c9c35372c4d6106471ec51071ee748b3187f02c6303efe7fbf6667cc7d0d pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam guard_tests sha256=d1df8069c9935679a05e36a5b9c6859bc81fa68434855f3791e0cbb5bb328dd3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam demo sha256=8e1c9ad0d52f997df1f1772757262a6aa63e238472565237f514ae1f2a87b0d7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam installer_smoke sha256=a6096ae2b4167dd5c392794d5f0d8f59b4a002061acceca66f340ad5062cec1a pass=13 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam consumer_smoke sha256=0c75bf04291b3562f6563d8658d1a21bf45e500711d232721b08309766e25628 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam upgrade sha256=3e5e2e65e2c0ef9a6b4ac1a921b07e7cdd3aa7c364d87ba726c72da778099dd1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam agents_md_smoke sha256=4f53112b1fb71b30d327638f282a9fa7f7e4c929a6a7d62bdb29042f8e5d26e9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+static-config-seam native_crate sha256=1b0385ec7367a48776d56398fe0312a9543e09d8d02fa820b7f7ae064e582a62 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
