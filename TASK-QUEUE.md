@@ -17,6 +17,63 @@
 ## Deferred
 
 
+- **lead-journal-advisory-fires-on-the-live-lead** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — the
+  boundary entry's undisposed-lead-journal advisory (lifecycle-kit/SPEC.md §bin/enter-stage.sh, the
+  lead-journal invariant paragraph) fires on the **live** dispatching lead's own journal at every
+  lead-dispatched scope entry, labelled as the prior lead's journal: the lead opens its journal
+  (posture, grant, dispatch log) before it dispatches scope, so at that boundary the file never ends
+  in `DISPOSED`. Attested at the 2026-09-12 and 2026-09-13 scope entries; re-verified at this
+  iteration's close against `native/src/emit/enter_stage.rs`, whose only test is the last non-empty
+  line.
+  **Why [design-pending]:** telling a live journal from a prior one needs a discriminator the file
+  does not carry today — an opening line naming the iteration, a session marker, or the lead writing
+  the journal only after scope stamps — and each moves the lead template's contract.
+  **Cost while deferred:** a permanent advisory at every lead-run boundary trains the reader to skip
+  the one line that would carry a real undisposed journal.
+  Filed 2026-09-13 by scope; drained from the gap inbox at `resident-tier-restatement`'s close.
+
+- **audit-roster-mechanism-has-no-kit-owner** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the
+  audit roster's contract header names doctrine-kit/DOCTRINE.md rule 2 (Enforcement-first) as
+  owner, and the only procedure that runs the review is this repo's close skill binding; no kit
+  template or SPEC section carries the roster's format or its review step. Re-verified at the
+  drain: outside that binding and the doctrine body, only a lifecycle-kit fixture mentions the
+  file. Distinct from `audit-roster-row-carry-unruled` (row growth) and
+  `audit-roster-last-stamp-author-unconstrained` (who stamps): this is which kit ships the
+  mechanism at all.
+  **Candidate:** a lifecycle-kit section plus a close-template step owning the format and the
+  review, with rule 2 pointing at it.
+  **Cost while deferred:** a consumer vendoring the doctrine is told a cadence is owed and ships
+  no mechanism that performs it, and rule 2's body keeps the roster's grounds.
+  Filed 2026-09-13 at `resident-tier-restatement`'s spec, from the rule-body audit; drained at
+  its close.
+
+- **agent-file-paragraph-sections-ungoverned** [design-pending] [cost: event/low] [surface: context-kit] — `check-brevity`,
+  widened to a section set and every top-level item (context-kit/SPEC.md §The brevity gate),
+  reads list items only, so the agent file's paragraph sections carry no brevity bound — its
+  kit-governance section alone runs about sixty lines of rule prose, beside the provenance-seam
+  and agent-execution sections. Re-verified at the drain: the gate's item predicate admits list
+  items and nothing else.
+  **Candidate shapes:** a paragraph arm with a per-paragraph budget and the same pointer
+  conjunct, or restructuring those sections as bullets so the widened gate reaches them. Either
+  reds on first run and wants the clause-to-owner tracing the Housekeeping cut needed.
+  **Cost while deferred:** the largest resident rule prose in the tree is guarded only by the
+  close brevity pass and the always-loaded ratchet.
+  Filed 2026-09-13 at `resident-tier-restatement`'s spec, from the brevity-reach amendment;
+  drained at its close.
+
+- **consumer-footprint-roster-omits-lifecycle-kit** [design-pending] [cost: event/low] [surface: context-kit] — context-kit/SPEC.md
+  §The consumer footprint rosters each kit's resident ask under a one-pointer-line budget, lists
+  delegation-kit, doctrine-kit and drift-kit, and says every other kit asks none. lifecycle-kit asks
+  more: its generated registration block in the agent file (lifecycle-kit/SPEC.md
+  §check-lifecycle-registration) and the gap-capture and survey-capture bullets. Re-verified at the
+  drain against the roster text.
+  **Why [design-pending], cross-component:** either the roster gains a lifecycle-kit row and the
+  budget rule states its exception, or the asks move behind a load trigger.
+  **Cost while deferred:** an adopter weighing adoption cost reads a footprint that understates one
+  kit's resident ask.
+  Filed 2026-09-13 by the clause-owner audit behind `resident-tier-restatement`'s Housekeeping
+  cut; drained at that iteration's close.
+
 - **config-seam-static-format** [design-pending] [cost: event/high] [surface: gate-sdk] — the knob seam
   is executable bash: a knob's value is computed by sourcing the owning kit's `lib/*.sh` and the
   consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh), so the battery, hook
@@ -5379,9 +5436,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- always-loaded-bullets-restate-owned-spec
-- doctrine-rule-body-length-unruled
-- editor-diagnostic-unruled
 
 ## Lessons Learned

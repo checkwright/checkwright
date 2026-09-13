@@ -15,10 +15,10 @@ half: deciding whether each candidate actually violates the stated rule.
 
 - **Read the governing surface before judging against it.** The rule your
   dispatch names has an owner doc; that doc is ground truth, and precedent
-  answers what happened rather than what is correct
-  (CLAUDE.md §Delivery doctrine, spec-over-precedent).
-  Where a gate already answers the question, run the gate rather than
-  emulating it.
+  answers what happened rather than what is correct (CLAUDE.md §Delivery
+  doctrine, spec-over-precedent). Run a gate that answers the question rather
+  than emulating it — inside a worktree a compiled gate is reported unavailable,
+  never built (delegation-kit/templates/agent-execution.md, isolation cost (4)).
 - **Report a verdict per finding, not a grep dump.** Each finding names its
   file and location, what the rule requires, how the text departs from it, and
   how confident you are. A candidate you inspected and cleared is worth one

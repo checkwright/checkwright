@@ -161,3 +161,4 @@
 | instruction-surface-tier | sc sp a b v c | 1f/0d | 5 · ≤0d | 20s clean | 113 |
 | couples-resolver-reach | sc sp a b v c | 4f/5d | 2 · ≤0d | 20s clean | 113 |
 | registry-roster-oracles | sc sp a b v c | 7f/4d | 3 · ≤1d | 20s clean | 113 |
+| resident-tier-restatement | sc sp a b v c | 5f/0d | 3 · ≤0d | 20s clean | 113 |

@@ -1,14 +1,10 @@
-// spec: CLAUDE.md §Housekeeping — the installer package declares no resolvable-dependency field
-// and no install-time lifecycle script, the two shapes that would turn a one-shot vendoring
-// installer into a dependency channel or a run-on-install code path
+// spec: installer/README.md §What this package is — no dependency field, no install-time lifecycle script
 use crate::fresh;
 use serde_json::Value;
 use std::path::Path;
 
 const DEFAULT_PKG: &str = "installer/package.json";
-// spec: CLAUDE.md §Housekeeping — the field's presence is the finding, not its emptiness: an
-// empty dependency map declares a channel with nothing in it yet, and a lifecycle hook is code
-// that runs on install whatever its body
+// spec: gate-sdk/SPEC.md §The consumer remainder cohort — the field's presence is the finding, not its emptiness
 const DEP_FIELDS: &[&str] = &["dependencies", "peerDependencies", "optionalDependencies"];
 const LIFECYCLE_KEYS: &[&str] = &["preinstall", "install", "postinstall"];
 
