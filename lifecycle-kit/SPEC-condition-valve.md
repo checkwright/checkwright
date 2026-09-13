@@ -112,7 +112,8 @@ gains one valve line as its first line. **Not yet applied:**
 ```
 
 This is no ruling edit. The paragraph is the file's framing, and none of the record's three acts
-reaches it. The oracle for the delta is the arm itself: after the edit, `bash
+reaches it. **Build may add this line: operator direction, 2026-09-13**, given in the lead
+session and relayed to spec. The oracle for the delta is the arm itself: after the edit, `bash
 gate-sdk/bin/run-gates.sh --emit ruling-staleness` prints `(none)` under `== undeclared
 conditions ==` on this tree. Before the edit it prints the one `TRAJECTORY.md` row.
 

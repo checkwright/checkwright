@@ -148,8 +148,9 @@ entry points to two. Its heading stays, for the reason its first paragraph gives
 ### (3) The parity gate holds all three sections and is renamed to what it now holds {design-bearing}
 
 `check-tightened-gates-note-parity` becomes **`check-release-declaration-parity`**. It is this
-repo's `scripts/` member, not kit-shipped, so the rename reaches no consumer's `gates.list`. Its
-rule, **Not yet applied:**
+repo's `scripts/` member, not kit-shipped, so the rename reaches no consumer's `gates.list`. The
+rename is a **lead decision, 2026-09-13**: this repo's own gate, inside this amendment's envelope.
+Its rule, **Not yet applied:**
 
 - The corpus and arming are unchanged. It arms on exactly one note whose declared version carries
   no tag, is dormant on none, and refuses (exit 2) on more than one.
@@ -286,6 +287,9 @@ seed:
   bullets, each checked against every published note since its filing. A bullet that no published
   note declares is carried. Every reconstructed bullet names the iteration it came from in its
   prose, so the composing session can tell a seed from a declaration.
+- **Sibling declarations**: any bullet an amendment in this unit set obliges on the surface,
+  if its change landed before this commit. `lifecycle-kit/SPEC-claim-standing.md` delta 7 is one
+  such bullet. A sibling landing after this commit appends its own.
 
 This delta is the last reconstruction the surface pays for. The commit message states the count
 per section and the iterations read. Where a basis clause is too thin to reconstruct from, the
