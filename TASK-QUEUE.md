@@ -5041,6 +5041,10 @@
   outside. A fifth multi-line restating bullet, the permission-settings one, landed 2026-09-13.
   **Leads unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed**,
   with `doctrine-rule-body-length-unruled` and `editor-diagnostic-unruled`; `/spec` authors.
+  **Seam ruled 2026-09-13 at scope.** Kit mechanism: the brevity gate's reach, should `/spec` widen
+  it past one section. Consumer config: which sections are governed, and their budgets, stay in
+  `scripts/context-config.sh`; no section name enters a kit literal. No private rule content is in
+  reach. Spelling, shape and the per-bullet cuts are `/spec`'s.
   **Cost while deferred:** four restatements on the highest-blast-radius surface in the tree, each
   re-read by every session of every stage.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its always-loaded
