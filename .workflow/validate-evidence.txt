@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+carried-record-reliability gates sha256=93844a5c9977c36b6c6473e1decd3c904b226a853b8841b8b94e72c2e60fe0c6 pass=113 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability gate_sdk sha256=66a533f5aabd61861735228ab38d37160110c0bb5cf1faa6276fb232d8f64908 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability canon_kit sha256=e0780e41e810cbac5bb0be8cbace64fd320c84899e0272c315453780c9dd6455 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability guard_kit sha256=bec1c9c35372c4d6106471ec51071ee748b3187f02c6303efe7fbf6667cc7d0d pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability guard_tests sha256=d1df8069c9935679a05e36a5b9c6859bc81fa68434855f3791e0cbb5bb328dd3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability demo sha256=684286c6e458598e8af44dcf97a098b7c8cce8c971647721af105b275ecf49cb pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability installer_smoke sha256=f40596b46fc32d1207a031560f0e4cd5e892887e09c528b98e04d37f029668ab pass=13 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability consumer_smoke sha256=c0d55b09ab08bb0559df1678de72935412388e78aa2714e658f7b2df0ed93e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability upgrade sha256=c0a6dc96b8fa38f8728ed31084b2dc96f47afec0903baa6323280d47e41abb32 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability agents_md_smoke sha256=c206476da1a228b575c6800d7631668f1524c31b2d148d61ccf0990b19c452c2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
+carried-record-reliability native_crate sha256=4d289ec82b3b1f179e29fb59bc5072a180c5001f26ce0aca1d32ebb9e450a9de pass=1 fail=0 ignore=0 verdict=clean 2026-09-13
