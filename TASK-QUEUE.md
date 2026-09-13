@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: carried-record-reliability
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -1613,8 +1613,8 @@
   the bare name — correctly — and the one-line remedy a consumer needs had no route from build to
   the composing session. Two witnesses, both landing on "name plus prose versus bare names", is the
   open design question above asked twice rather than a second question.
-  **Taken at the next iteration's intake — operator direction, 2026-09-13, lead-relayed**, after two
-  threshold declines (2026-09-11, 2026-09-12); its order there is that scope's to settle.
+  **Leads unit set `carried-record-reliability` with `deferred-release-declaration-accumulation`**
+  — operator direction, 2026-09-13, lead-relayed; ahead of the claim-reliability pair.
   recurrence: behavior-change-surface 2026-08-25 2026-09-06
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
 
@@ -1798,8 +1798,8 @@
   under-declares by however many iterations batched into it, which is the one section a consumer
   reconciles by reading. At the third deferral the carrier was capped and took nothing at all,
   so the evidence this entry needed is complete: the next scope ranks it on a closed case.
-  **PAIRED WITH `behavior-change-surface`** — lead decision 2026-09-12: both ask where a
-  deferral-surviving declaration accumulates, so whichever lands first states its reach over both.
+  **Leads unit set `carried-record-reliability` with its pair `behavior-change-surface`** — operator
+  direction, 2026-09-13, lead-relayed; both ask where a deferral-surviving declaration accumulates.
   Filed 2026-08-08 by close, from the release-note obligation its own drain could not discharge.
 
 - **audit-class-corpus-attestation** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — an un-gateable-class audit stamps a
@@ -1937,9 +1937,8 @@
   lifecycle-kit/SPEC.md §The committed gap inbox has **already refused both obvious shapes** for
   the sibling channel, a filing-time prompt and a fact-versus-inference grammar, so a proposal
   here argues against a recorded refusal or finds a third shape.
-  **Taken at the next iteration's intake — operator direction, 2026-09-13, lead-relayed**, beside
-  `survey-record-claim-reliability`, after declines on 2026-09-11 and 2026-09-12; how it ranks there
-  is that scope's call.
+  **Joins unit set `carried-record-reliability` beside `survey-record-claim-reliability`** —
+  operator direction, 2026-09-13, lead-relayed; ordered after the release-declaration pair.
   recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
   **Three attested instances, each falling on a different limb.** A build batch stamped the
   consumer smoke's cost as "~50-60 minutes" and reasoned that the run serializes against all
@@ -2009,8 +2008,8 @@
   The close re-ran the entry's own reproduction and the residue regenerated, because the arm's pin
   misses the knob form a bridged gate reads. The survey never ran the reproduction the entry names.
   recurrence: survey-record-claim-reliability 2026-09-08 2026-09-11
-  **Operator direction, 2026-09-13, lead-relayed: take it at the next iteration's intake**, with
-  `kfric-capture-unverified-assertion`, past two threshold declines; placement is that scope's.
+  **Joins unit set `carried-record-reliability` beside `kfric-capture-unverified-assertion`** —
+  operator direction, 2026-09-13, lead-relayed; decided together, after the release pair.
   Filed 2026-08-10 by close, on operator direction after the third error.
 
 - **kit-ref-liveness-stem-token-hole** [design-pending] [cost: event/high] [surface: canon-kit] — a typo'd knob name under
@@ -4925,6 +4924,8 @@
   read at every close and at every scope ritual.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its ruling-record
   read; drained here, and reproduced live at this scope's own ritual.
+  **Rides unit set `carried-record-reliability` — operator direction, 2026-09-13, lead-relayed**;
+  reproduced again at that scope's ritual.
 
 - **append-and-wrapper-shapes-unsteered** [design-pending] [cost: session/low] [surface: guard-kit]
   — two prompt-friction shapes rank at the top with no guard steering and no allowlist entry that
@@ -5058,6 +5059,8 @@
   half surviving the boundary, since an inbound sum ages with the queue rather than the tree,
   and correcting the SPEC's named reader.
   **Cost while deferred:** every scope re-derives the inbound sums its predecessor bought.
+  **Rides unit set `carried-record-reliability` with the claim-reliability pair** — operator
+  direction, 2026-09-13, lead-relayed; re-attested at that scope's stamp.
   Filed 2026-09-12 by scope, from its ranking survey; drained and promoted 2026-09-13 at close.
 
 - **survey-locator-review-catches-after-loss** [design-pending] [cost: event/low] [surface: lifecycle-kit]
