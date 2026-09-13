@@ -2094,7 +2094,7 @@ that is a contract of this loader rather than a spelling: a probe designed to
 return non-zero on a routine non-match, run as a bare command, aborts every
 `set -e` caller that sources this file. The attested cost of getting it wrong was
 a consumer with a pattern configured being unable to re-emit its own derived
-surfaces, silently and at exit 1 — that caller was `bin/install-lifecycle.sh`,
+surfaces, silently and at exit 1 — that caller was `bin/install-lifecycle.sh`, <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 which has since ported, as has `--enter-stage`, and no surviving shell sourcer in
 this tree (the config bridge, the parity harness) runs under `set -e`. The contract binds
 the next one that does, which is why it is stated as a property of the loader
@@ -3128,12 +3128,12 @@ failure lands at the session's first step rather than midway through work. The
 alternative — a second dispatch resolver written in shell — is the duplicate the
 shared substrate exists to remove, so the dependency is taken.
 
-**This section records the cut.** `bin/enter-stage.sh` was the one owed file
+**This section records the cut.** `bin/enter-stage.sh` was the one owed file <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 declaring this section, and taking it discharges the section **with no shell
 residue left in the kit at all** — the kit's other shell members (`lib/stages.sh`,
 the two `smoke/` members, the config template) are each `no-port` by declared
 cause, so `lifecycle-kit/bin/` is gone rather than merely lighter. The heading
-stays `bin/enter-stage.sh` deliberately: roughly eighty pointers inside the
+stays `bin/enter-stage.sh` deliberately: roughly eighty pointers inside the <!-- manifest-temporal-exempt: names the section heading kept as a pointer target, not a live file -->
 governed manifest set are backstopped by `check-kit-ref-liveness`, and at least
 six citations outside it have no gate behind them at all, so a rename would take
 half the pointer corpus stale silently.
@@ -3162,8 +3162,8 @@ end is a malformed target (exit 2, rather than guess the bounds); the agent
 file must already exist — the arm edits an always-loaded file, it does
 not mint one — so a missing target is exit 2. The marker insert/replace itself
 is not this member's code: it rides `crate::marker`'s installer writer, the
-compiled half of gate-sdk's `lib/inject.sh` (gate-sdk/SPEC.md §lib/inject.sh),
-so no second replace path exists to drift.
+holder of gate-sdk's marker-bounded span mechanics (gate-sdk/SPEC.md
+§lib/inject.sh), so no second replace path exists to drift.
 
 **It is a bridged `Arm::Run` member** (gate-sdk/SPEC.md §The non-gate arm),
 reached by its own `bin/run-gates.sh` front-end branch rather than through the

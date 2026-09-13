@@ -532,6 +532,8 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
             "CANON_KIT_MDREF_EXCLUDE",
+            "CANON_KIT_TEMPORAL_EXEMPT_SECTIONS",
+            "CANON_KIT_TEMPORAL_EXEMPT_PATHS",
         ],
         "canon-kit",
         &[("git", "")],

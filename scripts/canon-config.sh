@@ -38,7 +38,7 @@ CANON_KIT_MANIFEST_FILES=(
     "docs/posts/*.md"
 )
 
-# comment-tier-exempt: dated posts under docs/posts/ are immutable published artifacts whose dated narrative is their nature — a heading name cannot address a whole-file class, so the path valve exempts them from temporal-narration governance while link and command resolution still apply
+# comment-tier-exempt: dated posts under docs/posts/ are immutable published artifacts whose dated narrative is their nature — a heading name cannot address a whole-file class, so the path valve exempts them from temporal-narration governance and retired-path citation while link and fenced-command resolution still apply
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_TEMPORAL_EXEMPT_PATHS=("docs/posts/*")
 

@@ -19,6 +19,7 @@
 - `check-deferred-board-tags` — new, opt-in: every top-level deferred queue entry carries exactly one valid `[cost:]` and one valid `[surface:]` tag, and no active entry carries either.
 - `check-surface-ratchet` — new: every governed always-loaded surface is held at or below its committed line-count ceiling.
 - `check-brevity` — governs a configurable section set and every top-level bullet, not only bold-named ones.
+- `check-docs-cmd` — gains assertion C: a path cited in an inline code span in the governed doc set reds when the repository has retired it (deleted in reachable history, or deleted in the index) and it resolves under neither the doc's directory, the repo root nor any kit root, unless check-manifest-temporal's valves mark the site as history. A doc citing a script your tree deleted now reds until the citation is re-pointed or the line carries `<!-- manifest-temporal-exempt: <reason> -->`.
 
 ## Renamed knobs
 

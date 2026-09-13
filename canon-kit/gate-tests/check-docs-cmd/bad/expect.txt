@@ -1,1 +1,3 @@
 invoked script 'bin/ghost.sh' is not a tracked file
+cited path 'drift-kit/bin/trajectory.sh' was retired
+cited path 'bin/trajectory.sh' was retired

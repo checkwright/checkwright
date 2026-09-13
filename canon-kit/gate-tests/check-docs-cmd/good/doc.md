@@ -16,3 +16,7 @@ cp gate-sdk/templates/example-config.sh scripts/example-config.sh   # optional
 
 Config knobs `GATE_SDK_GATES_DIR` and the cross-kit-read `GATE_SDK_LIB` resolve
 against the kits' code, and the `CANON_KIT_COMMENT_*` family stem resolves too.
+
+The same retired script named as history, `drift-kit/bin/trajectory.sh`, clears on its <!-- manifest-temporal-exempt: fixture history -->
+marker; a never-tracked hypothetical `bin/never-tracked.sh` is no stale identifier; and the
+kit-relative `lib/gate.sh` resolves under another kit root.

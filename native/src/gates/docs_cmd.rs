@@ -1,6 +1,7 @@
-// spec: canon-kit/SPEC.md §check-docs-cmd — every fenced invoked repo-relative .sh path and
-// every backticked/fenced kit-prefixed env knob in the governed doc set resolves against the
-// tree
+// spec: canon-kit/SPEC.md §check-docs-cmd — every fenced invoked repo-relative .sh path, every
+// backticked/fenced kit-prefixed env knob and every inline-span path citation in the governed doc
+// set resolves against the tree or names no path the tree has retired
+use super::manifest_temporal::{LineKind, TemporalValve};
 use crate::proc;
 use crate::spec;
 use crate::walk;
@@ -20,6 +21,7 @@ pub fn run(args: &[String]) -> i32 {
 enum Token {
     Path(usize, String),
     Knob(usize, String),
+    Cited(usize, String),
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
@@ -55,17 +57,22 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let defined = defined_knobs(&top, &roots, &prefixes)?;
+    let valve = TemporalValve::load()?;
+    let tree = Tree::read(&top)?;
+    let cwd = walk::cwd()?;
 
     let mut bad: Vec<String> = Vec::new();
     let mut npath = 0usize;
     let mut nknob = 0usize;
+    let mut ncited = 0usize;
     for f in &files {
         if !Path::new(f).is_file() {
             continue;
         }
         let docdir = dirname(f);
         let text = spec::read_text(Path::new(f))?;
-        for tok in scan(&text, &prefixes) {
+        let cite = !valve.path_exempt(&spec::strip_dot_slash(f));
+        for tok in scan(&text, &prefixes, &valve, cite) {
             match tok {
                 Token::Path(ln, t) => {
                     npath += 1;
@@ -82,25 +89,45 @@ fn rule(args: &[String]) -> Result<i32, String> {
                         ));
                     }
                 }
+                Token::Cited(ln, t) => {
+                    ncited += 1;
+                    let cands = resolutions(&top, &cwd, &docdir, &t, &roots);
+                    if tree.retired_unresolved(&cands) {
+                        bad.push(format!(
+                            "{}:{}: cited path '{}' was retired (no tracked file under any resolution)",
+                            f, ln, t
+                        ));
+                    }
+                }
             }
         }
     }
 
     if !bad.is_empty() {
-        println!("check-docs-cmd: unresolvable command path(s) or env knob(s) in the governed doc set:");
+        println!("check-docs-cmd: unresolvable command path(s), env knob(s) or retired cited path(s) in the governed doc set:");
         for b in &bad {
             println!("  {}", b);
         }
         println!("  help: fix the path (relative to the doc, or repo-relative) and track the script, or");
-        println!("        correct the knob name. A hypothetical example goes outside a fence, or the doc");
-        println!("        joins CANON_KIT_MDREF_EXCLUDE. Only invoked .sh paths and kit-prefixed knobs count.");
+        println!("        correct the knob name. A hypothetical invocation goes outside a fence, or the doc");
+        println!("        joins CANON_KIT_MDREF_EXCLUDE.");
+        println!("        A retired cited path: re-point it at the capability's current holder, or mark the");
+        println!("        line as history with '<!-- manifest-temporal-exempt: <reason> -->' on it or the line");
+        println!("        above, CANON_KIT_TEMPORAL_EXEMPT_SECTIONS or CANON_KIT_TEMPORAL_EXEMPT_PATHS.");
         return Ok(1);
     }
+    let shallow = if tree.shallow {
+        " (shallow clone: retirements limited to fetched history)"
+    } else {
+        ""
+    };
     println!(
-        "DOCS-CMD: clean ({} doc(s); {} invoked path(s) + {} kit-prefixed knob(s) resolve)",
+        "DOCS-CMD: clean ({} doc(s); {} invoked path(s) + {} kit-prefixed knob(s) resolve; {} cited path(s) name no retired path){}",
         files.len(),
         npath,
-        nknob
+        nknob,
+        ncited,
+        shallow
     );
     Ok(0)
 }
@@ -147,6 +174,109 @@ fn defined_knobs(
         }
     }
     Ok(set)
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — assertion C's two repo-root-relative sets: what the
+// index tracks (files and the directories holding them) and what the held history retired
+struct Tree {
+    tracked: HashSet<String>,
+    retired: HashSet<String>,
+    shallow: bool,
+}
+
+impl Tree {
+    fn read(top: &str) -> Result<Tree, String> {
+        let mut tracked = HashSet::new();
+        for f in git_names(top, &["ls-files", "-z"], "listing tracked files")? {
+            let mut i = 0usize;
+            while let Some(off) = f[i..].find('/') {
+                tracked.insert(f[..i + off].to_string());
+                i += off + 1;
+            }
+            tracked.insert(f);
+        }
+        let shallow = git_text(top, &["rev-parse", "--is-shallow-repository"], "reading the shallow state")?
+            .trim()
+            == "true";
+        Ok(Tree {
+            tracked,
+            retired: retired_set(top)?,
+            shallow,
+        })
+    }
+
+    fn retired_unresolved(&self, cands: &[String]) -> bool {
+        !cands.iter().any(|c| self.tracked.contains(c)) && cands.iter().any(|c| self.retired.contains(c))
+    }
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — every path deleted in held history plus every path
+// the index deletes against HEAD, so the deleting commit reds at pre-commit; an unborn HEAD has
+// retired nothing
+fn retired_set(top: &str) -> Result<HashSet<String>, String> {
+    let head = proc::run("git", &["-C", top, "rev-parse", "--verify", "-q", "HEAD"])?;
+    match head.code() {
+        Some(0) => {}
+        Some(1) => return Ok(HashSet::new()),
+        _ => return Err("git rev-parse failed resolving HEAD for the retired set".to_string()),
+    }
+    let mut set: HashSet<String> = HashSet::new();
+    set.extend(git_names(
+        top,
+        &["log", "-z", "--no-renames", "--diff-filter=D", "--name-only", "--format="],
+        "reading deletions from history",
+    )?);
+    set.extend(git_names(
+        top,
+        &["diff", "--cached", "-z", "--no-renames", "--diff-filter=D", "--name-only"],
+        "reading deletions staged in the index",
+    )?);
+    Ok(set)
+}
+
+fn git_text(top: &str, args: &[&str], what: &str) -> Result<String, String> {
+    let mut argv: Vec<&str> = vec!["-C", top];
+    argv.extend_from_slice(args);
+    let out = proc::run("git", &argv)?;
+    match out.code() {
+        Some(0) => Ok(String::from_utf8_lossy(out.stdout().unwrap_or(&[])).into_owned()),
+        Some(c) => Err(format!("git {} failed (exit {}) {}", args[0], c, what)),
+        None => Err(format!("git {} failed (killed by a signal) {}", args[0], what)),
+    }
+}
+
+fn git_names(top: &str, args: &[&str], what: &str) -> Result<Vec<String>, String> {
+    Ok(git_text(top, args, what)?
+        .split(['\0', '\n'])
+        .filter(|s| !s.is_empty())
+        .map(str::to_string)
+        .collect())
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — a cited token's resolutions, repo-root-relative: the
+// doc's directory, the repo root, and each kit root
+fn resolutions(top: &str, cwd: &str, docdir: &str, tok: &str, roots: &[String]) -> Vec<String> {
+    let docabs = if walk::path_root(docdir).is_some() {
+        docdir.to_string()
+    } else {
+        format!("{}/{}", cwd, docdir)
+    };
+    let mut out: Vec<String> = Vec::new();
+    let mut bases: Vec<String> = vec![docabs, top.to_string()];
+    bases.extend(roots.iter().map(|r| format!("{}/{}", top, r)));
+    for base in bases {
+        if let Some(rel) = under_top(top, &walk::normalize_abs(&format!("{}/{}", base, tok))) {
+            if !out.contains(&rel) {
+                out.push(rel);
+            }
+        }
+    }
+    out
+}
+
+fn under_top(top: &str, abs: &str) -> Option<String> {
+    let lead = format!("{}/", top.trim_end_matches('/'));
+    abs.strip_prefix(&lead).filter(|r| !r.is_empty()).map(str::to_string)
 }
 
 // spec: canon-kit/SPEC.md §check-docs-cmd — an exact code occurrence, or for a family stem
@@ -208,21 +338,24 @@ fn caps_runs(s: &str, min_tail: usize) -> Vec<String> {
     out
 }
 
-fn scan(text: &str, prefixes: &[String]) -> Vec<Token> {
+// spec: canon-kit/SPEC.md §check-docs-cmd — a history valve exempts a line's cited paths alone;
+// its fenced invocations and knobs are still scanned
+fn scan(text: &str, prefixes: &[String], valve: &TemporalValve, cite: bool) -> Vec<Token> {
     let mut out = Vec::new();
-    let mut infence = false;
-    for (idx, line) in text.lines().enumerate() {
-        let ln = idx + 1;
-        if spec::is_fence_line(line) {
-            infence = !infence;
-            continue;
-        }
-        if infence {
-            scan_a(line, ln, &mut out);
-            scan_b(line, ln, prefixes, &mut out);
-        } else {
-            for span in inline_code_spans(line) {
-                scan_b(&span, ln, prefixes, &mut out);
+    for line in valve.lines(text) {
+        match line.kind {
+            LineKind::Fence => {}
+            LineKind::Fenced => {
+                scan_a(line.raw, line.ln, &mut out);
+                scan_b(line.raw, line.ln, prefixes, &mut out);
+            }
+            LineKind::Heading | LineKind::Prose => {
+                for span in inline_code_spans(line.raw) {
+                    scan_b(&span, line.ln, prefixes, &mut out);
+                    if cite && !line.valved {
+                        scan_c(&span, line.ln, &mut out);
+                    }
+                }
             }
         }
     }
@@ -252,6 +385,38 @@ fn scan_b(text: &str, ln: usize, prefixes: &[String], out: &mut Vec<Token>) {
             out.push(Token::Knob(ln, run));
         }
     }
+}
+
+fn scan_c(span: &str, ln: usize, out: &mut Vec<Token>) {
+    for w in span.split_whitespace() {
+        if let Some(t) = cited_path(w) {
+            out.push(Token::Cited(ln, t));
+        }
+    }
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — the path shape: two or more segments, an extension on
+// the last, no `..`, after (A)'s quote and punctuation trims
+fn cited_path(w: &str) -> Option<String> {
+    let e = trim_word(w);
+    let rest = e.strip_prefix("./").unwrap_or(e);
+    let parts: Vec<&str> = rest.split('/').collect();
+    if parts.len() < 2 || !parts.iter().all(|p| seg_ok(p)) || parts.contains(&"..") {
+        return None;
+    }
+    if !parts[parts.len() - 1].trim_matches('.').contains('.') {
+        return None;
+    }
+    Some(rest.to_string())
+}
+
+fn trim_word(w: &str) -> &str {
+    w.trim_start_matches(['`', '"', '\'', '('])
+        .trim_end_matches(['`', '"', '\'', ')', ';', ':', ','])
+}
+
+fn seg_ok(s: &str) -> bool {
+    !s.is_empty() && s.bytes().all(|c| c.is_ascii_alphanumeric() || matches!(c, b'.' | b'_' | b'-'))
 }
 
 fn scan_a(line: &str, ln: usize, out: &mut Vec<Token>) {
@@ -335,11 +500,7 @@ fn strip_prompt(cmd: &str) -> &str {
 // spec: canon-kit/SPEC.md §check-docs-cmd — only an invoked repo-relative `.sh` path counts,
 // after the quote and paren trims
 fn invoked_script(w: &str) -> Option<String> {
-    let e = w
-        .trim_start_matches(['`', '"', '\'', '('])
-        .trim_end_matches(['`', '"', '\'', ')', ';', ':', ',']);
-    let seg_ok =
-        |s: &str| !s.is_empty() && s.bytes().all(|c| c.is_ascii_alphanumeric() || matches!(c, b'.' | b'_' | b'-'));
+    let e = trim_word(w);
     for lead in ["./", ".", "/", ""] {
         let rest = match e.strip_prefix(lead) {
             Some(r) => r,
@@ -355,4 +516,69 @@ fn invoked_script(w: &str) -> Option<String> {
         }
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn git(dir: &str, args: &[&str]) {
+        let mut argv: Vec<&str> = vec!["-C", dir, "-c", "user.name=t", "-c", "user.email=t@t"];
+        argv.extend_from_slice(args);
+        let out = proc::run("git", &argv).expect("git runs");
+        assert_eq!(out.code(), Some(0), "git {:?}", args);
+    }
+
+    // spec: canon-kit/SPEC.md §check-docs-cmd — the retired set's staged half: a deletion the
+    // index holds against HEAD is retired before any commit records it
+    #[test]
+    fn the_retired_set_holds_history_and_staged_deletions() {
+        let dir = std::env::temp_dir().join(format!("cw-docs-cmd-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("bin")).unwrap();
+        let d = walk::normalize_abs(&dir.display().to_string());
+        git(&d, &["init", "-q"]);
+        assert!(retired_set(&d).unwrap().is_empty());
+        for f in ["bin/old.sh", "bin/staged.sh", "bin/kept.sh"] {
+            std::fs::write(dir.join(f), "x\n").unwrap();
+        }
+        git(&d, &["add", "."]);
+        git(&d, &["commit", "-q", "-m", "a"]);
+        git(&d, &["rm", "-q", "bin/old.sh"]);
+        git(&d, &["commit", "-q", "-m", "b"]);
+        git(&d, &["rm", "-q", "--cached", "bin/staged.sh"]);
+        let set = retired_set(&d).unwrap();
+        let _ = std::fs::remove_dir_all(&dir);
+        assert!(set.contains("bin/old.sh"));
+        assert!(set.contains("bin/staged.sh"));
+        assert!(!set.contains("bin/kept.sh"));
+    }
+
+    #[test]
+    fn a_cited_path_needs_two_segments_and_an_extension() {
+        assert_eq!(cited_path("`bin/x.sh`,"), Some("bin/x.sh".to_string()));
+        assert_eq!(cited_path("./lib/gate.sh"), Some("lib/gate.sh".to_string()));
+        assert_eq!(cited_path("x.sh"), None);
+        assert_eq!(cited_path("bin/tool"), None);
+        assert_eq!(cited_path("a/.gitignore"), None);
+        assert_eq!(cited_path("../a/b.sh"), None);
+        assert_eq!(cited_path("*/SPEC.md"), None);
+        assert_eq!(cited_path("/abs/b.sh"), None);
+    }
+
+    #[test]
+    fn a_valved_line_exempts_citations_and_not_knobs() {
+        let valve = TemporalValve::new(vec!["History".into()], vec![]);
+        let text = "<!-- manifest-temporal-exempt: port record -->\n`bin/a.sh` `GATE_SDK_LIB`\n## History\n`bin/b.sh`\n## Now\n`bin/c.sh`\n";
+        let toks = scan(text, &["GATE_SDK_".to_string()], &valve, true);
+        let cited: Vec<String> = toks
+            .iter()
+            .filter_map(|t| match t {
+                Token::Cited(_, s) => Some(s.clone()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(cited, vec!["bin/c.sh".to_string()]);
+        assert!(toks.iter().any(|t| matches!(t, Token::Knob(2, _))));
+    }
 }

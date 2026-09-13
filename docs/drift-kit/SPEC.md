@@ -543,7 +543,7 @@ declared `# no-port:`: `native/src/emit/kfric.rs` and its `BRIDGED_ARMS` row in
 `native/src/emit/mod.rs` (the capture arm above), `native/src/emit/kpi/knowledge_friction.rs`
 (the reader `kpi-knowledge-friction`), and `smoke/install.sh`, which carries the
 reader's three-state coverage and the arm's argv seam in a file whose own header
-declares `# no-port:`. `bin/kfric.sh` was the one owed surface and the
+declares `# no-port:`. `bin/kfric.sh` was the one owed surface and the <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 2026-09-03 cut took it, so **no later port cut is sequenced against this
 section**. Worth saying rather than leaving to a reader: the 2026-09-01 survey
 cut established a residue paragraph as the norm here, and a reader who learned
@@ -765,7 +765,7 @@ be inferred.** Every surface declaring it is now either in-crate or declared
 `# no-port:`: `native/src/emit/overhead_meter.rs`, its `BRIDGED_ARMS` row in
 `native/src/emit/mod.rs`, the shared `native/src/sessions.rs`, and
 `smoke/install.sh`, whose own header declares `# no-port:` and which stays the
-meter's behavioural oracle permanently (§Testing). `bin/overhead-meter.sh` was
+meter's behavioural oracle permanently (§Testing). `bin/overhead-meter.sh` was <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 the one owed surface and the 2026-09-05 cut took it, so **no later port cut is
 sequenced against this section**.
 
@@ -970,7 +970,7 @@ kit's is too.** Every surface declaring this section is now either in-crate —
 `native/src/emit/stage_economics.rs`, its `BRIDGED_ARMS` row, the shared
 `native/src/sessions.rs` and `native/src/history.rs` — or declared `# no-port:`
 (`smoke/install.sh`, this meter's behavioural oracle across six fixture sets).
-`bin/stage-economics.sh` was the one owed surface and the 2026-09-05 cut took it,
+`bin/stage-economics.sh` was the one owed surface and the 2026-09-05 cut took it, <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 so **no later port cut is sequenced against this section**. drift-kit now holds
 no owed file and no `bin/` directory at all; neither cut of the pair could make
 that claim alone.
@@ -1347,7 +1347,7 @@ minting a new one. Nothing in the declaration changes.
 **The trajectory arm's four knobs live here for exactly that reason, and their
 move is what the port paid.** `DRIFT_KIT_CONFIG_FILE`,
 `DRIFT_KIT_TRAJECTORY_SURFACES`, `DRIFT_KIT_GATES_FILE` and `DRIFT_KIT_STAGES`
-were resolved inside `bin/trajectory.sh` while the extractor was a shell tool
+were resolved inside `bin/trajectory.sh` while the extractor was a shell tool <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 that could source its own config. A compiled arm cannot: it reads the bridge, the
 bridge sources this library and nothing else, so a default left in the tool would
 have made every one of them the bridge's undeclared-knob refusal. **Sourcing the consumer
@@ -1388,7 +1388,7 @@ for it.
 and the second copy that vanished with it was never a counter-example to the
 sole-resolver claim above.** The knob was already defined here, so `--emit-kfric`
 declares it and reads what the bridge resolves rather than carrying a default of
-its own. What the port removed is a different duplicate: `bin/kfric.sh` was a
+its own. What the port removed is a different duplicate: `bin/kfric.sh` was a <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 standalone tool that re-implemented this library's *opening* — its own inline
 `DRIFT_KIT_CONFIG_FILE` resolution block — because it did not source the library
 at all. That copy did not falsify the sole-resolver sentence, whose scope is its

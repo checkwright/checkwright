@@ -42,85 +42,6 @@
   2026-09-13, lead-relayed; a corpus increment, so it demotes at landing.
   Filed 2026-09-12 by consult, an operator-directed direct entry.
 
-- **cited-script-path-liveness-inline** [spec: SPEC-retired-path-citation.md]
-  — `check-docs-cmd` sees a deleted `.sh` path only inside a fence, so the same path in an inline
-  code span survives a port unflagged.
-  **Measured at this close, seven instances in one iteration.** The emitter-tail port deleted
-  `drift-kit/bin/trajectory.sh` and `queue-kit/bin/roadmap.sh`, and the battery stayed green at
-  104/104 while seven governed surfaces still named them in the present tense: an `Interface:`
-  line in drift-kit/SPEC.md, a queue-kit/README.md intro sentence, a `.gate` descriptor's
-  `# spec:` line, three gate-sdk/SPEC.md paragraphs and a `# spec:` comment in
-  gate-sdk/lib/gate.sh. All seven were inline code spans or bare prose; all seven are fixed in
-  the commit that files this.
-  **The gate is not absent, its corpus is narrower than its name reads.** Its own module states
-  the reach — "every **fenced** invoked repo-relative .sh path and every backticked/fenced
-  kit-prefixed env knob" (`native/src/gates/docs_cmd.rs:1`) — so an inline span is scanned for
-  knobs and not for paths. gate-sdk/SPEC.md already predicts the fenced half working: it will
-  "correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port."
-  It does. The unfenced half is the hole.
-  **Why it needed design, and the design is the valve rather than the scan.** The fence *is*
-  the current exemption: the gate's own help says a hypothetical example goes outside a fence.
-  Widening to inline spans removes that valve and needs a replacement, and the replacement has
-  to admit the case this close met repeatedly — prose that names a deleted path **deliberately**,
-  as history. Two shapes, neither ruled: a per-line exemption tag, or a tense-blind rule paired
-  with a convention that historical mentions cite the commit rather than the path.
-  **Not the same as the audit class that caught these.** `capability-liveness-after-descope` is
-  a human audit on the roster because judging live-vs-historical prose is a session act; this is
-  the mechanical half underneath it — does the cited path exist at all — which is decidable and
-  today only half-scanned. Landing it narrows what that audit must read; it does not retire it.
-  **THIS ENTRY AND `stale-identifier-after-retirement` ARE THE (C) SLICE of
-  `citation-liveness-family-convergence`** — grounds relocated here 2026-09-08 from that hub under
-  `check-queue-entry-budget`'s rule that an unanswered ground moves to the entry already owning its
-  subject, this one having already held the open ruling. The slice widens `check-docs-cmd` from
-  fenced-only to inline spans and is priced at likely ONE ticket for the pair; the open ruling is
-  which gate holds it. Two of the family's 37 inbound edges land here.
-  **Cost while deferred:** measured, recurring, and it lands exactly when the tree is most
-  trusted — a green 104/104 battery over prose that names files the same commit deleted.
-  **Rides unit set `static-config-seam` with `stale-identifier-after-retirement`, built first** —
-  operator direction, 2026-09-13, lead-relayed.
-  Surfaced 2026-08-18. Filed by close 2026-08-18, discharging the gap generalization owed by
-  the staleness the `capability-liveness-after-descope` audit turned up in this same commit.
-
-- **stale-identifier-after-retirement** [spec: SPEC-retired-path-citation.md]
-  — governed prose citing a deleted path
-  whose capability moved intact to a new holder: a class the close-stage audit roster does not
-  name.
-  Found as a five-instance out-of-class residue — two in queue-kit/SPEC.md and three in live
-  deferred entries, all naming `bin/queue-index.sh` after the port deleted it. **The instances
-  were fixed; the class was not.**
-  **Why both rostered siblings read past it.** It is neither
-  capability-pendency-after-landing — nothing is claimed outstanding — nor
-  capability-liveness-after-descope — nothing was descoped. Both are tense-and-inference classes
-  over a *claim*; here the capability survived and only its holder changed, so the citation is
-  stale in its **subject** rather than in its claim, and no roster line covers that axis.
-  **What makes it different in kind: it is PARTLY GATEABLE.** A backticked path in governed
-  prose either exists on disk or does not, and deciding that infers no intent — the exact ground
-  both existing classes are rostered un-gateable on. The class does not merely widen the roster;
-  it moves an instance out of the human-audit tier.
-  **Three readings, and the choice is real — each costed here rather than left to the unit.**
-  Widen `prose-filename-citation-liveness`, the decisive neighbour, which owns the same dangling
-  -backtick shape but is bounded to bare `<name>.md` filenames and states its own reason for
-  staying narrow (its `AGENTS.md` false positive); or mint a new audit class; or rule it a
-  `check-docs-cmd` widening — and that third arm is dearer than it looks, because assertion A
-  scans **invocation position only** and calls that its deliberate calibration, so the widening
-  reopens a stated design decision rather than extending a corpus.
-  **Attested cost, not estimated:** commit `19098b08` swept for the qualified
-  `bin/queue-index.sh` spelling and missed every bare-basename one, so a hand sweep has already
-  failed at this once.
-  **Cost while deferred:** every retirement that relocates a capability leaves citations no audit
-  line claims, and the failure is silent — the prose reads correct and names a path that is gone.
-  Class: mints a gate name and a roster line on the mint-a-class arm, so canon-kit's litmus makes
-  it a **feature** there; debt only as a widening of a line already carried.
-  Filed 2026-08-17 into the gap inbox by the `post-close-intake-and-index-port` close, from its
-  capability-pendency audit; promoted 2026-08-17 at scope, the disposition landing one iteration
-  after the finding.
-  **Recurred 2026-09-13, judged at the `carried-record-reliability` close:** that iteration
-  replaced `.workflow/tightened-gates.txt` and its parity gate module with a renamed holder, and
-  two live deferred entries kept naming the deleted paths; build saw them and left them.
-  **Rides unit set `static-config-seam` with `cited-script-path-liveness-inline`, built first** —
-  operator direction, 2026-09-13, lead-relayed; the seam cut's own path retirements are its reach.
-  recurrence: stale-identifier-after-retirement 2026-09-09 2026-09-13
-
 ## Technical Debt
 
 ## Deferred
@@ -5229,5 +5150,8 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- cited-script-path-liveness-inline
+- stale-identifier-after-retirement
 
 ## Lessons Learned

@@ -1202,7 +1202,7 @@ silent third parse that would work everywhere and drift from its owner.
 
 **The kit shipped no default reader for as long as it could not ship a real one,
 and enforcement made that rule stronger rather than negotiable.** It defaulted to
-`evidence-kit/checks/check-producer-liveness.sh` while that gate was
+`evidence-kit/checks/check-producer-liveness.sh` while that gate was <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 shell-declared. Porting the gate to a descriptor dispatched to
 the binary left that path existing in **no** tree — the readability test the reader
 sits behind fails everywhere, and the hook logged `unavailable` on every firing
@@ -1658,7 +1658,7 @@ than left for a reader to check.
 exists against.** A two-way branch would print "a launch record does not parse"
 over a case that holds **no record to parse** — a false diagnosis pointing at a
 remedy (find the malformed record) that cannot be carried out. That is the same
-message-axis conflation `scripts/gate-exec.sh` was repaired for one caller down
+message-axis conflation `scripts/gate-exec.sh` was repaired for one caller down <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 (gate-sdk/SPEC.md §lib/gate.sh), and a refusal whose message names no reachable
 remedy is exactly what invites a read-only agent to invent a mutating one.
 
@@ -1863,7 +1863,7 @@ discharge it either way: that builds, and runs neither arm.
 **The hermetic stub-driven lane that used to hold every verdict arm moved into
 the member's own module with the port, and the move is stated rather than left to
 be inferred from this section's silence.** The retired
-`gate-tests/subagent-stop-liveness.test.sh` drove a
+`gate-tests/subagent-stop-liveness.test.sh` drove a <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 **stub** reader through all six arms (`green`, `red`, `corrupt`, `unresolved`,
 `unavailable`, `error`) hermetically, `corrupt` and `unresolved` twice each — once
 over a run dir holding a record and once over an empty one, since they are one
@@ -3575,7 +3575,7 @@ than a move, and affordable because the whole case set is under a second of wall
 clock against an arm that already runs at every commit. **One
 table stayed and one did not**, and that split is the rule rather than an
 accident. `usage-tests/dispatch-guard-cases.tsv` stays on disk and is now read
-by the crate test that replaced `bin/run-dispatch-guard-tests.sh`: it pairs an
+by the crate test that replaced `bin/run-dispatch-guard-tests.sh`: it pairs an <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 expected outcome (`block`/`advise`/`fallthrough`) with
 `subagent_type isolation nested desc`, fixes one roster for its whole run
 (`DELEGATION_KIT_READONLY_TYPES=(ro-type)`), and carries two sentinels in the
@@ -3584,7 +3584,7 @@ row that proves D2 is inert on the roster's *absence* rather than on a type
 missing from a populated one, and `UNPARSEABLE` is the degraded row that makes
 the fail-open-but-loud posture testable rather than merely stated. It is kit
 test data rather than consumer config, so moving it into Rust literals would
-trade a reviewable table for a recompile. `usage-tests/budget-guard-cases.tsv`
+trade a reviewable table for a recompile. `usage-tests/budget-guard-cases.tsv` <!-- manifest-temporal-exempt: port record of the retired table and runner -->
 went with `bin/run-budget-guard-tests.sh` instead: its columns
 (`action pct age_off reset_off cred_age desc`) are `usage-verdict`'s inputs
 rather than the guard's, and the guard-side assertion they drove is a two-branch

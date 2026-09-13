@@ -194,7 +194,7 @@ header, for taking them.
 **The parser resolution, the parser dispatch and the per-scenario diff are the
 three that retired, and the sequence is what makes it lawful rather than a
 judgment.** `ek_parser_for`, `ek_parse` and `ek_diff` had exactly two production
-callers, `bin/run-validate.sh` and `bin/diff-baseline.sh`, and no third — probed
+callers, `bin/run-validate.sh` and `bin/diff-baseline.sh`, and no third — probed <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 rather than reasoned. The spine cut ported the first and left the duplication
 live; the diff cut ported the second and the caller set emptied, so the shell
 forms came out in that cut's own commit. That is the whole content of the
@@ -205,7 +205,7 @@ which is also why the two were not droppable independently.
 disposition is the rule rather than a judgment.** `ek_pid_alive` and
 `ek_lock_read` had compiled twins from the day §check-producer-liveness ported,
 and criterion 6's *unless* clause admitted the duplication only because
-`bin/run-validate.sh` still called both. Porting that script emptied their
+`bin/run-validate.sh` still called both. Porting that script emptied their <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 production caller set, so both shell forms retired with it — and the parity
 harness that had held the two implementations equal retired with them, because a
 comparison with one holder can only skip (gate-sdk/SPEC.md §The non-gate arm:
@@ -1189,14 +1189,14 @@ so the restored `.sh` probe sits outside the corpus it probes.
 **Criterion 6's *unless* clause bound on two helpers rather than one, and then
 stopped binding at all — which is the whole disposition and worth keeping as a
 sequence.** This port created a dual implementation of `ek_pid_alive` **and** of
-`ek_lock_read`, both with a live shell consumer after it: `bin/run-validate.sh`
+`ek_lock_read`, both with a live shell consumer after it: `bin/run-validate.sh` <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 called the reader twice and the predicate once, so the caller set did not empty,
 the deletion disposition was unavailable, and what discharged the criterion was a
 **standing cross-substrate comparison** in this kit's fixture lane — one canned
 corpus of lock records and PID strings fed to both holders, classifications
 compared byte for byte, with the corpus's own branch coverage asserted so an
 agreement over nothing could not pass for a hold. Its discriminating case was
-**PID 1**, which `kill -0` alone reads as dead. Porting `bin/run-validate.sh`
+**PID 1**, which `kill -0` alone reads as dead. Porting `bin/run-validate.sh` <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 (§bin/run-validate.sh) then removed that one consumer, so the shell forms retired
 and the lane retired with them: a comparison with one holder can only skip, and an
 arm that can only skip is unreachable code (gate-sdk/SPEC.md §The non-gate arm).

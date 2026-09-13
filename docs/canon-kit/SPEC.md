@@ -1265,7 +1265,10 @@ excludes); and `CANON_KIT_TEMPORAL_EXEMPT_PATHS` — path
 globs whose whole file is exempt, for an immutable dated-narrative surface a
 heading name cannot address (this repo's config naming `docs/posts/*`, the
 dated announcement posts, which take link and command resolution but not
-narration governance). Producer: the generated pre-commit hook /
+narration governance). These three valves also admit a retired-path citation
+under §check-docs-cmd assertion C, so a site's marker or path exemption clears
+both gates at once and their reach is stated once, by the section that owns the
+valves. Producer: the generated pre-commit hook /
 `run-gates.sh`; consumer: the committing operator via the output contract; each
 marker hit is read at the single scan transition (file, line, marker in the
 message), no persistent state. Fail-closed on an unreadable manifest.
@@ -2566,11 +2569,12 @@ and dispatches through `gate_run`.
 
 ### check-docs-cmd
 
-Invariant: every invoked repo-relative `.sh` path and every kit-prefixed env
-knob written inside a fence or inline backticks in the governed doc set resolves
-against the tree — the command/knob analog of `check-md-refs`, since a broken
-`bash <path>` line or a retired knob name drifts silently where a broken link
-would be caught. Two assertions:
+Invariant: every invoked repo-relative `.sh` path in a fence, every backticked or
+fenced kit-prefixed env knob, and every inline-span path citation in the governed
+doc set resolves against the tree, or names no path the tree has retired — the
+command/knob/citation analog of `check-md-refs`, since a broken `bash <path>`
+line, a retired knob name or a citation of a deleted file drifts silently where a
+broken link would be caught. Three assertions:
 
 - **(A) invoked command paths.** Inside a fenced block, a `.sh` path in
   *invocation* position — the first word of a `;`/`|`/`&&`-separated segment, or
@@ -2596,16 +2600,67 @@ would be caught. Two assertions:
   follows it (`EVIDENCE_KIT_RUN_<suite>`, `CANON_KIT_COMMENT_*`) — resolves when
   any code name extends it. Names with no kit prefix are out of scope, so
   generic shell vars never false-positive.
+- **(C) retired cited paths.** Outside a fence, a path-shaped token inside an
+  inline code span reds when it names a path the repository has **retired** and
+  still tracks under none of its resolutions. A token is path-shaped when it has
+  two or more `/`-separated segments of `[A-Za-z0-9._-]`, a final segment
+  carrying an extension, and no `..`, after the same quote and punctuation trims
+  as (A) and a leading `./` stripped. Its **resolutions** are the doc's
+  directory, the repo root, and each `gate_kit_roots` member: a kit-relative
+  citation such as `lib/gate.sh`, written in one kit's SPEC about another kit's
+  file, resolves the way its reader resolves it. A token **resolves** when any
+  resolution is a tracked file or a directory holding one. The **retired set** is
+  every path deleted in the history this clone holds (`git log --no-renames
+  --diff-filter=D`, so a rename counts as a deletion of its old name), plus every
+  path the index deletes against `HEAD`; the second half makes the deleting
+  commit red at pre-commit, before its deletion is in history, and an unborn
+  `HEAD` has retired nothing. A token that resolves nowhere and names no retired
+  path is admitted: a hypothetical, a consumer-side file or a gitignored capture
+  stream is not a stale identifier.
+
+  **History is admitted where `check-manifest-temporal` admits it, through its
+  three valves and no fourth:** a `manifest-temporal-exempt: <reason>` marker on
+  the line or the one above, a section named in
+  `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS`, or a file matching
+  `CANON_KIT_TEMPORAL_EXEMPT_PATHS`. Naming a retired path is narration about the
+  past, and that gate already rules where narration may stand; the compiled
+  member reads the valves through that member's own line classifier, so neither
+  gate can disagree with the other about which line is history. The exemption goes no
+  further than that: a valved line's fenced invocations and knobs are still
+  scanned. In a flowing paragraph the marker rides the end of a line as inline
+  HTML, since a line-leading `<!--` opens an HTML block that ends the paragraph;
+  one marker covers its own line and the next.
+
+  **(C) reds on retirement and (A) on absence, and the difference is
+  deliberate.** An invocation of a path that was never tracked is a broken
+  command; a citation of one is usually a hypothetical, a consumer-side file or a
+  gitignored capture stream, and a valve on it would record nothing true.
+  Admission never turns on a line's age against the deleting commit: a port
+  commit is exactly the one that rewrites the paragraphs citing what it deleted,
+  so an age test would admit the stale citations at the one moment they matter.
+  A historical mention names the path, not the commit, because a kit SPEC states
+  its rules undated and provenance stays in git history. **A shallow clone
+  under-reds and never invents:** its retired set is whatever history the clone
+  holds, so the arm reports fewer findings and no false ones; gate-sdk's workflow template
+  fetches full depth for history-reading gates, and the clean line names the
+  shallow case rather than passing silently.
 
 The governed doc set is exactly `check-md-refs`' — the manifest set minus
 `CANON_KIT_MDREF_EXCLUDE` — shared, with no gate-specific knob. Prose outside
-fences and backticks is never scanned; a hypothetical example path is written
-unfenced, or its whole doc joins the per-file `CANON_KIT_MDREF_EXCLUDE` valve.
-The knob set is built by a repo-root-anchored `git grep`, so it holds when the
-fixture runner invokes from a case directory. Not a git repository, or a
-`git grep` that errors, is fail-closed (exit 2). The `# graph:` manifest couples
-the doc set to `scripts/*.sh` and every kit's shell sources (`kit:*.sh`), so a
-script rename or a knob retirement re-fires the gate over the docs.
+fences and code spans is never scanned for paths. A hypothetical *invocation* is
+written outside a fence, or its whole doc joins the per-file
+`CANON_KIT_MDREF_EXCLUDE` valve; a hypothetical *citation* needs nothing, because
+a path never tracked is not retired. A path written outside every code span stays
+unscanned, and that residue is the close-stage audit roster's. The knob set, the
+tracked set and the retired set are built by repo-root-anchored `git` reads, so
+they hold when the fixture runner invokes from a case directory. Not a git
+repository, or a `git` read that errors, is fail-closed (exit 2). The `# graph:`
+manifest couples the doc set to `scripts/*.sh` and every kit's shell sources
+(`kit:*.sh`), so a script rename, a knob retirement or a valve edit in the
+consumer config re-fires the gate over the docs. The two valve knobs take no
+`knob:` token: the path valve narrows the corpus and the section valve names
+headings rather than paths, and neither is a walk filter's pattern set
+(gate-sdk/SPEC.md §gen-pre-commit).
 
 ### check-install-claim
 

@@ -1507,7 +1507,7 @@ whose `rust.sh` emits a marker row: it is the extractor seam's **end-to-end
 proof**, the consumer-first resolution order and the `bash` spawn that executes a
 consumer extractor both exercised, with the shadow's output rather than the
 built-in grammar's recorded in the golden. **The installer's behind-invoke relocation reached
-`index-tests/toolfloor-cases.sh` and the shell library it sourced, and the
+`index-tests/toolfloor-cases.sh` and the shell library it sourced, and the <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 mechanism is stated so a later reader can re-run the test rather than inherit the
 verdict**: the case table *sourced* that library, so it was a projection of that
 library's own verdict set and the two moved together — into deletion rather than
@@ -1525,7 +1525,7 @@ members it names (gate-sdk/SPEC.md §Porting a gate to the binary substrate). Th
 smoke declared the same section, sourced neither, and its own header called it a
 standalone validate suite, so it was unblocked and has since cut; the driver was
 released on the same test and has since cut too (below). **Releasing the driver
-released nothing else** at the time. `bin/always-loaded.sh` (§The always-loaded
+released nothing else** at the time. `bin/always-loaded.sh` (§The always-loaded <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 meter) was a different section's owed file, correctly homed and takeable as a
 singleton on its own, and it has since cut too — its golden is the arm's parity
 oracle, held byte-for-byte over an unedited expectation file (below). **Nothing

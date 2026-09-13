@@ -1873,7 +1873,7 @@ settings, never a kit literal.
 either in-crate — `native/src/emit/scratch_run.rs` and its `BRIDGED_ARMS` row —
 or declared `# no-port:` (`lib/guard.sh`, which composes rule 23's steer). The
 seam cases stay in `gate-tests/scratch-run.test.sh`, on the shell substrate by
-their own nature. `bin/scratch-run.sh` was the one owed surface and its port took
+their own nature. `bin/scratch-run.sh` was the one owed surface and its port took <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 it, so **no later port cut is sequenced against this section**.
 
 ## scan-prompts
@@ -2816,7 +2816,7 @@ subject is a spawned shell surface the payload ships, which `bash-guard.sh` is.
 
 **The `compare-settings-allow` cut empties guard-kit's owed column outright**, and
 it is the second cut to reach this section: the `run-guard-tests` cut took
-§Testing's one owed file, leaving `bin/compare-settings-allow.sh`
+§Testing's one owed file, leaving `bin/compare-settings-allow.sh` <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 (§compare-settings-allow) as the kit's last member — a different section,
 correctly homed, and takeable as a singleton — and this cut ports that to the
 `--emit-compare-settings-allow` arm above. `lib/guard.sh` and

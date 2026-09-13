@@ -27,13 +27,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    // spec: canon-kit/SPEC.md §check-manifest-temporal — path valve: a whole file whose
-    // immutable dated narrative a heading name cannot address (dated posts)
-    let paths = spec::knob_array_pub("CANON_KIT_TEMPORAL_EXEMPT_PATHS")?;
+    let valve = TemporalValve::load()?;
     let mut exempt_n = 0usize;
     let mut manifests: Vec<String> = Vec::new();
     for m in all {
-        if paths.iter().any(|g| walk::pattern_match(g, &m)) {
+        if valve.path_exempt(&m) {
             exempt_n += 1;
         } else {
             manifests.push(m);
@@ -59,64 +57,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
         compiled.push((m.clone(), compile(m, "CANON_KIT_TEMPORAL_MARKERS")?));
     }
 
-    let exempt_sections: Vec<String> = spec::knob_array_pub("CANON_KIT_TEMPORAL_EXEMPT_SECTIONS")?
-        .iter()
-        .map(|s| s.to_ascii_lowercase())
-        .collect();
-
     let mut out: Vec<String> = Vec::new();
     for f in &manifests {
         let text = spec::read_text(Path::new(f))?;
-        let mut in_fence = false;
-        let mut exempt = false;
-        let mut exempt_level = 0usize;
-        let mut prev = String::new();
-        for (idx, raw) in text.lines().enumerate() {
-            let fnr = idx + 1;
-            if spec::is_fence_line(raw) {
-                in_fence = !in_fence;
-                prev = raw.to_string();
-                continue;
-            }
-            if in_fence {
-                prev = raw.to_string();
-                continue;
-            }
-            if let Some(lvl) = heading_level(raw) {
-                if exempt && lvl <= exempt_level {
-                    exempt = false;
-                    exempt_level = 0;
-                }
-                let h = heading_text(raw).to_ascii_lowercase();
-                if exempt_sections.contains(&h) {
-                    exempt = true;
-                    exempt_level = lvl;
-                }
-                prev = raw.to_string();
-                continue;
-            }
-            if exempt {
-                prev = raw.to_string();
-                continue;
-            }
-            if raw.contains(EXEMPT_MARKER) || prev.contains(EXEMPT_MARKER) {
-                prev = raw.to_string();
+        for line in valve.lines(&text) {
+            if line.kind != LineKind::Prose || line.valved {
                 continue;
             }
             // spec: canon-kit/SPEC.md §check-manifest-temporal — a marker named in inline code
             // is a meta-reference, not narration; the subject is folded and the pattern is not
-            let scan = spec::strip_inline_code(raw.as_bytes());
+            let scan = spec::strip_inline_code(line.raw.as_bytes());
             let low: String = String::from_utf8_lossy(&scan).to_ascii_lowercase();
             for (name, re) in &compiled {
                 if re.is_match(&low) {
                     out.push(format!(
                         "  {}:{}  temporal-narration marker: {}",
-                        f, fnr, name
+                        f, line.ln, name
                     ));
                     break;
                 }
             }
-            prev = raw.to_string();
         }
     }
 
@@ -143,6 +103,90 @@ fn rule(args: &[String]) -> Result<i32, String> {
 }
 
 const EXEMPT_MARKER: &str = "manifest-temporal-exempt:";
+
+// spec: canon-kit/SPEC.md §check-manifest-temporal — the three history valves, read once and
+// shared with check-docs-cmd assertion C so the two members cannot disagree about which line is
+// history
+pub(crate) struct TemporalValve {
+    sections: Vec<String>,
+    paths: Vec<String>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub(crate) enum LineKind {
+    Fence,
+    Fenced,
+    Heading,
+    Prose,
+}
+
+pub(crate) struct ValvedLine<'a> {
+    pub ln: usize,
+    pub raw: &'a str,
+    pub kind: LineKind,
+    pub valved: bool,
+}
+
+impl TemporalValve {
+    pub(crate) fn load() -> Result<Self, String> {
+        Ok(Self::new(
+            spec::knob_array_pub("CANON_KIT_TEMPORAL_EXEMPT_SECTIONS")?,
+            spec::knob_array_pub("CANON_KIT_TEMPORAL_EXEMPT_PATHS")?,
+        ))
+    }
+
+    pub(crate) fn new(sections: Vec<String>, paths: Vec<String>) -> Self {
+        TemporalValve {
+            sections: sections.iter().map(|s| s.to_ascii_lowercase()).collect(),
+            paths,
+        }
+    }
+
+    // spec: canon-kit/SPEC.md §check-manifest-temporal — path valve: a whole file whose
+    // immutable dated narrative a heading name cannot address (dated posts)
+    pub(crate) fn path_exempt(&self, rel: &str) -> bool {
+        self.paths.iter().any(|g| walk::pattern_match(g, rel))
+    }
+
+    // spec: canon-kit/SPEC.md §check-manifest-temporal — the section and per-site valves: a line
+    // outside a fence is valved when an exempt section encloses it or the marker stands on it or
+    // on the line directly above
+    pub(crate) fn lines<'a>(&self, text: &'a str) -> Vec<ValvedLine<'a>> {
+        let mut out = Vec::new();
+        let mut in_fence = false;
+        let mut exempt = false;
+        let mut exempt_level = 0usize;
+        let mut prev: &str = "";
+        for (idx, raw) in text.lines().enumerate() {
+            let ln = idx + 1;
+            let marked = raw.contains(EXEMPT_MARKER) || prev.contains(EXEMPT_MARKER);
+            prev = raw;
+            if spec::is_fence_line(raw) {
+                in_fence = !in_fence;
+                out.push(ValvedLine { ln, raw, kind: LineKind::Fence, valved: false });
+                continue;
+            }
+            if in_fence {
+                out.push(ValvedLine { ln, raw, kind: LineKind::Fenced, valved: false });
+                continue;
+            }
+            if let Some(lvl) = heading_level(raw) {
+                if exempt && lvl <= exempt_level {
+                    exempt = false;
+                    exempt_level = 0;
+                }
+                if self.sections.contains(&heading_text(raw).to_ascii_lowercase()) {
+                    exempt = true;
+                    exempt_level = lvl;
+                }
+                out.push(ValvedLine { ln, raw, kind: LineKind::Heading, valved: exempt || marked });
+                continue;
+            }
+            out.push(ValvedLine { ln, raw, kind: LineKind::Prose, valved: exempt || marked });
+        }
+        out
+    }
+}
 
 // spec: canon-kit/SPEC.md §check-manifest-temporal — `^#{1,6}[[:space:]]` and its level
 // count, a kit literal that hand-compiles
