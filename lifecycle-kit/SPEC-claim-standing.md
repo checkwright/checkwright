@@ -186,9 +186,37 @@ Step 2's remediation list gains a limb ahead of **Both hold**, **Not yet applied
   in that order. The empty-value refusal moves from `edges` to `inferred`, with the help text
   naming `none` as the form for a survey that inferred nothing. The hex-token scan's field set
   becomes `corpus`, `oracle`, `finding`, `inferred`. Its `good/` and `bad/` fixture blocks are
-  re-keyed. The `bad/` blocks that exercise a missing `edges` key, an empty `edges` value, and a
-  block missing both `oracle` and `edges` exercise the same three shapes on `inferred`. The
-  `edges-token-unknown` case in `check-survey-record.test.sh` plants its token in `inferred`.
+  re-keyed. **Re-keying is a content rewrite, not a label swap**: the current `edges` slot's
+  content (a comma-separated per-candidate sum, or `none`) has no home under `finding`, and the
+  current `finding` slot's content (a prose judgment) has no home under `inferred`, so each
+  fixture block's `finding:`/`inferred:` pair is re-authored — a judgment sentence under `finding`,
+  `none` under `inferred` for every block, since every block in both fixtures already ran an
+  oracle (`oracle: none` blocks stay notes and still write `inferred: none`, on the ground the
+  field records what no *command* established, not what the block's grounds are). The `bad/`
+  blocks currently exercise two `edges` shapes — an empty `edges` value and a missing `edges` key
+  (`lifecycle-kit/gate-tests/check-survey-record/bad/record.md`'s 2026-01-06 and 2026-01-07
+  blocks) — not three, and no block misses both `oracle` and `edges` together. Those two shapes
+  move to `inferred`: an empty `inferred` value and a missing `inferred` key. The `oracle`-facing
+  bad shapes (a missing `oracle` line, an empty `oracle` value, a short `rev`) are untouched. The
+  `edges-token-unknown` case in `check-survey-record.test.sh` plants its token in `inferred`, and
+  that file's descriptive comments naming `edges` (its `write_token_record` doc-comment's
+  `[$5=edges value]` and the surrounding case comments) are reworded to `inferred` alongside it.
+- `lifecycle-kit/SPEC.md` §check-survey-record — two prose spots beyond the key roster and the
+  empty-value refusal retarget from `edges` to `inferred`: the paragraph opening **`edges` is
+  asserted on the same two footings as `oracle`**, and the sentence *"Its input is every field but
+  `rev`, `edges` included"*. The gate-model paragraph's fixture-shape sentence — *"two carrying
+  `edges: none`... an **empty** `edges` and a block whose `edges` line is **missing**"* — retargets
+  to `inferred` on the corrected shapes above (two `bad/` shapes, not three; the good fixture's two
+  `edges: none` blocks become two `inferred: none` blocks).
+- `.workflow/survey-record.md` — this repo's own live record carries three blocks filed this
+  iteration, each with a live `- edges:` line. The commit landing this delta re-keys those blocks
+  in the same motion (§Red conditions already states the obligation; this is that obligation's
+  file).
+- `lifecycle-kit/smoke/install.sh` — its `--emit file-survey` call (§check-survey-record's smoke
+  coverage) currently passes `"none"` then a prose judgment as its fourth and fifth positionals,
+  the old `edges`/`finding` order. Under the new order those arguments land under `finding` and
+  `inferred` respectively, backwards from what they say — the fourth argument becomes the swapped
+  pair: the prose judgment fourth, `"none"` fifth.
 - `native/src/emit/enter_stage.rs` — the survey read trigger's note, *"run its witness (…) and
   cite it if both hold"*, becomes *"… and cite its finding if both hold — its inferred claims are
   not carried"*. The entry report is the one surface every stage session reads before it cites a
@@ -257,9 +285,11 @@ commit. If it lands first, the seed carries the bullet, and delta 8's seed inclu
 ## Existing sections updated
 
 - `lifecycle-kit/SPEC.md` — §The survey record's grammar fence, field-reader paragraph, `inferred`
-  paragraphs, witness outcome, and token-scan and witness field lists (delta 1); its four `edges`
-  paragraphs out and the derivation paragraph in (delta 2); §The committed gap inbox's refusal
-  reach sentence (delta 3); §check-survey-record's key roster and empty-value refusal (delta 5).
+  paragraphs and witness outcome (delta 1); its four `edges` paragraphs out, the derivation paragraph in,
+  and the token-scan and witness field lists (delta 2); §The committed gap inbox's refusal reach
+  sentence (delta 3); §check-survey-record's key roster, empty-value refusal, the "asserted on the
+  same two footings" paragraph, the "every field but `rev`" sentence and the gate-model
+  fixture-shape sentence (delta 5).
 - `drift-kit/SPEC.md` — §The knowledge-friction loop's seam paragraph and drain limb (delta 4).
 - `drift-kit/templates/close-knowledge.md` — the drain limb (delta 4).
 - `native/src/emit/file_survey.rs` — positionals, usage, stamped block, unit tests (delta 5).
@@ -272,6 +302,10 @@ commit. If it lands first, the seed carries the bullet, and delta 8's seed inclu
 - `lifecycle-kit/gate-tests/check-survey-record.test.sh` — the `edges-token-unknown` case moves
   to a token in `inferred` (delta 5).
 - `lifecycle-kit/gate-tests/survey-record-entry.test.sh` — any block it seeds re-keyed (delta 5).
+- `lifecycle-kit/smoke/install.sh` — its `--emit file-survey` call's fourth and fifth positionals
+  swapped to the new order (delta 5).
+- `.workflow/survey-record.md` — this repo's own live blocks filed this iteration re-keyed in the
+  same commit (delta 5).
 - `native/src/emit/enter_stage.rs` — the read trigger's note (delta 5).
 - `lifecycle-kit/templates/stages/scope.md` — the edges-field sentence (delta 6).
 - `CLAUDE.md` — the survey-capture bullet's operands (delta 6).

@@ -349,6 +349,8 @@ The retired file's history mentions in the published `docs/posts/` notes stay as
 - `native/src/gates/mod.rs` — the registration (delta 3).
 - `scripts/check-tightened-gates-note-parity.gate` — renamed, `couples=` retargeted (delta 3).
 - `scripts/gates.list` — the registered name (delta 3).
+- `scripts/gate-tests/check-tightened-gates-note-parity/` — renamed with the gate, its `good/` pair
+  carrying all three sections and its `bad/` pair a mismatch in each (delta 3).
 - `scripts/gate-tests/check-tightened-gates-note-parity.test.sh` — renamed with the gate (delta 3).
 - `scripts/git-hooks/pre-commit` — regenerated (delta 3).
 - `docs/enforcement.md` — regenerated (delta 3).
