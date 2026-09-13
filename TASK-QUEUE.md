@@ -17,6 +17,22 @@
 ## Deferred
 
 
+- **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
+  CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
+  reads the host repo's history passes here and fails in a consumer tree or a depth-1 clone.
+  **Attested once:** check-docs-cmd's assertion-C cases did, until `static-config-seam`'s close
+  moved them into a scratch-history test; a depth-1 clone printed FAIL for that bad case first.
+  **Probed at promotion, no live instance:** every suite `gate_fixture_suites` derives ran clean
+  in a depth-1 clone of HEAD, so the class is unguarded rather than red.
+  **Why [design-pending]:** the gates workflow checks out at full depth for a battery gate that
+  reads the commit graph, so the candidate — the fixture step run from a history-less copy, or a
+  consumer-smoke arm doing the same — decides which job pays the copy and whether the template
+  ships it.
+  **Cost while deferred:** the next history-reading fixture ships green here and red for an
+  adopter.
+  Filed 2026-09-14 by `static-config-seam`'s close into the gap inbox; no stage of that iteration
+  could drain it, and this scope promoted it, so the record is late and says so.
+
 - **lead-journal-advisory-fires-on-the-live-lead** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — the
   boundary entry's undisposed-lead-journal advisory (lifecycle-kit/SPEC.md §bin/enter-stage.sh, the
   lead-journal invariant paragraph) fires on the **live** dispatching lead's own journal at every
@@ -31,6 +47,7 @@
   **Cost while deferred:** a permanent advisory at every lead-run boundary trains the reader to skip
   the one line that would carry a real undisposed journal.
   Filed 2026-09-13 by scope; drained from the gap inbox at `resident-tier-restatement`'s close.
+  recurrence: lead-journal-advisory-fires-on-the-live-lead 2026-09-14
 
 - **audit-roster-mechanism-has-no-kit-owner** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the
   audit roster's contract header names doctrine-kit/DOCTRINE.md rule 2 (Enforcement-first) as
