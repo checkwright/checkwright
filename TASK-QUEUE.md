@@ -117,6 +117,10 @@
   **Cost while deferred:** a harness-moved producer can outlive its session, and a commit can land
   beside it; rule 14 and the stage-entry liveness check see neither, because nothing recorded it.
   Filed 2026-09-11 by spec on the operator's split direction.
+  **Third attestation, 2026-09-14 validate:** `--run-validate` passed the 120s foreground timeout
+  and was moved. Its own `run-validate.lock` named the pid, so the stage-entry preflight would
+  have seen it; guard rule 14 reads only `*.run` records and would not have blocked a git write.
+  recurrence: harness-moved-background-task-unrecorded 2026-09-14
 
 - **payload-withholds-kit-specs** [design-pending] [cost: event/high] [surface: installer] — the customer payload packs every kit root
   whole (`git archive` per root at `native/src/emit/pack_installer.rs`), so the kit SPECs ride
@@ -2537,9 +2541,10 @@
   the major criterion to name shipped-surface removal directly; or an explicit ruling that a
   `bin/` tool is not a declared surface and its removal rides a minor forever, which would at
   least make today's behaviour intentional rather than accidental.
-  **Distinct from `cited-script-path-liveness-inline`**, which shares the instance and not the
-  axis: that entry is about governed prose still naming a deleted path, a staleness question
-  inside this tree; this one is about what an ADOPTER is owed when a shipped path disappears.
+  **Distinct from `cited-script-path-liveness-inline`, landed** (canon-kit/SPEC.md §check-docs-cmd
+  assertion (C)), which shares the instance and not the axis: that one was governed prose still
+  naming a deleted path, a staleness question inside this tree; this one is about what an ADOPTER
+  is owed when a shipped path disappears.
   **Cost while deferred:** silent and consumer-side. It lands on an adopter who automated around
   a kit tool, and it lands as a broken script rather than a red gate — the failure class the
   two-phase upgrade contract exists to convert into a worklist.
@@ -2721,10 +2726,10 @@
   **Probed rather than assumed:** a scan of every plain-code slug-shaped token across the
   top-level governed docs against the live slug set returned exactly one true positive, so the
   class is real and rare rather than a wave.
-  **DISTINCT from `stale-identifier-after-retirement`**, which is a deleted *path* whose capability
-  moved intact. This is a retired *slug* cited as a live pointer, and the two differ in what a
-  reader can do about it: a dead path is checkable against disk, while a retired slug resolves to
-  nothing anywhere, the Done section being cleared every iteration.
+  **DISTINCT from `stale-identifier-after-retirement`**, landed as check-docs-cmd assertion (C):
+  a deleted *path* whose capability moved intact. This is a retired *slug* cited as a live
+  pointer; a dead path is checkable against disk, while a retired slug resolves to nothing
+  anywhere, the Done section being cleared every iteration.
   **Why `[design-pending]`:** the mechanical half is a scan for a plain-code slug-shaped token that
   matches no live slug but does match a slug in the queue's own history — buildable, and it needs a
   false-positive budget, since gate names share the slug grammar and dominate the token
@@ -3417,8 +3422,8 @@
   takes about two assertions for `retired-slug-live-pointer-citation` and
   `queue-status-parenthetical-liveness`, plus ONE report-only deliverable riding the queue-edges
   arm's resolution, `done-slug-ownership-citation-report` — report-not-gate under the SPEC's
-  reference-vs-membership ruling, its twin `dead-queue-citation-report` shipped. (C) is
-  `cited-script-path-liveness-inline` plus `stale-identifier-after-retirement`, likely one ticket.
+  reference-vs-membership ruling, its twin `dead-queue-citation-report` shipped. (C), the
+  two path-citation entries, LANDED 2026-09-13 as canon-kit/SPEC.md §check-docs-cmd assertion (C).
   **(D), the two `guard-rule-number-*` entries, is ANSWERED and out**, both slices' grounds having
   relocated 2026-09-08 to the entries already owning them.
   **Two members are content-unverified though both re-verified live above:** Icebox's
@@ -3443,8 +3448,8 @@
   **The zero-inbound RANKING ground this entry carried is FALSIFIED and deleted rather than left
   standing:** summed 2026-09-08 the family carries **37 inbound over seventeen live members**
   against the hub's 1, four times the largest single entry. **THE HEALTH TRIAD'S QUEUE LIMB READS
-  THE WRONG WAY** — 301 Deferred + 101 Icebox against 292 + 84 on 2026-09-05 — so (A)+(B)+(C), nine
-  entries over three gate widenings, is the largest lever the pool offers on it.
+  THE WRONG WAY** — 301 Deferred + 101 Icebox against 292 + 84 on 2026-09-05 — so (A)+(B), seven
+  entries over two gate widenings now (C) has landed, is the largest lever the pool offers on it.
   **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
   first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
   a read of four gate sources — the re-derivation the survey record exists to prevent. Filed
@@ -3706,45 +3711,6 @@
   Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception, staged and
   committed in one motion. FILED AND NOT BUILT: it rides no cut, no iteration since has shared its
   surface (scope's composition test, re-grounded 2026-09-11), and this is no hotfix.
-
-- **docs-cmd-invariant-inline-scope-imprecise** [design-pending] [cost: event/low] [surface: canon-kit] — `check-docs-cmd`'s invariant
-  sentence promises that inline-backticked `.sh` paths are scanned while its own assertion (A)
-  scans only fenced ones, so the sentence over-promises and the class it names stays ungated.
-  **The imprecision, read at the source rather than argued.** `canon-kit/SPEC.md`'s invariant is
-  ONE sentence introducing BOTH assertions, so its "or inline backticks" is satisfied by (B),
-  which genuinely does cover inline — loose prose rather than a flat self-contradiction. (A)
-  carries an explicit justification for its narrowness where the invariant sentence carries none,
-  and `native/src/gates/docs_cmd.rs` matches each assertion precisely: the path scan runs only
-  inside a fence, the knob scan runs in-fence and over inline code spans.
-  **The two repairs are ASYMMETRIC and this entry starts from the narrow one**, ruled by the lead
-  on all four sites read directly, which corrected an earlier framing of it as a symmetric
-  coin-flip. (b) correcting the invariant sentence to say paths are fence-only is the ACCURACY fix
-  and the presumptive default. (a) widening (A) and the implementation to inline code spans is
-  enforcement-first, but it must win a POSITIVE case against that calibration paragraph and it
-  re-arms over the whole governed doc set at once.
-  **The live class that prompted it is DISCHARGED and does not ride this entry.** The eight inline
-  citations the two port cuts made dead were swept as a Definition-of-Done item inside the units;
-  re-verified by grep at this drain, the sharpest of them — `canon-kit/SPEC.md`'s own invoked
-  `bash scripts/enum-sets.sh` — is gone, and what survives in `gate-sdk/SPEC.md` is a dated
-  history paragraph naming the deleted scripts deliberately. This is the gate-precision half alone.
-  **THE POSITIVE CASE LIMB (a) WAS WAITING FOR ARRIVED 2026-09-05, and it does not settle the
-  fork.** Two independent close audits (`internal-identifier-restatement`,
-  `capability-liveness-after-descope`) each found the SAME five present-tense inline-backticked
-  `.sh` paths in published kit SPECs, naming three files that iteration deleted; a third sweep's
-  corpus-wide existence probe returned 38 non-resolvers over 68 literals. Every one is inline, so
-  assertion (A) saw none of them and `check-docs-cmd` stayed green throughout. That is
-  enforcement-first's case measured rather than argued. What keeps the fork open is the SAME
-  probe's other column: its non-resolvers are dominated by legitimate past-tense port narrative,
-  dated release posts and explicit placeholders — exactly the false-positive surface (b) prices.
-  **Why `[design-pending]`:** choosing between (a) and (b) is a doctrine call between
-  enforcement-first and a stated calibration, not a coding one.
-  **Cost while deferred:** an invoked `.sh` path in inline backticks stales silently across the
-  governed doc set while a reader of the invariant sentence is told otherwise — an adopter reading
-  a kit SPEC to learn what a gate checks witnesses that, so it is product rather than machinery.
-  **DISTINCT from `prose-filename-citation-liveness`**, which owns bare `.md` filenames falling
-  between `check-md-refs` and `check-spec-pointer`; this is `.sh` paths and the precision of one
-  gate's own invariant sentence.
-  Filed at spec 2026-09-03 and reframed the same day on the lead's four-site read; drained here.
 
 - **registry-needs-conflates-requirement-and-spawn** [design-pending] [cost: event/high] [surface: gate-sdk] — the crate's registry
   declares a member's HOST REQUIREMENT while the test guarding it compares that declaration
@@ -5143,5 +5109,6 @@
 
 - cited-script-path-liveness-inline
 - stale-identifier-after-retirement
+- docs-cmd-invariant-inline-scope-imprecise
 
 ## Lessons Learned

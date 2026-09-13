@@ -620,7 +620,7 @@ reason for any bespoke unit test beside it. The bespoke unit tests are named
 together here, because a roster spread across per-gate sections is one no reader
 and no oracle sees whole: `check-amendment-update-target.test.sh`,
 `check-comment-tier.test.sh`,
-`check-deprecation-task.test.sh`, `check-docs-link-convention.test.sh`,
+`check-deprecation-task.test.sh`, `check-docs-cmd.test.sh`, `check-docs-link-convention.test.sh`,
 `check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`,
 `check-manifest-count.test.sh`, `check-md-refs.test.sh`,
 `check-measured-claim.test.sh`, `check-prose-enum.test.sh`,
@@ -2649,7 +2649,9 @@ broken link would be caught. Three assertions:
   under-reds and never invents:** its retired set is whatever history the clone
   holds, so the arm reports fewer findings and no false ones; gate-sdk's workflow template
   fetches full depth for history-reading gates, and the clean line names the
-  shallow case rather than passing silently.
+  shallow case rather than passing silently. The same dependence bars (C) from
+the `good/`+`bad/` pair, which runs inside whatever repository vendored it: a
+retirement case builds its own history in the bespoke test instead.
 
 The governed doc set is exactly `check-md-refs`' — the manifest set minus
 `CANON_KIT_MDREF_EXCLUDE` — shared, with no gate-specific knob. Prose outside
