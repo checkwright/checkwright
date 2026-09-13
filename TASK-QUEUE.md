@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: resident-tier-restatement
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -771,6 +771,7 @@
   a regression claim and not to be re-quoted without re-running it — and the cost scales with the
   number of owning kits rather than of members, so a new kit raises the floor for everyone while a
   new member no longer does. A nested bridge, as `check-prose-enum` now has, pays it twice.
+  **`config-seam-static-format` retires the bridge this entry's cost is measured on** (2026-09-13).
   Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;
   re-scoped here after the batch landed, with every retired figure deleted.
   recurrence: config-bridge-resolution-cost 2026-09-03
@@ -1555,8 +1556,8 @@
   the bare name — correctly — and the one-line remedy a consumer needs had no route from build to
   the composing session. Two witnesses, both landing on "name plus prose versus bare names", is the
   open design question above asked twice rather than a second question.
-  **At threshold, declined again at scope — operator direction, 2026-09-11 (lead-relayed):** the
-  release-note surface is unshared, its design question open on purpose, and releases deferred.
+  **Taken at the next iteration's intake — operator direction, 2026-09-13, lead-relayed**, after two
+  threshold declines (2026-09-11, 2026-09-12); its order there is that scope's to settle.
   recurrence: behavior-change-surface 2026-08-25 2026-09-06
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
 
@@ -1879,9 +1880,9 @@
   lifecycle-kit/SPEC.md §The committed gap inbox has **already refused both obvious shapes** for
   the sibling channel, a filing-time prompt and a fact-versus-inference grammar, so a proposal
   here argues against a recorded refusal or finds a third shape.
-  **Threshold decline at scope, 2026-09-11 — operator direction (lead-relayed):** the
-  drain-side half landed 2026-09-07 and what remains argues against a recorded refusal, which is
-  design work rather than a takeable unit; drift-kit shares no surface with this iteration.
+  **Taken at the next iteration's intake — operator direction, 2026-09-13, lead-relayed**, beside
+  `survey-record-claim-reliability`, after declines on 2026-09-11 and 2026-09-12; how it ranks there
+  is that scope's call.
   recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
   **Three attested instances, each falling on a different limb.** A build batch stamped the
   consumer smoke's cost as "~50-60 minutes" and reasoned that the run serializes against all
@@ -1951,9 +1952,8 @@
   The close re-ran the entry's own reproduction and the residue regenerated, because the arm's pin
   misses the knob form a bridged gate reads. The survey never ran the reproduction the entry names.
   recurrence: survey-record-claim-reliability 2026-09-08 2026-09-11
-  **Declined at threshold at scope:** its design pairs with `kfric-capture-unverified-assertion`'s
-  capture-side question, itself declined, and its cheapest part — deriving the `edges` slot
-  rather than taking it hand-typed — shares no surface with the `instruction-surface-tier` set.
+  **Operator direction, 2026-09-13, lead-relayed: take it at the next iteration's intake**, with
+  `kfric-capture-unverified-assertion`, past two threshold declines; placement is that scope's.
   Filed 2026-08-10 by close, on operator direction after the third error.
 
 - **kit-ref-liveness-stem-token-hole** [design-pending] [cost: event/high] [surface: canon-kit] — a typo'd knob name under
@@ -3953,6 +3953,8 @@
   verify-after-commit set, or CLAUDE.md's `native/` paragraph beside its
   "neither discharges the other" rule — both narrower than the doctrine call above.
   recurrence: editor-diagnostic-unruled 2026-09-01 2026-09-12
+  **Taken at threshold into unit set `resident-tier-restatement` — operator direction, 2026-09-13,
+  lead-relayed** — both named candidate homes are that set's surfaces.
   Filed 2026-09-01 at scope's boundary drain and born in the icebox; re-tiered the same day by
   close on instances 3 and 4, which postdate the eviction. Both fell on one calendar day, so the
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
@@ -5033,6 +5035,12 @@
   funded a one-line `couples=` pointer, so the meter read 202l and +0 unchanged.
   **Why `[design-pending]`:** what a resident bullet owes beyond its pointer is unruled, and the
   answer is a rule about the always-loaded tier rather than four edits.
+  **Premise corrected 2026-09-13 at scope:** doctrine-kit/DOCTRINE.md rule 5 already rules one line
+  per rule with the mechanism behind the pointer; what is unruled is ENFORCEMENT REACH, since
+  `check-brevity` governs one designated section and only bold-name bullets, leaving Housekeeping
+  outside. A fifth multi-line restating bullet, the permission-settings one, landed 2026-09-13.
+  **Leads unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed**,
+  with `doctrine-rule-body-length-unruled` and `editor-diagnostic-unruled`; `/spec` authors.
   **Cost while deferred:** four restatements on the highest-blast-radius surface in the tree, each
   re-read by every session of every stage.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its always-loaded
@@ -5056,6 +5064,9 @@
   a rule whose digest is complete and whose body is three times its length is the readable signal —
   or an explicit acceptance of the length as the price of a valve that must not be misread, said
   once. Either way it is a ruling on the deliverable, not an edit.
+  **Joins unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed.**
+  Compressing rule 11's hotfix valve may not widen or narrow what a session may start: that is
+  operator-class, never wording.
   **Cost while deferred:** two editorial reads unspent, against a surface every stage reads through
   its digest.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on the
