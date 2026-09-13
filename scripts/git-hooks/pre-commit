@@ -361,8 +361,8 @@ if staged_matches 'docs/posts/*.md' 'docs/install.md' 'native/src/gates/tightene
     run_gate check-tightened-gates-grammar native/target/release/checkwright-gates check-tightened-gates-grammar
 fi
 
-if staged_matches 'docs/posts/*.md' '.workflow/tightened-gates.txt' 'native/src/gates/tightened_gates_note_parity.rs' 'native/src/declaration.rs'; then
-    run_gate check-tightened-gates-note-parity native/target/release/checkwright-gates check-tightened-gates-note-parity
+if staged_matches 'docs/posts/*.md' '.workflow/release-declarations.md' 'native/src/gates/release_declaration_parity.rs' 'native/src/declaration.rs'; then
+    run_gate check-release-declaration-parity native/target/release/checkwright-gates check-release-declaration-parity
 fi
 
 if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' 'native/src/gates/npm_publish_spec.rs' 'native/src/fresh.rs'; then

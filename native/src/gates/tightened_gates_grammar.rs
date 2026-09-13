@@ -2,7 +2,7 @@
 // resolves to an explicit `None` or to a non-empty set of backticked bare gate names; a
 // non-`none` section yielding no tokens is the silently-empty declaration the smoke cannot see
 use crate::declaration;
-use crate::declaration::SectionVerdict;
+use crate::declaration::{SectionVerdict, TokenRule};
 use crate::gates::release_bump::read_text;
 use crate::walk;
 use std::path::Path;
@@ -52,7 +52,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         notes += 1;
-        match declaration::section_tokens(&text, SECTION) {
+        match declaration::section_tokens(&text, SECTION, TokenRule::GateName) {
             SectionVerdict::ExplicitNone => none += 1,
             SectionVerdict::Tokens(t) => tokens += t.len(),
             SectionVerdict::Unparsed(b) if b.is_empty() => errors.push(format!(

@@ -111,7 +111,7 @@ pub mod template_copy_parity;
 pub mod template_registry_parity;
 pub mod test_hermetic;
 pub mod tightened_gates_grammar;
-pub mod tightened_gates_note_parity;
+pub mod release_declaration_parity;
 pub mod tracking_claim;
 pub mod tree_terms;
 pub mod unmarked_claim;
@@ -1203,8 +1203,8 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
     ),
     (
-        "check-tightened-gates-note-parity",
-        tightened_gates_note_parity::run,
+        "check-release-declaration-parity",
+        release_declaration_parity::run,
         &[("docs/posts", "glob:lit:*.md", "", "")],
         &[],
         "-",

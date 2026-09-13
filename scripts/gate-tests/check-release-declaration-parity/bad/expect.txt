@@ -1,0 +1,5 @@
+declare different sets
+Tightened gates: on the surface, missing from the note
+Tightened gates: in the note, missing from the surface
+Renamed knobs: on the surface, missing from the note
+Behavior changes: in the note, missing from the surface

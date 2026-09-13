@@ -225,7 +225,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if walk::path_pruned(path, &prune) {
             continue;
         }
-        if path.starts_with("docs/posts/") || path == "docs/evidence-data.md" {
+        if path.starts_with("docs/posts/")
+            || path == "docs/evidence-data.md"
+            || path == ".workflow/release-declarations.md"
+        {
             continue;
         }
         let base = path.rsplit('/').next().unwrap_or(path);

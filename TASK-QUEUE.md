@@ -12,116 +12,6 @@
 
 ## New Features
 
-- **behavior-change-surface** [spec: SPEC-release-declarations.md]
-  — no accumulating declaration surface.
-  A tightened gate has one and a behavior change does not — and gate-sdk/SPEC.md §upgrade-smoke's
-  own rationale for the former covers the latter without modification: it grounds
-  `.workflow/tightened-gates.txt` on build being the only stage that knows what it tightened at
-  the moment it tightens it, so the declaration is *written from knowledge* rather than
-  reconstructed later. docs/install.md §The upgrade contract requires a Behavior changes section
-  in every release note and gives it no such surface, while that set is judgment-laden rather
-  than diff-derivable — so composing it at close means reconstructing an author's judgment from
-  commits.
-  **Deliverable:** the missing surface, carrying the three things `tightened-gates.txt` has and
-  this would need — a `# contract:` header, a drain protocol at the tag, and a freshness or
-  parity gate.
-  **Open design question the promoting scope answers first — deliberately unresolved here:**
-  whether this is a second `.workflow/` file or a widening of the existing one. A
-  behavior-change bullet carries a changed-surface name plus prose, while the existing surface
-  is specified as bare gate names and nothing else.
-  **Measured, which is why the cost is not hypothetical.** The "each batch records its own set"
-  convention was invented at batch 4 (`13f8091`) in response to this gap being filed at
-  `df6fd3d`. Batches 1 and 2 closed before it existed and recorded nothing — a case-insensitive
-  scan of every diff in the iteration finds the phrase only in those two later commits. So
-  `native-artifact-publish-path`, `native-artifact-install-path` and
-  `install-path-gnu-userland-undeclared` carry **no declaration, not a declared "none"**, and
-  close reconstructed their sets from commit bodies so the next note need not: *publish-path* —
-  the parity gate rides Tightened gates, leaving the descriptor and roster path as its behavior
-  set; *install-path* — `init`, `doctor` and the lock/digest resolvers changed, and `c5c19e6`
-  and `d13c1f6` are defect fixes whose own bodies say they "would have reached an adopter";
-  *gnu-userland* — documentation only, no shipped-code path.
-  **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
-  release note, against evidence that is coldest when the batch count is highest.
-  **A live instance, 2026-08-25 at build in commit `04f81ad8`, and it sharpens the open question
-  above.** `evidence-kit/bin/diff-baseline.sh` gained a refusal: each argument group is now
-  `<suite> <logfile> [<status>]`, and a suite on the exit-code parser named *without* a status is
-  refused at exit 2 rather than handed a hardcoded 0. A vendored consumer invoking the old pair form
-  against such a suite now gets an exit 2 where it used to get a verdict. Nothing owes a
-  declaration for it: `.workflow/tightened-gates.txt`'s own contract line takes *one bare
-  kit-shipped gate name* per data line, and `diff-baseline.sh` is a `bin` tool and not a registered
-  gate — so the surface cannot hold it even in principle. That is the reconstruction cost this entry
-  predicts, arriving in the half the open question is about: the tightening is real and the existing
-  surface's grammar, not just its scope, is what excludes it.
-  **SECOND INSTANCE 2026-09-06 at build, and it comes at the grammar from the OTHER side.** The
-  2026-08-25 witness was a surface that could not hold the *name*. Here it held the name and could
-  not hold the *remedy*: minting the `open-authorization-channel` binding slot reds
-  `check-skill-binding` in every vendoring consumer until that consumer binds it, so build appended
-  the bare name — correctly — and the one-line remedy a consumer needs had no route from build to
-  the composing session. Two witnesses, both landing on "name plus prose versus bare names", is the
-  open design question above asked twice rather than a second question.
-  **Leads unit set `carried-record-reliability` with `deferred-release-declaration-accumulation`**
-  — operator direction, 2026-09-13, lead-relayed; ahead of the claim-reliability pair.
-  recurrence: behavior-change-surface 2026-08-25 2026-09-06
-  **Authored at spec 2026-09-13:** one surface, `.workflow/release-declarations.md`, carries all
-  three note sections in the note's own grammar and retires the tightened-gates file
-  (SPEC-release-declarations.md). **Seam:** kit mechanism is the surface, the holder's token rules
-  and the build instruction; no new consumer config; no private rule content in reach.
-  Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
-
-- **deferred-release-declaration-accumulation** [spec: SPEC-release-declarations.md]
-  — only one of the note's three
-  sections survives a deferred release.
-  `.workflow/tightened-gates.txt` is the accumulating declaration surface for **Tightened
-  gates** and is drained only at the tag, so that section batches correctly across any number of
-  deferrals (RELEASING.md §The procedure step 1). **Behavior changes** and **Renamed knobs** have
-  no such surface: RELEASING.md step 2 says the outstanding criteria are carried into the next
-  qualifying note, and nothing carries them. A deferral therefore drops them unless a later
-  session reconstructs them from `git log`.
-  **Already live, three times, and the third is the closed case.** `installer-lifecycle-verbs`
-  deferred on behavior changes alone, its declaration surviving only in its disposition line's
-  basis clause; the 2026-08-08 close deferred again with five, carried verbatim below to the
-  grammar docs/install.md §The upgrade contract owns; and on 2026-08-09 this carrier hit
-  `check-queue-entry-budget`'s cap, so a third deferral's declarations could not land here at all
-  and rode the basis clause instead — the second alternative below, chosen by the cap, not design.
-  *`lifecycle-kit/bin/file-gap.sh`* — the slug matcher no longer writes a verdict onto the
-  bullet it files. Every filing gets one bullet shape; on a match the tool raises a stderr
-  advisory *asking* the filer to say in the prose whether the bullet re-files the named entry or
-  merely cites it. The recurrence judgment moved to close's gap-inbox drain, which reads every
-  bullet and stamps the `recurrence:` declaration in the same commit that truncates the inbox.
-  Reconcile if your close skill or tooling parsed the retired prefix form.
-  *`kpi-incident-recurrence`* (drift-kit) — the counted series is **not comparable across this
-  release**. Every `recurrence:` date before it was matcher-derived; every date after is a
-  session's judgment read off a bullet's prose. Compare within a segment, never across the
-  break. For this project the break is the release carrying `gap-resolver-mention-overcount`;
-  for a consumer it is that consumer's own adoption of it.
-  *`installer/lib/doctor.sh`* — `doctor` now walks only the consumer-audience subset of the
-  toolchain roster, so a machine with no Rust toolchain installs. Reconcile if you copied the
-  roster out or relied on `doctor` failing on a contributor-side tool.
-  *`context-kit/lib/toolfloor.sh`* — a roster element gained a fourth positional field,
-  `<name>[:<min-version>[:<impl-token>[:<audience>]]]`. The only declarable audience is
-  `contributor`; empty or omitted means every audience, so existing elements are unchanged.
-  Reconcile if you carry a local roster read by a consumer-side reader of your own.
-  *`.github/workflows/site-health.yml`* — a release-channel arm was added: it reads the
-  published Release list on the schedule and files a `site-health` issue naming every Release
-  whose prerelease flag disagrees with its own version line. Reconcile if you copied the
-  workflow out.
-  Renamed knobs: None.
-  **Why it needed design:** a second accumulating file is the obvious fix and is probably wrong
-  — three surfaces to drain at one tag, two of them free prose no gate can hold to the note the
-  way `check-tightened-gates-note-parity` holds the first. The honest alternatives: one surface
-  carrying all three sections, or the deferral line's basis as declared carrier with a gate on it.
-  **Cost while deferred — and the prediction has graduated from slow loss to hard stop.** Each
-  deferral loses its non-gate declarations to git history, so the next qualifying note
-  under-declares by however many iterations batched into it, which is the one section a consumer
-  reconciles by reading. At the third deferral the carrier was capped and took nothing at all,
-  so the evidence this entry needed is complete: the next scope ranks it on a closed case.
-  **Leads unit set `carried-record-reliability` with its pair `behavior-change-surface`** — operator
-  direction, 2026-09-13, lead-relayed; both ask where a deferral-surviving declaration accumulates.
-  **Authored at spec 2026-09-13:** the deferral line carries the level and no criteria; the release
-  declaration surface carries all three sections across deferrals, seeded once from every basis
-  clause since the newest tag and from the bullets above (SPEC-release-declarations.md).
-  Filed 2026-08-08 by close, from the release-note obligation its own drain could not discharge.
-
 - **survey-record-claim-reliability** [spec: SPEC-claim-standing.md] — the survey record carries
   unwitnessed mechanism claims and was wrong three times in one iteration.
   `.workflow/survey-record.md` exists so a later stage need not re-derive a survey,
@@ -5458,5 +5348,8 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- behavior-change-surface
+- deferred-release-declaration-accumulation
 
 ## Lessons Learned

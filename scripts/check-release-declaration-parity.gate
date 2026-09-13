@@ -1,0 +1,2 @@
+# graph: couples=docs/posts/*.md,.workflow/release-declarations.md,native/src/gates/release_declaration_parity.rs,native/src/declaration.rs dir=one valve=none tier=precommit
+# spec: docs/install.md §The upgrade contract — while a release note is under composition each declaration-bearing section's token set equals the release declaration surface it was composed from, both directions

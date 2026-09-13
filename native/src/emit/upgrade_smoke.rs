@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof, bridged as an `Arm::Run`
 // member: its contract is the exit status (2 broken tag or environment, 1 upgrade finding, 0 clean
 // with one verdict line on stdout), which `Arm::Emit` collapses to 0-or-2
-use crate::declaration::{self, SectionVerdict};
+use crate::declaration::{self, SectionVerdict, TokenRule};
 use crate::emit::csmoke;
 use crate::ere::Ere;
 use crate::proc::{self, Stderr};
@@ -21,6 +21,7 @@ pub const KNOBS: &[&str] = &[
 
 const NAME: &str = "upgrade-smoke";
 const SECTION: &str = "Tightened gates";
+const SURFACE: &str = "release-declarations.md";
 
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the exit-status contract as a type, so a finding cannot
 // be raised on a broken environment's spelling or the reverse
@@ -201,14 +202,14 @@ fn smoke() -> Result<String, Fail> {
     let undeclared: Vec<&String> = red.iter().filter(|g| !allowed.contains(g)).collect();
     if !undeclared.is_empty() {
         let mut r = one(format!(
-            "{}: FAIL — gate(s) went red that TO's tightened-gates declaration does not name:",
+            "{}: FAIL — gate(s) went red that TO's Tightened-gates declaration does not name:",
             NAME
         ));
         for g in &undeclared {
             r.push(format!("  {}", g));
         }
         r.push(format!(
-            "  each red must be named in {} — a bullet in the note's Tightened gates section, or a data line of the declaration surface — or the tree fixed (docs/install.md §The upgrade contract).",
+            "  each red must be named in {} — a bullet in the Tightened gates section of the note or of the release declaration surface — or the tree fixed (docs/install.md §The upgrade contract).",
             decl_src
         ));
         return Err(finding(r));
@@ -690,20 +691,20 @@ fn commit_phase_a(consumer: &str, to: &str) -> Result<(), Fail> {
     Ok(())
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the declaration resolves on two arms over one token
-// predicate, read **in crate** through `native/src/declaration.rs`: a tagged TO from the note whose
-// front matter names its version, an untagged TO from the declaration surface in TO's own tree.
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the declaration resolves on two arms, read **in crate**
+// through `native/src/declaration.rs`: a tagged TO from its note, an untagged TO from the release
+// declaration surface in TO's own tree.
 fn declared_set(repo: &str, to: &str, to_tree: &str) -> Result<(String, Vec<String>), Fail> {
     let ver = points_at(repo, to);
     let workflow = knob("GATE_SDK_WORKFLOW_DIR")?;
-    let decl_file = format!("{}/{}/tightened-gates.txt", to_tree, workflow);
+    let decl_file = format!("{}/{}/{}", to_tree, workflow, SURFACE);
 
     let mut tokens: Vec<String> = Vec::new();
     let mut src = String::new();
     if !ver.is_empty() {
         if let Some(note) = release_note(to_tree, &ver)? {
             src = note.clone();
-            match declaration::section_tokens(&read(&note)?, SECTION) {
+            match declaration::section_tokens(&read(&note)?, SECTION, TokenRule::GateName) {
                 SectionVerdict::Absent => {
                     return Err(finding(vec![
                         format!(
@@ -722,9 +723,14 @@ fn declared_set(repo: &str, to: &str, to_tree: &str) -> Result<(String, Vec<Stri
         }
     } else if Path::new(&decl_file).is_file() {
         src = decl_file.clone();
-        match declaration::record_tokens(&read(&decl_file)?) {
-            Ok(t) => tokens = t,
-            Err(bad) => return Err(unparsed(to, &src, &bad)),
+        // spec: gate-sdk/SPEC.md §lib/declaration.sh — the surface verdict: an absent, `None` or
+        // bullet-less section is the empty set, and only an unreadable bullet is a finding
+        match declaration::section_tokens(&read(&decl_file)?, SECTION, TokenRule::GateName) {
+            SectionVerdict::Tokens(t) => tokens = t,
+            SectionVerdict::Unparsed(bad) if !bad.is_empty() => {
+                return Err(unparsed(to, &src, &bad))
+            }
+            _ => {}
         }
     }
 
@@ -736,7 +742,7 @@ fn declared_set(repo: &str, to: &str, to_tree: &str) -> Result<(String, Vec<Stri
 
 fn unparsed(named: &str, src: &str, bad: &[String]) -> Fail {
     let mut r = one(format!(
-        "{}: FAIL — TO ({})'s tightened-gates declaration does not parse, so it would resolve to a silently empty allowed-red set — {}:",
+        "{}: FAIL — TO ({})'s Tightened-gates declaration does not parse, so it would resolve to a silently empty allowed-red set — {}:",
         NAME, named, src
     ));
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the finding list is printed as the shell holder
@@ -824,7 +830,7 @@ fn no_declaration(repo: &str, to: &str, red: &[String]) -> Result<Fail, Fail> {
     let ver = points_at(repo, to);
     let named = if ver.is_empty() { to } else { &ver };
     let mut r = one(format!(
-        "{}: FAIL — TO ({}) reddened gate(s) but declares no tightened-gates set anywhere:",
+        "{}: FAIL — TO ({}) reddened gate(s) but declares no Tightened-gates set anywhere:",
         NAME, named
     ));
     for g in red {
@@ -838,8 +844,8 @@ fn no_declaration(repo: &str, to: &str, red: &[String]) -> Result<Fail, Fail> {
     } else {
         let workflow = knob("GATE_SDK_WORKFLOW_DIR")?;
         r.push(format!(
-            "  an untagged TO reads {}/tightened-gates.txt, which TO's tree does not carry; the build stage that lands or tightens a gate appends its name there (gate-sdk/SPEC.md §upgrade-smoke).",
-            workflow
+            "  an untagged TO reads the Tightened-gates section of {}/{}, which TO's tree does not carry; the session that lands or tightens a gate appends its bullet there (gate-sdk/SPEC.md §upgrade-smoke).",
+            workflow, SURFACE
         ));
     }
     Ok(finding(r))

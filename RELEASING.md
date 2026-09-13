@@ -48,18 +48,22 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
      Behavior changes, authored to [docs/install.md](docs/install.md) §The
      upgrade contract's grammar (a knob *removal* is expressed `old → ∅` under
      Renamed knobs); that pointer owns their grammar, this skeleton does not
-     restate it. **Tightened gates is composed, not recalled** — its bullets come
-     from `.workflow/tightened-gates.txt`, the declaration surface each build
-     stage appended to as it landed or tightened a gate
-     (gate-sdk/SPEC.md §upgrade-smoke). One bullet per declared name, each given
-     the intent behind the move; an empty surface means a stated "None." Because
-     the surface accumulates across every iteration since the last tag, a release
-     batching several iterations inherits all of their declarations here.
-     **Held by a gate, not by review:** `check-tightened-gates-note-parity`
-     asserts the composed section's token set equals the surface it was
-     composed from while the note is under composition (its declared version
-     carries no tag yet), so the transcription this step performs is checked
-     at commit time rather than trusted to a manual read-across.
+     restate it. **All three are composed, not recalled** — their bullets come
+     from `.workflow/release-declarations.md`, the release declaration surface
+     each landing session appended to in the commit that shipped the change
+     (gate-sdk/SPEC.md §upgrade-smoke). One note bullet per surface bullet, in
+     the same section, each section's lead tokens carried unchanged; the prose
+     may be edited for the reader. An empty section means a stated "None." A
+     change the composing session finds undeclared is appended to the surface
+     first, then transcribed. Because the surface accumulates across every
+     iteration since the last tag, a release batching several iterations inherits
+     all of their declarations here.
+     **Held by a gate, not by review:** `check-release-declaration-parity`
+     asserts each of the three composed sections' token sets equals the same
+     section of the surface it was composed from while the note is under
+     composition (its declared version carries no tag yet), so the transcription
+     this step performs is checked at commit time rather than trusted to a manual
+     read-across.
    - **Upgrading — sync/regen slot** — {the wholesale kit sync at `vX.Y.Z`, the
      generated artifacts to regenerate, then the full battery}.
    - **Upgrading — allowed-red slot (two-way)** — state either "**No allowed
@@ -86,8 +90,10 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    <basis>` — the version the criteria would have shipped as, derived over the
    newest already-released note — and stop, again with no tag and no Release. The
    deferral stays outstanding until a later line releases at or above it, and the
-   outstanding criteria are carried into the next qualifying note's three
-   sections; `check-release-bump` floors that note against it. Never overload
+   outstanding criteria stay on the release declaration surface, which the next
+   qualifying note is composed from; `check-release-bump` floors that note
+   against it. The deferral line's basis states the level and why the release was
+   held. It carries no criteria. Never overload
    `none` for this — `none` means nothing was earned.
    Otherwise continue with the derived `vX.Y.Z`.
 
@@ -103,7 +109,7 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    grammar; a disposition block opens with a bare `<release> — <date>` line
    below it, never a `#` one.
 
-4. **Tag the iteration's final commit, and drain the tightened-gates declaration
+4. **Tag the iteration's final commit, and drain the release declaration
    surface.** The
    drain and the disposition stamp are both tree writes, so the iteration's final
    commit is the one this step creates — which fixes the ordering, and **the
@@ -111,7 +117,7 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    commit of step 1 precedes this drain-and-stamp commit, and the two are not to
    be squashed into one**: in the window between them the note and the surface are
    both non-empty and comparable, which is the only window in which
-   `check-tightened-gates-note-parity` can hold them equal. Compose and drain in a
+   `check-release-declaration-parity` can hold them equal. Compose and drain in a
    single commit and the gate never sees a comparable state — it does not red, it
    simply has nothing to say, so the parity claim is silently forfeited.
    Enforcement of the split is this runbook's, not that gate's: a pre-commit gate
@@ -126,18 +132,18 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
 
    **The drain lands after the tag, and the parity gate is what forces it.** That
    gate arms on a note whose declared version carries **no tag yet**, so while the
-   note is untagged it holds the note's Tightened-gates set equal to the surface —
-   which means draining before the tag reds it, with the whole composed set
-   reported as gates that never tightened. Push and watch the stamp commit, tag
+   note is untagged it holds the note's three declaration-bearing sections equal
+   to the surface — which means draining before the tag reds it, with the whole
+   composed set reported as never declared. Push and watch the stamp commit, tag
    it, push the tag; the note is then tagged, the gate goes dormant, and the drain
    commits cleanly. Sequenced this way the release is one `gates` watch and one
    `publish` watch, and the drain commit rides the next push rather than buying a
    third run.
 
    Tag with `git tag -a vX.Y.Z` on the stamp commit, then push the tag to the
-   origin. The tag is also what discharges `.workflow/tightened-gates.txt`:
+   origin. The tag is also what discharges `.workflow/release-declarations.md`:
    step 1 composed the note from it, so drain it at the tag and only there — an
-   iteration closing on `release none` or a deferral carries its declarations
+   iteration closing on `release none` or a deferral carries every section
    forward, which is exactly what the next release's note must inherit. Drain by
    **truncating to the header line**, never by clearing the file: it is a tracked
    checked projection whose header is required, and a whole-file clear reds

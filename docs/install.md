@@ -717,8 +717,9 @@ outstanding deferred release. When an iteration's criteria were met but the
 release was held back, its disposition line records the earned version as
 `deferred:vX.Y.Z` (lifecycle-kit/SPEC.md §templates/stages/), and
 those criteria stay unconsumed until a release at or above that version ships.
-The next qualifying note carries them in its declaration-bearing sections and may not fall
-below that version — so a note's floor is the higher of what its own sections
+The next qualifying note carries them in its declaration-bearing sections, composed
+from the release declaration surface that carried them across every deferral. That
+note may not fall below that version, so a note's floor is the higher of what its own sections
 derive and what an outstanding deferral carries. `check-release-bump` reads both.
 
 The derivable half is gated: `check-release-bump` (this repo's `scripts/`, a
@@ -761,8 +762,8 @@ you are current.
 Two shipped tools carry this contract. [The upgrade smoke](gate-sdk/SPEC.md#upgrade-smoke)
 is its executable proof — it drives both phases against a scratch consumer,
 asserting the phase-A sync is deterministic and the red set stays within `TO`'s
-tightened-gates declaration — the target note's when `TO` is a tag, and the
-declaration surface in `TO`'s own tree when it is
+Tightened-gates declaration — the target note's when `TO` is a tag, and the
+release declaration surface in `TO`'s own tree when it is
 not. [The upgrade skill](lifecycle-kit/SPEC.md#templatesupgrademd)
 is the phase-B disposition ritual a consumer runs to register the note's newly
 declared gates and disposition each red.
@@ -792,7 +793,7 @@ here does not silently falsify a sentence somewhere else.
   carries no tag yet. A note published before this section existed is history. It
   is not retro-fitted with a fabricated summary, and the assertion goes dormant
   on it, reporting which state it is in rather than going quiet. The
-  predicate is `check-tightened-gates-note-parity`'s, adopted so that release
+  predicate is `check-release-declaration-parity`'s, adopted so that release
   state is read one way across the corpus. Its residual is that sibling's too: a
   note authored and drained inside a single commit is never seen under
   composition, so what carries the section into existence is the split
@@ -822,14 +823,19 @@ here does not silently falsify a sentence somewhere else.
 
   **A sibling gate makes a separate claim, and neither is the other's coverage.**
   The grammar gate holds each note's section *well-formed*.
-  `check-tightened-gates-note-parity` (also this repo's `scripts/`) holds a note
-  *under composition* **equal to the declaration surface it was composed from**,
-  as set equality in both directions — both, because each direction costs
-  something different: a name on the surface and missing from the note is a gate
-  that tightened and shipped undeclared, licensing a red the upgrade smoke would
-  wave through, while a name in the note and missing from the surface declares a
-  gate that never tightened and sends consumers hunting a reconcile that does not
-  exist. It arms on a note whose declared version carries no tag yet and disarms
+  `check-release-declaration-parity` (also this repo's `scripts/`) holds a note
+  *under composition* **equal to the release declaration surface it was composed
+  from**, in all three declaration-bearing sections, as set equality of lead
+  tokens in both directions — both, because each direction costs something
+  different. In Tightened gates, a name on the surface and missing from the note is
+  a gate that tightened and shipped undeclared, licensing a red the upgrade smoke
+  would wave through, while a name in the note and missing from the surface
+  declares a gate that never tightened and sends consumers hunting a reconcile
+  that does not exist. In Renamed knobs and Behavior changes, a token on the
+  surface and missing from the note is a declared change the note dropped, while a
+  token in the note and missing from the surface is a change close reconstructed
+  instead of the landing session declaring it: the composing session appends it to
+  the surface in the composing commit, then transcribes. It arms on a note whose declared version carries no tag yet and disarms
   once tagged, reporting its dormancy rather than letting a drained surface read
   as verification. It is a compiled subcommand
   (gate-sdk/SPEC.md §The declaration cohort) and rides that cohort's holder of the
@@ -840,12 +846,17 @@ here does not silently falsify a sentence somewhere else.
   apart and read different token sets from the same bytes.
 
   **A declaration precedes its release.** Because the upgrade smoke's untagged
-  arm reads a working tree's tightened-gates declaration surface rather than a
-  note (gate-sdk/SPEC.md §upgrade-smoke), an allowed-red set is owed from the
-  moment a gate is landed or tightened, not from the tag. Running the smoke
-  against your checkwright clone at an untagged `TO` is what reads it.
+  arm reads a working tree's release declaration surface rather than a note
+  (gate-sdk/SPEC.md §upgrade-smoke), an allowed-red set is owed from the moment a
+  gate is landed or tightened, not from the tag. The surface carries every
+  section, so a behavior change or a rename is owed from the moment it lands too.
+  Running the smoke against your checkwright clone at an untagged `TO` is what
+  reads it.
 - **Renamed knobs** — one bullet per rename, `old → new`; a knob *removal* is
-  the same residue class (own-config orphaned) and is expressed `old → ∅`.
+  the same residue class (own-config orphaned) and is expressed `old → ∅`. The
+  lead token is the old name, backticked and unbolded, directly after the bullet
+  marker (``- `OLD_NAME` → `NEW_NAME` ``). The arrow, the new name and any prose
+  follow it.
 - **Behavior changes** — one bullet per shipped change that alters what the kits
   *do* without landing or tightening a battery gate: a fail-closed convergence
   in a shared library, a runner's semantics, a skill or template behavior, a
@@ -853,7 +864,14 @@ here does not silently falsify a sentence somewhere else.
   script, knob, template, or file), bolded; the rest states what moved and what,
   if anything, the consumer reconciles. This section keeps its own spelling — its
   lead tokens are legitimately prose phrases rather than identifiers, so the
-  Tightened-gates rule above does not reach it.
+  Tightened-gates rule above does not reach it. Its lead token is read verbatim.
+  It is the bolded span directly after the bullet marker, so a surface or phrase
+  inside the bold is the token and whatever follows the closing `**` is prose.
+
+  These two lead-token pins bind the **note under composition** only. No gate
+  reads a published note's Renamed knobs or Behavior changes tokens, and notes
+  published before the pins spelled their leads several ways and are not
+  retro-fitted.
 
 "None" is a valid body for any of the three sections and must be stated, not
 omitted — a release that tightens nothing, renames nothing, and changes no

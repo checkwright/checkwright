@@ -82,17 +82,15 @@ oracle still returns the same verdict, is cited rather than re-surveyed, and one
 whose witness fails narrows the dispatch to what moved. File the surveys you buy
 (lifecycle-kit/SPEC.md §The survey record).
 
-**Declare a gate you land or tighten, in the unit that lands it.** A unit that
-lands a new gate or makes an existing one stricter appends that gate's bare name
-to the tightened-gates declaration surface,
-`<workflow-dir>/tightened-gates.txt` (gate-sdk/SPEC.md §upgrade-smoke), in the
-same commit. The
-surface accumulates across the iterations batched into one release; the release
-step composes the note's Tightened-gates section from it and drains it at the
-tag, so nothing here loads the release runbook. Only gates a consumer's vendored
-tree can actually run are declared: a gate living solely in your own gates
-directory never reaches a vendored tree and is not part of any release's
-allowed-red set.
+**Declare what a vendoring consumer will meet, in the unit that lands it.** A unit
+that lands or tightens a gate, renames or removes a knob, or changes what a kit
+script, template or default does appends one bullet to the matching section of
+the release declaration surface, `<workflow-dir>/release-declarations.md`
+(gate-sdk/SPEC.md §upgrade-smoke), in the same commit, written as the release
+note's bullet: the lead token that section takes, then what moved and what the
+consumer must do. The surface accumulates across the iterations batched into one
+release; the release step composes the note from it and drains it at the tag, so
+nothing here loads the release runbook. Only what ships inside a kit is declared.
 
 **Run the system; don't reason about it** — when a running system is
 reachable, reproduce first, read second. Recorded evidence rots: a static

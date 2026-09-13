@@ -1,0 +1,72 @@
+# contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's three declaration-bearing sections in the note's grammar, appended by the session landing a kit-shipped change, composed into the release note and drained to this header at the tag.
+
+## Tightened gates
+
+- `check-gate-exemption-tasks` — the port oracle's exclusion corpus was narrower than its own directive; widened, so the gate can now red on a `# port-until:` hold it previously could not see. It is zero-config, so it reaches every vendored tree.
+- `check-survey-record` — every word-bounded 7–40-character lowercase-hex run carrying a letter inside a survey record's `corpus`, `oracle` or `finding` field must resolve to a real git object, catching a minted identifier that fakes a citation's precision.
+- `check-evidence-baseline` — gains a fourth arm: every configured suite must carry at least one baseline row.
+- `check-action-permissions` — new: a workflow job that consumes the GitHub token must declare its scopes rather than inherit the repository default.
+- `check-action-run-shell` — resolves an absent `shell:` key's dialect from `runs-on` instead of assuming bash (a Windows runner defaults to `pwsh`), and refuses a `defaults.run` subtree whose dialect it cannot resolve.
+- `check-template-registry-parity` — the population predicate widens so a native-dispatch registry stays gated after its sibling shell directory is deleted.
+- `check-path-dialect` — new: a path value reaching a dialect-sensitive consumer (a shell `cd`, or a Rust path API) must be cleared for that substrate at the occurrence.
+- `check-gate-substrate-parity` — assertion G widens to the union of the declaration set and the tracked shell tree, so a malformed port declaration on an unregistered shell script is caught rather than counted as owed.
+- `check-stage-skill-coverage` — gains a third direction: every configured stage's executed surface must cite the stage-journal closing step.
+- `check-skill-binding` — the lead template gains an `open-authorization-channel` binding slot, and an unbound slot reds a vendoring consumer until it is bound.
+- `check-portability-floor` — new: no file on the configured adopter-install-path corpus may use a banned non-portable shell construct without a `# portability-declared:` valve; absent config disables it.
+- `check-amendment-retired-spelling` — new: every amendment carries a `## Retired spellings` block, and each declared spelling survives only at a path the amendment's update-target roster names.
+- `check-doctrine-registration` — gains assertion F: an installed digest bullet's text must match its doctrine rule's `Digest:` trailer verbatim.
+- `check-tag-lead-line` — the class table gains `[observed-by: <producer>]` as a governed tag.
+- `check-deferred-board-tags` — new, opt-in: every top-level deferred queue entry carries exactly one valid `[cost:]` and one valid `[surface:]` tag, and no active entry carries either.
+- `check-surface-ratchet` — new: every governed always-loaded surface is held at or below its committed line-count ceiling.
+- `check-brevity` — governs a configurable section set and every top-level bullet, not only bold-named ones.
+
+## Renamed knobs
+
+- `CONTEXT_KIT_BREVITY_SECTION` → `CONTEXT_KIT_BREVITY_SECTIONS` — the scalar becomes an array, and `lib/context.sh` refuses the retired name. Rename it in your config. (seeded from iteration resident-tier-restatement's deferral basis)
+- `DELEGATION_KIT_VERDICT_BIN` → ∅ — removed with the shell binary it named, the verdict rule having ported to the compiled arm. Delete it from your config. (seeded from iteration usage-verdict-cut's deferral basis)
+
+## Behavior changes
+
+- **`.workflow/release-declarations.md`** — replaces `<workflow-dir>/tightened-gates.txt` as the accumulating declaration surface, and carries all three declaration-bearing sections as release-note bullets rather than bare gate names; `--upgrade-smoke` at an untagged `TO` reads its Tightened-gates section. If your tree keeps the old file, move each name to a `` - `check-name` `` bullet under `## Tightened gates` in the new file, keep a `# contract:` first line, and delete the old file.
+- **`lifecycle-kit/templates/stages/build.md`** — the declaration instruction widens from appending a tightened gate's bare name to appending a release-note bullet, remedy included, for any kit-shipped gate, knob or behavior change. If you copied the template out, your copy teaches the retired file and grammar.
+- **`context-kit/bin/always-loaded.sh`** — deleted, reachable as a bridged `run-gates.sh` arm; an unrecognized operand now refuses at exit 2 where it exited 0, every operand is validated, and an `--update-baseline` write failure refuses naming the path. (seeded from iteration always-loaded-cut-and-seam-slice's deferral basis)
+- **`guard-kit/bin/compare-settings-allow.sh`** — deleted, reachable as a bridged `run-gates.sh` arm with the same tightened operand handling. (seeded from iteration always-loaded-cut-and-seam-slice's deferral basis)
+- **`gate-sdk/bin/run-gates.sh`** — the battery dispatches through the binary's `--run` arm on a worker pool sized by the new `GATE_SDK_JOBS` knob, with per-member `TMPDIR` isolation. (seeded from iteration battery-runner-port's deferral basis)
+- **`installer/lib/`** — deleted; its verbs moved behind a `checkwright-gates --install <verb>` invoke, the omit-and-declare degraded install retired, and the bootstrap has one success path and refuses rather than completing degraded. (seeded from iteration behind-invoke-relocation's deferral basis)
+- **`queue-kit/bin/`** — deleted (`lesson-sink.sh`, `queue-counts.sh`, `queue-edges.sh`), each moved to a bridged arm. Re-point any script that called them. (seeded from iteration cause-instrument-and-queue-kit-cut's deferral basis)
+- **`couples=` manifest field** — gains a `knob:<NAME>` token, widening a regenerated hook's trigger set; regenerate your hooks. (seeded from iteration couples-resolver-reach's deferral basis)
+- **`--reads` declaration** — gains a third field, a prune set, held to executed behavior by `check-reads-couples`. (seeded from iteration couples-resolver-reach's deferral basis)
+- **`DELEGATION_KIT_LIVENESS_CMD`** — lost its shipped default; without an authored reader every firing reports `verdict=unavailable` rather than red. (seeded from iteration shell-gate-tail-port-and-completion-oracle's deferral basis)
+- **turn-end liveness hook** — the refusal set gains a third verdict, `unstarted`, logged with a spawn field for a resolved reader that could not start (previously logged `unavailable`). (seeded from iterations crate-arms-flake-sources and turn-end-liveness-seam-and-worktree-cause's deferral bases)
+- **`lifecycle-kit/bin/`** — deleted, `enter-stage.sh` included; reachable via `run-gates.sh --enter-stage`. (seeded from iteration enter-stage-cut-and-file-authoring-act's deferral basis)
+- **guard-kit rule 17** — now auto-allows a create-redirect or quoted-delimiter heredoc body to a gitignored target, where it prompted. (seeded from iteration enter-stage-cut-and-file-authoring-act's deferral basis)
+- **`drift-kit/bin/drift-report.sh`** — deleted with `drift-kit/kpis/*`; reachable via `run-gates.sh --emit-drift-report`. (seeded from iteration drift-kpi-contract-port's deferral basis)
+- **`init` digest repair** — `init` now rewrites a gate binary that fails its recorded digest, so the remedy `doctor` prints for a mismatch works. (seeded from iteration installer-trial-lifecycle-repair's deferral basis)
+- **`context-kit/bin/md-index.sh`** — deleted with `md-section.sh`, `pub-index.sh`, `lib/pub-lang/rust.sh`, `lib/pub-lang/ts.sh` and lifecycle-kit's `cite-survey.sh` and `file-survey.sh`, each moved to a bridged arm; `CONTEXT_KIT_PUB_LANG_DIR` shadowing is unchanged. (seeded from iteration index-first-and-survey-record-cuts's deferral basis)
+- **guard-kit command classification** — an unrecorded backgrounded launch blocks where it advised (rule 22); rules 4 and 7 withhold a rewrite's allow unless bounded; a path-slot block and a `git rm` force-flag block are new; read-only roster members are withheld on declared write or execute forms; wrapper stripping widens. `GUARD_KIT_RO_FORMS` and `GUARD_KIT_SEARCH_TOOLS` are new knobs. (seeded from iterations guard-command-classification and execution-control-reach-and-turn-end-blocking's deferral bases)
+- **`guard-kit/bin/scan-prompts.sh`** — deleted; reachable via `--emit scan-prompts`. (seeded from iteration scan-prompts-cut's deferral basis)
+- **`lifecycle-kit/bin/session-id.sh`** — removed with `context-kit/bin/env-probe.sh`, both re-pointed at bridged arms. (seeded from iteration session-id-and-env-probe-cuts's deferral basis)
+- **`evidence-kit/bin/diff-baseline.sh`** — each argument group is `<suite> <logfile> [<status>]`, and a suite on the exit-code parser named without a status refuses at exit 2; pass the suite's own exit status. (seeded from iteration platform-reach-and-target-roster's deferral basis)
+- **`install-lifecycle`** — no longer exits 1 with no output; it works wherever the worktree-lock pattern is configured. (seeded from iteration platform-reach-and-target-roster's deferral basis)
+- **iteration-boundary worktree check** — `--enter-stage` refuses on agent-worktree residue, under the new `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` knob defaulting to 1, so an upgrading consumer meets the refusal unopted. (seeded from iteration port-remainder-disposition-and-worktree-reclamation's deferral basis)
+- **`gate-sdk/bin/port-blockers.sh`** — deleted; reachable via `--emit port-blockers`. (seeded from iteration port-oracle-and-composer-ruling's deferral basis)
+- **`INSTALLER_SMOKE_ARTIFACTS_DIR`** — new knob: the consumer smoke adopts a producer's built artifacts instead of always building on the host. (seeded from iteration supported-platform-roster-widening's deferral basis)
+- **`--enter-stage` surplus argument** — refused, where it was silently dropped. (seeded from iteration supported-platform-roster-widening's deferral basis)
+- **`gate-sdk/bin/run-gate-tests.sh`** — removed with `guard-kit/bin/run-guard-tests.sh` and `context-kit/smoke/agents-md.sh`, replaced by `run-gates.sh` arms. (seeded from iteration test-harness-cut-seam-sweep's deferral basis)
+- **`gate-sdk/bin/upgrade-smoke.sh`** — deleted; reachable via `run-gates.sh --upgrade-smoke`, whose stdout is now reserved for the one verdict line. (seeded from iteration test-runner-and-upgrade-cuts-with-liveness-attribution's deferral basis)
+- **`delegation-kit/bin/run-usage-tests.sh`** — deleted with `run-trend-tests.sh`, folded into the crate's own test lane. (seeded from iteration test-runner-and-upgrade-cuts-with-liveness-attribution's deferral basis)
+- **`delegation-kit/bin/wait-probe.sh`** — deleted; reachable via `run-gates.sh --wait-probe`. (seeded from iteration wait-probe-cut-and-stage-journal-absence's deferral basis)
+- **`lifecycle-kit/templates/stages/`** — each of the six stage templates gains a mandatory last step appending to the stage's resume journal. (seeded from iteration wait-probe-cut-and-stage-journal-absence's deferral basis)
+- **`lifecycle-kit/templates/lead.md`** — the pre-dispatch `--simulate` read is a mandatory step. (seeded from iteration wait-probe-cut-and-stage-journal-absence's deferral basis)
+- **`check-queue-entry-budget`** — a `ruled:` declaration line no longer counts against the wrap budget. (seeded from iteration windows-adopter-unblock's deferral basis)
+- **`gate-sdk/templates/gates-workflow.yml`** — gains a least-privilege `permissions:` block; a copy taken earlier runs the gates job under the repository's default token scope. (seeded from iteration windows-artifact-proof's deferral basis)
+- **`installer/bin/checkwright.ps1`** — a PowerShell bootstrap ships beside the bash one. (seeded from iteration windows-install-path-behind-the-invoke's deferral basis)
+- **`installer/lib/init.sh`** — with `uninstall.sh`, routes every git call naming the whole vendored roster through batched argv, fixing an argv-width overflow. (seeded from iteration windows-install-path-behind-the-invoke's deferral basis)
+- **consumer-smoke manifest arm** — splits exit 2 from a finding and reports before it fails. (seeded from iterations index-runner-hold-release-and-windows-smoke-comparison and windows-leg-manifest-cause-read's deferral bases)
+- **`check-graph`** — resolves its own interpreter, changing how it spawns on a Windows host. (seeded from iteration parser-and-enum-adapter-cuts-with-graph-hotfix's deferral basis)
+- **`--emit ruling-staleness`** — a new reporting arm; its three `LIFECYCLE_KIT_RULING_*` knobs default empty and inert. (seeded from iteration demo-cut-record-authority-and-attribution's deferral basis)
+- **supported-platform roster** — `x86_64-apple-darwin` and `aarch64-apple-darwin` joined. (seeded from iterations intel-macos-roster-join and macos-roster-join's deferral bases)
+- **`kpi-incident-recurrence`** (drift-kit) — the counted series is not comparable across the release carrying `gap-resolver-mention-overcount`: every `recurrence:` date before it was matcher-derived, every date after is a session's judgment. Compare within a segment, never across the break. (carried from the deferred-release-declaration-accumulation queue entry, filed 2026-08-08; no note since declares it)
+- **`installer/lib/doctor.sh`** — `doctor` walks only the consumer-audience subset of the toolchain roster, so a machine with no Rust toolchain installs. Reconcile if you relied on `doctor` failing on a contributor-side tool. (carried from the deferred-release-declaration-accumulation queue entry, filed 2026-08-08; no note since declares it)
+- **`context-kit/lib/toolfloor.sh`** — a roster element gains a fourth positional field, `<name>[:<min-version>[:<impl-token>[:<audience>]]]`; empty or omitted means every audience, so existing elements are unchanged. (carried from the deferred-release-declaration-accumulation queue entry, filed 2026-08-08; no note since declares it)
+- **`.github/workflows/site-health.yml`** — a release-channel arm files a `site-health` issue naming every Release whose prerelease flag disagrees with its version line. Reconcile if you copied the workflow out. (carried from the deferred-release-declaration-accumulation queue entry, filed 2026-08-08; no note since declares it)

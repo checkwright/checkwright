@@ -1,6 +1,6 @@
-// spec: gate-sdk/SPEC.md §lib/declaration.sh — the declaration grammar's compiled holder: two
-// container arms over one token predicate, pure over text so the caller keeps the shell form's
-// *missing file is the empty set* rule and this module reaches no filesystem
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — the declaration grammar's compiled holder, pure
+// over text so the caller keeps the *missing file is the empty set* rule and this module reaches
+// no filesystem
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — the trichotomy is a type here rather than the
 // shell's status code, so a caller cannot reach a token list without having matched the
 // resolved-empty arm; nothing else about the grammar changes
@@ -82,9 +82,9 @@ fn bullet_body(line: &str) -> Option<&str> {
     line.get(i..)
 }
 
-// spec: gate-sdk/SPEC.md §lib/declaration.sh — a bullet's lead token is the backticked, unbolded
-// bare name *directly* after the marker: anything else yields no token rather than a stripped
-// one, which is what keeps the bolded spellings visible instead of silent
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — a backticked lead is the span *directly* after the
+// marker: anything else yields no token rather than a stripped one, which is what keeps the bolded
+// spellings visible instead of silent
 fn lead_token(line: &str) -> Option<&str> {
     let body = bullet_body(line)?;
     let inner = body.strip_prefix('`')?;
@@ -92,7 +92,43 @@ fn lead_token(line: &str) -> Option<&str> {
     inner.get(..end)
 }
 
-// spec: gate-sdk/SPEC.md §lib/declaration.sh — the one token predicate both container arms share
+fn bold_lead(line: &str) -> Option<&str> {
+    let body = bullet_body(line)?;
+    let inner = body.strip_prefix("**")?;
+    let end = inner.find("**")?;
+    let b = inner.as_bytes();
+    let (mut s, mut e) = (0, end);
+    while s < e && is_blank(b[s]) {
+        s += 1;
+    }
+    while e > s && is_blank(b[e - 1]) {
+        e -= 1;
+    }
+    inner.get(s..e)
+}
+
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — each declaration-bearing section's lead-token rule;
+// the caller names the rule with the section, so the holder still carries no section name
+#[derive(Clone, Copy)]
+pub enum TokenRule {
+    GateName,
+    Backticked,
+    Bolded,
+}
+
+fn rule_token(line: &str, rule: TokenRule) -> Option<&str> {
+    let t = match rule {
+        TokenRule::GateName => return lead_token(line).filter(|t| is_token(t)),
+        TokenRule::Backticked => lead_token(line)?,
+        TokenRule::Bolded => bold_lead(line)?,
+    };
+    if has_content(t) {
+        Some(t)
+    } else {
+        None
+    }
+}
+
 fn is_token(s: &str) -> bool {
     let b = s.as_bytes();
     if b.is_empty() || !b[0].is_ascii_alphabetic() {
@@ -171,7 +207,7 @@ pub enum SectionVerdict {
     Unparsed(Vec<String>),
 }
 
-pub fn section_tokens(text: &str, section: &str) -> SectionVerdict {
+pub fn section_tokens(text: &str, section: &str, rule: TokenRule) -> SectionVerdict {
     let bullets = match section_bullets(text, section) {
         None => return SectionVerdict::Absent,
         Some(b) => b,
@@ -185,9 +221,9 @@ pub fn section_tokens(text: &str, section: &str) -> SectionVerdict {
         if !has_content(line) {
             continue;
         }
-        match lead_token(line) {
-            Some(t) if is_token(t) => tokens.push(t.to_string()),
-            _ => bad.push(line.to_string()),
+        match rule_token(line, rule) {
+            Some(t) => tokens.push(t.to_string()),
+            None => bad.push(line.to_string()),
         }
     }
     if bad.is_empty() && !tokens.is_empty() {
@@ -195,35 +231,6 @@ pub fn section_tokens(text: &str, section: &str) -> SectionVerdict {
     }
     tokens.extend(bad);
     SectionVerdict::Unparsed(tokens)
-}
-
-// spec: gate-sdk/SPEC.md §lib/declaration.sh — the record arm, a markup-free surface where the
-// spelling question does not arise: one bare name per data line, `Err` the caller's finding list
-// on `Unparsed`'s terms above.
-// spec: gate-sdk/SPEC.md §lib/declaration.sh — a final line with no terminator is not a data
-// line, because the shell holder's own reader drops it.
-pub fn record_tokens(text: &str) -> Result<Vec<String>, Vec<String>> {
-    let mut lines = split_lines(text);
-    if !text.is_empty() && !text.ends_with('\n') {
-        lines.pop();
-    }
-    let mut tokens: Vec<String> = Vec::new();
-    let mut bad: Vec<String> = Vec::new();
-    for line in lines {
-        if line.starts_with('#') || !has_content(line) {
-            continue;
-        }
-        if is_token(line) {
-            tokens.push(line.to_string());
-        } else {
-            bad.push(line.to_string());
-        }
-    }
-    if bad.is_empty() {
-        return Ok(tokens);
-    }
-    tokens.extend(bad);
-    Err(tokens)
 }
 
 #[cfg(test)]
@@ -268,6 +275,10 @@ set the section contradicts.
 None of the above reaches a vendored tree that shadows it.
 ";
 
+    fn gate_tokens(section: &str) -> SectionVerdict {
+        section_tokens(CORPUS, section, TokenRule::GateName)
+    }
+
     #[test]
     fn the_container_arm_reports_absence_as_a_value_and_collects_across_subheadings() {
         assert!(section_bullets(CORPUS, "Missing").is_none());
@@ -278,20 +289,20 @@ None of the above reaches a vendored tree that shadows it.
     #[test]
     fn every_arm_of_the_trichotomy_is_reachable_and_distinct() {
         assert!(matches!(
-            section_tokens(CORPUS, "Missing"),
+            gate_tokens("Missing"),
             SectionVerdict::Absent
         ));
         assert!(matches!(
-            section_tokens(CORPUS, "Beta"),
+            gate_tokens("Beta"),
             SectionVerdict::ExplicitNone
         ));
-        match section_tokens(CORPUS, "Alpha") {
+        match gate_tokens("Alpha") {
             SectionVerdict::Tokens(t) => assert_eq!(t, vec!["alpha-one", "alpha-two", "alpha-three"]),
             _ => panic!("a resolving container did not report tokens"),
         }
         // spec: gate-sdk/SPEC.md §lib/declaration.sh — both spellings the corpus actually carried,
         // bolded and bold-and-backticked, refused in one container rather than one at a time.
-        match section_tokens(CORPUS, "Delta") {
+        match gate_tokens("Delta") {
             SectionVerdict::Unparsed(b) => {
                 assert!(b[0].starts_with("- **delta-one"));
                 assert!(b[1].starts_with("- **`delta-two`"));
@@ -301,7 +312,7 @@ None of the above reaches a vendored tree that shadows it.
         }
         // spec: gate-sdk/SPEC.md §lib/declaration.sh — the preserved conflation: a bare token
         // first, a whole bullet line second.
-        match section_tokens(CORPUS, "Epsilon") {
+        match gate_tokens("Epsilon") {
             SectionVerdict::Unparsed(b) => {
                 assert_eq!(b[0], "epsilon-one");
                 assert!(b[1].starts_with("- see "));
@@ -311,21 +322,21 @@ None of the above reaches a vendored tree that shadows it.
         }
         // spec: gate-sdk/SPEC.md §lib/declaration.sh — the silently-empty declaration the
         // grammar refuses, carrying no offending line.
-        match section_tokens(CORPUS, "Gamma") {
+        match gate_tokens("Gamma") {
             SectionVerdict::Unparsed(b) => assert!(b.is_empty()),
             _ => panic!("an empty container resolved instead of refusing"),
         }
         // spec: gate-sdk/SPEC.md §lib/declaration.sh — a prose-only container is the same refusal
         // by a different route: content, but no bullet and no `None` body, so the empty offender
         // list is what the container's own text contradicts.
-        match section_tokens(CORPUS, "Zeta") {
+        match gate_tokens("Zeta") {
             SectionVerdict::Unparsed(b) => assert!(b.is_empty()),
             _ => panic!("a prose-only container resolved instead of refusing"),
         }
         // spec: gate-sdk/SPEC.md §lib/declaration.sh — `None` is read off the container's first
         // line carrying content, so a later line opening with the word leaves a real declaration
         // resolving rather than emptying it.
-        match section_tokens(CORPUS, "Eta") {
+        match gate_tokens("Eta") {
             SectionVerdict::Tokens(t) => assert_eq!(t, vec!["eta-one"]),
             _ => panic!("a later `None` line emptied a resolving container"),
         }
@@ -344,34 +355,65 @@ None of the above reaches a vendored tree that shadows it.
         assert!(!is_token(""));
     }
 
+    // spec: gate-sdk/SPEC.md §lib/declaration.sh — a drained surface is its header line alone, so
+    // every section reads `Absent`, which the surface's readers take as the empty set
     #[test]
-    fn the_record_arm_drops_a_final_line_its_shell_holder_never_reads() {
-        assert_eq!(
-            record_tokens("# header\nalpha-one\nalpha-two\n"),
-            Ok(vec!["alpha-one".to_string(), "alpha-two".to_string()])
-        );
-        assert_eq!(
-            record_tokens("# header\nalpha-one\nalpha-two"),
-            Ok(vec!["alpha-one".to_string()])
-        );
-        assert_eq!(record_tokens(""), Ok(Vec::new()));
-        // spec: gate-sdk/SPEC.md §lib/declaration.sh — a record holding only its contract header
-        // is the resolved empty set, never a refusal: a tree that has never declared one is not
-        // thereby malformed.
-        assert_eq!(record_tokens("# contract: x.md §y\n"), Ok(Vec::new()));
-        assert_eq!(
-            record_tokens("alpha one\nalpha-two\n"),
-            Err(vec!["alpha-two".to_string(), "alpha one".to_string()])
-        );
+    fn a_header_only_surface_holds_no_section() {
+        let drained = "# contract: x.md §y\n";
+        for rule in [TokenRule::GateName, TokenRule::Backticked, TokenRule::Bolded] {
+            assert!(matches!(
+                section_tokens(drained, "Alpha", rule),
+                SectionVerdict::Absent
+            ));
+        }
     }
 
-    // spec: gate-sdk/SPEC.md §lib/declaration.sh — a `\r` is content the shell holder refuses,
-    // so the record split must not silently strip it into a passing token
+    const PROSE: &str = "\
+## Renamed knobs
+
+- `KIT_OLD_KNOB` → `KIT_NEW_KNOB` — renamed.
+- `[tag:]` → ∅ — removed.
+- **`KIT_BOLD`** → `KIT_X` — bolded, which this section refuses.
+
+## Behavior changes
+
+- **`kit/bin/tool.sh`** refuses a bare pair — prose after the bold.
+- ** a surface phrase ** — trimmed.
+- `kit/bin/other.sh` — backticked, which this section refuses.
+- **** — an empty bold.
+";
+
     #[test]
-    fn a_carriage_return_is_content_rather_than_a_terminator() {
-        assert_eq!(
-            record_tokens("alpha-one\r\n"),
-            Err(vec!["alpha-one\r".to_string()])
-        );
+    fn the_prose_sections_take_their_own_lead_rules() {
+        match section_tokens(PROSE, "Renamed knobs", TokenRule::Backticked) {
+            SectionVerdict::Unparsed(b) => {
+                assert_eq!(b[0], "KIT_OLD_KNOB");
+                assert_eq!(b[1], "[tag:]");
+                assert!(b[2].starts_with("- **`KIT_BOLD`**"));
+                assert_eq!(b.len(), 3);
+            }
+            _ => panic!("a bolded knob lead resolved"),
+        }
+        match section_tokens(PROSE, "Behavior changes", TokenRule::Bolded) {
+            SectionVerdict::Unparsed(b) => {
+                assert_eq!(b[0], "`kit/bin/tool.sh`");
+                assert_eq!(b[1], "a surface phrase");
+                assert!(b[2].starts_with("- `kit/bin/other.sh`"));
+                assert!(b[3].starts_with("- ****"));
+                assert_eq!(b.len(), 4);
+            }
+            _ => panic!("an unbolded or empty behavior lead resolved"),
+        }
+        // spec: gate-sdk/SPEC.md §lib/declaration.sh — the gate-name predicate refuses the
+        // underscore and bracket a knob lead legitimately carries, which is why the rule is per section
+        assert!(matches!(
+            section_tokens(PROSE, "Renamed knobs", TokenRule::GateName),
+            SectionVerdict::Unparsed(_)
+        ));
+        let clean = "## Renamed knobs\n\n- `KIT_OLD` → `KIT_NEW`\n";
+        match section_tokens(clean, "Renamed knobs", TokenRule::Backticked) {
+            SectionVerdict::Tokens(t) => assert_eq!(t, vec!["KIT_OLD"]),
+            _ => panic!("a canonical knob lead did not resolve"),
+        }
     }
 }

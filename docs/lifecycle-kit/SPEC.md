@@ -585,8 +585,9 @@ natures, and each answers to its own threshold.
 
 **Declaration — owed from the first release tag, unconditionally.** A tagged
 release is a distribution, and whoever vendored it reads the note to learn what
-moved. From the first tag onward a rename owes a tightened-gates/release-note
-declaration (the deprecation-lifecycle and upgrade-path rungs).
+moved. From the first tag onward a rename owes a Renamed knobs declaration on the
+release declaration surface, and so in the note (the deprecation-lifecycle and
+upgrade-path rungs).
 
 **Compat shim and deprecation window — owed from the project's declared
 general-availability posture onward, never from a tag.** While a project's own
@@ -4589,10 +4590,9 @@ bump the note's upgrade-contract sections floor, applied over the newest
 already-released note — never the next version the project happens to reach.
 Stating that rule is what keeps the field mechanically derivable rather than an
 operator's guess, since without a defined scale the discharge comparison has
-none. The criteria themselves stay in the basis prose and are not structured
-fields: the release note's upgrade-contract sections already own them, and a
-structured list here would be a second copy of that surface — the line carries
-the *level*, the note owns the *criteria*.
+none. The criteria are not fields on the line. Until a release ships they
+accumulate on the release declaration surface (gate-sdk/SPEC.md §upgrade-smoke),
+and the note composed from it owns them after. The line carries the *level*.
 
 **Outstanding-deferral is derived, never tracked.** A `deferred:<version>` line
 is **outstanding** until a later line dispositions a release at or above

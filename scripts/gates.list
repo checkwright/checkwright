@@ -88,7 +88,7 @@ check-installer-no-deps
 check-release-bump
 check-release-channel-parity
 check-tightened-gates-grammar
-check-tightened-gates-note-parity
+check-release-declaration-parity
 check-npm-publish-spec
 check-manifest-temporal
 check-manifest-count

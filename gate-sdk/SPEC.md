@@ -766,7 +766,7 @@ those the reclaim path cannot be local capture's `: > <file>`, which erases the
 header and reds this gate on the very commit that drains. Truncate to the
 header instead. Every draining member of this tier already does:
 `WORKFLOW-STATE.txt` at the iteration boundary, `gap-inbox.md` at close,
-`tightened-gates.txt` at the tag.
+`release-declarations.md` at the tag.
 
 **The header form.** A checked projection's first line is `# contract: `
 followed by one of two ruled payloads:
@@ -810,7 +810,10 @@ tracks tracking.
 - `.txt` — a **record file with a stated line grammar** that a gate or `bin/`
   affordance parses field-wise.
 - `.md` — a **prose surface a human reads and dispositions**, machine-read only
-  for emptiness or for a bullet count.
+  for emptiness, a bullet count, or a bullet's lead token under a named section.
+  The release declaration surface (§upgrade-smoke) is this last kind: a human
+  transcribes it into a note and the holder reads its lead tokens, so a `.txt`
+  line grammar would give it a second grammar beside the note's.
 - `.log` — an **append-only capture stream** written by tooling at the moment of
   an event, triaged in bulk and cleared wholesale; no per-line grammar contract,
   which is exactly why nothing parses it field-wise.
@@ -7167,7 +7170,7 @@ encodes some tree's terms — and the bar above excludes that class by construct
 ### The declaration cohort
 
 **Three members: `check-release-bump`, `check-tightened-gates-grammar` and
-`check-tightened-gates-note-parity`**, and what the cohort buys is the
+`check-release-declaration-parity`**, and what the cohort buys is the
 release-note declaration family off the shell substrate. Named for what it buys,
 on §The POSIX ERE matcher's precedent rather than for a group key — the group key
 is precisely what did *not* select it. All three are **consumer-declared**, so
@@ -9709,36 +9712,47 @@ through a `--remove`/reinstall round trip beside it. lifecycle-kit's own
 
 ### lib/declaration.sh
 
-The tightened-gates declaration grammar — **two container arms over one token
-predicate**, held once, in `native/src/declaration.rs`. **This section's name is a
+The release declaration grammar — **one container arm over a token rule per
+declaration-bearing section**, held once, in `native/src/declaration.rs`. **This section's name is a
 path the tree does not carry, and that is deliberate**: the citations
 throughout this SPEC and in `docs/install.md` resolve against
 `§lib/declaration.sh`, and renaming the heading strands every one of them. What
-the section owns is the grammar and its compiled holder. The token predicate is
-a bare gate name; the container is the only thing that differs between the arms,
-which is what keeps two surfaces from re-opening the same defect from opposite
-directions.
+the section owns is the grammar and its compiled holder. A release note and the
+release declaration surface (§upgrade-smoke) are both markdown in one grammar, so
+they share the container and each section's token rule, which is what keeps the
+two surfaces from reading different token sets from the same bullets.
 
-- **The markdown arm** — a note's `## <section>` bullet lead tokens
-  (`section_bullets` for the container alone, `section_tokens` for the verdict).
-  A bullet's
-  lead token is the backticked, unbolded bare gate name directly after the bullet
-  marker; a bullet shaped any other way yields *no* token rather than a stripped
-  one, which is what makes the bolded and bold-and-backticked spellings visible
-  instead of silent.
-- **The record arm** — a declaration file's data lines, one bare gate name each
-  (`record_tokens`). That surface is deliberately markup-free, so the
-  spelling question does not arise on it at all. The holder is pure over text and
-  reaches no filesystem, so **a missing file is the empty set** at the caller that
-  reads it rather than an error: a tree that has never declared one is not thereby
+- **The container arm** — a `## <section>` container's bullets
+  (`section_bullets` for the container alone, `section_tokens` for the verdict,
+  which takes the section's token rule as an argument). A bullet's lead token is
+  read *directly* after the bullet marker; a bullet shaped any other way yields
+  *no* token rather than a stripped one, which is what makes a wrong spelling
+  visible instead of silent. The holder is pure over text and reaches no
+  filesystem, so **a missing file is the empty set** at the caller that reads it
+  rather than an error: a tree that has never declared one is not thereby
   malformed.
+- **Tightened gates** (`TokenRule::GateName`) — a backticked, unbolded bare gate
+  name directly after the marker, which makes the bolded and bold-and-backticked
+  spellings unreadable rather than stripped.
+- **Renamed knobs** (`TokenRule::Backticked`) — the backticked, unbolded span
+  directly after the marker, which is the old name, with any non-empty content. A
+  knob name carries underscores and a tag carries brackets, and the gate-name
+  predicate refuses both, which is why the rule is per section.
+- **Behavior changes** (`TokenRule::Bolded`) — the bolded span directly after the
+  marker, verbatim and trimmed, with any non-empty content.
 
 The verdict a caller branches on is a **type**: `Absent`, the named section is
 not there; `ExplicitNone`, a `None` body, which is the resolved empty set;
 `Tokens`, a declared set that is non-empty by construction; and `Unparsed`,
 unparsed while not `None`, carrying the offending lines — which is the *empty*
-list when the container held no bullet at all. The record arm has no `None` body
-and so no `Absent`: it answers `Ok` or `Err`. **The type is the grammar's whole
+list when the container held no bullet at all. The trichotomy, and its refusal of
+a non-`None` section yielding no token, hold for every section rule. **A reader of
+the declaration surface applies the surface verdict**: `Absent` and a heading
+with no bullets (`Unparsed` with an empty list) are the empty set, and `Unparsed`
+carrying offending lines is a finding, exactly as on a note. `ExplicitNone` cannot
+arise on a conforming surface; a reader meeting one takes it as the empty set
+rather than refusing, since "None" means the same thing on both surfaces. **The
+type is the grammar's whole
 spelling now that one holder is left.** The shell holder reported the same
 trichotomy as exit statuses — **0** resolved with the declared set on stdout,
 **1** unparsed-and-not-`None` with the offending lines, **2** the section absent
@@ -9747,16 +9761,18 @@ cannot reach a token list without having matched the resolved-empty arm. Read th
 status grammar as the record of what the type has to keep distinguishable, not as
 a live interface: nothing exits those codes for this grammar any more.
 
-The markdown arm reports the **trichotomy** the grammar defines: an explicit
+The container arm reports the **trichotomy** the grammar defines: an explicit
 `None` body (the resolved empty set), a non-empty token list, or
 unparsed-and-not-`None`. Every arm has a named reader at a named transition, and
 one with none would be removed: *absent* is read by `check-release-bump` at its
-fixed-section presence assertions and by `check-tightened-gates-grammar` at its
-`Absent` arm; *explicit `None`* by the grammar gate's `none` counter, which its
-clean line prints, and by note-parity as the resolved empty set it compares;
-*tokens* by all three, as a bullet count in the bump gate and as a token set in
-the other two; *unparsed* by the grammar gate's finding list and by note-parity's
-refusal. The third arm is the one that earns the helper. A
+fixed-section presence assertions, by `check-tightened-gates-grammar` at its
+`Absent` arm, by the declaration parity gate's note refusal, and as the empty set
+by both surface readers; *explicit `None`* by the grammar gate's `none` counter,
+which its clean line prints, and by the parity gate as the resolved empty set it
+compares; *tokens* by every cohort gate, as a bullet count in the bump gate and as a
+token set in the other two, and by the smoke's arm as the allowed-red set;
+*unparsed* by the grammar gate's finding list, by the parity gate's refusal on
+either surface, and by the smoke's finding. The third arm is the one that earns the helper. A
 non-`none` section yielding zero tokens must not become "no allowed reds": on a
 green battery that passes silently over a note naming several gates, and on a red
 one it fails *loudly with a false message*, accusing the note of an omission it
@@ -9798,10 +9814,11 @@ deleting commit, and the four the crate did not already reach — a prose-only
 container refusing with no offending line, `None` read at the container head
 only, a record holding just its contract header as the resolved empty set, and
 both refused bold spellings inside one container — landed there as crate unit
-tests in that same commit.
+tests in that same commit. The record case retired with the record arm; its
+successor is a header-only surface reading `Absent` under every section rule.
 
 **One conflation the surviving holder carries, recorded rather than repaired.**
-On the refusal path each arm emits the tokens it had already resolved *before*
+On the refusal path the arm emits the tokens it had already resolved *before*
 the offending lines, because the shell form printed a token as it walked and
 appended the offenders at the end — so a container mixing a readable and an
 unreadable bullet reports the readable one to its caller's finding list as
@@ -9815,29 +9832,27 @@ stated because a reader who takes only the first will read the missing oracle as
 an oversight.
 
 The caller relations, stated in one place: this repo's
-`check-tightened-gates-grammar` uses the markdown arm's verdict at each note it
-walks; `check-tightened-gates-note-parity` uses both arms, comparing a note's
-`Tightened gates` section against its declaration-file argument's record set; and
-`check-release-bump` uses the markdown arm's *container* alone, counting bullets
+`check-tightened-gates-grammar` uses the verdict under the gate-name rule at each
+note it walks; `check-release-declaration-parity` uses the verdict under every
+section's rule on both surfaces, comparing each of a note's
+declaration-bearing sections against the same section of its declaration-file
+argument; and `check-release-bump` uses the *container* alone, counting bullets
 across the note's declaration-bearing sections. All three are compiled members
 calling the holder directly, so the relation is a call rather than a source.
-That last caller is why the container and the token predicate are
-separable rather than one pass: Behavior-changes lead tokens are legitimately
-prose phrases, so the bump derivation needs the bullets without the token
-predicate. Before this grammar had a holder the container was stated three times
-and two of the statements already disagreed on whether a bullet marker could be
-indented,
+That last caller is why the container and the token rules are separable rather
+than one pass: the bump derivation needs the bullets without any token rule.
+Before this grammar had a holder the container was stated three times and two of
+the statements already disagreed on whether a bullet marker could be indented,
 so the section a bump was derived from and the section an allowed-red set was
 parsed from were not guaranteed to be the same section. Not a gate, so it owes no
-`good/`+`bad/` pair. The record arm is exercised a second
-way, through `scripts/gate-tests/check-tightened-gates-note-parity`'s own
-`good/`+`bad/` pair, whose `tightened-gates.txt` fixture drives it via the gate's
-declaration-file argument — which since the port drives the compiled holder, so
-that pair now reaches the only holder there is.
+`good/`+`bad/` pair. The surface read is exercised a second way, through
+`scripts/gate-tests/check-release-declaration-parity`'s own `good/`+`bad/` pair,
+whose `release-declarations.md` fixture carries all three sections and drives the
+holder via the gate's declaration-file argument.
 
-**The compiled holder's public surface is bounded and is exactly these three
-entry points** — the container arm alone, the markdown arm's verdict, and the
-record arm. There is no writer, no renderer and no section-discovery API, and
+**The compiled holder's public surface is bounded and is exactly these two
+entry points** — the container arm alone and the verdict under a section's token
+rule. There is no writer, no renderer and no section-discovery API, and
 adding one is a design decision with its own reader rather than an omission to
 fill in. Its consumers are **four** and are named: the three gate modules of §The
 declaration cohort and §upgrade-smoke's arm, whose declaration-resolve step moved
@@ -10872,7 +10887,7 @@ then replaces the vendored kit directories wholesale at a **TO** ref and
 regenerates the generated artifacts — the contract's consumer phase-A steps
 (docs/install.md §The upgrade contract). It asserts **determinism** (the scratch
 consumer's `git status` shows changes only under the kit roots) and then, over the
-phase-B battery, that the **red set is a subset of TO's tightened-gates
+phase-B battery, that the **red set is a subset of TO's Tightened-gates
 declaration**. A new N+1 gate
 is *not* in this consumer's `gates.list` (the phase-A sync never re-runs the
 installer, so it does not run in phase B); the smoke asserts the declaration's
@@ -10982,7 +10997,7 @@ recover it". The arm takes the root whose basename is `gate-sdk` — a name this
 member already spells, since its vendorable-kit derivation names that kit
 explicitly to order it first.
 
-**The declaration resolve moved in-crate.** The arm reads TO's tightened-gates
+**The declaration resolve moved in-crate.** The arm reads TO's Tightened-gates
 declaration through `native/src/declaration.rs`, which was then the compiled half
 of a dual holding and is now the grammar's only holder, and it sources no shell
 library. This port is what emptied that library's non-test caller set; what the
@@ -11060,7 +11075,7 @@ so a throwaway commit on a scratch branch is a legitimate TO and the suite reads
 it exactly as it would read master. What makes a working-tree measurement invalid
 is the *default* of `HEAD`, never the contract — so "this cannot be sized until it
 lands" is a wrong reading of the paragraph above, and sizing a
-tightened-gates declaration before the push is one commit away rather than
+Tightened-gates declaration before the push is one commit away rather than
 blocked.
 
 **What it does not cover.** The transition it proves is the *vendored kit
@@ -11095,39 +11110,55 @@ token predicate.** A **tagged TO** resolves its version from the `v*` tag
 pointing at it and its declaration from the `docs/posts/` note whose front-matter
 `release:` names that version — the Tightened-gates section's bullet lead tokens,
 whose grammar docs/install.md owns. An **untagged TO** — the `HEAD` default, and
-so every run of the standing pre-release assertion — reads
-`<workflow-dir>/tightened-gates.txt` out of TO's tree instead. It is *this* arm
+so every run of the standing pre-release assertion — reads the
+Tightened-gates section of `<workflow-dir>/release-declarations.md` out of TO's
+tree instead. It is *this* arm
 that makes the assertion satisfiable by an iteration that tightens something: the
 old rule resolved no version, so no note, so an empty declared set, so a red set
 that had to be empty — which no tightening iteration can be until the moment it
 is tagged. The empty-declaration rule survives as the narrow case (an empty
 declared set still forces an empty red set), not as the universal one.
 
-**The tightened-gates declaration surface**, `<workflow-dir>/tightened-gates.txt`,
-is a tracked checked projection (§The workflow directory) whose path derives from
-`GATE_SDK_WORKFLOW_DIR` — no knob of its own, since a knob naming this file would
-add a way to configure the assertion away without adding a way to satisfy it
-honestly. It always exists, header-only when the declared set is empty, so
-"absent" is never a state a reader must interpret. Its data lines are one bare
-gate name each and nothing else: no markup, no prose, no ordering significance —
-a rationale column would be a field the smoke never reads and the note's bullet
-prose already owns. Only gates that ship **inside a kit** are declared, because
-those are the only ones a consumer's vendored tree runs; a gate living solely in
-the consumer's own gates directory cannot appear in a vendored tree and is not
-part of any release's allowed-red set. Being tracked is load-bearing rather than
-incidental: the smoke reads the file out of a `git archive` of TO, which carries
-tracked content only.
+**The release declaration surface**, `<workflow-dir>/release-declarations.md`, is
+a tracked checked projection (§The workflow directory). Its path derives from
+`GATE_SDK_WORKFLOW_DIR` and it has no knob of its own, since a knob naming this
+file would add a way to configure the assertion away without adding a way to
+satisfy it honestly. Its first line is the `# contract:` header. Below that, it
+carries up to three `## ` sections named exactly as the note's
+declaration-bearing sections (**Tightened gates**, **Renamed knobs**, **Behavior
+changes**). Each holds bullets in the grammar docs/install.md §The upgrade
+contract gives that section in a note. A section that is absent, or present with
+no bullet, is the empty set. The surface has no `None` body, so a drained surface
+is its header line alone and "absent" is never a state a reader must interpret.
+Order carries no meaning. A section is written in note order when it is first
+created.
 
-Its **producer** is the build stage that lands or tightens a gate, appending the
-name in the same unit (lifecycle-kit/templates/stages/build.md). Build is the
-only stage that knows what it tightened at the moment it tightens it, so the
-declaration is written from knowledge rather than reconstructed from a red — and
-an assertion that discovers its allowed-red set from the gate it was meant to
-check is its own trigger. A gate that lands **new** is appended too: docs/install.md
-defines the note's section as one bullet per gate that landed new or got
-stricter, so a surface holding only strictly-tightened gates would make the
-composition lossy. It costs the assertion nothing — containment is red ⊆
-declared, so a declared gate that never reds is inert.
+The surface holds **exactly what the note will declare, written in the note's
+grammar**, rather than a bare-name record. A bare-name record fails twice, and
+both failures were measured. A red that a vendored tree meets on upgrade can need
+a one-line remedy only the landing session knows, and a bare name gives it no
+route to the composing session. And a changed surface that is not a gate has no
+line it can hold at all. Prose that the smoke does not read is still read, by the
+close that transcribes it into the note. The smoke reads only the Tightened-gates
+section's lead tokens, through the same holder the tagged arm uses.
+
+Only surfaces that ship **inside a kit** are declared, because those are the only
+ones a consumer's vendored tree meets. A gate, tool, template or knob living
+solely in the consumer's own tree cannot reach a vendored tree and belongs to no
+release's declaration. Being tracked is load-bearing: the smoke reads the file
+out of a `git archive` of TO, which carries tracked content only.
+
+Its **producer** is the session that lands the change, in the same commit. That
+is the build stage, for every section (lifecycle-kit/templates/stages/build.md),
+and any other session whose commit ships such a change, such as a close fixing a
+drained bullet inline, on the same obligation. The landing session is the only
+one that knows what it changed at the moment it changes it, so the declaration is
+written from knowledge rather than reconstructed from commits or from a red. A
+gate that lands **new** or gets stricter takes a Tightened-gates bullet, and an
+assertion that discovers its allowed-red set from the gate it was meant to check
+is its own trigger. A knob renamed or removed takes a Renamed-knobs bullet. Any
+other change to what the kits do takes a Behavior-changes bullet. Where a
+consumer must act, the bullet's prose carries the remedy.
 
 **A gate whose *input* moved is appended on the same ground, and the producer
 clause reaches it.** Build minting a new template binding slot reds the gate that
@@ -11136,20 +11167,20 @@ while the gate's own rule stands still. What makes a declaration owed is a red a
 vendored tree meets on upgrade, not a diff inside the gate — so "lands or
 tightens" names the common producers rather than the boundary, and a build
 reading it as the boundary declares nothing and hands the consumer an undeclared
-red. The one-line remedy such a red needs is the note bullet's to carry, and this
-surface, taking bare names only, cannot hold it.
+red. The bullet's prose carries the one-line remedy such a red needs.
 
-It **accumulates**, and that shape is chosen rather than inherited. Tightened
-gates is a *release*-level aggregate, not an iteration-level one: several
-internal iterations batching into one external release is a shape this repo
-wants, and under it a build stage authoring note prose directly would write into
-an artifact that does not exist yet and whose version it cannot know. Appending
-to a buffer composed once at the release boundary is correct under batching and
-degenerates gracefully to the one-iteration-one-release case. So an iteration
-closing on `release none` or a deferral carries its declarations forward, which
-is exactly what the next release's note must inherit. RELEASING.md §The procedure
-composes the note's Tightened-gates section from it at step 1 and drains it —
-truncating to the header, never clearing the file — at the tag in step 4.
+It **accumulates**, and that shape is chosen rather than inherited. Each of the
+three declaration-bearing sections is a *release*-level aggregate, not an
+iteration-level one: several internal iterations batching into one external
+release is a shape this repo wants, and under it a build stage authoring note
+prose directly would write into an artifact that does not exist yet and whose
+version it cannot know. Appending to a buffer composed once at the release
+boundary is correct under batching and degenerates gracefully to the
+one-iteration-one-release case. RELEASING.md §The procedure composes the note's
+three declaration-bearing sections from it at step 1 and drains it — truncating
+to the header, never clearing the file — at the tag in step 4. An iteration
+closing on `release none` or a deferral carries every section forward, so a
+deferral's disposition line carries the earned level and no criteria.
 
 Knobs — config-via-env in the `<KIT>_<KNOB>` shape, defaults this repo's layout,
 each read exactly once at the resolve step:
@@ -11277,20 +11308,23 @@ the arm pre-upgrade; it is consumed by the validate session's evidence file
 `GATE_SDK_UPGRADE_*` knobs are produced by the invoking environment (defaulted in
 `lib/gate.sh`, so the zero-config run works here) and read only
 at the resolve step, resolved by `gate_command`/`gate_knob_env` before the exec. The declaration path is derived from `GATE_SDK_WORKFLOW_DIR`
-at the same step. The tightened-gates declaration is produced by the build stage
-that lands or tightens a gate, appending to that surface, and composed
-by close into the note at the release boundary; it is consumed at three named
-transitions — here at the resolve step on either arm (the allowed-red-set parse),
-by close when it composes and drains, and by the upgrade skill reading the note
-as the consumer's registration checklist. That third reader is unaffected by the
-two-arm resolution: it reads the *note*, which is unchanged as an artifact, and
-only the note's Tightened-gates section changed its source. The grammar's owner
-is docs/install.md §The upgrade contract; its implementation is
-§lib/declaration.sh, and this repo holds the corpus to it with
-`check-tightened-gates-grammar`. The surface has a second consumer-side reader:
-`check-tightened-gates-note-parity` compares it against the note composed from it
-while that note is still untagged, so the compose-then-drain flow specified here
-is held equal at its one comparable moment rather than by review.
+at the same step. The release declaration surface is produced by the session that
+lands a kit-shipped change, appending a bullet to the matching section in the
+landing commit, and composed by close into the note at the release boundary. It
+is read at three named transitions: here at the resolve step, where the untagged
+arm reads the Tightened-gates lead tokens as the allowed-red set; by close, which
+composes all three note sections by transcription and drains the surface at the
+tag; and by `check-release-declaration-parity` at pre-commit, which compares every
+section against the note composed from it while that note is still untagged, so
+the compose-then-drain flow specified here is held equal at its one comparable
+moment rather than by review. Every bullet's lead token has a reader in the parity
+gate, and the smoke reads it in Tightened gates only; its prose is read by the
+composing close. The upgrade skill reads the *note* as the consumer's registration
+checklist, and is unaffected: the note is unchanged as an artifact, and only its
+sections' source moved. The grammar's owner is docs/install.md §The upgrade
+contract; its implementation is §lib/declaration.sh, and this repo holds the
+published corpus's Tightened-gates sections to it with
+`check-tightened-gates-grammar`.
 
 ### gen-pre-commit
 

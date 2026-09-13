@@ -71,7 +71,7 @@ check-installer-no-deps 5 5 5
 check-release-bump 312 312 306
 check-release-channel-parity 9 10 9
 check-tightened-gates-grammar 104 105 102
-check-tightened-gates-note-parity 54 54 54
+check-release-declaration-parity 54 54 54
 check-npm-publish-spec 10 8 9
 check-manifest-temporal 244 242 242
 check-manifest-count 2228 2238 2224

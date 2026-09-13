@@ -369,10 +369,10 @@ graph LR
     n44[".workflow/WORKFLOW-STATE.txt"]
     n45[".workflow/gap-inbox.md"]
     n46[".workflow/lesson-evidence.txt"]
-    n47[".workflow/release-disposition.txt"]
-    n48[".workflow/surface-ceiling.txt"]
-    n49[".workflow/survey-record.md"]
-    n50[".workflow/tightened-gates.txt"]
+    n47[".workflow/release-declarations.md"]
+    n48[".workflow/release-disposition.txt"]
+    n49[".workflow/surface-ceiling.txt"]
+    n50[".workflow/survey-record.md"]
     n51[".workflow/validate-baseline.txt"]
     n52[".workflow/validate-evidence.txt"]
     n53["CLAUDE.md"]
@@ -542,10 +542,10 @@ graph LR
     n374["native/src/gates/queue_prose_precondition.rs"]
     n375["native/src/gates/release_bump.rs"]
     n376["native/src/gates/release_channel_parity.rs"]
-    n377["native/src/gates/roadmap_fresh.rs"]
-    n378["native/src/gates/surface_ratchet.rs"]
-    n379["native/src/gates/tightened_gates_grammar.rs"]
-    n380["native/src/gates/tightened_gates_note_parity.rs"]
+    n377["native/src/gates/release_declaration_parity.rs"]
+    n378["native/src/gates/roadmap_fresh.rs"]
+    n379["native/src/gates/surface_ratchet.rs"]
+    n380["native/src/gates/tightened_gates_grammar.rs"]
     n381["native/src/gates/trajectory_fresh.rs"]
     n382["native/src/gates/value_rollup_fresh.rs"]
     n383["native/src/installer/recipe.rs"]
@@ -1665,15 +1665,18 @@ graph LR
   n247 -->|"check-reads-couples"| n326
   n247 -->|"check-reads-couples"| n342
   n159 -->|"check-release-bump"| n154
-  n159 -->|"check-release-bump"| n47
+  n159 -->|"check-release-bump"| n48
   n159 -->|"check-release-bump"| n375
   n159 -->|"check-release-bump"| n327
   n154 -->|"check-release-channel-parity"| n41
   n154 -->|"check-release-channel-parity"| n376
   n154 -->|"check-release-channel-parity"| n341
+  n159 -->|"check-release-declaration-parity"| n47
+  n159 -->|"check-release-declaration-parity"| n377
+  n159 -->|"check-release-declaration-parity"| n327
   n63 -->|"check-roadmap-fresh"| n59
   n63 -->|"check-roadmap-fresh"| n430
-  n63 -->|"check-roadmap-fresh"| n377
+  n63 -->|"check-roadmap-fresh"| n378
   n63 -->|"check-roadmap-fresh"| n336
   n63 -->|"check-roadmap-fresh"| n385
   n63 -->|"check-roadmap-fresh"| n384
@@ -1907,24 +1910,24 @@ graph LR
   n63 -->|"check-stage-entry"| n25
   n63 -->|"check-stage-evidence"| n44
   n35 -->|"check-stage-skill-coverage"| n321
-  n48 -->|"check-surface-ratchet"| n53
-  n48 -->|"check-surface-ratchet"| n260
-  n48 -->|"check-surface-ratchet"| n85
-  n48 -->|"check-surface-ratchet"| n110
-  n48 -->|"check-surface-ratchet"| n135
-  n48 -->|"check-surface-ratchet"| n184
-  n48 -->|"check-surface-ratchet"| n209
-  n48 -->|"check-surface-ratchet"| n234
-  n48 -->|"check-surface-ratchet"| n285
-  n48 -->|"check-surface-ratchet"| n313
-  n48 -->|"check-surface-ratchet"| n409
-  n48 -->|"check-surface-ratchet"| n453
-  n48 -->|"check-surface-ratchet"| n321
-  n48 -->|"check-surface-ratchet"| n34
-  n48 -->|"check-surface-ratchet"| n35
-  n48 -->|"check-surface-ratchet"| n378
-  n48 -->|"check-surface-ratchet"| n329
-  n49 -->|"check-survey-record"| n49
+  n49 -->|"check-surface-ratchet"| n53
+  n49 -->|"check-surface-ratchet"| n260
+  n49 -->|"check-surface-ratchet"| n85
+  n49 -->|"check-surface-ratchet"| n110
+  n49 -->|"check-surface-ratchet"| n135
+  n49 -->|"check-surface-ratchet"| n184
+  n49 -->|"check-surface-ratchet"| n209
+  n49 -->|"check-surface-ratchet"| n234
+  n49 -->|"check-surface-ratchet"| n285
+  n49 -->|"check-surface-ratchet"| n313
+  n49 -->|"check-surface-ratchet"| n409
+  n49 -->|"check-surface-ratchet"| n453
+  n49 -->|"check-surface-ratchet"| n321
+  n49 -->|"check-surface-ratchet"| n34
+  n49 -->|"check-surface-ratchet"| n35
+  n49 -->|"check-surface-ratchet"| n379
+  n49 -->|"check-surface-ratchet"| n329
+  n50 -->|"check-survey-record"| n50
   n63 -->|"check-tag-lead-line"| n63
   n63 -->|"check-task-conservation"| n63
   n63 -->|"check-task-names"| n63
@@ -1983,11 +1986,8 @@ graph LR
   n251 -->|"check-test-hermetic"| n407
   n251 -->|"check-test-hermetic"| n451
   n159 -->|"check-tightened-gates-grammar"| n154
-  n159 -->|"check-tightened-gates-grammar"| n379
+  n159 -->|"check-tightened-gates-grammar"| n380
   n159 -->|"check-tightened-gates-grammar"| n327
-  n159 -->|"check-tightened-gates-note-parity"| n50
-  n159 -->|"check-tightened-gates-note-parity"| n380
-  n159 -->|"check-tightened-gates-note-parity"| n327
   n415 -->|"check-todo-task-liveness"| n239
   n415 -->|"check-todo-task-liveness"| n65
   n415 -->|"check-todo-task-liveness"| n90

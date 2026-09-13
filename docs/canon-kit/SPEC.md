@@ -383,9 +383,11 @@ is carrying (gate-sdk/SPEC.md §lib/gate.sh), so kit source contains the stem an
 never the members. Spelling the members out to satisfy an exact match would be a
 hardcoded roster of consumer knob names in a kit literal, which is the one shape
 that crosses the provenance seam here. It valves the surfaces that legitimately
-name design-ahead or frozen brands — `gate-tests/` fixture bodies, `docs/posts/*`, the generated
-trajectory data, `SPEC-*.md` amendments, and the queue — so a rename cannot
-leave a dangle without turning a gate red.
+name design-ahead or frozen brands — `gate-tests/` fixture bodies, `docs/posts/*`, the
+release declaration surface those notes are composed from (whose Renamed knobs
+section names a removed knob by construction), the generated trajectory data,
+`SPEC-*.md` amendments, and the queue — so a rename cannot leave a dangle without
+turning a gate red.
 
 Config follows queue-kit's pattern: copy `templates/canon-config.sh` into
 the gates dir as `canon-config.sh` (or point `CANON_KIT_CONFIG_FILE`
