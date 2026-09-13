@@ -33,6 +33,10 @@ const FORWARD_PHRASES: &[&str] = &[
     "once that",
 ];
 
+// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the valve that excuses a paragraph
+// stating the record's contract from the undeclared pass alone.
+const VALVE_LEAD: &str = "<!-- undeclared-condition-exempt:";
+
 pub struct Declared {
     pub name: String,
     pub oracle: String,
@@ -83,7 +87,7 @@ impl Band {
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the two body-line declarations, read
 // with the fence skip and the full-line lead token the sibling roster arm already established, so
 // the grammar stays quotable in the surface that specifies it.
-fn declarations<'a>(text: &'a str, lead: &str) -> Vec<(usize, &'a str)> {
+fn body_lines(text: &str) -> Vec<(usize, &str)> {
     let mut out: Vec<(usize, &str)> = Vec::new();
     let mut fence = false;
     for (i, line) in text.lines().enumerate() {
@@ -92,16 +96,38 @@ fn declarations<'a>(text: &'a str, lead: &str) -> Vec<(usize, &'a str)> {
             fence = !fence;
             continue;
         }
-        if fence {
-            continue;
-        }
-        if let Some(rest) = t.strip_prefix(lead) {
-            if rest.starts_with(WS) {
-                out.push((i + 1, rest.trim_matches(WS)));
-            }
+        if !fence {
+            out.push((i + 1, t));
         }
     }
     out
+}
+
+fn declarations<'a>(text: &'a str, lead: &str) -> Vec<(usize, &'a str)> {
+    body_lines(text)
+        .into_iter()
+        .filter_map(|(line, t)| {
+            let rest = t.strip_prefix(lead)?;
+            rest.starts_with(WS).then(|| (line, rest.trim_matches(WS)))
+        })
+        .collect()
+}
+
+// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the contract-paragraph valve, read with
+// the declarations' fence skip and trim; a `None` reason is a valve that excuses nothing.
+fn valves(text: &str) -> Vec<(usize, &str, Option<&str>)> {
+    body_lines(text)
+        .into_iter()
+        .filter_map(|(line, t)| {
+            let rest = t.strip_prefix(VALVE_LEAD)?;
+            let reason = rest
+                .trim_end_matches(WS)
+                .strip_suffix("-->")
+                .map(|r| r.trim_matches(WS))
+                .filter(|r| !r.is_empty());
+            Some((line, rest.trim_matches(WS), reason))
+        })
+        .collect()
 }
 
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — one or more names, appended and never
@@ -170,6 +196,15 @@ pub fn malformed(text: &str) -> Vec<Malformed> {
             });
         }
     }
+    for (line, raw, reason) in valves(text) {
+        if reason.is_none() {
+            out.push(Malformed {
+                line,
+                raw: raw.to_string(),
+                want: "<!-- undeclared-condition-exempt: <reason> --> — a non-empty reason",
+            });
+        }
+    }
     out.sort_by_key(|m| m.line);
     out
 }
@@ -201,11 +236,18 @@ fn paragraphs(text: &str) -> Vec<(usize, String)> {
 // never inherited, and the pass reads well-formed declarations only: a paragraph is excused by a
 // `discharge:` line the arm can read, never by the token's presence.
 pub fn undeclared(text: &str) -> Vec<Undeclared> {
+    let valved: Vec<usize> = valves(text)
+        .into_iter()
+        .filter(|(_, _, reason)| reason.is_some())
+        .map(|(line, _, _)| line)
+        .collect();
     paragraphs(text)
         .into_iter()
-        .filter(|(_, p)| {
+        .filter(|(start, p)| {
             let low = p.to_lowercase();
+            let end = start + p.lines().count();
             FORWARD_PHRASES.iter().any(|ph| low.contains(ph))
+                && !valved.iter().any(|v| (*start..end).contains(v))
                 && !p.lines().any(|l| match l.trim_start_matches(WS).strip_prefix("discharge:") {
                     Some(rest) if rest.starts_with(WS) => {
                         split_discharge(rest.trim_matches(WS)).is_some()
@@ -530,6 +572,53 @@ mod tests {
             malformed("discharge: good  true\nruling: a name\n").is_empty(),
             "a readable declaration of either kind is not malformed"
         );
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the valve excuses its paragraph
+    // from the undeclared pass and from nothing else.
+    #[test]
+    fn a_valved_conditioned_paragraph_is_excused_from_the_undeclared_pass() {
+        let text = "The record's contract, in force until that instruction is updated.\n\
+                    <!-- undeclared-condition-exempt: the record's contract, no ruling -->\n\n\
+                    A ruling. Discharge event: that unit lands.\n";
+        let holes = undeclared(text);
+        assert_eq!(holes.len(), 1);
+        assert_eq!(holes[0].line, 4);
+        assert!(malformed(text).is_empty());
+        assert!(discharges(text).is_empty());
+        assert!(ruling_names(text).is_empty());
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — a malformed valve must not buy the
+    // skip it failed to justify.
+    #[test]
+    fn a_reasonless_valve_reports_malformed_and_leaves_its_paragraph_a_hole() {
+        let text = "The contract, in force until that instruction is updated.\n\
+                    <!-- undeclared-condition-exempt:   -->\n\n\
+                    Another, until the gate is green.\n\
+                    <!-- undeclared-condition-exempt: unclosed\n";
+        let bad = malformed(text);
+        assert_eq!(bad.len(), 2, "the empty reason and the unclosed valve");
+        assert_eq!(bad[0].line, 2);
+        assert_eq!(bad[1].line, 5);
+        assert!(bad[0].want.contains("a non-empty reason"));
+        let holes = undeclared(text);
+        assert_eq!(holes.len(), 2);
+        assert_eq!(holes[0].line, 1);
+        assert_eq!(holes[1].line, 4);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — a fenced valve is quotation.
+    #[test]
+    fn a_valve_inside_a_fence_excuses_nothing() {
+        let text = "The contract, in force until that instruction is updated.\n\
+                    ```\n\
+                    <!-- undeclared-condition-exempt: quoted, not applied -->\n\
+                    ```\n";
+        let holes = undeclared(text);
+        assert_eq!(holes.len(), 1);
+        assert_eq!(holes[0].line, 1);
+        assert!(malformed(text).is_empty());
     }
 
     // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — escalation-only, proved rather than

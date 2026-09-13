@@ -1,5 +1,6 @@
 # TRAJECTORY.md — the override ledger
 
+<!-- undeclared-condition-exempt: the record's contract, defining what a ruling is; it directs no work and carries no condition of its own -->
 This file carries two things and shrinks toward empty: the **objectives** of a
 running pivot, and the operator's **rulings** — each an override of a
 business-as-usual instruction until that instruction is updated. The terms are

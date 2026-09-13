@@ -3345,7 +3345,7 @@ knobs (§Layout and configuration) and reads nothing else; with
 returns, which is what makes close's repair step skip rather than fail for a
 consumer keeping no such record.
 
-**Two declarations are its whole input grammar**, both body lines in the record,
+**Two declarations are its whole ruling grammar**, both body lines in the record,
 both hand-written under judgment by the session recording or retiring a ruling.
 Neither is a **tag**: a tag marks a move across a pending/ready boundary and
 these mark none, which is the further-tag test's own words.
@@ -3484,10 +3484,33 @@ forward-looking phrasing, FP-bearing by construction, on the same honest posture
 forward-precondition scan takes about the same problem. It reports, it does not
 red, and a false positive costs a reader one line.
 
+**A paragraph that states the record's contract takes a valve, and the valve excuses it from
+this pass alone.** A record that opens by defining what a ruling is will match the detector,
+because the definition carries the forward phrasing a ruling carries. That paragraph takes one
+line, anywhere inside it:
+
+```
+<!-- undeclared-condition-exempt: <why this paragraph is no ruling> -->
+```
+
+The **reason is mandatory**. A valve with no reason reports in the malformed band and does
+**not** excuse its paragraph, on the rule that band states below: a malformed declaration must
+not buy the skip it failed to justify. The valve reaches the undeclared pass only. It is no
+declaration of a ruling, so the discharge report, the citing report and the `ruling:` name
+lookup never read it. It is per **paragraph** because the paragraph is the pass's unit. The
+line is found by the same reading the two declarations get, the fence skip and a
+leading-whitespace trim, so a valve quoted inside a fenced block, like the one above, is
+quotation and excuses nothing. Structural answers are refused. The probe does not skip a
+record's preamble by heading position, which would couple it to the record's shape and
+silently drop a real ruling placed there. The detector's phrases are not narrowed either,
+which is the evasion §The committed gap inbox refuses. The valve puts the fact on the record,
+where the author who wrote the paragraph can state it.
+
 **A malformed declaration reports as malformed, and never as absent.** Both
-declarations are hand-written and both have a likeliest slip — a `discharge:`
-naming a ruling and no oracle, a `ruling:` whose name list is empty — which the
-readers above drop rather than report. Dropped alone that is a silent loss;
+declarations and the contract valve are hand-written, and each has a likeliest
+slip — a `discharge:` naming a ruling and no oracle, a `ruling:` whose name list
+is empty, a valve with no reason — which a reader that only parses would drop,
+or for the valve honour, rather than report. Dropped alone that is a silent loss;
 **composed it is worse than writing nothing**, because the undeclared pass
 skipped a paragraph on the *presence* of a `discharge:` line, so a typo
 suppressed the report that would otherwise name the ruling. So the arm carries a

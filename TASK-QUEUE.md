@@ -12,32 +12,6 @@
 
 ## New Features
 
-- **ruling-staleness-header-reads-as-undeclared** [spec: SPEC-condition-valve.md]
-  — the `--emit ruling-staleness` probe reports the ruling record's own framing header as an
-  UNDECLARED CONDITION, so every reader of that section meets a permanent false positive.
-  **Reproduced live at this scope's ritual, not carried on the filing.** The arm prints
-  `== undeclared conditions ==` with one row, `TRAJECTORY.md:3`, which is the file's own "This file
-  carries two things and shrinks toward empty" paragraph — prose declaring the record's contract,
-  not a ruling, so it correctly carries no `discharge:` declaration. The probe partitions the file
-  into paragraphs and demands a declaration of each, with no way to tell a governing header from a
-  governed paragraph.
-  **The consequence is not noise alone.** The section exists to surface a ruling somebody forgot to
-  declare; a row that is always present trains the reader to skip the section, which is exactly the
-  one finding it would ever carry.
-  **Why it needed design:** the probe skipping paragraphs above the first `##` heading is a
-  boundary condition inside one reader; the record declaring its header exempt — the way it already
-  declares its own close-surface row inline at `TRAJECTORY.md:12` — puts the fact on the governed
-  surface instead. Which is right decides whether the record's shape is the probe's business.
-  **Cost while deferred:** one boundary condition plus a fixture pair, unspent, against a section
-  read at every close and at every scope ritual.
-  **Premise corrected 2026-09-13 at spec:** the arm demands no declaration of every paragraph; the
-  header matches its forward-phrase list on `until that`. **Authored at spec 2026-09-13:** a
-  record-side `undeclared-condition-exempt` valve with a mandatory reason (SPEC-condition-valve.md).
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its ruling-record
-  read; drained here, and reproduced live at this scope's own ritual.
-  **Rides unit set `carried-record-reliability` — operator direction, 2026-09-13, lead-relayed**;
-  reproduced again at that scope's ritual.
-
 ## Technical Debt
 
 ## Deferred
@@ -5244,5 +5218,6 @@
 - survey-record-claim-reliability
 - kfric-capture-unverified-assertion
 - survey-edges-reader-arrives-after-truncation
+- ruling-staleness-header-reads-as-undeclared
 
 ## Lessons Learned
