@@ -124,6 +124,13 @@ The paragraph after the bullets changes in two places. **Not yet applied:**
   `knob:CANON_KIT_TEMPORAL_EXEMPT_PATHS`. A change to either knob re-fires the gate, since
   either can move a (C) verdict.
 
+canon-kit/SPEC.md §check-manifest-temporal gains one sentence, after its three-valve list.
+**Not yet applied:**
+
+> These three valves also admit a retired-path citation under §check-docs-cmd assertion C, so a
+> site's marker or path exemption clears both gates at once and their reach is stated once, by
+> the section that owns the valves.
+
 ### (2) The compiled member implements the arm {design-bearing}
 
 `native/src/gates/docs_cmd.rs`:
@@ -167,9 +174,10 @@ this count.** Each finding takes one of two dispositions:
   marker on the line or the one above, where one marker can cover two adjacent lines.
 
 `docs/posts/*` is already in `CANON_KIT_TEMPORAL_EXEMPT_PATHS` here, so the posts' 49 tokens need
-no edit. The `scripts/canon-config.sh` comment above that knob still says the posts "take link
-and command resolution but not narration governance". It becomes: *take link resolution and
-fenced command resolution, but not narration governance or retired-path citation*.
+no edit. The `scripts/canon-config.sh` comment above that knob (line 41) currently says the path
+valve "exempts them from temporal-narration governance while link and command resolution still
+apply". It becomes: exempts them from temporal-narration governance and retired-path citation
+while link and fenced-command resolution still apply.
 
 Regenerate the kit SPEC mirrors under `docs/` and the pre-commit hook, whose baked argv for this
 member gains the two knobs. Each freshness gate prints its own command.
@@ -258,7 +266,7 @@ tense, under a `manifest-temporal-exempt:` marker if it keeps a path.
 - canon-kit/gate-tests/check-docs-cmd/: the fixture pair (delta 2).
 - scripts/canon-config.sh: the posts path-valve comment (delta 3).
 - The kit SPECs carrying findings, and their generated mirrors under docs/ (delta 3).
-- scripts/git-hooks/pre-commit, regenerated (delta 2).
+- scripts/git-hooks/pre-commit, regenerated (delta 3).
 - .workflow/audit-roster.txt: the new class line (delta 4).
 - gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate: the reverse-trigger row
   (delta 5).

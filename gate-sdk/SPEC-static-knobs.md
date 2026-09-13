@@ -408,10 +408,11 @@ applied:**
 ## Existing sections updated
 
 - `gate-sdk/SPEC.md` — §Layout and configuration: new §The knob file (deltas 1, 3 and 9) and the
-  loader paragraph, including its hand-authored `site-config.sh` mention (delta 8); §lib/gate.sh's
-  single-producer paragraph and sentinel expansion (delta 2); §The config-seam port disposition,
-  §The kit-library port disposition, §The port-candidate criteria and §Meta-gate conservation for
-  the binary substrate (delta 8); §The non-gate arm's `knob-roster` arm (delta 5).
+  loader paragraph (delta 8, one sentence naming the static seam); §lib/gate.sh's single-producer
+  paragraph and sentinel expansion (delta 2); §The config-seam port disposition, including its
+  hand-authored `site-config.sh` mention, §The kit-library port disposition, §The port-candidate
+  criteria and §Meta-gate conservation for the binary substrate (delta 8); §The non-gate arm's
+  `knob-roster` arm (delta 5).
 - `canon-kit/SPEC.md` — §check-docs-cmd assertion B and §check-knob-default-coupling (delta 5).
 - `site-kit/SPEC.md` — §lib/site.sh becomes §Knob defaults; §Layout and configuration names the
   knob file and `SITE_KIT_KNOB_FILE` (delta 7).
