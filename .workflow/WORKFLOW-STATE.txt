@@ -5,3 +5,4 @@
 ---
 
 evidence-population-fidelity scope a42ba4e2 2026-09-14 d57c4fec
+evidence-population-fidelity spec a5fe7de1 2026-09-14 5fdbe54a
