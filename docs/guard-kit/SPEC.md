@@ -2311,16 +2311,19 @@ hand, and never by a delegated session.** A finding here is neither queue work
 nor build work, and it is not left standing either: the allowlist is how the
 friction the close stage measures is paid down (§The close-stage triage step), so
 a prepared diff nobody applies is that loop left open. What gates the application
-is impact, and the two files differ in it:
+is impact: a **high-impact** edit waits for the operator's explicit confirmation,
+and a **low-impact** edit is applied and then reported, never asked. The file sets
+the bar, because the two differ in reach:
 
-- **the committed settings file** is shared, reviewed and read by every clone, so
-  **every** edit to it waits for the operator's explicit confirmation;
-- **the local overlay** binds one machine, so an edit there waits for explicit
-  confirmation when it is **high-impact** — it widens what runs without a prompt
-  (a new or broader allow entry, a removed deny or ask entry) or relaxes a guard
-  (a removed hook, an env override such as a raised pause threshold) — and is
-  applied and then reported when it only narrows (pruning a redundant or one-off
-  entry, narrowing a glob).
+- **low-impact in either file** — an edit that only narrows: pruning a redundant or
+  one-off entry, narrowing a glob, adding a deny or ask entry;
+- **high-impact in either file** — an edit that relaxes a guard: a removed deny or
+  ask entry, a removed or weakened hook, an env override such as a raised pause
+  threshold;
+- **a widening** — a new or broader allow entry — is high-impact in **the committed
+  settings file**, which every clone reads, and in **the local overlay** is
+  high-impact only when it reaches a write, execute, network or destructive form;
+  a local widening to a read-only command or a fixed literal is low-impact.
 
 A **delegated** session may only *prepare* the edit — derive the diff, state its
 security grounds, record both — and hand it up; there its remit ends. The ground

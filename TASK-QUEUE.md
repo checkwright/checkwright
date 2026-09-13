@@ -3211,9 +3211,9 @@
   and the class was about half of every prompting call in the snapshot. The record is
   guard-kit/SPEC.md §The generic ruleset rules 16 and 17 and §scan-prompts, not restated here.
   **WHAT KEEPS THIS ENTRY ALIVE IS TWO THINGS, and neither is design this project can self-serve.**
-  **(1) A PREPARED SETTINGS DIFF AWAITS OUT-OF-BAND OPERATOR APPLICATION**, recorded here under
-  guard-kit/SPEC.md §compare-settings-allow, which lets a session derive a diff and state its
-  grounds and ends its remit there. Six committed `permissions.allow` entries:
+  **(1) A PREPARED SETTINGS DIFF AWAITS THE OPERATOR'S CONFIRMATION**, recorded here under
+  guard-kit/SPEC.md §compare-settings-allow, which classes a committed widening high-impact and
+  applies it only once confirmed. Six committed `permissions.allow` entries:
   `Bash(date *)`, `Bash(find *)`, `Bash(git merge-base *)`, `Bash(git config *)`, `Bash(mkdir *)`,
   and `Bash(: > .workflow/subagent-stop-liveness.log)`. SECURITY GROUNDS: the first five are
   read-only or scratch-creating, take no path outside the tree that a `*` does not already reach in

@@ -158,9 +158,9 @@ load behind that trigger, so they are not resident here.
   concerns as `operator direction, <date>`. The terms (objective, ruling,
   direction, decision, grant): lifecycle-kit/SPEC.md §The steering vocabulary.
 - **A permission-settings edit is applied on the operator's behalf, never by
-  hand** (`operator direction, 2026-09-13`) — every `settings.json` edit and any
-  widening `settings.local.json` edit waits for explicit confirmation; a delegated
-  session prepares the diff and hands it up. Impact classes and the refused
+  hand** (`operator direction, 2026-09-13`) — a high-impact edit waits for explicit
+  confirmation, a low-impact one is applied and reported; a delegated session
+  prepares the diff and hands it up. Impact classes and the refused
   laundering alternative: guard-kit/SPEC.md §compare-settings-allow.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit; its chrome, page-authoring rules,
