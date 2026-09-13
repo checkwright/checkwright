@@ -3,7 +3,7 @@
 ## Tightened gates
 
 - `check-gate-exemption-tasks` — the port oracle's exclusion corpus was narrower than its own directive; widened, so the gate can now red on a `# port-until:` hold it previously could not see. It is zero-config, so it reaches every vendored tree.
-- `check-survey-record` — every word-bounded 7–40-character lowercase-hex run carrying a letter inside a survey record's `corpus`, `oracle` or `finding` field must resolve to a real git object, catching a minted identifier that fakes a citation's precision.
+- `check-survey-record` — every word-bounded 7–40-character lowercase-hex run carrying a letter inside a survey record's `corpus`, `oracle`, `finding` or `inferred` field must resolve to a real git object, catching a minted identifier that fakes a citation's precision; and every block must now carry a non-empty `- inferred:` line (each claim no command established, or the literal `none`) in place of the retired `- edges:` line. A survey record mid-iteration at upgrade reds until its blocks are re-keyed to `corpus`/`oracle`/`rev`/`finding`/`inferred`, or until the next scope boundary truncates it.
 - `check-evidence-baseline` — gains a fourth arm: every configured suite must carry at least one baseline row.
 - `check-action-permissions` — new: a workflow job that consumes the GitHub token must declare its scopes rather than inherit the repository default.
 - `check-action-run-shell` — resolves an absent `shell:` key's dialect from `runs-on` instead of assuming bash (a Windows runner defaults to `pwsh`), and refuses a `defaults.run` subtree whose dialect it cannot resolve.
