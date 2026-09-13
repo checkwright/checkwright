@@ -2328,7 +2328,10 @@ operator is present to give the confirmation the edit's impact may owe. The
 refusal that remains is permission laundering: a supervising session applying a
 delegated session's diff **without the confirmation its impact owes**, which
 converts the permission boundary into a formality. Confirmation is the operator's
-act, never the supervisor's. A delegated session that meets the refusal and stops
+act, never the supervisor's, and it does not bind the harness: a permission
+classifier may still deny a confirmed edit in the operator's own session, and the
+session then stops, names the denied edit, and lets the operator grant it —
+never retrying a narrower spelling of the same edit to slip past the denial. A delegated session that meets the refusal and stops
 has behaved correctly.
 
 The probe set is consumer config (`GUARD_KIT_BREADTH_PROBES`, §Layout and

@@ -3201,8 +3201,7 @@
   `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
   filing put to it.
 
-- **file-authoring-act-ungoverned** [design-pending] [cost: session/low] [surface: guard-kit] — the file-authoring writes no glob can reach,
-  and a prepared settings diff no stage session may apply.
+- **file-authoring-act-ungoverned** [design-pending] [cost: session/low] [surface: guard-kit] — the file-authoring writes no glob can reach.
   **What landed 2026-09-04 and what did not.** Guard rule 17 was narrowed and widened in one unit:
   its substitution decline moved onto the `hdq` view, so the quoted-delimiter heredoc body every
   journal append spells its slugs in stops defeating the grant; and its `>>`-only test went, so a
@@ -3210,24 +3209,17 @@
   calls. Measured at that build: sixteen of sixteen locatable journal appends carried a backtick,
   and the class was about half of every prompting call in the snapshot. The record is
   guard-kit/SPEC.md §The generic ruleset rules 16 and 17 and §scan-prompts, not restated here.
-  **WHAT KEEPS THIS ENTRY ALIVE IS TWO THINGS, and neither is design this project can self-serve.**
-  **(1) A PREPARED SETTINGS DIFF AWAITS THE OPERATOR'S CONFIRMATION**, recorded here under
-  guard-kit/SPEC.md §compare-settings-allow, which classes a committed widening high-impact and
-  applies it only once confirmed. Six committed `permissions.allow` entries:
-  `Bash(date *)`, `Bash(find *)`, `Bash(git merge-base *)`, `Bash(git config *)`, `Bash(mkdir *)`,
-  and `Bash(: > .workflow/subagent-stop-liveness.log)`. SECURITY GROUNDS: the first five are
-  read-only or scratch-creating, take no path outside the tree that a `*` does not already reach in
-  a sibling grant, and each ranked in the live friction log; the sixth is a fixed literal whose two
-  sibling reclaim paths are already granted, so its absence is an asymmetry rather than a decision.
-  **These do NOT fix this entry's own class** and are not offered as doing so. They ride the same
-  operator application, and this entry is the queue's carrier for that obligation — which is why the
-  2026-09-04 build DEMOTED it rather than moving it to `## Done`, where a bare slug would have taken
-  every tag and the obligation with them.
-  **(2) THE RESIDUE THE LANDED GRANT DOES NOT REACH:** a write to a path OUTSIDE the gitignored
-  scratch set — a heredoc to a tracked file, a commit-message file, a scratch script under another
-  root. Rule 17 declines every one on its target test, by design. The Write-tool steer was RECORDED
-  AS REFUSED-FOR-NOW at that build: the landed deltas removed its subject, and a steer firing on
-  writes the same commit had just granted is a rule arguing with its neighbour. Two facts were
+  **The prepared six-entry settings diff is disposed** (operator direction, 2026-09-13): four
+  landed in the committed allowlist — `date`, `git merge-base`, `mkdir`, the liveness-log clear —
+  and two were refused, `Bash(find *)` for reaching find's `-exec`/`-delete` forms and
+  `Bash(git config *)` for reaching `core.hooksPath` and `!`-aliases, both execute forms a glob
+  cannot fence off. None of the four fixed this entry's class.
+  **WHAT KEEPS THIS ENTRY ALIVE — THE RESIDUE THE LANDED GRANT DOES NOT REACH:** a write to a
+  path OUTSIDE the gitignored scratch set — a heredoc to a tracked file, a commit-message file, a
+  scratch script under another root. Rule 17 declines every one on its target test, by design.
+  The Write-tool steer was RECORDED AS REFUSED-FOR-NOW at that build: the landed deltas removed
+  its subject, and a steer firing on writes the same commit had just granted is a rule arguing
+  with its neighbour. Two facts were
   bought so a later session need not re-buy them — `.claude/settings.json` already carries a
   `Write|Edit` `PreToolUse` matcher, so a Write-side rule needs no new matcher shape; and a steer is
   not a distinct primitive, `guard_block` being stderr plus exit 2 for a block and a steer alike.
@@ -3240,11 +3232,9 @@
   call never reaches the friction log, so widening rule 17 shrank the log's own corpus.
   guard-kit/SPEC.md §scan-prompts carries that caveat, and a close attributing the drop to fewer
   writes is reading the instrument's own boundary as a result.
-  **Cost while deferred:** one out-of-band decision per file authored outside the scratch set, plus
-  the six ungranted entries above, and invisible to every gate — the friction log is advisory, so
-  nothing reds however far the residue grows.
-  **Stays deferred — lead decision, 2026-09-12:** relayed upward and left here, because the
-  settings half is applied only on operator confirmation, and no stage may promote it.
+  **Cost while deferred:** one out-of-band decision per file authored outside the scratch set,
+  invisible to every gate — the friction log is advisory, so nothing reds however far the residue
+  grows.
   Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
   drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
   2026-09-04 within one iteration.
