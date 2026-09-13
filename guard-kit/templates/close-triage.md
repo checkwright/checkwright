@@ -53,9 +53,9 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
 
    Then, by judgment, prune the remaining one-off exact-string local entries and
    promote recurring safe patterns to the committed `settings.json` as globs.
-   Widening the committed set is the **consumer's** call, not the session's: an
-   agent may propose a standing grant and may prune, but it does not widen its
-   own auto-allow set on its own say-so.
+   Widening either set, or any committed-file edit, waits for the **consumer's**
+   explicit confirmation; a session with no consumer present to confirm prepares
+   the diff and hands it up (guard-kit/SPEC.md §compare-settings-allow).
 5. **Clear the friction log** — its named reclaim path:
    `: > .workflow/prompt-friction.log`. Run each clear as its own bare command:
    the allowlist entry is an exact string, so compounding it (`&&`, `;`, a

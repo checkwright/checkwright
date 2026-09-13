@@ -2300,19 +2300,33 @@ something on every call it stops matching. Narrowing is warranted only where a
 clean, a force push, a bare `checkout --` discarding local changes. A glob broad
 only in a harmless direction is declared intended, never trimmed.
 
-**Applying the disposition is the ruling authority's, out of band, and no
-delegated session may take it.** A finding here is neither queue work nor build
-work: a session may *prepare* the edit — derive the diff, state its security
-grounds, record both — and there its remit ends. The ground is not a preference
-about who should do it but that the work is not executable where a delegated
-session runs: a permission classifier denies the edit, and a dispatched session's
-own definition forbids changing permission settings on any agent's say-so. So a
-finding resolving to *edit the allowlist* cannot be discharged by the session
-sent to discharge it, and a pipeline that plans one spends itself reaching a
-wall. The tempting alternative is refused with it: a session handing its prepared
-diff to a supervising session to apply is permission laundering, and it converts
-the permission boundary into a formality. A session that meets the refusal and
-stops has behaved correctly.
+**Applying the disposition is the operator's authority, exercised by the session
+the operator is present in, on the operator's behalf — never by the operator's
+hand, and never by a delegated session.** A finding here is neither queue work
+nor build work, and it is not left standing either: the allowlist is how the
+friction the close stage measures is paid down (§The close-stage triage step), so
+a prepared diff nobody applies is that loop left open. What gates the application
+is impact, and the two files differ in it:
+
+- **the committed settings file** is shared, reviewed and read by every clone, so
+  **every** edit to it waits for the operator's explicit confirmation;
+- **the local overlay** binds one machine, so an edit there waits for explicit
+  confirmation when it is **high-impact** — it widens what runs without a prompt
+  (a new or broader allow entry, a removed deny or ask entry) or relaxes a guard
+  (a removed hook, an env override such as a raised pause threshold) — and is
+  applied and then reported when it only narrows (pruning a redundant or one-off
+  entry, narrowing a glob).
+
+A **delegated** session may only *prepare* the edit — derive the diff, state its
+security grounds, record both — and hand it up; there its remit ends. The ground
+is not a preference about who should do it but that the work is not executable
+where a delegated session runs: a permission classifier denies the edit, and no
+operator is present to give the confirmation the edit's impact may owe. The
+refusal that remains is permission laundering: a supervising session applying a
+delegated session's diff **without the confirmation its impact owes**, which
+converts the permission boundary into a formality. Confirmation is the operator's
+act, never the supervisor's. A delegated session that meets the refusal and stops
+has behaved correctly.
 
 The probe set is consumer config (`GUARD_KIT_BREADTH_PROBES`, §Layout and
 configuration), and it is **probes rather than a roster**: each entry is a single

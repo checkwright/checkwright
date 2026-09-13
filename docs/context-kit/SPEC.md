@@ -1099,8 +1099,10 @@ but for that one member, and not from the shipped install path at all.
 
 **The gate is not the prune.** It reads the settings file and writes nothing,
 but it reds the moment it registers on a tree carrying stranded entries, and the
-settings file is operator-owned configuration a session may not edit. The
-landing order is therefore fixed: the operator prunes, then the gate registers.
+settings file is operator-owned configuration a session edits only on the
+operator's explicit confirmation (guard-kit/SPEC.md §compare-settings-allow). The
+landing order is therefore fixed: the confirmed prune lands, then the gate
+registers.
 
 ## check-memory-off
 

@@ -3244,7 +3244,7 @@
   the six ungranted entries above, and invisible to every gate — the friction log is advisory, so
   nothing reds however far the residue grows.
   **Stays deferred — lead decision, 2026-09-12:** relayed upward and left here, because the
-  settings half is the operator's applied out of band and no stage may promote it.
+  settings half is applied only on operator confirmation, and no stage may promote it.
   Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
   drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
   2026-09-04 within one iteration.
