@@ -117,6 +117,12 @@ in that commit; its freshness gate prints the command.
 `check-doctrine-registration`, so a brevity finding there is unreachable. The three paragraph
 sections carry no bullets.
 
+**Found at align.** Root `README.md`'s kit table, the context-kit row, describes the gate in prose
+as running "over the densest always-loaded section" — singular, accurate only while the knob is a
+scalar. No gate reads that prose against the knob's arity, so delta 1 would leave it stale rather
+than wrong-and-caught. The same commit rewords it to "over its governed always-loaded sections."
+**Not yet applied.**
+
 ### (4) The eight red bullets are cut to budget, every dropped clause traced to its owner {design-bearing}
 
 Each replacement below is **Not yet applied**, holds at most four lines at the file's prevailing
@@ -333,6 +339,8 @@ cut).
 - `context-kit/gate-tests/check-brevity.test.sh` (deltas 1 and 2) — the cases above.
 - `context-kit/smoke/violation.sh` (delta 1) — reads the set's first element.
 - `context-kit/README.md` (delta 1) — its knob summary line.
+- Root `README.md` (delta 3, found at align) — the context-kit kit-table row's brevity clause,
+  singular to plural. **Not yet applied.**
 - `native/src/gates/brevity.rs` (deltas 1 and 2) — the set, the predicate, the finding line.
 - `native/src/gates/mod.rs` (delta 1) — the member's declared knob roster.
 - `scripts/context-config.sh` (delta 3).
@@ -366,6 +374,8 @@ still describes the gate truly. `docs/install.md` names only `CONTEXT_KIT_BREVIT
       names, re-read at build; the `OPS.local.md` relocation lands before the Local-only cut.
 - [ ] **No line joined to fit** — no rewritten bullet carries a line wider than that bullet's
       widest line before the cut.
+- [ ] **Root README.md kept current** — the context-kit kit-table row's brevity clause reads the
+      governed section set, not a single section (found at align).
 - [ ] **Commands byte-identical** — `git diff` over `CLAUDE.md` touches no backticked command.
 - [ ] **The ambient-diagnostic clause is present** in the `native/` bullet after both this unit and
       `doctrine-kit/SPEC-ambient-diagnostic.md` land.

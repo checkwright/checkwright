@@ -119,7 +119,10 @@ only its content. Whichever batch lands second verifies the clause survived the 
 the entry's other named home: it governs what a *dispatcher* re-verifies after a child's commit, and
 the channel misleads the session holding the editor, dispatched or not — a clause there would reach
 fewer of the sessions that met it and restate delta 1 in a second instruction surface.
-`.claude/settings.json`: unchanged, by the operator direction above.
+`.claude/settings.json`: unchanged, by the operator direction above. `native/src/gates/crate_arms.rs`'s
+own failure message, a second live surface stating the battery-plus-build-native obligation on a
+narrower trigger (a `check-crate-arms` red, not every crate-touching commit) — found at align and
+filed as a gap (`crate-arms-failure-message-omits-editor-diagnostic-clause`) rather than judged here.
 
 ## Retired spellings
 
