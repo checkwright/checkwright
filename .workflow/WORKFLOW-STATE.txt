@@ -8,3 +8,4 @@ resident-tier-restatement scope a27fb154 2026-09-13 97d707a0
 resident-tier-restatement spec ad630aa2 2026-09-13 fa335e3d
 resident-tier-restatement align a0a924a8 2026-09-13 6219b87d
 resident-tier-restatement build ac6227ca 2026-09-13 ce31e0d9
+resident-tier-restatement validate a59cdd15 2026-09-13 3289e5ec
