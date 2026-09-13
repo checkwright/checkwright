@@ -12,6 +12,252 @@
 
 ## New Features
 
+- **behavior-change-surface** [spec: SPEC-release-declarations.md]
+  — no accumulating declaration surface.
+  A tightened gate has one and a behavior change does not — and gate-sdk/SPEC.md §upgrade-smoke's
+  own rationale for the former covers the latter without modification: it grounds
+  `.workflow/tightened-gates.txt` on build being the only stage that knows what it tightened at
+  the moment it tightens it, so the declaration is *written from knowledge* rather than
+  reconstructed later. docs/install.md §The upgrade contract requires a Behavior changes section
+  in every release note and gives it no such surface, while that set is judgment-laden rather
+  than diff-derivable — so composing it at close means reconstructing an author's judgment from
+  commits.
+  **Deliverable:** the missing surface, carrying the three things `tightened-gates.txt` has and
+  this would need — a `# contract:` header, a drain protocol at the tag, and a freshness or
+  parity gate.
+  **Open design question the promoting scope answers first — deliberately unresolved here:**
+  whether this is a second `.workflow/` file or a widening of the existing one. A
+  behavior-change bullet carries a changed-surface name plus prose, while the existing surface
+  is specified as bare gate names and nothing else.
+  **Measured, which is why the cost is not hypothetical.** The "each batch records its own set"
+  convention was invented at batch 4 (`13f8091`) in response to this gap being filed at
+  `df6fd3d`. Batches 1 and 2 closed before it existed and recorded nothing — a case-insensitive
+  scan of every diff in the iteration finds the phrase only in those two later commits. So
+  `native-artifact-publish-path`, `native-artifact-install-path` and
+  `install-path-gnu-userland-undeclared` carry **no declaration, not a declared "none"**, and
+  close reconstructed their sets from commit bodies so the next note need not: *publish-path* —
+  the parity gate rides Tightened gates, leaving the descriptor and roster path as its behavior
+  set; *install-path* — `init`, `doctor` and the lock/digest resolvers changed, and `c5c19e6`
+  and `d13c1f6` are defect fixes whose own bodies say they "would have reached an adopter";
+  *gnu-userland* — documentation only, no shipped-code path.
+  **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
+  release note, against evidence that is coldest when the batch count is highest.
+  **A live instance, 2026-08-25 at build in commit `04f81ad8`, and it sharpens the open question
+  above.** `evidence-kit/bin/diff-baseline.sh` gained a refusal: each argument group is now
+  `<suite> <logfile> [<status>]`, and a suite on the exit-code parser named *without* a status is
+  refused at exit 2 rather than handed a hardcoded 0. A vendored consumer invoking the old pair form
+  against such a suite now gets an exit 2 where it used to get a verdict. Nothing owes a
+  declaration for it: `.workflow/tightened-gates.txt`'s own contract line takes *one bare
+  kit-shipped gate name* per data line, and `diff-baseline.sh` is a `bin` tool and not a registered
+  gate — so the surface cannot hold it even in principle. That is the reconstruction cost this entry
+  predicts, arriving in the half the open question is about: the tightening is real and the existing
+  surface's grammar, not just its scope, is what excludes it.
+  **SECOND INSTANCE 2026-09-06 at build, and it comes at the grammar from the OTHER side.** The
+  2026-08-25 witness was a surface that could not hold the *name*. Here it held the name and could
+  not hold the *remedy*: minting the `open-authorization-channel` binding slot reds
+  `check-skill-binding` in every vendoring consumer until that consumer binds it, so build appended
+  the bare name — correctly — and the one-line remedy a consumer needs had no route from build to
+  the composing session. Two witnesses, both landing on "name plus prose versus bare names", is the
+  open design question above asked twice rather than a second question.
+  **Leads unit set `carried-record-reliability` with `deferred-release-declaration-accumulation`**
+  — operator direction, 2026-09-13, lead-relayed; ahead of the claim-reliability pair.
+  recurrence: behavior-change-surface 2026-08-25 2026-09-06
+  **Authored at spec 2026-09-13:** one surface, `.workflow/release-declarations.md`, carries all
+  three note sections in the note's own grammar and retires the tightened-gates file
+  (SPEC-release-declarations.md). **Seam:** kit mechanism is the surface, the holder's token rules
+  and the build instruction; no new consumer config; no private rule content in reach.
+  Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
+
+- **deferred-release-declaration-accumulation** [spec: SPEC-release-declarations.md]
+  — only one of the note's three
+  sections survives a deferred release.
+  `.workflow/tightened-gates.txt` is the accumulating declaration surface for **Tightened
+  gates** and is drained only at the tag, so that section batches correctly across any number of
+  deferrals (RELEASING.md §The procedure step 1). **Behavior changes** and **Renamed knobs** have
+  no such surface: RELEASING.md step 2 says the outstanding criteria are carried into the next
+  qualifying note, and nothing carries them. A deferral therefore drops them unless a later
+  session reconstructs them from `git log`.
+  **Already live, three times, and the third is the closed case.** `installer-lifecycle-verbs`
+  deferred on behavior changes alone, its declaration surviving only in its disposition line's
+  basis clause; the 2026-08-08 close deferred again with five, carried verbatim below to the
+  grammar docs/install.md §The upgrade contract owns; and on 2026-08-09 this carrier hit
+  `check-queue-entry-budget`'s cap, so a third deferral's declarations could not land here at all
+  and rode the basis clause instead — the second alternative below, chosen by the cap, not design.
+  *`lifecycle-kit/bin/file-gap.sh`* — the slug matcher no longer writes a verdict onto the
+  bullet it files. Every filing gets one bullet shape; on a match the tool raises a stderr
+  advisory *asking* the filer to say in the prose whether the bullet re-files the named entry or
+  merely cites it. The recurrence judgment moved to close's gap-inbox drain, which reads every
+  bullet and stamps the `recurrence:` declaration in the same commit that truncates the inbox.
+  Reconcile if your close skill or tooling parsed the retired prefix form.
+  *`kpi-incident-recurrence`* (drift-kit) — the counted series is **not comparable across this
+  release**. Every `recurrence:` date before it was matcher-derived; every date after is a
+  session's judgment read off a bullet's prose. Compare within a segment, never across the
+  break. For this project the break is the release carrying `gap-resolver-mention-overcount`;
+  for a consumer it is that consumer's own adoption of it.
+  *`installer/lib/doctor.sh`* — `doctor` now walks only the consumer-audience subset of the
+  toolchain roster, so a machine with no Rust toolchain installs. Reconcile if you copied the
+  roster out or relied on `doctor` failing on a contributor-side tool.
+  *`context-kit/lib/toolfloor.sh`* — a roster element gained a fourth positional field,
+  `<name>[:<min-version>[:<impl-token>[:<audience>]]]`. The only declarable audience is
+  `contributor`; empty or omitted means every audience, so existing elements are unchanged.
+  Reconcile if you carry a local roster read by a consumer-side reader of your own.
+  *`.github/workflows/site-health.yml`* — a release-channel arm was added: it reads the
+  published Release list on the schedule and files a `site-health` issue naming every Release
+  whose prerelease flag disagrees with its own version line. Reconcile if you copied the
+  workflow out.
+  Renamed knobs: None.
+  **Why it needed design:** a second accumulating file is the obvious fix and is probably wrong
+  — three surfaces to drain at one tag, two of them free prose no gate can hold to the note the
+  way `check-tightened-gates-note-parity` holds the first. The honest alternatives: one surface
+  carrying all three sections, or the deferral line's basis as declared carrier with a gate on it.
+  **Cost while deferred — and the prediction has graduated from slow loss to hard stop.** Each
+  deferral loses its non-gate declarations to git history, so the next qualifying note
+  under-declares by however many iterations batched into it, which is the one section a consumer
+  reconciles by reading. At the third deferral the carrier was capped and took nothing at all,
+  so the evidence this entry needed is complete: the next scope ranks it on a closed case.
+  **Leads unit set `carried-record-reliability` with its pair `behavior-change-surface`** — operator
+  direction, 2026-09-13, lead-relayed; both ask where a deferral-surviving declaration accumulates.
+  **Authored at spec 2026-09-13:** the deferral line carries the level and no criteria; the release
+  declaration surface carries all three sections across deferrals, seeded once from every basis
+  clause since the newest tag and from the bullets above (SPEC-release-declarations.md).
+  Filed 2026-08-08 by close, from the release-note obligation its own drain could not discharge.
+
+- **survey-record-claim-reliability** [spec: SPEC-claim-standing.md] — the survey record carries
+  unwitnessed mechanism claims and was wrong three times in one iteration.
+  `.workflow/survey-record.md` exists so a later stage need not re-derive a survey,
+  and its findings are cited on that authority. This iteration it was wrong three
+  times: the scope block's cohort claim (corrected at spec by operator ruling),
+  its criterion-7 verdict (contested and re-framed), and the spec block's claim
+  that the generated pre-commit hook "never calls `gate_command`" — false at HEAD,
+  `gate-sdk/bin/gen-pre-commit.sh:54`. The third was corrected in place at this
+  close; the first two carry their corrections inline.
+  **What makes this a surface problem, not three line problems.** The record's own
+  contract is a `finding` free-text field a later session "judges before citing",
+  with no bar on the mechanism claims inside it. `check-survey-record` parses the
+  block's *shape* — key order, non-empty `corpus`/`oracle`, a real `rev` — and
+  asserts nothing about whether the finding was verified. So a confident wrong
+  claim is perfectly grammatical.
+  **Interaction with boundary truncation, which cuts both ways.** The record is
+  truncated at the next first-stage entry, so a wrong claim cannot rot for long —
+  which is the argument that this needs no fix. Against that: the whole *point* of
+  the record is to be cited within the iteration, and all three errors did their
+  damage well inside the truncation window.
+  **Deliverable, and why it needed design:** the honest options are a
+  witness-on-cite discipline (already gestured at by `enter-stage.sh`'s reminder,
+  but advisory), a `verified:`/`inferred:` split inside the finding field, or
+  accepting the surface as lossy and demoting how findings may be cited. The
+  middle option is the one `kfric-capture-unverified-assertion` is separately
+  weighing for the friction log, and the two should probably be decided together.
+  **Cost while deferred:** a wrong finding is cited with the record's authority by
+  the exact sessions it was written to save work for.
+  **FOURTH instance, 2026-09-08, and it moves the class off the `finding` field.** The scope
+  recurrence survey's `edges:` recorded `prompt-ranking-ungrantable-shape-class 1`; the real inbound
+  count is TWO, at that survey's own cited rev and at HEAD. So a *derived* field is wrong the same
+  way the free-text ones were — `--emit file-survey` takes `edges` as a hand-typed argument rather
+  than deriving it, which no candidate deliverable above addresses. The survey's headline finding is
+  unaffected (it reads `recurrence:` dates, not this figure). Judged a recurrence at close after
+  re-running the count; not corrected in the record, which the next first-stage entry truncates.
+  **FIFTH instance, 2026-09-11, and the wrong finding travelled into a direction.** The scope
+  survey called `bridged-knob-case-tmp-dir-override-inert`'s premise STALE: the shell harness was
+  gone and the native arm absolutizes the case scratch. Scope routed the entry to close to retire.
+  The close re-ran the entry's own reproduction and the residue regenerated, because the arm's pin
+  misses the knob form a bridged gate reads. The survey never ran the reproduction the entry names.
+  recurrence: survey-record-claim-reliability 2026-09-08 2026-09-11
+  **Joins unit set `carried-record-reliability` beside `kfric-capture-unverified-assertion`** —
+  operator direction, 2026-09-13, lead-relayed; decided together, after the release pair.
+  **Authored at spec 2026-09-13:** the record gains an `inferred:` field for claims no command
+  established and retires `edges:`; a citer carries inferred claims onward rather than citing them
+  (SPEC-claim-standing.md). **Seam:** kit mechanism only; no new config; no private rule content.
+  Filed 2026-08-10 by close, on operator direction after the third error.
+
+- **kfric-capture-unverified-assertion** [spec: SPEC-claim-standing.md]
+  — the knowledge-friction channel has
+  no oracle, so it captures whatever a session asserts and the next reader reads it as measured.
+  **The DRAIN-side axis is LANDED**, 2026-09-07, in `drift-kit/SPEC.md` §The knowledge-friction
+  loop and `templates/close-knowledge.md`: the drain re-verifies both limbs of a capture — the fact
+  and the ownership clause its surface field asserts — and records the outcome in the close commit.
+  **What returns here is the capture-side question alone, and it is unruled:** whether the
+  affordance should carry a measured-vs-estimated distinction at all. The whole value of
+  `--emit-kfric` is that stamping is cheaper than deferring, so a field that slows capture buys
+  accuracy with the capture rate the loop depends on. A convention may beat a flag — and
+  lifecycle-kit/SPEC.md §The committed gap inbox has **already refused both obvious shapes** for
+  the sibling channel, a filing-time prompt and a fact-versus-inference grammar, so a proposal
+  here argues against a recorded refusal or finds a third shape.
+  **Joins unit set `carried-record-reliability` beside `survey-record-claim-reliability`** —
+  operator direction, 2026-09-13, lead-relayed; ordered after the release-declaration pair.
+  recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
+  **Three attested instances, each falling on a different limb.** A build batch stamped the
+  consumer smoke's cost as "~50-60 minutes" and reasoned that the run serializes against all
+  tracked editing for that window; validate measured **227s** twice. The figure was disprovable
+  from evidence already in front of every reader — the reporting batch's own session runtime was
+  ~26 minutes — and was relayed onward unchecked, shaping two sessions' scheduling.
+  2026-08-28, a wrong MECHANISM rather than a wrong number: a kfric asserted that
+  `check-stage-entry` assertion C's component dir is one holding `LIFECYCLE_KIT_ROSTER_BASENAME`,
+  and close's remediation wrote that into lifecycle-kit/SPEC.md §check-stage-entry as a
+  definition. It is false against `native/src/gates/stage_entry.rs`, whose multi-file arm returns
+  on `amend_dirs.len() >= 2` with no roster test. Corrected in the same close — so the harm is
+  attested on a governed kit SPEC, not only on a scratch log.
+  2026-09-06, a wrong OWNERSHIP claim rather than a wrong fact: the fact held and the clause beside
+  it, "no gate-sdk/SPEC.md section states it", did not — that section having stated it since
+  `121e76cb`, two days earlier, landed by this same triage loop.
+  Distinct from `kfric-empty-log-ambiguity`, retired, which is about an *empty* log's two readings;
+  this is about a populated one whose entries carry no distinction between a measurement and an
+  estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
+  sweep *cites*; this covers what a session captures about its own work.
+  **Cost while deferred:** an unverified assertion in the log is still indistinguishable from a
+  measurement. The drain axis caught the channel by which a wrong number reaches a canonical
+  surface with a citation on it; it did not make the log itself readable, so every consumer of a
+  captured line before the drain still reads an estimate as a measurement.
+  **Authored at spec 2026-09-13:** capture takes no claim-status field; an estimate has no surface
+  it was read off, so it is outside the seam and the drain drops it (SPEC-claim-standing.md).
+  Filed 2026-08-09 by close, from its own knowledge-friction triage. Promoted 2026-09-07 by spec
+  on the drain axis alone — `lead, own-authority`, relayed in that iteration's dispatch — and
+  demoted at merge with that axis landed and this one untaken.
+
+- **survey-edges-reader-arrives-after-truncation** [spec: SPEC-claim-standing.md]
+  — the survey record's `edges` field names a reader that can never read it.
+  lifecycle-kit/SPEC.md §The survey record assigns `edges` to "the next boundary's ranking",
+  but that boundary is `--enter-stage scope`, whose built-in truncation runs at the scope
+  template's first step, before the ranking that reads the field. Measured 2026-09-12: the
+  stamp wiped the prior scope's ranking block, and that scope re-derived the same partition
+  before recovering it from git.
+  **Why it needed design:** the truncation's own ground holds (a carried survey describes a
+  tree the arriving iteration never had), so the choice is between a ranking block's `edges`
+  half surviving the boundary, since an inbound sum ages with the queue rather than the tree,
+  and correcting the SPEC's named reader.
+  **Cost while deferred:** every scope re-derives the inbound sums its predecessor bought.
+  **Rides unit set `carried-record-reliability` with the claim-reliability pair** — operator
+  direction, 2026-09-13, lead-relayed; re-attested at that scope's stamp.
+  **Authored at spec 2026-09-13:** neither option; the field retires and the inbound sum is
+  re-derived by the queue-edges arm at its reader (SPEC-claim-standing.md).
+  Filed 2026-09-12 by scope, from its ranking survey; drained and promoted 2026-09-13 at close.
+
+- **ruling-staleness-header-reads-as-undeclared** [spec: SPEC-condition-valve.md]
+  — the `--emit ruling-staleness` probe reports the ruling record's own framing header as an
+  UNDECLARED CONDITION, so every reader of that section meets a permanent false positive.
+  **Reproduced live at this scope's ritual, not carried on the filing.** The arm prints
+  `== undeclared conditions ==` with one row, `TRAJECTORY.md:3`, which is the file's own "This file
+  carries two things and shrinks toward empty" paragraph — prose declaring the record's contract,
+  not a ruling, so it correctly carries no `discharge:` declaration. The probe partitions the file
+  into paragraphs and demands a declaration of each, with no way to tell a governing header from a
+  governed paragraph.
+  **The consequence is not noise alone.** The section exists to surface a ruling somebody forgot to
+  declare; a row that is always present trains the reader to skip the section, which is exactly the
+  one finding it would ever carry.
+  **Why it needed design:** the probe skipping paragraphs above the first `##` heading is a
+  boundary condition inside one reader; the record declaring its header exempt — the way it already
+  declares its own close-surface row inline at `TRAJECTORY.md:12` — puts the fact on the governed
+  surface instead. Which is right decides whether the record's shape is the probe's business.
+  **Cost while deferred:** one boundary condition plus a fixture pair, unspent, against a section
+  read at every close and at every scope ritual.
+  **Premise corrected 2026-09-13 at spec:** the arm demands no declaration of every paragraph; the
+  header matches its forward-phrase list on `until that`. **Authored at spec 2026-09-13:** a
+  record-side `undeclared-condition-exempt` valve with a mandatory reason (SPEC-condition-valve.md).
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its ruling-record
+  read; drained here, and reproduced live at this scope's own ritual.
+  **Rides unit set `carried-record-reliability` — operator direction, 2026-09-13, lead-relayed**;
+  reproduced again at that scope's ritual.
+
 ## Technical Debt
 
 ## Deferred
@@ -1567,57 +1813,6 @@
   the exemption set rather than merely costing a reflow.
   Filed 2026-08-03 at close from the gap inbox; found by build batch 4.
 
-- **behavior-change-surface** [design-pending] [cost: event/high] [surface: gate-sdk] — no accumulating declaration surface.
-  A tightened gate has one and a behavior change does not — and gate-sdk/SPEC.md §upgrade-smoke's
-  own rationale for the former covers the latter without modification: it grounds
-  `.workflow/tightened-gates.txt` on build being the only stage that knows what it tightened at
-  the moment it tightens it, so the declaration is *written from knowledge* rather than
-  reconstructed later. docs/install.md §The upgrade contract requires a Behavior changes section
-  in every release note and gives it no such surface, while that set is judgment-laden rather
-  than diff-derivable — so composing it at close means reconstructing an author's judgment from
-  commits.
-  **Deliverable:** the missing surface, carrying the three things `tightened-gates.txt` has and
-  this would need — a `# contract:` header, a drain protocol at the tag, and a freshness or
-  parity gate.
-  **Open design question the promoting scope answers first — deliberately unresolved here:**
-  whether this is a second `.workflow/` file or a widening of the existing one. A
-  behavior-change bullet carries a changed-surface name plus prose, while the existing surface
-  is specified as bare gate names and nothing else.
-  **Measured, which is why the cost is not hypothetical.** The "each batch records its own set"
-  convention was invented at batch 4 (`13f8091`) in response to this gap being filed at
-  `df6fd3d`. Batches 1 and 2 closed before it existed and recorded nothing — a case-insensitive
-  scan of every diff in the iteration finds the phrase only in those two later commits. So
-  `native-artifact-publish-path`, `native-artifact-install-path` and
-  `install-path-gnu-userland-undeclared` carry **no declaration, not a declared "none"**, and
-  close reconstructed their sets from commit bodies so the next note need not: *publish-path* —
-  the parity gate rides Tightened gates, leaving the descriptor and roster path as its behavior
-  set; *install-path* — `init`, `doctor` and the lock/digest resolvers changed, and `c5c19e6`
-  and `d13c1f6` are defect fixes whose own bodies say they "would have reached an adopter";
-  *gnu-userland* — documentation only, no shipped-code path.
-  **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
-  release note, against evidence that is coldest when the batch count is highest.
-  **A live instance, 2026-08-25 at build in commit `04f81ad8`, and it sharpens the open question
-  above.** `evidence-kit/bin/diff-baseline.sh` gained a refusal: each argument group is now
-  `<suite> <logfile> [<status>]`, and a suite on the exit-code parser named *without* a status is
-  refused at exit 2 rather than handed a hardcoded 0. A vendored consumer invoking the old pair form
-  against such a suite now gets an exit 2 where it used to get a verdict. Nothing owes a
-  declaration for it: `.workflow/tightened-gates.txt`'s own contract line takes *one bare
-  kit-shipped gate name* per data line, and `diff-baseline.sh` is a `bin` tool and not a registered
-  gate — so the surface cannot hold it even in principle. That is the reconstruction cost this entry
-  predicts, arriving in the half the open question is about: the tightening is real and the existing
-  surface's grammar, not just its scope, is what excludes it.
-  **SECOND INSTANCE 2026-09-06 at build, and it comes at the grammar from the OTHER side.** The
-  2026-08-25 witness was a surface that could not hold the *name*. Here it held the name and could
-  not hold the *remedy*: minting the `open-authorization-channel` binding slot reds
-  `check-skill-binding` in every vendoring consumer until that consumer binds it, so build appended
-  the bare name — correctly — and the one-line remedy a consumer needs had no route from build to
-  the composing session. Two witnesses, both landing on "name plus prose versus bare names", is the
-  open design question above asked twice rather than a second question.
-  **Leads unit set `carried-record-reliability` with `deferred-release-declaration-accumulation`**
-  — operator direction, 2026-09-13, lead-relayed; ahead of the claim-reliability pair.
-  recurrence: behavior-change-surface 2026-08-25 2026-09-06
-  Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
-
 - **session-model-identity-verification** [design-pending] [cost: event/high] [surface: delegation-kit] — a session cannot report or
   verify the model tier it is running at.
   The session-context hook prints iteration, budget and drift; `drift-report` prints neither.
@@ -1752,56 +1947,6 @@
   escalated as an envelope call and folded in here on the lead's ruling the same day.
 
 
-- **deferred-release-declaration-accumulation** [design-pending] [cost: iteration/high] [surface: RELEASING.md] — only one of the note's three
-  sections survives a deferred release.
-  `.workflow/tightened-gates.txt` is the accumulating declaration surface for **Tightened
-  gates** and is drained only at the tag, so that section batches correctly across any number of
-  deferrals (RELEASING.md §The procedure step 1). **Behavior changes** and **Renamed knobs** have
-  no such surface: RELEASING.md step 2 says the outstanding criteria are carried into the next
-  qualifying note, and nothing carries them. A deferral therefore drops them unless a later
-  session reconstructs them from `git log`.
-  **Already live, three times, and the third is the closed case.** `installer-lifecycle-verbs`
-  deferred on behavior changes alone, its declaration surviving only in its disposition line's
-  basis clause; the 2026-08-08 close deferred again with five, carried verbatim below to the
-  grammar docs/install.md §The upgrade contract owns; and on 2026-08-09 this carrier hit
-  `check-queue-entry-budget`'s cap, so a third deferral's declarations could not land here at all
-  and rode the basis clause instead — the second alternative below, chosen by the cap, not design.
-  *`lifecycle-kit/bin/file-gap.sh`* — the slug matcher no longer writes a verdict onto the
-  bullet it files. Every filing gets one bullet shape; on a match the tool raises a stderr
-  advisory *asking* the filer to say in the prose whether the bullet re-files the named entry or
-  merely cites it. The recurrence judgment moved to close's gap-inbox drain, which reads every
-  bullet and stamps the `recurrence:` declaration in the same commit that truncates the inbox.
-  Reconcile if your close skill or tooling parsed the retired prefix form.
-  *`kpi-incident-recurrence`* (drift-kit) — the counted series is **not comparable across this
-  release**. Every `recurrence:` date before it was matcher-derived; every date after is a
-  session's judgment read off a bullet's prose. Compare within a segment, never across the
-  break. For this project the break is the release carrying `gap-resolver-mention-overcount`;
-  for a consumer it is that consumer's own adoption of it.
-  *`installer/lib/doctor.sh`* — `doctor` now walks only the consumer-audience subset of the
-  toolchain roster, so a machine with no Rust toolchain installs. Reconcile if you copied the
-  roster out or relied on `doctor` failing on a contributor-side tool.
-  *`context-kit/lib/toolfloor.sh`* — a roster element gained a fourth positional field,
-  `<name>[:<min-version>[:<impl-token>[:<audience>]]]`. The only declarable audience is
-  `contributor`; empty or omitted means every audience, so existing elements are unchanged.
-  Reconcile if you carry a local roster read by a consumer-side reader of your own.
-  *`.github/workflows/site-health.yml`* — a release-channel arm was added: it reads the
-  published Release list on the schedule and files a `site-health` issue naming every Release
-  whose prerelease flag disagrees with its own version line. Reconcile if you copied the
-  workflow out.
-  Renamed knobs: None.
-  **Why `[design-pending]`:** a second accumulating file is the obvious fix and is probably wrong
-  — three surfaces to drain at one tag, two of them free prose no gate can hold to the note the
-  way `check-tightened-gates-note-parity` holds the first. The honest alternatives: one surface
-  carrying all three sections, or the deferral line's basis as declared carrier with a gate on it.
-  **Cost while deferred — and the prediction has graduated from slow loss to hard stop.** Each
-  deferral loses its non-gate declarations to git history, so the next qualifying note
-  under-declares by however many iterations batched into it, which is the one section a consumer
-  reconciles by reading. At the third deferral the carrier was capped and took nothing at all,
-  so the evidence this entry needed is complete: the next scope ranks it on a closed case.
-  **Leads unit set `carried-record-reliability` with its pair `behavior-change-surface`** — operator
-  direction, 2026-09-13, lead-relayed; both ask where a deferral-surviving declaration accumulates.
-  Filed 2026-08-08 by close, from the release-note obligation its own drain could not discharge.
-
 - **audit-class-corpus-attestation** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — an un-gateable-class audit stamps a
   **verdict**, not the corpus it read, so a false negative is indistinguishable from a clean tree.
   `.workflow/audit-roster.txt` rows carry `due:` and `last:` and nothing else, so the close that
@@ -1924,93 +2069,6 @@
   worse than none — and it is the first command a cautious adopter runs, which is the same
   first-contact surface the profile work is being bought to improve.
   Filed 2026-08-09 by close, draining the build stage's bullet.
-
-- **kfric-capture-unverified-assertion** [design-pending] [cost: iteration/high] [surface: drift-kit] — the knowledge-friction channel has
-  no oracle, so it captures whatever a session asserts and the next reader reads it as measured.
-  **The DRAIN-side axis is LANDED**, 2026-09-07, in `drift-kit/SPEC.md` §The knowledge-friction
-  loop and `templates/close-knowledge.md`: the drain re-verifies both limbs of a capture — the fact
-  and the ownership clause its surface field asserts — and records the outcome in the close commit.
-  **What returns here is the capture-side question alone, and it is unruled:** whether the
-  affordance should carry a measured-vs-estimated distinction at all. The whole value of
-  `--emit-kfric` is that stamping is cheaper than deferring, so a field that slows capture buys
-  accuracy with the capture rate the loop depends on. A convention may beat a flag — and
-  lifecycle-kit/SPEC.md §The committed gap inbox has **already refused both obvious shapes** for
-  the sibling channel, a filing-time prompt and a fact-versus-inference grammar, so a proposal
-  here argues against a recorded refusal or finds a third shape.
-  **Joins unit set `carried-record-reliability` beside `survey-record-claim-reliability`** —
-  operator direction, 2026-09-13, lead-relayed; ordered after the release-declaration pair.
-  recurrence: kfric-capture-unverified-assertion 2026-08-28 2026-09-06
-  **Three attested instances, each falling on a different limb.** A build batch stamped the
-  consumer smoke's cost as "~50-60 minutes" and reasoned that the run serializes against all
-  tracked editing for that window; validate measured **227s** twice. The figure was disprovable
-  from evidence already in front of every reader — the reporting batch's own session runtime was
-  ~26 minutes — and was relayed onward unchecked, shaping two sessions' scheduling.
-  2026-08-28, a wrong MECHANISM rather than a wrong number: a kfric asserted that
-  `check-stage-entry` assertion C's component dir is one holding `LIFECYCLE_KIT_ROSTER_BASENAME`,
-  and close's remediation wrote that into lifecycle-kit/SPEC.md §check-stage-entry as a
-  definition. It is false against `native/src/gates/stage_entry.rs`, whose multi-file arm returns
-  on `amend_dirs.len() >= 2` with no roster test. Corrected in the same close — so the harm is
-  attested on a governed kit SPEC, not only on a scratch log.
-  2026-09-06, a wrong OWNERSHIP claim rather than a wrong fact: the fact held and the clause beside
-  it, "no gate-sdk/SPEC.md section states it", did not — that section having stated it since
-  `121e76cb`, two days earlier, landed by this same triage loop.
-  Distinct from `kfric-empty-log-ambiguity`, retired, which is about an *empty* log's two readings;
-  this is about a populated one whose entries carry no distinction between a measurement and an
-  estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
-  sweep *cites*; this covers what a session captures about its own work.
-  **Cost while deferred:** an unverified assertion in the log is still indistinguishable from a
-  measurement. The drain axis caught the channel by which a wrong number reaches a canonical
-  surface with a citation on it; it did not make the log itself readable, so every consumer of a
-  captured line before the drain still reads an estimate as a measurement.
-  Filed 2026-08-09 by close, from its own knowledge-friction triage. Promoted 2026-09-07 by spec
-  on the drain axis alone — `lead, own-authority`, relayed in that iteration's dispatch — and
-  demoted at merge with that axis landed and this one untaken.
-
-
-- **survey-record-claim-reliability** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — the survey record carries
-  unwitnessed mechanism claims and was wrong three times in one iteration.
-  `.workflow/survey-record.md` exists so a later stage need not re-derive a survey,
-  and its findings are cited on that authority. This iteration it was wrong three
-  times: the scope block's cohort claim (corrected at spec by operator ruling),
-  its criterion-7 verdict (contested and re-framed), and the spec block's claim
-  that the generated pre-commit hook "never calls `gate_command`" — false at HEAD,
-  `gate-sdk/bin/gen-pre-commit.sh:54`. The third was corrected in place at this
-  close; the first two carry their corrections inline.
-  **What makes this a surface problem, not three line problems.** The record's own
-  contract is a `finding` free-text field a later session "judges before citing",
-  with no bar on the mechanism claims inside it. `check-survey-record` parses the
-  block's *shape* — key order, non-empty `corpus`/`oracle`, a real `rev` — and
-  asserts nothing about whether the finding was verified. So a confident wrong
-  claim is perfectly grammatical.
-  **Interaction with boundary truncation, which cuts both ways.** The record is
-  truncated at the next first-stage entry, so a wrong claim cannot rot for long —
-  which is the argument that this needs no fix. Against that: the whole *point* of
-  the record is to be cited within the iteration, and all three errors did their
-  damage well inside the truncation window.
-  **Deliverable, and why `[design-pending]`:** the honest options are a
-  witness-on-cite discipline (already gestured at by `enter-stage.sh`'s reminder,
-  but advisory), a `verified:`/`inferred:` split inside the finding field, or
-  accepting the surface as lossy and demoting how findings may be cited. The
-  middle option is the one `kfric-capture-unverified-assertion` is separately
-  weighing for the friction log, and the two should probably be decided together.
-  **Cost while deferred:** a wrong finding is cited with the record's authority by
-  the exact sessions it was written to save work for.
-  **FOURTH instance, 2026-09-08, and it moves the class off the `finding` field.** The scope
-  recurrence survey's `edges:` recorded `prompt-ranking-ungrantable-shape-class 1`; the real inbound
-  count is TWO, at that survey's own cited rev and at HEAD. So a *derived* field is wrong the same
-  way the free-text ones were — `--emit file-survey` takes `edges` as a hand-typed argument rather
-  than deriving it, which no candidate deliverable above addresses. The survey's headline finding is
-  unaffected (it reads `recurrence:` dates, not this figure). Judged a recurrence at close after
-  re-running the count; not corrected in the record, which the next first-stage entry truncates.
-  **FIFTH instance, 2026-09-11, and the wrong finding travelled into a direction.** The scope
-  survey called `bridged-knob-case-tmp-dir-override-inert`'s premise STALE: the shell harness was
-  gone and the native arm absolutizes the case scratch. Scope routed the entry to close to retire.
-  The close re-ran the entry's own reproduction and the residue regenerated, because the arm's pin
-  misses the knob form a bridged gate reads. The survey never ran the reproduction the entry names.
-  recurrence: survey-record-claim-reliability 2026-09-08 2026-09-11
-  **Joins unit set `carried-record-reliability` beside `kfric-capture-unverified-assertion`** —
-  operator direction, 2026-09-13, lead-relayed; decided together, after the release pair.
-  Filed 2026-08-10 by close, on operator direction after the third error.
 
 - **kit-ref-liveness-stem-token-hole** [design-pending] [cost: event/high] [surface: canon-kit] — a typo'd knob name under
   a defined stem resolves and passes unchecked.
@@ -4904,29 +4962,6 @@
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its audit-roster
   review; drained and promoted at this iteration's scope.
 
-- **ruling-staleness-header-reads-as-undeclared** [design-pending] [cost: session/low] [surface: lifecycle-kit]
-  — the `--emit ruling-staleness` probe reports the ruling record's own framing header as an
-  UNDECLARED CONDITION, so every reader of that section meets a permanent false positive.
-  **Reproduced live at this scope's ritual, not carried on the filing.** The arm prints
-  `== undeclared conditions ==` with one row, `TRAJECTORY.md:3`, which is the file's own "This file
-  carries two things and shrinks toward empty" paragraph — prose declaring the record's contract,
-  not a ruling, so it correctly carries no `discharge:` declaration. The probe partitions the file
-  into paragraphs and demands a declaration of each, with no way to tell a governing header from a
-  governed paragraph.
-  **The consequence is not noise alone.** The section exists to surface a ruling somebody forgot to
-  declare; a row that is always present trains the reader to skip the section, which is exactly the
-  one finding it would ever carry.
-  **Why `[design-pending]`:** the probe skipping paragraphs above the first `##` heading is a
-  boundary condition inside one reader; the record declaring its header exempt — the way it already
-  declares its own close-surface row inline at `TRAJECTORY.md:12` — puts the fact on the governed
-  surface instead. Which is right decides whether the record's shape is the probe's business.
-  **Cost while deferred:** one boundary condition plus a fixture pair, unspent, against a section
-  read at every close and at every scope ritual.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its ruling-record
-  read; drained here, and reproduced live at this scope's own ritual.
-  **Rides unit set `carried-record-reliability` — operator direction, 2026-09-13, lead-relayed**;
-  reproduced again at that scope's ritual.
-
 - **append-and-wrapper-shapes-unsteered** [design-pending] [cost: session/low] [surface: guard-kit]
   — two prompt-friction shapes rank at the top with no guard steering and no allowlist entry that
   could ever match them, because both are composition rather than a command.
@@ -5046,22 +5081,6 @@
   session, with a probed remedy on record and unranked.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its
   release-transport read; drained and promoted at this iteration's scope.
-
-- **survey-edges-reader-arrives-after-truncation** [design-pending] [cost: iteration/low] [surface: lifecycle-kit]
-  — the survey record's `edges` field names a reader that can never read it.
-  lifecycle-kit/SPEC.md §The survey record assigns `edges` to "the next boundary's ranking",
-  but that boundary is `--enter-stage scope`, whose built-in truncation runs at the scope
-  template's first step, before the ranking that reads the field. Measured 2026-09-12: the
-  stamp wiped the prior scope's ranking block, and that scope re-derived the same partition
-  before recovering it from git.
-  **Why `[design-pending]`:** the truncation's own ground holds (a carried survey describes a
-  tree the arriving iteration never had), so the choice is between a ranking block's `edges`
-  half surviving the boundary, since an inbound sum ages with the queue rather than the tree,
-  and correcting the SPEC's named reader.
-  **Cost while deferred:** every scope re-derives the inbound sums its predecessor bought.
-  **Rides unit set `carried-record-reliability` with the claim-reliability pair** — operator
-  direction, 2026-09-13, lead-relayed; re-attested at that scope's stamp.
-  Filed 2026-09-12 by scope, from its ranking survey; drained and promoted 2026-09-13 at close.
 
 - **survey-locator-review-catches-after-loss** [design-pending] [cost: event/low] [surface: lifecycle-kit]
   — the provenance-never-locator rule for survey-record citations is held by review, and the
