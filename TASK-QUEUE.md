@@ -2183,7 +2183,7 @@
   in the gates dir that `lib/gate.sh` auto-sources for layout knobs — from `_gate_knob_value`'s
   search path. The gap is one missing source, not a missing owner.
   **Visible today as an asymmetry rather than a red.** `native/src/gates/release_bump.rs` and
-  `native/src/gates/tightened_gates_note_parity.rs` each hardcode a workflow-dir const while
+  `native/src/gates/release_declaration_parity.rs` each hardcode a workflow-dir const while
   `native/src/emit/upgrade_smoke.rs` resolves the same file through `GATE_SDK_WORKFLOW_DIR`, a
   knob it declares. The tenth cohort's three members declare no knobs, so nothing fails yet.
   **DISTINCT from `consumer-gate-port-disposition`, landed, which it cites rather than re-files.**
@@ -2393,7 +2393,10 @@
   Filed 2026-08-17 into the gap inbox by the `post-close-intake-and-index-port` close, from its
   capability-pendency audit; promoted 2026-08-17 at scope, the disposition landing one iteration
   after the finding.
-  recurrence: stale-identifier-after-retirement 2026-09-09
+  **Recurred 2026-09-13, judged at the `carried-record-reliability` close:** that iteration
+  replaced `.workflow/tightened-gates.txt` and its parity gate module with a renamed holder, and
+  two live deferred entries kept naming the deleted paths; build saw them and left them.
+  recurrence: stale-identifier-after-retirement 2026-09-09 2026-09-13
 
 - **threshold-recurrence-routing-residency** [design-pending] [cost: once/low] [surface: lifecycle-kit] — where the threshold-recurrence
   routing clause lives, now that its only carrier has left the live tree.
@@ -3599,8 +3602,9 @@
   `3763bc3e` added an account-identification pattern to `gate-sdk/templates/msg-patterns.list`,
   the config template the installer's `init` seeds into a consumer's gates dir. **The gate code
   did not change** — that commit's `native/src/gates/commit_msg.rs` diff is entirely inside
-  `mod tests`, so the whole tightening is data. `.workflow/tightened-gates.txt` carries neither
-  `check-commit-msg` nor `check-tree-terms`.
+  `mod tests`, so the whole tightening is data. `.workflow/release-declarations.md` carries
+  neither `check-commit-msg` nor `check-tree-terms`: its seed from past deferrals took Tightened
+  gates from the old bare-name surface only, which never held them.
   **CALL 1 IS RULED — BOTH SECTIONS, ALWAYS. Operator ruling 2026-08-26**, relayed through the
   iteration lead at this scope's escalation. A tightening that ships as kit template data
   declares in **both** `Tightened gates` **and** `Behavior changes`. The ground is the adopter
@@ -3623,10 +3627,11 @@
   **OPEN CALL — who may declare a late-discovered tightening. Left open 2026-08-26 by lead ruling**
   for a later spec stage: it is a hole inside the existing envelope, and filling a hole in an owner
   doc is spec's work rather than the operator's. gate-sdk/SPEC.md §upgrade-smoke
-  names the build stage the producer, on the ground that build alone "knows what it tightened at
-  the moment it tightens it". A tightening found after that stage closed therefore has **no
-  declared producer at all**, and every stage that could append is out of contract.
-  **Cost while deferred:** nothing can red for it. `check-tightened-gates-note-parity` compares
+  names the session that lands the change the producer, on the ground that it is "the only one
+  that knows what it changed at the moment it changes it". A tightening found after its landing
+  session ended therefore has **no declared producer at all**, and every later session that could
+  append is out of contract.
+  **Cost while deferred:** nothing can red for it. `check-release-declaration-parity` compares
   the note against the declaration surface, never against the tree, so an omission passes now and
   passes again at composition. It surfaces as an adopter meeting a red the release note never
   named — the defect docs/install.md assigns to the release rather than to the adopter's work.
@@ -5078,7 +5083,6 @@
 - **survey-record-supersede-invisible** [design-pending] — Superseded survey blocks look live.
 - **probe-before-assertion-doctrine** [design-pending] — Rule shipped; mechanizing it is open.
 - **consumer-smoke-accounting-spelling-unpinned** [design-pending] — Dual-spelling count unpinned.
-- **build-stage-tightened-gates-write-pair** [design-pending] — Template names one of two writes.
 - **release-runbook-identity-diagnosis** [design-pending] — Account check is prose, not a step.
 - **dispatch-cited-evidence-unverified** [design-pending] — A sweep's quotations go unverified.
 - **queue-provenance-restates-git-history** [design-pending] — Provenance prose restates git log.
@@ -5219,5 +5223,6 @@
 - kfric-capture-unverified-assertion
 - survey-edges-reader-arrives-after-truncation
 - ruling-staleness-header-reads-as-undeclared
+- build-stage-tightened-gates-write-pair
 
 ## Lessons Learned

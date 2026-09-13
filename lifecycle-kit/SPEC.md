@@ -1008,13 +1008,12 @@ a supervising lead, the obligation is restated at the surface that session reads
 stamps, queue writes and evidence files, and a literal reader takes the omission
 of commits for a prohibition.
 
-**Taking that port did not discharge this section, and the residue is written
-rather than implied.** Three implementations carry this section's contract and
-only one of them is in-crate. The capture affordance above is compiled.
-`--enter-stage` still holds the **iteration-boundary gap-inbox check** and
-its close-skipped/post-close discriminator (§bin/enter-stage.sh), and it ports in
-a cut of its own. `lib/stages.sh` still holds this surface's union-merge
-membership (§Multi-operator semantics), and it is **permanently shell** under the
+**The ports did not discharge this section, and the residue is written rather
+than implied.** Three implementations carry this section's contract and two are
+in-crate: the capture affordance above, and `--enter-stage`'s
+**iteration-boundary gap-inbox check** with its close-skipped/post-close
+discriminator (§bin/enter-stage.sh). `lib/stages.sh` still holds this surface's
+union-merge membership (§Multi-operator semantics), and it is **permanently shell** under the
 kit-library class ruling as the config bridge's sole `LIFECYCLE_KIT_*` resolver
 (gate-sdk/SPEC.md §The kit-library port disposition) — so this section's contract
 will not be wholly in-crate while that ruling stands. Its already-ported twin
@@ -1283,12 +1282,9 @@ the filing window do not coincide.
 The discriminator is the cursor read `lifecycle_closing_stage_reached`
 (§lib/stages.sh), the same predicate the `--emit-file-gap` arm warns from at
 capture, so a filer told "none is left to drain it" is told so by the same test
-that later admits the bullet. **That agreement now holds inside each substrate
-and not across them**: the boundary check here is shell and the capture warning
-is compiled, so until this tool ports the two are lookalikes rather than one
-hoisted predicate. **This check and its discriminator are §The committed gap
-inbox's surviving shell half**, stated here so a later cut selector meets the
-fact where it works rather than in the other section. **Two edges take the post-close
+that later admits the bullet. **Both sides are compiled, and the agreement is
+two compositions rather than one hoisted predicate**: each arm composes it from
+the crate's `stages::current_stage` read and the last configured stage. **Two edges take the post-close
 disposition**, both following precedents the script already carries: a closing
 iteration that was never named (the `—` placeholder) has no close to have
 skipped — the guard `LIFECYCLE_KIT_BOUNDARY_REQUIRE` applies one block down for
@@ -1716,33 +1712,22 @@ shape contract is a census find rather than a firing: it carries
 flag, and while it writes nothing, its help behavior was the same misleading
 error — the half of that finding the port discharges outright.
 
-**Four shell files implement this section and a port cut has taken two of
-them**, so the section is not discharged and that is written here rather than
-left to be inferred. The two that moved are the affordances above, each of which
-declared this section in its own `# spec:` header. The two that did not are
-reachable by no stated-contract cut selecting on this section, because each
-declares a different one: `--enter-stage` carries this section's **read
-trigger** — the entry report that prints the record's headings and never its
-findings — together with the boundary truncation below, and declares
-§bin/enter-stage.sh, so it ports in a different cut; `lib/stages.sh` carries
-`LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS`, the surface list the no-retrieval-pointer
-rule above reads, and is header-declared `no-port` as the config
-bridge's sole resolver for the `LIFECYCLE_KIT_*` knobs (gate-sdk/SPEC.md §The
-kit-library port disposition). That last is structural rather than a sizing
+**Four shell files implemented this section and three have ported**, so the
+section is not discharged and that is written here rather than left to be
+inferred. The affordances above ported in a cut selecting on this section, each
+declaring it in its own `# spec:` header; `--enter-stage`, which carries this
+section's **read trigger** — the entry report that prints the record's headings
+and never its findings — together with the boundary truncation below, declares
+§bin/enter-stage.sh and ported in that section's own cut. `lib/stages.sh`
+carries `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS`, the surface list the
+no-retrieval-pointer rule above reads, and is header-declared `no-port` as the
+config bridge's sole resolver for the `LIFECYCLE_KIT_*` knobs (gate-sdk/SPEC.md
+§The kit-library port disposition). That is structural rather than a sizing
 judgment, so **this section's contract will not be wholly in-crate while that
 class ruling stands.** The general shape outlives the cut: a stated-contract cut
 ports the files that *declare* a section, not every file that *implements* it,
 and the two sets come apart wherever a shared entry point or a config library
 carries one clause of another section's contract.
-
-**What a consumer with no binary for its host loses is the two affordances and
-not the surface**, which is the whole of the port's residual here. The raw append
-is already ruled the sanctioned fallback, `check-survey-record` is already
-compiled and stays the assertion, and the read trigger and the boundary
-truncation live in `--enter-stage`, which the paragraph above shows stays
-shell. So such a consumer still files surveys by hand, still has them asserted,
-still has them printed at every stage entry and still has them truncated at the
-boundary; what it goes without is one convenience and one witness hint.
 
 The citation arm deliberately does **not** rewrite the citing surface. The author
 chooses where
@@ -2105,8 +2090,8 @@ return non-zero on a routine non-match, run as a bare command, aborts every
 `set -e` caller that sources this file. The attested cost of getting it wrong was
 a consumer with a pattern configured being unable to re-emit its own derived
 surfaces, silently and at exit 1 — that caller was `bin/install-lifecycle.sh`,
-which has since ported, and no surviving shell sourcer in this tree
-(`--enter-stage`) runs under `set -e`. The contract binds
+which has since ported, as has `--enter-stage`, and no surviving shell sourcer in
+this tree (the config bridge, the parity harness) runs under `set -e`. The contract binds
 the next one that does, which is why it is stated as a property of the loader
 rather than as a note about one caller.
 Exercised in `smoke/` with a pattern actually set, the empty default never
@@ -2538,11 +2523,7 @@ never their findings, since printing a possibly-stale judgment ahead of its
 witness is the failure the witness exists to prevent. It rides the tool every
 stage already invokes as its first step, so it adds no invocation point and no
 schedule, and it lands at the one moment a stage session is guaranteed to be
-looking. **This trigger and the truncation above are the survey record's
-surviving shell half**: the two capture affordances having ported onto the
-binary, this file declares §bin/enter-stage.sh rather than that section
-and so ports in a different cut, and a later cut selector meets that fact here,
-where it works, rather than only in the other section (§The survey record).
+looking.
 
 The boundary entry also **refuses when any linked worktree still stands** (exit
 1, each path printed, nothing written — the same refusal contract as the two
