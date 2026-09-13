@@ -12,60 +12,6 @@
 
 ## New Features
 
-- **editor-diagnostic-unruled** [spec: SPEC-ambient-diagnostic.md] — the harness LSP channel
-  contradicts the tree's own oracles on crate-touching commits, and no surface rules that channel
-  out as an oracle.
-  **Re-tiered out of the icebox 2026-09-01 by close's gap drain, on a dated recurrence.** It was
-  born in the icebox at `9845f2c3` this same iteration, on the stated basis that the channel had
-  "contradicted the tree's own oracle TWICE ... one candidate shape is to do nothing, which is what
-  makes this dormant". Two further instances have since fired, so the eviction's premise is spent
-  and §The icebox tier's own round trip applies. **The ground is ELIGIBILITY, not grammar** — the
-  stronger reading, added by the lead sustaining the move: queue-kit/SPEC.md:220-224 requires an
-  iceboxed entry to have no live promotion trigger and names "a dated `recurrence:` line" as one, so
-  stamping the judged recurrence makes the entry ineligible for the tier by its own eligibility
-  rule. The move out is FORCED, which is exactly why the drain is not promoting anything. The
-  grammatical reading — assertion (B) barring a body line from a one-line entry — is a second,
-  weaker fence around the same conclusion. Not a reversal of the evicting session's judgment.
-  **The four instances, all 2026-09-01.** (1) and (2) are the icebox basis. (3) At `64cce1d9` the
-  channel reported nine rustc errors — E0603 private-import on `emit/mod.rs`'s `targets`,
-  `corpus`, `relative` and `read_text` from `md_index.rs` and `pub_index.rs`, and E0277 missing
-  `Debug` on `pub_index::Extractor` — plus dead_code on `walk.rs`'s new `Links` variant and
-  `find_link_entries_with_prune`. (4) At `65e22a28`, the same shape. Both times the lead ran the
-  oracles rather than reasoning about them: `run-gates.sh` read 108/108 including
-  `check-crate-arms`, and `build-native.sh` compiled the release profile clean.
-  **What the frequency adds.** Instances 3 and 4 are the first two crate-module-adding commits of
-  a new iteration, so the divergence is a standing property of such a commit rather than an
-  incident. The exposure is the direction of trust: a session taking the editor channel as ground
-  would "repair" correct code to silence a stale index, inverting oracle-first at a channel that
-  rule does not name.
-  **Cost while deferred:** low but no longer dormant — it blocks no stage entry and no push, and
-  the whole cost lands on a session that trusts the wrong channel, which is unbounded when that
-  happens and zero when it does not.
-  **Why it needed design:** the candidate shapes are unchanged and one of them is to do nothing
-  — name the channel in the oracle-first rule as a non-oracle, or leave it to session judgment —
-  so picking one is a doctrine call rather than a defect repair.
-  **FOUR FURTHER INSTANCES, 2026-09-12, and TWO OF THEM ARE STRUCTURALLY IMPOSSIBLE rather than
-  merely stale** — which is new information, not a fifth repetition: across one iteration the
-  channel reported compile errors and dead code in `native/` on four separate occasions and
-  `bash gate-sdk/bin/build-native.sh` compiled clean in about thirteen seconds every time; one
-  report named a symbol that does not exist anywhere in the tree, another called a function missing
-  that is defined and read within the same module. A stale index explains a lag; it does not
-  manufacture a symbol. **The candidate surfaces named with them:** the agent-execution protocol's
-  verify-after-commit set, or CLAUDE.md's `native/` paragraph beside its
-  "neither discharges the other" rule — both narrower than the doctrine call above.
-  recurrence: editor-diagnostic-unruled 2026-09-01 2026-09-12
-  **Taken at threshold into unit set `resident-tier-restatement` — operator direction, 2026-09-13,
-  lead-relayed** — both named candidate homes are that set's surfaces.
-  **Disposition — operator direction, 2026-09-13, lead-relayed:** option A — rule 8 names an
-  ambient diagnostic as a non-oracle and the `native/` bullet says it discharges neither; plugin and
-  settings untouched (disabling the channel was not chosen). Config probe: a user-scope LSP plugin;
-  tracker probe: anthropics/claude-code#85225, open, already reported (SPEC-ambient-diagnostic.md).
-  **Lead decision, same day:** the phantom-symbol reports are a filed gap, their cause unverified.
-  Filed 2026-09-01 at scope's boundary drain and born in the icebox; re-tiered the same day by
-  close on instances 3 and 4, which postdate the eviction. Both fell on one calendar day, so the
-  single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
-  is escalated rather than closed by this session.
-
 ## Technical Debt
 
 ## Deferred
@@ -5436,5 +5382,6 @@
 
 - always-loaded-bullets-restate-owned-spec
 - doctrine-rule-body-length-unruled
+- editor-diagnostic-unruled
 
 ## Lessons Learned

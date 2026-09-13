@@ -155,7 +155,11 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    emulating it, and treat a red run — including a red commit attempt, where the
    generated hook runs exactly the coupled subset — as the designed feedback
    channel, not an incident. Gate source is opened to fix the gate or write its
-   fixtures, never to predict its verdict. The battery is an oracle but not the
+   fixtures, never to predict its verdict. Nor is a diagnostic the session did
+   not run an oracle: an editor or language-server report the harness surfaces
+   unasked answers to no pinned toolchain and no snapshot the session controls,
+   so one contradicting the oracle is settled by re-running the oracle, never by
+   editing code the oracle passed. The battery is an oracle but not the
    only one: a change whose real output is a deployed or generated artifact — a
    rendered site, a compiled binary, a published package — is *tree-correct*
    when the battery is green but not yet *artifact-correct*, so it names the
@@ -169,11 +173,13 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    honest only when deployment-faithful — toolchain version- and plugin-matched
    to the pinned deployment; a newer local toolchain invents failures the
    deployment never shows and masks real ones it would, making it a second wrong
-   oracle rather than a check.
+   oracle rather than a check. An ambient report is the cheapest wrong oracle to
+   trust, because it arrives in context unrequested and in a compiler's voice.
    *Enforced by:* the gate output contract in
    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — the `clean` and `help:` lines are
    written to be that interface — and the targeted-run resolver reachable through
-   the generated hook.
+   the generated hook. Whether a session acted on an ambient report leaves no
+   residue in the tree, so that clause is judgment.
    *Digest:* run the gate, never emulate it; a red run is the feedback channel.
 
 9. **Spec-over-precedent.** A gate-enforced doc is ground truth: read the
