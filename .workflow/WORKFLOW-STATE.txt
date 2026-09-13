@@ -4,11 +4,4 @@
 
 ---
 
-carried-record-reliability scope ab7ccbd7 2026-09-13 117f60d5
-carried-record-reliability spec a962195f 2026-09-13 fc601c2a
-carried-record-reliability align a5bd18b8 2026-09-13 0b1b1035
-carried-record-reliability build a4bf1bd9 2026-09-13 b0714d5d
-carried-record-reliability build a2ada106 2026-09-13 cf10f313
-carried-record-reliability build acc8b542 2026-09-13 c7407112
-carried-record-reliability validate abbce4d1 2026-09-13 4ead9811
-carried-record-reliability close af2c199d 2026-09-13 13a9ca6b
+— scope a264b32e 2026-09-13 4b8f29fa
