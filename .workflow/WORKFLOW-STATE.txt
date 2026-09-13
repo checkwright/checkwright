@@ -6,3 +6,4 @@
 
 carried-record-reliability scope ab7ccbd7 2026-09-13 117f60d5
 carried-record-reliability spec a962195f 2026-09-13 fc601c2a
+carried-record-reliability align a5bd18b8 2026-09-13 0b1b1035
