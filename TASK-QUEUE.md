@@ -97,6 +97,8 @@
   (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
   **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
   every native-Windows adopter carries a bash floor the install docs attribute to git alone.
+  **Leads unit set `static-config-seam`** — operator direction, 2026-09-13, lead-relayed; it builds
+  after that set's citation-liveness pair, and the figures above are re-measured at spec.
   Filed 2026-09-12 by consult, an operator-directed direct entry.
 
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
@@ -792,10 +794,9 @@
   run. It may not: resolution is **member-independent**, verified by reading the resolver rather
   than the SPEC — `gate-sdk/lib/gate.sh`'s `_gate_knob_emit` takes the gate name as a parameter and
   uses it at exactly one site, a refusal message, so no resolver reads the requesting member.
-  Batch 1 then built on that property. The tag nevertheless STAYS: canon-kit/SPEC.md §The amendment
-  lifecycle makes `[design-pending]` a section-membership invariant ("every entry in the set carries
-  the tag"), so it comes off at promotion and not on a closed question — probed, not assumed,
-  since removing it reds `check-amendment-queue` outright.
+  Batch 1 built on that property. The tag STAYS: canon-kit/SPEC.md §The amendment lifecycle makes
+  `[design-pending]` a section-membership invariant, so it comes off at promotion, not on a closed
+  question — probed: removing it reds `check-amendment-queue` outright.
   **Its third candidate shape is BUILT** — "resolve each kit's declared-knob set once per run
   rather than once per knob" is what `gate_knob_env_set` and `_gate_knob_kit_emit` now do, one
   subshell per owning kit. The other two shapes are untaken and stay open.
@@ -828,7 +829,8 @@
   a regression claim and not to be re-quoted without re-running it — and the cost scales with the
   number of owning kits rather than of members, so a new kit raises the floor for everyone while a
   new member no longer does. A nested bridge, as `check-prose-enum` now has, pays it twice.
-  **`config-seam-static-format` retires the bridge this entry's cost is measured on** (2026-09-13).
+  **Joins unit set `static-config-seam` beside `config-seam-static-format`, which retires the bridge
+  this entry's cost is measured on** — operator direction, 2026-09-13, lead-relayed.
   Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;
   re-scoped here after the batch landed, with every retired figure deleted.
   recurrence: config-bridge-resolution-cost 2026-09-03
@@ -2396,6 +2398,8 @@
   **Recurred 2026-09-13, judged at the `carried-record-reliability` close:** that iteration
   replaced `.workflow/tightened-gates.txt` and its parity gate module with a renamed holder, and
   two live deferred entries kept naming the deleted paths; build saw them and left them.
+  **Rides unit set `static-config-seam` with `cited-script-path-liveness-inline`, built first** —
+  operator direction, 2026-09-13, lead-relayed; the seam cut's own path retirements are its reach.
   recurrence: stale-identifier-after-retirement 2026-09-09 2026-09-13
 
 - **threshold-recurrence-routing-residency** [design-pending] [cost: once/low] [surface: lifecycle-kit] — where the threshold-recurrence
@@ -2589,6 +2593,8 @@
   which gate holds it. Two of the family's 37 inbound edges land here.
   **Cost while deferred:** measured, recurring, and it lands exactly when the tree is most
   trusted — a green 104/104 battery over prose that names files the same commit deleted.
+  **Rides unit set `static-config-seam` with `stale-identifier-after-retirement`, built first** —
+  operator direction, 2026-09-13, lead-relayed.
   Surfaced 2026-08-18. Filed by close 2026-08-18, discharging the gap generalization owed by
   the staleness the `capability-liveness-after-descope` audit turned up in this same commit.
 
@@ -4900,6 +4906,8 @@
   stage or lead session ranks it.
   **Cost while deferred:** a consumer config assigning a pinned knob silently redirects
   fixture scratch into its own tree.
+  **Stays Deferred and unranked at `static-config-seam`'s scope** — operator direction, 2026-09-13,
+  lead-relayed; it is disposed at landing if `config-seam-static-format` dissolves it.
   Filed 2026-09-12 by build, beside a SPEC re-grounding; promoted unranked 2026-09-13 at close.
 
 - **scan-prompts-grant-test-redirect-blind** [design-pending] [cost: event/low] [surface: guard-kit]
