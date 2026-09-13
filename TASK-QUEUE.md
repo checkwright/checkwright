@@ -12,6 +12,73 @@
 
 ## New Features
 
+- **always-loaded-bullets-restate-owned-spec** [spec: SPEC-brevity-reach.md]
+  — the always-loaded surface carries four bullets whose bodies restate what the kit SPEC they
+  point at already owns.
+  **Measured at a close brevity pass, ranked by lines.** (1) The TRAJECTORY.md bullet, 9 lines
+  defining the ruling/direction/decision/grant vocabulary and the consult-only rule before pointing
+  at lifecycle-kit/SPEC.md §The steering vocabulary, which owns those definitions. (2) The `native/`
+  bullet, 8 lines on crate structure, the commit-time obligation and the not-a-kit predicate before
+  pointing at gate-sdk/SPEC.md §Porting a gate to the binary substrate. (3) The three capture
+  bullets at roughly 21 lines together, where the invocable commands MUST stay resident — they are
+  the invocation surface an agent needs every session — but the surrounding policy prose duplicates
+  the kit sections each bullet already cites. (4) The `.tmp`/`.metric`/`.workflow` bullet at 6
+  lines, mostly definitional.
+  **WHY A CLOSE COULD NOT TAKE IT, which is why it is filed rather than done.** The resident tier is
+  what every session of every stage reads, so a cut dropping a load-bearing clause is discovered as
+  a behaviour change in some later session with no gate between, and the surface sits at its
+  committed ceiling so the change cannot be validated by the ratchet moving. A close also has no
+  mandate to rewrite what sessions are instructed with.
+  **The pass paid for its own addition in-iteration:** two lines cut from the opening paragraph
+  funded a one-line `couples=` pointer, so the meter read 202l and +0 unchanged.
+  **Why it needed design:** what a resident bullet owes beyond its pointer is unruled, and the
+  answer is a rule about the always-loaded tier rather than four edits.
+  **Premise corrected 2026-09-13 at scope:** doctrine-kit/DOCTRINE.md rule 5 already rules one line
+  per rule with the mechanism behind the pointer; what is unruled is ENFORCEMENT REACH, since
+  `check-brevity` governs one designated section and only bold-name bullets, leaving Housekeeping
+  outside. A fifth multi-line restating bullet, the permission-settings one, landed 2026-09-13.
+  **Leads unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed**,
+  with `doctrine-rule-body-length-unruled` and `editor-diagnostic-unruled`.
+  **Authored at spec 2026-09-13:** the gate governs a section SET and every top-level bullet;
+  this repo adds Housekeeping, and the eight bullets that then red are cut with each dropped
+  clause traced to its owner (SPEC-brevity-reach.md).
+  **Seam ruled 2026-09-13 at scope.** Kit mechanism: the brevity gate's reach, should `/spec` widen
+  it past one section. Consumer config: which sections are governed, and their budgets, stay in
+  `scripts/context-config.sh`; no section name enters a kit literal. No private rule content is in
+  reach. Spelling, shape and the per-bullet cuts are `/spec`'s.
+  **Cost while deferred:** four restatements on the highest-blast-radius surface in the tree, each
+  re-read by every session of every stage.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its always-loaded
+  brevity pass; drained and promoted at this iteration's scope.
+
+- **doctrine-rule-body-length-unruled** [spec: SPEC-rule-body.md]
+  — two doctrine rule bodies are the longest in the deliverable and neither is narration, a count,
+  nor a seam violation, so a brevity pass finds them and can do nothing with them.
+  **Measured:** rule 11 Scope-gated intake at roughly 20 lines, of which the hotfix-valve paragraph
+  is three nested bounded-three-ways clauses each qualified further; and rule 2 Enforcement-first at
+  roughly 27 lines. The doctrine is load-triggered rather than resident, but every Engineering-craft
+  rule pays at each `--emit stage-rules` read and every methodology rule pays through its digest, so
+  length is a real cost here and not a neutral one.
+  **WHY A CLOSE DID NOT CUT THEM.** Each clause in rule 11 narrows a valve deciding whether work may
+  start mid-iteration, so compressing it changes what a session believes it is permitted to do — a
+  judgment wanting the rule's intent in view rather than a length target, and the close brevity
+  pass's licence is compression, not re-ruling. The same close DID cut this file where the class was
+  unambiguous: two attested-session-narration blocks out of rule 12, which the generalizable rule
+  already carried without them.
+  **Why it needed design:** the disposition is a rule about what a doctrine body owes its digest —
+  a rule whose digest is complete and whose body is three times its length is the readable signal —
+  or an explicit acceptance of the length as the price of a valve that must not be misread, said
+  once. Either way it is a ruling on the deliverable, not an edit.
+  **Joins unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed.**
+  Compressing rule 11's hotfix valve may not widen or narrow what a session may start: that is
+  operator-class, never wording.
+  **Authored at spec 2026-09-13:** a body is ruled by clause class, length ungraded; rule 2
+  loses three restating clauses and rule 11 audits clean, its valve untouched (SPEC-rule-body.md).
+  **Cost while deferred:** two editorial reads unspent, against a surface every stage reads through
+  its digest.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on the
+  doctrine half of the same brevity pass; drained and promoted at this scope.
+
 ## Technical Debt
 
 ## Deferred
@@ -5013,68 +5080,6 @@
   start-to-finish read of one list item reaches it.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its gate-manifest
   pointer sweep; drained and promoted at this iteration's scope.
-
-- **always-loaded-bullets-restate-owned-spec** [design-pending] [cost: session/high] [surface: context-kit]
-  — the always-loaded surface carries four bullets whose bodies restate what the kit SPEC they
-  point at already owns.
-  **Measured at a close brevity pass, ranked by lines.** (1) The TRAJECTORY.md bullet, 9 lines
-  defining the ruling/direction/decision/grant vocabulary and the consult-only rule before pointing
-  at lifecycle-kit/SPEC.md §The steering vocabulary, which owns those definitions. (2) The `native/`
-  bullet, 8 lines on crate structure, the commit-time obligation and the not-a-kit predicate before
-  pointing at gate-sdk/SPEC.md §Porting a gate to the binary substrate. (3) The three capture
-  bullets at roughly 21 lines together, where the invocable commands MUST stay resident — they are
-  the invocation surface an agent needs every session — but the surrounding policy prose duplicates
-  the kit sections each bullet already cites. (4) The `.tmp`/`.metric`/`.workflow` bullet at 6
-  lines, mostly definitional.
-  **WHY A CLOSE COULD NOT TAKE IT, which is why it is filed rather than done.** The resident tier is
-  what every session of every stage reads, so a cut dropping a load-bearing clause is discovered as
-  a behaviour change in some later session with no gate between, and the surface sits at its
-  committed ceiling so the change cannot be validated by the ratchet moving. A close also has no
-  mandate to rewrite what sessions are instructed with.
-  **The pass paid for its own addition in-iteration:** two lines cut from the opening paragraph
-  funded a one-line `couples=` pointer, so the meter read 202l and +0 unchanged.
-  **Why `[design-pending]`:** what a resident bullet owes beyond its pointer is unruled, and the
-  answer is a rule about the always-loaded tier rather than four edits.
-  **Premise corrected 2026-09-13 at scope:** doctrine-kit/DOCTRINE.md rule 5 already rules one line
-  per rule with the mechanism behind the pointer; what is unruled is ENFORCEMENT REACH, since
-  `check-brevity` governs one designated section and only bold-name bullets, leaving Housekeeping
-  outside. A fifth multi-line restating bullet, the permission-settings one, landed 2026-09-13.
-  **Leads unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed**,
-  with `doctrine-rule-body-length-unruled` and `editor-diagnostic-unruled`; `/spec` authors.
-  **Seam ruled 2026-09-13 at scope.** Kit mechanism: the brevity gate's reach, should `/spec` widen
-  it past one section. Consumer config: which sections are governed, and their budgets, stay in
-  `scripts/context-config.sh`; no section name enters a kit literal. No private rule content is in
-  reach. Spelling, shape and the per-bullet cuts are `/spec`'s.
-  **Cost while deferred:** four restatements on the highest-blast-radius surface in the tree, each
-  re-read by every session of every stage.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its always-loaded
-  brevity pass; drained and promoted at this iteration's scope.
-
-- **doctrine-rule-body-length-unruled** [design-pending] [cost: session/low] [surface: doctrine-kit]
-  — two doctrine rule bodies are the longest in the deliverable and neither is narration, a count,
-  nor a seam violation, so a brevity pass finds them and can do nothing with them.
-  **Measured:** rule 11 Scope-gated intake at roughly 20 lines, of which the hotfix-valve paragraph
-  is three nested bounded-three-ways clauses each qualified further; and rule 2 Enforcement-first at
-  roughly 27 lines. The doctrine is load-triggered rather than resident, but every Engineering-craft
-  rule pays at each `--emit stage-rules` read and every methodology rule pays through its digest, so
-  length is a real cost here and not a neutral one.
-  **WHY A CLOSE DID NOT CUT THEM.** Each clause in rule 11 narrows a valve deciding whether work may
-  start mid-iteration, so compressing it changes what a session believes it is permitted to do — a
-  judgment wanting the rule's intent in view rather than a length target, and the close brevity
-  pass's licence is compression, not re-ruling. The same close DID cut this file where the class was
-  unambiguous: two attested-session-narration blocks out of rule 12, which the generalizable rule
-  already carried without them.
-  **Why `[design-pending]`:** the disposition is a rule about what a doctrine body owes its digest —
-  a rule whose digest is complete and whose body is three times its length is the readable signal —
-  or an explicit acceptance of the length as the price of a valve that must not be misread, said
-  once. Either way it is a ruling on the deliverable, not an edit.
-  **Joins unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed.**
-  Compressing rule 11's hotfix valve may not widen or narrow what a session may start: that is
-  operator-class, never wording.
-  **Cost while deferred:** two editorial reads unspent, against a surface every stage reads through
-  its digest.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on the
-  doctrine half of the same brevity pass; drained and promoted at this scope.
 
 - **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
