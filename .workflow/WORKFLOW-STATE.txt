@@ -4,10 +4,4 @@
 
 ---
 
-static-config-seam scope a264b32e 2026-09-13 4b8f29fa
-static-config-seam spec a5201ba7 2026-09-13 c5377e4d
-static-config-seam align af31f42e 2026-09-13 a14eced6
-static-config-seam build a88351c5 2026-09-13 2dff8a98
-static-config-seam build a34136af 2026-09-13 0428477e
-static-config-seam validate a75636a3 2026-09-14 6c59165a
-static-config-seam close abf3dfd0 2026-09-14 1281a53f
+— scope a42ba4e2 2026-09-14 d57c4fec
