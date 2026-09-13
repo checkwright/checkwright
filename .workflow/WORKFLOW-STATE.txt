@@ -5,3 +5,4 @@
 ---
 
 static-config-seam scope a264b32e 2026-09-13 4b8f29fa
+static-config-seam spec a5201ba7 2026-09-13 c5377e4d
