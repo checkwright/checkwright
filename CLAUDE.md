@@ -166,7 +166,7 @@ load behind that trigger, so they are not resident here.
   direct entry, staged and committed in one motion under the shared-index rule above.
 - **Survey capture (any stage session):** read the survey record and run its witness
   before buying a survey; land one a later stage will want before acting on it, with
-  `bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"`
+  `bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"`
   (lifecycle-kit/SPEC.md §The survey record).
 - No per-user memory files: durable guidance goes in tracked manifests (this file,
   kit SPECs) or `BRIEF.local.md`. Harness auto-memory is enforced off; doctrine:

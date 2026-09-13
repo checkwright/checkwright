@@ -10,17 +10,17 @@ tooling-friction triage (guard-kit's close-triage pattern).
    instruction (that converts one re-derivation into a permanent per-session
    tax, exactly what context-kit's brevity machinery rejects).
    **Re-verify first — a captured line is the filer's claim, not an established
-   fact.** Capture is deliberately frictionless, so nothing upstream checked
-   either of the line's two claims: the **fact** re-derived, and the **surface**
-   beside it, which claims the fact has no owner or that its owner is not what
-   the session read. Per entry, name the claim the remediation turns on, name
-   the command that establishes it, run that command, and pick the shape below
-   from what it returned — the fact false drops the entry with the correction
-   recorded (and a false fact already on a governed surface files to your gap
-   channel), the fact true with a false ownership clause takes the second shape
-   and never the first, and a claim no cheap command settles is remediated *as a
-   claim*, said openly. Record in the close commit that clears the log which
-   entries were re-verified and what fell.
+   fact.** Nothing upstream checked either of the line's two claims: the **fact**
+   re-derived, and the **surface** beside it, which claims the fact has no owner
+   or that its owner is not what the session read. Per entry, name the claim the
+   remediation turns on, name the command that establishes it, run that command,
+   and pick the shape below from what it returned — the fact false, or an
+   estimate whose surface names nothing it was read off, drops the entry with the
+   claim and any correction or measurement recorded (one already on a governed
+   surface files to your gap channel), the fact true with a false ownership
+   clause takes the second shape and never the first, and a claim no cheap
+   command settles is remediated *as a claim*, said openly. Record in the close
+   commit that clears the log which entries were re-verified and what fell.
    drift-kit/SPEC.md §The knowledge-friction loop rules why this check sits at
    the drain and not at capture time. Two shapes:
    - **Give the fact a home** under your tier contract (canon-kit's star

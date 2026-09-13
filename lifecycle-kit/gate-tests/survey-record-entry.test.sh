@@ -46,15 +46,15 @@ EOF
 - corpus: checks/
 - oracle: bash run-gates.sh
 - rev: 0123456789abcdef0123456789abcdef01234567
-- edges: check-gate-substrate-parity 4
 - finding: FINDING-BODY-MUST-NOT-BE-PRINTED
+- inferred: none
 
 ## 2026-06-02 build — which specs cite the retired knob?
 - corpus: */SPEC.md
 - oracle: none
 - rev: 89abcdef0123456789abcdef0123456789abcdef
-- edges: none
 - finding: SECOND-FINDING-BODY
+- inferred: none
 EOF
 }
 

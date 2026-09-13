@@ -44,7 +44,7 @@ write_record() {  # $1=dir  $2=rev
     write_token_record "$1" "$2" "checks/"
 }
 
-write_token_record() {  # $1=dir  $2=rev  $3=corpus value  [$4=valve line]  [$5=edges value]
+write_token_record() {  # $1=dir  $2=rev  $3=corpus value  [$4=valve line]  [$5=inferred value]
     mkdir -p "$1/.workflow"
     cat >"$1/.workflow/survey-record.md" <<EOF
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys.
@@ -53,8 +53,8 @@ write_token_record() {  # $1=dir  $2=rev  $3=corpus value  [$4=valve line]  [$5=
 ${4-}- corpus: $3
 - oracle: bash run-gates.sh
 - rev: $2
-- edges: ${5-none}
 - finding: four of them.
+- inferred: ${5-none}
 EOF
 }
 
@@ -106,12 +106,12 @@ write_token_record "$valve" "$valve_sha" "checks/ as of deadbeef1" \
 '
 check_case "valve-exempts" "$valve" 0 "clean (1 block(s)"
 
-# the widened arm reads `edges` too: a sum whose caveat pastes a sha is a citation like any other,
-# and it is covered by the arm that exists rather than by a second one
-edge_tok="$SANDBOX/edges-token"; mkdir -p "$edge_tok"
-edge_sha="$(seed_repo "$edge_tok")"
-write_token_record "$edge_tok" "$edge_sha" "checks/" "" "port-blockers 4 as of deadbeef1"
-check_case "edges-token-unknown" "$edge_tok" 1 "token names no object in this repository: deadbeef1"
+# the widened arm reads `inferred` too: an inferred claim that pastes a sha is a citation like any
+# other, and it is covered by the arm that exists rather than by a second one
+inf_tok="$SANDBOX/inferred-token"; mkdir -p "$inf_tok"
+inf_sha="$(seed_repo "$inf_tok")"
+write_token_record "$inf_tok" "$inf_sha" "checks/" "" "the cohort landed at deadbeef1"
+check_case "inferred-token-unknown" "$inf_tok" 1 "token names no object in this repository: deadbeef1"
 
 # a valve with no reason is a finding AND does not exempt: a malformed valve must not buy the
 # skip it failed to justify
@@ -127,5 +127,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-survey-record.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-survey-record.test.sh: clean (rev-exists + rev-unknown probe arms, the widened non-rev token arm resolvable and not and over the edges field, the valve and a reasonless valve that does not exempt, absent-record and header-only inert shapes, 10 cases)"
+echo "check-survey-record.test.sh: clean (rev-exists + rev-unknown probe arms, the widened non-rev token arm resolvable and not and over the inferred field, the valve and a reasonless valve that does not exempt, absent-record and header-only inert shapes, 10 cases)"
 exit 0

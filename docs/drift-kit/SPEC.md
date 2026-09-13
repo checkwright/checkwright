@@ -436,6 +436,16 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    to the gap inbox; what kfric captures is the narrower *fact re-derived* — the
    specific value or structure reconstructed from the prior artifact because no
    doc owns it.
+   **The `<surface>` field is the measured-versus-estimated distinction, so
+   capture needs no other.** A kfric line records a fact *read off* a surface.
+   Such a fact was observed by construction, and whether the observation holds
+   is the drain's fact limb. A figure or mechanism that no surface printed — an
+   estimate, a cost reasoned from a manifest, a behaviour inferred from a name —
+   has no surface it was read off. It is not knowledge friction and is not
+   captured here. A flag or a grammar would buy the same distinction with the
+   capture rate this loop depends on, which is the ground lifecycle-kit/SPEC.md
+   §The committed gap inbox refuses its own capture-time shapes on, and both of
+   that refusal's premises hold for this channel.
 2. **Triage (close)** — `templates/close-knowledge.md`, spliced into the
    consumer's close skill (the close-triage/close-brevity pattern): walk the
    log and, per entry, **re-verify before remediating** — name the claim the
@@ -456,6 +466,12 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    not the surface I read it off* — which the sibling channel's bullets have no
    analogue for and its rule therefore never names. Both limbs are checked, and
    the remediation is keyed on which one fell:
+   - **The surface field names nothing the fact could have been read off** —
+     the line is an estimate or an inference, outside this loop's seam. Drop it,
+     and record in the close commit what it claimed and, where the drain
+     measured it, what the measurement said. If it already reached a governed
+     surface, that is work-shaped and routes to the committed gap channel, as a
+     false fact does.
    - **Both hold** — a **doc-owner edit**: give the fact a home under the
      consumer's tier contract (canon-kit's star topology: one owner per fact).
    - **The fact is false** — no doc-owner edit. The entry is dropped with the

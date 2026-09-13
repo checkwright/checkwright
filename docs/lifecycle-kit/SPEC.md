@@ -1254,7 +1254,10 @@ exists to keep cheap, and both bill it to the party least able to pay — the
 mid-stage filer whose finding otherwise stays in session context. That is the
 deferred-capture antipattern the channel was built against, and it is not traded
 away to fix a different failure mode. The affordance gains no prompt and no
-grammar; §check-gap-inbox-neutrality keeps the bullet's fields at two.
+grammar; §check-gap-inbox-neutrality keeps the bullet's fields at two. The
+refusal is this channel's and reaches no surface where capture is not cheap or no
+drain re-verifies. The survey record is such a surface, and it takes the split
+(§The survey record).
 
 **Merge semantics.** The inbox carries `merge=union` (git-native, so no per-clone
 driver registration), not the keep-ours `merge=iteration-scoped` the
@@ -1513,48 +1516,54 @@ prose header, then one block per survey:
 - corpus: <git pathspec the survey covered>
 - oracle: <the command whose verdict grounds it, or the literal `none`>
 - rev: <full commit sha the survey was taken at>
-- edges: <the inbound-citation sum per candidate this survey ranked, or the literal `none`>
-- finding: <the judgment, in prose>
+- finding: <the judgment over what this survey's commands established, in prose>
+- inferred: <each claim the survey reasoned to without running a command, or the literal `none`>
 ```
 
 Five fields, and each earns its place by being read at a named transition —
-`corpus` and `rev` by the diff, `oracle` by the re-run, `edges` by the next
-boundary's ranking, `finding` by the consuming session. The heading is the
+`corpus` and `rev` by the diff, `oracle` by the re-run, `finding` by the
+consuming session under the witness, and `inferred` by the consuming session
+**before** its work turns on any claim listed there. The heading is the
 discovery key and it states the *question*, because a later stage searches by
 the question it is about to ask, not by the corpus it has not yet chosen.
+
+**`inferred` is where a claim goes that nothing ran.** A claim belongs in
+`finding` only when a command the survey ran established it — the oracle or any
+other — and in `inferred` otherwise: a mechanism read off prose, a count
+reasoned to rather than printed, a premise judged from its description. A
+verdict on a premise whose owning surface names its own reproduction is
+established only by running that reproduction. Every block carries the field,
+with the literal `none` legal and an empty value refused, on the convention
+`oracle:` set. The obligation is what does the work. A block missing the field
+reds. An author who writes `none` has written a checkable statement. So what
+stays uncaught is an author who believed an unrun claim verified, and that class
+is strictly smaller than the one uncaught without the field. The same argument
+justifies the retired-spelling block (canon-kit/SPEC.md §The amendment
+lifecycle).
+
+**Why this record takes the split §The committed gap inbox refuses.** That
+refusal rests on capture being cheap for a mid-stage filer and on a drain
+re-verifying every bullet. Neither holds here. A survey is bought by a session
+holding the oracle's output, and nothing drains the record: its readers are
+licensed to cite instead of re-deriving. The refusal's grounds do not reach this
+surface, so its conclusion does not either.
 
 **`corpus` is spliced verbatim into the composed witness, so it is a pathspec
 and nothing else.** Scoping prose belongs in `finding`. Prose in this field does
 not error: `git diff` accepts the words as pathspecs matching nothing and exits
 clean, so the witness certifies a corpus it never read.
 
-**`edges` sits fourth, between the witness and the judgment, and the position is
-not arbitrary.** `corpus`, `oracle` and `rev` are the *witness* — the three
-strings the two-command re-use protocol consumes — and they stay contiguous.
-`edges` and `finding` are the *judgment half*: an input to a ranking and the
-ranking's reading. Appending `edges` after `finding` would put the field a
-reader wants at a glance behind the longest line in the block.
-
-**`edges` is obliged on every block, with the literal `none` legal — the second
-reader of `oracle:`'s convention rather than a new one.** A field present only
-on ranking blocks reintroduces exactly the "absent, or taken and dropped?"
-ambiguity this field exists to remove, and the grammar is rigidly positional
-precisely so that question never has to be asked. A field obliging every block
-to write `edges: n/a — not a ranking survey` closes the ambiguity by making
-every non-ranking block carry a *declaration*, which is the ceremony this
-surface refuses. `edges: none` is one word, asserts nothing about a pass having
-run, and is true of every survey that ranked no candidates; an *empty* value is
-the silent form and is refused, exactly as `oracle`'s is. When the value is not
-`none` it carries one inbound-citation sum per candidate the survey ranked, in
-the spelling scope already writes — `<slug> <n>`, comma-separated, with any
-caveat the sum needs. Free prose, deliberately: what makes the field usable is
-that it is *addressable*, not that it is parseable.
-
-The sum itself is bought at scope (queue-kit/SPEC.md §The queue-edges arm) and
-was, before this field, recorded only inside `finding:` if at all — present but
-unaddressable, so the next boundary could not tell "no sum was taken" from "the
-sum is in there somewhere" and re-bought an aggregation the last boundary had
-already paid for. The field is what makes it readable instead of re-buyable.
+**No field carries a ranking's inbound sums, and that is a derivation rule, not
+an omission.** The sum is an oracle's output (queue-kit/SPEC.md §The queue-edges
+arm), printed deterministically in about a second, so the Derivation-first rule
+says it is re-derived and never transcribed. A transcribed sum was also
+unreadable where it was meant to be read. Its reader was the next boundary's
+ranking, and that boundary's own truncation empties this record before the
+ranking runs. The queue moves at close's drain and at scope's intake anyway, so
+a carried sum would be stale at its only reader. A ranking survey therefore
+names the queue-edges command in `oracle:`, where the witness re-runs it, and its
+`finding` cites the figures it ranked on without the record promising them to a
+later boundary.
 
 **No field for "how long this stays true."** Deliberately absent: an author
 cannot know it, and a field carrying a guess would be read as a warrant.
@@ -1568,8 +1577,8 @@ census read as precise, is an attested failure of exactly this surface. Its
 class — *an identifier you did not read is not a citation* — is owned by
 delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
 So a word-bounded run of 7-40 lowercase hex
-carrying at least one `a`-`f`, in **any** of `corpus`, `oracle`, `edges` or
-`finding`, must name a real object in this repository. A block that carries such a token on
+carrying at least one `a`-`f`, in **any** of `corpus`, `oracle`, `finding` or
+`inferred`, must name a real object in this repository. A block that carries such a token on
 purpose — an illustrative sha in an `oracle:` command, a fixture literal — takes
 a valve line inside the block:
 
@@ -1600,11 +1609,13 @@ witness:
 
 **The witness is five strings, and that is what makes a finding portable.** It is
 not a property of the record file: the protocol's whole input is `corpus`,
-`oracle`, `rev`, `edges` and `finding`, each a short string, and both commands
+`oracle`, `rev`, `finding` and `inferred`, each a short string, and both commands
 run from HEAD. Copied onto another surface the witness is *more* durable than it
 is here, because the copy is not truncated.
 
-Both hold → **cite the record; do not re-buy the survey.** Either moved →
+Both hold → **cite the record; do not re-buy the survey** — cite its `finding`.
+A claim in its `inferred` field is not carried by the witness: re-establish it
+before your work turns on it, or carry it onward as inferred. Either moved →
 **dispatch only the delta**, the dispatch prompt naming the record block and the
 diff, so the child re-surveys what changed rather than the corpus. The
 asymmetry is what makes this safe to ship: a false *stale* costs one
@@ -1628,7 +1639,7 @@ every block on any commit* — too coarse to leave the mechanism any use; the
 `corpus` pathspec exists precisely to make invalidation proportionate.
 
 **The affordance.** `bash gate-sdk/bin/run-gates.sh --emit file-survey [--]
-"<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"` appends one block,
+"<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"` appends one block,
 seeding the contract header when the record does not yet exist. It is a bridged
 non-gate arm (gate-sdk/SPEC.md §The non-gate arm) declaring two reads,
 `LIFECYCLE_KIT_SURVEY_RECORD_FILE` and `LIFECYCLE_KIT_STATE_FILE`; the family is
@@ -1650,11 +1661,6 @@ a positional beginning with `-` that is not preceded by `--` is a refusal at exi
 2, on every slot, and `--` still ends option processing. Usage, by contrast,
 belongs to the substrate and lives in the front-end's own help, so
 `--emit file-survey --help` is a **refusal**, never a capture.
-
-The arm **does not default the `edges` slot**. An omitted fifth argument is the
-arity misuse it already refuses, which is the behavior wanted: a session
-that forgot the field is told at filing time, by the producer, rather than at
-commit time by the gate.
 
 It **stamps `rev` and the date itself and derives `<stage>` from the cursor**
 (the crate's `stages::current_stage` read over `LIFECYCLE_KIT_STATE_FILE`, which
@@ -4154,7 +4160,7 @@ precedent).
 
 Invariant: every block in the survey record (§The survey record) carries a whole
 witness. Over each `## ` block: all five keys present, in order, one per line
-(and no sixth key, no stray line); `corpus` non-empty; `oracle` and `edges`
+(and no sixth key, no stray line); `corpus` non-empty; `oracle` and `inferred`
 non-empty, where the literal `none` is legal and is the honest form and an
 *empty* value is the silent form and is refused; and `rev` a full 40-hex sha
 naming a commit that
@@ -4163,17 +4169,17 @@ reason the field is machine-stamped rather than author-supplied. **And every
 git-object-shaped token in the other four non-`rev` fields names an object that
 exists** (§The survey record), unless the block carries the valve.
 
-`edges` is asserted on the same two footings as `oracle` — present, and
+`inferred` is asserted on the same two footings as `oracle` — present, and
 non-empty with `none` legal — because it answers the same question in its own
-dimension: an absent key and an empty value are both the silent form of "no sum
-was taken", and the field exists precisely so a later boundary can tell that
-apart from a sum it can read.
+dimension: an absent key and an empty value are both the silent form of "no
+claim was sorted", and the field exists precisely so a citing session can tell
+that apart from a survey that inferred nothing.
 
 **The widened arm reuses the `rev` arm's probe over a wider input, and its two
 asymmetries with that arm are deliberate.** The mechanism was already here and
 already trusted — `git cat-file -e` — pointed at the one field the attested
-fabrication did not use. Its input is every field but `rev`, `edges` included:
-a sum whose caveat pastes a sha is a citation like any other, so the arm covers
+fabrication did not use. Its input is every field but `rev`, `inferred` included:
+an inferred claim that pastes a sha is a citation like any other, so the arm covers
 it by construction rather than by a second arm. First asymmetry: the widened arm
 accepts **any object type**, where `rev` demands `^{commit}`. A sha naming a blob
 or a tree is a real citation, and demanding a commit outside `rev` would red a
@@ -4227,11 +4233,11 @@ grammar and the `--emit file-survey` arm on the finding path (output); exit 2 on
 an unreadable or explicitly-named-but-missing record and on a failed parse
 (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` driven through
 the hermetic argument — the good case a three-block record including an
-`oracle: none` note, a valved block, one block carrying a real per-candidate sum
-and two carrying `edges: none`, the bad case a short sha, an empty
-oracle, a block with its `oracle` line missing, an **empty** `edges` and a block
-whose `edges` line is **missing** — which are different findings with different
-remedies, one "write `none`" and one "the grammar grew a field" — and a
+`oracle: none` note, a valved block, and every block carrying `inferred: none`,
+the bad case a short sha, an empty oracle, a block with its `oracle` line
+missing, an **empty** `inferred` and a block whose `inferred` line is
+**missing** — which are different findings with different remedies, one "write
+`none`" and one "the grammar grew a field" — and a
 reasonless valve — plus
 `gate-tests/check-survey-record.test.sh` for the half the pair cannot hold,
 which is everything the probe decides: both arms of the rev-existence probe in a

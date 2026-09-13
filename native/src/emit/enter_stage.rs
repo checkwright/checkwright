@@ -1090,7 +1090,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
             println!(
                 "  note: {} carries {} survey(s) this iteration — before buying one of these \
                  again, run its witness (diff the corpus since its rev, re-run its oracle) and \
-                 cite it if both hold:",
+                 cite its finding if both hold — its inferred claims are not carried:",
                 c.survey_record,
                 qs.len()
             );

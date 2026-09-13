@@ -117,7 +117,7 @@ by design.
 bash gate-sdk/bin/run-gates.sh --enter-stage <stage>          # stamp a stage entry (the transition itself)
 bash gate-sdk/bin/run-gates.sh --install-lifecycle    # (re)write the registration and merge-attribute blocks
 bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
-bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"
+bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"
 bash gate-sdk/bin/run-gates.sh --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
 bash gate-sdk/bin/run-gates.sh --emit session-id                       # the canonical stamp id, by the derivation order
 bash gate-sdk/bin/run-gates.sh --emit ruling-staleness ["<ruling name>"…]  # fired conditions, undeclared ones, citing sites

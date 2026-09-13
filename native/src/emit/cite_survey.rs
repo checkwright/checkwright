@@ -12,7 +12,7 @@ const USAGE: &str = "usage: --emit cite-survey [--] \"<heading-substring>\"\n  e
 // spec: lifecycle-kit/SPEC.md §The survey record — the block's five fields in record order; a line
 // outside this set is not part of the snippet, which is what keeps a pasted citation the witness
 // rather than whatever prose happened to follow the heading.
-const FIELDS: &[&str] = &["corpus", "oracle", "rev", "edges", "finding"];
+const FIELDS: &[&str] = &["corpus", "oracle", "rev", "finding", "inferred"];
 
 fn is_field(line: &str) -> bool {
     FIELDS
@@ -88,7 +88,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 mod tests {
     use super::*;
 
-    const REC: &str = "# contract: seeded\n\n## 2026-01-01 scope — alpha question\n- corpus: a\n- oracle: b\n- rev: c\n- edges: d\n- finding: e\nstray prose\n\n## 2026-01-02 build — beta question\n- corpus: f\n- oracle: g\n- rev: h\n- edges: i\n- finding: j\n";
+    const REC: &str = "# contract: seeded\n\n## 2026-01-01 scope — alpha question\n- corpus: a\n- oracle: b\n- rev: c\n- finding: d\n- inferred: e\nstray prose\n\n## 2026-01-02 build — beta question\n- corpus: f\n- oracle: g\n- rev: h\n- finding: i\n- inferred: j\n";
 
     // spec: lifecycle-kit/SPEC.md §The survey record — the snippet is the heading reformatted plus
     // the five fields in record order, bounded by the next block's heading and nothing else
@@ -98,7 +98,8 @@ mod tests {
         assert_eq!(one.len(), 1);
         let mut argvless = REC.lines().skip_while(|l| *l != one[0]).skip(1);
         assert_eq!(argvless.next(), Some("- corpus: a"));
-        assert!(is_field("- finding: e"));
+        assert!(is_field("- finding: d"));
+        assert!(is_field("- inferred: e"));
         assert!(!is_field("stray prose"), "unfielded prose entered the snippet");
         assert!(!is_field("- notafield: x"));
     }

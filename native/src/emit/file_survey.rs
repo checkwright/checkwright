@@ -7,7 +7,7 @@ use crate::walk;
 
 pub const KNOBS: &[&str] = &["LIFECYCLE_KIT_SURVEY_RECORD_FILE", "LIFECYCLE_KIT_STATE_FILE"];
 
-const USAGE: &str = "usage: --emit file-survey [--] \"<question>\" \"<corpus>\" \"<oracle>\" \"<edges>\" \"<finding>\"\n  appends one dated block to the survey record; \"--\" files a field beginning with \"-\"";
+const USAGE: &str = "usage: --emit file-survey [--] \"<question>\" \"<corpus>\" \"<oracle>\" \"<inferred>\" \"<finding>\"\n  appends one dated block to the survey record; \"--\" files a field beginning with \"-\"";
 
 // spec: lifecycle-kit/SPEC.md §The survey record — the never-named stage the queue header already
 // uses, stamped when the cursor is absent.
@@ -87,7 +87,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     if fields.len() != 5 || fields.iter().any(String::is_empty) {
         return Err(USAGE.to_string());
     }
-    let (question, corpus, oracle, edges, finding) = (
+    let (question, corpus, oracle, inferred, finding) = (
         &fields[0], &fields[1], &fields[2], &fields[3], &fields[4],
     );
     let rev = head_rev()?;
@@ -103,8 +103,8 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             .map_err(|e| format!("cannot seed {}: {}", spelled, e))?;
     }
     let block = format!(
-        "\n## {} {} — {}\n- corpus: {}\n- oracle: {}\n- rev: {}\n- edges: {}\n- finding: {}\n",
-        today, stage, question, corpus, oracle, rev, edges, finding
+        "\n## {} {} — {}\n- corpus: {}\n- oracle: {}\n- rev: {}\n- finding: {}\n- inferred: {}\n",
+        today, stage, question, corpus, oracle, rev, finding, inferred
     );
     append(path, &block).map_err(|e| format!("cannot append to {}: {}", spelled, e))?;
 
@@ -152,25 +152,25 @@ mod tests {
     #[test]
     fn a_flag_in_any_slot_is_refused_and_a_separator_files_it() {
         for i in 0..5 {
-            let mut a = argv(&["q", "c", "o", "e", "f"]);
+            let mut a = argv(&["q", "c", "o", "i", "f"]);
             a[i] = "--finding".to_string();
             let err = positionals(&a, "field")
                 .err()
                 .unwrap_or_else(|| panic!("a flag in slot {} was captured", i));
             assert!(err.contains("--finding"), "the refusal named no offender: {}", err);
         }
-        let sep = argv(&["--", "-q", "c", "o", "e", "f"]);
+        let sep = argv(&["--", "-q", "c", "o", "i", "f"]);
         assert_eq!(
             positionals(&sep, "field").expect("the separator did not end option processing"),
             &sep[1..]
         );
     }
 
-    // spec: lifecycle-kit/SPEC.md §The survey record — the edges slot takes no default, so an
-    // omitted fifth argument is arity misuse the arm refuses rather than a silently blank field
+    // spec: lifecycle-kit/SPEC.md §The survey record — no slot takes a default, so an omitted
+    // argument is arity misuse the arm refuses rather than a silently blank field
     #[test]
     fn four_fields_or_an_empty_one_is_arity_misuse() {
-        assert!(emit(&argv(&["q", "c", "o", "e"])).is_err());
+        assert!(emit(&argv(&["q", "c", "o", "i"])).is_err());
         assert!(emit(&argv(&["q", "c", "o", "", "f"])).is_err());
         assert!(emit(&argv(&[])).is_err());
     }
