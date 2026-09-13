@@ -5217,12 +5217,4 @@
 
 ## Done
 
-- behavior-change-surface
-- deferred-release-declaration-accumulation
-- survey-record-claim-reliability
-- kfric-capture-unverified-assertion
-- survey-edges-reader-arrives-after-truncation
-- ruling-staleness-header-reads-as-undeclared
-- build-stage-tightened-gates-write-pair
-
 ## Lessons Learned
