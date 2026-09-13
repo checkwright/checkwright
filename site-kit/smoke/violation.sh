@@ -6,10 +6,8 @@ set -euo pipefail
 
 echo "check-docs-cname-parity"
 
-cat > scripts/site-config.sh <<'EOF'
-# shellcheck shell=bash
-# shellcheck disable=SC2034  # sourced by site-kit/lib/site.sh
-SITE_KIT_ALIASES=(alt.example)
+cat > scripts/site-config.knobs <<'EOF'
+SITE_KIT_ALIASES[] = alt.example
 EOF
 
 cat > NOTES.md <<'EOF'

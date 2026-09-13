@@ -144,7 +144,9 @@ pub fn couples_knob_names(resolve_dirs: &[String]) -> Result<Vec<String>, String
                     continue;
                 }
                 for name in v.split(',').filter_map(|t| t.strip_prefix("knob:")) {
-                    out.push(name.to_string());
+                    if !crate::knobs::is_static(name) {
+                        out.push(name.to_string());
+                    }
                 }
             }
         }

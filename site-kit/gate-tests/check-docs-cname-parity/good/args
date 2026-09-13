@@ -1,6 +1,6 @@
 # No positional: the gate takes its DEFAULT whole-tree arm — SITE_KIT_SCAN_ROOT
-# resolves to "." and SITE_KIT_CNAME to docs/CNAME, both through the config
-# bridge, from this case dir. The corpus is therefore every tracked file of this
+# resolves to "." and SITE_KIT_CNAME to docs/CNAME, both from the kit's
+# static knob defaults, read in this case dir. The corpus is therefore every tracked file of this
 # case, declaration paths included, which is the criterion-4 exposure that arm
 # creates and the reason it needs a case at all. The alias URLs sit under the
 # pruned and the exempt path classes, so the gate must PASS.

@@ -56,7 +56,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         prefixes.push(format!("{}_", base.to_ascii_uppercase().replace('-', "_")));
     }
 
-    let defined = defined_knobs(&top, &roots, &prefixes)?;
+    let mut defined = defined_knobs(&top, &roots, &prefixes)?;
+    // spec: canon-kit/SPEC.md §check-docs-cmd — a static kit's knobs left kit-root source with its
+    // library, so the set is unioned with the names the static reader reads
+    defined.extend(crate::knobs::static_names());
     let valve = TemporalValve::load()?;
     let tree = Tree::read(&top)?;
     let cwd = walk::cwd()?;

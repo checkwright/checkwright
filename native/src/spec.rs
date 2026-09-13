@@ -7,21 +7,11 @@ use std::path::{Path, PathBuf};
 // spec: gate-sdk/SPEC.md §lib/gate.sh — every knob read is bridged; the crate holds no
 // default, so an unset variable is a harness error rather than a fallback.
 fn knob(name: &str) -> Result<String, String> {
-    std::env::var(format!("GATE_SDK_KNOB_{}", name)).map_err(|_| {
-        format!(
-            "GATE_SDK_KNOB_{} is unset — the gate was invoked without the config bridge \
-             gate_command emits, so {} could not be resolved",
-            name, name
-        )
-    })
+    walk::knob_scalar(name)
 }
 
 fn knob_array(name: &str) -> Result<Vec<String>, String> {
-    let raw = knob(name)?;
-    if raw.is_empty() {
-        return Ok(Vec::new());
-    }
-    Ok(raw.split('\t').map(String::from).collect())
+    walk::knob_array(name)
 }
 
 // spec: canon-kit/SPEC.md §lib/spec.sh — the finders skip `templates/` stubs; the shell

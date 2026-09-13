@@ -218,7 +218,7 @@ fn resolve_filter(
     // spec: gate-sdk/SPEC.md §check-reads-couples — the guard is evaluated against the *resolved*
     // selector, so which branch a consumer takes is read at run time and no descriptor carries it
     if let (Some(sel), _) = gates::filter_guard(spec) {
-        let raw = std::env::var(format!("GATE_SDK_KNOB_{}", sel)).map_err(|_| {
+        let raw = crate::knobs::wire(sel)?.ok_or_else(|| {
             format!(
                 "{} declares read root '{}' guarded by knob {}, which the config bridge could not \
                  resolve — the branch could not be decided; treating as failure (not clean)",
@@ -252,7 +252,7 @@ fn resolve_filter(
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a named knob the bridge did not carry is exit 2,
     // never an empty filter silently widening the demand to the whole root: "cannot resolve", "no
     // filter" and "resolved empty" must not share a verdict
-    let raw = std::env::var(format!("GATE_SDK_KNOB_{}", knob)).map_err(|_| {
+    let raw = crate::knobs::wire(knob)?.ok_or_else(|| {
         format!(
             "{} declares read root '{}' filtered by knob {}, which the config bridge could not \
              resolve — the coverage assertion could not run; treating as failure (not clean)",

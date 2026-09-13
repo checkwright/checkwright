@@ -152,8 +152,8 @@ pub type GateEntry = (
 // section files as unsettled, and a kit cannot demand an adopter satisfy it over an unseen tree
 const MANIFEST_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:214 via const MANIFEST_ROOTS"),
-    ("?", "", "", "fallback@src/spec.rs:220 via const MANIFEST_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:204 via const MANIFEST_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:210 via const MANIFEST_ROOTS"),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
 ];
 
@@ -161,7 +161,7 @@ const MANIFEST_ROOTS: &[RootDecl] = &[
 // configured one declares, and the kit-literal fallback keeps `?` on the ground above
 const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:243 via const COMMENT_SURFACE_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:233 via const COMMENT_SURFACE_ROOTS"),
 ];
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — `MANIFEST_ROOTS` and `COMMENT_SURFACE_ROOTS`
@@ -169,11 +169,11 @@ const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
 // rather than per walk is what drops the second walk silently.
 const SPEC_POINTER_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:214 via const SPEC_POINTER_ROOTS"),
-    ("?", "", "", "fallback@src/spec.rs:220 via const SPEC_POINTER_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:204 via const SPEC_POINTER_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:210 via const SPEC_POINTER_ROOTS"),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:243 via const SPEC_POINTER_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:233 via const SPEC_POINTER_ROOTS"),
 ];
 
 pub const REGISTRY: &[GateEntry] = &[
@@ -1997,7 +1997,7 @@ fn expanded_knobs() -> &'static [(&'static str, Vec<&'static str>)] {
     })
 }
 
-pub fn knobs(name: &str) -> Option<&'static [&'static str]> {
+fn declared_knobs(name: &str) -> Option<&'static [&'static str]> {
     if let Some((_, v)) = expanded_knobs().iter().find(|(n, _)| *n == name) {
         return Some(v.as_slice());
     }
@@ -2005,6 +2005,22 @@ pub fn knobs(name: &str) -> Option<&'static [&'static str]> {
         .iter()
         .find(|(n, _, _, _, _, _)| *n == name)
         .map(|(_, _, _, k, _, _)| *k)
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — a member's bridged knobs: its declared set with every
+// statically owned name dropped, because the member resolves those itself
+pub fn knobs(name: &str) -> Option<&'static [&'static str]> {
+    static BRIDGED: std::sync::OnceLock<Vec<(&'static str, Vec<&'static str>)>> =
+        std::sync::OnceLock::new();
+    let all = BRIDGED.get_or_init(|| {
+        REGISTRY
+            .iter()
+            .map(|(n, _, _, _, _, _)| {
+                (*n, crate::knobs::bridged(declared_knobs(n).unwrap_or(&[]).iter().copied()))
+            })
+            .collect()
+    });
+    all.iter().find(|(n, _)| *n == name).map(|(_, v)| v.as_slice())
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the requirement set `--needs` prints. A

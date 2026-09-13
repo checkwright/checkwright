@@ -21,11 +21,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             .into_iter()
             .map(|p| p.display().to_string())
             .collect();
-        let queue = std::env::var("GATE_SDK_KNOB_CANON_KIT_QUEUE_FILE").map_err(|_| {
-            "GATE_SDK_KNOB_CANON_KIT_QUEUE_FILE is unset — the gate was invoked without the \
-             config bridge gate_command emits"
-                .to_string()
-        })?;
+        let queue = crate::walk::knob_scalar("CANON_KIT_QUEUE_FILE")?;
         if Path::new(&queue).is_file() {
             v.push(queue);
         }

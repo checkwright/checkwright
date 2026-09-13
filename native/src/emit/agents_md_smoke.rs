@@ -235,8 +235,8 @@ fn write_config_seams(consumer: &str) -> Result<(), Outcome> {
             true,
         ),
         (
-            "scripts/doctrine-config.sh",
-            "# shellcheck shell=bash disable=SC2034\nDOCTRINE_KIT_AGENT_FILE=\"AGENTS.md\"\n",
+            "scripts/doctrine-config.knobs",
+            "DOCTRINE_KIT_AGENT_FILE = AGENTS.md\n",
             false,
         ),
         (

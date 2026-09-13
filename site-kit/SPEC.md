@@ -41,10 +41,27 @@ is registered in the consumer's `gates.list` by name and resolves through
 gate-sdk's multi-kit path. `check-docs-cname-parity` registers where a docs
 site with a gated host exists; a consumer without one simply omits it.
 
-Config follows the kit pattern: copy a `site-config.sh` into the gates dir (or
-point `SITE_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
-what the consumer left unset, and the loader exits 2 on a config path it was
-told to load but cannot find. Knobs:
+Config is a **knob file**: write a `site-config.knobs` in the gates dir (or point
+`SITE_KIT_KNOB_FILE` elsewhere) setting any knob §Knob defaults lists; defaults
+fill what the file leaves unset. The grammar, the `.local` overlay, the
+environment-over-file precedence for a scalar, and the refusals — a set
+`SITE_KIT_KNOB_FILE` that does not exist, a left-behind `site-config.sh`, a
+non-empty file named by the retired `SITE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md
+§The knob file's.
+
+`templates/site-health.yml` is governed by none of these. Its knobs — `ALT_DOMAIN`
+and the three `RELEASE_NOTE_*` below — are **step-level workflow env** set in the
+copied file itself, not `SITE_KIT_*` knobs, and no knob file names them.
+The template is copied and edited rather than read as config, so reaching into
+the gates dir would couple a monitor to it and hard-code a vendored kit path into
+a workflow whose whole distribution model is verbatim copy.
+
+## Knob defaults
+
+site-kit's knobs are **static**: the binary resolves them in process from its own
+defaults table and the consumer's knob file, and the config bridge never carries
+them (gate-sdk/SPEC.md §lib/gate.sh). `bash gate-sdk/bin/run-gates.sh --emit
+knob-roster` prints each one with its shape and rendered default.
 
 - `SITE_KIT_CNAME` — the CNAME file holding the one authoritative host line,
   default `docs/CNAME`.
@@ -89,16 +106,10 @@ told to load but cannot find. Knobs:
   and the gate would report clean against a parser build they explicitly
   rejected — a false clean produced by an upgrade. Under the rule they instead
   keep the per-document path at its own cost and its own semantics, and opt in by
-  pointing this knob at the batch form of their own pinned renderer.
-- `SITE_KIT_CONFIG_FILE` — the loader override; when set it must resolve, else
-  the gate exits 2 rather than silently run on defaults.
-
-`templates/site-health.yml` is governed by none of these. Its knobs — `ALT_DOMAIN`
-and the three `RELEASE_NOTE_*` below — are **step-level workflow env** set in the
-copied file itself, not `SITE_KIT_*` knobs, and `lib/site.sh` never loads them.
-The template is copied and edited rather than sourced, so reaching into the gate
-config loader would couple a monitor to the gates dir and hard-code a vendored
-kit path into a workflow whose whole distribution model is verbatim copy.
+  pointing this knob at the batch form of their own pinned renderer. "Pinned"
+  means set in a knob file, tracked or overlay: an indexed knob takes no
+  environment override, so a file is the only place `SITE_KIT_RENDERER` is set
+  from.
 
 ## check-docs-cname-parity
 
@@ -130,19 +141,14 @@ direction (gate-sdk/SPEC.md §The fourth budget batch). The discharge is the
 general one: the fixture pair carries the arm, because `gate-tests` is pruned
 from every live-tree walk and no port can change what is inside it. The pair's
 good case therefore takes the default arm — no positional, scan root and CNAME
-both off the config bridge, a fixture declaration path inside its own corpus —
+both at their knob defaults, a fixture declaration path inside its own corpus —
 and the bad case keeps the explicit-root arm.
 
-**There is no third positional selecting a config file, and the ground is a
-finding rather than a preference.** Such an argument could only work by exporting
-`SITE_KIT_CONFIG_FILE` and re-sourcing `lib/site.sh` mid-run. A
-`.gate`-dispatched member cannot do that: the config bridge resolves every declared knob *before* the binary starts
-(gate-sdk/SPEC.md §lib/gate.sh), so an argument that selects which config file
-the knobs come from arrives a process too late, and a documented flag that
-silently changes nothing is worse than none. A fixture supplies its own alias set
-the way any consumer does — a `site-config.sh` in the gates dir the loader
-already resolves — which is the shape gate-sdk/SPEC.md §The third budget batch
-settled for the same cause, and it costs the pair nothing.
+**There is no third positional selecting a config file.** Which knob file the
+member reads is already selectable, by `SITE_KIT_KNOB_FILE`, so a positional would
+be a second spelling of that one knob. A fixture supplies its own alias set the way
+any consumer does — a `site-config.knobs` in the gates dir of its case — which
+costs the pair nothing.
 
 ## check-docs-render-fidelity
 
@@ -252,13 +258,13 @@ program the rule requires is the first element of whichever renderer knob the ru
 resolves to a command, so the compiled form spawns it and refuses at exit 2 when
 it cannot run, the dependency moving not at all (gate-sdk/SPEC.md §The
 port-candidate criteria, criterion 7). The dependency itself, and the fact that a
-consumer who repoints a knob moves it, are owned at §Layout and configuration
-under those knobs and are not restated here.
+consumer who repoints a knob moves it, are owned at §Knob defaults under those
+knobs and are not restated here.
 
 **Its requirement is knob-derived, and it is *two* knobs rather than one.**
 `--needs` declares `git` plus `?<TAB>SITE_KIT_RENDERER_BATCH` and
 `?<TAB>SITE_KIT_RENDERER`, and the port arm resolves the pair through the
-same bridge the dispatcher uses. Naming only `SITE_KIT_RENDERER` — as this section
+same knob resolver the member itself reads them through. Naming only `SITE_KIT_RENDERER` — as this section
 did before the port — is wrong for a reason no zero-config run exposes: with the
 batch knob non-empty the gate never invokes the per-document one, so a consumer
 who pins only the batch renderer requires *that* command. The two defaults both
@@ -277,18 +283,11 @@ edge is operator-class and whose decision that entry owns. Recorded here so that
 entry's taker reads a discharged precondition rather than re-deriving it.
 
 **The second positional is retired on port, and its function is not.**
-`[docs-dir] [config-file]` read argv[2] by exporting `SITE_KIT_CONFIG_FILE` before
-sourcing `lib/site.sh`. A compiled member cannot: a config file is bash, the
-bridge transports resolved values and interprets nothing (gate-sdk/SPEC.md §The
-port-candidate criteria, criterion 6), and the member receives knob values rather
-than a path. The positional is therefore unreachable by construction, which is
-what makes this a retirement-on-port rather than a narrowing. What it did survives
-under the variable it always set: the bridge resolves a kit's knobs by sourcing
-that kit's `lib/*.sh` in a subshell that inherits the caller's environment, so a
-harness pointing the renderer knobs at a synthetic setup exports
-`SITE_KIT_CONFIG_FILE` and the resolution follows — which is the shape every
-ported member's bespoke tests already use. The **first** positional is unchanged
-and still defaults to `SITE_KIT_DOCS_DIR`.
+`[docs-dir] [config-file]` took a config path as argv[2]. What it did survives
+under the file knob: a harness pointing the renderer knobs at a synthetic setup
+exports `SITE_KIT_KNOB_FILE` naming a knob file, and the member reads its static
+knobs from that file (gate-sdk/SPEC.md §The knob file). The **first** positional is
+unchanged and still defaults to `SITE_KIT_DOCS_DIR`.
 
 **`NUL`-stripping becomes deliberate, and it has to.** The framing's
 unforgeability rests on the gate's own reader having already dropped any `NUL` in
@@ -433,15 +432,17 @@ under a blanket widening, which would clear the good page at the cost of the
 placeholder tokens the assertion exists for. The batch test exists because the
 good/bad pair sets no renderer knob, so it already runs the batch path and cannot
 by itself distinguish that path from the fallback; it asserts that the kit's two
-renderer defaults render a corpus byte-identically, that a pinned
-`SITE_KIT_RENDERER` suppresses the batch default, that the batch path and the
-per-document fallback return the same verdict on the same pages, and that a wrong
-document count and an unresolvable batch command each exit 2. The count case uses
+renderer defaults, read off `--emit knob-roster`, render a corpus
+byte-identically, that the batch path and the per-document fallback return the
+same verdict on the same pages, and that a wrong document count and an
+unresolvable batch command each exit 2. That a pinned `SITE_KIT_RENDERER`
+suppresses the batch default is a crate unit test on the site-kit knob table,
+because the fill rule is a property of the table and not of a tracked tree. The count case uses
 a stub that always emits two documents, so it passes the two-document probe and is
 caught only by the corpus count — a stub the probe already rejected would never
 reach the assertion under test.
 All four are invoked through `gate_run`, so each names a gate and never a
-substrate, and each supplies its renderer configuration as `SITE_KIT_CONFIG_FILE`
+substrate, and each supplies its renderer configuration as `SITE_KIT_KNOB_FILE`
 rather than as the retired second positional. The positional form
 `check-docs-render-fidelity [docs-dir]` lets a fixture point the docs dir at a
 synthetic tree without touching consumer config. `precommit` tier, coupling the
@@ -488,27 +489,6 @@ and nothing in the framing contract can detect that. What the kit does hold is
 its own pair: the two defaults are asserted byte-identical over a corpus by
 fixture, so the zero-config path is covered by construction rather than by
 assumption.
-
-## lib/site.sh
-
-The sourced config loader: it loads `SITE_KIT_CONFIG_FILE` (or the gates-dir
-`site-config.sh` when that env is unset), then fills each knob's default, so a
-gate and a fixture read one resolved configuration. It carries no gate logic —
-structure stays in the check, values in config, defaults here.
-
-**It is permanently shell and declares so in its own header**, as the config
-bridge's sole resolver for the `SITE_KIT_*` knobs — gate-sdk/SPEC.md §The
-kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
-states the ground. Its only non-bridge reader left in the tree is its own
-gate-test, so the bridge is very nearly the whole of its live role.
-
-Every knob's default is filled whenever the consumer left it unset, with one
-exception the loader is the only place to state: `SITE_KIT_RENDERER_BATCH` is
-filled only where the loader also owns `SITE_KIT_RENDERER` — where the consumer
-overrode neither. A consumer who overrode the per-document renderer and left the
-batch knob unset gets an empty batch array instead of a default, so the gate
-keeps running the oracle they chose; §Layout and configuration states the rule
-with the false clean it exists to prevent.
 
 ## templates/site-health.yml
 

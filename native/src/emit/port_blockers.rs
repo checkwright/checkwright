@@ -312,7 +312,7 @@ fn knob_program(knob: &str) -> Option<String> {
     if knob.chars().any(|c| c.is_ascii_lowercase()) {
         return None;
     }
-    let raw = std::env::var(format!("GATE_SDK_KNOB_{}", knob)).ok()?;
+    let raw = crate::knobs::wire(knob).ok().flatten()?;
     let first = raw.split('\t').next().unwrap_or_default();
     let word = first.split(' ').next().unwrap_or_default();
     if word.is_empty() {

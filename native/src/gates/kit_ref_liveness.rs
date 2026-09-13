@@ -196,6 +196,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
             defined.insert(run.to_string());
         }
     }
+    // spec: canon-kit/SPEC.md §check-docs-cmd — the same union assertion B takes: a static kit's
+    // knob names live in the binary's table, not in kit-root source
+    defined.extend(crate::knobs::static_names());
 
     // spec: canon-kit/SPEC.md §Layout and configuration — the queue is design-ahead and names
     // future knobs and paths, so it is valved out by basename; the knob crosses the config

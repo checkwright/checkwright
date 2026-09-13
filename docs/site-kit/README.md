@@ -51,10 +51,10 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 2. Establish the host source of truth — a CNAME file holding exactly one host
    line, at the path `SITE_KIT_CNAME` names (site-kit/SPEC.md owns its fallback).
 
-3. Declare your aliases — copy a `site-config.sh` into your gates dir naming
-   `SITE_KIT_ALIASES` (every reachable host that is *not* the cited docs host:
-   www subdomains, redirect domains, the pre-CNAME Pages host). With the array
-   unset the gate holds on defaults and finds nothing.
+3. Declare your aliases — write a `site-config.knobs` in your gates dir with one
+   `SITE_KIT_ALIASES[] = <host>` line per reachable host that is *not* the cited
+   docs host (www subdomains, redirect domains, the pre-CNAME Pages host). With
+   no such line the gate holds on defaults and finds nothing.
 
 4. Optional live monitor — copy `templates/site-health.yml` verbatim into
    `.github/workflows/`, then set two groups of step env or delete the arm each

@@ -1,0 +1,8 @@
+# spec: site-kit/SPEC.md §Layout and configuration — this repo's site-kit consumer knob file
+
+# comment-tier-exempt: these are this repo's own project host aliases — rule content the provenance seam bars a kit gate from carrying, so it lives here in consumer config; the docs/CNAME host equals the first entry and is skipped at compare, the rest are reachable hosts that must never be the cited docs URL
+SITE_KIT_ALIASES[] = checkwright.dev
+SITE_KIT_ALIASES[] = www.checkwright.dev
+SITE_KIT_ALIASES[] = checkwright.com
+SITE_KIT_ALIASES[] = www.checkwright.com
+SITE_KIT_ALIASES[] = checkwright.github.io

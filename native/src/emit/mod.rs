@@ -480,6 +480,9 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(enum_sets::emit),
         enum_sets::KNOBS,
     ),
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the static knob table published, an `Arm::Emit`
+    // whose roster is empty by construction: the arm takes no knob and reads no file
+    ("--emit-knob-roster", Arm::Emit(crate::knobs::emit), &[]),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
     // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter spec: gate-
     // sdk/SPEC.md §The non-gate arm — both rosters are empty of the `--emit-md-section` kind, not
@@ -715,7 +718,7 @@ pub fn emit_names() -> Vec<&'static str> {
 // `Arm` variant is not consulted at all.
 pub fn knobs(arm: &str, rest: &[String]) -> Option<Vec<&'static str>> {
     let (_, _, own) = BRIDGED_ARMS.iter().find(|(a, _, _)| *a == arm)?;
-    Some(expand(own, rest))
+    Some(crate::knobs::bridged(expand(own, rest)))
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm carrying no sentinel keeps exactly its own

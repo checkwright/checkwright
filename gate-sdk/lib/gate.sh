@@ -432,7 +432,7 @@ gate_knob_env_set() {
         if [[ "$_gkes_n" == "$GATE_SDK_COUPLES_KNOB_SENTINEL" ]]; then
             local -a _gkes_derived=()
             local _gkes_out
-            _gkes_out="$(_gate_couples_knob_names)"
+            _gkes_out="$(_gate_couples_knob_names)" || return 2
             if [[ -n "$_gkes_out" ]]; then
                 mapfile -t _gkes_derived <<<"$_gkes_out"
                 names+=("${_gkes_derived[@]}")
@@ -730,7 +730,19 @@ _gate_couples_knob_names() {
         done
     done <<<"$manifests"
     [[ ${#names[@]} -gt 0 ]] || return 0
-    printf '%s\n' "${names[@]}" | LC_ALL=C sort -u
+    # spec: gate-sdk/SPEC.md §lib/gate.sh — a statically owned name is dropped by the same rule the crate's derivation applies, learned from the binary's knob roster rather than from a second list
+    local roster roster_name
+    local -A static_names=()
+    roster="$("$(gate_native_bin)" --emit-knob-roster)" || {
+        printf '_gate_couples_knob_names: %s --emit-knob-roster failed — the couples-knob set could not be derived; treating as failure (not clean)\n' "$(gate_native_bin)" >&2
+        return 2
+    }
+    while IFS=$'\t' read -r roster_name _; do
+        [[ -n "$roster_name" ]] && static_names["$roster_name"]=1
+    done <<<"$roster"
+    for roster_name in "${names[@]}"; do
+        [[ -v static_names["$roster_name"] ]] || printf '%s\n' "$roster_name"
+    done | LC_ALL=C sort -u
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union resolved into this shell's own environment, once per process: a shell reader expands *another* member's couples= and so needs values outside its own declared set. A refusal anywhere in the slice fails the call, because a partially resolved environment is the fail-open an empty expansion would be.
@@ -739,7 +751,7 @@ _gate_couples_knob_bridge() {
     _gate_couples_knob_bridged=1
     local out line derived
     local -a names=()
-    derived="$(_gate_couples_knob_names)"
+    derived="$(_gate_couples_knob_names)" || return 2
     [[ -n "$derived" ]] || return 0
     mapfile -t names <<<"$derived"
     out="$(gate_knob_env_set couples-expansion "${names[@]}")" || return 2

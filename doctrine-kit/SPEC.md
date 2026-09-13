@@ -427,9 +427,9 @@ reached through the generic `--emit <name>` composer rather than a front-end
 branch of its own, because its contract is a **document** and both of its
 failures — a missing `<stage>` and an unreadable doctrine file — are already the
 exit 2 that variant collapses every error to. Its declared roster is the one knob
-it resolves, `DOCTRINE_KIT_DOCTRINE_FILE`, which crosses the config bridge by
-`lib/doctrine.sh` being sourced: a hardcoded top-level flag would resolve a
-platform default and silently ignore every consumer override. The
+it reads, `DOCTRINE_KIT_DOCTRINE_FILE`, which it resolves from doctrine-kit's
+static knob table and the consumer's knob file (§Knob defaults), so a consumer
+override reaches it as it reaches the gate. The
 `[doctrine-file]` positional is **kept** rather than dropped as a config
 redirection, because the sibling surfaces it exists to match — `--install-doctrine
 [agent-file [doctrine-file]]` and the gate — still take theirs, and dropping it
@@ -450,11 +450,9 @@ time. The arm bakes **no stage vocabulary**: each parsed token is compared again
 the `<stage>` its caller supplies, so no kit literal spells any project's stages.
 
 **Criterion 6 is discharged by the duplication being absent rather than
-machine-held.** `lib/doctrine.sh` is permanently `# no-port:` as the config
-bridge's sole resolver for the `DOCTRINE_KIT_*` knobs, and this member's one knob
-crosses that bridge — so the value is computed in exactly one place and the crate
-holds no default to drift. The member sourced that one library and reached no
-other helper, which is the enumeration the criterion demands. **Criterion 5's
+machine-held.** This member's one knob has one producer, doctrine-kit's static
+knob table (§Knob defaults), so the value is computed in exactly one place and no
+second default exists to drift. **Criterion 5's
 residual is narrow, real and invisible**: a vendored consumer on a host the
 artifact roster does not cover loses the craft-rule pointer block outright, where
 a shell script used to give it to them. It is advisory output in a session brief
@@ -479,27 +477,14 @@ knob stale renders no block and reds nowhere — no gate reads whether the block
 still renders — which is why the porting session proved it by an observed hook
 run rather than off the diff.
 
-## lib/doctrine.sh
+## Knob defaults
 
-The sourced config loader shared by the installer and the gate: it loads
-`DOCTRINE_KIT_CONFIG_FILE` (or the gates-dir `doctrine-config.sh` when that env
-is unset), then a gitignored `.local.sh` overlay beside it, then fills each
-knob's default — so the installer and the gate read one resolved configuration.
-It carries no gate logic: structure stays in the check, values in config,
-defaults here.
-
-**It is permanently shell and declares so in its own header**, as the config
-bridge's sole resolver for the `DOCTRINE_KIT_*` knobs — gate-sdk/SPEC.md §The
-kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
-states the ground.
-
-## Layout and configuration
-
-The kit is vendored beside gate-sdk (conventionally at `doctrine-kit/`); its
-gate is registered in the consumer's `gates.list` by name and resolves through
-gate-sdk's multi-kit path. Config follows the kit pattern: an optional
-`doctrine-config.sh` in the gates dir (or a `DOCTRINE_KIT_CONFIG_FILE`
-elsewhere) overrides any knob; defaults fill what the consumer left unset. Knobs:
+doctrine-kit's knobs are **static**: the binary resolves them in process from its
+own defaults table and the consumer's knob file, so the installer arm, the gate
+and the stage-rules emitter read one resolved configuration and the config bridge
+never carries them (gate-sdk/SPEC.md §lib/gate.sh). `bash gate-sdk/bin/run-gates.sh
+--emit knob-roster` prints each one with its shape and rendered default. All three
+are scalars:
 
 - `DOCTRINE_KIT_AGENT_FILE` — the always-loaded file the installer edits and the
   gate scans, default `CLAUDE.md`.
@@ -511,13 +496,23 @@ elsewhere) overrides any knob; defaults fill what the consumer left unset. Knobs
   heading, so a zero-config consumer that installed via the tool is green out of
   the box; a consumer that renamed the heading repoints this knob (a rename that
   leaves it stale exits 2 rather than passing an empty set).
-- `DOCTRINE_KIT_CONFIG_FILE` — the loader override; when set it must resolve,
-  else the loader exits 2 rather than silently run on defaults. A `.local.sh`
-  sibling of the resolved config sources last for private overlay values.
 
 The defaults are this repo's own layout, so this repo runs the kit on itself
-with no config file: `CLAUDE.md` is the always-loaded agent file, and its
+with no knob file: `CLAUDE.md` is the always-loaded agent file, and its
 `## Delivery doctrine` reference block links `doctrine-kit/DOCTRINE.md`.
+
+## Layout and configuration
+
+The kit is vendored beside gate-sdk (conventionally at `doctrine-kit/`); its
+gate is registered in the consumer's `gates.list` by name and resolves through
+gate-sdk's multi-kit path. Config is a **knob file**: an optional
+`doctrine-config.knobs` in the gates dir (or a `DOCTRINE_KIT_KNOB_FILE` elsewhere)
+sets any knob §Knob defaults lists, and a gitignored `doctrine-config.local.knobs`
+beside it carries private overlay values; defaults fill what both leave unset.
+The grammar, the environment-over-file precedence for a scalar, and the refusals —
+a set `DOCTRINE_KIT_KNOB_FILE` that does not exist, a left-behind
+`doctrine-config.sh`, a non-empty file named by the retired
+`DOCTRINE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's.
 
 ## Out of scope
 

@@ -25,6 +25,7 @@
 
 - `CONTEXT_KIT_BREVITY_SECTION` → `CONTEXT_KIT_BREVITY_SECTIONS` — the scalar becomes an array, and `lib/context.sh` refuses the retired name. Rename it in your config. (seeded from iteration resident-tier-restatement's deferral basis)
 - `DELEGATION_KIT_VERDICT_BIN` → ∅ — removed with the shell binary it named, the verdict rule having ported to the compiled arm. Delete it from your config. (seeded from iteration usage-verdict-cut's deferral basis)
+- `SITE_KIT_CONFIG_FILE` → `SITE_KIT_KNOB_FILE`, and `DOCTRINE_KIT_CONFIG_FILE` → `DOCTRINE_KIT_KNOB_FILE` — the file they name changes grammar, and a set old name naming a non-empty file is refused at exit 2. Point the new name at your rewritten knob file.
 
 ## Behavior changes
 
@@ -84,3 +85,4 @@
 - **the gate binary on Windows** — every spawn of `bash` refuses to resolve it by bare name, because the System32 WSL launcher shadows Git for Windows' `bash.exe` on `PATH`; a bare-name spawn that used to launch WSL silently now fails with a named refusal. (seeded from iteration host-resolution-fail-open-cut's commits)
 - **`context-kit/bin/run-index-tests.sh`** — deleted; run `run-gates.sh --run-index-tests` instead, and drop any permission grant naming the old path. (seeded from iteration index-runner-hold-release-and-windows-smoke-comparison's commits)
 - **`--emit parse-gates-log`, `--emit parse-smoke-log`, `--emit enum-sets`** — new bundled arms you can name in `EVIDENCE_KIT_PARSER_<suite>` and `CANON_KIT_ENUM_SETS_CMD` instead of writing a parser or enum-set script. Both knobs still take any command, so nothing changes unless you adopt them. (seeded from iteration parser-and-enum-adapter-cuts-with-graph-hotfix's commits)
+- **`<gates-dir>/site-config.sh`, `<gates-dir>/doctrine-config.sh`** — with their `.local.sh` overlays, replaced by `site-config.knobs` / `doctrine-config.knobs` (and `.local.knobs`) in the knob-file line grammar (gate-sdk/SPEC.md §The knob file); `site-kit/lib/site.sh` and `doctrine-kit/lib/doctrine.sh` are deleted, the defaults living in the gate binary and printed by `run-gates.sh --emit knob-roster`. A left-behind shell config is refused at exit 2. For both kits an exported scalar knob now outranks the file, where a bare assignment in the shell config used to beat it, and the `.local` overlay always sits in the gates dir, never beside a relocated file. Rewrite each `NAME=(a b)` as one `NAME[] = a` line per element, and each `NAME=v` as `NAME = v`.

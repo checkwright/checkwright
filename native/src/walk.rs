@@ -8,15 +8,7 @@ use std::path::{Path, PathBuf};
 // default for a bridged knob, so an absent variable is an error rather than a fallback;
 // an empty one is a resolved-empty set, which is why the two part company here.
 pub fn prune_dirs() -> Result<Vec<String>, String> {
-    let raw = std::env::var("GATE_SDK_KNOB_GATE_PRUNE_DIRS").map_err(|_| {
-        "GATE_SDK_KNOB_GATE_PRUNE_DIRS is unset — the gate was invoked without the config \
-         bridge gate_command emits, so the prune set could not be resolved"
-            .to_string()
-    })?;
-    if raw.is_empty() {
-        return Ok(Vec::new());
-    }
-    Ok(raw.split('\t').map(String::from).collect())
+    knob_array("GATE_PRUNE_DIRS")
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_path_pruned`: the prune-dir set matched as a
@@ -169,14 +161,7 @@ fn header_field<'a>(header: &'a str, name: &str) -> Vec<&'a str> {
 // the shape `prune_dirs` above has; an absent variable is an error because the crate holds
 // no default for a bridged knob, and an empty one is a resolved-empty set.
 pub fn knob_array(knob: &str) -> Result<Vec<String>, String> {
-    let var = format!("GATE_SDK_KNOB_{}", knob);
-    let raw = std::env::var(&var).map_err(|_| {
-        format!(
-            "{} is unset — the gate was invoked without the config bridge gate_command \
-             emits, so {} could not be resolved",
-            var, knob
-        )
-    })?;
+    let raw = knob_wire(knob)?;
     if raw.is_empty() {
         return Ok(Vec::new());
     }
@@ -188,13 +173,7 @@ pub fn knob_array(knob: &str) -> Result<Vec<String>, String> {
 // resolved-empty map, and pairs arrive in the sorted order the wire carries.
 pub fn knob_map(knob: &str) -> Result<Vec<(String, String)>, String> {
     let var = format!("GATE_SDK_KNOB_{}", knob);
-    let raw = std::env::var(&var).map_err(|_| {
-        format!(
-            "{} is unset — the gate was invoked without the config bridge gate_command \
-             emits, so {} could not be resolved",
-            var, knob
-        )
-    })?;
+    let raw = knob_wire(knob)?;
     if raw.is_empty() {
         return Ok(Vec::new());
     }
@@ -218,6 +197,14 @@ pub fn knob_map(knob: &str) -> Result<Vec<(String, String)>, String> {
 // receiving half: every `GATE_SDK_KNOB_<prefix>…` variable, keyed by the suffix the prefix leaves.
 // Sorted, so a reader's output order does not depend on the environment's.
 pub fn knob_prefix(prefix: &str) -> Vec<(String, String)> {
+    if let Some(kit) = crate::knobs::owner(prefix) {
+        return kit
+            .rows
+            .iter()
+            .filter_map(|r| r.name.strip_prefix(prefix).map(|s| (s.to_string(), r.name)))
+            .filter_map(|(s, n)| crate::knobs::wire(n).ok().flatten().map(|v| (s, v)))
+            .collect();
+    }
     let var_prefix = format!("GATE_SDK_KNOB_{}", prefix);
     let mut out: Vec<(String, String)> = std::env::vars()
         .filter_map(|(k, v)| k.strip_prefix(&var_prefix).map(|s| (s.to_string(), v)))
@@ -254,12 +241,17 @@ pub fn kit_roots_rel() -> Result<Vec<String>, String> {
 // one-element array in the wire format, so this is `bridged_array`'s single-value face and an
 // absent variable is the same error for the same reason: the crate holds no default.
 pub fn knob_scalar(knob: &str) -> Result<String, String> {
-    let var = format!("GATE_SDK_KNOB_{}", knob);
-    std::env::var(&var).map_err(|_| {
+    knob_wire(knob)
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — every reader above resolves through `knobs::wire`, and a
+// bridged name the bridge did not carry is the harness error the crate holds no default for
+pub fn knob_wire(knob: &str) -> Result<String, String> {
+    crate::knobs::wire(knob)?.ok_or_else(|| {
         format!(
-            "{} is unset — the gate was invoked without the config bridge gate_command \
-             emits, so {} could not be resolved",
-            var, knob
+            "GATE_SDK_KNOB_{} is unset — the gate was invoked without the config bridge \
+             gate_command emits, so {} could not be resolved",
+            knob, knob
         )
     })
 }
@@ -963,7 +955,12 @@ pub fn bridge_case_knobs(env: &crate::knobenv::KnobEnv, case: &Path, gate: &str,
         .join("gate-sdk/lib/gate.sh");
     // spec: gate-sdk/SPEC.md §lib/gate.sh — resolution goes through the library's own per-name
     // dispatch, so the prefix form has one implementation rather than one here and one there
-    let script = "source \"$1\"; g=\"$2\"; shift 2; \
+    // spec: gate-sdk/SPEC.md §run-gate-tests — the binary is absolutized against the library's own
+    // tree before the case dir is the cwd, as the fixture runner exports it, because the couples-knob
+    // derivation asks the binary for its static knob roster
+    let script = "source \"$1\"; [[ \"$GATE_SDK_NATIVE_BIN\" == /* ]] || \
+                  export GATE_SDK_NATIVE_BIN=\"${1%/gate-sdk/lib/gate.sh}/$GATE_SDK_NATIVE_BIN\"; \
+                  g=\"$2\"; shift 2; \
                   for k in \"$@\"; do gate_knob_env_one \"$k\" \"$g\" || exit 2; done";
     let out = std::process::Command::new("bash")
         .arg("-c")

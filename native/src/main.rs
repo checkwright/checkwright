@@ -19,6 +19,8 @@ mod installer;
 mod json;
 #[cfg(test)]
 mod knobenv;
+mod knobfile;
+mod knobs;
 mod marker;
 mod proc;
 mod queue;

@@ -370,6 +370,26 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         let text = spec::read_text(Path::new(f))?;
         records.extend(extract(&pairs, f, &text));
     }
+    // spec: canon-kit/SPEC.md §check-knob-default-coupling — idiom 3, the static knob roster: a
+    // scalar default rendered there is coupled exactly as a guarded assignment is
+    for (idx, line) in crate::knobs::roster()?.lines().enumerate() {
+        let mut f = line.splitn(3, '\t');
+        let (Some(knob), Some("scalar"), Some(val)) = (f.next(), f.next(), f.next()) else {
+            continue;
+        };
+        let kit = knob_owner(&pairs, knob);
+        if kit.is_empty() {
+            continue;
+        }
+        records.push(Record {
+            literal: classify_literal(val),
+            knob: knob.to_string(),
+            kit,
+            val: val.to_string(),
+            file: "--emit knob-roster".to_string(),
+            lno: idx + 1,
+        });
+    }
     let skipped = records.iter().filter(|r| !r.literal).count();
     let lit_count = records.iter().filter(|r| r.literal).count();
 

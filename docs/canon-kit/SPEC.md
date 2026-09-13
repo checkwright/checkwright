@@ -1915,7 +1915,13 @@ the provenance seam holds; a token is a candidate only when it opens with a
 derived prefix. The scanned surface is the kit source under those roots (the
 roster the meta-gates walk, `templates/` and fixtures pruned); a knob's owning
 SPEC is resolved by its prefix, not the citing file's kit, so a `canon-kit`
-source citing a `GATE_SDK_` knob couples to gate-sdk's SPEC.
+source citing a `GATE_SDK_` knob couples to gate-sdk's SPEC. A **third idiom** is
+the static knob roster (gate-sdk/SPEC.md §The non-gate arm, `--emit
+knob-roster`): a static kit's defaults live in the binary's knob table rather than
+in kit source, and each scalar default rendered there is a record coupled exactly
+as a guarded assignment is, read from the table in process and reported at its
+roster line. An indexed or keyed roster default is an array default, skipped as
+below.
 
 Assertion 1 (source self-agreement): every literal site for one knob carries the
 same literal; two disagreeing is drift inside the source before any SPEC is
@@ -2599,7 +2605,12 @@ broken link would be caught. Three assertions:
   location. A family stem — a caps run ending `_` because a placeholder or glob
   follows it (`EVIDENCE_KIT_RUN_<suite>`, `CANON_KIT_COMMENT_*`) — resolves when
   any code name extends it. Names with no kit prefix are out of scope, so
-  generic shell vars never false-positive.
+  generic shell vars never false-positive. A **static** kit's knob names leave
+  kit-root code with its library, so the set is that grep unioned with the static
+  knob roster's names (gate-sdk/SPEC.md §The non-gate arm, `--emit knob-roster`),
+  each static kit's `<KIT>_KNOB_FILE` locator and the retired `<KIT>_CONFIG_FILE`
+  its legacy refusal still reads, all from the binary's table in process.
+  `check-kit-ref-liveness` takes the same union.
 - **(C) retired cited paths.** Outside a fence, a path-shaped token inside an
   inline code span reds when it names a path the repository has **retired** and
   still tracks under none of its resolutions. A token is path-shaped when it has
