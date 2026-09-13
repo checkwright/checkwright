@@ -178,8 +178,15 @@ Step 2's remediation list gains a limb ahead of **Both hold**, **Not yet applied
 ### (5) The two affordances and the gate follow the grammar {design-bearing}
 
 - `native/src/emit/file_survey.rs` — the positionals become `"<question>" "<corpus>" "<oracle>"
-  "<finding>" "<inferred>"`, still five, still with no default on the last slot. The usage
-  string, the stamped block and the unit tests move with it.
+  "<inferred>" "<finding>"`, still five, still with no default on the last slot. **Operator
+  direction, 2026-09-13, lead-relayed via AskUserQuestion**: `inferred` takes the fourth slot and
+  `finding` stays fifth — not the reverse — because that ordering makes an old-order call degrade
+  safely rather than misfile blind: its old `edges`-shaped fourth argument lands under `inferred`,
+  which every reader already re-checks before relying on, while its fifth argument still lands
+  under `finding`, unchanged from the grammar it was written against. No arity bump and no second
+  break for a caller who already moved to the pre-direction order, since none exists yet — this
+  direction lands before any caller does. The usage string, the stamped block and the unit tests
+  move with it.
 - `native/src/emit/cite_survey.rs` — `FIELDS` becomes `corpus, oracle, rev, finding, inferred`,
   and the unit-test record moves with it.
 - `native/src/gates/survey_record.rs` (`check-survey-record`) — `WANT` becomes the same five keys
@@ -212,11 +219,12 @@ Step 2's remediation list gains a limb ahead of **Both hold**, **Not yet applied
   iteration, each with a live `- edges:` line. The commit landing this delta re-keys those blocks
   in the same motion (§Red conditions already states the obligation; this is that obligation's
   file).
-- `lifecycle-kit/smoke/install.sh` — its `--emit file-survey` call (§check-survey-record's smoke
-  coverage) currently passes `"none"` then a prose judgment as its fourth and fifth positionals,
-  the old `edges`/`finding` order. Under the new order those arguments land under `finding` and
-  `inferred` respectively, backwards from what they say — the fourth argument becomes the swapped
-  pair: the prose judgment fourth, `"none"` fifth.
+- `lifecycle-kit/smoke/install.sh` — **reviewed, no edit owed.** Its `--emit file-survey` call
+  (§check-survey-record's smoke coverage) passes `"none"` fourth and a prose judgment fifth, the
+  old `edges`/`finding` order. Under the direction's `<inferred> <finding>` order those same two
+  arguments land correctly: `"none"` under `inferred` (nothing was inferred — the call ran the
+  oracle), the prose under `finding` (the judgment). This call is a live instance of the direction's
+  own ground — an old-order caller that degrades safely with no edit forced on it.
 - `native/src/emit/enter_stage.rs` — the survey read trigger's note, *"run its witness (…) and
   cite it if both hold"*, becomes *"… and cite its finding if both hold — its inferred claims are
   not carried"*. The entry report is the one surface every stage session reads before it cites a
@@ -228,17 +236,22 @@ Step 2's remediation list gains a limb ahead of **Both hold**, **Not yet applied
   record's `edges` field** becomes *"The ranking survey names the queue-edges command as its
   oracle"*.
 - `CLAUDE.md` §Housekeeping, the survey-capture bullet — the invocation's last two operands
-  become `"<finding>" "<inferred>"`.
+  become `"<inferred>" "<finding>"`.
 - `lifecycle-kit/README.md` and the front-end's `--help`, wherever they print the file-survey
   usage.
 
 ### (7) The re-key is declared to vendoring adopters as a behavior change {mechanical}
 
 Deltas 2 and 5 change two things a vendoring adopter meets. First, what `--emit file-survey`'s
-fourth and fifth positionals mean: `"<edges>" "<finding>"` becomes `"<finding>" "<inferred>"`,
-still five arguments, so an old-order call is accepted and files its fields under the wrong keys.
-Second, which keys `check-survey-record` demands. That makes this a **lead decision,
-2026-09-13**: the commit landing delta 5 appends a Behavior changes bullet to
+fourth and fifth positionals mean: `"<edges>" "<finding>"` becomes `"<inferred>" "<finding>"` —
+**operator direction, 2026-09-13, lead-relayed via AskUserQuestion**, over the delta 5 draft's
+`"<finding>" "<inferred>"`, on the ground that this order degrades an old-order call safely rather
+than misfiling it blind: its old `edges` text lands under `inferred`, already a re-check-before-
+relying field for every reader, while its `finding` text stays under `finding`, unmoved. Still
+five arguments, so an old-order call is still accepted, but it now files both fields where an old
+caller can trust one of them outright and knows to re-check the other, not where either one is
+silently wrong. Second, which keys `check-survey-record` demands. That makes this a **lead
+decision, 2026-09-13**: the commit landing delta 5 appends a Behavior changes bullet to
 `.workflow/release-declarations.md`, the release declaration surface
 `gate-sdk/SPEC-release-declarations.md` mints. It is written in that surface's grammar, with a
 bolded lead naming the arm. **Not yet applied:**
@@ -246,10 +259,13 @@ bolded lead naming the arm. **Not yet applied:**
 > - **`--emit file-survey`** (with `check-survey-record` and `--emit cite-survey`) — a survey
 >   block's fields are now `corpus`, `oracle`, `rev`, `finding`, `inferred`. The `edges` field is
 >   retired, and `inferred` holds each claim no command established, or `none`. The arm's fourth
->   and fifth positionals are now `"<finding>" "<inferred>"`. An old-order call still has five
->   arguments and is accepted, so update any instruction file or script that spells the old
->   order. A survey record your tree has not yet truncated at its next boundary re-keys its blocks
->   in the same motion, or `check-survey-record` reds.
+>   and fifth positionals are now `"<inferred>" "<finding>"`. An old-order call still has five
+>   arguments and is accepted: its old `edges` argument now files under `inferred` and its old
+>   `finding` argument still files under `finding`, unmoved — a safe degrade rather than a
+>   misfile, since `inferred` is already re-checked before a reader relies on it. Update any
+>   instruction file or script that spells the old order at your own pace, not as a fire drill. A
+>   survey record your tree has not yet truncated at its next boundary re-keys its blocks in the
+>   same motion, or `check-survey-record` reds.
 
 **How it composes with that amendment's seed.** `gate-sdk/SPEC-release-declarations.md` delta 8
 creates the surface. If this delta lands after delta 8, the bullet is appended in this delta's
@@ -259,7 +275,7 @@ commit. If it lands first, the seed carries the bullet, and delta 8's seed inclu
 ## Producers and consumers
 
 - **`inferred:` (new field).** *Producer:* any session filing a survey through `--emit
-  file-survey`, whose fifth positional it is, or through the sanctioned raw append. The arm is
+  file-survey`, whose fourth positional it is, or through the sanctioned raw append. The arm is
   live wherever the kit is vendored, with no enabling config. *Consumer:* the citing session at
   whichever stage reads the record: spec, align, build, validate, close or scope, each already
   directed to the record by its template. It reads the field at the moment it would cite the
@@ -302,8 +318,8 @@ commit. If it lands first, the seed carries the bullet, and delta 8's seed inclu
 - `lifecycle-kit/gate-tests/check-survey-record.test.sh` — the `edges-token-unknown` case moves
   to a token in `inferred` (delta 5).
 - `lifecycle-kit/gate-tests/survey-record-entry.test.sh` — any block it seeds re-keyed (delta 5).
-- `lifecycle-kit/smoke/install.sh` — its `--emit file-survey` call's fourth and fifth positionals
-  swapped to the new order (delta 5).
+- `lifecycle-kit/smoke/install.sh` — reviewed, no edit owed: its existing call already types
+  correctly under the direction's `<inferred> <finding>` order (delta 5).
 - `.workflow/survey-record.md` — this repo's own live blocks filed this iteration re-keyed in the
   same commit (delta 5).
 - `native/src/emit/enter_stage.rs` — the read trigger's note (delta 5).
