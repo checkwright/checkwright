@@ -11,6 +11,8 @@ consumer's always-loaded agent file, never copy-installed — re-vendoring the k
 *is* the doctrine upgrade. Each rule lands as its statement, why it holds under
 coding-agent work, and a pointer to the mechanism that enforces it; the
 mechanism and its knob rosters live in the cited kit SPEC, never restated here.
+Length is not graded: a clause stays for its class, never goes for its size
+([SPEC.md](SPEC.md) §The doctrine deliverable).
 
 The roster is in two registers. **Methodology-maintenance** rules govern how the
 methodology's own surfaces stay honest; they bear on every surface edit and form
@@ -46,24 +48,20 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    duplication or collapse the surface so the defect class cannot recur, and no
    gate is owed. No duplication with no gate outranks duplication with a gate;
    tolerated duplication is the exception and carries its defence (the amendment
-   template's sanctioned-copy rule is the model). The caveat that keeps this
-   from reading gate-averse: for a drift-prone surface that must exist, the
-   gate is cheap insurance and is owed — the budget argument never keeps a
-   needed gate out; it keeps removable surfaces from being kept because a gate
-   could watch them. The defence that excuses a *missing* gate on such a
-   surface is a high false-positive rate: a noisy check breeds exemptions and
-   erodes the battery's authority, so the class a check cannot decide cleanly
-   stays a stated manual duty rather than a noisy gate. A stated manual duty
-   carries a *named cadence*, or it is a duty no session performs: the
-   un-gateable class joins a tracked audit roster reviewed on a lifecycle hook,
-   with event-keyed due-ness — a named observable event (a contract edit, a
-   release prep, a template upgrade, a new member on a governed surface) beats
-   an iteration counter no surface tracks. The roster is hand-curated, not derived — which classes escape a
-   clean check is a judgment no tool enumerates, so Derivation-first's ladder
-   lands on state-once-at-the-owner — and the roster plus its review step *are*
-   the capture mechanism this carve-out owes, self-applying like the
-   Gap-disposition rule's costed deferral rather than a gate; a duty with no
-   cadence rots exactly like the gap that rule catches.
+   template's sanctioned-copy rule is the model). But for a drift-prone surface
+   that must exist, the gate is cheap insurance and is owed. The defence that
+   excuses a *missing* gate on such a surface is a high false-positive rate: a
+   noisy check breeds exemptions and erodes the battery's authority, so the
+   class a check cannot decide cleanly stays a stated manual duty rather than a
+   noisy gate. A stated manual duty carries a *named cadence*, or it is a duty
+   no session performs: the un-gateable class joins a tracked audit roster
+   reviewed on a lifecycle hook, with event-keyed due-ness — a named observable
+   event (a contract edit, a release prep, a template upgrade, a new member on a
+   governed surface) beats an iteration counter no surface tracks. The roster is
+   hand-curated, not derived — which classes escape a clean check is a judgment
+   no tool enumerates, so Derivation-first's ladder lands on
+   state-once-at-the-owner — and the roster with its review step is this
+   carve-out's capture mechanism rather than a gate.
    *Under agent work:* an unenforced rule is a rule the next session cannot see;
    a gate is the only carrier of intent that survives a fresh context window.
    *Enforced by:* the meta-gate contracts every gate must satisfy —

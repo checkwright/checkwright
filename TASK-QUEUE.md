@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **doctrine-rule-body-length-unruled** [spec: SPEC-rule-body.md]
-  — two doctrine rule bodies are the longest in the deliverable and neither is narration, a count,
-  nor a seam violation, so a brevity pass finds them and can do nothing with them.
-  **Measured:** rule 11 Scope-gated intake at roughly 20 lines, of which the hotfix-valve paragraph
-  is three nested bounded-three-ways clauses each qualified further; and rule 2 Enforcement-first at
-  roughly 27 lines. The doctrine is load-triggered rather than resident, but every Engineering-craft
-  rule pays at each `--emit stage-rules` read and every methodology rule pays through its digest, so
-  length is a real cost here and not a neutral one.
-  **WHY A CLOSE DID NOT CUT THEM.** Each clause in rule 11 narrows a valve deciding whether work may
-  start mid-iteration, so compressing it changes what a session believes it is permitted to do — a
-  judgment wanting the rule's intent in view rather than a length target, and the close brevity
-  pass's licence is compression, not re-ruling. The same close DID cut this file where the class was
-  unambiguous: two attested-session-narration blocks out of rule 12, which the generalizable rule
-  already carried without them.
-  **Why it needed design:** the disposition is a rule about what a doctrine body owes its digest —
-  a rule whose digest is complete and whose body is three times its length is the readable signal —
-  or an explicit acceptance of the length as the price of a valve that must not be misread, said
-  once. Either way it is a ruling on the deliverable, not an edit.
-  **Joins unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed.**
-  Compressing rule 11's hotfix valve may not widen or narrow what a session may start: that is
-  operator-class, never wording.
-  **Authored at spec 2026-09-13:** a body is ruled by clause class, length ungraded; rule 2
-  loses three restating clauses and rule 11 audits clean, its valve untouched (SPEC-rule-body.md).
-  **Cost while deferred:** two editorial reads unspent, against a surface every stage reads through
-  its digest.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, on the
-  doctrine half of the same brevity pass; drained and promoted at this scope.
-
 - **editor-diagnostic-unruled** [spec: SPEC-ambient-diagnostic.md] — the harness LSP channel
   contradicts the tree's own oracles on crate-touching commits, and no surface rules that channel
   out as an oracle.
@@ -5463,5 +5435,6 @@
 ## Done
 
 - always-loaded-bullets-restate-owned-spec
+- doctrine-rule-body-length-unruled
 
 ## Lessons Learned

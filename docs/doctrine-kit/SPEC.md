@@ -36,6 +36,38 @@ maintenance register forms the installed digest; the craft register lives behind
 the link, load-triggered — the doctrine applying its own load-trigger residency
 rule to itself.
 
+**What a rule body owes beyond its digest.** A rule's body carries its
+*statement* — the convention, its scope, and every valve with each of its
+bounds; the *grounds* of a statement clause where no other surface owns them;
+*why it holds under agent work*; and *where it is enforced*, with that
+enforcement's honest limit — and length grades none of them. What is never owed,
+a compression pass removes on sight: a clause a sibling clause of the same body
+already states; a mechanism's operation or defence that a kit SPEC owns, which
+the *Enforced by* pointer already reaches (the Content-tiering rule applied to
+the doctrine itself); and narration of the sessions that attested the rule,
+whose home is version control. A long body whose every clause is owed is correct
+at its length. The split is the existing doctrine read at the body's grain
+rather than a new obligation — the file header keeps mechanism in the cited kit
+SPEC, and the Content-tiering rule forbids a parallel copy; what it settles is
+the residue a brevity pass meets, a clause in none of the never-owed classes
+that is merely *long*, and length is not a class. A length target is refused on
+the same ground: a digest is one line by construction, so *a body several times
+its digest* is true of every rule and discriminates nothing.
+
+A valve is where that consequence has to be said rather than inferred. A clause
+bounding what a session may start or do is statement, and a compression pass
+does not reword it even where shorter wording looks equivalent: a valve's
+wording is what a session reads to decide whether it is permitted, so changing
+it re-rules the valve, which enters as a scoped unit — the Scope-gated intake
+rule's own self-exemption clause. A repetition inside a valve is not a sibling
+restatement where removing it changes a count the valve enumerates. No gate
+grades any of this; whether a clause is owed is a judgment about its class, the
+false-positive carve-out's case, and its cadence is the close-stage brevity
+pass's walk of the doctrine file whenever it grows
+(context-kit/SPEC.md §The close-stage brevity pass). Its reader is whoever is
+about to shorten a rule body, who opens `DOCTRINE.md` rather than this SPEC, so
+the doctrine header carries a one-line pointer here.
+
 The file is referenced in place, never copy-installed. A consumer vendors the
 kit and links the vendored path; re-vendoring the kit *is* the doctrine upgrade.
 A copied doctrine drifts the moment the source moves and the copy does not; a
