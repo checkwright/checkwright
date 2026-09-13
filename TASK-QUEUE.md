@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: evidence-population-fidelity
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -601,6 +601,8 @@
   Filed 2026-09-06 by the close of `index-runner-hold-release-and-windows-smoke-comparison` into
   the gap inbox, which no stage of that iteration could drain; carried into this iteration's scope
   intake and promoted here, so the record is late and says so.
+  **Selected for `evidence-population-fidelity`** — operator direction, 2026-09-14, lead-relayed,
+  in the set `settings-pins-live-suite-coverage` leads; spec promotes.
 
 - **measured-marker-cannot-sit-mid-paragraph** [design-pending] [cost: event/low] [surface: canon-kit] — `check-measured-claim` binds its
   marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
@@ -1911,6 +1913,8 @@
   ran against anything.
   Filed 2026-08-13 by close, from the roster sweep; raised by the lead and re-scoped here after
   reading the fixtures.
+  **Selected to lead `evidence-population-fidelity`** — operator direction, 2026-09-14,
+  lead-relayed, with the three sibling entries that name that iteration; spec promotes.
 
 - **vendored-library-identifier-reach** [design-pending] [cost: iteration/low] [surface: doctrine-kit] — De-literalization's reach test gives
   two answers for a vendored `lib/*.sh` function, and the corpus holds both populations.
@@ -4463,6 +4467,8 @@
   Filed 2026-08-08 by close, from running the meter during its own brevity pass; iceboxed
   2026-09-11; returned 2026-09-12 at scope on the third incidence, whose measurement arrived as a
   gap bullet from the prior iteration's close, so the record is late and says so.
+  **In the `evidence-population-fidelity` set** by operator direction, 2026-09-14, lead-relayed,
+  ruled together with `drift-baseline-unnamed-iteration` as this body asks; spec promotes.
   recurrence: always-loaded-baseline-restamp-unforced 2026-09-12
 
 
@@ -4502,6 +4508,8 @@
   reading, so the two are best ruled together.
   Filed 2026-08-08 at scope on the lead's ruling, from running the report during its own survey;
   iceboxed 2026-09-11; returned 2026-09-12 at scope on an independent re-derivation.
+  **Joins `evidence-population-fidelity`** on an operator direction of 2026-09-14, lead-relayed,
+  ruled together with `always-loaded-baseline-restamp-unforced`; spec promotes.
   recurrence: drift-baseline-unnamed-iteration 2026-09-12
 
 
