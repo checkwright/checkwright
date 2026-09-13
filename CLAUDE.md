@@ -120,48 +120,33 @@ load behind that trigger, so they are not resident here.
 
 ## Housekeeping
 
-- `.tmp/` is gitignored disposable scratch — gate timings, resume journals,
-  `<key>.run` liveness records — that the scope boundary wipes (keep-list:
-  `scripts/lifecycle-config.sh`); `.metric/` is gitignored persistent,
-  account-bearing measurement, **never committed**; `.workflow/` holds tracked
-  projections beside gitignored capture
-  (gate-sdk/SPEC.md §The workflow directory).
+- `.tmp/` is gitignored disposable scratch the scope boundary wipes;
+  `.metric/` is gitignored persistent, account-bearing measurement, **never
+  committed**; `.workflow/` holds tracked projections beside gitignored
+  capture (gate-sdk/SPEC.md §The workflow directory).
 - Local-only and gitignored: `BRIEF.local.md` (private brief), `ENV.local.md`
-  (probed machine profile plus gotchas — context-kit/SPEC.md §bin/env-probe) and
-  `OPS.local.md` (DNS, repo settings, the release account and push transport).
-  Consult `OPS.local.md` before any domain, repo-settings, release or push work,
-  and run its account step before **any GitHub write**: a write needing no
-  permission succeeds silently under the wrong account, so the step is per-write,
-  never per-session.
+  (machine profile, context-kit/SPEC.md §bin/env-probe) and `OPS.local.md`.
+  Consult `OPS.local.md` before any domain, repo-settings, release or push work;
+  run its account step before **any GitHub write**, per write, never per session.
 - `reserve/` holds the crates.io name-reservation placeholder — do not develop
   in it (the npm name is the `installer/` package below).
-- `native/` is the gate binary's Rust crate — one multi-call binary, a
-  subcommand per gate plus the non-gate arms. The commit-time obligation is the
-  battery, which runs the crate's lint and test arms through `check-crate-arms`,
-  **plus** `bash gate-sdk/bin/build-native.sh`; neither discharges the other. It
-  is **not a kit** — no `checks/`, no `smoke/`, the predicate that makes a root
-  directory one — and `check-gate-binary-fresh` holds the binary's currency.
-  Dispatch, descriptors, port sequencing and the toolchain floor:
-  gate-sdk/SPEC.md §Porting a gate to the binary substrate.
+- `native/` is the gate binary's Rust crate and **not a kit** (no `checks/`, no
+  `smoke/`). The commit-time obligation is `bash gate-sdk/bin/build-native.sh`
+  **plus** the battery; neither discharges the other, and an editor diagnostic
+  discharges neither (gate-sdk/SPEC.md §Porting a gate to the binary substrate).
 - The governed repo-meta pinned in `scripts/core-files.list` is tracked and gated
   like any doc; the fixture is the unit of contribution, so edit the guide, not
   GitHub UI settings.
 - `ROADMAP.md` is a generated root projection of this queue's curated
   `[roadmap:]` tags — never hand-edit its marker block.
-- [`TRAJECTORY.md`](TRAJECTORY.md) is the hand-authored **override ledger** —
-  the objectives of the running pivot and the operator's rulings, each naming
-  the instruction it overrides and its discharge, and leaving the file on
-  discharge. A ruling is closed: escalate it to `/consult`, never reverse,
-  annotate or re-verify it. **Only the operator rules, and only through
-  `/consult`**; what an operator says in a lead or stage session is a
-  direction, revisable at scope or spec, and lands on the work surface it
-  concerns as `operator direction, <date>`. The terms (objective, ruling,
-  direction, decision, grant): lifecycle-kit/SPEC.md §The steering vocabulary.
-- **A permission-settings edit is applied on the operator's behalf, never by
-  hand** (`operator direction, 2026-09-13`) — a high-impact edit waits for explicit
-  confirmation, a low-impact one is applied and reported; a delegated session
-  prepares the diff and hands it up. Impact classes and the refused
-  laundering alternative: guard-kit/SPEC.md §compare-settings-allow.
+- [`TRAJECTORY.md`](TRAJECTORY.md) is the **override ledger**: a ruling is
+  closed: escalate to `/consult`, never reverse, annotate or re-verify. **Only
+  the operator rules, only via `/consult`**; operator words in a lead or stage
+  session are a direction (lifecycle-kit/SPEC.md §The steering vocabulary).
+- **A permission-settings edit is applied on the operator's behalf, never by hand**
+  (`operator direction, 2026-09-13`): a high-impact edit waits for explicit
+  confirmation, a low-impact one is applied and reported, and a delegated session
+  only prepares the diff (guard-kit/SPEC.md §compare-settings-allow).
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit; its chrome, page-authoring rules,
   generated projections and docs gate roster live in the load-triggered
@@ -171,23 +156,17 @@ load behind that trigger, so they are not resident here.
   package from one payload; repo-root-governed, and not a kit by the predicate
   under `native/` above. Its payload is never committed. Layout, boundary and
   packing: installer/README.md.
-- **Knowledge-friction capture (any session):** re-deriving a fact no doc owns
-  (off an implementation, a gate's source, a commit, or a prior/sibling
-  deliverable)? stamp it in the moment with
-  `bash gate-sdk/bin/run-gates.sh --emit kfric "<fact>" "<surface>"` — deferred capture is
-  no capture; close triages it (drift-kit/SPEC.md §The knowledge-friction loop).
-- **Gap capture (any mid-iteration session):** a work-shaped finding — a gap,
-  a task, a defect — routes to the committed gap inbox with
-  `bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"`, never a mid-iteration queue
-  edit contending on a stage session's surface; close drains it
-  (lifecycle-kit/SPEC.md §The committed gap inbox). The sanctioned exception:
-  an operator-directed filing may land in the queue directly, staged and
-  committed in one motion under the shared-index rule above.
-- **Survey capture (any stage session):** bought a survey — a census, a cohort
-  sweep, a roster over a corpus — that a later stage will want? land it before
-  you act on it with
-  `bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"`;
-  and before buying one, read the record and run its witness
+- **Knowledge-friction capture (any session):** re-deriving a fact no doc owns (off an
+  implementation, a gate's source, a commit, or a prior/sibling deliverable)? stamp it in
+  the moment with `bash gate-sdk/bin/run-gates.sh --emit kfric "<fact>" "<surface>"` —
+  deferred capture is no capture (drift-kit/SPEC.md §The knowledge-friction loop).
+- **Gap capture (any mid-iteration session):** a gap, task or defect goes to
+  `bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"`, never a queue edit
+  (lifecycle-kit/SPEC.md §The committed gap inbox) — unless the operator directs a
+  direct entry, staged and committed in one motion under the shared-index rule above.
+- **Survey capture (any stage session):** read the survey record and run its witness
+  before buying a survey; land one a later stage will want before acting on it, with
+  `bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"`
   (lifecycle-kit/SPEC.md §The survey record).
 - No per-user memory files: durable guidance goes in tracked manifests (this file,
   kit SPECs) or `BRIEF.local.md`. Harness auto-memory is enforced off; doctrine:

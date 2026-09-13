@@ -7,7 +7,7 @@ set -euo pipefail
 echo "check-brevity"
 
 # spec: context-kit/SPEC.md §Testing — insert inside the budgeted section, never at EOF (a co-vendored trailing section would push an EOF bullet out of scope)
-section="${CONTEXT_KIT_BREVITY_SECTION:-## Shared conventions}"
+section="${CONTEXT_KIT_BREVITY_SECTIONS[0]:-## Shared conventions}"
 awk -v sec="$section" '
     { print }
     !ins && substr($0, 1, length(sec)) == sec {

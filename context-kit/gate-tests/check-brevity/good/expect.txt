@@ -1,1 +1,1 @@
-BREVITY: clean
+BREVITY: clean (5 bullets, 4 within budget; '## Shared conventions' 5)

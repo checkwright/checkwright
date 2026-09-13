@@ -1380,7 +1380,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "CONTEXT_KIT_BREVITY_FILE",
             "CONTEXT_KIT_BREVITY_BUDGET",
-            "CONTEXT_KIT_BREVITY_SECTION",
+            "CONTEXT_KIT_BREVITY_SECTIONS",
             "CONTEXT_KIT_BREVITY_POINTER_RE",
         ],
         "context-kit",

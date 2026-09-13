@@ -3,6 +3,8 @@
 ## Shared conventions
 
 - **Terse bullet:** one line, well within the budget.
+- A plain bullet with no bold name, within budget, citing the
+  HANDBOOK §Some section: measured, and clean.
 - **Two-liner:** a second continuation line that keeps it at
   two, still comfortably within the four-line budget.
 - **Over budget, no pointer:** this bullet runs long across

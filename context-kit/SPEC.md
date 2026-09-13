@@ -8,7 +8,7 @@ line is a recurring per-session tax that grows silently, because no single
 session ever sees the trend. The kit attacks both: an index-first reading
 toolset, a session-start hook template that assembles a compact brief, a
 meter that tracks the always-loaded surface against a per-iteration
-baseline, a brevity gate over the densest always-loaded section, the
+baseline, a brevity gate over its governed always-loaded sections, the
 close-stage brevity pass that reacts to the meter's delta, and a memory-off
 gate pair that keeps the ungoverned harness-memory surface disabled rather
 than left to accrete.
@@ -769,30 +769,74 @@ stale page.
 
 ## The brevity gate
 
-`check-brevity` — a section-agnostic name: the governed section
-is a knob, so no section name binds the gate (a consumer's
+`check-brevity` — a section-agnostic name: the governed sections
+are a knob, so no section name binds the gate (a consumer's
 `check-convention-brevity` would be its section-specific counterpart). It scans one designated
-always-loaded file for a bulleted section where each `- **name:**` bullet
-carries a line budget, and flags a bullet that is **over budget and cites
-a deeper doc** (carries a `§` pointer) — over-long while admitting its
+always-loaded file for a **set** of bulleted sections (`CONTEXT_KIT_BREVITY_SECTIONS`) where
+every top-level `- ` list item carries a line budget, and flags a bullet that is **over budget
+and cites a deeper doc** (carries a `§` pointer) — over-long while admitting its
 detail already has a home elsewhere. Under-budget bullets and over-budget
 bullets with no pointer pass (the latter may genuinely own their content);
 `<!-- brevity-exempt: <reason> -->` on the bullet's first line or the line
 above blesses a bullet whose every line is load-bearing.
 
-Section resolution fails closed: a `CONTEXT_KIT_BREVITY_SECTION` matching no
-heading in the governed file exits 2, never a clean 0. The knob and the heading
+**The item.** A bullet is a top-level `- ` item and its extent runs to the next
+one or the section's end, so an indented item belongs to its parent. A bold name
+is not required: a restating bullet on the always-loaded tier is as costly whether
+or not it opens in bold, and a predicate reading only `- **` items left most of a
+consumer's housekeeping-shaped sections outside the gate. The span is measured to
+the bullet's last line carrying content. The predicate is the member's own
+argument to the shared section-walking primitive, which
+`check-doctrine-registration` calls with its own, so widening it moves no other
+gate's walk.
+
+**The finding line** names each over-budget bullet by its governed section, its
+line number in the file and its lead — the bold run where the bullet opens with
+one, else the opening characters of its lead line, cut on a character — because
+a bullet with no bold name has nothing else to print, and a finding naming only
+the bullet cannot locate it while several sections are governed. The clean
+line names each section with the count of bullets read in it.
+
+**Section resolution fails closed.** Every element of the set must resolve: an
+element matching no heading in the governed file exits 2 and names that heading,
+never a clean 0, even while its siblings resolve. The knob and the heading
 are a coupling no other gate holds, so a renamed or deleted section would
-otherwise disarm the gate while it reported an empty section as clean — a gate
+otherwise disarm the gate while it reported the rest as clean — a gate
 whose target vanished is a broken machine, not a clean tree. A section that
 resolves and holds no bullets is clean: resolution is what fails closed, not
-emptiness.
+emptiness. An **empty set** also exits 2: a registered gate governing nothing is
+the vacuous pass the fail-closed contract refuses, and a consumer that wants no
+brevity check unregisters the gate — unlike `CONTEXT_KIT_RATCHET_PATHS`, whose
+empty default means *no load-triggered surface*, an empty brevity set has no
+reading. A **repeated element is scanned once**, so a duplicated heading in config
+cannot double a finding or the clean line's count.
+
+**One budget for the set.** `CONTEXT_KIT_BREVITY_BUDGET` is a scalar. A
+per-section budget has no reader while no governed section wants a different
+value, so it is not a field; a consumer that attests one reopens it.
 
 The pointer default is any `§`, not a single doc name like `HANDBOOK §`:
 "cites a deeper doc" is the mechanism-level meaning and a consumer's handbook
 is one instance of it, so the superset matches every such pointer. Ships with
 a `good/`+`bad/` fixture pair and registers in the
 consumer's `gates.list` (this repo's included).
+
+**Two honest limits.**
+
+- **The unit is the physical line.** A bullet joined onto one long line passes
+  any budget. The always-loaded meter and the surface ratchet measure the same
+  unit, so the context apparatus measures one quantity and a joined line lowers
+  all three together; a width-aware span would diverge from both. A cut made to
+  satisfy this gate holds the bullet's own prevailing wrap — no line wider than
+  the widest it already had — rather than buying its budget by joining lines.
+- **The pointer conjunct reads `§` by default**, so a bullet pointing at a
+  document by path alone passes on it. `CONTEXT_KIT_BREVITY_POINTER_RE` is the
+  consumer's lever; widening it to a path pattern also matches a bullet whose
+  *subject* is a file, which is most of a housekeeping section, so this repo
+  leaves it at the default.
+
+Prose outside any bullet — the paragraph sections of an agent file — is outside
+the gate's grammar.
 
 ## The surface ratchet
 
@@ -886,9 +930,11 @@ growth — the consumer's own content shares the file and is theirs to grow — 
 a level gate would be a noisy check breeding exemptions, the high-false-positive
 case the enforcement-first rule sanctions for keeping a class as stated manual
 duty rather than a gate. The mechanical holds that do exist stay: `check-brevity`
-bounds the one bulleted section its knob designates (§The brevity gate; this
-repo points it at the conventions block, not the digest), and the meter delta
-feeds `kpi-always-loaded`.
+bounds the bulleted sections its knob designates (§The brevity gate; this repo
+governs the conventions block and Housekeeping, not the digest — generated one
+line per rule and held byte-for-byte by `check-doctrine-registration`, so a
+brevity finding there is unreachable), and the meter delta feeds
+`kpi-always-loaded`.
 
 The measured counterpart to this budget doctrine is the published footprint page
 (§bin/footprint): this section owns the budget rule, the page owns the measured
@@ -1177,7 +1223,7 @@ no bare collection total.
 ```
 context-kit/
   lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
-  checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
+  checks/check-brevity.gate      # hermetic, binary-dispatched: the governed sections' over-budget pointer bullets
   checks/check-surface-ratchet.gate # hermetic, binary-dispatched: every governed surface at or below its committed ceiling
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
@@ -1189,7 +1235,7 @@ context-kit/
   gate-tests/check-settings-paths/{good,bad}/
   gate-tests/check-memory-off/{good,bad}/
   gate-tests/check-footprint-fresh/{good,bad}/
-  gate-tests/check-brevity.test.sh      # the unmatched-section axis the pair cannot hold
+  gate-tests/check-brevity.test.sh      # the section-set resolution axes the pair cannot hold
   gate-tests/check-surface-ratchet.test.sh # the refusal axis the pair cannot hold
   gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold
   gate-tests/check-settings-pins.test.sh # the refusal axis the pair cannot hold
@@ -1393,8 +1439,18 @@ spelling, and there the absolute answer is the honest one.
   repo's own copy names its kit templates, agent definitions and binding shims,
   and excludes the gate-test fixture corpus.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
-- `CONTEXT_KIT_BREVITY_SECTION` — heading of the budgeted bullet section;
-  default `## Shared conventions`.
+- `CONTEXT_KIT_BREVITY_SECTIONS` — array of headings of the budgeted bullet
+  sections; default `("## Shared conventions")`, a one-element set. It replaces
+  the retired scalar `CONTEXT_KIT_BREVITY_SECTION`, which **`lib/context.sh`
+  refuses (exit 2, naming the replacement) when set**, for the reason
+  `CONTEXT_KIT_SETTINGS_FILE`'s refusal lives there: once values cross the config
+  bridge a compiled reader sees only declared knobs, the retired name is not
+  one, and without the refusal a config still setting it would be silently
+  ignored while a file carrying `## Shared conventions` was governed on the wrong
+  section at exit 0 (the retired `GATE_SDK_GRAPH_THEME` precedent,
+  gate-sdk/SPEC.md §check-graph). A scalar and a one-element array cross the
+  bridge as the same value, so the member reads the set through the bridge's
+  array read. This repo governs the conventions block and `## Housekeeping`.
 - `CONTEXT_KIT_BREVITY_BUDGET` — lines per bullet; default `4`.
 - `CONTEXT_KIT_BREVITY_POINTER_RE` — the "cites a deeper doc" pattern;
   default `§`.
@@ -1497,11 +1553,14 @@ check-identity precedent) reading `<dir>/settings.json` against
 `CONTEXT_KIT_MEMORY_DIRS` from its own case-dir config, because that member's
 fixture arm was deleted for being a code path its live arm never took.
 The direct unit tests beside the pairs hold the axes those pairs fix and so
-cannot express: `check-brevity.test.sh` holds the unmatched-section resolution (the
-pair fixes `CONTEXT_KIT_BREVITY_SECTION` at the stock default and always
-supplies a file carrying it, so neither case can express a section that
-resolves to nothing — an unmatched section is exit 2, a broken machine rather
-than a clean tree). The memory-off local-override axis — an untracked
+cannot express: `check-brevity.test.sh` holds the section-set resolution (the
+pair fixes `CONTEXT_KIT_BREVITY_SECTIONS` at the stock one-element default and
+always supplies a file carrying it, so neither case can express an element that
+resolves to nothing — exit 2, a broken machine rather than a clean tree — nor an
+unmatched element beside a resolved one, the empty set, a repeated element, a
+second section's non-bold bullet, or the retired scalar knob's refusal). The pair
+itself carries a non-bold bullet on each side, over budget with a pointer in
+`bad/` and within budget in `good/`. The memory-off local-override axis — an untracked
 `settings.local.json` that re-enables a pinned key past an empty dir — cannot
 be a good/bad pair (the pair fixes the dir axis), so `check-memory-off.test.sh`
 holds it. `check-settings-pins.test.sh` holds the **refusal** axis: the pair
@@ -1535,10 +1594,10 @@ accounting's own probe exempts it (gate-sdk/SPEC.md §Consumer smoke) and no
 `# smoke-unregistered:` reason is owed.
 `smoke/violation.sh` crafts an over-budget pointered bullet in the scratch
 consumer's brevity file and asserts the battery reddens via
-`check-brevity`. It inserts the bullet inside the budgeted section rather than
+`check-brevity`. It inserts the bullet inside the first governed section rather than
 appending at end-of-file: a co-vendored kit may append a trailing section (the
 doctrine-kit installer adds one), and an EOF-appended bullet would land outside
-`check-brevity`'s scanned section and silently disarm the smoke.
+`check-brevity`'s scanned sections and silently disarm the smoke.
 
 Both of those scripts stay on the shell substrate permanently and carry
 `# no-port:` saying so. The disposition is not this section's to argue: it is the

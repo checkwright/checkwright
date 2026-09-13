@@ -446,7 +446,7 @@ if staged_matches '.claude/agents/*.md'; then
 fi
 
 if staged_matches 'CLAUDE.md'; then
-    run_gate check-brevity env GATE_SDK_KNOB_CONTEXT_KIT_BREVITY_FILE=CLAUDE.md GATE_SDK_KNOB_CONTEXT_KIT_BREVITY_BUDGET=4 $'GATE_SDK_KNOB_CONTEXT_KIT_BREVITY_SECTION=## Conventions established in gate-sdk (keep every kit consistent)' $'GATE_SDK_KNOB_CONTEXT_KIT_BREVITY_POINTER_RE=§' native/target/release/checkwright-gates check-brevity
+    run_gate check-brevity env GATE_SDK_KNOB_CONTEXT_KIT_BREVITY_FILE=CLAUDE.md GATE_SDK_KNOB_CONTEXT_KIT_BREVITY_BUDGET=4 $'GATE_SDK_KNOB_CONTEXT_KIT_BREVITY_SECTIONS=## Conventions established in gate-sdk (keep every kit consistent)\t## Housekeeping' $'GATE_SDK_KNOB_CONTEXT_KIT_BREVITY_POINTER_RE=§' native/target/release/checkwright-gates check-brevity
 fi
 
 if staged_matches '.workflow/surface-ceiling.txt' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md' '.claude/agents/*.md' '.claude/commands/*.md' 'native/src/gates/surface_ratchet.rs' 'native/src/emit/always_loaded.rs'; then

@@ -12,45 +12,6 @@
 
 ## New Features
 
-- **always-loaded-bullets-restate-owned-spec** [spec: SPEC-brevity-reach.md]
-  — the always-loaded surface carries four bullets whose bodies restate what the kit SPEC they
-  point at already owns.
-  **Measured at a close brevity pass, ranked by lines.** (1) The TRAJECTORY.md bullet, 9 lines
-  defining the ruling/direction/decision/grant vocabulary and the consult-only rule before pointing
-  at lifecycle-kit/SPEC.md §The steering vocabulary, which owns those definitions. (2) The `native/`
-  bullet, 8 lines on crate structure, the commit-time obligation and the not-a-kit predicate before
-  pointing at gate-sdk/SPEC.md §Porting a gate to the binary substrate. (3) The three capture
-  bullets at roughly 21 lines together, where the invocable commands MUST stay resident — they are
-  the invocation surface an agent needs every session — but the surrounding policy prose duplicates
-  the kit sections each bullet already cites. (4) The `.tmp`/`.metric`/`.workflow` bullet at 6
-  lines, mostly definitional.
-  **WHY A CLOSE COULD NOT TAKE IT, which is why it is filed rather than done.** The resident tier is
-  what every session of every stage reads, so a cut dropping a load-bearing clause is discovered as
-  a behaviour change in some later session with no gate between, and the surface sits at its
-  committed ceiling so the change cannot be validated by the ratchet moving. A close also has no
-  mandate to rewrite what sessions are instructed with.
-  **The pass paid for its own addition in-iteration:** two lines cut from the opening paragraph
-  funded a one-line `couples=` pointer, so the meter read 202l and +0 unchanged.
-  **Why it needed design:** what a resident bullet owes beyond its pointer is unruled, and the
-  answer is a rule about the always-loaded tier rather than four edits.
-  **Premise corrected 2026-09-13 at scope:** doctrine-kit/DOCTRINE.md rule 5 already rules one line
-  per rule with the mechanism behind the pointer; what is unruled is ENFORCEMENT REACH, since
-  `check-brevity` governs one designated section and only bold-name bullets, leaving Housekeeping
-  outside. A fifth multi-line restating bullet, the permission-settings one, landed 2026-09-13.
-  **Leads unit set `resident-tier-restatement` — operator direction, 2026-09-13, lead-relayed**,
-  with `doctrine-rule-body-length-unruled` and `editor-diagnostic-unruled`.
-  **Authored at spec 2026-09-13:** the gate governs a section SET and every top-level bullet;
-  this repo adds Housekeeping, and the eight bullets that then red are cut with each dropped
-  clause traced to its owner (SPEC-brevity-reach.md).
-  **Seam ruled 2026-09-13 at scope.** Kit mechanism: the brevity gate's reach, should `/spec` widen
-  it past one section. Consumer config: which sections are governed, and their budgets, stay in
-  `scripts/context-config.sh`; no section name enters a kit literal. No private rule content is in
-  reach. Spelling, shape and the per-bullet cuts are `/spec`'s.
-  **Cost while deferred:** four restatements on the highest-blast-radius surface in the tree, each
-  re-read by every session of every stage.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its always-loaded
-  brevity pass; drained and promoted at this iteration's scope.
-
 - **doctrine-rule-body-length-unruled** [spec: SPEC-rule-body.md]
   — two doctrine rule bodies are the longest in the deliverable and neither is narration, a count,
   nor a seam violation, so a brevity pass finds them and can do nothing with them.
@@ -5500,5 +5461,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- always-loaded-bullets-restate-owned-spec
 
 ## Lessons Learned

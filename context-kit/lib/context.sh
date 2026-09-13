@@ -33,7 +33,12 @@ unset _ck_cfg
 [[ -v CONTEXT_KIT_MEMORY_DIRS ]] || CONTEXT_KIT_MEMORY_DIRS=""
 
 [[ -v CONTEXT_KIT_BREVITY_FILE ]] || CONTEXT_KIT_BREVITY_FILE="CLAUDE.md"
-[[ -v CONTEXT_KIT_BREVITY_SECTION ]] || CONTEXT_KIT_BREVITY_SECTION="## Shared conventions"
+# spec: context-kit/SPEC.md §Layout and configuration — CONTEXT_KIT_BREVITY_SECTION is RETIRED for the CONTEXT_KIT_BREVITY_SECTIONS set and refused when set, here because a compiled reader sees only declared knobs and the retired name is no longer one; named rather than deleted so a consumer grepping the kit for the old knob lands on its replacement
+[[ -v CONTEXT_KIT_BREVITY_SECTION ]] && {
+    echo "context-kit: CONTEXT_KIT_BREVITY_SECTION is retired — set CONTEXT_KIT_BREVITY_SECTIONS=(\"<heading>\" ...) instead" >&2
+    exit 2
+}
+declare -p CONTEXT_KIT_BREVITY_SECTIONS >/dev/null 2>&1 || CONTEXT_KIT_BREVITY_SECTIONS=("## Shared conventions")
 [[ -v CONTEXT_KIT_BREVITY_BUDGET ]] || CONTEXT_KIT_BREVITY_BUDGET=4
 [[ -v CONTEXT_KIT_BREVITY_POINTER_RE ]] || CONTEXT_KIT_BREVITY_POINTER_RE="§"
 

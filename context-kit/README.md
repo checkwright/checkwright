@@ -3,7 +3,7 @@
 Token-economics-aware context management for stateless agent sessions: an
 index-first reading toolset, a session-start hook that assembles a compact
 brief, a meter that tracks the always-loaded surface against a committed
-baseline, one gate over the densest always-loaded section, a freshness-gated
+baseline, one gate over its governed always-loaded sections, a freshness-gated
 per-kit token-footprint projection, a close-stage
 brevity pass that reacts to the meter's delta, and a memory-off gate pair
 (settings pins plus a local memory-dir scan) that keeps the harness's
@@ -69,8 +69,8 @@ hook approximation and the session-context template also expect
    when the box changes. The session-context hook emits it when present.
 
 5. Optional — retune: copy `templates/context-config.sh` into your gates dir and
-   override any knob (surfaces, hook-body command, brevity file/section/budget/
-   pointer pattern, env-profile file). Defaults are this repo's layout. Splice
+   override any knob (surfaces, hook-body command, brevity file/section set/
+   budget/pointer pattern, env-profile file). Defaults are this repo's layout. Splice
    `templates/close-brevity.md` into your close skill.
 
 ## Use

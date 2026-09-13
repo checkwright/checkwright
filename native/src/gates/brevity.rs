@@ -1,21 +1,35 @@
-// spec: context-kit/SPEC.md §The brevity gate — an over-budget bullet in the budgeted
-// always-loaded section that admits its detail lives elsewhere
+// spec: context-kit/SPEC.md §The brevity gate — an over-budget bullet in a governed always-loaded
+// section that admits its detail lives elsewhere
 use crate::ere::Ere;
 use crate::section;
 use crate::walk;
 
-// spec: context-kit/SPEC.md §The brevity gate — the bullet's name, the lead-in stripped and the
-// bold run closed; a bullet whose bold never closes keeps the rest of its line
-fn bullet_name(line: &str) -> &str {
-    let rest = line.strip_prefix("- **").unwrap_or(line);
-    match rest.find("**") {
-        Some(at) => &rest[..at],
-        None => rest,
+// spec: context-kit/SPEC.md §The brevity gate — the lead's width when a bullet opens without a bold
+// run, counted in characters so the cut never splits one
+const LEAD_WIDTH: usize = 48;
+
+// spec: context-kit/SPEC.md §The brevity gate — the bullet's lead: the bold run where the bullet
+// opens with one (a run that never closes keeps the rest of its line), else its lead line's opening
+// text
+fn bullet_lead(line: &str) -> String {
+    if let Some(rest) = line.strip_prefix("- **") {
+        return match rest.find("**") {
+            Some(at) => rest[..at].to_string(),
+            None => rest.to_string(),
+        };
+    }
+    let rest = line.strip_prefix("- ").unwrap_or(line);
+    let mut chars = rest.chars();
+    let head: String = chars.by_ref().take(LEAD_WIDTH).collect();
+    if chars.next().is_some() {
+        format!("{}…", head)
+    } else {
+        head
     }
 }
 
 struct Bullet {
-    name: String,
+    lead: String,
     span: usize,
     pointer: bool,
     exempt: bool,
@@ -34,7 +48,7 @@ fn measure(lines: &[&str], at: usize, end: usize, pointer_re: &Ere) -> Bullet {
         }
     }
     Bullet {
-        name: bullet_name(lines[at]).to_string(),
+        lead: bullet_lead(lines[at]),
         span,
         pointer: pointer_re.is_match(&body),
         exempt: lines[at].contains("brevity-exempt")
@@ -42,16 +56,42 @@ fn measure(lines: &[&str], at: usize, end: usize, pointer_re: &Ere) -> Bullet {
     }
 }
 
+// spec: context-kit/SPEC.md §The brevity gate — every top-level list item is measured, so a bullet
+// needs no bold name to be in reach; an indented item belongs to its parent's extent
+fn is_item(line: &str) -> bool {
+    line.starts_with("- ")
+}
+
+// spec: context-kit/SPEC.md §The brevity gate — a repeated element is scanned once, so a duplicated
+// heading in config cannot double a finding or the clean line's count
+fn distinct(names: Vec<String>) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for n in names {
+        if !out.contains(&n) {
+            out.push(n);
+        }
+    }
+    out
+}
+
 pub fn run(args: &[String]) -> i32 {
     let knob = |name: &str| walk::knob_scalar(name);
 
-    let section_name = match knob("CONTEXT_KIT_BREVITY_SECTION") {
-        Ok(v) => v,
+    let section_names = match walk::knob_array("CONTEXT_KIT_BREVITY_SECTIONS") {
+        Ok(v) => distinct(v),
         Err(e) => {
             eprintln!("check-brevity: {}", e);
             return 2;
         }
     };
+    if section_names.is_empty() {
+        eprintln!("check-brevity: CONTEXT_KIT_BREVITY_SECTIONS is empty — the gate governs nothing");
+        eprintln!(
+            "check-brevity: help: name at least one heading of the governed file, or unregister \
+             check-brevity to opt out of the brevity check"
+        );
+        return 2;
+    }
     let budget: usize = match knob("CONTEXT_KIT_BREVITY_BUDGET") {
         Ok(v) => match v.parse() {
             Ok(n) => n,
@@ -117,46 +157,70 @@ pub fn run(args: &[String]) -> i32 {
     };
 
     let lines = section::split_lines(&text);
-    let found = section::sections(&lines, &section_name);
-    if found.is_empty() {
-        eprintln!(
-            "check-brevity: no heading matches CONTEXT_KIT_BREVITY_SECTION in {}: '{}'",
-            brevity_file, section_name
-        );
+    let mut resolved: Vec<(&str, Vec<section::Section>)> = Vec::new();
+    let mut unmatched: Vec<&str> = Vec::new();
+    for name in &section_names {
+        let found = section::sections(&lines, name);
+        if found.is_empty() {
+            unmatched.push(name);
+        } else {
+            resolved.push((name, found));
+        }
+    }
+    if !unmatched.is_empty() {
+        for name in &unmatched {
+            eprintln!(
+                "check-brevity: no heading matches CONTEXT_KIT_BREVITY_SECTIONS element in {}: '{}'",
+                brevity_file, name
+            );
+        }
         eprintln!(
             "check-brevity: help: a renamed or deleted section silently disarms this gate — \
-             repoint CONTEXT_KIT_BREVITY_SECTION at the live heading, or restore the heading it names"
+             repoint the CONTEXT_KIT_BREVITY_SECTIONS element at the live heading, or restore the \
+             heading it names"
         );
         return 2;
     }
 
     let mut total = 0usize;
     let mut within = 0usize;
+    let mut counts: Vec<String> = Vec::new();
     let mut findings: Vec<String> = Vec::new();
-    for sec in &found {
-        let body = &lines[sec.start..sec.end];
-        for item in section::items(body, |l| l.starts_with("- **")) {
-            let b = measure(&lines, sec.start + item.start, sec.start + item.end, &pointer_re);
-            total += 1;
-            if b.span <= budget {
-                within += 1;
+    let mut scanned: Vec<usize> = Vec::new();
+    for (name, found) in &resolved {
+        let mut in_section = 0usize;
+        for sec in found {
+            if scanned.contains(&sec.start) {
+                continue;
             }
-            if b.span > budget && b.pointer && !b.exempt {
-                findings.push(format!(
-                    "{} — {} lines AND cites a deeper doc (over the {}-line budget while \
-                     admitting its detail lives elsewhere)",
-                    b.name, b.span, budget
-                ));
+            scanned.push(sec.start);
+            let body = &lines[sec.start..sec.end];
+            for item in section::items(body, is_item) {
+                let at = sec.start + item.start;
+                let b = measure(&lines, at, sec.start + item.end, &pointer_re);
+                total += 1;
+                in_section += 1;
+                if b.span <= budget {
+                    within += 1;
+                }
+                if b.span > budget && b.pointer && !b.exempt {
+                    findings.push(format!(
+                        "'{}' line {}: {} — {} lines AND cites a deeper doc (over the {}-line \
+                         budget while admitting its detail lives elsewhere)",
+                        name,
+                        at + 1,
+                        b.lead,
+                        b.span,
+                        budget
+                    ));
+                }
             }
         }
+        counts.push(format!("'{}' {}", name, in_section));
     }
 
     if !findings.is_empty() {
-        println!(
-            "BREVITY: {} bullet(s) over budget in '{}':",
-            findings.len(),
-            section_name
-        );
+        println!("BREVITY: {} bullet(s) over budget:", findings.len());
         for f in &findings {
             println!("  {}", f);
         }
@@ -168,7 +232,12 @@ pub fn run(args: &[String]) -> i32 {
         );
         return 1;
     }
-    println!("BREVITY: clean ({} bullets, {} within budget)", total, within);
+    println!(
+        "BREVITY: clean ({} bullets, {} within budget; {})",
+        total,
+        within,
+        counts.join(", ")
+    );
     0
 }
 
@@ -187,7 +256,7 @@ mod tests {
         let lines = section::split_lines("## S\n- **a** — x\ncont\n\n\n");
         let b = measure(&lines, 1, lines.len(), &re());
         assert_eq!(b.span, 2);
-        assert_eq!(b.name, "a");
+        assert_eq!(b.lead, "a");
         assert!(!b.pointer);
     }
 
@@ -210,8 +279,29 @@ mod tests {
     }
 
     #[test]
-    fn the_name_is_the_bold_run_and_survives_an_unclosed_one() {
-        assert_eq!(bullet_name("- **Name** — body"), "Name");
-        assert_eq!(bullet_name("- **Name"), "Name");
+    fn the_lead_is_the_bold_run_and_survives_an_unclosed_one() {
+        assert_eq!(bullet_lead("- **Name** — body"), "Name");
+        assert_eq!(bullet_lead("- **Name"), "Name");
+    }
+
+    #[test]
+    fn a_bullet_without_a_bold_run_leads_with_its_opening_text_cut_on_a_character() {
+        assert_eq!(bullet_lead("- `.tmp/` is scratch"), "`.tmp/` is scratch");
+        let long = format!("- {}", "é".repeat(LEAD_WIDTH + 3));
+        assert_eq!(bullet_lead(&long), format!("{}…", "é".repeat(LEAD_WIDTH)));
+    }
+
+    #[test]
+    fn every_top_level_item_leads_and_an_indented_one_does_not() {
+        assert!(is_item("- plain"));
+        assert!(is_item("- **bold**"));
+        assert!(!is_item("  - nested"));
+        assert!(!is_item("-no space"));
+    }
+
+    #[test]
+    fn a_repeated_section_name_is_kept_once_in_first_order() {
+        let got = distinct(vec!["## B".into(), "## A".into(), "## B".into()]);
+        assert_eq!(got, vec!["## B".to_string(), "## A".to_string()]);
     }
 }
