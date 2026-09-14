@@ -174,9 +174,19 @@ pub fn projected_members(cfg: &Config) -> Result<Vec<Member>, String> {
             None => continue,
         };
         let f = registry::manifest_fields(man);
+        // spec: gate-sdk/SPEC.md §check-graph — a derived knob-file couple is an edge like an
+        // authored one, so the published graph draws it
+        let mut couples =
+            registry::expand_couples(&registry::field(&f, "couples"), &cfg.kit_roots_rel)?;
+        for p in registry::knob_files(&name, &cfg.resolve_dirs)? {
+            if !couples.is_empty() {
+                couples.push(',');
+            }
+            couples.push_str(&p);
+        }
         out.push(Member {
             name,
-            couples: registry::expand_couples(&registry::field(&f, "couples"), &cfg.kit_roots_rel)?,
+            couples,
             dir: registry::field(&f, "dir"),
             valve: registry::field(&f, "valve"),
         });

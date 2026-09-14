@@ -12,26 +12,6 @@
 
 ## New Features
 
-- **static-knob-file-couple-underived** [spec: SPEC-knob-file-couples.md] — a gate reading a static
-  kit's knob file must couple that file (gate-sdk/SPEC.md §The `# graph:` manifest: couples covers
-  every path read), and nothing derives or asserts it, so a knob-file edit skips the gate at
-  pre-commit and only the battery reaches it.
-  **Measured at `config-seam-second-cut`'s close:** every registered gate run once per static kit
-  with that kit's `<KIT>_KNOB_FILE` pointed at a malformed file. 35 gates flipped; 25 descriptors
-  lacked the file and were coupled by hand in the drain commit. The kit's move to a knob file had
-  dropped `check-queue-slug-liveness`'s trigger, since its `scripts/*.sh` couple stood in for
-  `scripts/queue-config.sh`, and most readers had never coupled their config at all.
-  **Why it needed design:** a gate's registry declaration names the static knobs its own code reads,
-  so hook generation could add `<gates-dir>/<stem>-config.knobs` per declared kit. It would miss
-  three reader shapes the probe found: meta-gates reading knob files by expanding other members'
-  `knob:` tokens (`check-graph`, `check-reads-couples`, `check-gate-substrate-parity`), a gate
-  spawning an arm that reads one (`check-prose-enum` through its enum-sets command), and a freshness
-  gate whose projection reads every kit.
-  Filed 2026-09-14 by close, from the drain of build's gap bullet.
-  **Rides `config-seam-third-cut` beside config-seam-static-format's cut 3** — operator direction,
-  2026-09-14, lead-relayed. Spec ruled the derivation's reach and its one residue, and lands it
-  before the cut (the amendment's header).
-
 - **config-seam-static-format** [spec: SPEC-knob-files-cut-3.md] — the knob seam is still executable
   bash for every bridged kit: a knob's value is computed by sourcing the owning kit's `lib/*.sh` and
   the consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh), so the battery, hook
@@ -4982,5 +4962,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- static-knob-file-couple-underived
 
 ## Lessons Learned

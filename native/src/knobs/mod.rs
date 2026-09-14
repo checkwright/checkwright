@@ -192,7 +192,7 @@ pub fn is_static(name: &str) -> bool {
 // a file cannot name its own directory
 pub const GATES_DIR_DEFAULT: &str = "scripts";
 
-fn gates_dir() -> String {
+pub fn gates_dir() -> String {
     std::env::var("GATE_SDK_GATES_DIR")
         .ok()
         .filter(|v| !v.is_empty())

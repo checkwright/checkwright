@@ -584,8 +584,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
 
-        let surf: Vec<&str> = couples.split(',').collect();
-        for s in &surf {
+        for s in couples.split(',') {
             if !in_vocab(s, &vocab) {
                 errors.push(format!(
                     "MANIFEST: {} couples surface '{}' not in the declared GRAPH_VOCAB",
@@ -593,16 +592,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 ));
             }
         }
-
-        // assertion B: couples⊆trigger parity
-        let trig_set = if trigger.is_empty() {
-            couples.clone()
-        } else {
-            trigger.clone()
-        };
-        let trigsurf: Vec<&str> = trig_set.split(',').collect();
-        for s in &trigsurf {
-            if *s == "*" {
+        let authored_trigger = if trigger.is_empty() { &couples } else { &trigger };
+        for s in authored_trigger.split(',') {
+            if s == "*" {
                 continue;
             }
             if !in_vocab(s, &vocab) {
@@ -612,6 +604,31 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 ));
             }
         }
+
+        // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the derived knob files join both fields
+        // after the vocabulary check, which reads the authored field alone
+        let derived = registry::knob_files(c, &cfg.resolve_dirs)?;
+        let append = |field: &str| -> String {
+            let mut out = field.to_string();
+            for p in &derived {
+                out.push(',');
+                out.push_str(p);
+            }
+            out
+        };
+        couples = append(&couples);
+        if !trigger.is_empty() && trigger != "*" {
+            trigger = append(&trigger);
+        }
+        let surf: Vec<&str> = couples.split(',').collect();
+
+        // assertion B: couples⊆trigger parity
+        let trig_set = if trigger.is_empty() {
+            couples.clone()
+        } else {
+            trigger.clone()
+        };
+        let trigsurf: Vec<&str> = trig_set.split(',').collect();
         for s in &surf {
             if !covered_by(s, &trigsurf) {
                 errors.push(format!(

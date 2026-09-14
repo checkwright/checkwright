@@ -2143,6 +2143,43 @@ The manifest grammar:
   for the statically resolvable walks — so the author's duty narrows to the
   undecidable remainder that gate skips-and-counts (check-shim-restatement's
   stage-template subdirectory was exactly this bug).
+  **A static kit's knob file is a derived couple, never a hand-written one.** A
+  member that reads a static knob reads its kit's knob file, so the couple is a
+  function of the member's registry declaration, and `registry::knob_files`
+  computes it. The set holds `<gates-dir>/<stem>-config.knobs` for every static kit
+  the declaration reaches, in the static-kit table's order, where a declaration
+  reaches a kit through:
+  - **a declared name the kit owns**, a `<KIT>_…*` family name included;
+  - **the couples-knob sentinel**, which reaches each static kit owning a name a
+    `knob:` token in the descriptor corpus carries — the sentinel's static half,
+    computed from the corpus exactly as its bridged half is (§lib/gate.sh);
+  - **a derived default's declared input** that another static kit owns,
+    transitively.
+
+  The gates directory is the locator the static reader itself uses, env-or-default
+  (§The knob file). The set names the tracked file at its default location and
+  nothing else. The local overlay is gitignored and never staged, so it fires no
+  trigger. A tracked file relocated through `<KIT>_KNOB_FILE` is a per-invocation
+  path that a tracked hook cannot bake, so a consumer who relocates one couples it
+  by hand.
+  **The derivation stops at a command.** A knob whose value is a command hands its
+  reads to the program it names, and the kit cannot see them. A member spawning a
+  consumer's command couples the command knob's own kit file, which the rules above
+  derive, and the program's reads are the consumer's to couple.
+  A `mode=staged` member that reaches a static kit is refused at exit 2 by every
+  reader of the derivation. The staged hook passes matched paths to the gate as
+  arguments, so a derived knob file would reach the gate as a file to scan. No
+  staged member reads a static knob.
+  **Every trigger reader appends the set**: a member's trigger is its expanded
+  `trigger=`, or its expanded `couples=` when `trigger=` is absent, followed by
+  `registry::knob_files(member)`, and a `trigger=*` member is unchanged. The four
+  readers are `run-gates --for` (§run-gates), `check-graph`'s manifest loop and the
+  graph emitter (§check-graph), and hook generation (§gen-pre-commit). The three
+  readers that take `registry::expand_couples` for another purpose do not append it:
+  `check-reads-couples` asks about walk roots and a knob file is a named-file read;
+  `check-gate-substrate-parity` assertion C asks about gate declaration paths, which
+  a knob file never is; and `port-blockers` prints the descriptor's own field as
+  evidence.
 - `dir=` — `bi` for a coupling bijection (both sides must agree), `one` for a
   one-way audit.
 - `valve=` — `PROPOSED` marks a cycle valve: a coupling where a leading
@@ -9258,7 +9295,19 @@ test holds the two derivations and the two spellings of the literal together. A
 registry-wide union was refused on measurement rather than on taste: a registry's knob
 count runs an order of magnitude past what any descriptor corpus names, so that carrier
 would grow one member's baked hook invocation far past the shape it needs and stale it on
-every knob edit anywhere.
+every knob edit anywhere. The sentinel's **static half** — the corpus names a static
+kit owns — is the crate's `registry::couples_knob_static_names`, read by the knob-file
+derivation (§The `# graph:` manifest) over the same resolve dirs.
+
+`--knob-files <check-dir>... -- [<gate-name>...]` prints one `<gate-name>`⇥`<path>`
+line per derived knob file, for the named members or, with none after `--`, for every
+registry member. The check dirs are the resolve dirs its caller already holds, gates
+directory first, because the sentinel's static half and the staged refusal read the
+descriptor corpus and a top-level flag reaches no bridged layout. A member deriving
+none prints nothing. A missing `--`, no check dir, a name the registry does not carry,
+or a `mode=staged` member that reaches a static kit is exit 2. It reads no knob and
+resolves no bridge; a caller whose dirs differ from the crate's reddens `check-graph`
+assertion D.
 
 **So a knob has exactly one producer, and which one is a property of its owning
 kit.** A kit whose knobs are **static** has a defaults table in the crate, and its
@@ -10652,7 +10701,8 @@ rule spelled at the one place both causes converge. A status rather than a secon
 `run-gates.sh --for <path> [<path>...]` is the path-scoped selector, the
 agent-callable half of the oracle-first rule: it resolves the registry exactly
 as a bare run, then runs only the members whose *effective trigger* (`trigger=`
-else `couples=`, expanded through `gate_expand_couples_var`) glob-matches at least
+else `couples=`, expanded through `gate_expand_couples_var`, followed by the
+member's derived knob files per §The `# graph:` manifest) glob-matches at least
 one given repo-relative path. Registry order and per-gate output are unchanged;
 a bare `run-gates.sh` keeps its behavior. The loop this buys — edit → run
 coupled gates → read the verdict+help — is strictly cheaper than reading gate
@@ -11888,7 +11938,11 @@ wrapper lives in the emitter's heredoc, so the freshness assertion carries any
 change into the committed hooks. A `trigger=`/`couples=` `kit:<glob>` token is emitted *expanded*
 (via `gate_expand_couples_var`), so adding a kit later reddens `check-graph`
 (committed hook ≠ `--emit`) until regeneration — the freshness gate keeps the
-static hooks honest across a kit-set change.
+static hooks honest across a kit-set change. A member's derived knob files
+(§The `# graph:` manifest) follow its expanded trigger, read once per process from
+the binary's `--knob-files` over this generator's own check dirs (§lib/gate.sh);
+assertion D regenerates the hook, so the hook and `--for` cannot diverge on them
+without a red.
 
 ### install-hooks
 
@@ -13538,7 +13592,8 @@ crate's dispatch roster joined to the battery's registration.
   subcommand with no descriptor and red as a stranded implementation.
   `--knobs` is the fourth, added by the config bridge (§lib/gate.sh), and it is
   named here rather than left to be re-derived: it was written against exactly
-  this paragraph's invitation to the next author. The owner column adds no fifth:
+  this paragraph's invitation to the next author; `--knob-files`, added by the
+  knob-file derivation (§lib/gate.sh), is another. The owner column adds no further flag:
   it is roster **data** on a line the roster already carries, which is the whole
   reason it was taken instead of a flag.
 - **assertion C — disposition coverage.** Every substrate-sensitive member
@@ -15163,6 +15218,12 @@ knobs its own code reads, so an admissible token is provably a corpus the gate r
 **Couples-to-hook parity is unaffected by either token**, and the reason is
 structural rather than measured: both operands of that comparison pass through the
 same expansion, so they agree by construction whatever the token set is.
+**The derived knob files join both fields after the vocabulary check.** The loop
+appends a member's derived knob files (§The `# graph:` manifest) to its expanded
+`couples=` and `trigger=` alike, so couples-within-trigger parity is unchanged; the
+`GRAPH_VOCAB` surface check reads the authored field alone, because a derived path is
+no surface a consumer wrote. The graph emitter appends the same set, so the published
+coupling graph draws the edge a derived couple creates.
 
 **The interpreter assertion D spawns is resolved, not named** — and it is
 resolved by the **owner**, not by the call site. Assertion D spawns the bare

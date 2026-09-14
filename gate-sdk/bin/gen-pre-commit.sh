@@ -85,6 +85,21 @@ read_manual() {
 }
 read_manual
 
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — a static kit's knob file is a derived couple, read once per process from the binary over this script's own check dirs
+declare -A KNOB_FILES=()
+read_knob_files() {
+    local out member path
+    out="$("$(gate_native_bin)" --knob-files "${REL_DIRS[@]}" --)" || {
+        echo "gen-pre-commit: --knob-files could not derive the static knob-file couples; treating as failure (not clean)" >&2
+        exit 2
+    }
+    while IFS=$'\t' read -r member path; do
+        [[ -n "$member" ]] || continue
+        KNOB_FILES["$member"]+="${KNOB_FILES[$member]:+,}$path"
+    done <<<"$out"
+}
+read_knob_files
+
 manifest_field() {
     local gate="$1" key="$2" src
     src="$(resolve_rel "$gate")" || return 0
@@ -108,6 +123,7 @@ emit_block() {
     couples="$(manifest_field "$gate" couples)"
     trigger="$(manifest_field "$gate" trigger)"; trigger="${trigger:-$couples}"
     gate_expand_couples_var trigger "$trigger" || exit 2
+    [[ "$trigger" == '*' || -z "${KNOB_FILES[$gate]:-}" ]] || trigger+="${trigger:+,}${KNOB_FILES[$gate]}"
     mode="$(manifest_field "$gate" mode)"
     gen="$(manifest_field "$gate" gen)"
     relpath="$(command_rel "$gate")" || relpath="$GATES_DIR/$gate.sh"

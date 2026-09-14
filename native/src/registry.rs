@@ -125,6 +125,29 @@ pub const EVERY_COUPLES_KNOB: &str = "@every-couples-knob";
 // resolve dirs, held to `_gate_couples_knob_names`' derivation by a unit test because the bridge's
 // own substitution is the shell's; a static token contributes the bridged inputs its default reads
 pub fn couples_knob_names(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
+    let tokens = corpus_knob_tokens(resolve_dirs)?;
+    let mut out: Vec<String> = crate::knobs::bridged(tokens.iter().map(String::as_str))
+        .into_iter()
+        .map(str::to_string)
+        .collect();
+    out.sort();
+    out.dedup();
+    Ok(out)
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the sentinel's static half: the corpus's `knob:` names a
+// static kit owns, which the member resolves from that kit's knob file rather than the bridge
+pub fn couples_knob_static_names(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
+    let mut out: Vec<String> = corpus_knob_tokens(resolve_dirs)?
+        .into_iter()
+        .filter(|t| crate::knobs::is_static(t))
+        .collect();
+    out.sort();
+    out.dedup();
+    Ok(out)
+}
+
+fn corpus_knob_tokens(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
     let mut tokens: Vec<String> = Vec::new();
     for d in resolve_dirs {
         let decls = crate::walk::glob_files(
@@ -147,13 +170,73 @@ pub fn couples_knob_names(resolve_dirs: &[String]) -> Result<Vec<String>, String
             }
         }
     }
-    let mut out: Vec<String> = crate::knobs::bridged(tokens.iter().map(String::as_str))
-        .into_iter()
-        .map(str::to_string)
-        .collect();
-    out.sort();
-    out.dedup();
-    Ok(out)
+    Ok(tokens)
+}
+
+fn reach_kits(name: &str, kits: &mut Vec<&'static str>, seen: &mut Vec<&'static str>) {
+    let bare = name.trim_end_matches('*');
+    let Some(kit) = crate::knobs::owner(bare) else {
+        return;
+    };
+    if !kits.contains(&kit.root) {
+        kits.push(kit.root);
+    }
+    let family = name.ends_with('*');
+    for row in kit.rows {
+        let hit = if family { row.name.starts_with(bare) } else { row.name == bare };
+        if !hit || seen.contains(&row.name) {
+            continue;
+        }
+        seen.push(row.name);
+        for input in row.inputs {
+            reach_kits(input, kits, seen);
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a static kit's knob file is a derived couple:
+// the tracked file at its default location for every static kit the member's declaration reaches,
+// in the static-kit table's order; a staged member reaching one is refused, never handed the file
+pub fn knob_files(member: &str, resolve_dirs: &[String]) -> Result<Vec<String>, String> {
+    let Some(declared) = crate::gates::declared(member) else {
+        return Ok(Vec::new());
+    };
+    let mut kits: Vec<&'static str> = Vec::new();
+    let mut seen: Vec<&'static str> = Vec::new();
+    for name in declared {
+        if *name == EVERY_COUPLES_KNOB {
+            for t in couples_knob_static_names(resolve_dirs)? {
+                reach_kits(&t, &mut kits, &mut seen);
+            }
+        } else {
+            reach_kits(name, &mut kits, &mut seen);
+        }
+    }
+    if kits.is_empty() {
+        return Ok(Vec::new());
+    }
+    if let Some(src) = resolve(member, resolve_dirs) {
+        let text = std::fs::read(&src)
+            .map(|b| String::from_utf8_lossy(&b).into_owned())
+            .unwrap_or_default();
+        let mode = manifest_line(&text).map(|m| field(&manifest_fields(m), "mode")).unwrap_or_default();
+        if mode == "staged" {
+            return Err(format!(
+                "{} is mode=staged and reads the knob file of {} — the staged hook passes matched \
+                 paths to the gate as arguments, so a derived knob-file couple would reach it as a \
+                 file to scan; treating as failure (not clean).\n  help: read no static knob from a \
+                 mode=staged member, or drop mode=staged",
+                member,
+                kits.join(", ")
+            ));
+        }
+    }
+    let dir = crate::knobs::gates_dir();
+    Ok(crate::knobs::STATIC_KITS
+        .iter()
+        .filter(|k| kits.contains(&k.root))
+        .map(|k| format!("{}/{}-config.knobs", dir, k.stem()))
+        .collect())
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the couples/trigger expansion every reader
@@ -327,6 +410,95 @@ mod tests {
                 k
             );
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the derivation over every registry member:
+    // a declared static name yields its kit's file, and the sentinel yields exactly the kits the
+    // corpus's static tokens name beside the member's own
+    #[test]
+    fn every_member_derives_the_knob_files_its_declaration_reaches() {
+        let knobs = crate::knobenv::lock();
+        knobs.remove("GATE_SDK_GATES_DIR");
+        let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        let listed = std::process::Command::new("bash")
+            .arg("-c")
+            .arg("set -euo pipefail; . gate-sdk/lib/gate.sh; gate_check_dirs")
+            .current_dir(&repo)
+            .output()
+            .expect("cannot run the shell library");
+        assert!(listed.status.success(), "gate_check_dirs failed");
+        let dirs: Vec<String> = String::from_utf8_lossy(&listed.stdout)
+            .lines()
+            .filter(|l| !l.is_empty())
+            .map(|d| if d.starts_with('/') { d.to_string() } else { repo.join(d).display().to_string() })
+            .collect();
+        let file = |k: &crate::knobs::Kit| {
+            format!("{}/{}-config.knobs", crate::knobs::GATES_DIR_DEFAULT, k.stem())
+        };
+        let corpus: Vec<&str> = couples_knob_static_names(&dirs)
+            .expect("the descriptor corpus is readable")
+            .iter()
+            .filter_map(|t| crate::knobs::owner(t).map(|k| k.root))
+            .collect();
+        assert!(
+            !corpus.is_empty(),
+            "the descriptor corpus names no static knob token, so the sentinel half held over nothing"
+        );
+        let (mut declaring, mut sentinel) = (0, 0);
+        for (member, _) in crate::gates::names_with_owners() {
+            let got = knob_files(member, &dirs).expect("no registry member is staged");
+            let declared = crate::gates::declared(member).unwrap_or(&[]);
+            let own: Vec<&str> = declared
+                .iter()
+                .filter_map(|n| crate::knobs::owner(n.trim_end_matches('*')).map(|k| k.root))
+                .collect();
+            for kit in crate::knobs::STATIC_KITS.iter().filter(|k| own.contains(&k.root)) {
+                declaring += 1;
+                assert!(
+                    got.contains(&file(kit)),
+                    "{} declares a {} knob but derives no couple on {}",
+                    member,
+                    kit.root,
+                    file(kit)
+                );
+            }
+            if declared.contains(&EVERY_COUPLES_KNOB) {
+                sentinel += 1;
+                let want: Vec<String> = crate::knobs::STATIC_KITS
+                    .iter()
+                    .filter(|k| corpus.contains(&k.root) || own.contains(&k.root))
+                    .map(|k| file(k))
+                    .collect();
+                assert_eq!(got, want, "{}'s sentinel derivation", member);
+            }
+        }
+        assert!(declaring > 0 && sentinel > 0, "one half of the derivation held over no member");
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a staged member reaching a static kit is a
+    // refusal, because the staged hook would hand it the derived file as a path to scan
+    #[test]
+    fn a_staged_member_reaching_a_static_kit_is_refused() {
+        let _knobs = crate::knobenv::lock();
+        let d = std::env::temp_dir().join(format!("checkwright-knob-files.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let dirs = vec![d.display().to_string()];
+        let member = "check-queue-sections";
+        let write = |mode: &str| {
+            std::fs::write(
+                d.join(format!("{}.gate", member)),
+                format!("# graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit{}\n", mode),
+            )
+            .expect("write");
+        };
+        write("");
+        let whole = knob_files(member, &dirs);
+        write(" mode=staged");
+        let staged = knob_files(member, &dirs);
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(whole.is_ok_and(|f| !f.is_empty()), "the whole-tree member derives its kit's file");
+        assert!(staged.is_err(), "the staged member must refuse rather than derive");
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — each refusal the knob token carries: an
