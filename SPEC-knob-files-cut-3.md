@@ -18,8 +18,8 @@ member's bridged resolution (`gate_knob_env check-prose-enum`) takes 121–123 m
 The gate's own execution takes the remaining ~630 ms. So the cut removes at most ~80 ms there, and
 the nested bridge the spawned front-end sources stays until gate-sdk's cut.
 
-Authoring found six further items the probe did not reach, and each is ruled here: drift-kit's KPI
-plugin contract exports consumer-declared knobs (delta 4); five defaults read the gates directory,
+Authoring found five further items the probe did not reach, and each is ruled here: drift-kit's KPI
+plugin contract exports consumer-declared knobs (delta 4); eight defaults read the gates directory,
 two probe the filesystem, and three read the harness's home (delta 5); two set-ness refusals and one
 retired-name refusal (delta 6); two post-config compositions (delta 7); and a drift-kit template that
 sources canon-kit's shell config (delta 8).

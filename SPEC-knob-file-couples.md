@@ -234,7 +234,9 @@ them without failing on them.
 ## Retired spellings
 
 - None — no delta retires a name. Delta 3 deletes couple tokens whose path stays live as a derived
-  trigger, so every deleted string still names a real file.
+  trigger, so every deleted string still names the path `registry::knob_files` derives for that
+  member, whether or not a consumer has adopted an override file there — `scripts/doctrine-config.knobs`
+  is such a path with no file at it today.
 
 ## Definition of Done
 
