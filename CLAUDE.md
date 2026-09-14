@@ -60,7 +60,7 @@ The state machine, its stamp protocol, and the per-stage contracts:
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and regenerate.
 **Never read a `couples=` field's reach off the field** — four readers match it and
-two of their glob semantics disagree: gate-sdk/SPEC.md §The `# graph:` manifest.
+two of their glob semantics disagree: gate-sdk/SPEC.md §Reading a `couples=` field's reach.
 Per-clone opt-in: `bash gate-sdk/bin/run-gates.sh --install-hooks`. Every generated
 projection, that hook included, is rostered with its trigger, its regen command and
 the wide fan-outs in [docs/site-architecture.md](docs/site-architecture.md)

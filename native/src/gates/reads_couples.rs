@@ -550,7 +550,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for f in &ctx.findings {
             println!("  {}", f);
         }
-        println!("  help: add the covering sibling glob to the gate's '# graph: couples=' — a '<dir>/<sub>/*.ext' that matches the deeper path (globs never cross '/', so a shallow one-level couple misses a file one level down), then regenerate the hook + graph artifacts; or mark the walk '# reads-couples-exempt: <reason>' (same line, or the line directly above) when the uncoupled read is deliberate. Never widen a glob to cross '/' to pass a near-miss.");
+        println!("  help: add the covering sibling glob to the gate's '# graph: couples=' — a '<dir>/<sub>/*.ext' that matches the deeper path (globs never cross '/', so a shallow one-level couple misses a file one level down), then regenerate the hook + graph artifacts; or mark the walk '# reads-couples-exempt: <reason>' (same line, or the line directly above) when the uncoupled read is deliberate. Never widen a glob to cross '/' to pass a near-miss. That is this gate's matcher, not the hook's: gate-sdk/SPEC.md §Reading a `couples=` field's reach.");
         return Ok(1);
     }
     println!(

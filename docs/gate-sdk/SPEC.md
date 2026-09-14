@@ -2105,24 +2105,9 @@ The manifest grammar:
   `gate_find`) must couple that recursion — a `<dir>/<sub>/*.ext` sibling glob or
   a wider one — and never lean on the tree holding only the shape the couple
   enumerates; an under-covering couple silently skips the gate on the very edit it
-  should catch. **That is the coverage reader's rule and not every reader's, and
-  reading it as universal is a live, attested error.** `check-reads-couples`
-  matches segment-wise and is the reader the rule is written for; the **trigger**
-  readers do not — the generated hook's `staged_matches` is spliced from
-  `gate_staged_matches` in `lib/gate.sh`, whose `[[ "$f" == $pat ]]` leaves the
-  pattern operand unquoted under a standing `# shellcheck disable=SC2053`, so it
-  is bash *string* matching in which `*` spans `/`, and `run-gates --for` reaches
-  the same slash-spanning matcher. So `native/src/*.rs` **does** fire the hook on
-  `native/src/emit/mod.rs` while **not** covering a read there. Stated because the
-  narrow reading alone, applied to a trigger, says a gate will not run when it
-  will, and the field's own text cannot tell a reader which reader is asking — so
-  the remedy is to read the reach through `gate_staged_matches` rather than off the
-  field, every time, however obvious the field looks. **Do not "fix" the unquoting** —
-  it is declared intent, and quoting it would break every trigger in the tree at
-  once. Which of these semantics the field *should* have is not settled here and
-  is filed as its own deliverable; what is settled is that the
-  authoring rule above stays conservative for the coverage reader while the
-  trigger's reach is wider. `check-graph` verifies couples→hook parity, not reads⊆couples;
+  should catch. That rule is the coverage reader's, and the trigger's reach differs
+  from it: §Reading a `couples=` field's reach.
+  `check-graph` verifies couples→hook parity, not reads⊆couples;
   `check-reads-couples` (§check-reads-couples) mechanizes the reads⊆couples half
   for the statically resolvable walks — so the author's duty narrows to the
   undecidable remainder that gate skips-and-counts (check-shim-restatement's
@@ -2155,6 +2140,26 @@ The manifest grammar:
   emits an unconditional invocation.
 - `gen=manual` — the gate's hook block is bespoke and round-trips verbatim
   between `# >>> manual: <gate>` / `# <<< manual: <gate>` sentinels.
+
+### Reading a `couples=` field's reach
+
+**The field has two matchers, and its text cannot tell a reader which one is asking.**
+`check-reads-couples` matches segment-wise, and the authoring rule above is written for it: a
+glob never crosses `/`. The **trigger** readers do not match that way. The generated hook's
+`staged_matches` is spliced from `gate_staged_matches` in `lib/gate.sh`, whose
+`[[ "$f" == $pat ]]` leaves the pattern operand unquoted under a standing
+`# shellcheck disable=SC2053`. That is bash *string* matching, in which `*` spans `/`, and
+`run-gates --for` reaches the same matcher. So `native/src/*.rs` **does** fire the hook on
+`native/src/emit/mod.rs`, while **not** covering a read there. Reading the narrow rule as
+universal is a live, attested error: applied to a trigger, it says a gate will not run when it
+will.
+
+**Read the reach through the oracle for the question asked, never off the field.** Run
+`run-gates.sh --for <path>` to learn what a path triggers, and `check-reads-couples` to learn
+what a gate's couples cover. **Do not "fix" the unquoting**: it is declared intent, and quoting it
+would break every trigger in the tree at once. Which semantics the field *should* have is not
+settled here and is filed as its own deliverable. What is settled is that the authoring rule
+stays conservative for the coverage reader while the trigger's reach is wider.
 
 ## The install disposition
 

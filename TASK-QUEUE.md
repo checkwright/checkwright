@@ -35,29 +35,6 @@
   operator direction, 2026-09-14, lead-relayed; a corpus increment, so it demotes at landing.
   Spec ruled scope's three probe findings and three more authoring found (the amendment's header).
 
-- **couples-caution-unreachable-by-pointer** [spec: SPEC-couples-caution.md]
-  — the `couples=` reader-divergence caution is unreachable by pointer from anywhere a descriptor
-  author starts, and that is a PLACEMENT finding rather than a request to restate it.
-  **The rule is stated and the error is attested anyway.** gate-sdk/SPEC.md (the `# graph:`
-  manifest) states the divergence and calls reading the field as universal a live error; the
-  attested count is at least FOUR independent readings that derived the trigger-versus-coverage
-  divergence off a `couples=` line by eye and got it wrong, one of which nearly shipped a matcher
-  change flipping `check-reads-couples`' own bad case to exit 0. The count lives in git history and
-  in this entry rather than on the kit surface, since a kit states its rule undated.
-  **PROBED rather than asserted.** The paragraph sits deep in the `couples=` bullet of the manifest
-  grammar, with no sub-heading and no anchor; a live `.gate` descriptor carries only its own
-  `# graph:` and `# spec:` lines and points at neither; gate-sdk/README.md has no `couples=` grammar
-  section. Corrected at spec: a shell skeleton, `gate-sdk/templates/check-skeleton.sh`, does exist.
-  **PARTLY REMEDIATED, and the residue is what is filed.** CLAUDE.md gained a one-line pointer
-  beside its edit-a-gate-manifest-and-regenerate sentence, which reaches a reader who opens the
-  always-loaded file and reaches nobody who opens a descriptor.
-  **RESTATING THE PARAGRAPH ANYWHERE IS REFUSED** — relocating prose behind a tag rather than making
-  it findable is the blessing-a-restatement defect.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its gate-manifest
-  pointer sweep; drained and promoted at this iteration's scope.
-  **Rides `config-seam-second-cut` beside config-seam-static-format's cut 2** — operator direction,
-  2026-09-14, lead-relayed.
-
 ## Technical Debt
 
 ## Deferred
@@ -4964,5 +4941,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- couples-caution-unreachable-by-pointer
 
 ## Lessons Learned

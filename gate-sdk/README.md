@@ -28,7 +28,9 @@ honest:
 - `bin/gen-pre-commit.sh` + the `--install-hooks` arm — the `pre-commit` and
   `commit-msg` hooks *generated* from per-gate `# graph:` coupling manifests
   (`tier=precommit` vs `tier=commit-msg`); adding a gate to a hook is
-  manifest-only, so hook membership cannot drift.
+  manifest-only, so hook membership cannot drift. A manifest's trigger reach is
+  read with `--for`, never off the field ([SPEC.md](SPEC.md) §Reading a
+  `couples=` field's reach).
 - `bin/build-native.sh` — the one spelling of the crate build for the binary
   substrate: resolves the crate from `GATE_SDK_NATIVE_CRATE`, passes trailing
   arguments to cargo (so a per-target build reuses it), and returns cargo's own
