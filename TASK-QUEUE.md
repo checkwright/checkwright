@@ -16,6 +16,25 @@
 
 ## Deferred
 
+- **static-knob-file-couple-underived** [design-pending] [cost: event/low] [surface: gate-sdk] — a gate
+  reading a static kit's knob file must couple that file (gate-sdk/SPEC.md §The `# graph:` manifest:
+  couples covers every path read), and nothing derives or asserts it, so a knob-file edit skips the
+  gate at pre-commit and only the battery reaches it.
+  **Measured at `config-seam-second-cut`'s close:** every registered gate run once per static kit
+  with that kit's `<KIT>_KNOB_FILE` pointed at a malformed file. 35 gates flipped; 25 descriptors
+  lacked the file and were coupled by hand in the drain commit. The kit's move to a knob file had
+  dropped `check-queue-slug-liveness`'s trigger, since its `scripts/*.sh` couple stood in for
+  `scripts/queue-config.sh`, and most readers had never coupled their config at all.
+  **Why [design-pending]:** a gate's registry declaration names the static knobs its own code reads,
+  so hook generation could add `<gates-dir>/<stem>-config.knobs` per declared kit. It would miss
+  three reader shapes the probe found: meta-gates reading knob files by expanding other members'
+  `knob:` tokens (`check-graph`, `check-reads-couples`, `check-gate-substrate-parity`), a gate
+  spawning an arm that reads one (`check-prose-enum` through its enum-sets command), and a freshness
+  gate whose projection reads every kit. Where the derivation stops, and whether an assertion
+  holds the rest, is the unit's question.
+  **Cost while deferred:** each new static-knob reader, and each kit's cut, can land uncoupled.
+  Filed 2026-09-14 by close, from the drain of build's gap bullet.
+
 - **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
   CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
   reads the host repo's history passes here and fails in a consumer tree or a depth-1 clone.
@@ -3598,7 +3617,7 @@
   `recurrence:` alone.
   **The envelope is two knobs and compression pays on both axes**, which is why this is not a
   tidiness argument: `QUEUE_KIT_WRAP_BUDGET=100` and `QUEUE_KIT_ENTRY_LINE_CAP=50`
-  (`queue-kit/lib/queue.sh:37,39`) bound columns and lines separately, so a shorter stamp frees
+  (queue-kit's in-crate knob defaults) bound columns and lines separately, so a shorter stamp frees
   columns directly and freed columns let prose reflow into fewer lines.
   **The column axis is WITNESSED THREE TIMES, all measured, none projected.** 2026-09-01: `/spec`
   blocked outright — `native-gate-port-remaining-corpus`'s lead line could not hold two `spec:`
@@ -4028,7 +4047,7 @@
   configured drain stage, and nothing refuses the DoD until a session tries to execute it.
   **Measured 2026-09-05 across spec and build.** spec authored a DoD parking
   `platform-support-ci-matrix`'s queue transition at CLOSE; the lead confirmed it. Both missed that
-  `lifecycle-kit/lib/stages.sh:29` sets `LIFECYCLE_KIT_DRAIN_STAGE=validate` in this tree, so the
+  `LIFECYCLE_KIT_DRAIN_STAGE` defaults to `validate` in lifecycle-kit's knob table, so the
   DoD was not merely late but UNEXECUTABLE: the pre-dispatch `--enter-stage validate --simulate`
   refused, and build had to demote the entry on a resume after its push was already spent.
   **The cost is measured, not estimated:** one resume round trip, and a demotion taken under time
