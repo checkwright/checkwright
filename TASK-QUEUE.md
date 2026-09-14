@@ -5001,9 +5001,4 @@
 
 ## Done
 
-- settings-pins-live-suite-coverage
-- drift-baseline-unnamed-iteration
-- always-loaded-baseline-restamp-unforced
-- overhead-meter-resolves-the-newest-transcript-not-its-own
-
 ## Lessons Learned
