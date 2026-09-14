@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+config-bridge-floor gates sha256=92328cfd940bbc94c92f7de8df7bdba4006e14455df2cace1effbfe8fcca5406 pass=113 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor gate_sdk sha256=66a533f5aabd61861735228ab38d37160110c0bb5cf1faa6276fb232d8f64908 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor canon_kit sha256=9abfbc2ca869a1d99fc0042041770b8d85097bf852c31e7c128600b65e24f1bf pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor guard_kit sha256=bec1c9c35372c4d6106471ec51071ee748b3187f02c6303efe7fbf6667cc7d0d pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor lifecycle_kit sha256=61748948812b01d5885d4f399d23f31c9e5dcdf2fa575347e4b1bbc036448d52 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor guard_tests sha256=d1df8069c9935679a05e36a5b9c6859bc81fa68434855f3791e0cbb5bb328dd3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor demo sha256=fcc228aac9900bfb93e86fbcd747e60eb447265920b2a05825e51b09946faa4e pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor installer_smoke sha256=a4d2339179b31483bc4e829e4cff9568999c9a156b588294d83354e1d5f30e60 pass=13 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor consumer_smoke sha256=da2e5d389b1eff9d843209447b7d2df4d27d9cb6823a0aff1e05cc58bc07d5a6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor upgrade sha256=775cb185494f1d5fcccff798a438c4bf5931a7b92e0c18fbcc10653c886d1108 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor agents_md_smoke sha256=b565a94606f253e5464723d590701968a05f44bdde442a703bf8081252bd6794 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-bridge-floor native_crate sha256=9413cccf69d0ef7de02e2f7311995353d5bd93741a9986be8a983473d6211379 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
