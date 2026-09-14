@@ -2131,7 +2131,7 @@ for the other is the mistake.
 
 *Who actually reads the 2, and the honest limit that has to be stated with it.*
 The verdict class is read by CI's job verdict and by a human reading the log — and
-by **nothing else**. `scripts/evidence-config.sh` gives the `installer_smoke`
+by **nothing else**. `scripts/evidence-config.knobs` gives the `installer_smoke`
 suite the `parse-smoke-log` parser, and that custom-parser path never references
 the process status it is handed: the evidence row is derived from the log's arm
 headers alone, so **exit 1 and exit 2 are indistinguishable to it**. The
