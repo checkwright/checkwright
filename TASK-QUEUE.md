@@ -12,20 +12,17 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-- **upgrade-smoke-consumer-unseeded-configs** [design-pending] [cost: event/high] [surface: gate-sdk] — upgrade-smoke's
+- **upgrade-smoke-consumer-unseeded-configs** [spec: SPEC-knob-files-cut-4.md] — upgrade-smoke's
   scratch consumer never reproduces what installer init seeds: init copies every vendored kit's
   `templates/*-config.{sh,knobs}` into the gates dir (`recipe::config_seam_plan`), while the smoke
   installs each kit through its own `smoke/install.sh`, which at the v0.25.0 FROM copies a config
-  template for context-kit and drift-kit only. So a left-behind-shell-config red is visible to the
-  smoke only for kits whose smoke happens to seed a config, and the earlier knob-file cuts (site,
-  doctrine, queue, lifecycle, canon, delegation) passed it with no Tightened-gates declaration for
-  the gates an init-seeded consumer meets red. Re-verified at the drain against `config_seam_plan`
-  and the v0.25.0 canon, delegation and context smoke installs.
-  **Why [design-pending]:** the seeding site — the FROM vendoring step or a phase-1 step — decides
+  template for context-kit, drift-kit and guard-kit only, evidence-kit's writing its own inline
+  (corrected at spec from `git grep` over the tag). So a left-behind-shell-config red is visible to
+  the smoke only for kits whose smoke happens to seed a config, and the earlier knob-file cuts
+  (site, doctrine, queue, lifecycle, canon, delegation) passed it with no Tightened-gates
+  declaration for the gates an init-seeded consumer meets red. Re-verified at the drain against
+  `config_seam_plan` and the v0.25.0 canon, delegation and context smoke installs.
+  **Why it needed design:** the seeding site — the FROM vendoring step or a phase-1 step — decides
   whether the suite's red set is the init-seeded one, and it must stay inside gate-sdk/SPEC.md
   §upgrade-smoke's ruling that phase A is sync-plus-regen and never reconciles a consumer red away.
   **Cost while deferred:** a future config-shape change to a kit whose smoke seeds no config ships
@@ -33,9 +30,94 @@
   Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 3, which declared the missed set
   after the fact from `checkwright-gates --knob-files` and a per-gate refusal probe); promoted at
   that iteration's close.
-  **Rides `config-seam-fourth-cut` beside its three kit cuts** — operator direction, 2026-09-14,
-  lead-relayed; stays Deferred for spec to author and pair. Each cut is a config-shape change this
-  entry's cost names, and gate-sdk ships no config template for a smoke to seed.
+  **Rides `config-seam-fourth-cut` and lands first** — operator direction, 2026-09-14, lead-relayed.
+  Spec ruled the site: the FROM install, after the kit smokes and before the baseline, copying each
+  absent `config_seam_plan` destination; the placement seam init writes beside an artifact stays the
+  suite's stated limit (the amendment's delta 1).
+
+- **config-seam-static-format** [spec: SPEC-knob-files-cut-4.md] — the knob seam is still
+  executable bash for every bridged kit: a knob's value is computed by sourcing the owning kit's
+  `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh), so
+  the battery, hook generation and every harness hook enter through bash before the binary runs.
+  **Cuts 1 to 3 landed:** site-kit and doctrine-kit at `static-config-seam`, queue-kit and
+  lifecycle-kit at `config-seam-second-cut`, canon-kit, context-kit, delegation-kit and drift-kit at
+  `config-seam-third-cut`; all eight read knob files in the line grammar with their defaults
+  in-crate, and the grammar rules the command knob and the knob reference (gate-sdk/SPEC.md §The
+  knob file).
+  **Why it needed design:** each remaining kit waited on a shape the grammar had not ruled — a
+  generated family, guard-kit's rule content — and gate-sdk migrates last, retiring the bridge; the
+  selection rule and each shape's reason are that section's.
+  **The tension it closes.** TRAJECTORY objective 6 rules a surviving script surface
+  dual-implementable, bash and PowerShell; the runtime bridge is neither and cannot be, since a
+  PowerShell twin is the second producer criterion 6 refuses.
+  **Refused:** a PowerShell twin of the bridge (second producer); porting the files under the
+  present seam (each ruling's ground holds while the seam is bash); a generated knob projection
+  (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
+  **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
+  every native-Windows adopter carries a bash floor the install docs attribute to git alone.
+  Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
+  `static-config-seam`, cut 2 at `config-seam-second-cut` and cut 3 at `config-seam-third-cut`, each
+  demoted at landing as a corpus increment.
+  **Cut 4 leads `config-seam-fourth-cut` and finishes the seam: evidence-kit and guard-kit move to
+  knob files, then gate-sdk last, retiring the bridge** — operator direction, 2026-09-14,
+  lead-relayed, taken with a partial landing named as a real risk. Spec ruled the generated family
+  (declared scalar families over a crate fixture-suite derivation) and guard-kit's rule content (the
+  guard stays the one shell hook) in this amendment; gate-sdk's cut takes a second one, paired
+  here when it lands on disk. The entry demotes if that cut does not land, and moves to Done when
+  it does.
+
+- **append-and-wrapper-shapes-unsteered** [spec: SPEC-knob-files-cut-4.md]
+  — two prompt-friction shapes rank at the top with no guard steering and no allowlist entry that
+  could ever match them, because both are composition rather than a command.
+  **Measured over 226 prompting calls across 49 patterns:** `cat >>` at 27x and `bash -c` at 20x.
+  The harness matcher refuses a composed form by construction, so an allowlist entry buys nothing
+  and the triage criterion lands both on GUARD RULE rather than allowlist.
+  **Each has a strictly better shipped form.** An append to a capture surface has the
+  `--emit kfric` / `file-gap` / `file-survey` arms; an append to a tracked file has Write and Edit.
+  `bash-guard` already steers the READ direction ("don't read files with a bare `cat`") and leaves
+  the APPEND direction unguarded, which is the asymmetry. `bash -c` wraps its payload so neither the
+  allowlist nor any guard rule can see the command inside, which makes it a steering target on its
+  own terms rather than a convenience.
+  **DIAGNOSED AGAINST THE COMMITTED ALLOWLIST rather than assumed:** `grep` 18x,
+  `bash gate-sdk/bin/run-gates.sh` 23x, `echo` 10x, `printf` 4x, `git status` and `git log` 2x each
+  are ALREADY GRANTED and fell through only on compounding or redirection, so those are
+  habit-change findings and covering them would read as a fix while buying nothing. The mandated
+  wait primitives (`while >` 24x, `until` 4x) are unmatchable by construction and their friction is
+  the accepted price of the prescribed shape.
+  **Why it needed design:** a guard rule that steers an append has to name the sanctioned
+  destination set, and whether that set is kit-generic or consumer config is the seam question.
+  **One grant record qualifies this entry's allowlist claim, and this entry is its home — operator
+  direction, 2026-09-12.**
+  **THE `cat >> .tmp/*` GRANT WAS GRANTED 2026-09-09 AND IS NOT LANDED HERE:** it edits
+  `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
+  authorization, so it was routed back. The limit it was granted on, recorded here because JSON
+  carries no comment: the glob is a PREFIX match, reaching any path under `.tmp/`.
+  So a granted-but-unlanded allowlist entry exists for one prefix of the 27x shape, and it reaches
+  `.tmp/` alone, leaving every append to a tracked or `.workflow/` path where this entry found it.
+  **An observation, not a verdict — the grant's standing stays the operator's:** the default
+  `GUARD_KIT_APPEND_BINS` roster (`guard-kit/lib/guard.sh`) already lets guard rule 17 auto-allow a
+  `cat >>` write whose every target is gitignored, and rule 17 states a `Bash(...)` entry cannot
+  grant a redirect target, so the grant would reach no `.tmp/` append the guard does not.
+  **One measured residue has no other home and survives here:** the second measurement's
+  falsification of a tempting sub-case — ten `GATE_SDK_VERBOSE=1` calls read as a
+  missing-`env`-word steer were all piped into `grep`, so the prefix changes nothing.
+  DISTINCT from the ranking's allowlist-unreachable section (guard-kit/SPEC.md §scan-prompts),
+  which says what the RANKING reports about an unretireable row; this one asks for the steer that
+  retires it.
+  DISTINCT from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed
+  at all — this is the append shape specifically, and its `bash -c` half is not an authoring act.
+  **Cost while deferred:** the tree's two heaviest unmatchable shapes stay unaddressed while the
+  ranking keeps re-surfacing them.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its prompt-friction
+  triage; drained and promoted at this iteration's scope.
+  **Rides `config-seam-fourth-cut` beside guard-kit's cut** — operator direction, 2026-09-14,
+  lead-relayed. Spec ruled the seam question kit mechanism: rule 25 steers an emitter write the
+  harness cannot grant, compounded or to a target git does not ignore, and rule 26 a `bash -c`
+  wrapper, both on rule 17's own tests with no destination roster (the amendment's delta 9).
+
+## Technical Debt
+
+## Deferred
 
 - **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
@@ -111,38 +193,6 @@
   kit's resident ask.
   Filed 2026-09-13 by the clause-owner audit behind `resident-tier-restatement`'s Housekeeping
   cut; drained at that iteration's close.
-
-- **config-seam-static-format** [design-pending] [cost: event/high] [surface: gate-sdk] — the knob seam
-  is still executable bash for every bridged kit: a knob's value is computed by sourcing the owning
-  kit's `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh),
-  so the battery, hook generation and every harness hook enter through bash before the binary runs.
-  **Cuts 1 to 3 landed:** site-kit and doctrine-kit at `static-config-seam`, queue-kit and
-  lifecycle-kit at `config-seam-second-cut`, canon-kit, context-kit, delegation-kit and drift-kit at
-  `config-seam-third-cut`; all eight read knob files in the line grammar with their defaults
-  in-crate, and the grammar rules the command knob and the knob reference (gate-sdk/SPEC.md §The
-  knob file).
-  **Why [design-pending]:** each remaining kit waits on a shape the grammar has not ruled — a
-  generated family, guard-kit's rule content — and gate-sdk migrates last, retiring the bridge; the
-  selection rule and each shape's reason are that section's.
-  **The tension it closes.** TRAJECTORY objective 6 rules a surviving script surface
-  dual-implementable, bash and PowerShell; the runtime bridge is neither and cannot be, since a
-  PowerShell twin is the second producer criterion 6 refuses.
-  **Refused:** a PowerShell twin of the bridge (second producer); porting the files under the
-  present seam (each ruling's ground holds while the seam is bash); a generated knob projection
-  (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
-  **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
-  every native-Windows adopter carries a bash floor the install docs attribute to git alone.
-  Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
-  `static-config-seam`, cut 2 at `config-seam-second-cut` and cut 3 at `config-seam-third-cut`, each
-  demoted at landing as a corpus increment.
-  **Cut 4 leads `config-seam-fourth-cut` and finishes the seam: evidence-kit and guard-kit move to
-  knob files, then gate-sdk last, retiring the bridge** — operator direction, 2026-09-14,
-  lead-relayed, taken with a partial landing named as a real risk; stays Deferred for spec to author
-  and pair. It rules the generated family (evidence-kit's per-suite `RUN_`/`PARSER_` knobs over
-  `gate_fixture_suites`) and guard-kit's rule content. The scope probe found keyed knobs only in
-  those two kits (`EVIDENCE_KIT_SCENARIO_GLOBS`, `GUARD_KIT_BREADTH_DECLARED`,
-  `GUARD_KIT_RO_FORMS`), guard's shell hook sourcing its config directly while four crate emitters
-  read its knobs, and gate-sdk's consumer config holding four scalars.
 
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
@@ -4442,54 +4492,6 @@
   **Cost while deferred:** the roster's own header states an authority its rows cannot be held to.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its audit-roster
   review; drained and promoted at this iteration's scope.
-
-- **append-and-wrapper-shapes-unsteered** [design-pending] [cost: session/low] [surface: guard-kit]
-  — two prompt-friction shapes rank at the top with no guard steering and no allowlist entry that
-  could ever match them, because both are composition rather than a command.
-  **Measured over 226 prompting calls across 49 patterns:** `cat >>` at 27x and `bash -c` at 20x.
-  The harness matcher refuses a composed form by construction, so an allowlist entry buys nothing
-  and the triage criterion lands both on GUARD RULE rather than allowlist.
-  **Each has a strictly better shipped form.** An append to a capture surface has the
-  `--emit kfric` / `file-gap` / `file-survey` arms; an append to a tracked file has Write and Edit.
-  `bash-guard` already steers the READ direction ("don't read files with a bare `cat`") and leaves
-  the APPEND direction unguarded, which is the asymmetry. `bash -c` wraps its payload so neither the
-  allowlist nor any guard rule can see the command inside, which makes it a steering target on its
-  own terms rather than a convenience.
-  **DIAGNOSED AGAINST THE COMMITTED ALLOWLIST rather than assumed:** `grep` 18x,
-  `bash gate-sdk/bin/run-gates.sh` 23x, `echo` 10x, `printf` 4x, `git status` and `git log` 2x each
-  are ALREADY GRANTED and fell through only on compounding or redirection, so those are
-  habit-change findings and covering them would read as a fix while buying nothing. The mandated
-  wait primitives (`while >` 24x, `until` 4x) are unmatchable by construction and their friction is
-  the accepted price of the prescribed shape.
-  **Why `[design-pending]`:** a guard rule that steers an append has to name the sanctioned
-  destination set, and whether that set is kit-generic or consumer config is the seam question.
-  **One grant record qualifies this entry's allowlist claim, and this entry is its home — operator
-  direction, 2026-09-12.**
-  **THE `cat >> .tmp/*` GRANT WAS GRANTED 2026-09-09 AND IS NOT LANDED HERE:** it edits
-  `.claude/settings.json`, and a stage session may not touch a permission surface on a relayed
-  authorization, so it was routed back. The limit it was granted on, recorded here because JSON
-  carries no comment: the glob is a PREFIX match, reaching any path under `.tmp/`.
-  So a granted-but-unlanded allowlist entry exists for one prefix of the 27x shape, and it reaches
-  `.tmp/` alone, leaving every append to a tracked or `.workflow/` path where this entry found it.
-  **An observation, not a verdict — the grant's standing stays the operator's:** the default
-  `GUARD_KIT_APPEND_BINS` roster (`guard-kit/lib/guard.sh`) already lets guard rule 17 auto-allow a
-  `cat >>` write whose every target is gitignored, and rule 17 states a `Bash(...)` entry cannot
-  grant a redirect target, so the grant would reach no `.tmp/` append the guard does not.
-  **One measured residue has no other home and survives here:** the second measurement's
-  falsification of a tempting sub-case — ten `GATE_SDK_VERBOSE=1` calls read as a
-  missing-`env`-word steer were all piped into `grep`, so the prefix changes nothing.
-  DISTINCT from the ranking's allowlist-unreachable section (guard-kit/SPEC.md §scan-prompts),
-  which says what the RANKING reports about an unretireable row; this one asks for the steer that
-  retires it.
-  DISTINCT from `file-authoring-act-ungoverned`, which owns whether the authoring act is governed
-  at all — this is the append shape specifically, and its `bash -c` half is not an authoring act.
-  **Cost while deferred:** the tree's two heaviest unmatchable shapes stay unaddressed while the
-  ranking keeps re-surfacing them.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its prompt-friction
-  triage; drained and promoted at this iteration's scope.
-  **Rides `config-seam-fourth-cut` beside guard-kit's cut** — operator direction, 2026-09-14,
-  lead-relayed; stays Deferred for spec to author and pair. Its seam question, kit-generic or
-  consumer config, is the one that cut rules for guard-kit's rule content.
 
 - **retired-block-admits-live-gate-name** [design-pending] [cost: session/low] [surface: queue-kit]
   — the `queue-edges` retired block admits a live GATE NAME as a retired queue slug, and that false
