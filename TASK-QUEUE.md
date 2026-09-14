@@ -47,7 +47,7 @@
   **Cost while deferred:** a permanent advisory at every lead-run boundary trains the reader to skip
   the one line that would carry a real undisposed journal.
   Filed 2026-09-13 by scope; drained from the gap inbox at `resident-tier-restatement`'s close.
-  recurrence: lead-journal-advisory-fires-on-the-live-lead 2026-09-14
+  recurrence: lead-journal-advisory-fires-on-the-live-lead 2026-09-14 2026-09-14
 
 - **audit-roster-mechanism-has-no-kit-owner** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the
   audit roster's contract header names doctrine-kit/DOCTRINE.md rule 2 (Enforcement-first) as
