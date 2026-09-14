@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: config-bridge-floor
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,7 +14,50 @@
 
 ## Technical Debt
 
+- **bridge-owning-kit-partition-forks-per-knob** — `gate_knob_env_set` (`gate-sdk/lib/gate.sh`)
+  finds each declared name's owning kit through `$(_gate_knob_owning_kit …)`, which forks and
+  re-runs `gate_kit_roots` once per name: 284 ms of the 734 ms a `--run` resolution costs over
+  this tree's 178 names, measured 2026-09-14 at scope (`.workflow/survey-record.md`).
+  **Deliverable:** the kit-root set resolved once per call and the partition computed
+  in-process, emitting the same elements in the same order with the same refusals, and a
+  before/after timing of that resolution in the landing commit.
+  Split out of `config-bridge-resolution-cost` as its cut 1a at `config-bridge-floor`'s scope —
+  operator direction, 2026-09-14, lead-relayed; that entry stays Deferred.
+
+- **template-copy-parity-knobless-refusal** — `check-template-copy-parity` refuses the whole gate
+  at exit 2 on any paired file carrying no knob-with-default idiom.
+  **The behavior, reproduced by execution at the drain rather than read.** When a paired file
+  carries no knob-with-default token at all, the surface derivation reports *could not classify*
+  rather than *no knobs*, and the fail-closed wrapper turns that into exit 2 for the whole gate,
+  with a message naming an internal step rather than the file.
+  **The tree is green by exclusion, not by correctness.** The two knob-less files in the corpus
+  are dropped before the derivation runs — one by the `*-config.sh` rule, one by being unpaired.
+  Vendoring an unpaired knob-less template into the gates dir turns every run into that refusal.
+  **The seam question that held it is moot, re-verified 2026-09-14 at scope.** It asked how a
+  repaired verdict lands on both substrates at once; no shell form remains (`gate-sdk/checks/`
+  carries only the `.gate` descriptor), so the repair lands on one.
+  **Deliverable:** a knob-less file yields an empty knob class, a fixture case vendors a
+  knob-less template, and gate-sdk/SPEC.md §check-template-copy-parity's reproduced-refusal
+  sentence is retired in the same commit.
+  Filed 2026-08-19 by close from the gap inbox; promoted at `config-bridge-floor`'s scope —
+  operator direction, 2026-09-14, lead-relayed.
+
 ## Deferred
+
+- **run-knob-union-selector-narrowing** [design-pending] [cost: session/high] [surface: gate-sdk] — a
+  selector run (`--only`, `--for`) resolves the knob union of every member the tree registers,
+  not of the members it selected. gate-sdk/SPEC.md §The non-gate arm scopes `--knobs --run` to
+  the tree's registry for correctness and states no selector narrowing. Measured 2026-09-14 at
+  scope (`.workflow/survey-record.md`): `check-core-files`' own 2 knobs resolve in 28 ms and
+  `check-prose-enum`'s 9 in 123 ms, against 734 ms for the union.
+  **Why [design-pending]:** narrowing changes a ruled derivation, so the amendment states the
+  union a selector run declares (the selected members' knobs plus the runner's own), why the
+  dispatcher's per-member slice keeps it sufficient, and what a whole-registry run keeps.
+  **Cost while deferred:** every single-gate run a session makes pays about 700 ms resolving
+  knobs it never reads.
+  Split out of `config-bridge-resolution-cost` as its cut 1b and ranked into `config-bridge-floor`
+  at its scope — operator direction, 2026-09-14, lead-relayed; spec authors and promotes it.
+  Filed 2026-09-14 by scope.
 
 
 - **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
@@ -47,6 +90,8 @@
   **Cost while deferred:** a permanent advisory at every lead-run boundary trains the reader to skip
   the one line that would carry a real undisposed journal.
   Filed 2026-09-13 by scope; drained from the gap inbox at `resident-tier-restatement`'s close.
+  **Ranked into `config-bridge-floor` at the recurrence threshold — operator direction, 2026-09-14,
+  lead-relayed;** it stays Deferred for spec to author and promote.
   recurrence: lead-journal-advisory-fires-on-the-live-lead 2026-09-14 2026-09-14
 
 - **audit-roster-mechanism-has-no-kit-owner** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the
@@ -792,15 +837,13 @@
   **Its third candidate shape is BUILT** — "resolve each kit's declared-knob set once per run
   rather than once per knob" is what `gate_knob_env_set` and `_gate_knob_kit_emit` now do, one
   subshell per owning kit. The other two shapes are untaken and stay open.
-  **What actually remains, measured at this close, best-of-three warm.** A single-gate run of a
-  gate that does almost no work (`check-core-files`) costs **640 ms**, essentially all of it one
-  bridge resolution — that is the floor every bridged invocation pays. `gen-pre-commit.sh --emit`
-  is **4104 ms**, down from the 6119/6203/6243 ms this entry used to carry. The old
-  92%-of-`check-graph` framing is retired with those figures and must not be revived.
-  **Why it does not close.** 4104 ms is still the largest non-cargo single cost in the tree, and
-  the 640 ms floor is paid by every hook regeneration, every `install-hooks.sh`, and every
-  single-gate run a session makes while iterating. What the batch removed was the per-knob
-  multiplier, not the per-kit subshell.
+  **What remains, re-measured 2026-09-14 at scope (`.workflow/survey-record.md`).** A `--only`
+  single-gate run costs 755-805 ms whether its kit is static or bridged, since `--run` resolves
+  the whole registry's 178 declared names across 8 bridged kits (734 ms). The batch removed
+  per-knob SOURCING only: `gate_knob_env_set` still forks `_gate_knob_owning_kit` per name (284 ms).
+  **Split at `config-bridge-floor`'s scope — operator direction, 2026-09-14, lead-relayed:** cut 1a
+  is `bridge-owning-kit-partition-forks-per-knob` (debt), cut 1b `run-knob-union-selector-narrowing`
+  (amendment); this entry keeps the per-kit subshell residue and its closing condition below.
   **Nothing else owns the residue.** The surviving `bash` spawn is owned by gate-sdk/SPEC.md
   §gen-pre-commit, where its disposition is recorded, and was ruled 2026-08-23 not to fall to this
   port — only its price did.
@@ -2617,29 +2660,6 @@
   failure mode names its cause.
   Filed 2026-08-19 by close from the gap inbox, which carried it twice — once from the sixth
   batch's port survey and once from the port itself; the drain read the validator and counted.
-
-- **template-copy-parity-knobless-refusal** [design-pending] [cost: event/high] [surface: gate-sdk] — `check-template-copy-parity`
-  refuses the whole gate at exit 2 on any paired file carrying no knob-with-default idiom.
-  **The behavior, reproduced by execution at the drain rather than read.** When a paired file
-  carries no knob-with-default token at all, the surface derivation reports *could not classify*
-  rather than *no knobs*, and the fail-closed wrapper turns that into exit 2 for the whole gate,
-  with a message naming an internal step rather than the file.
-  **The tree is green by exclusion, not by correctness.** The two knob-less files in the corpus
-  are dropped before the derivation runs — one by the `*-config.sh` rule, one by being unpaired.
-  Vendoring an unpaired knob-less template into the gates dir turns every run into that refusal.
-  **Reproduced rather than repaired at the sixth budget batch**, and the crate module says so in
-  its own spec comment: a refusal the shell form never made is a verdict change across the seam,
-  which the parity run holds invariant. Both substrates now carry it identically, proven by a
-  differential run.
-  **Why `[design-pending]` rather than a two-line fix:** the repair itself needs no ruling — a
-  knob-less file has an **empty** knob class, not an unreadable one. What needs one is the seam:
-  this is the first deliberate defect-reproduction the port has filed for later repair, so the
-  unit has to establish how a repaired verdict lands on both substrates at once without either
-  side briefly disagreeing.
-  **Cost while deferred:** the first consumer to vendor a template with no defaulted-env read
-  gets exit 2 on a file that is fine, and no gate anywhere would have predicted it.
-  Filed 2026-08-19 by close from the gap inbox, which carried it twice — from the port survey and
-  from the port; the drain reproduced the refusal rather than reading for it.
 
 - **pipeline-membership-idiom-latent** [design-pending] [cost: event/high] [surface: gate-sdk] — the SIGPIPE-under-pipefail membership
   idiom that produced `installer-init-noop-regen-conflict` has no gate, so nothing stops the next
