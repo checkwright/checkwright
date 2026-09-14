@@ -2216,9 +2216,9 @@ The manifest grammar:
   The gates directory is the locator the static reader itself uses, env-or-default
   (§The knob file). The set names the tracked file at its default location and
   nothing else. The local overlay is gitignored and never staged, so it fires no
-  trigger, and its reference lines reach no kit. A tracked file relocated through `<KIT>_KNOB_FILE` is a per-invocation
-  path that a tracked hook cannot bake, so a consumer who relocates one couples it
-  by hand.
+  trigger, and its reference lines reach no kit. A tracked file relocated through
+  `<KIT>_KNOB_FILE` is a per-invocation path that a tracked hook cannot bake, so a
+  consumer who relocates one couples it by hand.
   **The derivation stops at a command.** A knob whose value is a command hands its
   reads to the program it names, and the kit cannot see them. A member spawning a
   consumer's command couples the command knob's own kit file, which the rules above
