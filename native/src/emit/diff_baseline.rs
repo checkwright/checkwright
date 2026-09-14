@@ -61,7 +61,7 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
         skip: walk::knob_scalar("EVIDENCE_KIT_SKIP_FILE")?,
         tmpdir: walk::knob_scalar("EVIDENCE_KIT_TMP_DIR")?,
         parser: walk::knob_scalar("EVIDENCE_KIT_PARSER")?,
-        parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_"),
+        parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_")?,
     };
     std::fs::create_dir_all(&cfg.tmpdir)
         .map_err(|e| format!("cannot create {}: {}", cfg.tmpdir, e))?;

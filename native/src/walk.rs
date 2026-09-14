@@ -196,21 +196,20 @@ pub fn knob_map(knob: &str) -> Result<Vec<(String, String)>, String> {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of a knob *family*, the prefix form's
 // receiving half: every `GATE_SDK_KNOB_<prefix>…` variable, keyed by the suffix the prefix leaves.
 // Sorted, so a reader's output order does not depend on the environment's.
-pub fn knob_prefix(prefix: &str) -> Vec<(String, String)> {
-    if let Some(kit) = crate::knobs::owner(prefix) {
-        return kit
-            .rows
-            .iter()
-            .filter_map(|r| r.name.strip_prefix(prefix).map(|s| (s.to_string(), r.name)))
-            .filter_map(|(s, n)| crate::knobs::wire(n).ok().flatten().map(|v| (s, v)))
-            .collect();
+// spec: gate-sdk/SPEC.md §The knob file — a statically owned prefix reads its kit's family
+pub fn knob_prefix(prefix: &str) -> Result<Vec<(String, String)>, String> {
+    if crate::knobs::owner(prefix).is_some() {
+        return Ok(crate::knobs::family(prefix)?
+            .into_iter()
+            .filter_map(|(n, v)| n.strip_prefix(prefix).map(|s| (s.to_string(), v)))
+            .collect());
     }
     let var_prefix = format!("GATE_SDK_KNOB_{}", prefix);
     let mut out: Vec<(String, String)> = std::env::vars()
         .filter_map(|(k, v)| k.strip_prefix(&var_prefix).map(|s| (s.to_string(), v)))
         .collect();
     out.sort();
-    out
+    Ok(out)
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — a prefix is a *resolution set, never a roster*: this
@@ -1262,7 +1261,7 @@ mod tests {
         knobs.set("GATE_SDK_KNOB_PROBEFAM_beta", "b");
         knobs.set("GATE_SDK_KNOB_PROBEFAM_alpha", "a");
         knobs.set("GATE_SDK_KNOB_PROBEFAM_ID", "not-a-member");
-        let fam = knob_prefix("PROBEFAM_");
+        let fam = knob_prefix("PROBEFAM_").expect("a bridged family never refuses");
         let keys: Vec<&str> = fam.iter().map(|(k, _)| k.as_str()).collect();
         assert_eq!(keys, vec!["ID", "alpha", "beta"], "family is sorted by suffix");
         assert_eq!(knob_in_family(&fam, "alpha").as_deref(), Some("a"));

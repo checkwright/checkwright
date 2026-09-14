@@ -11,6 +11,7 @@ pub mod context_kit;
 pub mod delegation_kit;
 pub mod doctrine_kit;
 pub mod drift_kit;
+pub mod evidence_kit;
 pub mod lifecycle_kit;
 pub mod queue_kit;
 pub mod site_kit;
@@ -92,19 +93,22 @@ pub struct Row {
     // spec: gate-sdk/SPEC.md §The knob file — every name a derived default reads, so the bridge's
     // closure is known without running the derivation; empty on every other row
     pub inputs: &'static [&'static str],
+    // spec: gate-sdk/SPEC.md §The knob file — the knobs a reference to this row may name even where
+    // their default reaches a bridged input, so the bridge's closure carries what the splice needs
+    pub referents: &'static [&'static str],
 }
 
 impl Row {
     pub const fn scalar(name: &'static str, v: &'static str) -> Row {
-        Row { name, shape: Shape::Scalar, default: Default::Scalar(v), inputs: &[] }
+        Row { name, shape: Shape::Scalar, default: Default::Scalar(v), inputs: &[], referents: &[] }
     }
 
     pub const fn indexed(name: &'static str, v: &'static [&'static str]) -> Row {
-        Row { name, shape: Shape::Indexed, default: Default::Indexed(v), inputs: &[] }
+        Row { name, shape: Shape::Indexed, default: Default::Indexed(v), inputs: &[], referents: &[] }
     }
 
     pub const fn keyed(name: &'static str, v: &'static [(&'static str, &'static str)]) -> Row {
-        Row { name, shape: Shape::Keyed, default: Default::Keyed(v), inputs: &[] }
+        Row { name, shape: Shape::Keyed, default: Default::Keyed(v), inputs: &[], referents: &[] }
     }
 
     pub const fn derived(
@@ -113,8 +117,29 @@ impl Row {
         f: fn(Resolve) -> Result<Value, String>,
         inputs: &'static [&'static str],
     ) -> Row {
-        Row { name, shape, default: Default::Derived(f), inputs }
+        Row { name, shape, default: Default::Derived(f), inputs, referents: &[] }
     }
+
+    pub const fn with_referents(self, referents: &'static [&'static str]) -> Row {
+        Row { referents, ..self }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — a declared scalar family: each member's name is the prefix
+// and a suffix; a derivation returns `(suffix, value)` defaults, reading only its declared inputs
+pub type FamilyDerivation = fn(Resolve) -> Result<Vec<(String, String)>, String>;
+
+pub struct Family {
+    pub prefix: &'static str,
+    pub derive: Option<FamilyDerivation>,
+    pub inputs: &'static [&'static str],
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — a member's suffix: non-empty and identifier-shaped
+fn is_suffix(s: &str) -> bool {
+    let mut chars = s.chars();
+    matches!(chars.next(), Some(c) if c.is_ascii_alphabetic() || c == '_')
+        && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
 }
 
 // spec: gate-sdk/SPEC.md §The knob file — what a kit validator reads: each row's resolved value beside
@@ -132,6 +157,7 @@ pub struct Kit {
     pub validate: Option<(&'static str, Validator)>,
     // spec: gate-sdk/SPEC.md §The knob file — an undeclared scalar under the prefix is a consumer knob
     pub open_family: bool,
+    pub families: &'static [Family],
     // spec: gate-sdk/SPEC.md §The knob file — each retired name with the name that replaced it
     pub retired: &'static [(&'static str, &'static str)],
 }
@@ -191,6 +217,17 @@ impl Kit {
         self.rows.iter().find(|r| r.name == name)
     }
 
+    // spec: gate-sdk/SPEC.md §The knob file — the declared family a name is a member of: under its
+    // prefix with a valid suffix, and never a declared row the prefix also spells
+    fn family_of(&self, name: &str) -> Option<&'static Family> {
+        if self.row(name).is_some() {
+            return None;
+        }
+        self.families
+            .iter()
+            .find(|f| name.strip_prefix(f.prefix).is_some_and(is_suffix))
+    }
+
     fn replacement(&self, name: &str) -> Option<&'static str> {
         self.retired.iter().find(|(n, _)| *n == name).map(|(_, r)| *r)
     }
@@ -216,6 +253,7 @@ pub const STATIC_KITS: &[&Kit] = &[
     &delegation_kit::KIT,
     &doctrine_kit::KIT,
     &drift_kit::KIT,
+    &evidence_kit::KIT,
     &lifecycle_kit::KIT,
     &queue_kit::KIT,
     &site_kit::KIT,
@@ -396,6 +434,22 @@ fn layer(kit: &'static Kit, path: &str, text: &str) -> Result<Layer, String> {
             return Err(at(e.lno, retired_message(&e.name, replacement)));
         }
         let Some(row) = kit.row(&e.name) else {
+            if let Some(fam) = kit.family_of(&e.name) {
+                if e.form != Form::Scalar {
+                    return Err(at(
+                        e.lno,
+                        format!(
+                            "{} is a member of the {} family, and a member is a scalar — write `{} = value`",
+                            e.name, fam.prefix, e.name
+                        ),
+                    ));
+                }
+                if out.contains_key(&e.name) {
+                    return Err(twice());
+                }
+                out.insert(e.name.clone(), Held::Value(Value::Scalar(e.value.clone())));
+                continue;
+            }
             if e.form == Form::Scalar && kit.admits_consumer_scalar(&e.name) {
                 if out.contains_key(&e.name) {
                     return Err(twice());
@@ -452,7 +506,7 @@ fn layer(kit: &'static Kit, path: &str, text: &str) -> Result<Layer, String> {
                 }
                 let piece = match &e.form {
                     Form::Reference(other) => {
-                        refuse_referent(&e.name, other).map_err(|what| at(e.lno, what))?;
+                        refuse_referent(row, other).map_err(|what| at(e.lno, what))?;
                         Piece::Reference {
                             other: other.clone(),
                             at: format!("{}:{}", path, e.lno),
@@ -539,8 +593,10 @@ fn static_row(name: &str) -> Result<(&'static Kit, &'static Row), String> {
 }
 
 // spec: gate-sdk/SPEC.md §The knob file — the referent refusals a file line can be held to alone:
-// itself, an unowned or non-indexed name, and a row whose default reads a bridged input
-fn refuse_referent(name: &str, other: &str) -> Result<(), String> {
+// itself, an unowned or non-indexed name, and a row whose default reads a bridged input unless the
+// referencing row declares it a referent
+fn refuse_referent(named: &'static Row, other: &str) -> Result<(), String> {
+    let name = named.name;
     if other == name {
         return Err(format!("{} references itself — write its elements instead", name));
     }
@@ -557,20 +613,19 @@ fn refuse_referent(name: &str, other: &str) -> Result<(), String> {
             other, kit.root
         ));
     };
-    if reaches_bridged(row) {
+    if reaches_bridged(row) && !named.referents.contains(&other) {
         return Err(format!(
-            "{}'s default reads a bridged input this member's bridge may not carry — write its \
-             elements here instead",
-            other
+            "{}'s default reads a bridged input this member's bridge may not carry, and {} does not \
+             declare it a referent — write its elements here instead",
+            other, name
         ));
     }
     Ok(())
 }
 
-// spec: gate-sdk/SPEC.md §The knob file — a held value made whole: each reference splices its
-// referent's resolved elements, and a referent whose own value carries a reference is refused, since
-// resolution is one pass
-fn materialize(held: &Held) -> Result<(Value, bool), String> {
+// spec: gate-sdk/SPEC.md §The knob file — a held value made whole, one pass; the validator's pass
+// skips a splice whose referent reaches a bridged input
+fn materialize(held: &Held, validating: bool) -> Result<(Value, bool), String> {
     let pieces = match held {
         Held::Value(v) => return Ok((v.clone(), false)),
         Held::Pieces(p) => p,
@@ -582,6 +637,9 @@ fn materialize(held: &Held) -> Result<(Value, bool), String> {
             Piece::Element(e) => out.push(e.clone()),
             Piece::Reference { other, at } => {
                 spliced = true;
+                if validating && owner(other).and_then(|k| k.row(other)).is_some_and(reaches_bridged) {
+                    continue;
+                }
                 let (v, _, nested) = lookup_held(other)?;
                 if nested {
                     return Err(format!(
@@ -603,6 +661,15 @@ fn materialize(held: &Held) -> Result<(Value, bool), String> {
 // spec: gate-sdk/SPEC.md §The knob file — the precedence, highest first: the environment for a
 // scalar only, the local overlay, the tracked file; `None` leaves the kit default to the caller
 fn layered(kit: &'static Kit, name: &str, shape: Shape) -> Result<Option<(Value, Origin, bool)>, String> {
+    layered_as(kit, name, shape, false)
+}
+
+fn layered_as(
+    kit: &'static Kit,
+    name: &str,
+    shape: Shape,
+    validating: bool,
+) -> Result<Option<(Value, Origin, bool)>, String> {
     let l = layers(kit);
     let l = l.as_ref().as_ref().map_err(String::clone)?;
     if shape == Shape::Scalar {
@@ -612,7 +679,7 @@ fn layered(kit: &'static Kit, name: &str, shape: Shape) -> Result<Option<(Value,
     }
     for (layer, origin) in [(&l.local, Origin::Local), (&l.tracked, Origin::Tracked)] {
         if let Some(held) = layer.get(name) {
-            let (v, spliced) = materialize(held)?;
+            let (v, spliced) = materialize(held, validating)?;
             return Ok(Some((v, origin, spliced)));
         }
     }
@@ -671,7 +738,7 @@ fn validated(kit: &'static Kit) -> Result<(), String> {
         };
         let mut values = Values::new();
         for row in kit.rows {
-            let v = match layered(kit, row.name, row.shape)? {
+            let v = match layered_as(kit, row.name, row.shape, true)? {
                 Some((v, o, _)) => Some((v, o)),
                 None if reaches_bridged(row) => None,
                 None => Some((default_value(row, &input)?, Origin::Default)),
@@ -703,11 +770,15 @@ pub fn resolve(name: &str) -> Result<(Value, Origin), String> {
     lookup(name)
 }
 
-// spec: gate-sdk/SPEC.md §The knob file — a kit's family read: every declared scalar's resolved value,
-// then, for an open kit, every consumer scalar its files set, the environment still first
+// spec: gate-sdk/SPEC.md §The knob file — a kit's family read. A declared family's prefix answers its
+// members: derived, then either file's, then the environment's, each replacing the one before. Any
+// other prefix answers every declared scalar under it, then an open kit's consumer scalars
 pub fn family(prefix: &str) -> Result<Vec<(String, String)>, String> {
     let kit = owner(prefix).ok_or_else(|| format!("{} is not a statically owned prefix", prefix))?;
     validated(kit)?;
+    if let Some(fam) = kit.families.iter().find(|f| f.prefix == prefix) {
+        return declared_family(kit, fam);
+    }
     let mut out: Vec<(String, String)> = Vec::new();
     for row in kit.rows.iter().filter(|r| r.shape == Shape::Scalar && r.name.starts_with(prefix)) {
         out.push((row.name.to_string(), lookup(row.name)?.0.wire()));
@@ -728,6 +799,32 @@ pub fn family(prefix: &str) -> Result<Vec<(String, String)>, String> {
         }
     }
     Ok(out)
+}
+
+fn declared_family(kit: &'static Kit, fam: &'static Family) -> Result<Vec<(String, String)>, String> {
+    let mut members: BTreeMap<String, String> = BTreeMap::new();
+    if let Some(derive) = fam.derive {
+        for (suffix, value) in derive(&input)? {
+            members.insert(format!("{}{}", fam.prefix, suffix), value);
+        }
+    }
+    let l = layers(kit);
+    let l = l.as_ref().as_ref().map_err(String::clone)?;
+    for layer in [&l.tracked, &l.local] {
+        for (name, held) in layer {
+            if let (Some(f), Held::Value(Value::Scalar(v))) = (kit.family_of(name), held) {
+                if f.prefix == fam.prefix {
+                    members.insert(name.clone(), v.clone());
+                }
+            }
+        }
+    }
+    for (name, v) in std::env::vars() {
+        if kit.family_of(&name).is_some_and(|f| f.prefix == fam.prefix) {
+            members.insert(name, v);
+        }
+    }
+    Ok(members.into_iter().collect())
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the one function every knob read resolves through: a
@@ -806,8 +903,8 @@ pub fn declared_names(args: &[String]) -> Vec<&'static str> {
         .collect()
 }
 
-fn bridged_inputs(row: &'static Row, out: &mut Vec<&str>) {
-    for i in row.inputs {
+fn bridged_names(inputs: &'static [&'static str], out: &mut Vec<&str>) {
+    for i in inputs {
         match owner(i) {
             None => {
                 if !out.contains(i) {
@@ -821,6 +918,13 @@ fn bridged_inputs(row: &'static Row, out: &mut Vec<&str>) {
             }
         }
     }
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — a row's bridged inputs, and those of each referent it
+// declares, since a file may splice that referent in
+fn bridged_inputs(row: &'static Row, out: &mut Vec<&str>) {
+    bridged_names(row.inputs, out);
+    bridged_names(row.referents, out);
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `--knobs` answers the knobs a member needs the bridge to
@@ -837,6 +941,9 @@ pub fn bridged<'a>(names: impl IntoIterator<Item = &'a str>) -> Vec<&'a str> {
             Some(stem) => {
                 for r in kit.rows.iter().filter(|r| r.name.starts_with(stem)) {
                     bridged_inputs(r, &mut out);
+                }
+                for f in kit.families.iter().filter(|f| f.prefix == stem) {
+                    bridged_names(f.inputs, &mut out);
                 }
             }
             None => {
@@ -1011,16 +1118,136 @@ mod tests {
         rows: &[Row::keyed("PROBE_KIT_MAP", &[])],
         validate: None,
         open_family: false,
+        families: &[],
         retired: &[],
     };
 
     #[test]
     fn a_keyed_knob_takes_pairs_sorted_and_refuses_a_repeated_key_or_an_element() {
         let got = layer(&KEYED_KIT, "f", "PROBE_KIT_MAP[b] = 2 = two\nPROBE_KIT_MAP[a] = 1\n").expect("parses");
-        assert_eq!(materialize(&got["PROBE_KIT_MAP"]).unwrap().0.wire(), "a=1\tb=2 = two");
+        assert_eq!(materialize(&got["PROBE_KIT_MAP"], false).unwrap().0.wire(), "a=1\tb=2 = two");
         assert!(layer(&KEYED_KIT, "f", "PROBE_KIT_MAP[a] = 1\nPROBE_KIT_MAP[a] = 2\n").unwrap_err().starts_with("f:2: "));
         assert!(layer(&KEYED_KIT, "f", "PROBE_KIT_MAP[] = 1\n").unwrap_err().contains("is declared keyed"));
-        assert_eq!(materialize(&layer(&KEYED_KIT, "f", "PROBE_KIT_MAP =\n").expect("empties")["PROBE_KIT_MAP"]).unwrap().0.wire(), "");
+        assert_eq!(materialize(&layer(&KEYED_KIT, "f", "PROBE_KIT_MAP =\n").expect("empties")["PROBE_KIT_MAP"], false).unwrap().0.wire(), "");
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — a scratch tree holding one kit root with a fixture suite
+    // and its checks, bridged as the family derivation's inputs
+    fn fixture_tree(env: &knobenv::KnobEnv, s: &Scratch) -> String {
+        let kit = s.0.join("probe-kit");
+        std::fs::create_dir_all(kit.join("gate-tests")).expect("tests dir");
+        std::fs::create_dir_all(kit.join("checks")).expect("checks dir");
+        bridge_inputs(env, &s.dir());
+        env.set("GATE_SDK_KNOB_GATE_KIT_ROOTS_REL", &kit.display().to_string());
+        env.set("GATE_SDK_KNOB_GATE_SDK_ROOT_HERE", "sdk");
+        kit.display().to_string()
+    }
+
+    fn unfixture(env: &knobenv::KnobEnv) {
+        unbridge(env);
+        env.remove("GATE_SDK_KNOB_GATE_KIT_ROOTS_REL");
+        env.remove("GATE_SDK_KNOB_GATE_SDK_ROOT_HERE");
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — a declared family's members: derived, replaced by a file
+    // member of the same name, outranked by the environment; a declared row the prefix spells is no
+    // member, and an indexed line under the prefix is refused
+    #[test]
+    fn a_declared_family_resolves_its_members_and_refuses_the_rest() {
+        let env = knobenv::lock();
+        let s = Scratch::new("family");
+        clean(&env, &s.dir());
+        let kit = fixture_tree(&env, &s);
+        env.remove("EVIDENCE_KIT_RUN_probe_kit");
+        env.remove("EVIDENCE_KIT_RUN_demo");
+        let get = |n: &str| {
+            family("EVIDENCE_KIT_RUN_").expect("the family reads").into_iter().find(|(k, _)| k == n).map(|(_, v)| v)
+        };
+        assert_eq!(
+            get("EVIDENCE_KIT_RUN_probe_kit").as_deref(),
+            Some(format!("bash sdk/bin/run-gates.sh --run-gate-tests {0}/gate-tests {0}/checks", kit).as_str())
+        );
+        assert_eq!(get("EVIDENCE_KIT_RUN_ID"), None, "a declared row is never a member");
+        s.write("evidence-config.knobs", "EVIDENCE_KIT_RUN_demo = from-file\nEVIDENCE_KIT_RUN_probe_kit = replaced\n");
+        reset(&env);
+        assert_eq!(get("EVIDENCE_KIT_RUN_demo").as_deref(), Some("from-file"));
+        assert_eq!(get("EVIDENCE_KIT_RUN_probe_kit").as_deref(), Some("replaced"));
+        env.set("EVIDENCE_KIT_RUN_demo", "from-env");
+        assert_eq!(get("EVIDENCE_KIT_RUN_demo").as_deref(), Some("from-env"));
+        env.remove("EVIDENCE_KIT_RUN_demo");
+        assert_eq!(
+            walk_suffixes("EVIDENCE_KIT_PARSER_"),
+            Vec::<String>::new(),
+            "a family with no derivation and no member is empty"
+        );
+        for (body, want) in [
+            ("EVIDENCE_KIT_RUN_demo[] = x\n", "a member is a scalar"),
+            ("EVIDENCE_KIT_RUN_demo[k] = x\n", "a member is a scalar"),
+            ("EVIDENCE_KIT_RUN_ = x\n", "not a evidence-kit knob"),
+            ("EVIDENCE_KIT_RUN_demo = a\nEVIDENCE_KIT_RUN_demo = b\n", "given twice"),
+        ] {
+            s.write("evidence-config.knobs", body);
+            reset(&env);
+            assert!(family("EVIDENCE_KIT_RUN_").unwrap_err().contains(want), "{:?}", body);
+        }
+        unfixture(&env);
+        clean(&env, &s.dir());
+        restore(&env);
+    }
+
+    fn walk_suffixes(prefix: &str) -> Vec<String> {
+        family(prefix).expect("the family reads").into_iter().map(|(k, _)| k).collect()
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — a referent reaching a bridged input is refused unless the
+    // referencing row declares it; a declared one splices, and the closure carries its inputs
+    #[test]
+    fn a_declared_referent_splices_and_carries_its_bridged_inputs() {
+        let env = knobenv::lock();
+        let s = Scratch::new("referents");
+        clean(&env, &s.dir());
+        fixture_tree(&env, &s);
+        s.write(
+            "evidence-config.knobs",
+            "EVIDENCE_KIT_SUITES[] = gates\nEVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES\nEVIDENCE_KIT_SUITES[] = tail\n",
+        );
+        reset(&env);
+        assert_eq!(wire("EVIDENCE_KIT_SUITES").unwrap().unwrap(), "gates\tprobe_kit\ttail");
+        assert_eq!(bridged(["EVIDENCE_KIT_SUITES"]), vec!["GATE_KIT_ROOTS_REL", "GATE_SDK_GATES_DIR"]);
+        assert_eq!(
+            bridged(["EVIDENCE_KIT_RUN_*"]),
+            vec!["GATE_KIT_ROOTS_REL", "GATE_SDK_GATES_DIR", "GATE_SDK_ROOT_HERE"]
+        );
+        let p = s.write("evidence-config.knobs", "EVIDENCE_KIT_PERMANENT_SLUGS[] <- EVIDENCE_KIT_FIXTURE_SUITES\n");
+        reset(&env);
+        let e = resolve("EVIDENCE_KIT_PARSER").unwrap_err();
+        assert!(e.starts_with(&format!("{}:1: ", p)) && e.contains("does not declare it a referent"), "{}", e);
+        unfixture(&env);
+        clean(&env, &s.dir());
+        restore(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — the validator runs for a member whose bridge may not carry
+    // a declared referent's inputs, so its pass skips that splice and still checks the written elements
+    #[test]
+    fn the_validator_skips_a_bridged_splice_and_checks_the_written_elements() {
+        let env = knobenv::lock();
+        let s = Scratch::new("referent-validate");
+        clean(&env, &s.dir());
+        bridge_inputs(&env, &s.dir());
+        s.write(
+            "evidence-config.knobs",
+            "EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES\nEVIDENCE_KIT_SUITES[] = bad-name\n",
+        );
+        reset(&env);
+        let e = resolve("EVIDENCE_KIT_RUNNER_DOC").unwrap_err();
+        assert!(e.contains("malformed evidence config") && e.contains("'bad-name'"), "{}", e);
+        s.write("evidence-config.knobs", "EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES\n");
+        reset(&env);
+        assert_eq!(resolve("EVIDENCE_KIT_RUNNER_DOC").unwrap().0, Value::Scalar("README.md".into()));
+        unbridge(&env);
+        clean(&env, &s.dir());
+        restore(&env);
     }
 
     #[test]
@@ -1090,6 +1317,22 @@ mod tests {
                 f(&record).unwrap_or_else(|e| panic!("{}: {}", row.name, e));
                 for n in asked.borrow().iter() {
                     assert!(row.inputs.contains(&n.as_str()), "{} reads {}, which its row does not declare", row.name, n);
+                }
+            }
+            for fam in kit.families {
+                let Some(f) = fam.derive else {
+                    assert!(fam.inputs.is_empty(), "{} declares inputs but derives nothing", fam.prefix);
+                    continue;
+                };
+                derived += 1;
+                let asked = std::cell::RefCell::new(Vec::<String>::new());
+                let record = |n: &str| -> Result<(Value, Origin), String> {
+                    asked.borrow_mut().push(n.to_string());
+                    Ok((Value::Scalar("in".into()), Origin::Bridged))
+                };
+                f(&record).unwrap_or_else(|e| panic!("{}: {}", fam.prefix, e));
+                for n in asked.borrow().iter() {
+                    assert!(fam.inputs.contains(&n.as_str()), "{} reads {}, which it does not declare", fam.prefix, n);
                 }
             }
         }

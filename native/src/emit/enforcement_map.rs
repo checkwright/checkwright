@@ -286,14 +286,14 @@ fn hook_sections(settings: &str) -> Result<Vec<Section>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §enforcement-map — Validate suites: evidence-kit's suite registry. The
-// roster is EVIDENCE_KIT_SUITES and each run command is looked up *by name* in the bridged
+// roster is EVIDENCE_KIT_SUITES and each run command is looked up *by name* in the
 // EVIDENCE_KIT_RUN_ family, because a prefix is a resolution set and never a roster.
 fn suite_section() -> Result<Option<Section>, String> {
     let suites = walk::knob_array(SUITES_KNOB)?;
     if suites.is_empty() {
         return Ok(None);
     }
-    let family = walk::knob_prefix(RUN_PREFIX);
+    let family = walk::knob_prefix(RUN_PREFIX)?;
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the reader holds the roster, so the reader is what
     // fail-closes: a suite the roster named with no `RUN_` entry is adopted-but-broken and refuses
     // naming it. An *empty* roster never reaches here, which is the not-adopted case degrading.
@@ -528,16 +528,27 @@ mod tests {
     #[test]
     fn an_empty_roster_drops_the_section_and_a_named_missing_member_refuses() {
         let knobs = crate::knobenv::lock();
-        for k in ["EVIDENCE_KIT_SUITES", "EVIDENCE_KIT_RUN_alpha"] {
-            knobs.remove(&format!("GATE_SDK_KNOB_{}", k));
+        let dir = std::env::temp_dir().join(format!("enfmap-suites-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("scratch dir");
+        let family = format!("{}*", RUN_PREFIX);
+        let bridged = crate::knobs::bridged([family.as_str(), SUITES_KNOB]);
+        for k in &bridged {
+            knobs.set(&format!("GATE_SDK_KNOB_{}", k), &dir.display().to_string());
         }
-        knobs.set("GATE_SDK_KNOB_EVIDENCE_KIT_SUITES", "");
+        knobs.remove("EVIDENCE_KIT_RUN_alpha");
+        let use_file = |name: &str, body: &str| {
+            let p = dir.join(name);
+            std::fs::write(&p, body).expect("write knob file");
+            knobs.set("EVIDENCE_KIT_KNOB_FILE", &p.display().to_string());
+            crate::knobs::reset(&knobs);
+        };
+        use_file("empty.knobs", "");
         assert!(
             suite_section().expect("an empty roster must not refuse").is_none(),
             "an empty roster is the not-adopted case and drops its section"
         );
 
-        knobs.set("GATE_SDK_KNOB_EVIDENCE_KIT_SUITES", "alpha");
+        use_file("named.knobs", "EVIDENCE_KIT_SUITES[] = alpha\n");
         let err = match suite_section() {
             Err(e) => e,
             Ok(_) => panic!("a named-but-absent member must refuse"),
@@ -548,14 +559,17 @@ mod tests {
             err
         );
 
-        knobs.set("GATE_SDK_KNOB_EVIDENCE_KIT_RUN_alpha", "bash guard-kit/bin/x.sh");
+        use_file("whole.knobs", "EVIDENCE_KIT_SUITES[] = alpha\nEVIDENCE_KIT_RUN_alpha = bash guard-kit/bin/x.sh\n");
         let s = suite_section().expect("a whole roster resolves").expect("section present");
         assert_eq!(s.rows.len(), 1);
         assert_eq!(s.rows[0].kit, "guard-kit");
 
-        for k in ["EVIDENCE_KIT_SUITES", "EVIDENCE_KIT_RUN_alpha"] {
+        knobs.remove("EVIDENCE_KIT_KNOB_FILE");
+        for k in bridged {
             knobs.remove(&format!("GATE_SDK_KNOB_{}", k));
         }
+        crate::knobs::reset(&knobs);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: gate-sdk/SPEC.md §enforcement-map — the settings registry's two arms, held here

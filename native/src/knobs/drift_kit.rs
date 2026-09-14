@@ -102,6 +102,7 @@ pub const KIT: Kit = Kit {
     ],
     validate: Some(("drift config", validate)),
     open_family: true,
+    families: &[],
     retired: &[],
 };
 

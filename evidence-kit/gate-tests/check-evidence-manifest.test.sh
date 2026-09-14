@@ -5,7 +5,7 @@
 # re-armed past it; (A) a close-entry cursor demands the full green block over
 # every configured suite; and both no-cursor disarms.
 #
-# The cursor is the state file's last data line (ek_state_stage), so every case
+# The cursor is the state file's last data line, so every case
 # below drives the stage axis from <state-body> and the header carries the name
 # axis alone — a header-sourced stage would make these cases prove nothing.
 #
@@ -28,8 +28,9 @@ case_run() {
     printf '# contract: evidence-manifest v1\n%b' "$man" >"$d/man.txt"
     printf '%s\n' "$hdr" >"$d/queue.md"
     printf '%b' "$state" >"$d/state.txt"
-    [[ -n "$suites" ]] && printf 'EVIDENCE_KIT_SUITES=(%s)\n' "$suites" >"$d/scripts/evidence-config.sh"
-    out="$( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+    # shellcheck disable=SC2086  # one element line per space-separated suite
+    [[ -n "$suites" ]] && printf 'EVIDENCE_KIT_SUITES[] = %s\n' $suites >"$d/scripts/evidence-config.knobs"
+    out="$( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
         && gate_env GATE_SDK_GATES_DIR=scripts \
         && gate_run check-evidence-manifest "$CHECKS" man.txt queue.md state.txt 2>&1 )"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then

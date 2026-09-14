@@ -38,12 +38,12 @@ mk_tree() {
     ( cd "$1" && git init -q . ) >/dev/null 2>&1
     printf '# baseline\ngreen green pass\n' >"$1/.workflow/validate-baseline.txt"
     printf '# contract: evidence-manifest v1\n' >"$1/.workflow/validate-evidence.txt"
-    printf "EVIDENCE_KIT_SUITES=(green)\nEVIDENCE_KIT_PARSER=exit-code\nEVIDENCE_KIT_RUN_ID=lock-test\nEVIDENCE_KIT_RUN_green='%s'\n" \
-        "${2:-true}" >"$1/scripts/evidence-config.sh"
+    printf "EVIDENCE_KIT_SUITES[] = green\nEVIDENCE_KIT_RUN_ID = lock-test\nEVIDENCE_KIT_RUN_green = %s\n" \
+        "${2:-true}" >"$1/scripts/evidence-config.knobs"
 }
-# test-hermetic pins EVIDENCE_KIT_CONFIG_FILE to a shared empty file, so each
+# test-hermetic pins EVIDENCE_KIT_KNOB_FILE to a shared empty file, so each
 # scratch tree names its own config rather than relying on the cwd lookup.
-_rv() { ( cd "$1" && EVIDENCE_KIT_CONFIG_FILE=scripts/evidence-config.sh bash "$FE" --run-validate 2>&1 ); }
+_rv() { ( cd "$1" && EVIDENCE_KIT_KNOB_FILE=scripts/evidence-config.knobs bash "$FE" --run-validate 2>&1 ); }
 
 # A — the reader reds on a PID the test owns. The fixture pair's bad case can
 #     only reach for PID 1, so the live-PID verdict is pinned here against a
@@ -137,8 +137,8 @@ fi
 #     producer reaches the same branch but cannot be scheduled reliably, and its
 #     more common outcome is the live-holder refusal arm C already pins.
 mk_tree "$tmp/e"
-printf "EVIDENCE_KIT_LOCK_FILE='no-such-dir/run-validate.lock'\n" >>"$tmp/e/scripts/evidence-config.sh"
-out="$(timeout 30 bash -c "cd '$tmp/e' && EVIDENCE_KIT_CONFIG_FILE=scripts/evidence-config.sh bash '$FE' --run-validate 2>&1")"; rc=$?
+printf "EVIDENCE_KIT_LOCK_FILE = no-such-dir/run-validate.lock\n" >>"$tmp/e/scripts/evidence-config.knobs"
+out="$(timeout 30 bash -c "cd '$tmp/e' && EVIDENCE_KIT_KNOB_FILE=scripts/evidence-config.knobs bash '$FE' --run-validate 2>&1")"; rc=$?
 if [[ "$rc" -eq 124 ]] || [[ "$out" != *"refusing to start rather than retrying"* ]]; then
     echo "  FAIL: the reclaim is not bounded to one retry (rc=$rc): $out"; fails=$((fails + 1))
 fi

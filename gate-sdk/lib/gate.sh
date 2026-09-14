@@ -675,22 +675,6 @@ gate_check_dirs() {
     done < <(gate_kit_roots)
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the fixture-suite derivation shared by CI and evidence-kit's validate config: every dir with a gate-tests/ tree (the kit roots plus the gates dir), one tab-separated '<suite> <tests-dir> <checks-dir-or-empty>' row per suite in kit-roots-then-gates-dir order. suite = the dir basename with '-'→'_' (a valid var suffix + scenario name); checks-dir is the sibling checks/ when present, else empty so run-gate-tests falls back to consumer-first resolution. A new kit's gate-tests/ enrols with no hand-list to drift.
-gate_fixture_suites() {
-    local anchor base suite
-    anchor="${GATE_SDK_ROOT:-$(gate_sdk_root)}"; anchor="${anchor%/*}"
-    { gate_kit_roots_rel; gate_sdk_gates_dir; } | while IFS= read -r base; do
-        base="${base%/}"
-        [[ -d "$anchor/$base/gate-tests" ]] || continue
-        suite="${base##*/}"; suite="${suite//-/_}"
-        if [[ -d "$anchor/$base/checks" ]]; then
-            printf '%s\t%s\t%s\n' "$suite" "$base/gate-tests" "$base/checks"
-        else
-            printf '%s\t%s\t\n' "$suite" "$base/gate-tests"
-        fi
-    done
-}
-
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the gate_kit_roots_rel cache-fill, split out so an in-process caller (gate_expand_couples) can prime the shared _gate_kit_roots_rel_cache array and read it directly, with no stdout round-trip / process-substitution fork of its own. The kit-root set cannot change mid-process, so a cold-cache fill (the realpath-per-root fork cost) happens at most once per gate invocation.
 _gate_kit_roots_rel_ensure_cache() {
     [[ -n "${_gate_kit_roots_rel_cache_set:-}" ]] && return 0

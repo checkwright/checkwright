@@ -1,0 +1,7 @@
+# spec: evidence-kit/SPEC.md §check-battery-roster — fixture consumer config: the same three suites as good/, so the pair differs only in the runner doc
+EVIDENCE_KIT_SUITES[] = alpha
+EVIDENCE_KIT_SUITES[] = beta
+EVIDENCE_KIT_SUITES[] = gamma
+EVIDENCE_KIT_RUN_alpha = bash bin/run-alpha.sh
+EVIDENCE_KIT_RUN_beta = env FIXTURE_VERBOSE=1 bash bin/run-beta.sh
+EVIDENCE_KIT_RUN_gamma = bash bin/run-gamma.sh --deep

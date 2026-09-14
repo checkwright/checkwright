@@ -17,10 +17,10 @@ assert_has()    { grep -qF -- "$2" <<<"$3" || { echo "FAIL [$1]: expected presen
 assert_absent() { grep -qF -- "$2" <<<"$3" && { echo "FAIL [$1]: expected absent: $2"; fails=$((fails + 1)); }; return 0; }
 
 # The baseline asserts every real registry projects its section. Evidence
-# routes through EVIDENCE_KIT_CONFIG_FILE, which the hermetic bootstrap pins to
+# routes through EVIDENCE_KIT_KNOB_FILE, which the hermetic bootstrap pins to
 # an empty file; drop that pin here so the emitter resolves this repo's real
-# evidence-config.sh (the other registries already read their real defaults).
-base="$(env -u EVIDENCE_KIT_CONFIG_FILE bash "${EMIT[@]}")"
+# evidence-config.knobs (the other registries already read their real defaults).
+base="$(env -u EVIDENCE_KIT_KNOB_FILE bash "${EMIT[@]}")"
 for section in "## Blocking gates" "## Advisory KPIs" "## Guards" "## Session warnings" "## Validate suites" "## Monitors"; do
     assert_has baseline "$section" "$base"
 done
@@ -39,7 +39,7 @@ assert_strict() {  # $1=case $2=knob-name $3=knob-value
 }
 assert_strict strict-kpis     DRIFT_KIT_KPIS_FILE        /nonexistent/kpis.list
 assert_strict strict-settings CONTEXT_KIT_SETTINGS_FILE  /nonexistent/settings.json
-assert_strict strict-evidence EVIDENCE_KIT_CONFIG_FILE   /nonexistent/evidence-config.sh
+assert_strict strict-evidence EVIDENCE_KIT_KNOB_FILE     /nonexistent/evidence-config.knobs
 assert_strict strict-scandir  GATE_SDK_ENFORCE_SCAN_DIR  /nonexistent/scandir
 printf '{ not json\n' > "$scratch/bad-settings.json"
 assert_strict strict-settings-unparseable CONTEXT_KIT_SETTINGS_FILE "$scratch/bad-settings.json"
@@ -47,16 +47,16 @@ assert_strict strict-settings-unparseable CONTEXT_KIT_SETTINGS_FILE "$scratch/ba
 # spec: gate-sdk/SPEC.md §enforcement-map — not-adopted degrades: an unset knob
 # whose default path is absent drops exactly its own section. A scratch
 # GATE_SDK_GATES_DIR holding only a gates.list copy leaves the kpis.list and
-# evidence-config.sh defaults absent; adding kpis.list back restores only the
+# evidence-config.knobs defaults absent; adding kpis.list back restores only the
 # KPI section, so the sections drop independently.
 mkdir -p "$scratch/gates"
 cp "scripts/gates.list" "$scratch/gates/gates.list"
-deg="$(env -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "${EMIT[@]}")"
+deg="$(env -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_KNOB_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "${EMIT[@]}")"
 assert_absent degrade-both "## Advisory KPIs" "$deg"
 assert_absent degrade-both "## Validate suites" "$deg"
 assert_has    degrade-both "## Blocking gates" "$deg"
 cp "scripts/kpis.list" "$scratch/gates/kpis.list"
-deg2="$(env -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "${EMIT[@]}")"
+deg2="$(env -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_KNOB_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "${EMIT[@]}")"
 assert_has    degrade-independent "## Advisory KPIs" "$deg2"
 assert_absent degrade-independent "## Validate suites" "$deg2"
 assert_has    degrade-independent "## Blocking gates" "$deg2"

@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 # Behavioral test of this repo's WIRING of EVIDENCE_KIT_PARSER_<suite>: that the values
-# scripts/evidence-config.sh actually configures resolve and answer through the compiled parser
+# scripts/evidence-config.knobs actually configures resolve and answer through the compiled parser
 # dispatch. The crate's own #[cfg(test)] module holds each arm's grammar, so it cannot see whether
 # the CONFIGURED value reaches it — which is how a port that deleted a knob value's target once
 # left a seam degraded silently for 77 firings. This test drives the seam, never a hardcoded arm
 # invocation, so arms C and D are negative controls proving it would notice.
 #
-# spec: evidence-kit/SPEC.md §lib/evidence.sh — the dispatch is the compiled twin since the
-# 2026-09-04 diff cut retired the shell adapters, so the seam is driven through the front end's
-# `--diff-baseline` arm. The scenarios are read out of its FINDINGS against a fixture baseline:
+# spec: evidence-kit/SPEC.md §The evidence adapters — the dispatch is compiled, so the seam is driven
+# through the front end's `--diff-baseline` arm. The scenarios are read out of its FINDINGS against a fixture baseline:
 # a scenario the configured value failed to produce reds as an absent baseline row, which is what
 # makes a dead value observable rather than merely quiet.
 #
@@ -18,7 +17,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FE="$ROOT/gate-sdk/bin/run-gates.sh"
-CONFIG="$ROOT/scripts/evidence-config.sh"
+CONFIG="$ROOT/scripts/evidence-config.knobs"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -29,14 +28,14 @@ cd "$ROOT" || { echo "  FAIL: cannot reach the repo root"; exit 1; }
 
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the preamble above pins every kit's config file at
 # an empty one so a KIT test runs on kit defaults; this is a CONSUMER-wiring test and the values
-# under test live in this repo's consumer config, so that file IS the subject here. A negative
-# control edits a COPY of it rather than the environment, because the config is sourced after the
-# environment and would overwrite an env override — which is the seam, not a test detail.
+# under test live in this repo's consumer knob file, so that file IS the subject here. A negative
+# control edits a COPY of its line rather than exporting an override, so the value under test is
+# still the one the file spells.
 # The findings are STDOUT and a parser's own diagnostic is stderr, so the two are held apart:
 # what a dead value proves is the absence of scenario lines, and folding its complaint into the
 # compared stream would make the control pass on the complaint instead.
 _diff() {   # $1 = config file, $2.. = argv groups; stderr lands in $tmp/err
-    env EVIDENCE_KIT_CONFIG_FILE="$1" \
+    env EVIDENCE_KIT_KNOB_FILE="$1" \
         EVIDENCE_KIT_BASELINE_FILE="$tmp/base.txt" \
         EVIDENCE_KIT_SKIP_FILE="$tmp/no-skips.txt" \
         EVIDENCE_KIT_TMP_DIR="$tmp/scratch" \
@@ -97,9 +96,9 @@ rc=1"
 #     scenario lines, so the baselined `check-alpha pass` reds as absent and neither `fail`
 #     scenario appears. This is the arm a hardcoded-arm test cannot make, and the failure mode it
 #     names is the one that shipped green before.
-sed "s#^EVIDENCE_KIT_PARSER_gates=.*#EVIDENCE_KIT_PARSER_gates='bash scripts/parse-gates-log.sh'#" \
-    "$CONFIG" >"$tmp/dead-gates.sh"
-check "a dead gates value produces nothing" "$(_diff "$tmp/dead-gates.sh" gates "$tmp/verbose.log" 1)" \
+sed "s#^EVIDENCE_KIT_PARSER_gates = .*#EVIDENCE_KIT_PARSER_gates = bash scripts/parse-gates-log.sh#" \
+    "$CONFIG" >"$tmp/dead-gates.knobs"
+check "a dead gates value produces nothing" "$(_diff "$tmp/dead-gates.knobs" gates "$tmp/verbose.log" 1)" \
 "new-failure gates check-alpha
 diff-baseline: NEW failures against $tmp/base.txt (see 'new-failure' lines above)
 rc=1"
@@ -108,10 +107,10 @@ grep -q 'parse-gates-log.sh' "$tmp/err" \
 
 # D — negative control for the failure mode this wiring newly admits: an installer_smoke value
 #     whose leading positional is missing, so the arm cannot derive a roster and refuses.
-sed "s#^EVIDENCE_KIT_PARSER_installer_smoke=.*#EVIDENCE_KIT_PARSER_installer_smoke='bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log'#" \
-    "$CONFIG" >"$tmp/driverless.sh"
+sed "s#^EVIDENCE_KIT_PARSER_installer_smoke = .*#EVIDENCE_KIT_PARSER_installer_smoke = bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log#" \
+    "$CONFIG" >"$tmp/driverless.knobs"
 check "a driver-less installer_smoke value produces nothing" \
-    "$(_diff "$tmp/driverless.sh" installer_smoke "$tmp/smoke.log" 1)" \
+    "$(_diff "$tmp/driverless.knobs" installer_smoke "$tmp/smoke.log" 1)" \
 "new-failure installer_smoke build
 new-failure installer_smoke pack
 diff-baseline: NEW failures against $tmp/base.txt (see 'new-failure' lines above)

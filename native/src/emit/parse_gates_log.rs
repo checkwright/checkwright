@@ -18,7 +18,7 @@ fn tail(line: &str) -> Option<String> {
     Some(format!("{} {}", name, status))
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — the log is the arm's only positional
+// spec: evidence-kit/SPEC.md §The evidence adapters — the log is the arm's only positional
 pub fn emit(args: &[String]) -> Result<String, String> {
     let log = args.first().map(String::as_str).unwrap_or("");
     if log.is_empty() || !std::path::Path::new(log).is_file() {

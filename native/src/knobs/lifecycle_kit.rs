@@ -125,6 +125,7 @@ pub const KIT: Kit = Kit {
     ],
     validate: Some(("stage-machine config", validate)),
     open_family: false,
+    families: &[],
     retired: &[],
 };
 

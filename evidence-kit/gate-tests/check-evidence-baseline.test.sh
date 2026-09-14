@@ -51,10 +51,10 @@ case_run "pass-with-slug" \
 # E — a permanent marker satisfies liveness without a queue task.
 _perm_cfg() {
     local d="$tmp/perm"; mkdir -p "$d/scripts"
-    printf 'EVIDENCE_KIT_PERMANENT_SLUGS=(forever)\n' >"$d/scripts/evidence-config.sh"
+    printf 'EVIDENCE_KIT_PERMANENT_SLUGS[] = forever\n' >"$d/scripts/evidence-config.knobs"
     printf '# fixture\nu a ignore forever\n' >"$d/base.txt"
     printf '## New Features\n- **unrelated** — x\n' >"$d/queue.md"
-    ( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+    ( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
         && gate_env GATE_SDK_GATES_DIR=scripts \
         && gate_run check-evidence-baseline "$DIR/checks" base.txt queue.md 2>&1 )
 }
@@ -66,10 +66,10 @@ fi
 #     scenario with no baseline line is red.
 _cov_cfg() {
     local d="$tmp/cov"; mkdir -p "$d/scripts" "$d/scen"
-    printf 'declare -A EVIDENCE_KIT_SCENARIO_GLOBS=([sx]="scen/*.txt")\n' >"$d/scripts/evidence-config.sh"
+    printf 'EVIDENCE_KIT_SCENARIO_GLOBS[sx] = scen/*.txt\n' >"$d/scripts/evidence-config.knobs"
     : >"$d/scen/a.txt"; : >"$d/scen/b.txt"
     printf '# fixture\nsx a.txt pass\n' >"$d/base.txt"
-    ( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+    ( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
         && gate_env GATE_SDK_GATES_DIR=scripts \
         && gate_run check-evidence-baseline "$DIR/checks" base.txt 2>&1 )
 }
@@ -83,9 +83,9 @@ fi
 #     declared early-out, rather than falling through the live assertions.
 _nosuites_cfg() {
     local d="$tmp/nosuites"; mkdir -p "$d/scripts"
-    printf 'EVIDENCE_KIT_SUITES=()\n' >"$d/scripts/evidence-config.sh"
+    printf 'EVIDENCE_KIT_SUITES =\n' >"$d/scripts/evidence-config.knobs"
     printf '# fixture\nu a pass\n' >"$d/base.txt"
-    ( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+    ( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
         && gate_env GATE_SDK_GATES_DIR=scripts \
         && gate_run check-evidence-baseline "$DIR/checks" base.txt 2>&1 )
 }
@@ -93,34 +93,20 @@ if ! out="$(_nosuites_cfg)" || ! grep -qF "0 configured suite(s)" <<<"$out"; the
     echo "  FAIL: an empty suite roster did not disarm cleanly at the declared early-out: $out"; fails=$((fails + 1))
 fi
 
-# H — a suite roster the bridge could not carry is exit 2, never a clean run. The
-#     argv the bridge built, minus that one assignment, is NOT by itself that
-#     state: the knob is a bridged scalar, which (unlike the old unexportable
-#     EVIDENCE_KIT_SUITES bash array) survives a process boundary, so a caller
-#     such as --run-validate that has it in its own env leaves it ambient for
-#     every child it spawns regardless of what that child's own argv omits.
-#     Isolation needs the name gone from both the argv this case builds AND the
-#     inherited environment, which is what the explicit unset below buys back.
+# H — a suite roster the knob file cannot resolve is exit 2, never a clean run.
 _unresolvable() {
     local d="$tmp/unres"; mkdir -p "$d/scripts"
-    printf 'EVIDENCE_KIT_SUITES=(gates)\n' >"$d/scripts/evidence-config.sh"
+    printf 'EVIDENCE_KIT_SUITES = gates\n' >"$d/scripts/evidence-config.knobs"
     printf '# fixture\ngates gates pass\n' >"$d/base.txt"
-    ( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+    ( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
         && gate_env GATE_SDK_GATES_DIR=scripts \
-        && source "$GATE_SDK_TEST_LIB_DIR/gate.sh" \
-        && mapfile -t argv < <(gate_command check-evidence-baseline "$DIR/checks") \
-        && kept=() \
-        && for a in "${argv[@]}"; do
-               [[ "$a" == GATE_SDK_KNOB_EVIDENCE_KIT_SUITES=* ]] || kept+=("$a")
-           done \
-        && unset GATE_SDK_KNOB_EVIDENCE_KIT_SUITES \
-        && "${kept[@]}" base.txt 2>&1 )
+        && gate_run check-evidence-baseline "$DIR/checks" base.txt 2>&1 )
 }
 out="$(_unresolvable)"; rc=$?
 if [[ "$rc" -ne 2 ]]; then
     echo "  FAIL: an unresolvable suite roster exited $rc, want 2 (fail-closed): $out"; fails=$((fails + 1))
-elif ! grep -qF "could not run" <<<"$out"; then
-    echo "  FAIL: the fail-closed refusal did not name itself as a non-run: $out"; fails=$((fails + 1))
+elif ! grep -qF "EVIDENCE_KIT_SUITES is declared indexed" <<<"$out"; then
+    echo "  FAIL: the fail-closed refusal did not name the knob it could not resolve: $out"; fails=$((fails + 1))
 fi
 
 if [[ "$fails" -gt 0 ]]; then

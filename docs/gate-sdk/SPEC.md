@@ -342,7 +342,10 @@ NAME[key] = value       one pair of a keyed knob
 NAME[] <- OTHER         the resolved elements of OTHER, at this position
 ```
 
-`NAME` is a SCREAMING_SNAKE knob name. The first `=` on the line separates the head
+`NAME` is a SCREAMING_SNAKE knob name, or a declared family's member, whose suffix
+may be lowercase: the line grammar takes an uppercase letter then letters, digits
+and `_`, and the owning kit refuses a name it neither declares nor admits. The
+first `=` on the line separates the head
 from the value. Blanks around the head and the value are trimmed, and the value is
 otherwise taken **verbatim to end of line**: no quoting, no escapes, no expansion,
 and `#` or `=` inside a value is data. A `key` is non-empty and carries no `]`, `=`
@@ -371,9 +374,12 @@ as without a reference. A reference is refused with its file and line, exit 2, w
 - `NAME` or `OTHER` is not a declared **indexed** knob. The form splices elements,
   and no scalar or keyed reference has a reader.
 - `OTHER` is not statically owned. A bridged value is not the crate's to resolve.
-- `OTHER`'s row reaches a bridged input (the derived-default paragraph below). The
-  member's `--knobs` closure is computed from declarations and cannot see a file's
-  reference, so such a referent could ask for an input the bridge never carried.
+- `OTHER`'s row reaches a bridged input (the derived-default paragraph below) **and
+  `NAME`'s row does not declare `OTHER` a referent**. A row may list the referents
+  a reference to it may name. The member's `--knobs` closure then adds a declared
+  referent's bridged inputs whenever the member reads `NAME`, so the bridge carries
+  what the splice needs. An undeclared referent is still refused, because the
+  closure is computed from declarations and cannot see a file's reference.
 - `OTHER`'s own resolved value carries a reference, or `OTHER` is `NAME`.
   Resolution is **one pass**, the bound the `couples=` `knob:` token takes, so no
   cycle detector is needed. A kit validator reads every row at the kit's first
@@ -411,9 +417,8 @@ bash and PowerShell alike needs.
 expansion inside a value, no command substitution and no loop. Every derived value
 a kit library computed lives in that kit's defaults table, where a derived default
 is a function of already-resolved knobs. Every value a consumer config computes is
-either a *reference*, ruled above, or a *generated family*, and the cut that first
-migrates a family rules its extension under this section's invariants: raw values,
-no expansion, no shell, and one owner per knob.
+either a *reference*, ruled above, or a *generated family*, ruled below: raw
+values, no expansion, no shell, and one owner per knob.
 
 A derived default may read a **bridged** knob as well as a static sibling. Its row
 declares every name its derivation reads, so the set is known without running it,
@@ -441,7 +446,8 @@ row whose default derives from a bridged input is validated only when its value
 comes from the environment or a file: the validator runs at the kit's first read,
 for a member that may not carry that input, and a unit test holds every kit default
 valid under its validator, which is what makes skipping those rows at their default
-sound.
+sound. For the same reason the validator's read skips a declared referent's splice
+whose referent reaches a bridged input, and checks the elements the file writes.
 
 **Where a static knob resolves from, highest first:**
 
@@ -457,7 +463,7 @@ sound.
 4. **the kit default** from the crate's table.
 
 `<stem>` is the kit root's name less `-kit` (`site`, `doctrine`, `queue`,
-`lifecycle`, `canon`, `context`, `delegation`, `drift`), the stem its shell
+`lifecycle`, `canon`, `context`, `delegation`, `drift`, `evidence`), the stem its shell
 config used, so a consumer finds the new file where the old one was. The gates
 directory is `GATE_SDK_GATES_DIR` from the environment, default `scripts`. It stays
 env-or-default for the reason §Layout and configuration already gives: a file
@@ -511,6 +517,33 @@ mistake the family would otherwise hide. drift-kit is the one open kit, for its
 plugin contract. The honest limit: a misspelled declared name in an open kit's file
 reads as a consumer knob rather than a refusal.
 
+**A kit may declare a scalar family**, a prefix under which each member is a scalar
+whose name the prefix and a suffix spell: `EVIDENCE_KIT_RUN_demo = bash
+gate-sdk/bin/run-gates.sh --run-demo`. A file line naming an undeclared scalar
+under a declared family prefix is a family member rather than a refusal. The
+suffix is non-empty and SCREAMING_SNAKE-or-lowercase identifier-shaped
+(`[A-Za-z_][A-Za-z0-9_]*`), and an indexed or keyed line under the prefix is
+refused. A member resolves through the scalar precedence, so an exported
+`EVIDENCE_KIT_RUN_demo` outranks the file. A declared row whose name the prefix
+also spells, such as `EVIDENCE_KIT_RUN_ID`, is never a member.
+
+**A family may carry a derivation**, the generated family: a function of
+already-resolved knobs returning `(suffix, value)` members, with every name it
+reads declared like a derived row's, and a unit test holds each derivation to that
+declaration as it holds a derived row. A derived member is the family's default
+for that suffix, so a file or environment member of the same name replaces it. It
+is a kit-side derivation and never a loop in consumer config. `--knobs` adds a
+family derivation's bridged inputs when a member declares the family's `*` name.
+
+**The family is still a resolution set and never a roster.** A reader looks a
+member up by the suffix its own roster knob names, and `knobs::family(prefix)`
+returns every derived member, every member either file sets, and every member the
+environment exports, the environment first. The honest limit is the open
+family's, narrowed to one prefix: a misspelled member reads as a member, and it is
+found only by the reader whose roster names the correct spelling and does not find
+it. evidence-kit declares the two families, `EVIDENCE_KIT_RUN_` with a derivation
+and `EVIDENCE_KIT_PARSER_` without one.
+
 **The table is published.** `bash gate-sdk/bin/run-gates.sh --emit knob-roster`
 prints every statically owned knob (§The non-gate arm), which is how an adopter reads
 a static kit's names and defaults now that no shell file holds them.
@@ -520,8 +553,6 @@ expressible, and the cut that first needs a shape rules its grammar under this
 section's invariants.** The shapes not yet ruled, each with the reason it cannot be
 deferred past its kit:
 
-- **A generated family** (`EVIDENCE_KIT_RUN_` over the fixture suites) is a kit-side
-  derivation the owning kit's table performs, never a loop in consumer config.
 - **guard-kit's rule content** is bash a consumer composes against `lib/guard.sh`.
   Its cut rules whether the rules become data or the guard stays the one shell hook.
 - **gate-sdk migrates last**, with `lib/gate.sh`, the three bridge front-ends, the
@@ -578,7 +609,7 @@ taking one side would leave the other re-arguing the same ground at the next cut
 deletes the thing there is to edit, and a template and its seeded copy stand or
 fall together.** A ruling that granted the ground to a template while its own
 consumer copy stayed owed would be an incoherence rather than an exception, which
-is why the class takes both sides. `evidence-kit/templates/evidence-config.sh`, a
+is why the class takes both sides. `guard-kit/templates/guard-config.sh`, a
 bridged kit's template still in shell, is the live declarer: its `# no-port:`
 names this section and states that it **is** the surface an adopter edits rather
 than kit mechanism reaching one.
@@ -2365,7 +2396,7 @@ is substrate-sensitive when its expanded `couples=` covers the **declaration
 path of a registry member** — the derivation `check-gate-substrate-parity`
 performs at runtime, so no count or roster here can rot. (The test is against
 registry members' declaration paths specifically, not against every `*.sh`
-under a resolve dir: `scripts/evidence-config.sh` sits in the gates dir and is not
+under a resolve dir: `scripts/measured-claims.sh` sits in the gates dir and is not
 a gate, and matching it would over-report.) **Where a declaration lives is not a
 term of that derivation**, on either side of it: a member the consumer's own
 gates directory declares earns a row on exactly the same terms as a kit-declared
@@ -2682,7 +2713,7 @@ criteria already has a cohort sequence a member without declaring it held. And a
 port that must read the sequenced member's content — env-probe read toolfloor's
 roster and floor predicate — keeps one owner where the crate already reads it, and
 holds a predicate twice only under criterion 6's *unless*
-clause with a parity test, evidence-kit/SPEC.md §lib/evidence.sh's shape. Three
+clause with a parity test, evidence-kit/SPEC.md §The evidence adapters' shape. Three
 alternatives were refused. *Whole section or nothing* is the over-read the
 packaging ruling refused for one-cut-per-iteration, contradicts the
 owning SPEC's own per-member sequencing, and prices unblocked lines at the
@@ -3641,7 +3672,7 @@ is a *roster* rather than a seam or two.** `--usage-verdict` spawns one consumer
 command and `--emit-env-probe` probes a configured tool list; this member spawns
 `bash`, whatever the configured parser and pre-hook commands name, **and each
 suite's own run command** — which in this tree includes `cargo`
-(`scripts/evidence-config.sh`). The set is therefore a consumer's configuration
+(`scripts/evidence-config.knobs`). The set is therefore a consumer's configuration
 rather than a property of the arm, and it is recorded in prose because a
 `BRIDGED_ARMS` row carries no requirement element and `--needs` answers about
 registry members only. Not a first on the axis a reader might expect: the wait
@@ -9159,9 +9190,20 @@ reader needs outlive the refactor that renames a helper:
   resolver (canon-kit/SPEC.md §check-md-refs) and the reference-link producers
   share, so an emitted link and the pass that validates it cannot derive
   divergent identities; it ships no repo name — the provenance seam holds.
-- `gate_fixture_suites` is the single source both the CI workflow
-  (`.github/workflows/gates.yml`) and evidence-kit's validate config loop over,
-  so adding a kit enrols its fixtures with no hand-list to drift.
+- `registry::fixture_suites()` is the single fixture-suite derivation: one
+  `(suite, tests-dir, checks-dir)` triple per directory carrying a `gate-tests/`
+  tree, the kit roots in `GATE_KIT_ROOTS_REL` order then the gates directory,
+  the suite named by the directory's basename with `-` turned to `_` and the
+  checks directory the sibling `checks/` when one exists, else empty. A
+  directory is tested at the path its row prints, which is the operand
+  `--run-gate-tests` receives. `--emit fixture-suites` prints one
+  `<suite>⇥<tests-dir>⇥<checks-dir>` line per triple, and the CI workflow
+  (`.github/workflows/gates.yml`, and the template it fills) captures that output
+  before looping, `suites="$(bash gate-sdk/bin/run-gates.sh --emit
+  fixture-suites)" || exit 2`, because a loop over a process substitution would
+  lose the arm's status and run zero suites green. evidence-kit's
+  `EVIDENCE_KIT_FIXTURE_SUITES` and its `EVIDENCE_KIT_RUN_` family derive from the
+  same function, so adding a kit enrols its fixtures with no hand-list to drift.
 - `gate_kit_roots_rel` emits the roots relative to **the directory holding the
   kits**, which it derives from `gate_sdk_root` — the library's own location,
   never the caller's working directory and never the git toplevel. That is the
@@ -9627,8 +9669,10 @@ Resolution, per declared knob:
   is baked into is stable. This is what lets a member read a keyed family whose
   key set is *another knob's value*: `--knobs` publishes a static roster, so
   without it a member can only name knobs it knows at compile time.
-  `EVIDENCE_KIT_RUN_<suite>` is the live instance — one variable per suite, with
-  the suite set coming from `EVIDENCE_KIT_SUITES`.
+  A bridged kit's family is resolved this way; a static kit's prefix reads its
+  declared family in process (§The knob file), and `EVIDENCE_KIT_RUN_<suite>` is
+  that static instance — one member per suite, with the suite set coming from
+  `EVIDENCE_KIT_SUITES`.
 
   **This is a family of separate variables, not the keyed knob the bullet above
   carries, and both shapes now cross — so the live question is which wire each
@@ -9640,11 +9684,9 @@ Resolution, per declared knob:
   takes the keyed arm.
 
   **Resolution happens at the instant the scalar arm's does** — after the owning
-  kit's `lib/*.sh` has been sourced, in the same subshell, which is the load-bearing
-  detail: it is what puts a consumer config's *loop-declared* variables in scope.
-  `scripts/evidence-config.sh` builds most of its family with a `while` loop over
-  `gate_fixture_suites`, so a reader that parsed the file rather than resolving it
-  would see the statically-assigned names and silently miss the rest.
+  kit's `lib/*.sh` has been sourced, in the same subshell, so a bridged config's
+  computed variables are in scope. A static family's computed members are its
+  derivation's, never a loop in consumer config (§The knob file).
 
   **A prefix matching nothing resolves to an empty family and passes**, and the
   fail-closed obligation it looks like that drops is **relocated, not removed**:
@@ -9912,8 +9954,8 @@ disagree only for a consumer whose config narrows the input.
 **The ground is stated in each member's own header rather than inherited by
 example.** A cohort inherits a stated reason where it cannot inherit a
 precedent-by-example, so every member names this section and states its own
-sole-resolver face: `evidence-kit/lib/evidence.sh` is the live kit-library
-declarer, "the config bridge's sole resolver for the `EVIDENCE_KIT_*` knobs", and
+sole-resolver face: `guard-kit/lib/guard.sh` is the live kit-library declarer,
+"the sole resolver for the GUARD_KIT_* knobs" (the worked instance below), and
 `gate-sdk/lib/consumer-smoke.sh` is the second, under §Consumer smoke *The port
 disposition*'s leg 1.
 
@@ -11308,7 +11350,7 @@ convention). A malformed declaration is a contract violation rather than a broke
 environment, which is why it takes exit 1 and not 2.
 A **bridged non-gate arm**, not a gate (§The non-gate arm) — no `good/`+`bad/`
 fixture pair is owed; the `upgrade` validate suite running it
-(scripts/evidence-config.sh) is its evidence, at ~2× run-consumer-smoke's cost
+(scripts/evidence-config.knobs) is its evidence, at ~2× run-consumer-smoke's cost
 since it runs the battery twice in scratch (accepted as validate-stage cost,
 never pre-commit).
 
@@ -18117,7 +18159,7 @@ is ruled here even though the gate never asserts on it.
 template's own body carries the marked gap a consumer fills, that template *is*
 the extension point, and porting it deletes the thing there is to fill. It is the
 general rule that a cut narrows the port applied to a seam that is a file
-rather than a knob, and it is the ground `evidence-kit/templates/evidence-config.sh`
+rather than a knob, and it is the ground `guard-kit/templates/guard-config.sh`
 declares on in the sibling class — that file "**is** the surface an adopter edits
 rather than kit mechanism reaching one".
 

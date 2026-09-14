@@ -21,7 +21,6 @@ pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_MANIFEST_FILE",
     "EVIDENCE_KIT_SKIP_FILE",
     "EVIDENCE_KIT_QUEUE_FILE",
-    "EVIDENCE_KIT_STATE_FILE",
     "EVIDENCE_KIT_TMP_DIR",
     "EVIDENCE_KIT_LOCK_FILE",
     "EVIDENCE_KIT_RUN_ID",
@@ -69,9 +68,9 @@ fn config() -> Result<Cfg, Refusal> {
     let scalar = |k: &str| walk::knob_scalar(k).map_err(guard);
     Ok(Cfg {
         suites: walk::knob_array("EVIDENCE_KIT_SUITES").map_err(guard)?,
-        run_family: walk::knob_prefix("EVIDENCE_KIT_RUN_"),
+        run_family: walk::knob_prefix("EVIDENCE_KIT_RUN_").map_err(guard)?,
         parser: scalar("EVIDENCE_KIT_PARSER")?,
-        parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_"),
+        parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_").map_err(guard)?,
         baseline: scalar("EVIDENCE_KIT_BASELINE_FILE")?,
         manifest: scalar("EVIDENCE_KIT_MANIFEST_FILE")?,
         skip: scalar("EVIDENCE_KIT_SKIP_FILE")?,

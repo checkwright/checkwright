@@ -80,6 +80,40 @@ pub fn fixture_dirs(tests_dir: &str, kit_roots: &[String]) -> Vec<String> {
     dirs
 }
 
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the fixture-suite derivation: one `(suite, tests, checks)`
+// triple per directory carrying a `gate-tests/` tree, the kit roots in order then the gates dir; the
+// suite is the basename with `-` turned to `_`, and `checks` is empty where no sibling `checks/` is
+pub fn fixture_suites_in(kit_roots_rel: &[String], gates_dir: &str) -> Vec<(String, String, String)> {
+    let mut out: Vec<(String, String, String)> = Vec::new();
+    for base in kit_roots_rel.iter().map(String::as_str).chain(std::iter::once(gates_dir)) {
+        let base = base.trim_end_matches('/');
+        let tests = format!("{}/gate-tests", base);
+        if !Path::new(&tests).is_dir() {
+            continue;
+        }
+        let suite = base.rsplit('/').next().unwrap_or(base).replace('-', "_");
+        let checks = format!("{}/checks", base);
+        let checks = if Path::new(&checks).is_dir() { checks } else { String::new() };
+        out.push((suite, tests, checks));
+    }
+    out
+}
+
+pub fn fixture_suites() -> Result<Vec<(String, String, String)>, String> {
+    Ok(fixture_suites_in(
+        &crate::walk::kit_roots_rel()?,
+        &crate::walk::knob_scalar("GATE_SDK_GATES_DIR")?,
+    ))
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — `--emit fixture-suites`: one tab-separated line per triple
+pub fn emit_fixture_suites(_args: &[String]) -> Result<String, String> {
+    Ok(fixture_suites()?
+        .into_iter()
+        .map(|(s, t, c)| format!("{}\t{}\t{}\n", s, t, c))
+        .collect())
+}
+
 pub fn list_path(gates_dir: &str) -> String {
     format!("{}/gates.list", gates_dir)
 }

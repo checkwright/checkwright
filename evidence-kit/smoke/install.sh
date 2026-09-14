@@ -36,14 +36,15 @@ printf '#!/usr/bin/env bash\nprintf "a pass\\nb pass\\n"\n' > "$es/scripts/multi
 # spec: evidence-kit/SPEC.md §Evidence manifest — a suite standing in for one whose precondition is a clean worktree: it reds if the manifest already carries a data line at its turn, which is what an earlier suite's row means. Second in the roster on purpose — first, it would pass under either writer
 printf '#!/usr/bin/env bash\ngrep -qEv "^[[:space:]]*(#|$)" .workflow/validate-evidence.txt \\\n    && { echo "the spine wrote the tracked manifest before this suite ran" >&2; exit 1; }\nexit 0\n' \
     > "$es/scripts/untouched-tree.sh"
-cat > "$es/scripts/evidence-config.sh" <<'EOF'
-EVIDENCE_KIT_SUITES=(green untouched_tree multi)
-EVIDENCE_KIT_PARSER=exit-code
-EVIDENCE_KIT_RUN_ID=smoke
-EVIDENCE_KIT_RUN_green='true'
-EVIDENCE_KIT_RUN_untouched_tree='bash scripts/untouched-tree.sh'
-EVIDENCE_KIT_RUN_multi='true'
-EVIDENCE_KIT_PARSER_multi='bash scripts/multi-parser.sh'
+cat > "$es/scripts/evidence-config.knobs" <<'EOF'
+EVIDENCE_KIT_SUITES[] = green
+EVIDENCE_KIT_SUITES[] = untouched_tree
+EVIDENCE_KIT_SUITES[] = multi
+EVIDENCE_KIT_RUN_ID = smoke
+EVIDENCE_KIT_RUN_green = true
+EVIDENCE_KIT_RUN_untouched_tree = bash scripts/untouched-tree.sh
+EVIDENCE_KIT_RUN_multi = true
+EVIDENCE_KIT_PARSER_multi = bash scripts/multi-parser.sh
 EOF
 # spec: evidence-kit/SPEC.md §bin/run-validate.sh — the spine is the bridged `--run-validate` arm, so this scratch tree becomes its own git toplevel (the front end refuses outside a repository and resolves every relative knob against the toplevel it lands on) and the binary this consumer was given crosses absolute, its repo-relative default naming nothing inside the new toplevel.
 ( cd "$es" && git init -q . ) >/dev/null 2>&1

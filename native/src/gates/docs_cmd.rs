@@ -572,7 +572,7 @@ mod tests {
     #[test]
     fn a_valved_line_exempts_citations_and_not_knobs() {
         let valve = TemporalValve::new(vec!["History".into()], vec![]);
-        let text = "<!-- manifest-temporal-exempt: port record -->\n`bin/a.sh` `GATE_SDK_LIB`\n## History\n`bin/b.sh`\n## Now\n`bin/c.sh`\n";
+        let text = "<!-- manifest-temporal-exempt: port record -->\n`bin/a.sh` `GATE_SDK_NATIVE_BIN`\n## History\n`bin/b.sh`\n## Now\n`bin/c.sh`\n";
         let toks = scan(text, &["GATE_SDK_".to_string()], &valve, true);
         let cited: Vec<String> = toks
             .iter()

@@ -488,6 +488,12 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(crate::knobs::values),
         &[crate::knobs::ARGV_STATIC_KNOBS],
     ),
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the fixture-suite roster the workflows loop over
+    (
+        "--emit-fixture-suites",
+        Arm::Emit(crate::registry::emit_fixture_suites),
+        &["GATE_KIT_ROOTS_REL", "GATE_SDK_GATES_DIR"],
+    ),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
     // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter spec: gate-
     // sdk/SPEC.md §The non-gate arm — both rosters are empty of the `--emit-md-section` kind, not
@@ -824,7 +830,7 @@ mod tests {
         let bare = knobs("--run", &[]).expect("--run is not in the bridged-arm table");
         assert!(bare.contains(&"GATE_SDK_TMP_DIR"), "the arm's own knob is missing");
         assert!(
-            !bare.contains(&"EVIDENCE_KIT_BASELINE_FILE"),
+            !bare.contains(&"GATE_SDK_COMMIT_TYPES"),
             "an unregistered member's knob rode an unscoped union"
         );
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
@@ -834,7 +840,7 @@ mod tests {
         ];
         let scoped = knobs("--run", &here).expect("--run is not in the bridged-arm table");
         assert!(
-            scoped.contains(&"EVIDENCE_KIT_BASELINE_FILE"),
+            scoped.contains(&"GATE_SDK_COMMIT_TYPES"),
             "a registered member's knob is missing from the scoped union"
         );
         let mut sorted = scoped.clone();

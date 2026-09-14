@@ -65,6 +65,7 @@ pub const KIT: Kit = Kit {
     ],
     validate: Some(("delegation config", validate)),
     open_family: false,
+    families: &[],
     retired: &[],
 };
 

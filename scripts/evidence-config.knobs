@@ -1,0 +1,28 @@
+# spec: evidence-kit/SPEC.md §Layout and configuration — this repo's evidence-kit consumer knob file; set only what this repo overrides beyond the kit defaults
+EVIDENCE_KIT_SUITES[] = gates
+# spec: evidence-kit/SPEC.md §Layout and configuration — the per-kit fixture suites, derived from the gate-tests dirs on disk with their run members, so a new kit's fixtures enrol with no edit here; the suites below have no gate-tests dir and stay hand-listed
+EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES
+EVIDENCE_KIT_SUITES[] = guard_tests
+EVIDENCE_KIT_SUITES[] = demo
+EVIDENCE_KIT_SUITES[] = installer_smoke
+EVIDENCE_KIT_SUITES[] = consumer_smoke
+EVIDENCE_KIT_SUITES[] = upgrade
+EVIDENCE_KIT_SUITES[] = agents_md_smoke
+EVIDENCE_KIT_SUITES[] = index_tests
+EVIDENCE_KIT_SUITES[] = native_crate
+
+# spec: evidence-kit/SPEC.md §Layout and configuration — per-gate scenarios for the gates suite; the verbose run is what emits the per-gate tails the parser reads
+EVIDENCE_KIT_PARSER_gates = bash gate-sdk/bin/run-gates.sh --emit parse-gates-log
+EVIDENCE_KIT_RUN_gates = env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh
+
+# spec: evidence-kit/SPEC.md §Layout and configuration — per-arm scenarios for the installer smoke; the arm roster is derived from the smoke's own headers, and the suite's fail-fast shape is what turns an early abort into a red on every arm behind it rather than a hidden one
+EVIDENCE_KIT_PARSER_installer_smoke = bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log installer/consumer-smoke/run-smoke.sh
+
+EVIDENCE_KIT_RUN_guard_tests = bash gate-sdk/bin/run-gates.sh --run-guard-tests
+EVIDENCE_KIT_RUN_demo = bash gate-sdk/bin/run-gates.sh --run-demo
+EVIDENCE_KIT_RUN_installer_smoke = bash installer/consumer-smoke/run-smoke.sh
+EVIDENCE_KIT_RUN_consumer_smoke = bash gate-sdk/bin/run-consumer-smoke.sh
+EVIDENCE_KIT_RUN_upgrade = bash gate-sdk/bin/run-gates.sh --upgrade-smoke
+EVIDENCE_KIT_RUN_agents_md_smoke = bash gate-sdk/bin/run-gates.sh --agents-md-smoke
+EVIDENCE_KIT_RUN_index_tests = bash gate-sdk/bin/run-gates.sh --run-index-tests
+EVIDENCE_KIT_RUN_native_crate = cargo test --release --manifest-path native/Cargo.toml

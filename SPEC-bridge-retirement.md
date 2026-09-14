@@ -535,6 +535,8 @@ Named because each states a rule rather than narrating the flow:
   and 6).
 - `native/src/knobs/gate_sdk.rs` — new table and the pre-binary accessor test (deltas 2 and 5).
 - `native/src/knobs/context_kit.rs` — the root input (delta 1).
+- `native/src/knobs/evidence_kit.rs` — the root and kit-root inputs SPEC-knob-files-cut-4.md gave it
+  (delta 1).
 - `native/src/graph_vocab.rs` — new reader (delta 4).
 - `native/src/walk.rs` — the root derivations, the prune composition, the bridge readers and test helper
   (deltas 1, 3 and 6).
@@ -585,6 +587,8 @@ Named because each states a rule rather than narrating the flow:
 - `gate-sdk/gate-tests/run-dispatch-streams.test.sh` — the `--knobs` probe (delta 13).
 - `gate-sdk/gate-tests/run-gate-tests.test.sh` — the `--knobs` probe (delta 13).
 - `gate-sdk/gate-tests/check-graph-refs.test.sh` — config pin (delta 13).
+- `gate-sdk/gate-tests/run-arm-contract.test.sh` — the scratch gate-sdk config its knob-union case
+  writes (delta 13).
 - `gate-sdk/gate-tests/check-graph-tree.test.sh` — vocabulary writer (deltas 4 and 13).
 - `gate-sdk/gate-tests/check-install-disposition/good/args` — comment (delta 13).
 - `gate-sdk/gate-tests/check-portability-floor/bad/args` — comment (delta 13).

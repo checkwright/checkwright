@@ -96,7 +96,7 @@ template, and a stem no TO kit ships, retire nothing.
 `gate_fixture_suites` computes the roster of fixture suites in shell. Its callers are this repo's CI
 workflow, the shipped workflow template and this repo's evidence config loop, and delta 5 needs the
 same roster in the crate. So the derivation gets one compiled holder and the shell function is deleted
-in the same commit.
+in the same commit. **Applied at build, second batch.**
 
 - **`registry::fixture_suites()`** returns one `(suite, tests_dir, checks_dir)` triple per directory
   carrying a `gate-tests/` tree: the kit roots in `GATE_KIT_ROOTS_REL` order, then the gates directory.
@@ -117,7 +117,9 @@ standing twin, since the shell holder leaves in the same commit.
 ### (3) A kit may declare a scalar family {design-bearing}
 
 gate-sdk/SPEC.md §The knob file, the generated-family bullet of the unruled-shapes list, becomes a rule.
-**Not yet applied:**
+**Applied at build, second batch**, with two calibrations merged beside it: the line grammar's name
+takes an uppercase letter then letters, digits and `_`, so a member's lowercase suffix parses, and
+the validator's read skips a declared referent's splice that reaches a bridged input:
 
 > **A kit may declare a scalar family**, a prefix under which each member is a scalar whose name the
 > prefix and a suffix spell: `EVIDENCE_KIT_RUN_demo = bash gate-sdk/bin/run-gates.sh --run-demo`. A
@@ -156,7 +158,7 @@ why the family is separate variables and not a map.
 ### (4) A row may declare the referents a reference to it may name {design-bearing}
 
 gate-sdk/SPEC.md §The knob file, the reference refusal list. The bullet refusing a referent that reaches
-a bridged input gains its exception. **Not yet applied:**
+a bridged input gains its exception. **Applied at build, second batch:**
 
 > - `OTHER`'s row reaches a bridged input **and `NAME`'s row does not declare `OTHER` a referent**. A
 >   row may list the referents a reference to it may name. The member's `--knobs` closure then adds a
@@ -176,6 +178,8 @@ would carry another tree's inputs. Also refused: a hand-listed fixture-suite ros
 until gate-sdk's cut. It is a maintained roster, and it goes stale silently if that cut does not land.
 
 ### (5) evidence-kit goes static {mechanical}
+
+**Applied at build, second batch.**
 
 evidence-kit gains `native/src/knobs/evidence_kit.rs` and joins `STATIC_KITS`. Every row transcribes
 from `evidence-kit/lib/evidence.sh` as it stands at this amendment's commit:
@@ -208,6 +212,12 @@ precedent keeps.
 `--run-validate`'s declaration of `EVIDENCE_KIT_STATE_FILE`, which that arm never reads, is deleted.
 
 ### (6) evidence-kit's library, configs and fixtures {mechanical}
+
+**Applied at build, second batch.** The roster grep missed two readers, both fixed in the same batch:
+`gate-sdk/gate-tests/check-reads-couples.test.sh` case F, whose withheld bridged filter knob no longer
+exists and which now drives a malformed static knob file, and canon-kit/SPEC.md §check-docs-cmd's
+`GATE_SDK_LIB` example with its unit-test twin in `native/src/gates/docs_cmd.rs` and its fixture in
+`canon-kit/gate-tests/check-docs-cmd/good/doc.md`, whose only kit-code reader was the deleted library.
 
 - Delete `evidence-kit/lib/evidence.sh` and the empty `lib/` directory. Its five shell adapters have no
   caller anywhere in the tree, and each has its compiled holder in `native/src/evidence.rs`.
@@ -381,6 +391,9 @@ prompt and teach nothing durable.
 
 ### (10) The kits' own SPEC sections {design-bearing}
 
+**The evidence-kit bullets are applied at build, second batch**; the guard-kit bullets and the
+`--emit-scan-prompts` bullet are the third batch's.
+
 - **evidence-kit/SPEC.md §Layout and configuration** states the kit static, as site-kit/SPEC.md does:
   the knob file, `EVIDENCE_KIT_KNOB_FILE`, the `.local.knobs` overlay and a pointer to gate-sdk/SPEC.md
   §The knob file. The *permanently shell* sentence goes. The `EVIDENCE_KIT_RUN_<suite>` and
@@ -412,6 +425,11 @@ prompt and teach nothing durable.
 
 ### (11) gate-sdk's standing rules and the release declarations {mechanical}
 
+**The evidence-kit halves are applied at build, second batch**: the `evidence` stem, the generated
+family and delta 4's exception in §The knob file, §lib/gate.sh's two bullets, the live declarers of
+both port dispositions re-pointed at guard-kit's template and library, and evidence-kit's declarations.
+The guard-kit halves are the third batch's.
+
 - **gate-sdk/SPEC.md §The knob file:** the `<stem>` examples gain `evidence` and `guard`. The
   unruled-shapes list loses the generated family (delta 3) and guard-kit's rule content (delta 7), and
   keeps *gate-sdk migrates last*. The reference refusal list gains delta 4's exception.
@@ -425,7 +443,8 @@ prompt and teach nothing durable.
   condition has fired for evidence-kit, and `guard-kit/lib/guard.sh`'s worked-instance paragraph keeps
   only its second ground.
 - **gate-sdk/SPEC.md §upgrade-smoke** gains delta 1 (applied at build, first batch).
-- **`.workflow/release-declarations.md`.** **Not yet applied:**
+- **`.workflow/release-declarations.md`.** **Evidence-kit's halves applied at build, second batch;
+  guard-kit's not yet applied:**
   - Renamed knobs: `EVIDENCE_KIT_CONFIG_FILE` → `EVIDENCE_KIT_KNOB_FILE`, `GUARD_KIT_CONFIG_FILE` →
     `GUARD_KIT_KNOB_FILE`.
   - Behavior changes: **`<gates-dir>/evidence-config.sh` and `<gates-dir>/guard-config.sh`** are replaced

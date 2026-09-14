@@ -8,7 +8,7 @@
 # 2026-09-04 port, which is also where the `-h`/`--help` arm now lives; cases G, H and I are the
 # three behaviours the port ADDS, so they are asserted rather than carried over.
 #
-# The defect it pins: the tool used to hand ek_parse a hardcoded 0, so an
+# The defect it pins: the tool used to hand the parser a hardcoded 0, so an
 # exit-code suite reported pass for every log it was ever handed and the tool
 # cleared reds it could not see. A test asserting only the happy path would have
 # passed against that, so case A is the load-bearing one.
@@ -31,7 +31,7 @@ printf 'whatever the suite happened to print\n' >"$tmp/log"
 # Every run is hermetic: an empty gates dir keeps consumer config off the lookup
 # path, and the baseline, skip file and scratch are the fixture's own.
 _run() {
-    env -u EVIDENCE_KIT_CONFIG_FILE \
+    env -u EVIDENCE_KIT_KNOB_FILE \
         GATE_SDK_GATES_DIR="$tmp/empty" \
         EVIDENCE_KIT_PARSER=exit-code \
         EVIDENCE_KIT_BASELINE_FILE="$tmp/base.txt" \
@@ -82,7 +82,7 @@ fi
 # F — a log-parsing suite may still omit the status, so the pair form keeps
 #     working for the consumers it was written for.
 printf '#!/usr/bin/env bash\nprintf "greensuite pass\\n"\n' >"$tmp/stub.sh"
-out="$(env -u EVIDENCE_KIT_CONFIG_FILE \
+out="$(env -u EVIDENCE_KIT_KNOB_FILE \
         GATE_SDK_GATES_DIR="$tmp/empty" \
         EVIDENCE_KIT_PARSER="bash $tmp/stub.sh" \
         EVIDENCE_KIT_BASELINE_FILE="$tmp/base.txt" \

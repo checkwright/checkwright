@@ -1,6 +1,6 @@
 # Filled instance of gate-sdk/templates/gates-workflow.yml — this repo's CI
 # backstop. The full battery, then the fixture suites derived from the
-# gate-tests dirs on disk (gate_fixture_suites — no hand-list to drift from
+# gate-tests dirs on disk (--emit fixture-suites — no hand-list to drift from
 # CLAUDE.md's battery), then the non-gate-tests runners. Checkout + bash only.
 # Scope + neutrality boundary: see the template header and gate-sdk/SPEC.md
 # §Enforcement tiers.
@@ -59,13 +59,13 @@ jobs:
         run: bash gate-sdk/bin/run-gates.sh
       - name: fixture suites (derived from */gate-tests)
         run: |
-          source gate-sdk/lib/gate.sh
+          suites="$(bash gate-sdk/bin/run-gates.sh --emit fixture-suites)" || exit 2
           rc=0
           while IFS=$'\t' read -r suite tests checks; do
             echo "== $suite =="
             # shellcheck disable=SC2086  # empty checks expands to no arg by design
             bash gate-sdk/bin/run-gates.sh --run-gate-tests "$tests" $checks || rc=1
-          done < <(gate_fixture_suites)
+          done <<<"$suites"
           exit $rc
       - name: guard-kit decision table
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests

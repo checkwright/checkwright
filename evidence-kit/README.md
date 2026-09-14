@@ -44,9 +44,12 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    (override the paths with `EVIDENCE_KIT_BASELINE_FILE` /
    `EVIDENCE_KIT_MANIFEST_FILE`).
 
-3. Configure the suites — copy `templates/evidence-config.sh` into your gates
-   dir as `evidence-config.sh`, naming `EVIDENCE_KIT_SUITES`, an
-   `EVIDENCE_KIT_RUN_<suite>` command per suite,
+3. Configure the suites — copy `templates/evidence-config.knobs` into your gates
+   dir as `evidence-config.knobs`, naming `EVIDENCE_KIT_SUITES` (one
+   `EVIDENCE_KIT_SUITES[] = <suite>` line each, or
+   `EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES` for the derived fixture
+   suites, whose run commands are derived too), an `EVIDENCE_KIT_RUN_<suite>`
+   command per other suite,
    and the `EVIDENCE_KIT_PARSER` adapter (`exit-code` for a whole-suite pass/fail,
    `libtest` for per-test result logs, or your own log-parsing command).
 

@@ -176,10 +176,10 @@ assert_absent only-widened-bound 'g_unreg saw:' "$out"
 # spec: gate-sdk/SPEC.md §The non-gate arm — a registered compiled member whose knob cannot
 # resolve (the scratch consumer config gives it a tab-bearing element) fails a bare run at the
 # bridge, and no longer fails a --only run that does not select it, with one name or two.
-cp "$ROOT/evidence-kit/checks/check-evidence-baseline.gate" "$scratch/"
-printf '%s\n' "EVIDENCE_KIT_PERMANENT_SLUGS=(\$'has\\ttab')" > "$scratch/evidence-config.sh"
-narrowing() { EVIDENCE_KIT_CONFIG_FILE="$scratch/evidence-config.sh" merged "$@"; }
-{ echo g_args; echo g_pass; echo check-evidence-baseline; } > "$scratch/gates.list"
+cp "$ROOT/gate-sdk/checks/check-commit-subject.gate" "$scratch/"
+printf '%s\n' "GATE_SDK_COMMIT_TYPES=\$'has\\ttab'" > "$scratch/gate-sdk-config.sh"
+narrowing() { GATE_SDK_CONFIG_FILE="$scratch/gate-sdk-config.sh" merged "$@"; }
+{ echo g_args; echo g_pass; echo check-commit-subject; } > "$scratch/gates.list"
 
 out="$(narrowing --only g_pass)"; rc=$?
 assert_rc  only-narrowed-sole "$rc" 0
@@ -191,8 +191,8 @@ assert_has only-narrowed-two 'All 2 gates passed.' "$out"
 
 out="$(narrowing)"; rc=$?
 assert_rc  bare-keeps-union "$rc" 2
-assert_has bare-keeps-union 'knob EVIDENCE_KIT_PERMANENT_SLUGS has an element containing a tab' "$out"
-rm -f "$scratch/check-evidence-baseline.gate" "$scratch/evidence-config.sh"
+assert_has bare-keeps-union 'knob GATE_SDK_COMMIT_TYPES has an element containing a tab' "$out"
+rm -f "$scratch/check-commit-subject.gate" "$scratch/gate-sdk-config.sh"
 
 # ---- a mistyped --emit arm is answered with the ARM roster ---------------------
 # The binary holds two rosters and the emit path used to fall through to the gate

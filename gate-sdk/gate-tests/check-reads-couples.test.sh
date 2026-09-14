@@ -93,20 +93,19 @@ make_case unknown_member sandbox.gate "$MANIFEST_NARROW"
 run_case unknown_member sandbox.gate 2 'no registered subcommand answers'
 
 # F — surviving refusal two, and it is fail-closed by the same contract: a declared filter knob
-# the config bridge did not carry is exit 2, never an empty filter silently widening the demand
-# back to the whole root. Driven by invoking the arm with that one knob withheld. The member is
-# one whose filter knob is still bridged: a static knob resolves in process and cannot be withheld.
+# the gate cannot resolve is exit 2, never an empty filter silently widening the demand back to
+# the whole root. Driven by a knob file that refuses the filter knob: the filter knob is static, so
+# it resolves in process and the unresolvable state is a malformed line rather than a withheld one.
 cases=$((cases + 1))
 BIN="${GATE_SDK_NATIVE_BIN:-}"
 make_case withheld check-evidence-baseline.gate "$MANIFEST_NARROW"
 if [[ -x "$BIN" ]]; then
     env_args=()
     while IFS= read -r kv; do
-        [[ -n "$kv" ]] || continue
-        [[ "$kv" == GATE_SDK_KNOB_EVIDENCE_KIT_SCENARIO_GLOBS=* ]] && continue
-        env_args+=("$kv")
+        [[ -n "$kv" ]] && env_args+=("$kv")
     done < <( cd "$tmp/withheld" && source "$DIR/lib/gate.sh" && gate_knob_env check-reads-couples )
-    out="$( cd "$tmp/withheld" && env "${env_args[@]}" "$BIN" check-reads-couples check-evidence-baseline.gate 2>&1 )"
+    printf 'EVIDENCE_KIT_SCENARIO_GLOBS = not-a-pair\n' >"$tmp/withheld.knobs"
+    out="$( cd "$tmp/withheld" && env "${env_args[@]}" EVIDENCE_KIT_KNOB_FILE="$tmp/withheld.knobs" "$BIN" check-reads-couples check-evidence-baseline.gate 2>&1 )"
     rc=$?
     if [[ "$rc" -ne 2 ]]; then
         echo "  FAIL [filter-unresolvable]: want exit 2, got $rc -- $out"; fails=$((fails + 1))

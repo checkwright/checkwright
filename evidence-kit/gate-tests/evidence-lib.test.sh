@@ -2,10 +2,8 @@
 # Behavioral test of the library's per-suite parser dispatch and its absent-from-baseline triple,
 # neither of which any gate fixture pair can hold: both are adapters, not gates.
 #
-# spec: evidence-kit/SPEC.md §lib/evidence.sh — the adapters are the COMPILED twins since the
-# 2026-09-04 diff cut retired their shell forms, so this suite drives them through the front end's
-# `--diff-baseline` arm rather than by sourcing the library. What it asserts is unchanged: the
-# subject moved substrate, and the assertions moved to the surviving implementation.
+# spec: evidence-kit/SPEC.md §The evidence adapters — the adapters are compiled, so this suite drives
+# them through the front end's `--diff-baseline` arm.
 #
 # Every scenario is read out of `--diff-baseline`'s FINDINGS rather than out of the parsed lines,
 # which is what a caller can observe: a baseline row is the probe, and a scenario the parser failed
@@ -27,7 +25,7 @@ mkdir -p "$tmp/empty" "$tmp/scratch"
 # The hermetic preamble pins every kit's config at an empty file; the empty gates dir keeps a
 # consumer config off the lookup path too, and every knob below is the fixture's own.
 _diff() {   # $1 = baseline file, $2.. = argv groups; extra knobs come from the caller's env
-    env -u EVIDENCE_KIT_CONFIG_FILE \
+    env -u EVIDENCE_KIT_KNOB_FILE \
         GATE_SDK_GATES_DIR="$tmp/empty" \
         EVIDENCE_KIT_BASELINE_FILE="$1" \
         EVIDENCE_KIT_SKIP_FILE="$tmp/no-skips.txt" \

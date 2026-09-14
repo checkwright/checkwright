@@ -1,14 +1,12 @@
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — the binary side of evidence-kit's own library:
-// the readers its gates share, kept here rather than reached for in `crate::stages` so the
-// compiled form inherits the shell library's deliberate independence from lifecycle-kit
+// spec: evidence-kit/SPEC.md §The evidence adapters — evidence-kit's adapters and the readers its
+// gates share, kept here rather than reached for in `crate::stages` so the kit stays independent of
+// lifecycle-kit
 
-// spec: evidence-kit/SPEC.md §Evidence manifest — the versioned wire format the header
-// declares. The spec owns the value; the shell library and this const are its two
-// implementations, and the unit test below is what holds them equal.
+// spec: evidence-kit/SPEC.md §Evidence manifest — the versioned wire format the header declares
 pub const MANIFEST_CONTRACT: &str = "evidence-manifest v1";
 
-// spec: evidence-kit/SPEC.md §check-evidence-manifest — `ek_data_lines`: everything but a
-// comment line and a blank one. Distinct from `crate::stages::data_lines` — same name,
+// spec: evidence-kit/SPEC.md §check-evidence-manifest — everything but a comment line and a blank
+// one. Distinct from `crate::stages::data_lines` — same name,
 // different primitive, and that section owns why binding to the other one is silent.
 pub fn data_lines(text: &str) -> Vec<&str> {
     text.lines()
@@ -19,9 +17,9 @@ pub fn data_lines(text: &str) -> Vec<&str> {
         .collect()
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — `ek_queue_iteration`: the first `## Iteration:`
-// line with its lead and any residual `[stage:` field stripped. `None` is the helper's non-zero
-// return — an absent file or no header at all — where an empty string is a header with no name.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the first `## Iteration:` line with its lead
+// and any residual `[stage:` field stripped. `None` is no header at all, where an empty string is a
+// header with no name.
 pub fn queue_iteration(text: &str) -> Option<String> {
     let hdr = text.lines().find(|l| l.starts_with("## Iteration:"))?;
     let mut s = hdr.strip_prefix("## Iteration:").unwrap_or(hdr);
@@ -32,7 +30,7 @@ pub fn queue_iteration(text: &str) -> Option<String> {
     })
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — `ek_state_stage`'s corpus: every non-blank line
+// spec: evidence-kit/SPEC.md §The evidence adapters — the cursor reader's corpus: every non-blank line
 // below the `---` separator, which is also the set assertion C's validate-stamp scan reads
 pub fn state_lines(text: &str) -> Vec<&str> {
     let mut out = Vec::new();
@@ -51,21 +49,21 @@ pub fn state_lines(text: &str) -> Vec<&str> {
     out
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — `ek_state_stage`: the last data line's second
+// spec: evidence-kit/SPEC.md §The evidence adapters — the cursor: the last data line's second
 // field. `None` on all three non-zero shapes — absent file, no data line, no second field.
 pub fn state_stage(text: &str) -> Option<String> {
     let last = state_lines(text).last().copied()?;
     last.split_whitespace().nth(1).map(String::from)
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — the never-named iteration the queue header carries
-// before a run is named; `ek_run_key` reads it as *no key* rather than as one, so the placeholder
-// never reaches a manifest line.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the never-named iteration the queue header
+// carries before a run is named; the run key reads it as *no key* rather than as one, so the
+// placeholder never reaches a manifest line.
 const UNNAMED: &str = "—";
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — `ek_run_key`: the queue header's iteration where it
-// names one, else the configured run id. `None` is the helper's non-zero return, which the spine
-// turns into the guards' exit 2 — never into a verdict.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the run key: the queue header's iteration where
+// it names one, else the configured run id. `None` is what the spine turns into the guards' exit 2 —
+// never into a verdict.
 pub fn run_key(queue_text: Option<&str>, run_id: &str) -> Option<String> {
     if let Some(iter) = queue_text.and_then(queue_iteration) {
         if !iter.is_empty() && iter != UNNAMED {
@@ -78,16 +76,15 @@ pub fn run_key(queue_text: Option<&str>, run_id: &str) -> Option<String> {
     Some(run_id.to_string())
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — `ek_suite_cmd`: the suite's configured run command,
-// resolved out of the `EVIDENCE_KIT_RUN_*` family rather than by composing the variable name, so a
-// suite the family does not carry answers empty and the caller's own guard reports it.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the suite's configured run command, looked up
+// in the `EVIDENCE_KIT_RUN_` family by suite, so a suite the family does not carry answers empty and
+// the caller's own guard reports it.
 pub fn suite_cmd(run_family: &[(String, String)], suite: &str) -> String {
     crate::walk::knob_in_family(run_family, suite).unwrap_or_default()
 }
 
-// spec: evidence-kit/SPEC.md §Layout and configuration — `ek_parser_for`: the per-suite override
-// ahead of the global knob, `${!var:-$EVIDENCE_KIT_PARSER}` — the `:-` form, so an override
-// resolving *empty* falls through to the global exactly as an unset one does.
+// spec: evidence-kit/SPEC.md §Layout and configuration — the per-suite override ahead of the global
+// knob, and an override resolving *empty* falls through to the global exactly as an unset one does.
 pub fn parser_for(parser_family: &[(String, String)], suite: &str, global: &str) -> String {
     match crate::walk::knob_in_family(parser_family, suite) {
         Some(v) if !v.is_empty() => v,
@@ -95,9 +92,9 @@ pub fn parser_for(parser_family: &[(String, String)], suite: &str, global: &str)
     }
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — `ek_parse`'s three arms: the two bundled adapters
-// and, for any other value, the consumer command word-split and spawned with the log appended last.
-// The consumer arm keeps the child's stdout whatever its status, the shell capture's own rule.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the parser's three arms: the two bundled
+// adapters and, for any other value, the consumer command word-split and spawned with the log
+// appended last. The consumer arm keeps the child's stdout whatever its status.
 pub fn parse(
     suite: &str,
     log: &std::path::Path,
@@ -133,7 +130,7 @@ pub fn parse(
     }
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — the `libtest` adapter's awk program: a line whose
+// spec: evidence-kit/SPEC.md §The evidence adapters — the `libtest` adapter's awk program: a line whose
 // first field is `test` and which carries a ` ... ` run of the result separator, keyed on the
 // second field and graded by the last. A token that is none of the three ranks is no scenario.
 fn libtest_lines(text: &str) -> Vec<String> {
@@ -237,7 +234,7 @@ pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &s
     out
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — what bash's `while read` over a redirected file
+// spec: evidence-kit/SPEC.md §The evidence adapters — what bash's `while read` over a redirected file
 // yields: a final line with no terminating newline is read into the variables but the loop body
 // never runs on it, so the adapters see complete lines only and the compiled twin must too.
 fn bash_lines(text: &str) -> Vec<&str> {
@@ -340,35 +337,12 @@ pub fn pid_alive(pid: &str) -> Result<bool, PidProbe> {
 mod tests {
     use super::*;
 
-    // spec: evidence-kit/SPEC.md §Evidence manifest — the wire-format version has two
-    // implementations, so the crate's copy is held to the shell library's by executing it.
-    // A static roster would be a third holder of the same value.
-    #[test]
-    fn the_wire_contract_matches_the_shell_library() {
-        let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
-        let completed = crate::proc::run(
-            "bash",
-            &[
-                "-c",
-                "cd \"$1\" || exit 2; . evidence-kit/lib/evidence.sh; \
-                 printf '%s' \"$EVIDENCE_MANIFEST_CONTRACT\"",
-                "bash",
-                &repo.display().to_string(),
-            ],
-        )
-        .expect("cannot run the shell library");
-        let out = completed
-            .stdout()
-            .expect("evidence-kit/lib/evidence.sh could not report the wire contract");
-        assert_eq!(String::from_utf8_lossy(out), MANIFEST_CONTRACT);
-    }
-
     #[test]
     fn comments_and_blanks_are_not_data_lines() {
         assert_eq!(data_lines("# h\n\n  \nu a pass\n  # c\n"), vec!["u a pass"]);
     }
 
-    // spec: evidence-kit/SPEC.md §lib/evidence.sh — the two readers part company on shape:
+    // spec: evidence-kit/SPEC.md §The evidence adapters — the two readers part company on shape:
     // the iteration is a header field, the stage a positional on the last data line
     #[test]
     fn the_iteration_and_the_cursor_are_read_from_their_own_shapes() {

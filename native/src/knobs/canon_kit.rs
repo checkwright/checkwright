@@ -112,6 +112,7 @@ pub const KIT: Kit = Kit {
     ],
     validate: Some(("spec config", validate)),
     open_family: false,
+    families: &[],
     retired: &[],
 };
 

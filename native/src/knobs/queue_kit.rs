@@ -42,6 +42,7 @@ pub const KIT: Kit = Kit {
     ],
     validate: Some(("queue config", validate)),
     open_family: false,
+    families: &[],
     retired: &[],
 };
 

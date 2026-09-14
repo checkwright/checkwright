@@ -14,7 +14,7 @@ rides in argument position, so neither `cp` operand is an invocation to resolve:
 cp gate-sdk/templates/example-config.sh scripts/example-config.sh   # optional
 ```
 
-Config knobs `GATE_SDK_GATES_DIR` and the cross-kit-read `GATE_SDK_LIB` resolve
+Config knobs `GATE_SDK_GATES_DIR` and the cross-kit-read `GATE_SDK_NATIVE_BIN` resolve
 against the kits' code, and the `CANON_KIT_COMMENT_*` family stem resolves too.
 
 A never-tracked hypothetical `bin/never-tracked.sh` is no stale identifier, and the

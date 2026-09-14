@@ -16,7 +16,7 @@
 # (guard tests, a language test suite) after the derived fixture step, and
 # require this workflow's status check before merge (branch-protection recipe:
 # the install-page docs). The fixture suites need no hand-list — they derive
-# from your gate-tests dirs (gate_fixture_suites). A filled example is this
+# from your gate-tests dirs (run-gates.sh --emit fixture-suites). A filled example is this
 # repo's own .github/workflows/gates.yml.
 name: gates
 
@@ -46,13 +46,13 @@ jobs:
       # hand-list to drift as kits are added or renamed.
       - name: fixture suites (derived from */gate-tests)
         run: |
-          source gate-sdk/lib/gate.sh
+          suites="$(bash gate-sdk/bin/run-gates.sh --emit fixture-suites)" || exit 2
           rc=0
           while IFS=$'\t' read -r suite tests checks; do
             echo "== $suite =="
             # shellcheck disable=SC2086  # empty checks expands to no arg by design
             bash gate-sdk/bin/run-gates.sh --run-gate-tests "$tests" $checks || rc=1
-          done < <(gate_fixture_suites)
+          done <<<"$suites"
           exit $rc
       # PLACEHOLDER — add one step per non-gate-tests runner your CLAUDE.md
       # names (a guard-test runner, a language test suite), e.g.

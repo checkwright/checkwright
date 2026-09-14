@@ -90,6 +90,7 @@ pub const KIT: Kit = Kit {
     ],
     validate: Some(("context config", validate)),
     open_family: false,
+    families: &[],
     retired: &[("CONTEXT_KIT_BREVITY_SECTION", "CONTEXT_KIT_BREVITY_SECTIONS")],
 };
 

@@ -2520,8 +2520,8 @@ broken link would be caught. Three assertions:
   the kits' tracked *code* — their shell sources and config templates, never
   their own prose, so a knob name-dropped only in markdown cannot self-satisfy.
   The corpus is the union across all kits, not the prefix owner alone: a
-  namespaced knob may be read by a dependent kit (`GATE_SDK_LIB` is gate-sdk's,
-  resolved in delegation-kit and evidence-kit), and the prefix marks scope, not
+  namespaced knob may be read by a dependent kit (`GATE_SDK_NATIVE_BIN` is
+  gate-sdk's, read by other kits' smokes), and the prefix marks scope, not
   location. A family stem — a caps run ending `_` because a placeholder or glob
   follows it (`EVIDENCE_KIT_RUN_<suite>`, `CANON_KIT_COMMENT_*`) — resolves when
   any code name extends it. Names with no kit prefix are out of scope, so

@@ -77,7 +77,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
 
-    // spec: evidence-kit/SPEC.md §lib/evidence.sh — both readers swallow their own failure at
+    // spec: evidence-kit/SPEC.md §The evidence adapters — both readers swallow their own failure at
     // the call site (`|| true`), so an absent or headerless file is an empty cursor here
     let iter = evidence::queue_iteration(&read_or_empty(&queue)).unwrap_or_default();
     let stext = read_or_empty(&state);

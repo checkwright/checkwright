@@ -17,38 +17,58 @@ its side of the seam (§lifecycle-kit integration).
 
 The kit is vendored beside [gate-sdk](../gate-sdk/) (required); its gates
 register in the consumer's `gates.list` by name and resolve through gate-sdk's
-multi-kit path. Config follows the established kit pattern: copy
-`templates/evidence-config.sh` into the gates dir as `evidence-config.sh` (or
-point `EVIDENCE_KIT_CONFIG_FILE` elsewhere) and override any knob; the loader
-fills every unset knob with a default, then validates and exits 2 on a malformed
-machine (a suite name that is not a valid variable suffix) — a broken config
-gates nothing. Both sides of that seam — this template and the
-`evidence-config.sh` it becomes — are **permanently shell**, each carrying the
-`# no-port:` cause of the class ruling at gate-sdk/SPEC.md §The config-seam port
-disposition.
+multi-kit path.
+
+Config is a **knob file**: copy `templates/evidence-config.knobs` into the gates
+dir as `evidence-config.knobs` (or point `EVIDENCE_KIT_KNOB_FILE` elsewhere) and
+set any knob below; defaults fill what the file leaves unset. evidence-kit's knobs
+are **static**: the binary resolves them in process from its own defaults table
+and the consumer's knob file, and the config bridge never carries them
+(gate-sdk/SPEC.md §lib/gate.sh); `bash gate-sdk/bin/run-gates.sh --emit
+knob-roster` prints each one with its shape and rendered default. A gitignored
+`evidence-config.local.knobs` in the gates dir is the home for a private value a
+tracked file cannot carry. The grammar, that `.local` overlay, the
+environment-over-file precedence for a scalar, the knob reference, the declared
+family, and the refusals — a set `EVIDENCE_KIT_KNOB_FILE` that does not exist, a
+left-behind `evidence-config.sh` or `evidence-config.local.sh`, a non-empty file
+named by the retired `EVIDENCE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob
+file's. The kit's table validator refuses at exit 2 when `EVIDENCE_KIT_PARSER`,
+`EVIDENCE_KIT_BASELINE_FILE`, `EVIDENCE_KIT_MANIFEST_FILE` or
+`EVIDENCE_KIT_QUEUE_FILE` is empty, or when a suite name is not a valid
+`EVIDENCE_KIT_RUN_<suite>` suffix, so a broken config gates nothing. A derived
+default below is written in the roster's `${NAME}` spelling for the knob it reads.
 
 Knobs, this repo's surface names as defaults:
 
-- `EVIDENCE_KIT_SUITES` — the ordered suite names.
+- `EVIDENCE_KIT_SUITES` — the ordered suite names; default empty. It declares
+  `EVIDENCE_KIT_FIXTURE_SUITES` a referent, so a file may splice the derived
+  suites in with `EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES` at the
+  position the order wants them.
+- `EVIDENCE_KIT_FIXTURE_SUITES` — the fixture suites, derived: one suite per
+  directory carrying a `gate-tests/` tree, the kit roots in order then the gates
+  directory, named by the directory's basename with `-` turned to `_`
+  (gate-sdk/SPEC.md §lib/gate.sh). No reader reads it directly; it exists to be
+  referenced into the roster, and a consumer who does not want the derived suites
+  leaves the reference out.
 - `EVIDENCE_KIT_RUN_<suite>` — the command that runs a suite (captured to a log
-  under `EVIDENCE_KIT_TMP_DIR`, default gate-sdk's `.tmp`).
+  under `EVIDENCE_KIT_TMP_DIR`). A **declared family**: each fixture suite has a
+  derived member, the fixture runner over the suite's tests directory and, when
+  one exists, its checks directory:
+  `bash ${GATE_SDK_ROOT_HERE}/bin/run-gates.sh --run-gate-tests <tests-dir> <checks-dir>`.
+  A file or exported member of the same name replaces it. Every other suite's member is the
+  consumer's to set.
 - `EVIDENCE_KIT_PARSER` — a parser adapter name or a consumer command mapping a
   captured log to `<scenario> <pass|fail|ignore>` lines; default `exit-code`.
 - `EVIDENCE_KIT_PARSER_<suite>` — a per-suite parser override with the same
-  value grammar; default unset, an unset suite falling through to the global
-  knob — and an override resolving *empty* falls through too, which is the
-  library's `:-` form rather than an accident of it. The name mirrors the
-  `EVIDENCE_KIT_RUN_<suite>` convention, and the two are the kit's **two prefix
-  families**: both cross the config bridge as declared families rather than as
-  enumerated names, resolved inside this kit's already-sourced subshell so a
-  consumer config's loop-declared variables are in scope. A family is a
-  *resolution set, never a roster* — the suite roster is `EVIDENCE_KIT_SUITES`
-  and the family answers *what is this suite's value* — because a reader
-  enumerating the run family instead would publish `EVIDENCE_KIT_RUN_ID` as a
-  suite. That overlap is pre-existing rather than port-introduced: a suite
-  literally named `ID` collides with the run-id knob in either substrate, and the
-  port preserves the collision rather than resolving it, resolving it being a
-  behaviour widening a faithful port may not take on its own authority.
+  value grammar; a declared family with no derived member, an unset suite falling
+  through to the global knob — and an override resolving *empty* falls through
+  too. The name mirrors the `EVIDENCE_KIT_RUN_<suite>` convention, and the two
+  are the kit's **two declared families** (gate-sdk/SPEC.md §The knob file). A
+  family is a *resolution set, never a roster* — the suite roster is `EVIDENCE_KIT_SUITES`
+  and the family answers *what is this suite's value*. `EVIDENCE_KIT_RUN_ID` is
+  the run-id row and never a member, since a declared row the prefix spells is
+  excluded from its family, so a suite literally named `ID` has no run member and
+  `--run-validate` refuses it.
   **A value naming neither bundled adapter stays a consumer command the tools
   word-split and spawn**, in the compiled substrate exactly as in the shell one:
   compiling the two shipped adapters in would privilege them over a consumer's
@@ -98,7 +118,7 @@ Knobs, this repo's surface names as defaults:
   leading positional, the arm holds no default for it, and an invocation missing it
   or naming a driver that does not resolve is exit 2 before any line of the log is
   judged. The log arrives **last**, after everything the knob value spells, which
-  §lib/evidence.sh's appended-log rule is what fixes.
+  §The evidence adapters' appended-log rule is what fixes.
   **The completion marker is derived from the same headers, positionally: a
   driver's *last* top-level header is its completion announcement and the ones
   before it are its arms.** That replaces what was a literal in the consumer's
@@ -126,87 +146,47 @@ Knobs, this repo's surface names as defaults:
   is the blame.
 - `EVIDENCE_KIT_SCENARIO_GLOBS` — optional per-suite globs; configuring one
   arms the manifest↔disk set-equality assertion for that suite.
-- `EVIDENCE_KIT_BASELINE_FILE` (default `.workflow/validate-baseline.txt`),
-  `EVIDENCE_KIT_MANIFEST_FILE` (default `.workflow/validate-evidence.txt`),
-  `EVIDENCE_KIT_SKIP_FILE` (default `.workflow/validate-skips.txt`).
+- `EVIDENCE_KIT_BASELINE_FILE` (default `${GATE_SDK_WORKFLOW_DIR}/validate-baseline.txt`),
+  `EVIDENCE_KIT_MANIFEST_FILE` (default `${GATE_SDK_WORKFLOW_DIR}/validate-evidence.txt`),
+  `EVIDENCE_KIT_SKIP_FILE` (default `${GATE_SDK_WORKFLOW_DIR}/validate-skips.txt`).
+- `EVIDENCE_KIT_TMP_DIR` — the scratch dir run logs land in; default
+  `${GATE_SDK_TMP_DIR}`.
 - `EVIDENCE_KIT_LOCK_FILE` — the producer-liveness lock (§The producer-liveness
-  lock), default `run-validate.lock` under `EVIDENCE_KIT_TMP_DIR`. It resolves
+  lock), default `${EVIDENCE_KIT_TMP_DIR}/run-validate.lock`. It resolves
   *through* the scratch knob rather than beside it, so a consumer that moves the
   scratch dir moves the lock with it and never has to keep two paths in step.
 - `EVIDENCE_KIT_QUEUE_FILE` / `EVIDENCE_KIT_STATE_FILE` — the lifecycle surfaces
   read for the manifest's optional close-entry and stamp-coupling assertions;
-  they default through gate-sdk's `GATE_SDK_QUEUE_FILE` / `GATE_SDK_WORKFLOW_DIR`.
+  defaults `${GATE_SDK_QUEUE_FILE}` and `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt`.
 - `EVIDENCE_KIT_RUN_ID` — the evidence-line key when no lifecycle queue header
-  names the iteration.
+  names the iteration; default empty.
 - `EVIDENCE_KIT_PRE_HOOK` — an optional per-suite pre-run command (projection
-  regen, container teardown) kept on the consumer side of the spine.
+  regen, container teardown) kept on the consumer side of the spine; default empty.
 - `EVIDENCE_KIT_PERMANENT_SLUGS` — blocking slugs that satisfy baseline liveness
-  without a live queue task.
+  without a live queue task; default empty.
 - `EVIDENCE_KIT_RUNNER_DOC` (default `README.md`, resolved against the git
   toplevel) — the doc whose battery-roster block `check-battery-roster` holds
   against the suite roster. It is gate-local: nothing in the validate run path
-  reads it, so the loader fills no default for it and the gate carries its own.
-  The name mirrors gate-sdk's `GATE_SDK_RUNNER_DOC` deliberately — in a tree
+  reads it. The name mirrors gate-sdk's `GATE_SDK_RUNNER_DOC` deliberately — in a tree
   vendoring both kits the two name the same physical doc for two different
   assertions, and a reader who has met one should not have to learn a second
   vocabulary for the other.
 
 ## Per-component contracts
 
-### lib/evidence.sh
+### The evidence adapters
 
-The sourced config loader: consumer config first, kit defaults fill what it
-left unset, then validation. Its remaining adapters are `ek_suite_cmd`
-(a suite's configured run command, `EVIDENCE_KIT_RUN_<suite>`), `ek_data_lines`,
-and the self-contained `ek_queue_iteration` / `ek_run_key`
-header readers plus the `ek_state_stage` cursor reader that let the kit read
+`native/src/evidence.rs` is the kit's sole holder of its adapters and of the
+readers its gates share: the suite's configured run command, looked up in the
+`EVIDENCE_KIT_RUN_` family by suite; the data-line filter; and the
+self-contained queue-iteration, run-key and cursor readers that let the kit read
 lifecycle state without a lifecycle-kit dependency. The two axes come from two
 surfaces: the queue header names the iteration, the state file's **last data
-line** is the stage cursor. `ek_state_stage` returns non-zero on both no-cursor
+line** is the stage cursor. The cursor reader answers no stage on both no-cursor
 shapes — an absent state file, and a file truncated to its preamble with no data
-line yet — so a caller's `|| true` yields an empty stage for either. Values and adapters only, never tool structure. It
-sources gate-sdk's `lib/gate.sh` for `fail_closed`, so evidence-kit requires
-gate-sdk vendored beside it.
-
-**It is permanently shell and declares so in its own header**, as the config
-bridge's sole resolver for the `EVIDENCE_KIT_*` knobs — gate-sdk/SPEC.md §The
-kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
-states the ground. The adapters listed above ride the same file and are not
-themselves the ground; the header says so in as many words, which is the licence
-for the compiled twins below.
-
-**Every adapter this library ever held now has a compiled twin in
-`native/src/evidence.rs`, and three of them live there alone.** `ek_run_key`,
-`ek_suite_cmd`, `ek_parser_for`, `ek_parse` and `ek_diff` were paid there by the
-`--run-validate` port (§bin/run-validate.sh), joining `ek_data_lines`,
-`ek_queue_iteration` and `ek_state_stage`, which the kit's gates already held
-twice. The class ruling does not foreclose this and the *file* is not narrowed by
-it: the ruling names the file as the config bridge's sole resolver and says in
-the same breath that the parser adapters beside those defaults are a separate
-question it does not reach — which is the licence, stated in the library's own
-header, for taking them.
-
-**The parser resolution, the parser dispatch and the per-scenario diff are the
-three that retired, and the sequence is what makes it lawful rather than a
-judgment.** `ek_parser_for`, `ek_parse` and `ek_diff` had exactly two production
-callers, `bin/run-validate.sh` and `bin/diff-baseline.sh`, and no third — probed <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-rather than reasoned. The spine cut ported the first and left the duplication
-live; the diff cut ported the second and the caller set emptied, so the shell
-forms came out in that cut's own commit. That is the whole content of the
-between-cuts economy: the sibling creates a duplication and this cut ends it,
-which is also why the two were not droppable independently.
-
-**Two adapters left this file entirely when their last shell caller did, and the
-disposition is the rule rather than a judgment.** `ek_pid_alive` and
-`ek_lock_read` had compiled twins from the day §check-producer-liveness ported,
-and criterion 6's *unless* clause admitted the duplication only because
-`bin/run-validate.sh` still called both. Porting that script emptied their <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-production caller set, so both shell forms retired with it — and the parity
-harness that had held the two implementations equal retired with them, because a
-comparison with one holder can only skip (gate-sdk/SPEC.md §The non-gate arm:
-*a parity arm's caller is the second holder, so the arm retires with it*). The
-compiled forms are unchanged and remain the readers §The producer-liveness lock
-names.
+line yet — so a caller reads an empty stage for either. Values and adapters only,
+never tool structure. The knobs they read are the kit's table (§Layout and
+configuration).
 
 The parser adapters map a captured log — and, for `exit-code`, the suite's exit
 status — to `<scenario> <pass|fail|ignore>` lines: `libtest` reads per-test
@@ -249,28 +229,24 @@ consumer needing exit-code semantics for a suite simply leaves that suite on the
 global adapter.
 
 **Two properties of that branch bind any value written against it, and neither is
-a preference.** The value word-splits — the dispatch runs `$parser "$log"`
-unquoted, with the SC2086 disable in the library saying so — so **no argument a
-value spells may contain a space**; a value needing to pass one passes a rule that
+a preference.** The value word-splits — the dispatch splits it on whitespace and
+spawns the words with no shell — so **no argument a value spells may contain a
+space**; a value needing to pass one passes a rule that
 derives it instead. And the log path is **appended after everything the value
 spells**, which is what the paragraph above fixes: a value carrying its own
 operands spells them first and the log arrives last.
 
 **A third built-in adapter beside `exit-code` and `libtest` is refused, and the
-refusal is recorded here because this is the file that would grow it.** Making a
-consumer's parser a named convention rather than each consumer's invention is a
-live question, and it is not answered by absorbing a consumer's script into this
-library: this library is permanently shell, so a mechanism moved here is a
-mechanism kept off the compiled substrate while the port's own count reads as
-discharged. Naming the convention is the deliverable of a queued entry and is
-ruled there, not by a port cut passing through.
+refusal is recorded here because this is the section that would grow it.** Making
+a consumer's parser a named convention rather than each consumer's invention is a
+live question, and it is not answered by absorbing a consumer's script into the
+kit's adapters. Naming the convention is the deliverable of a queued entry and is
+ruled there, not by a cut passing through.
 
 Neither adapter is a gate, so their branches are covered by
-`gate-tests/evidence-lib.test.sh` — re-pointed at the compiled twins through the
-front-end rather than deleted when the shell forms went, because what those
-assertions are *about* survived the substrate change and belongs to the surviving
-implementation. This repo's own wiring of the knob has a second suite,
-`scripts/gate-tests/evidence-parser-values.test.sh`, re-pointed the same way: it
+`gate-tests/evidence-lib.test.sh`, driven through the front-end. This repo's own
+wiring of the knob has a second suite,
+`scripts/gate-tests/evidence-parser-values.test.sh`, driven the same way: it
 drives the *configured value* rather than a hardcoded arm, so it is what would
 notice a port that deleted a value's target. Both read the dispatch's answer out
 of `--diff-baseline`'s findings against a fixture baseline, which is what a caller
@@ -320,7 +296,7 @@ an unbaselined one at this layer, so it has to be caught at the argument.
 **A row is a claim about one scenario, and a suite's scenarios come from its
 parser.** What the row asserts is that *that scenario* is held at the recorded
 status; what counts as a scenario is whatever the suite's configured parser emits
-(§lib/evidence.sh). Two consequences follow. A suite carrying a single scenario
+(§The evidence adapters). Two consequences follow. A suite carrying a single scenario
 has a baseline that asserts about the suite as a whole and nothing finer —
 **adequate** where the suite's arms are not independently meaningful, and
 **empty** where they are. And finer coverage is bought by **configuring a
@@ -434,7 +410,7 @@ means a torn read is unreachable. The gap is liveness alone, and the lock is the
 artifact that closes it.
 
 The record is one line, `pid=<n> run=<key>`, where `<key>` is the evidence-line
-key `ek_run_key` yields. Both fields have named readers and nothing else is
+key the run-key reader yields. Both fields have named readers and nothing else is
 carried: a start timestamp was considered and removed, because once the stale
 policy is PID-liveness rather than age it has no reader, and a field with no
 reader is removed rather than kept for plausibility.
@@ -584,22 +560,22 @@ question of whether that contract binds a tool taking **no** positionals is not
 answered here: the port makes the question moot for this one member by moving
 usage to the front-end, and rules nothing about the rest of the corpus.
 
-**The declared knob roster is thirteen names** — `EVIDENCE_KIT_SUITES`,
+**The declared knob roster is twelve names** — `EVIDENCE_KIT_SUITES`,
 `EVIDENCE_KIT_RUN_*`, `EVIDENCE_KIT_PARSER`, `EVIDENCE_KIT_PARSER_*`,
 `EVIDENCE_KIT_BASELINE_FILE`, `EVIDENCE_KIT_MANIFEST_FILE`,
-`EVIDENCE_KIT_SKIP_FILE`, `EVIDENCE_KIT_QUEUE_FILE`, `EVIDENCE_KIT_STATE_FILE`,
-`EVIDENCE_KIT_TMP_DIR`, `EVIDENCE_KIT_LOCK_FILE`, `EVIDENCE_KIT_RUN_ID` and
-`EVIDENCE_KIT_PRE_HOOK` — and it is a **bridged** roster rather than a set of
-hardcoded flags because every one of those values is defined and defaulted in
-§lib/evidence.sh, the config bridge's sole resolver: a hardcoded flag would
-resolve platform defaults and silently ignore every consumer override. Two of the
-names are prefix families, and this member is the crate's first declaration of
-`EVIDENCE_KIT_PARSER_*` (gate-sdk/SPEC.md §The non-gate arm).
+`EVIDENCE_KIT_SKIP_FILE`, `EVIDENCE_KIT_QUEUE_FILE`, `EVIDENCE_KIT_TMP_DIR`,
+`EVIDENCE_KIT_LOCK_FILE`, `EVIDENCE_KIT_RUN_ID` and `EVIDENCE_KIT_PRE_HOOK` — and
+it is a declared roster rather than a set of hardcoded flags because every one of
+those values is the kit table's, resolved against the consumer's knob file: a
+hardcoded flag would resolve platform defaults and silently ignore every consumer
+override. Two of the names are the kit's declared families, and this member is the
+crate's first declaration of `EVIDENCE_KIT_PARSER_*` (gate-sdk/SPEC.md §The
+non-gate arm).
 
 **Two consumer seams survive the port unnarrowed, and neither is an
 implementation detail.** A `EVIDENCE_KIT_PARSER_<suite>` value that names neither
 bundled adapter is a consumer command the arm still word-splits and **spawns**
-against the log, exactly as the shell library does — compiling the two shipped
+against the log — compiling the two shipped
 adapters' behaviour in and short-circuiting the spawn would silently privilege
 them over a consumer's own and make the shipped `--emit-parse-*` arms unreachable
 through the path their own section documents. `EVIDENCE_KIT_PRE_HOOK` is
@@ -724,7 +700,7 @@ functional caller is a CI leg that reads nothing but the status.
 
 **The declared knob roster is five names** — `EVIDENCE_KIT_BASELINE_FILE`,
 `EVIDENCE_KIT_SKIP_FILE`, `EVIDENCE_KIT_TMP_DIR`, `EVIDENCE_KIT_PARSER` and the
-`EVIDENCE_KIT_PARSER_*` family — all bridged, on the same forced-family test its
+`EVIDENCE_KIT_PARSER_*` family — all declared, on the same forced-family test its
 sibling states. **It declares no suite roster and needs none**: this tool's
 suites arrive on argv, one group at a time, which is exactly what distinguishes
 it from the spine.
@@ -821,7 +797,7 @@ gate has nothing to say, which is the failure mode the cursor migration was
 ordered to avoid.
 `checks/check-evidence-manifest.gate` (`precommit`, binary-dispatched).
 Argument mode `$1 $2 $3` (manifest, queue, state) survives the port — each
-positional reaches the subcommand as argv and overrides the bridged knob there,
+positional reaches the subcommand as argv and overrides the knob there,
 so none of the three is the arrives-too-late shape gate-sdk/SPEC.md §The
 non-gate arm deletes. The good/bad pair drops its `args` and reaches the rule
 through the three path knobs instead, which is the branch the production battery
@@ -902,14 +878,14 @@ resolution failure, where the `--only` run exits with the aggregate's non-zero
 status. The pre-flight caller reads zero versus non-zero and nothing else, so both
 refuse the entry identically.
 
-**The data-line helper is `ek_data_lines`' own primitive, and the crate carries
-a same-named one that is a different rule.** `ek_data_lines` filters comment and
-blank lines and nothing else. The crate's `stages::data_lines` — the lifecycle
+**The data-line helper is evidence-kit's own primitive, and the crate carries
+a same-named one that is a different rule.** `evidence::data_lines` filters comment
+and blank lines and nothing else. The crate's `stages::data_lines` — the lifecycle
 state file's reader — takes only the lines *below a `---` separator*, so binding
 to it here compiles, passes a thin fixture, and silently drops every manifest
 line in a file with no separator. The compiled form therefore keeps
 evidence-kit's own reader (`native/src/evidence.rs`), which is the same
-independence from lifecycle-kit the shell library states at §lib/evidence.sh.
+independence from lifecycle-kit §The evidence adapters states.
 
 ### check-battery-roster
 
@@ -964,7 +940,7 @@ The overlap with `check-kit-registration` assertion B (gate-sdk/SPEC.md
 §check-kit-registration) is deliberate. That assertion requires every kit root
 with tracked `gate-tests/` files to have a runner-doc line naming
 `<kit>/gate-tests`; because this repo's config derives exactly those roots into
-`EVIDENCE_KIT_SUITES` through `gate_fixture_suites`, assertion (A) here is a
+`EVIDENCE_KIT_SUITES` through `EVIDENCE_KIT_FIXTURE_SUITES`, assertion (A) here is a
 superset of that arm for a consumer running both kits. It is kept rather than
 retired on a dependency direction: a gate-sdk gate may not require this kit's
 config — gate-sdk's enforcement-map emitter reads the suite roster where a
@@ -988,16 +964,13 @@ covered by `gate-tests/check-battery-roster.test.sh`, which dispatches through
 `gate_run` rather than by script path — the invocation shape that survives a
 substrate move (gate-sdk/SPEC.md §lib/test-hermetic.sh).
 
-**The suite roster and the run family cross the bridge as two knobs of different
-kinds, and the asymmetry is the contract rather than an accident.**
+**The suite roster and the run family are two knobs of different kinds, and the
+asymmetry is the contract rather than an accident.**
 `EVIDENCE_KIT_SUITES` is the roster; `EVIDENCE_KIT_RUN_*` is a **prefix family**,
 a resolution set the gate looks names up in and never enumerates. Enumerating it
 would publish `EVIDENCE_KIT_RUN_ID` as a suite — the reason gate-sdk/SPEC.md
 §lib/gate.sh states that a prefix is a resolution set and never a roster, stated
 again here because this gate is the one that would break.
-`EVIDENCE_KIT_RUNNER_DOC` is resolved onto its own name in `lib/evidence.sh` for
-the same reason the loader's other defaults are: a default the bridge's
-`declare -p` cannot find is its undeclared-knob refusal.
 
 ### check-producer-liveness
 
@@ -1289,20 +1262,16 @@ evidence line proves the green result once the suites have run.
   iteration (A/C scoping), suite + verdict + counts (A's green-block test),
   sha256 (audit pinning of the producing log), date (A's stamp-ordering floor).
 - **Suite roster** (`EVIDENCE_KIT_SUITES` + `EVIDENCE_KIT_RUN_<suite>`) —
-  produced by consumer config, wholly or in part derived there; consumed by
+  produced by consumer config, with the fixture suites and their run members
+  derived by the kit's table; consumed by
   `--run-validate` (what to run), by `check-evidence-manifest` (A's green
-  block), by `check-battery-roster` (the doc-parity compare), and — behind a
-  `declare -p` probe, so evidence-kit stays optional — by gate-sdk's
-  enforcement-map emitter. Every one of them reads it by sourcing the config
-  through the loader rather than parsing the file, so a suite a derivation loop
-  adds is visible to all of them with no second parse to keep in step. The
-  compiled emitter reads it through that same loader at one remove: gate-sdk's
-  config bridge sources this kit's library to resolve `EVIDENCE_KIT_SUITES` and
-  the `EVIDENCE_KIT_RUN_` family, so the derivation loop still runs in bash and
-  nothing re-parses the file (gate-sdk/SPEC.md §lib/gate.sh).
+  block), by `check-battery-roster` (the doc-parity compare), and — dropping its section on an empty roster, so evidence-kit stays optional —
+  by gate-sdk's enforcement-map emitter. Every one of them resolves it through the crate's knob
+  table rather than parsing the file, so a derived suite is visible to all of them
+  with no second parse to keep in step (gate-sdk/SPEC.md §The knob file).
 - **Producer-liveness lock** — produced by `--run-validate` at the claim point,
   which sits on the ordinary path (the validate stage runs it, and it is the only
-  writer of the manifest); its enabling config carries a default in the loader, so
+  writer of the manifest); its enabling config carries a default in the kit's table, so
   it resolves in every deployed configuration rather than only under a test
   harness. Consumed by `check-producer-liveness` through the entry-preflight hook
   and, inheriting it with no extra wiring, by that hook's read-only simulate mode.

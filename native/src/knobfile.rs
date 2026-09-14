@@ -23,10 +23,12 @@ fn blank(c: char) -> bool {
     c == ' ' || c == '\t'
 }
 
+// spec: gate-sdk/SPEC.md §The knob file — uppercase-led, so a family member's lowercase suffix parses;
+// the owning kit refuses a name it neither declares nor admits
 fn is_name(s: &str) -> bool {
     let mut chars = s.chars();
     matches!(chars.next(), Some(c) if c.is_ascii_uppercase())
-        && chars.all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_')
+        && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
 }
 
 fn refuse(file: &str, lno: usize, what: &str) -> String {
