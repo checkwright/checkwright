@@ -35,10 +35,11 @@
   absent `config_seam_plan` destination; the placement seam init writes beside an artifact stays the
   suite's stated limit (the amendment's delta 1).
 
-- **config-seam-static-format** [spec: SPEC-knob-files-cut-4.md] — the knob seam is still
-  executable bash for every bridged kit: a knob's value is computed by sourcing the owning kit's
-  `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh), so
-  the battery, hook generation and every harness hook enter through bash before the binary runs.
+- **config-seam-static-format** [spec: SPEC-knob-files-cut-4.md] [spec: SPEC-bridge-retirement.md]
+  — the knob seam is still executable bash for every bridged kit: a knob's value is computed by
+  sourcing the owning kit's `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh`
+  (gate-sdk/SPEC.md §lib/gate.sh), so the battery, hook generation and every harness hook enter
+  through bash before the binary runs.
   **Cuts 1 to 3 landed:** site-kit and doctrine-kit at `static-config-seam`, queue-kit and
   lifecycle-kit at `config-seam-second-cut`, canon-kit, context-kit, delegation-kit and drift-kit at
   `config-seam-third-cut`; all eight read knob files in the line grammar with their defaults
@@ -62,9 +63,10 @@
   knob files, then gate-sdk last, retiring the bridge** — operator direction, 2026-09-14,
   lead-relayed, taken with a partial landing named as a real risk. Spec ruled the generated family
   (declared scalar families over a crate fixture-suite derivation) and guard-kit's rule content (the
-  guard stays the one shell hook) in this amendment; gate-sdk's cut takes a second one, paired
-  here when it lands on disk. The entry demotes if that cut does not land, and moves to Done when
-  it does.
+  guard stays the one shell hook) in the first amendment, and gate-sdk's cut in the second, which
+  lands after it. The entry demotes if that cut does not land, and moves to Done when it does. **The
+  native-Windows floor is not this entry's** — operator direction, 2026-09-14, lead-relayed: the cut
+  states the surviving bash surfaces, and `native-windows-bash-floor` owns the rest.
 
 - **append-and-wrapper-shapes-unsteered** [spec: SPEC-knob-files-cut-4.md]
   — two prompt-friction shapes rank at the top with no guard steering and no allowlist entry that
@@ -115,9 +117,134 @@
   harness cannot grant, compounded or to a target git does not ignore, and rule 26 a `bash -c`
   wrapper, both on rule 17's own tests with no destination roster (the amendment's delta 9).
 
+- **config-bridge-resolution-cost** [spec: SPEC-bridge-retirement.md] — the array-knob config
+  bridge still costs about 640 ms on every invocation that resolves it, and no entry owns the
+  residue.
+  **RE-SCOPED 2026-08-23 at `battery-runner-port`'s close, on a lead ruling: correcting a false
+  claim in an entry is not a descope.** Three of this entry's four load-bearing statements moved
+  under `6d813968`, and the retired ones are deleted rather than annotated.
+  **Its blocking design question is ANSWERED, by an executed fact rather than a preference.** It
+  asked whether one knob's resolved value may legitimately differ between two members in the same
+  run. It may not: resolution is **member-independent**, verified by reading the resolver rather
+  than the SPEC — `gate-sdk/lib/gate.sh`'s `_gate_knob_emit` takes the gate name as a parameter and
+  uses it at exactly one site, a refusal message, so no resolver reads the requesting member.
+  Batch 1 built on that property. The design-pending tag stayed until promotion, because
+  canon-kit/SPEC.md §The amendment lifecycle makes it a section-membership invariant.
+  **Its third candidate shape is BUILT** — "resolve each kit's declared-knob set once per run
+  rather than once per knob" is what `gate_knob_env_set` and `_gate_knob_kit_emit` now do, one
+  subshell per owning kit. The other two shapes are untaken and stay open.
+  **What remains after `config-bridge-floor`, whose two cuts landed.** Cut 1a (`9412923d`) took
+  the per-name owning-kit fork out of `gate_knob_env_set`; cut 1b (`31c1a773`) narrowed a `--only`
+  run's knob union to the selected members. Re-measured 2026-09-14 at close, best-of-3:
+  `--only check-core-files` reads 103 ms. A bare or `--for` run still resolves the registry union,
+  one subshell per bridged kit; this entry keeps that residue and its closing condition.
+  **Nothing else owns the residue.** The surviving `bash` spawn is owned by gate-sdk/SPEC.md
+  §gen-pre-commit, where its disposition is recorded, and was ruled 2026-08-23 not to fall to this
+  port — only its price did.
+  **The nested-bridge exposure is gone, and the old figure was not the bridge.** Canon-kit left the
+  bridge at cut 3, so `CANON_KIT_ENUM_SETS_CMD` is a static argv. Re-measured 2026-09-14 at scope:
+  `--only check-prose-enum` reads 0.80 s wrapped and 0.75 s as the bare binary, nearly all user CPU,
+  so its cost is the gate's own compute. The commit-hook path pays NOTHING, since `gen-pre-commit`
+  bakes the resolved arrays, so the exposure is whole-tree battery runs and hook regeneration. The
+  repair refused, named so it is not re-derived: an in-process call from the gate to the bundled
+  emitter would resolve the BUNDLED producer for a consumer who configured a different one, which
+  is the extension point that knob exists to protect.
+  **Cost while deferred:** every bare run pays one bridge subshell per bridged kit, now
+  evidence-kit, guard-kit and gate-sdk. Measured at spec, `692ad8c2`: the bare-run union resolves
+  in 120-124 ms plus 12 ms sourcing `lib/gate.sh`, against a 30 664 ms per-gate sum, under 0.5%.
+  **Stays Deferred at `static-config-seam`; it closes at `config-seam-static-format`'s gate-sdk cut,
+  which retires the bridge** — operator direction, 2026-09-13, lead-relayed, revising scope's.
+  **Rides `config-seam-fourth-cut`, which takes that cut** — operator direction, 2026-09-14,
+  lead-relayed. The figure was corrected in place on a lead decision the same day. **Should the
+  gate-sdk cut not land, the entry demotes with cost class session/low** — lead decision,
+  2026-09-14, on spec's measurement above. It closes at that cut's landing (the amendment's
+  delta 11).
+  Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;
+  re-scoped here after the batch landed, with every retired figure deleted.
+  recurrence: config-bridge-resolution-cost 2026-09-03
+
+- **knob-shape-flip-undetected** [spec: SPEC-bridge-retirement.md] — a crate reading a knob as
+  an array cannot tell that its consumer has since redeclared it `declare -A`: the values arrive as
+  `key=value` strings and pass.
+  The reverse direction *is* caught — the map reader refuses an element with no `=` — so this
+  is the one open half of the keyed arm, named by gate-sdk/SPEC.md §Porting a gate to the
+  binary substrate as the residue the arm leaves rather than discovered later. That section
+  owns the grounds and is cited here, never restated.
+  **Re-verified at this drain rather than taken on the filing's word.** Both crate readers were
+  read at HEAD: the array reader tab-splits and asserts no shape, the map reader errors naming
+  the offending element. Every associative knob in the tree — `LIFECYCLE_KIT_PREDECESSOR`,
+  `EVIDENCE_KIT_SCENARIO_GLOBS`, `QUEUE_KIT_LESSON_SINKS` — is read by key wherever a crate
+  reads it, so the hazard is a **future** flip with no live instance today. The filing's
+  mechanism claim held; only its silence about liveness needed correcting.
+  **Why it needed design:** closing it at the wire means transporting the reader's expected
+  shape back to the producer, the maintained declaration the derived-shape rule deliberately
+  declined to mint. So the candidate close is the *auditor* shape instead — assert that no
+  knob a crate reads as an array is declared associative in its owning kit's lib. That is
+  `check-gate-substrate-parity`-shaped work, and whether it lands as a further assertion there
+  or as its own member is the open call this entry cannot make from the wire alone.
+  **Cost while deferred:** silent, and it presents as a gate reading plausible-looking garbage
+  rather than as a refusal — the same failure shape the keyed arm was written to end. Bounded
+  by needing a consumer to change a shipped knob's *grammar*, itself a kit-SPEC-governed
+  contract change rather than a configuration edit.
+  Class: lands as a gate assertion, so canon-kit's litmus makes it **debt**.
+  Filed 2026-08-16 at spec from the amendment's own residue section; drained and promoted
+  2026-08-17 by close.
+  **Rides `config-seam-fourth-cut`, whose bridge retirement dissolves it** — operator direction,
+  2026-09-14, lead-relayed. With no bridged kit left, no shell `declare -A` reaches the wire, and a
+  static knob file refuses a line whose form disagrees with the owner's declared shape
+  (gate-sdk/SPEC.md §The knob file). It closes at the gate-sdk cut's landing, which deletes the
+  residue paragraph with the keyed arm (the amendment's delta 11).
+
+- **config-seam-overrides-harness-pin** [spec: SPEC-bridge-retirement.md]
+  — the consumer config seam overrides a knob value the fixture harness pins, and nothing
+  closes it.
+  `gate-sdk/lib/gate.sh` sources the config seam with plain assignments (:6-20) ahead of its
+  `[[ -v ]]` resolutions (:43-55), and `_gate_knob_kit_emit` re-sources per case (:381-396),
+  so a case or invoker config assigning `GATE_SDK_TMP_DIR` beats the harness's pin.
+  gate-sdk/SPEC.md §run-gate-tests records it as a known hole with no sanction, so nothing
+  depends on it; the pin holds here only because no config in this tree assigns the knob. All
+  three line citations were re-verified at the drain.
+  **Standing intent:** the scope seam decision of 2026-09-12 held a case's sandbox location to
+  be the harness's own fact, never a choice. That is prescriptive, so the hole should close.
+  **Why it needed design:** closing it changes how the seam treats every knob, through an
+  env-preserving source form or a harness-pin tier above the seam;
+  `config-seam-static-format` would dissolve it as a side effect.
+  **Ranking this is operator-class:** it re-scopes a decision recorded this iteration, so no
+  stage or lead session ranks it.
+  **Cost while deferred:** a consumer config assigning a pinned knob silently redirects
+  fixture scratch into its own tree.
+  **Stays Deferred and unranked at `static-config-seam`'s scope** — operator direction, 2026-09-13,
+  lead-relayed; it is disposed at landing if `config-seam-static-format` dissolves it.
+  **Rides `config-seam-fourth-cut`, whose gate-sdk cut dissolves it** — operator direction,
+  2026-09-14, lead-relayed. `GATE_SDK_TMP_DIR` is the attested bridged scalar, and gate-sdk/SPEC.md
+  §The knob file puts the environment above the file. It closes at the gate-sdk cut's landing, with
+  a unit test holding a case knob file's value below the pin (the amendment's delta 11).
+  Filed 2026-09-12 by build, beside a SPEC re-grounding; promoted unranked 2026-09-13 at close.
+
 ## Technical Debt
 
 ## Deferred
+
+- **native-windows-bash-floor** [design-pending] [cost: event/high] [surface: gate-sdk] — after the
+  config bridge retires, a native-Windows runtime still needs bash in three places: the
+  `bin/run-gates.sh` front-end stub, which locates the binary before any binary runs; the two
+  generated git hooks; and guard-kit's `PreToolUse` hook, whose rules stay bash by
+  SPEC-knob-files-cut-4.md's ruling. TRAJECTORY objective 6 rules a surviving script surface
+  dual-implementable, bash and PowerShell, and objective 2 rules a bash-only path a failure.
+  **Measured at spec:** every harness hook this repo wires runs `bash`, either through the front-end
+  or as a bash hook, and docs/install.md requires `bash` 4.3 or later.
+  **Candidates, none ruled:** a PowerShell twin of the front-end stub (resolve the root, read the
+  pre-binary knobs, exec the binary), held to the bash stub by a standing comparison; hooks that
+  invoke the binary directly with the locators the stub exports; and, for the git hooks, whatever
+  shell Git for Windows runs them under. guard-kit's hook is the hardest: its rules are the consumer
+  extension point, so a twin doubles every consumer rule.
+  **Why [design-pending]:** the twin's parity oracle, the hook invocation form, and whether
+  guard-kit needs a second substrate at all are three separate decisions.
+  **Cost while deferred:** a native-Windows adopter still needs Git-for-Windows bash for every
+  battery run and tool call, and docs/install.md says so.
+  Filed 2026-09-14 by `config-seam-fourth-cut`'s spec, a direct entry the operator authorized
+  (operator direction, 2026-09-14, lead-relayed), splitting the floor out of the bridge's
+  retirement.
 
 - **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
@@ -858,49 +985,6 @@
   Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
   whether the tag earns its keep; the operator noted having proposed removal before and gave no
   ruling. Promoted 2026-09-06 by close — too wide to fix inline, live trigger bars the icebox.
-
-- **config-bridge-resolution-cost** [design-pending] [cost: session/high] [surface: gate-sdk] — the array-knob config bridge still costs
-  about 640 ms on every invocation that resolves it, and no entry owns the residue.
-  **RE-SCOPED 2026-08-23 at `battery-runner-port`'s close, on a lead ruling: correcting a false
-  claim in an entry is not a descope.** Three of this entry's four load-bearing statements moved
-  under `6d813968`, and the retired ones are deleted rather than annotated.
-  **Its blocking design question is ANSWERED, by an executed fact rather than a preference.** It
-  asked whether one knob's resolved value may legitimately differ between two members in the same
-  run. It may not: resolution is **member-independent**, verified by reading the resolver rather
-  than the SPEC — `gate-sdk/lib/gate.sh`'s `_gate_knob_emit` takes the gate name as a parameter and
-  uses it at exactly one site, a refusal message, so no resolver reads the requesting member.
-  Batch 1 built on that property. The tag STAYS: canon-kit/SPEC.md §The amendment lifecycle makes
-  `[design-pending]` a section-membership invariant, so it comes off at promotion, not on a closed
-  question — probed: removing it reds `check-amendment-queue` outright.
-  **Its third candidate shape is BUILT** — "resolve each kit's declared-knob set once per run
-  rather than once per knob" is what `gate_knob_env_set` and `_gate_knob_kit_emit` now do, one
-  subshell per owning kit. The other two shapes are untaken and stay open.
-  **What remains after `config-bridge-floor`, whose two cuts landed.** Cut 1a (`9412923d`) took
-  the per-name owning-kit fork out of `gate_knob_env_set`; cut 1b (`31c1a773`) narrowed a `--only`
-  run's knob union to the selected members. Re-measured 2026-09-14 at close, best-of-3:
-  `--only check-core-files` reads 103 ms. A bare or `--for` run still resolves the registry union,
-  one subshell per bridged kit; this entry keeps that residue and its closing condition.
-  **Nothing else owns the residue.** The surviving `bash` spawn is owned by gate-sdk/SPEC.md
-  §gen-pre-commit, where its disposition is recorded, and was ruled 2026-08-23 not to fall to this
-  port — only its price did.
-  **The nested-bridge exposure is gone, and the old figure was not the bridge.** Canon-kit left the
-  bridge at cut 3, so `CANON_KIT_ENUM_SETS_CMD` is a static argv. Re-measured 2026-09-14 at scope:
-  `--only check-prose-enum` reads 0.80 s wrapped and 0.75 s as the bare binary, nearly all user CPU,
-  so its cost is the gate's own compute. The commit-hook path pays NOTHING, since `gen-pre-commit`
-  bakes the resolved arrays, so the exposure is whole-tree battery runs and hook regeneration. The
-  repair refused, named so it is not re-derived: an in-process call from the gate to the bundled
-  emitter would resolve the BUNDLED producer for a consumer who configured a different one, which
-  is the extension point that knob exists to protect.
-  **Cost while deferred:** every bare run pays one bridge subshell per bridged kit, now
-  evidence-kit, guard-kit and gate-sdk; that cost is unmeasured since cut 3 and is spec's probe.
-  **Stays Deferred at `static-config-seam`; it closes at `config-seam-static-format`'s gate-sdk cut,
-  which retires the bridge** — operator direction, 2026-09-13, lead-relayed, revising scope's.
-  **Rides `config-seam-fourth-cut`, which takes that cut** — operator direction, 2026-09-14,
-  lead-relayed; stays Deferred for spec to author and pair. The figure was corrected in place on a
-  lead decision the same day, and the session/high class stands until spec measures.
-  Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;
-  re-scoped here after the batch landed, with every retired figure deleted.
-  recurrence: config-bridge-resolution-cost 2026-09-03
 
 - **amendment-reader-roster-undercount** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — an amendment's reader/caller roster is a
   dated measurement presented as a roster, and it undercounted twice in one iteration.
@@ -2282,37 +2366,6 @@
   **feature**; debt only as an assertion folded into an existing meta-gate.
   Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
   fresh finding — the two instances are already fixed.
-
-- **knob-shape-flip-undetected** [design-pending] [cost: event/high] [surface: gate-sdk] — a crate reading a knob as an array cannot
-  tell that its consumer has since redeclared it `declare -A`: the values arrive as
-  `key=value` strings and pass.
-  The reverse direction *is* caught — the map reader refuses an element with no `=` — so this
-  is the one open half of the keyed arm, named by gate-sdk/SPEC.md §Porting a gate to the
-  binary substrate as the residue the arm leaves rather than discovered later. That section
-  owns the grounds and is cited here, never restated.
-  **Re-verified at this drain rather than taken on the filing's word.** Both crate readers were
-  read at HEAD: the array reader tab-splits and asserts no shape, the map reader errors naming
-  the offending element. Every associative knob in the tree — `LIFECYCLE_KIT_PREDECESSOR`,
-  `EVIDENCE_KIT_SCENARIO_GLOBS`, `QUEUE_KIT_LESSON_SINKS` — is read by key wherever a crate
-  reads it, so the hazard is a **future** flip with no live instance today. The filing's
-  mechanism claim held; only its silence about liveness needed correcting.
-  **Why `[design-pending]`:** closing it at the wire means transporting the reader's expected
-  shape back to the producer, the maintained declaration the derived-shape rule deliberately
-  declined to mint. So the candidate close is the *auditor* shape instead — assert that no
-  knob a crate reads as an array is declared associative in its owning kit's lib. That is
-  `check-gate-substrate-parity`-shaped work, and whether it lands as a further assertion there
-  or as its own member is the open call this entry cannot make from the wire alone.
-  **Cost while deferred:** silent, and it presents as a gate reading plausible-looking garbage
-  rather than as a refusal — the same failure shape the keyed arm was written to end. Bounded
-  by needing a consumer to change a shipped knob's *grammar*, itself a kit-SPEC-governed
-  contract change rather than a configuration edit.
-  Class: lands as a gate assertion, so canon-kit's litmus makes it **debt**.
-  Filed 2026-08-16 at spec from the amendment's own residue section; drained and promoted
-  2026-08-17 by close.
-  **Rides `config-seam-fourth-cut`, whose bridge retirement dissolves it** — operator direction,
-  2026-09-14, lead-relayed; stays Deferred for spec to author and pair. With no bridged kit left,
-  no shell `declare -A` reaches the wire, and a static knob file refuses a line whose form disagrees
-  with the owner's declared shape (gate-sdk/SPEC.md §The knob file).
 
 - **kit-spec-consumer-config-literal** [design-pending] [cost: event/high] [surface: gate-sdk] — nothing stops a kit SPEC from spelling
   out a value that belongs to a consumer's config, so the seam leaks by worked example.
@@ -4580,31 +4633,6 @@
   **Cost while deferred:** what a disposition commit dropped from an entry is recoverable only
   by hand-walking history.
   Filed 2026-09-12 by build, outside its envelope; drained and promoted 2026-09-13 at close.
-
-- **config-seam-overrides-harness-pin** [design-pending] [cost: event/low] [surface: gate-sdk]
-  — the consumer config seam overrides a knob value the fixture harness pins, and nothing
-  closes it.
-  `gate-sdk/lib/gate.sh` sources the config seam with plain assignments (:6-20) ahead of its
-  `[[ -v ]]` resolutions (:43-55), and `_gate_knob_kit_emit` re-sources per case (:381-396),
-  so a case or invoker config assigning `GATE_SDK_TMP_DIR` beats the harness's pin.
-  gate-sdk/SPEC.md §run-gate-tests records it as a known hole with no sanction, so nothing
-  depends on it; the pin holds here only because no config in this tree assigns the knob. All
-  three line citations were re-verified at the drain.
-  **Standing intent:** the scope seam decision of 2026-09-12 held a case's sandbox location to
-  be the harness's own fact, never a choice. That is prescriptive, so the hole should close.
-  **Why `[design-pending]`:** closing it changes how the seam treats every knob, through an
-  env-preserving source form or a harness-pin tier above the seam;
-  `config-seam-static-format` would dissolve it as a side effect.
-  **Ranking this is operator-class:** it re-scopes a decision recorded this iteration, so no
-  stage or lead session ranks it.
-  **Cost while deferred:** a consumer config assigning a pinned knob silently redirects
-  fixture scratch into its own tree.
-  **Stays Deferred and unranked at `static-config-seam`'s scope** — operator direction, 2026-09-13,
-  lead-relayed; it is disposed at landing if `config-seam-static-format` dissolves it.
-  **Rides `config-seam-fourth-cut`, whose gate-sdk cut dissolves it** — operator direction,
-  2026-09-14, lead-relayed; stays Deferred for spec to author and pair. `GATE_SDK_TMP_DIR` is the
-  attested bridged scalar, and gate-sdk/SPEC.md §The knob file puts the environment above the file.
-  Filed 2026-09-12 by build, beside a SPEC re-grounding; promoted unranked 2026-09-13 at close.
 
 - **scan-prompts-grant-test-redirect-blind** [design-pending] [cost: event/low] [surface: guard-kit]
   — `scan-prompts`' grant test and its reachability verdict disagree on a redirect call.
