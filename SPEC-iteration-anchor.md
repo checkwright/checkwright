@@ -151,10 +151,25 @@ first sentence gains a second reader: `…the stage-economics join reads for sta
 stage-economics meter, history ∪ live), and whose first stamp the report skeleton reads for the
 iteration-start commit (§The report skeleton)`.
 
+In `drift-kit/smoke/install.sh`, the `# spec:` comment reading `the iteration-start handoff is
+asserted *present*, not non-empty: no baseline is derivable in a throwaway consumer, and the
+contract's promise there is the empty string rather than an absent variable.` becomes `…: there is
+no iteration-start commit in a throwaway consumer, and the contract's promise there is the empty
+string rather than an absent variable.`, tracking §The KPI plugin contract's retired phrase above.
+The asserted behavior (the `start=set` grep) is unchanged; only the comment's citation of the
+retired sentence moves.
+
 ### (3) The always-loaded meter measures growth from the iteration start and flags a stale baseline {design-bearing}
 
 `CONTEXT_KIT_STATE_FILE` is new, and it is defined in `lib/context.sh` with the default
 `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. It joins the meter arm's `KNOBS`.
+
+**Not yet applied.** In context-kit/SPEC.md §The always-loaded meter, the sentence naming the arm's
+resolved knobs, the substring `` `CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE` and
+`CONTEXT_KIT_RATCHET_PATHS` `` becomes `` `CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE`,
+`CONTEXT_KIT_RATCHET_PATHS` and `CONTEXT_KIT_STATE_FILE` ``, so the enumeration still mirrors the
+`KNOBS` array this delta widens (the SSOT relation the section's own `# spec:` pointer in
+`native/src/emit/always_loaded.rs` states).
 
 `native/src/emit/always_loaded.rs`:
 
@@ -298,6 +313,8 @@ Append to `.workflow/release-declarations.md` `## Behavior changes`:
 - `drift-kit/SPEC.md` — §The report skeleton, §The KPI plugin contract, §Bundled KPIs'
   `kpi-queue-net-delta` and §Layout and configuration (delta 2), and §Bundled KPIs'
   `kpi-always-loaded` (delta 4).
+- `drift-kit/smoke/install.sh` — the `# spec:` comment tracking §The KPI plugin contract's retired
+  phrase (delta 2).
 - `context-kit/lib/context.sh` — `CONTEXT_KIT_STATE_FILE` (delta 3).
 - `native/src/emit/always_loaded.rs` — `measure`, `Measurement`, `line`, `growth`, `KNOBS`,
   tests (delta 3).

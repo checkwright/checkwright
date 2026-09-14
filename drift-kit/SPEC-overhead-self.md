@@ -100,6 +100,12 @@ is the no-transcript notice at exit 0 naming the operand. `USAGE` names both for
 cover each bare verdict, including that the delegated verdict writes no log line, and both operand
 forms plus the unmatched key.
 
+**Not yet applied.** In drift-kit/SPEC.md §The overhead meter, the section's opening invocation
+synopsis, `` `--emit overhead-meter [transcript.jsonl]` measures the methodology's own cost, `` becomes
+`` `--emit overhead-meter [transcript.jsonl | session8]` measures the methodology's own cost, `` —
+the widened operand this delta introduces two sentences later, so the section does not show two
+different bracket notations for the same arm.
+
 **Not yet applied.** In drift-kit/SPEC.md §The overhead meter, the opening paragraph's sentences
 from `A bare invocation resolves` through `whose newest candidate wins.` become:
 
