@@ -6,3 +6,4 @@
 
 config-seam-third-cut scope a1ac73fc 2026-09-14 8e3a82c1
 config-seam-third-cut spec a14a9b84 2026-09-14 04eda725
+config-seam-third-cut align afdad0c4 2026-09-14 7187f477
