@@ -338,17 +338,21 @@ fn write_shadow(scratch: &Scratch) -> Result<String, String> {
     Ok(cfg.display().to_string())
 }
 
-// spec: context-kit/SPEC.md §The always-loaded meter — the meter's three inputs pinned at the
-// fixture corpus, so the golden holds a measurement of the corpus rather than of this repo.
+// spec: context-kit/SPEC.md §The always-loaded meter — the meter's four inputs pinned at the
+// fixture corpus (the state file pinned absent-but-nonempty-path), so the golden holds a
+// measurement of the corpus rather than of this repo's live iteration state.
 fn write_meter_config(scratch: &Scratch, corpus: &str) -> Result<String, String> {
     let cfg = scratch.root.join("meter.conf");
+    let absent_state = scratch.root.join("no-iteration-state.txt");
     write(
         &cfg,
         &format!(
             "CONTEXT_KIT_SURFACES=(\"{0}/surface.md\")\n\
              CONTEXT_KIT_HOOK_CMD=\"cat {0}/hook-sample.txt\"\n\
-             CONTEXT_KIT_BASELINE_FILE=\"{0}/baseline.txt\"\n",
-            corpus
+             CONTEXT_KIT_BASELINE_FILE=\"{0}/baseline.txt\"\n\
+             CONTEXT_KIT_STATE_FILE=\"{1}\"\n",
+            corpus,
+            absent_state.display()
         ),
     )?;
     Ok(cfg.display().to_string())
