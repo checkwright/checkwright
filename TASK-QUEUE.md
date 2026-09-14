@@ -12,6 +12,21 @@
 
 ## New Features
 
+- **lead-journal-advisory-fires-on-the-live-lead** [spec: SPEC-lead-journal-open.md]
+  — the boundary entry's undisposed-lead-journal advisory (lifecycle-kit/SPEC.md
+  §bin/enter-stage.sh) fires on the **live** dispatching lead's own journal at every
+  lead-dispatched scope entry, labelled as the prior lead's: the lead opens its journal before it
+  dispatches scope, so at that boundary the file never ends in `DISPOSED`. Attested at the
+  2026-09-12, 2026-09-13 and 2026-09-14 scope entries.
+  **Designed at spec:** `--enter-stage --open-lead-journal` appends a heading keyed on the stage
+  cursor (fields 2 to last of the last stamp), the boundary advisory reads the journal as
+  segments and exempts only a last segment whose key matches, and the lead template's first step
+  runs the opener. The entry's three candidates are refused in the amendment on probed grounds.
+  Filed 2026-09-13 by scope; drained from the gap inbox at `resident-tier-restatement`'s close.
+  **Ranked into `config-bridge-floor` at the recurrence threshold — operator direction, 2026-09-14,
+  lead-relayed;** promoted at spec.
+  recurrence: lead-journal-advisory-fires-on-the-live-lead 2026-09-14 2026-09-14
+
 ## Technical Debt
 
 - **bridge-owning-kit-partition-forks-per-knob** — `gate_knob_env_set` (`gate-sdk/lib/gate.sh`)
@@ -75,24 +90,6 @@
   adopter.
   Filed 2026-09-14 by `static-config-seam`'s close into the gap inbox; no stage of that iteration
   could drain it, and this scope promoted it, so the record is late and says so.
-
-- **lead-journal-advisory-fires-on-the-live-lead** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — the
-  boundary entry's undisposed-lead-journal advisory (lifecycle-kit/SPEC.md §bin/enter-stage.sh, the
-  lead-journal invariant paragraph) fires on the **live** dispatching lead's own journal at every
-  lead-dispatched scope entry, labelled as the prior lead's journal: the lead opens its journal
-  (posture, grant, dispatch log) before it dispatches scope, so at that boundary the file never ends
-  in `DISPOSED`. Attested at the 2026-09-12 and 2026-09-13 scope entries; re-verified at this
-  iteration's close against `native/src/emit/enter_stage.rs`, whose only test is the last non-empty
-  line.
-  **Why [design-pending]:** telling a live journal from a prior one needs a discriminator the file
-  does not carry today — an opening line naming the iteration, a session marker, or the lead writing
-  the journal only after scope stamps — and each moves the lead template's contract.
-  **Cost while deferred:** a permanent advisory at every lead-run boundary trains the reader to skip
-  the one line that would carry a real undisposed journal.
-  Filed 2026-09-13 by scope; drained from the gap inbox at `resident-tier-restatement`'s close.
-  **Ranked into `config-bridge-floor` at the recurrence threshold — operator direction, 2026-09-14,
-  lead-relayed;** it stays Deferred for spec to author and promote.
-  recurrence: lead-journal-advisory-fires-on-the-live-lead 2026-09-14 2026-09-14
 
 - **audit-roster-mechanism-has-no-kit-owner** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the
   audit roster's contract header names doctrine-kit/DOCTRINE.md rule 2 (Enforcement-first) as
