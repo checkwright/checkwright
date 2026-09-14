@@ -96,3 +96,42 @@ ratchet 1 "on a surface grown past its row"
 bash "$SDK/bin/run-gates.sh" --emit always-loaded --ceiling >/dev/null
 ratchet 0 "after the growth was deliberately re-stamped"
 rm -f .workflow/surface-ceiling.txt
+
+# spec: context-kit/SPEC.md §Testing — check-settings-pins driven through its pass, violation and
+# skip dispositions on a pin derived from the settings file this recipe just wrote, through
+# gate_command at the pins knob's default path
+pins_conf="scripts/settings-pins.conf"
+pin_key=""
+while IFS= read -r k; do
+    [[ "$k" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+    pin_key="$k"
+    break
+done < <(jq -r 'to_entries[] | select(.value != null) | .key' .claude/settings.json)
+[[ -n "$pin_key" ]] || {
+    echo "context-kit/smoke/install.sh: no ident-named, non-null top-level key in .claude/settings.json to pin" >&2
+    exit 1
+}
+pin_path=".$pin_key"
+pin_val="$(jq -c --arg k "$pin_key" '.[$k]' .claude/settings.json)"
+printf '%s = %s\n' "$pin_path" "$pin_val" > "$pins_conf"
+
+pins_check() {  # $1=label  $2=want-rc  $3=want-substring
+    local label="$1" want="$2" sub="$3" out rc
+    out="$(kit_gate check-settings-pins 2>&1)" && rc=0 || rc=$?
+    if [[ "$rc" -ne "$want" ]] || ! grep -qF -- "$sub" <<<"$out"; then
+        echo "context-kit/smoke/install.sh: check-settings-pins $label: want exit $want and '$sub', got exit $rc: $out" >&2
+        exit 1
+    fi
+}
+
+cp .claude/settings.json .claude/settings.json.smoke-orig
+pins_check "pass" 0 "1 pin(s) hold"
+
+jq --arg k "$pin_key" --argjson orig "$pin_val" '.[$k] = {"consumer-smoke-violated": $orig}' \
+    .claude/settings.json > .claude/settings.json.new
+mv .claude/settings.json.new .claude/settings.json
+pins_check "violation" 1 "$pin_path"
+
+mv .claude/settings.json.smoke-orig .claude/settings.json
+rm -f "$pins_conf"
+pins_check "skip" 0 "no pins file"

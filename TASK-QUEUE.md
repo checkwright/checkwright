@@ -12,31 +12,6 @@
 
 ## New Features
 
-- **settings-pins-live-suite-coverage** [spec: SPEC-pins-smoke.md]
-  — `check-settings-pins` is exercised by its fixtures and by no live suite, so the vendored path
-  is unproven end to end.
-  **Scoped against the tree rather than taken from the report that raised it.** The fixture pair
-  does cover the real branches: `context-kit/gate-tests/check-settings-pins/{good,bad}/` each ship
-  a `settings-pins.conf` and a `settings.json`, so the pass and the legible-violation dispositions
-  both run. The claim that the gate only ever reaches its trivial branch is true of the **live**
-  suites and false of the fixture suite, and the difference is the whole entry.
-  **What no live suite reaches:** no installer profile, no consumer smoke and no upgrade suite ever
-  writes a pins file (re-verified at spec, 2026-09-14). So the smoke battery exercises only the
-  absent-pins-file clean skip, and a vendoring defect that broke the gate against a real settings
-  file would ship green.
-  **This is the craft rule's own shape** (doctrine-kit/DOCTRINE.md, *Test from the real consumer's
-  runtime*): the lower layer is covered and the higher one is not, which is the inverse of the
-  usual finding and is why it reads as adequate coverage at a glance.
-  **Deliverable:** context-kit's own `smoke/install.sh` drives the gate through pass, violation
-  and skip on a pin derived from the installed settings file, then disarms it, since guard-kit's
-  later install overwrites that file. The amendment weighs the refused homes.
-  **Cost while deferred:** the smoke's green battery carries no evidence that this gate ran
-  against anything.
-  Filed 2026-08-13 by close, from the roster sweep; raised by the lead and re-scoped here after
-  reading the fixtures.
-  **Leads `evidence-population-fidelity`** — operator direction, 2026-09-14, lead-relayed, with
-  the three sibling entries that name that iteration; promoted at spec.
-
 - **drift-baseline-unnamed-iteration** [spec: SPEC-iteration-anchor.md]
   — every since-iteration-start KPI baselines on the wrong commit, silently.
   `--emit drift-report`'s `iteration_start` reads the queue header's iteration name and runs
@@ -5102,5 +5077,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- settings-pins-live-suite-coverage
 
 ## Lessons Learned

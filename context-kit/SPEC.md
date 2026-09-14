@@ -1038,8 +1038,9 @@ non-JSON settings file, a malformed pin line, a pin outside the path grammar, or
 a pin naming a key **absent** from the settings file — an absent key is a desynced
 manifest (the pins and the settings are one repo's tracked config, edited
 together), not the legible drift a red is for. Absent pins file: the opt-in-off
-state, a clean skip. Ships a `good/`+`bad/` fixture pair and registers in the
-consumer's `gates.list` (this repo's included).
+state, a clean skip. Ships a `good/`+`bad/` fixture pair, registers in the
+consumer's `gates.list` (this repo's included), and is driven end to end against
+an installed settings file by the consumer smoke (§Testing).
 
 **What a pin is worth depends on which tiers can outrank the file it pins**, and
 the gate reads exactly one tier. The harness resolves settings across five, in
@@ -1592,6 +1593,13 @@ by construction before the green-battery assertion runs. Unregistered is the
 accounted state for it — the disposition is `on-surface`, so the registration
 accounting's own probe exempts it (gate-sdk/SPEC.md §Consumer smoke) and no
 `# smoke-unregistered:` reason is owed.
+It then drives `check-settings-pins` through its pass, violation and skip dispositions the same
+way — through `gate_command`, at the pins knob's default path — on a pin **derived** from the
+first `ident`-named, non-null key of the settings file the install just wrote, so the recipe
+asserts no particular key is pinnable. The pass is asserted on the clean line's pin count and
+not on exit 0, which the absent-pins skip shares. It restores the settings file and deletes the
+pins file before handing on, because a later co-vendored install overwrites the settings file
+and would leave a standing pin naming an absent key.
 `smoke/violation.sh` crafts an over-budget pointered bullet in the scratch
 consumer's brevity file and asserts the battery reddens via
 `check-brevity`. It inserts the bullet inside the first governed section rather than
