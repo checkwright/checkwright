@@ -2885,9 +2885,7 @@ A **non-gate arm** is specified by three properties:
   `--declaration-parity` left this roster in the cut that deleted the
   shell form it compared against (§lib/declaration.sh), because one holder cannot
   be held equal to itself and an arm whose harness can only skip is exactly the
-  unreachable code this property refuses. `--queue-parity` and `--stages-lib-parity`
-  left it the same way, with the libraries their harnesses compared against, when
-  queue-kit and lifecycle-kit moved to knob files (§The knob file).
+  unreachable code this property refuses.
   **`--evidence-lib-parity` left it by the other door, and the pair is worth
   reading together**: nothing
   deleted the shell forms of `ek_lock_read` and `ek_pid_alive` *in order to*
@@ -15060,25 +15058,18 @@ that predicate and no gate enforces their agreement** — `queue_slugs`
 the crate's own queue module, since one
 shared function would end the arrangement this count prices), the crate's own
 queue module, the section-pool builder inside
-drift-kit's `kpi-queue-net-delta`, and this gate. **It was eight, and porting is
-what shrank it** — the roadmap adapter left the shell library for the crate's own
-queue module when its two consumers ported together, so a holder became a second
-call site of one already counted; the inline scans in `check-task-names` and
-`check-queue-entry-budget`, and both of the `queue-index` arm's walks, now call
-one shared crate function, and two call sites of one function are one holder by
-this section's own criterion. That is the shared-derivation question below
-answering itself for three members without anyone deciding it. A fourth left by
-deletion: queue-kit's shell live-slug reader went with its library when that kit's
-knobs moved to a knob file. Only the public
+drift-kit's `kpi-queue-net-delta`, and this gate. Call sites of one shared crate
+function are one holder by this section's own criterion, so the inline scans in
+`check-task-names` and `check-queue-entry-budget` and both of the `queue-index`
+arm's walks count once. Only the public
 library functions are named; the rest are cited by the surface that owns them,
 because naming another kit's private helper here would couple this
 count to an identifier no gate holds. They are cited at all because a grep for the *function* names
-finds one of them and the rest are inline scans no naming convention surfaces —
-which is how the count was twice under-stated before it was surveyed. The risk
+finds one of them and the rest are inline scans no naming convention surfaces. The risk
 and the cost do not sit in the same place: a **set builder** with a wrong
 predicate fails silently, in wrong membership, which is this gate's own defect
 class, while a **per-bullet extractor** fails loudly and locally — a missing
-index row, an extent measured wrong. So a format change costs all six edits
+index row, an extent measured wrong. So a format change costs an edit per holder
 and endangers only the few that build sets. Accepted on the same ground as the
 section-set residue above: a cross-kit code dependency would cost more than the
 divergence risk. **The `# port-until:` widening added no holder to this count**,

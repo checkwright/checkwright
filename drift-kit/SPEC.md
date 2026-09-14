@@ -1535,7 +1535,7 @@ Knobs (this repo's layout as defaults):
   LIFECYCLE_KIT_STAGES DRIFT_KIT_STAGES` (gate-sdk/SPEC.md §The knob file), called
   only when `DRIFT_KIT_STAGES` is in `GATE_SDK_RESOLVING_KNOB` because the read costs
   a spawn — this repo's `scripts/drift-config.sh` is the live instance, the SSOT
-  activation. The helper is transitional and leaves with the shell config bridge. Third instance of drift-kit re-deriving a
+  activation. Third instance of drift-kit re-deriving a
   cross-kit fact with its own knob rather than importing a sibling kit's bin
   contract (alongside `DRIFT_KIT_SESSIONS_DIR` and `DRIFT_KIT_STATE_FILE`).
 - `DRIFT_KIT_STAGE_ECONOMICS_LOG` — the stage-economics append trend log; default
