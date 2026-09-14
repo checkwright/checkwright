@@ -3,7 +3,7 @@
 // test, 2 a harness or fixture error — which `Arm::Emit` collapses to 0-or-2.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a bridged-arm table member rather than a hardcoded
 // top-level flag, because the member is configured: a top-level flag would resolve platform
-// defaults and silently ignore every consumer override of the four knobs below.
+// defaults and silently ignore every consumer override of the three knobs below.
 use crate::proc;
 use crate::walk;
 use std::path::Path;
@@ -12,7 +12,6 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_TESTS_DIR",
     "GATE_SDK_TMP_DIR",
     "GATE_SDK_NATIVE_BIN",
-    "GATE_KIT_ROOTS_HERE",
 ];
 
 const NAME: &str = "run-gate-tests";
@@ -81,7 +80,7 @@ fn setup(args: &[String]) -> Result<Harness, String> {
     // because a case runs after a `cd` into its own dir and the knob's default is deliberately
     // repo-relative (§lib/gate.sh); the gate dirs above are absolutized for the same reason.
     let mut bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
-    let mut exported: Vec<(String, String)> = Vec::new();
+    let mut exported: Vec<(String, String)> = vec![("GATE_SDK_ROOT".to_string(), sdk.clone())];
     let absolutized = walk::abs_against(&here, &bin);
     if absolutized != bin && Path::new(&bin).exists() {
         bin = absolutized;
@@ -102,20 +101,18 @@ fn setup(args: &[String]) -> Result<Harness, String> {
     })
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the arm reaches gate-sdk's own library through the
-// transported kit roots rather than through a path relative to itself: a compiled member has no
-// `BASH_SOURCE` anchor, and a binary the installer copied elsewhere cannot recover one.
+// spec: gate-sdk/SPEC.md §Layout and configuration — the arm reaches gate-sdk's own library through
+// the gate-sdk root locator, absolutized here because every case runs in another working directory
 fn sdk_root() -> Result<String, String> {
-    walk::kit_roots_abs()?
-        .into_iter()
-        .find(|r| r.rsplit('/').next() == Some("gate-sdk"))
-        .ok_or_else(|| {
-            format!(
-                "{}: GATE_KIT_ROOTS_HERE names no gate-sdk root, so the shell library this runner \
-                 resolves each case's dispatch through cannot be found",
-                NAME
-            )
-        })
+    let root = walk::abs_against(&walk::cwd()?, walk::sdk_root().trim_end_matches('/'));
+    if !Path::new(&root).join("lib/gate.sh").is_file() {
+        return Err(format!(
+            "{}: GATE_SDK_ROOT names {}, which holds no lib/gate.sh, so the shell library this \
+             runner resolves each case's dispatch through cannot be found",
+            NAME, root
+        ));
+    }
+    Ok(root)
 }
 
 // spec: gate-sdk/SPEC.md §run-gate-tests — the default gate-declaration dir set is `gate_check_dirs`'
@@ -419,7 +416,7 @@ fn resolve_argv(h: &Harness, gate: &str, casedir: &str) -> Option<Vec<String>> {
     // spec: gate-sdk/SPEC.md §run-gate-tests — the binary and the pinned scratch are exported into
     // the resolving shell, which is the shell form's process-wide export; both exports precede the
     // source, which is where that section's upstream-of-the-bridge argument bites.
-    let script = r#"export GATE_SDK_NATIVE_BIN="$1"; export GATE_SDK_TMP_DIR="$3"; source "$2/lib/gate.sh"; shift 3; cd "$1" || exit 2; shift; gate_command "$@""#;
+    let script = r#"export GATE_SDK_NATIVE_BIN="$1"; export GATE_SDK_TMP_DIR="$3"; export GATE_SDK_ROOT="$2"; source "$2/lib/gate.sh"; shift 3; cd "$1" || exit 2; shift; gate_command "$@""#;
     let mut argv: Vec<&str> = vec!["-c", script, "bash", &h.bin, &h.sdk, &h.case_tmp, casedir, gate];
     argv.extend(h.gate_dirs.iter().map(String::as_str));
     // spec: gate-sdk/SPEC.md §run-gate-tests — a refusal is a status, not a parse: `gate_command`

@@ -351,7 +351,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -372,7 +372,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -408,7 +408,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[(".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", "")],
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_DOD_HEADING",
@@ -423,7 +423,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[(".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", "")],
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_BANNED_HEADINGS",
@@ -442,7 +442,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -464,7 +464,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -498,7 +498,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -519,8 +519,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -540,7 +539,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -559,7 +558,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -577,8 +576,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "GATE_SDK_GATES_DIR",
-            "GATE_KIT_ROOTS_HERE",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "GATE_PRUNE_DIRS",
             EVERY_FILTER_KNOB,
             crate::registry::EVERY_COUPLES_KNOB,
@@ -605,7 +603,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", ""), (".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""), ("?", "", "", "projection@src/gates/spec_embedded_source.rs:147")],
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_AMENDMENT_GLOB",
             "CANON_KIT_SCAN_KIT_ROOTS",
@@ -628,7 +626,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "GATE_SDK_QUEUE_FILE",
             "GATE_SDK_GATES_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_NATIVE_CRATE",
             "GATE_PRUNE_DIRS",
         ],
@@ -664,7 +662,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-knob-default-coupling",
         knob_default_coupling::run,
         &[("?", "", "", "dynamic@src/gates/knob_default_coupling.rs:353")],
-        &["GATE_PRUNE_DIRS", "GATE_KIT_ROOTS_REL", "CANON_KIT_SPEC_NAME"],
+        &["GATE_PRUNE_DIRS", "GATE_SDK_KIT_DIRS", "CANON_KIT_SPEC_NAME"],
         "canon-kit",
         &[("git", "")],
     ),
@@ -677,8 +675,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -696,7 +693,7 @@ pub const REGISTRY: &[GateEntry] = &[
         MANIFEST_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
@@ -717,7 +714,7 @@ pub const REGISTRY: &[GateEntry] = &[
         COMMENT_SURFACE_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_WORKFLOW_DIR",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_COMMENT_SURFACE",
@@ -741,7 +738,7 @@ pub const REGISTRY: &[GateEntry] = &[
         SPEC_POINTER_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_WORKFLOW_DIR",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
@@ -762,7 +759,7 @@ pub const REGISTRY: &[GateEntry] = &[
         COMMENT_SURFACE_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_WORKFLOW_DIR",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_COMMENT_SURFACE",
@@ -783,7 +780,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", "")],
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_AMENDMENT_GLOB",
             "CANON_KIT_QUEUE_FILE",
@@ -805,7 +802,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", "")],
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_AMENDMENT_GLOB",
         ],
@@ -820,7 +817,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", "")],
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_AMENDMENT_GLOB",
             "CANON_KIT_RETIRED_SPELLING_EXCLUDE",
@@ -836,7 +833,7 @@ pub const REGISTRY: &[GateEntry] = &[
         COMMENT_SURFACE_ROOTS,
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_WORKFLOW_DIR",
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_COMMENT_SURFACE",
@@ -884,8 +881,8 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
     ),
     // spec: gate-sdk/SPEC.md §The kit-roots `gate_kit_roots` cohort — five members sharing one
-    // corpus derivation, `GATE_KIT_ROOTS_HERE`/`_REL`, so each declares the bridged spelling its
-    // own rule reads and nothing more
+    // corpus derivation, the kit roots, so each declares the override they are computed from and
+    // nothing more
     // spec: gate-sdk/SPEC.md §check-reads-couples — an empty walk-root set for the two members
     // that probe fixed literal paths rather than listing a directory: there is no root for the
     // recorder to observe, the shape the queue-kit cohort's file readers already declare.
@@ -894,7 +891,7 @@ pub const REGISTRY: &[GateEntry] = &[
         kit_registration::run,
         &[],
         &[
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_REGISTRY_DOC",
             "GATE_SDK_RUNNER_DOC",
         ],
@@ -905,7 +902,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-smoke-entry-guard",
         smoke_entry_guard::run,
         &[],
-        &["GATE_KIT_ROOTS_HERE"],
+        &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),
@@ -916,7 +913,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-test-hermetic",
         test_hermetic::run,
         &[("?", "", "", "dynamic@src/gates/test_hermetic.rs:42")],
-        &["GATE_KIT_ROOTS_HERE"],
+        &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[],
     ),
@@ -924,7 +921,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-assertion-strength",
         assertion_strength::run,
         &[("?", "", "", "dynamic@src/gates/assertion_strength.rs:375")],
-        &["GATE_KIT_ROOTS_HERE"],
+        &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[],
     ),
@@ -935,7 +932,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-template-registry-parity",
         template_registry_parity::run,
         &[("?", "", "", "dynamic@src/gates/template_registry_parity.rs:89")],
-        &["GATE_KIT_ROOTS_HERE"],
+        &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),
@@ -1033,7 +1030,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gate-tamper",
         gate_tamper::run,
         &[],
-        &["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS", "GATE_KIT_ROOTS_REL"],
+        &["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS", "GATE_SDK_KIT_DIRS"],
         "delegation-kit",
         &[("git", "")],
     ),
@@ -1073,7 +1070,7 @@ pub const REGISTRY: &[GateEntry] = &[
         close_surfaces::run,
         &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:135 via emit::close_surfaces::derive")],
         &[
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "LIFECYCLE_KIT_ROSTER_BASENAME",
             "LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS",
             "GATE_SDK_WORKFLOW_DIR",
@@ -1134,7 +1131,7 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         &[
             "GATE_PRUNE_DIRS",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "LIFECYCLE_KIT_SKILLS_DIR",
             "LIFECYCLE_KIT_SHIM_NGRAM",
             "LIFECYCLE_KIT_SHIM_DEDUP_CORPUS",
@@ -1218,7 +1215,7 @@ pub const REGISTRY: &[GateEntry] = &[
         docs_kit_parity::run,
         &[("docs", "glob:lit:*/index.md", "", "")],
         &[
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_REGISTRY_DOC",
             "GATE_SDK_RUNNER_DOC",
         ],
@@ -1262,7 +1259,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-install-platforms",
         install_platforms::run,
         &[],
-        &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_REL"],
+        &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS"],
         "-",
         &[],
     ),
@@ -1279,7 +1276,7 @@ pub const REGISTRY: &[GateEntry] = &[
         kit_ref_liveness::run,
         &[],
         &[
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "GATE_PRUNE_DIRS",
             "GATE_SDK_QUEUE_FILE",
         ],
@@ -1324,7 +1321,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_PRUNE_DIRS",
             "DRIFT_KIT_KPIS_FILE",
             "CONTEXT_KIT_SETTINGS_FILE",
@@ -1356,7 +1353,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_PRUNE_DIRS",
             "DRIFT_KIT_KPIS_FILE",
             "CONTEXT_KIT_SETTINGS_FILE",
@@ -1466,7 +1463,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-readme-roster",
         readme_roster::run,
         &[("?", "", "", "dynamic@src/gates/readme_roster.rs:101")],
-        &["GATE_KIT_ROOTS_HERE"],
+        &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[],
     ),
@@ -1503,8 +1500,7 @@ pub const REGISTRY: &[GateEntry] = &[
     // spec: gate-sdk/SPEC.md §check-graph — the coupling-graph auditor. `?` as its walk root for
     // the reason its shell original was classified `?`: assertion G's scan root is the member's own
     // first argument with a default, the variable-first-argument shape §check-reads-couples calls
-    // undecidable. It declares GATE_SDK_ROOT_HERE because assertion D spawns the hook generator,
-    // which stays shell (§gen-pre-commit), and a compiled member has no BASH_SOURCE to find it by.
+    // undecidable.
     // spec: gate-sdk/SPEC.md §gen-pre-commit — `bash` is the whole declared requirement: assertion
     // D's two generator arms are this member's only spawns, measured, and the generator's own
     // programs ride the floor behind them rather than joining this element.
@@ -1516,9 +1512,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_PRUNE_DIRS",
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_HOOKS_DIR",
-            "GATE_SDK_ROOT_HERE",
-            "GATE_KIT_ROOTS_HERE",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_GRAPH_ARTIFACT",
             "GATE_SDK_GRAPH_THEME_DIR",
             "GATE_SDK_GRAPH_MAX_EDGES",
@@ -1538,7 +1532,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gate-fail-closed",
         gate_fail_closed::run,
         &[],
-        &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_HERE"],
+        &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),
@@ -1554,8 +1548,7 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         &[
             "GATE_SDK_GATES_DIR",
-            "GATE_SDK_ROOT_HERE",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_NATIVE_CRATE",
             "GATE_SDK_NATIVE_SRC",
             "GATE_SDK_NATIVE_TARGETS_FILE",
@@ -1574,7 +1567,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_NATIVE_BIN",
             "GATE_SDK_NATIVE_CRATE",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
         ],
         "gate-sdk",
         &[("git", ""), ("?", "GATE_SDK_NATIVE_BIN")],
@@ -1606,7 +1599,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "GATE_SDK_GATES_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_NATIVE_CRATE",
         ],
         "gate-sdk",
@@ -1619,7 +1612,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_TESTS_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
         ],
         "gate-sdk",
         &[("git", "")],
@@ -1630,7 +1623,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "GATE_SDK_GATES_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_NATIVE_CRATE",
         ],
         "gate-sdk",
@@ -1647,7 +1640,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "GATE_SDK_GATES_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_LINT_EXTRA_DIRS",
         ],
         "gate-sdk",
@@ -1660,7 +1653,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-install-disposition",
         install_disposition::run,
         &[("?", "", "", "dynamic@src/gates/install_disposition.rs:153")],
-        &["GATE_KIT_ROOTS_HERE"],
+        &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),
@@ -1670,8 +1663,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "GATE_SDK_GATES_DIR",
-            "GATE_KIT_ROOTS_HERE",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
         ],
         "gate-sdk",
         &[("git", "")],
@@ -1733,7 +1725,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-core-files",
         core_files::run,
         &[],
-        &["GATE_SDK_CORE_FILES_FILE", "GATE_KIT_ROOTS_REL"],
+        &["GATE_SDK_CORE_FILES_FILE", "GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),
@@ -1805,7 +1797,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_DUP_SURFACES",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_SCAN_KIT_ROOTS",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_PRUNE_DIRS",
         ],
         "canon-kit",

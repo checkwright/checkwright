@@ -206,7 +206,7 @@ for r in "${roots[@]}"; do
         echo "CONSUMER-SMOKE: $kit has no violation script — install coverage only"
         continue
     fi
-    expected="$( ( cd "$SCRATCH" && SMOKE_KIT_ROOT="$SCRATCH/$kit" bash "$vio" ) | head -n1 )"
+    expected="$( ( cd "$SCRATCH" && GATE_SDK_ROOT="$SCRATCH/gate-sdk" SMOKE_KIT_ROOT="$SCRATCH/$kit" bash "$vio" ) | head -n1 )"
     if [[ -z "$expected" ]]; then
         echo "CONSUMER-SMOKE: FAIL — $kit/smoke/violation.sh printed no expected-gate name on line 1"
         restore

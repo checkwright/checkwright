@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 // spec: context-kit/SPEC.md §Testing — one declared knob, the transported kit roots; a compiled
 // member has no `BASH_SOURCE` anchor. No `CONTEXT_KIT_` knob is declared, that section's rule for
 // the sibling smoke.
-pub const KNOBS: &[&str] = &["GATE_KIT_ROOTS_HERE"];
+pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS"];
 
 const NAME: &str = "run-index-tests";
 const VERDICT: &str = "INDEX-TESTS";
@@ -293,7 +293,7 @@ fn kit_root(name: &str) -> Result<String, String> {
         .find(|r| r.rsplit('/').next() == Some(name))
         .ok_or_else(|| {
             format!(
-                "GATE_KIT_ROOTS_HERE names no {} root, so neither the fixture corpus nor the \
+                "the kit roots name no {} root, so neither the fixture corpus nor the \
                  front-end the checks reach their arms through can be found",
                 name
             )

@@ -49,7 +49,7 @@ The bridge carried three values the crate could not derive, because each was anc
 `lib/gate.sh`'s own location: `GATE_KIT_ROOTS_HERE`, `GATE_KIT_ROOTS_REL` and `GATE_SDK_ROOT_HERE`. With
 no shell library resolving them, the crate needs the anchor handed to it once.
 
-gate-sdk/SPEC.md §Layout and configuration, the `GATE_SDK_ROOT` entry. **Not yet applied:**
+gate-sdk/SPEC.md §Layout and configuration, the `GATE_SDK_ROOT` entry. **Applied** (the crate derivations, `--emit kit-roots`, the front-end and harness exports, the run-gate-tests absolutization; the two derived rows reading `GATE_SDK_ROOT_HERE` and `GATE_KIT_ROOTS_REL` move with delta 6):
 
 > `GATE_SDK_ROOT` — the vendored gate-sdk root, a **locator** read from the environment, default
 > `gate-sdk` relative to the working directory. It is not a knob a file can set, for the reason
@@ -77,7 +77,10 @@ The crate gains the derivations the shell library held:
 `GATE_KIT_ROOTS_HERE` retires with no replacement name. It existed because a bridged value could not
 carry an absolute path, and an in-process value can. Every reader of it moves to `kit_roots_abs()`.
 Every reader of `GATE_SDK_ROOT_HERE` moves to `sdk_root()`, and `CONTEXT_KIT_HOOK_CMD`'s derived row
-declares `GATE_SDK_ROOT` in its place.
+declares `GATE_SDK_ROOT` in its place. Every declaration of `GATE_KIT_ROOTS_HERE` or
+`GATE_KIT_ROOTS_REL` declares `GATE_SDK_KIT_DIRS`, the one knob the roots are computed from, and
+`walk::kit_roots` keeps the working-directory spelling `--emit kit-roots` prints. An override's
+relative entry passes through all three spellings unchanged, as `gate_kit_roots_rel` passed it.
 
 **A spawning arm absolutizes the locators it hands a child in another working directory.**
 §run-gate-tests already absolutizes `GATE_SDK_NATIVE_BIN` and pins `GATE_SDK_TMP_DIR` at the invoker's
@@ -217,7 +220,7 @@ gate-sdk/SPEC.md §lib/gate.sh, a new bullet. **Not yet applied:**
 constant for the platform the binary was built for, which is the platform it runs on.
 `gate_exe_suffix` stays the shell owner of the target form, for `bin/build-native.sh` and
 `scripts/ci-build-artifact.sh`, and the accessor test above covers its host form through the default.
-**`GATE_SDK_NATIVE_ARTIFACT_NAMES` retires.** `--pack-installer` takes each roster target's artifact
+**`GATE_SDK_NATIVE_ARTIFACT_NAMES` retires (applied).** `--pack-installer` takes each roster target's artifact
 name by discovery instead: the target's artifact directory must hold exactly one regular file not named
 `*.sha256`, beside its sidecar, and zero or several is a refusal naming the directory. That is the
 bootstrap's own `select_artifact` rule (§lib/gate.sh, the `gate_exe_suffix` bullet), so the packer and

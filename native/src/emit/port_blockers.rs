@@ -12,8 +12,7 @@ use std::path::Path;
 // platform defaults and ignore every consumer override; the family is forced, not chosen.
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
-    "GATE_KIT_ROOTS_HERE",
-    "GATE_KIT_ROOTS_REL",
+    "GATE_SDK_KIT_DIRS",
     "GATE_PRUNE_DIRS",
     "GATE_SDK_PROGRAM_FLOOR",
     "GATE_SDK_TESTS_DIR",

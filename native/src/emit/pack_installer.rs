@@ -7,14 +7,13 @@ use crate::ere::Ere;
 use crate::proc::{self, Stderr};
 use crate::walk;
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the four declared names, each defined in
+// spec: gate-sdk/SPEC.md §The non-gate arm — the three declared names, each defined in
 // `gate-sdk/lib/gate.sh`. `INSTALLER_PACK_TMP_DIR` and its `TMPDIR` fallback are absent and must
 // be: no kit library defines either, so a declared row would fail-close the arm on every run
 pub const KNOBS: &[&str] = &[
-    "GATE_KIT_ROOTS_REL",
+    "GATE_SDK_KIT_DIRS",
     "GATE_SDK_NATIVE_TARGETS_FILE",
     "GATE_SDK_NATIVE_BIN",
-    "GATE_SDK_NATIVE_ARTIFACT_NAMES",
 ];
 
 // spec: installer/README.md §The packer — the diagnostic prefix the shell form printed, kept across
@@ -442,16 +441,16 @@ fn pack_artifacts(dir: &str, asm: &str) -> Result<usize, Refusal> {
         return Err(refuse(format!("artifact directory not found: {}", dir)));
     }
     let roster = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE").map_err(refuse)?;
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the per-target artifact NAME crosses the bridge as a
-    // value, so the executable suffix keeps one owner and this arm derives nothing
-    let names = walk::knob_map("GATE_SDK_NATIVE_ARTIFACT_NAMES").map_err(refuse)?;
-    if names.is_empty() {
-        if !std::path::Path::new(&roster).is_file() {
-            return Err(refuse(format!(
-                "no target roster at {} — there is no declared platform set to pack artifacts for.",
-                roster
-            )));
-        }
+    if !std::path::Path::new(&roster).is_file() {
+        return Err(refuse(format!(
+            "no target roster at {} — there is no declared platform set to pack artifacts for.",
+            roster
+        )));
+    }
+    let text = std::fs::read_to_string(&roster)
+        .map_err(|e| refuse(format!("cannot read the target roster at {}: {}", roster, e)))?;
+    let targets = crate::registry::members(&text);
+    if targets.is_empty() {
         return Err(refuse(format!(
             "the target roster at {} declares no targets.",
             roster
@@ -459,7 +458,7 @@ fn pack_artifacts(dir: &str, asm: &str) -> Result<usize, Refusal> {
     }
     mkdir(&format!("{}/payload/artifact", asm))?;
     let mut packed = 0usize;
-    for (target, binary) in &names {
+    for target in &targets {
         let src = format!("{}/{}", dir.trim_end_matches('/'), target);
         if !std::path::Path::new(&src).is_dir() {
             return Err(refuse_help(
@@ -467,6 +466,7 @@ fn pack_artifacts(dir: &str, asm: &str) -> Result<usize, Refusal> {
                 &["every declared target's build leg must have run; a roster target no leg built is a broken payload, not a narrower one."],
             ));
         }
+        let binary = artifact_name(&src)?;
         let bin = format!("{}/{}", src, binary);
         let side = format!("{}.sha256", bin);
         if !std::path::Path::new(&bin).is_file() || !std::path::Path::new(&side).is_file() {
@@ -491,6 +491,25 @@ fn pack_artifacts(dir: &str, asm: &str) -> Result<usize, Refusal> {
     // never regenerated or filtered
     copy(&roster, &format!("{}/payload/artifact/targets.list", asm))?;
     Ok(packed)
+}
+
+// spec: gate-sdk/SPEC.md §Consumer payload — a target's artifact name is discovered, the bootstrap's
+// own selection rule: exactly one regular file not named `*.sha256`, so no reader spells a suffix
+fn artifact_name(src: &str) -> Result<String, Refusal> {
+    let entries = walk::list_dir(std::path::Path::new(src)).map_err(refuse)?;
+    let names: Vec<String> = entries
+        .into_iter()
+        .filter(|(n, _)| !n.ends_with(".sha256") && std::path::Path::new(&format!("{}/{}", src, n)).is_file())
+        .map(|(n, _)| n)
+        .collect();
+    match names.as_slice() {
+        [one] => Ok(one.clone()),
+        _ => Err(refuse(format!(
+            "{} holds {} artifact(s) beside its sidecars, and a target's directory holds exactly one.",
+            src,
+            names.len()
+        ))),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §Consumer payload — the digest is emitted once by the build leg and only

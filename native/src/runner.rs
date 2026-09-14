@@ -143,8 +143,7 @@ land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
 // `--only` selection, else the whole registry), expanded in `emit::knobs`.
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
-    "GATE_KIT_ROOTS_HERE",
-    "GATE_KIT_ROOTS_REL",
+    "GATE_SDK_KIT_DIRS",
     "GATE_SDK_TMP_DIR",
     crate::emit::EVERY_REGISTERED_KNOB,
 ];

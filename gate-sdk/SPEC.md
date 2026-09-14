@@ -150,10 +150,8 @@ member without maintaining a copy of the kit default that drifts; *removing* a
 default member is still the replacing knob's job, because an append cannot
 subtract — see §lib/gate.sh), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
-siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT` (default: the
-vendored `gate-sdk/` resolved beside the sourcing script — the root a
-consumer-copied gate sources `lib/gate.sh` from and the anchor kit roots
-relativize against), `GATE_SDK_ROOT_ALLOWLIST` (default
+siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT` (see the
+locator paragraph below), `GATE_SDK_ROOT_ALLOWLIST` (default
 `<gates-dir>/root-allowlist.list`), `GATE_SDK_REGISTRY_DOC` (default `README.md`)
 and `GATE_SDK_RUNNER_DOC` (default `README.md`) for `check-kit-registration`
 — both resolved in `lib/gate.sh` rather than inline in the check, so the config
@@ -240,15 +238,7 @@ set (§Consumer payload). And `GATE_SDK_NATIVE_TARGETS_FILE` (default **derived*
 from `GATE_SDK_NATIVE_CRATE` as `<crate>/targets.list`, exactly as
 `GATE_SDK_NATIVE_SRC`'s default is, so the crate's location keeps one owner; the
 target roster §Consumer payload rules the platform-support surface, read through
-`gate_native_targets` — see §lib/gate.sh). And `GATE_SDK_NATIVE_ARTIFACT_NAMES`
-(array, default **derived** from that roster and `gate_exe_suffix`: one
-`<target>=<artifact-name>` element per roster line, resolved once in `lib/gate.sh`
-after the roster knob does, so a caller steering the roster is served a value
-derived from the steered one. It is a **carried value and not a rule** — the
-executable suffix keeps `gate_exe_suffix` as its single owner and a compiled
-reader derives nothing, which is what keeps a second holder of that one-line
-predicate from existing at all. Read across the bridge, never in shell; a
-consumer pinning it explicitly keeps its exact value — see §lib/gate.sh). And
+`gate_native_targets` — see §lib/gate.sh). And
 `GATE_SDK_NATIVE_RUNNERS_FILE`
 (default **derived** from `GATE_SDK_NATIVE_CRATE` as `<crate>/runners.list`, the
 same derivation and for the same reason; one `<target> <runner>` pair per live
@@ -288,6 +278,34 @@ repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them. That sentence states **shape and mechanism and never
 dialect** — which spelling a root arrives in, and who owes the conversion, is
 §The path-dialect contract below.
+
+`GATE_SDK_ROOT` — the vendored gate-sdk root, a **locator** read from the environment,
+default `gate-sdk` relative to the working directory. It is not a knob a file can set,
+for the reason `GATE_SDK_GATES_DIR` is not: the binary needs it to find the kits whose
+knob files it reads. `bin/run-gates.sh` exports it on every exec, from its own location,
+spelled relative to the repo root when the root lies under it and absolute otherwise, so
+every front-end call carries the exact root. A call reaching the binary without the
+front-end, a generated git hook or a harness spawning the binary directly, takes the
+default, which is where `init` vendors gate-sdk. A consumer vendoring it anywhere else
+exports the locator for those calls, as it already exports `GATE_SDK_GATES_DIR` for a
+relocated gates directory. **The crate derives the kit roots from it**: the gate-sdk
+root, then every sibling under the root's parent holding a `checks/` or a `smoke/`
+directory, in name order, with `GATE_SDK_KIT_DIRS` replacing the set when it is
+non-empty. `walk::kit_roots_abs` spells them absolute, `walk::kit_roots_rel` relative to
+the root's parent, the anchor the couples globs share, and `walk::kit_roots` relative to
+the working directory, the spelling `--emit kit-roots` prints (§The non-gate arm). The
+three are computed from one list, so they stay index-aligned by construction, and an
+override's relative entry passes through each unchanged. A consumer-copied gate
+(`templates/check-skeleton.sh`) sources `lib/gate.sh` from the same locator. **A
+spawning arm absolutizes the locators it hands a child in another working directory**:
+§run-gate-tests exports the absolutized root into every case it runs,
+§lib/test-hermetic.sh exports it absolute from its own anchor, and a scratch consumer's
+installer, violation, battery and regeneration scripts receive that consumer's own root
+(§Consumer smoke, §upgrade-smoke), since
+a script of another tree reading the invoker's relative locator after changing directory
+would source the wrong library. The binary's own path
+is no anchor for it, because `init` places the binary in the gates directory and
+nothing relates that path to the kits.
 
 **That `cd` refuses outside a repository, and the refusal is why a bridged arm may
 have a second caller.** `bin/run-gates.sh` exits 2 with `not inside a git
@@ -689,13 +707,12 @@ works. An MSYS bash process wants the opposite — its own `getcwd(3)` answers
 root spelled `C:/repo` compares unequal to a path spelled `/c/repo` while naming
 one directory. No single spelling is available to declare.
 
-**The split leaks nothing, because roots cross the shell/crate boundary
-relative, never absolute.** `walk::kit_roots_abs` re-absolutises each bridged root
-against the crate's own cwd — which is §lib/gate.sh's `GATE_KIT_ROOTS_HERE` rule,
-each root spelled relative to the invoking directory, read here as a dialect
-guarantee rather than only as the public-file constraint it was written for. No
-value arrives in a substrate whose dialect it was not spelled
-in, so the per-substrate declaration costs nothing at the seam.
+**The split leaks nothing, because no root crosses the shell/crate boundary
+absolute.** The crate derives the kit roots itself, from the `GATE_SDK_ROOT`
+locator and the working directory it reads through `walk::cwd` (§Layout and
+configuration), and `--emit kit-roots` hands a shell caller each root spelled
+relative to that directory. No value arrives in a substrate whose dialect it was
+not spelled in, so the per-substrate declaration costs nothing at the seam.
 
 **The boundary, and who crosses it.** The dialect boundary is crossed exactly
 where a value enters from a **platform-native producer**: `git rev-parse
@@ -3253,8 +3270,7 @@ that does nothing, which is the state this section calls worse than no flag.
 
 **An arm receives no configuration, and a member needing some is reached
 through a caller.** The config bridge is built by `gate_command` (§lib/gate.sh)
-for a `.gate`-declared member alone, and `kit_roots` is transported rather than
-re-derived by standing crate invariant, so a bare invocation of an arm resolves
+for a `.gate`-declared member alone, so a bare invocation of an arm resolves
 only what the arm can compute for itself. This does not make the class unusable
 for a member with inputs: the arm stays the only entry point into the crate, and
 a front-end that already sources the shell library — the battery runner among
@@ -3363,8 +3379,13 @@ is a second arm rather than an argument form of `--emit knob-roster`, since one 
 answering *defaults* bare and *resolved values* with arguments gives two meanings to
 one spelling.
 
+**`--emit kit-roots` prints the kit roots**, one per line, spelled relative to the
+working directory: the crate's derivation from the `GATE_SDK_ROOT` locator and the
+`GATE_SDK_KIT_DIRS` override (§Layout and configuration), for a shell caller that
+needs the set. Its declared roster is that override.
+
 **`--run-demo` carries the same refusal inside a roster that is not empty, which
-is the third shape.** Its declared pair is `GATE_KIT_ROOTS_HERE` and
+is the third shape.** Its declared pair is `GATE_SDK_KIT_DIRS` and
 `GATE_SDK_NATIVE_BIN`; the scratch base it also reads, `DEMO_TMP_DIR` with its
 `TMPDIR` fallback, is **absent from that roster and must be** — neither name
 carries a kit prefix the bridge can partition by, and neither is defined in a kit
@@ -3380,7 +3401,7 @@ declared set by each knob's own `<KIT>_` prefix and resolves each slice inside t
 kit's sourced subshell (§lib/gate.sh), so a member declaring across kits is
 resolved a slice at a time — `--emit-enforcement-map` already declares knobs owned
 across the kit roster. `--emit-enum-sets` is the smallest worked instance:
-`GATE_KIT_ROOTS_REL`,
+`GATE_SDK_KIT_DIRS`,
 the roster `--emit-close-surfaces` already declares for the same purpose, beside
 `QUEUE_KIT_LESSON_TAGS`, a row of queue-kit's static table and therefore
 declarable. **That roster also carries a constraint no gate enforces**:
@@ -8263,7 +8284,10 @@ target triple per live line in the file `GATE_SDK_NATIVE_TARGETS_FILE` names
 (§Layout and configuration), with one owner and three readers: the publish
 workflow's roster job derives its build matrix from it, the `--pack-installer` arm
 packs one artifact directory per line and copies the roster verbatim into the
-payload as its one publication, and the installer reads that payload copy to
+payload as its one publication, taking each target's artifact name by discovery
+— the directory must hold exactly one regular file not named `*.sha256`, beside
+its sidecar, and zero or several is a refusal naming the directory, the
+bootstrap's own `select_artifact` rule — and the installer reads that payload copy to
 select the host's artifact. A hand-maintained platform list inside the workflow
 would be the maintained roster derivation-first refuses, and would leave the
 build's idea of the supported set and the installer's idea in two files to drift
@@ -8725,7 +8749,7 @@ configuration owns its value), and its entire product is the status. An
 emitting arm would fold a broken walkthrough into the dispatch-failure band and the
 suite would report a real finding as an environment error. Its **table membership**
 is forced on the same test as `--agents-md-smoke`'s: it resolves
-`GATE_KIT_ROOTS_HERE` (which kits to vendor) and `GATE_SDK_NATIVE_BIN` (the
+`GATE_SDK_KIT_DIRS` (which kits to vendor) and `GATE_SDK_NATIVE_BIN` (the
 placement, and the scratch `.gitignore` line that spares it), and a hardcoded
 top-level flag would receive neither. No front-end edit is owed and none is legal —
 `bin/run-gates.sh` passes a leading `-*` token straight through to the crate's own
@@ -9184,7 +9208,7 @@ reader needs outlive the refactor that renames a helper:
   divergent identities; it ships no repo name — the provenance seam holds.
 - `registry::fixture_suites()` is the single fixture-suite derivation: one
   `(suite, tests-dir, checks-dir)` triple per directory carrying a `gate-tests/`
-  tree, the kit roots in `GATE_KIT_ROOTS_REL` order then the gates directory,
+  tree, the kit roots in `walk::kit_roots_rel` order then the gates directory,
   the suite named by the directory's basename with `-` turned to `_` and the
   checks directory the sibling `checks/` when one exists, else empty. A
   directory is tested at the path its row prints, which is the operand
@@ -9251,24 +9275,18 @@ reader needs outlive the refactor that renames a helper:
   `MINGW*`, `MSYS*`, `CYGWIN*` and `Windows_NT`. Three readers take it and each
   picks its form from what it is naming: `GATE_SDK_NATIVE_BIN`'s default (§Layout
   and configuration) takes the **host** form, because the knob names a binary on
-  the machine resolving it; `bin/build-native.sh`'s `BN_ART` and this library's
-  own `GATE_SDK_NATIVE_ARTIFACT_NAMES` derivation take the **target**
-  form, because both name an artifact built *for* a triple that need not be the
-  host's (§build-native, §Consumer payload). **The second of those two is how the
-  binary-side reader gets an artifact name without becoming a second owner of the
-  suffix**: the payload assembler needs a per-roster-line name, it runs compiled,
-  and the value crosses the bridge already resolved — so the `*-windows-*`
-  predicate is computed here and nowhere else, which is a stronger discharge than
-  a machine-held cross-substrate comparator (a parity arm whose second holder
-  could never empty). The other caller of the target form,
-  `bin/build-native.sh`, cannot take that road at all: its body *is* the binary's
-  build, so an arm for it would predate itself, and the shell holder is therefore
-  permanent by construction rather than by preference. The bootstrap's
-  `select_artifact` deliberately takes **neither**: it discovers the artifact name
-  with `find … -maxdepth 1 -type f ! -name '*.sha256'` and asserts exactly one, so
-  it is already name-agnostic and a `.exe` satisfies it unchanged — named here
-  because the instinct is to add a fourth reader, and adding one would replace a
-  working derivation with a spelling. The crate is **not** a kit and holds the
+  the machine resolving it; `bin/build-native.sh`'s `BN_ART` and
+  `scripts/ci-build-artifact.sh` take the **target** form, because each names an
+  artifact built *for* a triple that need not be the host's (§build-native,
+  §Consumer payload). `bin/build-native.sh`'s body *is* the binary's build, so an
+  arm for it would predate itself, and the shell holder is therefore permanent by
+  construction rather than by preference. The bootstrap's `select_artifact` and the
+  payload assembler, `--pack-installer`, deliberately take **neither**: each
+  discovers the artifact name as the one regular file not named `*.sha256` in the
+  target's artifact directory, and refuses zero or several, so both are
+  name-agnostic and a `.exe` satisfies them unchanged — named here because the
+  instinct is to add a reader, and adding one would replace a working derivation
+  with a spelling. The crate is **not** a kit and holds the
   *other* suffix question — what an already-installed program may be named, from
   `PATHEXT` — under its own single owner (§Fail-closed contract); nothing there
   names a built artifact, and nothing here reads `PATHEXT`.
@@ -9454,8 +9472,9 @@ Resolution, per declared knob:
   `GATE_SDK_PRUNE_EXTRA_DIRS` are the pair to watch, because prose in this document
   names them together as the source of the prune set: that sentence describes the
   **conceptual** pair, and the bridgeable spelling is the resolved
-  `GATE_PRUNE_DIRS` alone. The same shape covers the kit-root override, whose
-  bridgeable spellings are `GATE_KIT_ROOTS_HERE` and `GATE_KIT_ROOTS_REL`. The trap
+  `GATE_PRUNE_DIRS` alone. The kit-root override is not of that shape: it resolves
+  onto its own name, and the crate derives the roots from it and the
+  `GATE_SDK_ROOT` locator (§Layout and configuration). The trap
   runs the other way too and is worth stating with it: a knob spelled as an inline
   default at its use site can still be perfectly declarable, because the guarded
   top-level assignment exists elsewhere in this library. **Neither direction is
@@ -9533,14 +9552,9 @@ Resolution, per declared knob:
 - **A bridged value may not carry an absolute path.** The resolved argv is baked
   **verbatim** into the generated pre-commit hook, which is tracked, so an
   absolute value commits one machine's checkout path to a public file. That is a
-  constraint on what a knob may hold, not on the bridge: `gate_kit_roots`
-  therefore crosses as `GATE_KIT_ROOTS_HERE`, each root spelled relative to the
-  invoking directory, which the binary re-absolutises against its own cwd to
-  recover exactly the path the shell compares. `GATE_KIT_ROOTS_REL` is the other
-  spelling — anchored at the kits' parent, which is what a repo-relative
-  pathspec or a knob-prefix owner needs — and the two are separate knobs because
-  the anchor relating them is not recoverable from either alone once an override
-  is in play.
+  constraint on what a knob may hold, not on the bridge: `GATE_KIT_ROOTS_REL`, the
+  kit roots anchored at the kits' parent for the static derived defaults that still
+  read it, crosses relative for that reason.
 - **`GATE_SDK_RESOLVING_KNOB` is the *set* of names under resolution**, one per
   line, exported into the subshell before the kit's libraries are sourced, and a
   reader tests **membership** rather than equality. Its one sanctioned reader is
@@ -9771,31 +9785,15 @@ stays **relative**: the resolved argv is baked verbatim into the tracked
 pre-commit hook, and an absolute value would commit one machine's checkout path
 to a public file.
 
-**`GATE_SDK_NATIVE_ARTIFACT_NAMES` is the per-roster-line artifact *name* as a
-bridgeable value**, and it belongs beside the two roots below because it is the
-same move for a different quantity: a value a consumer can override is not
-derivable on the binary side, so it is resolved once here and carried. One
-`<target>=<artifact-name>` element per live roster line, computed from
-`gate_native_targets` and `gate_exe_suffix` **after** `GATE_SDK_NATIVE_TARGETS_FILE`
-resolves in this same file — so a caller that steers the roster knob in a bridged
-arm's environment is served a value derived from the steered roster rather than
-the default one. Its reader is the payload assembler, `--pack-installer` (§The
-non-gate arm), which reads both fields at one transition: the target selects the
-artifact directory and the name selects the binary and its sidecar inside it. No
-third field is added — the sidecar's name is the artifact's with a fixed suffix
-and needs no carrier. It costs one small file read per sourcing of this library,
-the same class of source-time cost `GATE_KIT_ROOTS_HERE`'s own resolution
-already carries.
-
 **`GATE_SDK_ROOT_HERE` is the kit's own root as a bridgeable value**, spelled
-relative to the current directory by `GATE_KIT_ROOTS_HERE`'s rule and for its
-reason. It exists because a compiled member that must reach a file inside its own
-kit has **no `BASH_SOURCE`** to find it by — the one thing a shell gate knew about
-itself for free is the one thing a port must be handed. `check-graph`'s assertion
-D is the worked instance: it spawns `bin/gen-pre-commit.sh`, which stays shell
-(§gen-pre-commit). The kit-root set is not a substitute, because
-`GATE_SDK_KIT_DIRS` may narrow it to a consumer's own tree — which is exactly the
-configuration a sandboxed fixture runs under.
+relative to the current directory, for the static derived defaults that read it
+until gate-sdk's cut. A compiled member that must reach a file inside its own kit
+has **no `BASH_SOURCE`** to find it by, and reads the `GATE_SDK_ROOT` locator
+instead (§Layout and configuration): `check-graph`'s assertion D is the worked
+instance, spawning `bin/gen-pre-commit.sh`, which stays shell (§gen-pre-commit).
+The kit-root set is not a substitute, because `GATE_SDK_KIT_DIRS` may narrow it to
+a consumer's own tree — which is exactly the configuration a sandboxed fixture runs
+under.
 
 **A consumer config *file* whose content is rule data is sourced here, not in the
 member.** `GATE_SDK_GRAPH_VOCAB` (default `<gates-dir>/graph-vocab.sh`) is read at
@@ -10347,6 +10345,13 @@ The consequence for a caller: a test run against a binary it pins itself (a
 scratch-built pre-fix crate, for a red-before-green probe) passes the path
 absolute, since a set value is never joined; and that scratch crate builds only
 inside a git checkout that tracks its sources (§upgrade-smoke, on `native/build.rs`).
+
+**The gate-sdk root locator is exported absolute, unconditionally, from the same
+anchor.** A suite drives its subject from a sandbox cwd, where the locator's default,
+`gate-sdk` relative to the working directory, names nothing, and the crate derives
+every kit root from it (§Layout and configuration). A suite steering the roots for one
+case sets `GATE_SDK_ROOT` or `GATE_SDK_KIT_DIRS` through `gate_env` after this library
+has run.
 
 **Its port disposition is a declaration, and the ground is stated here because no
 existing class reaches it.** It rides the bridge's `lib/*.sh` glob and resolves no
@@ -10987,11 +10992,13 @@ caller reads and which an `Arm::Emit` collapses to 0-or-2: such a member could
 carry the report but not the verdict, and the verdict is what the evidence-kit
 suite and the per-kit roster line consume. It is a table member and not a
 hardcoded top-level flag because it is **configured**: `GATE_SDK_TESTS_DIR`,
-`GATE_SDK_TMP_DIR`, `GATE_SDK_NATIVE_BIN` and `GATE_KIT_ROOTS_HERE` all reach it
+`GATE_SDK_TMP_DIR` and `GATE_SDK_NATIVE_BIN` all reach it
 through `lib/gate.sh`, and §The non-gate arm rules that a configured tool ported
 as a top-level flag resolves platform defaults and silently ignores every
-consumer override. The kit-roots knob is the **transport**: a compiled arm has no
-`BASH_SOURCE` anchor to find gate-sdk's own shell library from. The front-end
+consumer override. The `GATE_SDK_ROOT` locator is how it finds gate-sdk's own shell
+library, since a compiled arm has no `BASH_SOURCE` anchor: the arm absolutizes it
+against the invoker's root, as it does the binary, and exports it into every case
+and every unit test it spawns, because each runs in another working directory. The front-end
 needs no edit for any of this — `bin/run-gates.sh` hands every leading `--<token>`
 that is not one of the five forms it names straight to `exec_arm`, and
 `ARM_UNAVAILABLE_STATUS` stays 2 for this arm by falling outside that file's
@@ -11467,14 +11474,12 @@ output reach *its* stdout, which this section's own contract already reserved fo
 the one clean line; the stdout protocol forces that output to stderr, so the
 stated contract and the behaviour agree for the first time.
 
-**The arm resolves gate-sdk's own library through the transported kit roots, and
-that is why `GATE_KIT_ROOTS_HERE` is on the roster below.** The deleted driver
-anchored on its own `BASH_SOURCE`; a compiled arm has no such anchor, and
-§lib/gate.sh already rules that the kit roots are *transported rather than
-re-derived* precisely because "a binary the installer copies elsewhere cannot
-recover it". The arm takes the root whose basename is `gate-sdk` — a name this
-member already spells, since its vendorable-kit derivation names that kit
-explicitly to order it first.
+**The arm resolves gate-sdk's own library through the kit roots, and that is why
+`GATE_SDK_KIT_DIRS` is on the roster below.** The deleted driver anchored on its
+own `BASH_SOURCE`; a compiled arm has no such anchor, so it reads the roots the
+crate derives from the `GATE_SDK_ROOT` locator (§Layout and configuration). The arm
+takes the root whose basename is `gate-sdk` — a name this member already spells,
+since its vendorable-kit derivation names that kit explicitly to order it first.
 
 **The declaration resolve moved in-crate.** The arm reads TO's Tightened-gates
 declaration through `native/src/declaration.rs`, which was then the compiled half
@@ -11674,9 +11679,9 @@ each read exactly once at the resolve step:
 - `GATE_SDK_UPGRADE_TO` — the TO ref (default: `HEAD`).
 - Scratch base is the existing `GATE_SDK_TMP_DIR` knob; the extracted trees, the
   per-ref worktrees and the consumer are created under it and trap-removed.
-- The declaration path derives from `GATE_SDK_WORKFLOW_DIR`, and
-  `GATE_KIT_ROOTS_HERE` is how the arm finds the kit library it drives — both
-  declared, both resolved at the same step.
+- The declaration path derives from `GATE_SDK_WORKFLOW_DIR`, and the kit roots,
+  under the `GATE_SDK_KIT_DIRS` override, are how the arm finds the kit library it
+  drives — both declared, both resolved at the same step.
 
 **All three `GATE_SDK_UPGRADE_*` defaults live in `lib/gate.sh`, and that is
 load-bearing rather than tidy.** They were defaulted inside the deleted driver and
@@ -15448,8 +15453,8 @@ default that could still compose a bare refusal is the defect this paragraph
 records, not an acceptable coercion.
 
 **How that arm is exercised at all, since no fixture input reaches it.** The
-generator is resolved as `<GATE_SDK_ROOT_HERE>/bin/gen-pre-commit.sh`, so the
-failure path is observable end-to-end only by pointing that bridged knob at a
+generator is resolved as `<GATE_SDK_ROOT>/bin/gen-pre-commit.sh`, so the
+failure path is observable end-to-end only by pointing that locator at a
 scratch kit root whose `bin/gen-pre-commit.sh` exits non-zero. A `good/`+`bad/`
 pair cannot reach it: the fixture varies the gate's *input*, and no input makes
 a healthy child crash.

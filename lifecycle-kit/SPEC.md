@@ -2281,7 +2281,7 @@ gate gains a knob. The three names beside it are there because **the config
 bridge carries only what an arm declares** — a child receives a filtered view of
 its parent's bridged environment, never a freshly resolved one, so a knob this
 arm hands onward must be on this arm's own roster. `GATE_PRUNE_DIRS` is
-`check-stage-entry`'s, `GATE_KIT_ROOTS_HERE` locates the `checks/` directories the
+`check-stage-entry`'s, `GATE_SDK_KIT_DIRS` steers the kit roots whose `checks/` directories the
 two pre-flight members resolve in, and `GATE_SDK_TMP_DIR` is the scratch dir that
 is the temp state file's home, the boundary wipe's subject and the resume
 journal's parent.

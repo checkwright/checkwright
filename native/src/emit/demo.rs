@@ -11,7 +11,7 @@ use crate::walk;
 // spec: gate-sdk/SPEC.md §Consumer smoke — the roster is the *consumer's*: which kits the
 // walkthrough vendors, and the binary the scratch consumer receives. `DEMO_TMP_DIR` is read below
 // and may not join this roster (§The non-gate arm).
-pub const KNOBS: &[&str] = &["GATE_KIT_ROOTS_HERE", "GATE_SDK_NATIVE_BIN"];
+pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_BIN"];
 
 const NAME: &str = "run-demo";
 const VERDICT: &str = "DEMO";
@@ -182,7 +182,7 @@ fn kit_roots() -> Result<Vec<String>, Outcome> {
     let roots = walk::kit_roots_abs().map_err(refuse)?;
     if roots.is_empty() {
         return Err(Outcome::Refuse(format!(
-            "{}: GATE_KIT_ROOTS_HERE names no kit root, so there is nothing to vendor",
+            "{}: the kit roots name no kit root, so there is nothing to vendor",
             NAME
         )));
     }
@@ -196,7 +196,7 @@ fn gate_sdk_root(roots: &[String]) -> Result<String, Outcome> {
         .cloned()
         .ok_or_else(|| {
             Outcome::Refuse(format!(
-                "{}: GATE_KIT_ROOTS_HERE names no gate-sdk root, so neither the consumer-smoke \
+                "{}: the kit roots name no gate-sdk root, so neither the consumer-smoke \
                  library nor the craftable violation this walkthrough fires can be found",
                 NAME
             ))
@@ -319,7 +319,7 @@ fn place_binary(sdk: &str, consumer: &str, host: &str, roots: &[String]) -> Resu
 // consumer and `SMOKE_KIT_ROOT` = the vendored copy, and its own narration is part of what the
 // walkthrough shows, so it is inherited rather than captured. A non-zero exit is environment-class.
 fn install(consumer: &str, kit: &str) -> Result<(), Outcome> {
-    let script = r#"cd "$1" || exit 2; export SMOKE_KIT_ROOT="$1/$2"; exec bash "$1/$2/smoke/install.sh""#;
+    let script = r#"cd "$1" || exit 2; export GATE_SDK_ROOT="$1/gate-sdk" SMOKE_KIT_ROOT="$1/$2"; exec bash "$1/$2/smoke/install.sh""#;
     let code = proc::run_to_env(
         "bash",
         &["-c", script, "bash", consumer, kit],
@@ -374,7 +374,7 @@ fn ends_with_newline(out: &str) -> String {
 // red-phase assertion reads; its own chatter stays on the terminal as the shell form's did.
 fn fire_violation(consumer: &str, sdk_kit: &str) -> Result<String, Outcome> {
     let script =
-        r#"cd "$1" || exit 2; export SMOKE_KIT_ROOT="$1/$2"; exec bash "$1/$2/smoke/violation.sh""#;
+        r#"cd "$1" || exit 2; export GATE_SDK_ROOT="$1/gate-sdk" SMOKE_KIT_ROOT="$1/$2"; exec bash "$1/$2/smoke/violation.sh""#;
     let done = csmoke::spawn(script, &[consumer, sdk_kit], Stderr::Inherit).map_err(refuse)?;
     Ok(String::from_utf8_lossy(done.stdout())
         .lines()

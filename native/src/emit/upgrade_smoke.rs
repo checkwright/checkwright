@@ -17,7 +17,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_UPGRADE_TO",
     "GATE_SDK_TMP_DIR",
     "GATE_SDK_WORKFLOW_DIR",
-    "GATE_KIT_ROOTS_HERE",
+    "GATE_SDK_KIT_DIRS",
 ];
 
 const NAME: &str = "upgrade-smoke";
@@ -321,7 +321,7 @@ fn sdk_root() -> Result<String, Fail> {
         .find(|r| basename(r) == "gate-sdk")
         .ok_or_else(|| {
             broken(one(format!(
-                "{}: GATE_KIT_ROOTS_HERE names no gate-sdk root, so the consumer-smoke library this suite drives cannot be found",
+                "{}: the kit roots name no gate-sdk root, so the consumer-smoke library this suite drives cannot be found",
                 NAME
             )))
         })
@@ -604,7 +604,7 @@ fn run_battery(consumer: &str) -> Result<(i32, String), Fail> {
         "bash",
         &[
             "-c",
-            r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh"#,
+            r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh"#,
             "bash",
             consumer,
         ],
@@ -704,7 +704,7 @@ fn stage_all(consumer: &str) -> Result<(), Fail> {
 // process's, because the host's value is a different tree's.
 fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     let hook = bash(
-        r#"cd "$1" && exec bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null"#,
+        r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null"#,
         &[consumer],
         Stderr::Inherit,
     )?;
@@ -716,7 +716,7 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     }
 
     let resolved = bash(
-        r#"cd "$1" && source gate-sdk/lib/gate.sh && printf '%s' "$GATE_SDK_GRAPH_ARTIFACT""#,
+        r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && source gate-sdk/lib/gate.sh && printf '%s' "$GATE_SDK_GRAPH_ARTIFACT""#,
         &[consumer],
         Stderr::Inherit,
     )?;
@@ -735,7 +735,7 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     }
 
     let emitted = bash(
-        r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --emit graph > "$2""#,
+        r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --emit graph > "$2""#,
         &[consumer, &artifact],
         Stderr::Inherit,
     )?;
@@ -751,7 +751,7 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     // quietly false and drop this step out of phase A altogether.
     if Path::new(&format!("{}/doctrine-kit/DOCTRINE.md", consumer)).is_file() {
         let doctrine = bash(
-            r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --install-doctrine >/dev/null"#,
+            r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --install-doctrine >/dev/null"#,
             &[consumer],
             Stderr::Inherit,
         )?;

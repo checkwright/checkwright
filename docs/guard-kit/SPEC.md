@@ -2735,7 +2735,7 @@ that needs configuration at all*). The front-end needs no edit —
 shares with `--emit-scan-prompts` and which is a refusal with a message at
 exit 2, not a defect.
 
-**The declared roster is `GATE_KIT_ROOTS_HERE` and nothing else, and the two
+**The declared roster is `GATE_SDK_KIT_DIRS` and nothing else, and the two
 omissions are design content rather than an oversight.** `GUARD_KIT_LOG` is not
 declared because the arm **overrides** it: the paragraph below rules that any
 ad-hoc invocation must point it at a scratch path, and declaring the knob would

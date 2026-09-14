@@ -14,7 +14,7 @@ use std::path::Path;
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_HOOKS_DIR",
     "GATE_SDK_GATES_DIR",
-    "GATE_KIT_ROOTS_HERE",
+    "GATE_SDK_KIT_DIRS",
     "GATE_SDK_IDENTITY_FILE",
     "GATE_SDK_GIT_EMAIL_FILE",
     "GATE_SDK_GIT_REMOTES_FILE",

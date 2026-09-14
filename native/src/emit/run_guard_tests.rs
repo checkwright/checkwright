@@ -10,7 +10,7 @@ use std::path::Path;
 // spec: guard-kit/SPEC.md §Testing — one declared knob; the two omissions are ruled there,
 // `GUARD_KIT_LOG` because the arm overrides it and the guard's own knobs because the spawned
 // child's `lib/guard.sh` reads them from the binary.
-pub const KNOBS: &[&str] = &["GATE_KIT_ROOTS_HERE"];
+pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS"];
 
 const NAME: &str = "run-guard-tests";
 
@@ -107,7 +107,7 @@ fn kit_root() -> Result<String, String> {
         .find(|r| r.rsplit('/').next() == Some("guard-kit"))
         .ok_or_else(|| {
             format!(
-                "{}: GATE_KIT_ROOTS_HERE names no guard-kit root, so the guard this table drives \
+                "{}: the kit roots name no guard-kit root, so the guard this table drives \
                  and the tables themselves cannot be found",
                 NAME
             )

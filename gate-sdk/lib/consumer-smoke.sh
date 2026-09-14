@@ -57,7 +57,7 @@ csmoke_vendor_and_install() {   # $1 = the checkout whose native/ was built, $2.
     CSMOKE_INSTALLED=0
     for r in "${roots[@]}"; do
         kit="$(basename "$r")"
-        if ! ( cd "$SCRATCH" && SMOKE_KIT_ROOT="$SCRATCH/$kit" bash "$SCRATCH/$kit/smoke/install.sh" ); then
+        if ! ( cd "$SCRATCH" && GATE_SDK_ROOT="$SCRATCH/gate-sdk" SMOKE_KIT_ROOT="$SCRATCH/$kit" bash "$SCRATCH/$kit/smoke/install.sh" ); then
             echo "csmoke: $kit/smoke/install.sh failed (a broken installer is an environment failure)" >&2
             return 2
         fi

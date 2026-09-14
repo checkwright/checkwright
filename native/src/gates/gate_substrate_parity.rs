@@ -431,7 +431,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Some(a) => a.clone(),
         None => format!(
             "{}/SPEC.md",
-            walk::knob_scalar("GATE_SDK_ROOT_HERE")?.trim_end_matches('/')
+            walk::sdk_root().trim_end_matches('/')
         ),
     };
     let list = registry::list_path(&gates_dir);

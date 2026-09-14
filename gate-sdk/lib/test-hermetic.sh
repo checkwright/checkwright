@@ -14,6 +14,8 @@ for _th_kit in "$_th_root"/gate-sdk "$_th_root"/*-kit; do
     [[ "$_th_var" == GATE_SDK ]] || export "${_th_var}_KNOB_FILE=${_th_empty_knobs}"
 done
 GATE_SDK_TEST_LIB_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the gate-sdk root locator, absolute from this library's own anchor, because a suite drives its subject from a sandbox cwd the default cannot reach
+export GATE_SDK_ROOT="${GATE_SDK_TEST_LIB_DIR%/lib}"
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the accessor's answer absolutized against this
 # library's own anchor, never a second default; the already-set guard is the bridge's, and that
 # section owns why the block must stay a no-op once lib/gate.sh has run.

@@ -222,18 +222,107 @@ pub fn knob_in_family(family: &[(String, String)], name: &str) -> Option<String>
         .map(|(_, v)| v.clone())
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the binary side of `gate_kit_roots`: transported,
-// never re-derived, because the fallback predicate is anchored at the shell library's own
-// location and a binary the installer copies elsewhere cannot recover it
-pub fn kit_roots() -> Result<Vec<String>, String> {
-    knob_array("GATE_KIT_ROOTS_HERE")
+// spec: gate-sdk/SPEC.md §Layout and configuration — the gate-sdk root locator: the environment,
+// else the conventional vendoring place relative to the working directory
+pub const SDK_ROOT_DEFAULT: &str = "gate-sdk";
+
+pub fn sdk_root() -> String {
+    std::env::var("GATE_SDK_ROOT")
+        .ok()
+        .filter(|v| !v.is_empty())
+        .unwrap_or_else(|| SDK_ROOT_DEFAULT.to_string())
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_kit_roots_rel`'s value, bridged rather than
-// derived from `kit_roots` above: the anchor relating the two spellings is not recoverable
-// from the absolute set once GATE_SDK_KIT_DIRS overrides it.
+// spec: gate-sdk/SPEC.md §lib/gate.sh — one kit root as its override spelled it, or absolute where
+// the derivation produced it; the three spellings below are all computed from this one list
+enum Root {
+    Given(String),
+    Derived(String),
+}
+
+fn roots() -> Result<(String, Vec<Root>), String> {
+    let here = cwd()?;
+    let sdk = abs_against(&here, sdk_root().trim_end_matches('/'));
+    let dirs: Vec<String> = knob_scalar("GATE_SDK_KIT_DIRS")?
+        .split_whitespace()
+        .map(String::from)
+        .collect();
+    if !dirs.is_empty() {
+        return Ok((here, dirs.into_iter().map(Root::Given).collect()));
+    }
+    let mut out = vec![Root::Derived(sdk.clone())];
+    if let Some((parent, _)) = sdk.rsplit_once('/') {
+        let parent = if parent.is_empty() { "/" } else { parent };
+        for (name, _) in list_dir(Path::new(parent))? {
+            let kit = child(Path::new(parent), &name).display().to_string();
+            if name.starts_with('.') || kit == sdk || !Path::new(&kit).is_dir() {
+                continue;
+            }
+            if Path::new(&kit).join("checks").is_dir() || Path::new(&kit).join("smoke").is_dir() {
+                out.push(Root::Derived(kit));
+            }
+        }
+    }
+    Ok((here, out))
+}
+
+// spec: gate-sdk/SPEC.md §The path-dialect contract — a lexical relative path between two
+// absolute paths in one dialect; a differing root answers the target unchanged
+pub fn relative_to(base: &str, target: &str) -> String {
+    let (b, t) = (normalize_abs(base), normalize_abs(target));
+    if path_root(&b) != path_root(&t) {
+        return t;
+    }
+    let bs: Vec<&str> = b.split('/').filter(|c| !c.is_empty()).collect();
+    let ts: Vec<&str> = t.split('/').filter(|c| !c.is_empty()).collect();
+    let common = bs.iter().zip(&ts).take_while(|(x, y)| x == y).count();
+    let mut parts: Vec<&str> = vec![".."; bs.len() - common];
+    parts.extend(&ts[common..]);
+    if parts.is_empty() {
+        ".".to_string()
+    } else {
+        parts.join("/")
+    }
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — a root spelled against an anchor: the remainder where the
+// root lies under it, a relative path where it is elsewhere, and an override's relative entry as given
+fn spelled(anchor: &str, root: &Root) -> String {
+    match root {
+        Root::Given(r) if path_root(r).is_none() => r.clone(),
+        Root::Given(r) | Root::Derived(r) => {
+            let r = normalize_abs(r);
+            match r.strip_prefix(&format!("{}/", anchor.trim_end_matches('/'))) {
+                Some(rest) => rest.to_string(),
+                None => relative_to(anchor, &r),
+            }
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the kit roots spelled relative to the working directory,
+// the spelling `--emit kit-roots` prints and a reader naming a root to its user takes
+pub fn kit_roots() -> Result<Vec<String>, String> {
+    let (here, roots) = roots()?;
+    Ok(roots.iter().map(|r| spelled(&here, r)).collect())
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the same roots relative to the gate-sdk root's parent, the
+// anchor the couples globs share, computed beside the absolute spelling so the two stay index-aligned
 pub fn kit_roots_rel() -> Result<Vec<String>, String> {
-    knob_array("GATE_KIT_ROOTS_REL")
+    let (here, roots) = roots()?;
+    let sdk = abs_against(&here, sdk_root().trim_end_matches('/'));
+    let anchor = match sdk.rsplit_once('/') {
+        Some(("", _)) | None => "/".to_string(),
+        Some((p, _)) => p.to_string(),
+    };
+    Ok(roots.iter().map(|r| spelled(&anchor, r)).collect())
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — `--emit kit-roots`: one root per line, relative to the
+// working directory, for the shell callers that still need the set
+pub fn emit_kit_roots(_args: &[String]) -> Result<String, String> {
+    Ok(kit_roots()?.into_iter().map(|r| format!("{}\n", r)).collect())
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one scalar knob. A scalar is a
@@ -255,15 +344,14 @@ pub fn knob_wire(knob: &str) -> Result<String, String> {
     })
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — a bridged root crosses spelled relative to the invoking
-// directory, and re-absolutising it against the binary's own cwd is how the reader recovers
-// exactly the path the shell library computed
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the kit roots absolutized against the working directory
 pub fn kit_roots_abs() -> Result<Vec<String>, String> {
-    let here = cwd()?;
-    Ok(kit_roots()?
-        .into_iter()
-        .filter(|r| !r.is_empty())
-        .map(|r| abs_against(&here, r.trim_end_matches('/')))
+    let (here, roots) = roots()?;
+    Ok(roots
+        .iter()
+        .map(|r| match r {
+            Root::Given(p) | Root::Derived(p) => abs_against(&here, p.trim_end_matches('/')),
+        })
         .collect())
 }
 

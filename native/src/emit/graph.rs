@@ -138,7 +138,7 @@ impl Config {
             layers: walk::knob_array("GRAPH_LAYERS")?,
             layer_rules: walk::knob_array("GRAPH_LAYER_RULES")?,
             layer_default: walk::knob_scalar("GRAPH_LAYER_DEFAULT")?,
-            kit_roots_rel: walk::knob_array("GATE_KIT_ROOTS_REL")?,
+            kit_roots_rel: walk::kit_roots_rel()?,
             resolve_dirs,
         })
     }

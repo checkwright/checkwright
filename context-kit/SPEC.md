@@ -1621,7 +1621,7 @@ operand; a non-emitting `Arm::Run` is spelled directly, as `--upgrade-smoke`,
 `--run-validate` and `--scratch-run` already are. No front-end edit is owed
 either way.
 
-**Its declared roster is `GATE_KIT_ROOTS_HERE` and `GATE_SDK_NATIVE_BIN`, and it
+**Its declared roster is `GATE_SDK_KIT_DIRS` and `GATE_SDK_NATIVE_BIN`, and it
 declares no `CONTEXT_KIT_` knob at all** — which is the point rather than an
 omission. The first is what tells the arm which kits to vendor and the second
 what the binary placement needs; every knob in the six-knob set above is
@@ -1727,7 +1727,7 @@ on the machine that last ran `--update`.
 repairs a window rather than transcribing one: the shell form armed its single
 `trap … EXIT` *after* the shadow dir and config were created and used, so a
 failure in between leaked them. The arm removes one scratch root on every exit
-path. Its declared roster is `GATE_KIT_ROOTS_HERE` and no `CONTEXT_KIT_` knob at
+path. Its declared roster is `GATE_SDK_KIT_DIRS` and no `CONTEXT_KIT_` knob at
 all, for the same reason the smoke above declares none.
 
 ## Out of scope

@@ -6,7 +6,7 @@
 use crate::proc;
 use crate::walk;
 
-pub const KNOBS: &[&str] = &["GATE_KIT_ROOTS_REL", "QUEUE_KIT_LESSON_TAGS"];
+pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "QUEUE_KIT_LESSON_TAGS"];
 
 // spec: canon-kit/SPEC.md §check-prose-enum — the Lessons channel is queue-kit's own `[attend]`
 // (queue-kit/SPEC.md §The Lessons Learned channel) plus the consumer's configured harvest tags;

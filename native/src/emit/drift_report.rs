@@ -13,7 +13,7 @@ use std::path::Path;
 pub const KNOBS: &[&str] = &[
     "DRIFT_KIT_*",
     "GATE_SDK_GATES_DIR",
-    "GATE_KIT_ROOTS_HERE",
+    "GATE_SDK_KIT_DIRS",
     "GUARD_KIT_LOG",
     "GUARD_KIT_SETTINGS",
     "GUARD_KIT_SETTINGS_LOCAL",

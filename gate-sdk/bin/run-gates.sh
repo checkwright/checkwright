@@ -16,6 +16,13 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null)" || {
     exit 2
 }
 
+# spec: gate-sdk/SPEC.md §Layout and configuration — the gate-sdk root locator, exported from this front-end's own location so every arm reaches the exact root
+if [[ "$SDK" == "$PWD"/* ]]; then
+    export GATE_SDK_ROOT="${SDK#"$PWD"/}"
+else
+    export GATE_SDK_ROOT="$SDK"
+fi
+
 # spec: gate-sdk/SPEC.md §run-gates — the bridged environment for one arm, resolved and exec'd: the front-end's whole job beyond argv, and the shape `--emit` already had. $ARM_UNAVAILABLE_STATUS is the status a *dispatch* failure exits — 2 for every arm whose verdict a battery or a session reads, 0 for a harness-integration arm gating a user action, which §The non-gate arm rules must decline rather than wedge the session
 ARM_UNAVAILABLE_STATUS=2
 exec_arm() {

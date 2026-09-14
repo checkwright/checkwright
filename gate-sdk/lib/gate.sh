@@ -586,16 +586,6 @@ gate_native_targets() {
     gates_list_members "$f"
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the per-roster-line artifact NAME as a bridgeable keyed value, one `<target>=<name>` element per line, computed here from gate_native_targets and gate_exe_suffix so the executable suffix keeps exactly one owner: a compiled reader is served the resolved name and derives nothing, which discharges the second-holder criterion by construction rather than by a Rust twin of the `*-windows-*` predicate. Computed after GATE_SDK_NATIVE_TARGETS_FILE resolves above, so a caller steering the roster knob in the arm's environment is served a value derived from the steered roster and not the default one.
-# shellcheck disable=SC2034  # read across the dispatch seam, never in this shell: the config bridge resolves it by name for a member that declares it
-GATE_SDK_NATIVE_ARTIFACT_NAMES=()
-while IFS= read -r _gan_target; do
-    [[ -n "$_gan_target" ]] || continue
-    _gan_name="$(gate_native_bin)"; _gan_name="${_gan_name##*/}"
-    GATE_SDK_NATIVE_ARTIFACT_NAMES+=("$_gan_target=${_gan_name%.exe}$(gate_exe_suffix "$_gan_target")")
-done < <(gate_native_targets)
-unset _gan_target _gan_name
-
 # spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_RUNNERS_FILE, defaulted off GATE_SDK_NATIVE_CRATE beside the roster's own so the crate's location keeps one owner
 gate_native_runners_file() {
     printf '%s\n' "$GATE_SDK_NATIVE_RUNNERS_FILE"
@@ -632,6 +622,8 @@ _gate_kit_roots_derived() {
     return 0
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the kit-root override resolved onto its own name, empty meaning the derived set, so the bridge carries it to the crate's kit-root derivation
+[[ -v GATE_SDK_KIT_DIRS ]] || GATE_SDK_KIT_DIRS=""
 gate_kit_roots() {
     local d
     if [[ -n "${GATE_SDK_KIT_DIRS:-}" ]]; then
@@ -641,28 +633,12 @@ gate_kit_roots() {
     _gate_kit_roots_derived
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the resolved kit-root set as a bridgeable variable, the shape GATE_PRUNE_DIRS already has: GATE_SDK_KIT_DIRS is an override a consumer sets in the environment, so `declare -p` cannot find it and the config bridge cannot carry it. Resolving it here gives the value one computation serving both substrates, which is criterion 6's discharge-by-construction rather than a Rust twin of the predicate.
-# spec: gate-sdk/SPEC.md §lib/gate.sh — spelled relative to the *current directory*, because a bridged value is baked verbatim into the generated pre-commit hook: an absolute root would commit one machine's checkout path to a tracked file. Resolving each root against the invoking directory keeps the path-prefix comparison exact on the binary side while nothing environment-specific crosses.
-GATE_KIT_ROOTS_HERE=()
-while IFS= read -r _gkr; do
-    [[ -n "$_gkr" ]] || continue
-    if [[ "$_gkr" == "$PWD"/* ]]; then
-        GATE_KIT_ROOTS_HERE+=("${_gkr#"$PWD"/}")
-    elif [[ "$_gkr" == /* ]]; then
-        # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; relativizing an absolute kit root against the cwd is what keeps a bridged value out of the tracked hook
-        GATE_KIT_ROOTS_HERE+=("$(realpath --relative-to="$PWD" "$_gkr" 2>/dev/null || printf '%s' "$_gkr")")
-    else
-        GATE_KIT_ROOTS_HERE+=("$_gkr")
-    fi
-done < <(gate_kit_roots)
-unset _gkr
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the kit's own root as a bridgeable variable, spelled relative to the current directory by GATE_KIT_ROOTS_HERE's rule above and for its reason. A compiled member that must reach a file inside its own kit — check-graph's assertion D spawns bin/gen-pre-commit.sh, which stays shell (§gen-pre-commit) — has no BASH_SOURCE to find it by, and the kit-root set is not a substitute: GATE_SDK_KIT_DIRS may narrow that set to a consumer's own tree, which is exactly the configuration a sandboxed fixture runs under.
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the kit's own root as a bridgeable variable, spelled relative to the current directory, for the static derived defaults that read it until gate-sdk's cut
 GATE_SDK_ROOT_HERE="$(gate_sdk_root)"
 if [[ "$GATE_SDK_ROOT_HERE" == "$PWD"/* ]]; then
     GATE_SDK_ROOT_HERE="${GATE_SDK_ROOT_HERE#"$PWD"/}"
 elif [[ "$GATE_SDK_ROOT_HERE" == /* ]]; then
-    # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; the kit's own root takes GATE_KIT_ROOTS_HERE's relativization for its reason
+    # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; a bridged value relativized against the cwd keeps an absolute path out of the tracked hook
     GATE_SDK_ROOT_HERE="$(realpath --relative-to="$PWD" "$GATE_SDK_ROOT_HERE" 2>/dev/null \
         || printf '%s' "$GATE_SDK_ROOT_HERE")"
 fi
@@ -679,7 +655,9 @@ gate_check_dirs() {
 _gate_kit_roots_rel_ensure_cache() {
     [[ -n "${_gate_kit_roots_rel_cache_set:-}" ]] && return 0
     local anchor root
-    anchor="${GATE_SDK_ROOT:-$(gate_sdk_root)}"; anchor="${anchor%/*}"
+    anchor="${GATE_SDK_ROOT:-$(gate_sdk_root)}"
+    [[ "$anchor" == /* ]] || anchor="$(cd "$anchor" 2>/dev/null && pwd)" || anchor="$(gate_sdk_root)"
+    anchor="${anchor%/*}"
     _gate_kit_roots_rel_cache=()
     while IFS= read -r root; do
         # spec: gate-sdk/SPEC.md §lib/gate.sh — a root already under the anchor is the

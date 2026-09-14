@@ -179,7 +179,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-close-surfaces",
         Arm::Emit(close_surfaces::emit),
         &[
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "LIFECYCLE_KIT_ROSTER_BASENAME",
             "LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS",
             "GATE_SDK_WORKFLOW_DIR",
@@ -199,7 +199,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_PRUNE_DIRS",
             "DRIFT_KIT_KPIS_FILE",
             "CONTEXT_KIT_SETTINGS_FILE",
@@ -216,7 +216,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
-            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_KIT_DIRS",
             "GATE_PRUNE_DIRS",
             "DRIFT_KIT_KPIS_FILE",
             "CONTEXT_KIT_SETTINGS_FILE",
@@ -271,8 +271,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(graph::emit),
         &[
             "GATE_SDK_GATES_DIR",
-            "GATE_KIT_ROOTS_HERE",
-            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_KIT_DIRS",
             "GATE_SDK_GRAPH_ARTIFACT",
             "GATE_SDK_GRAPH_THEME_DIR",
             "GATE_SDK_GRAPH_MAX_EDGES",
@@ -491,7 +490,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     (
         "--emit-fixture-suites",
         Arm::Emit(crate::registry::emit_fixture_suites),
-        &["GATE_KIT_ROOTS_REL", "GATE_SDK_GATES_DIR"],
+        &["GATE_SDK_KIT_DIRS", "GATE_SDK_GATES_DIR"],
+    ),
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the kit roots, derived from the gate-sdk root
+    // locator, for the shell callers that still need the set
+    (
+        "--emit-kit-roots",
+        Arm::Emit(crate::walk::emit_kit_roots),
+        &["GATE_SDK_KIT_DIRS"],
     ),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
     // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter spec: gate-
@@ -635,7 +641,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: gate-sdk/SPEC.md §run-gate-tests — an `Arm::Run` because the contract is a three-valued
     // exit — 0 clean, 1 a logic failure, 2 a harness or fixture error — and a table member because
-    // it resolves four knobs a hardcoded flag would silently ignore
+    // it resolves three knobs a hardcoded flag would silently ignore
     (
         "--run-gate-tests",
         Arm::Run(run_gate_tests::run),
@@ -671,7 +677,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ("--run-demo", Arm::Run(demo::run), demo::KNOBS),
     // spec: gate-sdk/SPEC.md §Consumer payload — the payload assembler, an `Arm::Run` because its
     // product is a tarball plus a receipt rather than a document, and a table member because all
-    // four of its inputs are consumer-overridable where a hardcoded flag would ignore every one
+    // three of its inputs are consumer-overridable where a hardcoded flag would ignore every one
     (
         "--pack-installer",
         Arm::Run(pack_installer::run),
@@ -817,7 +823,7 @@ mod tests {
         assert!(lookup("--emit-enum-set").is_none());
         assert_eq!(
             knobs("--emit-enum-sets", &[]),
-            Some(vec!["GATE_KIT_ROOTS_REL"])
+            Some(vec!["GATE_SDK_KIT_DIRS"])
         );
     }
 

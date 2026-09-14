@@ -12,7 +12,7 @@ use std::path::Path;
 // spec: context-kit/SPEC.md §Testing — the roster is the *consumer's*: which kits to vendor, and
 // the binary to place. No `CONTEXT_KIT_` knob is declared — every agent-file knob this smoke
 // touches it writes into the scratch consumer's own config seams rather than resolving here.
-pub const KNOBS: &[&str] = &["GATE_KIT_ROOTS_HERE", "GATE_SDK_NATIVE_BIN"];
+pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_BIN"];
 
 const NAME: &str = "agents-md";
 const VERDICT: &str = "AGENTS-MD-SMOKE";
@@ -147,7 +147,7 @@ fn kit_roots() -> Result<Vec<String>, Outcome> {
         .cloned()
         .ok_or_else(|| {
             Outcome::Refuse(format!(
-                "{}: GATE_KIT_ROOTS_HERE names no gate-sdk root, so the consumer-smoke library this suite vendors through cannot be found",
+                "{}: the kit roots name no gate-sdk root, so the consumer-smoke library this suite vendors through cannot be found",
                 NAME
             ))
         })?;

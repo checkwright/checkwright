@@ -470,9 +470,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("no members parsed from {}", list));
     }
 
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the kit root the generator lives under, bridged because
-    // a compiled member has no BASH_SOURCE to find its own kit by
-    let sdk_root = walk::knob_scalar("GATE_SDK_ROOT_HERE")?;
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the kit root the generator lives under is
+    // the locator, because a compiled member has no BASH_SOURCE to find its own kit by
+    let sdk_root = walk::sdk_root();
     let gen = format!("{}/bin/gen-pre-commit.sh", sdk_root.trim_end_matches('/'));
     if !Path::new(&gen).is_file() {
         return Err(format!("gen-pre-commit.sh not found at {}", gen));

@@ -14,7 +14,7 @@ pub const KNOBS: &[&str] = &[
     "LIFECYCLE_KIT_*",
     "GATE_SDK_TMP_DIR",
     "GATE_PRUNE_DIRS",
-    "GATE_KIT_ROOTS_HERE",
+    "GATE_SDK_KIT_DIRS",
 ];
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the unnamed-iteration placeholder, resolved
