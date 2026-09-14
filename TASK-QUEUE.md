@@ -12,6 +12,31 @@
 
 ## New Features
 
+- **settings-pins-live-suite-coverage** [spec: SPEC-pins-smoke.md]
+  — `check-settings-pins` is exercised by its fixtures and by no live suite, so the vendored path
+  is unproven end to end.
+  **Scoped against the tree rather than taken from the report that raised it.** The fixture pair
+  does cover the real branches: `context-kit/gate-tests/check-settings-pins/{good,bad}/` each ship
+  a `settings-pins.conf` and a `settings.json`, so the pass and the legible-violation dispositions
+  both run. The claim that the gate only ever reaches its trivial branch is true of the **live**
+  suites and false of the fixture suite, and the difference is the whole entry.
+  **What no live suite reaches:** no installer profile, no consumer smoke and no upgrade suite ever
+  writes a pins file (re-verified at spec, 2026-09-14). So the smoke battery exercises only the
+  absent-pins-file clean skip, and a vendoring defect that broke the gate against a real settings
+  file would ship green.
+  **This is the craft rule's own shape** (doctrine-kit/DOCTRINE.md, *Test from the real consumer's
+  runtime*): the lower layer is covered and the higher one is not, which is the inverse of the
+  usual finding and is why it reads as adequate coverage at a glance.
+  **Deliverable:** context-kit's own `smoke/install.sh` drives the gate through pass, violation
+  and skip on a pin derived from the installed settings file, then disarms it, since guard-kit's
+  later install overwrites that file. The amendment weighs the refused homes.
+  **Cost while deferred:** the smoke's green battery carries no evidence that this gate ran
+  against anything.
+  Filed 2026-08-13 by close, from the roster sweep; raised by the lead and re-scoped here after
+  reading the fixtures.
+  **Leads `evidence-population-fidelity`** — operator direction, 2026-09-14, lead-relayed, with
+  the three sibling entries that name that iteration; promoted at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -1887,34 +1912,6 @@
   **Cost while deferred:** the full sweep's result decays from the next template edit onward, so a
   one-time pass with no differential successor buys a baseline that expires.
   Filed 2026-08-13 by close, on operator direction.
-
-- **settings-pins-live-suite-coverage** [design-pending] [cost: session/high] [surface: context-kit] — `check-settings-pins` is exercised by
-  its fixtures and by no live suite, so the vendored path is unproven end to end.
-  **Scoped against the tree rather than taken from the report that raised it.** The fixture pair
-  does cover the real branches: `context-kit/gate-tests/check-settings-pins/{good,bad}/` each ship
-  a `settings-pins.conf` and a `settings.json`, so the pass and the legible-violation dispositions
-  both run. The claim that the gate only ever reaches its trivial branch is true of the **live**
-  suites and false of the fixture suite, and the difference is the whole entry.
-  **What no live suite reaches:** grepping `CONTEXT_KIT_SETTINGS_PINS` and `settings-pins.conf`
-  across the tree returns the two checks and one gate-test and nothing else — no installer profile,
-  no consumer smoke, no upgrade suite ever writes a pins file. So in every consumer tree the
-  battery exercises only the absent-pins-file clean skip, and a vendoring defect that broke the
-  gate against a real settings file would ship green.
-  **This is the craft rule's own shape** (doctrine-kit/DOCTRINE.md, *Test from the real consumer's
-  runtime*): the lower layer is covered and the higher one is not, which is the inverse of the
-  usual finding and is why it reads as adequate coverage at a glance.
-  **Deliverable, and why `[design-pending]`:** have a smoke profile pin a key and assert the gate
-  bites on a violated pin. What is open is which profile owns it — a pin is consumer config, so the
-  suite must author one without asserting that any particular key is pinnable, or it re-couples the
-  kit to this repo's own pin set and breaks the provenance seam.
-  **This iteration added a pin**, which is what made the hole visible; the pin is correct and
-  independently fixture-covered, so nothing here is a red.
-  **Cost while deferred:** a green battery in an adopter's tree carries no evidence that this gate
-  ran against anything.
-  Filed 2026-08-13 by close, from the roster sweep; raised by the lead and re-scoped here after
-  reading the fixtures.
-  **Selected to lead `evidence-population-fidelity`** — operator direction, 2026-09-14,
-  lead-relayed, with the three sibling entries that name that iteration; spec promotes.
 
 - **vendored-library-identifier-reach** [design-pending] [cost: iteration/low] [surface: doctrine-kit] — De-literalization's reach test gives
   two answers for a vendored `lib/*.sh` function, and the corpus holds both populations.
