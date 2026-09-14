@@ -38,11 +38,15 @@ frame; every measurement lives in a member:
    it to every plugin. Both the derivation and its invocation sit above the
    loop — relocating the call alone would leave it undefined — and its inputs
    are already set by that point. The report header keeps reading the same
-   value. **Priced, because the position is not free:** deriving it above the
-   loop runs it in `--trend` mode as well as in the full report, so one `grep`
-   and one single-file `git log -S` run on every session start through the
-   context hook. Accepted — a pickaxe over a file of a few dozen lines — but it
-   is a per-session cost rather than a per-report one.
+   value. The commit is lifecycle-kit's **iteration-start commit**
+   (lifecycle-kit/SPEC.md §The state machine), read through that section's
+   shared crate read on `DRIFT_KIT_STATE_FILE`. It is **never** a history search
+   keyed on the iteration's name. The name is not unique while the
+   unnamed-iteration sentinel stands, and `--enter-stage --rename` rewrites every
+   stamp's name, so a search on it lands on the oldest sentinel commit or on the
+   rename. **Priced, because the position is not free:** deriving it above the
+   loop runs it in `--trend` mode too, so one state-file read and one
+   `git rev-parse` run on every session start through the context hook.
 3. Run each plugin, collect its rows, and group them into the two labeled
    sections — the honesty labels are the frame's contract:
    - header: `=== Drift KPIs (advisory — trend, not level) ===`, plus the
@@ -154,7 +158,8 @@ as exported environment and every built-in as the same resolved value, never a
 consumer knob. What it does not share is the
 parity hazard: it introduces no fixed export list that could drift out of step
 with the knob set it travels beside. A plugin reading it gets the empty string
-when no baseline is derivable and degrades to `n/a` on its own rows rather than
+when there is no iteration-start commit (lifecycle-kit/SPEC.md §The state
+machine lists the cases) and degrades to `n/a` on its own rows rather than
 dying.
 
 Plugins never block and never write outside `$DRIFT_KIT_TMP_DIR` scratch;
@@ -242,8 +247,9 @@ Lead:
   makes for carrying two rows that point different ways. `--trend` volunteers
   one fragment, `qnet <±N>`, per the one-per-plugin rule; the weight row
   volunteers none, because intake is the axis a filing session can act on
-  inside the session. With no baseline (a standalone run, a fresh clone) both
-  rows degrade to `n/a (no iteration baseline)`.
+  inside the session. With no iteration-start commit (no state file, the
+  no-cursor window, or a head this clone cannot resolve) both rows degrade to
+  `n/a (no iteration baseline)`.
 - **kpi-prompt-friction** — distinct/total prompting calls, read from guard-kit's
   ported ranker as **two integers in one process**: the member calls the counter
   in-crate, so there is no spawn, no stdout and no string between the producer
@@ -280,8 +286,13 @@ Lead:
   signal, and the smallness of that diff would not be a mitigation. What the witness still buys is
   the case it was written for: a cut that deletes a guard-kit `bin/` tool while the library stays
   resolves normally and degrades correctly.
-- **kpi-always-loaded** — the standing per-session surface: level and
-  since-baseline delta from context-kit's meter, read **in process** as figures.
+- **kpi-always-loaded** — the standing per-session surface: level, since-baseline
+  delta, and the surfaces' delta since the report's iteration-start commit, with
+  the meter's stale-baseline mark, from context-kit's meter, read **in process**
+  as figures. It hands the meter the report's own `DRIFT_KIT_ITERATION_START`
+  rather than letting it resolve `CONTEXT_KIT_STATE_FILE`, so the row and the
+  header can never name two different starts. `--trend` appends `stale` to its
+  `loaded` fragment when marked.
   The row spawned the meter and parsed its rendered line back apart until the
   meter became an arm; that parse was an undeclared cross-kit output contract, and
   the split into a measurement function the arm renders over is what ended it
@@ -1554,7 +1565,8 @@ Knobs (this repo's layout as defaults):
   degradation contract already gives a consumer the only thing an opt-out buys.
 - `DRIFT_KIT_STATE_FILE` — the WORKFLOW-STATE path whose *committed history and
   live content* the stage-economics join reads for stamps (§The stage-economics
-  meter, history ∪ live); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
+  meter, history ∪ live), and whose first stamp the report skeleton reads for
+  the iteration-start commit (§The report skeleton); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
   same default the trajectory extractor's surface list computes — drift-kit
   re-derives with its own knob rather than importing a sibling kit's bin contract,
   the established `DRIFT_KIT_SESSIONS_DIR` precedent), resolved in `lib/drift.sh`

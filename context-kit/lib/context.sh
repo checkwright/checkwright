@@ -46,6 +46,7 @@ declare -p CONTEXT_KIT_SURFACES >/dev/null 2>&1 || CONTEXT_KIT_SURFACES=("CLAUDE
 
 declare -p CONTEXT_KIT_GROWTH_PATHS >/dev/null 2>&1 || CONTEXT_KIT_GROWTH_PATHS=("*.md")
 [[ -v CONTEXT_KIT_BASELINE_FILE ]] || CONTEXT_KIT_BASELINE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt"
+[[ -v CONTEXT_KIT_STATE_FILE ]] || CONTEXT_KIT_STATE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt"
 
 # spec: context-kit/SPEC.md §The surface ratchet — the ceilings get their own file because --update-baseline rewrites the baseline as one row, and a ceiling row living there would be erased at every close
 [[ -v CONTEXT_KIT_CEILING_FILE ]] || CONTEXT_KIT_CEILING_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/surface-ceiling.txt"

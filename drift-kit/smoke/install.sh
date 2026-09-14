@@ -143,8 +143,8 @@ xpout="$(xp)"
 grep -q 'consumer shadow' <<<"$xpout" \
     || fail "a consumer plugin did not shadow the bundled member of its own name: $xpout"
 # spec: drift-kit/SPEC.md §The KPI plugin contract — the iteration-start handoff is asserted
-# *present*, not non-empty: no baseline is derivable in a throwaway consumer, and the contract's
-# promise there is the empty string rather than an absent variable.
+# *present*, not non-empty: there is no iteration-start commit in a throwaway consumer, and the
+# contract's promise there is the empty string rather than an absent variable.
 grep -qE 'roots=[1-9][0-9]* start=set' <<<"$xpout" \
     || fail "the consumer plugin did not receive both driver handoffs (kit roots, iteration start): $xpout"
 grep -q 'custom=reached' <<<"$xpout" \

@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §lib/stages.sh — the Rust counterpart of the stage machine's
 // shared surface: the derived stage roster, the two boundary sets, the registration block.
 // The shell library is not retired, so this module sits beside it rather than replacing it
+use crate::proc;
 use crate::walk;
 
 pub fn stages() -> Result<Vec<String>, String> {
@@ -105,9 +106,82 @@ pub fn current_stage(text: &str) -> String {
     }
 }
 
+// spec: lifecycle-kit/SPEC.md §lib/stages.sh — the iteration-start read's pure half: field five of
+// the first data line, and only in the abbreviated-hex shape `--enter-stage` writes, so `none`, a
+// four-field line and the no-cursor shapes all read as no commit
+pub fn first_head(text: &str) -> String {
+    let head = data_lines(text)
+        .first()
+        .and_then(|l| l.split_whitespace().nth(4))
+        .unwrap_or("");
+    let hex = head.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c));
+    if (7..=40).contains(&head.len()) && hex {
+        head.to_string()
+    } else {
+        String::new()
+    }
+}
+
+pub fn commit_resolves(commit: &str) -> bool {
+    proc::run(
+        "git",
+        &["rev-parse", "-q", "--verify", &format!("{}^{{commit}}", commit)],
+    )
+    .map(|c| c.stdout().is_some())
+    .unwrap_or(false)
+}
+
+// spec: lifecycle-kit/SPEC.md §The state machine — the iteration-start commit, empty in every
+// no-commit case that section lists; the caller hands in the path its own knob resolved
+pub fn iteration_start(state_file: &str) -> String {
+    let text = match std::fs::read(state_file) {
+        Ok(b) => String::from_utf8_lossy(&b).into_owned(),
+        Err(_) => return String::new(),
+    };
+    let head = first_head(&text);
+    if head.is_empty() || !commit_resolves(&head) {
+        return String::new();
+    }
+    head
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: lifecycle-kit/SPEC.md §The state machine — the start is the *first* stamp's head, never
+    // the cursor's, and every malformed or absent head reads as no commit
+    #[test]
+    fn the_iteration_start_is_the_first_stamps_head_and_the_no_commit_shapes_are_empty() {
+        let hdr = "# hdr\n---\n\n";
+        assert_eq!(
+            first_head(&format!("{}a scope s1 2026-09-14 d57c4fec\na build s2 2026-09-14 fe2e2066\n", hdr)),
+            "d57c4fec"
+        );
+        assert_eq!(first_head(""), "");
+        assert_eq!(first_head("# hdr\n---\n\n"), "");
+        assert_eq!(first_head(&format!("{}a scope s1 2026-09-14 none\n", hdr)), "");
+        assert_eq!(first_head(&format!("{}a scope s1 2026-09-14\n", hdr)), "");
+        assert_eq!(first_head(&format!("{}a scope s1 2026-09-14 D57C4FEC\n", hdr)), "");
+        assert_eq!(first_head(&format!("{}a scope s1 2026-09-14 d57c4f\n", hdr)), "");
+
+        let dir = std::env::temp_dir().join(format!("cw-start-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("cannot make the fixture dir");
+        let absent = dir.join("absent.txt");
+        assert_eq!(iteration_start(&absent.display().to_string()), "");
+        let unresolvable = dir.join("state.txt");
+        std::fs::write(&unresolvable, format!("{}a scope s1 2026-09-14 0000000\n", hdr))
+            .expect("cannot write the fixture state file");
+        assert_eq!(iteration_start(&unresolvable.display().to_string()), "");
+        let head = proc::run("git", &["rev-parse", "--short", "HEAD"])
+            .ok()
+            .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
+            .expect("the crate's tests run inside a work tree");
+        std::fs::write(&unresolvable, format!("{}a scope s1 2026-09-14 {}\n", hdr, head))
+            .expect("cannot write the fixture state file");
+        assert_eq!(iteration_start(&unresolvable.display().to_string()), head);
+        std::fs::remove_dir_all(&dir).ok();
+    }
 
     #[test]
     fn the_cursor_is_the_last_data_lines_stage_and_absent_shapes_are_empty() {

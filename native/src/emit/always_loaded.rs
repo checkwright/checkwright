@@ -2,6 +2,7 @@
 // the committed baseline. Two levels: `measure` produces the figures and `emit` renders the three
 // modes over them, which is what lets `kpi-always-loaded` read them as data (§bin/footprint).
 use crate::proc;
+use crate::stages;
 use crate::walk;
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the knobs `lib/context.sh` defines and the
@@ -14,25 +15,37 @@ pub const KNOBS: &[&str] = &[
     "CONTEXT_KIT_GROWTH_PATHS",
     "CONTEXT_KIT_CEILING_FILE",
     "CONTEXT_KIT_RATCHET_PATHS",
+    "CONTEXT_KIT_STATE_FILE",
 ];
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the usage an unrecognized mode operand
 // prints, the half of the bin/-tool contract that does not retire to the front-end.
-const USAGE: &str = "usage: --emit always-loaded [--growth | --update-baseline | --ceiling]\n  bare: the total, its per-part split and the delta since the baseline; --growth: per-file net growth since the baseline commit; --update-baseline: rewrite the baseline row; --ceiling: rewrite the ceiling file to current sizes";
+const USAGE: &str = "usage: --emit always-loaded [--growth | --update-baseline | --ceiling]\n  bare: the total, its per-part split, the delta since the baseline and the surfaces' delta since the iteration start; --growth: per-file net growth since the iteration start, else since the baseline commit; --update-baseline: rewrite the baseline row; --ceiling: rewrite the ceiling file to current sizes";
 
 const BASELINE_HEADER: &str = "# contract: context-kit/SPEC.md §The always-loaded meter";
 
 pub const CEILING_HEADER: &str = "# contract: context-kit/SPEC.md §The surface ratchet";
 
-// spec: context-kit/SPEC.md §The always-loaded meter — the measurement: every field is one the
-// rendered line already carried, read by the arm and by `kpi-always-loaded`. The baseline row's
-// fourth field is not one — its only reader is the update mode's rewrite, which reads the row.
+// spec: context-kit/SPEC.md §The always-loaded meter — the measurement, read by the arm and by
+// `kpi-always-loaded`. The baseline row's fourth field is not one — its only reader is the update
+// mode's rewrite, which reads the row.
 pub struct Measurement {
     pub surface: u64,
     pub hook: u64,
     pub total: u64,
     pub base_total: Option<u64>,
     pub base_commit: String,
+    pub base_surface: Option<u64>,
+    pub start_commit: String,
+    pub start_surface: Option<u64>,
+}
+
+impl Measurement {
+    // spec: context-kit/SPEC.md §The always-loaded meter — stale: the row's surface count is not
+    // the surfaces' size at the iteration start; the surface half only
+    pub fn stale(&self) -> bool {
+        matches!((self.base_surface, self.start_surface), (Some(b), Some(s)) if b != s)
+    }
 }
 
 // spec: context-kit/SPEC.md §The always-loaded meter — `[[:space:]]` as the holder's `grep -E`
@@ -41,10 +54,10 @@ fn trim_space(s: &str) -> &str {
     s.trim_matches([' ', '\t', '\u{b}', '\u{c}', '\r'])
 }
 
-// spec: context-kit/SPEC.md §The always-loaded meter — `read -r total _ commit extra` over the
+// spec: context-kit/SPEC.md §The always-loaded meter — `read -r total surface commit extra` over the
 // baseline row: three whitespace-delimited fields and then the remainder verbatim, which is what
 // preserves a consumer's fourth field through the update mode's rewrite.
-fn split_row(line: &str) -> (String, String, String) {
+fn split_row(line: &str) -> Row {
     let mut rest = line.trim_start_matches([' ', '\t', '\u{b}', '\u{c}', '\r']);
     let mut fields: Vec<String> = Vec::new();
     for _ in 0..3 {
@@ -54,16 +67,34 @@ fn split_row(line: &str) -> (String, String, String) {
         fields.push(rest[..end].to_string());
         rest = rest[end..].trim_start_matches([' ', '\t', '\u{b}', '\u{c}', '\r']);
     }
-    (
-        fields[0].clone(),
-        fields[2].clone(),
-        trim_space(rest).to_string(),
-    )
+    Row {
+        total: fields[0].clone(),
+        surface: fields[1].clone(),
+        commit: fields[2].clone(),
+        extra: trim_space(rest).to_string(),
+    }
+}
+
+struct Row {
+    total: String,
+    surface: String,
+    commit: String,
+    extra: String,
+}
+
+// spec: context-kit/SPEC.md §The always-loaded meter — `^[0-9]+$`: a field that is not a bare
+// non-negative integer carries no figure, rather than one read off a partial parse.
+fn count(field: &str) -> Option<u64> {
+    if !field.is_empty() && field.bytes().all(|c| c.is_ascii_digit()) {
+        field.parse::<u64>().ok()
+    } else {
+        None
+    }
 }
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the baseline row is the file's first line
 // that is neither blank nor a comment; an absent file has no row, which is the no-delta reading.
-fn baseline_row(path: &str) -> Option<(String, String, String)> {
+fn baseline_row(path: &str) -> Option<Row> {
     let text = std::fs::read(path).ok()?;
     let text = String::from_utf8_lossy(&text).into_owned();
     let line = text
@@ -172,35 +203,53 @@ pub fn write_ceiling(path: &str) -> Result<String, String> {
     ))
 }
 
-pub fn measure() -> Result<Measurement, String> {
+fn newlines(b: &[u8]) -> u64 {
+    b.iter().filter(|&&c| c == b'\n').count() as u64
+}
+
+// spec: context-kit/SPEC.md §The always-loaded meter — the surfaces' size at a past commit, one
+// `git show` per surface; a path git cannot show counts zero, as an absent surface does live.
+fn surface_at(commit: &str, surfaces: &[String]) -> u64 {
+    surfaces
+        .iter()
+        .filter_map(|p| {
+            proc::run("git", &["show", &format!("{}:{}", commit, p)])
+                .ok()
+                .and_then(|c| c.stdout().map(newlines))
+        })
+        .sum()
+}
+
+// spec: context-kit/SPEC.md §The always-loaded meter — `start` is the iteration-start commit the
+// caller read, empty when there is none, which leaves every start figure absent.
+pub fn measure(start: &str) -> Result<Measurement, String> {
+    let surfaces = walk::knob_array("CONTEXT_KIT_SURFACES")?;
     let mut surface = 0u64;
-    for f in walk::knob_array("CONTEXT_KIT_SURFACES")? {
-        if !std::path::Path::new(&f).is_file() {
+    for f in &surfaces {
+        if !std::path::Path::new(f).is_file() {
             continue;
         }
-        if let Ok(b) = std::fs::read(&f) {
-            surface += b.iter().filter(|&&c| c == b'\n').count() as u64;
+        if let Ok(b) = std::fs::read(f) {
+            surface += newlines(&b);
         }
     }
     let cmd = walk::knob_scalar("CONTEXT_KIT_HOOK_CMD")?;
     let hook = if cmd.is_empty() { 0 } else { hook_lines(&cmd) };
-    let (row_total, base_commit) = match baseline_row(&walk::knob_scalar("CONTEXT_KIT_BASELINE_FILE")?) {
-        Some((total, commit, _)) => (total, commit),
-        None => (String::new(), String::new()),
-    };
-    // spec: context-kit/SPEC.md §The always-loaded meter — `^[0-9]+$`: a row whose total is not a
-    // bare non-negative integer carries no delta, rather than one read off a partial parse.
-    let base_total = if !row_total.is_empty() && row_total.bytes().all(|c| c.is_ascii_digit()) {
-        row_total.parse::<u64>().ok()
-    } else {
+    let row = baseline_row(&walk::knob_scalar("CONTEXT_KIT_BASELINE_FILE")?);
+    let start_surface = if start.is_empty() {
         None
+    } else {
+        Some(surface_at(start, &surfaces))
     };
     Ok(Measurement {
         surface,
         hook,
         total: surface + hook,
-        base_total,
-        base_commit,
+        base_total: row.as_ref().and_then(|r| count(&r.total)),
+        base_commit: row.as_ref().map_or(String::new(), |r| r.commit.clone()),
+        base_surface: row.as_ref().and_then(|r| count(&r.surface)),
+        start_commit: start.to_string(),
+        start_surface,
     })
 }
 
@@ -219,10 +268,10 @@ fn parts(m: &Measurement) -> String {
     )
 }
 
-// spec: context-kit/SPEC.md §The always-loaded meter — the default invocation: total, per-part
-// breakdown, and the delta against the baseline when the row carries a numeric total.
+// spec: context-kit/SPEC.md §The always-loaded meter — the default invocation; with no start
+// commit the line must stay byte-identical to the baseline-only reading.
 pub fn line(m: &Measurement) -> String {
-    match m.base_total {
+    let mut out = match m.base_total {
         Some(base) => format!(
             "{}  {:+} since {}",
             parts(m),
@@ -230,30 +279,35 @@ pub fn line(m: &Measurement) -> String {
             short(&m.base_commit)
         ),
         None => parts(m),
+    };
+    if let Some(start) = m.start_surface {
+        out.push_str(&format!(
+            " \u{b7} surfaces {:+} since iteration start {}",
+            m.surface as i64 - start as i64,
+            short(&m.start_commit)
+        ));
     }
+    if m.stale() {
+        out.push_str(" (baseline stale)");
+    }
+    out
 }
 
-fn commit_resolves(commit: &str) -> bool {
-    proc::run(
-        "git",
-        &["rev-parse", "-q", "--verify", &format!("{}^{{commit}}", commit)],
-    )
-    .map(|c| c.stdout().is_some())
-    .unwrap_or(false)
-}
-
-// spec: context-kit/SPEC.md §The always-loaded meter — the growth worklist: every governed prose
-// file whose net line growth since the baseline commit is positive, largest first, a tie broken by
-// descending path bytes because that is what `sort -rn`'s last-resort comparison gives under `-r`.
+// spec: context-kit/SPEC.md §The always-loaded meter — the growth worklist, from the iteration
+// start else the baseline commit; a tie breaks by descending path bytes, `sort -rn`'s last resort.
 fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
-    if m.base_commit.is_empty() || !commit_resolves(&m.base_commit) {
+    let (from, label) = if !m.start_commit.is_empty() {
+        (m.start_commit.as_str(), format!("iteration start {}", short(&m.start_commit)))
+    } else if m.base_commit.is_empty() || !stages::commit_resolves(&m.base_commit) {
         return Ok(format!(
             "growth: no resolvable baseline commit in {}\n",
             baseline_file
         ));
-    }
+    } else {
+        (m.base_commit.as_str(), short(&m.base_commit))
+    };
     let paths = walk::knob_array("CONTEXT_KIT_GROWTH_PATHS")?;
-    let mut args: Vec<&str> = vec!["diff", "--numstat", &m.base_commit, "--"];
+    let mut args: Vec<&str> = vec!["diff", "--numstat", from, "--"];
     args.extend(paths.iter().map(String::as_str));
     let numstat = proc::run("git", &args)
         .ok()
@@ -274,10 +328,18 @@ fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
     let net: i64 = rows.iter().map(|(d, _)| d).sum();
     let mut out = format!(
         "growth since {}: {} file(s) grew, +{} net line(s)\n",
-        short(&m.base_commit),
+        label,
         rows.len(),
         net
     );
+    if let (true, Some(b), Some(s)) = (m.stale(), m.base_surface, m.start_surface) {
+        out.push_str(&format!(
+            "baseline {} is stale: its surfaces count {}, the iteration opened at {} \u{2014} re-stamp with --update-baseline at close\n",
+            short(&m.base_commit),
+            b,
+            s
+        ));
+    }
     for (d, f) in &rows {
         out.push_str(&format!("  +{}\t{}\n", d, f));
     }
@@ -301,7 +363,7 @@ fn update_baseline(m: &Measurement, baseline_file: &str) -> Result<String, Strin
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
         .unwrap_or_else(|| "unknown".to_string());
-    let extra = baseline_row(baseline_file).map_or(String::new(), |(_, _, e)| e);
+    let extra = baseline_row(baseline_file).map_or(String::new(), |r| r.extra);
     let mut row = format!("{} {} {}", m.total, m.surface, commit);
     if !extra.is_empty() {
         row.push(' ');
@@ -338,7 +400,7 @@ fn mode(args: &[String]) -> Result<Option<&str>, String> {
 
 pub fn emit(args: &[String]) -> Result<String, String> {
     let selected = mode(args)?;
-    let m = measure()?;
+    let m = measure(&stages::iteration_start(&walk::knob_scalar("CONTEXT_KIT_STATE_FILE")?))?;
     let baseline_file = walk::knob_scalar("CONTEXT_KIT_BASELINE_FILE")?;
     match selected {
         Some("--growth") => growth(&m, &baseline_file),
@@ -415,22 +477,59 @@ mod tests {
     // rather than as a mis-assigned commit
     #[test]
     fn the_baseline_row_splits_three_fields_and_keeps_the_remainder_verbatim() {
+        let fields = |r: Row| (r.total, r.surface, r.commit, r.extra);
+        let s = |v: &str| v.to_string();
         assert_eq!(
-            split_row("213 203 de046195 41 extra"),
-            (
-                "213".to_string(),
-                "de046195".to_string(),
-                "41 extra".to_string()
-            )
+            fields(split_row("213 203 de046195 41 extra")),
+            (s("213"), s("203"), s("de046195"), s("41 extra"))
         );
         assert_eq!(
-            split_row("  213   203   de046195  "),
-            ("213".to_string(), "de046195".to_string(), String::new())
+            fields(split_row("  213   203   de046195  ")),
+            (s("213"), s("203"), s("de046195"), String::new())
         );
         assert_eq!(
-            split_row("213 203"),
-            ("213".to_string(), String::new(), String::new())
+            fields(split_row("213 203")),
+            (s("213"), s("203"), String::new(), String::new())
         );
+        assert_eq!(count("203"), Some(203));
+        assert_eq!(count("-3"), None);
+        assert_eq!(count(""), None);
+    }
+
+    // spec: context-kit/SPEC.md §The always-loaded meter — the start figures: the surfaces' delta
+    // since the iteration start rides the line, and the stale mark fires only when both surface
+    // counts exist and differ
+    #[test]
+    fn the_bare_line_adds_the_start_delta_and_marks_a_baseline_that_missed_the_start() {
+        let m = Measurement {
+            surface: 203,
+            hook: 10,
+            total: 213,
+            base_total: Some(211),
+            base_commit: "de0461952f".to_string(),
+            base_surface: Some(201),
+            start_commit: "d57c4fec11".to_string(),
+            start_surface: Some(201),
+        };
+        assert!(!m.stale());
+        assert_eq!(
+            line(&m),
+            "213l (surfaces 203 \u{b7} hook 10)  +2 since de046195 \u{b7} surfaces +2 since iteration start d57c4fec"
+        );
+        let m = Measurement {
+            base_surface: Some(190),
+            ..m
+        };
+        assert!(m.stale());
+        assert_eq!(
+            line(&m),
+            "213l (surfaces 203 \u{b7} hook 10)  +2 since de046195 \u{b7} surfaces +2 since iteration start d57c4fec (baseline stale)"
+        );
+        let m = Measurement {
+            base_surface: None,
+            ..m
+        };
+        assert!(!m.stale(), "a row with no surface count was marked stale");
     }
 
     // spec: context-kit/SPEC.md §The always-loaded meter — the default invocation's line, and a
@@ -443,6 +542,9 @@ mod tests {
             total: 213,
             base_total: Some(211),
             base_commit: "de0461952f".to_string(),
+            base_surface: Some(1),
+            start_commit: String::new(),
+            start_surface: None,
         };
         assert_eq!(line(&m), "213l (surfaces 203 \u{b7} hook 10)  +2 since de046195");
         let m = Measurement {

@@ -631,9 +631,9 @@ it.
 **It is the `--emit-always-loaded` bridged arm, and both halves of that are forced
 rather than chosen.** It is a **table member** because it resolves the consumer knobs
 `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_HOOK_CMD`, `CONTEXT_KIT_BASELINE_FILE`,
-`CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE` and
-`CONTEXT_KIT_RATCHET_PATHS` — which a hardcoded top-level flag would receive none
-of, the difference between working and appearing to. `GATE_SDK_WORKFLOW_DIR` and
+`CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE`,
+`CONTEXT_KIT_RATCHET_PATHS` and `CONTEXT_KIT_STATE_FILE` — which a hardcoded
+top-level flag would receive none of, the difference between working and appearing to. `GATE_SDK_WORKFLOW_DIR` and
 `GATE_SDK_GATES_DIR` are deliberately **not** declared: §lib/context.sh already rides
 them into the baseline path's and the hook command's own resolved values, so
 declaring either would resolve one fact twice. It is an **`Arm::Emit`** because the
@@ -643,8 +643,9 @@ the one non-zero path is exit 2 — so `{0, 2}` discards nothing the member carr
 
 **The measurement is a library function the arm wraps, not the arm itself** —
 §bin/footprint's split, and this is its second instance in the kit. The function
-returns the figures (surface total, hook total, the combined total, and the baseline
-row's total and commit where one resolves); the arm renders the three modes over
+returns the figures (surface total, hook total, the combined total, the baseline
+row's total, surface count and commit where one resolves, and the iteration-start
+commit with the surfaces' size there where the caller hands one in); the arm renders the three modes over
 them, and `kpi-always-loaded` reads the same figures in process. That is what ended
 the undeclared cross-kit output contract the KPI used to keep, parsing the rendered
 line back apart for a leading total and a marked delta.
@@ -676,8 +677,12 @@ index-test case driving this member with `CONTEXT_KIT_HOOK_CMD="cat <file>"`, wh
 port that special-cased the default would keep green while breaking the seam the
 golden exists to prove.
 
-- **Default invocation** prints one line: total, per-part breakdown, and
-  the delta against the baseline when one exists.
+- **Default invocation** prints one line: total, per-part breakdown, the delta against the
+  baseline when one exists, and — where an iteration-start commit exists — the surfaces' delta
+  since it. The line marks the baseline **stale** when the row's surface count differs from the
+  surfaces' size at the iteration-start commit, which means a close skipped its re-stamp and the
+  baseline delta is cumulative. The mark covers the surface half only: the hook body's size at
+  a past commit is not recoverable, so a stale hook half is not detected.
 - **`--ceiling`** — rewrite the ceiling file (§The surface ratchet) to current
   sizes, creating it if absent; the baseline row stays. Checked write; exit 2
   names the path.
@@ -690,11 +695,16 @@ golden exists to prove.
   confirmation line reporting a rewrite that did not happen is worse than none.
 - **`--growth`** prints the brevity pass's other worklist: a header with the
   count of files that grew and their net lines, then one row per governed
-  prose file whose net line growth since the baseline commit is positive,
-  largest first, over the pathspecs in `CONTEXT_KIT_GROWTH_PATHS`. It is
-  derived from git against the commit the baseline already records, so it
-  adds no second baseline; a baseline commit git cannot resolve prints a
-  one-line notice and exits clean. Separate from the bare invocation because
+  prose file whose net line growth is positive, largest first, over the
+  pathspecs in `CONTEXT_KIT_GROWTH_PATHS`. It measures from lifecycle-kit's
+  **iteration-start commit** (lifecycle-kit/SPEC.md §The state machine), read
+  through that section's shared crate read on `CONTEXT_KIT_STATE_FILE`. So the
+  worklist is this iteration's growth whether or not the last close
+  re-stamped. Where there is no iteration-start commit it measures from the
+  commit the baseline row records, and a baseline commit git cannot resolve
+  then prints a one-line notice and exits clean. Neither path adds a second
+  baseline file. A stale baseline adds a second header line naming both
+  surface counts. Separate from the bare invocation because
   `kpi-always-loaded` reads that as one line.
 - **Baseline file** (`${GATE_SDK_WORKFLOW_DIR:-.workflow}/`
   `always-loaded-baseline.txt`, committed): a `# contract:` header
@@ -858,8 +868,8 @@ the gate's grammar.
   causes it. A re-stamp makes it deliberate, not justified; close judges.
 - **Why these files, per file:** a trigger loads each whole. A SPEC is read by
   section; close's growth walk reads it.
-- **Why its own file:** `--update-baseline` rewrites the baseline as one row, and
-  that row anchors close's growth read.
+- **Why its own file:** `--update-baseline` rewrites the baseline as one row, whose
+  surface count is the meter's staleness witness.
 - **Why `on-surface`:** `init` writes no ceiling file; `--ceiling` arms the gate.
 - **Outside:** the hook body — consumer state, not authored text.
 - **Limit:** pathspecs outside the descriptor's static `couples=` are held by the
@@ -1423,6 +1433,11 @@ spelling, and there the absolute answer is the honest one.
   default `${GATE_SDK_TMP_DIR:-.tmp}/session-role` (gitignored scratch).
 - `CONTEXT_KIT_BASELINE_FILE` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
+- `CONTEXT_KIT_STATE_FILE` — the lifecycle state file whose first stamp names the
+  iteration-start commit the meter's `--growth` and staleness read (§The always-loaded meter);
+  default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. context-kit's own knob
+  rather than an import of lifecycle-kit's, so a consumer without lifecycle-kit resolves an
+  absent file and keeps the baseline-only reading.
 - `CONTEXT_KIT_GROWTH_PATHS` — array of git pathspecs the meter's `--growth`
   arm measures; default `("*.md")`. A consumer excludes generated mirrors and
   fixture copies here, since a copy's growth is its source's.

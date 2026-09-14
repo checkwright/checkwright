@@ -43,6 +43,17 @@ Two governed surfaces, carrying **one axis each**:
   is **appended** rather than inserted, so every positional reader of fields one
   to four is unmoved.
 
+  **The iteration-start commit is the first data line's `<head>`.** The boundary
+  truncation leaves the boundary stamp as the file's first data line, and that
+  stamp's `<head>` is the commit the iteration opened on. Anything a reader wants
+  to measure "since the iteration started" is measured from it. It is unaffected
+  by the unnamed-iteration sentinel and by `--enter-stage --rename`, since both
+  touch column 1 only. It is held true at introduction by §check-stage-evidence's
+  stamp-provenance assertion. There is **no** iteration-start commit when the
+  file is absent, when it has no data line (the no-cursor window), when that
+  `<head>` is `none`, or when this clone cannot resolve it. Each reader states
+  what it does then.
+
   **The five-field grammar is a breaking change to a shipped file format**, and
   a consumer vendoring it mid-iteration reds until they rewrite their own
   stamps: for each, `<head>` is the first parent of the commit that introduced
@@ -1998,6 +2009,15 @@ still carrying `[stage:]` read as the bare iteration name. The cross-kit
 readers deliberately do *not* call this helper — each derives the cursor
 itself from a path it already configures, so no consumer kit gains a
 lifecycle-kit dependency.
+
+The crate counterpart of these adapters, `native/src/stages.rs`, also holds the
+**iteration-start read**. It takes a state-file path and returns the first data
+line's `<head>` exactly as recorded, or empty in every no-commit case §The state
+machine lists. It verifies the commit resolves in one
+`git rev-parse --verify <head>^{commit}` before returning. A cross-kit reader
+hands in the path its own knob resolved, so it calls the crate read without
+gaining a lifecycle-kit vendoring dependency (the shared-derivation shape of
+§bin/session-id.sh).
 
 `lifecycle_closing_stage_reached [<state-file>]` is the **closing-stage
 predicate** built on that cursor: success when the cursor equals the last member

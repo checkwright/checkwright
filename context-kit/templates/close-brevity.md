@@ -8,8 +8,10 @@ baseline is actionable.
    `bash gate-sdk/bin/run-gates.sh --emit always-loaded`
    — it prints the total, the per-part split, and the delta against the committed
    baseline. Then run it with `--growth`: every governed prose file that grew net
-   since the baseline commit, largest first. Both lists are the worklist.
-2. **Walk the growth since baseline, asking two distinct questions per block:**
+   since the iteration started, largest first. Both lists are the worklist; a
+   `stale` baseline means the delta is cumulative, so read the growth list for
+   this iteration's share.
+2. **Walk the growth, asking two distinct questions per block:**
    - **Staleness** — *is it still true?* Outdated context is a standing tax on
      every session that reads it.
    - **Brevity** — *is each block worth its recurring per-session token cost?*

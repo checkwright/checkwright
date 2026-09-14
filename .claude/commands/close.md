@@ -20,7 +20,9 @@ drift-kit/SPEC.md §The overhead meter owns: it logs the governance-vs-task
 proportion, the per-session producer feeding `kpi-overhead`. The drain's commit
 message states the health triad beside its `qnet` fragment — `qnet`, the
 always-loaded delta with the `--growth` figure, and `kpi-overhead`'s share — with the
-cause when one moves the wrong way. **The three are read against a stated
+cause when one moves the wrong way. The template's brevity pass (step 10) is
+context-kit/templates/close-brevity.md, run whole — its re-baseline step included.
+**The three are read against a stated
 expectation, and it is the operator's:** `qnet` at or below zero, governed prose
 flat or shrinking, the share falling. A gate enforcing them stays refused on the
 grounds lifecycle-kit/SPEC.md §The committed gap inbox states for the net-growth

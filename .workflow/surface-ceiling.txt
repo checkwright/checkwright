@@ -4,7 +4,7 @@
 23 .claude/commands/agent-execution.md
 11 .claude/commands/align.md
 18 .claude/commands/build.md
-127 .claude/commands/close.md
+129 .claude/commands/close.md
 31 .claude/commands/consult.md
 24 .claude/commands/economics.md
 72 .claude/commands/lead.md
@@ -12,9 +12,9 @@
 111 .claude/commands/scope.md
 19 .claude/commands/spec.md
 20 .claude/commands/validate.md
-194 CLAUDE.md
+173 CLAUDE.md
 105 canon-kit/templates/SPEC-amendment.md
-35 context-kit/templates/close-brevity.md
+37 context-kit/templates/close-brevity.md
 466 delegation-kit/templates/agent-execution.md
 60 delegation-kit/templates/dispatch-checklists.md
 40 drift-kit/templates/close-knowledge.md
@@ -24,9 +24,9 @@
 601 lifecycle-kit/templates/lead.md
 33 lifecycle-kit/templates/release-sweep.md
 103 lifecycle-kit/templates/stages/align.md
-109 lifecycle-kit/templates/stages/build.md
+107 lifecycle-kit/templates/stages/build.md
 270 lifecycle-kit/templates/stages/close.md
-242 lifecycle-kit/templates/stages/scope.md
+240 lifecycle-kit/templates/stages/scope.md
 116 lifecycle-kit/templates/stages/spec.md
 87 lifecycle-kit/templates/stages/validate.md
 41 lifecycle-kit/templates/upgrade.md

@@ -12,64 +12,6 @@
 
 ## New Features
 
-- **drift-baseline-unnamed-iteration** [spec: SPEC-iteration-anchor.md]
-  — every since-iteration-start KPI baselines on the wrong commit, silently.
-  `--emit drift-report`'s `iteration_start` reads the queue header's iteration name and runs
-  `git log --format=%h -S"<iteration> scope " -- .workflow/WORKFLOW-STATE.txt`, taking the LAST
-  line. While the header carries the unnamed-iteration sentinel — which is every scope stage, from
-  the boundary reset until the stage names the iteration — the pickaxe matches the *sentinel*
-  rather than a name, so the last line is the **oldest** sentinel-bearing commit in the whole
-  history instead of this iteration's.
-  **Probed at filing (2026-08-08):** `[iteration start 718ab4e]`, dated 2026-07-10, four weeks
-  stale; `queue net delta +111` and `queue carry weight +3759 lines`, where the true delta for the
-  last full iteration measured off boundary commits was roughly +280.
-  **Re-derived independently 2026-09-12 at scope, with the decay measured:** the same anchor is now
-  **two months** stale, the pickaxe returns 283 matching commits, and the report printed `queue net
-  delta +120` and `queue carry weight +4820 lines` as this iteration's.
-  **Wrong after naming too, probed at spec 2026-09-14:** `--enter-stage --rename` rewrites every
-  stamp's name, so the named pickaxe lands on the rename commit and drops scope's own drain and
-  survey commits for the rest of the iteration.
-  NOT `queue-recovery-pickaxe-wrong-oracle`'s subject (`-S` blind to eviction), a separate entry
-  this leaves untouched.
-  **Ruled at spec:** the anchor is the first stamp's `<head>`, a field `check-stage-evidence`
-  already holds true, read in one crate place. The amendment records the refused candidates
-  (`n/a` under the sentinel, the newest boundary-reset commit).
-  **Cost while deferred:** it fails silent behind a plausible sha and worsens with age, and the
-  stage it misleads is the one stage that reads the trend to pick units.
-  Filed 2026-08-08 at scope on the lead's ruling, from running the report during its own survey;
-  iceboxed 2026-09-11; returned 2026-09-12 at scope on an independent re-derivation.
-  **Joins `evidence-population-fidelity`** on an operator direction of 2026-09-14, lead-relayed,
-  ruled together with `always-loaded-baseline-restamp-unforced`; promoted at spec.
-  recurrence: drift-baseline-unnamed-iteration 2026-09-12
-
-- **always-loaded-baseline-restamp-unforced** [spec: SPEC-iteration-anchor.md]
-  — the brevity pass reacts to a delta nothing keeps per-iteration.
-  `--update-baseline` is specified as a close-stage act precisely because the pass must react to
-  *growth since the iteration started* rather than to the level (context-kit/SPEC.md §The
-  always-loaded meter). Nothing forces it, and `kpi-always-loaded` is advisory, so a close that
-  skips the re-stamp silently converts the next close's delta into a cumulative one.
-  **Measured at filing (2026-08-08):** the baseline last moved 2026-07-19 and had gone unrefreshed
-  through roughly fifteen iterations, reporting `+41` where that iteration's own growth was zero.
-  **Third incidence, measured 2026-09-12 at close:** four closes since the last write, and
-  `--growth` reported 50 files and +3056 net lines across several iterations. Re-baselined
-  in-session there.
-  **Fourth, live at spec 2026-09-14:** the row names `9bfa332b` with six scope boundaries since,
-  and `--growth` reports +1439 lines where this iteration's own growth is zero. The executed close
-  surface never names the re-stamp: lifecycle-kit's close step 10 does not, and this repo's close
-  binding does not splice `context-kit/templates/close-brevity.md`.
-  **Ruled at spec:** `--growth` measures from the iteration-start commit
-  `drift-baseline-unnamed-iteration` also reads, the bare line flags a baseline whose surface count
-  disagrees with that commit, and this repo's close binding points step 10 at the brevity template.
-  A recency gate stays refused, since it would gate a cadence.
-  **Cost while deferred:** a cumulative delta reads as this iteration's growth, so the pass either
-  re-reads surface it already cleared or dismisses a real addition as inherited.
-  Filed 2026-08-08 by close, from running the meter during its own brevity pass; iceboxed
-  2026-09-11; returned 2026-09-12 at scope on the third incidence, absorbing the duplicate
-  `always-loaded-baseline-freshness`.
-  **In the `evidence-population-fidelity` set** by operator direction, 2026-09-14, lead-relayed,
-  ruled together with `drift-baseline-unnamed-iteration`; promoted at spec.
-  recurrence: always-loaded-baseline-restamp-unforced 2026-09-12
-
 - **overhead-meter-resolves-the-newest-transcript-not-its-own** [spec: SPEC-overhead-self.md]
   — a bare `--emit overhead-meter` resolves the NEWEST candidate transcript, so any session that
   delegates and then meters measures its child; the close stage is that session by construction.
@@ -5079,5 +5021,7 @@
 ## Done
 
 - settings-pins-live-suite-coverage
+- drift-baseline-unnamed-iteration
+- always-loaded-baseline-restamp-unforced
 
 ## Lessons Learned

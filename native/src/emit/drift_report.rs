@@ -3,6 +3,7 @@
 // member that fails yields a visible row rather than a missing one.
 use super::kpi::{self, Ctx};
 use crate::proc;
+use crate::stages;
 use crate::walk;
 use std::path::Path;
 
@@ -12,7 +13,6 @@ use std::path::Path;
 pub const KNOBS: &[&str] = &[
     "DRIFT_KIT_*",
     "GATE_SDK_GATES_DIR",
-    "GATE_SDK_WORKFLOW_DIR",
     "GATE_KIT_ROOTS_HERE",
     "GUARD_KIT_LOG",
     "GUARD_KIT_SETTINGS",
@@ -44,35 +44,12 @@ fn scalar(fam: &[(String, String)], suffix: &str) -> String {
 }
 
 // spec: drift-kit/SPEC.md §The report skeleton — the iteration-start commit, derived **before** the
-// member loop so the same value reaches every member and the header; the pickaxe is over one file
-// of a few dozen lines and is priced in the section.
-fn iteration_start(queue_file: &str, workflow_dir: &str) -> String {
-    let text = match std::fs::read(queue_file) {
-        Ok(b) => String::from_utf8_lossy(&b).into_owned(),
-        Err(_) => return String::new(),
-    };
-    let iter = text
-        .lines()
-        .find_map(|l| l.strip_prefix("## Iteration:"))
-        .map(|r| {
-            let r = r.trim_start_matches([' ', '\t']);
-            match r.find("[stage:") {
-                Some(i) => r[..i].trim_end_matches([' ', '\t']),
-                None => r.trim_end_matches([' ', '\t']),
-            }
-        })
-        .unwrap_or("");
-    if iter.is_empty() {
-        return String::new();
-    }
-    let state = format!("{}/WORKFLOW-STATE.txt", workflow_dir);
-    let pickaxe = format!("-S{} scope ", iter);
-    proc::run("git", &["log", "--format=%h", &pickaxe, "--", &state])
-        .ok()
-        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
-        .and_then(|s| s.lines().last().map(String::from))
-        .unwrap_or_default()
+// member loop so the same value reaches every member and the header, off drift-kit's own
+// state-file knob and never off the iteration's name.
+fn iteration_start(fam: &[(String, String)]) -> String {
+    stages::iteration_start(&scalar(fam, "STATE_FILE"))
 }
+
 
 // spec: drift-kit/SPEC.md §The extensibility contract — the three resolution tiers, consumer-first:
 // the adopter's own dirs, then each vendored kit's `kpis/`, then the crate's built-in members. The
@@ -160,13 +137,11 @@ fn render_rows(rows: &[(String, String)]) -> String {
 pub fn emit(args: &[String]) -> Result<String, String> {
     let trend = args.iter().any(|a| a == "--trend");
     let fam = family();
-    let workflow_dir = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?;
-    let queue_file = scalar(&fam, "QUEUE_FILE");
     let kit_roots = walk::kit_roots_abs()?;
 
     let ctx = Ctx {
-        iteration_start: iteration_start(&queue_file, &workflow_dir),
-        queue_file,
+        iteration_start: iteration_start(&fam),
+        queue_file: scalar(&fam, "QUEUE_FILE"),
         knowledge_log: scalar(&fam, "KNOWLEDGE_LOG"),
         timings_file: scalar(&fam, "TIMINGS_FILE"),
         overhead_log: scalar(&fam, "OVERHEAD_LOG"),
@@ -316,19 +291,31 @@ mod tests {
         assert!(has("DRIFT_KIT_KIT_ROOTS") && has("DRIFT_KIT_ITERATION_START"));
     }
 
-    // spec: drift-kit/SPEC.md §The report skeleton — the iteration name is the heading less its
-    // stage tag, so a queue mid-iteration and one at a stage boundary derive the same baseline
+    // spec: drift-kit/SPEC.md §The report skeleton — the value reaching `Ctx` is the first stamp's
+    // head read through `DRIFT_KIT_STATE_FILE`, whatever the queue header names, and an unset or
+    // absent state file hands every member the empty string
     #[test]
-    fn the_iteration_name_drops_its_stage_tag_and_an_absent_queue_derives_nothing() {
+    fn the_iteration_start_reaching_ctx_is_the_state_files_first_head() {
+        let head = proc::run("git", &["rev-parse", "--short", "HEAD"])
+            .ok()
+            .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
+            .expect("the crate's tests run inside a work tree");
         let dir = std::env::temp_dir().join(format!("cw-iter-{}", std::process::id()));
         std::fs::create_dir_all(&dir).expect("cannot make the fixture dir");
-        let q = dir.join("Q.md");
-        std::fs::write(&q, "# T\n## Iteration: some-iter  [stage: build]\n")
-            .expect("cannot write the fixture queue");
-        assert_eq!(iteration_start(&dir.join("absent.md").display().to_string(), "."), "");
-        // spec: drift-kit/SPEC.md §The report skeleton — no stamp for this name exists in any
-        // state file, so the pickaxe answers empty; what the case pins is the parse reaching it.
-        assert_eq!(iteration_start(&q.display().to_string(), "."), "");
+        let state = dir.join("WORKFLOW-STATE.txt");
+        std::fs::write(
+            &state,
+            format!("# hdr\n---\n\nit scope s1 2026-09-14 {}\nit build s2 2026-09-14 0000000\n", head),
+        )
+        .expect("cannot write the fixture state file");
+        let fam = vec![("STATE_FILE".to_string(), state.display().to_string())];
+        assert_eq!(iteration_start(&fam), head);
+        let absent = vec![(
+            "STATE_FILE".to_string(),
+            dir.join("absent.txt").display().to_string(),
+        )];
+        assert_eq!(iteration_start(&absent), "");
+        assert_eq!(iteration_start(&[]), "");
         std::fs::remove_dir_all(&dir).ok();
     }
 
