@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+config-seam-third-cut gates sha256=753a9438de75a8d38816ef1f26424e9745a59db59649806d0e8b19c026295318 pass=113 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut gate_sdk sha256=66a533f5aabd61861735228ab38d37160110c0bb5cf1faa6276fb232d8f64908 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut canon_kit sha256=9abfbc2ca869a1d99fc0042041770b8d85097bf852c31e7c128600b65e24f1bf pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut guard_kit sha256=bec1c9c35372c4d6106471ec51071ee748b3187f02c6303efe7fbf6667cc7d0d pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut queue_kit sha256=2334582dd365a18ebe2f1daf9532d2acc25728fa9e04376e62f24f0c8a5a1788 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut guard_tests sha256=d1df8069c9935679a05e36a5b9c6859bc81fa68434855f3791e0cbb5bb328dd3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut demo sha256=95115f13b4aee5a55941ac5fa7a677f1e4e4cc99f70a5430bcb5a9a795fac77f pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut installer_smoke sha256=636e4ed575cc256286e117f5ec7449f8963715011ac676d949e35bb0c08f7700 pass=13 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut consumer_smoke sha256=3b93ad1b72ee9e71964e87ad9b99e530dd97f3fce4c40c530b4485339d266e9e pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut upgrade sha256=bb5d525bb112d367f4cc1af890a3189522c40d9fde16f1c3f356a4009fe697c2 pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-14
+config-seam-third-cut agents_md_smoke sha256=cc3ad59e7a23493230af84bf674aac3967f2c054756cf3e7302ab98fc3b300ec pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
+config-seam-third-cut native_crate sha256=89b5576802f03a4b8d3457b9f04e558929c88774522037e25cbdeab93165afa9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-14
