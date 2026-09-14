@@ -4952,9 +4952,4 @@
 
 ## Done
 
-- bridge-owning-kit-partition-forks-per-knob
-- run-knob-union-selector-narrowing
-- template-copy-parity-knobless-refusal
-- lead-journal-advisory-fires-on-the-live-lead
-
 ## Lessons Learned
