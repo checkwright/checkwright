@@ -37,6 +37,64 @@
   **Leads `evidence-population-fidelity`** — operator direction, 2026-09-14, lead-relayed, with
   the three sibling entries that name that iteration; promoted at spec.
 
+- **drift-baseline-unnamed-iteration** [spec: SPEC-iteration-anchor.md]
+  — every since-iteration-start KPI baselines on the wrong commit, silently.
+  `--emit drift-report`'s `iteration_start` reads the queue header's iteration name and runs
+  `git log --format=%h -S"<iteration> scope " -- .workflow/WORKFLOW-STATE.txt`, taking the LAST
+  line. While the header carries the unnamed-iteration sentinel — which is every scope stage, from
+  the boundary reset until the stage names the iteration — the pickaxe matches the *sentinel*
+  rather than a name, so the last line is the **oldest** sentinel-bearing commit in the whole
+  history instead of this iteration's.
+  **Probed at filing (2026-08-08):** `[iteration start 718ab4e]`, dated 2026-07-10, four weeks
+  stale; `queue net delta +111` and `queue carry weight +3759 lines`, where the true delta for the
+  last full iteration measured off boundary commits was roughly +280.
+  **Re-derived independently 2026-09-12 at scope, with the decay measured:** the same anchor is now
+  **two months** stale, the pickaxe returns 283 matching commits, and the report printed `queue net
+  delta +120` and `queue carry weight +4820 lines` as this iteration's.
+  **Wrong after naming too, probed at spec 2026-09-14:** `--enter-stage --rename` rewrites every
+  stamp's name, so the named pickaxe lands on the rename commit and drops scope's own drain and
+  survey commits for the rest of the iteration.
+  NOT `queue-recovery-pickaxe-wrong-oracle`'s subject (`-S` blind to eviction), a separate entry
+  this leaves untouched.
+  **Ruled at spec:** the anchor is the first stamp's `<head>`, a field `check-stage-evidence`
+  already holds true, read in one crate place. The amendment records the refused candidates
+  (`n/a` under the sentinel, the newest boundary-reset commit).
+  **Cost while deferred:** it fails silent behind a plausible sha and worsens with age, and the
+  stage it misleads is the one stage that reads the trend to pick units.
+  Filed 2026-08-08 at scope on the lead's ruling, from running the report during its own survey;
+  iceboxed 2026-09-11; returned 2026-09-12 at scope on an independent re-derivation.
+  **Joins `evidence-population-fidelity`** on an operator direction of 2026-09-14, lead-relayed,
+  ruled together with `always-loaded-baseline-restamp-unforced`; promoted at spec.
+  recurrence: drift-baseline-unnamed-iteration 2026-09-12
+
+- **always-loaded-baseline-restamp-unforced** [spec: SPEC-iteration-anchor.md]
+  — the brevity pass reacts to a delta nothing keeps per-iteration.
+  `--update-baseline` is specified as a close-stage act precisely because the pass must react to
+  *growth since the iteration started* rather than to the level (context-kit/SPEC.md §The
+  always-loaded meter). Nothing forces it, and `kpi-always-loaded` is advisory, so a close that
+  skips the re-stamp silently converts the next close's delta into a cumulative one.
+  **Measured at filing (2026-08-08):** the baseline last moved 2026-07-19 and had gone unrefreshed
+  through roughly fifteen iterations, reporting `+41` where that iteration's own growth was zero.
+  **Third incidence, measured 2026-09-12 at close:** four closes since the last write, and
+  `--growth` reported 50 files and +3056 net lines across several iterations. Re-baselined
+  in-session there.
+  **Fourth, live at spec 2026-09-14:** the row names `9bfa332b` with six scope boundaries since,
+  and `--growth` reports +1439 lines where this iteration's own growth is zero. The executed close
+  surface never names the re-stamp: lifecycle-kit's close step 10 does not, and this repo's close
+  binding does not splice `context-kit/templates/close-brevity.md`.
+  **Ruled at spec:** `--growth` measures from the iteration-start commit
+  `drift-baseline-unnamed-iteration` also reads, the bare line flags a baseline whose surface count
+  disagrees with that commit, and this repo's close binding points step 10 at the brevity template.
+  A recency gate stays refused, since it would gate a cadence.
+  **Cost while deferred:** a cumulative delta reads as this iteration's growth, so the pass either
+  re-reads surface it already cleared or dismisses a real addition as inherited.
+  Filed 2026-08-08 by close, from running the meter during its own brevity pass; iceboxed
+  2026-09-11; returned 2026-09-12 at scope on the third incidence, absorbing the duplicate
+  `always-loaded-baseline-freshness`.
+  **In the `evidence-population-fidelity` set** by operator direction, 2026-09-14, lead-relayed,
+  ruled together with `drift-baseline-unnamed-iteration`; promoted at spec.
+  recurrence: always-loaded-baseline-restamp-unforced 2026-09-12
+
 ## Technical Debt
 
 ## Deferred
@@ -4429,85 +4487,6 @@
   surface ratchet's ceiling for that file.
   Filed 2026-09-12 at build to the gap inbox; promoted here by close after →fix took only the
   history half.
-
-
-- **always-loaded-baseline-restamp-unforced** [design-pending] [cost: iteration/high] [surface: context-kit] — the
-  brevity pass reacts to a delta nothing keeps per-iteration.
-  `--update-baseline` is specified as a close-stage act precisely because the pass must react to
-  *growth since the iteration started* rather than to the level (context-kit/SPEC.md §The
-  always-loaded meter). Nothing forces it, and `kpi-always-loaded` is advisory, so a close that
-  skips the re-stamp silently converts the next close's delta into a cumulative one — and the
-  reading degrades further with every close that then trusts it.
-  **Measured at filing (2026-08-08):** the baseline last moved 2026-07-19 and had gone unrefreshed
-  through roughly fifteen iterations, reporting `+41` where that iteration's own growth was zero.
-  **Third incidence, measured 2026-09-12 at close** and carried here from that close's gap bullet:
-  the baseline's last write was `68cc1ea5` (2026-09-07) with four closes run since, and
-  `--emit always-loaded --growth` reported 50 files and +3056 net lines across 411 commits and
-  several iterations — a multi-iteration accumulation presented as the single-iteration worklist
-  `context-kit/templates/close-brevity.md` step 1 says it is. Re-baselined in-session there, so
-  the instance is discharged and the class is not. The ceiling half is armed now
-  (`check-surface-ratchet`); the baseline half still reds nothing.
-  **Returned from the icebox on that recurrence, absorbing a duplicate:**
-  `always-loaded-baseline-freshness` was filed 2026-09-07 as a bodyless one-line icebox entry for
-  this same defect, a month after this one, and is retired to Done as the merged duplicate. Two
-  sessions minted two slugs for one finding and a third nearly minted another, which is the tier's
-  own cost showing: a one-line row cannot tell a filer the finding is already there.
-  **Why `[design-pending]`:** the obvious fix, a gate asserting the baseline commit is recent,
-  gates a *cadence* rather than a property and would red on any close that legitimately had
-  nothing to re-stamp. The honest candidates are folding the re-stamp into the same commit the
-  brevity pass already writes, or making the meter report both deltas — against the baseline and
-  against the iteration's first stamp — so a stale baseline is visible in the reading instead of
-  invisible behind it. That second candidate is the same shape `drift-baseline-unnamed-iteration`
-  reaches for, which is why the two are best ruled together.
-  **Cost while deferred:** a cumulative delta reads as this iteration's growth, so the pass either
-  re-reads surface it already cleared or dismisses a real addition as inherited.
-  Filed 2026-08-08 by close, from running the meter during its own brevity pass; iceboxed
-  2026-09-11; returned 2026-09-12 at scope on the third incidence, whose measurement arrived as a
-  gap bullet from the prior iteration's close, so the record is late and says so.
-  **In the `evidence-population-fidelity` set** by operator direction, 2026-09-14, lead-relayed,
-  ruled together with `drift-baseline-unnamed-iteration` as this body asks; spec promotes.
-  recurrence: always-loaded-baseline-restamp-unforced 2026-09-12
-
-
-- **drift-baseline-unnamed-iteration** [design-pending] [cost: iteration/high] [surface: drift-kit] — every
-  since-iteration-start KPI baselines on an ancient commit for the whole of scope, silently.
-  `--emit drift-report`'s `iteration_start` reads the queue header's iteration name and runs
-  `git log --format=%h -S"<iteration> scope " -- .workflow/WORKFLOW-STATE.txt`, taking the LAST
-  line. While the header carries the unnamed-iteration sentinel — which is every scope stage, from
-  the boundary reset until the stage names the iteration — the pickaxe matches the *sentinel*
-  rather than a name, so the last line is the **oldest** sentinel-bearing commit in the whole
-  history instead of this iteration's.
-  **Probed at filing (2026-08-08):** `[iteration start 718ab4e]`, dated 2026-07-10, four weeks
-  stale; `queue net delta +111` and `queue carry weight +3759 lines`, where the true delta for the
-  last full iteration measured off boundary commits was roughly +280.
-  **Re-derived independently 2026-09-12 at scope, with the decay measured:** the same anchor is now
-  **two months** stale, the pickaxe returns 283 matching commits, and the report printed `queue net
-  delta +120` and `queue carry weight +4820 lines` as this iteration's. That session had not found
-  this entry and was about to file the finding a second time.
-  **The root cause is sharper than the pickaxe spelling**, which that re-derivation adds: the
-  anchor is keyed to the iteration *name*, and the sentinel is not unique by construction, so no
-  pickaxe over the name can identify this iteration. NOT
-  `queue-recovery-pickaxe-wrong-oracle`'s subject (`-S` blind to eviction), a separate entry this
-  leaves untouched.
-  **Premise drift:** the filing named a shell script under `drift-kit/bin/`; the port moved the
-  resolver to `native/src/emit/drift_report.rs`, so the fix now costs a crate edit and a rebuild.
-  **Why `[design-pending]`:** reporting `n/a` while the sentinel is live is honest and goes blank
-  at exactly the stage that wanted the reading; resolving from the newest boundary-reset commit
-  keeps the reading but changes what "iteration start" means for every KPI that reads it. A third
-  candidate the re-derivation adds: the first stamp in the boundary-truncated state file already
-  carries the iteration's head commit in its fourth field, so the anchor is readable off a file the
-  gates already read, with no git call at all. Which is right is not the reporter's call in passing.
-  **Cost while deferred:** it fails silent behind a plausible sha and worsens with age, and the
-  stage it misleads is the one stage that reads the trend to pick units — attested twice now, most
-  recently by the scope session that returned it. Distinct from
-  `always-loaded-baseline-restamp-unforced`, the always-loaded meter's re-stamp cadence rather than
-  this resolver, though both candidate sets now converge on making a stale anchor visible in the
-  reading, so the two are best ruled together.
-  Filed 2026-08-08 at scope on the lead's ruling, from running the report during its own survey;
-  iceboxed 2026-09-11; returned 2026-09-12 at scope on an independent re-derivation.
-  **Joins `evidence-population-fidelity`** on an operator direction of 2026-09-14, lead-relayed,
-  ruled together with `always-loaded-baseline-restamp-unforced`; spec promotes.
-  recurrence: drift-baseline-unnamed-iteration 2026-09-12
 
 
 - **close-surface-row-absent-reads-as-empty** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — the
