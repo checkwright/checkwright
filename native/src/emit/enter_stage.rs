@@ -129,7 +129,9 @@ fn usage(stages: &[String]) -> String {
     format!(
         "usage: run-gates.sh --enter-stage [--simulate] <stage>          (stage ∈ {})\n       \
          run-gates.sh --enter-stage [--simulate] --rename <name>  (rename the iteration: queue \
-         header + column 1 of every stamp)\n       run-gates.sh --enter-stage [-h|--help]",
+         header + column 1 of every stamp)\n       run-gates.sh --enter-stage [--simulate] \
+         --open-lead-journal  (open the lead journal under a heading keyed on the cursor)\n       \
+         run-gates.sh --enter-stage [-h|--help]",
         stages.join(" ")
     )
 }
@@ -161,7 +163,113 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     if rest.first().map(String::as_str) == Some("--rename") {
         return rename(&c, &say, &rest[1..]);
     }
+    if rest.first().map(String::as_str) == Some(OPEN_LEAD_JOURNAL) {
+        return open_lead_journal(&c, &say, rest);
+    }
     stamp(&c, &say, rest)
+}
+
+const OPEN_LEAD_JOURNAL: &str = "--open-lead-journal";
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --open-lead-journal: the lead journal's opener,
+// not stage motion — no stamp, no pre-flight, no queue write, nothing tracked
+fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
+    if let Some(msg) = surplus_refusal(rest) {
+        eprintln!("{}", msg);
+        eprintln!("{}", usage(&c.stages));
+        return Ok(2);
+    }
+    if !Path::new(&c.state).is_file() {
+        eprintln!("enter-stage: state file not found: {}", c.state);
+        return Ok(2);
+    }
+    let key = cursor_key(&read(&c.state));
+    let heading = format!("{}{}", LEAD_OPEN_MARK, key);
+    let lj = lead_journal_file(c);
+    let body = read(&lj);
+    let segs = lead_segments(&body);
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the no-op needs the live segment undisposed:
+    // a disposed one is dropped and reopened like any other
+    if let Some(last) = segs.last() {
+        if last.key == Some(key.as_str()) && !last.disposed() {
+            if say.sim {
+                say.out(&format!(
+                    "{} already opens its last segment with '{}' — the real opener would be an \
+                     idempotent no-op.",
+                    lj, heading
+                ));
+            } else {
+                println!(
+                    "enter-stage: {} already opens its last segment with '{}' — idempotent no-op, \
+                     nothing written.",
+                    lj, heading
+                );
+            }
+            return Ok(0);
+        }
+    }
+
+    let dropped: Vec<String> = segs
+        .iter()
+        .filter(|s| s.disposed())
+        .map(|s| s.label())
+        .collect();
+
+    if say.sim {
+        say.out(&format!(
+            "--open-lead-journal would append '{}' to {} — no write.",
+            heading, lj
+        ));
+        for d in &dropped {
+            say.out(&format!("would drop the disposed segment: {}", d));
+        }
+        return Ok(0);
+    }
+
+    std::fs::create_dir_all(&c.tmpdir)
+        .map_err(|e| format!("cannot create the scratch dir {}: {}", c.tmpdir, e))?;
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — append, never overwrite: the file is
+    // rewritten only when a disposed segment is dropped, and then every other segment is kept
+    if dropped.is_empty() {
+        let mut add = String::new();
+        if !body.is_empty() {
+            if !body.ends_with('\n') {
+                add.push('\n');
+            }
+            add.push('\n');
+        }
+        add.push_str(&heading);
+        add.push('\n');
+        append_raw(&lj, &add)?;
+    } else {
+        let mut kept: String = segs
+            .iter()
+            .filter(|s| !s.disposed())
+            .flat_map(|s| s.lines.iter().copied())
+            .collect();
+        while kept.ends_with("\n\n") {
+            kept.pop();
+        }
+        if !kept.is_empty() {
+            if !kept.ends_with('\n') {
+                kept.push('\n');
+            }
+            kept.push('\n');
+        }
+        kept.push_str(&heading);
+        kept.push('\n');
+        write_file(&lj, &kept)?;
+    }
+    println!(
+        "enter-stage: opened the lead journal {} under '{}' — append under it; never overwrite the \
+         file.",
+        lj, heading
+    );
+    for d in &dropped {
+        println!("  note: dropped the disposed segment: {}", d);
+    }
+    Ok(0)
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --rename: the two-surface iteration rename in
@@ -391,14 +499,21 @@ fn fields_two_to_last(text: &str) -> Vec<String> {
 // branch names the flag-first spelling because that is the misuse the refusal exists to catch
 fn surplus_refusal(rest: &[String]) -> Option<String> {
     let surplus = rest.get(1)?;
+    let (before, after, operand) = if rest[0] == OPEN_LEAD_JOURNAL {
+        (OPEN_LEAD_JOURNAL, OPEN_LEAD_JOURNAL, OPEN_LEAD_JOURNAL)
+    } else {
+        ("the stage", "the stage name", "<stage>")
+    };
     Some(if surplus == "--simulate" {
-        "enter-stage: '--simulate' is read before the stage, never after it — spell it \
-         '--enter-stage --simulate <stage>'. Nothing written."
-            .to_string()
+        format!(
+            "enter-stage: '--simulate' is read before {}, never after it — spell it \
+             '--enter-stage --simulate {}'. Nothing written.",
+            before, operand
+        )
     } else {
         format!(
-            "enter-stage: unexpected argument '{}' after the stage name — nothing written.",
-            surplus
+            "enter-stage: unexpected argument '{}' after {} — nothing written.",
+            surplus, after
         )
     })
 }
@@ -1103,9 +1218,22 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the undisposed-journal advisory: the lead
     // journal survives the wipe, so the boundary makes an undisposed one loud and never blocking
     // (the entering session cannot discharge a disposition it has no context to judge).
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary key is read off the state text
+    // captured before the reset truncated it; only a last segment opened under it is exempt
     if first {
-        let lj = format!("{}/{}", c.tmpdir.trim_end_matches('/'), c.lead_journal);
-        if Path::new(&lj).is_file() && !disposed(&lj) {
+        let lj = lead_journal_file(c);
+        let boundary_key = cursor_key(&state_text);
+        let body = read(&lj);
+        let segs = lead_segments(&body);
+        let n = segs.len();
+        let prior: Vec<&Segment> = segs
+            .iter()
+            .enumerate()
+            .filter(|(i, s)| !(i + 1 == n && s.key == Some(boundary_key.as_str())))
+            .map(|(_, s)| s)
+            .filter(|s| !s.disposed())
+            .collect();
+        if Path::new(&lj).is_file() && !prior.is_empty() {
             println!(
                 "  note: {} crossed this boundary carrying no '{}' line — the prior lead's journal \
                  is undisposed. Anything in it that must outlive the iteration belongs in a \
@@ -1113,8 +1241,10 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
                  these are its headings:",
                 lj, DISPOSITION_MARK
             );
-            for h in read_headings(&lj) {
-                println!("    {}", h);
+            for s in prior {
+                for h in s.lines.iter().map(|l| l.trim_end()).filter(|l| is_h2(l)) {
+                    println!("    {}", h);
+                }
             }
         }
     }
@@ -1122,16 +1252,74 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the disposition mark is a presence marker on
-// the file's last non-empty line, the stage journal's `DONE` shape with a disposition semantic
+// a segment's last non-empty line, the stage journal's `DONE` shape with a disposition semantic
 pub const DISPOSITION_MARK: &str = "DISPOSED";
 
-fn disposed(path: &str) -> bool {
-    read(path)
-        .lines()
-        .rev()
-        .find(|l| !l.trim().is_empty())
-        .map(|l| l.trim() == DISPOSITION_MARK)
-        .unwrap_or(false)
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the segment heading's fixed lead, spelled once
+// because the opener writes it and the boundary advisory reads it
+const LEAD_OPEN_MARK: &str = "## lead-journal opened after ";
+
+fn lead_journal_file(c: &Cfg) -> String {
+    format!("{}/{}", c.tmpdir.trim_end_matches('/'), c.lead_journal)
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — fields 2 through the last of the last stamp,
+// never the whole line, because --rename rewrites column 1
+fn cursor_key(state_text: &str) -> String {
+    fields_two_to_last(state_text)
+        .pop()
+        .filter(|k| !k.is_empty())
+        .unwrap_or_else(|| "none".to_string())
+}
+
+struct Segment<'a> {
+    key: Option<&'a str>,
+    lines: Vec<&'a str>,
+}
+
+impl Segment<'_> {
+    fn disposed(&self) -> bool {
+        self.lines
+            .iter()
+            .map(|l| l.trim())
+            .rev()
+            .find(|l| !l.is_empty())
+            == Some(DISPOSITION_MARK)
+    }
+    fn label(&self) -> String {
+        match self.key {
+            Some(k) => format!("{}{}", LEAD_OPEN_MARK, k),
+            None => "(the content before the first opening heading)".to_string(),
+        }
+    }
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — content before the first heading is a segment
+// too, so a journal no opener wrote reads as one keyless segment; a blank-only one is no segment
+fn lead_segments(text: &str) -> Vec<Segment<'_>> {
+    let mut segs = vec![Segment {
+        key: None,
+        lines: Vec::new(),
+    }];
+    for l in lines_with_ends(text) {
+        if let Some(k) = l.trim_end().strip_prefix(LEAD_OPEN_MARK) {
+            segs.push(Segment {
+                key: Some(k.trim()),
+                lines: vec![l],
+            });
+            continue;
+        }
+        if let Some(s) = segs.last_mut() {
+            s.lines.push(l);
+        }
+    }
+    segs.retain(|s| s.key.is_some() || s.lines.iter().any(|l| !l.trim().is_empty()));
+    segs
+}
+
+fn is_h2(l: &str) -> bool {
+    let mut b = l.bytes();
+    b.next() == Some(b'#') && b.next() == Some(b'#') && matches!(b.next(), Some(c) if c.is_ascii_whitespace())
 }
 
 struct Valve {
@@ -1638,12 +1826,7 @@ fn read_headings(path: &str) -> Vec<&'static str> {
     // comment-tier-exempt: the leak is a lifetime device local to this one reader — the record is
     // small and read exactly here — and states nothing the SPEC owns
     let body: &'static str = Box::leak(read(path).into_boxed_str());
-    body.lines()
-        .filter(|l| {
-            let mut b = l.bytes();
-            b.next() == Some(b'#') && b.next() == Some(b'#') && matches!(b.next(), Some(c) if c.is_ascii_whitespace())
-        })
-        .collect()
+    body.lines().filter(|l| is_h2(l)).collect()
 }
 
 fn lines_with_ends(text: &str) -> Vec<&str> {
@@ -1776,6 +1959,43 @@ mod tests {
         assert!(rewrite_column_one(six, "new").contains("new a bb ccc dddd eeeee"));
     }
 
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lead journal's key survives a rename,
+    // since the rename rewrites the one column the key leaves out
+    #[test]
+    fn the_lead_journal_key_survives_a_rename_and_names_none_without_a_stamp() {
+        let state = "# h\n\n---\n\nold scope aaaa 2026-01-01 none\nold close bbbb 2026-01-02 1234abc\n";
+        assert_eq!(cursor_key(state), "close bbbb 2026-01-02 1234abc");
+        assert_eq!(cursor_key(&rewrite_column_one(state, "new")), cursor_key(state));
+        assert_eq!(cursor_key("# h\n\n---\n\n"), "none");
+    }
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — segments split at the opening heading, a
+    // heading-less journal is one keyless segment, and disposition is per segment
+    #[test]
+    fn the_lead_journal_reads_as_segments_each_disposed_on_its_own() {
+        let bare = "# lead journal\n\n## roster\nprose\n";
+        let segs = lead_segments(bare);
+        assert_eq!(segs.len(), 1);
+        assert_eq!(segs[0].key, None);
+        assert!(!segs[0].disposed());
+
+        let mixed = format!(
+            "{m}a b c d\n## roster\nDISPOSED\n\n{m}e f g h\n## live\nprose\n",
+            m = LEAD_OPEN_MARK
+        );
+        let segs = lead_segments(&mixed);
+        assert_eq!(segs.len(), 2, "a blank-only leading run must not count as a segment");
+        assert_eq!(segs[0].key, Some("a b c d"));
+        assert!(segs[0].disposed());
+        assert_eq!(segs[1].key, Some("e f g h"));
+        assert!(!segs[1].disposed());
+        assert_eq!(
+            segs.iter().flat_map(|s| s.lines.iter().copied()).collect::<String>(),
+            mixed,
+            "segmenting must lose no byte"
+        );
+    }
+
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the header run stops at a '## ' heading as
     // well as at the first data line, and the retained blank run does not grow by one per boundary
     #[test]
@@ -1886,6 +2106,9 @@ mod tests {
         let other = surplus_refusal(&["build".to_string(), "extra".to_string()])
             .expect("any surplus argument must refuse");
         assert!(other.contains("'extra'"), "{}", other);
+        let opener = surplus_refusal(&[OPEN_LEAD_JOURNAL.to_string(), "--simulate".to_string()])
+            .expect("a trailing --simulate after the opener must refuse");
+        assert!(opener.contains("--enter-stage --simulate --open-lead-journal"), "{}", opener);
     }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — `--simulate`'s contract is that it runs

@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **lead-journal-advisory-fires-on-the-live-lead** [spec: SPEC-lead-journal-open.md]
-  — the boundary entry's undisposed-lead-journal advisory (lifecycle-kit/SPEC.md
-  §bin/enter-stage.sh) fires on the **live** dispatching lead's own journal at every
-  lead-dispatched scope entry, labelled as the prior lead's: the lead opens its journal before it
-  dispatches scope, so at that boundary the file never ends in `DISPOSED`. Attested at the
-  2026-09-12, 2026-09-13 and 2026-09-14 scope entries.
-  **Designed at spec:** `--enter-stage --open-lead-journal` appends a heading keyed on the stage
-  cursor (fields 2 to last of the last stamp), the boundary advisory reads the journal as
-  segments and exempts only a last segment whose key matches, and the lead template's first step
-  runs the opener. The entry's three candidates are refused in the amendment on probed grounds.
-  Filed 2026-09-13 by scope; drained from the gap inbox at `resident-tier-restatement`'s close.
-  **Ranked into `config-bridge-floor` at the recurrence threshold — operator direction, 2026-09-14,
-  lead-relayed;** promoted at spec.
-  recurrence: lead-journal-advisory-fires-on-the-live-lead 2026-09-14 2026-09-14
-
 ## Technical Debt
 
 ## Deferred
@@ -4977,5 +4962,6 @@
 - bridge-owning-kit-partition-forks-per-knob
 - run-knob-union-selector-narrowing
 - template-copy-parity-knobless-refusal
+- lead-journal-advisory-fires-on-the-live-lead
 
 ## Lessons Learned

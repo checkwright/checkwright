@@ -2316,9 +2316,10 @@ appends the invocation stamp, deriving the session id in process by the
 rides into the tool.
 
 **It is a bridged `Arm::Run`, and the variant is the exit contract.** The
-grammar is `--enter-stage [--simulate] <stage>` or
-`--enter-stage [--simulate] --rename <name>`: `--simulate` and `--rename` ride as
-operands, so the argument grammar is the one this tool always had and only the
+grammar is `--enter-stage [--simulate] <stage>`,
+`--enter-stage [--simulate] --rename <name>` or
+`--enter-stage [--simulate] --open-lead-journal`: `--simulate`, `--rename` and
+`--open-lead-journal` ride as operands, so the argument grammar is the one this tool always had and only the
 program word changed. `Arm::Run` rather than `Arm::Emit` because the exit status
 is **three-state and every code is load-bearing** — 0 a stamp or a reported
 no-op, **1 a refusal** (the entry pre-flight, a `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
@@ -2333,8 +2334,8 @@ the arms whose verdict a session reads rather than the decline-with-0 posture of
 a harness-integration arm.
 
 **A surplus argument is refused, never dropped, and the ground is that this
-tool's only flag is position-sensitive.** `<stage>` takes exactly one operand
-and `--rename` exactly one `<name>`; anything after it exits 2 naming the
+tool's only flag is position-sensitive.** `<stage>` takes exactly one operand,
+`--rename` exactly one `<name>` and `--open-lead-journal` none; anything after it exits 2 naming the
 surplus token, and a trailing `--simulate` is named specially with the
 flag-first spelling because that is the misuse the refusal exists to catch.
 Silently ignoring it fails open on precisely the input a caller got wrong: the
@@ -2495,9 +2496,17 @@ and cannot drop a second it never mentioned — so the same reasoning that made
 exists only so a consumer who renames the file can say so.
 
 **Preserving is not draining, so the boundary entry also reports an undisposed
-journal.** When the lead journal exists and its last non-empty line is not the
-disposition mark `DISPOSED`, the boundary entry prints the file's `## ` headings
-as an advisory and **proceeds**. This is the survey record's read trigger reused
+journal.** When the lead journal exists, the boundary entry splits it into segments at its
+`## lead-journal opened after <key>` headings (the `--open-lead-journal` paragraph below) and compares each key
+with the **boundary key**: fields 2 through the last of the state file's last stamp *before
+this entry wrote*, or `none`. The **last** segment is **live** when its heading's key equals
+the boundary key. That segment was opened after the stamp this boundary closes over, so it
+belongs to the lead dispatching this very entry. Every other segment is **prior**. Each prior
+segment whose last non-empty line is not the disposition mark `DISPOSED` is reported: the
+advisory prints that segment's `## ` headings, its own opening heading first, and **proceeds**.
+A journal with no opening heading is a single prior segment, which is exactly the whole-file
+test. The boundary key is read before the reset truncates the state file, because the truncate
+removes the stamp the key names. This is the survey record's read trigger reused
 rather than reinvented (§The survey record) — the same print over a different
 file, headings and never findings. The mark itself is a presence marker on the
 `DONE` marker's precedent, produced by the lead at its close
@@ -2513,7 +2522,10 @@ very artifact the invariant protects. So the boundary makes the state **loud**
 and never blocking. **Its honest limit:** the advisory can be read and ignored,
 and nothing here forces the lead's disposition step. What it buys is that the
 undisposed state stops being silent — the attested failure being three findings
-that survived only because the operator happened to ask.
+that survived only because the operator happened to ask. The live exemption trusts the heading.
+A lead that opens its journal by hand, or not at all, gets the whole-file test and the false
+advisory with it, and a hand-written heading with a wrong key reads as prior. That is the safe
+direction.
 
 The scratch dir has a **second reclaimer, and the two do not overlap.**
 context-kit's session-context hook sweeps the same directory at *every* session
@@ -3108,6 +3120,75 @@ hermetic cases — both surfaces rewritten, fields 2-4 proved unchanged, the
 half-landed heal, each refusal, the idempotent no-op, and `--simulate --rename`
 writing nothing — live in `gate-tests/`, because a rename cannot be exercised
 against a live checkout's own queue the way `smoke/` exercises the stamp path.
+
+**`--open-lead-journal` — the lead's journal opener.** `[--simulate] --open-lead-journal`
+appends one heading to the lead journal (`<scratch>/$LIFECYCLE_KIT_LEAD_JOURNAL_FILE`),
+creating the file and its directory when absent:
+
+`## lead-journal opened after <key>`
+
+`<key>` is fields 2 through the last of the state file's last stamp, or the literal `none` when
+the file carries no stamp. The heading opens a **segment**, which runs to the next such heading
+or to the end of the file. Content before the first heading is a segment as well, so a journal
+written before this opener existed reads as one segment with no key; a blank-only run is no
+segment.
+
+- **Append, never overwrite**, on the stage-journal opener's precedent. An undisposed prior
+  segment is the thing the boundary advisory reports, and an overwrite would delete it before
+  any reader ran.
+- **Disposed segments are dropped.** Before appending, the opener removes every segment whose
+  last non-empty line is `DISPOSED`. It keeps every other segment, in order. A disposed segment
+  has been discharged by the lead that wrote it, so no reader remains for it. Dropping it keeps
+  the protected file from becoming the accumulator the invariant warns about. The file is
+  rewritten only when a segment is dropped; otherwise the heading is a plain append.
+- **Idempotent.** When the file's last segment already opens with the heading for the current
+  key **and is undisposed**, the opener reports and exits 0 without writing. That covers a
+  resumed lead re-running its first step. A disposed last segment under the same key is dropped
+  and reopened like any other disposed segment: the no-op exists for a lead that is still
+  writing, and a lead that disposed has stopped. **Honest limit:** a second lead opening at the
+  same cursor, after the first ended without disposing, continues the first lead's segment. The
+  opener cannot tell a resumed lead from a replacing one. Either way the segment belongs to the
+  iteration about to open, and that is the property the advisory reads.
+- **Not stage motion.** No stamp is appended, no pre-flight runs, the queue is untouched, and
+  the command writes nothing tracked. `--simulate --open-lead-journal` relays what it would
+  write and drop, prefixed `enter-stage (simulate):`, and writes nothing.
+- **Exit contract:** 0 opened, or a reported no-op; 2 a usage or configuration error, an absent
+  state file included, on the stamp path's precedent. Surplus arguments after the operand are
+  refused by this tool's existing surplus rule. It has no 1, because it refuses nothing a caller
+  could clear.
+
+The key derivation is one function the opener and the boundary advisory both call, and the
+heading lead is one constant beside `DISPOSED`, spelled once for the reason the stage journal's
+opening mark is: the writer and the reader of the key must agree byte for byte.
+
+**Why the opener keys on the stage cursor, and why the entry tool writes the heading.** The
+cursor is the last stamp (§The state machine): a journal opened after that stamp was opened for
+the iteration about to open, and the stamp is unique by construction, since it carries a session
+id and a head. The key is fields 2 through the last rather than the whole line because `--rename`
+rewrites column 1 of every stamp — the same witness `--rename` asserts. A hand-written key would
+mean the lead reading the state file and copying a line out of it, which §templates/lead.md
+forbids (the lead never hand-derives prior-stage completeness) and which drifts by a single
+space. The opener is an operand of this tool, which already owns the lead journal's knob, its
+disposition mark and the advisory, rather than a new arm: a new arm would be a second module
+holding one key derivation, with its own bridged roster. Three other discriminators are **ruled
+out**:
+
+- **The lead writes its journal only after scope stamps.** A grant lives in the lead's resume
+  journal (§The steering vocabulary), and the lead holds the grant before it dispatches scope, so
+  deferring the write leaves the grant with no durable home for the whole scope stage.
+- **A session marker.** The lead already writes `lead <id>` to context-kit's session-role
+  marker, and the marker survives the boundary, but its staleness test is an id match against
+  *the reading session's own* id. That works for the lead's own hook and for nobody else: at the
+  boundary the reader is the entering session, so a marker left by a lead that ended without
+  disposing reads exactly like a live one — failing open on the case the advisory exists for.
+- **An opening line naming the iteration.** The boundary reset writes the unnamed placeholder,
+  so a lead opening before the first stage sees either the prior iteration's name or the
+  placeholder, and two consecutive iterations that never got a name collide on the placeholder.
+
+Advisory tooling like `--simulate`, so no fixture pair is owed; the hermetic cases — creation,
+append after an undisposed segment, the disposed-segment drop, the idempotent no-op,
+`--simulate --open-lead-journal` writing nothing, the surplus refusal and the `none` key — live
+in `gate-tests/`, and the key's survival of a rename is a unit test beside the rename witness's.
 
 **Idempotent:** if the
 state file already ends with a stamp for the same `<iteration> <stage> <id>`,
@@ -4748,7 +4829,8 @@ The **iteration lead** template — an optional live session that dispatches an
 iteration's stage sessions and answers their escalations, closing the
 restart-cost of a stage that would otherwise stop and surface to the user cold
 (§The state machine). Like `release-sweep.md` it is a **boundary skill, not a
-stage**: it invokes no `--enter-stage` and joins no stage set, so
+stage**: it stamps nothing through `--enter-stage` — it runs only the
+non-stamping `--simulate` and `--open-lead-journal` forms — and joins no stage set, so
 `check-stage-skill-coverage` never reads it. Like release-sweep it carries
 named slots, so it adopts the binding-shim grammar (§templates/stages/) — a
 consumer copies-and-specializes it or binds it through a thin shim, and
@@ -4858,7 +4940,10 @@ wasted dispatch — rather than undetected, and a duplicate reading of one fact
 would buy only the timing the simulate read already buys for free.
 The template also carries the lead's first step —
 writing the session-role marker context-kit's hook reads
-(context-kit/SPEC.md §The session-context hook).
+(context-kit/SPEC.md §The session-context hook), then opening its resume journal
+through `--enter-stage --open-lead-journal` (§bin/enter-stage.sh), whose keyed
+heading is what exempts the live lead's segment from the boundary's undisposed
+advisory.
 **Both of the lead's scratch artifacts outlive the iteration the boundary wipe
 reclaims, and that is one fact rather than two exceptions.** A lead session is
 live *at* the boundary — it files a boundary judgment there for the entering

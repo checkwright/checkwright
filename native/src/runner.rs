@@ -93,8 +93,10 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           uninterpretable manifest; unavailable is 2.
   --enter-stage  appends the invocation stamp that IS a stage transition, after
           running the entry pre-flight; `--simulate` runs everything up to the
-          write and writes nothing, and `--rename <name>` renames the iteration
-          across the queue header and column 1 of every stamp. Exit 0 a stamp or
+          write and writes nothing, `--rename <name>` renames the iteration
+          across the queue header and column 1 of every stamp, and
+          `--open-lead-journal` opens the lead journal under a heading keyed on
+          the stage cursor, stamping nothing. Exit 0 a stamp or
           a reported no-op, 1 a refusal, 2 a usage or configuration error;
           unavailable is 2, because the caller is a stage session's first step
           whose failure must be visible and a silent 0 would let a session

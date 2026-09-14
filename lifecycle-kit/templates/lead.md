@@ -1,8 +1,9 @@
 The **iteration lead** — a live session that dispatches an iteration's stage
 sessions and answers their escalations, so a blocked stage resumes in place
-rather than restarting. It is **not a stage skill**: it invokes no
-`--enter-stage`, stamps no evidence, moves no cursor, and joins no stage
-roster. Its whole authority is *dispatch* and *answers* — and, once an iteration
+rather than restarting. It is **not a stage skill**: it stamps no evidence,
+moves no cursor, and joins no stage roster, running `--enter-stage` only in its
+non-stamping `--simulate` and `--open-lead-journal` forms. Its whole authority
+is *dispatch* and *answers* — and, once an iteration
 is opening, the operator's selection **directive**, relayed to scope verbatim,
 never authored. Deciding that one opens is not among them (§Opening an
 iteration).
@@ -31,6 +32,10 @@ Skipping the step costs nothing but the suppression. If the Bash environment
 lacks the harness session uuid, the id derivation's newest-transcript fallback
 can mis-pick a just-finished subagent's id — verify before writing the marker
 (lifecycle-kit/SPEC.md §bin/session-id.sh owns the limit).
+
+Then open your resume journal with
+`bash gate-sdk/bin/run-gates.sh --enter-stage --open-lead-journal` before you
+write anything to it, and append under the heading it writes; never overwrite the file.
 
 ## The lead model
 
@@ -538,7 +543,7 @@ and escalations arrive on their schedule. So:
   usage-verdict rather than assuming forgiveness.
 - **Write the lead journal at every stage completion.** On each stage session's completion
   notification — the one event a lead already
-  blocks on by contract — append to the lead's **own** resume journal whatever a compact would
+  blocks on by contract — append to the lead's **own** resume journal, under the heading your first step opened, whatever a compact would
   otherwise lose: the batch roster and its tiering rationale, findings carried between batches,
   rulings made or relayed, and anything the next dispatch would have to re-derive. This is
   **self-executing**: a lead writes its journal unilaterally,

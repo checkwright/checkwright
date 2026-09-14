@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe end-to-end through a sandboxed enter-stage: the iteration-boundary entry deletes the scratch dir's members, keeps the .gitkeep and lead-journal kit invariants and every LIFECYCLE_KIT_BOUNDARY_PRESERVE basename at any depth, names the wiped set in its report, raises the undisposed-journal advisory without blocking, and a non-boundary entry touches no scratch at all
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe end-to-end through a sandboxed enter-stage: the iteration-boundary entry deletes the scratch dir's members, keeps the .gitkeep and lead-journal kit invariants and every LIFECYCLE_KIT_BOUNDARY_PRESERVE basename at any depth, names the wiped set in its report, raises the undisposed-journal advisory without blocking for every prior segment while exempting the live lead's, and a non-boundary entry touches no scratch at all
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -116,6 +116,44 @@ out="$(run_enter "$dis" scope)"; rc=$?
 [[ -f "$dis/scratch/lead-journal.md" ]] || note disposed-kept "a disposed lead journal was deleted"
 grep -qF '## batch roster and tiering' <<<"$out" && note disposed-advisory "a disposed journal still raised the advisory: $out"
 
+# --- the segment the live lead opened after the closing stamp is exempt ---
+live_key='close dddddddd 2026-06-04 none'
+liv="$SANDBOX/live"
+seed "$liv"
+printf '## lead-journal opened after %s\n\n## live roster\n\nprose\n' "$live_key" >"$liv/scratch/lead-journal.md"
+out="$(run_enter "$liv" scope)"; rc=$?
+[[ "$rc" -eq 0 ]] || note live-entry "want exit 0, got $rc -- $out"
+[[ -f "$liv/scratch/lead-journal.md" ]] || note live-kept "the live lead's journal was deleted"
+grep -qF 'is undisposed' <<<"$out" && note live-advisory "the live lead's own segment raised the advisory: $out"
+
+# --- a prior undisposed segment before the live one is reported, and only its headings print ---
+pri="$SANDBOX/prior-then-live"
+seed "$pri"
+printf '## lead-journal opened after close zzzzzzzz 2026-05-01 none\n\n## prior findings\n\nprose\n\n## lead-journal opened after %s\n\n## live roster\n' \
+    "$live_key" >"$pri/scratch/lead-journal.md"
+out="$(run_enter "$pri" scope)"; rc=$?
+[[ "$rc" -eq 0 ]] || note prior-entry "want exit 0, got $rc -- $out"
+grep -qF 'is undisposed' <<<"$out" || note prior-advisory "an undisposed prior segment raised no advisory: $out"
+grep -qF '## prior findings' <<<"$out" || note prior-headings "the prior segment's headings did not print: $out"
+grep -qF 'opened after close zzzzzzzz' <<<"$out" || note prior-opening "the prior segment's opening heading did not print: $out"
+grep -qF '## live roster' <<<"$out" && note prior-live-leak "the live segment's headings printed: $out"
+
+# --- a lone segment keyed on an older stamp is prior ---
+old="$SANDBOX/older-key"
+seed "$old"
+printf '## lead-journal opened after validate cccccccc 2026-06-03 none\n\n## stale roster\n' >"$old/scratch/lead-journal.md"
+out="$(run_enter "$old" scope)"; rc=$?
+[[ "$rc" -eq 0 ]] || note older-entry "want exit 0, got $rc -- $out"
+grep -qF '## stale roster' <<<"$out" || note older-advisory "a segment keyed on an older stamp was read as live: $out"
+
+# --- a heading-less journal keeps the whole-file test: a mid-file mark disposes nothing ---
+hl="$SANDBOX/headingless"
+seed "$hl"
+printf '## early\nDISPOSED\n\n## late\nprose\n' >"$hl/scratch/lead-journal.md"
+out="$(run_enter "$hl" scope)"; rc=$?
+[[ "$rc" -eq 0 ]] || note headingless-entry "want exit 0, got $rc -- $out"
+grep -qF '## late' <<<"$out" || note headingless-advisory "a heading-less journal whose last line is not the mark raised no advisory: $out"
+
 [[ "$fails" -eq 0 ]] || { echo "boundary-scratch-wipe.test: $fails assertion(s) failed"; exit 1; }
-echo "boundary-scratch-wipe.test: clean (boundary wipe keeps .gitkeep, the lead journal and every PRESERVE basename at any depth, reports the wiped set, announces an undisposed journal without blocking, and leaves non-boundary entries untouched)"
+echo "boundary-scratch-wipe.test: clean (boundary wipe keeps .gitkeep, the lead journal and every PRESERVE basename at any depth, reports the wiped set, announces an undisposed prior segment without blocking and exempts the live one, and leaves non-boundary entries untouched)"
 exit 0
