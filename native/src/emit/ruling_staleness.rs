@@ -7,7 +7,7 @@ use std::path::Path;
 
 const WS: [char; 5] = [' ', '\t', '\x0b', '\x0c', '\r'];
 
-// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the declared roster the bridge resolves;
+// spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the declared roster;
 // all three default empty or inert kit-side, so an adopter keeping no ruling record reaches a
 // configured-off report rather than a broken arm.
 pub const KNOBS: &[&str] = &[

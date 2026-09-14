@@ -2,14 +2,14 @@
 // validator
 use super::{indexed, scalar, Kit, Resolve, Row, Shape, Value, Values};
 
-fn bridged_scalar(resolve: Resolve, name: &str) -> Result<String, String> {
+fn input_scalar(resolve: Resolve, name: &str) -> Result<String, String> {
     resolve(name).map(|(v, _)| v.wire())
 }
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — beside a set usage file, `${file%/*}`'s
 // directory; empty beside the empty usage file, which `usage::paths` fills at the reader
 fn cred_file(resolve: Resolve) -> Result<Value, String> {
-    let usage = bridged_scalar(resolve, "DELEGATION_KIT_USAGE_FILE")?;
+    let usage = input_scalar(resolve, "DELEGATION_KIT_USAGE_FILE")?;
     if usage.is_empty() {
         return Ok(Value::Scalar(String::new()));
     }
@@ -18,11 +18,11 @@ fn cred_file(resolve: Resolve) -> Result<Value, String> {
 }
 
 fn stop_log(resolve: Resolve) -> Result<Value, String> {
-    bridged_scalar(resolve, "GATE_SDK_WORKFLOW_DIR").map(|d| Value::Scalar(format!("{}/subagent-stop-liveness.log", d)))
+    input_scalar(resolve, "GATE_SDK_WORKFLOW_DIR").map(|d| Value::Scalar(format!("{}/subagent-stop-liveness.log", d)))
 }
 
 fn gate_files(resolve: Resolve) -> Result<Value, String> {
-    let g = bridged_scalar(resolve, "GATE_SDK_GATES_DIR")?;
+    let g = input_scalar(resolve, "GATE_SDK_GATES_DIR")?;
     Ok(Value::Indexed(vec![
         format!("{}/check-*.sh", g),
         format!("{}/check-*.gate", g),
@@ -31,8 +31,8 @@ fn gate_files(resolve: Resolve) -> Result<Value, String> {
 }
 
 fn meta_paths(resolve: Resolve) -> Result<Value, String> {
-    let g = bridged_scalar(resolve, "GATE_SDK_GATES_DIR")?;
-    let w = bridged_scalar(resolve, "GATE_SDK_WORKFLOW_DIR")?;
+    let g = input_scalar(resolve, "GATE_SDK_GATES_DIR")?;
+    let w = input_scalar(resolve, "GATE_SDK_WORKFLOW_DIR")?;
     Ok(Value::Indexed(vec![format!("{}/", g), format!("{}/", w), ".claude/".to_string()]))
 }
 
@@ -67,6 +67,7 @@ pub const KIT: Kit = Kit {
     open_family: false,
     families: &[],
     retired: &[],
+    env_only: &[],
 };
 
 fn digits(s: &str) -> bool {

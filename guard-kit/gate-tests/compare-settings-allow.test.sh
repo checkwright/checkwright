@@ -5,8 +5,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 2
 ROOT="$(pwd -P)"
-# The subject is the bridged arm, reached through the front-end that resolves its four declared
-# knobs; a bare binary invocation would resolve none of them. No `jq` precondition rides along:
+# The subject is the arm, reached through the shipped front-end a consumer invokes. No `jq`
+# precondition rides along:
 # the arm reads both allow lists in-crate, and the sandbox JSON below is written with printf, so
 # refusing a runnable suite on a machine that no longer needs the tool would be a false dividend.
 CMP="gate-sdk/bin/run-gates.sh"

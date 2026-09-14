@@ -2,7 +2,7 @@
 // inline-ready snippet, so carrying a finding onto a permanent surface is one command rather than a
 // pointer that dies at the next boundary.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
-// arm resolves the record knob and a hardcoded flag receives no consumer override at all.
+// arm reads the record knob, which a hardcoded flag would hide from `--knob-files`.
 use super::file_survey::{anchored, positionals};
 
 pub const KNOBS: &[&str] = &["LIFECYCLE_KIT_SURVEY_RECORD_FILE"];

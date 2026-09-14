@@ -1,18 +1,18 @@
 // spec: drift-kit/SPEC.md §Layout and configuration — drift-kit's static knob table and validator
 use super::{set_but_missing, Kit, Origin, Resolve, Row, Shape, Value, Values};
 
-fn bridged_scalar(resolve: Resolve, name: &str) -> Result<(String, Origin), String> {
+fn input_scalar(resolve: Resolve, name: &str) -> Result<(String, Origin), String> {
     resolve(name).map(|(v, o)| (v.wire(), o))
 }
 
 fn under(resolve: Resolve, input: &str, base: &str) -> Result<Value, String> {
-    bridged_scalar(resolve, input).map(|(d, _)| Value::Scalar(format!("{}/{}", d, base)))
+    input_scalar(resolve, input).map(|(d, _)| Value::Scalar(format!("{}/{}", d, base)))
 }
 
 // spec: drift-kit/SPEC.md §Layout and configuration — the registry at its default path when that file
 // exists, else empty, the not-adopted answer; the roster's placeholder renders the path unprobed
 fn kpis_file(resolve: Resolve) -> Result<Value, String> {
-    let (gates, origin) = bridged_scalar(resolve, "GATE_SDK_GATES_DIR")?;
+    let (gates, origin) = input_scalar(resolve, "GATE_SDK_GATES_DIR")?;
     let path = format!("{}/kpis.list", gates);
     if origin == Origin::Placeholder || std::path::Path::new(&path).is_file() {
         return Ok(Value::Scalar(path));
@@ -22,7 +22,7 @@ fn kpis_file(resolve: Resolve) -> Result<Value, String> {
 
 // spec: drift-kit/SPEC.md §Layout and configuration — one scalar, `<state-file> <evidence-file>`
 fn trajectory_surfaces(resolve: Resolve) -> Result<Value, String> {
-    let (w, _) = bridged_scalar(resolve, "GATE_SDK_WORKFLOW_DIR")?;
+    let (w, _) = input_scalar(resolve, "GATE_SDK_WORKFLOW_DIR")?;
     Ok(Value::Scalar(format!("{0}/WORKFLOW-STATE.txt {0}/validate-evidence.txt", w)))
 }
 
@@ -35,7 +35,7 @@ fn price_table(resolve: Resolve) -> Result<Value, String> {
 }
 
 fn kpi_dirs(resolve: Resolve) -> Result<Value, String> {
-    bridged_scalar(resolve, "GATE_SDK_GATES_DIR").map(|(g, _)| Value::Indexed(vec![g]))
+    input_scalar(resolve, "GATE_SDK_GATES_DIR").map(|(g, _)| Value::Indexed(vec![g]))
 }
 
 fn queue_file(resolve: Resolve) -> Result<Value, String> {
@@ -104,6 +104,7 @@ pub const KIT: Kit = Kit {
     open_family: true,
     families: &[],
     retired: &[],
+    env_only: &[],
 };
 
 // spec: drift-kit/SPEC.md §Layout and configuration — the registry a consumer set to a path that is

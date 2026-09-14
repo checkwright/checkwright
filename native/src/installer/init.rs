@@ -480,7 +480,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // resolves to this binary, so the knob must name it and the file must be there.
     // spec: installer/README.md §The install boundary — the placement is the `--install
     // place-artifact` op called in-process: one derivation, two callers, this arm and that flag.
-    let seam = format!("{}/gate-sdk-config.sh", GATES_DIR);
+    let seam = format!("{}/gate-sdk-config.knobs", GATES_DIR);
     let src = pkg.artifact.to_string_lossy().into_owned();
     let placement = install::Placement {
         root: root.clone(),

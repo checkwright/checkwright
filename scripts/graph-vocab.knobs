@@ -1,0 +1,19 @@
+# spec: gate-sdk/SPEC.md §check-graph — this repo's consumer graph vocabulary: group the projection's surfaces into per-kit layers (this is a kit monorepo, so the kit is the natural cluster) with one shared bucket for cross-cutting surfaces
+
+GRAPH_LAYER_RULES[] = gate-sdk/:k_gate_sdk
+GRAPH_LAYER_RULES[] = lifecycle-kit/:k_lifecycle
+GRAPH_LAYER_RULES[] = queue-kit/:k_queue
+GRAPH_LAYER_RULES[] = canon-kit/:k_canon
+GRAPH_LAYER_RULES[] = guard-kit/:k_guard
+GRAPH_LAYER_RULES[] = delegation-kit/:k_delegation
+GRAPH_LAYER_RULES[] = context-kit/:k_context
+GRAPH_LAYER_DEFAULT = k_shared
+
+GRAPH_LAYERS[] = k_gate_sdk:gate-sdk
+GRAPH_LAYERS[] = k_lifecycle:lifecycle-kit
+GRAPH_LAYERS[] = k_queue:queue-kit
+GRAPH_LAYERS[] = k_canon:canon-kit
+GRAPH_LAYERS[] = k_guard:guard-kit
+GRAPH_LAYERS[] = k_delegation:delegation-kit
+GRAPH_LAYERS[] = k_context:context-kit
+GRAPH_LAYERS[] = k_shared:shared / consumer surfaces

@@ -151,7 +151,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("  no journal step:    {}", u);
         }
         println!("  help: add the missing <stage>.md skill, or retire the orphan skill / fix the");
-        println!("        stage name it invokes. The stage set is LIFECYCLE_KIT_STAGES (lifecycle-config.sh).");
+        println!("        stage name it invokes. The stage set is LIFECYCLE_KIT_STAGES (lifecycle-config.knobs).");
         println!(
             "  help: a stage's executed surface owes the resume-journal step, marked by its"
         );

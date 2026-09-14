@@ -15,8 +15,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
 CHECKS="$DIR/checks"
 # spec: evidence-kit/SPEC.md §bin/run-validate.sh — the writer is driven through the front end
-# rather than by a path: it is the bridged `--run-validate` arm, and the front end is what
-# resolves its declared knob roster. The binary needs no pin here — the preamble above already
+# rather than by a path: it is the `--run-validate` arm, which the front end runs at each scratch
+# tree's own toplevel. The binary needs no pin here — the preamble above already
 # exports GATE_SDK_NATIVE_BIN absolute, which is what survives the front end's cd to each
 # scratch tree's own toplevel, where the knob's repo-relative default would name nothing.
 FE="$(cd "$DIR/../gate-sdk/bin" && pwd)/run-gates.sh"

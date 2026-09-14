@@ -1,7 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §The survey record — the capture affordance: one appended block per
 // survey, the grammar stamped by the producer rather than by its author.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
-// arm resolves two consumer knobs and a hardcoded flag receives no override at all.
+// arm reads two consumer knobs, which a hardcoded flag would hide from `--knob-files`.
 use crate::stages;
 use crate::walk;
 

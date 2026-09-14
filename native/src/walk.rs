@@ -1,14 +1,20 @@
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the Rust counterpart of gate_find's pruned walk,
-// reading across the config bridge the value gate_find's own GATE_PRUNE_DIRS array already
-// resolved, so one computation of the set serves both substrates
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the Rust counterpart of gate_find's pruned walk, over the
+// one prune set both substrates read
 use std::fs;
 use std::path::{Path, PathBuf};
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged value, tab-split. The crate holds no
-// default for a bridged knob, so an absent variable is an error rather than a fallback;
-// an empty one is a resolved-empty set, which is why the two part company here.
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the prune set composed at the reader: the replacing knob's
+// words, then the appending knob's
 pub fn prune_dirs() -> Result<Vec<String>, String> {
-    knob_array("GATE_PRUNE_DIRS")
+    let mut out = knob_words("GATE_SDK_PRUNE_DIRS")?;
+    out.extend(knob_words("GATE_SDK_PRUNE_EXTRA_DIRS")?);
+    Ok(out)
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — a whitespace-list knob's words, split by its reader and
+// expanded by nothing
+pub fn knob_words(knob: &str) -> Result<Vec<String>, String> {
+    Ok(knob_scalar(knob)?.split_whitespace().map(String::from).collect())
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_path_pruned`: the prune-dir set matched as a
@@ -157,9 +163,8 @@ fn header_field<'a>(header: &'a str, name: &str) -> Vec<&'a str> {
         .collect()
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one tab-joined array knob,
-// the shape `prune_dirs` above has; an absent variable is an error because the crate holds
-// no default for a bridged knob, and an empty one is a resolved-empty set.
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the read of one indexed knob's elements; an empty value is
+// a resolved-empty set
 pub fn knob_array(knob: &str) -> Result<Vec<String>, String> {
     let raw = knob_wire(knob)?;
     if raw.is_empty() {
@@ -168,11 +173,9 @@ pub fn knob_array(knob: &str) -> Result<Vec<String>, String> {
     Ok(raw.split('\t').map(String::from).collect())
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of a *keyed* knob, the map counterpart
-// of knob_array: each element splits on its first `=`, absent is an error where empty is a
-// resolved-empty map, and pairs arrive in the sorted order the wire carries.
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the read of a *keyed* knob, the map counterpart of
+// knob_array: each pair splits on its first `=`, and pairs arrive sorted by key
 pub fn knob_map(knob: &str) -> Result<Vec<(String, String)>, String> {
-    let var = format!("GATE_SDK_KNOB_{}", knob);
     let raw = knob_wire(knob)?;
     if raw.is_empty() {
         return Ok(Vec::new());
@@ -184,8 +187,8 @@ pub fn knob_map(knob: &str) -> Result<Vec<(String, String)>, String> {
             None => {
                 return Err(format!(
                     "{} carries the element '{}', which has no '=' — a keyed knob's element \
-                     is <key>=<value>, so {} could not be read as a map",
-                    var, el, knob
+                     is <key>=<value>, so it could not be read as a map",
+                    knob, el
                 ))
             }
         }
@@ -193,23 +196,13 @@ pub fn knob_map(knob: &str) -> Result<Vec<(String, String)>, String> {
     Ok(out)
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of a knob *family*, the prefix form's
-// receiving half: every `GATE_SDK_KNOB_<prefix>…` variable, keyed by the suffix the prefix leaves.
-// Sorted, so a reader's output order does not depend on the environment's.
-// spec: gate-sdk/SPEC.md §The knob file — a statically owned prefix reads its kit's family
+// spec: gate-sdk/SPEC.md §The knob file — the read of a knob *family*: its kit's members, keyed by
+// the suffix the prefix leaves
 pub fn knob_prefix(prefix: &str) -> Result<Vec<(String, String)>, String> {
-    if crate::knobs::owner(prefix).is_some() {
-        return Ok(crate::knobs::family(prefix)?
-            .into_iter()
-            .filter_map(|(n, v)| n.strip_prefix(prefix).map(|s| (s.to_string(), v)))
-            .collect());
-    }
-    let var_prefix = format!("GATE_SDK_KNOB_{}", prefix);
-    let mut out: Vec<(String, String)> = std::env::vars()
-        .filter_map(|(k, v)| k.strip_prefix(&var_prefix).map(|s| (s.to_string(), v)))
-        .collect();
-    out.sort();
-    Ok(out)
+    Ok(crate::knobs::family(prefix)?
+        .into_iter()
+        .filter_map(|(n, v)| n.strip_prefix(prefix).map(|s| (s.to_string(), v)))
+        .collect())
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — a prefix is a *resolution set, never a roster*: this
@@ -241,12 +234,13 @@ enum Root {
 }
 
 fn roots() -> Result<(String, Vec<Root>), String> {
+    roots_from(&sdk_root(), &knob_scalar("GATE_SDK_KIT_DIRS")?)
+}
+
+fn roots_from(sdk_root: &str, kit_dirs: &str) -> Result<(String, Vec<Root>), String> {
     let here = cwd()?;
-    let sdk = abs_against(&here, sdk_root().trim_end_matches('/'));
-    let dirs: Vec<String> = knob_scalar("GATE_SDK_KIT_DIRS")?
-        .split_whitespace()
-        .map(String::from)
-        .collect();
+    let sdk = abs_against(&here, sdk_root.trim_end_matches('/'));
+    let dirs: Vec<String> = kit_dirs.split_whitespace().map(String::from).collect();
     if !dirs.is_empty() {
         return Ok((here, dirs.into_iter().map(Root::Given).collect()));
     }
@@ -310,13 +304,26 @@ pub fn kit_roots() -> Result<Vec<String>, String> {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the same roots relative to the gate-sdk root's parent, the
 // anchor the couples globs share, computed beside the absolute spelling so the two stay index-aligned
 pub fn kit_roots_rel() -> Result<Vec<String>, String> {
-    let (here, roots) = roots()?;
-    let sdk = abs_against(&here, sdk_root().trim_end_matches('/'));
+    kit_roots_rel_from(&sdk_root(), &knob_scalar("GATE_SDK_KIT_DIRS")?)
+}
+
+// spec: gate-sdk/SPEC.md §Layout and configuration — the same derivation over a locator and an
+// override its caller already resolved, the form a derived knob default reads through its resolver
+pub fn kit_roots_rel_from(sdk_root: &str, kit_dirs: &str) -> Result<Vec<String>, String> {
+    let (here, roots) = roots_from(sdk_root, kit_dirs)?;
+    let sdk = abs_against(&here, sdk_root.trim_end_matches('/'));
     let anchor = match sdk.rsplit_once('/') {
         Some(("", _)) | None => "/".to_string(),
         Some((p, _)) => p.to_string(),
     };
     Ok(roots.iter().map(|r| spelled(&anchor, r)).collect())
+}
+
+// spec: gate-sdk/SPEC.md §Layout and configuration — a locator's root spelled relative to the working
+// directory where it lies under it, the spelling a derived command a reader prints takes
+pub fn spelled_here(root: &str) -> Result<String, String> {
+    let here = cwd()?;
+    Ok(spelled(&here, &Root::Derived(abs_against(&here, root.trim_end_matches('/')))))
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — `--emit kit-roots`: one root per line, relative to the
@@ -325,23 +332,14 @@ pub fn emit_kit_roots(_args: &[String]) -> Result<String, String> {
     Ok(kit_roots()?.into_iter().map(|r| format!("{}\n", r)).collect())
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one scalar knob. A scalar is a
-// one-element array in the wire format, so this is `bridged_array`'s single-value face and an
-// absent variable is the same error for the same reason: the crate holds no default.
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the read of one scalar knob
 pub fn knob_scalar(knob: &str) -> Result<String, String> {
     knob_wire(knob)
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — every reader above resolves through `knobs::wire`, and a
-// bridged name the bridge did not carry is the harness error the crate holds no default for
-pub fn knob_wire(knob: &str) -> Result<String, String> {
-    crate::knobs::wire(knob)?.ok_or_else(|| {
-        format!(
-            "GATE_SDK_KNOB_{} is unset — the gate was invoked without the config bridge \
-             gate_command emits, so {} could not be resolved",
-            knob, knob
-        )
-    })
+// spec: gate-sdk/SPEC.md §lib/gate.sh — every reader above resolves through `knobs::wire`
+fn knob_wire(knob: &str) -> Result<String, String> {
+    crate::knobs::wire(knob)
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the kit roots absolutized against the working directory
@@ -437,7 +435,7 @@ pub fn path_root(p: &str) -> Option<&str> {
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the pure half: `cwd()` and `toplevel()` are the
 // producers, and these two are functions of their inputs alone.
-// spec: gate-sdk/SPEC.md §lib/gate.sh — a relative bridged root may climb out with `..`, so the
+// spec: gate-sdk/SPEC.md §lib/gate.sh — a relative root may climb out with `..`, so the
 // join is normalised rather than concatenated: an unnormalised `..` component makes every later
 // path-prefix comparison fail silently, the defect the canon-kit cohort's edge tree caught.
 pub fn abs_against(here: &str, p: &str) -> String {
@@ -482,7 +480,7 @@ pub fn find_named(root: &Path, names: &[&str]) -> Result<Vec<PathBuf>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — the same walk with a caller-declared prune set beside
-// the bridged one: root-relative directory globs, `**`-capable. The set is **recorded**, because an
+// the knob one: root-relative directory globs, `**`-capable. The set is **recorded**, because an
 // unrecorded narrowing is the self-certification that section refuses.
 pub fn find_named_pruning(
     root: &Path,
@@ -491,11 +489,11 @@ pub fn find_named_pruning(
 ) -> Result<Vec<PathBuf>, String> {
     #[cfg(test)]
     recorder::note_prune(&root.display().to_string(), prune_globs);
-    let bridged = prune_dirs()?;
+    let pruned = prune_dirs()?;
     let rootstr = root.display().to_string();
     let all = walk_pruned(
         root,
-        &|n| bridged.iter().any(|d| d == n),
+        &|n| pruned.iter().any(|d| d == n),
         Links::Skip,
         Some(&|dir: &Path| dir_prune_matches(&rootstr, dir, prune_globs)),
     )?;
@@ -598,7 +596,7 @@ pub fn list_dir(root: &Path) -> Result<Vec<(String, bool)>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the same traversal with the prune predicate
-// supplied by the caller, because `gate_find`'s bridged set is not every shell form's rule: a
+// supplied by the caller, because `gate_find`'s configured set is not every shell form's rule: a
 // member whose original reached for a bare `find` prunes what that `find` pruned.
 pub fn find_with_prune(
     root: &Path,
@@ -623,7 +621,7 @@ pub fn find_link_entries_with_prune(
 }
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — the second prune is by *path* where the first is by
-// component name, because a declared prune is root-relative and a bridged one is a directory name
+// component name, because a declared prune is root-relative and a knob one is a directory name
 type DirPrune<'a> = Option<&'a dyn Fn(&Path) -> bool>;
 
 fn walk_pruned(
@@ -796,7 +794,7 @@ fn entry_path(dir: &Path, ent: &fs::DirEntry) -> Option<PathBuf> {
 }
 
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — `**`-capable list matching over a
-// bridged glob array, the semantics committed once there rather than re-decided per port.
+// knob's glob array, the semantics committed once there rather than re-decided per port.
 // Bash-faithful: no prune set applies, because pathname expansion has none.
 pub fn glob_files(root: &Path, globs: &[String]) -> Result<Vec<PathBuf>, String> {
     #[cfg(test)]
@@ -996,84 +994,6 @@ pub mod recorder {
                 }
             }
         });
-    }
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the unit tests reach find_files without going through
-// gate_command, so they stand in for the bridge by asking its one owner, the kit's shell
-// library, for the resolved value; a literal here would restore the deleted second default
-#[cfg(test)]
-pub fn bridge_declared_knobs(knobs: &crate::knobenv::KnobEnv) {
-    use std::sync::Once;
-    static ONCE: Once = Once::new();
-    ONCE.call_once(|| {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
-        let out = std::process::Command::new("bash")
-            .arg("-c")
-            .arg("source gate-sdk/lib/gate.sh; IFS=$'\\t'; printf '%s' \"${GATE_PRUNE_DIRS[*]}\"")
-            .current_dir(&root)
-            .output()
-            .expect("cannot run the shell library's knob resolution");
-        assert!(
-            out.status.success(),
-            "gate-sdk/lib/gate.sh could not resolve GATE_PRUNE_DIRS: {}",
-            String::from_utf8_lossy(&out.stderr).trim()
-        );
-        let value = String::from_utf8_lossy(&out.stdout).to_string();
-        assert!(
-            !value.is_empty(),
-            "the shell library resolved GATE_PRUNE_DIRS to nothing — the tests would walk an \
-             unpruned tree and observe roots no production invocation reaches"
-        );
-        knobs.set("GATE_SDK_KNOB_GATE_PRUNE_DIRS", &value);
-    });
-}
-
-// spec: gate-sdk/SPEC.md §run-gate-tests — a bridged member's knob values resolve inside the
-// case dir, so this asks the one owner from the cwd the runner uses; resolving at the repo
-// root would make the crate's case runner the second oracle that section was repaired for
-#[cfg(test)]
-pub fn bridge_case_knobs(env: &crate::knobenv::KnobEnv, case: &Path, gate: &str, knobs: &[&str]) {
-    if knobs.is_empty() {
-        return;
-    }
-    let lib = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("..")
-        .join("gate-sdk/lib/gate.sh");
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — resolution goes through the library's own per-name
-    // dispatch, so the prefix form has one implementation rather than one here and one there
-    // spec: gate-sdk/SPEC.md §run-gate-tests — the binary is absolutized against the library's own
-    // tree before the case dir is the cwd, as the fixture runner exports it, because the couples-knob
-    // derivation asks the binary for its static knob roster
-    let script = "source \"$1\"; [[ \"$GATE_SDK_NATIVE_BIN\" == /* ]] || \
-                  export GATE_SDK_NATIVE_BIN=\"${1%/gate-sdk/lib/gate.sh}/$GATE_SDK_NATIVE_BIN\"; \
-                  g=\"$2\"; shift 2; \
-                  for k in \"$@\"; do gate_knob_env_one \"$k\" \"$g\" || exit 2; done";
-    let out = std::process::Command::new("bash")
-        .arg("-c")
-        .arg(script)
-        .arg("bash")
-        .arg(&lib)
-        .arg(gate)
-        .args(knobs)
-        .current_dir(case)
-        .output()
-        .expect("cannot run the shell library's knob resolution");
-    assert!(
-        out.status.success(),
-        "the config bridge could not resolve {}'s knobs in {}: {}",
-        gate,
-        case.display(),
-        String::from_utf8_lossy(&out.stderr).trim()
-    );
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the wire format is one tab-joined value per knob
-    // and the library refuses an element carrying a newline, so one line is one knob and the
-    // first `=` is its only separator
-    for line in String::from_utf8_lossy(&out.stdout).lines() {
-        let (name, value) = line
-            .split_once('=')
-            .unwrap_or_else(|| panic!("unparseable knob line from the bridge: {}", line));
-        env.set(name, value);
     }
 }
 
@@ -1340,28 +1260,6 @@ mod tests {
         assert_eq!(child(Path::new(""), "kit").display().to_string(), "kit");
     }
 
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the prefix form's receiving half: the family is keyed
-    // by the suffix, sorted independently of the environment's order, and a lookup is by name
-    // because a prefix is a resolution set rather than a roster.
-    #[test]
-    fn a_knob_family_is_keyed_by_suffix_and_read_by_name_not_enumerated() {
-        let knobs = crate::knobenv::lock();
-        knobs.set("GATE_SDK_KNOB_PROBEFAM_beta", "b");
-        knobs.set("GATE_SDK_KNOB_PROBEFAM_alpha", "a");
-        knobs.set("GATE_SDK_KNOB_PROBEFAM_ID", "not-a-member");
-        let fam = knob_prefix("PROBEFAM_").expect("a bridged family never refuses");
-        let keys: Vec<&str> = fam.iter().map(|(k, _)| k.as_str()).collect();
-        assert_eq!(keys, vec!["ID", "alpha", "beta"], "family is sorted by suffix");
-        assert_eq!(knob_in_family(&fam, "alpha").as_deref(), Some("a"));
-        assert_eq!(knob_in_family(&fam, "absent"), None);
-        // spec: gate-sdk/SPEC.md §lib/gate.sh — the decoy resolves and is simply never looked up,
-        // which is what keeps EVIDENCE_KIT_RUN_ID out of the emitted suite roster
-        assert!(knob_in_family(&fam, "ID").is_some());
-        for k in ["beta", "alpha", "ID"] {
-            knobs.remove(&format!("GATE_SDK_KNOB_PROBEFAM_{}", k));
-        }
-    }
-
     // spec: gate-sdk/SPEC.md §check-reads-couples — unit test B: a walk outside this file
     // would be invisible to the recorder and would unverify test A, so the roster of
     // filesystem-walk spellings is asserted absent from every other module.
@@ -1369,7 +1267,7 @@ mod tests {
 
     #[test]
     fn no_module_outside_this_one_walks_the_filesystem() {
-        bridge_declared_knobs(&crate::knobenv::lock());
+        let _knobs = crate::knobenv::lock();
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files = find_files(&src, &["rs"]).expect("cannot enumerate the crate's sources");
         assert!(!files.is_empty(), "no crate source found to scan");

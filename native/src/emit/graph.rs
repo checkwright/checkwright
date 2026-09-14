@@ -40,7 +40,7 @@ const COMMENT_HEAD: &str = r##"<!--
 const HEAD_TOP: &str = r##"  check-graph (assertion E) fails if this file drifts from them.
 
   Reading it: nodes are surfaces (grouped by layer when the consumer's
-  graph-vocab.sh declares layers); an edge is a gate. A bidirectional edge is a
+  graph-vocab.knobs declares layers); an edge is a gate. A bidirectional edge is a
   coupling bijection; a self-loop is a gate that guards one surface's internal
   consistency. Amber edges are cycle valves (valve=PROPOSED) - couplings where a
   leading surface may run ahead via a queue-tracked PROPOSED marker.
@@ -119,25 +119,22 @@ pub struct Config {
     pub artifact: String,
     pub theme_dir: String,
     pub max_edges: String,
-    pub layers: Vec<String>,
-    pub layer_rules: Vec<String>,
-    pub layer_default: String,
+    pub vocab: crate::graph_vocab::Vocab,
     pub kit_roots_rel: Vec<String>,
     pub resolve_dirs: Vec<String>,
 }
 
 impl Config {
-    pub fn from_bridge() -> Result<Config, String> {
-        let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    pub fn resolve() -> Result<Config, String> {
+        let gates_dir = crate::knobs::gates_dir();
         let resolve_dirs = registry::resolve_dirs(&gates_dir, &walk::kit_roots()?);
+        let vocab = crate::graph_vocab::read(&walk::knob_scalar("GATE_SDK_GRAPH_VOCAB")?, &gates_dir)?;
         Ok(Config {
-            gates_dir,
             artifact: walk::knob_scalar("GATE_SDK_GRAPH_ARTIFACT")?,
             theme_dir: walk::knob_scalar("GATE_SDK_GRAPH_THEME_DIR")?,
             max_edges: walk::knob_scalar("GATE_SDK_GRAPH_MAX_EDGES")?,
-            layers: walk::knob_array("GRAPH_LAYERS")?,
-            layer_rules: walk::knob_array("GRAPH_LAYER_RULES")?,
-            layer_default: walk::knob_scalar("GRAPH_LAYER_DEFAULT")?,
+            gates_dir,
+            vocab,
             kit_roots_rel: walk::kit_roots_rel()?,
             resolve_dirs,
         })
@@ -198,7 +195,7 @@ pub fn projected_members(cfg: &Config) -> Result<Vec<Member>, String> {
 // `<path-prefix>:<layer-id>` roster split at the last `:`, first match wins, default otherwise.
 // A prefix test rather than a glob, so this reader owns no glob semantics to disagree about.
 pub fn surface_layer(surface: &str, cfg: &Config) -> String {
-    for rule in &cfg.layer_rules {
+    for rule in &cfg.vocab.layer_rules {
         if let Some(at) = rule.rfind(':') {
             let (prefix, layer) = (&rule[..at], &rule[at + 1..]);
             if !prefix.is_empty() && surface.starts_with(prefix) {
@@ -206,16 +203,16 @@ pub fn surface_layer(surface: &str, cfg: &Config) -> String {
             }
         }
     }
-    cfg.layer_default.clone()
+    cfg.vocab.layer_default.clone()
 }
 
 // spec: gate-sdk/SPEC.md §check-graph — layer_specs: the consumer's declared layers, or the single
 // built-in bucket when it declares none
 fn layer_specs(cfg: &Config) -> Vec<String> {
-    if cfg.layers.is_empty() {
+    if cfg.vocab.layers.is_empty() {
         vec!["surfaces:governed surfaces".to_string()]
     } else {
-        cfg.layers.clone()
+        cfg.vocab.layers.clone()
     }
 }
 
@@ -340,7 +337,7 @@ pub fn render(cfg: &Config, members: &[Member]) -> String {
 }
 
 pub fn emit(_args: &[String]) -> Result<String, String> {
-    let cfg = Config::from_bridge()?;
+    let cfg = Config::resolve()?;
     let members = projected_members(&cfg)?;
     Ok(render(&cfg, &members))
 }
@@ -357,13 +354,18 @@ mod tests {
             artifact: "a.html".into(),
             theme_dir: "scripts/graph-theme".into(),
             max_edges: "100".into(),
-            layers: vec![],
-            layer_rules: vec![
+            vocab: crate::graph_vocab::Vocab {
+                vocab: vec![],
+                leading: vec![],
+                lagging: vec![],
+                layers: vec![],
+                layer_rules: vec![
                 "gate-sdk/:k_gate_sdk".into(),
                 "gate-sdk/lib/:k_never_reached".into(),
                 "odd:name/:k_odd".into(),
-            ],
-            layer_default: "k_shared".into(),
+                ],
+                layer_default: "k_shared".into(),
+            },
             kit_roots_rel: vec![],
             resolve_dirs: vec![],
         };

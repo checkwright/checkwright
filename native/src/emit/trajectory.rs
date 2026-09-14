@@ -1,6 +1,6 @@
 // spec: drift-kit/SPEC.md §The published-evidence extractor — the governed-trajectory table, a
 // pure function of committed history. The stage roster and the evidence-surface pair are the
-// consumer's vocabulary and cross the config bridge; not one stage name is written here.
+// consumer's vocabulary and are knobs; not one stage name is written here.
 use crate::history::Git;
 use crate::walk;
 use std::collections::{HashMap, HashSet};

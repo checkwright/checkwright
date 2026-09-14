@@ -10,8 +10,8 @@ use std::io::Write;
 use std::path::Path;
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — the declared roster, two of whose names
-// are prefix families: a hardcoded top-level flag would resolve this crate's own defaults for every
-// one of them and silently ignore each consumer override, which is the forced-family test.
+// are prefix families: a hardcoded top-level flag has no row to declare them on, so `--knob-files`
+// could not see one of them, which is the forced-family test.
 pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_SUITES",
     "EVIDENCE_KIT_RUN_*",
@@ -82,8 +82,8 @@ fn config() -> Result<Cfg, Refusal> {
     })
 }
 
-// spec: evidence-kit/SPEC.md §bin/run-validate.sh — the whole input arrives through the bridged
-// environment, so the member takes no positional at all: there is no free text for the argv-shape
+// spec: evidence-kit/SPEC.md §bin/run-validate.sh — the whole input arrives as knobs, so the
+// member takes no positional at all: there is no free text for the argv-shape
 // refusal or the `--` escape to bind on, and usage lives in the front-end.
 fn dispatch(_args: &[String]) -> Result<i32, Refusal> {
     let cfg = config()?;

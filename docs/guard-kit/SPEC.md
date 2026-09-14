@@ -1827,7 +1827,7 @@ the actual posture of the entry.
 **The consumer's opt-out is retired, knowingly, and the sentence that sold it is
 replaced rather than deleted.** This section used to tell a consumer unwilling to
 move review downstream to simply not add the grant — the tool still ran without
-it. Post-port that is false: the runner is a bridged arm, so it is reachable
+it. Post-port that is false: the runner is an arm-table member, so it is reachable
 wherever the battery front end is, and a consumer cannot decline scratch
 execution without declining the battery. What a consumer loses is the ability to
 **separate** the two decisions; what is unchanged is the compensating control
@@ -1860,10 +1860,10 @@ structural fact stands; what it prices does not.** A permission set is matched,
 not versioned, so a *relocated* arm is a different command string and the old
 entry cannot become the new one without a window where neither runs. What this
 section used to conclude from that — *and that is what prices the work* — the
-port to a bridged arm falsified. Under gate-sdk/SPEC.md §The non-gate arm's
-forced-family test the runner is a **bridged** arm, so its new command string is
+port to an arm-table member falsified. Under gate-sdk/SPEC.md §The non-gate arm's
+forced-family test the runner is an **arm-table member**, so its new command string is
 the battery **front end's**, which a consumer's front-end grant already buys
-whole: any addition owed is that grant, bought once for every bridged arm, and
+whole: any addition owed is that grant, bought once for every non-gate arm, and
 not a decision about scratch execution at all. A consumer running lifecycle
 stages already holds it; one running only the generated pre-commit hook may not,
 and owes the front-end grant rather than this tool's. So this port forced a
@@ -1919,18 +1919,18 @@ fails. That is a narrowing of a fail-closed control, which this paragraph's own
 rule forbids, and the seam test asserts the symlink case rather than assuming it.
 
 Content-agnostic generic mechanism: the scratch dir comes from gate-sdk's
-existing `GATE_SDK_TMP_DIR` and no kit knob is added — and through the bridge
-that knob is now actually **resolved**, where the standalone script sourced no
-config and read it straight from the process environment, so a consumer setting
-it in their gates-dir config got a runner that ignored it. The port is a fix
-there rather than a translation, and it does not disturb how the knob is driven
-under test: an environment-set value still wins (`gate.sh` uses `[[ -v … ]]`),
-and the bridge resolves a member's knobs in a subshell that **inherits the
-caller's environment**. The consumer's allowlist entry is that consumer's
+existing `GATE_SDK_TMP_DIR` and no kit knob is added — and that knob is now
+actually **resolved** from gate-sdk's table and the consumer's knob file, where
+the standalone script sourced no config and read it straight from the process
+environment, so a consumer setting it in their gates-dir config got a runner that
+ignored it. The port is a fix there rather than a translation, and it does not
+disturb how the knob is driven under test: an environment-set value still wins,
+because a scalar's environment value outranks every file (gate-sdk/SPEC.md §The
+knob file). The consumer's allowlist entry is that consumer's
 settings, never a kit literal.
 
 **This section's port-owed set is empty.** Every surface declaring it is now
-either in-crate — `native/src/emit/scratch_run.rs` and its `BRIDGED_ARMS` row —
+either in-crate — `native/src/emit/scratch_run.rs` and its `ARMS` row —
 or declared `# no-port:` (`lib/guard.sh`, which composes rule 23's steer). The
 seam cases stay in `gate-tests/scratch-run.test.sh`, on the shell substrate by
 their own nature. `bin/scratch-run.sh` was the one owed surface and its port took <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
@@ -1949,17 +1949,16 @@ against `git status && rm -rf x` — does not read as allowed and is counted as
 prompting.
 
 **The invocation, and why the arm is a table member rather than a top-level
-flag.** The ranker is a bridged arm, reached through the shipped front-end as
+flag.** The ranker is a non-gate arm, reached through the shipped front-end as
 `run-gates.sh --emit scan-prompts [--count] [--] [<log>]` with no front-end
 change, since the `--emit <name>` operand composes `--emit-<name>`. Its declared
 roster is three names — `GUARD_KIT_LOG`, `GUARD_KIT_SETTINGS` and
 `GUARD_KIT_SETTINGS_LOCAL` — every one a row of guard-kit's table (§Layout and
-configuration). Membership of the bridged-arm table is **forced by that roster**
-rather than chosen by family resemblance: `GUARD_KIT_LOG`'s default derives from
-`GATE_SDK_WORKFLOW_DIR`, a bridged input, and `--knobs` publishes a member's
-closure and the bridge resolves it before the exec, while a hardcoded top-level
-flag is reached by neither (gate-sdk/SPEC.md §The non-gate arm). A hardcoded flag
-here would not resolve a log path at all.
+configuration). Membership of the arm table is **forced by that roster**
+rather than chosen by family resemblance: the row declares the three reads, which
+`--knob-files`, `check-reads-couples` and `check-gate-substrate-parity` read in
+process, while a hardcoded top-level flag has no row for any of them to read
+(gate-sdk/SPEC.md §The non-gate arm).
 
 **The residue this section keeps, stated because the arm is not the whole of
 it.** The behaviour below is composed from three `lib/guard.sh` primitives —
@@ -1994,7 +1993,7 @@ still shell to `jq` — rule 20's own allowlist read and the settings-merge in t
 install recipe — and this member never joined the battery, so the
 battery's own program floor moves by nothing at all. **The arm's spawned-program
 set is empty**, which is stated here because nothing mechanical records it: a
-bridged-arm row carries no requirement element and `--needs` answers for
+an arm-table row carries no requirement element and `--needs` answers for
 registry members only (gate-sdk/SPEC.md §The non-gate arm). The ranking needs no
 `jq`, `sed`, `grep`, `sort`, `wc` or `tr`, so no absent program can change what
 it reports.
@@ -2149,11 +2148,11 @@ comparator as the other two.
 
 **Where `--guard-lib-parity` is dispatched from, and why that was measured
 rather than assumed.** The arm is a **hardcoded top-level flag**, resolved before
-the registry lookup beside the other parity arms, and **not** a `BRIDGED_ARMS`
+the registry lookup beside the other parity arms, and **not** an `ARMS`
 row. Table membership turns on one property and not on the family an arm belongs
-to: a member's declared knob roster is what `--knobs` publishes and what the
-bridge resolves before the exec, so an arm resolving a consumer knob must be a
-member and an arm resolving none has nothing for either to do. All three modes
+to: a member's declared knob roster is what `--knob-files`, `check-reads-couples`
+and `check-gate-substrate-parity` read, so an arm resolving a consumer knob must be
+a member and an arm resolving none has nothing for any of them to read. All three modes
 are pure functions of their arguments — read statically, the three bodies name no
 `GUARD_KIT_*` knob and call nothing that could reach one; read dynamically, their
 classification of a corpus is byte-identical with every knob in this kit's roster
@@ -2213,8 +2212,8 @@ number for the *default* log, which is the worst failure mode an instrument has:
 silent, plausible, and reached for first by exactly the measurement session that
 cannot afford it. The positional survives the port on §The non-gate arm's own
 distinguishing test (gate-sdk/SPEC.md): it selects the rule's **input corpus**
-rather than redirecting configuration the bridge has already resolved, so it
-arrives as argv into the arm and the arm consumes it.
+rather than selecting where configuration comes from, so it arrives as argv
+into the arm and the arm consumes it.
 
 **That silent-plausible failure has a second door, and the arm closes it too.**
 A free-text positional absorbs whatever it is handed, so an unrecognized
@@ -2226,7 +2225,7 @@ log path spelled with a leading dash stays reachable; without that escape the
 refusal would be a capability loss rather than a fix. This is gate-sdk/SPEC.md
 §The bin/-tool contract's shape half, which binds on every free-text argument
 and does not turn on whether the tool captures. Its `-h`/`--help` half does
-**not** cross: usage for a bridged arm lives in the front-end's own help and in
+**not** cross: usage for a non-gate arm lives in the front-end's own help and in
 `guard-kit/README.md`, so `--emit scan-prompts --help` is a refusal rather than
 a help request.
 
@@ -2291,13 +2290,13 @@ mutates (the operator prunes). It is the detector, not the policy: a
 non-redundant local entry can still be one-off junk worth pruning by
 judgment.
 
-**The advisory is the `--emit-compare-settings-allow` bridged arm, and both halves
-of that are forced rather than chosen.** It is a **table member** on the
+**The advisory is the `--emit-compare-settings-allow` arm-table member, and both
+halves of that are forced rather than chosen.** It is a **table member** on the
 forced-family test, the shape `--emit-scan-prompts` already holds: all four
 declared knobs — `GUARD_KIT_SETTINGS`, `GUARD_KIT_SETTINGS_LOCAL`,
 `GUARD_KIT_BREADTH_PROBES` and `GUARD_KIT_BREADTH_DECLARED` — are consumer
 configuration, rows of guard-kit's table (§Layout and configuration), and a
-member's declared roster is what `--knobs` publishes for it. It is an **`Arm::Emit`** because every report
+member's declared roster is what `--knob-files` and the roster checks read for it. It is an **`Arm::Emit`** because every report
 path already returns 0 — the no-overlay path, the empty-probe-set path and every
 path that finds candidates, this being an advisory that never renders a verdict —
 and the one non-zero path is the operand refusal at exit 2, so the `{0, 2}`
@@ -2594,17 +2593,15 @@ Config is a **knob file**: copy `templates/guard-config.knobs` into the gates di
 as `guard-config.knobs` (or point `GUARD_KIT_KNOB_FILE` elsewhere) and set any knob
 below; defaults fill what the file leaves unset. guard-kit's knobs are **static**:
 the binary resolves them in process from its own defaults table and the consumer's
-knob file, and the config bridge never carries them (gate-sdk/SPEC.md §lib/gate.sh);
-`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape
-and rendered default. A gitignored `guard-config.local.knobs` in the gates dir is
+knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with
+its shape and rendered default. A gitignored `guard-config.local.knobs` in the gates dir is
 the home for a private value a tracked file cannot carry. The grammar, that `.local`
 overlay, the environment-over-file precedence for a scalar, and the refusals — a set
 `GUARD_KIT_KNOB_FILE` that does not exist, a left-behind `guard-config.sh` or
 `guard-config.local.sh`, a non-empty file named by the retired
 `GUARD_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. `lib/guard.sh`
 reads the values through the binary, and a refusal reaches the hook as a block
-carrying its text (§The guard framework). A derived default below is written in the
-roster's `${NAME}` spelling for the knob it reads.
+carrying its text (§The guard framework). A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement.
 Knobs (this repo's layout as defaults):
 
 - `GUARD_KIT_LIB` — the vendored `lib/guard.sh` path the copied guards
@@ -2613,9 +2610,9 @@ Knobs (this repo's layout as defaults):
   guard's head only, because it names the library before the library exists,
   so `guard-config.knobs` cannot set it.
 - `GUARD_KIT_LOG` — derived default
-  `${GATE_SDK_WORKFLOW_DIR}/prompt-friction.log`.
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log`.
 - `GUARD_KIT_WAKEUP_LOG` — derived default
-  `${GATE_SDK_WORKFLOW_DIR}/wakeup-attempts.log`.
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log`.
 - `GUARD_KIT_SETTINGS` — default `.claude/settings.json`.
 - `GUARD_KIT_SETTINGS_LOCAL` — default `.claude/settings.local.json`.
 - `GUARD_KIT_BREADTH_PROBES` — array of permission-rule strings, each a witness
@@ -2712,7 +2709,7 @@ The gate contracts do not fit hooks (a guard speaks exit-2 + hook JSON, not
 `OK:`/`FAIL:` lines), so the kit ships its own decision-table runner
 instead of `gate-tests/`: `guard-tests/cases.tsv` pairs an expected
 decision (`block`/`advise`/`allow`/`rewrite`/`fallthrough`) with a command;
-the bridged `--run-guard-tests` arm feeds each through the template guard as
+the `--run-guard-tests` arm feeds each through the template guard as
 hook JSON
 on stdin and asserts the exit code and output class, failing on any
 mismatch. Every generic rule carries at least one firing and one
@@ -2721,13 +2718,13 @@ make a command expressible in one tab-separated cell: `@ROOT@` becomes the git
 sandbox root, and `@NL@` becomes a newline — without the second a heredoc case
 cannot be written at all, and the heredoc class would ship untested.
 
-**The member is an `Arm::Run` and a bridged-arm table row, and both are forced
+**The member is an `Arm::Run` and an arm-table row, and both are forced
 rather than chosen.** The contract is a three-valued exit — 0 clean, 1 one or
 more verdict mismatches, 2 a harness precondition it could not meet — and the
 verdict, not the report, is what the evidence-kit suite reads; an `Arm::Emit`
 collapses that to 0-or-2. It is a table member rather than a hardcoded top-level
 flag because it is **configured**: the arm needs to know where guard-kit is
-vendored, which is gate-sdk's knob crossing the bridge
+vendored, which is gate-sdk's `GATE_SDK_KIT_DIRS` on its declared roster
 (gate-sdk/SPEC.md §The non-gate arm, *the family choice is forced for any tool
 that needs configuration at all*). The front-end needs no edit —
 `bin/run-gates.sh` hands every unrecognised leading `--<token>` to `exec_arm`.
@@ -2925,10 +2922,10 @@ with an older block is re-pointed where the older rule answers first, which only
 probe of the message tells apart.
 
 **The knob load's price is measured, on a `git status` payload over ten calls
-each:** 106 to 110 ms per call with the load, against 57 to 61 ms for the library
-that sourced its shell config. The difference is sourcing `lib/gate.sh` and the
-bridge's resolution of `GATE_SDK_WORKFLOW_DIR` for the two log paths; the bridge's
-retirement removes the bridged half.
+each:** 65 to 68 ms per call, against 57 to 61 ms for the library that sourced its
+shell config. The load costs sourcing `lib/gate.sh` and one binary read, the binary
+resolving `GATE_SDK_WORKFLOW_DIR` for the two log paths in process beside the
+guard's own knobs.
 
 `smoke/install.sh` copies the templates into the scratch consumer (guard
 and config into the gates dir, hook wiring merged into `.claude/settings.json`,
@@ -2968,7 +2965,7 @@ dividend in the other direction.
 **The unit/seam split `--scratch-run` and the kfric port took is refused here, on the
 split's own discriminator.** That split moved pure functions over inputs into
 `#[cfg(test)]` tests and kept at the seam the cases that need the front end, the
-bridge and a real child process. Every case in this suite is the second kind: each
+knob files and a real child process. Every case in this suite is the second kind: each
 asserts the *report* rendered from four knobs a sandbox config supplies, and the two
 that look like unit cases are not — the exactness case asserts that the declaration
 lookup never became a glob match, which is only observable as an entry staying in the
@@ -2984,7 +2981,7 @@ stay at `gate-tests/scratch-run.test.sh` — echo-then-exec ordering, pass-throu
 of args and exit code, the out-of-scratch, traversal and symlink-escape
 refusals, the absent-target and missing-argument exits, and the
 refusal-prints-no-body discriminator — because each is a property of the front
-end resolving the arm, the bridge supplying the knob, and a real child process,
+end resolving the arm, the binary resolving the knob, and a real child process,
 which a crate unit test cannot see. Its **unit** cases — the shebang classifier
 across its spellings and the containment predicate — are pinned in the ported
 module's own `#[cfg(test)]` tests, where `check-crate-arms` runs them: they are

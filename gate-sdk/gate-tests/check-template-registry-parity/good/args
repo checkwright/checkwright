@@ -1,4 +1,4 @@
-# Anchor the sweep at this case dir: gate-sdk-config.sh (auto-sourced at cwd)
+# Anchor the sweep at this case dir: gate-sdk-config.knobs (read at cwd)
 # names the synthetic kits via GATE_SDK_KIT_DIRS; their relative roots resolve
 # against the positional root. alpha-kit is the in-population case — a .list
 # template beside the directory whose artifacts it registers, in parity both

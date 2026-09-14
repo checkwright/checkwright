@@ -151,8 +151,8 @@ pub fn read_text(path: &str) -> Result<String, String> {
 // returned string is what the arm prints: the document, or the action a write performed.
 pub type EmitFn = fn(&[String]) -> Result<String, String>;
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — a bridged arm either renders a document or returns an
-// exit code; the class the table keys is *bridged*, not *emitting*. The variant is a return shape
+// spec: gate-sdk/SPEC.md §The non-gate arm — a non-gate arm either renders a document or returns an
+// exit code; the class the table keys is *non-gate*, not *emitting*. The variant is a return shape
 // and nothing else — no declared-knob union keys on it.
 pub enum Arm {
     Emit(EmitFn),
@@ -163,10 +163,10 @@ pub enum Arm {
 // rather than beside the first member that spelled it: the expansion is the mechanism's.
 pub const EVERY_REGISTERED_KNOB: &str = "@every-registered-knob";
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the **bridged-arm table**, keyed by the arm's own flag
-// spelling: `--knobs` publishes each member's roster and a front-end resolves it, which is the
-// property the members share. `--emit-` is one arm family's spelling, not the table's name.
-pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
+// spec: gate-sdk/SPEC.md §The non-gate arm — the **arm table**, keyed by the arm's own flag spelling,
+// each row carrying the arm's declared knob roster. `--emit-` is one arm family's spelling, not the
+// table's name.
+pub const ARMS: &[(&str, Arm, &[&str])] = &[
     (
         "--emit-footprint",
         Arm::Emit(footprint::emit),
@@ -200,7 +200,8 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
             "GATE_SDK_KIT_DIRS",
-            "GATE_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "DRIFT_KIT_KPIS_FILE",
             "CONTEXT_KIT_SETTINGS_FILE",
             "CANON_KIT_DOCS_BLOB_REF",
@@ -217,7 +218,8 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
             "GATE_SDK_KIT_DIRS",
-            "GATE_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
             "DRIFT_KIT_KPIS_FILE",
             "CONTEXT_KIT_SETTINGS_FILE",
             "CANON_KIT_DOCS_BLOB_REF",
@@ -234,7 +236,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         &["CANON_KIT_DOCS_BLOB_REF"],
     ),
     // spec: drift-kit/SPEC.md §The published-evidence extractor — the stage roster and the
-    // evidence-surface pair are this consumer's vocabulary, so they cross the bridge as knobs; a
+    // evidence-surface pair are this consumer's vocabulary, so they are knobs; a
     // stage name in the crate would ship one project's lifecycle as everyone's
     (
         "--emit-trajectory",
@@ -263,9 +265,9 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "QUEUE_KIT_ROADMAP_MARKER",
         ],
     ),
-    // spec: gate-sdk/SPEC.md §check-graph — the theme crosses as a *path* rather than as content:
-    // the bridge refuses any element carrying a newline and a stylesheet is newline-bearing by
-    // construction. Values cross the bridge; documents cross as a path.
+    // spec: gate-sdk/SPEC.md §check-graph — the theme is configured as a *path* rather than as
+    // content: a knob value cannot carry a newline and a stylesheet is newline-bearing by
+    // construction. Values are knobs; documents are paths.
     (
         "--emit-graph",
         Arm::Emit(graph::emit),
@@ -275,17 +277,15 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "GATE_SDK_GRAPH_ARTIFACT",
             "GATE_SDK_GRAPH_THEME_DIR",
             "GATE_SDK_GRAPH_MAX_EDGES",
-            "GRAPH_LAYERS",
-            "GRAPH_LAYER_RULES",
-            "GRAPH_LAYER_DEFAULT",
+            "GATE_SDK_GRAPH_VOCAB",
             // spec: gate-sdk/SPEC.md §lib/gate.sh — this arm expands every member's `couples=`, so
-            // it needs the knobs those tokens name rather than only its own: the sentinel the bridge
-            // substitutes off the descriptor corpus.
+            // it needs the knobs those tokens name rather than only its own: the sentinel stands
+            // for them, read off the descriptor corpus.
             crate::registry::EVERY_COUPLES_KNOB,
         ],
     ),
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a
-    // generator, and configured: a hardcoded flag receives no configuration
+    // generator, and configured: a hardcoded flag would hide its reads from `--knob-files`
     (
         "--emit-queue-index",
         Arm::Emit(queue_index::emit),
@@ -338,8 +338,8 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         ],
     ),
     // spec: context-kit/SPEC.md §Index-first reading — the markdown structural index. A table
-    // member rather than a hardcoded flag because it resolves a consumer knob, and a hardcoded flag
-    // receives no consumer override at all.
+    // member rather than a hardcoded flag because it reads a consumer knob, which a hardcoded flag
+    // would hide from `--knob-files`.
     (
         "--emit-md-index",
         Arm::Emit(md_index::emit),
@@ -353,7 +353,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         md_section::KNOBS,
     ),
     // spec: context-kit/SPEC.md §Index-first reading — the public-surface dispatcher: the extractor
-    // seam survives the port, so the two knobs that resolve it cross the bridge beside the prune set.
+    // seam survives the port, so the two knobs that resolve it are declared beside the prune set.
     (
         "--emit-pub-index",
         Arm::Emit(pub_index::emit),
@@ -375,16 +375,16 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(reads_census::emit),
         reads_census::KNOBS,
     ),
-    // spec: drift-kit/SPEC.md §The report skeleton — the collator, a *bridged* arm rather than a
-    // top-level flag: its knob defaults and its members' guard-kit knobs are bridged inputs.
+    // spec: drift-kit/SPEC.md §The report skeleton — the collator, a table member rather than a
+    // top-level flag: it reads its own knobs and its members' guard-kit knobs.
     (
         "--emit-drift-report",
         Arm::Emit(drift_report::emit),
         drift_report::KNOBS,
     ),
     // spec: guard-kit/SPEC.md §scan-prompts — the ranker, a table member on the forced-family
-    // test rather than by resemblance: it resolves three consumer knobs a hardcoded top-level
-    // flag would receive none of, and its free-text positional keeps the shape refusal.
+    // test rather than by resemblance: it reads three consumer knobs a hardcoded top-level
+    // flag would hide from `--knob-files`, and its free-text positional keeps the shape refusal.
     (
         "--emit-scan-prompts",
         Arm::Emit(scan_prompts::emit),
@@ -398,7 +398,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         compare_settings_allow::KNOBS,
     ),
     // spec: context-kit/SPEC.md §The always-loaded meter — the context meter, a table member
-    // because it resolves four consumer knobs a hardcoded top-level flag would receive none of;
+    // because it reads four consumer knobs a hardcoded flag would hide from `--knob-files`;
     // its three modes arrive as operands, the shape `--hook` and `--wait-probe` already carry.
     (
         "--emit-always-loaded",
@@ -470,7 +470,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: canon-kit/SPEC.md §check-prose-enum — the bundled enum-set emitter, an `Arm::Emit`:
     // the contract is a document and every failure is already exit 2 spec: gate-sdk/SPEC.md §The
-    // non-gate arm — a **two-kit** declared roster, resolved a slice at a time by the
+    // non-gate arm — a **two-kit** declared roster
     (
         "--emit-enum-sets",
         Arm::Emit(enum_sets::emit),
@@ -480,7 +480,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     // whose roster is empty by construction: the arm takes no knob and reads no file
     ("--emit-knob-roster", Arm::Emit(crate::knobs::emit), &[]),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the resolved static values, the one producer the
-    // shell couples expander and a bridged config's static read take; its roster is its argv's closure
+    // shell couples expander and every shell knob read take; its roster is its argv's closure
     (
         "--emit-knob-values",
         Arm::Emit(crate::knobs::values),
@@ -528,7 +528,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(usage_trend::emit),
         usage_trend::KNOBS,
     ),
-    // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
+    // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag
     ("--run", Arm::Run(crate::runner::run), crate::runner::KNOBS),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the one dispatching harness-integration arm; its
@@ -569,7 +569,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof: an `Arm::Run` because
     // its contract is the 1-versus-2 split of its exit status, which an emitting arm collapses, and
-    // a table member because it resolves six knobs a hardcoded flag would silently ignore
+    // a table member because it reads six knobs a hardcoded flag would hide from `--knob-files`
     (
         "--upgrade-smoke",
         Arm::Run(upgrade_smoke::run),
@@ -585,14 +585,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — an `Arm::Run` because the member
     // mutates two files and a git config key and emits no document; the `--install <op>` family is
-    // refused with cause there, its unbridged contract being unable to resolve these eight knobs
+    // refused with cause there, a hardcoded flag having no row to declare these eight knobs on
     (
         "--install-lifecycle",
         Arm::Run(install_lifecycle::run),
         install_lifecycle::KNOBS,
     ),
     // spec: doctrine-kit/SPEC.md §install-doctrine — an `Arm::Run` on the member above's own
-    // precedent, and it resolves two knobs the unbridged `--install <op>` family could not. Its
+    // precedent, and it reads two knobs the rowless `--install <op>` family could not declare. Its
     // callers are the adopter's install step, the kit's smoke, and `--init`, in-process.
     (
         "--install-doctrine",
@@ -601,7 +601,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: gate-sdk/SPEC.md §install-hooks — an `Arm::Run` because `check-identity`'s 1 surfaces
     // through this member's own status; it also declines the `--install <op>` family, whose
-    // unbridged contract could resolve neither of the two knobs this one reads from kit config
+    // rowless contract could declare neither of the two knobs this one reads from kit config
     (
         "--install-hooks",
         Arm::Run(install_hooks::run),
@@ -641,7 +641,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: gate-sdk/SPEC.md §run-gate-tests — an `Arm::Run` because the contract is a three-valued
     // exit — 0 clean, 1 a logic failure, 2 a harness or fixture error — and a table member because
-    // it resolves three knobs a hardcoded flag would silently ignore
+    // it reads three knobs a hardcoded flag would hide from `--knob-files`
     (
         "--run-gate-tests",
         Arm::Run(run_gate_tests::run),
@@ -649,7 +649,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: guard-kit/SPEC.md §Testing — an `Arm::Run` because the contract is a three-valued exit
     // an emitting arm collapses, and a table member because the arm needs the vendored guard-kit
-    // root a hardcoded flag could not take from a consumer
+    // root, a read a hardcoded flag would hide from `--knob-files`
     (
         "--run-guard-tests",
         Arm::Run(run_guard_tests::run),
@@ -657,7 +657,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: context-kit/SPEC.md §Testing — an `Arm::Run` because the contract is the three-valued
     // exit the `index_tests` validate suite reads, and a table member because it reaches two kit
-    // roots a hardcoded flag could not take from a consumer
+    // roots, a read a hardcoded flag would hide from `--knob-files`
     (
         "--run-index-tests",
         Arm::Run(run_index_tests::run),
@@ -677,7 +677,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ("--run-demo", Arm::Run(demo::run), demo::KNOBS),
     // spec: gate-sdk/SPEC.md §Consumer payload — the payload assembler, an `Arm::Run` because its
     // product is a tarball plus a receipt rather than a document, and a table member because all
-    // three of its inputs are consumer-overridable where a hardcoded flag would ignore every one
+    // three of its inputs are knobs a hardcoded flag would hide from `--knob-files`
     (
         "--pack-installer",
         Arm::Run(pack_installer::run),
@@ -685,34 +685,8 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
 ];
 
-// spec: gate-sdk/SPEC.md §run-gates — the child's declared knob environment, filtered out of the
-// bridged set the dispatching arm itself received: the declared-knob discipline an in-process
-// dispatch cannot keep. Shared by every arm that dispatches a member, never copied per caller.
-pub fn child_knobs(declared: &[&str]) -> Vec<(String, String)> {
-    let mut out: Vec<(String, String)> = Vec::new();
-    for d in declared {
-        match d.strip_suffix('*') {
-            Some(stem) => {
-                let want = format!("GATE_SDK_KNOB_{}", stem);
-                for (k, v) in std::env::vars() {
-                    if k.starts_with(&want) {
-                        out.push((k, v));
-                    }
-                }
-            }
-            None => {
-                let want = format!("GATE_SDK_KNOB_{}", d);
-                if let Ok(v) = std::env::var(&want) {
-                    out.push((want, v));
-                }
-            }
-        }
-    }
-    out
-}
-
 pub fn lookup(arm: &str) -> Option<&'static Arm> {
-    BRIDGED_ARMS
+    ARMS
         .iter()
         .find(|(a, _, _)| *a == arm)
         .map(|(_, f, _)| f)
@@ -722,92 +696,15 @@ pub fn lookup(arm: &str) -> Option<&'static Arm> {
 // rather than maintained beside it; the filter is the family the `--emit <name>` operand composes,
 // which that section's refusal paragraph is why.
 pub fn emit_names() -> Vec<&'static str> {
-    BRIDGED_ARMS
+    ARMS
         .iter()
         .map(|(a, _, _)| *a)
         .filter(|a| a.starts_with("--emit-"))
         .collect()
 }
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — an arm's declared reads are its own roster with every
-// sentinel in it expanded, derived rather than maintained. One expansion for every member: the
-// `Arm` variant is not consulted at all.
-pub fn knobs(arm: &str, rest: &[String]) -> Option<Vec<&'static str>> {
-    let (_, _, own) = BRIDGED_ARMS.iter().find(|(a, _, _)| *a == arm)?;
-    Some(crate::knobs::bridged(expand(own, rest)))
-}
-
-// spec: gate-sdk/SPEC.md §The non-gate arm — an arm carrying no sentinel keeps exactly its own
-// roster, argv for argv; one carrying either is bridged that sentinel's expansion instead, and the
-// result is sorted and deduped because two sentinels can name one knob.
-fn expand(own: &'static [&'static str], rest: &[String]) -> Vec<&'static str> {
-    if !own.iter().any(|k| is_sentinel(k)) {
-        return own.to_vec();
-    }
-    let mut all: Vec<&'static str> = own.iter().copied().filter(|k| !is_sentinel(k)).collect();
-    if own.contains(&EVERY_REGISTERED_KNOB) {
-        for name in registered_members(rest) {
-            if let Some(k) = crate::gates::knobs(&name) {
-                all.extend_from_slice(k);
-            }
-        }
-    }
-    if own.contains(&crate::hook::EVERY_HOOK_KNOB) {
-        all.extend_from_slice(&hook_knobs(rest));
-    }
-    if own.contains(&crate::knobs::ARGV_STATIC_KNOBS) {
-        all.extend(crate::knobs::declared_names(rest));
-    }
-    all.sort_unstable();
-    all.dedup();
-    all
-}
-
-fn is_sentinel(knob: &str) -> bool {
-    knob == EVERY_REGISTERED_KNOB
-        || knob == crate::hook::EVERY_HOOK_KNOB
-        || knob == crate::knobs::ARGV_STATIC_KNOBS
-}
-
-// spec: gate-sdk/SPEC.md §The non-gate arm — `--knobs --hook <member>` answers that member's own
-// roster and `--knobs --hook` with no member the union over the table: the per-member answer is
-// what makes the bridge resolve one guard's configuration rather than six.
-fn hook_knobs(rest: &[String]) -> Vec<&'static str> {
-    match rest.first().and_then(|m| crate::hook::knobs(m)) {
-        Some(k) => k.to_vec(),
-        None => crate::hook::HOOKS
-            .iter()
-            .flat_map(|(_, _, k)| k.iter().copied())
-            .collect(),
-    }
-}
-
-// spec: gate-sdk/SPEC.md §The non-gate arm — the member set the registry sentinel scopes to, and
-// the crate's one implementation of that scan: the scope arrives as argv, so `--gates-dir` is read
-// out of whatever grammar the arm carries and its absence under-reports rather than fails open.
-fn registered_members(args: &[String]) -> Vec<String> {
-    let Some(dir) = args
-        .iter()
-        .position(|a| a == "--gates-dir")
-        .and_then(|i| args.get(i + 1))
-    else {
-        return Vec::new();
-    };
-    let members = match std::fs::read_to_string(crate::registry::list_path(dir)) {
-        Ok(t) => crate::registry::members(&t),
-        Err(_) => Vec::new(),
-    };
-    // spec: gate-sdk/SPEC.md §run-gates — scope is the runner's `--only` selection, read by its own
-    // parser: a sole name as typed, two or more intersected with the registry, none the whole registry
-    match crate::runner::only_names(args).as_slice() {
-        [] => members,
-        [sole] => vec![sole.clone()],
-        names => members.into_iter().filter(|m| names.contains(m)).collect(),
-    }
-}
-
 pub fn arms() -> Vec<&'static str> {
-    BRIDGED_ARMS.iter().map(|(a, _, _)| *a).collect()
+    ARMS.iter().map(|(a, _, _)| *a).collect()
 }
 
 #[cfg(test)]
@@ -821,68 +718,5 @@ mod tests {
         assert!(lookup("--emit-enum-sets").is_some());
         assert!(lookup("enum-sets").is_none());
         assert!(lookup("--emit-enum-set").is_none());
-        assert_eq!(
-            knobs("--emit-enum-sets", &[]),
-            Some(vec!["GATE_SDK_KIT_DIRS"])
-        );
-    }
-
-    // spec: gate-sdk/SPEC.md §The non-gate arm — the dispatching arm's roster is derived and
-    // registry-scoped: it carries its own knobs always, and a member's knobs only where that
-    // member is registered in the tree the caller named
-    #[test]
-    fn the_dispatching_arms_roster_is_scoped_to_what_the_tree_registers() {
-        let bare = knobs("--run", &[]).expect("--run is not in the bridged-arm table");
-        assert!(bare.contains(&"GATE_SDK_TMP_DIR"), "the arm's own knob is missing");
-        assert!(
-            !bare.contains(&"GATE_SDK_COMMIT_TYPES"),
-            "an unregistered member's knob rode an unscoped union"
-        );
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
-        let here = vec![
-            "--gates-dir".to_string(),
-            root.join("scripts").display().to_string(),
-        ];
-        let scoped = knobs("--run", &here).expect("--run is not in the bridged-arm table");
-        assert!(
-            scoped.contains(&"GATE_SDK_COMMIT_TYPES"),
-            "a registered member's knob is missing from the scoped union"
-        );
-        let mut sorted = scoped.clone();
-        sorted.sort_unstable();
-        sorted.dedup();
-        assert_eq!(scoped, sorted, "the union is not deterministic");
-    }
-
-    // spec: gate-sdk/SPEC.md §The non-gate arm — the sentinel's member set is the runner's `--only`
-    // selection: a sole name as typed, two or more intersected with the registry, the whole
-    // registry without `--only`, and never an argument forwarded past `--`
-    #[test]
-    fn the_registry_sentinel_scopes_to_the_only_selection() {
-        let dir = std::env::temp_dir().join(format!("cw-sentinel-scope-{}", std::process::id()));
-        std::fs::create_dir_all(&dir).expect("scratch dir");
-        std::fs::write(dir.join("gates.list"), "g_one\ng_two\ng_three\n").expect("gates.list");
-        let argv = |rest: &[&str]| -> Vec<String> {
-            let mut v = vec!["--gates-dir".to_string(), dir.display().to_string()];
-            v.extend(rest.iter().map(|s| s.to_string()));
-            v
-        };
-        let cases: &[(&str, &[&str], &[&str])] = &[
-            ("bare", &[], &["g_one", "g_two", "g_three"]),
-            ("sole registered", &["--only", "g_two"], &["g_two"]),
-            ("sole unregistered", &["--only", "g_absent"], &["g_absent"]),
-            ("two registered", &["--only", "g_three", "g_one"], &["g_one", "g_three"]),
-            ("registered and unregistered", &["--only", "g_two", "g_absent"], &["g_two"]),
-            (
-                "forwarded past --",
-                &["--only", "g_one", "--", "g_two", "g_three"],
-                &["g_one"],
-            ),
-        ];
-        for (label, rest, want) in cases {
-            let got = registered_members(&argv(rest));
-            assert_eq!(got, want.to_vec(), "{}", label);
-        }
-        let _ = std::fs::remove_dir_all(&dir);
     }
 }

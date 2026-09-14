@@ -1,8 +1,8 @@
 // spec: drift-kit/SPEC.md §The stage-economics meter — lifecycle spend by stage × model ×
 // iteration: WORKFLOW-STATE stamps ⋈ transcripts ⋈ a consumer price table, advisory by
 // construction so exit is always 0 and a missing input is a notice rather than a failure.
-// spec: gate-sdk/SPEC.md §The non-gate arm — a bridged-arm table member on the forced-family test
-// (it resolves seven consumer knobs), and `Arm::Emit` because exit is always 0, so no `1` is
+// spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member on the forced-family test
+// (it reads seven consumer knobs), and `Arm::Emit` because exit is always 0, so no `1` is
 // load-bearing and the `{0, 2}` collapse costs nothing.
 use std::collections::HashMap;
 

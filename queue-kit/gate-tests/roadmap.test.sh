@@ -6,8 +6,8 @@
 # QUEUE_KIT_KNOB_FILE so the repo's queue-config.knobs does not leak in.
 #
 # Both halves are compiled now, so both are driven through their declared entry
-# points: gate_run resolves the gate's descriptor and its config bridge, and the
-# battery runner's --emit front-end resolves the arm's. The sandbox is a git repo
+# points: gate_run resolves the gate's descriptor, and the battery runner's
+# --emit front-end resolves the arm. The sandbox is a git repo
 # because that front-end anchors at the toplevel before it dispatches.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).

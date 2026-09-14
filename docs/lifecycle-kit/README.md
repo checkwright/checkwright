@@ -140,8 +140,7 @@ whose sessions dir is the cwd-slugged default invokes the binary's
 
 The two survey arms are the capture and citation affordances of
 [SPEC.md](SPEC.md) §The survey record, reached through gate-sdk's battery
-front-end because a bridged arm's knobs are resolved by the caller that already
-sources the kit libraries. `--` ends option processing for either, and a
+front-end, which locates the gate binary for them. `--` ends option processing for either, and a
 positional beginning with `-` without it is a refusal — the shape half of
 gate-sdk/SPEC.md §The bin/-tool contract, which outlives the port.
 

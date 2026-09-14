@@ -279,7 +279,7 @@ needs a payload copy of a shell script any more.
 
 What the installer became is an `Arm::Run` on `--install-lifecycle`'s precedent
 (gate-sdk/SPEC.md §The non-gate arm): it mutates one file, emits no document, and
-resolves the two knobs an unbridged arm could not. Its named callers are the
+its arm-table row declares the two knobs it resolves. Its named callers are the
 adopter's own install step, this kit's consumer smoke, and the `--init` arm.
 **One coupling a later reader will meet**: the crate's `--upgrade-smoke` arm ran
 this installer by path inside the vendored consumer tree, and now guards on the
@@ -422,7 +422,7 @@ gets no routing rather than wrong routing (the stated honest limit — a stage
 remap knob is deferred until such a consumer exists). A missing doctrine file is
 exit 2, an absent craft section or a no-match stage is empty output.
 
-**It is a bridged `Arm::Emit` member** (gate-sdk/SPEC.md §The non-gate arm),
+**It is an `Arm::Emit` arm-table member** (gate-sdk/SPEC.md §The non-gate arm),
 reached through the generic `--emit <name>` composer rather than a front-end
 branch of its own, because its contract is a **document** and both of its
 failures — a missing `<stage>` and an unreadable doctrine file — are already the
@@ -481,8 +481,8 @@ run rather than off the diff.
 
 doctrine-kit's knobs are **static**: the binary resolves them in process from its
 own defaults table and the consumer's knob file, so the installer arm, the gate
-and the stage-rules emitter read one resolved configuration and the config bridge
-never carries them (gate-sdk/SPEC.md §lib/gate.sh). `bash gate-sdk/bin/run-gates.sh
+and the stage-rules emitter read one resolved configuration (gate-sdk/SPEC.md §The
+knob file). `bash gate-sdk/bin/run-gates.sh
 --emit knob-roster` prints each one with its shape and rendered default. All three
 are scalars:
 

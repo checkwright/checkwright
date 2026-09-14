@@ -28,8 +28,7 @@ Config is a **knob file**: copy `templates/evidence-config.knobs` into the gates
 dir as `evidence-config.knobs` (or point `EVIDENCE_KIT_KNOB_FILE` elsewhere) and
 set any knob below; defaults fill what the file leaves unset. evidence-kit's knobs
 are **static**: the binary resolves them in process from its own defaults table
-and the consumer's knob file, and the config bridge never carries them
-(gate-sdk/SPEC.md §lib/gate.sh); `bash gate-sdk/bin/run-gates.sh --emit
+and the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit
 knob-roster` prints each one with its shape and rendered default. A gitignored
 `evidence-config.local.knobs` in the gates dir is the home for a private value a
 tracked file cannot carry. The grammar, that `.local` overlay, the
@@ -41,15 +40,16 @@ file's. The kit's table validator refuses at exit 2 when `EVIDENCE_KIT_PARSER`,
 `EVIDENCE_KIT_BASELINE_FILE`, `EVIDENCE_KIT_MANIFEST_FILE` or
 `EVIDENCE_KIT_QUEUE_FILE` is empty, or when a suite name is not a valid
 `EVIDENCE_KIT_RUN_<suite>` suffix, so a broken config gates nothing. A derived
-default below is written in the roster's `${NAME}` spelling for the knob it reads.
+default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement.
 
 Knobs, this repo's surface names as defaults:
 
-- `EVIDENCE_KIT_SUITES` — the ordered suite names; default empty. It declares
-  `EVIDENCE_KIT_FIXTURE_SUITES` a referent, so a file may splice the derived
-  suites in with `EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES` at the
-  position the order wants them.
-- `EVIDENCE_KIT_FIXTURE_SUITES` — the fixture suites, derived: one suite per
+- `EVIDENCE_KIT_SUITES` — the ordered suite names; default empty. A file may
+  splice the derived suites in with
+  `EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES` at the position the
+  order wants them.
+- `EVIDENCE_KIT_FIXTURE_SUITES` — the fixture suites, derived from
+  `GATE_SDK_ROOT`, `GATE_SDK_KIT_DIRS` and `GATE_SDK_GATES_DIR`: one suite per
   directory carrying a `gate-tests/` tree, the kit roots in order then the gates
   directory, named by the directory's basename with `-` turned to `_`
   (gate-sdk/SPEC.md §lib/gate.sh). No reader reads it directly; it exists to be
@@ -57,9 +57,10 @@ Knobs, this repo's surface names as defaults:
   leaves the reference out.
 - `EVIDENCE_KIT_RUN_<suite>` — the command that runs a suite (captured to a log
   under `EVIDENCE_KIT_TMP_DIR`). A **declared family**: each fixture suite has a
-  derived member, the fixture runner over the suite's tests directory and, when
-  one exists, its checks directory:
-  `bash ${GATE_SDK_ROOT_HERE}/bin/run-gates.sh --run-gate-tests <tests-dir> <checks-dir>`.
+  derived member over the same three inputs, the fixture runner over the suite's
+  tests directory and, when one exists, its checks directory, with the gate-sdk
+  root spelled relative to the working directory:
+  `bash ${GATE_SDK_ROOT}/bin/run-gates.sh --run-gate-tests <tests-dir> <checks-dir>`.
   A file or exported member of the same name replaces it. Every other suite's member is the
   consumer's to set.
 - `EVIDENCE_KIT_PARSER` — a parser adapter name or a consumer command mapping a
@@ -151,18 +152,18 @@ Knobs, this repo's surface names as defaults:
   is the blame.
 - `EVIDENCE_KIT_SCENARIO_GLOBS` — optional per-suite globs; configuring one
   arms the manifest↔disk set-equality assertion for that suite.
-- `EVIDENCE_KIT_BASELINE_FILE` (default `${GATE_SDK_WORKFLOW_DIR}/validate-baseline.txt`),
-  `EVIDENCE_KIT_MANIFEST_FILE` (default `${GATE_SDK_WORKFLOW_DIR}/validate-evidence.txt`),
-  `EVIDENCE_KIT_SKIP_FILE` (default `${GATE_SDK_WORKFLOW_DIR}/validate-skips.txt`).
+- `EVIDENCE_KIT_BASELINE_FILE` (default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/validate-baseline.txt`),
+  `EVIDENCE_KIT_MANIFEST_FILE` (default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/validate-evidence.txt`),
+  `EVIDENCE_KIT_SKIP_FILE` (default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/validate-skips.txt`).
 - `EVIDENCE_KIT_TMP_DIR` — the scratch dir run logs land in; default
-  `${GATE_SDK_TMP_DIR}`.
+  `${GATE_SDK_TMP_DIR:-.tmp}`.
 - `EVIDENCE_KIT_LOCK_FILE` — the producer-liveness lock (§The producer-liveness
-  lock), default `${EVIDENCE_KIT_TMP_DIR}/run-validate.lock`. It resolves
+  lock), default `${EVIDENCE_KIT_TMP_DIR:-.tmp}/run-validate.lock`. It resolves
   *through* the scratch knob rather than beside it, so a consumer that moves the
   scratch dir moves the lock with it and never has to keep two paths in step.
 - `EVIDENCE_KIT_QUEUE_FILE` / `EVIDENCE_KIT_STATE_FILE` — the lifecycle surfaces
   read for the manifest's optional close-entry and stamp-coupling assertions;
-  defaults `${GATE_SDK_QUEUE_FILE}` and `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt`.
+  defaults `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}` and `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`.
 - `EVIDENCE_KIT_RUN_ID` — the evidence-line key when no lifecycle queue header
   names the iteration; default empty.
 - `EVIDENCE_KIT_PRE_HOOK` — an optional per-suite pre-run command (projection
@@ -540,7 +541,7 @@ non-zero suite exit verbatim. A log with no parseable result is a run failure,
 not an empty diff. Not a gate — a `bin/` tool exercised end-to-end in `smoke/`,
 with the lock's own behavior pinned by `gate-tests/producer-lock.test.sh`.
 
-**It is the bridged arm `--run-validate`**, reached through
+**It is the arm-table member `--run-validate`**, reached through
 `bash gate-sdk/bin/run-gates.sh --run-validate` and dispatched to
 `native/src/emit/run_validate.rs`. The heading keeps the tool's old file name
 because two sibling sections cite it and the tool's identity did not move; what
@@ -557,8 +558,8 @@ whose entire product is that distinction, and nothing in the battery would repor
 it (gate-sdk/SPEC.md §The bin/-tool contract; §The non-gate arm owns the family
 test and this member's placement in the class).
 
-**It takes no positional argument at all** — its whole input is the bridged
-`EVIDENCE_KIT_*` environment — so the argv-shape refusal and the `--` escape have
+**It takes no positional argument at all** — its whole input is the resolved
+`EVIDENCE_KIT_*` knobs — so the argv-shape refusal and the `--` escape have
 no free text to bind on and the `-h`/`--help` arm lives in the front-end, as it
 does for every member of the class. Stated rather than skipped, because the open
 question of whether that contract binds a tool taking **no** positionals is not
@@ -685,7 +686,7 @@ be all digits, and a status can never be anything else. `--run-validate` does
 not go through this path — it holds each suite's status directly at the point it
 ran it, and passes it to the parser dispatch itself.
 
-**It is the bridged arm `--diff-baseline`**, reached through
+**It is the arm-table member `--diff-baseline`**, reached through
 `bash gate-sdk/bin/run-gates.sh --diff-baseline` and dispatched to
 `native/src/emit/diff_baseline.rs`. The heading keeps the tool's old file name
 because the compiled diff's own directive and two sibling sections cite it, and
@@ -752,13 +753,12 @@ liveness and coverage branches beyond the one good/bad pair are covered by
 
 **The gate dispatches to the binary substrate** — `checks/check-evidence-baseline.gate`
 to `native/src/gates/evidence_baseline.rs`, the shell script deleted — and asserts
-nothing new. It was held on the config bridge's want of a key channel, since
-`EVIDENCE_KIT_SCENARIO_GLOBS` is read **by key** (gate-sdk/SPEC.md §lib/gate.sh,
-the keyed arm that retired the hold), and it is this kit's first compiled member.
+nothing new. `EVIDENCE_KIT_SCENARIO_GLOBS` is a keyed knob and is read **by key**
+(gate-sdk/SPEC.md §The knob file), and it is this kit's first compiled member.
 **Where the non-empty keyed map is actually exercised is a caveat worth stating
 rather than discovering.** A consumer configuring no scenario glob resolves the
 kit default — an empty map — so its whole battery crosses the *empty* arm and a
-defect in the keyed wire would pass it; the non-empty arm is exercised by the
+defect in the keyed read would pass it; the non-empty arm is exercised by the
 coverage case in this gate's own behavioral test, which is therefore the
 load-bearing evidence for it rather than an extra scenario.
 

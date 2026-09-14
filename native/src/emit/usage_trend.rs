@@ -7,7 +7,7 @@
 use crate::walk;
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — the two names this arm resolves, both
-// defined and defaulted in the shell library the bridge sources: a hardcoded default would work in
+// rows of delegation-kit's table: a hardcoded default would work in
 // this tree and break silently for a consumer that overrides either.
 pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_USAGE_HISTORY",
@@ -288,8 +288,8 @@ fn positionals(args: &[String]) -> Result<&[String], String> {
     super::file_survey::positionals(args, "history path").map_err(|e| format!("{}\n{}", e, USAGE))
 }
 
-// spec: delegation-kit/SPEC.md §Trend reporter — the positional overrides the bridged knob and is
-// read first, `${1:-…}`'s own laziness; the knob's default being empty, an absent bridge variable
+// spec: delegation-kit/SPEC.md §Trend reporter — the positional overrides the knob and is
+// read first, `${1:-…}`'s own laziness; the knob's default being empty, an unset knob
 // and a configured-empty one are one reading and take the tool's own diagnostic.
 fn history(args: &[String]) -> Result<String, String> {
     let rest = positionals(args)?;

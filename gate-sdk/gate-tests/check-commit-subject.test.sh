@@ -15,7 +15,7 @@ fails=0
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 
 # Run the gate on a one-line subject; echo the exit code. The roster override, when
-# one is given, is exported in the same subshell gate_run resolves the bridge in.
+# one is given, is exported in a subshell so it never leaks into the next case.
 run_subject() {  # $1=subject  $2..=NAME=VALUE
     printf '%s\n' "$1" > "$tmp/msg.txt"
     shift

@@ -167,7 +167,7 @@ jobs:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/artifact
 
-      # The assemble step below dispatches the payload assembler as a bridged arm
+      # The assemble step below dispatches the payload assembler as a table arm
       # of the gate binary, and this is the one job that had no build — the
       # consumer smoke builds before it packs, and the macOS install-smoke legs
       # adopt a compiled binary from the build legs' hand-off. So the binary is

@@ -46,7 +46,7 @@ EVIDENCE_KIT_RUN_untouched_tree = bash scripts/untouched-tree.sh
 EVIDENCE_KIT_RUN_multi = true
 EVIDENCE_KIT_PARSER_multi = bash scripts/multi-parser.sh
 EOF
-# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the spine is the bridged `--run-validate` arm, so this scratch tree becomes its own git toplevel (the front end refuses outside a repository and resolves every relative knob against the toplevel it lands on) and the binary this consumer was given crosses absolute, its repo-relative default naming nothing inside the new toplevel.
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the spine is the `--run-validate` arm, reached through the front end, so this scratch tree becomes its own git toplevel (the front end refuses outside a repository and resolves every relative knob against the toplevel it lands on) and the binary this consumer was given crosses absolute, its repo-relative default naming nothing inside the new toplevel.
 ( cd "$es" && git init -q . ) >/dev/null 2>&1
 spine_bin="$PWD/$( ( source "$SDK/lib/gate.sh"; gate_native_bin ) )"
 ( cd "$es" && GATE_SDK_GATES_DIR=scripts GATE_SDK_NATIVE_BIN="$spine_bin" \

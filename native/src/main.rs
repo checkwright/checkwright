@@ -10,6 +10,7 @@ mod emit;
 mod ere;
 mod evidence;
 mod fresh;
+mod graph_vocab;
 mod gates;
 mod guard;
 mod history;
@@ -191,7 +192,6 @@ const TOP_LEVEL_FLAGS: &[&str] = &[
     "--uninstall",
     "--reads",
     "--needs",
-    "--knobs",
     "--knob-files",
 ];
 
@@ -238,18 +238,12 @@ fn known_arm(name: &str) -> bool {
     TOP_LEVEL_FLAGS.contains(&name) || emit::lookup(name).is_some() || gates::lookup(name).is_some()
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — the front-end's spelling normalized to the arm table's, above
-// both doors and recursing through `--knobs` so they cannot disagree. A dashless leading token is
-// left alone: only the front-end can tell a gates-dir from a gate name.
+// spec: gate-sdk/SPEC.md §run-gates — the front-end's spelling normalized to the arm table's. A
+// dashless leading token is left alone: only the front-end can tell a gates-dir from a gate name.
 fn normalize(argv: Vec<String>) -> Vec<String> {
     let Some(first) = argv.first().cloned() else {
         return argv;
     };
-    if first == "--knobs" && argv.len() > 1 {
-        let mut out = vec![first];
-        out.extend(normalize(argv[1..].to_vec()));
-        return out;
-    }
     if first == "--emit" {
         if let Some(name) = argv.get(1) {
             let arm = format!("--emit-{}", name);
@@ -298,8 +292,8 @@ fn main() {
         None => {
             eprintln!("checkwright-gates: no subcommand given");
             eprintln!("  adopter verbs: {}", installer::VERBS.iter().map(|(f, _)| f.trim_start_matches('-')).collect::<Vec<_>>().join(", "));
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
-            eprintln!("  bridged arms: {}", emit::arms().join(", "));
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --source-stamp | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  arms: {}", emit::arms().join(", "));
             exit(2);
         }
     };
@@ -416,42 +410,13 @@ fn main() {
         }
     }
 
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — one line per declared knob name and nothing else;
-    // gate_command reads this to decide which GATE_SDK_KNOB_* elements to resolve into the
-    // emitted argv.
-    if first == "--knobs" {
-        let name = match argv.get(1) {
-            Some(n) => n.as_str(),
-            None => {
-                eprintln!("checkwright-gates: --knobs needs a gate name — the config bridge could not report; treating as failure (not clean)");
-                eprintln!("  usage: checkwright-gates --knobs <gate-name>");
-                exit(2);
-            }
-        };
-        // spec: gate-sdk/SPEC.md §The non-gate arm — the knob roster is published through this one
-        // arm rather than a second flag, so a front-end asks one question whatever it is about to
-        // invoke: a gate, or an arm whose caller must resolve its reads.
-        match gates::knobs(name)
-            .map(<[&str]>::to_vec)
-            .or_else(|| emit::knobs(name, &argv[2..]))
-        {
-            Some(knobs) => {
-                for k in knobs {
-                    println!("{}", k);
-                }
-                exit(0);
-            }
-            None => no_such_gate(name),
-        }
-    }
-
     // spec: gate-sdk/SPEC.md §lib/gate.sh — `--knob-files <check-dir>... -- [<gate-name>...]`: one
     // `<gate-name>`⇥`<path>` line per derived knob file, the corpus read from the caller's dirs
     if first == "--knob-files" {
         exit(knob_files(&argv[1..]));
     }
 
-    // spec: gate-sdk/SPEC.md §The non-gate arm — the bridged arms, resolved before the registry
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the arm table, resolved before the registry
     // lookup and absent from `--list`. A thin wrapper by construction: the emission is a library
     // function, so the comparator and the rollup join call it in-process rather than through this.
     if let Some(arm) = emit::lookup(first) {

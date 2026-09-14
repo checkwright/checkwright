@@ -129,7 +129,7 @@ impl Scan {
 
     // spec: gate-sdk/SPEC.md §port-blockers — knob resolution for a command-position expansion is
     // the third derivation input: the name is reported and the caller resolves it through the one
-    // bridge resolver, so this report cannot disagree with a dispatched binary's value.
+    // knob resolver, so this report cannot disagree with a dispatched binary's value.
     fn classify(&mut self, t: &str) {
         if is_assignment(t) {
             self.cmdpos = true;

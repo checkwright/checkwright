@@ -172,7 +172,7 @@ twelve consumer knobs, and it removes the environment override fixtures and adop
 unprefixed globals. With no bridge, it becomes what §lib/gate.sh already calls a configurable document:
 a path the member reads.
 
-gate-sdk/SPEC.md §check-graph, the vocabulary paragraph. **Not yet applied:**
+gate-sdk/SPEC.md §check-graph, the vocabulary paragraph. **Applied:**
 
 > **The vocabulary file is `GATE_SDK_GRAPH_VOCAB`**, default `<gates-dir>/graph-vocab.knobs`, written in
 > the knob-file grammar (§The knob file) and read by `check-graph` and `--emit graph` through one reader.
@@ -201,7 +201,7 @@ banned-pattern files `bin/build-native.sh` checks a fresh artifact against. Thes
 knobs**: `GATE_SDK_NATIVE_BIN`, `GATE_SDK_NATIVE_CRATE`, `GATE_SDK_NATIVE_TARGETS_FILE`,
 `GATE_SDK_NATIVE_RUNNERS_FILE`, `GATE_SDK_MSG_PATTERN_FILES` and `GATE_SDK_MSG_PATTERN_FILES_LOCAL`.
 
-gate-sdk/SPEC.md §lib/gate.sh, a new bullet. **Not yet applied:**
+gate-sdk/SPEC.md §lib/gate.sh, a new bullet. **Applied:**
 
 > **The pre-binary accessors read their knob in shell, and a crate test holds them to the table.**
 > `gate_native_bin`, `gate_native_crate`, `gate_native_targets_file`, `gate_native_runners_file` and
@@ -288,6 +288,10 @@ installer writes into the file, and the binary reads them too.
   `gate_authoring_tree`, `gate_native_module`, `gate_self_repo_prefix`, `gate_sdk_gates_dir` and
   `fail_closed` are unchanged.
 
+**Applied, calibrated:** the prune-set read is a named function, `gate_prune_load`, which fills both
+the prune set and `GATE_GREP_EXCLUDES` once per sourcing, so a gate splicing that array calls it first
+and a subshell sourcing the library afresh reads its own environment rather than a parent's memo.
+
 The crate tests that spawn the library change with it: `registry.rs`' couples-sentinel test keeps its
 literal half against the crate and drops the shell half; `knobs/mod.rs`' gates-directory default test
 stays; `gates/mod.rs`' `resolve_gates_dir` helper stays; `main.rs`' source-stamp test stays.
@@ -309,6 +313,12 @@ stays; `gates/mod.rs`' `resolve_gates_dir` helper stays; `main.rs`' source-stamp
   pins every retired locator. It exports an absolute `GATE_SDK_ROOT` from its own anchor, beside the
   absolute `GATE_SDK_NATIVE_BIN` it already exports. `gate_run` executes `gate_command`'s argv, and
   `gate_arm_run` executes `<binary> <arm> <argv>`.
+
+**Applied, calibrated at §run-gate-tests:** once the environment outranks the file, the harness's
+exported `GATE_SDK_NATIVE_BIN` would override a case whose own knob file points the knob at a stand-in,
+which `check-gate-binary-fresh`'s pair does. The resolving shell reads the case's own value with the
+pre-binary accessor, the environment unset, and the case invocation carries that value in place of the
+harness binary when it is set. The argv's executable stays the harness binary either way.
 
 ### (9) The installer writes the knob-file seam {mechanical}
 
@@ -400,6 +410,10 @@ ground it states.
 - **`config-bridge-resolution-cost` closes.** No union is resolved and no library is sourced to launch a
   battery. The measurement above is recorded in §run-gates' front-end paragraph as the cost the cut
   removed.
+- **Applied**, the three entries moved to Done. The harness-pin test is
+  `knobs::tests::a_case_knob_file_does_not_outrank_the_harness_pin`, holding a tracked and an overlay
+  value of `GATE_SDK_TMP_DIR` below the exported pin, and guard-kit §Testing's load price is re-measured
+  without the bridge.
 - **§The port-candidate criteria, criterion 6**: *For a bridged knob the criterion is discharged by
   construction* becomes *for a static knob*, and delta 5's accessors are the clause's machine-held
   instance.
@@ -449,9 +463,21 @@ Named because each states a rule rather than narrating the flow:
 - Regenerate the pre-commit and commit-msg hooks, the graph, every kit SPEC mirror and the knob roster's
   readers.
 
+**Applied, calibrated:** a knob file expands nothing, so `check-crate-arms`' pair names its cargo target
+directory relative to the case directory, under the invoking tree's `.tmp`, where the shell config
+expanded `TMPDIR`. `run-dispatch-streams.test.sh`'s first arm lost its stderr source with the kit
+library, so it asserts the two-element argv and an empty stderr. `check-kit-ref-liveness`' good case
+takes its family-stem example from `EVIDENCE_KIT_RUN_`, the `GATE_SDK_KNOB_` stem being gone.
+`agents_md_smoke.rs` appends its line to the knob file `init` wrote rather than replacing it.
+
 ### (14) The release declarations {mechanical}
 
-`.workflow/release-declarations.md`. **Not yet applied:**
+`.workflow/release-declarations.md`. **Applied**, calibrated by the refusal probe: `run-gates.sh`
+itself reads gate-sdk's knobs before it dispatches, so a left-behind `gate-sdk-config.sh` refuses the
+whole battery at exit 2, and the Behavior-changes bullet says so. The per-gate Tightened-gates bullets
+still name the 92 members `--knob-files` derives, because a generated hook dispatches each one directly
+and meets the refusal per gate. The resolved arrays' Renamed bullet names `gate_prune_load` as the
+remedy for a shell gate splicing `GATE_GREP_EXCLUDES`.
 
 - Renamed knobs: `GATE_SDK_CONFIG_FILE` → `GATE_SDK_KNOB_FILE`. `GATE_SDK_NATIVE_ARTIFACT_NAMES` → ∅,
   never set by a consumer. The nine resolved `GATE_*` arrays and `GATE_KIT_ROOTS_HERE`,

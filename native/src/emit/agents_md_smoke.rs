@@ -1,4 +1,4 @@
-// spec: context-kit/SPEC.md §Testing — the AGENTS.md agent-file adapter smoke, bridged as an
+// spec: context-kit/SPEC.md §Testing — the AGENTS.md agent-file adapter smoke, an
 // `Arm::Run` member: the contract is a verdict — 0 with the clean line, 1 with a `FAIL — <reason>`
 // line, 2 a precondition the harness could not meet — which `Arm::Emit` cannot carry.
 // spec: context-kit/SPEC.md §Testing — the vendoring calls `lib/consumer-smoke.sh`'s helpers in the
@@ -225,9 +225,9 @@ fn convert_agent_file(consumer: &str) -> Result<(), Outcome> {
 fn write_config_seams(consumer: &str) -> Result<(), Outcome> {
     let seams: [(&str, &str, bool); 4] = [
         (
-            "scripts/gate-sdk-config.sh",
-            "# shellcheck shell=bash\n# shellcheck disable=SC2034  # read by check-root-tiering after lib/gate.sh sources this seam\nGATE_SDK_AGENT_FILE=\"AGENTS.md\"\n",
-            false,
+            "scripts/gate-sdk-config.knobs",
+            "GATE_SDK_AGENT_FILE = AGENTS.md\n",
+            true,
         ),
         (
             "scripts/context-config.knobs",

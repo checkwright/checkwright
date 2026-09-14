@@ -218,11 +218,11 @@ fn resolve_filter(
     // spec: gate-sdk/SPEC.md §check-reads-couples — the guard is evaluated against the *resolved*
     // selector, so which branch a consumer takes is read at run time and no descriptor carries it
     if let (Some(sel), _) = gates::filter_guard(spec) {
-        let raw = crate::knobs::wire(sel)?.ok_or_else(|| {
+        let raw = crate::knobs::wire(sel).map_err(|e| {
             format!(
-                "{} declares read root '{}' guarded by knob {}, which the config bridge could not \
-                 resolve — the branch could not be decided; treating as failure (not clean)",
-                gname, root, sel
+                "{} declares read root '{}' guarded by knob {}, which could not be resolved ({}) — \
+                 the branch could not be decided; treating as failure (not clean)",
+                gname, root, sel, e
             )
         })?;
         if !raw.is_empty() {
@@ -249,20 +249,20 @@ fn resolve_filter(
             ),
         )));
     };
-    // spec: gate-sdk/SPEC.md §Fail-closed contract — a named knob the bridge did not carry is exit 2,
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a named knob that does not resolve is exit 2,
     // never an empty filter silently widening the demand to the whole root: "cannot resolve", "no
     // filter" and "resolved empty" must not share a verdict
-    let raw = crate::knobs::wire(knob)?.ok_or_else(|| {
+    let raw = crate::knobs::wire(knob).map_err(|e| {
         format!(
-            "{} declares read root '{}' filtered by knob {}, which the config bridge could not \
-             resolve — the coverage assertion could not run; treating as failure (not clean)",
-            gname, root, knob
+            "{} declares read root '{}' filtered by knob {}, which could not be resolved ({}) — \
+             the coverage assertion could not run; treating as failure (not clean)",
+            gname, root, knob, e
         )
     })?;
     let mut pats: Vec<String> = Vec::new();
     if !raw.is_empty() {
         let els: Vec<&str> = raw.split('\t').collect();
-        // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridge's own discriminator for a keyed knob:
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — the serialization's own discriminator for a keyed knob:
         // every element is `<key>=<value>`, and it is the value that bounds the walk
         let keyed = els.iter().all(|e| e.contains('='));
         for e in els {
@@ -402,8 +402,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
             return Err(format!("no registry at {}", list));
         }
         // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_check_dirs`' own spelling: the gates dir as
-        // configured, then each kit root re-absolutised, because a bridged root crosses relative
-        // to the invoking directory and the resolved source path travels into every finding
+        // configured, then each kit root absolutised, because the resolved source path travels
+        // into every finding
         let mut resolve_dirs = vec![gates_dir.clone()];
         for k in walk::kit_roots_abs()? {
             if k.is_empty() {

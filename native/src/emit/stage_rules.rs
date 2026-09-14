@@ -7,7 +7,7 @@ use crate::emit;
 use crate::walk;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — one declared knob: a hardcoded top-level flag would
-// resolve a platform default and silently ignore every consumer override
+// hide the read from `--knob-files`
 pub const KNOBS: &[&str] = &["DOCTRINE_KIT_DOCTRINE_FILE"];
 
 // spec: doctrine-kit/SPEC.md §stage-rules — kit mechanism (the kit ships `DOCTRINE.md`), never

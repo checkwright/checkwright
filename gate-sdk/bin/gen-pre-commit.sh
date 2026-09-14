@@ -21,7 +21,8 @@ cd "$REPO_ROOT"
 
 GATES_DIR="$(gate_sdk_gates_dir)"
 LIST="$GATES_DIR/gates.list"
-HOOKS_DIR="${GATE_SDK_HOOKS_DIR:-$GATES_DIR/git-hooks}"
+HOOKS_DIR="$(gate_knob_values GATE_SDK_HOOKS_DIR)" || { echo "gen-pre-commit: GATE_SDK_HOOKS_DIR could not be read from the gate binary" >&2; exit 2; }
+HOOKS_DIR="${HOOKS_DIR#*$'\t'*$'\t'}"
 HOOK="$HOOKS_DIR/pre-commit"
 MSG_HOOK="$HOOKS_DIR/commit-msg"
 [[ -f "$LIST" ]] || { echo "gen-pre-commit: no registry at $LIST" >&2; exit 2; }
@@ -55,8 +56,7 @@ quote_elem() {
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the hook is a persisted consumer of the
-# invocation argv, so it emits `<binary> <name>` for a ported member, prefixed by that
-# member's resolved `env` elements
+# invocation argv, so it emits `<binary> <name>` for a ported member
 command_rel() {
     local -a argv=()
     mapfile -t argv < <(gate_command "$1" "${REL_DIRS[@]}") || return 1

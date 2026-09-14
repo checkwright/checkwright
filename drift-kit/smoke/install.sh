@@ -30,7 +30,7 @@ EOF
 registered="$(grep -cEv '^[[:space:]]*(#|$)' "$work/kpis.list")"
 
 # spec: gate-sdk/SPEC.md §The non-gate arm — the collator is a compiled arm reached through the
-# front-end that resolves its bridged knobs, the shape the trajectory extractor below already has.
+# front-end, the shape the trajectory extractor below already has.
 DRIFT_ARM="$SMOKE_KIT_ROOT/../gate-sdk/bin/run-gates.sh"
 
 report() {
@@ -178,7 +178,7 @@ printf 'alpha close s3 2025-01-02 none\n' >> "$trepo/.workflow/WORKFLOW-STATE.tx
 printf 'beta scope s4 2025-01-03 none\n'  > "$trepo/.workflow/WORKFLOW-STATE.txt";  tcommit "feat: beta scope"
 
 # spec: gate-sdk/SPEC.md §The non-gate arm — the extractor is a compiled arm reached through the
-# front-end that resolves its bridged knobs. The binary knob is absolutised because the run
+# front-end. The binary knob is absolutised because the run
 # happens after a cd, where its repo-relative default would resolve to nothing.
 TRAJ_BIN="$PWD/$(gate_native_bin)"
 set +e
@@ -590,7 +590,7 @@ sort "$folog" > "$work/fo-nometa.txt"
 diff -q "$work/fo-intact.txt" "$work/fo-nometa.txt" >/dev/null \
     || fail "losing the meta layer changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-nometa.txt")"
 
-# spec: drift-kit/SPEC.md §The knowledge-friction loop — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit kfric, a leading-dash field is still exit 2 in EITHER slot through the bridge, and the knowledge log is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them; the -h/--help cases retired with the port, the help half belonging to the substrate.
+# spec: drift-kit/SPEC.md §The knowledge-friction loop — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit kfric, a leading-dash field is still exit 2 in EITHER slot through the front-end, and the knowledge log is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them; the -h/--help cases retired with the port, the help half belonging to the substrate.
 kflog="$work/kfric-argv.log"
 printf '2026-01-01 a real fact ← a real surface\n' > "$kflog"
 cp "$kflog" "$work/kfric-argv.before"
@@ -608,8 +608,8 @@ cmp -s "$work/kfric-argv.before" "$kflog" \
     || fail "--emit kfric wrote the knowledge log on a refusal path"
 
 # spec: gate-sdk/SPEC.md §The bin/-tool contract — '--' ends option processing, so the refusal never
-# makes a legitimate filing unfileable; and a SET consumer knob reaches the arm's write through the
-# shell bridge, which the refusal above cannot show.
+# makes a legitimate filing unfileable; and a SET consumer knob reaches the arm's write, which the
+# refusal above cannot show.
 kf -- "--list is captured at exit 0" "a surface" >/dev/null
 grep -q -- '--list is captured at exit 0 ← a surface$' "$kflog" \
     || fail "--emit kfric -- did not file a fact beginning with a dash"

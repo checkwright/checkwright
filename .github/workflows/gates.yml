@@ -140,7 +140,7 @@ jobs:
           rc="${PIPESTATUS[0]}"
           set -e
           echo "installer_smoke exited $rc; the verdict below is the baseline diff, not that status"
-          # The verdict is the bridged `--diff-baseline` arm, and the binary it needs is built by
+          # The verdict is the `--diff-baseline` arm, and the binary it needs is built by
           # the smoke's OWN first arm above (installer/consumer-smoke/run-smoke.sh, `build (the
           # host gate binary the main payload carries)`) on this runner's preinstalled cargo — not
           # by the `gates` job, which is a separate job with a separate workspace. The residual is
@@ -739,10 +739,10 @@ jobs:
           $dest = "scripts/$binname"
           $r = Invoke-Bootstrap $f @('--install','place-artifact','--root',$root,'--src',$src,
                                      '--dest',$dest,
-                                     '--seam','scripts/gate-sdk-config.sh',
+                                     '--seam','scripts/gate-sdk-config.knobs',
                                      '--target',$target,'--digest',$digest)
           Check "a real --install place-artifact performs a placement and emits its two verbs" `
-                ($r.Code -eq 0 -and $r.Out -match ("own\t" + [regex]::Escape($dest)) -and $r.Out -match 'own\tscripts/gate-sdk-config.sh') `
+                ($r.Code -eq 0 -and $r.Out -match ("own\t" + [regex]::Escape($dest)) -and $r.Out -match 'own\tscripts/gate-sdk-config.knobs') `
                 "exit $($r.Code): out=$($r.Out) err=$($r.Err)"
           Check "the placement actually wrote the artifact" `
                 (Test-Path -LiteralPath (Join-Path $root $dest)) "nothing was written"
@@ -983,9 +983,8 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       # A macOS runner's stock `/bin/bash` is 3.2 and the step below sources
-      # `gate-sdk/lib/gate.sh`, whose knob defaults use `[[ -v ]]` — a bash 4.2
-      # unary. Without this step both darwin legs die on their first executed
-      # line with `conditional binary operator expected`, having compiled
+      # `gate-sdk/lib/gate.sh`, whose accessors use bash 4.3 namerefs. Without
+      # this step both darwin legs die inside that library, having compiled
       # nothing, which is what run 34200226768 measured. The floor is not new:
       # docs/install.md §Requirements already declares `bash (>= 4.3)`, so this
       # installs the declared floor rather than working around its absence.
@@ -994,9 +993,8 @@ jobs:
       # install-smoke leg's brew step below.** That step's package set IS an
       # adopter claim and is held equal to §Requirements' list in both
       # directions; this one is the producer's own prerequisite and is held to
-      # what this job's path executes — bash for the library's defaults, and the
-      # GNU userland for `gate.sh`'s `realpath`, `comm` and `sort` and for
-      # `build-native.sh`'s `grep -aoEhf -` and `sort -u`. `shellcheck` is
+      # what this job's path executes — bash for the library's accessors, and the
+      # GNU userland for `build-native.sh`'s `grep -aoEhf -` and `sort -u`. `shellcheck` is
       # deliberately absent: nothing this job runs invokes it (both files carry
       # `# shellcheck` directives and no call), and the sibling installs it
       # because `init` refuses without it on an install path this job never

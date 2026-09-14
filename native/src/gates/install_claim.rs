@@ -1,6 +1,6 @@
 // spec: canon-kit/SPEC.md §check-install-claim — exactly one governed doc declares the
 // primary install transport, and no scanned install section leads with a different one; the
-// transport vocabulary arrives as bridged data, never from an emitter spawned here
+// transport vocabulary is the consumer's command knob's output, never a crate literal
 use crate::spec::{self, compile_pattern as compile, declared_id, governed_docs, skip_space};
 use std::path::Path;
 

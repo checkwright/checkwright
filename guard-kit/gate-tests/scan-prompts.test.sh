@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # spec: guard-kit/SPEC.md §scan-prompts — the headline count filters the friction log against BOTH the committed allowlist and the local overlay, matching per compound segment as the harness does; an overlay-only grant did not prompt (kept off the headline, surfaced in the advisory promote-or-prune section), and a whole-string glob spanning a compound the harness would split and refuse does not read as allowed
-# spec: gate-sdk/SPEC.md §The non-gate arm — the end-to-end holder of the arm's *output shape*, reached through the shipped front-end rather than against the binary, because the front-end is what resolves the three declared knobs; the key derivation is additionally pinned in-crate by check-crate-arms
+# spec: gate-sdk/SPEC.md §The non-gate arm — the end-to-end holder of the arm's *output shape*, reached through the shipped front-end rather than against the binary, because the front-end is the invocation a consumer makes; the key derivation is additionally pinned in-crate by check-crate-arms
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 # shellcheck source=../../gate-sdk/lib/gate.sh
@@ -36,8 +36,7 @@ LOG="$sb/friction.log"
     echo 'make build'               # nothing grants it: a true prompt
 } > "$LOG"
 
-# The knobs cross the bridge: gate_command sources guard-kit/lib/guard.sh, whose ':=' defaults
-# yield to a value already in the environment, so a sandbox's settings pair reaches the arm.
+# The environment outranks every knob file, so a sandbox's settings pair reaches the arm.
 run() { GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
         GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
         GUARD_KIT_LOG="$LOG" \

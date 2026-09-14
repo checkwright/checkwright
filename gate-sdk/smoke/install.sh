@@ -163,9 +163,8 @@ read -r w <<<"$v"
 for f in ./*.sh; do pb_tail_prog "$f" "$w"; done
 fail_closed 0 SMOKE-TOKENIZER probe
 EOF
-# spec: gate-sdk/SPEC.md §The non-gate arm — the arm is reached through the one front-end that
-# resolves a bridged arm's environment; --gates-dir is what scopes the arm's own declared-knob
-# union, so the invocation asserted here is the one a caller actually makes
+# spec: gate-sdk/SPEC.md §The non-gate arm — the arm is reached through the front-end with an
+# explicit --gates-dir, so the invocation asserted here is the one a caller actually makes
 pb_run() { GATE_SDK_GATES_DIR="$pb" bash "$SDK/bin/run-gates.sh" --emit port-blockers --gates-dir "$pb" "$@"; }
 
 out="$(pb_run)" || { echo "smoke(port-blockers): default arm exited non-zero" >&2; exit 1; }

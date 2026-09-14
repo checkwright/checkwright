@@ -1,9 +1,9 @@
-// spec: gate-sdk/SPEC.md §run-gate-tests — the golden-fixture runner, bridged as an `Arm::Run`
+// spec: gate-sdk/SPEC.md §run-gate-tests — the golden-fixture runner, an `Arm::Run`
 // member: its contract is a three-valued exit — 0 clean, 1 a logic failure in a gate or a unit
 // test, 2 a harness or fixture error — which `Arm::Emit` collapses to 0-or-2.
-// spec: gate-sdk/SPEC.md §The non-gate arm — a bridged-arm table member rather than a hardcoded
-// top-level flag, because the member is configured: a top-level flag would resolve platform
-// defaults and silently ignore every consumer override of the three knobs below.
+// spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
+// top-level flag, because the member is configured: a top-level flag has no row, so
+// `--knob-files` could not see the three knobs below.
 use crate::proc;
 use crate::walk;
 use std::path::Path;
@@ -271,11 +271,11 @@ fn basename(p: &str) -> &str {
     p.rsplit('/').next().unwrap_or(p)
 }
 
-// spec: gate-sdk/SPEC.md §run-gate-tests — one case: resolve the dispatch inside the case dir,
-// take the executable guard and the absolutization on the first element that is neither `env` nor
-// an assignment, then run it from inside the case dir with the scratch pin.
+// spec: gate-sdk/SPEC.md §run-gate-tests — one case: resolve the dispatch inside the case dir, take
+// the executable guard and the absolutization on its first element, then run it from inside the case
+// dir with the scratch pin.
 fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> i32 {
-    let Some(mut argv) = resolve_argv(h, gate, casedir) else {
+    let Some((pinned, mut argv)) = resolve_argv(h, gate, casedir) else {
         println!(
             "  HARNESS: {} resolves in none of: {}",
             gate,
@@ -291,18 +291,8 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
         );
         return 2;
     }
-    // spec: gate-sdk/SPEC.md §run-gate-tests — a bridged argv leads with `env` and its NAME=VALUE
-    // elements, so the dispatch executable is the first element that is neither, and it is that
-    // element the executable guard and the absolutization take.
-    let x = dispatch_index(&argv);
-    if x >= argv.len() || !proc::is_executable(Path::new(&argv[x])) {
-        println!(
-            "  HARNESS: {} is not executable",
-            argv
-                .get(x)
-                .map(String::as_str)
-                .unwrap_or("<no dispatch executable in argv>")
-        );
+    if !proc::is_executable(Path::new(&argv[0])) {
+        println!("  HARNESS: {} is not executable", argv[0]);
         return 2;
     }
     let here = match walk::cwd() {
@@ -312,7 +302,7 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
             return 2;
         }
     };
-    argv[x] = walk::abs_against(&here, &argv[x]);
+    argv[0] = walk::abs_against(&here, &argv[0]);
 
     // spec: gate-sdk/SPEC.md §run-gate-tests — `#` lines are stripped and the surviving text is
     // word-split on whitespace into argv, never taken one argument per line; the deliberate
@@ -327,7 +317,11 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
         }
     }
 
-    let mut env = h.exported.clone();
+    // spec: gate-sdk/SPEC.md §run-gate-tests — a case pinning the binary in its own knob file keeps its pin,
+    // since the environment outranks the file; every other case is handed the absolutized binary
+    let mut env: Vec<(String, String)> =
+        h.exported.iter().filter(|(k, _)| k != "GATE_SDK_NATIVE_BIN").cloned().collect();
+    env.push(("GATE_SDK_NATIVE_BIN".to_string(), if pinned.is_empty() { h.bin.clone() } else { pinned }));
     env.push(("GATE_SDK_TMP_DIR".to_string(), h.case_tmp.clone()));
     let mut spawn: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
     spawn.extend(args.iter().map(String::as_str));
@@ -412,11 +406,10 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
 // spec: gate-sdk/SPEC.md §run-gate-tests — the dispatch resolution is `gate_command`'s own answer,
 // read out of a bash that sources the unchanged `lib/gate.sh` with the `cd` on the shell side,
 // before `gate_command` runs.
-fn resolve_argv(h: &Harness, gate: &str, casedir: &str) -> Option<Vec<String>> {
-    // spec: gate-sdk/SPEC.md §run-gate-tests — the binary and the pinned scratch are exported into
-    // the resolving shell, which is the shell form's process-wide export; both exports precede the
-    // source, which is where that section's upstream-of-the-bridge argument bites.
-    let script = r#"export GATE_SDK_NATIVE_BIN="$1"; export GATE_SDK_TMP_DIR="$3"; export GATE_SDK_ROOT="$2"; source "$2/lib/gate.sh"; shift 3; cd "$1" || exit 2; shift; gate_command "$@""#;
+fn resolve_argv(h: &Harness, gate: &str, casedir: &str) -> Option<(String, Vec<String>)> {
+    // spec: gate-sdk/SPEC.md §run-gate-tests — the binary, the pinned scratch and the gate-sdk root are
+    // exported into the resolving shell, the shell form's process-wide export
+    let script = r#"export GATE_SDK_NATIVE_BIN="$1"; export GATE_SDK_TMP_DIR="$3"; export GATE_SDK_ROOT="$2"; source "$2/lib/gate.sh"; shift 3; cd "$1" || exit 2; shift; printf '%s\n' "$(unset GATE_SDK_NATIVE_BIN; _gate_prebinary_knob GATE_SDK_NATIVE_BIN '')"; gate_command "$@""#;
     let mut argv: Vec<&str> = vec!["-c", script, "bash", &h.bin, &h.sdk, &h.case_tmp, casedir, gate];
     argv.extend(h.gate_dirs.iter().map(String::as_str));
     // spec: gate-sdk/SPEC.md §run-gate-tests — a refusal is a status, not a parse: `gate_command`
@@ -426,35 +419,12 @@ fn resolve_argv(h: &Harness, gate: &str, casedir: &str) -> Option<Vec<String>> {
     if done.code() != 0 {
         return None;
     }
-    Some(
-        String::from_utf8_lossy(done.stdout())
-            .lines()
-            .map(String::from)
-            .collect(),
-    )
-}
-
-// spec: gate-sdk/SPEC.md §run-gate-tests — `env` is a PATH lookup with no directory to resolve, so
-// guarding argv[0] would reject every bridged member; the guard takes the first element that is
-// neither `env` nor a `NAME=VALUE` assignment.
-pub fn dispatch_index(argv: &[String]) -> usize {
-    if argv.first().map(String::as_str) != Some("env") {
-        return 0;
+    let mut lines: Vec<String> = String::from_utf8_lossy(done.stdout()).lines().map(String::from).collect();
+    if lines.is_empty() {
+        return None;
     }
-    let mut x = 1;
-    while x < argv.len() && assignment(&argv[x]) {
-        x += 1;
-    }
-    x
-}
-
-fn assignment(el: &str) -> bool {
-    let mut cs = el.chars();
-    match cs.next() {
-        Some(c) if c.is_ascii_alphabetic() || c == '_' => {}
-        _ => return false,
-    }
-    el.contains('=')
+    let pinned = lines.remove(0);
+    Some((pinned, lines))
 }
 
 // spec: gate-sdk/SPEC.md §run-gate-tests — `grep -qF` over the combined output: a pin has no
@@ -497,27 +467,6 @@ pub fn help_line(l: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // spec: gate-sdk/SPEC.md §run-gate-tests — the executable guard's target across the two argv
-    // shapes `gate_command` emits: a one-element shell path, and a bridged `env` prefix whose
-    // assignments the guard must walk past.
-    #[test]
-    fn the_dispatch_element_is_found_past_any_env_prefix() {
-        let shell = vec!["checks/check-foo.sh".to_string()];
-        assert_eq!(dispatch_index(&shell), 0);
-        let bridged: Vec<String> = ["env", "GATE_SDK_KNOB_A=1", "GATE_SDK_KNOB_B=x\ty", "bin", "foo"]
-            .iter()
-            .map(|s| s.to_string())
-            .collect();
-        assert_eq!(dispatch_index(&bridged), 3);
-        let bare_env: Vec<String> = vec!["env".to_string()];
-        assert_eq!(
-            dispatch_index(&bare_env),
-            1,
-            "an argv that is nothing but `env` has no dispatch element, and the guard must report \
-             that rather than index into it"
-        );
-    }
 
     // spec: gate-sdk/SPEC.md §Output contract — the clean line's grammar, which a fixture pair
     // cannot pin: the runner asserts it about *other* members and owes no pair of its own.

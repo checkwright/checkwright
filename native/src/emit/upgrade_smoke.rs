@@ -1,4 +1,4 @@
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof, bridged as an `Arm::Run`
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof, an `Arm::Run`
 // member: its contract is the exit status (2 broken tag or environment, 1 upgrade finding, 0 clean
 // with one verdict line on stdout), which `Arm::Emit` collapses to 0-or-2
 use crate::declaration::{self, SectionVerdict, TokenRule};
@@ -9,8 +9,8 @@ use crate::proc::{self, Stderr};
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the five knobs the resolve step reads, plus the kit-roots
-// transport: a compiled arm has no `BASH_SOURCE` anchor to find its own kit library from.
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the five knobs the resolve step reads, plus the kit
+// roots' override: a compiled arm has no `BASH_SOURCE` anchor to find its own kit library from.
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_UPGRADE_REPO",
     "GATE_SDK_UPGRADE_FROM",
@@ -50,7 +50,7 @@ fn one(line: String) -> Vec<String> {
     vec![line]
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — a knob the bridge could not resolve is a broken
+// spec: gate-sdk/SPEC.md §upgrade-smoke — a knob that does not resolve is a broken
 // environment, never an upgrade finding
 fn knob(name: &str) -> Result<String, Fail> {
     walk::knob_scalar(name).map_err(|e| broken(one(format!("{}: {}", NAME, e))))
@@ -700,8 +700,8 @@ fn stage_all(consumer: &str) -> Result<(), Fail> {
 }
 
 // spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 3 of 3: the regen runs *after* the sync has
-// been judged, and the artifact's path is resolved in the **consumer's** library rather than this
-// process's, because the host's value is a different tree's.
+// been judged, and the artifact's path is resolved against the **consumer's** knob files rather than
+// this process's, because the host's value is a different tree's.
 fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     let hook = bash(
         r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null"#,
@@ -716,11 +716,16 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     }
 
     let resolved = bash(
-        r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && source gate-sdk/lib/gate.sh && printf '%s' "$GATE_SDK_GRAPH_ARTIFACT""#,
+        r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --emit knob-values GATE_SDK_GRAPH_ARTIFACT"#,
         &[consumer],
         Stderr::Inherit,
     )?;
-    let artifact = String::from_utf8_lossy(resolved.stdout()).trim().to_string();
+    let artifact = String::from_utf8_lossy(resolved.stdout())
+        .trim_end_matches('\n')
+        .splitn(3, '\t')
+        .nth(2)
+        .unwrap_or("")
+        .to_string();
     if resolved.code() != 0 {
         return Err(broken(one(format!(
             "{}: could not resolve the graph artifact path at TO ({})",
@@ -729,7 +734,7 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     }
     if artifact.is_empty() {
         return Err(broken(one(format!(
-            "{}: the consumer's library resolved an empty graph artifact path at TO ({})",
+            "{}: the consumer's knob files resolved an empty graph artifact path at TO ({})",
             NAME, to
         ))));
     }

@@ -1,4 +1,4 @@
-// spec: gate-sdk/SPEC.md §Consumer smoke — the adoption walkthrough as a bridged `Arm::Run`
+// spec: gate-sdk/SPEC.md §Consumer smoke — the adoption walkthrough as an `Arm::Run`
 // member: its contract is the verdict — 0 the arc behaved, 1 an act of it did not, 2 a
 // precondition the harness could not meet — which `Arm::Emit` cannot carry.
 // spec: gate-sdk/SPEC.md §Consumer smoke — the binary placement calls `csmoke_place_binary` in the

@@ -37,11 +37,13 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring
 
 # gate-sdk owns GATE_SDK_QUEUE_FILE and states its default; widget-kit source cites
 # it (cross-kit) and defines its own knobs the three skip classes cover. All clean.
-cat >"$SANDBOX/gate-sdk/SPEC.md" <<'EOF'
-# gate-sdk — SPEC
-
-- `GATE_SDK_QUEUE_FILE` — default `TASK-QUEUE.md`.
-EOF
+# gate-sdk's table is static, so its roster couples every literal scalar default to
+# the sandbox SPEC, which states each one.
+{ printf '# gate-sdk — SPEC\n\n'
+  gate_arm_run --emit-knob-roster | awk -F'\t' '$1 ~ /^GATE_SDK_/ && $2 == "scalar" && $3 != "" && $3 !~ /\$\{/ { printf "- `%s` — default `%s`.\n", $1, $3 }'
+} >"$SANDBOX/gate-sdk/SPEC.md"
+grep -qF -- '- `GATE_SDK_QUEUE_FILE` — default `TASK-QUEUE.md`.' "$SANDBOX/gate-sdk/SPEC.md" \
+    || { echo "  FAIL [roster-spec]: the roster rendered no GATE_SDK_QUEUE_FILE default"; fails=$((fails + 1)); }
 cat >"$SANDBOX/widget-kit/SPEC.md" <<'EOF'
 # widget-kit — SPEC
 

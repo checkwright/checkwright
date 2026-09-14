@@ -59,9 +59,9 @@ a workflow whose whole distribution model is verbatim copy.
 ## Knob defaults
 
 site-kit's knobs are **static**: the binary resolves them in process from its own
-defaults table and the consumer's knob file, and the config bridge never carries
-them (gate-sdk/SPEC.md §lib/gate.sh). `bash gate-sdk/bin/run-gates.sh --emit
-knob-roster` prints each one with its shape and rendered default.
+defaults table and the consumer's knob file (gate-sdk/SPEC.md §The knob file).
+`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its
+shape and rendered default.
 
 - `SITE_KIT_CNAME` — the CNAME file holding the one authoritative host line,
   default `docs/CNAME`.

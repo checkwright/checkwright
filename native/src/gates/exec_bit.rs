@@ -12,14 +12,14 @@ fn pruned(path: &str, prune: &[String]) -> bool {
 }
 
 pub fn run(args: &[String]) -> i32 {
-    let globs = match walk::knob_array("GATE_EXEC_GLOBS") {
+    let globs = match walk::knob_words("GATE_SDK_EXEC_GLOBS") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-exec-bit: {}", e);
             return 2;
         }
     };
-    let prune = match walk::knob_array("GATE_EXEC_PRUNE") {
+    let prune = match walk::knob_words("GATE_SDK_EXEC_PRUNE") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-exec-bit: {}", e);

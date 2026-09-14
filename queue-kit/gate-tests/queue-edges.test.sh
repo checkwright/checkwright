@@ -63,13 +63,13 @@ checks=$((checks + 1))
 grep -qF ', retired)' <<<"$out" \
     && note no-repo-no-retired-block "a sandbox outside a work tree still printed a retired block: $out"
 
-# --- a set consumer knob reaches the rendering through the bridge: the deferred section name.
+# --- a set consumer knob reaches the rendering: the deferred section name.
 # Renamed away, def-a is no longer in a task section, so it is no longer a live target at all.
 checks=$((checks + 1))
 out="$( cd "$ROOT" && env QUEUE_KIT_DEFERRED_SECTION='Someday' \
     bash "$RUN_GATES" --emit queue-edges "$Q" 2>&1 )"
 grep -qF 'def-a (' <<<"$out" \
-    && note bridge-deferred "a renamed deferred section did not reach the arm through the bridge: $out"
+    && note knob-deferred "a renamed deferred section did not reach the arm: $out"
 
 # --- the arm mutates nothing ---
 checks=$((checks + 1))
@@ -175,5 +175,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "queue-edges.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "queue-edges.test.sh: clean (the --emit front-end resolves the arm, a renamed deferred section reaches it through the bridge, the no-repository degradation is total, and a real two-revision history yields the retired target, the never-live floor, the trailing block and both --inbound domains; $checks checks)"
+echo "queue-edges.test.sh: clean (the --emit front-end resolves the arm, a renamed deferred section reaches it, the no-repository degradation is total, and a real two-revision history yields the retired target, the never-live floor, the trailing block and both --inbound domains; $checks checks)"
 exit 0

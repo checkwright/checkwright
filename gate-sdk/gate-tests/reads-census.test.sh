@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §check-reads-couples — the census arm's properties that a crate unit test
 # cannot reach, because each is a property of the arm as a *dispatched* member rather than of the
-# function behind it. (1) It resolves through the bridged-arm table, so `--emit reads-census` is a
+# function behind it. (1) It resolves through the arm table, so `--emit reads-census` is a
 # live spelling and not an unreachable function. (2) Its two derivable totals agree with `--reads`,
 # the other arm over the same registry field — the two-oracle agreement that makes a census an
 # oracle rather than a second transcription. (3) The report carries no count line and no header,
@@ -16,7 +16,7 @@ checks=0
 tab=$'\t'
 note() { echo "  FAIL [$1]: $2"; fails=$((fails + 1)); }
 
-# --- (1) the arm dispatches through the bridge, at the spelling the roster publishes ----------
+# --- (1) the arm dispatches through the binary, at the spelling the roster publishes ----------
 checks=$((checks + 1))
 census="$(gate_arm_run --emit-reads-census)"
 rc=$?
@@ -92,5 +92,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "reads-census.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "reads-census.test.sh: clean (the arm dispatches through the bridge, every line is four columns with no header or count line, and both derivable totals plus every per-member count and ground column agree with a --reads sweep over all members — $census_members members, $census_roots ? roots; $checks checks)"
+echo "reads-census.test.sh: clean (the arm dispatches through the binary, every line is four columns with no header or count line, and both derivable totals plus every per-member count and ground column agree with a --reads sweep over all members — $census_members members, $census_roots ? roots; $checks checks)"
 exit 0

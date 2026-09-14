@@ -711,19 +711,18 @@ Config is a **knob file**: copy `templates/queue-config.knobs` into the gates di
 as `queue-config.knobs` (or point `QUEUE_KIT_KNOB_FILE` elsewhere) and set any knob
 below; defaults fill what the file leaves unset. queue-kit's knobs are **static**:
 the binary resolves them in process from its own defaults table and the consumer's
-knob file, and the config bridge never carries them (gate-sdk/SPEC.md §lib/gate.sh);
-`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape
-and rendered default. A gitignored `queue-config.local.knobs` in the gates dir is the
+knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with
+its shape and rendered default. A gitignored `queue-config.local.knobs` in the gates dir is the
 home for a private value a tracked file cannot carry. The grammar, that `.local`
 overlay, the environment-over-file precedence for a scalar, and the refusals — a
 set `QUEUE_KIT_KNOB_FILE` that does not exist, a left-behind `queue-config.sh` or
 `queue-config.local.sh`, a non-empty file named by the retired
 `QUEUE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's table
 validator refuses a malformed config at exit 2 with every finding — a broken grammar
-must not gate anything. A derived default below is written in the roster's
-`${NAME}` spelling for the gate-sdk knob it reads. Knobs:
+must not gate anything. A derived default below is written as
+`${NAME}` for the knob it reads, or `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs:
 
-- `QUEUE_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE}`;
+- `QUEUE_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`;
   every gate also takes the file as `$1` (fixture capability).
 - `QUEUE_KIT_ACTIVE_SECTIONS` — array, default
   `("New Features" "Technical Debt")`, order = selection order (§The queue
@@ -895,15 +894,14 @@ retained as a dispatching shim: a shim keeps the interpreted lines the port
 exists to retire and adds a second entry point into the emission path, which the
 class forbids.
 
-**The front-end is not optional dressing.** It supplies the bridged environment
-in front of the arm — here `GATE_SDK_QUEUE_FILE`, the input `QUEUE_KIT_QUEUE_FILE`'s
-default derives from — and the queue-kit knobs the arm declares resolve in process
-from the kit's static table, so a consumer override reaches the arm through its
-knob file. The arm is configured — its reads are declared beside it in the emitter
-table — which is why it is a table member rather than a hardcoded top-level flag:
-a hardcoded flag receives no bridged input at all, and an arm that cannot see
-`QUEUE_KIT_ICEBOX_SECTION` silently drops the tally in every consumer that
-configures a tier. The derived section matchers were never a configuration
+**The arm is configured, and its reads are declared beside it in the arm table.**
+The queue-kit knobs it declares resolve in process from the kit's static table,
+and `GATE_SDK_QUEUE_FILE`, the input `QUEUE_KIT_QUEUE_FILE`'s default derives
+from, resolves from gate-sdk's, so a consumer override reaches the arm through its
+knob file. That is why it is a table member rather than a hardcoded top-level
+flag: a hardcoded flag has no row, so `--knob-files`, `check-reads-couples` and
+`check-gate-substrate-parity` cannot see that it reads `QUEUE_KIT_ICEBOX_SECTION`,
+whose tally every consumer configuring a tier depends on. The derived section matchers were never a configuration
 surface, only the adapters' internal spelling of these knobs, so none of them is a
 declared read.
 **This paragraph settles the caller that reaches an arm *as* an arm, and an
@@ -917,7 +915,7 @@ that class disposition is what composed the cut they landed in.** Each was "a to
 not a gate (no `# graph:` manifest)" in its own words, and §The queue-edges arm
 already stated its membership as *following the queue-index precedent*. This
 section ported the **first** member of that class and settled every question the
-other three raised: that the front-end is required, which knobs cross the bridge,
+other three raised: that the arm is a table member, which knobs it declares,
 that the derived shell regexes were never a configuration surface and so do not
 cross, that a mode rides the arm's own argv tail rather than earning a second
 arm, and that stdout is byte-preserved while an error path's exit code collapses
@@ -936,11 +934,11 @@ because this is where a later selector meets it.
 contract question rather than a naming preference.** §The lesson-sink arm's
 stated contract is that its child's exit status becomes its own, and an emitting
 arm collapses every error to 2 and every success to 0. It is an `Arm::Run` member
-of the same bridged table, which is why that table is keyed by flag rather than
+of the same arm table, which is why that table is keyed by flag rather than
 by family (gate-sdk/SPEC.md §The non-gate arm).
 
 **No `-h`/`--help` arm crosses with any of the three.** Each shell form carried
-a usage flag with no in-crate counterpart, and usage for a bridged arm lives in `run-gates.sh --help` and in
+a usage flag with no in-crate counterpart, and usage for a non-gate arm lives in `run-gates.sh --help` and in
 queue-kit/README.md — where the class already keeps it. A per-arm help flag would
 be a second home for one sentence, so `-h` lands on the unknown-option refusal
 like any other unrecognised flag. This arm's own `--help` predates that rule and
@@ -1083,7 +1081,7 @@ one arm two jobs and two output grammars.
 A **non-gate arm of the binary** (gate-sdk/SPEC.md §The non-gate arm), reached
 through the battery runner's `--emit` front-end:
 `run-gates.sh --emit queue-counts [<queue-file>]`. It registers in the
-bridged-arm table under the derived spelling `--emit-queue-counts`, stays outside
+arm table under the derived spelling `--emit-queue-counts`, stays outside
 `--list`, and owes no `.gate` descriptor, no `gates.list` registration and no
 `good/`+`bad/` fixture pair. Its declared reads are the four
 §The queue-index arm resolves less that arm's two own: the queue file and the
@@ -1123,9 +1121,8 @@ an oversight and merge them.
 
 **Two callers at two transitions.** delegation-kit's statusline arm calls the
 rendering **in process** at each statusline fire, resolving the four knobs above
-from the kit's static table, with the one gate-sdk input the queue file's default
-reads carried by the bridge that arm's own exec already carries
-(delegation-kit/SPEC.md §The statusline arm); and a session invokes the arm
+from the kit's static table and the one gate-sdk input the queue file's default
+reads from gate-sdk's (delegation-kit/SPEC.md §The statusline arm); and a session invokes the arm
 through the front-end at the command queue-kit/README.md documents. The
 subprocess call the statusline once made is retired with the shell tool, and the
 paragraph that ruled the subprocess shape a *contract* retires with it: its
@@ -1305,10 +1302,10 @@ it between the markers in `QUEUE_KIT_ROADMAP_FILE` through the crate's shared
 marker writer, leaving every byte outside them untouched.
 
 **Table membership is forced rather than chosen, and the alternative is the
-failure mode that looks like success.** Only an emitter-table member is bridged,
-and the queue path's default derives from a gate-sdk knob the bridge carries, so
-this tool as a hardcoded top-level flag would fail on that input rather than
-resolve it. The table's knob column declares `QUEUE_KIT_HORIZONS` and
+failure mode that looks like success.** A hardcoded top-level flag has no table
+row, so `--knob-files`, `check-reads-couples` and `check-gate-substrate-parity`
+could not see its reads, and every check would stay green over an undeclared
+read. The table's knob column declares `QUEUE_KIT_HORIZONS` and
 `QUEUE_KIT_TRACKS` as reads of consumer configuration, which is the provenance
 seam holding: the crate ships the
 projection *grammar* — the headings, the bullet shape, the placeholder, the
@@ -1443,9 +1440,9 @@ invokes it so the tracked skill
 names the mechanism, never a sink value, and a private sink command lives in
 the `queue-config.local.knobs` overlay (§The shared queue adapters).
 
-**A bridged non-gate arm, and the `--emit-` spelling is refused rather than
+**A non-gate arm, and the `--emit-` spelling is refused rather than
 declined.** It is reached as `run-gates.sh --lesson-sink <tag>` and registers in
-the bridged-arm table as an **`Arm::Run`** member beside `--statusline` and
+the arm table as an **`Arm::Run`** member beside `--statusline` and
 `--usage-poll` (gate-sdk/SPEC.md §The non-gate arm), with a matching case in the
 front-end's argument grammar (gate-sdk/SPEC.md §run-gates). The `--emit-` family
 cannot carry it: an emitting arm collapses every error to exit 2 and every
@@ -1482,13 +1479,6 @@ a stream; the arm reads it to completion first. A lesson body
 is one queue entry's prose, so the bound is the queue's own per-entry cap
 (§check-queue-entry-budget), and this is recorded rather than absorbed because it
 is the one place the port changes what an arbitrarily large input would do.
-
-**One tightening rides with the fail-open default.** The staging directory used
-to fall back to a built-in default when the knob was unset; the arm resolves it
-through the bridge, where unset is an error. The knob has a shipped default, so
-no configured consumer moves — an adopter who deleted it from their config gets
-a refusal instead of a silent write to `.workflow`, which is the better failure
-and is stated so it is not read as a regression.
 
 ### check-queue-hygiene
 

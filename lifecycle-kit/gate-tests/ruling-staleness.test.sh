@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the seam a crate unit test cannot see:
 # that the battery runner's --emit front-end resolves the arm at all, and that each of the three
-# consumer knobs actually reaches the report through the shell bridge. The discriminating case is
+# consumer knobs actually reaches the report through it. The discriminating case is
 # the EMPTIED record knob, which a hardcoded implementation passes against this repo's own config
 # and fails only here. The bands, the manual operand, the undeclared closure and the verbatim citing
 # row are pinned in the module's own #[cfg(test)] tests, where check-crate-arms runs them.
@@ -37,13 +37,13 @@ the widget run was the rule until it was retired
 the widget run is the rule and binds this cut
 EOF
 
-# --- the front-end resolves the arm at all, and the record knob reaches it through the bridge ---
+# --- the front-end resolves the arm at all, and the record knob reaches it ---
 checks=$((checks + 1))
 out="$( cd "$ROOT" && env LIFECYCLE_KIT_RULING_RECORD="$SANDBOX/RECORD.md" \
     bash "$RUN_GATES" --emit ruling-staleness 2>&1 )"; rc=$?
 [[ "$rc" -eq 0 ]] || note resolve "the front-end did not resolve --emit ruling-staleness (exit $rc): $out"
 grep -q 'widget-ruling	fired' <<<"$out" \
-    || note bridge-record "a configured record did not reach the arm through the bridge: $out"
+    || note knob-record "a configured record did not reach the arm: $out"
 grep -q 'brief-ruling	manual' <<<"$out" \
     || note manual-band "a manual condition did not report as owed to judgment: $out"
 grep -q 'undeclared conditions' <<<"$out" \
@@ -64,7 +64,7 @@ out="$( cd "$SANDBOX" && env LIFECYCLE_KIT_RULING_RECORD=RECORD.md \
     LIFECYCLE_KIT_KNOB_FILE="$SANDBOX/citers.knobs" \
     bash "$RUN_GATES" --emit ruling-staleness 2>&1 )"
 [[ "$(grep -c 'CITERS.md:' <<<"$out")" -eq 2 ]] \
-    || note bridge-citers "the configured citing corpus did not yield both rows verbatim: $out"
+    || note knob-citers "the configured citing corpus did not yield both rows verbatim: $out"
 
 # --- the timeout knob reaches the dispatcher: an oracle outrunning it is a dispatch failure ---
 checks=$((checks + 1))
@@ -73,7 +73,7 @@ out="$( cd "$ROOT" && env LIFECYCLE_KIT_RULING_RECORD="$SANDBOX/SLOW.md" \
     LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT=1 \
     bash "$RUN_GATES" --emit ruling-staleness 2>&1 )"
 grep -q 'slow-ruling	dispatch-failure' <<<"$out" \
-    || note bridge-timeout "the configured bound did not reach the dispatcher: $out"
+    || note knob-timeout "the configured bound did not reach the dispatcher: $out"
 
 # --- a configured record that does not exist is a refusal, never an empty clean answer ---
 checks=$((checks + 1))
@@ -85,5 +85,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "ruling-staleness.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "ruling-staleness.test.sh: clean (the --emit front-end resolves the arm; the record, citers and timeout knobs each reach the report through the bridge; an emptied record reports configured-off and an absent one refuses; $checks checks)"
+echo "ruling-staleness.test.sh: clean (the --emit front-end resolves the arm; the record, citers and timeout knobs each reach the report; an emptied record reports configured-off and an absent one refuses; $checks checks)"
 exit 0

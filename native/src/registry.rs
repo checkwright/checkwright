@@ -151,31 +151,14 @@ pub fn field(fields: &[(String, String)], key: &str) -> String {
 // does not falls through as an inert literal glob
 pub const COUPLES_PREFIXES: &[&str] = &["knob:", "kit:"];
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union sentinel: the name a member declares
-// in place of knobs written on the descriptor corpus rather than in its own entry
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob sentinel: the name a member declares in
+// place of knobs written on the descriptor corpus rather than in its own entry
 pub const EVERY_COUPLES_KNOB: &str = "@every-couples-knob";
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the sentinel's expansion for a caller already holding the
-// resolve dirs, held to `_gate_couples_knob_names`' derivation by a unit test because the bridge's
-// own substitution is the shell's; a static token contributes the bridged inputs its default reads
+// resolve dirs: every `knob:` name the descriptor corpus carries, sorted once each
 pub fn couples_knob_names(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
-    let tokens = corpus_knob_tokens(resolve_dirs)?;
-    let mut out: Vec<String> = crate::knobs::bridged(tokens.iter().map(String::as_str))
-        .into_iter()
-        .map(str::to_string)
-        .collect();
-    out.sort();
-    out.dedup();
-    Ok(out)
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the sentinel's static half: the corpus's `knob:` names a
-// static kit owns, which the member resolves from that kit's knob file rather than the bridge
-pub fn couples_knob_static_names(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
-    let mut out: Vec<String> = corpus_knob_tokens(resolve_dirs)?
-        .into_iter()
-        .filter(|t| crate::knobs::is_static(t))
-        .collect();
+    let mut out = corpus_knob_tokens(resolve_dirs)?;
     out.sort();
     out.dedup();
     Ok(out)
@@ -209,13 +192,23 @@ fn corpus_knob_tokens(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
 
 fn reach_kits(name: &str, kits: &mut Vec<&'static str>, seen: &mut Vec<&'static str>) {
     let bare = name.trim_end_matches('*');
-    let Some(kit) = crate::knobs::owner(bare) else {
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — an environment-only name is no knob file's
+    let Some(kit) = crate::knobs::owner(bare).filter(|k| !k.is_env_only(bare)) else {
         return;
     };
     if !kits.contains(&kit.root) {
         kits.push(kit.root);
     }
     let family = name.ends_with('*');
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a declared family reaches the kits its
+    // derivation reads, as a row reaches its inputs
+    if family {
+        for f in kit.families.iter().filter(|f| f.prefix == bare) {
+            for input in f.inputs {
+                reach_kits(input, kits, seen);
+            }
+        }
+    }
     for row in kit.rows {
         let hit = if family { row.name.starts_with(bare) } else { row.name == bare };
         if !hit || seen.contains(&row.name) {
@@ -239,7 +232,7 @@ pub fn knob_files(member: &str, resolve_dirs: &[String]) -> Result<Vec<String>, 
     let mut seen: Vec<&'static str> = Vec::new();
     for name in declared {
         if *name == EVERY_COUPLES_KNOB {
-            for t in couples_knob_static_names(resolve_dirs)? {
+            for t in couples_knob_names(resolve_dirs)? {
                 reach_kits(&t, &mut kits, &mut seen);
             }
         } else {
@@ -300,9 +293,8 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
                     format!(
                         "couples token 'knob:{}' could not be resolved: {} — a knob token expands \
                          to the knob's members, and an empty expansion would be a lost trigger; \
-                         treating as failure (not clean).\n  help: the expanding member must \
-                         declare the '{}' sentinel so the bridge carries every knob the descriptor \
-                         corpus names",
+                         treating as failure (not clean).\n  help: name a knob a static kit declares, \
+                         and declare the '{}' sentinel on the expanding member",
                         name, e, EVERY_COUPLES_KNOB
                     )
                 })? {
@@ -364,128 +356,97 @@ mod tests {
         );
     }
 
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a scratch gates dir holding one canon-kit
+    // knob file, so a `knob:` token names a static knob with a value this test controls
+    fn scratch_corpus(knobs: &crate::knobenv::KnobEnv, tag: &str, body: &str) -> std::path::PathBuf {
+        let d = std::env::temp_dir().join(format!("checkwright-couples-{}.{}", tag, std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        std::fs::write(d.join("canon-config.knobs"), body).expect("write");
+        knobs.set("GATE_SDK_GATES_DIR", &d.display().to_string());
+        knobs.remove("CANON_KIT_KNOB_FILE");
+        crate::knobs::reset(knobs);
+        d
+    }
+
+    fn unscratch(knobs: &crate::knobenv::KnobEnv, d: &Path) {
+        knobs.remove("GATE_SDK_GATES_DIR");
+        crate::knobs::reset(knobs);
+        let _ = std::fs::remove_dir_all(d);
+    }
+
     // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the resolution order: `knob:` first, then
     // `kit:` over the result, so a knob member spelled `kit:<glob>` composes; and the union is a
     // union, so a descriptor's own literals survive beside the knob's members.
     #[test]
     fn a_knob_token_expands_first_and_a_kit_member_then_composes() {
         let knobs = crate::knobenv::lock();
-        knobs.set("GATE_SDK_KNOB_PROBE_CORPUS", "CLAUDE.md\tkit:SPEC.md");
+        let d = scratch_corpus(
+            &knobs,
+            "compose",
+            "CANON_KIT_MANIFEST_FILES[] = CLAUDE.md\nCANON_KIT_MANIFEST_FILES[] = kit:SPEC.md\n",
+        );
         let roots = vec!["gate-sdk".to_string()];
         assert_eq!(
-            expand_couples("*SPEC*.md,knob:PROBE_CORPUS", &roots).expect("resolvable"),
+            expand_couples("*SPEC*.md,knob:CANON_KIT_MANIFEST_FILES", &roots).expect("resolvable"),
             "*SPEC*.md,CLAUDE.md,gate-sdk/SPEC.md"
         );
-        knobs.set("GATE_SDK_KNOB_PROBE_CORPUS", "");
+        std::fs::write(d.join("canon-config.knobs"), "CANON_KIT_MANIFEST_FILES =\n").expect("write");
+        crate::knobs::reset(&knobs);
         assert_eq!(
-            expand_couples("CLAUDE.md,knob:PROBE_CORPUS", &roots).expect("resolved-empty"),
+            expand_couples("CLAUDE.md,knob:CANON_KIT_MANIFEST_FILES", &roots).expect("resolved-empty"),
             "CLAUDE.md",
             "a consumer's empty knob expands to nothing, because the gate then scans nothing either"
         );
-        knobs.remove("GATE_SDK_KNOB_PROBE_CORPUS");
+        unscratch(&knobs, &d);
     }
 
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the sentinel crosses the dispatch seam, so its two
-    // spellings and the two derivations behind it are held together rather than remembered
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the sentinel is spelled in the crate alone, and its
+    // expansion is every `knob:` name the descriptor corpus carries, each a static kit's
     #[test]
-    fn the_couples_knob_sentinel_and_its_derivation_agree_across_the_dispatch_seam() {
+    fn the_couples_knob_sentinel_expands_to_the_static_names_the_corpus_carries() {
         let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
-        let lib = repo.join("gate-sdk/lib/gate.sh");
-        let text = std::fs::read_to_string(&lib)
-            .unwrap_or_else(|e| panic!("cannot read {}: {}", lib.display(), e));
+        let dirs = repo_check_dirs(&repo);
+        let names = couples_knob_names(&dirs).expect("the descriptor corpus is readable");
         assert!(
-            text.contains(EVERY_COUPLES_KNOB),
-            "{} no longer carries the sentinel literal {} — the binary would declare a name the \
-             bridge does not substitute, and every knob token would refuse",
-            lib.display(),
-            EVERY_COUPLES_KNOB
+            !names.is_empty(),
+            "the descriptor corpus names no knob token, so the expansion held over nothing — read it \
+             as unverified rather than as clean"
         );
-        // spec: gate-sdk/SPEC.md §lib/gate.sh — run under the caller's own `set -euo pipefail`, which
-        // `gen-pre-commit.sh` sets: a derivation that aborts there returns *nothing* rather than
-        // failing, and an empty derivation bridges no knob and refuses every token. Attested.
-        let shell = |snippet: &str| -> Vec<String> {
-            let out = std::process::Command::new("bash")
-                .arg("-c")
-                .arg(format!(
-                    "set -euo pipefail; . gate-sdk/lib/gate.sh; {}",
-                    snippet
-                ))
-                .current_dir(&repo)
-                .output()
-                .expect("cannot run the shell library");
-            assert!(
-                out.status.success(),
-                "gate-sdk/lib/gate.sh failed on {:?}: {}",
-                snippet,
-                String::from_utf8_lossy(&out.stderr).trim()
-            );
-            String::from_utf8_lossy(&out.stdout)
-                .lines()
-                .filter(|l| !l.is_empty())
-                .map(str::to_string)
-                .collect()
-        };
-        let dirs: Vec<String> = shell("gate_check_dirs")
-            .into_iter()
-            .map(|d| {
-                if d.starts_with('/') {
-                    d
-                } else {
-                    repo.join(d).display().to_string()
-                }
-            })
-            .collect();
-        assert!(!dirs.is_empty(), "no resolve dir to derive over");
-        let mine = couples_knob_names(&dirs).expect("the descriptor corpus is readable");
-        assert_eq!(
-            mine,
-            shell("_gate_couples_knob_names"),
-            "the two substrates read one descriptor corpus differently, so a member bridged by the \
-             shell and a child bridged by the crate would see different knob sets"
-        );
-        assert!(
-            !mine.is_empty(),
-            "the descriptor corpus names no knob token, so the agreement above held over nothing — \
-             read it as unverified rather than as clean"
-        );
-        // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridge's own output for the derived set, so the
-        // path from a declared sentinel to an exported value is asserted end to end rather than in
-        // two halves that could each pass while the join between them produces nothing
-        let bridged = shell("_gate_couples_knob_bridge; env | grep '^GATE_SDK_KNOB_' | cut -d= -f1");
-        for k in &mine {
-            assert!(
-                bridged.contains(&format!("GATE_SDK_KNOB_{}", k)),
-                "the bridge resolved no value for {}, which a knob token names — an empty expansion \
-                 is the lost trigger the token exists to prevent",
-                k
-            );
+        for n in &names {
+            assert!(crate::knobs::owner(n).is_some(), "the knob token {} names no static kit's knob", n);
         }
+        let mut sorted = names.clone();
+        sorted.sort();
+        sorted.dedup();
+        assert_eq!(names, sorted, "the expansion is not deterministic");
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — this repo's resolve dirs, derived in the crate: the gates
+    // dir, then each kit root's `checks/`, absolute
+    fn repo_check_dirs(repo: &Path) -> Vec<String> {
+        let sdk = crate::walk::normalize_abs(&repo.join("gate-sdk").display().to_string());
+        let roots: Vec<String> = crate::walk::kit_roots_rel_from(&sdk, "")
+            .expect("the kit roots derive")
+            .into_iter()
+            .map(|r| repo.join(r).display().to_string())
+            .collect();
+        resolve_dirs(&repo.join(crate::knobs::GATES_DIR_DEFAULT).display().to_string(), &roots)
     }
 
     // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the derivation over every registry member:
     // a declared static name yields its kit's file, and the sentinel yields exactly the kits the
-    // corpus's static tokens name beside the member's own
+    // corpus's tokens name beside the member's own
     #[test]
     fn every_member_derives_the_knob_files_its_declaration_reaches() {
         let knobs = crate::knobenv::lock();
         knobs.remove("GATE_SDK_GATES_DIR");
         let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
-        let listed = std::process::Command::new("bash")
-            .arg("-c")
-            .arg("set -euo pipefail; . gate-sdk/lib/gate.sh; gate_check_dirs")
-            .current_dir(&repo)
-            .output()
-            .expect("cannot run the shell library");
-        assert!(listed.status.success(), "gate_check_dirs failed");
-        let dirs: Vec<String> = String::from_utf8_lossy(&listed.stdout)
-            .lines()
-            .filter(|l| !l.is_empty())
-            .map(|d| if d.starts_with('/') { d.to_string() } else { repo.join(d).display().to_string() })
-            .collect();
+        let dirs = repo_check_dirs(&repo);
         let file = |k: &crate::knobs::Kit| {
             format!("{}/{}-config.knobs", crate::knobs::GATES_DIR_DEFAULT, k.stem())
         };
-        let corpus: Vec<&str> = couples_knob_static_names(&dirs)
+        let corpus: Vec<&str> = couples_knob_names(&dirs)
             .expect("the descriptor corpus is readable")
             .iter()
             .filter_map(|t| crate::knobs::owner(t).map(|k| k.root))
@@ -500,7 +461,8 @@ mod tests {
             let declared = crate::gates::declared(member).unwrap_or(&[]);
             let own: Vec<&str> = declared
                 .iter()
-                .filter_map(|n| crate::knobs::owner(n.trim_end_matches('*')).map(|k| k.root))
+                .map(|n| n.trim_end_matches('*'))
+                .filter_map(|n| crate::knobs::owner(n).filter(|k| !k.is_env_only(n)).map(|k| k.root))
                 .collect();
             for kit in crate::knobs::STATIC_KITS.iter().filter(|k| own.contains(&k.root)) {
                 declaring += 1;
@@ -591,23 +553,22 @@ mod tests {
         assert!(staged.is_err(), "the staged member must refuse rather than derive");
     }
 
-    // spec: gate-sdk/SPEC.md §Fail-closed contract — each refusal the knob token carries: an
-    // unbridged knob, a nested token, and a member unrepresentable after expansion. None may
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — each refusal the knob token carries: a name no
+    // static kit owns, a nested token, and a member unrepresentable after expansion. None may
     // degrade to an empty expansion, because an empty expansion is a lost trigger.
     #[test]
     fn every_knob_token_refusal_is_an_error_and_never_an_empty_expansion() {
         let knobs = crate::knobenv::lock();
         let roots = vec!["gate-sdk".to_string()];
-        knobs.remove("GATE_SDK_KNOB_PROBE_ABSENT");
         assert!(expand_couples("knob:PROBE_ABSENT", &roots).is_err());
         for bad in ["knob:PROBE_NEST", "a,b", "has space"] {
-            knobs.set("GATE_SDK_KNOB_PROBE_BAD", bad);
+            let d = scratch_corpus(&knobs, "bad", &format!("CANON_KIT_MANIFEST_FILES[] = {}\n", bad));
             assert!(
-                expand_couples("knob:PROBE_BAD", &roots).is_err(),
+                expand_couples("knob:CANON_KIT_MANIFEST_FILES", &roots).is_err(),
                 "member {:?} must refuse",
                 bad
             );
+            unscratch(&knobs, &d);
         }
-        knobs.remove("GATE_SDK_KNOB_PROBE_BAD");
     }
 }

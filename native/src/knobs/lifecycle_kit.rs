@@ -2,7 +2,7 @@
 // stage machine's validator
 use super::{indexed, keyed, scalar, Kit, Resolve, Row, Shape, Value, Values};
 
-fn bridged_scalar(resolve: Resolve, name: &str) -> Result<String, String> {
+fn input_scalar(resolve: Resolve, name: &str) -> Result<String, String> {
     match resolve(name)? {
         (Value::Scalar(s), _) => Ok(s),
         (v, _) => Ok(v.wire()),
@@ -10,11 +10,11 @@ fn bridged_scalar(resolve: Resolve, name: &str) -> Result<String, String> {
 }
 
 fn queue_file(resolve: Resolve) -> Result<Value, String> {
-    bridged_scalar(resolve, "GATE_SDK_QUEUE_FILE").map(Value::Scalar)
+    input_scalar(resolve, "GATE_SDK_QUEUE_FILE").map(Value::Scalar)
 }
 
 fn in_workflow_dir(resolve: Resolve, base: &str) -> Result<Value, String> {
-    bridged_scalar(resolve, "GATE_SDK_WORKFLOW_DIR").map(|d| Value::Scalar(format!("{}/{}", d, base)))
+    input_scalar(resolve, "GATE_SDK_WORKFLOW_DIR").map(|d| Value::Scalar(format!("{}/{}", d, base)))
 }
 
 fn state_file(resolve: Resolve) -> Result<Value, String> {
@@ -36,11 +36,11 @@ fn survey_record_file(resolve: Resolve) -> Result<Value, String> {
 // spec: lifecycle-kit/SPEC.md §The state machine — the journal pattern defers to the scratch dir's
 // own knob rather than restating its literal
 fn stage_journal_pattern(resolve: Resolve) -> Result<Value, String> {
-    bridged_scalar(resolve, "GATE_SDK_TMP_DIR").map(|d| Value::Scalar(format!("{}/<stage>-journal.md", d)))
+    input_scalar(resolve, "GATE_SDK_TMP_DIR").map(|d| Value::Scalar(format!("{}/<stage>-journal.md", d)))
 }
 
 fn audit_stage(resolve: Resolve) -> Result<String, String> {
-    bridged_scalar(resolve, "LIFECYCLE_KIT_AUDIT_STAGE")
+    input_scalar(resolve, "LIFECYCLE_KIT_AUDIT_STAGE")
 }
 
 fn audit_entry_stage(resolve: Resolve) -> Result<Value, String> {
@@ -56,7 +56,7 @@ fn waiver_token(resolve: Resolve) -> Result<Value, String> {
 // spec: lifecycle-kit/SPEC.md §The survey record — the queue file alone, the one permanent surface
 // this kit owns
 fn permanent_surface_globs(resolve: Resolve) -> Result<Value, String> {
-    bridged_scalar(resolve, "LIFECYCLE_KIT_QUEUE_FILE").map(|q| Value::Indexed(vec![q]))
+    input_scalar(resolve, "LIFECYCLE_KIT_QUEUE_FILE").map(|q| Value::Indexed(vec![q]))
 }
 
 pub const KIT: Kit = Kit {
@@ -127,6 +127,7 @@ pub const KIT: Kit = Kit {
     open_family: false,
     families: &[],
     retired: &[],
+    env_only: &[],
 };
 
 fn positive(v: &str) -> bool {

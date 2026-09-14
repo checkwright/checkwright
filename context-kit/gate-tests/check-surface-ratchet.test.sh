@@ -35,8 +35,8 @@ cfg narrowed && printf '# contract: x\n2 %s\n99 %s/gone.md\n' "$SANDBOX/CLAUDE.m
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=config-name
     local label="$1" want="$2" sub="$3" name="$4"
     local out rc
-    # spec: gate-sdk/SPEC.md §lib/gate.sh — the override is exported rather than passed through
-    # `env`, because the config bridge resolves this member's knobs before the argv it builds runs
+    # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the override is exported rather than passed
+    # through `env`, because `env` cannot invoke the gate_run shell function
     out="$(export CONTEXT_KIT_KNOB_FILE="$SANDBOX/$name.knobs"; gate_run check-surface-ratchet "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return

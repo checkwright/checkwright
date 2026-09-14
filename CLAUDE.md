@@ -17,7 +17,7 @@ product constant sets — **and this project's provenance**: a dated operator
 stamp, a `TRAJECTORY.md` pointer, a refused alternative's grounds belong in
 `TRAJECTORY.md` and git history, never in a kit SPEC, which states the rule
 undated. When a kit component needs such content, it becomes
-optional consumer config (the `check-graph` / `scripts/graph-vocab.sh`
+optional consumer config (the `check-graph` / `scripts/graph-vocab.knobs`
 pattern), never a kit literal. This is a privacy boundary before it is a design
 one: a kit literal carrying a private vocabulary publishes it.
 

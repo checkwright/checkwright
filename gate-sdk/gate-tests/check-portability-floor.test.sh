@@ -107,10 +107,9 @@ expect binary-skipped 0 '1 binary member(s) skipped' "$rc" "$out"
 
 # --- record order over the tracked bad/ case: path order, then line order. Read
 # off the pair so the corpus has one home. The corpus knob is set here rather
-# than left to the case's own config seam, because gate_run resolves the bridge
-# from the library this file sourced at the repo root and never re-enters the
-# case dir to source it again — the case's seam is what the --run-gate-tests arm
-# reads, and this driver is not that arm.
+# than left to the case's own config seam, because the hermetic library pins the
+# tracked knob file empty, so the case's knob file is never read — the case's
+# seam is what the --run-gate-tests arm reads, and this driver is not that arm.
 out="$( cd "$CASES/bad" \
     && gate_env GATE_SDK_PORTABILITY_PATHS=tree \
     && gate_run check-portability-floor "$CHECKS" patterns.list 2>&1 )"; rc=$?

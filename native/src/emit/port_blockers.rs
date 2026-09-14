@@ -8,12 +8,13 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's declared structural knobs. A hardcoded
-// top-level flag receives no configuration at all, so this tool ported as one would resolve
-// platform defaults and ignore every consumer override; the family is forced, not chosen.
+// top-level flag has no row in the arm table, so this tool ported as one would hide its reads
+// from `--knob-files`; the family is forced, not chosen.
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_KIT_DIRS",
-    "GATE_PRUNE_DIRS",
+    "GATE_SDK_PRUNE_DIRS",
+    "GATE_SDK_PRUNE_EXTRA_DIRS",
     "GATE_SDK_PROGRAM_FLOOR",
     "GATE_SDK_TESTS_DIR",
     // spec: gate-sdk/SPEC.md §The non-gate arm — the union sentinel: this arm resolves an
@@ -304,14 +305,13 @@ fn builtins(words: &BTreeSet<String>) -> BTreeSet<String> {
     out
 }
 
-// spec: gate-sdk/SPEC.md §port-blockers — a knob's default resolves through the config bridge the
-// arm's own union sentinel had resolved before the exec, the one place a knob default is read, so
-// this report cannot disagree with the value a dispatched binary is handed.
+// spec: gate-sdk/SPEC.md §port-blockers — a knob's value resolves through the one reader every member
+// uses, so this report cannot disagree with the value a dispatched binary reads
 fn knob_program(knob: &str) -> Option<String> {
     if knob.chars().any(|c| c.is_ascii_lowercase()) {
         return None;
     }
-    let raw = crate::knobs::wire(knob).ok().flatten()?;
+    let raw = crate::knobs::wire(knob).ok()?;
     let first = raw.split('\t').next().unwrap_or_default();
     let word = first.split(' ').next().unwrap_or_default();
     if word.is_empty() {
@@ -735,20 +735,20 @@ mod tests {
         assert!(d.mode == Mode::Default && d.gates_dir.is_none());
     }
 
-    // spec: gate-sdk/SPEC.md §port-blockers — a knob outside the union reports `?` with the same
-    // *default unresolvable* evidence, and a lowercase name is not a knob at all.
+    // spec: gate-sdk/SPEC.md §port-blockers — a name no kit owns reports `?` with the same *default
+    // unresolvable* evidence, and a lowercase name is not a knob at all.
     #[test]
-    fn an_unbridged_knob_resolves_to_nothing_rather_than_to_a_guess() {
+    fn an_unowned_knob_resolves_to_nothing_rather_than_to_a_guess() {
         assert_eq!(knob_program("gate_sdk_lowercase"), None);
         assert_eq!(knob_program("PORT_BLOCKERS_ABSENT_KNOB"), None);
         let knobs = crate::knobenv::lock();
-        knobs.set("GATE_SDK_KNOB_PORT_BLOCKERS_TEST", "ruby -w\tsecond");
+        knobs.set("GATE_SDK_UPGRADE_REPO", "ruby -w");
         assert_eq!(
-            knob_program("PORT_BLOCKERS_TEST"),
+            knob_program("GATE_SDK_UPGRADE_REPO"),
             Some("ruby".to_string()),
             "the requirement is the resolved value's command word: first element, first word"
         );
-        knobs.remove("GATE_SDK_KNOB_PORT_BLOCKERS_TEST");
+        knobs.remove("GATE_SDK_UPGRADE_REPO");
     }
 
     // spec: gate-sdk/SPEC.md §port-blockers — the content-glob factor is read off the
@@ -823,7 +823,7 @@ mod tests {
         let blind = scan_rows(
             "check-probe",
             "scripts/check-probe.sh",
-            "\"$PORT_BLOCKERS_UNBRIDGED\" --check\n\"$PORT_BLOCKERS_UNBRIDGED\" again\n",
+            "\"$PORT_BLOCKERS_UNOWNED\" --check\n\"$PORT_BLOCKERS_UNOWNED\" again\n",
             &reg,
         );
         assert!(blind.undecidable);
@@ -832,18 +832,18 @@ mod tests {
         assert!(blind.rows[0].evidence.contains("default unresolvable"));
 
         let knobs = crate::knobenv::lock();
-        knobs.set("GATE_SDK_KNOB_PORT_BLOCKERS_SCAN", "ruby -w");
+        knobs.set("GATE_SDK_UPGRADE_REPO", "ruby -w");
         let seeing = scan_rows(
             "check-probe",
             "scripts/check-probe.sh",
-            "\"$PORT_BLOCKERS_SCAN\" --check\n",
+            "\"$GATE_SDK_UPGRADE_REPO\" --check\n",
             &reg,
         );
-        knobs.remove("GATE_SDK_KNOB_PORT_BLOCKERS_SCAN");
+        knobs.remove("GATE_SDK_UPGRADE_REPO");
         assert!(!seeing.undecidable);
         assert_eq!(seeing.rows.len(), 1);
         assert_eq!(seeing.rows[0].program, "ruby");
-        assert!(seeing.rows[0].evidence.ends_with("($PORT_BLOCKERS_SCAN)"));
+        assert!(seeing.rows[0].evidence.ends_with("($GATE_SDK_UPGRADE_REPO)"));
     }
 
     // spec: gate-sdk/SPEC.md §port-blockers — the kit-library call set is the default arm's own

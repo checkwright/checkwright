@@ -46,8 +46,8 @@ installer/bin/checkwright.sh
 
 # Gate registry + graph rule content + the checked pre-commit/graph projections.
 scripts/gates.list
-scripts/gate-sdk-config.sh
-scripts/graph-vocab.sh
+scripts/gate-sdk-config.knobs
+scripts/graph-vocab.knobs
 scripts/identity.conf
 scripts/git-hooks/pre-commit
 docs/check-graph.html

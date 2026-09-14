@@ -876,9 +876,8 @@ pub fn run_to(program: &str, args: &[&str], sink: &Sink) -> Result<i32, String> 
     run_to_env(program, args, &[], sink)
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — `run_to` with the child's own declared knob environment
-// added, the shape a member dispatching another member owes: the callee is a child rather than an
-// in-process call precisely so it reads the knobs its own registry entry declares.
+// spec: gate-sdk/SPEC.md §run-gates — `run_to` with environment pairs added over the invoking
+// environment the child otherwise inherits unchanged.
 pub fn run_to_env(
     program: &str,
     args: &[&str],
@@ -969,8 +968,6 @@ fn exit_code(status: &std::process::ExitStatus) -> i32 {
 // terminal is a shared resource two concurrent members could both read from.
 pub fn dispatch(
     argv: &[String],
-    env: &[(String, String)],
-    drop_env: &[String],
     tmpdir: &std::path::Path,
     capture: &std::path::Path,
 ) -> Result<Dispatched, String> {
@@ -991,12 +988,6 @@ pub fn dispatch(
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::from(err))
         .env("TMPDIR", tmpdir);
-    for name in drop_env {
-        cmd.env_remove(name);
-    }
-    for (k, v) in env {
-        cmd.env(k, v);
-    }
     let status = cmd.status().map_err(|e| io_err("spawn", e))?;
     let output = std::fs::read(capture).map_err(|e| io_err("read the capture file", e))?;
     Ok(Dispatched {
@@ -1416,7 +1407,7 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the shipped half of a module: a
-    // `#[cfg(test)]`-gated item is dropped, so a bridge helper's own spawn is not a shipped one.
+    // `#[cfg(test)]`-gated item is dropped, so a test helper's own spawn is not a shipped one.
     // rustfmt's shape is the boundary — the gated item ends at a `}` in the attribute's column
     fn shipped_scope(text: &str) -> String {
         let lines: Vec<&str> = text.lines().collect();
@@ -1472,7 +1463,7 @@ mod tests {
     // corpus this scans and the one exception class it declares
     #[test]
     fn no_module_outside_proc_constructs_a_subprocess_itself() {
-        walk::bridge_declared_knobs(&crate::knobenv::lock());
+        let _knobs = crate::knobenv::lock();
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
         assert!(!files.is_empty(), "no module found to scan");
@@ -1541,7 +1532,7 @@ mod tests {
     // kept, because a test is the writer it exists to catch
     #[test]
     fn no_crate_source_writes_the_working_directory_in_process() {
-        walk::bridge_declared_knobs(&crate::knobenv::lock());
+        let _knobs = crate::knobenv::lock();
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
         assert!(!files.is_empty(), "no module found to scan");

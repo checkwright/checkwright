@@ -1,0 +1,13 @@
+# spec: gate-sdk/SPEC.md §Layout and configuration — this repo's gate-sdk knob file; set only what this repo overrides beyond the kit defaults
+
+# spec: gate-sdk/SPEC.md §check-graph — publish the coupling-graph artifact on the docs site (a same-tree served file), not in the workflow dir
+GATE_SDK_GRAPH_ARTIFACT = docs/check-graph.html
+
+# spec: gate-sdk/SPEC.md §check-graph — this repo's graph-theme chrome links the docs host and the source repo; sanction those prefixes for the external-ref assertion
+GATE_SDK_GRAPH_EXTERNAL_REFS = https://checkwright.dev https://github.com/checkwright
+
+# spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships bash under no kit root: the installer's two bootstraps, its consumer smoke, and the runnable adoption walkthrough; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
+GATE_SDK_LINT_EXTRA_DIRS = installer/bin installer/consumer-smoke demo
+
+# spec: gate-sdk/SPEC.md §check-portability-floor — this repo's install-path corpus: the files an adopter's machine actually executes. After the behind-invoke relocation that is `installer/bin` — the two bootstraps, and the whole of the install path written in a shell — plus `gate-sdk/lib/gate.sh` and `gate-sdk/bin/gen-pre-commit.sh`, which are what `init` leaves behind and runs. Everything else an install performs is Rust and reaches no shell dialect at all. A corpus drawn by directory rather than by reachability is what let a GNU-only primary sit unseen. The vocabulary rides the knob's own default, scripts/portability-patterns.list
+GATE_SDK_PORTABILITY_PATHS = installer/bin gate-sdk/lib/gate.sh gate-sdk/bin/gen-pre-commit.sh

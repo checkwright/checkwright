@@ -222,8 +222,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the shell form's own prune, a
-    // bare `find … -type d -name '_*' -prune`, which is not `gate_find`'s bridged set: this
-    // member reads no GATE_PRUNE_DIRS and declares none.
+    // bare `find … -type d -name '_*' -prune`, which is not `gate_find`'s prune set: this
+    // member reads no prune knob and declares none.
     let mut pages: Vec<String> = walk::find_with_prune(Path::new(&root), &|n| n.starts_with('_'))?
         .into_iter()
         .map(|p| p.display().to_string())

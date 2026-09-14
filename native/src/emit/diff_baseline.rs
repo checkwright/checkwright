@@ -7,9 +7,8 @@ use crate::evidence;
 use crate::walk;
 use std::path::Path;
 
-// spec: evidence-kit/SPEC.md §Layout and configuration — the five names this arm resolves. Every
-// one is defined and defaulted in the shell library the bridge sources, so a hardcoded flag would
-// resolve platform defaults and ignore every consumer override.
+// spec: evidence-kit/SPEC.md §Layout and configuration — the five names this arm resolves, every
+// one a row of evidence-kit's table and a read a hardcoded flag would hide from `--knob-files`.
 pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_BASELINE_FILE",
     "EVIDENCE_KIT_SKIP_FILE",

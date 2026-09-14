@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # spec: queue-kit/SPEC.md §The queue-index arm — the seam a crate unit test cannot see: that the
 # battery runner's --emit front-end resolves the arm at all, and that a set consumer knob actually
-# reaches the rendering through the shell bridge. The rendering itself is pinned in the ported
+# reaches the rendering through it. The rendering itself is pinned in the ported
 # module's own #[cfg(test)] tests, where check-crate-arms runs them; duplicating it here would
 # assert the same thing twice and hold neither end of this seam.
 #
@@ -56,40 +56,40 @@ out="$(emit "$SANDBOX/TASK-QUEUE.md")"; rc=$?
 grep -qF 'Active (pick the first •):' <<<"$out" \
     || note resolve-render "the arm resolved but rendered no index: $out"
 
-# --- a set consumer knob reaches the rendering through the bridge: the icebox section ---
-# The arm cannot know this section name; it arrives only if the bridge carried it.
+# --- a set consumer knob reaches the rendering: the icebox section ---
+# The arm cannot know this section name; it arrives only if the knob was read.
 checks=$((checks + 1))
 out="$( cd "$ROOT" && env QUEUE_KIT_ICEBOX_SECTION='Cold Storage' \
     bash "$RUN_GATES" --emit queue-index "$SANDBOX/TASK-QUEUE.md" 2>&1 )"
 grep -qF 'Cold Storage: 2 entries' <<<"$out" \
-    || note bridge-icebox "a configured icebox section did not reach the arm through the bridge: $out"
+    || note knob-icebox "a configured icebox section did not reach the arm: $out"
 
 checks=$((checks + 1))
 out="$( cd "$ROOT" && env QUEUE_KIT_ICEBOX_SECTION= \
     bash "$RUN_GATES" --emit queue-index "$SANDBOX/TASK-QUEUE.md" 2>&1 )"
 grep -qF 'entries' <<<"$out" \
-    && note bridge-icebox-empty "an empty icebox knob still printed a tally: $out"
+    && note knob-icebox-empty "an empty icebox knob still printed a tally: $out"
 
-# --- a set consumer knob reaches the rendering through the bridge: the attend cap ---
+# --- a set consumer knob reaches the rendering: the attend cap ---
 checks=$((checks + 1))
 out="$( cd "$ROOT" && env QUEUE_KIT_ATTEND_CAP=1 \
     bash "$RUN_GATES" --emit queue-index "$SANDBOX/TASK-QUEUE.md" 2>&1 )"
 grep -qF '(+1 more [attend])' <<<"$out" \
-    || note bridge-cap "a lowered attend cap did not reach the arm through the bridge: $out"
+    || note knob-cap "a lowered attend cap did not reach the arm: $out"
 
 # --- the other two modes reach the arm through the same front-end ---
 checks=$((checks + 1))
 out="$(emit --extent def-a "$SANDBOX/TASK-QUEUE.md")"
 [[ "$out" =~ ^[0-9]+\ [0-9]+$ ]] \
-    || note bridge-extent "--extent did not reach the arm through the front-end: $out"
+    || note frontend-extent "--extent did not reach the arm through the front-end: $out"
 
 checks=$((checks + 1))
 out="$(emit --icebox-candidates "$SANDBOX/TASK-QUEUE.md")"; rc=$?
-[[ "$rc" -eq 0 ]] || note bridge-candidates "--icebox-candidates did not reach the arm (exit $rc): $out"
+[[ "$rc" -eq 0 ]] || note frontend-candidates "--icebox-candidates did not reach the arm (exit $rc): $out"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "queue-index.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "queue-index.test.sh: clean (the --emit front-end resolves the arm, and a configured icebox section, an emptied one and a lowered attend cap each reach the rendering through the bridge; $checks checks)"
+echo "queue-index.test.sh: clean (the --emit front-end resolves the arm, and a configured icebox section, an emptied one and a lowered attend cap each reach the rendering; $checks checks)"
 exit 0

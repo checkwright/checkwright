@@ -1,5 +1,5 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the crate's one serialization point for the
-// process-global config bridge: a case writes a knob only while holding this guard, so
+// process-global environment: a case writes a variable only while holding this guard, so
 // cargo's threads cannot interleave two writers of one variable
 use std::path::Path;
 use std::sync::{Mutex, MutexGuard};
@@ -45,8 +45,7 @@ mod tests {
     // calling the std API directly leaves the race the guard was landed to delete
     #[test]
     fn no_module_outside_this_one_writes_the_environment() {
-        let knobs = lock();
-        crate::walk::bridge_declared_knobs(&knobs);
+        let _knobs = lock();
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files = crate::walk::find_files(&src, &["rs"]).expect("cannot enumerate the sources");
         assert!(!files.is_empty(), "no crate source found to scan");

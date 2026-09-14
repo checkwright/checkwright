@@ -1,8 +1,8 @@
 // spec: drift-kit/SPEC.md §The overhead meter — the byte-proxy governance/task classifier over a
 // session transcript: a fixed marker table, first match wins, whole-line classification, and one
 // keyed line appended to the trend log per measured session.
-// spec: gate-sdk/SPEC.md §The non-gate arm — a bridged-arm table member and not a hardcoded flag,
-// because the meter resolves consumer knobs and a hardcoded flag receives no override at all; and
+// spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member and not a hardcoded flag,
+// because the meter reads consumer knobs a hardcoded flag would hide from `--knob-files`; and
 // `Arm::Emit` rather than `Arm::Run`, because exit is always 0 so no `1` is load-bearing.
 
 pub const KNOBS: &[&str] = &[

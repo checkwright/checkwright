@@ -7,7 +7,7 @@ set -uo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
 REPO_ROOT="$(pwd -P)"
 
-RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: the queue surface and the three index arms, bridged
+RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: the queue surface and the three index arms
 NATIVE_BIN="$(bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin' 2>/dev/null)"  # the binary those arms dispatch to
 DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-drift-report}"  # drift-kit trend line: an --emit arm name
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-bash gate-sdk/bin/run-gates.sh --emit stage-rules}"  # doctrine-kit craft-rule router: a command, not a path

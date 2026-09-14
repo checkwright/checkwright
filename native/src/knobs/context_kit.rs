@@ -1,16 +1,16 @@
 // spec: context-kit/SPEC.md §Layout and configuration — context-kit's static knob table and validator
 use super::{scalar, set_but_missing, Kit, Origin, Resolve, Row, Shape, Value, Values};
 
-fn bridged_scalar(resolve: Resolve, name: &str) -> Result<(String, Origin), String> {
+fn input_scalar(resolve: Resolve, name: &str) -> Result<(String, Origin), String> {
     resolve(name).map(|(v, o)| (v.wire(), o))
 }
 
 fn in_workflow_dir(resolve: Resolve, base: &str) -> Result<Value, String> {
-    bridged_scalar(resolve, "GATE_SDK_WORKFLOW_DIR").map(|(d, _)| Value::Scalar(format!("{}/{}", d, base)))
+    input_scalar(resolve, "GATE_SDK_WORKFLOW_DIR").map(|(d, _)| Value::Scalar(format!("{}/{}", d, base)))
 }
 
 fn in_gates_dir(resolve: Resolve, base: &str) -> Result<Value, String> {
-    bridged_scalar(resolve, "GATE_SDK_GATES_DIR").map(|(d, _)| Value::Scalar(format!("{}/{}", d, base)))
+    input_scalar(resolve, "GATE_SDK_GATES_DIR").map(|(d, _)| Value::Scalar(format!("{}/{}", d, base)))
 }
 
 fn baseline_file(resolve: Resolve) -> Result<Value, String> {
@@ -37,7 +37,7 @@ fn pub_lang_dir(resolve: Resolve) -> Result<Value, String> {
 // consumer-first over two candidates with file existence as the predicate, else empty; the roster's
 // placeholder renders the first candidate rather than probe it
 fn hook_cmd(resolve: Resolve) -> Result<Value, String> {
-    let (gates, origin) = bridged_scalar(resolve, "GATE_SDK_GATES_DIR")?;
+    let (gates, origin) = input_scalar(resolve, "GATE_SDK_GATES_DIR")?;
     let first = format!("{}/run-gates.sh", gates);
     let argv = |c: String| {
         Value::Indexed(
@@ -50,8 +50,8 @@ fn hook_cmd(resolve: Resolve) -> Result<Value, String> {
     if origin == Origin::Placeholder || std::path::Path::new(&first).is_file() {
         return Ok(argv(first));
     }
-    let (root, _) = bridged_scalar(resolve, "GATE_SDK_ROOT_HERE")?;
-    let second = format!("{}/bin/run-gates.sh", root.trim_end_matches('/'));
+    let (root, _) = input_scalar(resolve, "GATE_SDK_ROOT")?;
+    let second = format!("{}/bin/run-gates.sh", crate::walk::spelled_here(&root)?);
     if std::path::Path::new(&second).is_file() {
         return Ok(argv(second));
     }
@@ -78,7 +78,7 @@ pub const KIT: Kit = Kit {
             "CONTEXT_KIT_HOOK_CMD",
             Shape::Indexed,
             hook_cmd,
-            &["GATE_SDK_GATES_DIR", "GATE_SDK_ROOT_HERE"],
+            &["GATE_SDK_GATES_DIR", "GATE_SDK_ROOT"],
         ),
         Row::scalar("CONTEXT_KIT_ENV_PROFILE_FILE", "ENV.local.md"),
         Row::indexed(
@@ -92,6 +92,7 @@ pub const KIT: Kit = Kit {
     open_family: false,
     families: &[],
     retired: &[("CONTEXT_KIT_BREVITY_SECTION", "CONTEXT_KIT_BREVITY_SECTIONS")],
+    env_only: &[],
 };
 
 // spec: context-kit/SPEC.md §Layout and configuration — a broken context config gates nothing:

@@ -36,18 +36,12 @@ DESC='# graph: couples=docs/*.md dir=one valve=none tier=precommit
 # dispatch knob itself, so a case pointing GATE_SDK_NATIVE_BIN at a missing binary
 # cannot reach the rule through an untouched dispatch: gate_command resolves the
 # binary through that same knob and refuses first. The argv is resolved through
-# gate_command (never a declaration path) and the one bridged element the case
-# varies is substituted after, which is also what makes the case substrate-agnostic.
+# gate_command (never a declaration path) before the case's value is exported, and the
+# gate reads that exported value, which outranks every knob file.
 gate_argv() {  # gate_argv <knob> <value> -> ARGV
-    local knob="$1" val="$2" e
-    local -a resolved=()
-    mapfile -t resolved < <(gate_command check-gate-binary-fresh "$DIR/checks")
-    [[ ${#resolved[@]} -gt 0 ]] || return 2
-    ARGV=()
-    for e in ${resolved[@]+"${resolved[@]}"}; do
-        [[ "$e" == "GATE_SDK_KNOB_$knob="* ]] && e="GATE_SDK_KNOB_$knob=$val"
-        ARGV+=("$e")
-    done
+    local knob="$1" val="$2"
+    mapfile -t ARGV < <(gate_command check-gate-binary-fresh "$DIR/checks")
+    [[ ${#ARGV[@]} -gt 0 ]] || return 2
     export "$knob=$val"
 }
 

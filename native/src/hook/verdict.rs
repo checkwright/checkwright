@@ -50,7 +50,7 @@ fn parse(args: &[String]) -> Result<(Option<&str>, Option<&str>), String> {
     ))
 }
 
-// spec: delegation-kit/SPEC.md §usage-verdict — a declared knob the bridge did not resolve is read
+// spec: delegation-kit/SPEC.md §usage-verdict — a declared knob that does not resolve is read
 // as budget-unknown rather than as a decline: this member's return shape carries no decline, and 2
 // is the code the contract already rules never-blocking. The front-end owns the real decline.
 struct Config {

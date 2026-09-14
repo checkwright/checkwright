@@ -377,10 +377,10 @@ kit knob (check-docs-cmd's resolver, reused so the non-uniform knob-prefix map
 has one home). **A knob resolves through a family stem in either direction**: a
 scanned `<FAMILY>_` stem resolves when kit source defines any member under it,
 and a scanned member resolves when kit source defines the stem. The second
-direction is what a **dispatch-composed** knob name needs — gate-sdk's
-`GATE_SDK_KNOB_<NAME>` bridge builds the full name at runtime from the knob it
-is carrying (gate-sdk/SPEC.md §lib/gate.sh), so kit source contains the stem and
-never the members. Spelling the members out to satisfy an exact match would be a
+direction is what a **dispatch-composed** knob name needs — evidence-kit's
+`EVIDENCE_KIT_RUN_<suite>` family builds the full name at runtime from the suite
+it is running (evidence-kit/SPEC.md §Layout and configuration), so kit source
+contains the stem and never the members. Spelling the members out to satisfy an exact match would be a
 hardcoded roster of consumer knob names in a kit literal, which is the one shape
 that crosses the provenance seam here. It valves the surfaces that legitimately
 name design-ahead or frozen brands — `gate-tests/` fixture bodies, `docs/posts/*`, the
@@ -393,16 +393,15 @@ Config is a **knob file**: copy `templates/canon-config.knobs` into the gates di
 as `canon-config.knobs` (or point `CANON_KIT_KNOB_FILE` elsewhere) and set any knob
 below; defaults fill what the file leaves unset. canon-kit's knobs are **static**:
 the binary resolves them in process from its own defaults table and the consumer's
-knob file, and the config bridge never carries them (gate-sdk/SPEC.md §lib/gate.sh);
-`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape
-and rendered default. A gitignored `canon-config.local.knobs` in the gates dir is the
+knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one
+with its shape and rendered default. A gitignored `canon-config.local.knobs` in the gates dir is the
 home for a private value a tracked file cannot carry. The grammar, that `.local`
 overlay, the environment-over-file precedence for a scalar, the knob reference and
 the refusals — a set `CANON_KIT_KNOB_FILE` that does not exist, a left-behind
 `canon-config.sh` or `canon-config.local.sh`, a non-empty file named by the retired
 `CANON_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's table
 validator refuses a malformed config at exit 2 with every finding. A derived default
-below is written in the roster's `${NAME}` spelling for the gate-sdk knob it reads.
+below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement.
 **The five `CANON_KIT_*_CMD` knobs are command knobs**: each is an argv, one
 `NAME[] = element` line per word, spawned directly with no shell, and an empty knob
 is no command, which its reader takes as the clean skip (gate-sdk/SPEC.md §The knob
@@ -425,7 +424,7 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
 
 - `CANON_KIT_SPEC_NAME` — canonical spec filename, default `SPEC.md`.
 - `CANON_KIT_AMENDMENT_GLOB` — default `SPEC-*.md`.
-- `CANON_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE}`.
+- `CANON_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`.
 - `CANON_KIT_FEATURE_SECTIONS` — array, default `("New Features")`: active
   sections whose entries require `[spec:]`.
 - `CANON_KIT_ACTIVE_SECTIONS` — array, default
@@ -736,12 +735,12 @@ the same shapes:
   invocation inside another — and the termination is a constraint on the arm's
   roster rather than a property inherited.** A command that is a front-end arm must
   not declare the knob that names it, or the resolution recurses:
-  `--emit-enum-sets` declares `GATE_KIT_ROOTS_REL` and `QUEUE_KIT_LESSON_TAGS` and
+  `--emit-enum-sets` declares `GATE_SDK_KIT_DIRS` and `QUEUE_KIT_LESSON_TAGS` and
   may never gain `CANON_KIT_ENUM_SETS_CMD`. **Nothing reds if it does** — the
   failure is a hang or an unbounded recursion, not a verdict — which is why the
   condition is written here, beside the adapter. The residue stays: the spawned
-  front-end still sources `lib/gate.sh` and resolves the arm's own bridged knobs
-  before exec'ing the binary, one extra `bash`, one `lib/gate.sh` source and one
+  front-end still sources `lib/gate.sh` to locate the binary before exec'ing it,
+  one extra `bash`, one `lib/gate.sh` source and one
   binary exec per read of that vocabulary. It is a **residue to file, never a
   licence** to take the in-process shortcut §check-prose-enum refuses.
 - **The count adapter** the restated-total gates share, so a consumer's
@@ -801,7 +800,7 @@ the same shapes:
   **workflow tier** — which §check-spec-pointer requires, so a consumer who set the knob
   silently lost the whole `.workflow/` tracked tier — and **the walker's own prune set**,
   because the glob walk is bash-faithful and prunes nothing where the extension walk
-  prunes `GATE_PRUNE_DIRS`. **That last one is the cause of the directory-shape explosion**
+  prunes `GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS`. **That last one is the cause of the directory-shape explosion**
   a configured value otherwise has to enumerate around — named explicitly because the
   kit-root prune is the arm that reads like the culprit and cannot be it, being a no-op
   wherever `CANON_KIT_SCAN_KIT_ROOTS=1`. The knob is a corpus
@@ -1704,8 +1703,9 @@ this project refuses.
 The same emitter adds two roster families over the kit tree, one set per kit
 root: a `<kit>-lib` set of the tracked top-level `lib/*.sh` basenames and a
 `<kit>-gate-test` set of the tracked top-level `gate-tests/*.test.sh` basenames,
-with the roots read from `gate_kit_roots_rel` (gate-sdk/SPEC.md §lib/gate.sh) so
-the sets cannot enumerate a tree the battery does not. **Tracked is contract, not
+with the roots the binary derives from `GATE_SDK_ROOT` and `GATE_SDK_KIT_DIRS`
+(gate-sdk/SPEC.md §Layout and configuration) so the sets cannot enumerate a tree
+the battery does not. **Tracked is contract, not
 an implementation accident**: the listing comes from `git`, so an *untracked* new
 sibling does not enrol, and a walk of the filesystem would silently widen a set
 another surface reasons about. A battery run before `git add` of a new sibling

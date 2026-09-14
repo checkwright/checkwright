@@ -2,7 +2,7 @@
 # check-portability-floor (gate-sdk default template, gate-sdk/SPEC.md
 # §check-portability-floor). One POSIX ERE per line; '#' comments and blank lines
 # ignored. The corpus it scans is GATE_SDK_PORTABILITY_PATHS in
-# scripts/gate-sdk-config.sh — the files an adopter's machine actually executes.
+# scripts/gate-sdk-config.knobs — the files an adopter's machine actually executes.
 # Files named portability-patterns* are self-exempt from the scan.
 #
 # A live site is marked '# portability-declared: <reason>' on that line or the one

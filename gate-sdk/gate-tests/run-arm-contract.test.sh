@@ -172,43 +172,19 @@ assert_rc  only-widened-bound "$rc" 2
 assert_has only-widened-bound "run-gates: --only: 'g_unreg' is not registered in $scratch/gates.list" "$out"
 assert_absent only-widened-bound 'g_unreg saw:' "$out"
 
-# ---- the knob union narrows to the --only selection ----------------------------
-# spec: gate-sdk/SPEC.md §The non-gate arm — a registered compiled member whose knob cannot
-# resolve (the scratch consumer config gives it a tab-bearing element) fails a bare run at the
-# bridge, and no longer fails a --only run that does not select it, with one name or two.
-cp "$ROOT/gate-sdk/checks/check-commit-subject.gate" "$scratch/"
-printf '%s\n' "GATE_SDK_COMMIT_TYPES=\$'has\\ttab'" > "$scratch/gate-sdk-config.sh"
-narrowing() { GATE_SDK_CONFIG_FILE="$scratch/gate-sdk-config.sh" merged "$@"; }
-{ echo g_args; echo g_pass; echo check-commit-subject; } > "$scratch/gates.list"
-
-out="$(narrowing --only g_pass)"; rc=$?
-assert_rc  only-narrowed-sole "$rc" 0
-assert_has only-narrowed-sole 'All 1 gates passed.' "$out"
-
-out="$(narrowing --only g_args g_pass)"; rc=$?
-assert_rc  only-narrowed-two "$rc" 0
-assert_has only-narrowed-two 'All 2 gates passed.' "$out"
-
-out="$(narrowing)"; rc=$?
-assert_rc  bare-keeps-union "$rc" 2
-assert_has bare-keeps-union 'knob GATE_SDK_COMMIT_TYPES has an element containing a tab' "$out"
-rm -f "$scratch/check-commit-subject.gate" "$scratch/gate-sdk-config.sh"
-
 # ---- a mistyped --emit arm is answered with the ARM roster ---------------------
 # The binary holds two rosters and the emit path used to fall through to the gate
 # one, so the moment-of-miss diagnostic confirmed a wrong mental model instead of
 # correcting it. Read rather than diffed: the roster printed must be the arm set,
-# the gate set must be absent from it entirely, the section that owns the roster
-# must be cited, and the knob-probe line above it must name the whole two-token
-# argv rather than the bare `--emit` that is not the arm.
+# the gate set must be absent from it entirely, and the section that owns the roster
+# must be cited.
 out="$(bash "$RUN" --emit no-such-arm-at-all 2>&1)"; rc=$?
 assert_rc     emit-miss "$rc" 2
 assert_has    emit-miss 'no such --emit arm: --emit-no-such-arm-at-all'          "$out"
 assert_has    emit-miss '--emit-docs-mirror'                                     "$out"
 assert_has    emit-miss 'gate-sdk/SPEC.md §The non-gate arm owns the arm roster' "$out"
 assert_absent emit-miss 'check-shellcheck'                                       "$out"
-assert_has    emit-miss 'report what --emit no-such-arm-at-all reads'            "$out"
 
 [[ "$fails" -eq 0 ]] || { echo "run-arm-contract.test: $fails assertion(s) failed"; exit 1; }
-echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the --only argv channel forwarded on a single-member selection and refused on a two-member one, the sole-name widening selected/refused/bounded, the knob union narrowed to a one- and two-name selection while a bare run keeps it, two default runs and a serial run byte-identical, and a mistyped --emit arm answered with the arm roster and no gate name)"
+echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the --only argv channel forwarded on a single-member selection and refused on a two-member one, the sole-name widening selected/refused/bounded, two default runs and a serial run byte-identical, and a mistyped --emit arm answered with the arm roster and no gate name)"
 exit 0

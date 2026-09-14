@@ -45,7 +45,7 @@ fn split_pin(line: &str) -> Option<(&str, &str)> {
 
 fn resolve_memory_dirs() -> Result<Vec<String>, String> {
     // spec: context-kit/SPEC.md §check-memory-off — the knob is a word-split list of globs, so
-    // each bridged element splits again on whitespace exactly as the shell's unquoted `$memdirs`
+    // each element splits again on whitespace exactly as the shell's unquoted `$memdirs`
     // does; empty means "derive it", not "no dir"
     let words: Vec<String> = walk::knob_array("CONTEXT_KIT_MEMORY_DIRS")?
         .iter()

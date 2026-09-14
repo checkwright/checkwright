@@ -26,7 +26,7 @@ if [[ ${#kit_args[@]} -gt 0 ]]; then
         roots+=("$(cd "$r" && pwd)")
     done
 else
-    while IFS= read -r r; do roots+=("$r"); done < <(gate_kit_roots)
+    while IFS= read -r r; do roots+=("$(cd "$r" && pwd)"); done < <(gate_kit_roots)
 fi
 
 ordered=("$SDK")

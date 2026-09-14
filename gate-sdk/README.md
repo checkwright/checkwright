@@ -15,8 +15,8 @@ honest:
   parser must never read as "clean"), the fixture-tree prune adapters, and the
   registry/resolution helpers.
 - `bin/run-gates.sh` — the aggregate battery: every gate in your `gates.list`,
-  one shot, per-gate timings. Two selectors narrow it without losing the config
-  bridge or the output contract: `--only <name>...` runs the gates you name (in
+  one shot, per-gate timings. Two selectors narrow it without losing the knob
+  files or the output contract: `--only <name>...` runs the gates you name (in
   registry order; an unregistered name is a refusal), and `--for <path>...` runs
   the gates coupling to the paths you name, exactly as the generated hook would.
 - the `--run-gate-tests` arm — the golden-fixture runner: every gate proves it

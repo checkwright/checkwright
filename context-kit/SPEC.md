@@ -24,10 +24,11 @@ stay in the consumer repo (§Out of scope).
 are **advisory arms of the gate binary**, reached through the battery runner's
 `--emit` front-end (`bash gate-sdk/bin/run-gates.sh --emit <name> …`); none joins
 `gates.list` and none returns a verdict a battery reads, which is the non-gate
-class gate-sdk/SPEC.md §The non-gate arm rules. Each is a **bridged-arm table
-member** rather than a hardcoded flag, and for the first and third that family is
-forced rather than chosen: a tool that resolves a consumer knob and is ported as a
-hardcoded flag resolves platform defaults and silently ignores every override.
+class gate-sdk/SPEC.md §The non-gate arm rules. Each is an **arm-table member**
+rather than a hardcoded flag, and for the first and third that family is forced
+rather than chosen: a tool that resolves a consumer knob declares it on its table
+row, and a hardcoded flag has no row, so `--knob-files`, `check-reads-couples` and
+`check-gate-substrate-parity` cannot see what it reads.
 
 - **`--emit md-index [paths…]`** — compact structural index for Markdown:
   heading hierarchy with line numbers, each heading followed by its
@@ -89,7 +90,7 @@ hardcoded flag resolves platform defaults and silently ignores every override.
   stated limit rather than a defect the port fixed.
 
   **Its declared knob roster is empty**, because the arm resolves no knob; it is
-  a bridged-arm table row regardless, since table membership is what makes
+  an arm-table row regardless, since table membership is what makes
   `--emit md-section` reach it at all. Exit statuses: `0` with the section on
   stdout; **`2`** with a diagnostic on stderr for a missing argument, a file
   that is not there, and a query matching no heading. That last was exit 1 in
@@ -368,10 +369,10 @@ actually changed (Cadence, below), so the block's probe date marks the last
 real change, not the last run. The probed half is derivation-first — never
 hand-maintained.
 
-**How it is invoked, and its one knob.** It is a bridged non-gate arm
+**How it is invoked, and its one knob.** It is a non-gate arm
 (gate-sdk/SPEC.md §The non-gate arm) rather than a script: `--emit-env-probe`,
-reached by every caller as `run-gates.sh --emit env-probe`, so the front-end
-resolves its configuration and hands it over. It is an *action that reports* —
+reached by every caller as `run-gates.sh --emit env-probe`, and the binary
+resolves its configuration in process. It is an *action that reports* —
 it rewrites the block and prints one line naming what it did — and both its
 failures exit 2. Its declared knob roster is **`CONTEXT_KIT_ENV_PROFILE_FILE`
 and nothing else**: that name is one of context-kit's static knobs, resolved from
@@ -629,16 +630,16 @@ context economics and the *report* is drift reporting — drift-kit's
 `kpi-always-loaded` consumes this measurement for its row instead of re-embedding
 it.
 
-**It is the `--emit-always-loaded` bridged arm, and both halves of that are forced
-rather than chosen.** It is a **table member** because it resolves the consumer knobs
+**It is the `--emit-always-loaded` arm-table member, and both halves of that are
+forced rather than chosen.** It is a **table member** because it resolves the consumer knobs
 `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_HOOK_CMD`, `CONTEXT_KIT_BASELINE_FILE`,
 `CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE`,
-`CONTEXT_KIT_RATCHET_PATHS` and `CONTEXT_KIT_STATE_FILE` — which a hardcoded
-top-level flag would receive none of, the difference between working and appearing to. `GATE_SDK_WORKFLOW_DIR` and
+`CONTEXT_KIT_RATCHET_PATHS` and `CONTEXT_KIT_STATE_FILE`, and a hardcoded
+top-level flag has no row to declare them on. `GATE_SDK_WORKFLOW_DIR` and
 `GATE_SDK_GATES_DIR` are deliberately **not** declared: the static rows whose
-defaults derive from them declare them as inputs (§Layout and configuration), and the
-member's knob closure carries them from those declarations (gate-sdk/SPEC.md §The
-knob file), so declaring either would state one fact twice. It is an **`Arm::Emit`** because the
+defaults derive from them declare them as inputs (§Layout and configuration), and
+resolving those rows resolves them (gate-sdk/SPEC.md §The knob file), so declaring
+either would state one fact twice. It is an **`Arm::Emit`** because the
 whole failure grammar is already that variant's collapse — every mode returns 0 and
 the one non-zero path is exit 2 — so `{0, 2}` discards nothing the member carried;
 `--emit-usage-trend` is the sibling admitted on exactly that ground.
@@ -658,7 +659,7 @@ shape `--hook` and `--wait-probe` already carry for their own subcommand words.
 Composing a flag spelling per mode is
 refused for the reason that shape exists: each spelling would be another row
 publishing one knob roster, and the front-end's grammar would carry a second copy of
-a decision the bridged-arm table already holds.
+a decision the arm table already holds.
 
 **An operand outside that closed set is a refusal**: usage on stderr, exit 2,
 `--help` included. The ground is the harm rather than an argument-shape rule —
@@ -709,7 +710,7 @@ stdout is counted whatever its exit status.
   baseline file. A stale baseline adds a second header line naming both
   surface counts. Separate from the bare invocation because
   `kpi-always-loaded` reads that as one line.
-- **Baseline file** (`${GATE_SDK_WORKFLOW_DIR}/`
+- **Baseline file** (`${GATE_SDK_WORKFLOW_DIR:-.workflow}/`
   `always-loaded-baseline.txt`, committed): a `# contract:` header
   pointing here, then one data line
   `<total-lines> <surface-lines> <baseline-commit>`. Trailing extra
@@ -1286,8 +1287,7 @@ Config is a **knob file**: copy `templates/context-config.knobs` into the gates 
 as `context-config.knobs` (or point `CONTEXT_KIT_KNOB_FILE` elsewhere) and set any
 knob below; defaults fill what the file leaves unset. context-kit's knobs are
 **static**: the binary resolves them in process from its own defaults table and the
-consumer's knob file, and the config bridge never carries them (gate-sdk/SPEC.md
-§lib/gate.sh); `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one
+consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one
 with its shape and rendered default. A gitignored `context-config.local.knobs` in the
 gates dir is the home for a private value a tracked file cannot carry. The grammar,
 that `.local` overlay, the environment-over-file precedence for a scalar, and the
@@ -1298,8 +1298,7 @@ knob file's. The kit's table validator refuses a malformed context config at exi
 with every finding — a broken config must not gate anything: an empty
 `CONTEXT_KIT_SETTINGS_FILE`, `CONTEXT_KIT_SETTINGS_PINS` or
 `CONTEXT_KIT_BREVITY_FILE`, a non-integer `CONTEXT_KIT_BREVITY_BUDGET`, and the
-set-but-missing settings file below. A derived default below is written in the
-roster's `${NAME}` spelling for the gate-sdk knob it reads. Knobs:
+set-but-missing settings file below. A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs:
 
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
   `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer
@@ -1337,8 +1336,9 @@ roster's `${NAME}` spelling for the gate-sdk knob it reads. Knobs:
   a derived row: queue-kit's `queue-index` arm through the battery front-end,
   `("bash" "<candidate>" "--emit" "queue-index" "--collapse-deferred")`, for the
   first candidate that exists as a file among `${GATE_SDK_GATES_DIR}/run-gates.sh`
-  and `${GATE_SDK_ROOT_HERE}/bin/run-gates.sh` — consumer-first, then the sibling
-  gate-sdk's front-end — else **empty** (surfaces only). The empty answer is what
+  and `${GATE_SDK_ROOT}/bin/run-gates.sh`, the gate-sdk root locator spelled
+  relative to the working directory — consumer-first, then the sibling gate-sdk's
+  front-end — else **empty** (surfaces only). The empty answer is what
   the meter's `hook 0` branch reads and what a consumer vendoring context-kit
   without a battery front-end depends on; a file line `CONTEXT_KIT_HOOK_CMD =`
   replaces the default whole with that empty value, a deliberate no-hook override.
@@ -1373,7 +1373,7 @@ roster's `${NAME}` spelling for the gate-sdk knob it reads. Knobs:
   citations in two SPECs and a template.
 - `CONTEXT_KIT_STATE_FILE` — the lifecycle evidence file whose **last data
   line** carries the stage cursor the hook routes on (§The session-context
-  hook); default `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt`. Read
+  hook); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Read
   as a named file, never through stdin — the session-role signal consumes stdin
   exactly once, and a second reader there would starve it.
 - `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file the
@@ -1383,10 +1383,10 @@ roster's `${NAME}` spelling for the gate-sdk knob it reads. Knobs:
   the session-context hook's identity match reads (§The session-context hook);
   default `${GATE_SDK_TMP_DIR:-.tmp}/session-role` (gitignored scratch).
 - `CONTEXT_KIT_BASELINE_FILE` — default
-  `${GATE_SDK_WORKFLOW_DIR}/always-loaded-baseline.txt`.
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
 - `CONTEXT_KIT_STATE_FILE` — the lifecycle state file whose first stamp names the
   iteration-start commit the meter's `--growth` and staleness read (§The always-loaded meter);
-  default `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt`. context-kit's own knob
+  default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. context-kit's own knob
   rather than an import of lifecycle-kit's, so a consumer without lifecycle-kit resolves an
   absent file and keeps the baseline-only reading.
 - `CONTEXT_KIT_GROWTH_PATHS` — array of git pathspecs the meter's `--growth`
@@ -1394,7 +1394,7 @@ roster's `${NAME}` spelling for the gate-sdk knob it reads. Knobs:
   fixture copies here, since a copy's growth is its source's.
 - `CONTEXT_KIT_CEILING_FILE` — the ratchet's committed ceilings
   (§The surface ratchet); default
-  `${GATE_SDK_WORKFLOW_DIR}/surface-ceiling.txt`. Its own file rather
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/surface-ceiling.txt`. Its own file rather
   than a row in the baseline, because `--update-baseline` rewrites that file as
   one row and would erase a ceiling at every close.
 - `CONTEXT_KIT_RATCHET_PATHS` — array of git pathspecs naming the
@@ -1464,7 +1464,7 @@ headings, fences, and link-bearing first sentences; Rust with the pub-item
 kinds; TypeScript with every kind the `ts` grammar claims — including
 `const enum` and `export default` — beside re-export and non-export lines it
 must skip; a baseline file) beside expected outputs, and
-the bridged `--run-index-tests` arm (gate-sdk/SPEC.md §The non-gate arm) drives
+the `--run-index-tests` arm (gate-sdk/SPEC.md §The non-gate arm) drives
 each one through the `--emit` front-end over
 that corpus and asserts exact output, failing on any diff. The runner spawns the
 arms from the host checkout, so it pins every knob an arm reads at the corpus, the
@@ -1473,9 +1473,7 @@ live state and leaks it into the golden. **The goldens are the
 port's parity oracle and they are unusually strong**: they were produced by the
 shell implementations the arms replaced, so holding them byte-for-byte is a
 cross-substrate comparison over a committed corpus rather than an assertion of
-parity. The runner reaches the arms through the front-end rather than the binary,
-because that is what resolves the bridged environment two of them declare.
-A consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
+parity. A consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
 whose `rust.sh` emits a marker row: it is the extractor seam's **end-to-end
 proof**, the consumer-first resolution order and the `bash` spawn that executes a
 consumer extractor both exercised, with the shadow's output rather than the
@@ -1596,7 +1594,7 @@ recipe, so neither leg reached it and it ported.
 
 The **AGENTS.md agent-file adapter smoke** is the exercise behind the
 Tier-two compatibility claim (docs/positioning.md §The tiered compatibility
-claim), and it is the bridged `--agents-md-smoke` arm (gate-sdk/SPEC.md §The
+claim), and it is the `--agents-md-smoke` arm (gate-sdk/SPEC.md §The
 non-gate arm). It vendors a scratch consumer through the shared consumer-smoke
 mechanics (gate-sdk/SPEC.md §Consumer smoke), converts its agent file from
 `CLAUDE.md` to `AGENTS.md`, sets the agent-file knobs in the consumer's config
@@ -1609,7 +1607,7 @@ harness — not driven by `run-consumer-smoke.sh`, which asserts the kit default
 under zero config — and registers as its own evidence-kit validate suite
 (`agents_md_smoke`, the `demo` precedent).
 
-**The member is an `Arm::Run` and a bridged-arm table row.** The contract is a
+**The member is an `Arm::Run` and an arm-table row.** The contract is a
 verdict — 0 with the clean line, 1 with a `FAIL — <reason>` line, 2 a
 precondition the harness could not meet — and an `Arm::Emit` could carry the
 report but not the verdict, which is what the validate suite reads through its

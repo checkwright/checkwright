@@ -10,8 +10,8 @@ use crate::walk;
 // `DELEGATION_KIT_USAGE_HISTORY`: the shipped producer calls `usage-verdict` nowhere, so the knob
 // has no reader here and a declared one would be a field with no named reader
 // spec: delegation-kit/SPEC.md §The statusline arm — the four `QUEUE_KIT_*` names are the
-// counter rendering's, and declaring them here IS what puts them in front of an in-process
-// reader that resolves through the bridge
+// counter rendering's, read in process, and declaring them here IS what shows those reads to
+// `--knob-files`
 pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_USAGE_FILE",
     "DELEGATION_KIT_CRED_FILE",

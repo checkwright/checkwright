@@ -57,7 +57,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     // spec: gate-sdk/SPEC.md §check-core-files — the kit-root set is resolved only where a
-    // `kit:` line asks for it, so a token-free manifest costs no bridge read
+    // `kit:` line asks for it, so a token-free manifest costs no kit-root derivation
     let roots = if lines.iter().any(|l| l.starts_with("kit:")) {
         match walk::kit_roots_rel() {
             Ok(v) => v,

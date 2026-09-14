@@ -5,8 +5,8 @@ use crate::walk;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — every knob read is bridged; the crate holds no
-// default, so an unset variable is a harness error rather than a fallback.
+// spec: gate-sdk/SPEC.md §lib/gate.sh — every knob read resolves through its owning kit's table,
+// so a name no kit declares is a resolution error rather than a fallback.
 fn knob(name: &str) -> Result<String, String> {
     walk::knob_scalar(name)
 }
@@ -76,9 +76,8 @@ fn root_to_abs(p: &str) -> String {
         _ if p.starts_with("./") => format!("{}/{}", cwd(), &p[2..]),
         _ => format!("{}/{}", cwd(), p),
     };
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — a bridged root is spelled relative to the
-    // invoking directory, so it may climb out with `..`; normalising here recovers the
-    // absolute path the shell compares, without one ever crossing the bridge
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a root spelled relative to the invoking directory
+    // may climb out with `..`; normalising here recovers the absolute path the shell compares
     normalize(abs.trim_end_matches('/'))
 }
 
@@ -438,8 +437,8 @@ pub fn relative_to_cwd(p: &str) -> String {
     }
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — one normaliser, in the module that owns the bridged
-// root spelling this rule exists for; a second copy here would be the drift the kit-roots
+// spec: gate-sdk/SPEC.md §lib/gate.sh — one normaliser, in the module that owns the kit-root
+// spelling this rule exists for; a second copy here would be the drift the kit-roots
 // cohort's own criterion-6 discharge argues against
 fn normalize(abs: &str) -> String {
     walk::normalize_abs(abs)
@@ -471,7 +470,7 @@ pub fn strip_dot_slash(s: &str) -> String {
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — the claim-gate primitives the two members share:
 // the declaration grammar, the declaration roster, the governed-doc set behind its two
-// exclude valves, and the bridged vocabulary
+// exclude valves, and the command-knob vocabulary
 pub fn declared_id(line: &str, tag: &str) -> Option<String> {
     let b = line.as_bytes();
     let mut i = skip_space(b, 0);

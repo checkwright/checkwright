@@ -201,8 +201,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     defined.extend(crate::knobs::static_names());
 
     // spec: canon-kit/SPEC.md §Layout and configuration — the queue is design-ahead and names
-    // future knobs and paths, so it is valved out by basename; the knob crosses the config
-    // bridge rather than carrying a crate-side default (gate-sdk/SPEC.md §lib/gate.sh)
+    // future knobs and paths, so it is valved out by basename, the queue
+    // file's knob read rather than a literal name
     let queue_file = walk::knob_scalar("GATE_SDK_QUEUE_FILE")
         .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
     let queue_base = queue_file.rsplit('/').next().unwrap_or(&queue_file).to_string();

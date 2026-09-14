@@ -2,24 +2,6 @@
 # spec: gate-sdk/SPEC.md §lib/gate.sh — sourced library: values + adapters, never gate structure
 # no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope, and this file is the ground held twice over. It is not a client of the config bridge; it IS the bridge — the machinery that sources every other kit's lib/*.sh and derives which kit owns a knob from its prefix. gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, so a crate-side form would have to either source shell libraries from inside a binary or re-implement every kit's defaults, which is the second producer criterion 6 refuses, squared. gate-sdk/SPEC.md §gen-pre-commit already declares on this ground from the opposite direction: the hook generator bakes a resolved knob and so cannot move either. Structural, not a sizing judgment.
 
-# spec: gate-sdk/SPEC.md §Layout and configuration — auto-source the consumer config seam so a layout knob's override persists past the shell that set it; GATE_SDK_CONFIG_FILE wins, else <gates-dir>/gate-sdk-config.sh (GATE_SDK_GATES_DIR stays env-or-default — a config file cannot name its own directory)
-_gate_sdk_config="${GATE_SDK_CONFIG_FILE:-}"
-if [[ -n "$_gate_sdk_config" ]]; then
-    [[ -f "$_gate_sdk_config" ]] || {
-        echo "gate-sdk: GATE_SDK_CONFIG_FILE not found: $_gate_sdk_config" >&2
-        exit 2
-    }
-    # shellcheck disable=SC1090  # consumer-supplied config, path is a knob
-    source "$_gate_sdk_config"
-else
-    _gate_sdk_config="${GATE_SDK_GATES_DIR:-scripts}/gate-sdk-config.sh"
-    if [[ -f "$_gate_sdk_config" ]]; then
-        # shellcheck disable=SC1090  # consumer-supplied config, path is a knob
-        source "$_gate_sdk_config"
-    fi
-fi
-unset _gate_sdk_config
-
 # spec: gate-sdk/SPEC.md §Fail-closed contract — non-zero capture status means the check could not run; exit 2, never a false clean
 fail_closed() {
     if [[ "$1" -ne 0 ]]; then
@@ -30,78 +12,19 @@ fail_closed() {
     fi
 }
 
-if [[ -n "${GATE_SDK_PRUNE_DIRS:-}" ]]; then
-    read -r -a GATE_PRUNE_DIRS <<<"$GATE_SDK_PRUNE_DIRS"
-else
-    GATE_PRUNE_DIRS=(target .git node_modules .tmp gate-tests worktrees)
-fi
-# spec: gate-sdk/SPEC.md §lib/gate.sh — GATE_SDK_PRUNE_EXTRA_DIRS appends to the resolved set whichever branch produced it, so a consumer adds one directory without copying the default
-for _gpx in ${GATE_SDK_PRUNE_EXTRA_DIRS:-}; do GATE_PRUNE_DIRS+=("$_gpx"); done
-unset _gpx
+# spec: gate-sdk/SPEC.md §lib/gate.sh — a value read on first use is memoised for one sourcing, never for the process, so a subshell re-sourcing under another environment reads its own
+unset _gate_prune_loaded _gate_couples_loaded
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — check-kit-registration's two document knobs, resolved here rather than inline in the check so the config bridge can carry them: a knob the owning kit's library does not define is the bridge's undeclared-knob refusal, so a compiled member declaring either would fail-close on every invocation. Resolved under their own consumer names (the queue-kit shape) rather than renamed the way GATE_PRUNE_DIRS is: that rename exists because a whitespace scalar feeds an array and one name would mean two grammars, and these are scalars in and scalars out.
-[[ -v GATE_SDK_REGISTRY_DOC ]] || GATE_SDK_REGISTRY_DOC="README.md"
-[[ -v GATE_SDK_RUNNER_DOC ]] || GATE_SDK_RUNNER_DOC="README.md"
-# spec: gate-sdk/SPEC.md §The workflow directory — the same resolution for the workflow directory, and for the same reason: the governed-comment corpus takes its tracked tier, so a compiled member reading that corpus declares this knob and the bridge can only carry a value some kit library defines
-[[ -v GATE_SDK_WORKFLOW_DIR ]] || GATE_SDK_WORKFLOW_DIR=".workflow"
-# spec: gate-sdk/SPEC.md §Layout and configuration — the same resolution for the scratch directory, on the cause the roster above states: the battery runner is a compiled arm and declares this knob, so a value written only as an inline `${…:-.tmp}` default at a use site is invisible to the bridge's `declare -p`. Every inline reader keeps its spelling and its value.
-[[ -v GATE_SDK_TMP_DIR ]] || GATE_SDK_TMP_DIR=".tmp"
-# spec: gate-sdk/SPEC.md §upgrade-smoke — the upgrade suite's three knobs, defaulted here rather than inside the driver that used to hold them: that driver is a compiled arm now, and the bridge resolves a declared knob by sourcing exactly one kit's library, so a default left beside the compiled reader is sourced by nothing and refuses the whole environment with exit 2. GATE_SDK_UPGRADE_TO keeps the `:-` semantics its use site had, so an explicitly empty value still means HEAD.
-# spec: gate-sdk/SPEC.md §upgrade-smoke — the other two default **empty**, and empty means *derive it* rather than *no value*: each is a derivation over a git repository that no repo-relative literal can express, so the one reader of the knob expands it (the CONTEXT_KIT_MEMORY_DIRS shape), and transcribing the derivation here would be the second producer criterion 6 refuses.
-[[ -v GATE_SDK_UPGRADE_REPO ]] || GATE_SDK_UPGRADE_REPO=""
-[[ -v GATE_SDK_UPGRADE_FROM ]] || GATE_SDK_UPGRADE_FROM=""
-[[ -n "${GATE_SDK_UPGRADE_TO:-}" ]] || GATE_SDK_UPGRADE_TO="HEAD"
-# spec: gate-sdk/SPEC.md §Layout and configuration — and the same resolution for the queue file, on the third occurrence of the same cause: a compiled member valving the queue out of its corpus declares this knob, and an environment-only override no kit library defines is the bridge's undeclared-knob refusal whatever prefix its name carries. Every inline reader keeps its spelling and its value; what changes is that the name now resolves to something declare -p can find.
-[[ -v GATE_SDK_QUEUE_FILE ]] || GATE_SDK_QUEUE_FILE="TASK-QUEUE.md"
-# spec: gate-sdk/SPEC.md §Layout and configuration — the same resolution again, for the two knobs the enforcement-map emitter reads once it is a compiled arm: a value no kit library defines is the bridge's undeclared-knob refusal, and these two were previously defaulted inside the emitter script itself, which is the duplication the bridge exists to remove. Resolved *after* the config seam above, so the config file still cannot name its own directory — what changes is that the resolved value is now something declare -p can find, not where it comes from.
-# spec: gate-sdk/SPEC.md §enforcement-map — a guarded default erases set-ness, and the enforcement map tells its two adoption modes apart *by* set-ness (adopted-but-broken refuses where not-adopted degrades). These two are safe only because neither default can be absent: `scripts` is the gates dir the registry was already read from, and `.` is the cwd, so the refusal arm each knob's preflight guards is unreachable for the defaulted value. **This is not a precedent for a knob whose default may legitimately not exist** — `DRIFT_KIT_KPIS_FILE`'s is such a knob and takes a mode-preserving resolution in its own kit's table and validator instead (drift-kit/SPEC.md §Layout and configuration).
-[[ -v GATE_SDK_GATES_DIR ]] || GATE_SDK_GATES_DIR="scripts"
-[[ -v GATE_SDK_ENFORCE_SCAN_DIR ]] || GATE_SDK_ENFORCE_SCAN_DIR="."
-# spec: gate-sdk/SPEC.md §check-hook-exec-bit — the same resolution once more, for the hooks
-# directory, off GATE_SDK_GATES_DIR's own resolved default above rather than the not-yet-defined
-# gate_sdk_gates_dir, so the two stay one value by construction rather than by two readers agreeing
-[[ -v GATE_SDK_HOOKS_DIR ]] || GATE_SDK_HOOKS_DIR="$GATE_SDK_GATES_DIR/git-hooks"
-# spec: gate-sdk/SPEC.md §check-root-tiering — the same resolution for that member's two remaining knobs, on the cause the four above already state: a knob no kit library defines is the bridge's undeclared-knob refusal, so the defaults could not stay inline in a check that dispatches to the binary. The allowlist default rides GATE_SDK_GATES_DIR's own resolved value above rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction; an absent allowlist is the gate's own built-in-fallback branch, not a refusal, which is why defaulting a path that need not exist is safe here.
-[[ -v GATE_SDK_ROOT_ALLOWLIST ]] || GATE_SDK_ROOT_ALLOWLIST="$GATE_SDK_GATES_DIR/root-allowlist.list"
-[[ -v GATE_SDK_AGENT_FILE ]] || GATE_SDK_AGENT_FILE="CLAUDE.md"
-# spec: gate-sdk/SPEC.md §check-commit-msg — the banned-pattern file set as arrays, so the config bridge can carry the value gate_msg_pattern_files already resolves. Distinct names on §lib/gate.sh's rule (a whitespace scalar feeding an array), and filled by the unquoted expansion the resolver itself used, so word-splitting and pathname expansion keep the semantics they had.
-# shellcheck disable=SC2034  # read across the dispatch seam by the compiled member and by gate_msg_pattern_files below
-GATE_MSG_PATTERN_FILES=()
-for _gmp in ${GATE_SDK_MSG_PATTERN_FILES:-$GATE_SDK_GATES_DIR/msg-patterns.list}; do
-    GATE_MSG_PATTERN_FILES+=("$_gmp")
-done
-# shellcheck disable=SC2034  # read across the dispatch seam by the compiled member and by gate_msg_pattern_files below
-GATE_MSG_PATTERN_FILES_LOCAL=()
-for _gmp in ${GATE_SDK_MSG_PATTERN_FILES_LOCAL:-$GATE_SDK_GATES_DIR/msg-patterns.local.list}; do
-    GATE_MSG_PATTERN_FILES_LOCAL+=("$_gmp")
-done
-unset _gmp
-# spec: gate-sdk/SPEC.md §check-portability-floor — the portability roster and the install-path corpus as arrays, resolved here on the cause the pattern-file pair above states: a whitespace scalar feeding an array earns a spelling of its own, and a default the bridge's `declare -p` cannot find is its undeclared-knob refusal. The corpus default is EMPTY, which is what disables the assertion for a consumer who has not named their install path — the kit cannot know one, and a fail-closed default would red every adopter's first commit on a roster only their project can write.
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-GATE_PORTABILITY_PATTERNS=()
-for _gpp in ${GATE_SDK_PORTABILITY_PATTERNS:-$GATE_SDK_GATES_DIR/portability-patterns.list}; do
-    GATE_PORTABILITY_PATTERNS+=("$_gpp")
-done
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-GATE_PORTABILITY_PATHS=()
-for _gpp in ${GATE_SDK_PORTABILITY_PATHS:-}; do
-    GATE_PORTABILITY_PATHS+=("$_gpp")
-done
-unset _gpp
-# spec: gate-sdk/SPEC.md §check-core-files — the same resolution for that member's manifest path, on the cause the knobs above state: a default the bridge's `declare -p` cannot find is its undeclared-knob refusal. Rides GATE_SDK_GATES_DIR's resolved value; an absent manifest is the gate's own optional-config branch, not a refusal.
-[[ -v GATE_SDK_CORE_FILES_FILE ]] || GATE_SDK_CORE_FILES_FILE="$GATE_SDK_GATES_DIR/core-files.list"
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the four knobs the fifth batch's members declare, resolved here for the cause the roster above states: a default written inline at a use site or inside a helper's body is invisible to the bridge's `declare -p`, which is its undeclared-knob refusal on the member's first post-port run. Each keeps the `:-` semantics its use site had (an empty value takes the default), and the identity manifest and tests dir ride GATE_SDK_GATES_DIR's resolved value above so the pair stays one value by construction. An absent identity manifest is the gate's own optional-config branch and an absent tests dir the coverage gate's own no-pair branch, not a refusal.
-[[ -n "${GATE_SDK_IDENTITY_FILE:-}" ]] || GATE_SDK_IDENTITY_FILE="$GATE_SDK_GATES_DIR/identity.conf"
-# spec: gate-sdk/SPEC.md §check-identity — the two actual-source knobs: each names a file standing in for one thing the *clone itself* says, and each is empty by default so the gate falls through to the live git read, which is the production path. Defined rather than left unset so the bridge can find them; the family's third member is the rider's own.
-[[ -v GATE_SDK_GIT_EMAIL_FILE ]] || GATE_SDK_GIT_EMAIL_FILE=""
-[[ -v GATE_SDK_GIT_REMOTES_FILE ]] || GATE_SDK_GIT_REMOTES_FILE=""
-# spec: gate-sdk/SPEC.md §check-identity — the family's third member, the account kind's hosts file. Empty by default and *derived in the member* rather than here, on check-memory-off's cause: this knob's derivation reads $HOME, and a HOME-less derivation would yield a path under `/` that is absent, which this kind's graded absence posture reads as clean — the one false clean it exists to refuse. Empty means "derive it", never "no file".
-[[ -v GATE_SDK_GH_HOSTS_FILE ]] || GATE_SDK_GH_HOSTS_FILE=""
-# spec: gate-sdk/SPEC.md §check-identity — the host whose block the account kind reads, config-via-env on the CLI's own host-variable shape rather than a third manifest field
-[[ -n "${GATE_SDK_GH_HOST:-}" ]] || GATE_SDK_GH_HOST="github.com"
-[[ -n "${GATE_SDK_TESTS_DIR:-}" ]] || GATE_SDK_TESTS_DIR="$GATE_SDK_GATES_DIR/gate-tests"
+gate_sdk_root() {
+    ( cd "${BASH_SOURCE[0]%/*}/.." && pwd )
+}
+
+gate_sdk_gates_dir() {
+    printf '%s\n' "${GATE_SDK_GATES_DIR:-scripts}"
+}
+
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the executable suffix has one owner and no other surface spells `.exe`: given a target triple it answers for that triple, given nothing (or an empty triple, which *is* the host triple — the shape `--target`-less cargo builds for) it answers for the host
-# shellcheck disable=SC2120  # one argument-passing caller is in another file (bin/build-native.sh) and the in-file one is the artifact-names derivation far below, so an analyser reading top-down sees only the argument-less call on the next line and cannot see that the parameter is optional by contract rather than unused
+# shellcheck disable=SC2120  # the argument-passing callers are in other files (bin/build-native.sh, scripts/ci-build-artifact.sh), so an analyser reading this file sees only the argument-less call below and cannot see that the parameter is optional by contract rather than unused
 gate_exe_suffix() {
     local triple="${1:-}"
     if [[ -n "$triple" ]]; then
@@ -114,103 +37,106 @@ gate_exe_suffix() {
     MINGW* | MSYS* | CYGWIN* | Windows_NT) printf '.exe' ;;
     esac
 }
-[[ -n "${GATE_SDK_NATIVE_BIN:-}" ]] || GATE_SDK_NATIVE_BIN="native/target/release/checkwright-gates$(gate_exe_suffix)"
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the crate root is normalized where it is resolved rather than at each read, so the value the bridge carries is the canonical one gate_native_crate already printed
-[[ -n "${GATE_SDK_NATIVE_CRATE:-}" ]] || GATE_SDK_NATIVE_CRATE="native"
-GATE_SDK_NATIVE_CRATE="${GATE_SDK_NATIVE_CRATE%/}"
-# spec: gate-sdk/SPEC.md §Layout and configuration — the three crate-adjacent knobs resolved here rather than at their read sites, because the config bridge reads a declared knob through `declare -p` and an inline `${KNOB:-default}` is invisible to it. GATE_SDK_NATIVE_TARGETS_FILE keeps riding GATE_SDK_NATIVE_CRATE's already-normalized value, so the crate's location keeps one owner.
-[[ -n "${GATE_SDK_NATIVE_SRC:-}" ]] || GATE_SDK_NATIVE_SRC="$GATE_SDK_NATIVE_CRATE/src"
-[[ -n "${GATE_SDK_NATIVE_TARGETS_FILE:-}" ]] || GATE_SDK_NATIVE_TARGETS_FILE="$GATE_SDK_NATIVE_CRATE/targets.list"
-[[ -n "${GATE_SDK_NATIVE_RUNNERS_FILE:-}" ]] || GATE_SDK_NATIVE_RUNNERS_FILE="$GATE_SDK_NATIVE_CRATE/runners.list"
-[[ -n "${GATE_SDK_NATIVE_PUBLISH_WORKFLOW:-}" ]] || GATE_SDK_NATIVE_PUBLISH_WORKFLOW=".github/workflows/publish.yml"
-# spec: gate-sdk/SPEC.md §Layout and configuration — the fourth crate-adjacent knob, resolved here for the cause the three above state and riding the same already-normalized GATE_SDK_NATIVE_CRATE, which is the derivation §Layout already described. A case dir setting it is sourced by the config seam above these lines, so a fixture's redirection out of the tree still wins.
-[[ -n "${GATE_SDK_CARGO_TARGET_DIR:-}" ]] || GATE_SDK_CARGO_TARGET_DIR="$GATE_SDK_NATIVE_CRATE/target"
-# spec: gate-sdk/SPEC.md §check-exec-bit — check-exec-bit's two whitespace-scalar overrides, resolved to arrays here so the config bridge can carry them. Distinct names on §lib/gate.sh's own rule: a scalar feeding an array is the one case a resolved global earns a spelling of its own, which is why GATE_PRUNE_DIRS above has one and the scalar-in/scalar-out knobs beside it do not. The glob default rides GATE_SDK_GATES_DIR's resolved value rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction.
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-if [[ -n "${GATE_SDK_EXEC_GLOBS:-}" ]]; then
-    read -r -a GATE_EXEC_GLOBS <<<"$GATE_SDK_EXEC_GLOBS"
-else
-    GATE_EXEC_GLOBS=('*/checks/*.sh' '*/kpis/*.sh' '*/bin/*.sh'
-        "$GATE_SDK_GATES_DIR/check-*.sh" "$GATE_SDK_GATES_DIR/kpi-*.sh")
-fi
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-if [[ -n "${GATE_SDK_EXEC_PRUNE:-}" ]]; then
-    read -r -a GATE_EXEC_PRUNE <<<"$GATE_SDK_EXEC_PRUNE"
-else
-    GATE_EXEC_PRUNE=(gate-tests fixtures templates smoke)
-fi
 
-# spec: gate-sdk/SPEC.md §check-shellcheck — the lint-extra-dirs knob is a whitespace-separated scalar feeding an array, which is the one case a resolved global earns a spelling of its own; GATE_PRUNE_DIRS and GATE_EXEC_GLOBS above are the same shape for the same reason. Resolved here rather than at the use site because the config bridge reads a declared knob through `declare -p`, and a consumer that never sets it would be the bridge's undeclared-knob refusal on the member's first post-port run. Empty is the shipped default, so a consumer setting nothing keeps exactly the derived coverage.
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-if [[ -n "${GATE_SDK_LINT_EXTRA_DIRS:-}" ]]; then
-    read -r -a GATE_LINT_EXTRA_DIRS <<<"$GATE_SDK_LINT_EXTRA_DIRS"
-else
-    GATE_LINT_EXTRA_DIRS=()
-fi
+# spec: gate-sdk/SPEC.md §lib/gate.sh — one knob file's scalar line for a name, into <outvar>; returns 1 when the file names none. The binary refuses a malformed line at its first gate-sdk read, so this read skips one
+_gate_prebinary_file_value() {  # <file> <NAME> <outvar>
+    local _gpf_file="$1" _gpf_name="$2" _gpf_line _gpf_head
+    local -n _gpf_out="$3"
+    [[ -f "$_gpf_file" ]] || return 1
+    while IFS= read -r _gpf_line || [[ -n "$_gpf_line" ]]; do
+        _gpf_line="${_gpf_line#"${_gpf_line%%[![:blank:]]*}"}"
+        [[ -n "$_gpf_line" && "$_gpf_line" != \#* && "$_gpf_line" == *=* ]] || continue
+        _gpf_head="${_gpf_line%%=*}"
+        _gpf_head="${_gpf_head%"${_gpf_head##*[![:blank:]]}"}"
+        [[ "$_gpf_head" == "$_gpf_name" ]] || continue
+        _gpf_line="${_gpf_line#*=}"
+        _gpf_line="${_gpf_line#"${_gpf_line%%[![:blank:]]*}"}"
+        _gpf_out="${_gpf_line%"${_gpf_line##*[![:blank:]]}"}"
+        return 0
+    done < "$_gpf_file"
+    return 1
+}
 
-# spec: gate-sdk/SPEC.md §check-graph — check-graph's three scalar graph knobs, resolved here rather than inline at their use sites on the cause the roster above states: a default the bridge's `declare -p` cannot find is its undeclared-knob refusal on the member's first post-port run. Each keeps the `:-` semantics its use site had (an empty value takes the default), and the artifact and the theme directory ride GATE_SDK_GATES_DIR's own resolved value above so the pair stays one value by construction. Every one of them stays relative: the resolved argv is baked verbatim into the tracked pre-commit hook, and an absolute value would commit one machine's checkout path to a public file.
-[[ -n "${GATE_SDK_GRAPH_ARTIFACT:-}" ]]  || GATE_SDK_GRAPH_ARTIFACT="$GATE_SDK_GATES_DIR/CHECK-GRAPH.html"
-# spec: gate-sdk/SPEC.md §check-graph — GATE_SDK_GRAPH_THEME is RETIRED and the gate refuses, exit 2, on finding it set or on a stale <gates-dir>/graph-theme.sh; the theme is now GATE_SDK_GRAPH_THEME_DIR's directory of verbatim part files. Named here rather than deleted so a consumer grepping the kit for the old knob lands on its replacement instead of on nothing.
-[[ -n "${GATE_SDK_GRAPH_THEME_DIR:-}" ]] || GATE_SDK_GRAPH_THEME_DIR="$GATE_SDK_GATES_DIR/graph-theme"
-[[ -n "${GATE_SDK_GRAPH_MAX_EDGES:-}" ]] || GATE_SDK_GRAPH_MAX_EDGES="100000"
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the allowlist is a whitespace-separated scalar feeding an array, which is the one case a resolved global earns a spelling of its own; GATE_PRUNE_DIRS above is the same shape for the same reason.
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-if [[ -n "${GATE_SDK_GRAPH_EXTERNAL_REFS:-}" ]]; then
-    read -r -a GATE_GRAPH_EXTERNAL_REFS <<<"$GATE_SDK_GRAPH_EXTERNAL_REFS"
-else
-    GATE_GRAPH_EXTERNAL_REFS=()
-fi
-# spec: gate-sdk/SPEC.md §check-graph — the consumer's vocabulary file is sourced here rather than in the member, because the member is compiled: it receives the resolved values and never the path, so GATE_SDK_GRAPH_VOCAB is not a knob the crate declares. All six globals are defined first, so an absent vocabulary file resolves to empty arrays that disable their checks exactly as before and the bridge's does-not-define refusal cannot fire on any of them. GRAPH_LAYER_RULES and GRAPH_LAYER_DEFAULT replace the retired graph_surface_layer() hook: an ordered `<path-prefix>:<layer-id>` roster split at the last `:`, first match wins, and GRAPH_LAYER_DEFAULT is what an unmatched path resolves to — the layer the gate assigned when no consumer hook was defined.
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-GRAPH_VOCAB=()
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-GRAPH_LEADING=()
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-GRAPH_LAGGING=()
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-GRAPH_LAYERS=()
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-GRAPH_LAYER_RULES=()
-# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
-GRAPH_LAYER_DEFAULT="surfaces"
-[[ -n "${GATE_SDK_GRAPH_VOCAB:-}" ]] || GATE_SDK_GRAPH_VOCAB="$GATE_SDK_GATES_DIR/graph-vocab.sh"
-if [[ -f "$GATE_SDK_GRAPH_VOCAB" ]]; then
-    # shellcheck disable=SC1090  # consumer-supplied rule content, path is config
-    source "$GATE_SDK_GRAPH_VOCAB"
-fi
+# spec: gate-sdk/SPEC.md §lib/gate.sh — a pre-binary knob over the static precedence: the environment, the local overlay, the tracked file, then the default its caller derives as the table does; an empty value takes the default, as each of these rows does
+_gate_prebinary_knob() {  # <NAME> <default>
+    local _gpk_name="$1" _gpk_dir="${GATE_SDK_GATES_DIR:-scripts}" _gpk_v=""
+    if [[ -n "${!_gpk_name:-}" ]]; then
+        printf '%s\n' "${!_gpk_name}"
+        return 0
+    fi
+    if _gate_prebinary_file_value "$_gpk_dir/gate-sdk-config.local.knobs" "$_gpk_name" _gpk_v && [[ -n "$_gpk_v" ]]; then
+        printf '%s\n' "$_gpk_v"
+        return 0
+    fi
+    if _gate_prebinary_file_value "${GATE_SDK_KNOB_FILE:-$_gpk_dir/gate-sdk-config.knobs}" "$_gpk_name" _gpk_v && [[ -n "$_gpk_v" ]]; then
+        printf '%s\n' "$_gpk_v"
+        return 0
+    fi
+    printf '%s\n' "$2"
+}
+
+# spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_BIN, read before any binary can answer for it
+gate_native_bin() {
+    _gate_prebinary_knob GATE_SDK_NATIVE_BIN "native/target/release/checkwright-gates$(gate_exe_suffix)"
+}
+
+# spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_CRATE, its trailing `/` stripped where it resolves
+gate_native_crate() {
+    local c
+    c="$(_gate_prebinary_knob GATE_SDK_NATIVE_CRATE native)"
+    printf '%s\n' "${c%/}"
+}
+
+# spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_TARGETS_FILE, defaulted off GATE_SDK_NATIVE_CRATE so the crate's location keeps one owner
+gate_native_targets_file() {
+    _gate_prebinary_knob GATE_SDK_NATIVE_TARGETS_FILE "$(gate_native_crate)/targets.list"
+}
+
+# spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_RUNNERS_FILE, defaulted off GATE_SDK_NATIVE_CRATE beside the roster's own
+gate_native_runners_file() {
+    _gate_prebinary_knob GATE_SDK_NATIVE_RUNNERS_FILE "$(gate_native_crate)/runners.list"
+}
+
+# spec: gate-sdk/SPEC.md §The non-gate arm — the resolved value of each named static knob, read off the binary's `--emit-knob-values` arm: the crate is the value's one producer, so no bash here recomputes a default
+gate_knob_values() {
+    "$(gate_native_bin)" --emit-knob-values "$@"
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the prune set, read once on first use: the replacing knob's words, then the appending knob's, split on whitespace and expanded by nothing. It also fills GATE_GREP_EXCLUDES, which a gate splicing that array loads through this function first
+gate_prune_load() {
+    [[ -n "${_gate_prune_loaded:-}" ]] && return 0
+    local out n el
+    out="$(gate_knob_values GATE_SDK_PRUNE_DIRS GATE_SDK_PRUNE_EXTRA_DIRS)" || {
+        echo "gate-sdk: the prune set could not be read from the gate binary; treating as failure (not clean)" >&2
+        exit 2
+    }
+    _gate_prune=()
+    GATE_GREP_EXCLUDES=()
+    while IFS=$'\t' read -r n _ el; do
+        [[ -n "$n" ]] || continue
+        read -ra _gate_prune_words <<<"$el"
+        _gate_prune+=(${_gate_prune_words[@]+"${_gate_prune_words[@]}"})
+    done <<<"$out"
+    for el in ${_gate_prune[@]+"${_gate_prune[@]}"}; do GATE_GREP_EXCLUDES+=(--exclude-dir="$el"); done
+    unset _gate_prune_words
+    _gate_prune_loaded=1
+}
 
 gate_find() {
+    gate_prune_load
     local prune=() d
-    for d in "${GATE_PRUNE_DIRS[@]}"; do prune+=(-name "$d" -o); done
+    for d in ${_gate_prune[@]+"${_gate_prune[@]}"}; do prune+=(-name "$d" -o); done
     unset 'prune[${#prune[@]}-1]'
     find "$1" \( "${prune[@]}" \) -prune -o "${@:2}" -print
 }
 
-# shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
-GATE_GREP_EXCLUDES=()
-for _gpd in "${GATE_PRUNE_DIRS[@]}"; do GATE_GREP_EXCLUDES+=(--exclude-dir="$_gpd"); done
-unset _gpd
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the programs the payload is entitled to assume present, so a command-position word in this set is not a criterion-7 requirement; git is on it because §The port-candidate criteria already rules it the one sanctioned exception, "because it is the floor"
-declare -p GATE_SDK_PROGRAM_FLOOR &>/dev/null \
-    || GATE_SDK_PROGRAM_FLOOR=(awk basename bash cat cd chmod cmp comm cp cut date diff dirname
-        env find git grep head ln ls mkdir mktemp mv printf pwd realpath rm sed sh sort tail tee
-        touch tr uniq wc xargs)
-
 gate_path_pruned() {
+    gate_prune_load
     local p="$1" d
-    for d in "${GATE_PRUNE_DIRS[@]}"; do
+    for d in ${_gate_prune[@]+"${_gate_prune[@]}"}; do
         [[ "$p" == "$d/"* || "$p" == "./$d/"* || "$p" == */"$d"/* ]] && return 0
     done
     return 1
-}
-
-gate_sdk_root() {
-    ( cd "${BASH_SOURCE[0]%/*}/.." && pwd )
-}
-
-gate_sdk_gates_dir() {
-    printf '%s\n' "${GATE_SDK_GATES_DIR:-scripts}"
 }
 
 gates_list_members() {
@@ -234,270 +160,7 @@ gate_resolve() {
     return 1
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union sentinel, spelled here and in the crate's `registry::EVERY_COUPLES_KNOB`; it crosses the dispatch seam because the binary declares it and this library substitutes for it, and a crate unit test asserts this file still carries the literal so the two cannot drift apart silently.
-GATE_SDK_COUPLES_KNOB_SENTINEL='@every-couples-knob'
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the owning kit of a bridged knob, derived from the knob's own `<KIT>_` prefix rather than from a maintained knob→kit roster: each gate_kit_roots member's basename, hyphens to underscores and upper-cased, is tried as a prefix. A knob matching no other kit's prefix is gate-sdk's own — the one kit every `.gate` dispatch already runs inside — never a parse error and never a third kit guessed at.
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the configured set is consulted first, then the shipped one: GATE_SDK_KIT_DIRS narrows which kits a battery *scans*, and reading it as the set of kits that *exist* would leave a narrowed run unable to attribute another kit's knob and fail-close on every member that declares one
-_gate_knob_owning_kit() {
-    local -a _gkok_cands=()
-    local _gkok_kit
-    _gate_knob_owner_candidates _gkok_cands
-    _gate_knob_owner_match "$1" _gkok_kit "${_gkok_cands[@]}"
-    printf '%s\n' "$_gkok_kit"
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the candidates are read to EOF *before* the match loop, never streamed through a `while read` the first prefix hit returns out of: this runs under a stdout capture, so a producer left writing into a closed pipe reports the write error on stderr wherever SIGPIPE is ignored, which §run-gates' capture is what makes dispatch-fatal
-# spec: gate-sdk/SPEC.md §lib/gate.sh — fills <outvar> with `<prefix><TAB><kit>` pairs in match order, the gate-sdk root last under an empty prefix
-_gate_knob_owner_candidates() {
-    local -n _gkoc_out="$1"
-    local kit base prefix
-    local -a kits=()
-    mapfile -t kits < <(gate_kit_roots; [[ -n "${GATE_SDK_KIT_DIRS:-}" ]] && _gate_kit_roots_derived)
-    _gkoc_out=()
-    for kit in ${kits[@]+"${kits[@]}"}; do
-        kit="${kit%/}"
-        [[ -n "$kit" ]] || continue
-        base="${kit##*/}"
-        prefix="${base^^}"; prefix="${prefix//-/_}_"
-        _gkoc_out+=("$prefix"$'\t'"$kit")
-    done
-    _gkoc_out+=($'\t'"$(gate_sdk_root)")
-}
-
-_gate_knob_owner_match() {
-    local _gkom_knob="$1" _gkom_c
-    local -n _gkom_out="$2"
-    shift 2
-    for _gkom_c in "$@"; do
-        [[ "$_gkom_knob" == "${_gkom_c%%$'\t'*}"* ]] && { _gkom_out="${_gkom_c#*$'\t'}"; return 0; }
-    done
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — emit one declared knob's bridged element(s) from *inside* an already-sourced per-kit subshell: the trailing `*` selects the prefix family, anything else the scalar/keyed arm derived from `declare -p`. Returns non-zero having named the knob on stderr for each refusal.
-# spec: gate-sdk/SPEC.md §lib/gate.sh — each emitted line is prefixed `<idx><TAB>` so the batching caller can restore the requested order across kits; splitting on the first tab alone is what leaves a tab-joined value intact.
-_gate_knob_emit() {
-    local knob="$1" gate="$2" idx="$3" kit="$4"
-    if [[ "$knob" == *'*' ]]; then
-        _gate_knob_prefix_emit "${knob%\*}" "$idx"
-        return $?
-    fi
-    local _gkv_decl
-    if ! _gkv_decl="$(declare -p "$knob" 2>/dev/null)"; then
-        printf 'gate_command: %s declares knob %s, but %s/lib defines no such knob — ' "$gate" "$knob" "$kit" >&2
-        printf 'the config bridge could not resolve it; treating as failure (not clean)\n' >&2
-        return 2
-    fi
-    if [[ "$_gkv_decl" =~ ^declare[[:space:]]+-[a-zA-Z]*A ]]; then
-        local _gkv_pairs
-        _gkv_pairs="$(_gate_knob_pairs "$knob")" || return 2
-        printf '%s\tGATE_SDK_KNOB_%s=%s\n' "$idx" "$knob" "$_gkv_pairs"
-        return 0
-    fi
-    local -n _gkv_val="$knob"
-    local _gkv_e
-    for _gkv_e in "${_gkv_val[@]+"${_gkv_val[@]}"}"; do
-        case "$_gkv_e" in
-            *$'\n'*)
-                printf 'gate_command: knob %s has an element containing a newline: %s — ' "$knob" "$_gkv_e" >&2
-                printf 'the argv protocol is one element per line; treating as failure (not clean)\n' >&2
-                return 2 ;;
-            *$'\t'*)
-                printf 'gate_command: knob %s has an element containing a tab: %s — ' "$knob" "$_gkv_e" >&2
-                printf 'tab separates the serialized elements; treating as failure (not clean)\n' >&2
-                return 2 ;;
-        esac
-    done
-    local IFS=$'\t'
-    printf '%s\tGATE_SDK_KNOB_%s=%s\n' "$idx" "$knob" "${_gkv_val[*]+"${_gkv_val[*]}"}"
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the keyed arm's serialization: one `<key>=<value>` per tab-separated element, sorted by key. The sort is `LC_ALL=C` because the resolved argv is baked verbatim into the tracked pre-commit hook, so the emitted order must not depend on the invoking locale any more than it may depend on bash's hash seed. The split is on the *first* `=`, the rule `env` itself applies one level out, so only the key is constrained and a value carries `=` freely.
-_gate_knob_pairs() {
-    local -n _gkp_map="$1"
-    local knob="$1" _gkp_k _gkp_v
-    local -a _gkp_keys=() _gkp_pairs=()
-    # comment-tier-exempt: the emptiness guard is a count test rather than the `${!map[@]+…}`
-    # alternate-value form the indexed arms use — with a `!` prefix bash reads that as
-    # indirect expansion with a default and hands back the values
-    if [[ ${#_gkp_map[@]} -gt 0 ]]; then
-        for _gkp_k in "${!_gkp_map[@]}"; do
-            _gkp_v="${_gkp_map[$_gkp_k]}"
-            case "$_gkp_k$_gkp_v" in
-                *$'\n'*)
-                    printf 'gate_command: knob %s has key %s whose pair contains a newline — ' "$knob" "$_gkp_k" >&2
-                    printf 'the argv protocol is one element per line; treating as failure (not clean)\n' >&2
-                    return 2 ;;
-                *$'\t'*)
-                    printf 'gate_command: knob %s has key %s whose pair contains a tab — ' "$knob" "$_gkp_k" >&2
-                    printf 'tab separates the serialized elements; treating as failure (not clean)\n' >&2
-                    return 2 ;;
-            esac
-            case "$_gkp_k" in
-                *=*)
-                    printf 'gate_command: knob %s has key %s containing an "=" — ' "$knob" "$_gkp_k" >&2
-                    printf 'the pair splits on its first "=", so such a key is unsplittable; treating as failure (not clean)\n' >&2
-                    return 2 ;;
-            esac
-            _gkp_keys+=("$_gkp_k")
-        done
-    fi
-    if [[ ${#_gkp_keys[@]} -gt 0 ]]; then
-        while IFS= read -r _gkp_k; do
-            _gkp_pairs+=("$_gkp_k=${_gkp_map[$_gkp_k]}")
-        done < <(printf '%s\n' "${_gkp_keys[@]}" | LC_ALL=C sort)
-    fi
-    local IFS=$'\t'
-    printf '%s' "${_gkp_pairs[*]+"${_gkp_pairs[*]}"}"
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the prefix form of _gate_knob_emit: a declared name ending in `*` resolves the whole family defined under it, one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per match, sorted so the emitted environment is deterministic. Resolution happens at the same instant the scalar arm's does — inside the owning kit's already-sourced subshell, which is what puts a consumer config's loop-declared variables in scope. A prefix matching nothing is an empty family and passes. The element-shape refusals are the scalar arm's, applied per match.
-_gate_knob_prefix_emit() {
-    local prefix="$1" idx="$2"
-    local _gkp_n _gkp_e
-    local -a _gkp_names=()
-    while IFS= read -r _gkp_n; do
-        [[ "$_gkp_n" == "$prefix"* ]] && _gkp_names+=("$_gkp_n")
-    done < <(compgen -v | sort)
-    for _gkp_n in ${_gkp_names[@]+"${_gkp_names[@]}"}; do
-        # spec: gate-sdk/SPEC.md §lib/gate.sh — the family arm takes the scalar arm's associative branch rather than expanding the map: `${map[*]}` yields an associative array's *values* with its keys destroyed, so a keyed knob crossing under a family declaration would arrive unreadable by knob_map while every element-shape refusal below still passed it
-        if [[ "$(declare -p "$_gkp_n" 2>/dev/null)" =~ ^declare[[:space:]]+-[a-zA-Z]*A ]]; then
-            local _gkp_a
-            _gkp_a="$(_gate_knob_pairs "$_gkp_n")" || return 2
-            printf '%s\tGATE_SDK_KNOB_%s=%s\n' "$idx" "$_gkp_n" "$_gkp_a"
-            continue
-        fi
-        local -n _gkp_val="$_gkp_n"
-        for _gkp_e in "${_gkp_val[@]+"${_gkp_val[@]}"}"; do
-            case "$_gkp_e" in
-                *$'\n'*)
-                    printf 'gate_command: knob %s has an element containing a newline: %s — ' "$_gkp_n" "$_gkp_e" >&2
-                    printf 'the argv protocol is one element per line; treating as failure (not clean)\n' >&2
-                    return 2 ;;
-                *$'\t'*)
-                    printf 'gate_command: knob %s has an element containing a tab: %s — ' "$_gkp_n" "$_gkp_e" >&2
-                    printf 'tab separates the serialized elements; treating as failure (not clean)\n' >&2
-                    return 2 ;;
-            esac
-        done
-        ( IFS=$'\t'; printf '%s\tGATE_SDK_KNOB_%s=%s\n' "$idx" "$_gkp_n" "${_gkp_val[*]+"${_gkp_val[*]}"}" )
-        unset -n _gkp_val
-    done
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — one owning kit's whole requested slice, resolved in **one** subshell: the kit's lib/*.sh is sourced once for the batch rather than once per knob, and every requested name owned by that kit is emitted from inside it. This is the batch: a knob's resolved value is a function of the knob name and the tree's config alone (no resolver reads the requesting member), so a per-run resolution is value-identical to a per-member one. A refusal on any member of the slice fails the whole call, because a partially resolved environment is the fail-open the does-not-define refusal exists against.
-_gate_knob_kit_emit() {
-    local kit="$1" gate="$2"
-    shift 2
-    local -a _gkk_pairs=("$@")
-    local _gkk_i
-    local -a _gkk_names=()
-    for (( _gkk_i = 1; _gkk_i < ${#_gkk_pairs[@]}; _gkk_i += 2 )); do
-        _gkk_names+=("${_gkk_pairs[$_gkk_i]}")
-    done
-    local _gkk_set
-    printf -v _gkk_set '%s\n' "${_gkk_names[@]}"
-    _gkk_set="${_gkk_set%$'\n'}"
-    (
-        shopt -s nullglob
-        # spec: gate-sdk/SPEC.md §lib/gate.sh — the knob *set* under resolution, published to
-        # the kit libraries being sourced, so a library whose knob costs a subprocess computes
-        # the ones this batch asked for and no others
-        export GATE_SDK_RESOLVING_KNOB="$_gkk_set"
-        local _gkk_f
-        for _gkk_f in "$kit"/lib/*.sh; do
-            # shellcheck disable=SC1090  # the owning kit's library, resolved by prefix
-            source "$_gkk_f"
-        done
-        local _gkk_j
-        for (( _gkk_j = 0; _gkk_j < ${#_gkk_pairs[@]}; _gkk_j += 2 )); do
-            _gate_knob_emit "${_gkk_pairs[$(( _gkk_j + 1 ))]}" "$gate" "${_gkk_pairs[$_gkk_j]}" "$kit" || exit 2
-        done
-    )
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged environment for one binary arm, whether that arm is a `.gate`-dispatched gate or a non-gate arm a front-end invokes (§The non-gate arm): asks the binary what the arm reads — handing it the arm's own argv, since a dispatching arm's declared set is scoped by it — resolves the whole declared set through gate_knob_env_set, and emits one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per line. Returns non-zero having named the refusal on stderr — the status is the caller's to propagate, which is why this prints to stdout for a `$(…)` capture rather than writing into a process substitution that would swallow it.
-gate_knob_env() {
-    local g="$1" bin knob_names knob_status knob
-    shift
-    bin="$(gate_native_bin)"
-    knob_names="$("$bin" --knobs "$g" "$@" 2>&1)"; knob_status=$?
-    if [[ "$knob_status" -ne 0 ]]; then
-        # spec: gate-sdk/SPEC.md §The non-gate arm — the refusal names the arm's WHOLE argv, because
-        # a two-token arm reported by its flag alone names something that is not the arm, at the one
-        # moment the reader is trying to learn what the arm set is
-        local subject="$g"
-        [[ "$#" -gt 0 ]] && subject="$g $*"
-        printf 'gate_command: %s --knobs %s exited %s — the config bridge could not ' "$bin" "$subject" "$knob_status" >&2
-        printf 'report what %s reads; treating as failure (not clean)\n%s\n' "$subject" "$knob_names" >&2
-        return 2
-    fi
-    local -a names=()
-    while IFS= read -r knob; do
-        [[ -n "$knob" ]] || continue
-        names+=("$knob")
-    done <<<"$knob_names"
-    [[ ${#names[@]} -gt 0 ]] || return 0
-    gate_knob_env_set "$g" "${names[@]}"
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the declared set resolved **batched by owning kit**: the names are partitioned by owning kit against a candidate set filled once per call, each kit's slice is resolved in one subshell that sources that kit's lib/*.sh once, and the elements are re-emitted in the *requested* order so the argv a caller receives is unchanged by the batching. Split out from gate_knob_env so a caller already holding a name set — the battery front-end resolving the runner's union — shares one implementation of the partition and the ordering.
-gate_knob_env_set() {
-    local g="$1"
-    shift
-    local -a names=()
-    local _gkes_n
-    for _gkes_n in "$@"; do
-        # spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union sentinel's receiving half. A member that expands another member's couples= cannot name those knobs in its own compile-time entry, so it declares this one name and the bridge substitutes the set the descriptor corpus carries. Expanded here rather than in gate_knob_env, so the arity-one face and the battery front-end's union resolve it through the same substitution.
-        if [[ "$_gkes_n" == "$GATE_SDK_COUPLES_KNOB_SENTINEL" ]]; then
-            local -a _gkes_derived=()
-            local _gkes_out
-            _gkes_out="$(_gate_couples_knob_names)" || return 2
-            if [[ -n "$_gkes_out" ]]; then
-                mapfile -t _gkes_derived <<<"$_gkes_out"
-                names+=("${_gkes_derived[@]}")
-            fi
-            continue
-        fi
-        names+=("$_gkes_n")
-    done
-    [[ ${#names[@]} -gt 0 ]] || return 0
-    local -A kit_slice=()
-    local -a kit_order=() owners=()
-    local i knob kit
-    _gate_knob_owner_candidates owners
-    for i in "${!names[@]}"; do
-        knob="${names[$i]}"
-        _gate_knob_owner_match "${knob%\*}" kit "${owners[@]}"
-        [[ -v kit_slice["$kit"] ]] || kit_order+=("$kit")
-        kit_slice["$kit"]+="$i"$'\n'"$knob"$'\n'
-    done
-    local -A by_idx=()
-    local -a slice=()
-    local out line idx rest
-    for kit in "${kit_order[@]}"; do
-        slice=()
-        mapfile -t slice <<<"${kit_slice[$kit]%$'\n'}"
-        out="$(_gate_knob_kit_emit "$kit" "$g" "${slice[@]}")" || return 2
-        [[ -n "$out" ]] || continue
-        while IFS= read -r line; do
-            idx="${line%%$'\t'*}"
-            rest="${line#*$'\t'}"
-            by_idx["$idx"]+="$rest"$'\n'
-        done <<<"$out"
-    done
-    for i in "${!names[@]}"; do
-        [[ -v by_idx["$i"] ]] || continue
-        printf '%s' "${by_idx[$i]}"
-    done
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — one declared name resolved to its bridged element(s): the arity-one face of gate_knob_env_set, for a harness resolving a single knob rather than a member's whole declared set. Which arm a name takes stays derived from its spelling in one place rather than re-derived per caller.
-gate_knob_env_one() {
-    gate_knob_env_set "$2" "$1"
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, the execution counterpart of gate_resolve's declaration path: one element `<dir>/<name>.sh` for a shell gate, two elements `<binary> <name>` for a `.gate`-dispatched one — prefixed, when that member declares knobs, by `env` and one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per knob. Emits one argv element per line, so a caller looking for the dispatch executable takes the first element that is neither `env` nor an assignment. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract): a skip would let the battery silently stop running a gate whenever a build is missing. A binary that cannot report its knobs, and any of the bridge's knob-resolution refusals (§lib/gate.sh, which owns the roster and its count), exit 2 by the same contract.
+# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, one element per line: `<dir>/<name>.sh` for a shell gate, `<binary> <name>` for a `.gate`-dispatched one. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract).
 gate_command() {
     local g="$1" d bin
     shift
@@ -514,29 +177,11 @@ gate_command() {
                 printf 'failure (not clean). Build it: bash gate-sdk/bin/build-native.sh\n' >&2
                 exit 2
             fi
-            local env_out
-            env_out="$(gate_knob_env "$g")" || exit 2
-            local -a env_elems=()
-            [[ -n "$env_out" ]] && mapfile -t env_elems <<<"$env_out"
-            if [[ ${#env_elems[@]} -gt 0 ]]; then
-                printf 'env\n'
-                printf '%s\n' "${env_elems[@]}"
-            fi
             printf '%s\n%s\n' "$bin" "$g"
             return 0
         fi
     done
     return 1
-}
-
-# spec: gate-sdk/SPEC.md §Layout and configuration — the accessor for GATE_SDK_NATIVE_BIN, whose default is resolved at the top of this library so the bridge can find it; a knob default gains readers without gaining spellings
-gate_native_bin() {
-    printf '%s\n' "$GATE_SDK_NATIVE_BIN"
-}
-
-# spec: gate-sdk/SPEC.md §Layout and configuration — the accessor for GATE_SDK_NATIVE_CRATE, resolved and trailing-slash-stripped at the top of this library, so its three shell readers share a spelling rather than each carrying one
-gate_native_crate() {
-    printf '%s\n' "$GATE_SDK_NATIVE_CRATE"
 }
 
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the authoring-tree test: this tree carries the crate's *tracked source*, which is what makes it the tree that declared the kits it carries rather than a tree that vendored them. Source, so build output under the crate root cannot read as authorship. One holder for a predicate its readers scope themselves by; its honest limit is that it is tree-shaped, so a consumer authoring its own kit beside vendored ones reads as non-authoring.
@@ -551,11 +196,6 @@ gate_authoring_tree() {
 gate_native_module() {
     local g="${1#check-}"
     printf '%s/src/gates/%s.rs\n' "$(gate_native_crate)" "${g//-/_}"
-}
-
-# spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_TARGETS_FILE, defaulted off GATE_SDK_NATIVE_CRATE so the crate's location keeps one owner
-gate_native_targets_file() {
-    printf '%s\n' "$GATE_SDK_NATIVE_TARGETS_FILE"
 }
 
 # spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the tree side of the source stamp: the same three git invocations native/build.rs bakes into the binary, so the comparison stays one algorithm rather than two implementations of one. Returns 1 emitting nothing when git cannot answer, so a caller fails closed rather than comparing against an empty string.
@@ -586,11 +226,6 @@ gate_native_targets() {
     gates_list_members "$f"
 }
 
-# spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_RUNNERS_FILE, defaulted off GATE_SDK_NATIVE_CRATE beside the roster's own so the crate's location keeps one owner
-gate_native_runners_file() {
-    printf '%s\n' "$GATE_SDK_NATIVE_RUNNERS_FILE"
-}
-
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the target-to-runner map's single reader: it prints the runner one target is built on and returns 1 emitting nothing for a target the map does not name, so a caller refuses that target rather than picking a host for it. An absent map returns 1 for every target, which is the same refusal reached one step earlier.
 gate_native_runner() {
     local target="$1" f line
@@ -607,248 +242,82 @@ gate_native_runner() {
     return 1
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the shipped kit set, by the checks/-or-smoke/ predicate alone: what a tree *contains*, before GATE_SDK_KIT_DIRS narrows what a battery scans
-_gate_kit_roots_derived() {
-    local d kit sdk parent
-    sdk="$(gate_sdk_root)"
-    printf '%s\n' "$sdk"
-    parent="${sdk%/*}"
-    for d in "$parent"/*/; do
-        kit="${d%/}"
-        [[ "$kit" == "$sdk" ]] && continue
-        [[ -d "$kit/checks" || -d "$kit/smoke" ]] || continue
-        printf '%s\n' "$kit"
-    done
-    return 0
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the kit-root override resolved onto its own name, empty meaning the derived set, so the bridge carries it to the crate's kit-root derivation
-[[ -v GATE_SDK_KIT_DIRS ]] || GATE_SDK_KIT_DIRS=""
+# spec: gate-sdk/SPEC.md §Layout and configuration — the kit roots the gate binary derives from the GATE_SDK_ROOT locator and the GATE_SDK_KIT_DIRS override, one per line relative to the working directory
 gate_kit_roots() {
-    local d
-    if [[ -n "${GATE_SDK_KIT_DIRS:-}" ]]; then
-        for d in $GATE_SDK_KIT_DIRS; do printf '%s\n' "$d"; done
-        return 0
-    fi
-    _gate_kit_roots_derived
+    GATE_SDK_ROOT="${GATE_SDK_ROOT:-$(gate_sdk_root)}" "$(gate_native_bin)" --emit-kit-roots
 }
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the kit's own root as a bridgeable variable, spelled relative to the current directory, for the static derived defaults that read it until gate-sdk's cut
-GATE_SDK_ROOT_HERE="$(gate_sdk_root)"
-if [[ "$GATE_SDK_ROOT_HERE" == "$PWD"/* ]]; then
-    GATE_SDK_ROOT_HERE="${GATE_SDK_ROOT_HERE#"$PWD"/}"
-elif [[ "$GATE_SDK_ROOT_HERE" == /* ]]; then
-    # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; a bridged value relativized against the cwd keeps an absolute path out of the tracked hook
-    GATE_SDK_ROOT_HERE="$(realpath --relative-to="$PWD" "$GATE_SDK_ROOT_HERE" 2>/dev/null \
-        || printf '%s' "$GATE_SDK_ROOT_HERE")"
-fi
 
 gate_check_dirs() {
     gate_sdk_gates_dir
-    local k
+    local k roots
+    roots="$(gate_kit_roots)" || return 2
     while IFS= read -r k; do
-        printf '%s/checks\n' "$k"
-    done < <(gate_kit_roots)
+        [[ -n "$k" ]] && printf '%s/checks\n' "$k"
+    done <<<"$roots"
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the gate_kit_roots_rel cache-fill, split out so an in-process caller (gate_expand_couples) can prime the shared _gate_kit_roots_rel_cache array and read it directly, with no stdout round-trip / process-substitution fork of its own. The kit-root set cannot change mid-process, so a cold-cache fill (the realpath-per-root fork cost) happens at most once per gate invocation.
-_gate_kit_roots_rel_ensure_cache() {
-    [[ -n "${_gate_kit_roots_rel_cache_set:-}" ]] && return 0
-    local anchor root
-    anchor="${GATE_SDK_ROOT:-$(gate_sdk_root)}"
-    [[ "$anchor" == /* ]] || anchor="$(cd "$anchor" 2>/dev/null && pwd)" || anchor="$(gate_sdk_root)"
-    anchor="${anchor%/*}"
-    _gate_kit_roots_rel_cache=()
-    while IFS= read -r root; do
-        # spec: gate-sdk/SPEC.md §lib/gate.sh — a root already under the anchor is the
-        # common case and its relative form is the string remainder, so the realpath fork
-        # is paid only for the exotic root that is not
-        if [[ "$root" == "$anchor"/* ]]; then
-            root="${root#"$anchor"/}"
-        elif [[ "$root" == /* ]]; then
-            # portability-declared: docs/install.md §Requirements pins GNU coreutils and names this long option as the binding construct; this is the exotic-root fork the cache-fill above pays for at most once
-            root="$(realpath --relative-to="$anchor" "$root" 2>/dev/null || printf '%s' "$root")"
-        fi
-        _gate_kit_roots_rel_cache+=("$root")
-    done < <(gate_kit_roots)
-    _gate_kit_roots_rel_cache_set=1
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_kit_roots as repo-root-relative dirs (the anchor the couples globs share); absolute roots resolve against the kits' parent, relative roots (a GATE_SDK_KIT_DIRS override) pass through
-gate_kit_roots_rel() {
-    _gate_kit_roots_rel_ensure_cache
-    printf '%s\n' "${_gate_kit_roots_rel_cache[@]}"
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the memo is scoped to one *sourcing* of this library rather than to the process: _gate_knob_kit_emit resolves a kit's knob slice in a subshell that inherits the dispatcher's shell variables, so a memo carried across the re-source would hand a bridged member the dispatcher's kit-root set instead of the one the consumer config in scope resolves
-unset _gate_kit_roots_rel_cache_set
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the anchored spelling as a bridgeable variable, GATE_KIT_ROOTS' counterpart: a binary-side member needing repo-relative roots (a pathspec, a knob-prefix owner) reads this rather than re-deriving the anchor rule, which an override makes underivable from the absolute set alone
-_gate_kit_roots_rel_ensure_cache
-# shellcheck disable=SC2034  # read across the dispatch seam, never in this shell: the config bridge resolves it by name for a member that declares it
-GATE_KIT_ROOTS_REL=("${_gate_kit_roots_rel_cache[@]}")
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — every knob name the descriptor corpus's couples=/trigger= fields carry in a knob:<NAME> token, derived from the surface the names are written on so a newly written token cannot be forgotten. One grep over the whole corpus rather than a field read per descriptor, because the set is wanted once per process and a fork per member would be paid on every battery run.
-# spec: gate-sdk/SPEC.md §The path-dialect contract — an unmatched glob is filtered by testing the path rather than by toggling `nullglob`: `shopt -p` exits non-zero when the option is unset, so saving and restoring it aborts this function under a caller's `set -e` and the derivation silently returns nothing.
-_gate_couples_knob_names() {
-    _gate_couples_knob_partition bridged
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the same derivation's statically owned half, whose members come from the binary's `--emit-knob-values` arm rather than from the bridge
-_gate_couples_static_knob_names() {
-    _gate_couples_knob_partition static
-}
-
-_gate_couples_knob_partition() {
-    local want="$1" line kv tok d f dirs
+# spec: gate-sdk/SPEC.md §lib/gate.sh — every `knob:` token the descriptor corpus carries, resolved in one binary call once per process and held by name, and the kit roots read once beside them
+_gate_couples_ensure() {
+    [[ -n "${_gate_couples_loaded:-}" ]] && return 0
+    local dirs d f line kv tok out n el roots
     local -a files=() names=() parts=()
-    dirs="$(gate_check_dirs)"
+    declare -gA _GATE_COUPLES_VALUES=()
+    _gate_couples_roots=()
+    roots="$(gate_kit_roots)" || return 2
+    [[ -n "$roots" ]] && mapfile -t _gate_couples_roots <<<"$roots"
+    dirs="$(gate_check_dirs)" || return 2
     while IFS= read -r d; do
         [[ -n "$d" ]] || continue
         for f in "$d"/*.gate "$d"/*.sh; do
             [[ -f "$f" ]] && files+=("$f")
         done
     done <<<"$dirs"
-    [[ ${#files[@]} -gt 0 ]] || return 0
-    local manifests
-    manifests="$(grep -h '^# graph: ' "${files[@]}" 2>/dev/null || true)"
-    [[ -n "$manifests" ]] || return 0
-    while IFS= read -r line; do
-        for kv in ${line#\# graph: }; do
-            case "$kv" in couples=*|trigger=*) ;; *) continue ;; esac
-            IFS=',' read -ra parts <<<"${kv#*=}"
-            for tok in ${parts[@]+"${parts[@]}"}; do
-                [[ "$tok" == knob:* ]] && names+=("${tok#knob:}")
+    if [[ ${#files[@]} -gt 0 ]]; then
+        while IFS= read -r line; do
+            for kv in ${line#\# graph: }; do
+                case "$kv" in couples=*|trigger=*) ;; *) continue ;; esac
+                IFS=',' read -ra parts <<<"${kv#*=}"
+                for tok in ${parts[@]+"${parts[@]}"}; do
+                    [[ "$tok" == knob:* ]] && names+=("${tok#knob:}")
+                done
             done
-        done
-    done <<<"$manifests"
-    [[ ${#names[@]} -gt 0 ]] || return 0
-    # spec: gate-sdk/SPEC.md §lib/gate.sh — a statically owned name is dropped by the same rule the crate's derivation applies, learned from the binary's knob roster rather than from a second list
-    local roster roster_name
-    local -A static_names=()
-    roster="$("$(gate_native_bin)" --emit-knob-roster)" || {
-        printf '_gate_couples_knob_names: %s --emit-knob-roster failed — the couples-knob set could not be derived; treating as failure (not clean)\n' "$(gate_native_bin)" >&2
-        return 2
-    }
-    while IFS=$'\t' read -r roster_name _; do
-        [[ -n "$roster_name" ]] && static_names["$roster_name"]=1
-    done <<<"$roster"
-    local -a picked=() statics=()
-    for roster_name in "${names[@]}"; do
-        if [[ -v static_names["$roster_name"] ]]; then
-            statics+=("$roster_name")
-        else
-            picked+=("$roster_name")
-        fi
-    done
-    if [[ "$want" == static ]]; then
-        picked=(${statics[@]+"${statics[@]}"})
-    elif [[ ${#statics[@]} -gt 0 ]]; then
-        # spec: gate-sdk/SPEC.md §The knob file — a static token still needs the bridged inputs its derived default reads, and the binary's closure answers which
-        local closure
-        closure="$("$(gate_native_bin)" --knobs --emit-knob-values "${statics[@]}")" || {
-            printf '_gate_couples_knob_names: %s --knobs --emit-knob-values failed — the couples-knob set could not be derived; treating as failure (not clean)\n' "$(gate_native_bin)" >&2
+        done < <(grep -h '^# graph: ' "${files[@]}" 2>/dev/null || true)
+    fi
+    if [[ ${#names[@]} -gt 0 ]]; then
+        out="$(gate_knob_values "${names[@]}")" || {
+            printf 'gate_expand_couples: the couples knob tokens could not be read from the gate binary — an empty expansion is a lost trigger; treating as failure (not clean)\n' >&2
             return 2
         }
-        [[ -n "$closure" ]] && mapfile -t -O "${#picked[@]}" picked <<<"$closure"
+        while IFS=$'\t' read -r n _ el; do
+            [[ -n "$n" ]] || continue
+            if [[ -v _GATE_COUPLES_VALUES["$n"] && -n "${_GATE_COUPLES_VALUES[$n]}" ]]; then
+                _GATE_COUPLES_VALUES["$n"]+=$'\t'"$el"
+            else
+                _GATE_COUPLES_VALUES["$n"]="$el"
+            fi
+        done <<<"$out"
     fi
-    [[ ${#picked[@]} -gt 0 ]] || return 0
-    printf '%s\n' "${picked[@]}" | LC_ALL=C sort -u
+    _gate_couples_loaded=1
 }
 
-# spec: gate-sdk/SPEC.md §The non-gate arm — the resolved value of each named static knob, read off the binary's `--emit-knob-values` arm run under its own bridged environment: the crate is the value's one producer, so no bash here parses a knob file or recomputes a default
-gate_knob_values() {
-    local _gkv_env
-    local -a _gkv_elems=()
-    _gkv_env="$(gate_knob_env --emit-knob-values "$@")" || return 2
-    [[ -n "$_gkv_env" ]] && mapfile -t _gkv_elems <<<"$_gkv_env"
-    env ${_gkv_elems[@]+"${_gkv_elems[@]}"} "$(gate_native_bin)" --emit-knob-values "$@"
-}
-
-# spec: gate-sdk/SPEC.md §The knob file — a bridged config's read of one static indexed knob into an array: it copies the arm's third column and computes nothing. Transitional, retired with this library at gate-sdk's cut.
-gate_static_knob() {  # <NAME> <array-outvar>
-    local _gsk_name="$1" _gsk_out _gsk_n _gsk_shape _gsk_el
-    local -n _gsk_arr="$2"
-    if ! _gsk_out="$(gate_knob_values "$_gsk_name")"; then
-        printf 'gate_static_knob: %s could not be read from the binary — treating as failure (not clean)\n' "$_gsk_name" >&2
-        return 2
-    fi
-    _gsk_arr=()
-    while IFS=$'\t' read -r _gsk_n _gsk_shape _gsk_el; do
-        [[ -n "$_gsk_n" ]] || continue
-        if [[ "$_gsk_shape" != indexed ]]; then
-            printf 'gate_static_knob: %s is a %s knob, and an array read takes an indexed one — treating as failure (not clean)\n' "$_gsk_name" "$_gsk_shape" >&2
-            return 2
-        fi
-        [[ -n "$_gsk_el" ]] && _gsk_arr+=("$_gsk_el")
-    done <<<"$_gsk_out"
-    return 0
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — every static knob a `knob:` token names, read once per process in one arm call and held by name, never exported as a GATE_SDK_KNOB_ variable: a static name is never bridged
-_gate_couples_static_bridge() {
-    [[ -n "${_gate_couples_static_bridged:-}" ]] && return 0
-    _gate_couples_static_bridged=1
-    declare -gA _GATE_COUPLES_STATIC=()
-    local derived out n el
-    local -a names=()
-    derived="$(_gate_couples_static_knob_names)" || return 2
-    [[ -n "$derived" ]] || return 0
-    mapfile -t names <<<"$derived"
-    out="$(gate_knob_values "${names[@]}")" || return 2
-    while IFS=$'\t' read -r n _ el; do
-        [[ -n "$n" ]] || continue
-        if [[ -v _GATE_COUPLES_STATIC["$n"] && -n "${_GATE_COUPLES_STATIC[$n]}" ]]; then
-            _GATE_COUPLES_STATIC["$n"]+=$'\t'"$el"
-        else
-            _GATE_COUPLES_STATIC["$n"]="$el"
-        fi
-    done <<<"$out"
-}
-
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union resolved into this shell's own environment, once per process: a shell reader expands *another* member's couples= and so needs values outside its own declared set. A refusal anywhere in the slice fails the call, because a partially resolved environment is the fail-open an empty expansion would be.
-_gate_couples_knob_bridge() {
-    [[ -n "${_gate_couples_knob_bridged:-}" ]] && return 0
-    _gate_couples_knob_bridged=1
-    local out line derived
-    local -a names=()
-    derived="$(_gate_couples_knob_names)" || return 2
-    [[ -n "$derived" ]] || return 0
-    mapfile -t names <<<"$derived"
-    out="$(gate_knob_env_set couples-expansion "${names[@]}")" || return 2
-    while IFS= read -r line; do
-        [[ -n "$line" ]] && export "${line?}"
-    done <<<"$out"
-}
-
-# spec: gate-sdk/SPEC.md §The `# graph:` manifest — expand a comma-joined couples/trigger field in two passes in a fixed order: knob:<NAME> to that knob's bridged members, then kit:<glob> to <kit-root>/<glob> for every gate_kit_roots_rel member, so a knob member spelled kit:<glob> composes; anything else passes through verbatim. One pass each bounds the expansion without a cycle detector. Assigns into the caller's <outvar> by nameref rather than printing, so a per-manifest-line loop calls this directly (no `$(...)` fork) and the whole loop shares one _gate_kit_roots_rel_ensure_cache fill instead of paying it — and forking — once per line. gate_expand_couples below is the same expansion for a caller that still wants the stdout form.
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — expand a comma-joined couples/trigger field in two passes in a fixed order: knob:<NAME> to that knob's members, then kit:<glob> to <kit-root>/<glob> for every kit root, so a knob member spelled kit:<glob> composes; anything else passes through verbatim. One pass each bounds the expansion without a cycle detector. Assigns into the caller's <outvar> by nameref rather than printing, so a per-manifest-line loop calls this directly with no fork.
 # spec: gate-sdk/SPEC.md §Fail-closed contract — every knob-token refusal returns non-zero having named the knob on stderr, never an expansion missing the token's members: a silently lost trigger is a gate the hook stops running.
 gate_expand_couples_var() {
     local -n _gate_expand_couples_out="$1"
     local field="$2"
     local -a parts=() once=() out=() members=()
-    _gate_kit_roots_rel_ensure_cache
     IFS=',' read -ra parts <<<"$field"
-    local tok r glob name var m value
+    local tok r glob name m value
     for tok in "${parts[@]}"; do
         if [[ "$tok" == knob:* ]]; then
+            _gate_couples_ensure || return 2
             name="${tok#knob:}"
-            var="GATE_SDK_KNOB_$name"
-            if [[ -v "$var" ]]; then
-                value="${!var}"
-            else
-                _gate_couples_static_bridge || return 2
-                if [[ -v _GATE_COUPLES_STATIC["$name"] ]]; then
-                    value="${_GATE_COUPLES_STATIC[$name]}"
-                else
-                    _gate_couples_knob_bridge || return 2
-                    if [[ ! -v "$var" ]]; then
-                        printf 'gate_expand_couples: couples token knob:%s names a knob the config bridge could not carry — ' "$name" >&2
-                        printf 'an empty expansion is a lost trigger; treating as failure (not clean)\n' >&2
-                        return 2
-                    fi
-                    value="${!var}"
-                fi
+            if [[ ! -v _GATE_COUPLES_VALUES["$name"] ]]; then
+                printf 'gate_expand_couples: couples token knob:%s names a knob the gate binary could not resolve — ' "$name" >&2
+                printf 'an empty expansion is a lost trigger; treating as failure (not clean)\n' >&2
+                return 2
             fi
+            value="${_GATE_COUPLES_VALUES[$name]}"
             members=()
             [[ -n "$value" ]] && IFS=$'\t' read -ra members <<<"$value"
             for m in ${members[@]+"${members[@]}"}; do
@@ -870,8 +339,9 @@ gate_expand_couples_var() {
     done
     for tok in ${once[@]+"${once[@]}"}; do
         if [[ "$tok" == kit:* ]]; then
+            _gate_couples_ensure || return 2
             glob="${tok#kit:}"
-            for r in "${_gate_kit_roots_rel_cache[@]}"; do out+=("${r%/}/$glob"); done
+            for r in ${_gate_couples_roots[@]+"${_gate_couples_roots[@]}"}; do out+=("${r%/}/$glob"); done
         else
             out+=("$tok")
         fi
@@ -910,28 +380,25 @@ gate_staged_matches() {
     return 1
 }
 
-# spec: gate-sdk/SPEC.md §check-commit-msg — resolve the banned-pattern file set shared by check-commit-msg and check-tree-terms: explicit positional args win; otherwise GATE_SDK_MSG_PATTERN_FILES (tracked, must exist — fail-closed) plus GATE_SDK_MSG_PATTERN_FILES_LOCAL (gitignored, skipped when absent). Emits one existing readable file path per line; returns 2 when a required tracked file is missing.
+# spec: gate-sdk/SPEC.md §check-commit-msg — resolve the banned-pattern file set shared by check-commit-msg and check-tree-terms: explicit positional args win; otherwise GATE_SDK_MSG_PATTERN_FILES (tracked, must exist — fail-closed) plus GATE_SDK_MSG_PATTERN_FILES_LOCAL (gitignored, skipped when absent). Both are whitespace lists split with no expansion. Emits one existing readable file path per line; returns 2 when a required tracked file is missing.
 gate_msg_pattern_files() {
     if [[ $# -gt 0 ]]; then
         printf '%s\n' "$@"
         return 0
     fi
-    local f
-    for f in "${GATE_MSG_PATTERN_FILES[@]}"; do
+    local f dir="${GATE_SDK_GATES_DIR:-scripts}"
+    local -a required=() local_files=()
+    read -ra required <<<"$(_gate_prebinary_knob GATE_SDK_MSG_PATTERN_FILES "$dir/msg-patterns.list")"
+    read -ra local_files <<<"$(_gate_prebinary_knob GATE_SDK_MSG_PATTERN_FILES_LOCAL "$dir/msg-patterns.local.list")"
+    for f in ${required[@]+"${required[@]}"}; do
         [[ -f "$f" ]] || { echo "gate_msg_pattern_files: required tracked pattern file missing: $f" >&2; return 2; }
         [[ -r "$f" ]] || { echo "gate_msg_pattern_files: pattern file not readable: $f" >&2; return 2; }
         printf '%s\n' "$f"
     done
-    for f in "${GATE_MSG_PATTERN_FILES_LOCAL[@]}"; do
+    for f in ${local_files[@]+"${local_files[@]}"}; do
         [[ -f "$f" && -r "$f" ]] && printf '%s\n' "$f"
     done
     return 0
-}
-
-# spec: gate-sdk/SPEC.md §check-commit-subject — the single home of the commit-type roster (check-commit-subject's type alternation; the trajectory arm and kpi-task-split classify over the same tokens). The default resolves onto the knob's own name so `declare -p` can find it, the shape §lib/gate.sh's document knobs already take: the compiled member declares GATE_SDK_COMMIT_TYPES, and a value no kit library defines is the config bridge's undeclared-knob refusal. Nothing moves but where the default is written — this stays the one place the roster is computed, and gate_commit_types stays its accessor, emitting the space-separated roster on one line.
-[[ -n "${GATE_SDK_COMMIT_TYPES:-}" ]] || GATE_SDK_COMMIT_TYPES="feat fix refactor perf docs test build ci chore style"
-gate_commit_types() {
-    printf '%s\n' "$GATE_SDK_COMMIT_TYPES"
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the self-repo blob-link prefix `<identity>/blob/<ref>/`, shared by check-md-refs' resolver and the reference-link producers (the enforcement map) so an emitted link and the pass that validates it derive one identity. Identity comes from `git remote get-url origin`; the git@ and https remote forms normalize to one https identity, so no kit ships a repo name (the provenance seam holds). Empty output ⇒ no origin or an unrecognized remote form, and the caller skips the self-repo pass. The ref is the caller's policy arg, never a literal here.

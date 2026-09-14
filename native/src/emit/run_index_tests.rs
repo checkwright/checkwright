@@ -1,5 +1,5 @@
 // spec: context-kit/SPEC.md §Testing — the expected-output runner for the advisory index-first
-// tools and the always-loaded meter, bridged as an `Arm::Run` member: the three-valued exit is the
+// tools and the always-loaded meter, an `Arm::Run` member: the three-valued exit is the
 // contract and `Arm::Emit` collapses it.
 // spec: context-kit/SPEC.md §Testing — the checks reach their arms through the `--emit` front-end
 // rather than through the binary, which is the property the port must not lose.

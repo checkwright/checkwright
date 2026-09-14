@@ -223,7 +223,7 @@ pub fn diagnose() -> Report {
             // after install, and the path comes from the knob that owns it, not a stored copy.
             let (target, digest) = manifest.artifact();
             if !target.is_empty() {
-                let seam = manifest.own_file(&format!("{}/gate-sdk-config.sh", GATES_DIR));
+                let seam = manifest.own_file(&format!("{}/gate-sdk-config.knobs", GATES_DIR));
                 let bin = seam_binary(&root, &seam);
                 // spec: installer/README.md §doctor — an artifact finding reports without setting
                 // the verdict, deliberately: the status is the toolchain contract init gates on, so
@@ -283,9 +283,12 @@ fn seam_binary(root: &std::path::Path, seam: &str) -> Option<String> {
         return None;
     }
     let text = std::fs::read_to_string(root.join(seam)).ok()?;
-    let rel = text
-        .lines()
-        .find_map(|l| l.strip_prefix("GATE_SDK_NATIVE_BIN="))?;
+    let rel = crate::knobfile::parse(&text, seam)
+        .ok()?
+        .into_iter()
+        .find(|e| e.name == "GATE_SDK_NATIVE_BIN" && e.form == crate::knobfile::Form::Scalar)?
+        .value;
+    let rel = rel.as_str();
     if rel.is_empty() || !root.join(rel).is_file() {
         return None;
     }

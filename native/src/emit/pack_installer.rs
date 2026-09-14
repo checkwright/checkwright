@@ -1,7 +1,7 @@
 // spec: installer/README.md §The packer — assemble the installer package out of tree and npm-pack
 // it there; the payload is derived from the consumer's own kit roots at pack time, so no second
 // copy of any kit is ever checked in or written inside the worktree
-// spec: gate-sdk/SPEC.md §The non-gate arm — a bridged `Arm::Run` and not an `--emit-` member: the
+// spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` and not an `--emit-` member: the
 // product is a tarball plus a receipt, so an emitting arm would return a receipt for a side effect
 use crate::ere::Ere;
 use crate::proc::{self, Stderr};
@@ -175,7 +175,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
 
     pack_tracked(&commit, "installer", &asm)?;
 
-    // spec: installer/README.md §The packer — the payload's kit set is gate_kit_roots_rel, the same
+    // spec: installer/README.md §The packer — the payload's kit set is `walk::kit_roots_rel`, the same
     // derivation the battery runs on, so the shipped set cannot drift from the governed one
     mkdir(&format!("{}/payload", asm))?;
     let mut packed = 0usize;

@@ -7,7 +7,7 @@ set -uo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
 REPO_ROOT="$(pwd -P)"
 
-# spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]. The queue index and the three index arms are reached through the battery runner's --emit front-end rather than by tool path: the front-end sources the shell library and supplies the bridged environment, so a consumer's section and cap overrides reach the arm (gate-sdk/SPEC.md §The non-gate arm).
+# spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]. The queue index and the three index arms are reached through the battery runner's --emit front-end rather than by tool path: the front-end locates the binary and runs it at the git toplevel, where the arm reads a consumer's section and cap overrides itself (gate-sdk/SPEC.md §The non-gate arm).
 RUN_GATES="gate-sdk/bin/run-gates.sh"
 NATIVE_BIN="$(bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin' 2>/dev/null)"
 DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-}"

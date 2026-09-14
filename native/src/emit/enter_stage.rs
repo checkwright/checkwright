@@ -8,12 +8,13 @@ use crate::walk;
 use std::path::Path;
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the declared roster: the whole
-// `LIFECYCLE_KIT_*` family this arm reads, plus the three names outside it that must cross
-// because this arm *bridges* them onward.
+// `LIFECYCLE_KIT_*` family this arm reads, plus the gate-sdk names outside it that the arm and
+// the pre-flight gates it dispatches read.
 pub const KNOBS: &[&str] = &[
     "LIFECYCLE_KIT_*",
     "GATE_SDK_TMP_DIR",
-    "GATE_PRUNE_DIRS",
+    "GATE_SDK_PRUNE_DIRS",
+    "GATE_SDK_PRUNE_EXTRA_DIRS",
     "GATE_SDK_KIT_DIRS",
 ];
 
@@ -371,8 +372,8 @@ fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
     write_file(&ts, &new_state)?;
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the rename pre-flight names the gate and
-    // never a substrate: the resolver yields the shell member's argv or the binary's, and an argv
-    // the bridge refused to build is exit 2 — never a rename that proceeds unchecked
+    // never a substrate: the resolver yields the shell member's argv or the binary's, and a gate
+    // it cannot dispatch is exit 2 — never a rename that proceeds unchecked
     match preflight_gate("check-stage-evidence", &tq, &ts)? {
         GateRun::Undispatchable => {
             eprintln!(
@@ -634,8 +635,8 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
     };
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the built-in pre-flight names the gate and
-    // never a substrate, the rename pre-flight's own resolution: an argv the bridge refused to
-    // build is exit 2, never an entry that proceeds unchecked.
+    // never a substrate, the rename pre-flight's own resolution: a gate it cannot dispatch is
+    // exit 2, never an entry that proceeds unchecked.
     match preflight_gate("check-stage-entry", pre_queue, &tmpstate)? {
         GateRun::Undispatchable => {
             eprintln!(
@@ -1471,20 +1472,18 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
         return Ok(GateRun::Undispatchable);
     };
     let mut argv: Vec<String>;
-    let mut env: Vec<(String, String)> = Vec::new();
     if src.ends_with(".gate") {
-        let Some(declared) = crate::gates::knobs(name) else {
+        if crate::gates::declared(name).is_none() {
             eprintln!(
                 "checkwright-gates: no such gate subcommand: {} — the check could not run; \
                  treating as failure (not clean)",
                 name
             );
             return Ok(GateRun::Undispatchable);
-        };
+        }
         let exe = std::env::current_exe()
             .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?;
         argv = vec![exe.display().to_string(), name.to_string()];
-        env = child_knobs(declared);
     } else {
         argv = vec![src];
     }
@@ -1492,7 +1491,7 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
     argv.push(state.to_string());
 
     let args: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
-    let merged = proc::run_merged_in(&argv[0], &args, &env, None)?;
+    let merged = proc::run_merged_in(&argv[0], &args, &[], None)?;
     if merged.succeeded() {
         Ok(GateRun::Passed)
     } else {
@@ -1500,13 +1499,6 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
             String::from_utf8_lossy(merged.output()).into_owned(),
         ))
     }
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the child's declared knob environment, built by filtering
-// the bridged set this arm itself received: a member receives the GATE_SDK_KNOB_* variables its
-// own registry entry declares and no others, which is what keeps the declared-knob discipline
-fn child_knobs(declared: &[&str]) -> Vec<(String, String)> {
-    super::child_knobs(declared)
 }
 
 struct PreflightOut {

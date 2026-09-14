@@ -4,7 +4,7 @@ Execute the template at delegation-kit/templates/agent-execution.md, applying th
 
 **shared-file-roster** — the generated `scripts/git-hooks/pre-commit` and
 `docs/check-graph.html` (regenerate through the owning unit, never
-hand-edit); `scripts/gates.list` with the `scripts/*-config.sh` knob files;
+hand-edit); `scripts/gates.list` with the `scripts/*-config.knobs` knob files;
 `TASK-QUEUE.md` with `.workflow/WORKFLOW-STATE.txt`; and any `SPEC-*.md`
 amendment a unit is mid-merge on — the git index and HEAD besides, shared by
 every committing agent regardless of source disjointness.

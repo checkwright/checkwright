@@ -9,8 +9,7 @@ use crate::walk;
 use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §install-hooks — this arm's own three names, then the five its
-// registry-resolved callee declares: a dispatching arm must itself be handed what it passes down,
-// and the unit test below holds this tail against `check-identity`'s own entry so it cannot rot.
+// registry-resolved callee declares
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_HOOKS_DIR",
     "GATE_SDK_GATES_DIR",
@@ -28,7 +27,7 @@ const IDENTITY: &str = "check-identity";
 // refusal has no free text to bind on and only the option half binds; usage itself lives on this
 // arm's own front-end `case` arm, which the class gives every member holding one.
 const USAGE: &str = "usage: run-gates.sh --install-hooks
-  Takes no argument: the whole input is the bridged GATE_SDK_* environment.";
+  Takes no argument: the whole input is the GATE_SDK_* configuration.";
 
 pub fn run(args: &[String]) -> i32 {
     match dispatch(args) {
@@ -44,7 +43,7 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     super::file_survey::positionals(args, "argument").map_err(|e| format!("{}\n{}", e, USAGE))?;
 
     // spec: gate-sdk/SPEC.md §install-hooks — both knobs are resolved before any wiring, the order
-    // the shell form read them in, so a bridge failure refuses without half-installing.
+    // the shell form read them in, so a configuration failure refuses without half-installing.
     let hooks_dir = walk::knob_scalar("GATE_SDK_HOOKS_DIR")?;
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
     if !Path::new(&hooks_dir).is_dir() {
@@ -129,15 +128,14 @@ fn identity_rung(gates_dir: &str) -> i32 {
     println!("Verifying git identity ({})…", IDENTITY);
     if src.ends_with(".gate") {
         // spec: gate-sdk/SPEC.md §run-gates — the descriptor branch re-execs this binary as a
-        // child rather than calling the member in process: an in-process call cannot hand the
-        // callee its own declared knob set, which is the discipline that refusal exists for.
-        let Some(declared) = crate::gates::knobs(IDENTITY) else {
+        // child rather than calling the member in process, on that section's fault-isolation ground
+        if crate::gates::declared(IDENTITY).is_none() {
             eprintln!(
                 "install-hooks: {} declares a descriptor at {} but this binary carries no such subcommand — the gate could not run; treating as failure (not clean)",
                 IDENTITY, src
             );
             return 2;
-        };
+        }
         let exe = match std::env::current_exe() {
             Ok(p) => p.display().to_string(),
             Err(e) => {
@@ -145,8 +143,7 @@ fn identity_rung(gates_dir: &str) -> i32 {
                 return 2;
             }
         };
-        let env = super::child_knobs(declared);
-        match proc::run_to_env(&exe, &[IDENTITY], &env, &proc::Sink::Inherit) {
+        match proc::run_to(&exe, &[IDENTITY], &proc::Sink::Inherit) {
             Ok(code) => code,
             Err(e) => {
                 eprintln!("install-hooks: {}", e);
@@ -164,30 +161,5 @@ fn identity_rung(gates_dir: &str) -> i32 {
                 2
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // spec: gate-sdk/SPEC.md §install-hooks — the declared-knob discipline reaches a dispatching
-    // arm as a containment: a child is handed what this arm itself received, so a callee knob
-    // absent from this roster arrives unset and the opt-in fails on a gate that was fine.
-    #[test]
-    fn the_arm_declares_every_knob_its_callee_declares() {
-        let callee = crate::gates::knobs(IDENTITY).expect("check-identity must be registered");
-        let missing: Vec<&str> = callee
-            .iter()
-            .copied()
-            .filter(|k| !KNOBS.contains(k))
-            .collect();
-        assert!(
-            missing.is_empty(),
-            "{} declares {:?}, which --install-hooks does not: a dispatching arm is handed only \
-             its own declared set, so the child would receive these unset",
-            IDENTITY,
-            missing
-        );
     }
 }

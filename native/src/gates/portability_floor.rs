@@ -82,9 +82,9 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        walk::knob_array("GATE_PORTABILITY_PATTERNS")?
+        walk::knob_words("GATE_SDK_PORTABILITY_PATTERNS")?
     };
-    let paths = walk::knob_array("GATE_PORTABILITY_PATHS")?;
+    let paths = walk::knob_words("GATE_SDK_PORTABILITY_PATHS")?;
 
     let (patterns, files_present) = resolve_patterns(&files)?;
 

@@ -1,8 +1,7 @@
 // spec: canon-kit/SPEC.md §check-prose-enum — the bundled enum-set emitter: the queue tag
 // vocabulary plus the derived roster families over the kit tree, one `<set-name>`⇥`<member>` line
 // per member, every member read from the tree or from the gate that owns it
-// spec: gate-sdk/SPEC.md §The non-gate arm — a two-kit declared roster, resolved by the
-// partitioning bridge a slice at a time
+// spec: gate-sdk/SPEC.md §The non-gate arm — a two-kit declared roster
 use crate::proc;
 use crate::walk;
 
@@ -83,7 +82,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         .map(|k| k.trim_end_matches('/').to_string())
         .collect();
     if kits.is_empty() {
-        return Err("gate_kit_roots_rel enumerated no kit roots".to_string());
+        return Err("the kit roots name no kit root".to_string());
     }
 
     for kit in &kits {

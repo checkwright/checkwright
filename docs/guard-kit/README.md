@@ -88,7 +88,7 @@ bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow  # local-overlay en
 and composes with `--count` in either order; `--` ends option processing, so a
 log path spelled with a leading dash is still reachable. An unrecognized
 `-`-prefixed argument is a refusal at exit 2 — there is no per-arm `--help`,
-because a bridged arm's usage lives here and in `run-gates.sh --help`.
+because a non-gate arm's usage lives here and in `run-gates.sh --help`.
 
 ## Test
 

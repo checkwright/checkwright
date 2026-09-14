@@ -1,4 +1,4 @@
-// spec: gate-sdk/SPEC.md §The non-gate arm — the harness-integration arms: bridged non-gate arms
+// spec: gate-sdk/SPEC.md §The non-gate arm — the harness-integration arms: non-gate arms
 // whose named caller is the coding harness, so their channels are the harness's rather than the
 // gate output contract's. `--hook <member>` is the one dispatching arm of that sub-class.
 use serde_json::Value;
@@ -20,8 +20,8 @@ pub mod workflow_state;
 pub type HookFn = fn(Option<&Value>) -> i32;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the member table: the single roster the arm dispatches
-// on, `--knobs --hook` reads and the unknown-member refusal prints. Each row's knob slice is
-// exactly what that member's shell original read, less the knobs a compiled member cannot want.
+// on and the unknown-member refusal prints. Each row's knob slice is exactly what that member's
+// shell original read, less the knobs a compiled member cannot want.
 pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
     // spec: delegation-kit/SPEC.md §usage-verdict — the rule runs inside the hook process, so the row
     // declares the rule's own reads rather than a path to it, one roster for both callers
@@ -49,22 +49,13 @@ pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
     ),
 ];
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the sentinel `--hook`'s own declared roster carries:
-// it resolves to one member's knobs where the arm's argv names a member and to the union over the
-// table where it does not, which is what keeps the bridge resolving one guard's configuration.
+// spec: gate-sdk/SPEC.md §The non-gate arm — the sentinel `--hook`'s own declared roster carries,
+// standing for one member's knobs where the arm's argv names a member and for the union over the
+// table where it does not
 pub const EVERY_HOOK_KNOB: &str = "@every-hook-knob";
 
 pub fn members() -> Vec<&'static str> {
     HOOKS.iter().map(|(n, _, _)| *n).collect()
-}
-
-// spec: gate-sdk/SPEC.md §The non-gate arm — the per-member answer `--knobs --hook <member>` gives,
-// reachable because `gate_knob_env "$arm" "$@"` forwards the arm's own argv to the bridge.
-pub fn knobs(member: &str) -> Option<&'static [&'static str]> {
-    HOOKS
-        .iter()
-        .find(|(n, _, _)| *n == member)
-        .map(|(_, _, k)| *k)
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — stdout is the hook-JSON envelope, serialized rather
@@ -197,11 +188,10 @@ mod tests {
     // resolves only under its own name and the roster the refusal prints is that same table
     #[test]
     fn a_member_resolves_only_under_its_own_name() {
-        assert!(knobs("agent-budget-guard").is_some());
-        assert!(knobs("agent-budget-guards").is_none());
-        assert!(knobs("PreToolUse").is_none());
+        assert!(members().contains(&"agent-budget-guard"));
+        assert!(!members().contains(&"agent-budget-guards"));
+        assert!(!members().contains(&"PreToolUse"));
         assert_eq!(members().len(), HOOKS.len());
-        assert_eq!(knobs("escalation-guard"), Some(&[] as &[&str]));
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the computed stamp is the one

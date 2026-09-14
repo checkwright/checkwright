@@ -31,8 +31,8 @@ pub(super) fn print_reissue_remedy() {
 // spec: gate-sdk/SPEC.md §check-commit-msg — `gate_msg_pattern_files` with no positional: every
 // required file must exist and be readable, and each local one joins where it does
 pub(super) fn resolve_files() -> Result<Vec<String>, String> {
-    let required = walk::knob_array("GATE_MSG_PATTERN_FILES")?;
-    let local = walk::knob_array("GATE_MSG_PATTERN_FILES_LOCAL")?;
+    let required = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES")?;
+    let local = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES_LOCAL")?;
     let mut out: Vec<String> = Vec::new();
     for f in required {
         if !Path::new(&f).is_file() {

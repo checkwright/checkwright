@@ -5,9 +5,7 @@
 # diagnostic written by a *successful* call must never become argv[0] and be exec'd.
 # spec: gate-sdk/SPEC.md §run-gates — plus the arm's own tails over a hermetic scratch registry:
 # the exact green phrase, and the dispatch-harness-error tail a `.gate` naming a subcommand the
-# binary does not carry still earns. Deterministic by construction — a stand-in kit library that
-# writes to stderr while still resolving its knob reproduces the shape without reproducing the
-# SIGPIPE-disposition accident that first exposed it.
+# binary does not carry still earns.
 # Run by the --run-gate-tests arm.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
@@ -23,43 +21,32 @@ fails=0
 assert_has()    { grep -qF -- "$2" <<<"$3" || { echo "FAIL [$1]: expected present: $2"; fails=$((fails + 1)); }; }
 assert_absent() { grep -qF -- "$2" <<<"$3" && { echo "FAIL [$1]: expected absent: $2"; fails=$((fails + 1)); }; return 0; }
 
-# A .gate member dispatching to a stand-in binary that answers --knobs, so the resolved argv is
-# observable without the real binary carrying the subcommand.
+# A .gate member dispatching to a stand-in binary, so the resolved argv is observable without the
+# real binary carrying the subcommand.
 printf '# graph: couples=cfg dir=one valve=none tier=precommit trigger=*\n' \
     > "$scratch/check-noisy.gate"
 cat > "$scratch/bin" <<'BIN'
 #!/usr/bin/env bash
-[[ "${1:-}" == --knobs ]] && { printf 'PROBE_KIT_VALUE\n'; exit 0; }
 exit 0
 BIN
 chmod +x "$scratch/bin"
 
-# The stand-in kit whose library resolves the knob *and* writes to stderr while
-# doing it: a gate_command that exits 0 with non-empty stderr, which is exactly
-# the shape a merged capture turns into argv[0].
-mkdir -p "$scratch/probe-kit/lib" "$scratch/probe-kit/checks"
-cat > "$scratch/probe-kit/lib/probe.sh" <<'PROBE'
-# shellcheck shell=bash
-printf 'probe-kit: a diagnostic on stderr, exit status still 0\n' >&2
-PROBE_KIT_VALUE=resolved
-PROBE
 printf 'check-noisy\n' > "$scratch/gates.list"
 
 gate_command_argv() {
-    GATE_SDK_GATES_DIR="$scratch" GATE_SDK_KIT_DIRS="$scratch/probe-kit" \
+    GATE_SDK_GATES_DIR="$scratch" \
         GATE_SDK_NATIVE_BIN="$1" \
         bash -c 'source "$1/gate-sdk/lib/gate.sh"; gate_command check-noisy "$2"' \
         bash "$ROOT" "$scratch" 2>"$scratch/err.txt"
 }
 
-# Arm 1 — stderr on a successful resolution: argv comes from stdout alone, so the diagnostic the
-# kit library wrote is not in the argv a caller would exec.
+# Arm 1 — a successful resolution: argv on stdout is exactly the binary and the member name, with
+# no environment prefix, and nothing reaches stderr.
 argv="$(gate_command_argv "$scratch/bin")"; rc=$?
 err="$(<"$scratch/err.txt")"
-assert_has    stdout-argv 'GATE_SDK_KNOB_PROBE_KIT_VALUE=resolved' "$argv"
-assert_has    stdout-argv 'check-noisy'                            "$argv"
-assert_absent stdout-argv 'a diagnostic on stderr'                 "$argv"
-assert_has    stdout-argv 'a diagnostic on stderr'                 "$err"
+[[ "$(paste -sd'|' - <<<"$argv")" == "$scratch/bin|check-noisy" ]] \
+    || { echo "FAIL [stdout-argv]: argv was '$argv'"; fails=$((fails + 1)); }
+[[ -z "$err" ]] || { echo "FAIL [stdout-argv]: stderr was '$err'"; fails=$((fails + 1)); }
 [[ "$rc" -eq 0 ]] || { echo "FAIL [stdout-argv]: expected exit 0, got $rc"; fails=$((fails + 1)); }
 
 # Arm 2 — the stderr the split must not discard: an absent binary is gate_command's exit 2, whose
@@ -105,5 +92,5 @@ assert_has arm-red '1 of 1 gates FAILED: check-noisy'                     "$out"
 [[ "$rc" -eq 1 ]] || { echo "FAIL [arm-red]: expected exit 1, got $rc"; fails=$((fails + 1)); }
 
 [[ "$fails" -eq 0 ]] || { echo "run-dispatch-streams.test: $fails assertion(s) failed"; exit 1; }
-echo "run-dispatch-streams.test: clean (argv taken from stdout alone with stderr present on a successful resolution; the exit-2 diagnostic body still reaches the caller; the arm's green phrase and dispatch-harness-error tail hold over a hermetic registry)"
+echo "run-dispatch-streams.test: clean (argv taken from stdout alone as the two-element binary form; the exit-2 diagnostic body still reaches the caller; the arm's green phrase and dispatch-harness-error tail hold over a hermetic registry)"
 exit 0

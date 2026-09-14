@@ -17,18 +17,10 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: gate-sdk/SPEC.md §check-graph — the retired sourced-function theme seam fails loudly. A
+// spec: gate-sdk/SPEC.md §check-graph — the retired sourced-function theme file fails loudly. A
 // consumer that quietly lost its theme emits an artifact the byte-compare cannot tell from a
 // legitimate theme edit, so the failure would be invisible in a green battery.
 fn retired_theme_seam(gates_dir: &str) -> Option<String> {
-    if let Ok(v) = std::env::var("GATE_SDK_GRAPH_THEME") {
-        if !v.is_empty() {
-            return Some(format!(
-                "GATE_SDK_GRAPH_THEME is set ({}), but the sourced-function theme seam is retired",
-                v
-            ));
-        }
-    }
     let legacy = format!("{}/graph-theme.sh", gates_dir.trim_end_matches('/'));
     if Path::new(&legacy).is_file() {
         return Some(format!(
@@ -42,7 +34,7 @@ fn retired_theme_seam(gates_dir: &str) -> Option<String> {
 const MIGRATION: &str = "  help: the theme is now a directory of verbatim part files at \
 GATE_SDK_GRAPH_THEME_DIR (default <gates-dir>/graph-theme/): move graph_theme_css's body to \
 theme.css, graph_theme_header's to header.html and graph_theme_footer's to footer.html, then \
-delete graph-theme.sh and unset GATE_SDK_GRAPH_THEME (gate-sdk/SPEC.md §check-graph)";
+delete graph-theme.sh (gate-sdk/SPEC.md §check-graph)";
 
 // spec: gate-sdk/SPEC.md §check-graph — the external-ref allowlist: the pinned-major mermaid ESM
 // import the emitter itself emits (kit-seeded, always allowed) plus the consumer-sanctioned
@@ -398,7 +390,7 @@ fn because(cause: &str) -> String {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let cfg = proj::Config::from_bridge()?;
+    let cfg = proj::Config::resolve()?;
 
     if let Some(what) = retired_theme_seam(&cfg.gates_dir) {
         println!("CHECK-GRAPH: 1 retired-seam violation(s):");
@@ -429,7 +421,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     if mode == "--refs-only" {
-        let allowed = walk::knob_array("GATE_GRAPH_EXTERNAL_REFS")?;
+        let allowed = walk::knob_words("GATE_SDK_GRAPH_EXTERNAL_REFS")?;
         let members = proj::projected_members(&cfg)?;
         let emitted = proj::render(&cfg, &members);
         let bad = disallowed_external_refs(&emitted, &allowed);
@@ -478,10 +470,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("gen-pre-commit.sh not found at {}", gen));
     }
 
-    let vocab = walk::knob_array("GRAPH_VOCAB")?;
-    let leading = walk::knob_array("GRAPH_LEADING")?;
-    let lagging = walk::knob_array("GRAPH_LAGGING")?;
-    let allowed = walk::knob_array("GATE_GRAPH_EXTERNAL_REFS")?;
+    let vocab = cfg.vocab.vocab.clone();
+    let leading = cfg.vocab.leading.clone();
+    let lagging = cfg.vocab.lagging.clone();
+    let allowed = walk::knob_words("GATE_SDK_GRAPH_EXTERNAL_REFS")?;
 
     let mut errors: Vec<String> = Vec::new();
     let mut has_msg_gate = false;

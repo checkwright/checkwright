@@ -2,7 +2,8 @@
 // registration block into the always-loaded agent file, the merge attributes into
 // `.gitattributes`, and the keep-ours driver into this clone's git config
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the contract is an action with
-// an exit status, and a table member because it resolves eight knobs a hardcoded flag would ignore
+// an exit status, and a table member because it reads eight knobs a hardcoded flag would hide
+// from `--knob-files`
 use crate::marker;
 use crate::proc;
 use crate::stages;
@@ -41,7 +42,7 @@ pub fn run(args: &[String]) -> i32 {
 
 // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the `[agent-file]` positional is the
 // file the rule writes into rather than a selector for where configuration comes from, so it
-// arrives as argv and overrides the bridged default (gate-sdk/SPEC.md §The non-gate arm)
+// arrives as argv and overrides the knob's default (gate-sdk/SPEC.md §The non-gate arm)
 fn agent_file(args: &[String]) -> Result<String, String> {
     match args.first().filter(|a| !a.is_empty()) {
         Some(a) if a.starts_with('-') => Err(format!("unknown option: {}", a)),

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the end-to-end half of the capture arm's contract, the seam a crate unit test cannot see: the bridged knobs reach the arm through the front-end, every filing writes the one plain '- <date> — <prose>' bullet with no verdict interposed, a live entry's slug in the prose asks the filer on stderr, and NO FILING TOUCHES THE QUEUE FILE — the invariant the inbox exists to hold and the one with no other holder. The grammar cases (done, Lessons, sub-task, hyphen-embedded near-miss, longest-match, icebox, a denying prose) are pinned in native/src/emit/file_gap.rs's own #[cfg(test)] tests, where check-crate-arms runs them.
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the end-to-end half of the capture arm's contract, the seam a crate unit test cannot see: the set knobs reach the arm through the front-end, every filing writes the one plain '- <date> — <prose>' bullet with no verdict interposed, a live entry's slug in the prose asks the filer on stderr, and NO FILING TOUCHES THE QUEUE FILE — the invariant the inbox exists to hold and the one with no other holder. The grammar cases (done, Lessons, sub-task, hyphen-embedded near-miss, longest-match, icebox, a denying prose) are pinned in native/src/emit/file_gap.rs's own #[cfg(test)] tests, where check-crate-arms runs them.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -71,9 +71,9 @@ grep -qF "$ASKS \`fork-dispatch-prohibition\`" <<<"$ERR" \
 grep -qF 'RE-FILES' <<<"$ERR" \
     || note live-question "the advisory does not ask the filer to state the claim: $ERR"
 
-# --- the SET consumer knobs reach the arm through the bridge, which a crate test cannot show ---
+# --- the SET consumer knobs reach the arm through the front-end, which a crate test cannot show ---
 grep -qxF -- "- $DATE — $p" "$LAST_INBOX" \
-    || note knob-reach "a set LIFECYCLE_KIT_GAP_INBOX_FILE did not reach the arm through the bridge"
+    || note knob-reach "a set LIFECYCLE_KIT_GAP_INBOX_FILE did not reach the arm through the front-end"
 head -1 "$LAST_INBOX" | grep -qF '# contract: lifecycle-kit/SPEC.md §The committed gap inbox' \
     || note seeded-header "a fresh inbox was not seeded with the contract header: $(head -1 "$LAST_INBOX")"
 
@@ -88,5 +88,5 @@ grep -qF "$ASKS" <<<"$ERR" && note done-ask "a done-section slug raised the recu
     || note no-queue-write "the arm modified the queue file — the constraint the gap inbox exists to hold"
 
 [[ "$fails" -eq 0 ]] || { echo "file-gap-recurrence.test: $fails assertion(s) failed"; exit 1; }
-echo "file-gap-recurrence.test: clean (the bridged knobs reach the arm, every filing writes the plain bullet and no verdict, a fresh inbox is seeded with the contract header, a live slug asks the filer while a done slug stays silent, and no filing writes the queue)"
+echo "file-gap-recurrence.test: clean (the set knobs reach the arm, every filing writes the plain bullet and no verdict, a fresh inbox is seeded with the contract header, a live slug asks the filer while a done slug stays silent, and no filing writes the queue)"
 exit 0

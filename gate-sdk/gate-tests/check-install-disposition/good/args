@@ -1,4 +1,4 @@
-# Anchor the sweep at this case dir: gate-sdk-config.sh (auto-sourced at cwd)
+# Anchor the sweep at this case dir: gate-sdk-config.knobs (read at cwd)
 # names the synthetic kit via GATE_SDK_KIT_DIRS, and the positional root is what
 # the installer recipe path resolves against.
 # alpha-kit is a mixed kit — a .sh-declared and a .gate-declared member side by

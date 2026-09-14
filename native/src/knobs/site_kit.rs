@@ -32,55 +32,56 @@ pub const KIT: Kit = Kit {
             shape: Shape::Scalar,
             default: Default::Scalar("docs/CNAME"),
             inputs: &[],
-            referents: &[],
+            empty_takes_default: false,
         },
         Row {
             name: "SITE_KIT_SCAN_ROOT",
             shape: Shape::Scalar,
             default: Default::Scalar("."),
             inputs: &[],
-            referents: &[],
+            empty_takes_default: false,
         },
         Row {
             name: "SITE_KIT_DOCS_DIR",
             shape: Shape::Scalar,
             default: Default::Scalar("docs"),
             inputs: &[],
-            referents: &[],
+            empty_takes_default: false,
         },
         Row {
             name: "SITE_KIT_ALIASES",
             shape: Shape::Indexed,
             default: Default::Indexed(&[]),
             inputs: &[],
-            referents: &[],
+            empty_takes_default: false,
         },
         Row {
             name: "SITE_KIT_EXEMPT_PATHS",
             shape: Shape::Indexed,
             default: Default::Indexed(&["*/gate-tests/*", "*docs/posts/*"]),
             inputs: &[],
-            referents: &[],
+            empty_takes_default: false,
         },
         Row {
             name: "SITE_KIT_RENDERER",
             shape: Shape::Indexed,
             default: Default::Indexed(RENDERER),
             inputs: &[],
-            referents: &[],
+            empty_takes_default: false,
         },
         Row {
             name: "SITE_KIT_RENDERER_BATCH",
             shape: Shape::Indexed,
             default: Default::Derived(renderer_batch),
             inputs: &["SITE_KIT_RENDERER"],
-            referents: &[],
+            empty_takes_default: false,
         },
     ],
     validate: None,
     open_family: false,
     families: &[],
     retired: &[],
+    env_only: &[],
 };
 
 #[cfg(test)]
@@ -99,14 +100,14 @@ mod tests {
         env.remove("SITE_KIT_KNOB_FILE");
         env.remove("SITE_KIT_CONFIG_FILE");
         reset(&env);
-        let batch = wire("SITE_KIT_RENDERER_BATCH").unwrap().unwrap();
+        let batch = wire("SITE_KIT_RENDERER_BATCH").unwrap();
         assert!(batch.starts_with("ruby\t-e\t") && batch.contains(r#"split("\x00", -1)"#), "{}", batch);
         std::fs::write(d.join("site-config.knobs"), "SITE_KIT_RENDERER[] = true\n").expect("write");
         reset(&env);
-        assert_eq!(wire("SITE_KIT_RENDERER_BATCH").unwrap().unwrap(), "");
+        assert_eq!(wire("SITE_KIT_RENDERER_BATCH").unwrap(), "");
         std::fs::write(d.join("site-config.knobs"), "SITE_KIT_RENDERER[] = true\nSITE_KIT_RENDERER_BATCH[] = cat\n").expect("write");
         reset(&env);
-        assert_eq!(wire("SITE_KIT_RENDERER_BATCH").unwrap().unwrap(), "cat");
+        assert_eq!(wire("SITE_KIT_RENDERER_BATCH").unwrap(), "cat");
         let _ = std::fs::remove_dir_all(&d);
         env.remove("GATE_SDK_GATES_DIR");
         reset(&env);

@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §scratch-run — the echo-then-exec runner for scratch scripts: the body
 // is printed before it runs, so an allowlisted execution documents itself in the transcript.
-// spec: gate-sdk/SPEC.md §The non-gate arm — bridged and `Arm::Run`, both forced rather than
-// chosen: the runner resolves `GATE_SDK_TMP_DIR`, and it passes the child's exit code through
+// spec: gate-sdk/SPEC.md §The non-gate arm — a table member and `Arm::Run`, both forced rather
+// than chosen: the runner reads `GATE_SDK_TMP_DIR`, and it passes the child's exit code through
 // verbatim while its stdout must reach the terminal as the child produces it.
 
 pub const KNOBS: &[&str] = &["GATE_SDK_TMP_DIR"];

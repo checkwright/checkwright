@@ -2,7 +2,7 @@
 // of hand-swept: one line per registry member declaring an undecidable walk root. A projection over
 // registry field 2 and nothing else — no new field, no config, no source parsing.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member rather than a hardcoded flag, for the
-// family's own reason: the flag family the bridged-arm table keys is what `no_such_arm` prints, so
+// family's own reason: the flag family the arm table keys is what `no_such_arm` prints, so
 // an arm outside the table is an arm a mistyped `--emit` can never be steered to.
 
 pub const KNOBS: &[&str] = &[];

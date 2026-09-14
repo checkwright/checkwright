@@ -272,13 +272,13 @@ for h in --help -h; do
         || { echo "smoke(argv): --enter-stage $h wrote no usage to stdout: $out" >&2; exit 1; }
 done
 
-# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit file-gap, a leading-dash prose is still exit 2 through the bridge, and the inbox is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them.
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit file-gap, a leading-dash prose is still exit 2 through the front-end, and the inbox is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them.
 rc=0; emit_run file-gap --list >/dev/null 2>&1 || rc=$?
 [[ "$rc" -eq 2 ]] || { echo "smoke(argv): --emit file-gap refused --list with exit $rc, want 2" >&2; exit 1; }
 so="$(emit_run file-gap --list 2>/dev/null)" || true
 [[ -z "$so" ]] || { echo "smoke(argv): --emit file-gap wrote usage to stdout on a refusal: $so" >&2; exit 1; }
 
-# spec: lifecycle-kit/SPEC.md §The survey record — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit file-survey, a flag in the FIFTH slot is still exit 2 through the bridge, and the record is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them.
+# spec: lifecycle-kit/SPEC.md §The survey record — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit file-survey, a flag in the FIFTH slot is still exit 2 through the front-end, and the record is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them.
 rc=0; emit_run file-survey q c o e --finding >/dev/null 2>&1 || rc=$?
 [[ "$rc" -eq 2 ]] || { echo "smoke(argv): --emit file-survey took a flag in its fifth slot (exit $rc)" >&2; exit 1; }
 
@@ -288,10 +288,10 @@ cmp -s "$av/record.before" "$av/record.md" \
     || { echo "smoke(argv): the file-survey arm wrote the survey record on a refusal path" >&2; exit 1; }
 
 # spec: lifecycle-kit/SPEC.md §The survey record — the other half of that seam: a SET consumer knob
-# actually reaches the arm's write through the shell bridge, which the refusal above cannot show
+# actually reaches the arm's write, which the refusal above cannot show
 emit_run file-survey "smoke: does a set record knob reach the arm" c o e f >/dev/null
 grep -q -- '— smoke: does a set record knob reach the arm$' "$av/record.md" \
-    || { echo "smoke(argv): a set LIFECYCLE_KIT_SURVEY_RECORD_FILE did not reach the file-survey arm through the bridge" >&2; exit 1; }
+    || { echo "smoke(argv): a set LIFECYCLE_KIT_SURVEY_RECORD_FILE did not reach the file-survey arm" >&2; exit 1; }
 
 # spec: gate-sdk/SPEC.md §The bin/-tool contract — '--' ends option processing, so the refusal never makes a legitimate filing unfileable
 emit_run file-gap -- "--list is captured at exit 0" >/dev/null

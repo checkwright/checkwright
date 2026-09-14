@@ -8,7 +8,7 @@ use std::io::Write;
 
 // spec: queue-kit/SPEC.md §The lesson-sink arm — the seam survives the port: the sink map stays
 // the adopter's configuration and the workflow dir stays the fail-open default's home. Both
-// cross the bridge, the first through the keyed-map arm (gate-sdk/SPEC.md §lib/gate.sh).
+// are knobs, the first a keyed map.
 pub const KNOBS: &[&str] = &["QUEUE_KIT_LESSON_SINKS", "GATE_SDK_WORKFLOW_DIR"];
 
 pub fn run(args: &[String]) -> i32 {
@@ -86,24 +86,19 @@ mod tests {
         assert_eq!(run(&["--nope".to_string()]), 2);
     }
 
-    // spec: queue-kit/SPEC.md §The lesson-sink arm — the fail-open default is a *bridged* read
-    // now, so an adopter who deleted the knob from their config gets a refusal rather than a
-    // silent write to a platform default
+    // spec: queue-kit/SPEC.md §The lesson-sink arm — the fallback appends under the resolved workflow
+    // directory, never truncating an earlier body
     #[test]
-    fn the_fallback_appends_under_the_bridged_workflow_dir() {
+    fn the_fallback_appends_under_the_resolved_workflow_dir() {
         let knobs = crate::knobenv::lock();
         let dir = std::env::temp_dir().join(format!("checkwright-sink-{}", std::process::id()));
         std::fs::create_dir_all(&dir).expect("cannot create the sandbox");
-        knobs.set(
-            "GATE_SDK_KNOB_GATE_SDK_WORKFLOW_DIR",
-            &dir.display().to_string(),
-        );
+        knobs.set("GATE_SDK_WORKFLOW_DIR", &dir.display().to_string());
         assert_eq!(fallback("lesson", b"one body\n"), Ok(0));
         assert_eq!(fallback("lesson", b"two body\n"), Ok(0));
         let got = std::fs::read_to_string(dir.join("lesson-harvest.md")).expect("no harvest file");
         assert_eq!(got, "one body\ntwo body\n", "the fallback is append, not truncate");
         std::fs::remove_dir_all(&dir).ok();
-        knobs.remove("GATE_SDK_KNOB_GATE_SDK_WORKFLOW_DIR");
-        assert!(fallback("lesson", b"x").is_err(), "an unset knob must refuse");
+        knobs.remove("GATE_SDK_WORKFLOW_DIR");
     }
 }

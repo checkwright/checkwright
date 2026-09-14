@@ -29,9 +29,9 @@ pub fn scan_root(args: &[String], gate: &str) -> Option<String> {
     Some(s)
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the shell form reads gate_kit_roots, whose live values
-// are absolute; the bridge carries the relative spelling, so an absolute root passes through and
-// a relative one resolves against the positional root exactly as the shell resolves it
+// spec: gate-sdk/SPEC.md §lib/gate.sh — a kit root may be spelled absolute or relative to the
+// working directory, so an absolute root passes through and a relative one resolves against the
+// positional root exactly as the shell resolves it
 pub fn kit_abs(root: &str, r: &str) -> String {
     if r.starts_with('/') {
         r.to_string()

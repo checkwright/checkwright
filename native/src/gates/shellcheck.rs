@@ -38,7 +38,7 @@ fn target_dirs(args: &[String]) -> Result<Vec<String>, String> {
     // spec: gate-sdk/SPEC.md §check-shellcheck — the consumer-added set is appended to the
     // derived default, never substituted for it, so a consumer that sets nothing keeps the
     // shipped coverage exactly and one that sets it can only widen
-    dirs.extend(walk::knob_array("GATE_LINT_EXTRA_DIRS")?);
+    dirs.extend(walk::knob_words("GATE_SDK_LINT_EXTRA_DIRS")?);
     Ok(dirs)
 }
 
@@ -108,7 +108,7 @@ mod tests {
     #[test]
     fn positionals_replace_the_derived_set_rather_than_extending_it() {
         let args = vec!["alpha".to_string(), "beta".to_string()];
-        let dirs = target_dirs(&args).expect("positional dirs need no bridged knob");
+        let dirs = target_dirs(&args).expect("positional dirs need no knob");
         assert_eq!(
             dirs,
             vec!["alpha".to_string(), "beta".to_string()],

@@ -5,7 +5,7 @@ use crate::{fresh, proc, walk};
 
 // spec: gate-sdk/SPEC.md §check-root-tiering — the fallback orientation set, generic by
 // construction plus the two configured document knobs: the consumer-shaped roster is the
-// optional allowlist file, never a literal the crate carries (the graph-vocab.sh pattern)
+// optional allowlist file, never a literal the crate carries (the graph-vocab.knobs pattern)
 fn builtin_allow(queue: &str, agent: &str) -> Vec<String> {
     vec![
         "README.md".to_string(),

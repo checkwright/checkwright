@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: guard-kit/SPEC.md §scratch-run — the runner echoes an in-scratch script's contents before executing it, passes the child's args and exit code through verbatim, and refuses (exit 2, nothing echoed, nothing executed) any target resolving outside GATE_SDK_TMP_DIR. Every case here is a property of the SEAM — the front end resolving the arm, the config bridge supplying GATE_SDK_TMP_DIR, and a real child process — which a crate unit test cannot see; the shebang classifier's own cases and the containment predicate's are pinned in the ported module's #[cfg(test)] tests, where check-crate-arms runs them.
+# spec: guard-kit/SPEC.md §scratch-run — the runner echoes an in-scratch script's contents before executing it, passes the child's args and exit code through verbatim, and refuses (exit 2, nothing echoed, nothing executed) any target resolving outside GATE_SDK_TMP_DIR. Every case here is a property of the SEAM — the front end resolving the arm, the binary reading GATE_SDK_TMP_DIR from the environment, and a real child process — which a crate unit test cannot see; the shebang classifier's own cases and the containment predicate's are pinned in the ported module's #[cfg(test)] tests, where check-crate-arms runs them.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 

@@ -28,7 +28,7 @@ printf '  <div id="%s"></div>\n' "$HDR_MARKER" > "$tmp/theme/header.html"
 printf '  <div id="%s"></div>\n' "$FTR_MARKER" > "$tmp/theme/footer.html"
 
 # spec: gate-sdk/SPEC.md §The non-gate arm — the emitter is a binary arm, so it is reached through
-# the front-end that resolves its bridged knobs, never as a mode of the gate
+# the front-end, never as a mode of the gate
 emit() {  # emit() <theme-dir> -> the emission under that theme directory
     gate_env GATE_SDK_GRAPH_THEME_DIR="$1" && bash "$DIR/bin/run-gates.sh" --emit graph
 }

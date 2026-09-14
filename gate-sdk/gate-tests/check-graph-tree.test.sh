@@ -65,11 +65,16 @@ LIST
     # B branch 3 (a literal couple read against the trigger as a bash pattern)
     # and C branch 3 (no leading surface — valve must be none)
     member check-epsilon 'couples=docs/site.md trigger=docs/*.md dir=bi valve=none tier=precommit'
-    cat >"$repo/scripts/graph-vocab.sh" <<'VOCAB'
-GRAPH_VOCAB=('scripts/gates.list' 'scripts/*.sh' '*.sh' 'docs/site.md' 'docs/*.md' 'SPEC.md')
-GRAPH_LEADING=('SPEC.md')
-GRAPH_LAGGING=('scripts/*.sh')
-GRAPH_LAYERS=('surfaces:governed surfaces')
+    cat >"$repo/scripts/graph-vocab.knobs" <<'VOCAB'
+GRAPH_VOCAB[] = scripts/gates.list
+GRAPH_VOCAB[] = scripts/*.sh
+GRAPH_VOCAB[] = *.sh
+GRAPH_VOCAB[] = docs/site.md
+GRAPH_VOCAB[] = docs/*.md
+GRAPH_VOCAB[] = SPEC.md
+GRAPH_LEADING[] = SPEC.md
+GRAPH_LAGGING[] = scripts/*.sh
+GRAPH_LAYERS[] = surfaces:governed surfaces
 VOCAB
 }
 

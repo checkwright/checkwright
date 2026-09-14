@@ -530,10 +530,8 @@ mod tests {
         let knobs = crate::knobenv::lock();
         let dir = std::env::temp_dir().join(format!("enfmap-suites-{}", std::process::id()));
         std::fs::create_dir_all(&dir).expect("scratch dir");
-        let family = format!("{}*", RUN_PREFIX);
-        let bridged = crate::knobs::bridged([family.as_str(), SUITES_KNOB]);
-        for k in &bridged {
-            knobs.set(&format!("GATE_SDK_KNOB_{}", k), &dir.display().to_string());
+        for k in ["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS"] {
+            knobs.set(k, &dir.display().to_string());
         }
         knobs.remove("EVIDENCE_KIT_RUN_alpha");
         let use_file = |name: &str, body: &str| {
@@ -565,8 +563,8 @@ mod tests {
         assert_eq!(s.rows[0].kit, "guard-kit");
 
         knobs.remove("EVIDENCE_KIT_KNOB_FILE");
-        for k in bridged {
-            knobs.remove(&format!("GATE_SDK_KNOB_{}", k));
+        for k in ["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS"] {
+            knobs.remove(k);
         }
         crate::knobs::reset(&knobs);
         let _ = std::fs::remove_dir_all(&dir);

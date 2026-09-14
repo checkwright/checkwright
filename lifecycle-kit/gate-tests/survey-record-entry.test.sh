@@ -5,8 +5,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the second sanctioned caller: this harness
 # drives the arm from a non-git sandbox cwd, which bin/run-gates.sh refuses by design (it cds to
-# the git toplevel and a `mktemp -d` is no repository), so it resolves the binary and the bridged
-# environment through gate_arm_run rather than through that front-end.
+# the git toplevel and a `mktemp -d` is no repository), so it resolves the binary through
+# gate_arm_run rather than through that front-end.
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 

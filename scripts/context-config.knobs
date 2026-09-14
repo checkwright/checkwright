@@ -4,7 +4,7 @@
 CONTEXT_KIT_BREVITY_SECTIONS[] = ## Conventions established in gate-sdk (keep every kit consistent)
 CONTEXT_KIT_BREVITY_SECTIONS[] = ## Housekeeping
 
-# comment-tier-exempt: assigned explicitly rather than derived from GATE_PRUNE_DIRS — the two sets are deliberately not identical (this one omits .tmp and gate-tests, and carries dist and build), and deriving one from the other would make context-kit's own exclusion rule a gate-sdk read
+# comment-tier-exempt: assigned explicitly rather than derived from GATE_SDK_PRUNE_DIRS — the two sets are deliberately not identical (this one omits .tmp and gate-tests, and carries dist and build), and deriving one from the other would make context-kit's own exclusion rule a gate-sdk read
 CONTEXT_KIT_PRUNE_DIRS[] = .git
 CONTEXT_KIT_PRUNE_DIRS[] = node_modules
 CONTEXT_KIT_PRUNE_DIRS[] = target

@@ -136,10 +136,10 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:begin -->
 
-- `bash` (≥ 4.3) — the shell library every gate loads through and both generated
-  git hooks are written in bash; nothing in the
-  battery runs without it. The floor is the highest construct the
-  battery runs: a nameref (`local -n`) in the gate library every check sources.
+- `bash` (≥ 4.3) — the `run-gates.sh` front-end that locates the gate binary,
+  both generated git hooks and guard-kit's hook are written in bash; nothing in
+  the battery runs without it. The floor is the highest construct the
+  battery runs: a nameref (`local -n`) in the gate library the front-end sources.
   Associative arrays, `mapfile`, and the lowercasing case expansion are more
   widespread but only reach 4.0.
 - `git` — the gates read tracked files and the hooks fire at commit time; the

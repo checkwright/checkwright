@@ -1,6 +1,6 @@
 // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the registry walk, the two selectors,
 // the timings, the omission accounting, the output contract and the worker pool. `bin/run-gates.sh`
-// is the front-end that resolves one bridged environment and execs this arm.
+// is the front-end that locates the binary and execs this arm.
 use crate::gates;
 use crate::proc;
 use crate::registry;
@@ -16,7 +16,7 @@ const TOOL: &str = "run-gates";
 
 // spec: gate-sdk/SPEC.md §run-gates — the one usage text, the stdout body of a help request and the
 // stderr body of an unrecognized-option refusal, per §The bin/-tool contract. It lives beside the
-// arm table it describes, because it grows by a paragraph per bridged arm.
+// arm table it describes, because it grows by a paragraph per configured arm.
 pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --only <name> [<name>...]  run only the named gates
        run-gates.sh --only <name> -- <arg>...  run one named gate, forwarding <arg>...
@@ -112,7 +112,7 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           suite foreground, parses it, diffs the baseline slice per-scenario and
           folds one evidence line per suite into the tracked manifest after the
           whole roster has run. Takes no argument: the whole input is the
-          bridged EVIDENCE_KIT_* environment. Exit 0 every suite clean, 1 a
+          EVIDENCE_KIT_* configuration. Exit 0 every suite clean, 1 a
           suite recorded new-failures, 2 the run could not start (no suites, no
           run key, absent manifest, a held or unclaimable lock, a missing suite
           command, a failing pre-hook, a parser producing no result is 1);
@@ -130,17 +130,16 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
-The battery itself is the binary's `--run` arm; run-gates.sh resolves its
-bridged environment and execs it.
+The battery itself is the binary's `--run` arm; run-gates.sh locates the
+binary and execs it.
 
 GATE_SDK_VERBOSE (any non-empty value) restores the per-gate banner roll the
 quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
 (default: the machine's parallelism; 1 restores a serial run). Per-gate timings
 land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own bridged reads, plus the union sentinel:
-// `--knobs --run` prints these with the knobs of every member the argv can dispatch added (the
-// `--only` selection, else the whole registry), expanded in `emit::knobs`.
+// spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own reads, plus the sentinel standing for
+// the reads of every member the argv can dispatch
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_KIT_DIRS",
@@ -199,12 +198,6 @@ fn unrecognized(option: &str) -> Refusal {
         message: format!("unrecognized option: {}", option),
         usage: true,
     }
-}
-
-// spec: gate-sdk/SPEC.md §The non-gate arm — the `--only` names this argv selects by, empty for an
-// argv the parser refuses or one carrying no `--only`
-pub(crate) fn only_names(args: &[String]) -> Vec<String> {
-    parse(args).map(|a| a.only).unwrap_or_default()
 }
 
 fn parse(args: &[String]) -> Result<Args, Refusal> {
@@ -462,54 +455,10 @@ fn select_only(
         .collect())
 }
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the child's declared knob environment, built by *filtering*
-// the union the front-end resolved: a member receives the `GATE_SDK_KNOB_*` variables its own
-// registry entry declares and no others, which is what keeps the declared-knob discipline executed.
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob sentinel substitutes here too: filtering
-// the union by the sentinel's own literal name would hand the child an empty set, and its expansion
-// would then refuse
-fn child_knobs(
-    declared: &[&str],
-    union: &[(String, String)],
-    couples_knobs: &[String],
-) -> Vec<(String, String)> {
-    let mut names: Vec<&str> = Vec::new();
-    for d in declared {
-        if *d == registry::EVERY_COUPLES_KNOB {
-            names.extend(couples_knobs.iter().map(String::as_str));
-            continue;
-        }
-        names.push(d);
-    }
-    let mut out: Vec<(String, String)> = Vec::new();
-    for d in &names {
-        match d.strip_suffix('*') {
-            Some(stem) => {
-                let want = format!("GATE_SDK_KNOB_{}", stem);
-                for (k, v) in union {
-                    if k.starts_with(&want) {
-                        out.push((k.clone(), v.clone()));
-                    }
-                }
-            }
-            None => {
-                let want = format!("GATE_SDK_KNOB_{}", d);
-                if let Some((k, v)) = union.iter().find(|(k, _)| *k == want) {
-                    out.push((k.clone(), v.clone()));
-                }
-            }
-        }
-    }
-    out
-}
-
 struct Dispatch<'a> {
     resolve_dirs: &'a [String],
     self_exe: &'a str,
     list: &'a str,
-    union: &'a [(String, String)],
-    union_names: &'a [String],
-    couples_knobs: &'a [String],
     scratch: &'a Path,
 }
 
@@ -538,10 +487,9 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
             )
         }
     };
-    let (argv, knobs) = if src.ends_with(".gate") {
-        let declared = match gates::knobs(&sel.name) {
-            Some(k) => k,
-            None => {
+    let argv = if src.ends_with(".gate") {
+        if gates::declared(&sel.name).is_none() {
+            {
                 return fail(
                     "dispatch harness error, exit 2",
                     format!(
@@ -550,15 +498,12 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
                         sel.name
                     ),
                     started.elapsed().as_millis(),
-                )
+                );
             }
-        };
-        (
-            vec![d.self_exe.to_string(), sel.name.clone()],
-            child_knobs(declared, d.union, d.couples_knobs),
-        )
+        }
+        vec![d.self_exe.to_string(), sel.name.clone()]
     } else {
-        (vec![src], Vec::new())
+        vec![src]
     };
     let mut full = argv;
     full.extend(sel.args.iter().cloned());
@@ -577,7 +522,7 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
         );
     }
     let capture = d.scratch.join(format!("c{}", idx));
-    match proc::dispatch(&full, &knobs, d.union_names, &tmpdir, &capture) {
+    match proc::dispatch(&full, &tmpdir, &capture) {
         Err(e) => fail(
             "dispatch harness error, exit 2",
             e,
@@ -690,9 +635,8 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged roots cross spelled relative to the invoking
-    // directory and are re-absolutised here, which is how the reader recovers exactly the paths the
-    // shell library computed — and what keeps the two dispatchers' unresolved-member report equal
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the kit roots absolutized, so the
+    // unresolved-member report names the paths every dispatcher resolves
     let kit_roots = match walk::kit_roots_abs() {
         Ok(v) => v,
         Err(e) => {
@@ -768,29 +712,10 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    let union: Vec<(String, String)> = std::env::vars()
-        .filter(|(k, _)| k.starts_with("GATE_SDK_KNOB_"))
-        .collect();
-    let union_names: Vec<String> = union.iter().map(|(k, _)| k.clone()).collect();
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — resolved once for the run rather than per child: the
-    // descriptor corpus cannot change mid-battery, and a refusal here is exit 2 because a child
-    // whose couples token goes unresolved is a gate that cannot compute its own trigger.
-    let couples_knobs = match registry::couples_knob_names(&resolve_dirs) {
-        Ok(n) => n,
-        Err(e) => {
-            eprintln!("{}: {}", TOOL, e);
-            let _ = std::fs::remove_dir_all(&scratch);
-            return 2;
-        }
-    };
-
     let d = Dispatch {
         resolve_dirs: &resolve_dirs,
         self_exe: &self_exe,
         list: &list,
-        union: &union,
-        union_names: &union_names,
-        couples_knobs: &couples_knobs,
         scratch: &scratch,
     };
 
@@ -907,46 +832,6 @@ fn dispatch_all(d: &Dispatch, selected: &[Selected]) -> Vec<Outcome> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — a member receives the knobs its registry entry
-    // declares and no others, prefix families included, out of the union the front-end resolved
-    #[test]
-    fn a_child_receives_only_the_knobs_its_entry_declares() {
-        let union = vec![
-            ("GATE_SDK_KNOB_A".to_string(), "1".to_string()),
-            ("GATE_SDK_KNOB_B".to_string(), "2".to_string()),
-            ("GATE_SDK_KNOB_P_ONE".to_string(), "3".to_string()),
-            ("GATE_SDK_KNOB_P_TWO".to_string(), "4".to_string()),
-        ];
-        let got = child_knobs(&["A", "P_*"], &union, &[]);
-        let names: Vec<&str> = got.iter().map(|(k, _)| k.as_str()).collect();
-        assert_eq!(
-            names,
-            vec!["GATE_SDK_KNOB_A", "GATE_SDK_KNOB_P_ONE", "GATE_SDK_KNOB_P_TWO"]
-        );
-    }
-
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob sentinel is substituted rather than
-    // looked up: filtering the union by the sentinel's own name would hand the child nothing, and an
-    // empty expansion is the lost trigger the token exists to prevent.
-    #[test]
-    fn the_couples_knob_sentinel_substitutes_the_corpus_names_it_stands_for() {
-        let union = vec![
-            ("GATE_SDK_KNOB_A".to_string(), "1".to_string()),
-            ("GATE_SDK_KNOB_CORPUS".to_string(), "x\ty".to_string()),
-        ];
-        let got = child_knobs(
-            &["A", registry::EVERY_COUPLES_KNOB],
-            &union,
-            &["CORPUS".to_string()],
-        );
-        let names: Vec<&str> = got.iter().map(|(k, _)| k.as_str()).collect();
-        assert_eq!(names, vec!["GATE_SDK_KNOB_A", "GATE_SDK_KNOB_CORPUS"]);
-        assert!(
-            child_knobs(&[registry::EVERY_COUPLES_KNOB], &union, &[]).is_empty(),
-            "a corpus naming no knob token bridges nothing, which is correct rather than a refusal"
-        );
-    }
 
     // spec: gate-sdk/SPEC.md §The port-candidate criteria — the criterion-6 discharge for the
     // `staged_matches` twin the port created: one canned corpus of glob/path pairs put to

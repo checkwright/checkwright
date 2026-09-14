@@ -1,7 +1,7 @@
-// spec: guard-kit/SPEC.md §Testing — the decision-table runner, bridged as an `Arm::Run` member:
+// spec: guard-kit/SPEC.md §Testing — the decision-table runner, an `Arm::Run` member:
 // its contract is a three-valued exit — 0 clean, 1 a verdict mismatch, 2 a harness precondition —
 // which `Arm::Emit` collapses to 0-or-2.
-// spec: gate-sdk/SPEC.md §The non-gate arm — a bridged-arm table member rather than a hardcoded
+// spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: it needs the vendored guard-kit root.
 use crate::proc::{self, Stderr};
 use crate::walk;

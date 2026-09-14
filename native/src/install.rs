@@ -1,6 +1,5 @@
 // spec: installer/README.md §The install boundary — the `--install <op>` arm family: the seam
 // both bootstraps call, so the bash caller and its PowerShell twin issue byte-identical argv.
-// spec: gate-sdk/SPEC.md §The non-gate arm — the class's first deliberately unbridged member.
 use crate::sha256;
 // spec: installer/README.md §The manifest — the recorded hash has one owner, the schema module's
 // own `hash`, so this op and the `--init` arm that shares its claim rule cannot disagree about
@@ -170,36 +169,25 @@ pub fn make_executable(_file: &Path) -> Result<(), String> {
     Ok(())
 }
 
-// spec: installer/README.md §The gate binary — the seam is rewritten preserving every line except
-// the knob this op owns, and the two shellcheck directives are seeded only when the file is
-// absent: a consumer's own check-shellcheck reds on a sourced file written without them.
+// spec: installer/README.md §The gate binary — the seam is a knob file rewritten preserving every line
+// except one whose head is the knob this op owns
 fn seam_text(existing: Option<&str>, dest: &str) -> String {
     let mut out = String::new();
-    match existing {
-        None => {
-            out.push_str("# shellcheck shell=bash\n");
-            out.push_str(
-                "# shellcheck disable=SC2034  # consumed by gate-sdk/lib/gate.sh after sourcing\n",
-            );
+    for line in existing.unwrap_or_default().lines() {
+        if line.split_once('=').is_some_and(|(head, _)| head.trim() == "GATE_SDK_NATIVE_BIN") {
+            continue;
         }
-        Some(text) => {
-            for line in text.lines() {
-                if line.starts_with("GATE_SDK_NATIVE_BIN=") {
-                    continue;
-                }
-                out.push_str(line);
-                out.push('\n');
-            }
-        }
+        out.push_str(line);
+        out.push('\n');
     }
-    out.push_str("GATE_SDK_NATIVE_BIN=");
+    out.push_str("GATE_SDK_NATIVE_BIN = ");
     out.push_str(dest);
     out.push('\n');
     out
 }
 
 // spec: installer/README.md §The install boundary — the seam write is a temporary beside the
-// target and a rename, so no reader sees a half-written sourced file and a failed write leaves
+// target and a rename, so no reader sees a half-written knob file and a failed write leaves
 // whatever was there intact.
 fn write_atomically(file: &Path, body: &str) -> Result<(), String> {
     let mut tmp: PathBuf = file.to_path_buf();
@@ -424,7 +412,7 @@ mod tests {
             root: root.to_path_buf(),
             src,
             dest: "scripts/checkwright-gates",
-            seam: "scripts/gate-sdk-config.sh",
+            seam: "scripts/gate-sdk-config.knobs",
             target: "x86_64-unknown-linux-gnu",
             digest,
             force: false,
@@ -455,23 +443,20 @@ mod tests {
         assert_eq!(run(&[]), 2);
     }
 
-    // spec: installer/README.md §The gate binary — the seam rewrite preserves every line except
-    // the knob this op owns, and seeds the two directives only when the file is absent.
+    // spec: installer/README.md §The gate binary — the seam rewrite preserves every line except one
+    // whose head is the knob this op owns, whatever blanks surround its `=`
     #[test]
-    fn the_seam_rewrite_keeps_every_other_line_and_seeds_only_when_absent() {
-        let fresh = seam_text(None, "scripts/checkwright-gates");
-        assert!(fresh.starts_with("# shellcheck shell=bash\n"));
-        assert!(fresh.ends_with("GATE_SDK_NATIVE_BIN=scripts/checkwright-gates\n"));
-        let existing = "# shellcheck shell=bash\nOTHER_KNOB=1\nGATE_SDK_NATIVE_BIN=stale\n";
+    fn the_seam_rewrite_keeps_every_other_line_and_replaces_the_owned_one() {
+        assert_eq!(seam_text(None, "scripts/checkwright-gates"), "GATE_SDK_NATIVE_BIN = scripts/checkwright-gates\n");
+        let existing = "# a comment\nGATE_SDK_TMP_DIR = .scratch\nGATE_SDK_NATIVE_BIN=stale\n  GATE_SDK_NATIVE_BIN = older\n";
         let rewritten = seam_text(Some(existing), "scripts/checkwright-gates");
         assert_eq!(
             rewritten,
-            "# shellcheck shell=bash\nOTHER_KNOB=1\nGATE_SDK_NATIVE_BIN=scripts/checkwright-gates\n"
+            "# a comment\nGATE_SDK_TMP_DIR = .scratch\nGATE_SDK_NATIVE_BIN = scripts/checkwright-gates\n"
         );
-        assert_eq!(rewritten.matches("GATE_SDK_NATIVE_BIN=").count(), 1);
         // comment-tier-exempt: a source file with no closing newline is a local property of the
         // input, not a rule either tier owns — `grep -v` terminated its last line and so must this
-        assert_eq!(seam_text(Some("A=1"), "b"), "A=1\nGATE_SDK_NATIVE_BIN=b\n");
+        assert_eq!(seam_text(Some("A = 1"), "b"), "A = 1\nGATE_SDK_NATIVE_BIN = b\n");
     }
 
     // spec: installer/README.md §The install boundary — claim's three ways to reach `Take`: no
@@ -530,7 +515,7 @@ mod tests {
         std::fs::write(&src, "artifact bytes\n").expect("cannot write the scratch artifact");
         let digest = sha256::file_hex(&src).expect("cannot hash the scratch artifact");
         let src_s = src.to_string_lossy().into_owned();
-        let (dest, seam) = ("scripts/checkwright-gates", "scripts/gate-sdk-config.sh");
+        let (dest, seam) = ("scripts/checkwright-gates", "scripts/gate-sdk-config.knobs");
         let owned = vec![format!("own\t{}", dest), format!("own\t{}", seam)];
 
         let first = place(
@@ -545,7 +530,7 @@ mod tests {
         );
         assert!(std::fs::read_to_string(dir.join(seam))
             .expect("no seam was written")
-            .contains(&format!("GATE_SDK_NATIVE_BIN={}\n", dest)));
+            .contains(&format!("GATE_SDK_NATIVE_BIN = {}\n", dest)));
 
         // spec: installer/README.md §The manifest — an unreadable `--src` is what proves the
         // skip-rewrite branch was taken: a re-run that copied would fail on it rather than pass

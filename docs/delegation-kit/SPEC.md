@@ -650,9 +650,8 @@ carries the judgment the trigger cannot.
 
 **Degradation — fail-open, but loud**, the posture guard-kit/SPEC.md §The guard
 framework names for a deny-guard whose matcher proves the tool but whose rule
-turns on a payload field. The binary being absent, or the config bridge
-refusing the whole environment, take the general fail-open path
-(gate-sdk/SPEC.md §The non-gate arm) before this member ever runs — silently,
+turns on a payload field. The binary being absent takes the general fail-open
+path (gate-sdk/SPEC.md §The non-gate arm) before this member ever runs — silently,
 with no advisory of this guard's own. What follows is the degradation surface
 once the arm does run:
 
@@ -1463,7 +1462,7 @@ list does not name one for:
   **The honest limit on that countability, and it is a break in this contract
   rather than a caveat on it: the named reader cannot see a worktree-isolated
   agent's firings at all.** `DELEGATION_KIT_STOP_LOG` defaults under
-  `${GATE_SDK_WORKFLOW_DIR}`, resolved against the *writing session's*
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}`, resolved against the *writing session's*
   cwd. An isolated agent's cwd is its own worktree, so its lines land in that
   worktree's `.workflow/` and are destroyed with the worktree at reclamation —
   and that is precisely the class `unresolved` names, so the field's claim that a
@@ -2386,16 +2385,15 @@ section's last shell holder. §Trend reporter's own reader has since crossed as
 kit's other owed section and is discharged, on a narrower reading of *discharged*
 that section states.
 
-**It is a bridged `Arm::Run` and cannot be an `--emit-` member**, which the exit
+**It is an `Arm::Run` arm-table row and cannot be an `--emit-` member**, which the exit
 contract forces rather than taste choosing: the emitting family maps every
 success to 0 and every failure to 2, and this rule's **1** is the whole blocking
 signal the budget guard grades. So it takes its own flag spelling and its own
 front-end case arm, as `--upgrade-smoke` does (gate-sdk/SPEC.md §The non-gate
 arm). It is **not** a harness-integration arm either — its callers are a session
 brief, a kit smoke and a gate reaching it in process, the caller set that
-subsection's own definition excludes. Unavailable, whether for want of a binary
-on the host or because the config bridge refused, is exit **2** at the
-front-end: already this rule's budget-unknown code, so an artifact-less host
+subsection's own definition excludes. Unavailable, for want of a binary on the
+host, is exit **2** at the front-end: already this rule's budget-unknown code, so an artifact-less host
 reads as STALE rather than as a verdict it never took.
 
 **Eleven declared knobs, each a row of delegation-kit's static table**:
@@ -2717,30 +2715,26 @@ against.
 to resolve its own and an in-process reader resolves them itself. That
 *improves* on the state it replaces — knob resolution stops happening twice by
 two mechanisms. **Where those four resolve is stated here rather than inherited,
-because queue-kit/SPEC.md §The queue-index arm's front-end paragraph settles the
-caller that reaches an arm *as* an arm and an in-process call from a hook module
+because queue-kit/SPEC.md §The queue-index arm's configured-arm paragraph settles
+the caller that reaches an arm *as* an arm and an in-process call from a hook module
 is neither the front end nor a direct binary invoke:**
 
 - **They resolve in process from queue-kit's static table.** The four are static
   knobs, so the binary reads them from the kit's defaults and the consumer's
-  `queue-config.knobs` wherever it runs, and no bridge carries them
-  (gate-sdk/SPEC.md §The knob file). A consumer override reaches this reader
-  through the crate's own resolution. The one bridged input is the gate-sdk queue
-  file `QUEUE_KIT_QUEUE_FILE`'s default derives from: the harness invokes `bash
-  gate-sdk/bin/run-gates.sh --statusline`, so the front end resolves this arm's
-  declared roster, whose closure carries that input, and execs the binary with it
-  in the environment. Adding the four names to the roster is therefore not
-  bookkeeping — it is what puts that input there.
-- **The silent-override-ignored failure that path could have had is structurally
-  unavailable.** The crate's read of an absent bridged input returns `Err` — the
-  crate holds no default for it — so an unbridged invocation cannot substitute a
-  platform default for a consumer's value.
+  `queue-config.knobs` wherever it runs (gate-sdk/SPEC.md §The knob file), and the
+  gate-sdk queue file `QUEUE_KIT_QUEUE_FILE`'s default derives from resolves from
+  gate-sdk's own table the same way. A consumer override reaches this reader
+  through the crate's own resolution. Adding the four names to the roster is
+  therefore not bookkeeping — it is what lets `--knob-files`,
+  `check-reads-couples` and `check-gate-substrate-parity` see those reads.
+- **The silent-override-ignored failure is structurally unavailable.** No path
+  resolves the four but the kit table and the knob files, so no invocation can
+  substitute a platform default for a consumer's value.
 - **So the residual failure is total and visible, never partial and wrong.** A
-  malformed queue config, which the table validator refuses, or a caller invoking
-  the binary directly and bypassing the front end, drops the **whole** counter
-  group and changes nothing else about the bar — one of the degradations above. The failure the
-  front-end paragraph exists to prevent, a consumer's configured tier silently
-  missing from a rendered tally, has no spelling on this path.
+  malformed queue config, which the table validator refuses, drops the **whole**
+  counter group and changes nothing else about the bar — one of the degradations
+  above. A consumer's configured tier silently missing from a rendered tally has
+  no spelling on this path.
 
 The render cost is one in-process scan per statusline fire, which is the kit's
 most frequent trigger by a wide margin (§The usage.txt contract). A full scan of a
@@ -2796,7 +2790,7 @@ which is the clearest statement of what that test asks.
 
 **One consequence of taking the `--emit` family is where usage now lives, and
 it is not where a reader would guess.** The front-end's `--help` gives every
-bridged arm holding its own `case` arm a named line and a paragraph, but the
+non-gate arm holding its own `case` arm a named line and a paragraph, but the
 `--emit-` family gets one generic line and enumerates no member — so this arm's
 usage is **not** in the front-end's help text and is not owed there. It lives at
 the member's own **shape refusal**: `--emit usage-trend --help` prints the usage
@@ -2885,11 +2879,11 @@ no knob of its own for either (§Layout and configuration owns why).
 
 **Six subcommands, and the subcommand word is an operand rather than part of the
 flag**: `produce`, `waiter`, `arm-local`, `record`, `report`, `sweep`. That is
-`--hook`'s shape, which also settles the arity question — the bridge forwards an
-arm's own argv when resolving its declared knobs, so a subcommand-bearing arm is a
-solved registration rather than a new one (gate-sdk/SPEC.md §The non-gate arm).
+`--hook`'s shape, which also settles the arity question — the front-end hands the
+binary an arm's own argv unchanged, so a subcommand-bearing arm is a solved
+registration rather than a new one (gate-sdk/SPEC.md §The non-gate arm).
 
-**It is a bridged `Arm::Run` with its own front-end case arm, and it cannot be an
+**It is an `Arm::Run` arm-table row with its own front-end case arm, and it cannot be an
 `--emit-` member**, for two independent reasons. The exit contract is the first:
 the emitting family maps success to 0 and failure to 2, so it can never return the
 **1** below. The second stands without it — four of the six subcommands emit no
@@ -2898,9 +2892,9 @@ trial line, so the `--emit-` spelling would be a stretch this member has no clai
 to. It joins the arms that take their own spelling for their own contract.
 
 **Two declared knobs and the port minted none**: `GATE_SDK_TMP_DIR` and
-`GATE_SDK_WORKFLOW_DIR`, the two the instrument already read. Both are resolved by
-the front-end before the exec, and the arm's status survives that exec verbatim
-because `exec` replaces the shell's process image — so a dispatch failure is the
+`GATE_SDK_WORKFLOW_DIR`, the two the instrument already read. Both resolve in
+process from gate-sdk's table, and the arm's status survives the front-end's exec
+verbatim because `exec` replaces the shell's process image — so a dispatch failure is the
 only path on which the front-end's own unavailable status is reachable.
 
 **The exit contract is three-state**: **0** on a completed subcommand, **1** for
@@ -3116,8 +3110,7 @@ Config is a **knob file**: copy `templates/delegation-config.knobs` into the gat
 dir as `delegation-config.knobs` (or point `DELEGATION_KIT_KNOB_FILE` elsewhere) and
 set any knob below; defaults fill what the file leaves unset. delegation-kit's
 knobs are **static**: the binary resolves them in process from its own defaults
-table and the consumer's knob file, and the config bridge never carries them
-(gate-sdk/SPEC.md §lib/gate.sh); `bash gate-sdk/bin/run-gates.sh --emit knob-roster`
+table and the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit knob-roster`
 prints each one with its shape and rendered default. A gitignored
 `delegation-config.local.knobs` in the gates dir is the home for a private value a
 tracked file cannot carry. The grammar, that `.local` overlay, the
@@ -3127,8 +3120,7 @@ or `delegation-config.local.sh`, a non-empty file named by the retired
 `DELEGATION_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. A file value
 for an indexed knob replaces its default whole. The kit's table validator refuses a
 malformed config at exit 2 with every finding — a broken machine gates nothing. A
-derived default below is written in the roster's `${NAME}` spelling for the knob it
-reads. Knobs (this repo's layout as defaults):
+derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement. Knobs (this repo's layout as defaults):
 
 - `DELEGATION_KIT_USAGE_FILE` — default empty, and empty means *derive it*: the
   reader fills `<config-home>/usage.txt`, the config home being
@@ -3226,10 +3218,11 @@ reads. Knobs (this repo's layout as defaults):
   two knobs do not behave alike.
 - `DELEGATION_KIT_META_PATHS` — prefixes counted as meta-layer for
   assertion A; default `("${GATE_SDK_GATES_DIR}/"
-  "${GATE_SDK_WORKFLOW_DIR}/" ".claude/")`; root-level `*.md` is
-  always meta. The reader, `check-gate-tamper`, unions every `GATE_KIT_ROOTS_REL`
-  member into the resolved value as a root-relative `<root>/` prefix the value
-  does not already hold, and declares `GATE_KIT_ROOTS_REL` for it — a vendored
+  "${GATE_SDK_WORKFLOW_DIR:-.workflow}/" ".claude/")`; root-level `*.md` is
+  always meta. The reader, `check-gate-tamper`, unions every kit root the binary
+  derives from `GATE_SDK_ROOT` and `GATE_SDK_KIT_DIRS` into the resolved value as a
+  root-relative `<root>/` prefix the value does not already hold, and declares
+  `GATE_SDK_KIT_DIRS` for it — a vendored
   kit's edits are meta-layer by definition, so the consumer's config need not
   name kit dirs at all (this repo's keeps only the non-kit prefixes). The union
   sits at the reader rather than in the default because a file value replaces the
@@ -3237,7 +3230,7 @@ reads. Knobs (this repo's layout as defaults):
   additive, never a filter: a prefix the consumer declared cannot be lost.
 - `DELEGATION_KIT_STOP_LOG` — the turn-end hook's log (§The turn-end liveness
   hook); default
-  `${GATE_SDK_WORKFLOW_DIR}/subagent-stop-liveness.log`, the same
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log`, the same
   deferral guard-kit's two logs already take. No scratch-dir knob sits beside it:
   the launch record's home is `${GATE_SDK_TMP_DIR:-.tmp}`, the cross-kit deferral
   every kit reaching that directory already resolves it through, and a second

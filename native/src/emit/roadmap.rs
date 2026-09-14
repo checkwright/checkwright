@@ -1,6 +1,6 @@
 // spec: queue-kit/SPEC.md §The roadmap arm — the public roadmap projected off the queue's
-// [roadmap:] tags. The arm ships the projection *grammar* only; every lane name crosses the
-// config bridge as a knob (§The tag algebra), so not one enters here.
+// [roadmap:] tags. The arm ships the projection *grammar* only; every lane name is a knob
+// (§The tag algebra), so not one enters here.
 use crate::marker;
 use crate::queue::{self, RoadmapEntry, Sections};
 

@@ -114,6 +114,7 @@ pub const KIT: Kit = Kit {
     open_family: false,
     families: &[],
     retired: &[],
+    env_only: &[],
 };
 
 fn digits(v: &str) -> bool {

@@ -11,7 +11,7 @@ LIFECYCLE_KIT_CONFIG_FILE
 
 A dispatch-composed name resolves through the family stem kit source defines,
 since the members are built at runtime and appear in no kit literal:
-GATE_SDK_KNOB_SOME_BRIDGED_KNOB
+EVIDENCE_KIT_RUN_SOME_SUITE
 
 Out of scope, never flagged — prose compounds and non-brand namespaces:
 a per-kit note, check-kit-registration, and the SMOKE_KIT_ROOT harness var

@@ -577,8 +577,7 @@ the gates dir as `lifecycle-config.knobs` (or point `LIFECYCLE_KIT_KNOB_FILE`
 elsewhere) and set only what you override — this roster owns every knob and its
 default; the template carries no second copy. lifecycle-kit's knobs are
 **static**: the binary resolves them in process from its own defaults table and
-the consumer's knob file, and the config bridge never carries them
-(gate-sdk/SPEC.md §lib/gate.sh); `bash gate-sdk/bin/run-gates.sh --emit
+the consumer's knob file; `bash gate-sdk/bin/run-gates.sh --emit
 knob-roster` prints each one with its shape and rendered default. The grammar, the
 `.local` overlay, the environment-over-file precedence for a scalar, and the
 refusals — a set `LIFECYCLE_KIT_KNOB_FILE` that does not exist, a left-behind
@@ -587,8 +586,7 @@ refusals — a set `LIFECYCLE_KIT_KNOB_FILE` that does not exist, a left-behind
 table validator checks the machine (unknown stages in the map, a waiver token
 colliding with a stage name, a non-integer n-gram width, a malformed preflight
 entry) and exits 2 on a malformed config — a broken machine must not gate
-anything (§The stage-machine adapters). A derived default below is written in the
-roster's `${NAME}` spelling for the gate-sdk knob it reads.
+anything (§The stage-machine adapters). A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<default>}` so the roster's rendered literal reads as agreement.
 
 **No knob carries the ruling-authority vocabulary, and this is where a reader
 looking for one finds out why.** §The state machine obliges a stage session to
@@ -705,8 +703,8 @@ the clause's reader is a human or agent rather than a gate.
   `check-lifecycle-registration` reads it back from; default `CLAUDE.md`
   (the `DOCTRINE_KIT_AGENT_FILE` sibling).
 - `LIFECYCLE_KIT_QUEUE_FILE` / `LIFECYCLE_KIT_STATE_FILE` — the governed header and
-  stamp files; defaults `${GATE_SDK_QUEUE_FILE}` /
-  `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt`.
+  stamp files; defaults `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}` /
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`.
 - `LIFECYCLE_KIT_SESSION_ID` — the harness-neutral stamp-id override, source 1
   of the derivation order (§bin/session-id.sh); default unset. Read from the
   process environment and never a row of the kit's table, so no knob file can set
@@ -724,16 +722,16 @@ the clause's reader is a human or agent rather than a gate.
   posture-independent; `templates/lead.md` consumes it as the inline-run
   posture prose.
 - `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp
-  file; default `${GATE_SDK_WORKFLOW_DIR}/lesson-evidence.txt`,
+  file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`,
   read by `check-lesson-disposition` and the boundary-reset built-in.
 - `LIFECYCLE_KIT_GAP_INBOX_FILE` — the committed append-only gap inbox
   (§The committed gap inbox); default
-  `${GATE_SDK_WORKFLOW_DIR}/gap-inbox.md`, written by the `--emit-file-gap` arm,
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by the `--emit-file-gap` arm,
   its `merge=union` attribute verified by `check-merge-attrs`, drained by the
   close skill and read for emptiness by `--enter-stage`'s boundary refusal.
 - `LIFECYCLE_KIT_SURVEY_RECORD_FILE` — the committed per-iteration survey record
   (§The survey record); default
-  `${GATE_SDK_WORKFLOW_DIR}/survey-record.md`, written by the
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/survey-record.md`, written by the
   `--emit file-survey` arm, asserted by `check-survey-record`, its headings
   printed and its body truncated by `--enter-stage` (a kit-owned boundary built-in,
   so it does not ride `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`), and its
@@ -780,7 +778,7 @@ the clause's reader is a human or agent rather than a gate.
   knob-citation gate as its only reader.
 - `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` — array of path globs for the surfaces
   held to the no-retrieval-pointer rule (§check-scratch-citation); default the
-  queue file alone (`${GATE_SDK_QUEUE_FILE}`, through `LIFECYCLE_KIT_QUEUE_FILE`). That default is the one permanent
+  queue file alone (`${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`, through `LIFECYCLE_KIT_QUEUE_FILE`). That default is the one permanent
   surface this kit owns and where both attested firings landed, so it is
   non-vacuous in every consumer and over-reaches in none. The roster is consumer
   config and the forbidden targets are derived from the consumer's own truncate
@@ -848,7 +846,7 @@ the clause's reader is a human or agent rather than a gate.
   without which a tracked ledger reaches no derived roster at all.
 - `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` — the resume journal's path as a function
   of the stage, carrying a `<stage>` placeholder (§The state machine); default
-  `${GATE_SDK_TMP_DIR}/<stage>-journal.md`, so the scratch dir's literal is
+  `${GATE_SDK_TMP_DIR:-.tmp}/<stage>-journal.md`, so the scratch dir's literal is
   deferred to rather than restated here. A pattern carrying no placeholder is a
   fail-closed config refusal (§The stage-machine adapters).
 - `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` — `0` or `1`; default `0`. At `1` the entry
@@ -991,19 +989,18 @@ What *append-only* means on this surface is a merge property, and
 `--emit-kfric` pattern: repo-root anchor, config-via-env, exit 2 on an empty
 argument) appends one dated bullet, seeding the contract header — byte-identical
 to the line close's drain truncates back to — when the inbox does not yet exist.
-It is the `--emit-file-gap` bridged arm (gate-sdk/SPEC.md §The non-gate arm),
+It is the `--emit-file-gap` arm (gate-sdk/SPEC.md §The non-gate arm),
 whose declared roster is five rows of the kit's static table:
 `LIFECYCLE_KIT_GAP_INBOX_FILE`, `LIFECYCLE_KIT_QUEUE_FILE`,
 `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES` and
 `LIFECYCLE_KIT_FIRST_STAGE`. The family is forced rather than chosen: the tool
-reads knobs whose defaults derive from gate-sdk inputs only the bridge carries,
-and a hardcoded top-level flag receives no bridged input.
+reads knobs, and a hardcoded top-level flag has no table row to declare them on.
 Its one positional is free text, so it validates that argument's **shape** to
 gate-sdk/SPEC.md §The bin/-tool contract — an unrecognized leading `-` refused
 at exit 2, `--` ending option processing — which is the rule this capture
 affordance's own three attested firings bought, and which **survives the port
 because the hazard belongs to the argument rather than to the substrate**. The
-`-h`/`--help` arm does **not** survive: usage for a bridged arm lives in
+`-h`/`--help` arm does **not** survive: usage for a non-gate arm lives in
 `run-gates.sh`'s own help and in [README.md](README.md), so `--emit file-gap
 --help` is a refusal rather than a capture. That is the one observable this
 member's port moved. Stdout is the filed bullet and nothing else; the three
@@ -1650,11 +1647,11 @@ every block on any commit* — too coarse to leave the mechanism any use; the
 
 **The affordance.** `bash gate-sdk/bin/run-gates.sh --emit file-survey [--]
 "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"` appends one block,
-seeding the contract header when the record does not yet exist. It is a bridged
+seeding the contract header when the record does not yet exist. It is a
 non-gate arm (gate-sdk/SPEC.md §The non-gate arm) declaring two reads,
 `LIFECYCLE_KIT_SURVEY_RECORD_FILE` and `LIFECYCLE_KIT_STATE_FILE`; the family is
 forced rather than chosen, since the arm resolves consumer knobs and a hardcoded
-flag would resolve platform defaults while silently ignoring every override. It
+flag has no table row to declare them on. It
 keeps the repo-root anchor — a relative record path names the same file from any
 subdirectory, falling back to the working directory outside a repository — exit 2
 on a missing or empty argument, and the free-text argument-shape contract of
@@ -1947,8 +1944,8 @@ is the stronger claim this rule was written to earn.
 
 The rest exercise advisory tooling with no gate to dispatch, and so have nothing
 to say about reach — but since the enter-stage cut they do have something to say
-about **caller**: the seven that drive `--enter-stage` reach the binary and its
-bridged environment directly rather than through gate-sdk's front-end, because
+about **caller**: the seven that drive `--enter-stage` reach the binary
+directly rather than through gate-sdk's front-end, because
 that front-end refuses outside a git repository and these harnesses run in a
 non-git `mktemp -d` by design. That is the arm's sanctioned second caller
 (§bin/enter-stage.sh), not a bypass, and it is spelled once in
@@ -2080,10 +2077,7 @@ a pattern with no `<stage>` placeholder names one file for every stage, so the
 entry assertion would read some other session's journal and **pass** on it — a
 wrong answer, not a missing one, which is why it is refused rather than tolerated.
 `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` takes the `0|1` arm shape
-`LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` already has. A row whose default derives
-from a bridged gate-sdk input is validated only when its value comes from the
-environment or a knob file, and every kit default passes the validator, which is
-what makes skipping those rows at their default sound.
+`LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` already has.
 `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` deliberately gains **no** validator arm, which
 is the roster's rule applied rather than an omission from it: its value is a path
 that need not exist — header-only is the valve ledger's resting state
@@ -2101,8 +2095,8 @@ generic composer as `bash gate-sdk/bin/run-gates.sh --emit session-id`. **The
 heading is a section name, not a file name** — no `.sh` driver stands behind it,
 and it keeps this spelling because the citations pointing here resolve against
 it. It is not a gate — no
-`gates.list` row, no `.gate` descriptor, no fixture pair — but a bridged-arm
-table member (gate-sdk/SPEC.md §The non-gate arm), whose contract is a
+`gates.list` row, no `.gate` descriptor, no fixture pair — but an arm-table
+member (gate-sdk/SPEC.md §The non-gate arm), whose contract is a
 **document**: one normalized id on stdout and exit 0, or a diagnostic on stderr
 and exit 2.
 
@@ -2182,16 +2176,15 @@ refused: a knob file must never be able to set a stamp-id override, because ever
 session reading that file would then stamp one id. The arm keeps reading both off
 the process environment.
 
-**Both names reach the arm anyway, and so do the harness's, because the bridge
-*adds* to the environment rather than replacing it.** `gate_command` and
-`exec_arm` both compose `env <resolved knobs> <binary> <arm>` (gate-sdk/SPEC.md
-§lib/gate.sh, §run-gates), never an `env -i`, so `LIFECYCLE_KIT_SESSION_ID`,
+**Both names reach the arm anyway, and so do the harness's, because the
+front-end hands the binary its environment unchanged.** `gate_command` composes
+`<binary> <arm>` and `exec_arm` `exec`s the binary (gate-sdk/SPEC.md
+§lib/gate.sh, §run-gates), never under an `env -i`, so `LIFECYCLE_KIT_SESSION_ID`,
 `LIFECYCLE_KIT_SESSIONS_DIR`, `CLAUDE_CODE_SESSION_ID`,
 `CLAUDE_CODE_CHILD_SESSION`, `CLAUDE_CONFIG_DIR` and `HOME` reach it exactly as
 they reached the driver. §The non-gate arm's rule that *a default the deleted
 shell driver held inline moves into the owning kit's library in the same cut*
-does not bind here: its ground is a **declared** knob resolving empty through the
-bridge, and this arm declares none.
+does not bind here: its ground is a **declared** knob, and this arm declares none.
 
 **The process cwd is an input to source 3, so `--enter-stage` reaches the binary
 directly rather than through the front-end.** `bin/run-gates.sh` cds to the git
@@ -2244,7 +2237,7 @@ appends the invocation stamp, deriving the session id in process by the
 `--emit-session-id` derivation — never an argument, so the no-hand-picking rule
 rides into the tool.
 
-**It is a bridged `Arm::Run`, and the variant is the exit contract.** The
+**It is an `Arm::Run` arm-table member, and the variant is the exit contract.** The
 grammar is `--enter-stage [--simulate] <stage>`,
 `--enter-stage [--simulate] --rename <name>` or
 `--enter-stage [--simulate] --open-lead-journal`: `--simulate`, `--rename` and
@@ -2275,26 +2268,23 @@ evidence file and every `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member. Permissiveness
 the one spelling anybody has typed and leaves every other unparsed argument
 being discarded in silence, where the refusal covers the class. Making the mode
 an environment knob was refused as well, on a different ground: it mints a
-config surface to express what an argument already expresses, and a knob is
-carried into every child of a bridged arm where an argument is not.
+config surface to express what an argument already expresses, and an exported
+knob is inherited by every child the arm spawns where an argument is not.
 
-**The declared roster is the prefix family `LIFECYCLE_KIT_*`, plus three names
+**The declared roster is the prefix family `LIFECYCLE_KIT_*`, plus four names
 outside it.** The family is a derivation rather than a transcription: this arm
-resolves its own knobs *and* bridges the declared rosters of the two gates it
-dispatches, and a transcribed union of the three drifts the first time either
-gate gains a knob. The three names beside it are there because **the config
-bridge carries only what an arm declares** — a child receives a filtered view of
-its parent's bridged environment, never a freshly resolved one, so a knob this
-arm hands onward must be on this arm's own roster. `GATE_PRUNE_DIRS` is
-`check-stage-entry`'s, `GATE_SDK_KIT_DIRS` steers the kit roots whose `checks/` directories the
-two pre-flight members resolve in, and `GATE_SDK_TMP_DIR` is the scratch dir that
-is the temp state file's home, the boundary wipe's subject and the resume
-journal's parent.
+and the pre-flight gates it dispatches read lifecycle-kit knobs, and a transcribed
+union of them drifts the first time one of those gates gains a knob. Each dispatched gate
+inherits the invoking environment unchanged and resolves its own knobs.
+`GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS` are `check-stage-entry`'s,
+`GATE_SDK_KIT_DIRS` steers the kit roots whose `checks/` directories the two
+pre-flight members resolve in, and `GATE_SDK_TMP_DIR` is the scratch dir that is
+the temp state file's home, the boundary wipe's subject and the resume journal's
+parent.
 
 **Two callers are sanctioned, and the second one is not a convenience.** A stage
 session reaches the arm through `bash gate-sdk/bin/run-gates.sh`; a hermetic test
-harness resolves the binary and the bridged environment itself and invokes the arm
-directly. The front-end `cd`s to the git toplevel and **refuses outside a
+harness resolves the binary itself and invokes the arm directly. The front-end `cd`s to the git toplevel and **refuses outside a
 repository**, while the harnesses that drive this tool end to end run in a non-git
 `mktemp -d` — and one of them asserts, as a named case, that a non-git tree skips
 the linked-worktree check rather than failing on it. Routing every caller through
@@ -2713,7 +2703,7 @@ committed file, carries a mandatory written reason, and valves one arm rather
 than the tool. The hand-off keeps the
 same `<queue> <state>` argv it always had, but **the temp file swapped sides**:
 because the cursor is the last stamp, the candidate transition now lives in a
-temp *state* file under `${GATE_SDK_TMP_DIR}` carrying the not-yet-written
+temp *state* file under `${GATE_SDK_TMP_DIR:-.tmp}` carrying the not-yet-written
 stamp, while the live queue passes through untouched (the boundary reset, which
 does rewrite the header, passes a temp queue as well). The refusal is advisory
 in the same sense the gate is at commit time (no `--force`, so the easy path is
@@ -3016,7 +3006,7 @@ temporaries, `check-stage-evidence` runs against them, and a non-zero exit
 refuses with the gate's output relayed and nothing written. That gate is
 resolved through gate-sdk's `gate_command` rather than named by script path, so
 the arm names a gate and never a substrate: the resolved argv is prefix-shaped,
-so the two positionals ride it unchanged, and an argv the bridge refused to build
+so the two positionals ride it unchanged, and a gate the resolver cannot find
 is exit 2 — the dispatcher's own verdict — never a rename pre-flighted by a check
 that did not run. The built-in `check-stage-entry` pre-flight above resolves the
 same way, so both arms of this tool name a gate and neither names a substrate.
@@ -3121,12 +3111,12 @@ re-runs its entry step safely. It reads the kit's knobs
 **The pre-flight gates this arm names are dispatched as child processes, never called in
 process.** Both arms name a gate and never a substrate: the member is resolved
 across the kit `checks/` directories, a `.sh` before a `.gate` in each, and a
-`.gate` becomes the argv `<binary> <name>` prefixed by the subset of this arm's
-bridged environment that the member's own registry entry declares. A member that
+`.gate` becomes the argv `<binary> <name>`, run under this arm's environment
+unchanged. A member that
 resolves nowhere is exit 2 with the dispatcher's own diagnostic, never an entry
 pre-flighted by a check that did not run. The in-process call is refused where the
-compiled dispatcher already refuses it — on the declared-knob discipline, fault
-isolation and the surviving `.sh` members — so the arm spawns even though both
+compiled dispatcher already refuses it — on fault isolation and the surviving
+`.sh` members — so the arm spawns even though both
 gates live inside the same binary and the direct call would be free. **The
 resolution set is the kit's own `checks/` directories and not the consumer's gates
 directory**, which is the incumbent behaviour restated rather than widened: these
@@ -3134,8 +3124,8 @@ two members are declared by this kit alone, and a `.sh` beside a `.gate` in the
 same directory still shadows it.
 
 **This arm depends on gate-sdk, and the dependency is stated rather than
-absorbed.** It is a bridged arm: it is reached through gate-sdk's front-end, its
-knobs are resolved by gate-sdk's config bridge, and it dispatches through
+absorbed.** It is an arm of gate-sdk's binary: it is reached through gate-sdk's
+front-end, it reads gate-sdk's knobs beside its own, and it dispatches through
 gate-sdk's resolver. A tree that vendored lifecycle-kit without gate-sdk cannot
 run the stamp writer at all — and, since the port, cannot run stage motion by any
 other path either. **That is the honest cost of this cut and it is stated rather
@@ -3186,18 +3176,17 @@ is not this member's code: it rides `crate::marker`'s installer writer, the
 holder of gate-sdk's marker-bounded span mechanics (gate-sdk/SPEC.md
 §lib/inject.sh), so no second replace path exists to drift.
 
-**It is a bridged `Arm::Run` member** (gate-sdk/SPEC.md §The non-gate arm),
+**It is an `Arm::Run` arm-table member** (gate-sdk/SPEC.md §The non-gate arm),
 reached by its own `bin/run-gates.sh` front-end branch rather than through the
 `--emit <name>` composer, because its contract is an **action with an exit
 status** — it mutates two files and writes one git config key, printing narration
 on stdout — and `Arm::Emit` collapses every error to 2. **The obvious alternative
 is an op of the `--install <op>` family, and it is refused on that family's own
-stated terms**: installer/README.md §The install boundary rules that arm
-deliberately unbridged, reading no kit config and no knob, because its caller is
-the bootstrap and may not be assumed to be a POSIX shell. This member's whole job
-is to render blocks derived from **resolved kit config**, so an unbridged op
-would have to take all eight knobs on argv from a caller with no way to resolve
-them. Recorded as refused rather than unconsidered, because the name collision
+stated terms**: installer/README.md §The install boundary rules that arm reads no
+kit config and no knob, because its caller is the bootstrap and may not be
+assumed to be a POSIX shell. This member's whole job is to render blocks derived
+from **resolved kit config**, so a knob-free op would have to take all eight knobs
+on argv from a caller with no way to resolve them. Recorded as refused rather than unconsidered, because the name collision
 makes it the first place a reader looks. Its declared roster is the union of what
 the two renderers read, taken from the gates that already declare those knobs
 rather than re-derived: `LIFECYCLE_KIT_AGENT_FILE`, `LIFECYCLE_KIT_STAGES` and
@@ -3205,17 +3194,15 @@ rather than re-derived: `LIFECYCLE_KIT_AGENT_FILE`, `LIFECYCLE_KIT_STAGES` and
 `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
 `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` and
 `LIFECYCLE_KIT_GAP_INBOX_FILE` from `check-merge-attrs` — **eight**. A hardcoded
-top-level flag would resolve platform defaults and silently ignore every consumer
-override, which is not a calibration between two workable shapes but the
-difference between working and appearing to.
+top-level flag would have no table row to declare them on, so none of the checks
+reading the declared rosters could see what it reads.
 
 **The `[agent-file]` positional ports unchanged, and the test that decides it was
 run rather than assumed.** §The non-gate arm's distinguishing test makes an
-argument *unportable* when it redirects something the front-end has already
-resolved from the tree's own config before the exec — it arrives a process too
-late and would silently change nothing. This positional is the other kind: it is
-not a selector for where configuration comes from, it **is the file the rule
-writes into**, read from the arm's own argv and overriding the bridged default.
+argument *unportable* when it is a selector for where configuration comes from,
+which the tree's own knob files already answer. This positional is the other
+kind: it **is the file the rule writes into**, read from the arm's own argv and
+overriding the resolved default.
 The near miss is one line away and is an env var rather than a positional:
 `smoke/install.sh` runs the arm under `LIFECYCLE_KIT_KNOB_FILE=lock-stages.knobs`,
 a genuine config-file selector — and it keeps working, because the arm resolves
@@ -3311,8 +3298,7 @@ empty roster prints nothing and succeeds: a resolved-empty derivation is an
 answer, never an error.
 
 A **non-gate arm** (gate-sdk/SPEC.md §The non-gate arm), invoked as
-`bash gate-sdk/bin/run-gates.sh --emit close-surfaces [scan-root]` — the
-front-end that resolves the arm's bridged knobs in front of it. Its two callers
+`bash gate-sdk/bin/run-gates.sh --emit close-surfaces [scan-root]`. Its two callers
 are `check-close-surfaces`, which reaches the derivation **in process** rather
 than spawning anything, and close's own inbound-triage sweep. Nothing stores the
 roster and nothing must: its whole value is that it is recomputed at the moment
@@ -3324,7 +3310,7 @@ resolution, consumer-first with kit shadowing — the order every kit registry
 already uses); duplicates collapse. Follows the affordance contract, with the
 `cd` a compiled arm cannot take becoming a **computed base**: the scan-root
 argument, else the repo toplevel, with every path globbed, ignored and printed
-relative to it. Config-via-env across the bridge; and the three exit-2 causes —
+relative to it. Config-via-env through the knob files; and the three exit-2 causes —
 a non-repo base, an unreadable declaration surface, a `git check-ignore` that
 could not decide — become the arm's error return, which the front-end and the
 in-process caller both surface. Advisory tooling, no fixture pair owed — the
@@ -3966,9 +3952,8 @@ false-negative, strictly better than self-report.
 **The gate dispatches to the binary substrate** — `checks/check-stage-entry.gate`
 to `native/src/gates/stage_entry.rs`, the shell script deleted — and the port
 asserts nothing new: the three assertions, their calibration and assertion C's
-honest limit are exactly as stated above. The port was held on the config
-bridge's want of a key channel, since the predecessor map is read **by key**
-(gate-sdk/SPEC.md §lib/gate.sh, the keyed arm that retired the hold). Two
+honest limit are exactly as stated above. The predecessor map is a keyed knob
+and is read **by key** (gate-sdk/SPEC.md §The knob file). Two
 consequences are worth stating where a reader of this gate will look for them.
 Its `couples=` **widens** to reach the amendment and roster corpora assertion C
 scans, which is correct coupling rather than a concession: an amendment landing

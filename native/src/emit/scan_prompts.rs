@@ -1,12 +1,11 @@
 // spec: guard-kit/SPEC.md §scan-prompts — the ranker: fall-throughs split three ways, the prompting
 // share grouped by the ranking key with its rows (never its count) partitioned by allowlist
-// reachability. A bridged arm, because it resolves three consumer knobs.
+// reachability. A table member, because it reads three consumer knobs.
 use crate::guard;
 use crate::walk;
 use serde_json::Value;
 
-// spec: guard-kit/SPEC.md §scan-prompts — the three guard-kit table rows the arm reads; the log's
-// default derives from a bridged input only this declaration carries
+// spec: guard-kit/SPEC.md §scan-prompts — the three guard-kit table rows the arm reads
 pub const KNOBS: &[&str] = &[
     "GUARD_KIT_LOG",
     "GUARD_KIT_SETTINGS",
