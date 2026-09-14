@@ -692,11 +692,7 @@ falls back to the newest-candidate scan, and the reading says it did; so does a
 session whose child flag is set while neither its subagent tier nor a top-level
 transcript exists for its id, the report's first line naming which. The tool is
 advisory by construction — exit is always 0 and it never joins `gates.list`, and
-a missing transcript is a 0-exit notice, not a failure. The refusal at a
-delegated session is preferred over two ways of keeping the bare invocation:
-excluding descendants through the harness meta layer, and anchoring on the last
-lifecycle stamp. Both print a plausible wrong total in a case the reading cannot
-show.
+a missing transcript is a 0-exit notice, not a failure.
 
 **The series splits at 2026-09-05, and the log gains no field saying so.** Before
 that date the resolution was a flat-tier glob, so every logged key is a
