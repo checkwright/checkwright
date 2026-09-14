@@ -12,31 +12,57 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-- **static-knob-file-couple-underived** [design-pending] [cost: event/low] [surface: gate-sdk] — a gate
-  reading a static kit's knob file must couple that file (gate-sdk/SPEC.md §The `# graph:` manifest:
-  couples covers every path read), and nothing derives or asserts it, so a knob-file edit skips the
-  gate at pre-commit and only the battery reaches it.
+- **static-knob-file-couple-underived** [spec: SPEC-knob-file-couples.md] — a gate reading a static
+  kit's knob file must couple that file (gate-sdk/SPEC.md §The `# graph:` manifest: couples covers
+  every path read), and nothing derives or asserts it, so a knob-file edit skips the gate at
+  pre-commit and only the battery reaches it.
   **Measured at `config-seam-second-cut`'s close:** every registered gate run once per static kit
   with that kit's `<KIT>_KNOB_FILE` pointed at a malformed file. 35 gates flipped; 25 descriptors
   lacked the file and were coupled by hand in the drain commit. The kit's move to a knob file had
   dropped `check-queue-slug-liveness`'s trigger, since its `scripts/*.sh` couple stood in for
   `scripts/queue-config.sh`, and most readers had never coupled their config at all.
-  **Why [design-pending]:** a gate's registry declaration names the static knobs its own code reads,
+  **Why it needed design:** a gate's registry declaration names the static knobs its own code reads,
   so hook generation could add `<gates-dir>/<stem>-config.knobs` per declared kit. It would miss
   three reader shapes the probe found: meta-gates reading knob files by expanding other members'
   `knob:` tokens (`check-graph`, `check-reads-couples`, `check-gate-substrate-parity`), a gate
   spawning an arm that reads one (`check-prose-enum` through its enum-sets command), and a freshness
-  gate whose projection reads every kit. Where the derivation stops, and whether an assertion
-  holds the rest, is the unit's question.
-  **Cost while deferred:** each new static-knob reader, and each kit's cut, can land uncoupled.
+  gate whose projection reads every kit.
   Filed 2026-09-14 by close, from the drain of build's gap bullet.
   **Rides `config-seam-third-cut` beside config-seam-static-format's cut 3** — operator direction,
-  2026-09-14, lead-relayed; stays Deferred for spec to author and pair. The cut's own exposure is
-  canon-kit's knob readers: 24 descriptors cite a `CANON_KIT_` knob.
+  2026-09-14, lead-relayed. Spec ruled the derivation's reach and its one residue, and lands it
+  before the cut (the amendment's header).
+
+- **config-seam-static-format** [spec: SPEC-knob-files-cut-3.md] — the knob seam is still executable
+  bash for every bridged kit: a knob's value is computed by sourcing the owning kit's `lib/*.sh` and
+  the consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh), so the battery, hook
+  generation and every harness hook enter through bash before the binary runs.
+  **Cuts 1 and 2 landed:** site-kit and doctrine-kit at `static-config-seam`, queue-kit and
+  lifecycle-kit at `config-seam-second-cut`; all four read knob files in the line grammar with their
+  defaults in-crate (gate-sdk/SPEC.md §The knob file).
+  **Why it needed design:** each remaining kit waits on a shape the grammar has not ruled — a
+  command knob, a knob reference, a generated family, guard-kit's rule content — and gate-sdk
+  migrates last, retiring the bridge; the selection rule and each shape's reason are that section's.
+  **The tension it closes.** TRAJECTORY objective 6 rules a surviving script surface
+  dual-implementable, bash and PowerShell; the runtime bridge is neither and cannot be, since a
+  PowerShell twin is the second producer criterion 6 refuses.
+  **Refused:** a PowerShell twin of the bridge (second producer); porting the files under the
+  present seam (each ruling's ground holds while the seam is bash); a generated knob projection
+  (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
+  **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
+  every native-Windows adopter carries a bash floor the install docs attribute to git alone; and
+  this repo's drift config reads the lifecycle stage roster through the transitional
+  `gate_static_knob` helper until drift-kit's cut rules the knob reference form.
+  Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
+  `static-config-seam` and cut 2 at `config-seam-second-cut`, each demoted at landing as a corpus
+  increment.
+  **Cut 3 leads `config-seam-third-cut`: canon-kit, context-kit, delegation-kit and drift-kit move
+  to knob files** — operator direction, 2026-09-14, lead-relayed; a corpus increment, so it demotes
+  at landing. Spec ruled the command knob, the knob reference and six shapes authoring found, and
+  probed the `check-prose-enum` floor: the cut does not remove it (the amendment's header).
+
+## Technical Debt
+
+## Deferred
 
 - **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
   CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
@@ -95,38 +121,6 @@
   kit's resident ask.
   Filed 2026-09-13 by the clause-owner audit behind `resident-tier-restatement`'s Housekeeping
   cut; drained at that iteration's close.
-
-- **config-seam-static-format** [design-pending] [cost: event/high] [surface: gate-sdk] — the knob seam
-  is still executable bash for every bridged kit: a knob's value is computed by sourcing the owning
-  kit's `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh),
-  so the battery, hook generation and every harness hook enter through bash before the binary runs.
-  **Cuts 1 and 2 landed:** site-kit and doctrine-kit at `static-config-seam`, queue-kit and
-  lifecycle-kit at `config-seam-second-cut`; all four read knob files in the line grammar with their
-  defaults in-crate (gate-sdk/SPEC.md §The knob file).
-  **Why [design-pending]:** each remaining kit waits on a shape the grammar has not ruled — a
-  command knob, a knob reference, a generated family, guard-kit's rule content — and gate-sdk
-  migrates last, retiring the bridge; the selection rule and each shape's reason are that section's.
-  **The tension it closes.** TRAJECTORY objective 6 rules a surviving script surface
-  dual-implementable, bash and PowerShell; the runtime bridge is neither and cannot be, since a
-  PowerShell twin is the second producer criterion 6 refuses.
-  **Refused:** a PowerShell twin of the bridge (second producer); porting the files under the
-  present seam (each ruling's ground holds while the seam is bash); a generated knob projection
-  (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
-  **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
-  every native-Windows adopter carries a bash floor the install docs attribute to git alone; and
-  this repo's drift config reads the lifecycle stage roster through the transitional
-  `gate_static_knob` helper until drift-kit's cut rules the knob reference form.
-  Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
-  `static-config-seam` and cut 2 at `config-seam-second-cut`, each demoted at landing as a corpus
-  increment.
-  **Cut 3 leads `config-seam-third-cut`: canon-kit, context-kit, delegation-kit and drift-kit move
-  to knob files** — operator direction, 2026-09-14, lead-relayed; stays Deferred for spec to author
-  and pair. It rules two shapes, the command knob and the knob reference. The scope probe found five
-  `*_CMD` knobs in canon's consumer config and one each in context's and delegation's; a same-kit
-  reference in canon's (`CANON_KIT_MEASURED_SURFACE_GLOBS`) and drift's cross-kit read, whose
-  helper retires; and canon's `GATE_SDK_RESOLVING_KNOB` gating, which the command-knob shape
-  retires. `check-prose-enum` reads about 700 ms above `check-core-files` through canon's bridged
-  resolution; whether the cut removes it is spec's probe, unmeasured here.
 
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
