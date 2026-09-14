@@ -34,8 +34,7 @@ can mis-pick a just-finished subagent's id — verify before writing the marker
 (lifecycle-kit/SPEC.md §bin/session-id.sh owns the limit).
 
 Then open your resume journal with
-`bash gate-sdk/bin/run-gates.sh --enter-stage --open-lead-journal` before you
-write anything to it, and append under the heading it writes; never overwrite the file.
+`bash gate-sdk/bin/run-gates.sh --enter-stage --open-lead-journal` before writing to it; never overwrite the file.
 
 ## The lead model
 

@@ -3163,22 +3163,8 @@ id and a head. The key is fields 2 through the last rather than the whole line b
 rewrites column 1 of every stamp — the same witness `--rename` asserts. A hand-written key would
 mean the lead reading the state file and copying a line out of it, which §templates/lead.md
 forbids (the lead never hand-derives prior-stage completeness) and which drifts by a single
-space. The opener is an operand of this tool, which already owns the lead journal's knob, its
-disposition mark and the advisory, rather than a new arm: a new arm would be a second module
-holding one key derivation, with its own bridged roster. Three other discriminators are **ruled
-out**:
-
-- **The lead writes its journal only after scope stamps.** A grant lives in the lead's resume
-  journal (§The steering vocabulary), and the lead holds the grant before it dispatches scope, so
-  deferring the write leaves the grant with no durable home for the whole scope stage.
-- **A session marker.** The lead already writes `lead <id>` to context-kit's session-role
-  marker, and the marker survives the boundary, but its staleness test is an id match against
-  *the reading session's own* id. That works for the lead's own hook and for nobody else: at the
-  boundary the reader is the entering session, so a marker left by a lead that ended without
-  disposing reads exactly like a live one — failing open on the case the advisory exists for.
-- **An opening line naming the iteration.** The boundary reset writes the unnamed placeholder,
-  so a lead opening before the first stage sees either the prior iteration's name or the
-  placeholder, and two consecutive iterations that never got a name collide on the placeholder.
+space. The opener is an operand of this tool because the tool already owns the lead journal's
+knob, its disposition mark and the advisory, so the key derivation has one home.
 
 Advisory tooling like `--simulate`, so no fixture pair is owed; the hermetic cases — creation,
 append after an undisposed segment, the disposed-segment drop, the idempotent no-op,

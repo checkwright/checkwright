@@ -3582,22 +3582,9 @@ nobody consumes.
 **`--for` keeps the tree union, and the ground is that its selection reads bridged
 values.** `select_for` expands each member's trigger through `GATE_KIT_ROOTS_REL`
 and through the values of its `knob:` tokens. `--knobs` answers before any knob
-resolves, so it cannot compute that selection in one round. Two shapes are
-refused:
-
-- **A two-round bridge.** A sentinel the bridge expands by re-asking `--knobs`
-  once the selection inputs have resolved. That is new protocol in `lib/gate.sh`,
-  and the gate-sdk cut of the static config seam deletes that library. It would
-  serve a selector with no hot path: its callers are one smoke line, one fixture
-  test and a README example, and the generated hook bakes its own arrays.
-- **A one-round over-approximation in the crate.** It would be a second trigger
-  matcher, and §run-gates defines exactly one.
-
-**The residue is costed, not flagged.** A `--for` run keeps paying the tree union
-— on the order of 700 ms over a registry the size of this tree's, against roughly
-95 ms plus the selected members' knobs for an exact narrowing. That cost is part
-of the bridge floor the static config seam's gate-sdk cut discharges when it
-retires the bridge.
+resolves, so it cannot compute that selection in one round; the tree union a
+`--for` run pays is part of the bridge floor the static config seam's gate-sdk cut
+discharges when it retires the bridge.
 
 #### The harness-integration arm
 

@@ -778,7 +778,7 @@
   **What remains after `config-bridge-floor`, whose two cuts landed.** Cut 1a (`9412923d`) took
   the per-name owning-kit fork out of `gate_knob_env_set`; cut 1b (`31c1a773`) narrowed a `--only`
   run's knob union to the selected members. Re-measured 2026-09-14 at close, best-of-3:
-  `--only check-core-files` reads 103 ms. A bare run still resolves the whole registry's union,
+  `--only check-core-files` reads 103 ms. A bare or `--for` run still resolves the registry union,
   one subshell per bridged kit; this entry keeps that residue and its closing condition.
   **Nothing else owns the residue.** The surviving `bash` spawn is owned by gate-sdk/SPEC.md
   §gen-pre-commit, where its disposition is recorded, and was ruled 2026-08-23 not to fall to this
