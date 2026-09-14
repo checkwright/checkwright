@@ -123,9 +123,9 @@ pub const EVERY_COUPLES_KNOB: &str = "@every-couples-knob";
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the sentinel's expansion for a caller already holding the
 // resolve dirs, held to `_gate_couples_knob_names`' derivation by a unit test because the bridge's
-// own substitution is the shell's
+// own substitution is the shell's; a static token contributes the bridged inputs its default reads
 pub fn couples_knob_names(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
-    let mut out: Vec<String> = Vec::new();
+    let mut tokens: Vec<String> = Vec::new();
     for d in resolve_dirs {
         let decls = crate::walk::glob_files(
             Path::new(d),
@@ -143,14 +143,14 @@ pub fn couples_knob_names(resolve_dirs: &[String]) -> Result<Vec<String>, String
                 if k != "couples" && k != "trigger" {
                     continue;
                 }
-                for name in v.split(',').filter_map(|t| t.strip_prefix("knob:")) {
-                    if !crate::knobs::is_static(name) {
-                        out.push(name.to_string());
-                    }
-                }
+                tokens.extend(v.split(',').filter_map(|t| t.strip_prefix("knob:")).map(str::to_string));
             }
         }
     }
+    let mut out: Vec<String> = crate::knobs::bridged(tokens.iter().map(String::as_str))
+        .into_iter()
+        .map(str::to_string)
+        .collect();
     out.sort();
     out.dedup();
     Ok(out)

@@ -728,7 +728,16 @@ GATE_KIT_ROOTS_REL=("${_gate_kit_roots_rel_cache[@]}")
 # spec: gate-sdk/SPEC.md §lib/gate.sh — every knob name the descriptor corpus's couples=/trigger= fields carry in a knob:<NAME> token, derived from the surface the names are written on so a newly written token cannot be forgotten. One grep over the whole corpus rather than a field read per descriptor, because the set is wanted once per process and a fork per member would be paid on every battery run.
 # spec: gate-sdk/SPEC.md §The path-dialect contract — an unmatched glob is filtered by testing the path rather than by toggling `nullglob`: `shopt -p` exits non-zero when the option is unset, so saving and restoring it aborts this function under a caller's `set -e` and the derivation silently returns nothing.
 _gate_couples_knob_names() {
-    local line kv tok d f dirs
+    _gate_couples_knob_partition bridged
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the same derivation's statically owned half, whose members come from the binary's `--emit-knob-values` arm rather than from the bridge
+_gate_couples_static_knob_names() {
+    _gate_couples_knob_partition static
+}
+
+_gate_couples_knob_partition() {
+    local want="$1" line kv tok d f dirs
     local -a files=() names=() parts=()
     dirs="$(gate_check_dirs)"
     while IFS= read -r d; do
@@ -761,9 +770,77 @@ _gate_couples_knob_names() {
     while IFS=$'\t' read -r roster_name _; do
         [[ -n "$roster_name" ]] && static_names["$roster_name"]=1
     done <<<"$roster"
+    local -a picked=() statics=()
     for roster_name in "${names[@]}"; do
-        [[ -v static_names["$roster_name"] ]] || printf '%s\n' "$roster_name"
-    done | LC_ALL=C sort -u
+        if [[ -v static_names["$roster_name"] ]]; then
+            statics+=("$roster_name")
+        else
+            picked+=("$roster_name")
+        fi
+    done
+    if [[ "$want" == static ]]; then
+        picked=(${statics[@]+"${statics[@]}"})
+    elif [[ ${#statics[@]} -gt 0 ]]; then
+        # spec: gate-sdk/SPEC.md §The knob file — a static token still needs the bridged inputs its derived default reads, and the binary's closure answers which
+        local closure
+        closure="$("$(gate_native_bin)" --knobs --emit-knob-values "${statics[@]}")" || {
+            printf '_gate_couples_knob_names: %s --knobs --emit-knob-values failed — the couples-knob set could not be derived; treating as failure (not clean)\n' "$(gate_native_bin)" >&2
+            return 2
+        }
+        [[ -n "$closure" ]] && mapfile -t -O "${#picked[@]}" picked <<<"$closure"
+    fi
+    [[ ${#picked[@]} -gt 0 ]] || return 0
+    printf '%s\n' "${picked[@]}" | LC_ALL=C sort -u
+}
+
+# spec: gate-sdk/SPEC.md §The non-gate arm — the resolved value of each named static knob, read off the binary's `--emit-knob-values` arm run under its own bridged environment: the crate is the value's one producer, so no bash here parses a knob file or recomputes a default
+gate_knob_values() {
+    local _gkv_env
+    local -a _gkv_elems=()
+    _gkv_env="$(gate_knob_env --emit-knob-values "$@")" || return 2
+    [[ -n "$_gkv_env" ]] && mapfile -t _gkv_elems <<<"$_gkv_env"
+    env ${_gkv_elems[@]+"${_gkv_elems[@]}"} "$(gate_native_bin)" --emit-knob-values "$@"
+}
+
+# spec: gate-sdk/SPEC.md §The knob file — a bridged config's read of one static indexed knob into an array: it copies the arm's third column and computes nothing. Transitional, retired with this library at gate-sdk's cut.
+gate_static_knob() {  # <NAME> <array-outvar>
+    local _gsk_name="$1" _gsk_out _gsk_n _gsk_shape _gsk_el
+    local -n _gsk_arr="$2"
+    if ! _gsk_out="$(gate_knob_values "$_gsk_name")"; then
+        printf 'gate_static_knob: %s could not be read from the binary — treating as failure (not clean)\n' "$_gsk_name" >&2
+        return 2
+    fi
+    _gsk_arr=()
+    while IFS=$'\t' read -r _gsk_n _gsk_shape _gsk_el; do
+        [[ -n "$_gsk_n" ]] || continue
+        if [[ "$_gsk_shape" != indexed ]]; then
+            printf 'gate_static_knob: %s is a %s knob, and an array read takes an indexed one — treating as failure (not clean)\n' "$_gsk_name" "$_gsk_shape" >&2
+            return 2
+        fi
+        [[ -n "$_gsk_el" ]] && _gsk_arr+=("$_gsk_el")
+    done <<<"$_gsk_out"
+    return 0
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — every static knob a `knob:` token names, read once per process in one arm call and held by name, never exported as a GATE_SDK_KNOB_ variable: a static name is never bridged
+_gate_couples_static_bridge() {
+    [[ -n "${_gate_couples_static_bridged:-}" ]] && return 0
+    _gate_couples_static_bridged=1
+    declare -gA _GATE_COUPLES_STATIC=()
+    local derived out n el
+    local -a names=()
+    derived="$(_gate_couples_static_knob_names)" || return 2
+    [[ -n "$derived" ]] || return 0
+    mapfile -t names <<<"$derived"
+    out="$(gate_knob_values "${names[@]}")" || return 2
+    while IFS=$'\t' read -r n _ el; do
+        [[ -n "$n" ]] || continue
+        if [[ -v _GATE_COUPLES_STATIC["$n"] && -n "${_GATE_COUPLES_STATIC[$n]}" ]]; then
+            _GATE_COUPLES_STATIC["$n"]+=$'\t'"$el"
+        else
+            _GATE_COUPLES_STATIC["$n"]="$el"
+        fi
+    done <<<"$out"
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the couples-knob union resolved into this shell's own environment, once per process: a shell reader expands *another* member's couples= and so needs values outside its own declared set. A refusal anywhere in the slice fails the call, because a partially resolved environment is the fail-open an empty expansion would be.
@@ -789,19 +866,29 @@ gate_expand_couples_var() {
     local -a parts=() once=() out=() members=()
     _gate_kit_roots_rel_ensure_cache
     IFS=',' read -ra parts <<<"$field"
-    local tok r glob name var m
+    local tok r glob name var m value
     for tok in "${parts[@]}"; do
         if [[ "$tok" == knob:* ]]; then
             name="${tok#knob:}"
             var="GATE_SDK_KNOB_$name"
-            [[ -v "$var" ]] || _gate_couples_knob_bridge || return 2
-            if [[ ! -v "$var" ]]; then
-                printf 'gate_expand_couples: couples token knob:%s names a knob the config bridge could not carry — ' "$name" >&2
-                printf 'an empty expansion is a lost trigger; treating as failure (not clean)\n' >&2
-                return 2
+            if [[ -v "$var" ]]; then
+                value="${!var}"
+            else
+                _gate_couples_static_bridge || return 2
+                if [[ -v _GATE_COUPLES_STATIC["$name"] ]]; then
+                    value="${_GATE_COUPLES_STATIC[$name]}"
+                else
+                    _gate_couples_knob_bridge || return 2
+                    if [[ ! -v "$var" ]]; then
+                        printf 'gate_expand_couples: couples token knob:%s names a knob the config bridge could not carry — ' "$name" >&2
+                        printf 'an empty expansion is a lost trigger; treating as failure (not clean)\n' >&2
+                        return 2
+                    fi
+                    value="${!var}"
+                fi
             fi
             members=()
-            [[ -n "${!var}" ]] && IFS=$'\t' read -ra members <<<"${!var}"
+            [[ -n "$value" ]] && IFS=$'\t' read -ra members <<<"$value"
             for m in ${members[@]+"${members[@]}"}; do
                 case "$m" in
                     knob:*)

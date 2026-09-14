@@ -23,14 +23,14 @@ fn entries(dir: &Path) -> Vec<std::path::PathBuf> {
 }
 
 // spec: installer/README.md §What init seeds — the config seam is derived, never listed: a kit's
-// consumer config is whatever `templates/*-config.sh` it ships. It plans and writes nothing — a
+// consumer config is whatever `templates/*-config.sh` or `*-config.knobs` it ships. It plans and writes nothing — a
 // copy landing before the claim hashes the tree destroys the evidence the refusal is computed from.
 pub fn config_seam_plan(kit_payload: &Path, gates_dir: &str) -> Vec<(String, String)> {
     entries(&kit_payload.join("templates"))
         .into_iter()
         .filter_map(|t| {
             let base = t.file_name()?.to_string_lossy().into_owned();
-            if !base.ends_with("-config.sh") {
+            if !base.ends_with("-config.sh") && !base.ends_with("-config.knobs") {
                 return None;
             }
             Some((
@@ -117,8 +117,8 @@ pub fn queue_source(payload: &Path, kits: &[String]) -> Option<String> {
 }
 
 // spec: installer/README.md §What init seeds — the fallback carries every
-// `QUEUE_KIT_REQUIRED_SECTIONS` heading at that knob's default: the section floor is not registered
-// at install, so a skeleton missing one passes open here and reds on the day they register it.
+// `QUEUE_KIT_REQUIRED_SECTIONS` heading at that knob's default, rendered from the kit's table: the
+// section floor is not registered at install, so a skeleton missing one reds on the day they register it.
 pub fn write_queue(src: &str, root: &Path, queue_file: &str) -> Result<(), String> {
     let dest = root.join(queue_file);
     if src != "-" {
@@ -126,10 +126,14 @@ pub fn write_queue(src: &str, root: &Path, queue_file: &str) -> Result<(), Strin
             .map(|_| ())
             .map_err(|e| format!("cannot write {}: {}", queue_file, e));
     }
-    let body = format!(
-        "# {}\n\n## Iteration: —\n\n---\n\n## New Features\n\n## Technical Debt\n\n## Deferred\n\n## Done\n\n## Lessons Learned\n",
-        queue_file
-    );
+    let mut body = format!("# {}\n", queue_file);
+    for sec in crate::knobs::queue_kit::REQUIRED_SECTIONS {
+        body.push_str(&format!("\n## {}\n", sec));
+        if sec.ends_with(':') {
+            body.truncate(body.len() - 1);
+            body.push_str(" —\n\n---\n");
+        }
+    }
     std::fs::write(&dest, body).map_err(|e| format!("cannot write {}: {}", queue_file, e))
 }
 

@@ -58,9 +58,11 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    last two for backlogs whose carry weight has become the problem, off by
    default (`QUEUE_KIT_ICEBOX_SECTION`).
 
-3. Optional — reshape the grammar: copy `templates/queue-config.sh` into your
-   gates dir and override section names, the wrap budget, prose-lead tokens, or
-   the precondition trigger set. Defaults are this repo's layout.
+3. Optional — reshape the grammar: copy `templates/queue-config.knobs` into your
+   gates dir and set section names, the wrap budget, prose-lead tokens, or the
+   precondition trigger set, one `NAME = value` or `NAME[] = element` line each.
+   Defaults are this repo's layout; `bash gate-sdk/bin/run-gates.sh --emit
+   knob-roster` prints them.
 
 ## Use
 

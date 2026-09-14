@@ -107,9 +107,11 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    hand-stamp all fire at commit, and an uncommitted one moves the cursor for a
    whole session (SPEC.md §check-stage-evidence). Requires guard-kit vendored.
 
-6. Optional — reshape the machine: copy `templates/lifecycle-config.sh` into
-   your gates dir and override stages, predecessors, drain/audit stages,
-   section names, or file paths. Defaults are this repo's own lifecycle.
+6. Optional — reshape the machine: copy `templates/lifecycle-config.knobs` into
+   your gates dir and set stages, predecessors, drain/audit stages, section
+   names, or file paths, one `NAME = value` or `NAME[] = element` line each.
+   Defaults are this repo's own lifecycle; `bash gate-sdk/bin/run-gates.sh --emit
+   knob-roster` prints them.
 
 After install the battery is red at `check-stage-evidence` until your first
 `/scope` session runs (it names the iteration and stamps the evidence file as

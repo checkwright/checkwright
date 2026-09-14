@@ -2691,7 +2691,7 @@ library exits 2 at source time on a malformed queue config, so an in-process cal
 would take the whole status bar down — model, context gauge, both rate-limit
 gauges — over a component worth four characters. The hazard is a **sourced shell
 library** calling `exit` in its caller's process, and the ported rendering has no
-spelling for it: it resolves its knobs through the crate's bridged reads, which
+spelling for it: it resolves its knobs through the crate's knob reads, which
 return `Result` and cannot exit, so a malformed queue config becomes an `Err`
 this arm maps to an empty counter group. The isolation argument's remaining force
 was already spent in any case — this module imports `crate::emit::kpi` and
@@ -2708,30 +2708,31 @@ against.
 
 **The arm's declared reads gain the counter rendering's four**
 (`QUEUE_KIT_QUEUE_FILE` and the three section knobs), because the subprocess used
-to resolve its own and an in-process reader resolves through the bridge. That
+to resolve its own and an in-process reader resolves them itself. That
 *improves* on the state it replaces — knob resolution stops happening twice by
 two mechanisms. **Where those four resolve is stated here rather than inherited,
 because queue-kit/SPEC.md §The queue-index arm's front-end paragraph settles the
 caller that reaches an arm *as* an arm and an in-process call from a hook module
 is neither the front end nor a direct binary invoke:**
 
-- **They resolve from the bridged environment this arm's own exec already
-  carries.** The harness invokes `bash gate-sdk/bin/run-gates.sh --statusline`,
-  so the front end sources the shell library, resolves this arm's declared roster
-  and execs the binary with `GATE_SDK_KNOB_<NAME>=…` in the environment. Adding
-  the four names to the roster is therefore not bookkeeping — it *is* the
-  mechanism that puts them there. A consumer override in the gates dir's
-  `queue-config.sh` reaches this reader by exactly the path it reached the
-  subprocess, since the front end sources the same library either way.
+- **They resolve in process from queue-kit's static table.** The four are static
+  knobs, so the binary reads them from the kit's defaults and the consumer's
+  `queue-config.knobs` wherever it runs, and no bridge carries them
+  (gate-sdk/SPEC.md §The knob file). A consumer override reaches this reader
+  through the crate's own resolution. The one bridged input is the gate-sdk queue
+  file `QUEUE_KIT_QUEUE_FILE`'s default derives from: the harness invokes `bash
+  gate-sdk/bin/run-gates.sh --statusline`, so the front end resolves this arm's
+  declared roster, whose closure carries that input, and execs the binary with it
+  in the environment. Adding the four names to the roster is therefore not
+  bookkeeping — it is what puts that input there.
 - **The silent-override-ignored failure that path could have had is structurally
-  unavailable.** The crate's bridged read returns `Err` when its variable is
-  absent — the crate holds no default — so an unbridged or partially-bridged
-  invocation cannot substitute a platform default for a consumer's value. It has
-  none to substitute.
+  unavailable.** The crate's read of an absent bridged input returns `Err` — the
+  crate holds no default for it — so an unbridged invocation cannot substitute a
+  platform default for a consumer's value.
 - **So the residual failure is total and visible, never partial and wrong.** A
-  roster widened to three of the four, or a caller invoking the binary directly
-  and bypassing the front end, drops the **whole** counter group and changes
-  nothing else about the bar — one of the degradations above. The failure the
+  malformed queue config, which the table validator refuses, or a caller invoking
+  the binary directly and bypassing the front end, drops the **whole** counter
+  group and changes nothing else about the bar — one of the degradations above. The failure the
   front-end paragraph exists to prevent, a consumer's configured tier silently
   missing from a rendered tally, has no spelling on this path.
 

@@ -528,11 +528,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         }
         // spec: gate-sdk/SPEC.md §check-graph — the `knob:` token's admissibility rule, read against
-        // the binary's own `--knobs` answer: a token naming a knob the member does not declare is a
-        // finding, never a wider trigger
+        // the member's declared set, static names included: a token naming a knob the member does
+        // not declare is a finding, never a wider trigger
         for field in [&couples, &trigger] {
             for name in field.split(',').filter_map(|t| t.strip_prefix("knob:")) {
-                let declared = crate::gates::knobs(c).unwrap_or(&[]);
+                let declared = crate::gates::declared(c).unwrap_or(&[]);
                 if !declared.contains(&name) {
                     errors.push(format!(
                         "MANIFEST: {} carries couples token 'knob:{}', but {} declares no such \

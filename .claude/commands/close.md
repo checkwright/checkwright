@@ -3,7 +3,7 @@ Execute the template at lifecycle-kit/templates/stages/close.md, applying the bi
 ## Bindings
 
 **harvest-routing** — harvest routing (`QUEUE_KIT_LESSON_TAGS`,
-`scripts/queue-config.sh`): stream each tagged entry's body through `bash
+`scripts/queue-config.knobs`): stream each tagged entry's body through `bash
 gate-sdk/bin/run-gates.sh --lesson-sink <tag>`, which resolves the sink from the local
 `QUEUE_KIT_LESSON_SINKS` overlay or falls open to the default
 `.workflow/<tag>-harvest.md` staging append.
@@ -126,4 +126,4 @@ cadence. Timing is policy under a mandatory disposition stamp, and that stamp is
 not nothing: silence is not a disposition.
 
 Disposition evidence: `.workflow/release-disposition.txt` (committed,
-boundary-required and boundary-truncated per `scripts/lifecycle-config.sh`).
+boundary-required and boundary-truncated per `scripts/lifecycle-config.knobs`).

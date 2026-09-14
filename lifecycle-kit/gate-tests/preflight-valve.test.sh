@@ -37,10 +37,9 @@ echo "the manifest carries a non-clean suite verdict"
 exit 1
 STUB
     chmod +x "$sb/refuse.sh"
-    cat >"$sb/config.sh" <<'CFG'
-# shellcheck shell=bash
-LIFECYCLE_KIT_ENTRY_PREFLIGHT=('build=./refuse.sh')
-LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE=.workflow/preflight-valve.txt
+    cat >"$sb/config.knobs" <<'CFG'
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = build=./refuse.sh
+LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE = .workflow/preflight-valve.txt
 CFG
     if [[ "${3:-}" != noledger ]]; then
         { printf '# contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh\n'; printf '%s' "$2"; } \
@@ -51,7 +50,7 @@ CFG
 
 run_enter() {  # $1=case dir, rest=argv
     ( cd "$1" && gate_env GATE_SDK_TMP_DIR=scratch \
-                          LIFECYCLE_KIT_CONFIG_FILE=config.sh \
+                          LIFECYCLE_KIT_KNOB_FILE=config.knobs \
                           LIFECYCLE_KIT_SESSION_ID=deadbeef04 \
         && gate_arm_run --enter-stage "${@:2}" 2>&1 )
 }

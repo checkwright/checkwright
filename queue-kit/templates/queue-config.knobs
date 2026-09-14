@@ -1,0 +1,1 @@
+# spec: queue-kit/SPEC.md §Layout and configuration — the knob roster (every knob, its default) and the line grammar; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints the defaults; set only what you override

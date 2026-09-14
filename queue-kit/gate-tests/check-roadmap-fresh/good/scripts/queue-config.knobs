@@ -1,0 +1,5 @@
+# spec: queue-kit/SPEC.md §Layout and configuration — the fixture's own roadmap vocabulary, so the case reads no tree state outside this directory
+QUEUE_KIT_HORIZONS[] = soon
+QUEUE_KIT_HORIZONS[] = someday
+QUEUE_KIT_TRACKS[] = alpha
+QUEUE_KIT_TRACKS[] = beta

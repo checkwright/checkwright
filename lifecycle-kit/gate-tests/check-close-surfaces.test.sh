@@ -29,7 +29,7 @@ check_case() {  # $1=label  $2=dir  $3=want-rc  $4=want-substring
     fi
 }
 
-# lib/test-hermetic.sh pins LIFECYCLE_KIT_CONFIG_FILE to an empty file, so these
+# lib/test-hermetic.sh pins LIFECYCLE_KIT_KNOB_FILE to an empty file, so these
 # cases run on the kit's default declaration glob; the good/bad pair is what
 # exercises a consumer-set LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS.
 seed_repo() {  # $1=dir  $2=declaration body (may be empty)

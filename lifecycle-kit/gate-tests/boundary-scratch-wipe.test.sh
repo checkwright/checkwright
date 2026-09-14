@@ -39,9 +39,8 @@ demo-iteration build bbbbbbbb 2026-06-02 none
 demo-iteration validate cccccccc 2026-06-03 none
 demo-iteration close dddddddd 2026-06-04 none
 EOF
-    cat >"$sb/lifecycle-config.sh" <<'EOF'
-# shellcheck shell=bash
-LIFECYCLE_KIT_BOUNDARY_PRESERVE=(keep-me)
+    cat >"$sb/lifecycle-config.knobs" <<'EOF'
+LIFECYCLE_KIT_BOUNDARY_PRESERVE[] = keep-me
 EOF
     : >"$sb/scratch/.gitkeep"
     printf 'live\n'   >"$sb/scratch/keep-me"
@@ -58,7 +57,7 @@ EOF
 }
 
 run_enter() {  # $1=sandbox subdir  $2=stage
-    ( cd "$1" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$1/lifecycle-config.sh" \
+    ( cd "$1" && gate_env LIFECYCLE_KIT_KNOB_FILE="$1/lifecycle-config.knobs" \
                           GATE_SDK_TMP_DIR=scratch \
                           LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
         && gate_arm_run --enter-stage "$2" 2>&1 )
@@ -100,7 +99,7 @@ grep -qF 'boundary-wiped' <<<"$out" && note nonboundary-report "a non-boundary e
 # --- an unset keep-list still spares the invariant ---
 def="$SANDBOX/default-knob"
 seed "$def"
-: >"$def/lifecycle-config.sh"
+: >"$def/lifecycle-config.knobs"
 out="$(run_enter "$def" scope)"; rc=$?
 [[ "$rc" -eq 0 ]] || note default-entry "want exit 0, got $rc -- $out"
 [[ -f "$def/scratch/.gitkeep" ]] || note default-invariant ".gitkeep was deleted under an empty keep-list"

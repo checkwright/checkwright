@@ -465,8 +465,8 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         stage_rules::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — an empty-roster member whose roster must
-    // stay empty rather than merely happening to be: neither name it reads is defined in
-    // lifecycle-kit's `lib/stages.sh`, so a declared row would fail-close through the bridge
+    // stay empty rather than merely happening to be: neither name it reads is a row in
+    // lifecycle-kit's static table, so a declared row would be an undeclared-name refusal
     (
         "--emit-session-id",
         Arm::Emit(session_id::emit),
@@ -483,6 +483,13 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     // spec: gate-sdk/SPEC.md §The non-gate arm — the static knob table published, an `Arm::Emit`
     // whose roster is empty by construction: the arm takes no knob and reads no file
     ("--emit-knob-roster", Arm::Emit(crate::knobs::emit), &[]),
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the resolved static values, the one producer the
+    // shell couples expander and a bridged config's static read take; its roster is its argv's closure
+    (
+        "--emit-knob-values",
+        Arm::Emit(crate::knobs::values),
+        &[crate::knobs::ARGV_STATIC_KNOBS],
+    ),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
     // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter spec: gate-
     // sdk/SPEC.md §The non-gate arm — both rosters are empty of the `--emit-md-section` kind, not
@@ -739,13 +746,18 @@ fn expand(own: &'static [&'static str], rest: &[String]) -> Vec<&'static str> {
     if own.contains(&crate::hook::EVERY_HOOK_KNOB) {
         all.extend_from_slice(&hook_knobs(rest));
     }
+    if own.contains(&crate::knobs::ARGV_STATIC_KNOBS) {
+        all.extend(crate::knobs::declared_names(rest));
+    }
     all.sort_unstable();
     all.dedup();
     all
 }
 
 fn is_sentinel(knob: &str) -> bool {
-    knob == EVERY_REGISTERED_KNOB || knob == crate::hook::EVERY_HOOK_KNOB
+    knob == EVERY_REGISTERED_KNOB
+        || knob == crate::hook::EVERY_HOOK_KNOB
+        || knob == crate::knobs::ARGV_STATIC_KNOBS
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — `--knobs --hook <member>` answers that member's own

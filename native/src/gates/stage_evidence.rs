@@ -231,7 +231,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    // spec: lifecycle-kit/SPEC.md §lib/stages.sh — an unreadable queue yields no header, the
+    // spec: lifecycle-kit/SPEC.md §The stage-machine adapters — an unreadable queue yields no header, the
     // shell form's `grep … 2>/dev/null || true`, and the missing-header branch below reports it
     let qtext = std::fs::read(&queue)
         .map(|b| String::from_utf8_lossy(&b).into_owned())

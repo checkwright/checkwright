@@ -1,0 +1,2 @@
+# comment-tier-exempt: fixture config — the declaration surfaces this case dir carries
+LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS[] = owners/*.md

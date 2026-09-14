@@ -629,11 +629,10 @@ mod tests {
 
     fn render(collapse: bool, cap: usize) -> String {
         let knobs = crate::knobenv::lock();
-        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features\tTechnical Debt");
-        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
-        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
-        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP", &cap.to_string());
-        index(Q, collapse).expect("index render failed")
+        knobs.set("QUEUE_KIT_ATTEND_CAP", &cap.to_string());
+        let out = index(Q, collapse).expect("index render failed");
+        knobs.remove("QUEUE_KIT_ATTEND_CAP");
+        out
     }
 
     #[test]
@@ -711,10 +710,7 @@ mod tests {
     fn an_absent_attend_tag_produces_no_block_at_all() {
         let out = {
             let knobs = crate::knobenv::lock();
-            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features");
-            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
-            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
-            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP", "3");
+            knobs.remove("QUEUE_KIT_ATTEND_CAP");
             index(
                 "## Iteration: demo\n\n## New Features\n\n## Deferred\n\n## Lessons Learned\n\n- **only** — an untagged lesson\n",
                 false,
@@ -801,11 +797,10 @@ mod tests {
 
     fn worklist(q: &str) -> String {
         let knobs = crate::knobenv::lock();
-        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features");
-        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
-        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
-        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_AGE_DAYS", "7");
-        candidates(q).expect("candidates failed")
+        knobs.set("QUEUE_KIT_ICEBOX_AGE_DAYS", "7");
+        let out = candidates(q).expect("candidates failed");
+        knobs.remove("QUEUE_KIT_ICEBOX_AGE_DAYS");
+        out
     }
 
     // spec: queue-kit/SPEC.md §The queue-index arm — the census is preserved: an excluded row

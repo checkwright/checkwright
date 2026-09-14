@@ -39,7 +39,7 @@ demo-iteration build bbbbbbbb 2026-06-02 none
 demo-iteration validate cccccccc 2026-06-03 none
 demo-iteration close dddddddd 2026-06-04 none
 EOF
-    : >"$sb/lifecycle-config.sh"
+    : >"$sb/lifecycle-config.knobs"
     : >"$sb/scratch/.gitkeep"
 }
 
@@ -52,7 +52,7 @@ git_seed() {  # $1=sandbox subdir; seeds and turns it into a real checkout with 
 
 run_enter() {  # $1=sandbox subdir  $2...=enter-stage argv
     local sb="$1"; shift
-    ( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+    ( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
                            GATE_SDK_TMP_DIR=scratch \
                            LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
         && gate_arm_run --enter-stage "$@" 2>&1 )
@@ -81,7 +81,7 @@ grep -qF '.claude/worktrees/agent-01' <<<"$out" || note sim-path "the simulate r
 [[ "$(state_of "$wt")" == "$before" ]]          || note sim-nowrite "--simulate wrote to the state file"
 
 # --- the knob turns it off, and the same entry then proceeds ---
-out="$( cd "$wt" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$wt/lifecycle-config.sh" \
+out="$( cd "$wt" && gate_env LIFECYCLE_KIT_KNOB_FILE="$wt/lifecycle-config.knobs" \
                              GATE_SDK_TMP_DIR=scratch LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
                              LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=0 \
         && gate_arm_run --enter-stage --simulate scope 2>&1 )"; rc=$?
@@ -100,7 +100,7 @@ DEAD_PID=2147483646   # never a live process; the same probe value producer_live
 
 run_classified() {  # $1=sandbox  $2=pattern  $3...=argv
     local sb="$1" re="$2"; shift 2
-    ( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+    ( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
                            GATE_SDK_TMP_DIR=scratch \
                            LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
                            LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE="$re" \

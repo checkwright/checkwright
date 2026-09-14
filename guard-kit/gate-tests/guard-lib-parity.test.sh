@@ -227,7 +227,7 @@ shell_side() {
 }
 
 # The compiled side is reached through the same binary a dispatched gate reaches, and the arm
-# reports classification rather than an internal representation — `--queue-parity`'s own rule.
+# reports classification rather than an internal representation, the rule a parity arm keeps.
 native_side() {
     local w s
     "$BIN" --guard-lib-parity split "${CORPUS[@]}" || return $?

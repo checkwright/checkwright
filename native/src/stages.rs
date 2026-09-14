@@ -1,6 +1,5 @@
-// spec: lifecycle-kit/SPEC.md §lib/stages.sh — the Rust counterpart of the stage machine's
-// shared surface: the derived stage roster, the two boundary sets, the registration block.
-// The shell library is not retired, so this module sits beside it rather than replacing it
+// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the sole holder of the stage machine's
+// shared surface: the derived stage roster, the two boundary sets, the registration block
 use crate::proc;
 use crate::walk;
 
@@ -66,7 +65,7 @@ pub fn header(text: &str) -> Option<&str> {
     text.lines().find(|l| l.starts_with("## Iteration:"))
 }
 
-// spec: lifecycle-kit/SPEC.md §lib/stages.sh — the trailing-bracket strip is residual-field
+// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the trailing-bracket strip is residual-field
 // healing: a pre-upgrade header still carrying [stage:] yields the bare name
 pub fn header_iter(hdr: &str) -> String {
     let mut s = hdr.strip_prefix("## Iteration:").unwrap_or(hdr);
@@ -77,7 +76,7 @@ pub fn header_iter(hdr: &str) -> String {
     }
 }
 
-// spec: lifecycle-kit/SPEC.md §lib/stages.sh — the data lines of the state file: everything
+// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the data lines of the state file: everything
 // non-blank below the `---` separator, the one derivation every lifecycle reader shares
 pub fn data_lines(text: &str) -> Vec<&str> {
     let mut out = Vec::new();
@@ -96,7 +95,7 @@ pub fn data_lines(text: &str) -> Vec<&str> {
     out
 }
 
-// spec: lifecycle-kit/SPEC.md §lib/stages.sh — the cursor: the last data line's stage token.
+// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the cursor: the last data line's stage token.
 // Empty for both no-cursor shapes (absent file, no data line yet) — "no cursor" is a
 // legitimate state, not an error, and each caller decides what it means.
 pub fn current_stage(text: &str) -> String {
@@ -106,7 +105,7 @@ pub fn current_stage(text: &str) -> String {
     }
 }
 
-// spec: lifecycle-kit/SPEC.md §lib/stages.sh — the iteration-start read's pure half: field five of
+// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the iteration-start read's pure half: field five of
 // the first data line, and only in the abbreviated-hex shape `--enter-stage` writes, so `none`, a
 // four-field line and the no-cursor shapes all read as no commit
 pub fn first_head(text: &str) -> String {
@@ -191,7 +190,7 @@ mod tests {
         assert_eq!(current_stage("---\nonlyonefield\n"), "");
     }
 
-    // spec: lifecycle-kit/SPEC.md §lib/stages.sh — the residual [stage:] field is healed away
+    // spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the residual [stage:] field is healed away
     // rather than reported, so a consumer upgrades mid-iteration without a red
     #[test]
     fn the_iteration_name_survives_a_residual_stage_field() {

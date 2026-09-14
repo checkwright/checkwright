@@ -37,12 +37,12 @@ EOF
 demo-iteration scope aaaaaaaa 2026-06-01 none
 demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
-    : >"$sb/lifecycle-config.sh"
+    : >"$sb/lifecycle-config.knobs"
 }
 
 run_enter() {  # $1=sandbox  $2=REQUIRE  $3...=enter-stage argv
     local sb="$1" req="$2"; shift 2
-    ( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+    ( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
                            GATE_SDK_TMP_DIR=scratch \
                            LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
                            LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE="$req" \
@@ -53,7 +53,7 @@ state_of() { cat "$1/.workflow/WORKFLOW-STATE.txt"; }
 
 # --- the DEFAULT asserts nothing and opens nothing: a consumer who has not taken the feature gains no file ---
 sb="$SANDBOX/default-off"; seed "$sb"
-out="$( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+out="$( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
                              GATE_SDK_TMP_DIR=scratch LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
         && gate_arm_run --enter-stage validate 2>&1 )"; rc=$?
 [[ "$rc" -eq 0 ]] || note default-off "the default REQUIRE refused an entry with no journal: $out"
@@ -106,7 +106,7 @@ out="$(run_enter "$sb" 1 build)"; rc=$?   # a second 'build' session, opening bu
 mkdir -p "$sb/scratch"; echo "the predecessor left none" > "$sb/scratch/build-journal.md"
 out="$(run_enter "$sb" 1 build)"; rc=$?
 [[ "$rc" -eq 0 ]] || note unwritten-seed2 "the stand-in did not clear the same-stage entry: $out"
-out="$( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+out="$( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
                              GATE_SDK_TMP_DIR=scratch LIFECYCLE_KIT_SESSION_ID=deadbeef02 \
                              LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE=1 \
         && gate_arm_run --enter-stage validate 2>&1 )"; rc=$?
@@ -173,7 +173,7 @@ out="$(run_enter "$sb" 1 build)"; rc=$?
 # --- the derivation is a real expansion, not a hardcoded name ---
 sb="$SANDBOX/pattern"; seed "$sb"
 mkdir -p "$sb/scratch/j"; echo x > "$sb/scratch/j/build.log"
-out="$( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+out="$( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
                              GATE_SDK_TMP_DIR=scratch LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
                              LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE=1 \
                              LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN='scratch/j/<stage>.log' \
@@ -181,7 +181,7 @@ out="$( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh"
 [[ "$rc" -eq 0 ]] || note pattern "a configured pattern did not resolve to the file it names: $out"
 
 # --- a pattern with no <stage> placeholder is a config refusal, never a wrong-file assertion ---
-out="$( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+out="$( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
                              GATE_SDK_TMP_DIR=scratch LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
                              LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN='scratch/j/one.log' \
         && gate_arm_run --enter-stage --simulate validate 2>&1 )"; rc=$?

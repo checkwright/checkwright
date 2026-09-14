@@ -64,89 +64,6 @@ fn no_such_arm(arm: &str) -> ! {
     exit(2);
 }
 
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — the arm reports *classification* and never an
-// internal representation, `--queue-parity`'s own rule: the two holders share no data shape, so a
-// comparison of derived literals would fail on a difference that is not a disagreement spec
-fn stages_lib_parity(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --stages-lib-parity iter <file>... | cursor <file>... \
-| known <name>... | journal <stage>... | written <file>... | mark | open <file>";
-    let sub = args.first().map(String::as_str);
-    let rest = if args.is_empty() { &args[0..0] } else { &args[1..] };
-    match sub {
-        Some("iter") => {
-            for f in rest {
-                let text = std::fs::read_to_string(f).unwrap_or_default();
-                let hdr = stages::header(&text).unwrap_or("");
-                println!("iter\t{}\t{}", f, stages::header_iter(hdr));
-            }
-            0
-        }
-        Some("cursor") => {
-            for f in rest {
-                let text = std::fs::read_to_string(f).unwrap_or_default();
-                println!("cursor\t{}\t{}", f, stages::current_stage(&text));
-            }
-            0
-        }
-        Some("known") => {
-            let set = match stages::stages() {
-                Ok(s) => s,
-                Err(e) => {
-                    eprintln!("checkwright-gates: {}", e);
-                    return 2;
-                }
-            };
-            for n in rest {
-                println!("known\t{}\t{}", n, stages::stage_known(&set, n));
-            }
-            0
-        }
-        Some("journal") => {
-            let pattern = match walk::knob_scalar("LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN") {
-                Ok(p) => p,
-                Err(e) => {
-                    eprintln!("checkwright-gates: {}", e);
-                    return 2;
-                }
-            };
-            for s in rest {
-                println!("journal\t{}\t{}", s, emit::enter_stage::journal_path(&pattern, s));
-            }
-            0
-        }
-        Some("written") => {
-            for f in rest {
-                println!("written\t{}\t{}", f, emit::enter_stage::journal_written(f));
-            }
-            0
-        }
-        Some("mark") => {
-            println!("mark\t{}", emit::enter_stage::JOURNAL_MARK);
-            0
-        }
-        // spec: lifecycle-kit/SPEC.md §lib/stages.sh — the compiled writer, so the harness holds
-        // the shell predicate against the opener's own bytes rather than a lookalike of them
-        Some("open") => {
-            let Some(path) = rest.first() else {
-                eprintln!("checkwright-gates: --stages-lib-parity open needs a path");
-                return 2;
-            };
-            match emit::enter_stage::journal_open(path, "build", "it", "aaaa", "2026-06-01", "none") {
-                Ok(()) => 0,
-                Err(e) => {
-                    eprintln!("checkwright-gates: {}", e);
-                    2
-                }
-            }
-        }
-        _ => {
-            eprintln!("checkwright-gates: --stages-lib-parity needs a subcommand — the comparison could not run; treating as failure (not clean)");
-            eprintln!("{}", usage);
-            2
-        }
-    }
-}
-
 // spec: guard-kit/SPEC.md §The guard framework — the holder's four classes, so both sides take one
 // spelling; `hd`/`hdq` carry nothing here because the branch reading them is unreachable, and a
 // token outside the four is a malformed corpus rather than a silent no-class.
@@ -168,7 +85,7 @@ fn parse_wants(spec: &str) -> Result<guard::Wants, String> {
 
 // spec: guard-kit/SPEC.md §The guard framework — the standing oracle criterion 6's *unless* clause
 // owes for the three twinned primitives: this module's classification of one canned corpus,
-// reported as classification and never as an internal representation, `--queue-parity`'s own rule.
+// reported as classification and never as an internal representation, the rule a parity arm keeps.
 fn guard_lib_parity(args: &[String]) -> i32 {
     let usage = "  usage: checkwright-gates --guard-lib-parity split <cmd>... | --guard-lib-parity skeleton <wants> <cmd>... | --guard-lib-parity redirect <cmd>... | --guard-lib-parity allow-match <string> <glob>... | --guard-lib-parity harness-view <cmd>...";
     match args.first().map(String::as_str) {
@@ -265,8 +182,6 @@ const TOP_LEVEL_FLAGS: &[&str] = &[
     "-h",
     "--source-stamp",
     "--list",
-    "--queue-parity",
-    "--stages-lib-parity",
     "--guard-lib-parity",
     "--install",
     "--init",
@@ -343,7 +258,7 @@ fn main() {
         None => {
             eprintln!("checkwright-gates: no subcommand given");
             eprintln!("  adopter verbs: {}", installer::VERBS.iter().map(|(f, _)| f.trim_start_matches('-')).collect::<Vec<_>>().join(", "));
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -373,43 +288,6 @@ fn main() {
             println!("{}\t{}", n, owner);
         }
         exit(0);
-    }
-
-    // spec: queue-kit/SPEC.md §lib/queue.sh — the introspection arm the shell/compiled parity
-    // harness reads: this module's classification of one queue file, one record per line.
-    if first == "--queue-parity" {
-        let file = match argv.get(1) {
-            Some(f) => f.as_str(),
-            None => {
-                eprintln!("checkwright-gates: --queue-parity needs a queue file — the classification could not be reported; treating as failure (not clean)");
-                eprintln!("  usage: checkwright-gates --queue-parity <queue-file>");
-                exit(2);
-            }
-        };
-        let text = match std::fs::read_to_string(file) {
-            Ok(t) => t,
-            Err(e) => {
-                eprintln!("checkwright-gates: cannot read {}: {} — the classification could not be reported; treating as failure (not clean)", file, e);
-                exit(2);
-            }
-        };
-        let sec = match queue::Sections::active_and_deferred() {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("checkwright-gates: {} — treating as failure (not clean)", e);
-                exit(2);
-            }
-        };
-        for rec in queue::parity_report(&text, &sec) {
-            println!("{}", rec);
-        }
-        exit(0);
-    }
-
-    // spec: lifecycle-kit/SPEC.md §lib/stages.sh — the standing oracle criterion 6's *unless*
-    // clause owes a comparator wherever a library stays shell while its readers compile.
-    if first == "--stages-lib-parity" {
-        exit(stages_lib_parity(&argv[1..]));
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — a hardcoded top-level flag, measured rather than

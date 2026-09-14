@@ -223,7 +223,11 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-queue-sections",
         queue_sections::run,
         &[],
-        &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_REQUIRED_SECTIONS"],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_REQUIRED_SECTIONS",
+            "QUEUE_KIT_ICEBOX_SECTION",
+        ],
         "queue-kit",
         &[],
     ),
@@ -261,9 +265,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "queue-kit",
         &[],
     ),
-    // spec: queue-kit/SPEC.md §lib/queue.sh — a member reading a derived section matcher declares
-    // every knob that matcher is computed from, since the Rust side derives them from the
-    // bridged values exactly as lib/queue.sh derives its regexes
+    // spec: queue-kit/SPEC.md §The shared queue adapters — a member reading a derived section
+    // matcher declares every knob that matcher is computed from
     (
         "check-tag-lead-line",
         tag_lead_line::run,
@@ -1995,6 +1998,12 @@ fn expanded_knobs() -> &'static [(&'static str, Vec<&'static str>)] {
             })
             .collect()
     })
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — a member's declared knobs, static names included, the set a
+// `knob:` token is admissible against
+pub fn declared(name: &str) -> Option<&'static [&'static str]> {
+    declared_knobs(name)
 }
 
 fn declared_knobs(name: &str) -> Option<&'static [&'static str]> {

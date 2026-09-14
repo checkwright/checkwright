@@ -3,7 +3,7 @@
 # grammar. The gate's good/bad pair proves assertion A (the byte-compare), which
 # is the one axis a single pair can carry; B's rejection shapes and the emitter's
 # projection rules are driven directly here. Config is isolated via
-# QUEUE_KIT_CONFIG_FILE so the repo's queue-config.sh does not leak in.
+# QUEUE_KIT_KNOB_FILE so the repo's queue-config.knobs does not leak in.
 #
 # Both halves are compiled now, so both are driven through their declared entry
 # points: gate_run resolves the gate's descriptor and its config bridge, and the
@@ -21,12 +21,14 @@ SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 git -C "$SANDBOX" init -q
 
-cat >"$SANDBOX/config.sh" <<'EOF'
-QUEUE_KIT_HORIZONS=(soon someday)
-QUEUE_KIT_TRACKS=(alpha beta)
-QUEUE_KIT_ROADMAP_FILE=ROADMAP.md
+cat >"$SANDBOX/config.knobs" <<'EOF'
+QUEUE_KIT_HORIZONS[] = soon
+QUEUE_KIT_HORIZONS[] = someday
+QUEUE_KIT_TRACKS[] = alpha
+QUEUE_KIT_TRACKS[] = beta
+QUEUE_KIT_ROADMAP_FILE = ROADMAP.md
 EOF
-export QUEUE_KIT_CONFIG_FILE="$SANDBOX/config.sh"
+export QUEUE_KIT_KNOB_FILE="$SANDBOX/config.knobs"
 
 fails=0
 want() {   # $1=label $2=output $3=substring-that-must-be-present
@@ -183,19 +185,22 @@ want   "write-below" "$page" "KEEP-BELOW"
 absent "write-stale" "$page" "stale"
 
 # An empty QUEUE_KIT_ROADMAP_FILE is the clean skip for a consumer with no page.
-cat >"$SANDBOX/noroadmap.sh" <<'EOF'
-QUEUE_KIT_HORIZONS=(soon someday)
-QUEUE_KIT_TRACKS=(alpha beta)
+cat >"$SANDBOX/noroadmap.knobs" <<'EOF'
+QUEUE_KIT_HORIZONS[] = soon
+QUEUE_KIT_HORIZONS[] = someday
+QUEUE_KIT_TRACKS[] = alpha
+QUEUE_KIT_TRACKS[] = beta
 EOF
-out="$( cd "$SANDBOX" && QUEUE_KIT_CONFIG_FILE="$SANDBOX/noroadmap.sh" gate_run check-roadmap-fresh "$CHECKS" 2>&1 )"
+out="$( cd "$SANDBOX" && QUEUE_KIT_KNOB_FILE="$SANDBOX/noroadmap.knobs" gate_run check-roadmap-fresh "$CHECKS" 2>&1 )"
 code "skip-exit" "$?" 0
 want "skip" "$out" "this consumer publishes no roadmap"
 
 # A half-configured vocabulary is malformed config, not a lenient default.
-cat >"$SANDBOX/halfconfig.sh" <<'EOF'
-QUEUE_KIT_HORIZONS=(soon someday)
+cat >"$SANDBOX/halfconfig.knobs" <<'EOF'
+QUEUE_KIT_HORIZONS[] = soon
+QUEUE_KIT_HORIZONS[] = someday
 EOF
-out="$( cd "$SANDBOX" && QUEUE_KIT_CONFIG_FILE="$SANDBOX/halfconfig.sh" gate_run check-roadmap-fresh "$CHECKS" 2>&1 )"
+out="$( cd "$SANDBOX" && QUEUE_KIT_KNOB_FILE="$SANDBOX/halfconfig.knobs" gate_run check-roadmap-fresh "$CHECKS" 2>&1 )"
 code "half-exit" "$?" 2
 want "half" "$out" "QUEUE_KIT_TRACKS is empty"
 

@@ -31,38 +31,46 @@ pub const KIT: Kit = Kit {
             name: "SITE_KIT_CNAME",
             shape: Shape::Scalar,
             default: Default::Scalar("docs/CNAME"),
+            inputs: &[],
         },
         Row {
             name: "SITE_KIT_SCAN_ROOT",
             shape: Shape::Scalar,
             default: Default::Scalar("."),
+            inputs: &[],
         },
         Row {
             name: "SITE_KIT_DOCS_DIR",
             shape: Shape::Scalar,
             default: Default::Scalar("docs"),
+            inputs: &[],
         },
         Row {
             name: "SITE_KIT_ALIASES",
             shape: Shape::Indexed,
             default: Default::Indexed(&[]),
+            inputs: &[],
         },
         Row {
             name: "SITE_KIT_EXEMPT_PATHS",
             shape: Shape::Indexed,
             default: Default::Indexed(&["*/gate-tests/*", "*docs/posts/*"]),
+            inputs: &[],
         },
         Row {
             name: "SITE_KIT_RENDERER",
             shape: Shape::Indexed,
             default: Default::Indexed(RENDERER),
+            inputs: &[],
         },
         Row {
             name: "SITE_KIT_RENDERER_BATCH",
             shape: Shape::Indexed,
             default: Default::Derived(renderer_batch),
+            inputs: &["SITE_KIT_RENDERER"],
         },
     ],
+    validate: None,
 };
 
 #[cfg(test)]

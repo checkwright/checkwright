@@ -180,9 +180,8 @@ cat > "$es/preflight-stub.sh" <<'STUB'
 [[ -f "$(dirname "$0")/preflight-ok" ]]
 STUB
 chmod +x "$es/preflight-stub.sh"
-cat > "$es/stages.sh" <<STAGES
-# shellcheck shell=bash
-LIFECYCLE_KIT_ENTRY_PREFLIGHT=('validate=$es/preflight-stub.sh')
+cat > "$es/stages.knobs" <<STAGES
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = validate=$es/preflight-stub.sh
 STAGES
 
 es_pf_run() {
@@ -191,7 +190,7 @@ es_pf_run() {
     LIFECYCLE_KIT_STATE_FILE="$ess" \
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
-    LIFECYCLE_KIT_CONFIG_FILE="$es/stages.sh" \
+    LIFECYCLE_KIT_KNOB_FILE="$es/stages.knobs" \
     bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 
@@ -225,10 +224,9 @@ cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): --simulate wrote que
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve on a live install: an armed line admits the entry the same red command would otherwise refuse, the state token flips to used, and --simulate reports the would-be admission ahead of it without touching the ledger
 esv="$es/preflight-valve.txt"
 printf '# contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh\n' > "$esv"
-cat > "$es/valve-stages.sh" <<STAGES
-# shellcheck shell=bash
-LIFECYCLE_KIT_ENTRY_PREFLIGHT=('close=$es/preflight-stub.sh')
-LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE=$esv
+cat > "$es/valve-stages.knobs" <<STAGES
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = close=$es/preflight-stub.sh
+LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE = $esv
 STAGES
 es_valve_run() {
     env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID \
@@ -236,7 +234,7 @@ es_valve_run() {
     LIFECYCLE_KIT_STATE_FILE="$ess" \
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
-    LIFECYCLE_KIT_CONFIG_FILE="$es/valve-stages.sh" \
+    LIFECYCLE_KIT_KNOB_FILE="$es/valve-stages.knobs" \
     bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 rm -f "$es/preflight-ok"
@@ -340,9 +338,9 @@ if ( cd "$ma" && kit_gate check-merge-attrs >/dev/null 2>&1 ); then
     echo "smoke(install-lifecycle): a smuggled out-of-set merge attribute should redden the parity gate" >&2; exit 1
 fi
 
-# spec: lifecycle-kit/SPEC.md §lib/stages.sh — the arm resolves its LIFECYCLE_KIT_* knobs by sourcing the loader in the bridge's subshell, and the loader's lock-pattern probe is itself a subshell designed to return non-zero on a non-match; under a `set -e` sourcer that probe aborted the run silently with a pattern configured, leaving a consumer unable to re-emit its own derived surfaces. Exercised with a real pattern set, because the kit default is empty and an unconfigured run never reaches the branch.
-printf "LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE='^held by pid ([0-9]+)\$'\n" > "$ma/lock-stages.sh"
-( cd "$ma" && LIFECYCLE_KIT_CONFIG_FILE=lock-stages.sh bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null ) \
+# spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the validator compiles a configured lock-reason pattern under bash, and a pattern that compiles must leave the arm able to re-emit a consumer's derived surfaces. Exercised with a real pattern set, because the kit default is empty and an unconfigured run never reaches the branch.
+printf 'LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE = ^held by pid ([0-9]+)$\n' > "$ma/lock-stages.knobs"
+( cd "$ma" && LIFECYCLE_KIT_KNOB_FILE=lock-stages.knobs bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null ) \
     || { echo "smoke(install-lifecycle): a configured lock-reason pattern aborted the installer" >&2; exit 1; }
 
 # spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order: env-first, agent- strip, widened + child-narrowed subagents scan (advisory tool, no fixture pair)
@@ -397,9 +395,8 @@ EOF
 $1 close aabbccdd $d none
 EOF
 }
-cat > "$br/stages.sh" <<STAGES
-# shellcheck shell=bash
-LIFECYCLE_KIT_BOUNDARY_REQUIRE=($brd)
+cat > "$br/stages.knobs" <<STAGES
+LIFECYCLE_KIT_BOUNDARY_REQUIRE[] = $brd
 STAGES
 br_run() {
     env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID \
@@ -407,7 +404,7 @@ br_run() {
     LIFECYCLE_KIT_STATE_FILE="$brs" \
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
-    LIFECYCLE_KIT_CONFIG_FILE="$br/stages.sh" \
+    LIFECYCLE_KIT_KNOB_FILE="$br/stages.knobs" \
     bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 
@@ -459,9 +456,8 @@ gap-iter $1 aabbccdd $d none
 EOF
 }
 gp_seed_state build
-cat > "$gp/stages.sh" <<STAGES
-# shellcheck shell=bash
-LIFECYCLE_KIT_GAP_INBOX_FILE=$gpi
+cat > "$gp/stages.knobs" <<STAGES
+LIFECYCLE_KIT_GAP_INBOX_FILE = $gpi
 STAGES
 gp_run() {
     env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID \
@@ -469,7 +465,7 @@ gp_run() {
     LIFECYCLE_KIT_STATE_FILE="$gps" \
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
-    LIFECYCLE_KIT_CONFIG_FILE="$gp/stages.sh" \
+    LIFECYCLE_KIT_KNOB_FILE="$gp/stages.knobs" \
     bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 printf '# contract: gap inbox\n- 2026-07-17 — an untriaged gap bullet\n' > "$gpi"   # (a) close-skipped + non-empty inbox → refuse, nothing written

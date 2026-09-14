@@ -1535,9 +1535,12 @@ Knobs (this repo's layout as defaults):
   renders (one slot per stage, labelled by its shortest roster-unique prefix);
   default `(scope align build validate close)`, which reduces to the frozen
   single-letter header. A consumer running a wider roster derives this from its
-  sole roster owner — this repo's `scripts/drift-config.sh` sources
-  `scripts/lifecycle-config.sh` and copies `LIFECYCLE_KIT_STAGES`, the SSOT
-  activation — rather than re-listing. Third instance of drift-kit re-deriving a
+  sole roster owner rather than re-listing: lifecycle-kit's knobs are static, so
+  the config reads the value through the binary with `gate_static_knob
+  LIFECYCLE_KIT_STAGES DRIFT_KIT_STAGES` (gate-sdk/SPEC.md §The knob file), called
+  only when `DRIFT_KIT_STAGES` is in `GATE_SDK_RESOLVING_KNOB` because the read costs
+  a spawn — this repo's `scripts/drift-config.sh` is the live instance, the SSOT
+  activation. The helper is transitional and leaves with the shell config bridge. Third instance of drift-kit re-deriving a
   cross-kit fact with its own knob rather than importing a sibling kit's bin
   contract (alongside `DRIFT_KIT_SESSIONS_DIR` and `DRIFT_KIT_STATE_FILE`).
 - `DRIFT_KIT_STAGE_ECONOMICS_LOG` — the stage-economics append trend log; default

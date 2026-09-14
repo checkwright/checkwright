@@ -7,7 +7,7 @@ draft) and the seam is ruled: what ships as mechanism, what stays private rule
 content, what becomes consumer config.
 
 **evidence-reset** — nothing to reset by hand here:
-`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` (`scripts/lifecycle-config.sh`) lists
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` (`scripts/lifecycle-config.knobs`) lists
 `.workflow/validate-evidence.txt`, so `--enter-stage scope` truncates it —
 together with the lesson-evidence file — in the same stamp commit. Wipe
 `.tmp/`'s files at this boundary — **except** the session-role marker

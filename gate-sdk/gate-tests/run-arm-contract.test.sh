@@ -176,10 +176,10 @@ assert_absent only-widened-bound 'g_unreg saw:' "$out"
 # spec: gate-sdk/SPEC.md §The non-gate arm — a registered compiled member whose knob cannot
 # resolve (the scratch consumer config gives it a tab-bearing element) fails a bare run at the
 # bridge, and no longer fails a --only run that does not select it, with one name or two.
-cp "$ROOT/queue-kit/checks/check-queue-sections.gate" "$scratch/"
-printf '%s\n' "QUEUE_KIT_REQUIRED_SECTIONS=(\$'has\\ttab')" > "$scratch/queue-config.sh"
-narrowing() { QUEUE_KIT_CONFIG_FILE="$scratch/queue-config.sh" merged "$@"; }
-{ echo g_args; echo g_pass; echo check-queue-sections; } > "$scratch/gates.list"
+cp "$ROOT/canon-kit/checks/check-spec-derivable-section.gate" "$scratch/"
+printf '%s\n' "CANON_KIT_BANNED_HEADINGS=(\$'has\\ttab')" > "$scratch/canon-config.sh"
+narrowing() { CANON_KIT_CONFIG_FILE="$scratch/canon-config.sh" merged "$@"; }
+{ echo g_args; echo g_pass; echo check-spec-derivable-section; } > "$scratch/gates.list"
 
 out="$(narrowing --only g_pass)"; rc=$?
 assert_rc  only-narrowed-sole "$rc" 0
@@ -191,8 +191,8 @@ assert_has only-narrowed-two 'All 2 gates passed.' "$out"
 
 out="$(narrowing)"; rc=$?
 assert_rc  bare-keeps-union "$rc" 2
-assert_has bare-keeps-union 'knob QUEUE_KIT_REQUIRED_SECTIONS has an element containing a tab' "$out"
-rm -f "$scratch/check-queue-sections.gate" "$scratch/queue-config.sh"
+assert_has bare-keeps-union 'knob CANON_KIT_BANNED_HEADINGS has an element containing a tab' "$out"
+rm -f "$scratch/check-spec-derivable-section.gate" "$scratch/canon-config.sh"
 
 # ---- a mistyped --emit arm is answered with the ARM roster ---------------------
 # The binary holds two rosters and the emit path used to fall through to the gate

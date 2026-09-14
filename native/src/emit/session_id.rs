@@ -2,8 +2,8 @@
 // order, first hit wins, every source ending in the same normalization. That section owns the
 // contract; `crate::sessions` holds the one implementation the drift meters read too.
 // spec: gate-sdk/SPEC.md §The non-gate arm — the roster is empty and must stay empty: neither
-// name this arm reads is defined in lifecycle-kit's `lib/stages.sh`, so a declared row would
-// fail-close through the config bridge's undeclared-knob refusal on every invocation.
+// name this arm reads is a row in lifecycle-kit's static table, so a declared row would fail-close
+// on the undeclared-name refusal on every invocation, and a knob file must never set a stamp id.
 use crate::sessions::{key, resolve, Inputs};
 
 pub const KNOBS: &[&str] = &[];

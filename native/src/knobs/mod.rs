@@ -7,15 +7,14 @@ use std::path::Path;
 use std::sync::{Arc, Mutex};
 
 pub mod doctrine_kit;
+pub mod lifecycle_kit;
+pub mod queue_kit;
 pub mod site_kit;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Shape {
     Scalar,
     Indexed,
-    // spec: gate-sdk/SPEC.md §The knob file — a shape of the grammar every later cut inherits, held
-    // before any static kit declares one
-    #[cfg_attr(not(test), allow(dead_code))]
     Keyed,
 }
 
@@ -58,6 +57,7 @@ pub enum Origin {
     Local,
     Tracked,
     Default,
+    Bridged,
 }
 
 // spec: gate-sdk/SPEC.md §The knob file — a derived default is a function of already-resolved knobs,
@@ -67,6 +67,7 @@ pub type Resolve<'a> = &'a dyn Fn(&str) -> Result<(Value, Origin), String>;
 pub enum Default {
     Scalar(&'static str),
     Indexed(&'static [&'static str]),
+    Keyed(&'static [(&'static str, &'static str)]),
     Derived(fn(Resolve) -> Result<Value, String>),
 }
 
@@ -74,11 +75,67 @@ pub struct Row {
     pub name: &'static str,
     pub shape: Shape,
     pub default: Default,
+    // spec: gate-sdk/SPEC.md §The knob file — every name a derived default reads, so the bridge's
+    // closure is known without running the derivation; empty on every other row
+    pub inputs: &'static [&'static str],
 }
+
+impl Row {
+    pub const fn scalar(name: &'static str, v: &'static str) -> Row {
+        Row { name, shape: Shape::Scalar, default: Default::Scalar(v), inputs: &[] }
+    }
+
+    pub const fn indexed(name: &'static str, v: &'static [&'static str]) -> Row {
+        Row { name, shape: Shape::Indexed, default: Default::Indexed(v), inputs: &[] }
+    }
+
+    pub const fn keyed(name: &'static str, v: &'static [(&'static str, &'static str)]) -> Row {
+        Row { name, shape: Shape::Keyed, default: Default::Keyed(v), inputs: &[] }
+    }
+
+    pub const fn derived(
+        name: &'static str,
+        shape: Shape,
+        f: fn(Resolve) -> Result<Value, String>,
+        inputs: &'static [&'static str],
+    ) -> Row {
+        Row { name, shape, default: Default::Derived(f), inputs }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — what a kit validator reads: each row's resolved value, or
+// `None` for a row left at a default derived from a bridged input the reading member may not carry
+pub type Values = BTreeMap<&'static str, Option<Value>>;
+
+pub type Validator = fn(&Values) -> Vec<String>;
 
 pub struct Kit {
     pub root: &'static str,
     pub rows: &'static [Row],
+    // spec: gate-sdk/SPEC.md §The knob file — the config noun the refusal's lead line names, and the
+    // check returning every finding, so a malformed config gates nothing
+    pub validate: Option<(&'static str, Validator)>,
+}
+
+pub fn scalar<'a>(v: &'a Values, name: &str) -> Option<&'a str> {
+    match v.get(name) {
+        Some(Some(Value::Scalar(s))) => Some(s.as_str()),
+        _ => None,
+    }
+}
+
+pub fn indexed<'a>(v: &'a Values, name: &str) -> Option<&'a [String]> {
+    match v.get(name) {
+        Some(Some(Value::Indexed(e))) => Some(e.as_slice()),
+        _ => None,
+    }
+}
+
+pub fn keyed<'a>(v: &'a Values, name: &str) -> Option<&'a [(String, String)]> {
+    match v.get(name) {
+        Some(Some(Value::Keyed(m))) => Some(m.as_slice()),
+        _ => None,
+    }
 }
 
 impl Kit {
@@ -99,7 +156,12 @@ impl Kit {
     }
 }
 
-pub const STATIC_KITS: &[&Kit] = &[&doctrine_kit::KIT, &site_kit::KIT];
+pub const STATIC_KITS: &[&Kit] = &[
+    &doctrine_kit::KIT,
+    &lifecycle_kit::KIT,
+    &queue_kit::KIT,
+    &site_kit::KIT,
+];
 
 // spec: canon-kit/SPEC.md §check-docs-cmd — every name a static kit's reader reads: its declared
 // knobs, its file locator, and the retired locator the legacy refusal still reads
@@ -153,18 +215,30 @@ fn cache() -> &'static Cache {
     &CACHE
 }
 
+type Checked = Mutex<Vec<(CacheKey, Result<(), String>)>>;
+
+fn checked() -> &'static Checked {
+    static CHECKED: Checked = Mutex::new(Vec::new());
+    &CHECKED
+}
+
 #[cfg(test)]
 pub fn reset(_guard: &crate::knobenv::KnobEnv) {
     cache().lock().unwrap_or_else(|e| e.into_inner()).clear();
+    checked().lock().unwrap_or_else(|e| e.into_inner()).clear();
 }
 
-fn layers(kit: &'static Kit) -> Loaded {
-    let key: CacheKey = (
+fn cache_key(kit: &'static Kit) -> CacheKey {
+    (
         kit.root,
         gates_dir(),
         std::env::var(kit.knob_file_var()).unwrap_or_default(),
         std::env::var(format!("{}CONFIG_FILE", kit.prefix())).unwrap_or_default(),
-    );
+    )
+}
+
+fn layers(kit: &'static Kit) -> Loaded {
+    let key = cache_key(kit);
     let mut held = cache().lock().unwrap_or_else(|e| e.into_inner());
     if let Some((_, l)) = held.iter().find(|(k, _)| *k == key) {
         return l.clone();
@@ -328,6 +402,12 @@ fn default_value(row: &'static Row, resolve: Resolve) -> Result<Value, String> {
     Ok(match &row.default {
         Default::Scalar(s) => Value::Scalar(s.to_string()),
         Default::Indexed(v) => Value::Indexed(v.iter().map(|s| s.to_string()).collect()),
+        Default::Keyed(m) => {
+            let mut pairs: Vec<(String, String)> =
+                m.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect();
+            pairs.sort();
+            Value::Keyed(pairs)
+        }
         Default::Derived(f) => f(resolve)?,
     })
 }
@@ -339,25 +419,105 @@ fn undeclared(kit: &Kit, name: &str) -> String {
     )
 }
 
-// spec: gate-sdk/SPEC.md §The knob file — the precedence, highest first: the environment for a
-// scalar only, the local overlay, the tracked file, the kit default
-pub fn resolve(name: &str) -> Result<(Value, Origin), String> {
+fn static_row(name: &str) -> Result<(&'static Kit, &'static Row), String> {
     let kit = owner(name).ok_or_else(|| format!("{} is not a statically owned knob", name))?;
     let row = kit.row(name).ok_or_else(|| undeclared(kit, name))?;
+    Ok((kit, row))
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — the precedence, highest first: the environment for a
+// scalar only, the local overlay, the tracked file; `None` leaves the kit default to the caller
+fn layered(kit: &'static Kit, row: &'static Row) -> Result<Option<(Value, Origin)>, String> {
     let l = layers(kit);
     let l = l.as_ref().as_ref().map_err(String::clone)?;
     if row.shape == Shape::Scalar {
-        if let Ok(v) = std::env::var(name) {
-            return Ok((Value::Scalar(v), Origin::Env));
+        if let Ok(v) = std::env::var(row.name) {
+            return Ok(Some((Value::Scalar(v), Origin::Env)));
         }
     }
-    if let Some(v) = l.local.get(name) {
-        return Ok((v.clone(), Origin::Local));
+    if let Some(v) = l.local.get(row.name) {
+        return Ok(Some((v.clone(), Origin::Local)));
     }
-    if let Some(v) = l.tracked.get(name) {
-        return Ok((v.clone(), Origin::Tracked));
+    if let Some(v) = l.tracked.get(row.name) {
+        return Ok(Some((v.clone(), Origin::Tracked)));
     }
-    Ok((default_value(row, &resolve)?, Origin::Default))
+    Ok(None)
+}
+
+fn lookup(name: &str) -> Result<(Value, Origin), String> {
+    let (kit, row) = static_row(name)?;
+    match layered(kit, row)? {
+        Some(v) => Ok(v),
+        None => Ok((default_value(row, &input)?, Origin::Default)),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — a derivation's resolver: a static sibling through the
+// table, a bridged input through the one reader function, whose absence is its ordinary refusal
+fn input(name: &str) -> Result<(Value, Origin), String> {
+    if owner(name).is_some() {
+        return lookup(name);
+    }
+    crate::walk::knob_scalar(name).map(|v| (Value::Scalar(v), Origin::Bridged))
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — a row whose default reads a bridged input, directly or
+// through a static sibling, which the validator skips while that row sits at its default
+fn reaches_bridged(row: &'static Row) -> bool {
+    row.inputs.iter().any(|n| match owner(n) {
+        None => true,
+        Some(k) => k.row(n).is_some_and(reaches_bridged),
+    })
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — the kit validator runs once per process per kit, at its
+// first resolution, and refuses with every finding under the kit's malformed-config lead line
+fn validated(kit: &'static Kit) -> Result<(), String> {
+    let Some((noun, check)) = kit.validate else {
+        return Ok(());
+    };
+    let key = cache_key(kit);
+    if let Some((_, r)) = checked()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .iter()
+        .find(|(k, _)| *k == key)
+    {
+        return r.clone();
+    }
+    let run = || -> Result<(), String> {
+        let mut values = Values::new();
+        for row in kit.rows {
+            let v = match layered(kit, row)? {
+                Some((v, _)) => Some(v),
+                None if reaches_bridged(row) => None,
+                None => Some(default_value(row, &input)?),
+            };
+            values.insert(row.name, v);
+        }
+        let findings = check(&values);
+        if findings.is_empty() {
+            return Ok(());
+        }
+        Err(format!(
+            "{}: malformed {} — the gates cannot run:\n  {}",
+            kit.root,
+            noun,
+            findings.join("\n  ")
+        ))
+    };
+    let r = run();
+    checked()
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .push((key, r.clone()));
+    r
+}
+
+pub fn resolve(name: &str) -> Result<(Value, Origin), String> {
+    let (kit, _) = static_row(name)?;
+    validated(kit)?;
+    lookup(name)
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the one function every knob read resolves through: a
@@ -370,29 +530,38 @@ pub fn wire(name: &str) -> Result<Option<String>, String> {
     Ok(std::env::var(format!("GATE_SDK_KNOB_{}", name)).ok())
 }
 
+// spec: gate-sdk/SPEC.md §The non-gate arm — one line per element in the roster's grammar, and one
+// line with an empty third field for an empty collection
+fn render(out: &mut String, row: &'static Row, v: Value) {
+    let lines: Vec<String> = match v {
+        Value::Scalar(s) => vec![s],
+        Value::Indexed(e) => e,
+        Value::Keyed(m) => m.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect(),
+    };
+    if lines.is_empty() {
+        out.push_str(&format!("{}\t{}\t\n", row.name, row.shape.word()));
+    }
+    for l in lines {
+        out.push_str(&format!("{}\t{}\t{}\n", row.name, row.shape.word(), l));
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The non-gate arm — `--emit knob-roster`: every statically owned knob with
-// its shape and default, the default rendered with every sibling at its own default
+// its shape and default, the default rendered with every sibling at its own default and a bridged
+// input as `${NAME}`, because gate-sdk's default for that input is not the crate's to spell
 pub fn roster() -> Result<String, String> {
     fn defaults_only(name: &str) -> Result<(Value, Origin), String> {
-        let kit = owner(name).ok_or_else(|| format!("{} is not a statically owned knob", name))?;
-        let row = kit.row(name).ok_or_else(|| undeclared(kit, name))?;
+        if owner(name).is_none() {
+            return Ok((Value::Scalar(format!("${{{}}}", name)), Origin::Bridged));
+        }
+        let (_, row) = static_row(name)?;
         Ok((default_value(row, &defaults_only)?, Origin::Default))
     }
     let mut out = String::new();
     for kit in STATIC_KITS {
         for row in kit.rows {
             let (v, _) = defaults_only(row.name)?;
-            let lines: Vec<String> = match v {
-                Value::Scalar(s) => vec![s],
-                Value::Indexed(e) => e,
-                Value::Keyed(m) => m.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect(),
-            };
-            if lines.is_empty() {
-                out.push_str(&format!("{}\t{}\t\n", row.name, row.shape.word()));
-            }
-            for l in lines {
-                out.push_str(&format!("{}\t{}\t{}\n", row.name, row.shape.word(), l));
-            }
+            render(&mut out, row, v);
         }
     }
     Ok(out)
@@ -402,10 +571,72 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     roster()
 }
 
+// spec: gate-sdk/SPEC.md §The non-gate arm — `--emit knob-values`: the resolved value of each named
+// static knob in the invoking tree, in the roster's grammar; its declared set is its argv's closure
+pub const ARGV_STATIC_KNOBS: &str = "@argv-static-knobs";
+
+pub fn values(args: &[String]) -> Result<String, String> {
+    if args.is_empty() {
+        return Err("needs at least one static knob name — usage: --emit knob-values <NAME>...".to_string());
+    }
+    let mut out = String::new();
+    for name in args {
+        let (_, row) = static_row(name)?;
+        let (v, _) = resolve(name)?;
+        render(&mut out, row, v);
+    }
+    Ok(out)
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the argv names a static table declares, spelled as its
+// rows spell them, so the arm's declared set can be closed like any member's
+pub fn declared_names(args: &[String]) -> Vec<&'static str> {
+    args.iter()
+        .filter_map(|a| owner(a).and_then(|k| k.row(a)).map(|r| r.name))
+        .collect()
+}
+
+fn bridged_inputs(row: &'static Row, out: &mut Vec<&str>) {
+    for i in row.inputs {
+        match owner(i) {
+            None => {
+                if !out.contains(i) {
+                    out.push(i);
+                }
+            }
+            Some(k) => {
+                if let Some(r) = k.row(i) {
+                    bridged_inputs(r, out);
+                }
+            }
+        }
+    }
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `--knobs` answers the knobs a member needs the bridge to
-// carry, so a statically owned name never reaches a kit library that no longer defines it
+// carry: its non-static names, plus the bridged inputs its static names' derivations reach, so a
+// static name never reaches a kit library and a derived default never meets an absent input
 pub fn bridged<'a>(names: impl IntoIterator<Item = &'a str>) -> Vec<&'a str> {
-    names.into_iter().filter(|n| !is_static(n)).collect()
+    let names: Vec<&'a str> = names.into_iter().collect();
+    let mut out: Vec<&'a str> = names.iter().copied().filter(|n| !is_static(n)).collect();
+    for n in names.iter().filter(|n| is_static(n)) {
+        let Some(kit) = owner(n.trim_end_matches('*')) else {
+            continue;
+        };
+        match n.strip_suffix('*') {
+            Some(stem) => {
+                for r in kit.rows.iter().filter(|r| r.name.starts_with(stem)) {
+                    bridged_inputs(r, &mut out);
+                }
+            }
+            None => {
+                if let Some(r) = kit.row(n) {
+                    bridged_inputs(r, &mut out);
+                }
+            }
+        }
+    }
+    out
 }
 
 #[cfg(test)]
@@ -550,11 +781,8 @@ mod tests {
 
     static KEYED_KIT: Kit = Kit {
         root: "probe-kit",
-        rows: &[Row {
-            name: "PROBE_KIT_MAP",
-            shape: Shape::Keyed,
-            default: Default::Indexed(&[]),
-        }],
+        rows: &[Row::keyed("PROBE_KIT_MAP", &[])],
+        validate: None,
     };
 
     #[test]
@@ -593,6 +821,117 @@ mod tests {
             bridged(["SITE_KIT_CNAME", "GATE_PRUNE_DIRS", "DOCTRINE_KIT_AGENT_FILE"]),
             vec!["GATE_PRUNE_DIRS"]
         );
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — the closure carries a derived default's bridged inputs,
+    // transitively through a static sibling, once each and never the static name itself
+    #[test]
+    fn the_bridged_closure_reaches_a_derived_defaults_inputs_through_its_siblings() {
+        assert_eq!(
+            bridged(["LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS", "GATE_SDK_QUEUE_FILE", "QUEUE_KIT_QUEUE_FILE"]),
+            vec!["GATE_SDK_QUEUE_FILE"]
+        );
+        assert_eq!(
+            bridged(["LIFECYCLE_KIT_STATE_FILE", "LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN", "LIFECYCLE_KIT_STAGES"]),
+            vec!["GATE_SDK_WORKFLOW_DIR", "GATE_SDK_TMP_DIR"]
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — the closure's soundness rests on each derived row's
+    // declared inputs, so every derivation runs under a recording resolver and asks nothing undeclared
+    #[test]
+    fn every_derived_row_reads_only_its_declared_inputs() {
+        let mut derived = 0usize;
+        for kit in STATIC_KITS {
+            for row in kit.rows {
+                let Default::Derived(f) = row.default else {
+                    assert!(row.inputs.is_empty(), "{} declares inputs but derives nothing", row.name);
+                    continue;
+                };
+                derived += 1;
+                let asked = std::cell::RefCell::new(Vec::<String>::new());
+                let record = |n: &str| -> Result<(Value, Origin), String> {
+                    asked.borrow_mut().push(n.to_string());
+                    let (_, r) = match static_row(n) {
+                        Ok(v) => v,
+                        Err(_) => return Ok((Value::Scalar("in".into()), Origin::Bridged)),
+                    };
+                    Ok((default_value(r, &|_| Ok((Value::Scalar("in".into()), Origin::Bridged)))?, Origin::Default))
+                };
+                f(&record).unwrap_or_else(|e| panic!("{}: {}", row.name, e));
+                for n in asked.borrow().iter() {
+                    assert!(row.inputs.contains(&n.as_str()), "{} reads {}, which its row does not declare", row.name, n);
+                }
+            }
+        }
+        assert!(derived > 0, "no derived row to hold");
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — skipping a bridged-derived row at its default is sound
+    // only because every kit default passes its own validator
+    #[test]
+    fn every_kit_default_passes_its_validator() {
+        for kit in STATIC_KITS {
+            let Some((_, check)) = kit.validate else {
+                continue;
+            };
+            let mut values = Values::new();
+            for row in kit.rows {
+                let v = default_value(row, &|n| match static_row(n) {
+                    Ok((_, r)) => Ok((default_value(r, &|b| Ok((Value::Scalar(format!("dir-{}", b)), Origin::Bridged)))?, Origin::Default)),
+                    Err(_) => Ok((Value::Scalar(format!("dir-{}", n)), Origin::Bridged)),
+                })
+                .expect("a default renders");
+                values.insert(row.name, Some(v));
+            }
+            assert_eq!(check(&values), Vec::<String>::new(), "{}'s defaults fail its validator", kit.root);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §The knob file — a malformed file value is refused at the kit's first
+    // read with every finding, and a bridged-derived row at its default is not asked for its input
+    #[test]
+    fn a_malformed_config_is_refused_at_first_resolution_with_every_finding() {
+        let env = knobenv::lock();
+        let s = Scratch::new("validate");
+        clean(&env, &s.dir());
+        env.remove("GATE_SDK_KNOB_GATE_SDK_WORKFLOW_DIR");
+        env.remove("GATE_SDK_KNOB_GATE_SDK_TMP_DIR");
+        assert_eq!(resolve("LIFECYCLE_KIT_FIRST_STAGE").unwrap().0, Value::Scalar("scope".into()));
+        s.write("lifecycle-config.knobs", "LIFECYCLE_KIT_FIRST_STAGE = nope\nLIFECYCLE_KIT_SHIM_NGRAM = x\n");
+        reset(&env);
+        let e = resolve("LIFECYCLE_KIT_STAGES").unwrap_err();
+        assert!(e.starts_with("lifecycle-kit: malformed stage-machine config"), "{}", e);
+        assert!(e.contains("'nope' is not in LIFECYCLE_KIT_STAGES") && e.contains("'x' is not a positive integer"), "{}", e);
+        clean(&env, &s.dir());
+        restore(&env);
+    }
+
+    #[test]
+    fn knob_values_prints_the_resolved_value_and_refuses_an_unowned_name() {
+        let env = knobenv::lock();
+        let s = Scratch::new("values");
+        clean(&env, &s.dir());
+        s.write("queue-config.knobs", "QUEUE_KIT_TRACKS[] = a\nQUEUE_KIT_TRACKS[] = b\nQUEUE_KIT_HORIZONS[] = now\n");
+        reset(&env);
+        let args = |v: &[&str]| v.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        assert_eq!(
+            values(&args(&["QUEUE_KIT_TRACKS", "QUEUE_KIT_PROSE_SURFACE_GLOBS"])).unwrap(),
+            "QUEUE_KIT_TRACKS\tindexed\ta\nQUEUE_KIT_TRACKS\tindexed\tb\nQUEUE_KIT_PROSE_SURFACE_GLOBS\tindexed\t\n"
+        );
+        assert!(values(&args(&["GATE_PRUNE_DIRS"])).is_err());
+        assert!(values(&[format!("{}NOPE", queue_kit::KIT.prefix())]).is_err());
+        assert_eq!(declared_names(&args(&["LIFECYCLE_KIT_STATE_FILE", "NOPE"])), vec!["LIFECYCLE_KIT_STATE_FILE"]);
+        clean(&env, &s.dir());
+        restore(&env);
+    }
+
+    #[test]
+    fn the_roster_renders_a_bridged_input_by_name() {
+        let r = roster().expect("renders");
+        assert!(r.contains("LIFECYCLE_KIT_STATE_FILE\tscalar\t${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt\n"), "{}", r);
+        assert!(r.contains("LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS\tindexed\t${GATE_SDK_QUEUE_FILE}\n"), "{}", r);
+        assert!(r.contains("LIFECYCLE_KIT_PREDECESSOR\tkeyed\talign=scope\n"), "{}", r);
     }
 
     // spec: gate-sdk/SPEC.md §The knob file — the gates-directory default is spelled here and in

@@ -1,41 +1,56 @@
-# shellcheck shell=bash
-# spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's lifecycle-kit consumer config: the boundary-truncate and entry-preflight knobs wire evidence-kit's manifest across the seam, the boundary-require knob makes close's release disposition a boundary precondition, the session-boundary posture is set below; every other knob keeps the platform default
-# no-port: CLAUDE.md §The provenance seam (never cross it) — operator-ruled 2026-08-24 for this repo's scripts/ config-and-vocabulary class, on the vocabulary half of scripts/measured-claims.sh's cause alone (scripts/ riding no installer payload is the half the ruling deliberately does NOT declare on). LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE is this harness's own lock vocabulary, ruled consumer-side against an empty kit default in its comment below, so porting this file would spell one harness's layout in every adopter's binary.
-# shellcheck disable=SC2034  # consumed by lifecycle-kit/lib/stages.sh after sourcing
-LIFECYCLE_KIT_BOUNDARY_TRUNCATE=(.workflow/validate-evidence.txt .workflow/release-disposition.txt .workflow/preflight-valve.txt)
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve is live in this tree, the close-entry manifest gate being the wired preflight whose deadlock the valve exists to admit past. The ledger joins the truncate array one line up, so its horizon is the iteration and close's disposition step has a bounded set to answer for.
-LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE=.workflow/preflight-valve.txt
-LIFECYCLE_KIT_BOUNDARY_REQUIRE=(.workflow/release-disposition.txt)
+# spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's lifecycle-kit consumer knob file: the boundary-truncate and entry-preflight knobs wire evidence-kit's manifest across the seam, the boundary-require knob makes close's release disposition a boundary precondition, the session-boundary posture is set below; every other knob keeps the platform default
+LIFECYCLE_KIT_BOUNDARY_TRUNCATE[] = .workflow/validate-evidence.txt
+LIFECYCLE_KIT_BOUNDARY_TRUNCATE[] = .workflow/release-disposition.txt
+LIFECYCLE_KIT_BOUNDARY_TRUNCATE[] = .workflow/preflight-valve.txt
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve is live in this tree, the close-entry manifest gate being the wired preflight whose deadlock the valve exists to admit past. The ledger joins the truncate array above, so its horizon is the iteration and close's disposition step has a bounded set to answer for.
+LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE = .workflow/preflight-valve.txt
+LIFECYCLE_KIT_BOUNDARY_REQUIRE[] = .workflow/release-disposition.txt
 # spec: context-kit/SPEC.md §The session-context hook — `session-role`: the marker the hook reads to suppress the delegation nudge for a lead session, whose lifetime is that live session's, not the iteration's
 # spec: lifecycle-kit/SPEC.md §templates/lead.md — the lead's own resume journal shares that live-session lifetime and takes no entry here: its protection is the kit invariant LIFECYCLE_KIT_LEAD_JOURNAL_FILE names, precisely so assigning this array cannot drop it. A stage journal and a consult journal each take none either, for the reasons that section contrasts.
-LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)
+LIFECYCLE_KIT_BOUNDARY_PRESERVE[] = session-role
 # spec: evidence-kit/SPEC.md §check-producer-liveness — the liveness gate is wired at the entry and nowhere else, now in set mode at *every* stage against the scratch directory: the subject is any recorded producer and any stage can leave one (the ninth firing's `gh run watch` had no lock at all), where the two lock-pointed entries were chosen when the subject was one producer with one lock. The cost is one invocation per entry against a usually-empty directory. It is deliberately absent from gates.list — this repo's `gates` suite is the battery --run-validate itself invokes, so a registered liveness gate would red every validate run against its own lock.
 # spec: evidence-kit/SPEC.md §check-producer-liveness — the two lock-pointed entries are *kept beside* the set entries rather than replaced by them, and this is a widening with no narrowing inside it: set mode globs `*.run`, and `EVIDENCE_KIT_LOCK_FILE` deliberately keeps the `.lock` suffix (a lock's absence means free; a launch record's means nothing was recorded), so the directory pass cannot see --run-validate's own lock and dropping these two would have traded the ninth firing's coverage for the eighth's.
 # spec: evidence-kit/SPEC.md §check-evidence-manifest — every entry names a *gate* and reaches it through the battery front-end's --only form, never a declaration path: --enter-stage execs the configured argv with no interpreter word, so a ported member's `.gate` descriptor is a non-executable data file and the entry is refused, while gate-sdk/bin/run-gates.sh rides its own exec bit. The `--` is mandatory rather than stylistic on all nine: --enter-stage appends <queue> <state> to every entry's argv and --only would read each appended token as a gate name (gate-sdk/SPEC.md §run-gates owns that grammar and the sole-name resolution the eight unregistered entries ride).
-LIFECYCLE_KIT_ENTRY_PREFLIGHT=(
-    'close=gate-sdk/bin/run-gates.sh --only check-evidence-manifest -- .workflow/validate-evidence.txt'
-    'scope=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp'
-    'spec=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp'
-    'align=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp'
-    'build=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp'
-    'validate=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp'
-    'close=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp'
-    'validate=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp/run-validate.lock'
-    'close=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp/run-validate.lock'
-)
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = close=gate-sdk/bin/run-gates.sh --only check-evidence-manifest -- .workflow/validate-evidence.txt
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = scope=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = spec=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = align=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = build=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = validate=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = close=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = validate=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp/run-validate.lock
+LIFECYCLE_KIT_ENTRY_PREFLIGHT[] = close=gate-sdk/bin/run-gates.sh --only check-producer-liveness -- .tmp/run-validate.lock
 # spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's session-boundary posture: 'iteration' sanctions the lead's inline fallback; cost accepted that the dogfood evidence stops demonstrating the strict posture
-LIFECYCLE_KIT_SESSION_BOUNDARY=iteration
+LIFECYCLE_KIT_SESSION_BOUNDARY = iteration
 # spec: lifecycle-kit/SPEC.md §The close-surface roster — this repo's declaration surfaces beyond the kit SPECs: the always-loaded agent file, the doctrine deliverable, the stage-skill bindings which own the consumer-side capture surfaces no kit may name, and the ruling record, which declares itself in its own header because it owns itself and no binding owns any part of it
-LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS=("*/SPEC.md" "CLAUDE.md" "doctrine-kit/DOCTRINE.md" ".claude/commands/*.md" "TRAJECTORY.md")
+LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS[] = */SPEC.md
+LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS[] = CLAUDE.md
+LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS[] = doctrine-kit/DOCTRINE.md
+LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS[] = .claude/commands/*.md
+LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS[] = TRAJECTORY.md
 # spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — this repo's ruling record and the surfaces that argue about its rulings; the kit defaults both empty because a record's name and a tree's arguing surfaces are the consumer's facts, and an adopter keeping no record leaves the machinery inert
-LIFECYCLE_KIT_RULING_RECORD=TRAJECTORY.md
-LIFECYCLE_KIT_RULING_CITERS=("TASK-QUEUE.md" "CLAUDE.md" "*/SPEC.md" "doctrine-kit/DOCTRINE.md" ".workflow/audit-roster.txt")
+LIFECYCLE_KIT_RULING_RECORD = TRAJECTORY.md
+LIFECYCLE_KIT_RULING_CITERS[] = TASK-QUEUE.md
+LIFECYCLE_KIT_RULING_CITERS[] = CLAUDE.md
+LIFECYCLE_KIT_RULING_CITERS[] = */SPEC.md
+LIFECYCLE_KIT_RULING_CITERS[] = doctrine-kit/DOCTRINE.md
+LIFECYCLE_KIT_RULING_CITERS[] = .workflow/audit-roster.txt
 # spec: lifecycle-kit/SPEC.md §check-scratch-citation — this repo's widening beyond the kit default (the queue alone): the governed spec set, the other permanent surface where a carried finding wants to land. The array replaces rather than extends, so the queue is restated here.
-LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS=("TASK-QUEUE.md" "*/SPEC.md")
+LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS[] = TASK-QUEUE.md
+LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS[] = */SPEC.md
 # spec: lifecycle-kit/SPEC.md §check-stage-entry — this repo splits amendment authoring into a dedicated trigger-gated `spec` stage (scope bounds, spec authors, align verifies); the roster and its `[spec]=scope` predecessor edge are set together — a roster member absent from the predecessor map fails config-load validation. Only `scope` (LIFECYCLE_KIT_FIRST_STAGE) resets the evidence file; `spec` appends. `spec` is omitted as any stage's mandatory predecessor (same calibration as the trigger-gated audit stage), so align/build/validate/close edges are unchanged.
-LIFECYCLE_KIT_STAGES=(scope spec align build validate close)
+LIFECYCLE_KIT_STAGES[] = scope
+LIFECYCLE_KIT_STAGES[] = spec
+LIFECYCLE_KIT_STAGES[] = align
+LIFECYCLE_KIT_STAGES[] = build
+LIFECYCLE_KIT_STAGES[] = validate
+LIFECYCLE_KIT_STAGES[] = close
 # comment-tier-exempt: the seam. This harness's worktree lock reason is its own vocabulary, so the kit ships an empty default and the pattern lands here beside the other consumer-vocabulary knobs — a kit literal spelling it would publish one harness's layout. The one capture group is the holder's pid; the start field is matched and not captured, argued in lifecycle-kit/SPEC.md §bin/enter-stage.sh.
-LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE='^claude agent [^ ]+ \(pid ([0-9]+) start [0-9]+\)$'
+LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE = ^claude agent [^ ]+ \(pid ([0-9]+) start [0-9]+\)$
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the predecessor-journal assertion is ON here, and this close is the only place the switch that section mandates can be thrown: it rules the flip a boundary act rather than a mid-iteration one, and close is the last stage of an iteration, so no session of this iteration runs underneath it. The first stage of an iteration is never asserted against, so the next boundary crosses clean and the first enforced firing is its second stage.
-LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE=1
-declare -A LIFECYCLE_KIT_PREDECESSOR=([spec]=scope [align]=scope [build]=scope [validate]=build [close]=validate)
+LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE = 1
+LIFECYCLE_KIT_PREDECESSOR[spec] = scope
+LIFECYCLE_KIT_PREDECESSOR[align] = scope
+LIFECYCLE_KIT_PREDECESSOR[build] = scope
+LIFECYCLE_KIT_PREDECESSOR[validate] = build
+LIFECYCLE_KIT_PREDECESSOR[close] = validate

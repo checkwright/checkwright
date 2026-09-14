@@ -1,0 +1,2 @@
+# comment-tier-exempt: fixture config — the permanent surfaces this case dir carries
+LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS[] = surfaces/*.md

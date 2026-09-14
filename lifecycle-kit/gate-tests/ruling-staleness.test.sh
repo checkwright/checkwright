@@ -59,8 +59,9 @@ grep -q 'no ruling record configured' <<<"$out" \
 
 # --- the citers knob reaches the citing sweep, and both readings of one name come back ---
 checks=$((checks + 1))
+printf 'LIFECYCLE_KIT_RULING_CITERS[] = CITERS.md\n' >"$SANDBOX/citers.knobs"
 out="$( cd "$SANDBOX" && env LIFECYCLE_KIT_RULING_RECORD=RECORD.md \
-    LIFECYCLE_KIT_RULING_CITERS='CITERS.md' \
+    LIFECYCLE_KIT_KNOB_FILE="$SANDBOX/citers.knobs" \
     bash "$RUN_GATES" --emit ruling-staleness 2>&1 )"
 [[ "$(grep -c 'CITERS.md:' <<<"$out")" -eq 2 ]] \
     || note bridge-citers "the configured citing corpus did not yield both rows verbatim: $out"

@@ -67,7 +67,7 @@ drift-kit's deferred-age KPI and the `queue-index` arm's `--icebox-candidates`.
 Widening, not replacing: `Surfaced` records when the premise was observed and
 is the better premise-rot datum, `Filed` is the honest available fallback, so
 no entry owes a migration. drift-kit re-implements the definition rather than
-sourcing `lib/queue.sh`, because a kit dependency the other way would close a
+reading this kit's shared adapters, because a kit dependency the other way would close a
 cross-kit cycle; both implementations cite this section. That is the general
 rule for this format, not a one-off for drift-kit: **a kit that cannot depend on
 queue-kit re-implements the predicate and both ends cite this section.**
@@ -81,19 +81,6 @@ because a holder added or dropped is then owed two edits in two SPECs and only
 the one that prompted the change is likely to get it.
 - Any other section (an iteration header, a lessons section) is outside the
   grammar and ignored by every gate except the file-wide hygiene axes.
-
-**Where this format has two holders, what is compared between them is
-classification over a corpus, never the derived literals.** The shell library
-exposes ERE strings and an array; its compiled counterpart exposes a section
-value and free predicates over it, so there is no value either could hand the
-other — comparing them would compare nothing, or force one side to grow an
-accessor whose only reader is the test. The comparable question is the one this
-section defines: given the same queue file, do both agree on which lines are
-section boundaries, which are task bullets, which is the lessons line, which
-slugs are live? Two witnesses held to each other over a golden *corpus*, with no
-committed expected file — a maintained golden is a third copy to drift, and the
-failure the comparison exists to catch is one side edited without the other,
-which it catches directly (§lib/queue.sh names the holder).
 
 An entry is a column-0 `- **slug** — prose…` bullet; continuation lines are
 indented, never column 0. An *indented* bullet with a bold lead-in is a
@@ -165,7 +152,8 @@ that is the whole design:
 - **Tags stay lead-line-governed**, with no gate edit.
 
 Every gate keyed on the shared task regex therefore widens with **no change to
-any gate file** — the widening is entirely in `lib/queue.sh`, which is what the
+any gate file** — the widening is entirely in the shared adapters (§The shared
+queue adapters), which is what the
 one-adapter rule was built to buy. `check-queue-prose-precondition` deliberately does not
 reach the tier: forward-looking phrasing is normal vocabulary in a parked
 entry, the same exemption the deferred section already carries.
@@ -352,7 +340,7 @@ aggregated by §The queue-edges arm and audited by
 nothing. The rules below make citations parseable, each covering a shape a live
 corpus contains:
 
-- **Resolution is against the live slug set** — `queue_live_slugs`: active,
+- **Resolution is against the live slug set** — `live_slugs`: active,
   deferred, and a configured icebox, the existing source of truth — **and
   against the retired one**, the slugs the file's own history shows were once
   live (§The queue-edges arm). A citation resolving to a retired slug is an edge,
@@ -724,17 +712,23 @@ is a non-gate arm of the binary, registered in no `gates.list` and carrying no
 derived set for the same reason and therefore takes a **bespoke** test,
 `gate-tests/entry-history.test.sh`, rather than a `good/`+`bad/` pair.
 
-Config follows lifecycle-kit's pattern: copy `templates/queue-config.sh`
-into the gates dir as `queue-config.sh` (or point `QUEUE_KIT_CONFIG_FILE`
-elsewhere) and override any knob; defaults fill what the consumer left unset,
-and the loader exits 2 on a malformed config — a broken grammar must not gate
-anything. A gitignored `queue-config.local.sh` beside that file sources last
-(§lib/queue.sh) — the home for a private value a tracked config cannot carry.
-That template and the copy it seeds are **permanently shell**, each carrying the
-`# no-port:` cause of the class ruling at gate-sdk/SPEC.md §The config-seam port
-disposition. Knobs:
+Config is a **knob file**: copy `templates/queue-config.knobs` into the gates dir
+as `queue-config.knobs` (or point `QUEUE_KIT_KNOB_FILE` elsewhere) and set any knob
+below; defaults fill what the file leaves unset. queue-kit's knobs are **static**:
+the binary resolves them in process from its own defaults table and the consumer's
+knob file, and the config bridge never carries them (gate-sdk/SPEC.md §lib/gate.sh);
+`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape
+and rendered default. A gitignored `queue-config.local.knobs` in the gates dir is the
+home for a private value a tracked file cannot carry. The grammar, that `.local`
+overlay, the environment-over-file precedence for a scalar, and the refusals — a
+set `QUEUE_KIT_KNOB_FILE` that does not exist, a left-behind `queue-config.sh` or
+`queue-config.local.sh`, a non-empty file named by the retired
+`QUEUE_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's table
+validator refuses a malformed config at exit 2 with every finding — a broken grammar
+must not gate anything. A derived default below is written in the roster's
+`${NAME}` spelling for the gate-sdk knob it reads. Knobs:
 
-- `QUEUE_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`;
+- `QUEUE_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE}`;
   every gate also takes the file as `$1` (fixture capability).
 - `QUEUE_KIT_ACTIVE_SECTIONS` — array, default
   `("New Features" "Technical Debt")`, order = selection order (§The queue
@@ -777,7 +771,10 @@ disposition. Knobs:
   configured `QUEUE_KIT_ICEBOX_SECTION` is **appended by derivation**, never by
   a second consumer list: an icebox configured but absent from the file would
   otherwise let every icebox assertion pass open on a section that is not
-  there, the exact fail-open class `check-queue-sections` exists to stop.
+  there, the exact fail-open class `check-queue-sections` exists to stop. The
+  append is the reader's (§The shared queue adapters), not the knob's, so the
+  knob holds exactly what the consumer wrote and a consumer setting the list
+  keeps it.
 - `QUEUE_KIT_LESSON_TAGS` — array of bare harvest-tag names, default empty; the
   consumer-named outbound lesson vocabulary (§The tag algebra), read by
   `check-tag-lead-line` for placement. Names, sinks, and handling are consumer
@@ -799,12 +796,12 @@ disposition. Knobs:
 - `QUEUE_KIT_ROADMAP_MARKER` — the marker-block token, default `roadmap`,
   delimiting the generated span as `<!-- roadmap:begin -->` /
   `<!-- roadmap:end -->`. One knob with two readers — the `--write` splice and
-  the gate's block locator — which must agree, so it resolves through this
-  loader rather than being re-defaulted in each.
+  the gate's block locator — which must agree, so it resolves through the kit's
+  table rather than being re-defaulted in each.
 
 The roadmap vocabulary is configured as a **pair**: `QUEUE_KIT_HORIZONS` or
-`QUEUE_KIT_TRACKS` set while the other is empty is malformed config and
-`lib/queue.sh` exits 2, per the loader's broken-grammar contract. A
+`QUEUE_KIT_TRACKS` set while the other is empty is malformed config and the
+table validator exits 2, per the broken-grammar contract above. A
 half-configured vocabulary would silently accept every value of the
 unconfigured field. Both empty is the unconfigured default — a consumer that
 publishes no roadmap gets a clean skip rather than a kit-shaped one.
@@ -820,137 +817,76 @@ kit to "no icebox" rather than to a wrong section.
 
 ## Per-component contracts
 
-### lib/queue.sh
+### The shared queue adapters
 
-The sourced config loader plus shared adapters: the section-regex builders
-the gates pass to awk (both sides of every section boundary must parse
-identically — a shared adapter removes that drift axis), and the slug/tag
-extraction helpers. Values and adapters only, never gate structure
-(gate-sdk's `lib/gate.sh` rule).
+`native/src/queue.rs` is the **sole holder** of the adapters every queue reader
+shares: the section matchers the gates and arms apply (both sides of every section
+boundary must parse identically — a shared adapter removes that drift axis), the
+slug and tag extraction helpers, and the roadmap parse. Values and adapters only,
+never gate structure (gate-sdk's `lib/gate.sh` rule). The knobs they read resolve
+from the kit's static table (§Layout and configuration).
 
-**It is permanently shell and declares so in its own header**, as the config
-bridge's sole resolver for the `QUEUE_KIT_*` knobs — gate-sdk/SPEC.md §The
-kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
-states the ground.
+**Validation is the table's.** The kit validator runs at the kit's first knob read
+in a process: an empty or non-numeric knob is a broken grammar, and the roadmap
+vocabulary is validated as a pair (§Layout and configuration) rather than
+per-array, because the failure the check exists to stop is one array set alone.
+Findings are collected and reported together under one malformed-config lead line,
+then exit 2 (gate-sdk/SPEC.md §The knob file).
 
-The loader validates what it loads: an empty or non-numeric knob is a
-broken grammar, and the roadmap vocabulary is validated as a pair (§Layout and
-configuration) rather than per-array, because the failure the check exists to
-stop is one array set alone. Validation failures are collected and reported
-together, then exit 2.
+The icebox is *derived* here rather than configured twice. A non-empty
+`QUEUE_KIT_ICEBOX_SECTION` joins the shared task set, and it joins the required set
+that `required_sections()` composes — the resolved `QUEUE_KIT_REQUIRED_SECTIONS`
+followed by the icebox unless the list already names it, the set
+`check-queue-sections` reads. When it is empty every icebox matcher matches
+nothing, so each reader degrades to "no icebox" rather than to "every section".
 
-The icebox is *derived* here rather than configured twice: a non-empty
-`QUEUE_KIT_ICEBOX_SECTION` joins both the shared task regex and the effective
-required-sections set, and when it is empty every icebox regex is the empty
-string so each reader degrades to "no icebox" rather than to "every section".
+**That degradation is the reader's to complete.** An empty icebox name only
+*carries* the "no icebox" answer; a reader of an optional section matcher tests the
+empty name explicitly, as `is_icebox` does, because a match against an empty
+pattern matches every line and an unguarded match therefore degrades to exactly the
+"every section" reading the empty name was chosen to avoid. Any reader of an
+optional section matcher owes that guard.
 
-**That degradation is the reader's to complete, not the library's.** The empty
-regex only *carries* the "no icebox" answer; an awk consumer must test it
-explicitly (`iceboxre != "" && $0 ~ iceboxre`), because awk's `$0 ~ ""` matches
-every line and an unguarded match therefore degrades to exactly the "every
-section" reading the empty string was chosen to avoid. Any reader of an
-optional section regex owes that guard.
+`QUEUE_TASK_SECTIONS` — `Sections::task_sections` — is that composition itself:
+the active sections, the deferred section, and a configured icebox, in configured
+order, exposed rather than consumed and discarded. The task-section matcher is built
+from it, and a reader that needs the sections *individually* rather than as one
+alternation (§The queue-counts arm) reads the list. One composition, two shapes of
+the same answer: a second reader recomposing the set from the three knobs is the
+drift axis a shared adapter exists to remove.
 
-`QUEUE_TASK_SECTIONS` is that composition itself — the active sections, the
-deferred section, and a configured icebox, in configured order — exposed rather
-than consumed and discarded. `QUEUE_TASK_RE` is built from it, and a reader that
-needs the sections *individually* rather than as one alternation
-(§The queue-counts arm) reads the array. One composition, two shapes of the same
-answer: a second reader recomposing the set from the three knobs is the drift
-axis a shared adapter exists to remove.
-
-`roadmap_entries` — `native/src/queue.rs`'s, this library holding no counterpart
-— is the single `[roadmap:]` and `roadmap-summary:` parse, shared by the roadmap
-arm (§The roadmap arm) and `check-roadmap-fresh` so the emitter and the gate can
-never disagree about what an entry claims — the same one-adapter rule the section
-regexes follow. It walks the live task sections in queue order and returns one
-record per entry carrying **either** marking: the entry's `[roadmap:]` tag count,
-the raw field text, the slug, the `roadmap-summary:` declaration count, and the
-declaration's text. Emitting on either marking rather than on the tag alone is
-what lets assertion C see a dead declaration — an entry the tag has fallen off is
-exactly the case a tag-triggered walk cannot report.
-
-**The record is a typed value rather than a TSV line, and that difference is a
-deletion rather than a translation.** A tab-separated form exists only because a
-shell function's only return channel is stdout, and such a form must carry a
-defensive `-` in an untagged entry's field column: a tab counts as IFS
-whitespace, so a reader splitting on it coalesces an empty column and silently
-shifts every field after it. In-crate the five fields travel as fields, so the
-field-count and embedded-tab hazards have no spelling and an absent field is
-simply empty.
+`roadmap_entries` is the single `[roadmap:]` and `roadmap-summary:` parse, shared
+by the roadmap arm (§The roadmap arm) and `check-roadmap-fresh` so the emitter and
+the gate can never disagree about what an entry claims — the same one-adapter rule
+the section matchers follow. It walks the live task sections in queue order and
+returns one record per entry carrying **either** marking: the entry's `[roadmap:]`
+tag count, the raw field text, the slug, the `roadmap-summary:` declaration count,
+and the declaration's text. Emitting on either marking rather than on the tag alone
+is what lets assertion C see a dead declaration — an entry the tag has fallen off is
+exactly the case a tag-triggered walk cannot report. The record is a typed value,
+so its five fields travel as fields and an absent field is simply empty.
 
 The in-body citation scan (§The tag algebra) is deliberately **not** here: it
-has one reader, and this library holds adapters two or more readers share. It
+has one reader, and this module holds adapters two or more readers share. It
 lives in the queue-edges arm, which takes the section matchers and the live-slug
-reading from `native/src/queue.rs`, this library's counterpart, rather than
-carrying its own. A second reader of body-position slug tokens is what would
-promote the scan into that roster.
+reading from this module rather than carrying its own. A second reader of
+body-position slug tokens is what would promote the scan into that roster.
 
 **The entry lead-line grammar is here, and it is here by that same rule rather
-than by convention.** `QUEUE_LEAD_RE` (a bullet opening an entry) and
-`QUEUE_SLUG_BOLD_RE` (the bold slug token inside it) are exported globals like
-the section regexes. Three readers shared them when the grammar landed here:
-`queue_live_slugs` above, the edge aggregator's bullet scan, and its history
-walk, which asks the *same* question of an older revision. The last two are now
-one crate module (§The queue-edges arm) reading `native/src/queue.rs`'s
-counterpart, so the sharing moved substrate rather than dissolving — a history
-walk carrying its own spelling would still let the retired set and the live set
-disagree about what an entry is, which is why the crate side shares
-`bullet_slug` between them exactly as this side shared these two.
+than by convention.** `bullet_slug` (a bullet opening an entry) and
+`first_bold_slug` (the bold slug token inside it) have three readers: `live_slugs`,
+the edge aggregator's bullet scan, and its history walk, which asks the *same*
+question of an older revision. A history walk carrying its own spelling would let
+the retired set and the live set disagree about what an entry is, which is why the
+two share one grammar.
 
-Both are written with **bracketed literals** (`[*][*]`) rather than backslash
-escapes. They reach `awk` through `-v`, where awk's string-escape pass runs
-before the regex engine sees the value and eats a `\*` with a warning; the
-bracket form has no escape to lose. This is mechanism, not style — the same
-value spelled with backslashes is a different regex by the time it is applied.
-
-**The one-adapter guarantee is split for `queue_live_slugs` and the section
-regexes, and the split is machine-held rather than filed as debt.** The gates
-that read the queue ported to the binary substrate (gate-sdk/SPEC.md §Porting a
-gate to the binary substrate), so `check-queue-slug-liveness` and
-`check-task-conservation` call a Rust reimplementation of that helper; the same
-is true of the section regexes, and of the counter and edge readings, which are
-now arms of the same binary. **The split is permanent, and the reason is the
-resolver rather than any shell caller:** this library is
-the config bridge's **sole resolver** for every `QUEUE_KIT_*` knob — the bridge
-computes a knob's value by sourcing exactly this file (gate-sdk/SPEC.md
-§lib/gate.sh), so every crate-side reader above resolves *through* it. The shell
-form therefore cannot be deleted the way a ported primitive's is, and a port-time
-byte-identity proof would expire at the next edit to either side.
-**The kit ships no `bin/` directory and no shell gate, so the roster a reader
-reaches for — a grep for `lib/queue.sh` under the kit's own script directories —
-finds no caller at all, and the derived globals' one live in-tree reader is the
-parity harness below.** That is stated so the empty answer is not read as the library being
-dead: it narrows what the split *guards*, never whether it holds, because the
-resolver role above is what makes the library permanent and that role has no
-shell caller in it. What holds the
-two equal is `gate-tests/queue-lib-parity.test.sh`: it feeds one canned
-corpus to both and compares their **classification** of it byte for byte
-(§The queue format owns why classification is the comparable thing), which is
-criterion 6's *machine-held* disposition rather than its duplication-absent one
-(gate-sdk/SPEC.md §The port-candidate criteria, criterion 6).
-
-The obligation covers **one helper — `queue_live_slugs` — and every derived
-global this library exports** (`grep -n '^QUEUE_[A-Z_]*=' queue-kit/lib/queue.sh`),
-and nothing else is owed one. The crate's `done_slugs` has no counterpart here and needs none: a shell
-twin with no caller is a duplication removal disposes of, which enforcement-first
-ranks above gating it, and the bound on that disposition is undocumented surface
-— no section named it, which is what separates it from the section regexes, every
-one of which is documented and load-bearing.
-`roadmap_entries` is **not** in the split
-either, for the opposite reason: its only two consumers are the roadmap arm and
-`check-roadmap-fresh`, and both now sit on the **crate** function. The exclusion
-is therefore **satisfied on the other substrate, not repealed** — the two still
-cannot disagree, by the identical argument, and what would have spent it is
-porting exactly one of the pair, which is why the arm and the gate landed in one
-commit.
-
-The loader sources the consumer config, then a `<config>.local.sh` overlay
-beside it when present — last write wins. This is the tracked-name /
-gitignored-value split (the `msg-patterns.local.list` precedent): a private
-sink value tracked in `queue-config.sh` would itself be the leak, so it lands
-in the gitignored overlay instead. The overlay is optional — its absence is
-fail-open, not an error.
+The consumer's private values ride the gitignored `queue-config.local.knobs`
+overlay in the gates directory, which outranks the tracked file and stays in the
+gates directory even when `QUEUE_KIT_KNOB_FILE` relocates the tracked one
+(gate-sdk/SPEC.md §The knob file). This is the tracked-name / gitignored-value split
+(the `msg-patterns.local.list` precedent): a private sink value tracked in
+`queue-config.knobs` would itself be the leak, so it lands in the overlay instead.
+The overlay is optional — its absence is fail-open, not an error.
 
 ### The queue-index arm
 
@@ -964,17 +900,17 @@ retained as a dispatching shim: a shim keeps the interpreted lines the port
 exists to retire and adds a second entry point into the emission path, which the
 class forbids.
 
-**The front-end is not optional dressing.** A caller that invoked the binary
-directly would resolve platform defaults and silently ignore every consumer
-override; the front-end sources the shell library and supplies the bridged
-environment in front of the arm. The arm is configured — its bridged reads are
-declared beside it in the emitter table — which is why it is a table member
-rather than a hardcoded top-level flag: a hardcoded flag receives no
-configuration at all, and an arm that cannot see `QUEUE_KIT_ICEBOX_SECTION`
-silently drops the tally in every consumer that configures a tier. The derived
-regexes the shell library built (`QUEUE_ACTIVE_RE` and its siblings) were never a
-configuration surface, only that library's internal spelling of these knobs, so
-none of them crosses into the arm and nothing is lost by their not crossing.
+**The front-end is not optional dressing.** It supplies the bridged environment
+in front of the arm — here `GATE_SDK_QUEUE_FILE`, the input `QUEUE_KIT_QUEUE_FILE`'s
+default derives from — and the queue-kit knobs the arm declares resolve in process
+from the kit's static table, so a consumer override reaches the arm through its
+knob file. The arm is configured — its reads are declared beside it in the emitter
+table — which is why it is a table member rather than a hardcoded top-level flag:
+a hardcoded flag receives no bridged input at all, and an arm that cannot see
+`QUEUE_KIT_ICEBOX_SECTION` silently drops the tally in every consumer that
+configures a tier. The derived section matchers were never a configuration
+surface, only the adapters' internal spelling of these knobs, so none of them is a
+declared read.
 **This paragraph settles the caller that reaches an arm *as* an arm, and an
 in-process call from a hook module is outside it** — neither the front end nor a
 direct binary invoke — so that path owes its own answer, which
@@ -1154,7 +1090,7 @@ through the battery runner's `--emit` front-end:
 `run-gates.sh --emit queue-counts [<queue-file>]`. It registers in the
 bridged-arm table under the derived spelling `--emit-queue-counts`, stays outside
 `--list`, and owes no `.gate` descriptor, no `gates.list` registration and no
-`good/`+`bad/` fixture pair. Its bridged reads are the four
+`good/`+`bad/` fixture pair. Its declared reads are the four
 §The queue-index arm resolves less that arm's two own: the queue file and the
 three section knobs. `QUEUE_KIT_DONE_SECTION` is deliberately **not** among
 them — Done is not a task section, and the arm must not acquire a read it does
@@ -1169,7 +1105,7 @@ argument the rule itself consumes, falling back to a knob, the shape
 `check-amendment-queue` and `check-evidence-manifest` already carry.
 
 The section set is **derived, never listed**: it is `QUEUE_TASK_SECTIONS`, the
-same composition `QUEUE_TASK_RE` is built from (§lib/queue.sh). So
+same composition the task-section matcher is built from (§The shared queue adapters). So
 `QUEUE_KIT_DONE_SECTION` is out because Done is not a task section, a configured
 `QUEUE_KIT_ICEBOX_SECTION` is in because the icebox is a live one, and a consumer
 who renamed their sections gets their own names back. Nothing here enumerates a
@@ -1192,14 +1128,15 @@ an oversight and merge them.
 
 **Two callers at two transitions.** delegation-kit's statusline arm calls the
 rendering **in process** at each statusline fire, resolving the four knobs above
-through the bridge that arm's own exec already carries
+from the kit's static table, with the one gate-sdk input the queue file's default
+reads carried by the bridge that arm's own exec already carries
 (delegation-kit/SPEC.md §The statusline arm); and a session invokes the arm
 through the front-end at the command queue-kit/README.md documents. The
 subprocess call the statusline once made is retired with the shell tool, and the
 paragraph that ruled the subprocess shape a *contract* retires with it: its
-stated ground was that `lib/queue.sh` exits 2 at source time on a malformed
-config, which is a property of a **sourced shell library** and has no spelling on
-this substrate. The rendering resolves its knobs through `walk::knob_scalar` and
+stated ground was that the kit's retired shell loader exited 2 at source time on a
+malformed config, which is a property of a **sourced shell library** and has no
+spelling on this substrate. The rendering resolves its knobs through `walk::knob_scalar` and
 `knob_array`, which return `Result` and cannot exit, so a malformed queue config
 becomes an `Err` the caller absorbs and the counter group vanishes exactly as it
 did before.
@@ -1220,7 +1157,7 @@ the queue, writes **stdout only**, and mutates nothing.
 ```
 
 The mode rides the arm's **own argv tail**, the mechanism §The queue-index arm
-already uses for its three modes; the bridged reads are §The queue-counts arm's
+already uses for its three modes; the declared reads are §The queue-counts arm's
 same four.
 
 **One observable moved, and the ruling that moves it is inherited rather than
@@ -1279,7 +1216,7 @@ different question over the same file.
 **The retired set is derived from the file's own history, so nothing is
 maintained.** One `git log -p --format= -- <queue-file>` pass at start-up, its
 added, removed and context lines matched against the lead-line grammar
-§lib/queue.sh owns — the same one the live reader applies, through the same
+§The shared queue adapters owns — the same one the live reader applies, through the same
 shared adapter, never a second spelling. `git` is this arm's one program requirement, recorded
 here in prose rather than in a `--needs` declaration for the reason
 §The lesson-sink arm states;
@@ -1316,7 +1253,7 @@ contributes its `[blocked-by:]` tag alone — never its prose, which is title an
 tags rather than relation.
 
 The body-citation scan lives **in this arm, not in the shared adapter**: it has
-exactly one reader, and the rule is shared adapters (§lib/queue.sh). It reuses
+exactly one reader, and the rule is shared adapters (§The shared queue adapters). It reuses
 the shared section matchers and live-slug reading; a second reader of
 body-position slugs is what would move it.
 
@@ -1373,19 +1310,19 @@ it between the markers in `QUEUE_KIT_ROADMAP_FILE` through the crate's shared
 marker writer, leaving every byte outside them untouched.
 
 **Table membership is forced rather than chosen, and the alternative is the
-failure mode that looks like success.** An arm receives no configuration and only
-an emitter-table member is bridged, so this tool ported as a hardcoded top-level
-flag would resolve platform defaults and silently ignore every consumer override
-of the horizons, the tracks, the queue path or the marker name. The table's knob
-column is what keeps `QUEUE_KIT_HORIZONS` and `QUEUE_KIT_TRACKS` on the caller's
-side of the bridge, which is the provenance seam holding: the crate ships the
+failure mode that looks like success.** Only an emitter-table member is bridged,
+and the queue path's default derives from a gate-sdk knob the bridge carries, so
+this tool as a hardcoded top-level flag would fail on that input rather than
+resolve it. The table's knob column declares `QUEUE_KIT_HORIZONS` and
+`QUEUE_KIT_TRACKS` as reads of consumer configuration, which is the provenance
+seam holding: the crate ships the
 projection *grammar* — the headings, the bullet shape, the placeholder, the
 trailing blank — and not one lane name (§The tag algebra).
 
 The section trio (`QUEUE_KIT_ACTIVE_SECTIONS`, `QUEUE_KIT_DEFERRED_SECTION`,
 `QUEUE_KIT_ICEBOX_SECTION`) rides the same roster, because the shared adapter is
-what scopes the scan and a knob the bridge does not carry is a knob the arm
-cannot read. It reads the live task sections only — active, deferred, and a configured icebox,
+what scopes the scan and a knob the arm does not declare is a knob it does not
+read. It reads the live task sections only — active, deferred, and a configured icebox,
 never the done section, because a shipped item is history, not direction. The
 icebox enters that walk on purpose even though no icebox entry can be
 projectable: excluded, a `[roadmap:]` tag that drifted into the tier would
@@ -1509,7 +1446,7 @@ manual-drain default that keeps a fresh clone (no overlay) closing cleanly and
 preserves the staging file's documented reclaim path. The consumer close skill
 invokes it so the tracked skill
 names the mechanism, never a sink value, and a private sink command lives in
-the `queue-config.local.sh` overlay (§lib/queue.sh).
+the `queue-config.local.knobs` overlay (§The shared queue adapters).
 
 **A bridged non-gate arm, and the `--emit-` spelling is refused rather than
 declined.** It is reached as `run-gates.sh --lesson-sink <tag>` and registers in
@@ -1527,9 +1464,10 @@ harness event reaches it.
 **The seam survives; only the resolver moves in-crate.** `QUEUE_KIT_LESSON_SINKS`
 stays the adopter's configuration, a configured entry still runs as `bash -c
 "<value>"` with the body on its stdin, and a private sink value still lives in
-the `queue-config.local.sh` overlay. The map crosses the bridge through the
-keyed-map arm (gate-sdk/SPEC.md §lib/gate.sh), which is what made this member
-portable at all. `bash` is the arm's one program requirement, recorded here in
+the `queue-config.local.knobs` overlay. The map is a keyed knob of the kit's static
+table, its value a shell string crossing verbatim, so `bash -c` execution is
+unchanged; gate-sdk/SPEC.md §The knob file's command-knob bullet governs `*_CMD`
+knobs, and this knob is not one. `bash` is the arm's one program requirement, recorded here in
 prose rather than in a `--needs` declaration, because `--needs` answers over the
 `.gate`-declared registry and a non-gate arm carries no descriptor — the same
 disposition §The queue-index arm's `date -d` derivation takes.
@@ -1584,8 +1522,9 @@ misspelled. A trailing `:` on a required entry marks a dynamic-suffix heading
 (the iteration header, whose suffix is its iteration name) and is
 prefix-matched; every other entry is matched exactly. A grep error (not a
 no-match) is fail-closed (exit 2). The required set is the configured array
-**plus the derived icebox heading** (§Layout and configuration), which is what
-closes the half-configured hole by construction. The `# graph:` couples the
+**plus the derived icebox heading**, composed in the reader by
+`required_sections()` (§The shared queue adapters), which is what closes the
+half-configured hole by construction. The `# graph:` couples the
 queue file at `tier=precommit`.
 
 ### check-queue-entry-budget
@@ -2068,7 +2007,7 @@ emitter reads for the tag vocabulary (this repo's `--emit-enum-sets` arm →
 `check-prose-enum`), so it is the single source for the spelling on both the
 enforcement and the prose side. The emitter references the table rather than
 parsing the module as text, and `QUEUE_KIT_LESSON_TAGS` stays the consumer's:
-the arm declares it as a bridged knob and bakes no spelling of it.
+the arm declares it as a knob and bakes no spelling of it.
 
 Calibration: lead-class rule — a tag of class C on a continuation line is a
 violation only when the lead line lacks class C (prose that mentions a tag
@@ -2177,7 +2116,7 @@ silent pick attested in production use and the bounded scope.
 Invariant: on every prose surface named by `QUEUE_KIT_PROSE_SURFACE_GLOBS`,
 every slug-shaped bold-code token — `` **`<token>`** `` whose token matches the
 slug grammar (`[a-z0-9][a-z0-9-]*`, so a `--flag` mention falls outside) —
-resolves against the queue's live slug set (`lib/queue.sh`'s `queue_live_slugs`,
+resolves against the queue's live slug set (the shared adapters' `live_slugs`,
 active + deferred + icebox — a page citing an iceboxed task stays green,
 correctly: the task is dormant, not landed). A token naming no live task is a
 dead membership claim,
@@ -2196,10 +2135,10 @@ is ground truth, the prose the audited follower.
 
 ### templates/
 
-`queue-config.sh` — the consumer config template: a two-line `# spec:` pointer
-to the §Layout knob table (which now includes `QUEUE_KIT_LESSON_SINKS` and its
-local-overlay reminder), so the table stays the one owner of the knob roster
-rather than a parallel copy in the template drifting against it.
+`queue-config.knobs` — the consumer knob-file template: comment-only, one `# spec:`
+pointer to the §Layout knob table with no override set, so the table stays the one
+owner of the knob roster rather than a parallel copy in the template drifting
+against it, and a seeded copy is a valid knob file as written.
 `TASK-QUEUE.md` — a starter queue skeleton: the sections in default order,
 one example entry per grammar shape shown under `Technical Debt` (the
 `[spec:]`-gated `New Features` carries teaching prose only, since a spec-ready

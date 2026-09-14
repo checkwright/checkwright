@@ -1295,7 +1295,7 @@ config-seam port disposition. Knobs (this repo's layout as defaults):
 ### lib/context.sh
 
 **The one home of the consumer-config load and of every knob default above**, a
-sourceable library on queue-kit's `lib/queue.sh` shape: it loads the consumer
+sourceable library on the shape every bridged kit loader shares: it loads the consumer
 config first, then defaults each knob the consumer left unset, then refuses a
 malformed value rather than running on it. Every context-kit gate and `bin/` tool
 sources it instead of re-defaulting, which is the single-home form

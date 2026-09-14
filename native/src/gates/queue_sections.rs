@@ -13,7 +13,7 @@ fn matches(line: &str, sec: &str) -> bool {
 }
 
 pub fn run(args: &[String]) -> i32 {
-    let required = match queue::knob_array("QUEUE_KIT_REQUIRED_SECTIONS") {
+    let required = match queue::required_sections() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-queue-sections: {}", e);
@@ -63,7 +63,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("  duplicate: ## {}", s);
         }
         println!("  help: restore the heading (spelled exactly), or remove the duplicate. The");
-        println!("        required set is QUEUE_KIT_REQUIRED_SECTIONS (queue-config.sh).");
+        println!("        required set is QUEUE_KIT_REQUIRED_SECTIONS (queue-config.knobs).");
         return 1;
     }
 

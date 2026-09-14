@@ -1,9 +1,7 @@
-// spec: queue-kit/SPEC.md §lib/queue.sh — the Rust counterpart of queue-kit/lib/queue.sh's
-// shared surface: the derived section matchers and the slug adapters. The shell library is
-// not retired, so this module sits beside it rather than replacing it
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read has exactly one implementation in
-// the crate, `walk`'s; these two are the queue-kit-facing spelling of it, so a second copy
-// of the unset-is-an-error rule cannot drift from the first
+// spec: queue-kit/SPEC.md §The shared queue adapters — the sole holder of the queue's shared
+// surface: the derived section matchers, the slug adapters and the roadmap parse
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the knob read has exactly one implementation in the
+// crate, `walk`'s; these two are the queue-kit-facing spelling of it
 pub fn knob_array(name: &str) -> Result<Vec<String>, String> {
     crate::walk::knob_array(name)
 }
@@ -12,8 +10,19 @@ pub fn knob_scalar(name: &str) -> Result<String, String> {
     crate::walk::knob_scalar(name)
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — the section vocabulary every derived matcher below
-// is computed from, resolved once per invocation from the bridged knobs
+// spec: queue-kit/SPEC.md §The shared queue adapters — the required set composed in the reader:
+// a configured icebox joins it unless already named, so a consumer setting the list keeps the append
+pub fn required_sections() -> Result<Vec<String>, String> {
+    let mut out = knob_array("QUEUE_KIT_REQUIRED_SECTIONS")?;
+    let icebox = knob_scalar("QUEUE_KIT_ICEBOX_SECTION")?;
+    if !icebox.is_empty() && !out.contains(&icebox) {
+        out.push(icebox);
+    }
+    Ok(out)
+}
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — the section vocabulary every derived
+// matcher below is computed from, resolved once per invocation
 pub struct Sections {
     pub active: Vec<String>,
     pub deferred: String,
@@ -73,13 +82,13 @@ impl Sections {
     }
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — QUEUE_SECTION_RE is `^## ` and nothing more: a
+// spec: queue-kit/SPEC.md §The shared queue adapters — QUEUE_SECTION_RE is `^## ` and nothing more: a
 // prefix test, so a heading with trailing content still closes the section it ends
 pub fn is_section_line(line: &str) -> bool {
     line.starts_with("## ")
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — the `^## <name>[[:space:]]*$` shape the derived
+// spec: queue-kit/SPEC.md §The shared queue adapters — the `^## <name>[[:space:]]*$` shape the derived
 // section matchers share; trailing whitespace is the only slack the regex allows
 pub fn heading_name(line: &str) -> Option<&str> {
     let rest = line.strip_prefix("## ")?;
@@ -100,7 +109,7 @@ fn is_slug_head(b: u8) -> bool {
     b.is_ascii_lowercase() || b.is_ascii_digit()
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — awk's leftmost-longest `\*\*[a-z0-9][a-z0-9-]*\*\*`,
+// spec: queue-kit/SPEC.md §The shared queue adapters — awk's leftmost-longest `\*\*[a-z0-9][a-z0-9-]*\*\*`,
 // returning the slug between the delimiters
 pub fn first_bold_slug(line: &str) -> Option<&str> {
     let b = line.as_bytes();
@@ -127,7 +136,7 @@ pub fn first_bold_slug(line: &str) -> Option<&str> {
     None
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — the anchored guard the extraction runs behind:
+// spec: queue-kit/SPEC.md §The shared queue adapters — the anchored guard the extraction runs behind:
 // `^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*`
 pub fn bullet_slug(line: &str) -> Option<&str> {
     let rest = strip_bullet_lead(line)?;
@@ -179,7 +188,7 @@ pub fn is_top_level_bullet(line: &str) -> bool {
 }
 
 // spec: queue-kit/SPEC.md §The tag algebra — every `[blocked-by: <slug>]` on a line, in order
-// spec: queue-kit/SPEC.md §lib/queue.sh — a shared adapter because the grammar has two readers:
+// spec: queue-kit/SPEC.md §The shared queue adapters — a shared adapter because the grammar has two readers:
 // the index arm marks a row blocked with it, the edges arm attributes an edge with it
 pub fn blocked_by(line: &str) -> Vec<&str> {
     const TAG: &str = "[blocked-by:";
@@ -230,7 +239,7 @@ pub struct FieldTag<'a> {
     pub value: Option<&'a str>,
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — every `[<name>:…]` token on a line, in order; shared,
+// spec: queue-kit/SPEC.md §The shared queue adapters — every `[<name>:…]` token on a line, in order; shared,
 // because the board-tags gate asserts on the tags and the wrap gate discounts them, and a second
 // parse is what would let the two disagree
 pub fn field_tags<'a>(line: &'a str, name: &str) -> Vec<FieldTag<'a>> {
@@ -269,7 +278,7 @@ pub fn is_bullet(line: &str) -> bool {
     matches!(b.get(i + 1), Some(&c) if c == b' ' || c == b'\t')
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — awk's `match($0, /[^[:space:]]/) - 1`: the column
+// spec: queue-kit/SPEC.md §The shared queue adapters — awk's `match($0, /[^[:space:]]/) - 1`: the column
 // of the first non-space character, and 0 for a line that is entirely space
 pub fn indent(line: &str) -> usize {
     line.bytes()
@@ -277,7 +286,7 @@ pub fn indent(line: &str) -> usize {
         .unwrap_or(0)
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — queue_live_slugs: every bold kebab slug leading a
+// spec: queue-kit/SPEC.md §The shared queue adapters — queue_live_slugs: every bold kebab slug leading a
 // bullet in a task section, in file order
 pub fn live_slugs(text: &str, sec: &Sections) -> Vec<String> {
     let mut out = Vec::new();
@@ -319,8 +328,7 @@ pub fn bare_bullet_slug(line: &str) -> Option<&str> {
 }
 
 // spec: queue-kit/SPEC.md §check-task-conservation — every bare bullet slug in the done
-// section, in file order; the shell library carries no counterpart, its dead one having been
-// deleted rather than held in parity (§lib/queue.sh)
+// section, in file order
 pub fn done_slugs(text: &str, sec: &Sections) -> Vec<String> {
     let mut out = Vec::new();
     let mut ind = false;
@@ -342,63 +350,7 @@ pub fn done_slugs(text: &str, sec: &Sections) -> Vec<String> {
     out
 }
 
-// spec: queue-kit/SPEC.md §The queue format — the parity subject between this module and
-// queue-kit/lib/queue.sh: what each side *classifies* one queue file as, never the derived
-// literals. Its one consumer is gate-tests/queue-lib-parity.test.sh, which reads every field
-pub fn parity_report(text: &str, sec: &Sections) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut head = String::from("task-sections");
-    for s in sec.task_sections() {
-        head.push('\t');
-        head.push_str(s);
-    }
-    out.push(head);
-    for (i, line) in text.lines().enumerate() {
-        let mut v: Vec<&str> = Vec::new();
-        if is_section_line(line) {
-            v.push("section");
-        }
-        // spec: queue-kit/SPEC.md §lib/queue.sh — QUEUE_ACTIVE_RE's counterpart is composed from
-        // the live matchers rather than added as an accessor the runner would be the only reader
-        // of: the task set is the active sections plus the deferred one plus a configured icebox
-        if sec.is_task(line) && !sec.is_deferred(line) && !sec.is_icebox(line) {
-            v.push("active");
-        }
-        if sec.is_deferred(line) {
-            v.push("deferred");
-        }
-        if sec.is_icebox(line) {
-            v.push("icebox");
-        }
-        if sec.is_task(line) {
-            v.push("task");
-        }
-        if is_lessons_line(line) {
-            v.push("lessons");
-        }
-        // spec: queue-kit/SPEC.md §lib/queue.sh — queue_live_slugs' own two-step: the anchored
-        // bullet grammar guards, and the leftmost bold slug is what it prints
-        let bullet = match bullet_slug(line) {
-            Some(_) => first_bold_slug(line).unwrap_or("-"),
-            None => "-",
-        };
-        if v.is_empty() && bullet == "-" {
-            continue;
-        }
-        let verdicts = if v.is_empty() {
-            "-".to_string()
-        } else {
-            v.join(",")
-        };
-        out.push(format!("line\t{}\t{}\t{}", i + 1, verdicts, bullet));
-    }
-    for s in live_slugs(text, sec) {
-        out.push(format!("live\t{}", s));
-    }
-    out
-}
-
-// spec: queue-kit/SPEC.md §lib/queue.sh — the one [roadmap:] + roadmap-summary: parse, shared by
+// spec: queue-kit/SPEC.md §The shared queue adapters — the one [roadmap:] + roadmap-summary: parse, shared by
 // the roadmap arm and check-roadmap-fresh so the two never disagree on what an entry claims. The
 // typed record is that section's, TSV line and defensive `-` column included.
 pub struct RoadmapEntry {
@@ -412,12 +364,12 @@ pub struct RoadmapEntry {
 const TAG_OPEN: &str = "[roadmap:";
 const DECLARATION: &str = "roadmap-summary:";
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — awk's non-overlapping `while (match(s, /\[roadmap:/))`
+// spec: queue-kit/SPEC.md §The shared queue adapters — awk's non-overlapping `while (match(s, /\[roadmap:/))`
 fn tag_count(line: &str) -> usize {
     line.matches(TAG_OPEN).count()
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — awk's `/\[roadmap:[^]]*\]/`: the leftmost `[roadmap:`
+// spec: queue-kit/SPEC.md §The shared queue adapters — awk's `/\[roadmap:[^]]*\]/`: the leftmost `[roadmap:`
 // bounded by the first `]` after it. No `]` anywhere to its right means no match at any later
 // occurrence either, so the first one decides.
 fn tag_field(line: &str) -> String {
@@ -443,7 +395,7 @@ fn is_declaration(line: &str) -> bool {
     body.len() < line.len() && body.starts_with(DECLARATION)
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — awk's `declared()`: the marking stripped, every
+// spec: queue-kit/SPEC.md §The shared queue adapters — awk's `declared()`: the marking stripped, every
 // whitespace run collapsed to one space, and the leading and trailing space that collapse leaves
 // removed. The declaration is a whitelist, so this is the only text that reaches the page.
 fn declared(line: &str) -> String {
@@ -465,7 +417,7 @@ fn declared(line: &str) -> String {
     out
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — one record per live entry carrying a tag or a
+// spec: queue-kit/SPEC.md §The shared queue adapters — one record per live entry carrying a tag or a
 // declaration, in queue order. An entry carrying neither is not a roadmap entry and is dropped
 // here rather than at each caller, which is what keeps the two callers' universe identical.
 pub fn roadmap_entries(text: &str, sec: &Sections) -> Vec<RoadmapEntry> {
