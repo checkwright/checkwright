@@ -33,6 +33,9 @@
   Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 3, which declared the missed set
   after the fact from `checkwright-gates --knob-files` and a per-gate refusal probe); promoted at
   that iteration's close.
+  **Rides `config-seam-fourth-cut` beside its three kit cuts** — operator direction, 2026-09-14,
+  lead-relayed; stays Deferred for spec to author and pair. Each cut is a config-shape change this
+  entry's cost names, and gate-sdk ships no config template for a smoke to seed.
 
 - **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
