@@ -10148,6 +10148,10 @@ the knob by the time this file is sourced — and an *unconditional* absolutizat
 here would silently rewrite that case's value against the repo root. That is not
 hypothetical: §check-gate-binary-fresh's fixture pair pins the knob to a
 case-local `./stub-bin`, and it is the oracle that catches the unguarded shape.
+The consequence for a caller: a test run against a binary it pins itself (a
+scratch-built pre-fix crate, for a red-before-green probe) passes the path
+absolute, since a set value is never joined; and that scratch crate builds only
+inside a git checkout that tracks its sources (§upgrade-smoke, on `native/build.rs`).
 
 **Its port disposition is a declaration, and the ground is stated here because no
 existing class reaches it.** It rides the bridge's `lib/*.sh` glob and resolves no

@@ -775,33 +775,26 @@
   **Its third candidate shape is BUILT** — "resolve each kit's declared-knob set once per run
   rather than once per knob" is what `gate_knob_env_set` and `_gate_knob_kit_emit` now do, one
   subshell per owning kit. The other two shapes are untaken and stay open.
-  **What remains, re-measured 2026-09-14 at scope (`.workflow/survey-record.md`).** A `--only`
-  single-gate run costs 755-805 ms whether its kit is static or bridged, since `--run` resolves
-  the whole registry's 178 declared names across 8 bridged kits (734 ms). The batch removed
-  per-knob SOURCING only: `gate_knob_env_set` forked `_gate_knob_owning_kit` per name until cut 1a.
-  **Split at `config-bridge-floor`'s scope — operator direction, 2026-09-14, lead-relayed:** cut 1a
-  is `bridge-owning-kit-partition-forks-per-knob` (debt), cut 1b `run-knob-union-selector-narrowing`
-  (amendment); this entry keeps the per-kit subshell residue and its closing condition below.
+  **What remains after `config-bridge-floor`, whose two cuts landed.** Cut 1a (`9412923d`) took
+  the per-name owning-kit fork out of `gate_knob_env_set`; cut 1b (`31c1a773`) narrowed a `--only`
+  run's knob union to the selected members. Re-measured 2026-09-14 at close, best-of-3:
+  `--only check-core-files` reads 103 ms. A bare run still resolves the whole registry's union,
+  one subshell per bridged kit; this entry keeps that residue and its closing condition.
   **Nothing else owns the residue.** The surviving `bash` spawn is owned by gate-sdk/SPEC.md
   §gen-pre-commit, where its disposition is recorded, and was ruled 2026-08-23 not to fall to this
   port — only its price did.
-  **The residue is now paid TWICE on one gate, measured at this close rather than estimated.**
-  Cut B's enum-sets port made `CANON_KIT_ENUM_SETS_CMD`'s value itself a bridged arm that
-  re-sources `lib/gate.sh` and resolves its own knobs before exec'ing the binary, so
-  `check-prose-enum`'s whole resolve-and-run went **366 ms -> 1236 ms** (build read a 1223 median
-  at the cut; this drain re-read 1210/1211/1236/1237/1237). The nesting is what the excess is: the
-  same five-run method reads **743-765 ms for `check-core-files`**, one bridge resolution over
-  almost no work, so `check-prose-enum` carries about one further floor on top of it. The
+  **The nested bridge survives the cuts.** Cut B's enum-sets port made `CANON_KIT_ENUM_SETS_CMD`'s
+  value a bridged arm that re-sources `lib/gate.sh` and resolves its own knobs before exec'ing the
+  binary, and cut 1b does not reach that inner resolution: `--only check-prose-enum` reads
+  797-806 ms against `check-core-files`' 103, so nearly its whole cost is the inner floor. The
   commit-hook path pays NOTHING — `gen-pre-commit` bakes the resolved arrays — so the exposure is
-  whole-tree battery runs, `--only` runs, and hook regeneration. The repair refused, named so it
-  is not re-derived: an in-process call from the gate to the bundled emitter would resolve the
-  BUNDLED producer for a consumer who configured a different one, which is the extension point
-  that knob exists to protect.
-  **Cost while deferred:** every bridged invocation pays the floor it cannot avoid — 640 ms
-  best-of-three on 2026-08-23, 743 ms best-of-five at this close, indicative of drift rather than
-  a regression claim and not to be re-quoted without re-running it — and the cost scales with the
-  number of owning kits rather than of members, so a new kit raises the floor for everyone while a
-  new member no longer does. A nested bridge, as `check-prose-enum` now has, pays it twice.
+  whole-tree battery runs, that nested `--only` run, and hook regeneration. The repair refused,
+  named so it is not re-derived: an in-process call from the gate to the bundled emitter would
+  resolve the BUNDLED producer for a consumer who configured a different one, which is the
+  extension point that knob exists to protect.
+  **Cost while deferred:** every bare run and nested bridge pays the floor — about 700 ms here,
+  indicative rather than a regression claim and not to be re-quoted without re-running it — and
+  it scales with the number of owning kits rather than of members.
   **Stays Deferred at `static-config-seam`; it closes at `config-seam-static-format`'s gate-sdk cut,
   which retires the bridge** — operator direction, 2026-09-13, lead-relayed, revising scope's.
   Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;

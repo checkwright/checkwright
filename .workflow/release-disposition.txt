@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+config-bridge-floor release deferred:v0.26.0 — MINOR, the level the outstanding v0.26.0 deferral already set (this iteration adds three Behavior-changes bullets, for run-gates.sh --only, check-template-copy-parity and run-gates.sh --enter-stage, all minor-class under the preview channel, and removes no deprecated surface); held because no release trigger fired (channel preview so the elapsed-time limb is dormant, no major, no security or supply-chain fix, no operator direction, no audience arrival).
