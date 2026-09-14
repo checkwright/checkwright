@@ -20,3 +20,10 @@
 - rev: fd2111317dfa5c4862741424a8d39a60425aa825
 - finding: Nine gates reach evidence-config.knobs; eight kit-shipped ones refuse on the probe (check-battery-roster, check-enforcement-fresh, check-evidence-baseline, check-evidence-manifest, check-gate-substrate-parity, check-graph, check-producer-liveness, check-reads-couples); check-value-rollup-fresh reaches it but is repo-local and unresolvable in the scratch gates dir, so it is not a declaration row.
 - inferred: none
+
+## 2026-09-15 build — Which kit-shipped gates refuse at exit 2 on a left-behind <gates-dir>/guard-config.sh after guard-kit went static?
+- corpus: native/src/knobs/guard_kit.rs native/src/gates/mod.rs */checks/*.gate scripts/gates.list
+- oracle: checkwright-gates --knob-files scripts gate-sdk/checks canon-kit/checks context-kit/checks delegation-kit/checks doctrine-kit/checks drift-kit/checks evidence-kit/checks lifecycle-kit/checks queue-kit/checks site-kit/checks -- | grep guard-config
+- rev: d3834b7c1fda999ae773a4c955c2863d75170a9f
+- finding: No registered gate reaches guard-config.knobs (the same oracle lists nine for evidence-config), so guard-kit's cut owes no Tightened-gates row; its readers are the bash guard's knob load and the scan-prompts, compare-settings-allow, drift-report and wakeup-guard arms, which a Behavior-changes bullet covers.
+- inferred: none
