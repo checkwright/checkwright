@@ -164,3 +164,4 @@
 | resident-tier-restatement | sc sp a b v c | 5f/0d | 3 · ≤0d | 20s clean | 113 |
 | carried-record-reliability | sc sp a b v c | 4f/0d | 3 · ≤0d | 20s clean | 113 |
 | static-config-seam | sc sp a b v c | 4f/0d | 2 · ≤1d | 20s clean | 113 |
+| evidence-population-fidelity | sc sp a b v c | 6f/1d | 3 · ≤0d | 20s clean | 113 |

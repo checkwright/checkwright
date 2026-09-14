@@ -137,6 +137,17 @@
   **Third attestation, 2026-09-14 validate:** `--run-validate` passed the 120s foreground timeout
   and was moved. Its own `run-validate.lock` named the pid, so the stage-entry preflight would
   have seen it; guard rule 14 reads only `*.run` records and would not have blocked a git write.
+  **Fourth attestation, same validate — a new shape: the session ended its turn on the moved
+  producer.** The stage session ended its turn twice while the moved `--run-validate` lived, first
+  on the move itself and then on its own backgrounded wait of the lock's pid; the turn-end hook's
+  log reads `decision=allow records=0` at both. It never wrote a `.run` record for the moved
+  producer, even after reading its pid. Later in the same session, a re-run launched with a `.run`
+  record was held at a real turn end: the hook's refusal reached the session as stop-hook feedback,
+  and the session kept working. **So a record written the moment a session learns a moved
+  producer's pid would have held both turn-ends.** That is a second candidate, beside widening the
+  hook: a steer at the move, which the tool result announces as "moved to the background (ID: …)".
+  Whether any hook payload carries that line is unmeasured. The liveness log records the
+  `background_tasks` key and not its contents.
   recurrence: harness-moved-background-task-unrecorded 2026-09-14
 
 - **payload-withholds-kit-specs** [design-pending] [cost: event/high] [surface: installer] — the customer payload packs every kit root

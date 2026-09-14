@@ -1507,7 +1507,10 @@ kinds; TypeScript with every kind the `ts` grammar claims — including
 must skip; a baseline file) beside expected outputs, and
 the bridged `--run-index-tests` arm (gate-sdk/SPEC.md §The non-gate arm) drives
 each one through the `--emit` front-end over
-that corpus and asserts exact output, failing on any diff. **The goldens are the
+that corpus and asserts exact output, failing on any diff. The runner spawns the
+arms from the host checkout, so it pins every knob an arm reads at the corpus, the
+meter's iteration state file included: an unpinned knob resolves against the host's
+live state and leaks it into the golden. **The goldens are the
 port's parity oracle and they are unusually strong**: they were produced by the
 shell implementations the arms replaced, so holding them byte-for-byte is a
 cross-substrate comparison over a committed corpus rather than an assertion of
@@ -1613,8 +1616,8 @@ way — through `gate_command`, at the pins knob's default path — on a pin **d
 first `ident`-named, non-null key of the settings file the install just wrote, so the recipe
 asserts no particular key is pinnable. The pass is asserted on the clean line's pin count and
 not on exit 0, which the absent-pins skip shares. It restores the settings file and deletes the
-pins file before handing on, because a later co-vendored install overwrites the settings file
-and would leave a standing pin naming an absent key.
+pins file before handing on, because a later co-vendored install merges into the settings file
+and would leave a standing pin on a value that install changed.
 `smoke/violation.sh` crafts an over-budget pointered bullet in the scratch
 consumer's brevity file and asserts the battery reddens via
 `check-brevity`. It inserts the bullet inside the first governed section rather than

@@ -2841,9 +2841,12 @@ column re-derived under the non-monotone rule above, never assumed still
 correct.
 
 `smoke/install.sh` copies the templates into the scratch consumer (guard
-and config into the gates dir, hook wiring into `.claude/settings.json`,
+and config into the gates dir, hook wiring merged into `.claude/settings.json`,
 log paths gitignored) and then drives one crafted payload directly through
-the installed guard, asserting a block — the install is self-verifying.
+the installed guard, asserting a block — the install is self-verifying. The
+wiring is merged rather than written, and the merge asserts every hook event a
+co-vendored kit wired before it survives: an overwrite silently drops that kit's
+wiring from the composed consumer, and nothing downstream reads the final file.
 There is no `smoke/violation.sh`: the kit registers no gates, so no
 battery-reddening violation is craftable (gate-sdk/SPEC.md §Consumer smoke
 makes that file conditional on exactly this).

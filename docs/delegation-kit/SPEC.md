@@ -1769,10 +1769,12 @@ harness revision: at an intermediate firing the reach is nil. The judgment still
 comes out the same way, because the cost it was weighed against is nil for the
 same reason — an intermediate firing costs the session nothing at all, and what
 survives is a logged `decision=refuse` line that the close-stage triage can
-count. **The honest limit is that this measured the non-stop firing only.**
-Delivery at a real turn end under a red reading rests on the published contract
-and on nothing measured here, and it sits under the same limit as the rest of
-that contract: only re-reading it, or buying that firing, catches a revision.
+count. **The real turn end was bought later, and it delivers.** A dispatched
+session ended its turn while its own `.run` record named a live producer; the
+firing logged `decision=refuse`, the reason reached the session as stop-hook
+feedback, and the session resumed work on the producer. Both readings are now
+observed, not just contracted. They sit under the contract's own limit: only a
+fresh firing catches a harness revision.
 
 **The log is capture-tier** — gitignored, advisory, drained by a named reclaim
 path (gate-sdk/SPEC.md §The workflow directory), which is what keeps

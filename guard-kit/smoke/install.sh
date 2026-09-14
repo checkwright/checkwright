@@ -9,7 +9,20 @@ cp "$SMOKE_KIT_ROOT/templates/bash-guard.sh"     scripts/bash-guard.sh
 cp "$SMOKE_KIT_ROOT/templates/guard-config.sh"   scripts/guard-config.sh
 
 mkdir -p .claude
-jq 'del(.["//"])' "$SMOKE_KIT_ROOT/templates/settings-hooks.json" > .claude/settings.json
+if [[ -f .claude/settings.json ]]; then
+    prior_events="$(jq -c '.hooks // {} | keys' .claude/settings.json)"
+    jq -s '.[0] * .[1] | del(.["//"])' \
+        .claude/settings.json "$SMOKE_KIT_ROOT/templates/settings-hooks.json" \
+        > .claude/settings.json.new
+    mv .claude/settings.json.new .claude/settings.json
+    if ! jq -e --argjson prior "$prior_events" '$prior - (.hooks // {} | keys) == []' \
+        .claude/settings.json >/dev/null; then
+        echo "guard-kit/smoke/install.sh: merging the hook wiring dropped a hook event a co-vendored kit had wired (had $prior_events)" >&2
+        exit 1
+    fi
+else
+    jq 'del(.["//"])' "$SMOKE_KIT_ROOT/templates/settings-hooks.json" > .claude/settings.json
+fi
 
 {
     echo '.workflow/prompt-friction.log'
