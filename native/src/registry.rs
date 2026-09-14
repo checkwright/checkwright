@@ -215,6 +215,23 @@ pub fn knob_files(member: &str, resolve_dirs: &[String]) -> Result<Vec<String>, 
     if kits.is_empty() {
         return Ok(Vec::new());
     }
+    let dir = crate::knobs::gates_dir();
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a reference line in a reached kit's tracked
+    // file reaches its referent's kit, read from the file now; the local overlay is never read
+    for root in kits.clone() {
+        let Some(kit) = crate::knobs::STATIC_KITS.iter().find(|k| k.root == root) else {
+            continue;
+        };
+        let path = format!("{}/{}-config.knobs", dir, kit.stem());
+        let Ok(text) = std::fs::read_to_string(&path) else {
+            continue;
+        };
+        for e in crate::knobfile::parse(&text, &path)? {
+            if let crate::knobfile::Form::Reference(other) = &e.form {
+                reach_kits(other, &mut kits, &mut seen);
+            }
+        }
+    }
     if let Some(src) = resolve(member, resolve_dirs) {
         let text = std::fs::read(&src)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
@@ -231,7 +248,6 @@ pub fn knob_files(member: &str, resolve_dirs: &[String]) -> Result<Vec<String>, 
             ));
         }
     }
-    let dir = crate::knobs::gates_dir();
     Ok(crate::knobs::STATIC_KITS
         .iter()
         .filter(|k| kits.contains(&k.root))
@@ -464,15 +480,55 @@ mod tests {
             }
             if declared.contains(&EVERY_COUPLES_KNOB) {
                 sentinel += 1;
-                let want: Vec<String> = crate::knobs::STATIC_KITS
+                let reached: Vec<&str> = crate::knobs::STATIC_KITS
                     .iter()
                     .filter(|k| corpus.contains(&k.root) || own.contains(&k.root))
+                    .map(|k| k.root)
+                    .collect();
+                let referents = referent_kits(&repo, &reached);
+                let want: Vec<String> = crate::knobs::STATIC_KITS
+                    .iter()
+                    .filter(|k| reached.contains(&k.root) || referents.contains(&k.root))
                     .map(|k| file(k))
                     .collect();
                 assert_eq!(got, want, "{}'s sentinel derivation", member);
             }
         }
         assert!(declaring > 0 && sentinel > 0, "one half of the derivation held over no member");
+    }
+
+    fn referent_kits(repo: &Path, reached: &[&str]) -> Vec<&'static str> {
+        let mut out: Vec<&'static str> = Vec::new();
+        for kit in crate::knobs::STATIC_KITS.iter().filter(|k| reached.contains(&k.root)) {
+            let path = repo.join(crate::knobs::GATES_DIR_DEFAULT).join(format!("{}-config.knobs", kit.stem()));
+            let text = std::fs::read_to_string(&path).unwrap_or_default();
+            for e in crate::knobfile::parse(&text, "tracked").expect("a tracked knob file parses") {
+                if let crate::knobfile::Form::Reference(other) = e.form {
+                    out.extend(crate::knobs::owner(&other).map(|k| k.root));
+                }
+            }
+        }
+        out
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a reference line in a reached kit's tracked
+    // file reaches its referent's kit; the same line in the local overlay reaches nothing
+    #[test]
+    fn a_tracked_reference_reaches_its_referents_kit_and_the_overlay_does_not() {
+        let knobs = crate::knobenv::lock();
+        let d = std::env::temp_dir().join(format!("checkwright-knob-refs.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        knobs.set("GATE_SDK_GATES_DIR", &d.display().to_string());
+        let dirs: Vec<String> = Vec::new();
+        let member = "check-trajectory-fresh";
+        let lifecycle = format!("{}/lifecycle-config.knobs", d.display());
+        std::fs::write(d.join("drift-config.local.knobs"), "DRIFT_KIT_STAGES[] <- LIFECYCLE_KIT_STAGES\n").expect("write");
+        assert!(!knob_files(member, &dirs).expect("derives").contains(&lifecycle));
+        std::fs::write(d.join("drift-config.knobs"), "DRIFT_KIT_STAGES[] <- LIFECYCLE_KIT_STAGES\n").expect("write");
+        assert!(knob_files(member, &dirs).expect("derives").contains(&lifecycle));
+        knobs.remove("GATE_SDK_GATES_DIR");
+        let _ = std::fs::remove_dir_all(&d);
     }
 
     // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a staged member reaching a static kit is a

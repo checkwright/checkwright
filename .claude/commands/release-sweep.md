@@ -2,9 +2,9 @@ Execute the template at lifecycle-kit/templates/release-sweep.md, applying the b
 
 ## Bindings
 
-**inventory-command** — `bash drift-kit/templates/kpi-deprecated-surface.sh`,
+**inventory-command** — `DRIFT_KIT_KIT_ROOTS=gate-sdk bash drift-kit/templates/kpi-deprecated-surface.sh`,
 the live-marker scan over the `CANON_KIT_DEPRECATION_MARKERS` roster
-(`scripts/canon-config.sh`) — the same resolution `check-deprecation-task`
+(`scripts/canon-config.knobs`) — the same resolution `check-deprecation-task`
 enforces between majors. An empty roster reports `n/a`: nothing to disposition.
 
 **evidence-gate** — the evidence path is `.workflow/release-sweep-evidence.txt`,

@@ -75,7 +75,7 @@ linked one cannot. This is point-never-restate applied to the doctrine mechanism
 itself.
 
 `DOCTRINE.md` joins the consumer's spec manifest (this repo wires it into
-`scripts/canon-config.sh`), so its links and commands resolve under the
+`scripts/canon-config.knobs`), so its links and commands resolve under the
 canon-kit doc gates like any governed page.
 
 ## install-doctrine

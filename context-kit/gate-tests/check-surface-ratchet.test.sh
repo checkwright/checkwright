@@ -21,9 +21,9 @@ fails=0
 printf 'one\ntwo\n' >"$SANDBOX/CLAUDE.md"
 
 cfg() {  # $1=name  $2=ceiling-file body writer already run
-    cat >"$SANDBOX/$1.sh" <<EOF
-CONTEXT_KIT_SURFACES=("$SANDBOX/CLAUDE.md")
-CONTEXT_KIT_CEILING_FILE="$SANDBOX/$1.txt"
+    cat >"$SANDBOX/$1.knobs" <<EOF
+CONTEXT_KIT_SURFACES[] = $SANDBOX/CLAUDE.md
+CONTEXT_KIT_CEILING_FILE = $SANDBOX/$1.txt
 EOF
 }
 
@@ -37,7 +37,7 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=config-name
     local out rc
     # spec: gate-sdk/SPEC.md §lib/gate.sh — the override is exported rather than passed through
     # `env`, because the config bridge resolves this member's knobs before the argv it builds runs
-    out="$(export CONTEXT_KIT_CONFIG_FILE="$SANDBOX/$name.sh"; gate_run check-surface-ratchet "$DIR/checks" 2>&1)"; rc=$?
+    out="$(export CONTEXT_KIT_KNOB_FILE="$SANDBOX/$name.knobs"; gate_run check-surface-ratchet "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi

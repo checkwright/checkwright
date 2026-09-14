@@ -64,7 +64,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    a queue entry tagged `[spec: SPEC-<feature>.md]`. Merge it into the canonical
    spec and delete it when the work completes.
 
-3. Optional — reshape the config: copy `templates/canon-config.sh` into your
+3. Optional — reshape the config: copy `templates/canon-config.knobs` into your
    gates dir and override the spec/amendment names, section set, the
    Definition-of-Done mode (`exactly-one` / `at-most-one`), the banned-heading
    set and density budget, the embedded-source language map, or the glossary

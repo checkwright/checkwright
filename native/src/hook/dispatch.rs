@@ -8,8 +8,7 @@ const NAME: &str = "agent-dispatch-guard";
 
 pub fn run(payload: Option<&Value>) -> i32 {
     // spec: delegation-kit/SPEC.md §The delegation model — an unresolvable roster leaves D2 with an
-    // empty set and earns a note, never a skip of D1: the shell member read this one knob outside
-    // the validating loader precisely so a config fault could not wedge a dispatch.
+    // empty set and earns a note, never a skip of D1, so a config fault cannot wedge a dispatch.
     let (roster, roster_note) = match walk::knob_array("DELEGATION_KIT_READONLY_TYPES") {
         Ok(v) => (v, String::new()),
         Err(e) => (

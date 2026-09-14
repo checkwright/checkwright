@@ -65,9 +65,10 @@ sp="$PWD/.tmp/stop-probe-smoke"
 rm -rf "$sp"; mkdir -p "$sp"
 # comment-tier-exempt: a pid above every attested pid_max is dead without a spawn, the same idiom evidence-kit's own producer-lock test buys its dead-record arms with — a live pid here would read red and refuse, which is the arm this one is not
 printf 'pid=2147483646 run=smoke\n' > "$sp/smoke.run"
+printf 'DELEGATION_KIT_LIVENESS_CMD =\n' > "$sp/delegation.knobs"
 printf '{"session_id":"smoke","hook_event_name":"SubagentStop"}' | \
     DELEGATION_KIT_STOP_LOG="$sp/probe.log" \
-    DELEGATION_KIT_LIVENESS_CMD="" \
+    DELEGATION_KIT_KNOB_FILE="$sp/delegation.knobs" \
     GATE_SDK_TMP_DIR="$sp" \
     bash "$SDK/bin/run-gates.sh" --hook subagent-stop-liveness || {
     echo "delegation-kit/smoke: the SubagentStop hook did not exit 0 on its allowing arm" >&2; exit 1; }

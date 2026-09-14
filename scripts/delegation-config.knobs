@@ -1,0 +1,27 @@
+# spec: delegation-kit/SPEC.md §Layout and configuration — this repo's delegation-kit consumer knob file
+
+# spec: delegation-kit/SPEC.md §The delegation model — this repo's D2 roster: audit-sweep is dispatched read-only by its own agent-definition description ("it mutates nothing"); stage-session is not read-only and stays off, and a type with no Edit/Write tools is still not exempt from declaring isolation once dispatched read-only (it still reaches git through its shell) — there is none such in this roster today
+DELEGATION_KIT_READONLY_TYPES[] = audit-sweep
+
+# spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; --emit-usage-trend reports the evolution
+DELEGATION_KIT_USAGE_HISTORY = .metric/usage-history.log
+
+# spec: gate-sdk/SPEC.md §The non-gate arm — the poller is an arm, so the refresh command dispatches it through the front-end
+DELEGATION_KIT_REFRESH_CMD[] = bash
+DELEGATION_KIT_REFRESH_CMD[] = gate-sdk/bin/run-gates.sh
+DELEGATION_KIT_REFRESH_CMD[] = --usage-poll
+
+# comment-tier-exempt: the gate-file globs match with `*` spanning '/', so */checks/*.sh reaches every kit's gates; a file value replaces the kit default whole, so the default's scripts/check-*.sh glob is restated here rather than inherited — the repo's consumer-resident gates would otherwise fall outside tamper coverage
+DELEGATION_KIT_GATE_FILES[] = */checks/*.sh
+DELEGATION_KIT_GATE_FILES[] = */checks/*.gate
+DELEGATION_KIT_GATE_FILES[] = scripts/check-*.sh
+DELEGATION_KIT_GATE_FILES[] = scripts/check-*.gate
+DELEGATION_KIT_GATE_FILES[] = gate-sdk/lib/gate.sh
+
+# comment-tier-exempt: check-gate-tamper unions every kit root into the meta paths (a vendored kit's edits are meta-layer by definition), so only the non-kit prefixes are declared here; native/ is declared explicitly because it ships no checks/ or smoke/ and so is never a kit root by gate_kit_roots's predicate, despite carrying ported gates' Rust implementations (gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate, check-gate-tamper row)
+DELEGATION_KIT_META_PATHS[] = scripts/
+DELEGATION_KIT_META_PATHS[] = .workflow/
+DELEGATION_KIT_META_PATHS[] = .claude/
+DELEGATION_KIT_META_PATHS[] = docs/
+DELEGATION_KIT_META_PATHS[] = .github/
+DELEGATION_KIT_META_PATHS[] = native/

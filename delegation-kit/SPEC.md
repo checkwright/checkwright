@@ -667,19 +667,16 @@ gets each of them wrong:
   shape), so the shell original's escape-by-convention fragility and its jq-backed
   delivery primitive both retire with it rather than needing a compiled
   equivalent.
-- **The guard reads its roster through delegation-kit's validating config
-  loader now, not around it — the port reversed that.** Pre-port the shell guard read
-  `DELEGATION_KIT_READONLY_TYPES` on its own, deliberately outside the loader,
-  so a malformed *unrelated* knob could not wedge a dispatch. Post-port the
-  config bridge resolves this knob by sourcing that same loader
-  (gate-sdk/SPEC.md §The non-gate arm), so the risk the old design sidestepped
-  is real again — and the mitigation moved with it: a config bridge that
-  refuses the whole environment for any reason, unrelated knob included, takes
-  the general fail-open path above and never reaches this guard at all, so an
-  unrelated typo still cannot wedge a dispatch, only through a different door.
-  The distinction the table's last two rows still draw is this kit's standing
-  one: a roster **resolved to nothing** is silent, a roster whose own read
-  fails **despite the bridge otherwise succeeding** is loud.
+- **The guard reads its roster through delegation-kit's validated table, not
+  around it, and an unrelated config fault still cannot wedge a dispatch.** The
+  kit's knobs are static (§Layout and configuration), so
+  `DELEGATION_KIT_READONLY_TYPES` resolves in process, and the table validator
+  runs at the kit's first resolution: a malformed *unrelated* delegation knob
+  fails this roster's read. That failure is the table's last row — D2 unenforced
+  with an advisory naming the fault, D1 and D3 unaffected — so the typo costs one
+  rule's enforcement, loudly, and never the dispatch. The distinction the
+  table's last two rows draw is this kit's standing one: a roster **resolved to
+  nothing** is silent, a roster whose own read fails is loud.
 
 ### One template, a resident pointer
 
@@ -1022,7 +1019,7 @@ The count picks the **name**, never the decision — both refuse.
 
 **`unstarted` is a reader whose argv resolved and whose spawn the operating system
 refused** — the default always resolves, and an override passed the
-executable-bit predicate — so `ETXTBSY`, `ENOENT` from an absent shebang
+resolution predicate — so `ETXTBSY`, `ENOENT` from an absent shebang
 interpreter, `EACCES`, `ENOEXEC`, `ENOMEM` or `EAGAIN`. **`unavailable` narrows to
 its name beside it.** The two are two cases with two fixes, a knob to correct
 and a reader or host that refused to start, and one name over both was a fail-open
@@ -1189,9 +1186,10 @@ here.
 stated rather than assumed.** The reading is the binary's own compiled
 `check-producer-liveness`, so a tree that can fire this hook at all can take a
 reading: the prerequisite is the binary, which *is* the hook. What survives is the
-**override**'s prerequisite — a consumer that points
-`DELEGATION_KIT_LIVENESS_CMD` at a path that is absent or carries no executable
-bit gets `verdict=unavailable decision=allow` on every line: a hook that answers
+**override**'s prerequisite — a consumer that sets
+`DELEGATION_KIT_LIVENESS_CMD` to an argv whose first element resolves to no
+executable program (an absent path, a path without the execute bit, a bare name
+not on `PATH`) gets `verdict=unavailable decision=allow` on every line: a hook that answers
 nothing and refuses nothing. That is honest degradation and it is preferable to a
 silent third parse that would work everywhere and drift from its owner.
 
@@ -1222,18 +1220,21 @@ ship before.** The refusal above was written while the gate was a descriptor a
 bash front end dispatched, so "only a consumer knows its front end" was true. The
 hook and `check-producer-liveness` are members of one binary, and a binary knows
 its own path: the hook reaches the gate through its **own executable** rather than
-through any front end, so **an unset or empty knob resolves to
+through any front end, so **an empty knob, the default, resolves to
 `current_exe()`, spawned with the gate name and the scratch dir as its argv**.
 That is a real default rather than a fake one — the executable that is running is,
 by definition, present — and it is what retires the fake-default objection above
 rather than reversing it. `DELEGATION_KIT_LIVENESS_CMD` survives as the consumer
-**override**: a path executed directly with the scratch dir as its only argument,
-**no interpreter word**, for a consumer whose reader is not this gate. An override
-that is a shell script therefore names its interpreter in its own shebang and
-carries its own executable bit, and **executability rather than mere file-ness is
-the override's resolution predicate** — one lacking the bit cannot be spawned, so
-it resolves to no reader and reads `unavailable` rather than being run under an
-interpreter the kit chose for it.
+**override**, for a consumer whose reader is not this gate: an indexed argv, one
+line per element, spawned directly with no shell and the scratch dir appended
+after its last element, so the consumer names an interpreter as an element when
+its reader needs one, and a one-element override naming an executable path runs
+that path with the scratch dir as its only argument. **Executability rather than
+mere file-ness is the override's resolution predicate**: its first element must
+resolve to an executable program — a path carrying a separator must carry the
+execute bit, a bare name must resolve on `PATH` — and one that does not cannot be
+spawned, so it resolves to no reader and reads `unavailable` rather than being run
+under an interpreter the kit chose for it.
 
 **The default is spawned rather than called in process, and the ground is the seam
 rather than caution.** `check-producer-liveness` is compiled into this binary and
@@ -1253,10 +1254,10 @@ spawn would name a reading that was never taken.
 
 **`unavailable` is not retired by the default, and where it survives is stated**,
 because the obvious reading of a working default is that no firing can lack a
-reading again. An override naming a path that is absent or carries no executable
-bit still resolves to no reader, so the arm keeps its producer; one that resolves
+reading again. An override whose first element resolves to no executable program
+still resolves to no reader, so the arm keeps its producer; one that resolves
 and then cannot be spawned reads `unstarted` instead. What
-it loses is the *unset knob* as a routine producer — precisely the fake-default
+it loses is the *empty knob* as a routine producer — precisely the fake-default
 degradation this section records as the reason the knob had no default at all.
 
 **A consumer's *override* must resolve from a worktree-isolated dispatch, and this
@@ -1457,7 +1458,7 @@ list does not name one for:
   **The honest limit on that countability, and it is a break in this contract
   rather than a caveat on it: the named reader cannot see a worktree-isolated
   agent's firings at all.** `DELEGATION_KIT_STOP_LOG` defaults under
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}`, resolved against the *writing session's*
+  `${GATE_SDK_WORKFLOW_DIR}`, resolved against the *writing session's*
   cwd. An isolated agent's cwd is its own worktree, so its lines land in that
   worktree's `.workflow/` and are destroyed with the worktree at reclamation —
   and that is precisely the class `unresolved` names, so the field's claim that a
@@ -1873,10 +1874,11 @@ recorded document order. The real-reader lane above still reaches neither
 `corrupt` nor `error`, and does not need to — the stub lane is where a reader's
 exit class is chosen, and the real lane exists to prove the *resolved* reader runs
 at all. **Since the default landed, that stub lane also carries the resolution
-itself**: the unset knob resolving to the running executable and the gate name, an
-override resolving to itself with the run dir as its only argument, and an
-override without the executable bit resolving to no reader — the three readings a
-lane driving pre-resolved argv could not otherwise reach.
+itself**: the empty knob resolving to the running executable and the gate name, an
+override resolving to itself with the run dir appended after its last element, an
+interpreter-led override resolving on `PATH`, and an override whose first element
+lacks the executable bit or names no program on `PATH` resolving to no reader —
+the readings a lane driving pre-resolved argv could not otherwise reach.
 
 **The compiled lane holds seven arms, and `unstarted` is pinned rather than left to
 a race.** Its case is an executable stub whose shebang names an interpreter that
@@ -2375,10 +2377,7 @@ and this is the first section in this kit whose whole contract is in-crate.**
 Both reference producers — the `--statusline` push producer and the
 `--usage-poll` poll producer — were already compiled, and the verdict was this
 section's last shell holder. §Trend reporter's own reader has since crossed as
-`--emit-usage-trend`, taking the kit's `bin/` column to **zero**; what still
-does *not* discharge the kit is `lib/delegation.sh`, which stays permanently
-shell as the config bridge's sole `DELEGATION_KIT_*` resolver (§Layout and
-configuration) and never enters that column. §bin/wait-probe was the
+`--emit-usage-trend`, taking the kit's `bin/` column to **zero**. §bin/wait-probe was the
 kit's other owed section and is discharged, on a narrower reading of *discharged*
 that section states.
 
@@ -2394,13 +2393,15 @@ on the host or because the config bridge refused, is exit **2** at the
 front-end: already this rule's budget-unknown code, so an artifact-less host
 reads as STALE rather than as a verdict it never took.
 
-**Ten declared knobs, reaching the arm through the config bridge**:
-`DELEGATION_KIT_USAGE_FILE`, `_CRED_FILE`, `_PAUSE_PCT`, `_PAUSE_PCT_7D`,
-`_STALE_AGE`, `_LOGIN_WINDOW`, `_REFRESH_CMD`, `_REFRESH_MIN_AGE`,
-`_USAGE_HISTORY` and `_FAN_WIDTH`, each defined and defaulted in
-`lib/delegation.sh` (§Layout and configuration). The bridge refuses the whole
-environment for a declared knob that library does not define, so the roster and
-those defaults are one change and never two.
+**Eleven declared knobs, each a row of delegation-kit's static table**:
+`DELEGATION_KIT_USAGE_FILE`, `_CRED_FILE`, `_ACCOUNT_CONFIG`, `_PAUSE_PCT`,
+`_PAUSE_PCT_7D`, `_STALE_AGE`, `_LOGIN_WINDOW`, `_REFRESH_CMD`,
+`_REFRESH_MIN_AGE`, `_USAGE_HISTORY` and `_FAN_WIDTH` (§Layout and
+configuration). The three paths are read through the reader's one
+empty-means-derive fill, which reads all three together, so `_ACCOUNT_CONFIG` is
+declared although the verdict never opens that file. A read of a name the table
+does not carry is an error rather than an empty value, so the roster and the
+table are one change and never two.
 
 **Two positionals and one refusal.** `[usage-file [credentials-file]]` arrive as
 the arm's own argv and override `DELEGATION_KIT_USAGE_FILE` and
@@ -2421,9 +2422,9 @@ the status; the arm prints the line and returns the status, and
 its block and relaying the `String` verbatim (§The delegation model). A shape
 refusal returns an **empty** line with its usage already on stderr, so the arm
 prints nothing on stdout and the status carries the whole signal. The one
-program the compiled rule spawns is `bash -c`, and only when
-`DELEGATION_KIT_REFRESH_CMD` is non-empty: that knob *is* a command seam, so its
-launcher survives the port.
+program the compiled rule spawns is `DELEGATION_KIT_REFRESH_CMD`'s argv, spawned
+directly with no shell, and only when that knob is non-empty: it *is* a command
+seam, so its spawn survives the port.
 
 Check order: parse → RESET-OK → age-STALE → pause axes → login-STALE → OK. The
 RESET-OK branch is the same decision one step earlier and is ordering
@@ -2451,8 +2452,8 @@ boundary reading is judged at the
 limit, not under it.
 
 **Demand-driven refresh.** The decision point triggers the poll: when
-`DELEGATION_KIT_REFRESH_CMD` is non-empty, `usage-verdict` runs it before
-reading the snapshot, so the budget guard and any verdict caller read live
+`DELEGATION_KIT_REFRESH_CMD` is non-empty, `usage-verdict` spawns its argv
+before reading the snapshot, so the budget guard and any verdict caller read live
 data instead of whatever the last statusline render left behind. This closes
 the push producer's blind spot at the point of use — a lead that delegates
 stops rendering exactly when it goes static, and the first live poll proved
@@ -2812,16 +2813,15 @@ and later positional is ignored exactly as the shell ignored it, because
 tightening it would turn an accepted invocation into a refusal.
 
 **The declared knob roster is `DELEGATION_KIT_USAGE_HISTORY` and
-`DELEGATION_KIT_PAUSE_PCT_7D`, and neither is minted.** Both are defined and
-defaulted in `lib/delegation.sh`, which the bridge sources, so a default
-hardcoded in the crate would work in this repo and break silently for a consumer
-that overrides either — this tree overrides the history path and does *not*
-override the ceiling, so the headroom line here runs on the kit default. The two
-differ in how absence reads: the history knob's own default **is** the empty
-string, so an absent bridge variable and a configured-empty one are one reading
-and take this tool's own "unset — no history to report" diagnostic; the
-ceiling's default is a real value, so its absence is a bridge failure and
-surfaces as one.
+`DELEGATION_KIT_PAUSE_PCT_7D`, and neither is minted.** Both are rows of
+delegation-kit's static table (§Layout and configuration), so a default hardcoded
+in the reader would work in this repo and break silently for a consumer that
+overrides either — this tree overrides the history path and does *not* override
+the ceiling, so the headroom line here runs on the kit default. The two differ in
+how absence reads: the history knob's own default **is** the empty string, so an
+unset knob and a configured-empty one are one reading and take this tool's own
+"unset — no history to report" diagnostic; the ceiling's default is a real value,
+so a failed read of it is a resolution failure and surfaces as one.
 
 **The wire shape is a contract, not an implementation detail, because the
 producer is already compiled and untouched by this port.** `--usage-verdict`
@@ -3081,7 +3081,6 @@ because the second half is the one that looks like an unfinished port and is not
 
 ```
 delegation-kit/
-  lib/delegation.sh               # shared helpers for the usage tools and the kit's gates
   usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs; read by the crate test that replaced its shell driver
   usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs; read by the crate test that replaced its shell driver
   usage-tests/trend-history.log   # fixture history for the trend assertions, read by that same crate module
@@ -3094,46 +3093,57 @@ delegation-kit/
   gate-tests/check-agent-tier-explicit/{good,bad}/
   templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
-  templates/delegation-config.sh          # knob overrides (arrays live here)
+  templates/delegation-config.knobs       # comment-only knob file: set only what you override
   smoke/install.sh
   smoke/violation.sh
 ```
-
-**`lib/delegation.sh` is permanently shell and declares so in its own header**,
-as the config bridge's sole resolver for the `DELEGATION_KIT_*` knobs —
-gate-sdk/SPEC.md §The kit-library port disposition rules the class and
-gate-sdk/SPEC.md §lib/gate.sh states the ground. The disposition is recorded here
-rather than in a library section because this kit has none; the layout line above
-is the file's only other mention.
 
 **The wait-primitive probe's port retired no knob, and the roster says so rather
 than leaving a reader to infer the pattern from the cut before it.** That cut took
 this kit's last holder of a default site and the knob left with it; this one
 cannot, because the probe's two reads are `GATE_SDK_TMP_DIR` and
 `GATE_SDK_WORKFLOW_DIR` — gate-sdk knobs with many other holders each, declared on
-the arm's own roster (§bin/wait-probe) and defaulted in `gate-sdk/lib/gate.sh`
-rather than here. Nothing moved in `lib/delegation.sh` for it, which is the fact a
+the arm's own roster (§bin/wait-probe) and defaulted by gate-sdk rather than
+here. Nothing in this kit's configuration moved for it, which is the fact a
 reader tracking the pattern needs.
 
-Config follows the established kit pattern: copy
-`templates/delegation-config.sh` into the gates dir (or point
-`DELEGATION_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults
-fill what the consumer left unset. The loader is fail-closed: a
-`DELEGATION_KIT_CONFIG_FILE` named but absent, or a config leaving any knob
-malformed, exits 2 (a broken machine gates nothing). That template and the
-copy it seeds are **permanently shell**, each carrying the `# no-port:` cause of
-the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
-(this repo's layout as defaults):
+Config is a **knob file**: copy `templates/delegation-config.knobs` into the gates
+dir as `delegation-config.knobs` (or point `DELEGATION_KIT_KNOB_FILE` elsewhere) and
+set any knob below; defaults fill what the file leaves unset. delegation-kit's
+knobs are **static**: the binary resolves them in process from its own defaults
+table and the consumer's knob file, and the config bridge never carries them
+(gate-sdk/SPEC.md §lib/gate.sh); `bash gate-sdk/bin/run-gates.sh --emit knob-roster`
+prints each one with its shape and rendered default. A gitignored
+`delegation-config.local.knobs` in the gates dir is the home for a private value a
+tracked file cannot carry. The grammar, that `.local` overlay, the
+environment-over-file precedence for a scalar, and the refusals — a set
+`DELEGATION_KIT_KNOB_FILE` that does not exist, a left-behind `delegation-config.sh`
+or `delegation-config.local.sh`, a non-empty file named by the retired
+`DELEGATION_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. A file value
+for an indexed knob replaces its default whole. The kit's table validator refuses a
+malformed config at exit 2 with every finding — a broken machine gates nothing. A
+derived default below is written in the roster's `${NAME}` spelling for the knob it
+reads. Knobs (this repo's layout as defaults):
 
-- `DELEGATION_KIT_USAGE_FILE` — default
-  `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`; positional `$1`
-  overrides (test injection).
-- `DELEGATION_KIT_CRED_FILE` — default the usage file's sibling
-  `.credentials.json`; positional `$2` overrides.
+- `DELEGATION_KIT_USAGE_FILE` — default empty, and empty means *derive it*: the
+  reader fills `<config-home>/usage.txt`, the config home being
+  `CLAUDE_CONFIG_DIR` when set non-empty and `$HOME/.claude` otherwise — the
+  crate's one config-home derivation (lifecycle-kit/SPEC.md §bin/session-id.sh),
+  which `DRIFT_KIT_SESSIONS_DIR` shares. The derivation sits at the reader rather
+  than in the table because the harness home is read from the environment and is
+  no knob a derived row could declare as its input. The statusline, the poller
+  and `--usage-verdict` read this knob, `DELEGATION_KIT_CRED_FILE` and
+  `DELEGATION_KIT_ACCOUNT_CONFIG` through that one fill and never directly.
+  Positional `$1` overrides (test injection).
+- `DELEGATION_KIT_CRED_FILE` — derived from `${DELEGATION_KIT_USAGE_FILE}`:
+  `.credentials.json` in that file's directory when the usage file is set
+  non-empty, and empty otherwise, which the reader fills as `.credentials.json`
+  beside the derived usage file. Positional `$2` overrides.
 - `DELEGATION_KIT_ACCOUNT_CONFIG` — the harness config the account uuid is read
-  out of, for the snapshot's optional `account` field; default
-  `$HOME/.claude.json`. Both usage producers read it and neither requires it: an
-  unreadable file leaves the field unwritten rather than failing the cycle.
+  out of, for the snapshot's optional `account` field; default empty, and empty
+  means *derive it*: the reader fills `$HOME/.claude.json`. Both usage producers
+  read it and neither requires it: an unreadable file leaves the field unwritten
+  rather than failing the cycle.
 - `DELEGATION_KIT_USAGE_ENDPOINT` — the poll producer's usage source; default
   `https://api.anthropic.com/api/oauth/usage`. The test seam (a `file://` stub)
   and the stability valve when the unpublished source moves (§The usage.txt
@@ -3149,10 +3159,13 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
 - `DELEGATION_KIT_LOGIN_WINDOW` — default `600` (seconds).
 - `DELEGATION_KIT_REFRESH_CMD` — the command `usage-verdict` runs before
   reading the snapshot (§usage-verdict); default empty, which keeps the
-  read-only behavior. This repo points it at the poll producer, run in place
-  from its template path.
+  read-only behavior. It is a **command knob**: an indexed argv, one
+  `DELEGATION_KIT_REFRESH_CMD[] = <element>` line per word, spawned directly with
+  no shell, so it takes no environment override and a command relying on shell
+  syntax names `bash`, `-c` and its command string as three elements. This repo
+  points it at the poll producer through the front-end.
 - `DELEGATION_KIT_REFRESH_MIN_AGE` — the refresh short-circuit (§usage-verdict);
-  default `60` (seconds), validated a non-negative integer by the loader. The
+  default `60` (seconds), validated a non-negative integer by the table validator. The
   floor is set by the render path, not the dispatch path: the statusline calls
   the verdict on every render, so the default bounds source traffic to roughly
   one poll a minute while leaving any dispatch-time reading fresh enough to act
@@ -3162,10 +3175,10 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   measurement trend (drift-kit/SPEC.md §Layout and configuration owns the
   metric-dir retention contract). Written by `--usage-verdict` and declared by
   `--emit-usage-trend`, whose `[history-file]` positional overrides it; because
-  the default is empty, an absent bridge variable reads as the configured-empty
-  value rather than as a bridge failure (§Trend reporter).
+  the default is empty, an unset knob and a configured-empty one are one reading
+  (§Trend reporter).
 - `DELEGATION_KIT_FAN_WIDTH` — read-only-fan-out width bound; default `2`,
-  validated a positive integer by the loader. It bounds read-only fan-outs
+  validated a positive integer by the table validator. It bounds read-only fan-outs
   only: a committing fan-out serializes or takes its own worktree regardless
   (the template's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide
   otherwise** rule), so this knob is never a licence to widen concurrent
@@ -3182,15 +3195,14 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   as the `width=` field (§usage-verdict), the knob's mechanical reader.
 - `DELEGATION_KIT_AGENT_DIR` — the directory `check-agent-tier-explicit` walks
   for agent definitions; default `.claude/agents`, this harness's conventional
-  agent-definition location, validated non-empty by the loader. Positional `$1`
+  agent-definition location, validated non-empty by the table validator. Positional `$1`
   overrides (fixture injection). A consumer whose harness keeps definitions
   elsewhere repoints it; one with no such directory leaves it and the gate
   reports its counted-inert clean line (§check-agent-tier-explicit).
 - `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper
   assertion A; default
-  `("${GATE_SDK_GATES_DIR:-scripts}/check-*.sh" "${GATE_SDK_GATES_DIR:-scripts}/check-*.gate")`
-  plus the gate-sdk lib and
-  runners. **Both declaration spellings are on the default**, because a gate's
+  `("${GATE_SDK_GATES_DIR}/check-*.sh" "${GATE_SDK_GATES_DIR}/check-*.gate" "${GATE_SDK_GATES_DIR}/lib/gate.sh")`.
+  **Both declaration spellings are on the default**, because a gate's
   declaration path is `<name>.sh` *or* `<name>.gate`
   (gate-sdk/SPEC.md §The `# graph:` manifest)
   and a consumer on the default would otherwise receive a
@@ -3199,7 +3211,7 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate
   mandates, come due at the first live descriptor.
   A consumer declaration **replaces** this default outright rather
-  than extending it — the loader guards it with `declare -p … ||`, so the
+  than extending it — a file value replaces the default whole, so the
   default is the no-declaration fallback, not a base to append to. A consumer
   adding kit-shipped globs must therefore restate any default glob it still
   wants covered (this repo's config names `*/checks/*.sh` and `*/checks/*.gate`
@@ -3208,19 +3220,19 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   `DELEGATION_KIT_META_PATHS` below, whose kit-root union *is* additive — the
   two knobs do not behave alike.
 - `DELEGATION_KIT_META_PATHS` — prefixes counted as meta-layer for
-  assertion A; default `("${GATE_SDK_GATES_DIR:-scripts}/"
-  "${GATE_SDK_WORKFLOW_DIR:-.workflow}/" ".claude/")`; root-level `*.md` is
-  always meta. When `gate.sh` is resolvable (`GATE_SDK_LIB`, else the vendored
-  sibling), the loader unions every `gate_kit_roots` member into this array as a
-  root-relative `dir/` prefix — a vendored kit's edits are meta-layer by
-  definition, so the consumer's config need not name kit dirs at all (this
-  repo's keeps only the non-kit prefixes). The union is additive, never a
-  filter: a
-  prefix the consumer declared cannot be lost, and without `gate.sh` the config
-  is used exactly as written.
+  assertion A; default `("${GATE_SDK_GATES_DIR}/"
+  "${GATE_SDK_WORKFLOW_DIR}/" ".claude/")`; root-level `*.md` is
+  always meta. The reader, `check-gate-tamper`, unions every `GATE_KIT_ROOTS_REL`
+  member into the resolved value as a root-relative `<root>/` prefix the value
+  does not already hold, and declares `GATE_KIT_ROOTS_REL` for it — a vendored
+  kit's edits are meta-layer by definition, so the consumer's config need not
+  name kit dirs at all (this repo's keeps only the non-kit prefixes). The union
+  sits at the reader rather than in the default because a file value replaces the
+  default whole, and a kit root must stay meta under a consumer's own value. It is
+  additive, never a filter: a prefix the consumer declared cannot be lost.
 - `DELEGATION_KIT_STOP_LOG` — the turn-end hook's log (§The turn-end liveness
   hook); default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log`, the same
+  `${GATE_SDK_WORKFLOW_DIR}/subagent-stop-liveness.log`, the same
   deferral guard-kit's two logs already take. No scratch-dir knob sits beside it:
   the launch record's home is `${GATE_SDK_TMP_DIR:-.tmp}`, the cross-kit deferral
   every kit reaching that directory already resolves it through, and a second
@@ -3238,10 +3250,14 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   be a name nothing reads, and the close stage reaches the file through the
   roster's literal rather than through a knob.
 - `DELEGATION_KIT_LIVENESS_CMD` — the liveness reader the probe invokes in set
-  mode, a path executed **directly** with the scratch dir as its only argument, no
-  interpreter word, so a shell reader owes its own shebang and its own executable
-  bit. It is an **override over a working default**: unset and empty are the same
-  value and both mean the binary's own compiled `check-producer-liveness`, spawned
+  mode. It is a **command knob**: an indexed argv, one
+  `DELEGATION_KIT_LIVENESS_CMD[] = <element>` line per word, spawned **directly**
+  with no shell and the scratch dir appended after its last element, so it takes
+  no environment override and may name its own interpreter. Its first element must
+  resolve to an executable program — a path carrying a separator must carry the
+  execute bit, a bare name must resolve on `PATH` — or the override resolves to no
+  reader. It is an **override over a working default**: the default is empty,
+  and empty means the binary's own compiled `check-producer-liveness`, spawned
   with the gate name and the scratch dir (§The turn-end liveness hook owns why the
   default is spawned rather than called in process, and why the earlier
   no-default ruling lapsed). A knob rather than a literal because a consumer's
@@ -3276,7 +3292,7 @@ commit here.
 `.claude/settings.json` (beside the guard-kit Bash guard). Wire
 `bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard`; the verdict rule is
 compiled into the same binary, so the guard calls it **in process** and resolves
-no path at all — the guard's declared knob slice is `--usage-verdict`'s ten
+no path at all — the guard's declared knob slice is `--usage-verdict`'s eleven
 (§usage-verdict). Registration
 is the whole opt-in: unwired, the guard is inert. This repo registers it, and
 its consumer session brief (`scripts/session-context.sh`) additionally prints
@@ -3365,47 +3381,48 @@ the budget guard makes (§usage-verdict). **The clock
 is read once for the whole run**, and every case's timestamps are computed
 against that one reading: a per-case read introduces cross-case skew that flakes
 exactly the at-or-over boundary rows the table exists to pin. Each
-case runs in a throwaway sandbox with no consumer config on the lookup
-path **and** with the ambient bridge namespace stripped before each
-invocation, so the rule exercises the kit defaults hermetic to the host
-repo — the decision table encodes those defaults, and a host override (a
-raised pause threshold, say) must not reshape it. Three properties carry that
-contract, and each is a place a reimplementation would quietly differ:
+case runs in a throwaway sandbox that is also the gates directory, so the only
+knob file on the lookup path is the one the case writes, **and** with the
+ambient `DELEGATION_KIT_*` environment stripped before each invocation, so the
+rule exercises the kit defaults hermetic to the host repo — the decision table
+encodes those defaults, and a host override (a raised pause threshold, say) must
+not reshape it. Three properties carry that contract, and each is a place a
+reimplementation would quietly differ:
 
-- **The strip is the whole `GATE_SDK_KNOB_*` namespace, derived at run time**
+- **The strip is the whole `DELEGATION_KIT_*` namespace, derived at run time**
   from the running process's own variables — never a hardcoded list of knob
   names, which re-creates precisely the failure the poison exists to catch. That
-  prefix and not `DELEGATION_KIT_*`: a compiled member reads
-  `GATE_SDK_KNOB_<name>` through `walk::knob_scalar`, so a strip aimed at the
-  kit prefix would remove names the subject could not have read and would ship
-  green and vacuous. The stripped pairs are **held and restored** at the end,
-  which is the in-process face of the child-environment boundary a spawn had for
-  free.
-- **The poison stays a real value in the running process** — the bridged
-  spelling of `DELEGATION_KIT_PAUSE_PCT`, at a threshold that PAUSEs every
-  under-threshold row — and it is **re-armed before every case**, so the strip is
-  proved at each one rather than once for the run. What makes it load-bearing is
-  the seeding *order*: the case override is applied first and the kit default
-  fills **only what is unset**, `lib/delegation.sh`'s own `[[ -v X ]] ||` shape,
-  so a poison the strip failed to remove is not overwritten and the table
-  reddens. A port that seeded unconditionally would pass every assertion while
-  proving nothing, which is the one way this coverage can be lost. The write goes
-  through `knobenv`'s serializing guard, the crate's sole writer of the
-  process-global environment (gate-sdk/SPEC.md §lib/gate.sh) — more load-bearing
-  in this form, not less, because the subject now shares that environment with
-  the test.
+  prefix because a static scalar knob's environment override is its own name
+  (gate-sdk/SPEC.md §The knob file), which is the spelling the subject reads. The
+  stripped pairs are **held and restored** at the end, which is the in-process
+  face of the child-environment boundary a spawn had for free. An indexed knob
+  takes no environment override, so a case's `DELEGATION_KIT_REFRESH_CMD` argv
+  is written into the sandbox's knob file, one element per line, rather than
+  exported.
+- **The poison stays a real value in the running process** —
+  `DELEGATION_KIT_PAUSE_PCT` at a threshold that PAUSEs every under-threshold
+  row — and it is **re-armed before every case**, so the strip is proved at each
+  one rather than once for the run. What makes it load-bearing is the seeding
+  *order*: the case's scalar overrides are applied first and each kit default is
+  then seeded into the environment **only where the name is unset**, so a poison
+  the strip failed to remove is not overwritten and the table reddens. A seed
+  that wrote unconditionally would pass every assertion while proving nothing,
+  which is the one way this coverage can be lost; a negative control beside the
+  table skips the strip once and asserts the surviving poison PAUSEs. The write
+  goes through `knobenv`'s serializing guard, the crate's sole writer of the
+  process-global environment (gate-sdk/SPEC.md §lib/gate.sh) — load-bearing
+  because the subject shares that environment with the test.
 - **The per-case expectations stay literal expectations of the kit defaults.**
-  With no child there is no bridge run, so the table does not prove that the
-  defaults it encodes are the ones `lib/delegation.sh` actually ships. Two
-  existing holders carry that link and neither is minted here:
-  `check-knob-default-coupling` holds every literal default site against the
-  owning SPEC, and `smoke/install.sh` drives a real front-end invocation through
-  the real bridge under its hermetic prelude. Spawning the front-end from the
-  crate test would keep the bridge in the loop and is refused: it re-introduces
-  the `bash` spawn this port deleted, one process further out, for what those two
-  already cover. The trend runner below reaches its subject in process on the
-  same terms since that member's own port, so no runner in this module spawns a
-  kit script any more.
+  The seeded defaults are the test's own literals rather than reads of the
+  table, so the table does not prove that the defaults it encodes are the ones
+  delegation-kit's defaults table actually ships. Two existing holders carry that
+  link and neither is minted here: `check-knob-default-coupling` holds every
+  literal default against the owning SPEC, and `smoke/install.sh` drives a real
+  front-end invocation under its hermetic prelude. Spawning the front-end from the
+  crate test is refused: it re-introduces the `bash` spawn this port deleted, one
+  process further out, for what those two already cover. The trend runner below
+  reaches its subject in process on the same terms, so no runner in this module
+  spawns a kit script any more.
   `touch -d "@<epoch>"` also stays, setting the credentials mtime that is the
   whole login-window input: `File::set_modified` and `FileTimes` stabilised in
   Rust 1.75 and `native/Cargo.toml` pins `rust-version = "1.71"`, so **the MSRV
@@ -3468,14 +3485,13 @@ witness can only ever be a previous reading.
 verdict), so it ships an assertion set over a
 static fixture history `usage-tests/trend-history.log` (static epochs are
 safe — the reporter measures within-segment deltas, never against *now*),
-carried by the same crate module under the same sandbox, strip and poison
-discipline. **The poison is re-aimed by that member's port rather than
-dropped**: the strip is now the in-process one — the ambient `GATE_SDK_KNOB_*`
-namespace held aside and reseeded from the kit defaults, so the arm reads the
-same empty history knob a stripped child read — and the poison is the
-**unbridged** `DELEGATION_KIT_USAGE_HISTORY` carrying a real path, which an arm
-reading the kit variable directly instead of through the config bridge would
-pick up, passing the report arm and then failing the unset arm loudly. It
+carried by the same crate module under the same sandbox and strip discipline:
+the ambient `DELEGATION_KIT_*` namespace held aside and reseeded from the kit
+defaults, so the arm reads the empty history knob and the unset arm fires.
+**The trend runner carries no poison of its own**, because the one it carried
+discriminated two spellings of one knob — a kit variable read directly against
+the same value read through a separate wire — and a static knob has one
+spelling, so no wrong reader is left for a poison to catch. It
 asserts per-axis segmentation at a reset boundary, a `login_at` change, and
 an account change; per-account grouping reuniting a weekly trajectory across
 a switch-back; a spike-then-correction flagged and excluded rather than
@@ -3505,7 +3521,7 @@ the shipped fixture plus four crafted inputs the fixture does not exercise: a
 directions, a comments-and-blanks-only log, and an account-less log whose every
 sample is suspect. The four exit outcomes were compared with them (report 0,
 zero-segment reading 0, unreadable history 2, unset knob 2), the last emptied at
-the **config bridge both substrates read** rather than by an environment
+the **shared config both substrates read** rather than by an environment
 variable either would have overridden. Nothing in the report is wall-clock
 dependent, so every field was compared for equality and none for relation —
 unlike §bin/wait-probe's sweep below. Two things the comparison bought that
@@ -3600,8 +3616,8 @@ advises, one without it falls through.
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot
 through the `--usage-verdict` arm asserting a verdict — self-verifying install,
-and the holder that keeps a real bridge run in this kit's coverage now that the
-crate table reaches the rule in process. It opens
+and the holder that keeps a real front-end run and a real knob resolution in this
+kit's coverage now that the crate table reaches the rule in process. It opens
 with **one hermetic env prelude covering the whole file**: it strips the whole
 `DELEGATION_KIT_*` namespace and then sets the knobs with no per-call home —
 sampling off, and both pause thresholds at the defaults the 95% reading is

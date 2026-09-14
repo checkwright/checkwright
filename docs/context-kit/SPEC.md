@@ -148,9 +148,9 @@ hardcoded flag resolves platform defaults and silently ignores every override.
 
 **One traversal-exclusion set, read by both walkers.** `CONTEXT_KIT_PRUNE_DIRS`
 is the kit's single exclusion array; the `md-index` and `pub-index` arms share
-one walk over it instead of each holding a private literal, and both receive it
-through gate-sdk's config bridge, which resolves it by sourcing `lib/context.sh`
-— the kit's one owner of the consumer-config seam. Two private literals had
+one walk over it instead of each holding a private literal, and both read it as
+one of context-kit's static knobs, resolved from the kit's defaults table and the
+consumer's knob file (§Layout and configuration). Two private literals had
 drifted apart *and* from the tree: neither carried the harness's isolated-agent
 worktree leaf, so both walkers descended into a second full copy of the
 repository and indexed it as tree content, which for `md-index` is every
@@ -379,9 +379,9 @@ reached by every caller as `run-gates.sh --emit env-probe`, so the front-end
 resolves its configuration and hands it over. It is an *action that reports* —
 it rewrites the block and prints one line naming what it did — and both its
 failures exit 2. Its declared knob roster is **`CONTEXT_KIT_ENV_PROFILE_FILE`
-and nothing else**: `lib/context.sh` defaults that name and is the config
-bridge's sole resolver for the family, so the value is computed in one place and
-no second default exists to drift. A hardcoded profile path would resolve
+and nothing else**: that name is one of context-kit's static knobs, resolved from
+the kit's defaults table and the consumer's knob file (§Layout and configuration),
+so the value is computed in one place and no second default exists to drift. A hardcoded profile path would resolve
 `ENV.local.md` and silently ignore every consumer override, which is the failure
 gate-sdk/SPEC.md §The non-gate arm names as the difference between working and
 appearing to.
@@ -450,8 +450,8 @@ The constrained members and what forces each:
 - `bash:4.3` — the floor is set by the **highest** construct the battery runs,
   not the most numerous. Three bash-4.0 constructs are widespread — `declare -A`
   (gate-sdk, guard-kit, delegation-kit, evidence-kit checks), `mapfile` (across
-  the kits), the `${x,,}` case expansion (canon-kit's `lib/spec.sh` and checks, a
-  delegation-kit template) — but the **nameref** (`local -n`, bash 4.3) outranks
+  the kits), the `${x,,}` case expansion (the installer's consumer smoke) — but
+  the **nameref** (`local -n`, bash 4.3) outranks
   them: `gate-sdk/lib/gate.sh`'s couples expander, which every gate sources. The
   leaf gate that carried the second instance, `check-comment-tier`, has since
   ported to the binary substrate and its script is gone — which changes nothing
@@ -639,9 +639,10 @@ rather than chosen.** It is a **table member** because it resolves the consumer 
 `CONTEXT_KIT_GROWTH_PATHS`, `CONTEXT_KIT_CEILING_FILE`,
 `CONTEXT_KIT_RATCHET_PATHS` and `CONTEXT_KIT_STATE_FILE` — which a hardcoded
 top-level flag would receive none of, the difference between working and appearing to. `GATE_SDK_WORKFLOW_DIR` and
-`GATE_SDK_GATES_DIR` are deliberately **not** declared: §lib/context.sh already rides
-them into the baseline path's and the hook command's own resolved values, so
-declaring either would resolve one fact twice. It is an **`Arm::Emit`** because the
+`GATE_SDK_GATES_DIR` are deliberately **not** declared: the static rows whose
+defaults derive from them declare them as inputs (§Layout and configuration), and the
+member's knob closure carries them from those declarations (gate-sdk/SPEC.md §The
+knob file), so declaring either would state one fact twice. It is an **`Arm::Emit`** because the
 whole failure grammar is already that variant's collapse — every mode returns 0 and
 the one non-zero path is exit 2 — so `{0, 2}` discards nothing the member carried;
 `--emit-usage-trend` is the sibling admitted on exactly that ground.
@@ -672,15 +673,16 @@ the next iteration's brevity pass reacts to a delta measured from the wrong comm
 refusal is what makes that state unreachable, and there is no third disposition
 available to an operand dispatch.
 
-**The hook body stays spawned, through `bash -c`, and calling `queue-index`
-in-process is refused.** The knob is a **command seam**, not an implementation
-detail: its whole contract is that a consumer names *their* hook body, and the
-default merely happens to name this project's own arm. An in-process shortcut would
-measure the wrong thing for every consumer whose hook body is not queue-kit's,
+**The hook body stays spawned, as the knob's argv with no shell, and calling
+`queue-index` in-process is refused.** The knob is a **command seam**, not an
+implementation detail: its whole contract is that a consumer names *their* hook body,
+and the default merely happens to name this project's own arm. An in-process shortcut
+would measure the wrong thing for every consumer whose hook body is not queue-kit's,
 silently and at exit 0 — and the committed witness is exactly such a consumer, the
-index-test case driving this member with `CONTEXT_KIT_HOOK_CMD="cat <file>"`, which a
-port that special-cased the default would keep green while breaking the seam the
-golden exists to prove.
+index-test case driving this member with a `cat <file>` argv, which a port that
+special-cased the default would keep green while breaking the seam the golden exists
+to prove. A command that could not be spawned contributes `hook 0`, and a command's
+stdout is counted whatever its exit status.
 
 - **Default invocation** prints one line: total, per-part breakdown, the delta against the
   baseline when one exists, and — where an iteration-start commit exists — the surfaces' delta
@@ -711,7 +713,7 @@ golden exists to prove.
   baseline file. A stale baseline adds a second header line naming both
   surface counts. Separate from the bare invocation because
   `kpi-always-loaded` reads that as one line.
-- **Baseline file** (`${GATE_SDK_WORKFLOW_DIR:-.workflow}/`
+- **Baseline file** (`${GATE_SDK_WORKFLOW_DIR}/`
   `always-loaded-baseline.txt`, committed): a `# contract:` header
   pointing here, then one data line
   `<total-lines> <surface-lines> <baseline-commit>`. Trailing extra
@@ -762,9 +764,10 @@ file — a live hook run, being state-dependent, could never be byte-gated.
 the gate binary**, `--emit-footprint` (gate-sdk/SPEC.md §The non-gate arm), and
 it prints the committed `docs/footprint.md` page whole: front matter, method and
 exclusion prose, then the table with a totals row. It is reached as
-`bash gate-sdk/bin/run-gates.sh --emit footprint`, because an arm receives no
-configuration of its own and that front-end resolves `CONTEXT_KIT_SURFACES`
-across the config bridge before invoking it.
+`bash gate-sdk/bin/run-gates.sh --emit footprint`, the front-end every `--emit` arm
+is reached through, and it reads `CONTEXT_KIT_SURFACES` as one of context-kit's
+static knobs, resolved from the kit's defaults table and the consumer's knob file
+(§Layout and configuration).
 
 The emission is a **library function** the arm wraps rather than the arm itself,
 which is what lets §check-footprint-fresh call it in-process and the value
@@ -990,7 +993,7 @@ dir, the untracked local settings) is a local-environment scan, CI-neutral
 binary — gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency)
 is the identity.conf pattern pointed at harness config. Every pin in
 `CONTEXT_KIT_SETTINGS_PINS`
-(default `${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf`) holds against
+(default `${GATE_SDK_GATES_DIR}/settings-pins.conf`) holds against
 the tracked settings file `CONTEXT_KIT_SETTINGS_FILE` (default
 `.claude/settings.json`). Grammar: one `<path> = <expected JSON>` per line,
 `#` comments and blanks ignored. General-purpose by construction — any
@@ -1223,7 +1226,7 @@ where the shell form ran `bash <emitter> --emit` in a subprocess, the compiled
 member calls the emitter module's `emit()` **in-process** — which is what
 retires the family's `bash` hop for this member (gate-sdk/SPEC.md §The first
 cohort, and the rule that selects the next). The `CONTEXT_KIT_SURFACES` the
-emitter reads arrives across the config bridge, declared by this member.
+emitter reads is one of context-kit's static knobs, declared by this member.
 
 Bare, it runs the live emitter; a two-argument form
 (`check-footprint-fresh <projection> <emit>`) compares two pre-baked files,
@@ -1238,7 +1241,6 @@ no bare collection total.
 
 ```
 context-kit/
-  lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
   checks/check-brevity.gate      # hermetic, binary-dispatched: the governed sections' over-budget pointer bullets
   checks/check-surface-ratchet.gate # hermetic, binary-dispatched: every governed surface at or below its committed ceiling
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
@@ -1258,18 +1260,19 @@ context-kit/
   index-tests/                   # fixture corpus + expected outputs
   templates/session-context.sh   # consumer copy: marked consumer sections
   templates/settings-sessionstart.json
-  templates/context-config.sh
+  templates/context-config.knobs # comment-only consumer knob file: a pointer to the roster below
   templates/close-brevity.md
   smoke/install.sh
   smoke/violation.sh
 ```
 
-**`lib/context.sh` is now the kit's only library member, and that is a
-discharge rather than a silence.** The one that sat beside it, the sourceable
-owner of the probe roster and the floor predicate, was read on the **installer**
+**The kit carries no `lib/` directory, and that is a discharge rather than a
+silence.** The kit's knob defaults and config refusals live in its static
+defaults table and validator (below). The sourceable
+owner of the probe roster and the floor predicate was read on the **installer**
 path and by `check-install-toolchain`; the installer's behind-invoke relocation
 put both readers in the crate, which emptied its caller set and let it be deleted
-rather than ported (§bin/env-probe). The `lib/pub-lang/` extractors that sat beside it are
+rather than ported (§bin/env-probe). The `lib/pub-lang/` extractors are
 **discharged**: they were the bundled members of the registry `pub-index`
 resolves, and they moved in-crate behind the surviving seam in the cut that
 ported that resolver (§Index-first reading).
@@ -1283,90 +1286,24 @@ env profile — `run-gates.sh --emit env-probe` writes the first `ENV.local.md`
 block (§bin/env-probe); being an operator-local, gitignored surface, no smoke
 asserts it (the stated install step is its enforcement).
 
-Config follows the established kit pattern: copy
-`templates/context-config.sh` into the gates dir (or point
-`CONTEXT_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
-what the consumer left unset, and a set-but-missing `CONTEXT_KIT_CONFIG_FILE`
-exits 2 rather than silently running on defaults. That template and the
-`<gates-dir>/context-config.sh` it seeds are **permanently shell**, each
-carrying the `# no-port:` cause of the class ruling at gate-sdk/SPEC.md §The
-config-seam port disposition. Knobs (this repo's layout as defaults):
-
-### lib/context.sh
-
-**The one home of the consumer-config load and of every knob default above**, a
-sourceable library on the shape every bridged kit loader shares: it loads the consumer
-config first, then defaults each knob the consumer left unset, then refuses a
-malformed value rather than running on it. Every context-kit gate and `bin/` tool
-sources it instead of re-defaulting, which is the single-home form
-`check-knob-default-coupling` asserts and what keeps a shell-side and a bridged
-value one value rather than two.
-
-**The config bridge is what forces a library rather than a convention.**
-gate-sdk's config bridge resolves each declared knob by sourcing one kit's
-library in a subshell, and **exits 2 on a knob that library does not define**
-(gate-sdk/SPEC.md §lib/gate.sh), so a
-`.gate`-dispatched member whose knobs were defaulted inside a check script would
-resolve none of them. That mechanism is indifferent to what any crate links: a
-member receives its knobs this way whatever the binary carries.
-
-**Which is also why it is permanently shell, and it declares so in its own
-header**: being the bridge's sole resolver for the `CONTEXT_KIT_*` knobs is
-exactly the property above, read as a port disposition — gate-sdk/SPEC.md §The
-kit-library port disposition rules the class. The ruling reaches this file alone,
-which after the roster's move is also the whole of what the kit's `lib/` carries.
-
-**Every default here is repo-relative, and that is a bridge requirement rather
-than a style.** A bridged value is baked verbatim into the tracked pre-commit
-hook, so an absolute path would pin one clone's layout into a committed artifact.
-The one knob whose natural value *is* absolute — `CONTEXT_KIT_MEMORY_DIRS`,
-naming a harness directory under `HOME` — defaults to **empty**, and the empty
-value means "derive it" rather than "no dir": the derivation belongs to the one
-member that reads the knob (`native/src/gates/memory_off.rs`), which folds `/`
-and `.` to `-` in the repo toplevel exactly as the harness names each project's
-dir. Deriving it lazily at that reader is also what keeps a `git` subprocess off
-the path of every unrelated knob resolution. The shell library once carried the
-derivation as `context_memory_dir_default()`; it left with the shell gate that
-was its only caller, so the layout rule has one implementation rather than two
-agreeing ones.
-
-**Empty-means-derive has a second member, and the ground is the same one read
-from a different direction.** `CONTEXT_KIT_PUB_LANGS` defaults to empty too, and
-its reason is not that its value is absolute but that no repo-relative literal
-can express it at all: the roster it names is the `pub-index` arm's built-in
-extractor set, which lives in the crate. Transcribing that set into shell would
-be the maintained list derivation-first forbids and a second producer of one
-roster, so the expansion belongs to the arm — the one reader of the knob — and
-the library states the default and stops. **Its sibling `CONTEXT_KIT_PUB_LANG_DIR`
-moved here verbatim** from the deleted dispatcher that held it inline, in the
-commit that deleted it, so the documented default and the supplying site became
-one string; the rule that forced the move is gate-sdk/SPEC.md §The non-gate arm's,
-and it is load-bearing rather than tidy — the bridge resolves a declared knob by
-sourcing exactly this library and **exits 2 on a knob it does not define**, so a
-default left beside the compiled reader would refuse the whole arm.
-
-**`CONTEXT_KIT_HOOK_CMD`'s default moved here on the same rule**, out of the meter
-that held it inline, in the same cut that made the meter an arm — the declaration
-and the default are one change, because a default left beside a compiled reader is
-sourced by nothing and resolves *empty*, which the reader takes as an unset knob
-rather than as an error. The failure would be silent. All three of its properties
-moved with it and none was re-derived: the two candidates stay consumer-first
-(`${GATE_SDK_GATES_DIR:-scripts}/run-gates.sh`, then the sibling kit's
-`bin/run-gates.sh`), `-f` stays the resolution predicate, and the empty string
-stays the unresolvable answer — which is what the meter's `hook 0` branch reads
-and what a consumer vendoring context-kit without a battery front-end depends on.
-The test is on **set-ness** (`-z "${CONTEXT_KIT_HOOK_CMD+x}"`), never on
-emptiness: set-but-empty is a deliberate override and is preserved as one.
-
-**The sibling candidate is de-absolutized against the invoking directory before it
-is stored**, and that is the repo-relative rule above binding on it. The bridge
-sources this library by its absolute kit path, so the candidate composed from the
-library's own location resolves absolute — and the rule binds because the value is a
-*bridged* default, which is what a knob becomes as soon as a compiled member declares
-it. The composed path therefore has a leading working-directory prefix stripped where
-one is present, leaving the shape `<kit>/../gate-sdk/bin/run-gates.sh` and only its
-absoluteness behind. A kit vendored outside the invoking tree has no repo-relative
-spelling, and there the absolute answer is the honest one.
+Config is a **knob file**: copy `templates/context-config.knobs` into the gates dir
+as `context-config.knobs` (or point `CONTEXT_KIT_KNOB_FILE` elsewhere) and set any
+knob below; defaults fill what the file leaves unset. context-kit's knobs are
+**static**: the binary resolves them in process from its own defaults table and the
+consumer's knob file, and the config bridge never carries them (gate-sdk/SPEC.md
+§lib/gate.sh); `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one
+with its shape and rendered default. A gitignored `context-config.local.knobs` in the
+gates dir is the home for a private value a tracked file cannot carry. The grammar,
+that `.local` overlay, the environment-over-file precedence for a scalar, and the
+refusals — a set `CONTEXT_KIT_KNOB_FILE` that does not exist, a left-behind
+`context-config.sh` or `context-config.local.sh`, a non-empty file named by the
+retired `CONTEXT_KIT_CONFIG_FILE`, a retired knob name — are gate-sdk/SPEC.md §The
+knob file's. The kit's table validator refuses a malformed context config at exit 2
+with every finding — a broken config must not gate anything: an empty
+`CONTEXT_KIT_SETTINGS_FILE`, `CONTEXT_KIT_SETTINGS_PINS` or
+`CONTEXT_KIT_BREVITY_FILE`, a non-integer `CONTEXT_KIT_BREVITY_BUDGET`, and the
+set-but-missing settings file below. A derived default below is written in the
+roster's `${NAME}` spelling for the gate-sdk knob it reads. Knobs:
 
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
   `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer
@@ -1379,7 +1316,11 @@ spelling, and there the absolute answer is the honest one.
 - `CONTEXT_KIT_PUB_LANGS` — array naming the `pub-index` extractors to enable;
   default **empty**, and empty means *derive it* rather than *no languages*: the
   one reader of the knob expands it to the arm's built-in extractor roster
-  (§lib/context.sh, the `CONTEXT_KIT_MEMORY_DIRS` shape). Setting it to an
+  (the `CONTEXT_KIT_MEMORY_DIRS` shape below). No literal default can express
+  that roster, which lives in the crate: transcribing it into the table would be
+  the maintained list derivation-first forbids and a second producer of one
+  roster, so the expansion belongs to the arm and the table states the empty
+  default and stops. Setting it to an
   explicitly empty array is therefore the same input as leaving it unset, which
   is the one behaviour the port collapsed — no shipped sentence promised that
   spelling as a way to disable the tool, and a sentinel meaning "none" would mint
@@ -1391,13 +1332,22 @@ spelling, and there the absolute answer is the honest one.
   gate-sdk's set and deliberately not derived from it.
 - `CONTEXT_KIT_PUB_LANG_DIR` — the consumer extractor dir searched before the
   arm's built-in roster (a same-basename file shadows the shipped grammar);
-  default `${GATE_SDK_GATES_DIR:-scripts}/pub-lang`, supplied by
-  §lib/context.sh — the documented default and the supplying site are one string.
-- `CONTEXT_KIT_HOOK_CMD` — command whose output line count approximates
-  the steady-state hook body; default queue-kit's
-  `run-gates.sh --emit queue-index --collapse-deferred` when resolvable, else empty
-  (surfaces only), supplied by §lib/context.sh — the documented default and the
-  supplying site are one string.
+  default `${GATE_SDK_GATES_DIR}/pub-lang`.
+- `CONTEXT_KIT_HOOK_CMD` — the command whose output line count approximates the
+  steady-state hook body (§The always-loaded meter). A **command knob**: an
+  indexed argv, one `CONTEXT_KIT_HOOK_CMD[] = word` line per element, spawned
+  directly with no shell, and taking no environment override; a command that needs
+  shell syntax is written as a `bash`, `-c` and command-string argv. Its default is
+  a derived row: queue-kit's `queue-index` arm through the battery front-end,
+  `("bash" "<candidate>" "--emit" "queue-index" "--collapse-deferred")`, for the
+  first candidate that exists as a file among `${GATE_SDK_GATES_DIR}/run-gates.sh`
+  and `${GATE_SDK_ROOT_HERE}/bin/run-gates.sh` — consumer-first, then the sibling
+  gate-sdk's front-end — else **empty** (surfaces only). The empty answer is what
+  the meter's `hook 0` branch reads and what a consumer vendoring context-kit
+  without a battery front-end depends on; a file line `CONTEXT_KIT_HOOK_CMD =`
+  replaces the default whole with that empty value, a deliberate no-hook override.
+  `--emit knob-roster` renders the first candidate rather than probing a path built
+  from a placeholder (gate-sdk/SPEC.md §The knob file).
 - `CONTEXT_KIT_DRIFT_REPORT` — the **`--emit` arm name** of the consumer's
   drift report, not a path: the hook runs
   `run-gates.sh --emit <name> --trend` for the brief's drift line; default
@@ -1427,7 +1377,7 @@ spelling, and there the absolute answer is the honest one.
   citations in two SPECs and a template.
 - `CONTEXT_KIT_STATE_FILE` — the lifecycle evidence file whose **last data
   line** carries the stage cursor the hook routes on (§The session-context
-  hook); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Read
+  hook); default `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt`. Read
   as a named file, never through stdin — the session-role signal consumes stdin
   exactly once, and a second reader there would starve it.
 - `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file the
@@ -1437,10 +1387,10 @@ spelling, and there the absolute answer is the honest one.
   the session-context hook's identity match reads (§The session-context hook);
   default `${GATE_SDK_TMP_DIR:-.tmp}/session-role` (gitignored scratch).
 - `CONTEXT_KIT_BASELINE_FILE` — default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
+  `${GATE_SDK_WORKFLOW_DIR}/always-loaded-baseline.txt`.
 - `CONTEXT_KIT_STATE_FILE` — the lifecycle state file whose first stamp names the
   iteration-start commit the meter's `--growth` and staleness read (§The always-loaded meter);
-  default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. context-kit's own knob
+  default `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt`. context-kit's own knob
   rather than an import of lifecycle-kit's, so a consumer without lifecycle-kit resolves an
   absent file and keeps the baseline-only reading.
 - `CONTEXT_KIT_GROWTH_PATHS` — array of git pathspecs the meter's `--growth`
@@ -1448,7 +1398,7 @@ spelling, and there the absolute answer is the honest one.
   fixture copies here, since a copy's growth is its source's.
 - `CONTEXT_KIT_CEILING_FILE` — the ratchet's committed ceilings
   (§The surface ratchet); default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/surface-ceiling.txt`. Its own file rather
+  `${GATE_SDK_WORKFLOW_DIR}/surface-ceiling.txt`. Its own file rather
   than a row in the baseline, because `--update-baseline` rewrites that file as
   one row and would erase a ceiling at every close.
 - `CONTEXT_KIT_RATCHET_PATHS` — array of git pathspecs naming the
@@ -1462,40 +1412,48 @@ spelling, and there the absolute answer is the honest one.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
 - `CONTEXT_KIT_BREVITY_SECTIONS` — array of headings of the budgeted bullet
   sections; default `("## Shared conventions")`, a one-element set. It replaces
-  the retired scalar `CONTEXT_KIT_BREVITY_SECTION`, which **`lib/context.sh`
-  refuses (exit 2, naming the replacement) when set**, for the reason
-  `CONTEXT_KIT_SETTINGS_FILE`'s refusal lives there: once values cross the config
-  bridge a compiled reader sees only declared knobs, the retired name is not
-  one, and without the refusal a config still setting it would be silently
-  ignored while a file carrying `## Shared conventions` was governed on the wrong
-  section at exit 0 (the retired `GATE_SDK_GRAPH_THEME` precedent,
-  gate-sdk/SPEC.md §check-graph). A scalar and a one-element array cross the
-  bridge as the same value, so the member reads the set through the bridge's
-  array read. This repo governs the conventions block and `## Housekeeping`.
+  the retired scalar `CONTEXT_KIT_BREVITY_SECTION`, a **retired name** in the
+  kit table: a knob-file line naming it, or the name exported in the environment,
+  is refused at exit 2 naming the replacement (gate-sdk/SPEC.md §The knob file).
+  Without the refusal a config still setting it would be silently ignored while a
+  file carrying `## Shared conventions` was governed on the wrong section at exit 0
+  (the retired `GATE_SDK_GRAPH_THEME` precedent, gate-sdk/SPEC.md §check-graph).
+  This repo governs the conventions block and `## Housekeeping`.
 - `CONTEXT_KIT_BREVITY_BUDGET` — lines per bullet; default `4`.
 - `CONTEXT_KIT_BREVITY_POINTER_RE` — the "cites a deeper doc" pattern;
   default `§`.
 - `CONTEXT_KIT_SETTINGS_FILE` — the tracked harness settings file
   check-settings-pins and check-settings-paths each verify, on a different
   invariant, and whose `.local.json` sibling check-memory-off scans; default
-  `.claude/settings.json`. **Explicitly setting it to a path that does not exist
-  is refused (exit 2) by `lib/context.sh` at resolution time**, while leaving it
-  unset and having no file at the default path is not-adopted and degrades at
-  each reader. The refusal lives in the library because that is the last place
-  *set-ness* is visible: once the value crosses gate-sdk's config bridge a
-  compiled reader sees one path string and cannot tell the misconfigured case
-  from the unadopted one. Emptiness is **not** the signal here — the config
-  validation below rejects an empty value as malformed, an invariant older than
-  the bridge — which is why this knob refuses where `DRIFT_KIT_KPIS_FILE`
-  resolves empty (drift-kit/SPEC.md §lib/drift.sh).
+  `.claude/settings.json`. **Explicitly setting it to a path that is not a file
+  is refused (exit 2) by the kit's table validator**, which reads the value's
+  origin beside it: a value from the environment, the local overlay or the tracked
+  knob file is set, while the default with no file at its path is not-adopted and
+  degrades at each reader. A reader sees one path string and cannot tell the
+  misconfigured case from the unadopted one, so the refusal belongs where the
+  origin is visible. Emptiness is **not** the signal here — the validator rejects
+  an empty value as malformed — which is why this knob's not-adopted default is a
+  path that may be absent, where `DRIFT_KIT_KPIS_FILE` resolves empty at its
+  not-adopted default (drift-kit/SPEC.md §Layout and configuration).
 - `CONTEXT_KIT_SETTINGS_PINS` — the pins manifest; default
-  `${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf`.
+  `${GATE_SDK_GATES_DIR}/settings-pins.conf`.
 - `CONTEXT_KIT_MEMORY_DIRS` — space-separated glob list of harness memory dirs
-  check-memory-off scans; default the current project's dir under the operator's
-  home, `$HOME/.claude/projects/<slug>/memory`, where `<slug>` is the project's
+  check-memory-off scans; default **empty**, and empty means *derive it* rather
+  than *no dir*: the current project's dir under the operator's home,
+  `$HOME/.claude/projects/<slug>/memory`, where `<slug>` is the project's
   absolute path with every `/` and `.` folded to `-` (the harness's own
-  encoding). A knob because the layout moves: design against the live layout,
-  keep it config.
+  encoding). The derivation belongs to the one member that reads the knob
+  (`native/src/gates/memory_off.rs`): a table row cannot name `HOME` as an input,
+  and deriving lazily at that reader keeps a `git` subprocess off the path of every
+  unrelated knob resolution. A knob because the layout moves: design against the
+  live layout, keep it config.
+
+`CONTEXT_KIT_DRIFT_REPORT`, `CONTEXT_KIT_STAGE_RULES` and
+`CONTEXT_KIT_SESSION_ROLE_FILE` have **no table row** and are not knob-file knobs:
+the consumer's copy of `templates/session-context.sh` reads them from its own
+environment, falling back to the defaults stated above, and reads
+`CONTEXT_KIT_STATE_FILE`, `CONTEXT_KIT_MEMORY_DIRS` and
+`CONTEXT_KIT_ENV_PROFILE_FILE` the same way beside their rows.
 
 The hook template itself is consumer-edited rather than knob-driven (the
 guard-kit guard precedent): its variation points are layout judgment,
@@ -1692,13 +1650,13 @@ sourcer, which has since ported too and emptied that set
 **Everything after the vendoring is the arm's own, and the step a port most
 easily loses is the regeneration ordering.** Each kit's `install.sh` already
 wrote the hook and `CHECK-GRAPH.html`, but that write ran before
-`scripts/canon-config.sh` existed, so the baked `# graph:` derivation used
+`scripts/canon-config.knobs` existed, so the baked `# graph:` derivation used
 canon-kit's bare default rather than the `AGENTS.md`-widened manifest set. The
 arm regenerates both **under the same env the battery will run with** —
-`LIFECYCLE_KIT_AGENT_FILE` and `CANON_KIT_CONFIG_FILE`, which ride the
+`LIFECYCLE_KIT_AGENT_FILE` and `CANON_KIT_KNOB_FILE`, which ride the
 environment of every spawned battery run because the lifecycle knob is scalar
 with no default config file and canon resolves its manifest only through its
-config file — or `check-graph` reds the AGENTS.md consumer on a hook stale by
+knob file — or `check-graph` reds the AGENTS.md consumer on a hook stale by
 construction. A regeneration step the arm could not complete is exit 2, the
 harness-precondition code: it is the arm's own construction and not a finding
 about the consumer.
@@ -1758,7 +1716,7 @@ one way this port could have passed while destroying the thing it ported.
 
 **Three sub-behaviours no golden holds each assert in the arm**, named because a
 port loses these first. The **consumer-shadowing case** writes its scratch
-`rust.sh` to disk and passes `CONTEXT_KIT_CONFIG_FILE` into a *spawned* child —
+`rust.sh` to disk and passes `CONTEXT_KIT_KNOB_FILE` into a *spawned* child —
 resolving that knob for the arm itself would hand it this repo's posture instead
 of the one it is constructing, the rule this section already states for the
 AGENTS.md smoke's six-knob set. The **refusal case** asserts exit 2, the usage

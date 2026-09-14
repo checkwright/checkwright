@@ -45,7 +45,7 @@ pub fn run(payload: Option<&Value>) -> i32 {
         Ok(v) => v,
         Err(e) => return hook::decline("subagent-stop-liveness", &e),
     };
-    let liveness_cmd = match walk::knob_scalar("DELEGATION_KIT_LIVENESS_CMD") {
+    let liveness_cmd = match walk::knob_array("DELEGATION_KIT_LIVENESS_CMD") {
         Ok(v) => v,
         Err(e) => return hook::decline("subagent-stop-liveness", &e),
     };
@@ -189,24 +189,31 @@ fn top_level_keys(payload: Option<&Value>) -> String {
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the reader argv, resolved once for
-// both the spawn and the refusal text: an unset knob is the DEFAULT and an override is spawned
-// directly, no interpreter word.
-fn reader_argv(cmd: &str, run_dir: &str) -> Option<Vec<String>> {
-    if cmd.is_empty() {
+// both the spawn and the refusal text: an empty knob is the DEFAULT and an override is its own argv,
+// the scratch dir appended.
+fn reader_argv(cmd: &[String], run_dir: &str) -> Option<Vec<String>> {
+    let Some(program) = cmd.first() else {
         let exe = std::env::current_exe().ok()?;
         return Some(vec![
             exe.display().to_string(),
             "check-producer-liveness".to_string(),
             run_dir.to_string(),
         ]);
-    }
-    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — executability rather than mere
-    // file-ness is the override's resolution predicate now that no interpreter word is prepended:
-    // an override without the bit cannot be spawned, so it resolves to no reader at all.
-    if !proc::is_executable(std::path::Path::new(cmd)) {
+    };
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — executability is the override's
+    // resolution predicate: a first element naming no executable program cannot be spawned, so it
+    // resolves to no reader at all.
+    let runnable = if program.contains('/') || program.contains('\\') {
+        proc::is_executable(std::path::Path::new(program))
+    } else {
+        proc::which(program).is_some()
+    };
+    if !runnable {
         return None;
     }
-    Some(vec![cmd.to_string(), run_dir.to_string()])
+    let mut argv = cmd.to_vec();
+    argv.push(run_dir.to_string());
+    Some(argv)
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — what a resolved reader yielded: its
@@ -339,7 +346,7 @@ mod tests {
         // comment-tier-exempt: a reader stub's resolved argv, one per exit class — the case table's own shape
         fn reader(&self, name: &str, code: i32) -> Vec<String> {
             let p = self.stub(name, &format!("exit {}", code));
-            reader_argv(&p, &self.at("runs")).expect("an executable stub must resolve")
+            reader_argv(&[p], &self.at("runs")).expect("an executable stub must resolve")
         }
         fn record(&self, name: &str) {
             std::fs::write(self.0.join("runs").join(name), "pid=1 run=k\n").expect("record");
@@ -548,7 +555,7 @@ mod tests {
             "reader-race",
             &format!("printf 'pid=1 run=r\\n' > {}/r.run\nexit 2", s.at("runs")),
         );
-        let stub = reader_argv(&path, &s.at("runs")).expect("an executable stub must resolve");
+        let stub = reader_argv(std::slice::from_ref(&path), &s.at("runs")).expect("an executable stub must resolve");
         let f = fire(payload(PAYLOAD).as_ref(), &s.at("race.log"), Some(&stub), &s.at("runs"));
         assert_eq!(f.code, 2, "{}", s.log("race.log"));
         want(&s.log("race.log"), "race", &["verdict=corrupt", "records=1", "decision=refuse"]);
@@ -562,7 +569,7 @@ mod tests {
         let s = Scratch::new("unstarted");
         s.record("k.run");
         let path = s.script("reader-unstarted", "#!/nonexistent/interpreter\nexit 1\n");
-        let reader = reader_argv(&path, &s.at("runs")).expect("an executable stub must resolve");
+        let reader = reader_argv(std::slice::from_ref(&path), &s.at("runs")).expect("an executable stub must resolve");
         let f = fire(payload(PAYLOAD).as_ref(), &s.at("n.log"), Some(&reader), &s.at("runs"));
         let line = s.log("n.log");
         assert_eq!(f.code, 0, "an unstarted reader allows: {}", line);
@@ -582,7 +589,7 @@ mod tests {
     fn an_unresolvable_override_is_unavailable_and_allows() {
         let s = Scratch::new("absent");
         s.record("k.run");
-        let reader = reader_argv(&s.at("nowhere/check.sh"), &s.at("runs"));
+        let reader = reader_argv(&[s.at("nowhere/check.sh")], &s.at("runs"));
         assert!(reader.is_none(), "a path that is not there resolves to no reader");
         let f = fire(payload(PAYLOAD).as_ref(), &s.at("g.log"), reader.as_deref(), &s.at("runs"));
         assert_eq!(f.code, 0, "{}", s.log("g.log"));
@@ -595,7 +602,7 @@ mod tests {
     // the argv is the binary, the gate name and the run dir.
     #[test]
     fn an_unset_knob_resolves_the_running_executable_and_the_gate_name() {
-        let argv = reader_argv("", "/run/dir").expect("the default must resolve");
+        let argv = reader_argv(&[], "/run/dir").expect("the default must resolve");
         let exe = std::env::current_exe().expect("a running test has an executable");
         assert_eq!(
             argv,
@@ -612,7 +619,7 @@ mod tests {
         let s = Scratch::new("override-argv");
         let exec = s.stub("with-bit", "exit 0");
         assert_eq!(
-            reader_argv(&exec, "/run/dir").expect("an executable override must resolve"),
+            reader_argv(std::slice::from_ref(&exec), "/run/dir").expect("an executable override must resolve"),
             vec![exec.clone(), "/run/dir".to_string()],
             "argv[0] is the override itself, and the run dir is its only argument"
         );
@@ -620,8 +627,17 @@ mod tests {
         let plain = s.at("no-bit");
         std::fs::write(&plain, "#!/usr/bin/env bash\nexit 0\n").expect("stub must be writable");
         assert!(
-            reader_argv(&plain, "/run/dir").is_none(),
+            reader_argv(std::slice::from_ref(&plain), "/run/dir").is_none(),
             "an override without the executable bit cannot be spawned, so it resolves to no reader"
+        );
+        assert_eq!(
+            reader_argv(&["bash".to_string(), plain.clone()], "/run/dir").expect("an interpreter on PATH resolves"),
+            vec!["bash".to_string(), plain.clone(), "/run/dir".to_string()],
+            "an argv may name its interpreter, and the run dir follows its last element"
+        );
+        assert!(
+            reader_argv(&["checkwright-no-such-program".to_string()], "/run/dir").is_none(),
+            "a first element naming no program on PATH resolves to no reader"
         );
     }
 

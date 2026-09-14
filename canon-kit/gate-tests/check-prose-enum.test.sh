@@ -33,21 +33,25 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4..=env assignments
 # The empty default is a clean skip: no declared sets, nothing to check.
 check_case "empty-default-skip" 0 "CANON_KIT_ENUM_SETS_CMD unset"
 
-cat >"$SANDBOX/three.sh" <<'EOF'
-CANON_KIT_ENUM_SETS_CMD='printf "sig\talpha\nsig\tbeta\nsig\tgamma\n"'
+cat >"$SANDBOX/three.knobs" <<'EOF'
+CANON_KIT_ENUM_SETS_CMD[] = printf
+CANON_KIT_ENUM_SETS_CMD[] = sig\talpha\nsig\tbeta\nsig\tgamma\n
 EOF
 
 # Fail-closed: a sets command that errors is treated as failure, never a false clean.
-cat >"$SANDBOX/boom.sh" <<'EOF'
-CANON_KIT_ENUM_SETS_CMD='echo hi; exit 4'
+cat >"$SANDBOX/boom.knobs" <<'EOF'
+CANON_KIT_ENUM_SETS_CMD[] = bash
+CANON_KIT_ENUM_SETS_CMD[] = -c
+CANON_KIT_ENUM_SETS_CMD[] = echo hi; exit 4
 EOF
-check_case "cmd-error-fail-closed" 2 "" CANON_KIT_CONFIG_FILE="$SANDBOX/boom.sh"
+check_case "cmd-error-fail-closed" 2 "" CANON_KIT_KNOB_FILE="$SANDBOX/boom.knobs"
 
 # Fail-closed: an emitted line with no tab does not parse.
-cat >"$SANDBOX/notab.sh" <<'EOF'
-CANON_KIT_ENUM_SETS_CMD='printf "sig-no-tab-here\n"'
+cat >"$SANDBOX/notab.knobs" <<'EOF'
+CANON_KIT_ENUM_SETS_CMD[] = printf
+CANON_KIT_ENUM_SETS_CMD[] = sig-no-tab-here\n
 EOF
-check_case "cmd-unparsable-fail-closed" 2 "" CANON_KIT_CONFIG_FILE="$SANDBOX/notab.sh"
+check_case "cmd-unparsable-fail-closed" 2 "" CANON_KIT_KNOB_FILE="$SANDBOX/notab.knobs"
 
 # Bracketed matching: the same member reads inside [alpha] tag syntax, so a
 # bracketed hand list that drops gamma trips just as a bare list does — the path
@@ -57,7 +61,7 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 
 The `[alpha]`/`[beta]` tags are the pair, a bracketed hand list.
 EOF
-check_case "bracketed-incomplete-trips" 1 "but omits: gamma" CANON_KIT_CONFIG_FILE="$SANDBOX/three.sh"
+check_case "bracketed-incomplete-trips" 1 "but omits: gamma" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
 
 # A complete bracketed hand list names every member, so it is clean.
 cat >"$SANDBOX/SPEC.md" <<'EOF'
@@ -65,7 +69,7 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 
 The `[alpha]`, `[beta]`, `[gamma]` tags are the whole set.
 EOF
-check_case "bracketed-complete-clean" 0 "PROSE-ENUM: clean" CANON_KIT_CONFIG_FILE="$SANDBOX/three.sh"
+check_case "bracketed-complete-clean" 0 "PROSE-ENUM: clean" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
 
 # Scattered mentions are not a hand list: two members far apart in one paragraph
 # with non-separator prose between them never engage.
@@ -74,20 +78,21 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 
 alpha opens the run; only much later, after unrelated prose, does beta close it.
 EOF
-check_case "scattered-mentions-clean" 0 "PROSE-ENUM: clean" CANON_KIT_CONFIG_FILE="$SANDBOX/three.sh"
+check_case "scattered-mentions-clean" 0 "PROSE-ENUM: clean" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
 
 # Multi-set independence: one complete set is clean while another incomplete set
 # in the same paragraph trips, and the finding names only the drifted set.
-cat >"$SANDBOX/two.sh" <<'EOF'
-CANON_KIT_ENUM_SETS_CMD='printf "col\tred\ncol\tgreen\nsig\talpha\nsig\tbeta\nsig\tgamma\n"'
+cat >"$SANDBOX/two.knobs" <<'EOF'
+CANON_KIT_ENUM_SETS_CMD[] = printf
+CANON_KIT_ENUM_SETS_CMD[] = col\tred\ncol\tgreen\nsig\talpha\nsig\tbeta\nsig\tgamma\n
 EOF
 cat >"$SANDBOX/SPEC.md" <<'EOF'
 # two sets
 
 The colors red, green are complete; the signals alpha, beta drop one.
 EOF
-check_case "multiset-only-drifted-trips" 1 "set 'sig' lists 2 of 3" CANON_KIT_CONFIG_FILE="$SANDBOX/two.sh"
-out="$(cd "$SANDBOX" && gate_env CANON_KIT_CONFIG_FILE="$SANDBOX/two.sh" \
+check_case "multiset-only-drifted-trips" 1 "set 'sig' lists 2 of 3" CANON_KIT_KNOB_FILE="$SANDBOX/two.knobs"
+out="$(cd "$SANDBOX" && gate_env CANON_KIT_KNOB_FILE="$SANDBOX/two.knobs" \
     && gate_run check-prose-enum "$DIR/checks" 2>&1)"
 if grep -qF -- "set 'col'" <<<"$out"; then
     echo "  FAIL [multiset-complete-quiet]: the complete 'col' set was flagged:"
@@ -100,7 +105,7 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 
 Common signals such as alpha, beta cover most runs.
 EOF
-check_case "subset-marker-escape" 0 "PROSE-ENUM: clean" CANON_KIT_CONFIG_FILE="$SANDBOX/three.sh"
+check_case "subset-marker-escape" 0 "PROSE-ENUM: clean" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
 
 # The partitive marker escapes: a selection from the set is not an enumeration of it.
 cat >"$SANDBOX/SPEC.md" <<'EOF'
@@ -108,7 +113,7 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 
 On startup any of alpha, beta may fire before the rest.
 EOF
-check_case "partitive-marker-escape" 0 "PROSE-ENUM: clean" CANON_KIT_CONFIG_FILE="$SANDBOX/three.sh"
+check_case "partitive-marker-escape" 0 "PROSE-ENUM: clean" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
 
 # The per-site marker escapes on the line above the offending list.
 cat >"$SANDBOX/SPEC.md" <<'EOF'
@@ -117,21 +122,22 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 <!-- prose-enum-exempt: alpha and beta are the fast pair, gamma the fallback -->
 The fast pair alpha/beta short-circuits.
 EOF
-check_case "per-site-exempt-escape" 0 "PROSE-ENUM: clean" CANON_KIT_CONFIG_FILE="$SANDBOX/three.sh"
+check_case "per-site-exempt-escape" 0 "PROSE-ENUM: clean" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
 
 # The identifier boundary: an underscore separates two names, so a member must
 # not read as present inside a longer sibling. Only a declared set can hold
 # underscore members, so the pair — which runs on the repo's own hyphenated
 # config — cannot reach this at all.
-cat >"$SANDBOX/guards.sh" <<'EOF'
-CANON_KIT_ENUM_SETS_CMD='printf "guard\tguard_allow\nguard\tguard_allow_match\nguard\tguard_deny\n"'
+cat >"$SANDBOX/guards.knobs" <<'EOF'
+CANON_KIT_ENUM_SETS_CMD[] = printf
+CANON_KIT_ENUM_SETS_CMD[] = guard\tguard_allow\nguard\tguard_allow_match\nguard\tguard_deny\n
 EOF
 cat >"$SANDBOX/SPEC.md" <<'EOF'
 # prefix sibling
 
 The guard_allow_match, guard_deny pair covers the whole surface.
 EOF
-check_case "prefix-sibling-trips" 1 "but omits: guard_allow" CANON_KIT_CONFIG_FILE="$SANDBOX/guards.sh"
+check_case "prefix-sibling-trips" 1 "but omits: guard_allow" CANON_KIT_KNOB_FILE="$SANDBOX/guards.knobs"
 
 # The mirror: spelled in its own right the member is present, so the boundary is
 # a boundary and not a blanket non-match.
@@ -140,7 +146,7 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 
 The guard_allow, guard_allow_match, guard_deny trio is the whole surface.
 EOF
-check_case "prefix-sibling-complete-clean" 0 "PROSE-ENUM: clean" CANON_KIT_CONFIG_FILE="$SANDBOX/guards.sh"
+check_case "prefix-sibling-complete-clean" 0 "PROSE-ENUM: clean" CANON_KIT_KNOB_FILE="$SANDBOX/guards.knobs"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-prose-enum.test.sh: $fails case(s) failed"

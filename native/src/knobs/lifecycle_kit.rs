@@ -124,6 +124,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE", ""),
     ],
     validate: Some(("stage-machine config", validate)),
+    open_family: false,
+    retired: &[],
 };
 
 fn positive(v: &str) -> bool {

@@ -1,6 +1,6 @@
 // spec: canon-kit/SPEC.md §check-prose-enum — within one manifest-prose paragraph, naming
 // two or more members of a declared governed set must name every member, unless an exempt
-// site holds; the vocabulary arrives as bridged data, never from an emitter spawned here
+// site holds; the vocabulary is the consumer command's output, spawned once through the adapter
 use crate::spec;
 use std::path::Path;
 
@@ -25,26 +25,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(root).is_dir() {
         return Err(format!("not a directory: {}", root));
     }
-    if spec::knob_pub("CANON_KIT_ENUM_SETS_CMD")?.is_empty() {
+    if spec::command("CANON_KIT_ENUM_SETS_CMD")?.is_empty() {
         println!("PROSE-ENUM: clean (CANON_KIT_ENUM_SETS_CMD unset — no declared sets to check)");
         return Ok(0);
     }
-    let names = spec::knob_array_pub("CANON_KIT_ENUM_SET_NAMES")?;
-    let members = spec::knob_array_pub("CANON_KIT_ENUM_SET_MEMBERS")?;
-    if names.len() != members.len() {
-        return Err(format!(
-            "the bridged enum vocabulary is not index-aligned: {} set name(s) against {} \
-             member(s) — the config bridge could not carry it; treating as failure (not clean)",
-            names.len(),
-            members.len()
-        ));
-    }
-    if names.is_empty() {
+    let lines = spec::enum_sets()?;
+    if lines.is_empty() {
         println!("PROSE-ENUM: clean (CANON_KIT_ENUM_SETS_CMD declared no members)");
         return Ok(0);
     }
     let mut sets: Vec<Set> = Vec::new();
-    for (n, m) in names.iter().zip(members.iter()) {
+    for (n, m) in &lines {
         match sets.iter_mut().find(|s| &s.name == n) {
             Some(s) => {
                 s.members.push(m.clone());

@@ -1,0 +1,3 @@
+# The candidate glob the finder discriminates: the slot-free cand-tmpl.md is
+# included, so its dangling citation is scanned and reddens.
+CANON_KIT_PROSE_SURFACE_GLOBS[] = cand-*.md

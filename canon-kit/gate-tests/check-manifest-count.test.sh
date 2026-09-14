@@ -23,9 +23,9 @@ trap 'rm -rf "$SANDBOX"' EXIT
 
 fails=0
 
-cat >"$SANDBOX/cfg.sh" <<'EOF'
-CANON_KIT_COUNT_COLLECTIONS=("contracts")
-CANON_KIT_COUNT_ALLOWED_PHRASES=("the four contracts")
+cat >"$SANDBOX/cfg.knobs" <<'EOF'
+CANON_KIT_COUNT_COLLECTIONS[] = contracts
+CANON_KIT_COUNT_ALLOWED_PHRASES[] = the four contracts
 EOF
 
 cat >"$SANDBOX/SPEC.md" <<'EOF'
@@ -52,9 +52,9 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4..=env assignments
 # Consumer governs "contracts": the growing "six contracts" total trips, while
 # the allowlisted fixed set "the four contracts" is exempt — so the run fails
 # on the growing total and its message never names the allowlisted phrase.
-check_case "governed-noun-trips" 1 "six contracts" CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh"
+check_case "governed-noun-trips" 1 "six contracts" CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs"
 
-out="$(cd "$SANDBOX" && gate_env CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh" \
+out="$(cd "$SANDBOX" && gate_env CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" \
     && gate_run check-manifest-count "$DIR/checks" 2>&1)"
 if grep -qF -- "four contracts" <<<"$out"; then
     echo "  FAIL [allowlist-exempt]: allowlisted 'the four contracts' was flagged:"

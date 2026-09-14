@@ -50,9 +50,9 @@ cat >"$SANDBOX/src.sh" <<'EOF'
 echo hi
 EOF
 
-cat >"$SANDBOX/cfg.sh" <<'EOF'
-CANON_KIT_DEPRECATION_MARKERS=('@deprecated')
-CANON_KIT_COMMENT_SURFACE=("*.sh")
+cat >"$SANDBOX/cfg.knobs" <<'EOF'
+CANON_KIT_DEPRECATION_MARKERS[] = @deprecated
+CANON_KIT_COMMENT_SURFACE[] = *.sh
 EOF
 
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4..=env assignments
@@ -76,12 +76,12 @@ check_case "empty-roster-skip" 0 "no CANON_KIT_DEPRECATION_MARKERS configured"
 
 # Configured roster: the live-bound marker resolves while all three failure
 # classes trip, each named with its offending slug.
-check_case "stale-done-slug"  1 "task: done-teardown is done"       CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh"
-check_case "absent-slug"      1 "no live task 'ghost-teardown'"     CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh"
-check_case "unbound-marker"   1 "no 'task: <slug>' binding"         CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh"
+check_case "stale-done-slug"  1 "task: done-teardown is done"       CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs"
+check_case "absent-slug"      1 "no live task 'ghost-teardown'"     CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs"
+check_case "unbound-marker"   1 "no 'task: <slug>' binding"         CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs"
 
 # The live-bound marker never appears in the findings — a resolved slug is clean.
-out="$(cd "$SANDBOX" && gate_env CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh" && gate_run check-deprecation-task "$DIR/checks" 2>&1)"
+out="$(cd "$SANDBOX" && gate_env CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" && gate_run check-deprecation-task "$DIR/checks" 2>&1)"
 if grep -qF -- "live-teardown" <<<"$out"; then
     echo "  FAIL [live-bound-clean]: a resolved marker was flagged:"; printf '    %s\n' "$out"
     fails=$((fails + 1))
@@ -89,7 +89,7 @@ fi
 
 # An unreadable queue is a fail-closed harness error (exit 2), never a silent pass.
 check_case "queue-missing-fail-closed" 2 "queue file not found" \
-    CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh" CANON_KIT_QUEUE_FILE="$SANDBOX/nope.md"
+    CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" CANON_KIT_QUEUE_FILE="$SANDBOX/nope.md"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-deprecation-task.test.sh: $fails case(s) failed"

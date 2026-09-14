@@ -6,10 +6,10 @@ use crate::emit::always_loaded;
 
 const LABEL: &str = "always-loaded";
 
-// spec: drift-kit/SPEC.md §Bundled KPIs — the presence witness is the library, never the surface
-// the measurement reads: `lib/context.sh` carries `# no-port:` on the sole-resolver ground, so no
-// later cut can delete it out from under this row.
-const WITNESS: &str = "lib/context.sh";
+// spec: drift-kit/SPEC.md §Bundled KPIs — the presence witness is the kit's config template, never
+// the surface the measurement reads: a knob file is no port candidate, so no later cut can delete
+// it out from under this row.
+const WITNESS: &str = "templates/context-config.knobs";
 
 pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
     if sibling_tool(&ctx.kit_roots, WITNESS).is_none() {

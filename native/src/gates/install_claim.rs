@@ -24,14 +24,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // install-section regex are consumer config with no kit default, so either left empty is
     // the clean skip for a consumer that documents no install path
     let section_re = spec::knob_pub("CANON_KIT_INSTALL_SECTION_RE")?;
-    if spec::knob_pub("CANON_KIT_INSTALL_TRANSPORTS_CMD")?.is_empty() || section_re.is_empty() {
+    if spec::command("CANON_KIT_INSTALL_TRANSPORTS_CMD")?.is_empty() || section_re.is_empty() {
         println!("INSTALL-CLAIM: clean (no transport vocabulary or install-section regex configured — nothing to hold)");
         return Ok(0);
     }
-    let transports = spec::claim_vocabulary(
-        "CANON_KIT_INSTALL_TRANSPORT_IDS",
-        "CANON_KIT_INSTALL_TRANSPORT_PATTERNS",
-    )?;
+    let transports = spec::claim_vocabulary("CANON_KIT_INSTALL_TRANSPORTS_CMD")?;
     if transports.is_empty() {
         println!("INSTALL-CLAIM: clean (CANON_KIT_INSTALL_TRANSPORTS_CMD declared no transports)");
         return Ok(0);

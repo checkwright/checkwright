@@ -42,7 +42,7 @@ A page's `title:` is its terse nav label; its opening H1 carries the descriptive
 full form (nav stays scannable, the page reads whole). Living pages are governed
 prose under the anti-restatement doctrine (cite downward, never restate a SPEC's
 invariant); dated `docs/posts/` are immutable, temporal-exempt but still
-link/command-resolved (`scripts/canon-config.sh`). A page off-nav by design joins
+link/command-resolved (`scripts/canon-config.knobs`). A page off-nav by design joins
 `scripts/docs-offnav.list` — an embedded data fragment no link targets, or
 maintainer governance like this page reached only by citation.
 

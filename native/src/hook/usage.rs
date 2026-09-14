@@ -53,6 +53,38 @@ impl Snapshot {
     }
 }
 
+// spec: delegation-kit/SPEC.md §Layout and configuration — the three harness paths, each empty knob
+// derived here: the usage file under the harness's config home, the credentials file beside it, and
+// the account config under the home directory
+#[derive(Default)]
+pub struct Paths {
+    pub usage_file: String,
+    pub cred_file: String,
+    pub account_config: String,
+}
+
+pub fn paths() -> Result<Paths, String> {
+    let k = crate::walk::knob_scalar;
+    let var = |n: &str| std::env::var(n).unwrap_or_default();
+    let home = var("HOME");
+    let mut p = Paths {
+        usage_file: k("DELEGATION_KIT_USAGE_FILE")?,
+        cred_file: k("DELEGATION_KIT_CRED_FILE")?,
+        account_config: k("DELEGATION_KIT_ACCOUNT_CONFIG")?,
+    };
+    if p.usage_file.is_empty() {
+        p.usage_file = format!("{}/usage.txt", crate::sessions::config_home(&var("CLAUDE_CONFIG_DIR"), &home));
+    }
+    if p.cred_file.is_empty() {
+        let dir = p.usage_file.rsplit_once('/').map_or(p.usage_file.as_str(), |(d, _)| d);
+        p.cred_file = format!("{}/.credentials.json", dir);
+    }
+    if p.account_config.is_empty() {
+        p.account_config = format!("{}/.claude.json", home);
+    }
+    Ok(p)
+}
+
 // spec: delegation-kit/SPEC.md §The usage.txt contract — one string field of a JSON file by object
 // path, empty where the file is unreadable, unparseable or carries no such field; `jq -r '<path>
 // // empty' <file> 2>/dev/null`, which is how both members read the credential and account files.

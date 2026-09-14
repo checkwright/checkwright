@@ -240,7 +240,6 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-trajectory",
         Arm::Emit(trajectory::emit),
         &[
-            "DRIFT_KIT_CONFIG_FILE",
             "DRIFT_KIT_TRAJECTORY_SURFACES",
             "DRIFT_KIT_GATES_FILE",
             "DRIFT_KIT_STAGES",
@@ -443,7 +442,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: drift-kit/SPEC.md §The stage-economics meter — an `Arm::Emit` on the variant's own
     // test: the meter is advisory and exit is always 0, so no `1` is load-bearing. Its roster is
-    // the meter's own seven knobs, every one of them defined in drift-kit's `lib/drift.sh`.
+    // the meter's own seven knobs, every one of them a row of drift-kit's table.
     (
         "--emit-stage-economics",
         Arm::Emit(stage_economics::emit),
@@ -505,7 +504,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: context-kit/SPEC.md §bin/env-probe — an action that reports, so an `Arm::Emit`: both
     // its failures are already exit 2, which is the variant's own collapse. Its one declared knob
-    // is resolved out of `lib/context.sh`, the config bridge's sole resolver for that family.
+    // is a row of context-kit's table.
     (
         "--emit-env-probe",
         Arm::Emit(env_probe::emit),
@@ -809,12 +808,12 @@ mod tests {
     // near-miss spelling resolves to nothing rather than to a different member
     #[test]
     fn an_arm_resolves_only_under_its_own_flag() {
-        assert!(lookup("--emit-footprint").is_some());
-        assert!(lookup("footprint").is_none());
-        assert!(lookup("--emit-footprints").is_none());
+        assert!(lookup("--emit-enum-sets").is_some());
+        assert!(lookup("enum-sets").is_none());
+        assert!(lookup("--emit-enum-set").is_none());
         assert_eq!(
-            knobs("--emit-footprint", &[]),
-            Some(vec!["CONTEXT_KIT_SURFACES"])
+            knobs("--emit-enum-sets", &[]),
+            Some(vec!["GATE_KIT_ROOTS_REL"])
         );
     }
 
@@ -826,7 +825,7 @@ mod tests {
         let bare = knobs("--run", &[]).expect("--run is not in the bridged-arm table");
         assert!(bare.contains(&"GATE_SDK_TMP_DIR"), "the arm's own knob is missing");
         assert!(
-            !bare.contains(&"CANON_KIT_SPEC_NAME"),
+            !bare.contains(&"EVIDENCE_KIT_BASELINE_FILE"),
             "an unregistered member's knob rode an unscoped union"
         );
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
@@ -836,7 +835,7 @@ mod tests {
         ];
         let scoped = knobs("--run", &here).expect("--run is not in the bridged-arm table");
         assert!(
-            scoped.contains(&"CANON_KIT_SPEC_NAME"),
+            scoped.contains(&"EVIDENCE_KIT_BASELINE_FILE"),
             "a registered member's knob is missing from the scoped union"
         );
         let mut sorted = scoped.clone();

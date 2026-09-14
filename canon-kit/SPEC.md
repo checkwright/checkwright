@@ -141,7 +141,7 @@ A bullet's entry is the bullet line plus its indented continuation — the same
 wrap-straddling boundary `check-amendment-update-target` crosses, for the same
 reason: a citation that wrapped across a newline is still one subject. The valve
 is `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first line or the
-one above, riding the shared exempt window (§lib/spec.sh) with a mandatory
+one above, riding the shared exempt window (§The shared spec adapters) with a mandatory
 reason; an exempt bullet leaves the declared-spelling count as well as the
 finding, so a reader of the clean line is never looking at a count that silently
 shrank. The **work-class tag** is outside this grammar for the reason it is
@@ -354,14 +354,14 @@ path.
 
 Brand tokens and generic vocabulary sit on opposite sides of a seam. Brand
 tokens carry the kit's identity and move with the kit name: the kit dir
-(`canon-kit/`), the `CANON_KIT_` env-knob prefix, the discovered config
-filename (`canon-config.sh`, the `<kit>-config.sh` convention), and the
+(`canon-kit/`), the `CANON_KIT_` env-knob prefix, the discovered knob
+filename (`canon-config.knobs`, the `<kit>-config.knobs` convention), and the
 docs-site page dir (`docs/canon-kit/`). Generic vocabulary names the spec
 *artifact* discipline rather than the brand and is fixed regardless of the
 kit's name: the `SPEC.md` canonical-spec filename, the `SPEC-*.md` amendment
 glob, the `spec:` and `contract:` source directives, the `[spec:]` and
-`[design-pending]` queue tags, the `check-spec-*` gate names, and the internal
-`lib/spec.sh` loader (where "spec" names the discipline). The consumer gate
+`[design-pending]` queue tags, the `check-spec-*` gate names, and the shared
+`native/src/spec.rs` adapters (where "spec" names the discipline). The consumer gate
 `check-kit-ref-liveness` (declared by a `.gate` descriptor in `scripts/` and
 dispatched to the binary substrate — the dangling-reference hazard is a kit
 author's, so it is not templated into gate-sdk) holds the brand-token side
@@ -384,12 +384,24 @@ section names a removed knob by construction), the generated trajectory data,
 `SPEC-*.md` amendments, and the queue — so a rename cannot leave a dangle without
 turning a gate red.
 
-Config follows queue-kit's pattern: copy `templates/canon-config.sh` into
-the gates dir as `canon-config.sh` (or point `CANON_KIT_CONFIG_FILE`
-elsewhere) and override any knob; defaults fill what the consumer left
-unset, and the loader exits 2 on a malformed config. That template and the
-copy it seeds are **permanently shell**, each carrying the `# no-port:` cause of
-the class ruling at gate-sdk/SPEC.md §The config-seam port disposition.
+Config is a **knob file**: copy `templates/canon-config.knobs` into the gates dir
+as `canon-config.knobs` (or point `CANON_KIT_KNOB_FILE` elsewhere) and set any knob
+below; defaults fill what the file leaves unset. canon-kit's knobs are **static**:
+the binary resolves them in process from its own defaults table and the consumer's
+knob file, and the config bridge never carries them (gate-sdk/SPEC.md §lib/gate.sh);
+`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape
+and rendered default. A gitignored `canon-config.local.knobs` in the gates dir is the
+home for a private value a tracked file cannot carry. The grammar, that `.local`
+overlay, the environment-over-file precedence for a scalar, the knob reference and
+the refusals — a set `CANON_KIT_KNOB_FILE` that does not exist, a left-behind
+`canon-config.sh` or `canon-config.local.sh`, a non-empty file named by the retired
+`CANON_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's table
+validator refuses a malformed config at exit 2 with every finding. A derived default
+below is written in the roster's `${NAME}` spelling for the gate-sdk knob it reads.
+**The five `CANON_KIT_*_CMD` knobs are command knobs**: each is an argv, one
+`NAME[] = element` line per word, spawned directly with no shell, and an empty knob
+is no command, which its reader takes as the clean skip (gate-sdk/SPEC.md §The knob
+file; the spawn and its output validation are §The shared spec adapters').
 
 **A corpus knob below widens the declaring gates' *triggers* as well as their
 scanned corpus**, which before the `knob:<NAME>` couples token it did not: a gate
@@ -408,7 +420,7 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
 
 - `CANON_KIT_SPEC_NAME` — canonical spec filename, default `SPEC.md`.
 - `CANON_KIT_AMENDMENT_GLOB` — default `SPEC-*.md`.
-- `CANON_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`.
+- `CANON_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE}`.
 - `CANON_KIT_FEATURE_SECTIONS` — array, default `("New Features")`: active
   sections whose entries require `[spec:]`.
 - `CANON_KIT_ACTIVE_SECTIONS` — array, default
@@ -453,7 +465,7 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
   lifecycle-kit binding slot `*<name: …>*`, no `CONSUMER BINDING` header), so
   slot-free kit-template markdown and agent definitions come under the manifest
   doc gates while slot-bearing surfaces self-exclude — which surfaces a consumer
-  governs is their config, the discriminator is kit mechanism (§lib/spec.sh).
+  governs is their config, the discriminator is kit mechanism (§The shared spec adapters).
   This repo sets `("*/templates/*.md" ".claude/agents/*.md")`.
   `CANON_KIT_TEMPORAL_MARKERS` — the temporal-narration marker set scanned by
   `check-manifest-temporal`, default a generic-English list (`previously`,
@@ -487,7 +499,7 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
   sets, and only a phrase whose noun it governs needs the valve).
 - `CANON_KIT_ENUM_SETS_CMD` — a consumer command emitting the governed sets
   `check-prose-enum` holds, one `<set-name>`⇥`<member>` line per member,
-  default empty ⇒ clean skip (no declared sets). This repo sets
+  default empty ⇒ clean skip (no declared sets). This repo sets the argv
   `bash gate-sdk/bin/run-gates.sh --emit enum-sets`, the bundled emitter, which
   derives the queue tag sets from queue-kit's own parser rather than restating
   them. The knob's own contract is unchanged by that value naming a bundled arm:
@@ -503,13 +515,9 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
   `CANON_KIT_INSTALL_CLAIM_EXCLUDE` — array of globs dropped from that gate's
   scanned set on top of `CANON_KIT_MDREF_EXCLUDE`, default empty. A transport
   vocabulary is one project's distribution model, so no spelling of it ships as a
-  kit literal (the provenance seam). This repo sets
+  kit literal (the provenance seam). This repo sets the argv
   `bash scripts/install-transports.sh`, `^(Quick start|Install)`, and
-  `("docs/posts/*")`. `CANON_KIT_INSTALL_TRANSPORT_IDS` /
-  `CANON_KIT_INSTALL_TRANSPORT_PATTERNS` — the index-aligned halves of that
-  command's parsed output, default empty arrays, filled by this kit's library only
-  while one of the two is the knob under resolution; they are the bridged form the
-  compiled member reads and are not a consumer-authored knob (§lib/spec.sh).
+  `("docs/posts/*")`.
 - `CANON_KIT_PAYLOAD_CLAIMS_CMD` — a consumer command emitting the payload
   disclosure classes `check-payload-claim` holds, one `<claim-id>`⇥`<ERE>` line
   per class, default empty ⇒ clean skip (the correct posture for a tree whose
@@ -518,18 +526,16 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
   `CANON_KIT_MDREF_EXCLUDE`, default empty. A spelling of what a payload
   discloses is one project's distribution model, so it is consumer config for
   the same provenance-seam reason the transport vocabulary above is. This repo
-  sets `bash scripts/payload-claims.sh` and `("docs/posts/*")`.
-  `CANON_KIT_PAYLOAD_CLAIM_IDS` / `CANON_KIT_PAYLOAD_CLAIM_PATTERNS` — that
-  command's parsed output in the same bridged, index-aligned shape as the
-  transport pair above, default empty arrays.
+  sets the argv `bash scripts/payload-claims.sh` and `("docs/posts/*")`.
 - `CANON_KIT_MEASURED_CLAIMS_CMD` — a consumer command emitting the oracle
   `check-measured-claim` re-runs, one `<key>`⇥`<value>` line per measurable fact,
   default empty ⇒ clean skip (no oracle, so no marker has anything to disagree
   with). `CANON_KIT_MEASURED_SURFACE_GLOBS` — array of globs naming the scanned
   surface, default empty ⇒ empty corpus and a clean gate; the two are set
   together or not at all. What a project measures is that project's vocabulary,
-  so no key ships as a kit literal (the provenance seam). This repo sets
-  `bash scripts/measured-claims.sh` and the `CANON_KIT_MANIFEST_FILES` globs plus
+  so no key ships as a kit literal (the provenance seam). This repo sets the argv
+  `bash scripts/measured-claims.sh`, and the surface as the reference
+  `CANON_KIT_MEASURED_SURFACE_GLOBS[] <- CANON_KIT_MANIFEST_FILES` followed by
   `.claude/commands/*.md` and `TASK-QUEUE.md` — the shims the manifest set omits and
   the prose surface
   excludes on a copy-shape ownership this rule is not covered by, and the work
@@ -555,11 +561,9 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
   a spelling of what one project claims about itself, so it is consumer config for
   the same provenance-seam reason the vocabularies above are, and for one more:
   this kit's own SPEC is governed prose, so a kit literal here would match its own
-  class while describing it. This repo sets `bash scripts/claim-classes.sh`. The
-  gate reads `CANON_KIT_MEASURED_SURFACE_GLOBS` above for its corpus and adds no
-  surface knob. `CANON_KIT_CLAIM_CLASS_IDS` / `CANON_KIT_CLAIM_CLASS_PATTERNS` —
-  that command's parsed output in the same bridged, index-aligned shape as the
-  transport and payload pairs above, default empty arrays.
+  class while describing it. This repo sets the argv `bash scripts/claim-classes.sh`.
+  The gate reads `CANON_KIT_MEASURED_SURFACE_GLOBS` above for its corpus and adds no
+  surface knob.
 - `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `CANON_KIT_COMMENT_SURFACE` —
@@ -595,12 +599,16 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
   its own through the matching `_EXTRA` knob:
   `CANON_KIT_PROSE_TELL_PHRASES_EXTRA`,
   `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA` and
-  `CANON_KIT_TEMPORAL_MARKERS_EXTRA`, all default empty, which the lib
-  unions onto the base after the base defaults resolve: the effective set is
-  base plus extra. Extension therefore costs one token, never a restatement of
-  the bundled default that would silently diverge from it. Assigning a base
-  array keeps its replace semantics, and that is the narrowing valve: a consumer
-  wanting a bundled member *gone* replaces the base array. Generic English is
+  `CANON_KIT_TEMPORAL_MARKERS_EXTRA`, all default empty, which each reader
+  unions onto the resolved base (`spec::vocabulary`): the effective set is the
+  base followed by the extra. The union is the reader's rather than a derived
+  default's, because a file value replaces a knob whole and a derived default fires
+  only at the default, so a consumer who set the base keeps the extra. Extension
+  therefore costs one token, never a restatement of the bundled default that would
+  silently diverge from it. Setting a base array keeps its replace semantics, and
+  that is the narrowing valve: a consumer wanting a bundled member *gone* replaces
+  the base array. A temporal marker set whose base and extra are both empty is
+  malformed config. Generic English is
   kit-shippable; a consumer's own vocabulary never becomes a kit literal (the
   provenance seam).
 
@@ -627,32 +635,22 @@ and no oracle sees whole: `check-amendment-update-target.test.sh`,
 `check-spec-dod-singleton.test.sh`, `check-tracking-claim.test.sh` and
 `check-unmarked-claim.test.sh`.
 
-### lib/spec.sh
+### The shared spec adapters
 
-The sourced config loader plus shared adapters — values and adapters only,
-never gate structure. It centralizes the surfaces and vocabularies the
-spec-scanning gates share, so a rule enters once and every sibling matches the
-same shapes:
+`native/src/spec.rs` is the sole holder of the adapters the spec-scanning gates
+share — values and adapters only, never gate structure. It centralizes the surfaces
+and vocabularies those gates read, so a rule enters once and every sibling matches
+the same shapes:
 
-**It is permanently shell and declares so in its own header**, as the config
-bridge's sole resolver for the `CANON_KIT_*` knobs — gate-sdk/SPEC.md §The
-kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
-states the ground.
-
-- **Section grammar and queue resolution:** the section-regex builders the
-  queue-facing gates use (queue-kit's rule — both sides of a section boundary
-  must parse identically), and the one queue walk that emits a live slug for a
-  bold lead-in bullet in an active or **design-pending** section — deferred
-  plus a configured icebox, built as one regex so the tag rule and the walk can
-  never disagree on the set — and a done slug for a bare-slug bullet outside
-  them; the single grammar `check-todo-task-liveness`
-  and `check-deprecation-task` resolve a `task: <slug>` binding through. **The
-  walk is `native/src/spec.rs`'s `queue_slugs`**: both members compile, so the
-  shell walk went with its last caller, and so did the shell library's section
-  builders — the compiled classifier matches a section name against the
-  configured sets directly rather than through a built regex, so those builders
-  are defined here with no reader left in the tree, a residue whose disposition
-  is filed rather than taken at a close. That walk's bullet lead-line predicate is written again in the
+- **Section grammar and queue resolution:** the one queue walk that emits a live
+  slug for a bold lead-in bullet in an active or **design-pending** section —
+  deferred plus a configured icebox, one section set so the tag rule and the walk
+  can never disagree on it — and a done slug for a bare-slug bullet outside them;
+  the single grammar `check-todo-task-liveness` and `check-deprecation-task`
+  resolve a `task: <slug>` binding through. **The walk is `queue_slugs`**, and its
+  classifier matches a section name against the configured sets directly (queue-kit's
+  rule — both sides of a section boundary must parse identically). That walk's
+  bullet lead-line predicate is written again in the
   crate rather than pointed at `native/src/queue.rs`'s adapters, which keeps
   canon-kit one of the format's independent holders under the
   re-implement-and-cite-from-both-ends rule
@@ -708,80 +706,40 @@ states the ground.
   skeleton — so regularizing the three finders into one loop silently drops two
   files that belong in the set. The rule is the asymmetry, not the tidy form.
 
-  **Which primitive is on which substrate.** `spec_manifest_files` has a Rust
-  implementation (`native/src/spec.rs`) carrying all three branches — explicit
-  globs, the default walk, and the prose-surface fold — plus the kit-root path
-  prune, because its family is partly compiled; the shell form stays, on a ground
-  that has moved. That module carries the claim-gate
-  primitives too: the declaration grammar, the declaration roster, the
-  governed-doc set behind its two exclude valves, and the bridged vocabulary
-  loader. The shell kept a copy of the last two per member; the compiled form has
-  one, ported once and proved by each member that calls it. `comment_surface` and
-  `queue_slugs` are **compiled only**, and so are all four of their callers
-  (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next): they
-  emptied their caller sets in one cohort and their shell forms were removed in
-  the same commit. **The manifest finder's caller set is empty too, and its shell
-  form stays** — `check-surface-duplication` was the last member outside the
-  family to call it and ported with `shell-gate-tail-port`, so what keeps the
-  shell form is the *dead twin* disposition's **undocumented-surface** bound
-  rather than a live caller: these are helpers this section names, and that
-  disposition reaches only helpers no section does
-  (gate-sdk/SPEC.md §The port-candidate criteria, criterion 6).
-  Read the two together and the rule is legible: an emptied caller set removes an
-  **unnamed** helper and leaves a documented one standing — **provided its twin
-  duplicates no value**. Where a twin spells a *literal* both forms must agree on
-  with no machine holding them equal, the documented-surface bound yields and the
-  shell form goes: that is the shape criterion 6 exists against, and it is why the
-  count grammar has one holder where the manifest finder keeps two. Duplicating a
-  finder the bridge feeds is safe; duplicating a literal is the defect.
-  The two implementations of the manifest finder are held together by the config
-  bridge rather than by a copied default: every knob either reads crosses it as
-  a resolved value, so there is exactly one place each is computed
-  (gate-sdk/SPEC.md §The port-candidate criteria, criterion 6).
-- **The emitter-backed vocabularies** — the enum sets, the install transports
-  and the payload-disclosure classes a consumer supplies as a *command*. For a
-  compiled member the command's **output** is the interface, never the command:
-  the library runs the emitter at knob-resolution time and the binary receives
-  data, so no compiled gate spawns an interpreter to read consumer config and no
-  spelling of a consumer's vocabulary becomes a kit literal. A pair rides two
-  index-aligned arrays (`CANON_KIT_ENUM_SET_NAMES` / `..._MEMBERS`) because the
-  bridge's wire format separates elements with a tab and refuses one inside an
-  element, so a `<name>`⇥`<member>` line cannot cross as a single string. The
-  resolution is gated on `GATE_SDK_RESOLVING_KNOB` (gate-sdk/SPEC.md
-  §lib/gate.sh), because it costs a subprocess and this library is sourced once
-  per owning kit per bridge call. That knob is a **set** of the names under
-  resolution, so each gated block tests **membership** through
-  `_spec_resolving` rather than equality: under the per-kit batch one subshell
-  carries a whole slice, and an equality test would match no batch of more than
-  one name — every one of these blocks would silently stop computing and every
-  vocabulary would cross the bridge empty.
-  Four vocabularies ride that shape, one pair each:
-  the enum sets, `CANON_KIT_INSTALL_TRANSPORT_IDS` / `..._PATTERNS`,
-  `CANON_KIT_PAYLOAD_CLAIM_IDS` / `..._PATTERNS`, and
-  `CANON_KIT_CLAIM_CLASS_IDS` / `..._PATTERNS` (§Layout and configuration). The
-  emitting **command** knob is bridged beside each pair, because it is what tells
-  *none configured* from *configured, and it declared nothing* — the two clean
-  skips a claim gate reports apart.
-  **A configured command may itself be a bridged arm, which nests one bridge
+  **Every primitive here is compiled only.** The manifest finder carries all three
+  branches — explicit globs, the default walk, and the prose-surface fold — plus the
+  kit-root path prune; beside it sit the claim-gate primitives: the declaration
+  grammar, the declaration roster, the governed-doc set behind its two exclude
+  valves, and the command adapters below. `comment_surface` and `queue_slugs` are
+  in the same module, so each primitive has one holder, ported once and proved by
+  each member that calls it.
+- **The emitter-backed vocabularies** — the enum sets, the install transports,
+  the payload-disclosure classes, the measured claims and the claim classes a
+  consumer supplies as a *command knob*. Each member reads its command's output
+  through an adapter that spawns the argv **once per process** and caches the
+  parsed `<first>`⇥`<second>` lines, so no spelling of a consumer's vocabulary
+  becomes a kit literal and a member that never asks spawns nothing. The empty argv
+  is checked before any spawn, which is what tells *none configured* from
+  *configured, and it declared nothing* — the two clean skips a claim gate reports
+  apart. **Two validation contracts, both exit 2:** for the enum sets a command that
+  fails or exits non-zero, a line with no tab, an empty field or an extra tab; for
+  the three `<id>`⇥`<ERE>` vocabularies and the measured claims the same, plus a
+  first field that is not slug-shaped or repeats, with the command knob named as the
+  label in every message. A tab a POSIX ERE may legitimately carry is refused as an
+  extra tab before a pattern is compiled.
+  **A configured command may itself be a front-end arm, which nests one front-end
   invocation inside another — and the termination is a constraint on the arm's
-  roster rather than a property inherited.** The nested invocation sources
-  `lib/gate.sh` again and resolves the arm's own declared knobs before exec'ing the
-  binary, so it terminates **exactly when that roster excludes the names the outer
-  batch is resolving**: `--emit-enum-sets` declares `GATE_KIT_ROOTS_REL` and
-  `QUEUE_KIT_LESSON_TAGS` and may never gain either enum-set knob. **Nothing reds
-  if it does** — the failure is a hang or an unbounded recursion at knob
-  resolution, not a verdict — which is why the condition is written here, beside
-  the guard, rather than left as a reassurance. The cost is real and was measured at the
-  cut rather than asserted small: one extra `bash`, one extra `lib/gate.sh` source
-  and one extra binary exec per resolution of that pair, which on this tree roughly
-  tripled that gate's resolve-and-run. It is a **residue to file, never a licence**
-  to take the in-process shortcut §check-prose-enum refuses — the array-knob
-  bridge's per-invocation cost already has an owner, and a nested resolution is that
-  residue met twice rather than a new class. The tab a POSIX ERE may legitimately carry
-  cannot reach the bridge: `spec_claim_vocabulary` below rejects a line with an
-  extra tab before the value is ever serialized.
-- **The count adapter** the restated-total gates share — **compiled only**
-  (`native/src/spec.rs`), by the literal-duplication rule above — so a consumer's
+  roster rather than a property inherited.** A command that is a front-end arm must
+  not declare the knob that names it, or the resolution recurses:
+  `--emit-enum-sets` declares `GATE_KIT_ROOTS_REL` and `QUEUE_KIT_LESSON_TAGS` and
+  may never gain `CANON_KIT_ENUM_SETS_CMD`. **Nothing reds if it does** — the
+  failure is a hang or an unbounded recursion, not a verdict — which is why the
+  condition is written here, beside the adapter. The residue stays: the spawned
+  front-end still sources `lib/gate.sh` and resolves the arm's own bridged knobs
+  before exec'ing the binary, one extra `bash`, one `lib/gate.sh` source and one
+  binary exec per read of that vocabulary. It is a **residue to file, never a
+  licence** to take the in-process shortcut §check-prose-enum refuses.
+- **The count adapter** the restated-total gates share, so a consumer's
   `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate
   matches the same total shapes — including a total whose cardinal and noun
   straddle a prose wrap, reported at the cardinal's physical line. **That
@@ -799,34 +757,26 @@ states the ground.
   boundary (§check-prose-enum), which the two once spelled alike and only
   half-alike at that. English nouns do not compound across underscores, so the
   noun rule stays as it is; the shared spelling was never a shared rule.
-- **The enum sets** arrive through the consumer's `CANON_KIT_ENUM_SETS_CMD`,
-  validated and fail-closing (exit 2) on a command error or an unparsable line
+- **The enum sets** arrive through `enum_sets`, over `CANON_KIT_ENUM_SETS_CMD`
   (§check-prose-enum).
-- **The claim vocabularies** arrive the same way, through
-  `spec_claim_vocabulary <command> <label>` — one loader for every
-  `<id>`⇥`<ERE>` vocabulary a claim gate reads, taking the command as an
-  argument rather than from one named knob so a second claim axis costs a caller
-  and not a second copy. **That argument is attested rather than anticipated:**
-  `check-unmarked-claim` is the fourth caller and it arrived as a caller and
-  nothing else — no fork of the loader, no second copy of the shape checks. It
-  carries the
-  same fail-closed contract its enum-set sibling does — a command error, an
-  unparsable line, an id that is not slug-shaped, or a repeated id is exit 2 —
-  and the `<label>` it is given names the failing vocabulary in every message,
-  so a fail-closed exit still says which one failed. The duplicate check is what
-  a bare emit grammar cannot express and both gates need: two lines claiming one
-  id would give a class two patterns and make its match order arbitrary. Its
-  callers are `spec_install_transports`, over
-  `CANON_KIT_INSTALL_TRANSPORTS_CMD` (§check-install-claim);
-  `check-payload-claim` directly, over `CANON_KIT_PAYLOAD_CLAIMS_CMD`
-  (§check-payload-claim); `spec_measured_claims`, over
-  `CANON_KIT_MEASURED_CLAIMS_CMD` (§check-measured-claim) — whose second field is
-  a measured value rather than an ERE, which the loader neither interprets nor
-  needs to, since every check it makes is on the line's shape; and
-  `check-unmarked-claim` directly, over `CANON_KIT_CLAIM_CLASSES_CMD`
-  (§check-unmarked-claim). The two-field shape is what makes that last caller
+- **The claim vocabularies** arrive through `claim_vocabulary(<command knob>)` —
+  one loader for every `<id>`⇥`<ERE>` vocabulary a claim gate reads, taking the
+  command knob as an argument rather than reading one named knob, so a second claim
+  axis costs a caller and not a second copy. **That argument is attested rather
+  than anticipated:** `check-unmarked-claim` arrived as a caller and nothing else —
+  no fork of the loader, no second copy of the shape checks. It compiles every
+  pattern before the first corpus line is read. The duplicate check is what a bare
+  emit grammar cannot express and both gates need: two lines claiming one id would
+  give a class two patterns and make its match order arbitrary. Its callers are
+  `check-install-claim` over `CANON_KIT_INSTALL_TRANSPORTS_CMD`
+  (§check-install-claim), `check-payload-claim` over `CANON_KIT_PAYLOAD_CLAIMS_CMD`
+  (§check-payload-claim) and `check-unmarked-claim` over
+  `CANON_KIT_CLAIM_CLASSES_CMD` (§check-unmarked-claim); `measured_claims` reads
+  `CANON_KIT_MEASURED_CLAIMS_CMD` under the same keyed contract without compiling
+  (§check-measured-claim), since its second field is a measured value rather than
+  an ERE. The two-field shape is what makes the unmarked-claim caller
   coverage-only: a class cannot carry a required key beside its ERE without a
-  third field this loader refuses, and the refusal is kept rather than relaxed.
+  third field the adapter refuses, and the refusal is kept rather than relaxed.
 - **The comment-surface adapters:** the comment gates read *different* surfaces,
   which is the one thing the primitive's parameter decides.
   `check-spec-pointer` scans the template-pruned surface — a template's `spec:`
@@ -855,19 +805,14 @@ states the ground.
   prune beside the `templates/` one it already applies. A prose gate grading a generated
   page is unfixable at the file — the repair is to the source and the regeneration — so
   the finding can only be absorbed or ignored, which is the reasoning this tree already
-  states for a sibling knob at `scripts/canon-config.sh`. Applied inside the kit
+  states for a sibling knob at `scripts/canon-config.knobs`. Applied inside the kit
   mechanism the ground is stronger than editorial scope: the mirror is excluded because
   it is **generated**, and the generator is the kit's own. The two narrowings are one
   prune list, read by the walk and by the member's registry declaration from one place,
   because a declared prune narrows a coverage demand and two spellings could disagree
   about it (gate-sdk/SPEC.md §check-reads-couples).
-- **The amendment finder** `spec_amendments`, the amendment-glob counterpart of
-  `spec_canonical_specs` above. Its last shell caller left at §The sixth budget
-  batch (gate-sdk/SPEC.md), and the function stays: the dead-twin disposition
-  (gate-sdk/SPEC.md §The port-candidate criteria, criterion 2) reaches
-  **undocumented** surface only, and this bullet documents it. The live holder is
-  `native/src/spec.rs`.
-  Its consumers are `check-amendment-queue` and
+- **The amendment finder** `amendments`, the amendment-glob counterpart of the
+  canonical-spec finder above. Its consumers are `check-amendment-queue` and
   `check-amendment-update-target`, and they **differ in fail-closed posture on
   purpose** — so the crate holds two spellings of one walk, `amendments` and
   `amendments_strict`, rather than one that reads as drift. The best-effort form
@@ -878,21 +823,14 @@ states the ground.
   violation silently and the walk refuses instead. Each section states its own
   half; the difference is a reasoned divergence, never an inconsistency to
   reconcile.
-- **The default-statement grammar** both knob gates share, so the rule for
-  what reads as a stated default has one home. `sk_literal_at` recognizes the
-  value literal opening a window (a backticked non-knob string, a quoted string,
-  or a number) and `sk_default_literal` returns the literal the word "default"
-  binds; a caller-supplied `sk_is_knobname` keeps a bare knob name from reading
-  as a value. `check-knob-citation` reads it to reject a restated value in prose;
+- **The default-statement grammar** both knob gates share, `DefaultGrammar`, so the
+  rule for what reads as a stated default has one home. It recognizes the value
+  literal opening a window (a backticked non-knob string, a quoted string, or a
+  number) and returns the literal the word "default" binds; a caller-supplied
+  knob-name predicate keeps a bare knob name from reading as a value.
+  `check-knob-citation` reads it to reject a restated value in prose;
   `check-knob-default-coupling` reads it to confirm the SPEC states the source's
   literal (§check-knob-default-coupling).
-  **Both callers are compiled since §The sixth budget batch, so the live holder is
-  `native/src/spec.rs`'s `DefaultGrammar`** — promoted there out of the first
-  gate's private implementation at that port, because the second caller arriving
-  is exactly when a private copy becomes the second owner this bullet exists to
-  prevent. The shell form's caller set emptied with it and it is **not** deleted:
-  the dead-twin disposition (gate-sdk/SPEC.md §The port-candidate criteria,
-  criterion 2) bounds itself to undocumented surface, and this bullet documents it.
 
 ### check-amendment-queue
 
@@ -983,7 +921,7 @@ batch repaired it at validate.
   included. Without C, arms A and B both pass on an amendment whose targets cite
   deltas that were renumbered out from under them.
 - **Valve** — `<!-- update-target-exempt: <reason> -->` on the bullet's first
-  line or the one above, riding the shared exempt-window (§lib/spec.sh — the line
+  line or the one above, riding the shared exempt-window (§The shared spec adapters — the line
   or the one above), and the reason is mandatory (the `comment-tier-exempt:`
   convention). An exempt bullet leaves the target count as well as the finding.
 
@@ -1000,10 +938,10 @@ the reader cannot read; and **an unwalkable scan root**, where
 divergence is deliberate and is the one to read carefully: the queue gate can
 afford an empty amendment set because its other direction contradicts it, while
 here an empty set hides every violation silently. The two spellings of the walk
-live at §lib/spec.sh, which owns the asymmetry.
+live at §The shared spec adapters, which owns the asymmetry.
 
 **No new knob, and the reason is not laziness.** The corpus is `spec_amendments`
-(§lib/spec.sh) — the same finder §check-amendment-queue uses, already applying
+(§The shared spec adapters) — the same finder §check-amendment-queue uses, already applying
 the `templates/` exclusion that keeps a shipped `SPEC-amendment.md` skeleton from
 being read as a live amendment, so the skeleton's illustrative headings cannot
 red the gate that governs its copies. The two heading names are **kit constants,
@@ -1108,7 +1046,7 @@ comma-list roster are three different spellings of one shifted number.
   renumbered out from under them — the same failure arm C of
   §check-amendment-update-target closes, reached through the second block.
 - **Valve** — `<!-- retired-spelling-exempt: <reason> -->` on the bullet's first
-  line or the one above, riding the shared exempt window (§lib/spec.sh), reason
+  line or the one above, riding the shared exempt window (§The shared spec adapters), reason
   mandatory per the `comment-tier-exempt:` convention. An exempt bullet leaves
   the declared-spelling count as well as the finding.
 
@@ -1140,7 +1078,7 @@ the reader cannot read; and a failure to enumerate the reconciliation corpus
 §check-amendment-update-target and **not** §check-amendment-queue: an empty
 amendment set here hides every violation silently, where the queue gate can
 afford one because its other direction contradicts it. That asymmetry is owned at
-§lib/spec.sh.
+§The shared spec adapters.
 
 **Output.** On clean, the amendments scanned, the spellings declared, and how
 many took the negative form — a count on the clean line and not only on the red
@@ -1243,7 +1181,7 @@ semantic residue (*is this sentence about the past?*); a by-eye
 narration-marker KPI is superseded by this gate (drift-kit/SPEC.md
 §Out of scope).
 
-The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh):
+The scanned set is the shared `spec_manifest_files` finder (§The shared spec adapters):
 canonical specs, `README.md` at any depth, and `CLAUDE.md`; amendments are
 excluded by construction (a transition artifact describes change — that is its
 nature). Markers are `CANON_KIT_TEMPORAL_MARKERS`, the base array merged with
@@ -1275,9 +1213,9 @@ exits 2 naming the pattern and the knob rather than scanning past what it meant.
 Two fidelity points a transliteration loses, recorded because both are invisible
 in a green run: the marker test runs against a **case-folded subject** and the
 pattern is not folded, so a marker written with an upper-case letter matches
-nothing; and `CANON_KIT_TEMPORAL_MARKERS_EXTRA` unions onto the base array inside
-this kit's library *before* the bridge reads it, so the compiled member declares
-the base knob alone and a second `_EXTRA` knob would double every added marker.
+nothing; and `CANON_KIT_TEMPORAL_MARKERS_EXTRA` unions onto the resolved base at
+this member, which declares both knobs and reads them through `spec::vocabulary`
+once, so no second union can double an added marker.
 
 Calibration: the marker set is tuned against this repo as the FP corpus — bare
 `used to` is excluded (it collides with instrumental "used to build/filter").
@@ -1298,12 +1236,12 @@ entity mapping; a lexical tripwire eliminates the copy. The motivating find: thi
 repo landed one gate and left the same total in four disagreeing copies (across
 two READMEs and a SPEC), caught only by close-stage review.
 
-The scanned set is the shared manifest-set finder (§lib/spec.sh) —
+The scanned set is the shared manifest-set finder (§The shared spec adapters) —
 canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks
 skipped, an inline-code cardinal a meta-reference (so this section may name its
 own examples). The grammar and the matcher have **one holder**, the compiled
 count adapter, and the prose walk is the shared manifest-prose driver
-(§lib/spec.sh), so this gate, its `check-prose-enum` sibling, and its
+(§The shared spec adapters), so this gate, its `check-prose-enum` sibling, and its
 comment-tier cousin
 read one vocabulary and one exemption behavior, and a total wrapped across a
 prose break is caught and reported at its first physical line; a blank line, a
@@ -1409,26 +1347,13 @@ this is an attachment that gives a gate something to check. The reader-facing
 form of the claim stays prose; the marker is the tier beside it.
 
 **The oracle is consumer-owned.** `CANON_KIT_MEASURED_CLAIMS_CMD` names a command
-emitting one `<key>`⇥`<value>` line per measurable fact, loaded through
-`spec_claim_vocabulary` (§lib/spec.sh) and so carrying that loader's fail-closed
-contract. The marker grammar and the comparison are kit mechanism; every key,
+emitting one `<key>`⇥`<value>` line per measurable fact, read through the
+`measured_claims` adapter (§The shared spec adapters) and so carrying its keyed
+fail-closed contract. The marker grammar and the comparison are kit mechanism; every key,
 every oracle command and every measured fact is consumer config, because a kit
 literal enumerating what a project measures would publish that project's
 vocabulary. An unset knob means the gate has no oracle and reports clean — the
 inactive-by-default posture its `*_CMD` siblings take.
-
-**Adding a key costs more than the emitter, and the extra cost is invisible from
-here: the key and value rosters are bridged knobs, so a consumer generating a
-hook bakes them into it.** Where this member is dispatched through gate-sdk's
-config bridge, the resolved `<KIT>_MEASURED_KEYS` and `_VALUES` sit literally in
-the generated pre-commit hook's invocation, which a freshness gate holds byte for
-byte. The consequence is the one to weigh before minting a key: **every input of
-that key's oracle becomes an input of a byte-gated artifact**, so a high-churn
-key stales the hook on every commit that moves it, whether or not the commit
-touches anything the hook is about. A low-churn key costs nothing extra. This is
-an instance of the general resolved-knob-baking property rather than a second
-mechanism, and it is named here because the emitter is authored on this surface
-while the property lives on gate-sdk's.
 
 **A key's *meaning* is consumer-owned too, and that is the one failure none of the
 three arms can catch.** Redefining an existing key's oracle to answer a wider or
@@ -1485,9 +1410,9 @@ than a gap.** An extent claim carries no cardinal, so arm C does not apply and a
 A does the work, with `<value>` whatever the author declares the extent to be and
 the emitter recomputes: a corpus size, a sorted membership list, a digest over
 the swept set. This is the axis no scanner reaches and it costs nothing extra —
-the same arms, with a set-valued rather than integer-valued oracle. Because the
-config bridge refuses an element containing a tab and tab is this protocol's own
-field separator, a set-valued oracle joins its members with something else. This
+the same arms, with a set-valued rather than integer-valued oracle. Because tab is
+this protocol's own field separator and the adapter refuses an extra one, a
+set-valued oracle joins its members with something else. This
 repo's first such inhabitant is `gate-substrates`, the live substrate set the
 enforcement core runs on, its members joined with `+`; it is the shape that makes
 a **definitional or qualitative** sentence self-correcting, since such a sentence
@@ -1508,7 +1433,7 @@ The scanned surface is its own glob knob, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
 **not** the manifest set. The motivating class ranges over SPEC sections and
 binding shims alike, and neither existing surface reaches a shim: the manifest set
 excludes them by omission, with no documented rationale (a reader should not infer
-a ruling from a silent absence), and the prose surface (§lib/spec.sh) excludes them
+a ruling from a silent absence), and the prose surface (§The shared spec adapters) excludes them
 by a documented decision about which gate *owns* a shim — `check-shim-restatement`,
 which holds copy shape. That ownership is not this rule's: a restatement that is
 **wrong** has diverged from its owner's wording and is therefore not a copy. So
@@ -1582,11 +1507,11 @@ phrasing.
   first class in roster order that matches it.
 - **B — the vocabulary fails to load.** Exit 2 on a command error, an unparsable
   line, a non-slug id, or a repeated id — inherited unchanged from
-  `spec_claim_vocabulary` (§lib/spec.sh), which already names the failing
-  vocabulary by its `<label>` in every message — and on a declared ERE that does
+  `claim_vocabulary` (§The shared spec adapters), which already names the failing
+  vocabulary by its command knob in every message — and on a declared ERE that does
   not compile, which is the same unreadable-roster failure one step later.
 - **Valve** — `<!-- unmarked-claim-exempt: <reason> -->` on the flagged line or
-  directly above it, riding the shared exempt-window (§lib/spec.sh — the line or
+  directly above it, riding the shared exempt-window (§The shared spec adapters — the line or
   the one above), and the reason is mandatory (the `comment-tier-exempt:`
   convention — a deliberate keep carries its cause in-line, a reasonless valve is
   red).
@@ -1606,7 +1531,7 @@ wrap included, collapsed to one space; the finding is reported at the physical
 line the match starts on. This is not a new mechanism: it is the boundary
 §check-manifest-count already crosses for a total whose cardinal and noun straddle
 a wrap, reported at the cardinal's physical line, and the shared adapter
-(§lib/spec.sh) is where that normalization already lives. The subject is
+(§The shared spec adapters) is where that normalization already lives. The subject is
 **ASCII-lowercased** before matching and a class pattern is authored in lower
 case, so a sentence's opening capital is not a way past the class.
 
@@ -1619,10 +1544,10 @@ being shown, not a claim being made.
 
 **Coverage-only, and the reason is a constraint rather than a preference.** The
 gate asserts that a matched claim carries *a* marker; it does not assert *which*
-key. `spec_claim_vocabulary` is a two-field loader that **rejects a line carrying
+key. `claim_vocabulary` is a two-field loader that **rejects a line carrying
 an extra tab**, so a class cannot declare a required key beside its ERE without a
 third field the loader refuses. Adding one would fork the loader every claim gate
-shares — the cost §lib/spec.sh explicitly took the shared-loader shape to avoid.
+shares — the cost §The shared spec adapters explicitly took the shared-loader shape to avoid.
 The key is checked by `check-measured-claim` on the very next arm (its arm B fails
 closed on a key nobody emits, its arm A on a value the oracle now contradicts),
 so the composition covers it and neither gate duplicates the other.
@@ -1698,8 +1623,8 @@ list.
 
 Set declarations are consumer config, never gate literals (the provenance seam):
 `CANON_KIT_ENUM_SETS_CMD` (default empty — clean skip) names a consumer command
-emitting one `<set-name>`⇥`<member>` line per member, loaded through
-`spec_enum_sets` (§lib/spec.sh); a command that fails or a line that does not
+emitting one `<set-name>`⇥`<member>` line per member, read through
+`enum_sets` (§The shared spec adapters); a command that fails or a line that does not
 parse is fail-closed (exit 2). A member matches word-bounded — bracketed
 (`[spec:]`) or bare (`spec`), neither an alphanumeric, a hyphen, nor an
 underscore abutting, so a stem never matches inside a longer tag, and an
@@ -1722,7 +1647,7 @@ profile, since any mention anywhere satisfies it. Reshaping such prose into a
 roster the paragraph judge can read closes the same case with no grammar change.
 
 The scanned set and the paragraph walk are the shared `spec_manifest_files`
-finder and `spec_manifest_walk_awk` driver (§lib/spec.sh); this gate's
+finder and `spec_manifest_walk_awk` driver (§The shared spec adapters); this gate's
 `sk_on_pflush` hook judges each flushed paragraph. Two or more members present
 count as a *hand list* only when a run of them is chained by list separators
 (comma, slash, brackets, whitespace, or `and`/`or`); members merely co-occurring
@@ -1750,11 +1675,11 @@ two roles are separate sets because a paragraph naming one role's tags is not
 enumerating the other. A set a consumer can only hand-list is that consumer's
 own drift to own; the kit contract asks only for the emit grammar.
 
-**The sets cross the bridge as *data*, and the gate must not call the emitter in
-process — which is a live refusal now that both can sit in one binary.** The
-resolved sets arrive as two parallel arrays filled by `spec_enum_sets` running the
-*configured* command inside canon-kit's own sourced subshell (§lib/spec.sh). Once
-the bundled emitter compiles into the same binary as the gate, an in-process call
+**The sets arrive as the configured command's output, and the gate must not call
+the emitter in process — which is a live refusal now that both sit in one binary.**
+The adapter spawns the *configured* argv and reads its lines (§The shared spec
+adapters). With the bundled emitter compiled into the same binary as the gate, an
+in-process call
 looks free; it is not, because it would resolve the **bundled** producer for a
 consumer who configured a different one — precisely the extension point the knob
 exists to protect. The property that makes the shortcut tempting is the reason to
@@ -1865,7 +1790,7 @@ literal that is not itself a backticked knob name, so a stated default like
 paths default through `<KIT>_<KNOB>`") does not.
 
 The scanned set is the shared `spec_manifest_files` finder and the prose walk is
-the shared `spec_manifest_walk_awk` driver (§lib/spec.sh); this gate supplies the
+the shared `spec_manifest_walk_awk` driver (§The shared spec adapters); this gate supplies the
 `sk_on_line` hook (the per-line triad) and leaves `sk_on_pflush` unused — the
 marker is same-line, so no paragraph join is needed. Fences are skipped, and a
 `knob-citation-exempt: <reason>` on the line or the one above is the per-site
@@ -1887,7 +1812,7 @@ SPEC but not in its README) the fixture pair cannot reach. `precommit` tier.
 This gate polices where a value is *placed* (prose may not restate it); its
 sibling `check-knob-default-coupling` polices whether the value *agrees* between
 the source fallback and the SPEC that owns it. The two share the
-default-statement grammar (§lib/spec.sh) — one reads it to reject a value in
+default-statement grammar (§The shared spec adapters) — one reads it to reject a value in
 prose, the other to confirm the SPEC states the source's literal.
 
 ### check-knob-default-coupling
@@ -1923,7 +1848,7 @@ same literal; two disagreeing is drift inside the source before any SPEC is
 read, and it suppresses the knob's assertion-2 check (fix the source first).
 Assertion 2 (SPEC agreement): the owning SPEC states that same literal as the
 knob's default, read through the default-statement grammar `check-knob-citation`
-shares (§lib/spec.sh). A default stated as the same `${…:-tail}` deferral the
+shares (§The shared spec adapters). A default stated as the same `${…:-tail}` deferral the
 source uses is reduced tail-to-tail before the compare, so a knob inheriting
 another kit's default reads as agreement. A knob whose SPEC carries no default
 statement at all reds — the SPEC owns knob defaults.
@@ -2061,7 +1986,7 @@ directive for a genuinely-local fact below SPEC altitude that neither tier
 owns.
 
 The governed-source corpus reaches the **implementation of a ported gate**, not
-just shell — `comment_surface` with templates kept (§lib/spec.sh), which owns
+just shell — `comment_surface` with templates kept (§The shared spec adapters), which owns
 the file set. This is the load-bearing half of the reader
 partition gate-sdk/SPEC.md §The `# graph:` manifest states — locality-class
 directives bind to a line of implementation and therefore stay there, so the
@@ -2281,7 +2206,7 @@ it is canon-kit's, not queue-kit's (which disclaims source-file conventions in
 its Out of scope). The gate scans the pruned comment surface, dropping `templates/`
 as placeholders-by-design like `check-spec-pointer`, and reads the queue through
 `CANON_KIT_QUEUE_FILE` with no new knob — the live/done split is the shared
-`queue_slugs` adapter (§lib/spec.sh), one queue walk reading a bare-slug
+`queue_slugs` adapter (§The shared spec adapters), one queue walk reading a bare-slug
 bullet outside the active and deferred sections as the queue's done shape. That
 `task: <slug>` binding grammar — a `task:` key naming a slug that must resolve
 to a live queue entry — is one grammar both liveness gates share:
@@ -2314,7 +2239,7 @@ slug absent from the queue is **unresolved**. All three redden — each finding
 names the file, the line, the matched marker, and the offending slug. The
 binding grammar and the queue-resolution pass are `check-todo-task-liveness`'s:
 the same `task: <slug>` key over the same `queue_slugs` adapter
-(§check-todo-task-liveness, §lib/spec.sh), one grammar both liveness gates
+(§check-todo-task-liveness, §The shared spec adapters), one grammar both liveness gates
 share. The gate scans the pruned comment surface (templates dropped as
 placeholders-by-design) and reads the queue through `CANON_KIT_QUEUE_FILE`, no
 new knob beyond the roster. An unreadable queue or source is fail-closed
@@ -2698,7 +2623,7 @@ visible sentence, because the reader-facing form of this claim already exists as
 prose and must stay prose; the marker is the tier beside it, not a replacement.
 The transport vocabulary is consumer config — one `<transport-id>`⇥`<ERE>` line
 per transport through `CANON_KIT_INSTALL_TRANSPORTS_CMD`, loaded by
-`spec_install_transports` (§lib/spec.sh) — because a kit literal spelling a
+`claim_vocabulary` (§The shared spec adapters) — because a kit literal spelling a
 transport publishes one project's distribution model as a kit fact.
 
 **Where this gate ends and §check-payload-claim begins.** The two answer
@@ -2810,7 +2735,7 @@ the reader-facing form of this claim already exists as prose and must stay prose
 It belongs in the section that rules the fact, which in this repo is
 gate-sdk/SPEC.md §Consumer payload. The disclosure vocabulary is consumer config
 — one `<claim-id>`⇥`<ERE>` line per class through
-`CANON_KIT_PAYLOAD_CLAIMS_CMD`, loaded by `spec_claim_vocabulary` (§lib/spec.sh)
+`CANON_KIT_PAYLOAD_CLAIMS_CMD`, loaded by `claim_vocabulary` (§The shared spec adapters)
 — because a spelling of what a payload discloses is one project's distribution
 model, and a kit literal carrying one would publish it. The scanned set is
 `check-md-refs`' governed doc set (the manifest set minus
@@ -2946,7 +2871,7 @@ tree. A consumer whose prose globs named descriptors would flip it.
 
 **Valve** — an HTML comment `<!-- prose-tell-exempt: <reason> -->` on the
 flagged line or directly above it suppresses the tell at that site; it rides the
-shared exempt-window (§lib/spec.sh — the line or the one above), and the reason
+shared exempt-window (§The shared spec adapters — the line or the one above), and the reason
 is mandatory (the `comment-tier-exempt:` convention — a deliberate stylistic
 keep carries its cause in-line, a reasonless valve is red). The gate is a
 producer of nothing but a verdict: the committing session reads the red and
@@ -2956,7 +2881,7 @@ by `check-prose-tells` at scan time and no other component.
 
 ### templates/
 
-`canon-config.sh` — the consumer config template: a two-line `# spec:` pointer
+`canon-config.knobs` — the consumer knob-file template: a one-line `#` pointer
 to the §Layout and configuration knob table, so the table stays the one owner
 of the knob roster rather than a parallel copy in the template drifting
 against it.

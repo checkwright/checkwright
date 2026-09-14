@@ -9,7 +9,7 @@ set -euo pipefail
 source "$SMOKE_KIT_ROOT/../gate-sdk/lib/gate.sh"
 
 mkdir -p scripts
-cp "$SMOKE_KIT_ROOT/templates/drift-config.sh" scripts/drift-config.sh
+cp "$SMOKE_KIT_ROOT/templates/drift-config.knobs" scripts/drift-config.knobs
 cp "$SMOKE_KIT_ROOT/templates/kpis.list"       scripts/kpis.list
 
 work="$(mktemp -d "${TMPDIR:-/tmp}/drift-smoke.XXXXXX")"
@@ -118,8 +118,8 @@ fi
 mkdir -p "$work/failing"
 printf '#!/usr/bin/env bash\nexit 3\n' > "$work/failing/kpi-deliberately-broken.sh"
 chmod +x "$work/failing/kpi-deliberately-broken.sh"
-printf 'DRIFT_KIT_KPI_DIRS=("%s")\n' "$work/failing" > "$work/failing-config.sh"
-broke="$(DRIFT_KIT_CONFIG_FILE="$work/failing-config.sh" solo kpi-deliberately-broken)"
+printf 'DRIFT_KIT_KPI_DIRS[] = %s\n' "$work/failing" > "$work/failing-config.knobs"
+broke="$(DRIFT_KIT_KNOB_FILE="$work/failing-config.knobs" solo kpi-deliberately-broken)"
 grep -q 'n/a (plugin failed)' <<<"$broke" \
     || fail "a member exiting non-zero must reach the fail-visible row, or the assertion above passes vacuously: $broke"
 
@@ -136,8 +136,8 @@ printf 'lead\tconsumer shadow\troots=%s start=%s custom=%s\n' \
     "$DRIFT_KIT_SMOKE_CUSTOM"
 SHADOW
 chmod +x "$work/consumer-kpis/kpi-knowledge-friction.sh"
-printf 'DRIFT_KIT_KPI_DIRS=("%s")\nDRIFT_KIT_SMOKE_CUSTOM=reached\n' "$work/consumer-kpis" > "$work/consumer-config.sh"
-xp() { DRIFT_KIT_CONFIG_FILE="$work/consumer-config.sh" solo kpi-knowledge-friction; }
+printf 'DRIFT_KIT_KPI_DIRS[] = %s\nDRIFT_KIT_SMOKE_CUSTOM = reached\n' "$work/consumer-kpis" > "$work/consumer-config.knobs"
+xp() { DRIFT_KIT_KNOB_FILE="$work/consumer-config.knobs" solo kpi-knowledge-friction; }
 
 xpout="$(xp)"
 grep -q 'consumer shadow' <<<"$xpout" \

@@ -4,9 +4,9 @@
 use crate::proc;
 use crate::toolfloor;
 
-// spec: context-kit/SPEC.md §bin/env-probe — one bridged knob and no other: `lib/context.sh`
-// defaults it and is the config bridge's sole resolver, so the value is computed in exactly one
-// place. A hardcoded path would resolve `ENV.local.md` and ignore every consumer override.
+// spec: context-kit/SPEC.md §bin/env-probe — one declared knob and no other: context-kit's table
+// defaults it, so the value is computed in exactly one place. A hardcoded path would resolve
+// `ENV.local.md` and ignore every consumer override.
 pub const KNOBS: &[&str] = &["CONTEXT_KIT_ENV_PROFILE_FILE"];
 
 const BEGIN: &str = "<!-- context-kit:env:begin -->";

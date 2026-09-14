@@ -76,7 +76,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    no knob: unwiring is the valve. Unwired, it is inert; wiring it is a
    permission-surface change, so it is yours to make.
 
-6. Optional — retune: copy `templates/delegation-config.sh` into your gates dir
+6. Optional — retune: copy `templates/delegation-config.knobs` into your gates dir
    and override the budget thresholds, the gate-file globs, or the meta-layer
    prefixes. Defaults are this repo's single-operator layout.
 

@@ -1,0 +1,3 @@
+# spec: canon-kit/SPEC.md §check-prose-enum — fixture consumer config: one three-member set so the pair exercises the gate the empty default would clean-skip
+CANON_KIT_ENUM_SETS_CMD[] = printf
+CANON_KIT_ENUM_SETS_CMD[] = sig\talpha\nsig\tbeta\nsig\tgamma\n

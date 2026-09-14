@@ -41,6 +41,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("QUEUE_KIT_ROADMAP_MARKER", "roadmap"),
     ],
     validate: Some(("queue config", validate)),
+    open_family: false,
+    retired: &[],
 };
 
 fn positive(v: &str) -> bool {

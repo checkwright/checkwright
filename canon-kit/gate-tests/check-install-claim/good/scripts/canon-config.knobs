@@ -1,0 +1,7 @@
+# spec: canon-kit/SPEC.md §check-install-claim — fixture consumer config: two transports, an anchored install-section regex, and the published-notes valve the pair proves is load-bearing
+CANON_KIT_MANIFEST_FILES[] = *.md
+CANON_KIT_MANIFEST_FILES[] = posts/*.md
+CANON_KIT_INSTALL_TRANSPORTS_CMD[] = bash
+CANON_KIT_INSTALL_TRANSPORTS_CMD[] = scripts/install-transports.sh
+CANON_KIT_INSTALL_SECTION_RE = ^(Quick start|Install)
+CANON_KIT_INSTALL_CLAIM_EXCLUDE[] = posts/*

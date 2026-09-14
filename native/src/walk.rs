@@ -388,7 +388,7 @@ pub fn pattern_match(pat: &str, s: &str) -> bool {
     glob_here(pat.as_bytes(), s.as_bytes())
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the walk `gate_find <root> -name <n> -type f`
+// spec: canon-kit/SPEC.md §The shared spec adapters — the walk `gate_find <root> -name <n> -type f`
 // performs, for a finder selecting by whole filename rather than by extension
 pub fn find_named(root: &Path, names: &[&str]) -> Result<Vec<PathBuf>, String> {
     find_named_pruning(root, names, &[])

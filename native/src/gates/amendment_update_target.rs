@@ -98,7 +98,7 @@ fn scan(text: &str) -> Scan {
                     i += 1;
                     continue;
                 }
-                // spec: canon-kit/SPEC.md §lib/spec.sh — the shared exempt window, the line or
+                // spec: canon-kit/SPEC.md §The shared spec adapters — the shared exempt window, the line or
                 // the one above
                 let exempt = raw.contains(EXEMPT) || (i > 0 && lines[i - 1].contains(EXEMPT));
                 let mut para = spec::Para::default();

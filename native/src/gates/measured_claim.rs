@@ -30,7 +30,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(root).is_dir() {
         return Err(format!("not a directory: {}", root));
     }
-    if spec::knob_pub("CANON_KIT_MEASURED_CLAIMS_CMD")?.is_empty() {
+    if spec::command("CANON_KIT_MEASURED_CLAIMS_CMD")?.is_empty() {
         println!("MEASURED-CLAIM: clean (CANON_KIT_MEASURED_CLAIMS_CMD unset — no oracle, so no marker has anything to disagree with)");
         return Ok(0);
     }
@@ -39,16 +39,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("MEASURED-CLAIM: clean (CANON_KIT_MEASURED_SURFACE_GLOBS empty — no scanned surface)");
         return Ok(0);
     }
-    let keys = spec::knob_array_pub("CANON_KIT_MEASURED_KEYS")?;
-    let values = spec::knob_array_pub("CANON_KIT_MEASURED_VALUES")?;
-    if keys.len() != values.len() {
-        return Err(format!(
-            "the bridged measured-claim roster is not index-aligned: {} key(s) against {} \
-             value(s) — the config bridge could not carry it; treating as failure (not clean)",
-            keys.len(),
-            values.len()
-        ));
-    }
+    let roster = spec::measured_claims()?;
 
     let mut files: Vec<String> = walk::glob_files(Path::new(root), &globs)?
         .into_iter()
@@ -73,7 +64,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // spec: canon-kit/SPEC.md §check-measured-claim — arm B, before either arm that reads
         // a value: an unknown key has no oracle value to compare against, so it fails closed
         // rather than reporting a disagreement it could not have measured
-        let idx = match keys.iter().position(|k| *k == m.key) {
+        let idx = match roster.iter().position(|(k, _)| *k == m.key) {
             Some(i) => i,
             None => {
                 errs.push(format!(
@@ -84,10 +75,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         };
         // spec: canon-kit/SPEC.md §check-measured-claim — arm A
-        if values[idx] != m.value {
+        if roster[idx].1 != m.value {
             out.push(format!(
                 "{}:{}  key '{}' is marked '{}' but the oracle now reports '{}'",
-                m.file, m.line, m.key, m.value, values[idx]
+                m.file, m.line, m.key, m.value, roster[idx].1
             ));
         }
         // spec: canon-kit/SPEC.md §check-measured-claim — arm C, which applies only to a

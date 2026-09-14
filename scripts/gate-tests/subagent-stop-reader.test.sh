@@ -14,11 +14,11 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the preamble above pins every kit's config file at
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the preamble above pins every kit's knob file at
 # an empty one so a KIT test runs on kit defaults; this is a CONSUMER-wiring test, so it un-pins
 # delegation-kit's and runs on this repo's real one — which since the liveness-reader cut names no
 # reader at all, making these arms the assertion that whatever this repo configures still answers
-export DELEGATION_KIT_CONFIG_FILE="$ROOT/scripts/delegation-config.sh"
+export DELEGATION_KIT_KNOB_FILE="$ROOT/scripts/delegation-config.knobs"
 # spec: gate-sdk/SPEC.md §The non-gate arm — the hook is a binary arm now, dispatched through the
 # front-end; the subject of arms A-C is unchanged and only its substrate moved
 HOOK_CMD=(bash "$ROOT/gate-sdk/bin/run-gates.sh" --hook subagent-stop-liveness)
@@ -90,7 +90,8 @@ want no-binary-message "$(cat "$tmp/no-binary.err")" "absent or not" "build-nati
 #      the no-interpreter-word contract asks of a consumer's shell reader — a stub written without
 #      them would not spawn at all, and this arm is where that requirement is executable.
 mute="$tmp/mute-reader.sh"; printf '#!/usr/bin/env bash\nexit 2\n' > "$mute"; chmod +x "$mute"
-line="$(fire unresolved "$absent" 2 DELEGATION_KIT_LIVENESS_CMD="$mute")"
+printf 'DELEGATION_KIT_LIVENESS_CMD[] = %s\n' "$mute" > "$tmp/mute.knobs"
+line="$(fire unresolved "$absent" 2 DELEGATION_KIT_KNOB_FILE="$tmp/mute.knobs")"
 want unresolved "$line" "verdict=unresolved" "live=no" "records=0" "decision=refuse"
 want unresolved-message "$(cat "$tmp/unresolved.err")" "turn-end refused" "produced no reading at all"
 

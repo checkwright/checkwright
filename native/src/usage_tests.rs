@@ -7,18 +7,13 @@ use crate::knobenv;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the namespace a *compiled* member reads: `walk::knob_scalar`
-// resolves `GATE_SDK_KNOB_<name>`, so this is the prefix the in-process subject's strip must aim at.
-// Aimed at `DELEGATION_KIT_` it would remove names the subject could not have read.
-const BRIDGE_PREFIX: &str = "GATE_SDK_KNOB_";
+// spec: gate-sdk/SPEC.md §The knob file — the namespace a static reader reads: a scalar from its own
+// name in the environment, so this is the prefix the in-process subject's strip must aim at.
+const KIT_PREFIX: &str = "DELEGATION_KIT_";
 
-fn bridged(knob: &str) -> String {
-    format!("{}{}", BRIDGE_PREFIX, knob)
-}
-
-// spec: delegation-kit/SPEC.md §Testing — the defaults `lib/delegation.sh` ships, as *literal
-// expectations* rather than reads of that library: reading them would make the table agree with
-// whatever the library says instead of asserting what it should say.
+// spec: delegation-kit/SPEC.md §Testing — the kit's defaults as *literal expectations* rather than
+// reads of its table, and the scalar ones only: the indexed command knob takes no environment
+// value, so its empty default is the knob file's absent line.
 const KIT_DEFAULTS: &[(&str, &str)] = &[
     ("DELEGATION_KIT_USAGE_FILE", ""),
     ("DELEGATION_KIT_CRED_FILE", ""),
@@ -26,23 +21,24 @@ const KIT_DEFAULTS: &[(&str, &str)] = &[
     ("DELEGATION_KIT_PAUSE_PCT_7D", "95"),
     ("DELEGATION_KIT_STALE_AGE", "600"),
     ("DELEGATION_KIT_LOGIN_WINDOW", "600"),
-    ("DELEGATION_KIT_REFRESH_CMD", ""),
     ("DELEGATION_KIT_REFRESH_MIN_AGE", "60"),
     ("DELEGATION_KIT_USAGE_HISTORY", ""),
     ("DELEGATION_KIT_FAN_WIDTH", "2"),
 ];
+
+const REFRESH_CMD: &str = "DELEGATION_KIT_REFRESH_CMD";
 
 // spec: delegation-kit/SPEC.md §Testing — the poison: a real value in the running process that
 // breaks every under-threshold row, so a strip that stops covering the namespace fails the table
 // loudly instead of passing it vacuously.
 const POISON: (&str, &str) = ("DELEGATION_KIT_PAUSE_PCT", "0");
 
-// spec: delegation-kit/SPEC.md §Testing — the in-process face of the child-environment strip: the
-// whole `GATE_SDK_KNOB_*` namespace, derived from the process's own variables at run time and never
-// a hardcoded list. Held so the surrounding process is left as the shell form's parent was.
-fn strip_bridge(knobs: &knobenv::KnobEnv) -> Vec<(String, String)> {
+// spec: delegation-kit/SPEC.md §Testing — the in-process face of the environment strip: the whole
+// `DELEGATION_KIT_*` namespace, derived from the process's own variables at run time and never a
+// hardcoded list. Held so the surrounding process is left as it was.
+fn strip_kit(knobs: &knobenv::KnobEnv) -> Vec<(String, String)> {
     let held: Vec<(String, String)> = std::env::vars()
-        .filter(|(n, _)| n.starts_with(BRIDGE_PREFIX))
+        .filter(|(n, _)| n.starts_with(KIT_PREFIX))
         .collect();
     for (name, _) in &held {
         knobs.remove(name);
@@ -50,25 +46,39 @@ fn strip_bridge(knobs: &knobenv::KnobEnv) -> Vec<(String, String)> {
     held
 }
 
-fn restore_bridge(knobs: &knobenv::KnobEnv, held: &[(String, String)]) {
+fn restore_kit(knobs: &knobenv::KnobEnv, held: &[(String, String)]) {
+    for (name, _) in KIT_DEFAULTS {
+        knobs.remove(name);
+    }
+    knobs.remove("GATE_SDK_GATES_DIR");
     for (name, value) in held {
         knobs.set(name, value);
     }
+    crate::knobs::reset(knobs);
 }
 
-// spec: delegation-kit/SPEC.md §Testing — the per-case bridge in `lib/delegation.sh`'s own order:
-// the case override first, then a default filling only what is unset. The order is what keeps the
-// poison load-bearing — a surviving one is not overwritten, so the table reddens.
-fn seed_bridge(knobs: &knobenv::KnobEnv, extra: &[(&str, String)]) {
+// spec: delegation-kit/SPEC.md §Testing — the per-case seed: the sandbox's knob file carries the
+// case's command argv, the case's scalars go first and a default fills only what is unset, which is
+// what keeps a surviving poison load-bearing.
+fn seed_kit(knobs: &knobenv::KnobEnv, sandbox: &Path, extra: &[(&str, String)]) {
+    knobs.set("GATE_SDK_GATES_DIR", &text(sandbox));
+    let mut file = String::new();
     for (name, value) in extra {
-        knobs.set(&bridged(name), value);
-    }
-    for (name, value) in KIT_DEFAULTS {
-        let var = bridged(name);
-        if std::env::var_os(&var).is_none() {
-            knobs.set(&var, value);
+        if *name == REFRESH_CMD {
+            for word in value.split(' ') {
+                file.push_str(&format!("{}[] = {}\n", REFRESH_CMD, word));
+            }
+        } else {
+            knobs.set(name, value);
         }
     }
+    std::fs::write(sandbox.join("delegation-config.knobs"), file).expect("the knob file must be writable");
+    for (name, value) in KIT_DEFAULTS {
+        if std::env::var_os(name).is_none() {
+            knobs.set(name, value);
+        }
+    }
+    crate::knobs::reset(knobs);
 }
 
 fn kit(rel: &str) -> PathBuf {
@@ -168,9 +178,9 @@ impl Verdict<'_> {
     // the same `verdict(args) -> (String, i32)` the budget guard makes, under a poison re-armed
     // before every case so the strip is proved at each one rather than once for the run.
     fn run(&self, extra: &[(&str, String)]) -> Ran {
-        self.knobs.set(&bridged(POISON.0), POISON.1);
-        strip_bridge(self.knobs);
-        seed_bridge(self.knobs, extra);
+        self.knobs.set(POISON.0, POISON.1);
+        strip_kit(self.knobs);
+        seed_kit(self.knobs, &self.sandbox, extra);
         let (out, code) = verdict::verdict(&[text(&self.usage), text(&self.cred)]);
         Ran { out, code }
     }
@@ -212,7 +222,7 @@ fn the_kits_verdict_decision_table_holds() {
     // spec: delegation-kit/SPEC.md §Testing — the subject now shares this process's environment
     // with the test, which makes `knobenv`'s serializing guard more load-bearing rather than less.
     let knobs = knobenv::lock();
-    let held = strip_bridge(&knobs);
+    let held = strip_kit(&knobs);
 
     let dir = sandbox("usage-tests");
     let v = Verdict {
@@ -462,8 +472,8 @@ fn the_kits_verdict_decision_table_holds() {
     // under-threshold reading PAUSEs rather than passing.
     v.write_snapshot("40", 0, 3600, None);
     v.set_credentials(None);
-    knobs.set(&bridged(POISON.0), POISON.1);
-    seed_bridge(&knobs, &[]);
+    knobs.set(POISON.0, POISON.1);
+    seed_kit(&knobs, &v.sandbox, &[]);
     let unstripped = verdict::verdict(&[text(&v.usage), text(&v.cred)]);
     assert_eq!(
         unstripped.1, 1,
@@ -473,10 +483,7 @@ fn the_kits_verdict_decision_table_holds() {
     );
 
     let _ = std::fs::remove_dir_all(&v.sandbox);
-    for (name, _) in KIT_DEFAULTS {
-        knobs.remove(&bridged(name));
-    }
-    restore_bridge(&knobs, &held);
+    restore_kit(&knobs, &held);
 }
 
 // spec: delegation-kit/SPEC.md §Testing — the trend needles are exact golden strings; loosening one
@@ -516,19 +523,14 @@ const TREND_SEGMENTS: &[(&str, &str, usize)] = &[
 // safe because the reporter measures within-segment deltas, never against *now*.
 #[test]
 fn the_kits_trend_fixture_reports_its_segments() {
-    // spec: delegation-kit/SPEC.md §Testing — the in-process face of the strip: the ambient bridge
-    // namespace is held aside and reseeded from the kit defaults, so the reporter reads the same
-    // empty history knob the stripped child read and the unset-knob arm below still fires.
+    // spec: delegation-kit/SPEC.md §Testing — the in-process face of the strip: the ambient kit
+    // namespace is held aside and reseeded from the kit defaults, so the reporter reads the empty
+    // history knob and the unset-knob arm below still fires.
     let knobs = knobenv::lock();
-    let held = strip_bridge(&knobs);
-    seed_bridge(&knobs, &[]);
+    let held = strip_kit(&knobs);
     let history = kit("delegation-kit/usage-tests/trend-history.log");
-    // spec: delegation-kit/SPEC.md §Testing — the poison, re-aimed by the port: the *unbridged*
-    // spelling carries a real path, so an arm reading the kit variable directly instead of through
-    // the config bridge passes the report arm and then fails the unset arm loudly.
-    knobs.set("DELEGATION_KIT_USAGE_HISTORY", &text(&history));
-
     let dir = sandbox("trend-tests");
+    seed_kit(&knobs, &dir, &[]);
 
     let report = usage_trend::emit(&[text(&history)]).expect("the fixture must report");
     for (label, needle) in TREND_NEEDLES {
@@ -599,9 +601,5 @@ fn the_kits_trend_fixture_reports_its_segments() {
     );
 
     let _ = std::fs::remove_dir_all(&dir);
-    knobs.remove("DELEGATION_KIT_USAGE_HISTORY");
-    for (name, _) in KIT_DEFAULTS {
-        knobs.remove(&bridged(name));
-    }
-    restore_bridge(&knobs, &held);
+    restore_kit(&knobs, &held);
 }

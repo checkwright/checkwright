@@ -475,7 +475,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     files.sort();
     files.dedup();
 
-    let phrases: Vec<(String, String)> = walk::knob_array("CANON_KIT_PROSE_TELL_PHRASES")?
+    let phrases: Vec<(String, String)> = crate::spec::vocabulary("CANON_KIT_PROSE_TELL_PHRASES", "CANON_KIT_PROSE_TELL_PHRASES_EXTRA")?
         .into_iter()
         .filter(|p| !p.is_empty())
         .map(|p| {
@@ -483,7 +483,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             (p, low)
         })
         .collect();
-    let allow: Vec<String> = walk::knob_array("CANON_KIT_PROSE_TELL_ABBR_ALLOW")?
+    let allow: Vec<String> = crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABBR_ALLOW", "CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA")?
         .into_iter()
         .filter(|a| !a.is_empty())
         .collect();

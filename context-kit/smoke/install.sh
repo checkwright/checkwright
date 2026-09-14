@@ -30,7 +30,7 @@ check-settings-paths
 # unregistered: check-surface-ratchet — exercised unregistered by this script's own ratchet() calls below: a ceiling stamped and registered here would be asserted against a half-installed consumer every co-vendored kit installing after context-kit still grows
 EOF
 
-cp "$SMOKE_KIT_ROOT/templates/context-config.sh"  scripts/context-config.sh
+cp "$SMOKE_KIT_ROOT/templates/context-config.knobs" scripts/context-config.knobs
 cp "$SMOKE_KIT_ROOT/templates/session-context.sh" scripts/session-context.sh
 
 mkdir -p .claude

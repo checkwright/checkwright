@@ -4,12 +4,12 @@
 use crate::proc;
 use crate::walk;
 
-// spec: delegation-kit/SPEC.md §Layout and configuration — the arm's declared reads. Every one is
-// defined and defaulted in `delegation-kit/lib/delegation.sh`, which the config bridge sources to
-// resolve them; the crate holds no default for a bridged knob.
+// spec: delegation-kit/SPEC.md §Layout and configuration — the arm's declared reads, every one a
+// row of delegation-kit's table.
 pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_USAGE_FILE",
     "DELEGATION_KIT_CRED_FILE",
+    "DELEGATION_KIT_ACCOUNT_CONFIG",
     "DELEGATION_KIT_PAUSE_PCT",
     "DELEGATION_KIT_PAUSE_PCT_7D",
     "DELEGATION_KIT_STALE_AGE",
@@ -60,7 +60,7 @@ struct Config {
     pause_pct_7d: String,
     stale_age: String,
     login_window: i64,
-    refresh_cmd: String,
+    refresh_cmd: Vec<String>,
     refresh_min_age: i64,
     history: String,
     width: String,
@@ -68,14 +68,15 @@ struct Config {
 
 fn config() -> Result<Config, String> {
     let k = walk::knob_scalar;
+    let paths = crate::hook::usage::paths()?;
     Ok(Config {
-        usage_file: k("DELEGATION_KIT_USAGE_FILE")?,
-        cred_file: k("DELEGATION_KIT_CRED_FILE")?,
+        usage_file: paths.usage_file,
+        cred_file: paths.cred_file,
         pause_pct: k("DELEGATION_KIT_PAUSE_PCT")?,
         pause_pct_7d: k("DELEGATION_KIT_PAUSE_PCT_7D")?,
         stale_age: k("DELEGATION_KIT_STALE_AGE")?,
         login_window: int(&k("DELEGATION_KIT_LOGIN_WINDOW")?),
-        refresh_cmd: k("DELEGATION_KIT_REFRESH_CMD")?,
+        refresh_cmd: walk::knob_array("DELEGATION_KIT_REFRESH_CMD")?,
         refresh_min_age: int(&k("DELEGATION_KIT_REFRESH_MIN_AGE")?),
         history: k("DELEGATION_KIT_USAGE_HISTORY")?,
         width: k("DELEGATION_KIT_FAN_WIDTH")?,
@@ -248,12 +249,11 @@ fn credentials_mtime(path: &str) -> i64 {
 }
 
 // spec: delegation-kit/SPEC.md §usage-verdict — demand-driven refresh, short-circuited under
-// REFRESH_MIN_AGE and fail-soft. `bash -c` survives the port because
-// DELEGATION_KIT_REFRESH_CMD *is* a command seam rather than an implementation detail.
+// REFRESH_MIN_AGE and fail-soft; DELEGATION_KIT_REFRESH_CMD is an argv spawned with no shell.
 fn refresh(cfg: &Config) {
-    if cfg.refresh_cmd.is_empty() {
+    let Some((program, rest)) = cfg.refresh_cmd.split_first() else {
         return;
-    }
+    };
     if let Ok(body) = std::fs::read_to_string(&cfg.usage_file) {
         // spec: delegation-kit/SPEC.md §usage-verdict — the short-circuit probe is `awk -F=`'s
         // read, which takes a final unterminated record where the `read` loop above drops it, so
@@ -267,7 +267,8 @@ fn refresh(cfg: &Config) {
             return;
         }
     }
-    let _ = proc::run("bash", &["-c", &cfg.refresh_cmd]);
+    let args: Vec<&str> = rest.iter().map(String::as_str).collect();
+    let _ = proc::run(program, &args);
 }
 
 // spec: delegation-kit/SPEC.md §usage-verdict — the rule itself, returning the verdict line and the

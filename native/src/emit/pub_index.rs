@@ -146,7 +146,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let paths = targets(args)?;
     let root = crate::walk::toplevel_opt()?;
     let dir = crate::walk::knob_scalar("CONTEXT_KIT_PUB_LANG_DIR")?;
-    // spec: context-kit/SPEC.md §lib/context.sh — an empty `CONTEXT_KIT_PUB_LANGS` means *derive
+    // spec: context-kit/SPEC.md §Layout and configuration — an empty `CONTEXT_KIT_PUB_LANGS` means *derive
     // it*, not *no languages*: a repo-relative literal cannot express the shipped roster, so the
     // one reader of the knob expands it to the built-in set.
     let mut langs = crate::walk::knob_array("CONTEXT_KIT_PUB_LANGS")?;

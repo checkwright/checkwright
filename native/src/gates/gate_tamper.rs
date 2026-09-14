@@ -188,7 +188,15 @@ pub fn run(args: &[String]) -> i32 {
 
 fn rule(args: &[String]) -> Result<i32, String> {
     let globs = walk::knob_array("DELEGATION_KIT_GATE_FILES")?;
-    let meta = walk::knob_array("DELEGATION_KIT_META_PATHS")?;
+    let mut meta = walk::knob_array("DELEGATION_KIT_META_PATHS")?;
+    // spec: delegation-kit/SPEC.md §Layout and configuration — a vendored kit's edits are meta-layer by
+    // definition: every kit root joins as a `<root>/` prefix the resolved value does not already hold
+    for root in walk::kit_roots_rel()? {
+        let prefix = format!("{}/", root.trim_end_matches('/'));
+        if !root.is_empty() && !meta.contains(&prefix) {
+            meta.push(prefix);
+        }
+    }
 
     let mut fixture: Option<String> = None;
     let mut i = 0usize;

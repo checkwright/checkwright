@@ -6,6 +6,9 @@ pub enum Form {
     Scalar,
     Indexed,
     Keyed(String),
+    // spec: gate-sdk/SPEC.md §The knob file — `NAME[] <- OTHER`: the referent's name, whose resolved
+    // elements splice at this line's position; the entry's value is empty
+    Reference(String),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -28,8 +31,8 @@ fn is_name(s: &str) -> bool {
 
 fn refuse(file: &str, lno: usize, what: &str) -> String {
     format!(
-        "{}:{}: {} — write `NAME = value`, `NAME[] = element` or `NAME[key] = value` \
-         (gate-sdk/SPEC.md §The knob file)",
+        "{}:{}: {} — write `NAME = value`, `NAME[] = element`, `NAME[key] = value` or \
+         `NAME[] <- OTHER` (gate-sdk/SPEC.md §The knob file)",
         file, lno, what
     )
 }
@@ -43,7 +46,25 @@ pub fn parse(text: &str, file: &str) -> Result<Vec<Entry>, String> {
             continue;
         }
         let Some((head, value)) = t.split_once('=') else {
-            return Err(refuse(file, lno, "a line with no `=`"));
+            let Some((head, other)) = t.split_once("<-") else {
+                return Err(refuse(file, lno, "a line with no `=`"));
+            };
+            let (head, other) = (head.trim_matches(blank), other.trim_matches(blank));
+            let Some(name) = head.strip_suffix("[]") else {
+                return Err(refuse(file, lno, &format!("the reference head `{}` is not `NAME[]`", head)));
+            };
+            for n in [name, other] {
+                if !is_name(n) {
+                    return Err(refuse(file, lno, &format!("`{}` is not a SCREAMING_SNAKE knob name", n)));
+                }
+            }
+            out.push(Entry {
+                lno,
+                name: name.to_string(),
+                form: Form::Reference(other.to_string()),
+                value: String::new(),
+            });
+            continue;
         };
         let head = head.trim_matches(blank);
         let value = value.trim_matches(blank);
@@ -98,13 +119,33 @@ mod tests {
     }
 
     #[test]
+    fn a_reference_line_names_its_referent_and_a_value_never_reads_as_one() {
+        assert_eq!(one("  A_B[]  <-  C_D ").form, Form::Reference("C_D".to_string()));
+        assert_eq!(one("A[] = x <- Y").form, Form::Indexed);
+        assert_eq!(one("A[] = x <- Y").value, "x <- Y");
+        assert_eq!(one("A[] = ${B}").value, "${B}");
+    }
+
+    #[test]
     fn blank_and_comment_lines_are_ignored() {
         assert!(parse("\n   \n# c\n   # indented\n", "f").expect("parses").is_empty());
     }
 
     #[test]
     fn every_malformed_line_is_refused_with_its_file_and_line() {
-        for bad in ["just words", "a = lower", "A[ = x", "A[k]x = 1", "A = a\tb", "= v", "A[a]b] = 1"] {
+        for bad in [
+            "just words",
+            "a = lower",
+            "A[ = x",
+            "A[k]x = 1",
+            "A = a\tb",
+            "= v",
+            "A[a]b] = 1",
+            "A <- B",
+            "A[k] <- B",
+            "A[] <- b",
+            "A[] <-",
+        ] {
             let e = parse(&format!("# ok\n{}\n", bad), "cfg.knobs").expect_err(bad);
             assert!(e.starts_with("cfg.knobs:2: "), "{:?} gave {}", bad, e);
         }

@@ -32,10 +32,7 @@ const BG_EMPTY: u16 = 238;
 
 pub fn run(_args: &[String]) -> i32 {
     let payload = hook::read_payload();
-    let knob = |name: &str| walk::knob_scalar(name).unwrap_or_default();
-    let usage_file = knob("DELEGATION_KIT_USAGE_FILE");
-    let cred_file = knob("DELEGATION_KIT_CRED_FILE");
-    let account_config = knob("DELEGATION_KIT_ACCOUNT_CONFIG");
+    let usage::Paths { usage_file, cred_file, account_config } = usage::paths().unwrap_or_default();
 
     let at = |path: &[&str]| hook::field(payload.as_ref(), path);
     let five = at(&["rate_limits", "five_hour", "used_percentage"]);

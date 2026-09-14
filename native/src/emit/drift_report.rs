@@ -8,8 +8,8 @@ use crate::walk;
 use std::path::Path;
 
 // spec: drift-kit/SPEC.md §The KPI plugin contract — the declared reads: `DRIFT_KIT_*` is the
-// **prefix family**, which is `compgen -v DRIFT_KIT_` carried across the config bridge rather than
-// a transcribed roster, so a consumer config's own knob resolves and reaches a plugin unchanged.
+// **prefix family**, the kit's family read rather than a transcribed roster, so a consumer knob file's
+// own scalar resolves and reaches a plugin unchanged.
 pub const KNOBS: &[&str] = &[
     "DRIFT_KIT_*",
     "GATE_SDK_GATES_DIR",
@@ -25,18 +25,18 @@ pub const KNOBS: &[&str] = &[
     "CONTEXT_KIT_BASELINE_FILE",
 ];
 
-// spec: drift-kit/SPEC.md §The KPI plugin contract — the two array knobs the wire format cannot
-// distinguish from a scalar: bash could not export an array, and reproducing that skip is what
-// keeps a consumer plugin's environment the one its shell original saw.
-const ARRAY_KNOBS: &[&str] = &["DRIFT_KIT_KPI_DIRS", "DRIFT_KIT_STAGES"];
-
 const HEADER: &str = "=== Drift KPIs (advisory — trend, not level) ===";
 const LEAD_BANNER: &str = "--- Lead (weighted high — act before drift compounds) ---";
 const LAG_BANNER: &str = "--- Lag (weighted low — undercounts by construction) ---";
 const FOOTER: &str = "Read trend across sessions; lag KPIs lower-bound only.";
 
-fn family() -> Vec<(String, String)> {
-    walk::knob_prefix("DRIFT_KIT_")
+// spec: drift-kit/SPEC.md §The KPI plugin contract — every scalar the family read resolves, keyed by
+// the suffix the prefix leaves
+fn family() -> Result<Vec<(String, String)>, String> {
+    Ok(crate::knobs::family("DRIFT_KIT_")?
+        .into_iter()
+        .filter_map(|(n, v)| n.strip_prefix("DRIFT_KIT_").map(|s| (s.to_string(), v)))
+        .collect())
 }
 
 fn scalar(fam: &[(String, String)], suffix: &str) -> String {
@@ -76,14 +76,11 @@ fn resolve(name: &str, kpi_dirs: &[String], kit_roots: &[String]) -> Option<Reso
 }
 
 // spec: drift-kit/SPEC.md §The KPI plugin contract — the exported environment a consumer plugin
-// reads: every scalar `DRIFT_KIT_*` the bridge resolved, plus the two driver handoffs, which are
+// reads: every scalar the family read resolves, plus the two driver handoffs, which are
 // recomputed every run and are not consumer knobs.
 fn child_env(fam: &[(String, String)], ctx: &Ctx) -> Vec<(String, String)> {
     let mut env: Vec<(String, String)> = fam
         .iter()
-        .filter(|(suffix, value)| {
-            !value.contains('\t') && !ARRAY_KNOBS.contains(&format!("DRIFT_KIT_{}", suffix).as_str())
-        })
         .map(|(suffix, value)| (format!("DRIFT_KIT_{}", suffix), value.clone()))
         .collect();
     env.push((
@@ -136,7 +133,7 @@ fn render_rows(rows: &[(String, String)]) -> String {
 
 pub fn emit(args: &[String]) -> Result<String, String> {
     let trend = args.iter().any(|a| a == "--trend");
-    let fam = family();
+    let fam = family()?;
     let kit_roots = walk::kit_roots_abs()?;
 
     let ctx = Ctx {
@@ -266,28 +263,19 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
-    // spec: drift-kit/SPEC.md §The KPI plugin contract — the exported environment: every scalar
-    // family member plus the two handoffs, with the array knobs skipped exactly as bash skipped
-    // them, so a consumer plugin reads what its shell original read
+    // spec: drift-kit/SPEC.md §The KPI plugin contract — the exported environment: every family
+    // scalar plus the two handoffs
     #[test]
-    fn the_child_environment_carries_the_scalars_and_both_handoffs_and_no_array() {
+    fn the_child_environment_carries_the_family_and_both_handoffs() {
         let fam = vec![
             ("QUEUE_FILE".to_string(), "TASK-QUEUE.md".to_string()),
-            ("KPI_DIRS".to_string(), "scripts".to_string()),
-            ("STAGES".to_string(), "scope\tbuild".to_string()),
             ("SESSIONS_DIR".to_string(), "/tmp/sessions".to_string()),
+            ("SMOKE_CUSTOM".to_string(), "reached".to_string()),
         ];
         let ctx = ctx_for_test();
         let env = child_env(&fam, &ctx);
         let has = |k: &str| env.iter().any(|(n, _)| n == k);
-        assert!(has("DRIFT_KIT_QUEUE_FILE"));
-        assert!(
-            has("DRIFT_KIT_SESSIONS_DIR"),
-            "a family member this arm's own code never names did not cross, which is the whole \
-             contract the prefix family exists for"
-        );
-        assert!(!has("DRIFT_KIT_KPI_DIRS"), "a declared array knob was exported");
-        assert!(!has("DRIFT_KIT_STAGES"), "a multi-element knob was exported");
+        assert!(has("DRIFT_KIT_QUEUE_FILE") && has("DRIFT_KIT_SESSIONS_DIR") && has("DRIFT_KIT_SMOKE_CUSTOM"));
         assert!(has("DRIFT_KIT_KIT_ROOTS") && has("DRIFT_KIT_ITERATION_START"));
     }
 

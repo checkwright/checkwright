@@ -1,0 +1,31 @@
+# spec: context-kit/SPEC.md §Layout and configuration — this repo's context-kit consumer knob file
+
+# comment-tier-exempt: this repo budgets the gate-sdk conventions roster and Housekeeping as its always-loaded sections, not the platform default "## Shared conventions"; the doctrine digest is generated and held byte-for-byte elsewhere, so it is not governed
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Conventions established in gate-sdk (keep every kit consistent)
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Housekeeping
+
+# comment-tier-exempt: assigned explicitly rather than derived from GATE_PRUNE_DIRS — the two sets are deliberately not identical (this one omits .tmp and gate-tests, and carries dist and build), and deriving one from the other would make context-kit's own exclusion rule a gate-sdk read
+CONTEXT_KIT_PRUNE_DIRS[] = .git
+CONTEXT_KIT_PRUNE_DIRS[] = node_modules
+CONTEXT_KIT_PRUNE_DIRS[] = target
+CONTEXT_KIT_PRUNE_DIRS[] = dist
+CONTEXT_KIT_PRUNE_DIRS[] = build
+CONTEXT_KIT_PRUNE_DIRS[] = worktrees
+
+# comment-tier-exempt: gate-sdk lives at gate-sdk/bin/ in this monorepo, so name the front-end explicitly rather than lean on the default gates-dir probe
+CONTEXT_KIT_HOOK_CMD[] = bash
+CONTEXT_KIT_HOOK_CMD[] = gate-sdk/bin/run-gates.sh
+CONTEXT_KIT_HOOK_CMD[] = --emit
+CONTEXT_KIT_HOOK_CMD[] = queue-index
+CONTEXT_KIT_HOOK_CMD[] = --collapse-deferred
+
+# comment-tier-exempt: docs/ is the generated SPEC mirror and gate-tests/ holds fixtures — both are copies, so their growth is the source's, counted once at the source
+CONTEXT_KIT_GROWTH_PATHS[] = *.md
+CONTEXT_KIT_GROWTH_PATHS[] = :(exclude)docs/
+CONTEXT_KIT_GROWTH_PATHS[] = :(exclude)*/gate-tests/
+
+# comment-tier-exempt: this repo's load-triggered surfaces — the kit templates a skill shim pulls in whole, the agent definitions and the binding shims; the gate-tests exclusion keeps the ratchet's own fixture corpus out of the governed set it fixtures
+CONTEXT_KIT_RATCHET_PATHS[] = */templates/*.md
+CONTEXT_KIT_RATCHET_PATHS[] = .claude/agents/*.md
+CONTEXT_KIT_RATCHET_PATHS[] = .claude/commands/*.md
+CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)*/gate-tests/*

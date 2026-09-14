@@ -1,0 +1,4 @@
+# spec: canon-kit/SPEC.md §check-unmarked-claim — fixture consumer config: the good pair's class and surface unchanged, so the bad case differs only in whether the prose carries an oracle
+CANON_KIT_CLAIM_CLASSES_CMD[] = printf
+CANON_KIT_CLAIM_CLASSES_CMD[] = engine-substrate\tthe engine is (a|one) (small )?(shell script|shell program)\n
+CANON_KIT_MEASURED_SURFACE_GLOBS[] = *.md

@@ -1,0 +1,6 @@
+# spec: canon-kit/SPEC.md §check-payload-claim — fixture consumer config: two disclosure classes and the published-notes valve the pair proves is load-bearing
+CANON_KIT_MANIFEST_FILES[] = *.md
+CANON_KIT_MANIFEST_FILES[] = posts/*.md
+CANON_KIT_PAYLOAD_CLAIMS_CMD[] = bash
+CANON_KIT_PAYLOAD_CLAIMS_CMD[] = scripts/payload-claims.sh
+CANON_KIT_PAYLOAD_CLAIM_EXCLUDE[] = posts/*

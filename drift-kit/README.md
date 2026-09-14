@@ -29,7 +29,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
    ```bash
    cp drift-kit/templates/kpis.list       scripts/kpis.list
-   cp drift-kit/templates/drift-config.sh scripts/drift-config.sh   # optional
+   cp drift-kit/templates/drift-config.knobs scripts/drift-config.knobs   # optional
    ```
 
    Prune `scripts/kpis.list` to the KPIs whose surfaces your repo has; each
@@ -42,7 +42,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
    and prints one line; absent the variable, the line is silently skipped.
 
 Configuration follows the established kit pattern — override any knob in
-`drift-config.sh` (registry path, extra KPI dirs, the queue/log/timings surfaces,
+`drift-config.knobs` (registry path, extra KPI dirs, the queue/log/timings surfaces,
 the metric dir holding the persistent trend logs, the Done/Deferred section
 headings); defaults are this repo's layout. Keep the metric dir
 (`DRIFT_KIT_METRIC_DIR`; drift-kit/SPEC.md §Layout and configuration owns the

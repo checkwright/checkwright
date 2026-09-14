@@ -27,9 +27,7 @@ fn fail(problem: &str, help: &str) -> i32 {
 
 pub fn run(_args: &[String]) -> i32 {
     let knob = |name: &str| walk::knob_scalar(name).unwrap_or_default();
-    let usage_file = knob("DELEGATION_KIT_USAGE_FILE");
-    let cred_file = knob("DELEGATION_KIT_CRED_FILE");
-    let account_config = knob("DELEGATION_KIT_ACCOUNT_CONFIG");
+    let usage::Paths { usage_file, cred_file, account_config } = usage::paths().unwrap_or_default();
     let endpoint = knob("DELEGATION_KIT_USAGE_ENDPOINT");
 
     // spec: delegation-kit/SPEC.md §The usage.txt contract — curl stays external and stays spawned:

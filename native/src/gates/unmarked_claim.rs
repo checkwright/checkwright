@@ -26,12 +26,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: canon-kit/SPEC.md §check-unmarked-claim — the roster is consumer config with no kit
     // default, so an unset command is the clean skip: a tree that declared no class has no
     // sentence falling in one
-    if spec::knob_pub("CANON_KIT_CLAIM_CLASSES_CMD")?.is_empty() {
+    if spec::command("CANON_KIT_CLAIM_CLASSES_CMD")?.is_empty() {
         println!("UNMARKED-CLAIM: clean (CANON_KIT_CLAIM_CLASSES_CMD unset — no declared claim class, so no sentence falls in one)");
         return Ok(0);
     }
-    let classes =
-        spec::claim_vocabulary("CANON_KIT_CLAIM_CLASS_IDS", "CANON_KIT_CLAIM_CLASS_PATTERNS")?;
+    let classes = spec::claim_vocabulary("CANON_KIT_CLAIM_CLASSES_CMD")?;
     if classes.is_empty() {
         println!("UNMARKED-CLAIM: clean (CANON_KIT_CLAIM_CLASSES_CMD declared no claim classes)");
         return Ok(0);

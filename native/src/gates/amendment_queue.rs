@@ -14,7 +14,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `SPEC_SECTION_RE` is `^## ` and nothing more, and the
+// spec: canon-kit/SPEC.md §The shared spec adapters — `SPEC_SECTION_RE` is `^## ` and nothing more, and the
 // three classifying patterns are `^## (<name>|…)[[:space:]]*$` over an unescaped `|` join, so a
 // heading's class is decided by comparing the trimmed name against the configured sets
 enum Sec {

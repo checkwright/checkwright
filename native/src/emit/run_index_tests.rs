@@ -95,19 +95,19 @@ fn execute(update: bool) -> Result<i32, String> {
         &[],
     )?;
     // spec: context-kit/SPEC.md §Testing — the extractor seam's end-to-end proof: the scratch
-    // `rust.sh` reaches disk and `CONTEXT_KIT_CONFIG_FILE` is passed into the *child*, never
+    // `rust.sh` reaches disk and `CONTEXT_KIT_KNOB_FILE` is passed into the *child*, never
     // resolved here.
     r.check(
         "pub-index-shadow",
         "pub-index-shadow.txt",
         &["--emit", "pub-index", &sample_rs],
-        &[("CONTEXT_KIT_CONFIG_FILE".to_string(), shadow_cfg.clone())],
+        &[("CONTEXT_KIT_KNOB_FILE".to_string(), shadow_cfg.clone())],
     )?;
     r.check(
         "always-loaded",
         "always-loaded.txt",
         &["--emit", "always-loaded"],
-        &[("CONTEXT_KIT_CONFIG_FILE".to_string(), cfg.clone())],
+        &[("CONTEXT_KIT_KNOB_FILE".to_string(), cfg.clone())],
     )?;
 
     if !r.update {
@@ -224,7 +224,7 @@ impl Runner {
     // refused. No golden holds this: the assertion is the exit status and the *stream* the usage
     // went to.
     fn refusal_case(&mut self, cfg: &str) -> Result<(), String> {
-        let env = [("CONTEXT_KIT_CONFIG_FILE".to_string(), cfg.to_string())];
+        let env = [("CONTEXT_KIT_KNOB_FILE".to_string(), cfg.to_string())];
         let done = proc::run_with_env_in(
             "bash",
             &[&self.front_end, "--emit", "always-loaded", "--growht"],
@@ -327,11 +327,11 @@ fn write_shadow(scratch: &Scratch) -> Result<String, String> {
          PUB_LANG_GLOBS=(\"*.rs\")\n\
          pub_lang_extract() { printf 'shadow ok 1\\n'; }\n",
     )?;
-    let cfg = scratch.root.join("shadow.conf");
+    let cfg = scratch.root.join("shadow.knobs");
     write(
         &cfg,
         &format!(
-            "CONTEXT_KIT_PUB_LANG_DIR=\"{}\"\nCONTEXT_KIT_PUB_LANGS=(\"rust\")\n",
+            "CONTEXT_KIT_PUB_LANG_DIR = {}\nCONTEXT_KIT_PUB_LANGS[] = rust\n",
             dir.display()
         ),
     )?;
@@ -342,15 +342,16 @@ fn write_shadow(scratch: &Scratch) -> Result<String, String> {
 // fixture corpus (the state file pinned absent-but-nonempty-path), so the golden holds a
 // measurement of the corpus rather than of this repo's live iteration state.
 fn write_meter_config(scratch: &Scratch, corpus: &str) -> Result<String, String> {
-    let cfg = scratch.root.join("meter.conf");
+    let cfg = scratch.root.join("meter.knobs");
     let absent_state = scratch.root.join("no-iteration-state.txt");
     write(
         &cfg,
         &format!(
-            "CONTEXT_KIT_SURFACES=(\"{0}/surface.md\")\n\
-             CONTEXT_KIT_HOOK_CMD=\"cat {0}/hook-sample.txt\"\n\
-             CONTEXT_KIT_BASELINE_FILE=\"{0}/baseline.txt\"\n\
-             CONTEXT_KIT_STATE_FILE=\"{1}\"\n",
+            "CONTEXT_KIT_SURFACES[] = {0}/surface.md\n\
+             CONTEXT_KIT_HOOK_CMD[] = cat\n\
+             CONTEXT_KIT_HOOK_CMD[] = {0}/hook-sample.txt\n\
+             CONTEXT_KIT_BASELINE_FILE = {0}/baseline.txt\n\
+             CONTEXT_KIT_STATE_FILE = {1}\n",
             corpus,
             absent_state.display()
         ),

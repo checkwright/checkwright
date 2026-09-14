@@ -23,13 +23,9 @@ pub type HookFn = fn(Option<&Value>) -> i32;
 // on, `--knobs --hook` reads and the unknown-member refusal prints. Each row's knob slice is
 // exactly what that member's shell original read, less the knobs a compiled member cannot want.
 pub const HOOKS: &[(&str, HookFn, &[&str])] = &[
-    // spec: delegation-kit/SPEC.md §usage-verdict — the rule runs inside the hook process now, so
-    // the row declares the rule's own reads rather than a path to it: the member's roster and its
-    // kit library's defaults stay one change, which is the property that rule exists for
+    // spec: delegation-kit/SPEC.md §usage-verdict — the rule runs inside the hook process, so the row
+    // declares the rule's own reads rather than a path to it, one roster for both callers
     ("agent-budget-guard", budget::run, verdict::KNOBS),
-    // spec: delegation-kit/SPEC.md §Layout and configuration — `DELEGATION_KIT_CONFIG_FILE` is not
-    // declared here: it selects which file the bridge sources to resolve the roster below, so it is
-    // resolved a process earlier and a declared copy would arrive too late to redirect anything.
     (
         "agent-dispatch-guard",
         dispatch::run,

@@ -1,0 +1,4 @@
+# spec: canon-kit/SPEC.md §check-unmarked-claim — fixture consumer config: one declared claim class and the shared measured surface, so the pair exercises the gate the empty defaults would clean-skip
+CANON_KIT_CLAIM_CLASSES_CMD[] = printf
+CANON_KIT_CLAIM_CLASSES_CMD[] = engine-substrate\tthe engine is (a|one) (small )?(shell script|shell program)\n
+CANON_KIT_MEASURED_SURFACE_GLOBS[] = *.md

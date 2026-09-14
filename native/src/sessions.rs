@@ -55,12 +55,17 @@ pub fn sessions_dir(i: &Inputs) -> String {
     if !i.sessions_dir.is_empty() {
         return i.sessions_dir.clone();
     }
-    let home = if i.config_home.is_empty() {
-        format!("{}/.claude", i.home)
+    format!("{}/projects/{}", config_home(&i.config_home, &i.home), slug(&i.here))
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the harness's config home, `$CLAUDE_CONFIG_DIR`
+// when set non-empty, else `~/.claude`: the one derivation every reader of that home shares
+pub fn config_home(config_dir: &str, home: &str) -> String {
+    if config_dir.is_empty() {
+        format!("{}/.claude", home)
     } else {
-        i.config_home.clone()
-    };
-    format!("{}/projects/{}", home, slug(&i.here))
+        config_dir.to_string()
+    }
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the two-tier candidate layout, in one place, so

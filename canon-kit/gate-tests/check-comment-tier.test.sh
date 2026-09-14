@@ -6,7 +6,7 @@
 # exempts them — a difference only the derived surface shows, since an explicit
 # CANON_KIT_COMMENT_SURFACE bypasses the split), and the count-shape override's
 # two edges: the comment-tier-exempt valve suppresses it, positional rescue does
-# not. Each needs a per-case CANON_KIT_CONFIG_FILE or scan root, which
+# not. Each needs a per-case CANON_KIT_KNOB_FILE or scan root, which
 # run-gate-tests passes to neither. The good/bad pair covers the shell classifier
 # (directive run, exempt, heredoc skip) and the count override's mainline; these
 # cover the mechanism a consumer activates by widening the surface, plus the
@@ -57,9 +57,9 @@ mkcfg() {  # $1=file  $2..=lines
     local f="$1"; shift
     printf '%s\n' "$@" >"$f"
 }
-mkcfg "$SANDBOX/rs.sh" 'CANON_KIT_COMMENT_SURFACE=(ok.rs)'   'CANON_KIT_COMMENT_POSITIONAL=(unsafe)'
-mkcfg "$SANDBOX/bad.sh" 'CANON_KIT_COMMENT_SURFACE=(bad.rs)' 'CANON_KIT_COMMENT_POSITIONAL=(unsafe)'
-mkcfg "$SANDBOX/txt.sh" 'CANON_KIT_COMMENT_SURFACE=(state.txt)'
+mkcfg "$SANDBOX/rs.knobs" 'CANON_KIT_COMMENT_SURFACE[] = ok.rs'   'CANON_KIT_COMMENT_POSITIONAL[] = unsafe'
+mkcfg "$SANDBOX/bad.knobs" 'CANON_KIT_COMMENT_SURFACE[] = bad.rs' 'CANON_KIT_COMMENT_POSITIONAL[] = unsafe'
+mkcfg "$SANDBOX/txt.knobs" 'CANON_KIT_COMMENT_SURFACE[] = state.txt'
 
 # The count-shape override's two edges. The exempt valve suppresses a count in
 # its window; positional rescue does not — it clears the tier flag a plain block
@@ -75,12 +75,12 @@ warm() { echo x; }
 # six gates guard the construct below
 run() { unsafe; }
 EOF
-mkcfg "$SANDBOX/exempt-cfg.sh" 'CANON_KIT_COMMENT_SURFACE=(exempt.sh)'
-mkcfg "$SANDBOX/pos-cfg.sh" 'CANON_KIT_COMMENT_SURFACE=(pos.sh)' 'CANON_KIT_COMMENT_POSITIONAL=(unsafe)'
+mkcfg "$SANDBOX/exempt-cfg.knobs" 'CANON_KIT_COMMENT_SURFACE[] = exempt.sh'
+mkcfg "$SANDBOX/pos-cfg.knobs" 'CANON_KIT_COMMENT_SURFACE[] = pos.sh' 'CANON_KIT_COMMENT_POSITIONAL[] = unsafe'
 
 # Derived-surface trees (no CANON_KIT_COMMENT_SURFACE) so the templates/ prune
 # axis is live. A thinned template stub passes; a narrating one is red.
-: >"$SANDBOX/derived.sh"
+: >"$SANDBOX/derived.knobs"
 mkdir -p "$SANDBOX/tmpl-good/templates" "$SANDBOX/tmpl-bad/templates"
 cat >"$SANDBOX/tmpl-good/templates/thin.sh" <<'EOF'
 # shellcheck shell=bash
@@ -112,13 +112,13 @@ cat >"$SANDBOX/wf-bad/.workflow/record.md" <<'EOF'
 - corpus: checks/
 # this single-hash line on the md member is still an untagged comment
 EOF
-mkcfg "$SANDBOX/wfmd.sh" 'CANON_KIT_COMMENT_SURFACE=(.workflow/record.md)'
+mkcfg "$SANDBOX/wfmd.knobs" 'CANON_KIT_COMMENT_SURFACE[] = .workflow/record.md'
 
 check_case() {  # $1=label $2=cfg $3=want-rc $4=want-substring $5=root(default SANDBOX)
     local label="$1" cfg="$2" want="$3" sub="$4" root="${5:-$SANDBOX}" out rc
     # spec: gate-sdk/SPEC.md §run-gate-tests — the gate is named, never spelled as a script
     #   path: gate_run resolves whichever substrate declares it, under this case's own env
-    out="$(gate_env CANON_KIT_CONFIG_FILE="$SANDBOX/$cfg" && gate_run check-comment-tier "$DIR/checks" "$root" 2>&1)"; rc=$?
+    out="$(gate_env CANON_KIT_KNOB_FILE="$SANDBOX/$cfg" && gate_run check-comment-tier "$DIR/checks" "$root" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -128,19 +128,19 @@ check_case() {  # $1=label $2=cfg $3=want-rc $4=want-substring $5=root(default S
     fi
 }
 
-check_case "slash-positional-rescue" rs.sh  0 "COMMENT-TIER: clean"
-check_case "slash-standalone-flag"    bad.sh 1 "standalone slash block restates"
-check_case "txt-restricted-roster"    txt.sh 1 "not in the roster"
-check_case "templates-thinned-ok"  derived.sh 0 "COMMENT-TIER: clean"          "$SANDBOX/tmpl-good"
-check_case "templates-narration-red" derived.sh 1 "the tier gate scans templates" "$SANDBOX/tmpl-bad"
-check_case "count-exempt-valve" exempt-cfg.sh 0 "COMMENT-TIER: clean"
-check_case "count-survives-positional-rescue" pos-cfg.sh 1 "restated collection total: six gates"
-check_case "workflow-md-headings-are-structure" wfmd.sh 0 "COMMENT-TIER: clean" "$SANDBOX/wf-good"
-check_case "workflow-md-single-hash-governed"   wfmd.sh 1 "still an untagged comment" "$SANDBOX/wf-bad"
+check_case "slash-positional-rescue" rs.knobs  0 "COMMENT-TIER: clean"
+check_case "slash-standalone-flag"    bad.knobs 1 "standalone slash block restates"
+check_case "txt-restricted-roster"    txt.knobs 1 "not in the roster"
+check_case "templates-thinned-ok"  derived.knobs 0 "COMMENT-TIER: clean"          "$SANDBOX/tmpl-good"
+check_case "templates-narration-red" derived.knobs 1 "the tier gate scans templates" "$SANDBOX/tmpl-bad"
+check_case "count-exempt-valve" exempt-cfg.knobs 0 "COMMENT-TIER: clean"
+check_case "count-survives-positional-rescue" pos-cfg.knobs 1 "restated collection total: six gates"
+check_case "workflow-md-headings-are-structure" wfmd.knobs 0 "COMMENT-TIER: clean" "$SANDBOX/wf-good"
+check_case "workflow-md-single-hash-governed"   wfmd.knobs 1 "still an untagged comment" "$SANDBOX/wf-bad"
 
 # The bad fixture's expect.txt asserts the count override, so the window-spill
 # half of the pair keeps its assertion here.
-check_case "window-spill-flagged" derived.sh 1 "spills outside the window" \
+check_case "window-spill-flagged" derived.knobs 1 "spills outside the window" \
     "$DIR/gate-tests/check-comment-tier/bad"
 
 # The paragraph-join window over a comment block: a total wrapped across two
@@ -156,11 +156,11 @@ cat >"$SANDBOX/wrapx.sh" <<'EOF'
 #   gates on purpose, the valve engaged across the wrap.
 noop() { echo x; }
 EOF
-mkcfg "$SANDBOX/wrapped-cfg.sh" 'CANON_KIT_COMMENT_SURFACE=(wrapped.sh)'
-mkcfg "$SANDBOX/wrapx-cfg.sh"   'CANON_KIT_COMMENT_SURFACE=(wrapx.sh)'
+mkcfg "$SANDBOX/wrapped-cfg.knobs" 'CANON_KIT_COMMENT_SURFACE[] = wrapped.sh'
+mkcfg "$SANDBOX/wrapx-cfg.knobs"   'CANON_KIT_COMMENT_SURFACE[] = wrapx.sh'
 
-check_case "count-wrap-flagged" wrapped-cfg.sh 1 "wrapped.sh:1: restated collection total: two comment gates"
-check_case "count-wrap-exempt-valve" wrapx-cfg.sh 0 "COMMENT-TIER: clean"
+check_case "count-wrap-flagged" wrapped-cfg.knobs 1 "wrapped.sh:1: restated collection total: two comment gates"
+check_case "count-wrap-exempt-valve" wrapx-cfg.knobs 0 "COMMENT-TIER: clean"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-comment-tier.test.sh: $fails case(s) failed"

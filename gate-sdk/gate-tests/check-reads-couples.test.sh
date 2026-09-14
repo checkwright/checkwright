@@ -98,19 +98,19 @@ run_case unknown_member sandbox.gate 2 'no registered subcommand answers'
 # one whose filter knob is still bridged: a static knob resolves in process and cannot be withheld.
 cases=$((cases + 1))
 BIN="${GATE_SDK_NATIVE_BIN:-}"
-make_case withheld check-spec-dod-singleton.gate "$MANIFEST_NARROW"
+make_case withheld check-evidence-baseline.gate "$MANIFEST_NARROW"
 if [[ -x "$BIN" ]]; then
     env_args=()
     while IFS= read -r kv; do
         [[ -n "$kv" ]] || continue
-        [[ "$kv" == GATE_SDK_KNOB_CANON_KIT_SPEC_NAME=* ]] && continue
+        [[ "$kv" == GATE_SDK_KNOB_EVIDENCE_KIT_SCENARIO_GLOBS=* ]] && continue
         env_args+=("$kv")
     done < <( cd "$tmp/withheld" && source "$DIR/lib/gate.sh" && gate_knob_env check-reads-couples )
-    out="$( cd "$tmp/withheld" && env "${env_args[@]}" "$BIN" check-reads-couples check-spec-dod-singleton.gate 2>&1 )"
+    out="$( cd "$tmp/withheld" && env "${env_args[@]}" "$BIN" check-reads-couples check-evidence-baseline.gate 2>&1 )"
     rc=$?
     if [[ "$rc" -ne 2 ]]; then
         echo "  FAIL [filter-unresolvable]: want exit 2, got $rc -- $out"; fails=$((fails + 1))
-    elif ! grep -qF -- 'CANON_KIT_SPEC_NAME' <<<"$out"; then
+    elif ! grep -qF -- 'EVIDENCE_KIT_SCENARIO_GLOBS' <<<"$out"; then
         echo "  FAIL [filter-unresolvable]: the refusal does not name the knob: $out"
         fails=$((fails + 1))
     fi

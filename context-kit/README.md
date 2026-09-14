@@ -68,7 +68,7 @@ hook approximation and the session-context template also expect
    above the markers. The file is local-only (gitignore it); re-run on demand
    when the box changes. The session-context hook emits it when present.
 
-5. Optional — retune: copy `templates/context-config.sh` into your gates dir and
+5. Optional — retune: copy `templates/context-config.knobs` into your gates dir and
    override any knob (surfaces, hook-body command, brevity file/section set/
    budget/pointer pattern, env-profile file). Defaults are this repo's layout. Splice
    `templates/close-brevity.md` into your close skill.

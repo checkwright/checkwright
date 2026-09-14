@@ -25,14 +25,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: canon-kit/SPEC.md §check-payload-claim — the disclosure vocabulary is consumer
     // config with no kit default, so an empty command is the clean skip for a tree whose
     // payload discloses one thing only
-    if spec::knob_pub("CANON_KIT_PAYLOAD_CLAIMS_CMD")?.is_empty() {
+    if spec::command("CANON_KIT_PAYLOAD_CLAIMS_CMD")?.is_empty() {
         println!("PAYLOAD-CLAIM: clean (no disclosure vocabulary configured — nothing to hold)");
         return Ok(0);
     }
-    let claims = spec::claim_vocabulary(
-        "CANON_KIT_PAYLOAD_CLAIM_IDS",
-        "CANON_KIT_PAYLOAD_CLAIM_PATTERNS",
-    )?;
+    let claims = spec::claim_vocabulary("CANON_KIT_PAYLOAD_CLAIMS_CMD")?;
     if claims.is_empty() {
         println!("PAYLOAD-CLAIM: clean (CANON_KIT_PAYLOAD_CLAIMS_CMD declared no disclosure classes)");
         return Ok(0);

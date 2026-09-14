@@ -145,23 +145,23 @@ pub type GateEntry = (
     &'static [(&'static str, &'static str)],
 );
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec::manifest_files`' branch set: the configured corpus
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec::manifest_files`' branch set: the configured corpus
 // and the prose surface it adds, declared once for the members that call it
 // spec: gate-sdk/SPEC.md §check-reads-couples — the kit-literal fallback keeps `?`, because the
 // conservative authoring rule it would be held to is the part of the `couples=` semantics that
 // section files as unsettled, and a kit cannot demand an adopter satisfy it over an unseen tree
 const MANIFEST_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:204 via const MANIFEST_ROOTS"),
-    ("?", "", "", "fallback@src/spec.rs:210 via const MANIFEST_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:205 via const MANIFEST_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:211 via const MANIFEST_ROOTS"),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
 ];
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec::comment_surface`'s two runtime branches: the
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec::comment_surface`'s two runtime branches: the
 // configured one declares, and the kit-literal fallback keeps `?` on the ground above
 const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:233 via const COMMENT_SURFACE_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:234 via const COMMENT_SURFACE_ROOTS"),
 ];
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — `MANIFEST_ROOTS` and `COMMENT_SURFACE_ROOTS`
@@ -169,11 +169,11 @@ const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
 // rather than per walk is what drops the second walk silently.
 const SPEC_POINTER_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:204 via const SPEC_POINTER_ROOTS"),
-    ("?", "", "", "fallback@src/spec.rs:210 via const SPEC_POINTER_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:205 via const SPEC_POINTER_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:211 via const SPEC_POINTER_ROOTS"),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:233 via const SPEC_POINTER_ROOTS"),
+    ("?", "", "", "fallback@src/spec.rs:234 via const SPEC_POINTER_ROOTS"),
 ];
 
 pub const REGISTRY: &[GateEntry] = &[
@@ -341,7 +341,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "queue-kit",
         &[("git", "")],
     ),
-    // spec: canon-kit/SPEC.md §lib/spec.sh — the canon-kit cohort's members all derive their
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the canon-kit cohort's members all derive their
     // corpus from `spec::manifest_files`, so each declares that derivation's whole knob set
     // beside its own: the bridge carries what the shared derivation reads, not what the
     // member's own rule reads.
@@ -378,11 +378,9 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
             "CANON_KIT_ENUM_SETS_CMD",
-            "CANON_KIT_ENUM_SET_NAMES",
-            "CANON_KIT_ENUM_SET_MEMBERS",
         ],
         "canon-kit",
-        &[("git", "")],
+        &[("git", ""), ("?", "CANON_KIT_ENUM_SETS_CMD")],
     ),
     // spec: canon-kit/SPEC.md §check-measured-claim — born native, so it derives its corpus
     // from its own glob surface rather than from `spec::manifest_files`: the knob set is its
@@ -394,11 +392,9 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "CANON_KIT_MEASURED_CLAIMS_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
-            "CANON_KIT_MEASURED_KEYS",
-            "CANON_KIT_MEASURED_VALUES",
         ],
         "canon-kit",
-        &[("git", "")],
+        &[("git", ""), ("?", "CANON_KIT_MEASURED_CLAIMS_CMD")],
     ),
     // spec: gate-sdk/SPEC.md §The canonical-spec `spec_canonical_specs` cohort — two members
     // sharing one corpus derivation, so each declares that derivation's knob set beside its
@@ -452,13 +448,14 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
             "CANON_KIT_TEMPORAL_MARKERS",
+            "CANON_KIT_TEMPORAL_MARKERS_EXTRA",
             "CANON_KIT_TEMPORAL_EXEMPT_SECTIONS",
             "CANON_KIT_TEMPORAL_EXEMPT_PATHS",
         ],
         "canon-kit",
         &[("git", "")],
     ),
-    // spec: canon-kit/SPEC.md §lib/spec.sh — the emitter-backed vocabularies ride as bridged
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the emitter-backed vocabularies ride as bridged
     // id/pattern pairs, and the command knob rides too: it is what tells "none configured"
     // from "configured, declared nothing", the two clean skips this member reports apart
     (
@@ -476,11 +473,9 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_INSTALL_CLAIM_EXCLUDE",
             "CANON_KIT_INSTALL_TRANSPORTS_CMD",
             "CANON_KIT_INSTALL_SECTION_RE",
-            "CANON_KIT_INSTALL_TRANSPORT_IDS",
-            "CANON_KIT_INSTALL_TRANSPORT_PATTERNS",
         ],
         "canon-kit",
-        &[("git", "")],
+        &[("git", ""), ("?", "CANON_KIT_INSTALL_TRANSPORTS_CMD")],
     ),
     // spec: canon-kit/SPEC.md §check-unmarked-claim — born native beside its family, and it
     // derives its corpus from check-measured-claim's glob surface rather than from
@@ -493,11 +488,9 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "CANON_KIT_CLAIM_CLASSES_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
-            "CANON_KIT_CLAIM_CLASS_IDS",
-            "CANON_KIT_CLAIM_CLASS_PATTERNS",
         ],
         "canon-kit",
-        &[("git", "")],
+        &[("git", ""), ("?", "CANON_KIT_CLAIM_CLASSES_CMD")],
     ),
     (
         "check-payload-claim",
@@ -513,11 +506,9 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MDREF_EXCLUDE",
             "CANON_KIT_PAYLOAD_CLAIM_EXCLUDE",
             "CANON_KIT_PAYLOAD_CLAIMS_CMD",
-            "CANON_KIT_PAYLOAD_CLAIM_IDS",
-            "CANON_KIT_PAYLOAD_CLAIM_PATTERNS",
         ],
         "canon-kit",
-        &[("git", "")],
+        &[("git", ""), ("?", "CANON_KIT_PAYLOAD_CLAIMS_CMD")],
     ),
     // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — a
     // substrate-sensitive member by reverse trigger only: its `couples=` reaches gate
@@ -654,7 +645,9 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "CANON_KIT_PROSE_TELL_GLOBS",
             "CANON_KIT_PROSE_TELL_PHRASES",
+            "CANON_KIT_PROSE_TELL_PHRASES_EXTRA",
             "CANON_KIT_PROSE_TELL_ABBR_ALLOW",
+            "CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA",
             "CANON_KIT_PROSE_TELL_EMDASH_MAX",
             "CANON_KIT_PROSE_TELL_CONTRAST_MAX",
             "CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES",
@@ -713,7 +706,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "canon-kit",
         &[("git", "")],
     ),
-    // spec: canon-kit/SPEC.md §lib/spec.sh — the `spec_comment_surface` cohort: four members on
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the `spec_comment_surface` cohort: four members on
     // one corpus derivation, so each declares that derivation's whole knob set beside its own,
     // `GATE_SDK_WORKFLOW_DIR` among them because the corpus takes that directory's tracked tier
     // spec: gate-sdk/SPEC.md §check-reads-couples — one `?` for the derivation's two walk call
@@ -760,7 +753,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "canon-kit",
         &[("git", "")],
     ),
-    // spec: canon-kit/SPEC.md §lib/spec.sh — the queue-resolution pass both liveness members
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the queue-resolution pass both liveness members
     // read is a second shared derivation, so each declares the section vocabulary it is
     // computed from beside the corpus knobs
     (
@@ -1040,7 +1033,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gate-tamper",
         gate_tamper::run,
         &[],
-        &["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS"],
+        &["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS", "GATE_KIT_ROOTS_REL"],
         "delegation-kit",
         &[("git", "")],
     ),
@@ -1316,7 +1309,6 @@ pub const REGISTRY: &[GateEntry] = &[
         // spec: gate-sdk/SPEC.md §The non-gate arm — the extractor it now calls in-process reads
         // the stage roster and the evidence surfaces, so the comparator declares them
         &[
-            "DRIFT_KIT_CONFIG_FILE",
             "DRIFT_KIT_TRAJECTORY_SURFACES",
             "DRIFT_KIT_GATES_FILE",
             "DRIFT_KIT_STAGES",

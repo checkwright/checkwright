@@ -1,8 +1,9 @@
-// spec: canon-kit/SPEC.md §lib/spec.sh — the binary side of the corpus primitive the
+// spec: canon-kit/SPEC.md §The shared spec adapters — the binary side of the corpus primitive the
 // manifest-narration gate family shares: ported once and proved N times, so a per-gate
 // copy of the derivation has no place to exist
 use crate::walk;
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — every knob read is bridged; the crate holds no
 // default, so an unset variable is a harness error rather than a fallback.
@@ -14,7 +15,7 @@ fn knob_array(name: &str) -> Result<Vec<String>, String> {
     walk::knob_array(name)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the finders skip `templates/` stubs; the shell
+// spec: canon-kit/SPEC.md §The shared spec adapters — the finders skip `templates/` stubs; the shell
 // filters the emitted path with a fixed substring, so the port matches on the same one
 fn under_templates(p: &str) -> bool {
     p.contains("/templates/")
@@ -65,7 +66,7 @@ fn cwd() -> String {
     crate::walk::cwd().unwrap_or_else(|_| ".".to_string())
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the scan root's absolute form on
+// spec: canon-kit/SPEC.md §The shared spec adapters — the scan root's absolute form on
 // `_spec_prune_kit_roots`' own four cases; a bare `.` is the cwd itself, and appending it
 // as a component instead makes every prefix test below fail silently
 fn root_to_abs(p: &str) -> String {
@@ -81,7 +82,7 @@ fn root_to_abs(p: &str) -> String {
     normalize(abs.trim_end_matches('/'))
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — normalised on the same terms the scan root already is:
+// spec: canon-kit/SPEC.md §The shared spec adapters — normalised on the same terms the scan root already is:
 // a walk anchored at a `..` root emits files carrying that `..`, and comparing one unnormalised
 // against a normalised kit root matches the invoking directory's own prefix, pruning everything
 fn file_to_abs(p: &str) -> String {
@@ -91,7 +92,7 @@ fn file_to_abs(p: &str) -> String {
     normalize(&format!("{}/{}", cwd(), p.strip_prefix("./").unwrap_or(p)))
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `_spec_prune_kit_roots`: exclude a file whose
+// spec: canon-kit/SPEC.md §The shared spec adapters — `_spec_prune_kit_roots`: exclude a file whose
 // absolute path falls under a kit root that is a strict descendant of the scan root. An
 // ancestor root never prunes; `walk::prune_dirs` is the other, by-directory-name rule.
 pub fn prune_kit_roots(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, String> {
@@ -121,7 +122,7 @@ pub fn prune_kit_roots(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, 
         .collect())
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_canonical_specs`: the SPEC-name find, directory-pruned
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec_canonical_specs`: the SPEC-name find, directory-pruned
 // and kit-root pruned. Lifted out of `manifest_files`' default branch rather than written twice.
 pub fn canonical_specs(root: &str) -> Result<Vec<PathBuf>, String> {
     let spec_name = knob("CANON_KIT_SPEC_NAME")?;
@@ -130,19 +131,19 @@ pub fn canonical_specs(root: &str) -> Result<Vec<PathBuf>, String> {
     prune_kit_roots(root, specs)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — this walk's two narrowings, as the directory prune both of
+// spec: canon-kit/SPEC.md §The shared spec adapters — this walk's two narrowings, as the directory prune both of
 // them are: `templates/` stubs at any depth, and the generated on-site mirror one level under the
 // site directory. Read by both the walk and the member's registry declaration from here.
 pub const CANON_SPEC_PRUNE: &[&str] = &["**/templates", "docs/*"];
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_amendments`: the amendment-glob find,
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec_amendments`: the amendment-glob find,
 // `templates/`-filtered and kit-root pruned, selecting by a glob on the basename where
 // `canonical_specs` above selects by a literal name
 pub fn amendments(root: &str) -> Result<Vec<PathBuf>, String> {
     amendments_walk(root, false)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the same walk with the swallow removed, for the
+// spec: canon-kit/SPEC.md §The shared spec adapters — the same walk with the swallow removed, for the
 // consumer whose empty set would hide every violation instead of contradicting itself
 pub fn amendments_strict(root: &str) -> Result<Vec<PathBuf>, String> {
     amendments_walk(root, true)
@@ -173,7 +174,7 @@ fn amendments_walk(root: &str, strict: bool) -> Result<Vec<PathBuf>, String> {
     prune_kit_roots(root, hits)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the sorted spelling the two spec-corpus members read,
+// spec: canon-kit/SPEC.md §The shared spec adapters — the sorted spelling the two spec-corpus members read,
 // where the shell pipes the finder through `sort`. A byte sort, per the kit-roots cohort's
 // ruling that the compiled form implements set semantics rather than a locale's collation.
 pub fn canonical_specs_sorted(root: &str) -> Result<Vec<String>, String> {
@@ -185,7 +186,7 @@ pub fn canonical_specs_sorted(root: &str) -> Result<Vec<String>, String> {
     Ok(out)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_manifest_files`, all three branches in the
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec_manifest_files`, all three branches in the
 // one place the cohort calls. The `CLAUDE.md` find is neither `templates/`-filtered nor
 // kit-root pruned while the other two are; the asymmetry is reproduced, not tidied.
 pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
@@ -220,10 +221,10 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
     Ok(out)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `_spec_comment_surface`: the governed-source corpus
+// spec: canon-kit/SPEC.md §The shared spec adapters — `_spec_comment_surface`: the governed-source corpus
 // across all four of its arms, with `templates/` kept for the tier gate and pruned for the
 // three members that read it as placeholder-by-design
-// spec: canon-kit/SPEC.md §lib/spec.sh — the knob selects which *files* the corpus is drawn from and
+// spec: canon-kit/SPEC.md §The shared spec adapters — the knob selects which *files* the corpus is drawn from and
 // nothing else, so every arm past that point is the corpus's definition rather than one branch's and
 // both branches pass through all five of them
 pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, String> {
@@ -283,13 +284,13 @@ fn workflow_tier(root: &str) -> Result<Vec<String>, String> {
     Ok(out)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_comment_whitelisted`: bash's `[[ rel == $g ]]`,
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec_comment_whitelisted`: bash's `[[ rel == $g ]]`,
 // whose `*` crosses `/` because it has no pathname semantics
 pub fn comment_whitelisted(rel: &str, whitelist: &[String]) -> bool {
     whitelist.iter().any(|g| walk::pattern_match(g, rel))
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_queue_slugs`: one walk emitting live for a
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec_queue_slugs`: one walk emitting live for a
 // bold lead-in bullet in an active or deferred section and done for a bare-slug bullet
 // outside them
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the format is written again here
@@ -336,7 +337,7 @@ pub fn queue_slugs(path: &Path) -> Result<QueueSlugs, String> {
     Ok(out)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `^[[:space:]]*-[[:space:]]+`, returning what follows
+// spec: canon-kit/SPEC.md §The shared spec adapters — `^[[:space:]]*-[[:space:]]+`, returning what follows
 fn bullet_lead(line: &str) -> Option<&str> {
     let b = line.as_bytes();
     let mut i = skip_space(b, 0);
@@ -369,7 +370,7 @@ fn is_slug(s: &str) -> bool {
         .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == b'-')
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — `\*\*[a-z0-9][a-z0-9-]*\*\*` at the bullet's lead-in,
+// spec: canon-kit/SPEC.md §The shared spec adapters — `\*\*[a-z0-9][a-z0-9-]*\*\*` at the bullet's lead-in,
 // which is where the guard regex already required it, so awk's leftmost match is this one
 fn bold_slug_at_start(rest: &str) -> Option<String> {
     let b = rest.as_bytes();
@@ -389,7 +390,7 @@ fn bold_slug_at_start(rest: &str) -> Option<String> {
     None
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the manifest set as the members that sort it read
+// spec: canon-kit/SPEC.md §The shared spec adapters — the manifest set as the members that sort it read
 // it: `spec_manifest_files … | sed 's#^\./##' | sort -u`
 pub fn manifest_files_sorted_stripped(root: &str) -> Result<Vec<String>, String> {
     let mut v: Vec<String> = manifest_files(root)?
@@ -468,7 +469,7 @@ pub fn strip_dot_slash(s: &str) -> String {
     s.strip_prefix("./").unwrap_or(s).to_string()
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the claim-gate primitives the two members share:
+// spec: canon-kit/SPEC.md §The shared spec adapters — the claim-gate primitives the two members share:
 // the declaration grammar, the declaration roster, the governed-doc set behind its two
 // exclude valves, and the bridged vocabulary
 pub fn declared_id(line: &str, tag: &str) -> Option<String> {
@@ -560,31 +561,104 @@ pub fn governed_docs(root: &str, own_exclude: &str) -> Result<Vec<String>, Strin
 
 const CANON_MDREF_EXCLUDE: &str = "CANON_KIT_MDREF_EXCLUDE";
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the two index-aligned halves of a bridged claim
-// vocabulary, refused as a pair rather than read half-resolved, and every pattern compiled
-// before the first corpus line is read
-pub fn claim_vocabulary(
-    ids_knob: &str,
-    pats_knob: &str,
-) -> Result<Vec<(String, crate::ere::Ere)>, String> {
-    let ids = knob_array(ids_knob)?;
-    let pats = knob_array(pats_knob)?;
-    if ids.len() != pats.len() {
-        return Err(format!(
-            "the bridged claim vocabulary is not index-aligned: {} id(s) against {} pattern(s) \
-             — the config bridge could not carry it; treating as failure (not clean)",
-            ids.len(),
-            pats.len()
-        ));
+// spec: canon-kit/SPEC.md §The shared spec adapters — a command knob's argv; empty is no command,
+// which each reader takes as its clean skip
+pub fn command(knob: &str) -> Result<Vec<String>, String> {
+    knob_array(knob)
+}
+
+type Lines = Vec<(String, String)>;
+type Spawned = Mutex<Vec<((String, Vec<String>), Result<Lines, String>)>>;
+
+fn spawned() -> &'static Spawned {
+    static SPAWNED: Spawned = Mutex::new(Vec::new());
+    &SPAWNED
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the argv spawned once per process and read as
+// `<first>⇥<second>` lines under the two validation contracts that section states
+fn command_lines(knob: &str, slug_keyed: bool) -> Result<Lines, String> {
+    let argv = command(knob)?;
+    let key = (knob.to_string(), argv.clone());
+    if let Some((_, r)) = spawned().lock().unwrap_or_else(|e| e.into_inner()).iter().find(|(k, _)| *k == key) {
+        return r.clone();
     }
+    let parse = || -> Result<Lines, String> {
+        let Some((program, rest)) = argv.split_first() else {
+            return Ok(Vec::new());
+        };
+        let args: Vec<&str> = rest.iter().map(String::as_str).collect();
+        let done = crate::proc::run(program, &args).map_err(|e| format!("{}: {}", knob, e))?;
+        let Some(stdout) = done.stdout() else {
+            return Err(format!(
+                "{} exited {} — the vocabulary could not be read; treating as failure (not clean) ({})",
+                knob,
+                done.reported_code(),
+                done.failure_report().unwrap_or_default()
+            ));
+        };
+        let text = String::from_utf8_lossy(stdout).into_owned();
+        let mut out: Lines = Vec::new();
+        let refuse = |what: &str, line: &str| {
+            Err(format!("{}: {}: '{}' — treating as failure (not clean)", knob, what, line))
+        };
+        for line in text.lines().filter(|l| !l.is_empty()) {
+            let Some((first, second)) = line.split_once('\t') else {
+                return refuse("line has no tab", line);
+            };
+            if first.is_empty() || second.is_empty() {
+                return refuse("empty field", line);
+            }
+            if second.contains('\t') {
+                return refuse("extra tab in line", line);
+            }
+            if slug_keyed {
+                if !is_slug(first) {
+                    return refuse("id is not slug-shaped", first);
+                }
+                if out.iter().any(|(k, _)| k == first) {
+                    return refuse("duplicate id", first);
+                }
+            }
+            out.push((first.to_string(), second.to_string()));
+        }
+        Ok(out)
+    };
+    let r = parse();
+    spawned().lock().unwrap_or_else(|e| e.into_inner()).push((key, r.clone()));
+    r
+}
+
+// spec: canon-kit/SPEC.md §check-prose-enum — `<set-name>⇥<member>` lines, a set spanning many
+pub fn enum_sets() -> Result<Lines, String> {
+    command_lines("CANON_KIT_ENUM_SETS_CMD", false)
+}
+
+// spec: canon-kit/SPEC.md §check-measured-claim — `<key>⇥<value>` lines, one per slug-shaped key
+pub fn measured_claims() -> Result<Lines, String> {
+    command_lines("CANON_KIT_MEASURED_CLAIMS_CMD", true)
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — a claim vocabulary's `<id>⇥<ERE>` lines, every
+// pattern compiled before the first corpus line is read
+pub fn claim_vocabulary(cmd_knob: &str) -> Result<Vec<(String, crate::ere::Ere)>, String> {
     let mut out: Vec<(String, crate::ere::Ere)> = Vec::new();
-    for (id, p) in ids.iter().zip(pats.iter()) {
-        out.push((id.clone(), compile_pattern(p, pats_knob)?));
+    for (id, p) in command_lines(cmd_knob, true)? {
+        let ere = compile_pattern(&p, cmd_knob)?;
+        out.push((id, ere));
     }
     Ok(out)
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the paragraph accumulator: physical lines in,
+// spec: canon-kit/SPEC.md §Layout and configuration — a base vocabulary followed by its consumer's
+// extra, the union a reader applies because a file replaces the base whole
+pub fn vocabulary(base: &str, extra: &str) -> Result<Vec<String>, String> {
+    let mut v = knob_array(base)?;
+    v.extend(knob_array(extra)?);
+    Ok(v)
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the paragraph accumulator: physical lines in,
 // a logical window back out
 #[derive(Default)]
 pub struct Para {
@@ -593,7 +667,7 @@ pub struct Para {
 }
 
 impl Para {
-    // spec: canon-kit/SPEC.md §lib/spec.sh — both walk drivers fill this accumulator, the
+    // spec: canon-kit/SPEC.md §The shared spec adapters — both walk drivers fill this accumulator, the
     // shared prose one below and check-comment-tier's caller-owned comment walk
     pub fn reset(&mut self) {
         self.fnr.clear();
@@ -606,7 +680,7 @@ impl Para {
     pub fn len(&self) -> usize {
         self.line.len()
     }
-    // spec: canon-kit/SPEC.md §lib/spec.sh — `_sk_join(lo, hi)`, one-based inclusive
+    // spec: canon-kit/SPEC.md §The shared spec adapters — `_sk_join(lo, hi)`, one-based inclusive
     pub fn join(&self, lo: usize, hi: usize) -> String {
         let mut s = String::new();
         for k in lo..=hi {
@@ -619,10 +693,10 @@ impl Para {
     }
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the manifest-prose walk driver: fence tracking,
+// spec: canon-kit/SPEC.md §The shared spec adapters — the manifest-prose walk driver: fence tracking,
 // the blank-line paragraph reset, and the per-site exempt window (the line or the one
 // above), whose marker is a kit literal and so a substring test
-// spec: canon-kit/SPEC.md §lib/spec.sh — the two hooks the awk driver calls, as one sink
+// spec: canon-kit/SPEC.md §The shared spec adapters — the two hooks the awk driver calls, as one sink
 // rather than two callbacks: the member's finding list is the state both write, and a pair
 // of closures cannot share it
 pub trait ProseSink {
@@ -657,7 +731,7 @@ pub fn walk_prose_multi(
         for (idx, raw) in text.lines().enumerate() {
             let fnr = idx + 1;
             if first {
-                // spec: canon-kit/SPEC.md §lib/spec.sh — the FNR==1 flush closes the
+                // spec: canon-kit/SPEC.md §The shared spec adapters — the FNR==1 flush closes the
                 // *previous* file's paragraph, so it still reports under that file's name
                 sink.on_pflush(&curfile, &para);
                 para.reset();
@@ -689,7 +763,7 @@ pub fn walk_prose_multi(
     Ok(())
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the fence and blank-line shapes the awk driver
+// spec: canon-kit/SPEC.md §The shared spec adapters — the fence and blank-line shapes the awk driver
 // tests, byte-wise on POSIX space as awk matches them
 pub fn is_fence_line(line: &str) -> bool {
     lstrip_space(line.as_bytes()).starts_with(b"```")
@@ -1276,7 +1350,7 @@ pub fn leading_backticked(text: &str) -> Option<String> {
     Some(rest[..close].to_string())
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the default-statement grammar's one crate-side owner,
+// spec: canon-kit/SPEC.md §The shared spec adapters — the default-statement grammar's one crate-side owner,
 // so both readers of a SPEC's stated default read it identically; the knob-name predicate is the
 // caller's, since each gate derives its own prefix vocabulary
 pub struct DefaultGrammar<'a> {
@@ -1284,7 +1358,7 @@ pub struct DefaultGrammar<'a> {
 }
 
 impl DefaultGrammar<'_> {
-    // spec: canon-kit/SPEC.md §lib/spec.sh — `sk_literal_at`: a backticked non-knob string, a
+    // spec: canon-kit/SPEC.md §The shared spec adapters — `sk_literal_at`: a backticked non-knob string, a
     // quoted string, or a number. A backticked token that *is* a knob name is a name citation, so
     // the scan falls through to the quote and number shapes rather than stopping.
     pub fn literal_at(&self, after: &[u8]) -> String {
@@ -1301,7 +1375,7 @@ impl DefaultGrammar<'_> {
                 }
             }
         }
-        // spec: canon-kit/SPEC.md §lib/spec.sh — the number shape, last of the three
+        // spec: canon-kit/SPEC.md §The shared spec adapters — the number shape, last of the three
         let mut i = 0usize;
         while i < after.len() {
             if after[i].is_ascii_digit() {
@@ -1324,7 +1398,7 @@ impl DefaultGrammar<'_> {
         String::new()
     }
 
-    // spec: canon-kit/SPEC.md §lib/spec.sh — `sk_default_literal`: the literal the first
+    // spec: canon-kit/SPEC.md §The shared spec adapters — `sk_default_literal`: the literal the first
     // word-bounded "default" binds within a forward window, or the empty string
     pub fn default_literal(&self, line: &str, win: usize) -> String {
         let lb = line.to_ascii_lowercase();
@@ -1351,14 +1425,14 @@ impl DefaultGrammar<'_> {
         String::new()
     }
 
-    // spec: canon-kit/SPEC.md §lib/spec.sh — `sk_default_bound`: the word "default" binding a
+    // spec: canon-kit/SPEC.md §The shared spec adapters — `sk_default_bound`: the word "default" binding a
     // value literal within a 24-character forward window
     pub fn default_bound(&self, line: &str) -> bool {
         !self.default_literal(line, 24).is_empty()
     }
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the backticked and quoted shapes `sk_literal_at` reads,
+// spec: canon-kit/SPEC.md §The shared spec adapters — the backticked and quoted shapes `sk_literal_at` reads,
 // leftmost first
 fn delimited(b: &[u8], d: u8, nonempty: bool) -> Option<(usize, usize)> {
     let open = b.iter().position(|&c| c == d)?;

@@ -230,8 +230,8 @@ fn write_config_seams(consumer: &str) -> Result<(), Outcome> {
             false,
         ),
         (
-            "scripts/context-config.sh",
-            "# shellcheck disable=SC2034  # read by context-kit bins and check-brevity\nCONTEXT_KIT_SURFACES=(\"AGENTS.md\")\nCONTEXT_KIT_BREVITY_FILE=\"AGENTS.md\"\n",
+            "scripts/context-config.knobs",
+            "CONTEXT_KIT_SURFACES[] = AGENTS.md\nCONTEXT_KIT_BREVITY_FILE = AGENTS.md\n",
             true,
         ),
         (
@@ -240,8 +240,8 @@ fn write_config_seams(consumer: &str) -> Result<(), Outcome> {
             false,
         ),
         (
-            "scripts/canon-config.sh",
-            "# shellcheck shell=bash disable=SC2034\nCANON_KIT_MANIFEST_FILES=(\"AGENTS.md\" \"README.md\" \"*/SPEC.md\" \"*/README.md\")\n",
+            "scripts/canon-config.knobs",
+            "CANON_KIT_MANIFEST_FILES[] = AGENTS.md\nCANON_KIT_MANIFEST_FILES[] = README.md\nCANON_KIT_MANIFEST_FILES[] = */SPEC.md\nCANON_KIT_MANIFEST_FILES[] = */README.md\n",
             false,
         ),
     ];
@@ -268,14 +268,14 @@ fn battery_env() -> Vec<(String, String)> {
             "AGENTS.md".to_string(),
         ),
         (
-            "CANON_KIT_CONFIG_FILE".to_string(),
-            "scripts/canon-config.sh".to_string(),
+            "CANON_KIT_KNOB_FILE".to_string(),
+            "scripts/canon-config.knobs".to_string(),
         ),
     ]
 }
 
 // spec: context-kit/SPEC.md §Testing — the regeneration ordering: each kit's install.sh already
-// wrote the hook and the graph artifact, but before `canon-config.sh` existed, so both are
+// wrote the hook and the graph artifact, but before `canon-config.knobs` was written, so both are
 // rewritten here under the same env the battery will run with.
 fn regenerate(consumer: &str) -> Result<(), Outcome> {
     let hook = proc::run_merged_in(
@@ -295,8 +295,8 @@ fn regenerate(consumer: &str) -> Result<(), Outcome> {
     // spec: context-kit/SPEC.md §Testing — the graph artifact is a redirect rather than a capture,
     // so the emit's own stderr stays out of the committed HTML.
     let graph = spawn(
-        r#"cd "$1" && exec env LIFECYCLE_KIT_AGENT_FILE="$2" CANON_KIT_CONFIG_FILE="$3" bash gate-sdk/bin/run-gates.sh --emit graph > scripts/CHECK-GRAPH.html"#,
-        &[consumer, "AGENTS.md", "scripts/canon-config.sh"],
+        r#"cd "$1" && exec env LIFECYCLE_KIT_AGENT_FILE="$2" CANON_KIT_KNOB_FILE="$3" bash gate-sdk/bin/run-gates.sh --emit graph > scripts/CHECK-GRAPH.html"#,
+        &[consumer, "AGENTS.md", "scripts/canon-config.knobs"],
     )?;
     if graph.code() != 0 {
         return Err(Outcome::Refuse(format!(

@@ -71,6 +71,8 @@ pub const KIT: Kit = Kit {
         },
     ],
     validate: None,
+    open_family: false,
+    retired: &[],
 };
 
 #[cfg(test)]

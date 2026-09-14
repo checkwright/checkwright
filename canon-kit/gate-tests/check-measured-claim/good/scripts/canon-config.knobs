@@ -1,0 +1,4 @@
+# spec: canon-kit/SPEC.md §check-measured-claim — fixture consumer config: a two-key oracle (one cardinal, one extent) and a surface, so the pair exercises the gate the empty defaults would clean-skip
+CANON_KIT_MEASURED_CLAIMS_CMD[] = printf
+CANON_KIT_MEASURED_CLAIMS_CMD[] = gate-total\t7\nsupported-hosts\tlinux,macos\n
+CANON_KIT_MEASURED_SURFACE_GLOBS[] = *.md

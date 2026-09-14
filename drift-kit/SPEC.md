@@ -65,10 +65,9 @@ declared knob roster; a hardcoded top-level flag receives no consumer override a
 all. For a kit whose entire surface is consumer-overridable knobs that would be a
 silent functional regression rather than a porting detail.
 
-**The collator's own knobs resolve in `lib/drift.sh`** (§lib/drift.sh), not in the
-arm: the config bridge resolves a declared name by sourcing the owning kit's
-library alone, so a default left beside the reader would resolve to nothing and a
-default restated on the crate side would be a second producer.
+**The collator's own knobs resolve from drift-kit's static defaults table**
+(§Layout and configuration), not in the arm: the table is every default's one
+producer, so a default restated beside a reader would be a second.
 
 ## The extensibility contract
 
@@ -119,28 +118,26 @@ the report degrades that row to its fail-visible read. Two modes:
 - **`--trend`** — at most one compact `<key> <value>` fragment, or nothing
   (a plugin may opt out of the trend line).
 
-Plugins read **exported env only** — a plain assignment in the consumer
-config reaches the collator but never a child plugin. The collator closes that
-gap structurally: before invoking a plugin it exports every scalar `DRIFT_KIT_*`
-value the config bridge resolved, so a config override reaches writer and reader
-alike **with no fixed export list to drift out of parity**.
+Plugins read **exported env only** — a value in the consumer's knob file
+reaches the collator but never a child plugin by itself. The collator closes that
+gap structurally: before invoking a plugin it exports every scalar of drift-kit's
+knob family, so a config override reaches writer and reader alike **with no fixed
+export list to drift out of parity**.
 
-**The derivation is the contract, and the arm keeps it derived.** The shell
-collator spelled it `compgen -v DRIFT_KIT_`; the arm declares the **prefix
-family** `DRIFT_KIT_*` in its knob roster, which the config bridge resolves by
-running that same `compgen` inside the owning kit's already-sourced subshell
-(gate-sdk/SPEC.md §lib/gate.sh). A knob a consumer's own `drift-config.sh`
-declares and nothing in this repo names therefore crosses the bridge and reaches
-the plugin. A transcribed `DRIFT_KIT_*` roster would lose exactly that knob and
-would land on the derivation-first rule; none is introduced anywhere.
+**The derivation is the contract, and the arm keeps it derived.** The arm
+declares the **prefix family** `DRIFT_KIT_*` and reads it through the family
+read: every declared scalar's resolved value, then every consumer scalar the
+local overlay or the tracked knob file sets (§Layout and configuration, the open
+family), the environment still outranking both. A knob a consumer's own knob file
+sets and nothing in this repo names therefore reaches the plugin; one exported in
+the invoking environment reaches it by inheritance. A transcribed `DRIFT_KIT_*`
+roster would lose exactly that knob and would land on the derivation-first rule;
+none is introduced anywhere.
 
-Arrays are skipped, as bash skipped them: the wire format joins an array's
-elements with a tab, and the two array knobs (`DRIFT_KIT_KPI_DIRS`,
-`DRIFT_KIT_STAGES`) are consumed inside the collator itself. **Honest limit:** a
-*consumer-declared* one-element array is indistinguishable from a scalar on the
-wire and crosses as one, where bash would have dropped it. That is a difference in
-a consumer's favour, and it is the only place the exported set is not exactly the
-shell's.
+Indexed knobs are not exported: the two the kit declares (`DRIFT_KIT_KPI_DIRS`,
+`DRIFT_KIT_STAGES`) are consumed inside the collator itself, and a consumer
+line written as an indexed or keyed undeclared name is refused rather than
+admitted, so the file's form decides and no array crosses as a scalar.
 
 It also exports `DRIFT_KIT_KIT_ROOTS` — newline-separated kit roots, the resolved
 kit-root set; a plugin needing sibling-kit surfaces reads it rather than
@@ -292,11 +289,13 @@ Lead:
   meter became an arm; that parse was an undeclared cross-kit output contract, and
   the split into a measurement function the arm renders over is what ended it
   (context-kit/SPEC.md §The always-loaded meter). Its presence witness is
-  `lib/context.sh` — the library, never the surface the measurement reads, the same
-  shape `kpi-prompt-friction` takes — so a later cut deleting a `bin/` tool cannot
-  make the row report *absent* everywhere. `--emit-drift-report` declares the three
-  `CONTEXT_KIT_*` knobs the in-process read needs: while the row spawned a child,
-  that child sourced `lib/context.sh` and resolved its own.
+  context-kit's `templates/context-config.knobs` — never the surface the
+  measurement reads, the same shape `kpi-prompt-friction` takes. A knob-file
+  template is no port candidate, so a later cut deleting a `bin/` tool or a library
+  cannot make the row report *absent* everywhere (context-kit/SPEC.md §Layout and
+  configuration). `--emit-drift-report` declares the three `CONTEXT_KIT_*` knobs
+  the in-process read needs: while the row spawned a child, that child resolved its
+  own.
 - **kpi-settings-local** — entry count of the untracked local permission
   overlay (`.claude/settings.local.json` allow/deny/ask, via `jq`); the
   notice signal for guard-kit's close-stage prune/promote step.
@@ -406,9 +405,9 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    that grammar (date from `date +%F`) into `DRIFT_KIT_KNOWLEDGE_LOG`, creating
    the log's parent dir if missing, and refuses with a usage message and
    exit 2 unless both positionals are present and non-empty, **in the fixed
-   order fact then surface**. Its declared roster is that one knob, already
-   defined in §lib/drift.sh; the family is forced rather than chosen, since the
-   tool resolves a consumer knob and a hardcoded top-level flag would resolve
+   order fact then surface**. Its declared roster is that one knob, a row of
+   drift-kit's static table (§Layout and configuration); the family is forced
+   rather than chosen, since the tool resolves a consumer knob and a hardcoded top-level flag would resolve
    the platform default while silently ignoring every override. Both positionals
    are free text, so it also validates their **shape** — see
    gate-sdk/SPEC.md §The bin/-tool contract —
@@ -770,10 +769,9 @@ The producer of the log is the consumer's close-stage binding — this repo's
 config, not a lifecycle-kit change) — and any session may invoke it ad hoc. All
 three knobs carry working defaults, so the enabling config ships on by default,
 and the sessions-dir default matches the harness layout this repo already reads
-for stage stamps. `DRIFT_KIT_SESSIONS_DIR` is declared **empty** in `lib/drift.sh`
-and computed in-crate: the arm is compiled, and a knob the owning kit's library
-does not define is the config bridge's undeclared-knob refusal, which would
-fail-close the bare no-override invocation that is this meter's primary use.
+for stage stamps. `DRIFT_KIT_SESSIONS_DIR` defaults **empty** and the directory
+is computed in-crate from that emptiness, so the bare no-override invocation that
+is this meter's primary use needs no config (§Layout and configuration).
 
 **This section's port-owed set is empty, and that is stated rather than left to
 be inferred.** Every surface declaring it is now either in-crate or declared
@@ -1343,89 +1341,11 @@ stage (it moves no cursor, stamps nothing) and so is outside
 `check-stage-skill-coverage`'s stage roster; it is a reporting ritual the close
 skill may invoke, never a gate.
 
-## lib/drift.sh
-
-The kit's sourced knob resolution — values, never tool structure. It exists for
-one reason: `gate-sdk/SPEC.md §lib/gate.sh`'s config bridge resolves a compiled
-member's declared knob by sourcing **the owning kit's** `lib/*.sh`, and the owner
-is derived from the knob's own `DRIFT_KIT_` prefix. So a knob this kit owns can
-only be resolved from here; there is no other place that would work, and a knob
-no library defines is the bridge's undeclared-knob refusal (gate-sdk/SPEC.md §lib/gate.sh).
-
-**Its `# no-port:` declaration is now the class's stated precedent rather than a
-lone case.** It landed at the drift-kit cut saying the class of kit `lib/*.sh`
-had never been swept and that a cohort inherits a stated reason where it cannot
-inherit a precedent-by-example; gate-sdk/SPEC.md §The kit-library port
-disposition is that sweep, and it rules on this file's stated ground rather than
-minting a new one. Nothing in the declaration changes.
-
-**The trajectory arm's four knobs live here for exactly that reason, and their
-move is what the port paid.** `DRIFT_KIT_CONFIG_FILE`,
-`DRIFT_KIT_TRAJECTORY_SURFACES`, `DRIFT_KIT_GATES_FILE` and `DRIFT_KIT_STAGES`
-were resolved inside `bin/trajectory.sh` while the extractor was a shell tool <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-that could source its own config. A compiled arm cannot: it reads the bridge, the
-bridge sources this library and nothing else, so a default left in the tool would
-have made every one of them the bridge's undeclared-knob refusal. **Sourcing the consumer
-config is part of that**, and it happens here first — a knob a consumer config
-sets would otherwise resolve to the platform default and silently ignore the
-override, which is the failure mode that looks like success
-(gate-sdk/SPEC.md §The non-gate arm). The config path itself takes
-`DRIFT_KIT_KPIS_FILE`'s two adoption modes below, for the same reason: an
-explicitly-set path that does not exist is adopted-but-broken.
-
-`DRIFT_KIT_TRAJECTORY_SURFACES` keeps its **scalar** two-field shape
-(`"<state-file> <evidence-file>"`) across the substrate move rather than becoming
-an array, so a consumer that set it need not learn a second spelling; the reader
-splits its two whitespace-separated fields exactly as the shell form's `read -r`
-did.
-
-**`DRIFT_KIT_KPIS_FILE` resolves to the KPI registry path, and the two adoption
-modes are preserved here rather than at the reader.** They are the same two the
-enforcement map states for every registry it reads — *adopted-but-broken refuses
-where not-adopted degrades*:
-
-- **Explicitly set to a path that does not exist** is adopted-but-broken: exit 2
-  naming the knob. Under the config bridge that refusal fires inside the
-  resolution subshell and refuses the whole invocation, so a consumer who
-  misconfigured the registry gets a failure rather than a quietly shorter page.
-- **Unset, with the default path absent**, is not-adopted: the knob resolves to
-  the **empty string**, which a reader takes as *no registry, drop the section*.
-
-**A guarded default would have collapsed both into the refusing mode** — the
-idiom every other knob here could have used is wrong for this one, because it
-erases the set-ness the two modes are told apart by, turning a consumer that
-never adopted KPIs into a hard failure. Emptiness carries the not-adopted signal
-instead, which is what lets **a reader reached through the bridge carry no
-default**: a reader that had to recognise the default path would be a second home
-for it.
-
-**`DRIFT_KIT_KNOWLEDGE_LOG` moved no default at the capture affordance's port,
-and the second copy that vanished with it was never a counter-example to the
-sole-resolver claim above.** The knob was already defined here, so `--emit-kfric`
-declares it and reads what the bridge resolves rather than carrying a default of
-its own. What the port removed is a different duplicate: `bin/kfric.sh` was a <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-standalone tool that re-implemented this library's *opening* — its own inline
-`DRIFT_KIT_CONFIG_FILE` resolution block — because it did not source the library
-at all. That copy did not falsify the sole-resolver sentence, whose scope is its
-own next clause, knobs resolved **through the bridge**; a standalone `bin/`
-tool's own resolution fell outside it. So the port removed a genuine duplicate
-without repairing a defect, and this declaration's ground is unchanged in either
-direction — the honest statement, and the one a later sweep of this class needs.
-
-**The default had a second home, and the port closed it rather than the filing
-doing so.** The shell collator resolved the same knob inline with its own copy and
-was not a bridge reader; once the collator became a bridged arm it reads what this
-library resolves, so this library is the knob's only home. The report's other
-knobs moved here for the same reason and by the same forcing: a default left
-beside a compiled reader resolves to nothing, because the bridge sources this
-library and nothing else.
-
 ## Layout and configuration
 
 ```
 drift-kit/
-  lib/drift.sh                   # sourced knob resolution; the config bridge sources it
-  templates/drift-config.sh
+  templates/drift-config.knobs   # comment-only knob-file template, a pointer to the roster
   templates/kpis.list            # the shipped registry: every bundled KPI (consumer copies + prunes)
   templates/kpi-deprecated-surface.sh   # example toolchain-shaped KPI (§Out of scope)
   templates/close-knowledge.md
@@ -1456,29 +1376,57 @@ binary's own native-dispatch declaration rather than a sibling directory; the
 gate's population predicate takes either. `templates/kpi-deprecated-surface.sh`,
 an example a consumer adapts rather than a bundled member, stays out of it.
 
-Config follows the established kit pattern: copy `templates/drift-config.sh`
-into the gates dir (or point `DRIFT_KIT_CONFIG_FILE` elsewhere) and override
-any knob; defaults fill what the consumer left unset, and a set-but-missing
-`DRIFT_KIT_CONFIG_FILE` exits 2 rather than silently running on defaults. This
-template's own `# no-port:` cause, the first statement of the edit-seam ground
-anywhere, is now the **precedent for a class rather than a lone case**: gate-sdk/SPEC.md
-§The config-seam port disposition reads that ground across every kit's config
-seam and reaches the `<gates-dir>/drift-config.sh` this template is seeded into,
-which the precedent alone had left owed.
-Knobs (this repo's layout as defaults):
+Config is a **knob file**: copy `templates/drift-config.knobs` into the gates dir
+as `drift-config.knobs` (or point `DRIFT_KIT_KNOB_FILE` elsewhere) and set any knob
+below; defaults fill what the file leaves unset. drift-kit's knobs are **static**:
+the binary resolves them in process from its own defaults table and the consumer's
+knob file, and the config bridge never carries them (gate-sdk/SPEC.md §lib/gate.sh);
+`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape
+and rendered default. A gitignored `drift-config.local.knobs` in the gates dir is the
+home for a private value a tracked file cannot carry. The grammar, that `.local`
+overlay, the environment-over-file precedence for a scalar, the knob reference, and
+the refusals — a set `DRIFT_KIT_KNOB_FILE` that does not exist, a left-behind
+`drift-config.sh` or `drift-config.local.sh`, a non-empty file named by the retired
+`DRIFT_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. The kit's table
+validator refuses at exit 2 for the one rule `DRIFT_KIT_KPIS_FILE` states below.
+A derived default below is written in the roster's `${NAME}` spelling for the knob
+it reads.
 
-- `DRIFT_KIT_KPIS_FILE` — the registry; default
-  `${GATE_SDK_GATES_DIR:-scripts}/kpis.list`.
-- `DRIFT_KIT_KPI_DIRS` — extra resolution roots searched before the
+**drift-kit's family is open to consumer scalars**, for §The KPI plugin contract:
+in its knob files a scalar line naming an undeclared `DRIFT_KIT_` name is a
+consumer knob, resolved through the same precedence as a declared scalar, with no
+default and no validator, and read only by the family read that exports it to
+plugins. An undeclared name written as an indexed or keyed line is still refused,
+and so are the locators `DRIFT_KIT_KNOB_FILE` and `DRIFT_KIT_CONFIG_FILE` set in a
+file. **Honest limit:** a misspelled declared name in drift-kit's file reads as a
+consumer knob rather than a refusal. Knobs:
+
+- `DRIFT_KIT_KPIS_FILE` — the KPI registry; default
+  `${GATE_SDK_GATES_DIR}/kpis.list` **when that file exists, else empty**. The
+  roster renders the path unprobed. The two adoption modes are the ones the
+  enforcement map states for every registry it reads — *adopted-but-broken refuses
+  where not-adopted degrades*:
+  - **Set explicitly** — environment, local overlay or tracked file — **to a path
+    that is not a file** is adopted-but-broken: the table validator, which reads the
+    value's origin, refuses at exit 2 naming the knob, so a consumer who
+    misconfigured the registry gets a failure rather than a quietly shorter page.
+  - **Unset with the default path absent, or set empty**, is not-adopted: the knob
+    resolves to the **empty string**, which a reader takes as *no registry, drop the
+    section*.
+
+  Emptiness carries the not-adopted signal, so no reader carries the default path:
+  a reader that had to recognise it would be a second home for it.
+- `DRIFT_KIT_KPI_DIRS` — array, extra resolution roots searched before the
   vendored kits' `kpis/` dirs and before the binary's built-in members
-  (§The extensibility contract, tier 1); default: the consumer gates dir.
-- `DRIFT_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`.
+  (§The extensibility contract, tier 1); default `(${GATE_SDK_GATES_DIR})`, the
+  consumer gates dir.
+- `DRIFT_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE}`.
 - `DRIFT_KIT_KNOWLEDGE_LOG` — default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/knowledge-friction.log`.
+  `${GATE_SDK_WORKFLOW_DIR}/knowledge-friction.log`.
 - `DRIFT_KIT_TIMINGS_FILE` — default
-  `${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt`.
+  `${GATE_SDK_TMP_DIR}/gate-timings.txt`.
 - `DRIFT_KIT_TMP_DIR` — plugin scratch root; default
-  `${GATE_SDK_TMP_DIR:-.tmp}`. Members are regenerated on every run, so a
+  `${GATE_SDK_TMP_DIR}`. Members are regenerated on every run, so a
   scratch wipe is harmless.
 - `DRIFT_KIT_METRIC_DIR` — the persistent measurement home, distinct from
   `DRIFT_KIT_TMP_DIR` by retention contract: metric-dir members are
@@ -1496,19 +1444,15 @@ Knobs (this repo's layout as defaults):
   knob stays drift-kit's and the *derivation below it* is now shared in-crate
   (§The overhead meter), which is consistent rather than in tension: the sharing
   is below the config layer, where a knob has already been resolved to a value.
-  Two resolvers name it and only one computes — `lib/drift.sh` declares it
-  **empty** so the config bridge's `declare -p` can find it, and the computed
-  fallback above lives in `native/src/sessions.rs`. Empty means *derive it*,
-  never *no value*.
+  The table row's default is **empty**, and the computed fallback above lives in
+  `native/src/sessions.rs`. Empty means *derive it*, never *no value*.
 - `DRIFT_KIT_OVERHEAD_LOG` — the overhead meter's append log; default
-  `$DRIFT_KIT_METRIC_DIR/overhead-log.txt` (gitignored, so the private
+  `.metric/overhead-log.txt`, derived as `${DRIFT_KIT_METRIC_DIR}/overhead-log.txt`
+  so a set metric dir moves it (gitignored, so the private
   transcript's derived counts never enter version control; the meter
-  `mkdir -p`s the log's dirname). **One** resolver computes this default,
-  `lib/drift.sh`, through which the collator, `kpi-overhead` and the meter now
-  all read it: the second resolver was the meter's own, and it left with the
-  standalone script the port deleted — the same collapse §Layout records for
-  `DRIFT_KIT_PRICE_TABLE`. The smoke's writer/reader assertion keeps its subject
-  and holds the surviving pair together (§Testing).
+  `mkdir -p`s the log's dirname). The table is the one resolver of this default,
+  and the collator, `kpi-overhead` and the meter all read it there. The smoke's
+  writer/reader assertion holds that pair together (§Testing).
 - `DRIFT_KIT_DONE_SECTION` / `DRIFT_KIT_DEFERRED_SECTION` — queue section
   headings the task-split and deferred-age KPIs scan; defaults `Done` /
   `Deferred` (queue-kit's).
@@ -1519,49 +1463,46 @@ Knobs (this repo's layout as defaults):
   queue-kit and canon-kit carry: a consumer enabling the tier sets each, and
   one left unset degrades that kit to "no icebox".
 - `DRIFT_KIT_TRAJECTORY_SURFACES` — the state-file paths the trajectory
-  extractor harvests, given as `<state-file> <evidence-file>`; default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` and its
+  extractor harvests, one **scalar** of two whitespace-separated fields,
+  `<state-file> <evidence-file>`, never an array; default
+  `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt` and its
   `validate-evidence.txt` sibling. A surface it cannot read degrades that
   iteration's cell to `n/a`.
 - `DRIFT_KIT_GATES_FILE` — the registry whose member count the trajectory
   extractor reads at each close commit (gate-roster growth); default
-  `${GATE_SDK_GATES_DIR:-scripts}/gates.list`.
-- `DRIFT_KIT_STAGES` — the ordered stage roster the trajectory extractor
+  `${GATE_SDK_GATES_DIR}/gates.list`.
+- `DRIFT_KIT_STAGES` — array, the ordered stage roster the trajectory extractor
   renders (one slot per stage, labelled by its shortest roster-unique prefix);
   default `(scope align build validate close)`, which reduces to the frozen
   single-letter header. A consumer running a wider roster derives this from its
-  sole roster owner rather than re-listing: lifecycle-kit's knobs are static, so
-  the config reads the value through the binary with `gate_static_knob
-  LIFECYCLE_KIT_STAGES DRIFT_KIT_STAGES` (gate-sdk/SPEC.md §The knob file), called
-  only when `DRIFT_KIT_STAGES` is in `GATE_SDK_RESOLVING_KNOB` because the read costs
-  a spawn — this repo's `scripts/drift-config.sh` is the live instance, the SSOT
-  activation. Third instance of drift-kit re-deriving a
+  sole roster owner rather than re-listing, with a knob reference in its knob
+  file: `DRIFT_KIT_STAGES[] <- LIFECYCLE_KIT_STAGES` (gate-sdk/SPEC.md §The knob
+  file). This repo's `scripts/drift-config.knobs` is the live instance, the SSOT
+  activation, and the reference also reaches `check-trajectory-fresh`'s trigger
+  to lifecycle-kit's tracked knob file (gate-sdk/SPEC.md §The `# graph:`
+  manifest). Third instance of drift-kit re-deriving a
   cross-kit fact with its own knob rather than importing a sibling kit's bin
   contract (alongside `DRIFT_KIT_SESSIONS_DIR` and `DRIFT_KIT_STATE_FILE`).
 - `DRIFT_KIT_STAGE_ECONOMICS_LOG` — the stage-economics append trend log; default
-  `$DRIFT_KIT_METRIC_DIR/stage-economics-log.txt` (gitignored; the meter
-  `mkdir -p`s the dirname), resolved in `lib/drift.sh` now that the standalone
-  script it was computed inside is gone.
+  `.metric/stage-economics-log.txt`, derived as
+  `${DRIFT_KIT_METRIC_DIR}/stage-economics-log.txt` so a set metric dir moves it
+  (gitignored; the meter `mkdir -p`s the dirname).
 - `DRIFT_KIT_PRICE_TABLE` — the consumer-owned model→price roster the
   stage-economics meter prices through and `kpi-price-table-age` ages; default
-  `${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv` (beside `graph-vocab.sh`, the
+  `${GATE_SDK_GATES_DIR}/price-table.tsv` (beside `graph-vocab.sh`, the
   consumer-config precedent). Absent, cost degrades to `n/a` and tokens still report.
-  **One** site computes this default, `lib/drift.sh`, for every bridge reader.
-  The KPI's own restatement went with its port, and the standalone meter's went
-  with this one — a compiled member reads what the bridge resolved, so each
-  substrate move *removed* a duplicate here rather than converting one into a
-  cross-substrate pair, which is the outcome that was priced as a hazard.
+  The table is the one site computing this default, and both the KPI and the meter
+  read it there.
 - `DRIFT_KIT_SUPERVISION_LABEL` — the reserved value the stage-economics meter
   writes into the trend log's `<stage>` column for a lead's own burn
   (§The stage-economics meter, the reserved `supervision` value); default
-  `supervision`, resolved in `lib/drift.sh`. A consumer whose
+  `supervision`. A consumer whose
   lifecycle roster already carries that word renames it here; a stamp naming the
   label collides and suppresses the rows for that run rather than blending two
   meanings into one column value.
 - `DRIFT_KIT_FANOUT_SUFFIX` — the suffix the stage-economics meter appends to an
   anchor's stage-or-role value to name its dispatched subtree's row
-  (§The stage-economics meter, the fan-out row); default `+fanout`, resolved in
-  `lib/drift.sh`. The default is
+  (§The stage-economics meter, the fan-out row); default `+fanout`. The default is
   collision-proof by construction (`+` is outside the stamp's stage alphabet); an
   override that a stamped stage name ends in collides and suppresses the fan-out
   rows for that run. Deliberately the *only* new knob: a meta-filename or
@@ -1573,12 +1514,11 @@ Knobs (this repo's layout as defaults):
 - `DRIFT_KIT_STATE_FILE` — the WORKFLOW-STATE path whose *committed history and
   live content* the stage-economics join reads for stamps (§The stage-economics
   meter, history ∪ live), and whose first stamp the report skeleton reads for
-  the iteration-start commit (§The report skeleton); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
+  the iteration-start commit (§The report skeleton); default
+  `${GATE_SDK_WORKFLOW_DIR}/WORKFLOW-STATE.txt` (the
   same default the trajectory extractor's surface list computes — drift-kit
   re-derives with its own knob rather than importing a sibling kit's bin contract,
-  the established `DRIFT_KIT_SESSIONS_DIR` precedent), resolved in `lib/drift.sh`
-  so the config bridge's `declare -p` can find it: the reader is a compiled arm,
-  and a knob no kit library defines is the bridge's undeclared-knob refusal. The
+  the established `DRIFT_KIT_SESSIONS_DIR` precedent). The
   parenthetical above stays true and is not in tension with the shared in-crate
   derivation §The stage-economics meter reads — the knob is still drift-kit's, and
   the sharing happens below the config layer, where it has already resolved to a
@@ -1614,6 +1554,13 @@ is skipped, that row being the report's own and asserted separately. The probe
 asserts it probed something, so a resolution change cannot make it vacuous.
 Residual limit, stated because it is real: neither assertion pins *which* member
 emitted a given row, so a member emitting the wrong number of rows is not caught.
+The failing-member control and the extension-point assertions (§The extensibility
+contract) configure the collator through a throwaway knob file named by
+`DRIFT_KIT_KNOB_FILE`, never the environment, because `DRIFT_KIT_KPI_DIRS` is
+indexed and takes no environment override. That file's `DRIFT_KIT_KPI_DIRS[] =`
+line names the consumer plugin dir, and its scalar line
+`DRIFT_KIT_SMOKE_CUSTOM = reached`, a name no table declares, is the open-family
+knob the shadowing plugin is asserted to receive (§The KPI plugin contract).
 The trajectory extractor needs committed history the
 throwaway consumer lacks, so `smoke/install.sh` proves it against a hermetic
 fake-history repo — one closed, range-bounded iteration — and asserts the
@@ -1735,8 +1682,12 @@ roster (canon-kit's `check-deprecation-task` vocabulary), so it ships as
 its `kpis.list` rather than a bundled member: the marker spelling
 is a consumer literal, and the kit stays deprecation-neutral. Registered, it
 trends the live-marker backlog between majors so it surfaces gradually instead
-of at one release; it degrades to `n/a` when the roster is unset (the bundled
-plugins' fail-visible discipline). The release-boundary disposition walk over
+of at one release. It reads `CANON_KIT_DEPRECATION_MARKERS` and
+`CANON_KIT_COMMENT_SURFACE` through `run-gates.sh --emit knob-values`, finding the
+front-end under the `gate-sdk` member of the `DRIFT_KIT_KIT_ROOTS` handoff; a
+failed read prints an `n/a (knob read failed)` row, and it degrades to `n/a` when
+the roster is unset (the bundled plugins' fail-visible discipline — a plugin never
+blocks). The release-boundary disposition walk over
 the same roster is lifecycle-kit's `release-sweep` skill template. So are product-workflow KPIs: gate
 exemptions (a `scan-exceptions` disposition split) and backlog-aging finding
 counts — both read consumer gates. A narration-marker by-eye count is

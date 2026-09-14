@@ -5,9 +5,8 @@ use crate::proc;
 use crate::stages;
 use crate::walk;
 
-// spec: context-kit/SPEC.md §The always-loaded meter — the knobs `lib/context.sh` defines and the
-// bridge resolves by sourcing it; the two `GATE_SDK_*` names it already rides into these are
-// deliberately absent, since declaring either would resolve one fact twice.
+// spec: context-kit/SPEC.md §The always-loaded meter — the meter's context-kit rows; the two
+// `GATE_SDK_*` names they derive from are deliberately absent, since the closure carries them.
 pub const KNOBS: &[&str] = &[
     "CONTEXT_KIT_SURFACES",
     "CONTEXT_KIT_HOOK_CMD",
@@ -110,8 +109,12 @@ fn baseline_row(path: &str) -> Option<Row> {
 // spec: context-kit/SPEC.md §The always-loaded meter — the hook body is measured by running
 // whatever command the knob names, through `bash -c`, and counting the lines it wrote: the knob is
 // a consumer command seam, so the spawn is the contract rather than an implementation detail.
-fn hook_lines(cmd: &str) -> u64 {
-    let out = match proc::run_streamed("bash", &["-c", cmd], b"", proc::Stderr::Discard) {
+fn hook_lines(argv: &[String]) -> u64 {
+    let Some((program, rest)) = argv.split_first() else {
+        return 0;
+    };
+    let args: Vec<&str> = rest.iter().map(String::as_str).collect();
+    let out = match proc::run_streamed(program, &args, b"", proc::Stderr::Discard) {
         Ok(o) => o,
         // spec: context-kit/SPEC.md §The always-loaded meter — a hook command that could not run
         // contributes nothing, the holder's `|| true`: its stdout is read whatever its status, so
@@ -233,8 +236,7 @@ pub fn measure(start: &str) -> Result<Measurement, String> {
             surface += newlines(&b);
         }
     }
-    let cmd = walk::knob_scalar("CONTEXT_KIT_HOOK_CMD")?;
-    let hook = if cmd.is_empty() { 0 } else { hook_lines(&cmd) };
+    let hook = hook_lines(&walk::knob_array("CONTEXT_KIT_HOOK_CMD")?);
     let row = baseline_row(&walk::knob_scalar("CONTEXT_KIT_BASELINE_FILE")?);
     let start_surface = if start.is_empty() {
         None

@@ -55,33 +55,36 @@ cat >"$SANDBOX/two.md" <<'MD'
   it at all.
 MD
 
-cat >"$SANDBOX/cfg.sh" <<'CFG'
-CONTEXT_KIT_BREVITY_SECTIONS=("## Conventions we since renamed")
+cat >"$SANDBOX/cfg.knobs" <<'CFG'
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Conventions we since renamed
 CFG
 
-cat >"$SANDBOX/two-cfg.sh" <<'CFG'
-CONTEXT_KIT_BREVITY_SECTIONS=("## Shared conventions" "## Housekeeping")
+cat >"$SANDBOX/two-cfg.knobs" <<'CFG'
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Shared conventions
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Housekeeping
 CFG
 
-cat >"$SANDBOX/half-cfg.sh" <<'CFG'
-CONTEXT_KIT_BREVITY_SECTIONS=("## Shared conventions" "## Housekeeping we since renamed")
+cat >"$SANDBOX/half-cfg.knobs" <<'CFG'
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Shared conventions
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Housekeeping we since renamed
 CFG
 
-cat >"$SANDBOX/dup-cfg.sh" <<'CFG'
-CONTEXT_KIT_BREVITY_SECTIONS=("## Shared conventions" "## Shared conventions")
+cat >"$SANDBOX/dup-cfg.knobs" <<'CFG'
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Shared conventions
+CONTEXT_KIT_BREVITY_SECTIONS[] = ## Shared conventions
 CFG
 
-cat >"$SANDBOX/empty-cfg.sh" <<'CFG'
-CONTEXT_KIT_BREVITY_SECTIONS=()
+cat >"$SANDBOX/empty-cfg.knobs" <<'CFG'
+CONTEXT_KIT_BREVITY_SECTIONS =
 CFG
 
-cat >"$SANDBOX/retired-cfg.sh" <<'CFG'
-CONTEXT_KIT_BREVITY_SECTION="## Shared conventions"
+cat >"$SANDBOX/retired-cfg.knobs" <<'CFG'
+CONTEXT_KIT_BREVITY_SECTION = ## Shared conventions
 CFG
 
 # The stock-default cases pin an existing empty config (the strict loader
 # exits 2 on a set-but-missing path, and /dev/null is not a regular file).
-: >"$SANDBOX/noop-cfg.sh"
+: >"$SANDBOX/noop-cfg.knobs"
 
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=file  $5..=env assignments
     local label="$1" want="$2" sub="$3" file="$4"; shift 4
@@ -102,44 +105,44 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=file  $5..=env ass
 # renamed it, and the over-budget bullet below it goes unseen. Before the fix
 # this exited 0 reporting "0 bullets" — a disarmed gate reading as a clean tree.
 check_case "renamed-section-fails-closed" 2 "no heading matches" renamed.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/noop-cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/noop-cfg.knobs"
 
 # Symmetrically, a consumer config naming a heading the governed file lacks is
 # the same broken machine, reached through the config seam rather than the default.
 check_case "config-names-absent-heading" 2 "no heading matches" empty.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/cfg.knobs"
 
 # Resolution is what fails closed, not emptiness: a section that exists and
 # holds no bullets is a clean tree, and the help line stays out of the way.
 check_case "matched-but-bulletless-clean" 0 "BREVITY: clean (0 bullets" empty.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/noop-cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/noop-cfg.knobs"
 
 # The renamed file is clean once the knob is repointed at the live heading —
 # and the bullet it was hiding is now seen, so the knob really did resolve.
 check_case "repointed-knob-sees-bullets" 1 "Over budget with pointer" renamed.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/cfg.knobs"
 
 # A multi-section set reaches its second element, and the non-bold bullet there
 # is measured and named by section, line and opening text.
 check_case "second-section-non-bold-bullet" 1 "'## Housekeeping' line 9: \`scratch/\` is a plain bullet" two.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/two-cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/two-cfg.knobs"
 
 # One unmatched element refuses the whole set, naming that element — the resolved
 # sibling must not report the rest clean.
 check_case "one-unmatched-element-fails-closed" 2 "'## Housekeeping we since renamed'" two.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/half-cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/half-cfg.knobs"
 
 # A repeated element is scanned once: one bullet, not two.
 check_case "repeated-element-scanned-once" 0 "BREVITY: clean (1 bullets, 1 within budget; '## Shared conventions' 1)" two.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/dup-cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/dup-cfg.knobs"
 
 # An empty set governs nothing, which is the vacuous pass the fail-closed contract refuses.
 check_case "empty-set-fails-closed" 2 "CONTEXT_KIT_BREVITY_SECTIONS is empty" two.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/empty-cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/empty-cfg.knobs"
 
 # The retired scalar knob refuses rather than being silently ignored, naming its replacement.
 check_case "retired-scalar-knob-refused" 2 "set CONTEXT_KIT_BREVITY_SECTIONS" two.md \
-    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/retired-cfg.sh"
+    CONTEXT_KIT_KNOB_FILE="$SANDBOX/retired-cfg.knobs"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-brevity.test.sh: $fails case(s) failed"

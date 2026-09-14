@@ -48,7 +48,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — every consumer pattern compiles before
     // the first corpus line is read, so a pattern the substrate cannot honour exits 2 naming
     // the knob rather than scanning clean past what it meant
-    let markers = spec::knob_array_pub("CANON_KIT_TEMPORAL_MARKERS")?;
+    let markers = spec::vocabulary("CANON_KIT_TEMPORAL_MARKERS", "CANON_KIT_TEMPORAL_MARKERS_EXTRA")?;
     let mut compiled: Vec<(String, Ere)> = Vec::new();
     for m in &markers {
         if m.is_empty() {

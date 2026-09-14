@@ -1,0 +1,5 @@
+# spec: canon-kit/SPEC.md §check-prose-tells — the fixture opts in one prose surface so the gate has something to scan
+CANON_KIT_PROSE_TELL_GLOBS[] = prose.md
+
+# comment-tier-exempt: the base array stays at its bundled default so the trip proves the union, not a replacement
+CANON_KIT_PROSE_TELL_PHRASES_EXTRA[] = Suffice it to say

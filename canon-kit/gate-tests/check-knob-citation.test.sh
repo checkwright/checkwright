@@ -18,13 +18,14 @@ trap 'rm -rf "$SANDBOX"' EXIT
 fails=0
 mkdir -p "$SANDBOX/widget-kit"
 
-cat >"$SANDBOX/cfg.sh" <<'EOF'
-CANON_KIT_MANIFEST_FILES=("widget-kit/SPEC.md" "widget-kit/README.md")
+cat >"$SANDBOX/cfg.knobs" <<'EOF'
+CANON_KIT_MANIFEST_FILES[] = widget-kit/SPEC.md
+CANON_KIT_MANIFEST_FILES[] = widget-kit/README.md
 EOF
 
 check_case() {  # $1=label  $2=want-rc  $3=want-substring
     local label="$1" want="$2" sub="$3" out rc
-    out="$(cd "$SANDBOX" && gate_env GATE_SDK_KIT_DIRS="widget-kit" CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh" \
+    out="$(cd "$SANDBOX" && gate_env GATE_SDK_KIT_DIRS="widget-kit" CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" \
         && gate_run check-knob-citation "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return

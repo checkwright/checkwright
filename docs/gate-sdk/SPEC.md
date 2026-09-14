@@ -332,13 +332,14 @@ states.
 ### The knob file
 
 A **knob file** is UTF-8 text read line by line. A line that is blank, or whose
-first non-blank character is `#`, is ignored. Every other line is one of three
+first non-blank character is `#`, is ignored. Every other line is one of four
 forms:
 
 ```
 NAME = value            a scalar
 NAME[] = element        one element of an indexed knob, in file order
 NAME[key] = value       one pair of a keyed knob
+NAME[] <- OTHER         the resolved elements of OTHER, at this position
 ```
 
 `NAME` is a SCREAMING_SNAKE knob name. The first `=` on the line separates the head
@@ -356,9 +357,45 @@ already gives an empty serialization. A knob's **shape is its owner's
 declaration**, and the file does not choose it. A line whose form disagrees with
 the declared shape is refused with its file and line, exit 2. So are an undeclared
 name for the owning kit, a malformed line, a scalar or keyed pair given twice in
-one file, and an empty `NAME =` beside element or pair lines for the same knob.
-Leading or trailing blanks inside a value are unexpressible, and no live value
-carries them.
+one file, and an empty `NAME =` beside element, pair or reference lines for the
+same knob. Leading or trailing blanks inside a value are unexpressible, and no live
+value carries them.
+
+**A reference line splices another knob's value.** It carries no `=`, so no line in
+the three value forms can read as one. `NAME` and `OTHER` are SCREAMING_SNAKE names
+and blanks around `<-` are trimmed. The line contributes OTHER's **resolved** value,
+whatever layer supplied it, as elements of `NAME` in file order among `NAME`'s own
+element lines, and `NAME` is then replaced whole by its lines in that file, exactly
+as without a reference. A reference is refused with its file and line, exit 2, when:
+
+- `NAME` or `OTHER` is not a declared **indexed** knob. The form splices elements,
+  and no scalar or keyed reference has a reader.
+- `OTHER` is not statically owned. A bridged value is not the crate's to resolve.
+- `OTHER`'s row reaches a bridged input (the derived-default paragraph below). The
+  member's `--knobs` closure is computed from declarations and cannot see a file's
+  reference, so such a referent could ask for an input the bridge never carried.
+- `OTHER`'s own resolved value carries a reference, or `OTHER` is `NAME`.
+  Resolution is **one pass**, the bound the `couples=` `knob:` token takes, so no
+  cycle detector is needed. A kit validator reads every row at the kit's first
+  resolution, so a nested reference refuses that first read rather than only the
+  referencing knob's.
+
+A reference may cross kits. It is the one splice form the file admits, and the
+grammar still has no expansion inside a value: `$`, `<-` and `${…}` in a value are
+data. A reference in a kit's **tracked** file also reaches a trigger (§The `# graph:`
+manifest).
+
+**A command knob** (`<KIT>_…_CMD`) is an **indexed** knob holding an argv, one
+element per line: `CANON_KIT_MEASURED_CLAIMS_CMD[] = bash` then
+`CANON_KIT_MEASURED_CLAIMS_CMD[] = scripts/measured-claims.sh`. Its reader spawns the
+argv directly and no shell parses it, so a consumer on native Windows names its own
+interpreter. The program is resolved by the crate's one program resolver (§Fail-closed
+contract), the child inherits the reader's working directory and environment, and an
+empty knob means *no command*, which each reader takes as its skip. A reader
+appending an operand appends it after the argv's last element. What a failed spawn
+or a non-zero exit means stays each reader's own contract. A command knob takes no
+environment override, because it is indexed. A command that is itself a front-end
+arm must not declare the knob that names it, or the resolution recurses.
 
 **Why the grammar is lines and not a general format.** It maps one-to-one onto the
 wire the bridge already speaks — an element per tab-joined field, a `<key>=<value>`
@@ -371,12 +408,12 @@ in any interpreter is a dozen lines, which is what a surface that must survive i
 bash and PowerShell alike needs.
 
 **What the grammar deliberately lacks, and where each lack is answered.** It has no
-reference to another knob, no command substitution and no loop. Every derived value
-a kit library computes moves to that kit's defaults table, where a derived default
+expansion inside a value, no command substitution and no loop. Every derived value
+a kit library computed lives in that kit's defaults table, where a derived default
 is a function of already-resolved knobs. Every value a consumer config computes is
-either a *reference* or a *generated family*, and the cut that first migrates each
-rules its extension under this section's invariants: raw values, no expansion, no
-shell, and one owner per knob.
+either a *reference*, ruled above, or a *generated family*, and the cut that first
+migrates a family rules its extension under this section's invariants: raw values,
+no expansion, no shell, and one owner per knob.
 
 A derived default may read a **bridged** knob as well as a static sibling. Its row
 declares every name its derivation reads, so the set is known without running it,
@@ -389,11 +426,17 @@ input. The derivation reads a bridged input through the one reader function
 (§lib/gate.sh), so an absent input is the reader's ordinary refusal and never a
 silent fallback. `--emit knob-roster` renders a bridged input as `${NAME}`, because
 the arm takes no knob and gate-sdk's default for that input is not the crate's to
-spell.
+spell. It hands a derivation each bridged input as a **placeholder**, origin
+`Placeholder` and value `${NAME}`. A derivation that probes the filesystem does not
+probe a path built from a placeholder, and renders its first candidate instead, so
+the roster prints `${GATE_SDK_GATES_DIR}/kpis.list` rather than an empty value that
+is true of no tree.
 
 **A kit's table may carry a validator**, and a malformed config gates nothing. It
 runs once per process per kit, at the kit's first resolution, and collects every
 finding before refusing with exit 2 under the kit's malformed-config lead line. A
+validator reads each row's origin beside its value, so a rule that turns on whether
+a consumer set the knob, not on what the value is, is a validator rule. A
 row whose default derives from a bridged input is validated only when its value
 comes from the environment or a file: the validator runs at the kit's first read,
 for a member that may not carry that input, and a unit test holds every kit default
@@ -414,7 +457,7 @@ sound.
 4. **the kit default** from the crate's table.
 
 `<stem>` is the kit root's name less `-kit` (`site`, `doctrine`, `queue`,
-`lifecycle`), the stem its shell
+`lifecycle`, `canon`, `context`, `delegation`, `drift`), the stem its shell
 config used, so a consumer finds the new file where the old one was. The gates
 directory is `GATE_SDK_GATES_DIR` from the environment, default `scripts`. It stays
 env-or-default for the reason §Layout and configuration already gives: a file
@@ -451,6 +494,23 @@ refusal while a consumer's real pinned config is refused rather than dropped.
 `<KIT>_CONFIG_FILE` → `<KIT>_KNOB_FILE` is a rename, because the grammar changed and
 a distinct spelling is what a grammar change buys (§lib/gate.sh).
 
+**A kit's table may list retired names**, each with its replacement. A file line
+naming one, or a retired scalar exported in the environment, is refused at exit 2
+with the replacement named. The generic undeclared-name refusal would name only the
+roster, and an exported retired name would otherwise be silently ignored (the
+retired `GATE_SDK_GRAPH_THEME` precedent).
+
+**A kit may declare its family open to consumer scalars.** In such a kit's files, a
+scalar line naming an undeclared name under the kit's prefix is a consumer knob, not
+a refusal. It resolves through the same precedence as a declared scalar, it has no
+default and no validator, and the one reader of the set is the kit's family read
+(`knobs::family`). An undeclared name written as an indexed or keyed line is still
+refused, and so are the kit's own locator names, `<KIT>_KNOB_FILE` and
+`<KIT>_CONFIG_FILE`, and any retired name, since a file setting one of those is a
+mistake the family would otherwise hide. drift-kit is the one open kit, for its
+plugin contract. The honest limit: a misspelled declared name in an open kit's file
+reads as a consumer knob rather than a refusal.
+
 **The table is published.** `bash gate-sdk/bin/run-gates.sh --emit knob-roster`
 prints every statically owned knob (§The non-gate arm), which is how an adopter reads
 a static kit's names and defaults now that no shell file holds them.
@@ -460,13 +520,6 @@ expressible, and the cut that first needs a shape rules its grammar under this
 section's invariants.** The shapes not yet ruled, each with the reason it cannot be
 deferred past its kit:
 
-- **A command knob** (`*_CMD`) crosses as an **indexed** knob holding an argv, which
-  the binary spawns directly, never a shell string, so a consumer on native Windows
-  names its own interpreter. The canon-kit command knobs whose output feeds
-  `GATE_SDK_RESOLVING_KNOB` are resolved by the crate spawning the argv when a member
-  first reads a dependent knob, and that retires the resolving-knob gating.
-- **A reference to another knob**, same-kit or cross-kit, is the one splice form the
-  file admits, ruled at the first cut whose consumer config needs it.
 - **A generated family** (`EVIDENCE_KIT_RUN_` over the fixture suites) is a kit-side
   derivation the owning kit's table performs, never a loop in consumer config.
 - **guard-kit's rule content** is bash a consumer composes against `lib/guard.sh`.
@@ -487,10 +540,10 @@ seeding derivation reads `templates/*-config.knobs` beside `templates/*-config.s
 while the two seams coexist, and it is not the knob-file reference form above. A
 bridged kit's shell config that needs a static knob's value calls
 `gate_static_knob <NAME> <array-outvar>` (§lib/gate.sh), gated on
-`GATE_SDK_RESOLVING_KNOB` because the read costs a spawn; drift-kit's config
-reading lifecycle-kit's stage roster is the live instance (drift-kit/SPEC.md
-§Layout and configuration). It ends at the reading kit's own cut, which rules the
-reference form its knob file needs.
+`GATE_SDK_RESOLVING_KNOB` because the read costs a spawn. No config in this repo
+takes the shape; it stays for an adopter's still-bridged config, and both the helper
+and the export remain until gate-sdk's cut, since dropping the export would silently
+turn such a call off. A reading kit's own cut replaces it with the reference form.
 
 ### The config-seam port disposition
 
@@ -515,21 +568,20 @@ it reaches `no-port` by the separate ground below. **A static kit's knob file
 leaves the class by substrate, not by port** (§The knob file): it is not shell, so
 §port-blockers never scans it, while the ground above — it is the file an adopter
 edits — holds of it unchanged. The class therefore shrinks at each migration cut,
-and nothing below reopens on that account. **Both sides of the seam are members**, template and seeded copy alike —
+and every kit in the crate's static-kit table (`native/src/knobs/mod.rs`) has left
+it; nothing below reopens on that account. **Both sides of the seam are members**, template and seeded copy alike —
 they are one artifact at two points of one derivation, the copy is what the
 template exists to become, and the copy is the *more* edited of the two. A ruling
 taking one side would leave the other re-arguing the same ground at the next cut.
 
-**The ground is not minted here; it is read across its own class.**
-`drift-kit/templates/drift-config.sh` already declares on it verbatim — it "**is**
-the adopter's config seam rather than kit mechanism reaching it, so porting it
-deletes the seam: there would be nothing left for a consumer to edit". What that
-precedent leaves standing alone is an **incoherence**,
-and closing it is the sharpest case for a class ruling: the template declares on
-the edit-seam ground while `<gates-dir>/drift-config.sh`, the copy it is seeded
-into, stays owed. A template declaring on a ground its own consumer copy is denied
-is a state the tree already carries, so this ruling resolves one rather than
-creating an exception.
+**The ground, stated directly: a config file is the adopter's seam, so porting it
+deletes the thing there is to edit, and a template and its seeded copy stand or
+fall together.** A ruling that granted the ground to a template while its own
+consumer copy stayed owed would be an incoherence rather than an exception, which
+is why the class takes both sides. `evidence-kit/templates/evidence-config.sh`, a
+bridged kit's template still in shell, is the live declarer: its `# no-port:`
+names this section and states that it **is** the surface an adopter edits rather
+than kit mechanism reaching one.
 
 **Two mechanisms here already treat the class as an edit surface, and they are
 cited as evidence rather than as argument.** The installer's `init` claims a
@@ -542,8 +594,8 @@ on the stated ground that a config template is a starting point the consumer
 customizes "so equality would be the defect". A gate that refuses to hold this
 class to its own template is a gate already saying the class is the consumer's.
 
-**A caller-side check the class invites and does not need.** Every kit library
-takes `<KIT>_CONFIG_FILE` when set and otherwise resolves
+**A caller-side check the class invites and does not need.** Every bridged kit
+library takes `<KIT>_CONFIG_FILE` when set and otherwise resolves
 `<gates-dir>/<kit>-config.sh`, sourcing it **only when the file exists** — the
 loader paragraph above is gate-sdk's instance of a shape each kit's own §Layout
 and configuration repeats for its own library. A member's declaration therefore
@@ -2027,9 +2079,9 @@ strengthens as more gates port.
 - **Locality-class** — `# spec:` with its one-line binding, and the
   comment-tier directives — binds to a *line of implementation*, so it **stays
   in the implementation**: moving it to a companion file destroys the binding
-  that gives it meaning. The corpus primitive
-  `canon-kit/lib/spec.sh` reaches the implementation for exactly this reason
-  (canon-kit/SPEC.md §lib/spec.sh), so those assertions stay live on a ported
+  that gives it meaning. The corpus primitive `comment_surface` reaches the
+  implementation for exactly this reason (canon-kit/SPEC.md §The shared spec
+  adapters), so those assertions stay live on a ported
   gate instead of going dark.
 
 **The layer above the descriptor is substrate-blind.** Because the manifest sits
@@ -2159,12 +2211,17 @@ The manifest grammar:
     `knob:` token in the descriptor corpus carries — the sentinel's static half,
     computed from the corpus exactly as its bridged half is (§lib/gate.sh);
   - **a derived default's declared input** that another static kit owns,
-    transitively.
+    transitively;
+  - **a reference line** (§The knob file) in the **tracked** knob file of a kit
+    the declaration reaches, which reaches the static kit owning the line's
+    referent, read from the file at derivation time — so a reference added to or
+    removed from a tracked file changes the generated hook, and `check-graph`
+    assertion D reds until it is regenerated.
 
   The gates directory is the locator the static reader itself uses, env-or-default
   (§The knob file). The set names the tracked file at its default location and
   nothing else. The local overlay is gitignored and never staged, so it fires no
-  trigger. A tracked file relocated through `<KIT>_KNOB_FILE` is a per-invocation
+  trigger, and its reference lines reach no kit. A tracked file relocated through `<KIT>_KNOB_FILE` is a per-invocation
   path that a tracked hook cannot bake, so a consumer who relocates one couples it
   by hand.
   **The derivation stops at a command.** A knob whose value is a command hands its
@@ -2308,7 +2365,7 @@ is substrate-sensitive when its expanded `couples=` covers the **declaration
 path of a registry member** — the derivation `check-gate-substrate-parity`
 performs at runtime, so no count or roster here can rot. (The test is against
 registry members' declaration paths specifically, not against every `*.sh`
-under a resolve dir: `scripts/canon-config.sh` sits in the gates dir and is not
+under a resolve dir: `scripts/evidence-config.sh` sits in the gates dir and is not
 a gate, and matching it would over-report.) **Where a declaration lives is not a
 term of that derivation**, on either side of it: a member the consumer's own
 gates directory declares earns a row on exactly the same terms as a kit-declared
@@ -2374,12 +2431,12 @@ holds for the same reason it always did.
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. **This member is itself `.gate`-dispatched**, and its port moved more than its own spelling: the section it audits gained an enumerated contract of its own, so the gate now reads **its own implementation module** and the contingent immunity that kept its own heading out of discovery is ended deliberately (§check-gate-assertions). Its fixture pair, not the live tree, is what proves those arms — the `check-comment-tier` sentence, inherited for the same reason. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. **This member is itself `.gate`-dispatched**, so the row describes a ported member reading ported members' declaration paths — and its own port changed nothing in the rule: what it globs is both declaration spellings, which a descriptor still is. |
 | `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: the shared primitive `comment_surface` carries `*.gate` **and `*.rs`** arms — widened once, for every caller (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. **This member is itself `.gate`-dispatched**, so it now audits its own declaration — which is why its trigger names `*.gate` and `*.rs` and why its fixture pair, not the live tree, is what proves those arms. |
-| `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared primitive, `comment_surface` in `native/src/spec.rs`, its port having taken both it and all four of its callers (canon-kit/SPEC.md §lib/spec.sh); absent that one shared fix a ported gate's `# spec:` line would silently stop being checked in both places it can live — the descriptor and the implementation. With the primitive carrying the `.gate` and `*.rs` arms its own probe logic needs no change. |
+| `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared primitive, `comment_surface` in `native/src/spec.rs`, its port having taken both it and all four of its callers (canon-kit/SPEC.md §The shared spec adapters); absent that one shared fix a ported gate's `# spec:` line would silently stop being checked in both places it can live — the descriptor and the implementation. With the primitive carrying the `.gate` and `*.rs` arms its own probe logic needs no change. |
 | `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. **This member is itself `.gate`-dispatched**, so the row now describes a ported member reading ported members' declaration paths — the shape the `check-value-rollup-fresh` row already has, and the port changes nothing about the rule: what it scans is a set of basenames across both spellings, which the descriptor still is. |
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
 | `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk the shared comment surface hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. Both are `.gate`-dispatched, on the same terms as the two rows above. |
 | `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it could not reach — the crate's prune-dir default against `lib/gate.sh`'s — **is now absent rather than test-held**: a knob has exactly one producer (§lib/gate.sh) — the kit's shell library for a bridged kit, and the crate carries no default for a bridged knob to drift from. A **static** kit's defaults moved into the crate's knob table with its library, leaving the scanned corpus; its scalar defaults are coupled off `--emit knob-roster` instead, a third idiom beside the two shell ones (canon-kit/SPEC.md §check-knob-default-coupling), so the migration drops no coverage. The crate carries no unit test comparing the two literals, because it carries only one: that assertion is **deleted with the duplication it gated** — enforcement-first ranks removing the duplication above gating it, and a citation left behind would point this table at an absent mechanism, the exact defect its own prose calls out. Its verdict on `lib/gate.sh` is unchanged: the shell default stays exactly where it is, as the sole one. **This member is itself `.gate`-dispatched**, so the row now describes a ported member — and the port moves nothing in it: the two idioms it scans are shell whichever substrate reads them, so the not-corpus-extended verdict above is a property of its rule rather than of its own declaration's spelling. |
-| `check-gate-tamper` | **Retained, extended — and the extension is partly discharged.** The gate-file roster it recognises (`DELEGATION_KIT_GATE_FILES`) carries the `.gate` spelling on the **kit default** as of the first shipped descriptors, or a consumer on that default would receive a ported gate whose edits escape the isolation rule (delegation-kit/SPEC.md §Layout and configuration). This repo's own config carried both spellings ahead of the port, which is exactly why the kit default had to be checked separately rather than inferred from a green battery here. Its meta-layer path roster (`DELEGATION_KIT_META_PATHS`) is fixed **in this repo's consumer config**: `native/` is declared there (`scripts/delegation-config.sh`), so a commit editing a ported gate's Rust implementation alongside its descriptor is meta-isolated rather than refused. The kit default and any other consumer on it still lack the prefix — `native/` is never auto-unioned by the kit-root scan (`gate_kit_roots`'s predicate requires `checks/` or `smoke/`, which the crate ships neither of), so the fix is consumer config, not a kit-default change. One known limit stands: its exemption reader parses a shell `# exception-list:` array literal and has no Rust-source equivalent. Stated against the live ported set rather than the cohort that first raised it, since the binding condition is a property of the roster and moves with every cohort: the limit is unbound while no ported member carries an exemption list, and it is unbound for a stronger reason than a shell-only holder set — the tree carries **no** exemption-list holder at all, which `check-gate-exemption-tasks` counts on every run. The cohort that ports the first one owes the Rust-source reader. |
+| `check-gate-tamper` | **Retained, extended — and the extension is partly discharged.** The gate-file roster it recognises (`DELEGATION_KIT_GATE_FILES`) carries the `.gate` spelling on the **kit default** as of the first shipped descriptors, or a consumer on that default would receive a ported gate whose edits escape the isolation rule (delegation-kit/SPEC.md §Layout and configuration). This repo's own config carried both spellings ahead of the port, which is exactly why the kit default had to be checked separately rather than inferred from a green battery here. Its meta-layer path roster (`DELEGATION_KIT_META_PATHS`) is fixed **in this repo's consumer config**: `native/` is declared there (`scripts/delegation-config.knobs`), so a commit editing a ported gate's Rust implementation alongside its descriptor is meta-isolated rather than refused. The kit default and any other consumer on it still lack the prefix — `native/` is never unioned in by the gate's kit-root union (`gate_kit_roots`'s predicate requires `checks/` or `smoke/`, which the crate ships neither of), so the fix is consumer config, not a kit-default change. One known limit stands: its exemption reader parses a shell `# exception-list:` array literal and has no Rust-source equivalent. Stated against the live ported set rather than the cohort that first raised it, since the binding condition is a property of the roster and moves with every cohort: the limit is unbound while no ported member carries an exemption list, and it is unbound for a stronger reason than a shell-only holder set — the tree carries **no** exemption-list holder at all, which `check-gate-exemption-tasks` counts on every run. The cohort that ports the first one owes the Rust-source reader. |
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh` | **Survive unchanged** — all four read the declaration path as text (directly, or through the enforcement-map and footprint emitters, which do), which the descriptor still is. |
 | `check-value-rollup-fresh` | **Survives unchanged in mechanism, and is itself `.gate`-dispatched** — so this row now describes a ported member reading ported members' declaration paths. It reads them as text through the footprint emitter, a non-gate arm this gate calls in-process (§The non-gate arm), and the declaration path is what that emitter reads — which is why the port moves nothing about its rule. What the port *did* move is one term of its coupling, recorded because the re-derivation confirmed it rather than assuming it: its `couples=` names `scripts/*.sh,kit:*.sh`, and after the consumer's gates directory was emptied of check scripts, `scripts/*.sh` covers **no** registry member's declaration path at all. That left `kit:*.sh` as the whole of its selection, and **the port of the last shell gate declarations emptied that token too**: with no shell gate declaration left in any kit, the derivation does not select this member and its row is a **retained record rather than an owed disposition**. Both halves of the same narrowing, a cohort apart, which is why the second is stated here rather than treated as new. A narrowing is still not a clearance — `scripts/` and the kits retain many non-gate `*.sh`, and the coupling still earns its trigger — but a later reader deriving the set must not read either `*.sh` token as the thing that selects this row, because neither does. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. Descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
@@ -3276,7 +3333,9 @@ and is the only producer of the value a shell reader needs: no bash code parses 
 knob file or recomputes a default, which a second producer would be (§The
 port-candidate criteria, criterion 6). Its two readers are named: `lib/gate.sh`'s
 couples expander, for a `knob:` token naming a static knob (§lib/gate.sh), and
-`gate_static_knob`, a bridged config's read of a static knob (§The knob file). It
+`gate_static_knob`, a bridged config's read of a static knob (§The knob file), beside
+drift-kit's example `templates/kpi-deprecated-surface.sh`, a plugin reading two
+canon-kit knobs. It
 is a second arm rather than an argument form of `--emit knob-roster`, since one arm
 answering *defaults* bare and *resolved values* with arguments gives two meanings to
 one spelling.
@@ -3302,9 +3361,10 @@ across the kit roster. `--emit-enum-sets` is the smallest worked instance:
 the roster `--emit-close-surfaces` already declares for the same purpose, beside
 `QUEUE_KIT_LESSON_TAGS`, a row of queue-kit's static table and therefore
 declarable. **That roster also carries a constraint no gate enforces**:
-the member is run by a gate *while* the two enum-set knobs are resolving, so
-declaring either would nest its own resolution inside theirs and hang rather than
-red (canon-kit/SPEC.md §lib/spec.sh).
+the member is spawned by a gate's command adapter reading
+`CANON_KIT_ENUM_SETS_CMD`, so declaring that knob would nest its own resolution
+inside the spawn and hang rather than red (canon-kit/SPEC.md §The shared spec
+adapters).
 
 **`--emit-parse-gates-log` and `--emit-parse-smoke-log` are the first kind, and a
 reader should be able to tell which without opening the crate.** Each reads its
@@ -4685,8 +4745,8 @@ that answers each is the one whose corpus matches its question.
    bridge transports strings and interprets nothing — it has no glob matcher,
    because bridging a knob is not deriving a corpus from one. The commitment is
    for the reader that will interpret them: a Rust glob matcher over a bridged
-   knob is **`**`-capable (globstar semantics)**, matching the `shopt -s
-   globstar` the shell side enables in `canon-kit/lib/spec.sh`. The evidence and
+   knob is **`**`-capable (globstar semantics)**, matching bash's `shopt -s
+   globstar` reading of a consumer's glob. The evidence and
    its limit: this consumer's arrays use no `**` today, so plain-glob semantics
    would pass here — but the shell side enables `globstar`, so the config
    surface *permits* one, and a plain-glob reader would silently mis-scan the
@@ -5997,12 +6057,11 @@ their callers, so the shell forms are **deleted rather than duplicated** — the
 duplication is absent rather than machine-held, the same disposition the config
 bridge earned and for the same reason. That is the opposite verdict the same
 criterion earns on a library with live consumers, and both are recorded so
-neither reads as the general rule (canon-kit/SPEC.md §lib/spec.sh states the
+neither reads as the general rule (canon-kit/SPEC.md §The shared spec adapters states the
 price: three documented names a consumer's own gate could have called, answered
 by shadowing the gate). `check-spec-pointer`'s criterion-6 hold is discharged by
-that removal; `spec_manifest_files` stays dual, because members outside this
-family still call it, which is the pre-existing duplication the canon-kit cohort
-accepted and this one does not re-open.
+that removal; the manifest finder's shell form left the tree with canon-kit's
+library, so it has one holder too.
 
 **A trigger gap the earlier widening left behind is repaired in the same unit.**
 The primitive gained its `*.gate` and `*.rs` arms when the conservation contract
@@ -6777,7 +6836,7 @@ other half was found at implementation:
   **It is a class with two members, not a one-off**, which is why the shape is
   named here rather than the gate. `check-spec-derivable-section` sits in the
   identical position: `CANON_KIT_DERIVABLE_POINTER_REGEX`'s shipped default
-  (canon-kit/SPEC.md §lib/spec.sh) is an alternation too, so the same
+  (canon-kit/SPEC.md §Layout and configuration) is an alternation too, so the same
   override-nothing consumer makes the same engine load-bearing. Both are on the
   nine-member roster of members held on this engine, so a selector reading that
   roster is already warned; what a second instance adds is
@@ -6968,21 +7027,9 @@ the run surfaced none at or near the top, so the exclusion never bound.
 pruned — every piece of which `native/src/spec.rs` already carried inside
 `manifest_files`' default branch since the canon-kit cohort. The port **lifts it
 out** rather than writing a second copy beside it, so the manifest set and the
-canonical-spec set cannot disagree about which specs exist. The shell form stays,
-and **the reason it stays has moved twice while the verdict has not**. It was
-originally the *unless* clause's live-consumer disposition, the same one
-queue-kit's shell library took until its deletion: the caller set was two when this was written,
-one after §The sixth budget batch ported one of them, and **zero since
-`check-surface-duplication` ported** — `spec_manifest_files`
-now has no caller outside `canon-kit/lib/spec.sh` itself, and neither does
-`spec_canonical_specs` beyond that library's own default branch. An empty caller
-set is the *dead twin* case, whose disposition is deletion rather than a standing
-parity obligation — but that disposition carries an explicit bound, **undocumented
-surface**, and these two are documented helpers named by canon-kit/SPEC.md
-§lib/spec.sh as the manifest set the narration gate family shares. So the ground
-is the bound rather than a live caller, which is the distinction a later reader
-must not collapse: a documented shell helper survives its last caller, and the
-deletion disposition reaches only the helpers no section names.
+canonical-spec set cannot disagree about which specs exist. The shell form is gone:
+it left the tree with canon-kit's library when that kit's knobs went static, so the
+compiled finder is the one holder (canon-kit/SPEC.md §The shared spec adapters).
 
 **The edge-root arm disagreed, and the compiled side read the rule correctly.**
 Parity ran over both fixture pairs, the live tree at four scan-root spellings and
@@ -9462,21 +9509,16 @@ Resolution, per declared knob:
   is in play.
 - **`GATE_SDK_RESOLVING_KNOB` is the *set* of names under resolution**, one per
   line, exported into the subshell before the kit's libraries are sourced, and a
-  reader tests **membership** rather than equality. A knob whose value is a
-  consumer *command's output* costs a subprocess to compute, and a library
-  resolving every such knob on every source would pay that cost per source. A
-  library with no expensive knob ignores it and is unaffected. The set spelling
-  is what the per-kit batch below requires: one subshell now carries a whole
-  kit's slice, so an equality test would match no batch of more than one name and
-  the gated block would compute for nothing. A block whose names are absent from
-  the set still does not compute, which is the property the gating buys, and the
+  reader tests **membership** rather than equality. Its one sanctioned reader is
+  the transitional shape §The knob file names: a still-bridged config gating a
+  `gate_static_knob` read, which costs a spawn, on the names it serves. A library
+  or config with no expensive read ignores it and is unaffected. The set spelling
+  is what the per-kit batch below requires: one subshell carries a whole kit's
+  slice, so an equality test would match no batch of more than one name and the
+  gated block would compute for nothing. A block whose names are absent from the
+  set still does not compute, which is the property the gating buys, and the
   saving is that it computes once per *run* rather than once per requesting
-  member. The install
-  transport and payload disclosure vocabularies cross this way as index-aligned
-  id/pattern pairs (canon-kit/SPEC.md §lib/spec.sh), so a compiled member receives
-  the consumer command's *output* and spawns no interpreter of its own. Their
-  ownership is untouched: what changes is the transport, not who writes the
-  vocabulary.
+  member.
 - That kit's `lib/*.sh` is sourced **in a subshell**, in glob order, so a kit
   library's globals cannot leak into the dispatcher or across members. The value
   is read after every library has been sourced, so a kit whose knob is resolved
@@ -9867,14 +9909,13 @@ resolver would re-create exactly the duplication that deletion bought its way ou
 of, and would do it on a surface where the drift is silent: the two defaults
 disagree only for a consumer whose config narrows the input.
 
-**The ground has a stated precedent rather than a precedent by example.**
-`drift-kit/lib/drift.sh` already declares on it in full — the bridge's "**sole
-resolver** for the `DRIFT_KIT_*` knobs … so a crate-side resolver would be the
-second producer criterion 6 refuses" — and says why it stated the ground rather
-than citing one: "the class of kit `lib/*.sh` files has never been swept, and a
-cohort inherits a stated reason where it cannot inherit a precedent-by-example."
-This ruling is that sweep. `gate-sdk/lib/consumer-smoke.sh` is the second, under
-§Consumer smoke *The port disposition*'s leg 1.
+**The ground is stated in each member's own header rather than inherited by
+example.** A cohort inherits a stated reason where it cannot inherit a
+precedent-by-example, so every member names this section and states its own
+sole-resolver face: `evidence-kit/lib/evidence.sh` is the live kit-library
+declarer, "the config bridge's sole resolver for the `EVIDENCE_KIT_*` knobs", and
+`gate-sdk/lib/consumer-smoke.sh` is the second, under §Consumer smoke *The port
+disposition*'s leg 1.
 
 **The discriminator is content, not directory, and the mechanism says so.** The
 bridge sources `<kit>/lib/*.sh` — a **flat** glob — whenever any compiled member
@@ -9956,7 +9997,10 @@ generally if §lib/gate.sh ever admits a second bridge producer, and it dissolve
 for an individual member whose kit's knobs stop crossing the bridge — a member
 outside the bridge is not a sole resolver, and its disposition is then whatever
 its own kit's section can state for it, which is the position context-kit's
-`lib/pub-lang/` extractors occupied and discharged.
+`lib/pub-lang/` extractors occupied and discharged. **The member-level condition
+has fired for every kit in the static-kit table**: when a kit's knobs moved into
+the crate's defaults table its library resolved nothing and left the tree with them
+(§The knob file), so no static kit carries a member of this class.
 
 **That member-level condition has fired for every static kit** (§The knob file),
 and the disposition it reaches is **deletion, not port**: a static kit's defaults
@@ -16047,11 +16091,11 @@ page that would byte-match itself on the next freshness check.
 substance rather than a relocation of wording.** The shell form captured each
 registry knob's *set-ness* before defaulting it, so it could tell an
 explicitly-misconfigured registry from an unadopted one. A bridged knob crosses
-as a value with no set-ness attached, so each registry's owning library now makes
-that call at resolution time — `DRIFT_KIT_KPIS_FILE` resolving empty for
-not-adopted (drift-kit/SPEC.md §lib/drift.sh), `CONTEXT_KIT_SETTINGS_FILE`
-refusing on an explicitly-set missing path (context-kit/SPEC.md §Layout and
-configuration) — and what remains here is the reader's own half: a registry that
+as a value with no set-ness attached, so each registry's owning kit makes that call
+at its first resolution, its table validator reading the value's origin —
+`DRIFT_KIT_KPIS_FILE` resolving empty for not-adopted (drift-kit/SPEC.md §Layout
+and configuration), `CONTEXT_KIT_SETTINGS_FILE` refusing on an explicitly-set
+missing path (context-kit/SPEC.md §Layout and configuration) — and what remains here is the reader's own half: a registry that
 resolves to nothing drops its section, and a roster naming a member the bridge
 did not carry refuses naming it.
 
@@ -18032,9 +18076,9 @@ is ruled here even though the gate never asserts on it.
 template's own body carries the marked gap a consumer fills, that template *is*
 the extension point, and porting it deletes the thing there is to fill. It is the
 general rule that a cut narrows the port applied to a seam that is a file
-rather than a knob, and it is the ground `drift-kit/templates/drift-config.sh`
-declares on in the sibling class — that file "**is** the adopter's config seam
-rather than kit mechanism reaching it, so porting it deletes the seam".
+rather than a knob, and it is the ground `evidence-kit/templates/evidence-config.sh`
+declares on in the sibling class — that file "**is** the surface an adopter edits
+rather than kit mechanism reaching one".
 
 **The gap is marked in the source, so membership on this ground is read rather
 than judged.** The marker is `[EDIT ME]` on a `# spec:` line, and across the

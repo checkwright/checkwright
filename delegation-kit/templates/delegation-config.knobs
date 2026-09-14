@@ -1,0 +1,4 @@
+# spec: delegation-kit/SPEC.md §Layout and configuration — the knob roster (every knob, its default) and the line grammar; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints the defaults; set only what you override
+
+# spec: delegation-kit/SPEC.md §Layout and configuration — D2's roster: the consumer's own read-only-dispatched agent-type names; default empty (D2 inert) — never a kit-shipped vocabulary (CLAUDE.md §The provenance seam)
+# DELEGATION_KIT_READONLY_TYPES[] = <agent-type>
