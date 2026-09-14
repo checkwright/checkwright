@@ -178,7 +178,7 @@ from `evidence-kit/lib/evidence.sh` as it stands at this amendment's commit:
   none.
 - **The validator** moves from the library whole: `EVIDENCE_KIT_PARSER`, `_BASELINE_FILE`,
   `_MANIFEST_FILE` and `_QUEUE_FILE` non-empty, and every `EVIDENCE_KIT_SUITES` element a valid family
-  suffix. The two derived-from-bridged rows skip at their default, per the validator rule.
+  suffix. The three derived-from-bridged rows skip at their default, per the validator rule.
 
 The run and parser values keep their contract: word-split, spawned with no shell, the parser's log path
 appended last (evidence-kit/SPEC.md §lib/evidence.sh). They are scalars, not command knobs, because they
@@ -441,7 +441,7 @@ prompt and teach nothing durable.
   `native/src/knobs/{evidence,guard}_kit.rs`. *Consumers:* `knobs::resolve` for every read of the two
   prefixes, the two roster arms, the undeclared-name refusal and each validator at first resolution.
 - **`lib/guard.sh`'s knob load** (changed interface). *Producer:* `gate_knob_values`, over the binary's
-  `--emit knob-values`. *Consumers:* the rule functions that read the fourteen shell variables, the
+  `--emit knob-values`. *Consumers:* the rule functions that read the thirteen shell variables, the
   consumer's own rules in its hook copy, and the tests that source the library. Each value line's name,
   shape and element are read by the assignment, the shape choosing string, array or map.
 - **The upgrade smoke's seeding step** (new behaviour). *Producer:* `upgrade_smoke.rs`, through

@@ -324,7 +324,7 @@ stays; `gates/mod.rs`' `resolve_gates_dir` helper stays; `main.rs`' source-stamp
 
 ### (10) The dispositions the bridge held {design-bearing}
 
-Five `# no-port:` declarations and two class sections stand on the bridge. Each is re-read against the
+Six `# no-port:` declarations and two class sections stand on the bridge. Each is re-read against the
 ground it states.
 
 - **gate-sdk/SPEC.md §The kit-library port disposition** has no member left: evidence-kit's library is
