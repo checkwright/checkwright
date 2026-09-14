@@ -1,0 +1,13 @@
+# spec: guard-kit/SPEC.md §Layout and configuration — the knob roster (every knob, its default, when to set it) and the line grammar; `bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints the defaults; set only what you override
+
+# spec: guard-kit/SPEC.md §compare-settings-allow — declare your own probes; the kit ships none
+# GUARD_KIT_BREADTH_PROBES[] = Bash(rm -rf /)
+
+# spec: guard-kit/SPEC.md §compare-settings-allow — a breadth ruled intended, keyed on the exact local allow-rule string; the kit ships no declarations either
+# GUARD_KIT_BREADTH_DECLARED[Bash(mytool *)] = every subcommand is read-only
+
+# spec: guard-kit/SPEC.md §Layout and configuration — the dedicated search tools your harness build carries (default Glob and Grep); an empty line drops both, so rules 9 and 11 never steer at a tool the build lacks
+# GUARD_KIT_SEARCH_TOOLS =
+
+# spec: guard-kit/SPEC.md §The generic ruleset — declare the write and execute forms of each read-only roster member you add (rule 18's grammar, 'none' when it has none); an undeclared member is withheld, and an entry for a default member replaces the kit's declaration
+# GUARD_KIT_RO_FORMS[md5sum] = none

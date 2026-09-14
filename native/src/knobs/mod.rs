@@ -12,6 +12,7 @@ pub mod delegation_kit;
 pub mod doctrine_kit;
 pub mod drift_kit;
 pub mod evidence_kit;
+pub mod guard_kit;
 pub mod lifecycle_kit;
 pub mod queue_kit;
 pub mod site_kit;
@@ -254,6 +255,7 @@ pub const STATIC_KITS: &[&Kit] = &[
     &doctrine_kit::KIT,
     &drift_kit::KIT,
     &evidence_kit::KIT,
+    &guard_kit::KIT,
     &lifecycle_kit::KIT,
     &queue_kit::KIT,
     &site_kit::KIT,

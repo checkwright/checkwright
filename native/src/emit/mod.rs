@@ -392,8 +392,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         scan_prompts::KNOBS,
     ),
     // spec: guard-kit/SPEC.md §compare-settings-allow — the settings-allow advisory, a table
-    // member on the forced-family test at its sharpest: all four knobs live in `lib/guard.sh`, so a
-    // hardcoded flag would resolve no input path at all and could not name the files it compares.
+    // member on the forced-family test: its four knobs are consumer configuration.
     (
         "--emit-compare-settings-allow",
         Arm::Emit(compare_settings_allow::emit),

@@ -26,7 +26,7 @@ assert_absent() { grep -qF -- "$2" <<<"$3" && { echo "FAIL [$1]: expected absent
 # The consumer config is a sandbox file so this repo's own probe array cannot leak in.
 run() {
     local overlay="$1" cfg="$2"; shift 2
-    GUARD_KIT_CONFIG_FILE="$cfg" \
+    GUARD_KIT_KNOB_FILE="$cfg" \
     GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
     GUARD_KIT_SETTINGS_LOCAL="$overlay" bash "$CMP" "${CMP_ARM[@]}" "$@"
 }
@@ -34,47 +34,47 @@ run() {
 printf '%s\n' '{ "permissions": { "allow": ["Bash(git *)"] } }' > "$sb/broad.json"
 printf '%s\n' '{ "permissions": { "allow": ["Bash(git fetch --dry-run)"] } }' > "$sb/narrow.json"
 
-printf '%s\n' 'GUARD_KIT_BREADTH_PROBES=("Bash(git reset --hard)")' > "$sb/probes.sh"
-printf '%s\n' '# no probes declared' > "$sb/empty.sh"
+printf '%s\n' 'GUARD_KIT_BREADTH_PROBES[] = Bash(git reset --hard)' > "$sb/probes.knobs"
+printf '%s\n' '# no probes declared' > "$sb/empty.knobs"
 
-# The declaration is keyed on the exact local allow-rule string; 'off-by-one.sh'
+# The declaration is keyed on the exact local allow-rule string; 'off-by-one.knobs'
 # differs from the overlay entry by one character and must not silence it.
-two_probes='GUARD_KIT_BREADTH_PROBES=("Bash(git reset --hard)" "Bash(gh repo delete)")'
+two_probes=$'GUARD_KIT_BREADTH_PROBES[] = Bash(git reset --hard)\nGUARD_KIT_BREADTH_PROBES[] = Bash(gh repo delete)'
 {
     printf '%s\n' "$two_probes"
-    printf '%s\n' 'declare -A GUARD_KIT_BREADTH_DECLARED=(["Bash(git *)"]="sandbox repo, every git write is disposable")'
-} > "$sb/declared.sh"
+    printf '%s\n' 'GUARD_KIT_BREADTH_DECLARED[Bash(git *)] = sandbox repo, every git write is disposable'
+} > "$sb/declared.knobs"
 {
     printf '%s\n' "$two_probes"
-    printf '%s\n' 'declare -A GUARD_KIT_BREADTH_DECLARED=(["Bash(git*)"]="one character off the overlay entry")'
-} > "$sb/off-by-one.sh"
+    printf '%s\n' 'GUARD_KIT_BREADTH_DECLARED[Bash(git*)] = one character off the overlay entry'
+} > "$sb/off-by-one.knobs"
 
 printf '%s\n' '{ "permissions": { "allow": ["Bash(git *)", "Bash(gh *)"] } }' > "$sb/mixed.json"
 
 # Firing probe: the blanket glob auto-allows the destructive probe, reported with its witness.
-firing="$(run "$sb/broad.json" "$sb/probes.sh")"
+firing="$(run "$sb/broad.json" "$sb/probes.knobs")"
 assert_has firing-section  'settings allowlist breadth' "$firing"
 assert_has firing-glob     'Bash(git *)' "$firing"
 assert_has firing-witness  'Bash(git reset --hard)' "$firing"
 
 # Non-firing probe: a narrow local entry auto-allows nothing in the probe set.
-nonfiring="$(run "$sb/narrow.json" "$sb/probes.sh")"
+nonfiring="$(run "$sb/narrow.json" "$sb/probes.knobs")"
 assert_has nonfiring-section 'settings allowlist breadth' "$nonfiring"
 assert_has nonfiring-clean   'no over-broad local entries' "$nonfiring"
 
 # Empty knob: the section is omitted entirely, not printed clean.
-silent="$(run "$sb/broad.json" "$sb/empty.sh")"
+silent="$(run "$sb/broad.json" "$sb/empty.knobs")"
 assert_absent empty-knob-silent 'settings allowlist breadth' "$silent"
 assert_has    empty-knob-redundancy 'settings allowlist redundancy' "$silent"
 
 # --count carries both counts: redundancy first, breadth second.
-c_firing="$(run "$sb/broad.json" "$sb/probes.sh" --count)"
+c_firing="$(run "$sb/broad.json" "$sb/probes.knobs" --count)"
 [[ "$c_firing" == "0 1" ]] || { echo "FAIL [count-firing]: expected '0 1', got '$c_firing'"; fails=$((fails + 1)); }
-c_empty="$(run "$sb/broad.json" "$sb/empty.sh" --count)"
+c_empty="$(run "$sb/broad.json" "$sb/empty.knobs" --count)"
 [[ "$c_empty" == "0 0" ]] || { echo "FAIL [count-empty]: expected '0 0', got '$c_empty'"; fails=$((fails + 1)); }
 
 # No overlay at all: the pre-existing early path keeps the same two-field count shape.
-c_absent="$(run "$sb/does-not-exist.json" "$sb/probes.sh" --count)"
+c_absent="$(run "$sb/does-not-exist.json" "$sb/probes.knobs" --count)"
 [[ "$c_absent" == "0 0" ]] || { echo "FAIL [count-absent]: expected '0 0', got '$c_absent'"; fails=$((fails + 1)); }
 
 # Empty declaration map (every case above): the declared subsection is absent too.
@@ -82,14 +82,14 @@ assert_absent empty-declared-silent 'advisory — declared intended' "$firing"
 
 # An over-broad set that is entirely declared: the declared section prints with its
 # reason, and no narrowing section and no false clean line appear.
-all_declared="$(run "$sb/broad.json" "$sb/declared.sh")"
+all_declared="$(run "$sb/broad.json" "$sb/declared.knobs")"
 assert_has    all-declared-section  'advisory — declared intended' "$all_declared"
 assert_has    all-declared-reason   'sandbox repo, every git write is disposable' "$all_declared"
 assert_absent all-declared-narrow   'advisory — narrowing candidates' "$all_declared"
 assert_absent all-declared-clean    'no over-broad local entries' "$all_declared"
 
 # A mixed set: the declared entry leaves the narrowing set, the undeclared one stays.
-mixed="$(run "$sb/mixed.json" "$sb/declared.sh")"
+mixed="$(run "$sb/mixed.json" "$sb/declared.knobs")"
 assert_has mixed-narrowing 'advisory — narrowing candidates' "$mixed"
 assert_has mixed-undeclared 'Bash(gh *)  ⊇  Bash(gh repo delete)' "$mixed"
 assert_has mixed-declared  'Bash(git *)  ⊇  Bash(git reset --hard)  — sandbox repo' "$mixed"
@@ -99,11 +99,11 @@ grep -qxF -- '  Bash(git *)  ⊇  Bash(git reset --hard)' <<<"$mixed" \
     && { echo "FAIL [mixed-partition]: the declared glob is still in the narrowing set"; fails=$((fails + 1)); }
 
 # --count: the breadth number counts narrowing candidates, so the declared entry is excluded.
-c_mixed="$(run "$sb/mixed.json" "$sb/declared.sh" --count)"
+c_mixed="$(run "$sb/mixed.json" "$sb/declared.knobs" --count)"
 [[ "$c_mixed" == "0 1" ]] || { echo "FAIL [count-declared]: expected '0 1', got '$c_mixed'"; fails=$((fails + 1)); }
 
 # Exactness: a declaration one character off the overlay entry silences nothing.
-off="$(run "$sb/broad.json" "$sb/off-by-one.sh")"
+off="$(run "$sb/broad.json" "$sb/off-by-one.knobs")"
 assert_has    off-by-one-narrowing 'advisory — narrowing candidates' "$off"
 assert_has    off-by-one-entry     'Bash(git *)  ⊇  Bash(git reset --hard)' "$off"
 assert_absent off-by-one-declared  'advisory — declared intended' "$off"

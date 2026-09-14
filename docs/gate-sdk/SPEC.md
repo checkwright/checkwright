@@ -463,7 +463,7 @@ whose referent reaches a bridged input, and checks the elements the file writes.
 4. **the kit default** from the crate's table.
 
 `<stem>` is the kit root's name less `-kit` (`site`, `doctrine`, `queue`,
-`lifecycle`, `canon`, `context`, `delegation`, `drift`, `evidence`), the stem its shell
+`lifecycle`, `canon`, `context`, `delegation`, `drift`, `evidence`, `guard`), the stem its shell
 config used, so a consumer finds the new file where the old one was. The gates
 directory is `GATE_SDK_GATES_DIR` from the environment, default `scripts`. It stays
 env-or-default for the reason §Layout and configuration already gives: a file
@@ -550,11 +550,9 @@ a static kit's names and defaults now that no shell file holds them.
 
 **A kit migrates when every shape its knobs and its consumers' configs use is
 expressible, and the cut that first needs a shape rules its grammar under this
-section's invariants.** The shapes not yet ruled, each with the reason it cannot be
+section's invariants.** The shape not yet ruled, with the reason it cannot be
 deferred past its kit:
 
-- **guard-kit's rule content** is bash a consumer composes against `lib/guard.sh`.
-  Its cut rules whether the rules become data or the guard stays the one shell hook.
 - **gate-sdk migrates last**, with `lib/gate.sh`, the three bridge front-ends, the
   `GATE_SDK_KNOB_` wire and `gate_static_knob`, the transitional helper a bridged
   config reads a static knob through (§lib/gate.sh). That cut retires the bridge, so it is the one that discharges
@@ -609,10 +607,9 @@ taking one side would leave the other re-arguing the same ground at the next cut
 deletes the thing there is to edit, and a template and its seeded copy stand or
 fall together.** A ruling that granted the ground to a template while its own
 consumer copy stayed owed would be an incoherence rather than an exception, which
-is why the class takes both sides. `guard-kit/templates/guard-config.sh`, a
-bridged kit's template still in shell, is the live declarer: its `# no-port:`
-names this section and states that it **is** the surface an adopter edits rather
-than kit mechanism reaching one.
+is why the class takes both sides. The class has no shell member left, since every
+kit that ships a config template reads a knob file, and the ground stands for the
+knob files, each of which is the surface an adopter edits.
 
 **Two mechanisms here already treat the class as an edit surface, and they are
 cited as evidence rather than as argument.** The installer's `init` claims a
@@ -3277,14 +3274,13 @@ ignores every consumer override — which is not a calibration between two worka
 shapes but the difference between working and appearing to.
 
 **`--emit-scan-prompts` is the class's first member whose *whole* configuration
-is a permanently-shell library's, which is that test at its sharpest**
-(guard-kit/SPEC.md §scan-prompts). All three knobs it declares are defined and
-defaulted in `guard-kit/lib/guard.sh` — a `no-port` file the bridge sources to
-resolve them — so a hardcoded top-level flag would resolve not a stale default
+is another kit's table rows, which is that test at its sharpest**
+(guard-kit/SPEC.md §scan-prompts). All three knobs it declares are rows of
+guard-kit's static table (§The knob file), and `GUARD_KIT_LOG`'s default derives
+from `GATE_SDK_WORKFLOW_DIR`, a bridged input only a table member's `--knobs`
+closure carries, so a hardcoded top-level flag would resolve not a stale default
 but no input path at all, and the arm would be unable to name the corpus it
-measures. The same fact is what makes the member unresolvable in a tree that
-does not vendor guard-kit, which is a second, independent guard on the presence
-its in-crate reader witnesses separately.
+measures.
 
 **A member taking free-text argv into a *capture* keeps its shape refusal and its
 `--` escape across the port, while its `-h`/`--help` arm retires to the
@@ -3362,8 +3358,9 @@ bridged-input closure of its argv names (§The knob file), so a derived default
 resolves exactly as it does for a member. It reads the crate's static resolution
 and is the only producer of the value a shell reader needs: no bash code parses a
 knob file or recomputes a default, which a second producer would be (§The
-port-candidate criteria, criterion 6). Its two readers are named: `lib/gate.sh`'s
-couples expander, for a `knob:` token naming a static knob (§lib/gate.sh), and
+port-candidate criteria, criterion 6). Its three readers are named: `lib/gate.sh`'s
+couples expander, for a `knob:` token naming a static knob (§lib/gate.sh),
+`guard-kit/lib/guard.sh`'s knob load (guard-kit/SPEC.md §The guard framework), and
 `gate_static_knob`, a bridged config's read of a static knob (§The knob file), beside
 drift-kit's example `templates/kpi-deprecated-surface.sh`, a plugin reading two
 canon-kit knobs. It
@@ -9954,10 +9951,9 @@ disagree only for a consumer whose config narrows the input.
 **The ground is stated in each member's own header rather than inherited by
 example.** A cohort inherits a stated reason where it cannot inherit a
 precedent-by-example, so every member names this section and states its own
-sole-resolver face: `guard-kit/lib/guard.sh` is the live kit-library declarer,
-"the sole resolver for the GUARD_KIT_* knobs" (the worked instance below), and
-`gate-sdk/lib/consumer-smoke.sh` is the second, under §Consumer smoke *The port
-disposition*'s leg 1.
+sole-resolver face. `gate-sdk/lib/consumer-smoke.sh` is the one live declarer
+outside `lib/gate.sh`, under §Consumer smoke *The port disposition*'s leg 1, and no
+other kit's library is a member (the worked instance below).
 
 **The discriminator is content, not directory, and the mechanism says so.** The
 bridge sources `<kit>/lib/*.sh` — a **flat** glob — whenever any compiled member
@@ -9991,19 +9987,16 @@ precisely this ground from the opposite direction: the hook generator bakes a
 *resolved* knob, so it cannot move either.
 
 **The ruling reaches by ground, not by scope, and `guard-kit/lib/guard.sh` is
-the worked instance.** A stated-contract cut reaches the files answering to this
-section; the class is wider, exactly as §Consumer smoke *The port disposition*
-already rules for its own — a member takes this disposition because the ground
-holds of it, not because this section reaches it, and each declares in its own
-header with its own kit's section stating why. guard-kit is that case in both
-directions at once. Its library **is** a sole resolver — a ported non-gate arm
-declares a `GUARD_KIT_` knob and the bridge resolves it by sourcing this file
-(§The non-gate arm) — and it is **also** the API a consumer's own shell rules are
-composed from, which is the ground guard-kit's own section states and the one a
-reader of that kit needs. Both hold; neither is folded into the other. The
-sole-resolver face is why it is a member of this class at all, and
-guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) is where its second,
-independent ground is stated.
+the worked instance of a member leaving by ground.** A stated-contract cut reaches
+the files answering to this section; the class is wider, exactly as §Consumer smoke
+*The port disposition* already rules for its own — a member takes this disposition
+because the ground holds of it, not because this section reaches it, and each
+declares in its own header with its own kit's section stating why. guard-kit's
+library held two independent grounds, this one and the API a consumer's own shell
+rules are composed from. Its kit went static, so its knobs stopped crossing the
+bridge and the sole-resolver face dissolved; the library reads its knobs from the
+binary and keeps `# no-port:` on the second ground alone, which guard-kit/SPEC.md
+§The guard framework (`lib/guard.sh`) states.
 
 **The negative that looks like a measurement and is not, recorded because it
 cost this cut a stage.** *guard-kit ships no `checks/` directory and no
@@ -10048,7 +10041,8 @@ the crate's defaults table its library resolved nothing and left the tree with t
 and the disposition it reaches is **deletion, not port**: a static kit's defaults
 live in the crate's knob table, so its library computes nothing and is removed
 with its kit's migration. Membership being derived, a deleted library is simply
-not a member.
+not a member. `guard-kit/lib/guard.sh` is the one static kit library that stays,
+on its extension-point ground rather than this one.
 
 ### lib/inject.sh
 
@@ -18159,9 +18153,8 @@ is ruled here even though the gate never asserts on it.
 template's own body carries the marked gap a consumer fills, that template *is*
 the extension point, and porting it deletes the thing there is to fill. It is the
 general rule that a cut narrows the port applied to a seam that is a file
-rather than a knob, and it is the ground `guard-kit/templates/guard-config.sh`
-declares on in the sibling class — that file "**is** the surface an adopter edits
-rather than kit mechanism reaching one".
+rather than a knob, and it is the ground the sibling class stands on — a config
+file **is** the surface an adopter edits rather than kit mechanism reaching one.
 
 **The gap is marked in the source, so membership on this ground is read rather
 than judged.** The marker is `[EDIT ME]` on a `# spec:` line, and across the

@@ -9,7 +9,7 @@ use std::path::Path;
 
 // spec: guard-kit/SPEC.md §Testing — one declared knob; the two omissions are ruled there,
 // `GUARD_KIT_LOG` because the arm overrides it and the guard's own knobs because the spawned
-// child's `lib/guard.sh` is their sole resolver.
+// child's `lib/guard.sh` reads them from the binary.
 pub const KNOBS: &[&str] = &["GATE_KIT_ROOTS_HERE"];
 
 const NAME: &str = "run-guard-tests";
@@ -182,10 +182,15 @@ fn decide(
     cmd: &str,
     background: Option<&str>,
 ) -> Result<String, String> {
-    let script = r#"cd "$1" || exit 2; GUARD_KIT_LIB="$2" GUARD_KIT_LOG="$3" exec bash "$4""#;
+    // spec: guard-kit/SPEC.md §Testing — the library reads its knobs from the binary, and the
+    // repo-relative default names nothing from inside the sandbox, so the running binary is exported
+    let bin = std::env::current_exe()
+        .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
+    let bin = bin.to_string_lossy();
+    let script = r#"cd "$1" || exit 2; GUARD_KIT_LIB="$2" GUARD_KIT_LOG="$3" GATE_SDK_NATIVE_BIN="$5" exec bash "$4""#;
     let done = proc::run_streamed(
         "bash",
-        &["-c", script, "bash", root, lib, log, guard],
+        &["-c", script, "bash", root, lib, log, guard, &bin],
         payload(cmd, background).as_bytes(),
         Stderr::Discard,
     )?;

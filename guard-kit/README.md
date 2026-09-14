@@ -28,7 +28,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
    ```bash
    cp guard-kit/templates/bash-guard.sh      scripts/bash-guard.sh
-   cp guard-kit/templates/guard-config.sh    scripts/guard-config.sh
+   cp guard-kit/templates/guard-config.knobs scripts/guard-config.knobs
    ```
 
    The optional wakeup-guard and escalation-guard are **not** copied: they are
@@ -39,7 +39,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
    Add your project's block/steer/allow rules in `bash-guard.sh`'s marked
    consumer-rules section (before the generic ruleset). The generic ruleset and
-   hook primitives stay in the vendored `lib/guard.sh`.
+   hook primitives stay in the vendored `lib/guard.sh`, which reads its knobs
+   through the gate binary: where the binary is absent the guard steers nothing
+   and says so on every call.
 
 2. Wire the hooks — merge `templates/settings-hooks.json` into
    `.claude/settings.json` (the `bash-guard` on `PreToolUse(Bash)`; the optional
@@ -53,8 +55,10 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 4. Splice `templates/close-triage.md` into your close-stage skill (it fills
    lifecycle-kit's `tooling-friction triage` placeholder).
 
-Configuration follows the established kit pattern — override any knob in
-`guard-config.sh` (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
+Configuration is a knob file — override any knob in `guard-config.knobs`, one
+`NAME = value`, `NAME[] = element` or `NAME[key] = value` line each
+(gate-sdk/SPEC.md §The knob file), and `bash gate-sdk/bin/run-gates.sh --emit
+knob-roster` prints every default (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
 `GUARD_KIT_RO_BINS`, `GUARD_KIT_RO_FORMS`, `GUARD_KIT_SCRATCH_DIRS`,
 `GUARD_KIT_SEARCH_TOOLS`, `GUARD_KIT_BREADTH_PROBES`,
 `GUARD_KIT_BREADTH_DECLARED`); defaults are this

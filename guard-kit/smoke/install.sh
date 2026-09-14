@@ -6,7 +6,7 @@ set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 
 cp "$SMOKE_KIT_ROOT/templates/bash-guard.sh"     scripts/bash-guard.sh
-cp "$SMOKE_KIT_ROOT/templates/guard-config.sh"   scripts/guard-config.sh
+cp "$SMOKE_KIT_ROOT/templates/guard-config.knobs" scripts/guard-config.knobs
 
 mkdir -p .claude
 if [[ -f .claude/settings.json ]]; then
@@ -30,10 +30,11 @@ fi
 } >> .gitignore
 
 set +e
-printf '%s' '{"tool_input":{"command":"cd deploy && ls"}}' | bash scripts/bash-guard.sh >/dev/null 2>&1
+msg="$(printf '%s' '{"tool_input":{"command":"cd deploy && ls"}}' | bash scripts/bash-guard.sh 2>&1 >/dev/null)"
 rc=$?
 set -e
-if [[ "$rc" -ne 2 ]]; then
-    echo "guard-kit/smoke/install.sh: installed guard did not block a compound-cd payload (exit $rc, want 2)" >&2
+# spec: guard-kit/SPEC.md §Testing — the block must be rule 1's, since a knob load the binary refuses also exits 2
+if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
+    echo "guard-kit/smoke/install.sh: installed guard did not block a compound-cd payload with rule 1's steer (exit $rc, want 2): $msg" >&2
     exit 1
 fi

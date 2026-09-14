@@ -31,7 +31,7 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
    - **Too broad**: for every entry the report lists as a *narrowing candidate*,
      either narrow the glob or record that its breadth is intended — as a
      `GUARD_KIT_BREADTH_DECLARED` entry (glob plus reason) in the committed
-     `guard-config.sh`, which moves it into the report's *declared intended*
+     `guard-config.knobs`, which moves it into the report's *declared intended*
      section and stops it re-reporting. A per-clone note does not: the ruling is
      durable only where it is tracked. The probe printed beside an entry is the
      witness — the command that glob auto-allows. An empty breadth report is

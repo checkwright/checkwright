@@ -186,7 +186,7 @@ Primitives a consumer guard composes; each emits the harness's
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
   `|`). Also not a hook primitive — the single implementation every **shell**
   consumer that reasons *per segment* shares (rules
-  2/4/7/8/12/14/15/17/18/19/20/22/24 and the read-compound carve-out of rules
+  2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules
   9/10), so the harness's
   per-segment matching surface is modelled in exactly one place **on this
   substrate**. Across both substrates it is modelled in **two** places — the
@@ -248,6 +248,29 @@ Primitives a consumer guard composes; each emits the harness's
   harness revision that widens or narrows it is drift no gate here can
   self-detect — the footing the payload roster below already declares.
 
+**The library reads its knobs from the binary, once per sourcing.** Its tail calls
+`gate_knob_values` (gate-sdk/SPEC.md §lib/gate.sh), sourcing `gate-sdk/lib/gate.sh`
+beside the vendor root `GUARD_KIT_LIB` names, for every row of guard-kit's table,
+and assigns each value to the shell variable of the same name: a scalar as a string,
+an indexed knob as an array, a keyed knob as an associative array. The rules, and a
+consumer's own rules in its hook copy, read those variables exactly as they read the
+sourced config, so a test that reassigns one after sourcing still steers the rule.
+The crate's table is the knobs' one producer, and the library holds no default. The
+load sits at the tail rather than the head because both of its failure answers are
+primitives the file defines above it.
+
+**The load fails in one of two ways, and the hook answers each differently.** When
+the binary cannot be reached — no `gate-sdk/lib/gate.sh` beside the vendor root, or
+no executable at `GATE_SDK_NATIVE_BIN` — the knob read cannot run at all, and the
+hook emits a `guard_advise` naming the build command and exits 0. An advise carries
+no permission decision, so every command still takes the harness's own permission
+path. Only the steering is lost, and every call says so. A block there would refuse
+the very command that builds the binary. When the binary runs and refuses the
+config, with a malformed knob file or a set-but-missing `GUARD_KIT_KNOB_FILE`, the
+hook blocks with the refusal's own text, the loud posture a set-but-missing config
+file always had. The file is repaired with the Edit tool, which the guard does not
+intercept.
+
 **Five of these primitives are held twice, and a machine holds them equal.**
 `guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — the set
 `bin/`'s prompt ranker is composed from — `guard_allow_match`, the settings-allow
@@ -261,8 +284,8 @@ holders and compares their **classification**, A against B directly with no
 committed expected file, since a maintained golden would be a third copy to
 drift and the failure it exists to catch is one side edited without the other.
 The compiled side answers through `--guard-lib-parity <mode> <arg>...`, one mode
-per twinned predicate. The library's two `no-port` grounds do not reach the
-five: none of them resolves a knob — each is a pure function of its arguments —
+per twinned predicate. The library's `no-port` ground does not reach the
+five: each is a pure function of its arguments, resolving no knob,
 and `_guard_redirect_pairs` and `_guard_harness_view` are `_`-prefixed internal
 helpers rather than the documented
 `guard_*` surface a consumer composes rules from. `_guard_redirect_pairs` is
@@ -289,7 +312,7 @@ literal must not acquire one.
 **The duplication is permanent rather than transitional**, which is what makes
 the machine-held disposition the right one instead of a concession: the shell
 caller set for the five cannot empty. For the first three the live callers are
-rules 2/4/7/8/12/14/15/17/18/19/20/22/24 and the read-compound carve-out of rules
+rules 2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules
 9/10; for `guard_allow_match` they are rule 20's silent-grant guard, rules 4 and
 7's rewrite grant test, rule 19's recorded-launch grant and rule 24's slot parse; for `_guard_harness_view` it is
 rule 24's view — and all of them are functions in this same permanently-shell
@@ -435,23 +458,9 @@ one. The state file's path still lives with lifecycle-kit, never here, so
 guard-kit gains no dependency on a kit it does not otherwise know about
 (lifecycle-kit/SPEC.md §check-stage-evidence).
 
-**This library is permanently shell, and it declares so on two independent
-grounds because both are live.** The declaration sits in its own header and
-§port-blockers' `--tree` arm reads it there.
+**This library is permanently shell, on one ground.** The declaration sits in its
+own header and §port-blockers' `--tree` arm reads it there.
 
-- **It is the config bridge's sole resolver for the `GUARD_KIT_*` knobs.**
-  gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is
-  computed — the owning kit's shell library — so a crate-side resolver would be
-  the second producer criterion 6 refuses. The class ruling this ground belongs
-  to is gate-sdk/SPEC.md §The kit-library port disposition, and it reaches this
-  file by ground rather than by scope. **The route is a ported non-gate arm, not
-  a gate**, which is the part that misleads: this kit ships no `checks/`
-  directory and no registered member, so nothing it owns is ever baked into a
-  generated hook — and neither fact bears on the bridge, because a ported
-  emitter declares knobs and resolves them the same way, as
-  gate-sdk/SPEC.md §The non-gate arm states. The question *does the bridge source
-  this file* is answered by running the bridge for the arm in question and by
-  nothing else.
 - **It is the API a consumer's own shell rules are composed from.** §Consumer
   rules rules that a consumer's project block/steer/allow rules live in its copy
   of `templates/bash-guard.sh`, composed from the primitives above; the `kit
@@ -461,19 +470,19 @@ grounds because both are live.** The declaration sits in its own header and
   the port, never an extension point* refuses, on a seam whose interface is a set
   of shell functions.
 
-**What reopens it:** the first ground dissolves if this kit's knobs stop crossing
-the bridge, or if gate-sdk/SPEC.md §lib/gate.sh ever admits a second bridge
-producer; the second dissolves if §Consumer rules stops composing a consumer's
-rules from these primitives. Both would have to go for the disposition to move.
+It resolves no knob: the load above reads every `GUARD_KIT_*` value from the
+binary, so gate-sdk/SPEC.md §The kit-library port disposition does not reach it.
 
-**Neither ground moved when the decision table's runner ported**, and the
+**What reopens it:** the ground dissolves if §Consumer rules stops composing a
+consumer's rules from these primitives.
+
+**The ground did not move when the decision table's runner ported**, and the
 sentence is here because a reader meeting a ported runner beside an unported
 library will ask. §Testing's `--run-guard-tests` arm spawns
 `templates/bash-guard.sh`, which sources this library exactly as it always did,
-so the bridge still resolves every `GUARD_KIT_*` knob here and the extension
-point is still a set of shell functions a consumer's copy composes from. What
-the port moved is the harness around the subject; the subject and this library
-are what the two grounds are about.
+so the extension point is still a set of shell functions a consumer's copy
+composes from. What the port moved is the harness around the subject; the subject
+and this library are what the ground is about.
 
 ## Consumer rules
 
@@ -508,7 +517,7 @@ makes this contract durable rather than provisional.** A consumer writes its
 rules against `lib/guard.sh`'s functions; if that library moved in-crate the
 composition seam would move with it and every consumer copy would be written
 against an interface the tree does not carry. §The guard framework
-(`lib/guard.sh`) states the disposition and both grounds it rests on.
+(`lib/guard.sh`) states the disposition and the ground it rests on.
 
 **Placement is a verification decision before it is a seam one, and this is the
 sentence that makes the contract usable.** The generic lane carries §Testing's
@@ -1680,7 +1689,7 @@ that harness exists would be designing against no case.
     the fix. The rule is derived from the settings it bounds, is testable in the
     decision table, and lands with the kit. A deny list stays available as a
     harness-enforced backstop an operator may add independently.
-    **Placed immediately before fall-through logging.** No auto-allow above it
+    **Placed immediately before rule 25.** No auto-allow above it
     grants a rule-24 subject: rule 16 truncates only, rule 17's emitter bound
     refuses `rm` and `bash`, rule 18's roster carries neither, rule 19's arm (A)
     body is `sleep` only, and its arm (B) applies this rule's test as a predicate. Rules 4 and 7 run ahead of it and each emit a rewrite
@@ -1695,7 +1704,58 @@ that harness exists would be designing against no case.
     a reach the matcher would grant. And a command the rule declines — a
     heredoc-bearing one among them — is left to the harness's own decision,
     grant included.
-25. **Fall-through logging** — anything neither blocked nor auto-allowed is
+25. **An emitter write the harness cannot grant** — blocked, with a steer per arm.
+    Both arms read a statement whose leading command is a `GUARD_KIT_APPEND_BINS`
+    member writing through `>>` or `>`, the shape rule 17 grants, and declare rule
+    17's classes. A statement is what `;`, `&&`, `||` and a newline separate,
+    carrying its own heredoc residue on rule 17's reading.
+    - **(a) Compounded.** The command holds more than one statement, and one of
+      them, issued alone, satisfies every clause of rule 17. The steer is to issue
+      that write as its own call, which rule 17 grants with no permission decision,
+      and the rest as a separate call.
+    - **(b) A target git does not ignore.** The statement is the whole command, and
+      a target fails rule 17's `git check-ignore` test. The steer is the harness's
+      Write or Edit tool for a file, or the capture arm that owns the surface when
+      the target is one: the tool is reviewable where a redirect is not, and the arm
+      keeps the surface's grammar.
+
+    **Declines**, in this ruleset's established directions: rule 17's clause (d),
+    read over the whole command; a backgrounded command, which is rule 15's subject
+    and whose canonical recorded launch writes its record through an emitter to a
+    gitignored target, so arm (a) would otherwise refuse the spelling rule 15
+    mandates; a statement on a line whose heredoc openers sit in more than one
+    statement, whose residue cannot be attributed; and, for arm (b), a target under
+    `/dev/`, which is no file a Write or Edit tool can take.
+    **What was measured.** The friction log this rule was cut from holds twenty
+    resume-journal appends, every one to a path under `.tmp/`. Sixteen are followed
+    by a further statement, one is preceded by one, and the other three run past the
+    log's 500-character truncation. So arm (a) is the measured class. Arm (b) is the
+    stated better form for the tracked direction, which that log holds no instance
+    of, and it is kept because the steer is the READ direction's mirror (rule 10).
+    The destination test both arms need is rule 17's, so no consumer roster is owed,
+    and neither steer names a capture arm or its surface: that would put another
+    kit's surfaces inside guard-kit, a destination roster a consumer would then keep
+    in step, where the generic steer lets the agent's own instructions name the arm.
+26. **A `bash -c` or `sh -c` wrapper** — blocked, with the steer to run the payload
+    as the command itself, or, for a body that needs a shell of its own, to write it
+    to a scratch script and run it through the `--scratch-run` arm. Fires when a
+    segment's first word is `bash` or `sh` and its next word is `-c`. The wrapper
+    puts the whole payload inside one quoted argument, which the skeleton strips, so
+    no allowlist entry and no rule above can see the command inside it. That makes
+    the wrapper a steering target on its own terms, whatever it wraps. Declares
+    `sq dq hd`.
+    **What it does not reach.** A wrapper behind another command word,
+    `xargs bash -c` or `timeout 5 bash -c`, is out of scope: the leading word decides
+    which rule reads the call, and each of those leads is its own rule's subject. A
+    `bash <script>` naming a scratch path is rule 23's.
+
+    Both rules block rather than advise, on rule 20's reasoning: the call would take
+    a permission decision anyway, and a block turns that decision into a durable
+    steer at no extra cost, where an advise would fall through to the same prompt
+    and teach nothing durable. Both sit at the tail, after rule 24, because neither
+    grants anything and a command reaching them has been declined by every grant
+    above.
+27. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 **Nothing above claims the sleep half was already enforced.** Before rule 13, no
@@ -1893,18 +1953,18 @@ flag.** The ranker is a bridged arm, reached through the shipped front-end as
 `run-gates.sh --emit scan-prompts [--count] [--] [<log>]` with no front-end
 change, since the `--emit <name>` operand composes `--emit-<name>`. Its declared
 roster is three names — `GUARD_KIT_LOG`, `GUARD_KIT_SETTINGS` and
-`GUARD_KIT_SETTINGS_LOCAL` — every one defined and defaulted in `lib/guard.sh`,
-so no default moves into the binary and a tree without guard-kit cannot resolve
-the arm at all. Membership of the bridged-arm table is **forced by that roster**
-rather than chosen by family resemblance: `--knobs` publishes a member's roster
-and the bridge resolves it before the exec, while a hardcoded top-level flag is
-reached by neither (gate-sdk/SPEC.md §The non-gate arm). A hardcoded flag here
-would not resolve a log path at all.
+`GUARD_KIT_SETTINGS_LOCAL` — every one a row of guard-kit's table (§Layout and
+configuration). Membership of the bridged-arm table is **forced by that roster**
+rather than chosen by family resemblance: `GUARD_KIT_LOG`'s default derives from
+`GATE_SDK_WORKFLOW_DIR`, a bridged input, and `--knobs` publishes a member's
+closure and the bridge resolves it before the exec, while a hardcoded top-level
+flag is reached by neither (gate-sdk/SPEC.md §The non-gate arm). A hardcoded flag
+here would not resolve a log path at all.
 
 **The residue this section keeps, stated because the arm is not the whole of
 it.** The behaviour below is composed from three `lib/guard.sh` primitives —
 `guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — and that
-library is permanently shell on the two independent grounds §The guard framework
+library is permanently shell on the ground §The guard framework
 states. So this section's contract is **not wholly in-crate**, and will not be
 while that disposition stands: the binary holds the ranker, and what holds the
 primitives it is composed from is a compiled twin of each, kept equal to the
@@ -2083,7 +2143,7 @@ an accident. These are `_`-prefixed internal helpers rather than the documented
 `guard_*` surface, called from a `bin/` tool inside the same kit — a kit-internal
 call that widens no consumer contract. That is also what clears
 `_guard_redirect_pairs` for a compiled twin while the library it lives in stays
-shell: the second `no-port` ground is about the consumer surface, and this helper
+shell: the `no-port` ground is about the consumer surface, and this helper
 is not on it (§The guard framework). Its twin is held equal by the same
 comparator as the other two.
 
@@ -2133,7 +2193,7 @@ it needs to know the bite was measured rather than assumed.
 **This instrument cannot size the population its neighbouring rules already
 admit, and that is a property of the grant boundary rather than a gap in the
 sweep.** `guard_log_fallthrough` runs only after every rule has declined
-(rule 25), so a granted call is never a log line. Two consequences a reader of
+(rule 27), so a granted call is never a log line. Two consequences a reader of
 this ranking has to carry. First, a question of the form *how often does the
 shape rule 17 grants actually occur* has **no answer in this log** — a zero here
 is zero by design, not zero by finding, and any sizing of that population needs a
@@ -2233,14 +2293,11 @@ judgment.
 
 **The advisory is the `--emit-compare-settings-allow` bridged arm, and both halves
 of that are forced rather than chosen.** It is a **table member** on the
-forced-family test at its sharpest, the shape `--emit-scan-prompts` already holds:
-all four declared knobs — `GUARD_KIT_SETTINGS`, `GUARD_KIT_SETTINGS_LOCAL`,
-`GUARD_KIT_BREADTH_PROBES` and `GUARD_KIT_BREADTH_DECLARED` — are defined and
-defaulted in `lib/guard.sh`, the bridge's sole resolver for them, so a hardcoded
-top-level flag would resolve not a stale default but **no input path at all** and
-the arm would be unable to name the two files it compares. The same fact makes the
-member unresolvable in a tree that does not vendor guard-kit, which is a refusal
-with a message rather than a defect. It is an **`Arm::Emit`** because every report
+forced-family test, the shape `--emit-scan-prompts` already holds: all four
+declared knobs — `GUARD_KIT_SETTINGS`, `GUARD_KIT_SETTINGS_LOCAL`,
+`GUARD_KIT_BREADTH_PROBES` and `GUARD_KIT_BREADTH_DECLARED` — are consumer
+configuration, rows of guard-kit's table (§Layout and configuration), and a
+member's declared roster is what `--knobs` publishes for it. It is an **`Arm::Emit`** because every report
 path already returns 0 — the no-overlay path, the empty-probe-set path and every
 path that finds candidates, this being an advisory that never renders a verdict —
 and the one non-zero path is the operand refusal at exit 2, so the `{0, 2}`
@@ -2250,14 +2307,12 @@ collapse discards nothing the member carried. **`--count` does not make it an
 tool rather than a generator — and its status carries no distinction the collapse
 would lose.
 
-**Two of the four knobs are arrays and neither needs new mechanism.**
-`GUARD_KIT_BREADTH_PROBES` is an indexed array and `GUARD_KIT_BREADTH_DECLARED` an
-associative one; the bridge derives the scalar/keyed arm from `declare -p` and the
-crate reads them as a list and a map respectively. The keyed knob is the one worth
-naming: the bridge's family arm takes the scalar arm's associative branch, because
-a value-only crossing destroys the keys — and this member's whole declaration
-contract is the **key**, so such a crossing would silence nothing and report
-nothing while passing every element-shape check.
+**Two of the four knobs are collections and neither needs new mechanism.**
+`GUARD_KIT_BREADTH_PROBES` is an indexed knob and `GUARD_KIT_BREADTH_DECLARED` a
+keyed one, and the crate reads them as a list and a map respectively. The keyed
+knob is the one worth naming: this member's whole declaration contract is the
+**key**, so a value-only read would silence nothing and report nothing while
+passing every element-shape check.
 
 **The member spawns no external program at all — an empty set, the first in its
 class.** Both allow lists are read in-crate rather than through `jq`, which is
@@ -2526,37 +2581,41 @@ guard-kit/
   gate-tests/git-mutation-under-producer.test.sh  # bespoke unit test, run by gate-sdk's runner
   gate-tests/guard-read-path.test.sh  # bespoke unit test, run by gate-sdk's runner
   gate-tests/guard-lib-parity.test.sh # holds lib/guard.sh's five twinned primitives to their compiled counterparts
-  gate-tests/guard-config-knobs.test.sh  # the knob values a decision-table row cannot vary, each under a sandbox GUARD_KIT_CONFIG_FILE
+  gate-tests/guard-config-knobs.test.sh  # the knob values a decision-table row cannot vary, each under a sandbox GUARD_KIT_KNOB_FILE, and the knob load's two failure answers
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
-  templates/guard-config.sh
+  templates/guard-config.knobs
   templates/settings-hooks.json  # the PreToolUse wiring snippet
   templates/close-triage.md
   smoke/install.sh
 ```
 
-Config follows the established kit pattern: copy
-`templates/guard-config.sh` into the gates dir (or point
-`GUARD_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
-what the consumer left unset, and a set-but-missing `GUARD_KIT_CONFIG_FILE`
-exits 2 rather than silently running on defaults. In a hook that sources the
-lib, that exit 2 surfaces as a hook block carrying the not-found message —
-loud on the first guarded command, the intended fail-closed (the guards
-gate the lib source on file existence only, so the message is never
-swallowed; a lib that is not vendored at all stays fail-open). That template
-and the copy it seeds are **permanently shell**, each carrying the `# no-port:`
-cause of the class ruling at gate-sdk/SPEC.md §The config-seam port disposition.
+Config is a **knob file**: copy `templates/guard-config.knobs` into the gates dir
+as `guard-config.knobs` (or point `GUARD_KIT_KNOB_FILE` elsewhere) and set any knob
+below; defaults fill what the file leaves unset. guard-kit's knobs are **static**:
+the binary resolves them in process from its own defaults table and the consumer's
+knob file, and the config bridge never carries them (gate-sdk/SPEC.md §lib/gate.sh);
+`bash gate-sdk/bin/run-gates.sh --emit knob-roster` prints each one with its shape
+and rendered default. A gitignored `guard-config.local.knobs` in the gates dir is
+the home for a private value a tracked file cannot carry. The grammar, that `.local`
+overlay, the environment-over-file precedence for a scalar, and the refusals — a set
+`GUARD_KIT_KNOB_FILE` that does not exist, a left-behind `guard-config.sh` or
+`guard-config.local.sh`, a non-empty file named by the retired
+`GUARD_KIT_CONFIG_FILE` — are gate-sdk/SPEC.md §The knob file's. `lib/guard.sh`
+reads the values through the binary, and a refusal reaches the hook as a block
+carrying its text (§The guard framework). A derived default below is written in the
+roster's `${NAME}` spelling for the knob it reads.
 Knobs (this repo's layout as defaults):
 
 - `GUARD_KIT_LIB` — the vendored `lib/guard.sh` path the copied guards
   source (the test runner points it at the tree under test); default
-  `guard-kit/lib/guard.sh`. Env or the copied guard's head only — it
-  resolves before the config file loads, so `guard-config.sh` cannot set
-  it.
-- `GUARD_KIT_LOG` — default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log`.
-- `GUARD_KIT_WAKEUP_LOG` — default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log`.
+  `guard-kit/lib/guard.sh`. Not a knob and no table row: env or the copied
+  guard's head only, because it names the library before the library exists,
+  so `guard-config.knobs` cannot set it.
+- `GUARD_KIT_LOG` — derived default
+  `${GATE_SDK_WORKFLOW_DIR}/prompt-friction.log`.
+- `GUARD_KIT_WAKEUP_LOG` — derived default
+  `${GATE_SDK_WORKFLOW_DIR}/wakeup-attempts.log`.
 - `GUARD_KIT_SETTINGS` — default `.claude/settings.json`.
 - `GUARD_KIT_SETTINGS_LOCAL` — default `.claude/settings.local.json`.
 - `GUARD_KIT_BREADTH_PROBES` — array of permission-rule strings, each a witness
@@ -2567,16 +2626,18 @@ Knobs (this repo's layout as defaults):
   both sides, so a consumer can probe non-`Bash` rules with the same mechanism.
   The kit ships **no** default probes: every string naming a command is the
   consumer's vocabulary, never the kit's (CLAUDE.md §The provenance seam).
-- `GUARD_KIT_BREADTH_DECLARED` — associative array recording the breadths ruled
-  intended (§compare-settings-allow): the key is a permission-rule string, the
-  value the reason that breadth was ruled intended; default empty, in which case
+- `GUARD_KIT_BREADTH_DECLARED` — keyed knob recording the breadths ruled
+  intended (§compare-settings-allow), one
+  `GUARD_KIT_BREADTH_DECLARED[<rule>] = <reason>` line each: the key is a permission-rule string, the value the reason
+  that breadth was ruled intended; default empty, in which case
   the declared subsection is absent and the tool behaves exactly as it did before
-  the declaration shipped. **Associative rather than a delimited indexed array,
-  and the choice is not cosmetic:** a permission rule may contain any character a
-  command may, so every single-character separator an indexed array would need
+  the declaration shipped. **Keyed rather than a delimited indexed knob, and the
+  choice is not cosmetic:** a permission rule may contain any character a
+  command may, so every single-character separator an indexed knob would need
   (`|`, `::`, a tab) is a character a legitimate rule can carry, and the knob
-  would ship a grammar that cannot express part of its own subject. An
-  associative key holds the rule verbatim, and a key is unique by construction, so
+  would ship a grammar that cannot express part of its own subject. A key holds
+  the rule verbatim, bounded only by the line grammar's own key rule (no `]`,
+  `=` or tab, which a live permission rule does not carry), and a key is unique by construction, so
   the *which reason wins* question the delimited shape would raise cannot arise.
   Report order never depends on the map's iteration order: the tool walks the
   settings file's own allow list and looks each entry up, so the map is never
@@ -2589,17 +2650,17 @@ Knobs (this repo's layout as defaults):
   rule 18's discriminator rather than granting on the leads-with test alone.
   Every member also takes a declaration of its write and execute forms, from
   `GUARD_KIT_RO_FORMS` or the kit's table, and an undeclared member is withheld.
-- `GUARD_KIT_RO_FORMS` — associative array mapping a roster binary to its
-  declaration of write and execute forms, in rule 18's grammar; default empty,
+- `GUARD_KIT_RO_FORMS` — keyed knob mapping a roster binary to its
+  declaration of write and execute forms, in rule 18's grammar, one
+  `GUARD_KIT_RO_FORMS[<binary>] = <declaration>` line each; default empty,
   in which case the kit's table declares the default roster and nothing else.
   Its reader is `_guard_ro_forms_clear`, at rule 15's exemption (3), rule 18 and
   rule 19's clauses (c) and (d), plus rule 9's listing test for `find`, one
   lookup per roster-led segment. A consumer adding a member to
   `GUARD_KIT_RO_BINS` declares it here or the member is withheld; an entry for a
   default member replaces the kit's declaration rather than adding to it.
-  **Associative on `GUARD_KIT_BREADTH_DECLARED`'s ground**: the key is a binary
-  name held verbatim and unique by construction. No bridged arm declares it, so
-  no crate reader exists and no second resolver is owed.
+  **Keyed on `GUARD_KIT_BREADTH_DECLARED`'s ground**: the key is a binary
+  name held verbatim and unique by construction.
 - `GUARD_KIT_APPEND_BINS` — the emitter roster of rule 17's write grant, which
   covers the create case as well as the append the name was minted for;
   default `(cat printf echo)`. A knob rather than a kit literal on
@@ -2681,17 +2742,20 @@ ad-hoc invocation must point it at a scratch path, and declaring the knob would
 resolve a consumer's *live* friction log into a synthetic run and invite exactly
 the pollution that rule exists to prevent — so the arm sets the child's value to
 a path inside its own sandbox. The guard's own `GUARD_KIT_*` knobs are not
-declared because the spawned child resolves them: `bash-guard.sh` sources
-`lib/guard.sh` through `GUARD_KIT_LIB`, and that library is their sole resolver
-(§The guard framework), so declaring them here would resolve them a second time
-for a child that resolves them anyway — the second producer criterion 6 refuses,
-reached by the back door.
+declared because the spawned child reads them: `bash-guard.sh` sources
+`lib/guard.sh` through `GUARD_KIT_LIB`, and that library's load reads every one
+from the binary (§The guard framework), so declaring them here would resolve them
+for a child that reads them anyway. The arm exports the running binary's absolute
+path as `GATE_SDK_NATIVE_BIN` into each case instead, because a case runs in a
+sandbox where the repo-relative default names nothing and the load would answer
+every row with its unreachable-binary advise.
 
 **What is under test does not move; only the harness does.** Each case is still
 fed through the **unchanged** `templates/bash-guard.sh`, spawned as
-`bash <guard-kit>/templates/bash-guard.sh` with `GUARD_KIT_LIB` and
-`GUARD_KIT_LOG` in its environment, its working directory set to the sandbox and
-the hook payload on its stdin — the same four inputs the shell harness supplied.
+`bash <guard-kit>/templates/bash-guard.sh` with `GUARD_KIT_LIB`, `GUARD_KIT_LOG`
+and `GATE_SDK_NATIVE_BIN` in its environment, its working directory set to the
+sandbox and the hook payload on its stdin — the four inputs the shell harness
+supplied, and the binary the library's load reads its knobs from.
 Nothing about the guard's decision path is re-expressed in Rust, so the port
 creates no duplication at all: criterion 6's *unless* clause is satisfied in the
 absent form rather than argued around. What moved is the payload construction,
@@ -2820,8 +2884,8 @@ it is the second cut to reach this section: the `run-guard-tests` cut took
 (§compare-settings-allow) as the kit's last member — a different section,
 correctly homed, and takeable as a singleton — and this cut ports that to the
 `--emit-compare-settings-allow` arm above. `lib/guard.sh` and
-`templates/bash-guard.sh` carry `# no-port:` on the two independent grounds §The
-guard framework states, reopened by neither cut. Guard-kit has no owed file at
+`templates/bash-guard.sh` carry `# no-port:` on the extension-point ground §The
+guard framework and §Consumer rules state, reopened by neither cut. Guard-kit has no owed file at
 all.
 
 A **third** table, `guard-tests/background-cases.tsv`
@@ -2845,10 +2909,32 @@ fires: every existing row whose command carries a trailing `&` has its expected
 column re-derived under the non-monotone rule above, never assumed still
 correct.
 
+**Rules 25 and 26 are measured on rows of their own, and they took that
+re-derivation.** A journal append followed by a `git` line, and the same append
+joined by `&&`, block; the same append alone allows; a compounded write rule 17
+would refuse alone does not fire; `cat >> tracked.md` alone blocks; a lead off the
+emitter roster, a device target and a backgrounded launch writing its record do not
+fire. `bash -c` and `sh -c` block, alone and behind another statement, while
+`xargs bash -c`, `timeout 5 bash -c` and the scratch runner taking a script path do
+not fire, the first two pinning the stated boundary. Rule 25 turns a `fallthrough`
+row into a `block` row wherever it fires, so three existing rows flipped — two
+writes to a tracked target and a granted write followed by a second statement — and
+rule 10's redirect-composition row now writes a gitignored target, so it still
+proves rule 10 inert rather than reading rule 25's block. A row a new rule shares
+with an older block is re-pointed where the older rule answers first, which only a
+probe of the message tells apart.
+
+**The knob load's price is measured, on a `git status` payload over ten calls
+each:** 106 to 110 ms per call with the load, against 57 to 61 ms for the library
+that sourced its shell config. The difference is sourcing `lib/gate.sh` and the
+bridge's resolution of `GATE_SDK_WORKFLOW_DIR` for the two log paths; the bridge's
+retirement removes the bridged half.
+
 `smoke/install.sh` copies the templates into the scratch consumer (guard
 and config into the gates dir, hook wiring merged into `.claude/settings.json`,
 log paths gitignored) and then drives one crafted payload directly through
-the installed guard, asserting a block — the install is self-verifying. The
+the installed guard, asserting a block carrying rule 1's steer, since a knob load
+the binary refuses blocks too — the install is self-verifying. The
 wiring is merged rather than written, and the merge asserts every hook event a
 co-vendored kit wired before it survives: an overwrite silently drops that kit's
 wiring from the composed consumer, and nothing downstream reads the final file.
@@ -2868,11 +2954,9 @@ the declared section, no narrowing section and no false clean line; `--count`'s
 breadth number excluding the declared entry; and an exactness case — a declaration
 differing from the local entry by one character leaves that entry in the narrowing
 set, which is the assertion that the lookup never became a glob match. It drives the arm
-through the battery runner's `--emit` front-end, with `GUARD_KIT_CONFIG_FILE` pointed
-at a sandbox config and `GUARD_KIT_SETTINGS`/`GUARD_KIT_SETTINGS_LOCAL` set in the
-environment beside it, so the consumer's own probe array cannot leak into the fixture:
-a config-file selector is read by the bridge *before* it sources the owning kit's
-library rather than arriving after resolution.
+through the battery runner's `--emit` front-end, with `GUARD_KIT_KNOB_FILE` pointed
+at a sandbox knob file and `GUARD_KIT_SETTINGS`/`GUARD_KIT_SETTINGS_LOCAL` set in the
+environment beside it, so the consumer's own probe array cannot leak into the fixture.
 
 **It carries no `jq` precondition, and that is the mirror image of the one
 `--run-guard-tests` keeps.** That refusal stands because its subject spawns `jq`;
@@ -2944,8 +3028,8 @@ be deleted, this one's is permanently shell.
 ground: a knob's **non-default value**. The decision table's runner feeds every
 row through one sandbox whose config it never varies, so no
 `decision <TAB> command` row can express a consumer who set a knob. Each case sources
-`lib/guard.sh` under a sandbox `guard-config.sh` selected through
-`GUARD_KIT_CONFIG_FILE` — the consumer's own selector — and asks one rule for its
+`lib/guard.sh` under a sandbox knob file selected through
+`GUARD_KIT_KNOB_FILE` — the consumer's own selector — and asks one rule for its
 verdict in a subshell, as the rule-14 test does. For `GUARD_KIT_SEARCH_TOOLS` the
 cases are: rules 9 and 11 firing under the default, each firing on its own member
 alone, both inert when the knob is empty, and each firing corrective naming its
@@ -2954,7 +3038,10 @@ carrying a declaration granted by rule 18, the same addition undeclared withheld
 an empty declaration withheld, and a consumer entry for a default member replacing
 the kit's declaration rather than adding to it. The decision table keeps the
 default-valued rows, the kit's own declaration table among them, which is why the
-two lanes do not overlap.
+two lanes do not overlap. The same lane holds the knob load's two failure answers,
+which no row can reach because the runner always supplies a binary: an unreachable
+binary advises, exits 0 and runs no rule, and a missing or malformed knob file
+blocks with the refusal's own text.
 
 A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a
 sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`

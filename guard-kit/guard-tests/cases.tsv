@@ -132,7 +132,7 @@ fallthrough	cat a.md && cat b.md
 fallthrough	echo a; echo b
 allow	cat one.md two.md
 allow	cat notes.md | wc -l
-fallthrough	cat header.md > combined.md
+allow	cat header.md > .tmp/combined.md
 
 # rule 11 — working-tree git grep steered to Grep (a path-limited `-- <path>`
 #           search is still the working tree); a revision or --cached passes
@@ -199,11 +199,13 @@ fallthrough	: > tracked.txt
 #           Targets are relative, as rules 3 and 16's are: the runner drives the
 #           guard from inside the sandbox, and an `@ROOT@`-absolute target would
 #           meet rule 5's repo-root-prefix block nine rules earlier.
+#           A refused write still reaching rule 25 reads `block` there rather than
+#           `fallthrough`: what these rows assert is that rule 17 did not grant.
 allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 allow	cat > .tmp/journal.md <<'EOF'@NL@line@NL@EOF
-fallthrough	cat >> tracked.md <<'EOF'@NL@line@NL@EOF
+block	cat >> tracked.md <<'EOF'@NL@line@NL@EOF
 fallthrough	rm -rf .tmp/x >> .tmp/journal.md
-fallthrough	printf x >> .tmp/journal.md@NL@rm -rf .tmp/x
+block	printf x >> .tmp/journal.md@NL@rm -rf .tmp/x
 # (d)'s region test is `hdq`, not the raw command: a backtick in a QUOTED
 # delimiter's body cannot substitute, so the grant reaches the shape the mandated
 # journal append is always spelled in; an UNQUOTED delimiter leaves the body live
@@ -216,7 +218,7 @@ fallthrough	cat >> .tmp/journal.md <<EOF@NL@a `slug` in prose@NL@EOF
 # other clause still holds — a tracked target refuses on the per-target ignore
 # test the append case takes, which is the row that would catch an over-wide grant
 allow	printf 'x' > .tmp/note.txt
-fallthrough	cat > tracked.md <<'EOF'@NL@line@NL@EOF
+block	cat > tracked.md <<'EOF'@NL@line@NL@EOF
 # the two inert targets are exempt from (a) and (b): neither is a file the
 # append-only split protects, and neither is a path git check-ignore can answer
 allow	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
@@ -418,5 +420,29 @@ fallthrough	rm -rf .tmp/x 2>/dev/null
 fallthrough	bash guard-kit/checks/check-x.sh
 fallthrough	rm -rf .tmp/`printf x`/y
 
-# rule 25 — anything else falls through to the friction log
+# rule 25 — an emitter write the harness cannot grant. Arm (a): a write rule 17
+#           grants alone, compounded with another statement, blocks; the same write
+#           alone is rule 17's grant, and a compounded write rule 17 would refuse
+#           alone does not fire. Arm (b): a lone write to a target git does not
+#           ignore blocks, while a lead off the emitter roster, a device target and
+#           a backgrounded launch writing its record do not fire
+block	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF@NL@git status
+block	printf x >> .tmp/journal.md && git status
+allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
+fallthrough	printf x >> tracked.md; git status
+block	cat >> tracked.md
+fallthrough	bash gate-sdk/bin/run-gates.sh --emit trajectory > docs/x.md
+fallthrough	echo x > /dev/stderr
+fallthrough	make build > .tmp/b.log 2>&1 & echo "pid=$! run=b" > .tmp/b.run; wait; rm -f .tmp/b.run
+
+# rule 26 — a bash -c or sh -c wrapper blocks; a wrapper behind another command
+#           word, and the scratch runner taking a script path, do not fire
+block	bash -c 'git status'
+block	sh -c 'ls'
+block	make x; bash -c 'ls'
+fallthrough	xargs bash -c 'x'
+fallthrough	timeout 5 bash -c 'x'
+fallthrough	bash gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh
+
+# rule 27 — anything else falls through to the friction log
 fallthrough	make build

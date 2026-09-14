@@ -1,42 +1,6 @@
 # shellcheck shell=bash
 # spec: guard-kit/SPEC.md §The guard framework — hook primitives + generic ruleset; no project rule content
-# no-port: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — permanently shell on two independent grounds, and that section states them. (1) The config bridge: this library is the sole resolver for the GUARD_KIT_* knobs, one of which a ported non-gate arm declares and the bridge resolves by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses — gate-sdk/SPEC.md §The kit-library port disposition is the class ruling and gate-sdk/SPEC.md §lib/gate.sh the rule it rests on. (2) The extension point: guard-kit/SPEC.md §Consumer rules rules that a consumer's project block/steer/allow rules live in its copy of templates/bash-guard.sh, composed from these primitives, so this library is the API those rules are written against and porting it deletes the extension point — which is native-gate-port-remaining-corpus' ruling (1), a cut narrows the port and never an extension point. Structural, not a sizing judgment.
-
-# spec: guard-kit/SPEC.md §Layout and configuration — a set-but-missing GUARD_KIT_CONFIG_FILE exits 2, surfacing as a hook block with this message on the first guarded command
-_frik_cfg="${GUARD_KIT_CONFIG_FILE:-}"
-if [[ -n "$_frik_cfg" ]]; then
-    [[ -f "$_frik_cfg" ]] || {
-        echo "guard-kit: GUARD_KIT_CONFIG_FILE not found: $_frik_cfg" >&2
-        exit 2
-    }
-    # shellcheck source=/dev/null  # consumer config path is resolved at runtime
-    source "$_frik_cfg"
-else
-    _frik_cfg="${GATE_SDK_GATES_DIR:-scripts}/guard-config.sh"
-    if [[ -f "$_frik_cfg" ]]; then
-        # shellcheck source=/dev/null  # consumer config path is resolved at runtime
-        source "$_frik_cfg"
-    fi
-fi
-unset _frik_cfg
-
-: "${GUARD_KIT_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log}"
-: "${GUARD_KIT_WAKEUP_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log}"
-: "${GUARD_KIT_SETTINGS:=.claude/settings.json}"
-: "${GUARD_KIT_SETTINGS_LOCAL:=.claude/settings.local.json}"
-declare -p GUARD_KIT_BREADTH_PROBES >/dev/null 2>&1 || GUARD_KIT_BREADTH_PROBES=()
-declare -p GUARD_KIT_BREADTH_DECLARED >/dev/null 2>&1 || declare -A GUARD_KIT_BREADTH_DECLARED=()
-declare -p GUARD_KIT_RO_SCRIPTS >/dev/null 2>&1 || GUARD_KIT_RO_SCRIPTS=("check-*.sh")
-declare -p GUARD_KIT_SCRATCH_DIRS >/dev/null 2>&1 || GUARD_KIT_SCRATCH_DIRS=(".tmp")
-declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(
-    grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls xargs
-)
-declare -p GUARD_KIT_RO_FORMS >/dev/null 2>&1 || declare -A GUARD_KIT_RO_FORMS=()
-declare -p GUARD_KIT_APPEND_BINS >/dev/null 2>&1 || GUARD_KIT_APPEND_BINS=(cat printf echo)
-declare -p GUARD_KIT_SEARCH_TOOLS >/dev/null 2>&1 || GUARD_KIT_SEARCH_TOOLS=(Glob Grep)
-declare -p GUARD_KIT_SCRIPT_INTERPRETERS >/dev/null 2>&1 || GUARD_KIT_SCRIPT_INTERPRETERS=(
-    python python3 node deno ruby perl php zsh
-)
+# no-port: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — permanently shell on the extension-point ground that section states: guard-kit/SPEC.md §Consumer rules rules that a consumer's project block/steer/allow rules live in its copy of templates/bash-guard.sh, composed from these primitives, so this library is the API those rules are written against and porting it deletes the extension point — a cut narrows the port and never an extension point. Structural, not a sizing judgment.
 
 # spec: guard-kit/SPEC.md §The guard framework — the payload cache: called directly (never in a substitution, which would kill the global with its subshell) so a rule needing a second field can have one
 guard_read_input() {
@@ -558,10 +522,17 @@ _guard_dequoted_view() {
 
 # spec: guard-kit/SPEC.md §The generic ruleset — the runner path rules 8 and 23 print: gate-sdk's front end, derived from the vendor root GUARD_KIT_LIB already names rather than hardcoded, so a relocated tree still prints a path that resolves
 _guard_front_end() {
-    local lib="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}" root
-    root="${lib%/lib/guard.sh}"
-    if [[ "$root" == */* ]]; then root="${root%/*}/"; else root=""; fi
+    local root
+    _guard_vendor_root root
     printf '%sgate-sdk/bin/run-gates.sh' "$root"
+}
+
+# spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — the directory the kits are vendored under, with its trailing '/', or empty where guard-kit sits at the working directory; assigned by nameref so the load at this file's tail forks nothing
+_guard_vendor_root() {
+    local -n _gvr_out="$1"
+    local lib="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
+    _gvr_out="${lib%/lib/guard.sh}"
+    if [[ "$_gvr_out" == */* ]]; then _gvr_out="${_gvr_out%/*}/"; else _gvr_out=""; fi
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 8's awk arm: a pipeline-head awk segment with exactly one file operand whose program is a line range (NR comparisons only) or a markdown heading range, with no action or the print-all one; the steer is chosen by the program's shape
@@ -1123,20 +1094,26 @@ _guard_redirect_pairs() {
     grep -oE '[0-9]*>>?[[:space:]]*(&[0-9-]+|[^[:space:]|;&<>]+)' <<<"$1"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's single-statement test: guard_skeleton leaves a heredoc's body placeholder and terminator on lines of their own and guard_split_compound emits per line, so one statement is one segment plus exactly the residue that segment's own openers produce, never one segment
-_guard_only_heredoc_residue() {
-    local -a segs=() terms=()
-    local t seg i=1
-    mapfile -t segs < <(guard_split_compound "$1")
-    [[ "${#segs[@]}" -ge 1 ]] || return 1
+# spec: guard-kit/SPEC.md §The generic ruleset — the terminator of each heredoc a skeleton line opens, in order and unquoted, one per line; read by rule 17's single-statement test and rule 25's statement split
+_guard_heredoc_terms() {
+    local t
     while IFS= read -r t; do
         t="${t#*<<}"
         t="${t#-}"
         t="${t#"${t%%[![:space:]]*}"}"
         t="${t#[\"\']}"
         t="${t%[\"\']}"
-        terms+=("$t")
-    done < <(grep -oE '<<-?[[:space:]]*("[^"]*"|'\''[^'\'']*'\''|[A-Za-z_][A-Za-z0-9_]*)' <<<"${segs[0]}")
+        printf '%s\n' "$t"
+    done < <(grep -oE '<<-?[[:space:]]*("[^"]*"|'\''[^'\'']*'\''|[A-Za-z_][A-Za-z0-9_]*)' <<<"$1")
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's single-statement test: guard_skeleton leaves a heredoc's body placeholder and terminator on lines of their own and guard_split_compound emits per line, so one statement is one segment plus exactly the residue that segment's own openers produce, never one segment
+_guard_only_heredoc_residue() {
+    local -a segs=() terms=()
+    local t seg i=1
+    mapfile -t segs < <(guard_split_compound "$1")
+    [[ "${#segs[@]}" -ge 1 ]] || return 1
+    mapfile -t terms < <(_guard_heredoc_terms "${segs[0]}")
     for t in ${terms[@]+"${terms[@]}"}; do
         seg="${segs[i]:-}"
         seg="${seg#"${seg%%[![:space:]]*}"}"
@@ -1151,39 +1128,45 @@ _guard_only_heredoc_residue() {
     [[ "$i" -eq "${#segs[@]}" ]]
 }
 
-guard_rule_append_scratch() {
-    local raw="$1" s live
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 17 clause (d): the substitution and backtick declines run on the 'hdq' view rather than the raw command, because a quoted-delimiter heredoc body cannot substitute (rule 6's own ground, one rule over) while every other region can — rule 6 blocks three of the four substitution spellings and exits 2 first, but not the output-process-substitution one, and a grant may not rest on a coverage claim that is only mostly true
-    live="$(guard_skeleton "$raw" hdq)"
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 17 clause (d), read by rules 17 and 25: the substitution and backtick declines run on the 'hdq' view rather than the raw command, because a quoted-delimiter heredoc body cannot substitute (rule 6's own ground, one rule over) while every other region can — rule 6 blocks three of the four substitution spellings and exits 2 first, but not the output-process-substitution one, and a grant may not rest on a coverage claim that is only mostly true
+_guard_emitter_unmodelled() {
+    local live
+    live="$(guard_skeleton "$1" hdq)"
     grep -qE '\$\(|<\(|>\(' <<<"$live" && return 0
     case "$live" in *'`'*) return 0 ;; esac
-    s="$(guard_skeleton "$raw" sq dq hd)"
-    _guard_shell_backgrounds "$s" && return 0
-    _guard_only_heredoc_residue "$s" || return 0
+    return 1
+}
 
-    local lead b on_roster=0
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's clauses (0), (a) and (c) and its quoted-target decline on one statement's 'sq dq hd' skeleton, read by rules 17 and 25: fills _GUARD_EMITTER_TARGETS with every target that is neither /dev/null nor an fd-dup, and returns non-zero when the statement is not an emitter write rule 17 can test
+_guard_emitter_write() {
+    local s="$1" lead b on_roster=0 pair tgt
+    _GUARD_EMITTER_TARGETS=()
+    _guard_shell_backgrounds "$s" && return 1
+    _guard_only_heredoc_residue "$s" || return 1
     lead="${s%%$'\n'*}"
     lead="${lead#"${lead%%[![:space:]]*}"}"
     lead="${lead%%[[:space:]]*}"
     for b in "${GUARD_KIT_APPEND_BINS[@]}"; do
         [[ "$lead" == "$b" ]] && { on_roster=1; break; }
     done
-    [[ "$on_roster" == 1 ]] || return 0
-
-    local pair tgt
-    local -a targets=()
+    [[ "$on_roster" == 1 ]] || return 1
     while IFS= read -r pair; do
         [[ -z "$pair" ]] && continue
         pair="${pair#"${pair%%[!0-9]*}"}"
         if [[ "$pair" == '>>'* ]]; then tgt="${pair#>>}"; else tgt="${pair#>}"; fi
         tgt="${tgt#"${tgt%%[![:space:]]*}"}"
         case "$tgt" in /dev/null | '&'[0-9-]*) continue ;; esac
-        case "$tgt" in *[\"\']*) return 0 ;; esac
-        targets+=("$tgt")
+        case "$tgt" in *[\"\']*) _GUARD_EMITTER_TARGETS=(); return 1 ;; esac
+        _GUARD_EMITTER_TARGETS+=("$tgt")
     done < <(_guard_redirect_pairs "$s")
-    [[ "${#targets[@]}" -ge 1 ]] || return 0
+    [[ "${#_GUARD_EMITTER_TARGETS[@]}" -ge 1 ]]
+}
 
-    for tgt in "${targets[@]}"; do
+guard_rule_append_scratch() {
+    local raw="$1" tgt
+    _guard_emitter_unmodelled "$raw" && return 0
+    _guard_emitter_write "$(guard_skeleton "$raw" sq dq hd)" || return 0
+    for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
         git check-ignore --quiet -- "$tgt" || return 0
     done
     guard_allow "write to gitignored scratch (${GUARD_NAME:-guard} auto-allow)"
@@ -1842,6 +1825,87 @@ guard_rule_grant_path_slot() {
     guard_block "don't reach past a committed grant's path slot — $reach. A Bash rule's '*' spans '/', '..' and whole words, so a grant written for one directory reaches paths its author never named. Spell the path inside the pattern's reach, or, if you genuinely need this command, run it yourself with !<command>."
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 25's statements: a skeleton split on ';', '&&', '||' and newlines, each emitted NUL-terminated and followed by the heredoc residue its own openers produce; a line whose openers sit in more than one statement attributes its residue to none, so each of those fails rule 17's single-statement test
+_guard_statements() {
+    local -a lines=() parts=() terms=()
+    local line part t residue next carriers i=0
+    mapfile -t lines <<<"$1"
+    while ((i < ${#lines[@]})); do
+        line="${lines[i]}"
+        ((i++))
+        residue=''
+        mapfile -t terms < <(_guard_heredoc_terms "$line")
+        for t in ${terms[@]+"${terms[@]}"}; do
+            next="${lines[i]:-}"
+            if [[ "${next#"${next%%[![:space:]]*}"}" == HD ]]; then
+                residue+=$'\n'"$next"
+                ((i++))
+                next="${lines[i]:-}"
+            fi
+            [[ "${next#"${next%%[![:space:]]*}"}" == "$t" ]] || break
+            residue+=$'\n'"$next"
+            ((i++))
+        done
+        mapfile -t parts < <(sed -E 's/\|\||&&|;/\n/g' <<<"$line")
+        carriers=0
+        for part in ${parts[@]+"${parts[@]}"}; do
+            case "$part" in *'<<'*) ((carriers++)) ;; esac
+        done
+        for part in ${parts[@]+"${parts[@]}"}; do
+            [[ -n "${part//[[:space:]]/}" ]] || continue
+            case "$part" in
+                *'<<'*) [[ "$carriers" == 1 ]] && part+="$residue" ;;
+            esac
+            printf '%s\0' "$part"
+        done
+    done
+}
+
+guard_rule_emitter_write() {
+    local raw="$1" s stmt tgt lead
+    local -a stmts=()
+    case "$raw" in *'>'*) ;; *) return 0 ;; esac
+    _guard_emitter_unmodelled "$raw" && return 0
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 25 declines on a backgrounded launch, rule 15's subject, whose canonical spelling writes its liveness record with an emitter
+    _guard_shell_backgrounds "$s" && return 0
+    mapfile -d '' -t stmts < <(_guard_statements "$s")
+    if [[ "${#stmts[@]}" -gt 1 ]]; then
+        for stmt in "${stmts[@]}"; do
+            _guard_emitter_write "$stmt" || continue
+            for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
+                git check-ignore --quiet -- "$tgt" || continue 2
+            done
+            lead="${stmt#"${stmt%%[![:space:]]*}"}"
+            guard_block "issue the '${lead%%[[:space:]]*}' write to '${_GUARD_EMITTER_TARGETS[*]}' as its own call, and the rest of this command as a separate one: alone, that write is granted with no permission decision, while compounded it makes the whole call one the harness decides out of band. If you genuinely need the compound, run it yourself with !<command>."
+        done
+        return 0
+    fi
+    _guard_emitter_write "$s" || return 0
+    for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
+        # spec: guard-kit/SPEC.md §The generic ruleset — rule 25 arm (b) declines on a device target, which is no file a Write or Edit tool could take
+        case "$tgt" in /dev/*) return 0 ;; esac
+    done
+    for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
+        git check-ignore --quiet -- "$tgt" && continue
+        guard_block "don't write '$tgt' through a redirect: git does not ignore it, so no rule grants the write. Use the Write or Edit tool for a file, or the capture arm that owns the surface when the target is one — the tool is reviewable where a redirect is not, and the arm keeps the surface's grammar. If you genuinely need the redirect, run it yourself with !<command>."
+    done
+}
+
+guard_rule_shell_wrapper() {
+    local seg word rest
+    case "$1" in *sh*-c*) ;; *) return 0 ;; esac
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        word="${seg%%[[:space:]]*}"
+        case "$word" in bash | sh) ;; *) continue ;; esac
+        rest="${seg#"$word"}"
+        rest="${rest#"${rest%%[![:space:]]*}"}"
+        [[ "${rest%%[[:space:]]*}" == -c ]] || continue
+        guard_block "don't wrap a command in '$word -c': the payload sits inside one quoted argument, so neither the allowlist nor any guard rule can read what it runs. Run the payload as the command itself, or, for a body that needs a shell of its own, write it to a scratch script and run it through 'bash $(_guard_front_end) --scratch-run <script>'. If you genuinely need the wrapper, run it yourself with !<command>."
+    done < <(guard_split_compound "$(guard_skeleton "$1" sq dq hd)")
+}
+
 guard_generic_rules() {
     local cmd="$1"
     guard_rule_cd_compound "$cmd"
@@ -1868,4 +1932,45 @@ guard_generic_rules() {
     guard_rule_rm_tracked "$cmd"
     guard_rule_script_interpreter "$cmd"
     guard_rule_grant_path_slot "$cmd"
+    guard_rule_emitter_write "$cmd"
+    guard_rule_shell_wrapper "$cmd"
 }
+
+# spec: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — the knob load, once per sourcing and at the tail so both failure answers can use the primitives above: an unreachable binary advises and runs no rule, a refused config blocks with the refusal's own text, and every value lands in the shell variable of its name, so a caller reassigning one after sourcing still steers the rule
+_guard_root=''
+_guard_vendor_root _guard_root
+if [[ -f "${_guard_root}gate-sdk/lib/gate.sh" ]]; then
+    # shellcheck source=../../gate-sdk/lib/gate.sh
+    source "${_guard_root}gate-sdk/lib/gate.sh"
+fi
+if ! declare -F gate_knob_values >/dev/null || [[ ! -x "$(gate_native_bin)" ]]; then
+    guard_advise "guard-kit's rules did not run on this call: the gate binary its knobs are read from is not reachable, so the call takes the harness's own permission path with no steering. Build it: bash ${_guard_root}gate-sdk/bin/build-native.sh"
+fi
+_guard_knob_names=(
+    GUARD_KIT_LOG GUARD_KIT_WAKEUP_LOG GUARD_KIT_SETTINGS GUARD_KIT_SETTINGS_LOCAL GUARD_KIT_BREADTH_PROBES
+    GUARD_KIT_BREADTH_DECLARED GUARD_KIT_RO_SCRIPTS GUARD_KIT_SCRATCH_DIRS GUARD_KIT_RO_BINS GUARD_KIT_RO_FORMS
+    GUARD_KIT_APPEND_BINS GUARD_KIT_SEARCH_TOOLS GUARD_KIT_SCRIPT_INTERPRETERS
+)
+if ! _guard_knob_out="$(gate_knob_values "${_guard_knob_names[@]}" 2>/dev/null)"; then
+    guard_block "guard-kit could not read its knobs, so no command runs until the config is repaired — $(gate_knob_values "${_guard_knob_names[@]}" 2>&1 >/dev/null). Repair the file with the Edit tool, which this guard does not intercept."
+fi
+declare -A _guard_knob_seen=()
+while IFS=$'\t' read -r _guard_n _guard_shape _guard_el; do
+    [[ -n "$_guard_n" ]] || continue
+    if [[ -z "${_guard_knob_seen[$_guard_n]:-}" ]]; then
+        _guard_knob_seen[$_guard_n]=1
+        case "$_guard_shape" in
+            indexed) unset "$_guard_n"; declare -ga "$_guard_n=()" ;;
+            keyed) unset "$_guard_n"; declare -gA "$_guard_n=()" ;;
+        esac
+    fi
+    unset -n _guard_ref
+    declare -n _guard_ref="$_guard_n"
+    case "$_guard_shape" in
+        scalar) _guard_ref="$_guard_el" ;;
+        indexed) [[ -z "$_guard_el" ]] || _guard_ref+=("$_guard_el") ;;
+        keyed) [[ -z "$_guard_el" ]] || _guard_ref["${_guard_el%%=*}"]="${_guard_el#*=}" ;;
+    esac
+done <<<"$_guard_knob_out"
+unset -n _guard_ref
+unset _guard_root _guard_knob_names _guard_knob_out _guard_knob_seen _guard_n _guard_shape _guard_el

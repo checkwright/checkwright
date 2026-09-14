@@ -5,9 +5,8 @@ use crate::guard;
 use crate::walk;
 use serde_json::Value;
 
-// spec: guard-kit/SPEC.md §Layout and configuration — the three knobs `lib/guard.sh` defines and
-// the bridge resolves by sourcing it; no default moves into the crate, so an absent guard-kit
-// cannot resolve this arm at all.
+// spec: guard-kit/SPEC.md §scan-prompts — the three guard-kit table rows the arm reads; the log's
+// default derives from a bridged input only this declaration carries
 pub const KNOBS: &[&str] = &[
     "GUARD_KIT_LOG",
     "GUARD_KIT_SETTINGS",
