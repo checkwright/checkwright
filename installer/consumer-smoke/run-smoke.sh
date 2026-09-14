@@ -1149,8 +1149,8 @@ out="$( cd "$SC" && "$CW" init --profile "$PROFILE_DERIVED" 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the seam arm's install failed"; }
 say "init: $(grep -m1 '^INIT:' <<<"$out")"
 SEAM_LOCK="$SC/checkwright.lock"
-# spec: installer/README.md §What init seeds — the two surfaces init rewrites on every run: a templates/*-config.sh destination and gate-sdk's msg-patterns.list. The arm runs at the maximum profile because that is the only profile whose kit set is fixed by the payload rather than by a roster judgment, so it is where both surfaces are present by construction — a smaller profile would tie the arm to a membership row that is a judgment and may be revised
-SEAM_EDITED=(scripts/queue-config.sh scripts/msg-patterns.list)
+# spec: installer/README.md §What init seeds — the two surfaces init rewrites on every run: a templates/*-config.knobs destination and gate-sdk's msg-patterns.list. The arm runs at the maximum profile because that is the only profile whose kit set is fixed by the payload rather than by a roster judgment, so it is where both surfaces are present by construction — a smaller profile would tie the arm to a membership row that is a judgment and may be revised
+SEAM_EDITED=(scripts/queue-config.knobs scripts/msg-patterns.list)
 declare -A SEAM_INIT_HASH=() SEAM_WANT=()
 for f in "${SEAM_EDITED[@]}"; do
     [[ "$(jq -r --arg f "$f" '.files | has($f)' "$SEAM_LOCK")" == "true" ]] \

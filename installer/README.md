@@ -291,15 +291,17 @@ Beyond the kit directories themselves, `init` writes the least that makes the
 battery green on the tree it just made.
 
 The **config seam is derived, never listed**: a kit's consumer config is
-whatever `templates/*-config.sh` it ships, and the destination is always your
-gates directory under the file's own name. A kit that grows a config template
-is picked up with no edit here. The class this derivation defines — both sides
-of it, template and seeded copy — is **the edit seam, whatever its substrate**,
-ruled at gate-sdk/SPEC.md §The config-seam port disposition on the ground stated
-below: these are the files you edit, and a port would leave nothing to edit. A kit
-whose knobs are static reads a knob file instead of a shell config
-(gate-sdk/SPEC.md §The knob file); no such kit ships a config template yet, so the
-derivation above is unchanged.
+whatever `templates/*-config.sh` or `templates/*-config.knobs` it ships, and the
+destination is always your gates directory under the file's own name. A kit that
+grows a config template is picked up with no edit here. The class this derivation
+defines — both sides of it, template and seeded copy — is **the edit seam,
+whatever its substrate**, ruled at gate-sdk/SPEC.md §The config-seam port
+disposition on the ground stated below: these are the files you edit, and a port
+would leave nothing to edit. A kit whose knobs are static reads a knob file instead
+of a shell config (gate-sdk/SPEC.md §The knob file), and its template is a
+comment-only knob file, valid in the grammar as seeded. `init` never deletes a file
+a release stopped shipping (§init), so a shell config an earlier release seeded
+stays behind at upgrade, and the reader's legacy refusal names the migration.
 
 **Everything `init` seeds takes one of two disciplines, and which one follows
 from whether `init` keeps rewriting the file.** A surface `init` creates once and
