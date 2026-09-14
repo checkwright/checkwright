@@ -4,10 +4,4 @@
 
 ---
 
-config-bridge-floor scope ade21c65 2026-09-14 3ee35a5e
-config-bridge-floor spec a473bfca 2026-09-14 e6584fb7
-config-bridge-floor align acd491ba 2026-09-14 3e0663ca
-config-bridge-floor build ac4dd97b 2026-09-14 274ee45c
-config-bridge-floor build af9eed22 2026-09-14 59387a5c
-config-bridge-floor validate a48da16b 2026-09-14 0002d1a8
-config-bridge-floor close aee95e3c 2026-09-14 866b3dd7
+— scope a88aa849 2026-09-14 ccd5df65
