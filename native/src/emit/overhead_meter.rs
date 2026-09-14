@@ -12,8 +12,9 @@ pub const KNOBS: &[&str] = &[
 ];
 
 const USAGE: &str =
-    "usage: --emit overhead-meter [transcript.jsonl]\n  bare: the transcript this session is \
-     running in, resolved under DRIFT_KIT_SESSIONS_DIR";
+    "usage: --emit overhead-meter [transcript.jsonl | session8]\n  session8: a stamp's \
+     eight-character session id, looked up under DRIFT_KIT_SESSIONS_DIR\n  bare: a top-level \
+     session's own transcript; a delegated session must pass the operand";
 
 // spec: drift-kit/SPEC.md §The overhead meter — the fixed marker table: kit-name and gate-output
 // shapes only (mechanism, never a private vocabulary; the seam holds). Each row is an alternation
@@ -137,12 +138,6 @@ fn rewrite_keyed(path: &std::path::Path, session8: &str, line: &str) -> std::io:
     f.write_all(kept.as_bytes())
 }
 
-// spec: drift-kit/SPEC.md §The overhead meter — the meter measures the transcript the invoking
-// session is itself running in, so a delegated session resolves its own subagent transcript rather
-// than its lead's, and every other session takes the two-tier scan.
-// comment-tier-exempt: which `Inputs` fields carry that is a local construction the section does
-// not fix — the harness id rides only beside the child flag, because the pair is what narrows the
-// scan while the id alone is source 2, which answers with an id where this tool needs the file
 fn inputs() -> Result<crate::sessions::Inputs, String> {
     let var = |n: &str| std::env::var(n).unwrap_or_default();
     let pwd = var("PWD");
@@ -151,16 +146,10 @@ fn inputs() -> Result<crate::sessions::Inputs, String> {
     } else {
         pwd
     };
-    let child = var("CLAUDE_CODE_CHILD_SESSION");
-    let harness = if child.is_empty() {
-        String::new()
-    } else {
-        var("CLAUDE_CODE_SESSION_ID")
-    };
     Ok(crate::sessions::Inputs {
         session_id: String::new(),
-        harness_id: harness,
-        child,
+        harness_id: var("CLAUDE_CODE_SESSION_ID"),
+        child: var("CLAUDE_CODE_CHILD_SESSION"),
         sessions_dir: crate::walk::knob_scalar("DRIFT_KIT_SESSIONS_DIR")?,
         config_home: var("CLAUDE_CONFIG_DIR"),
         home: var("HOME"),
@@ -168,28 +157,81 @@ fn inputs() -> Result<crate::sessions::Inputs, String> {
     })
 }
 
+const DELEGATED: &str = "overhead-meter: a delegated session cannot identify its own transcript \
+     — pass it: --emit overhead-meter <transcript.jsonl | session8>\n  help: the usual operand \
+     is this session's own stage stamp id.\n";
+
+enum Target {
+    Measure(String, &'static str),
+    Absent(String),
+    Delegated,
+}
+
+// spec: drift-kit/SPEC.md §The overhead meter — a bare invocation measures only a transcript it
+// can identify, on the shared delegation verdict; an operand is a path, else a `session8`.
+fn target(given: Option<&str>, i: &crate::sessions::Inputs) -> Target {
+    use crate::sessions::{delegation, find, newest, sessions_dir, top_level, Delegation};
+    if let Some(op) = given {
+        if std::path::Path::new(op).is_file() {
+            return Target::Measure(op.to_string(), "");
+        }
+        let found = Some(op).filter(|k| k.chars().count() == 8).and_then(|k| find(i, k));
+        return match found {
+            Some(path) => Target::Measure(path, ""),
+            None => Target::Absent(op.to_string()),
+        };
+    }
+    match delegation(i) {
+        Delegation::TopLevel(id) => {
+            let path = top_level(&sessions_dir(i), &id);
+            if std::path::Path::new(&path).is_file() {
+                Target::Measure(path, "")
+            } else {
+                Target::Absent(path)
+            }
+        }
+        Delegation::Delegated(_) => Target::Delegated,
+        Delegation::Undetermined => {
+            let why = if i.harness_id.is_empty() {
+                "  (resolved by newest transcript — no harness session id)"
+            } else {
+                "  (resolved by newest transcript — the harness session id has no transcript here)"
+            };
+            match newest(i) {
+                Some(path) => Target::Measure(path, why),
+                None => Target::Absent(String::new()),
+            }
+        }
+    }
+}
+
 pub fn emit(args: &[String]) -> Result<String, String> {
     let given = super::file_survey::positionals(args, "transcript")?;
     if given.len() > 1 {
         return Err(USAGE.to_string());
     }
-    let transcript = match given.first() {
-        Some(t) => t.clone(),
-        None => crate::sessions::resolve(&inputs()?).unwrap_or_default(),
+    let log = crate::walk::knob_scalar("DRIFT_KIT_OVERHEAD_LOG")?;
+    measure(target(given.first().map(String::as_str), &inputs()?), &log)
+}
+
+fn measure(target: Target, log: &str) -> Result<String, String> {
+    let (transcript, marker) = match target {
+        Target::Measure(path, marker) => (path, marker),
+        Target::Delegated => return Ok(DELEGATED.to_string()),
+        // spec: drift-kit/SPEC.md §The overhead meter — advisory by construction: a missing
+        // transcript is a notice at exit 0, never a refusal, so it is the arm's document.
+        Target::Absent(named) => {
+            return Ok(format!(
+                "overhead-meter: no transcript to measure{}\n  help: pass a transcript path or a \
+                 session8, or set DRIFT_KIT_SESSIONS_DIR to the agent transcript dir.\n",
+                if named.is_empty() {
+                    String::new()
+                } else {
+                    format!(": {}", named)
+                }
+            ))
+        }
     };
-    // spec: drift-kit/SPEC.md §The overhead meter — advisory by construction: a missing transcript
-    // is a notice at exit 0, never a refusal, so it is returned as the arm's document.
-    if transcript.is_empty() || !std::path::Path::new(&transcript).is_file() {
-        return Ok(format!(
-            "overhead-meter: no transcript to measure{}\n  help: pass a transcript path, or set \
-             DRIFT_KIT_SESSIONS_DIR to the agent transcript dir.\n",
-            if transcript.is_empty() {
-                String::new()
-            } else {
-                format!(": {}", transcript)
-            }
-        ));
-    }
     let body = std::fs::read(&transcript)
         .map_err(|e| format!("cannot read the transcript {}: {}", transcript, e))?;
     let c = classify(&body);
@@ -198,20 +240,19 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 
     let session8 = crate::sessions::key(&transcript);
     let today = super::kpi::today_iso();
-    let log = crate::walk::knob_scalar("DRIFT_KIT_OVERHEAD_LOG")?;
     let line = format!(
         "{} {} total={} gov={} gate={} pct={}",
         today, session8, c.total, gov, c.gate, p
     );
-    rewrite_keyed(std::path::Path::new(&log), &session8, &line)
+    rewrite_keyed(std::path::Path::new(log), &session8, &line)
         .map_err(|e| format!("cannot write {}: {}", log, e))?;
 
     Ok(format!(
-        "overhead-meter: {} {}\n  total={} bytes\n  governance={} ({}%)  [gate={} hook={} \
+        "overhead-meter: {} {}{}\n  total={} bytes\n  governance={} ({}%)  [gate={} hook={} \
          stage={} govdoc={}]\n  task={} ({}%)\n  (byte-proxy at line granularity — a proportion \
          across same-shape sessions, not tokens; drift-kit/SPEC.md §The overhead meter)\n  \
          logged: {}\n",
-        today, session8, c.total, gov, p, c.gate, c.hook, c.stage, c.govdoc, task, tp, log
+        today, session8, marker, c.total, gov, p, c.gate, c.hook, c.stage, c.govdoc, task, tp, log
     ))
 }
 
@@ -268,6 +309,128 @@ mod tests {
         assert_eq!(text.lines().count(), 2, "the re-measure doubled a session: {}", text);
         assert!(text.contains("2026-01-02 aaaabbbb total=9"), "{}", text);
         assert!(text.contains("2026-01-01 ccccdddd total=2"), "{}", text);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    fn scratch(tag: &str) -> String {
+        let dir = std::env::temp_dir().join(format!("checkwright-ovh.{}.{}", tag, std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("the scratch sessions dir must be creatable");
+        dir.display().to_string()
+    }
+
+    fn transcript(path: &str, epoch: u64) {
+        let p = std::path::Path::new(path);
+        std::fs::create_dir_all(p.parent().expect("a transcript has a parent"))
+            .expect("the transcript's directory must be creatable");
+        std::fs::write(p, "ordinary work\n").expect("the transcript must be writable");
+        let status = std::process::Command::new("touch")
+            .arg("-d")
+            .arg(format!("@{}", epoch))
+            .arg(path)
+            .status()
+            .expect("touch must be spawnable");
+        assert!(status.success(), "touch could not set the mtime on {}", path);
+    }
+
+    fn inputs(dir: &str, harness: &str, child: &str) -> crate::sessions::Inputs {
+        crate::sessions::Inputs {
+            session_id: String::new(),
+            harness_id: harness.to_string(),
+            child: child.to_string(),
+            sessions_dir: dir.to_string(),
+            config_home: String::new(),
+            home: String::new(),
+            here: String::new(),
+        }
+    }
+
+    fn run(given: Option<&str>, i: &crate::sessions::Inputs, log: &str) -> String {
+        measure(target(given, i), log).expect("the meter is advisory and never refuses here")
+    }
+
+    const LEAD: &str = "11112222-3333-4444-5555-666677778888";
+
+    // spec: drift-kit/SPEC.md §The overhead meter — a top-level session measures its own transcript
+    // exactly, however many newer candidates its descendants wrote, and an absent one is the notice
+    #[test]
+    fn a_top_level_session_measures_its_own_transcript_not_the_newest() {
+        let dir = scratch("top");
+        let log = format!("{}/log.txt", dir);
+        transcript(&format!("{}/{}.jsonl", dir, LEAD), 1_000);
+        transcript(&format!("{}/{}/subagents/agent-aaaabbbb00.jsonl", dir, LEAD), 9_000);
+        let out = run(None, &inputs(&dir, LEAD, ""), &log);
+        assert!(out.contains(" 11112222\n"), "{}", out);
+        assert!(!out.contains("resolved by newest"), "{}", out);
+
+        let absent = "99998888-0000";
+        let out = run(None, &inputs(&dir, absent, ""), &log);
+        assert!(
+            out.contains("no transcript to measure") && out.contains(&format!("{}.jsonl", absent)),
+            "{}",
+            out
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: drift-kit/SPEC.md §The overhead meter — a delegated session measures nothing and logs
+    // nothing, and a spurious child flag is the top-level verdict rather than a refusal
+    #[test]
+    fn a_delegated_session_prints_the_notice_and_writes_no_log_line() {
+        let dir = scratch("delegated");
+        let log = format!("{}/log.txt", dir);
+        transcript(&format!("{}/{}/subagents/agent-aaaabbbb00.jsonl", dir, LEAD), 1_000);
+        let out = run(None, &inputs(&dir, LEAD, "1"), &log);
+        assert_eq!(out, DELEGATED);
+        assert!(!std::path::Path::new(&log).exists(), "a delegated bare invocation logged");
+
+        let spur = "ccccdddd-1111";
+        transcript(&format!("{}/{}.jsonl", dir, spur), 1_000);
+        let out = run(None, &inputs(&dir, spur, "1"), &log);
+        assert!(out.contains(" ccccdddd\n"), "{}", out);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: drift-kit/SPEC.md §The overhead meter — with no harness id the newest-candidate scan
+    // stands, and the reading says it was taken that way
+    #[test]
+    fn an_undetermined_session_takes_the_newest_and_says_so() {
+        let dir = scratch("undetermined");
+        let log = format!("{}/log.txt", dir);
+        transcript(&format!("{}/{}.jsonl", dir, LEAD), 1_000);
+        transcript(&format!("{}/{}/subagents/agent-aaaabbbb00.jsonl", dir, LEAD), 9_000);
+        let out = run(None, &inputs(&dir, "", ""), &log);
+        let first = out.lines().next().unwrap_or_default();
+        assert!(
+            first.contains(" aaaabbbb")
+                && first.contains("(resolved by newest transcript — no harness session id)"),
+            "{}",
+            out
+        );
+        let out = run(None, &inputs(&dir, "no-such-uuid", "1"), &log);
+        assert!(out.contains("the harness session id has no transcript here"), "{}", out);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: drift-kit/SPEC.md §The overhead meter — the operand is a path, else an eight-character
+    // `session8` normalized against each candidate, else the notice naming it
+    #[test]
+    fn the_operand_takes_a_path_or_a_session8_and_names_an_unmatched_one() {
+        let dir = scratch("operand");
+        let log = format!("{}/log.txt", dir);
+        let child = format!("{}/{}/subagents/agent-aaaabbbb00.jsonl", dir, LEAD);
+        transcript(&child, 1_000);
+        let i = inputs(&dir, LEAD, "1");
+        assert!(run(Some(&child), &i, &log).contains(" aaaabbbb\n"));
+        assert!(run(Some("aaaabbbb"), &i, &log).contains(" aaaabbbb\n"));
+        for key in ["eeeeffff", "aaaabbbb00"] {
+            let out = run(Some(key), &i, &log);
+            assert!(
+                out.contains(&format!("no transcript to measure: {}", key)),
+                "{}",
+                out
+            );
+        }
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

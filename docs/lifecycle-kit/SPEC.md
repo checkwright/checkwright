@@ -2183,7 +2183,11 @@ read as well as this arm — one copy in-crate rather than one per reader
 the module reads no environment at all, every input arriving as a value, so each
 consuming arm resolves **its own kit's** sessions-dir knob and hands the answer
 in. What is stated here rather than there is the *rule*; what lives there is the
-one implementation of it.
+one implementation of it. The child-flag verification in source 3 is exposed
+from that module as its own verdict (top-level, delegated, undetermined),
+because drift-kit's overhead meter decides whether it may resolve at all on
+that verdict (drift-kit/SPEC.md §The overhead meter). It is one verification
+with two readers, never a second copy.
 
 The id derives by a fixed source order, first hit wins, every source ending in
 the same normalization — strip a leading `agent-` token if present, then take

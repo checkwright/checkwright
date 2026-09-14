@@ -79,7 +79,7 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
 bash gate-sdk/bin/run-gates.sh --emit drift-report          # full report: lead/lag rows under the honesty labels
 bash gate-sdk/bin/run-gates.sh --emit drift-report --trend  # one compact line (fragments joined with ·)
 bash gate-sdk/bin/run-gates.sh --emit trajectory   # governed-trajectory table (one row per closed iteration)
-bash gate-sdk/bin/run-gates.sh --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript
+bash gate-sdk/bin/run-gates.sh --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript (a delegated session passes its transcript or stamp id)
 bash gate-sdk/bin/run-gates.sh --emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
 ```
 

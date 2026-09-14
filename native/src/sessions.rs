@@ -92,18 +92,60 @@ fn pick(newest: &mut Option<(String, SystemTime)>, pattern: &str) {
     }
 }
 
+// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the child-flag verification as its own verdict.
+// `Delegated` carries the narrowed scan's newest pick, which is source 3's answer and never the
+// delegated session's own transcript: the overhead meter must not measure it.
+pub enum Delegation {
+    TopLevel(String),
+    Delegated(String),
+    Undetermined,
+}
+
+pub fn delegation(i: &Inputs) -> Delegation {
+    if i.harness_id.is_empty() {
+        return Delegation::Undetermined;
+    }
+    if i.child.is_empty() {
+        return Delegation::TopLevel(i.harness_id.clone());
+    }
+    let dir = sessions_dir(i);
+    let mut newest: Option<(String, SystemTime)> = None;
+    pick(
+        &mut newest,
+        &format!("{}/{}/subagents/*.jsonl", dir, i.harness_id),
+    );
+    if let Some((path, _)) = newest {
+        return Delegation::Delegated(path);
+    }
+    if std::path::Path::new(&top_level(&dir, &i.harness_id)).exists() {
+        return Delegation::TopLevel(i.harness_id.clone());
+    }
+    Delegation::Undetermined
+}
+
+pub fn top_level(dir: &str, harness_id: &str) -> String {
+    format!("{}/{}.jsonl", dir, harness_id)
+}
+
+pub fn newest(i: &Inputs) -> Option<String> {
+    let dir = sessions_dir(i);
+    let mut newest: Option<(String, SystemTime)> = None;
+    for g in candidate_globs(&dir) {
+        pick(&mut newest, &g);
+    }
+    newest.map(|(p, _)| p)
+}
+
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order and its exit-2 refusals,
 // returning the *winning path* rather than the normalized key, so a caller needing the transcript
 // does not re-glob for the id it was handed. `key` is the identity on the two early returns.
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the child-narrowed scan verifies the flag
-// rather than trusting it: an empty narrowed scan with a top-level transcript for the env uuid
-// marks the flag spurious and falls back to source 2.
 pub fn resolve(i: &Inputs) -> Result<String, String> {
     if !i.session_id.is_empty() {
         return Ok(i.session_id.clone());
     }
-    if i.child.is_empty() && !i.harness_id.is_empty() {
-        return Ok(i.harness_id.clone());
+    let verdict = delegation(i);
+    if let (Delegation::TopLevel(id), true) = (&verdict, i.child.is_empty()) {
+        return Ok(id.clone());
     }
     let dir = sessions_dir(i);
     if !std::path::Path::new(&dir).is_dir() {
@@ -113,37 +155,24 @@ pub fn resolve(i: &Inputs) -> Result<String, String> {
             dir
         ));
     }
-    let narrowed = !i.child.is_empty() && !i.harness_id.is_empty();
-    let mut newest: Option<(String, SystemTime)> = None;
-    if narrowed {
-        pick(
-            &mut newest,
-            &format!("{}/{}/subagents/*.jsonl", dir, i.harness_id),
-        );
-    } else {
-        for g in candidate_globs(&dir) {
-            pick(&mut newest, &g);
-        }
+    match verdict {
+        Delegation::TopLevel(id) => Ok(top_level(&dir, &id)),
+        Delegation::Delegated(path) => Ok(path),
+        Delegation::Undetermined if !i.harness_id.is_empty() => Err(format!(
+            "no subagent transcript under {}/{}/subagents and no top-level {}\n  help: confirm \
+             this is the right sessions dir (LIFECYCLE_KIT_SESSIONS_DIR).",
+            dir,
+            i.harness_id,
+            top_level(&dir, &i.harness_id)
+        )),
+        Delegation::Undetermined => newest(i).ok_or_else(|| {
+            format!(
+                "no transcript (*.jsonl) under {}\n  help: confirm this is the right sessions \
+                 dir (LIFECYCLE_KIT_SESSIONS_DIR).",
+                dir
+            )
+        }),
     }
-    let Some((path, _)) = newest else {
-        if narrowed {
-            let top = format!("{}/{}.jsonl", dir, i.harness_id);
-            if std::path::Path::new(&top).exists() {
-                return Ok(top);
-            }
-            return Err(format!(
-                "no subagent transcript under {}/{}/subagents and no top-level {}\n  help: \
-                 confirm this is the right sessions dir (LIFECYCLE_KIT_SESSIONS_DIR).",
-                dir, i.harness_id, top
-            ));
-        }
-        return Err(format!(
-            "no transcript (*.jsonl) under {}\n  help: confirm this is the right sessions dir \
-             (LIFECYCLE_KIT_SESSIONS_DIR).",
-            dir
-        ));
-    };
-    Ok(path)
 }
 
 // spec: drift-kit/SPEC.md §The stage-economics meter — the inverse lookup: which transcript does

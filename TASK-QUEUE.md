@@ -12,36 +12,6 @@
 
 ## New Features
 
-- **overhead-meter-resolves-the-newest-transcript-not-its-own** [spec: SPEC-overhead-self.md]
-  — a bare `--emit overhead-meter` resolves the NEWEST candidate transcript, so any session that
-  delegates and then meters measures its child; the close stage is that session by construction.
-  **Measured, not inferred.** Run 2026-09-06 while a dispatched grandchild was live, the bare arm
-  resolved a session whose id prefixes the live GRANDCHILD's agent id — total=171739, 54 per cent
-  governance — rather than the metering close session's. Passing the close session's transcript
-  explicitly then measured total=1605018, 76 per cent governance: a 22-point spread on the one
-  number the health triad's third member reads.
-  **The SPEC and the implementation disagree.** drift-kit/SPEC.md §The overhead meter says a bare
-  invocation resolves "the transcript the invoking session is itself running in"; the implemented
-  rule is the two-tier scan's NEWEST CANDIDATE WINS, and even a top-level session discards its
-  harness id before scanning.
-  **Decided, 2026-09-14 — the lead's decision from the intent oracle, not an operator direction or
-  ruling:** a delegated session must pass the operand (a transcript path or a stamp `session8`),
-  and a bare invocation there prints an exit-0 notice and logs nothing. Grounds: the
-  descendant-exclusion and stamp-anchored shapes each print a plausible wrong total in a case the
-  reading cannot show. A top-level session resolves exactly through its harness id (spec's own
-  call). Probed at spec: no environment variable names a child's own id, and every descendant
-  transcript sits flat beside it.
-  **Cost while deferred:** `kpi-overhead`'s trailing window silently absorbs subagent rows in place
-  of close rows, and `.claude/commands/close.md`'s health triad reads its third member off a
-  population it was not defined over. Honest limit: only this one firing is measured.
-  **Product-class under the 2026-08-30 witness discriminator, not machinery-class:** drift-kit
-  ships the meter, so an adopter who delegates and then meters receives the same wrong number.
-  Filed 2026-09-06 by the close of `index-runner-hold-release-and-windows-smoke-comparison` into
-  the gap inbox; carried into the next scope's intake and promoted there, so the record is late
-  and says so.
-  **Selected for `evidence-population-fidelity`** — operator direction, 2026-09-14, lead-relayed,
-  in the set `settings-pins-live-suite-coverage` leads; promoted at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -5023,5 +4993,6 @@
 - settings-pins-live-suite-coverage
 - drift-baseline-unnamed-iteration
 - always-loaded-baseline-restamp-unforced
+- overhead-meter-resolves-the-newest-transcript-not-its-own
 
 ## Lessons Learned

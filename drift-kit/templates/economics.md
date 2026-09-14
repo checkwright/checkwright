@@ -10,8 +10,8 @@ iteration just run: what did it cost, where did the cost land, and was the model
 posture worth it. Chain the two reporting tools in order, then read their
 output into one narrative — do not paste the raw tool dumps:
 
-1. **Governance overhead** — `bash gate-sdk/bin/run-gates.sh --emit overhead-meter` on the
-   closing session (drift-kit/SPEC.md §The overhead meter): the governance-versus-task
+1. **Governance overhead** — `bash gate-sdk/bin/run-gates.sh --emit overhead-meter <session-id>` on the
+   closing session, passing its stage stamp id (a delegated session must) (drift-kit/SPEC.md §The overhead meter): the governance-versus-task
    byte proxy for this session.
 2. **Stage economics** — `bash gate-sdk/bin/run-gates.sh --emit stage-economics` (drift-kit/SPEC.md
    §The stage-economics meter): real spend by stage × model × iteration, priced

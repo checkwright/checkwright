@@ -15,7 +15,7 @@ gate-sdk/bin/run-gates.sh --lesson-sink <tag>`, which resolves the sink from the
     close-surface: .workflow/essay-harvest.md advisory reclaim=: > .workflow/essay-harvest.md
 
 **housekeeping** — measure, then triage. First meter this closing session with
-the `--emit overhead-meter` arm, whose invocation and byte-proxy contract
+`--emit overhead-meter <session-id>`, passing this session's own `close` stamp id, whose invocation and byte-proxy contract
 drift-kit/SPEC.md §The overhead meter owns: it logs the governance-vs-task
 proportion, the per-session producer feeding `kpi-overhead`. The drain's commit
 message states the health triad beside its `qnet` fragment — `qnet`, the

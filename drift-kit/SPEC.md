@@ -676,15 +676,27 @@ battery stays the outer backstop (gate-sdk/SPEC.md §Enforcement tiers).
 
 ## The overhead meter
 
-`--emit overhead-meter [transcript.jsonl]` measures the methodology's own cost,
+`--emit overhead-meter [transcript.jsonl | session8]` measures the methodology's own cost,
 so efficiency claims cut both ways: what fraction of a session's volume is
 governance (gate output, hook payloads, stage ritual, governed-doc reads)
-versus task work. A bare invocation resolves **the transcript the invoking
-session is itself running in**, under `DRIFT_KIT_SESSIONS_DIR`: a delegated
-session resolves its own subagent transcript rather than its lead's, and every
-other session takes the two-tier scan whose newest candidate wins. The tool is
+versus task work. `[transcript.jsonl | session8]` — the operand names the
+transcript by path or by a stamp's eight-character session id, resolved through
+the shared inverse lookup. A bare invocation measures **only a transcript it can
+identify**: a top-level session measures `<sessions-dir>/<harness-id>.jsonl`
+under `DRIFT_KIT_SESSIONS_DIR`. A **delegated** session — the shared verdict of
+lifecycle-kit/SPEC.md §bin/session-id.sh — prints a notice and logs nothing,
+because nothing in its environment names its own transcript and every
+descendant's transcript sits beside it. So a delegated caller passes the
+operand, usually its own stage stamp's id. A session whose harness exports no id
+falls back to the newest-candidate scan, and the reading says it did; so does a
+session whose child flag is set while neither its subagent tier nor a top-level
+transcript exists for its id, the report's first line naming which. The tool is
 advisory by construction — exit is always 0 and it never joins `gates.list`, and
-a missing transcript is a 0-exit notice, not a failure.
+a missing transcript is a 0-exit notice, not a failure. The refusal at a
+delegated session is preferred over two ways of keeping the bare invocation:
+excluding descendants through the harness meta layer, and anchoring on the last
+lifecycle stamp. Both print a plausible wrong total in a case the reading cannot
+show.
 
 **The series splits at 2026-09-05, and the log gains no field saying so.** Before
 that date the resolution was a flat-tier glob, so every logged key is a
@@ -739,7 +751,8 @@ arrives on a value struct, so **drift-kit still resolves its own knob** —
 `DRIFT_KIT_SESSIONS_DIR` — and hands the answer in; the sharing happens *below*
 the config layer, and post-port there is no `bin/` contract left to import, both
 tools being arms of one binary. The module exposes the normalization, the
-sessions-dir resolution, the delegation-aware `resolve` (which returns the
+sessions-dir resolution, the delegation verdict the bare invocation branches
+on, the delegation-aware `resolve` (which returns the
 winning **path**, so a caller needing the transcript does not re-glob for the id
 it was handed) and their composition `key`, over one private two-tier candidate
 glob that `resolve` and the sibling meter's `find` both walk — which is what
@@ -757,7 +770,7 @@ the four categories), and the field-removal rule reaches a field nothing reads a
 all.
 
 The producer of the log is the consumer's close-stage binding — this repo's
-`.claude/commands/close.md` invokes the arm on the closing session (consumer
+`.claude/commands/close.md` invokes the arm with the closing session's stamp id (consumer
 config, not a lifecycle-kit change) — and any session may invoke it ad hoc. All
 three knobs carry working defaults, so the enabling config ships on by default,
 and the sessions-dir default matches the harness layout this repo already reads
