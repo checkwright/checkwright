@@ -4962,6 +4962,4 @@
 
 ## Done
 
-- couples-caution-unreachable-by-pointer
-
 ## Lessons Learned
