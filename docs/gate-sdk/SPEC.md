@@ -17816,7 +17816,8 @@ diagnostic, a debug rendering or a test fixture — would have put consumer
 vocabulary inside the crate, and no committed case would catch it, because no case
 inspects intermediate state. `func:` is inert on every pair in this tree (thin hook
 scripts source a kit lib and delegate, declaring no functions); the surface's
-whole bite comes from the other three classes, which are non-empty on every file.
+whole bite comes from the other three classes, which are non-empty on every pair
+in this tree.
 
 **The three assertions.**
 
@@ -17848,17 +17849,10 @@ prose or logic, so a consumer rewording a message, reordering rules, or adding
 steering text triggers nothing. It fires only when a declared contract element
 appears on one side unexplained.
 
-**Ported to the binary substrate.** Two behaviours the
-port **reproduces rather than repairs**, on the rule that a refusal the shell form
-never made is a verdict change across the seam. The gate **refuses outright** —
-exit 2, the fail-closed message — on a paired file carrying no
-knob-with-default idiom at all, reporting *could not classify* where the honest
-verdict is *no knobs*. It fails *closed*, which is
-what makes reproducing it safe-but-wrong rather than dangerous, and the tree is
-green only because the two knob-less files in its corpus are excluded by the
-`*-config.sh` rule before the call. And the `lib:` class matches what the bullet
-above now says it matches. The refusal is filed as its own unit rather than
-repaired here.
+**A paired file carrying no knob-with-default idiom has an empty `knob:` class**,
+as any class may be empty, and its pair is compared on the other three — never a
+refusal of the whole gate. **Ported to the binary substrate**, the `lib:` class
+matches what the bullet above says it matches.
 
 **Its root default is a derivation no injected case can reach**, since every
 committed case passes an explicit root — so the discharge is a sibling harness,
@@ -17876,7 +17870,7 @@ precisely what B and C split between them. The fixture pair **synthesizes** the
 one-sided edit rather than capturing one: the tree's own attesting divergence is
 already repaired, so `good/` proves green-on-a-sanctioned-`spec:`-prose-difference
 (alongside an unpaired template and a divergent `*-config.sh` pair, proving both
-scope exclusions) and `bad/` proves all three assertions red on a hand-edited
+scope exclusions, and a knob-less pair counted as compared) and `bad/` proves all three assertions red on a hand-edited
 copy. Tier `precommit`.
 
 ### The harness-template port disposition

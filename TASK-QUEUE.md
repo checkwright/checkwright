@@ -29,24 +29,6 @@
 
 ## Technical Debt
 
-- **template-copy-parity-knobless-refusal** — `check-template-copy-parity` refuses the whole gate
-  at exit 2 on any paired file carrying no knob-with-default idiom.
-  **The behavior, reproduced by execution at the drain rather than read.** When a paired file
-  carries no knob-with-default token at all, the surface derivation reports *could not classify*
-  rather than *no knobs*, and the fail-closed wrapper turns that into exit 2 for the whole gate,
-  with a message naming an internal step rather than the file.
-  **The tree is green by exclusion, not by correctness.** The two knob-less files in the corpus
-  are dropped before the derivation runs — one by the `*-config.sh` rule, one by being unpaired.
-  Vendoring an unpaired knob-less template into the gates dir turns every run into that refusal.
-  **The seam question that held it is moot, re-verified 2026-09-14 at scope.** It asked how a
-  repaired verdict lands on both substrates at once; no shell form remains (`gate-sdk/checks/`
-  carries only the `.gate` descriptor), so the repair lands on one.
-  **Deliverable:** a knob-less file yields an empty knob class, a fixture case vendors a
-  knob-less template, and gate-sdk/SPEC.md §check-template-copy-parity's reproduced-refusal
-  sentence is retired in the same commit.
-  Filed 2026-08-19 by close from the gap inbox; promoted at `config-bridge-floor`'s scope —
-  operator direction, 2026-09-14, lead-relayed.
-
 ## Deferred
 
 - **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
@@ -4994,5 +4976,6 @@
 
 - bridge-owning-kit-partition-forks-per-knob
 - run-knob-union-selector-narrowing
+- template-copy-parity-knobless-refusal
 
 ## Lessons Learned

@@ -1,1 +1,1 @@
-TEMPLATE-COPY-PARITY: clean (1 template<->copy pair(s)
+TEMPLATE-COPY-PARITY: clean (2 template<->copy pair(s)

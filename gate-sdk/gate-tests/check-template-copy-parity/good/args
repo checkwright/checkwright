@@ -4,5 +4,7 @@
 # surface (case-arm exit tokens, lib calls, knob names) is identical, so B and C
 # are both silent. This is the live agent-budget-guard pair's shape, synthesized:
 # the tree's own pair is already repaired, so green-on-sanctioned is proven here
-# rather than captured.
+# rather than captured. A second pair, session-note.sh, carries no knob-with-default
+# idiom on either side: its knob class is empty and it counts as a compared pair,
+# which is what the expected pair count of 2 asserts.
 .

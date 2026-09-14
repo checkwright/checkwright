@@ -100,9 +100,8 @@ fn matches_in<'a>(re: &Ere, line: &'a str) -> Vec<&'a str> {
 // spec: gate-sdk/SPEC.md §check-template-copy-parity — the declared surface: four classes of
 // *declaration*, never content; the `case` arm's pattern is discarded rather than captured,
 // which is a privacy boundary and not a parsing convenience
-fn declared_surface(g: &Grammar, text: &str) -> (Vec<String>, bool) {
+fn declared_surface(g: &Grammar, text: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
-    let mut knob_hit = false;
 
     for line in text.lines() {
         if g.func.is_match(line) {
@@ -160,7 +159,6 @@ fn declared_surface(g: &Grammar, text: &str) -> (Vec<String>, bool) {
 
     for line in text.lines() {
         for m in matches_in(&g.knob, line) {
-            knob_hit = true;
             let name = m
                 .trim_start_matches("${")
                 .trim_end_matches(['-', '='])
@@ -171,7 +169,7 @@ fn declared_surface(g: &Grammar, text: &str) -> (Vec<String>, bool) {
 
     out.sort();
     out.dedup();
-    (out, knob_hit)
+    out
 }
 
 // spec: gate-sdk/SPEC.md §check-template-copy-parity — the captured group is the name, so the
@@ -271,23 +269,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
             ));
         }
 
-        // spec: gate-sdk/SPEC.md §check-template-copy-parity — the fail-closed refusal a file
-        // carrying no knob-with-default idiom triggers is reproduced rather than repaired: it is a
-        // verdict the shell form makes, and a port that stopped making it would change the verdict
-        let (t_surface, t_knob) = declared_surface(&g, &tpl_text);
-        if !t_knob {
-            return Err(
-                "declared_surface exited 1 — the check could not run; treating as failure (not clean)"
-                    .to_string(),
-            );
-        }
-        let (c_surface, c_knob) = declared_surface(&g, &copy_text);
-        if !c_knob {
-            return Err(
-                "declared_surface exited 1 — the check could not run; treating as failure (not clean)"
-                    .to_string(),
-            );
-        }
+        let t_surface = declared_surface(&g, &tpl_text);
+        let c_surface = declared_surface(&g, &copy_text);
 
         let missing: Vec<&String> = t_surface.iter().filter(|t| !c_surface.contains(t)).collect();
         if !missing.is_empty() {
