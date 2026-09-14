@@ -6,3 +6,4 @@
 
 config-seam-second-cut scope a88aa849 2026-09-14 ccd5df65
 config-seam-second-cut spec abd7ed2a 2026-09-14 324b4733
+config-seam-second-cut align abe55ea9 2026-09-14 8c7a8edb
