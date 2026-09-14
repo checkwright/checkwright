@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: config-seam-second-cut
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -93,6 +93,11 @@
   every native-Windows adopter carries a bash floor the install docs attribute to git alone.
   Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
   `static-config-seam`, demoted at landing as a corpus increment.
+  **Cut 2 leads `config-seam-second-cut`: queue-kit and lifecycle-kit move to knob files** —
+  operator direction, 2026-09-14, lead-relayed; stays Deferred for spec to author and pair.
+  Their consumer configs need no unruled shape, but spec rules three things the probe found: both
+  libraries derive defaults from still-bridged gate-sdk layout knobs, `queue-kit/lib/queue.sh`
+  appends a required section conditionally, and both kits ship the first config templates.
 
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
@@ -4550,6 +4555,8 @@
   start-to-finish read of one list item reaches it.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its gate-manifest
   pointer sweep; drained and promoted at this iteration's scope.
+  **Rides `config-seam-second-cut` beside config-seam-static-format's cut 2** — operator direction,
+  2026-09-14, lead-relayed; stays Deferred for spec to author and pair.
 
 - **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
@@ -4682,6 +4689,21 @@
   **Cost while deferred:** that walk stays `?`, skipped by `check-reads-couples` and outside
   its coverage assertion.
   Filed 2026-09-13 by build, beside the projection class; drained and promoted 2026-09-13 at close.
+
+- **release-binary-archive-versioned-name** [design-pending] [cost: event/low] [surface: installer]
+  — each per-target gate binary reaches the Release as a bare `checkwright-gates-<target>` plus its
+  `.sha256`, carrying no release version, so a hand download cannot tell releases apart.
+  **To consider, not a commitment** (operator direction, 2026-09-14, lead-relayed): ship each target
+  as one versioned archive holding the binary and its `.sha256` under their unchanged filenames.
+  **Refused:** renaming the binary or its sidecar, since every vendored reference and the upgrade
+  path key on them; the binary name itself stays.
+  **Why `[design-pending]`:** the reach is unpriced — the installer bootstraps' asset lookup and
+  digest verification (the digest's out-of-payload source is the release asset), `publish.yml`'s
+  release job, the install-smoke legs and RELEASING.md.
+  **Cost while deferred:** a hand-downloaded binary carries no version a reader can see, so telling
+  two releases' assets apart costs a digest comparison.
+  Surfaced 2026-09-14 by the lead into the gap inbox, after `config-bridge-floor`'s close; promoted
+  at this iteration's scope.
 
 ## Icebox
 
