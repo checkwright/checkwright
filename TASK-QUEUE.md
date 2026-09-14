@@ -12,6 +12,52 @@
 
 ## New Features
 
+- **config-seam-static-format** [spec: SPEC-knob-files-cut-2.md] — the knob seam
+  is still executable bash for every bridged kit: a knob's value is computed by sourcing the owning
+  kit's `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh),
+  so the battery, hook generation and every harness hook enter through bash before the binary runs.
+  **Cut 1 landed at `static-config-seam`:** site-kit and doctrine-kit are static, read from knob
+  files in the line grammar with their defaults in-crate (gate-sdk/SPEC.md §The knob file).
+  **Why it needed design:** each remaining kit waits on a shape the grammar has not ruled — a
+  command knob, a knob reference, a generated family, guard-kit's rule content — and gate-sdk
+  migrates last, retiring the bridge; the selection rule and each shape's reason are that section's.
+  **The tension it closes.** TRAJECTORY objective 6 rules a surviving script surface
+  dual-implementable, bash and PowerShell; the runtime bridge is neither and cannot be, since a
+  PowerShell twin is the second producer criterion 6 refuses.
+  **Refused:** a PowerShell twin of the bridge (second producer); porting the files under the
+  present seam (each ruling's ground holds while the seam is bash); a generated knob projection
+  (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
+  **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
+  every native-Windows adopter carries a bash floor the install docs attribute to git alone.
+  Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
+  `static-config-seam`, demoted at landing as a corpus increment.
+  **Cut 2 leads `config-seam-second-cut`: queue-kit and lifecycle-kit move to knob files** —
+  operator direction, 2026-09-14, lead-relayed; a corpus increment, so it demotes at landing.
+  Spec ruled scope's three probe findings and three more authoring found (the amendment's header).
+
+- **couples-caution-unreachable-by-pointer** [spec: SPEC-couples-caution.md]
+  — the `couples=` reader-divergence caution is unreachable by pointer from anywhere a descriptor
+  author starts, and that is a PLACEMENT finding rather than a request to restate it.
+  **The rule is stated and the error is attested anyway.** gate-sdk/SPEC.md (the `# graph:`
+  manifest) states the divergence and calls reading the field as universal a live error; the
+  attested count is at least FOUR independent readings that derived the trigger-versus-coverage
+  divergence off a `couples=` line by eye and got it wrong, one of which nearly shipped a matcher
+  change flipping `check-reads-couples`' own bad case to exit 0. The count lives in git history and
+  in this entry rather than on the kit surface, since a kit states its rule undated.
+  **PROBED rather than asserted.** The paragraph sits deep in the `couples=` bullet of the manifest
+  grammar, with no sub-heading and no anchor; a live `.gate` descriptor carries only its own
+  `# graph:` and `# spec:` lines and points at neither; gate-sdk/README.md has no `couples=` grammar
+  section. Corrected at spec: a shell skeleton, `gate-sdk/templates/check-skeleton.sh`, does exist.
+  **PARTLY REMEDIATED, and the residue is what is filed.** CLAUDE.md gained a one-line pointer
+  beside its edit-a-gate-manifest-and-regenerate sentence, which reaches a reader who opens the
+  always-loaded file and reaches nobody who opens a descriptor.
+  **RESTATING THE PARAGRAPH ANYWHERE IS REFUSED** — relocating prose behind a tag rather than making
+  it findable is the blessing-a-restatement defect.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its gate-manifest
+  pointer sweep; drained and promoted at this iteration's scope.
+  **Rides `config-seam-second-cut` beside config-seam-static-format's cut 2** — operator direction,
+  2026-09-14, lead-relayed.
+
 ## Technical Debt
 
 ## Deferred
@@ -73,31 +119,6 @@
   kit's resident ask.
   Filed 2026-09-13 by the clause-owner audit behind `resident-tier-restatement`'s Housekeeping
   cut; drained at that iteration's close.
-
-- **config-seam-static-format** [design-pending] [cost: event/high] [surface: gate-sdk] — the knob seam
-  is still executable bash for every bridged kit: a knob's value is computed by sourcing the owning
-  kit's `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh` (gate-sdk/SPEC.md §lib/gate.sh),
-  so the battery, hook generation and every harness hook enter through bash before the binary runs.
-  **Cut 1 landed at `static-config-seam`:** site-kit and doctrine-kit are static, read from knob
-  files in the line grammar with their defaults in-crate (gate-sdk/SPEC.md §The knob file).
-  **Why [design-pending]:** each remaining kit waits on a shape the grammar has not ruled — a
-  command knob, a knob reference, a generated family, guard-kit's rule content — and gate-sdk
-  migrates last, retiring the bridge; the selection rule and each shape's reason are that section's.
-  **The tension it closes.** TRAJECTORY objective 6 rules a surviving script surface
-  dual-implementable, bash and PowerShell; the runtime bridge is neither and cannot be, since a
-  PowerShell twin is the second producer criterion 6 refuses.
-  **Refused:** a PowerShell twin of the bridge (second producer); porting the files under the
-  present seam (each ruling's ground holds while the seam is bash); a generated knob projection
-  (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
-  **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
-  every native-Windows adopter carries a bash floor the install docs attribute to git alone.
-  Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
-  `static-config-seam`, demoted at landing as a corpus increment.
-  **Cut 2 leads `config-seam-second-cut`: queue-kit and lifecycle-kit move to knob files** —
-  operator direction, 2026-09-14, lead-relayed; stays Deferred for spec to author and pair.
-  Their consumer configs need no unruled shape, but spec rules three things the probe found: both
-  libraries derive defaults from still-bridged gate-sdk layout knobs, `queue-kit/lib/queue.sh`
-  appends a required section conditionally, and both kits ship the first config templates.
 
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
@@ -4527,36 +4548,6 @@
   most attention-expensive row.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its retired-block
   read; drained and promoted at this iteration's scope.
-
-- **couples-caution-unreachable-by-pointer** [design-pending] [cost: event/low] [surface: gate-sdk]
-  — the `couples=` reader-divergence caution is unreachable by pointer from anywhere a descriptor
-  author starts, and that is a PLACEMENT finding rather than a request to restate it.
-  **The rule is stated and the error is attested anyway.** gate-sdk/SPEC.md (the `# graph:`
-  manifest) states the divergence and calls reading the field as universal a live error; the
-  attested count is at least FOUR independent readings that derived the trigger-versus-coverage
-  divergence off a `couples=` line by eye and got it wrong, one of which nearly shipped a matcher
-  change flipping `check-reads-couples`' own bad case to exit 0. The count lives in git history and
-  in this entry rather than on the kit surface, since a kit states its rule undated.
-  **PROBED rather than asserted.** The paragraph sits roughly 70 lines into the `couples=` bullet of
-  the long when-a-gate-earns-its-place section, with no sub-heading and no anchor; a live `.gate`
-  descriptor carries only its own `# graph:` and `# spec:` lines and points at neither the paragraph
-  nor the grammar block; gate-sdk/README.md has no `couples=` grammar section; and no
-  gate-authoring template exists. The only route to it is reading that one list item start to
-  finish.
-  **PARTLY REMEDIATED, and the residue is what is filed.** CLAUDE.md gained a one-line pointer
-  beside its edit-a-gate-manifest-and-regenerate sentence, which reaches a reader who opens the
-  always-loaded file and reaches nobody who opens a descriptor.
-  **Why `[design-pending]`:** the caution earning its own sub-heading makes it citable, moving the
-  descriptor grammar to a surface a gate author opens makes it findable, and a second `.gate`
-  `# spec:` pointer makes it reachable from the artifact — three different governed surfaces.
-  **RESTATING THE PARAGRAPH ANYWHERE IS REFUSED** — relocating prose behind a tag rather than making
-  it findable is the blessing-a-restatement defect.
-  **Cost while deferred:** the tree's most-misread field keeps its caution where only a
-  start-to-finish read of one list item reaches it.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its gate-manifest
-  pointer sweep; drained and promoted at this iteration's scope.
-  **Rides `config-seam-second-cut` beside config-seam-static-format's cut 2** — operator direction,
-  2026-09-14, lead-relayed; stays Deferred for spec to author and pair.
 
 - **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
