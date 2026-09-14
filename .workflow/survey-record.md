@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-14 scope — Which unit set does the deferred pool rank first at this boundary, and which kits can config-seam cut 3 migrate?
+- corpus: TASK-QUEUE.md scripts/*-config.sh gate-sdk/SPEC.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: f371e45f1946eed70a8f95fd000b965e1655a7e8
+- finding: No deferred recurrence declaration carries two dates, so no threshold-forced unit. Session-tier leads: config-bridge-resolution-cost (session/high, closes only at the gate-sdk cut, so its route is further config-seam cuts) and couples-dynamic-root-resolution (session/high, blocked by couples-glob-semantics-unowned). Shape inventory: canon-kit carries five command knobs and one same-kit reference (CANON_KIT_MEASURED_SURFACE_GLOBS) and is cited by 24 descriptors; context-kit and delegation-kit carry one command knob each and no descriptor cites them; drift-kit needs a cross-kit reference; evidence-kit a generated family. Timings at this rev: --only check-core-files 103-107 ms, --only check-prose-enum 765-802 ms, --emit enum-sets 63 ms, full battery 71.9 s. Inbound: config-seam-static-format 3, prose-filename-citation-liveness 5, unqualified-section-citation-liveness 3.
+- inferred: The ~700 ms check-prose-enum floor is attributed to canon-kit's bridged resolution by subtraction (arm alone 63 ms), not traced; whether canon's cut removes it is unprobed. context-kit and delegation-kit knob readers are hook and arm paths, judged from zero .gate citations rather than a reader census.
