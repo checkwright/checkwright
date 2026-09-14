@@ -317,9 +317,26 @@ got="$(owner_probe 2>/dev/null)"
 [[ "$got" == "$sandbox/probe-kit" ]] \
     || { echo "  FAIL: knob owner was '$got' (want '$sandbox/probe-kit')"; fails=$((fails + 1)); }
 
+# --- the partition resolves the kit-root set once per call --------------------
+# Each call to the root producer leaves one line in a ledger file, since the
+# producer runs in a process substitution whose variables never reach this shell.
+# Three names across two owners must cost one fill, and still emit in requested
+# order with the gate-sdk-owned name resolved beside the kit's.
+ledger="$sandbox/roots-ledger"
+: >"$ledger"
+got="$( eval "$(declare -f gate_kit_roots | sed '1s/gate_kit_roots/_lib_gate_test_real_roots/')"
+        gate_kit_roots() { echo x >>"$ledger"; _lib_gate_test_real_roots; }
+        GATE_SDK_KIT_DIRS="$sandbox/probe-kit" \
+            gate_knob_env_set check-ported PROBE_KIT_SCALAR GATE_SDK_GATES_DIR PROBE_KIT_SPACED 2>&1 \
+            | cut -d= -f1 | paste -sd'|' - )"
+[[ "$got" == "GATE_SDK_KNOB_PROBE_KIT_SCALAR|GATE_SDK_KNOB_GATE_SDK_GATES_DIR|GATE_SDK_KNOB_PROBE_KIT_SPACED" ]] \
+    || { echo "  FAIL: a multi-owner set resolved as '$got'"; fails=$((fails + 1)); }
+[[ "$(wc -l <"$ledger")" -eq 1 ]] \
+    || { echo "  FAIL: the partition filled the kit-root set $(wc -l <"$ledger") times for one call, want 1"; fails=$((fails + 1)); }
+
 if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the keyed form's derived shape, sorted pairs, first-'=' split, empty map, and its refusals over both halves of a pair; the prefix form over a loop-declared family, its sibling-family exclusion, determinism, empty-family resolution leaving the argv inert, and per-match element refusal; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the keyed form's derived shape, sorted pairs, first-'=' split, empty map, and its refusals over both halves of a pair; the prefix form over a loop-declared family, its sibling-family exclusion, determinism, empty-family resolution leaving the argv inert, and per-match element refusal; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored; the partition filling the kit-root set once per call)"
 exit 0

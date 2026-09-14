@@ -41,16 +41,6 @@
 
 ## Technical Debt
 
-- **bridge-owning-kit-partition-forks-per-knob** — `gate_knob_env_set` (`gate-sdk/lib/gate.sh`)
-  finds each declared name's owning kit through `$(_gate_knob_owning_kit …)`, which forks and
-  re-runs `gate_kit_roots` once per name: 284 ms of the 734 ms a `--run` resolution costs over
-  this tree's 178 names, measured 2026-09-14 at scope (`.workflow/survey-record.md`).
-  **Deliverable:** the kit-root set resolved once per call and the partition computed
-  in-process, emitting the same elements in the same order with the same refusals, and a
-  before/after timing of that resolution in the landing commit.
-  Split out of `config-bridge-resolution-cost` as its cut 1a at `config-bridge-floor`'s scope —
-  operator direction, 2026-09-14, lead-relayed; that entry stays Deferred.
-
 - **template-copy-parity-knobless-refusal** — `check-template-copy-parity` refuses the whole gate
   at exit 2 on any paired file carrying no knob-with-default idiom.
   **The behavior, reproduced by execution at the drain rather than read.** When a paired file
@@ -833,7 +823,7 @@
   **What remains, re-measured 2026-09-14 at scope (`.workflow/survey-record.md`).** A `--only`
   single-gate run costs 755-805 ms whether its kit is static or bridged, since `--run` resolves
   the whole registry's 178 declared names across 8 bridged kits (734 ms). The batch removed
-  per-knob SOURCING only: `gate_knob_env_set` still forks `_gate_knob_owning_kit` per name (284 ms).
+  per-knob SOURCING only: `gate_knob_env_set` forked `_gate_knob_owning_kit` per name until cut 1a.
   **Split at `config-bridge-floor`'s scope — operator direction, 2026-09-14, lead-relayed:** cut 1a
   is `bridge-owning-kit-partition-forks-per-knob` (debt), cut 1b `run-knob-union-selector-narrowing`
   (amendment); this entry keeps the per-kit subshell residue and its closing condition below.
@@ -5013,5 +5003,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- bridge-owning-kit-partition-forks-per-knob
 
 ## Lessons Learned

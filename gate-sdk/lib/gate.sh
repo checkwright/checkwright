@@ -239,19 +239,39 @@ GATE_SDK_COUPLES_KNOB_SENTINEL='@every-couples-knob'
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the owning kit of a bridged knob, derived from the knob's own `<KIT>_` prefix rather than from a maintained knob→kit roster: each gate_kit_roots member's basename, hyphens to underscores and upper-cased, is tried as a prefix. A knob matching no other kit's prefix is gate-sdk's own — the one kit every `.gate` dispatch already runs inside — never a parse error and never a third kit guessed at.
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the configured set is consulted first, then the shipped one: GATE_SDK_KIT_DIRS narrows which kits a battery *scans*, and reading it as the set of kits that *exist* would leave a narrowed run unable to attribute another kit's knob and fail-close on every member that declares one
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the candidates are read to EOF *before* the match loop, never streamed through a `while read` the first prefix hit returns out of: this runs under a stdout capture, so a producer left writing into a closed pipe reports the write error on stderr wherever SIGPIPE is ignored, which §run-gates' capture is what makes dispatch-fatal
 _gate_knob_owning_kit() {
-    local knob="$1" kit base prefix
+    local -a _gkok_cands=()
+    local _gkok_kit
+    _gate_knob_owner_candidates _gkok_cands
+    _gate_knob_owner_match "$1" _gkok_kit "${_gkok_cands[@]}"
+    printf '%s\n' "$_gkok_kit"
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the candidates are read to EOF *before* the match loop, never streamed through a `while read` the first prefix hit returns out of: this runs under a stdout capture, so a producer left writing into a closed pipe reports the write error on stderr wherever SIGPIPE is ignored, which §run-gates' capture is what makes dispatch-fatal
+# spec: gate-sdk/SPEC.md §lib/gate.sh — fills <outvar> with `<prefix><TAB><kit>` pairs in match order, the gate-sdk root last under an empty prefix
+_gate_knob_owner_candidates() {
+    local -n _gkoc_out="$1"
+    local kit base prefix
     local -a kits=()
     mapfile -t kits < <(gate_kit_roots; [[ -n "${GATE_SDK_KIT_DIRS:-}" ]] && _gate_kit_roots_derived)
+    _gkoc_out=()
     for kit in ${kits[@]+"${kits[@]}"}; do
         kit="${kit%/}"
         [[ -n "$kit" ]] || continue
         base="${kit##*/}"
         prefix="${base^^}"; prefix="${prefix//-/_}_"
-        [[ "$knob" == "$prefix"* ]] && { printf '%s\n' "$kit"; return 0; }
+        _gkoc_out+=("$prefix"$'\t'"$kit")
     done
-    gate_sdk_root
+    _gkoc_out+=($'\t'"$(gate_sdk_root)")
+}
+
+_gate_knob_owner_match() {
+    local _gkom_knob="$1" _gkom_c
+    local -n _gkom_out="$2"
+    shift 2
+    for _gkom_c in "$@"; do
+        [[ "$_gkom_knob" == "${_gkom_c%%$'\t'*}"* ]] && { _gkom_out="${_gkom_c#*$'\t'}"; return 0; }
+    done
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — emit one declared knob's bridged element(s) from *inside* an already-sourced per-kit subshell: the trailing `*` selects the prefix family, anything else the scalar/keyed arm derived from `declare -p`. Returns non-zero having named the knob on stderr for each refusal.
@@ -421,7 +441,7 @@ gate_knob_env() {
     gate_knob_env_set "$g" "${names[@]}"
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the declared set resolved **batched by owning kit**: the names are partitioned by _gate_knob_owning_kit, each kit's slice is resolved in one subshell that sources that kit's lib/*.sh once, and the elements are re-emitted in the *requested* order so the argv a caller receives is unchanged by the batching. Split out from gate_knob_env so a caller already holding a name set — the battery front-end resolving the runner's union — shares one implementation of the partition and the ordering.
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the declared set resolved **batched by owning kit**: the names are partitioned by owning kit against a candidate set filled once per call, each kit's slice is resolved in one subshell that sources that kit's lib/*.sh once, and the elements are re-emitted in the *requested* order so the argv a caller receives is unchanged by the batching. Split out from gate_knob_env so a caller already holding a name set — the battery front-end resolving the runner's union — shares one implementation of the partition and the ordering.
 gate_knob_env_set() {
     local g="$1"
     shift
@@ -443,11 +463,12 @@ gate_knob_env_set() {
     done
     [[ ${#names[@]} -gt 0 ]] || return 0
     local -A kit_slice=()
-    local -a kit_order=()
+    local -a kit_order=() owners=()
     local i knob kit
+    _gate_knob_owner_candidates owners
     for i in "${!names[@]}"; do
         knob="${names[$i]}"
-        kit="$(_gate_knob_owning_kit "${knob%\*}")"
+        _gate_knob_owner_match "${knob%\*}" kit "${owners[@]}"
         [[ -v kit_slice["$kit"] ]] || kit_order+=("$kit")
         kit_slice["$kit"]+="$i"$'\n'"$knob"$'\n'
     done

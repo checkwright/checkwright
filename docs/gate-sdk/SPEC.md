@@ -9320,8 +9320,10 @@ Resolution, per declared knob:
   is read after every library has been sourced, so a kit whose knob is resolved
   by one library and consumed by another is carried correctly.
 - **Resolution is batched by owning kit: one subshell per kit per call, not one
-  per declared knob.** The declared set is partitioned by
-  `_gate_knob_owning_kit`, each kit's slice is resolved inside a single subshell
+  per declared knob.** The declared set is partitioned by owning kit in-process:
+  the candidate kit roots and their prefixes are resolved **once per call**, and
+  each name is matched against them with no fork, so the partition costs the same
+  whether a call carries one name or the registry union. Each kit's slice is resolved inside a single subshell
   that sources that kit's `lib/*.sh` once, and the elements are re-emitted in the
   **requested** order, so the argv a caller receives — and therefore the tracked
   hook it is baked into — is unchanged by the batching.
