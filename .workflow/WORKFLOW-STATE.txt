@@ -4,4 +4,4 @@
 
 ---
 
-— scope a1ac73fc 2026-09-14 8e3a82c1
+config-seam-third-cut scope a1ac73fc 2026-09-14 8e3a82c1

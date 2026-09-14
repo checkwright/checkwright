@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: config-seam-third-cut
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -34,6 +34,9 @@
   holds the rest, is the unit's question.
   **Cost while deferred:** each new static-knob reader, and each kit's cut, can land uncoupled.
   Filed 2026-09-14 by close, from the drain of build's gap bullet.
+  **Rides `config-seam-third-cut` beside config-seam-static-format's cut 3** — operator direction,
+  2026-09-14, lead-relayed; stays Deferred for spec to author and pair. The cut's own exposure is
+  canon-kit's knob readers: 24 descriptors cite a `CANON_KIT_` knob.
 
 - **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
   CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
@@ -116,6 +119,14 @@
   Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
   `static-config-seam` and cut 2 at `config-seam-second-cut`, each demoted at landing as a corpus
   increment.
+  **Cut 3 leads `config-seam-third-cut`: canon-kit, context-kit, delegation-kit and drift-kit move
+  to knob files** — operator direction, 2026-09-14, lead-relayed; stays Deferred for spec to author
+  and pair. It rules two shapes, the command knob and the knob reference. The scope probe found five
+  `*_CMD` knobs in canon's consumer config and one each in context's and delegation's; a same-kit
+  reference in canon's (`CANON_KIT_MEASURED_SURFACE_GLOBS`) and drift's cross-kit read, whose
+  helper retires; and canon's `GATE_SDK_RESOLVING_KNOB` gating, which the command-knob shape
+  retires. `check-prose-enum` reads about 700 ms above `check-core-files` through canon's bridged
+  resolution; whether the cut removes it is spec's probe, unmeasured here.
 
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
@@ -4692,6 +4703,22 @@
   two releases' assets apart costs a digest comparison.
   Surfaced 2026-09-14 by the lead into the gap inbox, after `config-bridge-floor`'s close; promoted
   at this iteration's scope.
+
+- **docs-cmd-retired-path-blind-to-queue** [design-pending] [cost: event/low] [surface: canon-kit]
+  — canon-kit/SPEC.md §check-docs-cmd assertion (C) cannot see a retired path cited from the queue,
+  from two sides: its corpus is the manifest set, which excludes TASK-QUEUE.md, and a
+  `<path>:<line>[,<line>]` token fails the path shape because `:` is outside the segment class.
+  **Attested once:** two Deferred bodies cited deleted kit libraries in that form after
+  `config-seam-second-cut` and stayed green; that close found them by grep and corrected them.
+  **Why `[design-pending]`:** the candidate trims a trailing line suffix before the shape test and
+  reads the queue's live sections, and the alternative is a stated reason the queue stays out.
+  Which, and whether the queue's retired-work citations then need an exemption, is the call.
+  **DISTINCT from the iceboxed `queue-citation-line-number-stales-within-its-own-session`**, where
+  the cited file lives and only its line number drifts; here the whole path is retired.
+  **Cost while deferred:** each kit-library retirement can strand a queue citation that reads live
+  until a hand grep finds it.
+  Filed 2026-09-14 by `config-seam-second-cut`'s close into the gap inbox, from its
+  stale-identifier-after-retirement audit; promoted at this iteration's scope.
 
 ## Icebox
 
