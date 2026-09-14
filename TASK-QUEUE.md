@@ -4928,8 +4928,4 @@
 
 ## Done
 
-- static-knob-file-couple-underived
-- spec-prune-normalisation-shell-oracle
-- spec-lib-dead-derivation
-
 ## Lessons Learned
