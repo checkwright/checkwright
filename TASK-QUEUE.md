@@ -95,6 +95,36 @@
   ruled together with `drift-baseline-unnamed-iteration`; promoted at spec.
   recurrence: always-loaded-baseline-restamp-unforced 2026-09-12
 
+- **overhead-meter-resolves-the-newest-transcript-not-its-own** [spec: SPEC-overhead-self.md]
+  — a bare `--emit overhead-meter` resolves the NEWEST candidate transcript, so any session that
+  delegates and then meters measures its child; the close stage is that session by construction.
+  **Measured, not inferred.** Run 2026-09-06 while a dispatched grandchild was live, the bare arm
+  resolved a session whose id prefixes the live GRANDCHILD's agent id — total=171739, 54 per cent
+  governance — rather than the metering close session's. Passing the close session's transcript
+  explicitly then measured total=1605018, 76 per cent governance: a 22-point spread on the one
+  number the health triad's third member reads.
+  **The SPEC and the implementation disagree.** drift-kit/SPEC.md §The overhead meter says a bare
+  invocation resolves "the transcript the invoking session is itself running in"; the implemented
+  rule is the two-tier scan's NEWEST CANDIDATE WINS, and even a top-level session discards its
+  harness id before scanning.
+  **Decided, 2026-09-14 — the lead's decision from the intent oracle, not an operator direction or
+  ruling:** a delegated session must pass the operand (a transcript path or a stamp `session8`),
+  and a bare invocation there prints an exit-0 notice and logs nothing. Grounds: the
+  descendant-exclusion and stamp-anchored shapes each print a plausible wrong total in a case the
+  reading cannot show. A top-level session resolves exactly through its harness id (spec's own
+  call). Probed at spec: no environment variable names a child's own id, and every descendant
+  transcript sits flat beside it.
+  **Cost while deferred:** `kpi-overhead`'s trailing window silently absorbs subagent rows in place
+  of close rows, and `.claude/commands/close.md`'s health triad reads its third member off a
+  population it was not defined over. Honest limit: only this one firing is measured.
+  **Product-class under the 2026-08-30 witness discriminator, not machinery-class:** drift-kit
+  ships the meter, so an adopter who delegates and then meters receives the same wrong number.
+  Filed 2026-09-06 by the close of `index-runner-hold-release-and-windows-smoke-comparison` into
+  the gap inbox; carried into the next scope's intake and promoted there, so the record is late
+  and says so.
+  **Selected for `evidence-population-fidelity`** — operator direction, 2026-09-14, lead-relayed,
+  in the set `settings-pins-live-suite-coverage` leads; promoted at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -651,41 +681,6 @@
   Filed 2026-09-08 by close from the gap inbox. Promoted rather than fixed because it is an
   envelope question the operator has already declined once in its wider form; promoted rather than
   iceboxed because the coupling is structural and inherited, which no single green run retires.
-
-
-- **overhead-meter-resolves-the-newest-transcript-not-its-own** [design-pending] [cost: iteration/high] [surface: drift-kit] — a bare
-  `--emit overhead-meter` resolves the NEWEST candidate transcript, so any session that delegates
-  and then meters measures its child; the close stage is that session by construction.
-  **Measured, not inferred.** Run 2026-09-06 while a dispatched grandchild was live, the bare arm
-  resolved a session whose id prefixes the live GRANDCHILD's agent id — total=171739, 54 per cent
-  governance — rather than the metering close session's. Passing the close session's transcript
-  explicitly then measured total=1605018, 76 per cent governance: a 22-point spread on the one
-  number the health triad's third member reads.
-  **The SPEC and the implementation disagree.** drift-kit/SPEC.md §The overhead meter says a bare
-  invocation resolves "the transcript the invoking session is itself running in", and that "a
-  delegated session resolves its own subagent transcript rather than its lead's". The implemented
-  rule is the two-tier scan's NEWEST CANDIDATE WINS, and a live child is always newer than its
-  parent, so the two readings coincide only where nothing was delegated.
-  **The close stage loses that race by construction:** the housekeeping binding tells it to meter
-  itself, and delegation is pre-authorized for the sweeps it runs first.
-  **Why `[design-pending]`:** two shapes, and they are not one. (a) Teach the resolver
-  session-ancestry — exclude a transcript whose agent id descends from the invoking session — which
-  needs a descendant test the two-tier scan does not have. (b) Rule the bare invocation
-  under-determined at a delegating session and make the transcript operand required there, which is
-  cheap and moves the burden onto every caller. The SPEC sentence changes either way, so the
-  amendment is the unit rather than a wording fix beside a patch.
-  **Cost while deferred:** `kpi-overhead`'s trailing window silently absorbs subagent rows in place
-  of close rows, and `.claude/commands/close.md`'s health triad reads its third member off a
-  population it was not defined over. Honest limit: only this one firing is measured, so whether
-  every prior close metered itself correctly is unread.
-  **Product-class under the 2026-08-30 witness discriminator, not machinery-class:** drift-kit
-  ships the meter, so an adopter who delegates and then meters receives the same wrong number off
-  the same SPEC sentence — the payload witnesses it, wherever the fix lands.
-  Filed 2026-09-06 by the close of `index-runner-hold-release-and-windows-smoke-comparison` into
-  the gap inbox, which no stage of that iteration could drain; carried into this iteration's scope
-  intake and promoted here, so the record is late and says so.
-  **Selected for `evidence-population-fidelity`** — operator direction, 2026-09-14, lead-relayed,
-  in the set `settings-pins-live-suite-coverage` leads; spec promotes.
 
 - **measured-marker-cannot-sit-mid-paragraph** [design-pending] [cost: event/low] [surface: canon-kit] — `check-measured-claim` binds its
   marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
