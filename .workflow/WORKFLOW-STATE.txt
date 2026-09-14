@@ -6,3 +6,4 @@
 
 config-seam-fourth-cut scope a6085f55 2026-09-14 738e8f4c
 config-seam-fourth-cut spec a96a2ce0 2026-09-14 1ac39cef
+config-seam-fourth-cut align a73d2672 2026-09-14 0f1f34a8
