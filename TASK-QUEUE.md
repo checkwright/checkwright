@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: config-seam-fourth-cut
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -132,6 +132,14 @@
   Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
   `static-config-seam`, cut 2 at `config-seam-second-cut` and cut 3 at `config-seam-third-cut`, each
   demoted at landing as a corpus increment.
+  **Cut 4 leads `config-seam-fourth-cut` and finishes the seam: evidence-kit and guard-kit move to
+  knob files, then gate-sdk last, retiring the bridge** — operator direction, 2026-09-14,
+  lead-relayed, taken with a partial landing named as a real risk; stays Deferred for spec to author
+  and pair. It rules the generated family (evidence-kit's per-suite `RUN_`/`PARSER_` knobs over
+  `gate_fixture_suites`) and guard-kit's rule content. The scope probe found keyed knobs only in
+  those two kits (`EVIDENCE_KIT_SCENARIO_GLOBS`, `GUARD_KIT_BREADTH_DECLARED`,
+  `GUARD_KIT_RO_FORMS`), guard's shell hook sourcing its config directly while four crate emitters
+  read its knobs, and gate-sdk's consumer config holding four scalars.
 
 - **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
@@ -822,20 +830,21 @@
   **Nothing else owns the residue.** The surviving `bash` spawn is owned by gate-sdk/SPEC.md
   §gen-pre-commit, where its disposition is recorded, and was ruled 2026-08-23 not to fall to this
   port — only its price did.
-  **The nested bridge survives the cuts.** Cut B's enum-sets port made `CANON_KIT_ENUM_SETS_CMD`'s
-  value a bridged arm that re-sources `lib/gate.sh` and resolves its own knobs before exec'ing the
-  binary, and cut 1b does not reach that inner resolution: `--only check-prose-enum` reads
-  797-806 ms against `check-core-files`' 103, so nearly its whole cost is the inner floor. The
-  commit-hook path pays NOTHING — `gen-pre-commit` bakes the resolved arrays — so the exposure is
-  whole-tree battery runs, that nested `--only` run, and hook regeneration. The repair refused,
-  named so it is not re-derived: an in-process call from the gate to the bundled emitter would
-  resolve the BUNDLED producer for a consumer who configured a different one, which is the
-  extension point that knob exists to protect.
-  **Cost while deferred:** every bare run and nested bridge pays the floor — about 700 ms here,
-  indicative rather than a regression claim and not to be re-quoted without re-running it — and
-  it scales with the number of owning kits rather than of members.
+  **The nested-bridge exposure is gone, and the old figure was not the bridge.** Canon-kit left the
+  bridge at cut 3, so `CANON_KIT_ENUM_SETS_CMD` is a static argv. Re-measured 2026-09-14 at scope:
+  `--only check-prose-enum` reads 0.80 s wrapped and 0.75 s as the bare binary, nearly all user CPU,
+  so its cost is the gate's own compute. The commit-hook path pays NOTHING, since `gen-pre-commit`
+  bakes the resolved arrays, so the exposure is whole-tree battery runs and hook regeneration. The
+  repair refused, named so it is not re-derived: an in-process call from the gate to the bundled
+  emitter would resolve the BUNDLED producer for a consumer who configured a different one, which
+  is the extension point that knob exists to protect.
+  **Cost while deferred:** every bare run pays one bridge subshell per bridged kit, now
+  evidence-kit, guard-kit and gate-sdk; that cost is unmeasured since cut 3 and is spec's probe.
   **Stays Deferred at `static-config-seam`; it closes at `config-seam-static-format`'s gate-sdk cut,
   which retires the bridge** — operator direction, 2026-09-13, lead-relayed, revising scope's.
+  **Rides `config-seam-fourth-cut`, which takes that cut** — operator direction, 2026-09-14,
+  lead-relayed; stays Deferred for spec to author and pair. The figure was corrected in place on a
+  lead decision the same day, and the session/high class stands until spec measures.
   Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;
   re-scoped here after the batch landed, with every retired figure deleted.
   recurrence: config-bridge-resolution-cost 2026-09-03
@@ -2247,6 +2256,10 @@
   Class: lands as a gate assertion, so canon-kit's litmus makes it **debt**.
   Filed 2026-08-16 at spec from the amendment's own residue section; drained and promoted
   2026-08-17 by close.
+  **Rides `config-seam-fourth-cut`, whose bridge retirement dissolves it** — operator direction,
+  2026-09-14, lead-relayed; stays Deferred for spec to author and pair. With no bridged kit left,
+  no shell `declare -A` reaches the wire, and a static knob file refuses a line whose form disagrees
+  with the owner's declared shape (gate-sdk/SPEC.md §The knob file).
 
 - **kit-spec-consumer-config-literal** [design-pending] [cost: event/high] [surface: gate-sdk] — nothing stops a kit SPEC from spelling
   out a value that belongs to a consumer's config, so the seam leaks by worked example.
@@ -4471,6 +4484,9 @@
   ranking keeps re-surfacing them.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its prompt-friction
   triage; drained and promoted at this iteration's scope.
+  **Rides `config-seam-fourth-cut` beside guard-kit's cut** — operator direction, 2026-09-14,
+  lead-relayed; stays Deferred for spec to author and pair. Its seam question, kit-generic or
+  consumer config, is the one that cut rules for guard-kit's rule content.
 
 - **retired-block-admits-live-gate-name** [design-pending] [cost: session/low] [surface: queue-kit]
   — the `queue-edges` retired block admits a live GATE NAME as a retired queue slug, and that false
@@ -4580,6 +4596,9 @@
   fixture scratch into its own tree.
   **Stays Deferred and unranked at `static-config-seam`'s scope** — operator direction, 2026-09-13,
   lead-relayed; it is disposed at landing if `config-seam-static-format` dissolves it.
+  **Rides `config-seam-fourth-cut`, whose gate-sdk cut dissolves it** — operator direction,
+  2026-09-14, lead-relayed; stays Deferred for spec to author and pair. `GATE_SDK_TMP_DIR` is the
+  attested bridged scalar, and gate-sdk/SPEC.md §The knob file puts the environment above the file.
   Filed 2026-09-12 by build, beside a SPEC re-grounding; promoted unranked 2026-09-13 at close.
 
 - **scan-prompts-grant-test-redirect-blind** [design-pending] [cost: event/low] [surface: guard-kit]

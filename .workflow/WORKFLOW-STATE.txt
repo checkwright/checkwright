@@ -4,4 +4,4 @@
 
 ---
 
-— scope a6085f55 2026-09-14 738e8f4c
+config-seam-fourth-cut scope a6085f55 2026-09-14 738e8f4c
