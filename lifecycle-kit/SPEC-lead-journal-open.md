@@ -142,7 +142,7 @@ honest limit remains. The limit gains one sentence. **Not yet applied:**
 
 The template states no grounds. The grounds are delta 2's and §templates/lead.md's.
 
-### (4) §templates/lead.md stops saying the lead invokes no `--enter-stage`
+### (4) §templates/lead.md, and the template's own opening, stop saying the lead invokes no `--enter-stage`
 
 lifecycle-kit/SPEC.md §templates/lead.md says the template "invokes no `--enter-stage`". That was
 already imprecise, since the template runs `--enter-stage --simulate` before every dispatch, and
@@ -150,6 +150,14 @@ this amendment adds a second non-stamping form. The clause becomes "stamps nothi
 `--enter-stage` — it runs only the non-stamping `--simulate` and `--open-lead-journal` forms"
 {mechanical}. The paragraph naming the lead's first step, *Both of the lead's scratch artifacts
 outlive the iteration*, gains the opener beside the session-role marker. **Not yet applied.**
+
+The template restates the same clause of itself, in its own opening paragraph: "It is **not a
+stage skill**: it invokes no `--enter-stage`, stamps no evidence, moves no cursor, and joins no
+stage roster." — found at this stage's audit, re-verified against `lifecycle-kit/templates/lead.md`
+lines 1-8, since delta 3's three-place list (First step, §Economics, §Closing) does not reach it
+{mechanical}. It becomes, word for word with the SPEC.md fix above: "It is **not a stage skill**:
+it stamps no evidence, moves no cursor, and joins no stage roster, running `--enter-stage` only in
+its non-stamping `--simulate` and `--open-lead-journal` forms." **Not yet applied.**
 
 ### (5) The front-end usage text and the release declaration
 
@@ -214,7 +222,8 @@ renamed state file. Advisory tooling like `--simulate`, so no fixture pair is ow
   honest limit (delta 2).
 - `lifecycle-kit/SPEC.md` — §templates/lead.md: the *invokes no `--enter-stage`* clause and the
   scratch-artifacts paragraph (delta 4).
-- `lifecycle-kit/templates/lead.md` — first step, §Economics journal bullet, §Closing (delta 3).
+- `lifecycle-kit/templates/lead.md` — first step, §Economics journal bullet, §Closing (delta 3);
+  the opening paragraph's own *invokes no `--enter-stage`* restatement (delta 4).
 - `native/src/emit/enter_stage.rs` — the operand dispatch, the opener, the shared key function,
   the heading constant, the segment-reading advisory and its unit tests (deltas 1, 2 and 6).
 - `native/src/runner.rs` — the usage text's `--enter-stage` paragraph (delta 5).
