@@ -4,6 +4,7 @@
 use crate::declaration::{self, SectionVerdict, TokenRule};
 use crate::emit::csmoke;
 use crate::ere::Ere;
+use crate::installer::{recipe, GATES_DIR};
 use crate::proc::{self, Stderr};
 use crate::walk;
 use std::path::Path;
@@ -103,8 +104,8 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the whole suite in the shell driver's order: resolve,
-// archive both refs, baseline at FROM, swap to TO, judge determinism, regenerate, then contain the
-// phase-B red set inside TO's declaration
+// archive both refs, seed and baseline at FROM, swap to TO, judge determinism, retire the replaced
+// shell configs, regenerate, then contain the phase-B red set inside TO's declaration
 fn smoke() -> Result<String, Fail> {
     let repo = resolve_repo()?;
     let from = resolve_from(&repo)?;
@@ -151,6 +152,10 @@ fn smoke() -> Result<String, Fail> {
         from_bin = ref_binary_tree(&mut env, &from, "from", &work)?;
     }
     let consumer = vendor_and_install(&mut env, &sdk, &base, &from_bin, &fromroots, &from)?;
+    let seeded = seed_config_seam(Path::new(&consumer), &fromroots)?;
+    if !seeded.is_empty() {
+        amend_baseline(&consumer, &from)?;
+    }
 
     let (rc, out) = run_battery(&consumer)?;
     if rc != 0 || !green(&out)? {
@@ -162,7 +167,7 @@ fn smoke() -> Result<String, Fail> {
         return Err(broken(r));
     }
 
-    // spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 1 of 2: the vendored kit directories are
+    // spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 1 of 3: the vendored kit directories are
     // replaced wholesale at TO, the contract's consumer step
     let mut seen: Vec<String> = Vec::new();
     for r in &fromroots {
@@ -189,6 +194,7 @@ fn smoke() -> Result<String, Fail> {
     }
 
     determinism(&consumer, &seen)?;
+    retire_shell_configs(Path::new(&consumer), &toroots)?;
     regenerate(&consumer, &to)?;
     commit_phase_a(&consumer, &to)?;
 
@@ -432,6 +438,88 @@ fn vendor_and_install(
     Ok(scratch)
 }
 
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the FROM consumer is seeded with the config seam `init`
+// derives, through `recipe::config_seam_plan` and never a second derivation, and a copy lands only
+// where nothing is, so a config a kit smoke wrote is kept
+fn seed_config_seam(consumer: &Path, roots: &[String]) -> Result<Vec<String>, Fail> {
+    let mut seeded: Vec<String> = Vec::new();
+    for r in roots {
+        let kit = consumer.join(basename(r));
+        for (src, dest) in recipe::config_seam_plan(&kit, GATES_DIR) {
+            let target = consumer.join(&dest);
+            if target.symlink_metadata().is_ok() {
+                continue;
+            }
+            if let Some(parent) = target.parent() {
+                std::fs::create_dir_all(parent).map_err(|e| {
+                    broken(one(format!("{}: cannot create {}: {}", NAME, parent.display(), e)))
+                })?;
+            }
+            std::fs::copy(&src, &target).map_err(|e| {
+                broken(one(format!("{}: cannot seed {}: {}", NAME, dest, e)))
+            })?;
+            seeded.push(dest);
+        }
+    }
+    Ok(seeded)
+}
+
+// spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 2 of 3: a stem TO's kits template only as
+// `.knobs` has its shell spellings deleted, because the regen reads knob values and the loader
+// refuses a shell config left beside a knob file
+fn retire_shell_configs(consumer: &Path, to_roots: &[String]) -> Result<Vec<String>, Fail> {
+    let mut retired: Vec<String> = Vec::new();
+    for r in to_roots {
+        let plan: Vec<String> = recipe::config_seam_plan(Path::new(r), GATES_DIR)
+            .into_iter()
+            .map(|(_, dest)| dest)
+            .collect();
+        for dest in &plan {
+            let Some(stem) = dest.strip_suffix("-config.knobs") else {
+                continue;
+            };
+            if plan.iter().any(|d| *d == format!("{}-config.sh", stem)) {
+                continue;
+            }
+            for legacy in [
+                format!("{}-config.sh", stem),
+                format!("{}-config.local.sh", stem),
+            ] {
+                let target = consumer.join(&legacy);
+                if target.symlink_metadata().is_err() {
+                    continue;
+                }
+                std::fs::remove_file(&target).map_err(|e| {
+                    broken(one(format!("{}: cannot retire {}: {}", NAME, legacy, e)))
+                })?;
+                retired.push(legacy);
+            }
+        }
+    }
+    Ok(retired)
+}
+
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the seeded copies ride the baseline commit itself, so the
+// FROM baseline is one commit an init-seeded consumer would hold
+fn amend_baseline(consumer: &str, from: &str) -> Result<(), Fail> {
+    stage_all(consumer)?;
+    let amended = proc::run(
+        "git",
+        &[
+            "-C", consumer, "-c", "user.email=smoke@example.invalid", "-c", "user.name=smoke",
+            "commit", "-q", "--no-verify", "--amend", "--no-edit",
+        ],
+    )
+    .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
+    if amended.stdout().is_none() {
+        return Err(broken(one(format!(
+            "{}: FAIL(env) — could not commit the seeded config seam into the FROM baseline ({})",
+            NAME, from
+        ))));
+    }
+    Ok(())
+}
+
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the placement's spawn wrapper moved into `csmoke.rs` when
 // it gained its second caller; this arm keeps only its own verdict for the helper's status, a
 // placement it could not make being a broken environment and never an upgrade finding.
@@ -611,7 +699,7 @@ fn stage_all(consumer: &str) -> Result<(), Fail> {
     Ok(())
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 2 of 2: the regen runs *after* the sync has
+// spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 3 of 3: the regen runs *after* the sync has
 // been judged, and the artifact's path is resolved in the **consumer's** library rather than this
 // process's, because the host's value is a different tree's.
 fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
@@ -879,5 +967,96 @@ mod tests {
     #[test]
     fn the_member_takes_no_arguments() {
         assert_eq!(run(&["--anything".to_string()]), 2);
+    }
+
+    // spec: gate-sdk/SPEC.md §upgrade-smoke — both template shapes are seeded into the gates
+    // directory, and a destination already on disk is left as the kit smoke wrote it
+    #[test]
+    fn the_seeding_step_copies_only_absent_config_seam_destinations() {
+        let dir = std::env::temp_dir().join(format!("cw-upgrade-seed-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        let templates = dir.join("demo/templates");
+        std::fs::create_dir_all(&templates).expect("cannot make the scratch kit");
+        std::fs::create_dir_all(dir.join(GATES_DIR)).expect("cannot make the gates directory");
+        std::fs::write(templates.join("demo-config.sh"), "# shell template\n")
+            .expect("cannot write the shell template");
+        std::fs::write(templates.join("demo-config.knobs"), "# knob template\n")
+            .expect("cannot write the knob template");
+        std::fs::write(templates.join("other.md"), "# not a config\n")
+            .expect("cannot write the non-config template");
+        let roots = vec!["/from/demo".to_string()];
+
+        let seeded = seed_config_seam(&dir, &roots).expect("the seeding step failed");
+        let sh = format!("{}/demo-config.sh", GATES_DIR);
+        let knobs = format!("{}/demo-config.knobs", GATES_DIR);
+        let mut sorted = seeded.clone();
+        sorted.sort();
+        assert_eq!(sorted, vec![knobs.clone(), sh.clone()]);
+        assert_eq!(
+            std::fs::read_to_string(dir.join(&sh)).expect("the shell copy is absent"),
+            "# shell template\n"
+        );
+        assert_eq!(
+            std::fs::read_to_string(dir.join(&knobs)).expect("the knob copy is absent"),
+            "# knob template\n"
+        );
+
+        std::fs::write(dir.join(&sh), "# the kit smoke's own config\n")
+            .expect("cannot overwrite the shell copy");
+        std::fs::remove_file(dir.join(&knobs)).expect("cannot remove the knob copy");
+        let again = seed_config_seam(&dir, &roots).expect("the second seeding step failed");
+        assert_eq!(again, vec![knobs.clone()]);
+        assert_eq!(
+            std::fs::read_to_string(dir.join(&sh)).expect("the shell config is absent"),
+            "# the kit smoke's own config\n"
+        );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: gate-sdk/SPEC.md §upgrade-smoke — only a stem a TO kit templates as `.knobs` alone is
+    // retired, both shell spellings of it, and a kit still shipping its shell template keeps its copy
+    #[test]
+    fn the_retirement_step_deletes_only_shell_configs_a_knob_template_replaced() {
+        let dir = std::env::temp_dir().join(format!("cw-upgrade-retire-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        let moved = dir.join("to/moved/templates");
+        let kept = dir.join("to/kept/templates");
+        let consumer = dir.join("consumer");
+        for d in [&moved, &kept, &consumer.join(GATES_DIR)] {
+            std::fs::create_dir_all(d).expect("cannot make the scratch tree");
+        }
+        std::fs::write(moved.join("moved-config.knobs"), "#\n").expect("cannot write a template");
+        std::fs::write(kept.join("kept-config.sh"), "#\n").expect("cannot write a template");
+        let put = |name: &str| {
+            std::fs::write(consumer.join(GATES_DIR).join(name), "x=1\n")
+                .expect("cannot write a consumer config")
+        };
+        for name in [
+            "moved-config.sh",
+            "moved-config.local.sh",
+            "kept-config.sh",
+            "orphan-config.sh",
+        ] {
+            put(name);
+        }
+        let roots = vec![
+            dir.join("to/moved").to_string_lossy().into_owned(),
+            dir.join("to/kept").to_string_lossy().into_owned(),
+        ];
+
+        let retired = retire_shell_configs(&consumer, &roots).expect("the retirement step failed");
+        assert_eq!(
+            retired,
+            vec![
+                format!("{}/moved-config.sh", GATES_DIR),
+                format!("{}/moved-config.local.sh", GATES_DIR),
+            ]
+        );
+        let on_disk = |name: &str| consumer.join(GATES_DIR).join(name).is_file();
+        assert!(!on_disk("moved-config.sh"));
+        assert!(!on_disk("moved-config.local.sh"));
+        assert!(on_disk("kept-config.sh"));
+        assert!(on_disk("orphan-config.sh"));
+        std::fs::remove_dir_all(&dir).ok();
     }
 }

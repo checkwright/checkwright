@@ -46,30 +46,50 @@ takes 58 to 63 ms per call over ten runs, dominated by bash start-up and the `jq
 
 ### (1) The upgrade smoke seeds what init seeds {design-bearing}
 
-gate-sdk/SPEC.md §upgrade-smoke gains a step between the FROM install and the FROM baseline. **Not yet
-applied:**
+gate-sdk/SPEC.md §upgrade-smoke gains a step between the FROM install and the FROM baseline, and the
+upgrade contract's phase A gains a step between the sync and the regen. **Widened at build** (operator
+direction, 2026-09-14, lead-relayed): the seeding alone, built as first authored, made phase A's regen
+refuse, because `gen-pre-commit` reads the knob values a `couples=knob:` token names and a seeded
+`canon-config.sh` refuses that read at exit 2, which no declaration contains. So the contract now handles
+a left-behind shell config and the suite goes green on it. **Applied at build, first batch:**
 
 > **The FROM consumer is seeded with the config seam `init` derives.** After the FROM kits are vendored
 > and each kit's `smoke/install.sh` has run, the arm copies every destination
 > `recipe::config_seam_plan` derives over each vendored FROM kit root that is still absent in the
 > scratch consumer, and commits the result into the baseline commit. So the baseline is the tree an
 > init-seeded consumer holds, and a kit whose smoke seeds no config still has its template copy on disk.
-> A smoke that wrote its own config keeps it, because a copy lands only where nothing is.
+> A smoke that wrote its own config keeps it, because a copy lands only where nothing is. A seeded copy
+> that reds the FROM baseline is the tag's own defect, reported as `FAIL(env)` like every other red
+> baseline.
 >
-> The step is part of the FROM install, never of phase A. Phase A still syncs the kit directories and
-> regenerates, and it reconciles nothing, so a left-behind config's red reaches phase B, where TO's
-> Tightened-gates declaration must contain it. A seeded copy that reds the FROM baseline is the tag's
-> own defect, reported as `FAIL(env)` like every other red baseline.
+> **Phase A retires the shell configs TO's kits replaced with knob files, before it regenerates.** A
+> kit that moved to a knob file ships `templates/<stem>-config.knobs` and no `<stem>-config.sh`, and its
+> loader refuses a `<gates-dir>/<stem>-config.sh` or `<stem>-config.local.sh` left beside it. The regen
+> reads knob values, so it cannot run until those files are gone. The upgrade contract's phase A
+> therefore has three steps: sync the kit directories, retire each such shell config (rewrite what you
+> set into the `.knobs` file, then delete it), and regenerate. The arm performs the middle step by
+> deleting each one, with the set derived through `recipe::config_seam_plan` over TO's kit roots. It
+> runs after the determinism check, so that check still measures the sync alone. Deleting is one of the
+> declared remedies, and the scratch consumer holds nothing an adopter set.
 >
-> **The honest limit.** The derivation applied is the host's, over FROM's templates, which is exact
+> A contract-following consumer therefore meets no red from a left-behind config, and the suite no
+> longer requires a Tightened-gates bullet for one. A gate that reds because the deleted file held a
+> value its kit smoke set still reaches phase B, where TO's declaration must contain it.
+>
+> **The honest limit.** Both derivations are the host's, over FROM's and TO's templates, which is exact
 > while the rule is unchanged since FROM. The placement seam `init` writes beside an artifact
 > (installer/README.md §The gate binary) is not seeded, because writing it faithfully means running
-> FROM's installer, the cross-version init path this suite does not reach.
+> FROM's installer, the cross-version init path this suite does not reach. The suite deletes rather than
+> rewrites, so it never proves an adopter's rewrite.
 
-`native/src/emit/upgrade_smoke.rs` gains the step after `vendor_and_install`, reusing
-`recipe::config_seam_plan`, the one owner of the derivation. `gate-sdk/lib/consumer-smoke.sh` is not
-touched, so the consumer smoke is unchanged. A unit test seeds a scratch kit root holding a `.sh` and a
-`.knobs` template and asserts both copies, and asserts an existing destination is left alone.
+`native/src/emit/upgrade_smoke.rs` gains the seeding step after `vendor_and_install` and the retirement
+step between `determinism` and `regenerate`, both reusing `recipe::config_seam_plan`, the one owner of
+the derivation. `gate-sdk/lib/consumer-smoke.sh` is not touched, so the consumer smoke is unchanged.
+docs/install.md §The upgrade contract states the middle phase-A step, and
+`lifecycle-kit/templates/upgrade.md` step 1 names it. Unit tests: a scratch kit root holding a `.sh` and
+a `.knobs` template gets both copies, and an existing destination is left alone. A TO kit root shipping
+only a `.knobs` template retires both shell spellings of its stem. A kit still shipping its `.sh`
+template, and a stem no TO kit ships, retire nothing.
 
 ### (2) The fixture-suite derivation moves into the crate {design-bearing}
 
@@ -404,7 +424,7 @@ prompt and teach nothing durable.
   empty and the ground stands for the knob files. **§The kit-library port disposition:** the member-level
   condition has fired for evidence-kit, and `guard-kit/lib/guard.sh`'s worked-instance paragraph keeps
   only its second ground.
-- **gate-sdk/SPEC.md §upgrade-smoke** gains delta 1.
+- **gate-sdk/SPEC.md §upgrade-smoke** gains delta 1 (applied at build, first batch).
 - **`.workflow/release-declarations.md`.** **Not yet applied:**
   - Renamed knobs: `EVIDENCE_KIT_CONFIG_FILE` → `EVIDENCE_KIT_KNOB_FILE`, `GUARD_KIT_CONFIG_FILE` →
     `GUARD_KIT_KNOB_FILE`.
@@ -444,9 +464,9 @@ prompt and teach nothing durable.
   `--emit knob-values`. *Consumers:* the rule functions that read the thirteen shell variables, the
   consumer's own rules in its hook copy, and the tests that source the library. Each value line's name,
   shape and element are read by the assignment, the shape choosing string, array or map.
-- **The upgrade smoke's seeding step** (new behaviour). *Producer:* `upgrade_smoke.rs`, through
-  `recipe::config_seam_plan`. *Consumer:* the FROM baseline battery, then phase B's red set against TO's
-  Tightened-gates declaration.
+- **The upgrade smoke's seeding and retirement steps** (new behaviour). *Producer:* `upgrade_smoke.rs`,
+  through `recipe::config_seam_plan`. *Consumers:* the FROM baseline battery, phase A's regen, which
+  needs the retired files gone, then phase B's red set against TO's Tightened-gates declaration.
 - **Rules 25 and 26** (new behaviour). *Producer:* `lib/guard.sh`. *Consumers:* the harness, which
   shows the block, and the decision-table runner, which reads the exit status.
 - **Red conditions (point 5).** Deltas 6 and 8 narrow corpora by deleting a library and replacing two
@@ -471,7 +491,9 @@ prompt and teach nothing durable.
     compounded journal append in an existing row would change from fall-through to block. Build runs
     `--run-guard-tests` and reads every changed row.
   - *`evidence-kit/smoke/install.sh` and the upgrade suite* red when a run misses a suite. Delta 5's
-    reference keeps the roster, and delta 1's step adds only absent files.
+    reference keeps the roster. Delta 1's seeding adds only absent files, and its retirement step
+    deletes evidence-kit's `evidence-config.sh` once delta 6 replaces the template, so build re-runs the
+    upgrade suite after delta 6 and declares any gate that reds without the smoke-set values.
 
 ## Existing sections updated
 
@@ -494,7 +516,9 @@ prompt and teach nothing durable.
 - `native/src/registry.rs` — `fixture_suites` (delta 2).
 - `native/src/emit/mod.rs` — the `--emit fixture-suites` row (delta 2).
 - `native/src/emit/run_validate.rs` — the unread `EVIDENCE_KIT_STATE_FILE` declaration (delta 5).
-- `native/src/emit/upgrade_smoke.rs` — the seeding step (delta 1).
+- `native/src/emit/upgrade_smoke.rs` — the seeding and retirement steps (delta 1).
+- `docs/install.md` — §The upgrade contract, the phase-A retirement step (delta 1).
+- `lifecycle-kit/templates/upgrade.md` — step 1 names the retirement step (delta 1).
 - `native/src/emit/run_guard_tests.rs` — the absolute binary export (delta 7).
 - `native/src/emit/enforcement_map.rs` — test knob writers (delta 6).
 - `native/src/evidence.rs` — the parity test deleted, the section citations (deltas 6 and 10).

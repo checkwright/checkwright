@@ -12,29 +12,6 @@
 
 ## New Features
 
-- **upgrade-smoke-consumer-unseeded-configs** [spec: SPEC-knob-files-cut-4.md] — upgrade-smoke's
-  scratch consumer never reproduces what installer init seeds: init copies every vendored kit's
-  `templates/*-config.{sh,knobs}` into the gates dir (`recipe::config_seam_plan`), while the smoke
-  installs each kit through its own `smoke/install.sh`, which at the v0.25.0 FROM copies a config
-  template for context-kit, drift-kit and guard-kit only, evidence-kit's writing its own inline
-  (corrected at spec from `git grep` over the tag). So a left-behind-shell-config red is visible to
-  the smoke only for kits whose smoke happens to seed a config, and the earlier knob-file cuts
-  (site, doctrine, queue, lifecycle, canon, delegation) passed it with no Tightened-gates
-  declaration for the gates an init-seeded consumer meets red. Re-verified at the drain against
-  `config_seam_plan` and the v0.25.0 canon, delegation and context smoke installs.
-  **Why it needed design:** the seeding site — the FROM vendoring step or a phase-1 step — decides
-  whether the suite's red set is the init-seeded one, and it must stay inside gate-sdk/SPEC.md
-  §upgrade-smoke's ruling that phase A is sync-plus-regen and never reconciles a consumer red away.
-  **Cost while deferred:** a future config-shape change to a kit whose smoke seeds no config ships
-  an undeclared consumer red that validate cannot see.
-  Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 3, which declared the missed set
-  after the fact from `checkwright-gates --knob-files` and a per-gate refusal probe); promoted at
-  that iteration's close.
-  **Rides `config-seam-fourth-cut` and lands first** — operator direction, 2026-09-14, lead-relayed.
-  Spec ruled the site: the FROM install, after the kit smokes and before the baseline, copying each
-  absent `config_seam_plan` destination; the placement seam init writes beside an artifact stays the
-  suite's stated limit (the amendment's delta 1).
-
 - **config-seam-static-format** [spec: SPEC-knob-files-cut-4.md] [spec: SPEC-bridge-retirement.md]
   — the knob seam is still executable bash for every bridged kit: a knob's value is computed by
   sourcing the owning kit's `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh`
@@ -4979,5 +4956,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- upgrade-smoke-consumer-unseeded-configs
 
 ## Lessons Learned

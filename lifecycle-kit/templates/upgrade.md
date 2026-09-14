@@ -10,8 +10,8 @@ is green or every red carries a stamped disposition.
 ## Session ritual
 
 1. **Run phase A.** Replace the vendored kit directories wholesale at the
-   target release and regenerate the generated artifacts, the install guide's
-   phase-A steps. Where the upgrade smoke is available, run it first: a green
+   target release, retire each shell config its kits replaced with a knob file,
+   and regenerate the generated artifacts, the install guide's phase-A steps. Where the upgrade smoke is available, run it first: a green
    verdict is the mechanical proof that the sync is deterministic and the red
    set is declared, before you disposition anything by hand.
 2. **Read the target release note.** The note whose front-matter `release:`

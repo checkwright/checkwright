@@ -11288,10 +11288,11 @@ The two-phase upgrade proof, the binary's **`--upgrade-smoke`** arm — the thir
 caller of `csmoke_vendor_and_install` (§Consumer smoke), reusing the same green
 baseline before it diverges. Where run-consumer-smoke proves a *single* release's
 defaults hold, this proves the *transition* between two: it vendors every kit at
-a **FROM** ref into a scratch consumer, installs and asserts the baseline is
-green (a red FROM baseline is a broken tag — exit 2, not an upgrade finding),
-then replaces the vendored kit directories wholesale at a **TO** ref and
-regenerates the generated artifacts — the contract's consumer phase-A steps
+a **FROM** ref into a scratch consumer, installs, seeds the config seam `init`
+derives, and asserts the baseline is green (a red FROM baseline is a broken tag — exit 2, not an upgrade finding),
+then replaces the vendored kit directories wholesale at a **TO** ref, retires the
+shell configs TO's kits replaced with knob files, and regenerates the generated
+artifacts — the contract's consumer phase-A steps
 (docs/install.md §The upgrade contract). It asserts **determinism** (the scratch
 consumer's `git status` shows changes only under the kit roots) and then, over the
 phase-B battery, that the **red set is a subset of TO's Tightened-gates
@@ -11335,6 +11336,46 @@ session's evidence file against `.workflow/validate-baseline.txt`'s
 assertion with `TO` at its `HEAD` default, and at the release procedure's go/no-go.
 A session reaching an arm through the front-end counts exactly as a stage step
 does (§The non-gate arm).
+
+**The FROM consumer is seeded with the config seam `init` derives.** After the
+FROM kits are vendored and each kit's `smoke/install.sh` has run, the arm copies
+every destination `recipe::config_seam_plan` derives over each vendored FROM kit
+root that is still absent in the scratch consumer, and commits the result into the
+baseline commit. So the baseline is the tree an init-seeded consumer holds, and a
+kit whose smoke seeds no config still has its template copy on disk. A smoke that
+wrote its own config keeps it, because a copy lands only where nothing is. The
+derivation is init's own, reused rather than restated, and the step lives in this
+arm alone, never in `lib/consumer-smoke.sh`, so the consumer smoke's baseline does
+not move with it. A seeded copy that reds the FROM baseline is the tag's own
+defect, reported as `FAIL(env)` like every other red baseline. Without the step,
+a config-shape change to a kit whose smoke seeds no config ships a consumer break
+this suite cannot see.
+
+**Phase A retires the shell configs TO's kits replaced with knob files, before it
+regenerates.** A kit that moved to a knob file ships `templates/<stem>-config.knobs`
+and no `<stem>-config.sh`, and its loader refuses a `<gates-dir>/<stem>-config.sh`
+or `<stem>-config.local.sh` left beside it (§The knob file). The regen reads knob
+values, since `gen-pre-commit` expands every `couples=knob:` token, so it cannot
+run while such a file stands: seeding without this step made phase A refuse at
+exit 2, which no declaration contains. So the contract's phase A is three steps
+(docs/install.md §The upgrade contract): sync, retire each such shell config, and
+regenerate. The arm performs the middle step by deleting each file, with the set
+derived through `recipe::config_seam_plan` over TO's kit roots. Deleting is one of
+the declared remedies, and the scratch consumer holds nothing an adopter set. The
+step runs after the determinism check, so that check still measures the sync
+alone, and the deletions ride the phase-A commit.
+
+A contract-following consumer therefore meets no red from a left-behind config,
+and the suite requires no Tightened-gates bullet for one. A gate that reds
+because a deleted file held a value its kit smoke set still reaches phase B,
+where TO's declaration must contain it.
+
+**The honest limit.** Both derivations are the host's, over FROM's and TO's
+templates, which is exact while the rule is unchanged since FROM. The placement
+seam `init` writes beside an artifact (installer/README.md §The gate binary) is
+not seeded, because writing it faithfully means running FROM's installer, the
+cross-version init path this suite does not reach. The suite deletes rather than
+rewrites, so it never proves an adopter's rewrite of a config they edited.
 
 **The determinism assertion is measured between phase A's two steps, and that
 ordering carries the assertion.** Phase A syncs the kit directories, then

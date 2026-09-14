@@ -749,8 +749,14 @@ An upgrade runs in two phases.
 
 **Phase A — deterministic.** Replace the vendored kit directories wholesale at
 the target tag. Because consumers never edit kit files, this sync loses
-nothing. Then regenerate the generated artifacts. *Which* artifacts those are is
-a property of the kits you vendored rather than a list to carry here: each one's
+nothing. Next, retire each shell config the target's kits replaced with a knob
+file. A kit that now ships `templates/<stem>-config.knobs` in place of
+`<stem>-config.sh` refuses the old `<stem>-config.sh` or `<stem>-config.local.sh`
+in your gates directory. The regeneration reads those knobs, so it refuses too.
+Rewrite what you set in each file into its `.knobs` file, then delete it. A copy
+`init` seeded that you never edited is simply deleted. Then regenerate the
+generated artifacts.
+*Which* artifacts those are is a property of the kits you vendored rather than a list to carry here: each one's
 freshness gate names its own regen command when it reds, so phase B is what tells
 you about any you skipped.
 
