@@ -137,8 +137,8 @@ quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
 land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own bridged reads, plus the union sentinel:
-// `--knobs --run` prints these with every registry member's added, expanded in `emit::knobs`. The
-// sentinel is what expresses the dispatch union per member rather than per `Arm` variant.
+// `--knobs --run` prints these with the knobs of every member the argv can dispatch added (the
+// `--only` selection, else the whole registry), expanded in `emit::knobs`.
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
     "GATE_KIT_ROOTS_HERE",
@@ -198,6 +198,12 @@ fn unrecognized(option: &str) -> Refusal {
         message: format!("unrecognized option: {}", option),
         usage: true,
     }
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the `--only` names this argv selects by, empty for an
+// argv the parser refuses or one carrying no `--only`
+pub(crate) fn only_names(args: &[String]) -> Vec<String> {
+    parse(args).map(|a| a.only).unwrap_or_default()
 }
 
 fn parse(args: &[String]) -> Result<Args, Refusal> {

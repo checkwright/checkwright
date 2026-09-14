@@ -772,29 +772,16 @@ fn registered_members(args: &[String]) -> Vec<String> {
     else {
         return Vec::new();
     };
-    let mut members = match std::fs::read_to_string(crate::registry::list_path(dir)) {
+    let members = match std::fs::read_to_string(crate::registry::list_path(dir)) {
         Ok(t) => crate::registry::members(&t),
         Err(_) => Vec::new(),
     };
-    // spec: gate-sdk/SPEC.md §run-gates — the sentinel's scope tracks `--only`'s sole-name
-    // widening: scope and selection answer the same question, so a widened member's knobs resolve
-    // instead of the bridge under-reporting and the member refusing on a knob it was configured for
-    if let Some(sole) = sole_only_name(args) {
-        if !members.contains(&sole) {
-            members.push(sole);
-        }
-    }
-    members
-}
-
-// spec: gate-sdk/SPEC.md §run-gates — the name `--only` would select alone: names run from `--only`
-// to the `--` that ends the list or to the end of argv, and only a list of exactly one answers
-fn sole_only_name(args: &[String]) -> Option<String> {
-    let i = args.iter().position(|a| a == "--only")?;
-    let names: Vec<&String> = args[i + 1..].iter().take_while(|a| *a != "--").collect();
-    match names.as_slice() {
-        [one] => Some((*one).clone()),
-        _ => None,
+    // spec: gate-sdk/SPEC.md §run-gates — scope is the runner's `--only` selection, read by its own
+    // parser: a sole name as typed, two or more intersected with the registry, none the whole registry
+    match crate::runner::only_names(args).as_slice() {
+        [] => members,
+        [sole] => vec![sole.clone()],
+        names => members.into_iter().filter(|m| names.contains(m)).collect(),
     }
 }
 
@@ -844,5 +831,37 @@ mod tests {
         sorted.sort_unstable();
         sorted.dedup();
         assert_eq!(scoped, sorted, "the union is not deterministic");
+    }
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the sentinel's member set is the runner's `--only`
+    // selection: a sole name as typed, two or more intersected with the registry, the whole
+    // registry without `--only`, and never an argument forwarded past `--`
+    #[test]
+    fn the_registry_sentinel_scopes_to_the_only_selection() {
+        let dir = std::env::temp_dir().join(format!("cw-sentinel-scope-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("scratch dir");
+        std::fs::write(dir.join("gates.list"), "g_one\ng_two\ng_three\n").expect("gates.list");
+        let argv = |rest: &[&str]| -> Vec<String> {
+            let mut v = vec!["--gates-dir".to_string(), dir.display().to_string()];
+            v.extend(rest.iter().map(|s| s.to_string()));
+            v
+        };
+        let cases: &[(&str, &[&str], &[&str])] = &[
+            ("bare", &[], &["g_one", "g_two", "g_three"]),
+            ("sole registered", &["--only", "g_two"], &["g_two"]),
+            ("sole unregistered", &["--only", "g_absent"], &["g_absent"]),
+            ("two registered", &["--only", "g_three", "g_one"], &["g_one", "g_three"]),
+            ("registered and unregistered", &["--only", "g_two", "g_absent"], &["g_two"]),
+            (
+                "forwarded past --",
+                &["--only", "g_one", "--", "g_two", "g_three"],
+                &["g_one"],
+            ),
+        ];
+        for (label, rest, want) in cases {
+            let got = registered_members(&argv(rest));
+            assert_eq!(got, want.to_vec(), "{}", label);
+        }
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

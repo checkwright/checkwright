@@ -12,18 +12,6 @@
 
 ## New Features
 
-- **run-knob-union-selector-narrowing** [spec: SPEC-selector-knob-union.md]
-  — a `--only` run resolves the knob union of every member the tree registers, not of the
-  members it selected: 718-736 ms for 178 names, against 37-39 ms for the runner's own knobs plus
-  `check-core-files`' two, re-measured 2026-09-14 at spec.
-  **Designed at spec:** under `--only` the registry sentinel expands over the named members
-  intersected with the registry, with a sole name joining as the existing widening already has it;
-  a bare run and `--for` keep the tree union. `--for` narrowing is refused in the amendment, its
-  residue discharged by `config-bridge-resolution-cost` at the gate-sdk cut — decision, 2026-09-14,
-  intent oracle via the lead.
-  Split out of `config-bridge-resolution-cost` as its cut 1b and ranked into `config-bridge-floor`
-  at its scope — operator direction, 2026-09-14, lead-relayed. Filed 2026-09-14 by scope.
-
 - **lead-journal-advisory-fires-on-the-live-lead** [spec: SPEC-lead-journal-open.md]
   — the boundary entry's undisposed-lead-journal advisory (lifecycle-kit/SPEC.md
   §bin/enter-stage.sh) fires on the **live** dispatching lead's own journal at every
@@ -5005,5 +4993,6 @@
 ## Done
 
 - bridge-owning-kit-partition-forks-per-knob
+- run-knob-union-selector-narrowing
 
 ## Lessons Learned

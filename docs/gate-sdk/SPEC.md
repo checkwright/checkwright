@@ -3315,7 +3315,9 @@ its own slice, where the sentinel resolves a union the arm itself reads.
 
 **A sentinel is minted with its expansion, and `knobs` expands two of the three.**
 `EVERY_REGISTERED_KNOB` expands to every knob the **tree's** registry declares,
-scoped by the arm's own `--gates-dir` argv; `EVERY_HOOK_KNOB` expands to one
+scoped by the arm's own `--gates-dir` argv and narrowed to the arm's `--only`
+selection where its argv carries one (the `--run` arm's roster, below);
+`EVERY_HOOK_KNOB` expands to one
 hook member's knobs where the arm's argv names a member and to the union over the
 hook table where it does not. Both live beside `knobs` rather than beside a
 member that spells one, because the expansion is the mechanism's and a member
@@ -3521,7 +3523,8 @@ dir, the kit roots and the scratch dir, so a flag would be the second shape.
 
 **Its declared knob roster is derived, never maintained.** `--knobs --run` answers
 the **union** of the runner's own knobs with those of every member the *tree*
-registers, computed from `gates.list` and the crate's registry. A maintained
+registers — or, under `--only`, every member the argv selects — computed from
+`gates.list` and the crate's registry. A maintained
 union would rot against a churning roster the moment a member's knob set changed,
 which derivation-first forbids; the union is exactly the data `gates::knobs` and
 the registry already hold. The dispatcher then hands each child only its own
@@ -3543,6 +3546,63 @@ property read forward: the runner never invokes a sibling arm, so declaring its
 knobs would violate the very rule `--knobs` exists to hold. A gate that reaches
 an emitter in-process declares that emitter's knobs on its own registry entry,
 which is the transitive-coupling rule below already covering the case.
+
+**Under `--only` the union narrows to the selection, and it is derived from the
+same rule as the selection.** When the arm's argv carries `--only`, the
+sentinel's member set is the names between `--only` and the `--` that ends the
+list (or the end of argv), read by the runner's own argv parser. With two or more
+names, the set is those names **intersected with the tree's registry**. A sole
+name joins the set whether or not the registry holds it, which is the sole-name
+widening §run-gates states. Without `--only` — a bare run, `--for`, or any other
+arm that declares the sentinel — the set is the whole tree registry. The one
+implementation is `registered_members` in `native/src/emit/mod.rs`; `port-blockers`
+declares the same sentinel and its grammar carries no `--only`, so its expansion
+is the whole registry.
+
+**Why the narrowed union is sufficient.** The dispatcher builds each child's
+environment by filtering the union by that child's own declared roster
+(§run-gates). A child is dispatched only if `select_only` picked it. That is the
+registry intersection, or the sole name, so the set of children is contained in
+the sentinel's member set. Every knob a dispatched child declares is therefore in
+the union, including a couples-knob sentinel it declares, which the bridge expands
+because it is in the child's roster. The runner's own reads under `--only` are its
+named knobs plus descriptor *names* from `registry::couples_knob_names`, and none
+of them needs a member's knob value.
+
+**Why the intersection, and not the typed names.** An unregistered name among two
+or more is refused by the runner (§run-gates). If its knobs were in the union, a
+crate member whose owning kit is not vendored would reach the bridge's
+does-not-define refusal first. The caller would get that message instead of the
+runner's *is not registered in* refusal — the starter-profile failure the registry
+scope exists against, arriving through a typo.
+
+**What a selector run gives up, stated because it changes a verdict.** A knob that
+an *unselected* member declares, and that cannot resolve, does not fail a `--only`
+run. It fails a bare run, which resolves the whole registry, and it fails a
+`--only` naming that member. A selected member gets the same bridge verdict it
+gets in the full battery. That is the declared-knob discipline read forward: the
+runner does not invoke an unselected member, so resolving its knobs is a read
+nobody consumes.
+
+**`--for` keeps the tree union, and the ground is that its selection reads bridged
+values.** `select_for` expands each member's trigger through `GATE_KIT_ROOTS_REL`
+and through the values of its `knob:` tokens. `--knobs` answers before any knob
+resolves, so it cannot compute that selection in one round. Two shapes are
+refused:
+
+- **A two-round bridge.** A sentinel the bridge expands by re-asking `--knobs`
+  once the selection inputs have resolved. That is new protocol in `lib/gate.sh`,
+  and the gate-sdk cut of the static config seam deletes that library. It would
+  serve a selector with no hot path: its callers are one smoke line, one fixture
+  test and a README example, and the generated hook bakes its own arrays.
+- **A one-round over-approximation in the crate.** It would be a second trigger
+  matcher, and §run-gates defines exactly one.
+
+**The residue is costed, not flagged.** A `--for` run keeps paying the tree union
+— on the order of 700 ms over a registry the size of this tree's, against roughly
+95 ms plus the selected members' knobs for an exact narrowing. That cost is part
+of the bridge floor the static config seam's gate-sdk cut discharges when it
+retires the bridge.
 
 #### The harness-integration arm
 
@@ -10611,6 +10671,9 @@ Naming a member the registry omits costs nothing when it is not a compiled gate 
 the per-gate knob roster is the filter, and a `.sh` member takes no bridge at all.
 Worth stating because the failure is silent in the direction that matters: a
 member reached without its bridge does not fail to run, it runs mis-configured.
+The same rule narrows the union with two or more names: those names intersected
+with the registry scope the sentinel, so a selector run resolves only what it
+dispatches (§The non-gate arm).
 
 **It reaches an `install: never` member in a vendored tree, and that is the
 intended reach rather than an accident to bound.** The disposition governs
