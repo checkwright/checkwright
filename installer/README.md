@@ -614,12 +614,11 @@ neither moves nor re-implements.
 
 **`--install <op>` is the seam both bootstraps call**, specified so the two
 calls are byte-identical. It is a non-gate arm of the binary
-(gate-sdk/SPEC.md §The non-gate arm) and deliberately **not** a bridged one: a
-bridged arm's knobs are resolved by `gate_command`, a bash front-end, and this
-arm's caller is the bootstrap, which may not be assumed to be a POSIX shell at
-all. So **every value the arm needs arrives as argv**, and the arm reads no kit
-config and no knob. A bridged install arm would be unreachable from the half of
-the boundary this section exists to make writable.
+(gate-sdk/SPEC.md §The non-gate arm) and deliberately reads no kit config and no
+knob: its caller is the bootstrap, which may not be assumed to be a POSIX shell at
+all, and a knob read would tie the call's meaning to whatever knob files the
+working directory holds, which neither bootstrap controls. So **every value the
+arm needs arrives as argv**.
 
 - **Grammar.** `--install <op> [--<key> <value>]…`, `<op>` from a closed set, an
   unknown `<op>` or an unknown key exiting 2.
@@ -892,7 +891,7 @@ bytes are published on the Release, so a human can cross-check the value out of
 band. The claim is **verified against a published digest**, never *reproducible*.
 
 **The gate-sdk config seam rides this path and only this path.** `init` claims
-`scripts/gate-sdk-config.sh` inside the branch that has selected an artifact
+`scripts/gate-sdk-config.knobs` inside the branch that has selected an artifact
 target, and gate-sdk ships no config-seam template for the generic seam plan to
 copy. On a payload carrying no artifact that file is therefore never written and
 is not a `files` entry at all — so a verb reasoning about the surfaces `init`
@@ -926,7 +925,7 @@ copy, which on a first install does not exist yet:
     --root   <absolute repo root>
     --src    <the verified payload artifact>
     --dest   <repo-relative path for the installed binary>
-    --seam   <repo-relative path of <gates-dir>/gate-sdk-config.sh>
+    --seam   <repo-relative path of <gates-dir>/gate-sdk-config.knobs>
     --target <rust target triple>
     --digest <the artifact's verified SHA-256>
     [--lock  <repo-relative manifest path>]
@@ -952,9 +951,9 @@ field with no reader is removed.
 
 **The install location has one owner.** The binary is written to your gates
 directory beside the `gates.list` seeded there, and the op sets
-`GATE_SDK_NATIVE_BIN` to that path in `<gates-dir>/gate-sdk-config.sh` — the
-optional persistent config seam gate-sdk's library already sources when it
-exists (gate-sdk/SPEC.md §Layout and configuration). The op creates that file
+`GATE_SDK_NATIVE_BIN` to that path in `<gates-dir>/gate-sdk-config.knobs` — the
+optional tracked knob file both the binary and gate-sdk's pre-binary accessors
+read when it exists (gate-sdk/SPEC.md §The knob file). The op creates that file
 when it places an artifact, and gate-sdk ships no config template for it because
 **the seam file's content is resolved at install time rather than shipped**: its
 one line sets `GATE_SDK_NATIVE_BIN` to the path the artifact was actually placed
@@ -967,8 +966,8 @@ because it is a **stable relative path** on purpose: the generated hook persists
 the emitted argv, so a machine-specific path baked into a tracked hook would make
 the graph artifact's freshness comparison machine-dependent. The seam is claimed
 like any rewritten surface and then rewritten preserving every line except the
-one setting `GATE_SDK_NATIVE_BIN`, seeding the two shellcheck directives only
-when the file is absent — so an adopter's own knobs in that file survive every re-run.
+one naming `GATE_SDK_NATIVE_BIN`, so an adopter's own knobs in that file survive
+every re-run.
 
 **The non-destructive re-run is the op's too, and `--seam` is where it applies.**
 The seam is claimed against the hash `--lock` records for it and left alone when
@@ -1330,7 +1329,7 @@ the shape behind it.
 
 **Resolving one of your own seam files is an exact-path question, not a search.**
 `doctor` and `uninstall` both need to know which `gates.list` — or which
-`gate-sdk-config.sh` — is *yours*, because the vendored kits carry fixture trees
+`gate-sdk-config.knobs` — is *yours*, because the vendored kits carry fixture trees
 holding files of the same name. `files` already answers it: it records the
 repo-relative path `init` wrote, and the layout constants live beside the recipe
 that wrote it under them, so the resolver asks whether the manifest
@@ -1511,7 +1510,7 @@ that does not know it sees the same manifest it always did.
 
 **The `artifact` key carries no path, and that is not an omission.** The install
 location has exactly one owner — `GATE_SDK_NATIVE_BIN` in your
-`gate-sdk-config.sh` — and that value is what the battery actually dispatches
+`gate-sdk-config.knobs` — and that value is what the battery actually dispatches
 to. A second copy under this key could disagree with the live one, so every
 reader asking *where is the binary* resolves it from the same owner: §doctor
 reads the knob and re-verifies whatever it finds there.
@@ -1525,7 +1524,7 @@ right about what `uninstall` has to reverse. The distinction is the one every
 
 ## The packer
 
-`--pack-installer`, the gate binary's bridged `Arm::Run` payload assembler
+`--pack-installer`, the gate binary's `Arm::Run` payload assembler
 (gate-sdk/SPEC.md §The non-gate arm), assembles the payload both transports
 ship — the Release tarball and the npm package — out of this repo's own kit
 roots, and npm-packs it in a scratch directory outside the worktree. Callers
@@ -1639,7 +1638,7 @@ is the habit that gets a genuinely dirty tree packed — a valve firing on every
 ordinary iteration stops being read. *Deriving the kit-root set from the stamped
 commit* instead of from the worktree would shrink the footprint to two members
 and make member two immune the way member one is, but the kit-root derivation is
-shared library mechanism the whole battery runs on, and a second, commit-scoped
+shared crate mechanism the whole battery runs on, and a second, commit-scoped
 derivation inside the pack path would be a duplicate with nothing holding the
 two together; the scoped refusal covers the same divergence at no such cost.
 
@@ -1651,8 +1650,8 @@ caller never named. Absent `--root`, the git toplevel of the current directory
 is what gets packed.
 
 **The cut split that one decision into two, and a caller must pin both.** The
-front-end resolves the gate binary and the bridged environment relative to the
-git toplevel of the **current directory**, so after the cut the cwd selects whose
+front-end resolves the gate binary relative to the git toplevel of the **current
+directory**, and the binary reads the knob files there, so the cwd selects whose
 tooling and configuration run while `--root` selects which tree is packed and
 stamped. A caller that already pinned `--root` and let the current directory fall
 where it may was pinning one of two decisions, which is why every pack call site
@@ -1662,7 +1661,7 @@ in this repo now names a directory as well.
 packer was its own script the roster had exactly one tier and it was the tool
 itself: `--help` printed it at exit 0, adopted on its own merits because with a
 flag surface that wide an unknown-argument refusal was too thin a discovery
-route to be a caller's only one. A bridged arm's usage lives in
+route to be a caller's only one. A non-gate arm's usage lives in
 `gate-sdk/bin/run-gates.sh`'s own help and in this section's prose instead. The
 arm keeps the unknown-argument refusal and gains the front-end's help, so the
 discoverability that rule bought is preserved, and its one-tier claim — which
@@ -1671,10 +1670,10 @@ the file's deletion makes false — does not stand.
 **The cut is taken, and the route it took is recorded here.** The packer was the
 last file in the reachable column of `--emit port-blockers --tree`; it is now
 `native/src/emit/pack_installer.rs`, reached by the bare flag `--pack-installer`
-off the bridged-arm table. Its four inputs — the packed kit set, the target
-roster, the binary's name and the per-target artifact names — all cross the
-config bridge, so nothing an adopter or a workflow could set before the cut
-became a crate literal after it.
+off the arm table. Its inputs — the packed kit set, the target roster and the
+binary's name — are knobs the binary resolves in process, and each target's
+artifact name is discovered from its artifact directory, so nothing an adopter or
+a workflow could set before the cut became a crate literal after it.
 
 **The reachability obligation the cut owed is discharged, and the route is
 ROUTE 1.** `consumer-smoke/run-smoke.sh` builds the gate binary before it
@@ -1746,7 +1745,7 @@ caller is §The packer's — this section cites that contract rather than hostin
 copy of it.
 
 *Two mechanisms hold that property, not one.* §The packer's split gives `--root`
-a partner: the front-end resolves the binary and the bridged environment against
+a partner: the front-end resolves the binary, and the binary its knob files, against
 the current directory. So each of the five call sites runs the front-end in a
 subshell whose current directory is that same script-derived root, and keeps
 `--root` naming it. **This is not the retired invocation requirement below** —

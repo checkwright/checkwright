@@ -78,7 +78,7 @@ done
 
 # spec: installer/README.md §The consumer smoke — the binary is built before the pack rather than by a late arm, because the main payload carries it: what every profile installs has to be the battery an adopter on a covered platform actually receives, and a payload with no artifact makes each profile an uncovered-platform install by accident of the harness
 printf 'build (the host gate binary the main payload carries)\n'
-# spec: gate-sdk/SPEC.md §Layout and configuration — the native knobs are read through gate-sdk's own accessors, from the tree under test, so the arm cannot drift from the roster or from a knob override; in a subshell because the library auto-sources a consumer config seam off the current directory and this script is not one of its consumers
+# spec: gate-sdk/SPEC.md §Layout and configuration — the native knobs are read through gate-sdk's own accessors, from the tree under test, so the arm cannot drift from the roster or from a knob override; in a subshell because the accessors read the knob file under the current directory, and this script's own directory is not a consumer
 native() {   # $@ = a gate-sdk accessor and its arguments, resolved against the tree under test
     # shellcheck source=../../gate-sdk/lib/gate.sh
     ( cd "$REPO" && source gate-sdk/lib/gate.sh && "$@" )
@@ -147,7 +147,7 @@ printf 'pack\n'
 VERSION="$(git -C "$REPO" describe --tags --abbrev=0 2>/dev/null)"; VERSION="${VERSION#v}"
 [[ -n "$VERSION" ]] || VERSION="0.0.0-smoke"
 # spec: installer/README.md §The consumer smoke — --root "$REPO" is what makes the packed tree and the asserted tree the same tree by construction: $REPO is script-path-derived, so without it the current directory selects what gets packed and a run from a second checkout greens while asserting nothing about the tree under test
-# spec: installer/README.md §The consumer smoke — the cd is the second half of that same pinning, and it is owed at every one of these five call sites: the front-end resolves the gate binary and the bridged environment against the git toplevel of the CURRENT DIRECTORY, so --root alone now selects only which tree is packed and the cwd selects whose tooling runs
+# spec: installer/README.md §The consumer smoke — the cd is the second half of that same pinning, and it is owed at every one of these five call sites: the front-end resolves the gate binary, and runs it to read its knob files, at the git toplevel of the CURRENT DIRECTORY, so --root alone now selects only which tree is packed and the cwd selects whose tooling runs
 PACK_OUT="$(cd "$REPO" && INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh --pack-installer --root "$REPO" \
     --version "$VERSION" --out "$SCRATCH" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the pack step failed."; }
@@ -219,10 +219,21 @@ say "installed $(jq -r '.version' "$PKG_ROOT/package.json") from $(basename "$TA
 GATES_DIR=scripts
 QUEUE_FILE=TASK-QUEUE.md
 PROFILE_DERIVED=full
-SEAM_FILES=("$GATES_DIR/gates.list" "$GATES_DIR/gate-sdk-config.sh")
+SEAM_FILES=("$GATES_DIR/gates.list" "$GATES_DIR/gate-sdk-config.knobs")
 # spec: installer/README.md §Profiles — every install's own registry, keyed by profile, so the monotonicity assertion deferred out of the profile-invariant arm has the gate-set derivation's own output to run over
 declare -A REGISTRY=()
 
+seam_bin() {   # $1 = the knob-file seam -> the value of its GATE_SDK_NATIVE_BIN line, read in the knob-file line grammar (the head before the first `=`, blanks trimmed)
+    local line head
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" == *=* ]] || continue
+        head="${line%%=*}"; head="${head//[[:blank:]]/}"
+        [[ "$head" == GATE_SDK_NATIVE_BIN ]] || continue
+        line="${line#*=}"; line="${line#"${line%%[![:blank:]]*}"}"
+        printf '%s\n' "${line%"${line##*[![:blank:]]}"}"
+        return 0
+    done < "$1"
+}
 lock_own_file() {   # $1 = manifest path, $2 = the repo-relative path init writes -> that path when the manifest records it, empty when it does not
     jq -r --arg p "$2" '(.files // {}) | if has($p) then $p else "" end' "$1" 2>/dev/null
 }
@@ -432,9 +443,9 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
     target="$(jq -r '.artifact.target // ""' "$LOCK")"
     art=""
     if [[ -n "$target" ]]; then
-        seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.sh")"
+        seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.knobs")"
         [[ -n "$seam" && -f "$C/$seam" ]] \
-            && art="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$seam" | head -n1)"
+            && art="$(seam_bin "$C/$seam")"
     fi
     if [[ -z "$target" ]]; then
         printf '  the manifest records no artifact key, so the discriminating binary sample is absent from this payload\n'
@@ -631,10 +642,10 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
         [[ -f "$C/$QUEUE_FILE" ]] \
             || fail "$profile: its kit set reads the queue file and init seeded none"
         # spec: installer/README.md §The gate binary — the section floor ported to the binary substrate, so this arm resolves it through gate_command out of the payload exactly as a battery would, rather than naming a script path that no longer exists; the knobs resolve against the consumer's own config because the dispatch runs with the consumer as cwd. There is no omitted-and-declared branch to fall into: every install that reaches here placed a verified artifact, because the bootstrap refuses rather than proceeding without one
-        q_seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.sh")"
+        q_seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.knobs")"
         q_bin=""
         [[ -n "$q_seam" && -f "$C/$q_seam" ]] \
-            && q_bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$q_seam" | head -n1)"
+            && q_bin="$(seam_bin "$C/$q_seam")"
         [[ -n "$q_bin" && -x "$C/$q_bin" ]] \
             || fail "$profile: the seam names no executable gate binary at '${q_bin:-<unset>}', so the section floor has nothing to dispatch to on an install the bootstrap let proceed"
         out="$( cd "$C" && PATH="$RUN_PATH" GATE_SDK_NATIVE_BIN="$C/$q_bin" bash -c '
@@ -662,7 +673,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
 
     # spec: installer/README.md §The gate binary — selection keeps three outcomes and only ONE of them proceeds, so an install that reached this line placed a verified artifact by construction: the branch that recorded no artifact and declared its omissions is not narrowed here, it is unreachable, because the bootstrap refuses before any verb runs. The three outcomes are still asserted, in the artifact arm, where the two refusals are driven directly and told apart by message and remedy
     target="$(jq -r '.artifact.target // ""' "$LOCK")"
-    seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.sh")"
+    seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.knobs")"
     list="$(lock_own_file "$LOCK" "$GATES_DIR/gates.list")"
     [[ -n "$list" ]] || fail "$profile: the manifest records no gates.list"
     # spec: installer/README.md §Profiles — the registry this install wrote, kept for the monotonicity assertion the profile-invariant arm deferred: comment and blank lines dropped, so what is compared is the live membership an adopter of this profile actually receives
@@ -675,7 +686,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     [[ -n "$target" ]] \
         || fail "$profile: the manifest records no artifact, yet the bootstrap ran a verb — the only outcome that proceeds is a verified artifact, so an install with none is a refusal that did not refuse"
     [[ -n "$seam" && -f "$C/$seam" ]] || fail "$profile: an artifact is recorded but no gate-sdk config seam names its path"
-    bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$seam" | head -n1)"
+    bin="$(seam_bin "$C/$seam")"
     [[ -n "$bin" && -x "$C/$bin" ]] || fail "$profile: no executable gate binary at '${bin:-<unset>}'"
     [[ "$(digest_of "$C/$bin")" == "$(jq -r '.artifact.digest' "$LOCK")" ]] \
         || fail "$profile: the installed gate binary does not match the digest the manifest recorded"
