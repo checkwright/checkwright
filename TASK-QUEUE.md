@@ -12,6 +12,18 @@
 
 ## New Features
 
+- **run-knob-union-selector-narrowing** [spec: SPEC-selector-knob-union.md]
+  — a `--only` run resolves the knob union of every member the tree registers, not of the
+  members it selected: 718-736 ms for 178 names, against 37-39 ms for the runner's own knobs plus
+  `check-core-files`' two, re-measured 2026-09-14 at spec.
+  **Designed at spec:** under `--only` the registry sentinel expands over the named members
+  intersected with the registry, with a sole name joining as the existing widening already has it;
+  a bare run and `--for` keep the tree union. `--for` narrowing is refused in the amendment, its
+  residue discharged by `config-bridge-resolution-cost` at the gate-sdk cut — decision, 2026-09-14,
+  intent oracle via the lead.
+  Split out of `config-bridge-resolution-cost` as its cut 1b and ranked into `config-bridge-floor`
+  at its scope — operator direction, 2026-09-14, lead-relayed. Filed 2026-09-14 by scope.
+
 - **lead-journal-advisory-fires-on-the-live-lead** [spec: SPEC-lead-journal-open.md]
   — the boundary entry's undisposed-lead-journal advisory (lifecycle-kit/SPEC.md
   §bin/enter-stage.sh) fires on the **live** dispatching lead's own journal at every
@@ -58,22 +70,6 @@
   operator direction, 2026-09-14, lead-relayed.
 
 ## Deferred
-
-- **run-knob-union-selector-narrowing** [design-pending] [cost: session/high] [surface: gate-sdk] — a
-  selector run (`--only`, `--for`) resolves the knob union of every member the tree registers,
-  not of the members it selected. gate-sdk/SPEC.md §The non-gate arm scopes `--knobs --run` to
-  the tree's registry for correctness and states no selector narrowing. Measured 2026-09-14 at
-  scope (`.workflow/survey-record.md`): `check-core-files`' own 2 knobs resolve in 28 ms and
-  `check-prose-enum`'s 9 in 123 ms, against 734 ms for the union.
-  **Why [design-pending]:** narrowing changes a ruled derivation, so the amendment states the
-  union a selector run declares (the selected members' knobs plus the runner's own), why the
-  dispatcher's per-member slice keeps it sufficient, and what a whole-registry run keeps.
-  **Cost while deferred:** every single-gate run a session makes pays about 700 ms resolving
-  knobs it never reads.
-  Split out of `config-bridge-resolution-cost` as its cut 1b and ranked into `config-bridge-floor`
-  at its scope — operator direction, 2026-09-14, lead-relayed; spec authors and promotes it.
-  Filed 2026-09-14 by scope.
-
 
 - **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
   CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
