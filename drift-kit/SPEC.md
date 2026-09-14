@@ -61,9 +61,10 @@ A member whose *surface* is missing (no log yet, no timings file) degrades to
 
 **Why a bridged arm rather than a top-level flag.** The front-end composes
 `--emit-<name>` from its `--emit <name>` operand and resolves each member's
-declared knob roster; a hardcoded top-level flag receives no consumer override at
-all. For a kit whose entire surface is consumer-overridable knobs that would be a
-silent functional regression rather than a porting detail.
+declared knob roster; a hardcoded top-level flag receives no bridged input. The
+collator's own knobs resolve in process, but their defaults derive from
+`GATE_SDK_GATES_DIR`, and the members read guard-kit's knobs — inputs only the
+bridge carries — so the family is forced rather than chosen.
 
 **The collator's own knobs resolve from drift-kit's static defaults table**
 (§Layout and configuration), not in the arm: the table is every default's one
@@ -407,8 +408,9 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    exit 2 unless both positionals are present and non-empty, **in the fixed
    order fact then surface**. Its declared roster is that one knob, a row of
    drift-kit's static table (§Layout and configuration); the family is forced
-   rather than chosen, since the tool resolves a consumer knob and a hardcoded top-level flag would resolve
-   the platform default while silently ignoring every override. Both positionals
+   rather than chosen, since that knob's default derives from
+   `GATE_SDK_WORKFLOW_DIR`, a bridged input a hardcoded top-level flag never
+   receives. Both positionals
    are free text, so it also validates their **shape** — see
    gate-sdk/SPEC.md §The bin/-tool contract —
    scanning every positional rather than the first, two slots making arity

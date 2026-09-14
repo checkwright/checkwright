@@ -448,11 +448,12 @@ that re-fires the day a second contributor-only member lands.
 The constrained members and what forces each:
 
 - `bash:4.3` — the floor is set by the **highest** construct the battery runs,
-  not the most numerous. Three bash-4.0 constructs are widespread — `declare -A`
-  (gate-sdk, guard-kit, delegation-kit, evidence-kit checks), `mapfile` (across
-  the kits), the `${x,,}` case expansion (the installer's consumer smoke) — but
-  the **nameref** (`local -n`, bash 4.3) outranks
-  them: `gate-sdk/lib/gate.sh`'s couples expander, which every gate sources. The
+  not the most numerous. Three bash-4.0 constructs are present — `declare -A`
+  (gate-sdk, guard-kit, evidence-kit, the installer's consumer smoke), `mapfile`
+  (across the kits), case-modification expansion (gate-sdk's gate library and the
+  installer's consumer smoke) — but the **nameref** (`local -n`, bash 4.3)
+  outranks them: `gate-sdk/lib/gate.sh`'s couples expander, which the gate runner
+  sources. The
   leaf gate that carried the second instance, `check-comment-tier`, has since
   ported to the binary substrate and its script is gone — which changes nothing
   about the floor, because the nameref in the shared gate

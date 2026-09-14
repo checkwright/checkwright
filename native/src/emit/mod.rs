@@ -377,8 +377,7 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         reads_census::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The report skeleton — the collator, a *bridged* arm rather than a
-    // top-level flag: a hardcoded flag receives no consumer override, which for a kit whose whole
-    // surface is overridable knobs would be a functional regression rather than a porting detail.
+    // top-level flag: its knob defaults and its members' guard-kit knobs are bridged inputs.
     (
         "--emit-drift-report",
         Arm::Emit(drift_report::emit),

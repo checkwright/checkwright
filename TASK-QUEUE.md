@@ -16,6 +16,41 @@
 
 ## Deferred
 
+- **upgrade-smoke-consumer-unseeded-configs** [design-pending] [cost: event/high] [surface: gate-sdk] — upgrade-smoke's
+  scratch consumer never reproduces what installer init seeds: init copies every vendored kit's
+  `templates/*-config.{sh,knobs}` into the gates dir (`recipe::config_seam_plan`), while the smoke
+  installs each kit through its own `smoke/install.sh`, which at the v0.25.0 FROM copies a config
+  template for context-kit and drift-kit only. So a left-behind-shell-config red is visible to the
+  smoke only for kits whose smoke happens to seed a config, and the earlier knob-file cuts (site,
+  doctrine, queue, lifecycle, canon, delegation) passed it with no Tightened-gates declaration for
+  the gates an init-seeded consumer meets red. Re-verified at the drain against `config_seam_plan`
+  and the v0.25.0 canon, delegation and context smoke installs.
+  **Why [design-pending]:** the seeding site — the FROM vendoring step or a phase-1 step — decides
+  whether the suite's red set is the init-seeded one, and it must stay inside gate-sdk/SPEC.md
+  §upgrade-smoke's ruling that phase A is sync-plus-regen and never reconciles a consumer red away.
+  **Cost while deferred:** a future config-shape change to a kit whose smoke seeds no config ships
+  an undeclared consumer red that validate cannot see.
+  Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 3, which declared the missed set
+  after the fact from `checkwright-gates --knob-files` and a per-gate refusal probe); promoted at
+  that iteration's close.
+
+- **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
+  default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
+  delegation-kit/SPEC.md §Layout and configuration) names `<gates-dir>/lib/gate.sh` as its third
+  element, a path no vendored tree carries — the gate library sits under the vendored gate-sdk
+  root — so a consumer on the default leaves the library outside `check-gate-tamper`'s gate-file
+  roster. Carried verbatim from the retired shell loader into the static table; this repo's own
+  knob file names the right path, which is why the battery here never showed it. Distinct from
+  `gate-file-coverage-closure`, which enumerates registered gate files and would not reach the
+  library.
+  **Why [design-pending]:** the fix derives the element from a gate-sdk root input rather than the
+  gates dir, and which root knob (relative to what `check-gate-tamper` matches) is a choice; it
+  widens the gate's refusal set for every consumer on the default, so it owes a fixture arm and a
+  Tightened-gates declaration.
+  **Cost while deferred:** a consumer's gate-library edit co-staged with product code escapes the
+  isolation rule.
+  Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 2); drained at its close.
+
 - **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
   CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
   reads the host repo's history passes here and fails in a consumer tree or a depth-1 clone.
@@ -1098,10 +1133,10 @@
   tree is matched by some `DELEGATION_KIT_GATE_FILES` glob, so a gate can sit
   outside `check-gate-tamper`'s assertion-A coverage silently. It did: this
   repo's consumer config declares the array, which **replaces** the kit default
-  rather than extending it (`delegation.sh` guards it with `declare -p … ||`),
+  rather than extending it (a knob-file value replaces the default whole),
   and the declaration named only `*/checks/*.sh` — leaving all nine
   `scripts/check-*.sh` consumer-resident gates uncovered. Close restated the
-  default's glob in `scripts/delegation-config.sh` and corrected
+  default's glob in this repo's delegation config and corrected
   delegation-kit/SPEC.md §Layout and configuration, which had described the
   knob as *widening* the default — the inverse of the mechanism.
   **The gate:** enumerate gate scripts (the `gates.list` registry resolved to
@@ -1513,9 +1548,10 @@
   counted that day" reds as a restated collection total purely because the line broke
   between the partitive marker and the cardinal — the same sentence reflowed onto one line
   passes.
-  **Root cause, decidable and narrow.** The partitive exemption in `canon-kit/lib/spec.sh`
-  tests a *same-line* prefix regex against the text preceding the cardinal, so a partitive
-  marker on the previous line is invisible to it — while canon-kit/SPEC.md
+  **Root cause, decidable and narrow.** The partitive exemption in the shared spec adapter
+  (`native/src/spec.rs`, re-read at `config-seam-third-cut`'s close) tests a *same-line* prefix
+  against the text preceding the cardinal, so a partitive marker on the previous line is
+  invisible to it — while canon-kit/SPEC.md
   §check-manifest-count states the exemption as a property of the *sentence*, a partitive
   marker on either side of the match, with no line-scoped qualifier. The gate being
   stricter than its own spec is the defect, not the reverse.
@@ -1527,7 +1563,7 @@
   carries a wrapped-paragraph hook beside the line hook, so the paragraph-joined text is
   available at the match site. Test the partitive prefix against the joined paragraph
   rather than the raw line, or carry a one-line lookback for the prefix window. The fix
-  belongs in `canon-kit/lib/spec.sh` where both gates read it — `check-prose-enum` shares
+  belongs in the shared spec adapter where both gates read it — `check-prose-enum` shares
   the same adapter and inherits the same defect — not in either gate. Plus a `good/`
   fixture case pinning a wrapped partitive, the regression the current pair does not carry.
   **Why `[design-pending]`:** paragraph-joined and one-line-lookback are not the same
@@ -1852,11 +1888,11 @@
   **Both populations exist, which is why no reading can be adopted silently.**
   `gate-sdk/lib/gate.sh` and `guard-kit/lib/guard.sh` have
   verified callers in other kits and in `scripts/` — public on either reading, so they decide
-  nothing. `canon-kit/lib/spec.sh` (`spec_manifest_files` and the adapters beside it) and
-  `evidence-kit/lib/evidence.sh` (eleven adapters, inventoried in one sentence at
-  evidence-kit/SPEC.md §lib/evidence.sh) have **zero callers outside their own kit**: public
+  nothing. `evidence-kit/lib/evidence.sh` (eleven adapters, inventoried in one sentence at
+  evidence-kit/SPEC.md §lib/evidence.sh) has **zero callers outside its own kit**: public
   under the first reading, and textbook "a SPEC subsection that inventories internal helpers"
-  under the second.
+  under the second. canon-kit's library was the second such population until it left the tree
+  with that kit's static knob cut (`config-seam-third-cut`).
   **What turns on it:** the kit-level reading makes those two inventories findings and buys a
   large corrective across two SPECs; the file-level reading clears them and matches the
   doctrine's own carve-out for a SPEC naming public functions as contracts.
@@ -2018,40 +2054,6 @@
   recurrence: install-disposition-smoke-accounting-split 2026-08-27
   Filed 2026-08-22 by close, draining the gap inbox; the lead filed the bullet at validate and this
   drain re-verified the skip at its source rather than off the gate's `spec:` line.
-
-- **spec-prune-normalisation-shell-oracle** [design-pending] [cost: event/high] [surface: canon-kit] — the shell twin of the
-  `_spec_prune_kit_roots` normalisation repair is covered by no standing oracle.
-  `canon-kit/lib/spec.sh`'s `_spec_prune_kit_roots` compared unnormalised paths, so a `..` scan
-  root pruned nothing at all and silently widened every caller's corpus; the eighth cohort's
-  edge-root parity run caught it and repaired it with `_spec_norm_abs`. The only standing
-  assertion is `check-spec-dod-singleton.test.sh`'s prune-through-dotdot case, and that member now
-  dispatches to the binary, so it holds the **crate's** normalisation, not the shell's.
-  **Re-verified at this close**, not relayed: `canon-kit/checks/` carries only
-  `check-spec-dod-singleton.gate` and `check-spec-derivable-section.gate` (both `.sh` files
-  deleted), while `canon-kit/lib/spec.sh:171-201` still routes three surviving shell gates through
-  the repaired prune — `check-surface-duplication.sh:34` (via `spec_canonical_specs`),
-  `check-spec-embedded-source` (both readers) and `check-amendment-queue` (via
-  `spec_amendments`), plus the README reader in that library. None of the three has a `.test.sh`
-  scenario runner. The bullet named two of the three; the third is `check-amendment-queue`.
-  **Since that re-verification** the fifth budget batch ported `check-amendment-queue` and the
-  sixth ported `check-spec-embedded-source`, leaving one shell caller, `check-surface-duplication`.
-  **THE COUNT IS NOW ZERO, and the DELIVERABLE AS WRITTEN IS MOOT — measured 2026-08-24 at
-  `shell-gate-tail-port`'s cut.** Delta 9 ported that last caller. A grep over every tracked `.sh`
-  finds no caller of `_spec_prune_kit_roots`, `spec_canonical_specs` or `spec_amendments` outside
-  `canon-kit/lib/spec.sh` itself; `check-spec-dod-singleton.test.sh` names them in comments only.
-  A scenario runner "for one still-shell caller" cannot be built for a caller that does not exist.
-  **What is NOT disposed of by that**, and is what a scope re-takes: the *library still ships*, so
-  a consumer's own shell gate sourcing `canon-kit/lib/spec.sh` meets the unrepaired-prune
-  regression with nothing asserting against it. The repaired behaviour is held on the crate side
-  by the eighth cohort's edge-root fixture, which is the alternative a re-scope folds this into.
-  **The control discipline the cohort paid for survives either shape:** a *symmetric* break of the
-  normaliser is invisible to this assertion, so the oracle must be an asymmetric one.
-  **Cost while deferred:** the shell prune can regress to the pre-repair behaviour with a green
-  battery, silently widening every surviving caller's corpus on any consumer leaving
-  `CANON_KIT_SCAN_KIT_ROOTS` at 0. This repo now has **no** shell caller, so the cost lands
-  entirely on adopters and this tree's battery cannot see it even in principle.
-  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from the eighth cohort's
-  build session, which paid for the repair and declined to absorb its coverage hole.
 
 - **baseline-row-prose-coupling-gate** [design-pending] [cost: event/low] [surface: canon-kit] — governed prose asserts what
   `.workflow/validate-baseline.txt` holds, and nothing checks it against the file.
@@ -2471,7 +2473,7 @@
   iteration deleted `drift-kit/bin/trajectory.sh` and `queue-kit/bin/roadmap.sh`. Both shipped:
   the `--pack-installer` arm recursively copies each enumerated kit root into the payload, `bin/`
   included, so a consumer who scripted a direct invocation now gets file-not-found. And
-  `CANON_KIT_DEPRECATION_MARKERS` defaults empty in `canon-kit/lib/spec.sh`, so no marker ever
+  `CANON_KIT_DEPRECATION_MARKERS` defaults empty in canon-kit's knob table, so no marker ever
   rode either script and none could.
   **Why the criterion cannot see it.** docs/install.md §Versioning defines a major as removing a
   DEPRECATED surface, or a change the two-phase upgrade contract cannot reconcile from the release
@@ -2498,40 +2500,6 @@
   Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
   whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
 
-
-- **spec-lib-dead-derivation** [design-pending] [cost: event/low] [surface: canon-kit] — three section-builder regexes in
-  `canon-kit/lib/spec.sh` have no reader left in the tree, and nothing rules what they are.
-  **Derived rather than inferred, 2026-08-19 at close's capability-pendency audit.**
-  `SPEC_FEATURE_RE`, `SPEC_ACTIVE_RE` and `SPEC_DEFERRED_RE` are matched by nothing but their own
-  definition lines: a grep for the three names across every `*.sh` in the tree returns those lines
-  and nothing else.
-  **It surfaced from a prose claim that had gone false, and the prose is already corrected.**
-  canon-kit/SPEC.md asserted `check-amendment-queue` "still reads `SPEC_ACTIVE_RE` and its
-  siblings here"; that gate ported to the crate, where the module classifies a section name
-  against `CANON_KIT_ACTIVE_SECTIONS` directly and builds no regex at all. The residue is what is
-  left uncorrected, and it is this entry.
-  **The disposition is genuinely open, which is why this is a unit and not a deletion.**
-  `canon-kit/lib/spec.sh` is a KIT library: a consumer's own shell gate may legitimately source
-  these, so *unread in this tree* is not *unused*. Deleting them is a kit-surface removal with an
-  upgrade-contract cost — a Renamed-knobs `old -> nothing` declaration under docs/install.md's
-  grammar — rather than a cleanup.
-  **Three shapes.** Delete them and declare the removal. Keep them and state in canon-kit/SPEC.md
-  that they are consumer surface with no in-tree reader, which makes the absence a fact rather
-  than a smell. Or hold them until the port's shell residue is dispositioned wholesale, since more
-  of this library loses its last caller as the remaining members port.
-  **The same class as `queue-lib-dead-derivation`, one library over, and deliberately not folded
-  into it.** That entry's regexes retain a gate-test reader and queue-kit/SPEC.md already rules
-  them internal, so its open question is whether a parity arm is live coverage. These have **no**
-  reader of any kind and no ruling behind them, so the question is the opposite one: whether they
-  are surface at all.
-  **DISTINCT from `in-crate-module-coupling-derivation`** (descriptors under-declaring their
-  couples) and from `native-gate-port-remaining-corpus`, retired 2026-09-10 at zero owed (what the
-  port owed, not what it leaves behind unread).
-  **Cost while deferred:** the port keeps generating this residue at the rate it lands members,
-  and every reader who wonders re-runs the same grep to learn the same thing.
-  Filed into the gap inbox 2026-08-19 by the `budget-batch-and-account-identity-kind` close, at
-  its capability-pendency audit; promoted at the following scope's drain, the grep re-run at HEAD
-  there and the three names still matched by their own definition lines alone.
 
 - **couples-glob-semantics-unowned** [design-pending] [cost: event/high] [surface: gate-sdk] — one manifest field, three readers, two
   incompatible glob semantics, and no surface owns which reader is entitled to which.
@@ -2566,7 +2534,7 @@
   (`path_matches_glob` requires equal segment count, `:157-167`, no `**` arm) — so a `**`
   filter value states a coverage demand its own `knob:` couples token cannot express. That
   is why this iteration's `CANON_KIT_COMMENT_SURFACE` is depth-enumerated per extension
-  rather than spelled `**` (`scripts/canon-config.sh:97` reasons it inline). Read in source,
+  rather than spelled `**` (`scripts/canon-config.knobs` reasons it inline). Read in source,
   not off prose. It widens the entry's subject from three couples readers to **which matcher
   a field is entitled to**, the filter field included — and it is the same unruled question,
   which is why it folded rather than minting a slug.
@@ -2574,20 +2542,21 @@
   than reading them.
 
 - **prose-tell-threshold-validation** [design-pending] [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
-  are read unvalidated on both substrates, so a typo turns a calibrated gate into a silent no-op
+  are read unvalidated, so a typo turns a calibrated gate into a silent no-op
   or a wall of noise, confidently and with no diagnostic.
   **The count in the filing was wrong and the drain corrected it: five, not six.**
-  `canon-kit/lib/spec.sh` defaults `CANON_KIT_PROSE_TELL_EMDASH_MAX`, `_CONTRAST_MAX`,
-  `_RHYTHM_MIN_SENTENCES`, `_RHYTHM_CV_MIN` and `_TRICOLON_MAX` with a bare `[[ -v ]] ||` and
-  validates none of them, while the same file's validator block checks fourteen other knobs for
-  range and shape. `_GLOBS` is the sixth knob the bullet counted and it is an array, not a
-  threshold — a different validation question.
+  canon-kit's static knob table (`native/src/knobs/canon_kit.rs`) defaults
+  `CANON_KIT_PROSE_TELL_EMDASH_MAX`, `_CONTRAST_MAX`, `_RHYTHM_MIN_SENTENCES`, `_RHYTHM_CV_MIN`
+  and `_TRICOLON_MAX` and its validator checks none of them, while it checks other knobs for
+  range and shape (re-read at `config-seam-third-cut`'s close, after the shell library left).
+  `_GLOBS` is the sixth knob the bullet counted and it is an array, not a threshold — a different
+  validation question.
   **The failure is silent in both directions.** The value is coerced by its leading numeric
   prefix, so a non-numeric max becomes zero and every paragraph reds, and a non-numeric minimum
   becomes zero and its assertion can never fire. The compiled form reproduces the coercion
   **deliberately** — a refusal the shell never made would be a verdict change across the seam.
-  **Why `[design-pending]`:** the repair is one validation in `canon-kit/lib/spec.sh`, which is
-  criterion 6's discharge-by-construction — one computation both substrates read. What is not
+  **Why `[design-pending]`:** the repair is one validation in canon-kit's knob-table validator,
+  which every reader shares. What is not
   settled is what a malformed threshold should *do*: refuse the gate at exit 2, matching every
   other knob in that validator, or fall back to the documented default and report. The first is
   consistent; the second is kinder to an adopter mid-edit.
@@ -4390,16 +4359,16 @@
   — a depth-enumerated glob value is a maintained copy of "any depth", and a file one level
   deeper than the enumeration reaches leaves the scanned corpus **silently**.
   **The class, not one value, and both instances are legitimate.**
-  `scripts/canon-config.sh` carries two: `CANON_KIT_MANIFEST_FILES`' single-level globs (reasoned
-  at :21, "single-level globs skip the gate-tests/ fixtures the finder pruned") and the
-  `CANON_KIT_COMMENT_SURFACE` value this iteration added, five depths per extension across
-  `sh|gate|rs` (reasoned at :97, because the couples matcher cannot express `**`). Both are
+  `scripts/canon-config.knobs` carries two: `CANON_KIT_MANIFEST_FILES`' single-level globs
+  (reasoned in its comment, "single-level globs skip the gate-tests/ fixtures the finder pruned")
+  and the `CANON_KIT_COMMENT_SURFACE` value, five depths per extension across `sh|gate|rs`
+  (reasoned in its comment, because the couples matcher cannot express `**`). Both are
   consumer editorial choices and neither is a kit defect. What no surface owns is that the depth
   bound is an **unoracled literal**.
   **Re-verified at the drain that the measured-claim mechanism cannot reach it.**
-  `scripts/canon-config.sh:80` sets `CANON_KIT_MEASURED_SURFACE_GLOBS` to
-  `CANON_KIT_MANIFEST_FILES` plus `.claude/commands/*.md` plus `TASK-QUEUE.md`; `scripts/*.sh` is
-  in none of them, so a `measured:` marker written in `canon-config.sh` is never read.
+  `scripts/canon-config.knobs` sets `CANON_KIT_MEASURED_SURFACE_GLOBS` to
+  `CANON_KIT_MANIFEST_FILES` plus `.claude/commands/*.md` plus `TASK-QUEUE.md`; the knob file is
+  in none of them, so a `measured:` marker written there is never read.
   **Why `[design-pending]`:** two dispositions and they cost differently — widen the
   measured-claim corpus to reach the config surface, or assert that no tracked governed source
   lies deeper than the enumerations reach. The first makes one more surface measured forever; the
@@ -4960,5 +4929,7 @@
 ## Done
 
 - static-knob-file-couple-underived
+- spec-prune-normalisation-shell-oracle
+- spec-lib-dead-derivation
 
 ## Lessons Learned
