@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: couples-field-semantics
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -1473,6 +1473,8 @@
   they are now a named class on the cadence row with a stated review question
   rather than an undifferentiated skip count — and strictly worse than a gate: the
   row is reviewed at close by a session, and a session can defer.
+  **Selected as `couples-field-semantics`' lead unit** (operator direction, 2026-09-15,
+  lead-relayed); the blocker rides the same iteration.
 
 - **amendment-owner-position-citation** [design-pending] [cost: iteration/low] [surface: queue-kit] — prose may cite a merged
   amendment as *settled history*, never as a live *owner*; today it does both.
@@ -2481,6 +2483,8 @@
   not off prose. It widens the entry's subject from three couples readers to **which matcher
   a field is entitled to**, the filter field included — and it is the same unruled question,
   which is why it folded rather than minting a slug.
+  **Selected for `couples-field-semantics` as the ruling its lead unit waits on** (operator
+  direction, 2026-09-15, lead-relayed).
   Filed 2026-08-19 by close from the gap inbox; the drain executed all three matchers rather
   than reading them.
 
@@ -4208,6 +4212,8 @@
   **Cost while deferred:** the corpus is two to five segments deep with one level of headroom, so
   the bound holds today and fails with no diagnostic on the day a governed source lands six
   levels down.
+  **Selected for `couples-field-semantics` as its depth-bound unit** (operator direction,
+  2026-09-15, lead-relayed).
   Filed 2026-09-12 by build into the gap inbox; drained and promoted at this close.
 
 - **delegated-read-blind-to-gitignored-capture** [design-pending] [cost: session/low] [surface: delegation-kit]
@@ -4360,6 +4366,8 @@
   emitter corpus inside a fixture, a design call per member.
   **Cost while deferred:** every no-walk or `?` claim on a steered member is unverifiable, and
   a changed emitter walk passes unit test A unseen.
+  **Selected for `couples-field-semantics` as its steered-walk unit** (operator direction,
+  2026-09-15, lead-relayed); its own delta at spec, a design call per member.
   Filed 2026-09-12 by build, as three bullets; folded and promoted 2026-09-13 at close.
 
 - **packed-knob-projection-filter-form** [design-pending] [cost: event/low] [surface: gate-sdk]
@@ -4373,6 +4381,8 @@
   pattern set", so a new form must be reconciled with that refusal rather than bolted on.
   **Cost while deferred:** that walk stays `?`, skipped by `check-reads-couples` and outside
   its coverage assertion.
+  **Selected for `couples-field-semantics` as its projection unit** (operator direction,
+  2026-09-15, lead-relayed); its own delta at spec, reconciled with the packed-knob refusal.
   Filed 2026-09-13 by build, beside the projection class; drained and promoted 2026-09-13 at close.
 
 - **release-binary-archive-versioned-name** [design-pending] [cost: event/low] [surface: installer]
