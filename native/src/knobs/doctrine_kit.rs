@@ -10,6 +10,7 @@ pub const KIT: Kit = Kit {
             default: Default::Scalar("CLAUDE.md"),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
         Row {
             name: "DOCTRINE_KIT_DOCTRINE_FILE",
@@ -17,6 +18,7 @@ pub const KIT: Kit = Kit {
             default: Default::Scalar("doctrine-kit/DOCTRINE.md"),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
         Row {
             name: "DOCTRINE_KIT_DIGEST_SECTION",
@@ -24,6 +26,7 @@ pub const KIT: Kit = Kit {
             default: Default::Scalar("## Delivery doctrine"),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
     ],
     validate: None,

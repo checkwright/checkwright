@@ -449,8 +449,10 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
   a shed section, default `pub-index|proto-index` (consumer index tooling).
 - `CANON_KIT_EMBED_THRESHOLD` / `CANON_KIT_EMBED_MINLINES` — defaults `0.70`
   / `8`; `CANON_KIT_EMBED_LANGS` — the scanned fence-language → source
-  mapping, one `kind|fence-alias,…|file-glob,…` entry per language family,
-  default = the bundled list; `CANON_KIT_EMBED_ILLUSTRATIVE` — fences
+  mapping, one `kind|fence-langs|file-globs` entry per language family, the two
+  list fields `,`-separated — field names the row declares, so a descriptor
+  couples the candidate globs as `knob:CANON_KIT_EMBED_LANGS.file-globs`
+  (gate-sdk/SPEC.md §The `# graph:` manifest) — default = the bundled list; `CANON_KIT_EMBED_ILLUSTRATIVE` — fences
   illustrative-by-default, default `(json)`; `CANON_KIT_EMBED_WIRE_KIND` — the
   one fence an amendment may embed as a not-yet-merged contract delta,
   default `proto`.

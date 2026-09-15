@@ -95,19 +95,29 @@ pub struct Row {
     pub inputs: &'static [&'static str],
     // spec: gate-sdk/SPEC.md §The knob file — an empty layered value answers the default on this row
     pub empty_takes_default: bool,
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the named fields an indexed row's elements
+    // pack, `None` on a row whose element is itself the pattern
+    pub packing: Option<&'static Packing>,
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — an element's field separator, and each field's
+// name with its list separator where the field is a list
+pub struct Packing {
+    pub sep: char,
+    pub fields: &'static [(&'static str, Option<char>)],
 }
 
 impl Row {
     pub const fn scalar(name: &'static str, v: &'static str) -> Row {
-        Row { name, shape: Shape::Scalar, default: Default::Scalar(v), inputs: &[], empty_takes_default: false }
+        Row { name, shape: Shape::Scalar, default: Default::Scalar(v), inputs: &[], empty_takes_default: false, packing: None }
     }
 
     pub const fn indexed(name: &'static str, v: &'static [&'static str]) -> Row {
-        Row { name, shape: Shape::Indexed, default: Default::Indexed(v), inputs: &[], empty_takes_default: false }
+        Row { name, shape: Shape::Indexed, default: Default::Indexed(v), inputs: &[], empty_takes_default: false, packing: None }
     }
 
     pub const fn keyed(name: &'static str, v: &'static [(&'static str, &'static str)]) -> Row {
-        Row { name, shape: Shape::Keyed, default: Default::Keyed(v), inputs: &[], empty_takes_default: false }
+        Row { name, shape: Shape::Keyed, default: Default::Keyed(v), inputs: &[], empty_takes_default: false, packing: None }
     }
 
     pub const fn derived(
@@ -116,12 +126,94 @@ impl Row {
         f: fn(Resolve) -> Result<Value, String>,
         inputs: &'static [&'static str],
     ) -> Row {
-        Row { name, shape, default: Default::Derived(f), inputs, empty_takes_default: false }
+        Row { name, shape, default: Default::Derived(f), inputs, empty_takes_default: false, packing: None }
     }
 
     pub const fn empty_takes_default(self) -> Row {
         Row { empty_takes_default: true, ..self }
     }
+
+    pub const fn packed(self, packing: &'static Packing) -> Row {
+        Row { packing: Some(packing), ..self }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a knob reference's name and the declared field it
+// projects, split at the first `.`, which no static knob name carries
+pub fn reference(r: &str) -> (&str, Option<&str>) {
+    match r.split_once('.') {
+        Some((name, field)) => (name, Some(field)),
+        None => (r, None),
+    }
+}
+
+fn row_packing(name: &str) -> Option<&'static Packing> {
+    owner(name).and_then(|k| k.row(name)).and_then(|r| r.packing)
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — whether a knob's row declares the named field
+pub fn declares_field(name: &str, field: &str) -> bool {
+    row_packing(name).is_some_and(|p| p.fields.iter().any(|(f, _)| *f == field))
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a packed knob is addressed by a declared field,
+// never whole, because an element is not a pattern
+pub fn refuse_whole_packed(name: &str) -> Result<(), String> {
+    match row_packing(name) {
+        Some(p) => Err(format!(
+            "{} packs its elements into fields ({}), so it is not a pattern set — name one field as {}.<field>",
+            name,
+            p.fields.iter().map(|(f, _)| *f).collect::<Vec<_>>().join(", "),
+            name
+        )),
+        None => Ok(()),
+    }
+}
+
+pub type Unpacked = Vec<(&'static str, Vec<String>)>;
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — each element's declared fields by name, the one
+// parser every reader of a packed knob reads through: a missing trailing field reads empty, and a list
+// field splits on its separator with empty members dropped
+pub fn unpack(name: &str) -> Result<Vec<Unpacked>, String> {
+    let packing = row_packing(name).ok_or_else(|| {
+        format!("{} declares no element packing, so it has no field to address — name the knob whole", name)
+    })?;
+    let raw = wire(name)?;
+    if raw.is_empty() {
+        return Ok(Vec::new());
+    }
+    Ok(raw
+        .split('\t')
+        .map(|el| {
+            let mut parts = el.splitn(packing.fields.len(), packing.sep);
+            packing
+                .fields
+                .iter()
+                .map(|(field, list)| {
+                    let v = parts.next().unwrap_or("");
+                    let members = match list {
+                        Some(s) => v.split(*s).filter(|m| !m.is_empty()).map(String::from).collect(),
+                        None => vec![v.to_string()],
+                    };
+                    (*field, members)
+                })
+                .collect()
+        })
+        .collect())
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — one declared field's members flattened across
+// the elements, in element order
+pub fn project(name: &str, field: &str) -> Result<Vec<String>, String> {
+    if row_packing(name).is_some() && !declares_field(name, field) {
+        return Err(format!("{} declares no field '{}' in its element packing", name, field));
+    }
+    Ok(unpack(name)?
+        .into_iter()
+        .flat_map(|el| el.into_iter().filter(|(f, _)| *f == field).flat_map(|(_, m)| m))
+        .filter(|m| !m.is_empty())
+        .collect())
 }
 
 // spec: gate-sdk/SPEC.md §The knob file — a declared scalar family: each member's name is the prefix

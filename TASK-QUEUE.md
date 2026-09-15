@@ -12,23 +12,6 @@
 
 ## New Features
 
-- **packed-knob-projection-filter-form** [spec: SPEC-packed-knob-projection.md]
-  — no filter-grammar form reaches a projection out of a knob whose elements pack several
-  fields, so gate-sdk/SPEC.md §check-reads-couples keeps its `projection` ground class.
-  Its one member is `check-spec-embedded-source`'s source-candidate walk over
-  `CANON_KIT_EMBED_LANGS`' `kind|fence-langs|file-globs` triples (`native/src/gates/mod.rs`,
-  the registry's `projection@` ground). The SPEC names the retirement condition, a form
-  reaching such a projection, and no entry owned it.
-  **Why it needed design:** the same SPEC (§gen-pre-commit) rules a packed knob "not a
-  pattern set", so a new form must be reconciled with that refusal rather than bolted on.
-  **Cost while deferred:** that walk stays `?`, skipped by `check-reads-couples` and outside
-  its coverage assertion.
-  **Selected for `couples-field-semantics` as its projection unit** (operator direction,
-  2026-09-15, lead-relayed); its own delta at spec, reconciled with the packed-knob refusal.
-  **Spec ruled a row-declared named field**, `CANON_KIT_EMBED_LANGS.file-globs`, read through one
-  parser; the bare packed knob stays refused.
-  Filed 2026-09-13 by build, beside the projection class; drained and promoted 2026-09-13 at close.
-
 - **steered-fixture-walk-roots-unverified** [spec: SPEC-steered-fixture-roots.md]
   — unit test A verifies nothing about a member whose every fixture case steers off its walk
   through positionals, so that member's walk-root declaration is unproven.
@@ -4607,5 +4590,6 @@
 
 - couples-glob-semantics-unowned
 - couples-dynamic-root-resolution
+- packed-knob-projection-filter-form
 
 ## Lessons Learned

@@ -33,6 +33,7 @@ pub const KIT: Kit = Kit {
             default: Default::Scalar("docs/CNAME"),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
         Row {
             name: "SITE_KIT_SCAN_ROOT",
@@ -40,6 +41,7 @@ pub const KIT: Kit = Kit {
             default: Default::Scalar("."),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
         Row {
             name: "SITE_KIT_DOCS_DIR",
@@ -47,6 +49,7 @@ pub const KIT: Kit = Kit {
             default: Default::Scalar("docs"),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
         Row {
             name: "SITE_KIT_ALIASES",
@@ -54,6 +57,7 @@ pub const KIT: Kit = Kit {
             default: Default::Indexed(&[]),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
         Row {
             name: "SITE_KIT_EXEMPT_PATHS",
@@ -61,6 +65,7 @@ pub const KIT: Kit = Kit {
             default: Default::Indexed(&["*/gate-tests/*", "*docs/posts/*"]),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
         Row {
             name: "SITE_KIT_RENDERER",
@@ -68,6 +73,7 @@ pub const KIT: Kit = Kit {
             default: Default::Indexed(RENDERER),
             inputs: &[],
             empty_takes_default: false,
+            packing: None,
         },
         Row {
             name: "SITE_KIT_RENDERER_BATCH",
@@ -75,6 +81,7 @@ pub const KIT: Kit = Kit {
             default: Default::Derived(renderer_batch),
             inputs: &["SITE_KIT_RENDERER"],
             empty_takes_default: false,
+            packing: None,
         },
     ],
     validate: None,

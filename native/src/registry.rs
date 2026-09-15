@@ -183,7 +183,11 @@ fn corpus_knob_tokens(resolve_dirs: &[String]) -> Result<Vec<String>, String> {
                 if k != "couples" && k != "trigger" {
                     continue;
                 }
-                tokens.extend(v.split(',').filter_map(|t| t.strip_prefix("knob:")).map(str::to_string));
+                tokens.extend(
+                    v.split(',')
+                        .filter_map(|t| t.strip_prefix("knob:"))
+                        .map(|r| crate::knobs::reference(r).0.to_string()),
+                );
             }
         }
     }
@@ -309,7 +313,15 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
     for tok in field.split(',') {
         match tok.strip_prefix("knob:") {
             Some(name) => {
-                for m in crate::walk::knob_array(name).map_err(|e| {
+                // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `<NAME>.<field>` token expands to
+                // the field's members across the elements, and a bare token on a packed knob is refused
+                let members = match crate::knobs::reference(name) {
+                    (knob, Some(field)) => crate::knobs::project(knob, field),
+                    (knob, None) => {
+                        crate::knobs::refuse_whole_packed(knob).and_then(|_| crate::walk::knob_array(knob))
+                    }
+                };
+                for m in members.map_err(|e| {
                     format!(
                         "couples token 'knob:{}' could not be resolved: {} — a knob token expands \
                          to the knob's members, and an empty expansion would be a lost trigger; \
@@ -452,6 +464,33 @@ mod tests {
             "CLAUDE.md",
             "a consumer's empty knob expands to nothing, because the gate then scans nothing either"
         );
+        unscratch(&knobs, &d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a packed knob is addressed by a declared field,
+    // read through its one parser with a short element's missing fields empty, and never whole
+    #[test]
+    fn a_packed_knob_expands_by_its_declared_field_and_is_refused_whole() {
+        let knobs = crate::knobenv::lock();
+        let d = scratch_corpus(
+            &knobs,
+            "packed",
+            "CANON_KIT_EMBED_LANGS[] = rs|rust,rs|*.rs\n\
+             CANON_KIT_EMBED_LANGS[] = make|make|Makefile,**/build/*.mk\n\
+             CANON_KIT_EMBED_LANGS[] = bare\n",
+        );
+        let roots = vec!["gate-sdk".to_string()];
+        assert_eq!(
+            expand_couples("*SPEC*.md,knob:CANON_KIT_EMBED_LANGS.file-globs", &roots).expect("a declared field"),
+            "*SPEC*.md,*.rs,*Makefile,*build/*.mk"
+        );
+        for refused in [
+            "knob:CANON_KIT_EMBED_LANGS",
+            "knob:CANON_KIT_EMBED_LANGS.no-such-field",
+            "knob:CANON_KIT_SPEC_NAME.file-globs",
+        ] {
+            assert!(expand_couples(refused, &roots).is_err(), "'{}' expanded rather than refusing", refused);
+        }
         unscratch(&knobs, &d);
     }
 

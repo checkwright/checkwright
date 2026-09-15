@@ -600,13 +600,12 @@ pub const REGISTRY: &[GateEntry] = &[
         "gate-sdk",
         &[("git", "")],
     ),
-    // spec: gate-sdk/SPEC.md §check-reads-couples — three walks at one root, declared per walk: two
-    // name their bounding knobs, and the source-candidate walk keeps `?` because its filter is a
-    // *projection* out of `CANON_KIT_EMBED_LANGS`' packed elements rather than a knob's value
+    // spec: gate-sdk/SPEC.md §check-reads-couples — three walks at one root, declared per walk; the
+    // source-candidate walk's filter is the `file-globs` field of `CANON_KIT_EMBED_LANGS`' elements
     (
         "check-spec-embedded-source",
         spec_embedded_source::run,
-        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", ""), (".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""), ("?", "", "", "projection@src/gates/spec_embedded_source.rs:147")],
+        &[(".", "name:knob:CANON_KIT_AMENDMENT_GLOB", "", ""), (".", "name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""), (".", "name:knob:CANON_KIT_EMBED_LANGS.file-globs", "", "")],
         &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
@@ -1850,7 +1849,7 @@ pub const REGISTRY: &[GateEntry] = &[
 // spec: gate-sdk/SPEC.md §check-reads-couples — the live ground classes, each named by what retires
 // its `?`; no further class is offered, since a `?` on a literal or literal-default root whose filter
 // the field can express declares the root instead
-pub const GROUND_CLASSES: &[&str] = &["dynamic", "projection"];
+pub const GROUND_CLASSES: &[&str] = &["dynamic"];
 
 const fn ground_opens_with(ground: &str, class: &str) -> bool {
     let (g, c) = (ground.as_bytes(), class.as_bytes());
@@ -1897,8 +1896,8 @@ const _: () = {
             let (r, f, p, g) = roots[j];
             assert!(
                 root_declaration_holds(r, f, p, g),
-                "a `?` walk root needs a ground `<class>@<path>:<line>`, the class one of `dynamic` or \
-                 `projection`, and no filter or prune, and any other root carries no ground \
+                "a `?` walk root needs a ground `<class>@<path>:<line>`, the class `dynamic`, and \
+                 no filter or prune, and any other root carries no ground \
                  (gate-sdk/SPEC.md §check-reads-couples)"
             );
             j += 1;
@@ -1955,6 +1954,12 @@ pub fn filter_source(spec: &str) -> &str {
 // here by both its readers: `None` for the two forms that name no knob, the omitted field (an
 // unfiltered walk) and `lit:<list>` (a kit literal the crate owns at the walk site)
 pub fn filter_knob(spec: &str) -> Option<&str> {
+    filter_reference(spec).map(|r| crate::knobs::reference(r).0)
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the knob reference a declared filter field names, a
+// `<NAME>.<field>` projection kept whole
+pub fn filter_reference(spec: &str) -> Option<&str> {
     let src = filter_source(spec);
     if src.is_empty() || src.starts_with("lit:") {
         return None;

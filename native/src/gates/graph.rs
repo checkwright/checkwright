@@ -496,13 +496,20 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // the member's declared set, static names included: a token naming a knob the member does
         // not declare is a finding, never a wider trigger
         for field in [&couples, &trigger] {
-            for name in field.split(',').filter_map(|t| t.strip_prefix("knob:")) {
+            for token in field.split(',').filter_map(|t| t.strip_prefix("knob:")) {
+                let (name, projected) = crate::knobs::reference(token);
                 let declared = crate::gates::declared(c).unwrap_or(&[]);
                 if !declared.contains(&name) {
                     errors.push(format!(
                         "MANIFEST: {} carries couples token 'knob:{}', but {} declares no such \
                          knob — a knob token is admissible only for a knob the gate reads",
-                        script, name, c
+                        script, token, c
+                    ));
+                } else if let Some(f) = projected.filter(|f| !crate::knobs::declares_field(name, f)) {
+                    errors.push(format!(
+                        "MANIFEST: {} carries couples token 'knob:{}', but {}'s row declares no \
+                         field '{}' — a projection names a field the knob's element packing declares",
+                        script, token, name, f
                     ));
                 }
             }

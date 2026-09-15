@@ -1,5 +1,11 @@
 // spec: canon-kit/SPEC.md §Layout and configuration — canon-kit's static knob table and validator
-use super::{indexed, scalar, Kit, Resolve, Row, Shape, Value, Values};
+use super::{indexed, scalar, Kit, Packing, Resolve, Row, Shape, Value, Values};
+
+// spec: canon-kit/SPEC.md §Layout and configuration — `CANON_KIT_EMBED_LANGS`' element packing
+const EMBED_LANGS_PACKING: Packing = Packing {
+    sep: '|',
+    fields: &[("kind", None), ("fence-langs", Some(',')), ("file-globs", Some(','))],
+};
 
 fn queue_file(resolve: Resolve) -> Result<Value, String> {
     resolve("GATE_SDK_QUEUE_FILE").map(|(v, _)| v)
@@ -40,7 +46,8 @@ pub const KIT: Kit = Kit {
                 "proto|proto,protobuf|*.proto",
                 "dockerfile|dockerfile|Dockerfile",
             ],
-        ),
+        )
+        .packed(&EMBED_LANGS_PACKING),
         Row::indexed("CANON_KIT_EMBED_ILLUSTRATIVE", &["json"]),
         Row::scalar("CANON_KIT_EMBED_WIRE_KIND", "proto"),
         Row::scalar("CANON_KIT_GLOSSARY_FILE", "GLOSSARY.md"),

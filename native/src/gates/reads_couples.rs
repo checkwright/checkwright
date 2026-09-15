@@ -243,6 +243,32 @@ fn resolve_filter(
             gname, root, knob, e
         )
     })?;
+    let unresolved = |e: String| {
+        format!(
+            "{} declares read root '{}' filtered by {}, which could not be resolved ({}) — the \
+             coverage assertion could not run; treating as failure (not clean)",
+            gname,
+            root,
+            gates::filter_reference(spec).unwrap_or(knob),
+            e
+        )
+    };
+    // spec: gate-sdk/SPEC.md §check-reads-couples — a packed knob is reached through a declared
+    // field, read by the knob's one parser, and never whole
+    if let (_, Some(field)) = crate::knobs::reference(gates::filter_reference(spec).unwrap_or(knob)) {
+        let pats = crate::knobs::project(knob, field).map_err(unresolved)?;
+        return Ok(Some((
+            Filter::Patterns(kind, pats.clone()),
+            format!(
+                "declared read root '{}' filtered by {}.{}='{}' (--reads)",
+                root,
+                knob,
+                field,
+                pats.join(",")
+            ),
+        )));
+    }
+    crate::knobs::refuse_whole_packed(knob).map_err(unresolved)?;
     let mut pats: Vec<String> = Vec::new();
     if !raw.is_empty() {
         let els: Vec<&str> = raw.split('\t').collect();

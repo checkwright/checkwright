@@ -2104,6 +2104,10 @@ The manifest grammar:
   name no static kit owns, and an empty value is a resolved-empty set, so a `knob:`
   naming an unowned name is exit 2 while a declared knob a consumer set empty
   expands to nothing — correct, because the gate then scans nothing either.
+  **A packed knob is addressed by a declared field, never whole.** Where a knob's row declares its
+  element packing, `knob:<NAME>.<field>` names one field's members across its elements, read through
+  the same parser the member's walk uses; a bare token on a packed knob is refused, since an element
+  is not a pattern. The field is the row's to declare, so a reordered packing moves no token.
   **What the token adds is a conversion, not a matcher.** A knob's member is a pattern in its
   walker's discipline, relative to its walk's root, so each member expands to its covering string
   pattern — every `**/` collapsed to `*`, and a leading `*` added unless present — which contains
@@ -11181,9 +11185,9 @@ a knob that **narrows** a corpus is never a couples token, because coupling it
 would trigger the gate on paths it deliberately does not scan — the inverse of the
 token's purpose, and the reason the rule reads the knob a walk's *filter argument*
 takes its value from rather than any knob the module reads; and a knob whose
-elements **pack several fields** is not a pattern set, so a walk filtered by a
-projection out of one (`CANON_KIT_EMBED_LANGS`' `kind|fence-langs|file-globs`
-triples) is outside the form and takes no token. The set the rule reaches is
+elements **pack several fields** is not a pattern set and takes no bare token, while a
+walk filtered by one of its declared fields carries `knob:<NAME>.<field>`, which is a
+pattern set. The set the rule reaches is
 therefore derived per walk, and a knob added later is reached with no edit here.
 
 **Assertions D and E both compute their emissions in process**: D compares each
@@ -14965,14 +14969,14 @@ answered one member at a time. It declares no knob, adds no registry field, and
 parses no source.
 
 **The figures, as of this writing and with the oracle that reproduces each.** 115
-registry members, **18** of which declare at least one `?`, across **20** `?`
-root-lines, over **20** declaration sites. Re-run the oracles rather than trusting
+registry members, **17** of which declare at least one `?`, across **19** `?`
+root-lines, over **19** declaration sites. Re-run the oracles rather than trusting
 those three: where an oracle and this paragraph disagree, the oracle wins and this
 paragraph is stale. Three denominators are live over the same population and they
 are **not** interchangeable, which is stated because conflating them is how the hand
-sweeps went wrong: the **20** root-lines are member-expanded, so a shared root const
-is counted once per member using it — the census's column-2 sum; the **18** members
-are the census's line count; and the **20** *textual* declaration sites are the
+sweeps went wrong: the **19** root-lines are member-expanded, so a shared root const
+is counted once per member using it — the census's column-2 sum; the **17** members
+are the census's line count; and the **19** *textual* declaration sites are the
 locator assertion's enumeration (below), which counts a shared root const's `?` once
 however many members use it. The root-lines and the sites agree today only because no shared
 root const holds a `?`; an assertion over this population must still say which of the three it
@@ -14998,28 +15002,14 @@ is empty on a declared root and required on a `?`, and a `?` with no ground — 
 with a filter or prune, which is what keeps `--reads`' second column unambiguous —
 fails to compile, as does a declared root carrying one. A class names **what would
 retire the `?`**, which is the question the cadence review reading the ground asks.
-Two classes are live:
+One class is live:
 
 - **`dynamic`** — a walk whose root no literal names: computed at run time from
   state the registry cannot hold. Nothing at this altitude retires it.
-- **`projection`** — a walk whose root is statically resolvable but whose filter is
-  projected out of a knob whose elements pack several fields, which the resolution
-  facts below place beyond the filter field's reach. Retired when the filter grammar
-  gains a form that reaches such a projection, at which point the site declares its
-  root.
 
 A further class is deliberately not offered: a `?` that is in fact a hardcoded literal
 root or a positional with a literal default, and whose filter the field can express,
 has no ground, because it should be declaring the root.
-
-**`projection` is the one admitted exception to the refusal of `?` on a statically
-resolvable root, and it is bounded by its cause.** The only other honest spelling is
-the root with its filter omitted, which is a positive claim that the walk reads
-everything under the root — for a member reading only its knob-selected files, an
-over-demand that reds coverage falsely rather than a gap it would expose. So the
-admission holds exactly where the filter field cannot reach the member's filter, and
-for no other reason: a `projection` ground on a walk whose filter the field *can*
-express is the refused opt-out spelled as a class.
 
 **The ground is `<class>@<path>:<line>`, and a locator off its site's home module
 carries one `via` clause.** `<path>` is crate-relative and `<line>` is the line of
@@ -15055,8 +15045,8 @@ site count and its in-module, off-module and per-class partitions are reported f
 this enumeration, which is the one oracle for the site denominator.
 
 **What it decides is presence and placement — deliberately not the class, and not
-the chain.** Whether a walk is a run-time computation or a packed-knob projection no
-gate can decide, and the assertion reads the class no further than its spelling. It
+the chain.** Whether a walk's root is a run-time computation no gate can decide, and
+the assertion reads the class no further than its spelling. It
 resolves a `via` symbol and its first-hop reference, never the path from symbol to
 walk line, which would be a call-graph analysis: where a member's only fixture case
 steers it off the walk through a positional — `check-enforcement-fresh` and
@@ -15094,9 +15084,9 @@ root's enumeration already was.
 than a refusal.** The value is **tab-split** before matching, since the wire joins a
 knob's members with a tab and matching a fifteen-glob knob whole against a basename
 selects nothing. An **indexed** knob resolves to its elements and a **keyed** knob to
-its values — mechanics of the one form rather than a further case, and it does not
-reach a knob whose elements *pack* several fields, whose pattern is a bespoke
-projection of a value rather than the value. And **"unresolvable", "no filter" and
+its values — mechanics of the one form rather than a further case, and a knob whose
+elements pack several fields is reached through a declared field (§The `# graph:`
+manifest). And **"unresolvable", "no filter" and
 "resolved empty" are three verdicts, not two**: a name no static kit owns is the
 knob reader's own refusal, an omitted field is unfiltered, and a declared knob a consumer
 left empty selects **nothing** — because that is what the member's own walk does with
@@ -15124,9 +15114,7 @@ a per-file exclusion list is a new question rather than a stretched prune.
 **Two alternatives are refused, recorded so a later port does not retry them.**
 Declaring `?` for a root that resolves statically is refused: `?` marks a root that
 cannot be *bounded statically*, and spelling one where the property holds would be the
-foreclosed opt-out moved into the registry. The `projection` ground class above is the
-one admission against this refusal, and it reaches no further than a filter the field
-cannot express. Re-implementing the scan over
+foreclosed opt-out moved into the registry. Re-implementing the scan over
 `git ls-files` to fall outside the analyzed class is refused for the same reason
 with a behavioral cost on top: enumeration is out of scope *because* it is not a
 walk, so using it to evade the assertion is opting out spelled in code, and it

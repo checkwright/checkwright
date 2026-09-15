@@ -35,6 +35,8 @@ struct Langs {
 // spec: canon-kit/SPEC.md §check-spec-embedded-source — the language roster is consumer config,
 // each entry `<kind>|<aliases>|<globs>`; the illustrative list then drops a fence language from
 // the map while leaving its file globs in the candidate index
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — the fields are read through the row's declared
+// packing, the parser the `knob:CANON_KIT_EMBED_LANGS.file-globs` projection also reads
 fn langs() -> Result<Langs, String> {
     let mut l = Langs {
         lang2kind: BTreeMap::new(),
@@ -42,20 +44,15 @@ fn langs() -> Result<Langs, String> {
         base2kind: BTreeMap::new(),
         globs: Vec::new(),
     };
-    for entry in walk::knob_array("CANON_KIT_EMBED_LANGS")? {
-        let mut it = entry.splitn(3, '|');
-        let kind = it.next().unwrap_or("").to_string();
-        let aliases = it.next().unwrap_or("").to_string();
-        let globs = it.next().unwrap_or("").to_string();
-        for a in aliases.split(',') {
-            if !a.is_empty() {
-                l.lang2kind.insert(a.to_string(), kind.clone());
-            }
+    for entry in crate::knobs::unpack("CANON_KIT_EMBED_LANGS")? {
+        let field = |name: &str| -> Vec<String> {
+            entry.iter().find(|(f, _)| *f == name).map(|(_, m)| m.clone()).unwrap_or_default()
+        };
+        let kind = field("kind").concat();
+        for a in field("fence-langs") {
+            l.lang2kind.insert(a, kind.clone());
         }
-        for g in globs.split(',') {
-            if g.is_empty() {
-                continue;
-            }
+        for g in field("file-globs") {
             l.globs.push(g.to_string());
             match g.strip_prefix("*.") {
                 Some(ext) if !ext.is_empty() => {
