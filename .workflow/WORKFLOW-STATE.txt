@@ -5,3 +5,4 @@
 ---
 
 amendment-authoring-completeness scope ad5c7f31 2026-09-15 5b4fa79a
+amendment-authoring-completeness spec a0d129fe 2026-09-15 8cad9d50
