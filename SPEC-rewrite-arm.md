@@ -85,7 +85,7 @@ A new `## rewrite` section after §scratch-run. **Not yet applied:**
 >   repository root (both sides resolved through `walk::canonicalize`, gate-sdk/SPEC.md §The crate's
 >   crosser);
 > - a component of its path is `.git`;
-> - it resolves to the lifecycle state file (lifecycle-kit/SPEC.md §check-stage-entry, the
+> - it resolves to the lifecycle state file (lifecycle-kit/SPEC.md §check-stage-evidence, the
 >   `workflow-state-guard` paragraph), tested with that hook's own predicate;
 > - its content, or the content the rewrite would produce, is not UTF-8 or carries a NUL byte;
 > - it names the same canonical file as an earlier operand.
@@ -174,7 +174,7 @@ compares `resolve(path)` with `resolve(<dir>/WORKFLOW-STATE.txt)`. The hook keep
 on `Err`. The arm treats `Err` as a refusal (exit 2), because a writer that cannot tell whether it is
 about to write the state file must not write.
 
-lifecycle-kit/SPEC.md §check-stage-entry, the residual paragraph beginning `The residual is stated
+lifecycle-kit/SPEC.md §check-stage-evidence, the residual paragraph beginning `The residual is stated
 because`. **Not yet applied:** after its first sentence add:
 
 > One Bash writer is closed by construction rather than by the hook: guard-kit's `--rewrite` arm
@@ -248,7 +248,7 @@ The build unit re-derives them.
 - `gate-sdk/SPEC.md` — §The POSIX ERE matcher (delta 3) and §The non-gate arm's `Arm::Run` list
   (delta 6).
 - `native/src/hook/workflow_state.rs` — `is_state_file` (delta 4).
-- `lifecycle-kit/SPEC.md` — §check-stage-entry's residual paragraph (delta 4).
+- `lifecycle-kit/SPEC.md` — §check-stage-evidence's residual paragraph (delta 4).
 - `native/src/emit/rewrite.rs` tests and `guard-kit/gate-tests/rewrite.test.sh` — new (delta 5).
 - `guard-kit/README.md` — §Use (delta 6).
 - `docs/guard-kit/SPEC.md`, `docs/gate-sdk/SPEC.md` and `docs/lifecycle-kit/SPEC.md` — the on-site SPEC

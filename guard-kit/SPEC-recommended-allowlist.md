@@ -3,6 +3,12 @@
 Queue entry: `recommended-allowlist-unshipped`, selected for `guard-friction-reach` (operator direction,
 2026-09-15, lead-relayed). The harness-adapter seam was left open for this stage to design.
 
+**It waits on `SPEC-rewrite-arm.md` and `SPEC-perl-rewrite-steer.md` (align finding).** Delta 2's
+subsection cites `--rewrite` and `§rewrite` as reachable through the front-end, and rule 8's
+`--rewrite` arm as one of the ruleset's own steer targets — both minted by those two sibling
+amendments, not yet present in the tracked tree. This unit merges after both land, so its SPEC
+prose describes a `§rewrite` section and a rule 8 steer that already exist.
+
 **The seam call, ruled: no adapter component. The recommendation ships as a guard-kit template beside
 the hook wiring it completes.** The harness settings format is already a guard-kit template tier:
 `templates/settings-hooks.json` is harness-native JSON, hardcoding the front-end path and the hook
@@ -127,9 +133,10 @@ guard-kit/SPEC.md §The recommended allowlist, and union the entries you accept 
 ### (5) Two sentences that read as forbidding a shipped command name {mechanical}
 
 - guard-kit/SPEC.md §Layout and configuration, `GUARD_KIT_BREADTH_PROBES`: `The kit ships **no**
-  default probes: every string naming a command is the consumer's vocabulary, never the kit's` becomes
-  `The kit ships **no** default probes: a probe names a command the consumer calls bad, which is the
-  consumer's vocabulary, never the kit's`. The old wording was already wider than the tree:
+  default probes: every string naming a command is the consumer's vocabulary, never the kit's
+  (CLAUDE.md §The provenance seam).` becomes `The kit ships **no** default probes: a probe names a
+  command the consumer calls bad, which is the consumer's vocabulary, never the kit's (CLAUDE.md §The
+  provenance seam).`. The old wording was already wider than the tree:
   `GUARD_KIT_RO_BINS` and `GUARD_KIT_SCRIPT_INTERPRETERS` ship command names as defaults, on the
   **the test is the content and never the shape** ground that knob's own bullet states.
 - guard-kit/SPEC.md §scan-prompts, **What crosses into the binary**: `ships no default allow entry of
