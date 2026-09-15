@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §run-gates — the battery front-end, reduced to its residue: resolve the repo root, locate the binary, export the gate-sdk root locator, exec the binary. The argument grammar, the usage text, the selectors, the dispatch and the output contract are all the binary's `--run` arm's.
-# no-port: gate-sdk/SPEC.md §run-gates, The front-end's port disposition — this is the residue that stub cut left, and it stays shell on the config-seam cause gate-sdk/SPEC.md §The config-seam port disposition rules for lib/gate.sh itself: gate_knob_env is the config bridge's bash producer, the single place a knob's value is computed, so the one call below cannot be made from inside the binary it is resolving the environment for. An existing cause reached one step further, never a new class.
+# no-port: gate-sdk/SPEC.md §run-gates, The front-end's port disposition — this is the residue that stub cut left, and it stays shell on a per-file bootstrap cause: the front-end locates the binary it executes, which the binary cannot do for itself. Structural, not a sizing judgment.
 #
 # usage: run-gates.sh [gates-dir] | --only <name>... [-- <arg>...] | --for <path>... | --emit <arm> [args...] | --pack-installer [--version <semver>] [--out <dir>] [--artifacts <dir>] [--root <dir>] | -h | --help
 #        every arm, its refusals and the knobs print from the tool itself: run-gates.sh --help

@@ -3573,12 +3573,12 @@ rule. **That last move retired the crate's only literal `kit(…)`-resolved
 shell-script invocation** — the two remaining `kit(…)` resolutions name *data*
 fixtures — and the spawn helper that read the merged child stream retired with
 its one caller. **What that does not claim, because it would be false, is that
-no crate code spawns `bash` on an owned kit script**: three sites still source
-`gate-sdk/lib/gate.sh` to read the shell library's *own* resolution of a knob,
-a default or the source stamp, which is deliberate — a literal on the Rust side
-would restore the second source of truth those sites exist to delete, and that
-library is permanently shell by ruling (gate-sdk/SPEC.md §The kit-library port
-disposition). The retired kind is a kit **`bin/` tool spawned as a test
+no crate code spawns `bash` on an owned kit script**: crate tests still source
+`gate-sdk/lib/gate.sh` to read the shell library's *own* answer — a pre-binary
+accessor, the gates-directory default or the source stamp — which is deliberate:
+a literal on the Rust side would restore the second source of truth those tests
+exist to hold, and that library stays shell on its own declared grounds
+(gate-sdk/SPEC.md §lib/gate.sh). The retired kind is a kit **`bin/` tool spawned as a test
 subject**, which is the kind a port can eliminate; sourcing a no-port library
 for parity is not that kind and does not retire with it. **What retirement buys is coverage at a second transition**: the
 assertions ran only in a validate suite, and now run under `check-crate-arms` at

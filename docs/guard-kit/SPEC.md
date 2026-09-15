@@ -471,7 +471,7 @@ own header and §port-blockers' `--tree` arm reads it there.
   of shell functions.
 
 It resolves no knob: the load above reads every `GUARD_KIT_*` value from the
-binary, so gate-sdk/SPEC.md §The kit-library port disposition does not reach it.
+binary, so the ground above is its only one.
 
 **What reopens it:** the ground dissolves if §Consumer rules stops composing a
 consumer's rules from these primitives.

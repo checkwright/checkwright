@@ -541,91 +541,30 @@ seeding derivation reads `templates/*-config.knobs` beside `templates/*-config.s
 
 ### The config-seam port disposition
 
-**Every kit's `templates/<kit>-config.sh`, and the `<gates-dir>/<kit>-config.sh`
-copy `init` seeds from it, carry `# no-port:` as a class, on one ground and not
-on size.** A config file **is** the adopter's seam rather
-than kit mechanism reaching it, so porting one deletes the thing there is to
-edit: a knob compiled into the binary is a knob no adopter can open. §port-blockers'
-`--tree` arm reclassifies each member `owed` → `no-port`, so the completion
-predicate over that arm's owed count subtracts them. The
-ruling comes back **uniform**, and the uniformity is the finding: the ground is
-either right for the whole class or right for none of it.
+**A kit's config template and the copy `init` seeds from it are the adopter's
+seam, so neither ports, on one ground and not on size.** A config file **is** the
+adopter's seam rather than kit mechanism reaching it, so porting one deletes the
+thing there is to edit: a knob compiled into the binary is a knob no adopter can
+open. A template and its seeded copy stand or fall together — they are one artifact
+at two points of one derivation, and the copy is the *more* edited of the two. Every
+member is a knob file (§The knob file), which is not shell, so §port-blockers never
+scans one and the class carries no `# no-port:` line; the ground is what keeps a
+later cut from compiling the file away. The installer's `init` already treats the
+class as an edit surface, reporting an adopter's edit rather than clobbering it on
+a re-run, and §check-template-copy-parity keeps it out of template-to-copy parity,
+where equality would be the defect.
 
-**The class is derived, never rostered**, and the derivation already has an
-owner — installer/README.md §What init seeds rules that "the config seam is
-derived, never listed: a kit's consumer config is whatever `templates/*-config.sh`
-it ships, and the destination is always your gates directory under the file's own
-name". A kit that ships no config template is simply **not a member**, and
-nothing here obliges one to exist: this repo's `<gates-dir>/gate-sdk-config.sh`
-is a hand-authored consumer config for such a kit rather than a seeded copy, and
-it reaches `no-port` by the separate ground below. **A static kit's knob file
-leaves the class by substrate, not by port** (§The knob file): it is not shell, so
-§port-blockers never scans it, while the ground above — it is the file an adopter
-edits — holds of it unchanged. The class therefore shrinks at each migration cut,
-and every kit in the crate's static-kit table (`native/src/knobs/mod.rs`) has left
-it; nothing below reopens on that account. **Both sides of the seam are members**, template and seeded copy alike —
-they are one artifact at two points of one derivation, the copy is what the
-template exists to become, and the copy is the *more* edited of the two. A ruling
-taking one side would leave the other re-arguing the same ground at the next cut.
-
-**The ground, stated directly: a config file is the adopter's seam, so porting it
-deletes the thing there is to edit, and a template and its seeded copy stand or
-fall together.** A ruling that granted the ground to a template while its own
-consumer copy stayed owed would be an incoherence rather than an exception, which
-is why the class takes both sides. The class has no shell member left, since every
-kit that ships a config template reads a knob file, and the ground stands for the
-knob files, each of which is the surface an adopter edits.
-
-**Two mechanisms here already treat the class as an edit surface, and they are
-cited as evidence rather than as argument.** The installer's `init` claims a
-rewritten file before writing it, comparing the file's on-disk hash against the
-hash `init` recorded for it, so an adopter's edit is reported rather than
-clobbered on a re-run — the seam is a file the installer *expects* to have been
-changed (installer/README.md §What init seeds). And §check-template-copy-parity
-excludes `*-config.sh` from the template↔copy parity assertion **by name suffix**,
-on the stated ground that a config template is a starting point the consumer
-customizes "so equality would be the defect". A gate that refuses to hold this
-class to its own template is a gate already saying the class is the consumer's.
-
-**A caller-side check the class invites and does not need.** Every bridged kit
-library takes `<KIT>_CONFIG_FILE` when set and otherwise resolves
-`<gates-dir>/<kit>-config.sh`, sourcing it **only when the file exists** — the
-loader paragraph above is gate-sdk's instance of a shape each kit's own §Layout
-and configuration repeats for its own library. A member's declaration therefore
-changes no resolution path and no absent-file behavior. Verified at each kit
-library rather than generalised from one, because the file those defaults name is
-this class's whole subject.
-
-**This does not reverse the vocabulary ruling, and the two grounds are
-cumulative rather than competing.** That ruling scoped itself in its own words: it
-generalises `scripts/measured-claims.sh`'s cause **on its vocabulary half alone**,
-so files holding this repo's private claim vocabulary declare and mechanism files
-stay owed — the clause every declaration it landed still carries. It left this
-class's seeded copies owed *deliberately*, and each reason it gave answers the
-vocabulary question and only that one: layout, a harness-generic type roster plus
-path globs, a stage roster derived from a sibling rather than held literally,
-tooling layout. None of them is an answer to *is this an edit seam?* A ruling that
-names the half it generalises on has said where it stops. So the verdict this one
-agrees with is untouched and stays true, and a file may be reached by either
-ground — the two already meet on `<gates-dir>/gate-sdk-config.sh` and its
-vocabulary-declared siblings, which this class does not contain and does not need
-to. The caution that ruling states for itself is **adopted here rather than set
-aside**: over-declaring wrongly excuses a file from the port and mis-sizes a
-governed completion predicate with nothing red to catch it, where under-declaring
-is visible and cheap. It is why this ruling reaches only files whose whole
-documented purpose is to be edited.
-
-**The honest limit.** This says nothing about the **knob defaults** a config
-template's owning kit library holds. Those live one directory over, they are a
-different question, and they are the kit-library cut's — stated here because the
-two look alike from a distance and a reader meeting one first must not carry its
-answer to the other.
+**The class is derived, never rostered**, and the derivation has an owner:
+installer/README.md §What init seeds rules that a kit's consumer config is whatever
+config template it ships, seeded into the gates directory under the file's own
+name. A kit that ships no config template is simply **not a member**, and this
+repo's `<gates-dir>/gate-sdk-config.knobs` is a hand-authored consumer config for
+such a kit rather than a seeded copy.
 
 **What reopens it**, written as a reopening condition rather than a permanence
-claim, on §Consumer smoke *The port disposition*'s terms: the ground dissolves for
-a kit whose config template stops being seeded into the consumer's gates
-directory — the derivation installer/README.md §What init seeds owns — because
-the file is then kit mechanism *reaching* a seam rather than the seam itself.
+claim: the ground dissolves for a kit whose config template stops being seeded into
+the consumer's gates directory, because the file is then kit mechanism *reaching* a
+seam rather than the seam itself.
 
 ## The path-dialect contract
 
@@ -8527,24 +8466,19 @@ live in a module both arms call, never a copy each (§upgrade-smoke).
 
 **The library's sourcer set is narrower than the builder's caller set, and the
 two are counted separately.** Of the three callers of
-`csmoke_vendor_and_install` above, two now reach it across a process boundary and
-none of the three sources this file. The adoption walkthrough below was the last
-shell sourcer — it took `csmoke_place_binary` and never built a scratch consumer
-at all — and it has ported too, so the sourcer set is now **zero** while the
+`csmoke_vendor_and_install` above, two now reach it across a process boundary, and
+`run-consumer-smoke.sh`, this harness's other member, is the one that sources this
+file. The adoption walkthrough below was the last sourcer outside the harness — it
+took `csmoke_place_binary` and never built a scratch consumer at all — and it has
+ported too, so the sourcer set outside the harness is now **zero** while the
 builder's caller set is unchanged at three. Read the distinction off this
 paragraph rather than counting callers of one function and generalising, which is
 the re-derivation that put a wrong count into an amendment once already.
 
-**An empty sourcer set does not reopen the library's own `no-port` cause, and
-this sentence sits beside the count because the misreading is cheap.** Leg 1 of
-*The port disposition* below rests on the **config bridge**: this library
-resolves `GATE_SDK_NATIVE_BIN` through §lib/gate.sh's accessor, so it sits inside
-the bridge rather than beside it, and §lib/gate.sh rules exactly one place a
-knob's value is computed. That is a property of the library, not of how many
-shells source it. A library with no shell sourcer left *looks* like one whose
-callers are all compiled and therefore like a candidate for going in-crate; it is
-not, because a crate-side placement would resolve the same knob a second time and
-be the second producer criterion 6 refuses.
+**The library is owed its port, and the sourcer count is not what makes it owed**
+(*The port disposition* below). Its one shell sourcer is `run-consumer-smoke.sh`,
+owed beside it, and every other caller is a compiled arm reaching it by spawn; a
+crate twin kept beside the library would be the second holder criterion 6 refuses.
 
 **The adoption walkthrough is this section's other member, and this is the
 mechanism owner its own header pointed elsewhere for.** `--run-demo` narrates
@@ -8608,11 +8542,9 @@ script prologue live in a module both arms call, never a copy each — binds at 
 moment a second arm calls the same helper, which is here; the placement wrapper was
 private to `--upgrade-smoke` and now sits beside the prologue, returning the helper's
 own status so each arm renders its own verdict for it. A crate-side reimplementation
-of the placement is refused, and not on effort: it would resolve
-`GATE_SDK_NATIVE_BIN` a second time, which is the second producer that put this
-library in the `no-port` class to begin with. Porting the *caller* while leaving the
-*library* is the whole shape of legs 1 and 2, and this member is an instance of it
-rather than an exception to it. The **spawned battery stays spawned**, and that is
+of the placement beside the library is refused, and not on effort: it would be a
+second holder of the placement while the library still holds it, and the
+library's own port is the road that removes the spawn. The **spawned battery stays spawned**, and that is
 load-bearing: the subject under test is the vendored consumer's own front-end, so
 calling this binary's registry in-process would run the host's gates against the
 scratch tree — the pairing defect the placement's own record names.
@@ -8627,7 +8559,7 @@ command, so a bare invocation (outside the harness that exports
 `SMOKE_KIT_ROOT`) refuses instead of writing into the caller's repo;
 `check-smoke-entry-guard` (§check-smoke-entry-guard) holds the guard's presence
 across the roster. Every script in that roster stays on the shell substrate
-permanently and declares `# no-port:` saying so — the class ruling, its four
+permanently and declares `# no-port:` saying so — the class ruling, its three
 legs and what would reopen it are *The port disposition* below. The
 README item of that checklist carries the register-the-gates block in
 `<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers, held in
@@ -8856,11 +8788,11 @@ disambiguation of exit 2, which the contract deliberately leaves general.
 
 ### The port disposition
 
-**Every `smoke/` install and violation recipe, and both members of this harness,
-carry `# no-port:` — the ruling reaches every kit `gate_kit_roots` vendors, on
-four measured legs and none of them size.** The declaration sits on
-`bin/run-consumer-smoke.sh` and `lib/consumer-smoke.sh` here, and on each kit
-root's `smoke/install.sh` and `smoke/violation.sh`; §port-blockers' `--tree` arm
+**Every `smoke/` install and violation recipe carries `# no-port:` — the ruling
+reaches every kit `gate_kit_roots` vendors, on three measured legs and none of them
+size.** The legs are numbered 2 to 4 because every member's header cites them by
+those numbers. The declaration sits on each kit root's `smoke/install.sh` and
+`smoke/violation.sh`; §port-blockers' `--tree` arm
 reclassifies each one `owed` → `no-port`, so the port's completion predicate
 over that arm's owed count subtracts them. **It is not a
 size judgment and must not be read as one**: the criteria relaxation is closed at
@@ -8870,33 +8802,19 @@ declarations and writes no Rust, and it stands on that measurement** — a cut i
 not less legitimate for resolving to declarations when the declarations are
 structural, and re-cutting for Rust was the alternative refused.
 
-**The class membership above is closed and enumerated, and this section's one owed
-non-member was the adoption walkthrough.** It was in none of those sets — not a
-`smoke/` recipe, not a member of this harness — and it ported (§Consumer smoke's
-walkthrough paragraphs). Stated in terms so a later reader does not have to derive
-non-membership from an enumeration, and because the worked precedent for a
-validate-suite *driver* porting sits in this same kit's reach: context-kit's AGENTS.md
-smoke was one by the identical predicate and became `--agents-md-smoke`. What stays
-owed to this tree after that cut is the installer family, held behind the
-behind-invoke relocation, and the four reachable non-installer members; the live
-count is `--emit port-blockers --tree`'s and is not restated here.
-
-**Leg 1 — the config bridge, and it is the load-bearing one.** A second file now
-stands on the same shape rather than restating it: `gate-sdk/lib/test-hermetic.sh`
-declares on being sourced into its callers' own shell and resolving
-`GATE_SDK_NATIVE_BIN` through the accessor, so it too sits inside the bridge
-rather than beside it (§lib/test-hermetic.sh). *The registration
-accounting* above probes each unregistered gate through `gate_command`
-(§lib/gate.sh), which builds the bridge by sourcing each owning kit's `lib/*.sh`.
-§lib/gate.sh rules **exactly one place a knob's value is computed**, so a
-crate-side probe would be the second producer criterion 6 refuses. Nor can the
-probe be delegated back to a bash front-end: `run-gates.sh --only` resolves
-against the registry, and the accounting's entire subject is gates that are
-**not** in it — which is why this harness calls `gate_command` directly rather
-than the front-end. That is the same structural ground §gen-pre-commit is
-already declared on, reached from the opposite direction: the hook generator
-bakes a resolved knob, this harness resolves a knob for a member no registry
-names. The two harness members rest here.
+**The class membership above is closed and enumerated, and the harness's own two
+files are not in it: `bin/run-consumer-smoke.sh` and `lib/consumer-smoke.sh` are
+owed, each port owned by its own queue entry.** Their declaration rested on criterion
+6's single-producer rule, since the accounting's probe resolved a gate's knobs by
+sourcing the owning kit's library; the crate is now every knob's one producer, so
+that ground is gone. What the ports must keep is stated here so neither is
+rediscovered: the probe cannot delegate to `run-gates.sh --only`, which resolves
+against the registry while the accounting's whole subject is gates that are **not**
+in it, and the spawned battery stays spawned (the walkthrough paragraphs above).
+The adoption walkthrough was the section's other owed member and ported, as
+context-kit's AGENTS.md smoke did by the identical predicate as
+`--agents-md-smoke`; the live owed count is `--emit port-blockers --tree`'s and is
+not restated here.
 
 **Leg 2 — a `smoke/install.sh` is an executable recipe by stated contract, and
 porting one is non-monotone for a live reader.** *Not derived from the README
@@ -8963,16 +8881,16 @@ disposition and both are answered on the text:
   three-name list belongs to the earlier sentence being corrected, not to that
   restatement. The "case-by-case residue rule" it names is the port's standing
   rule that "surviving shell is residue justified case by case, never a
-  protected category" — and four measured legs, each cited on its own file, is
+  protected category" — and three measured legs, each cited on its own file, is
   that reasoning applied to a class whose members happen to share legs, rather
   than the categorical "it is a smoke harness" exemption the directive refuses.
 - **The refused ground is not this ground.** "Ships to no adopter" was measured
   false for 31 of the 33 disputed files, and leg 3 **concedes** that measurement
   rather than disputing it — vendoring with the kit is leg 3's own opening
   clause. What leg 3 rests on is narrower and untouched by it: *executed by no
-  adopter path*. Legs 1, 2 and 4 do not use the shipping question at all. That
+  adopter path*. Legs 2 and 4 do not use the shipping question at all. That
   ruling closes by saying no mechanism is missing, "only a standing ruling that
-  would make one true, and none does"; four measured, individually-cited
+  would make one true, and none does"; three measured, individually-cited
   structural grounds are that ruling now existing.
 
 **The counterweight is real and it was ruled against, not absent.** That text's
@@ -8984,8 +8902,7 @@ rather than re-opening the question it already answers.
 
 **What reopens it**, written as a reopening condition rather than a permanence
 claim, because `# no-port:` is the permanent tier and a class ruling owes its
-reader what would falsify it: leg 1 dissolves if §lib/gate.sh ever admits a
-second bridge producer; legs 2 and 4 dissolve together if
+reader what would falsify it: legs 2 and 4 dissolve together if
 §check-install-disposition assertion B stops reading the script as text **and**
 the `bin/` tools the four envelope files drive are themselves ported. Leg 3
 dissolves if any adopter path executes a `smoke/` script.
@@ -9256,12 +9173,10 @@ the expander is hook generation's trigger expansion (§gen-pre-commit), and the
 crate's expander, which `run-gates --for` selection rides, reads through
 `knobs::wire`, so the generated hook and the runtime selector read one value. The
 rule is stated here because the sites that rely on it all cite it to this section:
-§The port-candidate criteria's criterion 6, §Consumer smoke *The port
-disposition*'s leg 1, §Meta-gate conservation's `check-knob-default-coupling` row,
-§check-core-files' root-set paragraph, §gen-pre-commit and §run-gates each turn on
-it, and a fact whose only statements are its citations has no owner. The
-disposition this once forced on the kit libraries is §The kit-library port
-disposition.
+§The port-candidate criteria's criterion 6, §Meta-gate conservation's
+`check-knob-default-coupling` row, §check-core-files' root-set paragraph and
+§gen-pre-commit each turn on it, and a fact whose only statements are its
+citations has no owner.
 
 Reading a knob's value, per shape:
 
@@ -9333,7 +9248,7 @@ exactly this to pin every kit at one empty file.
 **A compiled member that must reach a file inside gate-sdk** has **no
 `BASH_SOURCE`** to find it by, and reads `walk::sdk_root()`, the `GATE_SDK_ROOT`
 locator (§Layout and configuration): `check-graph`'s assertion D is the worked
-instance, spawning `bin/gen-pre-commit.sh`, which stays shell (§gen-pre-commit).
+instance, spawning `bin/gen-pre-commit.sh`, which is shell (§gen-pre-commit).
 The kit-root set is not a substitute, because `GATE_SDK_KIT_DIRS` may narrow it to
 a consumer's own tree — which is exactly the configuration a sandboxed fixture runs
 under.
@@ -9439,120 +9354,26 @@ harness error for the same reason, exit 2 from the member itself.
 could not execute (an awk/jq/parser crash) — never `grep`'s exit 1, which is
 the expected "no match"; the caller draws that line at the capture site.
 
-### The kit-library port disposition
+**Its port disposition is a declaration, on two grounds, and neither is size.**
+§port-blockers' `--tree` arm reads the `# no-port:` line in its header.
 
-**A kit's `lib/*.sh` that is the config bridge's sole resolver for its kit's
-knobs carries `# no-port:` — the ruling reaches the class, on one ground and not
-on size.** §port-blockers' `--tree` arm reclassifies each member `owed` →
-`no-port`, so the port's completion predicate over that arm's owed count
-subtracts them. The ground is §lib/gate.sh's rule above: the value is
-computed in the kit's shell library and nowhere else, so a crate-side resolver
-would be the **second producer** criterion 6 refuses.
+- **Its API is shell functions sourced into bash callers**: CI steps, the
+  installer smoke, the author template (§templates/check-skeleton.sh), the
+  front-ends and the test harness. A binary arm cannot be sourced into bash, which
+  is §lib/test-hermetic.sh's ground met by the library that harness composes.
+- **Its pre-binary accessors answer before any binary exists.** A caller that
+  must locate or build the binary reads the binary's path, the crate and its two
+  rosters here, which is the bootstrap cause §build-native declares on.
 
-**That refusal is not a preference; it is a deletion this tree already paid
-for.** When the bridge landed, the crate's prune-dir default and the unit test
-holding it equal to the shell default were **removed rather than extended**, and
-§The port-candidate criteria records the departure with a warning that a later
-reader must not restore the parity test as a missing piece. Porting a sole
-resolver would re-create exactly the duplication that deletion bought its way out
-of, and would do it on a surface where the drift is silent: the two defaults
-disagree only for a consumer whose config narrows the input.
-
-**The ground is stated in each member's own header rather than inherited by
-example.** A cohort inherits a stated reason where it cannot inherit a
-precedent-by-example, so every member names this section and states its own
-sole-resolver face. `gate-sdk/lib/consumer-smoke.sh` is the one live declarer
-outside `lib/gate.sh`, under §Consumer smoke *The port disposition*'s leg 1, and no
-other kit's library is a member (the worked instance below).
-
-**The discriminator is content, not directory, and the mechanism says so.** The
-bridge sources `<kit>/lib/*.sh` — a **flat** glob — whenever any compiled member
-declares a knob that kit owns. Two consequences fall out and both are
-load-bearing:
-
-- **A file one directory deeper is never sourced at all.** context-kit's
-  `lib/pub-lang/` extractors sat outside the bridge entirely, so the ground could
-  not reach them whatever else was true of them — which is why they took a
-  disposition of their own and have since moved in-crate.
-- **A file directly under `lib/` rides the glob whether or not it resolves
-  anything.** Bridge membership is by position; being *the resolver* is not. A
-  member sourced into the resolution subshell that computes no knob contributes
-  nothing to the bridge and is **not** held by this ground — deleting it would
-  leave the bridge sourcing one file fewer and resolving exactly the same values.
-
-**Membership is therefore derived and never rostered**: the members are the kit
-libraries that carry their own kit's knob defaults, which is the same predicate
-the bridge's own `declare -p` confirmation applies — a knob whose default is
-visible after the owning kit's library is sourced. A kit whose library computes
-no knob of its own is simply not a member, and no roster here can rot away from
-the tree, because §port-blockers' `--tree` arm reports the answer directly.
-
-**`gate-sdk/lib/gate.sh` is the same ground held twice over, and it is stated
-separately because the stronger case is easy to under-read.** It is not a client
-of the bridge; it **is** the bridge — the machinery that sources every other
-member and derives which kit owns a knob. A crate-side form would have to either
-source shell libraries from inside a binary or re-implement every kit's defaults,
-which is the second producer squared. §gen-pre-commit already declares on
-precisely this ground from the opposite direction: the hook generator bakes a
-*resolved* knob, so it cannot move either.
-
-**The ruling reaches by ground, not by scope, and `guard-kit/lib/guard.sh` is
-the worked instance of a member leaving by ground.** A stated-contract cut reaches
-the files answering to this section; the class is wider, exactly as §Consumer smoke
-*The port disposition* already rules for its own — a member takes this disposition
-because the ground holds of it, not because this section reaches it, and each
-declares in its own header with its own kit's section stating why. guard-kit's
-library held two independent grounds, this one and the API a consumer's own shell
-rules are composed from. Its kit went static, so its knobs stopped crossing the
-bridge and the sole-resolver face dissolved; the library reads its knobs from the
-binary and keeps `# no-port:` on the second ground alone, which guard-kit/SPEC.md
+A kit library that only computed its kit's knob defaults leaves with its kit's
+migration rather than porting: the defaults live in the crate's table (§The knob
+file), so the library has nothing left to compute. `guard-kit/lib/guard.sh` is the
+one static kit library that stays, on the extension-point ground guard-kit/SPEC.md
 §The guard framework (`lib/guard.sh`) states.
 
-**The negative that looks like a measurement and is not, recorded because it
-cost this cut a stage.** *guard-kit ships no `checks/` directory and no
-registered member* is true, and `grep -c GUARD_KIT` over the generated
-`pre-commit` is genuinely `0`. Neither establishes that the bridge does not
-source the file: the hook bakes only the knobs of the gates the hook runs, and
-the bridge's clients are not only `.gate` members — every ported non-gate arm
-resolves through it too. A negative about the bridge is answered by the bridge,
-`gate_knob_env` for the arm in question, and by nothing else.
-
-**The honest limit: the members this ruling leaves owed are left owed on
-purpose, and one set it positively said must port has since ported.**
-context-kit's `lib/pub-lang/` extractors were the **bundled members** of a
-consumer-first plug-in registry, and the standing ruling for that shape is that
-a seam's resolution, direct execution and env contract survive while
-*only the bundled members move in-crate* — the disposition drift-kit's KPI plugins
-already took (drift-kit/SPEC.md §The extensibility contract). That is what the
-cut did: `CONTEXT_KIT_PUB_LANG_DIR` shadowing, the two-name extractor
-file and its `bash` execution all survive in `--emit-pub-index`, and the two
-shipped grammars are in-crate rather than owed shell
-(context-kit/SPEC.md §Index-first reading). The libraries that
-ride the glob resolving nothing are owed still, each for its own reason, and each
-names the entry that owns its port in its own section — **except the first of
-them to take a stated ground of its own**: `gate-sdk/lib/test-hermetic.sh` leaves
-this set by declaring on a two-limb ground its own section states rather than by
-being ported (§lib/test-hermetic.sh), which is the route
-`context-kit/lib/pub-lang/`'s extractors opened and the shape a later member of
-this set should reach for before assuming a port is owed.
-
-**What reopens it**, written as a reopening condition rather than a permanence
-claim, on §Consumer smoke *The port disposition*'s terms: the ground dissolves
-generally if §lib/gate.sh ever admits a second bridge producer, and it dissolves
-for an individual member whose kit's knobs stop crossing the bridge — a member
-outside the bridge is not a sole resolver, and its disposition is then whatever
-its own kit's section can state for it, which is the position context-kit's
-`lib/pub-lang/` extractors occupied and discharged. **The member-level condition
-has fired for every kit in the static-kit table**: when a kit's knobs moved into
-the crate's defaults table its library resolved nothing and left the tree with them
-(§The knob file), so no static kit carries a member of this class.
-
-**That member-level condition has fired for every static kit** (§The knob file),
-and the disposition it reaches is **deletion, not port**: a static kit's defaults
-live in the crate's knob table, so its library computes nothing and is removed
-with its kit's migration. Membership being derived, a deleted library is simply
-not a member. `guard-kit/lib/guard.sh` is the one static kit library that stays,
-on its extension-point ground rather than this one.
+**What reopens it:** the first ground dissolves if no bash caller sources the
+library, and the second if the pre-binary accessors move to a surface that runs
+before the binary, such as a native front-end.
 
 ### lib/inject.sh
 
@@ -9566,8 +9387,7 @@ of them. What the section owns is the notion of a well-formed block; where it
 lives is `native/src/marker.rs`.
 
 **The shell library retired when its sourcer set emptied.** It sat in gate-sdk's
-flat `lib/*.sh` set and resolved no knob, so §The kit-library port disposition's
-ground never reached it; what sequenced it was its sourcer set, and its last
+flat `lib/*.sh` set and resolved no knob; what sequenced it was its sourcer set, and its last
 member — doctrine-kit's own installer — moved in-crate with the installer's
 behind-invoke relocation. Two had ported before that, at §bin/install-lifecycle.sh's
 cut and at context-kit/SPEC.md §bin/env-probe's. Deleting a library because its
@@ -9714,10 +9534,8 @@ closes the class permanently: no future markup variant can disarm the assertion,
 only red it.
 
 **The port disposition is closed, and the road was deletion.** The shell library
-`gate-sdk/lib/declaration.sh` (59 lines) was owed to the port and not <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-dispositioned by §The kit-library port disposition — it sat in gate-sdk's flat
-`lib/*.sh` set and resolved no knob, so that ruling's ground never reached it.
-Its own disposition was criterion 6's *unless* clause and it was **temporary
+`gate-sdk/lib/declaration.sh` (59 lines) was owed to the port — it sat in <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
+gate-sdk's flat `lib/*.sh` set and resolved no knob. Its own disposition was criterion 6's *unless* clause and it was **temporary
 rather than permanent**, the stated test being whether the shell caller set
 empties. It emptied at §upgrade-smoke's port, which moved the declaration
 resolve in-crate; the cut that spent that purchase is the one under this
@@ -9853,28 +9671,14 @@ every kit root from it (§Layout and configuration). A suite steering the roots 
 case sets `GATE_SDK_ROOT` or `GATE_SDK_KIT_DIRS` through `gate_env` after this library
 has run.
 
-**Its port disposition is a declaration, and the ground is stated here because no
-existing class reaches it.** It rides the bridge's `lib/*.sh` glob and resolves no
-knob of its own, so §The kit-library port disposition does not reach it — that
-section is explicit that a member sourced into the resolution subshell which
-computes no knob "contributes nothing to the bridge and is **not** held by this
-ground". The ground has two independent limbs.
-
-- **Its API is three shell functions, and a binary arm cannot be sourced into
-  bash.** `gate_env`, `gate_run` and `gate_arm_run` are called *inside* the
-  caller's own shell — which is why `gate_env` exists rather than an `env` prefix,
-  §run-gate-tests giving the reason a compiled form cannot recover. Of the files
-  matching `*/gate-tests/*.test.sh`, all but two source this library; the wider
-  tree-wide `*.test.sh` corpus is larger and is not that figure's denominator.
-  There is no in-crate arm a `source` line can name.
-- **What the two composing functions compose is the bridge itself.** `gate_run`
-  calls `gate_command` and `gate_arm_run` calls `gate_native_bin` and
-  `gate_knob_env`, all from `lib/gate.sh` — which §The kit-library port
-  disposition calls the second producer squared and holds permanently shell. The
-  relationship is the one `lib/consumer-smoke.sh` declares on under §Consumer
-  smoke *The port disposition* leg 1: sourced into its callers' own shell and
-  resolving `GATE_SDK_NATIVE_BIN` through the accessor, so it sits **inside** the
-  bridge rather than beside it.
+**Its port disposition is a declaration, on one ground stated here: its API is
+three shell functions, and a binary arm cannot be sourced into bash.** `gate_env`,
+`gate_run` and `gate_arm_run` are called *inside* the caller's own shell — which is
+why `gate_env` exists rather than an `env` prefix, `env` being unable to invoke a
+shell function. Of the files matching `*/gate-tests/*.test.sh`, all but two source
+this library; the wider tree-wide `*.test.sh` corpus is larger and is not that
+figure's denominator. There is no in-crate arm a `source` line can name. It resolves
+no knob of its own and computes no default.
 
 **Three alternatives are refused, each on its own ground.** An
 `--emit-test-hermetic` arm emitting the export lines for the library to `eval`
@@ -9887,14 +9691,13 @@ functions alone, narrows the contract: §check-test-hermetic requires the source
 line as each test's first act precisely so a standalone `bash <name>.test.sh` is
 hermetic too, and a runner-side pin reaches only the tests the runner spawns.
 And appending `gate_exe_suffix` beside the old hand-spelled default would have
-left the two spellings agreeing by hand, which is the duplication the whole class
-ruling rests on refusing.
+left the two spellings agreeing by hand, which is the duplication criterion 6
+refuses.
 
 **What reopens it**, as a reopening condition rather than a permanence claim: the
-ground dissolves if `lib/gate.sh` ever admits a second bridge producer, and it
-dissolves for this file if the bespoke `*.test.sh` corpus stops being bash — a
-member outside the bridge whose callers are compiled is held by neither limb, and
-its disposition would then be whatever this section could state for it.
+ground dissolves if the bespoke `*.test.sh` corpus stops being bash, since a
+library whose callers are compiled is not held by it, and its disposition would
+then be whatever this section could state for it.
 
 ### run-gates
 
@@ -9967,13 +9770,12 @@ criterion 6 admitted had no branch left to serve and was deleted, not ported. Th
 installer's binary-less leg re-scoped at the same cut, from asserting a green
 battery to asserting the declared omission and the refusal an install with
 nothing left to dispatch actually earns. The per-arm dispatch branches, which grew
-the file by one per bridged arm, moved into the binary's own argv parsing. What
-remains is the residue this section names: resolve the repo root, resolve the
-gates-dir positional, make the one `gate_knob_env` call that is the config
-bridge's bash producer (§lib/gate.sh, §The config-seam port disposition), and
-`exec` the binary. That stub declares `# no-port:` on the config-seam cause
-`lib/gate.sh` itself carries — an existing cause, never a new class — and it is
-the whole of what stays shell on the hook-to-binary path. Two readings were
+the file by one per arm, moved into the binary's own argv parsing. What
+remains is the residue this section names: resolve the repo root, locate the
+binary, resolve the gates-dir positional, export the gate-sdk root locator, and
+`exec` the binary. That stub declares `# no-port:` on a per-file bootstrap cause:
+the front-end locates the binary it executes, which the binary cannot do for
+itself. It is the whole of what stays shell on the front-end's path to the binary. Two readings were
 refused: porting the file whole with the loop inside, which keeps a duplication
 serving no branch; and declaring the whole file, a subtraction that grows with
 every arm.
@@ -10886,11 +10688,10 @@ This is what discharges the graph-artifact literal, and it takes neither of the
 two dispositions weighed against it: it neither duplicates the default
 expression nor mints an arm on a gate for one caller.
 
-**That read is a `bash -c` sourcing the consumer's own library, and the same
-protocol is how the whole suite reaches `lib/consumer-smoke.sh`.** That library is
-permanently `# no-port:` (§Consumer smoke, *The port disposition*) and keeps a
-shell sourcer besides this one, so criterion 6's delete-the-original road is
-unavailable. The road taken is not the *unless* clause's machine-held-twin form
+**That read is a `bash -c` running the consumer's own front-end, and a `bash -c`
+is how the whole suite reaches `lib/consumer-smoke.sh`.** That library is shell
+and owed its own port (§Consumer smoke, *The port disposition*), so until the port
+lands criterion 6's delete-the-original road is unavailable. The road taken is not the *unless* clause's machine-held-twin form
 but its strongest one — **the duplication is absent, because the arm creates
 none**. `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and
 `csmoke_place_binary` are **not reimplemented**: the arm spawns `bash`, sources
@@ -11291,40 +11092,20 @@ projection out of one (`CANON_KIT_EMBED_LANGS`' `kind|fence-langs|file-globs`
 triples) is outside the form and takes no token. The set the rule reaches is
 therefore derived per walk, and a knob added later is reached with no edit here.
 
-**This generator does not port, and the cause is structural rather than a sizing
-judgment.** The hook bakes the **resolved** invocation argv verbatim — `env
-GATE_SDK_KNOB_…=… <binary> <name>` — and resolving a knob means sourcing the
-owning kit's `lib/*.sh` in a subshell and reading `declare -p`. §lib/gate.sh
-rules there is exactly **one** place a knob's value is computed, the kit's shell
-library; a crate-side hook emitter would have to be the second, which criterion 6
-refuses. So this is not an unported emitter awaiting a cohort — it is the config
-bridge's own producer, and it stays where the bridge is. `check-graph`'s
-assertion D therefore keeps spawning it, which criterion 7 clears explicitly: a
-rule shelling out to `bash <emitter>` clears that criterion because `bash` is on
-the program floor, however unported the emitter is. The cost is real and is
-recorded rather than absorbed: the spawn crosses back from the compiled substrate
-into the shell one, which runs against the direction of the port. It was the **first** spawn of a program other than git on
-the crate's shipped gate path — never the first in the crate, whose test-only
-spawn sites predate it — and it is one of several there now, but it stays the only
-one of its shape: criterion 7's class-(i) wrappers spawn a program because that
+**This generator is owed.** Its `no-port` declaration rested on criterion 6's
+single-producer rule: the hook baked a knob the owning kit's shell library
+resolved, so a crate-side emitter would have been the second producer. The crate is
+now every knob's one producer, and that ratification was reopened by the authority
+that gave it, so the ground is gone and the declaration with it. The port is the
+emit-arm path this section once declined for now, moving `--emit` into the binary,
+and its own queue entry owns it. Until it lands, `check-graph` assertion D keeps
+spawning `bash bin/gen-pre-commit.sh`, declared in its `--needs` element, and
+criterion 7 still clears the spawn because `bash` is on the program floor. The
+spawn crosses back from the compiled substrate into the shell one, against the
+direction of the port, and it stays the only spawn of its shape on the crate's
+shipped gate path: criterion 7's class-(i) wrappers spawn a program because that
 program *is* the rule they assert, and this member spawns `bash` because a surface
-it reads structurally stays shell. The contrast is drawn from outside the
-criterion's two classes rather than inside them, and that matters — the class test
-is reached **only where the criterion raises a blocker**, which an on-floor program
-never does, so asking whether removing `bash` moves this gate's verdict (it does)
-sorts nothing.
-
-**And the disposition is declared where the arm that counts it can read it.** This
-generator's header carries a `# no-port:` line whose cause is the paragraph above
-in one sentence — criterion 6's single-producer rule — so §port-blockers' `--tree`
-arm reports it `no-port` rather than
-`owed`. Until it landed, the ruling existed and the instrument that measures the
-completion predicate could not see it, which is the exact misread the disposition
-column was built to prevent arriving through an empty declaration set. This file
-sits **squarely in the declaring class** of the substitution that arm's corpus
-rule turns on — a sibling declared on a provenance ground in the same commit — so
-landing the pair is what turned that substitution from a worked example into a
-live one.
+it reads is still shell.
 
 **The residue's disposition.** The spawn is **declared, and the declaration is what
 owns it**: this member's registry entry names `bash` in the requirement element
@@ -11337,9 +11118,8 @@ name, a descriptor, a fixture pair and a SPEC section to relocate an assertion
 criterion 7 already sanctions in place — is **void** rather than merely unbought,
 because born-native exception class (a) is retired (§The port-candidate
 criteria) and the refutation recorded there is that argument's own. What stays
-live is the pair this section records as declined-for-now rather than refuted —
-moving `--emit` into the binary, and reopening the ratification above — and
-this closure reopens neither.
+open is the port itself, moving `--emit` into the binary, and this residue lasts
+until it lands.
 
 **What the declaration does not cover, stated because it is the residue's own
 edge.** `--needs` names *a program the member spawns* (§The `# graph:` manifest),
@@ -11379,46 +11159,9 @@ with no `bash` did not run at all. There is no shell refusal to be at parity wit
 so building one would be inventing the thing it was supposed to match. Recorded
 so it is not re-proposed as the obvious ergonomic.
 
-**The battery's port made this generator cheaper and left its spawn standing,
-and both halves are stated so neither is rediscovered as news.** `command_rel`
-calls `gate_command` for every `tier=precommit` member, so the emitter is the
-loudest reader of the config bridge's cost; the per-kit batch (§lib/gate.sh)
-took `--emit` from 6637 ms to 4204 ms on this tree with the emitted hook
-byte-identical, which is the oracle that the batching moved no value. What did
-**not** change is the ruling above or its consequence: `check-graph` keeps
-spawning `bash bin/gen-pre-commit.sh` for assertion D's two arms, the pre-commit
-surface and the commit-msg one, so the residue's subject survives and only its
-price falls — the boundary that ruling holds, keeping the spawn outside the
-bridge-resolution-cost unit's scope. **Assertion E is not one of the
-two arms**: it compares the coupling-graph artifact against an emission this
-member computes in process, which is true of the compiled form and was true of
-the shell form it replaced, so the generator sits in neither one's path.
-
-**Two options were weighed against that cheaper generator and DECLINED FOR NOW
-rather than refuted, and the distinction is the whole reason this paragraph
-exists.** The first is the **emit-arm path**:
-moving `--emit` into the binary, which the batched bridge makes arithmetically
-more attractive than it was when the ratification above was taken. The second is
-any **reversal of that ratification** itself. Neither was argued down
-on the merits here; both were held because this unit's envelope was the battery's
-dispatch. A declined option and a refuted one are not the same record, and the
-refusals stated elsewhere in this section — criterion 6's single-producer rule,
-the four grounds against the hook shim — are refutations that stand. These two
-are open questions with a *timing* answer, so a later session may reopen either
-on its merits and must not read this section's silence as either a fresh idea or
-a settled no.
-
-**The `# no-port:` declaration above closes neither of them, and the two records
-do not collide.** The objection is the obvious one — the field's name says
-permanent and these two options are open on their merits — and it is answered at
-§port-blockers rather than here, because it generalises past this member: a cause
-declares the disposition **in force under the ruling that stands**, and if an open
-reopening path defeated a declaration the field would be undeclarable on any file
-whatsoever, every closed ruling being reopenable by the authority that closed it.
-So
-the header line is a reading of this section, not a fourth ruling in it. The day
-either option is taken, the unit that takes it edits that line along with
-everything else it moves.
+**Assertion E is not one of the two arms**: it compares the coupling-graph
+artifact against an emission this member computes in process, so the generator
+sits outside its path, and the port changes assertion D's arms alone.
 
 **The hook's shape is ruled rather than open.** The `--run` arm makes a
 two-line `exec <binary> --run --hook` shim look available; it is **refused**, and
@@ -12158,11 +11901,12 @@ reader would do.
 
 **A `# no-port:` cause asserts the disposition in force under the ruling that
 stands, never an oracle about future rulings.** The objection this answers is real
-and will arrive again in the same shape at every declaration: §gen-pre-commit
-records two options — moving `--emit` into the binary, and reopening its
-ratification — as *declined for now rather than refuted*, so a field
-whose name says permanent reads as overstating a question open on its merits. It
-does not, and the reason generalises past that member. Every closed ruling is
+and will arrive again in the same shape at every declaration: a section that
+records an option as *declined for now rather than refuted* makes a field whose
+name says permanent read as overstating a question open on its merits.
+§gen-pre-commit's generator was the instance, declared while its ratification
+stood and moved to owed by the unit that reopened it. The field does not
+overstate, and the reason generalises past that member. Every closed ruling is
 reopenable by the authority that closed it; that is what an
 escalate-rather-than-reverse rule is *for*. If an open reopening path defeated a `# no-port:`, the field would be
 undeclarable on **any** file whatsoever, and a field with no satisfiable declaration
@@ -14954,9 +14698,9 @@ statically resolvable slice of that parity is carried by its sibling
 the author's duty under §The `# graph:` manifest.
 
 Port sizing, **corrected at the port**: the earlier 929-line figure
-counted the generator, and `bin/gen-pre-commit.sh` (297) does **not** port
-(§gen-pre-commit). The ported surface is `check-graph.sh`'s 632 lines; the
-generator's 297 stay shell with the cause stated there, and assertion D keeps
+counted the generator, and `bin/gen-pre-commit.sh` (297) was **not** in that
+port (§gen-pre-commit). The ported surface is `check-graph.sh`'s 632 lines; the
+generator stays shell, owed its own port, and assertion D keeps
 spawning it for `--emit` and `--emit-commit-msg`. The spawn-invisibility rule the
 old figure illustrated still holds for a generator that *is* in a port's scope —
 what was wrong was the assumption that this one was.
@@ -17431,9 +17175,9 @@ rather than by a second suffix test: the pairing reads `<name>.sh` templates onl
 so a knob-file config template never enters it.
 That first exclusion partitions the template corpus along the same line a port
 disposition does, which is worth saying once here so a reader arriving from
-either side meets it: the excluded `*-config.sh` class is exactly the class
-§The config-seam port disposition rules permanently shell, on the ground this
-exclusion's own sentence states, while the executable templates left in this
+either side meets it: the excluded config class is the class §The config-seam
+port disposition rules the adopter's seam, on the ground this exclusion's own
+sentence states, while the executable templates left in this
 derivation are the corpus §The harness-template port disposition rules — in part,
 naming both the members it reaches and the members it does not. The two
 exclusions differ in kind and that ruling turns on the difference: the suffix
@@ -17567,14 +17311,15 @@ count subtracts them and keeps the remainder. The sibling cuts came
 back uniform because one ground was either right for a whole class or right for
 none of it; here two grounds this tree already holds reach part
 of the corpus and reach no further, and stretching either to cover the remainder
-would be the cross-class averaging §The config-seam port disposition and §The
-kit-library port disposition each refuse in their own terms.
+would be the cross-class averaging §The config-seam port disposition refuses in
+its own terms.
 
 **The corpus is the neighbouring section's, not one assembled for the occasion.**
 §check-template-copy-parity derives its population from layout —
 `<kit>/templates/<name>.sh` paired with `<gates-dir>/<name>.sh` — and its
-`*-config.sh` suffix exclusion is exactly §The config-seam port disposition's
-class, so the two cuts partition one population with no overlap and no gap. A
+`*-config.sh` suffix exclusion is §The config-seam port disposition's class on
+the shell side, so the two cuts partition one population with no overlap and no
+gap. A
 template with no `<gates-dir>/` counterpart stays inside that derivation and is
 merely skipped by the parity assertions, which is why `templates/check-skeleton.sh`
 is ruled here even though the gate never asserts on it.

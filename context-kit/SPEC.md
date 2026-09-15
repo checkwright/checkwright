@@ -1628,8 +1628,9 @@ the arm itself, because resolving one here would hand the arm this repo's postur
 in place of the one it is constructing.
 
 **The consumer-smoke helpers are called in the library that owns them.**
-`gate-sdk/lib/consumer-smoke.sh` is permanently `# no-port:` — it sits inside the
-config bridge — so the arm takes the **duplication-absent road** the upgrade
+`gate-sdk/lib/consumer-smoke.sh` is shell and owed its own port (gate-sdk/SPEC.md
+§Consumer smoke), and a crate twin beside it would be a second holder, so the arm
+takes the **duplication-absent road** the upgrade
 suite already took: a `bash -c` that sources the unchanged library, calls
 `csmoke_vendor_and_install` and reads the helper's own `SCRATCH` back off stdout,
 because that variable is set in the callee's shell and no process boundary

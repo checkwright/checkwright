@@ -12,39 +12,6 @@
 
 ## New Features
 
-- **config-seam-static-format** [spec: SPEC-bridge-retirement.md]
-  — the knob seam is still executable bash for every bridged kit: a knob's value is computed by
-  sourcing the owning kit's `lib/*.sh` and the consumer's `<gates-dir>/<kit>-config.sh`
-  (gate-sdk/SPEC.md §lib/gate.sh), so the battery, hook generation and every harness hook enter
-  through bash before the binary runs.
-  **Cuts 1 to 4 landed:** site-kit and doctrine-kit at `static-config-seam`, queue-kit and
-  lifecycle-kit at `config-seam-second-cut`, canon-kit, context-kit, delegation-kit and drift-kit at
-  `config-seam-third-cut`, evidence-kit and guard-kit at `config-seam-fourth-cut`; all ten read
-  knob files in the line grammar with their defaults in-crate, and the grammar rules the command
-  knob, the knob reference and the declared family (gate-sdk/SPEC.md §The knob file).
-  **Why it needed design:** each remaining kit waited on a shape the grammar had not ruled — a
-  generated family, guard-kit's rule content — and gate-sdk migrates last, retiring the bridge; the
-  selection rule and each shape's reason are that section's.
-  **The tension it closes.** TRAJECTORY objective 6 rules a surviving script surface
-  dual-implementable, bash and PowerShell; the runtime bridge is neither and cannot be, since a
-  PowerShell twin is the second producer criterion 6 refuses.
-  **Refused:** a PowerShell twin of the bridge (second producer); porting the files under the
-  present seam (each ruling's ground holds while the seam is bash); a generated knob projection
-  (refused at gate-sdk/SPEC.md §gen-pre-commit on per-fixture grounds).
-  **Cost while deferred:** objective 6 reads false on the runtime path and no surface says so;
-  every native-Windows adopter carries a bash floor the install docs attribute to git alone.
-  Filed 2026-09-12 by consult, an operator-directed direct entry; cut 1 built at
-  `static-config-seam`, cut 2 at `config-seam-second-cut` and cut 3 at `config-seam-third-cut`, each
-  demoted at landing as a corpus increment.
-  **Cut 4 leads `config-seam-fourth-cut` and finishes the seam: evidence-kit and guard-kit move to
-  knob files, then gate-sdk last, retiring the bridge** — operator direction, 2026-09-14,
-  lead-relayed, taken with a partial landing named as a real risk. Spec ruled the generated family
-  (declared scalar families over a crate fixture-suite derivation) and guard-kit's rule content (the
-  guard stays the one shell hook) in the first amendment, and gate-sdk's cut in the second, which
-  lands after it. The entry demotes if that cut does not land, and moves to Done when it does. **The
-  native-Windows floor is not this entry's** — operator direction, 2026-09-14, lead-relayed: the cut
-  states the surviving bash surfaces, and `native-windows-bash-floor` owns the rest.
-
 ## Technical Debt
 
 ## Deferred
@@ -69,6 +36,52 @@
   Filed 2026-09-14 by `config-seam-fourth-cut`'s spec, a direct entry the operator authorized
   (operator direction, 2026-09-14, lead-relayed), splitting the floor out of the bridge's
   retirement.
+
+- **gen-pre-commit-port** [design-pending] [cost: session/low] [surface: gate-sdk] — `gate-sdk/bin/gen-pre-commit.sh`
+  is owed: its `no-port` declaration rested on criterion 6's single-producer rule, and the crate is
+  now every knob's one producer (gate-sdk/SPEC.md §gen-pre-commit).
+  **Deliverable:** the pre-commit and commit-msg emissions as binary arms producing byte-identical
+  hooks, `check-graph` assertion D reading them in process with its `--needs` `bash` element gone,
+  every caller (`init`, the kit `smoke/install.sh` recipes, the upgrade and AGENTS.md smokes) moved
+  to the arm, and the script deleted.
+  **Why [design-pending]:** the `gen=manual` round-trip and `--write`'s conditional commit-msg write
+  move with it, and whether the smoke recipes keep a shell spelling of the call is a choice.
+  **Cost while deferred:** every battery spawns `bash` for assertion D's two arms, against the
+  port's direction; a host without `bash` fails `check-graph` at exit 2; `--emit port-blockers
+  --tree` counts the file owed.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the Deferred entry its bridge-retirement
+  amendment's delta 10 names (operator direction, 2026-09-14, lead-relayed).
+
+- **run-consumer-smoke-port** [design-pending] [cost: iteration/low] [surface: gate-sdk] —
+  `gate-sdk/bin/run-consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule,
+  since its registration accounting resolved a gate's knobs through the bridge, and that ground is
+  gone (gate-sdk/SPEC.md §Consumer smoke, The port disposition).
+  **Deliverable:** the install, green-battery, registration-accounting and violation phases as a
+  binary arm the `consumer_smoke` validate suite runs, its output and 0/1/2 contract unchanged, and
+  the script deleted.
+  **Why [design-pending]:** the accounting probes gates no registry names, so it cannot delegate to
+  `run-gates.sh --only`, and whether it probes in process or by spawning the consumer's own binary
+  is open; it also waits on or absorbs `consumer-smoke-library-port`.
+  **Cost while deferred:** every validate runs a 240-line bash harness; `--emit port-blockers
+  --tree` counts it owed.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s build beside its two sibling ports, when the
+  bridge retirement moved the smoke harness from no-port to owed (operator direction, 2026-09-14).
+
+- **consumer-smoke-library-port** [design-pending] [cost: iteration/low] [surface: gate-sdk] —
+  `gate-sdk/lib/consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule, and
+  the crate is now every knob's one producer (gate-sdk/SPEC.md §Consumer smoke). Its callers are
+  `run-consumer-smoke.sh`, which sources it, and three compiled arms (`--upgrade-smoke`,
+  `--agents-md-smoke`, `--run-demo`) that reach it through a shared `bash -c` spawn wrapper.
+  **Deliverable:** `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and `csmoke_place_binary`
+  in-crate, the spawn wrapper and its `SCRATCH` stdout protocol deleted, and the library deleted.
+  **Why [design-pending]:** it cannot delete while `run-consumer-smoke.sh` sources it, so the order
+  against `run-consumer-smoke-port` (together, or library first with a shell caller kept) is the
+  decision.
+  **Cost while deferred:** each of the three arms spawns `bash` to reach the helpers, and their
+  installer output is forced onto stderr by the protocol; `--emit port-blockers --tree` counts it
+  owed.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the third of the three ports the bridge
+  retirement made owed (operator direction, 2026-09-14, lead-relayed).
 
 - **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
@@ -4804,6 +4817,7 @@
 
 ## Done
 
+- config-seam-static-format
 - config-bridge-resolution-cost
 - knob-shape-flip-undetected
 - config-seam-overrides-harness-pin

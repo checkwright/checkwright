@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # spec: gate-sdk/SPEC.md §lib/gate.sh — sourced library: values + adapters, never gate structure
-# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope, and this file is the ground held twice over. It is not a client of the config bridge; it IS the bridge — the machinery that sources every other kit's lib/*.sh and derives which kit owns a knob from its prefix. gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, so a crate-side form would have to either source shell libraries from inside a binary or re-implement every kit's defaults, which is the second producer criterion 6 refuses, squared. gate-sdk/SPEC.md §gen-pre-commit already declares on this ground from the opposite direction: the hook generator bakes a resolved knob and so cannot move either. Structural, not a sizing judgment.
+# no-port: gate-sdk/SPEC.md §lib/gate.sh, its port disposition — two grounds. Its API is shell functions sourced into bash callers (CI steps, the installer smoke, the author template, the front-ends and the test harness), and a binary arm cannot be sourced into bash; and its pre-binary accessors answer before any binary exists, the bootstrap cause bin/build-native.sh declares on. Structural, not a sizing judgment.
 
 # spec: gate-sdk/SPEC.md §Fail-closed contract — non-zero capture status means the check could not run; exit 2, never a false clean
 fail_closed() {
