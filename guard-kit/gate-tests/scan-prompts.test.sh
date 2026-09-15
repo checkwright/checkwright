@@ -152,6 +152,24 @@ escape_out="$(run --count -- -dash.log)"; escape_status=$?
 [[ "$escape_status" -eq 0 && "$escape_out" == "0/0" ]] \
     || { echo "FAIL [dash-escape]: expected 0/0 at exit 0, got '$escape_out' at $escape_status"; fails=$((fails + 1)); }
 
+# The grant test reads the reachability verdict, on a sandbox pair and log of their
+# own so the counts above keep their corpora: the committed 'echo *' glob's trailing
+# '*' absorbs a file redirect and an expansion, and neither call is granted, while
+# the plain call it matches is.
+mkdir -p "$sb/grant/.claude"
+printf '%s\n' '{ "permissions": { "allow": ["Bash(echo *)"] } }' > "$sb/grant/.claude/settings.json"
+printf '%s\n' '{ "permissions": { "allow": [] } }' > "$sb/grant/.claude/settings.local.json"
+grantLOG="$sb/grant.log"
+# shellcheck disable=SC2016  # the backtick is the logged command's own text, never expanded here
+printf '%s\n' 'echo hi > notes.md' 'echo `date`' 'echo hi' > "$grantLOG"
+grant="$(GUARD_KIT_SETTINGS="$sb/grant/.claude/settings.json" \
+         GUARD_KIT_SETTINGS_LOCAL="$sb/grant/.claude/settings.local.json" \
+         bash gate-sdk/bin/run-gates.sh --emit scan-prompts "$grantLOG")"
+assert_has     grant-headline '2 prompting call(s)' "$grant"
+assert_has     grant-unreachable '2 of them allowlist-unreachable' "$grant"
+assert_row     grant-plain-call-granted '1x  echo' "$grant"
+assert_absent  grant-no-overlay 'Overlay-covered' "$grant"
+
 [[ "$fails" -eq 0 ]] || { echo "scan-prompts.test: $fails assertion(s) failed"; exit 1; }
-echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; a write-redirect call ranks in the allowlist-unreachable section without leaving the headline; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
+echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; a write-redirect call ranks in the allowlist-unreachable section without leaving the headline; a glob absorbing a redirect or an expansion grants neither call; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
 exit 0

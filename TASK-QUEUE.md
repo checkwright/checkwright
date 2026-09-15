@@ -12,22 +12,6 @@
 
 ## New Features
 
-- **scan-prompts-grant-test-redirect-blind** [spec: SPEC-grant-test-reach.md]
-  — `scan-prompts`' grant test and its reachability verdict disagree on a redirect call.
-  `granted()` runs `segment_granted` over `guard::allow_match`, a plain glob match on the raw
-  segment with no redirect model (`native/src/emit/scan_prompts.rs`, `native/src/guard.rs`).
-  So a committed `Bash(cat >> .tmp/*)` would read a write-redirect call as granted, although
-  guard-kit/SPEC.md rule 17 states no `Bash(...)` entry grants a redirect target. Such a grant
-  was committed once and reverted as inoperative.
-  DISTINCT from the Done `prompt-ranking-ungrantable-shape-class`, which partitions rows the
-  grant test already called prompting; this is the grant test upstream of that partition.
-  **Cost while deferred:** live, not latent, probed at spec: any committed `Bash(<cmd> *)` glob
-  absorbs a redirect or an expansion, so such calls already read granted.
-  **`guard-friction-reach`'s grant-test unit** (operator direction, 2026-09-15, lead-relayed).
-  **Widened at spec to expansions as well as redirects** (operator direction, 2026-09-15,
-  lead-relayed).
-  Filed 2026-09-12 by build, from the ranker partition; drained and promoted 2026-09-13 at close.
-
 - **settings-overlay-dead-path-unreported** [spec: SPEC-overlay-dead-path.md] —
   `compare-settings-allow` reports redundant and over-broad local-overlay grants but not a grant
   naming a path that no longer exists, and `check-settings-paths` holds that invariant over the
@@ -4711,5 +4695,6 @@
 - rewrite-arm
 - in-place-rewrite-steer-reach
 - file-authoring-act-ungoverned
+- scan-prompts-grant-test-redirect-blind
 
 ## Lessons Learned

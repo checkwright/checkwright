@@ -2168,7 +2168,8 @@ number either way, and it is the number the triage criterion reads.
 
 The friction log's fall-throughs split three ways:
 - **Committed-covered** — every segment matches the committed allowlist or a
-  harness built-in. Silently granted, reinforced; off every list.
+  harness built-in, and the call is not allowlist-unreachable (below). Silently
+  granted, reinforced; off every list.
 - **Prompting** — some segment nothing grants. The headline `<n> prompting
   call(s)`, grouped and ranked by pattern (leading binary, plus subcommand for
   the common multi-command binaries, plus the **write-shape suffix** below),
@@ -2178,7 +2179,8 @@ The friction log's fall-throughs split three ways:
   `<u> of them allowlist-unreachable`, the calls in the second section. The
   partition is over **rows, never over the count**: `<n>`, `<m>` and
   `kpi-prompt-friction`'s two integers are exactly what they were without it.
-- **Overlay-covered** — granted, but at least one segment relies on the
+- **Overlay-covered** — granted, and the call is not allowlist-unreachable
+  (below), but at least one segment relies on the
   uncommitted `GUARD_KIT_SETTINGS_LOCAL` overlay. It *did not prompt*, so it is
   excluded from the headline (the count is a true prompt count, not an upper
   bound), yet it is exactly the promote-or-prune candidate the close step must
@@ -2229,7 +2231,22 @@ change: both stay available for every row, and a guard rule reaching shapes no g
 can express is that disposition's stated reason for existing. The section is
 **advisory on the log's own terms** (§The close-stage triage step) and reds nothing.
 Because the partition moves no call between prompting and granted and re-keys no
-row, it is **not** a definitional step of the kind recorded below.
+row, it is **not** a definitional step of the kind recorded below. Reading the
+verdict in the grant test does move calls, from granted to prompting, and it is
+recorded as such a step below.
+
+**The grant test reads the verdict, so the two cannot disagree.** A glob match on a
+raw segment has no model of a redirect or an expansion. A trailing `*` absorbs both,
+so `Bash(echo *)` would otherwise read `echo x > notes.md` and ``echo `date` `` as
+granted, while the verdict above marks both allowlist-unreachable. A call the
+verdict marks is therefore never granted, by the committed file or the overlay, and
+it always lands on the headline and in the unreachable section. There is one
+predicate and the grant test does not restate it. **The honest limit leans the
+verdict's way:** a harness may grant a redirect target through a file-write
+permission rule, which this arm does not read. Such a call reads prompting although
+it was granted. That over-count is visible on the ranking, where an under-count
+would be silent. A write rule 17 grants never reaches the log, so the common
+gitignored case is untouched.
 
 **Every segment is read through the harness view before it is matched or
 keyed.** The grant test and the ranking key both take the segment through
@@ -2384,11 +2401,13 @@ Its behavior
 — the three-way split, the per-segment matching, the true count, the
 argument-override in both orders, the
 write-shape suffix's create/append/fd-dup/first-segment cases, the reachability
-partition's sections and headline clause, and the
+partition's sections and headline clause, the grant test's refusal of a call the
+verdict marks, and the
 argv-shape refusal with its `--` escape — is pinned by
 `gate-tests/scan-prompts.test.sh`, which reaches the arm through the front-end
 so the end-to-end path keeps a holder; the key derivation, the reachability
-verdict's shapes and exclusions, and the mixed-key rule are additionally pinned
+verdict's shapes and exclusions, the grant test's reading of it on both passes,
+and the mixed-key rule are additionally pinned
 in-crate, where `check-crate-arms` runs it. What that test pins is the split,
 the count semantics and those cases; the key's granularity beyond them is not a
 contract, which is why an additive suffix leaves its substring assertions true.
@@ -2413,6 +2432,12 @@ read **14 patterns across 68 prompting calls** immediately before and **14 acros
 68** immediately after, on one log. No logged line led with a wrapper either strip
 removes, so that corpus shows no discontinuity and a later trend read has none to
 attribute. The KPI is left as it is, on the same ground as above.
+
+**The grant test's reading of the verdict is a step of the same kind.** It moves
+every logged call carrying a write redirect or an expansion that a committed or
+overlay glob matched from granted to prompting, and re-keys nothing. On one log,
+**20 patterns across 69 prompting calls** immediately before and **23 across 77**
+immediately after. The KPI is left as it is, on the ground above.
 
 **A substrate change is not such a step, and that is recorded rather than
 assumed.** Moving the measurement off a spawn-and-parse and onto an in-crate

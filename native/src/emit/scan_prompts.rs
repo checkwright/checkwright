@@ -140,13 +140,15 @@ fn quoted_view(cmd: &str) -> String {
     String::from_utf8_lossy(&pass(&sq, b'"', b"DQ")).into_owned()
 }
 
-// spec: guard-kit/SPEC.md §scan-prompts — granted only if EVERY segment is, so a whole-string glob
-// spanning a compound the harness would split and refuse does not read as allowed.
+// spec: guard-kit/SPEC.md §scan-prompts — granted only if the call is not allowlist-unreachable and
+// EVERY segment is, so neither a glob's trailing `*` absorbing a redirect or an expansion nor a
+// whole-string glob spanning a compound the harness would split reads as allowed.
 fn granted(cmd: &str, allow: &[String], overlay: Option<&[String]>) -> bool {
-    guard::split_compound(&quoted_view(cmd))
-        .iter()
-        .filter(|seg| !seg.bytes().all(|c| c == b' '))
-        .all(|seg| segment_granted(seg, allow, overlay))
+    !allowlist_unreachable(cmd)
+        && guard::split_compound(&quoted_view(cmd))
+            .iter()
+            .filter(|seg| !seg.bytes().all(|c| c == b' '))
+            .all(|seg| segment_granted(seg, allow, overlay))
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the key's write-shape suffix: the segment's own
@@ -609,6 +611,27 @@ mod tests {
         ] {
             assert!(!allowlist_unreachable(c), "{:?} was marked unreachable", c);
         }
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — the grant test reads the verdict: a trailing `*` that
+    // absorbs a file redirect or an expansion grants neither, while an inert target still grants
+    #[test]
+    fn a_glob_absorbing_a_redirect_or_an_expansion_does_not_grant_it() {
+        let allow = vec!["echo *".to_string()];
+        assert!(!granted("echo hi > notes.md", &allow, None));
+        assert!(!granted("echo `date`", &allow, None));
+        assert!(granted("echo hi > /dev/null", &allow, None));
+        assert!(granted("echo hi 2>&1", &allow, None));
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — the overlay pass reads the same verdict, so an
+    // unreachable call lands prompting and unreachable rather than overlay-covered
+    #[test]
+    fn an_overlay_glob_absorbing_a_redirect_leaves_the_call_prompting_and_unreachable() {
+        let t = tally("ls >> notes.md\n", &[], &["ls *".to_string()]);
+        assert_eq!((t.prompting.len(), t.total), (1, 1));
+        assert_eq!(t.unreachable, vec![("ls >>".to_string(), 1)]);
+        assert_eq!((t.overlay.len(), t.overlay_total), (0, 0));
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — a key is unreachable only when every call under it is,
