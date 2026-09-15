@@ -416,8 +416,11 @@ fn root_tiering_accepts_one_agent_file(
 ) -> Result<(), Outcome> {
     let rt = orientation_repo(scratch)?;
     let argv = root_tiering_dispatch(consumer)?;
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_command`'s bare-argv contract bakes in no
+    // knob, so `rt`'s own env is this call's only route to GATE_SDK_AGENT_FILE.
+    let env = [("GATE_SDK_AGENT_FILE".to_string(), "AGENTS.md".to_string())];
 
-    let (rc, out) = run_dispatch(&argv, &rt)?;
+    let (rc, out) = run_dispatch(&argv, &rt, &env)?;
     if rc != 0 {
         return Err(fail(format!(
             "check-root-tiering rejected an orientation-clean AGENTS.md root: {}",
@@ -428,7 +431,7 @@ fn root_tiering_accepts_one_agent_file(
     std::fs::write(format!("{}/CLAUDE.md", rt), "")
         .map_err(|e| Outcome::Refuse(format!("{}: cannot write the stray agent file: {}", NAME, e)))?;
     git(&rt, &["add", "CLAUDE.md"])?;
-    let (rc, out) = run_dispatch(&argv, &rt)?;
+    let (rc, out) = run_dispatch(&argv, &rt, &env)?;
     if rc == 0 {
         return Err(fail(
             "check-root-tiering accepted a stray second agent file (CLAUDE.md beside AGENTS.md)"
@@ -510,9 +513,13 @@ fn root_tiering_dispatch(consumer: &str) -> Result<Vec<String>, Outcome> {
     Ok(argv)
 }
 
-fn run_dispatch(argv: &[String], cwd: &str) -> Result<(i32, String), Outcome> {
+fn run_dispatch(
+    argv: &[String],
+    cwd: &str,
+    env: &[(String, String)],
+) -> Result<(i32, String), Outcome> {
     let rest: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
-    let m = proc::run_merged_in(&argv[0], &rest, &[], Some(Path::new(cwd)))
+    let m = proc::run_merged_in(&argv[0], &rest, env, Some(Path::new(cwd)))
         .map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))?;
     Ok((
         m.reported_code(),
