@@ -24,6 +24,25 @@ else
     jq 'del(.["//"])' "$SMOKE_KIT_ROOT/templates/settings-hooks.json" > .claude/settings.json
 fi
 
+# spec: guard-kit/SPEC.md §The recommended allowlist — a union into permissions.allow, never a replacement
+sentinel='Bash(smoke-sentinel --prior-grant)'
+jq --arg s "$sentinel" '.permissions.allow = ((.permissions.allow // []) + [$s])' \
+    .claude/settings.json > .claude/settings.json.new
+mv .claude/settings.json.new .claude/settings.json
+jq --slurpfile t "$SMOKE_KIT_ROOT/templates/settings-allow.json" \
+    '(.permissions.allow // []) as $a
+     | .permissions.allow = ($a + [$t[0].permissions.allow[] | select(. as $e | $a | index([$e]) | not)])
+     | del(.["//"])' \
+    .claude/settings.json > .claude/settings.json.new
+mv .claude/settings.json.new .claude/settings.json
+if ! jq -e --arg s "$sentinel" --slurpfile t "$SMOKE_KIT_ROOT/templates/settings-allow.json" \
+    '.permissions.allow as $a | ($a | index([$s])) != null
+     and ($t[0].permissions.allow - $a == [])
+     and ($a | length) == ($a | unique | length)' .claude/settings.json >/dev/null; then
+    echo "guard-kit/smoke/install.sh: the allow union dropped a prior grant, missed a template entry or duplicated one" >&2
+    exit 1
+fi
+
 {
     echo '.workflow/prompt-friction.log'
     echo '.workflow/wakeup-attempts.log'
@@ -38,3 +57,18 @@ if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
     echo "guard-kit/smoke/install.sh: installed guard did not block a compound-cd payload with rule 1's steer (exit $rc, want 2): $msg" >&2
     exit 1
 fi
+
+# spec: guard-kit/SPEC.md §The recommended allowlist — the ruleset blocks no form the template grants
+while IFS= read -r entry; do
+    cmd="${entry#Bash(}"
+    cmd="${cmd%)}"
+    cmd="${cmd//\*/x}"
+    set +e
+    msg="$(jq -cn --arg c "$cmd" '{tool_input:{command:$c}}' | bash scripts/bash-guard.sh 2>&1 >/dev/null)"
+    rc=$?
+    set -e
+    if [[ "$rc" -eq 2 ]]; then
+        echo "guard-kit/smoke/install.sh: the installed guard blocks '$cmd', a form templates/settings-allow.json grants ($entry): $msg" >&2
+        exit 1
+    fi
+done < <(jq -r '.permissions.allow[]' "$SMOKE_KIT_ROOT/templates/settings-allow.json")

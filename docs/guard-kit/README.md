@@ -54,6 +54,10 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    showing the path-shaped shape a consumer kit's own guard registers under —
    lifecycle-kit's `workflow-state-guard` is the shipped instance).
 
+   Then review `templates/settings-allow.json` against guard-kit/SPEC.md §The
+   recommended allowlist, and union the entries you accept into
+   `.claude/settings.json`'s `permissions.allow`.
+
 3. Gitignore the two scratch logs (`.workflow/prompt-friction.log`,
    `.workflow/wakeup-attempts.log`) — both are per-iteration, cleared at close.
 

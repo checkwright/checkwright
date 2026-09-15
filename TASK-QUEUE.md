@@ -12,27 +12,6 @@
 
 ## New Features
 
-- **recommended-allowlist-unshipped** [spec: SPEC-recommended-allowlist.md] — no kit
-  ships or documents a recommended permission allowlist for the gates and tools an adopter
-  activates, so every adopter re-derives the grant set by meeting prompts.
-  **Probed at the drain:** guard-kit ships the triage criterion, scan-prompts,
-  compare-settings-allow and a hooks-only settings template
-  (`guard-kit/templates/settings-hooks.json`, no `permissions` block), and neither
-  `native/src/installer/` nor `installer/bin/` writes an allow entry. The core set is small,
-  since nearly every gate and tool is reached through the `run-gates.sh` front-end, plus the forms
-  guard-kit's generic ruleset steers onto.
-  **DISTINCT from `guard-steer-grant-mismatch` (icebox)**, which is the steer/grant mismatch within
-  one tree's own guard and settings; this is the absence of any shipped recommendation. The
-  template discharges that entry's customer-facing half and leaves its in-tree half standing.
-  **Ruled at spec:** no adapter component; a hand-authored guard-kit template beside
-  `settings-hooks.json`, never written by `init`, with the projection candidate refused.
-  **Cost while deferred:** every adopter pays out-of-band permission decisions on the very forms the
-  kit steers to, from first install.
-  **Selected for `guard-friction-reach`** (operator direction, 2026-09-15, lead-relayed); the
-  harness-adapter seam was left open for spec to design.
-  Filed 2026-09-15 to the gap inbox, raised by the operator in `owed-port-tail`'s lead session
-  after a stale settings grant blocked a build commit; promoted at that iteration's close.
-
 ## Technical Debt
 
 ## Deferred
@@ -4683,5 +4662,6 @@
 - file-authoring-act-ungoverned
 - scan-prompts-grant-test-redirect-blind
 - settings-overlay-dead-path-unreported
+- recommended-allowlist-unshipped
 
 ## Lessons Learned

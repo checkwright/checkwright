@@ -102,16 +102,66 @@ exists, steer to it in the guard rather than permitting the worse one.
 Note: the harness matches the allowlist **per segment** of a compound
 command, so a glob on the core command does not cover the `echo` banners,
 `wc`, redirects, or `;`-chained diagnostics wrapped around it — one
-unmatched segment takes the whole line off the match path. The read-only banner/diagnostic
-tools an agent habitually chains (`echo`, `wc`, `grep`, `ls`, `command -v`)
-are therefore themselves legitimate allowlist entries; allowlist them, or
-run the core command bare.
+unmatched segment takes the whole line off the match path. The read-only banner
+and diagnostic tools an agent habitually chains are therefore themselves
+legitimate allowlist entries (§The recommended allowlist names them); allowlist
+them, or run the core command bare.
 
 A row the ranking marks **allowlist-unreachable** (§scan-prompts) admits two
 dispositions, not three: an allowlist entry is *unavailable* for it rather than
 unattractive, so resolve it by a guard rule or a habit change, or leave it
 standing as measured friction — a standing row is an honest outcome, not an
 unfinished triage.
+
+### The recommended allowlist
+
+`templates/settings-allow.json` is a recommendation to merge by hand, entry by
+entry, into the committed settings file's `permissions.allow`, as a **union**: an
+object merge that replaces the array drops every grant the consumer already had.
+Nothing in the kit writes it, since a grant is the consumer's security decision
+(§compare-settings-allow's impact criterion rates a committed widening
+high-impact). Each entry is there for a stated reason and reaches a stated set:
+
+- **The front-end, bare and with arguments.** Every gate, every arm and the
+  ruleset's own front-end steer targets are reached through it: rule 8's section
+  extractor and `--rewrite` arm, and the `--scratch-run` runner rules 23 and 26
+  name. Its reach is the whole front-end. That includes:
+  - `--scratch-run`, which runs a scratch script under that arm's echo control;
+  - `--rewrite`, which rewrites files inside the repository under its own bounds
+    (§rewrite);
+  - `--install-hooks`, which opts the clone into the generated git hooks;
+  - every `--emit … --write` mode that regenerates a tracked projection.
+- **`git rm -q`**, rule 22's steer target, spelled as the steer prints it. Its
+  reach is deleting and staging tracked paths, which is recoverable from the last
+  commit. Rule 22 blocks its force flag whether or not a grant matches.
+- **The banner and diagnostic tools** an agent chains around a core command:
+  `echo`, `wc`, `grep`, `ls` and `command -v`. The harness matches each segment of
+  a compound on its own, so these are what keep a chained core command on the
+  match path. They read or print. A redirect on them is a file write the harness
+  checks against the target, not against these entries. **The criterion for this
+  set is that a utility has no write or execute form of its own**, meaning nothing
+  it can do beyond what the harness separately checks. So `find` (`-exec`,
+  `-delete`), `awk` (`system()`, `print >`), `xargs`, `sed` and every interpreter
+  stay out however habitually they are chained, and the steer for a rewrite is
+  `--rewrite`, not a grant. The front-end and `git rm -q` above are the kit's own
+  steer targets, each granted for its stated reach, not members of this set.
+  **The honest limit** is that a Bash read grant reaches paths a harness file-read
+  rule may deny, so a consumer holding such rules drops `grep` and `wc` here
+  rather than widening around them.
+
+**Deliberately absent, so a reader does not re-derive it.** The harness's built-in
+read-only `git` subcommands need no entry. A write to a gitignored target, a
+truncation of one and a sanctioned wait are granted by rules 16, 17 and 19 from
+the hook, where no settings entry can reach them. The harness's file tools, the
+steer targets of rules 8 to 11 and 25, are governed by its own permission mode,
+and an `Edit` or `Write` grant is a write widening this recommendation will not
+make on a consumer's behalf. Rule 2's bare-`git` steer target is one subcommand
+per consumer, and a blanket `git` grant reaches a force push. **The template
+assumes the kits are vendored at the repository root**, as `settings-hooks.json`
+does, and where `check-settings-paths` is registered it holds the front-end
+literal once merged. The set is hand-authored in the template, and the one
+invariant a hand-authored set can break — a rule blocking a form the template
+grants — is held by the consumer smoke (§Testing).
 
 ## The guard framework (`lib/guard.sh`)
 
@@ -2161,7 +2211,9 @@ substrate: a second harness with a different built-in set would force a
 configurable slot whether the set sat in shell or in the binary, so the port
 neither pays it nor pre-pays it. **The allowlist itself never crosses.** The arm
 reads a consumer's own `permissions.allow[]` through `GUARD_KIT_SETTINGS` and
-`GUARD_KIT_SETTINGS_LOCAL` and ships no default allow entry of any kind, so the
+`GUARD_KIT_SETTINGS_LOCAL` and ships no default allow entry of any kind —
+`templates/settings-allow.json` is a recommendation the consumer merges, and this
+arm never reads it — so the
 mechanism is the kit's and the vocabulary stays the consumer's file — the shape
 §compare-settings-allow's empty-by-default probe roster already holds.
 
@@ -2784,6 +2836,7 @@ guard-kit/
                             #   consumer-rules section
   templates/guard-config.knobs
   templates/settings-hooks.json  # the PreToolUse wiring snippet
+  templates/settings-allow.json  # the recommended allow entries, merged by hand
   templates/close-triage.md
   smoke/install.sh
 ```
@@ -2820,8 +2873,9 @@ Knobs (this repo's layout as defaults):
   before the criterion shipped. Entries are full permission-rule strings rather
   than bare commands, matching the settings vocabulary the tool already reads on
   both sides, so a consumer can probe non-`Bash` rules with the same mechanism.
-  The kit ships **no** default probes: every string naming a command is the
-  consumer's vocabulary, never the kit's (CLAUDE.md §The provenance seam).
+  The kit ships **no** default probes: a probe names a command the consumer
+  calls bad, which is the consumer's vocabulary, never the kit's (CLAUDE.md §The
+  provenance seam).
 - `GUARD_KIT_BREADTH_DECLARED` — keyed knob recording the breadths ruled
   intended (§compare-settings-allow), one
   `GUARD_KIT_BREADTH_DECLARED[<rule>] = <reason>` line each: the key is a permission-rule string, the value the reason
@@ -3139,6 +3193,12 @@ the binary refuses blocks too — the install is self-verifying. The
 wiring is merged rather than written, and the merge asserts every hook event a
 co-vendored kit wired before it survives: an overwrite silently drops that kit's
 wiring from the composed consumer, and nothing downstream reads the final file.
+It then unions `templates/settings-allow.json`'s entries into the same file beside
+a sentinel entry written first, asserting the sentinel survives, and feeds each
+template entry's literal form — `Bash(` and `)` stripped, each `*` replaced by the
+word `x` — through the installed guard, failing on any block: a rule later blocking
+a form the recommendation grants would ship that steer/grant contradiction to
+every adopter (§The recommended allowlist).
 There is no `smoke/violation.sh`: the kit registers no gates, so no
 battery-reddening violation is craftable (gate-sdk/SPEC.md §Consumer smoke
 makes that file conditional on exactly this).
