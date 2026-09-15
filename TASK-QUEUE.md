@@ -12,51 +12,6 @@
 
 ## New Features
 
-- **couples-dynamic-root-resolution** [spec: SPEC-fallback-roots.md]
-  — the skipped-and-counted bucket is where trigger-drift hides, and its dominant
-  subset is decidable.
-  **DEMOTED at couples-resolver-reach 2026-09-12 after a partial landing, and the
-  cause is a WITHDRAWAL rather than an overrun.** Landed: `?` ended for a
-  statically resolvable walk root whose coverage the author can express, held by a
-  crate-side property assertion; the declared root carries a mandatory filter kind
-  and a per-walk prune, both held to executed behaviour by assertion A. Measured
-  **52 roots covered against 51 still `?`**, from 2 against 63.
-  **Withdrawn, and never deliverable here:** 26 of the 51 are the kit-literal
-  fallback branches of `spec::manifest_files` and `spec::comment_surface`. Their
-  roots DO resolve; their `?` stands because the coverage they would be held to is
-  the conservative authoring rule gate-sdk/SPEC.md §The `# graph:` manifest
-  **files as unsettled**, and a kit cannot demand an adopter satisfy it over a
-  tree the kit has never seen. The refusal was stated on the root half alone and
-  does not reach that far.
-  **A boundary found, not a shortfall.** The remaining third was never decidable
-  at this altitude; what the iteration converted is a latent asymmetry into a
-  measured class with a population and a cadence row. Severity: **no trigger is
-  lost** — the hook's matcher spans `/`, so every path the coverage reader calls
-  uncovered still fires the gate. An adopter gains a red gate, never a missing
-  coupling.
-  **Five repair options were measured dead; do not re-buy them** (validate survey, 2026-09-12):
-  (1) per-descriptor depth enumeration — maintained, and the depths are one fixture's, not an
-  adopter's; (2) a shipped `CANON_KIT_COMMENT_SURFACE` default — the demo still fails, and adding a
-  `CANON_KIT_MANIFEST_FILES` default reds `check-spec-pointer` with 20 dangling pointers; (3) deeper
-  `kit:` expansion — reaches at most 49 of 151, the other 102 being plain-token `.gate`/`.rs`;
-  (4) an escape on provable inexpressibility — expressibility belongs to the corpus, not the
-  declaration; (5) keying the matcher off the filter kind — greens every adopter suite but flips
-  `check-reads-couples`' own `bad/` case and unit cases to exit 0, retiring its central assertion.
-  **Blocked rather than rankable:** settling that field's semantics is the only
-  thing that can move these 26 roots, so the floor has not moved.
-  **Cost while deferred:** the 26 roots stay skipped-and-counted, so the coverage
-  of their walks is unasserted and a genuine under-couple among them would read the
-  same as this withdrawal's deliberate one. That is strictly better than before —
-  they are now a named class on the cadence row with a stated review question
-  rather than an undifferentiated skip count — and strictly worse than a gate: the
-  row is reviewed at close by a session, and a session can defer.
-  **Selected as `couples-field-semantics`' lead unit** (operator direction, 2026-09-15,
-  lead-relayed); the blocker rides the same iteration. **Spec probed the premise and it holds**:
-  under the settled matcher the 26 roots declare under `else:` guards, option (5)'s refusal does
-  not reach a settled semantics, and a never-counted third fallback walk (`canonical_specs`)
-  declares with them. Its blocker tag left at promotion, because the lead line cannot carry it
-  beside the spec tag inside the wrap budget; the amendment's header carries the merge order.
-
 - **packed-knob-projection-filter-form** [spec: SPEC-packed-knob-projection.md]
   — no filter-grammar form reaches a projection out of a knob whose elements pack several
   fields, so gate-sdk/SPEC.md §check-reads-couples keeps its `projection` ground class.
@@ -4651,5 +4606,6 @@
 ## Done
 
 - couples-glob-semantics-unowned
+- couples-dynamic-root-resolution
 
 ## Lessons Learned

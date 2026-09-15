@@ -146,21 +146,19 @@ pub type GateEntry = (
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — `spec::manifest_files`' branch set: the configured corpus
 // and the prose surface it adds, declared once for the members that call it
-// spec: gate-sdk/SPEC.md §check-reads-couples — the kit-literal fallback keeps `?`, because the
-// conservative authoring rule it would be held to is the part of the `couples=` semantics that
-// section files as unsettled, and a kit cannot demand an adopter satisfy it over an unseen tree
+// spec: gate-sdk/SPEC.md §check-reads-couples — each branch declares, the fallback under its selector's guard
 const MANIFEST_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:204 via const MANIFEST_ROOTS"),
-    ("?", "", "", "fallback@src/spec.rs:210 via const MANIFEST_ROOTS"),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md", "", ""),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:CLAUDE.md", "", ""),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
 ];
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — `spec::comment_surface`'s two runtime branches: the
-// configured one declares, and the kit-literal fallback keeps `?` on the ground above
+// spec: canon-kit/SPEC.md §The shared spec adapters — `spec::comment_surface`'s two runtime branches
 const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:233 via const COMMENT_SURFACE_ROOTS"),
+    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", "", ""),
 ];
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — `MANIFEST_ROOTS` and `COMMENT_SURFACE_ROOTS`
@@ -168,11 +166,12 @@ const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
 // rather than per walk is what drops the second walk silently.
 const SPEC_POINTER_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:204 via const SPEC_POINTER_ROOTS"),
-    ("?", "", "", "fallback@src/spec.rs:210 via const SPEC_POINTER_ROOTS"),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", "**/templates,docs/*", ""),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md", "", ""),
+    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:CLAUDE.md", "", ""),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
-    ("?", "", "", "fallback@src/spec.rs:233 via const SPEC_POINTER_ROOTS"),
+    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", "", ""),
 ];
 
 pub const REGISTRY: &[GateEntry] = &[
@@ -1848,10 +1847,10 @@ pub const REGISTRY: &[GateEntry] = &[
     ),
 ];
 
-// spec: gate-sdk/SPEC.md §check-reads-couples — the three ground classes, each named by what retires
-// its `?`; a fourth is refused, since a `?` on a literal or literal-default root whose filter the
-// field can express declares the root instead
-pub const GROUND_CLASSES: &[&str] = &["fallback", "dynamic", "projection"];
+// spec: gate-sdk/SPEC.md §check-reads-couples — the live ground classes, each named by what retires
+// its `?`; no further class is offered, since a `?` on a literal or literal-default root whose filter
+// the field can express declares the root instead
+pub const GROUND_CLASSES: &[&str] = &["dynamic", "projection"];
 
 const fn ground_opens_with(ground: &str, class: &str) -> bool {
     let (g, c) = (ground.as_bytes(), class.as_bytes());
@@ -1898,8 +1897,8 @@ const _: () = {
             let (r, f, p, g) = roots[j];
             assert!(
                 root_declaration_holds(r, f, p, g),
-                "a `?` walk root needs a ground `<class>@<path>:<line>`, the class one of `fallback`, \
-                 `dynamic` or `projection`, and no filter or prune, and any other root carries no ground \
+                "a `?` walk root needs a ground `<class>@<path>:<line>`, the class one of `dynamic` or \
+                 `projection`, and no filter or prune, and any other root carries no ground \
                  (gate-sdk/SPEC.md §check-reads-couples)"
             );
             j += 1;
@@ -2115,6 +2114,7 @@ mod tests {
     #[test]
     fn every_registry_member_declares_the_root_that_carries_its_descriptor() {
         assert!(!REGISTRY.is_empty(), "no member to assert over");
+        let _env = crate::knobenv::lock();
         let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
         let mut gates_dir: Option<String> = None;
         for (name, _, _, _, owner, _) in REGISTRY {
@@ -3022,10 +3022,22 @@ mod tests {
         };
         let inm = pick(Placement::InModule, false);
         let off = pick(Placement::OffModule, false);
-        let shared = pick(Placement::OffModule, true);
         let (inm_loc, _) = inm.ground.split_once(" via ").unwrap_or((&inm.ground, ""));
         let (off_loc, off_via) = off.ground.split_once(" via ").expect("an off-module ground has a via");
-        let (_, shared_via) = shared.ground.split_once(" via ").expect("a const ground has a via");
+        // spec: gate-sdk/SPEC.md §check-reads-couples — the `via const` form is grammar whether or not a
+        // shared root const holds a `?` today, so its site is seeded off the live off-module locator
+        let shared_via = "const SEEDED_ROOTS";
+        let shared = Site {
+            ground: format!("{} via {}", off_loc, shared_via),
+            konst: Some("SEEDED_ROOTS".to_string()),
+            home: None,
+            ..off.clone()
+        };
+        assert_eq!(
+            locator_verdict(&shared, &root),
+            Ok(Placement::OffModule),
+            "a well-formed `via const` locator at a site inside that const was refused"
+        );
         let (inm_path, _) = inm_loc.rsplit_once(':').expect("a live locator has a line");
         let (off_module, _) = off_via.rsplit_once("::").expect("an inline off-module via names a fn");
         let seeded = |base: &Site, ground: String, kind: &str| {

@@ -320,17 +320,14 @@ impl Ctx {
     // spec: gate-sdk/SPEC.md §check-reads-couples — the per-root coverage assertion, shared by both
     // substrates: a root the parse resolved and a root the registry reported land here identically
     fn cover_root(&mut self, d: &Demand) -> Result<(), String> {
+        let listing = tracked_under(None, d.root)?;
+        self.cover_listing(d, &listing);
+        Ok(())
+    }
+
+    fn cover_listing(&mut self, d: &Demand, out: &str) {
         let (root, prune, gname, where_, globs, couples) =
             (d.root, d.prune, d.gname, d.where_, d.globs, d.couples);
-        let listing = if root == "." {
-            proc::run("git", &["ls-files"])
-        } else {
-            proc::run("git", &["ls-files", "--", root])
-        };
-        let out = listing
-            .ok()
-            .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
-            .ok_or_else(|| format!("git ls-files failed for root '{}'", root))?;
         for f in out.lines() {
             if f.is_empty() {
                 continue;
@@ -356,8 +353,24 @@ impl Ctx {
                 gname, where_, f, couples
             ));
         }
-        Ok(())
     }
+}
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — a root's tracked files, listed in the working
+// directory's repository unless the caller names another
+fn tracked_under(repo: Option<&str>, root: &str) -> Result<String, String> {
+    let mut args: Vec<&str> = Vec::new();
+    if let Some(r) = repo {
+        args.extend(["-C", r]);
+    }
+    args.push("ls-files");
+    if root != "." {
+        args.extend(["--", root]);
+    }
+    proc::run("git", &args)
+        .ok()
+        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
+        .ok_or_else(|| format!("git ls-files failed for root '{}'", root))
 }
 
 fn manifest_field(text: &str, key: &str) -> String {
@@ -545,4 +558,106 @@ fn rule(args: &[String]) -> Result<i32, String> {
         sources.len()
     );
     Ok(0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — a configured tree never analyzes a guarded branch,
+    // so every guarded root's coverage runs here with its selector resolved empty over the kit's own
+    // tracked tree, and reds on an uncovered read or on analyzing none
+    #[test]
+    fn every_guarded_root_is_covered_by_its_members_couples_over_this_tree() {
+        let knobs = crate::knobenv::lock();
+        let repo = walk::normalize_abs(
+            &Path::new(env!("CARGO_MANIFEST_DIR")).join("..").display().to_string(),
+        );
+        let guarded: Vec<(&str, &str, &gates::RootDecl)> = gates::REGISTRY
+            .iter()
+            .flat_map(|(n, _, roots, _, o, _)| roots.iter().map(move |r| (*n, *o, r)))
+            .filter(|(_, _, (_, f, _, _))| gates::filter_guard(f).0.is_some())
+            .collect();
+        assert!(!guarded.is_empty(), "no guarded root to analyze — the assertion held over nothing");
+
+        let scratch = std::env::temp_dir()
+            .join(format!("checkwright-guarded-roots.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&scratch);
+        std::fs::create_dir_all(&scratch).expect("scratch");
+        let mut bodies: std::collections::BTreeMap<String, String> = Default::default();
+        for (_, _, (_, f, _, _)) in &guarded {
+            let sel = gates::filter_guard(f).0.expect("a guarded root names its selector");
+            let kit = crate::knobs::owner(sel).expect("a guard's selector is a static kit's knob");
+            let body = bodies.entry(kit.knob_file_var()).or_default();
+            let line = format!("{} =\n", sel);
+            if !body.contains(&line) {
+                body.push_str(&line);
+            }
+        }
+        for (var, body) in &bodies {
+            let file = scratch.join(format!("{}.knobs", var));
+            std::fs::write(&file, body).expect("write");
+            knobs.set(var, &file.display().to_string());
+        }
+        crate::knobs::reset(&knobs);
+
+        let kit_roots =
+            walk::kit_roots_rel_from(&format!("{}/gate-sdk", repo), "").expect("the kit roots derive");
+        let mut ctx =
+            Ctx { prune: walk::prune_dirs().expect("the prune set resolves"), findings: Vec::new() };
+        let mut analyzed = 0usize;
+        let mut failures: Vec<String> = Vec::new();
+        for (name, owner, (root, fspec, pspec, _)) in &guarded {
+            let dir = if *owner == "-" {
+                crate::knobs::GATES_DIR_DEFAULT.to_string()
+            } else {
+                format!("{}/checks", owner)
+            };
+            let descriptor = format!("{}/{}/{}.gate", repo, dir, name);
+            let mut run = || -> Result<(), String> {
+                let text = std::fs::read_to_string(&descriptor)
+                    .map_err(|e| format!("cannot read {}: {}", descriptor, e))?;
+                let couples =
+                    crate::registry::expand_couples(&manifest_field(&text, "couples"), &kit_roots)?;
+                let globs: Vec<String> = couples.split(',').map(String::from).collect();
+                let (filter, where_) = resolve_filter(name, root, gates::filter_guard(fspec).1)?
+                    .ok_or_else(|| format!("{}'s unguarded filter '{}' did not resolve", name, fspec))?;
+                let declared_prune: Vec<String> =
+                    pspec.split(',').filter(|g| !g.is_empty()).map(String::from).collect();
+                let listing = tracked_under(Some(&repo), root)?;
+                ctx.cover_listing(
+                    &Demand {
+                        root,
+                        prune: true,
+                        filter: &filter,
+                        declared_prune: &declared_prune,
+                        gname: name,
+                        where_: &where_,
+                        globs: &globs,
+                        couples: &couples,
+                    },
+                    &listing,
+                );
+                Ok(())
+            };
+            match run() {
+                Ok(()) => analyzed += 1,
+                Err(e) => failures.push(e),
+            }
+        }
+        for var in bodies.keys() {
+            knobs.remove(var);
+        }
+        crate::knobs::reset(&knobs);
+        let _ = std::fs::remove_dir_all(&scratch);
+
+        assert!(failures.is_empty(), "a guarded root could not be analyzed:\n  {}", failures.join("\n  "));
+        assert!(analyzed > 0, "no guarded root was analyzed — the assertion held over nothing");
+        assert!(
+            ctx.findings.is_empty(),
+            "a kit literal couples= misses a read its guarded fallback branch takes on a tree that \
+             leaves the selector empty (gate-sdk/SPEC.md §check-reads-couples):\n  {}",
+            ctx.findings.join("\n  ")
+        );
+    }
 }

@@ -14913,42 +14913,28 @@ comes from is a property of the reader's own substrate: a shell reader invokes
 `"$GATE_SDK_NATIVE_BIN" --reads "<name>"` (§Layout and configuration), and the
 compiled reader calls the registry in process (below).
 
-**The substrate answers, and may not answer `?` for a root it can bound — as far as the
-`couples=` semantics are settled, and no further.** `?` stops being an available answer
-for a walk whose root resolves statically **and whose coverage the author can then
-express**, and a crate-side assertion reds a `?` standing where such a root could
-(§Meta-gate conservation for the binary substrate). The gate does not reach into a module
-to resolve what the registry declined to declare — the substrate ruling forbids that;
-what the refusal changes is that the registry has no licence to decline where both halves
-hold. Two shapes satisfy the root half today — a hardcoded literal root, and a positional
-argument with a literal default, which the crate spells at least six ways — and they are
-**instances rather than the definition**: a hand sweep over spellings under-reports, and
-the next spelling is always a module away. Read the property; treat any enumerated
-pattern as a floor.
+**The substrate answers, and may not answer `?` for a root it can bound.** `?` stops being
+an available answer for a walk whose root resolves statically, and a crate-side assertion
+reds a `?` standing where such a root could (§Meta-gate conservation for the binary
+substrate). The gate does not reach into a module to resolve what the registry declined to
+declare — the substrate ruling forbids that; what the refusal changes is that the registry
+has no licence to decline where the root resolves. Two shapes satisfy that property today —
+a hardcoded literal root, and a positional argument with a literal default, which the crate
+spells at least six ways — and they are **instances rather than the definition**: a hand
+sweep over spellings under-reports, and the next spelling is always a module away. Read the
+property; treat any enumerated pattern as a floor.
 
-**The second half is the boundary, and it is a *withdrawal* rather than a narrowing.**
-The refusal was first stated on the root half alone, and it does not reach that far. A
-walk's coverage must satisfy the authoring rule (§The `# graph:` manifest) — and for the **kit-literal fallback** branch of a
-runtime-selected corpus helper no adopter can satisfy it: the kit would be demanding that
-an adopter's `couples=` enumerate the depth of a tree the kit has never seen, while that
-rule's own correctness is the thing that section records as unsettled and files as its own
-deliverable. So those branches keep `?`, and the cadence row carries them as a sub-class
-with its own review question — not *has this root become decidable*, which it already is,
-but *has the semantics question settled*.
+**A runtime-selected corpus helper declares every branch, and the kit-literal fallback is no
+exception.** Each fallback walk declares its root under its selector's guard, so a tree that
+configures the selector neither analyzes nor counts it, and a tree that leaves the selector
+empty has its coverage asserted like any other walk's. The kit's literal couples must
+therefore cover the fallback's selection on a tree the kit has never seen — which the
+field's one semantics makes expressible, a `*<name>` or `*.<ext>` token containing every
+path a `name:` or `ext:` filter can select at any depth — and the crate holds those literals
+to this tree before they ship (below).
 
-**Read that boundary as a deliverable rather than a shortfall, because the residue of
-`?` invites the wrong reading.** What a refusal bounded this way covers is the whole of
-what is decidable at its altitude; the fallback branches it leaves behind were never
-decidable there, because the rule they rest on was already filed open. What the bound
-buys is that the open question carries a measured population and a named class instead of
-a latent asymmetry — and the measurement that settles its severity is that **no trigger is
-lost**: the hook's matcher spans `/`, so every path the coverage reader reports uncovered
-still fires the gate. An adopter gains a red gate, never a missing coupling. A consumer's
-own population belongs on that consumer's cadence row, never here, where it would rot on
-the next gate that joins the registry.
-
-**`--emit reads-census` is that population, measured by an oracle rather than
-swept.** The skip above has a population and the cadence row asks after it, and
+**`--emit reads-census` is the `?` population, measured by an oracle rather than
+swept.** The `?` set has a population and the cadence row asks after it, and
 until this arm nothing in the tree answered the question: three hand sweeps in one
 stage landed on 26, then 27, then at least 29, each miss caused by another spelling
 of one idiom. The arm prints **one line per registry member declaring at least one
@@ -14974,17 +14960,17 @@ answered one member at a time. It declares no knob, adds no registry field, and
 parses no source.
 
 **The figures, as of this writing and with the oracle that reproduces each.** 115
-registry members, **32** of which declare at least one `?`, across **46** `?`
-root-lines, over **26** declaration sites. Re-run the oracles rather than trusting
+registry members, **18** of which declare at least one `?`, across **20** `?`
+root-lines, over **20** declaration sites. Re-run the oracles rather than trusting
 those three: where an oracle and this paragraph disagree, the oracle wins and this
 paragraph is stale. Three denominators are live over the same population and they
 are **not** interchangeable, which is stated because conflating them is how the hand
-sweeps went wrong: the **46** root-lines are member-expanded, so a shared root const
-is counted once per member using it — the census's column-2 sum; the **32** members
-are the census's line count; and the **26** *textual* declaration sites are the
-locator assertion's enumeration (below), because three consts (`MANIFEST_ROOTS`,
-`COMMENT_SURFACE_ROOTS`, `SPEC_POINTER_ROOTS`) hold 6 sites between them that 14
-members share. An assertion over this population must say which of the three it
+sweeps went wrong: the **20** root-lines are member-expanded, so a shared root const
+is counted once per member using it — the census's column-2 sum; the **18** members
+are the census's line count; and the **20** *textual* declaration sites are the
+locator assertion's enumeration (below), which counts a shared root const's `?` once
+however many members use it. The root-lines and the sites agree today only because no shared
+root const holds a `?`; an assertion over this population must still say which of the three it
 counts.
 
 **The `--reads` report.** One line per walk root and nothing else — no count line
@@ -15007,11 +14993,8 @@ is empty on a declared root and required on a `?`, and a `?` with no ground — 
 with a filter or prune, which is what keeps `--reads`' second column unambiguous —
 fails to compile, as does a declared root carrying one. A class names **what would
 retire the `?`**, which is the question the cadence review reading the ground asks.
-Three classes are live:
+Two classes are live:
 
-- **`fallback`** — the kit-literal fallback branch of a runtime-selected corpus
-  helper, which the boundary passage above keeps `?`. Retired when the semantics
-  question that passage names settles.
 - **`dynamic`** — a walk whose root no literal names: computed at run time from
   state the registry cannot hold. Nothing at this altitude retires it.
 - **`projection`** — a walk whose root is statically resolvable but whose filter is
@@ -15020,7 +15003,7 @@ Three classes are live:
   gains a form that reaches such a projection, at which point the site declares its
   root.
 
-A fourth class is deliberately not offered: a `?` that is in fact a hardcoded literal
+A further class is deliberately not offered: a `?` that is in fact a hardcoded literal
 root or a positional with a literal default, and whose filter the field can express,
 has no ground, because it should be declaring the root.
 
@@ -15067,8 +15050,8 @@ site count and its in-module, off-module and per-class partitions are reported f
 this enumeration, which is the one oracle for the site denominator.
 
 **What it decides is presence and placement — deliberately not the class, and not
-the chain.** Whether a walk is a fallback branch, a run-time computation or a
-packed-knob projection no gate can decide, and the assertion reads the class no further than its spelling. It
+the chain.** Whether a walk is a run-time computation or a packed-knob projection no
+gate can decide, and the assertion reads the class no further than its spelling. It
 resolves a `via` symbol and its first-hop reference, never the path from symbol to
 walk line, which would be a call-graph analysis: where a member's only fixture case
 steers it off the walk through a positional — `check-enforcement-fresh` and
@@ -15191,6 +15174,10 @@ per branch**, and may guard a branch with `else:<SELECTOR>:`, which the resolver
 at run time: a branch whose selector knob resolves non-empty is a walk this tree does
 not take, so it is neither analyzed nor skipped-and-counted. The guard names the knob
 and never the knob's state, so no kit descriptor carries a consumer's configuration.
+Because a configured tree never analyzes a guarded branch, a kit literal covering one would
+ship unasserted, so a crate unit test runs every guarded root's coverage with its selector
+resolved empty over the kit's own tracked tree, and reds on an uncovered read or on
+analyzing none.
 
 **The coverage assertion itself is unchanged; only the source of the roots
 differs** — a shell parse for a `.sh` member, the substrate's own report for a
