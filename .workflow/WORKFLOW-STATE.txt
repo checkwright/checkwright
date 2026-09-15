@@ -8,3 +8,4 @@ amendment-authoring-completeness scope ad5c7f31 2026-09-15 5b4fa79a
 amendment-authoring-completeness spec a0d129fe 2026-09-15 8cad9d50
 amendment-authoring-completeness align a1ea1f9f 2026-09-16 e936f99e
 amendment-authoring-completeness build ac464d30 2026-09-16 709bc12a
+amendment-authoring-completeness validate a1d326a6 2026-09-16 cbf473d9
