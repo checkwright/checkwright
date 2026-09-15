@@ -36,7 +36,8 @@ Internal work lands as **direct commits to master and never rides a pull
 request** — the PR channel is inbound-only, for external contributors. A master
 push is verified against the remote oracle: watch the `gates` workflow
 to green (`gh run watch`) before calling the push done — and **budget one to two
-pushes per iteration**. A finished run is read for free with
+pushes per iteration**, plus up to two hotfix pushes for a red push, unasked; a
+third hotfix push is asked for. A finished run is read for free with
 `gh run view <id> --log`, so a new round is owed only when the facts wanted were
 never printed. Commits accumulate locally and ride one watched push at close; a
 release tag earns the second run (`publish`). Every push also costs a
