@@ -12,6 +12,163 @@
 
 ## New Features
 
+- **couples-glob-semantics-unowned** [spec: SPEC-couples-semantics.md] — one manifest field,
+  three readers, two incompatible glob semantics, and no surface owns which reader is entitled to
+  which.
+  recurrence: couples-glob-semantics-unowned 2026-09-12
+  **Probed at all three sources, not read off the bullet.** `check-gate-substrate-parity`
+  assertion C matches with a bash `[[ p == g ]]`, where `*` crosses `/` — verified by execution:
+  `gate-sdk/*.sh` matches `gate-sdk/checks/check-x.sh`. `check-reads-couples`' own couple matcher
+  requires **equal segment count** and never crosses `/`. `check-graph` assertion B reads the
+  same field a **third** way — exact-token subset membership against `trigger=`, invoking no glob
+  matcher at all — and the generated hook's staged-path test takes the slash-spanning form.
+  **What the drain corrected in the filing's own claim.** The bullet said the divergence is
+  stated nowhere; it is stated in **one** place, the compiled couple matcher's own comment, which
+  names its narrowness as deliberate and cites the slash-spanning matcher it differs from. That
+  narrows the gap without closing it: a comment inside one reader is not a contract any other
+  reader or any descriptor author reads, and the third semantics is undocumented outright.
+  **Why it needed design:** normalising is not obviously right. `check-reads-couples`' narrow
+  matcher is correct **as specified** and its spec says so, so the call is whether `couples=` has
+  one semantics with stated exceptions, or is a field whose meaning is per-reader and must
+  therefore be declared per reader. Only the second is cheap; only the first is safe.
+  **Cost while deferred:** it already bit once, at the sixth budget batch, which reproduced both
+  forms deliberately rather than normalising them. The crate now carries a component-wise matcher
+  and a slash-spanning one side by side, so a porting session reaching for "the" crate glob
+  matcher flips a verdict on one side and no gate anywhere would say which side.
+  **Half discharged 2026-08-21 at spec:** `SPEC-graph-port.md` states check-graph assertion B's
+  four coverage branches in gate-sdk/SPEC.md and forbids the port reaching for either crate
+  matcher, so the third semantics stops being undocumented and the port's own exposure closes.
+  What remains is this entry's real question: one semantics with stated exceptions, or a
+  per-reader meaning declared per reader.
+  **A FOURTH face, folded in at the couples-resolver-reach drain, and it reaches a second
+  field.** `check-reads-couples`' *filter* matcher supports `**` (`glob_walk`'s `**` arm,
+  `native/src/gates/reads_couples.rs:309`) where its *couples* matcher does not
+  (`path_matches_glob` requires equal segment count, `:157-167`, no `**` arm) — so a `**`
+  filter value states a coverage demand its own `knob:` couples token cannot express. That
+  is why this iteration's `CANON_KIT_COMMENT_SURFACE` is depth-enumerated per extension
+  rather than spelled `**` (`scripts/canon-config.knobs` reasons it inline). Read in source,
+  not off prose. It widens the entry's subject from three couples readers to **which matcher
+  a field is entitled to**, the filter field included — and it is the same unruled question,
+  which is why it folded rather than minting a slug.
+  **Selected for `couples-field-semantics` as the ruling its lead unit waits on** (operator
+  direction, 2026-09-15, lead-relayed). **Spec ruled one semantics, the trigger's**: the coverage
+  reader adopts the bash string matcher and a `knob:` member expands to its covering pattern
+  (the amendment's header carries the grounds and the probe); lands before the other four.
+  Filed 2026-08-19 by close from the gap inbox; the drain executed all three matchers rather
+  than reading them.
+
+- **couples-dynamic-root-resolution** [spec: SPEC-fallback-roots.md]
+  — the skipped-and-counted bucket is where trigger-drift hides, and its dominant
+  subset is decidable.
+  **DEMOTED at couples-resolver-reach 2026-09-12 after a partial landing, and the
+  cause is a WITHDRAWAL rather than an overrun.** Landed: `?` ended for a
+  statically resolvable walk root whose coverage the author can express, held by a
+  crate-side property assertion; the declared root carries a mandatory filter kind
+  and a per-walk prune, both held to executed behaviour by assertion A. Measured
+  **52 roots covered against 51 still `?`**, from 2 against 63.
+  **Withdrawn, and never deliverable here:** 26 of the 51 are the kit-literal
+  fallback branches of `spec::manifest_files` and `spec::comment_surface`. Their
+  roots DO resolve; their `?` stands because the coverage they would be held to is
+  the conservative authoring rule gate-sdk/SPEC.md §The `# graph:` manifest
+  **files as unsettled**, and a kit cannot demand an adopter satisfy it over a
+  tree the kit has never seen. The refusal was stated on the root half alone and
+  does not reach that far.
+  **A boundary found, not a shortfall.** The remaining third was never decidable
+  at this altitude; what the iteration converted is a latent asymmetry into a
+  measured class with a population and a cadence row. Severity: **no trigger is
+  lost** — the hook's matcher spans `/`, so every path the coverage reader calls
+  uncovered still fires the gate. An adopter gains a red gate, never a missing
+  coupling.
+  **Five repair options were measured dead; do not re-buy them** (validate survey, 2026-09-12):
+  (1) per-descriptor depth enumeration — maintained, and the depths are one fixture's, not an
+  adopter's; (2) a shipped `CANON_KIT_COMMENT_SURFACE` default — the demo still fails, and adding a
+  `CANON_KIT_MANIFEST_FILES` default reds `check-spec-pointer` with 20 dangling pointers; (3) deeper
+  `kit:` expansion — reaches at most 49 of 151, the other 102 being plain-token `.gate`/`.rs`;
+  (4) an escape on provable inexpressibility — expressibility belongs to the corpus, not the
+  declaration; (5) keying the matcher off the filter kind — greens every adopter suite but flips
+  `check-reads-couples`' own `bad/` case and unit cases to exit 0, retiring its central assertion.
+  **Blocked rather than rankable:** settling that field's semantics is the only
+  thing that can move these 26 roots, so the floor has not moved.
+  **Cost while deferred:** the 26 roots stay skipped-and-counted, so the coverage
+  of their walks is unasserted and a genuine under-couple among them would read the
+  same as this withdrawal's deliberate one. That is strictly better than before —
+  they are now a named class on the cadence row with a stated review question
+  rather than an undifferentiated skip count — and strictly worse than a gate: the
+  row is reviewed at close by a session, and a session can defer.
+  **Selected as `couples-field-semantics`' lead unit** (operator direction, 2026-09-15,
+  lead-relayed); the blocker rides the same iteration. **Spec probed the premise and it holds**:
+  under the settled matcher the 26 roots declare under `else:` guards, option (5)'s refusal does
+  not reach a settled semantics, and a never-counted third fallback walk (`canonical_specs`)
+  declares with them. Its blocker tag left at promotion, because the lead line cannot carry it
+  beside the spec tag inside the wrap budget; the amendment's header carries the merge order.
+
+- **packed-knob-projection-filter-form** [spec: SPEC-packed-knob-projection.md]
+  — no filter-grammar form reaches a projection out of a knob whose elements pack several
+  fields, so gate-sdk/SPEC.md §check-reads-couples keeps its `projection` ground class.
+  Its one member is `check-spec-embedded-source`'s source-candidate walk over
+  `CANON_KIT_EMBED_LANGS`' `kind|fence-langs|file-globs` triples (`native/src/gates/mod.rs`,
+  the registry's `projection@` ground). The SPEC names the retirement condition, a form
+  reaching such a projection, and no entry owned it.
+  **Why it needed design:** the same SPEC (§gen-pre-commit) rules a packed knob "not a
+  pattern set", so a new form must be reconciled with that refusal rather than bolted on.
+  **Cost while deferred:** that walk stays `?`, skipped by `check-reads-couples` and outside
+  its coverage assertion.
+  **Selected for `couples-field-semantics` as its projection unit** (operator direction,
+  2026-09-15, lead-relayed); its own delta at spec, reconciled with the packed-knob refusal.
+  **Spec ruled a row-declared named field**, `CANON_KIT_EMBED_LANGS.file-globs`, read through one
+  parser; the bare packed knob stays refused.
+  Filed 2026-09-13 by build, beside the projection class; drained and promoted 2026-09-13 at close.
+
+- **steered-fixture-walk-roots-unverified** [spec: SPEC-steered-fixture-roots.md]
+  — unit test A verifies nothing about a member whose every fixture case steers off its walk
+  through positionals, so that member's walk-root declaration is unproven.
+  Three members, re-verified at the drain and unchanged by this iteration's registry work:
+  `check-footprint-fresh` declares an empty root set (`native/src/gates/mod.rs`) while its
+  emitter calls `walk::glob_files` at `native/src/emit/footprint.rs:31` (a static
+  `*/SPEC.md` root at `.`) and :90, a false no-walk claim; `check-enforcement-fresh` and
+  `check-value-rollup-fresh` declare `?` citing `find_with_prune` at
+  `native/src/emit/enforcement_map.rs:336`, a chain no case observes. Every `good/` and
+  `bad/` case of all three passes the two positionals that steer off the emitter.
+  **Why it needed design:** the repair is a default-branch fixture case per member plus
+  `check-footprint-fresh`'s root declaration, and a default-branch case must stage a live
+  emitter corpus inside a fixture, a design call per member.
+  **Cost while deferred:** every no-walk or `?` claim on a steered member is unverifiable, and
+  a changed emitter walk passes unit test A unseen.
+  **Selected for `couples-field-semantics` as its steered-walk unit** (operator direction,
+  2026-09-15, lead-relayed); its own delta at spec, a design call per member. **Spec ruled** each
+  `good/` onto the default branch (the case set is closed), and found `check-value-rollup-fresh`
+  reaching footprint's walks too.
+  Filed 2026-09-12 by build, as three bullets; folded and promoted 2026-09-13 at close.
+
+- **depth-enumerated-glob-bound-unoracled** [spec: SPEC-depth-bound-globs.md]
+  — a depth-enumerated glob value is a maintained copy of "any depth", and a file one level
+  deeper than the enumeration reaches leaves the scanned corpus **silently**.
+  **The class, not one value, and both instances are legitimate.**
+  `scripts/canon-config.knobs` carries two: `CANON_KIT_MANIFEST_FILES`' single-level globs
+  (reasoned in its comment, "single-level globs skip the gate-tests/ fixtures the finder pruned")
+  and the `CANON_KIT_COMMENT_SURFACE` value, five depths per extension across `sh|gate|rs`
+  (reasoned in its comment, because the couples matcher cannot express `**`). Both are
+  consumer editorial choices and neither is a kit defect. What no surface owns is that the depth
+  bound is an **unoracled literal**.
+  **Re-verified at the drain that the measured-claim mechanism cannot reach it.**
+  `scripts/canon-config.knobs` sets `CANON_KIT_MEASURED_SURFACE_GLOBS` to
+  `CANON_KIT_MANIFEST_FILES` plus `.claude/commands/*.md` plus `TASK-QUEUE.md`; the knob file is
+  in none of them, so a `measured:` marker written there is never read.
+  **Why it needed design:** two dispositions and they cost differently — widen the
+  measured-claim corpus to reach the config surface, or assert that no tracked governed source
+  lies deeper than the enumerations reach. The first makes one more surface measured forever; the
+  second is a shallow assertion with no reader outside itself.
+  **DISTINCT from `couples-glob-semantics-unowned`**, which is about which matcher a field is
+  entitled to, not about a value's depth bound.
+  **Cost while deferred:** the corpus is two to five segments deep with one level of headroom, so
+  the bound holds today and fails with no diagnostic on the day a governed source lands six
+  levels down.
+  **Selected for `couples-field-semantics` as its depth-bound unit** (operator direction,
+  2026-09-15, lead-relayed). **Spec ruled neither disposition**: the amendment respells the
+  comment surface `**` and rules `CANON_KIT_MANIFEST_FILES`' bound a selection; the measured
+  headroom was zero, not one level.
+  Filed 2026-09-12 by build into the gap inbox; drained and promoted at this close.
+
 ## Technical Debt
 
 ## Deferred
@@ -1435,47 +1592,6 @@
   Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-09
   at scope.
 
-- **couples-dynamic-root-resolution** [design-pending] [blocked-by: couples-glob-semantics-unowned] [cost: session/high] [surface: gate-sdk]
-  — the skipped-and-counted bucket is where trigger-drift hides, and its dominant
-  subset is decidable.
-  **DEMOTED at couples-resolver-reach 2026-09-12 after a partial landing, and the
-  cause is a WITHDRAWAL rather than an overrun.** Landed: `?` ended for a
-  statically resolvable walk root whose coverage the author can express, held by a
-  crate-side property assertion; the declared root carries a mandatory filter kind
-  and a per-walk prune, both held to executed behaviour by assertion A. Measured
-  **52 roots covered against 51 still `?`**, from 2 against 63.
-  **Withdrawn, and never deliverable here:** 26 of the 51 are the kit-literal
-  fallback branches of `spec::manifest_files` and `spec::comment_surface`. Their
-  roots DO resolve; their `?` stands because the coverage they would be held to is
-  the conservative authoring rule gate-sdk/SPEC.md §The `# graph:` manifest
-  **files as unsettled**, and a kit cannot demand an adopter satisfy it over a
-  tree the kit has never seen. The refusal was stated on the root half alone and
-  does not reach that far.
-  **A boundary found, not a shortfall.** The remaining third was never decidable
-  at this altitude; what the iteration converted is a latent asymmetry into a
-  measured class with a population and a cadence row. Severity: **no trigger is
-  lost** — the hook's matcher spans `/`, so every path the coverage reader calls
-  uncovered still fires the gate. An adopter gains a red gate, never a missing
-  coupling.
-  **Five repair options were measured dead; do not re-buy them** (validate survey, 2026-09-12):
-  (1) per-descriptor depth enumeration — maintained, and the depths are one fixture's, not an
-  adopter's; (2) a shipped `CANON_KIT_COMMENT_SURFACE` default — the demo still fails, and adding a
-  `CANON_KIT_MANIFEST_FILES` default reds `check-spec-pointer` with 20 dangling pointers; (3) deeper
-  `kit:` expansion — reaches at most 49 of 151, the other 102 being plain-token `.gate`/`.rs`;
-  (4) an escape on provable inexpressibility — expressibility belongs to the corpus, not the
-  declaration; (5) keying the matcher off the filter kind — greens every adopter suite but flips
-  `check-reads-couples`' own `bad/` case and unit cases to exit 0, retiring its central assertion.
-  **Blocked rather than rankable:** settling that field's semantics is the only
-  thing that can move these 26 roots, so the floor has not moved.
-  **Cost while deferred:** the 26 roots stay skipped-and-counted, so the coverage
-  of their walks is unasserted and a genuine under-couple among them would read the
-  same as this withdrawal's deliberate one. That is strictly better than before —
-  they are now a named class on the cadence row with a stated review question
-  rather than an undifferentiated skip count — and strictly worse than a gate: the
-  row is reviewed at close by a session, and a session can defer.
-  **Selected as `couples-field-semantics`' lead unit** (operator direction, 2026-09-15,
-  lead-relayed); the blocker rides the same iteration.
-
 - **amendment-owner-position-citation** [design-pending] [cost: iteration/low] [surface: queue-kit] — prose may cite a merged
   amendment as *settled history*, never as a live *owner*; today it does both.
   recurrence: amendment-owner-position-citation 2026-08-06
@@ -2445,48 +2561,6 @@
   Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
   whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
 
-
-- **couples-glob-semantics-unowned** [design-pending] [cost: event/high] [surface: gate-sdk] — one manifest field, three readers, two
-  incompatible glob semantics, and no surface owns which reader is entitled to which.
-  recurrence: couples-glob-semantics-unowned 2026-09-12
-  **Probed at all three sources, not read off the bullet.** `check-gate-substrate-parity`
-  assertion C matches with a bash `[[ p == g ]]`, where `*` crosses `/` — verified by execution:
-  `gate-sdk/*.sh` matches `gate-sdk/checks/check-x.sh`. `check-reads-couples`' own couple matcher
-  requires **equal segment count** and never crosses `/`. `check-graph` assertion B reads the
-  same field a **third** way — exact-token subset membership against `trigger=`, invoking no glob
-  matcher at all — and the generated hook's staged-path test takes the slash-spanning form.
-  **What the drain corrected in the filing's own claim.** The bullet said the divergence is
-  stated nowhere; it is stated in **one** place, the compiled couple matcher's own comment, which
-  names its narrowness as deliberate and cites the slash-spanning matcher it differs from. That
-  narrows the gap without closing it: a comment inside one reader is not a contract any other
-  reader or any descriptor author reads, and the third semantics is undocumented outright.
-  **Why `[design-pending]`:** normalising is not obviously right. `check-reads-couples`' narrow
-  matcher is correct **as specified** and its spec says so, so the call is whether `couples=` has
-  one semantics with stated exceptions, or is a field whose meaning is per-reader and must
-  therefore be declared per reader. Only the second is cheap; only the first is safe.
-  **Cost while deferred:** it already bit once, at the sixth budget batch, which reproduced both
-  forms deliberately rather than normalising them. The crate now carries a component-wise matcher
-  and a slash-spanning one side by side, so a porting session reaching for "the" crate glob
-  matcher flips a verdict on one side and no gate anywhere would say which side.
-  **Half discharged 2026-08-21 at spec:** `SPEC-graph-port.md` states check-graph assertion B's
-  four coverage branches in gate-sdk/SPEC.md and forbids the port reaching for either crate
-  matcher, so the third semantics stops being undocumented and the port's own exposure closes.
-  What remains is this entry's real question: one semantics with stated exceptions, or a
-  per-reader meaning declared per reader.
-  **A FOURTH face, folded in at the couples-resolver-reach drain, and it reaches a second
-  field.** `check-reads-couples`' *filter* matcher supports `**` (`glob_walk`'s `**` arm,
-  `native/src/gates/reads_couples.rs:309`) where its *couples* matcher does not
-  (`path_matches_glob` requires equal segment count, `:157-167`, no `**` arm) — so a `**`
-  filter value states a coverage demand its own `knob:` couples token cannot express. That
-  is why this iteration's `CANON_KIT_COMMENT_SURFACE` is depth-enumerated per extension
-  rather than spelled `**` (`scripts/canon-config.knobs` reasons it inline). Read in source,
-  not off prose. It widens the entry's subject from three couples readers to **which matcher
-  a field is entitled to**, the filter field included — and it is the same unruled question,
-  which is why it folded rather than minting a slug.
-  **Selected for `couples-field-semantics` as the ruling its lead unit waits on** (operator
-  direction, 2026-09-15, lead-relayed).
-  Filed 2026-08-19 by close from the gap inbox; the drain executed all three matchers rather
-  than reading them.
 
 - **prose-tell-threshold-validation** [design-pending] [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
   are read unvalidated, so a typo turns a calibrated gate into a silent no-op
@@ -4189,33 +4263,6 @@
   expensive and where the session has no authority to narrow the assertion.
   Filed 2026-09-12 by spec into the gap inbox; drained and promoted at this close.
 
-- **depth-enumerated-glob-bound-unoracled** [design-pending] [cost: event/low] [surface: canon-kit]
-  — a depth-enumerated glob value is a maintained copy of "any depth", and a file one level
-  deeper than the enumeration reaches leaves the scanned corpus **silently**.
-  **The class, not one value, and both instances are legitimate.**
-  `scripts/canon-config.knobs` carries two: `CANON_KIT_MANIFEST_FILES`' single-level globs
-  (reasoned in its comment, "single-level globs skip the gate-tests/ fixtures the finder pruned")
-  and the `CANON_KIT_COMMENT_SURFACE` value, five depths per extension across `sh|gate|rs`
-  (reasoned in its comment, because the couples matcher cannot express `**`). Both are
-  consumer editorial choices and neither is a kit defect. What no surface owns is that the depth
-  bound is an **unoracled literal**.
-  **Re-verified at the drain that the measured-claim mechanism cannot reach it.**
-  `scripts/canon-config.knobs` sets `CANON_KIT_MEASURED_SURFACE_GLOBS` to
-  `CANON_KIT_MANIFEST_FILES` plus `.claude/commands/*.md` plus `TASK-QUEUE.md`; the knob file is
-  in none of them, so a `measured:` marker written there is never read.
-  **Why `[design-pending]`:** two dispositions and they cost differently — widen the
-  measured-claim corpus to reach the config surface, or assert that no tracked governed source
-  lies deeper than the enumerations reach. The first makes one more surface measured forever; the
-  second is a shallow assertion with no reader outside itself.
-  **DISTINCT from `couples-glob-semantics-unowned`**, which is about which matcher a field is
-  entitled to, not about a value's depth bound.
-  **Cost while deferred:** the corpus is two to five segments deep with one level of headroom, so
-  the bound holds today and fails with no diagnostic on the day a governed source lands six
-  levels down.
-  **Selected for `couples-field-semantics` as its depth-bound unit** (operator direction,
-  2026-09-15, lead-relayed).
-  Filed 2026-09-12 by build into the gap inbox; drained and promoted at this close.
-
 - **delegated-read-blind-to-gitignored-capture** [design-pending] [cost: session/low] [surface: delegation-kit]
   — a worktree-isolated read-only agent cannot see any gitignored capture surface, so a delegated
   close-surface read reports "absent" for a file that has content, and the delegation is mandated
@@ -4350,40 +4397,6 @@
   **Cost while deferred:** what a disposition commit dropped from an entry is recoverable only
   by hand-walking history.
   Filed 2026-09-12 by build, outside its envelope; drained and promoted 2026-09-13 at close.
-
-- **steered-fixture-walk-roots-unverified** [design-pending] [cost: event/low] [surface: gate-sdk]
-  — unit test A verifies nothing about a member whose every fixture case steers off its walk
-  through positionals, so that member's walk-root declaration is unproven.
-  Three members, re-verified at the drain and unchanged by this iteration's registry work:
-  `check-footprint-fresh` declares an empty root set (`native/src/gates/mod.rs`) while its
-  emitter calls `walk::glob_files` at `native/src/emit/footprint.rs:31` (a static
-  `*/SPEC.md` root at `.`) and :90, a false no-walk claim; `check-enforcement-fresh` and
-  `check-value-rollup-fresh` declare `?` citing `find_with_prune` at
-  `native/src/emit/enforcement_map.rs:336`, a chain no case observes. Every `good/` and
-  `bad/` case of all three passes the two positionals that steer off the emitter.
-  **Why `[design-pending]`:** the repair is a default-branch fixture case per member plus
-  `check-footprint-fresh`'s root declaration, and a default-branch case must stage a live
-  emitter corpus inside a fixture, a design call per member.
-  **Cost while deferred:** every no-walk or `?` claim on a steered member is unverifiable, and
-  a changed emitter walk passes unit test A unseen.
-  **Selected for `couples-field-semantics` as its steered-walk unit** (operator direction,
-  2026-09-15, lead-relayed); its own delta at spec, a design call per member.
-  Filed 2026-09-12 by build, as three bullets; folded and promoted 2026-09-13 at close.
-
-- **packed-knob-projection-filter-form** [design-pending] [cost: event/low] [surface: gate-sdk]
-  — no filter-grammar form reaches a projection out of a knob whose elements pack several
-  fields, so gate-sdk/SPEC.md §check-reads-couples keeps its `projection` ground class.
-  Its one member is `check-spec-embedded-source`'s source-candidate walk over
-  `CANON_KIT_EMBED_LANGS`' `kind|fence-langs|file-globs` triples (`native/src/gates/mod.rs`,
-  the registry's `projection@` ground). The SPEC names the retirement condition, a form
-  reaching such a projection, and no entry owned it.
-  **Why `[design-pending]`:** the same SPEC (§gen-pre-commit) rules a packed knob "not a
-  pattern set", so a new form must be reconciled with that refusal rather than bolted on.
-  **Cost while deferred:** that walk stays `?`, skipped by `check-reads-couples` and outside
-  its coverage assertion.
-  **Selected for `couples-field-semantics` as its projection unit** (operator direction,
-  2026-09-15, lead-relayed); its own delta at spec, reconciled with the packed-knob refusal.
-  Filed 2026-09-13 by build, beside the projection class; drained and promoted 2026-09-13 at close.
 
 - **release-binary-archive-versioned-name** [design-pending] [cost: event/low] [surface: installer]
   — each per-target gate binary reaches the Release as a bare `checkwright-gates-<target>` plus its
