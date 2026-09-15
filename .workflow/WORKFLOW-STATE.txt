@@ -6,3 +6,4 @@
 
 guard-friction-reach scope ad181ab0 2026-09-15 18fc4979
 guard-friction-reach spec a7a71f39 2026-09-15 8564e1ed
+guard-friction-reach align a7723414 2026-09-15 a3f59037
