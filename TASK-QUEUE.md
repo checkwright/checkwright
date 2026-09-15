@@ -12,6 +12,116 @@
 
 ## New Features
 
+- **in-place-rewrite-steer-reach** [spec: SPEC-perl-rewrite-steer.md] — guard-kit
+  rule 8 steers a `sed -i` rewrite to the Edit tool, but `perl -pi` and `perl -0pi` reach the same
+  rewrite unsteered, and so does a `python3 -` heredoc that rewrites a file.
+  **Measured at `config-seam-fourth-cut`'s prompt-friction triage:** `perl` ranked at 74 prompting
+  calls, 79 logged lines of them in-place rewrites, beside 23 `python3 -` heredoc rewrites; no entry
+  named either. Rule 8's walker is per tool (guard-kit/SPEC.md §The generic ruleset, rule 8), so a
+  `perl` arm is a new option-table row rather than a new walker.
+  **Ruled at spec:** the `perl` arm fires on exactly one literal file operand, and `python3 -`
+  bodies are not steered; the grounds and the transcript measurement are the amendment's.
+  **Cost while deferred:** one out-of-band permission decision per in-place `perl` rewrite,
+  invisible to every gate.
+  recurrence: in-place-rewrite-steer-reach 2026-09-15
+  **Recurred at `owed-port-tail`'s prompt-friction triage:** `python3 -` ranked first at 24
+  prompting calls, every one a heredoc writing a file (queue entries, a Rust module, parity
+  scratch).
+  **Selected as `guard-friction-reach`'s lead unit** (operator direction, 2026-09-15, lead-relayed).
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from its prompt-friction
+  triage; promoted at the next iteration's scope.
+
+- **file-authoring-act-ungoverned** [spec: SPEC-compound-write-steer.md] — the file-authoring
+  writes no glob can reach.
+  **What landed 2026-09-04 and what did not.** Guard rule 17 was narrowed and widened in one unit:
+  its substitution decline moved onto the `hdq` view, so the quoted-delimiter heredoc body every
+  journal append spells its slugs in stops defeating the grant; and its `>>`-only test went, so a
+  create to a gitignored target is granted where truncate-then-append already granted it in two
+  calls. Measured at that build: sixteen of sixteen locatable journal appends carried a backtick,
+  and the class was about half of every prompting call in the snapshot. The record is
+  guard-kit/SPEC.md §The generic ruleset rules 16 and 17 and §scan-prompts, not restated here.
+  **The prepared six-entry settings diff is disposed** (operator direction, 2026-09-13): four
+  landed in the committed allowlist — `date`, `git merge-base`, `mkdir`, the liveness-log clear —
+  and two were refused, `Bash(find *)` for reaching find's `-exec`/`-delete` forms and
+  `Bash(git config *)` for reaching `core.hooksPath` and `!`-aliases, both execute forms a glob
+  cannot fence off. None of the four fixed this entry's class.
+  **WHAT KEEPS THIS ENTRY ALIVE — THE RESIDUE THE LANDED GRANT DOES NOT REACH:** a write to a
+  path OUTSIDE the gitignored scratch set — a heredoc to a tracked file, a commit-message file, a
+  scratch script under another root. Rule 17 declines every one on its target test, by design.
+  The Write-tool steer was RECORDED AS REFUSED-FOR-NOW at that build: the landed deltas removed
+  its subject, and a steer firing on writes the same commit had just granted is a rule arguing
+  with its neighbour. **Re-read at spec:** rule 25 arm (b) has since landed that steer for a lone
+  write to a target git does not ignore, which rule 17 never grants; the compounded write it
+  leaves is the amendment's arm (c). Two facts were
+  bought so a later session need not re-buy them — `.claude/settings.json` already carries a
+  `Write|Edit` `PreToolUse` matcher, so a Write-side rule needs no new matcher shape; and a steer is
+  not a distinct primitive, `guard_block` being stderr plus exit 2 for a block and a steer alike.
+  A stated habit was the shape filed beside those two and it stays refused: it is not a mechanism.
+  **The operator ruling that scoped it, and its dated series, which lives once and here.** The class
+  read 41 of 185 prompting calls, then 56 of 139 at the 2026-09-04 close — 22 per cent to 40 per
+  cent — then 48 across 22 patterns on the mid-iteration snapshot the promoting spec measured afresh
+  under the ruling's re-costing rider. The ruling REOPENED the port-only run for a second non-port
+  unit. **A later reading of this class will fall for a reason other than fewer writes**: a granted
+  call never reaches the friction log, so widening rule 17 shrank the log's own corpus.
+  guard-kit/SPEC.md §scan-prompts carries that caveat, and a close attributing the drop to fewer
+  writes is reading the instrument's own boundary as a result.
+  **Cost while deferred:** one out-of-band decision per file authored outside the scratch set,
+  invisible to every gate — the friction log is advisory, so nothing reds however far the residue
+  grows.
+  **`guard-friction-reach`'s write-residue unit** (operator direction, 2026-09-15, lead-relayed).
+  Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
+  drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
+  2026-09-04 within one iteration.
+
+- **scan-prompts-grant-test-redirect-blind** [spec: SPEC-grant-test-reach.md]
+  — `scan-prompts`' grant test and its reachability verdict disagree on a redirect call.
+  `granted()` runs `segment_granted` over `guard::allow_match`, a plain glob match on the raw
+  segment with no redirect model (`native/src/emit/scan_prompts.rs`, `native/src/guard.rs`).
+  So a committed `Bash(cat >> .tmp/*)` would read a write-redirect call as granted, although
+  guard-kit/SPEC.md rule 17 states no `Bash(...)` entry grants a redirect target. Such a grant
+  was committed once and reverted as inoperative.
+  DISTINCT from the Done `prompt-ranking-ungrantable-shape-class`, which partitions rows the
+  grant test already called prompting; this is the grant test upstream of that partition.
+  **Cost while deferred:** live, not latent, probed at spec: any committed `Bash(<cmd> *)` glob
+  absorbs a redirect or an expansion, so such calls already read granted.
+  **`guard-friction-reach`'s grant-test unit** (operator direction, 2026-09-15, lead-relayed).
+  Filed 2026-09-12 by build, from the ranker partition; drained and promoted 2026-09-13 at close.
+
+- **settings-overlay-dead-path-unreported** [spec: SPEC-overlay-dead-path.md] —
+  `compare-settings-allow` reports redundant and over-broad local-overlay grants but not a grant
+  naming a path that no longer exists, and `check-settings-paths` holds that invariant over the
+  committed settings file only (context-kit/SPEC.md §check-settings-paths).
+  **Attested at `owed-port-tail`'s close:** 24 of 108 local allow entries named deleted scripts,
+  accumulated one port cohort at a time with no close-time reader flagging them. That instance
+  was pruned by hand; re-probed at scope, no local entry names a deleted script, so the class
+  stands and the instance does not.
+  **Cost while deferred:** every close triage prunes the overlay by judgment against dead lines
+  each reader must re-verify, and a dead grant beside a renamed tool reads as coverage.
+  **`guard-friction-reach`'s dead-path unit** (operator direction, 2026-09-15, lead-relayed).
+  Surfaced 2026-09-15 by `owed-port-tail`'s close into the gap inbox, after its drain; promoted at
+  the next iteration's scope, so the record is late and says so.
+
+- **recommended-allowlist-unshipped** [spec: SPEC-recommended-allowlist.md] — no kit
+  ships or documents a recommended permission allowlist for the gates and tools an adopter
+  activates, so every adopter re-derives the grant set by meeting prompts.
+  **Probed at the drain:** guard-kit ships the triage criterion, scan-prompts,
+  compare-settings-allow and a hooks-only settings template
+  (`guard-kit/templates/settings-hooks.json`, no `permissions` block), and neither
+  `native/src/installer/` nor `installer/bin/` writes an allow entry. The core set is small,
+  since nearly every gate and tool is reached through the `run-gates.sh` front-end, plus the forms
+  guard-kit's generic ruleset steers onto.
+  **DISTINCT from `guard-steer-grant-mismatch` (icebox)**, which is the steer/grant mismatch within
+  one tree's own guard and settings; this is the absence of any shipped recommendation. The
+  template discharges that entry's customer-facing half and leaves its in-tree half standing.
+  **Ruled at spec:** no adapter component; a hand-authored guard-kit template beside
+  `settings-hooks.json`, never written by `init`, with the projection candidate refused.
+  **Cost while deferred:** every adopter pays out-of-band permission decisions on the very forms the
+  kit steers to, from first install.
+  **Selected for `guard-friction-reach`** (operator direction, 2026-09-15, lead-relayed); the
+  harness-adapter seam was left open for spec to design.
+  Filed 2026-09-15 to the gap inbox, raised by the operator in `owed-port-tail`'s lead session
+  after a stale settings grant blocked a build commit; promoted at that iteration's close.
+
 ## Technical Debt
 
 ## Deferred
@@ -37,27 +147,6 @@
   Filed 2026-09-14 by `config-seam-fourth-cut`'s spec, a direct entry the operator authorized
   (operator direction, 2026-09-14, lead-relayed), splitting the floor out of the bridge's
   retirement.
-
-- **in-place-rewrite-steer-reach** [design-pending] [cost: session/low] [surface: guard-kit] — guard-kit
-  rule 8 steers a `sed -i` rewrite to the Edit tool, but `perl -pi` and `perl -0pi` reach the same
-  rewrite unsteered, and so does a `python3 -` heredoc that rewrites a file.
-  **Measured at `config-seam-fourth-cut`'s prompt-friction triage:** `perl` ranked at 74 prompting
-  calls, 79 logged lines of them in-place rewrites, beside 23 `python3 -` heredoc rewrites; no entry
-  named either. Rule 8's walker is per tool (guard-kit/SPEC.md §The generic ruleset, rule 8), so a
-  `perl` arm is a new option-table row rather than a new walker.
-  **Why `[design-pending]`:** a better form exists for a single-file edit, but a multi-file
-  mechanical sweep is a legitimate use the Edit tool pays for per file, so whether the steer fires
-  on every in-place `perl`, only on one file operand, or not at all is the call; `python3 -` has no
-  operand to read, which is a second call.
-  **Cost while deferred:** one out-of-band permission decision per in-place `perl` rewrite,
-  invisible to every gate.
-  recurrence: in-place-rewrite-steer-reach 2026-09-15
-  **Recurred at `owed-port-tail`'s prompt-friction triage:** `python3 -` ranked first at 24
-  prompting calls, every one a heredoc writing a file (queue entries, a Rust module, parity
-  scratch).
-  **Selected as `guard-friction-reach`'s lead unit** (operator direction, 2026-09-15, lead-relayed).
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from its prompt-friction
-  triage; promoted at the next iteration's scope.
 
 - **push-budget-unshipped** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the push
   budget (one to two pushes per iteration, two unasked hotfix pushes) lives only in this repo's
@@ -106,50 +195,6 @@
   vendors at the root) and asks `--for` what a path triggers: a silently wrong answer.
   Filed 2026-09-15 to the gap inbox from the git-hooks port's sandbox byte-parity proof; promoted
   at `owed-port-tail`'s close.
-
-- **recommended-allowlist-unshipped** [design-pending] [cost: event/high] [surface: guard-kit] — no kit
-  ships or documents a recommended permission allowlist for the gates and tools an adopter
-  activates, so every adopter re-derives the grant set by meeting prompts.
-  **Probed at the drain:** guard-kit ships the triage criterion, scan-prompts,
-  compare-settings-allow and a hooks-only settings template
-  (`guard-kit/templates/settings-hooks.json`, no `permissions` block), and neither
-  `native/src/installer/` nor `installer/bin/` writes an allow entry. The core set is small,
-  since nearly every gate and tool is reached through the `run-gates.sh` front-end, plus the forms
-  guard-kit's generic ruleset steers onto.
-  **DISTINCT from `guard-steer-grant-mismatch` (icebox)**, which is the steer/grant mismatch within
-  one tree's own guard and settings; this is the absence of any shipped recommendation. A projection
-  would discharge that entry's customer-facing half and leave its in-tree half standing.
-  **Candidate, not ruled:** a derived, freshness-gated projection of recommended allow entries built
-  from the registered gates and the guard rules' steer targets, shipped as a merge-it-yourself
-  recommendation and never written by `init`, since a grant is a per-consumer security decision.
-  The harness settings format places it in a harness adapter rather than kit mechanism;
-  `check-settings-paths` already covers dead-path drift in the committed file.
-  **Why `[design-pending]`:** it mints a shipped projection and its gate, and the adapter seam is
-  the call.
-  **Cost while deferred:** every adopter pays out-of-band permission decisions on the very forms the
-  kit steers to, from first install.
-  **Selected for `guard-friction-reach`** (operator direction, 2026-09-15, lead-relayed); the
-  harness-adapter seam stays open, spec's to design.
-  Filed 2026-09-15 to the gap inbox, raised by the operator in `owed-port-tail`'s lead session
-  after a stale settings grant blocked a build commit; promoted at that iteration's close.
-
-- **settings-overlay-dead-path-unreported** [design-pending] [cost: iteration/low] [surface: guard-kit] —
-  `compare-settings-allow` reports redundant and over-broad local-overlay grants but not a grant
-  naming a path that no longer exists, and `check-settings-paths` holds that invariant over the
-  committed settings file only (context-kit/SPEC.md §check-settings-paths).
-  **Attested at `owed-port-tail`'s close:** 24 of 108 local allow entries named deleted scripts,
-  accumulated one port cohort at a time with no close-time reader flagging them. That instance
-  was pruned by hand; re-probed at scope, no local entry names a deleted script, so the class
-  stands and the instance does not.
-  **Candidate, not ruled:** a dead-path section in `compare-settings-allow`, advisory, read at the
-  close triage, reusing `check-settings-paths`' extraction predicate.
-  **Why `[design-pending]`:** it adds a report section, and sharing a context-kit gate's predicate
-  from a guard-kit advisory is a placement call.
-  **Cost while deferred:** every close triage prunes the overlay by judgment against dead lines
-  each reader must re-verify, and a dead grant beside a renamed tool reads as coverage.
-  **`guard-friction-reach`'s dead-path unit** (operator direction, 2026-09-15, lead-relayed).
-  Surfaced 2026-09-15 by `owed-port-tail`'s close into the gap inbox, after its drain; promoted at
-  the next iteration's scope, so the record is late and says so.
 
 - **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
@@ -2860,47 +2905,6 @@
   `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
   filing put to it.
 
-- **file-authoring-act-ungoverned** [design-pending] [cost: session/low] [surface: guard-kit] — the file-authoring writes no glob can reach.
-  **What landed 2026-09-04 and what did not.** Guard rule 17 was narrowed and widened in one unit:
-  its substitution decline moved onto the `hdq` view, so the quoted-delimiter heredoc body every
-  journal append spells its slugs in stops defeating the grant; and its `>>`-only test went, so a
-  create to a gitignored target is granted where truncate-then-append already granted it in two
-  calls. Measured at that build: sixteen of sixteen locatable journal appends carried a backtick,
-  and the class was about half of every prompting call in the snapshot. The record is
-  guard-kit/SPEC.md §The generic ruleset rules 16 and 17 and §scan-prompts, not restated here.
-  **The prepared six-entry settings diff is disposed** (operator direction, 2026-09-13): four
-  landed in the committed allowlist — `date`, `git merge-base`, `mkdir`, the liveness-log clear —
-  and two were refused, `Bash(find *)` for reaching find's `-exec`/`-delete` forms and
-  `Bash(git config *)` for reaching `core.hooksPath` and `!`-aliases, both execute forms a glob
-  cannot fence off. None of the four fixed this entry's class.
-  **WHAT KEEPS THIS ENTRY ALIVE — THE RESIDUE THE LANDED GRANT DOES NOT REACH:** a write to a
-  path OUTSIDE the gitignored scratch set — a heredoc to a tracked file, a commit-message file, a
-  scratch script under another root. Rule 17 declines every one on its target test, by design.
-  The Write-tool steer was RECORDED AS REFUSED-FOR-NOW at that build: the landed deltas removed
-  its subject, and a steer firing on writes the same commit had just granted is a rule arguing
-  with its neighbour. Two facts were
-  bought so a later session need not re-buy them — `.claude/settings.json` already carries a
-  `Write|Edit` `PreToolUse` matcher, so a Write-side rule needs no new matcher shape; and a steer is
-  not a distinct primitive, `guard_block` being stderr plus exit 2 for a block and a steer alike.
-  A stated habit was the shape filed beside those two and it stays refused: it is not a mechanism.
-  **The operator ruling that scoped it, and its dated series, which lives once and here.** The class
-  read 41 of 185 prompting calls, then 56 of 139 at the 2026-09-04 close — 22 per cent to 40 per
-  cent — then 48 across 22 patterns on the mid-iteration snapshot the promoting spec measured afresh
-  under the ruling's re-costing rider. The ruling REOPENED the port-only run for a second non-port
-  unit. **A later reading of this class will fall for a reason other than fewer writes**: a granted
-  call never reaches the friction log, so widening rule 17 shrank the log's own corpus.
-  guard-kit/SPEC.md §scan-prompts carries that caveat, and a close attributing the drop to fewer
-  writes is reading the instrument's own boundary as a result.
-  **Cost while deferred:** one out-of-band decision per file authored outside the scratch set,
-  invisible to every gate — the friction log is advisory, so nothing reds however far the residue
-  grows.
-  **`guard-friction-reach`'s write-residue unit** (operator direction, 2026-09-15, lead-relayed).
-  Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
-  drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
-  2026-09-04 within one iteration.
-
-
-
 - **kfric-obligation-residency** [design-pending] [cost: iteration/low] [surface: delegation-kit] — the knowledge-friction capture obligation is
   declared for "any session" and reaches no surface a kit-template session actually loads.
   recurrence: kfric-obligation-residency 2026-08-24
@@ -4411,23 +4415,6 @@
   **Cost while deferred:** what a disposition commit dropped from an entry is recoverable only
   by hand-walking history.
   Filed 2026-09-12 by build, outside its envelope; drained and promoted 2026-09-13 at close.
-
-- **scan-prompts-grant-test-redirect-blind** [design-pending] [cost: event/low] [surface: guard-kit]
-  — `scan-prompts`' grant test and its reachability verdict disagree on a redirect call.
-  `granted()` runs `segment_granted` over `guard::allow_match`, a plain glob match on the raw
-  segment with no redirect model (`native/src/emit/scan_prompts.rs`, `native/src/guard.rs`).
-  So a committed `Bash(cat >> .tmp/*)` would read a write-redirect call as granted, although
-  guard-kit/SPEC.md rule 17 states no `Bash(...)` entry grants a redirect target. Such a grant
-  was committed once and reverted as inoperative.
-  **Why `[design-pending]`:** the fix is small, a redirect exclusion in `segment_granted` plus
-  a fixture, but it moves calls into the prompting count, a definitional step
-  guard-kit/SPEC.md §scan-prompts records with its pre-change reading.
-  DISTINCT from the Done `prompt-ranking-ungrantable-shape-class`, which partitions rows the
-  grant test already called prompting; this is the grant test upstream of that partition.
-  **Cost while deferred:** latent, since no committed glob has that shape today; the first one
-  would hide its calls from the prompting share.
-  **`guard-friction-reach`'s grant-test unit** (operator direction, 2026-09-15, lead-relayed).
-  Filed 2026-09-12 by build, from the ranker partition; drained and promoted 2026-09-13 at close.
 
 - **steered-fixture-walk-roots-unverified** [design-pending] [cost: event/low] [surface: gate-sdk]
   — unit test A verifies nothing about a member whose every fixture case steers off its walk
