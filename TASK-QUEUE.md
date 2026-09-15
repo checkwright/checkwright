@@ -4814,12 +4814,4 @@
 
 ## Done
 
-- config-seam-static-format
-- config-bridge-resolution-cost
-- run-validate-child-env-knob-leak
-- knob-shape-flip-undetected
-- config-seam-overrides-harness-pin
-- upgrade-smoke-consumer-unseeded-configs
-- append-and-wrapper-shapes-unsteered
-
 ## Lessons Learned
