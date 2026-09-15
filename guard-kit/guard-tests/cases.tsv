@@ -90,7 +90,10 @@ block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 #          pipe into the segment — a line range (steered to Read) and a markdown
 #          heading range (steered to the section extractor); a transform, a
 #          single-regex filter, a program file, a non-.md range, a second operand
-#          and a piped-into awk all pass
+#          and a piped-into awk all pass. perl fires on an in-place bundle with at
+#          least one file operand, a sweep or a glob included; perl -pi reading
+#          stdin, an xargs-led perl, an unmodelled perl option and a perl without
+#          the in-place flag all pass, and so does the --rewrite arm both steer to
 block	sed -n '1,60p' TASK-QUEUE.md
 block	sed -i 's/a/b/' notes.md
 fallthrough	sed -E 's/a/b/'
@@ -106,6 +109,16 @@ fallthrough	awk -f prog.awk notes.txt
 fallthrough	awk 'NR<=5' a.txt b.txt
 fallthrough	grep -n foo notes.txt | awk 'NR<=5' notes.txt
 fallthrough	awk -W posix 'NR<=5' notes.txt
+block	perl -pi -e 's/a/b/' notes.md
+block	perl -0pi -e 's/a/b/' notes.md
+block	perl -i.bak -pe 's/a/b/' notes.md
+block	perl -pi -e 's/a/b/' a.md b.md
+block	perl -pi -e 's/a/b/' src/*.rs
+fallthrough	grep -rl foo src | xargs perl -pi -e s/a/b/
+fallthrough	perl -pi -e 's/a/b/'
+fallthrough	perl -I lib -pi -e 's/a/b/' notes.md
+fallthrough	perl -ne 'print if /x/' notes.md
+fallthrough	bash gate-sdk/bin/run-gates.sh --rewrite --regex 'a|b' 'c' notes.md
 
 # rule 9 — listing-only find steered to Glob, alone or as a ';'-batch of listings
 #          (a literal banner between them is fine); action-predicate / piped /

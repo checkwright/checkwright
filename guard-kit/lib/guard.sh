@@ -425,9 +425,9 @@ guard_rule_brace_glyph() {
     guard_block "quote the '{' if it's literal (an unquoted awk/sed program), or write it out if it expands — the harness's matcher refuses every bare '{' glyph before allowlist matching, so the call is decided out of band. A brace inside quotes of either kind, or in a heredoc body, is already inert and never reaches this block."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's one program-then-operands walk: a per-tool option table separates a sed or awk segment's program word from its file operands, filling the caller's prog (empty when an option supplied the program), inplace and prog_operands; non-zero on an awk option the table does not carry, so the caller declines rather than guess
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's one program-then-operands walk: a per-tool option table separates a sed, awk or perl segment's program word from its file operands, filling the caller's prog (empty when an option supplied the program), inplace and prog_operands; non-zero on an awk or perl option the table does not carry, so the caller declines rather than guess
 _guard_program_operands() {
-    local tool="$1" tok skip='' ends=0 have_prog=0 amp='&'
+    local tool="$1" tok skip='' ends=0 have_prog=0 amp='&' bundle letter
     local -a toks
     read -ra toks <<<"$2"
     prog='' inplace=0 prog_operands=()
@@ -455,6 +455,22 @@ _guard_program_operands() {
                 awk:-F?* | awk:-v?*) continue ;;
                 awk:-f?*) have_prog=1; continue ;;
                 awk:-*) return 1 ;;
+                perl:--) ends=1; continue ;;
+                perl:- | perl:--*) return 1 ;;
+                perl:-*)
+                    bundle="${tok:1}"
+                    while [[ -n "$bundle" ]]; do
+                        letter="${bundle:0:1}"
+                        bundle="${bundle:1}"
+                        case "$letter" in
+                            [acnpstTuUwWX]) ;;
+                            0 | l) while [[ "$bundle" == [0-9]* ]]; do bundle="${bundle:1}"; done ;;
+                            e | E) if [[ -n "$bundle" ]]; then have_prog=1; else skip=prog; fi; bundle='' ;;
+                            i) inplace=1; bundle='' ;;
+                            *) return 1 ;;
+                        esac
+                    done
+                    continue ;;
             esac
         fi
         if [[ "$have_prog" == 0 ]]; then
@@ -564,16 +580,21 @@ _guard_awk_read() {
 }
 
 guard_rule_sed_file() {
-    local cmd="$1" s seg prog inplace
+    local cmd="$1" s seg prog inplace tool
     local -a prog_operands=()
     s="$(guard_skeleton "$cmd" sq dq hd)"
     while IFS= read -r seg; do
         seg="${seg#"${seg%%[![:space:]]*}"}"
-        case "$seg" in sed | sed[[:space:]]*) ;; *) continue ;; esac
-        _guard_program_operands sed "$seg"
-        if [[ "$inplace" == 1 ]]; then
-            guard_block "don't rewrite a file with 'sed -i' — use the Edit tool: it replaces an exact string, fails loudly when the match is missing or ambiguous, and keeps the harness's view of the file current. If you genuinely need the in-place edit, run it yourself with !<command>."
+        case "$seg" in
+            sed | sed[[:space:]]*) tool='sed' ;;
+            perl[[:space:]]*) tool='perl' ;;
+            *) continue ;;
+        esac
+        _guard_program_operands "$tool" "$seg" || continue
+        if [[ "$inplace" == 1 && ( "$tool" == sed || "${#prog_operands[@]}" -ge 1 ) ]]; then
+            guard_block "don't rewrite a file with '$tool -i' — use the rewrite arm: 'bash $(_guard_front_end) --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…' replaces a literal (or, with --regex, a line-scoped POSIX ERE) with fixed text across every named file and prints each changed span. For an edit a fixed replacement cannot express (a capture group, a deletion keyed on context), use the Edit tool. If you genuinely need the in-place edit, run it yourself with !<command>."
         fi
+        [[ "$tool" == sed ]] || continue
         if [[ "${#prog_operands[@]}" -ge 1 ]]; then
             guard_block "don't read a file through 'sed' — use the Read tool (offset/limit for a line range): it returns numbered lines and registers the file for a later Edit. For a markdown section, the consumer's section extractor beats a line range. If you genuinely need sed, pipe into it or run it yourself with !<command>."
         fi

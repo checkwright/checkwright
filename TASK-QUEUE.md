@@ -12,29 +12,6 @@
 
 ## New Features
 
-- **in-place-rewrite-steer-reach** [spec: SPEC-perl-rewrite-steer.md] — guard-kit
-  rule 8 steers a `sed -i` rewrite to the Edit tool, but `perl -pi` and `perl -0pi` reach the same
-  rewrite unsteered, and so does a `python3 -` heredoc that rewrites a file.
-  **Measured at `config-seam-fourth-cut`'s prompt-friction triage:** `perl` ranked at 74 prompting
-  calls, 79 logged lines of them in-place rewrites, beside 23 `python3 -` heredoc rewrites; no entry
-  named either. Rule 8's walker is per tool (guard-kit/SPEC.md §The generic ruleset, rule 8), so a
-  `perl` arm is a new option-table row rather than a new walker.
-  **Reshaped at spec** (operator direction, 2026-09-15, lead-relayed): steer agents off
-  interpreters and utilities whose side effects cannot be read, onto predictable tools
-  checkwright builds in Rust, starting now. Rule 8's in-place arm fires on every in-place `perl`
-  and `sed` and steers to the rewrite arm, which `rewrite-arm` builds and this unit waits on.
-  `python3 -` bodies stay unsteered for want of a target, carried by
-  `inline-interpreter-substrate-census`.
-  **Cost while deferred:** one out-of-band permission decision per in-place `perl` rewrite,
-  invisible to every gate.
-  recurrence: in-place-rewrite-steer-reach 2026-09-15
-  **Recurred at `owed-port-tail`'s prompt-friction triage:** `python3 -` ranked first at 24
-  prompting calls, every one a heredoc writing a file (queue entries, a Rust module, parity
-  scratch).
-  **Selected as `guard-friction-reach`'s lead unit** (operator direction, 2026-09-15, lead-relayed).
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from its prompt-friction
-  triage; promoted at the next iteration's scope.
-
 - **file-authoring-act-ungoverned** [spec: SPEC-compound-write-steer.md] — the file-authoring
   writes no glob can reach.
   **What landed 2026-09-04 and what did not.** Guard rule 17 was narrowed and widened in one unit:
@@ -4774,5 +4751,6 @@
 ## Done
 
 - rewrite-arm
+- in-place-rewrite-steer-reach
 
 ## Lessons Learned

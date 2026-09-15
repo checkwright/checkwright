@@ -679,10 +679,11 @@ that harness exists would be designing against no case.
    can suppress, block-and-steer strictly dominates; a brace in any inert region
    passes untouched. **Placed before both auto-allow rules**
    so their literal-target premise holds for braces as well.
-8. **`sed` or `awk` reading a file, or `sed` rewriting one** — blocked with the
-   steer to the harness's file tools: `sed -i` (or any short bundle carrying
-   `i`) to the Edit tool, a `sed` **file operand** to the Read tool's
-   offset/limit. A `sed` fed by a pipe is a text filter with no tool equivalent
+8. **`sed` or `awk` reading a file, or `sed` or `perl` rewriting one** — blocked with the
+   steer to a better tool: `sed -i` or `perl -i` (any short bundle carrying
+   `i`, on any file operand) to the `--rewrite` arm (§rewrite), with the Edit
+   tool named for an edit a fixed replacement cannot express, and a `sed`
+   **file operand** to the Read tool's offset/limit. A `sed` fed by a pipe is a text filter with no tool equivalent
    and is untouched, so the discriminator is the operand, not the binary — logic
    no allowlist glob can express, which is why this is a rule and not a deny
    entry. Segments are analyzed only when they *lead* with the tool, so a `-i`
@@ -696,6 +697,16 @@ that harness exists would be designing against no case.
    - `awk`: `-F` and `-v` consume an argument, separate or glued; `-f` consumes
      one and supplies the program; `--` ends options. Any other option word
      declines.
+   - `perl`: `-e` or `-E` as a whole word consumes the next word, which supplies
+     the program; in a bundle (`-ne`, `-pe`) `e`/`E` takes the rest of the word,
+     or the next word when the rest is empty, and the bundle ends there. `i`
+     anywhere in a bundle marks the in-place rewrite and the rest of that word is
+     its backup extension (`-i`, `-i.bak`, `-pi`, `-0pi`, `-0777pi`), ending the
+     bundle. `a c n p s t T u U w W X` take no argument and the bundle continues;
+     `0` and `l` take the digits that follow them. `--` ends options. Any other
+     option word or bundle letter (`-I`, `-M`, `-m`, `-F`, `-x`, `-d`, `-D`,
+     `-C`, `-V`, `-S`, `-f`, a bare `-`, a long option) declines — conservative
+     in the direction the `awk` row takes.
 
    Absent a supplying option, the first bare word is the program and every later
    one is an operand. `cat` keeps `_guard_is_cat_read` (rule 10), because it has
@@ -735,6 +746,28 @@ that harness exists would be designing against no case.
    overridden by an allow, so the steer fires on the two read shapes ahead of any
    grant; such a grant stays load-bearing for `awk` as a stream filter and for
    every program shape the arm declines.
+   **The `perl` arm blocks an in-place rewrite with at least one file operand.**
+   No operand means `perl -pi` reading stdin, which rewrites no file, so that
+   case passes.
+   **Both in-place arms steer to a tool whose effect is its command line.** An
+   in-place `sed` or `perl` program can read, write elsewhere, or execute, and the
+   guard cannot tell which from outside the program. `--rewrite` replaces fixed
+   text in named files and does nothing else, so the steer trades a program for a
+   statement of intent; its printed command is derived from `GUARD_KIT_LIB` as
+   rule 23 derives the runner. The Edit tool stays named for a single edit needing
+   more than a fixed replacement. A sweep over many files is one `--rewrite` call,
+   so neither arm bounds its operand count. **What passes:** `perl -pi` with no
+   file operand; an in-place call behind another command word (`xargs perl -pi`),
+   which is its lead's rule's subject; and a `perl` option the walker does not
+   model.
+   **`python3 -` bodies are not steered, because no target exists yet.** Deciding
+   whether an inline body rewrites a file needs text inside the heredoc or the
+   `-c` argument, which the skeleton every rule here declares blanks. And unlike a
+   rewrite, what the bodies compute has no predictable tool to be sent to. Rule
+   23's ruling still holds, that a body carried in the command string is shown to
+   the approver verbatim, so the shape stays a reviewable call rather than a
+   hazard. Most inline bodies sampled did write one path, so the shape will keep
+   ranking. That is measured friction waiting on a target, not a missed row.
    **Placed before both auto-allow rules:** a consumer that widens
    `GUARD_KIT_RO_BINS` with `sed` would otherwise have rule 18 silently grant an
    in-place rewrite. `awk` has no honest place on that roster, since a program
