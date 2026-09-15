@@ -19,6 +19,7 @@ pub mod env_probe;
 pub mod file_gap;
 pub mod file_survey;
 pub mod footprint;
+pub mod git_hooks;
 pub mod graph;
 pub mod install_hooks;
 pub mod install_lifecycle;
@@ -284,8 +285,15 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             crate::registry::EVERY_COUPLES_KNOB,
         ],
     ),
+    // spec: gate-sdk/SPEC.md §gen-pre-commit — an `Arm::Emit` whose operand names the hook, and
+    // whose `--write` operand writes both, on `--emit-docs-mirror`'s precedent
+    (
+        "--emit-git-hooks",
+        Arm::Emit(git_hooks::emit),
+        git_hooks::KNOBS,
+    ),
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a
-    // generator, and configured: a hardcoded flag would hide its reads from `--knob-files`
+    // generator, and configured: a hardcoded flag would hide its reads from the knob-file derivation
     (
         "--emit-queue-index",
         Arm::Emit(queue_index::emit),
@@ -339,7 +347,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: context-kit/SPEC.md §Index-first reading — the markdown structural index. A table
     // member rather than a hardcoded flag because it reads a consumer knob, which a hardcoded flag
-    // would hide from `--knob-files`.
+    // would hide from the knob-file derivation.
     (
         "--emit-md-index",
         Arm::Emit(md_index::emit),
@@ -384,7 +392,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: guard-kit/SPEC.md §scan-prompts — the ranker, a table member on the forced-family
     // test rather than by resemblance: it reads three consumer knobs a hardcoded top-level
-    // flag would hide from `--knob-files`, and its free-text positional keeps the shape refusal.
+    // flag would hide from the knob-file derivation, and its free-text positional keeps the shape refusal.
     (
         "--emit-scan-prompts",
         Arm::Emit(scan_prompts::emit),
@@ -398,7 +406,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         compare_settings_allow::KNOBS,
     ),
     // spec: context-kit/SPEC.md §The always-loaded meter — the context meter, a table member
-    // because it reads four consumer knobs a hardcoded flag would hide from `--knob-files`;
+    // because it reads four consumer knobs a hardcoded flag would hide from the knob-file derivation;
     // its three modes arrive as operands, the shape `--hook` and `--wait-probe` already carry.
     (
         "--emit-always-loaded",
@@ -569,7 +577,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof: an `Arm::Run` because
     // its contract is the 1-versus-2 split of its exit status, which an emitting arm collapses, and
-    // a table member because it reads six knobs a hardcoded flag would hide from `--knob-files`
+    // a table member because it reads six knobs a hardcoded flag would hide from the knob-file derivation
     (
         "--upgrade-smoke",
         Arm::Run(upgrade_smoke::run),
@@ -641,7 +649,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: gate-sdk/SPEC.md §run-gate-tests — an `Arm::Run` because the contract is a three-valued
     // exit — 0 clean, 1 a logic failure, 2 a harness or fixture error — and a table member because
-    // it reads three knobs a hardcoded flag would hide from `--knob-files`
+    // it reads three knobs a hardcoded flag would hide from the knob-file derivation
     (
         "--run-gate-tests",
         Arm::Run(run_gate_tests::run),
@@ -649,7 +657,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: guard-kit/SPEC.md §Testing — an `Arm::Run` because the contract is a three-valued exit
     // an emitting arm collapses, and a table member because the arm needs the vendored guard-kit
-    // root, a read a hardcoded flag would hide from `--knob-files`
+    // root, a read a hardcoded flag would hide from the knob-file derivation
     (
         "--run-guard-tests",
         Arm::Run(run_guard_tests::run),
@@ -657,7 +665,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: context-kit/SPEC.md §Testing — an `Arm::Run` because the contract is the three-valued
     // exit the `index_tests` validate suite reads, and a table member because it reaches two kit
-    // roots, a read a hardcoded flag would hide from `--knob-files`
+    // roots, a read a hardcoded flag would hide from the knob-file derivation
     (
         "--run-index-tests",
         Arm::Run(run_index_tests::run),
@@ -677,7 +685,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ("--run-demo", Arm::Run(demo::run), demo::KNOBS),
     // spec: gate-sdk/SPEC.md §Consumer payload — the payload assembler, an `Arm::Run` because its
     // product is a tarball plus a receipt rather than a document, and a table member because all
-    // three of its inputs are knobs a hardcoded flag would hide from `--knob-files`
+    // three of its inputs are knobs a hardcoded flag would hide from the knob-file derivation
     (
         "--pack-installer",
         Arm::Run(pack_installer::run),

@@ -32,7 +32,7 @@ are **advisory arms of the gate binary**, reached through the battery runner's
 class gate-sdk/SPEC.md §The non-gate arm rules. Each is an **arm-table member**
 rather than a hardcoded flag, and for the first and third that family is forced
 rather than chosen: a tool that resolves a consumer knob declares it on its table
-row, and a hardcoded flag has no row, so `--knob-files`, `check-reads-couples` and
+row, and a hardcoded flag has no row, so the knob-file derivation, `check-reads-couples` and
 `check-gate-substrate-parity` cannot see what it reads.
 
 - **`--emit md-index [paths…]`** — compact structural index for Markdown:

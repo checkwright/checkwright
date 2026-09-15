@@ -1,7 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the capture affordance: one dated bullet
 // per gap, the grammar stamped by the producer rather than by its filer.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
-// arm reads five consumer knobs, which a hardcoded flag would hide from `--knob-files`.
+// arm reads five consumer knobs, which a hardcoded flag would hide from the knob-file derivation.
 use crate::stages;
 
 pub const KNOBS: &[&str] = &[

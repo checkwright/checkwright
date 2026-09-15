@@ -13,7 +13,7 @@ fail_closed() {
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — a value read on first use is memoised for one sourcing, never for the process, so a subshell re-sourcing under another environment reads its own
-unset _gate_prune_loaded _gate_couples_loaded
+unset _gate_prune_loaded
 
 gate_sdk_root() {
     ( cd "${BASH_SOURCE[0]%/*}/.." && pwd )
@@ -256,118 +256,7 @@ gate_check_dirs() {
     done <<<"$roots"
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — every `knob:` token the descriptor corpus carries, resolved in one binary call once per process and held by name, and the kit roots read once beside them
-_gate_couples_ensure() {
-    [[ -n "${_gate_couples_loaded:-}" ]] && return 0
-    local dirs d f line kv tok out n el roots
-    local -a files=() names=() parts=()
-    declare -gA _GATE_COUPLES_VALUES=()
-    _gate_couples_roots=()
-    roots="$(gate_kit_roots)" || return 2
-    [[ -n "$roots" ]] && mapfile -t _gate_couples_roots <<<"$roots"
-    dirs="$(gate_check_dirs)" || return 2
-    while IFS= read -r d; do
-        [[ -n "$d" ]] || continue
-        for f in "$d"/*.gate "$d"/*.sh; do
-            [[ -f "$f" ]] && files+=("$f")
-        done
-    done <<<"$dirs"
-    if [[ ${#files[@]} -gt 0 ]]; then
-        while IFS= read -r line; do
-            for kv in ${line#\# graph: }; do
-                case "$kv" in couples=*|trigger=*) ;; *) continue ;; esac
-                IFS=',' read -ra parts <<<"${kv#*=}"
-                for tok in ${parts[@]+"${parts[@]}"}; do
-                    [[ "$tok" == knob:* ]] && names+=("${tok#knob:}")
-                done
-            done
-        done < <(grep -h '^# graph: ' "${files[@]}" 2>/dev/null || true)
-    fi
-    if [[ ${#names[@]} -gt 0 ]]; then
-        out="$(gate_knob_values "${names[@]}")" || {
-            printf 'gate_expand_couples: the couples knob tokens could not be read from the gate binary — an empty expansion is a lost trigger; treating as failure (not clean)\n' >&2
-            return 2
-        }
-        while IFS=$'\t' read -r n _ el; do
-            [[ -n "$n" ]] || continue
-            if [[ -v _GATE_COUPLES_VALUES["$n"] && -n "${_GATE_COUPLES_VALUES[$n]}" ]]; then
-                _GATE_COUPLES_VALUES["$n"]+=$'\t'"$el"
-            else
-                _GATE_COUPLES_VALUES["$n"]="$el"
-            fi
-        done <<<"$out"
-    fi
-    _gate_couples_loaded=1
-}
-
-# spec: gate-sdk/SPEC.md §The `# graph:` manifest — expand a comma-joined couples/trigger field in two passes in a fixed order: knob:<NAME> to that knob's members, then kit:<glob> to <kit-root>/<glob> for every kit root, so a knob member spelled kit:<glob> composes; anything else passes through verbatim. One pass each bounds the expansion without a cycle detector. Assigns into the caller's <outvar> by nameref rather than printing, so a per-manifest-line loop calls this directly with no fork.
-# spec: gate-sdk/SPEC.md §Fail-closed contract — every knob-token refusal returns non-zero having named the knob on stderr, never an expansion missing the token's members: a silently lost trigger is a gate the hook stops running.
-gate_expand_couples_var() {
-    local -n _gate_expand_couples_out="$1"
-    local field="$2"
-    local -a parts=() once=() out=() members=()
-    IFS=',' read -ra parts <<<"$field"
-    local tok r glob name m value
-    for tok in "${parts[@]}"; do
-        if [[ "$tok" == knob:* ]]; then
-            _gate_couples_ensure || return 2
-            name="${tok#knob:}"
-            if [[ ! -v _GATE_COUPLES_VALUES["$name"] ]]; then
-                printf 'gate_expand_couples: couples token knob:%s names a knob the gate binary could not resolve — ' "$name" >&2
-                printf 'an empty expansion is a lost trigger; treating as failure (not clean)\n' >&2
-                return 2
-            fi
-            value="${_GATE_COUPLES_VALUES[$name]}"
-            members=()
-            [[ -n "$value" ]] && IFS=$'\t' read -ra members <<<"$value"
-            for m in ${members[@]+"${members[@]}"}; do
-                case "$m" in
-                    knob:*)
-                        printf 'gate_expand_couples: knob:%s has the member %s, itself a knob token — ' "$name" "$m" >&2
-                        printf 'expansion is one pass each; treating as failure (not clean)\n' >&2
-                        return 2 ;;
-                    *,*|*[[:space:]]*)
-                        printf 'gate_expand_couples: knob:%s has the member %s, which carries a comma or whitespace — ' "$name" "$m" >&2
-                        printf 'it is unrepresentable after expansion; treating as failure (not clean)\n' >&2
-                        return 2 ;;
-                esac
-                once+=("$m")
-            done
-        else
-            once+=("$tok")
-        fi
-    done
-    for tok in ${once[@]+"${once[@]}"}; do
-        if [[ "$tok" == kit:* ]]; then
-            _gate_couples_ensure || return 2
-            glob="${tok#kit:}"
-            for r in ${_gate_couples_roots[@]+"${_gate_couples_roots[@]}"}; do out+=("${r%/}/$glob"); done
-        else
-            out+=("$tok")
-        fi
-    done
-    local IFS=','
-    _gate_expand_couples_out="${out[*]+"${out[*]}"}"
-}
-
-# spec: gate-sdk/SPEC.md §check-graph — the gate_expand_couples_var expansion, printed to stdout for a `$(...)` caller; gate_expand_couples_var is the in-process form a hot per-line loop should call instead.
-gate_expand_couples() {
-    local __gate_expand_couples_result
-    gate_expand_couples_var __gate_expand_couples_result "$1" || return 2
-    printf '%s\n' "$__gate_expand_couples_result"
-}
-
-# spec: gate-sdk/SPEC.md §The `# graph:` manifest — read one field from a resolved gate's `# graph:` line; the shared field reader gen-pre-commit and run-gates --for selection draw the manifest through (the couples-token expansion is gate_expand_couples_var, the reader check-graph also shares). Emits the value, empty when the field is absent; never fails on a missing field.
-gate_manifest_field() {
-    local src="$1" key="$2" man kv
-    man="$(grep -m1 '^# graph: ' "$src" 2>/dev/null || true)"
-    for kv in ${man#\# graph: }; do
-        [[ "$kv" == "$key="* ]] && { printf '%s' "${kv#"$key"=}"; return 0; }
-    done
-    return 0
-}
-
-# spec: gate-sdk/SPEC.md §run-gates — the path/glob matcher shared by run-gates --for selection and the emitted pre-commit hook: true when a path in the caller's staged_all array matches one of the given globs (bash glob, `*` spans '/'). gen-pre-commit emits this body verbatim into the hook's staged_matches; check-graph's freshness assertion holds the two in sync.
+# spec: gate-sdk/SPEC.md §run-gates — the path/glob matcher shared by run-gates --for selection and the emitted pre-commit hook: true when a path in the caller's staged_all array matches one of the given globs (bash glob, `*` spans '/'). The hook emitter splices this body verbatim into the hook's staged_matches; check-graph's freshness assertion holds the two in sync.
 # shellcheck disable=SC2154  # staged_all is the caller's array: the hook's staged set, the selector's --for paths
 gate_staged_matches() {
     local f pat

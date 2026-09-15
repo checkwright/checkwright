@@ -88,7 +88,7 @@ bash "$SDK/bin/run-gates.sh" --emit file-survey \
 # spec: lifecycle-kit/README.md §Install — step 4 points the consumer's own always-loaded agent file at the machine; run it on the consumer, not only on a scratch copy, or check-lifecycle-registration has nothing to hold
 bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null
 
-bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
+bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — exercise the --enter-stage arm end-to-end under .tmp (advisory tooling, no fixture pair). The knob paths are absolute, so the front-end's cd to the git toplevel leaves every one of them resolving where this smoke put it.

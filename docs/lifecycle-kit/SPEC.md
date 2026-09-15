@@ -266,7 +266,7 @@ The **deterministic half** of that first step — read the iteration from the
 header, read the id from the `--emit-session-id` arm, append the stamp — is
 mechanized by
 `bash gate-sdk/bin/run-gates.sh --enter-stage <stage>`, the same
-writer/asserter split as `gen-pre-commit.sh` ↔ `check-graph`: the skill
+writer/asserter split as `--emit git-hooks` ↔ `check-graph`: the skill
 invokes it, **judgment stays in the skill** (what the stage means, its exit
 condition, when to enter it at all), and the stage gates stay the independent
 verifier. The tool takes no `--force` flag, so the compliant path is the easy
@@ -939,7 +939,7 @@ attribute is inert and the file conflicts normally — the rule above then gover
 the hand resolution, so the uninstalled path degrades to judgment, never to
 silence. Writer/asserter split: the arm emits the attribute block
 (marker-bounded), `check-merge-attrs` verifies it — the
-`gen-pre-commit.sh` ↔ `check-graph` precedent.
+`--emit git-hooks` ↔ `check-graph` precedent.
 
 **Who may stamp, at this altitude.** Unchanged: the arriving stage session
 stamps,

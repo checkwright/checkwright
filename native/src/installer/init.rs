@@ -521,7 +521,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         format!("{}/CHECK-GRAPH.html", GATES_DIR),
     ];
     if !f.dry {
-        run_vendored(&root, "gate-sdk/bin/gen-pre-commit.sh", &["--write"], None)?;
+        run_vendored(&root, "gate-sdk/bin/run-gates.sh", &["--emit", "git-hooks", "--write"], None)?;
         run_vendored(
             &root,
             "gate-sdk/bin/run-gates.sh",

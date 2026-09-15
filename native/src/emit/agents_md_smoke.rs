@@ -280,7 +280,7 @@ fn battery_env() -> Vec<(String, String)> {
 fn regenerate(consumer: &str) -> Result<(), Outcome> {
     let hook = proc::run_merged_in(
         "bash",
-        &["gate-sdk/bin/gen-pre-commit.sh", "--write"],
+        &["gate-sdk/bin/run-gates.sh", "--emit", "git-hooks", "--write"],
         &battery_env(),
         Some(Path::new(consumer)),
     )

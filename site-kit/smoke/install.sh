@@ -38,5 +38,5 @@ echo "apex.example" > docs/CNAME
 mkdir -p .github/workflows
 cp "$SMOKE_KIT_ROOT/templates/site-health.yml" .github/workflows/site-health.yml
 
-bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
+bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html

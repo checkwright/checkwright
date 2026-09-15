@@ -66,7 +66,7 @@ A member whose *surface* is missing (no log yet, no timings file) degrades to
 
 **Why an arm-table member rather than a top-level flag.** The front-end composes
 `--emit-<name>` from its `--emit <name>` operand, and the table row declares the
-member's knob roster, which `--knob-files`, `check-reads-couples` and
+member's knob roster, which the knob-file derivation, `check-reads-couples` and
 `check-gate-substrate-parity` read; a hardcoded top-level flag has no row, so
 none of them could see what it reads. The collator's own knobs derive their
 defaults from `GATE_SDK_GATES_DIR`, and the members read guard-kit's knobs, so
@@ -650,7 +650,7 @@ Consumer wiring (this repo, not kit mechanism): the emission is committed at
 `check-trajectory-fresh` (registered in `gates.list`, declared by
 `scripts/check-trajectory-fresh.gate` and dispatching to the compiled binary
 since gate-sdk/SPEC.md §The consumer remainder cohort) re-emits and
-byte-compares — the gen-pre-commit/check-graph freshness pattern — so a
+byte-compares — the hook-emitter/check-graph freshness pattern — so a
 hand-edited or stale number is red at commit. The gate carries its own
 `# graph:` manifest coupling `docs/evidence-data.md` to the harvested state
 files, and a `good/`+`bad/` fixture pair that exercises the byte-compare

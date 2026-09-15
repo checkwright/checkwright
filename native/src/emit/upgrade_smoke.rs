@@ -704,13 +704,13 @@ fn stage_all(consumer: &str) -> Result<(), Fail> {
 // this process's, because the host's value is a different tree's.
 fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     let hook = bash(
-        r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null"#,
+        r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --emit git-hooks --write >/dev/null"#,
         &[consumer],
         Stderr::Inherit,
     )?;
     if hook.code() != 0 {
         return Err(broken(one(format!(
-            "{}: phase A gen-pre-commit failed at TO ({})",
+            "{}: phase A hook regeneration failed at TO ({})",
             NAME, to
         ))));
     }

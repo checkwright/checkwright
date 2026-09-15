@@ -2,9 +2,9 @@
 # commit-msg - GENERATED, DO NOT EDIT.
 #
 # Emitted from the tier=commit-msg `# graph:` manifests by:
-#     bash gate-sdk/bin/gen-pre-commit.sh --write
+#     bash gate-sdk/bin/run-gates.sh --emit git-hooks --write
 # Edit a gate's manifest, then regenerate. check-graph asserts this file equals
-# --emit-commit-msg. git feeds the prospective message file as $1; each gate
+# `--emit git-hooks commit-msg`. git feeds the prospective message file as $1; each gate
 # prints its own per-finding + `help:` lines before this hook reports failure.
 #
 # Install (opt-in, per clone):   bash gate-sdk/bin/run-gates.sh --install-hooks

@@ -136,8 +136,8 @@ pub fn manifest_fields(man: &str) -> Vec<(String, String)> {
         .collect()
 }
 
-// spec: gate-sdk/SPEC.md §The `# graph:` manifest — `gate_manifest_field`: the value, empty when
-// the field is absent; never an error on a missing field
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — one field's value, empty when the field is
+// absent; never an error on a missing field
 pub fn field(fields: &[(String, String)], key: &str) -> String {
     fields
         .iter()

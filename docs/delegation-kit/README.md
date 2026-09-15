@@ -36,8 +36,8 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    <!-- gate-roster:end -->
 
    They resolve through gate-sdk's registry path and their `# graph:` manifests
-   put them in the generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh
-   --write`.
+   put them in the generated pre-commit hook:
+   `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
 
 2. Bind the protocol skill and add its resident pointer:
    - Create `.claude/commands/agent-execution.md` as a binding shim naming

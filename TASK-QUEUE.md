@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **gen-pre-commit-port** [spec: SPEC-git-hooks-port.md] — `gate-sdk/bin/gen-pre-commit.sh` is owed:
-  its `no-port` declaration rested on criterion 6's single-producer rule, and the crate is now every
-  knob's one producer (gate-sdk/SPEC.md §gen-pre-commit).
-  **Deliverable:** the pre-commit and commit-msg emissions as binary arms producing byte-identical
-  hooks, `check-graph` assertion D reading them in process with its `--needs` `bash` element gone,
-  every caller (`init`, the kit `smoke/install.sh` recipes, the upgrade and AGENTS.md smokes) moved
-  to the arm, and the script deleted.
-  **Ruled at spec (the amendment):** one `--emit git-hooks` arm taking `pre-commit`, `commit-msg` or
-  `--write`; the recipes keep a shell spelling through the front-end and no shim script; the
-  `gen=manual` round-trip gets its first tree-test cases; `--knob-files` and three callerless
-  `lib/gate.sh` helpers retire with the script.
-  **Cost while deferred:** every battery spawns `bash` for assertion D's two arms, against the
-  port's direction; a host without `bash` fails `check-graph` at exit 2; `--emit port-blockers
-  --tree` counts the file owed.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the Deferred entry its bridge-retirement
-  amendment's delta 10 names (operator direction, 2026-09-14, lead-relayed).
-  **Leads `owed-port-tail`** — operator direction, 2026-09-15, lead-relayed; authored and paired at
-  spec.
-
 - **run-consumer-smoke-port** [spec: SPEC-consumer-smoke-port.md] —
   `gate-sdk/bin/run-consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule,
   since its registration accounting resolved a gate's knobs through the bridge, and that ground is
@@ -66,9 +47,10 @@
   **Rides `owed-port-tail`** — operator direction, 2026-09-15, lead-relayed; its order against
   `run-consumer-smoke-port` settled at spec as together.
 
-- **gate-command-status-conflation-third-caller** [spec: SPEC-git-hooks-port.md]
-  [spec: SPEC-consumer-smoke-port.md] — a third call site conflates `gate_command`'s harness-error
-  exit with a resolution failure, and its guard for the real case is dead.
+- **gate-command-status-conflation-third-caller** [spec: SPEC-consumer-smoke-port.md] — a third
+  call site conflates `gate_command`'s harness-error exit with a resolution failure, and its guard
+  for the real case is dead. Its `gen-pre-commit.sh` half landed by deletion in
+  `gen-pre-commit-port`; the `acct_probe` half rides the consumer-smoke port.
   **Both defects read off the source at this drain rather than cited.** In
   `gate-sdk/bin/run-gate-tests.sh`, `run_case` reaches `gate_command` through a PROCESS
   SUBSTITUTION, so the function's exit 2 for a harness error — an absent dispatch binary —
@@ -4791,5 +4773,6 @@
 
 - amendment-reader-roster-undercount
 - amendment-update-target-overcount-undetected
+- gen-pre-commit-port
 
 ## Lessons Learned

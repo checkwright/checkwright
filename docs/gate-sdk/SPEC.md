@@ -462,7 +462,7 @@ gate-sdk lists four: the two locators, `GATE_SDK_GATES_DIR` and `GATE_SDK_ROOT`,
 the two execution settings the runner reads from its own environment,
 `GATE_SDK_JOBS` and `GATE_SDK_VERBOSE` (§run-gates). None is a row, each counts
 among `check-docs-cmd`'s static names, and none reaches a knob file in the
-`--knob-files` derivation.
+knob-file derivation.
 
 **The environment beats the file, on purpose.** A shell config's own spelling
 decided, and a bare assignment won, so a harness could not make a knob
@@ -662,9 +662,10 @@ two builtins:
 
 Both are no-ops on a single-dialect host, and both are the same `-P` crossing the
 idiom above already rules — applied to the shell's cwd rather than to a name.
-`gate-sdk/bin/gen-pre-commit.sh` is the site this was written from: it is the one
-entry point that spells a kit root **relative to** a repo root, and its
-refusal on a Windows runner reported only that the generator "failed". A script
+The idiom was written from the shell hook generator, since ported
+(§gen-pre-commit): it was the one entry point that spelled a kit root **relative
+to** a repo root, and its refusal on a Windows runner reported only that the
+generator "failed". A script
 that merely `cd`s to a root and reads files under it is dialect-tolerant by the
 consumption predicate below and owes no anchor.
 
@@ -951,7 +952,7 @@ open to it either. It fits no row of a partition this section calls total, which
 makes its placement here a defect in the emitting default rather than a case the
 partition widens for — `check-workflow-tiering` reddens on it, correctly, in any
 consumer that registers the gate under kit defaults. Its home is the **gates
-dir**, `<gates-dir>/CHECK-GRAPH.html`, on three grounds: `gen-pre-commit.sh`'s
+dir**, `<gates-dir>/CHECK-GRAPH.html`, on three grounds: the generated
 hook is already a generated projection gate-sdk owns and already lives there, so
 the two artifacts sit under one owner instead of straddling two directories; the
 gates dir is a root entry every consumer allowlists anyway, so no adopter pays a
@@ -1979,7 +1980,7 @@ case runs one argv, so it selects one mode; a member none of whose cases selects
 mode that reaches a spawn is observed spawning **nothing**, and the subset
 assertion is vacuous over it — the undeclared spawn A exists to catch is caught
 only where a case reaches the branch that makes it. `check-graph` is the live
-instance (§gen-pre-commit), and it is the shape to look for: a member whose
+instance (§check-graph), and it is the shape to look for: a member whose
 fixture pair is deliberately narrowed to one hermetic assertion. What holds such a
 member is whatever behavioural driver reaches the branch, which is a different
 oracle and not this one. Test **B** — no `Command` construction
@@ -1995,10 +1996,11 @@ be unbuilt to generalize.
 use.** Shipped members declare this way — `check-action-pinning` and
 `check-action-gh-repo` among them — so the format below is specified against
 shipping files rather than against an intended one. Its reason does
-not expire with the port that introduced it: the installer's `init` runs
-`gen-pre-commit.sh --write` in the *consumer* tree, so the manifest must stay
-readable **with no build and no execution**, and that constraint only
-strengthens as more gates port.
+not expire with the port that introduced it: the installer's `init` generates
+the hooks in the *consumer* tree by reading every member's manifest as text
+(§gen-pre-commit), so the manifest must stay readable **with no build and no
+execution** of the member it declares, and that constraint only strengthens as
+more gates port.
 
 **Annotations partition by reader, and the partition is a rule.**
 
@@ -2024,9 +2026,10 @@ same. The same property is what keeps the deferred consumer-payload question
 tractable: a descriptor discloses a gate's *shape* without its *predicate*.
 
 Two shapes were refused, each on a constraint rather than on taste. **The binary
-emitting its own manifest** would make hook generation depend on executing the
-consumer's own binary, but `init` runs `gen-pre-commit.sh --write` in the
-*consumer* tree; keeping the manifest as tracked text is what makes the seam
+emitting its own manifest** would make hook generation depend on what the
+consumer's placed binary compiled in, but `init` generates the hooks in the
+*consumer* tree from every member's tracked declaration, a consumer's own `.sh`
+shadow included; keeping the manifest as tracked text is what makes the seam
 payload-neutral by construction. **A shell stub carrying the manifest and
 exec'ing the binary** would stay inside the `*.sh` corpora of `check-shellcheck`,
 `check-comment-tier`, `check-gate-output` and the rest, which would then scan a
@@ -2044,17 +2047,16 @@ The manifest grammar:
 - `couples=` — the surfaces the gate binds (comma-separated globs). **Two tokens
   are special, `kit:<glob>` and `knob:<NAME>`**, and the closed prefix set is held
   in one place — `registry::COUPLES_PREFIXES` — because the prefix is recognised by
-  exact literal match in four independent readers with no shared routine, and a
+  exact literal match in three independent readers with no shared routine, and a
   prefix one reader knows and another does not falls through as an inert literal
-  glob with the trigger silently lost. The four are `gate_expand_couples_var` in
-  `lib/gate.sh` (feeding `gen-pre-commit`'s hook emission),
-  `registry::expand_couples` (feeding `check-graph`, the graph emitter,
+  glob with the trigger silently lost. The three are
+  `registry::expand_couples` (feeding hook emission, `check-graph`, the graph emitter,
   `check-gate-substrate-parity` assertion G, `port-blockers` and `run-gates --for`),
   `check-reads-couples`' consumption path — which **calls the shared reader rather
   than carrying its own copy**, the copy having been deleted rather than taught the
   second prefix — and `check-graph`'s `valid_glob_token`, whose prefix set is the
   same constant so the validator cannot admit a set the resolvers do not recognise.
-  **That fourth reader also fixes when a *third* prefix may first be written
+  **That third reader also fixes when a *third* prefix may first be written
   down, and the answer is awkward enough to state:** `valid_glob_token` runs only
   inside `validate_amend_manifest`, over a `# graph:` manifest embedded in a
   `SPEC-*.md` amendment body, and it admits `[A-Za-z0-9._*?/-]` after stripping at
@@ -2764,7 +2766,7 @@ have to move first is that **assignment**, not this section.
 
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
-`--list`, `--reads`, `--needs`, `--knob-files`, `--source-stamp`,
+`--list`, `--reads`, `--needs`, `--source-stamp`,
 `--guard-lib-parity`, `--install`, `--help`, and the installer's five adopter
 verbs — `--init`, `--doctor`, `--diff`, `--update` and `--uninstall`
 (installer/README.md §The verbs) — plus the
@@ -3154,7 +3156,7 @@ member does. The arm stays the only entry point into the crate, and what the cla
 forbids is a *second* entry point into the emission path, not a caller.
 **So the family choice is forced for any tool that needs configuration at all.**
 Only an **arm table** member carries a declared knob roster: a hardcoded top-level
-flag receives no row in the arm table, so `--knob-files`, the couples check and
+flag receives no row in the arm table, so the knob-file derivation, the couples check and
 the substrate-parity check cannot see what it reads. A configured tool ported as
 a top-level flag therefore reads knobs no declaration accounts for — which is not
 a calibration between two workable shapes but the difference between a held read
@@ -3243,9 +3245,8 @@ member (§The knob file). It reads the crate's static resolution and is the only
 producer of the value a shell reader needs: no bash code parses a knob file or
 recomputes a default, which a second producer would be (§The port-candidate
 criteria, criterion 6), the pre-binary accessors aside (§lib/gate.sh). Its readers
-are named: `lib/gate.sh`'s `gate_knob_values`, through which the couples expander,
-the prune-set load and `bin/gen-pre-commit.sh`'s hooks-directory read reach it
-(§lib/gate.sh), and `guard-kit/lib/guard.sh`'s knob load (guard-kit/SPEC.md §The
+are named: `lib/gate.sh`'s `gate_knob_values`, through which the prune-set load
+reaches it (§lib/gate.sh), and `guard-kit/lib/guard.sh`'s knob load (guard-kit/SPEC.md §The
 guard framework), beside drift-kit's example `templates/kpi-deprecated-surface.sh`,
 a plugin reading two canon-kit knobs. It
 is a second arm rather than an argument form of `--emit knob-roster`, since one arm
@@ -3580,7 +3581,7 @@ answers to a caller this project wrote.
 **The family is forced, not chosen.** The forced-family test above settles it:
 these members read a consumer's own rosters and paths — a read-only dispatch-type
 roster, a verdict binary, a liveness reader — out of the owning kit's config. A
-hardcoded top-level flag receives no row in the arm table, so `--knob-files`, the
+hardcoded top-level flag receives no row in the arm table, so the knob-file derivation, the
 couples check and the substrate-parity check cannot see what it reads. So every
 member is an **arm table** member, and its knobs are declared on its row.
 
@@ -3829,7 +3830,7 @@ that answers each is the one whose corpus matches its question.
    **The literal value is a proxy for that reason, not a bar, and a
    `tier=commit-msg` member satisfies it in full.** Such a member lands in the
    generated **`commit-msg`** hook, which `check-graph` holds against
-   `--emit-commit-msg` on identical terms, so the end-to-end proof this criterion
+   its emission on identical terms, so the end-to-end proof this criterion
    exists for is available on the same terms. What the criterion actually names is
    *lands in a generated hook `check-graph` holds*; the two came apart at the first
    `commit-msg` port and the adjudication is recorded at §The second budget batch,
@@ -3924,7 +3925,7 @@ that answers each is the one whose corpus matches its question.
    gate anywhere, which is why this predicate is stated here rather than reasoned
    out per port.** Assertion C's derivation reported
    `check-template-registry-parity` substrate-sensitive: a `kit:` token expands
-   **once per kit root** (`gate_expand_couples_var`), so `kit:*/*.sh` is
+   **once per kit root** (`registry::expand_couples`), so `kit:*/*.sh` is
    `<root>/*/*.sh` for every root, and it covered every `.sh` still declaring a
    registry member under **any** kit's `checks/` — a shrinking set named by its
    shape rather than by a member or a root, because a port empties it one file at
@@ -4455,8 +4456,8 @@ that answers each is the one whose corpus matches its question.
    **`gate_staged_matches` is the second worked instance of that road, and it
    arrived from the opposite direction — a port *creating* the twin rather than
    inheriting one.** §run-gates rules `--for` "identical to the generated hook's
-   staged-path matching", and the hook's copy is `bin/gen-pre-commit.sh`'s
-   verbatim awk splice of that function's body. Moving `--for` into the `--run`
+   staged-path matching", and the hook's copy is the hook emitter's
+   verbatim splice of that function's body (§gen-pre-commit). Moving `--for` into the `--run`
    arm made the matcher two implementations with live consumers on both sides,
    which is the *unless* clause exactly. The discharge is the same standing
    comparison: one canned corpus of glob/path pairs fed to `gate_staged_matches`
@@ -4983,8 +4984,7 @@ judgment call.
   ported. The field's live holders sit outside that registry: it
   reaches any tracked script (§The `# graph:` manifest), and this tree's plain
   scripts declare on it in a count only §port-blockers' `--tree` trailer is
-  authority for — the hook generator on criterion 6's single-producer rule
-  (§gen-pre-commit), a consumer's measured-claim emitter on a provenance ground
+  authority for — a consumer's measured-claim emitter on a provenance ground
   (§port-blockers), and the whole consumer-smoke class on the ruling
   at §Consumer smoke, *The port disposition*.
   Scoping the sentence to the registry is what keeps it true of a corpus that has
@@ -6003,14 +6003,14 @@ literal value is a proxy rather than a bar.** It reads `tier=precommit`, and its
 stated reason is that the member *lands in the generated hook, so a green
 `check-graph` after the port is end-to-end proof the manifest survived the
 substrate change*. A `commit-msg` member lands in the generated **`commit-msg`**
-hook, which `check-graph` holds against `--emit-commit-msg` on identical terms,
+hook, which `check-graph` holds against its emission on identical terms,
 so the criterion's purpose is met in full — the batch's first member is where the
 literal value and the purpose come apart. **The dispatch was already there, and
 the assumption ran the other way first:** the generated `commit-msg` hook emits
 `run_gate <name> <declaration>.sh "$msg_file"`, which reads as a shell-only path
 and would owe a new emitter arm. It does not — that argv is built through the
-same `command_rel` → `gate_command` path the pre-commit emitter uses, and
-`gate_command` is what emits `<binary> <name>` for a `.gate` member. One emitter, one
+same registry resolution the pre-commit emitter uses, and that resolution is what
+emits `<binary> <name>` for a `.gate` member. One emitter, one
 resolver, both tiers; the message-file positional lands after the subcommand name
 and reaches the gate module's argv slice unchanged. Recorded because a member the
 criterion's literal text appears to bar, and does not, reads as a rule being bent
@@ -8004,8 +8004,8 @@ things ship, each because withholding it would break something the product
 needs:
 
 - **The `.gate` descriptor**, because its manifest readers must work with no
-  build and no execution — the installer's `init` runs `gen-pre-commit.sh
-  --write` in the consumer tree (§The `# graph:` manifest).
+  build and no execution — the installer's `init` generates the hooks from them
+  in the consumer tree (§The `# graph:` manifest).
 - **The `# spec:` pointer and its SPEC section**, because a gate that goes red
   without an explicable invariant is an unactionable block, and an unactionable
   block is how a blocking gate turns into a bypassed one.
@@ -8917,8 +8917,8 @@ It gives a gate author the fail-closed guard `fail_closed`, the walk adapters
 `GATE_SDK_PRUNE_DIRS` names, plus whatever `GATE_SDK_PRUNE_EXTRA_DIRS` appends),
 the registry helpers that resolve a check consumer-first across kit dirs
 (`gate_resolve`, `gate_kit_roots`, `gate_check_dirs` — the multi-kit resolution
-path other kits' gates ride), and the `# graph:` manifest readers
-(`gate_expand_couples` and its siblings §The `# graph:` manifest). It resolves no
+path other kits' gates ride), and the staged-path matcher `gate_staged_matches`
+the generated hook splices (§run-gates). It resolves no
 knob value of its own beyond the pre-binary accessors below: every other read asks
 the binary. How each derives its result lives in the source; the invariants a
 reader needs outlive the refactor that renames a helper:
@@ -9103,16 +9103,15 @@ same answer:
   `.gate` **within a dir**, which is what preserves registry-plus-shadowing: a
   consumer shadowing a kit's ported gate with its own shell script still wins.
   Every text reader is unchanged by the second spelling, because
-  `gate_manifest_field` greps the manifest out of whatever path it is handed and
-  has never required the file to be shell. A dir carrying both spellings for one
+  `registry::manifest_line` reads the manifest out of whatever path it is handed
+  and has never required the file to be shell. A dir carrying both spellings for one
   name is ambiguous dispatch and is red (§check-gate-substrate-parity assertion
   A), never resolved by ordering.
 - `gate_command` returns the **invocation argv**, one element per line: the
   one-element `<dir>/<name>.sh`, or the two-element `<binary> <name>`, and never
   an `env` prefix: the binary reads its knobs itself. Its
-  callers are the execution sites: gate-sdk's own — §run-gates, §run-gate-tests,
-  and §gen-pre-commit, which does not execute the argv but *emits* it into the
-  hook — and, since the lifecycle-kit cohort, **a kit's own `bin/` and `smoke/`**,
+  callers are the execution sites: gate-sdk's own — §run-gates and §run-gate-tests
+  — and, since the lifecycle-kit cohort, **a kit's own `bin/` and `smoke/`**,
   which reach it for the same reason and are the first callers outside the test
   lane. The contract they read is the one already stated here, with one asymmetry
   worth naming where the argv is: a caller that resolves and executes from
@@ -9135,7 +9134,7 @@ same answer:
 **A member's declared knobs are the crate's registry data**, off which a member
 cannot compile: a `.gate` member's registry row, a non-gate arm's row in the arm
 table, a hook member's row in the hook table. The binary reads them in process, so
-`--knob-files`, `check-reads-couples` and `check-gate-substrate-parity` hold what a
+the knob-file derivation, `check-reads-couples` and `check-gate-substrate-parity` hold what a
 member reads against what it declares. That is the same
 *registry-data-held-to-executed-behavior* shape as `--reads`.
 
@@ -9150,15 +9149,13 @@ returns every `knob:` token's name the descriptor corpus carries, derived from t
 surface the names are written on, so a newly written token cannot be forgotten, and
 a unit test holds each name to a static kit's ownership.
 
-`--knob-files <check-dir>... -- [<gate-name>...]` prints one `<gate-name>`⇥`<path>`
-line per derived knob file, for the named members or, with none after `--`, for every
-registry member. The check dirs are the resolve dirs its caller already holds, gates
-directory first, because the sentinel's expansion and the staged refusal read the
-descriptor corpus. A member deriving none prints nothing, and an environment-only
-name (§The knob file) reaches no knob file. A missing `--`, no check dir, a name the
-registry does not carry, or a `mode=staged` member that reaches a static kit is exit
-2. It reads no knob; a caller whose dirs differ from the crate's reddens
-`check-graph` assertion D.
+The derivation, `registry::knob_files`, answers for one member over the resolve dirs
+its caller already holds, gates directory first, because the sentinel's expansion and
+the staged refusal read the descriptor corpus. A member deriving none gets nothing, an
+environment-only name (§The knob file) reaches no knob file, and a `mode=staged`
+member that reaches a static kit is refused. Its callers are the trigger readers
+§The `# graph:` manifest names, each in process: `run-gates --for`, `check-graph`'s
+manifest loop, the graph emitter and the hook emitter.
 
 **So a knob has exactly one producer: its owning kit's defaults table in the
 crate, under that kit's knob files** (§The knob file). Every kit is static, so
@@ -9170,12 +9167,9 @@ name no static kit owns with *X is not a statically owned knob*, so no reader
 bypasses it. A shell caller reads through `gate_knob_values`, which runs the
 binary's `--emit-knob-values` arm directly, so no bash recomputes a default; the
 pre-binary accessors above are the one admitted second holder. A `knob:` token
-takes its members from that arm too: `gate_expand_couples_var` reads every token
-the descriptor corpus carries in one call, once per process, held by name, and
-reads the kit roots from `--emit kit-roots` once beside them. The shell consumer of
-the expander is hook generation's trigger expansion (§gen-pre-commit), and the
-crate's expander, which `run-gates --for` selection rides, reads through
-`knobs::wire`, so the generated hook and the runtime selector read one value. The
+takes its members from `knobs::wire` too: `registry::expand_couples` is the one
+expander, and hook generation (§gen-pre-commit) and `run-gates --for` selection
+both ride it, so the generated hook and the runtime selector read one value. The
 rule is stated here because the sites that rely on it all cite it to this section:
 §The port-candidate criteria's criterion 6, §Meta-gate conservation's
 `check-knob-default-coupling` row, §check-core-files' root-set paragraph and
@@ -9252,7 +9246,8 @@ exactly this to pin every kit at one empty file.
 **A compiled member that must reach a file inside gate-sdk** has **no
 `BASH_SOURCE`** to find it by, and reads `walk::sdk_root()`, the `GATE_SDK_ROOT`
 locator (§Layout and configuration): `check-graph`'s assertion D is the worked
-instance, spawning `bin/gen-pre-commit.sh`, which is shell (§gen-pre-commit).
+instance, reading `lib/gate.sh`'s matcher body to splice into the hook it emits in
+process (§gen-pre-commit).
 The kit-root set is not a substitute, because `GATE_SDK_KIT_DIRS` may narrow it to
 a consumer's own tree — which is exactly the configuration a sandboxed fixture runs
 under.
@@ -9456,7 +9451,7 @@ read — doctrine-kit's declared-trim round-trip (doctrine-kit/SPEC.md
 pushed down here. A preservation parameter on the installer writer would ship
 one kit's marker vocabulary to every consumer of a generic injector, which is
 the provenance seam this split keeps intact; the caller-side shape is the one
-`bin/gen-pre-commit.sh` already uses for its `gen=manual` regions. So a second
+the hook emitter already uses for its `gen=manual` regions (§gen-pre-commit). So a second
 injector adds no second copy of the replace logic — every marker-bounded
 projection in the tree rides this module, the `--install-doctrine` and
 `--install-lifecycle` arms among
@@ -9866,8 +9861,8 @@ own knobs from the knob files.
   replacing one.
 
 **No dispatch path carries an `env` prefix.** The arm hands each child the
-invoking environment as it stands, and `gate_command` emits no prefix, so the
-generated hook's baked argv is the bare `<binary> <name>` too (§gen-pre-commit).
+invoking environment as it stands, and the hook emitter bakes no prefix, so the
+generated hook's argv is the bare `<binary> <name>` too (§gen-pre-commit).
 
 **A child's two streams merge into one capture file rather than two pipes**, and
 the merge is two handles on one file description, so they share an offset and
@@ -10040,7 +10035,7 @@ failure class is structurally absent there, and the runner's shared
 dispatch-stderr file retired with the branch that read it. The front-end is no
 longer a caller either: the stub locates the binary and execs, and parses no
 argv out of a stream at all. The rule stays here for every surviving
-caller — the hook generator, the fixture runner, the hook installer, the consumer
+caller — the fixture runner, the hook installer, the consumer
 smoke, the hermetic-test library and the stage-entry step among them — each of
 which parses `gate_command`'s stdout as argv and must hold the two streams apart.
 
@@ -10090,7 +10085,7 @@ single-sourced.
 `run-gates.sh --for <path> [<path>...]` is the path-scoped selector, the
 agent-callable half of the oracle-first rule: it resolves the registry exactly
 as a bare run, then runs only the members whose *effective trigger* (`trigger=`
-else `couples=`, expanded through `gate_expand_couples_var`, followed by the
+else `couples=`, expanded through `registry::expand_couples`, followed by the
 member's derived knob files per §The `# graph:` manifest) glob-matches at least
 one given repo-relative path. Registry order and per-gate output are unchanged;
 a bare `run-gates.sh` keeps its behavior. The loop this buys — edit → run
@@ -10101,11 +10096,11 @@ the `# graph:` manifest the selection reads).
 
 The match is **one matcher, defined as identical to the generated hook's
 staged-path matching**: the glob step is `gate_staged_matches` in `lib/gate.sh`,
-whose body `gen-pre-commit` emits verbatim as the hook's `staged_matches` (the
+whose body the hook emitter splices verbatim as the hook's `staged_matches` (the
 self-contained hook and the selector share one source, held in sync by
 check-graph's freshness assertion §check-graph), and both draw the `# graph:`
-fields through `gate_manifest_field` + `gate_expand_couples_var` — the single reader
-§The `# graph:` manifest names. Two hook behaviors the selector reproduces
+fields through the registry readers — `registry::manifest_fields` and
+`registry::expand_couples`, the single expander §The `# graph:` manifest names. Two hook behaviors the selector reproduces
 beyond that matcher: a `trigger=*` gate is selected for every path, and a
 `mode=staged` gate — whose hook branch matches by git pathspec (exact path or
 subtree prefix), a second mechanism — is selected exactly when that branch would
@@ -10640,7 +10635,7 @@ this suite cannot see.
 regenerates.** A kit that moved to a knob file ships `templates/<stem>-config.knobs`
 and no `<stem>-config.sh`, and its loader refuses a `<gates-dir>/<stem>-config.sh`
 or `<stem>-config.local.sh` left beside it (§The knob file). The regen reads knob
-values, since `gen-pre-commit` expands every `couples=knob:` token, so it cannot
+values, since the hook emitter expands every `couples=knob:` token, so it cannot
 run while such a file stands: seeding without this step made phase A refuse at
 exit 2, which no declaration contains. So the contract's phase A is three steps
 (docs/install.md §The upgrade contract): sync, retire each such shell config, and
@@ -10669,7 +10664,7 @@ that replacing kit directories wholesale loses nothing a consumer owns. Read
 after the regen instead, one `git status` mixes two authors, and the mixture then
 has to be unmixed by an allow-set naming every generated artifact. That set was a
 hand-held roster with no way to learn an emitter had grown an output:
-`gen-pre-commit --write` began writing a second hook, and the roster reddened on
+the hook generator's `--write` began writing a second hook, and the roster reddened on
 an artifact the contract's own step had just written — an emitter's ordinary
 evolution reported as an upgrade regression. It also could not tell a sync that
 *clobbered* the agent file from `install-doctrine` writing it, and exempted both.
@@ -10702,7 +10697,7 @@ none**. `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and
 the unchanged library and calls the function that owns the rule, which clears
 criterion 7 by this SPEC's own sentence that "a rule shelling out to
 `bash <emitter>` clears this criterion, because `bash` is on the floor" — the
-`check-graph`→`gen-pre-commit.sh` shape exactly. **The seam problem is the shell
+shape `check-graph` had while the hook generator was shell. **The seam problem is the shell
 variable, and the idiom that solves it is the one above.**
 `csmoke_vendor_and_install` communicates by setting its caller's `SCRATCH` and
 `csmoke_place_binary` by reading it, and no process boundary carries either; so
@@ -11066,15 +11061,92 @@ a second hook, `<hooks-dir>/commit-msg`, passing that hook's `$1` (the
 prospective-message file git supplies) through to the gate — the message is
 rejected before the commit exists, whereas a history scan would find a leak
 only after push, when the remedy is a destructive rewrite (that CI/history
-backstop stays with the deferred hosted-attestation rung). `--emit` prints the
-pre-commit hook to stdout and `--emit-commit-msg` the commit-msg hook
-(`check-graph` compares against each); `--write` rewrites `pre-commit` always
-and `commit-msg` only when a `tier=commit-msg` gate is registered. Adding a
-gate to either hook is manifest-only — there is no second hand-wiring step to
-drift. The emission is deterministic (no timestamps) so the committed hooks are
-byte-stable. **A `tier=commit-msg` member therefore ports with no new emitter
-arm** — both hooks resolve argv through the one `command_rel` → `gate_command`
-path — which the generated hook's own shell spelling reads against.
+backstop stays with the deferred hosted-attestation rung). The emitter is the
+binary's `--emit git-hooks` arm, taking exactly one operand: `pre-commit` prints
+the pre-commit hook, `commit-msg` prints the commit-msg hook, and `--write`
+rewrites `pre-commit` always and `commit-msg` only when a `tier=commit-msg` gate
+is registered (`check-graph` compares the committed hooks against the same
+emission, in process). Adding a gate to either hook is manifest-only — there is
+no second hand-wiring step to drift. The emission is deterministic (no
+timestamps) so the committed hooks are byte-stable. **A `tier=commit-msg` member
+therefore ports with no new emitter arm** — both hooks resolve every member's
+invocation through one registry resolution in the emitter — which the generated
+hook's own shell spelling reads against.
+
+**The arm's contract.** `native/src/emit/git_hooks.rs` owns the emission and
+exposes it as two functions over the repository root and the resolved gates dir:
+`pre_commit` returns the pre-commit hook text, and `commit_msg` returns the
+commit-msg hook text or `None` when no registered member is `tier=commit-msg`.
+That `None` is **the one statement of the commit-msg conditional**: `--write`
+reads it to decide whether to write `commit-msg`, the `commit-msg` operand reads
+it to refuse at exit 2 naming the absent tier, and `check-graph` assertion D reads
+it to decide whether a committed `commit-msg` is required — three readers, one
+emission. `--write` creates the hooks dir, sets each written file's executable
+bit where the host has one, and prints one `git-hooks: wrote <path>` line per file,
+a line a human reads and no program parses. No operand, any other operand, or a
+second operand prints `usage: --emit git-hooks pre-commit|commit-msg|--write` at
+exit 2. The arm derives the root with `git rev-parse --show-toplevel` and refuses at
+exit 2 outside a repository; assertion D takes the root it runs at. The family and
+the operand shape are forced rather than chosen: the emitter declares no exit 1, so
+the {0, 2} collapse an emitting arm makes discards nothing; a member's own
+subcommand word is an operand, never composed into the flag (§The non-gate arm);
+and `--emit docs-mirror --write` is the precedent for a document arm that writes.
+The name is `git-hooks`, the hooks dir's own default basename, because a bare
+`hooks` would read as the harness-integration `--hook` family. A caller that is
+itself shell — the kit `smoke/` recipes, `init`'s vendored step, the tree test —
+reaches the arm through the front-end, its one door to the binary; a retained
+shell generator exec'ing the arm is refused, because it would be a second spelling
+of the arm roster, the thing §The non-gate arm refuses a front-end case for.
+
+**Each emission rule has one crate source.**
+
+- **Members** — `registry::members` over `<gates-dir>/gates.list`, deduplicated in
+  first-seen order, then filtered by `tier=`.
+- **Check dirs** — the gates dir first, then each kit root's `checks/`. **The kit
+  roots are spelled relative to the repository root**, and the same root-relative
+  spelling feeds the `kit:` expansion below: a hook glob is matched against a staged
+  path, which git spells repo-relative, so anchoring at the gate-sdk root's parent
+  — the spelling the other expansion readers pass — would emit globs that never
+  match wherever the kits are not vendored at the root.
+- **Manifest fields** — `registry::manifest_line` and `registry::manifest_fields`
+  over the member's resolved declaration; a member that resolves nowhere reads every
+  field empty.
+- **Trigger** — `trigger=`, else `couples=`, expanded by `registry::expand_couples`,
+  and, unless the trigger is `*`, followed by the member's derived knob files from
+  `registry::knob_files` over the same check dirs. Globs split on `,` with one
+  trailing empty field dropped, and each is emitted single-quoted.
+- **Invocation** — `registry::resolve` over the check dirs. A `.gate` declaration
+  emits `<GATE_SDK_NATIVE_BIN> <name>` with the knob's value as resolved; a `.sh`
+  declaration emits its resolved path. A member resolving nowhere emits
+  `<gates-dir>/<name>.sh`, so a registry naming an absent member still yields a hook
+  whose `run_gate` line fails loudly at commit. **Resolution returns found or not
+  found and nothing else**: the emitter is the binary, so a `.gate` declaration
+  always emits the binary's argv, and no harness-error status exists to be
+  conflated with a resolution failure (§lib/gate.sh states that obligation for a
+  shell caller of `gate_command`).
+- **Blocks** — the unconditional `run_gate` line for a `*` trigger, the
+  `mapfile … git diff --cached` staged block for `mode=staged`, and the
+  `staged_matches` block otherwise.
+- **`gen=manual`** — the current hook's `# >>> manual: <name>` and
+  `# <<< manual: <name>` regions are read from `<hooks-dir>/pre-commit` before emission, each
+  under its opening sentinel's name. A member with a stored region re-emits it
+  verbatim, and one without re-emits the TODO placeholder line between the
+  sentinels. A committed region edited in place therefore stays fresh: the manual
+  region is the consumer's text, and assertion D compares against an emission that
+  carries it back.
+- **Matcher body** — the lines strictly between `gate_staged_matches() {` and the
+  next line that is exactly `}` in `<GATE_SDK_ROOT>/lib/gate.sh`, read as text with
+  trailing blank lines dropped. An absent function or an empty body is exit 2 naming
+  it; no `bash` is spawned to read it. This is what keeps `gate_staged_matches` a
+  live shell function with two readers — the splice, and `runner.rs`'s standing
+  cross-substrate comparison (§The port-candidate criteria, criterion 6).
+- **Header and tail** — both hooks' fixed text, carried as literals in the module;
+  each header names `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write` as the
+  regeneration command and the operand `check-graph` compares against.
+
+The emitter's knob roster is `GATE_SDK_HOOKS_DIR`, `GATE_SDK_NATIVE_BIN`,
+`GATE_SDK_KIT_DIRS` and the `registry::EVERY_COUPLES_KNOB` sentinel, held to what
+the module reads by the crate's arm-knob test.
 
 **An emitted trigger set is knob-derived wherever a walk is, so a knob edit stales
 the hook through the trigger as well as through the baked invocation.** The
@@ -11096,76 +11168,9 @@ projection out of one (`CANON_KIT_EMBED_LANGS`' `kind|fence-langs|file-globs`
 triples) is outside the form and takes no token. The set the rule reaches is
 therefore derived per walk, and a knob added later is reached with no edit here.
 
-**This generator is owed.** Its `no-port` declaration rested on criterion 6's
-single-producer rule: the hook baked a knob the owning kit's shell library
-resolved, so a crate-side emitter would have been the second producer. The crate is
-now every knob's one producer, and that ratification was reopened by the authority
-that gave it, so the ground is gone and the declaration with it. The port is the
-emit-arm path this section once declined for now, moving `--emit` into the binary,
-and its own queue entry owns it. Until it lands, `check-graph` assertion D keeps
-spawning `bash bin/gen-pre-commit.sh`, declared in its `--needs` element, and
-criterion 7 still clears the spawn because `bash` is on the program floor. The
-spawn crosses back from the compiled substrate into the shell one, against the
-direction of the port, and it stays the only spawn of its shape on the crate's
-shipped gate path: criterion 7's class-(i) wrappers spawn a program because that
-program *is* the rule they assert, and this member spawns `bash` because a surface
-it reads is still shell.
-
-**The residue's disposition.** The spawn is **declared, and the declaration is what
-owns it**: this member's registry entry names `bash` in the requirement element
-`--needs` prints, so the criterion-7 roster answers for it on the compiled
-substrate exactly as the tokenizer answered for the shell form, and one floor
-filter clears it on both. Nothing new is minted and nothing else owns it. The
-answer the residue was filed with — a new shell gate owning hook parity alone,
-under born-native exception class (a), costed and refused here for minting a gate
-name, a descriptor, a fixture pair and a SPEC section to relocate an assertion
-criterion 7 already sanctions in place — is **void** rather than merely unbought,
-because born-native exception class (a) is retired (§The port-candidate
-criteria) and the refutation recorded there is that argument's own. What stays
-open is the port itself, moving `--emit` into the binary, and this residue lasts
-until it lands.
-
-**What the declaration does not cover, stated because it is the residue's own
-edge.** `--needs` names *a program the member spawns* (§The `# graph:` manifest),
-so it names `bash` and nothing the generator itself reaches for — the emitter's
-own `git`, `realpath` and `awk` sit one remove further out than the
-library-mediated requirements §port-blockers records as its second blind spot.
-Criterion 7 is cleared either way, since all four are on the floor and its own
-clause rules that a spawn target's unportedness does not reach it; what the bound
-costs is that a change to the generator's requirement set surfaces in no
-declaration, and review at the diff is what stands in for one. The declared set
-is `bash` alone, measured rather than assumed: assertion D's two generator arms —
-the second reached only where a `tier=commit-msg` member is registered — are the
-member's only spawns, the three narrow modes returning before the generator is
-resolved at all.
-
-**And the measurement is what the declaration rests on, because the executed
-oracle does not reach this member.** Unit test A observes a member over its own
-fixture cases, both of which pass `--amend-only` here, so the observed set is
-empty and the subset assertion is vacuous — the bound §The `# graph:` manifest
-states for the class, with this member as its instance. What holds the spawn is
-`check-graph-tree.test.sh`, which drives assertion D's both arms against a
-constructed mini-consumer through the real generator; that is a behavioural
-oracle and not the declaration's. So a spawn added to this member's rule reds
-nothing on the declaration side, and the narrowing above was taken from a spawn
-census over the gate's own resolved argv plus a read of every path reachable from
-its entry point, never from a green test.
-
-**The absent-`bash` branch was run rather than assumed, and it owes no wrapper
-refusal.** With that one name scrubbed off `PATH` the member exits **2** carrying
-`cannot run bash: … the check could not run; treating as failure (not clean)`,
-which is §Fail-closed contract's standing backstop doing exactly its job. A
-`proc::on_path` probe on top of it is **not** owed, and the ground is that the
-class rule such a probe satisfies has no content on this member: `on_path` exists
-so a wrapper refuses with its own message *at the shell form's own point in the
-order*, and this member's shell form was itself a bash script, which on a host
-with no `bash` did not run at all. There is no shell refusal to be at parity with,
-so building one would be inventing the thing it was supposed to match. Recorded
-so it is not re-proposed as the obvious ergonomic.
-
-**Assertion E is not one of the two arms**: it compares the coupling-graph
-artifact against an emission this member computes in process, so the generator
-sits outside its path, and the port changes assertion D's arms alone.
+**Assertions D and E both compute their emissions in process**: D compares each
+committed hook against `pre_commit` and `commit_msg`, and E compares the
+coupling-graph artifact against the graph emitter, so neither spawns a generator.
 
 **The hook's shape is ruled rather than open.** The `--run` arm makes a
 two-line `exec <binary> --run --hook` shim look available; it is **refused**, and
@@ -11192,10 +11197,10 @@ residue this refusal turns on going to zero. Once no member dispatches to
 the shim stops costing what it costs here. The refusal above is the correct
 reading **now**, not a narrower ruling standing against a wider one already made.
 
-**The hook carries no knob environment.** It resolves argv through
-`gate_command` at *generation* time and emits `run_gate <name> <binary> <name>`
-with no `env` prefix (§lib/gate.sh), so each member reads its knobs from the knob
-files when it runs. A knob edit changes the hook only through a trigger: a
+**The hook carries no knob environment.** It resolves each member's invocation
+through the registry at *generation* time and emits
+`run_gate <name> <binary> <name>` with no `env` prefix (§lib/gate.sh), so each member reads its knobs from the
+knob files when it runs. A knob edit changes the hook only through a trigger: a
 `knob:` token's expansion, or a member's derived knob-file couple (§The `# graph:`
 manifest). The one knob-derived value the hook bakes is the resolved
 `GATE_SDK_NATIVE_BIN` path, literally in each ported member's `run_gate` line,
@@ -11214,7 +11219,7 @@ walks the tracked list, not to any one of them.
 **Two hazards of this section compose, and the product is a red that belongs to
 the probing session rather than to the tree.** Driving a ported member's
 resolved argv by hand needs `GATE_SDK_NATIVE_BIN` pinned absolute, because the
-default is repo-relative (§lib/gate.sh); the same pin is what `--emit` bakes
+default is repo-relative (§lib/gate.sh); the same pin is what the emitter bakes
 into each `run_gate` line. So a session that pins the knob to hand-drive one
 member and then regenerates emits a hook carrying a machine-specific path, and
 `check-graph` reds on it — correctly, since §Layout and configuration defaults
@@ -11232,22 +11237,24 @@ so a later reader does not read the absence as a forgotten widening and re-attem
 it.
 
 Emitted argv elements are quoted **deterministically**: an element made only of
-shell-inert characters is emitted verbatim, and anything else — an element
-carrying a tab or spaces — becomes bash ANSI-C
-`$'…'`. `printf %q` is deliberately not used, because its spelling varies across
-bash versions and the committed hook must be byte-identical across clones for
-the freshness comparison to mean anything. Both emitted hooks carry the quiet-green wrapper in their
+`[A-Za-z0-9_./:=+,@%-]` is emitted verbatim, and anything else — an element
+carrying a tab or spaces — becomes bash ANSI-C `$'…'`, with backslash, single
+quote, tab and newline escaped. The hook is bash, so an element that is not
+shell-inert takes bash's ANSI-C form, and the emitter renders it with that fixed
+escape set rather than through any shell's own quoting, which is what keeps the
+committed hooks byte-identical across clones for the freshness comparison to mean
+anything. Both emitted hooks carry the quiet-green wrapper in their
 generated header (§run-gates owns the contract): each gate invocation's output
 is captured and reprinted only when that invocation fails (then the uniform
 failure report as before) or when `GATE_SDK_VERBOSE` is set, and a fully green
 hook run prints one summary line carrying its executed-invocation count. The
-wrapper lives in the emitter's heredoc, so the freshness assertion carries any
+wrapper lives in the emitter's literals, so the freshness assertion carries any
 change into the committed hooks. A `trigger=`/`couples=` `kit:<glob>` token is emitted *expanded*
-(via `gate_expand_couples_var`), so adding a kit later reddens `check-graph`
-(committed hook ≠ `--emit`) until regeneration — the freshness gate keeps the
+(via `registry::expand_couples`), so adding a kit later reddens `check-graph`
+(committed hook ≠ its emission) until regeneration — the freshness gate keeps the
 static hooks honest across a kit-set change. A member's derived knob files
-(§The `# graph:` manifest) follow its expanded trigger, read once per process from
-the binary's `--knob-files` over this generator's own check dirs (§lib/gate.sh);
+(§The `# graph:` manifest) follow its expanded trigger, read in process through
+`registry::knob_files` over the emitter's check dirs (§lib/gate.sh);
 assertion D regenerates the hook, so the hook and `--for` cannot diverge on them
 without a red.
 
@@ -11663,8 +11670,8 @@ top of it, where `bin/run-consumer-smoke.sh` composes the same call with one
   next paragraph is the whole reason for.
 
 **`couples=` is a printed column, never a key factor.** Each member's expanded
-`couples=` prints beside it, read through the same `gate_manifest_field` +
-`gate_expand_couples_var` helpers `check-graph` and the generated hook read, so
+`couples=` prints beside it, read through the same registry readers `check-graph`
+and the hook emitter read, so
 this report cannot disagree with them about what a manifest says. It is a
 **cross-check**: fusing a deliberately trigger-shaped field into a content key is
 the over-selection criterion 4 names, and burying it inside one fused key would
@@ -11860,8 +11867,9 @@ predicate rather than approximate it.
 and until this tree's first three declarations landed it had none — the column
 counted correctly and **discriminated nothing**, a file refused by a ratified
 structural ruling, a file held behind named work and a file nobody had ever looked
-at all reading the same row. §gen-pre-commit's generator is the first tracked file
-in this tree to sit squarely in the declaring class; the shell port oracle was the
+at all reading the same row. The shell hook generator, since ported
+(§gen-pre-commit), was the first tracked file in this tree to sit squarely in the
+declaring class; the shell port oracle was the
 first — and, until another file earns one, the last — to sit in the held one, and
 its hold discharged when the port landed; and a consumer's measured-claim emitter
 is the first refused on a provenance ground rather than a structural one. Recorded because a
@@ -11908,8 +11916,8 @@ stands, never an oracle about future rulings.** The objection this answers is re
 and will arrive again in the same shape at every declaration: a section that
 records an option as *declined for now rather than refuted* makes a field whose
 name says permanent read as overstating a question open on its merits.
-§gen-pre-commit's generator was the instance, declared while its ratification
-stood and moved to owed by the unit that reopened it. The field does not
+The shell hook generator was the instance, declared while its ratification stood,
+moved to owed by the unit that reopened it, and since ported (§gen-pre-commit). The field does not
 overstate, and the reason generalises past that member. Every closed ruling is
 reopenable by the authority that closed it; that is what an
 escalate-rather-than-reverse rule is *for*. If an open reopening path defeated a `# no-port:`, the field would be
@@ -12888,14 +12896,12 @@ crate's dispatch roster joined to the battery's registration.
   is still refused, and the zero-descriptor configuration is still carried in the
   bespoke test as its own case. **The roster is over subcommands
   alone**: the binary's top-level flags (`--list`, `--reads`, `--needs`,
-  `--source-stamp`, `--knob-files`) are outside it by construction, handled in the
+  `--source-stamp`) are outside it by construction, handled in the
   top-level dispatch and never entering the gate registry. Stated because the
   assertion's behavior does not change but a reader adding a further flag needs to
   know it is not a parity violation — a flag that *leaked* into `--list` would read
   here as a subcommand with no descriptor and red as a stranded implementation.
-  `--knob-files`, added by the knob-file derivation (§lib/gate.sh), is named here
-  rather than left to be re-derived: it was written against exactly this
-  paragraph's invitation to the next author. The owner column adds no further flag:
+  The owner column adds no further flag:
   it is roster **data** on a line the roster already carries, which is the whole
   reason it was taken instead of a flag.
 - **assertion C — disposition coverage.** Every substrate-sensitive member
@@ -14493,7 +14499,7 @@ gate's `trigger=` globs (trigger defaulting to couples), so editing a coupled
 surface always fires the gate; and the committed pre-commit hook, the commit-msg
 hook (when any gate is `tier=commit-msg`), and the coupling-graph projection at
 `GATE_SDK_GRAPH_ARTIFACT` (default `<gates-dir>/CHECK-GRAPH.html`) each equal
-their generator's `--emit` output, down to every emitted asset href resolving
+the emission this member computes in process, down to every emitted asset href resolving
 under the artifact's own directory. The remedy lines print the resolved artifact
 path, so a consumer that republishes it (this repo serves `docs/check-graph.html`)
 is always offered its own regenerate command; how each guarantee is asserted
@@ -14507,7 +14513,7 @@ admitted set is `registry::COUPLES_PREFIXES` rather than a second spelling of it
 (§The `# graph:` manifest). `valid_glob_token` strips at most one prefix from that
 constant and then holds the remainder to `[A-Za-z0-9._*?/-]`, so a prefix the
 resolvers recognise cannot be redded here and a prefix they do not cannot be
-admitted here. Held in one place because the alternative is a validator and four
+admitted here. Held in one place because the alternative is a validator and its
 resolvers disagreeing about a closed set, which is how a token becomes an inert
 literal glob with its trigger silently lost.
 
@@ -14526,10 +14532,11 @@ appends a member's derived knob files (§The `# graph:` manifest) to its expande
 no surface a consumer wrote. The graph emitter appends the same set, so the published
 coupling graph draws the edge a derived couple creates.
 
-**The interpreter assertion D spawns is resolved, not named** — and it is
-resolved by the **owner**, not by the call site. Assertion D spawns the bare
-literal `bash` exactly as every other spawn in the crate does; `proc::run*`
-resolves it. The name-to-treatment question lives in one governed **roster** in
+**A bare-name interpreter spawn is resolved, not named** — and it is
+resolved by the **owner**, not by the call site. The installer's `run_vendored`,
+which spawns `bash` for the vendored front-end on every `init`, is the standing
+instance: it spawns the bare literal `bash` exactly as every other spawn in the
+crate does, and `proc::run*` resolves it. The name-to-treatment question lives in one governed **roster** in
 `proc.rs`, `SYSTEM_DIR_HOMONYMS`, whose rows are a program **name** and a
 **disposition** — what a host offering that program nowhere but the system
 directory earns. `bash` **refuses**, by name, saying what was skipped and why,
@@ -14578,7 +14585,8 @@ takes a Win32 `PATH` search in which `%SystemRoot%\System32` precedes
 Git-for-Windows' `usr/bin`, and the only `bash.exe` Windows itself ships there is
 the **WSL launcher**: a dispatcher into a Linux VM that on a runner with no
 distro exits 1 saying it has no installed distributions. That, and not the
-generator, is what five consecutive Windows rounds returned on. So the resolution
+script it was handed, is what five consecutive Windows rounds returned on, when
+`check-graph` still spawned a shell hook generator. So the resolution
 walks `PATH` in the operating system's own order over the `PATHEXT` candidate set
 (§Fail-closed contract owns both), with **one rejection**: a candidate directory
 resolving inside the Windows system directory — `%SystemRoot%\System32` and its
@@ -14595,22 +14603,22 @@ a comparison that missed that would pass on every developer host and fail on the
 one host the rejection exists for. On every other target the rejection is inert:
 no candidate can match it, so no verdict changes on the platforms the battery
 runs on. When nothing survives the rejection the resolution refuses **by name**,
-saying what was skipped and why, and assertion D returns it on the `Err` arm it
-already has — a check-could-not-run verdict, exactly as an absent `bash` is
-today, arriving with a cause rather than as the bare refusal that cost a CI round.
+saying what was skipped and why, and the spawning site returns it on the `Err` arm
+it already has — a could-not-run verdict, exactly as an absent `bash` is,
+arriving with a cause rather than as the bare refusal that cost a CI round.
 
-**A generator that could not run reports why it could not run.** The hook
-guarantees are asserted by spawning the generator, and a generator dying under
-`set -e` says nothing on stdout, so the refusal used to name only the arm. It now
-carries the child's whole account of itself — exit code and both streams
-(§Fail-closed contract's widening) — because the alternative costs a full CI
-round per attempt: a Windows leg bought two rounds' worth of
+**A spawned child that could not run reports why it could not run.** A script
+dying under `set -e` says nothing on stdout, so a refusal naming only the arm
+says nothing either. The refusal carries the child's whole account of itself —
+exit code and both streams (§Fail-closed contract's widening) — because the
+alternative costs a full CI round per attempt: when assertion D still spawned a
+shell hook generator, a Windows leg bought two rounds' worth of
 `--emit failed` before the cause — one unguarded external command in the
 generator's prologue — could be read off the source instead of the log, and the
 next round then came back with the same failure and an **empty cause**,
 which is the reading that forced the second widening. Two mechanisms produced
-that emptiness and the refusal could not tell them apart: a generator diagnosing
-itself on stdout, which `stdout()` withholds on a non-zero exit, and a generator
+that emptiness and the refusal could not tell them apart: a child diagnosing
+itself on stdout, which `stdout()` withholds on a non-zero exit, and a child
 silent on stderr, which the old accessor folded to nothing. Both are closed, so
 the suffix is always present — a silent child now yields its exit code rather
 than a bare refusal.
@@ -14627,12 +14635,12 @@ the fallback is a **named non-empty refusal** rather than an empty string — a
 default that could still compose a bare refusal is the defect this paragraph
 records, not an acceptable coercion.
 
-**How that arm is exercised at all, since no fixture input reaches it.** The
-generator is resolved as `<GATE_SDK_ROOT>/bin/gen-pre-commit.sh`, so the
-failure path is observable end-to-end only by pointing that locator at a
-scratch kit root whose `bin/gen-pre-commit.sh` exits non-zero. A `good/`+`bad/`
-pair cannot reach it: the fixture varies the gate's *input*, and no input makes
-a healthy child crash.
+**How assertion D's emission-failure arm is exercised at all, since no fixture
+input reaches it.** The emitter reads the matcher body from
+`<GATE_SDK_ROOT>/lib/gate.sh`, so the failure path is observable end-to-end only
+by pointing that locator at a scratch kit root whose `lib/gate.sh` defines no
+`gate_staged_matches`. A `good/`+`bad/` pair cannot reach it: the fixture varies
+the gate's *input*, and no input makes a healthy kit root lose its library.
 
 Dual-couple manifest: the artifact path is a knob, but check-graph's own
 `# graph:` manifest is kit-shipped static text a consumer never edits, so it
@@ -14702,30 +14710,23 @@ statically resolvable slice of that parity is carried by its sibling
 the author's duty under §The `# graph:` manifest.
 
 Port sizing, **corrected at the port**: the earlier 929-line figure
-counted the generator, and `bin/gen-pre-commit.sh` (297) was **not** in that
-port (§gen-pre-commit). The ported surface is `check-graph.sh`'s 632 lines; the
-generator stays shell, owed its own port, and assertion D keeps
-spawning it for `--emit` and `--emit-commit-msg`. The spawn-invisibility rule the
-old figure illustrated still holds for a generator that *is* in a port's scope —
-what was wrong was the assumption that this one was.
+counted the generator, and the 297-line shell generator was **not** in that
+port. The ported surface was `check-graph.sh`'s 632 lines; the generator ported
+later as the `--emit git-hooks` arm (§gen-pre-commit), and assertion D reads its
+emission in process. The spawn-invisibility rule the old figure illustrated
+still holds for a generator that *is* in a port's scope — what was wrong was the
+assumption that this one was.
 
 **The runtime paragraph is corrected against measurement, and the correction
-removes an argument rather than adjusting it.** This member is among the
-battery's slowest, and the reason is the two spawns that do not port. Re-measured
-against this tree after the shell knob resolution began batching by owning kit,
-median of three: the member ran 4546 ms, of which `gen-pre-commit.sh --emit` was
-4153 ms and `--emit-commit-msg` 219 ms — so the two spawns were very nearly the
-whole of it, and the `--emit` figure was that resolution for every registered
-member, then once per owning kit rather than once per declared knob. The batching
-is where the fall came from: the same three numbers read 7629 / 5651 / 210 before
-it. **The shape of the finding is unchanged and that is the point** — the spawns
-dominate whatever their price, so a cheaper resolution moves the figure and not
-the argument. What the port
-banks is the graph emission and the per-member manifest read, in process. The
-earlier claim that *the port makes those calls in-process* was false as written:
-it never could, under the generator's own cause for staying shell. The standing
-ruling that every portable gate ports is the argument for this member's port and
-it needs no other; a runtime dividend was never one. Per-gate timings stay owned by the
+removes an argument rather than adjusting it.** While assertion D spawned the
+shell generator, the member was among the battery's slowest, and the two spawns
+were the reason: median of three, it ran 4546 ms, of which the pre-commit emission
+was 4153 ms and the commit-msg emission 219 ms. The hook port moved both emissions
+in process, and the member now runs in tens of milliseconds. **The shape of the
+finding is unchanged and that is the point** — the spawns dominated whatever
+their price, so a cheaper resolution moved the figure and not the argument. The
+standing ruling that every portable gate ports is the argument for this member's
+port and it needs no other; a runtime dividend was never one. Per-gate timings stay owned by the
 consumer's timing baseline and the close-stage runtime review that reads it,
 never by this line.
 
@@ -14841,9 +14842,8 @@ on a live tree that is green because it is clean. The widening therefore landed
 
 - The `good/`+`bad/` pair carries assertion **G and only G**. A case runs one
   argv, so it selects one mode, and the whole-tree default reaches D and E —
-  which a `good/` case cannot satisfy, since
-  `gen-pre-commit.sh` cds to `git rev-parse --show-toplevel` before resolving the
-  gates dir, and satisfying E would take a committed `CHECK-GRAPH.html` inside
+  which a `good/` case cannot satisfy, since D would take a committed generated
+  hook inside the case dir, and E a committed `CHECK-GRAPH.html` inside
   `gate-tests/`. Both are the second-copy-of-a-generated-file this corpus
   refuses. **`--amend-only` is not the *only* mode that escapes D and E, and this
   clause once said it was.** `--refs-only` reaches H alone and `--cap-only`
@@ -14856,9 +14856,12 @@ on a live tree that is green because it is clean. The widening therefore landed
 - Assertions **A through F** take a constructed mini-consumer in
   `check-graph-tree.test.sh` — a `mktemp`'d git repo carrying a registry, five
   member declarations in **both spellings**, and a vocabulary file. Its `.gate`
-  member is `tier=align-only`, which keeps it out of both generated hooks and so
-  out of `gate_command`'s reach, letting the sandbox exercise the descriptor
-  branch of assertion A's resolution with no binary present. The baseline case is
+  member is `tier=align-only`, which keeps it out of both generated hooks, letting
+  the sandbox exercise the descriptor branch of assertion A's resolution with no
+  binary present. A sixth, `gen=manual` member carries the round-trip's three
+  cases: the placeholder the first `--write` emits, a hand-filled region a second
+  `--write` carries back byte for byte, and a region edited in place without
+  regenerating, which assertion D reads back and stays clean on. The baseline case is
   the parity oracle for the branch set: it greens only if all four coverage
   branches and all three cycle-valve branches clear, so a branch that stops firing
   reds rather than passing vacuously.

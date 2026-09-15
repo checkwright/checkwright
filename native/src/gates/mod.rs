@@ -128,7 +128,7 @@ pub type RootDecl = (&'static str, &'static str, &'static str, &'static str);
 // walk roots, the data `--reads` prints, each paired with the name of the knob whose value
 // filters that root by basename — empty for an unfiltered root, un-omittable by construction.
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the fourth element is the member's declared knob
-// reads, the data `--knob-files` derives its couples from. Un-omittable by the same construction.
+// reads, the data the knob-file derivation reads its couples from. Un-omittable by the same construction.
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the fifth element is the declaring
 // root, `--list`'s second column: a kit's directory basename, or `-` where the consumer's own
 // gates directory declares the member. Un-omittable, and held to the tree by the test below.
@@ -1521,9 +1521,8 @@ pub const REGISTRY: &[GateEntry] = &[
     // the reason its shell original was classified `?`: assertion G's scan root is the member's own
     // first argument with a default, the variable-first-argument shape §check-reads-couples calls
     // undecidable.
-    // spec: gate-sdk/SPEC.md §gen-pre-commit — `bash` is the whole declared requirement: assertion
-    // D's two generator arms are this member's only spawns, measured, and the generator's own
-    // programs ride the floor behind them rather than joining this element.
+    // spec: gate-sdk/SPEC.md §gen-pre-commit — no declared requirement, by spawn census: assertion D
+    // computes both hooks in process and takes its root from the working directory.
     (
         "check-graph",
         graph::run,
@@ -1533,6 +1532,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_HOOKS_DIR",
+            "GATE_SDK_NATIVE_BIN",
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_GRAPH_ARTIFACT",
             "GATE_SDK_GRAPH_THEME_DIR",
@@ -1542,7 +1542,7 @@ pub const REGISTRY: &[GateEntry] = &[
             crate::registry::EVERY_COUPLES_KNOB,
         ],
         "gate-sdk",
-        &[("bash", "")],
+        &[],
     ),
     (
         "check-gate-fail-closed",

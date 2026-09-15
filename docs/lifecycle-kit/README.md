@@ -55,7 +55,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the
-   generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
+   generated pre-commit hook: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
 
 2. Give the queue file its header and each evidence file its skeleton — the
    stage-stamp file and the lesson-disposition file

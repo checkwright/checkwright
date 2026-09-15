@@ -2,7 +2,7 @@
 // session transcript: a fixed marker table, first match wins, whole-line classification, and one
 // keyed line appended to the trend log per measured session.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member and not a hardcoded flag,
-// because the meter reads consumer knobs a hardcoded flag would hide from `--knob-files`; and
+// because the meter reads consumer knobs a hardcoded flag would hide from the knob-file derivation; and
 // `Arm::Emit` rather than `Arm::Run`, because exit is always 0 so no `1` is load-bearing.
 
 pub const KNOBS: &[&str] = &[

@@ -39,7 +39,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
+   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
    `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the
    Pages parser); a consumer without a published docs site simply omits it.
 

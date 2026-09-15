@@ -2,11 +2,11 @@
 # Behavioral test of check-graph's whole-registry path — assertions A (manifest
 # well-formedness), B (couples<->trigger parity), C (the cycle-valve rule),
 # D (pre-commit + commit-msg hook freshness), E (graph-artifact freshness) and
-# F (emitted asset hrefs resolve). None is reachable from the good/bad pair: the
-# pair's cwd is a case dir and a `good/` case must exit 0, while D and E always
-# run on the full path — D's `gen-pre-commit.sh --emit` cds to
-# `git rev-parse --show-toplevel`, so satisfying it from a case dir would need a
-# committed byte-copy of the real repo's generated hook inside gate-tests/.
+# F (emitted asset hrefs resolve), and the `gen=manual` round-trip. None is
+# reachable from the good/bad pair: the pair's cwd is a case dir and a `good/`
+# case must exit 0, while D and E always run on the full path, so satisfying D
+# from a case dir would need a committed byte-copy of the real repo's generated
+# hook inside gate-tests/.
 # So the corpus is a mini-consumer tree built here and thrown away: the port
 # cannot add or remove a file in it, which is the property criterion 4 asks of a
 # gate-source auditor's oracle (gate-sdk/SPEC.md §The port-candidate criteria).
@@ -20,7 +20,6 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
 CHECKS="$DIR/checks"
-GEN="$DIR/bin/gen-pre-commit.sh"
 
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
@@ -79,7 +78,7 @@ VOCAB
 }
 
 regen() {  # regen() -> rewrite both hooks and the graph artifact from the manifests
-    ( cd "$repo" && bash "$GEN" --write >/dev/null 2>&1 ) || return 1
+    ( cd "$repo" && bash "$DIR/bin/run-gates.sh" --emit git-hooks --write >/dev/null 2>&1 ) || return 1
     ( cd "$repo" && bash "$DIR/bin/run-gates.sh" --emit graph >scripts/CHECK-GRAPH.html 2>/dev/null ) || return 1
 }
 
@@ -187,9 +186,40 @@ regen || true; run
 want_green f-asset-href-resolves
 unset GATE_SDK_GRAPH_THEME_DIR
 
+# --- gen=manual: the placeholder, the round-trip, and a region edited in place ---
+manual_member() {
+    seed
+    printf 'check-eta\n' >>"$repo/scripts/gates.list"
+    member check-eta 'couples=docs/site.md trigger=docs/*.md dir=one valve=none tier=precommit gen=manual'
+}
+hook="$repo/scripts/git-hooks/pre-commit"
+todo='    # TODO: fill this manual region, then re-run --emit'
+
+manual_member; regen || true; run
+if ! grep -qxF -- "$todo" "$hook" || ! grep -qxF '# >>> manual: check-eta' "$hook" \
+    || ! grep -qxF '# <<< manual: check-eta' "$hook"; then
+    echo "  FAIL [manual-placeholder]: the hook lacks the sentinels around the TODO line"; fails=$((fails + 1))
+fi
+want_green manual-placeholder
+
+manual_member; regen || true
+filled="$(awk -v todo="$todo" '$0 == todo { print "    echo hand-filled"; print ""; print "    run_gate check-eta scripts/check-eta.sh"; next } { print }' "$hook")"
+printf '%s\n' "$filled" >"$hook"
+before="$(cat "$hook")"
+regen || true; run
+if ! grep -qxF '    echo hand-filled' "$hook" || [[ "$(cat "$hook")" != "$before" ]]; then
+    echo "  FAIL [manual-round-trip]: a second --write did not carry the filled region back byte for byte"; fails=$((fails + 1))
+fi
+want_green manual-round-trip
+
+manual_member; regen || true
+edited="$(awk -v todo="$todo" '$0 == todo { print "    echo edited-in-place"; next } { print }' "$hook")"
+printf '%s\n' "$edited" >"$hook"
+run; want_green manual-stale-region
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-graph-tree.test: $fails case(s) failed"
     exit 1
 fi
-echo "check-graph-tree.test: ok (constructed consumer tree: A/B/C/D/E/F, both declaration spellings, 4 parity branches, 3 cycle-valve branches, 15 cases)"
+echo "check-graph-tree.test: ok (constructed consumer tree: A/B/C/D/E/F, both declaration spellings, 4 parity branches, 3 cycle-valve branches, the gen=manual round-trip, 18 cases)"
 exit 0

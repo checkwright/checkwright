@@ -39,7 +39,7 @@ hook approximation and the session-context template also expect
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the
-   generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
+   generated pre-commit hook: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
    The memory-off gates are inert until you opt in — `check-settings-pins`
    skips clean with no pins file, so create `settings-pins.conf` (one
    `<path> = <expected JSON>` per line, the path a dot/bracket path expression

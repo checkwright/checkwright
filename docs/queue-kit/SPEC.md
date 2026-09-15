@@ -904,7 +904,7 @@ The queue-kit knobs it declares resolve in process from the kit's static table,
 and `GATE_SDK_QUEUE_FILE`, the input `QUEUE_KIT_QUEUE_FILE`'s default derives
 from, resolves from gate-sdk's, so a consumer override reaches the arm through its
 knob file. That is why it is a table member rather than a hardcoded top-level
-flag: a hardcoded flag has no row, so `--knob-files`, `check-reads-couples` and
+flag: a hardcoded flag has no row, so the knob-file derivation, `check-reads-couples` and
 `check-gate-substrate-parity` cannot see that it reads `QUEUE_KIT_ICEBOX_SECTION`,
 whose tally every consumer configuring a tier depends on. The derived section matchers were never a configuration
 surface, only the adapters' internal spelling of these knobs, so none of them is a
@@ -1308,7 +1308,7 @@ marker writer, leaving every byte outside them untouched.
 
 **Table membership is forced rather than chosen, and the alternative is the
 failure mode that looks like success.** A hardcoded top-level flag has no table
-row, so `--knob-files`, `check-reads-couples` and `check-gate-substrate-parity`
+row, so the knob-file derivation, `check-reads-couples` and `check-gate-substrate-parity`
 could not see its reads, and every check would stay green over an undeclared
 read. The table's knob column declares `QUEUE_KIT_HORIZONS` and
 `QUEUE_KIT_TRACKS` as reads of consumer configuration, which is the provenance

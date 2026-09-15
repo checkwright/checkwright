@@ -63,7 +63,7 @@ EOF
 # spec: gate-sdk/SPEC.md §Consumer smoke — ship the tracked default pattern list; the local companion is absent, exercising the fresh-clone path
 cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list
 
-bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
+bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
 # spec: gate-sdk/SPEC.md §run-gates — quiet green, loud red: green is one summary line, red prints verbatim, GATE_SDK_VERBOSE restores the banner roll

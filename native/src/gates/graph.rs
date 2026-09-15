@@ -1,8 +1,8 @@
 // spec: gate-sdk/SPEC.md §check-graph — the `# graph:` manifest on every gates.list member is
 // well-formed and consistent, and the generated hooks and the coupling-graph artifact are the
 // faithful projections of those manifests.
+use crate::emit::git_hooks;
 use crate::emit::graph as proj;
-use crate::proc;
 use crate::registry;
 use crate::walk;
 use std::path::Path;
@@ -365,24 +365,6 @@ fn read_stripped(p: &str) -> Result<String, String> {
     std::fs::read_to_string(p).map_err(|e| format!("cannot read {}: {}", p, e))
 }
 
-// spec: gate-sdk/SPEC.md §check-graph — the generator stays shell (§gen-pre-commit), so assertion
-// D spawns it, and it spawns the bare name: the homonym roster resolves inside `proc::run*`, so a
-// site resolving first would hand `proc::recorder` a path its registry declaration cannot match
-// spec: gate-sdk/SPEC.md §check-graph — assertion D's refusal carries the generator's whole
-// account of itself, so a verdict arrives with its cause. The `Err` payload is non-empty on every
-// non-zero exit, the fallback included, so no arm here composes the bare refusal.
-fn generator_emit(gen: &str, arm: &str) -> Result<Result<String, String>, String> {
-    let out = proc::run("bash", &[gen, arm])?;
-    match out.stdout() {
-        Some(b) => Ok(Ok(String::from_utf8_lossy(b)
-            .trim_end_matches('\n')
-            .to_string())),
-        None => Ok(Err(out
-            .failure_report()
-            .unwrap_or_else(|| format!("bash {} {} left no account of its failure", gen, arm)))),
-    }
-}
-
 // spec: gate-sdk/SPEC.md §check-graph — the cause as a finding suffix: present it on one line so a
 // CI log reader sees it beside the verdict
 fn because(cause: &str) -> String {
@@ -462,21 +444,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("no members parsed from {}", list));
     }
 
-    // spec: gate-sdk/SPEC.md §Layout and configuration — the kit root the generator lives under is
-    // the locator, because a compiled member has no BASH_SOURCE to find its own kit by
-    let sdk_root = walk::sdk_root();
-    let gen = format!("{}/bin/gen-pre-commit.sh", sdk_root.trim_end_matches('/'));
-    if !Path::new(&gen).is_file() {
-        return Err(format!("gen-pre-commit.sh not found at {}", gen));
-    }
-
     let vocab = cfg.vocab.vocab.clone();
     let leading = cfg.vocab.leading.clone();
     let lagging = cfg.vocab.lagging.clone();
     let allowed = walk::knob_words("GATE_SDK_GRAPH_EXTERNAL_REFS")?;
 
     let mut errors: Vec<String> = Vec::new();
-    let mut has_msg_gate = false;
 
     for c in &checks {
         let script = match registry::resolve(c, &cfg.resolve_dirs) {
@@ -555,9 +528,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 "MANIFEST: {} tier= must be precommit|align-only|commit-msg (got '{}')",
                 script, tier
             ));
-        }
-        if tier == "commit-msg" {
-            has_msg_gate = true;
         }
         if !mode_f.is_empty() && mode_f != "staged" && mode_f != "whole-tree" {
             errors.push(format!(
@@ -648,18 +618,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    // assertion D: hook artifact freshness (pre-commit == --emit)
+    // assertion D: hook artifact freshness (each committed hook == its in-process emission)
+    const REGEN: &str = "regenerate: bash gate-sdk/bin/run-gates.sh --emit git-hooks --write";
+    let root = walk::cwd()?;
     let hooks_dir = walk::knob_scalar("GATE_SDK_HOOKS_DIR")?;
     let hook = format!("{}/pre-commit", hooks_dir.trim_end_matches('/'));
-    let hook_emitted = generator_emit(&gen, "--emit")?;
     if !Path::new(&hook).is_file() {
-        errors.push(format!("ARTIFACT: {} does not exist; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write", hook));
+        errors.push(format!("ARTIFACT: {} does not exist; {}", hook, REGEN));
     } else {
-        match hook_emitted {
-            Err(ref cause) => errors.push(format!("ARTIFACT: gen-pre-commit.sh --emit failed; fix the generator before trusting the hook{}", because(cause))),
+        match git_hooks::pre_commit(&root, &cfg.gates_dir) {
+            Err(ref cause) => errors.push(format!("ARTIFACT: the pre-commit hook emission failed; fix it before trusting the hook{}", because(cause))),
             Ok(ref e) => {
-                if e.as_str() != read_stripped(&hook)?.trim_end_matches('\n') {
-                    errors.push(format!("ARTIFACT: {} is stale vs the '# graph:' manifests; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write", hook));
+                if e.trim_end_matches('\n') != read_stripped(&hook)?.trim_end_matches('\n') {
+                    errors.push(format!("ARTIFACT: {} is stale vs the '# graph:' manifests; {}", hook, REGEN));
                 }
             }
         }
@@ -667,18 +638,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // assertion D (commit-msg surface)
     let msg_hook = format!("{}/commit-msg", hooks_dir.trim_end_matches('/'));
-    if has_msg_gate {
-        let msg_emitted = generator_emit(&gen, "--emit-commit-msg")?;
-        if !Path::new(&msg_hook).is_file() {
-            errors.push(format!("ARTIFACT: {} does not exist but a tier=commit-msg gate is registered; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write", msg_hook));
-        } else {
-            match msg_emitted {
-                Err(ref cause) => errors.push(format!("ARTIFACT: gen-pre-commit.sh --emit-commit-msg failed; fix the generator before trusting the hook{}", because(cause))),
-                Ok(ref e) => {
-                    if e.as_str() != read_stripped(&msg_hook)?.trim_end_matches('\n') {
-                        errors.push(format!("ARTIFACT: {} is stale vs the '# graph:' manifests; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write", msg_hook));
-                    }
-                }
+    match git_hooks::commit_msg(&root, &cfg.gates_dir) {
+        Err(ref cause) => errors.push(format!("ARTIFACT: the commit-msg hook emission failed; fix it before trusting the hook{}", because(cause))),
+        Ok(None) => {}
+        Ok(Some(_)) if !Path::new(&msg_hook).is_file() => errors.push(format!("ARTIFACT: {} does not exist but a tier=commit-msg gate is registered; {}", msg_hook, REGEN)),
+        Ok(Some(ref e)) => {
+            if e.trim_end_matches('\n') != read_stripped(&msg_hook)?.trim_end_matches('\n') {
+                errors.push(format!("ARTIFACT: {} is stale vs the '# graph:' manifests; {}", msg_hook, REGEN));
             }
         }
     }

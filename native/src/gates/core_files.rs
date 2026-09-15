@@ -6,7 +6,7 @@ use crate::registry;
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §check-core-files — `gate_expand_couples_var`'s expansion narrowed to
+// spec: gate-sdk/SPEC.md §check-core-files — the `kit:` expansion narrowed to
 // this reader: one `<kit-root>/<token>` per root, a non-`kit:` line verbatim, and a wildcard
 // token refused fail-closed rather than expanded, returned as the offending line
 fn expand(lines: &[&str], roots: &[String]) -> Result<Vec<String>, String> {

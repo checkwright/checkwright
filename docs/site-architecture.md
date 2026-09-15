@@ -149,7 +149,7 @@ recoverable:
   gaining a `# no-port:` cause moves the `tree-shell-owed` key and stales the
   hooks from a file no manifest names either:
   one command emits both hooks
-  (`bash gate-sdk/bin/gen-pre-commit.sh --write`), then the artifact
+  (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`), then the artifact
   (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`), which
   `check-graph` asserts fresh together. The hooks are never hand-edited;
   that rule is resident in `CLAUDE.md` because a session about to edit it is not
@@ -161,7 +161,7 @@ recoverable:
   the queue's tag set — `README.md`, `queue-kit/README.md` and
   `docs/queue-kit/index.md`, none of them generated, each repaired by hand. The
   generated hooks bake that same derived roster verbatim and stale with it
-  (`bash gate-sdk/bin/gen-pre-commit.sh --write`, then the graph artifact the
+  (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`, then the graph artifact the
   row above pairs with them). The new-gate row is the fan-out this file already
   rostered; this is the other one, and nothing derived it for the author.
 - **The new-gate fan-out** — the other wide trigger, and the one with no single
@@ -183,7 +183,7 @@ recoverable:
   which), `docs/install.md`'s
   `ported-gate-members` measured claim (for a gate born native, which every new
   gate now is), and — for a hook-tier gate — the generated hooks
-  (`bash gate-sdk/bin/gen-pre-commit.sh --write`). `docs/footprint.md` is absent
+  (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`). `docs/footprint.md` is absent
   for the reason the row above gives: a gate is a script or a crate module and
   the footprint measures neither. A prose-only SPEC edit reds the on-site mirror
   alone. **Two of these regenerations are staging-ordered** — the generated hooks

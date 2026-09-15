@@ -3,7 +3,7 @@
 // test, 2 a harness or fixture error — which `Arm::Emit` collapses to 0-or-2.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: a top-level flag has no row, so
-// `--knob-files` could not see the three knobs below.
+// the knob-file derivation could not see the three knobs below.
 use crate::proc;
 use crate::walk;
 use std::path::Path;

@@ -54,7 +54,7 @@ EOF
 qtpl="$SMOKE_KIT_ROOT/../queue-kit/templates/TASK-QUEUE.md"
 [[ -f TASK-QUEUE.md || ! -f "$qtpl" ]] || cp "$qtpl" TASK-QUEUE.md
 
-bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
+bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
 hook_out="$(bash scripts/session-context.sh 2>/dev/null)"; rc=$?

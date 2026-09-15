@@ -11,7 +11,7 @@ use crate::walk;
 // has no reader here and a declared one would be a field with no named reader
 // spec: delegation-kit/SPEC.md §The statusline arm — the four `QUEUE_KIT_*` names are the
 // counter rendering's, read in process, and declaring them here IS what shows those reads to
-// `--knob-files`
+// the knob-file derivation
 pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_USAGE_FILE",
     "DELEGATION_KIT_CRED_FILE",

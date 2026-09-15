@@ -192,47 +192,7 @@ const TOP_LEVEL_FLAGS: &[&str] = &[
     "--uninstall",
     "--reads",
     "--needs",
-    "--knob-files",
 ];
-
-fn knob_files(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --knob-files <check-dir>... -- [<gate-name>...]";
-    let Some(sep) = args.iter().position(|a| a == "--") else {
-        eprintln!("checkwright-gates: --knob-files needs its check dirs closed by `--` — the derived knob files could not be reported; treating as failure (not clean)");
-        eprintln!("{}", usage);
-        return 2;
-    };
-    let (dirs, names) = (&args[..sep], &args[sep + 1..]);
-    if dirs.is_empty() {
-        eprintln!("checkwright-gates: --knob-files needs at least one check dir — the descriptor corpus is read from them; treating as failure (not clean)");
-        eprintln!("{}", usage);
-        return 2;
-    }
-    let members: Vec<&str> = if names.is_empty() {
-        gates::names_with_owners().into_iter().map(|(n, _)| n).collect()
-    } else {
-        names.iter().map(String::as_str).collect()
-    };
-    let mut out = String::new();
-    for m in members {
-        if gates::declared(m).is_none() {
-            no_such_gate(m);
-        }
-        match registry::knob_files(m, dirs) {
-            Ok(files) => {
-                for f in files {
-                    out.push_str(&format!("{}\t{}\n", m, f));
-                }
-            }
-            Err(e) => {
-                eprintln!("checkwright-gates: --knob-files: {}", e);
-                return 2;
-            }
-        }
-    }
-    print!("{}", out);
-    0
-}
 
 fn known_arm(name: &str) -> bool {
     TOP_LEVEL_FLAGS.contains(&name) || emit::lookup(name).is_some() || gates::lookup(name).is_some()
@@ -408,12 +368,6 @@ fn main() {
             }
             None => no_such_gate(name),
         }
-    }
-
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — `--knob-files <check-dir>... -- [<gate-name>...]`: one
-    // `<gate-name>`⇥`<path>` line per derived knob file, the corpus read from the caller's dirs
-    if first == "--knob-files" {
-        exit(knob_files(&argv[1..]));
     }
 
     // spec: gate-sdk/SPEC.md §The non-gate arm — the arm table, resolved before the registry

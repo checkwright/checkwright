@@ -313,7 +313,7 @@ pub fn remove(agent_file: &str) -> Result<String, String> {
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` on `--install-lifecycle`'s
 // precedent: the member mutates a file and emits no document, and it reads two knobs a
-// hardcoded flag would hide from `--knob-files`.
+// hardcoded flag would hide from the knob-file derivation.
 pub const KNOBS: &[&str] = &["DOCTRINE_KIT_AGENT_FILE", "DOCTRINE_KIT_DOCTRINE_FILE"];
 
 pub fn run(args: &[String]) -> i32 {

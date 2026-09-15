@@ -54,7 +54,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the
-   generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
+   generated pre-commit hook: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
 
 2. Give your queue file the section skeleton — copy
    `templates/TASK-QUEUE.md` and fill it in (it shows one example entry per

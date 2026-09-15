@@ -10,7 +10,7 @@ use std::io::Write;
 use std::path::Path;
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — the declared roster, two of whose names
-// are prefix families: a hardcoded top-level flag has no row to declare them on, so `--knob-files`
+// are prefix families: a hardcoded top-level flag has no row to declare them on, so the knob-file derivation
 // could not see one of them, which is the forced-family test.
 pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_SUITES",

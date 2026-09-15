@@ -3,7 +3,7 @@
 // `.gitattributes`, and the keep-ours driver into this clone's git config
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the contract is an action with
 // an exit status, and a table member because it reads eight knobs a hardcoded flag would hide
-// from `--knob-files`
+// from the knob-file derivation
 use crate::marker;
 use crate::proc;
 use crate::stages;

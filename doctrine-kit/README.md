@@ -60,7 +60,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
+   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
 
 3. Edit the digest — to drop a rule your project does not keep resident, declare
    the trim in place: `<!-- doctrine-digest-trim: <rule name> — <reason> -->`

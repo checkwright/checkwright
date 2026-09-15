@@ -1,7 +1,7 @@
 // spec: drift-kit/SPEC.md §The knowledge-friction loop — the capture affordance: one appended line
 // per re-derivation, the grammar stamped by the producer rather than by its author.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
-// arm reads a consumer knob, which a hardcoded flag would hide from `--knob-files`.
+// arm reads a consumer knob, which a hardcoded flag would hide from the knob-file derivation.
 
 pub const KNOBS: &[&str] = &["DRIFT_KIT_KNOWLEDGE_LOG"];
 

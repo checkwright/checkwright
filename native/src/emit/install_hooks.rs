@@ -48,7 +48,7 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
     if !Path::new(&hooks_dir).is_dir() {
         return Err(format!(
-            "no hooks dir at {} — generate the pre-commit hook first:\n  bash gate-sdk/bin/gen-pre-commit.sh --write",
+            "no hooks dir at {} — generate the pre-commit hook first:\n  bash gate-sdk/bin/run-gates.sh --emit git-hooks --write",
             hooks_dir
         ));
     }

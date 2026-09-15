@@ -1953,7 +1953,7 @@ roster is three names — `GUARD_KIT_LOG`, `GUARD_KIT_SETTINGS` and
 `GUARD_KIT_SETTINGS_LOCAL` — every one a row of guard-kit's table (§Layout and
 configuration). Membership of the arm table is **forced by that roster**
 rather than chosen by family resemblance: the row declares the three reads, which
-`--knob-files`, `check-reads-couples` and `check-gate-substrate-parity` read in
+the knob-file derivation, `check-reads-couples` and `check-gate-substrate-parity` read in
 process, while a hardcoded top-level flag has no row for any of them to read
 (gate-sdk/SPEC.md §The non-gate arm).
 
@@ -2147,7 +2147,7 @@ comparator as the other two.
 rather than assumed.** The arm is a **hardcoded top-level flag**, resolved before
 the registry lookup beside the other parity arms, and **not** an `ARMS`
 row. Table membership turns on one property and not on the family an arm belongs
-to: a member's declared knob roster is what `--knob-files`, `check-reads-couples`
+to: a member's declared knob roster is what the knob-file derivation, `check-reads-couples`
 and `check-gate-substrate-parity` read, so an arm resolving a consumer knob must be
 a member and an arm resolving none has nothing for any of them to read. All three modes
 are pure functions of their arguments — read statically, the three bodies name no
@@ -2293,7 +2293,7 @@ forced-family test, the shape `--emit-scan-prompts` already holds: all four
 declared knobs — `GUARD_KIT_SETTINGS`, `GUARD_KIT_SETTINGS_LOCAL`,
 `GUARD_KIT_BREADTH_PROBES` and `GUARD_KIT_BREADTH_DECLARED` — are consumer
 configuration, rows of guard-kit's table (§Layout and configuration), and a
-member's declared roster is what `--knob-files` and the roster checks read for it. It is an **`Arm::Emit`** because every report
+member's declared roster is what the knob-file derivation and the roster checks read for it. It is an **`Arm::Emit`** because every report
 path already returns 0 — the no-overlay path, the empty-probe-set path and every
 path that finds candidates, this being an advisory that never renders a verdict —
 and the one non-zero path is the operand refusal at exit 2, so the `{0, 2}`

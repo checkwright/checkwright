@@ -2725,7 +2725,7 @@ is neither the front end nor a direct binary invoke:**
   gate-sdk queue file `QUEUE_KIT_QUEUE_FILE`'s default derives from resolves from
   gate-sdk's own table the same way. A consumer override reaches this reader
   through the crate's own resolution. Adding the four names to the roster is
-  therefore not bookkeeping — it is what lets `--knob-files`,
+  therefore not bookkeeping — it is what lets the knob-file derivation,
   `check-reads-couples` and `check-gate-substrate-parity` see those reads.
 - **The silent-override-ignored failure is structurally unavailable.** No path
   resolves the four but the kit table and the knob files, so no invocation can

@@ -484,7 +484,7 @@ Step 4 above points a clone's git hooks at bash from this tree, which is worth
 deciding with the files open. The account below aims at completeness over
 reassurance.
 
-**What the hook is.** A generated file. `gate-sdk/bin/gen-pre-commit.sh` emits
+**What the hook is.** A generated file. `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write` emits
 it from the per-gate `# graph:` manifests, so the hook carries the *triggered
 subset* of your registered battery: each gate fires under the path globs its
 own manifest declares, and the gates outside that subset run only in the full

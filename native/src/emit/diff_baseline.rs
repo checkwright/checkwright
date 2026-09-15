@@ -8,7 +8,7 @@ use crate::walk;
 use std::path::Path;
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — the five names this arm resolves, every
-// one a row of evidence-kit's table and a read a hardcoded flag would hide from `--knob-files`.
+// one a row of evidence-kit's table and a read a hardcoded flag would hide from the knob-file derivation.
 pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_BASELINE_FILE",
     "EVIDENCE_KIT_SKIP_FILE",

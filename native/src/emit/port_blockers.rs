@@ -9,7 +9,7 @@ use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's declared structural knobs. A hardcoded
 // top-level flag has no row in the arm table, so this tool ported as one would hide its reads
-// from `--knob-files`; the family is forced, not chosen.
+// from the knob-file derivation; the family is forced, not chosen.
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_KIT_DIRS",

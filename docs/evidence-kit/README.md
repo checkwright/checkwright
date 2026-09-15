@@ -36,7 +36,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
+   Regenerate the hook + graph artifacts: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.
 
 2. Seed the two surfaces — `.workflow/validate-baseline.txt`:
 

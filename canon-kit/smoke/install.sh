@@ -59,5 +59,5 @@ if [[ ! -f TASK-QUEUE.md ]]; then
 EOF
 fi
 
-bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
+bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html

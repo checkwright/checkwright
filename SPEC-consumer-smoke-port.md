@@ -3,7 +3,7 @@
 Queue entries: `run-consumer-smoke-port` and `consumer-smoke-library-port`, both riding unit set
 `owed-port-tail` (operator direction, 2026-09-15, lead-relayed), and the rider
 `gate-command-status-conflation-third-caller`, whose second surviving call site (`acct_probe`) this port
-deletes. SPEC-git-hooks-port.md deletes the first, and the rider closes when both have landed.
+deletes. The hook-emitter port (gate-sdk/SPEC.md §gen-pre-commit) deleted the first, and the rider closes when both have landed.
 
 **The order the two entries left to spec: together, in one unit.** `lib/consumer-smoke.sh` cannot be
 deleted while `bin/run-consumer-smoke.sh` sources it. Porting the library first while keeping that shell
