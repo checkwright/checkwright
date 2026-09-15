@@ -42,9 +42,10 @@ entries.
 
 The probe is filed in `.workflow/survey-record.md`.
 
-**Ruled: no new gate.** Point 2 gains a clause naming the roster-holding reader, and
-§check-amendment-update-target records the refused third slice beside the two it already refuses.
-Nothing is added that a later reader must maintain.
+**Ruled: no new gate** (operator direction, 2026-09-16, lead-relayed: accepts this refusal). Point 2
+gains a clause naming the roster-holding reader, and §check-amendment-update-target records the
+refused third slice beside the two it already refuses. Nothing is added that a later reader must
+maintain.
 
 **Growth restraint.** The direction: a SPEC is not expected to grow each iteration. A feature or an
 ambiguity is handled by re-phrasing existing text for clarity and brevity, and text is added only
