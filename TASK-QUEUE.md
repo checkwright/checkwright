@@ -4305,8 +4305,8 @@
   grammar against the same cap. Both share the unbounded slug length, so a scope may bundle them.
   **Cost while deferred:** a dependent promoted beside its blocker loses the tag its selection
   reads, and the order survives only in amendment prose.
-  Measured by `check-queue-wrap`'s red at that spec stage's promotion commit and filed to the gap
-  inbox there; drained and promoted 2026-09-15 at close.
+  Filed 2026-09-15 to the gap inbox at that spec stage, measured by `check-queue-wrap`'s red at its
+  promotion commit; drained and promoted the same day at close.
 
 ## Icebox
 

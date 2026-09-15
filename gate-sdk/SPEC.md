@@ -2233,8 +2233,7 @@ expansion (§The `# graph:` manifest, the `knob:` rule).
 
 **Read the reach through the oracle, never off the field**, because `kit:` and `knob:` tokens hide
 their expansion: `run-gates.sh --for <path>` answers what a path triggers, and
-`check-reads-couples` answers what a gate's couples cover. The two now differ only in the question,
-not in the matcher.
+`check-reads-couples` answers what a gate's couples cover: one matcher, two questions.
 
 ## The install disposition
 
