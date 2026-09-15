@@ -12,101 +12,6 @@
 
 ## New Features
 
-- **amendment-reader-roster-undercount** [spec: SPEC-roster-rederivation.md] — an amendment's
-  reader/caller roster is a dated measurement presented as a roster, and it undercounted twice in
-  one iteration.
-  **Both misses were the same spec session, one iteration.** `SPEC-graph-port.md` delta 5 scoped ONE
-  caller of a file it deleted where the tree held twelve — nine kit `smoke/install.sh` arms,
-  `context-kit/smoke/agents-md.sh`, `bin/upgrade-smoke.sh` and `installer/lib/init.sh`.
-  `SPEC-stamp-head.md` delta 5 asserted "exactly one parser breaks" and named it, missing FOUR
-  end-anchored `grep` assertions in `lifecycle-kit/smoke/install.sh` plus 7 of 10 cases in
-  `check-stage-evidence.test.sh` that flip to "malformed stamp" and stop reaching what they assert.
-  **One shape, and the spec method structurally cannot see it.** The hit is BUILT BY INTERPOLATION —
-  the date is a shell variable — so a literal-string, field-count or length sweep returns nothing;
-  the breakage is CONSEQUENTIAL, so "the tests still pass" reads true and is false. Re-verified at
-  the drain against `git diff`: every named site is there, rewritten by the unit that found it.
-  **This is a method finding about a STAGE, not a defect count.** Delta 5 itself says the build unit
-  re-runs the sweep against the tree rather than trusting the roster, and that sentence is what
-  caught both — carried by an individual amendment rather than by any contract that outlives it.
-  **Candidate deliverables were three:** a build-stage re-sweep contract line, an oracle grepping
-  the assertion IDIOM rather than the literal, or dropping the roster and keeping only the sweep
-  instruction. **Ruled at spec (the amendment):** the first, with the roster naming its own probe;
-  dropping it is refused because `check-amendment-retired-spelling` reconciles against it, and the
-  idiom grep because the recurrence below spells no name.
-  **THE COUNTER-CASE IS NOW OVERDUE AND THE POOL WENT THE OTHER WAY — FOUR FOR FOUR in a second
-  iteration**, the datum the design fork needed, and it arrived falsifying, not supplying, the
-  sparing case. `test-harness-cut-seam-sweep`: batch A's gate-tests
-  amendment named three callers and missed the CI workflow and its shipped template; batch B's
-  guard-tests amendment claimed one caller "verified this session over the tracked tree" against an
-  EXECUTABLE CI step plus six prose sites, and its agents-md amendment predicted two docs pages
-  needed no edit when both named the deleted path; batch C's cardinal-reach DoD asserted "grepped
-  every spec, config and gate source; nothing dangles" against eight live references. **The battery
-  caught every one and reading caught none** — so of the three candidates the two that reach an
-  ORACLE (the build-stage re-sweep line, the idiom grep) are now separated from the third by
-  evidence rather than by taste.
-  **AND THE DOC SIDE IS THE SAME MISS.** This close's `internal-identifier-restatement` and
-  `capability-liveness-after-descope` sweeps independently found five present-tense prose sites
-  naming the three shell files this iteration deleted, four of them in files the landing unit had
-  itself opened and edited. Grammatical position predicts them: every repaired occurrence sat in
-  subject or object position, every missed one in an appositive, an attributive modifier or a
-  coordinated list member. A roster derived by grep would have caught all five.
-  **RECURRED 2026-09-15, in both `config-seam-fourth-cut` build batches, past a grep the roster
-  DID run.** Rosters derived by spelling grep over retired names missed SEMANTIC readers: prose
-  saying a library resolves a knob, a smoke reading a knob as a sourced global, a root compared as
-  absolute, SPECs deferring a default to a bare family stem. None spells a retired name, so neither
-  the literal grep nor an idiom grep reaches them; the battery and build reading caught all.
-  recurrence: amendment-reader-roster-undercount 2026-09-05 2026-09-15
-  **Cost while deferred:** a spec session pays for a census the build session must buy again, and
-  the roster's authority runs inversely to its accuracy.
-  Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close;
-  **joins `owed-port-tail` at threshold** (operator direction, 2026-09-15, lead-relayed); built
-  first in the unit set, so the three port batches run under its build-stage line.
-
-- **amendment-update-target-overcount-undetected** [spec: SPEC-roster-rederivation.md] — an
-  amendment's `## Existing sections updated` roster is unchecked in the OVER-count direction, so a
-  rostered target with nothing to update is discovered only by a session that goes looking.
-  **The instance, and the correction this drain made to it.** The stage-journal amendment rostered
-  `lifecycle-kit/templates/stages/` as a delta-1 target for "every stage template's
-  dispatch-facing text that names a journal path", and its DoD named hand-spelled journal paths
-  as the strings to chase. No stage template spells one, re-verified here. But the filing's
-  stated sweep result — "NOT ONE tracked file spells a journal path ... anywhere else" — is FALSE
-  as written: `guard-kit/guard-tests/cases.tsv` spells one six times. Those are guard fixture
-  INPUTS with no reader, so the substantive conclusion holds while the sweep's reported reach
-  does not, and the entry carries both rather than the tidier half.
-  **Why the correct outcome is still the defect.** The roster bullet was vacuous and the DoD item
-  was discharged by finding nothing, which at read time is indistinguishable from a skip.
-  **The filing's "neither entry's fix reaches the other's direction" FELL at the drain.**
-  `amendment-reader-roster-undercount` is the under-count direction, where the failure is a
-  missed edit; this is the over-count, where the failure is a session either fabricating an edit
-  to satisfy a bullet or silently dropping it. But two of that entry's three candidate
-  deliverables — make the build-stage re-sweep a contract line, or drop the roster and keep only
-  the sweep instruction — reach BOTH directions squarely. The two are distinct in FAILURE MODE
-  and overlap in REMEDY, so whichever is taken first should take both.
-  **No `recurrence:` date joins that sibling:** its finding is a roster that UNDERCOUNTED, and an
-  undercount did not re-occur. The mirror direction is a new defect and files as one.
-  **Deliverable:** decide whether `check-amendment-update-target` can assert that a rostered path
-  exists AND that the amendment's own cited string is present in it, or whether the honest answer
-  is that a roster is a claim and the merging session owes a stated finding when one comes up
-  empty.
-  **Cost while deferred:** low per instance and paid at the worst moment — a build session either
-  buys a sweep the amendment implied was already scoped, or writes something to make a vacuous
-  target non-vacuous.
-  **JUDGED RECURRENCE 2026-09-05 at the close drain, on a second roster.** `SPEC-preflight-cut.md`
-  rostered eleven reader rows for ten readers: a quote living at `evidence-kit/SPEC.md:836` was
-  also attributed to `delegation-kit/SPEC.md:836`, and align verified the citation's TEXT without
-  checking that the file named holds it. Same finding, one axis over — a rostered row resolving to
-  nothing in the file it names, undetected — and the deliverable below already covers it verbatim,
-  so no entry is minted. It widens the deliverable's corpus from the update-target roster to any
-  amendment roster carrying a path.
-  recurrence: amendment-update-target-overcount-undetected 2026-09-05
-  Filed 2026-08-25 by build; drained and promoted 2026-08-25 at close, which re-ran the sweep and
-  corrected its reported reach.
-  **Paired into `owed-port-tail` at spec, beside `amendment-reader-roster-undercount`** — operator
-  direction, 2026-09-15, lead-relayed. **Ruled at spec (the amendment):** the second option; a
-  rostered target is a claim, and the build stage reports an empty one as a finding in its commit.
-  Both `check-amendment-update-target` arms are refused: a created target does not exist before
-  the merge, and a target's text is what the merge writes.
-
 - **gen-pre-commit-port** [spec: SPEC-git-hooks-port.md] — `gate-sdk/bin/gen-pre-commit.sh` is owed:
   its `no-port` declaration rested on criterion 6's single-producer rule, and the crate is now every
   knob's one producer (gate-sdk/SPEC.md §gen-pre-commit).
@@ -4883,5 +4788,8 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- amendment-reader-roster-undercount
+- amendment-update-target-overcount-undetected
 
 ## Lessons Learned

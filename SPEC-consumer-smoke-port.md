@@ -239,7 +239,7 @@ the arm.
   `check-measured-claim` over a `measured:` literal, which reds on any disagreement and is re-stamped,
   so the change is caught rather than silent.
 
-How the rosters here and below were derived, per SPEC-roster-rederivation.md's delta 2:
+How the rosters here and below were derived, per canon-kit/templates/SPEC-amendment.md's roster rule:
 `git grep -c "run-consumer-smoke\|consumer-smoke\.sh\|csmoke_\|CSMOKE_"` over the tracked tree without
 stderr suppression, a delegated read-only survey of the three arms' spawn seam, the suite
 configuration and `check-smoke-entry-guard`'s match literal, and `check-amendment-retired-spelling`'s
@@ -338,7 +338,7 @@ survivor report. This is a floor, and the build re-derives it.
 - [ ] **Instruction surfaces: instruction only.**
 - [ ] **Merged with no information lost** — §Consumer smoke reads whole without this file.
 - [ ] **Amendment deleted** — this file removed on merge.
-- [ ] **Roster re-derived** — per SPEC-roster-rederivation.md delta 1, with missed sites named in the
+- [ ] **Roster re-derived** — per lifecycle-kit/templates/stages/build.md's roster-floor paragraph, with missed sites named in the
       commit.
 - [ ] **Removals propagated** — `check-amendment-retired-spelling` green.
 - [ ] **Settings diff prepared** — handed to the lead, never applied by hand.

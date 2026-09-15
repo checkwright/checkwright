@@ -143,7 +143,8 @@ the reason the section gives, and `check-graph-tree.test.sh` stays the behaviour
 - **`gate-sdk/bin/gen-pre-commit.sh` is deleted.**
 - **`lib/gate.sh` loses `gate_manifest_field`, `gate_expand_couples_var` and `gate_expand_couples`.**
   The script was the only caller of the first two, and the third already had none. That census was taken
-  with a tracked-tree grep, and delta 1 of SPEC-roster-rederivation.md has the build re-take it. With the
+  with a tracked-tree grep, and the build stage's roster-floor paragraph (lifecycle-kit/templates/stages/build.md) has the
+  build re-take it. With the
   shell expander gone, §The `# graph:` manifest's roster of independent `kit:`/`knob:` prefix readers
   drops from four to three, and hook emission reads `registry::expand_couples`, the reader
   `check-graph` and `--for` already share.
@@ -275,7 +276,7 @@ so, drops "not compiled until that port lands", and keeps its point that the boo
     `# portability-declared:` site (its `realpath --relative-to`) leaves with it, and the emitter
     computes the relative spelling in Rust.
 
-How the rosters here and below were derived, per SPEC-roster-rederivation.md's delta 2: `git grep -c
+How the rosters here and below were derived, per canon-kit/templates/SPEC-amendment.md's roster rule: `git grep -c
 "gen-pre-commit"` and `git grep -c -- "--knob-files"` over the tracked tree without stderr suppression,
 a delegated read-only survey of the crate's arm table, check-graph's spawn and `lib/gate.sh`'s caller
 sets, and `check-amendment-retired-spelling`'s survivor report, which named the comment sites in
@@ -401,7 +402,7 @@ and the build re-derives it.
       not the grounds.
 - [ ] **Merged with no information lost** — §gen-pre-commit reads whole without this file.
 - [ ] **Amendment deleted** — this file removed on merge.
-- [ ] **Roster re-derived** — per SPEC-roster-rederivation.md delta 1, with missed sites named in the
+- [ ] **Roster re-derived** — per lifecycle-kit/templates/stages/build.md's roster-floor paragraph, with missed sites named in the
       commit.
 - [ ] **Removals propagated** — `check-amendment-retired-spelling` green.
 - [ ] **Settings diff prepared** — the allowlist removal handed to the lead, never applied by hand.

@@ -966,16 +966,35 @@ target that was *listed and unowned*, never one that was never listed at all.
 §check-amendment-retired-spelling rather than by a fourth arm here — a change
 that retires a *literal* leaves the retired and the replacing spellings in
 disjoint token spaces, so a survivor scan reconciles against this roster and the
-roster becomes the discriminator. What is left with the align stage is the
-residue that slice does not reach: a stale prose sentence, a semantic over-claim,
-a cross-reference dangled by a deletion, and the renumber case, where the two
-spellings occupy the *same* token space and no scanner can tell a stale citation
-from a correct one. Two stronger arms were weighed and refused. Requiring **every delta to be cited by some target** is
+roster becomes the discriminator. What is left is the residue that slice does not
+reach, and it is carried by the align stage, which reads it against the tree, and
+by the build stage, which re-derives the roster before the merge counts as complete
+(lifecycle-kit/SPEC.md §templates/stages/). That is also why an amendment's roster
+names the probe that produced it rather than claiming completeness
+(`templates/SPEC-amendment.md`): a completeness claim invites the merging session
+to skip the re-derivation that catches the misses. The residue is a stale prose
+sentence, a semantic over-claim, a cross-reference dangled by a deletion, and the
+renumber case, where the two spellings occupy the *same* token space and no
+scanner can tell a stale citation from a correct one. Two stronger arms were
+weighed and refused. Requiring **every delta to be cited by some target** is
 false — a delta adding a wholly new section legitimately touches no existing one.
 Requiring **every path or `§` reference in a delta body to appear in the roster**
 would be high-false-positive, because a delta body names many surfaces for
 context, and a gate that cries wolf trains its readers to bypass it (gate-sdk/SPEC.md
 §When a gate earns its place).
+
+**Deliberately not asserted either: a rostered target's non-vacuity.** Two arms
+were weighed for the over-count direction, where a bullet names a target with
+nothing to update. The first requires that a rostered path exist. It is refused
+because a target the change creates legitimately does not exist before the merge,
+and because the attested over-count names a file that exists and simply does not
+hold the text attributed to it. The second requires that the amendment's cited
+string be present in the named file. It is refused because an update target's text
+is what the merge will write, so at authoring time it has no subject to find. What
+remains is a claim the merging session checks: the build stage re-derives the
+roster and reports an empty target as a finding in its commit
+(lifecycle-kit/SPEC.md §templates/stages/), which is what separates a vacuous
+bullet from a skipped one.
 
 **Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears**: the
 corpus is `spec_amendments`, which reaches no gate declaration path. **Born
@@ -1102,7 +1121,9 @@ path the roster does name.
 Producer of nothing but a verdict; its consumers are the committing session
 through the output contract on the generated pre-commit hook, `run-gates.sh` and
 CI, the `--run-gate-tests` arm through the fixture pair, and the **align stage**,
-whose roster duty is now defined as the complement of what arm B covers.
+whose roster duty is now defined as the complement of what arm B covers — a duty
+the build stage's roster re-derivation shares (lifecycle-kit/SPEC.md
+§templates/stages/).
 `precommit` tier, `trigger=*` — a survivor can appear in any tracked file, so any
 tree edit is a trigger.
 

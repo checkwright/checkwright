@@ -50,6 +50,13 @@
      names the delta that owns it; an update target no delta claims reaches
      build as an orphan a batch adopts on its own authority.
 
+     A roster here, and any caller or reader roster a delta carries, names the
+     probe that produced it: the command and the corpus it ran over. It never
+     asserts its own completeness ("exactly one reader", "nothing dangles",
+     "verified over the tracked tree"). A roster is a floor the merging session
+     re-derives, and a completeness claim makes that re-derivation look
+     unnecessary.
+
      A citation is `delta <N>` or `deltas <N>` (case-insensitive), continuing
      into further integers through commas and/or the word `and` — `(deltas 2, 3)`,
      `(deltas 1 and 4)`; `delta 3's` is the same citation. `all deltas` cites

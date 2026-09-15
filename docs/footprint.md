@@ -42,7 +42,7 @@ host repository's residue.
 
 | kit | always-loaded | load-triggered |
 | --- | --- | --- |
-| canon-kit | — | 105l · ~1486t |
+| canon-kit | — | 112l · ~1587t |
 | context-kit | — | 37l · ~592t |
 | delegation-kit | — | 526l · ~9390t |
 | doctrine-kit | 18l · ~413t | — |
@@ -50,7 +50,7 @@ host repository's residue.
 | evidence-kit | — | — |
 | gate-sdk | — | — |
 | guard-kit | — | 67l · ~1098t |
-| lifecycle-kit | 5l · ~76t | 1671l · ~26935t |
+| lifecycle-kit | 5l · ~76t | 1682l · ~27135t |
 | queue-kit | — | 47l · ~465t |
 | site-kit | — | — |
-| **total** | 23l · ~489t | 2547l · ~41603t |
+| **total** | 23l · ~489t | 2565l · ~41904t |

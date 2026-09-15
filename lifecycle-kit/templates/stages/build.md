@@ -82,6 +82,17 @@ oracle still returns the same verdict, is cited rather than re-surveyed, and one
 whose witness fails narrows the dispatch to what moved. File the surveys you buy
 (lifecycle-kit/SPEC.md §The survey record).
 
+**An amendment's roster is a floor, never the reach.** Every roster an amendment
+carries (update targets, callers, readers) is a dated measurement taken before the
+change existed. Before the merge counts as complete, re-derive it against the
+tree. Grep each name the change moves or retires over the tracked tree without
+silencing stderr. Ask what consumes the changed behaviour without spelling any of
+those names. Then run the battery and the touched kit's fixture suite. Land every
+site the roster missed in the same unit as in-envelope work, and name the missed
+sites in the commit message. A rostered target the re-derivation finds nothing to
+update in is reported in the commit message as a finding, naming the target;
+never write an edit to make it non-vacuous, and never drop it silently.
+
 **Declare what a vendoring consumer will meet, in the unit that lands it.** A unit
 that lands or tightens a gate, renames or removes a knob, or changes what a kit
 script, template or default does appends one bullet to the matching section of
