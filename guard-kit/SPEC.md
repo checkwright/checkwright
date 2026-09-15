@@ -35,8 +35,9 @@ conventions without depending on its registry.
    local-overlay upper bound), grouped by command
    pattern. Each recurring pattern is resolved by the **triage criterion**
    (below); `--emit-compare-settings-allow` (§compare-settings-allow) lists the
-   local-overlay entries a committed glob already grants (the prune set) and
-   those a declared probe proves too broad (the narrowing set). Then the
+   local-overlay entries a committed glob already grants and those naming a
+   script that does not exist (the prune sets), and those a declared probe
+   proves too broad (the narrowing set). Then the
    log is cleared — its named reclaim path.
 3. **Steady state** — friction low and justified: the committed
    `settings.json` carries every durable pattern (reviewable, shared), the
@@ -2450,7 +2451,7 @@ if it was taken while both holders were present.
 ## compare-settings-allow
 
 Advisory: lists local-overlay allow entries already granted by a glob in
-the committed settings — the deterministic prune-candidate set for the
+the committed settings, and those naming a script absent from the tree — the deterministic prune-candidate set for the
 close-stage audit. A committed pattern subsumes a local entry when the
 local string matches it under shell-glob semantics; the harness `:*` prefix
 idiom (`Bash(printf:*)` ≡ any `printf …`) is normalized to a trailing `*`
@@ -2612,8 +2613,8 @@ that is **entirely** declared therefore prints the declared section and **no**
 narrowing section: *no over-broad local entries* would be false there. With no
 over-broad entries at all the report is unchanged, and with the map empty — the
 default, and the shipped state for a consumer who declares nothing — the partition
-is trivial, the declared subsection is omitted, and every byte of output matches
-the tool as it behaved before the declaration shipped. The asymmetry with
+is trivial, the declared subsection is omitted, and the breadth report matches,
+byte for byte, the tool as it behaved before the declaration shipped. The asymmetry with
 `GUARD_KIT_BREADTH_PROBES` is deliberate: an empty probe set omits the whole
 breadth section because silence there could be misread as coverage, while an empty
 declaration set omits only the declared subsection, where no coverage claim is
@@ -2650,6 +2651,27 @@ elsewhere — context-kit/SPEC.md §check-settings-paths, with the kit that alre
 owns the committed settings file as a gate subject. This kit holds the three
 `.permissions.allow[]` readers in the tree and still ships no gates; co-location
 by parsing technique does not outrank placement by governed surface.
+
+**A third question over the overlay: which entries grant a script that is gone.**
+A grant naming a deleted script breaks nothing, since no command reaches it, but
+every reader of the overlay must re-verify which lines still mean anything, and a
+dead grant beside a renamed tool reads as coverage. The report lists each local
+entry whose command token is a literal `.sh` path that does not resolve, as
+`<entry> — no such file: <path>` in a dead-path section between the redundancy and
+breadth sections, with the checked count on its clean line — the count is what
+tells a predicate that scoped to the array from one that matched nothing. The
+token is taken by context-kit/SPEC.md §check-settings-paths' extraction predicate,
+**called rather than copied**: the scoping is ruled there, and a second extraction
+would drift from it the first time either was edited. The one difference is
+resolution. An absolute token resolves as written, because a per-machine grant is
+routinely absolute where a committed one is not; any other resolves against the
+repository root, where the front-end runs. This is the same subject that section
+gates for the committed file, answered here as an advisory, because the placement
+ruling above is about the overlay and does not move. The question needs no
+vocabulary — existence is a filesystem fact — so it has no probe knob and no
+opt-in, and the no-overlay path prints no dead-path section. It reads the
+filesystem and spawns nothing, so the member's empty spawned-program set above
+stands. `--count` does not carry the set, on the declared count's ground below.
 
 `--count` emits both bare counts on one line, redundancy first and breadth
 second, and the breadth number counts the **narrowing candidates** rather than
@@ -2710,8 +2732,9 @@ log — the advisory is transient, so nothing accrues for the close-stage triage
 its close-stage skill — it fills the tooling-friction placeholder in
 lifecycle-kit's close template. The step: run `scan-prompts`, resolve each
 recurring pattern by the triage criterion; review and delete the wakeup
-log if present; run `compare-settings-allow` and take its **two**
-dispositions — prune the listed redundant local entries, and for each entry the
+log if present; run `compare-settings-allow` and take its **three**
+dispositions — prune the listed redundant local entries, prune the listed
+dead-path local entries, and for each entry the
 breadth report names as a narrowing candidate, either narrow the glob or record
 that its breadth is intended as a `GUARD_KIT_BREADTH_DECLARED` entry in the
 committed config, which is what moves it into the report's declared section and
@@ -3126,7 +3149,12 @@ reason and **not** in the narrowing set; an all-declared over-broad set printing
 the declared section, no narrowing section and no false clean line; `--count`'s
 breadth number excluding the declared entry; and an exactness case — a declaration
 differing from the local entry by one character leaves that entry in the narrowing
-set, which is the assertion that the lookup never became a glob match. It drives the arm
+set, which is the assertion that the lookup never became a glob match. A dead-path
+case sits with them: an overlay granting the front-end and a script that does not
+exist lists the second and not the first, while the unchanged `--count` assertions
+pin that the dead-path set never entered the two-integer line; the in-crate test
+pins the set's exact membership and checked count across a live, a dead relative
+and a dead absolute literal beside a `*` pattern and a bare command. It drives the arm
 through the battery runner's `--emit` front-end, with `GUARD_KIT_KNOB_FILE` pointed
 at a sandbox knob file and `GUARD_KIT_SETTINGS`/`GUARD_KIT_SETTINGS_LOCAL` set in the
 environment beside it, so the consumer's own probe array cannot leak into the fixture.

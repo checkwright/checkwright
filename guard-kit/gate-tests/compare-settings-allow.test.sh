@@ -108,6 +108,15 @@ assert_has    off-by-one-narrowing 'advisory — narrowing candidates' "$off"
 assert_has    off-by-one-entry     'Bash(git *)  ⊇  Bash(git reset --hard)' "$off"
 assert_absent off-by-one-declared  'advisory — declared intended' "$off"
 
+# Dead path: a literal .sh grant that does not resolve from the repository root is listed; one
+# that resolves is not.
+printf '%s\n' '{ "permissions": { "allow": ["Bash(bash gate-sdk/bin/run-gates.sh)", "Bash(bash scripts/no-such-script.sh)"] } }' \
+    > "$sb/dead.json"
+dead="$(run "$sb/dead.json" "$sb/empty.knobs")"
+assert_has    dead-path-section 'settings allowlist dead paths' "$dead"
+assert_has    dead-path-listed  'Bash(bash scripts/no-such-script.sh) — no such file: scripts/no-such-script.sh' "$dead"
+assert_absent dead-path-live    'Bash(bash gate-sdk/bin/run-gates.sh) — no such file' "$dead"
+
 [[ "$fails" -eq 0 ]] || { echo "compare-settings-allow.test: $fails assertion(s) failed"; exit 1; }
-echo "compare-settings-allow.test: clean (a firing probe names its witnessing glob, a non-firing probe reports clean, an empty probe set omits the section, a declared breadth moves out of the narrowing set and out of --count, and an exactness miss silences nothing)"
+echo "compare-settings-allow.test: clean (a firing probe names its witnessing glob, a non-firing probe reports clean, an empty probe set omits the section, a declared breadth moves out of the narrowing set and out of --count, an exactness miss silences nothing, and a dead literal script grant is listed while a live one is not)"
 exit 0

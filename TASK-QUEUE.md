@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **settings-overlay-dead-path-unreported** [spec: SPEC-overlay-dead-path.md] —
-  `compare-settings-allow` reports redundant and over-broad local-overlay grants but not a grant
-  naming a path that no longer exists, and `check-settings-paths` holds that invariant over the
-  committed settings file only (context-kit/SPEC.md §check-settings-paths).
-  **Attested at `owed-port-tail`'s close:** 24 of 108 local allow entries named deleted scripts,
-  accumulated one port cohort at a time with no close-time reader flagging them. That instance
-  was pruned by hand; re-probed at scope, no local entry names a deleted script, so the class
-  stands and the instance does not.
-  **Cost while deferred:** every close triage prunes the overlay by judgment against dead lines
-  each reader must re-verify, and a dead grant beside a renamed tool reads as coverage.
-  **`guard-friction-reach`'s dead-path unit** (operator direction, 2026-09-15, lead-relayed).
-  Surfaced 2026-09-15 by `owed-port-tail`'s close into the gap inbox, after its drain; promoted at
-  the next iteration's scope, so the record is late and says so.
-
 - **recommended-allowlist-unshipped** [spec: SPEC-recommended-allowlist.md] — no kit
   ships or documents a recommended permission allowlist for the gates and tools an adopter
   activates, so every adopter re-derives the grant set by meeting prompts.
@@ -4696,5 +4682,6 @@
 - in-place-rewrite-steer-reach
 - file-authoring-act-ungoverned
 - scan-prompts-grant-test-redirect-blind
+- settings-overlay-dead-path-unreported
 
 ## Lessons Learned

@@ -1108,6 +1108,11 @@ standing shape for a grant taking arguments is a bare entry beside a
 `*`-suffixed twin, and the twin's path is as literal — and as strandable — as
 the bare form's, so it stays in scope.
 
+The predicate has a second reader: guard-kit's `compare-settings-allow` applies it
+to the local overlay as an advisory (guard-kit/SPEC.md §compare-settings-allow). It
+calls this gate's holder rather than restating it, so a change to the scoping above
+changes that report too. The gate's subject stays the committed file alone.
+
 Splitting the grant into tokens must not expand it. Globbing a pattern grant
 against the tree and then asserting an arbitrary first match would green the whole
 pattern class instead of skipping it, while leaving the checked count silently

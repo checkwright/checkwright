@@ -25,9 +25,10 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
    `.workflow/wakeup-attempts.log`, act on any surfaced intent, then delete it.
 4. **Prune and narrow the local overlay.** Run
    `bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow` — it reports
-   two sets, and each has its own disposition.
+   three sets, and each has its own disposition.
    - **Redundant**: remove every listed `settings.local.json` entry (a committed
      glob already grants it).
+   - **Dead path**: remove every listed entry — it grants a script that does not exist.
    - **Too broad**: for every entry the report lists as a *narrowing candidate*,
      either narrow the glob or record that its breadth is intended — as a
      `GUARD_KIT_BREADTH_DECLARED` entry (glob plus reason) in the committed

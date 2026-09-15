@@ -81,7 +81,7 @@ grant withholds it.
 ```bash
 bash gate-sdk/bin/run-gates.sh --emit scan-prompts          # rank what nothing granted, filtered by the allowlist
 bash gate-sdk/bin/run-gates.sh --emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
-bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow  # local-overlay entries a committed glob already grants, and those a probe proves too broad
+bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow  # local-overlay entries a committed glob already grants, those a probe proves too broad, and those naming a script that does not exist
 bash gate-sdk/bin/run-gates.sh --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…  # replace text in tracked files, printing every changed span
 ```
 

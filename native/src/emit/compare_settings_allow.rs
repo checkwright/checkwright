@@ -1,9 +1,11 @@
-// spec: guard-kit/SPEC.md §compare-settings-allow — the prune-candidate set and the
-// narrowing-candidate set: two questions over one match core, `guard::allow_match` with its
-// arguments swapped between them. An advisory that renders no verdict, so every report path is 0.
+// spec: guard-kit/SPEC.md §compare-settings-allow — the redundancy and breadth questions over one
+// match core, `guard::allow_match` with its arguments swapped, and the dead-path question over
+// context-kit's extraction predicate; an advisory, so every report path is 0.
+use crate::gates::settings_paths;
 use crate::guard;
 use crate::walk;
 use serde_json::Value;
+use std::path::Path;
 
 // spec: guard-kit/SPEC.md §compare-settings-allow — the four guard-kit table rows the arm reads
 pub const KNOBS: &[&str] = &[
@@ -20,6 +22,8 @@ const USAGE: &str = "usage: --emit compare-settings-allow [--count]";
 
 const REDUNDANCY_HEADER: &str =
     "=== settings allowlist redundancy (advisory \u{2014} prune candidates) ===";
+const DEAD_PATH_HEADER: &str =
+    "=== settings allowlist dead paths (advisory \u{2014} prune candidates) ===";
 const BREADTH_HEADER: &str =
     "=== settings allowlist breadth (advisory \u{2014} narrowing candidates) ===";
 const DECLARED_HEADER: &str =
@@ -60,13 +64,15 @@ fn read_allow(path: &str) -> AllowRead {
     )
 }
 
-// spec: guard-kit/SPEC.md §compare-settings-allow — the three report sets, each with its own
-// reader: `redundant` the prune section and `--count`'s first integer, `too_broad` the narrowing
-// section and its second, `declared` the declared-intended section and deliberately neither.
+// spec: guard-kit/SPEC.md §compare-settings-allow — `redundant` and `too_broad` are `--count`'s
+// two integers; `declared` and `dead` (with its `checked` count) print in their own sections and
+// deliberately reach neither.
 struct Report {
     redundant: Vec<String>,
     too_broad: Vec<String>,
     declared: Vec<String>,
+    dead: Vec<String>,
+    checked: usize,
 }
 
 // spec: guard-kit/SPEC.md §compare-settings-allow — redundancy asks whether a committed glob
@@ -82,6 +88,8 @@ fn partition(
         redundant: Vec::new(),
         too_broad: Vec::new(),
         declared: Vec::new(),
+        dead: Vec::new(),
+        checked: 0,
     };
     for entry in local.iter().filter(|e| !e.is_empty()) {
         if let Some(pat) = committed
@@ -112,6 +120,49 @@ fn partition(
         }
     }
     r
+}
+
+// spec: guard-kit/SPEC.md §compare-settings-allow — the third question, over context-kit's
+// extraction predicate called rather than copied; an absolute token resolves as written, any other
+// against `root`. Returns the dead rows and the checked count.
+fn dead_paths(local: &[String], root: &Path) -> (Vec<String>, usize) {
+    let mut dead = Vec::new();
+    let mut checked = 0usize;
+    for entry in local {
+        let Some(cand) = settings_paths::literal_script_path(entry) else {
+            continue;
+        };
+        checked += 1;
+        let target = if cand.starts_with('/') {
+            Path::new(cand).to_path_buf()
+        } else {
+            root.join(cand)
+        };
+        if !target.is_file() {
+            dead.push(format!("{} \u{2014} no such file: {}", entry, cand));
+        }
+    }
+    (dead, checked)
+}
+
+fn dead_path_section(dead: &[String], checked: usize, local_path: &str, out: &mut String) {
+    out.push_str(DEAD_PATH_HEADER);
+    out.push('\n');
+    if dead.is_empty() {
+        out.push_str(&format!(
+            "no dead-path local entries ({} literal .sh grant(s) in {} resolve)\n",
+            checked, local_path
+        ));
+        return;
+    }
+    out.push_str(&format!(
+        "{} local allow entr(ies) grant a script that does not exist \u{2014} safe to prune from {}:\n",
+        dead.len(),
+        local_path
+    ));
+    listing(dead, out);
+    out.push_str("help: a script moved or deleted since the grant was taken strands it \u{2014}\n");
+    out.push_str("      repoint each listed entry at its replacement, or remove it.\n");
 }
 
 fn listing(rows: &[String], out: &mut String) {
@@ -203,6 +254,8 @@ fn render(local_path: &str, r: &Report, probes: &[String], count_only: bool) -> 
     }
     let mut out = String::new();
     redundancy_section(r, local_path, &mut out);
+    out.push('\n');
+    dead_path_section(&r.dead, r.checked, local_path, &mut out);
     // spec: guard-kit/SPEC.md §Layout and configuration — an empty probe set omits the whole
     // breadth section rather than printing a clean line, which is what keeps a consumer that
     // declared no vocabulary from reading silence as coverage.
@@ -269,7 +322,10 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     };
     let probes = walk::knob_array("GUARD_KIT_BREADTH_PROBES")?;
     let declarations = walk::knob_map("GUARD_KIT_BREADTH_DECLARED")?;
-    let r = partition(&local, &committed, &probes, &declarations);
+    let mut r = partition(&local, &committed, &probes, &declarations);
+    // spec: guard-kit/SPEC.md §compare-settings-allow — a relative token resolves against the
+    // working directory, which the front-end sets to the repository root
+    (r.dead, r.checked) = dead_paths(&local, Path::new("."));
     Ok(render(&local_path, &r, &probes, count_only))
 }
 
@@ -347,6 +403,34 @@ mod tests {
             read_allow(&dir.join("nothing.json").display().to_string()),
             AllowRead::Absent
         ));
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: guard-kit/SPEC.md §compare-settings-allow — the dead-path set is exactly the literal
+    // .sh grants that do not resolve, an absolute one as written and a relative one against the
+    // root, and the checked count excludes a `*` pattern and a non-script command
+    #[test]
+    fn the_dead_path_set_is_the_unresolved_literal_script_grants() {
+        let dir = std::env::temp_dir().join(format!("cw-csa-dead-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("scripts")).expect("cannot make the fixture dir");
+        std::fs::write(dir.join("scripts/live.sh"), "").expect("cannot write the fixture");
+        let dead_abs = dir.join("gone/abs.sh").display().to_string();
+        let local = vec![
+            "Bash(bash scripts/live.sh)".to_string(),
+            "Bash(bash scripts/gone.sh)".to_string(),
+            format!("Bash(bash {})", dead_abs),
+            "Bash(bash scripts/*.sh)".to_string(),
+            "Bash(git status)".to_string(),
+        ];
+        let (dead, checked) = dead_paths(&local, &dir);
+        assert_eq!(checked, 3);
+        assert_eq!(
+            dead,
+            vec![
+                "Bash(bash scripts/gone.sh) \u{2014} no such file: scripts/gone.sh".to_string(),
+                format!("Bash(bash {}) \u{2014} no such file: {}", dead_abs, dead_abs),
+            ]
+        );
         std::fs::remove_dir_all(&dir).ok();
     }
 

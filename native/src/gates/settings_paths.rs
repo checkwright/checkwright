@@ -50,6 +50,17 @@ fn is_assignment(t: &str) -> bool {
     (b[0].is_ascii_alphabetic() || b[0] == b'_') && at > 0
 }
 
+// spec: context-kit/SPEC.md §check-settings-paths — the extraction predicate's one holder; its
+// second reader is guard-kit's compare-settings-allow, which calls it rather than copying it
+pub fn literal_script_path(entry: &str) -> Option<&str> {
+    let inner = entry.strip_prefix("Bash(")?.strip_suffix(')')?;
+    let cand = command_token(&tokens(inner))?;
+    // spec: context-kit/SPEC.md §check-settings-paths — a `*` in the command token makes it a
+    // pattern, intentionally polymorphic over files that need not exist today; the `*` twin of
+    // a literal grant is a separate token and stays in scope
+    (cand.ends_with(".sh") && !cand.contains('*')).then_some(cand)
+}
+
 pub fn run(args: &[String]) -> i32 {
     let mut fixture: Option<String> = None;
     let mut i = 0usize;
@@ -114,22 +125,9 @@ pub fn run(args: &[String]) -> i32 {
     let mut dead: Vec<String> = Vec::new();
     let mut checked = 0usize;
     for entry in allow_entries(&doc) {
-        let Some(inner) = entry.strip_prefix("Bash(").and_then(|r| r.strip_suffix(')')) else {
+        let Some(cand) = literal_script_path(&entry) else {
             continue;
         };
-        let tok = tokens(inner);
-        let Some(cand) = command_token(&tok) else {
-            continue;
-        };
-        if !cand.ends_with(".sh") {
-            continue;
-        }
-        // spec: context-kit/SPEC.md §check-settings-paths — a `*` in the command token makes it a
-        // pattern, intentionally polymorphic over files that need not exist today; the `*` twin of
-        // a literal grant is a separate token and stays in scope
-        if cand.contains('*') {
-            continue;
-        }
         checked += 1;
         if !std::path::Path::new(&format!("{}/{}", root, cand)).is_file() {
             dead.push(format!("{} — no such file: {}", entry, cand));
@@ -176,6 +174,19 @@ mod tests {
         assert_eq!(command_token(&tokens("sh scripts/x.sh")), Some("scripts/x.sh"));
         assert_eq!(command_token(&tokens("git status")), Some("git"));
         assert_eq!(command_token(&tokens("")), None);
+    }
+
+    #[test]
+    fn the_literal_script_path_is_scoped_to_a_literal_sh_command_token() {
+        assert_eq!(literal_script_path("Read(scripts/x.sh)"), None);
+        assert_eq!(literal_script_path("Bash(git status)"), None);
+        assert_eq!(literal_script_path("Bash(bash scripts/*.sh)"), None);
+        assert_eq!(literal_script_path("Bash(bash scripts/x.sh)"), Some("scripts/x.sh"));
+        assert_eq!(
+            literal_script_path("Bash(env FOO=1 bash scripts/x.sh)"),
+            Some("scripts/x.sh")
+        );
+        assert_eq!(literal_script_path("Bash(scripts/x.sh --flag)"), Some("scripts/x.sh"));
     }
 
     #[test]

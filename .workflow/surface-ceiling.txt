@@ -19,7 +19,7 @@
 60 delegation-kit/templates/dispatch-checklists.md
 40 drift-kit/templates/close-knowledge.md
 54 drift-kit/templates/economics.md
-67 guard-kit/templates/close-triage.md
+68 guard-kit/templates/close-triage.md
 69 lifecycle-kit/templates/consult.md
 605 lifecycle-kit/templates/lead.md
 33 lifecycle-kit/templates/release-sweep.md
