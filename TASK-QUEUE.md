@@ -4672,6 +4672,4 @@
 
 ## Done
 
-- allowlist-path-existence-unchecked
-
 ## Lessons Learned

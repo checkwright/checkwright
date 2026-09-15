@@ -6945,10 +6945,8 @@ port hand-compiles. That is the same ground that correctly screened
 ERE matcher with leftmost-longest span reporting, and no substitution engine or
 capture-group replacement**.
 
-A caller that substitutes composes the matcher's spans itself. `--rewrite` (guard-kit/SPEC.md
-§rewrite) replaces each leftmost-longest span with literal text through a start-offset search,
-`find_from`, which the matcher carries for that caller alone. The engine still owns no substitution
-and no capture group.
+A caller that substitutes composes the spans itself, as `--rewrite` (guard-kit/SPEC.md §rewrite)
+does through `find_from` below.
 
 **"Sizing is foreclosed" binds the pattern language, not the API surface.** The
 foreclosure §The canon-kit `spec_manifest_files` cohort states, on criterion 6's

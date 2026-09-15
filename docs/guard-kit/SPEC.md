@@ -803,8 +803,6 @@ that harness exists would be designing against no case.
    grant; such a grant stays load-bearing for `awk` as a stream filter and for
    every program shape the arm declines.
    **The `perl` arm blocks an in-place rewrite with at least one file operand.**
-   No operand means `perl -pi` reading stdin, which rewrites no file, so that
-   case passes.
    **Both in-place arms steer to a tool whose effect is its command line.** An
    in-place `sed` or `perl` program can read, write elsewhere, or execute, and the
    guard cannot tell which from outside the program. `--rewrite` replaces fixed
@@ -813,7 +811,7 @@ that harness exists would be designing against no case.
    rule 23 derives the runner. The Edit tool stays named for a single edit needing
    more than a fixed replacement. A sweep over many files is one `--rewrite` call,
    so neither arm bounds its operand count. **What passes:** `perl -pi` with no
-   file operand; an in-place call behind another command word (`xargs perl -pi`),
+   file operand, which reads stdin and rewrites no file; an in-place call behind another command word (`xargs perl -pi`),
    which is its lead's rule's subject; and a `perl` option the walker does not
    model.
    **`python3 -` bodies are not steered, because no target exists yet.** Deciding
@@ -2127,10 +2125,9 @@ first, and the steer must not open the file that guard exists for. **The honest 
 consumer's own `Write|Edit` path guard is not consulted, and a file it protects is rewritable here as
 it already is by `--scratch-run`. Such a consumer's protection is only as wide as its Bash rules.
 
-**What the grant now reads as.** A consumer who reads the front-end grant as "run the gates" is also
-granting silent, bounded rewrites of tracked files. It already granted unbounded ones through
-`--scratch-run`, so a consumer cannot separate the decision without declining the battery. That is
-the taken cost §scratch-run records, recorded again here for this member.
+**What the grant now reads as.** A front-end grant read as "run the gates" also grants silent,
+bounded rewrites of tracked files, so declining them means declining the battery: §scratch-run's
+taken cost, for this member.
 
 **The matcher cannot be made to run away.** It is a Thompson-construction matcher with a bounded
 program (gate-sdk/SPEC.md §The POSIX ERE matcher), so a pattern costs at most linear memory and
@@ -2289,9 +2286,7 @@ change: both stay available for every row, and a guard rule reaching shapes no g
 can express is that disposition's stated reason for existing. The section is
 **advisory on the log's own terms** (§The close-stage triage step) and reds nothing.
 Because the partition moves no call between prompting and granted and re-keys no
-row, it is **not** a definitional step of the kind recorded below. Reading the
-verdict in the grant test does move calls, from granted to prompting, and it is
-recorded as such a step below.
+row, it is **not** a definitional step of the kind recorded below.
 
 **The grant test reads the verdict, so the two cannot disagree.** A glob match on a
 raw segment has no model of a redirect or an expansion. A trailing `*` absorbs both,
