@@ -169,3 +169,4 @@
 | config-seam-second-cut | sc sp a b v c | 4f/0d | 2 · ≤0d | 20s clean | 113 |
 | config-seam-third-cut | sc sp a b v c | 3f/1d | 2 · ≤0d | 27s 1✗ | 113 |
 | config-seam-fourth-cut | sc sp a b v c | 8f/1d | 2 · ≤1d | 20s clean | 113 |
+| owed-port-tail | sc sp a b v c | 5f/2d | 3 · ≤0d | 20s clean | 113 |

@@ -4688,12 +4688,9 @@ still spells a name, and a semantic reader spells none. **The honest limit:** no
 gate observes that the re-derivation ran. The battery reds on what it reaches, and
 a site no gate reaches is found only by the landing session's reading, which is
 what the paragraph obliges and does not verify. **The same re-derivation meets the
-over-count.** A roster can also name a target with nothing to update, or a row
-resolving to nothing in the file it names, and a session holding such a bullet
-either fabricates an edit to satisfy it or drops it, and at read time a silent
-drop is indistinguishable from a skip. The paragraph's last sentence makes the
-empty result a stated finding, which is the only form in which a later reader can
-tell the two apart.
+over-count:** a rostered target with nothing to update tempts a fabricated edit or
+a silent drop, and a silent drop reads as a skip, so the empty result is a stated
+finding.
 
 The `scope` template's recurrence override **decides** the collision rather than
 resolving it in the theme's favour: an automatic promotion would be a second

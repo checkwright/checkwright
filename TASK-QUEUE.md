@@ -51,6 +51,10 @@
   operand to read, which is a second call.
   **Cost while deferred:** one out-of-band permission decision per in-place `perl` rewrite,
   invisible to every gate.
+  recurrence: in-place-rewrite-steer-reach 2026-09-15
+  **Recurred at `owed-port-tail`'s prompt-friction triage:** `python3 -` ranked first at 24
+  prompting calls, every one a heredoc writing a file (queue entries, a Rust module, parity
+  scratch).
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from its prompt-friction
   triage; promoted at the next iteration's scope.
 
@@ -84,6 +88,47 @@
   **Cost while deferred:** a gap filer who names a proposed knob reds the battery and rewords.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
   filing hit; promoted at the next iteration's scope.
+
+- **kit-token-anchor-hook-for-divergence** [design-pending] [cost: event/low] [surface: gate-sdk] — a
+  `kit:<glob>` couples token expands against two different anchors, so where kits are not vendored
+  at the repository root `run-gates --for` selects against globs no staged path matches.
+  **Read off the source at the drain:** the hook emitter (`native/src/emit/git_hooks.rs`, its
+  context) spells kit roots relative to the repository root, since hook globs match repo-relative
+  staged paths; `--for`'s selector (`native/src/runner.rs`), the graph emitter, port-blockers and
+  the substrate-parity pass expand through `walk::kit_roots_rel`, anchored at the gate-sdk root's
+  parent. In this tree both spell the same roots. gate-sdk/SPEC.md §run-gates rules any divergence
+  between what the hook runs for a staged path and what `--for` runs a bug.
+  **Why `[design-pending]` and not a drain fix:** only the `--for` reader's anchor is settled by
+  that rule; whether the graph, port-blockers and parity readers follow is a per-reader call, and
+  the proof needs a fixture vendoring kits under a subdirectory, which no suite carries.
+  **Cost while deferred:** paid by an adopter who hand-vendors kits under a subdirectory (`init`
+  vendors at the root) and asks `--for` what a path triggers: a silently wrong answer.
+  Filed 2026-09-15 to the gap inbox from the git-hooks port's sandbox byte-parity proof; promoted
+  at `owed-port-tail`'s close.
+
+- **recommended-allowlist-unshipped** [design-pending] [cost: event/high] [surface: guard-kit] — no kit
+  ships or documents a recommended permission allowlist for the gates and tools an adopter
+  activates, so every adopter re-derives the grant set by meeting prompts.
+  **Probed at the drain:** guard-kit ships the triage criterion, scan-prompts,
+  compare-settings-allow and a hooks-only settings template
+  (`guard-kit/templates/settings-hooks.json`, no `permissions` block), and neither
+  `native/src/installer/` nor `installer/bin/` writes an allow entry. The core set is small,
+  since nearly every gate and tool is reached through the `run-gates.sh` front-end, plus the forms
+  guard-kit's generic ruleset steers onto.
+  **DISTINCT from `guard-steer-grant-mismatch` (icebox)**, which is the steer/grant mismatch within
+  one tree's own guard and settings; this is the absence of any shipped recommendation. A projection
+  would discharge that entry's customer-facing half and leave its in-tree half standing.
+  **Candidate, not ruled:** a derived, freshness-gated projection of recommended allow entries built
+  from the registered gates and the guard rules' steer targets, shipped as a merge-it-yourself
+  recommendation and never written by `init`, since a grant is a per-consumer security decision.
+  The harness settings format places it in a harness adapter rather than kit mechanism;
+  `check-settings-paths` already covers dead-path drift in the committed file.
+  **Why `[design-pending]`:** it mints a shipped projection and its gate, and the adapter seam is
+  the call.
+  **Cost while deferred:** every adopter pays out-of-band permission decisions on the very forms the
+  kit steers to, from first install.
+  Filed 2026-09-15 to the gap inbox, raised by the operator in `owed-port-tail`'s lead session
+  after a stale settings grant blocked a build commit; promoted at that iteration's close.
 
 - **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
@@ -1959,8 +2004,8 @@
   skip survives the port verbatim), and its clean line counts only the zero-config half. The full
   accounting — every shipped gate
   either registered in its kit's `smoke/install.sh` or carrying a `# smoke-unregistered:` line with
-  a reason — lives in `gate-sdk/bin/run-consumer-smoke.sh`, which this repo runs as the evidence-kit
-  `consumer_smoke` validate suite and never at precommit.
+  a reason — lives in the `--run-consumer-smoke` arm (`native/src/emit/run_consumer_smoke.rs`),
+  which this repo runs as the evidence-kit `consumer_smoke` validate suite and never at precommit.
   **The instance, measured 2026-08-22.** Batch A landed `check-unmarked-claim` (`install:
   on-surface`) without registering it in `canon-kit/smoke/install.sh`. The precommit battery passed
   at 105 and then at 106 across four commits and three independent lead verifications; validate's
@@ -3593,8 +3638,8 @@
   modes, and the attested shapes are silently-wrong rather than merely unhelpful.
   not-icebox-eligible: bin-tool-help-arm-absent-tree-wide 2026-09-12 live per-session trigger.
   **The remainder is also owed to the port**, so a cut can apply the split per member — but only
-  once the scope question is answered, since it decides which members owe an arm. `build-native.sh`,
-  `gen-pre-commit.sh` and `run-consumer-smoke.sh` are declared `no-port` and will never ride a cut,
+  once the scope question is answered, since it decides which members owe an arm. `build-native.sh`
+  and `run-gates.sh` are declared `no-port` and will never ride a cut,
   so their arm has no cut to ride and needs its own. That split re-derives off the census command
   joined with `--emit port-blockers --tree`.
   Filed 2026-09-04 to the gap inbox at spec as a guard-kit-local two-tool finding; WIDENED at that
@@ -3662,8 +3707,8 @@
   declares `impl Drop for Scratch` (:65-78) over a `worktrees: Vec<String>`, and its own comment
   at :56-57 says the shell form's `trap` is what that `Drop` replaces. Rust runs no destructor on
   SIGTERM or SIGKILL, so the claimed equivalence holds on every ordinary exit and fails on exactly
-  the case a trap exists for. `gate-sdk/lib/consumer-smoke.sh` carries no `trap` at all — only
-  `mktemp -d` at :42.
+  the case a trap exists for. The `--run-consumer-smoke` arm shares the shape: its scratch cleanup
+  is `impl Drop for Teardown` (`native/src/emit/run_consumer_smoke.rs`).
   **Re-verified at the drain rather than taken on the filer's word**, which is what the filing
   bullet itself asked for: a grep for `trap` and `signal` over both surfaces establishes it, and
   the two orphans the filing close reaped were stranded by a self-imposed timeout SIGTERM.
@@ -3886,7 +3931,8 @@
   to be a full-line one, which `check-comment-tier` governs.
   **Why the gate cannot see it.** canon-kit/SPEC.md §check-amendment-update-target asserts the
   decidable half by design — every LISTED target is owned — and says so in as many words, leaving
-  roster completeness to align. Arm B catches a target listed and unowned, never one never listed.
+  roster completeness to align and to build's roster re-derivation. Arm B catches a target listed
+  and unowned, never one never listed.
   The amendment is deleted on merge, so no later reader catches the omission either.
   **Why this is a THIRD narrow slice and not a re-file.** `amendment-roster-omission-detection`
   (retired) owned the general class and named two candidate gateable slices, literal-substitution

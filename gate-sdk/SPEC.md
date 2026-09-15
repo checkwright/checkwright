@@ -11637,11 +11637,10 @@ evidence of a shared derivation and the tool never treats it as one, because
 **both** single-factor candidates were measured to over-select and neither
 under-selects. `couples=` over-selects by criterion 4's own words — the expanded
 field is deliberately **trigger**-shaped and wide on purpose. A bare
-**primitive-call** key over-selects by more: `gate_kit_roots` alone has ten gate
-callers spanning canon-kit, gate-sdk and `scripts/` that share no corpus whatever.
-`check-shellcheck` is the worked case in both directions — it *does* call
-`gate_kit_roots`, then composes four fixed subdirectory names and a `*.sh` glob on
-top of it, where `check-smoke-entry-guard` reads the same kit roots with one
+**primitive-call** key over-selects by more: measured over the shell battery,
+`gate_kit_roots` alone had ten gate callers spanning canon-kit, gate-sdk and
+`scripts/` that shared no corpus whatever — one composed four fixed subdirectory
+names and a `*.sh` glob on top of it, another read the same kit roots with one
 `smoke/` path. Same primitive, different corpus.
 
 - **Kit-library call set** — the command-position words the scan emits that the
