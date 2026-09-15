@@ -169,10 +169,9 @@ split's whole economics). Feature promotion is not a separable step that could
 fall to either stage: writing the amendment *is* promoting the entry
 (canon-kit/SPEC.md §The amendment lifecycle, the bidirectional rule), so the
 stage that authors is necessarily the stage that promotes. Either way the
-detailed authoring how-to — causal
-completeness (every new field's producer, consumer, and named reader, surveyed
-across the whole component set) and the bidirectional queue pairing — is
-single-sourced in the authoring stage's template
+detailed authoring how-to — causal completeness (canon-kit's checklist,
+surveyed across the whole component set) and the bidirectional queue pairing —
+is single-sourced in the authoring stage's template
 (`lifecycle-kit/templates/stages/spec.md`); a default-roster scope that authors
 follows it here.
 

@@ -12,83 +12,6 @@
 
 ## New Features
 
-- **causal-completeness-has-no-per-member-satisfiability-point** [spec: SPEC-authoring-rules.md]
-  — an amendment may assert a per-member obligation over an enumerable corpus part of which has
-  no satisfying value, and nothing catches it.
-  **Selected as `amendment-authoring-completeness`' lead unit** (operator direction, 2026-09-15,
-  lead-relayed); the sixth point lands by re-phrasing, per the restraint unit beside it.
-  **Re-verified at the drain by reading the checklist, not the bullet.** canon-kit/SPEC.md:205-232
-  carries exactly five points — producer named and reachable, consumer named, existing integration
-  sections updated, every field has a named reader, each reader's red condition named under a
-  narrowing. None asks, for each member of the corpus a delta asserts over, what value satisfies
-  the obligation.
-  **Attested once, and caught out of band.** `SPEC-reads-root-default.md` delta 2 required every
-  member moved off `?` to declare the knob naming its scan pattern; five of the 26 (the four
-  `check-action-*` members and `check-graph`) bind their walk with a crate literal and have no
-  such knob. A member with no value to declare cannot declare, so build would have reached a stop
-  with no legal repair and no amount of reading would have said what to write. An oracle probe
-  found it; no gate and no checklist step did.
-  **Why it needed design:** the candidate is a sixth point, or a clause on point 4, owed only
-  where the asserted corpus is enumerable at authoring time — which is also the only time it is
-  answerable. Full gating is not claimed: evaluating the obligation per member means implementing
-  it, so the mechanism is a checklist obligation rather than a scanner, and that is the design
-  question rather than a detail of it.
-  **Cost while deferred:** every amendment asserting a per-member obligation over an enumerable
-  corpus carries the same unbounded stop risk, discovered at build where the repair is most
-  expensive and where the session has no authority to narrow the assertion.
-  Filed 2026-09-12 by spec into the gap inbox; drained and promoted at this close.
-
-- **spec-growth-restraint-unstated-at-authoring-surfaces** [spec: SPEC-authoring-rules.md]
-  — operator direction, 2026-09-12: a SPEC is not expected to grow each iteration; a new feature or
-  an ambiguity is preferably handled by re-phrasing existing instructions for clarity and brevity,
-  adding text only where it adds value, and brief phrase-shaped instructions read better to an LLM
-  than verbose prose.
-  **Selected for `amendment-authoring-completeness` as its restraint unit** (operator direction,
-  2026-09-15, lead-relayed).
-  **The direction reached this iteration's five amendments and stops there.** The authoring surfaces
-  that decide the *next* merge carry no statement of it: canon-kit/SPEC.md §Merging an amendment
-  (step 2 says integrate rather than append, but prefers no re-phrasing over adding), the shipped
-  amendment template's Definition of Done, the spec and build stage templates, and
-  context-kit/templates/close-brevity.md, which accepts growth that earns its cost.
-  **Cost while deferred:** later authoring and later merges default to appending, which is the
-  behaviour the direction was given against, and each iteration's default compounds.
-  **The shape is a re-phrase, not an addition** — applying the direction to the surfaces that state
-  it is the first test of it, and a delta that grows those five files fails its own subject.
-  Filed 2026-09-12 at spec to the gap inbox; promoted here by close.
-
-- **directive-minting-delta-roster-obligation** [spec: SPEC-authoring-rules.md]
-  — a delta that mints a machine comment directive obliges canon-kit's built-in directive roster,
-  and nothing in the amendment lifecycle prompts the author to list that surface.
-  **Selected for `amendment-authoring-completeness` as its roster-completeness unit** (operator
-  direction, 2026-09-15, lead-relayed).
-  **The instance is measured.** The portability-floor amendment's `## Existing sections updated`
-  roster missed the `native/src/gates/comment_tier.rs` + canon-kit/SPEC.md §check-comment-tier row
-  through spec AND align, and align had already corrected two other completeness gaps in the same
-  roster. Build closed it in-session only because delta 3's own grammar forced it: two of the six
-  valve sites sit on line-continuation statements that carry no trailing comment, so the marker had
-  to be a full-line one, which `check-comment-tier` governs.
-  **Why the gate cannot see it.** canon-kit/SPEC.md §check-amendment-update-target asserts the
-  decidable half by design — every LISTED target is owned — and says so in as many words, leaving
-  roster completeness to align and to build's roster re-derivation. Arm B catches a target listed
-  and unowned, never one never listed.
-  The amendment is deleted on merge, so no later reader catches the omission either.
-  **Why this is a THIRD narrow slice and not a re-file.** `amendment-roster-omission-detection`
-  (retired) owned the general class and named two candidate gateable slices, literal-substitution
-  and renumber, with "whether one mechanism covers both" as its open question. This is a slice
-  neither reaches and the only one whose evidence is IN the amendment: a delta body minting a
-  `<word>:` token absent from the directive rosters is decidable without reading the tree. That
-  entry was at its 50-line cap when it retired, which is why the slice landed here rather than
-  inside it; its recurrence date carries the instance.
-  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator** — canon-kit ships the
-  amendment lifecycle and `check-comment-tier`, so an adopter minting a directive in their own
-  amendment meets the same silent omission and their own gate's verdict witnesses it.
-  **Cost while deferred:** one roster row per directive-minting delta, caught by a later grep or not
-  at all; directives are rare, so the class is low-frequency and silent rather than loud.
-  Filed 2026-09-07 by build batch B to the gap inbox; promoted here at this iteration's close drain,
-  →fix refused (a prose nudge with no gate is the move §check-amendment-update-target already
-  refused) and →icebox refused on the live trigger and the product witness above.
-  not-icebox-eligible: directive-minting-delta-roster-obligation 2026-09-07 product witness above.
-
 ## Technical Debt
 
 ## Deferred
@@ -4579,5 +4502,9 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- causal-completeness-has-no-per-member-satisfiability-point
+- spec-growth-restraint-unstated-at-authoring-surfaces
+- directive-minting-delta-roster-obligation
 
 ## Lessons Learned

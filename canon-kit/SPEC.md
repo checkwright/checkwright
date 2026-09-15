@@ -205,48 +205,47 @@ so the litmus runs at filing time, in the scope skill's triage.
 
 ### The causal-completeness check
 
-Before an amendment is ready, every new state, event, and interface it
-introduces passes five points:
+Before an amendment is ready, every new state, event, interface and obligation
+it introduces passes these points:
 
-1. **Producer named and reachable** — what code path, call, or timer
-   triggers it; a named producer whose enabling config no deployed
-   configuration actually sets is dead everywhere but unit tests.
-2. **Consumer named** — what component receives it, by what mechanism
-   (which stream, which call, which poll).
-3. **Existing integration sections updated** — any affected spec section
-   describing the prior flow is updated in the amendment itself.
-4. **Every field has a named reader** — for each field on a new message,
-   name the consumer that reads it and the transition where it is read; a
-   field with no reader is removed, and a field read at one transition is
-   not populated at others.
-5. **Each reader's red condition named, not merely its subject** — binding
-   on a delta that *narrows* a corpus (a prune, a tighter glob, a dropped
-   file). A reader is safe to clear **by inspection** under a narrowing only
-   if its verdict is monotone in the violation set, and three ordinary shapes
-   are not: a reader that reds on *finding none*, one asserting an exact
-   count, and one holding a minimum or a coverage floor. So enumerate what
-   makes each reader **red**, never what it is about, and inspect only the
-   monotone ones. Attested: pruning the file that held a declaration's sole
-   instance flips `check-install-claim` green to red, because its
-   red condition is a zero count — the narrowing *added* a violation.
-   "A narrower corpus can only remove violations" is false, and it is the
-   first argument a narrowing delta reaches for.
+1. **Producer named and reachable** — what code path, call, or timer triggers
+   it; a producer whose enabling config no deployed configuration sets is dead
+   everywhere but unit tests.
+2. **Consumer named** — what receives it, by what mechanism (stream, call,
+   poll), and every roster-holding reader of the surface it lands on: such a
+   reader reds on a name its roster lacks, so a minted name lists that roster
+   as an update target (a comment directive meets `check-comment-tier`'s).
+3. **Existing integration sections updated** — any spec section describing the
+   prior flow is updated in the amendment itself.
+4. **Every field has a named reader** — the consumer and transition reading each
+   field of a new message; a field with no reader is removed, and one read at
+   one transition is not populated at others.
+5. **Each reader's red condition named, not merely its subject** — binding on a
+   delta that *narrows* a corpus (a prune, a tighter glob, a dropped file). Only
+   a verdict monotone in the violation set clears by inspection, and three
+   ordinary shapes are not: a reader that reds on *finding none*, one asserting
+   an exact count, one holding a minimum or coverage floor. "A narrower corpus
+   can only remove violations" is false: pruning the file holding a
+   declaration's sole instance flips `check-install-claim` red on a zero count.
+6. **Every member's satisfying value named** — binding on a delta obliging each
+   member of a corpus enumerable at authoring time: enumerate the members by a
+   named probe and name each one's value; a member with none narrows the
+   assertion here, because build can neither satisfy nor narrow it.
 
-A cross-component causal gap that surfaces during build is not a deferred
-TODO: stop, resolve it that session, update the spec before resuming.
-lifecycle-kit's scope/build skill templates carry these hooks; canon-kit
-supplies the checklist they invoke and the gate behind the promotion rule.
+A cross-component causal gap surfacing at build is not a deferred TODO: stop,
+resolve it that session, update the spec before resuming. lifecycle-kit's stage
+templates carry these hooks; canon-kit owns the checklist and the promotion gate.
 
 ### Merging an amendment (on task completion)
 
 1. Read the canonical spec fully, then the amendment.
-2. Integrate — do not append: each addition lands in its proper section,
-   and the merged spec reads as one coherent document a reader who never
-   saw the amendment can use alone. The merge separates by tier: design
-   rationale relocates into the spec's prose (its permanent home), and any
-   embedded wire-delta becomes a citation to the now-existing contract
-   file — the amendment's exemption is file-scoped, so once step 3 deletes
-   the file `check-spec-embedded-source` re-arms and a kept embed goes red.
+2. Integrate by re-phrasing, never by appending: a spec is not expected to grow
+   each merge, so an addition rewrites the instruction it refines — clearer,
+   briefer, phrase-shaped — and adds text only where no rewrite carries it. The
+   merged spec reads as one document to a reader who never saw the amendment.
+   Design rationale relocates into the spec's prose; an embedded wire-delta
+   becomes a citation to the contract file — the exemption is file-scoped, so
+   once step 3 deletes it `check-spec-embedded-source` re-arms on a kept embed.
 3. Delete the amendment file; verify none remain for the component. **The
    none-remain half is discharged at the iteration, not at the commit** — with
    sibling amendments in flight for one component, only the batch merging the
@@ -965,31 +964,30 @@ is real, and the line is where the surface is authored — that heading appears 
 skeleton**. A knob is available later behind an attested consumer rename; adding
 one now would be a knob whose only reader is §check-knob-citation.
 
-**Deliberately not asserted: roster completeness.** The gate cannot check that
-the update-target roster names every surface the change obliges a write to —
-that is a claim about the world, not about the file, and no scanner reaches it.
-It asserts the decidable half (every listed target is owned): arm B catches a
-target that was *listed and unowned*, never one that was never listed at all.
-**One narrow slice of the other half is now mechanized**, by
-§check-amendment-retired-spelling rather than by a fourth arm here — a change
-that retires a *literal* leaves the retired and the replacing spellings in
-disjoint token spaces, so a survivor scan reconciles against this roster and the
-roster becomes the discriminator. What is left is the residue that slice does not
-reach, and it is carried by the align stage, which reads it against the tree, and
-by the build stage, which re-derives the roster before the merge counts as complete
-(lifecycle-kit/SPEC.md §templates/stages/). That is also why an amendment's roster
-names the probe that produced it rather than claiming completeness
-(`templates/SPEC-amendment.md`): a completeness claim invites the merging session
-to skip the re-derivation that catches the misses. The residue is a stale prose
-sentence, a semantic over-claim, a cross-reference dangled by a deletion, and the
-renumber case, where the two spellings occupy the *same* token space and no
-scanner can tell a stale citation from a correct one. Two stronger arms were
-weighed and refused. Requiring **every delta to be cited by some target** is
-false — a delta adding a wholly new section legitimately touches no existing one.
-Requiring **every path or `§` reference in a delta body to appear in the roster**
-would be high-false-positive, because a delta body names many surfaces for
-context, and a gate that cries wolf trains its readers to bypass it (gate-sdk/SPEC.md
-§When a gate earns its place).
+**Deliberately not asserted: roster completeness.** Whether the roster names
+every surface the change obliges a write to is a claim about the world, not the
+file, and no scanner reaches it; arm B catches a target *listed and unowned*,
+never one never listed. **One narrow slice of that half is mechanized**, by
+§check-amendment-retired-spelling rather than a fourth arm here: retiring a
+*literal* leaves the retired and replacing spellings in disjoint token spaces,
+so a survivor scan reconciles against this roster. The residue is carried by
+the align stage, which reads it against the tree, and by the build stage, which
+re-derives the roster before the merge counts as complete
+(lifecycle-kit/SPEC.md §templates/stages/) — which is why a roster names the
+probe that produced it rather than claiming completeness
+(`templates/SPEC-amendment.md`), a claim that invites the merge to skip that
+re-derivation. The residue is a stale prose sentence, a semantic over-claim, a
+cross-reference dangled by a deletion, and the renumber case, whose two
+spellings share one token space. Three stronger arms were refused. **Every
+delta cited by some target** is false — a delta adding a new section touches no
+existing one. **Every path or `§` reference in a delta body rostered** cries
+wolf, since a delta names many surfaces for context (gate-sdk/SPEC.md §When a
+gate earns its place). **Every comment directive a delta mints rostered** cries
+wolf too: a name obliges `check-comment-tier`'s roster only where it lands as a
+full-line comment on the governed surface, which the amendment does not say,
+and names minted for fixtures, workflow files, descriptors or a trailing
+position owe no row. `check-comment-tier` reds at an obliged site regardless,
+and §The causal-completeness check point 2 prompts the row at authoring.
 
 **Deliberately not asserted either: a rostered target's non-vacuity.** Two arms
 were weighed for the over-count direction, where a bullet names a target with

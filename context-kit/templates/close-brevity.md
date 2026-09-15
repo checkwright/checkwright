@@ -1,8 +1,8 @@
 **Always-loaded brevity pass** — the recurring close-stage step that reacts to
 the standing per-session context cost. Splice this into your close skill (the
 guard-kit `close-triage.md` pattern). It reacts to the meter's *delta*, not
-its level: close is net-additive by design, so only growth since the iteration
-baseline is actionable.
+its level: a file is not expected to grow each iteration, so growth since the
+iteration baseline is the worklist.
 
 1. **Measure the delta, then the growth.** Run
    `bash gate-sdk/bin/run-gates.sh --emit always-loaded`
@@ -33,5 +33,5 @@ baseline is actionable.
    also lowers armed ratchet ceilings) and commit the baseline and ceiling files,
    so next iteration measures from this close.
 
-Goal: every governed prose file grows only where the growth earns its cost, and
-every session pays for context that is still true and still terse.
+Goal: a governed prose file grows only where re-phrasing could not carry the
+change, and every session pays for context that is still true and still terse.

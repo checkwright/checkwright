@@ -50,16 +50,16 @@ lifecycle and causal-completeness contract your canon-kit owns; name the
 queue-entry grammar and `[spec:]` ref-resolution owners the promotion writes
 against.>*
 
-**Verify causal completeness before declaring an amendment ready.** Every new
-state, event, or interface the amendment introduces names its **producer** (what
-code path or trigger creates it — and that the producer's enabling config is
-actually emitted everywhere it must be), its **consumer** (what receives it, by
-what mechanism), updates any **existing integration prose** describing the prior
-flow, and gives every new field a **named reader** (a field with no named reader
-should be removed). Survey those readers across the **whole component set**,
-never a hand-picked subset, and never silence a probe's stderr — a `2>/dev/null`
-on a path grep reads a bad path as "no reader", manufacturing the false negative
-that hides a cross-component reader.
+**Verify causal completeness before declaring an amendment ready** — every
+point of the checklist your canon-kit owns, for each new state, event,
+interface and obligation. Survey each reader across the **whole component
+set**, never a hand-picked subset, and never silence a probe's stderr — a
+`2>/dev/null` on a path grep reads a bad path as "no reader", the false
+negative that hides a cross-component reader.
+
+**Replacement text re-phrases; it never appends.** Rewrite the passage a
+delta refines, clearer and briefer, and add text only where no rewrite
+carries the change (canon-kit's amendment-merge rule).
 
 **The roster you need may already have been bought.** Authoring routinely wants
 an evidence-backed roster over some corpus, and the stage before you may have

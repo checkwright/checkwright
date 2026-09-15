@@ -697,9 +697,9 @@ stdout is counted whatever its exit status.
   names the path.
 - **`--update-baseline`** rewrites the baseline file, and the ceiling file where
   one exists — a close-stage act,
-  because the brevity pass reacts to the *delta*, not the level (close is
-  net-additive by design; only growth since the iteration started is
-  actionable). The write is checked and a failure names the path at exit 2, the
+  because the brevity pass reacts to the *delta*, not the level (a file is not
+  expected to grow each iteration, so growth since the iteration started is
+  the worklist). The write is checked and a failure names the path at exit 2, the
   refusal shape gate-sdk/SPEC.md §The non-gate arm rules for this class: a
   confirmation line reporting a rewrite that did not happen is worse than none.
 - **`--growth`** prints the brevity pass's other worklist: a header with the

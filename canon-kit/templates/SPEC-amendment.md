@@ -32,16 +32,16 @@
 
 ## Producers and consumers
 
-<!-- The causal-completeness check. For every new state, event, and interface:
-     — Producer: the code path / call / timer that triggers it (and the enabling
-       config some deployed configuration actually sets — not test-only).
-     — Consumer: the component that receives it, by what mechanism.
-     — Every field has a named reader: for each field on a new message, the
-       consumer that reads it and the transition where it is read (a field with
-       no reader is removed).
-     — Narrowing a corpus? name each reader's RED CONDITION, not its subject:
-       only a monotone verdict is clearable by inspection (SPEC §The
-       causal-completeness check, point 5). -->
+<!-- The causal-completeness check (SPEC §The causal-completeness check), for
+     every new state, event, interface and obligation:
+     — Producer: what triggers it, and the enabling config some deployed
+       configuration actually sets — not test-only.
+     — Consumer: what receives it, by what mechanism — and any roster-holding
+       reader of the surface a minted name lands on (point 2).
+     — Every field has a named reader at a named transition, or is removed.
+     — Narrowing a corpus? name each reader's RED CONDITION (point 5).
+     — Obliging every member of an enumerable corpus? name each member's
+       satisfying value, or narrow past a member with none (point 6). -->
 
 ## Existing sections updated
 
@@ -92,15 +92,14 @@
 
 ## Definition of Done
 
-- [ ] **Causal completeness** — every new state/event/interface has a named,
-      reachable producer and a named consumer; every new field has a named
-      reader at a named transition.
+- [ ] **Causal completeness** — every point of SPEC §The causal-completeness
+      check holds for each new state, event, interface and obligation.
 - [ ] **Instruction surfaces: instruction only** — replacement text for a
       template, agent definition or shim carries no grounds; a delta places them
       (the Content-tiering / SSOT rule).
-- [ ] **Merged with no information lost** — each addition integrated into its
-      proper canonical-spec section (not appended); the merged spec reads as one
-      coherent document a reader who never saw the amendment can use alone.
+- [ ] **Merged with no information lost** — each addition re-phrases the
+      canonical-spec text it refines rather than appending to it; the merged spec
+      reads as one document a reader who never saw the amendment can use alone.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
       component (`ls <component>/SPEC-*.md`).
 - [ ] **Removals propagated** — every name this change retired is declared in
