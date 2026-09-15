@@ -12,3 +12,4 @@ couples-field-semantics build aacde861 2026-09-15 28d4d525
 couples-field-semantics build a997bb88 2026-09-15 d6b899c8
 couples-field-semantics build a2e8e6a5 2026-09-15 75e6ef18
 couples-field-semantics validate a481816f 2026-09-15 261a01de
+couples-field-semantics close af9a7fa3 2026-09-15 999e4247
