@@ -5,3 +5,4 @@
 ---
 
 couples-field-semantics scope a5f23aa2 2026-09-15 8c664951
+couples-field-semantics spec a35dedfd 2026-09-15 b988ec54
