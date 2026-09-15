@@ -67,21 +67,28 @@ applied:**
 > consumer's security decision (§compare-settings-allow's impact criterion rates a committed widening
 > high-impact). Each entry is there for a stated reason and reaches a stated set:
 >
-> - **The front-end, bare and with arguments.** Every gate, every arm and three of the ruleset's own
->   steer targets are reached through it: rule 8's section extractor and the `--scratch-run` runner
->   rules 23 and 26 name. Its reach is the whole front-end. That includes `--scratch-run`, which runs a
->   scratch script under that arm's echo control, `--install-hooks`, which opts the clone into the
->   generated git hooks, and every `--emit … --write` mode that regenerates a tracked
->   projection.
+> - **The front-end, bare and with arguments.** Every gate, every arm and the ruleset's own
+>   front-end steer targets are reached through it: rule 8's section extractor and `--rewrite` arm,
+>   and the `--scratch-run` runner rules 23 and 26 name. Its reach is the whole front-end. That
+>   includes:
+>   - `--scratch-run`, which runs a scratch script under that arm's echo control;
+>   - `--rewrite`, which rewrites files inside the repository under its own bounds (§rewrite);
+>   - `--install-hooks`, which opts the clone into the generated git hooks;
+>   - every `--emit … --write` mode that regenerates a tracked projection.
 > - **`git rm -q`**, rule 22's steer target, spelled as the steer prints it. Its reach is deleting and
 >   staging tracked paths, which is recoverable from the last commit. Rule 22 blocks its force flag
 >   whether or not a grant matches.
 > - **The banner and diagnostic tools** an agent chains around a core command: `echo`, `wc`, `grep`,
 >   `ls` and `command -v`. The harness matches each segment of a compound on its own, so these are
 >   what keep a chained core command on the match path. They read or print. A redirect on them is a
->   file write the harness checks against the target, not against these entries. **The honest limit**
->   is that a Bash read grant reaches paths a harness file-read rule may deny, so a consumer holding
->   such rules drops `grep` and `wc` here rather than widening around them.
+>   file write the harness checks against the target, not against these entries. **The criterion
+>   for this set is that a utility has no write or execute form of its own**, meaning nothing it can
+>   do beyond what the harness separately checks. So `find` (`-exec`, `-delete`), `awk` (`system()`,
+>   `print >`), `xargs`, `sed` and every interpreter stay out however habitually they are chained,
+>   and the steer for a rewrite is `--rewrite`, not a grant. The front-end and `git rm -q` above are
+>   the kit's own steer targets, each granted for its stated reach, not members of this set. **The
+>   honest limit** is that a Bash read grant reaches paths a harness file-read rule may deny, so a
+>   consumer holding such rules drops `grep` and `wc` here rather than widening around them.
 >
 > **Deliberately absent, so a reader does not re-derive it.** The harness's built-in read-only `git`
 > subcommands need no entry. A write to a gitignored target, a truncation of one and a sanctioned wait

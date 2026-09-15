@@ -19,8 +19,12 @@
   calls, 79 logged lines of them in-place rewrites, beside 23 `python3 -` heredoc rewrites; no entry
   named either. Rule 8's walker is per tool (guard-kit/SPEC.md §The generic ruleset, rule 8), so a
   `perl` arm is a new option-table row rather than a new walker.
-  **Ruled at spec:** the `perl` arm fires on exactly one literal file operand, and `python3 -`
-  bodies are not steered; the grounds and the transcript measurement are the amendment's.
+  **Reshaped at spec** (operator direction, 2026-09-15, lead-relayed): steer agents off
+  interpreters and utilities whose side effects cannot be read, onto predictable tools
+  checkwright builds in Rust, starting now. Rule 8's in-place arm fires on every in-place `perl`
+  and `sed` and steers to the rewrite arm, which `rewrite-arm` builds and this unit waits on.
+  `python3 -` bodies stay unsteered for want of a target, carried by
+  `inline-interpreter-substrate-census`.
   **Cost while deferred:** one out-of-band permission decision per in-place `perl` rewrite,
   invisible to every gate.
   recurrence: in-place-rewrite-steer-reach 2026-09-15
@@ -30,6 +34,19 @@
   **Selected as `guard-friction-reach`'s lead unit** (operator direction, 2026-09-15, lead-relayed).
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from its prompt-friction
   triage; promoted at the next iteration's scope.
+
+- **rewrite-arm** [spec: SPEC-rewrite-arm.md] — the gate binary has no predictable,
+  side-effect-bounded tool for rewriting files, so an in-place `perl` or `sed` has no steer target
+  but the Edit tool, one call per file.
+  **Directed** (operator direction, 2026-09-15, lead-relayed): mint a Rust rewrite arm reached
+  through the front-end, literal or regex, over several files, as the steer target this iteration.
+  The operator chose it with its costs in view: a new name, a crate module and SPEC sections, a
+  security read, a wider align, and nothing yet for `python3`.
+  **Split from `in-place-rewrite-steer-reach`**, whose rule 8 widening steers to this arm. The arm
+  can land while that steer is still open, so the two take different dispositions.
+  **Cost while deferred:** that steer has no target, and a sweep stays an out-of-band decision or
+  N Edit calls.
+  Filed 2026-09-15 by `guard-friction-reach`'s spec under that direction.
 
 - **file-authoring-act-ungoverned** [spec: SPEC-compound-write-steer.md] — the file-authoring
   writes no glob can reach.
@@ -85,6 +102,8 @@
   **Cost while deferred:** live, not latent, probed at spec: any committed `Bash(<cmd> *)` glob
   absorbs a redirect or an expansion, so such calls already read granted.
   **`guard-friction-reach`'s grant-test unit** (operator direction, 2026-09-15, lead-relayed).
+  **Widened at spec to expansions as well as redirects** (operator direction, 2026-09-15,
+  lead-relayed).
   Filed 2026-09-12 by build, from the ranker partition; drained and promoted 2026-09-13 at close.
 
 - **settings-overlay-dead-path-unreported** [spec: SPEC-overlay-dead-path.md] —
@@ -163,6 +182,29 @@
   discipline, and this repo's numbers stay a restatement a kit cannot see.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, beside the hotfix-push
   allowance it landed in CLAUDE.md; promoted at the next iteration's scope.
+
+- **inline-interpreter-substrate-census** [design-pending] [cost: iteration/high] [surface: guard-kit]
+  — whether the recurring inline-interpreter computations are one-off scratch or unported tooling,
+  and which predictable, side-effect-bounded tools in the binary would replace them as steer
+  targets.
+  **What this asks that no ruled entry did**: the 2026-08-30 grant settled whether the inline
+  `python3` shape is GRANTED, never whether it is the right SUBSTRATE. A computation re-derived
+  every iteration is unported tooling the grant entrenches.
+  recurrence: inline-interpreter-substrate-census 2026-09-15
+  **Returned from the icebox by `guard-friction-reach`'s spec, on a second datum and a direction.**
+  First datum (2026-08-30 drain): 1 inline-interpreter call in 556 fall-throughs. Second datum,
+  read from the harness session transcripts rather than the friction log, 2026-09-08 to 2026-09-15:
+  743 inline `python3` calls in about 27k Bash calls, 572 writing one path and 50 several. So the
+  shape recurs. The direction widens the ask (operator direction, 2026-09-15, lead-relayed): steer
+  agents off interpreters and utilities whose side effects cannot be read, onto predictable tools
+  checkwright builds in Rust. `rewrite-arm` is that family's first member, and
+  `in-place-rewrite-steer-reach` records `python3` bodies as unsteered for want of a target.
+  **Why `[design-pending]`:** the census comes first. It classifies what the inline bodies
+  compute, and only then can a tool be named. Whether a steer can read a body the guard's skeleton
+  blanks is a second call.
+  **Cost while deferred:** every inline computation stays an unreviewable-effect call, granted by a
+  committed glob or decided out of band, and nothing counts what the calls recompute.
+  Filed 2026-08-30 by close from the gap inbox; iceboxed at a pool triage; returned 2026-09-15.
 
 - **gap-inbox-kit-ref-valve** [design-pending] [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
@@ -4624,7 +4666,6 @@
 - **queue-citation-line-number-stales-within-its-own-session** [design-pending] — Line cites stale.
 - **post-scope-admission-has-no-promotion-route** [design-pending] — Late debt has no promoter.
 - **declaration-shape-outside-header-unreadable** [design-pending] — Inert literals read as live.
-- **inline-interpreter-substrate-census** [design-pending] — Scratch computations may be tooling.
 - **boundary-preserve-covers-names-not-lifetimes** [design-pending] — Keep-list lists names only.
 - **validate-suite-wall-clock-unowned** [design-pending] — Serial smoke suites cost ~16 minutes.
 - **overlay-only-oracle-grants-uncommitted** [design-pending] — Oracle grants live off-tree.
