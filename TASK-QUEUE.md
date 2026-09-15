@@ -12,6 +12,156 @@
 
 ## New Features
 
+- **amendment-reader-roster-undercount** [spec: SPEC-roster-rederivation.md] — an amendment's
+  reader/caller roster is a dated measurement presented as a roster, and it undercounted twice in
+  one iteration.
+  **Both misses were the same spec session, one iteration.** `SPEC-graph-port.md` delta 5 scoped ONE
+  caller of a file it deleted where the tree held twelve — nine kit `smoke/install.sh` arms,
+  `context-kit/smoke/agents-md.sh`, `bin/upgrade-smoke.sh` and `installer/lib/init.sh`.
+  `SPEC-stamp-head.md` delta 5 asserted "exactly one parser breaks" and named it, missing FOUR
+  end-anchored `grep` assertions in `lifecycle-kit/smoke/install.sh` plus 7 of 10 cases in
+  `check-stage-evidence.test.sh` that flip to "malformed stamp" and stop reaching what they assert.
+  **One shape, and the spec method structurally cannot see it.** The hit is BUILT BY INTERPOLATION —
+  the date is a shell variable — so a literal-string, field-count or length sweep returns nothing;
+  the breakage is CONSEQUENTIAL, so "the tests still pass" reads true and is false. Re-verified at
+  the drain against `git diff`: every named site is there, rewritten by the unit that found it.
+  **This is a method finding about a STAGE, not a defect count.** Delta 5 itself says the build unit
+  re-runs the sweep against the tree rather than trusting the roster, and that sentence is what
+  caught both — carried by an individual amendment rather than by any contract that outlives it.
+  **Candidate deliverables were three:** a build-stage re-sweep contract line, an oracle grepping
+  the assertion IDIOM rather than the literal, or dropping the roster and keeping only the sweep
+  instruction. **Ruled at spec (the amendment):** the first, with the roster naming its own probe;
+  dropping it is refused because `check-amendment-retired-spelling` reconciles against it, and the
+  idiom grep because the recurrence below spells no name.
+  **THE COUNTER-CASE IS NOW OVERDUE AND THE POOL WENT THE OTHER WAY — FOUR FOR FOUR in a second
+  iteration**, the datum the design fork needed, and it arrived falsifying, not supplying, the
+  sparing case. `test-harness-cut-seam-sweep`: batch A's gate-tests
+  amendment named three callers and missed the CI workflow and its shipped template; batch B's
+  guard-tests amendment claimed one caller "verified this session over the tracked tree" against an
+  EXECUTABLE CI step plus six prose sites, and its agents-md amendment predicted two docs pages
+  needed no edit when both named the deleted path; batch C's cardinal-reach DoD asserted "grepped
+  every spec, config and gate source; nothing dangles" against eight live references. **The battery
+  caught every one and reading caught none** — so of the three candidates the two that reach an
+  ORACLE (the build-stage re-sweep line, the idiom grep) are now separated from the third by
+  evidence rather than by taste.
+  **AND THE DOC SIDE IS THE SAME MISS.** This close's `internal-identifier-restatement` and
+  `capability-liveness-after-descope` sweeps independently found five present-tense prose sites
+  naming the three shell files this iteration deleted, four of them in files the landing unit had
+  itself opened and edited. Grammatical position predicts them: every repaired occurrence sat in
+  subject or object position, every missed one in an appositive, an attributive modifier or a
+  coordinated list member. A roster derived by grep would have caught all five.
+  **RECURRED 2026-09-15, in both `config-seam-fourth-cut` build batches, past a grep the roster
+  DID run.** Rosters derived by spelling grep over retired names missed SEMANTIC readers: prose
+  saying a library resolves a knob, a smoke reading a knob as a sourced global, a root compared as
+  absolute, SPECs deferring a default to a bare family stem. None spells a retired name, so neither
+  the literal grep nor an idiom grep reaches them; the battery and build reading caught all.
+  recurrence: amendment-reader-roster-undercount 2026-09-05 2026-09-15
+  **Cost while deferred:** a spec session pays for a census the build session must buy again, and
+  the roster's authority runs inversely to its accuracy.
+  Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close;
+  **joins `owed-port-tail` at threshold** (operator direction, 2026-09-15, lead-relayed); built
+  first in the unit set, so the three port batches run under its build-stage line.
+
+- **gen-pre-commit-port** [spec: SPEC-git-hooks-port.md] — `gate-sdk/bin/gen-pre-commit.sh` is owed:
+  its `no-port` declaration rested on criterion 6's single-producer rule, and the crate is now every
+  knob's one producer (gate-sdk/SPEC.md §gen-pre-commit).
+  **Deliverable:** the pre-commit and commit-msg emissions as binary arms producing byte-identical
+  hooks, `check-graph` assertion D reading them in process with its `--needs` `bash` element gone,
+  every caller (`init`, the kit `smoke/install.sh` recipes, the upgrade and AGENTS.md smokes) moved
+  to the arm, and the script deleted.
+  **Ruled at spec (the amendment):** one `--emit git-hooks` arm taking `pre-commit`, `commit-msg` or
+  `--write`; the recipes keep a shell spelling through the front-end and no shim script; the
+  `gen=manual` round-trip gets its first tree-test cases; `--knob-files` and three callerless
+  `lib/gate.sh` helpers retire with the script.
+  **Cost while deferred:** every battery spawns `bash` for assertion D's two arms, against the
+  port's direction; a host without `bash` fails `check-graph` at exit 2; `--emit port-blockers
+  --tree` counts the file owed.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the Deferred entry its bridge-retirement
+  amendment's delta 10 names (operator direction, 2026-09-14, lead-relayed).
+  **Leads `owed-port-tail`** — operator direction, 2026-09-15, lead-relayed; authored and paired at
+  spec.
+
+- **run-consumer-smoke-port** [spec: SPEC-consumer-smoke-port.md] —
+  `gate-sdk/bin/run-consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule,
+  since its registration accounting resolved a gate's knobs through the bridge, and that ground is
+  gone (gate-sdk/SPEC.md §Consumer smoke, The port disposition).
+  **Deliverable:** the install, green-battery, registration-accounting and violation phases as a
+  binary arm the `consumer_smoke` validate suite runs, its output and 0/1/2 contract unchanged, and
+  the script deleted.
+  **Ruled at spec (the amendment):** the arm is `--run-consumer-smoke`; both probe legs spawn in the
+  probed tree, and an absent tree binary is a harness exit 2 rather than a probe verdict; it ports
+  together with `consumer-smoke-library-port` in one unit.
+  **Cost while deferred:** every validate runs a 240-line bash harness; `--emit port-blockers
+  --tree` counts it owed.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s build beside its two sibling ports, when the
+  bridge retirement moved the smoke harness from no-port to owed (operator direction, 2026-09-14).
+  **Rides `owed-port-tail`** beside `gen-pre-commit-port` — operator direction, 2026-09-15,
+  lead-relayed; authored and paired at spec.
+
+- **consumer-smoke-library-port** [spec: SPEC-consumer-smoke-port.md] —
+  `gate-sdk/lib/consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule, and
+  the crate is now every knob's one producer (gate-sdk/SPEC.md §Consumer smoke). Its callers are
+  `run-consumer-smoke.sh`, which sources it, and three compiled arms (`--upgrade-smoke`,
+  `--agents-md-smoke`, `--run-demo`) that reach it through a shared `bash -c` spawn wrapper.
+  **Deliverable:** `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and `csmoke_place_binary`
+  in-crate, the spawn wrapper and its `SCRATCH` stdout protocol deleted, and the library deleted.
+  **Ruled at spec (the amendment):** together with `run-consumer-smoke-port`, one unit;
+  library-first with a shell caller kept is refused as a second holder under criterion 6. No
+  caller's output channel moves in the cut.
+  **Cost while deferred:** each of the three arms spawns `bash` to reach the helpers, and their
+  installer output is forced onto stderr by the protocol; `--emit port-blockers --tree` counts it
+  owed.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the third of the three ports the bridge
+  retirement made owed (operator direction, 2026-09-14, lead-relayed).
+  **Rides `owed-port-tail`** — operator direction, 2026-09-15, lead-relayed; its order against
+  `run-consumer-smoke-port` settled at spec as together.
+
+- **gate-command-status-conflation-third-caller** [spec: SPEC-git-hooks-port.md]
+  [spec: SPEC-consumer-smoke-port.md] — a third call site conflates `gate_command`'s harness-error
+  exit with a resolution failure, and its guard for the real case is dead.
+  **Both defects read off the source at this drain rather than cited.** In
+  `gate-sdk/bin/run-gate-tests.sh`, `run_case` reaches `gate_command` through a PROCESS
+  SUBSTITUTION, so the function's exit 2 for a harness error — an absent dispatch binary —
+  kills only the subshell and reaches the caller as an empty argv. The
+  `if !` arm around it is dead, because `mapfile`'s status is `mapfile`'s own and not the
+  substitution's, so only the empty-argv arm ever fires; both arms print the same
+  resolves-in-no-check-dir line, which is FALSE for the binary-absent cause — the gate resolved
+  perfectly well and merely could not be built.
+  **RE-GROUNDED 2026-09-15 at scope: that referent is deleted.** `run-gate-tests.sh` became the
+  compiled `--run-gate-tests` arm, which spawns no process substitution. The shape survives at two
+  other callers: `gate-sdk/bin/gen-pre-commit.sh`'s `command_rel` (`mapfile ... < <(gate_command
+  ...) || return 1`, the same dead guard) and `gate-sdk/bin/run-consumer-smoke.sh`'s `acct_probe`.
+  Both files are owed ports (`gen-pre-commit-port`, `run-consumer-smoke-port`) whose deliverable
+  deletes them, so landing those ports discharges this entry by deletion.
+  **Rides `owed-port-tail` as a rider, superseding the 2026-08-25 lead decision below** — operator
+  direction, 2026-09-15, lead-relayed; discharged by the ports' deletions. Paired at spec to both
+  port amendments, each of which states why its crate form cannot re-conflate the two failures
+  (the hook emitter is the binary; the smoke probe returns a harness error as exit 2). It moves to
+  Done when the second of the two lands.
+  **Distinct from the closed exit-class unit, and NOT a re-filing of it.** That unit repaired
+  this shape at `scripts/gate-exec.sh` only and enumerated its blast radius as the name-addressed
+  pre-flight callers; this caller sits in gate-sdk's own `bin/` and outside that unit's audited
+  update-target roster, which is why it was filed rather than folded in.
+  **The verdict is already right and the defect is on the MESSAGE axis alone** — `run_case`
+  returns 2 and the run counts a harness failure, so nothing silently passes. But that is the
+  same axis the closed unit exists for, and gate-sdk/SPEC.md §lib/gate.sh now states the caller
+  obligation generically, so this is a stated-rule violation rather than an inconsistency.
+  **Shape:** `run-gates.sh`'s existing pattern is prior art in the same directory — capture
+  through a command substitution, keep the status, and name resolves-in-no-check-dir only on
+  status 1. It also owes an update to gate-sdk/SPEC.md §run-gate-tests, which is what puts it
+  past a mechanical sweep and made it a scope change rather than in-envelope calibration.
+  **Cost while deferred:** low and diagnostic — a fixture run against a stale binary tells its
+  reader the gate does not exist, pointing at a registration fix instead of at
+  `bash gate-sdk/bin/build-native.sh`.
+  **The authority named on the Filed line below is ITSELF A FILED QUESTION — read it there rather
+  than re-deriving it:** `pre-grammar-disposition-authority-ambiguity` owns whether an ungrammared
+  disposition naming an operator CLASS and a LEAD ruler is read as one or the other, and the
+  operator ruled 2026-09-03 that the ambiguity is FILED rather than settled. This entry's own
+  deferral turns on neither reading, so a drain meeting this row disposes of it without escalating.
+  Filed 2026-08-24 by build while landing the exit-class unit; DISPOSITIONED BY OPERATOR-CLASS
+  RULING at the 2026-08-25 close — the lead ruled it STAYS DEFERRED on CLAUDE.md's
+  scope-gated-intake rule, and directed it be promoted as a filing rather than started as work.
+
 ## Technical Debt
 
 ## Deferred
@@ -37,58 +187,6 @@
   Filed 2026-09-14 by `config-seam-fourth-cut`'s spec, a direct entry the operator authorized
   (operator direction, 2026-09-14, lead-relayed), splitting the floor out of the bridge's
   retirement.
-
-- **gen-pre-commit-port** [design-pending] [cost: session/low] [surface: gate-sdk] — `gate-sdk/bin/gen-pre-commit.sh`
-  is owed: its `no-port` declaration rested on criterion 6's single-producer rule, and the crate is
-  now every knob's one producer (gate-sdk/SPEC.md §gen-pre-commit).
-  **Deliverable:** the pre-commit and commit-msg emissions as binary arms producing byte-identical
-  hooks, `check-graph` assertion D reading them in process with its `--needs` `bash` element gone,
-  every caller (`init`, the kit `smoke/install.sh` recipes, the upgrade and AGENTS.md smokes) moved
-  to the arm, and the script deleted.
-  **Why [design-pending]:** the `gen=manual` round-trip and `--write`'s conditional commit-msg write
-  move with it, and whether the smoke recipes keep a shell spelling of the call is a choice.
-  **Cost while deferred:** every battery spawns `bash` for assertion D's two arms, against the
-  port's direction; a host without `bash` fails `check-graph` at exit 2; `--emit port-blockers
-  --tree` counts the file owed.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the Deferred entry its bridge-retirement
-  amendment's delta 10 names (operator direction, 2026-09-14, lead-relayed).
-  **Leads `owed-port-tail`** — operator direction, 2026-09-15, lead-relayed; stays Deferred for spec
-  to author and pair.
-
-- **run-consumer-smoke-port** [design-pending] [cost: iteration/low] [surface: gate-sdk] —
-  `gate-sdk/bin/run-consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule,
-  since its registration accounting resolved a gate's knobs through the bridge, and that ground is
-  gone (gate-sdk/SPEC.md §Consumer smoke, The port disposition).
-  **Deliverable:** the install, green-battery, registration-accounting and violation phases as a
-  binary arm the `consumer_smoke` validate suite runs, its output and 0/1/2 contract unchanged, and
-  the script deleted.
-  **Why [design-pending]:** the accounting probes gates no registry names, so it cannot delegate to
-  `run-gates.sh --only`, and whether it probes in process or by spawning the consumer's own binary
-  is open; it also waits on or absorbs `consumer-smoke-library-port`.
-  **Cost while deferred:** every validate runs a 240-line bash harness; `--emit port-blockers
-  --tree` counts it owed.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s build beside its two sibling ports, when the
-  bridge retirement moved the smoke harness from no-port to owed (operator direction, 2026-09-14).
-  **Rides `owed-port-tail`** beside `gen-pre-commit-port` — operator direction, 2026-09-15,
-  lead-relayed; stays Deferred for spec to author and pair.
-
-- **consumer-smoke-library-port** [design-pending] [cost: iteration/low] [surface: gate-sdk] —
-  `gate-sdk/lib/consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule, and
-  the crate is now every knob's one producer (gate-sdk/SPEC.md §Consumer smoke). Its callers are
-  `run-consumer-smoke.sh`, which sources it, and three compiled arms (`--upgrade-smoke`,
-  `--agents-md-smoke`, `--run-demo`) that reach it through a shared `bash -c` spawn wrapper.
-  **Deliverable:** `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and `csmoke_place_binary`
-  in-crate, the spawn wrapper and its `SCRATCH` stdout protocol deleted, and the library deleted.
-  **Why [design-pending]:** it cannot delete while `run-consumer-smoke.sh` sources it, so the order
-  against `run-consumer-smoke-port` (together, or library first with a shell caller kept) is the
-  decision.
-  **Cost while deferred:** each of the three arms spawns `bash` to reach the helpers, and their
-  installer output is forced onto stderr by the protocol; `--emit port-blockers --tree` counts it
-  owed.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the third of the three ports the bridge
-  retirement made owed (operator direction, 2026-09-14, lead-relayed).
-  **Rides `owed-port-tail`**, its order against `run-consumer-smoke-port` spec's to settle —
-  operator direction, 2026-09-15, lead-relayed; stays Deferred for spec to author and pair.
 
 - **in-place-rewrite-steer-reach** [design-pending] [cost: session/low] [surface: guard-kit] — guard-kit
   rule 8 steers a `sed -i` rewrite to the Edit tool, but `perl -pi` and `perl -0pi` reach the same
@@ -876,57 +974,6 @@
   Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
   whether the tag earns its keep; the operator noted having proposed removal before and gave no
   ruling. Promoted 2026-09-06 by close — too wide to fix inline, live trigger bars the icebox.
-
-- **amendment-reader-roster-undercount** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — an amendment's reader/caller roster is a
-  dated measurement presented as a roster, and it undercounted twice in one iteration.
-  **Both misses were the same spec session, one iteration.** `SPEC-graph-port.md` delta 5 scoped ONE
-  caller of a file it deleted where the tree held twelve — nine kit `smoke/install.sh` arms,
-  `context-kit/smoke/agents-md.sh`, `bin/upgrade-smoke.sh` and `installer/lib/init.sh`.
-  `SPEC-stamp-head.md` delta 5 asserted "exactly one parser breaks" and named it, missing FOUR
-  end-anchored `grep` assertions in `lifecycle-kit/smoke/install.sh` plus 7 of 10 cases in
-  `check-stage-evidence.test.sh` that flip to "malformed stamp" and stop reaching what they assert.
-  **One shape, and the spec method structurally cannot see it.** The hit is BUILT BY INTERPOLATION —
-  the date is a shell variable — so a literal-string, field-count or length sweep returns nothing;
-  the breakage is CONSEQUENTIAL, so "the tests still pass" reads true and is false. Re-verified at
-  the drain against `git diff`: every named site is there, rewritten by the unit that found it.
-  **This is a method finding about a STAGE, not a defect count.** Delta 5 itself says the build unit
-  re-runs the sweep against the tree rather than trusting the roster, and that sentence is what
-  caught both — carried by an individual amendment rather than by any contract that outlives it.
-  **Candidate deliverables, none ruled:** make the re-sweep obligation a build-stage contract line
-  rather than a sentence an amendment may or may not carry; or an oracle for the interpolated-hit
-  class that greps the assertion IDIOM rather than the literal; or drop the roster from amendments
-  and keep only the sweep instruction, since a roster nobody may trust is context cost with a
-  false-confidence coupon attached.
-  **Why `[design-pending]`:** the three are not variants of one fix — a template edit, a new gate,
-  and a deletion that removes a real aid; the counter-case it waited on (a RIGHT roster sparing its
-  reader the sweep) is answered below.
-  **THE COUNTER-CASE IS NOW OVERDUE AND THE POOL WENT THE OTHER WAY — FOUR FOR FOUR in a second
-  iteration**, which is the datum the `[design-pending]` fork was waiting on and it arrived
-  falsifying, not supplying, the sparing case. `test-harness-cut-seam-sweep`: batch A's gate-tests
-  amendment named three callers and missed the CI workflow and its shipped template; batch B's
-  guard-tests amendment claimed one caller "verified this session over the tracked tree" against an
-  EXECUTABLE CI step plus six prose sites, and its agents-md amendment predicted two docs pages
-  needed no edit when both named the deleted path; batch C's cardinal-reach DoD asserted "grepped
-  every spec, config and gate source; nothing dangles" against eight live references. **The battery
-  caught every one and reading caught none** — so of the three candidates the two that reach an
-  ORACLE (the build-stage re-sweep line, the idiom grep) are now separated from the third by
-  evidence rather than by taste, and a session picking this up starts there.
-  **AND THE DOC SIDE IS THE SAME MISS.** This close's `internal-identifier-restatement` and
-  `capability-liveness-after-descope` sweeps independently found five present-tense prose sites
-  naming the three shell files this iteration deleted, four of them in files the landing unit had
-  itself opened and edited. Grammatical position predicts them: every repaired occurrence sat in
-  subject or object position, every missed one in an appositive, an attributive modifier or a
-  coordinated list member. A roster derived by grep would have caught all five.
-  **RECURRED 2026-09-15, in both `config-seam-fourth-cut` build batches, past a grep the roster
-  DID run.** Rosters derived by spelling grep over retired names missed SEMANTIC readers: prose
-  saying a library resolves a knob, a smoke reading a knob as a sourced global, a root compared as
-  absolute, SPECs deferring a default to a bare family stem. None spells a retired name, so neither
-  the literal grep nor an idiom grep reaches them; the battery and build reading caught all.
-  recurrence: amendment-reader-roster-undercount 2026-09-05 2026-09-15
-  **Cost while deferred:** a spec session pays for a census the build session must buy again, and
-  the roster's authority runs inversely to its accuracy.
-  Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close;
-  **joins `owed-port-tail` at threshold** (operator direction, 2026-09-15, lead-relayed).
 
 - **boundary-wipe-preserve-basename-reach** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — the iteration-boundary scratch wipe
   matches its preserve list by **basename at any depth**, so one nested `.gitkeep` makes a whole
@@ -3045,49 +3092,6 @@
   one valve, and the surface teaching the repair teaches three wrong ones.
   Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
   2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
-
-- **gate-command-status-conflation-third-caller** [design-pending] [cost: event/low] [surface: gate-sdk] — a third call site conflates
-  `gate_command`'s harness-error exit with a resolution failure, and its guard for the real case
-  is dead.
-  **Both defects read off the source at this drain rather than cited.** In
-  `gate-sdk/bin/run-gate-tests.sh`, `run_case` reaches `gate_command` through a PROCESS
-  SUBSTITUTION, so the function's exit 2 for a harness error — an absent dispatch binary —
-  kills only the subshell and reaches the caller as an empty argv. The
-  `if !` arm around it is dead, because `mapfile`'s status is `mapfile`'s own and not the
-  substitution's, so only the empty-argv arm ever fires; both arms print the same
-  resolves-in-no-check-dir line, which is FALSE for the binary-absent cause — the gate resolved
-  perfectly well and merely could not be built.
-  **RE-GROUNDED 2026-09-15 at scope: that referent is deleted.** `run-gate-tests.sh` became the
-  compiled `--run-gate-tests` arm, which spawns no process substitution. The shape survives at two
-  other callers: `gate-sdk/bin/gen-pre-commit.sh`'s `command_rel` (`mapfile ... < <(gate_command
-  ...) || return 1`, the same dead guard) and `gate-sdk/bin/run-consumer-smoke.sh`'s `acct_probe`.
-  Both files are owed ports (`gen-pre-commit-port`, `run-consumer-smoke-port`) whose deliverable
-  deletes them, so landing those ports discharges this entry by deletion.
-  **Rides `owed-port-tail` as a rider, superseding the 2026-08-25 lead decision below** — operator
-  direction, 2026-09-15, lead-relayed; discharged by the ports' deletions.
-  **Distinct from the closed exit-class unit, and NOT a re-filing of it.** That unit repaired
-  this shape at `scripts/gate-exec.sh` only and enumerated its blast radius as the name-addressed
-  pre-flight callers; this caller sits in gate-sdk's own `bin/` and outside that unit's audited
-  update-target roster, which is why it was filed rather than folded in.
-  **The verdict is already right and the defect is on the MESSAGE axis alone** — `run_case`
-  returns 2 and the run counts a harness failure, so nothing silently passes. But that is the
-  same axis the closed unit exists for, and gate-sdk/SPEC.md §lib/gate.sh now states the caller
-  obligation generically, so this is a stated-rule violation rather than an inconsistency.
-  **Shape:** `run-gates.sh`'s existing pattern is prior art in the same directory — capture
-  through a command substitution, keep the status, and name resolves-in-no-check-dir only on
-  status 1. It also owes an update to gate-sdk/SPEC.md §run-gate-tests, which is what puts it
-  past a mechanical sweep and made it a scope change rather than in-envelope calibration.
-  **Cost while deferred:** low and diagnostic — a fixture run against a stale binary tells its
-  reader the gate does not exist, pointing at a registration fix instead of at
-  `bash gate-sdk/bin/build-native.sh`.
-  **The authority named on the Filed line below is ITSELF A FILED QUESTION — read it there rather
-  than re-deriving it:** `pre-grammar-disposition-authority-ambiguity` owns whether an ungrammared
-  disposition naming an operator CLASS and a LEAD ruler is read as one or the other, and the
-  operator ruled 2026-09-03 that the ambiguity is FILED rather than settled. This entry's own
-  deferral turns on neither reading, so a drain meeting this row disposes of it without escalating.
-  Filed 2026-08-24 by build while landing the exit-class unit; DISPOSITIONED BY OPERATOR-CLASS
-  RULING at the 2026-08-25 close — the lead ruled it STAYS DEFERRED on CLAUDE.md's
-  scope-gated-intake rule, and directed it be promoted as a filing rather than started as work.
 
 - **amendment-update-target-overcount-undetected** [design-pending] [cost: event/low] [surface: canon-kit] — an amendment's
   `## Existing sections updated` roster is unchecked in the OVER-count direction, so a rostered
