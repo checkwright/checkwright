@@ -4735,11 +4735,4 @@
 
 ## Done
 
-- amendment-reader-roster-undercount
-- amendment-update-target-overcount-undetected
-- gen-pre-commit-port
-- run-consumer-smoke-port
-- consumer-smoke-library-port
-- gate-command-status-conflation-third-caller
-
 ## Lessons Learned
