@@ -9,3 +9,4 @@ couples-field-semantics spec a35dedfd 2026-09-15 b988ec54
 couples-field-semantics align a7e357f4 2026-09-15 44415d36
 couples-field-semantics build ad82f0ad 2026-09-15 e5787d6c
 couples-field-semantics build aacde861 2026-09-15 28d4d525
+couples-field-semantics build a997bb88 2026-09-15 d6b899c8
