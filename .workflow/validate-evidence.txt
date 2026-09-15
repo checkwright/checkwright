@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+owed-port-tail gates sha256=43682a7bff30cb6d67e26d8b38017e3c37c4efef48ab62112fd3770dfe437c46 pass=113 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail canon_kit sha256=9abfbc2ca869a1d99fc0042041770b8d85097bf852c31e7c128600b65e24f1bf pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail guard_kit sha256=bec1c9c35372c4d6106471ec51071ee748b3187f02c6303efe7fbf6667cc7d0d pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail lifecycle_kit sha256=5311e9a5280a1575415221248652e5ca6505cf9935ddf39a83e9007804bcb172 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail queue_kit sha256=2334582dd365a18ebe2f1daf9532d2acc25728fa9e04376e62f24f0c8a5a1788 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail guard_tests sha256=2a108790560312278bb663395d2c9c016c4d1e1d20b24e6d76b12f65dc9a935f pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail demo sha256=a6f61883f9dac63ff70a9edb5cf0e2fd5b24fe318289df8d9237923a744a26b6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail installer_smoke sha256=3bdd6bbf4b8ae96d958b4805777b91b9e74d94617592c2007570ead8fcb2b91c pass=13 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail consumer_smoke sha256=125100d28f765ce151d6e69faaa3d8e0de685f90c633e3c3c71c7151148074e9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail upgrade sha256=eee4b8a32abd8d1ce1649925c33c8ecef718920e2c494de6183c53401681948d pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail agents_md_smoke sha256=511b11c0c4342385a262437ed02d13eb0d31bb2581a35f57eedf17d5f1b382b5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
+owed-port-tail native_crate sha256=391e45399f9ac1ba31039dd83964044179f9c9d0ae2b69d08e4f37840b67045e pass=1 fail=0 ignore=0 verdict=clean 2026-09-15
