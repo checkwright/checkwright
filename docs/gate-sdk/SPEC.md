@@ -9076,6 +9076,10 @@ reader needs outlive the refactor that renames a helper:
   value, an empty value and nothing, and compares each answer with
   `knobs::resolve`. The accessor does not refuse a malformed line it skips. The
   binary refuses it at its first gate-sdk read, which every arm reaches.
+- **`gate_command` bakes no knob into the argv it emits.** A dispatched member
+  resolves every knob itself, against the tree at its own working directory, so a
+  caller running a member in a tree whose knob file lacks a value it needs passes
+  that value in the child's environment.
 - **One name means one grammar, and a distinct spelling is what a grammar change
   buys.** A whitespace-list knob (`GATE_SDK_PRUNE_DIRS`, `GATE_SDK_KIT_DIRS`,
   `GATE_SDK_EXEC_GLOBS` and their siblings in §Layout and configuration) keeps its

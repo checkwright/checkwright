@@ -539,7 +539,8 @@ the single fold §Evidence manifest rules, so a suite never runs against a tree
 the spine has already written to. It never edits the baseline, never retries, and surfaces a
 non-zero suite exit verbatim. A log with no parseable result is a run failure,
 not an empty diff. Not a gate — a `bin/` tool exercised end-to-end in `smoke/`,
-with the lock's own behavior pinned by `gate-tests/producer-lock.test.sh`.
+with the lock's own behavior pinned by `gate-tests/producer-lock.test.sh` and the
+pre-hook's ordering and abort by `gate-tests/pre-hook.test.sh`.
 
 **It is the arm-table member `--run-validate`**, reached through
 `bash gate-sdk/bin/run-gates.sh --run-validate` and dispatched to

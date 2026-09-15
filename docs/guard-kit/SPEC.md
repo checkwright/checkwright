@@ -1726,12 +1726,9 @@ that harness exists would be designing against no case.
     mandates; a statement on a line whose heredoc openers sit in more than one
     statement, whose residue cannot be attributed; and, for arm (b), a target under
     `/dev/`, which is no file a Write or Edit tool can take.
-    **What was measured.** The friction log this rule was cut from holds twenty
-    resume-journal appends, every one to a path under `.tmp/`. Sixteen are followed
-    by a further statement, one is preceded by one, and the other three run past the
-    log's 500-character truncation. So arm (a) is the measured class. Arm (b) is the
-    stated better form for the tracked direction, which that log holds no instance
-    of, and it is kept because the steer is the READ direction's mirror (rule 10).
+    Arm (a) is the measured class: every prompting gitignored-target append in the
+    friction log it was cut from was compounded or ran past the log's truncation.
+    Arm (b) has no measured instance and is kept as the READ steer's mirror (rule 10).
     The destination test both arms need is rule 17's, so no consumer roster is owed,
     and neither steer names a capture arm or its surface: that would put another
     kit's surfaces inside guard-kit, a destination roster a consumer would then keep

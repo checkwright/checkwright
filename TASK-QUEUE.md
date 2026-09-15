@@ -19,9 +19,10 @@
 - **native-windows-bash-floor** [design-pending] [cost: event/high] [surface: gate-sdk] — after the
   config bridge retires, a native-Windows runtime still needs bash in three places: the
   `bin/run-gates.sh` front-end stub, which locates the binary before any binary runs; the two
-  generated git hooks; and guard-kit's `PreToolUse` hook, whose rules stay bash by
-  SPEC-knob-files-cut-4.md's ruling. TRAJECTORY objective 6 rules a surviving script surface
-  dual-implementable, bash and PowerShell, and objective 2 rules a bash-only path a failure.
+  generated git hooks; and guard-kit's `PreToolUse` hook, whose rules stay bash on the
+  extension-point ground (guard-kit/SPEC.md §Consumer rules). TRAJECTORY objective 6 rules a
+  surviving script surface dual-implementable, bash and PowerShell, and objective 2 rules a
+  bash-only path a failure.
   **Measured at spec:** every harness hook this repo wires runs `bash`, either through the front-end
   or as a bash hook, and docs/install.md requires `bash` 4.3 or later.
   **Candidates, none ruled:** a PowerShell twin of the front-end stub (resolve the root, read the
@@ -697,7 +698,7 @@
   adapter beside `exit-code` and `libtest` was refused twice over, on the ground that absorbing an
   owed script into a permanently shell library discharges the port's count while defeating its
   objective, and on the ground that naming the convention is this entry's own deliverable, which a
-  port cut may not rule (evidence-kit/SPEC.md §lib/evidence.sh). So the cut DEMOTES this entry
+  port cut may not rule (evidence-kit/SPEC.md §The evidence adapters). So the cut DEMOTES this entry
   rather than closing it, returning it to the position the 2026-08-24 promotion took it from.
   **The delegation instance LEAVES the class 2026-09-05 (operator, consult):** the liveness hook
   reaches its gate through its own executable, so the knob is an override over a working default
@@ -864,7 +865,12 @@
   itself opened and edited. Grammatical position predicts them: every repaired occurrence sat in
   subject or object position, every missed one in an appositive, an attributive modifier or a
   coordinated list member. A roster derived by grep would have caught all five.
-  recurrence: amendment-reader-roster-undercount 2026-09-05
+  **RECURRED 2026-09-15, in both `config-seam-fourth-cut` build batches, past a grep the roster
+  DID run.** Rosters derived by spelling grep over retired names missed SEMANTIC readers: prose
+  saying a library resolves a knob, a smoke reading a knob as a sourced global, a root compared as
+  absolute, SPECs deferring a default to a bare family stem. None spells a retired name, so neither
+  the literal grep nor an idiom grep reaches them; the battery and build reading caught all.
+  recurrence: amendment-reader-roster-undercount 2026-09-05 2026-09-15
   **Cost while deferred:** a spec session pays for a census the build session must buy again, and
   the roster's authority runs inversely to its accuracy.
   Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close.
@@ -1614,7 +1620,7 @@
   That is what makes it gateable where its parent class is not.
   **Why `[design-pending]`:** the construction vocabulary is the whole gate, and a literal
   phrase list in a kit is drift by construction plus a provenance-seam problem — the
-  vocabulary is consumer editorial. It wants the `check-graph` / `graph-vocab.sh` treatment,
+  vocabulary is consumer editorial. It wants the `check-graph` / `graph-vocab.knobs` treatment,
   optional consumer config, which is a design call rather than a size one. Also open: whether
   a legitimate "X landed, Y still waits on it" sentence pair trips it, which decides whether
   the predicate is per-slug or per-slug-per-section.
@@ -1871,11 +1877,10 @@
   **Both populations exist, which is why no reading can be adopted silently.**
   `gate-sdk/lib/gate.sh` and `guard-kit/lib/guard.sh` have
   verified callers in other kits and in `scripts/` — public on either reading, so they decide
-  nothing. `evidence-kit/lib/evidence.sh` (eleven adapters, inventoried in one sentence at
-  evidence-kit/SPEC.md §lib/evidence.sh) has **zero callers outside its own kit**: public
-  under the first reading, and textbook "a SPEC subsection that inventories internal helpers"
-  under the second. canon-kit's library was the second such population until it left the tree
-  with that kit's static knob cut (`config-seam-third-cut`).
+  nothing. The second population — a library with **zero callers outside its own kit**, public
+  under the first reading and textbook "a SPEC subsection that inventories internal helpers"
+  under the second — was canon-kit's and then evidence-kit's, and both left the tree with their
+  kits' static knob cuts (`config-seam-third-cut`, `config-seam-fourth-cut`); none is live now.
   **What turns on it:** the kit-level reading makes those two inventories findings and buys a
   large corrective across two SPECs; the file-level reading clears them and matches the
   doctrine's own carve-out for a SPEC naming public functions as contracts.
@@ -2098,21 +2103,16 @@
   which taxes exactly the good filings.
   Filed 2026-08-14 by close, from the prompt-friction triage.
 
-- **bridged-knob-owner-for-consumer-gate** [design-pending] [cost: event/high] [surface: gate-sdk] — the config bridge resolves a knob
-  by the knob's own name, so a consumer-declared ported gate that needs a consumer-owned knob
-  fails closed on every invocation with no library able to answer it.
-  **The mechanism, read at the drain rather than taken from the filing.**
-  `gate-sdk/lib/gate.sh`'s `_gate_knob_owning_kit` tries each `gate_kit_roots` basename,
-  upper-cased with hyphens to underscores, as a `<KIT>_` prefix on the knob, and falls back to
-  `gate_sdk_root`; `_gate_knob_value` then sources only that kit's `lib/*.sh` in a subshell. A
-  knob no kit's prefix claims therefore resolves to gate-sdk, whose library does not define it —
-  the bridge's first refusal, exit 2, on every invocation of that member.
-  **The filing's mechanism was wrong in a load-bearing way, and the correction narrows this.**
-  The bullet read it as "a gate in the consumer gates dir has no owning kit"; the gate's
-  *location* plays no part, and a consumer gate declaring `GATE_SDK_WORKFLOW_DIR` resolves
-  today. What is actually absent is the consumer's own config seam — the `gate-sdk-config.sh`
-  in the gates dir that `lib/gate.sh` auto-sources for layout knobs — from `_gate_knob_value`'s
-  search path. The gap is one missing source, not a missing owner.
+- **bridged-knob-owner-for-consumer-gate** [design-pending] [cost: event/high] [surface: gate-sdk] — every knob resolves against a static
+  kit table, so a consumer-declared ported gate that needs a consumer-owned knob is refused on
+  every invocation with no table able to answer it.
+  **RE-GROUNDED 2026-09-15 at `config-seam-fourth-cut`'s close, which retired the bridge this
+  entry was first written against.** `knobs::wire` (native/src/knobs/mod.rs) answers a locator
+  from the environment and any other name from its owning kit's table, and refuses a name no
+  static kit owns — including one spelled with the right kit's prefix that its table does not
+  declare (gate-sdk/SPEC.md §The declaration cohort states the open question as belonging to the
+  first consumer-owned knob name). The gate's *location* still plays no part: a consumer gate
+  declaring `GATE_SDK_WORKFLOW_DIR` resolves. What is absent is a consumer-owned row set.
   **Visible today as an asymmetry rather than a red.** `native/src/gates/release_bump.rs` and
   `native/src/gates/release_declaration_parity.rs` each hardcode a workflow-dir const while
   `native/src/emit/upgrade_smoke.rs` resolves the same file through `GATE_SDK_WORKFLOW_DIR`, a
@@ -2121,13 +2121,10 @@
   That entry owned the *declaration* question — the owner column and conservation row, authored
   this iteration — and this owns the *dispatch* question, which that amendment names and
   deliberately leaves unanswered because no member of its first tranche declares a knob.
-  **Why `[design-pending]`:** three candidates trade off. Add the consumer config seam to the
-  resolver's search path (widest, but a consumer file's globals then enter the same subshell as
-  the kit libraries, which the per-knob subshell exists to keep apart). Require a ported consumer
-  gate to spell its knob with an existing kit's prefix (costs nothing to build, and makes a
-  consumer-owned knob wear a kit's name, a provenance-seam inversion). Or let the `.gate`
-  descriptor name its resolving library, which is precise and adds a descriptor field whose only
-  user would be this case.
+  **Why `[design-pending]`:** the three candidates filed here were bridge-shaped (widen a sourced
+  search path, borrow a kit prefix, name a resolving library) and none survives the static table:
+  the prefix borrow is refused as undeclared too. The fork is unre-derived — where a consumer
+  declares a row (its own knob table, or the `.gate` descriptor) — and that is the design owed.
   **Cost while deferred:** paid in full by the first knob-declaring member of the remaining
   consumer tranche, and paid as exit 2 on every invocation — a gate that cannot run rather than
   one that answers wrongly, so it surfaces loudly rather than silently. Zero until then, which
@@ -2738,11 +2735,10 @@
   test's isolation defeated by ambient env it did not own, reaching `--run-validate`'s verdict.
   The mechanism was a different knob class (a bridged `GATE_SDK_KNOB_*` scalar inherited from a
   sibling arm, not an absolute path knob from an operator export), so the instance is filed as its
-  own entry, `run-validate-child-env-knob-leak`. What it changes HERE is the fork: shape 2 —
-  widening `gate-sdk/lib/test-hermetic.sh` to neutralize the knobs — now covers two knob classes
-  rather than one, while shape 1's per-test pinning covers only whichever class each author
-  anticipated. The choice was made on 7 one-line edits against one bootstrap change; it should be
-  re-made on that.
+  own entry, `run-validate-child-env-knob-leak`, since mooted: the bridge retirement at
+  `config-seam-fourth-cut` removed the `GATE_SDK_KNOB_*` class, so shape 2 — widening
+  `gate-sdk/lib/test-hermetic.sh` to neutralize the knobs — is back to covering one class. The
+  choice was made on 7 one-line edits against one bootstrap change; it should be re-made on that.
   recurrence: bespoke-test-path-knob-pinning 2026-09-05
   Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
   same seven names.
@@ -3002,8 +2998,8 @@
   is dead.
   **Both defects read off the source at this drain rather than cited.** In
   `gate-sdk/bin/run-gate-tests.sh`, `run_case` reaches `gate_command` through a PROCESS
-  SUBSTITUTION, so the function's exit 2 for a harness error — an absent dispatch binary, a
-  refused knob bridge — kills only the subshell and reaches the caller as an empty argv. The
+  SUBSTITUTION, so the function's exit 2 for a harness error — an absent dispatch binary —
+  kills only the subshell and reaches the caller as an empty argv. The
   `if !` arm around it is dead, because `mapfile`'s status is `mapfile`'s own and not the
   substitution's, so only the empty-argv arm ever fires; both arms print the same
   resolves-in-no-check-dir line, which is FALSE for the binary-absent cause — the gate resolved
@@ -3918,12 +3914,12 @@
   →icebox refused on the product witness above. Deferred and not active on scope's composition
   test, re-grounded 2026-09-11: no iteration since has shared its surface.
 
-- **fail-open-arm-status-second-source** [design-pending] [cost: event/high] [surface: gate-sdk] — the stub holds the bridged arms'
+- **fail-open-arm-status-second-source** [design-pending] [cost: event/high] [surface: gate-sdk] — the stub holds the non-gate arms'
   unavailable exit status as a two-name shell test, and nothing holds that set in lockstep with
   the status each arm's own contract prose states.
-  **Re-verified at the drain rather than taken from the bullets.** `gate-sdk/bin/run-gates.sh` is
-  70 lines after the cut; line 20 sets `ARM_UNAVAILABLE_STATUS=2` and line 42 flips it to `0` for
-  `--hook | --statusline` alone. The shell must keep holding it: the value is read exactly when
+  **Re-verified at the drain rather than taken from the bullets.** `gate-sdk/bin/run-gates.sh`
+  sets `ARM_UNAVAILABLE_STATUS=2` and flips it to `0` for `--hook | --statusline` alone, the
+  harness-integration arms. The shell must keep holding it: the value is read exactly when
   the binary is absent and cannot be asked, so this duplication cannot be removed the way the
   dispatch loop's was — only asserted.
   **Two bullets, one gap.** This drain merged the spec filing, which names the crate's per-arm
@@ -4032,6 +4028,7 @@
   Filed 2026-09-07 by build batch B to the gap inbox; promoted here at this iteration's close drain,
   →fix refused (a prose nudge with no gate is the move §check-amendment-update-target already
   refused) and →icebox refused on the live trigger and the product witness above.
+  not-icebox-eligible: directive-minting-delta-roster-obligation 2026-09-07 product witness above.
 
 - **portability-floor-adopter-on-ramp-unstated** [design-pending] [cost: event/low] [surface: gate-sdk] — a vendored consumer gets
   `check-portability-floor` registered and permanently disabled, and nothing tells them that naming
@@ -4056,6 +4053,7 @@
   Filed 2026-09-07 by build batch B; promoted here at this iteration's close drain, with →fix
   refused (choosing among the three candidates is design work an amendment owes) and →icebox
   refused on the adopter witness above.
+  not-icebox-eligible: portability-floor-adopter-on-ramp-unstated 2026-09-07 adopter witness above.
 
 - **substrate-parity-digest-assertion-stops-at-the-workflow-text** [design-pending] [cost: event/high] [surface: gate-sdk] — assertion F
   reads the publish workflow's own text for the digest producer, and the producer moved out into a
@@ -4794,7 +4792,6 @@
 - **icebox-trigger-blind-to-retired-carrier** [design-pending] — Blind to retired carriers.
 - **rationale-located-by-reading-not-by-grep** [design-pending] — Grep misses paraphrases.
 - **smoke-whole-tree-precondition-unscoped** [design-pending] — Any dirty path blocks the smoke.
-- **run-validate-child-env-knob-leak** [design-pending] — Suite children inherit bridged knobs.
 - **append-grant-decline-cause-unlogged** [design-pending] — Decline cause truncated from the log.
 - **spec-internal-identifier-prefix-drift** [design-pending] — SPECs cite internal names, not knobs.
 - **lint-scope-hook-trigger** [design-pending] — extra lint dirs skip the commit hook, CI-only.
@@ -4819,6 +4816,7 @@
 
 - config-seam-static-format
 - config-bridge-resolution-cost
+- run-validate-child-env-knob-leak
 - knob-shape-flip-undetected
 - config-seam-overrides-harness-pin
 - upgrade-smoke-consumer-unseeded-configs

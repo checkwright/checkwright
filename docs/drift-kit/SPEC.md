@@ -274,6 +274,11 @@ Lead:
   measuring code survives in the binary, the witness does not, and the row
   reports a number for a consumer that has no friction log, no allowlist reader
   and no guard.
+  **The shipped front-end reaches that degrade.** The guard-kit knobs the arm
+  declares resolve from the crate's own table, so on a tree without the kit —
+  with or without its knob file, and with a friction log present — `--emit
+  drift-report` exits 0, every other member runs, this row reads
+  `n/a (guard-kit absent)` and `--trend` omits its fragment.
 - **kpi-always-loaded** — the standing per-session surface: level, since-baseline
   delta, and the surfaces' delta since the report's iteration-start commit, with
   the meter's stale-baseline mark, from context-kit's meter, read **in process**
