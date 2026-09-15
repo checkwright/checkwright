@@ -172,3 +172,4 @@
 | owed-port-tail | sc sp a b v c | 5f/2d | 3 · ≤0d | 20s clean | 113 |
 | guard-friction-reach | sc sp a b v c | 8f/0d | 6 · ≤0d | 20s clean | 113 |
 | couples-field-semantics | sc sp a b v c | 6f/0d | 5 · ≤0d | 20s clean | 113 |
+| amendment-authoring-completeness | sc sp a b v c | 2f/0d | 1 · ≤1d | 20s clean | 113 |

@@ -4503,8 +4503,4 @@
 
 ## Done
 
-- causal-completeness-has-no-per-member-satisfiability-point
-- spec-growth-restraint-unstated-at-authoring-surfaces
-- directive-minting-delta-roster-obligation
-
 ## Lessons Learned
