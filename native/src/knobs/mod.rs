@@ -277,6 +277,14 @@ pub fn static_names() -> Vec<String> {
     out
 }
 
+// spec: canon-kit/SPEC.md §check-knob-default-coupling — a row whose default the table computes
+// rather than spells
+pub fn is_derived(name: &str) -> bool {
+    owner(name)
+        .and_then(|k| k.row(name))
+        .is_some_and(|r| matches!(r.default, Default::Derived(_)))
+}
+
 // spec: gate-sdk/SPEC.md §The knob file — a kit owns every name its `<KIT>_` prefix spells, declared
 // or not
 pub fn owner(name: &str) -> Option<&'static Kit> {

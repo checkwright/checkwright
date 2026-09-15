@@ -41,6 +41,7 @@ struct Record {
     knob: String,
     kit: String,
     val: String,
+    spec_val: String,
     file: String,
     lno: usize,
 }
@@ -186,6 +187,7 @@ fn extract(pairs: &[(String, String)], file: &str, text: &str) -> Vec<Record> {
                 literal: classify_literal(&val),
                 knob,
                 kit,
+                spec_val: val.clone(),
                 val,
                 file: file.to_string(),
                 lno,
@@ -338,6 +340,16 @@ fn spec_verdict(pairs: &[(String, String)], blob: &[char], knob: &str, want: &st
     }
 }
 
+// spec: canon-kit/SPEC.md §check-knob-default-coupling — a derived roster default carries the
+// host's executable suffix the table appends, so the SPEC literal it couples to is the value
+// with that same suffix removed; the suffix is a parameter so a test can force a Windows host
+fn spec_literal(val: &str, derived: bool, host_suffix: &str) -> String {
+    match val.strip_suffix(host_suffix) {
+        Some(base) if derived && !host_suffix.is_empty() => base.to_string(),
+        _ => val.to_string(),
+    }
+}
+
 fn rule(_args: &[String]) -> Result<i32, String> {
     let pairs = prefix_pairs()?;
     if pairs.is_empty() {
@@ -386,6 +398,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
             knob: knob.to_string(),
             kit,
             val: val.to_string(),
+            spec_val: spec_literal(val, crate::knobs::is_derived(knob), std::env::consts::EXE_SUFFIX),
             file: "--emit knob-roster".to_string(),
             lno: idx + 1,
         });
@@ -399,17 +412,17 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     // spec: canon-kit/SPEC.md §check-knob-default-coupling — assertion 1: every literal site for
     // one knob carries the same literal, else the source disagrees with itself before any SPEC is
     // read (and the knob's assertion-2 check is suppressed)
-    let mut first: BTreeMap<String, (String, String, String)> = BTreeMap::new();
+    let mut first: BTreeMap<String, (String, String, String, String)> = BTreeMap::new();
     let mut conflict: BTreeMap<String, ()> = BTreeMap::new();
     for r in records.iter().filter(|r| r.literal) {
         match first.get(&r.knob) {
             None => {
                 first.insert(
                     r.knob.clone(),
-                    (r.val.clone(), format!("{}:{}", r.file, r.lno), r.kit.clone()),
+                    (r.val.clone(), format!("{}:{}", r.file, r.lno), r.kit.clone(), r.spec_val.clone()),
                 );
             }
-            Some((val, at, _)) if *val != r.val => {
+            Some((val, at, _, _)) if *val != r.val => {
                 conflict.insert(r.knob.clone(), ());
                 findings.push(format!(
                     "  {}:{}  {} default '{}' disagrees with '{}' at {} — a knob's default has one literal across its sites",
@@ -420,22 +433,22 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let mut kit_subset: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
-    for (knob, (val, _, kit)) in &first {
+    let mut kit_subset: BTreeMap<String, Vec<(String, String, String)>> = BTreeMap::new();
+    for (knob, (val, _, kit, spec_val)) in &first {
         if conflict.contains_key(knob) {
             continue;
         }
         kit_subset
             .entry(kit.clone())
             .or_default()
-            .push((knob.clone(), val.clone()));
+            .push((knob.clone(), val.clone(), spec_val.clone()));
     }
 
     let spec_name = spec::spec_name()?;
     for (kit, subset) in &kit_subset {
         let spec_path = format!("{}/{}", kit, spec_name);
         if !Path::new(&spec_path).is_file() {
-            for (knob, val) in subset {
+            for (knob, val, _) in subset {
                 findings.push(format!(
                     "  {}  {} default `{}` has no owning SPEC to state it — the SPEC owns knob defaults",
                     spec_path, knob, val
@@ -450,8 +463,8 @@ fn rule(_args: &[String]) -> Result<i32, String> {
             .join(" ")
             .chars()
             .collect();
-        for (knob, val) in subset {
-            match spec_verdict(&pairs, &blob, knob, val) {
+        for (knob, val, spec_val) in subset {
+            match spec_verdict(&pairs, &blob, knob, spec_val) {
                 Verdict::Found => {}
                 Verdict::Disagree => findings.push(format!(
                     "  {}  {} — source default `{}` but the SPEC states a different default",
@@ -485,4 +498,45 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         described
     );
     Ok(0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SPEC_PHRASE: &str = "`GATE_SDK_NATIVE_BIN` (default **computed**: `native/target/release/checkwright-gates` with the **host's** executable suffix appended — the table's row reads the standard library's `EXE_SUFFIX` — so `…/checkwright-gates` everywhere but a Windows host and `…/checkwright-gates.exe` there.";
+
+    fn found(rendered: &str, derived: bool, host_suffix: &str) -> bool {
+        let pairs = vec![("GATE_SDK_".to_string(), "gate-sdk".to_string())];
+        let blob: Vec<char> = SPEC_PHRASE.chars().collect();
+        let want = spec_literal(rendered, derived, host_suffix);
+        matches!(spec_verdict(&pairs, &blob, "GATE_SDK_NATIVE_BIN", &want), Verdict::Found)
+    }
+
+    #[test]
+    fn a_derived_default_rendered_on_a_windows_host_couples_to_the_suffixless_spec_literal() {
+        assert!(found("native/target/release/checkwright-gates.exe", true, ".exe"));
+    }
+
+    #[test]
+    fn the_native_bin_row_is_the_derived_one_a_spelled_row_is_not() {
+        assert!(crate::knobs::is_derived("GATE_SDK_NATIVE_BIN"));
+        assert!(!crate::knobs::is_derived("GATE_SDK_TMP_DIR"));
+    }
+
+    #[test]
+    fn a_suffixless_host_couples_unchanged() {
+        assert!(found("native/target/release/checkwright-gates", true, ""));
+    }
+
+    #[test]
+    fn only_a_derived_row_takes_the_host_suffix_off() {
+        assert_eq!(spec_literal("bin/tool.exe", false, ".exe"), "bin/tool.exe");
+        assert!(!found("native/target/release/checkwright-gates.exe", false, ".exe"));
+    }
+
+    #[test]
+    fn a_disagreeing_derived_default_still_reds_on_a_windows_host() {
+        assert!(!found("native/target/debug/checkwright-gates.exe", true, ".exe"));
+    }
 }

@@ -670,7 +670,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-knob-default-coupling",
         knob_default_coupling::run,
-        &[("?", "", "", "dynamic@src/gates/knob_default_coupling.rs:353")],
+        &[("?", "", "", "dynamic@src/gates/knob_default_coupling.rs:365")],
         &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS", "GATE_SDK_KIT_DIRS", "CANON_KIT_SPEC_NAME"],
         "canon-kit",
         &[("git", "")],

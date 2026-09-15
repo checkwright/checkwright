@@ -1845,7 +1845,11 @@ the static knob roster (gate-sdk/SPEC.md §The non-gate arm, `--emit
 knob-roster`): a static kit's defaults live in the binary's knob table rather than
 in kit source, and each scalar default rendered there is a record coupled exactly
 as a guarded assignment is, read from the table in process and reported at its
-roster line. An indexed or keyed roster default is an array default, skipped as
+roster line. A row the table **derives** renders with the host's executable suffix
+where the row appends one (gate-sdk/SPEC.md §Layout and configuration), so its
+SPEC comparison removes that same standard-library suffix first: a Windows host
+couples `…checkwright-gates.exe` to the SPEC's suffix-less literal, a suffix-less
+host compares unchanged, and a spelled row is never trimmed. An indexed or keyed roster default is an array default, skipped as
 below.
 
 Assertion 1 (source self-agreement): every literal site for one knob carries the
