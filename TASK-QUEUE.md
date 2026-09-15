@@ -77,6 +77,22 @@
   committed glob or decided out of band, and nothing counts what the calls recompute.
   Filed 2026-08-30 by close from the gap inbox; iceboxed at a pool triage; returned 2026-09-15.
 
+- **scan-prompts-heredoc-grant-split** [design-pending] [cost: event/low] [surface: guard-kit] —
+  scan-prompts' grant test reads a flattened heredoc-bearing log line whole, so `split_compound`
+  cuts the body on `;` and `|` (`native/src/emit/scan_prompts.rs`, `granted`), while the
+  reachability verdict beside it stops at the first heredoc opener (`before_heredoc`).
+  **Re-verified at the drain:** under a committed `Bash(python3 -:*)` grant, a one-line log of
+  `python3 - <<'EOF' import sys; print(1) EOF` ranks 1 prompting call and the same body without
+  the `;` reads clean.
+  **Why `[design-pending]`, not a drain fix:** either reading is a guess at the harness. The
+  owed-port-tail close reported that multi-line `python3 -` heredocs prompt despite the grant, which
+  argues for a third allowlist-unreachable shape; stopping the grant test at the opener would
+  instead read every such call granted. §scan-prompts rules two shapes, so the choice is an
+  envelope change, and it wants a probe of the harness's multi-line match first.
+  **Cost while deferred:** the `python3 -` row's prompting count is neither a floor nor a ceiling,
+  so the census above reads a skewed friction figure.
+  Filed 2026-09-15 to the gap inbox at `guard-friction-reach`'s spec; promoted at its close.
+
 - **gap-inbox-kit-ref-valve** [design-pending] [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
   and names future knobs and paths, but the gap inbox is design-ahead in the same way and is not
@@ -4512,7 +4528,7 @@
 - **self-revert-reminder-expectation** [design-pending] — Self-revert reminder reads as injection.
 - **consumer-smoke-subset-accounting-verdict** [design-pending] — Kit-subset smoke reds falsely.
 - **co-authored-by-trailer-attribution** [design-pending] — Model trailer is a baked literal.
-- **guard-steer-grant-mismatch** [design-pending] — Guard steers onto forms no allowlist grants.
+- **guard-steer-grant-mismatch** [design-pending] — Tree steers unpaired; the kit's are templated.
 - **reclaim-precondition-outside-the-tree** [design-pending] — Essay-sink reclaim can never fire.
 - **release-drain-ordering-contradiction** [design-pending] — Step 4 opener contradicts its body.
 - **amendment-dod-sibling-dependence** [design-pending] — DoD items depend on unnamed siblings.
@@ -4656,12 +4672,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- rewrite-arm
-- in-place-rewrite-steer-reach
-- file-authoring-act-ungoverned
-- scan-prompts-grant-test-redirect-blind
-- settings-overlay-dead-path-unreported
-- recommended-allowlist-unshipped
 
 ## Lessons Learned
