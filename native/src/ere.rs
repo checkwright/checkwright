@@ -147,13 +147,19 @@ impl Ere {
     // offsets, the `RSTART`/`RLENGTH` pair awk reports: the earliest start that matches at
     // all, and from it the longest end
     pub fn find(&self, hay: &str) -> Option<(usize, usize)> {
+        self.find_from(hay, 0)
+    }
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the leftmost-longest span starting at or
+    // after `from`, searched in the whole subject so `^` still holds only at its position 0
+    pub fn find_from(&self, hay: &str, from: usize) -> Option<(usize, usize)> {
         let b = hay.as_bytes();
         let mut seen = vec![usize::MAX; self.prog.len()];
         // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — one monotone generation counter
         // across every start, or a later start reuses an earlier one's stamp and drops the
         // states it should have added
         let mut gen = 0usize;
-        for start in 0..=b.len() {
+        for start in from..=b.len() {
             if let Some(end) = self.longest_from(b, start, &mut seen, &mut gen) {
                 return Some((start, end));
             }
@@ -770,5 +776,18 @@ mod tests {
     fn alternation_reports_the_longest_span_not_the_first_branch() {
         let e = Ere::compile("(deprecated|deprecated-since)").expect("compiles");
         assert_eq!(e.find("x deprecated-since y"), Some((2, 18)));
+    }
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the start-offset search keeps `^` at the
+    // subject's position 0, returns a span beginning at the offset, and admits the empty match at
+    // the subject's end
+    #[test]
+    fn a_start_offset_search_keeps_the_anchor_at_the_subject_start() {
+        let bol = Ere::compile("^a").expect("compiles");
+        assert_eq!(bol.find_from("aa", 1), None);
+        let star = Ere::compile("a*").expect("compiles");
+        assert_eq!(star.find_from("baa", 2), Some((2, 3)));
+        let empty = Ere::compile("x*").expect("compiles");
+        assert_eq!(empty.find_from("abc", 3), Some((3, 3)));
     }
 }

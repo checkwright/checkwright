@@ -1928,6 +1928,112 @@ seam cases stay in `gate-tests/scratch-run.test.sh`, on the shell substrate by
 their own nature. `bin/scratch-run.sh` was the one owed surface and its port took <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 it, so **no later port cut is sequenced against this section**.
 
+## rewrite
+
+`--rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…` replaces text in the named files
+and does nothing else. It is reached through the front-end as
+`bash gate-sdk/bin/run-gates.sh --rewrite …`, and it is the steer target of rule 8's in-place arms.
+The `--emit-` prefix is load-bearing (gate-sdk/SPEC.md §The non-gate arm) and this member writes
+files, so it is spelled bare, as `--scratch-run` is. Its module is `native/src/emit/rewrite.rs`; it
+spawns no program.
+
+Two richer forms are refused, and both fall to the Edit tool or to `!<command>`:
+
+- **Capture-group replacement** would need a substitution engine inside the matcher, which
+  gate-sdk/SPEC.md §The POSIX ERE matcher sizes out, and a backreference makes the output depend on
+  the matched text — the unpredictability the arm exists to remove.
+- **A pattern read from a file** would make the program invisible on the command line, the hazard
+  rule 23 blocks for scripts.
+
+**What a match is.**
+
+- **Without `--regex`**, `<find>` is a literal matched over each file's whole content, so a match
+  may span lines. Three escapes are read, left to right, in both `<find>` and `<replace>`: `\n`
+  (newline), `\t` (tab) and `\\` (backslash). Any other backslash is literal. A multi-line edit can
+  therefore stay on one command line. An empty `<find>` is a refusal, since it matches everywhere.
+- **With `--regex`**, `<find>` is a POSIX extended regular expression (gate-sdk/SPEC.md §The POSIX
+  ERE matcher), applied line by line. A match never spans a newline, and `^` and `$` anchor at the
+  line's ends. A trailing newline ends the last line and opens none, so an empty file holds no line.
+  Matches are leftmost-longest and non-overlapping, scanning on from each match's end. An empty
+  match advances one byte.
+- `<replace>` is always literal text after the three escapes. There are no backreferences and
+  nothing is evaluated.
+
+**What it reports.** For every replaced span the arm prints `<file>:<line>:`, the original lines the
+span touched, each prefixed `-`, and those lines as the file now reads, each prefixed `+`. A span
+that deleted whole lines prints no `+` line, and two spans on one line each print that line's final
+form. A file with no match is named on a line of its own (`<file>: no match`) and left untouched.
+The arm then prints one summary line: `rewrite: <n> replacement(s) in <k> of <m> file(s)`.
+
+**Exit status.**
+
+- **0** — at least one replacement was written.
+- **1** — nothing was written, for one of two reasons: no operand matched, or `--expect <n>` was
+  given and the total differs from `<n>`, which prints the matched counts beside `<n>` and no span.
+  `--expect` is the Edit tool's missing-or-ambiguous check carried to a sweep.
+- **2** — a refusal. The usage (on stderr), an unparseable pattern, or an operand refused below.
+  Every refusal happens before the first write.
+
+An unrecognized `-`-prefixed argument before `--` is a refusal, wherever it sits among the operands,
+and `--` ends option processing, so a `<find>` or `<replace>` beginning with `-` stays reachable
+(gate-sdk/SPEC.md §The bin/-tool contract's shape half). Help lives at the refusal and in
+guard-kit/README.md, as for §compare-settings-allow.
+
+**An operand is refused, and nothing is written, when any of these holds:**
+
+- it is not an existing regular file, or it is a symlink — both read off the operand as given;
+- its canonical path is not inside the canonical working directory, which the front-end sets to the
+  repository root (both sides resolved through `walk::canonicalize`, gate-sdk/SPEC.md §The crate's
+  crosser, and compared with §scratch-run's boundary test);
+- a component of its path is `.git`, tested on the operand as given and again on its canonical path
+  below the root, so a symlinked directory into `.git` is refused too;
+- it resolves to the lifecycle state file (lifecycle-kit/SPEC.md §check-stage-evidence, the
+  `workflow-state-guard` paragraph), tested with that hook's own predicate, `is_state_file`, and a
+  predicate that cannot resolve `GATE_SDK_WORKFLOW_DIR` is a refusal where the hook advises: a writer
+  that cannot tell whether it is about to write the state file must not write;
+- its content, or the content the rewrite would produce, is not UTF-8 or carries a NUL byte — the
+  matcher is byte-wise, so a match can split a multi-byte character;
+- it names the same canonical file as an earlier operand.
+
+**The write.** Every operand is read, checked and rewritten in memory before the first byte is
+written. Each changed file is then written to a temporary file in its own directory and renamed over
+the original, with the original's permission bits, and its spans print once it is replaced. An I/O
+error part-way through is exit 2, and the message names the files already replaced, since a rename
+already done is not undone.
+
+### The rewrite arm's security posture
+
+**Its reach is narrower than what it replaces, and the grant it rides is not widened.** The arm is
+reached through the front-end grant a consumer already holds, so it needs no settings edit. That is
+the shape §scratch-run refuses for a second interpreter, and the difference is what the two widenings
+would add. Teaching the runner a second interpreter turns *run bash on a reviewed body* into *run
+anything*. But the front-end grant already reaches `--scratch-run`, and a bash body run there reaches
+`sed -i` and `perl -pi` on any path the process can write. So this arm adds **no capability** that
+grant lacks. What it adds is a **narrower form** of one capability the grant already has: bounded to
+the repository tree, refusing `.git` and the state file, executing nothing, and deterministic in its
+effect.
+
+**The compensating control is the printed span, and it relocates review rather than removing it.**
+A rewrite granted through the front-end is not decided before it runs. Its before-and-after lines
+land in the transcript as it runs, and the working tree's diff stands until commit. That is
+§scratch-run's echo posture, applied to an edit rather than a body.
+
+**A path guard on the harness's file tools does not see this arm.** A `PreToolUse(Write|Edit)` hook
+reads a file-tool call and never a Bash command. That is why the arm refuses the state file itself,
+through the predicate the kit's one shipped path guard uses: rule 8 steers an in-place rewrite here
+first, and the steer must not open the file that guard exists for. **The honest limit:** a
+consumer's own `Write|Edit` path guard is not consulted, and a file it protects is rewritable here as
+it already is by `--scratch-run`. Such a consumer's protection is only as wide as its Bash rules.
+
+**What the grant now reads as.** A consumer who reads the front-end grant as "run the gates" is also
+granting silent, bounded rewrites of tracked files. It already granted unbounded ones through
+`--scratch-run`, so a consumer cannot separate the decision without declining the battery. That is
+the taken cost §scratch-run records, recorded again here for this member.
+
+**The matcher cannot be made to run away.** It is a Thompson-construction matcher with a bounded
+program (gate-sdk/SPEC.md §The POSIX ERE matcher), so a pattern costs at most linear memory and
+polynomial time per line, and a construct outside the grammar is a refusal.
+
 ## scan-prompts
 
 Advisory: surfaces recurring permission-friction sources from the friction
@@ -2567,6 +2673,7 @@ guard-kit/
   guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message; read by the crate test that replaced this runner's escalation lane
   guard-tests/background-cases.tsv  # expected-decision <TAB> run_in_background <TAB> command
   gate-tests/scratch-run.test.sh    # the --scratch-run arm's SEAM cases, run by gate-sdk's runner
+  gate-tests/rewrite.test.sh  # the --rewrite arm's operand refusals and write, run by gate-sdk's runner
   gate-tests/scan-prompts.test.sh   # bespoke unit test, run by gate-sdk's runner
   gate-tests/compare-settings-allow.test.sh  # bespoke unit test, run by gate-sdk's runner
   gate-tests/git-mutation-under-producer.test.sh  # bespoke unit test, run by gate-sdk's runner
@@ -2990,6 +3097,14 @@ forfeit. A kit's first `gate-tests/` directory also obliges a fixture-runner
 line in the consumer's battery, which `check-kit-registration` reads from
 `git ls-files`: the line belongs in the same commit as the test, never a
 follow-up.
+
+The `--rewrite` arm (§rewrite) splits the same way. Its **seam** cases are
+`gate-tests/rewrite.test.sh`, in a git sandbox holding a relocated workflow dir:
+a two-file sweep through the front end, and the outside, symlink, `.git` and
+state-file refusals, each listed after a matching valid operand so exit 2 is
+seen to write nothing, since each needs the front end's root and the binary's
+knob resolution. Its **unit** cases, the matcher, report, `--expect`, UTF-8,
+duplicate and predicate-error cases, are the module's own `#[cfg(test)]` tests.
 
 Two `lib/guard.sh` primitives take the same bespoke-unit-test lane for the same
 structural reason — a `decision <TAB> command` row cannot express what they

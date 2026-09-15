@@ -2819,7 +2819,8 @@ evidence-kit's `--run-validate`
 and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
 §bin/diff-baseline.sh), `--scratch-run`
 (guard-kit/SPEC.md §scratch-run — the class's first member
-whose port **removes** a grant naming its own path rather than relocating one)
+whose port **removes** a grant naming its own path rather than relocating one),
+`--rewrite` (guard-kit/SPEC.md §rewrite),
 `--run-gate-tests` (§run-gate-tests),
 `--run-guard-tests` (guard-kit/SPEC.md §Testing),
 `--agents-md-smoke` and `--run-index-tests` (context-kit/SPEC.md §Testing),
@@ -6949,6 +6950,11 @@ port hand-compiles. That is the same ground that correctly screened
 ERE matcher with leftmost-longest span reporting, and no substitution engine or
 capture-group replacement**.
 
+A caller that substitutes composes the matcher's spans itself. `--rewrite` (guard-kit/SPEC.md
+§rewrite) replaces each leftmost-longest span with literal text through a start-offset search,
+`find_from`, which the matcher carries for that caller alone. The engine still owns no substitution
+and no capture group.
+
 **"Sizing is foreclosed" binds the pattern language, not the API surface.** The
 foreclosure §The canon-kit `spec_manifest_files` cohort states, on criterion 6's
 globs argument, binds the **grammar** the engine accepts: the config surface
@@ -6978,13 +6984,18 @@ question with a real candidate set, not a cleanup a passing cohort performs.
 concatenation, `*` `+` `?`, intervals `{n}` `{n,}` `{n,m}`, grouping, `.`,
 anchors `^` `$`, bracket expressions with ranges, negation and the POSIX
 character classes, and backslash escaping of every special. Its public surface is
-three items and no more:
+four items and no more:
 
 - `Ere::compile(pattern) -> Result<Ere, EreError>`
 - `Ere::is_match(&self, hay: &str) -> bool` — awk's `$0 ~ p`
 - `Ere::find(&self, hay: &str) -> Option<(usize, usize)>` — the
   **leftmost-longest** span as byte offsets, the `RSTART`/`RLENGTH` pair awk
   reports
+- `Ere::find_from(&self, hay: &str, from: usize) -> Option<(usize, usize)>` — the
+  leftmost-longest span starting at or after `from`, searched in the whole subject
+  so `^` still holds only at its position 0; `find` is `find_from(hay, 0)`. Its
+  reader is `--rewrite`, a born-native arm rather than a ported member, so it does
+  not fire the promotion trigger below.
 
 There is no `replace`, no `replace_all`, and no capture-group accessor; adding
 one is a design decision with its own reader rather than an omission to fill in.

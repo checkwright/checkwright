@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 const NAME: &str = "workflow-state-guard";
 
 pub fn run(payload: Option<&Value>) -> i32 {
-    let workflow_dir = match walk::knob_scalar("GATE_SDK_WORKFLOW_DIR") {
+    let state_file = match state_file() {
         Ok(v) => v,
         // spec: guard-kit/SPEC.md §The guard framework — fail-open-but-loud: the rule turns on a
         // payload field and on path resolution, so a call it cannot judge is allowed with an
@@ -20,14 +20,24 @@ pub fn run(payload: Option<&Value>) -> i32 {
         return degraded();
     }
     let path = hook::field(payload, &["tool_input", "file_path"]);
-    if path.is_empty() {
-        return 0;
-    }
-    let state_file = format!("{}/WORKFLOW-STATE.txt", workflow_dir);
-    if resolve(&path) != resolve(&state_file) {
+    if path.is_empty() || !same_file(&path, &state_file) {
         return 0;
     }
     hook::block(NAME, &blocked(&state_file))
+}
+
+fn state_file() -> Result<String, String> {
+    walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map(|dir| format!("{}/WORKFLOW-STATE.txt", dir))
+}
+
+// spec: guard-kit/SPEC.md §rewrite — the hook's own predicate, shared with the `--rewrite` arm,
+// which refuses on `Err` where this hook advises
+pub fn is_state_file(path: &str) -> Result<bool, String> {
+    Ok(same_file(path, &state_file()?))
+}
+
+fn same_file(path: &str, state_file: &str) -> bool {
+    resolve(path) == resolve(state_file)
 }
 
 fn degraded() -> i32 {

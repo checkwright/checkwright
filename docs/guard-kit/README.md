@@ -82,6 +82,7 @@ grant withholds it.
 bash gate-sdk/bin/run-gates.sh --emit scan-prompts          # rank what nothing granted, filtered by the allowlist
 bash gate-sdk/bin/run-gates.sh --emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
 bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow  # local-overlay entries a committed glob already grants, and those a probe proves too broad
+bash gate-sdk/bin/run-gates.sh --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…  # replace text in tracked files, printing every changed span
 ```
 
 `--emit scan-prompts` takes an optional log path, which overrides `GUARD_KIT_LOG`

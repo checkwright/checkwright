@@ -35,19 +35,6 @@
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from its prompt-friction
   triage; promoted at the next iteration's scope.
 
-- **rewrite-arm** [spec: SPEC-rewrite-arm.md] — the gate binary has no predictable,
-  side-effect-bounded tool for rewriting files, so an in-place `perl` or `sed` has no steer target
-  but the Edit tool, one call per file.
-  **Directed** (operator direction, 2026-09-15, lead-relayed): mint a Rust rewrite arm reached
-  through the front-end, literal or regex, over several files, as the steer target this iteration.
-  The operator chose it with its costs in view: a new name, a crate module and SPEC sections, a
-  security read, a wider align, and nothing yet for `python3`.
-  **Split from `in-place-rewrite-steer-reach`**, whose rule 8 widening steers to this arm. The arm
-  can land while that steer is still open, so the two take different dispositions.
-  **Cost while deferred:** that steer has no target, and a sweep stays an out-of-band decision or
-  N Edit calls.
-  Filed 2026-09-15 by `guard-friction-reach`'s spec under that direction.
-
 - **file-authoring-act-ungoverned** [spec: SPEC-compound-write-steer.md] — the file-authoring
   writes no glob can reach.
   **What landed 2026-09-04 and what did not.** Guard rule 17 was narrowed and widened in one unit:
@@ -4785,5 +4772,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- rewrite-arm
 
 ## Lessons Learned

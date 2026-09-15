@@ -3840,7 +3840,11 @@ sourcing no kit library of its own. The `GATE_SDK_WORKFLOW_DIR` indirection is
 honored, so a consumer who relocated the workflow directory gets a guard that
 follows it. No knob is added: there is no value to configure.
 
-The residual is stated because an unstated residual reads as a closed hole. The
+The residual is stated because an unstated residual reads as a closed hole. One
+Bash writer is closed by construction rather than by the hook: guard-kit's `--rewrite` arm
+refuses an operand resolving to the state file through this hook's own predicate
+(guard-kit/SPEC.md §rewrite), since rule 8 steers in-place rewrites to that arm as well as to the
+file tools this hook reads. Otherwise the
 guard reaches agent `Write`/`Edit` tool calls and nothing else — not a `Bash`
 redirect, not `--no-verify` at the commit that would have caught the result, not a
 human editing the file outside the agent tooling, and not any future writer that

@@ -39,6 +39,7 @@ pub mod queue_counts;
 pub mod queue_edges;
 pub mod queue_index;
 pub mod reads_census;
+pub mod rewrite;
 pub mod scan_prompts;
 pub mod stage_economics;
 pub mod stage_rules;
@@ -575,6 +576,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--scratch-run",
         Arm::Run(scratch_run::run),
         scratch_run::KNOBS,
+    ),
+    // spec: guard-kit/SPEC.md §rewrite — an `Arm::Run` because its contract is the 0/1/2 split an
+    // emitting arm collapses, and a table member because it resolves `GATE_SDK_WORKFLOW_DIR`
+    (
+        "--rewrite",
+        Arm::Run(rewrite::run),
+        rewrite::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof: an `Arm::Run` because
     // its contract is the 1-versus-2 split of its exit status, which an emitting arm collapses, and
