@@ -84,6 +84,53 @@
   Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the third of the three ports the bridge
   retirement made owed (operator direction, 2026-09-14, lead-relayed).
 
+- **in-place-rewrite-steer-reach** [design-pending] [cost: session/low] [surface: guard-kit] — guard-kit
+  rule 8 steers a `sed -i` rewrite to the Edit tool, but `perl -pi` and `perl -0pi` reach the same
+  rewrite unsteered, and so does a `python3 -` heredoc that rewrites a file.
+  **Measured at `config-seam-fourth-cut`'s prompt-friction triage:** `perl` ranked at 74 prompting
+  calls, 79 logged lines of them in-place rewrites, beside 23 `python3 -` heredoc rewrites; no entry
+  named either. Rule 8's walker is per tool (guard-kit/SPEC.md §The generic ruleset, rule 8), so a
+  `perl` arm is a new option-table row rather than a new walker.
+  **Why `[design-pending]`:** a better form exists for a single-file edit, but a multi-file
+  mechanical sweep is a legitimate use the Edit tool pays for per file, so whether the steer fires
+  on every in-place `perl`, only on one file operand, or not at all is the call; `python3 -` has no
+  operand to read, which is a second call.
+  **Cost while deferred:** one out-of-band permission decision per in-place `perl` rewrite,
+  invisible to every gate.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from its prompt-friction
+  triage; promoted at the next iteration's scope.
+
+- **push-budget-unshipped** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the push
+  budget (one to two pushes per iteration, two unasked hotfix pushes) lives only in this repo's
+  CLAUDE.md, so an adopting consumer cannot configure it and no kit surface reads it.
+  **Probed at promotion:** neither `lifecycle-kit/templates/stages/close.md` nor
+  `lifecycle-kit/templates/lead.md` states a push count, and lifecycle-kit's static knob table
+  carries no push knob.
+  **Candidate, not ruled:** two lifecycle-kit knobs, such as `LIFECYCLE_KIT_PUSH_BUDGET` and
+  `LIFECYCLE_KIT_HOTFIX_PUSHES`, defaulting to this repo's values, cited by close and the lead
+  template, with CLAUDE.md pointing at the knobs instead of stating numbers.
+  **Why `[design-pending]`:** it adds names, and whether the budget is a knob an arm reads or a
+  template binding a consumer fills is the seam call.
+  **Cost while deferred:** a consumer adopting the lead and close templates inherits no push
+  discipline, and this repo's numbers stay a restatement a kit cannot see.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, beside the hotfix-push
+  allowance it landed in CLAUDE.md; promoted at the next iteration's scope.
+
+- **gap-inbox-kit-ref-valve** [design-pending] [cost: event/low] [surface: canon-kit] —
+  `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
+  and names future knobs and paths, but the gap inbox is design-ahead in the same way and is not
+  valved.
+  **Attested:** a bullet proposing an unminted lifecycle-kit knob by its full prefixed name redded
+  the battery at `config-seam-fourth-cut`'s close, and the filed prose had to describe the knobs
+  instead of naming them. The valve reads `GATE_SDK_QUEUE_FILE`
+  (`native/src/gates/kit_ref_liveness.rs`), so the inbox has no knob read to join it by today.
+  **Why `[design-pending]`:** either the inbox joins the valve (it is truncated every close, so a
+  dangling name cannot outlive a boundary), or the rule that capture prose not spell unminted names
+  is stated where filers read it; the first changes a gate's scanned corpus, the second is prose.
+  **Cost while deferred:** a gap filer who names a proposed knob reds the battery and rewords.
+  Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
+  filing hit; promoted at the next iteration's scope.
+
 - **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
   delegation-kit/SPEC.md §Layout and configuration) names `<gates-dir>/lib/gate.sh` as its third
@@ -3004,6 +3051,12 @@
   substitution's, so only the empty-argv arm ever fires; both arms print the same
   resolves-in-no-check-dir line, which is FALSE for the binary-absent cause — the gate resolved
   perfectly well and merely could not be built.
+  **RE-GROUNDED 2026-09-15 at scope: that referent is deleted.** `run-gate-tests.sh` became the
+  compiled `--run-gate-tests` arm, which spawns no process substitution. The shape survives at two
+  other callers: `gate-sdk/bin/gen-pre-commit.sh`'s `command_rel` (`mapfile ... < <(gate_command
+  ...) || return 1`, the same dead guard) and `gate-sdk/bin/run-consumer-smoke.sh`'s `acct_probe`.
+  Both files are owed ports (`gen-pre-commit-port`, `run-consumer-smoke-port`) whose deliverable
+  deletes them, so landing those ports discharges this entry by deletion.
   **Distinct from the closed exit-class unit, and NOT a re-filing of it.** That unit repaired
   this shape at `scripts/gate-exec.sh` only and enumerated its blast radius as the name-addressed
   pre-flight callers; this caller sits in gate-sdk's own `bin/` and outside that unit's audited

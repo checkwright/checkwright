@@ -32,11 +32,14 @@ check_case() {  # $1=label  $2=dir  $3=want-rc  $4=want-substring
     fi
 }
 
+# Keep the dates pinned: token-exists cites a 9-character sha prefix, the gate counts a token only
+# when it carries a hex letter, and an unpinned sha's prefix is digit-only in a fraction of runs.
 seed_repo() {  # $1=dir -> a one-commit git repo, printing its HEAD sha
     git -C "$1" init -q
     printf 'seed\n' >"$1/seed.txt"
     git -C "$1" add -A
-    git -C "$1" -c user.email=t@t.invalid -c user.name=t commit -q -m base
+    GIT_AUTHOR_DATE='2026-01-02T00:00:00Z' GIT_COMMITTER_DATE='2026-01-02T00:00:00Z' \
+        git -C "$1" -c user.email=t@t.invalid -c user.name=t commit -q -m base
     git -C "$1" rev-parse HEAD
 }
 
