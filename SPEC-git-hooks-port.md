@@ -179,9 +179,9 @@ freshness comparison and the tree test.
 
 ### (6) The SPEC sections that described the shell generator {design-bearing}
 
-gate-sdk/SPEC.md §gen-pre-commit keeps its heading. §bin/enter-stage.sh and §run-gate-tests are the
-precedent for a section outliving its script under its old name, and every `§gen-pre-commit` citation
-in the tree stays live. Its body changes as follows. **Not yet applied:**
+gate-sdk/SPEC.md §gen-pre-commit keeps its heading. lifecycle-kit/SPEC.md §bin/enter-stage.sh and this
+file's own §run-gate-tests are the precedent for a section outliving its script under its old name, and
+every `§gen-pre-commit` citation in the tree stays live. Its body changes as follows. **Not yet applied:**
 
 - The opening paragraph names the arm and its three operands where it names `--emit`,
   `--emit-commit-msg` and `--write`. The sentence on a `tier=commit-msg` member porting "with no new

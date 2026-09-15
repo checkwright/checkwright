@@ -55,9 +55,13 @@ nothing the battery later reds on.
 ### (2) An amendment's roster states how it was derived and never claims completeness {design-bearing}
 
 canon-kit/templates/SPEC-amendment.md, the comment under `## Existing sections updated`, gains one
-paragraph after its first. This is the widest true tier for it: every amendment author reads this
-template, whichever stage the roster assigns authoring to, while lifecycle-kit's `spec.md` reaches only
-a split-authoring roster. **Not yet applied:**
+paragraph. That comment is two blocks: the first holds two paragraphs (what the section is for, then the
+`delta <N>` citation grammar), the second is the separate "one sanctioned copy exemption" note. The new
+paragraph lands after the first block's first paragraph and before its citation-grammar paragraph — it is
+about what a roster entry claims, the first paragraph's subject, not about citation syntax, the second's.
+This is the widest true tier for it: every amendment author reads this template, whichever stage the
+roster assigns authoring to, while lifecycle-kit's `spec.md` reaches only a split-authoring roster.
+**Not yet applied:**
 
 > A roster here, and any caller or reader roster a delta carries, names the probe that produced it:
 > the command and the corpus it ran over. It never asserts its own completeness ("exactly one reader",
