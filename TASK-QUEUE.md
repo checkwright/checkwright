@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: owed-port-tail
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -52,6 +52,8 @@
   --tree` counts the file owed.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the Deferred entry its bridge-retirement
   amendment's delta 10 names (operator direction, 2026-09-14, lead-relayed).
+  **Leads `owed-port-tail`** — operator direction, 2026-09-15, lead-relayed; stays Deferred for spec
+  to author and pair.
 
 - **run-consumer-smoke-port** [design-pending] [cost: iteration/low] [surface: gate-sdk] —
   `gate-sdk/bin/run-consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule,
@@ -67,6 +69,8 @@
   --tree` counts it owed.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s build beside its two sibling ports, when the
   bridge retirement moved the smoke harness from no-port to owed (operator direction, 2026-09-14).
+  **Rides `owed-port-tail`** beside `gen-pre-commit-port` — operator direction, 2026-09-15,
+  lead-relayed; stays Deferred for spec to author and pair.
 
 - **consumer-smoke-library-port** [design-pending] [cost: iteration/low] [surface: gate-sdk] —
   `gate-sdk/lib/consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule, and
@@ -83,6 +87,8 @@
   owed.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the third of the three ports the bridge
   retirement made owed (operator direction, 2026-09-14, lead-relayed).
+  **Rides `owed-port-tail`**, its order against `run-consumer-smoke-port` spec's to settle —
+  operator direction, 2026-09-15, lead-relayed; stays Deferred for spec to author and pair.
 
 - **in-place-rewrite-steer-reach** [design-pending] [cost: session/low] [surface: guard-kit] — guard-kit
   rule 8 steers a `sed -i` rewrite to the Edit tool, but `perl -pi` and `perl -0pi` reach the same
@@ -881,9 +887,8 @@
   `check-stage-evidence.test.sh` that flip to "malformed stamp" and stop reaching what they assert.
   **One shape, and the spec method structurally cannot see it.** The hit is BUILT BY INTERPOLATION —
   the date is a shell variable — so a literal-string, field-count or length sweep returns nothing;
-  and the breakage is CONSEQUENTIAL rather than assertional, so "the tests still pass" reads true
-  and is false. Re-verified at the drain against `git diff` on both files: every named site is there
-  and every one was rewritten by the build unit that found them.
+  the breakage is CONSEQUENTIAL, so "the tests still pass" reads true and is false. Re-verified at
+  the drain against `git diff`: every named site is there, rewritten by the unit that found it.
   **This is a method finding about a STAGE, not a defect count.** Delta 5 itself says the build unit
   re-runs the sweep against the tree rather than trusting the roster, and that sentence is what
   caught both — carried by an individual amendment rather than by any contract that outlives it.
@@ -893,8 +898,8 @@
   and keep only the sweep instruction, since a roster nobody may trust is context cost with a
   false-confidence coupon attached.
   **Why `[design-pending]`:** the three are not variants of one fix — a template edit, a new gate,
-  and a deletion that removes a real aid — and choosing needs the counter-case this iteration did
-  not supply: an amendment whose roster was RIGHT and whose reader was thereby spared the sweep.
+  and a deletion that removes a real aid; the counter-case it waited on (a RIGHT roster sparing its
+  reader the sweep) is answered below.
   **THE COUNTER-CASE IS NOW OVERDUE AND THE POOL WENT THE OTHER WAY — FOUR FOR FOUR in a second
   iteration**, which is the datum the `[design-pending]` fork was waiting on and it arrived
   falsifying, not supplying, the sparing case. `test-harness-cut-seam-sweep`: batch A's gate-tests
@@ -920,7 +925,8 @@
   recurrence: amendment-reader-roster-undercount 2026-09-05 2026-09-15
   **Cost while deferred:** a spec session pays for a census the build session must buy again, and
   the roster's authority runs inversely to its accuracy.
-  Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close.
+  Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close;
+  **joins `owed-port-tail` at threshold** (operator direction, 2026-09-15, lead-relayed).
 
 - **boundary-wipe-preserve-basename-reach** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — the iteration-boundary scratch wipe
   matches its preserve list by **basename at any depth**, so one nested `.gitkeep` makes a whole
@@ -3057,6 +3063,8 @@
   ...) || return 1`, the same dead guard) and `gate-sdk/bin/run-consumer-smoke.sh`'s `acct_probe`.
   Both files are owed ports (`gen-pre-commit-port`, `run-consumer-smoke-port`) whose deliverable
   deletes them, so landing those ports discharges this entry by deletion.
+  **Rides `owed-port-tail` as a rider, superseding the 2026-08-25 lead decision below** — operator
+  direction, 2026-09-15, lead-relayed; discharged by the ports' deletions.
   **Distinct from the closed exit-class unit, and NOT a re-filing of it.** That unit repaired
   this shape at `scripts/gate-exec.sh` only and enumerated its blast radius as the name-addressed
   pre-flight callers; this caller sits in gate-sdk's own `bin/` and outside that unit's audited
