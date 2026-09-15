@@ -123,5 +123,5 @@ KPIs, `kpi-knowledge-friction` (fed by the loop below) and
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-consumer-smoke.sh drift-kit   # report contract: sections, per-KPI rows, degradation, one-line --trend
+bash gate-sdk/bin/run-gates.sh --run-consumer-smoke drift-kit   # report contract: sections, per-KPI rows, degradation, one-line --trend
 ```

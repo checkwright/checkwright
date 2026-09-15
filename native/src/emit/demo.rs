@@ -1,8 +1,8 @@
 // spec: gate-sdk/SPEC.md §Consumer smoke — the adoption walkthrough as an `Arm::Run`
 // member: its contract is the verdict — 0 the arc behaved, 1 an act of it did not, 2 a
 // precondition the harness could not meet — which `Arm::Emit` cannot carry.
-// spec: gate-sdk/SPEC.md §Consumer smoke — the binary placement calls `csmoke_place_binary` in the
-// library that owns it, through the shared spawn seam, so the port creates no second producer.
+// spec: gate-sdk/SPEC.md §Consumer smoke — the binary placement calls the in-crate scratch-consumer
+// builder's own placement, so the walkthrough holds no second copy of it.
 use crate::emit::csmoke;
 use crate::ere::Ere;
 use crate::proc::{self, Sink, Stderr};
@@ -113,7 +113,7 @@ fn walkthrough(scratch: &mut Scratch) -> Outcome {
     for r in &roots {
         step!(vendor(r, &consumer));
     }
-    step!(place_binary(&sdk, &consumer, &host, &roots));
+    step!(place_binary(&consumer, &host, &roots));
     for r in &roots {
         let kit = basename(r);
         say(&format!("vendor + install: {}", kit));
@@ -196,8 +196,8 @@ fn gate_sdk_root(roots: &[String]) -> Result<String, Outcome> {
         .cloned()
         .ok_or_else(|| {
             Outcome::Refuse(format!(
-                "{}: the kit roots name no gate-sdk root, so neither the consumer-smoke \
-                 library nor the craftable violation this walkthrough fires can be found",
+                "{}: the kit roots name no gate-sdk root, so the craftable violation this \
+                 walkthrough fires cannot be found",
                 NAME
             ))
         })
@@ -304,15 +304,14 @@ fn vendor(root: &str, consumer: &str) -> Result<(), Outcome> {
 // spec: gate-sdk/SPEC.md §Consumer smoke — the binary placement is environment-class: a scratch
 // consumer that could not receive the artifact its vendored descriptors dispatch to is a harness
 // that could not be stood up, never a statement about the adoption arc.
-fn place_binary(sdk: &str, consumer: &str, host: &str, roots: &[String]) -> Result<(), Outcome> {
-    let code = csmoke::place_binary(sdk, consumer, host, roots).map_err(refuse)?;
-    if code != 0 {
-        return Err(Outcome::Refuse(format!(
-            "{}: the native gate binary could not be placed in the scratch consumer",
-            NAME
-        )));
-    }
-    Ok(())
+fn place_binary(consumer: &str, host: &str, roots: &[String]) -> Result<(), Outcome> {
+    csmoke::place_binary(consumer, host, roots).map_err(|e| {
+        Outcome::Refuse(format!(
+            "{}: the native gate binary could not be placed in the scratch consumer — {}",
+            NAME,
+            e.lines().join("\n")
+        ))
+    })
 }
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — a `smoke/install.sh` runs with cwd = the scratch
@@ -375,7 +374,8 @@ fn ends_with_newline(out: &str) -> String {
 fn fire_violation(consumer: &str, sdk_kit: &str) -> Result<String, Outcome> {
     let script =
         r#"cd "$1" || exit 2; export GATE_SDK_ROOT="$1/gate-sdk" SMOKE_KIT_ROOT="$1/$2"; exec bash "$1/$2/smoke/violation.sh""#;
-    let done = csmoke::spawn(script, &[consumer, sdk_kit], Stderr::Inherit).map_err(refuse)?;
+    let done = proc::run_streamed("bash", &["-c", script, "bash", consumer, sdk_kit], b"", Stderr::Inherit)
+        .map_err(refuse)?;
     Ok(String::from_utf8_lossy(done.stdout())
         .lines()
         .next()
@@ -420,7 +420,7 @@ mod tests {
 
     // spec: gate-sdk/SPEC.md §Consumer smoke — the gate-sdk root leads nothing here: the vendoring
     // keeps `gate_kit_roots`' own order, and the root is located rather than reordered because the
-    // violation and the library both live under it.
+    // craftable violation lives under it.
     #[test]
     fn the_gate_sdk_root_is_located_without_reordering() {
         let roots = vec!["/a/b/gate-sdk".to_string(), "/a/b/drift-kit".to_string()];

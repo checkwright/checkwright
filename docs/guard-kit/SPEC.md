@@ -3040,7 +3040,7 @@ blocks with the refusal's own text.
 A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a
 sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`
 alone would leave this kit undiscovered — its `smoke/install.sh` would never
-run under `run-consumer-smoke.sh`, and its `lib/` and `bin/` would escape
+run under `--run-consumer-smoke`, and its `lib/` and `bin/` would escape
 `check-shellcheck`'s self-lint sweep.
 
 ## Out of scope

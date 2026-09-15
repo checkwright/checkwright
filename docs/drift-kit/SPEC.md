@@ -1359,7 +1359,7 @@ drift-kit/
 Registers no gates (advisory; the guard-kit precedent), so no `checks/`,
 `gate-tests/`, or `smoke/violation.sh`. **So every assertion this kit makes —
 the stage-economics meter, the overhead meter, the bundled KPIs — runs from
-`smoke/install.sh`**, reached by `run-consumer-smoke.sh` with **every** kit
+`smoke/install.sh`**, reached by `--run-consumer-smoke` with **every** kit
 vendored. Two invocations a session reaches for first do not work and are not
 worth re-deriving: `--run-gate-tests drift-kit/gate-tests` errors *no fixture
 tree*, because there is none by the line above; and naming a subset of kits

@@ -44,6 +44,7 @@ pub mod stage_economics;
 pub mod stage_rules;
 pub mod roadmap;
 pub mod ruling_staleness;
+pub mod run_consumer_smoke;
 pub mod run_gate_tests;
 pub mod run_guard_tests;
 pub mod run_index_tests;
@@ -683,6 +684,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // split of its exit status, which an emitting arm collapses, and a table member because the
     // vendoring and the binary placement both read the consumer's own knobs
     ("--run-demo", Arm::Run(demo::run), demo::KNOBS),
+    // spec: gate-sdk/SPEC.md §Consumer smoke — an `Arm::Run` because the contract is the 1-versus-2
+    // split of its exit status, and a table member because the vendoring and the probes read the
+    // consumer's kit roots and binary path
+    (
+        "--run-consumer-smoke",
+        Arm::Run(run_consumer_smoke::run),
+        run_consumer_smoke::KNOBS,
+    ),
     // spec: gate-sdk/SPEC.md §Consumer payload — the payload assembler, an `Arm::Run` because its
     // product is a tarball plus a receipt rather than a document, and a table member because all
     // three of its inputs are knobs a hardcoded flag would hide from the knob-file derivation

@@ -4,7 +4,7 @@
 # The second guard names OK, which the callee's header binds to code 0 — a
 # truthiness guard discriminates 0 exactly, so it is honest as written.
 set -euo pipefail
-: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
+: "${SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}"
 
 bash "$SMOKE_KIT_ROOT/bin/verdict.sh" "$snap" >/dev/null 2>&1 && vrc=0 || vrc=$?
 if [[ "$vrc" -ne 1 ]]; then

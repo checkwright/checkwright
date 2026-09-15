@@ -26,7 +26,7 @@ honest:
   the gates coupling to the paths you name, exactly as the generated hook would.
 - the `--run-gate-tests` arm — the golden-fixture runner: every gate proves it
   accepts a `good/` case and rejects a `bad/` case with the right error text.
-- `bin/run-consumer-smoke.sh` — the end-to-end check no fixture makes: builds a
+- the `--run-consumer-smoke` arm — the end-to-end check no fixture makes: builds a
   fresh scratch consumer, runs each vendored kit's `smoke/` installer, and
   asserts the battery is green under zero config (then red on each kit's crafted
   violation). Each kit ships a `smoke/` directory to join the party.

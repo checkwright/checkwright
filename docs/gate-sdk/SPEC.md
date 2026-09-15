@@ -1142,7 +1142,7 @@ gives each its own `help:` line. Exit codes: **0** clean, **1** violation,
 A `help:` line **may name the governing SPEC section that owns the remedy**, and
 the citation is a **pointer, never a restatement**. The rule is stated because
 the coupling is already taken across both substrates — the crate's own refusals,
-`lib/guard.sh`'s, `bin/build-native.sh`'s and `bin/run-consumer-smoke.sh`'s all
+`lib/guard.sh`'s, `bin/build-native.sh`'s and the `--run-consumer-smoke` arm's all
 cite a section — and a silent convention is one a later reader may read as an
 accident and remove. Pointer-not-restatement is the content-tiering rule applied
 to refusal text, and it is also what stops a message growing into a copy of the
@@ -2823,7 +2823,8 @@ whose port **removes** a grant naming its own path rather than relocating one)
 `--run-gate-tests` (§run-gate-tests),
 `--run-guard-tests` (guard-kit/SPEC.md §Testing),
 `--agents-md-smoke` and `--run-index-tests` (context-kit/SPEC.md §Testing),
-`--run-demo`, the adoption walkthrough (§Consumer smoke),
+`--run-demo`, the adoption walkthrough, and `--run-consumer-smoke`, the
+scratch-consumer harness (both §Consumer smoke),
 and `--pack-installer`, the payload assembler (§Consumer payload; the route a
 consumer's release path invokes it by is that consumer's own surface and not a
 kit's — installer/README.md §The packer is this repo's) —
@@ -2981,11 +2982,15 @@ both ends of it: the shell form's last `jq` spawn on this path is gone, the
 allow lists are read with `serde_json`, and no program is spawned at all
 (guard-kit/SPEC.md §compare-settings-allow).
 **`--agents-md-smoke` shares `--upgrade-smoke`'s shape and not its weight**, and
-is named beside it because both reach `lib/consumer-smoke.sh` by spawning: `bash`,
-`git`, `mktemp`, and through the vendoring whatever `csmoke_vendor_and_install`
-reaches — no `cargo` and no `tar`, because it archives no ref and builds no
-binary (context-kit/SPEC.md §Testing).
-**`--run-demo` is the third member on that road**, and its set is stated beside
+is named beside it because both build their scratch consumer through the in-crate
+builder (§Consumer smoke): `bash`, `git`, `mktemp` and `cp`, plus whatever the
+vendored kits' own installers spawn — no `cargo` and no `tar`, because it archives
+no ref and builds no binary (context-kit/SPEC.md §Testing).
+**`--run-consumer-smoke` sits on the same builder** and adds only what its
+accounting spawns: each unregistered gate's own declaration, run by path or through
+the probed tree's binary, so its set beyond the builder's is whatever those gates
+spawn.
+**`--run-demo` is the fourth member on that road**, and its set is stated beside
 the other two rather than assumed from the shape: `bash`, `git`, `mktemp` and
 `cp`, plus whatever the vendored kits' own installers spawn. The shell form's
 `rm` and `awk` are **not** in it — the scratch teardown is the arm's own `Drop`
@@ -3051,14 +3056,11 @@ list, and an enumeration written here would be one more thing to stale. This sta
 the scope as it stands and rules nothing about whether it should: making arm
 requirements machine-readable is open work.
 
-**The class gained no member from the consumer smoke, and the near miss is
-recorded because the next reader will size that harness the same way.**
-`bin/run-consumer-smoke.sh` is a `bin/` tool with a named caller and a document
-to emit, so it reads as a candidate on every property above. Its registration
-accounting probes each unregistered gate through `gate_command` (§lib/gate.sh)
-from the scratch consumer's working directory, where the binary reads that
-consumer's knob files, and whether the harness ports is §Consumer smoke, *The port
-disposition*'s ruling.
+**The consumer smoke joined the class as `--run-consumer-smoke`, and its probes
+stay spawned.** Its registration accounting runs each unregistered gate with its
+working directory in the probed tree, where the binary reads that tree's knob
+files, so an in-process call from the arm would pair the invoking tree's knob state
+with the probed tree (§Consumer smoke, *The registration accounting*).
 
 **A gate argument that selects where configuration comes from cannot survive a
 port, because configuration already has one selector.** The binary resolves every
@@ -5530,7 +5532,7 @@ own reasoning is unaffected and stands: a prebuilt binary is still how a
 **The predicate was necessary and not sufficient, which is the part a later port
 most needs.** It clears every tree that *declares* without dispatching. A tree
 that legitimately **dispatches** and has no binary is a different problem and it
-had a real instance: `run-consumer-smoke.sh` vendors kit roots by copy, and
+had a real instance: `--run-consumer-smoke` vendors kit roots by copy, and
 site-kit's `smoke/install.sh` registers both members of this cohort because it
 installs the workflow template they lint. No predicate can make that green — a
 registered dispatch with no binary is exactly the harness error `gate_command`
@@ -8308,16 +8310,18 @@ The fixture suites prove each gate in isolation on contrived case dirs, and a
 consumer repo's battery runs under that consumer's own config overrides. Two
 things go untested there: that a *fresh* consumer reaches green by following
 the kit READMEs, and that the **kit defaults** hold on a vendored-kit tree
-under zero config. A DoD-mode defect shipped through exactly that gap. `bin/run-consumer-smoke.sh` closes it,
+under zero config. A DoD-mode defect shipped through exactly that gap. The
+`--run-consumer-smoke` arm closes it,
 mechanizing what was a hand-repeated validate-stage prose ritual with no
 committed evidence.
 
-The harness (`run-consumer-smoke.sh [--keep] [kit-root...]`, a `bin/` tool,
-never a registered gate — it builds a repo and runs the battery repeatedly, so
-it is pre-commit-unfit by runtime budget): builds a scratch consumer in a fresh
-temp dir (`git init`, seed commit), vendors each kit root by copy (default:
-`gate_kit_roots`), and runs each kit's `smoke/install.sh` — gate-sdk first,
-then argument order. It then commits the installed baseline and asserts the
+The harness (`run-gates.sh --run-consumer-smoke [--keep] [kit-root...]`, a
+non-gate `Arm::Run`, never a registered gate — it builds a repo and runs the
+battery repeatedly, so it is pre-commit-unfit by runtime budget): builds a
+scratch consumer in a fresh temp dir (`git init`, seed commit), vendors each kit
+root by copy (default: every derived kit root, §Layout and configuration), and
+runs each kit's `smoke/install.sh` — the invoking gate-sdk root first, then
+argument order. It then commits the installed baseline and asserts the
 full battery is green under **zero consumer config** (the positive green token
 `All N gates passed` — the defaults-on-a-vendored-tree assertion no fixture
 suite makes). It then runs the registration accounting (below) over the union of
@@ -8333,6 +8337,16 @@ failed, 2 usage/environment); the success token is `CONSUMER-SMOKE: clean
 self-declared, <h> hand-declared)`. `--keep` retains the temp dir and
 prints its path (the temp-dir write's named reclaim path).
 
+**Its operands, channels and arm placement.** `--keep` is the one flag; any other
+`-`-led word is an `unknown option` refusal, and a kit root that is not a directory
+or ships no `smoke/install.sh` is another, all exit 2. Diagnostics go to stderr
+under a `run-consumer-smoke:` prefix, the arm's name without its dashes; the
+verdict lines, and the installers' own output, go to stdout. It is a bare flag
+rather than an `--emit` member because its contract is the exit status an emitting
+arm collapses (§The non-gate arm), and a table member because it reads
+`GATE_SDK_KIT_DIRS` and `GATE_SDK_NATIVE_BIN`. `bin/run-gates.sh` passes it through
+unedited, and its operands are documented in the front-end's `--help` text alone.
+
 **This harness does not run the installer, and that is what bounds what it
 proves.** It vendors kit roots **by copy**, so no payload, no digest and no
 `# omitted:` record are in play: its scratch consumer registers whatever each
@@ -8344,7 +8358,7 @@ and runs `init` against it. The two harnesses must not blur: this one answers
 them*.
 
 **Its default run vendors every kit, so its silence on a subset vendoring is not
-coverage.** `run-consumer-smoke.sh` takes kit roots as arguments, and the
+coverage.** `--run-consumer-smoke` takes kit roots as operands, and the
 subset invocation — vendoring one kit while the shared binary carries every
 ported kit's subcommands — is a real configuration this harness can be put in and
 is not put in by any scheduled run. That configuration is covered instead by the
@@ -8357,7 +8371,7 @@ exception, because a reader will otherwise lean on the older
 no-binary-by-design sentence and find it gone.** The rule: **a vendored member
 that dispatches must be able to run, so the scratch consumer receives an
 already-built artifact out of a checkout the caller names**
-(`csmoke_place_binary`, §lib/consumer-smoke.sh).
+(the builder's `place_binary`, below).
 The ground is that a kit root vendoring a `.gate` descriptor is now the ordinary
 case — the first cohort ships two (§The first cohort, and the rule that selects
 the next) — and a kit's `smoke/install.sh` may legitimately register a ported
@@ -8369,15 +8383,15 @@ that registration permanently red and forced the coverage out, which is the
 opposite of what this harness exists for.
 
 **Whose artifact it is, is the caller's to name.** The checkout whose `native/`
-was built is the function's first argument. It was once resolved from the
-library's own `BASH_SOURCE`, and a shared library deciding from its own location
+was built is the placement's `host` argument. It was once resolved from the
+shell library's own `BASH_SOURCE`, and a shared builder deciding from its own location
 whose artifact a caller receives is a defect that stays invisible until some
 caller wants a different one. `upgrade-smoke` is that caller: it runs two refs'
 vendored shell against one scratch consumer, and under the old resolution both got
 the *invoking* tree's binary — so FROM's shell ran against TO's binary and the
-mismatch was reported as a broken tag (§upgrade-smoke). `run-consumer-smoke.sh`
+mismatch was reported as a broken tag (§upgrade-smoke). `--run-consumer-smoke`
 and context-kit's AGENTS.md smoke pass the invoking repo and behave exactly
-as they did. Whether a binary is wanted at all is `csmoke_gate_descriptors`,
+as they did. Whether a binary is wanted at all is the builder's `gate_descriptors`,
 factored out of the placement so a caller that must *produce* one can ask the same
 question a step earlier rather than keep a second copy of the predicate.
 
@@ -8433,52 +8447,50 @@ why the placement above exists rather than a relaxation.
 
 The scratch-consumer build itself — temp dir, seed commit, vendor-by-copy, the
 binary placement, the `smoke/install.sh` loop, the installed-baseline commit — is
-factored into `lib/consumer-smoke.sh` (`csmoke_vendor_and_install`, which sets
-`SCRATCH` and `CSMOKE_INSTALLED`, and `csmoke_place_binary`, which it calls), so a
-second harness that needs the same green baseline before it diverges shares the
-mechanics rather than copying them. The placement lives in the shared builder
-rather than in `run-consumer-smoke.sh` for the reason the factoring exists at
+the in-crate builder `native/src/emit/csmoke.rs` (`vendor_and_install`, which
+returns the scratch directory and the installed-kit count, and `place_binary`,
+which it calls), so a second harness that needs the same green baseline before it
+diverges shares the mechanics rather than copying them, and every caller reaches
+it in process. The placement lives in the shared builder
+rather than in the harness arm for the reason the factoring exists at
 all: every caller builds a tree the vendored kits' descriptors are in, so a
 placement in one caller would leave the others reddening identically. The caller
-owns its cleanup trap and every assertion after the baseline commit.
+owns its cleanup and every assertion after the baseline commit.
 context-kit's **AGENTS.md smoke** is that second caller: it builds the same
 baseline, then converts the consumer to a nondefault agent file (`AGENTS.md`)
-and asserts the agent-file knobs carry it — an assertion `run-consumer-smoke.sh`
+and asserts the agent-file knobs carry it — an assertion `--run-consumer-smoke`
 cannot make, since it fixes the kit defaults under zero config
 (context-kit/SPEC.md §Testing). The **upgrade suite** is the third caller: it
 builds the same FROM baseline, then diverges into the two-phase upgrade proof
 (§upgrade-smoke).
 
-**Two of those three are compiled arms, and each reaches the library by spawning
-`bash` rather than by sourcing it.** Each one's shell driver was deleted at its
-port, so neither sources this file at all; the arm invokes each helper in a
-`bash -c` that sources the unchanged library, calls the function and prints back
-the one value the caller needs. The library gains callers of a new **kind** and
-loses shell ones, and it acquires no crate twin — which is the whole of why both
-ports cleared criterion 6 on the duplication-*absent* road rather than needing
-the machine-held-twin one (§The port-candidate criteria, criterion 6). Two
-helpers here communicate by setting or reading their caller's shell variable —
-`SCRATCH` in both directions — and a process boundary carries neither, so the arm
-supplies it on the way in and reads it off stdout on the way out. That protocol
-is the function's own contract read out, never a private one minted beside it,
-and it has **one producer crate-side**: the spawn wrapper and the script prologue
-live in a module both arms call, never a copy each (§upgrade-smoke).
+**The builder's contract.** `gate_descriptors(roots)` counts the `.gate`
+descriptors directly under each root's `checks/`. `place_binary(consumer, host,
+roots)` does nothing when that count is zero, and otherwise copies
+`<host>/<GATE_SDK_NATIVE_BIN>` to `<consumer>/<GATE_SDK_NATIVE_BIN>`, creating the
+parent. Its `PlaceError` is `NoHost` (the caller named no checkout),
+`ArtifactUnusable` (the artifact is absent or not executable, carrying the
+`build-native.sh` help line) or `Io` (the binary path did not resolve or the copy
+failed); each is an environment failure, and every caller renders it in its own
+verdict grammar. `vendor_and_install(host, roots, base, out)`:
 
-**The library's sourcer set is narrower than the builder's caller set, and the
-two are counted separately.** Of the three callers of
-`csmoke_vendor_and_install` above, two now reach it across a process boundary, and
-`run-consumer-smoke.sh`, this harness's other member, is the one that sources this
-file. The adoption walkthrough below was the last sourcer outside the harness — it
-took `csmoke_place_binary` and never built a scratch consumer at all — and it has
-ported too, so the sourcer set outside the harness is now **zero** while the
-builder's caller set is unchanged at three. Read the distinction off this
-paragraph rather than counting callers of one function and generalising, which is
-the re-derivation that put a wrong count into an amendment once already.
+1. creates `consumer-smoke.XXXXXX` under `base`, which is the caller's (`TMPDIR`,
+   else `/tmp`, for the harness and the AGENTS.md smoke);
+2. runs `git init`, writes a `.gitignore` of `.tmp/` plus the binary path, and
+   makes the seed commit;
+3. copies each root by name;
+4. calls `place_binary`;
+5. runs each kit's `smoke/install.sh` with `bash`, in root order, with cwd at the
+   consumer and `GATE_SDK_ROOT` and `SMOKE_KIT_ROOT` exported;
+6. commits the installed baseline with `--no-verify`.
 
-**The library is owed its port, and the sourcer count is not what makes it owed**
-(*The port disposition* below). Its one shell sourcer is `run-consumer-smoke.sh`,
-owed beside it, and every other caller is a compiled arm reaching it by spawn; a
-crate twin kept beside the library would be the second holder criterion 6 refuses.
+A step that fails, an installer's non-zero exit among them, is an `Err` naming its
+cause, and the `Err` carries the scratch directory once one exists, so a caller's
+teardown and `--keep` see a tree whose build failed. `out` routes the installers'
+output: `--run-consumer-smoke` keeps it on stdout, and `--upgrade-smoke` and
+`--agents-md-smoke` route it to stderr, where each arm's stdout carries its
+verdict. The counts are populated for every caller and read by one: the installed
+count is `--run-consumer-smoke`'s clean line alone.
 
 **The adoption walkthrough is this section's other member, and this is the
 mechanism owner its own header pointed elsewhere for.** `--run-demo` narrates
@@ -8487,9 +8499,9 @@ and watch the battery pass, craft one violation and watch the battery turn red n
 the gate that caught it, drop the change and watch green return — and exit 0 asserts
 every act of it. It is registered as the evidence-kit `demo` validate suite, so a
 bit-rotted walkthrough is a red validate rather than a stale file nobody runs. It
-builds its own scratch consumer instead of calling `csmoke_vendor_and_install`,
-because the vendoring is part of what it narrates, and reaches this library for
-`csmoke_place_binary` alone. Its scratch base is `DEMO_TMP_DIR`, falling back to
+builds its own scratch consumer instead of calling `vendor_and_install`,
+because the vendoring is part of what it narrates, and calls the builder's
+`place_binary` alone, in process. Its scratch base is `DEMO_TMP_DIR`, falling back to
 `TMPDIR` and then `/tmp` — the builder's own base, which is what keeps the
 walkthrough's tree and the harness's comparable, and why folding it onto
 `GATE_SDK_TMP_DIR` (repo-relative `.tmp`, absolutized at the invoker's root) would
@@ -8536,16 +8548,8 @@ is the one way a caller believes it selected a mode and reads a verdict about a
 different run. `--agents-md-smoke` accepts `--keep` and this member accepts nothing:
 its scratch is narrated and torn down as part of the arc, so there is no mode to keep.
 
-**It reaches `csmoke_place_binary` by spawn, and that helper's wrapper moved when it
-gained its second caller.** The rule two paragraphs up — the spawn wrapper and the
-script prologue live in a module both arms call, never a copy each — binds at the
-moment a second arm calls the same helper, which is here; the placement wrapper was
-private to `--upgrade-smoke` and now sits beside the prologue, returning the helper's
-own status so each arm renders its own verdict for it. A crate-side reimplementation
-of the placement beside the library is refused, and not on effort: it would be a
-second holder of the placement while the library still holds it, and the
-library's own port is the road that removes the spawn. The **spawned battery stays spawned**, and that is
-load-bearing: the subject under test is the vendored consumer's own front-end, so
+**The spawned battery stays spawned**, in this arm and in every consumer-smoke
+caller, and that is load-bearing: the subject under test is the vendored consumer's own front-end, so
 calling this binary's registry in-process would run the host's gates against the
 scratch tree — the pairing defect the placement's own record names.
 
@@ -8554,7 +8558,7 @@ directory — shipping it joins fixtures + README + SPEC in the kit-landing
 checklist; a kit root lacking `smoke/` is an environment error (exit 2). Every
 `smoke/` script that mutates the invoking tree — `install.sh` and
 `violation.sh` both do — opens with the entry-point guard
-`: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"` before its first mutating
+`: "${SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}"` before its first mutating
 command, so a bare invocation (outside the harness that exports
 `SMOKE_KIT_ROOT`) refuses instead of writing into the caller's repo;
 `check-smoke-entry-guard` (§check-smoke-entry-guard) holds the guard's presence
@@ -8614,7 +8618,7 @@ harness accounts for each shipped-but-unregistered gate, so an omission is eithe
 derived-justified or declared, never silent. An unregistered gate is how a live
 contract violation survives — the harness cannot redden on a gate nothing runs.
 
-The accounting is one pass in `run-consumer-smoke.sh`, between the green-battery
+The accounting is one pass in `--run-consumer-smoke`, between the green-battery
 assertion and the violation phase, over the **union**: every vendored kit's
 `checks/` basenames against the scratch consumer's `scripts/gates.list`. The tree
 is already built and green at that point, so the pass adds no install and no
@@ -8623,17 +8627,38 @@ code read against §Output contract's three meanings — the authority here, and
 only one (`check-gate-fail-closed` is a static lint over `awk`/`jq` captures and
 asserts nothing about a gate's behaviour on an absent surface).
 
-**Both declaration spellings, and the probe dispatches rather than executing a
-path.** The union is over `check-*.sh` **and** `check-*.gate`, and each probe
-resolves its invocation through `gate_command` (§lib/gate.sh) instead of running
-`<dir>/<name>.sh`. Stated because the shell-only reading was live and silent: a
+**Both declaration spellings, and the probe dispatches by the spelling it finds.**
+The union is over `check-*.sh` **and** `check-*.gate`. Each probe resolves the
+gate's declaration in **one** checks dir — the vendored kit's in the scratch
+consumer, the kit root's own in the invoking repo — and dispatches it: a `.sh`
+declaration runs by its path, and a `.gate` one runs as
+`<tree>/<GATE_SDK_NATIVE_BIN> <gate>`. Both run with cwd at the probed tree and `GATE_SDK_ROOT` at that tree's
+`gate-sdk`, with both streams discarded. A gate that dir declares under neither
+spelling is exit 2, the "could not run" reading the table below already gives.
+Stated because the shell-only reading was live and silent: a
 gate whose implementation ported left this pass's universe entirely — not
 probed, not declared, not reported — so the one mechanism that catches an
 unregistered gate stopped seeing it at exactly the moment its substrate changed.
 That is the same silent-departure defect §Meta-gate conservation for the binary
-substrate exists to prevent, arriving through a `bin/` tool that assertion C's
+substrate exists to prevent, arriving through a harness that assertion C's
 runtime derivation cannot reach because it is not a registry member. A ported
 gate earns or forfeits a scratch-battery slot on the same terms as any other.
+
+**A probe that cannot dispatch is a harness failure, never a verdict.** A `.gate`
+declaration whose probed tree holds no executable binary at that path ends the run
+at exit 2, naming the tree and the path. Read as a probe exit 2 instead, it would
+combine on the invoking-repo leg with the scratch leg into an `unaccounted` row
+blaming the gate, and on the scratch leg it would fake the surface-absent row and
+grant the permanent exemption the corroborating probe below exists to withhold.
+
+**Both legs spawn, and neither runs in process.** A gate reads its knob files
+relative to its working directory, once per process, so an in-process call from
+the arm would read the invoking tree's knob state while pointed at the scratch
+tree — the spawned battery's ground, reaching the probes. The invoking-repo leg
+would pair correctly in process, and it spawns anyway, so there is one probe shape
+rather than a leg-specific shortcut a later edit could carry to the other leg.
+**Nor can the probe delegate to `run-gates.sh --only`**, which resolves against
+the registry while the accounting's whole subject is gates that are **not** in it.
 
 **One reading is not enough, and the second probe is not redundant.** Exit 2 is
 usage/environment failure *generally* — a missing binary, a malformed config, a
@@ -8730,9 +8755,9 @@ material, the sanctioned response is to report it — never to sample, and never
 cache a verdict across runs, a cached exemption being a maintained exemption
 wearing a derivation's clothes.
 
-**Never at pre-commit.** `run-consumer-smoke.sh` is a `bin/` tool, never a
+**Never at pre-commit.** `--run-consumer-smoke` is a non-gate arm, never a
 registered gate, so the accounting costs the pre-commit battery exactly nothing.
-The two sibling callers of `csmoke_vendor_and_install` do not run it: they build
+The two sibling callers of `vendor_and_install` do not run it: they build
 the same baseline for a different assertion, and charging them for a verdict they
 do not consume would be a cost with no reader.
 
@@ -8770,13 +8795,13 @@ by the scripts to copy from their own kit; the harness verdict is consumed by
 the validate-stage ritual (which gates on the success token) and is the natural
 CI entry point (wiring CI is out of scope here).
 
-The **accounting phase** is produced by `run-consumer-smoke.sh` on every
+The **accounting phase** is produced by `--run-consumer-smoke` on every
 invocation — no enabling knob, since the harness *is* a consumer's
 `consumer_smoke` validate suite, so the producer is reachable in the real
 configuration and not only under test. It reads the vendored kits' `checks/`
 directories, the scratch `scripts/gates.list`, and the vendored
 `smoke/install.sh` declarations, all present in the scratch tree once
-`csmoke_vendor_and_install` has run; its findings are consumed by the same
+`vendor_and_install` has returned; its findings are consumed by the same
 harness verdict, adding to an existing channel rather than opening one. Its
 **three counts** are read on the clean line at the validate
 transition, and the hand-declared count specifically by whoever owns the
@@ -8802,19 +8827,13 @@ declarations and writes no Rust, and it stands on that measurement** — a cut i
 not less legitimate for resolving to declarations when the declarations are
 structural, and re-cutting for Rust was the alternative refused.
 
-**The class membership above is closed and enumerated, and the harness's own two
-files are not in it: `bin/run-consumer-smoke.sh` and `lib/consumer-smoke.sh` are
-owed, each port owned by its own queue entry.** Their declaration rested on criterion
-6's single-producer rule, since the accounting's probe resolved a gate's knobs by
-sourcing the owning kit's library; the crate is now every knob's one producer, so
-that ground is gone. What the ports must keep is stated here so neither is
-rediscovered: the probe cannot delegate to `run-gates.sh --only`, which resolves
-against the registry while the accounting's whole subject is gates that are **not**
-in it, and the spawned battery stays spawned (the walkthrough paragraphs above).
-The adoption walkthrough was the section's other owed member and ported, as
-context-kit's AGENTS.md smoke did by the identical predicate as
-`--agents-md-smoke`; the live owed count is `--emit port-blockers --tree`'s and is
-not restated here.
+**The class membership above is closed and enumerated, and the harness is not in
+it: the harness is the `--run-consumer-smoke` arm and its builder is in-crate.**
+What the arm keeps — the probe never delegating to `run-gates.sh --only`, and the
+battery and both probe legs staying spawned — is *The registration accounting*'s
+to state. The adoption walkthrough ported as `--run-demo`, as context-kit's
+AGENTS.md smoke did by the identical predicate as `--agents-md-smoke`; the live
+owed count is `--emit port-blockers --tree`'s and is not restated here.
 
 **Leg 2 — a `smoke/install.sh` is an executable recipe by stated contract, and
 porting one is non-monotone for a live reader.** *Not derived from the README
@@ -9898,7 +9917,7 @@ as a kit narrowing. The runner counts those lines and prints the count and its r
 beside the summary, one line per reason token present, so a declared omission
 stays distinguishable from the regression the tripwire exists to catch. **The
 line is separate from the summary and carries none of its text**, and that is
-load-bearing rather than tidy: `run-consumer-smoke.sh` and the installer's own
+load-bearing rather than tidy: `--run-consumer-smoke` and the installer's own
 smoke both match the green phrase against this output, so a remedy folded into
 the summary line would either break their assertion or make the phrase match on
 a run that omitted half the battery. A registry with no omission lines prints
@@ -9915,7 +9934,7 @@ here** rather than left for a later reader to re-litigate against the sentence
 above. `GATE_SDK_VERBOSE` is *how* the battery reports — a value every caller of
 the battery should carry uniformly — and env is right for it. *Which* members run
 is the one thing that must not be ambient: a selector spelled as a `GATE_SDK_*`
-knob would be inherited by the generated hook, by `run-consumer-smoke.sh` and by
+knob would be inherited by the generated hook, by `--run-consumer-smoke` and by
 any CI wrapper that ran under it, silently narrowing a battery to one member
 while the summary line still reported a pass — precisely the
 green-with-nothing-behind-it the declared-omission accounting above exists to
@@ -10554,18 +10573,19 @@ shell function.
 
 ### run-consumer-smoke
 
-The scratch-consumer install+violation harness (§Consumer smoke): vendors the
+The scratch-consumer install+violation harness, the binary's
+**`--run-consumer-smoke`** arm (§Consumer smoke): vendors the
 kit roots into a fresh temp repo, drives each `smoke/install.sh`, asserts the
 full battery is green under zero config, runs the registration accounting over
 every shipped-but-unregistered gate, then fires each `smoke/violation.sh`
-and asserts the battery reddens at the named gate before restoring. A `bin/`
-tool, never a `gates.list` member — it is pre-commit-unfit by runtime budget
+and asserts the battery reddens at the named gate before restoring. A non-gate
+arm (§The non-gate arm), never a `gates.list` member — it is pre-commit-unfit by runtime budget
 and is the proof that the kit defaults hold on a vendored-kit tree.
 
 ### upgrade-smoke
 
 The two-phase upgrade proof, the binary's **`--upgrade-smoke`** arm — the third
-caller of `csmoke_vendor_and_install` (§Consumer smoke), reusing the same green
+caller of the scratch-consumer builder's `vendor_and_install` (§Consumer smoke), reusing the same green
 baseline before it diverges. Where run-consumer-smoke proves a *single* release's
 defaults hold, this proves the *transition* between two: it vendors every kit at
 a **FROM** ref into a scratch consumer, installs, seeds the config seam `init`
@@ -10625,7 +10645,7 @@ baseline commit. So the baseline is the tree an init-seeded consumer holds, and 
 kit whose smoke seeds no config still has its template copy on disk. A smoke that
 wrote its own config keeps it, because a copy lands only where nothing is. The
 derivation is init's own, reused rather than restated, and the step lives in this
-arm alone, never in `lib/consumer-smoke.sh`, so the consumer smoke's baseline does
+arm alone, never in the shared builder, so the consumer smoke's baseline does
 not move with it. A seeded copy that reds the FROM baseline is the tag's own
 defect, reported as `FAIL(env)` like every other red baseline. Without the step,
 a config-shape change to a kit whose smoke seeds no config ships a consumer break
@@ -10687,39 +10707,12 @@ This is what discharges the graph-artifact literal, and it takes neither of the
 two dispositions weighed against it: it neither duplicates the default
 expression nor mints an arm on a gate for one caller.
 
-**That read is a `bash -c` running the consumer's own front-end, and a `bash -c`
-is how the whole suite reaches `lib/consumer-smoke.sh`.** That library is shell
-and owed its own port (§Consumer smoke, *The port disposition*), so until the port
-lands criterion 6's delete-the-original road is unavailable. The road taken is not the *unless* clause's machine-held-twin form
-but its strongest one — **the duplication is absent, because the arm creates
-none**. `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and
-`csmoke_place_binary` are **not reimplemented**: the arm spawns `bash`, sources
-the unchanged library and calls the function that owns the rule, which clears
-criterion 7 by this SPEC's own sentence that "a rule shelling out to
-`bash <emitter>` clears this criterion, because `bash` is on the floor" — the
-shape `check-graph` had while the hook generator was shell. **The seam problem is the shell
-variable, and the idiom that solves it is the one above.**
-`csmoke_vendor_and_install` communicates by setting its caller's `SCRATCH` and
-`csmoke_place_binary` by reading it, and no process boundary carries either; so
-the arm supplies it on the way in and reads it back off a one-line stdout protocol
-on the way out, which is the function's own contract read out rather than a
-private one minted beside it. **The spawn wrapper and its script prologue are a
-shared crate module rather than this arm's**, because this seam now has a second
-spawn-side caller (context-kit/SPEC.md §Testing): a second copy would be the
-duplication the road exists to avoid, relocated from two shell scripts into two
-Rust modules — the refusal §lib/gate.sh's *exactly one place a value is computed*
-states, applied to a technique rather than to a knob. **One consequence is visible and is stated rather
-than left to be noticed:** the shell driver let the vendoring step's installer
-output reach *its* stdout, which this section's own contract already reserved for
-the one clean line; the stdout protocol forces that output to stderr, so the
-stated contract and the behaviour agree for the first time.
-
-**The arm resolves gate-sdk's own library through the kit roots, and that is why
-`GATE_SDK_KIT_DIRS` is on the roster below.** The deleted driver anchored on its
-own `BASH_SOURCE`; a compiled arm has no such anchor, so it reads the roots the
-crate derives from the `GATE_SDK_ROOT` locator (§Layout and configuration). The arm
-takes the root whose basename is `gate-sdk` — a name this member already spells,
-since its vendorable-kit derivation names that kit explicitly to order it first.
+**That read is a `bash -c` running the consumer's own front-end; the scratch
+build is not.** The descriptor count, the FROM vendoring and each placement are
+in-process calls to the scratch-consumer builder (§Consumer smoke), whose
+installers' output this arm routes to stderr, since its stdout carries the one
+clean line. Both FROM's and TO's vendorable kits come from the extracted refs, so
+the arm resolves no kit root of the invoking tree.
 
 **The declaration resolve moved in-crate.** The arm reads TO's Tightened-gates
 declaration through `native/src/declaration.rs`, which was then the compiled half
@@ -10773,7 +10766,7 @@ open and unbudgeted here — recorded rather than absorbed, because it moves a c
 from the contributor onto this suite's environment assumptions.
 
 **A ref carrying no crate is a branch, not a special case.** Whether a binary is
-needed at all comes from `csmoke_gate_descriptors` (§Consumer smoke) — the same
+needed at all comes from the builder's `gate_descriptors` (§Consumer smoke) — the same
 derivation the placement itself uses, asked one step earlier because a builder
 must decide before it can name a source tree. A ref whose vendored kits carry no
 `*.gate` needs none, so no worktree is added and no build runs: that is every tag
@@ -10821,7 +10814,7 @@ outside its reach entirely and an installed binary is neither a determinism
 finding nor a determinism exemption. Widening the assertion to name it would
 claim coverage this tool cannot have. Re-placing the binary at phase A does not
 disturb that, and the reason is mechanical rather than argued: the scratch
-consumer's `.gitignore` carries `gate_native_bin`'s path (§Consumer smoke), so
+consumer's `.gitignore` carries `GATE_SDK_NATIVE_BIN`'s path (§Consumer smoke), so
 the placed artifact never enters the `git status` the assertion reads, and
 nothing is exempted on its behalf. The ruling stands unchanged and is cited here,
 not amended. The install path's own idempotence proof is the installer's smoke
@@ -10919,9 +10912,10 @@ each read exactly once at the resolve step:
 - `GATE_SDK_UPGRADE_TO` — the TO ref (default: `HEAD`).
 - Scratch base is the existing `GATE_SDK_TMP_DIR` knob; the extracted trees, the
   per-ref worktrees and the consumer are created under it and trap-removed.
-- The declaration path derives from `GATE_SDK_WORKFLOW_DIR`, and the kit roots,
-  under the `GATE_SDK_KIT_DIRS` override, are how the arm finds the kit library it
-  drives — both declared, both resolved at the same step.
+- The declaration path derives from `GATE_SDK_WORKFLOW_DIR`, resolved at the same
+  step. `GATE_SDK_NATIVE_BIN` is declared beside it and read by the in-crate
+  builder the arm calls, which places each ref's binary at that path and names it
+  in the scratch `.gitignore` (§Consumer smoke).
 
 **All three `GATE_SDK_UPGRADE_*` defaults live in gate-sdk's table, and that is
 load-bearing rather than tidy.** They were defaulted inside the deleted driver and
@@ -11652,7 +11646,7 @@ field is deliberately **trigger**-shaped and wide on purpose. A bare
 callers spanning canon-kit, gate-sdk and `scripts/` that share no corpus whatever.
 `check-shellcheck` is the worked case in both directions — it *does* call
 `gate_kit_roots`, then composes four fixed subdirectory names and a `*.sh` glob on
-top of it, where `bin/run-consumer-smoke.sh` composes the same call with one
+top of it, where `check-smoke-entry-guard` reads the same kit roots with one
 `smoke/` path. Same primitive, different corpus.
 
 - **Kit-library call set** — the command-position words the scan emits that the
@@ -12349,7 +12343,7 @@ exists.
 directory-presence, and that was wrong for a reason worth keeping written down:
 the crate path is also where build artifacts land. `GATE_SDK_NATIVE_BIN`
 defaults inside it, so *anything* that places the binary at its default —
-`csmoke_place_binary` seeding a scratch consumer (§Consumer smoke), or an
+the consumer-smoke builder's `place_binary` seeding a scratch consumer (§Consumer smoke), or an
 adopter who hand-vendors and copies the artifact to that deliberately stable
 relative path — creates the directory while delivering no crate at all. Under
 directory-presence the out-of-reach branch could then never fire for exactly the
@@ -15908,9 +15902,8 @@ is not executable" cannot read as "a descriptor is not covered": the descriptor
 is data — a manifest and directives, never sourced and never run — and an
 executable one invites a reader to run a file carrying no interpreter line. The
 first class is by-path-invoked kit scripts — gate-sdk's runner
-(`run-gates.sh`), gate-sdk's consumer-smoke harness (`bin/run-consumer-smoke.sh`,
-which runs each vendored kit's own `smoke/install.sh` and `smoke/violation.sh` by
-path), and lifecycle-kit's
+(`run-gates.sh`), gate-sdk's consumer-smoke harness (`--run-consumer-smoke`,
+whose registration accounting runs each unregistered `.sh` gate by path), and lifecycle-kit's
 entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
 is by-convention path-invocable — so a script committed `100644` degrades
 silently in a fresh clone: a KPI plugin to `n/a (plugin failed)`, a

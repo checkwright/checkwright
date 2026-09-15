@@ -21,7 +21,7 @@ mkdir -p "$tmp/good"
 cat > "$tmp/good/install.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
+: "${SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}"
 DEMO_KIT_CRED_FILE="$pp/absent.json" bash "$SMOKE_KIT_ROOT/bin/verdict.sh" "$snap"
 EOF
 
@@ -30,7 +30,7 @@ mkdir -p "$tmp/bad"
 cat > "$tmp/bad/install.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
+: "${SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}"
 DEMO_KIT_CRED_FILE="$pp/creds.json" bash "$SMOKE_KIT_ROOT/bin/poller.sh"
 bash "$SMOKE_KIT_ROOT/bin/verdict.sh" "$snap"
 EOF
@@ -40,7 +40,7 @@ mkdir -p "$tmp/neutral"
 cat > "$tmp/neutral/install.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
+: "${SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}"
 bash "$SMOKE_KIT_ROOT/bin/install-thing.sh"
 EOF
 
@@ -50,7 +50,7 @@ cat > "$tmp/exempt/install.sh" <<'EOF'
 #!/usr/bin/env bash
 # hermetic-exempt: constructs its own HOME sandbox before any bin call.
 set -euo pipefail
-: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
+: "${SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}"
 DEMO_KIT_CRED_FILE="$pp/creds.json" bash "$SMOKE_KIT_ROOT/bin/poller.sh"
 bash "$SMOKE_KIT_ROOT/bin/verdict.sh" "$snap"
 EOF

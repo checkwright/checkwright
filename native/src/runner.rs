@@ -28,6 +28,7 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
        run-gates.sh --usage-verdict [paths]    budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
+       run-gates.sh --run-consumer-smoke [args] prove the kits install into a scratch consumer
        run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
        run-gates.sh --install-hooks            wire this clone's core.hooksPath (per-clone opt-in)
        run-gates.sh --enter-stage <stage>      stamp a stage entry (or --rename an iteration)
@@ -77,6 +78,14 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           sync is deterministic and the phase-B red set is declared. Takes no
           argument. Exit 0 clean with one UPGRADE-SMOKE line on stdout, 1 an
           upgrade finding, 2 a broken tag or environment; unavailable is 2.
+  --run-consumer-smoke  takes [--keep] [kit-root...]: vendors the named kit
+          roots (default: every kit; gate-sdk always first) into a scratch
+          consumer, runs each smoke/install.sh, asserts the battery green under
+          zero config, accounts for every shipped but unregistered gate, and
+          fires each smoke/violation.sh. `--keep` retains the scratch and
+          prints its path. Exit 0 with one
+          CONSUMER-SMOKE clean line, 1 an assertion failed, 2 usage or
+          environment; unavailable is 2.
   --install-lifecycle  writes the lifecycle registration block into the
           always-loaded agent file, the iteration-scoped merge attributes into
           .gitattributes, and the keep-ours merge driver into this clone's git

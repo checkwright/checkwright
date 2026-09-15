@@ -1603,7 +1603,7 @@ seams (`GATE_SDK_AGENT_FILE`, `LIFECYCLE_KIT_AGENT_FILE`, `DOCTRINE_KIT_AGENT_FI
 then asserts the battery is green, `--emit always-loaded` and the footprint emitter
 measure the `AGENTS.md` surface, and `check-root-tiering`'s built-in allowlist accepts
 `AGENTS.md` at root while rejecting a stray second agent file. It is a standalone
-harness — not driven by `run-consumer-smoke.sh`, which asserts the kit defaults
+harness — not driven by `--run-consumer-smoke`, which asserts the kit defaults
 under zero config — and registers as its own evidence-kit validate suite
 (`agents_md_smoke`, the `demo` precedent).
 
@@ -1627,20 +1627,10 @@ what the binary placement needs; every knob in the six-knob set above is
 the arm itself, because resolving one here would hand the arm this repo's posture
 in place of the one it is constructing.
 
-**The consumer-smoke helpers are called in the library that owns them.**
-`gate-sdk/lib/consumer-smoke.sh` is shell and owed its own port (gate-sdk/SPEC.md
-§Consumer smoke), and a crate twin beside it would be a second holder, so the arm
-takes the **duplication-absent road** the upgrade
-suite already took: a `bash -c` that sources the unchanged library, calls
-`csmoke_vendor_and_install` and reads the helper's own `SCRATCH` back off stdout,
-because that variable is set in the callee's shell and no process boundary
-carries it. The spawn wrapper and its script prologue are a **shared crate
-module** both arms call rather than a copy each. Two consequences are stated
-because they are observable: the helper's own installer output moves to stderr,
-that channel being reserved for the value coming back, and the library's shell
-sourcer set loses this member — leaving the adoption walkthrough as the last
-sourcer, which has since ported too and emptied that set
-(gate-sdk/SPEC.md §Consumer smoke).
+**The vendoring calls gate-sdk's in-crate scratch-consumer builder**
+(gate-sdk/SPEC.md §Consumer smoke), in process, so the smoke holds no second copy
+of the build. One consequence is observable and is stated: the arm routes the
+installers' output to its stderr, keeping its stdout for the verdict lines.
 
 **Everything after the vendoring is the arm's own, and the step a port most
 easily loses is the regeneration ordering.** Each kit's `install.sh` already

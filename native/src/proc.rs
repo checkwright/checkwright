@@ -864,9 +864,12 @@ pub enum Stderr {
 // spec: gate-sdk/SPEC.md §Fail-closed contract — where an *uncaptured* child's two streams go, the
 // one shape the capturing spawns above cannot carry: `Inherit` is a consumer hook running in the
 // caller's own terminal and `File` is `>"$log" 2>&1`, one description both handles dup onto.
+// spec: gate-sdk/SPEC.md §Consumer smoke — `Stderr` is `1>&2`: a caller whose own stdout is
+// reserved for its verdict routes a child's narration onto its stderr rather than capturing it.
 pub enum Sink {
     Inherit,
     File(std::path::PathBuf),
+    Stderr,
 }
 
 // spec: evidence-kit/SPEC.md §bin/run-validate.sh — the spine's own spawn: a configured command
@@ -884,6 +887,19 @@ pub fn run_to_env(
     env: &[(String, String)],
     sink: &Sink,
 ) -> Result<i32, String> {
+    run_to_in(program, args, env, None, sink)
+}
+
+// spec: gate-sdk/SPEC.md §Consumer smoke — `run_to_env` with the child's own working directory: a
+// kit's `smoke/install.sh` runs inside the scratch consumer, and moving the caller's cwd instead
+// would be process-global.
+pub fn run_to_in(
+    program: &str,
+    args: &[&str],
+    env: &[(String, String)],
+    cwd: Option<&std::path::Path>,
+    sink: &Sink,
+) -> Result<i32, String> {
     #[cfg(test)]
     recorder::note(program);
     let spawn_err = |e: std::io::Error| {
@@ -897,13 +913,59 @@ pub fn run_to_env(
     for (k, v) in env {
         cmd.env(k, v);
     }
-    if let Sink::File(path) = sink {
-        let out = std::fs::File::create(path).map_err(spawn_err)?;
-        let err = out.try_clone().map_err(spawn_err)?;
-        cmd.stdout(std::process::Stdio::from(out))
-            .stderr(std::process::Stdio::from(err));
+    if let Some(dir) = cwd {
+        cmd.current_dir(dir);
+    }
+    match sink {
+        Sink::Inherit => {}
+        Sink::File(path) => {
+            let out = std::fs::File::create(path).map_err(spawn_err)?;
+            let err = out.try_clone().map_err(spawn_err)?;
+            cmd.stdout(std::process::Stdio::from(out))
+                .stderr(std::process::Stdio::from(err));
+        }
+        Sink::Stderr => {
+            cmd.stdout(std::process::Stdio::from(std::io::stderr()));
+        }
     }
     cmd.status().map(|s| exit_code(&s)).map_err(spawn_err)
+}
+
+// spec: gate-sdk/SPEC.md §Consumer smoke — `$( cd <dir> && <child> )` with stderr left on the
+// terminal: `run_streamed`'s stdout capture for a child that needs its own working directory and
+// environment and is fed no body.
+pub fn run_stdout_in(
+    program: &str,
+    args: &[&str],
+    env: &[(String, String)],
+    cwd: &std::path::Path,
+) -> Result<Streamed, String> {
+    #[cfg(test)]
+    recorder::note(program);
+    let io_err = |e: std::io::Error| {
+        format!(
+            "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+            program, e
+        )
+    };
+    let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let outp = std::env::temp_dir().join(format!("checkwright-out.{}.{}", std::process::id(), seq));
+    let sink = std::fs::File::create(&outp).map_err(io_err)?;
+    let mut cmd = Command::new(spawn_target(program)?.as_ref());
+    cmd.args(args)
+        .current_dir(cwd)
+        .stdout(std::process::Stdio::from(sink));
+    for (k, v) in env {
+        cmd.env(k, v);
+    }
+    let status = cmd.status();
+    let stdout = std::fs::read(&outp);
+    let _ = std::fs::remove_file(&outp);
+    let status = status.map_err(io_err)?;
+    Ok(Streamed {
+        code: exit_code(&status),
+        stdout: stdout.map_err(io_err)?,
+    })
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the spawn recorder unit test A observes

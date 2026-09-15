@@ -22,7 +22,7 @@ EOF
 # comment-tier-exempt: a genuinely unavoidable note with no owning section
 bar() { echo bye; }
 
-# smoke-unregistered: check-example — a machine directive run-consumer-smoke.sh parses off the vendored copy, so it is blessed by name like graph:/contract: rather than needing an exempt tag
+# smoke-unregistered: check-example — a machine directive --run-consumer-smoke parses off the vendored copy, so it is blessed by name like graph:/contract: rather than needing an exempt tag
 baz() { echo sm; }
 
 # no-port: some/SPEC.md §thing — a declaration's port verdict, blessed by name off the built-in roster; the shell spelling is where the field lives

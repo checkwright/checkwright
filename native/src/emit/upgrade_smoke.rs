@@ -5,19 +5,19 @@ use crate::declaration::{self, SectionVerdict, TokenRule};
 use crate::emit::csmoke;
 use crate::ere::Ere;
 use crate::installer::{recipe, GATES_DIR};
-use crate::proc::{self, Stderr};
+use crate::proc::{self, Sink, Stderr};
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the five knobs the resolve step reads, plus the kit
-// roots' override: a compiled arm has no `BASH_SOURCE` anchor to find its own kit library from.
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the five knobs the resolve step reads, plus the binary
+// path the in-process placement and the scratch `.gitignore` line read.
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_UPGRADE_REPO",
     "GATE_SDK_UPGRADE_FROM",
     "GATE_SDK_UPGRADE_TO",
     "GATE_SDK_TMP_DIR",
     "GATE_SDK_WORKFLOW_DIR",
-    "GATE_SDK_KIT_DIRS",
+    "GATE_SDK_NATIVE_BIN",
 ];
 
 const NAME: &str = "upgrade-smoke";
@@ -110,7 +110,6 @@ fn smoke() -> Result<String, Fail> {
     let repo = resolve_repo()?;
     let from = resolve_from(&repo)?;
     let to = resolve_to(&repo)?;
-    let sdk = sdk_root()?;
 
     let base = scratch_base()?;
     let work = mktemp_dir(&base)?;
@@ -148,10 +147,10 @@ fn smoke() -> Result<String, Fail> {
     // spec: gate-sdk/SPEC.md §upgrade-smoke — step 1: FROM's kits paired with FROM's own binary, so
     // phase 1's claim is about FROM alone
     let mut from_bin = String::new();
-    if descriptors(&sdk, &fromroots)? > 0 {
+    if csmoke::gate_descriptors(&fromroots) > 0 {
         from_bin = ref_binary_tree(&mut env, &from, "from", &work)?;
     }
-    let consumer = vendor_and_install(&mut env, &sdk, &base, &from_bin, &fromroots, &from)?;
+    let consumer = vendor_and_install(&mut env, &base, &from_bin, &fromroots, &from)?;
     let seeded = seed_config_seam(Path::new(&consumer), &fromroots)?;
     if !seeded.is_empty() {
         amend_baseline(&consumer, &from)?;
@@ -188,9 +187,9 @@ fn smoke() -> Result<String, Fail> {
 
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the binary is re-placed in the motion that swaps the
     // kit directories, because that swap *is* the upgrade transition
-    if descriptors(&sdk, &toroots)? > 0 {
+    if csmoke::gate_descriptors(&toroots) > 0 {
         let tree = ref_binary_tree(&mut env, &to, "to", &work)?;
-        place_binary(&sdk, &consumer, &tree, &toroots, &to)?;
+        place_binary(&consumer, &tree, &toroots, &to)?;
     }
 
     determinism(&consumer, &seen)?;
@@ -311,22 +310,6 @@ fn resolves(repo: &str, git_ref: &str) -> bool {
     )
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the arm reaches gate-sdk's own library through the
-// transported kit roots rather than through a path relative to itself: a binary the installer
-// copied elsewhere cannot recover the shell form's `BASH_SOURCE` anchor (§lib/gate.sh).
-fn sdk_root() -> Result<String, Fail> {
-    let roots = walk::kit_roots_abs().map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
-    roots
-        .into_iter()
-        .find(|r| basename(r) == "gate-sdk")
-        .ok_or_else(|| {
-            broken(one(format!(
-                "{}: the kit roots name no gate-sdk root, so the consumer-smoke library this suite drives cannot be found",
-                NAME
-            )))
-        })
-}
-
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the scratch base is `GATE_SDK_TMP_DIR`, absolutized the
 // way the shell form's `cd && pwd` did, because every child below is spawned from another directory
 fn scratch_base() -> Result<String, Fail> {
@@ -385,57 +368,40 @@ fn kit_dirs_in(tree: &str) -> Result<Vec<String>, Fail> {
     Ok(out)
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the shared spawn seam wearing this arm's failure type:
-// a spawn this member could not make is a broken environment, never an upgrade finding.
+// spec: gate-sdk/SPEC.md §upgrade-smoke — `bash -c <script> bash <args…>`, wearing this arm's
+// failure type: a spawn this member could not make is a broken environment, never an upgrade finding.
 fn bash(script: &str, args: &[&str], stderr: Stderr) -> Result<proc::Streamed, Fail> {
-    csmoke::spawn(script, args, stderr).map_err(|e| broken(one(format!("{}: {}", NAME, e))))
+    let mut argv: Vec<&str> = vec!["-c", script, "bash"];
+    argv.extend_from_slice(args);
+    proc::run_streamed("bash", &argv, b"", stderr)
+        .map_err(|e| broken(one(format!("{}: {}", NAME, e))))
 }
 
-fn descriptors(sdk: &str, roots: &[String]) -> Result<i64, Fail> {
-    let script = format!("{} shift; csmoke_gate_descriptors \"$@\"", csmoke::SOURCE);
-    let refs: Vec<&str> = std::iter::once(sdk)
-        .chain(roots.iter().map(String::as_str))
-        .collect();
-    let done = bash(&script, &refs, Stderr::Inherit)?;
-    let text = String::from_utf8_lossy(done.stdout()).trim().to_string();
-    text.parse::<i64>().map_err(|_| {
-        broken(one(format!(
-            "{}: csmoke_gate_descriptors answered '{}', which is not a count",
-            NAME, text
-        )))
-    })
-}
-
-// spec: gate-sdk/SPEC.md §upgrade-smoke — `csmoke_vendor_and_install` communicates by setting its
-// caller's `SCRATCH`, which no process boundary carries, so the seam is the library's own contract
-// read out on stdout: everything the helper prints goes to stderr and the directory comes back.
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the installers' output stays on stderr, where this arm's
+// stdout keeps its one verdict line, and a failed build's directory still reaches the teardown.
 fn vendor_and_install(
     env: &mut Scratch,
-    sdk: &str,
     base: &str,
     host: &str,
     roots: &[String],
     from: &str,
 ) -> Result<String, Fail> {
-    let script = format!(
-        "{} TMPDIR=\"$2\"; export TMPDIR; host=\"$3\"; shift 3; \
-         csmoke_vendor_and_install \"$host\" \"$@\" 1>&2; st=$?; printf '%s' \"$SCRATCH\"; exit $st",
-        csmoke::SOURCE
-    );
-    let refs: Vec<&str> = vec![sdk, base, host]
-        .into_iter()
-        .chain(roots.iter().map(String::as_str))
-        .collect();
-    let done = bash(&script, &refs, Stderr::Inherit)?;
-    let scratch = String::from_utf8_lossy(done.stdout()).trim().to_string();
-    env.consumer = scratch.clone();
-    if done.code() != 0 || scratch.is_empty() {
-        return Err(broken(one(format!(
-            "{}: vendoring the FROM baseline ({}) failed — a broken tag, not an upgrade finding",
-            NAME, from
-        ))));
+    match csmoke::vendor_and_install(host, roots, base, &Sink::Stderr) {
+        Ok(built) => {
+            env.consumer = built.dir.clone();
+            Ok(built.dir)
+        }
+        Err(e) => {
+            env.consumer = e.dir;
+            Err(broken(vec![
+                format!("{}: {}", NAME, e.message),
+                format!(
+                    "{}: vendoring the FROM baseline ({}) failed — a broken tag, not an upgrade finding",
+                    NAME, from
+                ),
+            ]))
+        }
     }
-    Ok(scratch)
 }
 
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the FROM consumer is seeded with the config seam `init`
@@ -520,25 +486,18 @@ fn amend_baseline(consumer: &str, from: &str) -> Result<(), Fail> {
     Ok(())
 }
 
-// spec: gate-sdk/SPEC.md §upgrade-smoke — the placement's spawn wrapper moved into `csmoke.rs` when
-// it gained its second caller; this arm keeps only its own verdict for the helper's status, a
-// placement it could not make being a broken environment and never an upgrade finding.
-fn place_binary(
-    sdk: &str,
-    consumer: &str,
-    host: &str,
-    roots: &[String],
-    to: &str,
-) -> Result<(), Fail> {
-    let code = csmoke::place_binary(sdk, consumer, host, roots)
-        .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
-    if code != 0 {
-        return Err(broken(one(format!(
+// spec: gate-sdk/SPEC.md §upgrade-smoke — a placement this arm could not make is a broken
+// environment and never an upgrade finding.
+fn place_binary(consumer: &str, host: &str, roots: &[String], to: &str) -> Result<(), Fail> {
+    csmoke::place_binary(consumer, host, roots).map_err(|e| {
+        let mut r = e.lines();
+        r[0] = format!("{}: {}", NAME, r[0]);
+        r.push(format!(
             "{}: FAIL(env) — could not place TO ({})'s gate binary in the scratch consumer",
             NAME, to
-        ))));
-    }
-    Ok(())
+        ));
+        broken(r)
+    })
 }
 
 // spec: gate-sdk/SPEC.md §upgrade-smoke — a ref's binary is built from a **detached worktree** at

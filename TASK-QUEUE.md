@@ -12,88 +12,6 @@
 
 ## New Features
 
-- **run-consumer-smoke-port** [spec: SPEC-consumer-smoke-port.md] —
-  `gate-sdk/bin/run-consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule,
-  since its registration accounting resolved a gate's knobs through the bridge, and that ground is
-  gone (gate-sdk/SPEC.md §Consumer smoke, The port disposition).
-  **Deliverable:** the install, green-battery, registration-accounting and violation phases as a
-  binary arm the `consumer_smoke` validate suite runs, its output and 0/1/2 contract unchanged, and
-  the script deleted.
-  **Ruled at spec (the amendment):** the arm is `--run-consumer-smoke`; both probe legs spawn in the
-  probed tree, and an absent tree binary is a harness exit 2 rather than a probe verdict; it ports
-  together with `consumer-smoke-library-port` in one unit.
-  **Cost while deferred:** every validate runs a 240-line bash harness; `--emit port-blockers
-  --tree` counts it owed.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s build beside its two sibling ports, when the
-  bridge retirement moved the smoke harness from no-port to owed (operator direction, 2026-09-14).
-  **Rides `owed-port-tail`** beside `gen-pre-commit-port` — operator direction, 2026-09-15,
-  lead-relayed; authored and paired at spec.
-
-- **consumer-smoke-library-port** [spec: SPEC-consumer-smoke-port.md] —
-  `gate-sdk/lib/consumer-smoke.sh` is owed: it declared on criterion 6's single-producer rule, and
-  the crate is now every knob's one producer (gate-sdk/SPEC.md §Consumer smoke). Its callers are
-  `run-consumer-smoke.sh`, which sources it, and three compiled arms (`--upgrade-smoke`,
-  `--agents-md-smoke`, `--run-demo`) that reach it through a shared `bash -c` spawn wrapper.
-  **Deliverable:** `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and `csmoke_place_binary`
-  in-crate, the spawn wrapper and its `SCRATCH` stdout protocol deleted, and the library deleted.
-  **Ruled at spec (the amendment):** together with `run-consumer-smoke-port`, one unit;
-  library-first with a shell caller kept is refused as a second holder under criterion 6. No
-  caller's output channel moves in the cut.
-  **Cost while deferred:** each of the three arms spawns `bash` to reach the helpers, and their
-  installer output is forced onto stderr by the protocol; `--emit port-blockers --tree` counts it
-  owed.
-  Filed 2026-09-15 by `config-seam-fourth-cut`'s build, the third of the three ports the bridge
-  retirement made owed (operator direction, 2026-09-14, lead-relayed).
-  **Rides `owed-port-tail`** — operator direction, 2026-09-15, lead-relayed; its order against
-  `run-consumer-smoke-port` settled at spec as together.
-
-- **gate-command-status-conflation-third-caller** [spec: SPEC-consumer-smoke-port.md] — a third
-  call site conflates `gate_command`'s harness-error exit with a resolution failure, and its guard
-  for the real case is dead. Its `gen-pre-commit.sh` half landed by deletion in
-  `gen-pre-commit-port`; the `acct_probe` half rides the consumer-smoke port.
-  **Both defects read off the source at this drain rather than cited.** In
-  `gate-sdk/bin/run-gate-tests.sh`, `run_case` reaches `gate_command` through a PROCESS
-  SUBSTITUTION, so the function's exit 2 for a harness error — an absent dispatch binary —
-  kills only the subshell and reaches the caller as an empty argv. The
-  `if !` arm around it is dead, because `mapfile`'s status is `mapfile`'s own and not the
-  substitution's, so only the empty-argv arm ever fires; both arms print the same
-  resolves-in-no-check-dir line, which is FALSE for the binary-absent cause — the gate resolved
-  perfectly well and merely could not be built.
-  **RE-GROUNDED 2026-09-15 at scope: that referent is deleted.** `run-gate-tests.sh` became the
-  compiled `--run-gate-tests` arm, which spawns no process substitution. The shape survives at two
-  other callers: `gate-sdk/bin/gen-pre-commit.sh`'s `command_rel` (`mapfile ... < <(gate_command
-  ...) || return 1`, the same dead guard) and `gate-sdk/bin/run-consumer-smoke.sh`'s `acct_probe`.
-  Both files are owed ports (`gen-pre-commit-port`, `run-consumer-smoke-port`) whose deliverable
-  deletes them, so landing those ports discharges this entry by deletion.
-  **Rides `owed-port-tail` as a rider, superseding the 2026-08-25 lead decision below** — operator
-  direction, 2026-09-15, lead-relayed; discharged by the ports' deletions. Paired at spec to both
-  port amendments, each of which states why its crate form cannot re-conflate the two failures
-  (the hook emitter is the binary; the smoke probe returns a harness error as exit 2). It moves to
-  Done when the second of the two lands.
-  **Distinct from the closed exit-class unit, and NOT a re-filing of it.** That unit repaired
-  this shape at `scripts/gate-exec.sh` only and enumerated its blast radius as the name-addressed
-  pre-flight callers; this caller sits in gate-sdk's own `bin/` and outside that unit's audited
-  update-target roster, which is why it was filed rather than folded in.
-  **The verdict is already right and the defect is on the MESSAGE axis alone** — `run_case`
-  returns 2 and the run counts a harness failure, so nothing silently passes. But that is the
-  same axis the closed unit exists for, and gate-sdk/SPEC.md §lib/gate.sh now states the caller
-  obligation generically, so this is a stated-rule violation rather than an inconsistency.
-  **Shape:** `run-gates.sh`'s existing pattern is prior art in the same directory — capture
-  through a command substitution, keep the status, and name resolves-in-no-check-dir only on
-  status 1. It also owes an update to gate-sdk/SPEC.md §run-gate-tests, which is what puts it
-  past a mechanical sweep and made it a scope change rather than in-envelope calibration.
-  **Cost while deferred:** low and diagnostic — a fixture run against a stale binary tells its
-  reader the gate does not exist, pointing at a registration fix instead of at
-  `bash gate-sdk/bin/build-native.sh`.
-  **The authority named on the Filed line below is ITSELF A FILED QUESTION — read it there rather
-  than re-deriving it:** `pre-grammar-disposition-authority-ambiguity` owns whether an ungrammared
-  disposition naming an operator CLASS and a LEAD ruler is read as one or the other, and the
-  operator ruled 2026-09-03 that the ambiguity is FILED rather than settled. This entry's own
-  deferral turns on neither reading, so a drain meeting this row disposes of it without escalating.
-  Filed 2026-08-24 by build while landing the exit-class unit; DISPOSITIONED BY OPERATOR-CLASS
-  RULING at the 2026-08-25 close — the lead ruled it STAYS DEFERRED on CLAUDE.md's
-  scope-gated-intake rule, and directed it be promoted as a filing rather than started as work.
-
 ## Technical Debt
 
 ## Deferred
@@ -4774,5 +4692,8 @@
 - amendment-reader-roster-undercount
 - amendment-update-target-overcount-undetected
 - gen-pre-commit-port
+- run-consumer-smoke-port
+- consumer-smoke-library-port
+- gate-command-status-conflation-third-caller
 
 ## Lessons Learned

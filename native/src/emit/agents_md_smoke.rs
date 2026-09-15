@@ -1,11 +1,11 @@
 // spec: context-kit/SPEC.md §Testing — the AGENTS.md agent-file adapter smoke, an
 // `Arm::Run` member: the contract is a verdict — 0 with the clean line, 1 with a `FAIL — <reason>`
 // line, 2 a precondition the harness could not meet — which `Arm::Emit` cannot carry.
-// spec: context-kit/SPEC.md §Testing — the vendoring calls `lib/consumer-smoke.sh`'s helpers in the
-// library that owns them, through the shared spawn seam, so the port creates no second producer.
+// spec: context-kit/SPEC.md §Testing — the vendoring calls gate-sdk's in-crate scratch-consumer
+// builder, so the smoke holds no second copy of the build.
 use crate::emit::csmoke;
 use crate::ere::Ere;
-use crate::proc::{self, Stderr};
+use crate::proc::{self, Sink, Stderr};
 use crate::walk;
 use std::path::Path;
 
@@ -115,7 +115,7 @@ fn smoke(scratch: &mut Scratch) -> Outcome {
         }
     }
 
-    let consumer = step!(vendor(scratch, &sdk, &host, &roots));
+    let consumer = step!(vendor(scratch, &host, &roots));
     step!(convert_agent_file(&consumer));
     step!(write_config_seams(&consumer));
     step!(commit(&consumer, "convert to AGENTS.md"));
@@ -147,7 +147,7 @@ fn kit_roots() -> Result<Vec<String>, Outcome> {
         .cloned()
         .ok_or_else(|| {
             Outcome::Refuse(format!(
-                "{}: the kit roots name no gate-sdk root, so the consumer-smoke library this suite vendors through cannot be found",
+                "{}: the kit roots name no gate-sdk root, so the bin/run-gates.sh front-end every scratch battery runs through cannot be vendored",
                 NAME
             ))
         })?;
@@ -174,38 +174,34 @@ fn basename(p: &str) -> String {
         .to_string()
 }
 
-// spec: context-kit/SPEC.md §Testing — `csmoke_vendor_and_install` communicates by setting its
-// caller's `SCRATCH`, which no process boundary carries, so the seam is the library's own contract
-// read off stdout and the helper's own chatter moves to stderr to clear that channel.
-fn vendor(
-    scratch: &mut Scratch,
-    sdk: &str,
-    host: &str,
-    roots: &[String],
-) -> Result<String, Outcome> {
-    let script = format!(
-        "{} host=\"$2\"; shift 2; csmoke_vendor_and_install \"$host\" \"$@\" 1>&2; \
-         st=$?; printf '%s' \"$SCRATCH\"; exit $st",
-        csmoke::SOURCE
-    );
-    let refs: Vec<&str> = vec![sdk, host]
-        .into_iter()
-        .chain(roots.iter().map(String::as_str))
-        .collect();
-    let done = spawn(&script, &refs)?;
-    let consumer = String::from_utf8_lossy(done.stdout()).trim().to_string();
-    scratch.consumer = consumer.clone();
-    if done.code() != 0 || consumer.is_empty() {
-        return Err(Outcome::Refuse(format!(
-            "{}: could not vendor and install the scratch consumer",
-            NAME
-        )));
+// spec: context-kit/SPEC.md §Testing — the installers' output reaches this arm's stderr, the
+// routing it chose, and a failed build's directory still reaches the teardown.
+fn vendor(scratch: &mut Scratch, host: &str, roots: &[String]) -> Result<String, Outcome> {
+    let base = std::env::var("TMPDIR")
+        .ok()
+        .filter(|v| !v.is_empty())
+        .unwrap_or_else(|| "/tmp".to_string());
+    match csmoke::vendor_and_install(host, roots, &base, &Sink::Stderr) {
+        Ok(built) => {
+            scratch.consumer = built.dir.clone();
+            Ok(built.dir)
+        }
+        Err(e) => {
+            scratch.consumer = e.dir;
+            Err(Outcome::Refuse(format!(
+                "{}: could not vendor and install the scratch consumer — {}",
+                NAME, e.message
+            )))
+        }
     }
-    Ok(consumer)
 }
 
+// spec: context-kit/SPEC.md §Testing — `bash -c <script> bash <args…>`: the `$0` word is supplied
+// here so a caller writes only the arguments its own script reads.
 fn spawn(script: &str, args: &[&str]) -> Result<proc::Streamed, Outcome> {
-    csmoke::spawn(script, args, Stderr::Inherit)
+    let mut argv: Vec<&str> = vec!["-c", script, "bash"];
+    argv.extend_from_slice(args);
+    proc::run_streamed("bash", &argv, b"", Stderr::Inherit)
         .map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))
 }
 
@@ -550,7 +546,7 @@ mod tests {
     }
 
     // spec: context-kit/SPEC.md §Testing — the gate-sdk root leads the vendoring order and appears
-    // once, which is what `csmoke_vendor_and_install`'s gate-sdk-first contract reads.
+    // once, which is what the scratch-consumer builder's gate-sdk-first contract reads.
     #[test]
     fn the_parent_checkout_is_the_gate_sdk_roots_own() {
         assert!(matches!(parent_of("/a/b/gate-sdk"), Ok(ref h) if h == "/a/b"));

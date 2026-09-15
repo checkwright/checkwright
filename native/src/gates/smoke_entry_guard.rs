@@ -108,7 +108,7 @@ pub fn run(args: &[String]) -> i32 {
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: add ': \"${{SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}}\"' right after");
+        println!("  help: add ': \"${{SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}}\"' right after");
         println!("        'set -euo pipefail' and before the first mutating command, so a bare run");
         println!("        refuses instead of writing into the caller's repo (gate-sdk/SPEC.md §Consumer smoke).");
         return 1;
