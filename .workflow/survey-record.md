@@ -20,3 +20,31 @@
 - rev: 033bd1c8ce507de447927bf70fd3e95cd12dfb4b
 - finding: manifest members (10): 26 reads, 0 uncovered under the trigger matcher, 24 under segment-wise; comment-surface members (3, plus check-spec-pointer): 403 reads, 2 uncovered under the trigger matcher (installer/bin/checkwright.sh, installer/consumer-smoke/run-smoke.sh: .sh outside kit roots and scripts/, a genuine under-couple), 395 under segment-wise. Tracked governed sources outside gate-tests reach at most five path segments, the last rung of CANON_KIT_COMMENT_SURFACE's enumeration.
 - inferred: the probe approximates the walks' prune and kit-root filters by path grep rather than running spec::manifest_files/comment_surface; the segment-wise figure uses slash-count equality plus string match, an approximation of path_matches_glob
+
+## 2026-09-15 align — does GROUND_CLASSES in native/src/gates/mod.rs hold exactly fallback/dynamic/projection today, which SPEC-fallback-roots.md and SPEC-packed-knob-projection.md's one-member-list wording assumed away
+- corpus: native/src/gates/mod.rs
+- oracle: grep -n 'pub const GROUND_CLASSES' native/src/gates/mod.rs
+- rev: bdef4cbd42f8cdeeb8b01455e77d6b6c4b006cd9
+- finding: GROUND_CLASSES is a three-member list, fallback/dynamic/projection (mod.rs:1854); dynamic is live (check-knob-default-coupling, mod.rs:673) and untouched by either amendment, so whichever of the two lands second edits a two-member list, not one. Corrected in both amendments' delta text at align (2026-09-15).
+- inferred: none
+
+## 2026-09-15 align — what is the max path-segment depth of tracked .sh/.gate/.rs/.knobs files outside gate-tests/, and what depth do docs/<kit>/README.md,SPEC.md and reserve/crates/README.md sit at
+- corpus: *.sh *.gate *.rs *.knobs */README.md */SPEC.md
+- oracle: git ls-files -- '*.sh' '*.gate' '*.rs' '*.knobs' '*/README.md' '*/SPEC.md' | awk -F/ '{print NF, $0}' | sort -rn
+- rev: bdef4cbd42f8cdeeb8b01455e77d6b6c4b006cd9
+- finding: Max segment count outside gate-tests/ is 5 (e.g. native/src/emit/kpi/task_split.rs, native/src/emit/pub_lang/rust.rs), confirming SPEC-depth-bound-globs.md's headroom claim. docs/<kit>/README.md,SPEC.md and reserve/crates/README.md sit at 3 segments, not the 2 the amendment originally stated; corrected at align (2026-09-15).
+- inferred: none
+
+## 2026-09-15 align — which prose sites describe check-footprint-fresh/check-enforcement-fresh/check-value-rollup-fresh's good/+bad/ fixture pair as jointly driving the hermetic two-argument mode
+- corpus: context-kit/SPEC.md gate-sdk/SPEC.md
+- oracle: grep -n 'hermetic.*two-argument\|fixture pair drives\|drives the hermetic' context-kit/SPEC.md gate-sdk/SPEC.md
+- rev: bdef4cbd42f8cdeeb8b01455e77d6b6c4b006cd9
+- finding: Three sites (context-kit/SPEC.md ~1233-1235 and ~1526-1529, gate-sdk/SPEC.md section check-enforcement-fresh ~15427-15431) describe both good/ and bad/ as jointly driving two-argument mode; these go stale once SPEC-steered-fixture-roots.md's delta 1 moves good/ to the default branch. Added to that amendment's roster and corrected at align (2026-09-15).
+- inferred: none
+
+## 2026-09-15 align — does gate-sdk/SPEC.md's check-graph section call couples='s glob semantics an open/unowned question anywhere besides the Assertion B paragraph SPEC-couples-semantics.md delta 7 targets
+- corpus: gate-sdk/SPEC.md
+- oracle: grep -n 'open question of which glob\|fourth reader of an unowned\|unowned question' gate-sdk/SPEC.md
+- rev: bdef4cbd42f8cdeeb8b01455e77d6b6c4b006cd9
+- finding: Yes: the earlier paragraph in the same section beginning The rule is a prefix test, not a glob (~line 14675-14683) also calls the semantics open (nothing says which a port should reach for, a fourth reader of an unowned question). Folded into SPEC-couples-semantics.md delta 7 at align (2026-09-15).
+- inferred: none

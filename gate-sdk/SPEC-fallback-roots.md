@@ -67,7 +67,10 @@ declares, the fallback under its selector's guard.
 
 `native/src/gates/mod.rs`: `GROUND_CLASSES` drops `"fallback"`, and the `?`-ground refusal message
 drops it from its class list. `SPEC-packed-knob-projection.md` drops `"projection"` from the same
-constant, so whichever lands second edits a one-member list.
+constant. `GROUND_CLASSES` today holds three members — `"fallback"`, `"dynamic"` and `"projection"`
+— and `"dynamic"` is untouched by either amendment, so whichever of these two lands second finds a
+two-member list (`"dynamic"` plus the other's already-dropped member) and removes the one member
+that is not `"dynamic"`, leaving `GROUND_CLASSES` a one-member list only once both have landed.
 
 gate-sdk/SPEC.md §check-reads-couples. **Not yet applied:**
 

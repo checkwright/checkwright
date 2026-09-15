@@ -98,12 +98,12 @@ by:
 > - **`check-gate-substrate-parity` assertion C** asks whether a member's couples reach a gate
 >   declaration path.
 >
-> Three readers ask something else, and none is a second semantics. A `mode=staged` member's hook
+> Two readers ask something else, and neither is a second semantics. A `mode=staged` member's hook
 > branch selects its positional arguments by git pathspec, whose default (non-`:(glob)`) form also
 > lets `*` cross `/` (§run-gates). `check-graph` assertion B asks whether one *pattern* is contained
 > in another rather than whether a path matches, through a four-branch predicate that is sound for
 > this semantics and deliberately incomplete (§check-graph). The graph emitter and `port-blockers`
-> print the field.
+> print the field and ask nothing.
 >
 > **The filter field is not this field.** A `--reads` filter names its walker's discipline through
 > its mandatory kind (§check-reads-couples), because it stands for a walk the reader cannot see.
@@ -183,6 +183,12 @@ member already begins with `*` expanding unchanged.
   `MANIFEST_WIDE` and case B are re-instanced the same way. Case B becomes the prefix miss. A new
   case pins that a one-level pattern covers the deeper tracked file, which is the settled
   semantics' positive statement, so a later narrowing reds a named case rather than nothing.
+  `MANIFEST_NARROW` is a shared variable: case D (`claimed_exemption`) reuses it and hardcodes the
+  same uncovered-read substring case B asserts. The respelling is the variable, not a copy inlined
+  at case B alone, so case D's assertion holds unedited as long as the new value still misses
+  `corpus/sub/SPEC.md` — the same fact case B's re-instancing must establish. No other case
+  (C, E, F) reads `MANIFEST_NARROW` for its matching behavior, only for a narrow-looking manifest to
+  drive an unrelated refusal or skip, so none is sensitive to the respelling.
 
 ### (6) The resident caution retires {mechanical}
 
@@ -196,8 +202,9 @@ true and is unchanged.
 
 ### (7) `check-graph`'s section stops calling the question open {mechanical}
 
-gate-sdk/SPEC.md §check-graph, the paragraph beginning **Assertion B's coverage predicate**.
-**Not yet applied.**
+gate-sdk/SPEC.md §check-graph, the paragraph beginning **Assertion B's coverage predicate**, and
+the earlier paragraph in the same section beginning **The rule is a prefix test, not a glob**, which
+independently calls the semantics open. **Not yet applied.**
 
 - *it is the `couples=` field's third reader and it invokes no glob matcher at all* becomes *it
   asks whether a couple pattern is contained in a trigger pattern, which no path matcher answers*.
@@ -207,6 +214,12 @@ gate-sdk/SPEC.md §check-graph, the paragraph beginning **Assertion B's coverage
 - The closing sentences from *This closes the **port's** exposure* are replaced by *The predicate
   is sound for the field's one semantics (§Reading a `couples=` field's reach): a `*.<ext>` trigger
   contains every pattern ending in that suffix only because `*` crosses `/`.*
+- In the earlier paragraph, *and nothing says which a port should reach for — the open question of
+  which glob semantics `couples=` carries* becomes *and each is already spoken for by its field:
+  `couples=` the slash-spanning matcher, filter and prune the component-wise one (§Reading a
+  `couples=` field's reach)*, and *closes this surface's exposure rather than adding a fourth reader
+  of an unowned question* becomes *closes this surface's exposure rather than adding a reader of
+  either field's matcher where a prefix test already suffices*.
 
 ## Producers and consumers
 

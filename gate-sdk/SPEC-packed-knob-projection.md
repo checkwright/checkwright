@@ -114,7 +114,11 @@ matches each glob against the basename with `walk::pattern_match`. There is no p
 applies the global prune set, which a registry root already takes. Its comment, *projection out of
 `CANON_KIT_EMBED_LANGS`' packed elements…*, becomes one binding to the projection form.
 `GROUND_CLASSES` drops `"projection"` and the refusal message drops it. `SPEC-fallback-roots.md`
-drops `"fallback"` from the same constant, so whichever lands second edits a one-member list.
+drops `"fallback"` from the same constant. `GROUND_CLASSES` today holds three members —
+`"fallback"`, `"dynamic"` and `"projection"` — and `"dynamic"` is untouched by either amendment, so
+whichever of these two lands second finds a two-member list (`"dynamic"` plus the other's
+already-dropped member) and removes the one member that is not `"dynamic"`, leaving `GROUND_CLASSES`
+a one-member list only once both have landed.
 
 gate-sdk/SPEC.md. **Not yet applied:**
 

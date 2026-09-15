@@ -60,6 +60,15 @@ and `scripts/gate-tests/check-value-rollup-fresh/good/`. Each case changes in fo
 `expect.txt` stays the clean line. `bad/` keeps its positionals: the steered stale-projection case
 is the cheap hermetic statement of the red half, and the pair then covers both branches.
 
+**Three prose sites describe the pair the old way and go stale in the same commit.**
+context-kit/SPEC.md's `check-footprint-fresh` paragraph (*the hermetic mode the `good/`+`bad/`
+fixture pair drives*) and its fixture-pair roster line (*the footprint pair drives the hermetic
+two-argument mode*), and gate-sdk/SPEC.md §check-enforcement-fresh (*letting the fixture pair
+exercise it hermetically off the live registries*), each state that both fixture members drive the
+two-argument mode. Once `good/` takes the default branch, only `bad/` does; each site is corrected to
+say so (`bad/` drives the hermetic two-argument mode, `good/` exercises the live emitter on its
+default branch).
+
 **One kit, deliberately.** The footprint walk at `:90` observes one root per kit, and each `?`
 absorbs exactly one observed root. A one-kit corpus makes the arity statement exact. Its limit, that a
 per-kit loop is held to one iteration, is stated beside the declaration in delta 2's comment rather
@@ -133,6 +142,8 @@ generated hook and the coupling-graph artifact are regenerated.
   - Unit test A reds on any undeclared observed root or spawn. Delta 2 exists to answer it.
   - `check-reads-couples` reds on delta 2's `.` root until delta 3's couple lands.
   - The census and the locator site count change. Neither asserts a number.
+  - Docs-mirror freshness reds on `docs/gate-sdk/SPEC.md` and `docs/context-kit/SPEC.md` until
+    regenerated for delta 1's prose correction.
   - The steered branch keeps its red statement in `bad/`, and no reader counts cases.
 
 ## Existing sections updated
@@ -144,13 +155,17 @@ over `native/src/emit/{footprint,enforcement_map,value_rollup}.rs`, run at this 
 - `context-kit/gate-tests/check-footprint-fresh/good/` — default-branch case (delta 1).
 - `gate-sdk/gate-tests/check-enforcement-fresh/good/` — default-branch case (delta 1).
 - `scripts/gate-tests/check-value-rollup-fresh/good/` — default-branch case (delta 1).
+- `context-kit/SPEC.md` — the `check-footprint-fresh` paragraph and its fixture-pair roster line,
+  both naming the pair rather than `bad/` (delta 1).
+- `gate-sdk/SPEC.md` — §check-enforcement-fresh's two-argument-mode sentence (delta 1), and
+  §check-reads-couples' presence-and-placement paragraph (delta 2).
 - `native/src/gates/mod.rs` — the three members' root declarations and comments (delta 2).
-- `gate-sdk/SPEC.md` — §check-reads-couples' presence-and-placement paragraph (delta 2).
 - `context-kit/checks/check-footprint-fresh.gate` — `*/SPEC.md` (delta 3).
 - `scripts/check-value-rollup-fresh.gate` — `*/SPEC.md` (delta 3).
 - `scripts/git-hooks/pre-commit` — regenerated (delta 3).
 - `docs/check-graph.html` — regenerated (delta 3).
-- `docs/gate-sdk/SPEC.md` — the generated mirror, regenerated (delta 2).
+- `docs/gate-sdk/SPEC.md`, `docs/context-kit/SPEC.md` — the generated mirrors, regenerated
+  (deltas 1 and 2).
 
 ## Retired spellings
 

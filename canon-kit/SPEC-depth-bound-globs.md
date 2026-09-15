@@ -29,9 +29,10 @@ this repo's `scripts/canon-config.knobs` and offers two dispositions:
   narrows exactly as the default branch does*). `walk::glob_files`' `**` skips hidden directories as
   its `*` does (`walk.rs`, `subdirs`), so a `**` value reaches the same tree the rungs did.
 - **`CANON_KIT_MANIFEST_FILES`' single-level globs are a selection, not a copy.** The only tracked
-  `README.md`/`SPEC.md` files two segments deep outside fixtures are the generated mirror under
+  `README.md`/`SPEC.md` files three segments deep outside fixtures are the generated mirror under
   `docs/<kit>/` and `reserve/crates/README.md`, which the value lists by name. So `*/README.md` and
-  `*/SPEC.md` stop at one level in order to exclude the mirror, which a `**` spelling would admit.
+  `*/SPEC.md` stop at one level (two segments: `<kit>/README.md`) in order to exclude the
+  three-segment mirror, which a `**` spelling would admit.
   Their bound is the consumer's editorial choice. A new nested `README.md` escaping it is the
   ordinary staleness of any enumerated selection, the same as a new root document the list does not
   name, and not a depth defect.
