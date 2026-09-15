@@ -4620,7 +4620,6 @@
 - **tracked-to-untracked-pointer-scope** [design-pending] — Untracked-target pointer scope unheld.
 - **born-native-flip-enforcement-gate** [design-pending] — Born-native rule has no enforcing gate.
 - **msrv-move-clippy-arm-coupling** [design-pending] — Floor moves surface unbudgeted lints.
-- **allowlist-path-existence-unchecked** [design-pending] — Dead-path grants go undetected.
 - **declaration-lib-refusal-output-leak** [design-pending] — Refusal output mixes in good tokens.
 - **deferred-pool-identifier-restatement-sweep** [design-pending] — The pool was never swept.
 - **fixture-assertion-liveness** [design-pending] — Stale fixture expectations go uncaught.
@@ -4672,5 +4671,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- allowlist-path-existence-unchecked
 
 ## Lessons Learned
