@@ -12,48 +12,6 @@
 
 ## New Features
 
-- **file-authoring-act-ungoverned** [spec: SPEC-compound-write-steer.md] — the file-authoring
-  writes no glob can reach.
-  **What landed 2026-09-04 and what did not.** Guard rule 17 was narrowed and widened in one unit:
-  its substitution decline moved onto the `hdq` view, so the quoted-delimiter heredoc body every
-  journal append spells its slugs in stops defeating the grant; and its `>>`-only test went, so a
-  create to a gitignored target is granted where truncate-then-append already granted it in two
-  calls. Measured at that build: sixteen of sixteen locatable journal appends carried a backtick,
-  and the class was about half of every prompting call in the snapshot. The record is
-  guard-kit/SPEC.md §The generic ruleset rules 16 and 17 and §scan-prompts, not restated here.
-  **The prepared six-entry settings diff is disposed** (operator direction, 2026-09-13): four
-  landed in the committed allowlist — `date`, `git merge-base`, `mkdir`, the liveness-log clear —
-  and two were refused, `Bash(find *)` for reaching find's `-exec`/`-delete` forms and
-  `Bash(git config *)` for reaching `core.hooksPath` and `!`-aliases, both execute forms a glob
-  cannot fence off. None of the four fixed this entry's class.
-  **WHAT KEEPS THIS ENTRY ALIVE — THE RESIDUE THE LANDED GRANT DOES NOT REACH:** a write to a
-  path OUTSIDE the gitignored scratch set — a heredoc to a tracked file, a commit-message file, a
-  scratch script under another root. Rule 17 declines every one on its target test, by design.
-  The Write-tool steer was RECORDED AS REFUSED-FOR-NOW at that build: the landed deltas removed
-  its subject, and a steer firing on writes the same commit had just granted is a rule arguing
-  with its neighbour. **Re-read at spec:** rule 25 arm (b) has since landed that steer for a lone
-  write to a target git does not ignore, which rule 17 never grants; the compounded write it
-  leaves is the amendment's arm (c). Two facts were
-  bought so a later session need not re-buy them — `.claude/settings.json` already carries a
-  `Write|Edit` `PreToolUse` matcher, so a Write-side rule needs no new matcher shape; and a steer is
-  not a distinct primitive, `guard_block` being stderr plus exit 2 for a block and a steer alike.
-  A stated habit was the shape filed beside those two and it stays refused: it is not a mechanism.
-  **The operator ruling that scoped it, and its dated series, which lives once and here.** The class
-  read 41 of 185 prompting calls, then 56 of 139 at the 2026-09-04 close — 22 per cent to 40 per
-  cent — then 48 across 22 patterns on the mid-iteration snapshot the promoting spec measured afresh
-  under the ruling's re-costing rider. The ruling REOPENED the port-only run for a second non-port
-  unit. **A later reading of this class will fall for a reason other than fewer writes**: a granted
-  call never reaches the friction log, so widening rule 17 shrank the log's own corpus.
-  guard-kit/SPEC.md §scan-prompts carries that caveat, and a close attributing the drop to fewer
-  writes is reading the instrument's own boundary as a result.
-  **Cost while deferred:** one out-of-band decision per file authored outside the scratch set,
-  invisible to every gate — the friction log is advisory, so nothing reds however far the residue
-  grows.
-  **`guard-friction-reach`'s write-residue unit** (operator direction, 2026-09-15, lead-relayed).
-  Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
-  drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
-  2026-09-04 within one iteration.
-
 - **scan-prompts-grant-test-redirect-blind** [spec: SPEC-grant-test-reach.md]
   — `scan-prompts`' grant test and its reachability verdict disagree on a redirect call.
   `granted()` runs `segment_granted` over `guard::allow_match`, a plain glob match on the raw
@@ -4752,5 +4710,6 @@
 
 - rewrite-arm
 - in-place-rewrite-steer-reach
+- file-authoring-act-ungoverned
 
 ## Lessons Learned

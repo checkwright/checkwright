@@ -1733,7 +1733,7 @@ that harness exists would be designing against no case.
     heredoc-bearing one among them — is left to the harness's own decision,
     grant included.
 25. **An emitter write the harness cannot grant** — blocked, with a steer per arm.
-    Both arms read a statement whose leading command is a `GUARD_KIT_APPEND_BINS`
+    Every arm reads a statement whose leading command is a `GUARD_KIT_APPEND_BINS`
     member writing through `>>` or `>`, the shape rule 17 grants, and declare rule
     17's classes. A statement is what `;`, `&&`, `||` and a newline separate,
     carrying its own heredoc residue on rule 17's reading.
@@ -1746,19 +1746,32 @@ that harness exists would be designing against no case.
       Write or Edit tool for a file, or the capture arm that owns the surface when
       the target is one: the tool is reviewable where a redirect is not, and the arm
       keeps the surface's grammar.
+    - **(c) Compounded, to a target git does not ignore.** The command holds more
+      than one statement, and one of them is a write both arms above leave: not
+      every target is gitignored, so arm (a) does not fire, and it is not the whole
+      command, so arm (b) does not. The steer is to write that file with the Write
+      or Edit tool as its own call and issue the rest separately. It is the
+      composition of (a) and (b), and with it every emitter write statement meets
+      rule 17's grant, one of these three arms, or one of the declines below. A
+      statement whose targets are mixed, one gitignored and one not, is arm (c)'s,
+      since arm (a)'s premise that the write alone would be granted is false for it.
+      Statements are read in order, and the first that qualifies blocks.
 
     **Declines**, in this ruleset's established directions: rule 17's clause (d),
     read over the whole command; a backgrounded command, which is rule 15's subject
     and whose canonical recorded launch writes its record through an emitter to a
     gitignored target, so arm (a) would otherwise refuse the spelling rule 15
     mandates; a statement on a line whose heredoc openers sit in more than one
-    statement, whose residue cannot be attributed; and, for arm (b), a target under
-    `/dev/`, which is no file a Write or Edit tool can take.
+    statement, whose residue cannot be attributed; and, for arms (b) and (c), a
+    target under `/dev/`, which is no file a Write or Edit tool can take.
     Arm (a) is the measured class: every prompting gitignored-target append in the
     friction log it was cut from was compounded or ran past the log's truncation.
-    Arm (b) has no measured instance and is kept as the READ steer's mirror (rule 10).
-    The destination test both arms need is rule 17's, so no consumer roster is owed,
-    and neither steer names a capture arm or its surface: that would put another
+    Arm (b) fired on lone writes to tracked targets once it shipped, and arm (c) was
+    cut from the compounded shape that still fell through beside it: writes led by
+    `cat`, `printf` or `echo` to a repo-relative target outside the scratch set,
+    chained to another statement.
+    The destination test every arm needs is rule 17's, so no consumer roster is owed,
+    and no steer names a capture arm or its surface: that would put another
     kit's surfaces inside guard-kit, a destination roster a consumer would then keep
     in step, where the generic steer lets the agent's own instructions name the arm.
 26. **A `bash -c` or `sh -c` wrapper** — blocked, with the steer to run the payload
@@ -2314,9 +2327,10 @@ structural for a reason worth naming precisely: on a rule 17 match `guard_allow`
 exits the hook directly, so a granted write through a roster emitter can never
 reach the log under any key. A write to a **gitignored** target — create or
 append alike, since rule 17 grants both — is therefore invisible here by
-construction. What still keys as `echo >` or `cat >` is a write rule 17 declines:
-a tracked target, an emitter off the roster, a live substitution, a second
-statement. The honest reading is that the axis is **general and currently
+construction. What still keys as `echo >` or `cat >` is a write both rule 17 and
+rule 25 decline: a shape rule 17's clause (d) leaves unmodelled, a backgrounded
+launch, a line whose heredoc residue cannot be attributed, or a device target.
+The honest reading is that the axis is **general and currently
 near-single-instance**, and a later reader deciding whether to extend or retire
 it needs to know the bite was measured rather than assumed.
 
@@ -3040,10 +3054,15 @@ correct.
 
 **Rules 25 and 26 are measured on rows of their own, and they took that
 re-derivation.** A journal append followed by a `git` line, and the same append
-joined by `&&`, block; the same append alone allows; a compounded write rule 17
-would refuse alone does not fire; `cat >> tracked.md` alone blocks; a lead off the
-emitter roster, a device target and a backgrounded launch writing its record do not
-fire. `bash -c` and `sh -c` block, alone and behind another statement, while
+joined by `&&`, block; the same append alone allows; `cat >> tracked.md` alone
+blocks; a lead off the emitter roster, a device target and a backgrounded launch
+writing its record do not fire. Arm (c) flipped the row pinning the compounded
+write to a tracked target from `fallthrough` to `block`, and its rows add a heredoc
+create under a new directory and a target outside the repository, which block, and a
+compounded device target, which does not fire. Those two added compounds lead with
+`make build` rather than `git status`: the sandbox allowlists `git status`, so a
+compound led by it meets rule 20's block first, and the block row
+would pass for the wrong reason while the device row read `block`. `bash -c` and `sh -c` block, alone and behind another statement, while
 `xargs bash -c`, `timeout 5 bash -c` and the scratch runner taking a script path do
 not fire, the first two pinning the stated boundary. Rule 25 turns a `fallthrough`
 row into a `block` row wherever it fires, so three existing rows flipped — two

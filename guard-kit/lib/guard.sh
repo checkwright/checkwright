@@ -1884,7 +1884,7 @@ _guard_statements() {
 
 guard_rule_emitter_write() {
     local raw="$1" s stmt tgt lead
-    local -a stmts=()
+    local -a stmts=() unignored=()
     case "$raw" in *'>'*) ;; *) return 0 ;; esac
     _guard_emitter_unmodelled "$raw" && return 0
     s="$(guard_skeleton "$raw" sq dq hd)"
@@ -1894,11 +1894,19 @@ guard_rule_emitter_write() {
     if [[ "${#stmts[@]}" -gt 1 ]]; then
         for stmt in "${stmts[@]}"; do
             _guard_emitter_write "$stmt" || continue
-            for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
-                git check-ignore --quiet -- "$tgt" || continue 2
-            done
             lead="${stmt#"${stmt%%[![:space:]]*}"}"
-            guard_block "issue the '${lead%%[[:space:]]*}' write to '${_GUARD_EMITTER_TARGETS[*]}' as its own call, and the rest of this command as a separate one: alone, that write is granted with no permission decision, while compounded it makes the whole call one the harness decides out of band. If you genuinely need the compound, run it yourself with !<command>."
+            lead="${lead%%[[:space:]]*}"
+            unignored=()
+            for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
+                git check-ignore --quiet -- "$tgt" 2>/dev/null || unignored+=("$tgt")
+            done
+            if [[ "${#unignored[@]}" -eq 0 ]]; then
+                guard_block "issue the '$lead' write to '${_GUARD_EMITTER_TARGETS[*]}' as its own call, and the rest of this command as a separate one: alone, that write is granted with no permission decision, while compounded it makes the whole call one the harness decides out of band. If you genuinely need the compound, run it yourself with !<command>."
+            fi
+            for tgt in "${_GUARD_EMITTER_TARGETS[@]}"; do
+                case "$tgt" in /dev/*) continue 2 ;; esac
+            done
+            guard_block "write '${unignored[*]}' with the Write or Edit tool as its own call instead of the '$lead' redirect, and issue the rest of this command as a separate one: git does not ignore the target, so no rule grants the write, and compounding it takes the whole call off the match path. If you genuinely need the compound, run it yourself with !<command>."
         done
         return 0
     fi

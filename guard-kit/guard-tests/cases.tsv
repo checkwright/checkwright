@@ -435,14 +435,18 @@ fallthrough	rm -rf .tmp/`printf x`/y
 
 # rule 25 — an emitter write the harness cannot grant. Arm (a): a write rule 17
 #           grants alone, compounded with another statement, blocks; the same write
-#           alone is rule 17's grant, and a compounded write rule 17 would refuse
-#           alone does not fire. Arm (b): a lone write to a target git does not
+#           alone is rule 17's grant. Arm (b): a lone write to a target git does not
 #           ignore blocks, while a lead off the emitter roster, a device target and
-#           a backgrounded launch writing its record do not fire
+#           a backgrounded launch writing its record do not fire. Arm (c): a
+#           compounded write to a target git does not ignore, in or outside the
+#           repository, blocks; a compounded write to a device target does not fire
 block	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF@NL@git status
 block	printf x >> .tmp/journal.md && git status
 allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
-fallthrough	printf x >> tracked.md; git status
+block	printf x >> tracked.md; git status
+block	mkdir -p docs && cat > docs/x.md <<'EOF'@NL@line@NL@EOF
+block	make build && echo x > /tmp/x.txt
+fallthrough	make build; echo x > /dev/stderr
 block	cat >> tracked.md
 fallthrough	bash gate-sdk/bin/run-gates.sh --emit trajectory > docs/x.md
 fallthrough	echo x > /dev/stderr
