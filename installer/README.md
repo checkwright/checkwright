@@ -597,10 +597,11 @@ job *make the binary runnable*, and its very next sentence is what settles which
 half of "place" this is.
 
 **A `behind-invoke` step may spawn `bash`, and one does.** `gen-pre-commit.sh`
-does not port (gate-sdk/SPEC.md §gen-pre-commit), and `check-graph` is
-`install: zero-config`, so a fresh consumer's day-one battery holds the
-generated hook against `--emit` and the hook must therefore exist at install.
-The step is consequently neither droppable nor portable. It is **not** stuck:
+is shell until its owed port lands (gate-sdk/SPEC.md §gen-pre-commit), and
+`check-graph` is `install: zero-config`, so a fresh consumer's day-one battery
+holds the generated hook against `--emit` and the hook must therefore exist at
+install. The step is consequently not droppable, and not compiled until that
+port lands. It is **not** stuck:
 the compiled substrate already spawns `bash <emitter>` for exactly this
 generator from `check-graph`'s own assertion, the port criteria clear that spawn
 explicitly because `bash` is on `GATE_SDK_PROGRAM_FLOOR`
