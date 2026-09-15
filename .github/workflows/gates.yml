@@ -287,23 +287,20 @@ jobs:
           echo "TMPDIR=${TMPDIR:-<unset>}"
           exit 0
 
-      # Both values every later step needs, derived once here and handed on
-      # through the environment file rather than spelled per step. The suffix
-      # has ONE owner — `gate_exe_suffix`, which `GATE_SDK_NATIVE_BIN`'s default
-      # already applies — so this leg appends none: a hand-written twin beside a
-      # derivation double-suffixes the path, which is exactly what it did until
-      # 2026-08-27. The scratch base arrives in Windows spelling and everything
-      # below is handled by MSYS bash, so it is translated exactly once.
+      # The scratch base arrives in Windows spelling and everything below is
+      # handled by MSYS bash, so it is translated exactly once and handed on.
+      # The artifact name is printed and never exported: an exported
+      # `GATE_SDK_NATIVE_BIN` outranks the knob file `init` writes into each
+      # consumer, so a repo-relative export would resolve inside the consumer
+      # tree. A later step needing the name derives it with `gate_native_bin`,
+      # the suffix's one owner.
       - name: resolve the host's artifact name and scratch base
         shell: bash
         run: |
           set -uo pipefail
           source gate-sdk/lib/gate.sh
           tmp="$(cygpath -u "$RUNNER_TEMP" 2>/dev/null || printf '%s' "$RUNNER_TEMP")"
-          {
-            echo "GATE_SDK_NATIVE_BIN=$(gate_native_bin)"
-            echo "SMOKE_TMP=$tmp"
-          } >> "$GITHUB_ENV"
+          echo "SMOKE_TMP=$tmp" >> "$GITHUB_ENV"
           echo "artifact name $(gate_native_bin); scratch base $tmp"
 
       # Reporting only, and it never fails. The suite stops at the first defect
