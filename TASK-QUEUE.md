@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: amendment-authoring-completeness
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -3799,6 +3799,8 @@
 - **directive-minting-delta-roster-obligation** [design-pending] [cost: event/low] [surface: canon-kit] — a delta that mints a machine
   comment directive obliges canon-kit's built-in directive roster, and nothing in the amendment
   lifecycle prompts the author to list that surface.
+  **Selected for `amendment-authoring-completeness` as its roster-completeness unit** (operator
+  direction, 2026-09-15, lead-relayed).
   **The instance is measured.** The portability-floor amendment's `## Existing sections updated`
   roster missed the `native/src/gates/comment_tier.rs` + canon-kit/SPEC.md §check-comment-tier row
   through spec AND align, and align had already corrected two other completeness gaps in the same
@@ -4024,6 +4026,8 @@
   an ambiguity is preferably handled by re-phrasing existing instructions for clarity and brevity,
   adding text only where it adds value, and brief phrase-shaped instructions read better to an LLM
   than verbose prose.
+  **Selected for `amendment-authoring-completeness` as its restraint unit** (operator direction,
+  2026-09-15, lead-relayed).
   **The direction reached this iteration's five amendments and stops there.** The authoring surfaces
   that decide the *next* merge carry no statement of it: canon-kit/SPEC.md §Merging an amendment
   (step 2 says integrate rather than append, but prefers no re-phrasing over adding), the shipped
@@ -4085,6 +4089,8 @@
 - **causal-completeness-has-no-per-member-satisfiability-point** [design-pending] [cost: session/low] [surface: canon-kit]
   — an amendment may assert a per-member obligation over an enumerable corpus part of which has
   no satisfying value, and nothing catches it.
+  **Selected as `amendment-authoring-completeness`' lead unit** (operator direction, 2026-09-15,
+  lead-relayed); the sixth point lands by re-phrasing, per the restraint unit beside it.
   **Re-verified at the drain by reading the checklist, not the bullet.** canon-kit/SPEC.md:205-232
   carries exactly five points — producer named and reachable, consumer named, existing integration
   sections updated, every field has a named reader, each reader's red condition named under a

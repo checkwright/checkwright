@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-15 scope — which deferred entries lead this iteration's unit set under scope's cost-class ranking
+- corpus: TASK-QUEUE.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: c8fc75cd7fdead8b7646824db9ebe33613ff290f
+- finding: 136 deferred lead lines (queue-index); cost classes session/high 0, session/low 3, iteration/high 13; no recurrence: line carries a second date, threshold 2. The three session/low rows sit on three surfaces: causal-completeness-has-no-per-member-satisfiability-point (canon-kit), delegated-read-blind-to-gitignored-capture (delegation-kit), retired-block-admits-live-gate-name (queue-kit). Same-surface fillers: canon-kit authoring rows spec-growth-restraint-unstated-at-authoring-surfaces (iteration/low) and directive-minting-delta-roster-obligation (event/low); queue-kit arm-output rows icebox-standing-cause-truncated-on-board (iteration/low) and entry-history-reads-live-entries-only (event/low); close-surfaces roster row close-surface-row-absent-reads-as-empty (lifecycle-kit, iteration/low) beside the delegation-kit row. Retired block: check-spec-pointer (15 inbound) is a live registered gate name, not disposed work. delegation-kit's agent-execution template rule (3) already states an untracked-surface sweep is not delegable to an isolated agent, predating that entry.
+- inferred: cost classes and cost prose are taken as recorded on each entry, not re-priced; the tie-break among the three session/low rows is a judgment on each body's cost prose, not a measurement
