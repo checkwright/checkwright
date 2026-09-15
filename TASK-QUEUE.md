@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-friction-reach
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -55,6 +55,7 @@
   **Recurred at `owed-port-tail`'s prompt-friction triage:** `python3 -` ranked first at 24
   prompting calls, every one a heredoc writing a file (queue entries, a Rust module, parity
   scratch).
+  **Selected as `guard-friction-reach`'s lead unit** (operator direction, 2026-09-15, lead-relayed).
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from its prompt-friction
   triage; promoted at the next iteration's scope.
 
@@ -127,8 +128,28 @@
   the call.
   **Cost while deferred:** every adopter pays out-of-band permission decisions on the very forms the
   kit steers to, from first install.
+  **Selected for `guard-friction-reach`** (operator direction, 2026-09-15, lead-relayed); the
+  harness-adapter seam stays open, spec's to design.
   Filed 2026-09-15 to the gap inbox, raised by the operator in `owed-port-tail`'s lead session
   after a stale settings grant blocked a build commit; promoted at that iteration's close.
+
+- **settings-overlay-dead-path-unreported** [design-pending] [cost: iteration/low] [surface: guard-kit] —
+  `compare-settings-allow` reports redundant and over-broad local-overlay grants but not a grant
+  naming a path that no longer exists, and `check-settings-paths` holds that invariant over the
+  committed settings file only (context-kit/SPEC.md §check-settings-paths).
+  **Attested at `owed-port-tail`'s close:** 24 of 108 local allow entries named deleted scripts,
+  accumulated one port cohort at a time with no close-time reader flagging them. That instance
+  was pruned by hand; re-probed at scope, no local entry names a deleted script, so the class
+  stands and the instance does not.
+  **Candidate, not ruled:** a dead-path section in `compare-settings-allow`, advisory, read at the
+  close triage, reusing `check-settings-paths`' extraction predicate.
+  **Why `[design-pending]`:** it adds a report section, and sharing a context-kit gate's predicate
+  from a guard-kit advisory is a placement call.
+  **Cost while deferred:** every close triage prunes the overlay by judgment against dead lines
+  each reader must re-verify, and a dead grant beside a renamed tool reads as coverage.
+  **`guard-friction-reach`'s dead-path unit** (operator direction, 2026-09-15, lead-relayed).
+  Surfaced 2026-09-15 by `owed-port-tail`'s close into the gap inbox, after its drain; promoted at
+  the next iteration's scope, so the record is late and says so.
 
 - **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
@@ -2873,6 +2894,7 @@
   **Cost while deferred:** one out-of-band decision per file authored outside the scratch set,
   invisible to every gate — the friction log is advisory, so nothing reds however far the residue
   grows.
+  **`guard-friction-reach`'s write-residue unit** (operator direction, 2026-09-15, lead-relayed).
   Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
   drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
   2026-09-04 within one iteration.
@@ -4404,6 +4426,7 @@
   grant test already called prompting; this is the grant test upstream of that partition.
   **Cost while deferred:** latent, since no committed glob has that shape today; the first one
   would hide its calls from the prompting share.
+  **`guard-friction-reach`'s grant-test unit** (operator direction, 2026-09-15, lead-relayed).
   Filed 2026-09-12 by build, from the ranker partition; drained and promoted 2026-09-13 at close.
 
 - **steered-fixture-walk-roots-unverified** [design-pending] [cost: event/low] [surface: gate-sdk]

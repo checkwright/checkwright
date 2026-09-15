@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-15 scope — Which deferred units lead this undirected iteration, and which guard-kit rows bundle with the lead?
+- corpus: TASK-QUEUE.md guard-kit/SPEC.md .workflow/gap-inbox.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: b11298e5ee062e8906d3196ae9ba181a17edc9ae
+- finding: Board: 141 deferred; session class holds couples-dynamic-root-resolution (high, blocked-by couples-glob-semantics-unowned, no trigger lost) and five low rows, two on guard-kit (in-place-rewrite-steer-reach, file-authoring-act-ungoverned), one each on canon-kit, delegation-kit and queue-kit. No deferred entry carries two recurrence dates (threshold 2). Queue-edges: no session-class row has live inbound edges beyond the blocked pair; check-spec-pointer prints 16 inbound as retired though it is a registered gate, the live instance retired-block-admits-live-gate-name names. Rule 8's option table carries sed and awk only, and compare-settings-allow reports redundancy and breadth with no dead-path section, so both guard-kit premises hold; the dead overlay instance the carried gap bullet cites was already pruned by hand (84 local allow entries, none naming the deleted scripts), so the class stands and the instance does not.
+- inferred: The guard-kit bundle's impact figures are the entries' own recorded prompt-friction measurements, not re-run: the post-close friction log holds only this session's calls. scan-prompts-grant-test-redirect-blind is latent per its body (no committed redirect-shaped glob), not re-probed.
