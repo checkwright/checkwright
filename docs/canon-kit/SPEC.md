@@ -420,7 +420,18 @@ reaches is derived from the walks rather than listed as policy, so a knob added
 later is reached with no edit here; **`CANON_KIT_DUP_SURFACES` is deliberately not
 among them**, and that is a verdict rather than an omission — its members are read
 as named files, which §check-reads-couples rules outside the walk class, so
-coupling it would trigger a gate on paths no walk of its reaches. Knobs:
+coupling it would trigger a gate on paths no walk of its reaches.
+
+**A glob-array corpus knob spells "any depth" as `**`, never as one glob per
+depth.** Its value is a `walk::glob_files` pattern, whose `**` spans any number of
+directories and skips hidden ones as `*` does, and its `knob:` couples token
+expands a `**` member to a pattern covering every path it selects (gate-sdk/SPEC.md
+§The `# graph:` manifest). A value that enumerates depths to mean every depth is a
+maintained copy that drops a file one level below its last rung with no
+diagnostic. A depth bound that excludes a subtree on purpose is a selection, and
+stays the consumer's to spell.
+
+Knobs:
 
 - `CANON_KIT_SPEC_NAME` — canonical spec filename, default `SPEC.md`.
 - `CANON_KIT_AMENDMENT_GLOB` — default `SPEC-*.md`.
@@ -573,8 +584,8 @@ coupling it would trigger a gate on paths no walk of its reaches. Knobs:
 - `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `CANON_KIT_COMMENT_SURFACE` —
-  array of globs, default empty ⇒ derive: shell sources under the root (kit
-  roots per `CANON_KIT_SCAN_KIT_ROOTS`, `templates/` pruned) plus the
+  array of globs, default empty ⇒ derive: `.sh`, `.gate` and `.rs` sources under
+  the root (kit roots per `CANON_KIT_SCAN_KIT_ROOTS`, `templates/` pruned) plus the
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/*.txt` state files.
   `CANON_KIT_COMMENT_POSITIONAL` — the language construct roster for
   positional rescue, default empty (the kit is language-agnostic; a Rust

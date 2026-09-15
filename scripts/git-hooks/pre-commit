@@ -406,19 +406,19 @@ if staged_matches 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegatio
     run_gate check-knob-default-coupling native/target/release/checkwright-gates check-knob-default-coupling
 fi
 
-if staged_matches '*.sh' '*.gate' '*.rs' '.workflow/*' '*.sh' '*/*.sh' '*/*/*.sh' '*/*/*/*.sh' '*/*/*/*/*.sh' '*.gate' '*/*.gate' '*/*/*.gate' '*/*/*/*.gate' '*/*/*/*/*.gate' '*.rs' '*/*.rs' '*/*/*.rs' '*/*/*/*.rs' '*/*/*/*/*.rs' '*.knobs' '*/*.knobs' '*/*/*.knobs' '*/*/*/*.knobs' '*/*/*/*/*.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
+if staged_matches '*.sh' '*.gate' '*.rs' '.workflow/*' '**.sh' '**.gate' '**.rs' '**.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
     run_gate check-comment-tier native/target/release/checkwright-gates check-comment-tier
 fi
 
-if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*.sh' '*.gate' '*.rs' '.workflow/*' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' '*.sh' '*/*.sh' '*/*/*.sh' '*/*/*/*.sh' '*/*/*/*/*.sh' '*.gate' '*/*.gate' '*/*/*.gate' '*/*/*/*.gate' '*/*/*/*/*.gate' '*.rs' '*/*.rs' '*/*/*.rs' '*/*/*/*.rs' '*/*/*/*/*.rs' '*.knobs' '*/*.knobs' '*/*/*.knobs' '*/*/*/*.knobs' '*/*/*/*/*.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
+if staged_matches '*SPEC*.md' '*README.md' '*CLAUDE.md' '*.sh' '*.gate' '*.rs' '.workflow/*' '*CLAUDE.md' '*README.md' '*CONTRIBUTING.md' '*CODE_OF_CONDUCT.md' '*SECURITY.md' '*RELEASING.md' '*ROADMAP.md' '*TRAJECTORY.md' '*/SPEC.md' '*/README.md' '*reserve/*/README.md' '*doctrine-kit/DOCTRINE.md' '*docs/*.md' '*docs/*/index.md' '*docs/posts/*.md' '*/templates/*.md' '*.claude/agents/*.md' '*SPEC.md' '**.sh' '**.gate' '**.rs' '**.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
     run_gate check-spec-pointer native/target/release/checkwright-gates check-spec-pointer
 fi
 
-if staged_matches '*.sh' '*.gate' '*.rs' '.workflow/*' 'TASK-QUEUE.md' '*.sh' '*/*.sh' '*/*/*.sh' '*/*/*/*.sh' '*/*/*/*/*.sh' '*.gate' '*/*.gate' '*/*/*.gate' '*/*/*/*.gate' '*/*/*/*/*.gate' '*.rs' '*/*.rs' '*/*/*.rs' '*/*/*/*.rs' '*/*/*/*/*.rs' '*.knobs' '*/*.knobs' '*/*/*.knobs' '*/*/*/*.knobs' '*/*/*/*/*.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
+if staged_matches '*.sh' '*.gate' '*.rs' '.workflow/*' 'TASK-QUEUE.md' '**.sh' '**.gate' '**.rs' '**.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
     run_gate check-todo-task-liveness native/target/release/checkwright-gates check-todo-task-liveness
 fi
 
-if staged_matches '*.sh' '*.gate' '*.rs' '.workflow/*' 'TASK-QUEUE.md' '*.sh' '*/*.sh' '*/*/*.sh' '*/*/*/*.sh' '*/*/*/*/*.sh' '*.gate' '*/*.gate' '*/*/*.gate' '*/*/*/*.gate' '*/*/*/*/*.gate' '*.rs' '*/*.rs' '*/*/*.rs' '*/*/*/*.rs' '*/*/*/*/*.rs' '*.knobs' '*/*.knobs' '*/*/*.knobs' '*/*/*/*.knobs' '*/*/*/*/*.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
+if staged_matches '*.sh' '*.gate' '*.rs' '.workflow/*' 'TASK-QUEUE.md' '**.sh' '**.gate' '**.rs' '**.knobs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs'; then
     run_gate check-deprecation-task native/target/release/checkwright-gates check-deprecation-task
 fi
 

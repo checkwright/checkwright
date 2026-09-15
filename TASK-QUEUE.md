@@ -33,35 +33,6 @@
   reaching footprint's walks too.
   Filed 2026-09-12 by build, as three bullets; folded and promoted 2026-09-13 at close.
 
-- **depth-enumerated-glob-bound-unoracled** [spec: SPEC-depth-bound-globs.md]
-  — a depth-enumerated glob value is a maintained copy of "any depth", and a file one level
-  deeper than the enumeration reaches leaves the scanned corpus **silently**.
-  **The class, not one value, and both instances are legitimate.**
-  `scripts/canon-config.knobs` carries two: `CANON_KIT_MANIFEST_FILES`' single-level globs
-  (reasoned in its comment, "single-level globs skip the gate-tests/ fixtures the finder pruned")
-  and the `CANON_KIT_COMMENT_SURFACE` value, five depths per extension across `sh|gate|rs`
-  (reasoned in its comment, because the couples matcher cannot express `**`). Both are
-  consumer editorial choices and neither is a kit defect. What no surface owns is that the depth
-  bound is an **unoracled literal**.
-  **Re-verified at the drain that the measured-claim mechanism cannot reach it.**
-  `scripts/canon-config.knobs` sets `CANON_KIT_MEASURED_SURFACE_GLOBS` to
-  `CANON_KIT_MANIFEST_FILES` plus `.claude/commands/*.md` plus `TASK-QUEUE.md`; the knob file is
-  in none of them, so a `measured:` marker written there is never read.
-  **Why it needed design:** two dispositions and they cost differently — widen the
-  measured-claim corpus to reach the config surface, or assert that no tracked governed source
-  lies deeper than the enumerations reach. The first makes one more surface measured forever; the
-  second is a shallow assertion with no reader outside itself.
-  **DISTINCT from `couples-glob-semantics-unowned`**, which is about which matcher a field is
-  entitled to, not about a value's depth bound.
-  **Cost while deferred:** the corpus is two to five segments deep with one level of headroom, so
-  the bound holds today and fails with no diagnostic on the day a governed source lands six
-  levels down.
-  **Selected for `couples-field-semantics` as its depth-bound unit** (operator direction,
-  2026-09-15, lead-relayed). **Spec ruled neither disposition**: the amendment respells the
-  comment surface `**` and rules `CANON_KIT_MANIFEST_FILES`' bound a selection; the measured
-  headroom was zero, not one level.
-  Filed 2026-09-12 by build into the gap inbox; drained and promoted at this close.
-
 ## Technical Debt
 
 ## Deferred
@@ -4591,5 +4562,6 @@
 - couples-glob-semantics-unowned
 - couples-dynamic-root-resolution
 - packed-knob-projection-filter-form
+- depth-enumerated-glob-bound-unoracled
 
 ## Lessons Learned
