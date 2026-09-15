@@ -1,7 +1,10 @@
 # SPEC amendment: roster-rederivation
 
-Queue entry: `amendment-reader-roster-undercount`, in unit set `owed-port-tail` (operator direction,
-2026-09-15, lead-relayed), built before the unit set's three ports so their build batches run under it.
+Queue entries: `amendment-reader-roster-undercount`, in unit set `owed-port-tail` (operator direction,
+2026-09-15, lead-relayed), built before the unit set's three ports so their build batches run under it;
+and its over-count sibling `amendment-update-target-overcount-undetected`, paired here at spec (operator
+direction, 2026-09-15, lead-relayed), whose failure mode is the mirror image and whose remedy is the
+same build-stage paragraph.
 
 **The ruling this amendment makes, among the entry's three unruled candidates.** An amendment's reader,
 caller and update-target roster stays in the amendment, it stops claiming completeness, and the build
@@ -40,7 +43,9 @@ opposite sides. **Not yet applied:**
 > counts as complete, re-derive it against the tree. Grep each name the change moves or retires over the
 > tracked tree without silencing stderr. Ask what consumes the changed behaviour without spelling any
 > of those names. Then run the battery and the touched kit's fixture suite. Land every site the roster
-> missed in the same unit as in-envelope work, and name the missed sites in the commit message.
+> missed in the same unit as in-envelope work, and name the missed sites in the commit message. A
+> rostered target the re-derivation finds nothing to update in is reported in the commit message as a
+> finding, naming the target; never write an edit to make it non-vacuous, and never drop it silently.
 
 The paragraph is instruction only. Its grounds land in delta 3. It does not conflict with the paragraph
 it follows. That paragraph licenses citing a **survey-record block** whose witness passes, and an
@@ -79,7 +84,11 @@ existing `The build template runs one fresh session per task` paragraph. **Not y
 > An oracle grepping an assertion idiom instead of a literal still spells a name, and a semantic reader
 > spells none. **The honest limit:** no gate observes that the re-derivation ran. The battery reds on
 > what it reaches, and a site no gate reaches is found only by the landing session's reading, which is
-> what the paragraph obliges and does not verify.
+> what the paragraph obliges and does not verify. **The same re-derivation meets the over-count.** A
+> roster can also name a target with nothing to update, or a row resolving to nothing in the file it
+> names, and a session holding such a bullet either fabricates an edit to satisfy it or drops it, and at
+> read time a silent drop is indistinguishable from a skip. The paragraph's last sentence makes the
+> empty result a stated finding, which is the only form in which a later reader can tell the two apart.
 
 ### (4) The amendment template's derivation rule, grounded, and the roster-completeness residue repointed {design-bearing}
 
@@ -93,7 +102,19 @@ assigns the unlisted-surface residue to align alone. It becomes, **not yet appli
 > that produced it rather than claiming completeness (`templates/SPEC-amendment.md`): a completeness
 > claim invites the merging session to skip the re-derivation that catches the misses.
 
-The rest of the paragraph (the residue's four shapes and the two refused stronger arms) stands.
+The rest of the paragraph (the residue's four shapes and the two refused stronger arms) stands. After
+it, the section gains one paragraph on the over-count direction. **Not yet applied:**
+
+> **Deliberately not asserted either: a rostered target's non-vacuity.** Two arms were weighed for the
+> over-count direction, where a bullet names a target with nothing to update. The first requires that a
+> rostered path exist. It is refused because a target the change creates legitimately does not exist
+> before the merge, and because the attested over-count names a file that exists and simply does not
+> hold the text attributed to it. The second requires that the amendment's cited string be present in
+> the named file. It is refused because an update target's text is what the merge will write, so at
+> authoring time it has no subject to find. What remains is a claim the merging session checks: the
+> build stage re-derives the roster and reports an empty target as a finding in its commit
+> (lifecycle-kit/SPEC.md §templates/stages/), which is what separates a vacuous bullet from a skipped
+> one.
 
 ## Producers and consumers
 

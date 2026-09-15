@@ -62,6 +62,51 @@
   **joins `owed-port-tail` at threshold** (operator direction, 2026-09-15, lead-relayed); built
   first in the unit set, so the three port batches run under its build-stage line.
 
+- **amendment-update-target-overcount-undetected** [spec: SPEC-roster-rederivation.md] — an
+  amendment's `## Existing sections updated` roster is unchecked in the OVER-count direction, so a
+  rostered target with nothing to update is discovered only by a session that goes looking.
+  **The instance, and the correction this drain made to it.** The stage-journal amendment rostered
+  `lifecycle-kit/templates/stages/` as a delta-1 target for "every stage template's
+  dispatch-facing text that names a journal path", and its DoD named hand-spelled journal paths
+  as the strings to chase. No stage template spells one, re-verified here. But the filing's
+  stated sweep result — "NOT ONE tracked file spells a journal path ... anywhere else" — is FALSE
+  as written: `guard-kit/guard-tests/cases.tsv` spells one six times. Those are guard fixture
+  INPUTS with no reader, so the substantive conclusion holds while the sweep's reported reach
+  does not, and the entry carries both rather than the tidier half.
+  **Why the correct outcome is still the defect.** The roster bullet was vacuous and the DoD item
+  was discharged by finding nothing, which at read time is indistinguishable from a skip.
+  **The filing's "neither entry's fix reaches the other's direction" FELL at the drain.**
+  `amendment-reader-roster-undercount` is the under-count direction, where the failure is a
+  missed edit; this is the over-count, where the failure is a session either fabricating an edit
+  to satisfy a bullet or silently dropping it. But two of that entry's three candidate
+  deliverables — make the build-stage re-sweep a contract line, or drop the roster and keep only
+  the sweep instruction — reach BOTH directions squarely. The two are distinct in FAILURE MODE
+  and overlap in REMEDY, so whichever is taken first should take both.
+  **No `recurrence:` date joins that sibling:** its finding is a roster that UNDERCOUNTED, and an
+  undercount did not re-occur. The mirror direction is a new defect and files as one.
+  **Deliverable:** decide whether `check-amendment-update-target` can assert that a rostered path
+  exists AND that the amendment's own cited string is present in it, or whether the honest answer
+  is that a roster is a claim and the merging session owes a stated finding when one comes up
+  empty.
+  **Cost while deferred:** low per instance and paid at the worst moment — a build session either
+  buys a sweep the amendment implied was already scoped, or writes something to make a vacuous
+  target non-vacuous.
+  **JUDGED RECURRENCE 2026-09-05 at the close drain, on a second roster.** `SPEC-preflight-cut.md`
+  rostered eleven reader rows for ten readers: a quote living at `evidence-kit/SPEC.md:836` was
+  also attributed to `delegation-kit/SPEC.md:836`, and align verified the citation's TEXT without
+  checking that the file named holds it. Same finding, one axis over — a rostered row resolving to
+  nothing in the file it names, undetected — and the deliverable below already covers it verbatim,
+  so no entry is minted. It widens the deliverable's corpus from the update-target roster to any
+  amendment roster carrying a path.
+  recurrence: amendment-update-target-overcount-undetected 2026-09-05
+  Filed 2026-08-25 by build; drained and promoted 2026-08-25 at close, which re-ran the sweep and
+  corrected its reported reach.
+  **Paired into `owed-port-tail` at spec, beside `amendment-reader-roster-undercount`** — operator
+  direction, 2026-09-15, lead-relayed. **Ruled at spec (the amendment):** the second option; a
+  rostered target is a claim, and the build stage reports an empty one as a finding in its commit.
+  Both `check-amendment-update-target` arms are refused: a created target does not exist before
+  the merge, and a target's text is what the merge writes.
+
 - **gen-pre-commit-port** [spec: SPEC-git-hooks-port.md] — `gate-sdk/bin/gen-pre-commit.sh` is owed:
   its `no-port` declaration rested on criterion 6's single-producer rule, and the crate is now every
   knob's one producer (gate-sdk/SPEC.md §gen-pre-commit).
@@ -3092,46 +3137,6 @@
   one valve, and the surface teaching the repair teaches three wrong ones.
   Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
   2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
-
-- **amendment-update-target-overcount-undetected** [design-pending] [cost: event/low] [surface: canon-kit] — an amendment's
-  `## Existing sections updated` roster is unchecked in the OVER-count direction, so a rostered
-  target with nothing to update is discovered only by a session that goes looking.
-  **The instance, and the correction this drain made to it.** The stage-journal amendment rostered
-  `lifecycle-kit/templates/stages/` as a delta-1 target for "every stage template's
-  dispatch-facing text that names a journal path", and its DoD named hand-spelled journal paths
-  as the strings to chase. No stage template spells one, re-verified here. But the filing's
-  stated sweep result — "NOT ONE tracked file spells a journal path ... anywhere else" — is FALSE
-  as written: `guard-kit/guard-tests/cases.tsv` spells one six times. Those are guard fixture
-  INPUTS with no reader, so the substantive conclusion holds while the sweep's reported reach
-  does not, and the entry carries both rather than the tidier half.
-  **Why the correct outcome is still the defect.** The roster bullet was vacuous and the DoD item
-  was discharged by finding nothing, which at read time is indistinguishable from a skip.
-  **The filing's "neither entry's fix reaches the other's direction" FELL at the drain.**
-  `amendment-reader-roster-undercount` is the under-count direction, where the failure is a
-  missed edit; this is the over-count, where the failure is a session either fabricating an edit
-  to satisfy a bullet or silently dropping it. But two of that entry's three candidate
-  deliverables — make the build-stage re-sweep a contract line, or drop the roster and keep only
-  the sweep instruction — reach BOTH directions squarely. The two are distinct in FAILURE MODE
-  and overlap in REMEDY, so whichever is taken first should take both.
-  **No `recurrence:` date joins that sibling:** its finding is a roster that UNDERCOUNTED, and an
-  undercount did not re-occur. The mirror direction is a new defect and files as one.
-  **Deliverable:** decide whether `check-amendment-update-target` can assert that a rostered path
-  exists AND that the amendment's own cited string is present in it, or whether the honest answer
-  is that a roster is a claim and the merging session owes a stated finding when one comes up
-  empty.
-  **Cost while deferred:** low per instance and paid at the worst moment — a build session either
-  buys a sweep the amendment implied was already scoped, or writes something to make a vacuous
-  target non-vacuous.
-  **JUDGED RECURRENCE 2026-09-05 at the close drain, on a second roster.** `SPEC-preflight-cut.md`
-  rostered eleven reader rows for ten readers: a quote living at `evidence-kit/SPEC.md:836` was
-  also attributed to `delegation-kit/SPEC.md:836`, and align verified the citation's TEXT without
-  checking that the file named holds it. Same finding, one axis over — a rostered row resolving to
-  nothing in the file it names, undetected — and the deliverable below already covers it verbatim,
-  so no entry is minted. It widens the deliverable's corpus from the update-target roster to any
-  amendment roster carrying a path.
-  recurrence: amendment-update-target-overcount-undetected 2026-09-05
-  Filed 2026-08-25 by build; drained and promoted 2026-08-25 at close, which re-ran the sweep and
-  corrected its reported reach.
 
 - **readme-roster-enum-coverage** [design-pending] [cost: iteration/high] [surface: canon-kit] — a kit README enumerating a
   **derivable** set is outside every parity gate, so it drifts silently while the
