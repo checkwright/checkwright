@@ -389,10 +389,24 @@ fn monitor_surface(line: &str) -> Option<String> {
     Some(t.trim().to_string())
 }
 
+// spec: gate-sdk/SPEC.md §check-enforcement-fresh — the owner sections, in class order: a fixture
+// case must carry none of these paths, or its projection links through the enclosing repo's origin
+const CLASS_OWNERS: [(&str, &str, &str); 6] = [
+    ("gate-sdk/SPEC.md", "enforcement-tiers", "Enforcement tiers"),
+    ("drift-kit/SPEC.md", "the-kpi-plugin-contract", "The KPI plugin contract"),
+    ("guard-kit/SPEC.md", "the-guard-framework-libguardsh", "The guard framework"),
+    ("context-kit/SPEC.md", "the-session-context-hook-template", "The session-context hook"),
+    ("evidence-kit/SPEC.md", "baseline-manifest", "Baseline manifest"),
+    ("site-kit/SPEC.md", "the-monitor-boundary", "The monitor boundary"),
+];
+
 // spec: gate-sdk/SPEC.md §enforcement-map — the enforcement-class taxonomy, ordered hardest to
 // softest; this page owns the prose and each class cites its mechanism owner
 fn class_roster(prefix: &str) -> String {
-    let r = |p: &str, a: &str, t: &str| owner_ref(prefix, p, a, t);
+    let r: Vec<String> = CLASS_OWNERS
+        .iter()
+        .map(|(p, a, t)| owner_ref(prefix, p, a, t))
+        .collect();
     format!(
         "- A **blocking gate** fails the commit (or, at the `align-only` tier, the\n  \
          consistency audit) — the pre-commit hook is its local reach, the CI workflow\n  \
@@ -405,28 +419,7 @@ fn class_roster(prefix: &str) -> String {
          attests. Owner: {}.\n\
          - A **monitor** watches deployment truth rather than tree truth, so it reds a\n  \
          scheduled run, never a merge. Owner: {}.\n",
-        r("gate-sdk/SPEC.md", "enforcement-tiers", "Enforcement tiers"),
-        r(
-            "drift-kit/SPEC.md",
-            "the-kpi-plugin-contract",
-            "The KPI plugin contract"
-        ),
-        r(
-            "guard-kit/SPEC.md",
-            "the-guard-framework-libguardsh",
-            "The guard framework"
-        ),
-        r(
-            "context-kit/SPEC.md",
-            "the-session-context-hook-template",
-            "The session-context hook"
-        ),
-        r(
-            "evidence-kit/SPEC.md",
-            "baseline-manifest",
-            "Baseline manifest"
-        ),
-        r("site-kit/SPEC.md", "the-monitor-boundary", "The monitor boundary"),
+        r[0], r[1], r[2], r[3], r[4], r[5],
     )
 }
 
@@ -596,6 +589,21 @@ mod tests {
         };
         assert!(err.contains("unparseable"), "the refusal says what is wrong: {}", err);
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-enforcement-fresh — the good/ case's hermeticity constraint
+    #[test]
+    fn the_good_case_carries_no_class_owner_path() {
+        let case = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../gate-sdk/gate-tests/check-enforcement-fresh/good");
+        assert!(case.is_dir(), "the good/ case is where it was: {}", case.display());
+        for (path, _, _) in CLASS_OWNERS {
+            assert!(
+                !case.join(path).exists(),
+                "good/ carries {}, so its projection would link through the enclosing repo's origin",
+                path
+            );
+        }
     }
 
     // spec: gate-sdk/SPEC.md §enforcement-map — the marker needs whitespace after `enforce:` and

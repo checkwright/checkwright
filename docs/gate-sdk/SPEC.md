@@ -15424,6 +15424,11 @@ emitter and compares the committed page; given two arguments
 (`projection-file emit-file`) it compares pre-baked files, the hermetic mode the
 `bad/` fixture case drives off the live registries, while `good/` exercises the
 live emitter on its default branch over a staged synthetic registry set.
+That case is hermetic only while it carries none of the class roster's owner
+SPEC paths: the emitter links an owner section through the enclosing repo's
+origin whenever that path is tracked under the case, and a committed case file
+is tracked, so staging one would tie the projection to the clone's remote. An
+emitter unit test holds the case to that.
 Fail-closed: a missing
 projection, a missing emit source, or a failed emit is a red (exit 2), never a
 false clean.

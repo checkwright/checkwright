@@ -4272,6 +4272,42 @@
   Filed 2026-09-14 by `config-seam-second-cut`'s close into the gap inbox, from its
   stale-identifier-after-retirement audit; promoted at this iteration's scope.
 
+- **manifest-files-configured-branch-unpruned** [design-pending] [cost: event/low] [surface: canon-kit]
+  — `spec::manifest_files`' configured branch (`CANON_KIT_MANIFEST_FILES` non-empty) applies no
+  prune set, where the default branch's walks prune `GATE_SDK_PRUNE_DIRS` and canon-kit/SPEC.md
+  §The shared spec adapters rules that `comment_surface`'s configured branch narrow exactly as its
+  default does. So a configured value cannot say `**` without admitting `gate-tests/` fixtures;
+  this repo's single-level globs in `scripts/canon-config.knobs` stand in for the prune.
+  Verified 2026-09-15 at close: the configured branch is `glob_files` plus an `is_file` test, with
+  no `path_pruned` filter.
+  **Why `[design-pending]`:** the repair narrows a corpus shared by roughly ten readers
+  (`check-md-refs`, `check-docs-cmd`, `check-manifest-count`, `check-prose-enum` and the claim
+  gates among them), so canon-kit/SPEC.md §The causal-completeness check item 5 binds: each
+  reader's red condition is enumerated, a zero-count reader such as `check-install-claim` being
+  the attested inversion. Whether any consumer relies on the unpruned form is unprobed.
+  **Cost while deferred:** a consumer widening the knob with a multi-level glob governs fixture
+  prose as manifest content, or enumerates single-level globs around the gap.
+  Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted
+  2026-09-15 at close.
+
+- **lead-line-blocked-by-spec-tag-width-collision** [design-pending] [cost: event/low] [surface: queue-kit]
+  — an active lead line cannot carry both a spec tag and a blocked-by tag once the slugs are
+  long, because queue-kit/SPEC.md §check-queue-wrap discounts only a deferred lead line's cost
+  and surface tags, and refuses discounting the repeating blocked-by tag.
+  **Attested once:** promoting `couples-dynamic-root-resolution` needed 38 columns for its bold
+  lead, 45 for the blocked-by tag naming `couples-glob-semantics-unowned` and 18 for the shortest
+  legal spec tag, 101 against the 100-column budget before any prose (recounted at close). The
+  spec stage dropped the blocker tag and carried the merge order in the amendment header, so the
+  structured blocker a first-unblocked selection reads was lost for the promoted dependent.
+  **Why `[design-pending]`:** a bounded spec-tag discount, a continuation-line home for the
+  blocker (which §check-tag-lead-line forbids today), or a slug-length cap are each a grammar call.
+  **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is the icebox tier's one-line
+  grammar against the same cap. Both share the unbounded slug length, so a scope may bundle them.
+  **Cost while deferred:** a dependent promoted beside its blocker loses the tag its selection
+  reads, and the order survives only in amendment prose.
+  Measured by `check-queue-wrap`'s red at that spec stage's promotion commit and filed to the gap
+  inbox there; drained and promoted 2026-09-15 at close.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -4537,11 +4573,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- couples-glob-semantics-unowned
-- couples-dynamic-root-resolution
-- packed-knob-projection-filter-form
-- depth-enumerated-glob-bound-unoracled
-- steered-fixture-walk-roots-unverified
 
 ## Lessons Learned
