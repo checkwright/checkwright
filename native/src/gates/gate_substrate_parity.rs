@@ -681,7 +681,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let expanded = registry::expand_couples(&couples, &kit_roots)?;
         let hit = expanded
             .split(',')
-            .any(|g| declpaths.iter().any(|p| walk::pattern_match(g, p)));
+            .any(|g| declpaths.iter().any(|p| registry::couple_matches(p, g)));
         if !hit {
             continue;
         }

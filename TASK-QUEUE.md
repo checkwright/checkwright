@@ -12,51 +12,6 @@
 
 ## New Features
 
-- **couples-glob-semantics-unowned** [spec: SPEC-couples-semantics.md] — one manifest field,
-  three readers, two incompatible glob semantics, and no surface owns which reader is entitled to
-  which.
-  recurrence: couples-glob-semantics-unowned 2026-09-12
-  **Probed at all three sources, not read off the bullet.** `check-gate-substrate-parity`
-  assertion C matches with a bash `[[ p == g ]]`, where `*` crosses `/` — verified by execution:
-  `gate-sdk/*.sh` matches `gate-sdk/checks/check-x.sh`. `check-reads-couples`' own couple matcher
-  requires **equal segment count** and never crosses `/`. `check-graph` assertion B reads the
-  same field a **third** way — exact-token subset membership against `trigger=`, invoking no glob
-  matcher at all — and the generated hook's staged-path test takes the slash-spanning form.
-  **What the drain corrected in the filing's own claim.** The bullet said the divergence is
-  stated nowhere; it is stated in **one** place, the compiled couple matcher's own comment, which
-  names its narrowness as deliberate and cites the slash-spanning matcher it differs from. That
-  narrows the gap without closing it: a comment inside one reader is not a contract any other
-  reader or any descriptor author reads, and the third semantics is undocumented outright.
-  **Why it needed design:** normalising is not obviously right. `check-reads-couples`' narrow
-  matcher is correct **as specified** and its spec says so, so the call is whether `couples=` has
-  one semantics with stated exceptions, or is a field whose meaning is per-reader and must
-  therefore be declared per reader. Only the second is cheap; only the first is safe.
-  **Cost while deferred:** it already bit once, at the sixth budget batch, which reproduced both
-  forms deliberately rather than normalising them. The crate now carries a component-wise matcher
-  and a slash-spanning one side by side, so a porting session reaching for "the" crate glob
-  matcher flips a verdict on one side and no gate anywhere would say which side.
-  **Half discharged 2026-08-21 at spec:** `SPEC-graph-port.md` states check-graph assertion B's
-  four coverage branches in gate-sdk/SPEC.md and forbids the port reaching for either crate
-  matcher, so the third semantics stops being undocumented and the port's own exposure closes.
-  What remains is this entry's real question: one semantics with stated exceptions, or a
-  per-reader meaning declared per reader.
-  **A FOURTH face, folded in at the couples-resolver-reach drain, and it reaches a second
-  field.** `check-reads-couples`' *filter* matcher supports `**` (`glob_walk`'s `**` arm,
-  `native/src/gates/reads_couples.rs:309`) where its *couples* matcher does not
-  (`path_matches_glob` requires equal segment count, `:157-167`, no `**` arm) — so a `**`
-  filter value states a coverage demand its own `knob:` couples token cannot express. That
-  is why this iteration's `CANON_KIT_COMMENT_SURFACE` is depth-enumerated per extension
-  rather than spelled `**` (`scripts/canon-config.knobs` reasons it inline). Read in source,
-  not off prose. It widens the entry's subject from three couples readers to **which matcher
-  a field is entitled to**, the filter field included — and it is the same unruled question,
-  which is why it folded rather than minting a slug.
-  **Selected for `couples-field-semantics` as the ruling its lead unit waits on** (operator
-  direction, 2026-09-15, lead-relayed). **Spec ruled one semantics, the trigger's**: the coverage
-  reader adopts the bash string matcher and a `knob:` member expands to its covering pattern
-  (the amendment's header carries the grounds and the probe); lands before the other four.
-  Filed 2026-08-19 by close from the gap inbox; the drain executed all three matchers rather
-  than reading them.
-
 - **couples-dynamic-root-resolution** [spec: SPEC-fallback-roots.md]
   — the skipped-and-counted bucket is where trigger-drift hides, and its dominant
   subset is decidable.
@@ -4694,5 +4649,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- couples-glob-semantics-unowned
 
 ## Lessons Learned

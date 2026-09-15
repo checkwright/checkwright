@@ -23,8 +23,8 @@ cases=0
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
-MANIFEST_NARROW='# graph: couples=corpus/*.md dir=one valve=none tier=precommit'
-MANIFEST_WIDE='# graph: couples=corpus/*.md,corpus/sub/*.md dir=one valve=none tier=precommit'
+MANIFEST_NARROW='# graph: couples=corpus/SPEC*.md dir=one valve=none tier=precommit'
+MANIFEST_WIDE='# graph: couples=corpus/*.md dir=one valve=none tier=precommit'
 
 # A case dir holding one descriptor named for a real member, plus a tracked corpus whose
 # shape distinguishes a filter that is applied from one that is ignored: `other.txt` sits at
@@ -53,12 +53,17 @@ run_case() {  # $1=label  $2=descriptor-basename  $3=want-rc  $4=want-substring
 }
 
 # A — the declared roots' tracked reads are covered. The named member declares its scan root
-# twice under two filter knobs, so a couple naming both levels covers both walks.
+# twice under two filter knobs, and one `corpus/*.md` couple covers both levels of both walks.
 make_case covered check-stage-entry.gate "$MANIFEST_WIDE"
 run_case covered check-stage-entry.gate 0 '2 resolvable walk(s) covered'
 
-# B — the same roots, a couple that stops one level short. Globs never cross '/', so the
-# deeper tracked file is uncovered and the finding must name it.
+# A2 — a pattern of one segment covers a tracked file three segments deep: `*` crosses '/'. A
+# narrowed couples matcher reds here.
+make_case span check-stage-entry.gate '# graph: couples=*.md dir=one valve=none tier=precommit'
+run_case span check-stage-entry.gate 0 '2 resolvable walk(s) covered'
+
+# B — the same roots, a couple whose string prefix stops short of `corpus/sub/`, so the deeper
+# tracked file is uncovered and the finding must name it.
 make_case uncovered check-stage-entry.gate "$MANIFEST_NARROW"
 run_case uncovered check-stage-entry.gate 1 "corpus/sub/SPEC.md"
 
@@ -118,7 +123,7 @@ fi
 mkdir -p "$tmp/shell/corpus"
 : > "$tmp/shell/corpus/a.md"
 printf '%s\n' \
-    "$MANIFEST_NARROW" \
+    "$MANIFEST_WIDE" \
     'gate_find "corpus" -name '"'"'*.md'"'"' -type f' > "$tmp/shell/sandbox-gate.sh"
 ( cd "$tmp/shell" && git init -q . && git add -A ) >/dev/null 2>&1
 cases=$((cases + 1))

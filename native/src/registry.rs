@@ -282,6 +282,26 @@ pub fn knob_files(member: &str, resolve_dirs: &[String]) -> Result<Vec<String>, 
         .collect())
 }
 
+// spec: gate-sdk/SPEC.md §Reading a `couples=` field's reach — the field's one matcher, which every
+// reader asking what an expanded token reaches calls by this name
+pub fn couple_matches(path: &str, token: &str) -> bool {
+    crate::walk::pattern_match(token, path)
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `knob:` member's covering string pattern; a
+// `kit:<glob>` member passes unconverted to the `kit:` pass
+fn covering_pattern(member: &str) -> String {
+    if member.starts_with("kit:") {
+        return member.to_string();
+    }
+    let collapsed = member.replace("**/", "*");
+    if collapsed.starts_with('*') {
+        collapsed
+    } else {
+        format!("*{}", collapsed)
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the couples/trigger expansion every reader
 // shares: two passes in a fixed order, `knob:` then `kit:` over the result, one pass each
 pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, String> {
@@ -315,7 +335,7 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
                             name, m
                         ));
                     }
-                    once.push(m);
+                    once.push(covering_pattern(&m));
                 }
             }
             None => once.push(tok.to_string()),
@@ -356,6 +376,40 @@ mod tests {
         );
     }
 
+    // spec: gate-sdk/SPEC.md §Reading a `couples=` field's reach — the one semantics: `*` and `?`
+    // cross `/`, and `**` is no more than `*`
+    #[test]
+    fn the_couples_matcher_is_a_slash_spanning_string_match() {
+        assert!(couple_matches("native/src/emit/mod.rs", "native/src/*.rs"));
+        assert!(!couple_matches("a/b.rs", "a/**/b.rs"));
+        assert!(couple_matches("a/b", "a?b"));
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — each knob member expands to its covering
+    // pattern, and a member already leading with `*` expands unchanged
+    #[test]
+    fn a_knob_member_expands_to_the_pattern_that_covers_it() {
+        let knobs = crate::knobenv::lock();
+        let d = scratch_corpus(
+            &knobs,
+            "cover",
+            "CANON_KIT_MANIFEST_FILES[] = **/*.sh\nCANON_KIT_MANIFEST_FILES[] = SPEC.md\n\
+             CANON_KIT_MANIFEST_FILES[] = templates/*.md\nCANON_KIT_MANIFEST_FILES[] = */README.md\n",
+        );
+        let roots = vec!["gate-sdk".to_string()];
+        let got = expand_couples("knob:CANON_KIT_MANIFEST_FILES", &roots).expect("resolvable");
+        assert_eq!(got, "**.sh,*SPEC.md,*templates/*.md,*/README.md");
+        for (path, tok) in [
+            ("x.sh", "**.sh"),
+            ("a/b/x.sh", "**.sh"),
+            ("docs/gate-sdk/SPEC.md", "*SPEC.md"),
+            ("lifecycle-kit/templates/scope.md", "*templates/*.md"),
+        ] {
+            assert!(couple_matches(path, tok), "{} must cover {}", tok, path);
+        }
+        unscratch(&knobs, &d);
+    }
+
     // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a scratch gates dir holding one canon-kit
     // knob file, so a `knob:` token names a static knob with a value this test controls
     fn scratch_corpus(knobs: &crate::knobenv::KnobEnv, tag: &str, body: &str) -> std::path::PathBuf {
@@ -389,7 +443,7 @@ mod tests {
         let roots = vec!["gate-sdk".to_string()];
         assert_eq!(
             expand_couples("*SPEC*.md,knob:CANON_KIT_MANIFEST_FILES", &roots).expect("resolvable"),
-            "*SPEC*.md,CLAUDE.md,gate-sdk/SPEC.md"
+            "*SPEC*.md,*CLAUDE.md,gate-sdk/SPEC.md"
         );
         std::fs::write(d.join("canon-config.knobs"), "CANON_KIT_MANIFEST_FILES =\n").expect("write");
         crate::knobs::reset(&knobs);

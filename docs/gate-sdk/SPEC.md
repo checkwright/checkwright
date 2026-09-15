@@ -2084,9 +2084,7 @@ The manifest grammar:
   and derives its default set only when it is empty — so a descriptor that dropped
   its literals would lose the trigger for the branch not taken. The union
   over-triggers by exactly that branch, which is what the existing token's own
-  over-approximation rule already sanctions, and it is monotone-widening under
-  either of the two matchers above, so it settles nothing on the unowned
-  glob-semantics question.
+  over-approximation rule already sanctions.
   **Admissibility is checkable, and the check is what makes the token honest.**
   `knob:<NAME>` is admissible only where `<NAME>` is one of the knobs that gate
   declares — its registry declaration (§lib/gate.sh). Because the crate declares only the knobs its own code reads, an
@@ -2106,9 +2104,12 @@ The manifest grammar:
   name no static kit owns, and an empty value is a resolved-empty set, so a `knob:`
   naming an unowned name is exit 2 while a declared knob a consumer set empty
   expands to nothing — correct, because the gate then scans nothing either.
-  **What the token does not do is add a matcher.** Each reader expands the token to
-  the knob's members and then applies the matching discipline it already applies;
-  the incompatible semantics this field carries are untouched. Pre-expanding the
+  **What the token adds is a conversion, not a matcher.** A knob's member is a pattern in its
+  walker's discipline, relative to its walk's root, so each member expands to its covering string
+  pattern — every `**/` collapsed to `*`, and a leading `*` added unless present — which contains
+  every path the member can select under any discipline and any root. A member spelled `kit:<glob>`
+  is field syntax, not a walker pattern, and passes to the `kit:` pass unconverted. Each reader then
+  applies the field's one matcher. Pre-expanding the
   token in the shell so the binary never sees it is refused: `check-graph` parses the
   raw manifest line in the crate, so the binary *does* see the raw token, and hiding
   it would mean generating the descriptor — making a hand-authored field a generated
@@ -2117,13 +2118,14 @@ The manifest grammar:
   missing one would skip a red — and `check-kit-enum` gates the residual
   hand-lists derivation cannot reach. The corollary is a hard authoring rule:
   `couples=` must *cover* every path the gate reads at runtime, never a subset.
-  **The authoring rule is that globs never cross `/`** (and `kit:<glob>` expands
-  one level only), so a gate that walks a directory recursively (`find` /
-  `gate_find`) must couple that recursion — a `<dir>/<sub>/*.ext` sibling glob or
-  a wider one — and never lean on the tree holding only the shape the couple
-  enumerates; an under-covering couple silently skips the gate on the very edit it
-  should catch. That rule is the coverage reader's, and the trigger's reach differs
-  from it: §Reading a `couples=` field's reach.
+  **Every token, once expanded, is a bash string pattern over the repo-relative path** — the test
+  `[[ path == token ]]`, in which `*` and `?` cross `/` and `**` is no more than `*` — and every
+  reader that asks what a token reaches asks it through that one matcher, `trigger=` included. So
+  `native/src/*.rs` couples `native/src/emit/mod.rs`, both as a trigger and as coverage, and a
+  `kit:<glob>` token is one prefix whose reach is the pattern's. A gate that walks a directory
+  recursively couples that recursion with a pattern whose string reach contains every path the walk
+  reads; a sibling glob per depth is never needed, and never sufficient where it stops short of a
+  prefix the walk reaches. The readers and what each asks: §Reading a `couples=` field's reach.
   `check-graph` verifies couples→hook parity, not reads⊆couples;
   `check-reads-couples` (§check-reads-couples) mechanizes the reads⊆couples half
   for the statically resolvable walks — so the author's duty narrows to the
@@ -2204,23 +2206,36 @@ The manifest grammar:
 
 ### Reading a `couples=` field's reach
 
-**The field has two matchers, and its text cannot tell a reader which one is asking.**
-`check-reads-couples` matches segment-wise, and the authoring rule above is written for it: a
-glob never crosses `/`. The **trigger** readers do not match that way. The generated hook's
-`staged_matches` is spliced from `gate_staged_matches` in `lib/gate.sh`, whose
+**The field has one matcher, and every reader that asks what a token reaches uses it.** The
+generated hook's `staged_matches` is spliced from `gate_staged_matches` in `lib/gate.sh`, whose
 `[[ "$f" == $pat ]]` leaves the pattern operand unquoted under a standing
-`# shellcheck disable=SC2053`. That is bash *string* matching, in which `*` spans `/`, and
-`run-gates --for` reaches the same matcher. So `native/src/*.rs` **does** fire the hook on
-`native/src/emit/mod.rs`, while **not** covering a read there. Reading the narrow rule as
-universal is a live, attested error: applied to a trigger, it says a gate will not run when it
-will.
+`# shellcheck disable=SC2053`: bash *string* matching, in which `*` spans `/`. **Do not "fix" the
+unquoting**: it is the semantics, and quoting it would break every trigger in the tree at once. The
+crate's readers call its port, one function, rather than each carrying a matcher:
 
-**Read the reach through the oracle for the question asked, never off the field.** Run
-`run-gates.sh --for <path>` to learn what a path triggers, and `check-reads-couples` to learn
-what a gate's couples cover. **Do not "fix" the unquoting**: it is declared intent, and quoting it
-would break every trigger in the tree at once. Which semantics the field *should* have is not
-settled here and is filed as its own deliverable. What is settled is that the authoring rule
-stays conservative for the coverage reader while the trigger's reach is wider.
+- **`run-gates --for`** selects the members a path triggers.
+- **`check-reads-couples`** asks whether a walk's tracked reads are covered, so its answer is
+  exactly *would an edit to this read fire the gate*.
+- **`check-gate-substrate-parity` assertion C** asks whether a member's couples reach a gate
+  declaration path.
+
+Two readers ask something else, and neither is a second semantics. A `mode=staged` member's hook
+branch selects its positional arguments by git pathspec, whose default (non-`:(glob)`) form also
+lets `*` cross `/` (§run-gates). `check-graph` assertion B asks whether one *pattern* is contained
+in another rather than whether a path matches, through a four-branch predicate that is sound for
+this semantics and deliberately incomplete (§check-graph). The graph emitter and `port-blockers`
+print the field and ask nothing.
+
+**The filter field is not this field.** A `--reads` filter names its walker's discipline through
+its mandatory kind (§check-reads-couples), because it stands for a walk the reader cannot see.
+Couples name what fires a trigger. So a `glob:` filter's `**` is `walk::glob_files`' component
+globstar and a couples token's `**` is not. A knob serving as both is converted once, at
+expansion (§The `# graph:` manifest, the `knob:` rule).
+
+**Read the reach through the oracle, never off the field**, because `kit:` and `knob:` tokens hide
+their expansion: `run-gates.sh --for <path>` answers what a path triggers, and
+`check-reads-couples` answers what a gate's couples cover. The two now differ only in the question,
+not in the matcher.
 
 ## The install disposition
 
@@ -14681,27 +14696,25 @@ The rule is a **prefix test, not a glob, and that is a deliberate narrowing.**
 The retired `graph_surface_layer()` hook accepted an arbitrary shell pattern over
 the whole path, unanchored to path segments; the crate carries a component-wise
 matcher and a slash-spanning one side by
-side and nothing says which a port should reach for — the open question of which
-glob semantics `couples=` carries. A prefix test has no glob semantics to own,
-expresses every rule the live consumer's hook expressed, and closes this
-surface's exposure rather than adding a fourth reader of an unowned question. The `--amend-only [dir]` mode runs only
+side and each is already spoken for by its field: `couples=` the slash-spanning matcher, filter and
+prune the component-wise one (§Reading a `couples=` field's reach). A prefix test has no glob
+semantics to own, expresses every rule the live consumer's hook expressed, and closes this
+surface's exposure rather than adding a reader of either field's matcher where a prefix test
+already suffices. The `--amend-only [dir]` mode runs only
 (G) over a given directory, letting the fixture pair exercise it hermetically.
-**Assertion B's coverage predicate, stated because it is the `couples=` field's
-third reader and it invokes no glob matcher at all.** A couple is covered when
+**Assertion B's coverage predicate, stated because it asks whether a couple pattern is contained
+in a trigger pattern, which no path matcher answers.** A couple is covered when
 any trigger token satisfies one of four branches: a `*` trigger covers
 everything; an exact string match covers; a **literal** couple — one carrying no
 `*` or `?` — covered by the trigger read as a bash pattern covers; and a
-`*.<ext>` trigger covers a couple ending in that suffix. Neither of the crate's
-two matchers *is* this predicate — the component-wise one requires equal segment
-counts and the slash-spanning one is branch three alone — and substituting
-either flips verdicts on the live registry, so the predicate is carried whole.
+`*.<ext>` trigger covers a couple ending in that suffix. The field's matcher is branch three alone,
+and the component-wise filter matcher is not this field's; substituting either flips verdicts on the live registry, so the predicate is carried whole.
 Criterion 6's globstar commitment (§The port-candidate criteria) governs a Rust
 glob matcher over a knob's value and does not reach a predicate that matches no
 glob; it is stated here because it is the first ruling a porting session finds
-and it is the wrong one for this reader. This closes the **port's** exposure to that
-unowned question and its undocumented-third-semantics half; whether `couples=`
-has one semantics with stated exceptions or a per-reader meaning declared per
-reader is untouched and stays the open entry's deliverable.
+and it is the wrong one for this reader. The predicate is sound for the field's one semantics
+(§Reading a `couples=` field's reach): a `*.<ext>` trigger contains every pattern ending in that
+suffix only because `*` crosses `/`.
 
 Coverage ruling: a full `couples ⊇ find-globs` parity check over arbitrary
 shell is undecidable — neither cheap nor low-FP — so check-graph does not carry
@@ -14920,8 +14933,7 @@ pattern as a floor.
 
 **The second half is the boundary, and it is a *withdrawal* rather than a narrowing.**
 The refusal was first stated on the root half alone, and it does not reach that far. A
-walk's coverage must satisfy the conservative authoring rule — globs never cross `/`
-(§The `# graph:` manifest) — and for the **kit-literal fallback** branch of a
+walk's coverage must satisfy the authoring rule (§The `# graph:` manifest) — and for the **kit-literal fallback** branch of a
 runtime-selected corpus helper no adopter can satisfy it: the kit would be demanding that
 an adopter's `couples=` enumerate the depth of a tree the kit has never seen, while that
 rule's own correctness is the thing that section records as unsettled and files as its own
@@ -15295,10 +15307,8 @@ directory argument is one of three shapes — a quoted literal repo-relative pat
 enumerates the **tracked** files under it (`git ls-files`, filtered by a literal
 `-name '<pat>'` primary when one is extractable from the same invocation, else
 unfiltered; `gate_find` walks additionally drop the pruned dirs) and asserts
-every one matches at least one expanded couple under the manifest's own glob
-semantics — segments never cross `/`, so path and glob must share a segment
-count (a shallow one-level couple misses a file one level down, the
-check-shim-restatement bug). A walk whose root does not resolve is **skipped and
+every one matches at least one expanded couple under the field's one matcher
+(§Reading a `couples=` field's reach). A walk whose root does not resolve is **skipped and
 counted** in the clean line: the gate claims only the resolvable class and says
 how much it left undecided. Only tracked files need coverage (couples exist to
 fire the hook on a tracked-path commit; a walk over `.tmp/` or generated state
@@ -15310,8 +15320,7 @@ vendoring consumer that still ships them** — where none remain, every undecida
 arrives on the registry path and `resolve_root`'s three token shapes fire in fixtures
 alone. Stated so a reader meeting the shell spelling does not extend dead code.
 
-Over-demand is absorbed one of two ways, never by weakening the glob semantics
-to pass a near-miss: add the covering sibling glob (the correct fix), or mark
+Over-demand is absorbed one of two ways: add the covering sibling glob (the correct fix), or mark
 the deliberate uncoupled walk `# reads-couples-exempt: <reason>` on the walk's
 own line or the line directly above (the `comment-tier-exempt` precedent — local
 to the walk it excuses, auditable in place; a trailing marker excuses only its

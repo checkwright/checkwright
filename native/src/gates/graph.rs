@@ -334,14 +334,14 @@ fn amendment_findings(root: &str, errors: &mut Vec<String>) -> Result<(), String
 }
 
 // spec: gate-sdk/SPEC.md §check-graph — assertion B's four coverage branches, reproduced verbatim.
-// Neither crate matcher is this predicate and substituting either flips verdicts on the live
-// registry; criterion 6's globstar commitment does not reach a predicate that matches no glob.
+// The field's matcher is branch three alone, and substituting it or the filter matcher for the
+// whole predicate flips verdicts on the live registry.
 fn covered_by(s: &str, triggers: &[&str]) -> bool {
     for t in triggers {
         if *t == "*" || *t == s {
             return true;
         }
-        if !s.contains('*') && !s.contains('?') && walk::pattern_match(t, s) {
+        if !s.contains('*') && !s.contains('?') && crate::registry::couple_matches(s, t) {
             return true;
         }
         if let Some(ext) = t.strip_prefix("*.") {

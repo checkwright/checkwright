@@ -308,7 +308,7 @@ fn pathspec_matches(p: &str, globs: &[&str]) -> bool {
 // spec: gate-sdk/SPEC.md §run-gates — `gate_staged_matches`: bash's `[[ "$f" == $pat ]]` over the
 // trigger globs, the matcher the generated hook's `staged_matches` splices from the same body
 fn staged_matches(p: &str, globs: &[&str]) -> bool {
-    globs.iter().any(|g| walk::pattern_match(g, p))
+    globs.iter().any(|g| registry::couple_matches(p, g))
 }
 
 fn manifest(src: &str) -> Vec<(String, String)> {

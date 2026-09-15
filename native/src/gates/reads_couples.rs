@@ -151,22 +151,6 @@ fn quoted_after_name(line: &str, q: char) -> Option<String> {
     None
 }
 
-// spec: gate-sdk/SPEC.md §check-reads-couples — couple glob semantics: segments never cross '/',
-// so path and glob must have equal segment count. Deliberately narrower than the slash-spanning
-// matcher assertion C reads the same field with.
-fn path_matches_glob(path: &str, glob: &str) -> bool {
-    if glob == "*" {
-        return true;
-    }
-    let ps: Vec<&str> = path.split('/').collect();
-    let gs: Vec<&str> = glob.split('/').collect();
-    if ps.len() != gs.len() {
-        return false;
-    }
-    ps.iter().zip(gs.iter()).all(|(p, g)| walk::pattern_match(g, p))
-}
-
-
 // spec: gate-sdk/SPEC.md §check-reads-couples — a declared root's filter, resolved: the field
 // omitted is a *positive* declaration of an unfiltered walk, and a resolved-empty pattern set
 // selects nothing rather than everything
@@ -364,7 +348,7 @@ impl Ctx {
                     continue;
                 }
             }
-            if globs.iter().any(|g| path_matches_glob(f, g)) {
+            if globs.iter().any(|g| crate::registry::couple_matches(f, g)) {
                 continue;
             }
             self.findings.push(format!(
@@ -550,7 +534,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for f in &ctx.findings {
             println!("  {}", f);
         }
-        println!("  help: add the covering sibling glob to the gate's '# graph: couples=' — a '<dir>/<sub>/*.ext' that matches the deeper path (globs never cross '/', so a shallow one-level couple misses a file one level down), then regenerate the hook + graph artifacts; or mark the walk '# reads-couples-exempt: <reason>' (same line, or the line directly above) when the uncoupled read is deliberate. Never widen a glob to cross '/' to pass a near-miss. That is this gate's matcher, not the hook's: gate-sdk/SPEC.md §Reading a `couples=` field's reach.");
+        println!("  help: add the covering pattern to the gate's '# graph: couples=' — a glob whose string reach contains the uncovered path, such as '<dir>/*.ext' for a walk under '<dir>' — then regenerate the hook + graph artifacts; or mark the walk '# reads-couples-exempt: <reason>' (same line, or the line directly above) when the uncoupled read is deliberate. The field's one matcher: gate-sdk/SPEC.md §Reading a `couples=` field's reach.");
         return Ok(1);
     }
     println!(
