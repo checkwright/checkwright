@@ -1224,8 +1224,9 @@ committed `docs/footprint.md` against the footprint emitter, the
 freshness-gated projection is Derivation-first's sanctioned copy, so the
 maintainer re-runs the emitter after any change to a measured surface and a
 stale page reddens the battery. Its `# graph:` manifest couples the measured
-surfaces — the configured agent file and each kit's `templates/` tree — so an
-edit to what the page counts re-fires the gate.
+surfaces — the configured agent file and each kit's `templates/` tree — and the
+`*/SPEC.md` glob the kit roster derives from, so an edit to what the page counts,
+or a kit arriving or leaving, re-fires the gate.
 
 **It is a registry member of the gate binary, and its emitter is a function call
 rather than a spawn.** The comparator and the emitter ported in one unit, so
@@ -1237,7 +1238,8 @@ emitter reads is one of context-kit's static knobs, declared by this member.
 
 Bare, it runs the live emitter; a two-argument form
 (`check-footprint-fresh <projection> <emit>`) compares two pre-baked files,
-the hermetic mode the `good/`+`bad/` fixture pair drives. Fail-closed (exit 2)
+the hermetic mode the `bad/` fixture case drives; `good/` exercises the live
+emitter on its default branch over a staged one-kit corpus. Fail-closed (exit 2)
 on a missing projection or emit source; the stale byte-compare is the exit-1
 violation. The page's generated numbers ride the `docs/evidence-data.md`
 precedent past the prose gates on content, not a named valve — the figures live
@@ -1530,8 +1532,9 @@ has an automated validate-stage consumer. The footprint emitter is advisory the 
 projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds
 `docs/footprint.md` against `--emit`. `check-brevity`, `check-surface-ratchet`, `check-settings-pins`,
 `check-memory-off`, and `check-footprint-fresh` are gates and carry the standard
-fixture pair; the footprint pair drives the hermetic two-argument mode
-(`<projection> <emit>`), the `check-trajectory-fresh` precedent. Both
+fixture pair; the footprint `bad/` case drives the hermetic two-argument mode
+(`<projection> <emit>`), the `check-trajectory-fresh` precedent, and its `good/`
+case exercises the live emitter on its default branch. Both
 memory-off pairs reach their subject differently, and the difference is the
 point: the settings-pins pair takes a `--fixture <dir>` injection (the
 check-identity precedent) reading `<dir>/settings.json` against

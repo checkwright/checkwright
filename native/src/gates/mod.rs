@@ -1330,10 +1330,16 @@ pub const REGISTRY: &[GateEntry] = &[
         "-",
         &[("date", ""), ("git", "")],
     ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the join reaches both emitters' walks; its good/
+    // case stages one kit, so the per-kit templates `?` is held to one iteration of that loop
     (
         "check-value-rollup-fresh",
         value_rollup_fresh::run,
-        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:336 via emit::value_rollup::emit")],
+        &[
+            (".", "glob:lit:*/SPEC.md", "", ""),
+            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:336 via emit::value_rollup::emit"),
+            ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::value_rollup::emit"),
+        ],
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -1350,13 +1356,15 @@ pub const REGISTRY: &[GateEntry] = &[
         "-",
         &[("date", ""), ("git", "")],
     ),
-    // spec: gate-sdk/SPEC.md §check-reads-couples — no walk root: the comparator reads one named
-    // projection file, and the emitter it calls in-process declares its own reads through the knob
-    // below rather than through a root the recorder could observe.
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the emitter's kit-roster glob and its per-kit
+    // templates walk; its good/ case stages one kit, so the `?` is held to one iteration of that loop
     (
         "check-footprint-fresh",
         footprint_fresh::run,
-        &[],
+        &[
+            (".", "glob:lit:*/SPEC.md", "", ""),
+            ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::footprint::emit"),
+        ],
         &["CONTEXT_KIT_SURFACES"],
         "context-kit",
         &[("date", ""), ("git", "")],

@@ -12,27 +12,6 @@
 
 ## New Features
 
-- **steered-fixture-walk-roots-unverified** [spec: SPEC-steered-fixture-roots.md]
-  — unit test A verifies nothing about a member whose every fixture case steers off its walk
-  through positionals, so that member's walk-root declaration is unproven.
-  Three members, re-verified at the drain and unchanged by this iteration's registry work:
-  `check-footprint-fresh` declares an empty root set (`native/src/gates/mod.rs`) while its
-  emitter calls `walk::glob_files` at `native/src/emit/footprint.rs:31` (a static
-  `*/SPEC.md` root at `.`) and :90, a false no-walk claim; `check-enforcement-fresh` and
-  `check-value-rollup-fresh` declare `?` citing `find_with_prune` at
-  `native/src/emit/enforcement_map.rs:336`, a chain no case observes. Every `good/` and
-  `bad/` case of all three passes the two positionals that steer off the emitter.
-  **Why it needed design:** the repair is a default-branch fixture case per member plus
-  `check-footprint-fresh`'s root declaration, and a default-branch case must stage a live
-  emitter corpus inside a fixture, a design call per member.
-  **Cost while deferred:** every no-walk or `?` claim on a steered member is unverifiable, and
-  a changed emitter walk passes unit test A unseen.
-  **Selected for `couples-field-semantics` as its steered-walk unit** (operator direction,
-  2026-09-15, lead-relayed); its own delta at spec, a design call per member. **Spec ruled** each
-  `good/` onto the default branch (the case set is closed), and found `check-value-rollup-fresh`
-  reaching footprint's walks too.
-  Filed 2026-09-12 by build, as three bullets; folded and promoted 2026-09-13 at close.
-
 ## Technical Debt
 
 ## Deferred
@@ -4563,5 +4542,6 @@
 - couples-dynamic-root-resolution
 - packed-knob-projection-filter-form
 - depth-enumerated-glob-bound-unoracled
+- steered-fixture-walk-roots-unverified
 
 ## Lessons Learned

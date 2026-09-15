@@ -5743,7 +5743,12 @@ implementation at all — which is why the parity run and not the pair is cited 
 its emission's proof. The attestation sharpens the claim in one place the original
 wording left soft — a live-tree run must be a **stale** one, because a clean
 comparison exercises neither the diff renderer nor the cap, and those are the
-parts a pair steered off the emitter was never going to reach.
+parts a pair steered off the emitter was never going to reach. Three of the five —
+`check-footprint-fresh`, `check-enforcement-fresh` and `check-value-rollup-fresh` —
+now keep only their `bad/` case on the positionals and run `good/` on the live
+emitter's default branch (§check-reads-couples), so their pairs do execute the
+emitter; that `good/` run is a clean one, so the stale-run half of the warning
+stands for all five.
 
 **Two orthogonal nine-of-ten splits existed and neither predicted a held member.**
 One is the walk axis — every member reads fixed paths but `check-queue-slug-liveness`,
@@ -7706,7 +7711,7 @@ not be bought from a pair at all.** Each member's `gate-tests/<name>/good/` and
 `scripts/gate-tests/*.test.sh` that named their gate by **script path** now reach
 it through `gate_run` (§run-gate-tests), which is the declaration cohort's
 recorded lesson about a consumer's gates directory. `check-trajectory-fresh` and
-`check-value-rollup-fresh` are two of the five family members whose pairs steer
+`check-value-rollup-fresh` are two of the five family members whose pairs then steered
 off the live emitter through the emit-source positional, so their criterion-2
 parity was bought by a **live-tree run** with both implementations still present
 — and deliberately by a *stale* one, since a clean live run exercises neither the
@@ -14969,14 +14974,14 @@ answered one member at a time. It declares no knob, adds no registry field, and
 parses no source.
 
 **The figures, as of this writing and with the oracle that reproduces each.** 115
-registry members, **17** of which declare at least one `?`, across **19** `?`
-root-lines, over **19** declaration sites. Re-run the oracles rather than trusting
+registry members, **18** of which declare at least one `?`, across **21** `?`
+root-lines, over **21** declaration sites. Re-run the oracles rather than trusting
 those three: where an oracle and this paragraph disagree, the oracle wins and this
 paragraph is stale. Three denominators are live over the same population and they
 are **not** interchangeable, which is stated because conflating them is how the hand
-sweeps went wrong: the **19** root-lines are member-expanded, so a shared root const
-is counted once per member using it — the census's column-2 sum; the **17** members
-are the census's line count; and the **19** *textual* declaration sites are the
+sweeps went wrong: the **21** root-lines are member-expanded, so a shared root const
+is counted once per member using it — the census's column-2 sum; the **18** members
+are the census's line count; and the **21** *textual* declaration sites are the
 locator assertion's enumeration (below), which counts a shared root const's `?` once
 however many members use it. The root-lines and the sites agree today only because no shared
 root const holds a `?`; an assertion over this population must still say which of the three it
@@ -15048,11 +15053,11 @@ this enumeration, which is the one oracle for the site denominator.
 the chain.** Whether a walk's root is a run-time computation no gate can decide, and
 the assertion reads the class no further than its spelling. It
 resolves a `via` symbol and its first-hop reference, never the path from symbol to
-walk line, which would be a call-graph analysis: where a member's only fixture case
-steers it off the walk through a positional — `check-enforcement-fresh` and
-`check-value-rollup-fresh`, whose emitter walk is rooted at a scan knob — the clause
-records the chain rather than proving it, and unit test A observes no walk to hold
-their `?` to either. The locator is a pointer and never a copy: it names the walk
+walk line, which would be a call-graph analysis: where a member's walk lives off its
+module, the clause records the chain rather than proving it; what holds the
+declaration is a fixture case taking the walk, which is why a freshness member whose
+`bad/` case steers through positionals keeps a `good/` case on its emitter's default
+branch. The locator is a pointer and never a copy: it names the walk
 rather than transcribing its root expression, so no second spelling exists to drift,
 and it cannot be written without finding the walk, which is the act of classifying
 it.
@@ -15416,8 +15421,10 @@ docs page** (`<kit>/index.md`, relative to the page under the docs root); the
 Invariant: `docs/enforcement.md` byte-matches the enforcement-map emitter — the
 check-graph / trajectory-freshness byte-compare pattern. Bare, it runs the
 emitter and compares the committed page; given two arguments
-(`projection-file emit-file`) it compares pre-baked files, letting the fixture
-pair exercise it hermetically off the live registries. Fail-closed: a missing
+(`projection-file emit-file`) it compares pre-baked files, the hermetic mode the
+`bad/` fixture case drives off the live registries, while `good/` exercises the
+live emitter on its default branch over a staged synthetic registry set.
+Fail-closed: a missing
 projection, a missing emit source, or a failed emit is a red (exit 2), never a
 false clean.
 
@@ -15427,9 +15434,9 @@ where the shell form ran `bash <emitter> --emit` in a subprocess, the compiled
 member calls the emitter module's `emit()` **in-process** — retiring the
 family's `bash` hop for this member as it did for §check-footprint-fresh. Every
 registry knob the emitter reads is declared by this member, including the
-`EVIDENCE_KIT_RUN_` **prefix family**; because the
-hermetic two-argument mode bypasses the emitter entirely, those knobs are
-resolved but unread in a fixture run, which is why an empty family must resolve
+`EVIDENCE_KIT_RUN_` **prefix family**; because the `bad/` case's
+hermetic two-argument mode bypasses the emitter entirely and the `good/` case
+stages no suite roster, those knobs are resolved but unread in a fixture run, which is why an empty family must resolve
 rather than refuse (§lib/gate.sh). Its `# graph:` manifest couples every class registry — the gate
 sources (so a `tier=` edit re-fires), `kpis.list`, the settings file, and the
 monitor-carrier workflows — beside the artifact itself, so any registry change
