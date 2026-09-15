@@ -4,13 +4,4 @@
 
 ---
 
-config-seam-fourth-cut scope a6085f55 2026-09-14 738e8f4c
-config-seam-fourth-cut spec a96a2ce0 2026-09-14 1ac39cef
-config-seam-fourth-cut align a73d2672 2026-09-14 0f1f34a8
-config-seam-fourth-cut build ab6314bd 2026-09-14 de02637a
-config-seam-fourth-cut build aebb7ba2 2026-09-14 37b7d21b
-config-seam-fourth-cut build adafa5de 2026-09-15 0e263f89
-config-seam-fourth-cut build af13b090 2026-09-15 6d2e1a6e
-config-seam-fourth-cut build ac7942b3 2026-09-15 06a50d63
-config-seam-fourth-cut validate a115f82a 2026-09-15 f4177431
-config-seam-fourth-cut close a6211268 2026-09-15 c6ac5b93
+— scope aef25eb7 2026-09-15 e3932de1
