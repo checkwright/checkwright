@@ -146,6 +146,22 @@ the override that already replaces the derived set when it is non-empty. The
 declaration therefore mints no name and adds no mechanism; it uses the one that
 exists for it.
 
+**The declared set is the kit set and not the payload's directory listing, which
+is a correction this delta is obliged to make rather than inherit.** The
+payload-derived profile resolves its kit set as every directory under `payload/`,
+and the packer creates a reserved sibling there for the prebuilt binaries. Before
+this delta that sibling reached no resolver: the derived predicate tested for
+`checks/` or `smoke/` on disk and it has neither. Declaring the set changes that —
+a declared root is admitted verbatim with no disk predicate, which is the whole
+point — so the reserved directory would enter every kit-root sweep. That is the
+hazard this delta's own grounds reject `templates/` for, and an amendment may not
+reject a hazard in one paragraph and ship it in the next. **The reserved name is
+therefore excluded where the kit set is derived**, which de-literalizes a literal
+the installer already carries rather than minting one, and the exclusion reaches
+the manifest's `kits` and the declared knob together — filtering only the knob
+would leave the two disagreeing, which is exactly what delta 8's second assertion
+compares.
+
 **The seam file gains a second owned line and loses its condition.** Today the
 file is claimed and written only inside the branch that has selected an artifact
 target, so a verb reasoning about the surfaces `init` rewrites must not assume it
@@ -317,6 +333,18 @@ An assertion that *counts* is what the withholding needs, and the manifest's
 own oracle: it fires on a packer that stopped excluding, which is the regression
 delta 1 can suffer silently.
 
+**A third assertion, because the second cannot catch the reserved directory and
+saying so in a Definition of Done is the wrong resting place.** The equality above
+compares the declared knob against the manifest's `kits`, and the reserved
+directory would be in both, so the two agree while both are wrong; a DoD sentence
+is read once at merge where a gate reads every run. The suite therefore asserts
+that the reserved name is **absent** from the resolved kit-root set and from the
+manifest's kits — and it reads that name **by content, from the target roster the
+packer writes into that directory, never by the directory listing the kit-set
+derivation itself uses**. An oracle sharing its subject's blind spot is not an
+oracle: both the packer's derivation and the suite's own second reading walk
+`payload/*/`, so a name taken from either would agree with the defect.
+
 ### (9) Each kit README says where its SPEC is published, and its links stay relative
 
 Every kit README gains one sentence naming the publication; the markdown links
@@ -453,10 +481,16 @@ opt-out value a consumer who sets it would meet as dangling pointers; stated so
 the opt-out is not discovered as a defect), `--run-consumer-smoke` (delta 12), and
 the installer smoke's new assertions (delta 8).
 
-**Two more readers of those paths, found by running the installer smoke rather
+**Three more readers of those paths, found by running the installer smoke rather
 than by reading, and added because this roster is what a later reader trusts.**
-Both are gates the payload installs into a consumer's starting battery, and both
-red there once the paths are withheld:
+Each is a gate the payload installs into a consumer's starting battery, and each
+reds there once the paths are withheld. The roster is closed rather than
+open-ended: a read-only sweep of every `zero-config` gate — all of them ported,
+none still shell — found no fourth. Fifteen route their corpus through
+canon-kit's shared finders, which prune a vendored kit root by default and print
+a graceful empty-corpus clean line rather than failing closed; the rest touch raw
+kit roots only for `checks/`, `gate-tests/`, `lib/`, `bin/` and `templates/`,
+none of them withheld.
 
 - **`check-gate-assertions`** builds its corpus from `<gates-dir>/SPEC.md` plus
   each kit root's `SPEC.md`; withholding empties it, and an empty corpus is its
@@ -470,6 +504,32 @@ red there once the paths are withheld:
   disposition that section already gives sibling assertion C for the same tree
   class, and what B's own ground ("the smoke's tree is a superset of the tree
   `init` makes") already presupposes.
+- **`check-knob-default-coupling`** reds once per knob for every vendored kit,
+  its SPEC file being the half of the coupling the payload withholds. **A kit
+  whose SPEC file is absent is skipped and counted on the clean line.** The
+  distinction that carries it is *absent* versus *silent*: canon-kit/SPEC.md
+  §check-knob-default-coupling rules that a knob whose SPEC carries **no default
+  statement** reds, which is a file that exists and fails to state something,
+  where this is a file that is not there to state anything. The gate's assertion
+  is drift between two sites, and a withheld SPEC leaves one site — measured, of
+  44 findings on a vendored consumer 44 were the absent-file branch and **none**
+  was the gate's real disagreement branch, so the finding class was an artefact
+  rather than a drift. **That section is amended to state the absent-file case**,
+  because it currently rules the near case the other way and is silent on this
+  one, which is the gap that made the question a question; the next reader should
+  meet the distinction rather than re-derive it.
+
+**A latent reader, filed rather than fixed, and the disposition is on record so
+it is not read as an oversight.** `check-docs-cmd` builds its defined-knob set by
+grepping raw kit roots excluding only `*.md` and `*/gate-tests/*`, so a knob whose
+only tracked occurrence in its kit lies inside `smoke/` leaves that set once
+`smoke/` is withheld. Five are measured: `LIFECYCLE_KIT_SESSIONS_DIR`,
+`DRIFT_KIT_ITERATION_START`, `DRIFT_KIT_SMOKE_CUSTOM`, `CANON_KIT_GLOSSARY_FILE`
+and `CONTEXT_KIT_BREVITY_SECTIONS`, none of them a static-table row. Nothing reds
+today — a stock consumer's seeded docs cite none of them — and the exposure is an
+adopter who documents one and then cannot satisfy the gate. The subject is where
+a kit's knob names are *defined* rather than what the payload carries, so the
+repair is a separable unit and this one files it.
 
 **Neither repair weakens a gate to make a battery pass, and the test is stated
 because that is what the shape resembles.** Neither is a path or glob exemption.

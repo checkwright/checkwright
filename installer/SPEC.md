@@ -1314,7 +1314,20 @@ you move up, and a profile that is nobody's step is still a legitimate member.
   governance over `docs/*.md`: no kit spells one project's prose layout, so
   widening the corpus is your own `CANON_KIT_PROSE_SURFACE_GLOBS` line in the
   canon-kit config seam `init` already writes into your gates directory.
-- **`full`** is everything in the payload.
+- **`full`** is every kit in the payload.
+
+**The payload's reserved sibling is not a kit, and the derivation says so.** The
+packer writes the prebuilt binaries into a reserved directory beside the kit
+roots, so *every directory under `payload/`* and *every kit* are not the same
+set. The derivation excludes that one name — the same constant the package
+resolver already uses to locate itself — and the exclusion reaches the manifest's
+`kits`, the derived profile's vendored set and the kit-root knob `init` declares
+(§What init seeds) together, because a filter applied to only one of them leaves
+the others disagreeing. This mattered little while the kit-root resolver tested
+for `checks/` or `smoke/` on disk and the reserved directory failed both; it
+matters once the set is **declared**, since a declared root is admitted with no
+disk predicate at all and would carry the reserved directory into every kit-root
+sweep.
 
 `starter`, `delegation` and `prose` are rosters in `profiles.list`, because none
 follows from the tree — each is a judgment about what an adopter should meet
@@ -1854,8 +1867,9 @@ arm** — every command `init` printed in its block must resolve to an executabl
 path in the payload just written, with every flag it names accepted — then the
 battery must be green, then the manifest must agree with the tree it describes
 file by file, then the **withholding arm** — no vendored kit root carries a
-`SPEC.md` or a `smoke/`, and the kit-root set the battery resolves equals the
-manifest's `kits` — then the **queue post-condition** — a profile whose kit set reads
+`SPEC.md` or a `smoke/`, the kit-root set the battery resolves equals the
+manifest's `kits`, and the payload's reserved artifact directory is in neither —
+then the **queue post-condition** — a profile whose kit set reads
 the queue file must have one, satisfying `check-queue-sections`, and a profile
 whose kit set does not must have none — then a re-run must leave the tree object
 identical, then `doctor`
@@ -1881,6 +1895,19 @@ asked the packer what it excluded would compare a derivation against itself,
 where this reds on a packer that stopped excluding — the one regression the
 exclusion can suffer in silence, a payload carrying more than it promised
 breaking no install.
+
+**The third assertion exists because the second cannot make it.** The equality
+compares the declared kit-root knob against the manifest's `kits`, and the
+reserved artifact directory would be on *both* sides of it — the two agree while
+both are wrong. So the reserved name is asserted absent from each, and the suite
+reads that name **by content**, from the target roster the packer writes into
+that directory, rather than off the `payload/*/` listing the kit-set derivation
+itself uses (§Profiles). An oracle that shares its subject's blind spot is not an
+oracle: both the derivation under test and this suite's own independent reading
+of the payload walk that listing, so a name taken from either would confirm the
+defect instead of catching it. A payload where no directory carries the roster
+fails the arm rather than passing it, since that is the shape in which this
+assertion would otherwise pass vacuously.
 
 **The follow-up arm asserts what `init` printed, not a copy of it.** `init` ends
 by telling the adopter to run two commands, and until this arm nothing anywhere

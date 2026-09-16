@@ -569,7 +569,7 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
 # spec: installer/SPEC.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
 # spec: installer/SPEC.md §The gate binary — the battery expectation is no longer a parameter of this helper and the alternative it once carried is no longer a branch: selection has one success path, so an install that ran at all placed a verified artifact and a green battery is the only post-condition an install can earn. The refusals are asserted where they now occur — at the bootstrap, before any verb — by the artifact-less leg and the artifact arm
 assert_install() {   # $1 = profile, $2 = scratch consumer dir
-    local profile="$1" C="$2" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf n_omitted q_seam q_bin queue_src files_raw withheld
+    local profile="$1" C="$2" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf n_omitted q_seam q_bin queue_src files_raw withheld reserved
     local -a bad_hash=() lock_kits=() want_kits=() resolved_kits=()
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
@@ -647,7 +647,22 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     [[ "$(printf '%s\n' ${resolved_kits[@]+"${resolved_kits[@]}"} | LC_ALL=C sort)" \
         == "$(printf '%s\n' "${lock_kits[@]}" | LC_ALL=C sort)" ]] \
         || fail "$profile: the battery resolves kit root(s) (${resolved_kits[*]-}) that differ from the manifest's kits (${lock_kits[*]})"
-    say "kit roots: the battery resolves all ${#resolved_kits[@]} kit(s) the manifest records"
+
+    # spec: installer/SPEC.md §The consumer smoke — the equality above cannot catch the payload's reserved artifact directory, because that name would be on BOTH sides of it; and a DoD sentence saying so is read once at merge where this reads every run. So the reserved name is asserted absent from both, and it is read BY CONTENT — the target roster the packer writes into that directory — and never off the `payload/*/` listing the kit-set derivation itself uses, since a reader sharing its subject's blind spot agrees with the defect instead of catching it
+    shopt -s nullglob
+    reserved=""
+    for k in "$PKG_ROOT"/payload/*/; do
+        [[ -f "${k}targets.list" ]] || continue
+        k="${k%/}"; reserved="${k##*/}"
+    done
+    shopt -u nullglob
+    [[ -n "$reserved" ]] \
+        || fail "$profile: no payload directory carries targets.list, so the reserved artifact directory this assertion is about cannot be read independently — the assertion would pass vacuously"
+    for k in ${resolved_kits[@]+"${resolved_kits[@]}"} "${lock_kits[@]}"; do
+        [[ "$k" != "$reserved" ]] \
+            || fail "$profile: '$reserved' is the payload's reserved artifact directory, and it is being carried as a kit root — a declared root takes no disk predicate, so every kit-root sweep would reach it"
+    done
+    say "kit roots: the battery resolves all ${#resolved_kits[@]} kit(s) the manifest records, and the reserved '$reserved' directory is in neither set"
 
     # spec: installer/SPEC.md §What init seeds — the queue file is the one surface init seeds whose *content* has a format contract, and whether a profile gets one at all is a property of its kit set: the arm asks the same resolver init used rather than naming a profile, and asserts the same contract for both of its outcomes, since which arm wrote the file is exactly what the selection rule makes irrelevant. The section floor is on-surface, so it is absent from the battery just asserted above and is run here out of the installed payload — the only spelling that reaches a profile whose kit set reads the queue and carries no queue-kit
     # spec: installer/SPEC.md §The install boundary — the resolver is reached through the --install queue-source read op rather than by sourcing the module that owns it: one derivation with two readers, and the smoke now reads it ACROSS the package boundary instead of inside it. The wire is the family's — nonempty stdout is the whole answer — and the op is invoked through $CW, which is the bootstrap of the package $PKG_ROOT names, so the arm reads the package it resolved its kit set from whichever transport's entry point this leg is exercising

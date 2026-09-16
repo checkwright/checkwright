@@ -1889,6 +1889,19 @@ source uses is reduced tail-to-tail before the compare, so a knob inheriting
 another kit's default reads as agreement. A knob whose SPEC carries no default
 statement at all reds — the SPEC owns knob defaults.
 
+**An *absent* owning SPEC is a skip, where a *silent* one reds, and the
+distinction is the assertion's own.** The sentence above rules a file that exists
+and fails to state a default. A kit whose SPEC file is not there at all has no
+owning statement to drift *from*, and assertion 2 is a comparison between two
+sites rather than a requirement that a second site exist — so every knob of such
+a kit is skipped and counted on the clean line beside the other skip classes.
+Reading the two cases as one turns a missing file into a finding per knob, which
+says nothing about drift and everything about which files a tree happens to
+carry. The live case is a consumer whose kits arrived through a payload that
+withholds their SPECs (gate-sdk/SPEC.md §Consumer payload); in a tree that
+authors its kits every SPEC is present, the skip count is zero, and the assertion
+is unchanged.
+
 The coupling is literal-to-literal, and the calibration draws the boundary of
 what carries a single literal to couple. Skipped-and-counted, never coupled: a
 computed default (any expansion, substitution, or arithmetic in the value), an

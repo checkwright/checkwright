@@ -30,6 +30,9 @@ pub const VERBS: &[(&str, Verb)] = &[
 // which are gate-sdk's and canon-kit's own defaults. They live here rather than in one arm because
 // uninstall trims a span out of the same agent file init wrote it into.
 pub const GATES_DIR: &str = "scripts";
+// spec: installer/SPEC.md §Profiles — the payload's one reserved sibling of the kit roots: the
+// packer writes the prebuilt binaries there, so it is a payload directory that is not a kit
+pub const ARTIFACT_DIR: &str = "artifact";
 pub const AGENT_FILE: &str = "CLAUDE.md";
 pub const QUEUE_FILE: &str = "TASK-QUEUE.md";
 
@@ -133,7 +136,7 @@ fn resolve_package() -> Option<Package> {
     let exe = std::env::current_exe().ok()?;
     let target_dir = exe.parent()?;
     let target = target_dir.file_name()?.to_string_lossy().into_owned();
-    let artifact_dir = dir_named(target_dir.parent(), "artifact")?;
+    let artifact_dir = dir_named(target_dir.parent(), ARTIFACT_DIR)?;
     let payload = dir_named(artifact_dir.parent(), "payload")?;
     let root = payload.parent()?.to_path_buf();
     if !root.join("package.json").is_file() {

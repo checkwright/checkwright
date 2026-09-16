@@ -408,6 +408,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
 
     let mut findings: Vec<String> = Vec::new();
     let mut described = 0usize;
+    let mut unowned = 0usize;
 
     // spec: canon-kit/SPEC.md §check-knob-default-coupling — assertion 1: every literal site for
     // one knob carries the same literal, else the source disagrees with itself before any SPEC is
@@ -447,13 +448,11 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     let spec_name = spec::spec_name()?;
     for (kit, subset) in &kit_subset {
         let spec_path = format!("{}/{}", kit, spec_name);
+        // spec: canon-kit/SPEC.md §check-knob-default-coupling — an ABSENT owning SPEC is a skip on
+        // the clean line, where a PRESENT one that states no default still reds: the assertion is
+        // drift between two sites, and a file that is not there is not a second site
         if !Path::new(&spec_path).is_file() {
-            for (knob, val, _) in subset {
-                findings.push(format!(
-                    "  {}  {} default `{}` has no owning SPEC to state it — the SPEC owns knob defaults",
-                    spec_path, knob, val
-                ));
-            }
+            unowned += subset.len();
             continue;
         }
         let text = spec::read_text(Path::new(&spec_path))?;
@@ -491,11 +490,12 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "KNOB-DEFAULT-COUPLING: clean ({} kit source file(s); {} literal default site(s) agree across sites and with the owning SPEC; {} computed/array/empty + {} descriptively-stated default(s) skipped-and-counted)",
+        "KNOB-DEFAULT-COUPLING: clean ({} kit source file(s); {} literal default site(s) agree across sites and with the owning SPEC; {} computed/array/empty + {} descriptively-stated + {} whose kit ships no SPEC file default(s) skipped-and-counted)",
         sources.len(),
         lit_count,
         skipped,
-        described
+        described,
+        unowned
     );
     Ok(0)
 }

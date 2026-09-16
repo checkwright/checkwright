@@ -8,11 +8,14 @@ use std::path::Path;
 // hand-maintained "all the kits" roster is drift the day a kit lands.
 pub const DERIVED: &str = "full";
 
+// spec: installer/SPEC.md §Profiles — every payload directory EXCEPT the reserved artifact
+// sibling, which is a payload directory and not a kit; a declared kit root is admitted with no disk
+// predicate, so a set carrying it would put it inside every kit-root sweep
 pub fn payload_kits(installer: &Path) -> Vec<String> {
     crate::walk::list_dir(&installer.join("payload"))
         .unwrap_or_default()
         .into_iter()
-        .filter(|(_, is_dir)| *is_dir)
+        .filter(|(name, is_dir)| *is_dir && name != super::ARTIFACT_DIR)
         .map(|(name, _)| name)
         .collect()
 }
