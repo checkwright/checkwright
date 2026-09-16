@@ -1910,7 +1910,11 @@ that directory, rather than off the `payload/*/` listing the kit-set derivation
 itself uses (§Profiles). An oracle that shares its subject's blind spot is not an
 oracle: both the derivation under test and this suite's own independent reading
 of the payload walk that listing, so a name taken from either would confirm the
-defect instead of catching it. A payload where no directory carries the roster
+defect instead of catching it. **The suite's own kit-set reading takes the same
+content-derived exclusion**, because that reading is what every other assertion
+here compares the installer's answer against: left on the bare directory listing
+it would disagree with a corrected installer and report the correction as the
+defect. A payload where no directory carries the roster
 fails the arm rather than passing it, since that is the shape in which this
 assertion would otherwise pass vacuously.
 

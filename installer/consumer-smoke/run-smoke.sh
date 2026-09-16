@@ -240,10 +240,25 @@ lock_own_file() {   # $1 = manifest path, $2 = the repo-relative path init write
 digest_of() {   # $1 = file -> its SHA-256 in hex; sha256sum is a preflight tool of this harness, so there is no hasher to resolve between
     sha256sum -- "$1" 2>/dev/null | cut -d' ' -f1
 }
-payload_kits() {   # -> every kit root the installed payload carries, in directory order
+# spec: installer/SPEC.md §Profiles — the payload's reserved artifact sibling, identified BY CONTENT: the target roster the packer writes into it. Never by its name, because this reader has two callers and one of them is the assertion that the reserved directory is not a kit root — a name read off the same `payload/*/` listing the kit-set derivation uses would agree with that derivation's defect instead of catching it. Empty where the payload carries no artifact directory at all, which is a payload no install proceeds from
+reserved_payload_dir() {   # -> the reserved directory's basename, or empty
     local d
     shopt -s nullglob
-    for d in "$PKG_ROOT"/payload/*/; do d="${d%/}"; printf '%s\n' "${d##*/}"; done
+    for d in "$PKG_ROOT"/payload/*/; do
+        [[ -f "${d}targets.list" ]] || continue
+        d="${d%/}"; printf '%s\n' "${d##*/}"
+    done
+    shopt -u nullglob
+}
+# spec: installer/SPEC.md §Profiles — every payload directory EXCEPT the reserved one, which is the payload's own second reading of the same contract the installer's derivation holds: a payload directory is not automatically a kit
+payload_kits() {   # -> every kit root the installed payload carries, in directory order
+    local d reserved
+    reserved="$(reserved_payload_dir)"
+    shopt -s nullglob
+    for d in "$PKG_ROOT"/payload/*/; do
+        d="${d%/}"; d="${d##*/}"
+        [[ -n "$reserved" && "$d" == "$reserved" ]] || printf '%s\n' "$d"
+    done
     shopt -u nullglob
 }
 profile_rows() {   # -> the '<profile><TAB><kit>' rows of profiles.list, comments and blanks dropped; a '#' anywhere ends a line, which is what lets a row carry a trailing note
@@ -649,13 +664,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
         || fail "$profile: the battery resolves kit root(s) (${resolved_kits[*]-}) that differ from the manifest's kits (${lock_kits[*]})"
 
     # spec: installer/SPEC.md §The consumer smoke — the equality above cannot catch the payload's reserved artifact directory, because that name would be on BOTH sides of it; and a DoD sentence saying so is read once at merge where this reads every run. So the reserved name is asserted absent from both, and it is read BY CONTENT — the target roster the packer writes into that directory — and never off the `payload/*/` listing the kit-set derivation itself uses, since a reader sharing its subject's blind spot agrees with the defect instead of catching it
-    shopt -s nullglob
-    reserved=""
-    for k in "$PKG_ROOT"/payload/*/; do
-        [[ -f "${k}targets.list" ]] || continue
-        k="${k%/}"; reserved="${k##*/}"
-    done
-    shopt -u nullglob
+    reserved="$(reserved_payload_dir)"
     [[ -n "$reserved" ]] \
         || fail "$profile: no payload directory carries targets.list, so the reserved artifact directory this assertion is about cannot be read independently — the assertion would pass vacuously"
     for k in ${resolved_kits[@]+"${resolved_kits[@]}"} "${lock_kits[@]}"; do
