@@ -3002,10 +3002,12 @@
   read-only child buys nothing while making the dropped return look like a channel that was
   offered. `delegation-kit/templates/agent-execution.md` already draws the distinction; nothing
   makes a dispatcher pay it, which is shape two of the deliverable restated as an observed cost.
+  **The bare `.` did not reproduce 2026-09-16** — an isolated `audit-sweep` returned its report in
+  full through `SubagentHandback`, whose obligation the harness now states in the child's own
+  system prompt. The 2026-08-25 cost figure is retired and is re-measured before this is re-ranked.
   recurrence: worktree-isolated-agent-report-lost-to-a-failed-peer-send 2026-08-26
-  Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced
-  it twice while dispatching its own sweeps, and filed to the gap inbox there; promoted
-  2026-08-25 at this scope's drain of that inbox.
+  Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced it
+  twice dispatching its own sweeps and filed it to the gap inbox; promoted 2026-08-25 at that drain.
 
 - **site-health-issue-venue-unwanted** [design-pending] [cost: event/low] [surface: site-kit] — the site-health probe files issues on
   the public repo for failures the iteration lifecycle resolves anyway, and the operator does not
