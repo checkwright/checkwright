@@ -272,6 +272,15 @@
   **Cost while deferred:** every tarball and npm package ships its engineering record as its
   bulk, and the seam-leak surface stays in customers' trees.
   Filed 2026-09-11 by consult, an operator-directed direct entry.
+  **Directed 2026-09-16 at scope, lead-relayed, as `installer-front-door-cut`'s LEAD unit**, with
+  `installer-readme-usage-tier-split` as the second. The set's economic argument, recorded because
+  no gate reads it: bundled — this entry leads and that one joins; the shared surface is the
+  installer, and more tightly the single activation surface a prospective adopter meets — the
+  package page, the published tarball, and the docs/install.md and gate-sdk/SPEC.md §Consumer
+  payload text describing both. The two were filed beside each other by one consult and neither is
+  correctable without touching the other's files. The direction is revisable at a later scope or
+  spec; it is not a ruling and no ruling record carries it. Both entries are features, so the
+  authoring stage promotes them and writes the amendment.
 
 - **installer-readme-usage-tier-split** [design-pending] [cost: event/high] [surface: installer] — `installer/README.md` is the
   npm-visible package README and a 3,182-line, 216 KB design record, so the package page and the
@@ -288,6 +297,8 @@
   **Cost while deferred:** every npm page view and tarball reader meets a design record at the
   activation surface's front door, against the time-to-first-value objective.
   Filed 2026-09-11 by consult as a direct entry, beside `payload-withholds-kit-specs`.
+  **Directed 2026-09-16 at scope, lead-relayed, as `installer-front-door-cut`'s second unit**; the
+  set's composition argument is recorded on the lead entry above.
 
 - **config-variant-battery-harness** [design-pending] [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
   battery under a named config-seam variant and see what changes; the fixture pairs prove each
@@ -4260,6 +4271,9 @@
   spends a refused commit and a re-issue on a conflict with a known cause and no owner.
   Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close as the third of its
   four bullets, none of which that close could drain; promoted at the following scope.
+  **Disposition directed 2026-09-16, lead-relayed: both candidate diffs are prepared and neither
+  is applied, the ruling deferred.** The entry stays in this pool until it is ruled, and a session
+  preparing either diff records it here rather than landing it.
 
 - **queue-entry-evidence-tier** [design-pending] [cost: iteration/low] [surface: queue-kit] — nothing signals that an
   entry's body was compressed, so a later reader cannot tell a premise written at full evidence
