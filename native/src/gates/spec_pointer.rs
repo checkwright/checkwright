@@ -42,6 +42,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut scanned = 0usize;
     let mut pointers = 0usize;
     let mut markers = 0usize;
+    let mut withheld = 0usize;
+    let spec_name = spec::spec_name()?;
 
     for f in spec::comment_surface(root, false)? {
         let rel = spec::strip_dot_slash(f.strip_prefix(&format!("{}/", root)).unwrap_or(&f));
@@ -78,6 +80,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 continue;
             }
             if !Path::new(&format!("{}/{}", root, path)).is_file() {
+                // spec: canon-kit/SPEC.md §check-spec-pointer — a WITHHELD target is not a dangling
+                // one: the kit root resolves and only its SPEC file is absent, which is a tree that
+                // received the kits from a payload publishing that file rather than packing it
+                if withheld_spec(root, &path, &spec_name) {
+                    withheld += 1;
+                    continue;
+                }
                 errors.push(format!(
                     "{}:{}: target file not found: {}",
                     rel, lineno, path
@@ -142,10 +151,23 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "SPEC-POINTER: clean ({} directive pointer(s) across {} governed source(s), {} version-marker header(s) skipped as naming no path; {} prose citation(s) across {} manifest file(s); every target file tracked and named §heading present)",
-        pointers, scanned, markers, prose_cites, manifests
+        "SPEC-POINTER: clean ({} directive pointer(s) across {} governed source(s), {} version-marker header(s) skipped as naming no path, {} naming a withheld kit SPEC; {} prose citation(s) across {} manifest file(s); every target file tracked and named §heading present)",
+        pointers, scanned, markers, withheld, prose_cites, manifests
     );
     Ok(0)
+}
+
+// spec: canon-kit/SPEC.md §check-spec-pointer — the withheld predicate: the target is a kit root's
+// own SPEC file, that root is a directory here, and only the file is missing. A path naming no
+// resolvable root, or anything other than that root's SPEC, is a dangling pointer as before.
+fn withheld_spec(root: &str, path: &str, spec_name: &str) -> bool {
+    let Some((dir, file)) = path.rsplit_once('/') else {
+        return false;
+    };
+    if file != spec_name || dir.is_empty() {
+        return false;
+    }
+    Path::new(&format!("{}/{}", root, dir)).is_dir()
 }
 
 // spec: canon-kit/SPEC.md §check-spec-pointer — shape-only extraction of the directive lines

@@ -2176,16 +2176,31 @@ that own it (`check-md-refs`, `check-kit-ref-liveness`); ruling only on headings
 of resolvable files is what holds the false-positive rate at the directive
 pass's level.
 
-**The vendored-root prune is what makes a withheld kit SPEC safe, so its opt-out
-now has a consequence.** At the default, a vendored kit root is pruned from this
-gate's corpus, so no consumer battery ever resolves a vendored gate's `# spec:`
-pointer — which is precisely what lets a payload ship the descriptor and publish
-the SPEC section rather than packing the file (gate-sdk/SPEC.md §Consumer
-payload). A consumer who sets `CANON_KIT_SCAN_KIT_ROOTS=1` opts that prune off
-and will meet the withheld SPEC files as dangling pointers. That is stated here
-so the opt-out's cost is read as a boundary rather than discovered as a defect;
-the remedy is the knob's default, or a hand-vendored kit root that carries its
-own SPEC.
+**A *withheld* target is not a dangling one, and the two are told apart by the
+kit root.** A target `<dir>/`*spec name* whose `<dir>` resolves to a directory
+while only the SPEC file is absent is reported as **withheld** and counted on the
+clean line, not as a finding. The live case is a tree that received its kits from
+a payload publishing that file rather than packing it (gate-sdk/SPEC.md §Consumer
+payload): the pointer is correct and its document is reachable, which is already
+what a shipped gate's `# spec:` pointer means there. The discrimination is narrow
+on purpose — a path naming a kit root that does not exist is still a dangling
+pointer, a target present but missing the named heading still reds, and no other
+absent file is excused. Rewriting such a pointer instead would treat a correct
+binding as the defect, and resolving it to a published URL is not available: a
+directive's target is a repo-relative path and the grammar admits no URL form.
+
+**The vendored-root prune and this case cover different halves, and reading the
+prune as covering both is what a consumer's seeded files disprove.** At the
+default a vendored kit root is pruned from this gate's corpus, so a pointer
+**inside** a kit root is never scanned. That says nothing about a pointer
+**into** one from a file outside — the `# contract:` headers on the workflow
+directory's tracked members (gate-sdk/SPEC.md §The workflow directory) are
+exactly such a tier, and an installer seeds them. The withheld case above is what
+covers that half. A consumer who sets `CANON_KIT_SCAN_KIT_ROOTS=1` opts the prune
+off and brings the pointers inside those roots into the corpus; the withheld case
+does not silence a heading fragment they carry, its subject being the target file
+rather than the source. Stated so the opt-out's cost is read as a boundary rather
+than discovered as a defect.
 
 `check-comment-tier` owns the directive's *shape*; this gate adds *resolution*
 on top, the binding a `spec:` pointer makes being only as good as its liveness

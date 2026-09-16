@@ -8264,15 +8264,31 @@ payload was never going to carry.
 
 **Neither withheld member is load-bearing for a consumer.** canon-kit's finders
 prune a vendored kit root by default, opt-out only through
-`CANON_KIT_SCAN_KIT_ROOTS`, so no consumer battery ever resolves a vendored
-gate's pointer (canon-kit/SPEC.md §check-spec-pointer); and a kit's
+`CANON_KIT_SCAN_KIT_ROOTS`, so a pointer **inside** a vendored kit root is never
+scanned (canon-kit/SPEC.md §check-spec-pointer); and a kit's
 `smoke/install.sh` is the copy-vendoring path's installer, which the installer's
 own `init` recipe replaces — `init` derives a kit's consumer config from
 `templates/*-config.sh` and `templates/*-config.knobs` and its queue seed from
 `templates/TASK-QUEUE.md`, reaching `smoke/` for nothing. Beyond size, a kit's
 SPEC is the surface most likely to carry its publisher's own rule content, and
 withholding it keeps a publication decision from riding on the completeness of a
-sweep. **Refused, with its reason on record rather than left to be re-derived:**
+sweep.
+
+**The prune covers pointers inside a kit root and nothing else, and the
+difference is load-bearing.** A pointer **into** a kit root from a file outside
+one is not pruned, and this repository seeds exactly such a tier into a
+consumer's tree: the `# contract:` headers on the workflow directory's tracked
+members (§The workflow directory) name the kit SPEC that rules each file's
+format, and `init` writes two of them while the gap, survey and always-loaded
+arms write more on first use. Those pointers are **correct** — the document they
+name is published rather than packed — so the same rule that makes a gate
+descriptor's `# spec:` pointer resolvable here covers them, and
+`check-spec-pointer` reports such a target as withheld rather than dangling
+(canon-kit/SPEC.md §check-spec-pointer). Stating the prune as the whole of the
+safety would leave a later unit resting on a ground that holds for one half of
+the corpus.
+
+**Refused, with its reason on record rather than left to be re-derived:**
 a generated extract carrying only the sections shipped pointers cite. It buys
 offline reading for a reader the publication already serves, at the standing cost
 of a projection and a freshness gate, and it leaves the publisher's prose in the

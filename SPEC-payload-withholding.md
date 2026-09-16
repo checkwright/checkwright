@@ -474,12 +474,45 @@ knob-default coupling gate.
 
 **The withheld paths (delta 1).** Producer: `git archive`'s pathspec, once per
 packed root. Consumers, named as the readers that would notice their absence: the
-kit-root resolver (delta 4 answers it), `check-spec-pointer` (prunes vendored kit
-roots by default, so it never reads a withheld SPEC — the pruning is the reason
-the withholding is safe and is itself a knob, `CANON_KIT_SCAN_KIT_ROOTS`, whose
-opt-out value a consumer who sets it would meet as dangling pointers; stated so
-the opt-out is not discovered as a defect), `--run-consumer-smoke` (delta 12), and
-the installer smoke's new assertions (delta 8).
+kit-root resolver (delta 4 answers it), `check-spec-pointer` (below),
+`--run-consumer-smoke` (delta 12), and the installer smoke's new assertions
+(delta 8).
+
+**The prune ground, corrected — it was written wider than it holds, and that is
+the more valuable half of the finding.** This amendment rested delta 1's safety
+on *canon-kit's finders prune a vendored kit root, so no consumer battery ever
+resolves a vendored gate's pointer*. What the prune actually covers is a pointer
+**inside** a kit root. It does not cover a pointer **into** one from a file the
+installer seeds **outside** — and `check-spec-pointer` scans exactly such a tier,
+the `# contract:` headers on the workflow directory's tracked members
+(gate-sdk/SPEC.md §The workflow directory). Measured: at the payload-derived
+profile, `init`'s seeded `WORKFLOW-STATE.txt` and `validate-baseline.txt` both
+carry a header naming a kit SPEC, and both reported as dangling. Four more such
+headers are written by the gap, survey and always-loaded arms, appearing the
+first time a consumer runs one. A safety ground stated wider than it holds is
+what a later unit builds on, so the corrected statement goes undated into the
+canonical §Consumer payload rather than living and dying with this file.
+
+**So `check-spec-pointer` gains the withheld case.** A pointer whose target is
+`<dir>/SPEC.md`, where the kit root `<dir>` resolves and only the SPEC file is
+absent, is reported as **withheld rather than dangling** and counted on the clean
+line. A pointer naming a kit that does not exist still reds; a present SPEC
+missing the named heading still reds. The pointer is correct and the document is
+published rather than packed, which is already what a shipped gate's `# spec:`
+pointer means under delta 6 — so this is that rule reaching the one tier the
+prune never covered, not a new licence. Rewriting the headers instead, or having
+`init` rewrite them per tree, both treat a correct pointer as the defect, and the
+second would need the URL form the pointer grammar refuses, undoing delta 6's own
+ruling. **The case is stated in canon-kit/SPEC.md §check-spec-pointer**, undated
+and generic, for the reason the absent-SPEC skip is stated in
+§check-knob-default-coupling: the next reader should meet the distinction rather
+than re-derive it.
+
+**The opt-out keeps its consequence.** `CANON_KIT_SCAN_KIT_ROOTS` re-includes
+vendored kit roots in the corpus, and a consumer who sets it meets the withheld
+SPECs as the pointers *inside* those roots — which the withheld case above does
+not silence, its subject being the target rather than the source. Stated so the
+opt-out is read as a boundary rather than discovered as a defect.
 
 **Three more readers of those paths, found by running the installer smoke rather
 than by reading, and added because this roster is what a later reader trusts.**

@@ -1,0 +1,4 @@
+A kit root that resolves as a directory while its SPEC file is absent — the shape
+a payload leaves behind when it publishes that file instead of packing it. Not a
+governed comment source and not a manifest file, so it joins no corpus of its own
+and the only thing it establishes is that the directory is there.
