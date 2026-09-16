@@ -3407,51 +3407,16 @@
   SPEC at once or not at all, so **THE ANSWER IS OWED TO THE OPERATOR BEFORE THE SLICE THAT LANDS
   THE GATE** and not before any earlier one — it reaches the provenance seam, a privacy boundary
   before it is a design one. Right each time, and the count is the debt.
-  **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile.** It must encode the
-  sanctioned exemption for gate-sdk/SPEC.md §The decisions this substrate already closed (`lead,
-  own-authority` 2026-09-05), which retires only if
-  `provenance-ownership-recording-rule-assigns-into-kit-specs` lands first.
+  **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile.** It ships EXEMPTION-FREE:
+  the gate-sdk/SPEC.md §The decisions this substrate already closed carve-out retired when the
+  operator ruled (2026-09-16, consult) that the recording rule's split discharges the entry that
+  held it open, and that section was swept under delta 1 in the same consult, pointers standing.
   **DISCHARGE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and the gate
   is green", so it survives until this entry lands WHOLE.
   **Cost while deferred:** five published kit SPECs and every adopter's vendored copy carry private
   ruling history as mechanism and pointers a consumer cannot follow; product-class and accreting.
   Filed 2026-09-05 at scope with the split that created it; promoted and demoted 2026-09-06;
   re-promoted at spec and demoted again at build 2026-09-06 for the three-kit slice.
-
-- **provenance-ownership-recording-rule-assigns-into-kit-specs** [design-pending] [cost: iteration/high] [surface: TRAJECTORY.md]
-  — TRAJECTORY.md's recording rule does not merely permit the provenance class the seam sweep
-  removes; at least once it POSITIVELY ASSIGNS a closed ruling's ownership to a kit SPEC, which
-  is the class's stated cause rather than one of its instances.
-  **BOTH ANCHORS ARE RETIRED BY `ruling-record-shrink-to-bau`, 2026-09-09, and the entry is
-  corrected rather than left pointing at deleted prose.** The attested instance was the ruling
-  record's two pointer paragraphs — the Rust-versus-Go refusal and the bash-portability-floor
-  costing, assigned to gate-sdk/SPEC.md §The decisions this substrate already closed "because
-  the component that depends on them must be readable alone". That sweep deleted both, the home
-  carrying them unchanged, so the assignment stands while the paragraph asserting it is gone.
-  **The general rule it quoted went with them**: "a ruling whose mechanism already has a
-  canonical home is registered here with a pointer to that home rather than restated" was the
-  §Where the grounds live sentence, and the admission test that replaced it splits mechanism
-  from provenance in terms — mechanism to the owning kit SPEC with its engineering grounds and
-  undated, and date, authority, channel and refusals to the landing commit. What this entry
-  asked for is therefore ANSWERED IN THE RULE and open only in the tree; whether that is enough
-  is the doctrine call below, and the entry's disposition is next scope's.
-  **Why `[design-pending]`:** the shape is a doctrine call with at least three candidates — the
-  rule gains a clause splitting mechanism from provenance; or a kit SPEC may host a ruling's
-  mechanism while TRAJECTORY.md keeps its stamp; or the readable-alone objection is answered
-  some third way, since it is a real one and a blanket ban would leave a component's dependants
-  unable to read it alone. All three touch what a kit SPEC may contain.
-  **OPERATOR-CLASS WHEN WORKED, and that is why this is filed rather than started.** Reversing
-  the 118-130 assignment reverses a recorded ruling; and the rule reaches the provenance seam
-  itself, which is a privacy boundary before it is a design one. Filed under scope-gated intake;
-  a session picking it up escalates before editing TRAJECTORY.md's rule.
-  **Cost while deferred:** the class's cause stays live, so a swept kit SPEC re-accretes at the
-  next cut that records a ruling with a canonical home — measured once already, two new sites in
-  one iteration from cuts that were not editing provenance. It also holds one carve-out open:
-  gate-sdk/SPEC.md §The decisions this substrate already closed cannot be swept while this
-  stands, so the seam gate must ship an exemption for it (recorded on
-  `kit-spec-provenance-seam-sweep-remainder`, which owns the gate).
-  Filed 2026-09-05 by spec, on the lead's ruling (`lead, own-authority 2026-09-05`) that the
-  carve-out stands and its real fix is the recording rule.
 
 - **bin-tool-help-arm-absent-tree-wide** [design-pending] [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
@@ -4586,5 +4551,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- provenance-ownership-recording-rule-assigns-into-kit-specs
 
 ## Lessons Learned

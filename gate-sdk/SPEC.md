@@ -2714,25 +2714,19 @@ class, which mis-sizes the predicate with nothing red to catch it.
 
 ### The decisions this substrate already closed
 
-Two questions behind the port are settled. Both are recorded here because the
-only surface that ever held them was a queue entry, a compression dropped each,
-and each was then restated from memory rather than read — so this subsection is
-the two of them landing where the component that depends on them can be read
-alone. Reading them does not reopen them, and this section is their only home;
-the authoring rule that would have prevented both losses is stated where it
+Two questions behind the port are settled, and this subsection is where they are
+recorded so the component that depends on them can be read alone. Reading them
+does not reopen them, and this section is their only home; the authoring rule
+that keeps a settled question from being restated from memory is stated where it
 belongs, queue-kit/SPEC.md §check-queue-entry-budget, rather than here.
 
-**The substrate language is Rust — ruled 2026-08-02, final.** The alternative
-weighed and refused is **Go**, on three grounds: larger binaries, poorer memory
-management under a primitive garbage collector, and a weaker compiler. The first
-of those is not a matter of taste here, because footprint is a first-class cost
-under the objectives the trajectory pivot records
-(TRAJECTORY.md §The objectives) and the payload ships one prebuilt binary per
-declared target
-(§Consumer payload), so binary size is paid per target on every adopter's
-machine. The comparison had been made in an earlier session and lost with the
-compression that dropped it; it is written down rather than left to the next
-session's judgement.
+**The substrate language is Rust.** The alternative weighed and refused is
+**Go**, on three grounds: larger binaries, poorer memory management under a
+primitive garbage collector, and a weaker compiler. The first of those is not a
+matter of taste here, because footprint is a first-class cost under the
+objectives the trajectory pivot records (TRAJECTORY.md §The objectives) and the
+payload ships one prebuilt binary per declared target (§Consumer payload), so
+binary size is paid per target on every adopter's machine.
 
 **A bash portability floor was costed and rejected — closed, not deferred.**
 What was costed: shimming or dropping the GNU-only constructs the battery
@@ -2742,13 +2736,13 @@ about 25 files, mostly single call sites, with two shared libraries carrying
 most of the leverage, for an estimated two to four small units. It is rejected
 because it cannot deliver the reach it would be bought for: stock macOS ships
 bash 3.2, which no shim reaches, and `mapfile` / `declare -A` appeared
-in 57 of the 96 checks counted that day — so the floor buys BSD-userland
-tolerance and never a stock-macOS install.
+in 57 of the 96 checks the battery held when it was counted — so the floor buys
+BSD-userland tolerance and never a stock-macOS install.
 
 **That rejection stands on the trajectory pivot, and deliberately not on this
-section's own case for a port.** `native-gate-binary-port` ruled platform reach
-out as a ground for porting, so an argument from reach would contradict the
-entry it sits under. The pivot reinstates reach: it names every major operating
+section's own case for a port.** The port's own case ruled platform reach out as
+a ground for porting, so an argument from reach would contradict the case it
+sits under. The pivot reinstates reach: it names every major operating
 system and makes the non-technical adopter a design constraint (TRAJECTORY.md
 §The objectives, cited above). Read against those, a floor reaching BSD
 userlands but not a stock macOS install fails an objective rather than a
@@ -2760,20 +2754,10 @@ declaring way rather than the shimming one: docs/install.md §Requirements state
 the GNU-userland requirement for the **install path and the probe** and not the
 battery alone, so nothing about that trade is left open here.
 
-The figures above are a **dated measurement, not a live claim** about this tree:
-they record what the floor would have cost when it was rejected. A later session
-must not refresh them against the current battery — a recount is a step toward
-re-deciding, and only the operator reopens a closed ruling.
-
-**This section keeps its two dated rulings by the ruling record's own
-assignment, and a sweep that strips provenance from the rest of this SPEC leaves
-it standing on purpose.** Everywhere else here a rule is stated undated and
-impersonally, because a kit SPEC ships whole to every adopter and this project's
-ruling history resolves to nothing there. These two are the exception the ruling
-record itself creates: it assigns their ownership to this section rather than
-merely permitting it, on the ground that the component depending on them must be
-readable alone. So the survivor is not a miss — and what a future sweep would
-have to move first is that **assignment**, not this section.
+The figures above are a **measurement frozen at the rejection, not a live
+claim** about this tree: they record what the floor would have cost when it was
+rejected. A later session must not refresh them against the current battery — a
+recount is a step toward re-deciding a closed question.
 
 ### The non-gate arm
 
