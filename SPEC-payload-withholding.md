@@ -8,6 +8,21 @@ carries.
 Sited at the repository root: the unit spans `native/`, `gate-sdk/`,
 `installer/`, `docs/` and four kit READMEs, so no single component owns it.
 
+**The seam this unit crosses, ruled.** Kit mechanism: the *shape* of a
+withholding applied per packed root, the *shape* of a resolved pointer, and the
+two knobs that carry them — nothing here names a kit, a section or a host.
+Consumer config: both values. `GATE_SDK_PAYLOAD_WITHHOLD` carries the kit
+convention's own member names as its default because they are gate-sdk's names,
+and stays steerable for a consumer whose spec file is named otherwise;
+`GATE_SDK_SPEC_BASE_URL` is **empty** by default and its value is the
+publisher's, set in this repository's own knob file beside the host
+`GATE_SDK_GRAPH_EXTERNAL_REFS` already carries. Private rule content: none is
+created or moved — and the withholding *reduces* the class, since a kit SPEC is
+the surface most likely to carry its publisher's rule content and it stops
+travelling in customer trees. Provenance: the grounds below stand undated in the
+merged kit SPEC, as engineering grounds; no dated stamp, ledger pointer or queue
+slug goes with them.
+
 **Ordering.** `SPEC-installer-front-door.md` relocates five of the sections this
 amendment edits — §The packer, §The gate binary, §The manifest, §What init seeds
 and §The consumer smoke — out of `installer/README.md` and into

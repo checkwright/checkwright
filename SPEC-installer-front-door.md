@@ -10,6 +10,16 @@ Sited at the repository root: the sweep the split costs spans `native/`,
 `gate-sdk/`, `installer/`, `docs/`, `.github/`, `.workflow/` and the root
 manifests, so no single component owns it.
 
+**The seam this unit crosses, ruled.** Nothing here is kit mechanism: every
+surface it touches — `installer/`, the package roster, this repository's own
+docs and layout pointers — is repo-root-governed consumer content, and no kit
+SPEC, knob, gate or template acquires a literal from it. The one place the seam
+is *tested* is delta 5: naming a non-kit component's record `SPEC.md` puts it in
+the governed spec glob, and the ruling there is that the glob's reach is a
+mechanical fact while the provenance seam's subject stays a **kit** SPEC — so the
+record keeps the dated operator stamps it legitimately carries. No consumer
+config is minted and no knob is added.
+
 **Ordering.** This amendment and `SPEC-payload-withholding.md` edit the same
 passages — that amendment rewrites five sections this one relocates. Landing this
 one **first** costs one uniform sweep; landing it second costs authoring those
