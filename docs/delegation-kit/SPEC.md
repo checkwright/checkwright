@@ -159,6 +159,44 @@ stays evidence-kit's — the predicate, the PID-reuse residual and the refused T
 are ruled in evidence-kit/SPEC.md §The producer-liveness lock and are not
 seconded here. delegation-kit owns *when a session waits and on what*.
 
+**Which children owe a record is the second half of that ownership statement,
+and the template draws the line rather than pointing at it.** A record states
+that something is mutating shared files, so a child that writes nothing owes
+none: a wait loop and a read-only pipeline are **observers**, and only a
+**producer** — a child writing anything a later reader must not race — takes the
+launch record. guard-kit already draws the same line mechanically, exempting an
+inline wait loop and a read-only pipeline from its launch refusal
+(guard-kit/SPEC.md §The generic ruleset). The template was nonetheless the
+surface out of step, and it was out of step because it delegated the question
+**by pointer** — handing the guard "the shapes that owe no record" without
+saying what they are, so a reader of the template alone could not derive the
+exemption the guard would grant it. Read literally, an obligation over *every*
+shell child obliges a record of the mandated wait primitive, which is itself a
+shell child; where that waiter's condition is one the record set can falsify,
+the record makes the condition unsatisfiable and the only thing still blocking
+the loop is the loop. Attested against three consumers of one record set at once
+— the stage-entry preflight, rule 14's tracked-tree block, and the turn-end
+liveness hook — which is also what refuses the reader-side repair: teaching one
+reader to ignore a record whose run key names the stage being entered fixes one
+consumer of three and leaves the other two holding the same record. Refusing the
+self-naming record at **write** time is guard-kit's surface and has already
+shipped there as that exemption, so restating it here would be a second
+implementation of a decided thing.
+
+**The residual that exemption cannot reach gets an authoring check, and its want
+of an oracle is stated rather than hidden.** The exemption sees a wait loop only
+when it is spelled **inline**; guard-kit states that limit and accepts it, on the
+ground that the record costs a waiter nothing it does not already carry — rule 14
+holds tracked-tree mutations for the waiter's lifetime, which the producer it
+waits on already holds. That ground is sound for a waiter waiting on a
+**producer** and unsound for a waiter waiting on anything else: the attested
+instance waited on a **stage-entry precondition**, where no producer held
+anything and the waiter's own record was the only thing blocking the condition.
+So the template asks a recorded wait one question — can my own record falsify my
+condition — and nothing stands behind it as an oracle. The guard cannot read a
+wait's condition at `PreToolUse`, and the wedge's signature, a loop that never
+exits, is indistinguishable from a producer that is genuinely slow.
+
 **The record's name is a convention, and what the convention buys is a derivable
 set.** It is written as `<scratch-dir>/<key>.run`, carrying the same `pid=<n>
 run=<key>` line — the filename's `<key>` is that record's own `run=` value, not
@@ -464,6 +502,36 @@ the consumer configures no lock-reason pattern, so a guard-side sweep would be
 resting on optional consumer config to avoid destroying a sibling's checkout —
 an argument against moving it here even now that the signal exists.
 
+**The reap is owed at the dispatching session's own turn end, and that
+obligation is not a reversal of the refusal above.** What is refused is a sweep
+**in the dispatch guard**, on the two grounds just stated, and neither reaches a
+session reaping what it minted. The first is silent, because the subject is a
+**session** and not a verdict surface. The second inverts: a dispatch-time sweep
+runs while sibling dispatches are in flight, so its predicate would have to
+establish that a worktree belongs to no live child and a wrong guess destroys a
+running sibling's checkout — while a dispatcher at its own turn end is past every
+child it started this turn and is scoped to trees it minted, so it needs no
+predicate about a sibling's liveness and takes no action outside its own set. The
+property the iteration boundary was credited with, running at a moment whose
+definition is that the work is finished, is what moves earlier rather than what
+weakens. The boundary refusal stays the **backstop**, and what the obligation
+buys is **latency** rather than a newly caught class: the refusal already catches
+the harm, and the obligation shortens an orphan's carry from every session left
+in the iteration to one turn.
+
+**No new oracle is owed over that turn end, and the reason is the predicate
+rather than the budget.** `SubagentStop` does see a dispatched session's turn end
+and the turn-end liveness hook already refuses there, so the event is reachable —
+but a worktree carries no attribution to the ending session without the
+consumer's optional lock-reason configuration, so a refusal keyed on `git
+worktree list` would refuse a dispatcher for a concurrent session's live tree, at
+the most expensive moment to be wrong. **Registering the worktree for a later
+sweep is ruled out** on the launch record's own reasoning: `git worktree list` is
+already the registry, so what is missing is attribution and judgment rather than
+discoverability, and a record written by the dispatcher would share the reap's
+structural uncheckability — a session that skips the reap writes no record
+either, so there is no absence a check could have been told to expect.
+
 **`worktree.baseRef` is vendor configuration, and choosing it is the consumer's
 job.** The template's **Isolation charges four harness costs, and paying them
 is the parent's job** rule names the knob and both of its values rather than a
@@ -635,6 +703,37 @@ requires of every block message.
 and the kit ships no agent-type names. An inert D2 reports nothing; it is a
 hook, not a gate, so there is no clean line to print. Stated here so a consumer
 does not infer coverage it has not configured.
+
+**D2 composes with isolation's untracked-blindness cost, and the composition is
+stated in the protocol template because that is where a dispatcher reads it.**
+Isolation's third cost rules a sweep whose corpus includes an untracked or
+gitignored surface undelegable to an isolated agent, and its remedy reads as
+*dispatch it unisolated instead* — which, for a type in
+`DELEGATION_KIT_READONLY_TYPES`, is exactly the shape D2 blocks. Both rules are
+this kit's, their composition was stated on neither surface, and the consequence
+is that such a sweep is not delegable **at all** to a read-only type while the
+protocol never says so. Attested: a roster read delegated under that mandate
+reported "absent" for four surfaces that carried content, and a session trusting
+the numbers would have cleared nothing and reported clean. The **child's** half
+was missing with it — the sibling fourth cost tells a child that an unreadable
+gate verdict is the expected reading rather than a defect to repair, and the
+third cost carried no such clause, so an isolated child asked to read a
+gitignored path reports **absence** as a finding, which is the exact shape a
+parent cannot tell from a true empty. With an empty roster the *not delegable at
+all* clause is simply never reached, which is the correct inert behavior and
+needs no second knob to express.
+
+**Two candidate owners were weighed and both refused.** *At this guard*: the
+payload carries `subagent_type`, `isolation` and prompt text and never the
+sweep's corpus, so a rule here would have to key on whether the prompt "names a
+path" — which D3's own design already rules out as firing on the word and
+teaching dispatchers to game the wording, buying a green hook and no channel.
+*At a consumer's own roster emitter*, where such a derivation already takes a
+per-path ignore verdict and drops it before printing: it would work, and it
+would repair one instance of a general class while leaving the class open, since
+a delegable sweep's corpus is frequently not that roster. The constraint
+therefore belongs where the dispatcher reads its protocol, and the narrower
+emitter-side repair stays available rather than being absorbed here.
 
 **D3 advises rather than blocks**, and both halves are deliberate. It cannot
 block: a nested dispatch is legitimate and common — a stage session's own
@@ -878,6 +977,29 @@ actual defect, one keyword, shipped in all four carriers. The fifth firing's own
 lesson generalizes past this rule: an operative restatement propagates a rule's
 **wording**, so a defect in the wording is propagated with it, and N carriers make
 N copies of the bug rather than N chances to catch it.
+
+**The obligation fired a sixth time, and this firing is the one the fifth
+predicted.** The waiting rule changed again — the record obligation split into
+producer and observer, and a recorded wait acquired a self-deadlock check — and
+both `.claude/agents/` carriers held the rule in its *unconditional* form, which
+is to say both held the same defect the change repairs. That is the fifth
+firing's lesson observed rather than inferred. Two mechanics of the propagation
+are worth recording because they are what kept it honest: the carrier set was
+re-derived by grepping the rule's phrasing at the merge rather than read off this
+section's record of it, and each carrier again took an addition sized to its own
+voice rather than a paste, with none of the refused alternatives above riding
+along — (b)'s line.
+
+**A second rule of the same change was ruled *out* of residency, and the ruling
+is recorded beside the propagation so the two are not read as one sweep.** The
+turn-end worktree reap binds a session that **has dispatched**, and such a
+session loads `templates/agent-execution.md` through its own trigger, so
+condition (a) fails and the rule stays template-tier — the same reading this
+section records for the provenance floor. The isolated child's blindness clause
+goes the other way and qualifies on its own (a)–(c) reading: it binds a
+dispatched read-only agent, which fires no trigger that loads the template, and
+the carrier already stating the sibling gate-unavailability clause takes the new
+one beside it.
 
 **No gate is owed *over the act*, and not for budget — but one is now owed over
 its harm, and it exists.** No check can read a session's choice to end a turn:

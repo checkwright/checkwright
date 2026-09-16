@@ -12,40 +12,6 @@
 
 ## New Features
 
-- **wait-record-self-deadlock** [spec: SPEC-dispatch-obligations.md] — a backgrounded **wait**
-  that registers itself as a producer makes its own exit condition unsatisfiable, and blocks
-  every concurrent session's commits while it spins. Attested live 2026-08-26 against three
-  consumers of one record: the validate entry pre-flight, guard-kit rule 14's tracked-tree
-  block, and 21 `SubagentStop` refusals in `.workflow/subagent-stop-liveness.log`.
-  **Ruled:** state the producer/observer split in the agent-execution rule itself instead of
-  delegating it to guard-kit by pointer; the two reader-side alternatives are refused in the
-  amendment. Deltas 1 and 2, plus delta 5's carrier propagation.
-
-- **worktree-reap-unasserted-at-dispatching-turn-end** [spec: SPEC-dispatch-obligations.md] —
-  nothing asserts the worktree reap at the DISPATCHING session's own turn end, so an orphan
-  minted mid-iteration survives every later session until an iteration boundary meets it;
-  measured at six sessions of carry on the 2026-09-06 sighting.
-  Shape three of the retired `worktree-lock-pid-is-not-agent-liveness`, ruled out of that
-  unit's ENVELOPE and not refuted — operator, 2026-09-06, through an interactive prompt in the
-  lead session, relayed by the lead — which is the live trigger that put it in Deferred rather
-  than the icebox (`lead, own-authority`, 2026-09-06).
-  **Ruled:** the reap is owed at the dispatcher's own turn end, scoped to trees it minted;
-  the amendment carries its clearance of the standing dispatch-time-sweep ruling. Delta 3.
-
-- **delegated-read-blind-to-gitignored-capture** [spec: SPEC-dispatch-obligations.md] — a
-  worktree-isolated read-only agent cannot see any gitignored capture surface, so a delegated
-  close-surface read reports "absent" for a file that has content, and the delegation is
-  **mandated** rather than optional by the dispatch guard's D2 rule. Attested at a close that
-  would have dispositioned four surfaces as absent and reported clean. The recorded line
-  counts are deliberately gone: they are live capture logs and re-measure differently every
-  session, which is itself why the delegated reading cannot be trusted.
-  DISTINCT from `close-surface-row-absent-reads-as-empty`, which is that the ROSTER prints
-  empty and absent identically; this one is that a delegated READER cannot tell content from
-  absence at all.
-  **Ruled:** the constraint is stated in the protocol template — neither the roster emitter
-  nor the dispatch guard — with a child-side clause on isolation cost (4)'s pattern; the
-  roster-side print is filed separately. Delta 4, plus delta 5's carrier propagation.
-
 ## Technical Debt
 
 ## Deferred
@@ -4444,5 +4410,9 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- wait-record-self-deadlock
+- worktree-reap-unasserted-at-dispatching-turn-end
+- delegated-read-blind-to-gitignored-capture
 
 ## Lessons Learned

@@ -78,14 +78,25 @@ batch-specific pointers such as the journal path.
   `until kill -0 "$pid"` inverts it and the loop exits at once, clean, with the
   producer still running; that is the attested failure, not a fault of the
   primitive. An `Agent` you dispatched is awaited by its completion notification and
-  never by a path on disk; a shell child is awaited on the liveness record **you
-  write at its launch** — its PID, one line `pid=<n> run=<key>`, in a file named
-  `<key>.run` in repo-local `.tmp/` in the main checkout, never a temporary
-  worktree and never a system temp dir — and your wait is a loop on that recorded
-  PID's liveness, never a pattern match, whoever started the
-  producer. Launch and record in one call, in the spelling guard-kit's rule
+  never by a path on disk. A shell child splits two ways. A **producer** — one
+  that writes anything a later reader must not race — is awaited on the liveness
+  record **you write at its launch**: its PID, one line `pid=<n> run=<key>`, in a
+  file named `<key>.run` in repo-local `.tmp/` in the main checkout, never a
+  temporary worktree and never a system temp dir; your wait is a loop on that
+  recorded PID's liveness, never a pattern match, whoever started the producer.
+  An **observer** — a wait loop, a read-only pipeline, anything that writes
+  nothing — **writes no record**: a record says something is mutating shared
+  files, so registering a waiter blocks every session's tracked-tree mutations
+  and can leave the waiter's own exit condition unreachable. Launch and record in
+  one call, in the spelling guard-kit's rule
   *Backgrounded launch that records no producer* grants
-  (guard-kit/SPEC.md §The generic ruleset). Leave the record behind when you go: `check-producer-liveness
+  (guard-kit/SPEC.md §The generic ruleset), which exempts an **inline** wait loop
+  and a read-only pipeline from the record; spell a wait inline so it meets that
+  exemption. **A wait that must take a record owes one check before it starts:
+  can my own record falsify my condition?** A condition that reads the record
+  set, directly or through a gate that does — a stage entry, a commit, any
+  tracked-tree write — can never go true; respell the wait inline, or wait on the
+  artifact itself. Leave the record behind when you go: `check-producer-liveness
   <record>` reads it unchanged and `check-producer-liveness .tmp` reads the whole
   set, so whoever arrives next can still tell whether your orphan is writing.
   **Delete it once its producer has exited, and not before** — while it names a

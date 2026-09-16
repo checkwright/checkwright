@@ -11,12 +11,14 @@ For a **deletion, rename, or heavy cross-spec audit** dispatch, also load the
 mechanical pre-flight in [dispatch-checklists.md](dispatch-checklists.md) — a
 reach-through, not a change to this protocol; every rule below still applies.
 
-Two bullets below — **Background + notification, never poll** and **Findings you
-will act on are durable before you act on them** — bind a dispatched role that
+Three passages below — the **Background + notification, never poll** and
+**Findings you will act on are durable before you act on them** bullets, and the
+child-side clause of isolation cost **(3)** — bind a dispatched role that
 fires no trigger loading this template, so each is also stated as a bare
 imperative in the consumer's always-loaded agent definition under
 delegation-kit/SPEC.md §Operative residency. That copy is sanctioned rather than
-drift: do not delete it on sight, and when either rule changes here, propagate.
+drift: do not delete it on sight, and when any of the three changes here,
+propagate.
 
 - **Supervisor owns rulings; agents surface, never guess.** SECURITY and design
   rulings (e.g. a privileged caller set, a naming collision) are decided by the
@@ -76,19 +78,37 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   reachable.** An **`Agent` dispatch** is awaited by its **completion
   notification** — that record is the harness's, not the session's — so never go
   looking for it on disk. A **shell child** has no notification channel of its
-  own, so it is awaited on an artifact *the session placed*, and that artifact is
-  named: **record the child's PID at launch**, one line in the form
-  `pid=<n> run=<key>`, in a file named **`<key>.run`** — the same `<key>`, so the
-  name carries no field the line does not — written where the **Resume journal —
-  agent writes, scratch reset sweeps** bullet below sends a journal, repo-local
-  gitignored scratch in the main checkout, on that bullet's stated survivability
-  grounds — widened here from the journal to any artifact a session waits on.
+  own, so it is awaited on an artifact *the session placed*, and which artifact
+  depends on what the child **is**. A **producer** — a child that writes anything
+  a later reader must not race — is awaited on a **liveness record you write at
+  its launch**, one line in the form `pid=<n> run=<key>`, in a file named
+  **`<key>.run`** — the same `<key>`, so the name carries no field the line does
+  not — written where the **Resume journal — agent writes, scratch reset sweeps**
+  bullet below sends a journal, repo-local gitignored scratch in the main
+  checkout, on that bullet's stated survivability grounds, widened here from the
+  journal to any artifact a session waits on. An **observer** — a wait loop, a
+  read-only pipeline, anything that writes nothing — **writes no record**,
+  because a record states that something is mutating shared files and a waiter is
+  not. Registering a waiter is not a harmless surplus: while a record names a live
+  PID it blocks every tracked-tree mutation in *every* session, so a waiter that
+  records itself can make its own exit condition unreachable and wedge its
+  concurrent siblings at the same time.
   **Launch and record in one call, in the spelling the guard grants**: guard-kit's
   rule *Backgrounded launch that records no producer* (guard-kit/SPEC.md §The
-  generic ruleset) owns it, along with the shapes that owe no record. It refuses
-  any other launch that writes no record, and a record written in any other
-  spelling costs a permission decision on its `$!`.
-  That record *is* the wait target: loop on its PID's liveness —
+  generic ruleset) owns the spelling and enforces the same producer/observer
+  split, exempting an **inline** wait loop and a read-only pipeline from the
+  record. It refuses any other launch that writes no record, and a record written
+  in any other spelling costs a permission decision on its `$!`. Spell a wait
+  inline so it meets that exemption; a wait behind a script or binary name is
+  invisible to the guard's span walk and takes the record like any launch.
+  **A recorded wait owes one check before it starts: can my own record falsify my
+  condition?** Such a wait is only safe where its condition is independent of the
+  record set. A condition that *reads* the record set, directly or through a gate
+  that does — a stage entry, a commit, any tracked-tree write — is falsified by
+  the waiter's own record and can never go true. Two lawful answers: respell the
+  wait inline so it owes no record, or wait on the artifact itself rather than on
+  the gate that reads the record set.
+  A producer's record *is* the wait target: loop on its PID's liveness —
   `while kill -0 "$pid" 2>/dev/null; do sleep N; done`, on the polarity rule above
   — and the loop ends when the PID stops answering. Write it at the launch, not after, and leave it
   behind — a completion marker answers *is it done* to a live observer, and the
@@ -174,15 +194,21 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   and says so**, and never falls back to the dispatch prompt's own paraphrase of
   it. **(2) The worktree lands inside the repo and untracked**, so an in-flight
   isolated agent reads as a dirty tree and aborts every clean-tree precondition —
-  a consumer smoke, a packaging step, any commit. Gitignore the path, and reap
-  agents at the boundary with `git worktree list` rather than off `git status`:
-  once ignored, the status is clean while the worktree still stands. The
-  harness's auto-clean is best-effort, so the reap is **enforced** — the
-  iteration boundary refuses to enter while any linked worktree exists
-  (lifecycle-kit/SPEC.md §bin/enter-stage.sh). Reap **both** halves: `git
+  a consumer smoke, a packaging step, any commit. Gitignore the path, and **reap
+  what you minted at your own turn end**, by `git worktree list` rather than off
+  `git status`: once ignored, the status is clean while the worktree still
+  stands. Your turn end is the earliest moment the reap is *sound* — reclamation
+  is tied to the child's own return, so by then every child of this turn has
+  returned and the harness's best-effort auto-clean has either fired or failed —
+  and the last moment it is *informed*, because the only party who knows what a
+  tree was for is the session that minted it. Reap **both** halves: `git
   worktree remove` clears the directory and leaves the agent's branch ref
   standing, so delete that ref in the same motion, or the refusal clears while
-  the refs accrete unseen. **And the pid in a worktree's lock reason is the
+  the refs accrete unseen. Reap **your own** trees, never every tree you can
+  see: a concurrent session's checkout is live work, and the iteration-boundary
+  refusal — which refuses to enter while any linked worktree exists
+  (lifecycle-kit/SPEC.md §bin/enter-stage.sh) — stays the **backstop**, not the
+  schedule. **And the pid in a worktree's lock reason is the
   harness's, not an agent liveness signal.** Where a harness locks the tree it
   writes its own supervising process's pid there, not the dispatched agent's:
   that process is alive for as long as your session is and carries the same pid
@@ -193,9 +219,19 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   by that pid.
   **(3) An isolated child sees only committed state.** Untracked and gitignored
   files are in no commit, so no base ref reaches them and naming a rev does not
-  help. **A sweep whose corpus includes an untracked surface is not delegable to
-  an isolated agent**: read that surface yourself, or pass its content in the
-  prompt.
+  help. **A sweep whose corpus includes an untracked or gitignored surface is not
+  delegable to an isolated agent**: read that surface yourself, or pass its
+  content in the prompt. **For a type the dispatch guard's D2 rule holds to
+  isolation, that means not delegable at all** — D2 blocks such a dispatch
+  without `isolation: worktree`, so the escape this rule otherwise offers,
+  dispatching the same sweep unisolated, is the one shape that cannot be spelled.
+  Classify the corpus before you dispatch rather than after you read the answer;
+  `git check-ignore` decides it. **And the child's side of it, on cost (4)'s
+  pattern:** a target absent inside isolation because it is untracked or
+  gitignored is a **blindness**, never a finding of absence — name the path, say
+  it was unreadable at this rev, and return. A parent cannot tell a reported
+  absence from a true empty, so the distinction has to be drawn where it is
+  known.
   **(4) A gate dispatched to a compiled binary does not resolve inside an
   isolated worktree, and the lawful response is to report it, never to build
   one.** Build output is gitignored and in no commit, so by (3) a fresh worktree
