@@ -157,19 +157,67 @@ consumer who adds their own kit to the value keeps it — and `init` reports the
 edited seam rather than overwriting it, which is the existing discipline for a
 surface whose whole purpose is to be edited.
 
-### (5) A red gate names its own invariant at the point of the block
+### (5) A red gate presents its own invariant at the point of the block
 
-The runner prints the failing gate's descriptor `# spec:` line beside its `FAIL:`
-line. {design-bearing}
+The runner prints the failing gate's descriptor `# spec:` line beneath its
+`FAIL:` line, on every red, in every tree. {design-bearing}
 
-The second shipped member's reason is that a gate going red without an
-explicable invariant is an unactionable block, and an unactionable block is how a
-blocking gate turns into a bypassed one. The `.gate` descriptor ships and its
-`# spec:` line already carries both the pointer and a one-line statement of the
-invariant; nothing has ever printed it. Printing it is what keeps the member's
-reason met once the SPEC file is withheld — and meets it better than the present
-arrangement, where the invariant is reachable only by opening a file the adopter
-must first go and find.
+**The gap this closes is presentation, not reach, and the distinction is
+load-bearing.** The invariant is *not* unreachable and never becomes so: the
+`.gate` descriptor ships, `checks/` is not withheld by delta 1, and the
+descriptor's `# spec:` line carries the pointer and a one-line statement of the
+invariant after its em-dash. What is missing — today, in this repository, and
+independently of anything delta 1 does — is that nothing **presents** it at the
+moment a gate blocks a commit; it is reachable only by a detour the blocked
+author has to think to take. So delta 1 does not create this gap and does not
+break the second shipped member's reason. What delta 1 changes is the **cost of
+the detour**: the file at the end of it stops being in the tree. An amendment
+claiming otherwise would hand the next reader a premise one `head` of a `.gate`
+file refutes, so the claim is stated at the width it actually holds.
+
+It is worth closing at that narrower width because an unactionable block is how a
+blocking gate turns into a bypassed one, and this repository's standing rule is
+that a red gate is fixed and never bypassed. A remedy that arrives with the block
+is what keeps that rule cheap to follow.
+
+**The reach is wide — every red, every tree — and that is a recorded lead
+decision of this iteration rather than a ruling or an operator direction; a later
+scope or spec may revise it.** With the premise corrected, the narrow form
+(printing only where the SPEC is withheld) buys nothing: it would condition an
+output line on a payload property, leaving this repository's own battery output
+and a vendored tree's gratuitously different, and it would make the one surface
+that proves the behaviour — this tree's battery — the one surface that never
+exercises it.
+
+**Three coupled readers, enumerated by probe, so build does not meet them at
+validate.** The producer is the runner's `tail` field, formatted at each of its
+three `FAIL:` sites; the new line attaches there. Probe for the readers:
+`grep -rn 'FAIL: ' --include=*.rs --include=*.sh` over `native/src`,
+`gate-sdk/lib`, `gate-sdk/bin` and `installer`. Each reader's condition differs,
+and reading them as one rule is how two of the three get missed:
+
+- **The gates-log adapter** keys on the exact prefixes `"  PASS: "` and
+  `"  FAIL: "` — two leading spaces — and takes the gate name as the line's
+  second whitespace-delimited token. Its own fixture asserts that a line indented
+  otherwise maps to nothing. So its condition is on the **prefix**, and is not
+  the weaker *use a separate line*: a separate line beginning with those two
+  spaces would emit a scenario for a gate that never ran. Satisfied by a line
+  that misses both prefixes.
+- **The overhead meter** holds a `contains`-based marker table in which
+  `FAIL: check-` classifies a transcript line as gate output. Its condition is
+  therefore on **content, not position**: an extra line carrying that substring
+  would inflate a measurement wherever it appeared. Satisfied because the new
+  line carries the descriptor's `# spec:` body and not a verdict.
+- **The demo excerpt** quotes a reddened gate's block from its
+  `===== <gate> =====` header and **terminates on a line containing
+  `FAIL: <gate>`** — its stated purpose being that the reader sees the finding
+  and the help line rather than being told they exist. Its condition is on
+  **order**, and it is the one reader this delta cannot satisfy by staying out of
+  the way: printed beneath the verdict, where a reader wants it, the new line
+  falls outside the excerpt and the demo silently stops showing the remedy it
+  exists to show. **So this reader changes**: the excerpt's terminator moves past
+  the invariant line, and its fixture moves with it. That is the delta's one
+  non-trivial coupling, and it is named rather than discovered.
 
 What this does **not** claim: the descriptor's one line is not the SPEC section.
 It is the actionable statement of what the gate holds, which is what an adopter
@@ -380,12 +428,24 @@ reached in a vendored tree, and the assertion that would otherwise go unwitnesse
 — the resolved set matching the manifest — is delta 8's second assertion, which
 reds on a count rather than on a verdict.
 
-**The failure line (delta 5).** Producer: the runner, on each `FAIL:`. Consumer:
-the adopter at a blocked commit, and the installer smoke's value arm, which
-already records the battery's verdict on one crafted defect and therefore reads
-the new line. The descriptor's `# spec:` line is present on every shipped gate
-descriptor by the self-lint contract, so the producer has a value to print for
-every member; a descriptor carrying none is already a red before this delta.
+**The failure line (delta 5).** Producer: the runner, on each `FAIL:`, in every
+tree — the reach delta 5 records, so the producer is unconditional and this
+repository's own battery is the surface that exercises it. Consumers: the adopter
+at a blocked commit, and the installer smoke's value arm, which already records
+the battery's verdict on one crafted defect and therefore reads the new line. The
+descriptor's `# spec:` line is present on every shipped gate descriptor by the
+self-lint contract, so the producer has a value to print for every member; a
+descriptor carrying none is already a red before this delta.
+
+**The roster-holding readers of the surface that line lands on, each with its own
+red condition.** Three readers parse the run log's verdict lines, and the delta
+body enumerates them with the probe that found them. Their conditions are on
+three different properties — prefix, content and order — which is why the roster
+is stated as three rather than as one rule about separate lines. Two are
+satisfied by the new line's shape and **one changes**: the demo excerpt's
+terminator, whose red condition is that a reddened gate's quoted block no longer
+ends at the remedy. That reader's fixture is the oracle for the change, and it is
+listed as an update target below.
 
 **Enumerable corpus, each member's satisfying value (delta 9).** The corpus is
 the markdown links from a kit README to that kit's own `SPEC.md`. Probe: an
@@ -424,7 +484,13 @@ claims.
   and 6).
 - `gate-sdk/SPEC.md` §Consumer smoke — the refusal on a root shipping no
   `smoke/install.sh` gains its vendored-tree cause (delta 12).
-- `gate-sdk/SPEC.md` §run-gates — the failure line's content (delta 5).
+- `gate-sdk/SPEC.md` §run-gates — the failure line's content, and the verdict
+  line's prefix stated as **reserved**, three readers now parsing it (delta 5).
+- `gate-sdk/SPEC.md` §Consumer smoke — the demo excerpt's terminator, which moves
+  past the invariant line so a quoted block still ends at the remedy, and the
+  fixture asserting the excerpt's shape (delta 5). This is the delta's one reader
+  that changes; the other two are satisfied by the new line's shape and are
+  recorded in the delta body rather than here, having nothing to update.
 - `installer/README.md` §The packer — the withheld shape, the narrowed
   pre-flight, and the footprint's second ground (deltas 1, 2 and 3).
 - `installer/README.md` §The gate binary — the knob seam's unconditional
@@ -482,6 +548,11 @@ claims.
 - [ ] **The withholding is witnessed** — the installer smoke's two new
       assertions run and pass against a freshly packed payload, and the
       resolved kit-root set in that scratch consumer names all eleven kits.
+- [ ] **The verdict line's three readers are re-probed, not assumed** — the
+      delta 5 grep is re-run at merge and yields the same three; the demo
+      excerpt quotes a reddened gate's block through its remedy; and
+      `--emit parse-gates-log` over a log carrying the new line emits one
+      scenario per gate that actually ran.
 - [ ] **The provenance seam holds in the merged text** — no dated stamp, no
       ledger pointer and no queue slug reaches a kit SPEC; the withholding's
       grounds stand undated as engineering grounds.
