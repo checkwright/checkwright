@@ -1014,14 +1014,21 @@ excluded row prints its **cause** in place of the class, because the class
 is inclusion evidence and decides nothing once a categorical exclusion has
 settled the row. The cause names the exclusion class, decided in this order — the
 `[roadmap:]` tag; a `not-icebox-eligible:` declaration (§The tag algebra),
-printed as `[standing] not-icebox-eligible <date> — <grounds>`, a line with no
-date as `(undated)` and one with no grounds as `(ungrounded)`; a dated
+printed as `[standing] <date> — <grounds>` — the declaration's own lead token
+is dropped because the `✗` mark and the `[standing]` class token both already
+say it, and the four class tokens read uniformly as a result; a line with no
+date renders `(undated)` and one with no grounds `(ungrounded)`; a dated
 `recurrence:` declaration; or the first live slug named in file order, which
 stands for the class rather than enumerating it. A cause someone wrote about the
 entry outranks a trigger the arm infers, which is why the declaration precedes
-the two inferred triggers. Every cause prints under one fixed character cap,
-so a long grounds clause shows its head, and the self-naming line is one
-anchored grep away. A slug counts as *named*
+the two inferred triggers. Every cause prints its **class prefix whole** and
+caps only its **variable tail**, so a long grounds clause or a long slug shows
+its head while the class that decides the row is never the thing cut. Two of
+the four causes have no variable part and can never be cut at all. The cap is
+a module constant rather than a knob: `QUEUE_KIT_ATTEND_CAP` budgets tokens on
+the always-loaded brief, and this worklist is read once at close and budgets
+nothing standing. A tail that is cut is one anchored grep on the row's own
+slug away from the line that wrote it. A slug counts as *named*
 only where it stands as a whole token, the neighbouring bytes falling outside the
 slug alphabet: a substring hit inside a longer slug is a different entry, and
 holding a row against it would invent a trigger nobody wrote.

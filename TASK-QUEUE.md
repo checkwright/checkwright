@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **icebox-standing-cause-truncated-on-board** [spec: SPEC-arm-fidelity.md] — the cause cap.
-  — `--icebox-candidates` prints about three characters of a standing row's grounds.
-  An ineligible row's reason is capped at `CAUSE_CAP`, 48 characters
-  (native/src/emit/queue_index.rs), and the fixed prefix `[standing] not-icebox-eligible <date> — `
-  spends 44 of them, so a declared row shows its date, three characters and an ellipsis.
-  **Re-measured at spec, rev `b2bcd457`:** FIVE standing rows now render, every one cut to three
-  characters and an ellipsis (`wit…`, `evi…`, `liv…`, `liv…`, `ado…`). The cap touches no cost
-  text: an eligible row prints its cost class whole, so only the reasons are cut.
-  **Printed format ruled at spec (delta 2):** BOTH candidate repairs, as one rule — the prefix
-  loses the `not-icebox-eligible` token the `✗` mark and the `[standing]` class token already say,
-  and the cap binds each cause's variable tail rather than its fixed class prefix.
-  **Cost while deferred:** a close reviewing the standing declarations pays one anchored grep per
-  declared row to read grounds the worklist was meant to show, growing with the declarations.
-  Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the printed-format ground.
-
 ## Technical Debt
 
 ## Deferred
@@ -4502,5 +4487,6 @@
 - entry-history-reads-live-entries-only
 - retired-block-admits-live-gate-name
 - queue-counts-reports-no-tag-breakdown
+- icebox-standing-cause-truncated-on-board
 
 ## Lessons Learned

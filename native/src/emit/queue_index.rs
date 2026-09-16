@@ -457,9 +457,11 @@ fn has_date(line: &str) -> bool {
 
 // spec: queue-kit/SPEC.md §The icebox tier — the categorical half of the eligibility rule; §The
 // queue-index arm owns the 2026-08-24 reopening that moved it here.
-fn ineligibility(e: &Pending, live: &[String]) -> Option<String> {
+// spec: queue-kit/SPEC.md §The queue-index arm — a cause is its fixed class prefix, which prints
+// whole, and its variable tail, which is the only part a caller may cap.
+fn ineligibility(e: &Pending, live: &[String]) -> Option<(String, String)> {
     if e.lead.contains("[roadmap:") {
-        return Some("[roadmap] tag — not icebox-eligible".to_string());
+        return Some(("[roadmap] tag — not icebox-eligible".to_string(), String::new()));
     }
     // spec: queue-kit/SPEC.md §The queue-index arm — a written standing cause outranks an inferred trigger
     for line in e.body.lines() {
@@ -470,7 +472,7 @@ fn ineligibility(e: &Pending, live: &[String]) -> Option<String> {
     for line in e.body.lines() {
         let t = line.trim_start();
         if t.starts_with("recurrence:") && has_date(t) {
-            return Some("[recurrence] dated re-filing — live trigger".to_string());
+            return Some(("[recurrence] dated re-filing — live trigger".to_string(), String::new()));
         }
     }
     for s in live {
@@ -478,20 +480,20 @@ fn ineligibility(e: &Pending, live: &[String]) -> Option<String> {
             continue;
         }
         if names_slug(&e.body, s) {
-            return Some(format!("[trigger] names live slug {}", s));
+            return Some(("[trigger] names live slug ".to_string(), s.clone()));
         }
     }
     None
 }
 
-fn standing(rest: &str) -> String {
+fn standing(rest: &str) -> (String, String) {
     let fields: Vec<&str> = rest.split_whitespace().skip(1).collect();
     let (date, grounds) = match fields.split_first() {
         Some((d, g)) if d.len() == 10 && has_date(d) => (*d, g),
         _ => ("(undated)", &fields[..]),
     };
     let grounds = if grounds.is_empty() { "(ungrounded)".to_string() } else { grounds.join(" ") };
-    format!("[standing] not-icebox-eligible {} — {}", date, grounds)
+    (format!("[standing] {} — ", date), grounds)
 }
 
 struct Pending {
@@ -515,7 +517,7 @@ fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, live: &[String], out:
         // trades its class for the reason: the class is inclusion evidence, and it decides
         // nothing once a categorical exclusion has already settled the row.
         let (mark, tail) = match ineligibility(&e, live) {
-            Some(r) => ('✗', cap_chars(&r)),
+            Some((prefix, tail)) => ('✗', format!("{}{}", prefix, cap_chars(&tail))),
             None => {
                 let c = if e.cost.is_empty() { "(unclassed)" } else { e.cost.as_str() };
                 ('•', c.to_string())
@@ -759,15 +761,21 @@ mod tests {
     // spec: queue-kit/SPEC.md §The icebox tier — all three categorical triggers, plus the two
     // near-misses the grammar creates: the self-naming `recurrence:` mandates, and an undated
     // `recurrence:` line, neither of which is a live trigger.
+    // spec: queue-kit/SPEC.md §The queue-index arm — a cause's fixed prefix and variable tail,
+    // joined uncapped, is exactly the row a reader saw before the cap ever applies.
+    fn full(r: Option<(String, String)>) -> Option<String> {
+        r.map(|(prefix, tail)| format!("{}{}", prefix, tail))
+    }
+
     #[test]
     fn every_categorical_trigger_is_decided_and_self_naming_is_not_one() {
         let live = vec!["other".to_string(), "subject".to_string()];
         let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", ""), &live);
-        assert!(r.unwrap().starts_with("[roadmap]"));
+        assert!(full(r).unwrap().starts_with("[roadmap]"));
         let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-08-01\n"), &live);
-        assert!(r.unwrap().starts_with("[recurrence]"));
+        assert!(full(r).unwrap().starts_with("[recurrence]"));
         let r = ineligibility(&pend("- **subject** — t.", "  waits on `other` landing.\n"), &live);
-        assert_eq!(r.unwrap(), "[trigger] names live slug other");
+        assert_eq!(full(r).unwrap(), "[trigger] names live slug other");
         let r = ineligibility(&pend("- **subject** — t.", "  subject is the whole of it.\n"), &live);
         assert!(r.is_none(), "self-naming is narration, not a trigger: {:?}", r);
         let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject soon\n"), &live);
@@ -775,24 +783,41 @@ mod tests {
     }
 
     // spec: queue-kit/SPEC.md §The queue-index arm — the standing cause's place in the order and its
-    // printed form, an absent date or grounds appearing rather than vanishing.
+    // printed form, an absent date or grounds appearing rather than vanishing, and the declaration's
+    // own lead token dropped from the printed prefix.
     #[test]
     fn a_standing_declaration_is_decided_after_the_tag_and_before_the_recurrence_line() {
         let live = vec!["other".to_string()];
         let decl = "  not-icebox-eligible: subject 2026-08-17 eviction spends the clause\n";
         let r = ineligibility(&pend("- **subject** — t.", decl), &live);
-        assert_eq!(r.unwrap(), "[standing] not-icebox-eligible 2026-08-17 — eviction spends the clause");
+        assert_eq!(full(r).unwrap(), "[standing] 2026-08-17 — eviction spends the clause");
         let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", decl), &live);
-        assert!(r.unwrap().starts_with("[roadmap]"));
+        assert!(full(r).unwrap().starts_with("[roadmap]"));
         let body = format!("  recurrence: subject 2026-08-01\n  waits on `other`.\n{}", decl);
         let r = ineligibility(&pend("- **subject** — t.", &body), &live);
-        assert!(r.as_deref().unwrap_or("").starts_with("[standing]"), "{:?}", r);
+        assert!(full(r).as_deref().unwrap_or("").starts_with("[standing]"));
         let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject grounds only\n"), &live);
-        assert_eq!(r.unwrap(), "[standing] not-icebox-eligible (undated) — grounds only");
+        assert_eq!(full(r).unwrap(), "[standing] (undated) — grounds only");
         let r = ineligibility(&pend("- **subject** — t.", "  not-icebox-eligible: subject 2026-08-17\n"), &live);
-        assert_eq!(r.unwrap(), "[standing] not-icebox-eligible 2026-08-17 — (ungrounded)");
+        assert_eq!(full(r).unwrap(), "[standing] 2026-08-17 — (ungrounded)");
         let r = ineligibility(&pend("- **subject** — t.", "  prose naming not-icebox-eligible: mid-line.\n"), &live);
         assert!(r.is_none(), "only a line led by the token declares: {:?}", r);
+    }
+
+    // spec: queue-kit/SPEC.md §The queue-index arm — the cap binds the variable tail and never the
+    // fixed class prefix, however wide the prefix runs against the cap on its own.
+    #[test]
+    fn the_cap_binds_the_variable_tail_and_never_the_class_prefix() {
+        let live: Vec<String> = vec![];
+        let long = "a very long declared reason that runs well past the forty eight character mark on its own";
+        let decl = format!("  not-icebox-eligible: subject 2026-08-17 {}\n", long);
+        let (prefix, tail) = ineligibility(&pend("- **subject** — t.", &decl), &live).unwrap();
+        assert_eq!(prefix, "[standing] 2026-08-17 — ");
+        assert!(!prefix.contains("not-icebox-eligible"), "{}", prefix);
+        assert!(tail.chars().count() > CAUSE_CAP, "fixture must exceed the cap: {}", tail);
+        let capped = cap_chars(&tail);
+        assert_eq!(capped.chars().count(), CAUSE_CAP);
+        assert!(capped.ends_with('…'), "{}", capped);
     }
 
     fn worklist(q: &str) -> String {
@@ -881,5 +906,32 @@ mod tests {
         assert!(lines[1].starts_with("• once-low") && lines[1].ends_with("once/low"), "{}", out);
         assert!(lines[2].starts_with("• untagged") && lines[2].ends_with("(unclassed)"), "{}", out);
         assert!(lines[3].starts_with("• malformed") && lines[3].ends_with("(unclassed)"), "{}", out);
+    }
+
+    // spec: queue-kit/SPEC.md §The queue-index arm — the rendered worklist row shows the cap's worth
+    // of grounds behind the shortened prefix, not three characters of a cause string capped whole.
+    #[test]
+    fn a_rendered_standing_row_shows_capped_grounds_behind_the_shortened_prefix() {
+        let out = worklist(
+            "\
+## Iteration: demo
+
+## New Features
+
+## Deferred
+
+- **long-grounds** [design-pending] [cost: event/low] [surface: queue-kit] — t.
+  not-icebox-eligible: long-grounds 2026-08-17 a very long declared reason that runs well past the forty eight character mark on its own
+  Filed 2020-01-01 by close.
+
+## Lessons Learned
+",
+        );
+        let lines: Vec<&str> = out.lines().collect();
+        assert_eq!(lines.len(), 1, "{}", out);
+        assert!(lines[0].starts_with("✗ long-grounds"), "{}", out);
+        assert!(lines[0].contains("[standing] 2026-08-17 — "), "{}", out);
+        assert!(!lines[0].contains("not-icebox-eligible"), "{}", out);
+        assert!(lines[0].ends_with('…'), "{}", out);
     }
 }
