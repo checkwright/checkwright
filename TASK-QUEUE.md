@@ -12,6 +12,28 @@
 
 ## New Features
 
+- **kit-spec-provenance-seam-sweep-remainder** [spec: SPEC-provenance-seam.md] — the kit SPECs
+  that still carry this project's ruling provenance, plus the seam gate that goes green only once
+  the last is swept. gate-sdk landed with the parent split; context-kit and guard-kit as the first
+  slice; lifecycle, delegation and queue as the second. **This is the closing increment**: it lands
+  WHOLE, gate green, and moves to Done rather than demoting (amendment delta 7).
+  **THE REMAINDER IS DERIVED, NEVER FROZEN** — the scope census under-counted twice over: a
+  retired-slug probe over the queue's history finds pointers in evidence-kit, lifecycle-kit and
+  context-kit too, so every kit SPEC is the sweep corpus, not four (delta 1; the probes and the
+  floor are on the amendment and the survey record).
+  **THE PREDICATE IS RECOVERED, NEVER RE-AUTHORED** — parent deltas 1-3 at
+  `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`, the second slice's four rules at
+  `git show aae9f868^:SPEC-seam-slice.md`; the merged rule's home is gate-sdk/SPEC.md §The
+  provenance seam.
+  **THE POINTER CLASS IS ANSWERED (operator, 2026-09-16, consult, lead-relayed): RE-HOMED, NOT
+  STANDING**; the gate ships EXEMPTION-FREE and denies, beside dated attribution, a `CLAUDE.md §`
+  citation, a ruling-record mention, a local-brief mention and a live queue slug. **The possessive
+  fifth shape is ruled in** at spec (delta 3): same class, different spelling, zero live sites.
+  **TAKEN ALONE as `seam-sweep-remainder` (operator direction, 2026-09-16, lead-relayed).**
+  **Cost while deferred:** the remaining published kit SPECs and every adopter's vendored copy carry
+  private ruling history as mechanism and pointers a consumer cannot follow; product-class, and
+  accreting measurably — gate-sdk re-acquired a slug citation after its own sweep landed.
+
 ## Technical Debt
 
 ## Deferred
@@ -3216,55 +3238,6 @@
   **DISTINCT from `crate-interpreter-resolution-residue`, retired**, whose deliverable is the
   spawn sites themselves; this is the declaration grammar every registry member shares.
   Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
-
-- **kit-spec-provenance-seam-sweep-remainder** [design-pending] [cost: iteration/high] [surface: canon-kit] — the kit SPECs that still
-  carry this project's ruling provenance, plus the seam gate that goes green only once the last is
-  swept. gate-sdk landed with the parent split; context-kit and guard-kit as the first slice (14
-  sites); lifecycle, delegation and queue 2026-09-06 as the second (~38).
-  **THE REMAINDER IS DERIVED, NEVER FROZEN** — a frozen count here has been wrong twice, and the
-  rank order below settles nothing about it. The lower-bound oracle is a slug scan: every live
-  `TASK-QUEUE.md` lead-line slug of twelve characters or more, grep'd against each `*/SPEC.md`, a
-  hit being the event deixis delta 1's corollary makes the discriminator. It misses a retired slug,
-  a cut ordinal and a port date, which a supplementary grep for `operator`, `lead,` and `2026-0`
-  picks up; it reaches the landed slices too, so a hit there is **accretion**, not an unswept site.
-  **MEASURED TWICE 2026-09-16, AND THE TWO READS DISAGREE ON site-kit.** A dated-marker read gives
-  canon 2, doctrine 1, drift 7-8, site 0, evidence 0 and is the better sizing; the slug scan adds a
-  site-kit queue-slug citation a dated read structurally cannot see, plus one in gate-sdk
-  (accretion). **STILL OWING: canon, doctrine, drift, site — FOUR**; evidence-kit alone leaves.
-  **IT BELONGS IN `Deferred`, NEVER `Done`, AND IT DEMOTES AT BUILD, NEVER AT CLOSE** (`lead,
-  own-authority`, 2026-09-06): the deliverable is a corpus, so the next cut re-promotes with its
-  own amendment (canon-kit/SPEC.md §Merging an amendment), and `check-stage-entry` assertion B
-  refuses a validate entry on a non-empty active queue. **THE BY-KIT SPLIT NEEDS NO WAIVER: ITS
-  AUTHORITY IS THIS ENTRY'S RE-GROUNDING (operator, 2026-09-06, lead-relayed)** — the 2026-09-03
-  standing direction is SPENT, and this carries as product-class on its own accretion's trigger.
-  **DO NOT RE-AUTHOR THE PREDICATE OR RE-RUN THE SCAN — RECOVER IT** from the parent half's merged
-  amendment, `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`: delta 1 is the discriminator (the
-  seam decides the VOICE, never the content), delta 2 the taxonomy, delta 3 the move-versus-delete
-  test. Delta 1's COROLLARY is the sizing lever — the test is the IDENTIFIER, never the tense — and
-  delta 2 excludes a dated MEASUREMENT, whose date is its freeze and must survive, which is also why
-  a date scan misses. Recover the second slice's four supplementary rules the same way, from
-  `SPEC-seam-slice.md` in the commit that merged it.
-  **MOVE-VERSUS-DELETE IS ANSWERED THROUGH THE SECOND SLICE: NO SWEPT SITE WAS SOLE-HOME**, nothing
-  migrated to TRAJECTORY.md, and drift-kit is STILL LAST TO OWE IT.
-  **THE POINTER CLASS IS ANSWERED (operator, 2026-09-16, consult, lead-relayed): RE-HOMED, NOT
-  STANDING.** The seam rule's kit-owned home is gate-sdk/SPEC.md §The provenance seam — the one
-  kit every profile carries — and every former `CLAUDE.md` seam citation points there; gate-sdk's
-  two ruling-record pointers were swept under delta 1's corollary and the private-brief name
-  generalized to `*.local.md`. Refused, grounds in the landing commit: standing (an exemption by
-  omission), local restatement (SSOT), a doctrine-kit home (delegation profile only).
-  **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile.** It ships EXEMPTION-FREE,
-  and beside the dated-stamp class its predicate denies FOUR pointer shapes in a kit SPEC: a
-  `CLAUDE.md §` section citation, a `TRAJECTORY.md` mention, a `BRIEF.local.md` mention, and a
-  live queue slug — a bare `CLAUDE.md` as a knob default is mechanism and passes. The gate-sdk
-  carve-out retired at the 2026-09-16 consult, and that section is swept.
-  **A FIFTH SHAPE IS UNNAMED, AND THE GATE SLICE RULES IT:** a POSSESSIVE pointer (`CLAUDE.md's
-  ... line`) is no § citation and passes; gate-sdk's two sites were rewritten impersonally
-  2026-09-16, so only whether the predicate names the shape stays open.
-  **NO DISCHARGE LINE SURVIVES**: it lands WHOLE, gate green, or stays here. **TAKEN ALONE as
-  `seam-sweep-remainder` (operator direction, 2026-09-16, lead-relayed)**; spec promotes it.
-  **Cost while deferred:** the remaining published kit SPECs and every adopter's vendored copy carry
-  private ruling history as mechanism and pointers a consumer cannot follow; product-class, and
-  accreting measurably — gate-sdk re-acquired a slug citation after its own sweep landed.
 
 - **bin-tool-help-arm-absent-tree-wide** [design-pending] [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
