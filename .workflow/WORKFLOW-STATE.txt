@@ -4,4 +4,4 @@
 
 ---
 
-— scope ae2a67fd 2026-09-16 f60e3612
+queue-arm-report-fidelity scope ae2a67fd 2026-09-16 f60e3612
