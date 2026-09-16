@@ -4,9 +4,4 @@
 
 ---
 
-queue-arm-report-fidelity scope ae2a67fd 2026-09-16 f60e3612
-queue-arm-report-fidelity spec a5fa73f4 2026-09-16 7c334edd
-queue-arm-report-fidelity align a85838f8 2026-09-16 3c16e49a
-queue-arm-report-fidelity build a9d554f0 2026-09-16 903cf060
-queue-arm-report-fidelity validate af3719c1 2026-09-16 4dd606cf
-queue-arm-report-fidelity close ab43aea3 2026-09-16 6a83d719
+— scope a82d9a21 2026-09-16 3fe20068
