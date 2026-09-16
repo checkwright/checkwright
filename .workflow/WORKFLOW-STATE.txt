@@ -11,3 +11,4 @@ installer-front-door-cut align adce7f4e 2026-09-16 d8ea2bc5
 installer-front-door-cut build a333c87a 2026-09-16 a1149ad7
 installer-front-door-cut build a943064c 2026-09-16 7bec8854
 installer-front-door-cut validate a82fe252 2026-09-16 efcfa24d
+installer-front-door-cut close a7070a30 2026-09-16 bf44c122
