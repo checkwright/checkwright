@@ -51,12 +51,9 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    noisy gate. A stated manual duty carries a *named cadence*, or it is a duty
    no session performs: the un-gateable class joins a tracked audit roster
    reviewed on a lifecycle hook, with event-keyed due-ness — a named observable
-   event (a contract edit, a release prep, a template upgrade, a new member on a
-   governed surface) beats an iteration counter no surface tracks. The roster is
-   hand-curated, not derived — which classes escape a clean check is a judgment
-   no tool enumerates, so Derivation-first's ladder lands on
-   state-once-at-the-owner — and the roster with its review step is this
-   carve-out's capture mechanism rather than a gate.
+   event beats an iteration counter no surface tracks
+   ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The audit roster owns the
+   mechanism).
    *Under agent work:* an unenforced rule is a rule the next session cannot see;
    a gate is the only carrier of intent that survives a fresh context window.
    *Enforced by:* the meta-gate contracts every gate must satisfy —
@@ -86,7 +83,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    public functions as contracts, so the Enforcement-first false-positive
    carve-out applies — and it rides that carve-out's cadence as the
    `internal-identifier-restatement` seed member of the close-stage audit
-   roster (`.workflow/audit-roster.txt`), a stated authoring duty due on
+   roster (lifecycle-kit/SPEC.md §The audit roster), a stated authoring duty due on
    heavy-SPEC contract edits and at release prep.
    *Digest:* prose cites names; code or the owning SPEC owns values.
 

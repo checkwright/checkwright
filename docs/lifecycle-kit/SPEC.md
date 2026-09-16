@@ -3676,8 +3676,7 @@ the cost of a stamp-per-surface-per-iteration ritual. The lighter disposition
 comes first because an advisory surface's skip is often correct, and gating a
 correct action is the failure mode the gap-inbox refusal already demonstrated.
 The un-gateable half rides the Enforcement-first carve-out's cadence — a class on
-the consumer's close-stage audit roster (doctrine-kit/DOCTRINE.md
-§Methodology-maintenance rules).
+the consumer's close-stage audit roster (§The audit roster).
 
 ### check-lifecycle-registration
 
