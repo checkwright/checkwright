@@ -4145,6 +4145,53 @@
   Filed 2026-09-15 to the gap inbox at that spec stage, measured by `check-queue-wrap`'s red at its
   promotion commit; drained and promoted the same day at close.
 
+- **close-surface-row-trackedness-undeclared** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+  — a close-surface roster row does not say whether its path is tracked or gitignored, so a
+  session deciding whether that row's read is delegable to an isolated agent re-derives the bit
+  by hand. Isolation cost (3) makes that bit decide delegability outright: an untracked or
+  gitignored corpus is not delegable at all to a type held to isolation.
+  **The filing premise was corrected at the drain, and the correction changes the cost.** The
+  bullet claimed the emitter already holds a `git check-ignore` verdict per path and drops it.
+  It does not: `native/src/emit/close_surfaces.rs` calls `check-ignore` only inside the
+  workflow-directory walk that mints `(undeclared)` rows, and its exit-1 arm `continue`s, so the
+  verdict exists for gitignored workflow-dir members alone. Rows harvested from declaration
+  surfaces get no call at all. A fifth tier field is therefore a widening that adds one
+  `check-ignore` per declared row, not a free print of a fact already held.
+  **Why `[design-pending]`:** whether the field names the tier, the trackedness bit, or nothing
+  at all — the constraint living in the protocol template instead — is a grammar call, and
+  `check-close-surfaces` reads the same rows.
+  **DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which ruled
+  the general constraint onto the protocol template; this is one emitter withholding a fact its
+  reader needs, and it stands whether or not any sweep is ever delegated.
+  **Cost while deferred:** every delegating session re-derives the bit, and one that skips the
+  derivation delegates a read returning absence for content.
+  Filed 2026-09-16 to the gap inbox by the spec stage, weighed as that iteration's second
+  candidate owner and refused there for repairing one instance of a general class; drained and
+  promoted at close, which falsified half its premise.
+
+- **stage-commit-subject-scope-unowned** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+  — a stage session's commit subject scope is governed nowhere. An anchored grep across
+  lifecycle-kit, canon-kit and queue-kit for a `chore(<stage>)` spelling returns nothing, so every
+  stage session picks a scope by precedent.
+  **Measured at the drain, and the drift is wider than the filing said.** The filing recorded a
+  five-to-three split on the align stamp. A tabulation of every stage-entry stamp subject in
+  history returns four scopes on the align stamp alone — `chore(align)` 88, `chore(workflow)` 8,
+  `chore(spec)` 3, `chore(lifecycle)` 2 — and eight distinct scopes across all stages: spec 40,
+  build 34, align 22, validate 14, close 12, lifecycle 8, scope 5, workflow 1.
+  **Candidate deliverables:** (a) lifecycle-kit/SPEC.md states the subject scope as a per-stage
+  fact beside the stamp protocol; (b) a gate binds a stage session's own commits to its stage's
+  scope, checkable only for a commit carrying a stamp in the same commit; (c) rule it cosmetic and
+  say so, retiring the expectation rather than the drift.
+  **DISTINCT from `queue-recovery-pickaxe-wrong-oracle`**, which it cites for the failure shape
+  only: that entry is about recovery instructions naming an oracle that cannot answer, and it
+  stands whether or not any commit subject is governed; this is the stage machine leaving the
+  subject ungoverned, and it stands even where every recovery surface names the right oracle.
+  **Cost while deferred:** a `git log --grep` or pickaxe recovery keyed on a stage name silently
+  misses the commits that stage filed under a neighbouring scope, which the tabulation above
+  measures at a quarter of the align stamps.
+  Filed 2026-09-16 to the gap inbox by the iteration lead verifying align's own commits; no gate
+  reds on it. Drained and promoted at close, which re-ran the tabulation and widened the finding.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -4410,9 +4457,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- wait-record-self-deadlock
-- worktree-reap-unasserted-at-dispatching-turn-end
-- delegated-read-blind-to-gitignored-capture
 
 ## Lessons Learned

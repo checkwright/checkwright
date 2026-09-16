@@ -3922,7 +3922,10 @@ A **roster dir** is a directory holding `LIFECYCLE_KIT_ROSTER_BASENAME`, and
 the roster test screens the *body tokens* alone: an amendment file's own
 directory is a component wherever it sits, so a second component arrives
 either from a second amendment file anywhere, or from a body token that
-resolves to a roster dir.
+resolves to a roster dir. A **generated mirror** of a roster basename is a roster
+dir like any other, so a single-component amendment obliged to name the mirror as
+an update target — which a consumer's generated-projection rule may require —
+reaches ≥2 on that token alone.
 The
 waiver rides the same file the stamps do (auditable) and is written only on
 an explicit user ruling — never self-issued by the entering session; it
