@@ -72,7 +72,7 @@ bash gate-sdk/bin/run-gates.sh --emit queue-index --collapse-deferred   # deferr
 bash gate-sdk/bin/run-gates.sh --emit queue-index --extent <slug>       # inclusive line range of one entry's subtree
 bash gate-sdk/bin/run-gates.sh --emit queue-index --icebox-candidates   # the closing stage's eviction worklist
 bash gate-sdk/bin/run-gates.sh --emit queue-counts                       # "<section><TAB><count>" per task section, in configured order
-bash gate-sdk/bin/run-gates.sh --emit queue-edges                       # every live slug with inbound citations, and the entries citing it
+bash gate-sdk/bin/run-gates.sh --emit queue-edges                       # every live slug with inbound citations, then retired targets, each marked where its name is still a tracked file's stem
 bash gate-sdk/bin/run-gates.sh --emit queue-edges --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
 bash gate-sdk/bin/run-gates.sh --lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
 bash gate-sdk/bin/run-gates.sh --emit roadmap          # the public roadmap block, to stdout

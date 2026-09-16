@@ -1196,6 +1196,21 @@ Retired targets print **after** the live block, in a trailing block, each as
 They sort **alphabetically**: a retired slug has no queue position to order by,
 and inventing one — last-seen revision, say — would be a datum with no reader.
 
+**A retired slug and a retired name are different questions, and the block
+answers both.** The history test says an *entry* is gone; it says nothing about
+the name, and where the name shipped as live mechanism the citations of it are
+current prose rather than pointers at disposed work. A target whose slug is the
+basename, less its final extension, of a file the tracked tree carries renders as
+`<slug> (<N> inbound, retired — name live at <path>)`, `<path>` being the first
+such file in tracked order with a further match noted as `(+<M>)`. **The input is
+the tree listing and not a curated roster**, on the ground §The tag algebra
+already recorded for the `[surface:]` value set: a registry of names is a
+consumer file this kit would couple to for a set the tree yields. The test
+**under-claims** — a live name that is no file's own stem is unmarked, and that
+row reads as it did — which is the same direction the two history degradations
+above declare. It adds evidence and filters nothing: the no-red posture and the
+report-don't-rule division of labour are untouched.
+
 A **retired** slug is one that held a top-level entry lead line in some earlier
 revision of the queue file and holds none now. That is the whole discriminator,
 and it is what makes the report readable rather than merely longer. The naive

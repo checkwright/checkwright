@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §The queue-edges arm — the inbound-citation aggregator. It reads the
 // queue and its own history, writes stdout only, and mutates nothing. The `--inbound` mode rides
 // the arm's own argv tail, the mechanism §The queue-index arm already uses for its three modes.
+use crate::proc;
 use crate::queue::{self, Sections};
 
 struct Args {
@@ -50,7 +51,57 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     if !a.target.is_empty() && !live.contains(&a.target) && !retired.contains(&a.target) {
         return Err(format!("not a live or retired slug: {}", a.target));
     }
-    Ok(aggregate(&text, &sec, &live, &retired, &a.target))
+    let stems = if retired.is_empty() {
+        Vec::new()
+    } else {
+        tracked_stems(&file)
+    };
+    Ok(aggregate(&text, &sec, &live, &retired, &a.target, &stems))
+}
+
+// spec: queue-kit/SPEC.md §The queue-edges arm — the name-live test's input is the tracked tree
+// listing and not a curated roster; an absent `git` or a queue file outside a work tree marks
+// nothing, the same direction the retired set's own degradations take.
+fn tracked_stems(file: &str) -> Vec<(String, String)> {
+    if !proc::on_path("git") {
+        return Vec::new();
+    }
+    let path = std::path::Path::new(file);
+    let dir = match path.parent().map(|p| p.to_string_lossy().into_owned()) {
+        Some(d) if !d.is_empty() => d,
+        _ => ".".to_string(),
+    };
+    let listing = match proc::run("git", &["-C", &dir, "ls-files", "--full-name", "--", ":/"]) {
+        Ok(c) => match c.stdout() {
+            Some(o) => String::from_utf8_lossy(o).into_owned(),
+            None => return Vec::new(),
+        },
+        Err(_) => return Vec::new(),
+    };
+    listing
+        .lines()
+        .filter(|l| !l.is_empty())
+        .filter_map(|l| {
+            std::path::Path::new(l)
+                .file_stem()
+                .map(|s| (s.to_string_lossy().into_owned(), l.to_string()))
+        })
+        .collect()
+}
+
+// spec: queue-kit/SPEC.md §The queue-edges arm — the first match in tracked order, with a further
+// match noted as a count; a name that is no file's own stem is unmarked and its row reads as it did
+fn name_live(stems: &[(String, String)], slug: &str) -> Option<String> {
+    let hits: Vec<&String> = stems
+        .iter()
+        .filter(|(stem, _)| stem == slug)
+        .map(|(_, path)| path)
+        .collect();
+    let first = hits.first()?;
+    Some(match hits.len() {
+        1 => format!(" — name live at {}", first),
+        n => format!(" — name live at {} (+{})", first, n - 1),
+    })
 }
 
 struct Agg<'a> {
@@ -143,6 +194,7 @@ fn aggregate(
     live: &[String],
     retired: &[String],
     want: &str,
+    stems: &[(String, String)],
 ) -> String {
     let mut agg = Agg {
         live,
@@ -187,7 +239,11 @@ fn aggregate(
     let mut rorder = agg.rorder.clone();
     rorder.sort();
     for tgt in &rorder {
-        block(tgt, ", retired", &agg.recs, &mut out);
+        // spec: queue-kit/SPEC.md §The queue-edges arm — a retired slug and a retired name are
+        // different questions: the mark adds a column of evidence, filters nothing, and rules
+        // nothing, so the block's no-red posture is untouched.
+        let suffix = format!(", retired{}", name_live(stems, tgt).unwrap_or_default());
+        block(tgt, &suffix, &agg.recs, &mut out);
     }
     out
 }
@@ -249,10 +305,22 @@ mod tests {
     }
 
     fn run(want: &str, retired: &[&str]) -> String {
+        marked(want, retired, &[])
+    }
+
+    fn marked(want: &str, retired: &[&str], paths: &[&str]) -> String {
         let s = sec();
         let live = queue::live_slugs(Q, &s);
         let ret: Vec<String> = retired.iter().map(|r| r.to_string()).collect();
-        aggregate(Q, &s, &live, &ret, want)
+        let stems: Vec<(String, String)> = paths
+            .iter()
+            .filter_map(|p| {
+                std::path::Path::new(p)
+                    .file_stem()
+                    .map(|st| (st.to_string_lossy().into_owned(), p.to_string()))
+            })
+            .collect();
+        aggregate(Q, &s, &live, &ret, want, &stems)
     }
 
     // spec: queue-kit/SPEC.md §The queue-edges arm — the citation rules that section enumerates,
@@ -304,6 +372,31 @@ mod tests {
         // comment-tier-exempt: names this fixture's second retired slug, which is cited by
         // nothing and so never reaches the ordering — a property of the fixture, not the rule
         assert!(!out.contains("a-retired-one ("), "{}", out);
+    }
+
+    // spec: queue-kit/SPEC.md §The queue-edges arm — a retired target whose slug is a tracked
+    // file's own stem is marked with that path, a second match noted as a count; a name that is no
+    // file's stem is unmarked and its row reads byte-for-byte as it did.
+    #[test]
+    fn a_retired_target_whose_name_is_a_tracked_file_stem_is_marked() {
+        let out = marked("", &["landed-thing"], &["a/landed-thing.sh"]);
+        assert!(
+            out.contains("landed-thing (1 inbound, retired — name live at a/landed-thing.sh)"),
+            "{}",
+            out
+        );
+        let out = marked(
+            "",
+            &["landed-thing"],
+            &["a/landed-thing.sh", "b/landed-thing", "c/landed-thing.md"],
+        );
+        assert!(
+            out.contains("landed-thing (1 inbound, retired — name live at a/landed-thing.sh (+2))"),
+            "{}",
+            out
+        );
+        let out = marked("", &["landed-thing"], &["a/other.sh", "b/landed-thing.d/x"]);
+        assert!(out.contains("landed-thing (1 inbound, retired)"), "{}", out);
     }
 
     // spec: queue-kit/SPEC.md §The queue-edges arm — the argv tail is `[--inbound <slug>]

@@ -7,7 +7,8 @@
 # own #[cfg(test)] tests, where check-crate-arms runs them.
 #
 # The first sandbox is deliberately NOT a git repository: it is the no-repository arm. The retired
-# half needs history, so it gets a second sandbox with two revisions.
+# half needs history and a tracked tree listing, so it gets a second sandbox with two revisions and
+# one tracked file whose stem is a retired slug — which is the name-live mark's only real input.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -100,12 +101,17 @@ cat >"$GITBOX/TASK-QUEUE.md" <<'EOF'
 ## Deferred
 
 - **gone-a** — an entry that will be disposed of in the next revision.
+- **gone-b** — a second one, whose name ships nothing.
 
 ## Done
 
 ## Lessons Learned
 EOF
-gitc add TASK-QUEUE.md >/dev/null 2>&1
+# gone-a's NAME ships as a tracked file; gone-b's does not. That is the whole discriminator of the
+# name-live mark, and it resolves against the tree listing rather than any curated roster.
+mkdir -p "$GITBOX/tools"
+echo '# a tracked file whose stem is the retired slug' >"$GITBOX/tools/gone-a.sh"
+gitc add TASK-QUEUE.md tools/gone-a.sh >/dev/null 2>&1
 gitc commit -q --no-verify -m r1 >/dev/null 2>&1
 
 cat >"$GITBOX/TASK-QUEUE.md" <<'EOF'
@@ -123,12 +129,14 @@ cat >"$GITBOX/TASK-QUEUE.md" <<'EOF'
 
 - **debt-a** — a second citer, so the retired count is not always one.
   Sequence against `gone-a` rather than duplicating it, and defer to `feat-a`.
+  It also cites `gone-b`, whose name ships nothing.
 
 ## Deferred
 
 ## Done
 
 - gone-a
+- gone-b
 
 ## Lessons Learned
 EOF
@@ -138,10 +146,18 @@ gitc commit -q --no-verify -m r2 >/dev/null 2>&1
 GQ="$GITBOX/TASK-QUEUE.md"
 gout="$(edges "$GQ")"
 
-# A citation of a retired slug becomes an edge, marked as such and counted from real history.
+# A citation of a retired slug becomes an edge, marked as such and counted from real history. The
+# name-live field rides the same row: gone-a's slug is a tracked file's own stem and gone-b's is
+# not, so one row carries the path and the other reads byte-for-byte as it did before the mark.
 checks=$((checks + 1))
-grep -qF 'gone-a (2 inbound, retired)' <<<"$gout" \
-    || note retired-target "the history walk found no retired target: $gout"
+grep -qF 'gone-a (2 inbound, retired — name live at tools/gone-a.sh)' <<<"$gout" \
+    || note retired-target "the history walk found no marked retired target: $gout"
+
+checks=$((checks + 1))
+grep -qF 'gone-b (1 inbound, retired)' <<<"$gout" \
+    || note name-live-under-claims "a retired target whose name ships nothing was not left unmarked: $gout"
+grep -qF 'gone-b (1 inbound, retired —' <<<"$gout" \
+    && note name-live-invents "an unmarked target was marked anyway: $gout"
 
 # The floor holds: a token that was never a slug stays off it. This is the whole discriminator —
 # without it the report is dominated by SHAs and ordinary words.
@@ -152,7 +168,7 @@ grep -qF 'landed-thing (' <<<"$gout" \
 # The retired block trails the live one, which is what lets a reader stop at the live block.
 checks=$((checks + 1))
 live_at="$(grep -n 'feat-a (1 inbound)' <<<"$gout" | head -1 | cut -d: -f1)"
-ret_at="$(grep -n 'gone-a (2 inbound, retired)' <<<"$gout" | head -1 | cut -d: -f1)"
+ret_at="$(grep -n 'gone-a (2 inbound, retired' <<<"$gout" | head -1 | cut -d: -f1)"
 [[ -n "$live_at" && -n "$ret_at" && "$ret_at" -gt "$live_at" ]] \
     || note retired-block-trails "live at '$live_at', retired at '$ret_at'"
 
@@ -162,7 +178,7 @@ ret_at="$(grep -n 'gone-a (2 inbound, retired)' <<<"$gout" | head -1 | cut -d: -
 checks=$((checks + 1))
 gout_r="$(edges --inbound gone-a "$GQ")"; rc=$?
 [[ "$rc" -eq 0 ]] || note retired-inbound-rc "--inbound on a retired slug exited $rc"
-grep -qF 'gone-a (2 inbound, retired)' <<<"$gout_r" \
+grep -qF 'gone-a (2 inbound, retired' <<<"$gout_r" \
     || note retired-inbound "--inbound did not reach the retired domain: $gout_r"
 
 checks=$((checks + 1))
@@ -175,5 +191,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "queue-edges.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "queue-edges.test.sh: clean (the --emit front-end resolves the arm, a renamed deferred section reaches it, the no-repository degradation is total, and a real two-revision history yields the retired target, the never-live floor, the trailing block and both --inbound domains; $checks checks)"
+echo "queue-edges.test.sh: clean (the --emit front-end resolves the arm, a renamed deferred section reaches it, the no-repository degradation is total, and a real two-revision history yields the retired target, its name-live mark off the real tree listing beside an unmarked sibling, the never-live floor, the trailing block and both --inbound domains; $checks checks)"
 exit 0

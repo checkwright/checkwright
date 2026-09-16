@@ -25,8 +25,8 @@
 33 lifecycle-kit/templates/release-sweep.md
 103 lifecycle-kit/templates/stages/align.md
 118 lifecycle-kit/templates/stages/build.md
-270 lifecycle-kit/templates/stages/close.md
-239 lifecycle-kit/templates/stages/scope.md
+273 lifecycle-kit/templates/stages/close.md
+240 lifecycle-kit/templates/stages/scope.md
 116 lifecycle-kit/templates/stages/spec.md
 87 lifecycle-kit/templates/stages/validate.md
 41 lifecycle-kit/templates/upgrade.md

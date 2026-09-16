@@ -118,7 +118,10 @@ session.
    pointer at work that has been disposed of, indistinguishable from a live
    pointer to any reader who did not run this. It is a finding, never a
    violation: the correction is inline on the citing entry, in this session,
-   the way every attested instance was fixed. This is the corrective transition
+   the way every attested instance was fixed. A row the arm marks
+   `name live at <path>` is **not** in that set: its citations point at mechanism
+   the tree still carries. Skip it, and spend the step on the rows left.
+   This is the corrective transition
    for the class; scope's ranking survey is the other reader, and it reads the
    same block to a different end.
    **Judge the recurrence, in addition to the disposition — you are the judge,

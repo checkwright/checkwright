@@ -12,29 +12,6 @@
 
 ## New Features
 
-- **retired-block-admits-live-gate-name** [spec: SPEC-arm-fidelity.md] — the live-name mark.
-  — the `queue-edges` retired block reads a citation of a live NAME as a pointer at disposed work,
-  and that row is the block's LARGEST single target.
-  **Re-measured at spec, rev `b2bcd457`:** 56 target slugs across 88 retired citing rows, of which
-  `check-spec-pointer` alone carries 15 — 17 percent of the finding set.
-  **The filing's premise was wrong in one particular and the correction narrows the unit.**
-  `check-spec-pointer` DID hold a queue entry lead line (deferred `1ea41bd7`, landed `5c1a85e6`),
-  so the history test that puts it in the block is literally correct. What is conflated is the
-  entry with the NAME: the slug retired as an entry and shipped as live mechanism the tree carries.
-  **The consequence is specific to the reader the close contract creates.** Close is told to read
-  the retired block as a finding set and correct each citation inline, so 15 percent of the rows it
-  is sent to act on cite a live gate needing no correction at all — and the largest single target is
-  the one that is pure noise, which is where a reader spends the most attention.
-  **Seam ruled at spec (delta 1):** the arm resolves the name against the TRACKED TREE, never a
-  gate-sdk registry — measured over 792 distinct tracked-file stems, the tree and `gates.list` give
-  the same single answer here — so no gate-sdk clause lands and the arm's kit boundary is unmoved.
-  **DISTINCT from `retired-slug-live-pointer-citation`**, which is a citation pointing at genuinely
-  retired work; this one is that the target is not retired work at all.
-  **Cost while deferred:** every close reads a finding set 17 percent of which needs no correction,
-  at its most attention-expensive row.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its retired-block
-  read; drained and promoted at this iteration's scope.
-
 - **icebox-standing-cause-truncated-on-board** [spec: SPEC-arm-fidelity.md] — the cause cap.
   — `--icebox-candidates` prints about three characters of a standing row's grounds.
   An ineligible row's reason is capped at `CAUSE_CAP`, 48 characters
@@ -4545,5 +4522,6 @@
 ## Done
 
 - entry-history-reads-live-entries-only
+- retired-block-admits-live-gate-name
 
 ## Lessons Learned

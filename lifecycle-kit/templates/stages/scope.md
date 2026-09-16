@@ -196,10 +196,11 @@ premise that has already been settled or shipped — and it reads exactly like a
 live one until the block names it. That is the failure this stage is on record
 for committing, against its own survey. **One class in that block is not a
 disposed premise, and discounting it is the opposite error:** where a retired
-slug's *name* shipped as live mechanism — a check, a knob, a script the tree now
-carries — its inbound edges cite that mechanism and are current, however large
-the block says the target is. Tell the two apart by resolving the name in the
-tree rather than in the queue. The
+slug's *name* shipped as live mechanism, its inbound edges cite that mechanism
+and are current. The arm marks the row it can prove — `name live at <path>` — so
+read the mark rather than re-deriving it; it reaches a name that is a tracked
+file's own stem and no further, so an unmarked target with many inbound edges
+still earns one resolution in the tree before it reads as disposed. The
 promotion dividend lives in the total and in no single entry, so splitting an
 entry is safe only against that total.
 
