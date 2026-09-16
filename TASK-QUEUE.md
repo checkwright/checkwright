@@ -3041,8 +3041,8 @@
   points above. Answered, so no boundary carries the reach forward as open.
   **Inbound, summed 2026-09-08, falsifying the zero-inbound ground this entry once carried:** **37
   inbound over seventeen live members** against the hub's 1, four times the largest single entry.
-  **THE HEALTH TRIAD'S QUEUE LIMB READS THE WRONG WAY** — 301 Deferred + 101 Icebox against 292 + 84
-  on 2026-09-05 — so (A)+(B), seven entries over two widenings, is the pool's largest lever on it.
+  **THE HEALTH TRIAD'S QUEUE LIMB HAS MOVED** — 139 Deferred + 253 Icebox at scope 2026-09-16,
+  against the 301 + 101 filed here: shrunk by eviction, so (A)+(B)'s seven are a LARGER lever.
   **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
   first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
   a read of four gate sources — the re-derivation the survey record exists to prevent. Filed
