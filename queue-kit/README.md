@@ -7,11 +7,12 @@ square-bracket tags (`[blocked-by:]`, `[design-pending]`, `[spec:]`,
 `[precondition-ok:]`, plus the
 Lessons Learned
 channel's `[attend]` and the consumer-named harvest tags) are the state machine.
-Gates hold the grammar a coding agent selects work by, and four more arms of the
+Gates hold the grammar a coding agent selects work by, and five more arms of the
 same binary read the file: `queue-index` renders the compact selection surface,
 `queue-counts` tallies each task section for a status readout, `queue-edges`
-sums the citations pointing *at* an entry, and `roadmap` projects the entries
-curated with `[roadmap:]` onto a generated public page. A fifth, `--lesson-sink`,
+sums the citations pointing *at* an entry, `entry-history` reports the commits
+at which one entry's counted extent fell, and `roadmap` projects the entries
+curated with `[roadmap:]` onto a generated public page. A sixth, `--lesson-sink`,
 routes a harvested lesson body to its configured sink.
 
 Why: an agent picks work by *parsing*, not reading — so everything selection
@@ -75,6 +76,7 @@ bash gate-sdk/bin/run-gates.sh --emit queue-counts                       # "<key
 bash gate-sdk/bin/run-gates.sh --emit queue-counts --by <tag>           # the same grammar keyed "<section>/<value>", one line per partition
 bash gate-sdk/bin/run-gates.sh --emit queue-edges                       # every live slug with inbound citations, then retired targets, each marked where its name is still a tracked file's stem
 bash gate-sdk/bin/run-gates.sh --emit queue-edges --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
+bash gate-sdk/bin/run-gates.sh --emit entry-history <slug>              # commits where one entry's counted extent fell — live or departed slug; advisory, no verdict
 bash gate-sdk/bin/run-gates.sh --lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
 bash gate-sdk/bin/run-gates.sh --emit roadmap          # the public roadmap block, to stdout
 bash gate-sdk/bin/run-gates.sh --emit roadmap --write   # splice it into the configured projection page

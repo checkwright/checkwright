@@ -2505,14 +2505,14 @@
   surface, single-backtick form, and `check-queue-slug-liveness`' corpus does not reach it — so the
   false-positive budget question the entry owes now has two instances to size against, both on
   surfaces whose whole purpose is outliving the queue.
-  **THE FALSE-POSITIVE BUDGET IS NOW MEASURED, 2026-09-07 at close over `--emit queue-edges`.** Its
-  retired block ranks 84 retired slugs across 182 citing lines, 152 distinct (citer, retired-slug)
-  pairs. Exactly ONE of the 84 is a live registered gate name — `check-spec-pointer`, whose slug
-  once headed an entry — so the rate is 1/84, but that single false positive HEADS the ranking at 15
-  inbound, ahead of every true positive. A ranker must therefore filter against `scripts/gates.list`
-  before it reads the block at all; the budget is cheap and the ORDERING is what the collision
-  breaks. Of the 152 pairs, most already spell "retired" inline and are correct prose; the drain's
-  own corrective reach is this iteration's own retirements, which is what a close can honestly hold.
+  **THE FALSE-POSITIVE BUDGET IS MEASURED AND THE COLLISION IT FOUND IS ANSWERED.** Measured
+  2026-09-07 at close over `--emit queue-edges`: 84 retired slugs, 182 citing lines, 152 distinct
+  (citer, retired-slug) pairs, and exactly ONE of the 84 a live registered gate name —
+  `check-spec-pointer`, whose slug once headed an entry — so the rate is 1/84 while that one false
+  positive HEADS the ranking at 15 inbound, the ORDERING being what the collision breaks. A
+  `scripts/gates.list` pre-filter is no longer owed: 2026-09-16 the arm marks such a target `name
+  live at <path>` inline, so a ranker reads it off the block. Of the 152 pairs most already spell
+  "retired" and are correct prose; the drain's reach is its own iteration's retirements.
   recurrence: retired-slug-live-pointer-citation 2026-09-06
 
 - **settings-hook-command-path-gate** [design-pending] [cost: event/high] [surface: context-kit] — a hook registration in
@@ -3050,10 +3050,11 @@
 
 - **citation-liveness-family-convergence** [design-pending] [cost: iteration/high] [surface: canon-kit] — the citation-liveness deferred family
   is FOUR gate-touch points, not one resolver and not fourteen tickets; the measurement lives here.
-  **Why the survey lives here:** `.workflow/survey-record.md` is boundary-truncated and
-  `check-scratch-citation` reds a permanent pointer into it. **Witness re-run at scope 2026-09-08,
-  all sixteen named slugs LIVE** — corpus the two design-pending sections, `scripts/gates.list` and
-  `native/src/gates/`; oracle `--emit queue-edges` and a citation grep; rev `f2308550`.
+  **Why the survey is inline:** `.workflow/survey-record.md` is boundary-truncated and
+  `check-scratch-citation` reds a pointer into it, so no boundary stales this witness and a later
+  scope owes a **re-date**, never a re-run. **Re-verified at scope 2026-09-16, nineteen named slugs
+  LIVE** — corpus both design-pending sections, `scripts/gates.list`, `native/src/gates/`; oracle
+  `--emit queue-edges` and a citation grep; rev `62b7a76d`.
   **The finding.** Thirteen live members, eleven Deferred and two Icebox, none blocking on an
   operator-class fork; **size floor** four touch points, eight to ten assertions, two reports, all
   native modules. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
@@ -3065,9 +3066,9 @@
   takes about two assertions for `retired-slug-live-pointer-citation` and
   `queue-status-parenthetical-liveness`, plus ONE report-only deliverable riding the queue-edges
   arm's resolution, `done-slug-ownership-citation-report` — report-not-gate under the SPEC's
-  reference-vs-membership ruling, its twin `dead-queue-citation-report` shipped. (C), the
-  two path-citation entries, LANDED 2026-09-13 as canon-kit/SPEC.md §check-docs-cmd assertion (C).
-  **(D), the two `guard-rule-number-*` entries, is ANSWERED and out**, both slices' grounds having
+  reference-vs-membership ruling, its twin `dead-queue-citation-report` shipped. **(C), the two
+  path-citation entries, LANDED** 2026-09-13 as canon-kit/SPEC.md §check-docs-cmd assertion (C);
+  **(D), the two `guard-rule-number-*` entries, is ANSWERED and out**, both slices' grounds
   relocated 2026-09-08 to the entries already owning them.
   **Two members are content-unverified though both re-verified live above:** Icebox's
   `false-ground-citation-propagation` is title-only and `doctrine-rule-number-citation-liveness` a
@@ -3088,11 +3089,10 @@
   ADMISSIBILITY, never admission.** The three joining grounds apply unchanged and this family waits
   for a cut sharing its surface; 2026-09-09's, the behind-invoke relocation, shares none of the four
   points above. Answered, so no boundary carries the reach forward as open.
-  **The zero-inbound RANKING ground this entry carried is FALSIFIED and deleted rather than left
-  standing:** summed 2026-09-08 the family carries **37 inbound over seventeen live members**
-  against the hub's 1, four times the largest single entry. **THE HEALTH TRIAD'S QUEUE LIMB READS
-  THE WRONG WAY** — 301 Deferred + 101 Icebox against 292 + 84 on 2026-09-05 — so (A)+(B), seven
-  entries over two gate widenings now (C) has landed, is the largest lever the pool offers on it.
+  **Inbound, summed 2026-09-08, falsifying the zero-inbound ground this entry once carried:** **37
+  inbound over seventeen live members** against the hub's 1, four times the largest single entry.
+  **THE HEALTH TRIAD'S QUEUE LIMB READS THE WRONG WAY** — 301 Deferred + 101 Icebox against 292 + 84
+  on 2026-09-05 — so (A)+(B), seven entries over two widenings, is the pool's largest lever on it.
   **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
   first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
   a read of four gate sources — the re-derivation the survey record exists to prevent. Filed
@@ -4483,10 +4483,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- entry-history-reads-live-entries-only
-- retired-block-admits-live-gate-name
-- queue-counts-reports-no-tag-breakdown
-- icebox-standing-cause-truncated-on-board
 
 ## Lessons Learned
