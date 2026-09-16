@@ -11,15 +11,15 @@ including the harness's default `Claude-Session:` commit trailer.
 
 ## The provenance seam (never cross it)
 
-A kit ships generic mechanism only. **Private rule content never lands here** —
-term lists, coupling vocabularies, glossary bodies, wire-contract couplings,
-product constant sets — **and this project's provenance**: a dated operator
-stamp, a `TRAJECTORY.md` pointer, a refused alternative's grounds carried as
-provenance — belong in git history, never in a kit SPEC, which states the rule
-and its engineering grounds undated. When a kit component needs such content, it
-becomes optional consumer config (the `check-graph` / `scripts/graph-vocab.knobs`
-pattern), never a kit literal. This is a privacy boundary before it is a design
-one: a kit literal carrying a private vocabulary publishes it.
+A kit ships generic mechanism only — the two barred classes, the consumer-config
+pattern (`check-graph` / `scripts/graph-vocab.knobs` here) and the
+voice-not-content discriminator are gate-sdk/SPEC.md §The provenance seam, the
+one home every vendoring tree carries; a kit SPEC cites that section, never this
+one. **This project's provenance is the second class**: a dated operator stamp, a
+`TRAJECTORY.md`, queue-slug or `BRIEF.local.md` pointer, a refused alternative's
+grounds carried as provenance — belong in git history, never in a kit SPEC, which
+states the rule and its engineering grounds undated. This is a privacy boundary
+before it is a design one: a kit literal carrying a private vocabulary publishes it.
 
 ## This repo is governed by its own kits
 

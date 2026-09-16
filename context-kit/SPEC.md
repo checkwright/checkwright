@@ -597,8 +597,8 @@ absent the probe seeds that scaffold once, then only ever rewrites the block.
 The per-session re-probe (Cadence, below) does not trigger that seeding: it
 runs only against a file that already exists, so seeding stays a
 first-run/on-demand action.
-The file is `BRIEF.local.md`-class: local-only, gitignored (this repo's
-`.gitignore` and the CLAUDE.md housekeeping line carry it), so machine facts
+The file is `*.local.md`-class: local-only, gitignored (the consumer's
+`.gitignore` and its always-loaded housekeeping line carry it), so machine facts
 stay private.
 
 **Cadence — per-session auto-refresh.** The session-context hook re-probes
@@ -973,7 +973,7 @@ than governing its content.
 
 The banned class is *harness-side silent accumulation*, not every local file: an
 explicit, derived, operator-curated local file is config, not memory.
-`ENV.local.md` (§bin/env-probe) sits with `BRIEF.local.md` on the config side of
+`ENV.local.md` (§bin/env-probe) sits with every `*.local.md` on the config side of
 that line — its probed half is a re-runnable derivation, its gotchas half is
 hand-curated, and both are gitignored operator surfaces the operator chose to
 keep, never a store the harness wrote to behind the tier contract.

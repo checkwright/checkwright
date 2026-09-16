@@ -3388,7 +3388,7 @@ derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<defa
 - `DELEGATION_KIT_READONLY_TYPES` — agent-type names the consumer dispatches for
   read-only work; D2's only trigger (§The delegation model). Default empty, in
   which case D2 is inert by construction. Every entry is the consumer's own
-  agent roster, never the kit's (CLAUDE.md §The provenance seam) — the same
+  agent roster, never the kit's (gate-sdk/SPEC.md §The provenance seam) — the same
   reasoning that ships `GUARD_KIT_BREADTH_PROBES` with no default probes.
   Deliberately not knobbed alongside it, each ruled out for a stated reason: a
   fork-type-name knob and an accepted-isolation-values knob — `fork` and

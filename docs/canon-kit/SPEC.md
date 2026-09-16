@@ -2133,7 +2133,7 @@ four members of this family ported as one cohort
 `couples=` carries `*.gate` and `*.rs` as **bare globs** beside the shell and
 workflow spellings: the corpus scans both declaration forms and the ported
 implementation, and a token naming this repo's crate directory would publish one
-consumer's layout into a kit file (CLAUDE.md §The provenance seam) and be false
+consumer's layout into a kit file (gate-sdk/SPEC.md §The provenance seam) and be false
 for every other. The gate reads no regex engine — its blessing roster is a set of
 literal directive tokens, matched as a substring for a `keyword:` and
 non-alphanumeric-bounded for a bare word, which is joining rather than
@@ -2440,7 +2440,7 @@ scope: the network is not a gate dependency. The doc set is the manifest set
 (`CLAUDE.md` included; a vendored kit's own `README.md` only where
 `CANON_KIT_SCAN_KIT_ROOTS` re-includes it) minus the `CANON_KIT_MDREF_EXCLUDE` globs
 (default empty, for a consumer's generated docs); the scan runs over tracked
-sources only, so an untracked local-only file (`BRIEF.local.md`) is a legitimate
+sources only, so an untracked local-only file (a `*.local.md`) is a legitimate
 link *source* that is never scanned and, being git-ignored-and-present, a
 legitimate *target* that resolves without being tracked. A grep error is
 fail-closed (exit 2). The link extractor is purely syntactic — it matches the

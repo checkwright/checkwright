@@ -14,6 +14,41 @@ commit (or the merge) when they disagree.
 The kit carries the generic mechanism only; a consumer's rule content (term
 lists, coupling vocabularies, glossary bodies) stays in the consumer repo.
 
+## The provenance seam
+
+A kit ships generic mechanism only. Two classes of content never land in a kit
+file, and the seam between them and the mechanism is a privacy boundary before
+it is a design one:
+
+- **A consumer's rule content** — term lists, coupling vocabularies, glossary
+  bodies, wire-contract couplings, product constant sets, agent rosters, probe
+  commands, platform commitments. A kit literal carrying one consumer's
+  vocabulary publishes it, and is false for every other consumer the moment a
+  second one vendors the kit. When a kit component needs such content it takes
+  it as optional consumer config — a knob whose default is empty or universal,
+  on the config-via-env pattern §Layout and configuration establishes and
+  §check-graph's vocabulary knob is the worked example of — never as a literal.
+  The line between a consumer's vocabulary and a universal one is what lets a
+  knob ship with defaults: universal interpreter binaries are kit-shippable, the
+  commands one consumer calls bad are not.
+- **A publisher's own provenance** — a dated authority stamp; a pointer into the
+  publisher's ruling record, work queue, always-loaded agent file or local-only
+  brief; a refused alternative's grounds carried as an attribution rather than as
+  an argument. A kit SPEC states its rule and the rule's engineering grounds
+  undated and impersonally; who decided, when and through which channel is the
+  landing commit's, and a pointer that resolves only in the publisher's tree is
+  dead in every vendored copy and on every rendered mirror.
+
+The seam decides the voice, never the content. An unattributed engineering
+ground — *refused: a per-gate header, because it would cost a retrospective
+declaration on every existing member* — stays; the same ground attached to an
+authority, a date or a publisher-internal identifier is swept to that form. A
+dated measurement a reader is told not to refresh is neither class: its date is
+its freeze, and removing it would turn a frozen attestation into a live-looking
+claim. A specimen — a constructed instance the surrounding rule teaches the
+shape of — is not a stamp either: its date or name denotes nothing that
+happened, so any other would do without the rule becoming false.
+
 ## Layout and configuration
 
 The kit is vendored (or submoduled) into a consumer repo, conventionally at
@@ -262,7 +297,7 @@ because a publish path that does not exist is not one to audit). The roster and
 the workflow are **consumer config, never kit literals**: the knob, the line
 grammar and the assertions are gate-sdk mechanism, while *which* platforms a
 project commits to is that project's own support commitment — a kit literal
-spelling one project's would ship it as everyone's (CLAUDE.md §The provenance
+spelling one project's would ship it as everyone's (§The provenance
 seam). And `GATE_SDK_CARGO_TARGET_DIR` (default **derived** from
 `GATE_SDK_NATIVE_CRATE` as `<crate>/target`, cargo's own placement, so the
 warm cache `bin/build-native.sh` fills is the one §check-crate-arms reuses).
@@ -2759,10 +2794,10 @@ belongs, queue-kit/SPEC.md §check-queue-entry-budget, rather than here.
 **The substrate language is Rust.** The alternative weighed and refused is
 **Go**, on three grounds: larger binaries, poorer memory management under a
 primitive garbage collector, and a weaker compiler. The first of those is not a
-matter of taste here, because footprint is a first-class cost under the
-objectives the trajectory pivot records (TRAJECTORY.md §The objectives) and the
-payload ships one prebuilt binary per declared target (§Consumer payload), so
-binary size is paid per target on every adopter's machine.
+matter of taste here, because footprint is a first-class cost of the substrate —
+an install is tried and reversed without growing the adopter's dependency set —
+and the payload ships one prebuilt binary per declared target (§Consumer
+payload), so binary size is paid per target on every adopter's machine.
 
 **A bash portability floor was costed and rejected — closed, not deferred.**
 What was costed: shimming or dropping the GNU-only constructs the battery
@@ -2775,16 +2810,15 @@ bash 3.2, which no shim reaches, and `mapfile` / `declare -A` appeared
 in 57 of the 96 checks the battery held when it was counted — so the floor buys
 BSD-userland tolerance and never a stock-macOS install.
 
-**That rejection stands on the trajectory pivot, and deliberately not on this
-section's own case for a port.** The port's own case ruled platform reach out as
-a ground for porting, so an argument from reach would contradict the case it
-sits under. The pivot reinstates reach: it names every major operating
-system and makes the non-technical adopter a design constraint (TRAJECTORY.md
-§The objectives, cited above). Read against those, a floor reaching BSD
-userlands but not a stock macOS install fails an objective rather than a
-preference — and the pivot's own direction, shrinking the interpreter surface to
-the unavoidable, is the one this costing already pointed, which makes the
-costing a step on the trajectory rather than a casualty of it. The narrower
+**That rejection stands on the substrate's objectives, and deliberately not on
+this section's own case for a port.** The port's own case ruled platform reach
+out as a ground for porting, so an argument from reach would contradict the case
+it sits under. The objectives reinstate reach: every major operating system is a
+target and the non-technical adopter is a design constraint. Read against those,
+a floor reaching BSD userlands but not a stock macOS install fails an objective
+rather than a preference — and the objectives' own direction, shrinking the
+interpreter surface to the unavoidable, is the one this costing already pointed,
+which makes the costing a step toward them rather than a casualty of them. The narrower
 installer-and-probe trade this does **not** close has since been settled the
 declaring way rather than the shimming one: docs/install.md §Requirements states
 the GNU-userland requirement for the **install path and the probe** and not the
@@ -3336,7 +3370,7 @@ own argv and resolves no kit knob at all, so its slice is empty the way
 later would simply be declared. The second arm's driver path is the sharper half:
 it is the consumer's own file rather than any kit's, so it may not be a crate
 constant, and taking it as an operand is how the provenance seam is held on an arm
-the payload ships (CLAUDE.md §The provenance seam).
+the payload ships (§The provenance seam).
 
 **A default the deleted shell driver held inline moves into the owning kit's
 table in the same cut that deletes the driver, never after.** The binary resolves
@@ -5945,7 +5979,7 @@ one way that matters, by moving the four members' own declarations into that
 class. All four manifests gain `*.gate` and `*.rs`, and two spellings widen from
 `.workflow/*.txt` to `.workflow/*`. Both added tokens are **bare globs**: a token
 naming this repo's crate directory would publish one consumer's layout into a kit
-file and be false for every other (CLAUDE.md §The provenance seam), where the
+file and be false for every other (§The provenance seam), where the
 bare glob matches the corpus derivation exactly and over-selection in a
 trigger-shaped set is cheap by design.
 
@@ -13074,7 +13108,7 @@ crate's dispatch roster joined to the battery's registration.
   is the exact discrimination the scope rule needs it for. A crate literal
   spelling one project's gates-directory name would also ship that project's
   layout to everyone, which §Layout and configuration rules for the target roster
-  and CLAUDE.md §The provenance seam rules generally. The sentinel is
+  and §The provenance seam rules generally. The sentinel is
   layout-independent and needs to be, and nothing on the reading side wants the
   name: the gate resolves a consumer-declared descriptor through
   `gate_sdk_gates_dir` and already globs that directory into its descriptor set.
@@ -15018,7 +15052,7 @@ rather than presented as a clean port.** `GATE_SDK_GRAPH_THEME` and the three
 `graph_theme_css`/`_header`/`_footer` override functions are **retired**: a
 consumer carrying a `graph-theme.sh` had that file read at every emission, and
 after this change it is not. What the replacement is bound to is that the
-doctrine holds through the cut: CLAUDE.md §The provenance seam names this pair as
+doctrine holds through the cut: §The provenance seam names this pair as
 its worked example, and the theme stays the consumer's — only its **form** moves
 from executable to declarative.
 
@@ -16852,7 +16886,7 @@ one transition and read at none.
   Which scope a given `gh` call consumes depends on the subcommand, and a
   verb-to-scope map is a **vocabulary** — unbounded, provider-versioned, and
   the kind of rule content a kit must not ship as a literal
-  (CLAUDE.md §The provenance seam). So this arm asserts that the job *says*
+  (§The provenance seam). So this arm asserts that the job *says*
   what it takes, which is the whole difference between a reviewed allowlist and
   a repository default nobody in the tree can see.
 
@@ -16990,7 +17024,7 @@ only a name someone already thought to list, and the attested leak was a handle
 nobody had listed. So the shipped pattern matches the shape — a **handle-shaped**
 backticked token within a few characters of an account noun, in either order —
 and spells no handle, domain or project term of its own, which is what lets it
-ship tracked rather than local (CLAUDE.md §The provenance seam) and hold in a
+ship tracked rather than local (§The provenance seam) and hold in a
 fresh clone carrying no private list. Handle-shaped **excludes a short
 all-lowercase token**, which is a CLI name — `gh`, `git`, `npm`, `cargo`, `ssh`
 — rather than an account.
@@ -17105,7 +17139,7 @@ file, on one corpus, under one verdict. So a sentence about *this* pattern
 source feeding two readers stays exactly true; a sentence about the mechanism
 having two consumers does not. **No pattern is baked into the crate**: the roster is
 consumer config on the §check-graph pattern, and a kit literal carrying a
-consumer's vocabulary publishes it (CLAUDE.md §The provenance seam).
+consumer's vocabulary publishes it (§The provenance seam).
 
 **The cheap-filter-then-match split survives the port.** A fork-free per-path
 filter runs first — prune dirs, the `msg-patterns` prefix, the regular-file test
@@ -17281,7 +17315,7 @@ diverges from the sibling deliberately: `check-commit-msg`'s tracked pattern fil
 is *required* and missing it is exit 2, while here an absent pattern file or an
 empty corpus makes the gate assert nothing and exit clean, naming the absence in
 its detail line — the §check-graph / `graph-vocab.knobs` degradation, which is the
-pattern CLAUDE.md §The provenance seam names for exactly this case. The ground is
+pattern §The provenance seam names for exactly this case. The ground is
 that the kit cannot know any consumer's install path, so a fail-closed default
 would red every adopter's first commit on a roster only their project can write.
 **The honest limit, stated because the degradation is the whole risk:** an
@@ -17469,7 +17503,7 @@ collision across classes cannot mask one:
 
 The `case:` class reads the arm's **action, never its pattern**, and that is a
 **privacy boundary** rather than a parsing convenience: a consumer's arm patterns
-are its own rule vocabulary, which a kit gate must never read (CLAUDE.md §The
+are its own rule vocabulary, which a kit gate must never read (§The
 provenance seam). The gate asserts that a consumer's divergent rule lines are
 *declared*, never what they say. The discard is what enforces it, so the compiled
 form reproduces it **as a discard** and never as a capture that is later ignored:
@@ -17584,7 +17618,7 @@ vendoring adopter with no crate births a shell gate from that file, so porting i
 deletes the only thing gate-sdk hands that adopter.
 
 **The second ground — a consumer copy carrying the consumer's own rule content
-cannot cross into kit mechanism** (CLAUDE.md §The provenance seam), which is the
+cannot cross into kit mechanism** (§The provenance seam), which is the
 ground `drift-kit/templates/kpi-deprecated-surface.sh` declares on.
 `<gates-dir>/bash-guard.sh` is the one copy in this corpus that declares
 divergence at all, and what its `# copy-divergence:` reasons name is this
@@ -17728,7 +17762,7 @@ intentional retirement from an accidental one. It is named rather than closed.
 structural.** The flat form of the rule — *a kit's `templates/` registry must be
 the full bundled set* — is unsafe as stated: applied to
 `drift-kit/templates/price-table.tsv` it would force a kit literal enumerating a
-model roster, which is precisely the seam (CLAUDE.md §The provenance seam). Two
+model roster, which is precisely the seam (§The provenance seam). Two
 kinds of template are out of population, both by construction and in this order:
 one that is not a `.list` at all never reaches the sibling test (`price-table.tsv`
 exits there, on its extension); one that is a `.list` whose rows are consumer

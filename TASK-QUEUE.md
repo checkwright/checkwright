@@ -1215,7 +1215,7 @@
   reputational and front-door-resident, accruing on every reader rather than with
   time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
 
-- **design-partner-preview** [design-pending] [cost: iteration/high] [surface: installer] — a narrow external preview before
+- **design-partner-preview** [design-pending] [cost: event/low] [surface: installer] — a narrow external preview before
   any broad announcement: a narrow external preview cohort, its composition ruled
   in the operator's brief, installs observed live rather than by written feedback,
   instrumented for
@@ -1235,6 +1235,18 @@
   trust baseline, and two externally observed defect stories. The full launch
   ruling behind this sequencing is operator material and stays in the local-only
   private brief; this entry carries only the queue-visible rung.
+  **RUN IT (operator direction, 2026-09-16, consult-relayed) — a PROMOTION SIGNAL FOR THE NEXT
+  SCOPE.** Cohort 1–2, one observed install first, the retention field accepted as thin at that
+  n; the window starts on the first install, sought as soon as the observation protocol lands.
+  Re-costed: the tree half is event/low — an observation protocol naming the per-install record
+  (time-to-first-green, first useful red, false-positive dispositions, 7/30-day check-ins) as a
+  `.metric/`-class private record with a public aggregate projection; the expensive half is
+  operator hours and a calendar window of thirty days or more running beside later iterations,
+  never inside a stage session. Expected FIRST FINDING, not a precondition: today's quick start
+  is curl, sha256sum, tar and `bash … init` from a repository root; macOS needs GNU bash and
+  coreutils by adopter action; native Windows needs Git for Windows. Refused, grounds in the
+  landing commit: parking behind `native-windows-bash-floor` or the git-only-floor discharge (the
+  trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
   **Intake provenance:** item 4 of the external review's own priority order, and
   like `companion-toolkit-profile` it fell outside the 2026-07-23 intake's
   "top pre-announcement gaps" filter rather than being judged and declined —
@@ -3339,19 +3351,19 @@
   `SPEC-seam-slice.md` in the commit that merged it.
   **MOVE-VERSUS-DELETE IS ANSWERED THROUGH THE SECOND SLICE: NO SWEPT SITE WAS SOLE-HOME**, nothing
   migrated to TRAJECTORY.md, and drift-kit is STILL LAST TO OWE IT.
-  **THE POINTER CLASS STAYS OPEN**, has shipped intact for three consecutive units, and was
-  re-verified 2026-09-06 as EXACT at 17 across five kit SPECs, plus a `docs/`- and
-  `BRIEF.local.md`-class the same question reaches. **RULED `lead, own-authority` 2026-09-06: they
-  STAY STANDING.** Answerable for every kit SPEC at once or not at all, so **THE ANSWER IS OWED TO
-  THE OPERATOR BEFORE THE SLICE THAT LANDS THE GATE** — it reaches the provenance seam, a privacy
-  boundary before it is a design one.
-  **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile.** It ships EXEMPTION-FREE:
-  the gate-sdk/SPEC.md §The decisions this substrate already closed carve-out retired when the
-  operator ruled (2026-09-16, consult) that the recording rule's split discharges the entry that
-  held it open, and that section was swept under delta 1 in the same consult, pointers standing.
-  **NO DISCHARGE LINE SURVIVES** — the directive paragraph that discharged on "that unit lands and
-  the gate is green" went with the ruling above, so this entry carries its own end condition: it
-  lands WHOLE, gate green, or it stays here.
+  **THE POINTER CLASS IS ANSWERED (operator, 2026-09-16, consult, lead-relayed): RE-HOMED, NOT
+  STANDING.** The seam rule's kit-owned home is gate-sdk/SPEC.md §The provenance seam — the one
+  kit every profile carries — and every former `CLAUDE.md` seam citation points there; gate-sdk's
+  two ruling-record pointers were swept under delta 1's corollary and the private-brief name
+  generalized to `*.local.md`. Refused, grounds in the landing commit: standing (an exemption by
+  omission), local restatement (SSOT), a doctrine-kit home (delegation profile only).
+  **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile.** It ships EXEMPTION-FREE,
+  and beside the dated-stamp class its predicate denies FOUR pointer shapes in a kit SPEC: a
+  `CLAUDE.md §` section citation, a `TRAJECTORY.md` mention, a `BRIEF.local.md` mention, and a
+  live queue slug — a bare `CLAUDE.md` as a knob default is mechanism and passes. The gate-sdk
+  carve-out retired at the 2026-09-16 consult, and that section is swept.
+  **NO DISCHARGE LINE SURVIVES**: this entry carries its own end condition — it lands WHOLE, gate
+  green, or it stays here.
   **Cost while deferred:** the remaining published kit SPECs and every adopter's vendored copy carry
   private ruling history as mechanism and pointers a consumer cannot follow; product-class, and
   accreting measurably — gate-sdk re-acquired a slug citation after its own sweep landed.

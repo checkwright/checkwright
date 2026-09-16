@@ -364,9 +364,9 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     a text-level sweep closes it.
     *Enforced by:* a text-level completeness check whose term list is *consumer
     config*, never a kit literal — the same seam that keeps product vocabulary
-    out of shipped mechanism (the config-via-env pattern in
-    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md)), so the check ships and the
-    vocabulary stays with the consumer.
+    out of shipped mechanism ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The
+    provenance seam), so the check ships and the vocabulary stays with the
+    consumer.
     *Stages:* build
 
 17. **Config edits are merges, not rewrites.** Edit a config or settings file

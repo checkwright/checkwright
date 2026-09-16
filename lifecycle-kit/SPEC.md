@@ -2521,7 +2521,7 @@ kit's default is **empty**, so an unconfigured consumer classifies nothing and
 sees exactly the behaviour above. The kit ships the mechanism — read the
 porcelain, apply the pattern, probe the pid — and the consumer ships the
 pattern, the same split `check-graph` takes over its vocabulary
-(CLAUDE.md §The provenance seam).
+(gate-sdk/SPEC.md §The provenance seam).
 
 | observation | class |
 | --- | --- |

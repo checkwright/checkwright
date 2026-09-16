@@ -598,7 +598,7 @@ forced it, because a rule slipped in unremarked is what would rot it.**
   reads a PID and asks whether it is alive — so the test rule 12's widening had
   to pass is the test this one passes: **it admits nothing a project owns**. A
   kit's own artifact grammar is shipped mechanism, which is exactly what
-  CLAUDE.md §The provenance seam distinguishes from private rule content.
+  gate-sdk/SPEC.md §The provenance seam distinguishes from private rule content.
 
 A project's toolchain stays out on the same words as before, under both.
 
@@ -608,7 +608,7 @@ backgrounded condition wait and the harness's event-stream form, because a
 corrective that named neither would be unfollowable. A harness tool name is
 public, documented, and shared by every consumer of that harness, so it is not
 private rule content and the provenance seam — a privacy boundary over private
-vocabularies (CLAUDE.md §The provenance seam) — does not reach it. What such a
+vocabularies (gate-sdk/SPEC.md §The provenance seam) — does not reach it. What such a
 literal does cost is portability: a second harness with different form names is
 what would force these into a configurable slot, and building that slot before
 that harness exists would be designing against no case.
@@ -2864,7 +2864,7 @@ Knobs (this repo's layout as defaults):
   than bare commands, matching the settings vocabulary the tool already reads on
   both sides, so a consumer can probe non-`Bash` rules with the same mechanism.
   The kit ships **no** default probes: a probe names a command the consumer
-  calls bad, which is the consumer's vocabulary, never the kit's (CLAUDE.md §The
+  calls bad, which is the consumer's vocabulary, never the kit's (gate-sdk/SPEC.md §The
   provenance seam).
 - `GUARD_KIT_BREADTH_DECLARED` — keyed knob recording the breadths ruled
   intended (§compare-settings-allow), one
@@ -2935,7 +2935,7 @@ Knobs (this repo's layout as defaults):
   knob is what answers the *a roster rots* objection: the kit ships a default and
   the consumer owns the value, so a missing member is a config edit rather than a
   kit release. Its members are universal interpreter binaries — none of the
-  classes CLAUDE.md §The provenance seam names — so unlike
+  classes gate-sdk/SPEC.md §The provenance seam names — so unlike
   `GUARD_KIT_BREADTH_PROBES` it is kit-shippable *with* defaults; that roster is
   consumer config because its members are private, so the test is the content and
   never the shape. It has **exactly one** reader by design: arm (b)'s trigger.
