@@ -54,7 +54,7 @@ vendoring consumer resolves against its own pin, never the landing date, which
 is provenance and is false for every consumer that upgraded later.
 
 canon-kit's `check-provenance-seam` holds the publisher-provenance class's
-lexical shapes over every kit SPEC; its honest limits, the shapes it cannot see,
+lexical shapes over the kit SPECs of a tree that authors its kits; its honest limits, the shapes it cannot see,
 are recorded in canon-kit/SPEC.md §check-provenance-seam.
 
 ## Layout and configuration

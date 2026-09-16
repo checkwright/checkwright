@@ -497,9 +497,7 @@ Knobs:
   adds its own. `CANON_KIT_SEAM_PRIVATE_SURFACES` — array of the publisher's
   private paths (a ruling record, a local-only brief), default **empty**: those
   names are one publisher's vocabulary, so no spelling ships as a literal, and the
-  empty default switches the private-surface arm off. This repo sets its ruling
-  record and its local-only brief; the names are not spelled here, because this
-  SPEC is in the gate's own corpus. `CANON_KIT_SEAM_SLUG_MIN_LEN` — positive
+  empty default switches the private-surface arm off. `CANON_KIT_SEAM_SLUG_MIN_LEN` — positive
   integer, default `12`: the shortest queue slug the slug arm matches, so a short
   slug cannot match ordinary hyphenated prose.
 - `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
