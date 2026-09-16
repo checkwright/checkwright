@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+seam-sweep-remainder gates sha256=bfc74196d5bc10e6d113f97e1e9d9c4aff005460d6e2ed4a8a127fb45ffea66f pass=115 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder guard_kit sha256=7418de9de4572487cd88ef9d9415f87790a067e3d5dc68278afb7dfb8c61e109 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder lifecycle_kit sha256=1c39766343c6e46e13c6da2d3026398f0654a7cc53985ef01cf0e71653f68431 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder queue_kit sha256=2334582dd365a18ebe2f1daf9532d2acc25728fa9e04376e62f24f0c8a5a1788 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder guard_tests sha256=b6aa810279d5b9db9f60ade6549889447b49aaa86cbf148d67ab34a04b735c19 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder demo sha256=327e8be956b2b81378b0035c7d0dfb00040c646a7eff48b517d529355c2a97c1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder installer_smoke sha256=adafedcb06df4ad171881e0cf2a64fe42287f4ca46025dcee0c860800fe9d4a4 pass=13 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder consumer_smoke sha256=2250c54025215fb7c0e728bbbaf704b89ccf76ab55982f3d04f20daec8f3cc63 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder upgrade sha256=2c63f7d0e18a3ab6c2f0802edb9e9676c6563f586edc36d336007c05539c49d6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder agents_md_smoke sha256=503a10d9f39c6cc9359d7f26628ba6e4d3debe49a857a80476d1338be0e2a0d8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+seam-sweep-remainder native_crate sha256=7ea340baf9cf6da3defc6ac2c4633d404363899b6adfb436d2b5efb560c5dbaa pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
