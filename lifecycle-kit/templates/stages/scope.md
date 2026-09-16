@@ -34,7 +34,8 @@ not have drained, and prints them as an advisory naming them this session's
 intake (lifecycle-kit/SPEC.md §The committed gap inbox owns why it admits rather
 than refuses). Each carried bullet gets **exactly one** disposition — promoted to
 a queue entry, fixed inline this session, or discarded with cause in the commit
-message — after which this session truncates the inbox to its `# contract:`
+message — a promotion running the owner lookup first (lifecycle-kit/SPEC.md
+§The committed gap inbox) — after which this session truncates the inbox to its `# contract:`
 header **in the same commit**. That is the drain's own disposition set, run by
 the stage that can now legally run it; no linked-and-skipped middle state, per
 the gap-disposition rule, and deleting a bullet without a disposition is not a

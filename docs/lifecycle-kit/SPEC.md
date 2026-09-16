@@ -1267,6 +1267,31 @@ command, and a later bullet carried two false premises at once — one caught by
 the filer re-reading the source before the drain, the other only by the draining
 session's own probes. The step that reliably ran was the drain.
 
+**Filing looks for an owner first.** Re-verification reaches past the drain to
+every write of a new deferred entry, in any stage — a drain's or an intake's
+→promote, each finding close files on its own account (a lesson →task, an
+eviction or triage finding, a dispatch's captured debt), and a finding validate
+files as a task. Before writing, the session searches the
+queue file, the icebox included, for an entry that already owns the finding,
+grepping its distinctive terms: the paths, gate and knob names, and slug-shaped
+words. A match is read, not counted:
+- an owner carrying the finding is a **recurrence** — it takes a `recurrence:`
+  stamp and folds any new axis into its body, and no second entry is filed;
+- an adjacent entry is cited in the new entry's prose as **distinct**, with the
+  reason;
+- a done slug is a finding that recurred after its fix, filed as a new defect
+  naming that slug.
+
+The filing commit records the lookup per entry — the terms searched, and `none`
+or the matched slug with its reading — so a missed owner shows as a bad search
+rather than a silent omission. The step needs no similarity oracle: the re-filings
+it answers each had an owner a plain grep for the slug and subject would have
+found, and in each the filer never ran it, so what was missing was the step, not a
+scanner. It binds where the queue is written, never at capture (the refusal
+below stands). *Honest limit:* a filer whose terms miss the owner files a
+duplicate and nothing reds — `check-task-conservation` conserves a duplicate pair —
+so the commit-message record is the only residue a later reader can audit.
+
 **Two capture-time shapes are refused, recorded so they are not re-drafted.** A
 filing-time prompt for the establishing command, and a grammar separating
 observed fact from inferred mechanism, both add friction at the moment this inbox

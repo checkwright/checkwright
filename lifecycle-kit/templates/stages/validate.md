@@ -37,7 +37,8 @@ it and move on. Only excavate a failure that is genuinely new or a suspected
 regression from the current diff.
 
 When filing a finding, place it by kind: nameable deliverable + done-state ⇒
-queue task (the deferred section, design-pending); an observation about how
+queue task (the deferred section, design-pending, after the owner lookup of
+lifecycle-kit/SPEC.md §The committed gap inbox); an observation about how
 the work should be done ⇒ the lessons section, dispositioned at close.
 Undone work parked as a lesson evaporates; a process insight parked as a
 task rots.

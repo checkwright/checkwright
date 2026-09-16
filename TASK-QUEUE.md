@@ -12,58 +12,6 @@
 
 ## New Features
 
-- **close-eviction-refiles-without-checking** [spec: SPEC-filing-owner-check.md] — close's
-  backlog-eviction step
-  files its finding without checking whether a prior close already filed it, and has now done so.
-  **Self-demonstrating instance, found at this close:** the queue carried two entries for one
-  finding — `icebox-worklist-roadmap-blind` (filed 2026-08-09) and
-  `icebox-candidate-roadmap-filter` (filed 2026-08-13) — with the *same* three-row measurement in
-  both bodies. Merged at this close into the elder slug, which was the one carrying an inbound
-  citation; both have since retired.
-  **The shape generalizes past that step.** Any close-stage sweep that files from a *recurring*
-  worklist will re-file on the next iteration unless something checks; the eviction worklist is
-  simply the sweep that recurs most reliably, because its input is stable by construction.
-  `check-task-conservation` does not catch it — two distinct slugs carrying one finding is
-  conserved.
-  **Candidate fixes, none ruled:** a duplicate-finding check at filing time (needs a similarity
-  oracle, probably not buildable); or the cheaper direction — have the recurring sweeps *state*
-  their prior filing, so the next close reads a pointer instead of re-deriving. The second is the
-  same receiving-side shape `handoff-premise-reverification-placement` argues for.
-  **Cost while deferred:** one duplicated entry per recurring sweep per close, each of which then
-  has to be found and merged by a later close reading 5000 lines of queue.
-  recurrence: close-eviction-refiles-without-checking 2026-08-23
-  **FIRST RECURRENCE, 2026-08-23, self-demonstrating TWICE in one close and generalizing the
-  entry past its own step.** `leak-guard-and-assertion-meta-gate-port`'s close filed two gap
-  bullets that each re-derived a live entry, and withdrew both once an audit sweep surfaced the
-  owners. One came from the eviction step, re-filing `icebox-candidate-eligibility-unapplied`
-  (since retired) with the same roadmap-tag measurement for the FOURTH time across four
-  closes. The other came
-  from the PROMPT-FRICTION triage, re-deriving `guard-read-steer-tool-coverage`'s awk question
-  from the log — which is the paragraph above confirmed rather than merely restated: the shape
-  is any close-stage sweep whose input recurs, and the eviction step is only its most reliable
-  instance. It also settles which candidate fix is reachable. A similarity oracle is not needed
-  to catch either: both owners were found by a plain slug-and-subject grep of the queue, so the
-  cheap direction is not merely cheaper but sufficient — the missing step is a *lookup before
-  filing*, and neither sweep performed one. The contaminated measurement that came with the awk
-  bullet is a second cost the entry had not priced: a re-derived finding also re-measures, and
-  a worse measurement can overwrite a better one if the duplicate is promoted rather than caught.
-  **THIRD INSTANCE, 2026-08-23, and the SHARPENING is the datum rather than the count.**
-  `battery-runner-port`'s close read the audit-roster row `close-surface-actually-read` — which
-  already carried the prior close's finding that reading a capture surface is not the same act as
-  checking the queue for the owner — then filed five bullets that DID grep for an owner and one
-  that did not. The one that skipped it arrived off the **eviction worklist** rather than a capture
-  log. So the rule is neither unwritten nor unread: it was applied per-bullet by habit instead of
-  as a step, and the bullet arriving through the surface the row does not name is the one that
-  missed. The generalizable form is narrower and sharper than that row's wording — **the
-  owner-check is owed by every filing, not only by one read from a capture log** — and it is a
-  *lookup step*, which is exactly the cheap candidate fix above rather than a new one.
-  Filed 2026-08-13 by close, from its own backlog-eviction step.
-  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set**, feature-class
-  because an owner-check owed by every filing is a contract other stages honor. The set's argument
-  lives on `audit-roster-mechanism-has-no-kit-owner`.
-  **Ruled at spec:** every deferred-entry write runs an owner lookup first and records it in
-  its commit message; capture stays exempt.
-
 ## Technical Debt
 
 ## Deferred
@@ -4548,5 +4496,6 @@
 - audit-roster-mechanism-has-no-kit-owner
 - audit-class-corpus-attestation
 - audit-roster-last-stamp-author-unconstrained
+- close-eviction-refiles-without-checking
 
 ## Lessons Learned

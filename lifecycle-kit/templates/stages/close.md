@@ -28,7 +28,9 @@ finding, or a dispatch's "capture as debt". The active sections must be empty
 at the drain boundary, so a finding mis-filed into one is caught only later as
 a red `check-stage-entry` at the next iteration's entry; filing to Deferred
 keeps the boundary clean (lifecycle-kit/SPEC.md §check-stage-entry owns the
-deferred-filing model for ruled-but-unpromoted work).
+deferred-filing model for ruled-but-unpromoted work). Every filing, including a
+drain →promote, runs the owner lookup first and records it in the commit message
+(lifecycle-kit/SPEC.md §The committed gap inbox).
 
 **The survey record is not a close surface.** It carries no disposition
 obligation and blocks no boundary — the next first-stage entry truncates it,
