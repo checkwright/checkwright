@@ -1094,7 +1094,7 @@ one arm two jobs and two output grammars.
 
 A **non-gate arm of the binary** (gate-sdk/SPEC.md §The non-gate arm), reached
 through the battery runner's `--emit` front-end:
-`run-gates.sh --emit queue-counts [<queue-file>]`. It registers in the
+`run-gates.sh --emit queue-counts [--by <tag>] [<queue-file>]`. It registers in the
 arm table under the derived spelling `--emit-queue-counts`, stays outside
 `--list`, and owes no `.gate` descriptor, no `gates.list` registration and no
 `good/`+`bad/` fixture pair. Its declared reads are the four
@@ -1103,10 +1103,20 @@ three section knobs. `QUEUE_KIT_DONE_SECTION` is deliberately **not** among
 them — Done is not a task section, and the arm must not acquire a read it does
 not make.
 
-One job: the size of each **task section**, for a caller that wants the shape of
-the queue rather than its contents. It emits one `<section-name><TAB><count>`
-line per task section, in configured order, and nothing else — no flags, no
-modes, one output grammar. The optional `[queue-file]` positional ports
+One job: **the size of each set**, for a caller that wants the shape of the queue
+rather than its contents. It emits one `<key><TAB><count>` line and nothing else
+— **one output grammar**, which is the property the refusal below protects and
+which `--by` keeps. The key is the task-section name, in configured order; under
+`--by <tag>` it is `<section>/<value>`, the slash-joined compound
+`[roadmap: <horizon>/<track>]` already uses in this kit for a pair whose halves
+are never independently meaningful. A field tag yields its first lead-line value,
+a bare tag yields its own name, and an entry carrying neither yields `(none)` —
+an absent input appears rather than vanishing, as §The queue-index arm's
+`(undated)` and `(unclassed)` do. Values order by first appearance in queue
+order, and a section holding no entries has no partition and so emits no line
+under `--by`, where the default key still reports its zero. The arm enumerates no
+tag name, so §The tag algebra stays the vocabulary's one owner and an unknown tag
+honestly reports every entry under `(none)`. The optional `[queue-file]` positional ports
 unchanged, on gate-sdk/SPEC.md §The non-gate arm's distinguishing test: it is an
 argument the rule itself consumes, falling back to a knob, the shape
 `check-amendment-queue` and `check-evidence-manifest` already carry.
@@ -1131,7 +1141,9 @@ arm two output grammars — the same refusal that keeps §The queue-edges arm
 separate. A tally keyed by section name is a different job with a different
 grammar, so it lands beside the index rather than inside it. Recorded here
 because the next reader meeting two queue arms would otherwise read the split as
-an oversight and merge them.
+an oversight and merge them. `--by` is not that fold: it changes the partition
+key, leaving one job and one grammar, and the in-process caller
+(delegation-kit/SPEC.md §The statusline arm) receives the unchanged default.
 
 **Two callers at two transitions.** delegation-kit's statusline arm calls the
 rendering **in process** at each statusline fire, resolving the four knobs above

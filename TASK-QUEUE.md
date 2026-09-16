@@ -27,28 +27,6 @@
   declared row to read grounds the worklist was meant to show, growing with the declarations.
   Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the printed-format ground.
 
-- **queue-counts-reports-no-tag-breakdown** [spec: SPEC-arm-fidelity.md] — the tag partition.
-  — `--emit queue-counts` reports section counts and no tag breakdown, so a session needing the
-  share of the live pool carrying a given tag counts lead lines by hand.
-  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close: the fact "every live entry
-  still needs design, so scope can promote no debt and every unit set routes through the
-  spec stage" was stamped as a re-derivation at that iteration's scope, and re-verifying it took an
-  awk over the live window — 130 lead lines, 130 design-pending.
-  **Re-verified at the following scope:** the arm prints four section counts and nothing else.
-  **What is missing is the DERIVATION, not an owner.** The durable rule is already owned by
-  §The tag algebra and by the scope template's design-pending exit condition, so neither
-  knowledge-friction remediation shape applied and the stamped re-derivation dropped with its
-  measurement recorded.
-  **Printed format ruled at spec (delta 5):** a `--by <tag>` flag keying `<section>/<value>`, so
-  the arm keeps ONE output grammar and the in-process statusline caller keeps the default.
-  **The filing's candidate was wrong and is corrected here:** the queue-index parser computes a
-  per-`###`-SUBSECTION tally and separately extracts each deferred row's two board tags to echo
-  them. A tag breakdown is an aggregation over data already parsed, not an existing computation.
-  **Cost while deferred:** one hand count per scope session wanting the figure, and a figure nobody
-  re-verifies because re-deriving it is the same work as trusting it.
-  Filed 2026-09-16 to that close's gap inbox from its knowledge-friction triage; promoted at the
-  following iteration's scope.
-
 ## Technical Debt
 
 ## Deferred
@@ -4523,5 +4501,6 @@
 
 - entry-history-reads-live-entries-only
 - retired-block-admits-live-gate-name
+- queue-counts-reports-no-tag-breakdown
 
 ## Lessons Learned
