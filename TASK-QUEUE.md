@@ -4192,6 +4192,103 @@
   Filed 2026-09-16 to the gap inbox by the iteration lead verifying align's own commits; no gate
   reds on it. Drained and promoted at close, which re-ran the tabulation and widened the finding.
 
+- **isolation-oracle-cost-lacks-dispatcher-clause** [design-pending] [cost: event/high] [surface: delegation-kit]
+  — agent-execution's isolation cost (4) carries no dispatcher-side clause, so a dispatch sending
+  an oracle-running sweep into isolation is discovered unresolvable only after a full round trip.
+  **The asymmetry is inside one rule set.** Cost (3) already carries a dispatcher clause — a sweep
+  whose corpus is untracked or gitignored is not delegable to an isolated agent; read it yourself
+  or pass its content in the prompt, and classify the corpus *before* dispatching. Cost (4) carries
+  only a post-hoc recovery note, "the parent's checkout has the binary and can run it", which a
+  parent reads after the round trip is already spent.
+  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close: an `audit-sweep` dispatched
+  with `isolation: worktree` to run `--emit queue-edges` spent about 39k child tokens, 7 tool calls
+  and 70 seconds returning blindness, on a fact decidable before dispatch; re-dispatched with the
+  arm run in the main checkout and its stdout materialized under the scratch dir and named absolute
+  in the prompt, it completed the sweep. The child's half of the rule worked exactly as written —
+  it reported and refused to build.
+  **Why `[design-pending]`:** whether the remedy is one sentence on cost (4), a shared
+  classify-before-dispatch step both costs point at, or a guard assertion is a residency call.
+  **DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which is cost
+  (3)'s composition with the dispatch guard's D2; this is cost (4)'s missing dispatcher half and
+  stands whatever (3) says.
+  **Cost while deferred:** every dispatch of an oracle-running sweep into isolation buys one wasted
+  round trip and a re-dispatch.
+  Filed 2026-09-16 to the gap inbox at `isolated-dispatch-obligations`' close, which could not
+  drain it; promoted at the following iteration's scope.
+
+- **isolated-dispatch-resume-loses-its-isolation** [design-pending] [cost: event/high] [surface: delegation-kit]
+  — a `SendMessage` resume of an `isolation: worktree` read-only dispatch silently loses its
+  isolation, so the dispatch guard's claim-by-shape rule is evaluated once and never again.
+  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close, on a later dispatch than the
+  one above: an `audit-sweep` under `isolation: worktree` handed back, the harness auto-cleaned its
+  worktree, and the resume
+  re-entered with cwd at the MAIN CHECKOUT — the child verified this itself, `pwd` at the repo root
+  and `git worktree list` showing one checkout on master.
+  **The hole is in the guard's own premise.** `agent-dispatch-guard`'s D2 refuses a
+  `DELEGATION_KIT_READONLY_TYPES` dispatch carrying no isolation, on the ground that a read-only
+  claim is made by isolation and not by sentence. The resume path re-enters that same read-only
+  type with full write reach on the shared branch and no second D2 evaluation. The child stopped
+  only because that dispatch prompt happened to carry an explicit if-your-worktree-was-cleaned-up
+  stop clause; nothing structural refuses it.
+  **Why `[design-pending]`:** three candidate shapes with no ruling between them — (a) the guard
+  evaluates D2 on a resume as it does on a dispatch, if the resume payload is reachable at the
+  pre-tool hook; (b) agent-execution states that a resumed isolated dispatch is a NEW dispatch
+  owing re-isolation, making re-dispatch the sanctioned shape; (c) the read-only agent types carry
+  a self-check on their own cwd.
+  **DISTINCT from `worktree-isolated-agent-report-lost-to-a-failed-peer-send`**, which is about a
+  child's RETURN VALUE being dropped and has no permission half.
+  **Cost while deferred:** every resume of an isolated read-only dispatch runs with write reach the
+  dispatch itself would have been refused, and nothing reds.
+  Filed 2026-09-16 to that same close's gap inbox, undrainable there; promoted at the following
+  iteration's scope.
+
+- **queue-counts-reports-no-tag-breakdown** [design-pending] [cost: iteration/low] [surface: queue-kit]
+  — `--emit queue-counts` reports section counts and no tag breakdown, so a session needing the
+  share of the live pool carrying a given tag counts lead lines by hand.
+  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close: the fact "every live entry
+  carries `[design-pending]`, so scope can promote no debt and every unit set routes through the
+  spec stage" was stamped as a re-derivation at that iteration's scope, and re-verifying it took an
+  awk over the live window — 130 lead lines, 130 design-pending.
+  **Re-verified at the following scope:** the arm prints four section counts and nothing else.
+  **What is missing is the DERIVATION, not an owner.** The durable rule is already owned by
+  §The tag algebra and by the scope template's design-pending exit condition, so neither
+  knowledge-friction remediation shape applied and the stamped re-derivation dropped with its
+  measurement recorded.
+  **Why `[design-pending]`:** whether the breakdown is a second block on this arm, a flag, or a
+  column on §The queue-index arm's board is a printed-format call those sections own.
+  **Candidate:** the per-tag breakdown the queue-index arm's parser already computes to render its
+  rows.
+  **Cost while deferred:** one hand count per scope session wanting the figure, and a figure nobody
+  re-verifies because re-deriving it is the same work as trusting it.
+  Filed 2026-09-16 to that close's gap inbox from its knowledge-friction triage; promoted at the
+  following iteration's scope.
+
+- **stage-economics-meter-has-no-feeding-obligation** [design-pending] [cost: iteration/low] [surface: drift-kit]
+  — the tier decisions in this repo's lead ruling-config binding name the stage-economics log
+  under `.metric/` as their revert signal, but nothing obliges any session to run the meter, and
+  the log has silently stopped being fed.
+  **Measured 2026-09-16** by the iteration lead at `isolated-dispatch-obligations`' close: the
+  log's newest row is dated 2026-09-12 while 13 closes have stamped since that date, that
+  iteration's among them. So the channel a tiering revert would have to be read off has no data for
+  the last 13 iterations, and the staleness reds nothing — a tier gone wrong looks exactly like a
+  tier gone right.
+  **Why `[design-pending]`:** three candidate deliverables with no ruling between them — (a) a
+  close-stage step runs the meter for the iteration just finished, making the row a close
+  obligation like the audit roster's; (b) a freshness gate reds when the newest row is more than N
+  closes behind the newest close stamp, on the generated-projection pattern; (c) rule the meter
+  on-demand-only and cut the ruling-config's dependency on it, so a tier states how it is re-judged
+  without naming a channel nobody feeds.
+  **DISTINCT from `stage-economics-log-redates-rows`** (re-running the meter re-dates live rows, a
+  defect IN a run) and **`stage-economics-smoke-jq-arm-dormant`** (an untested arm): both
+  presuppose the meter is being run, and this one is that it is not. Also **DISTINCT from
+  `build-stage-tier-economics` and `spec-split-promotion-review`**, which each want a priced
+  reading for one stage's tier; this is that no reading is being taken at all, and it stands
+  whatever those two decide.
+  **Cost while deferred:** every iteration's tier decisions rest on a signal carrying no data, and
+  the gap between the log and the close stamps grows by one row per iteration.
+  Filed 2026-09-16 to the gap inbox by the iteration lead at `isolated-dispatch-obligations`'
+  close, which could not drain it; promoted at the following iteration's scope.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
