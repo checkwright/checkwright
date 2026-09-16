@@ -119,6 +119,7 @@ leaves its section absent.
 | (consumer) | check-npm-publish-spec | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-temporal | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-count | precommit |
+| [canon-kit](canon-kit/index.md) | check-provenance-seam | precommit |
 | [canon-kit](canon-kit/index.md) | check-measured-claim | precommit |
 | [canon-kit](canon-kit/index.md) | check-unmarked-claim | precommit |
 | [canon-kit](canon-kit/index.md) | check-tracking-claim | precommit |

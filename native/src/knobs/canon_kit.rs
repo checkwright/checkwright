@@ -73,6 +73,21 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_TEMPORAL_EXEMPT_SECTIONS", &[]),
         Row::indexed("CANON_KIT_TEMPORAL_EXEMPT_PATHS", &[]),
         Row::indexed(
+            "CANON_KIT_SEAM_AUTHORITY_MARKERS",
+            &[
+                "operator( |-)(ruled|ruling|direction|directed|decided|ratified|approved|chose)",
+                "lead, ",
+                "own-authority",
+                "ruled",
+                "ratified",
+                "consult",
+            ],
+        ),
+        Row::indexed("CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA", &[]),
+        Row::indexed("CANON_KIT_SEAM_AGENT_FILES", &["CLAUDE.md"]),
+        Row::indexed("CANON_KIT_SEAM_PRIVATE_SURFACES", &[]),
+        Row::scalar("CANON_KIT_SEAM_SLUG_MIN_LEN", "12"),
+        Row::indexed(
             "CANON_KIT_COUNT_COLLECTIONS",
             &["gates", "meta-gates", "checks", "kits", "stages", "rules", "KPIs"],
         ),
@@ -184,7 +199,12 @@ fn validate(v: &Values) -> Vec<String> {
     if let Some(t) = scalar(v, "CANON_KIT_EMBED_THRESHOLD").filter(|t| !fraction(t)) {
         errs.push(format!("CANON_KIT_EMBED_THRESHOLD must be a 0..1 fraction (got '{}')", t));
     }
-    for n in ["CANON_KIT_EMBED_MINLINES", "CANON_KIT_COUNT_WEDGE_WORDS", "CANON_KIT_COMMENT_RUN_CAP"] {
+    for n in [
+        "CANON_KIT_EMBED_MINLINES",
+        "CANON_KIT_COUNT_WEDGE_WORDS",
+        "CANON_KIT_COMMENT_RUN_CAP",
+        "CANON_KIT_SEAM_SLUG_MIN_LEN",
+    ] {
         if let Some(s) = scalar(v, n).filter(|s| !positive(s)) {
             errs.push(format!("{} must be a positive integer (got '{}')", n, s));
         }
@@ -198,6 +218,9 @@ fn validate(v: &Values) -> Vec<String> {
     // followed by its extra, so the set is empty only when both are
     if empty_list("CANON_KIT_TEMPORAL_MARKERS") && empty_list("CANON_KIT_TEMPORAL_MARKERS_EXTRA") {
         errs.push("CANON_KIT_TEMPORAL_MARKERS is empty".to_string());
+    }
+    if empty_list("CANON_KIT_SEAM_AUTHORITY_MARKERS") && empty_list("CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA") {
+        errs.push("CANON_KIT_SEAM_AUTHORITY_MARKERS is empty".to_string());
     }
     if empty_list("CANON_KIT_COUNT_COLLECTIONS") {
         errs.push("CANON_KIT_COUNT_COLLECTIONS is empty".to_string());

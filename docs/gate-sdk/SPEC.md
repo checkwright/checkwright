@@ -47,7 +47,15 @@ dated measurement a reader is told not to refresh is neither class: its date is
 its freeze, and removing it would turn a frozen attestation into a live-looking
 claim. A specimen — a constructed instance the surrounding rule teaches the
 shape of — is not a stamp either: its date or name denotes nothing that
-happened, so any other would do without the rule becoming false.
+happened, so any other would do without the rule becoming false. A date that
+bounds data a kit writes into a consumer's tree is the same boundary seen from
+the other side: the SPEC names the release that carried the change, which a
+vendoring consumer resolves against its own pin, never the landing date, which
+is provenance and is false for every consumer that upgraded later.
+
+canon-kit's `check-provenance-seam` holds the publisher-provenance class's
+lexical shapes over every kit SPEC; its honest limits, the shapes it cannot see,
+are recorded in canon-kit/SPEC.md §check-provenance-seam.
 
 ## Layout and configuration
 
@@ -16974,7 +16982,7 @@ cases rather than reasoned.
 
 `checks/check-commit-msg.gate` (`commit-msg`, binary-dispatched).
 Invariant: the prospective commit message (the `commit-msg` hook's `$1`) matches
-no banned pattern. This is the message half of the CLAUDE.md ban on leaked
+no banned pattern. This is the message half of a public repository's ban on leaked
 local paths / private repo/project/account terms — the surface the `pre-commit`
 hook never sees, since the message does not exist until commit time. Enforcement
 is a generated `commit-msg` hook (`tier=commit-msg`), which rejects the message
@@ -17851,8 +17859,8 @@ run, the drift signal working as designed.
 
 Scope boundary, stated in the template header rather than overclaimed:
 consumer-owned CI stops *bypass*, but cannot stop an agent editing the workflow
-itself in the same change. A tamper-proof verifier (verifier neutrality) is the
-deferred hosted-attestation-service rung. CI is not a smoke surface — it runs
+itself in the same change. A tamper-proof verifier (verifier neutrality) needs a
+verifier the consumer does not control, which no consumer-owned file supplies. CI is not a smoke surface — it runs
 the real battery, so it is not installed by any kit's `smoke/` (§Consumer
 smoke); the branch-protection recipe that makes the check a required merge gate
 is a GitHub setting, so it lands as install-page docs, not committable

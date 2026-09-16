@@ -1,0 +1,2 @@
+# Fixture config: make a sandbox 'widget-toolkit' the sole kit root. See gate-sdk/SPEC.md §Layout and configuration.
+GATE_SDK_KIT_DIRS = widget-toolkit

@@ -12,28 +12,6 @@
 
 ## New Features
 
-- **kit-spec-provenance-seam-sweep-remainder** [spec: SPEC-provenance-seam.md] — the kit SPECs
-  that still carry this project's ruling provenance, plus the seam gate that goes green only once
-  the last is swept. gate-sdk landed with the parent split; context-kit and guard-kit as the first
-  slice; lifecycle, delegation and queue as the second. **This is the closing increment**: it lands
-  WHOLE, gate green, and moves to Done rather than demoting (amendment delta 7).
-  **THE REMAINDER IS DERIVED, NEVER FROZEN** — the scope census under-counted twice over: a
-  retired-slug probe over the queue's history finds pointers in evidence-kit, lifecycle-kit and
-  context-kit too, so every kit SPEC is the sweep corpus, not four (delta 1; the probes and the
-  floor are on the amendment and the survey record).
-  **THE PREDICATE IS RECOVERED, NEVER RE-AUTHORED** — parent deltas 1-3 at
-  `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`, the second slice's four rules at
-  `git show aae9f868^:SPEC-seam-slice.md`; the merged rule's home is gate-sdk/SPEC.md §The
-  provenance seam.
-  **THE POINTER CLASS IS ANSWERED (operator, 2026-09-16, consult, lead-relayed): RE-HOMED, NOT
-  STANDING**; the gate ships EXEMPTION-FREE and denies, beside dated attribution, a `CLAUDE.md §`
-  citation, a ruling-record mention, a local-brief mention and a live queue slug. **The possessive
-  fifth shape is ruled in** at spec (delta 3): same class, different spelling, zero live sites.
-  **TAKEN ALONE as `seam-sweep-remainder` (operator direction, 2026-09-16, lead-relayed).**
-  **Cost while deferred:** the remaining published kit SPECs and every adopter's vendored copy carry
-  private ruling history as mechanism and pointers a consumer cannot follow; product-class, and
-  accreting measurably — gate-sdk re-acquired a slug citation after its own sweep landed.
-
 ## Technical Debt
 
 ## Deferred
@@ -4433,5 +4411,6 @@
 ## Done
 
 - harness-session-trailer-reds-first-commit
+- kit-spec-provenance-seam-sweep-remainder
 
 ## Lessons Learned

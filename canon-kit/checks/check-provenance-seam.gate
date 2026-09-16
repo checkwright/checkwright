@@ -1,0 +1,3 @@
+# graph: couples=kit:SPEC.md,knob:CANON_KIT_QUEUE_FILE,knob:CANON_KIT_SPEC_NAME dir=one valve=none tier=precommit
+# install: zero-config
+# spec: canon-kit/SPEC.md §check-provenance-seam — no kit SPEC carries a publisher-provenance marker: a dated attribution, an agent-file pointer, a private-surface mention or a live queue slug

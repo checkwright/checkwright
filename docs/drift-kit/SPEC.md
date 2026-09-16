@@ -550,10 +550,10 @@ declared `# no-port:`: `native/src/emit/kfric.rs` and its `ARMS` row in
 (the reader `kpi-knowledge-friction`), and `smoke/install.sh`, which carries the
 reader's three-state coverage and the arm's argv seam in a file whose own header
 declares `# no-port:`. `bin/kfric.sh` was the one owed surface and the <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-2026-09-03 cut took it, so **no later port cut is sequenced against this
-section**. Worth saying rather than leaving to a reader: the 2026-09-01 survey
-cut established a residue paragraph as the norm here, and a reader who learned
-the norm there would go looking for one that does not exist.
+port cut took it, so **no later port cut is sequenced against this
+section**. Worth saying rather than leaving to a reader: a port-owed section
+elsewhere carries a residue paragraph as the norm, and a reader who learned the
+norm there would go looking for one that does not exist.
 
 **Three alternatives were weighed and refused, and they are recorded so the next
 session meeting an empty log does not re-open a settled call as if it were an
@@ -585,8 +585,8 @@ repo's own governed trajectory — the
 evidence behind the docs evidence page. The benefits claim is
 *self-referential* by ruling: the extractor emits the governed arm's real
 history and states plainly that no controlled ungoverned baseline exists; a
-synthetic controlled A/B experiment is the separate deferred
-`benchmark-ab-experiment` rung, not this mechanism.
+synthetic controlled A/B experiment is a separate measurement, not this
+mechanism.
 
 The extractor is a pure function of *closed* history — byte-stable across any
 commit that is not a close. Each closed iteration N owns the commit range
@@ -694,16 +694,16 @@ transcript exists for its id, the report's first line naming which. The tool is
 advisory by construction — exit is always 0 and it never joins `gates.list`, and
 a missing transcript is a 0-exit notice, not a failure.
 
-**The series splits at 2026-09-05, and the log gains no field saying so.** Before
-that date the resolution was a flat-tier glob, so every logged key is a
+**The series splits at the first release after v0.25.0, and the log gains no
+field saying so.** Before that release the resolution was a flat-tier glob, so every logged key is a
 full-length id's first eight characters; after it the nested tier is in scope
 too, whose key is `normalize("agent-<hex>")`. The two populations are disjoint —
 no row is orphaned and no key collides — and the `date` field **already**
-partitions the series, so a reader splits on it. A field carrying the port date
-would have no reader (`kpi-overhead` reads `pct`, `gate`, `total` and field one
+partitions the series at the consumer's own upgrade across that release, so a
+reader splits on it. A field marking the split would have no reader (`kpi-overhead` reads `pct`, `gate`, `total` and field one
 as the date), and a log field with no reader is a field removed. One residual
 limit is stated rather than closed: `kpi-overhead` summarizes a trailing window,
-so for about that many measured sessions after the cut its average blends the two
+so for about that many measured sessions after the upgrade its average blends the two
 populations. The blend is finite and self-clearing, and a special case keyed on a
 date would be a second thing to stale.
 
@@ -727,13 +727,12 @@ is the governance share. `session8` is the dedup key the meter reads on append
 — re-measuring a session replaces its line rather than double-counting it.
 **That key was once derived differently from the sibling meter's, and the closed
 divergence is kept here because a later reader asking why two meters ever keyed
-differently needs the answer.** Until the 2026-09-05 port each meter normalized
+differently needs the answer.** Before the port each meter normalized
 the transcript name and enumerated the sessions tiers on its own terms — the two
 shapes are git history and not contract, since the scripts holding them are
 deleted — so one subagent transcript keyed differently in the two logs, and
-neither derivation was wrong on its own terms (§The stage-economics meter). The
-operator ruled (2026-09-05, consult) that **the port
-adopts the stage-economics derivation for both meters**: strip a leading
+neither derivation was wrong on its own terms (§The stage-economics meter).
+**The port adopts the stage-economics derivation for both meters**: strip a leading
 `agent-`, scan the subagent tier as well as the flat one, and resolve the session
 delegation-aware. The refused alternative — porting each meter with its own key —
 would have made the divergence permanent in a log whose only readers are
@@ -780,7 +779,7 @@ be inferred.** Every surface declaring it is now either in-crate or declared
 `native/src/emit/mod.rs`, the shared `native/src/sessions.rs`, and
 `smoke/install.sh`, whose own header declares `# no-port:` and which stays the
 meter's behavioural oracle permanently (§Testing). `bin/overhead-meter.sh` was <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-the one owed surface and the 2026-09-05 cut took it, so **no later port cut is
+the one owed surface and a port cut took it, so **no later port cut is
 sequenced against this section**.
 
 The economy levers this meter exists to inform stay *behind* it: **commit-first**
@@ -984,7 +983,7 @@ kit's is too.** Every surface declaring this section is now either in-crate —
 `native/src/emit/stage_economics.rs`, its `ARMS` row, the shared
 `native/src/sessions.rs` and `native/src/history.rs` — or declared `# no-port:`
 (`smoke/install.sh`, this meter's behavioural oracle across six fixture sets).
-`bin/stage-economics.sh` was the one owed surface and the 2026-09-05 cut took it, <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
+`bin/stage-economics.sh` was the one owed surface and a port cut took it, <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
 so **no later port cut is sequenced against this section**. drift-kit now holds
 no owed file and no `bin/` directory at all; neither cut of the pair could make
 that claim alone.
@@ -1080,9 +1079,8 @@ the order either way, the dedup key being the triple, but the emission's does an
 the port fixes it at first-appearance order. Any per-model sub-breakdown beyond these
 fields stays on stdout at measurement time; a log field with no reader is a field
 removed. Field readers: the `/economics` narrative reads `cost` and the four token
-fields (`cr` headline); the operator reads `cost` close-over-close; the deferred
-`benchmark-ab-experiment` rung's measurement half consumes this log rather than
-rebuilding it; `date` carries the reading-age caveat. `date` is the
+fields (`cr` headline); the operator reads `cost` close-over-close; a controlled
+A/B benchmark's measurement half would consume this log rather than rebuild it; `date` carries the reading-age caveat. `date` is the
 **measurement** date, not the stage's — and under the history read the two can be
 far apart, because re-deriving an old iteration restamps its row to the day it
 was re-measured. The reading-age caveat stays correct (it ages the reading, which
@@ -1306,9 +1304,9 @@ subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
   **stdout caveats at measurement time** — a log field with no reader is a field
   removed, and none of these has one. The row's own named readers are the
   `/economics` narrative's fan-out line item (§The `/economics` skill), the
-  operator reading the trend log close-over-close, and the deferred
-  `benchmark-ab-experiment` rung's measurement half, which consumes this log
-  rather than rebuilding it and inherits the row with no change.
+  operator reading the trend log close-over-close, and a controlled A/B
+  benchmark's measurement half, which would consume this log rather than
+  rebuild it and inherit the row with no change.
   **No dispatch-type dimension either, and that is the answer to a question the
   row invites.** A fork is distinguishable at the meta layer — its record carries
   `isFork` beside an `agentType` naming the fork type, and carries no `model` —
@@ -1660,7 +1658,7 @@ all) including the trend's silence under the first. Gate-sdk's `check-shellcheck
 lints all kit sources as usual.
 
 `smoke/install.sh` stays on the shell substrate permanently and carries
-`# no-port:` saying so, its temporary hold released 2026-08-30. The disposition
+`# no-port:` saying so. The disposition
 is not this section's to argue: it is the class ruling at gate-sdk/SPEC.md
 §Consumer smoke, *The port disposition*, which reaches this file by its **ground**
 rather than by its scope — that ruling's stated-contract cut covers the recipes

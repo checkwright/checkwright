@@ -73,6 +73,7 @@ pub mod portability_floor;
 pub mod producer_liveness;
 pub mod prose_enum;
 pub mod prose_tells;
+pub mod provenance_seam;
 pub mod queue_entry_budget;
 pub mod queue_hygiene;
 pub mod queue_prose_precondition;
@@ -662,6 +663,27 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "canon-kit",
         &[("git", "")],
+    ),
+    // spec: canon-kit/SPEC.md §check-provenance-seam — the corpus is one named file per kit root,
+    // read rather than walked, so this member declares no walk root
+    (
+        "check-provenance-seam",
+        provenance_seam::run,
+        &[],
+        &[
+            "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_GATES_DIR",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_QUEUE_FILE",
+            "CANON_KIT_SEAM_AUTHORITY_MARKERS",
+            "CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA",
+            "CANON_KIT_SEAM_AGENT_FILES",
+            "CANON_KIT_SEAM_PRIVATE_SURFACES",
+            "CANON_KIT_SEAM_SLUG_MIN_LEN",
+        ],
+        "canon-kit",
+        &[],
     ),
     // spec: canon-kit/SPEC.md §check-knob-default-coupling — the kit-root walk is one `?` and
     // not one per kit: the roster's members and its arity both come from a knob, so no literal

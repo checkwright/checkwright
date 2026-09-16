@@ -9,6 +9,10 @@ CANON_KIT_DOD_MODE = at-most-one
 # comment-tier-exempt: the kits are this repo's own first-party components, so the spec finders scan their SPEC.md rather than prune them as vendored roots
 CANON_KIT_SCAN_KIT_ROOTS = 1
 
+# comment-tier-exempt: this repo's ruling record and its local-only brief, the private surfaces a kit SPEC must never point into — their spellings are this publisher's vocabulary, so they ride consumer config rather than a kit literal
+CANON_KIT_SEAM_PRIVATE_SURFACES[] = TRAJECTORY.md
+CANON_KIT_SEAM_PRIVATE_SURFACES[] = BRIEF.local.md
+
 # comment-tier-exempt: deliberate-absence rulings may narrate what the kit excludes — an "Out of scope" section states what a kit does not carry and why, so the whole section is exempt from the temporal-narration gate
 CANON_KIT_TEMPORAL_EXEMPT_SECTIONS[] = Out of scope
 

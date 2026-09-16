@@ -1102,12 +1102,12 @@ cannot be expressed as a pair at all; three of the four also need a
 multi-record directory, and the red case needs a live PID the pair could only
 reach as init. The unit test carries all four plus the suffix bound.
 
-**`.gate`-dispatched since `shell-gate-tail-port`**, declared at
+**`.gate`-dispatched**, declared at
 `evidence-kit/checks/check-producer-liveness.gate` with its rule in
 `native/src/gates/producer_liveness.rs` and the two library readers it shares
 with the `--run-validate` arm in `native/src/evidence.rs`. Like
-§check-surface-duplication it ported on the directive's scope rather than the
-registry oracle's — the port arm's two registry arms walk `gates.list` and
+§check-surface-duplication it ported without the registry oracle selecting it —
+the port arm's two registry arms walk `gates.list` and
 this member is in none — so the port moved no number of theirs, and the fixture
 pair plus this kit's smoke is what
 stands in for the dispatch proof criteria 1 and 3 would have bought.
@@ -1118,7 +1118,7 @@ this repo names it through the gate-resolving front end rather than by a literal
 `.sh` path — the form §lifecycle-kit integration says would have broken at the
 port. That clause stops being a warning and becomes a discharged one.
 
-**It is the tail's fifth wrapper, and the requirement lives in the library rather
+**It is a wrapper, and the requirement lives in the library rather
 than in the gate's own text.** The pid predicate tries the `kill -0` builtin and
 falls back to `ps -p`, and `ps` is not on `GATE_SDK_PROGRAM_FLOOR`. Neither the
 gate's declaration text nor a registry walk could have reported that, which is

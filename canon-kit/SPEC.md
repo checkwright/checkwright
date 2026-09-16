@@ -484,6 +484,24 @@ Knobs:
   through `CANON_KIT_TEMPORAL_MARKERS_EXTRA` under the `_EXTRA` semantics below;
   `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole
   section is exempt, default empty (this repo sets `Out of scope`).
+- `CANON_KIT_SEAM_AUTHORITY_MARKERS` — the authority-marker ERE array
+  `check-provenance-seam` matches against a case-folded sentence, default a bundled
+  attribution-shaped set: `operator( |-)(ruled|ruling|direction|directed|decided|ratified|approved|chose)`,
+  `lead, `, `own-authority`, `ruled`, `ratified` and `consult`; extended through
+  `CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA` under the `_EXTRA` semantics below. The
+  set is attribution-shaped rather than role-shaped: a bare `operator`, `lead`,
+  `ruling` or `direction` is this kit family's role vocabulary, and adding one reds
+  a dated measurement and a specimen that are not provenance.
+  `CANON_KIT_SEAM_AGENT_FILES` — array of always-loaded agent-file names, default
+  `("CLAUDE.md")`, the harness's public file name; a consumer on another harness
+  adds its own. `CANON_KIT_SEAM_PRIVATE_SURFACES` — array of the publisher's
+  private paths (a ruling record, a local-only brief), default **empty**: those
+  names are one publisher's vocabulary, so no spelling ships as a literal, and the
+  empty default switches the private-surface arm off. This repo sets its ruling
+  record and its local-only brief; the names are not spelled here, because this
+  SPEC is in the gate's own corpus. `CANON_KIT_SEAM_SLUG_MIN_LEN` — positive
+  integer, default `12`: the shortest queue slug the slug arm matches, so a short
+  slug cannot match ordinary hyphenated prose.
 - `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
   `check-md-refs` skips (a consumer's generated documentation whose links a
   build tool owns).
@@ -606,11 +624,13 @@ Knobs:
   (`It's worth noting`, `That said`, …); `CANON_KIT_PROSE_TELL_ABBR_ALLOW` —
   array of abbreviations exempt from the undefined-abbreviation tell, default a
   bundled universal set (`API`, `CLI`, `URL`, …). A consumer extends any
-  bundled vocabulary — these two and `CANON_KIT_TEMPORAL_MARKERS` above — with
-  its own through the matching `_EXTRA` knob:
+  bundled vocabulary — these two, `CANON_KIT_TEMPORAL_MARKERS` and
+  `CANON_KIT_SEAM_AUTHORITY_MARKERS` above — with its own through the matching
+  `_EXTRA` knob:
   `CANON_KIT_PROSE_TELL_PHRASES_EXTRA`,
-  `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA` and
-  `CANON_KIT_TEMPORAL_MARKERS_EXTRA`, all default empty, which each reader
+  `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA`,
+  `CANON_KIT_TEMPORAL_MARKERS_EXTRA` and
+  `CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA`, all default empty, which each reader
   unions onto the resolved base (`spec::vocabulary`): the effective set is the
   base followed by the extra. The union is the reader's rather than a derived
   default's, because a file value replaces a knob whole and a derived default fires
@@ -618,8 +638,8 @@ Knobs:
   therefore costs one token, never a restatement of the bundled default that would
   silently diverge from it. Setting a base array keeps its replace semantics, and
   that is the narrowing valve: a consumer wanting a bundled member *gone* replaces
-  the base array. A temporal marker set whose base and extra are both empty is
-  malformed config. Generic English is
+  the base array. A temporal or authority marker set whose base and extra are both
+  empty is malformed config. Generic English is
   kit-shippable; a consumer's own vocabulary never becomes a kit literal (the
   provenance seam).
 
@@ -643,7 +663,7 @@ and no oracle sees whole: `check-amendment-update-target.test.sh`,
 `check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`,
 `check-manifest-count.test.sh`, `check-md-refs.test.sh`,
 `check-measured-claim.test.sh`, `check-prose-enum.test.sh`,
-`check-spec-dod-singleton.test.sh`, `check-tracking-claim.test.sh` and
+`check-provenance-seam.test.sh`, `check-spec-dod-singleton.test.sh`, `check-tracking-claim.test.sh` and
 `check-unmarked-claim.test.sh`.
 
 ### The shared spec adapters
@@ -1186,12 +1206,11 @@ of leaving a spelling that outlives its subject.
 Criterion 4's verdict on it was taken **conservatively without ruling the class**:
 its walk opens and content-compares every source file the language roster names,
 its own declaration and every sibling's included, but as a *diff reference* rather
-than as its assertion target, and whether that satisfies the criterion is the open
-ruling `spec-embedded-source-criterion-4-membership` owns. The batch took the
-binding verdict for its own member because that costs a fixture widening and
-cannot be wrong in the harmful direction, while clearing wrongly ships the hole
-the criterion exists to point at; a later reader must not read the disposition as
-that entry's answer. The widening the verdict bought is the one delta the pair was
+than as its assertion target, and whether that satisfies the criterion is a question
+about the class that this member's port does not answer. The port took the binding
+verdict for this member because that costs a fixture widening and cannot be wrong in
+the harmful direction, while clearing wrongly ships the hole the criterion exists to
+point at; a later reader must not read the disposition as the class's answer. The widening the verdict bought is the one delta the pair was
 missing: its cases derive a real corpus and do reach the finder, but neither valve
 was exercised by any committed case, and both now are.
 
@@ -1348,6 +1367,102 @@ measured-marker discharge's *window* — that the marked claim is exempt and the
 next paragraph is not, which a pair cannot spell because a fixture file either
 trips or does not. `precommit` tier.
 
+### check-provenance-seam
+
+`checks/check-provenance-seam.gate` (`precommit`, binary-dispatched).
+Invariant: no kit SPEC carries a publisher-provenance marker — the class
+gate-sdk/SPEC.md §The provenance seam bars from a kit file. A kit SPEC is
+vendored and rendered wherever the kit goes, so an attribution publishes who
+decided what and when, and a pointer into the publisher's tree is dead in every
+copy. The gate holds the lexical shapes of that class; the voice-not-content
+judgement behind it stays a review concern.
+
+**Corpus.** The canonical spec (`CANON_KIT_SPEC_NAME`) at the root of every kit
+root (gate-sdk/SPEC.md §Layout and configuration), derived rather than listed. It
+is scanned **only when `CANON_KIT_SCAN_KIT_ROOTS` is `1`**, that knob's existing
+meaning: the kit docs are the consumer's own first-party content. At the default
+`0` the gate passes with a clean line saying kit roots are a dependency's — right
+for an adopter vendoring a SPEC-bearing tree, whose own queue slugs and private
+names would otherwise red someone else's document. A consumer authoring kits sets
+the knob. The gate ships in a kit rather than as a consumer gate because the seam
+is a rule for every kit publisher.
+
+**Fenced blocks are skipped; nothing else is.** There is no per-site valve, no
+section carve-out and no path exemption. A fence holds grammar being shown, and a
+shown instance is a specimen, not a stamp. An inline-code span *is* scanned: a
+pointer written in backticks is exactly as dead in a vendored copy. Each paragraph
+is rejoined across its line wraps, so a marker split by a wrap still matches, and
+a finding reports its first physical line.
+
+**Arms.** Each finding names file, line, arm and matched span.
+
+- **dated-attribution** — an ISO `YYYY-MM-DD` date (no digit abutting it) and an
+  authority marker from `CANON_KIT_SEAM_AUTHORITY_MARKERS` in one sentence. A
+  sentence ends at `.`, `?`, `!` or `;` followed by whitespace. A date with no
+  marker passes, which is the dated-measurement exclusion made mechanical; a
+  marker with no date passes, because an unattributed rule about the kit family's
+  roles is mechanism.
+- **agent-file-pointer** — a name from `CANON_KIT_SEAM_AGENT_FILES` followed by a
+  section citation (`§`, with or without a joining comma or space) or by a
+  possessive `'s`. A closing backtick may sit between the name and either. A bare
+  mention passes, because a knob default naming a consumer's agent file is
+  mechanism; a name preceded by a word character or `.` is a different file.
+- **private-surface** — any mention of a path in `CANON_KIT_SEAM_PRIVATE_SURFACES`
+  as a whole path token: no word character, `/` or `.` before it, and no word
+  character, `/` or `.`-plus-alphanumeric after it, so a longer name containing
+  the path does not match.
+- **queue-slug** — a lead-line slug of the queue file (`CANON_KIT_QUEUE_FILE`) at
+  least `CANON_KIT_SEAM_SLUG_MIN_LEN` characters long, matched with
+  `[A-Za-z0-9_-]` as word characters on both sides. A lead line is an unindented
+  bullet whose lead is a bold slug or a bare slug, in any section. **A slug equal
+  to a mechanism name the tree defines is not a finding**: a kit root's directory
+  name, a gate declared in the gates directory or a kit's `checks/`, or a
+  `gates.list` member. That exclusion is structural, not a valve: a unit named
+  after the gate or kit it mints would otherwise red that gate's own section while
+  the unit's entry is live.
+
+The possessive shape is one class with the section citation — both point into the
+publisher's always-loaded file — so leaving it out would carve an exemption by
+omission into a gate that ships exemption-free.
+
+**Honest limits**, stated so a green run is not read as a clean seam:
+- undated attribution passes, since a marker-only arm would red the role
+  vocabulary;
+- a dated landing or incident label with no attribution passes, since a date-only
+  arm cannot tell it from a frozen measurement;
+- a stamp dated in words rather than ISO passes;
+- a retired slug or a cut ordinal passes, because deriving retired slugs reads
+  queue history, which a fixture cannot pin and a shallow clone does not have;
+- a slug below the length floor passes;
+- an attributive agent-file pointer (*the agent file's ban*) passes, because
+  telling it from a consumer-side mention (*the consumer's agent file carries …*)
+  is judgement;
+- kit templates, kit READMEs and a kit's doctrine file are outside the corpus.
+
+Those shapes are held by the close-stage review, not by this gate.
+
+**A queue edit can red a kit SPEC.** Filing an entry whose slug appears as text in
+a kit SPEC reds the commit that files it, naming the SPEC line; renaming a fresh
+slug costs nothing. The descriptor therefore couples `knob:CANON_KIT_QUEUE_FILE`
+beside `kit:SPEC.md`, so the hook fires on the commit that introduces the finding.
+
+**Fail-closed (exit 2):** a kit SPEC or the queue file that exists but cannot be
+read; an authority marker that does not compile (every pattern compiles before the
+first line is read, as §check-manifest-temporal's do); an authority marker set
+empty in both base and extra; a non-positive or non-integer slug floor. **An absent
+queue file** switches the queue-slug arm off and says so in the clean line, as an
+empty private-surface list does for its arm: a kit publisher with no work queue is
+an ordinary configuration, and the other arms still judge it.
+
+Producer: the generated pre-commit hook and `run-gates.sh`, on a commit touching a
+kit SPEC or the queue file; consumer: the committing session via the output
+contract, each finding read once at the scan transition (file, line, arm, span),
+no persistent state. The arm names the remedy: delete an attribution, restate what
+a pointer stood for, or rename a fresh slug. The fixture pair trips each arm and
+carries a fenced copy of every trip that must add no finding;
+`check-provenance-seam.test.sh` holds the paths a pair cannot spell — the
+kit-roots-off default, an absent queue file and the `_EXTRA` union.
+
 ### check-measured-claim
 
 Invariant: a measured count or extent claim that names an oracle agrees with it.
@@ -1473,9 +1588,7 @@ class. Fenced blocks are skipped (a fence is grammar being shown, not a claim be
 made), and a per-site `measured-claim-exempt: <reason>` marker on the line or the
 one above suppresses a marker a document is exhibiting rather than asserting.
 
-**The valve stays, and its zero live uses are not evidence against it** (ruled at
-the `native-cohort-canon-kit` close, on a filed observation that it shipped unused).
-The use count was taken over *this* tree, which is the wrong corpus: canon-kit is a
+**The valve stays, and its zero live uses are not evidence against it.** The use count was taken over *this* tree, which is the wrong corpus: canon-kit is a
 kit, so the valve's readers are adopters whose prose this repo cannot see. It is a
 fail-safe for an author who must exhibit a full-line marker outside a fence, and a
 fail-safe carrying live uses would mean the fence-and-inline escapes had already
@@ -1487,10 +1600,9 @@ Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the committi
 operator via the output contract; each marker read at the single scan transition
 (file, line, key, value), no persistent state. `precommit` tier.
 
-**Born native, and this is the first gate with no shell original** — operator-ruled
-2026-08-12 with the cost below in view. TRAJECTORY.md §The objectives' sixth
-shrinks the interpreter surface to the unavoidable, so a new shell gate is debt
-created knowingly; landing it as a Rust module plus a `.gate` descriptor avoids
+**Born native, and this is the first gate with no shell original.** Shrinking
+the interpreter surface to the unavoidable makes a new shell gate debt created
+knowingly; landing it as a Rust module plus a `.gate` descriptor avoids
 that, and it needs no unbuilt substrate (its glob corpus is served by the walker
 already in production, which is why the corpus was designed as its own surface
 rather than a union with the manifest set). The port criteria govern *ports*, so a
@@ -1501,14 +1613,11 @@ oracle is its `good/`+`bad/` pair, exactly like any new shell gate's, with
 a consumer whose host the release publishes no artifact for, so on an uncovered
 platform this gate does not run where a shell gate would have. That is the port's
 standing cost, already accepted for the members whose shell forms were deleted, and
-it is why the omit-and-declare path exists — a paid price, not an open risk. Its
-reach stayed deliberately open here — *this* gate settled, a second one weighing
-the cost again rather than citing this one as blanket precedent — and that
-question has since been **closed by ruling rather than by precedent**: new gates
-in a crate-carrying tree are born native by default, with shell an exception
-under one of three stated classes (gate-sdk/SPEC.md §The port-candidate
-criteria). The refusal above is unaffected in its own terms: what settles the
-second gate is the ruling, never this section.
+it is why the omit-and-declare path exists — a paid price, not an open risk. This
+section settles *this* gate only and is no precedent for a second: new gates in a
+crate-carrying tree are born native by default, with shell an exception under one
+of three stated classes (gate-sdk/SPEC.md §The port-candidate criteria), and what
+settles a second gate is that rule, never this section.
 
 ### check-unmarked-claim
 
@@ -1948,10 +2057,10 @@ own spec, so there is nothing to restate; gate-test fixtures are excluded;
 exits 2 when the glossary file is absent (register the gate only where the
 topology exists). `align-only` tier.
 
-**`.gate`-dispatched since `shell-gate-tail-port`**, declared at
+**`.gate`-dispatched**, declared at
 `canon-kit/checks/check-surface-duplication.gate` with its rule in
 `native/src/gates/surface_duplication.rs`. It is one of the two members that
-ported on the directive's scope rather than the registry oracle's: this tree
+ported without the registry oracle selecting them: this tree
 registers it in no `gates.list`, so the port arm's two registry arms never
 counted it and the port moved no number of theirs
 (gate-sdk/SPEC.md §The port-candidate criteria, criterion 7). Criteria 1
@@ -2372,7 +2481,7 @@ it, the always-loaded tier could only be given a false one. Its rule-based proof
 reaches only a directory the rules match whole (a `dir/` pattern) that also
 carries a tracked member; a directory whose ignored members are matched by file
 patterns, the directory itself matching no rule, has no rule-based two-tier proof
-and stays a prose description (the `runtime-dir-two-tier-detector` debt).
+and stays a prose description.
 
 Reddens on a predicate whose verification fails, and — fail-closed — on a bound
 path that exists in neither the index, the ignore rules, nor the working tree,
@@ -2403,7 +2512,7 @@ gitignored), each verified rule-based against the ignore rules; a third
 directory, `.workflow/`, is described in prose citing gate-sdk/SPEC.md §The
 workflow directory rather than as a bound claim, because its ignored members are
 file-pattern-matched and the directory itself matches no rule, so no rule-based
-two-tier proof exists for it (the `runtime-dir-two-tier-detector` debt). No
+two-tier proof exists for it. No
 backfill. That is the expected shape: it is a regression gate for a defect that already shipped on the
 always-loaded tier, not a discovery tool, and §When a gate earns its place in
 gate-sdk/SPEC.md governs that class. No per-site valve is taken: a claim that

@@ -93,6 +93,7 @@ check-release-declaration-parity
 check-npm-publish-spec
 check-manifest-temporal
 check-manifest-count
+check-provenance-seam
 check-measured-claim
 check-unmarked-claim
 check-tracking-claim

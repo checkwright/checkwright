@@ -603,8 +603,7 @@ natures, and each answers to its own threshold.
 **Declaration — owed from the first release tag, unconditionally.** A tagged
 release is a distribution, and whoever vendored it reads the note to learn what
 moved. From the first tag onward a rename owes a Renamed knobs declaration on the
-release declaration surface, and so in the note (the deprecation-lifecycle and
-upgrade-path rungs).
+release declaration surface, and so in the note.
 
 **Compat shim and deprecation window — owed from the project's declared
 general-availability posture onward, never from a tag.** While a project's own

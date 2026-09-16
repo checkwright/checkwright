@@ -405,7 +405,7 @@ craft rules that bear on it and emits one pointer line per hit, so a session
 entering a stage is reminded of the craft rules to follow *before* the matching
 action, without the always-loaded surface carrying the prose. **The `## stage-rules`
 heading is the section name, not a file name** — the shell emitter it was named
-after ported on 2026-09-03 and the citations in `context-kit/SPEC.md` and
+after is ported, and the citations in `context-kit/SPEC.md` and
 `doctrine-kit/README.md` resolve against this heading.
 
 **The tag grammar (single source: the rule owns its stage).** Each rule under

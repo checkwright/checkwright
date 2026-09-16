@@ -928,7 +928,7 @@ consumer's always-loaded surface — the load-trigger-residency and
 always-loaded-shape doctrine rules applied to kit shipping. The one sanctioned
 block-sized ask is doctrine-kit's digest, itself bounded by its one-line-per-rule
 shape (the always-loaded-shape rule); its name-lockstep with the doctrine is
-held separately (the doctrine-rule-lockstep unit), because a re-vendor upgrade
+held separately (doctrine-kit/SPEC.md §check-doctrine-registration, assertion F), because a re-vendor upgrade
 stales the digest by construction.
 
 **The roster, by citation.** Each kit's resident ask is named by citing the kit

@@ -166,7 +166,7 @@ renders through kramdown's GFM parser, which diverges from github.com's cmark:
 consecutive fenced blocks inside one list item corrupt the page — the second
 fence prints literally and a `#`-leading skeleton line becomes a heading — so a
 tree that reads green on github.com can ship a garbled Pages site with no gate in
-the path. This gate is the faithful-artifact-verification class mechanized for
+the path. This gate mechanizes deployment-faithful artifact verification for
 that artifact: it renders the real output and asserts the observed leakage class,
 rather than trusting the source.
 
@@ -257,8 +257,7 @@ published docs site simply omits the gate by the registry-not-array convention
 and never installs the dependency.
 
 **`checks/check-docs-render-fidelity.gate` (`precommit`, binary-dispatched).**
-Ported under `shell-gate-tail-port` as the last of its registered members, into
-`native/src/gates/docs_render_fidelity.rs`. It is a criterion-7 **wrapper**: the
+Ported into `native/src/gates/docs_render_fidelity.rs`. It is a criterion-7 **wrapper**: the
 program the rule requires is the first element of whichever renderer knob the run
 resolves to a command, so the compiled form spawns it and refuses at exit 2 when
 it cannot run, the dependency moving not at all (gate-sdk/SPEC.md §The
@@ -281,11 +280,11 @@ the three scans having moved in process.
 
 **The GNU-awk floor's last live holder left with it.** The three scans below were
 written in GNU awk (`BEGINFILE`/`ENDFILE`/`ARGIND`), and this was the only
-remaining registered shell member holding those extensions, which
-`interpreter-floor-gawk-residue-empty` established by measurement. The port
-retires the holder; it does **not** narrow docs/install.md §Requirements, whose
-edge is operator-class and whose decision that entry owns. Recorded here so that
-entry's taker reads a discharged precondition rather than re-deriving it.
+remaining registered shell member holding those extensions, which a measurement
+over the registered shell members established. The port retires the holder; it
+does **not** narrow docs/install.md §Requirements, which states an adopter-facing
+floor decided on its own terms, so narrowing it starts from a discharged
+precondition rather than a re-derivation.
 
 **The second positional is retired on port, and its function is not.**
 `[docs-dir] [config-file]` took a config path as argv[2]. What it did survives
@@ -411,10 +410,10 @@ masked by an offsetting raw-HTML `<table>` on the same page: one collapsed GFM
 table plus one HTML table balances the counts. The table detector is
 deliberately conservative (delimiter-row anchored), so a table kramdown accepts
 but the scan does not count can only *under*-count source starts — which
-false-cleans, never false-reds. The observed table incident (2026-07-13): the
-value page's generated rollup table abutted its `:end` marker and shipped as a
-literal-pipe paragraph with the gate silent; the emitter fix (a trailing blank
-line) landed then, and this assertion mechanizes the channel. The good/bad
+false-cleans, never false-reds. The observed table incident: a
+generated rollup table abutting its `:end` marker shipped as a literal-pipe
+paragraph with the gate silent; the emitter fix is a trailing blank line, and
+this assertion mechanizes the channel. The good/bad
 fixture pair exercises the span-corruption symptom (a bad page whose severed span
 leaks a stray backtick and a raw placeholder tag, a good page whose faithful code
 spans render clean) alongside the fence/heading case. Because that bad page would

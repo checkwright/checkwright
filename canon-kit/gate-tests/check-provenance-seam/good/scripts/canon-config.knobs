@@ -1,0 +1,3 @@
+# Fixture config: the sandbox kit is first-party, and its publisher names one private surface. See canon-kit/SPEC.md §Layout and configuration.
+CANON_KIT_SCAN_KIT_ROOTS = 1
+CANON_KIT_SEAM_PRIVATE_SURFACES[] = LEDGER.md

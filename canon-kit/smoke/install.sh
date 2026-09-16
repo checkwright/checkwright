@@ -28,6 +28,7 @@ check-measured-claim
 check-payload-claim
 check-prose-enum
 check-prose-tells
+check-provenance-seam
 check-spec-fence-balance
 check-spec-pointer
 check-todo-task-liveness
