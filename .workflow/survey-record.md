@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-16 scope — Which deferred entries rank first by what deferral costs, and which share the lead unit's surface tightly enough to bundle?
+- corpus: TASK-QUEUE.md Deferred section, 136 entries after the gap drain
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-index and --emit queue-edges, plus --emit queue-counts and an anchored grep over recurrence declarations
+- rev: fd41bca62061c8c0f6b463bc1df70dafef089ee7
+- finding: Live pool empty (0 active). Cost-class census over Deferred: session/low 1, iteration/high 13, iteration/low 16, once/high 2, once/low 5, event/high 44, event/low 51. Exactly ONE session-class row exists — retired-block-admits-live-gate-name [queue-kit] — so tier 1 has a single unambiguous lead. Recurrence census: 27 entries carry a recurrence declaration and every one carries exactly one date, so none reaches the threshold of 2 and no forced promotion rides this escalation. Roadmap-tagged deferred entries number 6 (plugin-marketplace, benchmark-ab-experiment, hosted-attestation-service, heterogeneous-agent-delegation, companion-toolkit-profile, gate-authoring-sdk-surface) and NONE carries the queue-kit surface, so rank tier 2 contributes nothing to a queue-kit window. The queue-kit surface holds 16 deferred rows, which partition into a queue-GRAMMAR group (tags, lead-line width, entry shape) and a REPORTING-ARM group whose members each hit exactly one native emit module: queue_edges.rs, queue_index.rs, entry_history.rs, queue_counts.rs, all four sharing queue-kit/SPEC.md's arm sections and its shared queue adapters.
+- inferred: no
