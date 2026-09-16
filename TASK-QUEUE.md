@@ -4363,6 +4363,31 @@
   corrected from five to three at that iteration's close drain, by re-probing the static tables the
   filing asserted were empty.
 
+- **gap-drain-precedes-its-own-kfric-read** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — close
+  drains the gap inbox at step 2 and reaches the knowledge-friction log only at step 4, so a fact
+  captured mid-iteration is not in the drain's hands when the drain needs it.
+  **Re-verified at scope 2026-09-16 against the tree rather than inherited from the bullet.**
+  `lifecycle-kit/templates/stages/close.md` line 72 is step 2, the drain; line 162 is step 4, the
+  close-surface sweep — and `--emit close-surfaces` lists `.workflow/knowledge-friction.log` as one
+  of that step's advisory rows (owner drift-kit/SPEC.md) against the drain's own `forced=` row for
+  `.workflow/gap-inbox.md`. The ordering is real and both ends of it are stated in one file.
+  **MEASURED at `installer-front-door-cut`'s close, not reasoned.** That drain's first bullet asked
+  it to re-size the provenance-seam remainder; it ran a slug scan and a marker grep to do so, while
+  `.workflow/knowledge-friction.log` line 1 — filed EARLIER IN THE SAME ITERATION — already carried
+  a per-kit sizing from a read against the recovered seam-sweep amendment. The drain reached a
+  compatible but coarser answer at the cost of two probes, and found the capture only at step 4.
+  **Nothing shipped wrong, and that is the point**: the two reads turned out complementary (the
+  kfric read is dated-marker-only and cannot see site-kit's queue-slug citation), so what was paid
+  was exactly the re-derivation the loop exists to prevent, by the session the loop captured FOR.
+  **Why `[design-pending]`:** two candidate fixes with opposite economics — move drift-kit's kfric
+  walk ahead of the drain (more likely to be read, but it reorders two kits' templates against each
+  other), or give the drain a one-line "read the kfric log first" precondition (cheaper, and a
+  precondition is the shape a hurried reader skips). Which of the two is the ruling.
+  **Cost while deferred:** every close drain re-derives facts its own iteration already captured,
+  and the loop's whole value is collected one step too late to reach the session that needed it.
+  Filed 2026-09-16 to the gap inbox by `installer-front-door-cut`'s close, the sole bullet that
+  close could not drain; promoted at the following scope, which re-verified the ordering above.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
