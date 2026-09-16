@@ -1,7 +1,6 @@
 // spec: queue-kit/SPEC.md §The queue-edges arm — the inbound-citation aggregator. It reads the
 // queue and its own history, writes stdout only, and mutates nothing. The `--inbound` mode rides
 // the arm's own argv tail, the mechanism §The queue-index arm already uses for its three modes.
-use crate::proc;
 use crate::queue::{self, Sections};
 
 struct Args {
@@ -44,7 +43,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         std::fs::read_to_string(&file).map_err(|e| format!("file not found: {}: {}", file, e))?;
     let sec = Sections::active_and_deferred()?;
     let live = queue::live_slugs(&text, &sec);
-    let retired = retired_set(&file, &live);
+    let retired = queue::retired_set(&file, &live);
 
     // spec: queue-kit/SPEC.md §The queue-edges arm — a slug that is neither live nor retired is a
     // caller error, not an empty set: silence has to mean "no inbound edges" and nothing else.
@@ -52,48 +51,6 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         return Err(format!("not a live or retired slug: {}", a.target));
     }
     Ok(aggregate(&text, &sec, &live, &retired, &a.target))
-}
-
-// spec: queue-kit/SPEC.md §The queue-edges arm — the retired set, derived from the file's own
-// history; every degradation the section declares yields the empty set and the live block alone
-fn retired_set(file: &str, live: &[String]) -> Vec<String> {
-    if !proc::on_path("git") {
-        return Vec::new();
-    }
-    let path = std::path::Path::new(file);
-    let dir = match path.parent().map(|p| p.to_string_lossy().into_owned()) {
-        Some(d) if !d.is_empty() => d,
-        _ => ".".to_string(),
-    };
-    let Some(base) = path.file_name().map(|b| b.to_string_lossy().into_owned()) else {
-        return Vec::new();
-    };
-    match proc::run("git", &["-C", &dir, "rev-parse", "--is-inside-work-tree"]) {
-        Ok(c) if c.stdout().is_some() => {}
-        _ => return Vec::new(),
-    }
-    let log = match proc::run("git", &["-C", &dir, "log", "-p", "--format=", "--", &base]) {
-        Ok(c) => match c.stdout() {
-            Some(o) => String::from_utf8_lossy(o).into_owned(),
-            None => return Vec::new(),
-        },
-        Err(_) => return Vec::new(),
-    };
-    let mut out: Vec<String> = Vec::new();
-    for line in log.lines() {
-        // spec: queue-kit/SPEC.md §The queue-edges arm — one strip takes the diff column off
-        // added, removed and context lines alike, so a lead line counts wherever the walk meets
-        // it; the diff headers survive the strip as text no lead-line grammar matches.
-        let mut chars = line.chars();
-        chars.next();
-        let s = chars.as_str();
-        if let Some(g) = queue::bullet_slug(s) {
-            if !live.iter().any(|l| l == g) && !out.iter().any(|r| r == g) {
-                out.push(g.to_string());
-            }
-        }
-    }
-    out
 }
 
 struct Agg<'a> {

@@ -871,6 +871,15 @@ lives in the queue-edges arm, which takes the section matchers and the live-slug
 reading from this module rather than carrying its own. A second reader of
 body-position slug tokens is what would promote the scan into that roster.
 
+The **retired-set derivation** is the same rule's other verdict. It began in the
+queue-edges arm with one reader and joined this module when `entry-history`
+became a second (§check-queue-entry-budget) — a history walk carrying its own
+spelling of what an entry is would let two arms disagree about which slugs ever
+existed, which is the drift the lead-line grammar is already here to remove. It
+takes `git` with it: this module's readers degrade to an empty retired set
+exactly as §The queue-edges arm declares, and no other adapter here gains a
+program requirement.
+
 **The entry lead-line grammar is here, and it is here by that same rule rather
 than by convention.** `bullet_slug` (a bullet opening an entry) and
 `first_bold_slug` (the bold slug token inside it) have three readers: `live_slugs`,
@@ -1211,7 +1220,10 @@ and a retired target is a target whose entry has been disposed of, not a
 different question over the same file.
 
 **The retired set is derived from the file's own history, so nothing is
-maintained.** One `git log -p --format= -- <queue-file>` pass at start-up, its
+maintained**, and it lives in the shared adapter because two arms read it — this
+one and `entry-history` (§check-queue-entry-budget), on §The shared queue
+adapters' two-reader rule rather than by convention. One
+`git log -p --format= -- <queue-file>` pass at start-up, its
 added, removed and context lines matched against the lead-line grammar
 §The shared queue adapters owns — the same one the live reader applies, through the same
 shared adapter, never a second spelling. `git` is this arm's one program requirement, recorded
@@ -1827,8 +1839,8 @@ fall was a legitimate compression, a relocation or a discard is left to the
 reader, who has the commit in hand — the judgment this section already concedes
 no gate can make, made by the party that can make it. The exit contract is
 two-valued: 0 with the report, and 2 on a usage error (an absent slug, or a slug
-the newest commit carries no entry for), which is the harness-error class and
-never a finding. The absence of a 1 is the member's whole point rather than an
+that is neither live nor retired — refused before any history is read), which is
+the harness-error class and never a finding. The absence of a 1 is the member's whole point rather than an
 accident of its implementation, and it is why the arm is **advisory** — the tier
 a surface nothing refuses a close over already occupies (guard-kit/SPEC.md
 §escalation-guard). It is a non-gate arm of the binary (gate-sdk/SPEC.md §The
@@ -1860,9 +1872,31 @@ age rather than the repository's. The blobs stream through **one**
 commit, which is what lets the walk stop early without having bought the answers
 it will not read.
 
-**Two honest limits, stated rather than discovered.** A fall is attributed to a
-**slug**, so an entry renamed mid-history reads as filed at its rename — as does
-one that spent a stretch outside the task sections. And a commit that compresses
+A slug the newest commit carries no entry for is **not** an error: it is a
+**departed** entry, and the arm reports it. The addressable domain is the live
+slugs plus the retired ones — the set §The queue-edges arm derives and §The
+shared queue adapters now holds — and that membership *is* the bound a
+back-search would otherwise lack, settled from one history pass before a blob is
+read. For a departed slug the walk searches back to the newest commit carrying a
+counted entry; the commit one step **newer** than that one — the oldest under
+which the entry is already gone — is the **departure commit**, named with its
+subject in the report's header, and the fall rows then run from the last live
+commit back to the filing commit unchanged. The departure is a header fact rather
+than a fall row, because absence is not a count of zero — the same rule that
+already reads a bare done-section slug as absence — and reporting it as a
+decrease would invent a measurement. The row grammar keeps its four fields and
+still carries no verdict column: which disposition a departure was is read off
+the commit. The retired set admits a slug on **lead-line shape** alone, so a bold
+bullet that never stood in a task section is addressable and has no counted
+history at all; that slug refuses at exit 2 after the search, and it is the one
+case the membership bound does not shorten.
+
+**Three honest limits, stated rather than discovered.** A fall is attributed to a
+**slug**, so an entry renamed mid-history reads as filed at its rename and as
+departed at it — as does one that spent a stretch outside the task sections. A
+shallow or rewritten history addresses fewer departed slugs and never more, so
+the refusal under-claims in the direction §The queue-edges arm already declares
+for its own derivation. And a commit that compresses
 one part of an entry while growing another **nets out and does not appear**: the
 arm reports the counted total, which is the quantity the cap binds and therefore
 the quantity a displacement is measured against.

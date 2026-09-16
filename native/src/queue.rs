@@ -311,6 +311,48 @@ pub fn live_slugs(text: &str, sec: &Sections) -> Vec<String> {
     out
 }
 
+// spec: queue-kit/SPEC.md §The shared queue adapters — the retired set, derived from the queue
+// file's own history; every degradation §The queue-edges arm declares yields the empty set
+pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
+    if !crate::proc::on_path("git") {
+        return Vec::new();
+    }
+    let path = std::path::Path::new(file);
+    let dir = match path.parent().map(|p| p.to_string_lossy().into_owned()) {
+        Some(d) if !d.is_empty() => d,
+        _ => ".".to_string(),
+    };
+    let Some(base) = path.file_name().map(|b| b.to_string_lossy().into_owned()) else {
+        return Vec::new();
+    };
+    match crate::proc::run("git", &["-C", &dir, "rev-parse", "--is-inside-work-tree"]) {
+        Ok(c) if c.stdout().is_some() => {}
+        _ => return Vec::new(),
+    }
+    let log = match crate::proc::run("git", &["-C", &dir, "log", "-p", "--format=", "--", &base]) {
+        Ok(c) => match c.stdout() {
+            Some(o) => String::from_utf8_lossy(o).into_owned(),
+            None => return Vec::new(),
+        },
+        Err(_) => return Vec::new(),
+    };
+    let mut out: Vec<String> = Vec::new();
+    for line in log.lines() {
+        // spec: queue-kit/SPEC.md §The queue-edges arm — one strip takes the diff column off
+        // added, removed and context lines alike, so a lead line counts wherever the walk meets
+        // it; the diff headers survive the strip as text no lead-line grammar matches.
+        let mut chars = line.chars();
+        chars.next();
+        let s = chars.as_str();
+        if let Some(g) = bullet_slug(s) {
+            if !live.iter().any(|l| l == g) && !out.iter().any(|r| r == g) {
+                out.push(g.to_string());
+            }
+        }
+    }
+    out
+}
+
 // spec: queue-kit/SPEC.md §check-task-conservation — a done entry is a bare `- <slug>` line and
 // nothing else (awk's `^[[:space:]]*-[[:space:]]+[a-z0-9][a-z0-9-]*[[:space:]]*$`), so an entry
 // carried into the done section with its live shape intact matches neither grammar

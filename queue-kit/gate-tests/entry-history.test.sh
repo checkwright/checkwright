@@ -4,7 +4,10 @@
 # not of a queue file. (1) The walk's BOUND — it stops at the entry's filing commit and not at the
 # repository root. (2) The two stated limits — a renamed slug reads as filed at its rename, and a
 # commit that compresses one part of an entry while growing another does not appear at all — each
-# recorded as behaviour rather than asserted as a claim. The count's single spelling is held here
+# recorded as behaviour rather than asserted as a claim. (3) The DEPARTED domain — an entry that has
+# left the task sections is addressed, its departure commit named in the header and never rendered
+# as a fall row, while a slug in neither the live nor the retired set is refused on membership
+# alone. The count's single spelling is held here
 # too, against check-queue-entry-budget's own headroom line at the same commit, which is the one
 # assertion that needs both substrates in the same sandbox.
 #
@@ -25,7 +28,7 @@ git -C "$SANDBOX" init -q
 git -C "$SANDBOX" config user.email seed@example.invalid
 git -C "$SANDBOX" config user.name Seed
 
-queue() {  # $1 = the def-target body lines, $2 = the renamed entry's slug
+queue() {  # $1 = the def-target body lines, $2 = the renamed entry's slug, $3 = the done lines
     cat >"$SANDBOX/TASK-QUEUE.md" <<EOF
 # TASK-QUEUE.md
 
@@ -45,6 +48,7 @@ $1
   one body line
 
 ## Done
+${3:-}
 
 ## Lessons Learned
 EOF
@@ -90,22 +94,38 @@ sha() { git -C "$SANDBOX" rev-parse --short=8 "$1"; }
 FILING="$(sha HEAD~3)"
 NETZERO="$(sha HEAD~1)"
 GROWTH="$(sha HEAD~2)"
-HEADC="$(sha HEAD)"
+COMPRESS="$(sha HEAD)"
+
+# One more commit disposes of def-target: it leaves the task sections for a bare Done slug, which
+# is absence rather than a count of zero. Every assertion above it is unmoved — the walk still runs
+# from the last live commit back to the filing commit — and the disposition is a header fact.
+queue '' def-renamed-new '- def-target'; commit "dispose of def-target: move it to Done"
+DEPARTURE="$(sha HEAD)"
 
 arm() { ( cd "$SANDBOX" && gate_arm_run --emit-entry-history "$@" 2>&1 ); }
 
 # --- the walk's bound: it stops at the filing commit, not at the root -----------------
 checks=$((checks + 1))
 out="$(arm def-target)"; rc=$?
-[[ "$rc" -eq 0 ]] || note bound-exit "the arm did not exit 0 on a live entry (exit $rc): $out"
+[[ "$rc" -eq 0 ]] || note bound-exit "the arm did not exit 0 on a departed entry (exit $rc): $out"
 grep -qF "filing commit $FILING" <<<"$out" \
     || note bound-filing "the walk did not stop at the filing commit $FILING: $out"
 grep -qF "4 commit(s) walked" <<<"$out" \
-    || note bound-count "the walk did not stop after the four commits from filing to HEAD: $out"
+    || note bound-count "the walk did not run the four commits from filing to the last live one: $out"
+
+# --- the departed entry is addressable, and its disposition is a HEADER fact ----------
+# The arm once refused this slug outright. It now reports it, naming the commit the entry departed
+# at with that commit's subject — and the departure is not a fall row, because absence is not a
+# count of zero and reporting it as a decrease would invent a measurement.
+checks=$((checks + 1))
+grep -qF "departed at $DEPARTURE (dispose of def-target: move it to Done)" <<<"$out" \
+    || note departed-header "the departure commit is not named in the header: $out"
+grep -qE "^  $DEPARTURE  " <<<"$out" \
+    && note departed-not-a-row "the departure was reported as a fall row: $out"
 
 # --- the decrease is reported, with its before, its after and its subject -------------
 checks=$((checks + 1))
-grep -qE "^  $HEADC  8 -> 4  compress def-target by answering\$" <<<"$out" \
+grep -qE "^  $COMPRESS  8 -> 4  compress def-target by answering\$" <<<"$out" \
     || note row "the compressing commit's row is not the reported one: $out"
 
 # --- limit: a commit that grows and one that nets out do not appear -------------------
@@ -122,15 +142,19 @@ ren="$(arm def-renamed-new)"; rc=$?
 [[ "$rc" -eq 0 ]] || note rename-exit "the arm did not exit 0 on the renamed slug (exit $rc): $ren"
 grep -qF "filing commit $NETZERO" <<<"$ren" \
     || note rename "the renamed slug did not read as filed at its rename $NETZERO: $ren"
-grep -qF "2 commit(s) walked" <<<"$ren" \
+grep -qF "3 commit(s) walked" <<<"$ren" \
     || note rename-count "the renamed slug's walk did not stop at the rename: $ren"
+grep -qF "departed at" <<<"$ren" \
+    && note live-no-departure "a live entry's header claimed a departure: $ren"
 
 # --- one spelling of the count: the arm's `after` is the cap's own count --------------
-# The gate prints headroom, which is cap minus that count, so the two are one subtraction apart.
+# The gate prints headroom, which is cap minus that count, so the two are one subtraction apart. It
+# reads the blob at the compressing commit, since the entry has since departed the task sections.
 checks=$((checks + 1))
-after="$(grep -E "^  $HEADC  " <<<"$out" | awk '{print $4}')"
+after="$(grep -E "^  $COMPRESS  " <<<"$out" | awk '{print $4}')"
+git -C "$SANDBOX" show "$COMPRESS:TASK-QUEUE.md" >"$SANDBOX/at-compress.md"
 head_out="$( cd "$SANDBOX" && gate_env QUEUE_KIT_ENTRY_LINE_CAP=50 \
-    && gate_run check-queue-entry-budget "$CHECKS" "$SANDBOX/TASK-QUEUE.md" 2>&1 )"
+    && gate_run check-queue-entry-budget "$CHECKS" "$SANDBOX/at-compress.md" 2>&1 )"
 headroom="$(grep -E '^  def-target: [0-9]+ lines of headroom' <<<"$head_out" | awk '{print $2}')"
 if [[ -z "$after" || -z "$headroom" ]]; then
     note one-spelling-read "could not read both numbers (after='$after' headroom='$headroom'): $head_out"
@@ -146,9 +170,15 @@ for bad in "" no-such-slug-at-all; do
     [[ "$rc" -eq 2 ]] || note usage "a usage error exited $rc rather than 2: $out2"
 done
 
+# --- a slug in neither set is refused on membership, before any blob is read ----------
+checks=$((checks + 1))
+none="$(arm no-such-slug-at-all 2>&1)"
+grep -qF 'not a live or retired slug: no-such-slug-at-all' <<<"$none" \
+    || note neither-set "the refusal did not name the membership class: $none"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "entry-history.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "entry-history.test.sh: clean (the walk stops at the filing commit and not at the root, a growing and a net-zero commit are both absent from the report, a renamed slug reads as filed at its rename, the arm's count is check-queue-entry-budget's own, and the exit contract is 0-or-2 with no 1; $checks checks)"
+echo "entry-history.test.sh: clean (the walk stops at the filing commit and not at the root, a departed entry names its departure commit in the header and never as a fall row, a growing and a net-zero commit are both absent from the report, a renamed slug reads as filed at its rename and claims no departure, the arm's count is check-queue-entry-budget's own, and the exit contract is 0-or-2 with no 1; $checks checks)"
 exit 0

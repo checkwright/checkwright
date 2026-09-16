@@ -50,19 +50,6 @@
   declared row to read grounds the worklist was meant to show, growing with the declarations.
   Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the printed-format ground.
 
-- **entry-history-reads-live-entries-only** [spec: SPEC-arm-fidelity.md] — the departed walk.
-  — `--emit entry-history` has no reader for an entry that has left the queue.
-  Verified: the arm run on `entry-compression-contract-unenforced` exits 2 with "the arm reads
-  a live entry", as queue-kit/SPEC.md §check-queue-entry-budget specifies. So the canon-kit
-  landing-commit sibling that section's durability clause cites, where prose leaves the queue
-  with the entry at its disposition, has no instrument at all: the same hole one scale up.
-  **Bound ruled at spec (delta 4):** retired-set membership IS the bound — settled from one
-  history pass before a blob is read — so the domain widens to live-plus-retired under the existing
-  argv tail, with no second mode and no new spelling.
-  **Cost while deferred:** what a disposition commit dropped from an entry is recoverable only
-  by hand-walking history.
-  Filed 2026-09-12 by build, outside its envelope; drained and promoted 2026-09-13 at close.
-
 - **queue-counts-reports-no-tag-breakdown** [spec: SPEC-arm-fidelity.md] — the tag partition.
   — `--emit queue-counts` reports section counts and no tag breakdown, so a session needing the
   share of the live pool carrying a given tag counts lead lines by hand.
@@ -4556,5 +4543,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- entry-history-reads-live-entries-only
 
 ## Lessons Learned

@@ -9,6 +9,8 @@ usage: --emit entry-history <slug> [queue-file]
   \"<commit>  <before> -> <after>  <subject>\". Advisory — it reports commits and
   issues no verdict; whether a fall was an answer, a relocation or a discard is
   read off the commit by the reader who opens it.
+  <slug> may be live or retired; a departed entry's header names the commit it
+  departed at, and a slug in neither set is refused.
 ";
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — git's own record separator between the two
@@ -47,12 +49,23 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let log = git
         .read(&["log", &format!("--format=%H{}%s", FIELD), "--", &file])
         .ok_or_else(|| format!("no committed history for {}", file))?;
+
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — the addressable domain is the live slugs
+    // plus the retired ones, and that membership is the bound the back-search would otherwise lack:
+    // it is settled from one history pass before a blob is read.
+    let text = std::fs::read_to_string(&file).unwrap_or_default();
+    let live = queue::live_slugs(&text, &sec_cfg);
+    if !live.contains(&slug) && !queue::retired_set(&file, &live).contains(&slug) {
+        return Err(format!("not a live or retired slug: {}", slug));
+    }
+
     let mut blobs = crate::history::Blobs::open(&top)?;
 
     let mut rows: Vec<Row> = Vec::new();
     let mut prev: Option<Row> = None;
     let mut walked = 0usize;
     let mut filing = String::new();
+    let mut departure: Option<(String, String)> = None;
     for line in log.lines() {
         let (commit, subject) = match line.split_once(FIELD) {
             Some(p) => p,
@@ -62,12 +75,18 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             Some(text) => count_of(&text, &sec_cfg, &slug),
             None => None,
         };
-        // spec: queue-kit/SPEC.md §check-queue-entry-budget — the bound: the first commit carrying
-        // no entry for the slug ends the walk, and a slug absent at the newest commit ends it at
-        // once, which the usage error below reports rather than an empty report
+        // spec: queue-kit/SPEC.md §check-queue-entry-budget — the bound, and the departure commit:
+        // the post-disposition run precedes the walk, and its oldest member is the commit one step
+        // newer than the last live one.
         let count = match count {
             Some(k) => k,
-            None => break,
+            None => {
+                if walked > 0 {
+                    break;
+                }
+                departure = Some((commit.to_string(), subject.to_string()));
+                continue;
+            }
         };
         walked += 1;
         filing = commit.to_string();
@@ -88,19 +107,35 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             subject: subject.to_string(),
         });
     }
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — the retired set admits a slug on
+    // lead-line shape alone, so a bold bullet that never stood in a task section is addressable and
+    // has no counted history; that is the one case the membership bound does not shorten
     if walked == 0 {
         return Err(format!(
-            "no entry for {} in the newest commit touching {} — the arm reads a live entry",
-            slug, file
+            "no commit touching {} carries a counted entry for {}",
+            file, slug
         ));
     }
 
-    let mut out = format!(
-        "ENTRY-HISTORY: {} — {} commit(s) walked back to its filing commit {}\n",
-        slug,
-        walked,
-        short(&filing)
-    );
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — the departure is a header fact and never
+    // a fall row: absence is not a count of zero, so reporting it as a decrease would invent a
+    // measurement
+    let mut out = match &departure {
+        Some((commit, subject)) => format!(
+            "ENTRY-HISTORY: {} — departed at {} ({}); {} commit(s) walked back to its filing commit {}\n",
+            slug,
+            short(commit),
+            subject,
+            walked,
+            short(&filing)
+        ),
+        None => format!(
+            "ENTRY-HISTORY: {} — {} commit(s) walked back to its filing commit {}\n",
+            slug,
+            walked,
+            short(&filing)
+        ),
+    };
     out.push_str("advisory: it reports commits and issues no verdict\n");
     out.push('\n');
     if rows.is_empty() {
