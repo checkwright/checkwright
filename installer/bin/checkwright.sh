@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The install boundary — the bash bootstrap, twin of the PowerShell half,
+# spec: installer/SPEC.md §The install boundary — the bash bootstrap, twin of the PowerShell half,
 # authored against that section's five steps: every install step is on the far side of the invoke
-# no-port: installer/README.md §The install boundary — this file's whole body is `bootstrap`-
+# no-port: installer/SPEC.md §The install boundary — this file's whole body is `bootstrap`-
 # disposition steps, the one no-port cause installer/ may carry: the binary cannot select itself
 #
 # usage: checkwright <verb> [args...]
@@ -14,7 +14,7 @@ die() {
     exit "${3:-2}"
 }
 
-# spec: installer/README.md §The install boundary — step 1: the package's own payload directory,
+# spec: installer/SPEC.md §The install boundary — step 1: the package's own payload directory,
 # resolved through the symlink chain, because npm installs the bin entry as a link in
 # node_modules/.bin and the unresolved path's parent is node_modules
 SELF="${BASH_SOURCE[0]}"
@@ -28,16 +28,16 @@ PAYLOAD="$INSTALLER/payload"
 [[ -d "$PAYLOAD" ]] || die "this package carries no payload" \
     "the bootstrap runs the gate binary out of the package's own payload/, assembled at pack time — run it from an installed package, not from a source checkout."
 
-# spec: installer/README.md §The gate binary — the detector's whole input, factored out so a refusal
+# spec: installer/SPEC.md §The gate binary — the detector's whole input, factored out so a refusal
 # can name what the host was detected AS rather than only that it mapped to nothing
 host_shape() {   # -> `<os>/<arch>` exactly as this host reports itself
     printf '%s/%s' "$(uname -s 2>/dev/null)" "$(uname -m 2>/dev/null)"
 }
 
-# spec: installer/README.md §The gate binary — step 2: which published artifact fits this host. Two
+# spec: installer/SPEC.md §The gate binary — step 2: which published artifact fits this host. Two
 # fields rather than `uname -a` because that is the smallest input answering the question and the
 # one a PowerShell half can answer without parsing prose
-# spec: installer/README.md §The gate binary — every mapped triple here is the sole single-quoted
+# spec: installer/SPEC.md §The gate binary — every mapped triple here is the sole single-quoted
 # operand of a `printf` and appears nowhere else in this function, which is the shape
 # check-install-platforms extracts this detector's triple set from
 target_of_host() {   # -> the Rust target triple this host is, empty when it maps to none
@@ -46,7 +46,7 @@ target_of_host() {   # -> the Rust target triple this host is, empty when it map
         Linux/aarch64|Linux/arm64)  printf 'aarch64-unknown-linux-gnu' ;;
         Darwin/x86_64)              printf 'x86_64-apple-darwin' ;;
         Darwin/arm64)               printf 'aarch64-apple-darwin' ;;
-        # spec: installer/README.md §The gate binary — the map answers which *published artifact*
+        # spec: installer/SPEC.md §The gate binary — the map answers which *published artifact*
         # fits this host, so a MinGW/MSYS/Cygwin `uname` — which reports the shell environment and
         # not the toolchain — maps to the msvc triple a Windows build leg would publish
         MINGW*/x86_64|MSYS*/x86_64|CYGWIN*/x86_64) printf 'x86_64-pc-windows-msvc' ;;
@@ -54,7 +54,7 @@ target_of_host() {   # -> the Rust target triple this host is, empty when it map
     esac
 }
 
-# spec: installer/README.md §The gate binary — the libc question, answered beside the other refusals
+# spec: installer/SPEC.md §The gate binary — the libc question, answered beside the other refusals
 # rather than inside the detector: two questions, two places, and each verdict rests on a POSITIVE
 # signal, so an unidentifiable libc refuses rather than being read as glibc
 libc_flavour() {   # -> musl | gnu | unknown
@@ -70,7 +70,7 @@ libc_flavour() {   # -> musl | gnu | unknown
     printf 'unknown'
 }
 
-# spec: installer/README.md §The gate binary — step 3: selection keeps three outcomes and only one
+# spec: installer/SPEC.md §The gate binary — step 3: selection keeps three outcomes and only one
 # of them proceeds, and they stay told apart by message and remedy rather than by exit status alone
 # — an undeclared host and a broken payload remain different answers to an adopter
 ARTIFACT=""
@@ -86,7 +86,7 @@ select_artifact() {
     roster="$dir/targets.list"
     [[ -f "$roster" ]] || die "this payload carries prebuilt gate binaries but no target roster" \
         "the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower."
-    # spec: installer/README.md §The gate binary — the one case where the roster grep cannot refuse
+    # spec: installer/SPEC.md §The gate binary — the one case where the roster grep cannot refuse
     # for us: `uname` cannot tell glibc from musl, so a musl host resolves to a triple that IS on
     # the roster and would be handed a binary that dies in the dynamic loader
     if [[ "$target" == *-linux-gnu ]]; then
@@ -107,7 +107,7 @@ select_artifact() {
             "the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
     fi
     src="$dir/$target"
-    # spec: installer/README.md §The gate binary — the prefix is stripped here rather than with a
+    # spec: installer/SPEC.md §The gate binary — the prefix is stripped here rather than with a
     # `-printf '%P'` primary: that primary is GNU findutils, a BSD `find` refuses it, and the refusal
     # lands in the same empty result a genuinely incomplete artifact does
     names=()
@@ -121,7 +121,7 @@ select_artifact() {
     ARTIFACT="$src/${names[0]}"
 }
 
-# spec: installer/README.md §The install boundary — step 4, the one step that cannot use the binary
+# spec: installer/SPEC.md §The install boundary — step 4, the one step that cannot use the binary
 # to verify the binary: a host carrying neither `sha256sum` nor `shasum` is refused rather than
 # served an unverified artifact. Behind the invoke the crate hashes in-process
 verify_digest() {
@@ -147,10 +147,10 @@ verify_digest() {
 select_artifact
 verify_digest
 
-# spec: installer/README.md §The install boundary — step 5: execute the verified artifact in place
+# spec: installer/SPEC.md §The install boundary — step 5: execute the verified artifact in place
 # out of the payload, under one unconditional argv rule — a dashless leading token is prefixed with
 # `--` and everything after it is forwarded verbatim
-# spec: installer/README.md §The verbs — the rule introduces no verb table into the bootstrap, which
+# spec: installer/SPEC.md §The verbs — the rule introduces no verb table into the bootstrap, which
 # is what the interpreter policy forbids here; the artifact owns which verbs exist
 if [[ $# -gt 0 && "$1" != -* ]]; then
     VERB="--$1"

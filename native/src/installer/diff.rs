@@ -1,4 +1,4 @@
-// spec: installer/README.md §diff — classifies every `files` entry against the tree using the same
+// spec: installer/SPEC.md §diff — classifies every `files` entry against the tree using the same
 // hash comparison the claim makes; changed and missing are named apart because a deletion and an
 // edit have different remedies. Exit status is the verdict: 0 all match, 1 at least one does not.
 use super::{lock, refuse, Refusal};
@@ -26,7 +26,7 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn compare() -> Result<i32, Refusal> {
-    // spec: installer/README.md §init — every precondition refuses rather than warns, and is
+    // spec: installer/SPEC.md §init — every precondition refuses rather than warns, and is
     // checked before anything is compared: diff's subject is exactly the roster init recorded, so
     // it needs the repository that roster is in.
     let root = super::repo_root().ok_or_else(|| {
@@ -54,7 +54,7 @@ fn compare() -> Result<i32, Refusal> {
             )
         })?;
 
-    // spec: installer/README.md §diff — a recorded path already off the tree is reported apart from
+    // spec: installer/SPEC.md §diff — a recorded path already off the tree is reported apart from
     // one whose content differs: the roster's exit rule means the next init silently drops a missing
     // path and rewrites it fresh, which is worth a warning before it happens rather than after.
     let (mut changed, mut missing) = (Vec::new(), Vec::new());
@@ -115,7 +115,7 @@ fn compare() -> Result<i32, Refusal> {
 
 #[cfg(test)]
 mod tests {
-    // spec: installer/README.md §The verbs — `--help` answers on its own, outside every repository
+    // spec: installer/SPEC.md §The verbs — `--help` answers on its own, outside every repository
     // precondition, and an unknown argument is a usage refusal.
     #[test]
     fn help_answers_outside_every_precondition() {

@@ -75,8 +75,9 @@ Several docs surfaces are generated and byte-gated for freshness; each gate's re
 output names its own regen command, so the command need not stay resident to be
 recoverable:
 
-- **The on-site SPEC mirror** (`docs/<kit>/SPEC.md`, `docs/<kit>/README.md`,
-  `docs/doctrine-kit/DOCTRINE.md`) — regenerate after editing any kit
+- **The on-site SPEC mirror** (`docs/<dir>/SPEC.md`, `docs/<dir>/README.md`,
+  `docs/doctrine-kit/DOCTRINE.md`, for every top-level directory holding a
+  `SPEC.md` — the kits and `installer/`) — regenerate after editing any mirrored
   SPEC/README/DOCTRINE: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`
   (`check-docs-mirror-fresh` byte-gates it).
 - **The value rollup** — `docs/value.md` is hand-framed prose around one
@@ -240,7 +241,7 @@ recoverable:
   **The binding is four-way, not three-way, and the fourth and fifth surfaces
   are the two host detectors** — `target_of_host` in
   `installer/bin/checkwright.sh` and `Get-HostTarget` in
-  `installer/bin/checkwright.ps1`, whose extraction shapes installer/README.md
+  `installer/bin/checkwright.ps1`, whose extraction shapes installer/SPEC.md
   §The gate binary pins. Each detector's **emitted** triple set is held equal to
   the block's **declared** set — equality rather than containment, because each
   direction closes a distinct failure. A triple a detector emits that the block

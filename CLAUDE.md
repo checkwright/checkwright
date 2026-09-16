@@ -153,8 +153,8 @@ load behind that trigger, so they are not resident here.
 - `installer/` is the published activation surface — a bash and a PowerShell
   bootstrap in front of the gate binary, shipped as a Release tarball and an npm
   package from one payload; repo-root-governed, and not a kit by the predicate
-  under `native/` above. Its payload is never committed. Layout, boundary and
-  packing: installer/README.md.
+  under `native/` above. Its payload is never committed. Its `README.md` is the
+  activation surface; layout, boundary and packing: installer/SPEC.md.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns (off an
   implementation, a gate's source, a commit, or a prior/sibling deliverable)? stamp it in
   the moment with `bash gate-sdk/bin/run-gates.sh --emit kfric "<fact>" "<surface>"` —

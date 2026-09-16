@@ -7,6 +7,14 @@
 # are external, not a nav slot. Release notes are NOT listed here: they carry a
 # `release:` key, and the Releases page names it in nav_children_key, so each
 # note holds a derived nav slot (labeled by its key value) that the gate models.
+# A mirror page the emitter produces mechanically and no tier points at also
+# belongs here: the mirror's corpus is every top-level directory holding a
+# SPEC.md plus that directory's README.md, so a directory whose README is the
+# package front door rather than site content acquires a page the site has no
+# reader for. Listed rather than suppressed, because the emitter's corpus has
+# one rule and an exception would be a second; the sibling SPEC page is NOT
+# listed, being reached from the install page's pointer.
+docs/installer/README.md
 docs/evidence-data.md
 docs/site-architecture.md
 docs/posts/2026-07-09-announcing-checkwright.md

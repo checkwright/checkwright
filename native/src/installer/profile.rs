@@ -1,10 +1,10 @@
-// spec: installer/README.md §Profiles — the crate's owner of the profile rosters: it parses
+// spec: installer/SPEC.md §Profiles — the crate's owner of the profile rosters: it parses
 // `profiles.list`, derives `full` from the payload rather than reading a row, and is the one place
 // a profile name resolves to a kit set.
 use super::recipe;
 use std::path::Path;
 
-// spec: installer/README.md §Profiles — the derived profile is never a row in `profiles.list`; a
+// spec: installer/SPEC.md §Profiles — the derived profile is never a row in `profiles.list`; a
 // hand-maintained "all the kits" roster is drift the day a kit lands.
 pub const DERIVED: &str = "full";
 
@@ -17,7 +17,7 @@ pub fn payload_kits(installer: &Path) -> Vec<String> {
         .collect()
 }
 
-// spec: installer/README.md §Profiles — the `<profile><TAB><kit>` rows, comments and blanks
+// spec: installer/SPEC.md §Profiles — the `<profile><TAB><kit>` rows, comments and blanks
 // dropped; a `#` anywhere on a line ends it, which is what lets a row carry a trailing note.
 fn rows(installer: &Path) -> Vec<(String, String)> {
     let Ok(text) = std::fs::read_to_string(installer.join("profiles.list")) else {
@@ -38,7 +38,7 @@ fn rows(installer: &Path) -> Vec<(String, String)> {
         .collect()
 }
 
-// spec: installer/README.md §Profiles — every selectable profile, the derived one last.
+// spec: installer/SPEC.md §Profiles — every selectable profile, the derived one last.
 pub fn names(installer: &Path) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for (p, _) in rows(installer) {
@@ -50,7 +50,7 @@ pub fn names(installer: &Path) -> Vec<String> {
     out
 }
 
-// spec: installer/README.md §Profiles — emit in payload order so a roster's line order never
+// spec: installer/SPEC.md §Profiles — emit in payload order so a roster's line order never
 // decides install order.
 pub fn kits(installer: &Path, want: &str) -> Vec<String> {
     if want == DERIVED {
@@ -74,7 +74,7 @@ pub fn known(installer: &Path, want: &str) -> bool {
     names(installer).iter().any(|n| n == want)
 }
 
-// spec: installer/README.md §Profiles — what an adopter meets is the battery, not the directory
+// spec: installer/SPEC.md §Profiles — what an adopter meets is the battery, not the directory
 // list, so the gate set is a derivation in its own right: one function answers it for the registry
 // init writes and for the smoke's monotonicity assertion, rather than each unioning it itself.
 pub fn gate_set(installer: &Path, profile: &str) -> Vec<String> {
@@ -91,7 +91,7 @@ pub fn gate_set(installer: &Path, profile: &str) -> Vec<String> {
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §Profiles — the derived profile is every payload kit and is never a
+    // spec: installer/SPEC.md §Profiles — the derived profile is every payload kit and is never a
     // row; a declared profile emits in payload order rather than in row order; an unknown one
     // resolves to nothing.
     #[test]

@@ -1,4 +1,4 @@
-// spec: installer/README.md §doctor — renders the toolchain floor as an exit status so `init` and a
+// spec: installer/SPEC.md §doctor — renders the toolchain floor as an exit status so `init` and a
 // CI step can gate on the verdict without parsing a report. The roster is the crate's own
 // (context-kit/SPEC.md §bin/env-probe), because at init time nothing is vendored in the tree yet.
 use super::{lock, GATES_DIR};
@@ -15,7 +15,7 @@ const USAGE: &[&str] = &[
     "Exit status is the verdict: 0 meets the contract, 1 below it.",
 ];
 
-// spec: installer/README.md §doctor — the report is built whole so `init` can read the same
+// spec: installer/SPEC.md §doctor — the report is built whole so `init` can read the same
 // rendering it prints, on the same three channels: what a caller shows, what it reports as a
 // refusal, and the verdict itself.
 pub struct Report {
@@ -46,7 +46,7 @@ fn probe_banner(tool: &str) -> String {
     "present".to_string()
 }
 
-// spec: installer/README.md §doctor — doctor defines no floor of its own: it renders whatever
+// spec: installer/SPEC.md §doctor — doctor defines no floor of its own: it renders whatever
 // verdict the roster's own predicate returns, so the contract has one owner and this is a display.
 fn render_member(out: &mut String, element: &str, banner: &str) -> bool {
     let e = toolfloor::parse(element);
@@ -96,7 +96,7 @@ fn render_member(out: &mut String, element: &str, banner: &str) -> bool {
     }
 }
 
-// spec: installer/README.md §The gate binary — the omitted-member record's reader. The two
+// spec: installer/SPEC.md §The gate binary — the omitted-member record's reader. The two
 // install-time reason tokens retired; the reason-agnostic class did not, so this reports whatever
 // reason it finds and invents no remedy for it.
 fn omitted_block(out: &mut String, list_text: &str) {
@@ -118,7 +118,7 @@ fn omitted_block(out: &mut String, list_text: &str) {
         let _ = writeln!(out, "  {:<12} {} gate(s), {}", "omitted", n, r);
         i += n;
     }
-    // spec: installer/README.md §The gate binary — the all-omitted registry's own line, said only
+    // spec: installer/SPEC.md §The gate binary — the all-omitted registry's own line, said only
     // when no live member survives: the per-reason counts read identically at 24-of-26 and at
     // 26-of-26, and the second is the one where an adopter's battery cannot run at all.
     let live = list_text
@@ -145,7 +145,7 @@ pub fn diagnose() -> Report {
 
     out.push_str("toolchain\n");
     for element in toolfloor::PROBE_SET {
-        // spec: installer/README.md §doctor — a contributor-audience member is skipped outright
+        // spec: installer/SPEC.md §doctor — a contributor-audience member is skipped outright
         // rather than rendered as informational: doctor is the adopter's verb, and showing an
         // adopter a tool the install path never reaches is an invitation to install it.
         if toolfloor::parse(element).audience == "contributor" {
@@ -184,10 +184,10 @@ pub fn diagnose() -> Report {
             };
         };
         let version = manifest.field("version");
-        // spec: installer/README.md §doctor — a manifest carrying `files` and no `version` is a
+        // spec: installer/SPEC.md §doctor — a manifest carrying `files` and no `version` is a
         // residue rather than an install, `version` being the field an install always has and a
         // residue never does.
-        // spec: installer/README.md §doctor — it guards the whole installed block rather than
+        // spec: installer/SPEC.md §doctor — it guards the whole installed block rather than
         // sitting beside it: every line below is a per-install reading, and printing them past a
         // residue is the mixed verdict doctor's exit-status carve-out already refuses.
         if version.is_empty() {
@@ -203,7 +203,7 @@ pub fn diagnose() -> Report {
             let _ = writeln!(out, "  {:<12} {}", "profile", manifest.field("profile"));
             let _ = writeln!(out, "  {:<12} {}", "kits", manifest.field("kits"));
 
-            // spec: installer/README.md §doctor — the registry this tree's battery runs from is
+            // spec: installer/SPEC.md §doctor — the registry this tree's battery runs from is
             // named rather than left implicit: it is the one install fact the identity fields do
             // not carry, and a report resolving the wrong file would say nothing about which.
             let list = manifest.own_file(&format!("{}/gates.list", GATES_DIR));
@@ -218,14 +218,14 @@ pub fn diagnose() -> Report {
                 let _ = writeln!(out, "  {:<12} {}{}", "registry", list, tail);
             }
 
-            // spec: installer/README.md §The gate binary — the recorded digest's second reader:
+            // spec: installer/SPEC.md §The gate binary — the recorded digest's second reader:
             // re-verifying in place is all that stands between a consumer and a binary swapped
             // after install, and the path comes from the knob that owns it, not a stored copy.
             let (target, digest) = manifest.artifact();
             if !target.is_empty() {
                 let seam = manifest.own_file(&format!("{}/gate-sdk-config.knobs", GATES_DIR));
                 let bin = seam_binary(&root, &seam);
-                // spec: installer/README.md §doctor — an artifact finding reports without setting
+                // spec: installer/SPEC.md §doctor — an artifact finding reports without setting
                 // the verdict, deliberately: the status is the toolchain contract init gates on, so
                 // failing it here would block the re-run that is this finding's own remedy.
                 match bin {
@@ -251,7 +251,7 @@ pub fn diagnose() -> Report {
             }
         }
 
-        // spec: installer/README.md §doctor — the report stops at the toolchain and identity
+        // spec: installer/SPEC.md §doctor — the report stops at the toolchain and identity
         // fields; per-file divergence is a separate verb's question on both paths, so `DOCTOR:
         // clean` is never read as a claim about the tree's contents.
         out.push_str("\nrun checkwright diff to see which files, if any, have changed since.\n");
@@ -262,7 +262,7 @@ pub fn diagnose() -> Report {
         out.push_str("  help: install or upgrade each tool reported above; the floors are the ones the gate battery needs to run, not preferences.\n");
         return Report { out, err, code: 1 };
     }
-    // spec: installer/README.md §doctor — the verdict line names an artifact finding rather than
+    // spec: installer/SPEC.md §doctor — the verdict line names an artifact finding rather than
     // swallowing it: the exit status stays the toolchain contract, but a run that reported a digest
     // mismatch must not sign off as plainly clean.
     if !artifact_finding.is_empty() {
@@ -311,7 +311,7 @@ pub fn run(args: &[String]) -> i32 {
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §doctor — every arm of the closed verdict set renders, and only the
+    // spec: installer/SPEC.md §doctor — every arm of the closed verdict set renders, and only the
     // clean arm leaves the verdict alone.
     #[test]
     fn each_verdict_renders_and_only_the_clean_one_passes() {
@@ -328,7 +328,7 @@ mod tests {
         assert!(out.contains("bash         could not be compared against the floor of 4.3"));
     }
 
-    // spec: installer/README.md §The gate binary — the omitted block reports whatever reason it
+    // spec: installer/SPEC.md §The gate binary — the omitted block reports whatever reason it
     // finds, invents no remedy for a retired one, and says the all-omitted line only when no live
     // member survives.
     #[test]
@@ -346,7 +346,7 @@ mod tests {
         assert!(empty.contains("battery      no gate survives here"));
     }
 
-    // spec: installer/README.md §The verbs — `--help` answers on its own and an unknown argument is
+    // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is
     // a usage refusal rather than an ignored token.
     #[test]
     fn help_answers_and_an_unknown_argument_refuses() {

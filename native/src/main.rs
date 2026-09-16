@@ -229,7 +229,7 @@ fn normalize(argv: Vec<String>) -> Vec<String> {
     argv
 }
 
-// spec: installer/README.md §The verbs — the roster is read off the verb table rather than restated.
+// spec: installer/SPEC.md §The verbs — the roster is read off the verb table rather than restated.
 // The harness line sits beside it because one binary answers to both audiences: the adopter who
 // reached it through the bootstrap, and the battery dispatching a registry member through it.
 fn adopter_usage() {
@@ -258,7 +258,7 @@ fn main() {
         }
     };
 
-    // spec: installer/README.md §The verbs — the adopter's help, answered here because the roster's
+    // spec: installer/SPEC.md §The verbs — the adopter's help, answered here because the roster's
     // owner is the binary: the bootstrap forwards `--help` unchanged under its one argv rule, so
     // this arm is what keeps it from promising a verb the artifact does not carry.
     if first == "--help" || first == "-h" {
@@ -291,13 +291,13 @@ fn main() {
         exit(guard_lib_parity(&argv[1..]));
     }
 
-    // spec: installer/README.md §The install boundary — the install seam both bootstraps call,
+    // spec: installer/SPEC.md §The install boundary — the install seam both bootstraps call,
     // resolved here before the registry lookup and absent from `--list` like the arms around it.
     if first == "--install" {
         exit(install::run(&argv[1..]));
     }
 
-    // spec: installer/README.md §The verbs — the five adopter verbs, resolved before the registry
+    // spec: installer/SPEC.md §The verbs — the five adopter verbs, resolved before the registry
     // lookup and absent from `--list` like the arms around them. Each takes every value as argv and
     // reads no knob: the caller is the bootstrap, not assumed to be a POSIX shell.
     if let Some(verb) = installer::VERBS.iter().find(|(flag, _)| *flag == first) {

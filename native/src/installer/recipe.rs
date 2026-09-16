@@ -1,10 +1,10 @@
-// spec: installer/README.md §What init seeds — the crate's owner of the per-kit install recipe:
+// spec: installer/SPEC.md §What init seeds — the crate's owner of the per-kit install recipe:
 // the starting gate roster a kit registers in a fresh consumer, and the seam surfaces those gates
 // need. Two output channels, and the difference between them is who writes the file.
 use super::{AGENT_FILE, GATES_DIR};
 use std::path::Path;
 
-// spec: installer/README.md §What init seeds — seed what is absent, plan what must be claimed: a
+// spec: installer/SPEC.md §What init seeds — seed what is absent, plan what must be claimed: a
 // surface init creates once is written here only when absent, and one it rewrites every run is
 // planned instead, because only the claim can compare the adopter's content before the overwrite.
 pub enum Seeded {
@@ -22,7 +22,7 @@ fn entries(dir: &Path) -> Vec<std::path::PathBuf> {
         .collect()
 }
 
-// spec: installer/README.md §What init seeds — the config seam is derived, never listed: a kit's
+// spec: installer/SPEC.md §What init seeds — the config seam is derived, never listed: a kit's
 // consumer config is whatever `templates/*-config.sh` or `*-config.knobs` it ships. It plans and writes nothing — a
 // copy landing before the claim hashes the tree destroys the evidence the refusal is computed from.
 pub fn config_seam_plan(kit_payload: &Path, gates_dir: &str) -> Vec<(String, String)> {
@@ -60,10 +60,10 @@ pub fn install_disposition(gate_file: &Path) -> String {
     String::new()
 }
 
-// spec: installer/README.md §What init seeds — the starting roster is the subset a fresh consumer
+// spec: installer/SPEC.md §What init seeds — the starting roster is the subset a fresh consumer
 // begins with: a gate whose subject the adopter has not authored yet would exit 2 on their tree, so
 // it is registered when that surface exists rather than at install.
-// spec: installer/README.md §Profiles — the roster is keyed by profile as well as by kit, so one
+// spec: installer/SPEC.md §Profiles — the roster is keyed by profile as well as by kit, so one
 // that varies by profile becomes a change to one arm rather than to this signature. Nothing varies
 // on it today; the parameter is the seam.
 // spec: gate-sdk/SPEC.md §Consumer payload — both declaration spellings are scanned, because a
@@ -95,7 +95,7 @@ pub fn needs_queue(kit: &str) -> bool {
     matches!(kit, "canon-kit" | "lifecycle-kit" | "queue-kit")
 }
 
-// spec: installer/README.md §What init seeds — the queue source is resolved once over the whole kit
+// spec: installer/SPEC.md §What init seeds — the queue source is resolved once over the whole kit
 // set, never inside a per-kit call blind to the others: a kit declares itself the format's owner by
 // shipping `templates/TASK-QUEUE.md`, and `-` is the inline fallback.
 pub fn queue_source(payload: &Path, kits: &[String]) -> Option<String> {
@@ -116,7 +116,7 @@ pub fn queue_source(payload: &Path, kits: &[String]) -> Option<String> {
     Some(if tpl.is_empty() { "-".to_string() } else { tpl })
 }
 
-// spec: installer/README.md §What init seeds — the fallback carries every
+// spec: installer/SPEC.md §What init seeds — the fallback carries every
 // `QUEUE_KIT_REQUIRED_SECTIONS` heading at that knob's default, rendered from the kit's table: the
 // section floor is not registered at install, so a skeleton missing one reds on the day they register it.
 pub fn write_queue(src: &str, root: &Path, queue_file: &str) -> Result<(), String> {
@@ -137,7 +137,7 @@ pub fn write_queue(src: &str, root: &Path, queue_file: &str) -> Result<(), Strin
     std::fs::write(&dest, body).map_err(|e| format!("cannot write {}: {}", queue_file, e))
 }
 
-// spec: installer/README.md §What init seeds — this asks whether the agent file must *exist* for a
+// spec: installer/SPEC.md §What init seeds — this asks whether the agent file must *exist* for a
 // kit's starting gates, a narrower question than which kit writes into it: reading this membership
 // as the seeding roster is the conflation that section's rule exists to settle.
 pub fn needs_agent_file(kit: &str) -> bool {
@@ -191,7 +191,7 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path) -> Result<Vec<Seeded>, S
                 &mut out,
             )?;
         }
-        // spec: installer/README.md §What init seeds — this kit has an arm because a gate init
+        // spec: installer/SPEC.md §What init seeds — this kit has an arm because a gate init
         // registers reads the block it writes; that is the whole test, and why no lifecycle-kit arm
         // sits beside it.
         // spec: doctrine-kit/SPEC.md §install-doctrine — the block is the kit's own installer's to
@@ -251,7 +251,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
-    // spec: installer/README.md §What init seeds — the queue source is resolved over the whole kit
+    // spec: installer/SPEC.md §What init seeds — the queue source is resolved over the whole kit
     // set: a set no member of which reads the queue seeds nothing, and one that does but ships no
     // template takes the inline fallback.
     #[test]

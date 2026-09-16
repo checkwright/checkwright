@@ -1,4 +1,4 @@
-// spec: installer/README.md §The verbs — the five adopter verbs, behind the invoke: each a
+// spec: installer/SPEC.md §The verbs — the five adopter verbs, behind the invoke: each a
 // top-level `--`-prefixed arm resolved before the registry lookup and absent from `--list`, taking
 // every value as argv because the caller is a bootstrap that may run no POSIX shell.
 pub mod diff;
@@ -13,7 +13,7 @@ pub mod update;
 use crate::{proc, walk};
 use std::path::{Path, PathBuf};
 
-// spec: installer/README.md §The verbs — the roster's owner is the binary: a verb is advertised
+// spec: installer/SPEC.md §The verbs — the roster's owner is the binary: a verb is advertised
 // because this table carries it, so `checkwright --help` cannot promise one the artifact does not
 // implement and an unknown verb is refused by the binary's own usage arm.
 pub type Verb = fn(&[String]) -> i32;
@@ -26,14 +26,14 @@ pub const VERBS: &[(&str, Verb)] = &[
     ("--uninstall", uninstall::run),
 ];
 
-// spec: installer/README.md §What init seeds — the consumer-layout names the verbs write against,
+// spec: installer/SPEC.md §What init seeds — the consumer-layout names the verbs write against,
 // which are gate-sdk's and canon-kit's own defaults. They live here rather than in one arm because
 // uninstall trims a span out of the same agent file init wrote it into.
 pub const GATES_DIR: &str = "scripts";
 pub const AGENT_FILE: &str = "CLAUDE.md";
 pub const QUEUE_FILE: &str = "TASK-QUEUE.md";
 
-// spec: installer/README.md §init — the rule that an install's size is never bounded by the host's
+// spec: installer/SPEC.md §init — the rule that an install's size is never bounded by the host's
 // argv width: every git call naming the whole roster goes through `git_batched`, so the batching is
 // one implementation rather than a discipline each call site must remember.
 // comment-tier-exempt: a native Windows process is handed at most 32767 command-line characters and
@@ -62,7 +62,7 @@ pub fn files_under(dir: &Path) -> Result<Vec<String>, String> {
     Ok(out)
 }
 
-// spec: installer/README.md §The verbs — every refusal carries the verb's own prefix, an optional
+// spec: installer/SPEC.md §The verbs — every refusal carries the verb's own prefix, an optional
 // `help:` line and an exit status, which is the published idiom rather than a second one.
 #[derive(Debug)]
 pub struct Refusal {
@@ -92,7 +92,7 @@ pub fn finish(verb: &str, outcome: Result<i32, Refusal>) -> i32 {
     }
 }
 
-// spec: installer/README.md §The verbs — `-h`/`--help` is intercepted first and answers on its own,
+// spec: installer/SPEC.md §The verbs — `-h`/`--help` is intercepted first and answers on its own,
 // outside every repository precondition, and an unknown argument is a usage refusal rather than a
 // silently ignored token.
 pub fn help_only(args: &[String], usage: &[&str]) -> Option<Result<i32, Refusal>> {
@@ -108,10 +108,10 @@ pub fn help_only(args: &[String], usage: &[&str]) -> Option<Result<i32, Refusal>
     }
 }
 
-// spec: installer/README.md §The install boundary — the package the running artifact belongs to,
+// spec: installer/SPEC.md §The install boundary — the package the running artifact belongs to,
 // derived from the artifact's own location rather than passed as argv: step 5's rule is
 // unconditional, so it has no slot to inject a root into and the payload layout answers instead.
-// spec: installer/README.md §Layout — a binary reached from anywhere else, the copy `init` places
+// spec: installer/SPEC.md §Layout — a binary reached from anywhere else, the copy `init` places
 // in a consumer's tree most of all, resolves nothing here and gets the no-payload refusal.
 pub struct Package {
     pub root: PathBuf,
@@ -160,7 +160,7 @@ pub fn package(verb_action: &str) -> Result<Package, Refusal> {
     })
 }
 
-// spec: installer/README.md §init — the repository every verb's preconditions are about, taken
+// spec: installer/SPEC.md §init — the repository every verb's preconditions are about, taken
 // through the crate's own crosser so the root is in one dialect (gate-sdk/SPEC.md §The crate's
 // crosser) rather than in whichever one the host's git answers in.
 pub fn repo_root() -> Option<PathBuf> {
@@ -178,7 +178,7 @@ pub fn git_capture(root: &Path, args: &[&str]) -> Result<String, String> {
         .unwrap_or_default())
 }
 
-// spec: installer/README.md §init — a git call read for its *status* rather than its stdout, which
+// spec: installer/SPEC.md §init — a git call read for its *status* rather than its stdout, which
 // is what `git diff --cached --quiet` and `git ls-files --error-unmatch` are: `None` is a spawn
 // failure, and folding it into either verdict is what a caller has to write down.
 pub fn git_code(root: &Path, args: &[&str]) -> Option<i32> {
@@ -188,7 +188,7 @@ pub fn git_code(root: &Path, args: &[&str]) -> Option<i32> {
     proc::run("git", &argv).ok()?.code()
 }
 
-// spec: installer/README.md §init — the roster goes to git in batches, so a large profile's install
+// spec: installer/SPEC.md §init — the roster goes to git in batches, so a large profile's install
 // is not bounded by the host's argv width. The status is captured rather than discarded: a read
 // that failed and returned nothing would look exactly like a clean tree.
 pub fn git_batched(root: &Path, fixed: &[&str], paths: &[String]) -> Result<Vec<u8>, String> {
@@ -212,7 +212,7 @@ pub fn git_batched(root: &Path, fixed: &[&str], paths: &[String]) -> Result<Vec<
     Ok(collected)
 }
 
-// spec: installer/README.md §init — the batching itself, separated from the spawn so the boundary
+// spec: installer/SPEC.md §init — the batching itself, separated from the spawn so the boundary
 // rule is asserted over a corpus rather than over a hundred processes: an empty roster is no call
 // at all, and a single path wider than the budget still gets its own call rather than none.
 fn chunks(paths: &[String]) -> Vec<&[String]> {
@@ -236,7 +236,7 @@ fn chunks(paths: &[String]) -> Vec<&[String]> {
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §init — every path lands in exactly one chunk, no chunk exceeds
+    // spec: installer/SPEC.md §init — every path lands in exactly one chunk, no chunk exceeds
     // the budget, an empty roster is no call at all, and a single path wider than the budget still
     // gets a call of its own rather than none.
     #[test]

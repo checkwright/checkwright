@@ -1,4 +1,4 @@
-// spec: installer/README.md §init — vendors the selected profile's kit source out of the package
+// spec: installer/SPEC.md §init — vendors the selected profile's kit source out of the package
 // payload into the consumer's repository and commits it, so what governs their tree afterwards is
 // committed, auditable source rather than something resolved at their build time.
 use super::{lock, profile, recipe, refuse, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
@@ -66,7 +66,7 @@ fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Flags>, Refusa
 }
 
 pub fn run(args: &[String]) -> i32 {
-    // spec: installer/README.md §The verbs — `--help` answers before every precondition, including
+    // spec: installer/SPEC.md §The verbs — `--help` answers before every precondition, including
     // the package's own: an adopter asking what the verb takes is not asking for an install.
     let pkg = super::package(
         "init copies kit source",
@@ -83,7 +83,7 @@ pub fn run(args: &[String]) -> i32 {
     super::finish("init", vendor(&pkg, &parsed))
 }
 
-// spec: installer/README.md §The manifest — a recorded hash is what init last wrote at that path,
+// spec: installer/SPEC.md §The manifest — a recorded hash is what init last wrote at that path,
 // so an entry init did not write this run carries its hash forward verbatim: hashing the tree at
 // emit time would file the adopter's own content as init's and let the next run write through it.
 struct Roster {
@@ -103,7 +103,7 @@ impl Roster {
         }
     }
 
-    // spec: installer/README.md §The manifest — membership in the written set is held as a key
+    // spec: installer/SPEC.md §The manifest — membership in the written set is held as a key
     // rather than re-derived by scanning the list, and the key is written where the path is
     // recorded so the two cannot part company.
     fn record(&mut self, path: &str, carried: Option<&str>) {
@@ -115,9 +115,9 @@ impl Roster {
     }
 }
 
-// spec: installer/README.md §init — the non-destructive re-run: a file still at its recorded hash
+// spec: installer/SPEC.md §init — the non-destructive re-run: a file still at its recorded hash
 // is init's to rewrite, one changed since is the adopter's and is reported instead.
-// spec: installer/README.md §The manifest — the carry-forward belongs to the refusal rather than to
+// spec: installer/SPEC.md §The manifest — the carry-forward belongs to the refusal rather than to
 // each caller: this is the single point where the roster would otherwise lose the path, and absence
 // of a key reads as "never installed" on the next run.
 fn claim(root: &Path, rel: &str, prior: &BTreeMap<String, String>, force: bool, r: &mut Roster) -> bool {
@@ -176,7 +176,7 @@ fn copy_in(
     Ok(())
 }
 
-// spec: installer/README.md §What init seeds — a starting-roster member is written by name and
+// spec: installer/SPEC.md §What init seeds — a starting-roster member is written by name and
 // nothing else: the install-time omission retired with the bootstrap's one success path (§The gate
 // binary), so no reason token is resolved and no second roster of ported gates is maintained.
 fn plan_gates(pkg: &Package, kits: &[String], profile_name: &str) -> String {
@@ -186,7 +186,7 @@ fn plan_gates(pkg: &Package, kits: &[String], profile_name: &str) -> String {
         profile_name
     ));
     out.push_str("# Each kit's starting subset; its README names the full roster to grow into.\n");
-    // spec: installer/README.md §Profiles — the gate set is derived once, by the function the
+    // spec: installer/SPEC.md §Profiles — the gate set is derived once, by the function the
     // smoke's monotonicity assertion also reads, so the registry and the invariant over it share
     // one derivation. The loop only sections it by kit; a member several kits register lands once.
     let mut pending: BTreeSet<String> = profile::gate_set(&pkg.root, profile_name)
@@ -226,7 +226,7 @@ fn read_package_field(pkg: &Package, path: &[&str]) -> String {
 }
 
 fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
-    // spec: installer/README.md §init — the three preconditions all refuse rather than warn, and
+    // spec: installer/SPEC.md §init — the three preconditions all refuse rather than warn, and
     // all three are checked before any file is written: a partial install is the outcome none of
     // them may produce.
     let root = super::repo_root().ok_or_else(|| {
@@ -237,7 +237,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         )
     })?;
 
-    // spec: installer/README.md §init — the clean-worktree precondition exists so the one commit
+    // spec: installer/SPEC.md §init — the clean-worktree precondition exists so the one commit
     // init makes is exactly what it vendored; --no-commit is its valve, because an operator staging
     // the vendoring themselves has taken that guarantee on.
     if !f.dry && f.commit {
@@ -275,7 +275,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 )
             })?;
         let prior_version = manifest.field("version");
-        // spec: installer/README.md §The manifest — the version field's re-run reader: a payload
+        // spec: installer/SPEC.md §The manifest — the version field's re-run reader: a payload
         // older than the recorded install is a silent downgrade, so it refuses, and `--force` is
         // what makes a rollback deliberate.
         // spec: context-kit/SPEC.md §bin/env-probe — the comparator is the crate's one `sort -V`
@@ -316,7 +316,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         ));
     }
 
-    // spec: installer/README.md §init — doctor is the last precondition and still runs before any
+    // spec: installer/SPEC.md §init — doctor is the last precondition and still runs before any
     // file is written; running it after the manifest and profile are resolved keeps a bad manifest
     // from being reported as a toolchain fault.
     let verdict = super::doctor::diagnose();
@@ -338,7 +338,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         ));
     }
 
-    // spec: installer/README.md §The install boundary — the artifact is the binary this arm runs
+    // spec: installer/SPEC.md §The install boundary — the artifact is the binary this arm runs
     // from: the bootstrap resolved and verified it at step 4, so nothing here re-selects a platform
     // and nothing hashes with an external tool.
     let artifact_digest = sha256::file_hex(&pkg.artifact)
@@ -353,7 +353,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
 
     let mut r = Roster::new();
 
-    // spec: installer/README.md §The manifest — the kit files' hashes are taken before the first kit copy
+    // spec: installer/SPEC.md §The manifest — the kit files' hashes are taken before the first kit copy
     let kit_prior: Vec<(String, PathBuf)> = prior
         .keys()
         .filter(|p| kits.iter().any(|k| p.starts_with(&format!("{}/", k))))
@@ -376,7 +376,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 2,
             ));
         }
-        // spec: installer/README.md §What init seeds — the count is asserted rather than trusted:
+        // spec: installer/SPEC.md §What init seeds — the count is asserted rather than trusted:
         // a failed enumeration and an empty kit reach this loop identically, so the next construct
         // that fails on an untested host would again install a tree silently missing a kit.
         let files = super::files_under(&kit_payload).map_err(|e| refuse(e, "", 2))?;
@@ -410,10 +410,10 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         for (src, dest) in recipe::config_seam_plan(&kit_payload, GATES_DIR) {
             copy_in(&root, Path::new(&src), &dest, &prior, None, f, &mut r)?;
         }
-        // spec: installer/README.md §init — `--dry-run` resolves the same seam plan the real run
+        // spec: installer/SPEC.md §init — `--dry-run` resolves the same seam plan the real run
         // would, out of the same enumerator: the copy already writes nothing, so the plan needs no
         // dry variant. What it cannot do is *seed*, so the seeded set is predicted below.
-        // spec: installer/README.md §What init seeds — the agent file is predicted once over the
+        // spec: installer/SPEC.md §What init seeds — the agent file is predicted once over the
         // whole kit set rather than once per kit that needs it, because the seeding arm below is
         // guarded on the file's absence and therefore fires at most once for a run.
         let seeds_agent = recipe::needs_agent_file(kit)
@@ -432,7 +432,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             continue;
         }
         if seeds_agent {
-            // spec: installer/README.md §What init seeds — the seeded agent file carries the
+            // spec: installer/SPEC.md §What init seeds — the seeded agent file carries the
             // section heading context-kit's brevity gate reads by default, so the gate init
             // registers has the surface it was pointed at from the first commit.
             let body = format!(
@@ -461,7 +461,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         }
     }
 
-    // spec: installer/README.md §What init seeds — the queue seed runs here, once, over the whole
+    // spec: installer/SPEC.md §What init seeds — the queue seed runs here, once, over the whole
     // resolved kit set: inside the loop above the first kit reached decided the source before any
     // kit shipping a template got a turn. One resolver serves the dry plan and the run alike.
     if let Some(src) = recipe::queue_source(&pkg.payload, &kits) {
@@ -475,10 +475,10 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         }
     }
 
-    // spec: installer/README.md §The gate binary — the write comes after every config seam and
+    // spec: installer/SPEC.md §The gate binary — the write comes after every config seam and
     // before the hook is generated: the generator resolves each member's argv and a `.gate` member
     // resolves to this binary, so the knob must name it and the file must be there.
-    // spec: installer/README.md §The install boundary — the placement is the `--install
+    // spec: installer/SPEC.md §The install boundary — the placement is the `--install
     // place-artifact` op called in-process: one derivation, two callers, this arm and that flag.
     let seam = format!("{}/gate-sdk-config.knobs", GATES_DIR);
     let src = pkg.artifact.to_string_lossy().into_owned();
@@ -513,7 +513,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         }
     }
 
-    // spec: installer/README.md §init — the generated projections are produced by the vendored
+    // spec: installer/SPEC.md §init — the generated projections are produced by the vendored
     // tools themselves, never restated by the installer: the hook generator and the graph emitter
     // are gate-sdk's, so a consumer's artifacts are the ones their own gate-sdk makes.
     let mut generated = vec![
@@ -539,7 +539,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         r.record(g, None);
     }
 
-    // spec: installer/README.md §The manifest — the roster's exit condition, and the whole rule:
+    // spec: installer/SPEC.md §The manifest — the roster's exit condition, and the whole rule:
     // init owns a path because it wrote the file there, so ownership ends when the file leaves the
     // tree and at no other moment — a payload that stops shipping one is not that moment.
     for (p, h) in &prior {
@@ -549,7 +549,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         r.record(p, Some(h));
     }
 
-    // spec: installer/README.md §The manifest — what init wrote this run is a subset of the roster
+    // spec: installer/SPEC.md §The manifest — what init wrote this run is a subset of the roster
     // it records, and staging takes the written set: folding an adopter's file into the vendoring
     // commit is what the clean-worktree precondition exists to prevent.
     let mut stage: Vec<String> = r
@@ -564,7 +564,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             .ident("version", &version)
             .ident("profile", &profile_name)
             .ident("kits", &kits.join(" "));
-        // spec: installer/README.md §The manifest — an identity field is present exactly when the
+        // spec: installer/SPEC.md §The manifest — an identity field is present exactly when the
         // caller supplied it; an empty commit written as "" would be a placeholder standing in for
         // an omission.
         if !commit.is_empty() {
@@ -646,7 +646,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     super::git_batched(&root, &["add"], &stage)
         .map_err(|e| refuse(format!("could not stage the vendored files: {}", e), "", 2))?;
 
-    // spec: installer/README.md §init — idempotence is a property of the tree, so a re-run that
+    // spec: installer/SPEC.md §init — idempotence is a property of the tree, so a re-run that
     // changed nothing exits clean rather than on an empty commit. The predicate reads the index and
     // stays the guard on whether a commit is attempted at all.
     let message = format!(
@@ -654,7 +654,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         profile_name, version
     );
     if super::git_code(&root, &["diff", "--cached", "--quiet"]) == Some(0) {
-        // spec: installer/README.md §init — a run init considers a no-op still commits what it
+        // spec: installer/SPEC.md §init — a run init considers a no-op still commits what it
         // rewrote, so this asks what the predicate above cannot: whether the roster differs from the
         // committed tree. `--no-commit` is exempt, having waived the attribution it rests on.
         if f.commit {
@@ -695,7 +695,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     }
 
     if f.commit {
-        // spec: installer/README.md §init — the commit is the distribution model, not a
+        // spec: installer/SPEC.md §init — the commit is the distribution model, not a
         // convenience: vendored-and-committed is what makes the tree auditable, so leaving it dirty
         // would hand the adopter the step that does the proving.
         if super::git_code(&root, &["commit", "-q", "-m", &message]) != Some(0) {
@@ -720,7 +720,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         );
     }
 
-    // spec: installer/README.md §init — the follow-up block is a STATED GRAMMAR with a named
+    // spec: installer/SPEC.md §init — the follow-up block is a STATED GRAMMAR with a named
     // reader, not a layout choice: the consumer smoke parses it out of what this prints, so
     // reflowing these lines reds that arm instead of silently un-covering the pair.
     println!("\nnext:");
@@ -729,7 +729,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     Ok(0)
 }
 
-// spec: installer/README.md §What init seeds — the dry plan names the surfaces the recipe would
+// spec: installer/SPEC.md §What init seeds — the dry plan names the surfaces the recipe would
 // seed, read off the same membership predicates the seeding arms key on rather than a second
 // roster: a kit gains a seeded surface by gaining an arm, and both sides read the same fact.
 fn dry_seed_paths(kit: &str) -> Vec<String> {
@@ -746,7 +746,7 @@ fn dry_seed_paths(kit: &str) -> Vec<String> {
     out
 }
 
-// spec: installer/README.md §init — the vendored tool runs out of the consumer's own tree, so the
+// spec: installer/SPEC.md §init — the vendored tool runs out of the consumer's own tree, so the
 // artifacts a consumer ends up with are the ones their own gate-sdk makes rather than ones this
 // arm restated.
 fn run_vendored(
@@ -781,7 +781,7 @@ fn run_vendored(
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §The verbs — the flag grammar: both `--profile` spellings, the three
+    // spec: installer/SPEC.md §The verbs — the flag grammar: both `--profile` spellings, the three
     // bare flags, `--help` answering on its own, and an unknown argument refusing.
     #[test]
     fn the_flag_grammar_is_the_verbs_own_and_an_unknown_token_refuses() {
@@ -807,7 +807,7 @@ mod tests {
         assert!(parse(&["--help".to_string()], None).expect("help refused").is_none());
     }
 
-    // spec: installer/README.md §What init seeds — the registry a fresh consumer receives carries
+    // spec: installer/SPEC.md §What init seeds — the registry a fresh consumer receives carries
     // each kit's own zero-config members under that kit's heading, once each, and no omission
     // record: the install-time omission retired with the bootstrap's one success path.
     #[test]

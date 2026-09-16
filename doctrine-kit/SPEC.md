@@ -262,7 +262,7 @@ config; unset, they fall to the knob defaults.
 **The port disposition: discharged, with the installer's behind-invoke
 relocation.** The member was once sequenced behind that relocation rather than
 ported — a stated-contract cut dropped from an iteration's unit set, because the
-relocation's own precondition forbade it. `installer/README.md` §The install
+relocation's own precondition forbade it. `installer/SPEC.md` §The install
 boundary stated the selecting rule as *a step is takeable now iff it already runs
 only when an artifact was selected*, and named what broke otherwise: two of §The
 gate binary's three selection outcomes left `init` with no artifact and both

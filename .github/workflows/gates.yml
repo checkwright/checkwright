@@ -233,7 +233,7 @@ jobs:
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-pc-windows-msvc'].held }}
     # MSYS emulates fork on every process spawn and this suite spawns thousands,
     # so the 272 seconds it takes on a Linux developer machine
-    # (installer/README.md §The consumer smoke) is not the number to plan from.
+    # (installer/SPEC.md §The consumer smoke) is not the number to plan from.
     timeout-minutes: 90
     permissions:
       contents: read
@@ -462,7 +462,7 @@ jobs:
       # The suite itself, under one steering that is **measurement scaffolding
       # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
       # this host, and this host is not the one declared triple. The re-entry is
-      # the one installer/README.md §The consumer smoke records — steer this
+      # the one installer/SPEC.md §The consumer smoke records — steer this
       # smoke's pack at the host alone while the published payload still commits
       # to what it commits to. The pack arm copies the steered file verbatim
       # into the payload, so the packed roster is this host's and no second copy
@@ -503,7 +503,7 @@ jobs:
           exit "$rc"
 
   # The second BOOTSTRAP's own install-smoke leg. Count these legs by bootstrap and
-  # never by platform (installer/README.md §The install boundary): every leg above
+  # never by platform (installer/SPEC.md §The install boundary): every leg above
   # drives ONE bootstrap — the Windows one through Git-for-Windows bash — so a
   # reader counting platforms has been reading a growing set of legs as covering a
   # growing set of bootstraps, which they never did. The platform count is
@@ -753,7 +753,7 @@ jobs:
           # would route around the very rule this half must agree with the other on.
           Write-Host "== payload coverage: a whole checkwright init completes through this bootstrap =="
           # init spawns `bash` once, for the hook generator that does not port
-          # (installer/README.md §The install boundary), and `doctor` holds the whole
+          # (installer/SPEC.md §The install boundary), and `doctor` holds the whole
           # toolchain floor an adopter is told to have. Provisioning the runner up to
           # that floor is this leg's job and hiding a shortfall is not.
           #
@@ -1230,7 +1230,7 @@ jobs:
       # be re-read every time the roster widens — and the smoke refuses any roster
       # that is not this host alone, at a guard sitting AHEAD of its artifact
       # hand-off branch which does not consult it
-      # (installer/consumer-smoke/run-smoke.sh; installer/README.md §The consumer
+      # (installer/consumer-smoke/run-smoke.sh; installer/SPEC.md §The consumer
       # smoke). So a smoke pointed at the tracked roster fails on the roster
       # before it reaches anything this leg is measuring — a failure that looks
       # exactly like the platform finding this leg exists to collect.
@@ -1272,7 +1272,7 @@ jobs:
           set +e
           # The explicit steering below is now REDUNDANT with the smoke's own
           # default, which derives the same one-line roster when the caller sets
-          # no knob (installer/README.md §The consumer smoke). It is kept rather
+          # no knob (installer/SPEC.md §The consumer smoke). It is kept rather
           # than dropped because it is the tree's one live witness for the
           # caller-override branch: the Linux leg exercises the default, this one
           # exercises the override, and neither path is then reached only in a

@@ -1,4 +1,4 @@
-// spec: installer/README.md §update — init with one added precondition and its argv forwarded
+// spec: installer/SPEC.md §update — init with one added precondition and its argv forwarded
 // verbatim: `checkwright.lock` must already exist, so a verb named update can manage an install but
 // never perform the first one. Every init flag stays valid, `--dry-run` included.
 use super::{lock, refuse, Refusal};
@@ -12,7 +12,7 @@ const USAGE: &[&str] = &[
 ];
 
 pub fn run(args: &[String]) -> i32 {
-    // spec: installer/README.md §The verbs — `-h`/`--help` is intercepted first and answers on its
+    // spec: installer/SPEC.md §The verbs — `-h`/`--help` is intercepted first and answers on its
     // own, outside any repository precondition, exactly as every other verb's `--help` does.
     if args.iter().any(|a| a == "-h" || a == "--help") {
         for line in USAGE {
@@ -23,15 +23,15 @@ pub fn run(args: &[String]) -> i32 {
     if let Err(r) = precondition() {
         return super::finish("update", Err(r));
     }
-    // spec: installer/README.md §init — everything else, including --dry-run, --force and
+    // spec: installer/SPEC.md §init — everything else, including --dry-run, --force and
     // --no-commit, is init's own contract, unrepeated here.
     super::init::run(args)
 }
 
-// spec: installer/README.md §update — the one added precondition, and the whole behavioral
+// spec: installer/SPEC.md §update — the one added precondition, and the whole behavioral
 // difference from init. It checks existence only: every other precondition is init's own, one call
 // away, and repeating one here would be a second copy that could drift.
-// spec: installer/README.md §update — an unresolvable root is not this verb's to own either, so it
+// spec: installer/SPEC.md §update — an unresolvable root is not this verb's to own either, so it
 // falls through to init's own refusal, which already names the accurate remedy.
 fn precondition() -> Result<(), Refusal> {
     let Some(root) = super::repo_root() else {
@@ -49,7 +49,7 @@ fn precondition() -> Result<(), Refusal> {
 
 #[cfg(test)]
 mod tests {
-    // spec: installer/README.md §The verbs — `--help` answers on its own wherever it sits in argv,
+    // spec: installer/SPEC.md §The verbs — `--help` answers on its own wherever it sits in argv,
     // which is what keeps it outside the added precondition.
     #[test]
     fn help_answers_from_any_position_and_before_the_precondition() {

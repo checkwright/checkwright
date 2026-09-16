@@ -176,7 +176,7 @@ jobs:
       # It compiles bytes this job checked out at the tag, so the
       # checkout-plus-bash tamper floor is intact, and it is the tooling binary
       # rather than a payload artifact: the payload still carries only what the
-      # `build:` matrix produced. installer/README.md §The packer owns the route
+      # `build:` matrix produced. installer/SPEC.md §The packer owns the route
       # and the refused alternative.
       - name: build the gate binary this job's assemble step dispatches to
         run: bash gate-sdk/bin/build-native.sh

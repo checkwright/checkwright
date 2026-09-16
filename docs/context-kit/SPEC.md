@@ -534,7 +534,7 @@ not one.
 **The predicate has one holder, and the road there was the deletion road.** It
 had two while the installer's `doctor` was bash and sourced the shell library off
 its own payload copy; the behind-invoke relocation put `doctor` in the crate
-(installer/README.md §The install boundary), which emptied that caller set and
+(installer/SPEC.md §The install boundary), which emptied that caller set and
 made the road gate-sdk/SPEC.md §The port-candidate criteria prefers available
 after all. The shell library, its golden and the cross-substrate parity harness
 that stood in for the deletion all retired together, on §The non-gate arm's own
@@ -734,9 +734,13 @@ the token-economics positioning. Where the meter reads one consumer's live
 always-loaded total, this reads the tracked kit surfaces and attributes the cost
 per kit, split by when it lands.
 
-The measured set is the kit roster, **derived not maintained**: the top-level
-directories carrying a `SPEC.md`. No knob names the set — a new kit joins the
-page by existing.
+The measured set is **derived, not maintained**: every top-level directory
+carrying a `SPEC.md`. No knob names it and nothing tests for kit-hood, so a
+directory joins the page by acquiring a `SPEC.md` — which makes a measured row a
+statement about that directory's context cost and never a claim that it is a
+kit. A directory that ships no always-loaded block and no `templates/` tree
+scores an empty tier in both columns and is reported at that, rather than
+filtered out: the derivation has one rule and a suppression would be a second.
 
 Each kit is measured in the always-loaded and load-triggered tiers:
 

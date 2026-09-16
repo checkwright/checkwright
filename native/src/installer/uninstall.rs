@@ -1,4 +1,4 @@
-// spec: installer/README.md §uninstall — reverses an install against the roster init recorded and
+// spec: installer/SPEC.md §uninstall — reverses an install against the roster init recorded and
 // nothing else: an entry still at what init wrote is removed, one edited since is kept and
 // reported, and the manifest is narrowed over the survivors rather than deleted.
 use super::{lock, refuse, Refusal, AGENT_FILE, GATES_DIR};
@@ -51,7 +51,7 @@ pub fn run(args: &[String]) -> i32 {
     )
 }
 
-// spec: installer/README.md §uninstall — the plan groups by top-level directory, so a large removal
+// spec: installer/SPEC.md §uninstall — the plan groups by top-level directory, so a large removal
 // reads as a shape rather than as a wall of paths.
 fn by_top_dir(paths: &[String]) -> Vec<String> {
     let mut keys: Vec<String> = paths
@@ -82,7 +82,7 @@ fn residual(keep: &[(String, String)]) -> String {
 }
 
 fn remove(f: &Flags) -> Result<i32, Refusal> {
-    // spec: installer/README.md §init — every precondition refuses rather than warns and all of
+    // spec: installer/SPEC.md §init — every precondition refuses rather than warns and all of
     // them are checked before anything is removed, for init's own reason: a partial removal is the
     // outcome none of them may produce.
     let root = super::repo_root().ok_or_else(|| {
@@ -110,7 +110,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             )
         })?;
 
-    // spec: installer/README.md §init — the clean-worktree precondition is init's, on the same
+    // spec: installer/SPEC.md §init — the clean-worktree precondition is init's, on the same
     // terms: one commit is made, and a dirty tree would fold your work into it; --no-commit is the
     // same valve.
     if !f.dry && f.commit {
@@ -133,7 +133,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         .collect();
     let gates_list = manifest.own_file(&format!("{}/gates.list", GATES_DIR));
 
-    // spec: installer/README.md §uninstall — the removal rule is the ownership claim seen from the
+    // spec: installer/SPEC.md §uninstall — the removal rule is the ownership claim seen from the
     // other side and needs no new data: a hash that still matches marks a file init's to remove, one
     // that differs marks yours to keep, and a path already off the tree is a no-op.
     let (mut remove_set, mut keep, mut gone) = (Vec::new(), Vec::new(), Vec::new());
@@ -169,13 +169,13 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         }
     }
 
-    // spec: installer/README.md §uninstall — the agent file is the one entry that is a span rather
+    // spec: installer/SPEC.md §uninstall — the agent file is the one entry that is a span rather
     // than a file, so the branch keeping it still owes the doctrine block a removal: that block is
     // prose you did not write, pointing at a doctrine file this verb just removed.
     let trim_agent = keep.iter().any(|(p, _)| p == AGENT_FILE)
         && kits.iter().any(|k| k == "doctrine-kit");
 
-    // spec: installer/README.md §uninstall — the hook opt-in is reported, not rewritten: git config
+    // spec: installer/SPEC.md §uninstall — the hook opt-in is reported, not rewritten: git config
     // is outside the ownership roster, and a `core.hooksPath` naming a directory that no longer
     // exists is inert rather than breaking.
     let mut hooks_line = String::new();
@@ -191,7 +191,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         }
     }
 
-    // spec: installer/README.md §uninstall — a run with nothing to remove says so and exits 0: the
+    // spec: installer/SPEC.md §uninstall — a run with nothing to remove says so and exits 0: the
     // install is still there, so narrowing the manifest here would disown an install that has not
     // ended.
     if remove_set.is_empty() {
@@ -207,7 +207,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         return Ok(0);
     }
 
-    // spec: installer/README.md §uninstall — a file you added inside a vendored directory is not on
+    // spec: installer/SPEC.md §uninstall — a file you added inside a vendored directory is not on
     // the roster, so it is never removed; the plan names it because a directory left behind holding
     // only your own files is a surprise worth spending a line on before the run rather than after.
     let mut added: Vec<String> = Vec::new();
@@ -289,7 +289,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             .map_err(|e| refuse(format!("could not remove {}: {}", p, e), "", 2))?;
     }
 
-    // spec: installer/README.md §uninstall — pruning is bottom-up and only ever removes a directory
+    // spec: installer/SPEC.md §uninstall — pruning is bottom-up and only ever removes a directory
     // that is now empty: uninstall removes files it owns, never directories it merely emptied
     // around, so one left holding anything at all is left alone.
     let mut dirs: BTreeSet<String> = BTreeSet::new();
@@ -331,10 +331,10 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         })?;
     }
 
-    // spec: installer/README.md §uninstall — the staged set is the removals and the manifest
+    // spec: installer/SPEC.md §uninstall — the staged set is the removals and the manifest
     // disposition, never a kept file: staging one left for the adopter is the defect init's
     // written-set/roster split exists to prevent, and it stays one when the write is a removal.
-    // spec: installer/README.md §init — the read's status must survive: every file above is already
+    // spec: installer/SPEC.md §init — the read's status must survive: every file above is already
     // deleted, so a read that failed and returned nothing would stage the manifest alone and commit
     // it under a message claiming the removal.
     let listed = super::git_batched(&root, &["ls-files", "-z"], &remove_set).map_err(|_| {
@@ -419,7 +419,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §uninstall — the plan's shape summary counts by top-level directory,
+    // spec: installer/SPEC.md §uninstall — the plan's shape summary counts by top-level directory,
     // and a bare file at the root is its own key.
     #[test]
     fn the_plan_groups_by_top_level_directory() {
@@ -433,7 +433,7 @@ mod tests {
         assert!(lines[1].contains("gate-sdk/") && lines[1].ends_with("2 file(s)"));
     }
 
-    // spec: installer/README.md §The verbs — `--help` answers on its own and an unknown argument is
+    // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is
     // a usage refusal rather than an ignored token.
     #[test]
     fn help_answers_and_an_unknown_argument_refuses() {

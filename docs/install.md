@@ -84,8 +84,7 @@ beside them: whether a **prebuilt gate binary** is published for a platform,
 which is what decides whether an install is possible there at all. A platform the
 roster does not carry is **refused** — the bootstrap verifies and runs that binary,
 and every step of an install is behind it, so there is nothing to proceed into and
-no adopter action to take (§The gate binary in the installer's
-README). The block below declares it per supported platform — the Rust target
+no adopter action to take (installer/SPEC.md §The gate binary). The block below declares it per supported platform — the Rust target
 triple the bootstrap resolves a host to, and one of two join states. The state `joined`
 means the triple is a live line in `native/targets.list`, so a release publishes
 an artifact for it. The state `held: <precondition>` means the platform is
@@ -312,7 +311,7 @@ bash "$cw/package/bin/checkwright.sh" init  # from your repository root
 `init` ends by printing the commands that finish the setup, each with its reason.
 They are deliberately not copied here: what `init` prints is `init`'s to say, and
 a second copy is a string a rename has to be remembered to move
-(installer/README.md §init).
+(installer/SPEC.md §init).
 
 Unpack outside the repository rather than inside it. `init` refuses a worktree
 that is not clean, and an extracted `package/` sitting in your root is untracked
@@ -389,8 +388,8 @@ and vendored source that is auditable.
 `init` makes an install. Three more verbs manage one once it exists. Each
 answers in its **exit status** as well as its output, so a CI step can gate on
 the answer without parsing a report. What follows is what each verb is for;
-the mechanism behind it lives in the installer's own README
-(`installer/README.md` in the repository).
+the mechanism behind it lives in the installer's own design record,
+[`installer/SPEC.md`](installer/SPEC.md).
 
 - **`checkwright update`** brings the install here up to the version the package
   you are running carries. One added precondition separates it from `init`:

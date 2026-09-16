@@ -11,7 +11,7 @@ const DEFAULT_INSTALL_MD: &str = "docs/install.md";
 // a read of GATE_SDK_NATIVE_TARGETS_FILE, whose value is a smoke's narrowed host roster: a bound
 // reading that would be discharged by the narrowing rather than by the declaration
 const DEFAULT_ROSTER: &str = "native/targets.list";
-// spec: installer/README.md §The gate binary — the two hand-kept host detectors, read as the
+// spec: installer/SPEC.md §The gate binary — the two hand-kept host detectors, read as the
 // OWNERS of their triple sets rather than against a roster comment beside them, which would be the
 // second copy this whole binding exists to refuse
 const DEFAULT_BASH_BOOTSTRAP: &str = "installer/bin/checkwright.sh";
@@ -109,7 +109,7 @@ fn roster_triples(text: &str) -> Vec<String> {
         .collect()
 }
 
-// spec: installer/README.md §The gate binary — one detector, named by the function whose body owns
+// spec: installer/SPEC.md §The gate binary — one detector, named by the function whose body owns
 // its triple set and by the verb whose sole single-quoted operand each mapped triple is
 struct Detector {
     opener: &'static str,
@@ -129,7 +129,7 @@ const PWSH_DETECTOR: Detector = Detector {
     verb: "return",
 };
 
-// spec: installer/README.md §The gate binary — the pinned shape: the verb's SOLE single-quoted
+// spec: installer/SPEC.md §The gate binary — the pinned shape: the verb's SOLE single-quoted
 // operand, so only whitespace may sit between the two. The empty operand is PowerShell's
 // no-mapping arm rather than a triple, and is dropped by the caller
 fn sole_quoted_after<'a>(line: &'a str, verb: &str) -> Option<&'a str> {
@@ -145,7 +145,7 @@ fn sole_quoted_after<'a>(line: &'a str, verb: &str) -> Option<&'a str> {
     Some(&body[..close])
 }
 
-// spec: installer/README.md §The gate binary — every failure here is a check that could not run and
+// spec: installer/SPEC.md §The gate binary — every failure here is a check that could not run and
 // never a pass: the function absent or renamed, its body unbounded, zero triples extracted, or the
 // file unreadable. An extraction that silently degrades to nothing is the one way a lockstep
 // assertion reports agreement it never tested
@@ -322,7 +322,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    // spec: installer/README.md §The gate binary — arm E, EQUALITY rather than containment
+    // spec: installer/SPEC.md §The gate binary — arm E, EQUALITY rather than containment
     // because each direction closes a distinct failure: a triple a detector emits that nobody
     // declares, and a declared triple no detector emits
     for (path, set) in &detected {
@@ -344,7 +344,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    // spec: installer/README.md §The gate binary — the count rides the clean line on the same
+    // spec: installer/SPEC.md §The gate binary — the count rides the clean line on the same
     // vacuous-pass ground arm D stands on: a source scan whose extraction quietly stops matching
     // reports an empty set as agreement, and a number is what makes that visible without an audit
     let detector_report = detected
@@ -442,7 +442,7 @@ mod tests {
         assert!(matches!(d[1].state, State::Unreadable(_)));
     }
 
-    // spec: installer/README.md §The gate binary — the SOLE single-quoted operand, so a triple
+    // spec: installer/SPEC.md §The gate binary — the SOLE single-quoted operand, so a triple
     // reached through a variable or sitting beside another operand is not extracted and the
     // detector's own shape stays the pin rather than a loose quote scan
     #[test]
@@ -460,7 +460,7 @@ mod tests {
         assert_eq!(sole_quoted_after("    printf-ish'x'", "printf"), None);
     }
 
-    // spec: installer/README.md §The gate binary — the two halves' pinned shapes, read off the
+    // spec: installer/SPEC.md §The gate binary — the two halves' pinned shapes, read off the
     // function body and bounded by its own closing brace, so a triple spelled outside it is not
     // this detector's
     #[test]
@@ -477,7 +477,7 @@ mod tests {
         );
     }
 
-    // spec: installer/README.md §The gate binary — every one of these is a check that could not
+    // spec: installer/SPEC.md §The gate binary — every one of these is a check that could not
     // run, reaching exit 2 through `rule`'s error path rather than reporting the agreement an
     // empty extraction would otherwise look like
     #[test]

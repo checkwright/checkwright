@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **installer-readme-usage-tier-split** [spec: SPEC-installer-front-door.md] —
-  `installer/README.md` is the npm-visible package README and a 3,201-line, 216,970-byte
-  design record, so the package page and the tarball lead with mechanism grounds where usage
-  belongs. The record becomes `installer/SPEC.md`, kept off `package.json`'s `files` roster so
-  it ships in neither tarball; the README is re-authored as the activation surface.
-  **Deliverable:** the section-for-section move, a fresh short README owning the usage tier,
-  and the citation sweep — measured at 43 tracked files and roughly 459 instances into 16
-  sections, correcting the 17-files/14-sections this entry carried while deferred.
-  `CLAUDE.md` §Housekeeping's layout pointer and `docs/install.md`'s references move with it.
-  Both open design questions — the usage tier's owner and what a governed `installer/SPEC.md`
-  admits — are ruled in the amendment.
-  Promoted 2026-09-16 at spec, as `installer-front-door-cut`'s second unit. **Lands before the
-  lead unit below:** it relocates five of the sections that unit edits.
-
 - **payload-withholds-kit-specs** [spec: SPEC-payload-withholding.md] — the customer payload
   packs every kit root whole (`git archive` per root at `native/src/emit/pack_installer.rs`),
   so the kit SPECs and `smoke/` trees ride along as 69.8% of its bulk. The payload withholds
@@ -442,7 +428,7 @@
   gates.yml's own correcting paragraph gives about platform counts: it moves, and a number
   written in prose goes stale silently.
   **The cost is attested rather than predicted:** `.github/workflows/gates.yml` and
-  `installer/README.md` each carry a paragraph whose whole job is to say that a reader counting
+  `installer/SPEC.md` each carry a paragraph whose whole job is to say that a reader counting
   platforms has been reading three legs as covering two halves, which they never did. A name
   needing a paragraph to be read correctly is the defect; the paragraph is the receipt.
   **WHETHER IS RULED, so only the scheme is open.** The operator ruled 2026-09-09, in the lead
@@ -460,7 +446,7 @@
   and were measured false at the drain: the runbook names no `install-smoke` leg at all, and
   this repo's branch-protection desired state is deliberately none, so there are no required
   checks to break. The radius is five tracked files — `.github/workflows/gates.yml`,
-  `installer/README.md`, `TASK-QUEUE.md`, `docs/site-architecture.md`, `docs/install.md` —
+  `installer/SPEC.md`, `TASK-QUEUE.md`, `docs/site-architecture.md`, `docs/install.md` —
   with no out-of-band step; other tracked files carry the literal descriptively or in
   historical logs and are not rename targets.
   **WHAT STILL MAKES IT SCOPE WORK, on the corrected radius.** Not reach: the unranked
@@ -913,13 +899,13 @@
   plugin substrate moves fast (the scope-session-routing ruling applies).
   **The install-ownership contract this must package against already exists:**
   `checkwright.lock`, written by the installer's `init` and specified at
-  installer/README.md §The manifest — its schema owner is
+  installer/SPEC.md §The manifest — its schema owner is
   `native/src/installer/lock.rs`. A marketplace package that installs kits
   without writing that manifest would be a second install model with no upgrade
   or uninstall story, which is the sequencing risk this entry has always
   flagged; the named contract replaces the re-derivation it used to imply.
   The upgrade/uninstall story itself has shipped as the installer's `update`
-  and `uninstall` verbs, specified at installer/README.md §update and
+  and `uninstall` verbs, specified at installer/SPEC.md §update and
   §uninstall — sequence against those rather than duplicating them.
   **Negative result — the tarball channel's economics do not transfer here.**
   The retired `release-tarball-delivery-channel` was cheap for a structural reason that is
@@ -1617,7 +1603,7 @@
   finding rather than a gate: the fix and what explains it land together. Closure therefore
   requires **both** (1) the `init --dry-run` assertion in the consumer smoke — one arm, because
   `update` execs `init`, so it covers both mutating paths the reversal arm does not — and (2)
-  removal of the stated bound now standing in `installer/README.md` §The verbs and §The consumer
+  removal of the stated bound now standing in `installer/SPEC.md` §The verbs and §The consumer
   smoke. Taking (1) without (2) leaves a published caveat naming a coverage limit that no longer
   holds.
   **The tree is honest today, only narrower than the refusal argued.** The capability-liveness
@@ -3573,7 +3559,7 @@
   **The candidate oracle is cheap and derivable:** diff the tracked `*/bin/*.sh` set between the
   newest released tag and the release commit, and require every disappeared path to appear in the
   pending note's declaration-bearing sections.
-  **DISTINCT from the printed-follow-up unit LANDED 2026-09-07** (installer/README.md §The consumer
+  **DISTINCT from the printed-follow-up unit LANDED 2026-09-07** (installer/SPEC.md §The consumer
   smoke): that owned a printed command inside installer shell source with no gate corpus reaching
   it, and this owns the coupling between a REMOVAL and a NOTE — another surface, another oracle.
   **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator**, which is what keeps it
@@ -3817,7 +3803,7 @@
   rest of the workflow under eight minutes. Three terms remain, each with a design question.
   **1. The harness still hashes each recorded file with its own `git hash-object` child**
   (installer/consumer-smoke/run-smoke.sh, the manifest assertion's `got`). That is deliberate: the
-  loop is the independent second reading of the recorded value and installer/README.md §The
+  loop is the independent second reading of the recorded value and installer/SPEC.md §The
   manifest names the smoke's comparison as its own invocation, so batching it re-authors that
   operand and has to decide whether a `--stdin-paths` reading still discriminates. The filer's
   measure, not re-run at close: about 250 s of the Windows leg.
@@ -4520,5 +4506,6 @@
 ## Done
 
 - provenance-ownership-recording-rule-assigns-into-kit-specs
+- installer-readme-usage-tier-split
 
 ## Lessons Learned

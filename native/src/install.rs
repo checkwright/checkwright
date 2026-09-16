@@ -1,7 +1,7 @@
-// spec: installer/README.md §The install boundary — the `--install <op>` arm family: the seam
+// spec: installer/SPEC.md §The install boundary — the `--install <op>` arm family: the seam
 // both bootstraps call, so the bash caller and its PowerShell twin issue byte-identical argv.
 use crate::sha256;
-// spec: installer/README.md §The manifest — the recorded hash has one owner, the schema module's
+// spec: installer/SPEC.md §The manifest — the recorded hash has one owner, the schema module's
 // own `hash`, so this op and the `--init` arm that shares its claim rule cannot disagree about
 // which identity a `files` entry carries.
 use crate::installer::lock::hash as lock_hash;
@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 const USAGE: &str = "  usage: checkwright-gates --install place-artifact --root <dir> --src <file> --dest <path> --seam <path> --target <triple> --digest <sha256> [--lock <path>] [--force] [--dry-run]
          checkwright-gates --install queue-source --payload <dir> --kits <kit>[,<kit>…]";
 
-// spec: installer/README.md §The install boundary — the closed op set an unknown `<op>` is refused
+// spec: installer/SPEC.md §The install boundary — the closed op set an unknown `<op>` is refused
 // against, so a caller's typo exits 2 rather than reading as a step that did nothing.
 const OPS: &[&str] = &["place-artifact", "queue-source"];
 
@@ -24,7 +24,7 @@ fn usage_error(what: &str) -> i32 {
     2
 }
 
-// spec: installer/README.md §The install boundary — `--install <op> [--<key> <value>]…`, each op
+// spec: installer/SPEC.md §The install boundary — `--install <op> [--<key> <value>]…`, each op
 // declaring its value keys and its bare flags; an unknown key exits 2 rather than defaulting.
 struct Argv {
     values: Vec<(String, String)>,
@@ -79,7 +79,7 @@ impl Argv {
     }
 }
 
-// spec: installer/README.md §The install boundary — the manifest a previous run left: the hash
+// spec: installer/SPEC.md §The install boundary — the manifest a previous run left: the hash
 // recorded against a path about to be claimed, and the target and digest recorded against the
 // artifact. Absent on a first install, which is why `--lock` is optional.
 pub struct Recorded {
@@ -128,7 +128,7 @@ impl Recorded {
     }
 }
 
-// spec: installer/README.md §The install boundary — the non-destructive re-run, which is the
+// spec: installer/SPEC.md §The install boundary — the non-destructive re-run, which is the
 // caller's `claim` moved behind the invoke: a file whose recorded hash still matches is the
 // installer's to rewrite, one that has changed since is the adopter's and is kept.
 enum Claim {
@@ -162,14 +162,14 @@ pub fn make_executable(file: &Path) -> Result<(), String> {
         .map_err(|e| format!("cannot set the executable bit on {}: {}", file.display(), e))
 }
 
-// spec: installer/README.md §The install boundary — the executable bit is set where the platform
+// spec: installer/SPEC.md §The install boundary — the executable bit is set where the platform
 // has one, so the Windows half of the boundary needs no branch of its own in either bootstrap.
 #[cfg(not(unix))]
 pub fn make_executable(_file: &Path) -> Result<(), String> {
     Ok(())
 }
 
-// spec: installer/README.md §The gate binary — the seam is a knob file rewritten preserving every line
+// spec: installer/SPEC.md §The gate binary — the seam is a knob file rewritten preserving every line
 // except one whose head is the knob this op owns
 fn seam_text(existing: Option<&str>, dest: &str) -> String {
     let mut out = String::new();
@@ -186,7 +186,7 @@ fn seam_text(existing: Option<&str>, dest: &str) -> String {
     out
 }
 
-// spec: installer/README.md §The install boundary — the seam write is a temporary beside the
+// spec: installer/SPEC.md §The install boundary — the seam write is a temporary beside the
 // target and a rename, so no reader sees a half-written knob file and a failed write leaves
 // whatever was there intact.
 fn write_atomically(file: &Path, body: &str) -> Result<(), String> {
@@ -204,7 +204,7 @@ fn write_atomically(file: &Path, body: &str) -> Result<(), String> {
     })
 }
 
-// spec: installer/README.md §The install boundary — the op's argv after resolution, carried as one
+// spec: installer/SPEC.md §The install boundary — the op's argv after resolution, carried as one
 // value so the two paths a placement takes read against the same resolved inputs.
 pub struct Placement<'a> {
     pub root: PathBuf,
@@ -217,18 +217,18 @@ pub struct Placement<'a> {
     pub dry: bool,
 }
 
-// spec: installer/README.md §The install boundary — the two stdout verbs, each with one reader in
+// spec: installer/SPEC.md §The install boundary — the two stdout verbs, each with one reader in
 // the caller: `own` is a path it records and stages, `kept` a path it leaves alone and carries
 // forward at the hash the manifest already holds.
 pub fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> {
     let mut records = Vec::new();
     let dest_path = p.root.join(p.dest);
 
-    // spec: installer/README.md §The gate binary — the artifact path is exempt from the ownership
+    // spec: installer/SPEC.md §The gate binary — the artifact path is exempt from the ownership
     // rule the seam below still runs, so a substituted binary is rewritten rather than kept and
     // the remedy §doctor prints is one a bare re-run performs.
     if !p.dry {
-        // spec: installer/README.md §The manifest — an on-disk artifact that still verifies
+        // spec: installer/SPEC.md §The manifest — an on-disk artifact that still verifies
         // against the recorded digest is not rewritten, which is what makes a bare re-run
         // leave the tree byte-identical.
         let stale = recorded.target != p.target
@@ -312,7 +312,7 @@ fn place_artifact(args: &[String]) -> i32 {
     }
 }
 
-// spec: installer/README.md §The install boundary — the family's one READ op: which template the
+// spec: installer/SPEC.md §The install boundary — the family's one READ op: which template the
 // queue is seeded from is a derivation the package owns, so a caller outside the package boundary
 // reads it across this wire rather than carrying a second implementation of the rule.
 fn queue_source_records(payload: &str, kits: &str) -> Vec<String> {
@@ -321,7 +321,7 @@ fn queue_source_records(payload: &str, kits: &str) -> Vec<String> {
         .filter(|k| !k.is_empty())
         .map(str::to_string)
         .collect();
-    // spec: installer/README.md §What init seeds — a kit set owed no queue emits no record, so an
+    // spec: installer/SPEC.md §What init seeds — a kit set owed no queue emits no record, so an
     // empty wire is the answer rather than a record whose field a caller must then interpret.
     match crate::installer::recipe::queue_source(Path::new(payload), &kits) {
         Some(src) => vec![format!("queue-source\t{}", src)],
@@ -346,7 +346,7 @@ fn queue_source(args: &[String]) -> i32 {
     0
 }
 
-// spec: installer/README.md §The install boundary — the family's entry point, resolved in `main`
+// spec: installer/SPEC.md §The install boundary — the family's entry point, resolved in `main`
 // before the registry lookup, and the family's exit statuses: 0 performed or planned, 1 an
 // adopter-actionable refusal, 2 usage or harness error.
 pub fn run(args: &[String]) -> i32 {
@@ -369,7 +369,7 @@ pub fn run(args: &[String]) -> i32 {
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §The install boundary — the read op's wire: one tab-separated record
+    // spec: installer/SPEC.md §The install boundary — the read op's wire: one tab-separated record
     // when the kit set is owed a queue and an EMPTY wire when it is not, so "nonempty means owed" is
     // the caller's whole reading rather than a field it has to interpret.
     #[test]
@@ -420,7 +420,7 @@ mod tests {
         }
     }
 
-    // spec: installer/README.md §The install boundary — an unknown key exits 2 rather than being
+    // spec: installer/SPEC.md §The install boundary — an unknown key exits 2 rather than being
     // ignored, which is the property that keeps the two bootstraps' argv equivalent.
     #[test]
     fn an_unknown_key_is_refused_and_a_declared_flag_takes_no_value() {
@@ -443,7 +443,7 @@ mod tests {
         assert_eq!(run(&[]), 2);
     }
 
-    // spec: installer/README.md §The gate binary — the seam rewrite preserves every line except one
+    // spec: installer/SPEC.md §The gate binary — the seam rewrite preserves every line except one
     // whose head is the knob this op owns, whatever blanks surround its `=`
     #[test]
     fn the_seam_rewrite_keeps_every_other_line_and_replaces_the_owned_one() {
@@ -459,7 +459,7 @@ mod tests {
         assert_eq!(seam_text(Some("A = 1"), "b"), "A = 1\nGATE_SDK_NATIVE_BIN = b\n");
     }
 
-    // spec: installer/README.md §The install boundary — claim's three ways to reach `Take`: no
+    // spec: installer/SPEC.md §The install boundary — claim's three ways to reach `Take`: no
     // recorded hash, no file on disk, and a file still at the hash the manifest records.
     #[test]
     fn an_unrecorded_or_unmoved_path_is_claimable_and_a_changed_one_is_kept() {
@@ -505,7 +505,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
-    // spec: installer/README.md §The install boundary — the two wire verbs and the skip-rewrite
+    // spec: installer/SPEC.md §The install boundary — the two wire verbs and the skip-rewrite
     // branch over a scratch tree: a first placement owns both paths, a bare re-run copies nothing,
     // a changed dest is kept at its hash, and `--dry-run` plans the same and writes none of it.
     #[test]
@@ -532,7 +532,7 @@ mod tests {
             .expect("no seam was written")
             .contains(&format!("GATE_SDK_NATIVE_BIN = {}\n", dest)));
 
-        // spec: installer/README.md §The manifest — an unreadable `--src` is what proves the
+        // spec: installer/SPEC.md §The manifest — an unreadable `--src` is what proves the
         // skip-rewrite branch was taken: a re-run that copied would fail on it rather than pass
         // for the same reason an idempotent one does.
         let files = format!(
@@ -549,7 +549,7 @@ mod tests {
         .expect("the bare re-run failed");
         assert_eq!(again, owned);
 
-        // spec: installer/README.md §The gate binary — the substitution case, which is the one
+        // spec: installer/SPEC.md §The gate binary — the substitution case, which is the one
         // §doctor reports as a digest mismatch: the artifact carries no adopter-authored version,
         // so a re-run rewrites it from the verified payload rather than reporting it kept.
         std::fs::write(dir.join(dest), "substituted bytes\n").expect("cannot substitute");

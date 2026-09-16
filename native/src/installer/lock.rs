@@ -1,16 +1,16 @@
-// spec: installer/README.md §The manifest — the crate's owner of the `checkwright.lock` schema:
+// spec: installer/SPEC.md §The manifest — the crate's owner of the `checkwright.lock` schema:
 // the wire key, the field accessors, and how a recorded content hash is obtained, so the arm that
 // writes the manifest and the arms that read it share one definition instead of a copy each.
 use crate::proc;
 use serde_json::{Map, Value};
 use std::path::{Path, PathBuf};
 
-// spec: installer/README.md §The manifest — the versioned wire key; a build refuses a schema it
+// spec: installer/SPEC.md §The manifest — the versioned wire key; a build refuses a schema it
 // does not know rather than guessing at an unknown shape.
 pub const SCHEMA: &str = "checkwright-lock v1";
 pub const FILE: &str = "checkwright.lock";
 
-// spec: installer/README.md §The manifest — the fields whose wire type is an array rather than a
+// spec: installer/SPEC.md §The manifest — the fields whose wire type is an array rather than a
 // string, which is knowledge only the schema owner has: `emit` splits exactly these on the space
 // the reader below joins them with, so one module holds both halves of the representation.
 const ARRAY_FIELDS: &[&str] = &["kits"];
@@ -19,7 +19,7 @@ pub fn path(root: &Path) -> PathBuf {
     root.join(FILE)
 }
 
-// spec: installer/README.md §The manifest — git's object hash, never a SHA-256: macOS ships
+// spec: installer/SPEC.md §The manifest — git's object hash, never a SHA-256: macOS ships
 // `shasum` and not `sha256sum`, and git is already a floor-contract member, so the manifest's
 // change detection stays inside the toolchain the contract asserts.
 pub fn hash(file: &Path) -> Result<String, String> {
@@ -32,7 +32,7 @@ pub fn hash(file: &Path) -> Result<String, String> {
     Ok(text.trim().to_string())
 }
 
-// spec: installer/README.md §The manifest — a roster is hashed in one `--stdin-paths` child
+// spec: installer/SPEC.md §The manifest — a roster is hashed in one `--stdin-paths` child
 pub fn hash_all(files: &[PathBuf]) -> Vec<String> {
     if files.is_empty() {
         return Vec::new();
@@ -75,14 +75,14 @@ impl Manifest {
         Some(Manifest { doc })
     }
 
-    // spec: installer/README.md §The manifest — a build refuses a schema it does not know; an
+    // spec: installer/SPEC.md §The manifest — a build refuses a schema it does not know; an
     // unparseable file and a wrong key are one answer, because neither is a manifest this build
     // may act on.
     pub fn schema_ok(&self) -> bool {
         self.doc.get("schema").and_then(Value::as_str) == Some(SCHEMA)
     }
 
-    // spec: installer/README.md §The manifest — arrays space-joined on read, the inverse of the
+    // spec: installer/SPEC.md §The manifest — arrays space-joined on read, the inverse of the
     // split `emit` makes on write, so a caller needs no second grammar to pass one.
     pub fn field(&self, name: &str) -> String {
         match self.doc.get(name) {
@@ -100,7 +100,7 @@ impl Manifest {
         }
     }
 
-    // spec: installer/README.md §The manifest — the recorded roster, in the wire's own key order.
+    // spec: installer/SPEC.md §The manifest — the recorded roster, in the wire's own key order.
     pub fn files(&self) -> Vec<(String, String)> {
         match self.doc.get("files") {
             Some(Value::Object(map)) => map
@@ -118,7 +118,7 @@ impl Manifest {
         }
     }
 
-    // spec: installer/README.md §The manifest — resolve one of the consumer's *own* seam files by
+    // spec: installer/SPEC.md §The manifest — resolve one of the consumer's *own* seam files by
     // exact key, which is what `files` holds. A tail match cannot: the vendored kits carry fixture
     // trees with their own `scripts/gates.list`, so a suffix picks whichever sorts first.
     pub fn own_file(&self, rel: &str) -> String {
@@ -141,7 +141,7 @@ impl Manifest {
     }
 }
 
-// spec: installer/README.md §The manifest — the single writer of the wire shape, so a second
+// spec: installer/SPEC.md §The manifest — the single writer of the wire shape, so a second
 // writing arm cannot drift from the first: keys sorted at every nesting level, and an identity
 // field present exactly when the caller supplied it rather than as an empty placeholder.
 pub struct Emit {
@@ -213,7 +213,7 @@ impl Emit {
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §The manifest — the wire shape: the schema key, sorted keys at
+    // spec: installer/SPEC.md §The manifest — the wire shape: the schema key, sorted keys at
     // every level, an array field split on the space the reader joins it with, and an identity
     // field present exactly when the caller supplied it.
     #[test]
@@ -239,7 +239,7 @@ mod tests {
         assert_eq!(doc["artifact"]["target"], Value::String("t".to_string()));
     }
 
-    // spec: installer/README.md §The manifest — the reader's inverse: an array joins on the space
+    // spec: installer/SPEC.md §The manifest — the reader's inverse: an array joins on the space
     // the writer split, an absent field reads empty, and `own_file` is an exact key lookup rather
     // than a tail match.
     #[test]
@@ -267,7 +267,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
-    // spec: installer/README.md §The manifest — the batch answers what one child per file answers
+    // spec: installer/SPEC.md §The manifest — the batch answers what one child per file answers
     #[test]
     fn the_batched_hash_answers_what_one_child_per_file_answers_in_order() {
         let dir = std::env::temp_dir().join(format!("cw-lock-batch-{}", std::process::id()));

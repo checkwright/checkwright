@@ -1,4 +1,4 @@
-# Progressive install profiles — installer/README.md §Profiles. One
+# Progressive install profiles — installer/SPEC.md §Profiles. One
 # `<profile><TAB><kit>` membership per line; `#` comments and blanks ignored.
 #
 # `full` has no rows here on purpose: it is every kit root in the payload,
@@ -43,7 +43,7 @@ starter	gate-sdk
 # read rather than only on the install page: lifecycle-kit registers **no gate**
 # at install, because none of its gates is `zero-config` — for reasons that
 # differ across the roster rather than one reason covering it
-# (installer/README.md §What init seeds). So an adopter who picks this profile
+# (installer/SPEC.md §What init seeds). So an adopter who picks this profile
 # *for* lifecycle governance gets the stage machinery vendored and nothing
 # enforcing it until the surface each gate reads exists — a stage stamp for
 # most, the kit's own installer for two. Vendored is not yet enforced.

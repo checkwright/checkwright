@@ -97,7 +97,7 @@
 # The behind-invoke relocation changed what that population MEETS and not how
 # large it is: an unrostered host is refused outright rather than served a
 # smaller battery, because nothing remains behind the invoke for it to proceed
-# into (installer/README.md §The gate binary).
+# into (installer/SPEC.md §The gate binary).
 #
 # What a further line costs is measured rather than predicted, twice over now:
 # one runner mapping in native/runners.list, and nothing else. The consumer smoke
@@ -111,7 +111,7 @@
 # further line on a platform class those two already bootstrap therefore costs
 # nothing on that path, and one on a class they do not costs its own floor first.
 # gate-sdk/SPEC.md §Consumer payload owns both halves;
-# installer/README.md §The consumer smoke owns the smoke's own side of it.
+# installer/SPEC.md §The consumer smoke owns the smoke's own side of it.
 x86_64-unknown-linux-gnu
 aarch64-apple-darwin
 x86_64-apple-darwin

@@ -1,4 +1,4 @@
-// spec: installer/README.md §The packer — assemble the installer package out of tree and npm-pack
+// spec: installer/SPEC.md §The packer — assemble the installer package out of tree and npm-pack
 // it there; the payload is derived from the consumer's own kit roots at pack time, so no second
 // copy of any kit is ever checked in or written inside the worktree
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` and not an `--emit-` member: the
@@ -16,11 +16,11 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_NATIVE_BIN",
 ];
 
-// spec: installer/README.md §The packer — the diagnostic prefix the shell form printed, kept across
+// spec: installer/SPEC.md §The packer — the diagnostic prefix the shell form printed, kept across
 // the cut so a reader of a finished CI log meets one name and not two
 const NAME: &str = "pack-installer";
 
-// spec: installer/README.md §The packer — one refusal type behind one formatter, so the arm has no
+// spec: installer/SPEC.md §The packer — one refusal type behind one formatter, so the arm has no
 // exit path that prints nothing: the shell form ran without `-e` and could leave a reader a
 // non-zero status with no cause at all
 #[derive(Debug)]
@@ -43,7 +43,7 @@ fn refuse_help(cause: impl Into<String>, help: &[&str]) -> Refusal {
     }
 }
 
-// spec: installer/README.md §The packer — the single refusal formatter: the prefix, the cause and
+// spec: installer/SPEC.md §The packer — the single refusal formatter: the prefix, the cause and
 // any help lines on stderr, exit 2; every refusal in this module returns through it
 fn report(r: &Refusal) -> i32 {
     eprintln!("{}: {}", NAME, r.cause);
@@ -53,7 +53,7 @@ fn report(r: &Refusal) -> i32 {
     2
 }
 
-// spec: installer/README.md §The packer — the scratch teardown as the arm's own `Drop` rather than
+// spec: installer/SPEC.md §The packer — the scratch teardown as the arm's own `Drop` rather than
 // an `EXIT` trap, the shape `--run-demo` established: every return path unwinds through it
 struct Scratch {
     dir: String,
@@ -88,7 +88,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: installer/README.md §The packer — the flag roster, whose one-tier `--help` rule retires
+// spec: installer/SPEC.md §The packer — the flag roster, whose one-tier `--help` rule retires
 // with the shell file: an unknown argument is still a refusal, and the usage lives in
 // `gate-sdk/bin/run-gates.sh`'s own help and in that section's prose
 fn parse(args: &[String]) -> Result<Flags, Refusal> {
@@ -117,7 +117,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
         .map_err(|e| refuse(format!("cannot enter the work tree at {}: {}", root, e)))?;
     let root = walk::cwd().map_err(refuse)?;
 
-    // spec: installer/README.md §The packer — the preflight tool set tracks the spawned set in
+    // spec: installer/SPEC.md §The packer — the preflight tool set tracks the spawned set in
     // both directions: `jq` is unreached, so probing it would refuse on a program nothing runs,
     // and `mktemp` is reached, so omitting it reported a generic spawn failure
     for tool in ["npm", "git", "tar", "mktemp"] {
@@ -135,7 +135,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
         ));
     }
 
-    // spec: installer/README.md §The packer — the refusal asks about the payload's own footprint
+    // spec: installer/SPEC.md §The packer — the refusal asks about the payload's own footprint
     // rather than the whole worktree, on both grounds that section states: the stamp, on the two
     // members the worktree can reach, and the tree-under-test property across the whole footprint
     let spec = footprint(&root, &f.artifacts)?;
@@ -159,7 +159,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
 
     let version = resolve_version(&f.version)?;
 
-    // spec: installer/README.md §The packer — the scratch base and its `TMPDIR` fallback, read off
+    // spec: installer/SPEC.md §The packer — the scratch base and its `TMPDIR` fallback, read off
     // the process environment: neither name is a kit knob, so neither may be declared
     let base = env_or("INSTALLER_PACK_TMP_DIR")
         .or_else(|| env_or("TMPDIR"))
@@ -175,7 +175,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
 
     pack_tracked(&commit, "installer", &asm)?;
 
-    // spec: installer/README.md §The packer — the payload's kit set is `walk::kit_roots_rel`, the same
+    // spec: installer/SPEC.md §The packer — the payload's kit set is `walk::kit_roots_rel`, the same
     // derivation the battery runs on, so the shipped set cannot drift from the governed one
     mkdir(&format!("{}/payload", asm))?;
     let mut packed = 0usize;
@@ -213,10 +213,10 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     ))
 }
 
-// spec: installer/README.md §The packer — a caller that already holds the tree it means says so;
+// spec: installer/SPEC.md §The packer — a caller that already holds the tree it means says so;
 // the value is validated to a work-tree top level because silently promoting a subdirectory is the
 // same correction the flag exists to remove
-// spec: installer/README.md §The packer — the cwd selects whose tooling runs and `--root` which
+// spec: installer/SPEC.md §The packer — the cwd selects whose tooling runs and `--root` which
 // tree is packed; the front-end resolved the first before this arm ran, and this resolves the
 // second
 fn resolve_root(named: &str) -> Result<String, Refusal> {
@@ -248,7 +248,7 @@ fn resolve_root(named: &str) -> Result<String, Refusal> {
     Ok(top)
 }
 
-// spec: installer/README.md §The packer — the version comes from the tag, never from an edit to
+// spec: installer/SPEC.md §The packer — the version comes from the tag, never from an edit to
 // installer/package.json; the regex is the one that also admits a prerelease suffix
 fn resolve_version(given: &str) -> Result<String, Refusal> {
     let mut version = given.to_string();
@@ -267,12 +267,12 @@ fn resolve_version(given: &str) -> Result<String, Refusal> {
     Ok(version)
 }
 
-// spec: installer/README.md §The packer — the payload's tree footprint, DERIVED from the same two
+// spec: installer/SPEC.md §The packer — the payload's tree footprint, DERIVED from the same two
 // resolvers the pack loop itself runs so the refusal's corpus cannot drift from the packed set;
 // the roster rides on `--artifacts`, which is what makes it a payload input at all
 fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
     let mut spec = vec!["installer".to_string()];
-    // spec: installer/README.md §The packer — the pack loop's own on-disk `is_dir` test is
+    // spec: installer/SPEC.md §The packer — the pack loop's own on-disk `is_dir` test is
     // deliberately NOT applied here: filtering the pathspec by it would blind the refusal to the
     // one divergence only it can see
     for kit in walk::kit_roots_rel().map_err(refuse)? {
@@ -289,7 +289,7 @@ fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
     Ok(spec)
 }
 
-// spec: installer/README.md §The packer — a member outside the packed tree is dropped rather than
+// spec: installer/SPEC.md §The packer — a member outside the packed tree is dropped rather than
 // handed to git, which refuses one; the test is lexical because a kit root deleted from the
 // worktree still belongs in the pathspec and cannot be canonicalized
 // spec: gate-sdk/SPEC.md §The path-dialect contract — absoluteness is a TWO-dialect question and
@@ -312,7 +312,7 @@ fn inside(root: &str, path: &str) -> Option<String> {
     Some(if rel.is_empty() { ".".to_string() } else { rel })
 }
 
-// spec: installer/README.md §The packer — the refusal names the entries it found, bounded and with
+// spec: installer/SPEC.md §The packer — the refusal names the entries it found, bounded and with
 // a total, so a reader tells a shipping path from scratch without re-running `git status` by hand
 const DIRTY_SHOWN: usize = 10;
 
@@ -342,7 +342,7 @@ fn env_or(name: &str) -> Option<String> {
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — git's stdout is reachable only through the
 // accessor that read the status, so a failed probe cannot be read as an empty answer
-// spec: installer/README.md §The packer — trailing whitespace only: a porcelain entry's first two
+// spec: installer/SPEC.md §The packer — trailing whitespace only: a porcelain entry's first two
 // bytes ARE its state code, so trimming both ends would re-column the one line the dirty
 // diagnostic prints first, and no other caller here reads a leading blank
 fn git(args: &[&str]) -> Result<String, Refusal> {
@@ -552,7 +552,7 @@ fn set_mode_755(_path: &str) -> Result<(), Refusal> {
     Ok(())
 }
 
-// spec: installer/README.md §The packer — the version-and-commit stamp, a `serde_json` edit rather
+// spec: installer/SPEC.md §The packer — the version-and-commit stamp, a `serde_json` edit rather
 // than a `jq` spawn: the tool's last reader of that program leaves with the port
 fn stamp(asm: &str, version: &str, commit: &str) -> Result<(), Refusal> {
     let path = format!("{}/package.json", asm);
@@ -578,7 +578,7 @@ fn stamp(asm: &str, version: &str, commit: &str) -> Result<(), Refusal> {
         .map_err(|e| refuse(format!("could not write {}: {}", path, e)))
 }
 
-// spec: installer/README.md §The packer — `npm pack` stays a spawn deliberately: reproducing the
+// spec: installer/SPEC.md §The packer — `npm pack` stays a spawn deliberately: reproducing the
 // package format in-crate is a second implementation of a format, not a port
 fn npm_pack(asm: &str) -> Result<String, Refusal> {
     let done = proc::run_merged_in("npm", &["pack"], &[], Some(std::path::Path::new(asm)))
@@ -606,7 +606,7 @@ fn npm_pack(asm: &str) -> Result<String, Refusal> {
     }
 }
 
-// spec: installer/README.md §The packer — the tarball is moved out of the scratch before the
+// spec: installer/SPEC.md §The packer — the tarball is moved out of the scratch before the
 // teardown runs; the copy-then-remove fallback is what a cross-filesystem rename needs, which two
 // separately configurable directories make reachable
 fn move_file(from: &str, to: &str) -> Result<(), Refusal> {
@@ -622,7 +622,7 @@ fn move_file(from: &str, to: &str) -> Result<(), Refusal> {
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §The packer — the flag roster's unknown-argument refusal survives
+    // spec: installer/SPEC.md §The packer — the flag roster's unknown-argument refusal survives
     // the cut, and `--help` is no longer one of the four: its one-tier rule retired with the file.
     #[test]
     fn an_unknown_argument_is_a_refusal() {
@@ -640,7 +640,7 @@ mod tests {
         assert!(f.out.is_empty() && f.artifacts.is_empty());
     }
 
-    // spec: installer/README.md §The packer — the version regex admits a prerelease suffix, which
+    // spec: installer/SPEC.md §The packer — the version regex admits a prerelease suffix, which
     // is the property docs/install.md rests its prerelease claim on.
     #[test]
     fn the_version_regex_admits_a_prerelease_suffix() {
@@ -651,7 +651,7 @@ mod tests {
         assert!(resolve_version("1.2").is_err());
     }
 
-    // spec: installer/README.md §The packer — the commit stamp is a 40-hex object name, so a short
+    // spec: installer/SPEC.md §The packer — the commit stamp is a 40-hex object name, so a short
     // or an abbreviated one is refused rather than stamped.
     #[test]
     fn only_a_forty_hex_commit_stamps() {
@@ -670,7 +670,7 @@ mod tests {
         assert_eq!(1 + "a/b/c".matches('/').count(), 3);
     }
 
-    // spec: installer/README.md §The packer — the single formatter prints the prefix, the cause and
+    // spec: installer/SPEC.md §The packer — the single formatter prints the prefix, the cause and
     // every help line, so no refusal reaches a reader as a bare non-zero status.
     #[test]
     fn every_refusal_carries_the_prefix_and_exits_two() {
@@ -678,7 +678,7 @@ mod tests {
         assert_eq!(report(&refuse_help("cause", &["do this"])), 2);
     }
 
-    // spec: installer/README.md §The packer — a footprint member outside the packed tree is
+    // spec: installer/SPEC.md §The packer — a footprint member outside the packed tree is
     // dropped rather than handed to git, and one inside it crosses as its repo-relative spelling.
     #[test]
     fn only_members_inside_the_packed_tree_enter_the_pathspec() {
@@ -706,7 +706,7 @@ mod tests {
         assert_eq!(inside("D:/w", "gate-sdk"), Some("gate-sdk".to_string()));
     }
 
-    // spec: installer/README.md §The packer — a worktree-deleted kit root is exactly what the
+    // spec: installer/SPEC.md §The packer — a worktree-deleted kit root is exactly what the
     // refusal must still see, so the whole tree is the pathspec when a member resolves to the root
     // itself rather than the member being silently dropped.
     #[test]
@@ -714,7 +714,7 @@ mod tests {
         assert_eq!(inside("/w", "/w"), Some(".".to_string()));
     }
 
-    // spec: installer/README.md §The packer — the diagnostic names the entries it found, bounded,
+    // spec: installer/SPEC.md §The packer — the diagnostic names the entries it found, bounded,
     // and states the total so a truncated list is never read as the whole of it.
     #[test]
     fn the_diagnostic_is_bounded_and_states_the_total() {

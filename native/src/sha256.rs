@@ -1,4 +1,4 @@
-// spec: installer/README.md §The install boundary — the hasher the `--install place-artifact`
+// spec: installer/SPEC.md §The install boundary — the hasher the `--install place-artifact`
 // op re-reads the installed copy with.
 // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — in-crate
 // rather than admitted into walk.rs's allowlist: a pure function buys the same answer.
@@ -58,7 +58,7 @@ fn compress(h: &mut [u32; 8], block: &[u8]) {
     }
 }
 
-// spec: installer/README.md §The install boundary — the SHA-256 of a byte string, lowercase hex.
+// spec: installer/SPEC.md §The install boundary — the SHA-256 of a byte string, lowercase hex.
 pub fn hex(data: &[u8]) -> String {
     let mut h = H0;
     let mut chunks = data.chunks_exact(64);
@@ -69,7 +69,7 @@ pub fn hex(data: &[u8]) -> String {
     let rest = chunks.remainder();
     tail[..rest.len()].copy_from_slice(rest);
     tail[rest.len()] = 0x80;
-    // spec: installer/README.md §The install boundary — the padded tail is one block when the
+    // spec: installer/SPEC.md §The install boundary — the padded tail is one block when the
     // length field still fits after the 0x80 terminator and two when it does not, which is the
     // whole of the standard's padding rule.
     let padded = if rest.len() + 1 + 8 <= 64 { 64 } else { 128 };
@@ -85,7 +85,7 @@ pub fn hex(data: &[u8]) -> String {
     out
 }
 
-// spec: installer/README.md §The install boundary — a file's SHA-256, or the read error, so a
+// spec: installer/SPEC.md §The install boundary — a file's SHA-256, or the read error, so a
 // caller cannot read an unreadable file as a digest that merely failed to match.
 pub fn file_hex(path: &std::path::Path) -> Result<String, String> {
     let bytes = std::fs::read(path).map_err(|e| format!("cannot read {}: {}", path.display(), e))?;
@@ -96,7 +96,7 @@ pub fn file_hex(path: &std::path::Path) -> Result<String, String> {
 mod tests {
     use super::*;
 
-    // spec: installer/README.md §The install boundary — the published NIST vectors, plus the two
+    // spec: installer/SPEC.md §The install boundary — the published NIST vectors, plus the two
     // lengths either side of the padding rule's branch: a hasher agreeing on short inputs and
     // disagreeing at a block boundary is the failure a single vector would not see.
     #[test]
@@ -115,7 +115,7 @@ mod tests {
         );
     }
 
-    // spec: installer/README.md §The install boundary — the lengths either side of the padding
+    // spec: installer/SPEC.md §The install boundary — the lengths either side of the padding
     // rule's branch, where a padding bug lives; the digests are literals, so the assertion needs
     // no hasher on the machine running it.
     #[test]

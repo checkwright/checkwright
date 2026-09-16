@@ -199,7 +199,7 @@ generated pre-commit hook persists the emitted argv, and a machine-specific
 absolute path baked into a tracked hook would make `check-graph`'s byte-freshness
 comparison machine-dependent. **A vendored consumer's value is set for them**, to
 the binary's place in their gates directory, by the installer writing this knob
-into their `gate-sdk-config.knobs` (installer/README.md §The gate binary) — the
+into their `gate-sdk-config.knobs` (installer/SPEC.md §The gate binary) — the
 config seam exists so a value can be relocated without the default moving.
 Deriving the default from `GATE_SDK_GATES_DIR` instead was weighed and refused:
 it would silently relocate the binary for every existing reader, and make this
@@ -537,7 +537,7 @@ a static kit's names and defaults now that no shell file holds them.
 than seam surface. They follow a migrated kit only where a suite writes that kit's
 config. A static kit's config template is a comment-only knob file, and init's
 seeding derivation reads `templates/*-config.knobs` beside `templates/*-config.sh`
-(installer/README.md §What init seeds).
+(installer/SPEC.md §What init seeds).
 
 ### The config-seam port disposition
 
@@ -555,7 +555,7 @@ a re-run, and §check-template-copy-parity keeps it out of template-to-copy pari
 where equality would be the defect.
 
 **The class is derived, never rostered**, and the derivation has an owner:
-installer/README.md §What init seeds rules that a kit's consumer config is whatever
+installer/SPEC.md §What init seeds rules that a kit's consumer config is whatever
 config template it ships, seeded into the gates directory under the file's own
 name. A kit that ships no config template is simply **not a member**, and this
 repo's `<gates-dir>/gate-sdk-config.knobs` is a hand-authored consumer config for
@@ -2266,7 +2266,7 @@ it already lives — the gate's own configured knob.
 
 **The installer's per-kit roster is derived from these declarations, not
 maintained.** The recipe's gate derivation
-(installer/README.md §What init seeds) is every `checks/` member of a kit — both
+(installer/SPEC.md §What init seeds) is every `checks/` member of a kit — both
 declaration spellings — whose disposition is `zero-config`. It carries no gate
 name of its own, which is what `check-install-disposition` assertion C holds.
 
@@ -2294,7 +2294,7 @@ removed. They are not: they answer what a kit's install must **seed**, not what
 it may **register**, and a seeded surface is a property of the kit rather than of
 any one gate — so a per-gate directive has nothing to say about it. Which
 decisions those are, and how each is made, is the installer's
-(installer/README.md §What init seeds). Recorded so the boundary is found drawn
+(installer/SPEC.md §What init seeds). Recorded so the boundary is found drawn
 rather than extended into a place it does not fit.
 
 ## Meta-gate conservation for the binary substrate
@@ -2771,7 +2771,7 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--source-stamp`,
 `--guard-lib-parity`, `--install`, `--help`, and the installer's five adopter
 verbs — `--init`, `--doctor`, `--diff`, `--update` and `--uninstall`
-(installer/README.md §The verbs) — plus the
+(installer/SPEC.md §The verbs) — plus the
 `--emit-` family the arm table keys (`--emit-queue-counts` and
 `--emit-queue-edges`; `--emit-entry-history`, queue-kit's advisory report of the
 commits at which one entry's counted extent fell
@@ -2830,7 +2830,7 @@ whose port **removes** a grant naming its own path rather than relocating one),
 scratch-consumer harness (both §Consumer smoke),
 and `--pack-installer`, the payload assembler (§Consumer payload; the route a
 consumer's release path invokes it by is that consumer's own surface and not a
-kit's — installer/README.md §The packer is this repo's) —
+kit's — installer/SPEC.md §The packer is this repo's) —
 and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
@@ -3126,7 +3126,7 @@ unportable", and the second is false.
 **A member may also decline the `--install <op>` family, and that is a worked
 instance rather than a hypothetical.** `--install-lifecycle` is spelled as its own
 arm-table arm and not as an op of that family, refused on the family's own stated
-terms: installer/README.md §The install boundary rules that family deliberately
+terms: installer/SPEC.md §The install boundary rules that family deliberately
 unconfigured, reading no kit config and no knob, because its caller is the bootstrap
 and may not be assumed to be a POSIX shell. A member whose whole job is to render
 blocks derived from resolved kit config cannot live there — it would have to take
@@ -3307,7 +3307,7 @@ the property the class had not carried before.** Every earlier hardcoded flag is
 hardcoded because it needs no configuration; this one is hardcoded because its
 caller cannot supply any. The forced-family test above resolves on what the
 member reads, and `--install` reads nothing: it is called by the installer's
-bootstrap, which installer/README.md §The install boundary forbids assuming to
+bootstrap, which installer/SPEC.md §The install boundary forbids assuming to
 be a POSIX shell at all, so **every value it needs arrives as argv** and it
 resolves no knob and no kit config. A configured install arm would read its
 values from knob files the install is still placing, so either half of that
@@ -3315,9 +3315,9 @@ boundary hands them over as argv instead. Its
 named callers are the `--init` arm, which reaches it in-process, and the two
 bootstraps that reach the arm; all live,
 and its grammar, channels and exit statuses are
-installer/README.md §The install boundary's. It owes no descriptor,
+installer/SPEC.md §The install boundary's. It owes no descriptor,
 registration or fixture pair, like every other member; what it is asserted by is
-the consumer smoke's install path (installer/README.md §The consumer smoke).
+the consumer smoke's install path (installer/SPEC.md §The consumer smoke).
 **The zero-config reading is a property, not an exemption** — a later op that
 grows a configured input has to arrive as a new argv key rather than as a knob,
 or it re-breaks the half of the boundary the member exists to serve.
@@ -4126,7 +4126,7 @@ that answers each is the one whose corpus matches its question.
    a step is takeable now iff it already runs only when an artifact was selected,
    and relocating the unconditional remainder is sequenced behind the roster
    covering every supported platform — is
-   installer/README.md §The install boundary's, stated there because it governs
+   installer/SPEC.md §The install boundary's, stated there because it governs
    the installer rather than any gate. This criterion is where a porting session
    meets it, which is why it is named here rather than only there.
    The placement branch never waited on that tag for its
@@ -4134,7 +4134,7 @@ that answers each is the one whose corpus matches its question.
    every invocation drives selection, pre-write digest verification and placement
    against a real artifact, and that artifact rides the **main**
    payload, so every profile the smoke installs takes the placement branch
-   (installer/README.md §The consumer smoke).
+   (installer/SPEC.md §The consumer smoke).
 
    **The criterion is priced per member and paid per cohort**, because the
    quantity a per-member statement cannot see is not any member's runnability. A
@@ -4150,7 +4150,7 @@ that answers each is the one whose corpus matches its question.
    artifact-free payload, derives the set that payload dispatches to a binary from
    the consumer's own vendored tree, and asserts the consumer's `gates.list`
    declares exactly that set, at a **non-zero** count
-   (installer/README.md §The consumer smoke). The quantity is therefore
+   (installer/SPEC.md §The consumer smoke). The quantity is therefore
    machine-derived and machine-asserted-complete, and a cohort records **the
    roster it grew**, against the post-cohort registry, with its amendment ruling
    whether that roster is acceptable. **N members each individually runnable is
@@ -7318,7 +7318,7 @@ both with named owners; after §The third budget batch, but for
 `check-installer-no-deps` alone. It was **not** retired from the shipped install
 path by that cohort either — the installer shelled to it then. *"The cohort
 retires jq"* was false in both directions. The install path has since stopped
-reading JSON with it altogether (installer/README.md §Requirements), which is a
+reading JSON with it altogether (installer/SPEC.md §Requirements), which is a
 later cut's doing and not this one's.
 
 **The enforcement-map port later closed one of those two**, and it is recorded
@@ -8146,7 +8146,7 @@ smoke that builds its artifact from the host it runs on cannot satisfy a roster
 naming a platform that host is not, so the second roster line blocks such a
 smoke until it is steered at a narrowed roster through
 `GATE_SDK_NATIVE_TARGETS_FILE` (§Layout and configuration) or given a
-cross-compiling build. installer/README.md §The consumer smoke owns that
+cross-compiling build. installer/SPEC.md §The consumer smoke owns that
 re-entry and records which of the two is built: **the steering is built and the
 cross-build is refused**, the smoke deriving a one-line host roster for itself
 unless its caller has already set that knob. The refusal takes the roster's own
@@ -8160,7 +8160,7 @@ never-from-a-working-tree rule; it does not promote that smoke's green into the
 standing way a roster widens on a plan. What discharges a join is a **pair**: a
 release-shaped producer, whose build command, sidecar format and directory
 layout are the release path's own, and a platform smoke that **consumed that
-producer's upload** — the artifact hand-off of installer/README.md §The consumer
+producer's upload** — the artifact hand-off of installer/SPEC.md §The consumer
 smoke — and reached its artifact-present branch. Neither half alone is the
 predicate, and the consumer's own project states the pair concretely beside its
 roster, since which jobs and which log line spell it are that project's CI and
@@ -8209,7 +8209,7 @@ section narrowly all along, saying the script never builds *one*. **The
 consumer smoke's host-built artifact is a harness stand-in, not this rule
 relaxing**: it builds from a working tree because it has no Release to draw on,
 and hands the arm a directory it did not produce, exactly as a build
-leg would (installer/README.md §The consumer smoke). The
+leg would (installer/SPEC.md §The consumer smoke). The
 one-payload shape is ruled on the numbers: the *installed* footprint is one
 binary either way, since the installer writes only the matching target, so the
 difference against a per-target payload is download size alone and is bounded by
@@ -8368,7 +8368,7 @@ proves.** It vendors kit roots **by copy**, so no payload, no digest and no
 `# omitted:` record are in play: its scratch consumer registers whatever each
 `smoke/install.sh` registers, and it asserts the **kit defaults** under **zero
 consumer config**. Proving the *install* path is the installer's own smoke
-(installer/README.md §The consumer smoke), the one caller that packs a payload
+(installer/SPEC.md §The consumer smoke), the one caller that packs a payload
 and runs `init` against it. The two harnesses must not blur: this one answers
 *do the kits work when vendored*, that one answers *does the installer deliver
 them*.
@@ -9782,7 +9782,7 @@ over the very tree it packs passes the tree operand and a `cd` together.
 **The front-end kept a shell dispatch loop for one branch until the stub cut, and
 the admission is preserved as closed history rather than deleted.** A host the
 payload carries no verified artifact for is an *omit-and-declare* install
-(installer/README.md §The gate binary), and while any member still resolved to a
+(installer/SPEC.md §The gate binary), and while any member still resolved to a
 `.sh` script that install's battery could stay green, so where
 `GATE_SDK_NATIVE_BIN` named nothing executable the front-end dispatched the
 registry itself. That was the one duplication the port carried, admitted on
@@ -9927,7 +9927,7 @@ omits from their own registry is recorded there as `# omitted: <name> <reason>`
 — a comment line, so `gates_list_members` strips it and N shrinks legitimately.
 The class is **reason-agnostic** and belongs to any consumer who omits a member
 for any cause of their own; it is not the installer's, whose own selection
-outcome retires with the tokens it wrote (installer/README.md §The gate binary).
+outcome retires with the tokens it wrote (installer/SPEC.md §The gate binary).
 Reading the class out of existence with them would publish an installer decision
 as a kit narrowing. The runner counts those lines and prints the count and its remedy
 beside the summary, one line per reason token present, so a declared omission
@@ -10688,7 +10688,7 @@ where TO's declaration must contain it.
 
 **The honest limit.** Both derivations are the host's, over FROM's and TO's
 templates, which is exact while the rule is unchanged since FROM. The placement
-seam `init` writes beside an artifact (installer/README.md §The gate binary) is
+seam `init` writes beside an artifact (installer/SPEC.md §The gate binary) is
 not seeded, because writing it faithfully means running FROM's installer, the
 cross-version init path this suite does not reach. The suite deletes rather than
 rewrites, so it never proves an adopter's rewrite of a config they edited.
@@ -10834,9 +10834,9 @@ consumer's `.gitignore` carries `GATE_SDK_NATIVE_BIN`'s path (§Consumer smoke),
 the placed artifact never enters the `git status` the assertion reads, and
 nothing is exempted on its behalf. The ruling stands unchanged and is cited here,
 not amended. The install path's own idempotence proof is the installer's smoke
-(installer/README.md §The consumer smoke), which does re-run `init`, and the rule
+(installer/SPEC.md §The consumer smoke), which does re-run `init`, and the rule
 that satisfies it is the manifest's: an on-disk artifact that still verifies
-against the recorded digest is not rewritten (installer/README.md §The manifest).
+against the recorded digest is not rewritten (installer/SPEC.md §The manifest).
 
 **The declaration resolves on two arms, both over §lib/declaration.sh's one
 token predicate.** A **tagged TO** resolves its version from the `v*` tag
@@ -11469,7 +11469,7 @@ fixture pair — the same distinction the kits' remaining `bin/` tools carry. It
 
 **The port disposition: declared, on a per-file bootstrap cause.** A fresh clone
 carries no binary, so nothing compiled exists to run the first build — the same
-irreducible the install bootstrap records (installer/README.md §The install
+irreducible the install bootstrap records (installer/SPEC.md §The install
 boundary), met on the contributor side. A ported build arm would also be the
 crate's authoritative rebuild-yourself step for its own staleness check
 (§check-gate-binary-fresh names this script as the remedy from inside the crate),

@@ -3177,7 +3177,7 @@ reached by its own `bin/run-gates.sh` front-end branch rather than through the
 status** — it mutates two files and writes one git config key, printing narration
 on stdout — and `Arm::Emit` collapses every error to 2. **The obvious alternative
 is an op of the `--install <op>` family, and it is refused on that family's own
-stated terms**: installer/README.md §The install boundary rules that arm reads no
+stated terms**: installer/SPEC.md §The install boundary rules that arm reads no
 kit config and no knob, because its caller is the bootstrap and may not be
 assumed to be a POSIX shell. This member's whole job is to render blocks derived
 from **resolved kit config**, so a knob-free op would have to take all eight knobs
