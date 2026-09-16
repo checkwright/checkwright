@@ -3989,35 +3989,6 @@
   Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could not drain
   it; promoted at the following iteration's scope.
 
-- **harness-session-trailer-reds-first-commit** [design-pending] [cost: session/low] [surface: gate-sdk] — the harness
-  injects a session-URL commit trailer by default and `check-commit-msg` bans it, so a session
-  following the harness's own attribution reminder has its first commit refused.
-  **Probed 2026-09-16 at this scope**, not inherited: a message carrying the default
-  `Claude-Session:` line was run through `check-commit-msg`, which refused it at exit 1 as a
-  banned pattern. The gate is CORRECT — CLAUDE.md bans internal session references in tracked
-  files and commit messages, and `scripts/msg-patterns.list` exempts the `Co-Authored-By` footer
-  and nothing else.
-  **The measured cost, and its honest bound.** `queue-arm-report-fidelity`'s close measured one
-  refused commit and one re-issue per stage session, six per iteration. This scope paid none of
-  it, because it dropped the trailer on prior knowledge. So the recurrence is paid by every
-  session that follows the harness default and avoided by any session that knows not to — which
-  makes the session class right and the magnitude low.
-  **Why `[design-pending]`: both candidate fixes land where a delegated session may not write.** A
-  settings-level suppression is a permission or configuration edit applied on the operator's
-  behalf (CLAUDE.md §Housekeeping); a CLAUDE.md-level instruction to drop the line edits the
-  always-loaded surface. A delegated session may only prepare either diff. Which surface owns the
-  suppression is the seam call, and whether a kit surface should own it at all is the second.
-  **Cost while deferred:** every stage session that follows the harness's own attribution reminder
-  spends a refused commit and a re-issue on a conflict with a known cause and no owner.
-  Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close as the third of its
-  four bullets, none of which that close could drain; promoted at the following scope.
-  **Where the suppression lives: SETTINGS-OWNED — operator direction 2026-09-16, lead-relayed at
-  scope, revisable at a later scope or spec.** Of the two prepared diffs the settings one is chosen
-  and the always-loaded one is declined, so no kit surface owns it. The chosen diff is applied on
-  the operator's behalf and never by a delegated session (CLAUDE.md §Housekeeping); `.claude/`'s
-  tracked settings carry no attribution key as of this scope, so it still awaits that application.
-  The entry stays deferred until then, and it did not join `audit-roster-and-refiling-cut`.
-
 - **queue-entry-evidence-tier** [design-pending] [cost: iteration/low] [surface: queue-kit] — nothing signals that an
   entry's body was compressed, so a later reader cannot tell a premise written at full evidence
   from one written at close-stage speed.
@@ -4487,5 +4458,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- harness-session-trailer-reds-first-commit
 
 ## Lessons Learned
