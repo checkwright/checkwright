@@ -30,7 +30,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("QUEUE_KIT_PROSE_SURFACE_GLOBS", &[]),
         Row::scalar(
             "QUEUE_KIT_PRECONDITION_REGEX",
-            "revisit when|once [^.]*(lands|ships|is (done|ready|merged))|gated on|contingent on|waiting on|pending [a-z]|blocked on",
+            "(^|[^a-z])(revisit when|once [^.]*(lands|ships|is (done|ready|merged))|gated on|contingent on|waiting on|pending [a-z]|blocked on)",
         ),
         Row::indexed("QUEUE_KIT_LESSON_TAGS", &[]),
         Row::keyed("QUEUE_KIT_LESSON_SINKS", &[]),

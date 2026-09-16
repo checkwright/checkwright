@@ -2147,7 +2147,9 @@ the precondition is met, or the `[precondition-ok: <reason>]` opt-out (a
 queue tag, not an HTML comment, so it survives the hygiene gate).
 
 Calibration: the trigger set (`QUEUE_KIT_PRECONDITION_REGEX`) is deliberately
-narrow — forward-looking phrasing only, past-tense narration stripped before
+narrow — forward-looking phrasing only, the default's phrases left-bounded on a
+non-letter so a trigger embedded in a longer word (`appending close`, `delegated
+on`) does not fire, past-tense narration stripped before
 matching, and **the queue's own `design-pending` tag name stripped in its
 unbracketed spelling too**. That third rewrite exists because the tag name ends
 in a trigger word: the bracket rewrite reaches `[design-pending]` and nothing
