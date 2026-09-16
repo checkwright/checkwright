@@ -12,6 +12,211 @@
 
 ## New Features
 
+- **audit-roster-row-carry-unruled** [spec: SPEC-audit-roster.md] — every close appends its
+  sweep reading to the audit-roster row it swept and nothing ever compacts one, so the file has
+  grown past the point where the close step that must read it can.
+  **Why the read is degraded, not merely long.** The Read tool refuses the whole file at a 256KB
+  cap, so the close skill's mandated **Audit-roster review** sub-step
+  (`.claude/commands/close.md:36`) can only reach a row through hand-built substring probes — it
+  reads the slug, `due:` and `last:` while structurally NOT reading the accumulated body those
+  fields exist to be judged against.
+  **The design question it posed, and why no session could just pick one.** Three shapes are
+  visible and none is costed: compact each row to its current standing reading and let git history
+  hold the retired ones; split one row per file under a roster directory; or cap a row and force
+  the close that appends to compress. Which is right turns on whether a row's accumulated prior
+  readings are load-bearing for a later judge or are history — and
+  doctrine-kit/DOCTRINE.md's Enforcement-first cadence clause, which owns this roster, says
+  nothing about the roster's own carry. Any of the three adds a name to a governed surface, so
+  this is feature-class and owes an amendment.
+  **A second fact about the same surface, folded in because a remedy for one touches the other:**
+  the file is TRACKED, so the close-surface derivation's capture-tier arm never reaches it and it
+  appears in no `--emit close-surfaces` row, declared or otherwise. That is the situation
+  CLAUDE.md §Housekeeping handles for `.workflow/preflight-valve.txt` with an explicit
+  `close-surface:` declaration and a stated reason; the audit roster has none. It is not UNREAD,
+  so this is a declaration asymmetry between two same-class surfaces and not a missed read.
+  **Cost while deferred:** recurring and accumulating — each close adds roughly 7KB and performs
+  a degraded review, so the mandated step's evidentiary value falls every iteration while the
+  roster keeps its authority. That live per-close trigger is why the icebox tier's
+  "no named event waiting to promote it" test fails here, and the machinery-class default
+  (TRAJECTORY.md, 2026-08-30) is defeated on the tier's own eligibility rule rather than ignored.
+  **NOT ASSERTED:** nobody has measured how much of a row's body a later judge actually uses.
+  **The measured series, each point taken at its own boundary and none forecast:** 270392 bytes /
+  11 lines at this drain; **280394 / 11 on 2026-09-04**, plus 10002 over one close and ABOVE the
+  roughly 7KB the cost line forecasts, so that forecast is understated rather than generous;
+  **214955 / 12 on 2026-09-06**, 65KB BELOW it, so growth is not monotone after a compaction lands
+  and the cost line prices appends rather than the file; **231607 / 11 on 2026-09-07**, one row's
+  single line at 65680 characters, about 80k tokens; **312154 / 13 at scope 2026-09-16**.
+  **The second point bears on WHICH shape is right, not merely on size.** Those 10KB were one
+  close's appends to FIVE rows that came due at once, and they came due because that iteration
+  deleted a shell file and recorded a ruling. So append size is driven by ITERATION SHAPE rather
+  than by the row, and capping a row per close — the third shape — would truncate hardest in
+  exactly the case the roster exists for.
+  **The FIRST shape has been run by accident and it lost a mandatory field — 2026-09-05.** A close
+  compressed the `internal-identifier-restatement` row from 72073 to 2588 characters and the
+  header-mandated `due:` field went with the prose, unreadable until the same close restored it
+  (the field sat 43311 characters into the row, at `b2cedcd3`). So "compact each row" is not safe
+  unattended: a compression pass reads an accreted row as prose, and the grammar is graded by
+  nothing.
+  recurrence: audit-roster-row-carry-unruled 2026-09-07
+  Surfaced 2026-09-04 by `usage-verdict-cut`'s close, drained at the next scope; re-filed 2026-09-07
+  with no new axis, drained as the `recurrence:` stamp (`lead, own-authority` 2026-09-07).
+  **Directed 2026-09-16 at scope as `audit-roster-and-refiling-cut`'s LEAD unit**; its carrier
+  `audit-roster-mechanism-has-no-kit-owner` holds the set and its composition argument.
+  **Ruled at spec:** nothing appends — a sweep replaces its block's attestation lines,
+  folds a standing reading into `scope:` by re-phrasing, and sends its narration to the
+  commit message; separate field lines under a per-line cap, graded by a native gate.
+
+- **audit-roster-mechanism-has-no-kit-owner** [spec: SPEC-audit-roster.md] — the
+  audit roster's contract header names doctrine-kit/DOCTRINE.md rule 2 (Enforcement-first) as
+  owner, and the only procedure that runs the review is this repo's close skill binding; no kit
+  template or SPEC section carries the roster's format or its review step. Re-verified at the
+  drain: outside that binding and the doctrine body, only a lifecycle-kit fixture mentions the
+  file. Distinct from `audit-roster-row-carry-unruled` (row growth) and
+  `audit-roster-last-stamp-author-unconstrained` (who stamps): this is which kit ships the
+  mechanism at all.
+  **Candidate:** a lifecycle-kit section plus a close-template step owning the format and the
+  review, with rule 2 pointing at it.
+  **Cost while deferred:** a consumer vendoring the doctrine is told a cadence is owed and ships
+  no mechanism that performs it, and rule 2's body keeps the roster's grounds.
+  Filed 2026-09-13 at `resident-tier-restatement`'s spec, from the rule-body audit; drained at
+  its close.
+  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set — operator direction,
+  lead-relayed, revisable at a later scope or spec; no ruling record carries it.** The set:
+  `audit-roster-row-carry-unruled` (lead), this entry, `audit-class-corpus-attestation`,
+  `audit-roster-last-stamp-author-unconstrained`, `close-eviction-refiles-without-checking`. Its
+  composition argument, recorded here because no gate reads it: bundled — the four roster entries
+  share `.workflow/audit-roster.txt`'s row grammar and the close-stage review step reading it, and
+  this entry is their CARRIER, the kit section the grammar lands in. The fifth is a different close
+  sub-step with no schema overlap, taken knowing it re-spends a little. All five are features —
+  each adds a name or a filing contract to a governed surface — so the authoring stage promotes
+  them; the rule-2 pointer spans lifecycle-kit and doctrine-kit, and the audit stage that fires was
+  accepted with the set.
+  **Ruled at spec:** lifecycle-kit owns the roster section, its knobs and a close-template
+  step; doctrine rule 2 keeps the cadence and points there; the classes stay consumer rows.
+
+- **audit-class-corpus-attestation** [spec: SPEC-audit-roster.md] — an un-gateable-class audit
+  stamps a
+  **verdict**, not the corpus it read, so a false negative is indistinguishable from a clean tree.
+  `.workflow/audit-roster.txt` rows carry `due:` and `last:` and nothing else, so the close that
+  performs one records *that* it swept and reports its finding count in prose. "Came back clean"
+  is unfalsifiable at the time it is written and un-re-runnable afterwards.
+  recurrence: audit-class-corpus-attestation 2026-08-15
+  **Third instance, and it widens the entry: this one was not a false negative.** The 2026-08-15
+  sweep of `capability-pendency-after-landing` *found* `gate-sdk/SPEC.md`'s "no `.gate` member
+  exists anywhere in the tree" — false since the first cohort, 2026-08-02 — and correctly ruled
+  it outside its own trigger, which is event-scoped to what the iteration landed. So an honest
+  sweep, with its corpus genuinely read, can leave standing drift; a `last:` carrying the corpus
+  command would not have changed that verdict. The scoping is the second axis, and this entry's
+  deliverable has to rule whether a row also stamps what it *declined* and why.
+  **Measured harm, and it is not hypothetical — a two-for-two false negative on consecutive
+  closes.** `capability-pendency-after-landing`'s trigger fired when `native-cohort-activation`
+  cut v0.22.0 (`.workflow/release-disposition.txt`, `git show d64e63c0`), the first tag publishing
+  gate binaries as Release assets. Both that close and the next swept the class and stamped it
+  performed: `ad8d4a31` recorded "the kit SPECs came back clean" and `9b2aec20` recorded "zero
+  findings". `gate-sdk/SPEC.md` carried the discharged-blocker claim in **two** places throughout
+  (§The port-candidate criteria criterion 5, and the paragraph opening "What stands between that
+  port and an adopter"). Both survived both sweeps and shipped to the published SPEC and its
+  public docs mirror, where validate found one of them two iterations later.
+  **The deliverable is a stamp grammar, not a scanner** — which is what makes it buildable against
+  a class the roster's own text calls un-gateable. A row's `last:` gains the corpus command the
+  sweep ran and the hit count it triaged, so the next close re-runs the predecessor's own oracle
+  instead of re-inventing a corpus, and a sweep that read nothing cannot stamp a verdict. What
+  stays un-gateable is the *judgment* on each hit; what stops being un-gateable is whether a
+  corpus was read at all.
+  **Why it needed design:** three classes on the roster have no single-command corpus (a
+  capability's "instances" are the tree set a scanner cannot infer — the reason they are on this
+  roster), so the unit must rule what a row with no derivable corpus stamps instead of a command,
+  and an honest "these rows stamp a named surface list" may be the answer for some of them.
+  **Cost while deferred:** compounding and paid at the boundary the roster exists to hold — every
+  close re-derives each class's corpus from scratch, and the roster's whole value is a cadence
+  claim it currently cannot evidence. The two closes above are the attested instances.
+  Filed 2026-08-09 by close (`install-profile-seam`), draining the criterion-5 staleness bullet:
+  the bullet's own finding is fixed in this close, and this entry is the mechanism half of it.
+  It is the generalization `check-measured-claim` names as the scope-claim axis it cannot
+  reach, and is cross-referenced there rather than folded into it — that entry designs a scanner
+  over authored prose, this one designs a stamp over a session act.
+  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set** as the corpus half
+  of the row grammar; `audit-roster-mechanism-has-no-kit-owner` records the set's argument.
+  **Ruled at spec:** a swept block stamps `corpus:` (a command or a `surfaces:` list),
+  `hits:` and `declined:`; the corpus is a floor, never a stored mandate.
+
+- **audit-roster-last-stamp-author-unconstrained** [spec: SPEC-audit-roster.md]
+  — the audit roster assigns each row's `last:` stamp to the CLOSE-STAGE review in its own header,
+  and any stage can write it with nothing refusing, so a row can read as close-audited when no
+  close audit ever ran.
+  **Attested at `couples-resolver-reach`.** The unresolvable-walk-root row left the build stage
+  carrying `last: couples-resolver-reach`, written by build at `8ac5e006`/`e4001f83`, and that
+  close found the row already stamped before performing its own verification. The verification
+  happened to hold — the live oracle reported 52 covered against 51 skipped, matching the row text
+  exactly — which is what makes the class invisible: a pre-stamp is indistinguishable from a
+  performed audit, and the one case where it is wrong looks identical to the many where it is right.
+  **NOT A VIOLATION BY BUILD in substance** — build had just moved the population and the row would
+  have been stale otherwise — so the open question is whether the roster should admit a non-close
+  stamp with an author field or refuse one outright.
+  **Why it needed design:** the candidates are a `<stage>` field beside `last:`, or a gate
+  asserting the stamping commit carries a close stamp in `.workflow/WORKFLOW-STATE.txt`. The first
+  adds a name to a governed grammar; the second is a shallow assertion. Either lands on the same
+  roster grammar `audit-roster-row-carry-unruled` opens, so one amendment plausibly answers both.
+  **Cost while deferred:** the roster's own header states an authority its rows cannot be held to.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its audit-roster
+  review; drained and promoted at this iteration's scope.
+  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set** as the stamp-author
+  half of the row grammar; the carrier entry named above records the set's argument.
+  **Ruled at spec:** `last:` names its stage, admitted from any stage and read by close as a
+  pre-stamp; the gate checks the current iteration's stage was stamped.
+
+- **close-eviction-refiles-without-checking** [spec: SPEC-filing-owner-check.md] — close's
+  backlog-eviction step
+  files its finding without checking whether a prior close already filed it, and has now done so.
+  **Self-demonstrating instance, found at this close:** the queue carried two entries for one
+  finding — `icebox-worklist-roadmap-blind` (filed 2026-08-09) and
+  `icebox-candidate-roadmap-filter` (filed 2026-08-13) — with the *same* three-row measurement in
+  both bodies. Merged at this close into the elder slug, which was the one carrying an inbound
+  citation; both have since retired.
+  **The shape generalizes past that step.** Any close-stage sweep that files from a *recurring*
+  worklist will re-file on the next iteration unless something checks; the eviction worklist is
+  simply the sweep that recurs most reliably, because its input is stable by construction.
+  `check-task-conservation` does not catch it — two distinct slugs carrying one finding is
+  conserved.
+  **Candidate fixes, none ruled:** a duplicate-finding check at filing time (needs a similarity
+  oracle, probably not buildable); or the cheaper direction — have the recurring sweeps *state*
+  their prior filing, so the next close reads a pointer instead of re-deriving. The second is the
+  same receiving-side shape `handoff-premise-reverification-placement` argues for.
+  **Cost while deferred:** one duplicated entry per recurring sweep per close, each of which then
+  has to be found and merged by a later close reading 5000 lines of queue.
+  recurrence: close-eviction-refiles-without-checking 2026-08-23
+  **FIRST RECURRENCE, 2026-08-23, self-demonstrating TWICE in one close and generalizing the
+  entry past its own step.** `leak-guard-and-assertion-meta-gate-port`'s close filed two gap
+  bullets that each re-derived a live entry, and withdrew both once an audit sweep surfaced the
+  owners. One came from the eviction step, re-filing `icebox-candidate-eligibility-unapplied`
+  (since retired) with the same roadmap-tag measurement for the FOURTH time across four
+  closes. The other came
+  from the PROMPT-FRICTION triage, re-deriving `guard-read-steer-tool-coverage`'s awk question
+  from the log — which is the paragraph above confirmed rather than merely restated: the shape
+  is any close-stage sweep whose input recurs, and the eviction step is only its most reliable
+  instance. It also settles which candidate fix is reachable. A similarity oracle is not needed
+  to catch either: both owners were found by a plain slug-and-subject grep of the queue, so the
+  cheap direction is not merely cheaper but sufficient — the missing step is a *lookup before
+  filing*, and neither sweep performed one. The contaminated measurement that came with the awk
+  bullet is a second cost the entry had not priced: a re-derived finding also re-measures, and
+  a worse measurement can overwrite a better one if the duplicate is promoted rather than caught.
+  **THIRD INSTANCE, 2026-08-23, and the SHARPENING is the datum rather than the count.**
+  `battery-runner-port`'s close read the audit-roster row `close-surface-actually-read` — which
+  already carried the prior close's finding that reading a capture surface is not the same act as
+  checking the queue for the owner — then filed five bullets that DID grep for an owner and one
+  that did not. The one that skipped it arrived off the **eviction worklist** rather than a capture
+  log. So the rule is neither unwritten nor unread: it was applied per-bullet by habit instead of
+  as a step, and the bullet arriving through the surface the row does not name is the one that
+  missed. The generalizable form is narrower and sharper than that row's wording — **the
+  owner-check is owed by every filing, not only by one read from a capture log** — and it is a
+  *lookup step*, which is exactly the cheap candidate fix above rather than a new one.
+  Filed 2026-08-13 by close, from its own backlog-eviction step.
+  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set**, feature-class
+  because an owner-check owed by every filing is a contract other stages honor. The set's argument
+  lives on `audit-roster-mechanism-has-no-kit-owner`.
+  **Ruled at spec:** every deferred-entry write runs an owner lookup first and records it in
+  its commit message; capture stays exempt.
+
 ## Technical Debt
 
 ## Deferred
@@ -157,32 +362,6 @@
   adopter.
   Filed 2026-09-14 by `static-config-seam`'s close into the gap inbox; no stage of that iteration
   could drain it, and this scope promoted it, so the record is late and says so.
-
-- **audit-roster-mechanism-has-no-kit-owner** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the
-  audit roster's contract header names doctrine-kit/DOCTRINE.md rule 2 (Enforcement-first) as
-  owner, and the only procedure that runs the review is this repo's close skill binding; no kit
-  template or SPEC section carries the roster's format or its review step. Re-verified at the
-  drain: outside that binding and the doctrine body, only a lifecycle-kit fixture mentions the
-  file. Distinct from `audit-roster-row-carry-unruled` (row growth) and
-  `audit-roster-last-stamp-author-unconstrained` (who stamps): this is which kit ships the
-  mechanism at all.
-  **Candidate:** a lifecycle-kit section plus a close-template step owning the format and the
-  review, with rule 2 pointing at it.
-  **Cost while deferred:** a consumer vendoring the doctrine is told a cadence is owed and ships
-  no mechanism that performs it, and rule 2's body keeps the roster's grounds.
-  Filed 2026-09-13 at `resident-tier-restatement`'s spec, from the rule-body audit; drained at
-  its close.
-  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set — operator direction,
-  lead-relayed, revisable at a later scope or spec; no ruling record carries it.** The set:
-  `audit-roster-row-carry-unruled` (lead), this entry, `audit-class-corpus-attestation`,
-  `audit-roster-last-stamp-author-unconstrained`, `close-eviction-refiles-without-checking`. Its
-  composition argument, recorded here because no gate reads it: bundled — the four roster entries
-  share `.workflow/audit-roster.txt`'s row grammar and the close-stage review step reading it, and
-  this entry is their CARRIER, the kit section the grammar lands in. The fifth is a different close
-  sub-step with no schema overlap, taken knowing it re-spends a little. All five are features —
-  each adds a name or a filing contract to a governed surface — so the authoring stage promotes
-  them; the rule-2 pointer spans lifecycle-kit and doctrine-kit, and the audit stage that fires was
-  accepted with the set.
 
 - **agent-file-paragraph-sections-ungoverned** [design-pending] [cost: event/low] [surface: context-kit] — `check-brevity`,
   widened to a section set and every top-level item (context-kit/SPEC.md §The brevity gate),
@@ -1622,49 +1801,6 @@
   escalated as an envelope call and folded in here on the lead's ruling the same day.
 
 
-- **audit-class-corpus-attestation** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — an un-gateable-class audit stamps a
-  **verdict**, not the corpus it read, so a false negative is indistinguishable from a clean tree.
-  `.workflow/audit-roster.txt` rows carry `due:` and `last:` and nothing else, so the close that
-  performs one records *that* it swept and reports its finding count in prose. "Came back clean"
-  is unfalsifiable at the time it is written and un-re-runnable afterwards.
-  recurrence: audit-class-corpus-attestation 2026-08-15
-  **Third instance, and it widens the entry: this one was not a false negative.** The 2026-08-15
-  sweep of `capability-pendency-after-landing` *found* `gate-sdk/SPEC.md`'s "no `.gate` member
-  exists anywhere in the tree" — false since the first cohort, 2026-08-02 — and correctly ruled
-  it outside its own trigger, which is event-scoped to what the iteration landed. So an honest
-  sweep, with its corpus genuinely read, can leave standing drift; a `last:` carrying the corpus
-  command would not have changed that verdict. The scoping is the second axis, and this entry's
-  deliverable has to rule whether a row also stamps what it *declined* and why.
-  **Measured harm, and it is not hypothetical — a two-for-two false negative on consecutive
-  closes.** `capability-pendency-after-landing`'s trigger fired when `native-cohort-activation`
-  cut v0.22.0 (`.workflow/release-disposition.txt`, `git show d64e63c0`), the first tag publishing
-  gate binaries as Release assets. Both that close and the next swept the class and stamped it
-  performed: `ad8d4a31` recorded "the kit SPECs came back clean" and `9b2aec20` recorded "zero
-  findings". `gate-sdk/SPEC.md` carried the discharged-blocker claim in **two** places throughout
-  (§The port-candidate criteria criterion 5, and the paragraph opening "What stands between that
-  port and an adopter"). Both survived both sweeps and shipped to the published SPEC and its
-  public docs mirror, where validate found one of them two iterations later.
-  **The deliverable is a stamp grammar, not a scanner** — which is what makes it buildable against
-  a class the roster's own text calls un-gateable. A row's `last:` gains the corpus command the
-  sweep ran and the hit count it triaged, so the next close re-runs the predecessor's own oracle
-  instead of re-inventing a corpus, and a sweep that read nothing cannot stamp a verdict. What
-  stays un-gateable is the *judgment* on each hit; what stops being un-gateable is whether a
-  corpus was read at all.
-  **Why `[design-pending]`:** three classes on the roster have no single-command corpus (a
-  capability's "instances" are the tree set a scanner cannot infer — the reason they are on this
-  roster), so the unit must rule what a row with no derivable corpus stamps instead of a command,
-  and an honest "these rows stamp a named surface list" may be the answer for some of them.
-  **Cost while deferred:** compounding and paid at the boundary the roster exists to hold — every
-  close re-derives each class's corpus from scratch, and the roster's whole value is a cadence
-  claim it currently cannot evidence. The two closes above are the attested instances.
-  Filed 2026-08-09 by close (`install-profile-seam`), draining the criterion-5 staleness bullet:
-  the bullet's own finding is fixed in this close, and this entry is the mechanism half of it.
-  It is the generalization `check-measured-claim` names as the scope-claim axis it cannot
-  reach, and is cross-referenced there rather than folded into it — that entry designs a scanner
-  over authored prose, this one designs a stamp over a session act.
-  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set** as the corpus half
-  of the row grammar; `audit-roster-mechanism-has-no-kit-owner` records the set's argument.
-
 - **qualified-pointer-section-ownership** [design-pending] [cost: event/high] [surface: canon-kit] — `check-spec-pointer` asserts a
   cited `§Heading` **exists**, never that it is the heading which *owns* the cited claim, so a
   fully-qualified pointer aimed at the wrong section resolves and reds nothing.
@@ -1879,55 +2015,6 @@
   **Cost while deferred:** a pointer that reads as precise and resolves elsewhere, which is worse
   than a broken pointer because nothing signals it.
   Filed 2026-08-13 by close, draining the gap inbox; both SPEC headings re-read at the drain.
-
-- **close-eviction-refiles-without-checking** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — close's backlog-eviction step
-  files its finding without checking whether a prior close already filed it, and has now done so.
-  **Self-demonstrating instance, found at this close:** the queue carried two entries for one
-  finding — `icebox-worklist-roadmap-blind` (filed 2026-08-09) and
-  `icebox-candidate-roadmap-filter` (filed 2026-08-13) — with the *same* three-row measurement in
-  both bodies. Merged at this close into the elder slug, which was the one carrying an inbound
-  citation; both have since retired.
-  **The shape generalizes past that step.** Any close-stage sweep that files from a *recurring*
-  worklist will re-file on the next iteration unless something checks; the eviction worklist is
-  simply the sweep that recurs most reliably, because its input is stable by construction.
-  `check-task-conservation` does not catch it — two distinct slugs carrying one finding is
-  conserved.
-  **Candidate fixes, none ruled:** a duplicate-finding check at filing time (needs a similarity
-  oracle, probably not buildable); or the cheaper direction — have the recurring sweeps *state*
-  their prior filing, so the next close reads a pointer instead of re-deriving. The second is the
-  same receiving-side shape `handoff-premise-reverification-placement` argues for.
-  **Cost while deferred:** one duplicated entry per recurring sweep per close, each of which then
-  has to be found and merged by a later close reading 5000 lines of queue.
-  recurrence: close-eviction-refiles-without-checking 2026-08-23
-  **FIRST RECURRENCE, 2026-08-23, self-demonstrating TWICE in one close and generalizing the
-  entry past its own step.** `leak-guard-and-assertion-meta-gate-port`'s close filed two gap
-  bullets that each re-derived a live entry, and withdrew both once an audit sweep surfaced the
-  owners. One came from the eviction step, re-filing `icebox-candidate-eligibility-unapplied`
-  (since retired) with the same roadmap-tag measurement for the FOURTH time across four
-  closes. The other came
-  from the PROMPT-FRICTION triage, re-deriving `guard-read-steer-tool-coverage`'s awk question
-  from the log — which is the paragraph above confirmed rather than merely restated: the shape
-  is any close-stage sweep whose input recurs, and the eviction step is only its most reliable
-  instance. It also settles which candidate fix is reachable. A similarity oracle is not needed
-  to catch either: both owners were found by a plain slug-and-subject grep of the queue, so the
-  cheap direction is not merely cheaper but sufficient — the missing step is a *lookup before
-  filing*, and neither sweep performed one. The contaminated measurement that came with the awk
-  bullet is a second cost the entry had not priced: a re-derived finding also re-measures, and
-  a worse measurement can overwrite a better one if the duplicate is promoted rather than caught.
-  **THIRD INSTANCE, 2026-08-23, and the SHARPENING is the datum rather than the count.**
-  `battery-runner-port`'s close read the audit-roster row `close-surface-actually-read` — which
-  already carried the prior close's finding that reading a capture surface is not the same act as
-  checking the queue for the owner — then filed five bullets that DID grep for an owner and one
-  that did not. The one that skipped it arrived off the **eviction worklist** rather than a capture
-  log. So the rule is neither unwritten nor unread: it was applied per-bullet by habit instead of
-  as a step, and the bullet arriving through the surface the row does not name is the one that
-  missed. The generalizable form is narrower and sharper than that row's wording — **the
-  owner-check is owed by every filing, not only by one read from a capture log** — and it is a
-  *lookup step*, which is exactly the cheap candidate fix above rather than a new one.
-  Filed 2026-08-13 by close, from its own backlog-eviction step.
-  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set**, feature-class
-  because an owner-check owed by every filing is a contract other stages honor. The set's argument
-  lives on `audit-roster-mechanism-has-no-kit-owner`.
 
 - **install-disposition-smoke-accounting-split** [design-pending] [cost: event/low] [surface: gate-sdk] — the precommit gate checks smoke
   registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
@@ -3435,57 +3522,6 @@
   Census command and count landed 2026-09-05 by close, on the lead's ruling that a close moving
   the number without landing its measurement pattern reproduces the defect one iteration later;
   both re-derived 2026-09-05 by build when its own cuts moved the corpus.
-
-- **audit-roster-row-carry-unruled** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — every close appends its sweep reading to
-  the audit-roster row it swept and nothing ever compacts one, so the file has grown past the
-  point where the close step that must read it can.
-  **Why the read is degraded, not merely long.** The Read tool refuses the whole file at a 256KB
-  cap, so the close skill's mandated **Audit-roster review** sub-step
-  (`.claude/commands/close.md:36`) can only reach a row through hand-built substring probes — it
-  reads the slug, `due:` and `last:` while structurally NOT reading the accumulated body those
-  fields exist to be judged against.
-  **The design question this waits on, and why no session may just pick one.** Three shapes are
-  visible and none is costed: compact each row to its current standing reading and let git history
-  hold the retired ones; split one row per file under a roster directory; or cap a row and force
-  the appending close to compress. Which is right turns on whether a row's accumulated prior
-  readings are load-bearing for a later judge or are history — and
-  doctrine-kit/DOCTRINE.md's Enforcement-first cadence clause, which owns this roster, says
-  nothing about the roster's own carry. Any of the three adds a name to a governed surface, so
-  this is feature-class and owes an amendment.
-  **A second fact about the same surface, folded in because a remedy for one touches the other:**
-  the file is TRACKED, so the close-surface derivation's capture-tier arm never reaches it and it
-  appears in no `--emit close-surfaces` row, declared or otherwise. That is the situation
-  CLAUDE.md §Housekeeping handles for `.workflow/preflight-valve.txt` with an explicit
-  `close-surface:` declaration and a stated reason; the audit roster has none. It is not UNREAD,
-  so this is a declaration asymmetry between two same-class surfaces and not a missed read.
-  **Cost while deferred:** recurring and accumulating — each close adds roughly 7KB and performs
-  a degraded review, so the mandated step's evidentiary value falls every iteration while the
-  roster keeps its authority. That live per-close trigger is why the icebox tier's
-  "no named event waiting to promote it" test fails here, and the machinery-class default
-  (TRAJECTORY.md, 2026-08-30) is defeated on the tier's own eligibility rule rather than ignored.
-  **NOT ASSERTED:** nobody has measured how much of a row's body a later judge actually uses.
-  **The measured series, each point taken at its own boundary and none forecast:** 270392 bytes /
-  11 lines at this drain; **280394 / 11 on 2026-09-04**, plus 10002 over one close and ABOVE the
-  roughly 7KB the cost line forecasts, so that forecast is understated rather than generous;
-  **214955 / 12 on 2026-09-06**, 65KB BELOW it, so growth is not monotone once a compaction lands
-  and the cost line prices appends rather than the file; **231607 / 11 on 2026-09-07**, one row's
-  single line at 65680 characters, about 80k tokens; **312154 / 13 at scope 2026-09-16**.
-  **The second point bears on WHICH shape is right, not merely on size.** Those 10KB were one
-  close's appends to FIVE rows that came due at once, and they came due because that iteration
-  deleted a shell file and recorded a ruling. So append size is driven by ITERATION SHAPE rather
-  than by the row, and capping a row per close — the third shape — would truncate hardest in
-  exactly the case the roster exists for.
-  **The FIRST shape has been run by accident and it lost a mandatory field — 2026-09-05.** A close
-  compressed the `internal-identifier-restatement` row from 72073 to 2588 characters and the
-  header-mandated `due:` field went with the prose, unreadable until the same close restored it
-  (the field sat 43311 characters into the row, at `b2cedcd3`). So "compact each row" is not safe
-  unattended: a compression pass reads an accreted row as prose, and the grammar is graded by
-  nothing.
-  recurrence: audit-roster-row-carry-unruled 2026-09-07
-  Surfaced 2026-09-04 by `usage-verdict-cut`'s close, drained at the next scope; re-filed 2026-09-07
-  with no new axis, drained as the `recurrence:` stamp (`lead, own-authority` 2026-09-07).
-  **Directed 2026-09-16 at scope as `audit-roster-and-refiling-cut`'s LEAD unit**; its carrier
-  `audit-roster-mechanism-has-no-kit-owner` holds the set and its composition argument.
 - **upgrade-smoke-producer-leaks-worktrees-on-signal** [design-pending] [cost: event/high] [surface: gate-sdk] — the upgrade-smoke arm
   removes its worktrees on its own exit paths and traps no signal, so a run killed from outside
   leaks every checkout it created.
@@ -3896,29 +3932,6 @@
   iteration could drain; promoted here at the next scope, so the record is late and says so.
 
 
-
-- **audit-roster-last-stamp-author-unconstrained** [design-pending] [cost: event/low] [surface: lifecycle-kit]
-  — the audit roster assigns each row's `last:` stamp to the CLOSE-STAGE review in its own header,
-  and any stage can write it with nothing refusing, so a row can read as close-audited when no
-  close audit ever ran.
-  **Attested at `couples-resolver-reach`.** The unresolvable-walk-root row left the build stage
-  carrying `last: couples-resolver-reach`, written by build at `8ac5e006`/`e4001f83`, and that
-  close found the row already stamped before performing its own verification. The verification
-  happened to hold — the live oracle reported 52 covered against 51 skipped, matching the row text
-  exactly — which is what makes the class invisible: a pre-stamp is indistinguishable from a
-  performed audit, and the one case where it is wrong looks identical to the many where it is right.
-  **NOT A VIOLATION BY BUILD in substance** — build had just moved the population and the row would
-  have been stale otherwise — so the open question is whether the roster should admit a non-close
-  stamp with an author field or refuse one outright.
-  **Why `[design-pending]`:** the candidates are a `<stage>` field beside `last:`, or a gate
-  asserting the stamping commit carries a close stamp in `.workflow/WORKFLOW-STATE.txt`. The first
-  adds a name to a governed grammar; the second is a shallow assertion. Either lands on the same
-  roster grammar `audit-roster-row-carry-unruled` opens, so one amendment plausibly answers both.
-  **Cost while deferred:** the roster's own header states an authority its rows cannot be held to.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its audit-roster
-  review; drained and promoted at this iteration's scope.
-  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set** as the stamp-author
-  half of the row grammar; the carrier entry named above records the set's argument.
 
 - **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
