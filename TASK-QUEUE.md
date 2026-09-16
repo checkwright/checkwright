@@ -4496,3 +4496,14 @@
 - payload-withholds-kit-specs
 
 ## Lessons Learned
+
+- A gate's Rust module can back both a kit-owned `gate-tests/` fixture pair and
+  this repo's own repo-native one under `scripts/gate-tests/` — the payload-
+  withholding build (d2fbbd2a) narrowed `check-docs-nav-reachable`'s
+  suffix-link rule and re-derived the coupled kit-owned readers it named, but
+  `scripts/gate-tests/check-docs-nav-reachable`'s own `good` fixture is not a
+  kit-owned reader any commit-time roster names, so it went stale and only
+  surfaced at validate's `scripts` suite. A gate-behavior change should re-run
+  (or at least grep for) every `gate-tests/good/` and `bad/` tree the touched
+  module's own name appears under, kit-owned or not, before calling the
+  fixture-pair contract discharged.
