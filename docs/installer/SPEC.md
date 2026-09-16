@@ -39,8 +39,9 @@ a build product, and the linter that governs every other script in the repositor
 governs the bash one — the PowerShell half has no such linter here and its oracle
 is its own install-smoke leg instead, which is the trade §The install boundary's
 parity ruling accepts. What the two scripts amount to is small and fixed by that
-section's five steps: resolve, select, verify, execute. There is no third thing a
-reader has to review before running an install.
+section's own step sequence, which the bash half labels step by step in its
+`# spec:` comments. There is no third thing a reader has to review before
+running an install.
 
 ## Requirements
 
