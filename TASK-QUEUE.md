@@ -3317,10 +3317,10 @@
   hit being the event deixis delta 1's corollary makes the discriminator. It misses a retired slug,
   a cut ordinal and a port date, which a supplementary grep for `operator`, `lead,` and `2026-0`
   picks up; it reaches the landed slices too, so a hit there is **accretion**, not an unswept site.
-  **MEASURED 2026-09-16 at close: canon 2, drift 1, site 1, gate-sdk 1 (accretion), doctrine 0 on
-  slugs but carrying port chronology, evidence 0 on both. STILL OWING: canon, doctrine, drift,
-  site — FOUR.** evidence-kit alone leaves; a gap bullet proposing to drop site-kit with it was
-  measured false and site-kit stays.
+  **MEASURED TWICE 2026-09-16, AND THE TWO READS DISAGREE ON site-kit.** A dated-marker read gives
+  canon 2, doctrine 1, drift 7-8, site 0, evidence 0 and is the better sizing; the slug scan adds a
+  site-kit queue-slug citation a dated read structurally cannot see, plus one in gate-sdk
+  (accretion). **STILL OWING: canon, doctrine, drift, site — FOUR**; evidence-kit alone leaves.
   **IT BELONGS IN `Deferred`, NEVER `Done`, AND IT DEMOTES AT BUILD, NEVER AT CLOSE** (`lead,
   own-authority`, 2026-09-06): the deliverable is a corpus, so the next cut re-promotes with its
   own amendment (canon-kit/SPEC.md §Merging an amendment), and `check-stage-entry` assertion B
@@ -4626,9 +4626,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- provenance-ownership-recording-rule-assigns-into-kit-specs
-- installer-readme-usage-tier-split
-- payload-withholds-kit-specs
 
 ## Lessons Learned
