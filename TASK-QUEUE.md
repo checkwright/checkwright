@@ -12,6 +12,34 @@
 
 ## New Features
 
+- **installer-readme-usage-tier-split** [spec: SPEC-installer-front-door.md] —
+  `installer/README.md` is the npm-visible package README and a 3,201-line, 216,970-byte
+  design record, so the package page and the tarball lead with mechanism grounds where usage
+  belongs. The record becomes `installer/SPEC.md`, kept off `package.json`'s `files` roster so
+  it ships in neither tarball; the README is re-authored as the activation surface.
+  **Deliverable:** the section-for-section move, a fresh short README owning the usage tier,
+  and the citation sweep — measured at 43 tracked files and roughly 459 instances into 16
+  sections, correcting the 17-files/14-sections this entry carried while deferred.
+  `CLAUDE.md` §Housekeeping's layout pointer and `docs/install.md`'s references move with it.
+  Both open design questions — the usage tier's owner and what a governed `installer/SPEC.md`
+  admits — are ruled in the amendment.
+  Promoted 2026-09-16 at spec, as `installer-front-door-cut`'s second unit. **Lands before the
+  lead unit below:** it relocates five of the sections that unit edits.
+
+- **payload-withholds-kit-specs** [spec: SPEC-payload-withholding.md] — the customer payload
+  packs every kit root whole (`git archive` per root at `native/src/emit/pack_installer.rs`),
+  so the kit SPECs and `smoke/` trees ride along as 69.8% of its bulk. The payload withholds
+  both, and a shipped gate's `# spec:` pointer resolves to the site's SPEC mirror instead.
+  **Deliverable:** the packer exclusion, the `gate-sdk/SPEC.md` §Consumer payload amendment
+  with its restatements at `docs/install.md` §What a gate discloses and `installer/README.md`
+  §What this package is, the four kit READMEs' nine own-SPEC links, the site's reference tier,
+  and the installer smoke's two new assertions. The grounds and the refused alternative are in
+  the amendment; the measured blocker it resolves is that drift-kit and guard-kit carry no
+  `checks/`, so withholding `smoke/` alone would drop both from the derived kit-root set in a
+  vendored tree, silently and with no red.
+  Promoted 2026-09-16 at spec, as `installer-front-door-cut`'s lead unit. Its terminal move
+  discharges the standing ruling recorded in `TRAJECTORY.md` under this slug.
+
 ## Technical Debt
 
 ## Deferred
@@ -238,67 +266,6 @@
   Whether any hook payload carries that line is unmeasured. The liveness log records the
   `background_tasks` key and not its contents.
   recurrence: harness-moved-background-task-unrecorded 2026-09-14
-
-- **payload-withholds-kit-specs** [design-pending] [cost: event/high] [surface: installer] — the customer payload packs every kit root
-  whole (`git archive` per root at `native/src/emit/pack_installer.rs`), so the kit SPECs ride
-  along as its bulk. **Operator ruling at consult, recorded in TRAJECTORY.md under this slug:**
-  the payload withholds each kit's SPEC and its `smoke/`, and a shipped gate's pointer resolves
-  to the site's per-kit SPEC mirror under docs/.
-  **Measured, not reasoned.** Tracked payload bytes: 4.51 MB. The eleven kit SPECs: 2.65 MB,
-  38,653 lines, 59% of it; gate-sdk's alone 1.2 MB and 17,224 lines, of which the porting section
-  is 5,406 and 50 of its 103 sections are cited by no shipped file (53 are; 73 more only from
-  the crate, which never ships). The smoke scripts refuse a bare invocation by their own header
-  and run only this repo's suites.
-  **Not load-bearing for a customer:** canon-kit's finders prune vendored kit roots, so the
-  spec-pointer gate never resolves a vendored gate's pointer; what explains a red offline is the
-  descriptor's one-line invariant, which ships. This tree keeps its SPECs; nothing here changes.
-  **Deliverable, five parts.** (a) A packer exclusion — kit-root SPEC and smoke, a declared shape
-  applied per root inside the tracked-set copy, never a per-kit list. (b) The amendment to
-  gate-sdk/SPEC.md §Consumer payload: the second member becomes the pointer, resolvable on the
-  published mirror, with the restatements at docs/install.md §What a gate discloses and
-  installer/README.md §What this package is corrected in the same unit. (c) Kit README links to
-  their own SPEC (gate-sdk 3, lifecycle-kit 11, canon-kit 1, delegation-kit 1) point at the site.
-  (d) The site keeps the mirror as an unlinked reference tier reached from a pointer, and its
-  front nav leads with install and the per-kit READMEs. (e) The consumer smoke asserts a
-  vendored tree carries no SPEC.
-  **Why [design-pending]: two shapes are open.** Whether the exclusion is a packer literal or a
-  per-kit declaration of non-shipping paths; and whether the pointer line gains a URL form or the
-  site resolves a kit path plus heading by convention.
-  **Refused, with grounds:** a generated extract of only the cited sections — offline reading for
-  a reader the site already serves, at a projection plus a freshness gate; keep shipping whole
-  SPECs — 59% of the payload for that same reader, and the seam-leak surface
-  `kit-spec-seam-content-half-unswept` and `kit-spec-consumer-config-literal` track stays
-  customer-visible.
-  **Cost while deferred:** every tarball and npm package ships its engineering record as its
-  bulk, and the seam-leak surface stays in customers' trees.
-  Filed 2026-09-11 by consult, an operator-directed direct entry.
-  **Directed 2026-09-16 at scope, lead-relayed, as `installer-front-door-cut`'s LEAD unit**, with
-  `installer-readme-usage-tier-split` as the second. The set's economic argument, recorded because
-  no gate reads it: bundled — this entry leads and that one joins; the shared surface is the
-  installer, and more tightly the single activation surface a prospective adopter meets — the
-  package page, the published tarball, and the docs/install.md and gate-sdk/SPEC.md §Consumer
-  payload text describing both. The two were filed beside each other by one consult and neither is
-  correctable without touching the other's files. The direction is revisable at a later scope or
-  spec; it is not a ruling and no ruling record carries it. Both entries are features, so the
-  authoring stage promotes them and writes the amendment.
-
-- **installer-readme-usage-tier-split** [design-pending] [cost: event/high] [surface: installer] — `installer/README.md` is the
-  npm-visible package README and a 3,182-line, 216 KB design record, so the package page and the
-  tarball lead with mechanism grounds where usage belongs.
-  **Operator ruling at consult: split it.** A short README — requirements, quick start, the verbs
-  table, profiles, and where the design lives — and the design record renamed to the installer's
-  own SPEC. Seventeen files carry pointers into fourteen of its sections, a mechanical rename
-  sweep (delegable); CLAUDE.md §Housekeeping's layout pointer and docs/install.md's references
-  move with it.
-  **Why [design-pending]: the usage tier's owner.** docs/install.md already carries quick start
-  and the verbs, so the README either points at the site (content-tiering: point, never restate)
-  or carries the copy an offline npm reader needs; and an installer SPEC joins canon-kit's
-  governed spec set by name, which is right but changes which gates read it.
-  **Cost while deferred:** every npm page view and tarball reader meets a design record at the
-  activation surface's front door, against the time-to-first-value objective.
-  Filed 2026-09-11 by consult as a direct entry, beside `payload-withholds-kit-specs`.
-  **Directed 2026-09-16 at scope, lead-relayed, as `installer-front-door-cut`'s second unit**; the
-  set's composition argument is recorded on the lead entry above.
 
 - **config-variant-battery-harness** [design-pending] [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
   battery under a named config-seam variant and see what changes; the fixture pairs prove each
