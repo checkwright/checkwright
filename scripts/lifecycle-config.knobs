@@ -35,6 +35,8 @@ LIFECYCLE_KIT_RULING_CITERS[] = CLAUDE.md
 LIFECYCLE_KIT_RULING_CITERS[] = */SPEC.md
 LIFECYCLE_KIT_RULING_CITERS[] = doctrine-kit/DOCTRINE.md
 LIFECYCLE_KIT_RULING_CITERS[] = .workflow/audit-roster.txt
+# spec: lifecycle-kit/SPEC.md §The audit roster — this repo keeps a roster; its advisory close-surface declaration lives in the close binding
+LIFECYCLE_KIT_AUDIT_ROSTER_FILE = .workflow/audit-roster.txt
 # spec: lifecycle-kit/SPEC.md §check-scratch-citation — this repo's widening beyond the kit default (the queue alone): the governed spec set, the other permanent surface where a carried finding wants to land. The array replaces rather than extends, so the queue is restated here.
 LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS[] = TASK-QUEUE.md
 LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS[] = */SPEC.md

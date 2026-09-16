@@ -20,7 +20,7 @@ drift-kit/SPEC.md §The overhead meter owns: it logs the governance-vs-task
 proportion, the per-session producer feeding `kpi-overhead`. The drain's commit
 message states the health triad beside its `qnet` fragment — `qnet`, the
 always-loaded delta with the `--growth` figure, and `kpi-overhead`'s share — with the
-cause when one moves the wrong way. The template's brevity pass (step 10) is
+cause when one moves the wrong way. The template's brevity pass (step 11) is
 context-kit/templates/close-brevity.md, run whole — its re-baseline step included.
 **The three are read against a stated
 expectation, and it is the operator's:** `qnet` at or below zero, governed prose
@@ -44,13 +44,11 @@ queue-kit/SPEC.md §The tag algebra.
 
     close-surface: .workflow/preflight-valve.txt advisory
 
-  - **Audit-roster review** — read `.workflow/audit-roster.txt`; for each
-    un-gateable class, judge which `due:` events fired since its `last:` stamp,
-    then perform or explicitly defer each due audit (a deferral is costed per
-    the Gap-disposition rule, not flagged-and-skipped) and set `last:` to this
-    iteration for every audit performed. This is the cadence the
-    Enforcement-first carve-out owes (doctrine-kit/DOCTRINE.md
-    §Methodology-maintenance rules).
+  - **The audit roster is a roster row this binding declares.** It is tracked, and
+    its knob is this repo's config.
+
+    close-surface: .workflow/audit-roster.txt advisory
+
   - **Backlog eviction** — the worklist is `bash gate-sdk/bin/run-gates.sh --emit
     queue-index --icebox-candidates`; disposition each row: evict (rewrite the lead line
     as a self-contained sentence dropping its `[cost:]` and `[surface:]` tags,

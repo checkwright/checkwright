@@ -218,13 +218,25 @@ session.
    work being done — that discharge is recorded on the record as a closed-ruling
    line, because it leaves no landed unit and no queue trace, so a later session
    reading only the directive re-derives the whole investigation.
-8. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
+8. **Review the audit roster**, where `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` names one
+   (lifecycle-kit/SPEC.md §The audit roster). For each class block, judge which
+   `due:` events fired since `last:`. A `last:` naming a stage other than this one
+   is a pre-stamp, so read it as unreviewed. Perform each due audit, or defer it as
+   a costed filing. For each audit performed:
+   - Derive the corpus from `scope:` and this iteration's range, taking the
+     predecessor's `corpus:` as a floor.
+   - Run it, and triage every hit.
+   - **Replace** `last:`, `corpus:`, `hits:` and `declined:`.
+   - Fold a reading that changes the next sweep into `scope:` by re-phrasing.
+
+   The sweep's narration and findings go in the commit message, never on the roster.
+9. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
    introduced this iteration (log, cache, scratch dir) has a named cleanup
    trigger: a write-path needs a paired reclaim-path. For a workflow-directory
    artifact the roster already answers it: the `reclaim=` field is that named
    trigger, and `check-close-surfaces` blocks a capture-tier declaration without
    one. What stays a judgment here is the artifact *outside* that directory.
-9. **Release disposition** — run after the surface-mutating steps above and
+10. **Release disposition** — run after the surface-mutating steps above and
    **before** the brevity pass (the disposition note is itself such a write).
    Every close dispositions the iteration at the release boundary: read the
    consumer's release policy (the `release-policy` slot below) and either
@@ -246,7 +258,7 @@ session.
    citation, the disposition-evidence path, and any boundary-only sub-procedures
    (e.g. a major-only deprecation sweep); or a plain "no release process — every
    iteration stamps none" line for a consumer without one.>*
-10. **Brevity pass on every governed prose file** — run this **last**, after
+11. **Brevity pass on every governed prose file** — run this **last**, after
    every surface-mutating step above. Scope by principle, not a fixed list:
    every surface injected into each agent session, and every file that grew
    since the last close. Staleness asks *is it still true?*; brevity asks *is
@@ -254,9 +266,9 @@ session.
    outdated context goes to git history. No file is exempt: an on-demand file
    pays at every open, and one a stage opens each iteration is always-loaded in
    effect.
-11. **Optionally merge** — an iteration can close without merging if validate
+12. **Optionally merge** — an iteration can close without merging if validate
    is incomplete or a follow-up iteration is planned.
-12. **The push precondition — select the writing identity, immediately before
+13. **The push precondition — select the writing identity, immediately before
    each push.** Any push this stage makes runs the consumer's identity
    precondition first, and that holds for the *ordinary* close push and not only
    for a release. It is **per-push,
