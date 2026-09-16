@@ -6,3 +6,4 @@
 
 queue-arm-report-fidelity scope ae2a67fd 2026-09-16 f60e3612
 queue-arm-report-fidelity spec a5fa73f4 2026-09-16 7c334edd
+queue-arm-report-fidelity align a85838f8 2026-09-16 3c16e49a
