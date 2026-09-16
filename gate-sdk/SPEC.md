@@ -1548,6 +1548,19 @@ escape for whole-tree scanners whose state has no static-fixture representation
 a stopgap is filed as debt and fixtured, never given a dishonest "infeasible"
 reason.
 
+**A behaviour change discharges the contract per *case dir*, and no manifest
+enumerates them.** `couples=` names a gate's **corpus**, never the pair that
+proves it, so a change re-derived from the `# graph:` manifest reaches every
+coupled reader and still never reaches the fixture. The pair also sits in the
+tests-dir of whoever owns the **descriptor**, which need not be whoever owns the
+implementation module: a consumer-registered gate implemented in the shared
+binary has its only pair under the consumer's tests-dir, outside every kit-owned
+roster. So a rule narrowed in a module discharges the contract only once every
+`<tests-dir>/<gate>/` for the gates that module backs has been re-run — kit-owned
+and consumer-owned alike. Skipping it is invisible at commit time, because the
+pre-commit battery runs gates and not fixture suites; the earliest reader is
+whatever stage runs the suites.
+
 **Stated non-target: an invariant whose `bad/` case would itself be unshippable
 payload content cannot take the pair form, and takes a producer-side refusal
 instead.** The worked instance is *the packed set carries no tracked symlink*

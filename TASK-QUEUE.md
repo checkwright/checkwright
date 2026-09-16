@@ -3307,55 +3307,55 @@
   spawn sites themselves; this is the declaration grammar every registry member shares.
   Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
 
-- **kit-spec-provenance-seam-sweep-remainder** [design-pending] [cost: iteration/high] [surface: canon-kit] — FIVE kit SPECs still carry this
-  project's ruling provenance, plus the seam gate that goes green only once the last is swept.
-  gate-sdk landed with the parent split; context-kit and guard-kit landed as the first slice, 14
-  sites; lifecycle, delegation and queue landed 2026-09-06 as the second, ~38 sites. **STILL
-  OWING: canon, doctrine, drift, site, evidence.**
+- **kit-spec-provenance-seam-sweep-remainder** [design-pending] [cost: iteration/high] [surface: canon-kit] — the kit SPECs that still
+  carry this project's ruling provenance, plus the seam gate that goes green only once the last is
+  swept. gate-sdk landed with the parent split; context-kit and guard-kit as the first slice (14
+  sites); lifecycle, delegation and queue 2026-09-06 as the second (~38).
+  **THE REMAINDER IS DERIVED, NEVER FROZEN** — a frozen count here has been wrong twice, and the
+  rank order below settles nothing about it. The lower-bound oracle is a slug scan: every live
+  `TASK-QUEUE.md` lead-line slug of twelve characters or more, grep'd against each `*/SPEC.md`, a
+  hit being the event deixis delta 1's corollary makes the discriminator. It misses a retired slug,
+  a cut ordinal and a port date, which a supplementary grep for `operator`, `lead,` and `2026-0`
+  picks up; it reaches the landed slices too, so a hit there is **accretion**, not an unswept site.
+  **MEASURED 2026-09-16 at close: canon 2, drift 1, site 1, gate-sdk 1 (accretion), doctrine 0 on
+  slugs but carrying port chronology, evidence 0 on both. STILL OWING: canon, doctrine, drift,
+  site — FOUR.** evidence-kit alone leaves; a gap bullet proposing to drop site-kit with it was
+  measured false and site-kit stays.
   **IT BELONGS IN `Deferred`, NEVER `Done`, AND IT DEMOTES AT BUILD, NEVER AT CLOSE** (`lead,
   own-authority`, 2026-09-06): the deliverable is a corpus, so the next cut re-promotes with its
   own amendment (canon-kit/SPEC.md §Merging an amendment), and `check-stage-entry` assertion B
-  refuses a validate entry on a non-empty active queue. TRAJECTORY.md §The closed rulings'
-  `kit-spec-provenance-seam` grants scope the by-kit split, so a slice needs no waiver.
-  **OWED ON A RE-GROUNDED BASIS, 2026-09-06 — operator, direct answer to the lead session's ask,
+  refuses a validate entry on a non-empty active queue. **THE BY-KIT SPLIT NEEDS NO WAIVER, AND THE
+  AUTHORITY IS THIS ENTRY'S OWN RE-GROUNDING, NOT A RULING POINTER** — the paragraph this clause
+  cited was deleted from TRAJECTORY.md at the steering-vocabulary consult and the name no longer
+  occurs there. **RE-GROUNDED 2026-09-06 — operator, direct answer to the lead session's ask,
   lead-relayed:** the 2026-09-03 standing direction is SPENT and the operator chose RE-GROUNDING
-  over renewing it, so what carries this now is product-class with a live trigger on its own
-  accretion.
+  over renewing it, so what carries this is product-class with a live trigger on its own accretion.
   **DO NOT RE-AUTHOR THE PREDICATE OR RE-RUN THE SCAN — RECOVER IT** from the parent half's merged
   amendment, `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`: delta 1 is the discriminator (the
   seam decides the VOICE, never the content), delta 2 the taxonomy, delta 3 the move-versus-delete
   test. Delta 1's COROLLARY is the sizing lever — the test is the IDENTIFIER, never the tense — and
-  delta 2 excludes a dated MEASUREMENT, whose date is its freeze and must survive. That is also why
-  a date scan MISSES: the swept mass is event deixis — queue slugs, cut ordinals, port chronology.
-  **FOUR MORE RULES, recovered the same way from the second slice's `SPEC-seam-slice.md`:** a dated
-  attestation used as a rule's own SPECIMEN is not a stamp and stays; a LIVE procedural status is
-  swept and routes to the gap inbox, never migrated into the ruling record; where an attribution
-  abuts UNDATED numeric evidence the cut lands BETWEEN them; and a passage's self-declared sole-home
-  claim is evidence about the MECHANISM, never about the stamp.
-  **THE RANK ORDER ORDERS AND NEVER COUNTS** — lifecycle, delegation, queue, canon, doctrine,
-  drift, site, evidence. It failed quantitatively at ranks 3 and 6 over the first slice and held
-  monotonically across the second's three (20 > 11 > 7), adjudicating nothing about the five left.
-  **MOVE-VERSUS-DELETE IS ANSWERED THROUGH THE SECOND SLICE: NO SWEPT SITE WAS SOLE-HOME**, and
-  nothing migrated to TRAJECTORY.md from it either. drift-kit is STILL LAST TO OWE IT — its half of
-  the guard-kit §scratch-run spent pair, plus its spelling's fixture shape, a parenthetical date.
-  **THE POINTER CLASS STAYS OPEN and has now shipped intact for THREE consecutive units** — ten,
-  then nine, then two — of a class re-verified 2026-09-06 as still EXACT at 17 across five kit
-  SPECs (gate-sdk 10, guard-kit 4, canon-kit/delegation-kit/lifecycle-kit 1 each; queue-kit zero),
-  plus a `docs/`- and `BRIEF.local.md`-class the same question reaches. **RULED `lead,
-  own-authority` 2026-09-06 for the second slice: they STAY STANDING.** Answerable for every kit
-  SPEC at once or not at all, so **THE ANSWER IS OWED TO THE OPERATOR BEFORE THE SLICE THAT LANDS
-  THE GATE** and not before any earlier one — it reaches the provenance seam, a privacy boundary
-  before it is a design one. Right each time, and the count is the debt.
+  delta 2 excludes a dated MEASUREMENT, whose date is its freeze and must survive, which is also why
+  a date scan misses. Recover the second slice's four supplementary rules the same way, from
+  `SPEC-seam-slice.md` in the commit that merged it.
+  **MOVE-VERSUS-DELETE IS ANSWERED THROUGH THE SECOND SLICE: NO SWEPT SITE WAS SOLE-HOME**, nothing
+  migrated to TRAJECTORY.md, and drift-kit is STILL LAST TO OWE IT.
+  **THE POINTER CLASS STAYS OPEN**, has shipped intact for three consecutive units, and was
+  re-verified 2026-09-06 as EXACT at 17 across five kit SPECs, plus a `docs/`- and
+  `BRIEF.local.md`-class the same question reaches. **RULED `lead, own-authority` 2026-09-06: they
+  STAY STANDING.** Answerable for every kit SPEC at once or not at all, so **THE ANSWER IS OWED TO
+  THE OPERATOR BEFORE THE SLICE THAT LANDS THE GATE** — it reaches the provenance seam, a privacy
+  boundary before it is a design one.
   **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile.** It ships EXEMPTION-FREE:
   the gate-sdk/SPEC.md §The decisions this substrate already closed carve-out retired when the
   operator ruled (2026-09-16, consult) that the recording rule's split discharges the entry that
   held it open, and that section was swept under delta 1 in the same consult, pointers standing.
-  **DISCHARGE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and the gate
-  is green", so it survives until this entry lands WHOLE.
-  **Cost while deferred:** five published kit SPECs and every adopter's vendored copy carry private
-  ruling history as mechanism and pointers a consumer cannot follow; product-class and accreting.
-  Filed 2026-09-05 at scope with the split that created it; promoted and demoted 2026-09-06;
-  re-promoted at spec and demoted again at build 2026-09-06 for the three-kit slice.
+  **NO DISCHARGE LINE SURVIVES** — the directive paragraph that discharged on "that unit lands and
+  the gate is green" went with the ruling above, so this entry carries its own end condition: it
+  lands WHOLE, gate green, or it stays here.
+  **Cost while deferred:** the remaining published kit SPECs and every adopter's vendored copy carry
+  private ruling history as mechanism and pointers a consumer cannot follow; product-class, and
+  accreting measurably — gate-sdk re-acquired a slug citation after its own sweep landed.
+  Filed 2026-09-05 at scope with the split that created it; promoted and demoted twice 2026-09-06.
 
 - **bin-tool-help-arm-absent-tree-wide** [design-pending] [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
@@ -4186,15 +4186,36 @@
   queue-kit/SPEC.md §The icebox tier conserves: a dated `recurrence:` line is a live trigger, and
   a one-line entry has nowhere to carry one. The narrowing that iceboxed it is NOT re-opened here;
   what returned it is the first measured rate to size that narrowing against.
-  **The rate, measured across `queue-arm-report-fidelity`.** FIVE filed premises were probed FALSE
-  in one iteration: scope corrected two of its own filings and one relayed claim, and spec probed
-  two more false, one of them the lead unit's core claim — `retired-block-admits-live-gate-name`
-  asserted the arm marked a target that was never a queue entry, while `check-spec-pointer` DID
-  hold a lead line (deferred `1ea41bd7`, landed `5c1a85e6`).
+  **The rate, measured across `queue-arm-report-fidelity`: FIVE filed premises probed FALSE in one
+  iteration**, three corrected by scope and two by spec, one of them the lead unit's core claim.
   **Every unit survived with a corrected framing and nothing was wasted**, which is why this is a
   filing-quality datum and not a defect: the re-verification that catches these is all downstream,
   and it worked five times out of five. What the rate sizes is the narrowing itself — whether a
   signal at authoring earns its cost when the downstream catch rate is that high.
+  **TWO MORE POINTS AT `installer-front-door-cut`, AND BOTH WIDEN THIS ENTRY'S SUBJECT.**
+  (6) `SPEC-payload-withholding.md` delta 5 tied the presentation gap CAUSALLY to the withholding,
+  implying delta 1 would otherwise break the second shipped member's reason — which one head of a
+  shipped `.gate` file refutes: the descriptor ships, `checks/` is not withheld, the invariant was
+  reachable throughout. **RECURRENCE DECLINED, and the decline is the datum**: the lead filed this
+  as a false premise of unreachability and the spec session proved otherwise (no unreachability
+  claim occurs anywhere in the tree), so it was one OVERSTATED CAUSAL CLAUSE plus a lead relaying an
+  oracle's paraphrase as the tree's words. An overstatement does not count toward the rate.
+  (7) `SPEC-installer-front-door.md` delta 5 gave `check-value-rollup-fresh` a satisfying value
+  grounded on "the footprint's axis is the kit roster, which `installer/` does not join". Measured
+  FALSE at build: `native/src/emit/footprint.rs` derives its set from a `*/SPEC.md` glob over
+  top-level directories, so `installer/` joined the moment the file was named `SPEC.md`, and both
+  `docs/footprint.md` and `docs/value.md` gained a row and needed regeneration — neither on the
+  amendment's update-target roster. **RECURRENCE JUDGED**, idempotent against the date below.
+  **TWO AXES THE CLASS DOES NOT COVER, AND BOTH POINTS SHOW IT.** The subject was filed as a queue
+  ENTRY's compressed body; both of these were **authored in-iteration by a spec-stage AMENDMENT**
+  rather than inherited from an aged entry, and (7) was load-bearing for a delta's REACH — which
+  projections it had to regenerate — rather than for whether the work was worth doing. A signal
+  marking evidence tier on a queue entry alone reaches neither.
+  **WHAT (7) ASKS THAT DETECTION DOES NOT**, and why
+  `survey-inferred-claim-has-no-execution-obligation` was split out rather than folded in: the spec
+  survey flagged that exact claim as inferred-not-executed and said to run the arm before relying on
+  it. The disclaimer did its job; no later stage ran the arm, and align returned zero defects over
+  an amendment carrying a self-declared unrun probe. Executing it cost one emit arm.
   **Cost while deferred:** every entry filed at close-stage speed carries premises a session reads
   iterations later with no way to tell how much evidence stood behind them, and the whole
   correction cost falls on the reading stage.
@@ -4226,6 +4247,121 @@
   Recurrence filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could
   not drain it; returned at the following iteration's scope.
   recurrence: stage-economics-log-redates-rows 2026-09-16
+
+- **gate-fixture-fanout-arm** [design-pending] [cost: event/low] [surface: gate-sdk] — nothing
+  enumerates the fixture pairs a change to a shared implementation module has to re-run:
+  `--run-gate-tests` takes one tests-dir per invocation, and a gate's `# graph:` manifest names its
+  **corpus**, never its own pair, so re-deriving readers off `couples=` reaches every coupled file
+  and never the case dir that proves the rule.
+  **Measured, not asserted:** `check-docs-nav-reachable`'s descriptor is consumer-owned
+  (`scripts/check-docs-nav-reachable.gate`) while its implementation is in the shared binary at
+  `native/src/gates/docs_nav_reachable.rs`, and its only case dir is
+  `scripts/gate-tests/check-docs-nav-reachable/` — no kit tests-dir carries that name. The README's
+  per-kit runner roster is 11 hand-maintained invocation lines.
+  **Candidate, not ruled:** a `--gate-fixtures <gate>` fan-out that resolves every registered
+  tests-dir and runs each `<tests-dir>/<gate>/` pair it finds, so a behaviour change's discharge is
+  one command rather than a grep the author has to remember; a second candidate is deriving the
+  README's runner roster from the same resolution instead of maintaining it.
+  **Why `[design-pending]`:** whether the fan-out is a new arm, an argument shape on the existing
+  one, or a widening of what the pre-commit battery runs is the seam call, and the third option
+  buys commit-time enforcement at a runtime-budget cost nobody has measured.
+  **Cost while deferred:** every gate-behaviour change carries a manual obligation — grep every
+  `gate-tests/` tree for the touched module's name and re-run each pair found
+  (gate-sdk/SPEC.md §Fixture-pair discipline states it) — and missing it costs a stage-late repair
+  commit, which is how it was found.
+  Filed 2026-09-16 by `installer-front-door-cut`'s close, as the gap generalization owed by the
+  lesson that dispositioned to that SPEC section.
+
+- **survey-inferred-claim-has-no-execution-obligation** [design-pending] [cost: event/high] [surface: lifecycle-kit]
+  — the survey record lets a session mark a claim inferred-not-executed, which is the honest
+  disclosure the record exists for, and **no later stage is obliged to execute it**. The disclaimer
+  names the cheap command and then nothing consumes it.
+  **Measured, not asserted:** `installer-front-door-cut`'s spec survey recorded
+  "`check-value-rollup-fresh`'s exact behaviour on an `installer/SPEC.md` edit was reasoned from
+  `value_rollup.rs`'s join … rather than executed; run the arm before relying on it". Align
+  re-verified sizes, counts and knob-table locations on that amendment and returned zero defects;
+  build then measured the claim false and landed two unplanned projection regenerations. The
+  execution cost was one `--emit` arm.
+  **Candidate, not ruled:** an align-stage obligation to run every survey claim the record marks
+  inferred, or state per claim why it cannot be run — align already re-verifies an amendment's
+  figures, so the surface is the one already doing this work.
+  **Why `[design-pending]`:** whether the obligation is align's, whether the record needs a machine-
+  readable inferred marker for it to be checkable at all, and whether an unrun probe should block a
+  merge or only annotate it are three separate calls. A marker is also the difference between a
+  prompt and a gate here, and the record's grammar was not designed to carry one.
+  **Cost while deferred:** an amendment can merge carrying a premise its own survey declared unrun,
+  and the correction lands at build with whatever regenerations the false premise missed.
+  Split out at `installer-front-door-cut`'s close from `queue-entry-evidence-tier`'s seventh rate
+  point: that entry's subject is the missing evidence-tier SIGNAL, this one is the missing
+  EXECUTION obligation over a signal that already exists.
+
+- **overhead-meter-gate-output-classifier-blind** [design-pending] [cost: iteration/low] [surface: drift-kit]
+  — the overhead meter classifies the runner's per-`FAIL` invariant line as non-gate output, so a
+  line the battery prints is metered as task rather than governance.
+  **Measured rather than reasoned:** the line printed beneath every `FAIL`
+  (gate-sdk/SPEC.md §run-gates) matches no row of `native/src/emit/overhead_meter.rs`'s `MARKERS`
+  table under this repo's URL-resolved configuration, so it falls to the task bucket; with
+  `GATE_SDK_SPEC_BASE_URL` empty it carries `<dir>/SPEC.md` and lands in `govdoc` instead — the
+  classification depends on a knob that has nothing to do with what the line is.
+  **Candidate, not ruled:** give drift-kit's gate row the runner's four-space `spec: ` prefix as a
+  marker, a second spelling of `runner::SPEC_LINE_PREFIX` and the same cross-kit literal coupling
+  `PASS: check-` already is.
+  **Why `[design-pending]`:** whether a classifier change owes a SERIES BREAK is the real question.
+  The meter feeds a live measurement, and changing the classifier mid-series costs comparability the
+  correction does not buy back.
+  **Cost while deferred:** ~150 B per red gate against a transcript of megabytes — no reading moves,
+  which is why this was costed and deferred at build rather than fixed there.
+  Filed 2026-09-16 by `installer-front-door-cut`'s build to the gap inbox;
+  `SPEC-payload-withholding.md` delta 5 rostered this reader and asked only whether the line
+  INFLATES the gate count (answered no, correctly), never whether it should COUNT as gate output.
+
+- **vendored-kit-readme-spec-link-dangles** [design-pending] [cost: event/high] [surface: gate-sdk]
+  — a vendored kit README still links a `SPEC.md` its installed tree no longer carries. This is the
+  residual the payload-withholding unit's ninth delta NARROWED rather than closed.
+  **What already landed:** each of the eleven kit READMEs carries one sentence naming the
+  withholding and `GATE_SDK_SPEC_BASE_URL`, so a reader who meets the dead link has the answer on
+  the same page.
+  **Why the links themselves stay relative:** re-targeting them at the published location would put
+  the publisher's host in eleven kit files — the kit literal the `<KIT>_<KNOB>` convention exists to
+  prevent, and the cost gate-sdk/SPEC.md §Consumer payload already counts when it refuses a URL form
+  for the pointer grammar — and would break canon-kit/SPEC.md §The reference-link grammar's
+  one-to-one mirror topology, `docs/<kit>/README.md` being a byte projection of the source.
+  **Candidate, not ruled:** resolve a kit README's own-SPEC link target from
+  `GATE_SDK_SPEC_BASE_URL` **at pack time**, the way a shipped `# spec:` pointer already resolves,
+  so the packed README carries the published target while the tracked one keeps its relative link
+  and its mirror topology.
+  **Cost while deferred:** 18 links across 11 kit READMEs dangle in every installed tree; a reader
+  who clicks one gets a missing file and has to read the sentence beside it.
+  Filed 2026-09-16 at the lead's direction during `installer-front-door-cut`, so a later scope reads
+  a known limit rather than rediscovering a defect.
+
+- **docs-cmd-knob-definition-site-withheld** [design-pending] [cost: event/low] [surface: gate-sdk]
+  — `check-docs-cmd`'s defined-knob set loses every knob whose only tracked kit-root occurrence
+  lives in `smoke/`, now that the payload withholds `smoke/`. The subject is where a kit's knob
+  names are DEFINED, not what the payload carries.
+  **Measured THREE members, not the five this was filed with.** The filing named five knobs whose
+  only kit-root occurrence is under `smoke/`; re-probed at the close drain, two of them are static-
+  table rows after all and `knobs::static_names()` covers them — `CONTEXT_KIT_BREVITY_SECTIONS` is
+  `Row::indexed` in `native/src/knobs/context_kit.rs` and `CANON_KIT_GLOSSARY_FILE` is `Row::scalar`
+  in `native/src/knobs/canon_kit.rs`. **The exposed set is `LIFECYCLE_KIT_SESSIONS_DIR`,
+  `DRIFT_KIT_ITERATION_START` and `DRIFT_KIT_SMOKE_CUSTOM`**: no row for any of the three occurs
+  anywhere under `native/src/knobs/` outside test bodies, `lifecycle_kit.rs` and `drift_kit.rs` both
+  carry `env_only: &[]`, and drift-kit's own SPEC calls `DRIFT_KIT_SMOKE_CUSTOM` "a name no table
+  declares".
+  **Mechanism:** `native/src/gates/docs_cmd.rs`'s `defined_knobs()` greps raw kit roots
+  (`walk::kit_roots_rel`, unpruned) excluding only `*.md` and `*/gate-tests/*`, and unions
+  `knobs::static_names()`; a knob in neither is reported as "env knob X occurs in no tracked kit
+  source".
+  **NOTHING REDS TODAY and that is why it is filed rather than fixed** — a stock consumer's seeded
+  docs cite none of the five, and `check-docs-cmd` is green in this tree (run, not assumed).
+  **Why `[design-pending]`:** whether a knob a kit reads must have a shipped non-smoke definition
+  site at all is the ruling, and only after it is whether the repair is table rows, an `env_only`
+  entry, or widening what `docs_cmd` counts as a definition.
+  **Cost while deferred:** an adopter who documents one of the three meets a hard fail they cannot
+  satisfy — the knob is real, and documented in a kit SPEC they do not have.
+  Filed 2026-09-16 at the lead's decision during `installer-front-door-cut`'s build; its sizing
+  corrected from five to three at that iteration's close drain, by re-probing the static tables the
+  filing asserted were empty.
 
 ## Icebox
 
@@ -4496,14 +4632,3 @@
 - payload-withholds-kit-specs
 
 ## Lessons Learned
-
-- A gate's Rust module can back both a kit-owned `gate-tests/` fixture pair and
-  this repo's own repo-native one under `scripts/gate-tests/` — the payload-
-  withholding build (d2fbbd2a) narrowed `check-docs-nav-reachable`'s
-  suffix-link rule and re-derived the coupled kit-owned readers it named, but
-  `scripts/gate-tests/check-docs-nav-reachable`'s own `good` fixture is not a
-  kit-owned reader any commit-time roster names, so it went stale and only
-  surfaced at validate's `scripts` suite. A gate-behavior change should re-run
-  (or at least grep for) every `gate-tests/good/` and `bad/` tree the touched
-  module's own name appears under, kit-owned or not, before calling the
-  fixture-pair contract discharged.
