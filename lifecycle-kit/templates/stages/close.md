@@ -221,17 +221,14 @@ session.
    line, because it leaves no landed unit and no queue trace, so a later session
    reading only the directive re-derives the whole investigation.
 8. **Review the audit roster**, where `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` names one
-   (lifecycle-kit/SPEC.md §The audit roster). For each class block, judge which
-   `due:` events fired since `last:`. A `last:` naming a stage other than this one
-   is a pre-stamp, so read it as unreviewed. Perform each due audit, or defer it as
-   a costed filing. For each audit performed:
-   - Derive the corpus from `scope:` and this iteration's range, taking the
-     predecessor's `corpus:` as a floor.
-   - Run it, and triage every hit.
-   - **Replace** `last:`, `corpus:`, `hits:` and `declined:`.
-   - Fold a reading that changes the next sweep into `scope:` by re-phrasing.
-
-   The sweep's narration and findings go in the commit message, never on the roster.
+   (lifecycle-kit/SPEC.md §The audit roster). Per class block, judge which `due:`
+   events fired since `last:` (a `last:` naming another stage is a pre-stamp, so
+   unreviewed), then perform each due audit or defer it as a costed filing. Per
+   audit: derive the corpus from `scope:` and this iteration's range, the
+   predecessor's `corpus:` a floor; triage every hit; **replace** `last:`,
+   `corpus:`, `hits:` and `declined:`; fold a reading that changes the next sweep
+   into `scope:` by re-phrasing. Narration and findings go in the commit message,
+   never on the roster.
 9. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
    introduced this iteration (log, cache, scratch dir) has a named cleanup
    trigger: a write-path needs a paired reclaim-path. For a workflow-directory
