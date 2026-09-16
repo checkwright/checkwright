@@ -12,6 +12,79 @@
 
 ## New Features
 
+- **retired-block-admits-live-gate-name** [spec: SPEC-arm-fidelity.md] — the live-name mark.
+  — the `queue-edges` retired block reads a citation of a live NAME as a pointer at disposed work,
+  and that row is the block's LARGEST single target.
+  **Re-measured at spec, rev `b2bcd457`:** 56 target slugs across 88 retired citing rows, of which
+  `check-spec-pointer` alone carries 15 — 17 percent of the finding set.
+  **The filing's premise was wrong in one particular and the correction narrows the unit.**
+  `check-spec-pointer` DID hold a queue entry lead line (deferred `1ea41bd7`, landed `5c1a85e6`),
+  so the history test that puts it in the block is literally correct. What is conflated is the
+  entry with the NAME: the slug retired as an entry and shipped as live mechanism the tree carries.
+  **The consequence is specific to the reader the close contract creates.** Close is told to read
+  the retired block as a finding set and correct each citation inline, so 15 percent of the rows it
+  is sent to act on cite a live gate needing no correction at all — and the largest single target is
+  the one that is pure noise, which is where a reader spends the most attention.
+  **Seam ruled at spec (delta 1):** the arm resolves the name against the TRACKED TREE, never a
+  gate-sdk registry — measured over 792 distinct tracked-file stems, the tree and `gates.list` give
+  the same single answer here — so no gate-sdk clause lands and the arm's kit boundary is unmoved.
+  **DISTINCT from `retired-slug-live-pointer-citation`**, which is a citation pointing at genuinely
+  retired work; this one is that the target is not retired work at all.
+  **Cost while deferred:** every close reads a finding set 17 percent of which needs no correction,
+  at its most attention-expensive row.
+  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its retired-block
+  read; drained and promoted at this iteration's scope.
+
+- **icebox-standing-cause-truncated-on-board** [spec: SPEC-arm-fidelity.md] — the cause cap.
+  — `--icebox-candidates` prints about three characters of a standing row's grounds.
+  An ineligible row's reason is capped at `CAUSE_CAP`, 48 characters
+  (native/src/emit/queue_index.rs), and the fixed prefix `[standing] not-icebox-eligible <date> — `
+  spends 44 of them, so a declared row shows its date, three characters and an ellipsis.
+  **Re-measured at spec, rev `b2bcd457`:** FIVE standing rows now render, every one cut to three
+  characters and an ellipsis (`wit…`, `evi…`, `liv…`, `liv…`, `ado…`). The cap touches no cost
+  text: an eligible row prints its cost class whole, so only the reasons are cut.
+  **Printed format ruled at spec (delta 2):** BOTH candidate repairs, as one rule — the prefix
+  loses the `not-icebox-eligible` token the `✗` mark and the `[standing]` class token already say,
+  and the cap binds each cause's variable tail rather than its fixed class prefix.
+  **Cost while deferred:** a close reviewing the standing declarations pays one anchored grep per
+  declared row to read grounds the worklist was meant to show, growing with the declarations.
+  Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the printed-format ground.
+
+- **entry-history-reads-live-entries-only** [spec: SPEC-arm-fidelity.md] — the departed walk.
+  — `--emit entry-history` has no reader for an entry that has left the queue.
+  Verified: the arm run on `entry-compression-contract-unenforced` exits 2 with "the arm reads
+  a live entry", as queue-kit/SPEC.md §check-queue-entry-budget specifies. So the canon-kit
+  landing-commit sibling that section's durability clause cites, where prose leaves the queue
+  with the entry at its disposition, has no instrument at all: the same hole one scale up.
+  **Bound ruled at spec (delta 4):** retired-set membership IS the bound — settled from one
+  history pass before a blob is read — so the domain widens to live-plus-retired under the existing
+  argv tail, with no second mode and no new spelling.
+  **Cost while deferred:** what a disposition commit dropped from an entry is recoverable only
+  by hand-walking history.
+  Filed 2026-09-12 by build, outside its envelope; drained and promoted 2026-09-13 at close.
+
+- **queue-counts-reports-no-tag-breakdown** [spec: SPEC-arm-fidelity.md] — the tag partition.
+  — `--emit queue-counts` reports section counts and no tag breakdown, so a session needing the
+  share of the live pool carrying a given tag counts lead lines by hand.
+  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close: the fact "every live entry
+  still needs design, so scope can promote no debt and every unit set routes through the
+  spec stage" was stamped as a re-derivation at that iteration's scope, and re-verifying it took an
+  awk over the live window — 130 lead lines, 130 design-pending.
+  **Re-verified at the following scope:** the arm prints four section counts and nothing else.
+  **What is missing is the DERIVATION, not an owner.** The durable rule is already owned by
+  §The tag algebra and by the scope template's design-pending exit condition, so neither
+  knowledge-friction remediation shape applied and the stamped re-derivation dropped with its
+  measurement recorded.
+  **Printed format ruled at spec (delta 5):** a `--by <tag>` flag keying `<section>/<value>`, so
+  the arm keeps ONE output grammar and the in-process statusline caller keeps the default.
+  **The filing's candidate was wrong and is corrected here:** the queue-index parser computes a
+  per-`###`-SUBSECTION tally and separately extracts each deferred row's two board tags to echo
+  them. A tag breakdown is an aggregation over data already parsed, not an existing computation.
+  **Cost while deferred:** one hand count per scope session wanting the figure, and a figure nobody
+  re-verifies because re-deriving it is the same work as trusting it.
+  Filed 2026-09-16 to that close's gap inbox from its knowledge-friction triage; promoted at the
+  following iteration's scope.
+
 ## Technical Debt
 
 ## Deferred
@@ -3852,20 +3925,6 @@
   Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
   the obvious cheap fix is already landed, and already failed.
   recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
-- **icebox-standing-cause-truncated-on-board** [design-pending] [cost: iteration/low] [surface: queue-kit]
-  — `--icebox-candidates` prints about three characters of a standing row's grounds.
-  An ineligible row's reason is capped at `CAUSE_CAP`, 48 characters
-  (native/src/emit/queue_index.rs), and the fixed prefix `[standing] not-icebox-eligible <date> — `
-  spends 44 of them, so a declared row shows its date, three characters and an ellipsis.
-  **Re-verified at close:** both standing rows on the 2026-09-11 worklist render `— evi…` and
-  `— liv…`. The cap no longer touches any cost text: an eligible row prints its `[cost:]` class
-  whole, so only the ineligibility reasons are cut.
-  **Candidate repairs, unranked:** a shorter fixed prefix, the `✗` mark already saying ineligible;
-  or exempting the grounds tail from the cap. Either changes the printed format queue-kit/SPEC.md
-  §The queue-index arm owns, which is why close did not fix it inline.
-  **Cost while deferred:** a close reviewing the standing declarations pays one anchored grep per
-  declared row to read grounds the worklist was meant to show, growing with the declarations.
-  Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the printed-format ground.
 - **prose-enum-common-word-tag-members** [design-pending] [cost: event/low] [surface: canon-kit]
   — check-prose-enum reads two adjacent ordinary words as a partial list of the queue's task tags.
   The consumer set `queue-task-tag` (native/src/emit/enum_sets.rs) now carries two task tags
@@ -3990,30 +4049,6 @@
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its audit-roster
   review; drained and promoted at this iteration's scope.
 
-- **retired-block-admits-live-gate-name** [design-pending] [cost: session/low] [surface: queue-kit]
-  — the `queue-edges` retired block admits a live GATE NAME as a retired queue slug, and that false
-  positive is the block's LARGEST single target.
-  **Measured over the whole block:** 51 target slugs across 92 citing rows, of which
-  `check-spec-pointer` alone carries 14 — and `check-spec-pointer` is a registered gate
-  (`scripts/gates.list`, `canon-kit/checks/check-spec-pointer.gate` with its fixture pair), never a
-  queue entry that retired. All 51 targets were grepped against `gates.list` and against every
-  `*.gate` in the tree; it is the only hit, so the class is narrow and fully measured rather than
-  estimated.
-  **The consequence is specific to the reader the close contract creates.** Close is told to read
-  the retired block as a finding set and correct each citation inline, so 15 percent of the rows it
-  is sent to act on cite a live gate needing no correction at all — and the largest single target is
-  the one that is pure noise, which is where a reader spends the most attention.
-  **Why `[design-pending]`:** subtracting the registered gate roster from the retired-target set
-  makes the arm read `gates.list` for a second purpose, and whether a queue-kit arm may take a
-  gate-sdk registry as an input is the seam question; marking such a row with its own token instead
-  keeps the arm's inputs where they are and moves the judgment to the reader.
-  **DISTINCT from `retired-slug-live-pointer-citation`**, which is a citation pointing at genuinely
-  retired work; this one is that the target is not retired work at all.
-  **Cost while deferred:** every close reads a finding set 15 percent of which is noise, at its
-  most attention-expensive row.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its retired-block
-  read; drained and promoted at this iteration's scope.
-
 - **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
   the active account re-arming between pushes inside one session, so the check narrows a window it
@@ -4065,18 +4100,6 @@
   (lead.md or delegation-kit's journal mechanics) is a tiering call.
   **Cost while deferred:** a lead after compaction can abandon a live agent on a bad address.
   Filed 2026-09-12 during build, after a compaction; drained and promoted 2026-09-13 at close.
-
-- **entry-history-reads-live-entries-only** [design-pending] [cost: event/low] [surface: queue-kit]
-  — `--emit entry-history` has no reader for an entry that has left the queue.
-  Verified: the arm run on `entry-compression-contract-unenforced` exits 2 with "the arm reads
-  a live entry", as queue-kit/SPEC.md §check-queue-entry-budget specifies. So the canon-kit
-  landing-commit sibling that section's durability clause cites, where prose leaves the queue
-  with the entry at its disposition, has no instrument at all: the same hole one scale up.
-  **Why `[design-pending]`:** a second walk mode searching back for the slug's last live
-  commit needs a bound nothing currently gives it.
-  **Cost while deferred:** what a disposition commit dropped from an entry is recoverable only
-  by hand-walking history.
-  Filed 2026-09-12 by build, outside its envelope; drained and promoted 2026-09-13 at close.
 
 - **release-binary-archive-versioned-name** [design-pending] [cost: event/low] [surface: installer]
   — each per-target gate binary reaches the Release as a bare `checkwright-gates-<target>` plus its
@@ -4241,27 +4264,6 @@
   dispatch itself would have been refused, and nothing reds.
   Filed 2026-09-16 to that same close's gap inbox, undrainable there; promoted at the following
   iteration's scope.
-
-- **queue-counts-reports-no-tag-breakdown** [design-pending] [cost: iteration/low] [surface: queue-kit]
-  — `--emit queue-counts` reports section counts and no tag breakdown, so a session needing the
-  share of the live pool carrying a given tag counts lead lines by hand.
-  **Measured 2026-09-16** at `isolated-dispatch-obligations`' close: the fact "every live entry
-  carries `[design-pending]`, so scope can promote no debt and every unit set routes through the
-  spec stage" was stamped as a re-derivation at that iteration's scope, and re-verifying it took an
-  awk over the live window — 130 lead lines, 130 design-pending.
-  **Re-verified at the following scope:** the arm prints four section counts and nothing else.
-  **What is missing is the DERIVATION, not an owner.** The durable rule is already owned by
-  §The tag algebra and by the scope template's design-pending exit condition, so neither
-  knowledge-friction remediation shape applied and the stamped re-derivation dropped with its
-  measurement recorded.
-  **Why `[design-pending]`:** whether the breakdown is a second block on this arm, a flag, or a
-  column on §The queue-index arm's board is a printed-format call those sections own.
-  **Candidate:** the per-tag breakdown the queue-index arm's parser already computes to render its
-  rows.
-  **Cost while deferred:** one hand count per scope session wanting the figure, and a figure nobody
-  re-verifies because re-deriving it is the same work as trusting it.
-  Filed 2026-09-16 to that close's gap inbox from its knowledge-friction triage; promoted at the
-  following iteration's scope.
 
 - **stage-economics-meter-has-no-feeding-obligation** [design-pending] [cost: iteration/low] [surface: drift-kit]
   — the tier decisions in this repo's lead ruling-config binding name the stage-economics log
