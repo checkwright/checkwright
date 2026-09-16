@@ -4218,6 +4218,97 @@
   Filed 2026-09-16 to the gap inbox by the iteration lead at `isolated-dispatch-obligations`'
   close, which could not drain it; promoted at the following iteration's scope.
 
+- **declined-update-target-cause-unaudited** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — a build
+  session that DECLINES a spec-authored update target states a cause, and nothing re-reads that
+  cause against the target's own purpose: validate confirms the declination on the terms the
+  declining session set.
+  **Measured 2026-09-16** across `queue-arm-report-fidelity`'s two build batches. Three targets
+  declined, all three probed by validate, all three confirmed — and one was nevertheless a real
+  roster hole. `queue-kit/README.md` enumerates the arms that read the queue file and omitted
+  entry-history entirely, so the stated cause "no entry-history line to widen" was literally true
+  while the right act was to ADD the line, which that iteration's close did.
+  **Why `[design-pending]`: the datum admits two opposite readings and nothing separates them.**
+  Either the spec stage's update-target roster over-reaches systematically, in which case the fix
+  is an authoring-side narrowing; or these are holes in the target surfaces, in which case the fix
+  is a coverage assertion on the surface itself. The candidate deliverables differ by an order,
+  and one measured instance cannot choose between them.
+  **Cost while deferred:** every iteration's build stage may decline a target on a true cause and
+  leave a roster hole behind it, and validate's confirmation is structurally incapable of catching
+  that case, because the terms it re-reads are the declining session's own.
+  Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could not drain
+  it; promoted at the following iteration's scope.
+
+- **harness-session-trailer-reds-first-commit** [design-pending] [cost: session/low] [surface: gate-sdk] — the harness
+  injects a session-URL commit trailer by default and `check-commit-msg` bans it, so a session
+  following the harness's own attribution reminder has its first commit refused.
+  **Probed 2026-09-16 at this scope**, not inherited: a message carrying the default
+  `Claude-Session:` line was run through `check-commit-msg`, which refused it at exit 1 as a
+  banned pattern. The gate is CORRECT — CLAUDE.md bans internal session references in tracked
+  files and commit messages, and `scripts/msg-patterns.list` exempts the `Co-Authored-By` footer
+  and nothing else.
+  **The measured cost, and its honest bound.** `queue-arm-report-fidelity`'s close measured one
+  refused commit and one re-issue per stage session, six per iteration. This scope paid none of
+  it, because it dropped the trailer on prior knowledge. So the recurrence is paid by every
+  session that follows the harness default and avoided by any session that knows not to — which
+  makes the session class right and the magnitude low.
+  **Why `[design-pending]`: both candidate fixes land where a delegated session may not write.** A
+  settings-level suppression is a permission or configuration edit applied on the operator's
+  behalf (CLAUDE.md §Housekeeping); a CLAUDE.md-level instruction to drop the line edits the
+  always-loaded surface. A delegated session may only prepare either diff. Which surface owns the
+  suppression is the seam call, and whether a kit surface should own it at all is the second.
+  **Cost while deferred:** every stage session that follows the harness's own attribution reminder
+  spends a refused commit and a re-issue on a conflict with a known cause and no owner.
+  Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close as the third of its
+  four bullets, none of which that close could drain; promoted at the following scope.
+
+- **queue-entry-evidence-tier** [design-pending] [cost: iteration/low] [surface: queue-kit] — nothing signals that an
+  entry's body was compressed, so a later reader cannot tell a premise written at full evidence
+  from one written at close-stage speed.
+  **RETURNED FROM THE ICEBOX 2026-09-16 on a judged recurrence**, by the round trip
+  queue-kit/SPEC.md §The icebox tier conserves: a dated `recurrence:` line is a live trigger, and
+  a one-line entry has nowhere to carry one. The narrowing that iceboxed it is NOT re-opened here;
+  what returned it is the first measured rate to size that narrowing against.
+  **The rate, measured across `queue-arm-report-fidelity`.** FIVE filed premises were probed FALSE
+  in one iteration: scope corrected two of its own filings and one relayed claim, and spec probed
+  two more false, one of them the lead unit's core claim — `retired-block-admits-live-gate-name`
+  asserted the arm marked a target that was never a queue entry, while `check-spec-pointer` DID
+  hold a lead line (deferred `1ea41bd7`, landed `5c1a85e6`).
+  **Every unit survived with a corrected framing and nothing was wasted**, which is why this is a
+  filing-quality datum and not a defect: the re-verification that catches these is all downstream,
+  and it worked five times out of five. What the rate sizes is the narrowing itself — whether a
+  signal at authoring earns its cost when the downstream catch rate is that high.
+  **Cost while deferred:** every entry filed at close-stage speed carries premises a session reads
+  iterations later with no way to tell how much evidence stood behind them, and the whole
+  correction cost falls on the reading stage.
+  Iceboxed on the ground that nothing shipped wrong; that ground still holds and is not what
+  returned it — the rate did. Recurrence filed 2026-09-16 to the gap inbox by
+  `queue-arm-report-fidelity`'s close as the second of its four bullets; returned to this pool at
+  the following scope, which judged the recurrence.
+  recurrence: queue-entry-evidence-tier 2026-09-16
+
+- **stage-economics-log-redates-rows** [design-pending] [cost: iteration/high] [surface: drift-kit] — re-running the
+  stage-economics meter re-dates rows it has already written, so the log's date column is a run
+  date rather than a stage date and any freshness or trend read over it is wrong by construction.
+  **RETURNED FROM THE ICEBOX 2026-09-16 on a measured recurrence**, by the same round trip
+  queue-kit/SPEC.md §The icebox tier conserves.
+  **Measured rather than asserted, for the first time.** Running the meter at
+  `queue-arm-report-fidelity`'s close appended 868 rows ALL dated 2026-09-16, of which only 9 name
+  that iteration; the rest re-date rows for `port-oracle-and-composer-ruling`,
+  `host-resolution-fail-open-cut` and every other iteration whose transcripts have not yet aged
+  out. Re-probed at this scope over `.metric/stage-economics-log.txt`: 1,695 rows, 868 of them
+  dated 2026-09-16 and 9 naming the closing iteration. The figures hold exactly.
+  **It interacts with `stage-economics-meter-has-no-feeding-obligation`, which is why it returns
+  now rather than on its own clock.** That entry's candidate (a) obliges close to run the meter,
+  and running the meter is precisely the act that corrupts the dates — so a fix for either one
+  that ignores the other ships a log worse than today's, and the two want one design pass.
+  **Cost while deferred:** the one channel a tiering revert would be read off carries a date
+  column that is wrong for every row a re-run touched, and each feeding re-dates more of the
+  history than it adds.
+  Iceboxed as a defect IN a run nobody was making; the feeding obligation is what made it live.
+  Recurrence filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could
+  not drain it; returned at the following iteration's scope.
+  recurrence: stage-economics-log-redates-rows 2026-09-16
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -4229,7 +4320,6 @@
 - **lead-held-block-no-sanctioned-surface** [design-pending] — No route records a lead-held block.
 - **survey-record-filed-after-the-fact** [design-pending] — Order to the work goes wholly unread.
 - **amendment-prose-misnumbers-its-delta** [design-pending] — Cites Delta 3 for delta 4's subject.
-- **stage-economics-log-redates-rows** [design-pending] — Re-running the meter re-dates live rows.
 - **battery-timing-file-overwritten-by-only-run** [design-pending] — A filtered run reports as all.
 - **audit-roster-row-body-unbounded-growth** [design-pending] — Row bodies never compress.
 - **worktree-dispatch-rebuilds-the-gate-binary** [design-pending] — Each dispatch pays a cold build.
@@ -4332,7 +4422,6 @@
 - **edges-retired-block-name-clash** [design-pending] — A live gate name inflates a retired slug.
 - **lead-report-is-an-ungated-terminal-act** [design-pending] — May close holding unfiled work.
 - **smoke-report-array-carrier-mangling-unexplained** [design-pending] — Witness now needs design.
-- **queue-entry-evidence-tier** [design-pending] — Nothing signals an entry was compressed.
 - **gate-timing-baseline-comparability** [design-pending] — Timing baseline has no comparer.
 - **amendment-landing-citation-assertions** [design-pending] — Landing citations go unvalidated.
 - **root-doc-roster-registration-parity** [design-pending] — Only one root-doc roster is enforced.
