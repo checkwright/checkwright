@@ -9,3 +9,4 @@ seam-sweep-remainder spec ad141d48 2026-09-16 ca6d9e9c
 seam-sweep-remainder align a38d2a81 2026-09-16 ff1779d3
 seam-sweep-remainder build a9107d00 2026-09-16 550231aa
 seam-sweep-remainder validate aa64b9fd 2026-09-17 cc527a02
+seam-sweep-remainder close a4fb5c8e 2026-09-17 3109dff5
