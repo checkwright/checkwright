@@ -4411,7 +4411,4 @@
 
 ## Done
 
-- harness-session-trailer-reds-first-commit
-- kit-spec-provenance-seam-sweep-remainder
-
 ## Lessons Learned
