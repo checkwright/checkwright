@@ -2449,10 +2449,16 @@ prune's canonical-spec half for the same reason.
 ### The reference-link grammar
 
 A docs-site page cites two kinds of in-repo target, and the grammar splits on
-which. A *rendered-document* reference — a kit's `SPEC.md`, `README.md`, or
-`DOCTRINE.md` — cites the on-site mirror of that document *relatively* when the
-site publishes one: a generated, freshness-gated projection under `docs/<kit>/`
-that keeps reference reading on the served site. The mirror preserves the
+which. A *rendered-document* reference — a `SPEC.md`, its sibling `README.md`,
+or the doctrine deliverable — cites the on-site mirror of that document
+*relatively* when the site publishes one: a generated, freshness-gated
+projection under `docs/<dir>/` that keeps reference reading on the served site.
+**The mirror's corpus is every top-level directory holding a `SPEC.md`, not
+every kit root.** A directory joins it by acquiring one, so a rendered document
+belonging to no kit is mirrored on the same terms as a kit's, and the freshness
+gate's coupling declares that corpus rather than a per-kit expansion of it — a
+coupling narrower than what the emitter reads would leave the wider half
+ungated. The mirror preserves the
 documents' cross-citation topology one-to-one, so the relative shape a page
 uses is the same shape the source tree uses. A *source* reference — a script, a
 gate body, config, a directory: files the site does not render — cites the tree

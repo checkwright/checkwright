@@ -1,4 +1,4 @@
-// spec: installer/README.md §What this package is — no dependency field, no install-time lifecycle script
+// spec: installer/SPEC.md §The dependency boundary — no dependency field, no install-time lifecycle script
 use crate::fresh;
 use serde_json::Value;
 use std::path::Path;
