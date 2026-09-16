@@ -6,3 +6,4 @@
 
 installer-front-door-cut scope a82d9a21 2026-09-16 3fe20068
 installer-front-door-cut spec aad4de75 2026-09-16 a6ee6b23
+installer-front-door-cut spec aad4de75 2026-09-16 c3c6c430
