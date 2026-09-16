@@ -12,6 +12,40 @@
 
 ## New Features
 
+- **wait-record-self-deadlock** [spec: SPEC-dispatch-obligations.md] — a backgrounded **wait**
+  that registers itself as a producer makes its own exit condition unsatisfiable, and blocks
+  every concurrent session's commits while it spins. Attested live 2026-08-26 against three
+  consumers of one record: the validate entry pre-flight, guard-kit rule 14's tracked-tree
+  block, and 21 `SubagentStop` refusals in `.workflow/subagent-stop-liveness.log`.
+  **Ruled:** state the producer/observer split in the agent-execution rule itself instead of
+  delegating it to guard-kit by pointer; the two reader-side alternatives are refused in the
+  amendment. Deltas 1 and 2, plus delta 5's carrier propagation.
+
+- **worktree-reap-unasserted-at-dispatching-turn-end** [spec: SPEC-dispatch-obligations.md] —
+  nothing asserts the worktree reap at the DISPATCHING session's own turn end, so an orphan
+  minted mid-iteration survives every later session until an iteration boundary meets it;
+  measured at six sessions of carry on the 2026-09-06 sighting.
+  Shape three of the retired `worktree-lock-pid-is-not-agent-liveness`, ruled out of that
+  unit's ENVELOPE and not refuted — operator, 2026-09-06, through an interactive prompt in the
+  lead session, relayed by the lead — which is the live trigger that put it in Deferred rather
+  than the icebox (`lead, own-authority`, 2026-09-06).
+  **Ruled:** the reap is owed at the dispatcher's own turn end, scoped to trees it minted;
+  the amendment carries its clearance of the standing dispatch-time-sweep ruling. Delta 3.
+
+- **delegated-read-blind-to-gitignored-capture** [spec: SPEC-dispatch-obligations.md] — a
+  worktree-isolated read-only agent cannot see any gitignored capture surface, so a delegated
+  close-surface read reports "absent" for a file that has content, and the delegation is
+  **mandated** rather than optional by the dispatch guard's D2 rule. Attested at a close that
+  would have dispositioned four surfaces as absent and reported clean. The recorded line
+  counts are deliberately gone: they are live capture logs and re-measure differently every
+  session, which is itself why the delegated reading cannot be trusted.
+  DISTINCT from `close-surface-row-absent-reads-as-empty`, which is that the ROSTER prints
+  empty and absent identically; this one is that a delegated READER cannot tell content from
+  absence at all.
+  **Ruled:** the constraint is stated in the protocol template — neither the roster emitter
+  nor the dispatch guard — with a child-side clause on isolation cost (4)'s pattern; the
+  roster-side print is filed separately. Delta 4, plus delta 5's carrier propagation.
+
 ## Technical Debt
 
 ## Deferred
@@ -3098,40 +3132,6 @@
   a read of four gate sources — the re-derivation the survey record exists to prevent. Filed
   2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
 
-- **wait-record-self-deadlock** [design-pending] [cost: event/high] [surface: delegation-kit] — a backgrounded **wait** that registers itself as
-  a producer makes its own exit condition unsatisfiable, and blocks every concurrent session's
-  commits while it spins.
-  **Attested live 2026-08-26.** This iteration's validate session backgrounded
-  `until bash gate-sdk/bin/run-gates.sh --enter-stage --simulate validate;
-  do sleep 15; done` and, per the
-  standing launch-liveness rule, wrote `.tmp/validate-entry-wait.run` naming its own pid. This repo
-  wires `check-producer-liveness .tmp` as a validate entry pre-flight, so the poll refused on the
-  record the poll itself had written; the only thing still blocking the loop was the loop.
-  **Second-order harm, wider than the filing claimed — corroborated at this close from a surface
-  the filer never cited.** The tracked-tree-mutation rule correctly refuses every git index,
-  worktree or ref write in *every* session while a record names a live pid, so the build session
-  could not commit the queue drain the waiter was waiting for. And
-  `.workflow/subagent-stop-liveness.log` shows the SAME record refusing SubagentStop 21 times
-  between 07:05Z and 07:15Z on 2026-08-26 (`live=yes verdict=red records=1 decision=refuse`), so
-  the wedge reached the turn-end path too, not only the poll. Three consumers, one record.
-  **The distinction the rule does not draw, and one surface already draws it.** A *producer* writes
-  artifacts a reader must not race and owes a record; an *observer* writes nothing and owes none.
-  Guard-kit's backgrounded-launch rule now exempts an inline wait loop from its record block, so
-  the attested spelling owes none; a wait behind a script name still does, and the agent-execution
-  template draws the split only by pointing at that rule — the attested instance followed no split.
-  **Why `[design-pending]`, three candidate fixes differing in kind:** state the producer/observer
-  split in the agent-execution rule so a wait never registers; have `check-producer-liveness` ignore
-  a record whose run key names the stage being entered; or refuse the self-naming record at write
-  time.
-  **DISTINCT from `close-entry-baseline-bootstrap-deadlock`**, closed this iteration: that one is a
-  circularity in what the close-entry evidence manifest demands, with queue and baseline content on
-  both sides. This is a liveness record invalidating its own waiter, with neither involved.
-  **Cost while deferred:** the rule as written walks a session into a wedge that costs that session
-  and every concurrent one, and the only escape is deleting a record that still names a live pid —
-  the one act the rule names as retracting a statement that is still true.
-  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-26 at build, observing validate.
-
-
 - **account-noun-plural-slips-the-shape** [design-pending] [cost: event/high] [surface: gate-sdk] — the account-identification pattern
   matches a singular account noun only, so the plural form passes both readers.
   **Probed rather than reasoned, at this close.** Feeding a three-line sample through
@@ -3616,41 +3616,6 @@
   Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
   2026-09-04 at this iteration's scope entry, the boundary having carried it.
 
-- **worktree-reap-unasserted-at-dispatching-turn-end** [design-pending] [cost: event/high] [surface: delegation-kit] — nothing asserts the
-  worktree reap at the DISPATCHING session's own turn end, so an orphan minted mid-iteration
-  survives every later session until an iteration boundary meets it.
-  **This is shape three of the retired `worktree-lock-pid-is-not-agent-liveness`**, whose shapes
-  one and two landed 2026-09-06 and whose slug is now out of the pool, so that pointer resolves
-  to history rather than to live work; the substance is restated here rather than cited.
-  **Ruled out of that unit's ENVELOPE, not refuted — operator, 2026-09-06, through an interactive
-  prompt in the lead session, relayed by the lead.** The ruling scoped one iteration's work and
-  said nothing about the shape's merit; the parent entry recorded it in exactly those terms,
-  "deferred rather than refuted".
-  **The record's own argument for it, and it is the evidence that ranked the shapes.** The fourth
-  sighting, 2026-09-06: an orphan minted at the prior iteration's spec stage survived align, three
-  build sessions, validate and close without any of six sessions noticing, and only the boundary
-  refusal surfaced it. Those five later sessions had no reason to look, and the party who knew
-  what the worktree was for was gone six sessions before the refusal fired. Reaping at the
-  dispatching turn end is the only shape that puts the judgment where the knowledge is.
-  **DISTINCT from what landed and from what already exists.** Shape one gave the boundary
-  refusal's LIVE branch a loss-gated reap remedy, which reaches a session that ALREADY MET the
-  refusal. Shape two told delegation-kit's isolation bullet that a lock reason's pid is the
-  harness's and not an agent liveness signal. Neither reaches an orphan nobody has met yet, and
-  delegation-kit's reap-both-halves rule says WHAT to delete while staying silent on WHEN.
-  **Candidate shapes, none costed:** assert the reap in the dispatching session's turn-end
-  obligations beside the existing liveness-record rule; or have the isolation arm register the
-  worktree so a later sweep reaps it without the dispatcher; or leave it to the boundary and
-  accept the latency, which is today's behaviour.
-  **Cost while deferred:** an orphan minted at any stage rides to the next iteration boundary and
-  converts there into a refused entry for a session with no context on it, which is the one moment
-  the loss question is hardest to answer; measured at six sessions of carry on the sighting above.
-  Filed 2026-09-06 by a build session to the gap inbox so the ranked evidence would survive the
-  parent's move out of the pool, explicitly as a record rather than a re-opening, and called
-  icebox-class by default there. Promoted to Deferred instead at the 2026-09-06 close —
-  `lead, own-authority`, 2026-09-06, relayed to the close session in its dispatch — on the ground
-  that the parent had already recorded the shape as deferred rather than refuted, which is a live
-  trigger the icebox tier's no-live-trigger predicate refuses.
-
 - **ere-matcher-capture-groups-unowned** [design-pending] [cost: iteration/low] [surface: gate-sdk] — the crate's POSIX ERE matcher reports
   spans and cannot report a capture group, so the first consumer needing one shells out to bash.
   **The sizing this falsifies, and the axis it falsifies it on.** gate-sdk/SPEC.md §The POSIX ERE
@@ -4037,31 +4002,6 @@
   iteration could drain; promoted here at the next scope, so the record is late and says so.
 
 
-- **delegated-read-blind-to-gitignored-capture** [design-pending] [cost: session/low] [surface: delegation-kit]
-  — a worktree-isolated read-only agent cannot see any gitignored capture surface, so a delegated
-  close-surface read reports "absent" for a file that has content, and the delegation is mandated
-  rather than optional.
-  **MEASURED, same commit, main checkout against a fresh worktree:**
-  `.workflow/knowledge-friction.log` 18 lines against reported absent;
-  `.workflow/prompt-friction.log` 822 against 23;
-  `.workflow/subagent-stop-liveness.log` 561 against 1;
-  `.workflow/essay-harvest.md` 220 against absent.
-  **The mandate is what makes it a trap rather than a caveat.** `agent-dispatch-guard` refuses a
-  `DELEGATION_KIT_READONLY_TYPES` dispatch without `isolation: worktree`, and a fresh worktree
-  carries no gitignored file — so every one of the eleven close-surface roster rows that carries
-  content is unreachable by the only dispatch shape the guard permits. A close that trusted the
-  delegated numbers would have cleared nothing, dispositioned four surfaces as absent, and reported
-  clean.
-  **Why `[design-pending]`:** the candidate is a statement of the constraint at the point of
-  dispatch — by the roster emitter or by the dispatch guard — and which surface owns it decides
-  whether the reader is warned at the roster or refused at the guard.
-  **DISTINCT from `close-surface-row-absent-reads-as-empty`**, which is that the ROSTER prints empty
-  and absent identically; this one is that a delegated READER cannot tell content from absence at
-  all.
-  **Cost while deferred:** the failure is silent and reads as a clean result, so it costs a wrong
-  disposition rather than a diagnosis.
-  Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its close-surface
-  roster read; drained and promoted at this iteration's scope.
 
 - **audit-roster-last-stamp-author-unconstrained** [design-pending] [cost: event/low] [surface: lifecycle-kit]
   — the audit roster assigns each row's `last:` stamp to the CLOSE-STAGE review in its own header,
