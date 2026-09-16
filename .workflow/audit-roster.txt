@@ -71,3 +71,11 @@ last: audit-roster-and-refiling-cut close
 corpus: bash gate-sdk/bin/run-gates.sh --emit reads-census; GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh --only check-reads-couples
 hits: 18
 declined: none
+
+class: provenance-seam-residue
+scope: the publisher-provenance shapes canon-kit/SPEC.md §check-provenance-seam lists as honest limits and assigns to close-stage review: undated attribution, a dated label with no attribution, a stamp dated in words, a retired slug or cut ordinal, a slug under the length floor, an attributive agent-file pointer, and all four lexical arms over the payload surfaces outside the gate's corpus (kit templates, kit READMEs, doctrine-kit/DOCTRINE.md). Un-gateable for the reasons that section states. Corpus: the iteration's range over every kit SPEC, template, README and DOCTRINE.md, plus a whole-corpus lexical pass when the gate's arms or seam knobs change. An agent-file section citation whose section a kit's own install step creates is a consumer binding, yet it is respelled to the kit-owned source where one exists, since the arm reads the shape as a pointer. A live queue slug in any payload file is a finding. Fix by deleting the marker or restating what the pointer stood for.
+due: any edit to a kit SPEC, template, README or DOCTRINE.md; a change to check-provenance-seam's arms or seam knobs; release prep
+last: seam-sweep-remainder close
+corpus: surfaces: */templates/**/*.md, */README.md, doctrine-kit/DOCTRINE.md under the queue-slug arm (lead-line slugs of at least 12 characters minus mechanism names), the agent-file-pointer arm, the private-surface list, and ISO dates beside an authority marker
+hits: 3
+declined: undated attribution, words-dated stamps, retired slugs and cut ordinals over the templates, READMEs and DOCTRINE.md were not swept this close; the kit-SPEC corpus carries the landing unit's build-stage sweep verdict

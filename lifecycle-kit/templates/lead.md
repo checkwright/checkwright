@@ -511,7 +511,7 @@ and escalations arrive on their schedule. So:
   tier, hidden from its budget and context accounting — the redundancy the split
   posture exists to remove, and the clause is a dispatched stage's authority to
   refuse. Read-only fan-outs inside a stage stay sanctioned (the delegation
-  nudge; CLAUDE.md §Agent execution). The batching *criteria* are the
+  nudge; delegation-kit/templates/agent-execution.md). The batching *criteria* are the
   shared-surface rule above, unchanged; this adds only the owner — the lead
   serializes sibling batches that share a surface and may parallelize those that
   do not, subject to the shared-index discipline.

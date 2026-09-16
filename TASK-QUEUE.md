@@ -3430,22 +3430,23 @@
   provenance seam bars "private rule content" as well: term lists, coupling vocabularies, product
   constant sets, and a consumer's configuration where a kit literal should be optional config.
   **TWO INSTANCES, both re-verified live at HEAD by this drain rather than carried from the
-  filing.** (1) gate-sdk/SPEC.md:2058-2078 documents THIS REPO'S QUEUE PRACTICE as gate-sdk
-  mechanism — which entry a cut rides, the scoping stage's promote and the entry's own build-stage
-  demotion, lead-line amendment-tag arithmetic against `check-queue-wrap`'s column budget, and a
-  `git log -S` re-derivation — and survived the sweep fully de-attributed. It is a content-tier
-  fault independently of the seam: queue practice is queue-kit's subject, not gate-sdk's. (2)
-  gate-sdk/SPEC.md:5398-5401 enumerates six literal `couples=` values of this consumer
-  (`scripts/git-hooks/*`, `.claude/agents/*.md`, two delegation-kit files, `CLAUDE.md` plus
-  `doctrine-kit/DOCTRINE.md`, `.workflow/*,.gitignore`) inside a kit SPEC.
+  filing.** (1) gate-sdk/SPEC.md §Porting a gate to the binary substrate documents THIS REPO'S
+  QUEUE PRACTICE as gate-sdk mechanism — which entry a cut rides, the scoping stage's promote
+  and the entry's own build-stage demotion, lead-line amendment-tag arithmetic against
+  `check-queue-wrap`'s column budget, and a `git log -S` re-derivation — and survived the sweep
+  fully de-attributed. It is a content-tier fault independently of the seam: queue practice is
+  queue-kit's subject, not gate-sdk's. (2) gate-sdk/SPEC.md §The first budget batch enumerates
+  six literal `couples=` values of this consumer (`scripts/git-hooks/*`, `.claude/agents/*.md`,
+  two delegation-kit files, `CLAUDE.md` plus `doctrine-kit/DOCTRINE.md`, `.workflow/*,.gitignore`)
+  inside a kit SPEC.
   **Why `[design-pending]` rather than a sweep:** each instance has a real defence and they differ.
   The queue-practice block exists because only half of it was derivable, so deleting it re-buys a
   `git log -S` at every cut; the `couples=` list is a RECORD of one past batch's derivation, so
   de-literalizing it destroys the thing it is for. Whether either is "private rule content" at all
   is the seam question, and answering it SETS an envelope rather than applying one.
-  **DISTINCT from `kit-spec-provenance-seam-sweep-remainder`**, whose corpus is the ten OTHER kit
-  SPECs under the attribution discriminator; this is the already-swept SPEC under the other
-  discriminator, and the two overlap in neither corpus nor test.
+  **DISTINCT from `kit-spec-provenance-seam-sweep-remainder`, landed**, which swept every kit SPEC
+  under the attribution discriminator; this is gate-sdk/SPEC.md under the other discriminator,
+  and the two share no test. Both instances re-verified live at the landing's close.
   **Cost while deferred:** the seam is a privacy boundary before it is a design one and this repo
   is public — a kit literal carrying a consumer's configuration publishes it, and every adopter
   vendors the copy. Product-class.

@@ -3,7 +3,7 @@ shim naming this template (a header `Execute the template at <path>, applying
 the bindings below.` then a `## Bindings` section) and bind its two slots — the
 shared-file roster and the validate battery. The full delegated-`Agent`
 execution protocol (any stage, any purpose — an audit, a build sweep, a one-off
-investigation). A resident pointer in CLAUDE.md §Agent execution keeps the
+investigation). A resident pointer in the consumer's agent file keeps the
 protocol reachable from a delegating session; this skill is the complete
 procedure.
 

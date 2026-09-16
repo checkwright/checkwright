@@ -299,9 +299,8 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     false-positive carve-out, on Gap disposition's model). Its capture surfaces
     are the survey record's witness discipline and the queue's practice of
     dating premise corrections into entry bodies
-    ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The survey record);
-    `probe-before-assertion-doctrine` in the queue holds the open question of
-    whether any slice of the class is mechanizable.
+    ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The survey record).
+    Whether any slice of the class is mechanizable is open.
     *Digest:* a claim one cheap command would settle is probed before it is asserted; relaying an unverified premise is asserting it.
 
 ## Engineering-craft rules
