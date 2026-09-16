@@ -310,9 +310,10 @@ each reader's red condition is named:
   replaces a slug with what the slug stood for can introduce one ("the three
   benchmark legs"), so build runs it.
 - **`check-manifest-temporal`** reds on a temporal marker that has no valve. Three
-  drift-kit retirement sentences carry `manifest-temporal-exempt:` valves on the line
-  where the dated cut label sits. Rewriting that line can separate a valve from its
-  marker, so build runs it.
+  drift-kit retirement sentences carry `manifest-temporal-exempt:` valves, each on
+  the line where its dated cut label sits or the line above (two of the three wrap
+  to the line above). Rewriting either line can separate a valve from its marker,
+  so build runs it.
 - **`check-measured-claim`** reds when a `measured:` marker disagrees with its oracle,
   and fails closed on an unknown key. The recovered abutment rule keeps the sweep off
   bound numbers, and build runs the gate as well.
