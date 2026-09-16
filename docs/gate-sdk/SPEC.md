@@ -4978,7 +4978,7 @@ gate at all, which is why `templates/check-skeleton.sh`, gate-sdk/README.md's
 first-gate walkthrough and §Consumer smoke's kit-landing checklist stay exactly
 as they are: a flipped walkthrough would be false on its face rather than merely
 premature. What the domain decides is which surfaces the flip reaches —
-publisher-facing ones (this section, and CLAUDE.md's always-loaded authoring
+publisher-facing ones (this section, and the publisher's always-loaded authoring
 line) change; consumer-facing ones do not.
 
 **A born-native gate is the member these criteria do not describe, and only some
@@ -5191,7 +5191,7 @@ false. Three enforceable shapes have been weighed:
   crate-carrying tree, but making the shape consumer-safe is design work it has
   not had.
 
-The flip therefore rests on this section and on CLAUDE.md's always-loaded
+The flip therefore rests on this section and on the publisher's always-loaded
 authoring line, and the enforcement disposition is **filed rather than
 flagged-and-skipped** per the gap-disposition rule — the unit that landed the flip
 did not open the work of landing a gate, and which iteration builds one is not

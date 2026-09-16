@@ -3234,12 +3234,9 @@
   **IT BELONGS IN `Deferred`, NEVER `Done`, AND IT DEMOTES AT BUILD, NEVER AT CLOSE** (`lead,
   own-authority`, 2026-09-06): the deliverable is a corpus, so the next cut re-promotes with its
   own amendment (canon-kit/SPEC.md §Merging an amendment), and `check-stage-entry` assertion B
-  refuses a validate entry on a non-empty active queue. **THE BY-KIT SPLIT NEEDS NO WAIVER, AND THE
-  AUTHORITY IS THIS ENTRY'S OWN RE-GROUNDING, NOT A RULING POINTER** — the paragraph this clause
-  cited was deleted from TRAJECTORY.md at the steering-vocabulary consult and the name no longer
-  occurs there. **RE-GROUNDED 2026-09-06 — operator, direct answer to the lead session's ask,
-  lead-relayed:** the 2026-09-03 standing direction is SPENT and the operator chose RE-GROUNDING
-  over renewing it, so what carries this is product-class with a live trigger on its own accretion.
+  refuses a validate entry on a non-empty active queue. **THE BY-KIT SPLIT NEEDS NO WAIVER: ITS
+  AUTHORITY IS THIS ENTRY'S RE-GROUNDING (operator, 2026-09-06, lead-relayed)** — the 2026-09-03
+  standing direction is SPENT, and this carries as product-class on its own accretion's trigger.
   **DO NOT RE-AUTHOR THE PREDICATE OR RE-RUN THE SCAN — RECOVER IT** from the parent half's merged
   amendment, `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`: delta 1 is the discriminator (the
   seam decides the VOICE, never the content), delta 2 the taxonomy, delta 3 the move-versus-delete
@@ -3260,12 +3257,14 @@
   `CLAUDE.md §` section citation, a `TRAJECTORY.md` mention, a `BRIEF.local.md` mention, and a
   live queue slug — a bare `CLAUDE.md` as a knob default is mechanism and passes. The gate-sdk
   carve-out retired at the 2026-09-16 consult, and that section is swept.
+  **A FIFTH SHAPE IS UNNAMED, AND THE GATE SLICE RULES IT:** a POSSESSIVE pointer (`CLAUDE.md's
+  ... line`) is no § citation and passes; gate-sdk's two sites were rewritten impersonally
+  2026-09-16, so only whether the predicate names the shape stays open.
   **NO DISCHARGE LINE SURVIVES**: this entry carries its own end condition — it lands WHOLE, gate
   green, or it stays here.
   **Cost while deferred:** the remaining published kit SPECs and every adopter's vendored copy carry
   private ruling history as mechanism and pointers a consumer cannot follow; product-class, and
   accreting measurably — gate-sdk re-acquired a slug citation after its own sweep landed.
-  Filed 2026-09-05 at scope with the split that created it; promoted and demoted twice 2026-09-06.
 
 - **bin-tool-help-arm-absent-tree-wide** [design-pending] [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
@@ -4240,11 +4239,9 @@
 - **survey-record-filed-after-the-fact** [design-pending] — Order to the work goes wholly unread.
 - **amendment-prose-misnumbers-its-delta** [design-pending] — Cites Delta 3 for delta 4's subject.
 - **battery-timing-file-overwritten-by-only-run** [design-pending] — A filtered run reports as all.
-- **audit-roster-row-body-unbounded-growth** [design-pending] — Row bodies never compress.
 - **worktree-dispatch-rebuilds-the-gate-binary** [design-pending] — Each dispatch pays a cold build.
 - **committed-grant-fallthrough-unexplained** [design-pending] — Three bare grants fell through.
 - **derived-count-literal-in-queue-unscanned** [design-pending] — No corpus reaches the queue file.
-- **audit-roster-grammar-ungated** [design-pending] — Row fields ungraded; waits on the format.
 - **bridged-arm-spawned-program-set-unheld** [design-pending] — Declared set unheld; shape ships.
 - **icebox-drops-a-bought-census** [design-pending] — No dormant home for a measured payload.
 - **surplus-arg-drop-in-six-emit-arms** [design-pending] — Six emit arms drop surplus args at 0.
@@ -4463,7 +4460,6 @@
 - **amendment-census-claim-unrun** [design-pending] — Amendment counts skip the shipped oracle.
 - **composition-test-scores-a-section-cut-as-one-unit** [design-pending] — A cut scores as one.
 - **deleted-runner-anchors-across-ten-entries** [design-pending] — Entries cite deleted runners.
-- **audit-roster-grammar-and-stored-probe-set** [design-pending] — Probe set is a stored constant.
 - **port-created-failure-mode-refusal-unruled** [design-pending] — Port-made refusals unruled.
 - **removal-propagation-site-argued-out-of-scope** [design-pending] — Found sites argued away.
 - **wait-form-unallowlistable-by-construction** [design-pending] — No grant reaches the wait.
@@ -4497,5 +4493,8 @@
 - audit-class-corpus-attestation
 - audit-roster-last-stamp-author-unconstrained
 - close-eviction-refiles-without-checking
+- audit-roster-row-body-unbounded-growth
+- audit-roster-grammar-ungated
+- audit-roster-grammar-and-stored-probe-set
 
 ## Lessons Learned

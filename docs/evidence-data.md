@@ -176,3 +176,4 @@
 | isolated-dispatch-obligations | sc sp a b v c | 2f/0d | 1 · ≤0d | 20s clean | 113 |
 | queue-arm-report-fidelity | sc sp a b v c | 5f/0d | 1 · ≤0d | 20s clean | 113 |
 | installer-front-door-cut | sc sp a b v c | 3f/6d | 2 · ≤0d | 20s clean | 113 |
+| audit-roster-and-refiling-cut | sc sp a b v c | 4f/1d | 2 · ≤0d | 20s clean | 114 |
