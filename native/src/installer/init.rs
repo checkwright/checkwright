@@ -480,13 +480,23 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // resolves to this binary, so the knob must name it and the file must be there.
     // spec: installer/SPEC.md §The install boundary — the placement is the `--install
     // place-artifact` op called in-process: one derivation, two callers, this arm and that flag.
+    // spec: installer/SPEC.md §What init seeds — the vendored tree's kit-root set is DECLARED and
+    // not left to the on-disk predicate, and the declared set is the resolved profile's, the same
+    // value the manifest records
+    // spec: installer/SPEC.md §The manifest — the publisher's SPEC base travels in the stamp and
+    // reaches the consumer through the same seam
     let seam = format!("{}/gate-sdk-config.knobs", GATES_DIR);
+    let declared = install::declared_lines(
+        &kits.join(" "),
+        &read_package_field(pkg, &["checkwright", "spec_base_url"]),
+    );
     let src = pkg.artifact.to_string_lossy().into_owned();
     let placement = install::Placement {
         root: root.clone(),
         src: &src,
         dest: &artifact_dest,
         seam: &seam,
+        declared: &declared,
         target: &pkg.target,
         digest: &artifact_digest,
         force: f.force,

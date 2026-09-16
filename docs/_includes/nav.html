@@ -9,7 +9,7 @@
         {%- if kids != empty -%}
         <ul class="nav-children">
           {%- for k in kids -%}
-          {%- assign sufs = site.pages | where: "dir", k.dir | where_exp: "s", "s.generated" | sort: "title" -%}
+          {%- assign sufs = site.pages | where: "dir", k.dir | where_exp: "s", "s.generated" | where_exp: "s", "s.title != 'SPEC'" | sort: "title" -%}
           {%- assign kid_current = false -%}
           {%- if k.url == page.url -%}{%- assign kid_current = true -%}{%- endif -%}
           {%- for s in sufs -%}{%- if s.url == page.url -%}{%- assign kid_current = true -%}{%- endif -%}{%- endfor -%}

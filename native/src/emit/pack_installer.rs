@@ -7,13 +7,15 @@ use crate::ere::Ere;
 use crate::proc::{self, Stderr};
 use crate::walk;
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the three declared names, each defined in
-// `gate-sdk/lib/gate.sh`. `INSTALLER_PACK_TMP_DIR` and its `TMPDIR` fallback are absent and must
-// be: no kit library defines either, so a declared row would fail-close the arm on every run
+// spec: gate-sdk/SPEC.md §The non-gate arm — the declared names, each defined in gate-sdk's knob
+// table; `INSTALLER_PACK_TMP_DIR` and its `TMPDIR` fallback are absent and must be, no kit library
+// defining either
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_KIT_DIRS",
     "GATE_SDK_NATIVE_TARGETS_FILE",
     "GATE_SDK_NATIVE_BIN",
+    "GATE_SDK_PAYLOAD_WITHHOLD",
+    "GATE_SDK_SPEC_BASE_URL",
 ];
 
 // spec: installer/SPEC.md §The packer — the diagnostic prefix the shell form printed, kept across
@@ -173,7 +175,18 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
         return Err(refuse(format!("output directory not found: {}", out)));
     }
 
-    pack_tracked(&commit, "installer", &asm)?;
+    // spec: gate-sdk/SPEC.md §Consumer payload — the withheld shape reaches the kit roots alone:
+    // `installer/` is packed whole, its own non-shipping content decided by the package roster
+    pack_tracked(&commit, "installer", &asm, &[])?;
+
+    // spec: gate-sdk/SPEC.md §Consumer payload — one declared shape reaching every root the loop
+    // yields, so the shipped set stays derived from the governed one; a per-kit roster would be the
+    // maintained copy derivation-first refuses, and would let a kit fall out by being forgotten
+    let withhold: Vec<String> = walk::knob_scalar("GATE_SDK_PAYLOAD_WITHHOLD")
+        .map_err(refuse)?
+        .split_whitespace()
+        .map(String::from)
+        .collect();
 
     // spec: installer/SPEC.md §The packer — the payload's kit set is `walk::kit_roots_rel`, the same
     // derivation the battery runs on, so the shipped set cannot drift from the governed one
@@ -185,7 +198,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
             continue;
         }
         let leaf = kit.rsplit('/').next().unwrap_or(kit);
-        pack_tracked(&commit, kit, &format!("{}/payload/{}", asm, leaf))?;
+        pack_tracked(&commit, kit, &format!("{}/payload/{}", asm, leaf), &withhold)?;
         packed += 1;
     }
     if packed == 0 {
@@ -196,7 +209,10 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
 
     let artifacts = pack_artifacts(&f.artifacts, &asm)?;
 
-    stamp(&asm, &version, &commit)?;
+    // spec: gate-sdk/SPEC.md §Consumer payload — the publisher's SPEC base travels in the stamp, so
+    // `init` has a value to write into the consumer's knob seam without re-deriving a host
+    let spec_base_url = walk::knob_scalar("GATE_SDK_SPEC_BASE_URL").map_err(refuse)?;
+    stamp(&asm, &version, &commit, &spec_base_url)?;
 
     let tarball = npm_pack(&asm)?;
     let landed = format!("{}/{}", out.trim_end_matches('/'), tarball);
@@ -377,12 +393,36 @@ fn make_scratch(base: &str, scratch: &mut Scratch) -> Result<String, Refusal> {
 // spec: gate-sdk/SPEC.md §Consumer payload — vendor git-tracked paths only, unconditionally: the
 // clean-tree check does not see ignored paths, so `git archive` at the stamped commit is the
 // tracked-set boundary and the strip count peels exactly the source's own path depth
-fn pack_tracked(commit: &str, src: &str, dst: &str) -> Result<(), Refusal> {
+// spec: gate-sdk/SPEC.md §Consumer payload — the withheld shape as `git archive` pathspec
+// exclusions, a member naming a directory on disk contributing its subtree form too
+fn pathspec(src: &str, withhold: &[String]) -> Vec<String> {
+    let mut spec = vec![src.to_string()];
+    for member in withhold {
+        let member = member.trim_matches('/');
+        if member.is_empty() {
+            continue;
+        }
+        let path = format!("{}/{}", src, member);
+        spec.push(format!(":(exclude){}", path));
+        if std::path::Path::new(&path).is_dir() {
+            spec.push(format!(":(exclude){}/*", path));
+        }
+    }
+    spec
+}
+
+fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Result<(), Refusal> {
     let src = src.trim_end_matches('/');
+    let spec = pathspec(src, withhold);
     // spec: gate-sdk/SPEC.md §Consumer payload — refuse an unvendorable tracked symlink BEFORE the
     // pipeline: a failure after it lands mid-kit having written a partial vendor, where a pre-flight
     // writes nothing and names the cause
-    let listing = git(&["ls-files", "-s", "--", src])?;
+    // spec: gate-sdk/SPEC.md §Consumer payload — the pre-flight reads the pathspec the archive
+    // reads, so the fail-closed guarantee covers precisely what is packed and no refusal names a
+    // path the payload was never going to carry
+    let mut ls: Vec<&str> = vec!["ls-files", "-s", "--"];
+    ls.extend(spec.iter().map(String::as_str));
+    let listing = git(&ls)?;
     let links: Vec<&str> = listing
         .lines()
         .filter(|l| l.starts_with("120000 "))
@@ -404,7 +444,9 @@ fn pack_tracked(commit: &str, src: &str, dst: &str) -> Result<(), Refusal> {
     }
     let depth = 1 + src.matches('/').count();
     mkdir(dst)?;
-    let archive = proc::run("git", &["archive", commit, "--", src]).map_err(refuse)?;
+    let mut archive_args: Vec<&str> = vec!["archive", commit, "--"];
+    archive_args.extend(spec.iter().map(String::as_str));
+    let archive = proc::run("git", &archive_args).map_err(refuse)?;
     let bytes = match archive.stdout() {
         Some(b) => b.to_vec(),
         None => {
@@ -554,7 +596,7 @@ fn set_mode_755(_path: &str) -> Result<(), Refusal> {
 
 // spec: installer/SPEC.md §The packer — the version-and-commit stamp, a `serde_json` edit rather
 // than a `jq` spawn: the tool's last reader of that program leaves with the port
-fn stamp(asm: &str, version: &str, commit: &str) -> Result<(), Refusal> {
+fn stamp(asm: &str, version: &str, commit: &str, spec_base_url: &str) -> Result<(), Refusal> {
     let path = format!("{}/package.json", asm);
     let text = std::fs::read_to_string(&path)
         .map_err(|e| refuse(format!("could not read {}: {}", path, e)))?;
@@ -571,6 +613,15 @@ fn stamp(asm: &str, version: &str, commit: &str) -> Result<(), Refusal> {
         .as_object_mut()
         .ok_or_else(|| refuse("could not stamp installer/package.json."))?;
     slot.insert("commit".into(), serde_json::Value::String(commit.into()));
+    // spec: installer/SPEC.md §The manifest — a stamped value is present exactly when the publisher
+    // set one; an empty string written here would be a placeholder standing in for an omission, and
+    // an empty base means *resolve in the tree*, which is a value with no location to record
+    if !spec_base_url.is_empty() {
+        slot.insert(
+            "spec_base_url".into(),
+            serde_json::Value::String(spec_base_url.into()),
+        );
+    }
     let mut body = serde_json::to_string_pretty(&doc)
         .map_err(|e| refuse(format!("could not stamp installer/package.json: {}", e)))?;
     body.push('\n');
@@ -712,6 +763,39 @@ mod tests {
     #[test]
     fn a_member_that_is_the_root_itself_spells_the_whole_tree() {
         assert_eq!(inside("/w", "/w"), Some(".".to_string()));
+    }
+
+    // spec: gate-sdk/SPEC.md §Consumer payload — the declared shape becomes pathspec exclusions
+    // beside the root, a directory member contributing its subtree form too; an empty shape packs
+    // the root whole, which is what the `installer/` call site passes.
+    #[test]
+    fn the_withheld_shape_becomes_pathspec_exclusions_beside_the_root() {
+        let dir = std::env::temp_dir().join(format!("cw-pack-pathspec.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("smoke")).expect("scratch kit root");
+        std::fs::write(dir.join("SPEC.md"), "").expect("scratch spec file");
+        let root = dir.display().to_string();
+
+        assert_eq!(pathspec(&root, &[]), vec![root.clone()]);
+        assert_eq!(
+            pathspec(&root, &["SPEC.md".to_string()]),
+            vec![root.clone(), format!(":(exclude){}/SPEC.md", root)]
+        );
+        assert_eq!(
+            pathspec(&root, &["smoke".to_string()]),
+            vec![
+                root.clone(),
+                format!(":(exclude){}/smoke", root),
+                format!(":(exclude){}/smoke/*", root),
+            ]
+        );
+        // comment-tier-exempt: a blank member is a local property of a whitespace-split value, and
+        // the assertion is that it contributes nothing rather than excluding the root itself
+        assert_eq!(
+            pathspec(&root, &["/".to_string(), String::new()]),
+            vec![root.clone()]
+        );
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: installer/SPEC.md §The packer — the diagnostic names the entries it found, bounded,

@@ -18,12 +18,20 @@ const SPACE: [char; 5] = [' ', '\t', '\r', '\x0b', '\x0c'];
 #[derive(Default)]
 struct Fm {
     title: bool,
+    // spec: docs/site-architecture.md §Site chrome and the nav contract — the suffix rule selects
+    // generated siblings BY TITLE, so the model of it needs the value and not only its presence
+    title_value: String,
     order: bool,
     id: String,
     parent: String,
     generated: bool,
     children_key: String,
 }
+
+// spec: docs/site-architecture.md §Site chrome and the nav contract — the one title the suffix
+// omits: the SPEC mirror is a reference tier, read when something sends a reader to it and not a
+// destination offered from every page, so it is reached from its kit's own index.md instead
+const SUFFIX_EXCLUDED_TITLE: &str = "SPEC";
 
 fn is_space(c: char) -> bool {
     SPACE.contains(&c)
@@ -66,8 +74,9 @@ fn front_matter(text: &str) -> Fm {
         if !inside {
             continue;
         }
-        if key_matches(line, "title:").is_some() {
+        if let Some(t) = key_matches(line, "title:") {
             fm.title = true;
+            fm.title_value = t.trim().to_string();
         }
         if let Some(t) = key_matches(line, "nav_order:") {
             if t.starts_with(|c: char| c.is_ascii_digit()) {
@@ -305,12 +314,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         }
         // spec: docs/site-architecture.md §Site chrome and the nav contract — the include's
-        // suffix-link rule: a generated mirror page is reachable iff its directory-sibling
-        // index.md is nav-reachable
+        // suffix-link rule: a generated mirror page OTHER THAN the SPEC mirror is reachable iff its
+        // directory-sibling index.md is nav-reachable
         if basename(&cur) == "index.md" {
             let curdir = dirname(&cur).to_string();
             for sib in &pages {
-                if dirname(sib) == curdir && fms[sib].generated && !reach.contains(sib) {
+                if dirname(sib) == curdir
+                    && fms[sib].generated
+                    && fms[sib].title_value != SUFFIX_EXCLUDED_TITLE
+                    && !reach.contains(sib)
+                {
                     reach.insert(sib.clone());
                     queue.push(sib.clone());
                 }

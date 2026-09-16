@@ -15,10 +15,12 @@ for stateless agent sessions, and token-economics-aware context management.
 A one-shot vendoring installer. It copies pinned kit source out of its own
 payload into your repository and commits it, then prints the commands that
 finish the setup. What governs your tree afterwards is committed and auditable:
-every gate arrives with its declaration, its `# spec:` pointer and the section
-behind it, and its `good/`+`bad/` fixture pair, and a gate whose implementation
-is compiled arrives as a digest-verified binary rather than as source
-(gate-sdk/SPEC.md §Consumer payload, which rules that and bounds it).
+every gate arrives with its declaration and the one-line invariant that
+declaration carries, its `# spec:` pointer, and its `good/`+`bad/` fixture pair,
+and a gate whose implementation is compiled arrives as a digest-verified binary
+rather than as source. The specification section behind each pointer is published
+rather than packed (gate-sdk/SPEC.md §Consumer payload, which rules that and
+bounds it).
 
 What it is not: a dependency channel. Nothing resolves at your build time and
 the installer writes no dependency reference, no registry lockfile entry and no

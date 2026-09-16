@@ -135,12 +135,15 @@ fn smoke(given: &[String], teardown: &mut Teardown) -> Outcome {
     let (sdk, roots) = step!(kit_roots(given));
     for r in &roots {
         if !Path::new(&format!("{}/smoke/install.sh", r)).is_file() {
+            // spec: gate-sdk/SPEC.md §Consumer smoke — the refusal names its vendored-tree cause,
+            // so a tree installed from the payload reads it as a boundary and not a broken install
             return Outcome::Env(vec![
                 format!(
                     "{}: {} has no smoke/install.sh — a vendored kit must ship one",
                     NAME, r
                 ),
                 "  help: add smoke/install.sh (+ optional smoke/violation.sh); see gate-sdk/SPEC.md §Consumer smoke.".to_string(),
+                "  help: in a tree installed from the customer payload this is expected on every kit — the payload withholds smoke/ (gate-sdk/SPEC.md §Consumer payload). This arm asks whether the kits work when vendored BY COPY, so it runs against a checkout of the kit sources, not against an installed tree.".to_string(),
             ]);
         }
     }

@@ -8,7 +8,7 @@ use crate::installer::lock::hash as lock_hash;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
-const USAGE: &str = "  usage: checkwright-gates --install place-artifact --root <dir> --src <file> --dest <path> --seam <path> --target <triple> --digest <sha256> [--lock <path>] [--force] [--dry-run]
+const USAGE: &str = "  usage: checkwright-gates --install place-artifact --root <dir> --src <file> --dest <path> --seam <path> --target <triple> --digest <sha256> [--lock <path>] [--kits <kit>[ <kit>…]] [--spec-base-url <url>] [--force] [--dry-run]
          checkwright-gates --install queue-source --payload <dir> --kits <kit>[,<kit>…]";
 
 // spec: installer/SPEC.md §The install boundary — the closed op set an unknown `<op>` is refused
@@ -170,11 +170,15 @@ pub fn make_executable(_file: &Path) -> Result<(), String> {
 }
 
 // spec: installer/SPEC.md §The gate binary — the seam is a knob file rewritten preserving every line
-// except one whose head is the knob this op owns
-fn seam_text(existing: Option<&str>, dest: &str) -> String {
+// except those whose head is a knob this op owns: the artifact path, plus whatever the caller
+// declares
+fn seam_text(existing: Option<&str>, dest: &str, declared: &[(String, String)]) -> String {
+    let owned = |head: &str| {
+        head == "GATE_SDK_NATIVE_BIN" || declared.iter().any(|(k, _)| k == head)
+    };
     let mut out = String::new();
     for line in existing.unwrap_or_default().lines() {
-        if line.split_once('=').is_some_and(|(head, _)| head.trim() == "GATE_SDK_NATIVE_BIN") {
+        if line.split_once('=').is_some_and(|(head, _)| owned(head.trim())) {
             continue;
         }
         out.push_str(line);
@@ -183,6 +187,12 @@ fn seam_text(existing: Option<&str>, dest: &str) -> String {
     out.push_str("GATE_SDK_NATIVE_BIN = ");
     out.push_str(dest);
     out.push('\n');
+    for (name, value) in declared {
+        out.push_str(name);
+        out.push_str(" = ");
+        out.push_str(value);
+        out.push('\n');
+    }
     out
 }
 
@@ -211,6 +221,9 @@ pub struct Placement<'a> {
     pub src: &'a str,
     pub dest: &'a str,
     pub seam: &'a str,
+    // spec: installer/SPEC.md §The gate binary — the seam's declared lines: knob/value pairs the
+    // install resolves rather than ships, supplied by the caller because the values are its own
+    pub declared: &'a [(String, String)],
     pub target: &'a str,
     pub digest: &'a str,
     pub force: bool,
@@ -256,7 +269,10 @@ pub fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> 
                 } else {
                     None
                 };
-                write_atomically(&seam_path, &seam_text(existing.as_deref(), p.dest))?;
+                write_atomically(
+                    &seam_path,
+                    &seam_text(existing.as_deref(), p.dest, p.declared),
+                )?;
             }
             records.push(format!("own\t{}", p.seam));
         }
@@ -265,10 +281,25 @@ pub fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> 
     Ok(records)
 }
 
+// spec: installer/SPEC.md §The gate binary — the seam's declared lines, built once for both
+// callers; an empty value is omitted rather than written blank
+pub fn declared_lines(kits: &str, spec_base_url: &str) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    for (name, value) in [
+        ("GATE_SDK_KIT_DIRS", kits.trim()),
+        ("GATE_SDK_SPEC_BASE_URL", spec_base_url.trim()),
+    ] {
+        if !value.is_empty() {
+            out.push((name.to_string(), value.to_string()));
+        }
+    }
+    out
+}
+
 fn place_artifact(args: &[String]) -> i32 {
     let parsed = match parse(
         args,
-        &["root", "src", "dest", "seam", "target", "digest", "lock"],
+        &["root", "src", "dest", "seam", "target", "digest", "lock", "kits", "spec-base-url"],
         &["force", "dry-run"],
     ) {
         Ok(a) => a,
@@ -282,11 +313,19 @@ fn place_artifact(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => return usage_error(&format!("place-artifact: {}", e)),
     };
+    // spec: installer/SPEC.md §The install boundary — the two declared-line keys are optional and
+    // omitting one omits its knob rather than writing a blank: an empty `GATE_SDK_KIT_DIRS` means
+    // *derive the set*, so a placeholder line would assert a configuration nobody asked for.
+    let declared = declared_lines(
+        parsed.get("kits").unwrap_or_default(),
+        parsed.get("spec-base-url").unwrap_or_default(),
+    );
     let placement = Placement {
         root: PathBuf::from(&resolved[0]),
         src: &resolved[1],
         dest: &resolved[2],
         seam: &resolved[3],
+        declared: &declared,
         target: &resolved[4],
         digest: &resolved[5],
         force: parsed.set("force"),
@@ -413,6 +452,7 @@ mod tests {
             src,
             dest: "scripts/checkwright-gates",
             seam: "scripts/gate-sdk-config.knobs",
+            declared: &[],
             target: "x86_64-unknown-linux-gnu",
             digest,
             force: false,
@@ -443,20 +483,47 @@ mod tests {
         assert_eq!(run(&[]), 2);
     }
 
-    // spec: installer/SPEC.md §The gate binary — the seam rewrite preserves every line except one
-    // whose head is the knob this op owns, whatever blanks surround its `=`
+    // spec: installer/SPEC.md §The gate binary — the seam rewrite preserves every line except those
+    // whose head is a knob this op owns, whatever blanks surround its `=`
     #[test]
     fn the_seam_rewrite_keeps_every_other_line_and_replaces_the_owned_one() {
-        assert_eq!(seam_text(None, "scripts/checkwright-gates"), "GATE_SDK_NATIVE_BIN = scripts/checkwright-gates\n");
+        assert_eq!(seam_text(None, "scripts/checkwright-gates", &[]), "GATE_SDK_NATIVE_BIN = scripts/checkwright-gates\n");
         let existing = "# a comment\nGATE_SDK_TMP_DIR = .scratch\nGATE_SDK_NATIVE_BIN=stale\n  GATE_SDK_NATIVE_BIN = older\n";
-        let rewritten = seam_text(Some(existing), "scripts/checkwright-gates");
+        let rewritten = seam_text(Some(existing), "scripts/checkwright-gates", &[]);
         assert_eq!(
             rewritten,
             "# a comment\nGATE_SDK_TMP_DIR = .scratch\nGATE_SDK_NATIVE_BIN = scripts/checkwright-gates\n"
         );
         // comment-tier-exempt: a source file with no closing newline is a local property of the
         // input, not a rule either tier owns — `grep -v` terminated its last line and so must this
-        assert_eq!(seam_text(Some("A = 1"), "b"), "A = 1\nGATE_SDK_NATIVE_BIN = b\n");
+        assert_eq!(seam_text(Some("A = 1"), "b", &[]), "A = 1\nGATE_SDK_NATIVE_BIN = b\n");
+    }
+
+    // spec: installer/SPEC.md §What init seeds — a declared line is owned exactly as the artifact
+    // path is: a stale spelling of it is replaced rather than duplicated, an adopter's own knob
+    // survives, and an empty value is omitted rather than written blank.
+    #[test]
+    fn a_declared_line_is_owned_replaced_and_omitted_when_empty() {
+        let declared = declared_lines("gate-sdk canon-kit", "https://example.test");
+        assert_eq!(
+            declared,
+            vec![
+                ("GATE_SDK_KIT_DIRS".to_string(), "gate-sdk canon-kit".to_string()),
+                ("GATE_SDK_SPEC_BASE_URL".to_string(), "https://example.test".to_string()),
+            ]
+        );
+        assert_eq!(declared_lines("  ", ""), Vec::new());
+        assert_eq!(
+            declared_lines("gate-sdk", ""),
+            vec![("GATE_SDK_KIT_DIRS".to_string(), "gate-sdk".to_string())]
+        );
+
+        let existing = "GATE_SDK_TMP_DIR = .scratch\nGATE_SDK_KIT_DIRS = stale one\nGATE_SDK_NATIVE_BIN = old\n";
+        assert_eq!(
+            seam_text(Some(existing), "scripts/checkwright-gates", &declared),
+            "GATE_SDK_TMP_DIR = .scratch\nGATE_SDK_NATIVE_BIN = scripts/checkwright-gates\n\
+             GATE_SDK_KIT_DIRS = gate-sdk canon-kit\nGATE_SDK_SPEC_BASE_URL = https://example.test\n"
+        );
     }
 
     // spec: installer/SPEC.md §The install boundary — claim's three ways to reach `Take`: no

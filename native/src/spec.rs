@@ -468,6 +468,31 @@ pub fn strip_dot_slash(s: &str) -> String {
     s.strip_prefix("./").unwrap_or(s).to_string()
 }
 
+// spec: canon-kit/SPEC.md §check-md-refs — the heading-to-anchor slug rule, held here rather than
+// in either reader: `check-md-refs` resolves an `#anchor` against it and the runner's invariant
+// line builds a published fragment with it, and two copies is how the two would come to disagree
+pub fn anchor_slug(heading: &str) -> String {
+    let kept: String = heading
+        .to_lowercase()
+        .chars()
+        .filter(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == ' ' || *c == '_' || *c == '-')
+        .collect();
+    let mut out = String::with_capacity(kept.len());
+    let mut in_run = false;
+    for c in kept.chars() {
+        if c == ' ' {
+            if !in_run {
+                out.push('-');
+                in_run = true;
+            }
+            continue;
+        }
+        in_run = false;
+        out.push(c);
+    }
+    out
+}
+
 // spec: canon-kit/SPEC.md §The shared spec adapters — the claim-gate primitives the two members share:
 // the declaration grammar, the declaration roster, the governed-doc set behind its two
 // exclude valves, and the command-knob vocabulary

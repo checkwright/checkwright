@@ -154,6 +154,8 @@ pub const KIT: Kit = Kit {
         Row::derived("GATE_SDK_PORTABILITY_PATTERNS", Shape::Scalar, portability_patterns, GATES).empty_takes_default(),
         Row::scalar("GATE_SDK_PORTABILITY_PATHS", "").empty_takes_default(),
         Row::scalar("GATE_SDK_KIT_DIRS", "").empty_takes_default(),
+        Row::scalar("GATE_SDK_PAYLOAD_WITHHOLD", "SPEC.md smoke"),
+        Row::scalar("GATE_SDK_SPEC_BASE_URL", "").empty_takes_default(),
         Row::scalar("GATE_SDK_COMMIT_TYPES", "feat fix refactor perf docs test build ci chore style")
             .empty_takes_default(),
     ],

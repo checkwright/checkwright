@@ -434,6 +434,11 @@ Each kit is a self-contained top-level directory. To adopt one, copy it into
 your repo root and wire it in:
 
 1. Copy the kit directory (for example `gate-sdk/`) into your repository.
+
+   Copying a kit directory out of this repository gives you its `SPEC.md` and
+   its `smoke/` as well, which the installer's payload withholds; the manual
+   path is the same kits with more of the engineering record attached, never
+   fewer of the gates.
 2. Register the gates it ships in your `gates.list`, where the kit ships gates.
 3. Point the kit at your layout through its external configuration — consumers
    never edit vendored kit files, so configuration always lives outside them.
@@ -454,11 +459,15 @@ runner — then add kits in the order the [kit map](index.md#the-kits) lists the
 ### What a gate discloses
 
 Worth knowing before you adopt, because it qualifies the opening claim on this
-page. A gate whose implementation is a compiled binary ships four things and
-withholds one. It ships its declaration. It ships its `# spec:` pointer with the
-specification section behind it. It ships its `good/`+`bad/` fixture pair. It
-ships the binary itself, verified against a published digest before anything is
-written to your tree. What it does not ship is the implementation source.
+page. A gate whose implementation is a compiled binary ships four things,
+withholds one, and publishes one. It ships its declaration, which carries a
+one-line statement of the invariant the gate holds and is printed when the gate
+blocks you. It ships its `# spec:` pointer. It ships its `good/`+`bad/` fixture
+pair. It ships the binary itself, verified against a published digest before
+anything is written to your tree. What it does not ship is the implementation
+source. What it publishes rather than ships is the specification section the
+pointer names: it is read on this site, and the `commit` your `checkwright.lock`
+records resolves the exact text your tree was vendored from.
 [gate-sdk/SPEC.md](gate-sdk/SPEC.md#consumer-payload) is where that is ruled and
 bounded.
 

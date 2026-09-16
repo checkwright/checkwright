@@ -301,6 +301,23 @@ comment-only knob file, valid in the grammar as seeded. `init` never deletes a f
 a release stopped shipping (§init), so a shell config an earlier release seeded
 stays behind at upgrade, and the reader's legacy refusal names the migration.
 
+**The vendored tree's kit-root set is declared, not inferred.** `init` writes
+`GATE_SDK_KIT_DIRS` into `<gates-dir>/gate-sdk-config.knobs` on every install,
+with the resolved profile's kit set — which is exactly what was copied in and
+exactly what the manifest's `kits` records, so the two cannot disagree. This is
+not a convenience: gate-sdk's derived resolver admits a kit root by testing for
+`checks/` or `smoke/` on disk, the payload withholds `smoke/`
+(gate-sdk/SPEC.md §Consumer payload), and a kit shipping no `checks/` would
+therefore drop out of a vendored tree's resolved set **silently and with no
+red** — a root that drops out contributes no gate, and a battery over a smaller
+set is still a green battery. Inference belongs to the repository that owns the
+kits, where the markers are present and the siblings are known; a tree that
+*received* them has a better source, and `GATE_SDK_KIT_DIRS` is the override
+gate-sdk already carries for it, so the declaration mints no name. The write is
+the placement op's (§The gate binary), which is the seam's one writer; §The
+consumer smoke is the oracle, and it counts rather than reading a verdict,
+because green cannot witness a set that quietly shrank.
+
 **Everything `init` seeds takes one of two disciplines, and which one follows
 from whether `init` keeps rewriting the file.** A surface `init` creates once and
 then leaves to you — the queue file, the agent file, the evidence manifests, the
@@ -889,12 +906,16 @@ in-payload value can. What raises it above a self-check is that the identical
 bytes are published on the Release, so a human can cross-check the value out of
 band. The claim is **verified against a published digest**, never *reproducible*.
 
-**The gate-sdk config seam rides this path and only this path.** `init` claims
-`scripts/gate-sdk-config.knobs` inside the branch that has selected an artifact
-target, and gate-sdk ships no config-seam template for the generic seam plan to
-copy. On a payload carrying no artifact that file is therefore never written and
-is not a `files` entry at all — so a verb reasoning about the surfaces `init`
-rewrites on every run must not assume it is present.
+**The gate-sdk config seam rides this path and only this path, and it is written
+on every install.** `init` claims `scripts/gate-sdk-config.knobs` through the
+placement op, and gate-sdk ships no config-seam template for the generic seam
+plan to copy. The file carries **two** owned lines now — the artifact path, and
+the vendored tree's declared kit-root set (§What init seeds) — so a verb
+reasoning about the surfaces `init` rewrites on every run may assume it is
+present. The clause that once said otherwise, *on a payload carrying no artifact
+that file is never written*, described a configuration no install can reach: a
+payload with no `artifact/` directory has no binary to run a verb from and is
+refused at the bootstrap (§The install boundary).
 
 **The install-time omission retired with the bootstrap's one success path.**
 `init` once wrote `# omitted: <name> <reason>` into the consumer's `gates.list` in
@@ -928,6 +949,8 @@ copy, which on a first install does not exist yet:
     --target <rust target triple>
     --digest <the artifact's verified SHA-256>
     [--lock  <repo-relative manifest path>]
+    [--kits  <kit>[ <kit>…]]
+    [--spec-base-url <url>]
     [--force] [--dry-run]
 ```
 
@@ -935,9 +958,16 @@ Every key has a reader inside the op: `--root` resolves every relative path,
 `--src` is the copy source, `--seam` is the claimed path, `--dest` is written on
 the rule below instead, `--target` and `--digest` are compared against the
 manifest's `artifact` key and the on-disk copy for the skip-rewrite branch,
-`--lock` supplies the recorded hash the claim compares, and `--force` and
+`--lock` supplies the recorded hash the claim compares, `--kits` and
+`--spec-base-url` become the seam's declared lines, and `--force` and
 `--dry-run` carry `init`'s existing meanings. `--lock` is optional and absent on
-a first install, where nothing is claimed. Two stdout verbs come back, and each has one reader in the caller:
+a first install, where nothing is claimed. **The two declared-line keys are
+optional and an omitted one omits its knob** rather than writing a blank: an
+empty `GATE_SDK_KIT_DIRS` means *derive the set*, so a placeholder line would
+assert a configuration nobody asked for. They exist so this op and `init`'s
+in-process call resolve one derivation rather than two — an install driven
+through the wire with no way to declare the kit set would leave a vendored tree
+inferring it, which is the silent narrowing §What init seeds exists against. Two stdout verbs come back, and each has one reader in the caller:
 
 | verb | record | the caller's reader |
 | --- | --- | --- |
@@ -964,9 +994,20 @@ The knob's own default is unchanged and still names the crate's build output,
 because it is a **stable relative path** on purpose: the generated hook persists
 the emitted argv, so a machine-specific path baked into a tracked hook would make
 the graph artifact's freshness comparison machine-dependent. The seam is claimed
-like any rewritten surface and then rewritten preserving every line except the
-one naming `GATE_SDK_NATIVE_BIN`, so an adopter's own knobs in that file survive
-every re-run.
+like any rewritten surface and then rewritten preserving every line except those
+naming a knob the op owns, so an adopter's own knobs in that file survive every
+re-run.
+
+**The owned set is the artifact path plus the caller's declared lines, and one
+writer holds all of them.** A second writer for the declared lines would have to
+claim a file this one already owns, and the two would disagree about whether an
+adopter's edit had been seen — the claim would read the first writer's own
+output as the adopter's change and refuse to place the binary. So the declared
+values arrive as an argument and the write stays single. A stale spelling of a
+declared knob is replaced rather than duplicated, exactly as `GATE_SDK_NATIVE_BIN`
+is; a consumer who *edits* the seam keeps their edit, because the claim reports
+it and leaves the file alone — the existing discipline for a surface whose whole
+purpose is to be edited.
 
 **The non-destructive re-run is the op's too, and `--seam` is where it applies.**
 The seam is claimed against the hash `--lock` records for it and left alone when
@@ -1322,7 +1363,7 @@ the shape behind it.
 | `version` | the release the payload was cut at | `doctor` reports it; a re-run of `init` compares it against the payload's and refuses a silent downgrade |
 | `commit` | the 40-hex commit the payload was assembled from | `doctor` prints it — it is what lets a reviewer resolve the vendored tree to an exact upstream state |
 | `profile` | the profile selected | a re-run of `init` re-applies the same profile without asking again |
-| `kits` | the vendored kit set | `init`'s re-run file plan, and `doctor`'s installed-set report |
+| `kits` | the vendored kit set | `init`'s re-run file plan, `doctor`'s installed-set report, and §The consumer smoke's count assertion — the recorded set the battery's resolved kit roots are held equal to |
 | `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there, until the file leaves the tree | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten — the gate binary's row excepted, §The gate binary — and stays on the roster so the next run reads it the same way, whether or not the running release still ships that path. `uninstall` walks the same roster to decide what it may remove and what it must keep, and `diff` classifies it against the tree |
 | `artifact` | the gate binary's `target` and its SHA-256 `digest`, or absent | `doctor` reports the target and re-verifies the digest in place; a re-run of `init` compares the target against this host and skips the rewrite while the digest still holds |
 
@@ -1554,12 +1595,34 @@ battery itself enumerates, so the shipped set cannot drift from the governed
 one, and the assembly happens under `INSTALLER_PACK_TMP_DIR` rather than in
 tree.
 
+**Each kit root is packed minus a declared shape, and `installer/` is packed
+whole.** Both go through one helper, which takes the withheld shape as an
+argument: the kit-root call site passes the shape
+`GATE_SDK_PAYLOAD_WITHHOLD` declares and the `installer/` call site passes none,
+`installer/`'s own non-shipping content being decided by the package roster
+instead. The shape becomes `git archive` pathspec exclusions, and the helper's
+symlink pre-flight reads the identical pathspec, so the fail-closed guarantee
+covers precisely what is packed. gate-sdk/SPEC.md §Consumer payload owns the
+shape, its grounds and the disclosure it changes; what is this section's is that
+the two call sites differ and why.
+
 **The payload is stamped with the commit it was packed from, and the refusal
 protecting that stamp asks about the payload's own footprint rather than about
 the whole worktree.** That stamp is the whole of what makes a vendored tree
 resolvable to an upstream state. The version stamped beside it comes from the
 newest reachable tag unless `--version` names one, and never from an edit to
 `installer/package.json`.
+
+**A third value joins the stamp, on the same present-when-supplied rule.** Where
+`GATE_SDK_SPEC_BASE_URL` resolves non-empty in the packed tree, the packer
+records it beside the version and the commit; where it resolves empty, the key is
+**absent** rather than written blank, because an empty base means *resolve in the
+tree* and is a configuration with no location to record. `init` reads it back and
+writes it into the consumer's knob seam (§The gate binary), which is how a
+consumer whose kit SPECs the payload withholds still reaches the invariant a red
+gate names (gate-sdk/SPEC.md §Consumer payload). The value is the publisher's,
+never a kit literal, so the packer reads it from the packing tree's own knob file
+and mints nothing.
 
 **The footprint has three members, and it is derived rather than listed.** A
 scoped refusal is unstateable without one, and a wrong scoping under-refuses
@@ -1591,6 +1654,16 @@ that under-refusal hazard reintroduced as a maintenance burden.
 What is **not** a member: the `--artifacts` tree, which is outside the worktree
 by contract, and every other path in the repository, which the payload neither
 ships nor reads.
+
+**The footprint keeps each kit root whole, and a withheld member is not dropped
+from it.** The payload excludes each kit's `SPEC.md` and its `smoke/`
+(gate-sdk/SPEC.md §Consumer payload), and the footprint's pathspec is unnarrowed
+by that. A withheld `SPEC.md` is not an unread file: it is the file the on-site
+mirror is generated from, and the mirror is where a shipped pointer resolves, so
+a pack taken over a dirty SPEC stamps a commit whose published statement may not
+be the one a red gate sends its adopter to read. Narrowing the footprint to the
+packed set would trade a real precondition for nothing — the footprint's subject
+is the tree under test, not the tarball's manifest.
 
 **The refusal is that footprint's `git status --porcelain`.** A member resolving
 outside the packed tree is dropped from the pathspec rather than handed to git,
@@ -1780,7 +1853,9 @@ the resulting tarball with
 arm** — every command `init` printed in its block must resolve to an executable
 path in the payload just written, with every flag it names accepted — then the
 battery must be green, then the manifest must agree with the tree it describes
-file by file, then the **queue post-condition** — a profile whose kit set reads
+file by file, then the **withholding arm** — no vendored kit root carries a
+`SPEC.md` or a `smoke/`, and the kit-root set the battery resolves equals the
+manifest's `kits` — then the **queue post-condition** — a profile whose kit set reads
 the queue file must have one, satisfying `check-queue-sections`, and a profile
 whose kit set does not must have none — then a re-run must leave the tree object
 identical, then `doctor`
@@ -1793,6 +1868,19 @@ first apart from the typo, so the green is the defect being gone rather than the
 scan having narrowed, and a profile green on the first run must still be green
 on the second. The arm restores the consumer to the commit it found, so the
 reversal below still runs against the tree `init` wrote.
+
+**The withholding arm's second assertion is not symmetry with its first.** The
+suite's standing assertion is that the battery is **green**, and a kit root that
+silently drops out of the resolved set yields a smaller battery that is still
+green — so green cannot witness the kit-root declaration (§What init seeds). An
+assertion that *counts* is what the withholding needs, and the manifest's `kits`
+key is the count already recorded, so no second roster is minted for it. The
+first assertion is the withholding's own oracle and it is spelled as the two
+member names rather than read back off the knob the packer used: a smoke that
+asked the packer what it excluded would compare a derivation against itself,
+where this reds on a packer that stopped excluding — the one regression the
+exclusion can suffer in silence, a payload carrying more than it promised
+breaking no install.
 
 **The follow-up arm asserts what `init` printed, not a copy of it.** `init` ends
 by telling the adopter to run two commands, and until this arm nothing anywhere

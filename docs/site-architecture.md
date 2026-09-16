@@ -18,7 +18,12 @@ lives in `docs/_config.yml`, `docs/_layouts/`, `docs/_includes/`, and
 `docs/assets/`. The nav is Liquid over front matter: `nav_order` / `nav_parent`
 place a page; a page's `nav_id` parents its `nav_child_order`-sorted children,
 each child carrying derived suffix links to its `generated:`-marked directory
-siblings. A nav page naming a `nav_children_key` instead derives its children from
+siblings. **Every such sibling except the SPEC mirror**, which is a reference
+tier: a surface read when something sends you to it, not one a reader is invited
+into from every page. It stays reached from its own kit's `index.md` and from a
+red gate's resolved pointer (gate-sdk/SPEC.md §Consumer payload). The
+reachability gate models the same exclusion, since a model wider than the include
+is a green the rendered site does not earn. A nav page naming a `nav_children_key` instead derives its children from
 the site pages carrying that key, path-descending, each labeled by the key's
 value (the release notes under the Releases page). `check-docs-nav-reachable`
 holds every docs page to a `title:` front-matter block and reachability from the

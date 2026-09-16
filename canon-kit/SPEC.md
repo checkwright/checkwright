@@ -2158,6 +2158,17 @@ that own it (`check-md-refs`, `check-kit-ref-liveness`); ruling only on headings
 of resolvable files is what holds the false-positive rate at the directive
 pass's level.
 
+**The vendored-root prune is what makes a withheld kit SPEC safe, so its opt-out
+now has a consequence.** At the default, a vendored kit root is pruned from this
+gate's corpus, so no consumer battery ever resolves a vendored gate's `# spec:`
+pointer — which is precisely what lets a payload ship the descriptor and publish
+the SPEC section rather than packing the file (gate-sdk/SPEC.md §Consumer
+payload). A consumer who sets `CANON_KIT_SCAN_KIT_ROOTS=1` opts that prune off
+and will meet the withheld SPEC files as dangling pointers. That is stated here
+so the opt-out's cost is read as a boundary rather than discovered as a defect;
+the remedy is the knob's default, or a hand-vendored kit root that carries its
+own SPEC.
+
 `check-comment-tier` owns the directive's *shape*; this gate adds *resolution*
 on top, the binding a `spec:` pointer makes being only as good as its liveness
 — a renamed or deleted heading leaves every inbound pointer or citation

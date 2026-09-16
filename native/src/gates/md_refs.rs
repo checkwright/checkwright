@@ -220,7 +220,7 @@ fn anchor_ok(
 }
 
 // spec: canon-kit/SPEC.md §check-md-refs — the heading-to-anchor slug rule an `#anchor`
-// link is resolved against
+// link is resolved against; the slug itself is `spec::anchor_slug`, this repo's one holder of it
 fn heading_slugs(text: &str) -> Vec<String> {
     let mut out = Vec::new();
     for line in text.lines() {
@@ -246,31 +246,7 @@ fn heading_slugs(text: &str) -> Vec<String> {
         if e <= s {
             continue;
         }
-        let head = String::from_utf8_lossy(&b[s..e]).to_lowercase();
-        let kept: String = head
-            .chars()
-            .filter(|c| {
-                c.is_ascii_lowercase() || c.is_ascii_digit() || *c == ' ' || *c == '_' || *c == '-'
-            })
-            .collect();
-        out.push(collapse_spaces(&kept));
-    }
-    out
-}
-
-fn collapse_spaces(s: &str) -> String {
-    let mut out = String::with_capacity(s.len());
-    let mut in_run = false;
-    for c in s.chars() {
-        if c == ' ' {
-            if !in_run {
-                out.push('-');
-                in_run = true;
-            }
-            continue;
-        }
-        in_run = false;
-        out.push(c);
+        out.push(spec::anchor_slug(&String::from_utf8_lossy(&b[s..e])));
     }
     out
 }

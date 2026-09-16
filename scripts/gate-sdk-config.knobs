@@ -6,6 +6,9 @@ GATE_SDK_GRAPH_ARTIFACT = docs/check-graph.html
 # spec: gate-sdk/SPEC.md §check-graph — this repo's graph-theme chrome links the docs host and the source repo; sanction those prefixes for the external-ref assertion
 GATE_SDK_GRAPH_EXTERNAL_REFS = https://checkwright.dev https://github.com/checkwright
 
+# spec: gate-sdk/SPEC.md §Layout and configuration — where this project publishes the SPEC sections its shipped gate pointers name. The value is the publisher's own and never a kit literal, which is why it lives here beside the host the external-ref sanction already carries: the packer stamps it into the payload and init writes it into a vendored tree's own knob seam, so a consumer whose kit SPECs the payload withholds still reaches the invariant a red gate names
+GATE_SDK_SPEC_BASE_URL = https://checkwright.dev
+
 # spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships bash under no kit root: the installer's two bootstraps, its consumer smoke, and the runnable adoption walkthrough; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
 GATE_SDK_LINT_EXTRA_DIRS = installer/bin installer/consumer-smoke demo
 

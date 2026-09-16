@@ -153,6 +153,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_KIT_DIRS",
     "GATE_SDK_TMP_DIR",
+    "GATE_SDK_SPEC_BASE_URL",
     crate::emit::EVERY_REGISTERED_KNOB,
 ];
 
@@ -469,14 +470,89 @@ struct Dispatch<'a> {
     self_exe: &'a str,
     list: &'a str,
     scratch: &'a Path,
+    // spec: gate-sdk/SPEC.md §run-gates — resolved once for the run rather than per red member: the
+    // value is a knob read, and a battery reddening at scale would otherwise buy the same answer
+    // once per failure
+    spec_base_url: &'a str,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the invariant line's reserved prefix, held here because the
+// producer and §Consumer smoke's demo excerpt, which terminates by recognising this line, may not
+// spell it twice
+pub const SPEC_LINE_PREFIX: &str = "    spec: ";
+
+// spec: gate-sdk/SPEC.md §run-gates — the failing member's own declared invariant, read off the
+// descriptor that resolved it and only on a red; a descriptor carrying no `# spec:` line
+// contributes nothing rather than a blank line
+fn invariant(d: &Dispatch, name: &str) -> String {
+    let Some(src) = registry::resolve(name, d.resolve_dirs) else {
+        return String::new();
+    };
+    let Ok(text) = std::fs::read_to_string(&src) else {
+        return String::new();
+    };
+    let Some(body) = text
+        .lines()
+        .find_map(|l| l.trim_start().strip_prefix("# spec:"))
+    else {
+        return String::new();
+    };
+    let body = body.trim();
+    // spec: canon-kit/SPEC.md §check-spec-pointer — the directive's payload: the significant head
+    // ends at the em-dash prose tail, which is the one-line statement printed verbatim
+    let (head, tail) = match body.split_once(" — ") {
+        Some((h, t)) => (h.trim(), t.trim()),
+        None => (body, ""),
+    };
+    let (path, frag) = match head.split_once('§') {
+        Some((p, f)) => (p.trim(), f.trim()),
+        None => (head, ""),
+    };
+    let located = resolved_location(path, frag, d.spec_base_url);
+    if tail.is_empty() {
+        format!("\n{}{}", SPEC_LINE_PREFIX, located)
+    } else {
+        format!("\n{}{} — {}", SPEC_LINE_PREFIX, located, tail)
+    }
+}
+
+// spec: gate-sdk/SPEC.md §Layout and configuration — `GATE_SDK_SPEC_BASE_URL`: empty resolves in
+// the tree, set resolves a `<dir>/SPEC.md §<heading>` pointer to `<base>/<dir>/SPEC#<anchor>`, and
+// a pointer the mirror does not publish keeps its repo-relative spelling
+fn resolved_location(path: &str, frag: &str, base: &str) -> String {
+    let in_tree = || {
+        if frag.is_empty() {
+            path.to_string()
+        } else {
+            format!("{} §{}", path, frag)
+        }
+    };
+    if base.is_empty() {
+        return in_tree();
+    }
+    let Some(dir) = path.strip_suffix("/SPEC.md") else {
+        return in_tree();
+    };
+    if dir.is_empty() || dir.contains('/') {
+        return in_tree();
+    }
+    let mut url = format!("{}/{}/SPEC", base.trim_end_matches('/'), dir);
+    if !frag.is_empty() {
+        url.push('#');
+        url.push_str(&crate::spec::anchor_slug(frag));
+    }
+    url
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — one member, run as a child process; the in-process call is
 // refused there, on the declared-knob discipline, fault isolation and the surviving `.sh` members
 fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
     let started = Instant::now();
+    // spec: gate-sdk/SPEC.md §run-gates — the invariant rides the `tail` field rather than a second
+    // Outcome field: the flush already writes the tail with `writeln!`, so a multi-line value needs
+    // no second writer and cannot be printed by one path and dropped by another
     let fail = |tail: &str, body: String, ms: u128| Outcome {
-        tail: format!("  FAIL: {} ({})", sel.name, tail),
+        tail: format!("  FAIL: {} ({}){}", sel.name, tail, invariant(d, &sel.name)),
         output: body.into_bytes(),
         failed: true,
         ms,
@@ -548,7 +624,12 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
                 }
             } else {
                 Outcome {
-                    tail: format!("  FAIL: {} (exit {})", sel.name, done.code),
+                    tail: format!(
+                        "  FAIL: {} (exit {}){}",
+                        sel.name,
+                        done.code,
+                        invariant(d, &sel.name)
+                    ),
                     output: done.output,
                     failed: true,
                     ms,
@@ -721,11 +802,19 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
+    let spec_base_url = match knob("GATE_SDK_SPEC_BASE_URL") {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("{}: {}", TOOL, e);
+            return 2;
+        }
+    };
     let d = Dispatch {
         resolve_dirs: &resolve_dirs,
         self_exe: &self_exe,
         list: &list,
         scratch: &scratch,
+        spec_base_url: &spec_base_url,
     };
 
     let outcomes = dispatch_all(&d, &selected);
@@ -829,7 +918,11 @@ fn dispatch_all(d: &Dispatch, selected: &[Selected]) -> Vec<Outcome> {
             m.into_inner()
                 .expect("a battery result slot is poisoned")
                 .unwrap_or_else(|| Outcome {
-                    tail: format!("  FAIL: {} (dispatch harness error, exit 2)", selected[i].name),
+                    tail: format!(
+                        "  FAIL: {} (dispatch harness error, exit 2){}",
+                        selected[i].name,
+                        invariant(d, &selected[i].name)
+                    ),
                     output: b"the worker pool returned no result for this member".to_vec(),
                     failed: true,
                     ms: 0,
@@ -841,6 +934,54 @@ fn dispatch_all(d: &Dispatch, selected: &[Selected]) -> Vec<Outcome> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §Layout and configuration — both branches of the resolution, and the
+    // two shapes the mirror does not publish: a nested path and a non-SPEC document, each keeping
+    // its repo-relative spelling rather than naming a page that is not there
+    #[test]
+    fn a_pointer_resolves_to_the_mirror_only_where_the_mirror_publishes_one() {
+        assert_eq!(
+            resolved_location("gate-sdk/SPEC.md", "Consumer payload", ""),
+            "gate-sdk/SPEC.md §Consumer payload"
+        );
+        assert_eq!(resolved_location("gate-sdk/SPEC.md", "", ""), "gate-sdk/SPEC.md");
+        assert_eq!(
+            resolved_location("gate-sdk/SPEC.md", "Consumer payload", "https://example.test"),
+            "https://example.test/gate-sdk/SPEC#consumer-payload"
+        );
+        // comment-tier-exempt: a trailing slash is a local property of a hand-written knob value
+        assert_eq!(
+            resolved_location("gate-sdk/SPEC.md", "", "https://example.test/"),
+            "https://example.test/gate-sdk/SPEC"
+        );
+        assert_eq!(
+            resolved_location("canon-kit/SPEC.md", "bin/env-probe — the floor", "https://example.test"),
+            format!(
+                "https://example.test/canon-kit/SPEC#{}",
+                crate::spec::anchor_slug("bin/env-probe — the floor")
+            )
+        );
+        assert_eq!(
+            resolved_location("vendor/gate-sdk/SPEC.md", "X", "https://example.test"),
+            "vendor/gate-sdk/SPEC.md §X"
+        );
+        assert_eq!(
+            resolved_location("docs/site-architecture.md", "X", "https://example.test"),
+            "docs/site-architecture.md §X"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the prefix is reserved AGAINST the two verdict prefixes
+    // and against the overhead meter's content marker, both asserted rather than eyeballed
+    #[test]
+    fn the_invariant_lines_prefix_misses_every_verdict_reader() {
+        assert!(!SPEC_LINE_PREFIX.starts_with("  PASS: "));
+        assert!(!SPEC_LINE_PREFIX.starts_with("  FAIL: "));
+        assert!(!SPEC_LINE_PREFIX.contains("FAIL: check-"));
+        let line = format!("{}gate-sdk/SPEC.md §X — the rule it holds", SPEC_LINE_PREFIX);
+        assert!(!line.starts_with("  PASS: ") && !line.starts_with("  FAIL: "));
+        assert!(!line.contains("FAIL: check-"));
+    }
 
     // spec: gate-sdk/SPEC.md §The port-candidate criteria — the criterion-6 discharge for the
     // `staged_matches` twin the port created: one canned corpus of glob/path pairs put to

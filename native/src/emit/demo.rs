@@ -384,13 +384,14 @@ fn fire_violation(consumer: &str, sdk_kit: &str) -> Result<String, Outcome> {
 }
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — the reddened gate's own block quoted back, from its
-// section header through its `FAIL:` line, so the reader sees the finding and the help line rather
-// than being told they exist.
+// section header through its `FAIL:` line and the invariant line beneath it, so the reader sees the
+// finding, the help line and the remedy rather than being told they exist
 fn excerpt(out: &str, gate: &str) -> Vec<String> {
     let head = format!("===== {} =====", gate);
     let tail = format!("FAIL: {}", gate);
     let mut quoted = Vec::new();
     let mut on = false;
+    let mut past_verdict = false;
     for line in out.lines() {
         if line.contains(&head) {
             on = true;
@@ -398,9 +399,12 @@ fn excerpt(out: &str, gate: &str) -> Vec<String> {
         if !on {
             continue;
         }
+        if past_verdict && !line.starts_with(crate::runner::SPEC_LINE_PREFIX) {
+            break;
+        }
         quoted.push(format!("  | {}", line));
         if line.contains(&tail) {
-            break;
+            past_verdict = true;
         }
     }
     quoted
@@ -430,21 +434,39 @@ mod tests {
         assert!(parent_of("/gate-sdk").is_err(), "a root-level kit has no host checkout");
     }
 
-    // spec: gate-sdk/SPEC.md §Consumer smoke — the excerpt runs from the gate's section header to
-    // its own `FAIL:` line and stops there, so a later gate's block never joins the quote.
+    // spec: gate-sdk/SPEC.md §Consumer smoke — the excerpt runs from the gate's section header
+    // through its own `FAIL:` line AND the invariant line beneath it, and stops there, so the
+    // remedy joins the quote and a later gate's block never does.
     #[test]
-    fn the_excerpt_stops_at_its_own_fail_line() {
-        let out = "before\n===== check-x =====\nfinding\nFAIL: check-x (exit 1)\n\
-                   ===== check-y =====\nFAIL: check-y (exit 1)\n";
+    fn the_excerpt_stops_after_its_own_fail_lines_invariant() {
+        let spec = format!("{}gate-sdk/SPEC.md §Whatever — the rule", crate::runner::SPEC_LINE_PREFIX);
+        let out = format!(
+            "before\n===== check-x =====\nfinding\nFAIL: check-x (exit 1)\n{}\n\
+             ===== check-y =====\nFAIL: check-y (exit 1)\n",
+            spec
+        );
         assert_eq!(
-            excerpt(out, "check-x"),
+            excerpt(&out, "check-x"),
+            vec![
+                "  | ===== check-x =====".to_string(),
+                "  | finding".to_string(),
+                "  | FAIL: check-x (exit 1)".to_string(),
+                format!("  | {}", spec),
+            ]
+        );
+        // comment-tier-exempt: a descriptor carrying no `# spec:` line is already a red under the
+        // self-lint contract, so this case pins a shape the battery cannot otherwise reach
+        let bare = "===== check-x =====\nfinding\nFAIL: check-x (exit 1)\n\
+                    ===== check-y =====\nFAIL: check-y (exit 1)\n";
+        assert_eq!(
+            excerpt(bare, "check-x"),
             vec![
                 "  | ===== check-x =====".to_string(),
                 "  | finding".to_string(),
                 "  | FAIL: check-x (exit 1)".to_string(),
             ]
         );
-        assert!(excerpt(out, "check-absent").is_empty());
+        assert!(excerpt(&out, "check-absent").is_empty());
     }
 
     // spec: gate-sdk/SPEC.md §Consumer smoke — the green token is the summary line's own grammar

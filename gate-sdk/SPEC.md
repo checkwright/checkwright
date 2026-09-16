@@ -142,7 +142,25 @@ default member is still the replacing knob's job, because an append cannot
 subtract — see §lib/gate.sh), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.knobs`; the graph vocabulary document — see
 §check-graph), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
-siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT` (see the
+siblings holding a `checks/` or a `smoke/`; **a vendored tree's value is set for
+them**, to the kit set the payload installed, by the installer writing this knob
+into their `gate-sdk-config.knobs` — the derived predicate is right where the
+kits are authored and wrong in a tree that merely received them, and §Consumer
+payload rules why), `GATE_SDK_PAYLOAD_WITHHOLD` (default `SPEC.md smoke`;
+whitespace-separated root-relative members the customer payload excludes from
+each packed kit root — see §Consumer payload. The default is the kit
+convention's own member names, because they are gate-sdk's names, and the knob
+stays steerable for a consumer whose spec file is named otherwise. An
+**explicitly empty** value withholds nothing and packs each root whole: that is a
+real configuration for a publisher who ships the engineering record, so this row
+is not one whose empty takes the default), `GATE_SDK_SPEC_BASE_URL` (default
+**empty**; where this project publishes the SPEC sections its shipped `# spec:`
+pointers name — see §Consumer payload and §run-gates. Empty means *resolve in the
+tree*, which is the live configuration for any tree holding the SPEC files,
+a hand-vendored one included. The value is the publisher's own and never
+a kit literal, so it sits in the publisher's own knob file beside
+`GATE_SDK_GRAPH_EXTERNAL_REFS`, which already carries the same host for the same
+reason), `GATE_SDK_ROOT` (see the
 locator paragraph below), `GATE_SDK_ROOT_ALLOWLIST` (default
 `<gates-dir>/root-allowlist.list`), `GATE_SDK_REGISTRY_DOC` (default `README.md`)
 and `GATE_SDK_RUNNER_DOC` (default `README.md`) for `check-kit-registration`
@@ -3266,6 +3284,18 @@ carries a kit prefix, so no static kit owns either, and declaring either would
 meet the same refusal and fail-close the arm on every invocation (§Consumer smoke).
 Read together with `--emit-session-id`: the refusal is a property of the *name*, not of the roster's
 size, so a member may declare what it can and still read what it may not declare.
+
+**`--pack-installer` is the same shape from the other side: a roster that grew
+when the payload gained a decision.** It declares the kit-root override, the
+target roster and the artifact path it already read, plus
+`GATE_SDK_PAYLOAD_WITHHOLD` and `GATE_SDK_SPEC_BASE_URL` (§Consumer payload) —
+each **defined in gate-sdk's static knob table**, which is the definition the
+declaration requirement asks for; the pre-binary shell library holds only a
+subset of that table, and a name it does not spell is declarable all the same,
+`GATE_SDK_KIT_DIRS` having been exactly that since before either new name
+existed. The scratch base the arm also reads, `INSTALLER_PACK_TMP_DIR` with its
+`TMPDIR` fallback, is absent from the roster and must be, on
+`--emit-session-id`'s ground above.
 
 **A declared roster may span more than one kit.** Each name resolves through the
 table of the kit its `<KIT>_` prefix names (§lib/gate.sh), so a member declaring
@@ -7980,19 +8010,25 @@ is ruled at §Porting a
 gate to the binary substrate (criterion 5) and implemented by the publish and
 install paths; this section is what arrives with it.
 
-**The payload withholds the predicate.** A gate on the binary substrate reaches
-a consumer as its `.gate` descriptor, its `# spec:` pointer and the SPEC section
-that pointer binds to, its `good/`+`bad/` fixture pair, and a prebuilt,
-digest-verified binary. **Its implementation source does not ship.** A consumer
-receives everything needed to run a gate, act on its verdict, and verify it
-behaves as specified, and does not receive the rule's text.
+**The payload withholds the predicate and the engineering record.** A gate on
+the binary substrate reaches a consumer as its `.gate` descriptor, its
+`# spec:` pointer, the one-line invariant that pointer's directive carries, its
+`good/`+`bad/` fixture pair, and a prebuilt, digest-verified binary. **Its
+implementation source does not ship, and neither does the SPEC file the pointer
+names.** A consumer receives everything needed to run a gate, act on its
+verdict, and verify it behaves as specified. The rule's text is withheld; the
+specification's prose is published rather than packed.
 
 <!-- payload-discloses: predicate-withheld -->
 
 That marker is the machine tier of the rule the paragraph above states, and this
 section is its one owner. canon-kit/SPEC.md §check-payload-claim owns what binds
 the two — a governed doc asserting a different disclosure class is a red rather
-than a discrepancy a reader has to notice.
+than a discrepancy a reader has to notice. **The class the marker declares does
+not move when a member's transport does.** Withholding the SPEC file newly
+withholds nothing *from* a consumer: the section is still disclosed, at a
+published location instead of inside the tarball. A change of transport is not a
+change of disclosure, and editing the marker would assert one.
 
 This serves a stated objective — that opacity is a goal and not a side effect,
 because withholding a gate's implementation favours *execution* of it over
@@ -8019,9 +8055,17 @@ needs:
 - **The `.gate` descriptor**, because its manifest readers must work with no
   build and no execution — the installer's `init` generates the hooks from them
   in the consumer tree (§The `# graph:` manifest).
-- **The `# spec:` pointer and its SPEC section**, because a gate that goes red
-  without an explicable invariant is an unactionable block, and an unactionable
-  block is how a blocking gate turns into a bypassed one.
+- **The `# spec:` pointer, resolved rather than accompanied**, because a gate
+  that goes red without an explicable invariant is an unactionable block, and
+  an unactionable block is how a blocking gate turns into a bypassed one. What
+  that ground needs is that the invariant be *reachable at the block*, not that
+  its file be *present in the tree*: the descriptor's own one-line invariant
+  ships and is printed with the failure (§run-gates), and the section behind the
+  pointer is published at `GATE_SDK_SPEC_BASE_URL` (§Layout and configuration) —
+  with the manifest's `commit` resolving the exact text a tree was vendored
+  from. The SPEC file itself is the majority of the packed bytes and is read by
+  no consumer battery, a vendored kit root being pruned from every finder by
+  default.
 - **The gate's own output and help text**, because the remedy line is the
   product. A gate that says only *no* is worse than no gate.
 - **The `good/`+`bad/` fixture pair**, which is shipping-side and is the
@@ -8187,6 +8231,89 @@ pack included. A refusal that writes nothing and names its cause beats a failure
 that half-vendors, and the difference matters most on the host that cannot debug
 it.
 
+The same helper is where the payload's withheld shape is applied, and it is
+applied to the kit roots alone: `installer/` goes through this helper too and is
+packed whole, its own non-shipping content being decided by the package roster
+instead. Because the shape is one declared value rather than a per-kit roster,
+the withheld set cannot drift from the governed one; and because the symlink
+pre-flight reads the same pathspec the archive does, the fail-closed guarantee
+still covers precisely what is packed.
+
+**The withheld shape, and why it is one value rather than a roster.**
+`GATE_SDK_PAYLOAD_WITHHOLD` (§Layout and configuration) is whitespace-separated
+root-relative members; each contributes `:(exclude)<root>/<member>` to the
+pathspec the archive and the pre-flight share and, for a member naming a
+directory on disk, `:(exclude)<root>/<member>/*` as well, since excluding a
+directory entry alone excludes no file under it. One shape reaching every root
+the pack loop yields is what keeps the shipped set derived from the governed
+set; a roster naming kits would be the maintained copy derivation-first refuses,
+and would let a kit fall out of the withholding by being forgotten. The
+exclusion rides `git archive`'s pathspec rather than `tar --exclude` because the
+pipeline's fragile half is `tar`'s reproduction of what it is handed — the
+paragraph above is that half — so the half that decides *what* is handed over is
+the half to narrow, and a pathspec needs nothing of `tar` at all.
+
+**The pre-flight's verdict is monotone in the packed set, which is why narrowing
+it costs nothing.** The verdict is *refuse iff the packed set contains a
+`120000` entry*, so narrowing can only remove refusals, and every refusal it
+removes names a path outside the packed set. The fail-closed guarantee is
+unchanged in reach while the class of refusals with no available remedy is
+emptied: a wide pre-flight would refuse a pack over a symlink inside a withheld
+`smoke/` tree, a refusal an operator could satisfy only by deleting content the
+payload was never going to carry.
+
+**Neither withheld member is load-bearing for a consumer.** canon-kit's finders
+prune a vendored kit root by default, opt-out only through
+`CANON_KIT_SCAN_KIT_ROOTS`, so no consumer battery ever resolves a vendored
+gate's pointer (canon-kit/SPEC.md §check-spec-pointer); and a kit's
+`smoke/install.sh` is the copy-vendoring path's installer, which the installer's
+own `init` recipe replaces — `init` derives a kit's consumer config from
+`templates/*-config.sh` and `templates/*-config.knobs` and its queue seed from
+`templates/TASK-QUEUE.md`, reaching `smoke/` for nothing. Beyond size, a kit's
+SPEC is the surface most likely to carry its publisher's own rule content, and
+withholding it keeps a publication decision from riding on the completeness of a
+sweep. **Refused, with its reason on record rather than left to be re-derived:**
+a generated extract carrying only the sections shipped pointers cite. It buys
+offline reading for a reader the publication already serves, at the standing cost
+of a projection and a freshness gate, and it leaves the publisher's prose in the
+payload for exactly the sections most likely to carry it.
+
+**Withholding `smoke/` costs the derived kit-root set, and the repair is a
+declaration.** The derived resolver admits a sibling directory as a kit root by
+testing for `checks/` or `smoke/` on disk (§Layout and configuration), and not
+every kit ships a `checks/` — so the withholding would make those roots
+unrecognizable in a vendored tree, silently and with no red, a root that drops
+out contributing no gate and a battery over a smaller set still being a green
+battery. No disk marker repairs it: `README.md` is the only member every kit
+still ships once both are withheld, and at a consumer's repository root it names
+nothing in particular, while `templates/` is a directory name a consumer's own
+root commonly holds and admitting it would read a consumer's tree as a kit root.
+A predicate that cannot be made both sufficient and specific is the wrong
+instrument. So the resolver is right where it runs and wrong where it does not:
+inference belongs to the repository that owns the kits, where the markers are
+present and the siblings are known, while a tree that *received* the kits has a
+better source — the set is a fact the payload already carries, and
+`GATE_SDK_KIT_DIRS` is the override that already replaces the derived set. The
+installer writes it (installer/SPEC.md §What init seeds), so the declaration
+mints no name and adds no mechanism.
+
+**The published resolution, and its honest bound.** Where
+`GATE_SDK_SPEC_BASE_URL` is set, a pointer `<dir>/SPEC.md §<heading>` resolves to
+`<base>/<dir>/SPEC#<anchor>`, the anchor being the heading's own auto-generated
+id, and the packer writes the resolved base into the payload stamp beside the
+version and the commit so `init` can write it into the consumer's knob seam
+(installer/SPEC.md §The manifest). The pointer *grammar* is untouched, and that
+is the ruling rather than an omission: a directive's target is a repo-relative
+path with an optional `§<heading>` fragment and nothing else, so a URL written
+into a pointer is read as a path and reported as a missing target. Adding a URL
+form would mint a second grammar for one fact, rewrite every shipped directive
+line, and put the publisher's host inside kit source — three costs for a
+resolution one knob already carries. **The bound, stated wherever the resolution
+is:** a published mirror serves the *current* statement of an invariant, not the
+statement at the commit a tree was vendored from. What resolves that exactly is
+the manifest's `commit`, against the public repository. No surface may present
+the mirror as version-pinned.
+
 The artifacts are never produced from a working
 tree: the pack step takes them
 from the run artifacts the build legs uploaded and builds none of them itself, so a
@@ -8350,7 +8477,12 @@ prints its path (the temp-dir write's named reclaim path).
 
 **Its operands, channels and arm placement.** `--keep` is the one flag; any other
 `-`-led word is an `unknown option` refusal, and a kit root that is not a directory
-or ships no `smoke/install.sh` is another, all exit 2. Diagnostics go to stderr
+or ships no `smoke/install.sh` is another, all exit 2. **That second refusal names
+its vendored-tree cause**, because the payload withholds `smoke/` (§Consumer
+payload) and so in an installed tree it is every root on every kit. The arm's
+subject is *do the kits work when vendored by copy* — a publisher's question,
+asked of a tree that has the kit sources — so refusing there is correct; refusing
+there without saying why reads as a broken install. Diagnostics go to stderr
 under a `run-consumer-smoke:` prefix, the arm's name without its dashes; the
 verdict lines, and the installers' own output, go to stdout. It is a bare flag
 rather than an `--emit` member because its contract is the exit status an emitting
@@ -8563,6 +8695,19 @@ its scratch is narrated and torn down as part of the arc, so there is no mode to
 caller, and that is load-bearing: the subject under test is the vendored consumer's own front-end, so
 calling this binary's registry in-process would run the host's gates against the
 scratch tree — the pairing defect the placement's own record names.
+
+**The walkthrough quotes the reddened gate's block back, through the remedy.**
+The excerpt runs from that gate's `===== <name> =====` header and terminates on
+its own `FAIL: <name>` line **and the invariant line beneath it**, so a reader
+sees the finding, the help line and the declared invariant rather than being told
+they exist. The terminator runs past the verdict because §run-gates prints that
+invariant line there: this reader's condition is on **order**, so a line printed
+where a blocked reader wants it falls outside an excerpt that stops at the
+verdict, and the walkthrough would silently stop showing the remedy it exists to
+show. The excerpt and the runner share one spelling of that line's prefix rather
+than each carrying its own, and a crate unit test pins the shape — the quoted
+block, a verdict with no invariant line beneath it, and a later gate's block
+never joining the quote.
 
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
@@ -9916,6 +10061,47 @@ roster-collapse tripwire — a battery that silently shrank shows a smaller N. A
 failing or erroring member prints its `===== <name> =====` banner and its
 captured output verbatim, always — the red path is the feedback channel and
 never quiets.
+
+**A red member's own declared invariant prints beneath its verdict, on every
+red, in every tree.** The runner reads the failing member's descriptor `# spec:`
+line and prints it on a line of its own — four spaces, `spec:`, then the pointer's
+location and the one-line statement after its em-dash. A member whose descriptor
+carries none contributes nothing rather than a blank line, which is already a red
+under the self-lint contract for a shipped gate; the read happens only on a red,
+so a green run pays nothing for it. Where `GATE_SDK_SPEC_BASE_URL` is set, the
+location is the published one (§Consumer payload), which is what makes the
+invariant reachable in a tree whose kit SPEC the payload withholds.
+
+**The gap that closes is presentation, not reach, and the distinction is
+load-bearing.** The invariant is not unreachable and never becomes so: the
+`.gate` descriptor ships, `checks/` is not withheld, and the descriptor's
+`# spec:` line carries the pointer and a one-line statement of the invariant
+after its em-dash. What is missing without this line is that nothing *presents*
+it at the moment a gate blocks a commit — it is reachable only by a detour the
+blocked author has to think to take. The withholding does not create that gap; it
+raises the cost of the detour, the file at the end of it having left the tree.
+The narrower form, printing only where the SPEC is withheld, is refused: it would
+condition an output line on a payload property, leave a publisher's own battery
+output and a vendored tree's gratuitously different, and make the one surface
+that proves the behaviour — the publisher's own battery — the one surface that
+never exercises it. Closing it at this width is worth it because an unactionable
+block is how a blocking gate turns into a bypassed one, and a remedy that arrives
+with the block is what keeps *fix it, never bypass it* cheap to follow.
+
+**The verdict line's two-space prefix is reserved, and three readers are why.**
+Three readers parse this log, on three different properties, and reading them as
+one rule is how two of the three get missed. `--emit parse-gates-log` keys on the
+exact prefixes `"  PASS: "` and `"  FAIL: "` and takes the gate name as the
+line's second whitespace-delimited token — its condition is on the **prefix**,
+not the weaker *use a separate line*, since a separate line beginning with those
+two spaces would emit a scenario for a gate that never ran. The overhead meter
+classifies a transcript line as gate output by `contains`, so its condition is on
+**content, not position**: an extra line carrying a verdict substring would
+inflate a measurement wherever it appeared. §Consumer smoke's demo excerpt quotes
+a reddened gate's block and terminates on the verdict, so its condition is on
+**order**. The invariant line's four-space `spec:` prefix satisfies the first
+two by construction, and the third is satisfied by that reader changing: its
+terminator runs past the invariant line, which §Consumer smoke owns.
 
 **A declared omission is what keeps that tripwire honest.** A member a consumer
 omits from their own registry is recorded there as `# omitted: <name> <reason>`
