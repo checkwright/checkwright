@@ -6,3 +6,4 @@
 
 isolated-dispatch-obligations scope a4c23d3d 2026-09-16 9bab3e27
 isolated-dispatch-obligations spec adaeb777 2026-09-16 d126f5ba
+isolated-dispatch-obligations align ae744949 2026-09-16 f1f5c7e9
