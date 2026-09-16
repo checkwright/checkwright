@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **payload-withholds-kit-specs** [spec: SPEC-payload-withholding.md] — the customer payload
-  packs every kit root whole (`git archive` per root at `native/src/emit/pack_installer.rs`),
-  so the kit SPECs and `smoke/` trees ride along as 69.8% of its bulk. The payload withholds
-  both, and a shipped gate's `# spec:` pointer resolves to the site's SPEC mirror instead.
-  **Deliverable:** the packer exclusion, the `gate-sdk/SPEC.md` §Consumer payload amendment
-  with its restatements at `docs/install.md` §What a gate discloses and `installer/README.md`
-  §What this package is, the four kit READMEs' nine own-SPEC links, the site's reference tier,
-  and the installer smoke's two new assertions. The grounds and the refused alternative are in
-  the amendment; the measured blocker it resolves is that drift-kit and guard-kit carry no
-  `checks/`, so withholding `smoke/` alone would drop both from the derived kit-root set in a
-  vendored tree, silently and with no red.
-  Promoted 2026-09-16 at spec, as `installer-front-door-cut`'s lead unit. Its terminal move
-  discharges the standing ruling recorded in `TRAJECTORY.md` under this slug.
-
 ## Technical Debt
 
 ## Deferred
@@ -4507,5 +4493,6 @@
 
 - provenance-ownership-recording-rule-assigns-into-kit-specs
 - installer-readme-usage-tier-split
+- payload-withholds-kit-specs
 
 ## Lessons Learned
