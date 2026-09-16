@@ -9,3 +9,4 @@ isolated-dispatch-obligations spec adaeb777 2026-09-16 d126f5ba
 isolated-dispatch-obligations align ae744949 2026-09-16 f1f5c7e9
 isolated-dispatch-obligations build a04729b9 2026-09-16 39e35aa7
 isolated-dispatch-obligations validate ab8b9d0c 2026-09-16 0789a44d
+isolated-dispatch-obligations close a8bfd22e 2026-09-16 c621f6bd
