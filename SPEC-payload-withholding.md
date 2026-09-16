@@ -345,7 +345,11 @@ lands on: `pack_installer::KNOBS`, whose declared rows must each be a name a kit
 library defines — an undefined name there fail-closes the arm on every run, so
 the table row lands in the same change as the declaration; gate-sdk/SPEC.md
 §Layout and configuration's knob roster; and the knob-default coupling gate,
-which reds on a table default the roster does not state.
+which reds on a table default the roster does not state. **Where the definition
+goes, measured rather than read off the declaration's own comment:** the table is
+`native/src/knobs/gate_sdk.rs`, and `gate-sdk/lib/gate.sh` defines only the
+pre-binary subset — `GATE_SDK_KIT_DIRS` is declared in `KNOBS` today while
+being defined in the Rust table alone, which settles that a table row suffices.
 
 **`GATE_SDK_SPEC_BASE_URL` (delta 6).** Producer: the knob table row at an empty
 default, set for this repository in `scripts/gate-sdk-config.knobs` and for a
