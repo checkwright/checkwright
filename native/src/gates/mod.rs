@@ -9,6 +9,7 @@ pub mod amendment_retired_spelling;
 pub mod amendment_update_target;
 pub mod agent_tier_explicit;
 pub mod assertion_strength;
+pub mod audit_roster;
 pub mod brevity;
 pub mod close_surfaces;
 pub mod comment_tier;
@@ -1135,6 +1136,20 @@ pub const REGISTRY: &[GateEntry] = &[
         &["LIFECYCLE_KIT_SURVEY_RECORD_FILE"],
         "lifecycle-kit",
         &[("git", "")],
+    ),
+    (
+        "check-audit-roster",
+        audit_roster::run,
+        &[],
+        &[
+            "LIFECYCLE_KIT_AUDIT_ROSTER_FILE",
+            "LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP",
+            "LIFECYCLE_KIT_STAGES",
+            "LIFECYCLE_KIT_QUEUE_FILE",
+            "LIFECYCLE_KIT_STATE_FILE",
+        ],
+        "lifecycle-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — two `?` and not one: the skills-dir listing
     // and the per-kit templates walk are separate call sites with separately unbounded roots,

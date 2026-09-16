@@ -109,6 +109,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_RULING_RECORD", ""),
         Row::indexed("LIFECYCLE_KIT_RULING_CITERS", &[]),
         Row::scalar("LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT", "10"),
+        Row::scalar("LIFECYCLE_KIT_AUDIT_ROSTER_FILE", ""),
+        Row::scalar("LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP", "1500"),
         Row::derived(
             "LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS",
             Shape::Indexed,
@@ -180,7 +182,11 @@ fn validate(v: &Values) -> Vec<String> {
             errs.push(format!("{} is empty", n));
         }
     }
-    for n in ["LIFECYCLE_KIT_SHIM_NGRAM", "LIFECYCLE_KIT_RECURRENCE_THRESHOLD"] {
+    for n in [
+        "LIFECYCLE_KIT_SHIM_NGRAM",
+        "LIFECYCLE_KIT_RECURRENCE_THRESHOLD",
+        "LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP",
+    ] {
         if let Some(s) = scalar(v, n) {
             if !positive(s) {
                 errs.push(format!("{} '{}' is not a positive integer", n, s));

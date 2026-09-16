@@ -36,6 +36,7 @@ check-close-surfaces
 check-merge-attrs
 check-lifecycle-registration
 check-survey-record
+check-audit-roster
 check-gap-inbox-neutrality
 check-scratch-citation
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar

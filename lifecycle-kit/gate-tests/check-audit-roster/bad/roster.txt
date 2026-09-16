@@ -1,0 +1,34 @@
+# contract: lifecycle-kit/SPEC.md §The audit roster
+
+class: dropped-due
+scope: a block whose due line a compaction pass lost
+last: never
+
+class: over-cap
+scope: an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close an accreted reading appended close after close 
+due: every close
+last: example-iteration close
+corpus: surfaces: TASK-QUEUE.md
+hits: 1
+declined: none
+
+class: over-cap
+scope: a second block under the same class slug
+due: every close
+last: never
+
+class: unknown-stage
+scope: a last naming a stage the machine does not configure
+due: every close
+last: example-iteration deploy
+corpus: git grep -n audit
+hits: 3
+declined: none
+
+class: empty-declined
+scope: a swept block that leaves declined empty instead of writing none
+due: every close
+last: example-iteration close
+corpus: git grep -n audit
+hits: 0
+declined:

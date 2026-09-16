@@ -106,6 +106,7 @@
 - `check-tree-terms` — reads gate-sdk's knobs from a knob file now, so a left-behind `<gates-dir>/gate-sdk-config.sh` refuses it at exit 2, including the one an earlier `init` wrote beside the gate binary — rewrite what you set into `gate-sdk-config.knobs` and delete the shell config.
 - `check-value-rollup-fresh` — reads gate-sdk's knobs from a knob file now, so a left-behind `<gates-dir>/gate-sdk-config.sh` refuses it at exit 2, including the one an earlier `init` wrote beside the gate binary — rewrite what you set into `gate-sdk-config.knobs` and delete the shell config.
 - `check-workflow-tiering` — reads gate-sdk's knobs from a knob file now, so a left-behind `<gates-dir>/gate-sdk-config.sh` refuses it at exit 2, including the one an earlier `init` wrote beside the gate binary — rewrite what you set into `gate-sdk-config.knobs` and delete the shell config.
+- `check-audit-roster` — new: every block of the audit roster `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` names carries `class:`/`scope:`/`due:`/`last:` and, once swept, `corpus:`/`hits:`/`declined:`, one line each under `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` bytes, each class once, with a current-iteration `last:` naming a stage the state file stamped. Both knobs are new; the file knob defaults empty, so the gate is inert until you set it — set it only after rewriting your roster into blocks (lifecycle-kit/SPEC.md §The audit roster), and declare the roster `close-surface: <path> advisory` in the binding that owns it.
 
 ## Renamed knobs
 

@@ -1,0 +1,6 @@
+block is missing its 'due:' line before 'last:'
+over the 1500-byte cap
+duplicate class 'over-cap'
+which is not a configured stage
+empty declined
+help:

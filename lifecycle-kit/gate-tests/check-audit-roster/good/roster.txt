@@ -1,0 +1,22 @@
+# contract: lifecycle-kit/SPEC.md §The audit roster
+
+class: identifier-restatement
+scope: governed prose restating a source's internal identifier roster; derive the corpus from the iteration's changed SPECs
+due: a heavy SPEC contract edit; release prep
+last: never
+
+class: capability-liveness
+scope: prose asserting a capability live after a descope; derive the deletion set per commit over the range
+due: any descope of a shipped capability
+last: example-iteration close
+corpus: surfaces: README.md, gate-sdk/SPEC.md
+hits: 2
+declined: none
+
+class: stale-identifier
+scope: a path cited as live after it was deleted; grep each deleted path tree-wide
+due: an iteration that deletes a tracked path
+last: example-iteration build
+corpus: git log --no-renames --diff-filter=D --name-only HEAD~3..HEAD
+hits: 0
+declined: the docs/ mirrors, regenerated from their sources and swept there

@@ -771,6 +771,16 @@ the clause's reader is a human or agent rather than a gate.
   refusal is the one this kit already records for ruling-authority names: nothing
   in the machinery branches on such a value, so a knob holding one would have the
   knob-citation gate as its only reader.
+- `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` — the consumer's audit roster (§The audit
+  roster); **default empty**, on `LIFECYCLE_KIT_RULING_RECORD`'s ground: a kit
+  default filename would assert that every adopter keeps this artifact under this
+  name. Empty makes close's review step and `check-audit-roster` inert.
+- `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP` — positive integer bytes bounding every
+  roster line (§check-audit-roster); default `1500`. A stated policy rather than a
+  derived number, `QUEUE_KIT_ENTRY_LINE_CAP`'s posture: no prior byte cap exists to
+  derive it from. It is sized so a `scope` line holds a class's standing readings
+  as a paragraph, while a dozen-class roster at the cap on every line still reads
+  whole in one pass. The table validator refuses a non-positive value at exit 2.
 - `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` — array of path globs for the surfaces
   held to the no-retrieval-pointer rule (§check-scratch-citation); default the
   queue file alone (`${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`, through `LIFECYCLE_KIT_QUEUE_FILE`). That default is the one permanent
@@ -1912,6 +1922,93 @@ The complaint the merge reached for is real — the two frictions compete for on
 triage attention and were ranked against each other by nothing — and the roster
 answers it directly: both appear on one derived roster, with modes, which is what
 "ranked against each other" needs. Merging the files was the proxy, not the thing.
+
+## The audit roster
+
+**The audit roster** is the capture mechanism of doctrine-kit's Enforcement-first
+carve-out. A class that no check can decide cleanly stays a stated manual duty,
+and a duty with no named cadence is one no session performs. So the class joins
+a tracked roster that the close stage reviews, with event-keyed due-ness: a named
+observable event — a contract edit, a release prep, a template upgrade, a new
+member on a governed surface — beats an iteration counter no surface tracks. The
+roster is hand-curated, not derived. Which classes escape a clean check is a
+judgment no tool enumerates, so Derivation-first's ladder lands on
+state-once-at-the-owner. The roster and its review step replace a gate; they
+are not one. Which classes a tree runs is consumer content: the blocks live in the
+consumer's file, and the kit ships no class.
+
+**The surface.** `LIFECYCLE_KIT_AUDIT_ROSTER_FILE` names it, and the knob
+defaults empty. A tracked record file carries a `# contract:` pointer header,
+then one block per class, separated by blank lines:
+
+```
+class: <class-slug>
+scope: <what to sweep, and each standing reading that changes how the next sweep runs>
+due: <the named event(s) that make the class due>
+last: <iteration> <stage>
+corpus: <the command the sweep ran> | surfaces: <path>[, <path>...]
+hits: <candidates triaged>
+declined: <what the sweep left unread or ruled outside its trigger, and why> | none
+```
+
+A never-swept class carries `last: never` and stops there. Every other block
+carries all seven keys, in this order, one per line, with no stray line. Each
+field has a named reader:
+- `class` — the review, as the block's key.
+- `due` and `last` — the review, to judge due-ness.
+- `scope` — the sweeping session, to derive its corpus.
+- `corpus` — the next sweep, which re-runs it as a floor.
+- `hits` — the next sweep. A count that falls with no tree change to explain it
+  is a signal to read.
+- `declined` — the next sweep, which takes up what its predecessor set aside.
+
+**Nothing appends.** A sweep *replaces* the `last`, `corpus`, `hits` and
+`declined` lines. A reading that changes how the next sweep runs is folded into
+`scope` by re-phrasing it, never by appending. The sweep's narration, its
+findings and its cleared candidates go into the commit message that re-stamps
+the block, so `git log -p` over the roster recovers every earlier reading, and
+the file carries only the standing ones. Every line is bounded by
+`LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP`, so a whole-file read stays affordable at
+the review.
+
+*Ruled out: one file per class.* It moves growth from one file to many and
+removes none of it, and a review still reads each accreted body whole. *Ruled
+out: capping an appending row and forcing the appending close to compress.* How
+much a sweep appends depends on the iteration's shape, such as a deletion or a
+ruling landing, so a per-close cap would truncate hardest in the iteration the
+roster exists for. The cap here bounds a standing line that is rewritten, never
+an append. *Compaction without a grammar is unsafe:* a pass that reads an accreted
+row as prose can drop a mandatory field. That is why the fields are separate lines
+and `check-audit-roster` grades them.
+
+**`corpus` attests what was read, not what the next sweep must read.** A stored
+probe goes stale whenever a class's instances are event-derived, such as the path
+components a deletion touched. So `scope` states how to derive the corpus, each
+sweep derives its own, and the predecessor's `corpus` is a floor that the sweep
+widens. A class with no single-command corpus stamps
+`corpus: surfaces:` and the list of surfaces it actually read. A capability claim's
+instances are an example: they are a tree set that no scanner infers. A sweep
+that read nothing has nothing to stamp there, so it cannot record a verdict.
+`declined` records any live-looking hit the sweep ruled outside its own trigger.
+A declined hit that is a live defect is still dispositioned, under the
+Gap-disposition rule.
+
+**`last` names its stage, and the stage is checked against the stamps.**
+`<stage>` is a member of `LIFECYCLE_KIT_STAGES`. The review belongs to the last
+configured stage, but any stage may stamp. A stage that just moved a class's
+population would otherwise leave the row stale. The review reads a `last` naming
+any other stage as a **pre-stamp**: the audit is still owed and has not run.
+Where `<iteration>` is the queue header's current iteration, the state file must
+carry an `<iteration> <stage>` stamp, so a row cannot claim a stage that never
+ran. *The honest limit:* the check proves the named stage was entered. It does
+not prove that session wrote the line, and it does not prove the audit was
+faithful.
+
+**A consumer that sets the knob owes the roster a `close-surface:` declaration,
+`advisory`** (§The close-surface roster). The roster is tracked, so without one it
+reaches no derived roster, which is the same position as the pre-flight valve's
+ledger. No forcing function exists, and the mode makes a skipped review visible.
+An empty knob leaves the review step skipped and `check-audit-roster` inert.
 
 ## Testing
 
@@ -4267,6 +4364,45 @@ read it. The first is unmechanizable; the second leaves no tracked artifact —
 the class delegation-kit/SPEC.md §Operative residency rules no gate is owed for.
 The entry report's read trigger (§bin/enter-stage.sh) is the affordance in place
 of an oracle there, and it is weaker than one by construction.
+
+### check-audit-roster
+
+Four assertions, over each block of the configured roster (§The audit roster):
+(A) the keys are present, in order, one per line, with no stray line — `last: never`
+closes a block after four keys and every other `last:` closes it after seven; every
+value is non-empty, `declined` taking the literal `none`, `hits` is a decimal
+integer, and `last` is `never` or `<iteration> <stage>` with `<stage>` a member of
+`LIFECYCLE_KIT_STAGES`; (B) no line exceeds `LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP`
+bytes; (C) `class` slugs are unique; (D) a `last` whose `<iteration>` equals the
+queue header's iteration names a stage the state file stamped for that iteration.
+
+A key found later in the block than expected reports every key dropped before it
+and keeps its own line, so a lost `due:` reads as the missing field it is rather
+than as a cascade of misplaced ones. A `corpus` value opening `surfaces:` must name
+at least one surface.
+
+An empty knob, an absent file, or a file holding its header alone is **clean and
+counted inert**. Bare mode drives the configured roster with all four assertions;
+an explicit file argument drives it hermetically with A, B and C, because a
+fixture's iteration names nothing in the host's state file. The clean line names
+which mode ran, on §check-survey-record's precedent. D reads nothing for a past
+iteration's `last`, because the boundary truncates the state file.
+
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model):
+the single `AUDIT-ROSTER: clean` line and a `help:` naming the grammar section on
+the finding path (output); exit 2 on an unreadable roster, queue or state file, an
+explicitly-named-but-missing roster, an unresolvable knob or a non-positive cap
+(fail-closed); a `good/`+`bad/` pair under `gate-tests/` driven through the
+hermetic argument — the bad case a dropped `due:` line (the attested compaction
+loss), an over-cap line, a duplicate class, a `last:` naming an unconfigured stage
+and an empty `declined:`, the good case a `never` block, a `surfaces:` block and a
+command block — plus `gate-tests/check-audit-roster.test.sh` for assertion D and
+the inert shapes (fixture-pair); and registration in this repo's `gates.list`
+(self-lint). Its `# graph:` couples the knob-named roster, the queue file and the
+state file at `tier=precommit`.
+
+*Not gated:* whether a sweep read its corpus faithfully, and whether a `hits` count
+is true. Both are session acts with no tracked residue.
 
 ### check-scratch-citation
 

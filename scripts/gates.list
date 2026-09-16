@@ -55,6 +55,7 @@ check-lesson-disposition
 check-merge-attrs
 check-close-surfaces
 check-survey-record
+check-audit-roster
 check-scratch-citation
 check-gap-inbox-neutrality
 check-queue-sections

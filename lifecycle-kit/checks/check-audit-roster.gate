@@ -1,0 +1,3 @@
+# graph: couples=knob:LIFECYCLE_KIT_AUDIT_ROSTER_FILE,TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt dir=one valve=none tier=precommit
+# install: on-surface
+# spec: lifecycle-kit/SPEC.md §check-audit-roster — every audit-roster block carries its grammar in order under the line cap, each class once, and a current-iteration last names a stage the state file stamped

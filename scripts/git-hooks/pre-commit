@@ -242,6 +242,10 @@ if staged_matches '.workflow/survey-record.md' 'scripts/gate-sdk-config.knobs' '
     run_gate check-survey-record native/target/release/checkwright-gates check-survey-record
 fi
 
+if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs'; then
+    run_gate check-audit-roster native/target/release/checkwright-gates check-audit-roster
+fi
+
 if staged_matches 'TASK-QUEUE.md' '*/SPEC.md' 'native/src/knobs/lifecycle_kit.rs' '*TASK-QUEUE.md' '*/SPEC.md' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs'; then
     run_gate check-scratch-citation native/target/release/checkwright-gates check-scratch-citation
 fi

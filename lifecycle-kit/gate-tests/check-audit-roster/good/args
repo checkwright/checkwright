@@ -1,0 +1,2 @@
+# hermetic override arg: the roster file (assertions A, B and C; no stamp check)
+roster.txt
