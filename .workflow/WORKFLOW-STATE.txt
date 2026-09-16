@@ -4,4 +4,4 @@
 
 ---
 
-— scope aefb279a 2026-09-16 8c6011e3
+seam-sweep-remainder scope aefb279a 2026-09-16 8c6011e3

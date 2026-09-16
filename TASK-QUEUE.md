@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: seam-sweep-remainder
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -3260,8 +3260,8 @@
   **A FIFTH SHAPE IS UNNAMED, AND THE GATE SLICE RULES IT:** a POSSESSIVE pointer (`CLAUDE.md's
   ... line`) is no § citation and passes; gate-sdk's two sites were rewritten impersonally
   2026-09-16, so only whether the predicate names the shape stays open.
-  **NO DISCHARGE LINE SURVIVES**: this entry carries its own end condition — it lands WHOLE, gate
-  green, or it stays here.
+  **NO DISCHARGE LINE SURVIVES**: it lands WHOLE, gate green, or stays here. **TAKEN ALONE as
+  `seam-sweep-remainder` (operator direction, 2026-09-16, lead-relayed)**; spec promotes it.
   **Cost while deferred:** the remaining published kit SPECs and every adopter's vendored copy carry
   private ruling history as mechanism and pointers a consumer cannot follow; product-class, and
   accreting measurably — gate-sdk re-acquired a slug citation after its own sweep landed.
