@@ -172,6 +172,17 @@
   no mechanism that performs it, and rule 2's body keeps the roster's grounds.
   Filed 2026-09-13 at `resident-tier-restatement`'s spec, from the rule-body audit; drained at
   its close.
+  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set — operator direction,
+  lead-relayed, revisable at a later scope or spec; no ruling record carries it.** The set:
+  `audit-roster-row-carry-unruled` (lead), this entry, `audit-class-corpus-attestation`,
+  `audit-roster-last-stamp-author-unconstrained`, `close-eviction-refiles-without-checking`. Its
+  composition argument, recorded here because no gate reads it: bundled — the four roster entries
+  share `.workflow/audit-roster.txt`'s row grammar and the close-stage review step reading it, and
+  this entry is their CARRIER, the kit section the grammar lands in. The fifth is a different close
+  sub-step with no schema overlap, taken knowing it re-spends a little. All five are features —
+  each adds a name or a filing contract to a governed surface — so the authoring stage promotes
+  them; the rule-2 pointer spans lifecycle-kit and doctrine-kit, and the audit stage that fires was
+  accepted with the set.
 
 - **agent-file-paragraph-sections-ungoverned** [design-pending] [cost: event/low] [surface: context-kit] — `check-brevity`,
   widened to a section set and every top-level item (context-kit/SPEC.md §The brevity gate),
@@ -1651,6 +1662,8 @@
   It is the generalization `check-measured-claim` names as the scope-claim axis it cannot
   reach, and is cross-referenced there rather than folded into it — that entry designs a scanner
   over authored prose, this one designs a stamp over a session act.
+  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set** as the corpus half
+  of the row grammar; `audit-roster-mechanism-has-no-kit-owner` records the set's argument.
 
 - **qualified-pointer-section-ownership** [design-pending] [cost: event/high] [surface: canon-kit] — `check-spec-pointer` asserts a
   cited `§Heading` **exists**, never that it is the heading which *owns* the cited claim, so a
@@ -1912,6 +1925,9 @@
   owner-check is owed by every filing, not only by one read from a capture log** — and it is a
   *lookup step*, which is exactly the cheap candidate fix above rather than a new one.
   Filed 2026-08-13 by close, from its own backlog-eviction step.
+  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set**, feature-class
+  because an owner-check owed by every filing is a contract other stages honor. The set's argument
+  lives on `audit-roster-mechanism-has-no-kit-owner`.
 
 - **install-disposition-smoke-accounting-split** [design-pending] [cost: event/low] [surface: gate-sdk] — the precommit gate checks smoke
   registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
@@ -3453,7 +3469,7 @@
   roughly 7KB the cost line forecasts, so that forecast is understated rather than generous;
   **214955 / 12 on 2026-09-06**, 65KB BELOW it, so growth is not monotone once a compaction lands
   and the cost line prices appends rather than the file; **231607 / 11 on 2026-09-07**, one row's
-  single line at 65680 characters, about 80k tokens to read whole.
+  single line at 65680 characters, about 80k tokens; **312154 / 13 at scope 2026-09-16**.
   **The second point bears on WHICH shape is right, not merely on size.** Those 10KB were one
   close's appends to FIVE rows that came due at once, and they came due because that iteration
   deleted a shell file and recorded a ruling. So append size is driven by ITERATION SHAPE rather
@@ -3466,11 +3482,10 @@
   unattended: a compression pass reads an accreted row as prose, and the grammar is graded by
   nothing.
   recurrence: audit-roster-row-carry-unruled 2026-09-07
-  Surfaced 2026-09-04 in the gap inbox by the `usage-verdict-cut` close's own later steps and
-  drained at the next iteration's scope entry, which is why its disposition is dated after it.
-  RE-FILED 2026-09-07 as a fresh gap bullet by that iteration's close — same subject, no new axis —
-  and drained here as a `recurrence:` stamp with the figure refreshed rather than as a second entry
-  (`lead, own-authority` 2026-09-07, on this scope's escalation).
+  Surfaced 2026-09-04 by `usage-verdict-cut`'s close, drained at the next scope; re-filed 2026-09-07
+  with no new axis, drained as the `recurrence:` stamp (`lead, own-authority` 2026-09-07).
+  **Directed 2026-09-16 at scope as `audit-roster-and-refiling-cut`'s LEAD unit**; its carrier
+  `audit-roster-mechanism-has-no-kit-owner` holds the set and its composition argument.
 - **upgrade-smoke-producer-leaks-worktrees-on-signal** [design-pending] [cost: event/high] [surface: gate-sdk] — the upgrade-smoke arm
   removes its worktrees on its own exit paths and traps no signal, so a run killed from outside
   leaks every checkout it created.
@@ -3902,6 +3917,8 @@
   **Cost while deferred:** the roster's own header states an authority its rows cannot be held to.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its audit-roster
   review; drained and promoted at this iteration's scope.
+  **Directed 2026-09-16 at scope into `audit-roster-and-refiling-cut`'s set** as the stamp-author
+  half of the row grammar; the carrier entry named above records the set's argument.
 
 - **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
@@ -4187,9 +4204,12 @@
   spends a refused commit and a re-issue on a conflict with a known cause and no owner.
   Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close as the third of its
   four bullets, none of which that close could drain; promoted at the following scope.
-  **Disposition directed 2026-09-16, lead-relayed: both candidate diffs are prepared and neither
-  is applied, the ruling deferred.** The entry stays in this pool until it is ruled, and a session
-  preparing either diff records it here rather than landing it.
+  **Where the suppression lives: SETTINGS-OWNED — operator direction 2026-09-16, lead-relayed at
+  scope, revisable at a later scope or spec.** Of the two prepared diffs the settings one is chosen
+  and the always-loaded one is declined, so no kit surface owns it. The chosen diff is applied on
+  the operator's behalf and never by a delegated session (CLAUDE.md §Housekeeping); `.claude/`'s
+  tracked settings carry no attribution key as of this scope, so it still awaits that application.
+  The entry stays deferred until then, and it did not join `audit-roster-and-refiling-cut`.
 
 - **queue-entry-evidence-tier** [design-pending] [cost: iteration/low] [surface: queue-kit] — nothing signals that an
   entry's body was compressed, so a later reader cannot tell a premise written at full evidence
