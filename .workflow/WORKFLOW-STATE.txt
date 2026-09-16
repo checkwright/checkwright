@@ -4,11 +4,4 @@
 
 ---
 
-installer-front-door-cut scope a82d9a21 2026-09-16 3fe20068
-installer-front-door-cut spec aad4de75 2026-09-16 a6ee6b23
-installer-front-door-cut spec aad4de75 2026-09-16 c3c6c430
-installer-front-door-cut align adce7f4e 2026-09-16 d8ea2bc5
-installer-front-door-cut build a333c87a 2026-09-16 a1149ad7
-installer-front-door-cut build a943064c 2026-09-16 7bec8854
-installer-front-door-cut validate a82fe252 2026-09-16 efcfa24d
-installer-front-door-cut close a7070a30 2026-09-16 bf44c122
+— scope acd8d224 2026-09-16 c4aa3c0d
