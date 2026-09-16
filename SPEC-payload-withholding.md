@@ -317,9 +317,44 @@ An assertion that *counts* is what the withholding needs, and the manifest's
 own oracle: it fires on a packer that stopped excluding, which is the regression
 delta 1 can suffer silently.
 
-### (9) The kit READMEs' own-SPEC links point at the published mirror
+### (9) Each kit README says where its SPEC is published, and its links stay relative
 
-Nine markdown links across four kit READMEs are re-targeted. {mechanical}
+Every kit README gains one sentence naming the publication; the markdown links
+to its own `SPEC.md` are **unchanged**, and no README names a host.
+{design-bearing}
+
+**The link target was re-derived and the shape was re-ruled.** The corpus is 18
+links across all eleven kit READMEs, not the nine across four this delta was
+authored with — the probe is an anchored grep for `[...](...SPEC.md...)` over
+`*/README.md` restricted to the README's own kit, and it yields
+`gate-sdk` 3, `lifecycle-kit` 4, `doctrine-kit` 3 and one each for the remaining
+eight. Re-targeting them to the site path was **refused**, on three grounds that
+point the same way:
+
+- It is a **kit literal carrying the publisher's host**, exactly the class the
+  `<KIT>_<KNOB>` convention exists to prevent, and exactly the cost delta 6
+  already counts when it refuses a URL form for the pointer grammar. This
+  amendment's own seam ruling says nothing here names a host; a rewrite that put
+  one in eleven kit files would contradict it.
+- The site mirror is a byte projection of these same READMEs, and
+  canon-kit/SPEC.md §The reference-link grammar rules that the mirror
+  **preserves the documents' cross-citation topology one-to-one**. An absolute
+  URL in the source turns the site's own relative kit-page topology into
+  absolute self-links.
+- A root-relative site path is read by `check-md-refs` as a repo-relative path
+  and reds.
+
+Shipping the URL now and filing the debt was put up and refused too: it lands
+the seam crossing and defers only the cleanup.
+
+**The residual cost, accepted knowingly rather than missed.** A vendored
+adopter's kit README still carries a relative link to a file their tree no
+longer holds. This delta **narrows** that break — the README now says where the
+document is published, so a reader meeting the dead link has the answer on the
+same page — and it does not close it. A later unit that wanted to close it
+would resolve a README's link target from `GATE_SDK_SPEC_BASE_URL` at pack
+time, the way a shipped pointer already resolves; that is a gap to file, not
+work this delta starts.
 
 ### (10) The disclosure restatements are corrected
 
@@ -418,6 +453,32 @@ opt-out value a consumer who sets it would meet as dangling pointers; stated so
 the opt-out is not discovered as a defect), `--run-consumer-smoke` (delta 12), and
 the installer smoke's new assertions (delta 8).
 
+**Two more readers of those paths, found by running the installer smoke rather
+than by reading, and added because this roster is what a later reader trusts.**
+Both are gates the payload installs into a consumer's starting battery, and both
+red there once the paths are withheld:
+
+- **`check-gate-assertions`** builds its corpus from `<gates-dir>/SPEC.md` plus
+  each kit root's `SPEC.md`; withholding empties it, and an empty corpus is its
+  fail-closed exit 2. It passed in a vendored tree only because the kit SPECs
+  filled the set. **Its disposition becomes `on-surface`** — in a consumer tree
+  its subject is the adopter's own SPEC and their own gates, which is
+  gate-sdk/SPEC.md §The install disposition's definition of that value verbatim.
+- **`check-install-disposition` assertion B** reds on every `zero-config` member
+  of every vendored kit, no kit shipping a `smoke/install.sh` any more. **A kit
+  shipping none is skipped and reported on the clean line** — verbatim the
+  disposition that section already gives sibling assertion C for the same tree
+  class, and what B's own ground ("the smoke's tree is a superset of the tree
+  `init` makes") already presupposes.
+
+**Neither repair weakens a gate to make a battery pass, and the test is stated
+because that is what the shape resembles.** Neither is a path or glob exemption.
+`on-surface` touches install-time arming alone, leaves the rule and the exit-2
+wrong-directory guard intact, and leaves this repository's own `gates.list`
+registering the gate. Assertion B's skip still fires wherever a kit does ship a
+`smoke/install.sh`, which is every kit in the publishing tree. Local coverage is
+unchanged by both; what changes is only which tree arms them.
+
 **The kit-root declaration (delta 4).** Producer: `init`, on every install,
 writing the payload's own kit set. Consumer: `walk::roots_from`, which returns
 the declared set whenever the knob is non-empty and never reaches the disk
@@ -448,15 +509,11 @@ ends at the remedy. That reader's fixture is the oracle for the change, and it i
 listed as an update target below.
 
 **Enumerable corpus, each member's satisfying value (delta 9).** The corpus is
-the markdown links from a kit README to that kit's own `SPEC.md`. Probe: an
-anchored grep for `[...](...SPEC.md...)` over `*/README.md`, restricted to
-targets naming the README's own kit. It yields nine members — `gate-sdk/README.md`
-three, `lifecycle-kit/README.md` four, `canon-kit/README.md` one,
-`delegation-kit/README.md` one — and each member's satisfying value is the same
-rewrite: the site path for that kit's mirrored SPEC, carrying the fragment the
-link already carries. No member lacks one. This roster is a floor the merging
-session re-derives with the same probe; the queue entry's own figures were
-produced by two different counting rules and are superseded by this one.
+the **kit READMEs**, all eleven, and each member's satisfying value is the same:
+one sentence naming where that kit's SPEC is published, and its own-SPEC links
+left as they are. No member lacks one. The link corpus those READMEs carry — 18
+markdown links, re-derived by the probe delta 9 states — is the corpus this
+delta deliberately **does not** change, and the reasons are on the delta.
 
 **Enumerable corpus, each member's satisfying value (delta 1's kit set).** The
 corpus is the kit roots the pack loop yields. Probe: `--emit kit-roots` in this
@@ -509,9 +566,11 @@ claims.
   sentence saying what the pruning now protects, its opt-out having acquired a
   consequence (delta 1). Probe: `grep -n 'CANON_KIT_SCAN_KIT_ROOTS'` over the
   tracked tree.
-- `gate-sdk/README.md`, `lifecycle-kit/README.md`, `canon-kit/README.md`,
-  `delegation-kit/README.md` — nine own-SPEC links (delta 9). Probe: as stated in
-  §Producers and consumers.
+- Every kit `README.md` — one sentence naming the publication, links unchanged
+  (delta 9). Probe: as stated on the delta.
+- `gate-sdk/checks/check-gate-assertions.gate` — its `# install:` disposition,
+  and `gate-sdk/SPEC.md` §check-install-disposition — assertion B's skip for a
+  kit shipping no `smoke/install.sh` (delta 1's two further readers, above).
 - The on-site SPEC mirror — `docs/<kit>/SPEC.md` and `docs/<kit>/README.md` are a
   byte-gated projection of every source above that this amendment edits, so the
   regeneration is owed with them (all deltas). Probe:

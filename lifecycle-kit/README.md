@@ -21,6 +21,10 @@ predecessor stamp, the drained queue at validate entry, and the
 cross-component audit trigger at build entry. See [SPEC.md](SPEC.md) for the
 full contracts.
 
+An installer-vendored tree does not carry this file. The payload withholds each
+kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
+`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+
 The linear stage walk is the default; the gate-legal ways to leave it —
 abandon, split, reopen — compose existing mechanism with no new tooling
 ([SPEC.md](SPEC.md) §Deviation transitions).

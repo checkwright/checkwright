@@ -12,6 +12,10 @@ markdown link to the vendored doctrine, and re-vendoring the kit *is* the
 doctrine upgrade. See [SPEC.md](SPEC.md#the-doctrine-deliverable) for why that
 reference-not-copy boundary is the mechanism.
 
+An installer-vendored tree does not carry this file. The payload withholds each
+kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
+`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+
 The installer — the gate binary's `--install-doctrine` arm — inserts or replaces the reference
 block between fixed markers, idempotently. It does not carry the digest: each
 bullet is derived from the summary its rule states in a `*Digest:*` trailer, so

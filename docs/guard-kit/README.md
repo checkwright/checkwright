@@ -21,6 +21,10 @@ closes the loop by making the fall-through set — exactly the commands nothing
 granted — the one thing that *is* recorded. See [SPEC.md](SPEC.md) for the
 framework, the generic ruleset, what the steering buys, and the triage criterion.
 
+An installer-vendored tree does not carry this file. The payload withholds each
+kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
+`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+
 Unlike the other kits, guard-kit registers **no gates**: its surfaces are
 hooks, a library and templates, so nothing joins `gates.list`. It follows
 gate-sdk's layout and smoke conventions without depending on its registry.

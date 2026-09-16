@@ -26,6 +26,10 @@ freshness, and the deferred pool's filing contract — its per-entry budget and
 its lead-line board tags. See [SPEC.md](SPEC.md) for
 the full contracts.
 
+An installer-vendored tree does not carry this file. The payload withholds each
+kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
+`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+
 ## Install
 
 Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:

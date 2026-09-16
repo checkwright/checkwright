@@ -60,6 +60,10 @@ same change) that is out of scope here.
 The design contracts, the manifest grammar, and each component's full contract
 live in [SPEC.md](SPEC.md).
 
+An installer-vendored tree does not carry this file. The payload withholds each
+kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
+`GATE_SDK_SPEC_BASE_URL` names instead (SPEC.md §Consumer payload).
+
 ## Quick start
 
 Vendor the kit into your repo at `gate-sdk/`, then:

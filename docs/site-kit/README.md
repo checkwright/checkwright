@@ -31,6 +31,10 @@ consumer copies, never a gate: the line is where the asserted object lives, and
 none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-boundary)
 for why that boundary is load-bearing.
 
+An installer-vendored tree does not carry this file. The payload withholds each
+kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
+`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+
 ## Install
 
 Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree/master/gate-sdk/) (required), then:

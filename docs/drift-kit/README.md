@@ -20,6 +20,10 @@ Advisory by construction: the report exits 0, never fails a session, and reads
 sessions is the signal. See [SPEC.md](SPEC.md) for the report frame, the plugin
 contract, the bundled KPI set, and the knowledge-friction loop.
 
+An installer-vendored tree does not carry this file. The payload withholds each
+kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
+`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+
 Like [guard-kit](https://github.com/checkwright/checkwright/tree/master/guard-kit/), drift-kit registers **no gates**: its surface
 is a pair of advisory `--emit` arms and a KPI registry, so nothing joins
 `gates.list`. It

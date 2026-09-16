@@ -8314,6 +8314,23 @@ statement at the commit a tree was vendored from. What resolves that exactly is
 the manifest's `commit`, against the public repository. No surface may present
 the mirror as version-pinned.
 
+**A kit README says where its SPEC is published and does not link it, which is a
+ruling and not an oversight.** Each kit's `README.md` ships, its `SPEC.md` does
+not, and the README's own relative links to that file therefore dangle in an
+installed tree. Re-targeting them at the published location was refused: the
+value is the publisher's host, so putting it in eleven kit files is the kit
+literal the `<KIT>_<KNOB>` convention exists to prevent — the same cost this
+section already counts when it refuses a URL form for the pointer grammar — and
+the site mirror is a byte projection of those same READMEs, which
+canon-kit/SPEC.md §The reference-link grammar requires to preserve the
+documents' cross-citation topology one-to-one. What each README carries instead
+is one sentence naming the withholding and the knob, no host in it. **The
+residual cost is accepted rather than closed:** the dangling link remains, and
+the sentence narrows the break by putting the answer on the same page as the
+dead link. Closing it would mean resolving a README's link target from the knob
+at pack time, the way a shipped pointer already resolves, and that is a
+separable unit rather than part of this one.
+
 The artifacts are never produced from a working
 tree: the pack step takes them
 from the run artifacts the build legs uploaded and builds none of them itself, so a
@@ -12666,6 +12683,17 @@ follow-on sentences, hierarchical axis/sub-rule contracts, and count-words
 with non-enumeration nouns. With no spec argument the gate scans
 `<gates-dir>/SPEC.md` when present plus each vendored kit's own `SPEC.md`;
 each matched heading resolves to its gate source through the registry path.
+
+**Its disposition is `on-surface`, and the payload's withholding is what makes
+that the right value rather than a preference.** An installed tree carries no kit
+`SPEC.md` and no gate source (§Consumer payload), so its corpus there is the
+adopter's own `<gates-dir>/SPEC.md` and their own gates — a surface they author
+later, which is §The install disposition's definition of that value. The empty
+corpus stays **exit 2**, and that is deliberate: it is the wrong-directory guard,
+and demoting it to a clean line to make a fresh install green would trade a
+fail-closed arm for an arming decision the disposition vocabulary already
+expresses. A publisher's tree registers the gate in its own `gates.list`
+regardless of disposition, so nothing this repository checks is narrowed.
 The three fail-closed exits and the internal skip sentinel port
 unchanged, the sentinel being no failure path at all: a `.gate`-declared member
 with no crate manifest present is counted onto the clean line as *declared out of
@@ -14078,6 +14106,13 @@ disposition.
   installer registers must be registrable there too. **The converse is not
   asserted** — a kit's smoke legitimately registers more than the installer does,
   and asserting equality would force one of the two trees to lie about itself.
+  **A kit shipping no `smoke/install.sh` is skipped**, counted on the clean line
+  and never a finding, for the reason assertion C's own absence is: there is no
+  roster there to be a superset of, which is what the assertion's ground already
+  presupposes. The case is a vendored consumer's, every one of them, the payload
+  withholding `smoke/` (§Consumer payload); in a tree that authors kits the skip
+  count is zero and the assertion is unchanged, so this narrows what the gate can
+  see nowhere that it could see anything.
 - **(C) No second copy** — the installer's `lib/common/recipe.sh` carries no
   literal gate name, so the de-literalization holds going forward rather than
   only at the commit that landed it. A `§`-prefixed occurrence is a spec-section

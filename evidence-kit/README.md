@@ -16,6 +16,10 @@ reached through gate-sdk's front end: `--run-validate` (the codified spine that
 runs the suites and records evidence) and `--diff-baseline` (the situational
 runtime diff). See [SPEC.md](SPEC.md) for the full contracts.
 
+An installer-vendored tree does not carry this file. The payload withholds each
+kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
+`GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
+
 ## Install
 
 Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:

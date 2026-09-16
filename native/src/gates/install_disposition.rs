@@ -140,7 +140,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     let mut findings: Vec<String> = Vec::new();
-    let (mut declared, mut zeroconf) = (0usize, 0usize);
+    let (mut declared, mut zeroconf, mut smokeless) = (0usize, 0usize, 0usize);
     for abs in &kit_roots {
         let kit = basename(abs);
         if !Path::new(&format!("{}/checks", abs)).is_dir() {
@@ -206,11 +206,11 @@ pub fn run(args: &[String]) -> i32 {
             zeroconf += 1;
             // assertion B: the smoke's roster is a superset of what the installer registers, so a
             // zero-config member of a kit appears in that kit's smoke/install.sh
+            // spec: gate-sdk/SPEC.md §check-install-disposition — a kit shipping no
+            // smoke/install.sh has no roster to be a superset of, so the absence is a SKIP reported
+            // on the clean line and never a finding, as assertion C's own absence already is
             if !Path::new(&smoke).is_file() {
-                findings.push(format!(
-                    "{}/checks/{}: declares {} where {} ships no smoke/install.sh to register it",
-                    kit, fname, ZERO_CONFIG, kit
-                ));
+                smokeless += 1;
             } else if !smoke_registers(&smoke, name) {
                 findings.push(format!(
                     "{}/checks/{}: declares {} but {}/smoke/install.sh does not register it",
@@ -267,8 +267,12 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     println!(
-        "INSTALL-DISPOSITION: clean ({} gate(s) declared, {} zero-config and registrable in their kit's smoke; recipe de-literalization checked: {})",
-        declared, zeroconf, recipe_checked
+        "INSTALL-DISPOSITION: clean ({} gate(s) declared, {} zero-config of which {} registrable in their kit's smoke and {} skipped for a kit shipping none; recipe de-literalization checked: {})",
+        declared,
+        zeroconf,
+        zeroconf - smokeless,
+        smokeless,
+        recipe_checked
     );
     0
 }
