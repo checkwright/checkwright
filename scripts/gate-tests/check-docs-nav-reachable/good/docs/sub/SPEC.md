@@ -5,5 +5,6 @@ generated: true
 
 # Sub SPEC mirror
 
-No nav slot and no inbound link: reachable only through the generated-sibling
-rule — its directory-sibling index.md is a nav child.
+No nav slot: the SPEC mirror is excluded from the generated-sibling suffix
+rule, so it is reachable only through the inbound link its directory-sibling
+index.md carries.
