@@ -278,8 +278,11 @@ consumer's path.
   - `check-scratch-citation` reads the forbidden truncated set, and the roster is not
     in it.
   - No reader asserts a count or a floor over the roster. Probe:
-    `git grep -n "audit-roster" -- '*.rs' '*.gate' scripts/` returned no gate reader
-    on 2026-09-16.
+    `git grep -n "audit-roster" -- '*.rs' '*.gate' scripts/` returns one hit on
+    2026-09-16 — `scripts/lifecycle-config.knobs`'s `LIFECYCLE_KIT_RULING_CITERS[]`
+    entry, the citing report's surface list already read above. It names the
+    roster as a citer to scan, not a count or a floor over it; no `.rs` or `.gate`
+    reader is in the set.
 - **Point 6.** The members are the nine class rows, enumerated by
   `cut -d' ' -f1 .workflow/audit-roster.txt`:
   - internal-identifier-restatement
