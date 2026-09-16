@@ -68,8 +68,8 @@
   743 inline `python3` calls in about 27k Bash calls, 572 writing one path and 50 several. So the
   shape recurs. The direction widens the ask (operator direction, 2026-09-15, lead-relayed): steer
   agents off interpreters and utilities whose side effects cannot be read, onto predictable tools
-  checkwright builds in Rust. `rewrite-arm` is that family's first member, and
-  `in-place-rewrite-steer-reach` records `python3` bodies as unsteered for want of a target.
+  checkwright builds in Rust. The landed `--rewrite` arm is that family's first member, and its
+  steer (Done 2026-09-15) left `python3` bodies unsteered for want of a target.
   **Why `[design-pending]`:** the census comes first. It classifies what the inline bodies
   compute, and only then can a tool be named. Whether a steer can read a body the guard's skeleton
   blanks is a second call.
@@ -4487,14 +4487,5 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
-
-- audit-roster-row-carry-unruled
-- audit-roster-mechanism-has-no-kit-owner
-- audit-class-corpus-attestation
-- audit-roster-last-stamp-author-unconstrained
-- close-eviction-refiles-without-checking
-- audit-roster-row-body-unbounded-growth
-- audit-roster-grammar-ungated
-- audit-roster-grammar-and-stored-probe-set
 
 ## Lessons Learned
