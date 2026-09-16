@@ -389,6 +389,47 @@ end. The roster is a floor the merging session re-derives.
   (docs/site-architecture.md §Generated projections and their freshness gates).
   (all deltas)
 
+## Provenance seam
+
+**What ships as kit mechanism.** All five deltas. Each is generic: the
+producer/observer split, the self-deadlock test, the turn-end reap, the
+blindness composition and the propagate obligation are statements about any
+session that backgrounds a child or dispatches into isolation, and none names a
+product, a term list, a vocabulary or a constant set. Deltas 1–4 land in
+`templates/agent-execution.md` and `SPEC.md`; delta 5 lands in the consumer's
+own surfaces and is the kit stating an obligation, never the kit shipping the
+text that discharges it.
+
+**What must not ride into the kit SPEC at merge, and it is named here because
+the merge is where it would slip.** Three consumer-specific facts appear above
+because the causal-completeness check demands them and cannot be answered
+generically:
+
+- `scripts/delegation-config.knobs` and the roster value `audit-sweep`, cited
+  under point 1 to show the producer is reachable in *deployed* configuration
+  rather than in fixtures alone. The kit SPEC states the rule against
+  `DELEGATION_KIT_READONLY_TYPES` as a knob whose roster is the consumer's, on
+  the standing config-via-env convention; the value is a consumer fact and stays
+  one.
+- The two `.claude/agents/` paths, enumerated under point 6 because the
+  obligation is over a corpus and the check requires each member's satisfying
+  value be named. `SPEC.md` §Operative residency already refers to such carriers
+  as *this consumer's* definitions and is the shape to match; a kit literal
+  naming these two files would publish this consumer's agent roster and would be
+  wrong for every other adopter besides.
+- The attested sightings, which are stated **undated and unattributed** above on
+  purpose. Their dates, the sessions that met them, and the operator ruling that
+  scoped delta 3's parent unit out of an earlier envelope are provenance: they
+  live on the queue entries and in git history, and the kit SPEC states each
+  rule undated.
+
+**What becomes consumer config.** Nothing new. No delta mints a knob, and none
+is owed: the only configurable input any of them reads is
+`DELEGATION_KIT_READONLY_TYPES`, which already exists and whose empty-roster
+degradation is already ruled — with it empty, delta 4's *not delegable at all*
+clause is simply never reached, which is the correct inert behavior and needs no
+second knob to express.
+
 ## Retired spellings
 
 - None — no delta of this amendment retires a spelling. The deltas replace
