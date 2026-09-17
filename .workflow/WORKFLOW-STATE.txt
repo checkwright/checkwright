@@ -8,3 +8,4 @@ enum-and-citation-parity scope aeb94296 2026-09-17 978cb7f7
 enum-and-citation-parity spec a29a765c 2026-09-17 f706eb81
 enum-and-citation-parity align a52819af 2026-09-17 0e83c873
 enum-and-citation-parity build ab4f09eb 2026-09-17 eb932a51
+enum-and-citation-parity build a9b024e2 2026-09-17 0555089e
