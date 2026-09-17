@@ -27,6 +27,20 @@
   whether the tag earns its keep; promoted 2026-09-06 by close; paired 2026-09-17 at spec,
   unit of `queue-entry-grammar`.
 
+- **amendment-owner-position-citation** [spec: SPEC-amendment-citation.md] — prose may cite a
+  merged amendment as *settled history*, never as a live *owner*.
+  recurrence: amendment-owner-position-citation 2026-08-06
+  Amendments are deleted on merge (canon-kit/SPEC.md §Merging an amendment), so a citation
+  naming one in owner position dangles the moment it merges. The inverse direction of
+  `amendment-landing-citation-assertions` and of `amendment-deletion-content-completeness`.
+  **Shape settled at spec, 2026-09-17:** the decidable slice is a filename citation of an
+  amendment inside another amendment, where every attested owner citation sat (path form, no
+  `§`); the queue half stays an honest limit, since its filename citations are mostly history
+  form and tense is not decidable. The one queue owner citation found at spec, in
+  `docs-link-red-remedy-first`, was repointed in the pairing commit.
+  Filed 2026-08-03 at close from the gap inbox; recurred 2026-08-06; body cut to the
+  owner-position assertion at scope 2026-09-17; paired at spec, unit of `queue-entry-grammar`.
+
 ## Technical Debt
 
 - **deferred-entry-defer-date-unasserted** — a deferred entry whose provenance
@@ -1184,52 +1198,6 @@
   Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-09
   at scope.
 
-- **amendment-owner-position-citation** [design-pending] [cost: iteration/low] [surface: queue-kit] — prose may cite a merged
-  amendment as *settled history*, never as a live *owner*; today it does both.
-  recurrence: amendment-owner-position-citation 2026-08-06
-  Amendments are deleted on merge (canon-kit/SPEC.md §Merging an amendment), so a citation
-  naming one in owner position dangles the moment it merges — by construction, not by
-  oversight. This is the inverse direction of the class
-  `amendment-landing-citation-assertions` covers (amendment-to-spec landing citations) and
-  of `amendment-deletion-content-completeness` (content that fails to land): here the
-  canonical side is the one that goes stale.
-  **Re-verified 2026-09-17 at scope: the slug-form residue the 2026-08-03 close counted is GONE.**
-  None of the five present-tense queue citations it found (four naming
-  `gate-payload-disclosure-ruling` or `native-gate-meta-layer-reach`) still stands; the one
-  surviving mention outside this entry is settled-history form, and no amendment file is on disk.
-  The repoint half of the old deliverable is discharged, and this body is cut to the half that
-  remains — the rewrite the lead relayed without operator objection the same day.
-  **Recurred 2026-08-06 on a second surface that re-verification did not cover, falsifying its
-  "entirely inside `TASK-QUEUE.md`" scoping.** Sibling amendments *inside one iteration* cite
-  each other by path, so merge order decides which side dangles: `SPEC-verify-verb.md` cited
-  `evidence-kit/SPEC-liveness-lock.md` and `lifecycle-kit/SPEC-dispatch-signal.md`, both
-  merged away by earlier batches, leaving two dead pointers inside a governing input the last
-  batch had to repoint by hand before it could reason from it. Nothing fired on either. This
-  surface is path-form, so unlike the five slug-form instances it is in `check-spec-pointer`'s
-  reach — and its cost lands on the session reading the amendment as governing input, not on a
-  reader of the queue.
-  **The design question is where an owner citation differs from a lawful one.** The tag
-  algebra's unresolved-token rule *explicitly* sanctions naming landed work: "entries
-  legitimately name a closed defect class, a shipped contract, a settled ruling, and that
-  citation is valuable prose no gate may punish." A lawful citation says a merged slug *holds* a
-  decision, past tense; a defective one says it *rules* something, present tense, as though the
-  reader could go read it. The 2026-08-03 instances are the calibration set, recoverable from git.
-  **Deliverable:** an owner-position assertion in `check-amendment-queue` (its `couples=` already
-  reach `TASK-QUEUE.md` and the amendment glob), so the next dangling owner citation reds.
-  **Why `[design-pending]`:** owner position needs a decidable spelling that separates those
-  two forms, and tense is not mechanically decidable. The tractable proxy is the
-  `§`-heading form and the amendment path form; whether that catches enough of the
-  present-tense class to be worth its false-negative surface is the open call, and getting
-  it wrong permissively punishes the prose the tag algebra protects.
-  **Cost while deferred:** nothing stands false today, but each merged amendment can leave a
-  dangling owner citation — in a queue body, or in a sibling amendment read as governing input —
-  and nothing fires.
-  **A unit of `queue-entry-grammar` — operator direction, 2026-09-17, lead-relayed**; its spec
-  stage authors the amendment and pairs the entry.
-  Filed 2026-08-03 at close from the gap inbox, merging the validate-filed instances into
-  the base class and re-verifying both against the tree; found by build batch 1 and
-  validate, corrected and widened at close.
-
 - **partitive-exemption-line-scope** [design-pending] [cost: event/high] [surface: canon-kit] — `check-manifest-count` is stricter
   than its own spec, and the gap is one line break wide.
   Verified 2026-08-03 by build batch 4: prose reading "appeared in 57 of" / "the 96 checks
@@ -1381,7 +1349,7 @@
   **The rule is correct, and changing it is not what this asks for.** For a site served from
   `docs/` alone such a link 404s, and the gate already offers a remedy — the absolute self-repo
   blob form, or a `docs-link-exempt:` comment. It stays on-surface deliberately
-  (`SPEC-prose.md` keeps it there), so nothing is broken today.
+  (its descriptor's `install:` line keeps it there), so nothing is broken today.
   **The gap is first contact.** The gate's whole subject is a docs host, so the adopter most
   likely to register it is the adopter most likely to write that link — and they meet a red
   before they meet the remedy, having adopted the battery minutes earlier.
