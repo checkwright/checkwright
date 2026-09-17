@@ -5,3 +5,4 @@
 ---
 
 interpreter-steer-census scope af324070 2026-09-17 e2ef406b
+interpreter-steer-census spec a29386aa 2026-09-17 529e0183
