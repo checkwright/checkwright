@@ -12,6 +12,76 @@
 
 ## New Features
 
+- **install-smoke-slow-leg-residue** [spec: SPEC-slow-leg.md]
+  — the native Windows install smoke, still the slowest leg, sets every close watch.
+  **Measured at close off the first run carrying the roster hash batch:** install-smoke-windows took
+  31m46s against 42m48s to 45m58s over the five runs before it; macOS Intel took 13m59s and the
+  rest of the workflow under eight minutes. **Re-measured 2026-09-17 at scope** off gates run
+  35194231255: install-smoke-windows 10m35s, still the slowest, macOS Intel 9m18s, the whole run
+  about 13m. Three terms remain, each with a design question.
+  **1. The harness still hashes each recorded file with its own `git hash-object` child**
+  (installer/consumer-smoke/run-smoke.sh, the manifest assertion's `got`). That is deliberate: the
+  loop is the independent second reading of the recorded value and installer/SPEC.md §The
+  manifest names the smoke's comparison as its own invocation, so batching it re-authors that
+  operand and has to decide whether a `--stdin-paths` reading still discriminates. The filer's
+  measure, not re-run at close: about 250 s of the Windows leg.
+  **2. The arms run serially on one core** while the Windows and macOS runners carry several.
+  Ordering is load-bearing: the printed arm headers are the `installer_smoke` scenario roster
+  (evidence-kit/SPEC.md §Layout and configuration); `ENTRY`, `RUN_PATH` and `VALUE_RED` are
+  globals each arm reassigns; the cross-version reversal arm consumes the payload path the upgrade
+  arm relinquishes. The cheapest concurrent shape that keeps the roster and every assertion is not
+  designed.
+  **3. Two large terms are unprofiled, carried as the filer's claim:** the vendored battery (about
+  63 s per 40-gate run, several per profile and twice in the value arm) and the non-hash work of a
+  full-profile init (about 60 s). No spawn count exists for either, so neither has a known lever;
+  a profile is the prerequisite.
+  **Cost while deferred:** the slowest smoke leg sets the watch wait on every push, every term
+  scales with the profile count, and Windows pays each spawn at MSYS fork cost.
+  Filed 2026-09-11 by close, draining three gap-inbox bullets left by the smoke-leg hash batch.
+  **Leads `install-smoke-slow-leg` — operator direction, 2026-09-17, lead-relayed.** Re-measured
+  at that scope off gates run 35214069775: install-smoke-windows 11m, the whole run about 15m.
+  **Promoted at spec:** the amendment is `installer/SPEC-slow-leg.md`; its profile, five deltas,
+  work classes and terminal moves are its own and are not restated here.
+
+- **binding-intel-leg-failed-one-run-in-two** [spec: SPEC-slow-leg.md] — a leg this project made
+  binding failed one of its first two runs, non-deterministically, in a way no finished run can
+  diagnose; master is green and nothing needs reverting.
+  **Read the resolution first.** Master went red at `adb7379f` and GREEN again at `7329b319`, the
+  very next commit, with `install-smoke-macos-intel` PASSING the second time on the same code path
+  and the same three declared targets. What is left is the leg, not a fire.
+  **What failed.** In run 34267324532 (job 102200720560), the upgrade arm's pack step:
+  the packer as it then was, `scripts/pack-installer.sh`, exited non-zero in 1.6
+  seconds having printed NOTHING —
+  `run-smoke.sh`:877 echoes `PACK_OUT` to stderr and `PACK_OUT` was empty. Every other arm on that
+  leg passed (main, toolchain-free, jq-less), and the SIBLING arm64 leg ran the same upgrade arm on
+  the same commit with the same three declared targets and finished clean.
+  **No cause is asserted.** Regression, a host condition of the `macos-15-intel` runner, and a
+  transient are all open. The leg was green on the immediately prior run 34245261556 at `held=true`,
+  so the failure itself is new; the roster count cannot be the cause, since both macOS legs carry
+  the identical count and only one failed.
+  **UNTESTED HYPOTHESIS with a cheap witness, offered as a hypothesis and not a finding:** the Intel
+  runner is markedly slower and reaches the upgrade arm 30 minutes in with several full payloads
+  already in SCRATCH, so scratch exhaustion would produce exactly a fast silent non-zero; a `df` and
+  a `du` in that leg before the upgrade pack would settle it for nothing.
+  **Ruled 2026-09-08 by the lead, own-authority: CARRY it, do not unbind** — unbinding would reverse
+  this iteration's own delivered predicate on a single sample, and the sibling-leg control already
+  excludes the roster count as the cause.
+  **DISTINCT in subject from `pack-step-dirty-tree-predicate-unscoped`**, whose subject is that
+  refusal's SCOPE alone; this entry's is a red binding leg and what to do about it. The joined cut
+  answered the silence incidentally — one refusal formatter, so the arm has no exit path that
+  prints nothing — and the diagnosis of THIS firing stays here, because a signal-killed process
+  prints nothing whatever the code does. That silence is what made the red unreadable from a
+  finished run, and its firing here is the recurrence that retired entry carried.
+  `lead, own-authority` 2026-09-10 by escalation reply, relayed by the lead, NOT the operator's.
+  **Cost while deferred:** a re-run is the only diagnosis available, and the next firing costs
+  another one. Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join`, which no
+  stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the
+  record is late and says so.
+  **Joins `install-smoke-slow-leg` — operator direction, 2026-09-17, lead-relayed:** its scratch
+  witness only, riding that unit's `run-smoke.sh` upgrade arm; green in 12 master runs since.
+  **Promoted at spec** for its scratch witness only (`installer/SPEC-slow-leg.md` delta 3); the
+  terminal move is a demotion back to this position, per that amendment's delta 5.
+
 ## Technical Debt
 
 ## Deferred
@@ -487,43 +557,6 @@
   Filed 2026-09-09 to the gap inbox by the close of `behind-invoke-relocation`, which no stage of
   that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the record
   is late and says so.
-
-- **binding-intel-leg-failed-one-run-in-two** [design-pending] [cost: iteration/high] [surface: .github] — a leg this project made binding
-  failed one of its first two runs, non-deterministically, in a way no finished run can diagnose;
-  master is green and nothing needs reverting.
-  **Read the resolution first.** Master went red at `adb7379f` and GREEN again at `7329b319`, the
-  very next commit, with `install-smoke-macos-intel` PASSING the second time on the same code path
-  and the same three declared targets. What is left is the leg, not a fire.
-  **What failed.** In run 34267324532 (job 102200720560), the upgrade arm's pack step:
-  the packer as it then was, `scripts/pack-installer.sh`, exited non-zero in 1.6
-  seconds having printed NOTHING —
-  `run-smoke.sh`:877 echoes `PACK_OUT` to stderr and `PACK_OUT` was empty. Every other arm on that
-  leg passed (main, toolchain-free, jq-less), and the SIBLING arm64 leg ran the same upgrade arm on
-  the same commit with the same three declared targets and finished clean.
-  **No cause is asserted.** Regression, a host condition of the `macos-15-intel` runner, and a
-  transient are all open. The leg was green on the immediately prior run 34245261556 at `held=true`,
-  so the failure itself is new; the roster count cannot be the cause, since both macOS legs carry
-  the identical count and only one failed.
-  **UNTESTED HYPOTHESIS with a cheap witness, offered as a hypothesis and not a finding:** the Intel
-  runner is markedly slower and reaches the upgrade arm 30 minutes in with several full payloads
-  already in SCRATCH, so scratch exhaustion would produce exactly a fast silent non-zero; a `df` and
-  a `du` in that leg before the upgrade pack would settle it for nothing.
-  **Ruled 2026-09-08 by the lead, own-authority: CARRY it, do not unbind** — unbinding would reverse
-  this iteration's own delivered predicate on a single sample, and the sibling-leg control already
-  excludes the roster count as the cause.
-  **DISTINCT in subject from `pack-step-dirty-tree-predicate-unscoped`**, whose subject is that
-  refusal's SCOPE alone; this entry's is a red binding leg and what to do about it. The joined cut
-  answered the silence incidentally — one refusal formatter, so the arm has no exit path that
-  prints nothing — and the diagnosis of THIS firing stays here, because a signal-killed process
-  prints nothing whatever the code does. That silence is what made the red unreadable from a
-  finished run, and its firing here is the recurrence that retired entry carried.
-  `lead, own-authority` 2026-09-10 by escalation reply, relayed by the lead, NOT the operator's.
-  **Cost while deferred:** a re-run is the only diagnosis available, and the next firing costs
-  another one. Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join`, which no
-  stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the
-  record is late and says so.
-  **Joins `install-smoke-slow-leg` — operator direction, 2026-09-17, lead-relayed:** its scratch
-  witness only, riding that unit's `run-smoke.sh` upgrade arm; green in 12 master runs since.
 
 - **substrate-parity-audits-one-producer-of-two** [design-pending] [cost: event/high] [surface: gate-sdk] — the parity gate's release-path
   assertions read a single named workflow, and the tree now has two workflows that build and hash a
@@ -3124,34 +3157,6 @@
   Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
   the obvious cheap fix is already landed, and already failed.
   recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
-- **install-smoke-slow-leg-residue** [design-pending] [cost: iteration/high] [surface: installer]
-  — the native Windows install smoke, still the slowest leg, sets every close watch.
-  **Measured at close off the first run carrying the roster hash batch:** install-smoke-windows took
-  31m46s against 42m48s to 45m58s over the five runs before it; macOS Intel took 13m59s and the
-  rest of the workflow under eight minutes. **Re-measured 2026-09-17 at scope** off gates run
-  35194231255: install-smoke-windows 10m35s, still the slowest, macOS Intel 9m18s, the whole run
-  about 13m. Three terms remain, each with a design question.
-  **1. The harness still hashes each recorded file with its own `git hash-object` child**
-  (installer/consumer-smoke/run-smoke.sh, the manifest assertion's `got`). That is deliberate: the
-  loop is the independent second reading of the recorded value and installer/SPEC.md §The
-  manifest names the smoke's comparison as its own invocation, so batching it re-authors that
-  operand and has to decide whether a `--stdin-paths` reading still discriminates. The filer's
-  measure, not re-run at close: about 250 s of the Windows leg.
-  **2. The arms run serially on one core** while the Windows and macOS runners carry several.
-  Ordering is load-bearing: the printed arm headers are the `installer_smoke` scenario roster
-  (evidence-kit/SPEC.md §Layout and configuration); `ENTRY`, `RUN_PATH` and `VALUE_RED` are
-  globals each arm reassigns; the cross-version reversal arm consumes the payload path the upgrade
-  arm relinquishes. The cheapest concurrent shape that keeps the roster and every assertion is not
-  designed.
-  **3. Two large terms are unprofiled, carried as the filer's claim:** the vendored battery (about
-  63 s per 40-gate run, several per profile and twice in the value arm) and the non-hash work of a
-  full-profile init (about 60 s). No spawn count exists for either, so neither has a known lever;
-  a profile is the prerequisite.
-  **Cost while deferred:** the slowest smoke leg sets the watch wait on every push, every term
-  scales with the profile count, and Windows pays each spawn at MSYS fork cost.
-  Filed 2026-09-11 by close, draining three gap-inbox bullets left by the smoke-leg hash batch.
-  **Leads `install-smoke-slow-leg` — operator direction, 2026-09-17, lead-relayed.** Re-measured
-  at that scope off gates run 35214069775: install-smoke-windows 11m, the whole run about 15m.
 
 - **align-in-session-absorption-tier-unruled** [design-pending] [cost: event/low] [surface: lifecycle-kit]
   — does a spec miss that build absorbs **in session** count against align's model tier?
