@@ -12,6 +12,28 @@
 
 ## New Features
 
+- **stage-economics-log-redates-rows** [spec: SPEC-stage-economics-feed.md] — re-running the
+  stage-economics meter re-dates every row it re-derives to the run's date, so the log's date
+  column orders the lead binding's `cr` trend by run rather than by stage. Measured at scope:
+  1,695 rows, 868 dated by one run. **Designed with the feeding unit as one pass** (feeding at
+  every close is the act that re-dates): a row's date becomes its stage's latest stamp date,
+  re-derived for every logged line so the first run heals the whole log, and a re-measured row is
+  replaced in place so a re-run is byte-identical (amendment deltas 1, 2, 5).
+  recurrence: stage-economics-log-redates-rows 2026-09-16
+  Selected 2026-09-17 with `stage-economics-meter-has-no-feeding-obligation` as one unit set
+  (operator direction, 2026-09-17, lead-relayed).
+
+- **stage-economics-meter-has-no-feeding-obligation** [spec: SPEC-stage-economics-feed.md] — the
+  lead binding's tier revert signal reads the stage-economics log, and nothing obliges a session
+  to feed it; at spec it was three closes behind while the overhead log, fed by the close
+  binding, was current. **Candidate (a) taken with (b) as an advisory KPI rather than a gate**: the
+  close binding runs the meter, and `kpi-stage-economics-lag` counts closes since the newest
+  priced close into the session-start trend line. A freshness gate is refused on the meter's
+  advisory contract (the log is absent in CI) and on-demand-only would cut the lead binding's one
+  signal (amendment deltas 3, 4, 5).
+  Selected 2026-09-17 with `stage-economics-log-redates-rows` as one unit set (operator direction,
+  2026-09-17, lead-relayed).
+
 ## Technical Debt
 
 ## Deferred
@@ -3895,34 +3917,6 @@
   Filed 2026-09-16 to that same close's gap inbox, undrainable there; promoted at the following
   iteration's scope.
 
-- **stage-economics-meter-has-no-feeding-obligation** [design-pending] [cost: iteration/low] [surface: drift-kit]
-  — the tier decisions in this repo's lead ruling-config binding name the stage-economics log
-  under `.metric/` as their revert signal, but nothing obliges any session to run the meter, and
-  the log has silently stopped being fed.
-  **Measured 2026-09-16** by the iteration lead at `isolated-dispatch-obligations`' close: the
-  log's newest row is dated 2026-09-12 while 13 closes have stamped since that date, that
-  iteration's among them. So the channel a tiering revert would have to be read off has no data for
-  the last 13 iterations, and the staleness reds nothing — a tier gone wrong looks exactly like a
-  tier gone right.
-  **Why `[design-pending]`:** three candidate deliverables with no ruling between them — (a) a
-  close-stage step runs the meter for the iteration just finished, making the row a close
-  obligation like the audit roster's; (b) a freshness gate reds when the newest row is more than N
-  closes behind the newest close stamp, on the generated-projection pattern; (c) rule the meter
-  on-demand-only and cut the ruling-config's dependency on it, so a tier states how it is re-judged
-  without naming a channel nobody feeds.
-  **DISTINCT from `stage-economics-log-redates-rows`** (re-running the meter re-dates live rows, a
-  defect IN a run) and **`stage-economics-smoke-jq-arm-dormant`** (an untested arm): both
-  presuppose the meter is being run, and this one is that it is not. Also **DISTINCT from
-  `build-stage-tier-economics` and `spec-split-promotion-review`**, which each want a priced
-  reading for one stage's tier; this is that no reading is being taken at all, and it stands
-  whatever those two decide.
-  **Cost while deferred:** every iteration's tier decisions rest on a signal carrying no data, and
-  the gap between the log and the close stamps grows by one row per iteration.
-  Filed 2026-09-16 to the gap inbox by the iteration lead at `isolated-dispatch-obligations`'
-  close, which could not drain it; promoted at the following iteration's scope.
-  Selected 2026-09-17 with `stage-economics-log-redates-rows` as one unit set (operator direction,
-  2026-09-17, lead-relayed).
-
 - **declined-update-target-cause-unaudited** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — a build
   session that DECLINES a spec-authored update target states a cause, and nothing re-reads that
   cause against the target's own purpose: validate confirms the declination on the terms the
@@ -3988,31 +3982,6 @@
   `queue-arm-report-fidelity`'s close as the second of its four bullets; returned to this pool at
   the following scope, which judged the recurrence.
   recurrence: queue-entry-evidence-tier 2026-09-16
-
-- **stage-economics-log-redates-rows** [design-pending] [cost: iteration/high] [surface: drift-kit] — re-running the
-  stage-economics meter re-dates rows it has already written, so the log's date column is a run
-  date rather than a stage date and any freshness or trend read over it is wrong by construction.
-  **RETURNED FROM THE ICEBOX 2026-09-16 on a measured recurrence**, by the same round trip
-  queue-kit/SPEC.md §The icebox tier conserves.
-  **Measured rather than asserted, for the first time.** Running the meter at
-  `queue-arm-report-fidelity`'s close appended 868 rows ALL dated 2026-09-16, of which only 9 name
-  that iteration; the rest re-date rows for `port-oracle-and-composer-ruling`,
-  `host-resolution-fail-open-cut` and every other iteration whose transcripts have not yet aged
-  out. Re-probed at this scope over `.metric/stage-economics-log.txt`: 1,695 rows, 868 of them
-  dated 2026-09-16 and 9 naming the closing iteration. The figures hold exactly.
-  **It interacts with `stage-economics-meter-has-no-feeding-obligation`, which is why it returns
-  now rather than on its own clock.** That entry's candidate (a) obliges close to run the meter,
-  and running the meter is precisely the act that corrupts the dates — so a fix for either one
-  that ignores the other ships a log worse than today's, and the two want one design pass.
-  **Cost while deferred:** the one channel a tiering revert would be read off carries a date
-  column that is wrong for every row a re-run touched, and each feeding re-dates more of the
-  history than it adds.
-  Iceboxed as a defect IN a run nobody was making; the feeding obligation is what made it live.
-  Recurrence filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could
-  not drain it; returned at the following iteration's scope.
-  Selected 2026-09-17 with `stage-economics-meter-has-no-feeding-obligation` as one unit set
-  (operator direction, 2026-09-17, lead-relayed).
-  recurrence: stage-economics-log-redates-rows 2026-09-16
 
 - **gate-fixture-fanout-arm** [design-pending] [cost: event/low] [surface: gate-sdk] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
