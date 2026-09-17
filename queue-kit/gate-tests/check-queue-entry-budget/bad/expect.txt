@@ -4,4 +4,7 @@ eta-idea — 7 lines (cap 6), after discounting one recurrence: line
 theta-idea — retired declaration grammar ruled:
 no 'Cost while deferred' field
 gamma-idea
+no defer date
+TASK-QUEUE.md:47: iota-idea
+TASK-QUEUE.md:52: kappa-idea
 delta-idea — 3 content lines; an icebox entry is exactly one

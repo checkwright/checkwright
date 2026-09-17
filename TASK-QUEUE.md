@@ -14,41 +14,6 @@
 
 ## Technical Debt
 
-- **deferred-entry-defer-date-unasserted** — a deferred entry whose provenance
-  date is malformed reads as **undated**, and no gate reds on it.
-  recurrence: deferred-entry-defer-date-unasserted 2026-08-24
-  **FIRST RECURRENCE 2026-08-24, in a SHAPE no prior instance covers: the spelling was CANONICAL
-  and a LINE WRAP broke it.** At this close a new deferred entry ended a body line on the word
-  `Filed` with `2026-08-24` beginning the next, and the arm listed it `(undated)`. Probed the same
-  way this entry's founding measurement was: moving the marker and the date onto one line dropped
-  the row from the worklist on re-measure. The reading that widens the class — the parse is
-  LINE-SCOPED, so the defect is reachable by ordinary reflow and not only by careless spelling,
-  which means any session that rewraps an entry can silently create one.
-  **PROBED both ways at the 2026-08-18 close, on entries that close itself wrote.** Two of its
-  seven new deferred entries spelled the date `filed 2026-08-18 by close` (lowercase, mid-line)
-  and `Filed at build 2026-08-18` (a word between the marker and the date). Both were listed by
-  `run-gates.sh --emit queue-index --icebox-candidates` with defer-date `(undated)`; rewriting
-  the two lines to the canonical form dropped both from the worklist on re-measure.
-  **The failure is silent by construction.** Such an entry is well-formed to every other gate —
-  the cost field is present, the budget gate is clean, the battery is green.
-  **Cost while deferred:** an undated entry never ages out of the age filter, so it is a
-  permanent icebox candidate *and* is invisible to drift-kit's deferred-age KPI, both readers of
-  the one definition (queue-kit/SPEC.md §The queue format).
-  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed**, unit of
-  `queue-entry-grammar`: an assertion inside a shipped gate adds no name, so no amendment is owed.
-  **Deliverable:** one more assertion on the walk `check-queue-entry-budget` already makes for its
-  (C) — every top-level deferred entry resolves a defer date under queue-kit/SPEC.md §The queue
-  format's definition — with its fixture pair, and that section's "conventions no gate reads"
-  sentence converged on it.
-  **Holder set, settled at promotion:** the assertion lands once, on queue-kit's own parse; a queue
-  that passes it resolves a date for every holder reading the same one-definition, so drift-kit's
-  KPI and `check-gate-exemption-tasks` owe no second assertion. Build reads both re-implementations
-  for parity with the definition, and a divergence found is filed, not folded in.
-  **Live instance, repaired in this unit:** `site-health-issue-venue-unwanted` lists `(undated)`
-  (probed 2026-09-17 at scope) — its provenance line reads `Operator-directed filing 2026-08-25`.
-  Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, at its backlog-eviction
-  step; promoted from the gap inbox at that iteration's scope.
-
 ## Deferred
 
 - **allow-match-colon-star-over-grants** [cost: event/low] [surface: guard-kit] —
@@ -2331,7 +2296,7 @@
   writes no step summary today, so this is net-new work rather than a redirect.
   **Cost while deferred:** tracker noise on a public repo, and nothing worse — the probe is
   accurate and self-clearing, so no outage goes unseen while this waits.
-  Operator-directed filing 2026-08-25, relayed through the lead at this scope; the tree read
+  Filed 2026-08-25 by scope, operator-directed and relayed through the lead; the tree read
   behind it was re-run here rather than taken on the relay.
 
 - **account-noun-plural-slips-the-shape** [cost: event/high] [surface: gate-sdk] — the account-identification pattern
@@ -2559,7 +2524,7 @@
   witness, which puts this on the product side of the 2026-08-30 discriminator.
   **DISTINCT from `crate-interpreter-resolution-residue`, retired**, whose deliverable is the
   spawn sites themselves; this is the declaration grammar every registry member shares.
-  Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
+  Filed 2026-09-03 by spec; drained here with the disagreement re-read at the source.
 
 - **bin-tool-help-arm-absent-tree-wide** [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
@@ -3552,6 +3517,7 @@
 
 ## Done
 
+- deferred-entry-defer-date-unasserted
 - queue-entry-evidence-tier
 - design-pending-tag-restates-its-own-section
 - amendment-owner-position-citation

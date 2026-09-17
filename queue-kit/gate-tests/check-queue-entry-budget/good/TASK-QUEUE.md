@@ -35,7 +35,7 @@
   rather than as a declaration line, so only the recurrence line is discounted
   and the entry lands exactly on the cap.
   recurrence: theta-idea 2026-01-05
-  **Cost while deferred:** low.
+  **Cost while deferred:** low. Filed 2026-01-05 by close.
 
 - **iota-idea** — seven extent lines against the same cap, one
   of them the standing-exclusion declaration below, which the count discounts
@@ -43,6 +43,10 @@
   not-icebox-eligible: iota-idea 2026-01-07 a recorded decision keeps it deferred
   **Cost while deferred:** low.
   Filed 2026-01-07 by close.
+
+- **kappa-idea** — dated by its premise mark alone, with no provenance line.
+  **Cost while deferred:** low.
+  Surfaced 2026-01-08 at build.
 
 ## Icebox
 

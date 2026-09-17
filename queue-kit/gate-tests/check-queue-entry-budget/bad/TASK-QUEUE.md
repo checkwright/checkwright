@@ -42,6 +42,17 @@
   follows it.
   ruled: theta-idea operator 2026-01-05 relay
   **Cost while deferred:** low.
+  Filed 2026-01-05 by scope.
+
+- **iota-idea** — costed and within the cap, but a reflow split
+  its provenance mark from its date, so the entry resolves no defer date.
+  **Cost while deferred:** low. Filed
+  2026-01-06 by close.
+
+- **kappa-idea** — costed and within the cap, its provenance
+  spelled with a word between the mark and the date and a lowercase mark.
+  **Cost while deferred:** low.
+  filed at build 2026-01-07 by close.
 
 ## Icebox
 

@@ -13,6 +13,7 @@ struct Open {
     costed: bool,
     nb: usize,
     decls: u32,
+    marks: queue::DeferMarks,
 }
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — the active sections are uncapped, so no
@@ -38,11 +39,12 @@ pub struct Closed {
     pub nb: usize,
     pub count: usize,
     pub decls: u32,
+    pub dated: bool,
 }
 
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — one pass answers both shapes the gate reads:
-// closed entries, which carry assertions (A)-(C), and the assertion-(D) lines, which are a property
-// of a *line* and not of an entry. Two passes would be two spellings of the same walk.
+// closed entries, which carry assertions (A)-(C) and (E), and the assertion-(D) lines, which are a
+// property of a *line* and not of an entry. Two passes would be two spellings of the same walk.
 pub struct Scan {
     pub entries: Vec<Closed>,
     pub retired: Vec<(usize, String, String)>,
@@ -132,6 +134,7 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                     nb: o.nb,
                     count,
                     decls: o.decls,
+                    dated: o.marks.defer_date().is_some(),
                 });
             }
         }};
@@ -173,6 +176,9 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                     for o in open.iter_mut() {
                         o.nb += 1;
                     }
+                    if let Some(o) = open.last_mut() {
+                        o.marks.observe(line);
+                    }
                 }
                 Some(slug) => {
                     let slug = slug.to_string();
@@ -188,6 +194,7 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                         costed: false,
                         nb: 1,
                         decls: 0,
+                        marks: queue::DeferMarks::default(),
                     });
                     if costed {
                         for o in open.iter_mut() {
@@ -210,6 +217,11 @@ pub fn walk(text: &str, sec_cfg: &queue::Sections) -> Scan {
                         retired.push((fnr, slug, tok.to_string()));
                     }
                 }
+            }
+            // spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (E) reads a mark into the
+            // innermost open entry alone, the scoping the icebox-candidates arm gives the same parse
+            if let Some(o) = open.last_mut() {
+                o.marks.observe(line);
             }
             let decl = declaration(line).map_or(0, |i| 1u32 << i);
             for o in open.iter_mut() {
@@ -275,7 +287,7 @@ pub fn run(args: &[String]) -> i32 {
     };
 
     let scan = walk(&text, &sec_cfg);
-    let (mut size, mut cost, mut shape) = (Vec::new(), Vec::new(), Vec::new());
+    let (mut size, mut cost, mut shape, mut undated) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — headroom is the size
     // assertion's own count one subtraction away, collected for every closed
     // Deferred entry regardless of cap outcome and surfaced only on the clean path
@@ -303,6 +315,9 @@ pub fn run(args: &[String]) -> i32 {
                 if o.ind == 0 && !o.costed {
                     cost.push(format!("{}:{}: {}", file, o.start, o.slug));
                 }
+                if o.ind == 0 && !o.dated {
+                    undated.push(format!("{}:{}: {}", file, o.start, o.slug));
+                }
                 headroom.push((o.start, o.slug.clone(), cap.saturating_sub(n)));
             }
             Sec::Icebox => {
@@ -317,7 +332,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    if !size.is_empty() || !cost.is_empty() || !shape.is_empty() || !retired.is_empty() {
+    if !size.is_empty() || !cost.is_empty() || !shape.is_empty() || !retired.is_empty() || !undated.is_empty() {
         println!("check-queue-entry-budget: deferred-pool entry budget violation(s):");
         println!();
         if !size.is_empty() {
@@ -331,6 +346,13 @@ pub fn run(args: &[String]) -> i32 {
             println!("no 'Cost while deferred' field (a gap you defer is costed and filed, never");
             println!("flagged-and-skipped):");
             for x in &cost {
+                println!("  {}", x);
+            }
+        }
+        if !undated.is_empty() {
+            println!("no defer date (neither a 'Surfaced <date>' nor a 'Filed <date>' mark, label");
+            println!("and date on one body line — an undated entry never ages out and no KPI sees it):");
+            for x in &undated {
                 println!("  {}", x);
             }
         }
@@ -366,7 +388,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     println!(
-        "QUEUE-ENTRY-BUDGET: clean (every {} entry within {} lines and carrying a cost field in {})",
+        "QUEUE-ENTRY-BUDGET: clean (every {} entry within {} lines, carrying a cost field and resolving a defer date in {})",
         sec_cfg.deferred, cap, file
     );
     if !headroom.is_empty() {

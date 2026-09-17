@@ -52,6 +52,6 @@ host repository's residue.
 | guard-kit | — | 68l · ~1119t |
 | installer | — | — |
 | lifecycle-kit | 5l · ~76t | 1747l · ~28350t |
-| queue-kit | — | 47l · ~461t |
+| queue-kit | — | 47l · ~464t |
 | site-kit | — | — |
-| **total** | 23l · ~489t | 2652l · ~43567t |
+| **total** | 23l · ~489t | 2652l · ~43571t |

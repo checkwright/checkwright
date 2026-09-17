@@ -36,9 +36,9 @@
 
 - **example-deferred** [cost: once/low] [surface: TASK-QUEUE.md] — a design-pending entry.
   **Cost while deferred:** what staying parked costs — a red gate, a stale
-  doc, a foregone lever — stated so a later scope can weigh it against the
-  work of landing it. The lead line carries its class (when the cost is paid,
-  then how much) and the top-level root entry the work mainly changes.
+  doc, a foregone lever — for a later scope to weigh; the lead line carries its
+  class (when paid, then how much) and the root entry the work mainly changes.
+  Filed 2026-01-01 by scope — the defer date, its mark and date on one line.
 
 ## Done
 

@@ -401,28 +401,6 @@ fn lead_class(line: &str) -> String {
         .to_string()
 }
 
-fn find_dated(line: &str, label: &str) -> Option<String> {
-    let mut from = 0usize;
-    while let Some(rel) = line[from..].find(label) {
-        let at = from + rel;
-        let p = at + label.len();
-        let b = line.as_bytes();
-        if p + 10 <= line.len() {
-            let d = &line[p..p + 10];
-            let ok = d.as_bytes().iter().enumerate().all(|(i, c)| match i {
-                4 | 7 => *c == b'-',
-                _ => c.is_ascii_digit(),
-            });
-            if ok {
-                return Some(d.to_string());
-            }
-        }
-        let _ = b;
-        from = at + 1;
-    }
-    None
-}
-
 fn is_slug_byte(c: u8) -> bool {
     c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-'
 }
@@ -499,8 +477,7 @@ fn standing(rest: &str) -> (String, String) {
 struct Pending {
     slug: String,
     start: usize,
-    surfaced: String,
-    filed: String,
+    marks: queue::DeferMarks,
     cost: String,
     lead: String,
     body: String,
@@ -508,7 +485,7 @@ struct Pending {
 
 fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, live: &[String], out: &mut String) {
     let Some(e) = p.take() else { return };
-    let d = if !e.surfaced.is_empty() { e.surfaced.as_str() } else { e.filed.as_str() };
+    let d = e.marks.defer_date().unwrap_or("");
     let dated_in = d.is_empty() || d < cutoff;
     let classed_in = e.cost.is_empty() || LOW_CLASS.contains(&e.cost.as_str());
     if dated_in && classed_in {
@@ -566,8 +543,7 @@ fn candidates(text: &str) -> Result<String, String> {
             pending = Some(Pending {
                 slug: slug.to_string(),
                 start: n,
-                surfaced: String::new(),
-                filed: String::new(),
+                marks: queue::DeferMarks::default(),
                 cost: lead_class(line),
                 lead: line.to_string(),
                 body: String::new(),
@@ -577,16 +553,7 @@ fn candidates(text: &str) -> Result<String, String> {
         let Some(e) = pending.as_mut() else { continue };
         e.body.push_str(line);
         e.body.push('\n');
-        if e.surfaced.is_empty() {
-            if let Some(d) = find_dated(line, "Surfaced ") {
-                e.surfaced = d;
-            }
-        }
-        if e.filed.is_empty() {
-            if let Some(d) = find_dated(line, "Filed ") {
-                e.filed = d;
-            }
-        }
+        e.marks.observe(line);
     }
     flush(&mut pending, n + 1, &cutoff, &live, &mut out);
     Ok(out)
@@ -750,8 +717,7 @@ mod tests {
         Pending {
             slug: "subject".to_string(),
             start: 1,
-            surfaced: String::new(),
-            filed: String::new(),
+            marks: queue::DeferMarks::default(),
             cost: "event/low".to_string(),
             lead: lead.to_string(),
             body: body.to_string(),

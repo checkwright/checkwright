@@ -31,15 +31,17 @@ as `##` sections over column-0 bullets:
   carrying no `[blocked-by:]` tag, in section order; do not invent work order.
 - **The deferred section** (default `Deferred`) — parked tasks, excluded from
   selection; `###` subsections are presentation, not semantics. An entry's
-  prose may carry a `Surfaced <date>` mark — an ungated convention recording
+  prose may carry a `Surfaced <date>` mark — an optional convention recording
   when the premise was observed. A deferred body is free prose, and four
   bold-lead-in fields recur, each answering a question a later scope asks:
   `Deliverable` (what landing looks like), `Why design-pending` (what the
   open design actually is), `Cost while deferred`, and a closing
-  `Filed <date> by <stage>` provenance line. Three are conventions no gate
-  reads; **`Cost while deferred` is required** — the Gap-disposition rule's
-  costing, held by `check-queue-entry-budget` (§check-queue-entry-budget),
-  which also caps the entry's total length. Its class rides the lead line's
+  `Filed <date> by <stage>` provenance line. `Deliverable` and
+  `Why design-pending` are conventions no gate reads; **`Cost while deferred`
+  is required** — the Gap-disposition rule's costing — and **every top-level
+  deferred entry resolves a defer date** (below), both held by
+  `check-queue-entry-budget` (§check-queue-entry-budget), which also caps the
+  entry's total length. Its class rides the lead line's
   `[cost:]` tag (§The tag algebra), and the field carries the prose that class
   summarises. The field's bold lead-in is
   line-local like a tag: split across a reflow it is invisible to the scanner
@@ -64,8 +66,13 @@ as `##` sections over column-0 bullets:
   widened is which entries may lawfully arrive, not how they are written.
 
 The **defer date** of an entry is its `Surfaced <date>` mark when present, else
-the date on its `Filed <date>` provenance line. One definition, two readers —
-drift-kit's deferred-age KPI and the `queue-index` arm's `--icebox-candidates`.
+the date on its `Filed <date>` provenance line. The mark is read off a body
+line, case-sensitive, with the ISO date directly after it on the same line — so a
+reflow that wraps the date, a lowercase mark, or a word between mark and date
+resolves nothing, and the entry is undated. One definition, three readers —
+drift-kit's deferred-age KPI, the `queue-index` arm's `--icebox-candidates`, and
+`check-queue-entry-budget`'s assertion (E), the last two through one shared
+adapter (§The shared queue adapters).
 Widening, not replacing: `Surfaced` records when the premise was observed and
 is the better premise-rot datum, `Filed` is the honest available fallback, so
 no entry owes a migration. drift-kit re-implements the definition rather than
@@ -825,7 +832,8 @@ kit to "no icebox" rather than to a wrong section.
 `native/src/queue.rs` is the **sole holder** of the adapters every queue reader
 shares: the section matchers the gates and arms apply (both sides of every section
 boundary must parse identically — a shared adapter removes that drift axis), the
-slug and tag extraction helpers, and the roadmap parse. Values and adapters only,
+slug and tag extraction helpers, the defer-date parse (`DeferMarks`), and the
+roadmap parse. Values and adapters only,
 never gate structure (gate-sdk's `lib/gate.sh` rule). The knobs they read resolve
 from the kit's static table (§Layout and configuration).
 
@@ -1577,7 +1585,7 @@ Invariant, one statement from three sides: **a deferred entry is a costed filing
 — bounded above so it is not an inlined amendment, bounded below so it is not a
 flag-and-skip, and bounded in what it may displace, so a bound on filing never
 becomes a bound on the record.** The first two sides are about the entry's
-*size*; the third is about what the cap *spends* to stay inside it. Three
+*size*; the third is about what the cap *spends* to stay inside it. Five
 assertions:
 
 - **(A) Size.** No deferred entry exceeds `QUEUE_KIT_ENTRY_LINE_CAP` **counted**
@@ -1610,6 +1618,15 @@ assertions:
   stated inline, and a declaration line restating it is the second tier the
   retirement removed. Refused rather than merely uncounted because the grammar's
   inducer was habit, and habit re-mints a spelling the record still shows.
+- **(E) Defer date resolves.** Every top-level deferred entry resolves a defer
+  date under §The queue format's definition. An undated entry is well-formed to
+  every other assertion and silently wrong to both date readers: it never ages
+  out of the icebox-candidates age filter and is invisible to the deferred-age
+  KPI. The walk reads the mark into the innermost open entry only — a body line
+  after a sub-task's lead is the sub-task's — which is the scoping the
+  icebox-candidates arm gives the same shared parse, so the gate and the arm
+  cannot disagree about which entries are undated. Binds top-level entries only,
+  as (C) does.
 
 Calibration: `QUEUE_KIT_ENTRY_LINE_CAP` defaults to `50`. The cap's job is to
 keep compression from regrowing rather than to force the initial cut, so it is
@@ -1625,7 +1642,7 @@ binds top-level entries only — a sub-task is covered by its parent's costing.
 entry's residency is one iteration by the drain rule, so it has no carry to
 cap. The carry problem is the deferred pool's alone.
 
-**Clean-path headroom.** When all three assertions hold, the clean line is
+**Clean-path headroom.** When every assertion holds, the clean line is
 followed by one line per Deferred entry — a sub-task included, since it is
 measured as its own entry under (A) — naming that entry's headroom to the cap:
 the same count assertion A already derives, one subtraction away, so exposing

@@ -4,3 +4,4 @@ gamma-idea: 2 lines of headroom
 zeta-idea: 0 lines of headroom
 theta-idea: 0 lines of headroom
 iota-idea: 0 lines of headroom
+kappa-idea: 2 lines of headroom

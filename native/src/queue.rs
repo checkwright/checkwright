@@ -585,9 +585,71 @@ pub fn roadmap_entries(text: &str, sec: &Sections) -> Vec<RoadmapEntry> {
     out
 }
 
+// spec: queue-kit/SPEC.md §The queue format — the first `<label><iso-day>` on a line; the label is
+// case-sensitive and the date must follow it directly, so a reflow or a word between the two reads
+// as no mark
+fn marked_date(line: &str, label: &str) -> Option<String> {
+    let mut from = 0usize;
+    while let Some(rel) = line[from..].find(label) {
+        let at = from + rel;
+        let p = at + label.len();
+        if p + 10 <= line.len() {
+            let d = &line[p..p + 10];
+            if d.bytes().enumerate().all(|(i, c)| match i {
+                4 | 7 => c == b'-',
+                _ => c.is_ascii_digit(),
+            }) {
+                return Some(d.to_string());
+            }
+        }
+        from = at + 1;
+    }
+    None
+}
+
+// spec: queue-kit/SPEC.md §The queue format — the defer date, one parse shared by the icebox
+// candidates arm and check-queue-entry-budget's assertion (E): fed an entry's body lines, it
+// resolves the first `Surfaced` mark, else the first `Filed` one
+#[derive(Default)]
+pub struct DeferMarks {
+    surfaced: Option<String>,
+    filed: Option<String>,
+}
+
+impl DeferMarks {
+    pub fn observe(&mut self, line: &str) {
+        if self.surfaced.is_none() {
+            self.surfaced = marked_date(line, "Surfaced ");
+        }
+        if self.filed.is_none() {
+            self.filed = marked_date(line, "Filed ");
+        }
+    }
+
+    pub fn defer_date(&self) -> Option<&str> {
+        self.surfaced.as_deref().or(self.filed.as_deref())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: queue-kit/SPEC.md §The queue format — Surfaced outranks Filed wherever each sits, and the
+    // spellings the definition does not name (lowercase, a word between, a wrapped date) resolve none
+    #[test]
+    fn the_defer_date_is_surfaced_else_filed_and_nothing_else() {
+        let mut m = DeferMarks::default();
+        m.observe("  Filed 2026-07-07 by close.");
+        assert_eq!(m.defer_date(), Some("2026-07-07"));
+        m.observe("  Surfaced 2026-08-01 at build.");
+        assert_eq!(m.defer_date(), Some("2026-08-01"));
+        for miss in ["  filed 2026-08-18 by close", "  Filed at build 2026-08-18", "  body ending Filed", "  2026-08-24 by close."] {
+            let mut m = DeferMarks::default();
+            m.observe(miss);
+            assert_eq!(m.defer_date(), None, "{}", miss);
+        }
+    }
 
     #[test]
     fn a_heading_matches_only_with_trailing_space_slack() {

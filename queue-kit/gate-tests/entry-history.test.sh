@@ -41,10 +41,10 @@ queue() {  # $1 = the def-target body lines, $2 = the renamed entry's slug, $3 =
 ## Deferred
 
 - **def-other** [cost: event/low] [surface: none] — an unrelated entry.
-  **Cost while deferred** nothing at all.
+  **Cost while deferred** nothing at all. Filed 2026-01-01 by scope.
 $1
 - **$2** [cost: event/low] [surface: none] — the renamed entry.
-  **Cost while deferred** nothing at all.
+  **Cost while deferred** nothing at all. Filed 2026-01-01 by scope.
   one body line
 
 ## Done
@@ -58,7 +58,7 @@ commit() { git -C "$SANDBOX" add TASK-QUEUE.md && git -C "$SANDBOX" commit -q -m
 
 TARGET_AT_FILING='
 - **def-target** [cost: event/low] [surface: none] — the measured entry.
-  **Cost while deferred** the grounds it carries.
+  **Cost while deferred** the grounds it carries. Filed 2026-01-01 by scope.
   ground one
   ground two
   ground three
@@ -68,7 +68,7 @@ TARGET_GROWN="$TARGET_AT_FILING
   ground six"
 TARGET_NET_ZERO='
 - **def-target** [cost: event/low] [surface: none] — the measured entry.
-  **Cost while deferred** the grounds it carries.
+  **Cost while deferred** the grounds it carries. Filed 2026-01-01 by scope.
   answer one, replacing two grounds
   a second answer line
   ground three
@@ -77,7 +77,7 @@ TARGET_NET_ZERO='
   ground six'
 TARGET_COMPRESSED='
 - **def-target** [cost: event/low] [surface: none] — the measured entry.
-  **Cost while deferred** the grounds it carries.
+  **Cost while deferred** the grounds it carries. Filed 2026-01-01 by scope.
   answered: all six grounds, relocated to `def-other`
   ground six'
 
