@@ -40,8 +40,8 @@
   they resolve against the whole governed set. Section ownership measured not buildable. The
   headingless-filename member moves to `check-docs-cmd` (C), which landed after the hub was costed.
   Retired-slug citations in governed prose are 2 genuine among 35, once live names are excluded.
-  **Designed as** amendment deltas 1 to 9. Deltas 6 and 8 ride an escalation to the lead on red
-  versus report.
+  **Designed as** amendment deltas 1 to 9. Deltas 6 and 8 red rather than report
+  (lead decision at spec, 2026-09-17).
   Admitted to `enum-and-citation-parity` (operator direction, 2026-09-17, AskUserQuestion in a lead
   session, lead-relayed); filed 2026-08-25.
 
@@ -80,7 +80,7 @@
   at a retired queue slug as a live surface. **Designed as:** check-queue-slug-liveness assertion B,
   on the new `QUEUE_KIT_CITATION_SURFACE_GLOBS`, reds a single-backtick retired slug that is no
   tracked file's stem, with a `retired-citation-exempt:` valve
-  (amendment delta 6; red versus report is escalated to the lead at spec). Filed 2026-08-19.
+  (amendment delta 6; red, not report, by lead decision at spec). Filed 2026-08-19.
   recurrence: retired-slug-live-pointer-citation 2026-09-06
 
 - **queue-status-parenthetical-liveness** [spec: SPEC-citation-liveness.md] — a `(icebox)`-style
@@ -90,7 +90,7 @@
 
 - **done-slug-ownership-citation-report** [spec: SPEC-citation-liveness.md] — governed prose claims
   a landed slug still owns an open question. **Designed as:** no report. A Done slug is in the
-  retired set, so assertion B covers it (amendment delta 8, on the same escalation). Filed
+  retired set, so assertion B covers it (amendment delta 8, by the same lead decision). Filed
   2026-08-16.
 
 ## Technical Debt

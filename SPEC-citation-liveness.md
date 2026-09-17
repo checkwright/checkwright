@@ -197,7 +197,9 @@ token resolves when any tracked file carries its basename, and reds when it name
 `QUEUE_KIT_CITATION_SURFACE_GLOBS`, a single-backtick slug-shaped token that is in the queue's
 retired set, and is no tracked file's stem, is red unless a history valve admits the line
 {design-bearing}.
-**Not yet applied.** Depends on the lead's answer to this stage's escalation (red or report).
+**Not yet applied.** Red, not report, by lead decision at spec (2026-09-17), informed by scope as
+intent oracle: the operator's set direction fixed no report shape, and report-only was the hub's
+filing-time assumption. The 35-hit count is the spec survey's and was not re-verified by the oracle.
 
 - **Why a red is honest here when §The queue-edges arm refuses one.** That refusal is about the
   queue file's own bodies, where landed-work citations are ordinary. On the governed set, the rule
@@ -263,7 +265,7 @@ delta 6's paragraph:
 
 No report arm is minted. A slug in `## Done` is already in the retired set, so delta 6 reds a
 governed-prose citation of it at the commit that moves it {mechanical}.
-**Not yet applied.** Depends on the same escalation as delta 6.
+**Not yet applied.** Settled by delta 6's lead decision.
 
 **Replacement text, queue-kit/SPEC.md §The queue-edges arm** (**Not yet applied**). The paragraph
 opening "**Not a gate, either.**" ends its second sentence with: "Assertion B of
@@ -360,8 +362,8 @@ Roster derivations, re-derived by the build:
 - [ ] **Causal completeness** — the three citation forms, the lead clause, the collision finding,
       the amendment shape, the new knob, assertions B and C and the moved live-name test each have a
       named producer and named consumers.
-- [ ] **Escalation answered** — deltas 6 and 8 land as the lead's answer shapes them, recorded on
-      this file before build.
+- [x] **Escalation answered** — red, not report, for deltas 6 and 8 (lead decision, 2026-09-17),
+      recorded at delta 6.
 - [ ] **Instruction surfaces: instruction only** — the three gates' `help:` lines carry the fix,
       not grounds.
 - [ ] **Merged with no information lost** — each SPEC passage re-phrased, not appended.
