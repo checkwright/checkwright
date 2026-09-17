@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-09-17 scope — Which deferred entries carry a per-iteration or per-session cost class, and what does the queue say about each by inbound citation?
+- corpus: TASK-QUEUE.md deferred section (112 rows) plus its icebox line set
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-index; bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: 6341daf75f9a312db6b06077235d74bee1a91252
+- finding: No session-class row exists; exactly seven rows are iteration/low and none is iteration/high — heterogeneous-agent-delegation, vendored-library-identifier-reach, kfric-obligation-residency, ere-matcher-capture-groups-unowned, declined-update-target-cause-unaudited, overhead-meter-gate-output-classifier-blind, smoke-leg-crate-build-uncached. Five of the seven carry zero inbound edges, so the ranking turns on each cost field's prose rather than on aggregation; the two with edges are heterogeneous-agent-delegation (cited by companion-toolkit-profile) and vendored-library-identifier-reach (cited by guard-ruleset-registration-lockstep, which defers its own sizing to that ruling). The retired block holds one edge reaching the shortlist: kfric-obligation-residency cites kfric-empty-log-ambiguity as a distinctness target and already marks it retired, and that entry landed the reader half, so the citation is honest and the writer half is untouched.
+- inferred: that the iteration-class shortlist would be dominated by delivery-machinery entries with rich inbound edges
