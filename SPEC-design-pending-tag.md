@@ -246,7 +246,7 @@ arm (d). Split across commits, the queue reds under the new arm or the old one
 ## Existing sections updated
 
 - `canon-kit/SPEC.md` §The amendment lifecycle, §Merging an amendment step 4,
-  §Layout and configuration (the generic-vocabulary sentence, three knob bullets, the
+  §Layout and configuration (the generic-vocabulary sentence, two knob bullets, the
   marker-spelling sentence), §The shared spec adapters (section grammar)
   (delta 1).
 - `canon-kit/SPEC.md` §check-amendment-queue: the invariant's arms, the coverage-limit
