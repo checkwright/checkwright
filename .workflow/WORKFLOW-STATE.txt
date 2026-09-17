@@ -9,3 +9,4 @@ queue-entry-grammar spec ac842d89 2026-09-17 ab533ee2
 queue-entry-grammar align a1978e8b 2026-09-17 f357de76
 queue-entry-grammar build a72396f2 2026-09-17 99d8341e
 queue-entry-grammar build af235948 2026-09-17 65c72068
+queue-entry-grammar build a6ab15e9 2026-09-17 fa92a6e5
