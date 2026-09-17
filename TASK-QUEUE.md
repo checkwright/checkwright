@@ -12,6 +12,42 @@
 
 ## New Features
 
+- **boundary-wipe-preserve-basename-reach** [spec: SPEC-wipe-and-drain.md] — the
+  iteration-boundary scratch wipe matches its preserve list by basename at any depth, so one
+  nested `.gitkeep` keeps a whole scratch tree alive while the report names it wiped. Attested
+  twice (`.tmp/upgrepro/`, two vendored kit payloads). **Designed as:** the spare set anchors to
+  the scratch root's immediate children, a spared directory is kept whole and not descended, a
+  keep-list entry with `/` is named in a note, and removal failures get their own non-blocking
+  note instead of being reported as wiped (amendment deltas 1, 2).
+  recurrence: boundary-wipe-preserve-basename-reach 2026-09-04
+  Selected 2026-09-17 as the lead of a lifecycle-kit unit set (operator direction, 2026-09-17,
+  lead-relayed).
+
+- **dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it** [spec: SPEC-wipe-and-drain.md]
+  — an amendment's DoD parked an entry's queue move at a stage whose entry refuses the entry
+  (measured 2026-09-05: a DoD naming close behind the `validate` drain stage cost a resume after
+  the push). **The unruled question is derived, not escalated:** check-stage-entry assertion B
+  lets an entry move only before the drain stage, or at it for a drain-exempt entry, so a
+  DoD must name a non-drain stage for an untagged entry. **Designed as** a spec-template clause;
+  an assertion over DoD prose is refused, having no stage grammar to read (amendment delta 3).
+  Joined 2026-09-17 the wipe set as its DoD drain-stage member (operator direction, lead-relayed).
+
+- **close-surface-row-absent-reads-as-empty** [spec: SPEC-wipe-and-drain.md] — the close-surface
+  roster prints a declared row identically whether its file is empty or absent, so a dead
+  capture writer is invisible (measured 2026-09-12: two of eleven rows had no file). **Designed
+  as** a fifth `<state>` column, `absent`/`empty`/`non-empty` on drift-kit's kfric three-state
+  precedent, `-` for a section row whose file exists; `empty` reuses the boundary truncate's
+  header-run predicate; the gate never reds on `absent` (amendment delta 4).
+  Joined 2026-09-17 the wipe set as its roster member (operator direction, lead-relayed).
+
+- **gap-drain-precedes-its-own-kfric-read** [spec: SPEC-wipe-and-drain.md] — close drains the gap
+  inbox at step 2 and reaches the knowledge-friction log only at step 4, so a fact captured
+  mid-iteration misses the drain that needs it (measured at `installer-front-door-cut`'s close:
+  two probes re-derived a logged sizing). **Designed as** a first read opening step 2 over the
+  surfaces a new `drain-inputs` slot names, recorded in the drain commit message; the reorder
+  is refused for crossing kit templates and renumbering cited steps (amendment delta 5).
+  Joined 2026-09-17 the wipe set as its drain-ordering member (operator direction, lead-relayed).
+
 ## Technical Debt
 
 ## Deferred
@@ -799,47 +835,6 @@
   Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
   whether the tag earns its keep; the operator noted having proposed removal before and gave no
   ruling. Promoted 2026-09-06 by close — too wide to fix inline, live trigger bars the icebox.
-
-- **boundary-wipe-preserve-basename-reach** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — the iteration-boundary scratch wipe
-  matches its preserve list by **basename at any depth**, so one nested `.gitkeep` makes a whole
-  scratch tree immortal and the wipe still reports success.
-  `gate-sdk/bin/run-gates.sh --enter-stage`'s boundary block walks the scratch tree depth-first and
-  skips any entry whose **basename** equals `.gitkeep` or a preserve-list member (`wipe_walk`,
-  `native/src/emit/enter_stage.rs`). The test is on the basename alone with no path anchor, so a
-  `.gitkeep` at any depth survives, its parent's directory removal then fails as non-empty, and
-  every ancestor up to the scratch root survives with it.
-  **Attested at this very boundary, not reasoned:** `.tmp/upgrepro/` survived this session's wipe
-  intact — two full vendored kit payload copies — because
-  `.tmp/upgrepro/{up,base}/package/payload/context-kit/gate-tests/check-memory-off/good/memory/.gitkeep`
-  sits inside it.
-  **The collision is structural rather than freak:** kit payloads ship `.gitkeep` files, and an
-  upgrade-smoke reproduction is a copy of a kit payload, so the shape recurs whenever scratch holds
-  one.
-  **The failure is silent by design.** The same `# spec:` comment above that `find` suppresses its
-  stderr deliberately, and the run reports what it wiped and never what it failed to wipe; `.tmp/`
-  is gitignored, so no gate sees the residue either.
-  **Why `[design-pending]`:** the preserve contract's intent is stated for the scratch dir's own
-  scaffolding (`<tmpdir>/.gitkeep`, "a consumer that tracks its scratch dir's scaffolding"), so the
-  fix is to anchor the match to the scratch root's immediate children — but whether
-  `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entries are basenames or root-relative paths is a kit contract
-  change a consumer inherits, and whether the wipe should *report* its failures instead of
-  suppressing them is a second, separable call. That inherited contract is what makes this a
-  **unit rather than a one-line patch**, and it is why the 2026-08-19 disposition was to leave it
-  filed rather than widen `budget-batch-and-account-identity-kind` onto it.
-  **The attesting residue was cleared** once this entry held the evidence: reproducing it costs
-  `mkdir -p .tmp/x/y && touch .tmp/x/y/.gitkeep` plus a boundary run, so keeping two vendored kit
-  payload copies alive across every future boundary bought nothing the entry does not state.
-  recurrence: boundary-wipe-preserve-basename-reach 2026-09-04
-  **Cost while deferred:** scratch accumulates across iteration boundaries without bound while the
-  one mechanism chartered to reclaim it reports success — the boundary reset's own claim is false
-  in exactly the case a consumer is most likely to hit.
-  Found 2026-08-18 by this iteration's scope at its own entry, from the surviving directory rather
-  than from a reading of the code; filed under scope-gated intake rather than fixed in-session.
-  Re-verified 2026-09-17 at scope: `wipe_walk` still matches by basename at any depth. Selected
-  2026-09-17 as the lead of a lifecycle-kit unit set with
-  `dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it`,
-  `close-surface-row-absent-reads-as-empty` and `gap-drain-precedes-its-own-kfric-read` (operator
-  direction, 2026-09-17, lead-relayed).
 
 - **baseline-move-stales-evidence-line** [design-pending] [cost: iteration/low] [surface: evidence-kit] — promoting a task and moving a suite's
   baseline is not enough to close: the evidence line already recorded against the *old* baseline is
@@ -3401,34 +3396,6 @@
   Deferred and not active on scope's composition test, re-grounded 2026-09-11: no iteration
   since has shared its surface.
 
-- **dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it** [design-pending] [cost: iteration/high] [surface: lifecycle-kit] — an
-  amendment's definition of done names a stage for the entry's queue transition without reading the
-  configured drain stage, and nothing refuses the DoD until a session tries to execute it.
-  **Measured 2026-09-05 across spec and build.** spec authored a DoD parking
-  `platform-support-ci-matrix`'s queue transition at CLOSE; the lead confirmed it. Both missed that
-  `LIFECYCLE_KIT_DRAIN_STAGE` defaults to `validate` in lifecycle-kit's knob table, so the
-  DoD was not merely late but UNEXECUTABLE: the pre-dispatch `--enter-stage validate --simulate`
-  refused, and build had to demote the entry on a resume after its push was already spent.
-  **The cost is measured, not estimated:** one resume round trip, and a demotion taken under time
-  pressure rather than as the planned exit.
-  **NEW, not a recurrence, and both nearby candidates were read before saying so.**
-  `amendment-dod-sibling-dependence` is a DoD item whose satisfiability depends on SIBLING UNITS the
-  amendment never names; there is no sibling here, and the dependence is on a config value.
-  `observation-predicate-entry-cannot-drain-in-its-own-iteration`, retired, is about WHETHER
-  the observation arrives before the drain; this is about the DoD naming the wrong stage for
-  the drain at all, and
-  it would have fired on an entry with no observation predicate.
-  **Why `[design-pending]`:** the candidates differ in kind — an authoring clause in the spec stage
-  template (a DoD's queue transition names the configured drain stage, never a literal), or an
-  assertion over the amendment glob reading a DoD's stage word against `LIFECYCLE_KIT_DRAIN_STAGE`.
-  The second is mechanical and the first is cheaper; which is right depends on whether a DoD may
-  legitimately name a non-drain stage, and that is unruled.
-  **Cost while deferred:** every iteration whose unit has a queue transition in its DoD can buy the
-  same resume, and the defect surfaces only at the dispatch that the wrong stage refuses.
-  Filed 2026-09-05 by close, routed by the lead as a finding neither spec nor build had filed.
-  Joined 2026-09-17 the boundary-wipe unit set as its DoD drain-stage member (operator direction,
-  lead-relayed).
-
 - **kit-spec-seam-content-half-unswept** [design-pending] [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
   VOICE and unswept of private CONTENT.
@@ -3658,34 +3625,6 @@
   surface ratchet's ceiling for that file.
   Filed 2026-09-12 at build to the gap inbox; promoted here by close after →fix took only the
   history half.
-
-
-- **close-surface-row-absent-reads-as-empty** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — the
-  close-surface roster prints a declared row identically whether its file is empty or absent from
-  disk, so a close cannot tell a drained capture surface from one that never existed.
-  **Measured 2026-09-12 at close** while performing the close-surface-actually-read audit row:
-  `--emit close-surfaces` printed eleven rows, and two — `.workflow/wait-primitive-evidence.txt`
-  and `.workflow/wakeup-attempts.log` — have no file on disk at all (`wc -c` exits 1 on both),
-  while their rows read the same as `.workflow/knowledge-friction.log`'s, which existed and
-  carried one line.
-  **The two states take different dispositions**, which is why the collapse matters: an empty
-  capture surface is a stated clean read, an absent one means either nothing ever wrote it or its
-  writer is gone, and only the second is a finding. A dead writer is invisible for as long as
-  nobody checks by hand.
-  **Why `[design-pending]`:** printing the byte size and printing an explicit absent marker are
-  both cheap and say different things to a reader — a size makes every row carry a number whose
-  only consumer is this one question, a marker adds a token the roster's grammar must then define.
-  drift-kit/SPEC.md already rules the same discrimination for an empty knowledge-friction log's two
-  readings, so the precedent exists and the choice is which half of it to copy.
-  **DISTINCT from the iceboxed `close-surface-reclaim-uncoupled-from-read`**, which is whether
-  reclaim may wipe a row nobody read; this one is whether the row can be read at all.
-  **Cost while deferred:** every close reads eleven rows of which an unknown number are
-  unreadable, and the audit row that exists to catch a dead capture writer cannot catch one.
-  Surfaced 2026-09-12 by the prior iteration's close into the gap inbox, which no stage of that
-  iteration could drain; promoted here at the next scope, so the record is late and says so.
-  Joined 2026-09-17 the boundary-wipe unit set as its close-surface roster member (operator
-  direction, lead-relayed).
-
 
 
 - **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
@@ -4084,33 +4023,6 @@
   Filed 2026-09-16 at the lead's decision during `installer-front-door-cut`'s build; its sizing
   corrected from five to three at that iteration's close drain, by re-probing the static tables the
   filing asserted were empty.
-
-- **gap-drain-precedes-its-own-kfric-read** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — close
-  drains the gap inbox at step 2 and reaches the knowledge-friction log only at step 4, so a fact
-  captured mid-iteration is not in the drain's hands when the drain needs it.
-  **Re-verified at scope 2026-09-16 against the tree rather than inherited from the bullet.**
-  `lifecycle-kit/templates/stages/close.md` line 72 is step 2, the drain; line 162 is step 4, the
-  close-surface sweep — and `--emit close-surfaces` lists `.workflow/knowledge-friction.log` as one
-  of that step's advisory rows (owner drift-kit/SPEC.md) against the drain's own `forced=` row for
-  `.workflow/gap-inbox.md`. The ordering is real and both ends of it are stated in one file.
-  **MEASURED at `installer-front-door-cut`'s close, not reasoned.** That drain's first bullet asked
-  it to re-size the provenance-seam remainder; it ran a slug scan and a marker grep to do so, while
-  `.workflow/knowledge-friction.log` line 1 — filed EARLIER IN THE SAME ITERATION — already carried
-  a per-kit sizing from a read against the recovered seam-sweep amendment. The drain reached a
-  compatible but coarser answer at the cost of two probes, and found the capture only at step 4.
-  **Nothing shipped wrong, and that is the point**: the two reads turned out complementary (the
-  kfric read is dated-marker-only and cannot see site-kit's queue-slug citation), so what was paid
-  was exactly the re-derivation the loop exists to prevent, by the session the loop captured FOR.
-  **Why `[design-pending]`:** two candidate fixes with opposite economics — move drift-kit's kfric
-  walk ahead of the drain (more likely to be read, but it reorders two kits' templates against each
-  other), or give the drain a one-line "read the kfric log first" precondition (cheaper, and a
-  precondition is the shape a hurried reader skips). Which of the two is the ruling.
-  **Cost while deferred:** every close drain re-derives facts its own iteration already captured,
-  and the loop's whole value is collected one step too late to reach the session that needed it.
-  Filed 2026-09-16 to the gap inbox by `installer-front-door-cut`'s close, the sole bullet that
-  close could not drain; promoted at the following scope, which re-verified the ordering above.
-  Joined 2026-09-17 the boundary-wipe unit set as its close-template drain-ordering member
-  (operator direction, lead-relayed).
 
 ## Icebox
 
