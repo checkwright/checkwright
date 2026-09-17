@@ -4015,7 +4015,6 @@
 - **md-refs-tree-link-resolution** [design-pending] — Unreachable while one generator produces.
 - **recurrence-judgment-vs-declaration** [design-pending] — The two share a noun, not a meaning.
 - **interpreter-floor-gawk-residue-empty** [design-pending] — Its ground died; awk stands.
-- **inline-interpreter-heredoc-unsteered** [design-pending] — No rule steers `python3 -`.
 - **advisory-lane-draft-state-unswept** [design-pending] — GitHub's notifications are the sweep.
 - **amendment-done-move-assertions** [design-pending] — Zero cost while merges are hand-checked.
 - **guard-advise-jq-dependency** [design-pending] — Needs jq; the one consumer works around it.
@@ -4232,5 +4231,6 @@
 
 - scan-prompts-heredoc-grant-split
 - inline-interpreter-substrate-census
+- inline-interpreter-heredoc-unsteered
 
 ## Lessons Learned
