@@ -8,3 +8,5 @@ misfiled in an active non-feature section
 queue references [spec: nested/SPEC-gone.md] but no such file exists at that path
 queue references [spec: SPEC-gone.md] but no amendment file named SPEC-gone.md exists on disk
 amendment on disk with no queue entry: ./SPEC-orphan.md
+SPEC-tidy.md:7: cites SPEC-merged.md, which names no file — an amendment is deleted on merge; cite the canonical section it merged into
+SPEC-tidy.md:8: cites canon-kit/SPEC-merged-away.md, which names no file

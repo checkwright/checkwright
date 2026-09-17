@@ -112,6 +112,111 @@ fn spec_refs_in(line: &str) -> Vec<String> {
     out
 }
 
+// spec: canon-kit/SPEC.md §check-amendment-queue — one resolution for a `[spec:]` ref and an
+// amendment citation alike: a path resolves as a file, a bare basename against the amendment set
+fn resolves(r: &str, disk: &[String]) -> bool {
+    if r.contains('/') {
+        Path::new(r).is_file()
+    } else {
+        disk.iter().any(|f| basename(f) == r)
+    }
+}
+
+fn is_name_byte(c: u8) -> bool {
+    c.is_ascii_alphanumeric() || c == b'.' || c == b'_' || c == b'-'
+}
+
+// spec: canon-kit/SPEC.md §check-amendment-queue — arm (e)'s basename test: the glob's `*` takes one
+// or more name bytes and `?` exactly one; every other glob byte is literal
+fn glob_matches(g: &[u8], s: &[u8]) -> bool {
+    match g.first() {
+        None => s.is_empty(),
+        Some(b'*') => (1..=s.len())
+            .take_while(|&n| is_name_byte(s[n - 1]))
+            .any(|n| glob_matches(&g[1..], &s[n..])),
+        Some(b'?') => !s.is_empty() && is_name_byte(s[0]) && glob_matches(&g[1..], &s[1..]),
+        Some(&c) => s.first() == Some(&c) && glob_matches(&g[1..], &s[1..]),
+    }
+}
+
+// spec: canon-kit/SPEC.md §check-amendment-queue — arm (e)'s token: a maximal run of name bytes and
+// `/` whose last segment matches the glob, with a sentence-final period read as punctuation
+fn citation_tokens(line: &str, glob: &str) -> Vec<String> {
+    let b = line.as_bytes();
+    let mut out: Vec<String> = Vec::new();
+    let mut i = 0usize;
+    while i < b.len() {
+        if !(is_name_byte(b[i]) || b[i] == b'/') {
+            i += 1;
+            continue;
+        }
+        let start = i;
+        while i < b.len() && (is_name_byte(b[i]) || b[i] == b'/') {
+            i += 1;
+        }
+        let mut run = &line[start..i];
+        loop {
+            let base = basename(run);
+            if !base.is_empty() && glob_matches(glob.as_bytes(), base.as_bytes()) {
+                out.push(run.to_string());
+                break;
+            }
+            match run.strip_suffix('.') {
+                Some(r) => run = r,
+                None => break,
+            }
+        }
+    }
+    out
+}
+
+// spec: canon-kit/SPEC.md §check-amendment-queue — arm (e) skips fenced blocks and HTML comments,
+// inline or spanning lines, and reads every other line of the amendment body
+fn amendment_citations(body: &str, glob: &str) -> Vec<(usize, String)> {
+    let mut out: Vec<(usize, String)> = Vec::new();
+    let mut fence = false;
+    let mut comment = false;
+    for (idx, line) in body.lines().enumerate() {
+        if !comment && line.trim_start().starts_with("```") {
+            fence = !fence;
+            continue;
+        }
+        if fence {
+            continue;
+        }
+        let mut visible = String::new();
+        let mut rest = line;
+        loop {
+            if comment {
+                match rest.find("-->") {
+                    Some(e) => {
+                        rest = &rest[e + 3..];
+                        comment = false;
+                    }
+                    None => break,
+                }
+            } else {
+                match rest.find("<!--") {
+                    Some(o) => {
+                        visible.push_str(&rest[..o]);
+                        visible.push(' ');
+                        rest = &rest[o + 4..];
+                        comment = true;
+                    }
+                    None => {
+                        visible.push_str(rest);
+                        break;
+                    }
+                }
+            }
+        }
+        for tok in citation_tokens(&visible, glob) {
+            out.push((idx + 1, tok));
+        }
+    }
+    out
+}
+
 fn rule(args: &[String]) -> Result<i32, String> {
     let queue = match args.first() {
         Some(q) => q.clone(),
@@ -212,13 +317,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         ref_bases.push(basename(r).to_string());
         if r.contains('/') {
-            if !Path::new(r).is_file() {
+            if !resolves(r, &disk) {
                 errors.push_str(&format!(
                     "queue references [spec: {}] but no such file exists at that path\n",
                     r
                 ));
             }
-        } else if !disk.iter().any(|f| basename(f) == r.as_str()) {
+        } else if !resolves(r, &disk) {
             errors.push_str(&format!(
                 "queue references [spec: {}] but no amendment file named {} exists on disk\n",
                 r, r
@@ -236,11 +341,25 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
+    let glob = spec::knob_pub("CANON_KIT_AMENDMENT_GLOB")?;
+    let glob = basename(&glob).to_string();
+    for f in &disk {
+        let body = spec::read_text(Path::new(f))?;
+        for (ln, tok) in amendment_citations(&body, &glob) {
+            if !resolves(&tok, &disk) {
+                errors.push_str(&format!(
+                    "{}:{}: cites {}, which names no file — an amendment is deleted on merge; cite the canonical section it merged into\n",
+                    f, ln, tok
+                ));
+            }
+        }
+    }
+
     if !errors.is_empty() {
         println!("check-amendment-queue: Task↔amendment bidirectional-rule violation(s):");
         println!();
         print!("{}", errors);
-        println!("  help: pair every amendment with a [spec: …] queue entry and vice versa; delete every retired [design-pending] tag (section membership is the state); give every feature entry a [spec:] ref");
+        println!("  help: pair every amendment with a [spec: …] queue entry and vice versa; delete every retired [design-pending] tag (section membership is the state); give every feature entry a [spec:] ref; cite a merged amendment by the canonical section it merged into, never by filename");
         return Ok(1);
     }
 
@@ -251,6 +370,35 @@ fn rule(args: &[String]) -> Result<i32, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: canon-kit/SPEC.md §check-amendment-queue — arm (e)'s token boundaries
+    #[test]
+    fn a_citation_token_is_a_glob_basename_with_an_optional_path_prefix() {
+        let g = "SPEC-*.md";
+        assert_eq!(citation_tokens("see canon-kit/SPEC-x.md here", g), vec!["canon-kit/SPEC-x.md"]);
+        assert_eq!(citation_tokens("the `SPEC-a_b.md` file", g), vec!["SPEC-a_b.md"]);
+        assert_eq!(citation_tokens("ends with SPEC-x.md.", g), vec!["SPEC-x.md"]);
+        assert!(citation_tokens("a `SPEC-<feature>.md` placeholder", g).is_empty());
+        assert!(citation_tokens("the glob `SPEC-*.md` and */SPEC-*.md", g).is_empty());
+        assert!(citation_tokens("SPEC-.md and XSPEC-x.md and SPEC.md", g).is_empty());
+        assert!(citation_tokens("SPEC-x.mdx", g).is_empty());
+    }
+
+    // spec: canon-kit/SPEC.md §check-amendment-queue — arm (e) reads no fenced block and no HTML
+    // comment, whether the comment sits inline or spans lines
+    #[test]
+    fn fences_and_comments_are_skipped() {
+        let body = "a SPEC-one.md\n```\nSPEC-fenced.md\n```\nx <!-- SPEC-inline.md --> SPEC-two.md\n<!--\nSPEC-spanning.md\n-->\nSPEC-three.md";
+        let got: Vec<(usize, String)> = amendment_citations(body, "SPEC-*.md");
+        assert_eq!(
+            got,
+            vec![
+                (1, "SPEC-one.md".to_string()),
+                (5, "SPEC-two.md".to_string()),
+                (9, "SPEC-three.md".to_string())
+            ]
+        );
+    }
 
     #[test]
     fn a_spec_ref_is_the_content_between_the_tag_and_the_first_bracket() {

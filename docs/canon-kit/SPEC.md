@@ -252,7 +252,10 @@ templates carry these hooks; canon-kit owns the checklist and the promotion gate
    Design rationale relocates into the spec's prose; an embedded wire-delta
    becomes a citation to the contract file — the exemption is file-scoped, so
    once step 3 deletes it `check-spec-embedded-source` re-arms on a kept embed.
-3. Delete the amendment file; verify none remain for the component. **The
+3. Delete the amendment file, and in the same commit repoint every sibling
+   amendment's filename citation of it to the canonical section it merged into
+   (arm (e) of `check-amendment-queue` reds the commit otherwise); verify none
+   remain for the component. **The
    none-remain half is discharged at the iteration, not at the commit** — with
    sibling amendments in flight for one component, only the batch merging the
    last of them can satisfy it, and the earlier batches' identical assertions are
@@ -883,13 +886,37 @@ leaving the token inert because an inert leftover keeps the two sources alive
 in every adopter queue with nothing to say so, and habit re-mints a spelling
 the record still shows — the ground queue-kit/SPEC.md
 §check-queue-entry-budget assertion (D) gives for its retired token; the
-migration is mechanical and the finding names it.
+migration is mechanical and the finding names it. (e) Every amendment-glob
+filename cited in the body of an amendment on disk resolves to a file — an
+amendment is deleted on merge, so a filename citation of a sibling dangles from
+that moment, and inside an amendment it is always read as governing input
+because the file is a transition artifact; its durable form is the canonical
+section the cited amendment merged into.
 
 Calibration: a ref is a bare amendment basename (searched tree-wide) or a
 repo-relative path (resolved directly — the generalization that lets a
 consumer point a task at any design artifact, e.g. this repo's kit-SPEC
 drafts). Sub-bullets and prose notes are outside the entry grammar;
 `precommit` tier.
+
+Arm (e)'s calibration. **The token** is the basename pattern of
+`CANON_KIT_AMENDMENT_GLOB` with its `*` matching one or more of
+`[A-Za-z0-9._-]`, behind an optional repo-relative directory prefix of the same
+characters plus `/`, standing between characters outside that class or a line
+edge; backticks do not change the match, a placeholder (`SPEC-<feature>.md`) or
+the glob itself carries a character outside the class and is no token, and a
+sentence-final period after a token is punctuation rather than part of it.
+**Resolution** is the one a `[spec:]` ref gets, so the two cannot diverge: a
+token containing `/` resolves when that path is a file, a bare basename when an
+amendment on disk carries it, so a self-citation resolves. **Skipped:** fenced
+blocks, because a quoted example is grammar being shown, and HTML comments,
+because they carry template guidance — nothing else. **No valve:** every
+filename citation of an amendment inside an amendment is read as input and every
+history use has a durable form, so a per-site exemption would only ever license
+the defect; an illustration that must show a filename goes in a fence. An
+unreadable amendment is exit 2 as for (a)–(c), while the finder stays
+best-effort: an empty amendment set makes (e) vacuous and hides nothing, since
+with no amendments there is nothing to cite from.
 
 Coverage limit, stated because the arms' section-wide reach invites the
 stronger claim: any heading that is not a feature, active, or deferred
@@ -916,6 +943,18 @@ lifetime belongs in a governed surface *before* the landing commit, never on the
 entry as its permanent home. This is a consequence of (c) rather than a further
 rule, and no gate can catch it — the loss is indistinguishable from an ordinary
 disposition.
+
+**Arm (e) holds the decidable slice of the owner-position question, and reads the
+amendment corpus alone.** Prose may cite a merged amendment as settled history,
+never as a live owner; tense separates the two and is not decidable, but spelling
+is. Measured when the arm landed, every attested owner citation between sibling
+amendments was the bare path form in running prose, never a `§` form, so a
+`§`-only proxy would have caught none. The queue half is an honest limit, not a
+deferred assertion: queue bodies' filename citations of amendments were
+overwhelmingly lawful history (six of seven named a merged amendment as where a
+past claim was made), so a filename assertion there would punish valuable prose to
+catch the rare owner citation, and a slug-form owner citation is not decidable
+either. Both stay review's.
 
 **The amendment finder is best-effort, and the port had to reproduce that
 rather than harden it.** `spec_amendments` ends `2>/dev/null … || true`, so an

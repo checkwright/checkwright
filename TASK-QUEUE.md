@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **amendment-owner-position-citation** [spec: SPEC-amendment-citation.md] — prose may cite a
-  merged amendment as *settled history*, never as a live *owner*.
-  recurrence: amendment-owner-position-citation 2026-08-06
-  Amendments are deleted on merge (canon-kit/SPEC.md §Merging an amendment), so a citation
-  naming one in owner position dangles the moment it merges. The inverse direction of
-  `amendment-landing-citation-assertions` and of `amendment-deletion-content-completeness`.
-  **Shape settled at spec, 2026-09-17:** the decidable slice is a filename citation of an
-  amendment inside another amendment, where every attested owner citation sat (path form, no
-  `§`); the queue half stays an honest limit, since its filename citations are mostly history
-  form and tense is not decidable. The one queue owner citation found at spec, in
-  `docs-link-red-remedy-first`, was repointed in the pairing commit.
-  Filed 2026-08-03 at close from the gap inbox; recurred 2026-08-06; body cut to the
-  owner-position assertion at scope 2026-09-17; paired at spec, unit of `queue-entry-grammar`.
-
 - **queue-entry-evidence-tier** [spec: SPEC-queue-entry-marker.md] — a later reader cannot tell a
   queue entry's premise written at full evidence from one written at close-stage speed.
   recurrence: queue-entry-evidence-tier 2026-09-16
@@ -3581,5 +3567,6 @@
 ## Done
 
 - design-pending-tag-restates-its-own-section
+- amendment-owner-position-citation
 
 ## Lessons Learned
