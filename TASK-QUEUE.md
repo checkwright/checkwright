@@ -4249,9 +4249,4 @@
 
 ## Done
 
-- boundary-wipe-preserve-basename-reach
-- close-surface-row-absent-reads-as-empty
-- gap-drain-precedes-its-own-kfric-read
-- dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it
-
 ## Lessons Learned
