@@ -4,4 +4,4 @@
 
 ---
 
-— scope ad2a545d 2026-09-17 a024f14f
+claim-execution-obligations scope ad2a545d 2026-09-17 a024f14f
