@@ -1792,8 +1792,11 @@ roster the paragraph judge can read closes the same case with no grammar change.
 The scanned set and the paragraph walk are the shared `spec_manifest_files`
 finder and `spec_manifest_walk_awk` driver (§The shared spec adapters); this gate's
 `sk_on_pflush` hook judges each flushed paragraph. Two or more members present
-count as a *hand list* only when a run of them is chained by list separators
-(comma, slash, brackets, whitespace, or `and`/`or`); members merely co-occurring
+count as a *hand list* only when a run of them is chained by a separator
+carrying a delimiter (a comma, slash, bracket, parenthesis, colon, period,
+backtick or pipe) or the word `and`/`or`. Whitespace alone never chains, because
+two set members side by side in running prose are ordinary words ("a cost
+surface"), and a list always spells its separator. Members merely co-occurring
 in one paragraph with prose between them stay mentions. Omitted members are set
 members absent from the whole paragraph — the sibling that landed but never
 joined the list. Exempt contexts follow the count gate's family shape,
@@ -1857,7 +1860,10 @@ the boundary rule above accepts the leading slash. The families fail closed
 where an empty result contradicts the shape they read (no kit roots at all, or a
 `lib/` tracking no top-level `*.sh`) and stay silent where emptiness is real: a
 `gate-tests/` holding only `good/`+`bad/` fixture directories ships no bespoke
-unit test, and that is a normal kit.
+unit test, and that is a normal kit. One set is not kit-rooted: `kpi-builtin`,
+the ids of the binary's bundled KPI table (drift-kit/SPEC.md §Bundled KPIs),
+referenced from that table the way the tag vocabulary is referenced from
+`check-tag-lead-line`'s.
 
 Two further families — a per-lib set of its function names, and a per-lib set of
 the files sourcing it — were derived, measured against this tree and refused;
@@ -1880,12 +1886,21 @@ while still firing falsely on a README row naming two of a kit's tools. The rule
 the pair teaches: declare a derived set when the tree shape it reads is one the
 prose rosters — a layout is such a shape, an incidental relation is not.
 
+**A set is what a registry holds, and a contract is cited, not enumerated.** A
+derived set reads a tracked listing, a registry file or a compiled table. A value
+set that exists only as a conditional's arms or an argument parser's modes is
+behaviour. An extractor for it would be a per-site oracle that a refactor breaks.
+Prose names the behaviour and cites its owning section, so nothing restates the
+members. An invocation block rostering an arm's modes is the residue, held by
+review.
+
 Calibration follows the count gate's procedure: tuned against this tree, every
 hit dispositioned — cite the set, complete the list, or site-exempt with reason.
 The good/bad pair covers a bare comma hand list dropping a member and the
 marked-subset cases; `check-prose-enum.test.sh` covers the config-driven paths
 (the empty-default skip, the fail-closed escapes, bracketed matching, multi-set
-independence, the exempt escapes, and the identifier boundary's prefix-sibling
+independence, the exempt escapes, the whitespace-only gap that never chains, and
+the identifier boundary's prefix-sibling
 pair) the pair cannot reach — the boundary case needs a declared set holding
 underscore members, which is a config no pair running on the consumer's own
 hyphenated sets can supply. `precommit` tier.

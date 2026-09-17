@@ -3,7 +3,7 @@
 # cannot hold: the empty-default clean skip, the fail-closed escapes (a sets
 # command that errors, a line that does not parse), bracketed-vs-bare member
 # matching, multi-set independence, and the subset/partitive/per-site exempt
-# escapes. The good/bad pair covers a bare comma hand list dropping a member
+# escapes, and the whitespace-only gap that never chains. The good/bad pair covers a bare comma hand list dropping a member
 # and the marked-subset good cases with the stock printf set; these cases reach
 # what a single set command and manifest cannot.
 #
@@ -124,6 +124,30 @@ The fast pair alpha/beta short-circuits.
 EOF
 check_case "per-site-exempt-escape" 0 "PROSE-ENUM: clean" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
 
+# A separator must carry a delimiter: two members apart by whitespace alone are
+# ordinary words, so they never chain into a hand list.
+cat >"$SANDBOX/SPEC.md" <<'EOF'
+# whitespace gap
+
+The run pays an alpha beta tax before it settles.
+EOF
+check_case "whitespace-gap-clean" 0 "PROSE-ENUM: clean" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
+
+# The same two members chain across a backtick pair or a bare slash, so the
+# narrowing removes only the whitespace case.
+cat >"$SANDBOX/SPEC.md" <<'EOF'
+# backtick gap
+
+The run pays an `alpha` `beta` tax before it settles.
+EOF
+check_case "backtick-gap-trips" 1 "but omits: gamma" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
+cat >"$SANDBOX/SPEC.md" <<'EOF'
+# slash gap
+
+The run pays an alpha/beta tax before it settles.
+EOF
+check_case "slash-gap-trips" 1 "but omits: gamma" CANON_KIT_KNOB_FILE="$SANDBOX/three.knobs"
+
 # The identifier boundary: an underscore separates two names, so a member must
 # not read as present inside a longer sibling. Only a declared set can hold
 # underscore members, so the pair — which runs on the repo's own hyphenated
@@ -152,5 +176,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-prose-enum.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-prose-enum.test.sh: clean (empty-skip + fail-closed error/parse + bracketed match + scattered non-engage + multiset independence + subset/partitive/per-site escapes + identifier boundary)"
+echo "check-prose-enum.test.sh: clean (empty-skip + fail-closed error/parse + bracketed match + scattered non-engage + multiset independence + subset/partitive/per-site escapes + delimiter-carrying separator + identifier boundary)"
 exit 0

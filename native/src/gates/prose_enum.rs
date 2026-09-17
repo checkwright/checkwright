@@ -162,10 +162,14 @@ fn present(low: &[u8], m: &[u8]) -> Option<usize> {
 }
 
 // spec: canon-kit/SPEC.md §check-prose-enum — the delimited-adjacency test that separates a
-// hand list from scattered mentions
+// hand list from scattered mentions; whitespace alone never chains, so two set members side by
+// side in running prose stay ordinary words
 fn adjacent(gap: &[u8]) -> bool {
-    const PUNCT: &[u8] = b"][ \t,/:().`|";
-    if gap.len() <= 8 && gap.iter().all(|c| PUNCT.contains(c)) {
+    const DELIM: &[u8] = b"][,/:().`|";
+    if gap.len() <= 8
+        && gap.iter().all(|c| DELIM.contains(c) || *c == b' ' || *c == b'\t')
+        && gap.iter().any(|c| DELIM.contains(c))
+    {
         return true;
     }
     if gap.len() <= 16 {
@@ -268,4 +272,19 @@ fn rtrim_space(b: &[u8]) -> usize {
 
 fn is_space(c: u8) -> bool {
     matches!(c, b' ' | b'\t' | b'\x0b' | b'\x0c' | b'\r' | b'\n')
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_separator_chains_only_when_it_carries_a_delimiter() {
+        for gap in [&b" "[..], &b"\t"[..], &b"  "[..], &b""[..]] {
+            assert!(!adjacent(gap), "whitespace-only gap {:?} chained", gap);
+        }
+        for gap in [&b", "[..], &b"/"[..], &b"` `"[..], &b"], ["[..], &b" and "[..], &b", or "[..]] {
+            assert!(adjacent(gap), "delimited gap {:?} did not chain", gap);
+        }
+    }
 }

@@ -12,27 +12,6 @@
 
 ## New Features
 
-- **readme-roster-enum-coverage** [spec: SPEC-enum-parity.md] — a kit README enumerating a
-  derivable set sits outside every parity gate and drifts silently while the battery stays green.
-  recurrence: readme-roster-enum-coverage 2026-08-25
-  **Surveyed at spec:** a fourth instance is live, since drift-kit/README.md's bundled-KPI roster
-  omits `kpi-stage-economics-lag`. Declaring the bundled KPI table as a set reds nothing today,
-  because the README names KPIs by description. The fenced `## Use` blocks are complete, and the
-  delegation-kit verdict set now lives in a compiled `matches!`. **Designed as:** the bundled
-  emitter declares `kpi-builtin` off the KPI table, and the README names the ids. A set that exists
-  only as a conditional's arms or an arm's flag forms is ruled a contract, which prose cites and
-  does not enumerate (amendment deltas 2 to 4).
-  Leads `enum-and-citation-parity` (operator direction, 2026-09-17, lead-relayed); filed 2026-07-31.
-
-- **prose-enum-common-word-tag-members** [spec: SPEC-enum-parity.md] — check-prose-enum reads two
-  adjacent ordinary words (`cost`, `surface`) as a partial list of the queue's task tags.
-  **Designed as:** a list separator must carry a delimiter or `and`/`or`, and whitespace alone
-  never chains. The member and set grammars stay two fields. The survey found no real hand list
-  relying on a bare-whitespace gap, and the one exemption this makes redundant is deleted
-  (amendment delta 1).
-  Joins `enum-and-citation-parity` on check-prose-enum's set grammar (operator direction,
-  2026-09-17, lead-relayed); filed 2026-09-11.
-
 - **citation-liveness-family-convergence** [spec: SPEC-citation-liveness.md] — the
   citation-liveness family, halves (A) and (B): one resolves-to-nothing predicate read through
   several windows, over `check-spec-pointer`, `check-docs-cmd` and `check-queue-slug-liveness`.
@@ -3971,5 +3950,8 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- readme-roster-enum-coverage
+- prose-enum-common-word-tag-members
 
 ## Lessons Learned

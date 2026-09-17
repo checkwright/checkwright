@@ -106,7 +106,16 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
             emit_set(&mut out, &format!("{}-gate-test", kit), &found);
         }
     }
+    emit_set(&mut out, KPI_BUILTIN, &kpi_builtin());
     Ok(out)
+}
+
+// spec: canon-kit/SPEC.md §check-prose-enum — the one set not kit-rooted: the bundled KPI ids are
+// referenced off the binary's own table, never re-listed, so a KPI added there enrols with no edit
+const KPI_BUILTIN: &str = "kpi-builtin";
+
+fn kpi_builtin() -> Vec<String> {
+    crate::emit::kpi::names().into_iter().map(str::to_string).collect()
 }
 
 #[cfg(test)]
@@ -139,5 +148,18 @@ mod tests {
         let mut out = String::new();
         emit_set(&mut out, "x-lib", &["x/lib/a.sh".to_string()]);
         assert_eq!(out, "x-lib\ta.sh\n");
+    }
+
+    #[test]
+    fn the_kpi_builtin_set_is_the_bundled_kpi_table() {
+        let want: Vec<String> = crate::emit::kpi::BUILTINS
+            .iter()
+            .map(|(n, _)| n.to_string())
+            .collect();
+        assert_eq!(kpi_builtin(), want);
+        let mut out = String::new();
+        emit_set(&mut out, KPI_BUILTIN, &kpi_builtin());
+        assert_eq!(out.lines().count(), want.len());
+        assert!(out.lines().all(|l| l.starts_with("kpi-builtin\tkpi-")));
     }
 }

@@ -120,12 +120,13 @@ dirs, then each vendored kit's `kpis/`, then the binary's built-in members —
 three tiers, consumer-first. Add your own by dropping a plugin in your gates dir
 and naming it in the registry; shadow a bundled one with a same-named file. Your
 plugin is executed directly and reads the exported `DRIFT_KIT_*` environment,
-both unchanged by the bundled set moving in-crate. The bundled set (drift-kit/SPEC.md §Bundled KPIs) covers, as lead KPIs, the
-queue split and its per-iteration net delta, the gate backlog, amendment/deferred
-age, prompt friction, the always-loaded surface, the local permission overlay,
-gate runtime, session overhead, and the price table's age and expiry; and as lag
-KPIs, `kpi-knowledge-friction` (fed by the loop below) and
-`kpi-incident-recurrence` (fed by the queue's `recurrence:` declarations).
+both unchanged by the bundled set moving in-crate. The bundled set (drift-kit/SPEC.md §Bundled KPIs) carries, as lead KPIs,
+`kpi-task-split`, `kpi-queue-net-delta`, `kpi-gate-backlog`,
+`kpi-amendment-age`, `kpi-deferred-age`, `kpi-prompt-friction`,
+`kpi-always-loaded`, `kpi-settings-local`, `kpi-gate-runtime`, `kpi-overhead`,
+`kpi-price-table-age` and `kpi-stage-economics-lag`; and as lag KPIs,
+`kpi-knowledge-friction` (fed by the loop below) and `kpi-incident-recurrence`
+(fed by the queue's `recurrence:` declarations).
 
 ## Test
 
