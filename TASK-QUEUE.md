@@ -983,7 +983,7 @@
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
 
-- **batch-split-stamp-ownership** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — who stamps the per-session
+- **batch-split-stamp-ownership** [design-pending] [cost: event/low] [surface: lifecycle-kit] — who stamps the per-session
   audit trail when a live lead splits one stage across several batch sessions is
   unowned. This iteration recorded **one** `build` line in
   `.workflow/WORKFLOW-STATE.txt` for five batch sessions.
@@ -1018,15 +1018,18 @@
   **Regressed 2026-08-02:** nine build batches, one stamp — the once-correct
   practice did not hold, and since economics attributes one row per transcript,
   the lead binding's per-batch tier lever is unmeasurable while the trail is not.
-  **Cost while deferred:** the trail silently under-reports session count on
-  every batched stage, so the evidence file cannot answer "how many sessions did
-  this stage take" — an economics question the drift KPIs would otherwise want.
   Debt: one contract narrowed, or one oracle added; adds no governed name unless
   the oracle lands.
   **Recurred 2026-08-29 in a new sub-shape: directed, not omitted.** Three build batches, one
   `build` stamp, under an explicit lead instruction not to re-stamp — the shape
   `lifecycle-kit/templates/lead.md` has named as the failure since 2026-08-04, so prose has now
   failed against a lead that had it in context. That is the second half of the fork's own argument.
+  **Cost while deferred** (re-costed 2026-09-17 at scope from `iteration/low` to `event/low`, on
+  the operator's direction): a batch that skips its stamp under-reports the stage's session count,
+  so the evidence file cannot answer "how many sessions did this stage take" for the drift KPIs.
+  No longer paid every iteration: each batched iteration since 2026-08-29 wrote one build stamp
+  per batch, by the stamp-commit subjects (owed-port-tail, guard-friction-reach,
+  couples-field-semantics and validate-red-holding among them).
   recurrence: batch-split-stamp-ownership 2026-08-29
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
 
