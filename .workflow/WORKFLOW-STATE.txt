@@ -5,3 +5,4 @@
 ---
 
 queue-entry-grammar scope aba3b980 2026-09-17 e559f31f
+queue-entry-grammar spec ac842d89 2026-09-17 ab533ee2
