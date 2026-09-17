@@ -3520,10 +3520,4 @@
 
 ## Done
 
-- deferred-entry-defer-date-unasserted
-- queue-entry-evidence-tier
-- design-pending-tag-restates-its-own-section
-- amendment-owner-position-citation
-- design-pending-boilerplate-reds-its-own-promotion
-
 ## Lessons Learned
