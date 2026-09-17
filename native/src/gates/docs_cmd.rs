@@ -22,6 +22,7 @@ enum Token {
     Path(usize, String),
     Knob(usize, String),
     Cited(usize, String),
+    Amendment(usize, String),
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
@@ -60,6 +61,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: canon-kit/SPEC.md §check-docs-cmd — a static kit's knobs left kit-root source with its
     // library, so the set is unioned with the names the static reader reads
     defined.extend(crate::knobs::static_names());
+    let amend_glob = spec::knob_pub("CANON_KIT_AMENDMENT_GLOB")?;
     let valve = TemporalValve::load()?;
     let tree = Tree::read(&top)?;
     let cwd = walk::cwd()?;
@@ -75,7 +77,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let docdir = dirname(f);
         let text = spec::read_text(Path::new(f))?;
         let cite = !valve.path_exempt(&spec::strip_dot_slash(f));
-        for tok in scan(&text, &prefixes, &valve, cite) {
+        for tok in scan(&text, &prefixes, &amend_glob, &valve, cite) {
             match tok {
                 Token::Path(ln, t) => {
                     npath += 1;
@@ -98,6 +100,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
                     if tree.retired_unresolved(&cands) {
                         bad.push(format!(
                             "{}:{}: cited path '{}' was retired (no tracked file under any resolution)",
+                            f, ln, t
+                        ));
+                    }
+                }
+                Token::Amendment(ln, t) => {
+                    ncited += 1;
+                    if tree.retired_basename(&t) {
+                        bad.push(format!(
+                            "{}:{}: cited amendment '{}' was retired (no tracked file carries the basename)",
                             f, ln, t
                         ));
                     }
@@ -184,13 +195,17 @@ fn defined_knobs(
 struct Tree {
     tracked: HashSet<String>,
     retired: HashSet<String>,
+    tracked_base: HashSet<String>,
+    retired_base: HashSet<String>,
     shallow: bool,
 }
 
 impl Tree {
     fn read(top: &str) -> Result<Tree, String> {
         let mut tracked = HashSet::new();
+        let mut tracked_base = HashSet::new();
         for f in git_names(top, &["ls-files", "-z"], "listing tracked files")? {
+            tracked_base.insert(basename(&f).to_string());
             let mut i = 0usize;
             while let Some(off) = f[i..].find('/') {
                 tracked.insert(f[..i + off].to_string());
@@ -201,9 +216,13 @@ impl Tree {
         let shallow = git_text(top, &["rev-parse", "--is-shallow-repository"], "reading the shallow state")?
             .trim()
             == "true";
+        let retired = retired_set(top)?;
+        let retired_base = retired.iter().map(|r| basename(r).to_string()).collect();
         Ok(Tree {
             tracked,
-            retired: retired_set(top)?,
+            retired,
+            tracked_base,
+            retired_base,
             shallow,
         })
     }
@@ -211,6 +230,16 @@ impl Tree {
     fn retired_unresolved(&self, cands: &[String]) -> bool {
         !cands.iter().any(|c| self.tracked.contains(c)) && cands.iter().any(|c| self.retired.contains(c))
     }
+
+    // spec: canon-kit/SPEC.md §check-docs-cmd — an amendment is cited by bare name wherever its
+    // component sits, so its basename resolves tree-wide rather than through the three roots
+    fn retired_basename(&self, base: &str) -> bool {
+        !self.tracked_base.contains(base) && self.retired_base.contains(base)
+    }
+}
+
+fn basename(p: &str) -> &str {
+    p.rsplit('/').next().unwrap_or(p)
 }
 
 // spec: canon-kit/SPEC.md §check-docs-cmd — every path deleted in held history plus every path
@@ -343,7 +372,13 @@ fn caps_runs(s: &str, min_tail: usize) -> Vec<String> {
 
 // spec: canon-kit/SPEC.md §check-docs-cmd — a history valve exempts a line's cited paths alone;
 // its fenced invocations and knobs are still scanned
-fn scan(text: &str, prefixes: &[String], valve: &TemporalValve, cite: bool) -> Vec<Token> {
+fn scan(
+    text: &str,
+    prefixes: &[String],
+    amend_glob: &str,
+    valve: &TemporalValve,
+    cite: bool,
+) -> Vec<Token> {
     let mut out = Vec::new();
     for line in valve.lines(text) {
         match line.kind {
@@ -356,7 +391,7 @@ fn scan(text: &str, prefixes: &[String], valve: &TemporalValve, cite: bool) -> V
                 for span in inline_code_spans(line.raw) {
                     scan_b(&span, line.ln, prefixes, &mut out);
                     if cite && !line.valved {
-                        scan_c(&span, line.ln, &mut out);
+                        scan_c(&span, line.ln, amend_glob, &mut out);
                     }
                 }
             }
@@ -390,12 +425,25 @@ fn scan_b(text: &str, ln: usize, prefixes: &[String], out: &mut Vec<Token>) {
     }
 }
 
-fn scan_c(span: &str, ln: usize, out: &mut Vec<Token>) {
+fn scan_c(span: &str, ln: usize, amend_glob: &str, out: &mut Vec<Token>) {
     for w in span.split_whitespace() {
         if let Some(t) = cited_path(w) {
             out.push(Token::Cited(ln, t));
+        } else if let Some(t) = cited_amendment(w, amend_glob) {
+            out.push(Token::Amendment(ln, t));
         }
     }
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — the single-segment shape: one segment matching the
+// amendment glob, after the same trims
+fn cited_amendment(w: &str, glob: &str) -> Option<String> {
+    let e = trim_word(w);
+    let rest = e.strip_prefix("./").unwrap_or(e);
+    if glob.is_empty() || !seg_ok(rest) || !walk::pattern_match(glob, rest) {
+        return None;
+    }
+    Some(rest.to_string())
 }
 
 // spec: canon-kit/SPEC.md §check-docs-cmd — the path shape: two or more segments, an extension on
@@ -570,10 +618,21 @@ mod tests {
     }
 
     #[test]
+    fn an_amendment_basename_is_path_shaped_in_one_segment() {
+        let g = "SPEC-*.md";
+        assert_eq!(cited_amendment("`SPEC-sqlite.md`,", g), Some("SPEC-sqlite.md".to_string()));
+        assert_eq!(cited_amendment("./SPEC-x.md", g), Some("SPEC-x.md".to_string()));
+        assert_eq!(cited_amendment("SPEC.md", g), None);
+        assert_eq!(cited_amendment("README.md", g), None);
+        assert_eq!(cited_amendment("SPEC-<name>.md", g), None);
+        assert_eq!(cited_amendment("SPEC-x.md", ""), None);
+    }
+
+    #[test]
     fn a_valved_line_exempts_citations_and_not_knobs() {
         let valve = TemporalValve::new(vec!["History".into()], vec![]);
         let text = "<!-- manifest-temporal-exempt: port record -->\n`bin/a.sh` `GATE_SDK_NATIVE_BIN`\n## History\n`bin/b.sh`\n## Now\n`bin/c.sh`\n";
-        let toks = scan(text, &["GATE_SDK_".to_string()], &valve, true);
+        let toks = scan(text, &["GATE_SDK_".to_string()], "SPEC-*.md", &valve, true);
         let cited: Vec<String> = toks
             .iter()
             .filter_map(|t| match t {

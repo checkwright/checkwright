@@ -1,7 +1,6 @@
 // spec: queue-kit/SPEC.md §The queue-edges arm — the inbound-citation aggregator. It reads the
 // queue and its own history, writes stdout only, and mutates nothing. The `--inbound` mode rides
 // the arm's own argv tail, the mechanism §The queue-index arm already uses for its three modes.
-use crate::proc;
 use crate::queue::{self, Sections};
 
 struct Args {
@@ -54,49 +53,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let stems = if retired.is_empty() {
         Vec::new()
     } else {
-        tracked_stems(&file)
+        queue::tracked_stems(&file)
     };
     Ok(aggregate(&text, &sec, &live, &retired, &a.target, &stems))
-}
-
-// spec: queue-kit/SPEC.md §The queue-edges arm — the name-live test's input is the tracked tree
-// listing and not a curated roster; an absent `git` or a queue file outside a work tree marks
-// nothing, the same direction the retired set's own degradations take.
-fn tracked_stems(file: &str) -> Vec<(String, String)> {
-    if !proc::on_path("git") {
-        return Vec::new();
-    }
-    let path = std::path::Path::new(file);
-    let dir = match path.parent().map(|p| p.to_string_lossy().into_owned()) {
-        Some(d) if !d.is_empty() => d,
-        _ => ".".to_string(),
-    };
-    let listing = match proc::run("git", &["-C", &dir, "ls-files", "--full-name", "--", ":/"]) {
-        Ok(c) => match c.stdout() {
-            Some(o) => String::from_utf8_lossy(o).into_owned(),
-            None => return Vec::new(),
-        },
-        Err(_) => return Vec::new(),
-    };
-    listing
-        .lines()
-        .filter(|l| !l.is_empty())
-        .filter_map(|l| {
-            std::path::Path::new(l)
-                .file_stem()
-                .map(|s| (s.to_string_lossy().into_owned(), l.to_string()))
-        })
-        .collect()
 }
 
 // spec: queue-kit/SPEC.md §The queue-edges arm — the first match in tracked order, with a further
 // match noted as a count; a name that is no file's own stem is unmarked and its row reads as it did
 fn name_live(stems: &[(String, String)], slug: &str) -> Option<String> {
-    let hits: Vec<&String> = stems
-        .iter()
-        .filter(|(stem, _)| stem == slug)
-        .map(|(_, path)| path)
-        .collect();
+    let hits = queue::name_live_at(stems, slug);
     let first = hits.first()?;
     Some(match hits.len() {
         1 => format!(" — name live at {}", first),
@@ -152,35 +117,9 @@ impl Agg<'_> {
         }
     }
 
-    // spec: queue-kit/SPEC.md §The queue-edges arm — the body-citation scan lives in this arm
-    // rather than in the shared adapter: it has exactly one reader, and the library's rule is
-    // shared adapters. A backticked kebab token is the candidate; resolution decides the rest.
     fn scan_body(&mut self, line: &str) {
-        let b = line.as_bytes();
-        let mut i = 0usize;
-        while i < b.len() {
-            if b[i] != b'`' {
-                i += 1;
-                continue;
-            }
-            let start = i + 1;
-            if start >= b.len() || !(b[start].is_ascii_lowercase() || b[start].is_ascii_digit()) {
-                i += 1;
-                continue;
-            }
-            let mut j = start + 1;
-            while j < b.len()
-                && (b[j].is_ascii_lowercase() || b[j].is_ascii_digit() || b[j] == b'-')
-            {
-                j += 1;
-            }
-            if j < b.len() && b[j] == b'`' {
-                let tgt = line[start..j].to_string();
-                self.edge(&tgt, line);
-                i = j + 1;
-            } else {
-                i += 1;
-            }
+        for (start, end) in queue::backtick_slugs(line) {
+            self.edge(&line[start..end], line);
         }
     }
 }

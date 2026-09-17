@@ -680,8 +680,8 @@ hand-edited or stale number is red at commit. The gate carries its own
 files, and a `good/`+`bad/` fixture pair that exercises the byte-compare
 hermetically: because the harvest reads real git history, the fixture supplies
 a synthetic emission as a second argument rather than regenerating one.
-`docs/evidence.md` — the framing page, owned by the docs site — carries the
-narrative and cites the data file, hand-copying no numbers.
+The published page is `docs/evidence-data.md` itself, with no framing page around
+it, so every number a reader meets there is emitted and none is hand-copied.
 
 The freshness gate is blind at the enter-close commit by construction: the
 extractor emits the closing iteration's row only once its `close` stamp is in

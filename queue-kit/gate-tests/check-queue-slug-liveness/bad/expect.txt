@@ -1,1 +1,2 @@
 bold-code token claims queue membership but names no live task
+status parenthetical disagrees with where the cited slug is

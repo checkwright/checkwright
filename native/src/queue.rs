@@ -353,6 +353,78 @@ pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
     out
 }
 
+// spec: queue-kit/SPEC.md §The shared queue adapters — the body-position citation token: a
+// backticked kebab run, returned as the byte span of the slug between its backticks; resolution
+// decides the rest
+pub fn backtick_slugs(line: &str) -> Vec<(usize, usize)> {
+    let b = line.as_bytes();
+    let mut out = Vec::new();
+    let mut i = 0usize;
+    while i < b.len() {
+        if b[i] != b'`' {
+            i += 1;
+            continue;
+        }
+        let start = i + 1;
+        if start >= b.len() || !is_slug_head(b[start]) {
+            i += 1;
+            continue;
+        }
+        let mut j = start + 1;
+        while j < b.len() && is_slug_byte(b[j]) {
+            j += 1;
+        }
+        if j < b.len() && b[j] == b'`' {
+            out.push((start, j));
+            i = j + 1;
+        } else {
+            i += 1;
+        }
+    }
+    out
+}
+
+// spec: queue-kit/SPEC.md §The queue-edges arm — the name-live test's input is the tracked tree
+// listing and not a curated roster; an absent `git` or a queue file outside a work tree marks
+// nothing, the same direction the retired set's own degradations take
+pub fn tracked_stems(file: &str) -> Vec<(String, String)> {
+    if !crate::proc::on_path("git") {
+        return Vec::new();
+    }
+    let path = std::path::Path::new(file);
+    let dir = match path.parent().map(|p| p.to_string_lossy().into_owned()) {
+        Some(d) if !d.is_empty() => d,
+        _ => ".".to_string(),
+    };
+    let listing =
+        match crate::proc::run("git", &["-C", &dir, "ls-files", "--full-name", "--", ":/"]) {
+            Ok(c) => match c.stdout() {
+                Some(o) => String::from_utf8_lossy(o).into_owned(),
+                None => return Vec::new(),
+            },
+            Err(_) => return Vec::new(),
+        };
+    listing
+        .lines()
+        .filter(|l| !l.is_empty())
+        .filter_map(|l| {
+            std::path::Path::new(l)
+                .file_stem()
+                .map(|s| (s.to_string_lossy().into_owned(), l.to_string()))
+        })
+        .collect()
+}
+
+// spec: queue-kit/SPEC.md §The queue-edges arm — every tracked path whose own stem is the slug, in
+// tracked order
+pub fn name_live_at<'a>(stems: &'a [(String, String)], slug: &str) -> Vec<&'a str> {
+    stems
+        .iter()
+        .filter(|(stem, _)| stem == slug)
+        .map(|(_, path)| path.as_str())
+        .collect()
+}
+
 // spec: queue-kit/SPEC.md §check-task-conservation — a done entry is a bare `- <slug>` line and
 // nothing else (awk's `^[[:space:]]*-[[:space:]]+[a-z0-9][a-z0-9-]*[[:space:]]*$`), so an entry
 // carried into the done section with its live shape intact matches neither grammar

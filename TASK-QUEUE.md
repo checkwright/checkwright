@@ -12,42 +12,6 @@
 
 ## New Features
 
-- **citation-liveness-family-convergence** [spec: SPEC-citation-liveness.md] — the
-  citation-liveness family, halves (A) and (B): one resolves-to-nothing predicate read through
-  several windows, over `check-spec-pointer`, `check-docs-cmd` and `check-queue-slug-liveness`.
-  **Surveyed at spec** (amendment preamble): unqualified `§` citations have no syntactic file, so
-  they resolve against the whole governed set. Section ownership measured not buildable. The
-  headingless-filename member moves to `check-docs-cmd` (C), which landed after the hub was costed.
-  Retired-slug citations in governed prose are 2 genuine among 35, once live names are excluded.
-  **Designed as** amendment deltas 1 to 9. Deltas 6 and 8 red rather than report
-  (lead decision at spec, 2026-09-17).
-  Admitted to `enum-and-citation-parity` (operator direction, 2026-09-17, AskUserQuestion in a lead
-  session, lead-relayed); filed 2026-08-25.
-
-- **prose-filename-citation-liveness** [spec: SPEC-citation-liveness.md] — a bare amendment
-  basename in governed prose outlives the deleted file. **Designed as:** check-docs-cmd assertion
-  (C) reads a single-segment `CANON_KIT_AMENDMENT_GLOB` token as path-shaped and resolves it by
-  basename. Its retired-versus-never-tracked split already keeps `AGENTS.md`-type citations green
-  (amendment delta 5). Filed 2026-07-31.
-  recurrence: prose-filename-citation-liveness 2026-09-06
-
-- **retired-slug-live-pointer-citation** [spec: SPEC-citation-liveness.md] — governed prose points
-  at a retired queue slug as a live surface. **Designed as:** check-queue-slug-liveness assertion B,
-  on the new `QUEUE_KIT_CITATION_SURFACE_GLOBS`, reds a single-backtick retired slug that is no
-  tracked file's stem, with a `retired-citation-exempt:` valve
-  (amendment delta 6; red, not report, by lead decision at spec). Filed 2026-08-19.
-  recurrence: retired-slug-live-pointer-citation 2026-09-06
-
-- **queue-status-parenthetical-liveness** [spec: SPEC-citation-liveness.md] — a `(icebox)`-style
-  status beside a cited slug goes stale when the slug moves. **Designed as:** assertion C over the
-  queue file, with an exact vocabulary derived from the section knobs plus `retired` (amendment
-  delta 7). Filed 2026-08-22; returned from the icebox as a family member.
-
-- **done-slug-ownership-citation-report** [spec: SPEC-citation-liveness.md] — governed prose claims
-  a landed slug still owns an open question. **Designed as:** no report. A Done slug is in the
-  retired set, so assertion B covers it (amendment delta 8, by the same lead decision). Filed
-  2026-08-16.
-
 ## Technical Debt
 
 ## Deferred
@@ -3934,5 +3898,10 @@
 - link-wrapped-section-citation-liveness
 - spec-section-title-collision
 - qualified-pointer-section-ownership
+- prose-filename-citation-liveness
+- retired-slug-live-pointer-citation
+- queue-status-parenthetical-liveness
+- done-slug-ownership-citation-report
+- citation-liveness-family-convergence
 
 ## Lessons Learned

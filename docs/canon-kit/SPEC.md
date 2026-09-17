@@ -2772,7 +2772,11 @@ broken link would be caught. Three assertions:
   still tracks under none of its resolutions. A token is path-shaped when it has
   two or more `/`-separated segments of `[A-Za-z0-9._-]`, a final segment
   carrying an extension, and no `..`, after the same quote and punctuation trims
-  as (A) and a leading `./` stripped. Its **resolutions** are the doc's
+  as (A) and a leading `./` stripped. A single-segment token matching
+  `CANON_KIT_AMENDMENT_GLOB` is path-shaped too, and it resolves by basename
+  against the whole tracked tree, since an amendment is cited by bare name
+  wherever its component sits: it reds when no tracked path carries that
+  basename and a retired one did. Every other token's **resolutions** are the doc's
   directory, the repo root, and each `gate_kit_roots` member: a kit-relative
   citation such as `lib/gate.sh`, written in one kit's SPEC about another kit's
   file, resolves the way its reader resolves it. A token **resolves** when any

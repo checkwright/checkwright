@@ -760,6 +760,12 @@ must not gate anything. A derived default below is written as
   `# graph:` manifest). This knob is reached by the same rule canon-kit's corpus
   knobs are, and it belongs to a different kit than they do — which is exactly why
   that rule is stated over walks rather than as a roster of members.
+- `QUEUE_KIT_CITATION_SURFACE_GLOBS` — array of repo-root-relative globs naming
+  the governed surfaces on which `check-queue-slug-liveness` assertion B reds a
+  retired slug citation, default empty (clean skip). It is a separate knob from
+  `QUEUE_KIT_PROSE_SURFACE_GLOBS` because a SPEC's bold-code emphasis is not a
+  membership claim; the descriptor couples `knob:QUEUE_KIT_CITATION_SURFACE_GLOBS`
+  on the same ground. A consumer with a canon-kit manifest aliases it to that set.
 - `QUEUE_KIT_PRECONDITION_REGEX` — the forward-precondition trigger set for
   `check-queue-prose-precondition`, default = the shipped phrase set.
 - `QUEUE_KIT_REQUIRED_SECTIONS` — array of `##` headings that must each appear
@@ -865,11 +871,13 @@ is what lets assertion C see a dead declaration — an entry the tag has fallen 
 exactly the case a tag-triggered walk cannot report. The record is a typed value,
 so its five fields travel as fields and an absent field is simply empty.
 
-The in-body citation scan (§The tag algebra) is deliberately **not** here: it
-has one reader, and this module holds adapters two or more readers share. It
-lives in the queue-edges arm, which takes the section matchers and the live-slug
-reading from this module rather than carrying its own. A second reader of
-body-position slug tokens is what would promote the scan into that roster.
+The in-body citation token (§The tag algebra), `backtick_slugs`, is here by
+that rule: the queue-edges arm reads it for edges and `check-queue-slug-liveness`
+reads it for assertions B and C. The arm keeps its attribution walk; only the
+token grammar is shared, so the two cannot disagree about what a citation is.
+The **name-live test** (`tracked_stems` and `name_live_at`, §The queue-edges arm)
+joined it for the same reason: the arm marks a retired target with it and
+assertion B exempts a live name with it.
 
 The **retired-set derivation** is the same rule's other verdict. It began in the
 queue-edges arm with one reader and joined this module when `entry-history`
@@ -1295,10 +1303,10 @@ sub-task cites in its own name rather than its parent's, and a lead line
 contributes its `[blocked-by:]` tag alone — never its prose, which is title and
 tags rather than relation.
 
-The body-citation scan lives **in this arm, not in the shared adapter**: it has
-exactly one reader, and the rule is shared adapters (§The shared queue adapters). It reuses
-the shared section matchers and live-slug reading; a second reader of
-body-position slugs is what would move it.
+The body-citation token grammar and the name-live test live in the shared
+adapter, because `check-queue-slug-liveness` reads both (§The shared queue
+adapters); the nearest-preceding-bullet attribution walk has this arm as its one
+reader and stays here.
 
 **No tracked projection, and no freshness gate.** A tracked artifact needs a
 reader who cannot run the arm, and there is none — the one consumer is a
@@ -1316,8 +1324,10 @@ is normal, and an entry with many is not a defect. The adjacent temptation —
 redding on a backticked token that resolves to no live slug — is refused
 outright, because those are overwhelmingly legitimate citations of landed work
 (§The tag algebra), and `check-queue-slug-liveness` already owns the liveness
-invariant on the surfaces where a dead reference *is* a false claim. Extending
-it inward would red on good prose.
+invariant on the surfaces where a dead reference *is* a false claim. Assertion B
+of §check-queue-slug-liveness reds a retired citation on the governed citation
+surfaces, where the same token is a false present-tense pointer, and never inside
+the queue file. Extending it inward would red on good prose.
 
 **The refusal and the retired block are the same ruling, not a softening of
 it.** Reporting is what a no-red posture always left available, and the retired
@@ -2192,6 +2202,35 @@ checked contract. Default-empty knob: a consumer with no configured surface
 no-ops clean; the surfaces are consumer editorial config, never a kit literal
 (the provenance seam). Resolution direction is one-way (`dir=one`): the queue
 is ground truth, the prose the audited follower.
+
+**Assertion B, the retired citation.** On every surface in
+`QUEUE_KIT_CITATION_SURFACE_GLOBS`, a single-backtick slug-shaped token naming a
+retired slug (§The queue-edges arm) whose name is no tracked file's stem is red,
+reported by file, line and slug. It is a pointer at disposed work, which the
+paragraph above already tells prose to replace with the owning SPEC; a slug in
+the done section is in the retired set, so a governed citation of it reds at the
+commit that moves it. A double-backtick span is a quoted literal and is not read.
+The live-name test is the queue-edges arm's: a slug that shipped as a tracked
+file's name is current prose, not a pointer. A line that is history takes
+`<!-- retired-citation-exempt: <reason> -->` on it or the line above, the reason
+mandatory. The marker is this kit's own rather than canon-kit's history valves,
+so the verdict never depends on another kit's knobs and the kit vendors alone.
+The knob ships empty, and it stays apart from the membership surfaces, because
+emphasis in bold code on a SPEC is not a queue claim. The retired set is the
+shared adapter's, so a missing `git` or a shallow clone under-reds and never
+invents.
+
+**Assertion C, the status parenthetical.** Inside the queue file, a cited slug
+followed by exactly `(<status>)` (one space allowed before it) must be where the
+status says. The vocabulary is the configured single-word section names
+(`QUEUE_KIT_DEFERRED_SECTION`, `QUEUE_KIT_ICEBOX_SECTION`,
+`QUEUE_KIT_DONE_SECTION`), lowercased, plus `retired`. A section word agrees when
+the slug heads an entry in that section; `retired` agrees when the slug is in the
+retired set; a token resolving to nothing is not a citation (§The tag algebra)
+and is skipped. A stale status inverts a reader's conclusion, and the queue's own
+sections are a total oracle for it. A richer parenthetical (`(landed …)`) or a
+multi-word section name is outside the vocabulary and never read. The finding
+names the line, slug, stated status and actual section.
 
 ### templates/
 

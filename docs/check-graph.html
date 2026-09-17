@@ -860,6 +860,7 @@ graph LR
   n314 -->|"check-crate-arms"| n316
   n314 -->|"check-crate-arms"| n333
   n314 -->|"check-crate-arms"| n419
+  n71 -->|"check-deferred-board-tags"| n410
   n71 -->|"check-deferred-board-tags"| n419
   n71 -->|"check-deferred-board-tags"| n430
   n12 -->|"check-deprecation-task"| n6
@@ -1663,20 +1664,41 @@ graph LR
   n237 -->|"check-provenance-seam"| n37
   n237 -->|"check-provenance-seam"| n410
   n237 -->|"check-provenance-seam"| n419
+  n71 -->|"check-queue-entry-budget"| n410
   n71 -->|"check-queue-entry-budget"| n419
   n71 -->|"check-queue-entry-budget"| n430
+  n71 -->|"check-queue-hygiene"| n410
   n71 -->|"check-queue-hygiene"| n419
   n71 -->|"check-queue-hygiene"| n430
   n71 -->|"check-queue-prose-precondition"| n366
+  n71 -->|"check-queue-prose-precondition"| n410
   n71 -->|"check-queue-prose-precondition"| n419
   n71 -->|"check-queue-prose-precondition"| n430
+  n71 -->|"check-queue-sections"| n410
   n71 -->|"check-queue-sections"| n419
   n71 -->|"check-queue-sections"| n430
   n71 -->|"check-queue-slug-liveness"| n408
   n71 -->|"check-queue-slug-liveness"| n40
   n71 -->|"check-queue-slug-liveness"| n7
+  n71 -->|"check-queue-slug-liveness"| n27
+  n71 -->|"check-queue-slug-liveness"| n31
+  n71 -->|"check-queue-slug-liveness"| n29
+  n71 -->|"check-queue-slug-liveness"| n28
+  n71 -->|"check-queue-slug-liveness"| n34
+  n71 -->|"check-queue-slug-liveness"| n32
+  n71 -->|"check-queue-slug-liveness"| n33
+  n71 -->|"check-queue-slug-liveness"| n39
+  n71 -->|"check-queue-slug-liveness"| n24
+  n71 -->|"check-queue-slug-liveness"| n22
+  n71 -->|"check-queue-slug-liveness"| n44
+  n71 -->|"check-queue-slug-liveness"| n43
+  n71 -->|"check-queue-slug-liveness"| n40
+  n71 -->|"check-queue-slug-liveness"| n41
+  n71 -->|"check-queue-slug-liveness"| n42
+  n71 -->|"check-queue-slug-liveness"| n410
   n71 -->|"check-queue-slug-liveness"| n419
   n71 -->|"check-queue-slug-liveness"| n430
+  n71 -->|"check-queue-wrap"| n410
   n71 -->|"check-queue-wrap"| n419
   n71 -->|"check-queue-wrap"| n430
   n235 <-->|"check-readme-roster"| n74
@@ -1735,6 +1757,7 @@ graph LR
   n71 -->|"check-roadmap-fresh"| n327
   n71 -->|"check-roadmap-fresh"| n379
   n71 -->|"check-roadmap-fresh"| n378
+  n71 -->|"check-roadmap-fresh"| n410
   n71 -->|"check-roadmap-fresh"| n419
   n71 -->|"check-roadmap-fresh"| n430
   n431 -->|"check-root-tiering"| n419
@@ -1980,10 +2003,13 @@ graph LR
   n61 -->|"check-surface-ratchet"| n419
   n62 -->|"check-survey-record"| n419
   n62 -->|"check-survey-record"| n427
+  n71 -->|"check-tag-lead-line"| n410
   n71 -->|"check-tag-lead-line"| n419
   n71 -->|"check-tag-lead-line"| n430
+  n71 -->|"check-task-conservation"| n410
   n71 -->|"check-task-conservation"| n419
   n71 -->|"check-task-conservation"| n430
+  n71 -->|"check-task-names"| n410
   n71 -->|"check-task-names"| n419
   n71 -->|"check-task-names"| n430
   n26 <-->|"check-template-copy-parity"| n408

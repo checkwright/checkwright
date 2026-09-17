@@ -532,6 +532,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MDREF_EXCLUDE",
             "CANON_KIT_TEMPORAL_EXEMPT_SECTIONS",
             "CANON_KIT_TEMPORAL_EXEMPT_PATHS",
+            "CANON_KIT_AMENDMENT_GLOB",
         ],
         "canon-kit",
         &[("git", "")],
@@ -908,16 +909,21 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-queue-slug-liveness",
         queue_slug_liveness::run,
-        &[(".", "glob:knob:QUEUE_KIT_PROSE_SURFACE_GLOBS", "", "")],
+        &[
+            (".", "glob:knob:QUEUE_KIT_PROSE_SURFACE_GLOBS", "", ""),
+            (".", "glob:knob:QUEUE_KIT_CITATION_SURFACE_GLOBS", "", ""),
+        ],
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_PROSE_SURFACE_GLOBS",
+            "QUEUE_KIT_CITATION_SURFACE_GLOBS",
             "QUEUE_KIT_ACTIVE_SECTIONS",
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
+            "QUEUE_KIT_DONE_SECTION",
         ],
         "queue-kit",
-        &[],
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The kit-roots `gate_kit_roots` cohort — five members sharing one
     // corpus derivation, the kit roots, so each declares the override they are computed from and

@@ -11,6 +11,7 @@
 ## Deferred
 
 - **deferred-task** — a deferred but still-live task; a claim on it resolves.
+  An accurate status beside `deferred-task` (deferred) and `landed-task` (done) agrees.
 
 ## Done
 
