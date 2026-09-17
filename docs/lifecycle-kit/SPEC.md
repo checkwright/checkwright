@@ -4200,15 +4200,8 @@ empty observation for this member and the scans' coverage rests on the
 behavioral test below and on the live battery.
 
 The good/bad pair covers
-assertion A; `gate-tests/check-stage-entry.test.sh` covers B, C and D over
-fourteen sandbox scenarios (untagged residue red, tagged residue at drain entry green,
-empty-reason tag red, tagged residue at successor entry red, `[observed-by:]`
-residue red and naming its own remedy; two-dir
-amendments ±waiver, a single-amendment cross-component body, a
-single-component amendment, and a `templates/` stub that must not fabricate a
-second component; a not-run marker red naming its file and line, a reasoned
-cannot-run marker green with its count, an empty-reason cannot-run marker red, and
-a fenced, a mid-line and a `templates/`-stub mention green). Suite *runs* and other
+assertion A; `gate-tests/check-stage-entry.test.sh` covers B, C and D in
+sandbox scenarios. Suite *runs* and other
 non-static exits are not re-runnable as pre-commit gates and stay
 human-judged at the stage approval; the prerequisite-stamp floor is their
 mechanical residual.
