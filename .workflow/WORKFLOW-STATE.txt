@@ -11,3 +11,4 @@ queue-entry-grammar build a72396f2 2026-09-17 99d8341e
 queue-entry-grammar build af235948 2026-09-17 65c72068
 queue-entry-grammar build a6ab15e9 2026-09-17 fa92a6e5
 queue-entry-grammar validate add84c57 2026-09-17 ac5e67df
+queue-entry-grammar close afb94bcc 2026-09-17 dbdbc18b
