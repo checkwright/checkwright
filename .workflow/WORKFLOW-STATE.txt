@@ -7,3 +7,4 @@
 obligation-residency scope a3cef882 2026-09-17 bfa7a0e9
 obligation-residency build a0309ce9 2026-09-17 132c5972
 obligation-residency validate ac55d614 2026-09-17 d14a2a79
+obligation-residency close a486bfc5 2026-09-17 1c673f5f
