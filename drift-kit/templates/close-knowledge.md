@@ -1,7 +1,7 @@
 **Knowledge-friction triage** — the recurring close-stage step that turns each
 captured re-derivation into a doc-owner fix, so the next session reads the fact
-instead of re-deriving it. Splice this into your close skill beside the
-tooling-friction triage (guard-kit's close-triage pattern).
+instead of re-deriving it. Splice this into your close skill's `housekeeping`
+slot (step 4), the knowledge-friction row's (guard-kit's close-triage pattern).
 
 1. **Walk the log.** Read `.workflow/knowledge-friction.log` — each line is
    `<date> <fact re-derived> ← <surface it was read from>`, one session's

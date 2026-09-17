@@ -61,7 +61,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
    `.workflow/wakeup-attempts.log`) — both are per-iteration, cleared at close.
 
 4. Splice `templates/close-triage.md` into your close-stage skill (it fills
-   lifecycle-kit's `tooling-friction triage` placeholder).
+   lifecycle-kit's `housekeeping` slot, close step 4).
 
 Configuration is a knob file — override any knob in `guard-config.knobs`, one
 `NAME = value`, `NAME[] = element` or `NAME[key] = value` line each

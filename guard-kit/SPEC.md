@@ -2776,7 +2776,7 @@ log — the advisory is transient, so nothing accrues for the close-stage triage
 ## The close-stage triage step
 
 `templates/close-triage.md` is the recurring step a consumer splices into
-its close-stage skill — it fills the tooling-friction placeholder in
+its close-stage skill — it fills the `housekeeping` slot (step 4) in
 lifecycle-kit's close template. The step: run `scan-prompts`, resolve each
 recurring pattern by the triage criterion; review and delete the wakeup
 log if present; run `compare-settings-allow` and take its **three**

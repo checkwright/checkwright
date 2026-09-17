@@ -1,6 +1,6 @@
 **Tooling-friction triage** — the recurring close-stage step that keeps the
-permission-friction loop a habit, not a one-off cleanup. Splice this in place
-of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
+permission-friction loop a habit, not a one-off cleanup. Splice this into
+lifecycle-kit's close `housekeeping` slot (step 4), the prompt-friction row's.
 
 1. **Rank what nothing granted.** Run
    `bash gate-sdk/bin/run-gates.sh --emit scan-prompts` — it
