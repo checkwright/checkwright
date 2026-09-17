@@ -162,6 +162,22 @@ hand-off paragraph, "which suite, what the red is, and why it is accepted rather
 suite whose failure is understood and is not a regression from this iteration's diff" becomes "a
 suite whose failure is understood and reproduces at the iteration-start commit".
 
+**The close template's valve-disposition step is the row's other producer, and it was missed.**
+The `reproduces-at=<rev>` token's producer bullet (§Producers and consumers below) already says the
+closing stage lands the row a `used` valve line owes, carrying delta 3's payload commit onto it —
+but no delta edited the step that instructs that landing, so close read no instruction to do it.
+The ordinary valve case is exactly a flip: the scenario validate held was `pass` in the baseline
+because nothing had reddened it yet, so the row close authors is the same row delta 2's flip
+assertion binds, and a close session landing it bare would trip a check the queue's
+`close-entry-baseline-bootstrap-deadlock` history already names as the recurring cost of an
+unstated step.
+
+**Replacement text, lifecycle-kit/templates/stages/close.md §3 (Disposition the pre-flight valve
+ledger)** (**Not yet applied**). "file the blocking task its reason names and land the baseline row
+that names that task" becomes "file the blocking task its reason names and land the baseline row
+that names that task, carrying the reason's `reproduces-at=<rev>` commit onto that row where
+evidence-kit/SPEC.md §check-evidence-baseline's flip assertion binds it".
+
 ### (4) This consumer's validate binding names the token
 
 `.claude/commands/validate.md`'s `suites` binding names `reproduces-at=` as where a hold records
@@ -235,6 +251,8 @@ so no migration is owed.
 - `evidence-kit/gate-tests/check-evidence-baseline.test.sh` — the flip cases (delta 2).
 - `lifecycle-kit/templates/stages/validate.md` — triage, completion and valve payload (delta 3).
 - `lifecycle-kit/SPEC.md` §templates/stages/ — the valve hand-off paragraph (delta 3).
+- `lifecycle-kit/templates/stages/close.md` §3 — the valve-disposition step carries the
+  reproduces-at commit onto the row it lands (delta 3).
 - `.claude/commands/validate.md` — the `suites` binding (delta 4).
 - `.workflow/validate-baseline.txt` — this repo's baseline header (delta 5).
 - `evidence-kit/smoke/install.sh` — the smoke's seed header (delta 5).
@@ -245,8 +263,11 @@ so no migration is owed.
 - `docs/lifecycle-kit/SPEC.md` — the generated mirror (all deltas).
 
 The roster comes from `grep -rn '<suite> <scenario> <status>'`, `grep -rn 'Triage a red'` and
-`grep -rn 'why it is accepted rather than fixed'` over the tracked tree at `66682ce6`. Build
-re-derives it.
+`grep -rn 'why it is accepted rather than fixed'` over the tracked tree at `66682ce6`, plus the
+close template's own valve-disposition step, found by the concept (align's read of the token's
+already-declared producer bullet below) rather than by either literal — no grep on this
+amendment's vocabulary matches close.md's "land the baseline row that names that task" phrasing.
+Build re-derives it.
 
 ## Retired spellings
 

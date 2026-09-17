@@ -96,8 +96,8 @@ the escalate list:
 mechanical. It says they are *priced* as mechanical, and points at the transition {mechanical}.
 **Not yet applied.**
 
-**Replacement text, `.claude/commands/lead.md`** (**Not yet applied**). The bullet's second and
-third sentences become:
+**Replacement text, `.claude/commands/lead.md`** (**Not yet applied**). The bullet's second
+sentence (the em-dash after "default" continues it, rather than starting a third) becomes:
 
 > validate is priced as *mechanical oracle-running* (run the battery, report), so the stage
 > collapses to a single stage-uniform-mechanical default. That is the degenerate case of per-batch
