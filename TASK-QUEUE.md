@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: interpreter-steer-census
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -76,6 +76,13 @@
   **Cost while deferred:** every inline computation stays an unreviewable-effect call, granted by a
   committed glob or decided out of band, and nothing counts what the calls recompute.
   Filed 2026-08-30 by close from the gap inbox; iceboxed at a pool triage; returned 2026-09-15.
+  **Re-verified 2026-09-17 at scope:** about 224 inline `python3` calls in about 9350 Bash calls
+  since 2026-09-15, so the shape still recurs.
+  **Directed 2026-09-17 at scope into `interpreter-steer-census`'s set, as its lead — operator
+  direction, lead-relayed, revisable at a later scope or spec; no ruling record carries it.** The
+  set: this entry and `scan-prompts-heredoc-grant-split`. Composition: bundled — both sit on
+  guard-kit's `scan-prompts` friction reading, and the joiner's skewed `python3 -` count is the
+  figure this census reads. Both add names, so the authoring stage promotes them.
 
 - **scan-prompts-heredoc-grant-split** [design-pending] [cost: event/low] [surface: guard-kit] —
   scan-prompts' grant test reads a flattened heredoc-bearing log line whole, so `split_compound`
@@ -92,6 +99,8 @@
   **Cost while deferred:** the `python3 -` row's prompting count is neither a floor nor a ceiling,
   so the census above reads a skewed friction figure.
   Filed 2026-09-15 to the gap inbox at `guard-friction-reach`'s spec; promoted at its close.
+  **Directed 2026-09-17 at scope into `interpreter-steer-census`'s set**;
+  `inline-interpreter-substrate-census` records the set's argument.
 
 - **gap-inbox-kit-ref-valve** [design-pending] [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
@@ -3533,7 +3542,9 @@
   — the native Windows install smoke, still the slowest leg, sets every close watch.
   **Measured at close off the first run carrying the roster hash batch:** install-smoke-windows took
   31m46s against 42m48s to 45m58s over the five runs before it; macOS Intel took 13m59s and the
-  rest of the workflow under eight minutes. Three terms remain, each with a design question.
+  rest of the workflow under eight minutes. **Re-measured 2026-09-17 at scope** off gates run
+  35194231255: install-smoke-windows 10m35s, still the slowest, macOS Intel 9m18s, the whole run
+  about 13m. Three terms remain, each with a design question.
   **1. The harness still hashes each recorded file with its own `git hash-object` child**
   (installer/consumer-smoke/run-smoke.sh, the manifest assertion's `got`). That is deliberate: the
   loop is the independent second reading of the recorded value and installer/SPEC.md §The
