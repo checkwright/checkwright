@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: obligation-residency
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,140 @@
 ## New Features
 
 ## Technical Debt
+
+- **kfric-obligation-residency** — the knowledge-friction capture obligation is declared for
+  "any session" and reaches no kit surface the session shape that most needs it actually loads.
+  recurrence: kfric-obligation-residency 2026-08-24
+  **FIRST RECURRENCE, the attested shape repeating in a SECOND iteration with a second lead.** At
+  `port-remainder-disposition-and-worktree-reclamation` the lead re-derived off implementation
+  source that `run-gate-tests.sh`'s case-scoped scratch override exports the PLAIN knob name while
+  the crate's bridged reader resolves only the `GATE_SDK_KNOB_`-prefixed one — a fact no doc owned
+  — and carried it to close in a DISPATCH PROMPT rather than stamping it. Probed at that close,
+  not inferred: `.workflow/knowledge-friction.log` was 0 bytes.
+  **THIRD SILENT ZERO, probed 2026-09-17 at this scope.** That log is 0 bytes with an mtime
+  preceding the whole `queue-entry-grammar` iteration — eight stamps, three separate build
+  sessions — so that iteration wrote nothing to it either. The file is not boundary-truncated, so
+  the zero is the writer's silence and not a reset.
+  **PREMISE CORRECTED at promotion, re-grepped first-hand rather than inherited.** The filing said
+  `lead.md` and `agent-execution.md` "carry no line at all". Stale for the first:
+  `lifecycle-kit/templates/lead.md` now names "a knowledge-friction line" among the committed
+  channels a lead disposes its journal into. It carries no command, no in-the-moment rule, and
+  sits at journal-disposal time — so it routes a lead to exactly the DEFERRED capture CLAUDE.md
+  §Housekeeping calls "no capture". The line sharpens the finding rather than closing it.
+  `delegation-kit/templates/agent-execution.md` still carries nothing, and the kits' templates
+  otherwise hold `kfric`/`knowledge-friction` only in drift-kit/templates/close-knowledge.md (the
+  close-side triage, a *reader*) and `drift-kit/templates/kpis.list`.
+  **A lead is the shape that re-derives most and writes least**, and it is the shape no template
+  serves: it runs off `lifecycle-kit/templates/lead.md`, meets no stage template, and reaches the
+  rule only through a consumer's always-loaded file a vendoring adopter need not have written at
+  all — so for that adopter the obligation ships with no carrier. The first attestation is the
+  same shape: at `shell-gate-tail-port-and-completion-oracle` a lead carried a re-derived fact to
+  close in a dispatch prompt, the log read 0 bytes, and `kpi-knowledge-friction`'s own lower-bound
+  hedge absorbed the miss silently. That fact is now homed at gate-sdk/SPEC.md §run-gate-tests, so
+  this entry is the CAPTURE PATH alone.
+  DISTINCT from `kfric-empty-log-ambiguity`, retired, which asked how an EMPTY log should be READ;
+  it landed the reader half and leaves the writer half this entry owns untouched.
+  **DISTINCT from `dispatch-claim-evidentiary-tier-unmarked`**, where a claim's evidentiary tier
+  is upgraded in transit — the relay here was accurate and the capture simply never happened.
+  **PAIRS with `recurrence-obligation-residency`, promoted beside it** in this unit: both are an
+  every-session obligation stated only where some sessions look, both resolve under
+  delegation-kit/SPEC.md §Operative residency's placement rule, and both face the identical trade
+  between one resident line and N template restatements.
+  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed**, lead
+  unit of `obligation-residency`: relocating one imperative mints no name, so no amendment is owed.
+  **Deliverable:** rule the placement once against §Operative residency's (a)-(c) and apply it to
+  both obligations — candidates are a bounded imperative in the unserved kit templates, a line on
+  drift-kit's own dispatch surface, or the widest-true-tier answer that disposes of the twin in the
+  same motion — then repair `lead.md`'s disposal-time line so it cannot read as the discharge.
+  **NO GATE THIS ITERATION — operator direction, 2026-09-17, lead-relayed**, on the ground that the
+  placement ruling must exist before anything can be gated against it. The gate candidate is filed
+  to the gap inbox with its argument.
+  **Cost while deferred:** one silently uncounted re-derivation per lead session that hits one, and
+  a KPI that reads cleanest exactly when the least-instrumented session shape re-derives most.
+  Surfaced 2026-08-24 by the `shell-gate-tail-port-and-completion-oracle` close and filed to the
+  gap inbox there; promoted to Deferred 2026-08-24 at that scope's drain.
+
+- **recurrence-obligation-residency** — the recurrence stamp is an obligation on **every** session,
+  and its statement reaches only some of the stages that owe it.
+  `recurrence-drain-input-widening` ruled the direct stamp sanctioned *and obliged*, attaching the
+  duty to the judgment rather than to the channel, so a build, align, spec or validate session that
+  observes a recurrence owes a stamp.
+  **PREMISE CORRECTED at promotion, re-grepped first-hand rather than inherited.** The filing
+  claimed the word reaches only `close.md` and `scope.md`, and scope's is the *reader* half (the
+  pre-emption threshold counting dates). `lifecycle-kit/templates/lead.md` now carries a full
+  bounded imperative with an adjacent citation — the §Operative residency shape already applied,
+  for the lead reader alone. `build.md`, `align.md`, `spec.md` and `validate.md` still carry
+  nothing, so the gap persists for four stage templates AND the doctrine has been applied
+  per-reader with no ruling behind it. That accretion is this unit's case.
+  **The remedy is already specified, which is why the gap was filed rather than argued.** This is
+  delegation-kit/SPEC.md §Operative residency's exact shape and its condition (a) holds: the bound
+  actor fires no trigger that loads lifecycle-kit/SPEC.md §The committed gap inbox, and a trigger
+  that exists but that the actor never fires is, for that actor, no trigger. So a bounded
+  imperative plus an adjacent citation is sanctioned — (b) and (c) bound what may be copied.
+  **Attested from history, not predicted.** A spec survey counted the stamping commits and found
+  direct stamps already produced by `chore(build)` twice, `chore(align)` once and `chore(scope)`
+  once — the stages the original ruling never contemplated as producers. A closing session then
+  attested it first-person: it made two direct stamps and reached the obligation only by reading
+  §The committed gap inbox for an unrelated reason.
+  **The placement trade, which is the open half.** One line in CLAUDE.md buys every session at a
+  standing per-session cost on the tier the brevity machinery guards; a clause in each unserved
+  stage template costs nothing resident but multiplies the restatement and drifts that many ways;
+  a clause in the dispatch-side agent definition serves only dispatched sessions and misses a
+  standalone run. Widest-true-tier placement decides it, and it is decided ONCE for this entry and
+  `kfric-obligation-residency` together — which is why one unit takes both.
+  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed** as the
+  second unit of `obligation-residency`, and EVICTED FROM THE ICEBOX to take it. Relocating one
+  imperative adds no name, so no amendment is owed. Body restored from the evicting commit
+  `d4b24d5f` (2026-09-11).
+  **Cost while deferred:** the obligation is unenforceable and silently unmet for four of six
+  stages — a recurrence *seen and not recorded* is the exact failure the counter exists to end, so
+  the ruling's own purpose is what erodes.
+  Filed 2026-08-17 by close from its own brevity-and-residency pass; the loaded-surface corpus was
+  grepped before the absence was asserted, and re-grepped at this promotion.
+
+- **instruction-sweep-grounds-residue-unrelocated** — three grounds passages the 2026-09-12
+  instruction sweep's per-passage enumeration missed, which the differential successor cannot reach
+  because it derives its worklist from a git diff range and these lines were never touched.
+  **The passages, re-verified present 2026-09-17 at this scope**, all in
+  lifecycle-kit/templates/lead.md: the prompt-answered-signal paragraph's
+  stated-here-rather-than-incident-lore meta-ground, the intra-stage-split bullet's
+  nests-a-second-supervisor ground, and the Lead-does-stamping-is-ruled-out grounds sentence under
+  §Stamps are authoritative.
+  **Why close did not take them.** Each is a *ground*, so the doctrine rule
+  (doctrine-kit/DOCTRINE.md, Content-tiering) relocates it to the section owning the mechanism
+  rather than deleting it, and each needs a per-passage read of whether lifecycle-kit/SPEC.md
+  already carries it — a judgment, not a brevity-pass deletion.
+  **DISTINCT from `close-differential-instruction-sweep`, landed**, the forward mechanism over
+  future edits, which is unchanged by this and cannot see these lines.
+  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed**, third
+  unit of `obligation-residency`: it shares the surface the lead units edit, `lead.md`, and the same
+  content-tiering placement question, so the per-passage read is bought once.
+  **Cost while deferred:** three grounds slabs ride the lead template at every dispatch, inside the
+  surface ratchet's ceiling for that file.
+  Filed 2026-09-12 at build to the gap inbox; promoted to Deferred by that iteration's close after
+  →fix took only the history half.
+
+- **consumer-footprint-roster-omits-lifecycle-kit** — context-kit/SPEC.md §The consumer footprint
+  rosters each kit's resident ask under a one-pointer-line budget, lists delegation-kit,
+  doctrine-kit and drift-kit, and says every other kit asks none. lifecycle-kit asks more: its
+  generated registration block in the agent file (lifecycle-kit/SPEC.md
+  §check-lifecycle-registration) and the gap-capture and survey-capture bullets. Re-verified
+  2026-09-17 at this scope against the roster text.
+  **The coupling that put it in this unit, found while probing rather than assumed.** That roster
+  names DRIFT-KIT's resident ask as "the knowledge-friction capture bullet" — the very bullet whose
+  placement `kfric-obligation-residency` questions. One roster, one budget rule, and one placement
+  sanction (delegation-kit/SPEC.md §Operative residency) govern all four units of this iteration,
+  so whichever way the placement is ruled, this row is what has to state the result.
+  **The open half:** either the roster gains a lifecycle-kit row and the budget rule states its
+  exception, or the asks move behind a load trigger. The ruling made for the lead units decides it.
+  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed**, fourth
+  unit of `obligation-residency`, kept in the set against the risk that its resolution turns out
+  rule-shaped: splitting it guarantees a later session re-reads the same two SPEC sections. Should
+  build find the fix mints a name, that is an envelope question to escalate, not to absorb.
+  **Cost while deferred:** an adopter weighing adoption cost reads a footprint that understates one
+  kit's resident ask.
+  Filed 2026-09-13 by the clause-owner audit behind `resident-tier-restatement`'s Housekeeping cut;
+  drained at that iteration's close.
 
 ## Deferred
 
@@ -147,19 +281,6 @@
   close brevity pass and the always-loaded ratchet.
   Filed 2026-09-13 at `resident-tier-restatement`'s spec, from the brevity-reach amendment;
   drained at its close.
-
-- **consumer-footprint-roster-omits-lifecycle-kit** [cost: event/low] [surface: context-kit] — context-kit/SPEC.md
-  §The consumer footprint rosters each kit's resident ask under a one-pointer-line budget, lists
-  delegation-kit, doctrine-kit and drift-kit, and says every other kit asks none. lifecycle-kit asks
-  more: its generated registration block in the agent file (lifecycle-kit/SPEC.md
-  §check-lifecycle-registration) and the gap-capture and survey-capture bullets. Re-verified at the
-  drain against the roster text.
-  **Why design-pending, cross-component:** either the roster gains a lifecycle-kit row and the
-  budget rule states its exception, or the asks move behind a load trigger.
-  **Cost while deferred:** an adopter weighing adoption cost reads a footprint that understates one
-  kit's resident ask.
-  Filed 2026-09-13 by the clause-owner audit behind `resident-tier-restatement`'s Housekeeping
-  cut; drained at that iteration's close.
 
 - **harness-moved-background-task-unrecorded** [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
@@ -2055,53 +2176,6 @@
   `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
   filing put to it.
 
-- **kfric-obligation-residency** [cost: iteration/low] [surface: delegation-kit] — the knowledge-friction capture obligation is
-  declared for "any session" and reaches no surface a kit-template session actually loads.
-  recurrence: kfric-obligation-residency 2026-08-24
-  **FIRST RECURRENCE, and it is the attested shape repeating in a SECOND iteration with a second
-  lead.** At `port-remainder-disposition-and-worktree-reclamation` the lead re-derived off
-  implementation source that `run-gate-tests.sh`'s case-scoped scratch override exports the PLAIN
-  knob name while the crate's bridged reader resolves only the `GATE_SDK_KNOB_`-prefixed one — a
-  fact no doc owned — and carried it to close in a DISPATCH PROMPT rather than stamping it. Probed
-  at that close, not inferred: `.workflow/knowledge-friction.log` was 0 bytes. Same session shape,
-  same carrier, same silent zero, one iteration later.
-  CLAUDE.md §Housekeeping binds capture to **any session** with "deferred capture is no capture",
-  and that sentence is the obligation's only statement in this tree. A live grep over the kits'
-  own templates — `lifecycle-kit/templates/`, `delegation-kit/templates/`,
-  `drift-kit/templates/` — finds `kfric` and `knowledge-friction` **only** in
-  drift-kit/templates/close-knowledge.md (the close-side triage, a *reader*) and in
-  `drift-kit/templates/kpis.list`. `lead.md` and `agent-execution.md` carry no line at all.
-  **Attested rather than predicted, and the instance is the worst-case shape.** At the
-  `shell-gate-tail-port-and-completion-oracle` iteration a **lead** session re-derived that
-  `run-gate-tests.sh` takes one argument for the consumer-remainder tree and carried the fact to
-  close in a dispatch prompt instead of stamping it. Probed at that close, not inferred:
-  `.workflow/knowledge-friction.log` was 0 bytes at the close entry, so `kpi-knowledge-friction`
-  read zero re-derivations for an iteration that demonstrably had one, and the KPI's own
-  lower-bound hedge absorbed the miss silently. The fact itself is now homed at
-  gate-sdk/SPEC.md §run-gate-tests and its fix filed, so this entry is the CAPTURE PATH alone.
-  **A lead is the shape that re-derives most and writes least**, and it is exactly the shape no
-  template serves: it runs off `lifecycle-kit/templates/lead.md`, meets no stage template, and
-  reaches the rule only through a consumer's always-loaded file a vendoring adopter need not have
-  written at all — so for that adopter the obligation ships with no carrier.
-  DISTINCT from `kfric-empty-log-ambiguity`, retired, which asks how an EMPTY log should be READ and
-  whether the KPI may be trusted at zero; this is the obligation never reaching the writer.
-  **DISTINCT from `dispatch-claim-evidentiary-tier-unmarked`**, where a claim's evidentiary tier
-  is upgraded in transit — the relay here was accurate and the capture simply never happened.
-  **PAIRS with `recurrence-obligation-residency` on one surface**: both are an every-session
-  obligation stated only where some sessions look, both resolve under
-  delegation-kit/SPEC.md §Operative residency's placement rule, and both face the identical trade
-  between one resident line and N template restatements. A unit taking either should take both.
-  **Why design-pending:** placement is the whole question and the candidates differ in kind —
-  a bounded imperative in the two unserved kit templates, a line on drift-kit's own dispatch
-  surface, or the widest-true-tier answer that disposes of the recurrence twin in the same motion.
-  Class: relocates one imperative and mints no name and no gate, so canon-kit's litmus makes it
-  **debt**.
-  **Cost while deferred:** one silently uncounted re-derivation per lead session that hits one,
-  and a KPI that reads cleanest exactly when the least-instrumented session shape re-derives most.
-  Surfaced 2026-08-24 by the `shell-gate-tail-port-and-completion-oracle` close and filed to the
-  gap inbox there; promoted 2026-08-24 at this scope's drain, which re-ran the template grep
-  first-hand and found both files still empty.
-
 - **release-body-step-has-no-in-tree-witness** [cost: event/high] [surface: RELEASING.md] — the one release step whose
   product lives off the tree is the one that was skipped, and its only backstop is next-day.
   RELEASING.md step 6 fills the GitHub Release body with the note post's apex URL by hand. It is
@@ -2879,27 +2953,6 @@
   readings recommend opposite moves when the next miss lands.
   Filed 2026-09-12 at spec to the gap inbox; promoted here by close, →fix refused as operator-class.
 
-- **instruction-sweep-grounds-residue-unrelocated** [cost: event/low] [surface: lifecycle-kit]
-  — three grounds passages the 2026-09-12 instruction sweep's per-passage enumeration missed, which
-  the differential successor cannot reach because it derives its worklist from a git diff range and
-  these lines were never touched.
-  **The passages, verified present at 2026-09-12 close** (the close's own brevity pass took the
-  *history* half of the residue and left these): lifecycle-kit/templates/lead.md — the
-  prompt-answered-signal paragraph's stated-here-rather-than-incident-lore meta-ground, the
-  intra-stage-split bullet's nests-a-second-supervisor ground, and the
-  Lead-does-stamping-is-ruled-out grounds sentence under §Stamps are authoritative.
-  **Why close did not take them.** Each is a *ground*, so the doctrine rule
-  (doctrine-kit/DOCTRINE.md, Content-tiering) relocates it to the section owning the
-  mechanism rather than deleting it, and each needs a per-passage read of whether
-  lifecycle-kit/SPEC.md already
-  carries it — a spec-stage judgment, not a brevity-pass deletion.
-  **DISTINCT from `close-differential-instruction-sweep`, landed**, the forward mechanism over
-  future edits, which is unchanged by this and cannot see these lines.
-  **Cost while deferred:** three grounds slabs ride the lead template at every dispatch, inside the
-  surface ratchet's ceiling for that file.
-  Filed 2026-09-12 at build to the gap inbox; promoted here by close after →fix took only the
-  history half.
-
 - **push-account-selection-has-an-explicit-per-command-form** [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
   the active account re-arming between pushes inside one session, so the check narrows a window it
@@ -3476,7 +3529,6 @@
 - **survey-engagement-residue-untracked** — Engagement residue rests on conduct.
 - **metric-dir-member-contract-unheld** — The metric dir accretes leftovers.
 - **kit-bin-entry-point-unrostered** — No roster maps bin tools to kits.
-- **recurrence-obligation-residency** — Stamp duty reaches two of six stages.
 - **queue-lib-dead-derivation** — Three queue-lib regexes have no live reader.
 - **gate-test-in-tree-invoker-ruling** — Is a gate-test an in-tree caller?
 - **survey-oracle-liveness-unasserted** — An oracle may name a wiped path.

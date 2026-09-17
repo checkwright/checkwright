@@ -4,4 +4,4 @@
 
 ---
 
-— scope a3cef882 2026-09-17 bfa7a0e9
+obligation-residency scope a3cef882 2026-09-17 bfa7a0e9
