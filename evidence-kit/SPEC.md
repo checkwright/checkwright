@@ -770,7 +770,7 @@ that is `pass` in the baseline as committed at the iteration-start commit and
 flip: a new scenario red from the start can be a new test for an old defect, and
 widening to it is a separate argued change. A flip row with no token is red, and
 so is any token whose `<rev>` resolves to no commit or is not the start commit or
-one of its ancestors ("names a commit inside the iteration"). The resolution and
+one of its ancestors. The resolution and
 ancestry checks cover every token, not only flip rows; a token valid in an earlier
 iteration stays valid, because each iteration starts after the one before. The
 prior baseline is read from git at the start commit: a path absent there makes
@@ -858,9 +858,8 @@ in order, before the close entry is stamped:
 3. **Re-run the suite** with `--run-validate` and commit the fresh evidence line,
    which the moved baseline now diffs clean.
 
-Stopping after step 2 is what reads as the first fix having failed: the refusal
-repeats for a reason neither landed change names. Both gates' help text names
-step 3 for that reason.
+Both gates' help text names step 3: stopping after step 2 repeats the refusal for
+a reason neither landed change names.
 
 **A pre-flight caller names this gate, never its declaration path, and the port
 is what made that binding.** `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
