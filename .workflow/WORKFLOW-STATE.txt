@@ -5,3 +5,4 @@
 ---
 
 external-install-evidence scope a3a1dd4a 2026-09-18 37b578b2
+external-install-evidence spec a17c2385 2026-09-18 8f31d2c4
