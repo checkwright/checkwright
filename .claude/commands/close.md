@@ -14,6 +14,9 @@ gate-sdk/bin/run-gates.sh --lesson-sink <tag>`, which resolves the sink from the
 
     close-surface: .workflow/essay-harvest.md advisory reclaim=: > .workflow/essay-harvest.md
 
+**drain-inputs** — `.workflow/knowledge-friction.log`, read whole; its triage stays
+the roster row's (drift-kit/templates/close-knowledge.md).
+
 **housekeeping** — measure, then triage. First meter this closing session with
 `--emit overhead-meter <session-id>`, passing this session's own `close` stamp id, whose invocation and byte-proxy contract
 drift-kit/SPEC.md §The overhead meter owns: it logs the governance-vs-task

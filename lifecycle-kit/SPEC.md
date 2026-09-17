@@ -3448,13 +3448,15 @@ this arm a heading resolver it needs nowhere else. The state is **three named
 states, not a byte size**, on drift-kit/SPEC.md §The knowledge-friction loop's
 precedent: a size is a number whose only consumer is this question, and a
 header-only file has a non-zero one. The column is appended rather than inserted,
-so the four positions every reader indexes stay put. Close's triage sweep is its
-reader, stating `empty` as a clean read and taking `absent` as a finding.
+so the four positions every reader indexes stay put. Close reads it twice: the
+triage sweep states `empty` as a clean read and takes `absent` as a finding, and
+the gap drain's first read skips both.
 
 A **non-gate arm** (gate-sdk/SPEC.md §The non-gate arm), invoked as
 `bash gate-sdk/bin/run-gates.sh --emit close-surfaces [scan-root]`. Its two callers
 are `check-close-surfaces`, which reaches the derivation **in process** rather
-than spawning anything, and close's own inbound-triage sweep. Nothing stores the
+than spawning anything, and close, at its gap drain's first read and its
+inbound-triage sweep. Nothing stores the
 roster and nothing must: its whole value is that it is recomputed at the moment
 close reads it, so a capture surface added yesterday appears today.
 
@@ -4850,6 +4852,21 @@ with no release process binds a plain `none`-every-iteration line. The
 disposition line's mechanical reader is `--enter-stage`'s boundary require-check
 (§bin/enter-stage.sh, `LIFECYCLE_KIT_BOUNDARY_REQUIRE`) when a consumer wires the
 file into that knob.
+
+The `close` template's gap drain opens with a **first read of its inputs**: the
+surfaces the consumer's `drain-inputs` slot names, skipping an `empty` or `absent`
+row (§The close-surfaces emit arm), before any bullet is dispositioned, the read
+recorded in the drain's commit message. The kit owns the read's placement and its
+record; which surfaces it covers is consumer content, because not every capture
+surface bears on a bullet's claim (a raw machine log does not), because
+lifecycle-kit depends on no other kit and so cannot name another kit's log, and
+because the reader is a session rather than a gate, which makes the value a slot
+and not a knob. **A first read and not a reorder:** moving the roster sweep ahead
+of the drain would reorder one kit's step against another kit's triage template,
+renumber steps a binding cites by number, and sweep the drain's own `forced=` row
+ahead of that drain. **The honest limit:** nothing gates that the read ran; the
+commit-message line makes a skip visible, not impossible, the posture the drain's
+re-verification record already takes.
 
 The `close` template's **push-identity precondition** is per-push and not
 per-session, an identity selected at a session's start being no evidence about

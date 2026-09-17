@@ -21,14 +21,6 @@
   an assertion over DoD prose is refused, having no stage grammar to read (amendment delta 3).
   Joined 2026-09-17 the wipe set as its DoD drain-stage member (operator direction, lead-relayed).
 
-- **gap-drain-precedes-its-own-kfric-read** [spec: SPEC-wipe-and-drain.md] — close drains the gap
-  inbox at step 2 and reaches the knowledge-friction log only at step 4, so a fact captured
-  mid-iteration misses the drain that needs it (measured at `installer-front-door-cut`'s close:
-  two probes re-derived a logged sizing). **Designed as** a first read opening step 2 over the
-  surfaces a new `drain-inputs` slot names, recorded in the drain commit message; the reorder
-  is refused for crossing kit templates and renumbering cited steps (amendment delta 5).
-  Joined 2026-09-17 the wipe set as its drain-ordering member (operator direction, lead-relayed).
-
 ## Technical Debt
 
 ## Deferred
@@ -4268,5 +4260,6 @@
 
 - boundary-wipe-preserve-basename-reach
 - close-surface-row-absent-reads-as-empty
+- gap-drain-precedes-its-own-kfric-read
 
 ## Lessons Learned

@@ -73,7 +73,16 @@ session.
    rule).>*
 2. **Drain the gap inbox** (`LIFECYCLE_KIT_GAP_INBOX_FILE`,
    §The committed gap inbox) → disposition every `- <date> — <gap>` bullet,
-   then **truncate the inbox to its `# contract:` header**. The disposition set,
+   then **truncate the inbox to its `# contract:` header**.
+   **Read the drain's inputs first.** Before the first bullet, run
+   `bash gate-sdk/bin/run-gates.sh --emit close-surfaces` and read each surface the
+   slot below names whose row is not `empty` or `absent`. A fact there bearing on a
+   bullet's claim is that bullet's re-verification input. The surface's own
+   disposition and reclaim stay at step 4. Name the surfaces read in the drain's
+   commit message.
+   *<drain-inputs: the capture surfaces holding facts a gap bullet's re-verification
+   may need (a knowledge-friction capture, say) — never a raw machine log.>*
+   The disposition set,
    **tried in this order** (§The committed gap inbox owns the order and why):
    →fix (resolve it inline this session — the default for a debt-shaped bullet),
    →promote (file a deferred `[design-pending]` queue entry carrying its

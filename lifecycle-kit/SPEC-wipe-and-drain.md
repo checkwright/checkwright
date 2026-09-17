@@ -158,7 +158,7 @@ missing declaration rather than reading past it.":
 Step 2 of the `close` template opens with a read of the capture surfaces a new
 named slot, `drain-inputs`, lists, before any bullet is dispositioned
 {design-bearing}.
-**Not yet applied.**
+**Applied.**
 
 **The kit mechanism.** The read happens first, and its record goes in the drain's
 commit message. **The consumer content** is which surfaces the read covers. Every
