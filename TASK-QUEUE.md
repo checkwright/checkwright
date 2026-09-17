@@ -35,7 +35,11 @@
   is the one the ruling supports, while the bullet as filed named the positive one (each rostered
   obligation reaches the templates of the readers it binds). Which the corollary's exception can be
   expressed in, and whether a grep can tell a sanctioned discharge-differs statement from a
-  restatement, are the two calls.
+  restatement, are the two calls. **The worked hard case, found by this close's instruction-tier
+  sweep:** `lifecycle-kit/templates/lead.md`'s journal-disposal block states the kfric obligation's
+  *timing* half and names no channel, which the corollary permits here only because the lead also
+  loads the resident line that does. Any oracle must rule that CLEAN; ruling it a violation is the
+  false positive that would make the check unusable.
   **Cost while deferred:** the placement ruling can rot exactly as the obligations it corrected did,
   with no oracle to catch the next template that ships unserved or doubly served.
   Filed 2026-09-17 to the gap inbox at build (gate candidate declined under operator direction,

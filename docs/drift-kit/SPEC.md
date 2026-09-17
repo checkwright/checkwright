@@ -597,7 +597,7 @@ oversight.**
   re-derivation into a permanent per-session tax. That reasoning binds the
   **capture** side identically. The refusal has since been generalized off this
   channel: context-kit/SPEC.md §The consumer footprint rules the resident-once
-  placement for every every-session obligation a kit owns.
+  placement for any every-session obligation a kit owns.
 - *A capture floor* — an independent signal that capture happened, which is the
   one this loop is most likely to be mistaken for having. **None cheap exists,
   and none is supplied here.** The honest consequence is that the KPI stops
