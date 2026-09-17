@@ -976,10 +976,11 @@ ask adds its row below, which is the review seam:
   drift-kit/SPEC.md §The knowledge-friction loop, which already states the
   one-bullet cost and its earn-back condition.
 - **lifecycle-kit** — the generated registration block
-  (lifecycle-kit/SPEC.md §check-lifecycle-registration), plus one capture line
-  per channel whose bound actor is any session and whose owning section no such
-  session's trigger loads: the gap inbox (§The committed gap inbox) and the
-  survey record (§The survey record).
+  (lifecycle-kit/SPEC.md §check-lifecycle-registration), plus one line per
+  obligation whose bound actor is any session and whose owning section no such
+  session's trigger loads: gap capture and the recurrence stamp, both
+  lifecycle-kit/SPEC.md §The committed gap inbox, and survey capture
+  (§The survey record).
 - **every other kit** — none: their hooks, skills, gates, and SPECs are load-
   or event-triggered, so they cost nothing until opened. The discriminator this
   row turns on, and the one the brevity pass reads: a resident line that

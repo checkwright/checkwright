@@ -14,44 +14,6 @@
 
 ## Technical Debt
 
-- **recurrence-obligation-residency** — the recurrence stamp is an obligation on **every** session,
-  and its statement reaches only some of the stages that owe it.
-  `recurrence-drain-input-widening` ruled the direct stamp sanctioned *and obliged*, attaching the
-  duty to the judgment rather than to the channel, so a build, align, spec or validate session that
-  observes a recurrence owes a stamp.
-  **PREMISE CORRECTED at promotion, re-grepped first-hand rather than inherited.** The filing
-  claimed the word reaches only `close.md` and `scope.md`, and scope's is the *reader* half (the
-  pre-emption threshold counting dates). `lifecycle-kit/templates/lead.md` now carries a full
-  bounded imperative with an adjacent citation — the §Operative residency shape already applied,
-  for the lead reader alone. `build.md`, `align.md`, `spec.md` and `validate.md` still carry
-  nothing, so the gap persists for four stage templates AND the doctrine has been applied
-  per-reader with no ruling behind it. That accretion is this unit's case.
-  **The remedy is already specified, which is why the gap was filed rather than argued.** This is
-  delegation-kit/SPEC.md §Operative residency's exact shape and its condition (a) holds: the bound
-  actor fires no trigger that loads lifecycle-kit/SPEC.md §The committed gap inbox, and a trigger
-  that exists but that the actor never fires is, for that actor, no trigger. So a bounded
-  imperative plus an adjacent citation is sanctioned — (b) and (c) bound what may be copied.
-  **Attested from history, not predicted.** A spec survey counted the stamping commits and found
-  direct stamps already produced by `chore(build)` twice, `chore(align)` once and `chore(scope)`
-  once — the stages the original ruling never contemplated as producers. A closing session then
-  attested it first-person: it made two direct stamps and reached the obligation only by reading
-  §The committed gap inbox for an unrelated reason.
-  **The placement trade, which is the open half.** One line in CLAUDE.md buys every session at a
-  standing per-session cost on the tier the brevity machinery guards; a clause in each unserved
-  stage template costs nothing resident but multiplies the restatement and drifts that many ways;
-  a clause in the dispatch-side agent definition serves only dispatched sessions and misses a
-  standalone run. Widest-true-tier placement decides it, and it is decided ONCE for this entry and
-  `kfric-obligation-residency` together — which is why one unit takes both.
-  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed** as the
-  second unit of `obligation-residency`, and EVICTED FROM THE ICEBOX to take it. Relocating one
-  imperative adds no name, so no amendment is owed. Body restored from the evicting commit
-  `d4b24d5f` (2026-09-11).
-  **Cost while deferred:** the obligation is unenforceable and silently unmet for four of six
-  stages — a recurrence *seen and not recorded* is the exact failure the counter exists to end, so
-  the ruling's own purpose is what erodes.
-  Filed 2026-08-17 by close from its own brevity-and-residency pass; the loaded-surface corpus was
-  grepped before the absence was asserted, and re-grepped at this promotion.
-
 ## Deferred
 
 - **allow-match-colon-star-over-grants** [cost: event/low] [surface: guard-kit] —
@@ -3479,5 +3441,6 @@
 - consumer-footprint-roster-omits-lifecycle-kit
 - kfric-obligation-residency
 - instruction-sweep-grounds-residue-unrelocated
+- recurrence-obligation-residency
 
 ## Lessons Learned

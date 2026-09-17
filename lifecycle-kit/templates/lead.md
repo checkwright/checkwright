@@ -440,17 +440,12 @@ nothing — the stage skill owns that rule and its gate tolerance
 therefore not conflict-avoidance; it silently spends the per-session audit trail
 the stamp exists to provide, and no later session can repair it.
 
-**A recurrence you judge is still yours to record, and the gap inbox is how.**
-Every session that judges a recurrence is obliged to stamp the date onto that
-entry's declaration (lifecycle-kit/SPEC.md §The committed gap inbox) — and the
-no-queue-write rule above leaves you no way to stamp one. You discharge the
-obligation by **filing the judgment and its grounds into a gap bullet**
-(`--emit file-gap`): the session that may write the queue then stamps from your
-prose, exactly as the drain stamps from a filer's. Doing this at the boundary is
-safe — the entry admits a bullet the closing stage could not have drained and
-carries it into the entering session's intake, so a boundary-filed judgment
-reaches a judge rather than a refusal. What you must not do is leave the judgment
-unrecorded on the ground that you cannot stamp it.
+**A recurrence you judge is still yours to record, and your discharge differs.**
+The no-queue-write rule above leaves you no way to stamp one, so you **file the
+judgment and its grounds into a gap bullet** (`--emit file-gap`) and the session
+that may write the queue stamps from your prose — at the boundary as safely as
+mid-iteration (lifecycle-kit/SPEC.md §The committed gap inbox). What you must not
+do is leave the judgment unrecorded on the ground that you cannot stamp it.
 
 **And commit the bullet yourself**, at the first moment the git index is free of
 stage-session work. The invariant above enumerates stamps, queue writes and

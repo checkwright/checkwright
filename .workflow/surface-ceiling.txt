@@ -12,7 +12,7 @@
 111 .claude/commands/scope.md
 19 .claude/commands/spec.md
 21 .claude/commands/validate.md
-172 CLAUDE.md
+176 CLAUDE.md
 109 canon-kit/templates/SPEC-amendment.md
 37 context-kit/templates/close-brevity.md
 490 delegation-kit/templates/agent-execution.md
@@ -21,7 +21,7 @@
 54 drift-kit/templates/economics.md
 68 guard-kit/templates/close-triage.md
 69 lifecycle-kit/templates/consult.md
-611 lifecycle-kit/templates/lead.md
+605 lifecycle-kit/templates/lead.md
 33 lifecycle-kit/templates/release-sweep.md
 105 lifecycle-kit/templates/stages/align.md
 119 lifecycle-kit/templates/stages/build.md

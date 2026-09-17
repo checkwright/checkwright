@@ -163,6 +163,10 @@ load behind that trigger, so they are not resident here.
   `bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"`, never a queue edit
   (lifecycle-kit/SPEC.md §The committed gap inbox) — unless the operator directs a
   direct entry, staged and committed in one motion under the shared-index rule above.
+- **Recurrence stamping (any session that judges one):** a finding that recurred takes
+  today's date on its entry's `recurrence:` declaration, in the commit you are already
+  making; a session that may not write the queue files the judgment and its grounds as a
+  gap bullet instead (lifecycle-kit/SPEC.md §The committed gap inbox).
 - **Survey capture (any stage session):** read the survey record and run its witness
   before buying a survey; land one a later stage will want before acting on it, with
   `bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"`

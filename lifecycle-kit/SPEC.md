@@ -1472,8 +1472,15 @@ judging from that prose. That is the shape the drain already has — the bullet'
 prose is the grounds the judge reads — so no new authority and no new producer is
 created. What the two dispositions above supply is the route's far end: a
 boundary-filed lead judgment reaches a judge rather than a refusal.
-This settles the **authority** half only; the **reach** half — stages that may
-write the queue but never load this rule — is untouched here.
+**The reach half — stages that may write the queue but never load this rule — is
+closed at the consumer's resident tier, not here and not in the stage
+templates.** The obligation binds *any session*, and context-kit/SPEC.md §The
+consumer footprint rules that class carried resident once: no kit-side surface
+every session shape loads exists, so a clause in each unserved stage template
+would be four restatements reaching no reader the resident line misses. This
+section stays the owner and the templates stay silent — with the one exception
+that ruling's corollary preserves, a reader whose *discharge differs*, which is
+the lead immediately below.
 
 *Not forbidden*, on three independent grounds. It would strand a class by
 construction: this drain runs once, early in close, while close's own later steps
