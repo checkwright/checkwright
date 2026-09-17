@@ -2490,7 +2490,7 @@ names the truncated set, a second note names each member whose removal
 counting it as wiped, and a third names each keep-list entry containing `/`,
 which is not a scratch-root name and spared nothing. All three are notes, never
 an abort or a refusal — a config typo must not block the iteration boundary —
-and since a non-empty directory is now either spared whole or fully descended, a
+and since a non-empty directory is either spared whole or fully descended, a
 failed-removal line is a real residue (a permission error, a concurrent writer).
 Truncate and wipe share the boundary trigger and the report line and **nothing
 else**: truncate rewrites a *tracked* file down to its `# contract:` header, so
@@ -2507,7 +2507,7 @@ outside it by retention contract.
 **Keep-list entries are root-relative basenames, never paths.** A path grammar
 (anchoring, `..`, a trailing slash) answers a need no reader has: every attested
 keep-list member is a root child, and a consumer that keeps nested scaffolding
-names the root directory holding it, which the wipe now keeps whole.
+names the root directory holding it, which the wipe keeps whole.
 
 **So scratch protects nothing, and a session holding verified-but-uncommitted
 work there holds one copy.** The wipe is the far end of it; the near end is that
