@@ -796,8 +796,10 @@ the clause's reader is a human or agent rather than a gate.
   iteration boundary; default empty. Adding a member also widens
   `check-scratch-citation`'s forbidden-target set, because both read
   `stages::supersede_set`.
-- `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — keep-list of scratch-dir **basenames** the
-  iteration-boundary wipe spares (§bin/enter-stage.sh); default empty, so an
+- `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — keep-list of **scratch-root names**, each an
+  immediate child of the scratch dir, that the iteration-boundary wipe spares whole
+  (§bin/enter-stage.sh); an entry containing `/` spares nothing and the boundary
+  report names it. Default empty, so an
   unset-knob consumer gets a clean wipe of an already-disposable surface.
   Boundary-only, and paired with the scratch dir it reads (`GATE_SDK_TMP_DIR`)
   rather than adding a directory knob of its own. **The tier split matters:** the
@@ -806,7 +808,7 @@ the clause's reader is a human or agent rather than a gate.
   who takes the knob for the wipe's only keep rule would reintroduce the
   tracked-file deletion.
 - `LIFECYCLE_KIT_LEAD_JOURNAL_FILE` — the lead's own resume journal; default
-  `lead-journal.md`, a **basename** resolved inside the scratch dir that
+  `lead-journal.md`, a **scratch-root name** resolved inside the scratch dir that
   `GATE_SDK_TMP_DIR` names. The boundary
   wipe spares it as a kit invariant beside `.gitkeep`, and the boundary entry
   reads it for the disposition mark (§bin/enter-stage.sh). Same tier split as the
@@ -2078,7 +2080,8 @@ harness ran against each, and a byte-level driver compared them per case over
 twin sandboxes: the exit status, stdout and stderr byte for byte including every
 `help:` line and every simulate prefix, every written file, every unwritten file
 on each refusal path, and the wiped set over a scratch tree seeded with a nested
-preserved basename. Two columns are compared by **shape** rather than by value and
+preserved basename, a case compared under the unanchored spare test the wipe then
+had. Two columns are compared by **shape** rather than by value and
 saying so is the honest half — `<head>` is read live and `<session-id>` is derived,
 so each case either pins them or accepts a short sha, eight hex characters or the
 literal `none`. Because this repo is itself a consumer with a real queue, a second
@@ -2476,11 +2479,24 @@ battery, and is invisible to any fixture that does not run a real boundary
 entry, which is why the boundary behavior is exercised end-to-end in
 `gate-tests/` rather than reasoned about.
 
-The boundary reset additionally **wipes the scratch dir** (`GATE_SDK_TMP_DIR`),
-deleting every member whose basename is neither `.gitkeep`, nor
-`LIFECYCLE_KIT_LEAD_JOURNAL_FILE`, nor a
-`LIFECYCLE_KIT_BOUNDARY_PRESERVE` entry — at any depth the wipe reaches — and
-naming the wiped set in its report the way it already names the truncated set.
+The boundary reset additionally **wipes the scratch dir** (`GATE_SDK_TMP_DIR`):
+every immediate child named neither `.gitkeep`, nor
+`LIFECYCLE_KIT_LEAD_JOURNAL_FILE`, nor a `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entry
+is deleted with everything below it, and a spared child is **not descended**, so
+a spared directory is kept whole. The spare test is **anchored at the scratch
+root**: below it nothing is spared, so a nested `.gitkeep` or a nested file whose
+basename happens to equal a keep-list entry goes like any other member. An
+unanchored test let one nested `.gitkeep` keep its parent, fail that parent's
+removal as non-empty and keep every ancestor up to the root; and filtering the
+delete but not the descent would, once anchored, empty the very directory a
+consumer named in order to keep it. The report names the removed set the way it
+names the truncated set, a second note names each member whose removal
+**failed** (`boundary-wipe could not remove from <scratch>: <paths>`) rather than
+counting it as wiped, and a third names each keep-list entry containing `/`,
+which is not a scratch-root name and spared nothing. All three are notes, never
+an abort or a refusal — a config typo must not block the iteration boundary —
+and since a non-empty directory is now either spared whole or fully descended, a
+failed-removal line is a real residue (a permission error, a concurrent writer).
 Truncate and wipe share the boundary trigger and the report line and **nothing
 else**: truncate rewrites a *tracked* file down to its `# contract:` header, so
 the file survives with an empty body; the wipe *deletes* untracked scratch
@@ -2491,8 +2507,12 @@ enter-stage removes its own temp files — so those temporaries are never
 candidates, and it is **boundary-only**: an ordinary stage entry appends and
 touches no scratch. It is unconditional over the directory because scratch is
 disposable *by definition*; a consumer's persistent measurement trends live
-outside it by retention contract. A delete that fails because a preserved
-basename sits inside an otherwise-doomed subdirectory is noise, never an abort.
+outside it by retention contract.
+
+**Keep-list entries are root-relative basenames, never paths.** A path grammar
+(anchoring, `..`, a trailing slash) answers a need no reader has: every attested
+keep-list member is a root child, and a consumer that keeps nested scaffolding
+names the root directory holding it, which the wipe now keeps whole.
 
 **So scratch protects nothing, and a session holding verified-but-uncommitted
 work there holds one copy.** The wipe is the far end of it; the near end is that
@@ -2520,6 +2540,9 @@ exemption. A
 git-aware "spare any tracked file" rule is **ruled out** too — it makes
 filesystem behavior git-dependent for one case, and it would spare any tracked
 file parked in scratch, re-opening the accumulation the wipe exists to close.
+**The invariant's honest limit follows the anchoring:** a consumer tracking a
+`.gitkeep` *below* the scratch root loses it at the boundary unless it names that
+root child on the keep-list, which is the declared route.
 
 **The lead journal is the second kit invariant, and it is a scalar knob for
 exactly the reason `.gitkeep` is not a default.** A lead session is live *at* the

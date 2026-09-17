@@ -22,7 +22,7 @@ step numbering is unchanged. No knob is added.
 The wipe's spare test matches `.gitkeep`, `LIFECYCLE_KIT_LEAD_JOURNAL_FILE` and each
 `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entry against the scratch dir's immediate children
 only, and a spared child that is a directory keeps its whole subtree {design-bearing}.
-**Not yet applied.**
+**Applied.**
 
 - **Anchored.** Below the scratch root nothing is spared. A nested `.gitkeep`, or a
   nested file whose basename happens to equal a keep-list entry, is deleted like
@@ -57,7 +57,7 @@ that root child on the keep-list. That is the declared route, and the git-aware
 
 The `boundary-wiped` note names only members whose removal succeeded, and a
 second non-blocking note names each member whose removal failed {mechanical}.
-**Not yet applied.**
+**Applied.**
 
 Today `wipe_walk` pushes a member onto the reported set before removing it and
 discards the removal's error. So a directory that survived is still reported as

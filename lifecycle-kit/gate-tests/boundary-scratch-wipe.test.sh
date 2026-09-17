@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe end-to-end through a sandboxed enter-stage: the iteration-boundary entry deletes the scratch dir's members, keeps the .gitkeep and lead-journal kit invariants and every LIFECYCLE_KIT_BOUNDARY_PRESERVE basename at any depth, names the wiped set in its report, raises the undisposed-journal advisory without blocking for every prior segment while exempting the live lead's, and a non-boundary entry touches no scratch at all
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe end-to-end through a sandboxed enter-stage: the iteration-boundary entry deletes the scratch dir's members, keeps the .gitkeep and lead-journal kit invariants and every LIFECYCLE_KIT_BOUNDARY_PRESERVE name at the scratch root only (a spared directory whole, a nested keep-name deleted with its ancestors), names the wiped set and each non-root keep-list entry in its report, raises the undisposed-journal advisory without blocking for every prior segment while exempting the live lead's, and a non-boundary entry touches no scratch at all
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -15,7 +15,7 @@ note() { echo "  FAIL [$1]: $2"; fails=$((fails + 1)); }
 
 seed() {  # $1=sandbox subdir; writes a boundary-ready consumer with a populated scratch dir
     local sb="$1"
-    mkdir -p "$sb/.workflow" "$sb/scratch/doomed-sub" "$sb/scratch/mixed-sub"
+    mkdir -p "$sb/.workflow" "$sb/scratch/doomed-sub" "$sb/scratch/mixed-sub" "$sb/scratch/x/y" "$sb/scratch/kept-dir/deep"
     cat >"$sb/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 
@@ -41,12 +41,16 @@ demo-iteration close dddddddd 2026-06-04 none
 EOF
     cat >"$sb/lifecycle-config.knobs" <<'EOF'
 LIFECYCLE_KIT_BOUNDARY_PRESERVE[] = keep-me
+LIFECYCLE_KIT_BOUNDARY_PRESERVE[] = kept-dir
+LIFECYCLE_KIT_BOUNDARY_PRESERVE[] = mixed-sub/keep-me
 EOF
     : >"$sb/scratch/.gitkeep"
     printf 'live\n'   >"$sb/scratch/keep-me"
     printf 'stale\n'  >"$sb/scratch/doomed.log"
     printf 'stale\n'  >"$sb/scratch/doomed-sub/nested.txt"
-    printf 'live\n'   >"$sb/scratch/mixed-sub/keep-me"
+    printf 'stale\n'  >"$sb/scratch/mixed-sub/keep-me"
+    : >"$sb/scratch/x/y/.gitkeep"
+    printf 'live\n'   >"$sb/scratch/kept-dir/deep/file"
     cat >"$sb/scratch/lead-journal.md" <<'EOF'
 # lead journal
 
@@ -71,14 +75,21 @@ out="$(run_enter "$bnd" scope)"; rc=$?
 
 [[ -f "$bnd/scratch/.gitkeep" ]]           || note keep-invariant ".gitkeep was deleted (kit invariant)"
 [[ -f "$bnd/scratch/keep-me" ]]            || note keep-listed "the PRESERVE member was deleted"
-[[ -f "$bnd/scratch/mixed-sub/keep-me" ]]  || note keep-nested "a PRESERVE basename below the top level was deleted"
+[[ -e "$bnd/scratch/mixed-sub" ]]          && note wipe-nested-name "a keep-list basename below the scratch root was spared"
+[[ -e "$bnd/scratch/x" ]]                  && note wipe-nested-gitkeep "a nested .gitkeep kept its ancestors alive"
+[[ -f "$bnd/scratch/kept-dir/deep/file" ]] || note keep-dir-whole "a spared root directory was descended and emptied"
 [[ -e "$bnd/scratch/doomed.log" ]]         && note wipe-file "an unlisted scratch file survived"
 [[ -e "$bnd/scratch/doomed-sub" ]]         && note wipe-dir "an all-unlisted subdirectory survived"
 [[ -d "$bnd/scratch" ]]                    || note wipe-dir-self "the scratch dir itself was removed (members, not the dir)"
 
 grep -qF 'boundary-wiped from scratch' <<<"$out" || note report "the boundary report names no wiped set: $out"
 grep -qF 'doomed.log' <<<"$out"                  || note report-member "the report does not name the wiped file: $out"
-grep -qF 'scratch/keep-me' <<<"$out"             && note report-kept "the report names a kept member as wiped: $out"
+wiped_line="$(grep -F 'boundary-wiped' <<<"$out")"
+grep -qE 'scratch/keep-me( |$)' <<<"$wiped_line" && note report-kept "the report names a kept member as wiped: $out"
+grep -qF 'kept-dir' <<<"$wiped_line"             && note report-kept-dir "the report names the spared directory as wiped: $out"
+grep -qF 'scratch/x/y/.gitkeep' <<<"$wiped_line" || note report-nested "the report does not name the nested .gitkeep: $out"
+grep -qF "boundary-preserve entry 'mixed-sub/keep-me' is not a scratch-root name" <<<"$out" || note report-non-root "the non-root keep-list entry was not named: $out"
+grep -qF 'boundary-wipe could not remove' <<<"$out" && note report-failed "a clean wipe reported a failed removal: $out"
 
 # the lead journal is a kit invariant this consumer's keep-list never names, and an undisposed
 # one is announced with its headings rather than refused
@@ -154,5 +165,5 @@ out="$(run_enter "$hl" scope)"; rc=$?
 grep -qF '## late' <<<"$out" || note headingless-advisory "a heading-less journal whose last line is not the mark raised no advisory: $out"
 
 [[ "$fails" -eq 0 ]] || { echo "boundary-scratch-wipe.test: $fails assertion(s) failed"; exit 1; }
-echo "boundary-scratch-wipe.test: clean (boundary wipe keeps .gitkeep, the lead journal and every PRESERVE basename at any depth, reports the wiped set, announces an undisposed prior segment without blocking and exempts the live one, and leaves non-boundary entries untouched)"
+echo "boundary-scratch-wipe.test: clean (boundary wipe keeps .gitkeep, the lead journal and every PRESERVE name at the scratch root with a spared directory whole, deletes nested keep-names, reports the wiped set, announces an undisposed prior segment without blocking and exempts the live one, and leaves non-boundary entries untouched)"
 exit 0

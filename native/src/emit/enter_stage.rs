@@ -611,7 +611,8 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
     let tmpstate = scratch.path("state");
     let tmpqueue = scratch.path("queue");
     let mut truncated: Vec<String> = Vec::new();
-    let mut wiped: Vec<String> = Vec::new();
+    let mut wiped = Wiped::default();
+    let mut unspared: Vec<String> = Vec::new();
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the pre-flight hand-off: the cursor is
     // the last stamp, so the temp file carrying the candidate transition is the STATE file, not
@@ -1118,6 +1119,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
         let mut keep = c.boundary_preserve.clone();
         keep.push(c.lead_journal.clone());
         wiped = wipe(&c.tmpdir, &keep);
+        unspared = non_root_preserve(&c.boundary_preserve);
     }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the journal open runs after the boundary
@@ -1182,11 +1184,24 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
             truncated.join(" ")
         );
     }
-    if !wiped.is_empty() {
+    if !wiped.removed.is_empty() {
         println!(
             "  note: boundary-wiped from {}: {}",
             c.tmpdir,
-            wiped.join(" ")
+            wiped.removed.join(" ")
+        );
+    }
+    if !wiped.failed.is_empty() {
+        println!(
+            "  note: boundary-wipe could not remove from {}: {}",
+            c.tmpdir,
+            wiped.failed.join(" ")
+        );
+    }
+    for e in &unspared {
+        println!(
+            "  note: boundary-preserve entry '{}' is not a scratch-root name and spared nothing",
+            e
         );
     }
     if !journal.is_empty() {
@@ -1699,39 +1714,53 @@ fn is_separator(l: &str) -> bool {
     l.starts_with("---") && l[3..].bytes().all(|b| b == b' ' || b == b'\t')
 }
 
-// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the wipe deletes every member whose basename
-// is neither '.gitkeep' nor a LIFECYCLE_KIT_BOUNDARY_PRESERVE entry, **at any depth the walk
-// reaches**.
-fn wipe(dir: &str, preserve: &[String]) -> Vec<String> {
-    let mut out: Vec<String> = Vec::new();
-    wipe_walk(Path::new(dir), preserve, &mut out);
-    out
+#[derive(Default)]
+struct Wiped {
+    removed: Vec<String>,
+    failed: Vec<String>,
 }
 
-fn wipe_walk(dir: &Path, preserve: &[String], out: &mut Vec<String>) {
-    // spec: gate-sdk/SPEC.md §The crate's crosser — the directory listing goes through `walk`,
-    // the crate's one filesystem-walking module: a direct traversal here would be invisible to
-    // the recorder that holds that invariant, and `list_dir` sorts, which is what makes the wiped
-    let Ok(kids) = walk::list_dir(dir) else {
-        return;
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the spare test reads the scratch root's
+// immediate children only, and a spared child is never descended, so a spared directory is kept
+// whole and nothing below the root is spared
+fn wipe(dir: &str, preserve: &[String]) -> Wiped {
+    let mut out = Wiped::default();
+    let root = Path::new(dir);
+    let Ok(kids) = walk::list_dir(root) else {
+        return out;
     };
     for (base, is_dir) in kids {
-        let p = dir.join(&base);
-        // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the keep-list filters the delete and
-        // never the descent, so a preserved directory's members are still candidates
-        if is_dir && !p.is_symlink() {
-            wipe_walk(&p, preserve, out);
-        }
         if base == ".gitkeep" || preserve.contains(&base) {
             continue;
         }
-        out.push(p.display().to_string());
-        if is_dir && !p.is_symlink() {
-            let _ = std::fs::remove_dir(&p);
-        } else {
-            let _ = std::fs::remove_file(&p);
+        remove_member(&root.join(&base), is_dir, &mut out);
+    }
+    out
+}
+
+fn remove_member(p: &Path, is_dir: bool, out: &mut Wiped) {
+    let dir = is_dir && !p.is_symlink();
+    if dir {
+        // spec: gate-sdk/SPEC.md §The crate's crosser — the listing goes through `walk`, the crate's
+        // one filesystem-walking module, and `list_dir` sorts, which keeps the report order stable
+        if let Ok(kids) = walk::list_dir(p) {
+            for (base, kid_dir) in kids {
+                remove_member(&p.join(&base), kid_dir, out);
+            }
         }
     }
+    let res = if dir { std::fs::remove_dir(p) } else { std::fs::remove_file(p) };
+    let name = p.display().to_string();
+    match res {
+        Ok(()) => out.removed.push(name),
+        Err(_) => out.failed.push(name),
+    }
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a keep-list entry is a scratch-root name, so
+// one containing '/' spares nothing and is named rather than refused
+fn non_root_preserve(preserve: &[String]) -> Vec<String> {
+    preserve.iter().filter(|e| e.contains('/')).cloned().collect()
 }
 
 // spec: lifecycle-kit/SPEC.md §The state machine — the one expansion every reader shares: a
@@ -2032,30 +2061,54 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the wipe keeps '.gitkeep' and every
-    // PRESERVE basename at any depth, and that at-any-depth reach is preserved rather than
-    // corrected: the filed defect is not this cut's to fix
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the spare test is anchored at the scratch
+    // root: a nested '.gitkeep' or keep-list basename is deleted with its ancestors, and a spared
+    // root directory is kept whole
     #[test]
-    fn the_wipe_keeps_the_invariant_and_every_preserved_basename_at_any_depth() {
+    fn the_wipe_spares_root_names_only_and_a_spared_directory_whole() {
         let dir = std::env::temp_dir().join(format!("enter-stage-wipe-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(dir.join("doomed-sub")).expect("mk");
         std::fs::create_dir_all(dir.join("mixed-sub")).expect("mk");
+        std::fs::create_dir_all(dir.join("x/y")).expect("mk");
+        std::fs::create_dir_all(dir.join("kept-dir/deep")).expect("mk");
         std::fs::write(dir.join(".gitkeep"), "").expect("w");
         std::fs::write(dir.join("keep-me"), "live").expect("w");
         std::fs::write(dir.join("doomed.log"), "stale").expect("w");
         std::fs::write(dir.join("doomed-sub/nested.txt"), "stale").expect("w");
-        std::fs::write(dir.join("mixed-sub/keep-me"), "live").expect("w");
-        let wiped = wipe(&dir.display().to_string(), &["keep-me".to_string()]);
+        std::fs::write(dir.join("mixed-sub/keep-me"), "stale").expect("w");
+        std::fs::write(dir.join("x/y/.gitkeep"), "").expect("w");
+        std::fs::write(dir.join("kept-dir/deep/file"), "live").expect("w");
+        let keep = ["keep-me".to_string(), "kept-dir".to_string()];
+        let wiped = wipe(&dir.display().to_string(), &keep);
         assert!(dir.join(".gitkeep").exists(), "the kit invariant was deleted");
         assert!(dir.join("keep-me").exists(), "a PRESERVE member was deleted");
-        assert!(dir.join("mixed-sub/keep-me").exists(), "the at-any-depth reach was lost");
+        assert!(!dir.join("mixed-sub").exists(), "a nested keep-list basename was spared");
+        assert!(!dir.join("x").exists(), "a nested .gitkeep kept its ancestors");
+        assert!(dir.join("kept-dir/deep/file").exists(), "a spared directory was descended");
         assert!(!dir.join("doomed.log").exists(), "an unlisted file survived");
         assert!(!dir.join("doomed-sub").exists(), "an all-unlisted subdir survived");
         assert!(dir.is_dir(), "the scratch dir itself was removed");
-        assert!(wiped.iter().any(|w| w.ends_with("doomed.log")));
-        assert!(!wiped.iter().any(|w| w.ends_with("/keep-me")));
+        assert!(wiped.removed.iter().any(|w| w.ends_with("doomed.log")));
+        assert!(wiped.removed.iter().any(|w| w.ends_with("x/y/.gitkeep")));
+        assert!(!wiped.removed.iter().any(|w| w.ends_with("/keep-me") && !w.contains("mixed-sub")));
+        assert!(wiped.failed.is_empty(), "a removal failed: {:?}", wiped.failed);
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a failed removal is reported apart from
+    // the removed set, never folded into it
+    #[test]
+    fn a_removal_that_fails_is_reported_as_failed_and_not_as_wiped() {
+        let mut out = Wiped::default();
+        let missing = std::env::temp_dir().join(format!("enter-stage-absent-{}", std::process::id()));
+        remove_member(&missing, false, &mut out);
+        assert!(out.removed.is_empty());
+        assert_eq!(out.failed, vec![missing.display().to_string()]);
+        assert_eq!(
+            non_root_preserve(&["session-role".to_string(), "a/b".to_string()]),
+            vec!["a/b".to_string()]
+        );
     }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lock-reason pattern is consumer config

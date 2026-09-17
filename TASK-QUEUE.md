@@ -12,17 +12,6 @@
 
 ## New Features
 
-- **boundary-wipe-preserve-basename-reach** [spec: SPEC-wipe-and-drain.md] — the
-  iteration-boundary scratch wipe matches its preserve list by basename at any depth, so one
-  nested `.gitkeep` keeps a whole scratch tree alive while the report names it wiped. Attested
-  twice (`.tmp/upgrepro/`, two vendored kit payloads). **Designed as:** the spare set anchors to
-  the scratch root's immediate children, a spared directory is kept whole and not descended, a
-  keep-list entry with `/` is named in a note, and removal failures get their own non-blocking
-  note instead of being reported as wiped (amendment deltas 1, 2).
-  recurrence: boundary-wipe-preserve-basename-reach 2026-09-04
-  Selected 2026-09-17 as the lead of a lifecycle-kit unit set (operator direction, 2026-09-17,
-  lead-relayed).
-
 - **dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it** [spec: SPEC-wipe-and-drain.md]
   — an amendment's DoD parked an entry's queue move at a stage whose entry refuses the entry
   (measured 2026-09-05: a DoD naming close behind the `validate` drain stage cost a resume after
@@ -4284,5 +4273,7 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- boundary-wipe-preserve-basename-reach
 
 ## Lessons Learned
