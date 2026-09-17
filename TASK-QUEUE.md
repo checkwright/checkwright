@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: scratch-wipe-and-drain-contracts
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -835,6 +835,11 @@
   in exactly the case a consumer is most likely to hit.
   Found 2026-08-18 by this iteration's scope at its own entry, from the surviving directory rather
   than from a reading of the code; filed under scope-gated intake rather than fixed in-session.
+  Re-verified 2026-09-17 at scope: `wipe_walk` still matches by basename at any depth. Selected
+  2026-09-17 as the lead of a lifecycle-kit unit set with
+  `dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it`,
+  `close-surface-row-absent-reads-as-empty` and `gap-drain-precedes-its-own-kfric-read` (operator
+  direction, 2026-09-17, lead-relayed).
 
 - **baseline-move-stales-evidence-line** [design-pending] [cost: iteration/low] [surface: evidence-kit] — promoting a task and moving a suite's
   baseline is not enough to close: the evidence line already recorded against the *old* baseline is
@@ -3421,6 +3426,8 @@
   **Cost while deferred:** every iteration whose unit has a queue transition in its DoD can buy the
   same resume, and the defect surfaces only at the dispatch that the wrong stage refuses.
   Filed 2026-09-05 by close, routed by the lead as a finding neither spec nor build had filed.
+  Joined 2026-09-17 the boundary-wipe unit set as its DoD drain-stage member (operator direction,
+  lead-relayed).
 
 - **kit-spec-seam-content-half-unswept** [design-pending] [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
@@ -3676,6 +3683,8 @@
   unreadable, and the audit row that exists to catch a dead capture writer cannot catch one.
   Surfaced 2026-09-12 by the prior iteration's close into the gap inbox, which no stage of that
   iteration could drain; promoted here at the next scope, so the record is late and says so.
+  Joined 2026-09-17 the boundary-wipe unit set as its close-surface roster member (operator
+  direction, lead-relayed).
 
 
 
@@ -4100,6 +4109,8 @@
   and the loop's whole value is collected one step too late to reach the session that needed it.
   Filed 2026-09-16 to the gap inbox by `installer-front-door-cut`'s close, the sole bullet that
   close could not drain; promoted at the following scope, which re-verified the ordering above.
+  Joined 2026-09-17 the boundary-wipe unit set as its close-template drain-ordering member
+  (operator direction, lead-relayed).
 
 ## Icebox
 

@@ -4,4 +4,4 @@
 
 ---
 
-— scope aad1e54e 2026-09-17 8b5e6206
+scratch-wipe-and-drain-contracts scope aad1e54e 2026-09-17 8b5e6206
