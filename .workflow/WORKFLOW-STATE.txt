@@ -5,3 +5,4 @@
 ---
 
 install-smoke-slow-leg scope a91284ed 2026-09-17 1ebbc3fa
+install-smoke-slow-leg spec a7f29a62 2026-09-17 1f151cef
