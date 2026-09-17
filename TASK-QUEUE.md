@@ -12,6 +12,42 @@
 
 ## New Features
 
+- **close-differential-instruction-sweep** [spec: SPEC-differential-sweep.md] — after the full
+  instruction-surface pass, close keeps the template and agent-definition corpus swept by reading
+  only what changed, instead of re-reading it whole.
+  **Operator-ruled 2026-08-13** as the second half of the sweep shape: one full pass, then close
+  runs differential passes in future iterations.
+  **Designed as** an audit-roster class rather than a new close step: the roster is the kit's
+  cadence mechanism for an un-gateable duty and close step 8 already reviews it. The open question,
+  which surface owns the range base, lands in lifecycle-kit/SPEC.md §The state machine as the
+  previous-close commit. The iteration-start range misses the previous close's own later commits
+  (measured: the brevity pass at the iteration-start commit falls outside it). The first base is
+  the full pass's landing commit (amendment deltas 1-3).
+  Filed 2026-08-13 by close, on operator direction.
+
+- **spec-authoring-self-check-pass** [spec: SPEC-claim-execution.md] — spec-stage amendment
+  authoring asserts tree facts a one-command probe refutes, and every instance is caught downstream
+  rather than at authoring exit (measured: six in one iteration's amendment set, across at least
+  three of four amendments).
+  **Designed as** an authoring-exit pass in the spec template. Re-running each delta's own
+  predicate catches the spent-delta class outright. Load-bearing premises are run or carry an
+  inferred marker on their passage. Illustrations are exempt, and probing every asserted tree fact
+  is refused as open-ended (amendment delta 1).
+  recurrence: spec-authoring-self-check-pass 2026-08-31
+  Filed 2026-08-30 by scope into the icebox; returned 2026-08-31 by close on a judged recurrence.
+
+- **survey-inferred-claim-has-no-execution-obligation** [spec: SPEC-claim-execution.md] — a
+  survey can mark a claim inferred-not-executed and no later stage is obliged to execute it
+  (measured: an amendment restated such a claim as fact, align returned zero defects, and build
+  measured it false and landed two unplanned regenerations).
+  **Designed as** a passage-level inferred marker (not-run with its command, or cannot-run before
+  build with a reason). Align runs the not-run ones, build runs the cannot-run ones first, and
+  check-stage-entry assertion D refuses the audit-entry stage on a remaining not-run marker. It is
+  a block rather than an annotation because the annotation already existed and went unconsumed
+  (amendment deltas 2-5).
+  Split out at `installer-front-door-cut`'s close from `queue-entry-evidence-tier`'s seventh rate
+  point.
+
 ## Technical Debt
 
 ## Deferred
@@ -664,40 +700,6 @@
   the consult and drained here into this entry rather than into a new one, the port-only run
   barring the drain's promote.
   recurrence: kit-knob-consumer-adapter-convention 2026-09-03
-
-- **spec-authoring-self-check-pass** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — spec-stage amendment authoring asserts tree
-  facts a one-command probe refutes, and every instance is caught downstream rather than at
-  authoring exit.
-  **RETURNED FROM THE ICEBOX 2026-08-31 on a judged recurrence**, by the round trip
-  queue-kit/SPEC.md §The icebox tier conserves: a dated `recurrence:` line is a live trigger, and a
-  one-line entry has nowhere to carry one. Iceboxed 2026-08-30 at `74018ceb` on the ground that
-  nothing shipped wrong. That ground still holds and is not what returned it — the rate did.
-  **The recurrence, measured across one iteration's amendment set.** Six loose grounds in
-  `port-declaration-cohort-and-windows-leg`, spread over at least three of the four amendments spec
-  authored, each caught by a stage AFTER the one that wrote it: align repaired one, build batches A,
-  B, C and D the rest. The per-amendment CONCENTRATION hypothesis the first re-file offered is
-  dead — the spread is wider than that bullet recorded, not narrower.
-  **What survives the concentration hypothesis is CLASS, and separating the classes is what a
-  costed look owes first, because their costs differ by an order.** A PREMISE defect is
-  load-bearing — a class ruling's ground, or a contract sentence quoted to a section that never says
-  it. An ILLUSTRATION moves no oracle row and the ruling stands on its own derivation. A SPENT DELTA
-  is an instruction whose predicate the authoring commit had ALREADY satisfied, and its hazard runs
-  the other way: a build session that trusts it hunts a discrepancy that does not exist, or
-  "corrects" a correct figure. A rate measured over all three together overstates the risk.
-  **The cheapest shape is named, and it is not the one the original filing proposed.** Probing every
-  asserted tree fact before landing an amendment is open-ended and expensive. Re-running each
-  delta's OWN predicate at authoring exit is bounded by the amendment's own text, and it catches the
-  spent-delta class outright — the one class fully visible from the commit that wrote it. Whether
-  the same pass reaches the premise class at all is the design question this entry owes.
-  **DISTINCT from the iceboxed `scope-amendment-authoring-gate`**, which is scope doing spec's job.
-  This is spec doing its own, at a rate that has now been measured twice.
-  **Cost while deferred:** low and downstream-absorbed — nothing has shipped wrong, because the
-  pipeline caught every attested instance. What it costs is the later stage's re-probe, and on the
-  spent-delta class a hunt for a discrepancy that is not there.
-  recurrence: spec-authoring-self-check-pass 2026-08-31
-  Filed 2026-08-30 by scope directly into the icebox under that tier's direct-filing rule; returned
-  to Deferred 2026-08-31 by close, judging the recurrence off three gap-inbox bullets that between
-  them report one iteration's instances and correct each other's readings of them.
 
 - **path-dialect-clauses-unenforced** [design-pending] [cost: event/high] [surface: gate-sdk] — the two clauses gate-sdk/SPEC.md §The
   path-dialect contract gained 2026-08-30 are held by review alone, and neither is shaped like the
@@ -1475,29 +1477,6 @@
   surfaces as behavior, not as a red.
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
 
-
-- **close-differential-instruction-sweep** [design-pending] [cost: iteration/low] [surface: lifecycle-kit]
-  — after the full sweep, close keeps the corpus swept differentially instead of re-reading it
-  whole. It waited on `instruction-surface-sweep`, which landed the full pass at build 2026-09-12;
-  that pass's compliant calls are in its landing commit's message, which the differential range
-  yields through `git log`.
-  **Operator-ruled 2026-08-13** as the second half of the sweep shape: one full pass, then close
-  runs differential passes in future iterations.
-  **The worklist is mechanically derivable and the judgment is not**, and naming that split is the
-  point — no gate is claimed over the what-vs-why call, only the set of files to look at:
-  `git diff --stat <prev-close>..HEAD -- '*/templates/*.md' '.claude/agents/*.md'`. This does not
-  contradict the standing ruling that the rule owes no gate, because a derived worklist is not an
-  oracle over the judgment applied to it.
-  **It self-applies, which constrains the deliverable's own shape.** The obligation lands in
-  `lifecycle-kit/templates/stages/close.md`, itself one of the governed surfaces, so the paragraph
-  installing it must be imperative-only with a pointer to the owning SPEC or it fails the rule it
-  installs.
-  **Deliverable, and why `[design-pending]`:** the close-stage step, plus its `<prev-close>`
-  resolution. What is open is where that ref comes from — the stamp file carries stage history, so
-  the previous close's commit is derivable, but which surface owns the derivation is not settled.
-  **Cost while deferred:** the full sweep's result decays from the next template edit onward, so a
-  one-time pass with no differential successor buys a baseline that expires.
-  Filed 2026-08-13 by close, on operator direction.
 
 - **vendored-library-identifier-reach** [design-pending] [cost: iteration/low] [surface: doctrine-kit] — De-literalization's reach test gives
   two answers for a vendored `lib/*.sh` function, and the corpus holds both populations.
@@ -3394,29 +3373,6 @@
   commit, which is how it was found.
   Filed 2026-09-16 by `installer-front-door-cut`'s close, as the gap generalization owed by the
   lesson that dispositioned to that SPEC section.
-
-- **survey-inferred-claim-has-no-execution-obligation** [design-pending] [cost: event/high] [surface: lifecycle-kit]
-  — the survey record lets a session mark a claim inferred-not-executed, which is the honest
-  disclosure the record exists for, and **no later stage is obliged to execute it**. The disclaimer
-  names the cheap command and then nothing consumes it.
-  **Measured, not asserted:** `installer-front-door-cut`'s spec survey recorded
-  "`check-value-rollup-fresh`'s exact behaviour on an `installer/SPEC.md` edit was reasoned from
-  `value_rollup.rs`'s join … rather than executed; run the arm before relying on it". Align
-  re-verified sizes, counts and knob-table locations on that amendment and returned zero defects;
-  build then measured the claim false and landed two unplanned projection regenerations. The
-  execution cost was one `--emit` arm.
-  **Candidate, not ruled:** an align-stage obligation to run every survey claim the record marks
-  inferred, or state per claim why it cannot be run — align already re-verifies an amendment's
-  figures, so the surface is the one already doing this work.
-  **Why `[design-pending]`:** whether the obligation is align's, whether the record needs a machine-
-  readable inferred marker for it to be checkable at all, and whether an unrun probe should block a
-  merge or only annotate it are three separate calls. A marker is also the difference between a
-  prompt and a gate here, and the record's grammar was not designed to carry one.
-  **Cost while deferred:** an amendment can merge carrying a premise its own survey declared unrun,
-  and the correction lands at build with whatever regenerations the false premise missed.
-  Split out at `installer-front-door-cut`'s close from `queue-entry-evidence-tier`'s seventh rate
-  point: that entry's subject is the missing evidence-tier SIGNAL, this one is the missing
-  EXECUTION obligation over a signal that already exists.
 
 - **overhead-meter-gate-output-classifier-blind** [design-pending] [cost: iteration/low] [surface: drift-kit]
   — the overhead meter classifies the runner's per-`FAIL` invariant line as non-gate output, so a
