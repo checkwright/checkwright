@@ -87,12 +87,7 @@ propagate.
   bullet below sends a journal, repo-local gitignored scratch in the main
   checkout, on that bullet's stated survivability grounds, widened here from the
   journal to any artifact a session waits on. An **observer** — a wait loop, a
-  read-only pipeline, anything that writes nothing — **writes no record**,
-  because a record states that something is mutating shared files and a waiter is
-  not. Registering a waiter is not a harmless surplus: while a record names a live
-  PID it blocks every tracked-tree mutation in *every* session, so a waiter that
-  records itself can make its own exit condition unreachable and wedge its
-  concurrent siblings at the same time.
+  read-only pipeline, anything that writes nothing — **writes no record**.
   **Launch and record in one call, in the spelling the guard grants**: guard-kit's
   rule *Backgrounded launch that records no producer* (guard-kit/SPEC.md §The
   generic ruleset) owns the spelling and enforces the same producer/observer
@@ -197,16 +192,11 @@ propagate.
   a consumer smoke, a packaging step, any commit. Gitignore the path, and **reap
   what you minted at your own turn end**, by `git worktree list` rather than off
   `git status`: once ignored, the status is clean while the worktree still
-  stands. Your turn end is the earliest moment the reap is *sound* — reclamation
-  is tied to the child's own return, so by then every child of this turn has
-  returned and the harness's best-effort auto-clean has either fired or failed —
-  and the last moment it is *informed*, because the only party who knows what a
-  tree was for is the session that minted it. Reap **both** halves: `git
+  stands. Reap **both** halves: `git
   worktree remove` clears the directory and leaves the agent's branch ref
   standing, so delete that ref in the same motion, or the refusal clears while
   the refs accrete unseen. Reap **your own** trees, never every tree you can
-  see: a concurrent session's checkout is live work, and the iteration-boundary
-  refusal — which refuses to enter while any linked worktree exists
+  see; the iteration-boundary refusal — which refuses to enter while any linked worktree exists
   (lifecycle-kit/SPEC.md §bin/enter-stage.sh) — stays the **backstop**, not the
   schedule. **And the pid in a worktree's lock reason is the
   harness's, not an agent liveness signal.** Where a harness locks the tree it
@@ -229,9 +219,7 @@ propagate.
   `git check-ignore` decides it. **And the child's side of it, on cost (4)'s
   pattern:** a target absent inside isolation because it is untracked or
   gitignored is a **blindness**, never a finding of absence — name the path, say
-  it was unreadable at this rev, and return. A parent cannot tell a reported
-  absence from a true empty, so the distinction has to be drawn where it is
-  known.
+  it was unreadable at this rev, and return.
   **(4) A gate dispatched to a compiled binary does not resolve inside an
   isolated worktree, and the lawful response is to report it, never to build
   one.** Build output is gitignored and in no commit, so by (3) a fresh worktree

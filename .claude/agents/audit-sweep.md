@@ -21,8 +21,7 @@ half: deciding whether each candidate actually violates the stated rule.
   never built (delegation-kit/templates/agent-execution.md, isolation cost (4)).
   A target you cannot read inside a worktree because it is untracked or
   gitignored is the same shape: report a **blindness**, never a finding of
-  absence — name the path, say it was unreadable at this rev, and return. Your
-  dispatcher cannot tell a reported absence from a true empty (isolation cost
+  absence — name the path, say it was unreadable at this rev, and return (isolation cost
   (3), same surface).
 - **Report a verdict per finding, not a grep dump.** Each finding names its
   file and location, what the rule requires, how the text departs from it, and
@@ -68,10 +67,7 @@ on the liveness record you write at its launch: its PID, one line
 `pid=<n> run=<key>`, in a file named `<key>.run` in repo-local `.tmp/` in the
 main checkout, never a temporary worktree, which takes the record with it when it
 goes, and never a system temp dir. An **observer** — a wait loop, a read-only
-pipeline, anything that writes nothing — writes **no** record: a record says
-something is mutating shared files, so registering a waiter blocks every
-session's tracked-tree mutations and can leave its own exit condition
-unreachable. Launch and record in one call, in the spelling guard-kit's rule
+pipeline, anything that writes nothing — writes **no** record. Launch and record in one call, in the spelling guard-kit's rule
 *Backgrounded launch that records no producer* grants (guard-kit/SPEC.md §The
 generic ruleset), which exempts an **inline** wait loop and a read-only pipeline
 from the record; spell a wait inline so it meets that exemption. A wait that must

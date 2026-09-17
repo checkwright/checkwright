@@ -497,14 +497,12 @@ and escalations arrive on their schedule. So:
   **all mechanical** is
   **tier-downgradeable**: a cheaper model serves it, and the dispatcher pins the
   cheaper tier with a `model` override on that batch's dispatch. A batch carrying
-  **any design-bearing** delta **stays on the judgment tier**. A cheaper tier is
-  priced on a premise the work can falsify, so every such dispatch carries an
-  **escalate-on-discovery** transition. A session that finds it must author a
+  **any design-bearing** delta **stays on the judgment tier**. Every cheaper-tier
+  dispatch carries an **escalate-on-discovery** transition. A session that finds it must author a
   fix, beyond running an oracle or editing a governed record, stops before
   authoring it. It journals the diagnosis and escalates a re-tier. You rule that
   alone. Re-dispatch the rest of the work as a same-stage session on the judgment
-  tier, pointed at the journal. Do not resume the paused session, because a
-  resume keeps its tier. Your ruling-config's escalation roster names the class,
+  tier, pointed at the journal. Do not resume the paused session. Your ruling-config's escalation roster names the class,
   so a dispatched session can recognize it. Class → live model
   is mapped at dispatch time (agent-execution.md, same bullet). There is no
   standing per-stage classification to bind: the batch's labels decide at

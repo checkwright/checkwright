@@ -88,9 +88,7 @@ batch-specific pointers such as the journal path.
   temporary worktree and never a system temp dir; your wait is a loop on that
   recorded PID's liveness, never a pattern match, whoever started the producer.
   An **observer** — a wait loop, a read-only pipeline, anything that writes
-  nothing — **writes no record**: a record says something is mutating shared
-  files, so registering a waiter blocks every session's tracked-tree mutations
-  and can leave the waiter's own exit condition unreachable. Launch and record in
+  nothing — **writes no record**. Launch and record in
   one call, in the spelling guard-kit's rule
   *Backgrounded launch that records no producer* grants
   (guard-kit/SPEC.md §The generic ruleset), which exempts an **inline** wait loop
