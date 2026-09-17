@@ -501,7 +501,7 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
         p="${entry%%$'\t'*}"; rest="${entry#*$'\t'}"; w="${rest%%$'\t'*}"; g="${rest#*$'\t'}"
         printf '  -- %s%s\n' "$p" "$role"
         held_probe want "$w" 'the want variable, as the manifest loop read left it and carried it out on the failure branch'
-        held_probe got "$g" 'the got variable, as the git hash-object command substitution left it in that same loop'
+        held_probe got "$g" 'the got variable, as the manifest arm paired it off the git hash-object --stdin-paths batch in that same loop'
         hash_probe reread git hash-object -- "$C/$p"
         hash_probe own git -C "$C" hash-object -- "$p"
         hash_probe raw git hash-object --no-filters -- "$C/$p"
@@ -585,7 +585,8 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
 # spec: installer/SPEC.md §The gate binary — the battery expectation is no longer a parameter of this helper and the alternative it once carried is no longer a branch: selection has one success path, so an install that ran at all placed a verified artifact and a green battery is the only post-condition an install can earn. The refusals are asserted where they now occur — at the bootstrap, before any verb — by the artifact-less leg and the artifact arm
 assert_install() {   # $1 = profile, $2 = scratch consumer dir
     local profile="$1" C="$2" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf n_omitted q_seam q_bin queue_src files_raw withheld reserved
-    local -a bad_hash=() lock_kits=() want_kits=() resolved_kits=()
+    local bi hi
+    local -a bad_hash=() lock_kits=() want_kits=() resolved_kits=() hash_lines=() hash_one=() hash_single=() batch_paths=() batch_got=()
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }
@@ -613,14 +614,41 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     # spec: installer/SPEC.md §The consumer smoke — the capture stays a command substitution and the line TERMINATOR is the read's to own, because this is the harness's only multi-line jq read and a terminator is host-dependent: a single-value control that comes back clean carries only the one terminator its own capture already consumes, so it discriminates nothing about the producer and reading it as a channel witness is what sent the previous repair at the channel
     files_raw="$(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")"
     if [[ -n "$files_raw" ]]; then
+        # spec: installer/SPEC.md §The consumer smoke — the first pass: every step before the hash, in the loop's order; the existence check stays here because one missing path makes the batch fatal, and a path the batch cannot carry takes the one-file call so it keeps its slot in the pairing
         while IFS= read -r line; do
             checked=$((checked + 1))
             [[ -n "$raw_first" ]] || raw_first="$line"
             # spec: installer/SPEC.md §The consumer smoke — a trailing CR is dropped as the second byte of a host's line terminator, and never silently: the raw line stays unstripped for the two evidence operands, exactly one strip is taken per line so a doubled one still shows, and the count is DECLARED below, which is what keeps a value that genuinely ended in a CR visible as a count instead of vanishing at the split
             field="${line%$'\r'}"; [[ "$field" == "$line" ]] || crlf=$((crlf + 1))
-            path="${field%%$'\t'*}"; want="${field#*$'\t'}"
+            path="${field%%$'\t'*}"
             [[ -f "$C/$path" ]] || { echo "  manifest names a file that is not there: $path"; mismatch=$((mismatch + 1)); continue; }
-            got="$(git hash-object -- "$C/$path")"
+            hash_lines+=("$line")
+            if [[ "$path" == *"$CR"* || "$path" == *$'\n'* || "$path" == '"'* ]]; then
+                hash_one+=(1); hash_single+=("$(git hash-object -- "$C/$path")")
+            else
+                hash_one+=(0); hash_single+=(""); batch_paths+=("$C/$path")
+            fi
+        done <<< "$files_raw"
+        # spec: installer/SPEC.md §The consumer smoke — the batch: one --stdin-paths child from the same working directory, with no fallback on failure; a non-zero exit or an answer count other than the path count refuses, since pairing by index is only sound on equal counts
+        if [[ ${#batch_paths[@]} -gt 0 ]]; then
+            printf '%s\n' "${batch_paths[@]}" | git hash-object --stdin-paths > "$SCRATCH/manifest-batch.out" 2> "$SCRATCH/manifest-batch.err"; rc=$?
+            [[ "$rc" -eq 0 ]] \
+                || blocked "$profile: the manifest arm's git hash-object --stdin-paths batch over ${#batch_paths[@]} path(s) exited $rc, standard error: $(cat "$SCRATCH/manifest-batch.err")"
+            read_stream batch_got "the manifest hash batch" < "$SCRATCH/manifest-batch.out"
+            [[ ${#batch_got[@]} -eq ${#batch_paths[@]} ]] \
+                || blocked "$profile: the manifest arm's git hash-object --stdin-paths batch answered ${#batch_got[@]} line(s) for ${#batch_paths[@]} path(s)"
+        fi
+        bi=0
+        for hi in "${!hash_lines[@]}"; do
+            line="${hash_lines[$hi]}"
+            field="${line%$'\r'}"
+            path="${field%%$'\t'*}"; want="${field#*$'\t'}"
+            # spec: installer/SPEC.md §The consumer smoke — the second pass: got is the batch's answer paired with this entry by position, or the one-file call's for an entry the batch could not carry
+            if [[ "${hash_one[$hi]}" -eq 1 ]]; then
+                got="${hash_single[$hi]}"
+            else
+                got="${batch_got[$bi]}"; bi=$((bi + 1))
+            fi
             # spec: installer/SPEC.md §The consumer smoke — the shape test sits on the failure branch beside the tuple it diagnoses, over BOTH operands, because a value that is not a hash makes the disagreement a statement about this harness rather than about the consumer's tree, and the verdict below has to be able to say which; it records the FIRST offending entry as a whole tuple in bad_hash's own spelling and counts every one, since a run-wide flag recording only THAT something tripped it hands the reader a verdict and withholds its subject, and it keeps the RAW LINE of the first disagreeing entry beside that tuple because a value re-read is a second observation and cannot testify about the first
             [[ "$got" == "$want" ]] \
                 || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1))
@@ -628,7 +656,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
                      bad_hash+=("$path"$'\t'"$want"$'\t'"$got")
                      [[ "$want" =~ ^[0-9a-f]{40}$ && "$got" =~ ^[0-9a-f]{40}$ ]] \
                          || { malformed_n=$((malformed_n + 1)); [[ -n "$malformed_first" ]] || malformed_first="$path"$'\t'"$want"$'\t'"$got"; }; }
-        done <<< "$files_raw"
+        done
     fi
     # spec: installer/SPEC.md §The consumer smoke — the strip's declaration, printed on the green path as well as the red because that is the only path a working strip ever takes: a count equal to the entries the capture did not consume a terminator for reads as the host's line ending, and any other count is the anomaly this arm refuses to normalize away
     [[ "$crlf" -eq 0 ]] \
@@ -1058,14 +1086,27 @@ next_patch() { awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }' <<<"${1%%[-+]*}";
 upgrade_direction() {   # $1 = from, $2 = to -> 0 iff $2 sorts strictly above $1
     [[ "$1" != "$2" && "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
 }
+# spec: installer/SPEC.md §The consumer smoke — the scratch witness prints free space and the scratch tree's size and never changes a verdict: a missing or failing df or du is said and passed over, and neither joins SMOKE_TOOLS
+scratch_witness() {   # $1 = the moment the reading is taken at
+    local tool out rc wline
+    say "scratch witness, $1:"
+    for tool in df du; do
+        command -v "$tool" > /dev/null 2>&1 || { say "  $tool: not on PATH, no reading"; continue; }
+        if [[ "$tool" == df ]]; then out="$(df -k "$SCRATCH" 2>&1)"; rc=$?; else out="$(du -sk "$SCRATCH" 2>&1)"; rc=$?; fi
+        [[ "$rc" -eq 0 ]] || say "  $tool: exited $rc, its output follows as given"
+        while IFS= read -r wline; do say "  $tool: $wline"; done <<< "$out"
+    done
+    return 0
+}
 UP_VERSION="$(next_patch "$VERSION")"
 upgrade_direction "$VERSION" "$UP_VERSION" \
     || fail "the arm derived $UP_VERSION from $VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
 UP="$SCRATCH/upgrade"
 mkdir -p "$UP"
 # spec: installer/SPEC.md §The gate binary — every cross-version pack carries the artifact directory the main pack used, because selection has one success path: a payload packed without one refuses at the bootstrap, and these hops assert manifest behavior that only a completed install reaches. The bytes are the same ones the build leg staged, so the hops differ in version and in the relinquish this arm performs, and in nothing else
+scratch_witness "before the first upgrade pack"
 PACK_OUT="$(cd "$REPO" && INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh --pack-installer --root "$REPO" --version "$UP_VERSION" --out "$UP" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
-    || { printf '%s\n' "$PACK_OUT" >&2; blocked "the upgrade pack step failed."; }
+    || { printf '%s\n' "$PACK_OUT" >&2; scratch_witness "the upgrade pack step failed"; blocked "the upgrade pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
 up_tarballs=("$UP"/*.tgz)
@@ -1143,7 +1184,7 @@ upgrade_direction "$UP_VERSION" "$UP2_VERSION" \
 UP2="$SCRATCH/upgrade2"
 mkdir -p "$UP2"
 PACK_OUT="$(cd "$REPO" && INSTALLER_PACK_TMP_DIR="$SCRATCH" bash gate-sdk/bin/run-gates.sh --pack-installer --root "$REPO" --version "$UP2_VERSION" --out "$UP2" --artifacts "$PACK_ARTIFACTS" 2>&1)" \
-    || { printf '%s\n' "$PACK_OUT" >&2; blocked "the second upgrade pack step failed."; }
+    || { printf '%s\n' "$PACK_OUT" >&2; scratch_witness "the second upgrade pack step failed"; blocked "the second upgrade pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
 up2_tarballs=("$UP2"/*.tgz)

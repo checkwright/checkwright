@@ -1860,11 +1860,23 @@ tree the run described instead of inferring it from a twelve-character hash.
 proving it.** The smoke asserts that tree is clean in its preflight, beside the
 tool checks and before the first build step. The packer keeps its own
 dirty-worktree refusal — the preflight removes the common case but not the real
-one, since the suite packs four separate times across a ~10-minute run and a
+one, since the suite packs several times over a long run and a
 concurrent edit mid-run trips a check the caller did not choose the moment for.
 That late refusal names the root it resolved and states that the check is
 per-invocation, so it reads as a precondition checked at an awkward moment
 rather than as a broken installer.
+
+**The arms run in sequence, and that is part of the contract.** The printed arm
+headers are a parsed scenario roster in print order (evidence-kit/SPEC.md §Layout
+and configuration). `ENTRY` and `RUN_PATH` are globals each arm reassigns, and
+`VALUE_RED` and `REGISTRY` are built up across the profile loop. The
+cross-version reversal arm reads the payload the upgrade arm removed a file from.
+Running arms concurrently would have to buffer every arm's output back into
+header order and pass each of those values between processes. On the leg this
+repository makes binding, that trades a known duration for failures that do not
+reproduce. What the suite spends goes into the per-install work each profile
+repeats. A reduction starts from a per-arm profile of a finished run, not from
+the shape of the arms.
 
 It builds the host gate binary, packs the package around it, installs it **from
 the resulting tarball with
@@ -2072,14 +2084,14 @@ leg where every entry disagreed.
   by parameter expansion, so this is what that split produced and one of the two
   values the failing comparison actually used. It is deliberately **not**
   re-read through a second channel.
-- **`got`** — **held.** The value the arm's own
-  `got="$(git hash-object -- "$C/P")"` assigned, carried out of the loop on the
-  failure branch: the comparison's other operand, not a description of one. It
-  is the second half of the correction `want` already carries, and the reason it
-  is spelled out here is that applying that correction to one operand of two is
-  precisely how the remaining asymmetry stayed invisible.
-- **`reread`** — a re-read. `git hash-object -- "$C/P"` run again at report time
-  from the smoke's own current directory. This is the value the label `got`
+- **`got`** — **held.** The line the arm's single
+  `git hash-object --stdin-paths` child answered for `$C/P`, paired with P by
+  its position among the entries the loop hashed and carried out of the loop on
+  the failure branch. It is the comparison's other operand, not a description of
+  one. It is spelled out because applying `want`'s correction to one operand of
+  two is exactly how the remaining asymmetry stayed invisible.
+- **`reread`** — a re-read. `git hash-object -- "$C/P"`, the one-file call, run
+  at report time from the same working directory as the batch. This is the value the label `got`
   printed before the held operand existed; it is renamed rather than dropped, so
   that a held value and a re-read of the same call can never be read as one
   thing — a single label covering both is how the asymmetry hid.
@@ -2163,8 +2175,8 @@ and the last three read the **instrument** rather than the operand:
 | `want == own == raw` and `reread != raw` | the read side's context applies a filter the write side's does not; the defect is at `run-smoke.sh`'s call site and the two-call-site narrowing is confirmed |
 | `want == own == reread` | the hashes agree and the arm could not have failed on this path — the disagreement is in the comparison, not in the hashing (whether they also equal `raw` says only *why* they agree: equal, no context filters at all; unequal, both contexts filter identically — neither changes the reading) |
 | `own == reread == raw` and `want != raw` | the bytes on disk are not the bytes `init` hashed; the porcelain below and the artifact control say which |
-| `got != reread` | the value the comparison used is not the value the same call yields now, so the mangling happens at capture time inside the loop; the two octet dumps name the byte and its position |
-| `want == got`, byte-equal, both held | the comparison received two equal values and reported them unequal, which bash cannot do — so the pairing is wrong and `bad_hash` associated one entry's `want` with another entry's `got`; read the sampled path against the loop's own echo order |
+| `got != reread` | the batch's answer for this path is not what the one-file call gives now. Either the value was mangled when the batch was captured or read back, or the batch filed another path's answer here. The two octet dumps name the byte and its position, and a `got` that is a well-formed hash of a different path is the second case |
+| `want == got`, byte-equal, both held | the comparison received two equal values and reported them unequal, which bash cannot do — so a pairing is wrong. Either `bad_hash` associated one entry's `want` with another entry's `got`, or the batch answer was paired off by one. Read the sampled path against the loop's own echo order. The count refusal rules out a short answer, not a reordered one |
 | any of the six fails the shape test | a stray byte, a truncation or a refusal will each do it and the value is then not a hash; `len` names a truncation outright, the octet dump shows a stray byte, and the captured standard error names the refusal. Read it against the row below first, which is the one case where that reading does not hold. The arm acts on this row too, and that is the one row it acts on: a refused operand makes the run **exit 2** rather than 1. Read it with the header's count: **one** entry failing the shape test is a statement about the sampled path, **all** of them a statement about the capture step every entry runs through |
 | `shape` fails while `len40` and `class` are both clean | two matchers in one shell disagree about one variable — the ERE engine or its locale is the subject, not the value; the operand is a hash and the harness refused it anyway |
 | `%q` renders bare while `octets` shows a byte outside `0-9a-f` | `printf '%q'` is not a byte rendering on this host, so **every** prior round's "bare rendering" reading is weakened to what quoting alone establishes; re-read rounds 12 to 17 against the octet dump before citing them |
@@ -3013,7 +3025,10 @@ that effect, because two different manifests leave the same intact file on this
 hop and neither survives the next: an entry dropped altogether reads as *never
 installed* on the following run, and an entry recorded at the adopter's own hash
 reads as *unchanged*. Both would let the next `init` claim the path, so both are
-named apart.
+named apart. Before its first pack, and on either pack's failure branch, the arm
+prints the free space and the scratch tree's size through a witness that never
+changes a verdict. A pack that dies printing nothing is still readable from a
+finished log: if the scratch filesystem ran out, the witness shows it.
 
 The second edited file is the **relinquish subject**, and it is what makes the arm
 reach §The manifest's exit rule at all. The pack step assembles every version from
