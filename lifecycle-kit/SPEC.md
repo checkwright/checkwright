@@ -4794,11 +4794,10 @@ audit-entry stage, so without the scope sentence the first reader of its marker 
 the refusal — the failure the align/D pairing below already closes for amendments.
 
 **Align runs every not-run marker and build runs the cannot-run ones first** — in an
-amendment or an active queue entry — and both templates carry it although
-§check-stage-entry assertion D already refuses the build entry on an unrun marker:
-align is trigger-gated and can be skipped, so D is what holds the obligation when it
-is, while align's sentence names the stage that meets a marker first when align does
-run — so the refusal is not the first time the marker is noticed.
+amendment or an active queue entry — although §check-stage-entry assertion D
+already refuses the build entry on an unrun marker: align is trigger-gated, so D
+holds the obligation when align is skipped, and align's sentence keeps the refusal
+from being the first notice when it runs.
 
 The directory holds the **stage-class** template set, not any one consumer's
 roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five,
