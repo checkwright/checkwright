@@ -3776,8 +3776,4 @@
 
 ## Done
 
-- validate-hold-rule-admits-iteration-caused-red
-- baseline-move-stales-evidence-line
-- validate-tier-premise-mechanical-only
-
 ## Lessons Learned
