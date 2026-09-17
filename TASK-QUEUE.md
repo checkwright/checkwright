@@ -12,15 +12,6 @@
 
 ## New Features
 
-- **dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it** [spec: SPEC-wipe-and-drain.md]
-  — an amendment's DoD parked an entry's queue move at a stage whose entry refuses the entry
-  (measured 2026-09-05: a DoD naming close behind the `validate` drain stage cost a resume after
-  the push). **The unruled question is derived, not escalated:** check-stage-entry assertion B
-  lets an entry move only before the drain stage, or at it for a drain-exempt entry, so a
-  DoD must name a non-drain stage for an untagged entry. **Designed as** a spec-template clause;
-  an assertion over DoD prose is refused, having no stage grammar to read (amendment delta 3).
-  Joined 2026-09-17 the wipe set as its DoD drain-stage member (operator direction, lead-relayed).
-
 ## Technical Debt
 
 ## Deferred
@@ -4261,5 +4252,6 @@
 - boundary-wipe-preserve-basename-reach
 - close-surface-row-absent-reads-as-empty
 - gap-drain-precedes-its-own-kfric-read
+- dod-parks-a-queue-transition-at-a-stage-that-cannot-perform-it
 
 ## Lessons Learned

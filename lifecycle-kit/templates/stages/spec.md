@@ -94,6 +94,12 @@ design rationale and ruled-out alternatives get re-derived under build pressure.
 scope has already run the feature/debt litmus at filing and bounded the unit
 set; this stage authors, it does not re-triage.
 
+**A Definition-of-Done item that moves the entry names a stage that can move it.**
+An entry's Done move or demotion lands before the drain stage
+(`LIFECYCLE_KIT_DRAIN_STAGE`), or at it only for a `[drain-exempt:]` entry — never
+at a stage after it (lifecycle-kit/SPEC.md §check-stage-entry, assertion B). Name
+that stage by its relation to the drain stage, never by a literal stage name.
+
 **Amendment text for a governed surface says whether it is landed, on the
 passage itself.** This stage authors and build lands, so replacement text is a
 proposal by default — but a stage authorized to land an in-unit edit produces

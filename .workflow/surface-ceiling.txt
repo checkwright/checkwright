@@ -27,7 +27,7 @@
 118 lifecycle-kit/templates/stages/build.md
 295 lifecycle-kit/templates/stages/close.md
 241 lifecycle-kit/templates/stages/scope.md
-116 lifecycle-kit/templates/stages/spec.md
+122 lifecycle-kit/templates/stages/spec.md
 88 lifecycle-kit/templates/stages/validate.md
 41 lifecycle-kit/templates/upgrade.md
 47 queue-kit/templates/TASK-QUEUE.md

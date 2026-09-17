@@ -4648,6 +4648,21 @@ recommendation attaching to a batch not yet cut. The judgment is the authoring
 stage's because it knows what each delta demands where the lead knows only what
 the queue entry says.
 
+`spec.md`'s **Definition-of-Done placement clause is derived, not a new rule.**
+§check-stage-entry assertion B refuses any untagged active entry at the drain
+stage's entry and any active entry at every successor's, so an entry's Done move or
+demotion can be performed only before the drain stage — where canon-kit's merge
+step 4 already puts it — or at it for a `[drain-exempt:]` entry; a DoD naming the
+drain stage for an untagged entry is as unexecutable as one naming a successor.
+**A clause and not an assertion:** an assertion over the amendment glob would need
+a DoD item to spell its stage in a grammar, and canon-kit's amendment template has
+none — a DoD item is prose, and a stage word in it may name a stage for any reason
+— so the assertion would either guess from prose, false-positive on every such
+mention, or mint a stage field in a second kit's grammar to catch one authoring
+slip. The mechanical backstop already exists: the lead's pre-completion
+`--enter-stage --simulate <next stage>` read (§templates/lead.md) refuses exactly
+this case, provided it runs before the push.
+
 The directory holds the **stage-class** template set, not any one consumer's
 roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five,
 because `spec.md` serves the split-authoring roster alone. Nothing derives a
