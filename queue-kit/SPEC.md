@@ -2210,8 +2210,7 @@ file's name is current prose, not a pointer. A line that is history takes
 `<!-- retired-citation-exempt: <reason> -->` on it or the line above, the reason
 mandatory. The marker is this kit's own rather than canon-kit's history valves,
 so the verdict never depends on another kit's knobs and the kit vendors alone.
-The knob ships empty, and it stays apart from the membership surfaces, because
-emphasis in bold code on a SPEC is not a queue claim. The retired set is the
+The retired set is the
 shared adapter's, so a missing `git` or a shallow clone under-reds and never
 invents. The live-name test reads the tracked listing, which the descriptor does
 not couple: a commit deleting the last file named after a retired slug, and
