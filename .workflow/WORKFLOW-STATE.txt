@@ -8,3 +8,4 @@ claim-execution-obligations scope ad2a545d 2026-09-17 a024f14f
 claim-execution-obligations spec adb3b77c 2026-09-17 9f2023cb
 claim-execution-obligations build ae769b57 2026-09-17 b233c3e8
 claim-execution-obligations build a71eebf0 2026-09-17 8ac90a03
+claim-execution-obligations validate a5441d7b 2026-09-17 cd0bc9d2
