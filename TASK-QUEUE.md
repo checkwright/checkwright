@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: install-smoke-slow-leg
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -522,6 +522,8 @@
   another one. Filed 2026-09-08 to the gap inbox by the close of `intel-macos-roster-join`, which no
   stage of that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the
   record is late and says so.
+  **Joins `install-smoke-slow-leg` — operator direction, 2026-09-17, lead-relayed:** its scratch
+  witness only, riding that unit's `run-smoke.sh` upgrade arm; green in 12 master runs since.
 
 - **substrate-parity-audits-one-producer-of-two** [design-pending] [cost: event/high] [surface: gate-sdk] — the parity gate's release-path
   assertions read a single named workflow, and the tree now has two workflows that build and hash a
@@ -3148,6 +3150,8 @@
   **Cost while deferred:** the slowest smoke leg sets the watch wait on every push, every term
   scales with the profile count, and Windows pays each spawn at MSYS fork cost.
   Filed 2026-09-11 by close, draining three gap-inbox bullets left by the smoke-leg hash batch.
+  **Leads `install-smoke-slow-leg` — operator direction, 2026-09-17, lead-relayed.** Re-measured
+  at that scope off gates run 35214069775: install-smoke-windows 11m, the whole run about 15m.
 
 - **align-in-session-absorption-tier-unruled** [design-pending] [cost: event/low] [surface: lifecycle-kit]
   — does a spec miss that build absorbs **in session** count against align's model tier?
@@ -3621,6 +3625,9 @@
   baseline diff stops it.
   Filed 2026-09-17 to the gap inbox by `enum-and-citation-parity`'s lead after its close;
   promoted at the next scope's intake, so the record is late and says so.
+  **Offered as a later set, not directed:** with `validate-tier-premise-mechanical-only` and
+  `baseline-move-stales-evidence-line`, all three governing how validate holds a red; judged not
+  combinable with `install-smoke-slow-leg` at its 2026-09-17 scope.
 
 ## Icebox
 
