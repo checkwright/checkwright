@@ -264,10 +264,10 @@ relocation.** The member was once sequenced behind that relocation rather than
 ported — a stated-contract cut dropped from an iteration's unit set, because the
 relocation's own precondition forbade it. `installer/SPEC.md` §The install
 boundary stated the selecting rule as *a step is takeable now iff it already runs
-only when an artifact was selected*, and named what broke otherwise: two of §The
-gate binary's three selection outcomes left `init` with no artifact and both
-**proceeded**, so a step that became artifact-dependent turned a smaller battery
-into **no install**.
+only when an artifact was selected*, and named what broke otherwise: two of
+`installer/SPEC.md` §The gate binary's three selection outcomes left `init` with
+no artifact and both **proceeded**, so a step that became artifact-dependent
+turned a smaller battery into **no install**.
 
 **The relocation retired that precondition rather than satisfying it**: both
 outcomes became bootstrap refusals, so an install that happens at all happens with

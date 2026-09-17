@@ -2235,8 +2235,8 @@ names the line, slug, stated status and actual section.
 ### templates/
 
 `queue-config.knobs` — the consumer knob-file template: comment-only, one `# spec:`
-pointer to the §Layout knob table with no override set, so the table stays the one
-owner of the knob roster rather than a parallel copy in the template drifting
+pointer to §Layout and configuration with no override set, so the table stays the
+one owner of the knob roster rather than a parallel copy in the template drifting
 against it, and a seeded copy is a valid knob file as written.
 `TASK-QUEUE.md` — a starter queue skeleton: the sections in default order,
 one example entry per grammar shape shown under `Technical Debt` (the

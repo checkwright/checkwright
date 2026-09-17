@@ -1828,7 +1828,9 @@ design that narrowed the turn-end rule to the writer would leave rule 14 and thi
 hook disagreeing about whose producers bind whom, on one record set, with no
 surface owning the difference.
 
-**Attribution was weighed and is not available.** The payload's `session_id` is
+### Attribution was weighed and is not available
+
+The payload's `session_id` is
 shared by a dispatched agent and its dispatcher, and the `pid=<n> run=<key>`
 grammar carries no writer identity. Adding one is a grammar change across
 evidence-kit and guard-kit for a narrowing the paragraph above argues against
