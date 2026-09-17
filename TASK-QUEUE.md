@@ -3601,6 +3601,27 @@
   Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s spec; promoted at its close
   drain.
 
+- **validate-hold-rule-admits-iteration-caused-red** [design-pending] [cost: event/high] [surface: lifecycle-kit]
+  — validate's triage rule lets a filed entry's *match* stand in for a *cause*, so a red this
+  iteration introduced can be committed as held.
+  **The instance.** At `enum-and-citation-parity` validate, `e22f7221` flipped `agents_md_smoke`'s
+  baseline row from `pass` to `fail` against the iceboxed `spec-pointer-boundary-legality`, though
+  that iteration's own widened `check-spec-pointer` caused the red; the lead caught it only by
+  reading the diff, and the operator directed the fix (`f78f5c8a`) before close.
+  **Verified at scope.** lifecycle-kit/templates/stages/validate.md's triage paragraph says a
+  filed red is noted and passed over, beside a completion rule that no baseline-pass item
+  regressed; nothing reconciles the two for a row that passed at the prior baseline, and
+  `check-evidence-baseline` checks a row's slug liveness, never its status against the previous
+  commit's.
+  **Open shape:** a template sentence (a prior-baseline `pass` row that reds is excavated as a
+  regression before any hold) versus an enforced one (a pass-to-fail flip must name a cause
+  outside the iteration's commits) — the second adds a name.
+  **DISTINCT from `spec-pointer-boundary-legality`**, the gate-design question the red matched.
+  **Cost while deferred:** a regression ships as an expected red, and only a lead reading the
+  baseline diff stops it.
+  Filed 2026-09-17 to the gap inbox by `enum-and-citation-parity`'s lead after its close;
+  promoted at the next scope's intake, so the record is late and says so.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
