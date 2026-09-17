@@ -12,6 +12,46 @@
 
 ## New Features
 
+- **validate-hold-rule-admits-iteration-caused-red** [spec: SPEC-hold-cause.md] — validate's
+  triage rule lets a filed entry's *match* stand in for a *cause*, so a red this iteration
+  introduced can be committed as held.
+  **The instance.** At `enum-and-citation-parity` validate, `e22f7221` held `agents_md_smoke`'s
+  flipped row against the iceboxed `spec-pointer-boundary-legality`, though that iteration's own
+  widened `check-spec-pointer` caused the red; the lead caught it reading the diff
+  (fixed `f78f5c8a`).
+  **Designed as** (spec picked the enforced shape, per the operator direction below): a baseline
+  row gains an optional `reproduces-at=<rev>` token, and `check-evidence-baseline` reds a row that
+  passed at the iteration-start commit and is held red now unless the token names a commit at or
+  before that start. The gate checks the commit's position, never the reproduction. The validate
+  template reads a filed match as a candidate cause and reproduces before holding; the valve payload
+  carries the reproducing commit (amendment deltas 1 to 5).
+  **DISTINCT from `spec-pointer-boundary-legality`**, the gate-design question the red matched.
+  **Unit of `validate-red-holding` — operator direction, 2026-09-17, lead-relayed:** with
+  `validate-tier-premise-mechanical-only` and `baseline-move-stales-evidence-line`; spec picks the
+  open shape and authors the amendment.
+  Filed 2026-09-17 to the gap inbox by `enum-and-citation-parity`'s lead after its close.
+
+- **validate-tier-premise-mechanical-only** [spec: SPEC-tier-discovery.md] — the ruling-config
+  assigns `validate` the cheaper model on the premise that its batches are uniformly mechanical
+  oracle-running, and one iteration falsified that premise.
+  **RULED BY THE OPERATOR 2026-08-23 — (b): KEEP THE TIER, ADD AN ESCALATE-ON-DISCOVERY CLAUSE.**
+  Re-tier validate and record-the-limit-only were refused. **OPERATOR-CLASS:** the tier is a
+  recorded ruling carried in the lead binding; this unit delivers the clause and re-judges nothing.
+  **The instance, from `battery-runner-port` 2026-08-23:** validate's spine went red on an
+  inherited defect whose fix took a diagnosis, a self-caught overreach (narrowed at `80d74291`) and
+  three spine runs; the lead re-dispatched on the capable tier. A one-off clause carried in the
+  2026-08-24 validate dispatch fired as intended.
+  **Designed as:** lifecycle-kit's lead template gives every cheaper-tier dispatch an
+  escalate-on-discovery transition — a session that finds a fix it must author journals the
+  diagnosis, authors none of it, and escalates a re-tier; the lead re-dispatches a same-stage
+  session on the judgment tier, since a resume keeps its tier. The stage-session roster names the
+  class and the lead binding prices validate as mechanical (amendment deltas 1 to 3).
+  **Not ridden:** `build-stage-tier-economics`'s "demonstrably works" sentence, corrected only when
+  that entry is worked.
+  **Unit of `validate-red-holding` — operator direction, 2026-09-17, lead-relayed:** the clause
+  names a transition, so spec authors it.
+  Filed 2026-08-23 at `battery-runner-port`'s close; ruled by the operator the same day.
+
 ## Technical Debt
 
 - **baseline-move-stales-evidence-line** — promoting a task and moving a suite's
@@ -2220,55 +2260,6 @@
   Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
   same seven names.
 
-- **validate-tier-premise-mechanical-only** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the ruling-config assigns `validate`
-  the cheaper model on the premise that its batches are uniformly mechanical oracle-running, and one
-  iteration falsified that premise.
-  **RULED BY THE OPERATOR 2026-08-23 — (b): KEEP THE TIER, ADD AN ESCALATE-ON-DISCOVERY CLAUSE.**
-  **FIRST EVIDENCE THE CLAUSE WORKS, 2026-08-24:** carried as a one-off in this iteration's
-  validate dispatch, it fired as intended — validate met a real defect and ESCALATED, not ground.
-  `validate` stays on the cheaper model, and a validate that discovers it must **fix** what it found
-  gets a named, cheap transition to the judgment tier rather than an improvisation. That CLOSES this
-  entry's design fork: what remains is delivery, not design. **Unit of `validate-red-holding` —
-  operator direction, 2026-09-17, lead-relayed:** the clause names a transition, so spec authors it.
-  **The `[design-pending]` tag STAYS, and this line exists so a later session does not strip it on
-  the strength of the paragraph above.** It is a section-membership invariant (canon-kit/SPEC.md
-  §The amendment lifecycle — every entry in the set carries it), so it marks the section rather than
-  an open design question and comes off at PROMOTION. Probed rather than argued at the 2026-08-23
-  drain: removing it reds `check-amendment-queue`.
-  **OPERATOR-CLASS, and this entry is a CARRIER rather than a proposal.** The tier is a recorded
-  ruling carried in the lead binding, so reversing, demoting or re-scoping it is the operator's;
-  the scope that promoted this escalated it and ruled nothing. What follows is the observation.
-  **The instance, from `battery-runner-port` 2026-08-23.** Validate's spine went red on an
-  INHERITED defect — a gate depositing runtime state inside the tracked fixture corpus it is the
-  oracle for — and closing it took a diagnosis, a fix, a self-caught overreach (the first cut
-  exported the pin process-wide and broke `producer-lock.test.sh`'s sandbox, narrowed at `80d74291`)
-  and three spine runs. The lead re-dispatched the stage on the more capable tier for exactly that
-  reason, so the corrective already happened; what is unrecorded is why.
-  **The distinction worth keeping, and it is the whole content: the TIER may well be right and the
-  PREMISE is what needs re-judging.** A validate that only runs oracles is mechanical; a validate
-  that has to FIX what it finds is not, and nothing in the current framing distinguishes the two or
-  says what a session should do on discovering it is in the second kind.
-  **The surface this bears on, NAMED and STILL not corrected — now under the ruling rather than
-  under restraint.** `build-stage-tier-economics` carries "the already-adopted validate→Sonnet
-  downgrade **demonstrably works** ... with no observed quality cost" as the affirmative precedent
-  its A/B tests for. That sentence has an operator-acknowledged counter-instance and the tier
-  survived it anyway. The operator ruled on the TIER, not on that entry's prose, so the correction
-  rides whenever that entry is worked and no session edits it on the strength of this one.
-  **DISTINCT from `build-stage-tier-economics`**, which is the BUILD stage's tier and its per-batch
-  split; this is validate's, and the two share only the meter that priced them.
-  **The three shapes that were open, and which was taken:** re-tier validate — refused; keep the
-  tier and add the escalate-on-discovery clause — **TAKEN**; record the premise's honest limit and
-  leave the tier alone — refused. Kept rather than deleted because a later session weighing a
-  re-tier meets what was already weighed against it.
-  **Cost while deferred, now that the shape is settled:** the exposure is unchanged and the carry is
-  narrower — a validate meeting a real defect on the cheaper tier still either escalates for a
-  re-dispatch, costing a lead turn and a restart, or does not, which is the case nobody sees. What
-  is no longer carried is the design question; what is carried is an unbuilt clause.
-  Filed 2026-08-23 to the gap inbox at `battery-runner-port`'s close, offered by the lead and
-  deliberately not ruled there; promoted 2026-08-23 at the next iteration's scope drain, which
-  escalated the ruling and did not take it; ruled by the operator the same day and recorded here by
-  that same scope, which authored no part of the ruling it records.
-
 - **dispatch-claim-evidentiary-tier-unmarked** [design-pending] [cost: event/high] [surface: lifecycle-kit] — a dispatch prompt can upgrade an
   inference into a finding, and the receiving session cannot see the evidence base to discount it.
   recurrence: dispatch-claim-evidentiary-tier-unmarked 2026-08-24
@@ -3577,30 +3568,6 @@
   five lines carrying `&`, every one inside a quoted argument.
   Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s spec; promoted at its close
   drain.
-
-- **validate-hold-rule-admits-iteration-caused-red** [design-pending] [cost: event/high] [surface: lifecycle-kit]
-  — validate's triage rule lets a filed entry's *match* stand in for a *cause*, so a red this
-  iteration introduced can be committed as held.
-  **The instance.** At `enum-and-citation-parity` validate, `e22f7221` flipped `agents_md_smoke`'s
-  baseline row from `pass` to `fail` against the iceboxed `spec-pointer-boundary-legality`, though
-  that iteration's own widened `check-spec-pointer` caused the red; the lead caught it only by
-  reading the diff, and the operator directed the fix (`f78f5c8a`) before close.
-  **Verified at scope.** lifecycle-kit/templates/stages/validate.md's triage paragraph says a
-  filed red is noted and passed over, beside a completion rule that no baseline-pass item
-  regressed; nothing reconciles the two for a row that passed at the prior baseline, and
-  `check-evidence-baseline` checks a row's slug liveness, never its status against the previous
-  commit's.
-  **Open shape:** a template sentence (a prior-baseline `pass` row that reds is excavated as a
-  regression before any hold) versus an enforced one (a pass-to-fail flip must name a cause
-  outside the iteration's commits) — the second adds a name.
-  **DISTINCT from `spec-pointer-boundary-legality`**, the gate-design question the red matched.
-  **Cost while deferred:** a regression ships as an expected red, and only a lead reading the
-  baseline diff stops it.
-  Filed 2026-09-17 to the gap inbox by `enum-and-citation-parity`'s lead after its close;
-  promoted at the next scope's intake, so the record is late and says so.
-  **Unit of `validate-red-holding` — operator direction, 2026-09-17, lead-relayed:** with
-  `validate-tier-premise-mechanical-only` and `baseline-move-stales-evidence-line`; spec picks the
-  open shape and authors the amendment.
 
 - **smoke-leg-crate-build-uncached** [design-pending] [cost: iteration/low] [surface: .github] — the
   platform install-smoke legs rebuild the gate crate from cold on every push.
