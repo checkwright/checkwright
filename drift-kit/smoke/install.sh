@@ -374,11 +374,37 @@ set -e
 [[ -s "$selog" ]] || fail "stage-economics wrote no trend line"
 [[ "$(grep -c '' "$selog")" -eq 1 ]] || fail "stage-economics log has more than one line for one (iteration,stage,model) triple"
 seln="$(cat "$selog")"
-grep -qE '^[0-9-]+ smoke build test-model in=14 out=11 cr=150 cw=30 cost=606\.[0-9]+$' <<<"$seln" \
-    || fail "trend line does not match the documented grammar/values: $seln"
+# spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: the row's date is its stage's stamp date, never the run's.
+grep -qE '^2025-01-01 smoke build test-model in=14 out=11 cr=150 cw=30 cost=606\.[0-9]+$' <<<"$seln" \
+    || fail "trend line does not match the documented grammar/values (date = the stamp's): $seln"
 
+cp "$selog" "$work/se-log.first"
 econ "$work/se-prices.tsv" >/dev/null   # re-measure replaces the triple's line, never doubles it
 [[ "$(grep -c '' "$selog")" -eq 1 ]] || fail "re-measure double-counted the triple (dedup broken)"
+cmp -s "$work/se-log.first" "$selog" \
+    || fail "a re-run over unchanged inputs was not byte-identical (the run re-dated or reordered): $(cat "$selog")"
+
+# spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: the heal: a logged line for the key carrying another date
+# comes back with the stamp's date in its own position, behind a line the run never re-measures.
+printf '2020-02-02 unrelated build test-model in=1 out=1 cr=1 cw=1 cost=1\n2099-09-09 smoke build test-model in=0 out=0 cr=0 cw=0 cost=0\n' > "$selog"
+healout="$(econ "$work/se-prices.tsv")"
+[[ "$(sed -n 1p "$selog")" == '2020-02-02 unrelated build test-model in=1 out=1 cr=1 cw=1 cost=1' ]] \
+    || fail "the heal moved or rewrote a line no stamp dates: $(cat "$selog")"
+grep -qE '^2025-01-01 smoke build test-model in=14 ' <<<"$(sed -n 2p "$selog")" \
+    || fail "the heal did not re-date the logged row in its original position: $(cat "$selog")"
+grep -q '1 row(s) dated by measurement' <<<"$healout" \
+    || fail "a logged row no stamp dates was not counted: $healout"
+
+# spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: the undated fallback: a live stamp with no date field dates
+# nothing, so the new row takes the run's date and the count names it.
+printf 'smoke build sess1234\n' > "$work/se-state.txt"
+: > "$selog"
+undout="$(econ "$work/se-prices.tsv")"
+grep -q '1 row(s) dated by measurement' <<<"$undout" \
+    || fail "an undated stamp did not raise the dated-by-measurement count: $undout"
+grep -qE "^$(date +%F) smoke build test-model " "$selog" \
+    || fail "a row no stamp dates did not take the run's date: $(cat "$selog")"
+printf 'smoke build sess1234 2025-01-01 none\n' > "$work/se-state.txt"
 
 : > "$selog"
 set +e
@@ -415,6 +441,36 @@ grep -q ' alpha build test-model ' "$hlog" \
     || fail "a stamp surviving only in committed history did not price (truncation immunity lost)"
 grep -q ' beta scope test-model ' "$hlog" \
     || fail "the live file's stamp did not price (the union dropped its live arm)"
+
+# spec: drift-kit/SPEC.md §Testing — kpi-stage-economics-lag over the same fake history, with a second
+# close stamped live: alpha (history) is priced, beta (live) is not, so one close is unpriced.
+printf 'beta close s5 2025-01-04 none\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"
+printf '2025-01-02 alpha close test-model in=1 out=1 cr=1 cw=1 cost=1\n' > "$work/lag-log.txt"
+lagkpi() {   # $1 = log path; the rest go to solo
+    local l="$1"; shift
+    ( cd "$trepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" \
+        DRIFT_KIT_STATE_FILE=".workflow/WORKFLOW-STATE.txt" \
+        DRIFT_KIT_STAGE_ECONOMICS_LOG="$l" solo kpi-stage-economics-lag "$@" )
+}
+lagout="$(lagkpi "$work/lag-log.txt")"
+grep -q '1 close(s) unpriced since alpha' <<<"$lagout" \
+    || fail "kpi-stage-economics-lag did not count the one unpriced close: $lagout"
+[[ "$(lagkpi "$work/lag-log.txt" --trend)" == 'drift: econ 1' ]] \
+    || fail "kpi-stage-economics-lag --trend not 'econ 1': $(lagkpi "$work/lag-log.txt" --trend)"
+printf '2025-01-04 beta close test-model in=1 out=1 cr=1 cw=1 cost=1\n' >> "$work/lag-log.txt"
+grep -q '0 — newest close priced (beta)' <<<"$(lagkpi "$work/lag-log.txt")" \
+    || fail "kpi-stage-economics-lag did not read a priced newest close as 0"
+grep -q 'n/a (no stage-economics log)' <<<"$(lagkpi "$work/no-such-lag-log.txt")" \
+    || fail "an absent stage-economics log must degrade fail-visibly"
+[[ -z "$(lagkpi "$work/no-such-lag-log.txt" --trend)" ]] || fail "--trend must emit nothing when the lag is n/a"
+printf '2025-01-01 zeta build test-model in=1 out=1 cr=1 cw=1 cost=1\n' > "$work/lag-unpriced.txt"
+grep -q 'n/a (no closed iteration priced)' <<<"$(lagkpi "$work/lag-unpriced.txt")" \
+    || fail "a log naming no closed iteration must degrade rather than count every close"
+printf 'DRIFT_KIT_STAGES =\n' > "$work/lag-noroster.knobs"
+grep -q 'n/a (empty stage roster)' <<<"$(DRIFT_KIT_KNOB_FILE="$work/lag-noroster.knobs" lagkpi "$work/lag-log.txt")" \
+    || fail "an empty stage roster must degrade fail-visibly"
+grep -q 'n/a (no closed iteration)' <<<"$(DRIFT_KIT_STATE_FILE="$work/se-state.txt" DRIFT_KIT_STAGE_ECONOMICS_LOG="$work/lag-log.txt" solo kpi-stage-economics-lag)" \
+    || fail "a stamp source with no terminal stamp must degrade fail-visibly"
 
 # spec: drift-kit/SPEC.md §The stage-economics meter — the attribution invariant over its own fixture
 # set: one session bearing two stamps bills once (its last), and a transcript matching no stamp is

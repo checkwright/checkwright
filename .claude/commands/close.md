@@ -17,7 +17,10 @@ gate-sdk/bin/run-gates.sh --lesson-sink <tag>`, which resolves the sink from the
 **housekeeping** — measure, then triage. First meter this closing session with
 `--emit overhead-meter <session-id>`, passing this session's own `close` stamp id, whose invocation and byte-proxy contract
 drift-kit/SPEC.md §The overhead meter owns: it logs the governance-vs-task
-proportion, the per-session producer feeding `kpi-overhead`. The drain's commit
+proportion, the per-session producer feeding `kpi-overhead`. Then feed the
+stage-economics log, the tier decisions' revert signal, per drift-kit/SPEC.md §The
+stage-economics meter, Feeding — run `--emit stage-economics` — and confirm
+`--emit drift-report --trend` reads `econ 0`. The drain's commit
 message states the health triad beside its `qnet` fragment — `qnet`, the
 always-loaded delta with the `--growth` figure, and `kpi-overhead`'s share — with the
 cause when one moves the wrong way. The template's brevity pass (step 11) is

@@ -4,7 +4,7 @@
 23 .claude/commands/agent-execution.md
 11 .claude/commands/align.md
 18 .claude/commands/build.md
-127 .claude/commands/close.md
+130 .claude/commands/close.md
 31 .claude/commands/consult.md
 24 .claude/commands/economics.md
 72 .claude/commands/lead.md

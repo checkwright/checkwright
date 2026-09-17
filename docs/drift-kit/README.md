@@ -110,7 +110,10 @@ provenance seam); absent it, cost degrades to `n/a` and tokens still report. The
 `/economics` skill (`templates/economics.md`, materialized as
 `.claude/commands/economics.md`) chains overhead-meter → stage-economics into
 one post-iteration cost narrative — a reporting ritual the close skill may
-invoke, not a lifecycle stage and not a gate.
+invoke, not a lifecycle stage and not a gate. If your decisions read the log, run
+the meter at your terminal stage — its rows are dated by their stamps, so a re-run
+at every close re-dates nothing — and `kpi-stage-economics-lag` shows how many
+closes have gone unpriced when that feed is skipped.
 
 A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
 dirs, then each vendored kit's `kpis/`, then the binary's built-in members —

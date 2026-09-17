@@ -150,8 +150,11 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         done_section: scalar(&fam, "DONE_SECTION"),
         deferred_section: scalar(&fam, "DEFERRED_SECTION"),
         icebox_section: scalar(&fam, "ICEBOX_SECTION"),
+        stage_economics_log: scalar(&fam, "STAGE_ECONOMICS_LOG"),
+        state_file: scalar(&fam, "STATE_FILE"),
+        stages: walk::knob_array("DRIFT_KIT_STAGES").unwrap_or_default(),
         kit_roots,
-        };
+    };
 
     let env = child_env(&fam, &ctx);
     let kpi_dirs = walk::knob_array("DRIFT_KIT_KPI_DIRS").unwrap_or_default();
@@ -323,6 +326,9 @@ mod tests {
             icebox_section: String::new(),
             kit_roots: vec!["/tmp/kit".to_string()],
             iteration_start: "abc1234".to_string(),
+            stage_economics_log: String::new(),
+            state_file: String::new(),
+            stages: Vec::new(),
         }
     }
 }

@@ -16,6 +16,7 @@ kpi-gate-runtime
 kpi-overhead
 kpi-price-table-age
 kpi-queue-net-delta
+kpi-stage-economics-lag
 
 # Lag — weighted low; undercounts by construction. kpi-knowledge-friction reads
 # drift-kit's knowledge-friction loop (its capture convention + close triage); it

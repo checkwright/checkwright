@@ -13,6 +13,7 @@ pub mod price_table_age;
 pub mod prompt_friction;
 pub mod queue_net_delta;
 pub mod settings_local;
+pub mod stage_economics_lag;
 pub mod task_split;
 
 use crate::proc;
@@ -35,6 +36,9 @@ pub struct Ctx {
     pub icebox_section: String,
     pub kit_roots: Vec<String>,
     pub iteration_start: String,
+    pub stage_economics_log: String,
+    pub state_file: String,
+    pub stages: Vec<String>,
 }
 
 // spec: drift-kit/SPEC.md §The KPI plugin contract — a member's whole result is the bytes it would
@@ -58,6 +62,7 @@ pub const BUILTINS: &[(&str, Member)] = &[
     ("kpi-prompt-friction", prompt_friction::run),
     ("kpi-queue-net-delta", queue_net_delta::run),
     ("kpi-settings-local", settings_local::run),
+    ("kpi-stage-economics-lag", stage_economics_lag::run),
     ("kpi-task-split", task_split::run),
 ];
 
@@ -167,7 +172,7 @@ mod tests {
         }
         assert!(lookup("kpi-always-loaded.sh").is_none());
         assert!(lookup("always-loaded").is_none());
-        assert_eq!(BUILTINS.len(), 13, "the bundled set moved without its roster");
+        assert_eq!(BUILTINS.len(), 14, "the bundled set moved without its roster");
     }
 
     // spec: drift-kit/SPEC.md §Bundled KPIs — the section walk resets on any heading, which is what

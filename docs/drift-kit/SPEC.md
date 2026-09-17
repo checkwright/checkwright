@@ -47,6 +47,10 @@ frame; every measurement lives in a member:
    rename. **Priced, because the position is not free:** deriving it above the
    loop runs it in `--trend` mode too, so one state-file read and one
    `git rev-parse` run on every session start through the context hook.
+   `kpi-stage-economics-lag` (§Bundled KPIs) adds a second read on that path —
+   the state file's committed history as `git log -p` — which costs tens of
+   milliseconds over a history of a few hundred iterations and is accepted at that
+   price; it is skipped outright where the stage-economics log is absent.
 3. Run each plugin, collect its rows, and group them into the two labeled
    sections — the honesty labels are the frame's contract:
    - header: `=== Drift KPIs (advisory — trend, not level) ===`, plus the
@@ -347,6 +351,32 @@ Lead:
   hermeticity (site-kit/SPEC.md §The monitor boundary). Reading a date in-tree
   needs no network. The mechanism is kit-generic; no model id, price, or roster
   enters the kit (§The stage-economics meter, the provenance seam).
+- **kpi-stage-economics-lag** — closes since the newest priced close: the count
+  of closed iterations stamped after the newest closed iteration the
+  stage-economics log (`DRIFT_KIT_STAGE_ECONOMICS_LOG`) prices. A **closed
+  iteration** is an iteration name carrying a stamp whose stage is the **last
+  member of `DRIFT_KIT_STAGES`**; closed iterations are **ordered** by the first
+  appearance of that terminal stamp in the meter's own history ∪ live stamp read
+  (committed history in commit order, then the live file); an iteration is
+  **priced** when any log line's iteration field (field 2) names it; the **lag**
+  is the number of closed iterations after the last priced one in that order.
+  The count is keyed on iterations, never on dates — several closes can stamp on
+  one day, so a date comparison could not tell them apart, and the count holds
+  whatever the log's date column says. **One producer for the stamp read**: the
+  meter's history ∪ live collector is a shared in-crate function
+  (`native/src/history.rs`) both call, since two copies of the union would be a
+  second producer of the coupling §The stage-economics meter already refuses one
+  for. Full mode emits `<N> close(s) unpriced since <iteration> (run --emit
+  stage-economics)`, or `0 — newest close priced (<iteration>)`; `--trend` emits
+  `econ <N>`. **Lead, not lag**: the value is exact rather than a lower bound, and
+  it is the signal to act on before the gap widens. Degrades fail-visible with no
+  trend fragment: `n/a (no stage-economics log)`, `n/a (empty stage roster)`,
+  `n/a (no closed iteration)`, and `n/a (no closed iteration priced)` — the last
+  deliberately not a count, since with nothing priced the count would be every
+  close in history, measuring when the log was started rather than lapse. It is
+  the visible half of the meter's feeding obligation (§The stage-economics meter,
+  Feeding): a KPI rather than a freshness gate, on the grounds that paragraph
+  states.
 
 Lag:
 
@@ -1005,7 +1035,14 @@ the dominant burn (build ~73% of session cost, climbing 37M→86M cr-tokens per
 session), so the field exists to keep that lever visible close-over-close. The
 dedup key read on append is the `<iteration> <stage> <model>` triple —
 re-measuring a triple replaces its line rather than double-counting, exactly as
-the overhead meter dedups on `session8`. That key is also what makes the
+the overhead meter dedups on `session8`. **The replace is in place**: a key
+already in the log has its first line rewritten where it stands, any later
+duplicate of that key (a legacy line from before the fold) is dropped, and only a
+key new to the log appends — so, with the stamp-date rule below, a second run over
+unchanged stamps, transcripts and price table writes a byte-identical log, and
+"the run re-dated nothing" is a fixture check rather than an inference. The touch
+rule is unchanged: a run that emitted no row neither creates nor rewrites the log.
+That key is also what makes the
 history ∪ live read safe with no added mechanism: a history arm re-derives rows
 already logged, and re-derivation replaces a triple's line rather than
 double-counting it.
@@ -1080,13 +1117,49 @@ the port fixes it at first-appearance order. Any per-model sub-breakdown beyond 
 fields stays on stdout at measurement time; a log field with no reader is a field
 removed. Field readers: the `/economics` narrative reads `cost` and the four token
 fields (`cr` headline); the operator reads `cost` close-over-close; a controlled
-A/B benchmark's measurement half would consume this log rather than rebuild it; `date` carries the reading-age caveat. `date` is the
-**measurement** date, not the stage's — and under the history read the two can be
-far apart, because re-deriving an old iteration restamps its row to the day it
-was re-measured. The reading-age caveat stays correct (it ages the reading, which
-is what it says), but the field may not be read as "when this stage ran": the
-stage's own date is in the stamp, and the trajectory extractor is the surface
-that renders it.
+A/B benchmark's measurement half would consume this log rather than rebuild it;
+`kpi-stage-economics-lag` reads the iteration field (§Bundled KPIs); and the
+consumer's lead binding orders the bare `align` rows by `date` to read a `cr`
+trend.
+
+**`date` is the stage's stamp date, never the day of the run.** A trend is a
+series ordered by date, and the collector re-derives history on every run, so a
+run-dated column would put most of the history on the last run's day and make the
+series' order an artifact of when the meter ran. The date is derived from the
+stamps alone, never from transcripts: the run collects, from the history ∪ live
+stamps it already reads, the latest date per `(iteration, stage)` and the latest
+date per iteration (ISO dates, so the latest is the greatest string), and a row's
+date is:
+
+- **a stage row** — the latest date among the stamps naming its `(iteration, stage)`;
+- **a fan-out row** — the same lookup on its stage with `DRIFT_KIT_FANOUT_SUFFIX`
+  removed, the anchor's date being its subtree's; a `supervision` anchor's fan-out
+  takes the supervision row's date;
+- **a supervision row** — the latest date among *all* the iteration's stamps, since
+  a lead carries no stamp of its own and supervises the whole iteration through its
+  terminal stage.
+
+**Latest, not first**: a split stage stamps once per session and its row is their
+sum, so the latest session is the one that makes the sum final — the day the
+stage's figures stopped moving, which is what an ordered series wants. **The rule
+applies to every line the run writes back, not only the lines it re-measures**:
+before the one write, every retained line whose `(iteration, stage)` derives a date
+takes it, so a row whose transcript has aged out is re-dated too — it cannot be
+re-measured, but its stamps survive in committed history — and the first run
+after this rule landed corrects a run-dated log with no migration step.
+
+**Degradation is visible and counted.** A live-file stamp whose fourth field is not
+an ISO date contributes no date (the history arm's grammar already refuses one),
+and a stamp whose iteration field falls outside that grammar — an unnamed-iteration
+placeholder, say — dates nothing from history. A row, logged or new, whose key no
+dated stamp names keeps the date it has, and a new one takes the run's date; every
+such line written adds to one stdout count, `<n> row(s) dated by measurement — no
+dated stamp names their (iteration, stage)`, printed only when non-zero. Dropping
+such a row is refused: it would destroy spend the meter measured correctly because
+a date was missing. **The measurement date lives on stdout only** — the run header's
+`stage-economics: <today>` — because a reading age on a logged row has no reader: a
+row whose transcript still exists is re-measured every run, and one whose transcript
+has aged out is final.
 
 **The reserved `supervision` value — the lead's burn is its own row.** Under a
 split-lead posture the lead session dispatches, verifies, and runs batteries
@@ -1149,15 +1222,17 @@ skeleton); the same rule decides this.
   honest reading, not a missing measurement. A lead transcript aged out of the
   sessions dir takes the existing unmatched-summary path.
 - **No new field.** The four token fields, `cost`, and `date` carry a supervision
-  row exactly as they carry a stage row, and the dedup key, the
+  row exactly as they carry a stage row — its `date` the latest stamp date of its
+  iteration (The trend log) — and the dedup key, the
   replace-on-re-measure behavior, and every existing reader work unchanged —
   `supervision` is a value in an existing column, not a new field. The
   apportionment key and the collision notice are **stdout caveats at measurement
   time**, not log fields; a log field with no reader is a field removed, and
   neither has one. The row's own named reader is the `/economics` narrative's
   supervision line item (§The `/economics` skill).
-- **Blast radius of the widened column.** The log has one parsing reader in
-  production code — this meter's own dedup grep — and one asserting reader in the
+- **Blast radius of the widened column.** The log has two parsing readers in
+  production code — this meter's own dedup match and `kpi-stage-economics-lag`,
+  which reads the iteration field and never the stage column — and one asserting reader in the
   harness, `smoke/install.sh`, which counts log lines. No *gate* reads it (it
   lives under the gitignored `DRIFT_KIT_METRIC_DIR`), and the `/economics`
   narrative reads it as prose rather than parsing the stage column.
@@ -1298,7 +1373,8 @@ subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
   | the price table absent or missing a model row | the row's `cost` degrades to `n/a` and raises the existing incomplete-pricing caveat, exactly as a stage row's does |
 
 - **No new field.** The four token fields, `cost`, and `date` carry a fan-out row
-  exactly as they carry a supervision row; the dedup key stays the
+  exactly as they carry a supervision row — its `date` its anchor's (The trend
+  log); the dedup key stays the
   `<iteration> <stage> <model>` triple and a re-measure replaces the row's line
   like any other. The split, the transcript count, and every degradation stay
   **stdout caveats at measurement time** — a log field with no reader is a field
@@ -1318,6 +1394,24 @@ subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
   template changes. The fan-out edge is *derived*, exactly as the supervision edge
   is, which is what keeps this a read-only consumption of lifecycle-kit/SPEC.md
   §The state machine.
+
+**Feeding — a consumer whose decisions read the log binds a feeding point.** The
+meter is on-demand by construction, so a log nobody runs it into goes stale with
+nothing to say so. A consumer that reads the log — a tier decision, a
+close-over-close cost comparison — binds a run into its **terminal stage's
+housekeeping**, the natural point: by then every stamp of the iteration exists, and
+that stage's own transcript and its lead's are still on disk. Because a row is
+dated by its stamps (The trend log), re-running the meter re-dates nothing, so the
+run is safe at every close. `kpi-stage-economics-lag` (§Bundled KPIs) makes a
+skipped feed visible. The kit names no stage and no binding: where the feed runs is
+consumer config. **Two alternatives are refused.** A freshness *gate* is ruled out
+by the advisory contract: the log lives under the gitignored, account-bearing
+`DRIFT_KIT_METRIC_DIR`, absent in CI, so a gate there could only pass vacuously or
+red on a cause no commit produced — the ground §Bundled KPIs already gives for the
+price table, which is why the signal is a KPI. **On-demand only** would cut the
+log's one parsing reader, a lead binding's tier-revert signal, and leave that tier
+with no way to be re-judged. The stage step is the shape the overhead meter's
+per-close run already proves.
 
 ## The `/economics` skill
 
@@ -1479,10 +1573,13 @@ consumer knob rather than a refusal. Knobs:
   manifest). Third instance of drift-kit re-deriving a
   cross-kit fact with its own knob rather than importing a sibling kit's bin
   contract (alongside `DRIFT_KIT_SESSIONS_DIR` and `DRIFT_KIT_STATE_FILE`).
+  `kpi-stage-economics-lag` reads it too: its **last** member is the terminal
+  stage whose stamp closes an iteration (§Bundled KPIs).
 - `DRIFT_KIT_STAGE_ECONOMICS_LOG` — the stage-economics append trend log; default
   `.metric/stage-economics-log.txt`, derived as
   `${DRIFT_KIT_METRIC_DIR}/stage-economics-log.txt` so a set metric dir moves it
-  (gitignored; the meter `mkdir -p`s the dirname).
+  (gitignored; the meter `mkdir -p`s the dirname). Written by the meter and read by
+  `kpi-stage-economics-lag` (§Bundled KPIs), both through this one resolved value.
 - `DRIFT_KIT_PRICE_TABLE` — the consumer-owned model→price roster the
   stage-economics meter prices through and `kpi-price-table-age` ages; default
   `${GATE_SDK_GATES_DIR}/price-table.tsv` (beside `graph-vocab.knobs`, the
@@ -1518,7 +1615,8 @@ consumer knob rather than a refusal. Knobs:
   parenthetical above stays true and is not in tension with the shared in-crate
   derivation §The stage-economics meter reads — the knob is still drift-kit's, and
   the sharing happens below the config layer, where it has already resolved to a
-  value.
+  value. `kpi-stage-economics-lag` reads its stamps through the meter's own
+  history ∪ live read (§Bundled KPIs).
 
 Per-KPI couplings (which meter, which log, which scan flag) are the
 plugins' own headers, not knobs — a consumer retargeting one edits its copy
@@ -1578,8 +1676,14 @@ is likewise fixture-driven: `smoke/install.sh` drives the join **through its
 arm** over a synthetic fixture set — a small WORKFLOW-STATE stamp file, a synthetic transcript carrying
 usage records for the stamped `session8`, and a placeholder price table — and
 asserts the emitted trend line's fields (the `<iteration> <stage> <model>`
-grouping and the `in`/`out`/`cr`/`cw`/`cost` values), that a re-measure replaces
-the triple's line rather than doubling it, and the `n/a` cost cell plus the
+grouping and the `in`/`out`/`cr`/`cw`/`cost` values) with the row's `date` pinned to
+the fixture stamp's own date, that a re-measure replaces the triple's line rather
+than doubling it **and leaves the log byte-identical**, the **heal** — a pre-seeded
+line for the fixture key carrying another date, behind an unrelated line, comes back
+with the stamp's date in its original position while the unrelated line stands and
+is counted as dated by measurement — the **undated fallback**, a live stamp with no
+date field raising the `dated by measurement` count and taking the run's date, and
+the `n/a` cost cell plus the
 incomplete-pricing caveat when the priced model has no row (the price-table-absent
 degradation). Its **history ∪ live** read is proved against the same hermetic
 fake-history repo the trajectory extractor uses, which already carries the
@@ -1587,7 +1691,13 @@ truncation shape: that repo's live WORKFLOW-STATE was overwritten with the
 in-flight iteration's stamp, so the closed iteration's stamps survive only in
 committed history. One run asserts both arms — the history-only stamp prices
 (replacement would lose it) and the live-only stamp prices (a history-only read
-would lose the uncommitted tail). Two further stage-economics fixtures each get
+would lose the uncommitted tail). `kpi-stage-economics-lag` is driven as a `solo`
+member over that same repo with a second close stamped live: one closed iteration
+priced in a purpose-built log and one not reads `1 close(s) unpriced` with trend
+`econ 1`, pricing the newest reads `0 — newest close priced`, and each of the four
+degradations — no log, an empty stage roster (a throwaway knob file emptying
+`DRIFT_KIT_STAGES`), no terminal stamp, and a log naming no closed iteration — is
+asserted by its own `n/a` row. Two further stage-economics fixtures each get
 **their own sessions dir, state file, and log**, because the flat fixture set's
 log is asserted to hold exactly one line and a second row there would red that
 assertion rather than the behavior under test. (i) A *two-stamp* fixture — one

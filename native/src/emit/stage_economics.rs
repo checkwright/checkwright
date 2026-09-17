@@ -137,41 +137,6 @@ pub fn split_tokens(total: u64, counts: &[u64]) -> Vec<u64> {
     parts
 }
 
-// spec: drift-kit/SPEC.md §The stage-economics meter — the stamp grammar the committed-history arm
-// filters added lines by: `<iteration> <stage> <session8> <YYYY-MM-DD>` with exactly one space
-// between fields, which is what keeps a diff header and a comment line out of the union.
-pub fn history_stamp(added: &str) -> Option<&str> {
-    let line = added.strip_prefix('+')?;
-    let f: Vec<&str> = line.splitn(5, ' ').collect();
-    if f.len() < 4 {
-        return None;
-    }
-    let kebab = |s: &str, head: fn(u8) -> bool| {
-        !s.is_empty()
-            && head(s.as_bytes()[0])
-            && s.bytes()
-                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
-    };
-    if !kebab(f[0], |b| b.is_ascii_lowercase() || b.is_ascii_digit())
-        || !kebab(f[1], |b| b.is_ascii_lowercase())
-        || f[2].is_empty()
-        || !f[2].bytes().all(|b| b.is_ascii_alphanumeric())
-    {
-        return None;
-    }
-    let d = f[3].as_bytes();
-    if d.len() < 10 || d[4] != b'-' || d[7] != b'-' {
-        return None;
-    }
-    if ![0, 1, 2, 3, 5, 6, 8, 9]
-        .iter()
-        .all(|i| d[*i].is_ascii_digit())
-    {
-        return None;
-    }
-    Some(line)
-}
-
 // spec: drift-kit/SPEC.md §The stage-economics meter — the price table is consumer config (the
 // provenance seam). Blank rows, `#` comments and the `model` header are skipped; a model with no
 // row degrades that cell rather than failing, so an absent table degrades and never errors.
@@ -222,6 +187,59 @@ struct Anchor {
     who: String,
 }
 
+// spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: a row's `date` is the latest stamp date of the stage it
+// prices, never the day of the run: ISO dates order as strings, so the latest is the greatest.
+#[derive(Default)]
+pub struct StampDates {
+    stage: HashMap<(String, String), String>,
+    iteration: HashMap<String, String>,
+}
+
+impl StampDates {
+    pub fn note(&mut self, iter: &str, stage: &str, date: &str) {
+        if !super::kpi::is_iso_day(date) {
+            return;
+        }
+        let later = |slot: &mut String| {
+            if date > slot.as_str() {
+                *slot = date.to_string();
+            }
+        };
+        later(
+            self.stage
+                .entry((iter.to_string(), stage.to_string()))
+                .or_default(),
+        );
+        later(self.iteration.entry(iter.to_string()).or_default());
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — a fan-out row dates by its anchor with the
+    // suffix removed, and a supervision anchor (a lead stamps nothing) by its whole iteration's latest.
+    pub fn row(&self, iter: &str, stage: &str, supervision: &str, suffix: &str) -> Option<&str> {
+        let base = match stage.strip_suffix(suffix) {
+            Some(b) if !suffix.is_empty() => b,
+            _ => stage,
+        };
+        if base == supervision {
+            return self.iteration.get(iter).map(String::as_str);
+        }
+        self.stage
+            .get(&(iter.to_string(), base.to_string()))
+            .map(String::as_str)
+    }
+}
+
+// spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: every line the run writes back is re-dated, not only the
+// re-measured ones, so a row whose transcript aged out heals too; `None` is a line no stamp dates.
+fn redated(line: &str, dates: &StampDates, supervision: &str, suffix: &str) -> Option<String> {
+    let (_, rest) = line.split_once(' ')?;
+    let mut f = rest.splitn(3, ' ');
+    let (iter, stage) = (f.next()?, f.next()?);
+    f.next()?;
+    let date = dates.row(iter, stage, supervision, suffix)?;
+    Some(format!("{} {}", date, rest))
+}
+
 struct Run {
     today: String,
     log: String,
@@ -233,6 +251,7 @@ struct Run {
     rows: usize,
     incomplete: bool,
     kept: Vec<String>,
+    dates: StampDates,
 }
 
 impl Run {
@@ -260,11 +279,24 @@ impl Run {
             iter, stage, who, model, t.input, t.output, t.cache_read, t.cache_write, cost
         ));
         let marker = format!("{} {} {} in=", iter, stage, model);
-        self.kept.retain(|l| !logged_under(l, &marker));
-        self.kept.push(format!(
+        let line = format!(
             "{} {} {} {} in={} out={} cr={} cw={} cost={}",
             self.today, iter, stage, model, t.input, t.output, t.cache_read, t.cache_write, cost
-        ));
+        );
+        // spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: replace in place: the key's first line is
+        // rewritten where it stands and a later duplicate dropped, so an unchanged re-run is
+        // byte-identical; only a key new to the log appends.
+        match self.kept.iter().position(|l| logged_under(l, &marker)) {
+            Some(at) => {
+                self.kept[at] = line;
+                let mut n = 0usize;
+                self.kept.retain(|l| {
+                    n += 1;
+                    n <= at + 1 || !logged_under(l, &marker)
+                });
+            }
+            None => self.kept.push(line),
+        }
         self.rows += 1;
     }
 
@@ -285,24 +317,6 @@ fn logged_under(line: &str, marker: &str) -> bool {
 
 fn knob(name: &str) -> Result<String, String> {
     crate::walk::knob_scalar(name)
-}
-
-// spec: drift-kit/SPEC.md §The stage-economics meter — history ∪ live, so the boundary truncation
-// of the live file destroys no economics and a stamped-but-uncommitted stage stays visible; the
-// 0-exit *nothing to read* notice fires only when **both** sources yield no stamps.
-fn collect_stamps(state_file: &str) -> Vec<String> {
-    let top = crate::walk::toplevel()
-        .or_else(|_| crate::walk::cwd())
-        .unwrap_or_else(|_| ".".to_string());
-    let git = crate::history::Git { top };
-    let mut out: Vec<String> = crate::history::added_lines(&git, state_file)
-        .into_iter()
-        .filter_map(|(_, l)| history_stamp(&l).map(str::to_string))
-        .collect();
-    if let Ok(b) = std::fs::read(state_file) {
-        out.extend(String::from_utf8_lossy(&b).lines().map(str::to_string));
-    }
-    out
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
@@ -340,6 +354,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         rows: 0,
         incomplete: false,
         kept: Vec::new(),
+        dates: StampDates::default(),
     };
     if let Ok(b) = std::fs::read(&r.log) {
         r.kept = String::from_utf8_lossy(&b)
@@ -369,12 +384,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let mut sessions: Ordered<(String, String)> = Ordered::default();
     let mut yielded: HashMap<String, String> = HashMap::new();
     let (mut label_collision, mut suffix_collision, mut stamps) = (false, false, 0usize);
-    for line in collect_stamps(&state_file) {
+    for line in crate::history::stamp_lines(&state_file) {
         let f: Vec<&str> = line.split_whitespace().collect();
         if f.is_empty() || f[0].starts_with('#') || f[0] == "---" || f.len() < 3 {
             continue;
         }
         let (iter, stage, session8) = (f[0], f[1], f[2]);
+        if let Some(date) = f.get(3) {
+            r.dates.note(iter, stage, date);
+        }
         if !stamp_seen.insert(format!("{}/{}/{}", iter, stage, session8)) {
             continue;
         }
@@ -572,6 +590,22 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         ));
     }
     let (log, rows) = (r.log.clone(), r.rows);
+    if rows > 0 {
+        let mut undated = 0usize;
+        let (supervision, suffix) = (r.supervision.clone(), r.fanout_suffix.clone());
+        for l in r.kept.iter_mut().filter(|l| !l.is_empty()) {
+            match redated(l, &r.dates, &supervision, &suffix) {
+                Some(d) => *l = d,
+                None => undated += 1,
+            }
+        }
+        if undated > 0 {
+            r.say(&format!(
+                "  {} row(s) dated by measurement — no dated stamp names their (iteration, stage)",
+                undated
+            ));
+        }
+    }
     r.say(&format!("  logged: {} ({} row(s))", log, rows));
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — the log is touched only where a row was
@@ -921,24 +955,6 @@ mod tests {
         assert_eq!(split_tokens(5, &[0, 0]), vec![5], "a zero split cannot divide");
     }
 
-    // spec: drift-kit/SPEC.md §The stage-economics meter — the stamp grammar the history arm
-    // filters by: exactly one space between fields, a kebab iteration, a lowercase-led stage, an
-    // alphanumeric session8 and an ISO date, which is what keeps a diff header out of the union.
-    #[test]
-    fn the_history_grammar_admits_a_stamp_and_refuses_a_header() {
-        assert_eq!(
-            history_stamp("+alpha build s2 2025-01-01 abc123"),
-            Some("alpha build s2 2025-01-01 abc123")
-        );
-        assert_eq!(history_stamp("+++ b/.workflow/WORKFLOW-STATE.txt"), None);
-        assert_eq!(history_stamp("+# a comment line"), None);
-        assert_eq!(history_stamp("+---"), None);
-        assert_eq!(history_stamp("+alpha  build s2 2025-01-01"), None, "two spaces");
-        assert_eq!(history_stamp("+Alpha build s2 2025-01-01"), None, "uppercase iteration");
-        assert_eq!(history_stamp("+alpha build s2 2025-1-1"), None, "short date");
-        assert_eq!(history_stamp("alpha build s2 2025-01-01"), None, "no + prefix");
-    }
-
     // spec: drift-kit/SPEC.md §The stage-economics meter — the log's replace-on-append matches the
     // dedup triple at the logged line's field boundaries, so a key that is a space-joined substring
     // of another's line leaves that line standing.
@@ -1001,6 +1017,72 @@ mod tests {
         );
         assert_eq!(who, "s1", "the first session's id survives for a one-session key");
         assert_eq!(count, 2, "the contributing session count is what degrades the column");
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: a stage row takes its own stage's latest stamp date, a
+    // fan-out row its anchor's, a supervision row (and its fan-out) its iteration's latest; a
+    // non-ISO date contributes nothing and an unstamped key keeps the date it has
+    #[test]
+    fn a_row_is_dated_by_the_latest_stamp_of_what_it_prices() {
+        let mut d = StampDates::default();
+        d.note("it", "build", "2026-01-02");
+        d.note("it", "build", "2026-01-05");
+        d.note("it", "build", "2026-01-03");
+        d.note("it", "close", "2026-01-09");
+        d.note("it", "scope", "none");
+        let row = |stage: &str| d.row("it", stage, "supervision", "+fanout");
+        assert_eq!(row("build"), Some("2026-01-05"), "latest, not first");
+        assert_eq!(row("build+fanout"), Some("2026-01-05"));
+        assert_eq!(row("supervision"), Some("2026-01-09"));
+        assert_eq!(row("supervision+fanout"), Some("2026-01-09"));
+        assert_eq!(row("scope"), None, "a non-ISO date field dates nothing");
+        let line = "2099-12-31 it build m in=1 out=2 cr=3 cw=4 cost=0.1";
+        assert_eq!(
+            redated(line, &d, "supervision", "+fanout").as_deref(),
+            Some("2026-01-05 it build m in=1 out=2 cr=3 cw=4 cost=0.1")
+        );
+        assert_eq!(redated("2099-12-31 other build m in=1", &d, "supervision", "+fanout"), None);
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: a re-measured key is rewritten where it stands and a
+    // legacy duplicate dropped, so the log's order survives a re-run; a new key appends
+    #[test]
+    fn a_re_measured_row_is_replaced_in_place_and_its_duplicates_dropped() {
+        let mut r = Run {
+            today: "2026-01-01".to_string(),
+            log: String::new(),
+            supervision: "supervision".to_string(),
+            fanout_suffix: "+fanout".to_string(),
+            prices: Prices::default(),
+            inputs: crate::sessions::Inputs {
+                session_id: String::new(),
+                harness_id: String::new(),
+                child: String::new(),
+                sessions_dir: String::new(),
+                config_home: String::new(),
+                home: String::new(),
+                here: String::new(),
+            },
+            out: String::new(),
+            rows: 0,
+            incomplete: false,
+            kept: vec![
+                "2025-01-01 a build m in=9".to_string(),
+                "2025-01-01 b build m in=9".to_string(),
+                "2025-01-01 a build m in=8".to_string(),
+                "2025-01-01 c build m in=9".to_string(),
+            ],
+            dates: StampDates::default(),
+        };
+        let t = Tokens {
+            input: 1,
+            ..Tokens::default()
+        };
+        r.emit_row("a", "build", "s", "m", t);
+        r.emit_row("d", "build", "s", "m", t);
+        let keys: Vec<&str> = r.kept.iter().map(|l| &l[11..17]).collect();
+        assert_eq!(keys, vec!["a buil", "b buil", "c buil", "d buil"]);
+        assert!(r.kept[0].contains(" in=1 "), "the first line is the one rewritten");
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — the table's skipped rows, and the

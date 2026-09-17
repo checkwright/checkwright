@@ -56,6 +56,61 @@ pub fn added_from_log(log: &str) -> Vec<(String, String)> {
     out
 }
 
+// spec: drift-kit/SPEC.md §The stage-economics meter — the stamp grammar the committed-history arm
+// filters added lines by: `<iteration> <stage> <session8> <YYYY-MM-DD>` with exactly one space
+// between fields, which is what keeps a diff header and a comment line out of the union.
+pub fn history_stamp(added: &str) -> Option<&str> {
+    let line = added.strip_prefix('+')?;
+    let f: Vec<&str> = line.splitn(5, ' ').collect();
+    if f.len() < 4 {
+        return None;
+    }
+    let kebab = |s: &str, head: fn(u8) -> bool| {
+        !s.is_empty()
+            && head(s.as_bytes()[0])
+            && s.bytes()
+                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+    };
+    if !kebab(f[0], |b| b.is_ascii_lowercase() || b.is_ascii_digit())
+        || !kebab(f[1], |b| b.is_ascii_lowercase())
+        || f[2].is_empty()
+        || !f[2].bytes().all(|b| b.is_ascii_alphanumeric())
+    {
+        return None;
+    }
+    let d = f[3].as_bytes();
+    if d.len() < 10 || d[4] != b'-' || d[7] != b'-' {
+        return None;
+    }
+    if ![0, 1, 2, 3, 5, 6, 8, 9]
+        .iter()
+        .all(|i| d[*i].is_ascii_digit())
+    {
+        return None;
+    }
+    Some(line)
+}
+
+// spec: drift-kit/SPEC.md §The stage-economics meter — history ∪ live, so the boundary truncation
+// of the live file destroys no economics and a stamped-but-uncommitted stage stays visible; the
+// 0-exit *nothing to read* notice fires only when **both** sources yield no stamps.
+// spec: drift-kit/SPEC.md §Bundled KPIs — kpi-stage-economics-lag reads this same union in this same
+// order (history in commit order, then the live file), so the meter and the KPI share one producer.
+pub fn stamp_lines(state_file: &str) -> Vec<String> {
+    let top = crate::walk::toplevel()
+        .or_else(|_| crate::walk::cwd())
+        .unwrap_or_else(|_| ".".to_string());
+    let git = Git { top };
+    let mut out: Vec<String> = added_lines(&git, state_file)
+        .into_iter()
+        .filter_map(|(_, l)| history_stamp(&l).map(str::to_string))
+        .collect();
+    if let Ok(b) = std::fs::read(state_file) {
+        out.extend(String::from_utf8_lossy(&b).lines().map(str::to_string));
+    }
+    out
+}
+
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — one `git cat-file --batch` child driven
 // request by request, so a walk that stops at an entry's filing commit never buys the blobs of the
 // commits older than it
@@ -91,7 +146,7 @@ impl Blobs {
 
 #[cfg(test)]
 mod tests {
-    use super::added_from_log;
+    use super::{added_from_log, history_stamp};
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — the shared shape's own assertion, the
     // one both readers depend on: the `+++ b/…` header never enters the added-line stream, and a
@@ -109,5 +164,23 @@ mod tests {
                 ("bbb".to_string(), "+second line".to_string()),
             ]
         );
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — the stamp grammar the history arm
+    // filters by: exactly one space between fields, a kebab iteration, a lowercase-led stage, an
+    // alphanumeric session8 and an ISO date, which is what keeps a diff header out of the union.
+    #[test]
+    fn the_history_grammar_admits_a_stamp_and_refuses_a_header() {
+        assert_eq!(
+            history_stamp("+alpha build s2 2025-01-01 abc123"),
+            Some("alpha build s2 2025-01-01 abc123")
+        );
+        assert_eq!(history_stamp("+++ b/.workflow/WORKFLOW-STATE.txt"), None);
+        assert_eq!(history_stamp("+# a comment line"), None);
+        assert_eq!(history_stamp("+---"), None);
+        assert_eq!(history_stamp("+alpha  build s2 2025-01-01"), None, "two spaces");
+        assert_eq!(history_stamp("+Alpha build s2 2025-01-01"), None, "uppercase iteration");
+        assert_eq!(history_stamp("+alpha build s2 2025-1-1"), None, "short date");
+        assert_eq!(history_stamp("alpha build s2 2025-01-01"), None, "no + prefix");
     }
 }

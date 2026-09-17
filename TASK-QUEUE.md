@@ -12,28 +12,6 @@
 
 ## New Features
 
-- **stage-economics-log-redates-rows** [spec: SPEC-stage-economics-feed.md] — re-running the
-  stage-economics meter re-dates every row it re-derives to the run's date, so the log's date
-  column orders the lead binding's `cr` trend by run rather than by stage. Measured at scope:
-  1,695 rows, 868 dated by one run. **Designed with the feeding unit as one pass** (feeding at
-  every close is the act that re-dates): a row's date becomes its stage's latest stamp date,
-  re-derived for every logged line so the first run heals the whole log, and a re-measured row is
-  replaced in place so a re-run is byte-identical (amendment deltas 1, 2, 5).
-  recurrence: stage-economics-log-redates-rows 2026-09-16
-  Selected 2026-09-17 with `stage-economics-meter-has-no-feeding-obligation` as one unit set
-  (operator direction, 2026-09-17, lead-relayed).
-
-- **stage-economics-meter-has-no-feeding-obligation** [spec: SPEC-stage-economics-feed.md] — the
-  lead binding's tier revert signal reads the stage-economics log, and nothing obliges a session
-  to feed it; at spec it was three closes behind while the overhead log, fed by the close
-  binding, was current. **Candidate (a) taken with (b) as an advisory KPI rather than a gate**: the
-  close binding runs the meter, and `kpi-stage-economics-lag` counts closes since the newest
-  priced close into the session-start trend line. A freshness gate is refused on the meter's
-  advisory contract (the log is absent in CI) and on-demand-only would cut the lead binding's one
-  signal (amendment deltas 3, 4, 5).
-  Selected 2026-09-17 with `stage-economics-log-redates-rows` as one unit set (operator direction,
-  2026-09-17, lead-relayed).
-
 ## Technical Debt
 
 ## Deferred
@@ -4383,5 +4361,8 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- stage-economics-log-redates-rows
+- stage-economics-meter-has-no-feeding-obligation
 
 ## Lessons Learned
