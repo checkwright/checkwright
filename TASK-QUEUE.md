@@ -3874,6 +3874,4 @@
 
 ## Done
 
-- install-smoke-slow-leg-residue
-
 ## Lessons Learned
