@@ -928,10 +928,9 @@ obligation it owns whose bound actor fires no trigger that loads it** — the
 load-trigger-residency and always-loaded-shape doctrine rules applied to kit
 shipping. The unit is the obligation, not the kit, and that is the rule rather
 than an allowance carved for a kit that outgrew it: a pair of such obligations
-merged onto one line states neither, and this tier is paid per obligation carried
-rather than per kit named. What the rule forbids is unchanged — a second line
-for a rule some trigger already loads, and a line spent on mechanism the owning
-SPEC holds.
+merged onto one line states neither. What the rule forbids is unchanged — a
+second line for a rule some trigger already loads, and a line spent on mechanism
+the owning SPEC holds.
 
 **A block-sized ask, and the property that sanctions one.** A resident ask may
 exceed a line when it is **generated and held in lockstep by a gate**: such a
