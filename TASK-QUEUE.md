@@ -3951,6 +3951,24 @@
   corrected from five to three at that iteration's close drain, by re-probing the static tables the
   filing asserted were empty.
 
+- **compound-splitter-background-separators** [design-pending] [cost: event/low] [surface: guard-kit] —
+  `guard_split_compound` and its compiled twin split on `;`, `&&`, `||` and `|` (plus a newline,
+  in the twin) but not on a lone `&` or `|&`, so a backgrounded compound `a & b` is one segment to
+  every per-segment guard rule and to the `scan-prompts` ranker's grant test.
+  **Measured at the close drain:** the shell class in `guard-kit/lib/guard.sh` is
+  `\|\||&&|;|\|`, and `native/src/guard.rs`'s `split_compound` tests only `||`, `&&`, `;`, `|` and
+  `\n`; `|&` splits at the `|` and leaves `&` heading the next segment.
+  **Carried as a claim, not probed:** that the harness's permission matcher treats `&` and `|&` as
+  separators rests on a read of the harness permissions page at spec, not on a `claude -p` probe.
+  **Why [design-pending]:** a lone `&` also occurs inside redirects (`&>`, `>&`, `2>&1`), so the
+  class needs a redirect-aware spelling held equal across both substrates by `--guard-lib-parity`,
+  and widening it re-segments every rule guard-kit/SPEC.md §The guard framework lists.
+  **Cost while deferred:** a rule can miss a segment that follows `&`, and the ranker can mis-read
+  a grant the harness would split. Unattested so far: the prompt-friction log at this close held
+  five lines carrying `&`, every one inside a quoted argument.
+  Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s spec; promoted at its close
+  drain.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no

@@ -180,3 +180,4 @@
 | seam-sweep-remainder | sc sp a b v c | 2f/1d | 1 · ≤0d | 20s clean | 115 |
 | stage-economics-feed | sc sp a b v c | 2f/0d | 1 · ≤0d | 20s clean | 115 |
 | scratch-wipe-and-drain-contracts | sc sp a b v c | 4f/1d | 1 · ≤0d | 20s clean | 115 |
+| interpreter-steer-census | sc sp a b v c | 2f/0d | 1 · ≤0d | 20s clean | 115 |

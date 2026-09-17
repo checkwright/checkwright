@@ -1,2 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The committed gap inbox — append-only mid-iteration gap capture, close-drained; one `- <YYYY-MM-DD> — <gap>` bullet per gap below (filed via run-gates.sh --emit file-gap).
-- 2026-09-17 — guard_split_compound and its compiled twin split on ; && || | but the harness permission docs list & and |& as separators too (and newlines), so a backgrounded compound 'a & b' is one segment to the ranker's grant test and to every per-segment rule while the harness matches two; found at interpreter-steer-census spec reading the harness permissions page
