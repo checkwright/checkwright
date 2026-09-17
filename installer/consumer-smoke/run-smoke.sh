@@ -584,7 +584,7 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
 # spec: installer/SPEC.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
 # spec: installer/SPEC.md §The gate binary — the battery expectation is no longer a parameter of this helper and the alternative it once carried is no longer a branch: selection has one success path, so an install that ran at all placed a verified artifact and a green battery is the only post-condition an install can earn. The refusals are asserted where they now occur — at the bootstrap, before any verb — by the artifact-less leg and the artifact arm
 assert_install() {   # $1 = profile, $2 = scratch consumer dir
-    local profile="$1" C="$2" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf n_omitted q_seam q_bin queue_src files_raw withheld reserved
+    local profile="$1" C="$2" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf n_omitted q_seam q_bin queue_src files_raw withheld reserved stdin_root
     local bi hi
     local -a bad_hash=() lock_kits=() want_kits=() resolved_kits=() hash_lines=() hash_one=() hash_single=() batch_paths=() batch_got=()
 
@@ -614,6 +614,11 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     # spec: installer/SPEC.md §The consumer smoke — the capture stays a command substitution and the line TERMINATOR is the read's to own, because this is the harness's only multi-line jq read and a terminator is host-dependent: a single-value control that comes back clean carries only the one terminator its own capture already consumes, so it discriminates nothing about the producer and reading it as a channel witness is what sent the previous repair at the channel
     files_raw="$(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")"
     if [[ -n "$files_raw" ]]; then
+        # spec: installer/SPEC.md §The consumer smoke — the batch's paths travel on stdin, which MSYS never translates the way it translates argv, so the scratch root is re-spelled for git by cygpath -m wherever cygpath exists; same directory, same working directory, one spelling
+        stdin_root="$C"
+        if command -v cygpath > /dev/null 2>&1; then
+            stdin_root="$(cygpath -m "$C")" || blocked "$profile: cygpath -m could not re-spell the scratch consumer root $C for the manifest hash batch"
+        fi
         # spec: installer/SPEC.md §The consumer smoke — the first pass: every step before the hash, in the loop's order; the existence check stays here because one missing path makes the batch fatal, and a path the batch cannot carry takes the one-file call so it keeps its slot in the pairing
         while IFS= read -r line; do
             checked=$((checked + 1))
@@ -626,7 +631,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
             if [[ "$path" == *"$CR"* || "$path" == *$'\n'* || "$path" == '"'* ]]; then
                 hash_one+=(1); hash_single+=("$(git hash-object -- "$C/$path")")
             else
-                hash_one+=(0); hash_single+=(""); batch_paths+=("$C/$path")
+                hash_one+=(0); hash_single+=(""); batch_paths+=("$stdin_root/$path")
             fi
         done <<< "$files_raw"
         # spec: installer/SPEC.md §The consumer smoke — the batch: one --stdin-paths child from the same working directory, with no fallback on failure; a non-zero exit or an answer count other than the path count refuses, since pairing by index is only sound on equal counts

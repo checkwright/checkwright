@@ -2088,7 +2088,9 @@ leg where every entry disagreed.
   `git hash-object --stdin-paths` child answered for `$C/P`, paired with P by
   its position among the entries the loop hashed and carried out of the loop on
   the failure branch. It is the comparison's other operand, not a description of
-  one. It is spelled out because applying `want`'s correction to one operand of
+  one. Where `cygpath` exists the batch receives `$C` as `cygpath -m` spells it,
+  because MSYS translates a path in argv but never one on stdin, and native Windows
+  git cannot open the untranslated `/d/...` form. It is spelled out because applying `want`'s correction to one operand of
   two is exactly how the remaining asymmetry stayed invisible.
 - **`reread`** — a re-read. `git hash-object -- "$C/P"`, the one-file call, run
   at report time from the same working directory as the batch. This is the value the label `got`
