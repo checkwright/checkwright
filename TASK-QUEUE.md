@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: enum-and-citation-parity
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -2711,6 +2711,7 @@
   first two instances; filed rather than fixed because the enum-set survey is the
   work. Evicted to the icebox on a low, non-rotting cost; returned to Deferred
   2026-08-25 on a judged recurrence, the tag algebra's own icebox exit.
+  **Leads `enum-and-citation-parity` — operator direction, 2026-09-17, lead-relayed.**
 
 - **icebox-eviction-line-budget-squeeze** [design-pending] [cost: event/low] [surface: queue-kit] — the icebox tier's one-line grammar
   and `check-queue-wrap`'s column cap are jointly unsatisfiable above a slug length nothing
@@ -2884,11 +2885,10 @@
   **MACHINERY-class HOLDS by the 2026-08-30 discriminator** — the family's only demand witness is
   this repo's delivery process — **but the class bar is ANSWERED, the operator having carved this
   entry out 2026-09-08**, so COST alone blocks and a costed look owes the honestly-low fields first.
-  **NOT THIS WINDOW, TWICE, AND THE CARVE-OUT'S REACH IS SETTLED — `lead, own-authority` 2026-09-08,
-  then operator 2026-09-09 (AskUserQuestion in a lead session, lead-relayed): the carve-out buys
-  ADMISSIBILITY, never admission.** The three joining grounds apply unchanged and this family waits
-  for a cut sharing its surface; 2026-09-09's, the behind-invoke relocation, shares none of the four
-  points above. Answered, so no boundary carries the reach forward as open.
+  **ADMITTED — operator direction, 2026-09-17 (AskUserQuestion in a lead session, lead-relayed),
+  superseding 2026-09-09's "admissibility, never admission":** (A)+(B) join
+  `enum-and-citation-parity` beside `readme-roster-enum-coverage`, admitted by the operator rather
+  than as a joiner sharing one of the four touch points, which that set does not.
   **Inbound, summed 2026-09-08, falsifying the zero-inbound ground this entry once carried:** **37
   inbound over seventeen live members** against the hub's 1, four times the largest single entry.
   **THE HEALTH TRIAD'S QUEUE LIMB HAS MOVED** — 139 Deferred + 253 Icebox at scope 2026-09-16,
@@ -3505,6 +3505,8 @@
   **Cost while deferred:** an occasional false red on unrelated prose, each remedied by an
   exemption comment that dilutes the exemption set.
   Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the set-grammar ground.
+  **Joins `enum-and-citation-parity` on check-prose-enum's set grammar — operator direction,
+  2026-09-17, lead-relayed.**
 - **install-smoke-slow-leg-residue** [design-pending] [cost: iteration/high] [surface: installer]
   — the native Windows install smoke, still the slowest leg, sets every close watch.
   **Measured at close off the first run carrying the roster hash batch:** install-smoke-windows took
