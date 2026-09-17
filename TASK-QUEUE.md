@@ -126,28 +126,6 @@
   Filed 2026-09-12 at build to the gap inbox; promoted to Deferred by that iteration's close after
   →fix took only the history half.
 
-- **consumer-footprint-roster-omits-lifecycle-kit** — context-kit/SPEC.md §The consumer footprint
-  rosters each kit's resident ask under a one-pointer-line budget, lists delegation-kit,
-  doctrine-kit and drift-kit, and says every other kit asks none. lifecycle-kit asks more: its
-  generated registration block in the agent file (lifecycle-kit/SPEC.md
-  §check-lifecycle-registration) and the gap-capture and survey-capture bullets. Re-verified
-  2026-09-17 at this scope against the roster text.
-  **The coupling that put it in this unit, found while probing rather than assumed.** That roster
-  names DRIFT-KIT's resident ask as "the knowledge-friction capture bullet" — the very bullet whose
-  placement `kfric-obligation-residency` questions. One roster, one budget rule, and one placement
-  sanction (delegation-kit/SPEC.md §Operative residency) govern all four units of this iteration,
-  so whichever way the placement is ruled, this row is what has to state the result.
-  **The open half:** either the roster gains a lifecycle-kit row and the budget rule states its
-  exception, or the asks move behind a load trigger. The ruling made for the lead units decides it.
-  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed**, fourth
-  unit of `obligation-residency`, kept in the set against the risk that its resolution turns out
-  rule-shaped: splitting it guarantees a later session re-reads the same two SPEC sections. Should
-  build find the fix mints a name, that is an envelope question to escalate, not to absorb.
-  **Cost while deferred:** an adopter weighing adoption cost reads a footprint that understates one
-  kit's resident ask.
-  Filed 2026-09-13 by the clause-owner audit behind `resident-tier-restatement`'s Housekeeping cut;
-  drained at that iteration's close.
-
 ## Deferred
 
 - **allow-match-colon-star-over-grants** [cost: event/low] [surface: guard-kit] —
@@ -3571,5 +3549,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- consumer-footprint-roster-omits-lifecycle-kit
 
 ## Lessons Learned

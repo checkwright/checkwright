@@ -923,13 +923,46 @@ readers are a consumer evaluating adoption cost before vendoring and this
 repo's own close-stage brevity pass, which reads the roster when judging
 whether a new resident line is a kit ask or repo content.
 
-**The budget rule.** A kit's resident ask is at most one pointer line on the
-consumer's always-loaded surface — the load-trigger-residency and
-always-loaded-shape doctrine rules applied to kit shipping. The one sanctioned
-block-sized ask is doctrine-kit's digest, itself bounded by its one-line-per-rule
-shape (the always-loaded-shape rule); its name-lockstep with the doctrine is
-held separately (doctrine-kit/SPEC.md §check-doctrine-registration, assertion F), because a re-vendor upgrade
-stales the digest by construction.
+**The budget rule.** A kit's resident ask is at most one pointer line **per
+obligation it owns whose bound actor fires no trigger that loads it** — the
+load-trigger-residency and always-loaded-shape doctrine rules applied to kit
+shipping. The unit is the obligation, not the kit, and that is the rule rather
+than an allowance carved for a kit that outgrew it: a pair of such obligations
+merged onto one line states neither, and this tier is paid per obligation carried
+rather than per kit named. What the rule forbids is unchanged — a second line
+for a rule some trigger already loads, and a line spent on mechanism the owning
+SPEC holds.
+
+**A block-sized ask, and the property that sanctions one.** A resident ask may
+exceed a line when it is **generated and held in lockstep by a gate**: such a
+block costs the consumer no authoring and cannot drift out of step with the kit
+that emits it, so the authoring and drift costs the line budget exists to bound
+are both zero. Two asks qualify — doctrine-kit's digest, itself bounded by its
+one-line-per-rule shape (the always-loaded-shape rule) and held by
+doctrine-kit/SPEC.md §check-doctrine-registration, assertion F, because a
+re-vendor upgrade stales the digest by construction; and lifecycle-kit's
+registration block, held by lifecycle-kit/SPEC.md §check-lifecycle-registration.
+A hand-written block qualifies under neither, and is the case the line budget is
+for.
+
+**Resident once, never once per template.** An obligation whose bound actor is
+*any session* is carried here and is **not** also restated in the kit templates
+those sessions load. delegation-kit/SPEC.md §Operative residency licenses a
+restatement where no bound actor's trigger reaches the owning doc; it licenses
+**one**, and a per-template copy multiplies the drift surface by the template
+count while reaching no reader this tier already reaches — there being no
+kit-side surface every session shape loads, since each stage skill is its own
+binding shim and a lead loads no stage template at all. drift-kit/SPEC.md §The
+knowledge-friction loop ruled this same call for its own channel, refusing a
+per-stage capture prompt because a standing session-start instruction converts
+one re-derivation into a permanent per-session tax; that ground is about the
+multiplication rather than about that channel, so it binds every obligation this
+roster carries. **The corollary is what a template may still say.** A template
+states such an obligation where its reader's *discharge differs* from the
+resident line's — instruction that surface authors for itself, which takes no
+sanction and is no restatement. What it must never do is carry the obligation's
+channel or disposal-time half alone: to a reader who meets no other statement of
+it, the deferred half reads as the discharge.
 
 **The roster, by citation.** Each kit's resident ask is named by citing the kit
 SPEC section that owns it, never by restating it here — so the roster cannot
@@ -942,8 +975,16 @@ ask adds its row below, which is the review seam:
 - **drift-kit** — the knowledge-friction capture bullet:
   drift-kit/SPEC.md §The knowledge-friction loop, which already states the
   one-bullet cost and its earn-back condition.
+- **lifecycle-kit** — the generated registration block
+  (lifecycle-kit/SPEC.md §check-lifecycle-registration), plus one capture line
+  per channel whose bound actor is any session and whose owning section no such
+  session's trigger loads: the gap inbox (§The committed gap inbox) and the
+  survey record (§The survey record).
 - **every other kit** — none: their hooks, skills, gates, and SPECs are load-
-  or event-triggered, so they cost nothing until opened.
+  or event-triggered, so they cost nothing until opened. The discriminator this
+  row turns on, and the one the brevity pass reads: a resident line that
+  *emphasizes* an already-enforced mechanism is the consumer's own content, not
+  a kit ask — only an obligation with no other carrier is.
 
 **The floor-holder ruling.** The meter plus its committed baseline
 (§The always-loaded meter) ship as the consumer's floor-holder: the consumer

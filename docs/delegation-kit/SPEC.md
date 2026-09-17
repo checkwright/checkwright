@@ -864,7 +864,11 @@ which is the whole point.
 keyed on (a): a rule that the bound actor's own skill or template already loads
 fails (a) and stays a pointer. Without that clause this reads as "duplicate when
 it feels important", which is the failure content-tiering exists to prevent and
-would cost more than the gap it closes.
+would cost more than the gap it closes. **(a) licenses one restatement and not
+one per reader**, so where the bound actor is *any session* the carrier is the
+consumer's always-loaded tier and the templates those sessions load carry
+nothing; context-kit/SPEC.md §The consumer footprint rules that case and states
+the one thing a template may still say.
 
 **A worked case the clause decided, recorded because it decided *against*
 residency.** The provenance floor (§Resume journal) binds a session that **has
