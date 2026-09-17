@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+interpreter-steer-census gates sha256=6bba2d116c2352e02dca92dca2985641ee647a332a72ceac487bdddb2afe0d2d pass=115 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census guard_kit sha256=7418de9de4572487cd88ef9d9415f87790a067e3d5dc68278afb7dfb8c61e109 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census lifecycle_kit sha256=1c39766343c6e46e13c6da2d3026398f0654a7cc53985ef01cf0e71653f68431 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census queue_kit sha256=2334582dd365a18ebe2f1daf9532d2acc25728fa9e04376e62f24f0c8a5a1788 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census guard_tests sha256=057f5776b4c12049c30617b8a02485839a19907c0dc0506e55b724b5b0fac9f4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census demo sha256=2ce62b9d53f2ff673294b8ee514d13c9df4fe0a2e2add0b58c98eb543faf0b6d pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census installer_smoke sha256=c8610fe181ab04f2cfa014d3429b89b6b73a27a44d9a340090433b966bb98bc5 pass=13 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census consumer_smoke sha256=dd75fbe6efd697c837793021f28cb4e9e41d69092c489739056cbfc77724901c pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census upgrade sha256=c8ea54e7c65c9abb88f57b822549188d37bd75a86bfe8d75e83dcdf6a29a6484 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census agents_md_smoke sha256=f3877a0fa4b11af6af8ca568d5a07bc0e7178c2c16fd183370015a5c55e2ccfe pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+interpreter-steer-census native_crate sha256=011c88f4a0a9480ead317199ba2c43dd5e82a335edfc8b184fac0264fd08ab38 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
