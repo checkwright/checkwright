@@ -12,10 +12,10 @@ enum-and-citation-parity queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f75
 enum-and-citation-parity site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
 enum-and-citation-parity scripts sha256=eafcb344069e9a73454b5dfe84d941ecef0ca83c2279aec9e20d7ea63b639dd0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
 enum-and-citation-parity guard_tests sha256=057f5776b4c12049c30617b8a02485839a19907c0dc0506e55b724b5b0fac9f4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
-enum-and-citation-parity demo sha256=4d3532e595d0d0a6d482eef08b78e3d11f83017070ba5ad6971cb75aad2f0630 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
-enum-and-citation-parity installer_smoke sha256=7a24e18412db7e7a491cba04b0b1bda354c591b6f12334bd04501af9658d7ff9 pass=13 fail=0 ignore=0 verdict=clean 2026-09-17
-enum-and-citation-parity consumer_smoke sha256=8369d1a72543b998ddfaec479cb5d13b671c274705929b3e2f7f8628ad847b0f pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
-enum-and-citation-parity upgrade sha256=47605b1d5551c3862a143492bf28f7d8667484e5b3c6d81f4b0483d192cc414d pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
-enum-and-citation-parity agents_md_smoke sha256=1fd9d4b2a368e81d813e76e6161477223e222e5ad5864f4bd03c5fdea2c61748 pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-17
+enum-and-citation-parity demo sha256=3d44bebcd0decc18715f647227de5de1d8e3700ff77187bcf32f32b07a54d707 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+enum-and-citation-parity installer_smoke sha256=2fbd8d906fca1bf2f7fc77043d063cde2049c496aa6d92aca66ce5ce443287a9 pass=13 fail=0 ignore=0 verdict=clean 2026-09-17
+enum-and-citation-parity consumer_smoke sha256=84d777e3db8a39eabc71e56786d3d4b0ba0f5a89ed9ea659a13214df3cbe50b3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+enum-and-citation-parity upgrade sha256=bb97dfadda12b6bcf4101f6a00ac5a2da56d8d6f2d0a336dba40fb1f31a09991 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+enum-and-citation-parity agents_md_smoke sha256=c4d012eeae48f8d9fd9f2b7e8a202a9743f710d348bca26ffe6606ea6fecb104 pass=0 fail=1 ignore=0 verdict=clean 2026-09-17
 enum-and-citation-parity index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
-enum-and-citation-parity native_crate sha256=491570f4d87b5499f246e49efc55c4489dda9ebce1556f1c0c5346ba6ac1120e pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
+enum-and-citation-parity native_crate sha256=d8e8ce8957d7113411e034aeeee0cb1befb39c8e0b19b71f1f052dca6c8b8218 pass=1 fail=0 ignore=0 verdict=clean 2026-09-17
