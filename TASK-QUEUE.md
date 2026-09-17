@@ -3599,6 +3599,22 @@
   `baseline-move-stales-evidence-line`, all three governing how validate holds a red; judged not
   combinable with `install-smoke-slow-leg` at its 2026-09-17 scope.
 
+- **smoke-leg-crate-build-uncached** [design-pending] [cost: iteration/low] [surface: .github] — the
+  platform install-smoke legs rebuild the gate crate from cold on every push.
+  **Measured at the drain, correcting the filed premise.** In gates run 35214069775 the
+  `probe the crate build` step took 90s on `install-smoke-macos-intel` and 82s on
+  `install-smoke-windows`, but 38s on `install-smoke-macos` and 32s on
+  `install-smoke-linux-arm64`, and the baseline `install-smoke` leg has no such step; the filed
+  "each leg 81-90s" held for two legs of five.
+  **Removing the step buys nothing:** `installer/consumer-smoke/run-smoke.sh` builds with
+  `build-native.sh` itself, so the probe only moves the build ahead of the suite, for the
+  diagnosis reason its workflow comment states. The saving needs a build cache that outlives a
+  run, which is the design question: a cache action, and what a restored target directory may
+  mask on legs that exist to catch a host's cold-build failure.
+  **Cost while deferred:** about 90s of wall-clock on the two slowest legs per watched push.
+  Filed 2026-09-17 to the gap inbox by `install-smoke-slow-leg`'s lead at spec; promoted at its
+  close.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no

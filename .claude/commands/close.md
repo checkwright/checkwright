@@ -69,9 +69,9 @@ queue-kit/SPEC.md §The tag algebra.
   - **Trajectory projection** — after the template's Clear-Done step lands the
     `close` stamp in history, regenerate the projection (`bash
     gate-sdk/bin/run-gates.sh --emit trajectory > docs/evidence-data.md`) and commit it
-    with the Done clear; the gate is blind at the enter-close commit by
-    construction, and the widened `trigger=` fires it on this commit
-    (drift-kit/SPEC.md §The published-evidence extractor).
+    with the Done clear; the gate is blind at the enter-close commit by construction
+    and the remote is not, so no push lands between (drift-kit/SPEC.md §The
+    published-evidence extractor).
 
 **release-policy** — the procedure is RELEASING.md's reordered per-iteration
 close-stage steps; the bump criteria and the note grammar are docs/install.md
