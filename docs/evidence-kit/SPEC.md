@@ -763,9 +763,9 @@ liveness, coverage and flip branches beyond the one good/bad pair are covered by
 **A filed task that matches a red is not what caused it.** A regression this
 iteration introduced can match a red someone filed earlier, and a hold keyed on
 the match commits the regression as expected. So a hold on a row that passed at
-the iteration start (the first state-file stamp's head, read through
-`stages::iteration_start`) must say where the red reproduces, and that commit must
-be outside the iteration. The gate checks the commit's position and **not** the
+the iteration start (the first state-file stamp's head, lifecycle-kit/SPEC.md
+§The state machine) must say where the red reproduces, and that commit must be
+outside the iteration. The gate checks the commit's position and **not** the
 reproduction, so a false commit still passes. What the rule buys is that holding a
 regression takes a claim the diff shows, rather than a match nobody wrote down.
 
