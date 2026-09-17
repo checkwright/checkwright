@@ -357,6 +357,15 @@ nothing the tracked surfaces do not already hold. The lead is a boundary skill,
 not a stage — it stamps nothing and joins no stage set, so the coverage gate
 never reads it (the release-sweep precedent, §templates/lead.md).
 
+**A lead stamp is ruled out rather than merely omitted, and the enforcement
+reading is what makes that difference.** It breaks the invariant above by
+construction, and under `LIFECYCLE_KIT_SESSION_BOUNDARY`'s `stage` posture it
+also trips the gate: a live lead holds one session id across every stage it
+touches, so a lead-written stamp is precisely the cross-stage duplicate
+§check-stage-evidence reads as a self-reported skip. The rule and the check
+therefore agree rather than merely coexist, which is why the template states the
+ban and not this reasoning.
+
 **Honest limit on the lead's dispatch precondition.** A lead dispatches stage
 N+1 on stage N's **agent completion notification**, never on an artifact — not
 its commit, its stamp, a clean tree, a green battery, or a cleared `--simulate`
@@ -373,7 +382,18 @@ dispatched session that ends its turn on still-running work emits a notification
 that lies, which is what delegation-kit/SPEC.md §Operative residency exists to
 prevent. The limit is recorded here rather than left to be inferred from the
 absence of a gate, because an unstated version reads as an oversight for a later
-session to fix by building the impossible gate. Naming it is also what routes the
+session to fix by building the impossible gate.
+
+**One misreading of that precondition is named in the template, and it is
+kit-tier for the same reason this limit is.** An approval prompt gates a command
+*starting*, so an operator's note about having just answered one timestamps a
+beginning and never a completion. The misreading is available to any lead on any
+harness that prompts — generality — and it arrives reading as good news at
+exactly the moment a lead wants good news — salience. Those two together are what
+make it a shipped rule rather than one tree's incident lore, which is the test any
+candidate trap has to pass before the template carries it.
+
+Naming the limit is also what routes the
 enforcement duty to where it *can* be discharged: the **negative is** assertable
 from the artifact side. A producer-liveness gate wired into
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT` (evidence-kit/SPEC.md §check-producer-liveness)
@@ -5212,7 +5232,10 @@ judgment tier, because a resume cannot change a session's model) and
 the lead-owns-batching clause (an intra-stage batch split is N sibling stage
 sessions the lead dispatches and verifies — each a same-stage re-entry,
 §The state machine — and a stage session never dispatches a sibling stage
-session), and
+session, which is a ban rather than a preference because a stage that
+sub-dispatches its own batches nests a second supervisor at the lead's tier,
+hidden from the lead's budget and context accounting: the redundancy the split
+posture exists to remove, reintroduced where nothing is watching for it), and
 the stamps-authoritative invariant carried from §The state machine as the
 design's load-bearing rule — a batch directed not to stamp spends the
 per-session audit trail unrepairably, backdating falsifying the trail rather than

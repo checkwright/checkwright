@@ -94,10 +94,8 @@ while leaving the marker plainly visible.
 
 **Any prompt-answered signal is a start signal, never a completion one.** An
 approval prompt gates a command **starting**, so an operator's note about having
-just answered one timestamps a beginning. Stated here
-rather than left as incident lore, because the misreading is available to any
-lead on any harness that prompts, and it reads as good news at exactly the moment
-the lead wants good news.
+just answered one timestamps a beginning
+(lifecycle-kit/SPEC.md §The state machine).
 
 The lead never hand-derives prior-stage completeness — reading WORKFLOW-STATE
 or the git log to decide whether a dispatch may proceed re-derives what the
@@ -256,8 +254,12 @@ as a decision taken.
 
 **Dispose of your journal before you report.** Every finding in it that must
 outlive the iteration goes to the committed channel that owns it — a gap bullet,
-a survey block, a knowledge-friction line — and a ruling goes to its governed
-surface; then append `DISPOSED` as the file's last line. The journal survives the
+a survey block — and a ruling goes to its governed
+surface; then append `DISPOSED` as the file's last line.
+**The knowledge-friction log is not on that list, and the omission is the
+instruction.** A fact you re-derived is stamped when you re-derive it; a line
+written here instead is the deferred capture that channel counts as none
+(drift-kit/SPEC.md §The knowledge-friction loop). The journal survives the
 boundary reset (§Economics), so this is what separates *preserved* from *drained*:
 an unread journal loses a finding exactly as a deleted one does, and the boundary
 entry announces an undisposed journal to the entering session rather than
@@ -426,10 +428,8 @@ ruling classes are stated.>*
 
 The lead writes **no** lifecycle state — no WORKFLOW-STATE stamps, no queue
 writes, no evidence files. Every stamp originates in the stage session via
-`--enter-stage` (lifecycle-kit/SPEC.md §The state machine). Lead-does-stamping
-is ruled out, not merely omitted: it breaks this invariant, and under the
-`stage` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` a lead stamp is exactly the
-self-reported skip `check-stage-evidence` exists to catch.
+`--enter-stage`. Lead-does-stamping is ruled out, not merely omitted
+(lifecycle-kit/SPEC.md §The state machine).
 
 **The lead stamping nothing is not the batch stamping nothing**, and the two
 read alike from here. A dispatched batch stamps on entry like any stage session:
@@ -512,11 +512,10 @@ and escalations arrive on their schedule. So:
   splits into batches, those batches are **N sibling stage sessions the lead
   dispatches and verifies** — each entering through `--enter-stage` as a
   same-stage re-entry (lifecycle-kit/SPEC.md §The state machine: N sessions may
-  enter one stage, each leaving its own stamp and the cursor staying put). A stage session **never dispatches a sibling stage session**: a stage
-  that sub-dispatches its own batches nests a second supervisor at the lead's
-  tier, hidden from its budget and context accounting — the redundancy the split
-  posture exists to remove, and the clause is a dispatched stage's authority to
-  refuse. Read-only fan-outs inside a stage stay sanctioned (the delegation
+  enter one stage, each leaving its own stamp and the cursor staying put). A stage
+  session **never dispatches a sibling stage session**
+  (lifecycle-kit/SPEC.md §templates/lead.md owns the ground), and the clause is
+  a dispatched stage's authority to refuse. Read-only fan-outs inside a stage stay sanctioned (the delegation
   nudge; delegation-kit/templates/agent-execution.md). The batching *criteria* are the
   shared-surface rule above, unchanged; this adds only the owner — the lead
   serializes sibling batches that share a surface and may parallelize those that
