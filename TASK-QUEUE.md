@@ -12,6 +12,87 @@
 
 ## New Features
 
+- **readme-roster-enum-coverage** [spec: SPEC-enum-parity.md] — a kit README enumerating a
+  derivable set sits outside every parity gate and drifts silently while the battery stays green.
+  recurrence: readme-roster-enum-coverage 2026-08-25
+  **Surveyed at spec:** a fourth instance is live, since drift-kit/README.md's bundled-KPI roster
+  omits `kpi-stage-economics-lag`. Declaring the bundled KPI table as a set reds nothing today,
+  because the README names KPIs by description. The fenced `## Use` blocks are complete, and the
+  delegation-kit verdict set now lives in a compiled `matches!`. **Designed as:** the bundled
+  emitter declares `kpi-builtin` off the KPI table, and the README names the ids. A set that exists
+  only as a conditional's arms or an arm's flag forms is ruled a contract, which prose cites and
+  does not enumerate (amendment deltas 2 to 4).
+  Leads `enum-and-citation-parity` (operator direction, 2026-09-17, lead-relayed); filed 2026-07-31.
+
+- **prose-enum-common-word-tag-members** [spec: SPEC-enum-parity.md] — check-prose-enum reads two
+  adjacent ordinary words (`cost`, `surface`) as a partial list of the queue's task tags.
+  **Designed as:** a list separator must carry a delimiter or `and`/`or`, and whitespace alone
+  never chains. The member and set grammars stay two fields. The survey found no real hand list
+  relying on a bare-whitespace gap, and the one exemption this makes redundant is deleted
+  (amendment delta 1).
+  Joins `enum-and-citation-parity` on check-prose-enum's set grammar (operator direction,
+  2026-09-17, lead-relayed); filed 2026-09-11.
+
+- **citation-liveness-family-convergence** [spec: SPEC-citation-liveness.md] — the
+  citation-liveness family, halves (A) and (B): one resolves-to-nothing predicate read through
+  several windows, over `check-spec-pointer`, `check-docs-cmd` and `check-queue-slug-liveness`.
+  **Surveyed at spec** (amendment preamble): unqualified `§` citations have no syntactic file, so
+  they resolve against the whole governed set. Section ownership measured not buildable. The
+  headingless-filename member moves to `check-docs-cmd` (C), which landed after the hub was costed.
+  Retired-slug citations in governed prose are 2 genuine among 35, once live names are excluded.
+  **Designed as** amendment deltas 1 to 9. Deltas 6 and 8 ride an escalation to the lead on red
+  versus report.
+  Admitted to `enum-and-citation-parity` (operator direction, 2026-09-17, AskUserQuestion in a lead
+  session, lead-relayed); filed 2026-08-25.
+
+- **unqualified-section-citation-liveness** [spec: SPEC-citation-liveness.md] — a bare
+  `(§Heading)` citation resolves to nothing and no gate reds. **Designed as:** the prose pass
+  resolves a `§` with no path against every manifest file's headings, a placeholder fragment never
+  fires, and a sentence-shaped heading is citable by its lead clause (amendment deltas 1 and 2).
+  Filed 2026-08-02; a member of `citation-liveness-family-convergence`.
+
+- **spec-pointer-self-section-citation** [spec: SPEC-citation-liveness.md] — a same-file `§`
+  citation goes unresolved. **Designed as** delta 1's union resolution, which includes the citing
+  file. Filed 2026-08-08; returned from the icebox as a family member.
+
+- **link-wrapped-section-citation-liveness** [spec: SPEC-citation-liveness.md] — `[x](path.md)
+  §Heading` hides its section from both citation gates. **Designed as:** the link target is the
+  path, and 43 of 45 live sites resolve (amendment delta 1). Filed 2026-08-06; a family member.
+
+- **spec-section-title-collision** [spec: SPEC-citation-liveness.md] — two headings in one SPEC
+  share a title, so a `§` pointer binds to the first. **Designed as:** a duplicated title in a
+  manifest file reds, and guard-kit/SPEC.md's `### Consumer rules` is renamed with its pointers
+  re-read (amendment delta 3). Filed 2026-08-13; a family member.
+
+- **qualified-pointer-section-ownership** [spec: SPEC-citation-liveness.md] — a resolving `§`
+  pointer may name a section that does not own the claim. **Measured at spec:** a token-ownership
+  proxy flagged 15 of 50 citations and none was wrong, so the entry's permitted not-buildable
+  outcome holds, recorded in §check-spec-pointer (amendment delta 4). Filed 2026-08-09.
+
+- **prose-filename-citation-liveness** [spec: SPEC-citation-liveness.md] — a bare amendment
+  basename in governed prose outlives the deleted file. **Designed as:** check-docs-cmd assertion
+  (C) reads a single-segment `CANON_KIT_AMENDMENT_GLOB` token as path-shaped and resolves it by
+  basename. Its retired-versus-never-tracked split already keeps `AGENTS.md`-type citations green
+  (amendment delta 5). Filed 2026-07-31.
+  recurrence: prose-filename-citation-liveness 2026-09-06
+
+- **retired-slug-live-pointer-citation** [spec: SPEC-citation-liveness.md] — governed prose points
+  at a retired queue slug as a live surface. **Designed as:** check-queue-slug-liveness assertion B,
+  on the new `QUEUE_KIT_CITATION_SURFACE_GLOBS`, reds a single-backtick retired slug that is no
+  tracked file's stem, with a `retired-citation-exempt:` valve
+  (amendment delta 6; red versus report is escalated to the lead at spec). Filed 2026-08-19.
+  recurrence: retired-slug-live-pointer-citation 2026-09-06
+
+- **queue-status-parenthetical-liveness** [spec: SPEC-citation-liveness.md] — a `(icebox)`-style
+  status beside a cited slug goes stale when the slug moves. **Designed as:** assertion C over the
+  queue file, with an exact vocabulary derived from the section knobs plus `retired` (amendment
+  delta 7). Filed 2026-08-22; returned from the icebox as a family member.
+
+- **done-slug-ownership-citation-report** [spec: SPEC-citation-liveness.md] — governed prose claims
+  a landed slug still owns an open question. **Designed as:** no report. A Done slug is in the
+  retired set, so assertion B covers it (amendment delta 8, on the same escalation). Filed
+  2026-08-16.
+
 ## Technical Debt
 
 ## Deferred
@@ -1007,42 +1088,6 @@
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
 
-- **prose-filename-citation-liveness** [design-pending] [cost: iteration/low] [surface: canon-kit] — a bare `<name>.md`
-  filename cited in governed prose can name no tracked file and nothing reds.
-  `check-md-refs` resolves markdown *links* only; `check-spec-pointer` resolves
-  `spec:`/`contract:` directives and free-prose `<path>.md §<heading>`
-  citations, so a citation with **no** `§heading` and no link syntax falls
-  between them.
-  **Instance, fixed at this close:** `site-kit/SPEC.md` and its `docs/` mirror
-  cited `SPEC-os-support.md` as owning `docs/install.md`'s Requirements ruling.
-  The amendment is deleted, so the pointer dangled. Close deleted the
-  parenthetical rather than repointing it — the same sentence already names
-  `docs/install.md`'s Requirements prose as the stater, and that page carries
-  the ruling. Same class as the seven citations the `release-assertion-honesty`
-  build sweep cleaned, which is what makes this recurring rather than a one-off:
-  every merged amendment deletes a file that governed prose may still name.
-  **Why `[design-pending]`:** the predicate needs care, and a naive one reds
-  correct prose. `docs/install.md` names `AGENTS.md` four times as a harness
-  convention file that is deliberately untracked here — a legitimate citation of
-  a filename with no in-tree target. Candidate narrowings: bind only the
-  `SPEC-*.md` amendment-naming convention (narrow, decidable, covers the whole
-  observed class), or extend `check-spec-pointer`'s free-prose extractor to the
-  headingless form behind an exclusion roster. Which, and whether it is a new
-  gate or an assertion inside an existing one, is the open call.
-  **Cost while deferred:** one dangling citation per merged amendment that
-  governed prose names, found only by a hand sweep somebody remembers to run;
-  the citations read as live pointers until then.
-  Debt: one gate plus its fixture pair, or an assertion added to an existing
-  gate. **That line states the unit's size, not its class** — on the shipped
-  path it mints a script name and a `scripts/gates.list` registration, so
-  canon-kit/SPEC.md's new-names litmus makes it a **feature** owing an
-  amendment. It promotes into a feature section; only the
-  assertion-on-an-existing-gate variant would be debt.
-  Filed 2026-07-31 at close as the gap-generalization owed by the inline fix
-  above; the `check-md-refs` blind spot and the `AGENTS.md` false-positive case
-  were both verified against source before filing.
-  recurrence: prose-filename-citation-liveness 2026-09-06
-
 - **batch-split-stamp-ownership** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — who stamps the per-session
   audit trail when a live lead splits one stage across several batch sessions is
   unowned. This iteration recorded **one** `build` line in
@@ -1217,54 +1262,6 @@
   someone decides to record it.
   Surfaced 2026-08-02 at close, in the same intake pass, as the third and last
   of the growth half's unfiled items.
-
-- **unqualified-section-citation-liveness** [design-pending] [cost: iteration/low] [surface: canon-kit] — a bare `(§Heading)`
-  citation in governed prose — the same-file form, with no `<path>.md` prefix —
-  resolves to nothing and no gate reds. The two citation gates each miss it from
-  a different side: `check-md-refs` resolves markdown *links* only, and
-  `check-spec-pointer`'s prose extractor requires a `<path>.md §` prefix before it
-  will look (the `match(s, /…\.md[[:space:]]*§/)` guard), so the qualified form is
-  held and the unqualified one is not.
-  **Instance, fixed at this close:** gate-sdk/SPEC.md cited `§check-fixture-pair`
-  as the authority for "a registered gate still owes its `good/`+`bad/` pair"; no
-  such section exists — the gate is `check-gate-fixture-coverage`, named correctly
-  seven lines later in the same paragraph. A reader chasing the load-bearing half
-  of that sentence landed nowhere.
-  **The class is large and currently unverified:** a mechanical sweep of the kit
-  SPECs plus `CLAUDE.md` and `DOCTRINE.md` counted 171 parenthesized unqualified
-  citations, against which a crude same-file resolver flagged 11 — one genuine
-  (the instance above) and the rest artifacts of the crude predicate. Those
-  artifacts are the design: they are the false-positive classes a real gate must
-  answer for.
-  **Why `[design-pending]` — three named false-positive classes, all observed in
-  that sweep.** (1) **Cross-file antecedent:** `site-kit/SPEC.md` cites
-  `(§run-gates)`, a gate-sdk section, and gate-sdk/SPEC.md cites
-  `(§check-spec-pointer)`, a canon-kit one — bare, with the owning path named
-  earlier in the paragraph. `check-spec-pointer` already implements a blank-line
-  paragraph join for the qualified form, so the antecedent rule has an
-  implementation to extend rather than invent, but whether a bare citation should
-  bind to the nearest prior path or be required to qualify itself is the ruling
-  this entry owes. (2) **Prose tail:** `(§Bundled KPIs / §Layout and
-  configuration)`, `(§run-gates owns the contract)` — where the heading name ends
-  and prose resumes is not syntactic. (3) **Possessive and inflected forms:**
-  `(§check-stage-entry's trigger-gated-stage calibration)`.
-  **Shape:** an assertion inside `check-spec-pointer` rather than a new gate — it
-  already owns heading resolution in both exact and prefix modes, already walks
-  the manifest set, and already carries the paragraph join. Sibling to
-  `prose-filename-citation-liveness`, which is the same family (a citation form
-  falling between the two gates) from the other end: that one is a path with no
-  heading, this one a heading with no path. A promoting scope should cost them
-  together and may find one predicate covers both.
-  **Cost while deferred:** 171 live unqualified citations across the governed doc
-  set, held by nothing. Each merged amendment and each renamed section can strand
-  one, and the only detector is a reader who follows the pointer — which is how
-  the instance above was found, one iteration after the paragraph was rewritten.
-  Debt: an assertion added to an existing gate and its fixture arm; adds no
-  governed name — the new-names litmus does not fire, which is what separates it
-  from `prose-filename-citation-liveness`' shipped-path variant.
-  Filed 2026-08-02 at spec to the gap inbox as the dangling pointer; promoted at
-  close as the gap-generalization that inline fix owed, with the coverage gap
-  verified against both gates' source and the class sized by sweep.
 
 - **gate-authoring-sdk-surface** [design-pending] [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] — a gate-authoring SDK.
   `.gate` as the substrate-neutral surface. **Operator-surfaced during
@@ -1467,29 +1464,6 @@
   — gate-sdk/SPEC.md is mirrored to the docs site, so the contradiction shipped.
   Filed 2026-08-04 at close; the instances it would have caught were fixed the same session.
 
-- **link-wrapped-section-citation-liveness** [design-pending] [cost: event/low] [surface: canon-kit] — a section citation inside a
-  markdown link is invisible to both citation gates.
-  `check-spec-pointer`'s prose extractor guards on a `.md` *immediately* followed by the section
-  sign, so it looks only where the two are adjacent. The reference-link form
-  `[path.md](path.md) §Heading` puts a `)` between them: the guard never fires, the heading is
-  never resolved, and this holds even though the file is in the governed manifest and
-  `check-md-refs` has already resolved the link half. Live at `CONTRIBUTING.md:65-66`.
-  **Third member of a family the queue already carries**, and the one that makes the family a
-  predicate question rather than three fixes: `prose-filename-citation-liveness` is a path with
-  no heading, `unqualified-section-citation-liveness` is a heading with no path, and this is a
-  path *and* a heading that the adjacency guard splits. That second entry already says one
-  predicate may cover both of the others; this is the evidence that the guard's window, not the
-  citation form, is the variable, so a promoting scope should cost all three together.
-  **Why `[design-pending]`:** widening the guard to tolerate an intervening `)` is a
-  two-character change and almost certainly wrong alone. The honest fix decides what the
-  extractor's window *is* — nearest preceding `.md` in the paragraph, or the link target — and
-  that decision is shared with the two siblings.
-  **Cost while deferred:** a renamed heading strands this citation with nothing red, inside a
-  governed repo-meta file whose whole purpose is telling a contributor where to go.
-  Found at spec 2026-08-06 while sizing the verb rename's blast radius, verified against the
-  gate's own extraction logic rather than inferred; filed 2026-08-06 by close from the gap inbox.
-
-
 - **amendment-refusal-acceptance-parity** [design-pending] [cost: event/low] [surface: canon-kit] — an amendment's refusal rationale can
   claim an acceptance criterion asserts something that criterion does not say.
   The `--dry-run` amendment refused a gate on the stated ground that the behavioral property was
@@ -1535,43 +1509,6 @@
   Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was
   escalated as an envelope call and folded in here on the lead's ruling the same day.
 
-
-- **qualified-pointer-section-ownership** [design-pending] [cost: event/high] [surface: canon-kit] — `check-spec-pointer` asserts a
-  cited `§Heading` **exists**, never that it is the heading which *owns* the cited claim, so a
-  fully-qualified pointer aimed at the wrong section resolves and reds nothing.
-  **Self-witnessed 2026-08-09, which is why it is filed rather than theorised.** This close,
-  correcting another entry's expired premise, cited `gate-sdk/SPEC.md §What the dispatch seam
-  does not settle` for a claim owned by §What is retained, and where the second port stands.
-  Both sections exist. The gate passed — "every target file tracked and named §heading present"
-  is its own verdict text, and presence is the whole of what it checks. Caught only by reading
-  the file to confirm the sentence was there.
-  **It is the mechanism under the ruling-staleness class.** The inbound half that class
-  diagnoses — a citation surviving the deletion of the ruling it names, now designed at
-  lifecycle-kit/SPEC.md §The ruling-staleness probe — and this are one defect seen from two
-  sides: a pointer is verified against the section's *existence*, so nothing notices when the
-  section stops carrying the claim, whether because the claim was pruned out of it or because
-  the wrong section was named to begin with. That section also records the measurement narrowing
-  the inbound reading: a probe over citation targets reaches almost none of the real cohort,
-  because the heading survives and only the body under it is rewritten.
-  **Distinct from the three sibling entries in this cluster**, which are all about citations
-  that resolve to *nothing*: `unqualified-section-citation-liveness` (a bare `§Heading` with no
-  path), `spec-pointer-self-section-citation` (the self-citing form), and
-  `prose-filename-citation-liveness`. This one resolves successfully and is wrong anyway, which
-  is the harder half — the reader's trust is higher precisely because the pointer works.
-  **Why `[design-pending]`, and an honest "not buildable" is a permitted outcome.** Deciding
-  whether a section *supports* a sentence is comprehension, not scanning. The only mechanical
-  approximations are term-overlap heuristics between the citing sentence and the target
-  section, whose false-positive surface is the one `check-measured-claim` escaped by ruling
-  for an author-applied marker — an escape closed here, because that gate needs the author only
-  to *declare* what was measured while this one must judge a citation nobody annotated.
-  A term-overlap red on a correct citation is worse than silence on a wrong one.
-  **Cost while deferred:** broad and unmeasured — `check-spec-pointer` reports 902 directive
-  pointers and 247 prose citations, and the ownership of every one of them is
-  unverified. The cost is not that they are wrong; it is that the gate's green is read as
-  saying they are right. **Both figures re-measured 2026-08-09 at scope by re-running the gate:
-  the directive count filed here was 1774, wrong by roughly a factor of two on the day it was
-  written. Read the numbers off the oracle, never off this line.**
-  Filed 2026-08-09 by close (`install-profile-seam`), from its own miswritten citation.
 
 - **docs-link-red-remedy-first** [design-pending] [cost: event/high] [surface: site-kit] — `check-docs-link-convention` reds on the
   most ordinary thing a docs subpage author writes, and leads with the diagnosis.
@@ -1735,22 +1672,6 @@
   ships silently; the three-way correspondence is exactly what a registration gate is for.
   Filed 2026-08-13 by close, draining the gap inbox; the SPEC re-grepped for both identifiers.
 
-- **spec-section-title-collision** [design-pending] [cost: event/low] [surface: canon-kit] — two sections in one SPEC may carry the same
-  title, and a `§`-pointer then resolves to the wrong one from the day it is written.
-  Live instance, re-verified at the drain: `guard-kit/SPEC.md` carries **Consumer rules** at the
-  `##` level (line 244) and again at the `###` level (line 508). Section-resolving readers take
-  the first match, so every `§Consumer rules` pointer binds to the `##` one — including both
-  pointers in `scripts/bash-guard.sh`, whose second one means the `###` section.
-  `check-spec-pointer` stays green, because the section exists.
-  **Distinct from `qualified-pointer-section-ownership`**, whose predicate is whether a pointer's
-  named section still *owns* the claim — a staleness question about one resolving target. This is
-  a resolution-*ambiguity* question: two targets carry one name, so no amount of ownership
-  freshness fixes it. Cited because the citation-liveness family is one predicate question and
-  this is a second predicate that family would have to absorb.
-  **Cost while deferred:** a pointer that reads as precise and resolves elsewhere, which is worse
-  than a broken pointer because nothing signals it.
-  Filed 2026-08-13 by close, draining the gap inbox; both SPEC headings re-read at the drain.
-
 - **install-disposition-smoke-accounting-split** [design-pending] [cost: event/low] [surface: gate-sdk] — the precommit gate checks smoke
   registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
   caught one stage late, at validate.
@@ -1884,33 +1805,6 @@
   `gate-sdk/lib/gate.sh` at the drain and the bullet's account corrected here.
 
 
-
-- **done-slug-ownership-citation-report** [design-pending] [cost: iteration/low] [surface: queue-kit] — governed prose says a queue slug
-  "owns" an open question in the present tense, and nothing notices when that slug lands.
-  **Two live instances, both found by hand at this close's audit sweep and both fixed here.**
-  `gate-sdk/SPEC.md` asserted that the shipped install path "degrades silently, which
-  `installer-jq-silent-degradation` owns", and again that the slug "still owns it" — text
-  *added by this same iteration*, weeks-fresh, and falsified by the same iteration's later
-  commits (`bd8ef299`, `97b65bdb`, `047c7426`) that landed the unit and moved the slug to
-  `## Done`. A reader arrives at a settled question dressed as an open one.
-  **DISTINCT from `dead-queue-citation-report`, shipped**, and not folded into it: that entry's
-  corpus was the queue's own bodies and its subject a slug resolving *nowhere*. This
-  one's corpus is governed SPEC prose and its subject is a slug resolving in `## Done` — live,
-  findable, and closed. Different scan, different reader, different remedy.
-  **Why `[design-pending]`:** the tempting form is a red, and a red is wrong for the same
-  reason it is wrong for its sibling — governed prose legitimately names landed work, and
-  telling a historical citation from a present-tense ownership claim means reading tense. The
-  cheaper true form is that sibling's own conclusion: a **listing**, every governed-prose
-  citation of a Done-resolving slug, reported rather than redded. Where the listing is read is
-  the same open question, and taking either entry should cost both.
-  **This narrows a class the audit roster carries as un-gateable.** `capability-pendency-after-
-  landing` is un-gateable because a scanner cannot infer which tree set discharges a prose
-  claim. The slug sub-case is the exception: the discharging set is the queue's own `## Done`,
-  which is machine-readable, so this is the gateable slice of an ungateable class.
-  Class: mints a name for a report rather than a gate; the promoting scope settles feature-vs-debt.
-  **Cost while deferred:** paid by every reader of a governed SPEC who takes a closed ruling
-  for an open one, and the audit that catches it is a per-close human sweep with no oracle.
-  Filed 2026-08-16 by close, from the two instances its own roster sweep found.
 
 - **in-crate-module-coupling-derivation** [design-pending] [cost: event/low] [surface: gate-sdk] — a ported gate's descriptor can omit
   the crate modules its own verdict depends on, and no gate says so.
@@ -2264,57 +2158,6 @@
   Filed 2026-08-19 by close from the gap inbox; recurrence judged and stamped at
   `battery-runner-port`'s close, whose drain re-ran the sweep and found the corpus empty.
 
-- **retired-slug-live-pointer-citation** [design-pending] [cost: event/low] [surface: queue-kit] — governed prose can point at a retired
-  queue slug as if it were a live surface, and the gate that owns slug citations permits that by
-  design rather than by omission.
-  **The rule is stated in two halves and only one is enforced.** queue-kit/SPEC.md
-  §check-queue-slug-liveness says prose about landed work must drop the bold-code form **and** cite
-  the owning SPEC instead; the gate's token grammar is the bold-code form alone, so a plain-code
-  slug is legal prose about landed work whether or not the sentence around it still points
-  anywhere real.
-  **One live instance, found 2026-08-19 at the generating close's staleness review and fixed in
-  place.** TRAJECTORY.md's port-sequence directive said a ruling's grounds, its accepted cost and
-  its discharging tranche "are the queue entry's", present tense, for an entry that had completed
-  13 of 13 and retired several iterations earlier — and the same sentence's closing clause
-  anticipated that retirement. That is what makes it the sharp case: the author saw the retirement
-  coming, recorded the ruling in TRAJECTORY.md precisely so it would survive, and still left the
-  pointer aimed at the vanishing surface. Re-pointed at gate-sdk/SPEC.md §The consumer remainder
-  cohort, which is where TRAJECTORY.md reads today.
-  **Probed rather than assumed:** a scan of every plain-code slug-shaped token across the
-  top-level governed docs against the live slug set returned exactly one true positive, so the
-  class is real and rare rather than a wave.
-  **DISTINCT from `stale-identifier-after-retirement`**, landed as check-docs-cmd assertion (C):
-  a deleted *path* whose capability moved intact. This is a retired *slug* cited as a live
-  pointer; a dead path is checkable against disk, while a retired slug resolves to nothing
-  anywhere, the Done section being cleared every iteration.
-  **Why `[design-pending]`:** the mechanical half is a scan for a plain-code slug-shaped token that
-  matches no live slug but does match a slug in the queue's own history — buildable, and it needs a
-  false-positive budget, since gate names share the slug grammar and dominate the token
-  population. Whether that budget is affordable, and whether the second half — does the sentence
-  still point anywhere — is decidable at all, is the ruling this entry owes.
-  Class: mints a gate name if the oracle lands, so canon-kit's new-names litmus makes it a
-  **feature** on that path; debt only if it lands as a further assertion inside
-  `check-queue-slug-liveness`.
-  **Cost while deferred:** low frequency, silent failure, and it lands hardest on the ruling record
-  — the one surface whose whole purpose is outliving the queue entries it was extracted from.
-  Surfaced 2026-08-19 at the same close's staleness review, filed to the gap inbox beside the entry
-  above; promoted 2026-08-20 by the next iteration's scope, which drained that inbox to its header.
-  **A second true positive, 2026-09-06, and it falsifies the rarity half of the probe above**, not
-  the class: `gate-sdk/SPEC.md` claimed an open installer-and-probe trade "stays
-  `install-path-gnu-userland-undeclared`'s" for a slug landed several iterations earlier. Published
-  surface, single-backtick form, and `check-queue-slug-liveness`' corpus does not reach it — so the
-  false-positive budget question the entry owes now has two instances to size against, both on
-  surfaces whose whole purpose is outliving the queue.
-  **THE FALSE-POSITIVE BUDGET IS MEASURED AND THE COLLISION IT FOUND IS ANSWERED.** Measured
-  2026-09-07 at close over `--emit queue-edges`: 84 retired slugs, 182 citing lines, 152 distinct
-  (citer, retired-slug) pairs, and exactly ONE of the 84 a live registered gate name —
-  `check-spec-pointer`, whose slug once headed an entry — so the rate is 1/84 while that one false
-  positive HEADS the ranking at 15 inbound, the ORDERING being what the collision breaks. A
-  `scripts/gates.list` pre-filter is no longer owed: 2026-09-16 the arm marks such a target `name
-  live at <path>` inline, so a ranker reads it off the block. Of the 152 pairs most already spell
-  "retired" and are correct prose; the drain's reach is its own iteration's retirements.
-  recurrence: retired-slug-live-pointer-citation 2026-09-06
-
 - **settings-hook-command-path-gate** [design-pending] [cost: event/high] [surface: context-kit] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
   fails silently at run time.
@@ -2664,55 +2507,6 @@
   Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
   2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
 
-- **readme-roster-enum-coverage** [design-pending] [cost: iteration/high] [surface: canon-kit] — a kit README enumerating a
-  **derivable** set is outside every parity gate, so it drifts silently while the
-  battery stays green.
-  recurrence: readme-roster-enum-coverage 2026-08-25
-  `check-readme-roster` holds one roster per README — the
-  `checks/` basenames — and nothing else; `check-prose-enum` holds only the sets
-  the `--emit-enum-sets` arm declares, which is the queue tag vocabulary plus two
-  derived roster families over the kit tree, none of them a behavioural enum.
-  **Three instances now, every one found by close's step-5 staleness read rather
-  than by an oracle.** (1) drift-kit/README.md omitted a bundled lead KPI shipped
-  that iteration and registered in `scripts/kpis.list` — a registry that is
-  exactly an enum-set source. (2) queue-kit/README.md's `## Use` block omitted a
-  `queue-index` invocation the SPEC states outright, while the README is the only
-  invocation surface a reader gets. (3) THE THIRD, 2026-08-25: delegation-kit's
-  README said the turn-end liveness hook refuses on `red` or `corrupt` while the
-  iteration's own landing widened the refusal guard to a third verdict, verified
-  against the consumer script's own disjunction rather than off the diff. All
-  three were corrected by hand at the close that found them, which is the
-  Enforcement-first shape the doctrine bars — the fix landing without the gate.
-  **The third instance MOVES this entry back out of the icebox, and it also
-  falsifies half its own cost claim.** "Low and non-rotting" was written when both
-  instances were omissions from a roster that never became false; this one is a
-  README stating a live refusal contract that the tree had already widened, in an
-  ADOPTER-FACING install step, in a file the widening diff never opened. So the
-  class does not merely cost a close's attention — between closes it ships a
-  false contract to a consumer wiring the hook, which is a different and higher
-  cost than an incomplete list.
-  **It also sharpens the shape.** The first two instances were rosters derived
-  from a registry FILE. This one is a set that exists only as a `[[ ]]`
-  disjunction inside a shell guard, so no registry read reaches it and an
-  extractor would have to be written against that one script. That is either the
-  case that makes the enum-set survey worth buying, or the case that bounds it.
-  **Why `[design-pending]`:** an enum set is cheap to declare and expensive to
-  land, because declaring one obliges **every** prose enumeration of that set,
-  tree-wide, to be complete. The unit owes a survey of what each candidate set
-  would red before it is declared, plus a ruling on whether a behavioural set
-  living in a conditional is an enum set at all or wants a different parity
-  shape. The count half of this class is `check-measured-claim`'s, not this
-  entry's: a bare cardinal qualifying a roster is a different scanner from a
-  membership check.
-  **Cost while deferred:** paid once per close by the staleness read, which is
-  the only detector — and, as the third instance shows, paid by a consumer in
-  between when the drifted roster is a contract rather than a list.
-  Surfaced 2026-07-31 by close's top-level staleness review, which found the
-  first two instances; filed rather than fixed because the enum-set survey is the
-  work. Evicted to the icebox on a low, non-rotting cost; returned to Deferred
-  2026-08-25 on a judged recurrence, the tag algebra's own icebox exit.
-  **Leads `enum-and-citation-parity` — operator direction, 2026-09-17, lead-relayed.**
-
 - **icebox-eviction-line-budget-squeeze** [design-pending] [cost: event/low] [surface: queue-kit] — the icebox tier's one-line grammar
   and `check-queue-wrap`'s column cap are jointly unsatisfiable above a slug length nothing
   bounds, and nothing says so at the point of eviction.
@@ -2848,55 +2642,6 @@
   accurate and self-clearing, so no outage goes unseen while this waits.
   Operator-directed filing 2026-08-25, relayed through the lead at this scope; the tree read
   behind it was re-run here rather than taken on the relay.
-
-- **citation-liveness-family-convergence** [design-pending] [cost: iteration/high] [surface: canon-kit] — the citation-liveness deferred family
-  is FOUR gate-touch points, not one resolver and not fourteen tickets; the measurement lives here.
-  **Why the survey is inline:** `.workflow/survey-record.md` is boundary-truncated and
-  `check-scratch-citation` reds a pointer into it, so no boundary stales this witness and a later
-  scope owes a **re-date**, never a re-run. **Re-verified at scope 2026-09-16, nineteen named slugs
-  LIVE** — corpus both design-pending sections, `scripts/gates.list`, `native/src/gates/`; oracle
-  `--emit queue-edges` and a citation grep; rev `62b7a76d`.
-  **The finding.** Thirteen live members, eleven Deferred and two Icebox, none blocking on an
-  operator-class fork; **size floor** four touch points, eight to ten assertions, two reports, all
-  native modules. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
-  `unqualified-section-citation-liveness`, `link-wrapped-section-citation-liveness` and
-  `spec-pointer-self-section-citation` as ONE resolves-to-nothing predicate — those entries say the
-  guard WINDOW, not the citation form, is the variable — plus `spec-section-title-collision` and
-  `qualified-pointer-section-ownership` as two harder predicates on the same gate, the latter
-  self-declaring an honest not-buildable as a permitted outcome. (B) `check-queue-slug-liveness`
-  takes about two assertions for `retired-slug-live-pointer-citation` and
-  `queue-status-parenthetical-liveness`, plus ONE report-only deliverable riding the queue-edges
-  arm's resolution, `done-slug-ownership-citation-report` — report-not-gate under the SPEC's
-  reference-vs-membership ruling, its twin `dead-queue-citation-report` shipped. **(C), the two
-  path-citation entries, LANDED** 2026-09-13 as canon-kit/SPEC.md §check-docs-cmd assertion (C);
-  **(D), the two `guard-rule-number-*` entries, is ANSWERED and out**, both slices' grounds
-  relocated 2026-09-08 to the entries already owning them.
-  **Two members are content-unverified though both re-verified live above:** Icebox's
-  `false-ground-citation-propagation` is title-only and `doctrine-rule-number-citation-liveness` a
-  forward bet, a 2026-08-27 probe having found DOCTRINE.md carrying ZERO `rule N` forms — both
-  one-liners with nowhere to hold a ground, which is why these stay and (D)'s did not.
-  **Excluded with cause:** `scratch-citation-skill-surface-reach` (self-disclaims, glob-coverage),
-  `kit-ref-liveness-stem-token-hole` (env-knob tokens), `fixture-assertion-liveness`,
-  `survey-oracle-liveness-unasserted`. **Adjacent, unfolded:**
-  `amendment-landing-citation-assertions` and `amendment-owner-position-citation` ride
-  `check-amendment-queue` over a corpus deleted at merge. **Fold-or-exclude, both filed after the
-  rev:** a FIFTH point `scratch-citation-introducer-form-reach`, an EIGHTEENTH member
-  `queue-citation-line-number-stales-within-its-own-session`.
-  **MACHINERY-class HOLDS by the 2026-08-30 discriminator** — the family's only demand witness is
-  this repo's delivery process — **but the class bar is ANSWERED, the operator having carved this
-  entry out 2026-09-08**, so COST alone blocks and a costed look owes the honestly-low fields first.
-  **ADMITTED — operator direction, 2026-09-17 (AskUserQuestion in a lead session, lead-relayed),
-  superseding 2026-09-09's "admissibility, never admission":** (A)+(B) join
-  `enum-and-citation-parity` beside `readme-roster-enum-coverage`, admitted by the operator rather
-  than as a joiner sharing one of the four touch points, which that set does not.
-  **Inbound, summed 2026-09-08, falsifying the zero-inbound ground this entry once carried:** **37
-  inbound over seventeen live members** against the hub's 1, four times the largest single entry.
-  **THE HEALTH TRIAD'S QUEUE LIMB HAS MOVED** — 139 Deferred + 253 Icebox at scope 2026-09-16,
-  against the 301 + 101 filed here: shrunk by eviction, so (A)+(B)'s seven are a LARGER lever.
-  **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
-  first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
-  a read of four gate sources — the re-derivation the survey record exists to prevent. Filed
-  2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
 
 - **account-noun-plural-slips-the-shape** [design-pending] [cost: event/high] [surface: gate-sdk] — the account-identification pattern
   matches a singular account noun only, so the plural form passes both readers.
@@ -3490,23 +3235,6 @@
   Filed 2026-09-10 by close, draining the gap inbox. →fix was refused on the re-verification above:
   the obvious cheap fix is already landed, and already failed.
   recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
-- **prose-enum-common-word-tag-members** [design-pending] [cost: event/low] [surface: canon-kit]
-  — check-prose-enum reads two adjacent ordinary words as a partial list of the queue's task tags.
-  The consumer set `queue-task-tag` (native/src/emit/enum_sets.rs) now carries two task tags
-  whose names are common English words, beside `spec`. canon-kit/SPEC.md §check-prose-enum
-  matches a member bare or bracketed and chains members separated by whitespace, so prose that
-  happens to put the two words side by side reads as a hand list and reds on every omitted tag.
-  **Re-verified at close:** the first instance is in range, a historical release post exempted by
-  a `prose-enum-exempt:` comment when the tags landed.
-  **The obvious fix is not free.** Requiring the bracketed or backticked spelling for common-word
-  members would stop the gate reading the one surface its attested drift lives on: README.md's
-  queue-kit row spells the tag algebra bare and slash-joined. A per-member match mode is also a
-  change to the set grammar, which that section keeps at two fields and refuses a third.
-  **Cost while deferred:** an occasional false red on unrelated prose, each remedied by an
-  exemption comment that dilutes the exemption set.
-  Filed 2026-09-11 by close, draining the gap inbox; →fix refused on the set-grammar ground.
-  **Joins `enum-and-citation-parity` on check-prose-enum's set grammar — operator direction,
-  2026-09-17, lead-relayed.**
 - **install-smoke-slow-leg-residue** [design-pending] [cost: iteration/high] [surface: installer]
   — the native Windows install smoke, still the slowest leg, sets every close watch.
   **Measured at close off the first run carrying the roster hash batch:** install-smoke-windows took
@@ -4146,7 +3874,6 @@
 - **amendment-deletion-content-completeness** [design-pending] — Merges can drop rationale unheld.
 - **template-registry-population-predicate** [design-pending] — A name collision would red parity.
 - **lead-line-parser-conformance** [design-pending] — Eight lead-line holders; no conformance.
-- **queue-status-parenthetical-liveness** [design-pending] — Stale status tags beside cited slugs.
 - **breadth-declaration-stale-listing** [design-pending] — Spent breadth declarations stay silent.
 - **breadth-declaration-committed-glob-home** [design-pending] — Glob keep-rulings have no home.
 - **criterion-4-two-spellings-disagree** [design-pending] — Criterion 4 reads two ways.
@@ -4229,7 +3956,6 @@
 - **lint-scope-hook-trigger** [design-pending] — extra lint dirs skip the commit hook, CI-only.
 - **release-note-section-set-derivation** [design-pending] — release gate hand-lists note sections.
 - **release-asset-claim-class-owner** [design-pending] — a release-ships-an-asset claim has no gate.
-- **spec-pointer-self-section-citation** [design-pending] — same-file section cites go unchecked.
 - **knob-default-accessor-singularity** [design-pending] — no gate bars re-spelling a knob default.
 - **bin-argv-shape-residual-member** [design-pending] — one bin arm skips the argv-shape contract.
 - **docs-corpus-derivation-manifest-divergence** [design-pending] — two docs gate corpora diverge.
