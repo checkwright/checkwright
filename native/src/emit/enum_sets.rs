@@ -128,7 +128,7 @@ mod tests {
     fn the_tag_vocabulary_is_the_gates_own_class_table_terminator_stripped() {
         let tags = all_tags();
         assert!(tags.contains(&"blocked-by".to_string()));
-        assert!(tags.contains(&"design-pending".to_string()));
+        assert!(tags.contains(&"spec".to_string()));
         assert!(tags.contains(&ATTEND.to_string()));
         assert!(
             !tags.iter().any(|t| t.ends_with(':') || t.ends_with(']')),

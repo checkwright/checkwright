@@ -139,13 +139,13 @@ mod tests {
 
 - **feat-a** [cost: event/low] — do a thing.
   - **not-an-entry** — an indented bullet is body, not a second entry.
-- **feat-b** [design-pending] — do another.
+- **feat-b** [roadmap: now/x] — do another.
 
 ## Technical Debt
 
 ## Deferred
 
-- **defer-a** [cost: once/high] [design-pending] — later.
+- **defer-a** [cost: once/high] — later.
 
 ## Chill
 
@@ -226,9 +226,10 @@ mod tests {
             "New Features/event/low\t1\nNew Features/(none)\t1\nDeferred/once/high\t1\nChill/(none)\t1\n"
         );
         assert_eq!(
-            render_by(Q, &sections("Chill"), "design-pending"),
-            "New Features/(none)\t1\nNew Features/design-pending\t1\nDeferred/design-pending\t1\nChill/(none)\t1\n"
+            render_by(Q, &sections("Chill"), "roadmap"),
+            "New Features/(none)\t1\nNew Features/now/x\t1\nDeferred/(none)\t1\nChill/(none)\t1\n"
         );
+        assert_eq!(value_of("- **a** [attend] — x", "attend"), "attend");
     }
 
     // spec: queue-kit/SPEC.md §The queue-counts arm — the arm enumerates no tag name, so an unknown

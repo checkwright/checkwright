@@ -176,13 +176,13 @@ mod tests {
 
     #[test]
     fn a_lead_line_with_one_valid_tag_of_each_is_clean() {
-        let line = "- **a** [design-pending] [cost: iteration/high] [surface: widget-kit] — x";
+        let line = "- **a** [cost: iteration/high] [surface: widget-kit] — x";
         assert!(deferred_findings(line, &root()).is_empty());
     }
 
     #[test]
     fn an_absent_tag_is_named_per_tag() {
-        let got = deferred_findings("- **a** [design-pending] — x", &root());
+        let got = deferred_findings("- **a** — x", &root());
         assert_eq!(got, vec!["no [cost:] tag", "no [surface:] tag"]);
     }
 

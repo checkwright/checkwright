@@ -8,7 +8,6 @@ use crate::queue;
 pub const CLASSES: &[&str] = &[
     "blocked-by:",
     "spec:",
-    "design-pending]",
     "attend]",
     "drain-exempt:",
     "roadmap:",
@@ -148,9 +147,9 @@ mod tests {
     fn a_class_is_keyed_by_its_name_and_matched_with_its_terminator() {
         let none: Vec<String> = Vec::new();
         assert_eq!(classes_on("- x [blocked-by: a]", &none), vec!["blocked-by"]);
-        assert_eq!(classes_on("- x [design-pending]", &none), vec!["design-pending"]);
+        assert_eq!(classes_on("- x [attend]", &none), vec!["attend"]);
         assert!(classes_on("- x [blocked-by]", &none).is_empty());
-        assert!(classes_on("- x design-pending]", &none).is_empty());
+        assert!(classes_on("- x attend]", &none).is_empty());
     }
 
     // spec: queue-kit/SPEC.md §check-tag-lead-line — membership tracks reader semantics, so

@@ -12,7 +12,7 @@
 
 ## Deferred
 
-- **later-teardown** [design-pending] — a deferred teardown.
+- **later-teardown** — a deferred teardown.
 
 ## Done
 

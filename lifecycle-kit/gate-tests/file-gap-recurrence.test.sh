@@ -25,7 +25,7 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 
 ## Deferred
 
-- **fork-dispatch-prohibition** [design-pending] — the deferred entry.
+- **fork-dispatch-prohibition** — the deferred entry.
   Cost while deferred: recovery is re-paid each time.
 
 ## Icebox

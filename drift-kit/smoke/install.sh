@@ -23,7 +23,7 @@ cat > "$work/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 ## Iteration: smoke
 ## Deferred
-- **foo** [design-pending] — a thing. Surfaced 2025-01-01.
+- **foo** — a thing. Surfaced 2025-01-01.
 ## Done
 EOF
 
@@ -323,9 +323,9 @@ cat > "$ir_q" <<'EOF'
 # TASK-QUEUE.md
 ## Iteration: smoke
 ## Deferred
-- **thrice** [design-pending] — a finding re-filed three times.
+- **thrice** — a finding re-filed three times.
   recurrence: thrice 2026-08-01 2026-08-02 2026-08-04
-- **once** [design-pending] — a finding re-filed once.
+- **once** — a finding re-filed once.
   recurrence: once 2026-08-04
 ## Done
 EOF

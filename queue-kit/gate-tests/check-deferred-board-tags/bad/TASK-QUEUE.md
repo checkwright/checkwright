@@ -10,10 +10,10 @@
 
 ## Deferred
 
-- **untagged-idea** [design-pending] — carries neither board tag.
-- **misclassed-idea** [design-pending] [cost: weekly/high] [surface: widget-kit] — recurrence off the set.
-- **doubled-idea** [design-pending] [cost: once/low] [cost: event/low] [surface: widget-kit] — two classes.
-- **nowhere-idea** [design-pending] [cost: event/high] [surface: no-such-kit] — names nothing at the root.
+- **untagged-idea** — carries neither board tag.
+- **misclassed-idea** [cost: weekly/high] [surface: widget-kit] — recurrence off the set.
+- **doubled-idea** [cost: once/low] [cost: event/low] [surface: widget-kit] — two classes.
+- **nowhere-idea** [cost: event/high] [surface: no-such-kit] — names nothing at the root.
 
 ## Done
 

@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **design-pending-tag-restates-its-own-section** [spec: SPEC-design-pending-tag.md] — the
-  tag every deferred entry carries is derivable from section membership alone, which is the
-  two-sources defect queue-kit/SPEC.md §The icebox tier refuses by name for `[icebox]`.
-  **Shape: REMOVE the tag and rely on section membership as the icebox tier does — operator
-  direction, 2026-09-17, lead-relayed**, chosen over a rename and keep-and-document.
-  **Measured confusion cost, one iteration, two sessions:** a lead read the tag as a semantic
-  claim and proposed a stale-tag correction on an entry an operator ruling had already settled;
-  a scope session dropped the tag and took the red learning the same thing.
-  **The demote-direction residual this entry owed is answered at spec:** the board tags already
-  checksum a move between the deferred and active sections in both directions, probed on a
-  scratch queue, so no history measurement is owed (the amendment's preamble).
-  Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
-  whether the tag earns its keep; promoted 2026-09-06 by close; paired 2026-09-17 at spec,
-  unit of `queue-entry-grammar`.
-
 - **amendment-owner-position-citation** [spec: SPEC-amendment-citation.md] — prose may cite a
   merged amendment as *settled history*, never as a live *owner*.
   recurrence: amendment-owner-position-citation 2026-08-06
@@ -94,14 +79,14 @@
 
 ## Deferred
 
-- **allow-match-colon-star-over-grants** [design-pending] [cost: event/low] [surface: guard-kit] —
+- **allow-match-colon-star-over-grants** [cost: event/low] [surface: guard-kit] —
   `guard_allow_match` and its compiled twin normalize the harness `:*` prefix idiom to a trailing
   `*` (guard-kit/SPEC.md §The guard framework), but a `claude -p` probe found `Bash(python3 -:*)`
   does not grant `python3 -c`, so the harness `:*` looks word-bounded and the normalization models
   a consumer's `:*` grant wider than the harness grants it (`printf:*` would admit `printfx`).
   **Carried as a claim:** the probe ran at `interpreter-steer-census`'s build and its output died
   with that iteration's scratch; one re-run settles the boundary rule before any fix.
-  **Why [design-pending]:** the fix rewrites the SPEC's stated equivalence and both twins, and
+  **Why design-pending:** the fix rewrites the SPEC's stated equivalence and both twins, and
   whether the boundary is a space, end of string, or any non-word character is the harness's call.
   **Cost while deferred:** compare-settings-allow can call a narrower grant redundant and rule 20
   can treat an ungranted spelling as silently granted; no `:*` entry is committed here, so nothing
@@ -109,7 +94,7 @@
   Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s close; promoted at the next
   scope.
 
-- **native-windows-bash-floor** [design-pending] [cost: event/high] [surface: gate-sdk] — after the
+- **native-windows-bash-floor** [cost: event/high] [surface: gate-sdk] — after the
   config bridge retires, a native-Windows runtime still needs bash in three places: the
   `bin/run-gates.sh` front-end stub, which locates the binary before any binary runs; the two
   generated git hooks; and guard-kit's `PreToolUse` hook, whose rules stay bash on the
@@ -123,7 +108,7 @@
   invoke the binary directly with the locators the stub exports; and, for the git hooks, whatever
   shell Git for Windows runs them under. guard-kit's hook is the hardest: its rules are the consumer
   extension point, so a twin doubles every consumer rule.
-  **Why [design-pending]:** the twin's parity oracle, the hook invocation form, and whether
+  **Why design-pending:** the twin's parity oracle, the hook invocation form, and whether
   guard-kit needs a second substrate at all are three separate decisions.
   **Cost while deferred:** a native-Windows adopter still needs Git-for-Windows bash for every
   battery run and tool call, and docs/install.md says so.
@@ -131,7 +116,7 @@
   (operator direction, 2026-09-14, lead-relayed), splitting the floor out of the bridge's
   retirement.
 
-- **push-budget-unshipped** [design-pending] [cost: event/low] [surface: lifecycle-kit] — the push
+- **push-budget-unshipped** [cost: event/low] [surface: lifecycle-kit] — the push
   budget (one to two pushes per iteration, two unasked hotfix pushes) lives only in this repo's
   CLAUDE.md, so an adopting consumer cannot configure it and no kit surface reads it.
   **Probed at promotion:** neither `lifecycle-kit/templates/stages/close.md` nor
@@ -140,14 +125,14 @@
   **Candidate, not ruled:** two lifecycle-kit knobs, such as `LIFECYCLE_KIT_PUSH_BUDGET` and
   `LIFECYCLE_KIT_HOTFIX_PUSHES`, defaulting to this repo's values, cited by close and the lead
   template, with CLAUDE.md pointing at the knobs instead of stating numbers.
-  **Why `[design-pending]`:** it adds names, and whether the budget is a knob an arm reads or a
+  **Why design-pending:** it adds names, and whether the budget is a knob an arm reads or a
   template binding a consumer fills is the seam call.
   **Cost while deferred:** a consumer adopting the lead and close templates inherits no push
   discipline, and this repo's numbers stay a restatement a kit cannot see.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, beside the hotfix-push
   allowance it landed in CLAUDE.md; promoted at the next iteration's scope.
 
-- **gap-inbox-kit-ref-valve** [design-pending] [cost: event/low] [surface: canon-kit] —
+- **gap-inbox-kit-ref-valve** [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
   and names future knobs and paths, but the gap inbox is design-ahead in the same way and is not
   valved.
@@ -155,14 +140,14 @@
   the battery at `config-seam-fourth-cut`'s close, and the filed prose had to describe the knobs
   instead of naming them. The valve reads `GATE_SDK_QUEUE_FILE`
   (`native/src/gates/kit_ref_liveness.rs`), so the inbox has no knob read to join it by today.
-  **Why `[design-pending]`:** either the inbox joins the valve (it is truncated every close, so a
+  **Why design-pending:** either the inbox joins the valve (it is truncated every close, so a
   dangling name cannot outlive a boundary), or the rule that capture prose not spell unminted names
   is stated where filers read it; the first changes a gate's scanned corpus, the second is prose.
   **Cost while deferred:** a gap filer who names a proposed knob reds the battery and rewords.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, from the red its own
   filing hit; promoted at the next iteration's scope.
 
-- **kit-token-anchor-hook-for-divergence** [design-pending] [cost: event/low] [surface: gate-sdk] — a
+- **kit-token-anchor-hook-for-divergence** [cost: event/low] [surface: gate-sdk] — a
   `kit:<glob>` couples token expands against two different anchors, so where kits are not vendored
   at the repository root `run-gates --for` selects against globs no staged path matches.
   **Read off the source at the drain:** the hook emitter (`native/src/emit/git_hooks.rs`, its
@@ -171,7 +156,7 @@
   the substrate-parity pass expand through `walk::kit_roots_rel`, anchored at the gate-sdk root's
   parent. In this tree both spell the same roots. gate-sdk/SPEC.md §run-gates rules any divergence
   between what the hook runs for a staged path and what `--for` runs a bug.
-  **Why `[design-pending]` and not a drain fix:** only the `--for` reader's anchor is settled by
+  **Why design-pending and not a drain fix:** only the `--for` reader's anchor is settled by
   that rule; whether the graph, port-blockers and parity readers follow is a per-reader call, and
   the proof needs a fixture vendoring kits under a subdirectory, which no suite carries.
   **Cost while deferred:** paid by an adopter who hand-vendors kits under a subdirectory (`init`
@@ -179,7 +164,7 @@
   Filed 2026-09-15 to the gap inbox from the git-hooks port's sandbox byte-parity proof; promoted
   at `owed-port-tail`'s close.
 
-- **gate-tamper-default-library-path-unvendored** [design-pending] [cost: event/low] [surface: delegation-kit] — the kit
+- **gate-tamper-default-library-path-unvendored** [cost: event/low] [surface: delegation-kit] — the kit
   default of `DELEGATION_KIT_GATE_FILES` (`native/src/knobs/delegation_kit.rs`,
   delegation-kit/SPEC.md §Layout and configuration) names `<gates-dir>/lib/gate.sh` as its third
   element, a path no vendored tree carries — the gate library sits under the vendored gate-sdk
@@ -188,7 +173,7 @@
   knob file names the right path, which is why the battery here never showed it. Distinct from
   `gate-file-coverage-closure`, which enumerates registered gate files and would not reach the
   library.
-  **Why [design-pending]:** the fix derives the element from a gate-sdk root input rather than the
+  **Why design-pending:** the fix derives the element from a gate-sdk root input rather than the
   gates dir, and which root knob (relative to what `check-gate-tamper` matches) is a choice; it
   widens the gate's refusal set for every consumer on the default, so it owes a fixture arm and a
   Tightened-gates declaration.
@@ -196,14 +181,14 @@
   isolation rule.
   Filed 2026-09-14 by `config-seam-third-cut`'s build (batch 2); drained at its close.
 
-- **fixture-suites-never-run-history-less** [design-pending] [cost: event/low] [surface: .github] — no
+- **fixture-suites-never-run-history-less** [cost: event/low] [surface: .github] — no
   CI leg or smoke runs a kit's fixture suites outside this repo's full git history, so a pair that
   reads the host repo's history passes here and fails in a consumer tree or a depth-1 clone.
   **Attested once:** check-docs-cmd's assertion-C cases did, until `static-config-seam`'s close
   moved them into a scratch-history test; a depth-1 clone printed FAIL for that bad case first.
   **Probed at promotion, no live instance:** every suite `gate_fixture_suites` derives ran clean
   in a depth-1 clone of HEAD, so the class is unguarded rather than red.
-  **Why [design-pending]:** the gates workflow checks out at full depth for a battery gate that
+  **Why design-pending:** the gates workflow checks out at full depth for a battery gate that
   reads the commit graph, so the candidate — the fixture step run from a history-less copy, or a
   consumer-smoke arm doing the same — decides which job pays the copy and whether the template
   ships it.
@@ -212,7 +197,7 @@
   Filed 2026-09-14 by `static-config-seam`'s close into the gap inbox; no stage of that iteration
   could drain it, and this scope promoted it, so the record is late and says so.
 
-- **agent-file-paragraph-sections-ungoverned** [design-pending] [cost: event/low] [surface: context-kit] — `check-brevity`,
+- **agent-file-paragraph-sections-ungoverned** [cost: event/low] [surface: context-kit] — `check-brevity`,
   widened to a section set and every top-level item (context-kit/SPEC.md §The brevity gate),
   reads list items only, so the agent file's paragraph sections carry no brevity bound — its
   kit-governance section alone runs about sixty lines of rule prose, beside the provenance-seam
@@ -226,20 +211,20 @@
   Filed 2026-09-13 at `resident-tier-restatement`'s spec, from the brevity-reach amendment;
   drained at its close.
 
-- **consumer-footprint-roster-omits-lifecycle-kit** [design-pending] [cost: event/low] [surface: context-kit] — context-kit/SPEC.md
+- **consumer-footprint-roster-omits-lifecycle-kit** [cost: event/low] [surface: context-kit] — context-kit/SPEC.md
   §The consumer footprint rosters each kit's resident ask under a one-pointer-line budget, lists
   delegation-kit, doctrine-kit and drift-kit, and says every other kit asks none. lifecycle-kit asks
   more: its generated registration block in the agent file (lifecycle-kit/SPEC.md
   §check-lifecycle-registration) and the gap-capture and survey-capture bullets. Re-verified at the
   drain against the roster text.
-  **Why [design-pending], cross-component:** either the roster gains a lifecycle-kit row and the
+  **Why design-pending, cross-component:** either the roster gains a lifecycle-kit row and the
   budget rule states its exception, or the asks move behind a load trigger.
   **Cost while deferred:** an adopter weighing adoption cost reads a footprint that understates one
   kit's resident ask.
   Filed 2026-09-13 by the clause-owner audit behind `resident-tier-restatement`'s Housekeeping
   cut; drained at that iteration's close.
 
-- **harness-moved-background-task-unrecorded** [design-pending] [cost: event/high] [surface: delegation-kit] — a command the
+- **harness-moved-background-task-unrecorded** [cost: event/high] [surface: delegation-kit] — a command the
   harness moves to the background on its timeout is a live producer no liveness record names.
   **Split out of `backgrounded-shell-child-run-record-unenforced` — operator direction, 2026-09-11,
   lead-relayed**, since landed, which kept the explicit-launch block and the recorded-launch grant.
@@ -278,14 +263,14 @@
   `background_tasks` key and not its contents.
   recurrence: harness-moved-background-task-unrecorded 2026-09-14
 
-- **config-variant-battery-harness** [design-pending] [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
+- **config-variant-battery-harness** [cost: event/high] [surface: gate-sdk] — nothing shipped lets a customer run the
   battery under a named config-seam variant and see what changes; the fixture pairs prove each
   gate's arm against fixed trees, and the smoke scripts are this repo's harness legs.
   **Operator ruling at consult: file it costed.** Deliverable: a shipped, bridged arm that takes a
   scratch copy of the consumer's tree, applies a named variant of the config seam, runs the
   battery, and prints the per-gate verdict diff against baseline — so an adopter sees which gates
   a knob arms, disarms or reds before committing the knob.
-  **Why [design-pending]:** the variant's declaration form (an env file or a config-dir overlay),
+  **Why design-pending:** the variant's declaration form (an env file or a config-dir overlay),
   whether the scratch copy is a worktree or a copy that carries untracked content, and whether
   the diff or a full report is the product. Native, per the interpreter objective.
   **Refused:** repurposing the smoke scripts, which are install recipes read as text by the
@@ -295,7 +280,7 @@
   the next red; the preview cohort's false-positive dispositions have no cheap rehearsal.
   Filed 2026-09-11 by consult as a direct entry, the test gap the operator named there.
 
-- **gate-binary-platform-roster-holes** [design-pending] [cost: once/low] [surface: native] — the shipped platform roster held four
+- **gate-binary-platform-roster-holes** [cost: once/low] [surface: native] — the shipped platform roster held four
   joined triples and two more the installed base plainly wants; **one of the two is discharged and
   this entry is what is left of it.**
   **PRODUCT-class** by the 2026-08-30 witness discriminator — the install path is adopter-facing,
@@ -335,7 +320,7 @@
   own-authority` 2026-09-11 through the lead's message channel, that lead reversing its own Done
   instruction of the same date after verifying the grounds at source.
 
-- **markdown-hard-wrap-unowned-and-ungated** [design-pending] [cost: once/high] [surface: queue-kit] — this repo's markdown hard-wrapping
+- **markdown-hard-wrap-unowned-and-ungated** [cost: once/high] [surface: queue-kit] — this repo's markdown hard-wrapping
   convention is unowned, bimodal and load-bearing for a gate whose manifest does not say so, and
   under enforcement-first the unwrap and its oracle land in one unit or neither does.
   **Measured at 2026-09-10 and RE-VERIFIED at this scope's HEAD.** `TRAJECTORY.md` is ungated —
@@ -372,7 +357,7 @@
   lead into the gap inbox of `packer-port-terminal-cut`'s close and promoted at this scope. The full
   probed body is recoverable: `git log -p -S'bimodal, and load-bearing' -- .workflow/gap-inbox.md`.
 
-- **queue-entry-shape-slugs-headings-links** [design-pending] [cost: once/low] [surface: queue-kit] — the operator's queue-shape sequence:
+- **queue-entry-shape-slugs-headings-links** [cost: once/low] [surface: queue-kit] — the operator's queue-shape sequence:
   ratchet slug length, make each task a third-level heading, then make every cross-task reference a
   real link and retire the bold-code typographic convention. Steps two through five of the
   2026-09-10 sequence, whose ORDER IS BINDING.
@@ -409,7 +394,7 @@
   Surfaced 2026-09-10 as above; full body via
   `git log -p -S'TASKS BECOME THIRD-LEVEL HEADINGS' -- .workflow/gap-inbox.md`.
 
-- **gates-must-not-bind-to-document-paths** [design-pending] [cost: once/high] [surface: gate-sdk] — a gate may know a document's SHAPE
+- **gates-must-not-bind-to-document-paths** [cost: once/high] [surface: gate-sdk] — a gate may know a document's SHAPE
   and never its PATH; path is always config. The discriminator is the operator's, ruled 2026-09-10,
   and it REPLACES the lead's earlier one.
   **The lead's refused reading, recorded because it is the trap.** The lead's discriminator was that
@@ -437,7 +422,7 @@
   Surfaced 2026-09-10 as above; the full probed body via
   `git log -p -S'GATES MUST NOT BIND TO DOCUMENT TYPES' -- .workflow/gap-inbox.md`.
 
-- **install-smoke-leg-names-mix-two-axes** [design-pending] [cost: event/low] [surface: .github] — the `install-smoke` legs in
+- **install-smoke-leg-names-mix-two-axes** [cost: event/low] [surface: .github] — the `install-smoke` legs in
   `.github/workflows/gates.yml` spend one suffix slot on two different axes, and two tracked
   surfaces now carry prose whose only job is to undo the misreading that produces.
   **The naming, read off the workflow.** Three legs take a PLATFORM suffix
@@ -461,7 +446,7 @@
   correct-but-underexplained disposition, a name a reader must be corrected about not being
   intuitive however well the correction is written. Closing this as no-mechanism is therefore not
   available to a later drain.
-  **Why `[design-pending]`:** two schemes are live and unranked — bootstrap-first
+  **Why design-pending:** two schemes are live and unranked — bootstrap-first
   (`install-smoke-bash-<platform>` alongside `install-smoke-powershell`), or
   platform-suffix-preserving (rename only the odd leg so it names its bootstrap unambiguously) —
   and the blast radius has to be priced with the scheme rather than discovered after it.
@@ -487,7 +472,7 @@
   because the operator's ruling makes the current naming a defect to close rather than a
   state to accept.
 
-- **toolchain-floor-spawn-on-native-windows** [design-pending] [cost: event/high] [surface: gate-sdk] — a compiled gate binary should not
+- **toolchain-floor-spawn-on-native-windows** [cost: event/high] [surface: gate-sdk] — a compiled gate binary should not
   need a GNU userland on the host at all, and the floor roster it advertises is wider than the set
   it actually spawns.
   **RE-SCOPED 2026-09-09 at scope, `lead, own-authority` through the message channel, because the
@@ -509,7 +494,7 @@
   requiring GNU `sort`, `date` and `stat` on the host is bash-era residue the pivot exists to
   collapse; the roster should shrink to what the binary's gates actually spawn, and on a native
   host that may be git alone.
-  **Why `[design-pending]`:** the roster is a published adopter claim as well as a runtime
+  **Why design-pending:** the roster is a published adopter claim as well as a runtime
   precondition, so narrowing it is an envelope change rather than a measurement — and what the
   binary spawns is itself moving while the port's remainder lands, so choosing the corpus to
   measure against is the design call.
@@ -519,7 +504,7 @@
   re-scoped the same day at scope, its filed premise having been overtaken by a commit that
   preceded the filing.
 
-- **instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set** [design-pending] [cost: event/high] [surface: .github] — an
+- **instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set** [cost: event/high] [surface: .github] — an
   instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running
   green ONCE, so widening the leg afterwards re-creates, silently, the never-run condition the
   exemption existed for.
@@ -535,7 +520,7 @@
   leg to the floor and cast the bare `-match` whose `System.Object[]` killed the step;
   `install-smoke-powershell` is SUCCESS at `273a9d76` in run `34346492761`, re-verified at this
   scope. Master is green and nothing needs reverting — what survives is the keying.
-  **Why `[design-pending]`, a real fork with no obviously right limb:** an expiry keyed to *the
+  **Why design-pending, a real fork with no obviously right limb:** an expiry keyed to *the
   assertion set unchanged* needs a stable identity for that set, which the live leg spells as
   inline PowerShell rather than as anything a scanner can count; a re-arm obligation on the
   widening session is a prose rule no gate reads and the same class this tree keeps refusing; and
@@ -566,7 +551,7 @@
   that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the record
   is late and says so.
 
-- **binding-intel-leg-failed-one-run-in-two** [design-pending] [cost: event/high] [surface: .github] — a leg this project made binding
+- **binding-intel-leg-failed-one-run-in-two** [cost: event/high] [surface: .github] — a leg this project made binding
   failed one of its first two runs, non-deterministically, in a way no finished run can diagnose;
   master is green and nothing needs reverting.
   **Read the resolution first.** Master went red at `adb7379f` and GREEN again at `7329b319`, the
@@ -603,7 +588,7 @@
   **Re-costed iteration/high to event/high — operator direction, 2026-09-17, lead-relayed:** the
   cost is per firing, and the leg passed in the last 20 master `gates` runs.
 
-- **substrate-parity-audits-one-producer-of-two** [design-pending] [cost: event/high] [surface: gate-sdk] — the parity gate's release-path
+- **substrate-parity-audits-one-producer-of-two** [cost: event/high] [surface: gate-sdk] — the parity gate's release-path
   assertions read a single named workflow, and the tree now has two workflows that build and hash a
   published-shaped artifact.
   **Verified at source 2026-09-08.** `native/src/gates/gate_substrate_parity.rs`:696 resolves
@@ -625,7 +610,7 @@
   change is adopter-facing design; promoted rather than iceboxed because the second producer is
   live in the tree today.
 
-- **held-ci-leg-failure-reddens-a-binding-one** [design-pending] [cost: event/high] [surface: .github] — a held producer leg's failure
+- **held-ci-leg-failure-reddens-a-binding-one** [cost: event/high] [surface: .github] — a held producer leg's failure
   fails the workflow through a binding consumer leg, so held-ness is defeated for the pair, and the
   binding leg's measurement goes to zero rather than degrading.
   **Every premise verified at HEAD 2026-09-08 and measured on a live run.** `native-artifacts`
@@ -660,7 +645,7 @@
   envelope question the operator has already declined once in its wider form; promoted rather than
   iceboxed because the coupling is structural and inherited, which no single green run retires.
 
-- **measured-marker-cannot-sit-mid-paragraph** [design-pending] [cost: event/low] [surface: canon-kit] — `check-measured-claim` binds its
+- **measured-marker-cannot-sit-mid-paragraph** [cost: event/low] [surface: canon-kit] — `check-measured-claim` binds its
   marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
   goes stale unwatched; TRAJECTORY.md's port figures are the attested instance.
   **The staleness is attested, not predicted.** The ordering paragraph read "thirty-five owed
@@ -693,7 +678,7 @@
   which no stage of that iteration could drain; carried into this iteration's scope intake and
   promoted here, so the record is late and says so.
 
-- **kit-knob-consumer-adapter-convention** [design-pending] [cost: event/low] [surface: evidence-kit] — whether a kit may ship
+- **kit-knob-consumer-adapter-convention** [cost: event/low] [surface: evidence-kit] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
   the front-end shape that answer takes should be a named convention rather than each consumer's
   invention.
@@ -743,7 +728,7 @@
   barring the drain's promote.
   recurrence: kit-knob-consumer-adapter-convention 2026-09-03
 
-- **path-dialect-clauses-unenforced** [design-pending] [cost: event/high] [surface: gate-sdk] — the two clauses gate-sdk/SPEC.md §The
+- **path-dialect-clauses-unenforced** [cost: event/high] [surface: gate-sdk] — the two clauses gate-sdk/SPEC.md §The
   path-dialect contract gained 2026-08-30 are held by review alone, and neither is shaped like the
   form scan `check-path-dialect` already runs.
   **Clause one: the cwd anchor has no oracle.** That section obliges a script to anchor its own
@@ -774,7 +759,7 @@
   (the assertion the second bullet proposes reds a benign population); icebox second, refused
   because a gate's verdict on an adopter's host is adopter-facing.
 
-- **plugin-marketplace** [design-pending] [roadmap: later/ecosystem] [cost: once/low] [surface: installer] — harness plugin packaging.
+- **plugin-marketplace** [roadmap: later/ecosystem] [cost: once/low] [surface: installer] — harness plugin packaging.
   roadmap-summary: The stage skills and guards installable as a harness plugin.
   Harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
@@ -820,7 +805,7 @@
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
-- **benchmark-ab-experiment** [design-pending] [roadmap: later/adoption] [cost: once/low] [surface: drift-kit] — a controlled A/B trial.
+- **benchmark-ab-experiment** [roadmap: later/adoption] [cost: once/low] [surface: drift-kit] — a controlled A/B trial.
   roadmap-summary: A controlled experiment measuring drift with and without governance.
   **Cost while deferred:** zero — the self-referential drift-trajectory route
   already carries the claim this rung would upgrade, and the measurement half it
@@ -844,7 +829,7 @@
   that tool: verifying the split-lead posture's savings
   (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15 by the
   per-stage budget analysis that motivated that posture.
-- **hosted-attestation-service** [design-pending] [roadmap: later/commercial] [cost: event/low] [surface: evidence-kit] — hosted attestation.
+- **hosted-attestation-service** [roadmap: later/commercial] [cost: event/low] [surface: evidence-kit] — hosted attestation.
   roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.
   The team/paid rung: gates
   verified server-side by a party the committing agents cannot touch —
@@ -858,7 +843,7 @@
   so nothing rots; the residue is that gate runs stay self-attested, which binds
   only when a party the committing agents cannot touch is asked to trust them.
 
-- **heterogeneous-agent-delegation** [design-pending] [roadmap: later/ecosystem] [cost: iteration/low] [surface: delegation-kit] — foreign agents.
+- **heterogeneous-agent-delegation** [roadmap: later/ecosystem] [cost: iteration/low] [surface: delegation-kit] — foreign agents.
   roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.
   Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent,
   extending the homogeneous multi-agent model to a heterogeneous fleet. It cashes the
@@ -908,7 +893,7 @@
   this design memory ages against fast-moving CLIs.
   Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
-- **background-credential-swap-support** [design-pending] [cost: event/high] [surface: delegation-kit] — first-class support for
+- **background-credential-swap-support** [cost: event/high] [surface: delegation-kit] — first-class support for
   swapping the Anthropic OAuth credential out from under in-flight agents (to
   spread burn across accounts), which the budget oracle does not model today.
   Four components, worst-first; all delegation-kit SPEC+code, all demand-gated
@@ -953,7 +938,7 @@
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
 
-- **gate-file-coverage-closure** [design-pending] [cost: event/high] [surface: delegation-kit] — the missing check class behind a
+- **gate-file-coverage-closure** [cost: event/high] [surface: delegation-kit] — the missing check class behind a
   hole this close fixed inline: nothing asserts that every gate script in the
   tree is matched by some `DELEGATION_KIT_GATE_FILES` glob, so a gate can sit
   outside `check-gate-tamper`'s assertion-A coverage silently. It did: this
@@ -969,7 +954,7 @@
   Cheap and mechanically decidable — the coverage set and the glob set are both
   already in hand at gate time. Needs a `gate-sdk` fixture pair and a home
   (delegation-kit, since it reads that kit's knob).
-  **Why `[design-pending]`:** it makes coverage-completeness a delegation-kit
+  **Why design-pending:** it makes coverage-completeness a delegation-kit
   contract, which is a SPEC assertion, not just a new script.
   **Cost while deferred:** the config is correct today but unheld — the next
   consumer-resident gate, or the next kit-glob edit, can reopen the identical
@@ -978,7 +963,7 @@
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
 
-- **batch-split-stamp-ownership** [design-pending] [cost: event/low] [surface: lifecycle-kit] — who stamps the per-session
+- **batch-split-stamp-ownership** [cost: event/low] [surface: lifecycle-kit] — who stamps the per-session
   audit trail when a live lead splits one stage across several batch sessions is
   unowned. This iteration recorded **one** `build` line in
   `.workflow/WORKFLOW-STATE.txt` for five batch sessions.
@@ -1006,7 +991,7 @@
   is stamping per batch or narrowing the contract to per stage. If per batch, the
   second half is what makes an instruction both templates already carry actually
   bind, since prose alone demonstrably did not.
-  **Why `[design-pending]`:** it either narrows a shipped stamp contract and
+  **Why design-pending:** it either narrows a shipped stamp contract and
   `check-stage-evidence`'s reading of it, or adds an oracle where two templates
   now rely on a dispatched session's compliance; and it recurs on every batched
   stage, not just build.
@@ -1028,7 +1013,7 @@
   recurrence: batch-split-stamp-ownership 2026-08-29
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
 
-- **companion-toolkit-profile** [design-pending] [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
+- **companion-toolkit-profile** [roadmap: next/ecosystem] [cost: event/high] [surface: lifecycle-kit] — the interop rung.
   roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.
   Govern a tree whose specs an **external spec-authoring toolkit produced** — a
   consumer profile for when the specs Checkwright gates were written by a second
@@ -1078,7 +1063,7 @@
   reputational and front-door-resident, accruing on every reader rather than with
   time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
 
-- **design-partner-preview** [design-pending] [cost: event/low] [surface: installer] — a narrow external preview before
+- **design-partner-preview** [cost: event/low] [surface: installer] — a narrow external preview before
   any broad announcement: a narrow external preview cohort, its composition ruled
   in the operator's brief, installs observed live rather than by written feedback,
   instrumented for
@@ -1125,7 +1110,7 @@
   Surfaced 2026-08-02 at close, in the same intake pass, as the review's own
   fourth-ranked priority.
 
-- **external-gate-quality-evidence** [design-pending] [cost: event/low] [surface: evidence-kit] — durable, published
+- **external-gate-quality-evidence** [cost: event/low] [surface: evidence-kit] — durable, published
   evidence of **gate quality as experienced outside this tree**: per-gate
   true/false-positive history, the disposition of each red a non-author hit, and
   whether a red changed behaviour or was worked around. The review's own
@@ -1156,7 +1141,7 @@
   Surfaced 2026-08-02 at close, in the same intake pass, as the third and last
   of the growth half's unfiled items.
 
-- **gate-authoring-sdk-surface** [design-pending] [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] — a gate-authoring SDK.
+- **gate-authoring-sdk-surface** [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] — a gate-authoring SDK.
   `.gate` as the substrate-neutral surface. **Operator-surfaced during
   `native-gate-dispatch-seam` build; filed so the framing outlives the session that
   saw it.** Horizon set 2026-08-02 on the operator's steer: this is ecosystem work
@@ -1191,7 +1176,7 @@
   before the second language exists — not after.
   Filed 2026-08-02 by build, on an operator ruling, during `native-gate-dispatch-seam`.
 
-- **gate-tamper-exemption-reader-substrate** [design-pending] [cost: event/low] [surface: gate-sdk] — `check-gate-tamper`'s
+- **gate-tamper-exemption-reader-substrate** [cost: event/low] [surface: gate-sdk] — `check-gate-tamper`'s
   exemption reader has no implementation-side equivalent.
   Split 2026-08-09 at scope by operator ruling from `gate-tamper-roster-native-reach`,
   when that entry narrowed to its meta-path-roster half and promoted; this is the
@@ -1199,7 +1184,7 @@
   `native-gate-meta-layer-reach`, so this is the second narrowing of one original gap.
   `extract_exemptions()` parses a shell `# exception-list:` array literal, so a ported
   gate's Rust module can carry no exemption the gate is able to read.
-  **Why `[design-pending]`:** it wants the ruling `gate-authoring-sdk-surface` holds
+  **Why design-pending:** it wants the ruling `gate-authoring-sdk-surface` holds
   — whether a meta-gate reads a substrate-neutral descriptor or learns each
   substrate — and that entry is horizon-set to ecosystem work, so this one waits.
   **The coupling was checked at the split rather than inherited.** It is true of this
@@ -1212,7 +1197,7 @@
   Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-09
   at scope.
 
-- **partitive-exemption-line-scope** [design-pending] [cost: event/high] [surface: canon-kit] — `check-manifest-count` is stricter
+- **partitive-exemption-line-scope** [cost: event/high] [surface: canon-kit] — `check-manifest-count` is stricter
   than its own spec, and the gap is one line break wide.
   Verified 2026-08-03 by build batch 4: prose reading "appeared in 57 of" / "the 96 checks
   counted that day" reds as a restated collection total purely because the line broke
@@ -1236,7 +1221,7 @@
   belongs in the shared spec adapter where both gates read it — `check-prose-enum` shares
   the same adapter and inherits the same defect — not in either gate. Plus a `good/`
   fixture case pinning a wrapped partitive, the regression the current pair does not carry.
-  **Why `[design-pending]`:** paragraph-joined and one-line-lookback are not the same
+  **Why design-pending:** paragraph-joined and one-line-lookback are not the same
   contract. Joining widens the exemption to any partitive anywhere in the paragraph, a real
   false-negative surface; the lookback is narrower and arbitrary. The spec says sentence,
   and neither implements a sentence.
@@ -1245,7 +1230,7 @@
   the exemption set rather than merely costing a reflow.
   Filed 2026-08-03 at close from the gap inbox; found by build batch 4.
 
-- **session-model-identity-verification** [design-pending] [cost: event/high] [surface: delegation-kit] — a session cannot report or
+- **session-model-identity-verification** [cost: event/high] [surface: delegation-kit] — a session cannot report or
   verify the model tier it is running at.
   The session-context hook prints iteration, budget and drift; `drift-report` prints neither.
   Nothing surfaces the running model, so a session cannot state its own tier without a human
@@ -1265,7 +1250,7 @@
   `Co-Authored-By` attribution defect has no derivable fix without it.
   Filed 2026-08-04 at close from the gap inbox; filed by the lead.
 
-- **consult-tier-declaration** [design-pending] [blocked-by: session-model-identity-verification] [cost: event/high] [surface: delegation-kit]
+- **consult-tier-declaration** [blocked-by: session-model-identity-verification] [cost: event/high] [surface: delegation-kit]
   — `/consult` governs the tier of what it dispatches and asserts nothing about its own.
   The skill landed this iteration to carry judgment-tier boundary questions, and its own
   amendment argues it is judgment-tier *by nature* — yet it declares no floor for the session
@@ -1280,7 +1265,7 @@
   and the failure is invisible in the artifact — a thin consultation reads as a short one.
   Filed 2026-08-04 at close from the gap inbox; filed by the lead on operator direction.
 
-- **intra-file-pendency-contradiction-scan** [design-pending] [cost: event/high] [surface: canon-kit] — one file can call the same
+- **intra-file-pendency-contradiction-scan** [cost: event/high] [surface: canon-kit] — one file can call the same
   slug landed in one section and pending in another, and nothing reads both.
   Found at close 2026-08-04 by the `capability-pendency-after-landing` audit:
   gate-sdk/SPEC.md said a second port "lands after `native-artifact-publish-path` and
@@ -1299,7 +1284,7 @@
   exist yet", "not yet") within the same file. It needs no tree comparison and no judgment
   about what is actually live: the contradiction is internal, so the file falsifies itself.
   That is what makes it gateable where its parent class is not.
-  **Why `[design-pending]`:** the construction vocabulary is the whole gate, and a literal
+  **Why design-pending:** the construction vocabulary is the whole gate, and a literal
   phrase list in a kit is drift by construction plus a provenance-seam problem — the
   vocabulary is consumer editorial. It wants the `check-graph` / `graph-vocab.knobs` treatment,
   optional consumer config, which is a design call rather than a size one. Also open: whether
@@ -1310,7 +1295,7 @@
   — gate-sdk/SPEC.md is mirrored to the docs site, so the contradiction shipped.
   Filed 2026-08-04 at close; the instances it would have caught were fixed the same session.
 
-- **amendment-refusal-acceptance-parity** [design-pending] [cost: event/low] [surface: canon-kit] — an amendment's refusal rationale can
+- **amendment-refusal-acceptance-parity** [cost: event/low] [surface: canon-kit] — an amendment's refusal rationale can
   claim an acceptance criterion asserts something that criterion does not say.
   The `--dry-run` amendment refused a gate on the stated ground that the behavioral property was
   asserted directly instead, in D8, as *each mutating verb's* `--dry-run` leaving the tree object
@@ -1331,7 +1316,7 @@
   no tree comparison — on a different axis: that one is about tense, this about the scope of an
   acceptance claim. Cited rather than folded, because collapsing them would hand one gate two
   unrelated vocabularies.
-  **Why `[design-pending]`:** the decidable predicate is not obvious. "A refusal section citing an
+  **Why design-pending:** the decidable predicate is not obvious. "A refusal section citing an
   acceptance item must quote it" is checkable but is ceremony; comparing a paraphrase against the
   criterion it paraphrases is a judgment no scanner makes. The honest middle — a refusal may cite
   an acceptance item by identifier and may not restate its content — is a change to the amendment
@@ -1355,7 +1340,7 @@
   Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was
   escalated as an envelope call and folded in here on the lead's ruling the same day.
 
-- **docs-link-red-remedy-first** [design-pending] [cost: event/high] [surface: site-kit] — `check-docs-link-convention` reds on the
+- **docs-link-red-remedy-first** [cost: event/high] [surface: site-kit] — `check-docs-link-convention` reds on the
   most ordinary thing a docs subpage author writes, and leads with the diagnosis.
   **Measured 2026-08-09 at spec on a real `init` consumer.** A `docs/` tree whose `index.md`
   carries a `[project README](../README.md)` link reds with "off-root relative link … resolves
@@ -1375,7 +1360,7 @@
   false-feeling red.
   Filed 2026-08-09 by close, draining the bullet spec filed under scope-gated intake.
 
-- **init-dry-run-plan-parity** [design-pending] [cost: event/high] [surface: installer] — `init --dry-run` is a hand-maintained second
+- **init-dry-run-plan-parity** [cost: event/high] [surface: installer] — `init --dry-run` is a hand-maintained second
   spelling of the seeds it predicts, and three of its four remaining arms already diverge.
   **The queue arm was exactly this defect, and `install-queue-template-unreachable` removed it**
   this iteration — one predicate, the write alone guarded by `(( DRY ))`. The four sibling arms
@@ -1400,7 +1385,7 @@
   first-contact surface the profile work is being bought to improve.
   Filed 2026-08-09 by close, draining the build stage's bullet.
 
-- **kit-ref-liveness-stem-token-hole** [design-pending] [cost: event/high] [surface: canon-kit] — a typo'd knob name under
+- **kit-ref-liveness-stem-token-hole** [cost: event/high] [surface: canon-kit] — a typo'd knob name under
   a defined stem resolves and passes unchecked.
   Build batch 2 widened `check-kit-ref-liveness` so that a dispatch-composed knob
   name resolves against its defined *stem* rather than requiring a full literal
@@ -1411,7 +1396,7 @@
   **Inherent to the shape, not a defect in the fix** — which is why it is filed
   rather than reverted. A composed name has no enumerable literal set, so tightening
   means reconstructing the composition rule inside the gate.
-  **Deliverable, and why `[design-pending]`:** the candidates are to have the
+  **Deliverable, and why design-pending:** the candidates are to have the
   binary answer the question (`--knobs` already reports a gate's knob set, so the
   gate could resolve a composed token against the live answer rather than a stem)
   or to constrain the tail to a declared per-gate knob roster. The first is
@@ -1422,7 +1407,7 @@
   surfaces as behavior, not as a red.
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
 
-- **vendored-library-identifier-reach** [design-pending] [cost: iteration/low] [surface: doctrine-kit] — De-literalization's reach test gives
+- **vendored-library-identifier-reach** [cost: iteration/low] [surface: doctrine-kit] — De-literalization's reach test gives
   two answers for a vendored `lib/*.sh` function, and the corpus holds both populations.
   The rule bans prose restating a source's **internal** identifier roster while allowing public
   contract names. Two readings of "internal" are both defensible and they disagree:
@@ -1442,7 +1427,7 @@
   **Deliverable:** rule it in doctrine-kit/DOCTRINE.md's De-literalization rule so the reach test
   is stated rather than re-derived per audit, then sweep whichever population the ruling makes
   findings.
-  **Why `[design-pending]` and not simply decided:** the governing docs do not resolve it and
+  **Why design-pending and not simply decided:** the governing docs do not resolve it and
   only precedent would, which is the case the spec-over-precedent rule says not to settle from
   history. Escalated to the lead at this close alongside filing.
   **Not blocking the audit it came from:** all seven findings that close's
@@ -1464,7 +1449,7 @@
   Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it;
   third population added 2026-08-14 by close from the same rostered sweep, which declined again.
 
-- **guard-ruleset-registration-lockstep** [design-pending] [cost: event/low] [surface: guard-kit] — guard-kit's generic ruleset exists in
+- **guard-ruleset-registration-lockstep** [cost: event/low] [surface: guard-kit] — guard-kit's generic ruleset exists in
   three places and nothing holds them in lockstep.
   The numbered roster in `guard-kit/SPEC.md` §The generic ruleset, the set of named
   `guard_rule_*` functions in `lib/guard.sh`, and the fixed dispatch order inside
@@ -1492,7 +1477,7 @@
   ships silently; the three-way correspondence is exactly what a registration gate is for.
   Filed 2026-08-13 by close, draining the gap inbox; the SPEC re-grepped for both identifiers.
 
-- **install-disposition-smoke-accounting-split** [design-pending] [cost: event/low] [surface: gate-sdk] — the precommit gate checks smoke
+- **install-disposition-smoke-accounting-split** [cost: event/low] [surface: gate-sdk] — the precommit gate checks smoke
   registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
   caught one stage late, at validate.
   `check-install-disposition` skips every non-`zero-config` disposition outright
@@ -1509,7 +1494,7 @@
   `consumer_smoke` caught it, fixed in one line at `1e18d154`. The same iteration's batch-B gate was
   `zero-config` and WAS registered, so the seam is the disposition split rather than a careless
   batch.
-  **Why `[design-pending]`:** the fix shape needs a ruling, not a build. Either widen
+  **Why design-pending:** the fix shape needs a ruling, not a build. Either widen
   `check-install-disposition` to run the full accounting for every disposition, or move the
   accounting out of `consumer_smoke` into a precommit member — the second buys the coverage but may
   re-buy smoke cost at every commit, which is the trade nothing here settles.
@@ -1535,7 +1520,7 @@
   Filed 2026-08-22 by close, draining the gap inbox; the lead filed the bullet at validate and this
   drain re-verified the skip at its source rather than off the gate's `spec:` line.
 
-- **baseline-row-prose-coupling-gate** [design-pending] [cost: event/low] [surface: canon-kit] — governed prose asserts what
+- **baseline-row-prose-coupling-gate** [cost: event/low] [surface: canon-kit] — governed prose asserts what
   `.workflow/validate-baseline.txt` holds, and nothing checks it against the file.
   **The instance that bought this entry** was fixed at this close, not deferred: `gate-sdk/SPEC.md`
   claimed in two places that the baseline carried a held `installer_smoke fail` row. It was flipped
@@ -1564,7 +1549,7 @@
   Filed 2026-08-14 by close, from its own gap-inbox drain and staleness review; kept in Deferred at
   the 2026-08-24 eviction review on the trigger above and on the live slug it names.
 
-- **gap-capture-argv-prompt-friction** [design-pending] [cost: event/low] [surface: gate-sdk] — the mandated capture tools take their
+- **gap-capture-argv-prompt-friction** [cost: event/low] [surface: gate-sdk] — the mandated capture tools take their
   prose as an argv string, so every filing whose prose contains shell punctuation costs an
   out-of-band permission decision.
   recurrence: gap-capture-argv-prompt-friction 2026-08-15
@@ -1595,7 +1580,7 @@
   which taxes exactly the good filings.
   Filed 2026-08-14 by close, from the prompt-friction triage.
 
-- **bridged-knob-owner-for-consumer-gate** [design-pending] [cost: event/high] [surface: gate-sdk] — every knob resolves against a static
+- **bridged-knob-owner-for-consumer-gate** [cost: event/high] [surface: gate-sdk] — every knob resolves against a static
   kit table, so a consumer-declared ported gate that needs a consumer-owned knob is refused on
   every invocation with no table able to answer it.
   **RE-GROUNDED 2026-09-15 at `config-seam-fourth-cut`'s close, which retired the bridge this
@@ -1613,7 +1598,7 @@
   That entry owned the *declaration* question — the owner column and conservation row, authored
   this iteration — and this owns the *dispatch* question, which that amendment names and
   deliberately leaves unanswered because no member of its first tranche declares a knob.
-  **Why `[design-pending]`:** the three candidates filed here were bridge-shaped (widen a sourced
+  **Why design-pending:** the three candidates filed here were bridge-shaped (widen a sourced
   search path, borrow a kit prefix, name a resolving library) and none survives the static table:
   the prefix borrow is refused as undeclared too. The fork is unre-derived — where a consumer
   declares a row (its own knob table, or the `.gate` descriptor) — and that is the design owed.
@@ -1624,7 +1609,7 @@
   Filed 2026-08-15 by close, draining the gap inbox; mechanism re-derived against
   `gate-sdk/lib/gate.sh` at the drain and the bullet's account corrected here.
 
-- **in-crate-module-coupling-derivation** [design-pending] [cost: event/low] [surface: gate-sdk] — a ported gate's descriptor can omit
+- **in-crate-module-coupling-derivation** [cost: event/low] [surface: gate-sdk] — a ported gate's descriptor can omit
   the crate modules its own verdict depends on, and no gate says so.
   recurrence: in-crate-module-coupling-derivation 2026-08-19
   **THE CORPUS IS 51 OF 89, measured 2026-08-19 at build and re-derived at this drain**: 51 `.gate`
@@ -1650,7 +1635,7 @@
   **`check-reads-couples` does not reach this**, and the distinction is the design's crux: that
   gate covers **walk roots** — what a gate reads off the filesystem — and an in-process call to a
   sibling module changes no walk root at all. This is a *source* coupling, a different axis.
-  **Why `[design-pending]`, though the derivation looks easy:** a `--deps` arm reporting each
+  **Why design-pending, though the derivation looks easy:** a `--deps` arm reporting each
   gate module's transitive in-crate dependencies is the obvious producer and has a precedent in
   `--reads` (§The non-gate arm), but transitive closure over a shared crate reaches `walk.rs`,
   `proc.rs` and every common helper, so a literal reading couples every gate to most of the
@@ -1664,7 +1649,7 @@
   Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
   fresh finding — the two instances are already fixed.
 
-- **kit-spec-consumer-config-literal** [design-pending] [cost: event/high] [surface: gate-sdk] — nothing stops a kit SPEC from spelling
+- **kit-spec-consumer-config-literal** [cost: event/high] [surface: gate-sdk] — nothing stops a kit SPEC from spelling
   out a value that belongs to a consumer's config, so the seam leaks by worked example.
   The provenance seam (CLAUDE.md) forbids a kit literal carrying consumer content, and
   de-literalization forbids prose owning a value. Both were crossed by one sentence this
@@ -1690,7 +1675,7 @@
   Filed 2026-08-17 by close from its own audit-roster review; the instance was fixed at this
   close and the absent-gate claim probed against `scripts/gates.list` before it was asserted.
 
-- **queue-recovery-pickaxe-wrong-oracle** [design-pending] [cost: event/high] [surface: queue-kit] — every surface that tells a reader how
+- **queue-recovery-pickaxe-wrong-oracle** [cost: event/high] [surface: queue-kit] — every surface that tells a reader how
   to recover an evicted queue body names `git log -S`, which is blind to exactly the eviction it
   documents.
   **Measured, not reasoned, at this close.** `-S` fires only when a literal's occurrence *count*
@@ -1724,7 +1709,7 @@
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
 
-- **threshold-recurrence-routing-residency** [design-pending] [cost: once/low] [surface: lifecycle-kit] — where the threshold-recurrence
+- **threshold-recurrence-routing-residency** [cost: once/low] [surface: lifecycle-kit] — where the threshold-recurrence
   routing clause lives, now that its only carrier has left the live tree.
   **The clause, carried here verbatim so it does not spend by attrition:** *"a third threshold
   recurrence routes to the operator, not to a third decline; two is where lead discretion
@@ -1773,7 +1758,7 @@
   re-verified that no permanent surface carries the clause — the only hits were the inbox this
   drain truncates and the survey record the next first-stage entry truncates.
 
-- **lead-specifies-constraint-not-mechanism** [design-pending] [cost: event/high] [surface: lifecycle-kit] — whether the lead contract should
+- **lead-specifies-constraint-not-mechanism** [cost: event/high] [surface: lifecycle-kit] — whether the lead contract should
   say that a lead states the constraint and a stage session finds the mechanism.
   **The claim, which is what a later scope rules on:** a supervision layer that specifies
   *mechanism* spends its sessions' verification discipline against its own unverified guess. The
@@ -1803,7 +1788,7 @@
   rule, a STAGE-side control and not a lead-side one. So "recoverable" holds only where the
   receiving stage happens to carry a refusal for that exact act; **where it does not there is no
   backstop at all**, which is the generalizable form.
-  **Why [design-pending], and it is the whole reason this is filed rather than landed:**
+  **Why design-pending, and it is the whole reason this is filed rather than landed:**
   lifecycle-kit/templates/lead.md is a kit template binding every consumer, so a rule added there
   is an envelope change. Close refused to make it alone and the lead adopted the refusal rather
   than substituting its own call. What scope owes is whether the claim generalizes past this
@@ -1824,7 +1809,7 @@
   are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
   adopted close's own refusal to take the envelope change alone.
 
-- **projection-trigger-witness** [design-pending] [cost: event/low] [surface: docs] — the generated-projections roster states each
+- **projection-trigger-witness** [cost: event/low] [surface: docs] — the generated-projections roster states each
   projection's staleness trigger in prose, and nothing checks the prose against the emitter.
   **The missing check class, named because a staleness fix without one forfeits it.** This close
   found five false trigger statements in `docs/site-architecture.md` §Generated projections, all
@@ -1837,7 +1822,7 @@
   says stales it and assert the projection's bytes move; and in the negative direction, perturb a
   class the row excludes and assert they do not. This is a property test over the emitters rather
   than a prose scanner, which is what makes it buildable where a claim-parity gate is not.
-  **Why `[design-pending]`:** the row-to-class binding is the open part. The roster names its
+  **Why design-pending:** the row-to-class binding is the open part. The roster names its
   triggers in English, so the witness needs a machine-readable trigger declaration per row, and
   adding one is a docs-surface change carrying its own freshness question.
   **Adjacent to `gate-spec-claim-assertion-parity`**, iceboxed as a human-audit class: that asks
@@ -1850,7 +1835,7 @@
   Surfaced 2026-08-18. Filed 2026-08-18 by close, as the gap generalization owed by the
   `docs/site-architecture.md` staleness fixed in the same commit.
 
-- **shipped-bin-removal-deprecation-path** [design-pending] [cost: event/high] [surface: canon-kit] — deleting a kit-shipped `bin/` tool
+- **shipped-bin-removal-deprecation-path** [cost: event/high] [surface: canon-kit] — deleting a kit-shipped `bin/` tool
   needs no deprecation marker, so that arm of the major-bump criterion is unreachable by design.
   **The instance, probed rather than assumed.** The `freshness-cohort-roadmap-hold-and-batch`
   iteration deleted `drift-kit/bin/trajectory.sh` and `queue-kit/bin/roadmap.sh`. Both shipped:
@@ -1883,7 +1868,7 @@
   Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
   whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
 
-- **prose-tell-threshold-validation** [design-pending] [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
+- **prose-tell-threshold-validation** [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
   are read unvalidated, so a typo turns a calibrated gate into a silent no-op
   or a wall of noise, confidently and with no diagnostic.
   **The count in the filing was wrong and the drain corrected it: five, not six.**
@@ -1897,7 +1882,7 @@
   prefix, so a non-numeric max becomes zero and every paragraph reds, and a non-numeric minimum
   becomes zero and its assertion can never fire. The compiled form reproduces the coercion
   **deliberately** — a refusal the shell never made would be a verdict change across the seam.
-  **Why `[design-pending]`:** the repair is one validation in canon-kit's knob-table validator,
+  **Why design-pending:** the repair is one validation in canon-kit's knob-table validator,
   which every reader shares. What is not
   settled is what a malformed threshold should *do*: refuse the gate at exit 2, matching every
   other knob in that validator, or fall back to the documented default and report. The first is
@@ -1907,7 +1892,7 @@
   Filed 2026-08-19 by close from the gap inbox, which carried it twice — once from the sixth
   batch's port survey and once from the port itself; the drain read the validator and counted.
 
-- **pipeline-membership-idiom-latent** [design-pending] [cost: event/high] [surface: gate-sdk] — the SIGPIPE-under-pipefail membership
+- **pipeline-membership-idiom-latent** [cost: event/high] [surface: gate-sdk] — the SIGPIPE-under-pipefail membership
   idiom that produced `installer-init-noop-regen-conflict` has no gate, so nothing stops the next
   site being written.
   recurrence: pipeline-membership-idiom-latent 2026-08-23
@@ -1929,7 +1914,7 @@
   over the idiom. `battery-runner-port` took the repair and could not take the gate inside its
   envelope, which settles the call by elimination: the gate is what is owed, and it is the only
   shape that stops a seventh site.
-  **Why `[design-pending]`:** born-native per CLAUDE.md — a Rust module matching a
+  **Why design-pending:** born-native per CLAUDE.md — a Rust module matching a
   producer-into-consumer pipe over an array/set membership idiom under `set -o pipefail`, a
   `.gate` descriptor, a `good/`+`bad/` fixture pair, and `gates.list` registration. The design is
   the predicate: separating this idiom from a deliberate early-exit pipe without flooding.
@@ -1942,7 +1927,7 @@
   Filed 2026-08-19 by close from the gap inbox; recurrence judged and stamped at
   `battery-runner-port`'s close, whose drain re-ran the sweep and found the corpus empty.
 
-- **settings-hook-command-path-gate** [design-pending] [cost: event/high] [surface: context-kit] — a hook registration in
+- **settings-hook-command-path-gate** [cost: event/high] [surface: context-kit] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
   fails silently at run time.
   **Probed at the drain, not reasoned:** `check-settings-paths` resolves command tokens for
@@ -1956,7 +1941,7 @@
   `check-settings-paths` already owns, so widening its subject from one JSON pointer to two is a
   small port-side change; extending the enforcement map's hook-event roster is a docs-projection
   ruling about what belongs on that page, not a gate.
-  **Why `[design-pending]`:** whether the widened subject stays inside `check-settings-paths` or
+  **Why design-pending:** whether the widened subject stays inside `check-settings-paths` or
   mints a second gate name is canon-kit's new-names litmus, and the projection half is a scope
   call on the enforcement page that nobody has taken.
   **Cost while deferred:** a broken hook is invisible until the behaviour it guards silently stops
@@ -1964,7 +1949,7 @@
   Filed 2026-08-22 at spec while surveying context-kit's settings gates; drained at that
   iteration's close, which re-verified the claim and found the enforcement-map reader it missed.
 
-- **guard-rule-number-not-citable-outside-kit** [design-pending] [cost: event/low] [surface: guard-kit] — a guard-kit rule number is a
+- **guard-rule-number-not-citable-outside-kit** [cost: event/low] [surface: guard-kit] — a guard-kit rule number is a
   stable-looking identifier that is not stable: rules renumber on every insertion, and the
   renumbering sweep's roster covers SPEC prose, lib comments, the test tables and the runner —
   **cross-corpus prose has never been in it**.
@@ -1999,7 +1984,7 @@
   citation of the history-rewrite advisory by its pre-insertion number, all pointed
   at the wrong rule. Corrected in place at close, by number rather than by name, because naming
   them here would silently do the second disposition's work and rewrap five capped entries.
-  **Why `[design-pending]`:** the second is a one-paragraph boundary note plus a sweep of unknown
+  **Why design-pending:** the second is a one-paragraph boundary note plus a sweep of unknown
   size, and whether a bare "rule N" outside the kit is gateable at all needs a false-positive
   budget nobody has measured.
   **THIS ENTRY AND ITS `guard-rule-number-intra-kit-citations-ungated` SIBLING WERE THE (D) ISLAND
@@ -2013,7 +1998,7 @@
   Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the
   bullet had named the wrong slug and located the real entry before dispositioning.
 
-- **guard-rule-number-intra-kit-citations-ungated** [design-pending] [cost: event/low] [surface: guard-kit] — guard-kit cites its own
+- **guard-rule-number-intra-kit-citations-ungated** [cost: event/low] [surface: guard-kit] — guard-kit cites its own
   rule numbers everywhere and nothing holds a single citation to the ruleset.
   **Measured at the rule-17 insertion, 2026-08-23**, which shifted rules 17-21 to 18-22: the
   kit's own surfaces carry 111 `rule N` citations — SPEC.md 63, `lib/guard.sh`'s `spec:` comments
@@ -2024,7 +2009,7 @@
   **Worse, one number-bearing roster was already stale and no renumber caused it:** SPEC.md's
   raw-vs-skeleton paragraph named two rules that carry no raw-command test and omitted three that
   do, drifting silently from the function bodies until it was re-derived against them at build.
-  **Why `[design-pending]`:** the corpus is bounded and the numbering is derivable from the
+  **Why design-pending:** the corpus is bounded and the numbering is derivable from the
   numbered list, so a gate could assert that every intra-kit `rule N` resolves to an existing
   item and that the derivable rosters — which rules take the raw command, which read a skeleton —
   match the bodies. Which claims are derivable and which are prose is the open question.
@@ -2038,7 +2023,7 @@
   Filed 2026-08-23 by build; drained at that iteration's close, which re-counted the citations
   and confirmed no gate matches them.
 
-- **bespoke-test-path-knob-pinning** [design-pending] [cost: event/high] [surface: gate-sdk] — a bespoke gate-test's cwd sandbox is
+- **bespoke-test-path-knob-pinning** [cost: event/high] [surface: gate-sdk] — a bespoke gate-test's cwd sandbox is
   isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
   values in the invoker's environment, which is an ambient default rather than anything the test
   owns.
@@ -2054,7 +2039,7 @@
   process-wide export produced and `80d74291` narrowed away — an export was one way to supply an
   ambient absolute value, not the only one. `producer-lock` is the sharpest case: the evidence_kit
   suite runs inside the spine *while a real run-validate producer is live by construction*.
-  **Why `[design-pending]`:** two fix shapes, and choosing is the deliverable. Have each exposed
+  **Why design-pending:** two fix shapes, and choosing is the deliverable. Have each exposed
   test pin its own path knobs (~7 one-line edits, no new mechanism, conforming to the majority
   idiom); or widen `gate-sdk/lib/test-hermetic.sh` to neutralize the path knobs the way it already
   neutralizes `<KIT>_CONFIG_FILE` — one place, and precedented, since that file already pins
@@ -2081,7 +2066,7 @@
   Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
   same seven names.
 
-- **dispatch-claim-evidentiary-tier-unmarked** [design-pending] [cost: event/high] [surface: lifecycle-kit] — a dispatch prompt can upgrade an
+- **dispatch-claim-evidentiary-tier-unmarked** [cost: event/high] [surface: lifecycle-kit] — a dispatch prompt can upgrade an
   inference into a finding, and the receiving session cannot see the evidence base to discount it.
   recurrence: dispatch-claim-evidentiary-tier-unmarked 2026-08-24
   **THIRD INSTANCE, in a SUB-SHAPE the two below do not reach and the highest-stakes one yet: a
@@ -2132,7 +2117,7 @@
   `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
   filing put to it.
 
-- **kfric-obligation-residency** [design-pending] [cost: iteration/low] [surface: delegation-kit] — the knowledge-friction capture obligation is
+- **kfric-obligation-residency** [cost: iteration/low] [surface: delegation-kit] — the knowledge-friction capture obligation is
   declared for "any session" and reaches no surface a kit-template session actually loads.
   recurrence: kfric-obligation-residency 2026-08-24
   **FIRST RECURRENCE, and it is the attested shape repeating in a SECOND iteration with a second
@@ -2168,7 +2153,7 @@
   obligation stated only where some sessions look, both resolve under
   delegation-kit/SPEC.md §Operative residency's placement rule, and both face the identical trade
   between one resident line and N template restatements. A unit taking either should take both.
-  **Why `[design-pending]`:** placement is the whole question and the candidates differ in kind —
+  **Why design-pending:** placement is the whole question and the candidates differ in kind —
   a bounded imperative in the two unserved kit templates, a line on drift-kit's own dispatch
   surface, or the widest-true-tier answer that disposes of the recurrence twin in the same motion.
   Class: relocates one imperative and mints no name and no gate, so canon-kit's litmus makes it
@@ -2179,7 +2164,7 @@
   gap inbox there; promoted 2026-08-24 at this scope's drain, which re-ran the template grep
   first-hand and found both files still empty.
 
-- **release-body-step-has-no-in-tree-witness** [design-pending] [cost: event/high] [surface: RELEASING.md] — the one release step whose
+- **release-body-step-has-no-in-tree-witness** [cost: event/high] [surface: RELEASING.md] — the one release step whose
   product lives off the tree is the one that was skipped, and its only backstop is next-day.
   RELEASING.md step 6 fills the GitHub Release body with the note post's apex URL by hand. It is
   the only release step whose artifact never touches the tree, so no gate, no fixture and no
@@ -2198,7 +2183,7 @@
   **DISTINCT from `release-drain-ordering-contradiction`** (step 4's drain/tag ordering) and from
   `release-runbook-identity-diagnosis` (which account is active); neither reads step 6, and both
   concern steps whose evidence is in the tree.
-  **Why `[design-pending]`:** three shapes trade real properties. Generate the body from the note
+  **Why design-pending:** three shapes trade real properties. Generate the body from the note
   post inside the `release` job — retires the hand step, but puts release-note text on a CI path
   the battery never runs. Have the release-sweep skill emit the exact body text as a copy-ready
   artifact — cheap, keeps the human in the loop, still skippable. Or move the monitor's cadence
@@ -2208,7 +2193,7 @@
   Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
   re-read the v0.25.0 Release body directly rather than trusting the issue text.
 
-- **precondition-gate-direction-blindness** [design-pending] [cost: event/low] [surface: queue-kit] — `check-queue-prose-precondition`
+- **precondition-gate-direction-blindness** [cost: event/low] [surface: queue-kit] — `check-queue-prose-precondition`
   reds an entry whose prose says the entry IS the blocker, and three of the four remedies it
   prints are false for that shape.
   **Reproduced at this iteration's scope rather than predicted.** Promoting
@@ -2241,12 +2226,12 @@
   Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
   2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
 
-- **icebox-eviction-line-budget-squeeze** [design-pending] [cost: event/low] [surface: queue-kit] — the icebox tier's one-line grammar
+- **icebox-eviction-line-budget-squeeze** [cost: event/low] [surface: queue-kit] — the icebox tier's one-line grammar
   and `check-queue-wrap`'s column cap are jointly unsatisfiable above a slug length nothing
   bounds, and nothing says so at the point of eviction.
   **Attested first-hand at the 2026-08-25 close, three failed attempts rather than predicted.**
   Evicting `spec-embedded-source-criterion-4-membership` (icebox) — a 44-character slug — left 31
-  columns after the mandatory `- **<slug>** [design-pending] — ` prefix. All three candidate
+  columns after the then-mandatory design-pending-tagged lead prefix. All three candidate
   sentences describing the question redded `check-queue-wrap`, and the line that landed says only
   "Its port sizing stays unruled." The tier's contract calls for a self-contained sentence; at 31
   columns that is not achievable, and the grammar gives no relief — `check-queue-entry-budget`
@@ -2287,7 +2272,7 @@
   stand unchanged and none of them is chosen here.
   recurrence: icebox-eviction-line-budget-squeeze 2026-09-03
 
-- **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [design-pending] [cost: event/high] [surface: delegation-kit] — an isolated
+- **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [cost: event/high] [surface: delegation-kit] — an isolated
   read-only sweep's final report reaches its dispatcher as a bare `.`, because the child sends to
   a peer name it cannot resolve and the harness returns only the last assistant message.
   **Reproduced twice at one close, 2026-08-25, not predicted.** Two `audit-sweep` dispatches
@@ -2338,7 +2323,7 @@
   Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced it
   twice dispatching its own sweeps and filed it to the gap inbox; promoted 2026-08-25 at that drain.
 
-- **site-health-issue-venue-unwanted** [design-pending] [cost: event/low] [surface: site-kit] — the site-health probe files issues on
+- **site-health-issue-venue-unwanted** [cost: event/low] [surface: site-kit] — the site-health probe files issues on
   the public repo for failures the iteration lifecycle resolves anyway, and the operator does not
   want that venue.
   **Operator-ruled 2026-08-25: the issue-filing path is unwanted.** The objection is to the
@@ -2377,7 +2362,7 @@
   Operator-directed filing 2026-08-25, relayed through the lead at this scope; the tree read
   behind it was re-run here rather than taken on the relay.
 
-- **account-noun-plural-slips-the-shape** [design-pending] [cost: event/high] [surface: gate-sdk] — the account-identification pattern
+- **account-noun-plural-slips-the-shape** [cost: event/high] [surface: gate-sdk] — the account-identification pattern
   matches a singular account noun only, so the plural form passes both readers.
   **Probed rather than reasoned, at this close.** Feeding a three-line sample through
   `grep -nE -f scripts/msg-patterns.list` matches the singular line and matches NEITHER plural: the
@@ -2400,7 +2385,7 @@
   the limit is held in history, and history answers what happened, never what is correct
   (CLAUDE.md §Delivery doctrine, spec-over-precedent).
   **The tolerance was a measured choice, not an oversight**, and it is the reason this is
-  `[design-pending]` rather than a patch: extending the noun set to plurals reds three tracked
+  design-pending rather than a patch: extending the noun set to plurals reds three tracked
   sentences that are not wrong, and the same tree-exact calibration that governs the singular form
   says rewriting prose to satisfy a heuristic inverts the rule the heuristic serves. The open call
   is which of the three moves to take — accept the three rewordings, add a plural arm scoped to the
@@ -2411,7 +2396,7 @@
   complete.
   Filed 2026-08-26 by close, triaging a build finding relayed through the lead.
 
-- **shipped-config-tightening-undeclared** [design-pending] [cost: event/high] [surface: gate-sdk] — a kit-shipped pattern-list change
+- **shipped-config-tightening-undeclared** [cost: event/high] [surface: gate-sdk] — a kit-shipped pattern-list change
   tightens two gates in an adopter's tree, and no surface says which release section owns it or
   who may declare it once the landing stage is gone.
   `3763bc3e` added an account-identification pattern to `gate-sdk/templates/msg-patterns.list`,
@@ -2453,7 +2438,7 @@
   Surfaced 2026-08-26 to the gap inbox by the close of the `platform-reach-and-target-roster`
   iteration, while re-probing that close's release disposition; promoted 2026-08-26 at scope.
 
-- **shellcheck-analyser-version-unpinned-in-ci** [design-pending] [cost: event/high] [surface: .github] — one battery member's verdict is
+- **shellcheck-analyser-version-unpinned-in-ci** [cost: event/high] [surface: .github] — one battery member's verdict is
   a function of the host, so a green local battery is not evidence of a green CI battery.
   **Attested 2026-08-27 first-hand and expensively at close.** The full battery read 106/106
   locally and the pushed run went RED on `check-shellcheck` alone, with SC2120 against
@@ -2471,7 +2456,7 @@
   **DISTINCT from any entry about the gate's own logic** — the gate behaved correctly and reported
   honestly on both hosts. **DISTINCT from the Windows-host inventory finding that shellcheck is
   ABSENT there**: absence is graded and visible, a version skew is silent and reverses a verdict.
-  **Why `[design-pending]`:** three uncosted shapes — pin the analyser version in the workflow and
+  **Why design-pending:** three uncosted shapes — pin the analyser version in the workflow and
   state it where the gate's contract is specified; have the gate REPORT the version it ran so two
   runs are comparable; or accept the float and say in the gate's SPEC section that this member's
   verdict is host-dependent.
@@ -2480,7 +2465,7 @@
   Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; attested
   2026-08-27 by the `windows-adopter-unblock` close's own verifying push.
 
-- **harness-project-dir-fold-dialect-unresolved** [design-pending] [cost: event/low] [surface: context-kit] — the harness project-dir
+- **harness-project-dir-fold-dialect-unresolved** [cost: event/low] [surface: context-kit] — the harness project-dir
   derivation `check-memory-off` and its two shell twins share folds a repo root's `/` and `.` to
   `-`, and under gate-sdk/SPEC.md §The path-dialect contract's per-substrate dialects the two
   substrates fold the *same* Windows checkout to two different names: the crate reads a
@@ -2517,7 +2502,7 @@
   Filed 2026-08-30 by close, promoted from the gap inbox (spec filed it; the three sites carry a
   recorded `spec:` verdict naming the open question rather than an invented answer).
 
-- **record-stamp-encoding-compression** [design-pending] [cost: event/low] [surface: queue-kit] — buy discrimination in the queue's
+- **record-stamp-encoding-compression** [cost: event/low] [surface: queue-kit] — buy discrimination in the queue's
   record stamps by RE-ENCODING them rather than by adding text, the deferred pool's per-entry
   budget being what makes added text the wrong trade.
   **Operator-ruled 2026-09-01, and the ruling picked a route none of the three escalated options
@@ -2556,7 +2541,7 @@
   `evidence_manifest.rs`, the first two spelling their own `is_date`), and SEVEN shell tools stamp
   `date +%F` outside fixtures and smoke, none of which stamps a time today. `YY` also drops the
   century, a deliberate trade rather than an oversight to find later.
-  **Why `[design-pending]`:** the ruling fixes the DIRECTION and not the grammar. Open: which
+  **Why design-pending:** the ruling fixes the DIRECTION and not the grammar. Open: which
   components take the new encoding and in what order, whether the change is a migration or a
   read-both-write-new window, and what each date-reading gate asserts across it — a wrong answer
   reds every governed surface at once.
@@ -2568,7 +2553,7 @@
   committed in one motion. FILED AND NOT BUILT: it rides no cut, no iteration since has shared its
   surface (scope's composition test, re-grounded 2026-09-11), and this is no hotfix.
 
-- **registry-needs-conflates-requirement-and-spawn** [design-pending] [cost: event/high] [surface: gate-sdk] — the crate's registry
+- **registry-needs-conflates-requirement-and-spawn** [cost: event/high] [surface: gate-sdk] — the crate's registry
   declares a member's HOST REQUIREMENT while the test guarding it compares that declaration
   against the literal program string a spawn used, so a member that resolves its interpreter is
   undeclarable by construction.
@@ -2593,7 +2578,7 @@
   resolved path satisfies a declared program name — is a small change to a crate-wide test made on
   behalf of every registry member. The vacuity half needs a fixture that reaches the generator arm
   and may not be buildable at all.
-  **Why `[design-pending]`:** whether the declaration is a REQUIREMENT (a resolved path matches by
+  **Why design-pending:** whether the declaration is a REQUIREMENT (a resolved path matches by
   its name) or a LITERAL argv[0] (then a resolving member can declare nothing host-independent) is
   a contract question gate-sdk/SPEC.md §The `# graph:` manifest owns, and the two answers differ
   in what `--needs` promises a consumer's machine must carry.
@@ -2604,7 +2589,7 @@
   spawn sites themselves; this is the declaration grammar every registry member shares.
   Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
 
-- **bin-tool-help-arm-absent-tree-wide** [design-pending] [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
+- **bin-tool-help-arm-absent-tree-wide** [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
   and deliberately not frozen in this sentence.
   **THE CENSUS IS DERIVABLE AND THIS IS ITS COMMAND**, stated on the entry because a count whose
@@ -2635,7 +2620,7 @@
   **context-kit's and doctrine-kit's smokes carry none**, one `bin/` tool each, measured at the
   2026-09-06 close; guard-kit's carried none either and its `bin/` left with the cut. The gap
   is the kits that never took the ruled substitute, not a missing scanner.
-  **Why `[design-pending]`: the contract's own scope is the design question.** §The bin/-tool
+  **Why design-pending: the contract's own scope is the design question.** §The bin/-tool
   contract states its three behaviors under a free-text-positional rule, yet
   `gate-sdk/bin/run-gates.sh --enter-stage`'s own note reads the HELP half as binding on a
   membership-validated tool too. Whether it binds on a tool taking **no** positionals — which is
@@ -2654,7 +2639,7 @@
   Census command and count landed 2026-09-05 by close, on the lead's ruling that a close moving
   the number without landing its measurement pattern reproduces the defect one iteration later;
   both re-derived 2026-09-05 by build when its own cuts moved the corpus.
-- **upgrade-smoke-producer-leaks-worktrees-on-signal** [design-pending] [cost: event/high] [surface: gate-sdk] — the upgrade-smoke arm
+- **upgrade-smoke-producer-leaks-worktrees-on-signal** [cost: event/high] [surface: gate-sdk] — the upgrade-smoke arm
   removes its worktrees on its own exit paths and traps no signal, so a run killed from outside
   leaks every checkout it created.
   **The producer is in-crate and its cleanup is `Drop`.** `native/src/emit/upgrade_smoke.rs`
@@ -2676,7 +2661,7 @@
   `worktree-cleanliness-assertion-scopes-to-checkout` are all about the DETECTOR's judgment, and
   `upgrade-smoke-refuses-inside-a-worktree` is about running INSIDE one. This is the PRODUCER
   never cleaning up. It re-files none of them and adds no recurrence date to any.
-  **Why `[design-pending]`, and it is why this is not fix-shaped.** `native/src/` carries no
+  **Why design-pending, and it is why this is not fix-shaped.** `native/src/` carries no
   signal handling anywhere and `native/Cargo.toml:14-16` lists one dependency, `serde_json` — so a
   SIGTERM trap costs either a new dependency or raw unsafe `sigaction`, and the crate's dependency
   BAR is engineering judgment gate-sdk/SPEC.md owns, which removes the no-dependency prohibition
@@ -2692,7 +2677,7 @@
   Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
   2026-09-04 at this iteration's scope entry, the boundary having carried it.
 
-- **ere-matcher-capture-groups-unowned** [design-pending] [cost: iteration/low] [surface: gate-sdk] — the crate's POSIX ERE matcher reports
+- **ere-matcher-capture-groups-unowned** [cost: iteration/low] [surface: gate-sdk] — the crate's POSIX ERE matcher reports
   spans and cannot report a capture group, so the first consumer needing one shells out to bash.
   **The sizing this falsifies, and the axis it falsifies it on.** gate-sdk/SPEC.md §The POSIX ERE
   matcher rules the owed engine "a POSIX ERE matcher with leftmost-longest span reporting, and no
@@ -2721,7 +2706,7 @@
   invisible once green, since nothing compares the two interpreters.
   Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
 
-- **release-note-removal-declaration-uncoupled** [design-pending] [cost: event/high] [surface: gate-sdk] — no oracle couples a removed
+- **release-note-removal-declaration-uncoupled** [cost: event/high] [surface: gate-sdk] — no oracle couples a removed
   adopter-facing entry point to its release-note declaration, so a note that omits one passes
   green and the adopter meets the omission as a broken invocation at upgrade time.
   **The instance is measured, not predicted.** The `evidence-runner-trend-and-install-hooks-cuts`
@@ -2753,7 +2738,7 @@
   →icebox refused on the product witness above. Deferred and not active on scope's composition
   test, re-grounded 2026-09-11: no iteration since has shared its surface.
 
-- **fail-open-arm-status-second-source** [design-pending] [cost: event/high] [surface: gate-sdk] — the stub holds the non-gate arms'
+- **fail-open-arm-status-second-source** [cost: event/high] [surface: gate-sdk] — the stub holds the non-gate arms'
   unavailable exit status as a two-name shell test, and nothing holds that set in lockstep with
   the status each arm's own contract prose states.
   **Re-verified at the drain rather than taken from the bullets.** `gate-sdk/bin/run-gates.sh`
@@ -2783,7 +2768,7 @@
   Deferred and not active on scope's composition test, re-grounded 2026-09-11: no iteration
   since has shared its surface.
 
-- **kit-spec-seam-content-half-unswept** [design-pending] [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
+- **kit-spec-seam-content-half-unswept** [cost: event/high] [surface: gate-sdk] — the provenance seam has two halves and
   the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
   VOICE and unswept of private CONTENT.
   **The discriminator that ran was ATTRIBUTION** — an authority, a date, a channel, an internal
@@ -2800,7 +2785,7 @@
   six literal `couples=` values of this consumer (`scripts/git-hooks/*`, `.claude/agents/*.md`,
   two delegation-kit files, `CLAUDE.md` plus `doctrine-kit/DOCTRINE.md`, `.workflow/*,.gitignore`)
   inside a kit SPEC.
-  **Why `[design-pending]` rather than a sweep:** each instance has a real defence and they differ.
+  **Why design-pending rather than a sweep:** each instance has a real defence and they differ.
   The queue-practice block exists because only half of it was derivable, so deleting it re-buys a
   `git log -S` at every cut; the `couples=` list is a RECORD of one past batch's derivation, so
   de-literalizing it destroys the thing it is for. Whether either is "private rule content" at all
@@ -2814,7 +2799,7 @@
   Surfaced 2026-09-05 by build batch A's provenance census, which flagged both and deliberately
   edited neither; drained here with both instances re-verified live.
 
-- **portability-floor-adopter-on-ramp-unstated** [design-pending] [cost: event/low] [surface: gate-sdk] — a vendored consumer gets
+- **portability-floor-adopter-on-ramp-unstated** [cost: event/low] [surface: gate-sdk] — a vendored consumer gets
   `check-portability-floor` registered and permanently disabled, and nothing tells them that naming
   their install path is what turns it on.
   **Probed, not inferred; RE-PROBED against the port 2026-09-09 and unchanged.**
@@ -2839,7 +2824,7 @@
   refused on the adopter witness above.
   not-icebox-eligible: portability-floor-adopter-on-ramp-unstated 2026-09-07 adopter witness above.
 
-- **substrate-parity-digest-assertion-stops-at-the-workflow-text** [design-pending] [cost: event/high] [surface: gate-sdk] — assertion F
+- **substrate-parity-digest-assertion-stops-at-the-workflow-text** [cost: event/high] [surface: gate-sdk] — assertion F
   reads the publish workflow's own text for the digest producer, and the producer moved out into a
   called script.
   **Re-probed at this drain, and it fell harder than it was filed.** `grep -n sha256sum
@@ -2866,7 +2851,7 @@
   taking only the overclaim clause (the widening is a Rust change owing a `good/`+`bad/` fixture
   pair, which a close cannot land test-and-doc-complete) and →icebox refused on the live trigger.
 
-- **macos-adopter-package-set-copied-per-leg** [design-pending] [cost: event/high] [surface: .github] — the adopter-claim brew set now
+- **macos-adopter-package-set-copied-per-leg** [cost: event/high] [surface: .github] — the adopter-claim brew set now
   exists twice in gates.yml and nothing holds either copy equal to the page it claims to mirror.
   **Re-probed at this drain, and the census is three-way rather than the filed two-way.**
   `grep -n 'brew install' .github/workflows/*.yml scripts/ci-macos-floor.sh`: gates.yml `:899` and
@@ -2899,7 +2884,7 @@
   choosing between extraction and a gate is design work and delta 3 already refused the extraction
   half once; →icebox refused on the adopter witness above.
 
-- **stage-journal-path-unsourced-mid-stage** [design-pending] [cost: event/high] [surface: lifecycle-kit] — a stage session dispatched into an
+- **stage-journal-path-unsourced-mid-stage** [cost: event/high] [surface: lifecycle-kit] — a stage session dispatched into an
   ALREADY-ENTERED stage has no mechanical source for that stage's journal path, so it invents a
   discriminated filename and the successor's entry assertion then refuses.
   **Attested twice, 2026-09-10 and again 2026-09-11:** each time `--enter-stage validate` refused
@@ -2922,7 +2907,7 @@
   the same breath as naming the per-batch path, so the control did not fail for want of being
   read, and a discoverability repair drafted at that close (a §Economics pointer to §Channel
   design) was WITHDRAWN unlanded as an eighth instance of the same failing control.
-  **Why `[design-pending]`:** the surviving shapes differ in kind and none is costed — a read-only
+  **Why design-pending:** the surviving shapes differ in kind and none is costed — a read-only
   `--emit stage-journal-path` arm any session can run without stamping; the same obligation moved
   into the stage-session agent contract, where a non-entering session actually reads it; or a
   detection half, now that the prompt-side rule is measured not to hold. Choosing is scope's.
@@ -2938,7 +2923,7 @@
   the obvious cheap fix is already landed, and already failed.
   recurrence: stage-journal-path-unsourced-mid-stage 2026-09-11
 
-- **align-in-session-absorption-tier-unruled** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+- **align-in-session-absorption-tier-unruled** [cost: event/low] [surface: lifecycle-kit]
   — does a spec miss that build absorbs **in session** count against align's model tier?
   **OPERATOR-CLASS, and that is the whole reason it is filed rather than answered.** Answering it
   re-scopes a recorded tiering reading, which lifecycle-kit/SPEC.md §The steering vocabulary puts
@@ -2953,7 +2938,7 @@
   readings recommend opposite moves when the next miss lands.
   Filed 2026-09-12 at spec to the gap inbox; promoted here by close, →fix refused as operator-class.
 
-- **instruction-sweep-grounds-residue-unrelocated** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+- **instruction-sweep-grounds-residue-unrelocated** [cost: event/low] [surface: lifecycle-kit]
   — three grounds passages the 2026-09-12 instruction sweep's per-passage enumeration missed, which
   the differential successor cannot reach because it derives its worklist from a git diff range and
   these lines were never touched.
@@ -2974,7 +2959,7 @@
   Filed 2026-09-12 at build to the gap inbox; promoted here by close after →fix took only the
   history half.
 
-- **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
+- **push-account-selection-has-an-explicit-per-command-form** [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
   the active account re-arming between pushes inside one session, so the check narrows a window it
   cannot close.
@@ -2990,14 +2975,14 @@
   closed operator ruling (2026-08-27) and the runbook stating it is local-only, so superseding it is
   a `/consult` and nothing else. What this entry asks for is a ranked decision on whether to take
   the explicit form.
-  **Why `[design-pending]`:** the tracked half — a credential precondition at RELEASING.md — exists
+  **Why design-pending:** the tracked half — a credential precondition at RELEASING.md — exists
   only if the form is taken, so the design is downstream of a ruling no session may make.
   **Cost while deferred:** the identity window the runbook measures stays open between pushes in one
   session, with a probed remedy on record and unranked.
   Filed 2026-09-12 by `couples-resolver-reach`'s close into the gap inbox, from its
   release-transport read; drained and promoted at this iteration's scope.
 
-- **survey-locator-review-catches-after-loss** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+- **survey-locator-review-catches-after-loss** [cost: event/low] [surface: lifecycle-kit]
   — the provenance-never-locator rule for survey-record citations is held by review, and the
   review arrives after the cited content is gone.
   lifecycle-kit/SPEC.md §The committed gap inbox refuses a gate on a measured rate of two
@@ -3005,14 +2990,14 @@
   `couples-dynamic-root-resolution`, was caught only after the boundary truncation had
   destroyed the five dead repair options it pointed at; they were recovered from git and
   restated on that entry at `registry-roster-oracles`' close.
-  **Why `[design-pending]`:** whether that rate now buys a write-time refusal (for example the
+  **Why design-pending:** whether that rate now buys a write-time refusal (for example the
   scratch-citation scan's corpus widened to queue prose for the two truncated surfaces)
   reopens a stated refusal, which is not a build call.
   **Cost while deferred:** a locator on a highly ranked entry loses its content silently at the
   next boundary.
   Filed 2026-09-12 by scope, from a truncated locator; drained and promoted 2026-09-13 at close.
 
-- **lead-agent-id-compaction-defense** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+- **lead-agent-id-compaction-defense** [cost: event/low] [surface: lifecycle-kit]
   — nothing tells a lead where a dispatched agent's id stays durable across a compaction.
   A lead that reads an id back off the compaction summary, which is lossy and can drop a
   character, gets an unreachable-agent error it can misread as the session being severed.
@@ -3021,19 +3006,19 @@
   instruction, so the gap is the absence of one.
   **Unverified claims carried openly:** that ids are fixed-width, that a listing shows only
   running subagents, and that a failed send is evidence about the address, not the session.
-  **Why `[design-pending]`:** each claim needs a probe before it becomes a rule, and the home
+  **Why design-pending:** each claim needs a probe before it becomes a rule, and the home
   (lead.md or delegation-kit's journal mechanics) is a tiering call.
   **Cost while deferred:** a lead after compaction can abandon a live agent on a bad address.
   Filed 2026-09-12 during build, after a compaction; drained and promoted 2026-09-13 at close.
 
-- **release-binary-archive-versioned-name** [design-pending] [cost: event/low] [surface: installer]
+- **release-binary-archive-versioned-name** [cost: event/low] [surface: installer]
   — each per-target gate binary reaches the Release as a bare `checkwright-gates-<target>` plus its
   `.sha256`, carrying no release version, so a hand download cannot tell releases apart.
   **To consider, not a commitment** (operator direction, 2026-09-14, lead-relayed): ship each target
   as one versioned archive holding the binary and its `.sha256` under their unchanged filenames.
   **Refused:** renaming the binary or its sidecar, since every vendored reference and the upgrade
   path key on them; the binary name itself stays.
-  **Why `[design-pending]`:** the reach is unpriced — the installer bootstraps' asset lookup and
+  **Why design-pending:** the reach is unpriced — the installer bootstraps' asset lookup and
   digest verification (the digest's out-of-payload source is the release asset), `publish.yml`'s
   release job, the install-smoke legs and RELEASING.md.
   **Cost while deferred:** a hand-downloaded binary carries no version a reader can see, so telling
@@ -3041,13 +3026,13 @@
   Surfaced 2026-09-14 by the lead into the gap inbox, after `config-bridge-floor`'s close; promoted
   at this iteration's scope.
 
-- **docs-cmd-retired-path-blind-to-queue** [design-pending] [cost: event/low] [surface: canon-kit]
+- **docs-cmd-retired-path-blind-to-queue** [cost: event/low] [surface: canon-kit]
   — canon-kit/SPEC.md §check-docs-cmd assertion (C) cannot see a retired path cited from the queue,
   from two sides: its corpus is the manifest set, which excludes TASK-QUEUE.md, and a
   `<path>:<line>[,<line>]` token fails the path shape because `:` is outside the segment class.
   **Attested once:** two Deferred bodies cited deleted kit libraries in that form after
   `config-seam-second-cut` and stayed green; that close found them by grep and corrected them.
-  **Why `[design-pending]`:** the candidate trims a trailing line suffix before the shape test and
+  **Why design-pending:** the candidate trims a trailing line suffix before the shape test and
   reads the queue's live sections, and the alternative is a stated reason the queue stays out.
   Which, and whether the queue's retired-work citations then need an exemption, is the call.
   **DISTINCT from the iceboxed `queue-citation-line-number-stales-within-its-own-session`**, where
@@ -3057,7 +3042,7 @@
   Filed 2026-09-14 by `config-seam-second-cut`'s close into the gap inbox, from its
   stale-identifier-after-retirement audit; promoted at this iteration's scope.
 
-- **manifest-files-configured-branch-unpruned** [design-pending] [cost: event/low] [surface: canon-kit]
+- **manifest-files-configured-branch-unpruned** [cost: event/low] [surface: canon-kit]
   — `spec::manifest_files`' configured branch (`CANON_KIT_MANIFEST_FILES` non-empty) applies no
   prune set, where the default branch's walks prune `GATE_SDK_PRUNE_DIRS` and canon-kit/SPEC.md
   §The shared spec adapters rules that `comment_surface`'s configured branch narrow exactly as its
@@ -3065,7 +3050,7 @@
   this repo's single-level globs in `scripts/canon-config.knobs` stand in for the prune.
   Verified 2026-09-15 at close: the configured branch is `glob_files` plus an `is_file` test, with
   no `path_pruned` filter.
-  **Why `[design-pending]`:** the repair narrows a corpus shared by roughly ten readers
+  **Why design-pending:** the repair narrows a corpus shared by roughly ten readers
   (`check-md-refs`, `check-docs-cmd`, `check-manifest-count`, `check-prose-enum` and the claim
   gates among them), so canon-kit/SPEC.md §The causal-completeness check item 5 binds: each
   reader's red condition is enumerated, a zero-count reader such as `check-install-claim` being
@@ -3075,7 +3060,7 @@
   Filed 2026-09-15 by `couples-field-semantics`' spec into the gap inbox; drained and promoted
   2026-09-15 at close.
 
-- **lead-line-blocked-by-spec-tag-width-collision** [design-pending] [cost: event/low] [surface: queue-kit]
+- **lead-line-blocked-by-spec-tag-width-collision** [cost: event/low] [surface: queue-kit]
   — an active lead line cannot carry both a spec tag and a blocked-by tag once the slugs are
   long, because queue-kit/SPEC.md §check-queue-wrap discounts only a deferred lead line's cost
   and surface tags, and refuses discounting the repeating blocked-by tag.
@@ -3084,7 +3069,7 @@
   legal spec tag, 101 against the 100-column budget before any prose (recounted at close). The
   spec stage dropped the blocker tag and carried the merge order in the amendment header, so the
   structured blocker a first-unblocked selection reads was lost for the promoted dependent.
-  **Why `[design-pending]`:** a bounded spec-tag discount, a continuation-line home for the
+  **Why design-pending:** a bounded spec-tag discount, a continuation-line home for the
   blocker (which §check-tag-lead-line forbids today), or a slug-length cap are each a grammar call.
   **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is the icebox tier's one-line
   grammar against the same cap. Both share the unbounded slug length, so a scope may bundle them.
@@ -3093,7 +3078,7 @@
   Filed 2026-09-15 to the gap inbox at that spec stage, measured by `check-queue-wrap`'s red at its
   promotion commit; drained and promoted the same day at close.
 
-- **close-surface-row-trackedness-undeclared** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+- **close-surface-row-trackedness-undeclared** [cost: event/low] [surface: lifecycle-kit]
   — a close-surface roster row does not say whether its path is tracked or gitignored, so a
   session deciding whether that row's read is delegable to an isolated agent re-derives the bit
   by hand. Isolation cost (3) makes that bit decide delegability outright: an untracked or
@@ -3105,7 +3090,7 @@
   verdict exists for gitignored workflow-dir members alone. Rows harvested from declaration
   surfaces get no call at all. A fifth tier field is therefore a widening that adds one
   `check-ignore` per declared row, not a free print of a fact already held.
-  **Why `[design-pending]`:** whether the field names the tier, the trackedness bit, or nothing
+  **Why design-pending:** whether the field names the tier, the trackedness bit, or nothing
   at all — the constraint living in the protocol template instead — is a grammar call, and
   `check-close-surfaces` reads the same rows.
   **DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which ruled
@@ -3117,7 +3102,7 @@
   candidate owner and refused there for repairing one instance of a general class; drained and
   promoted at close, which falsified half its premise.
 
-- **stage-commit-subject-scope-unowned** [design-pending] [cost: event/low] [surface: lifecycle-kit]
+- **stage-commit-subject-scope-unowned** [cost: event/low] [surface: lifecycle-kit]
   — a stage session's commit subject scope is governed nowhere. An anchored grep across
   lifecycle-kit, canon-kit and queue-kit for a `chore(<stage>)` spelling returns nothing, so every
   stage session picks a scope by precedent.
@@ -3140,7 +3125,7 @@
   Filed 2026-09-16 to the gap inbox by the iteration lead verifying align's own commits; no gate
   reds on it. Drained and promoted at close, which re-ran the tabulation and widened the finding.
 
-- **isolation-oracle-cost-lacks-dispatcher-clause** [design-pending] [cost: event/high] [surface: delegation-kit]
+- **isolation-oracle-cost-lacks-dispatcher-clause** [cost: event/high] [surface: delegation-kit]
   — agent-execution's isolation cost (4) carries no dispatcher-side clause, so a dispatch sending
   an oracle-running sweep into isolation is discovered unresolvable only after a full round trip.
   **The asymmetry is inside one rule set.** Cost (3) already carries a dispatcher clause — a sweep
@@ -3154,7 +3139,7 @@
   arm run in the main checkout and its stdout materialized under the scratch dir and named absolute
   in the prompt, it completed the sweep. The child's half of the rule worked exactly as written —
   it reported and refused to build.
-  **Why `[design-pending]`:** whether the remedy is one sentence on cost (4), a shared
+  **Why design-pending:** whether the remedy is one sentence on cost (4), a shared
   classify-before-dispatch step both costs point at, or a guard assertion is a residency call.
   **DISTINCT from `delegated-read-blind-to-gitignored-capture`, Done 2026-09-16**, which is cost
   (3)'s composition with the dispatch guard's D2; this is cost (4)'s missing dispatcher half and
@@ -3164,7 +3149,7 @@
   Filed 2026-09-16 to the gap inbox at `isolated-dispatch-obligations`' close, which could not
   drain it; promoted at the following iteration's scope.
 
-- **isolated-dispatch-resume-loses-its-isolation** [design-pending] [cost: event/high] [surface: delegation-kit]
+- **isolated-dispatch-resume-loses-its-isolation** [cost: event/high] [surface: delegation-kit]
   — a `SendMessage` resume of an `isolation: worktree` read-only dispatch silently loses its
   isolation, so the dispatch guard's claim-by-shape rule is evaluated once and never again.
   **Measured 2026-09-16** at `isolated-dispatch-obligations`' close, on a later dispatch than the
@@ -3178,7 +3163,7 @@
   type with full write reach on the shared branch and no second D2 evaluation. The child stopped
   only because that dispatch prompt happened to carry an explicit if-your-worktree-was-cleaned-up
   stop clause; nothing structural refuses it.
-  **Why `[design-pending]`:** three candidate shapes with no ruling between them — (a) the guard
+  **Why design-pending:** three candidate shapes with no ruling between them — (a) the guard
   evaluates D2 on a resume as it does on a dispatch, if the resume payload is reachable at the
   pre-tool hook; (b) agent-execution states that a resumed isolated dispatch is a NEW dispatch
   owing re-isolation, making re-dispatch the sanctioned shape; (c) the read-only agent types carry
@@ -3190,7 +3175,7 @@
   Filed 2026-09-16 to that same close's gap inbox, undrainable there; promoted at the following
   iteration's scope.
 
-- **declined-update-target-cause-unaudited** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — a build
+- **declined-update-target-cause-unaudited** [cost: iteration/low] [surface: lifecycle-kit] — a build
   session that DECLINES a spec-authored update target states a cause, and nothing re-reads that
   cause against the target's own purpose: validate confirms the declination on the terms the
   declining session set.
@@ -3199,7 +3184,7 @@
   roster hole. `queue-kit/README.md` enumerates the arms that read the queue file and omitted
   entry-history entirely, so the stated cause "no entry-history line to widen" was literally true
   while the right act was to ADD the line, which that iteration's close did.
-  **Why `[design-pending]`: the datum admits two opposite readings and nothing separates them.**
+  **Why design-pending: the datum admits two opposite readings and nothing separates them.**
   Either the spec stage's update-target roster over-reaches systematically, in which case the fix
   is an authoring-side narrowing; or these are holes in the target surfaces, in which case the fix
   is a coverage assertion on the surface itself. The candidate deliverables differ by an order,
@@ -3210,7 +3195,7 @@
   Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could not drain
   it; promoted at the following iteration's scope.
 
-- **gate-fixture-fanout-arm** [design-pending] [cost: event/low] [surface: gate-sdk] — nothing
+- **gate-fixture-fanout-arm** [cost: event/low] [surface: gate-sdk] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
   `--run-gate-tests` takes one tests-dir per invocation, and a gate's `# graph:` manifest names its
   **corpus**, never its own pair, so re-deriving readers off `couples=` reaches every coupled file
@@ -3224,7 +3209,7 @@
   tests-dir and runs each `<tests-dir>/<gate>/` pair it finds, so a behaviour change's discharge is
   one command rather than a grep the author has to remember; a second candidate is deriving the
   README's runner roster from the same resolution instead of maintaining it.
-  **Why `[design-pending]`:** whether the fan-out is a new arm, an argument shape on the existing
+  **Why design-pending:** whether the fan-out is a new arm, an argument shape on the existing
   one, or a widening of what the pre-commit battery runs is the seam call, and the third option
   buys commit-time enforcement at a runtime-budget cost nobody has measured.
   **Cost while deferred:** every gate-behaviour change carries a manual obligation — grep every
@@ -3234,7 +3219,7 @@
   Filed 2026-09-16 by `installer-front-door-cut`'s close, as the gap generalization owed by the
   lesson that dispositioned to that SPEC section.
 
-- **overhead-meter-gate-output-classifier-blind** [design-pending] [cost: iteration/low] [surface: drift-kit]
+- **overhead-meter-gate-output-classifier-blind** [cost: iteration/low] [surface: drift-kit]
   — the overhead meter classifies the runner's per-`FAIL` invariant line as non-gate output, so a
   line the battery prints is metered as task rather than governance.
   **Measured rather than reasoned:** the line printed beneath every `FAIL`
@@ -3245,7 +3230,7 @@
   **Candidate, not ruled:** give drift-kit's gate row the runner's four-space `spec: ` prefix as a
   marker, a second spelling of `runner::SPEC_LINE_PREFIX` and the same cross-kit literal coupling
   `PASS: check-` already is.
-  **Why `[design-pending]`:** whether a classifier change owes a SERIES BREAK is the real question.
+  **Why design-pending:** whether a classifier change owes a SERIES BREAK is the real question.
   The meter feeds a live measurement, and changing the classifier mid-series costs comparability the
   correction does not buy back.
   **Cost while deferred:** ~150 B per red gate against a transcript of megabytes — no reading moves,
@@ -3254,7 +3239,7 @@
   `SPEC-payload-withholding.md` delta 5 rostered this reader and asked only whether the line
   INFLATES the gate count (answered no, correctly), never whether it should COUNT as gate output.
 
-- **vendored-kit-readme-spec-link-dangles** [design-pending] [cost: event/high] [surface: gate-sdk]
+- **vendored-kit-readme-spec-link-dangles** [cost: event/high] [surface: gate-sdk]
   — a vendored kit README still links a `SPEC.md` its installed tree no longer carries. This is the
   residual the payload-withholding unit's ninth delta NARROWED rather than closed.
   **What already landed:** each of the eleven kit READMEs carries one sentence naming the
@@ -3274,7 +3259,7 @@
   Filed 2026-09-16 at the lead's direction during `installer-front-door-cut`, so a later scope reads
   a known limit rather than rediscovering a defect.
 
-- **docs-cmd-knob-definition-site-withheld** [design-pending] [cost: event/low] [surface: gate-sdk]
+- **docs-cmd-knob-definition-site-withheld** [cost: event/low] [surface: gate-sdk]
   — `check-docs-cmd`'s defined-knob set loses every knob whose only tracked kit-root occurrence
   lives in `smoke/`, now that the payload withholds `smoke/`. The subject is where a kit's knob
   names are DEFINED, not what the payload carries.
@@ -3293,7 +3278,7 @@
   source".
   **NOTHING REDS TODAY and that is why it is filed rather than fixed** — a stock consumer's seeded
   docs cite none of the five, and `check-docs-cmd` is green in this tree (run, not assumed).
-  **Why `[design-pending]`:** whether a knob a kit reads must have a shipped non-smoke definition
+  **Why design-pending:** whether a knob a kit reads must have a shipped non-smoke definition
   site at all is the ruling, and only after it is whether the repair is table rows, an `env_only`
   entry, or widening what `docs_cmd` counts as a definition.
   **Cost while deferred:** an adopter who documents one of the three meets a hard fail they cannot
@@ -3302,7 +3287,7 @@
   corrected from five to three at that iteration's close drain, by re-probing the static tables the
   filing asserted were empty.
 
-- **compound-splitter-background-separators** [design-pending] [cost: event/low] [surface: guard-kit] —
+- **compound-splitter-background-separators** [cost: event/low] [surface: guard-kit] —
   `guard_split_compound` and its compiled twin split on `;`, `&&`, `||` and `|` (plus a newline,
   in the twin) but not on a lone `&` or `|&`, so a backgrounded compound `a & b` is one segment to
   every per-segment guard rule and to the `scan-prompts` ranker's grant test.
@@ -3311,7 +3296,7 @@
   `\n`; `|&` splits at the `|` and leaves `&` heading the next segment.
   **Carried as a claim, not probed:** that the harness's permission matcher treats `&` and `|&` as
   separators rests on a read of the harness permissions page at spec, not on a `claude -p` probe.
-  **Why [design-pending]:** a lone `&` also occurs inside redirects (`&>`, `>&`, `2>&1`), so the
+  **Why design-pending:** a lone `&` also occurs inside redirects (`&>`, `>&`, `2>&1`), so the
   class needs a redirect-aware spelling held equal across both substrates by `--guard-lib-parity`,
   and widening it re-segments every rule guard-kit/SPEC.md §The guard framework lists.
   **Cost while deferred:** a rule can miss a segment that follows `&`, and the ranker can mis-read
@@ -3320,7 +3305,7 @@
   Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s spec; promoted at its close
   drain.
 
-- **smoke-leg-crate-build-uncached** [design-pending] [cost: iteration/low] [surface: .github] — the
+- **smoke-leg-crate-build-uncached** [cost: iteration/low] [surface: .github] — the
   platform install-smoke legs rebuild the gate crate from cold on every push.
   **Measured at the drain, correcting the filed premise.** In gates run 35214069775 the
   `probe the crate build` step took 90s on `install-smoke-macos-intel` and 82s on
@@ -3344,255 +3329,257 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
-- **lead-held-block-no-sanctioned-surface** [design-pending] — No route records a lead-held block.
-- **survey-record-filed-after-the-fact** [design-pending] — Order to the work goes wholly unread.
-- **amendment-prose-misnumbers-its-delta** [design-pending] — Cites Delta 3 for delta 4's subject.
-- **battery-timing-file-overwritten-by-only-run** [design-pending] — A filtered run reports as all.
-- **worktree-dispatch-rebuilds-the-gate-binary** [design-pending] — Each dispatch pays a cold build.
-- **committed-grant-fallthrough-unexplained** [design-pending] — Three bare grants fell through.
-- **derived-count-literal-in-queue-unscanned** [design-pending] — No corpus reaches the queue file.
-- **bridged-arm-spawned-program-set-unheld** [design-pending] — Declared set unheld; shape ships.
-- **icebox-drops-a-bought-census** [design-pending] — No dormant home for a measured payload.
-- **surplus-arg-drop-in-six-emit-arms** [design-pending] — Six emit arms drop surplus args at 0.
-- **inline-source-literal-ungateable** [design-pending] — Fence-only oracle; no rename pending.
-- **turn-end-refusal-used-as-a-busy-wait** [design-pending] — Sessions busy-wait via the stop hook.
-- **site-health-probe-no-retry-on-transient** [design-pending] — A single non-200 files an issue.
-- **non-gate-arm-roster-hand-maintained** [design-pending] — The arm class's flag list is ungated.
-- **craft-rule-step-has-no-reader** [design-pending] — A broken stage-rules knob reds nothing.
-- **runtime-dir-two-tier-detector** [design-pending] — No two-tier proof for file-pattern ignores.
-- **done-slug-commit-naming-gate** [design-pending] — Done-moving commits need not name their slug.
-- **enter-stage-simulate-no-write-fixture** [design-pending] — Guard present, unpinned by a fixture.
-- **stage-lag-disambiguation** [design-pending] — Hook over-firing is accepted, not a defect.
-- **metric-dir-admission-unstated** [design-pending] — Ad-hoc scripts persist in .metric/.
-- **stage-economics-smoke-jq-arm-dormant** [design-pending] — Its jq-absent arm never runs anywhere.
-- **hermetic-bin-roster-config** [design-pending] — Pinning coverage needs a consumer roster seam.
-- **split-posture-waiver-writer** [design-pending] — A lead-issued waiver stamp has no writer.
-- **supervisor-verification-attestation** [design-pending] — The verification duty is unattested.
-- **gate-spec-claim-assertion-parity** [design-pending] — Ruled a human-audit class, not gateable.
-- **port-takeability-has-no-instrument** [design-pending] — Takeability hand-read on the tree axis.
-- **scope-amendment-authoring-gate** [design-pending] — Scope can do spec's job and stay green.
-- **evidence-journal-hash-chain** [design-pending] — Tamper-evidence wanted only by a hosted rung.
-- **md-section-near-miss-match** [design-pending] — Empty on a near miss; correct on an exact query.
-- **operator-authored-unit-set** [design-pending] — The contract omits operator-authored unit sets.
-- **tarball-build-attestation** [design-pending] — The checksum proves transfer only; docs agree.
-- **action-run-shell-scan-predicate** [design-pending] — No consumer seam on a correct gate.
-- **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
-- **gate-tamper-consumer-gate-coverage** [design-pending] — A glob and a roster audit remain.
-- **upgrade-contract-rename-routing-unstated** [design-pending] — One clause leans on it.
-- **md-refs-tree-link-resolution** [design-pending] — Unreachable while one generator produces.
-- **recurrence-judgment-vs-declaration** [design-pending] — The two share a noun, not a meaning.
-- **interpreter-floor-gawk-residue-empty** [design-pending] — Its ground died; awk stands.
-- **advisory-lane-draft-state-unswept** [design-pending] — GitHub's notifications are the sweep.
-- **amendment-done-move-assertions** [design-pending] — Zero cost while merges are hand-checked.
-- **guard-advise-jq-dependency** [design-pending] — Needs jq; the one consumer works around it.
-- **survey-record-extension-tier-hybrid** [design-pending] — Paid only by a future workflow author.
-- **install-lifecycle-reversibility** [design-pending] — A declined branch; only optionality owed.
-- **pack-installer-payload-kit-set-anchor** [design-pending] — Latent --root trap, no caller.
-- **installer-jq-usability-probe** [design-pending] — Broken-but-present jq is unobserved.
-- **rendered-site-link-monitor** [design-pending] — Rendered-site link rot waits on a launch crawl.
-- **kit-index-page-vocabulary-ungated** [design-pending] — Index-page enums are ungated.
-- **absence-statement-grammar** [design-pending] — When to state absence, and how, is unruled.
-- **contributor-writeback-disposition** [design-pending] — Write-back is dormant pre-launch.
-- **context-pressure-signal** [design-pending] — Compaction timing has no per-session signal.
-- **post-immutability-machine-read-carveout** [design-pending] — Immutable prose, live machine read.
-- **path-pinned-allow-entry-oracle** [design-pending] — No scanner reds a path-naming grant.
-- **price-table-roster-coverage-oracle** [design-pending] — An unpriced model id reds nothing.
-- **economics-posture-binding-stale** [design-pending] — A shim restates a ruling it should cite.
-- **align-context-draw-growth** [design-pending] — Two falls read the draw as work-side.
-- **customer-facing-iteration-cadence** [design-pending] — No tracked classifier for the bound.
-- **scan-prompts-truncation-quote-desync** [design-pending] — Truncation inflates the scan only.
-- **template-out-of-tree-copy-obligation** [design-pending] — Out-of-tree copies are unreachable.
-- **queue-entry-grammar-single-owner** [design-pending] — Two entry grammars disagree, latently.
-- **installer-artifact-omission-residue** [design-pending] — An omission update strands a binary.
-- **installer-graph-artifact-literal** [design-pending] — Init literalises a resolver-owned path.
-- **doctrine-rule-number-citation-liveness** [design-pending] — A renumber stales citations.
-- **false-ground-citation-propagation** [design-pending] — Nothing re-reads a ground once cited.
-- **spec-embedded-source-criterion-4-membership** [design-pending] — Its port sizing stays unruled.
-- **lead-dispatch-simulate-optionality** [design-pending] — Dispatch may skip the pre-flight.
-- **self-repo-prefix-normalisation-unheld** [design-pending] — Two link-prefix holders, unheld.
-- **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
-- **interpreter-grant-redirect-residue** [design-pending] — Seven redirected shapes stay ungranted.
-- **canonicalize-extended-length-prefix** [design-pending] — A Windows `\\?\` root is unconverted.
-- **stage-cursor-unread-by-index-check** [design-pending] — A clean index hides who holds the stage.
-- **crate-arms-relink-under-worker-pool** [design-pending] — It relinks the binary it runs in.
-- **build-native-obligation-unconditional** [design-pending] — A crate-free commit still rebuilds.
-- **port-blockers-library-mediated-scan** [design-pending] — A library-mediated spawn reads clean.
-- **bridged-arm-requirements-undeclared** [design-pending] — `--needs` omits what an arm spawns.
-- **delta-citation-unresolvable** [design-pending] — A delta number names no openable file.
-- **scratch-grant-backtick-declined** [design-pending] — Rule 17's own clause voids its use case.
-- **walk-entry-model-unstated** [design-pending] — Walk drops symlinks unstated; tree has none.
-- **prune-set-matches-walk-root-ancestors** [design-pending] — A leaf above the root prunes it all.
-- **evidence-baseline-orphan-suite-row** [design-pending] — A row for a retired suite is unread.
-- **port-archaeology-restatement-residue** [design-pending] — Prose narrates deleted shell forms.
-- **non-gate-arm-testing-floor-unstated** [design-pending] — A new arm's testing floor is unstated.
-- **prune-set-convergence-question** [design-pending] — Two kits' prune sets diverge, unruled.
-- **gap-inbox-slug-predicate-ground** [design-pending] — Its anti-cycle premise died unreplaced.
-- **emit-arm-usage-unreachable** [design-pending] — Prints only on a refusal; lead-ruled 2026-09-03.
-- **check-graph-trigger-consumer-path-reach** [design-pending] — couples= misses installer/.
-- **precondition-gate-negation-false-positive** [design-pending] — Reds a true negated precondition.
-- **worktree-isolated-dispatch-cannot-reach-the-main-checkout** [design-pending] — Bridge undecided.
-- **cited-object-token-sweep-corpus-narrower-than-the-class** [design-pending] — Corpus unruled.
-- **worktree-lock-start-time-guard-untaken** [design-pending] — Dormant until a consumer acts on it.
-- **worktree-cleanliness-assertion-scopes-to-checkout** [design-pending] — Reds on foreign dirt.
-- **release-record-retired-knob** [design-pending] — A removal's basis may not name its own knob.
-- **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
-- **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
-- **cost-series-limb-unreadable-inside-close** [design-pending] — Close cannot price its open row.
-- **post-build-instrument-edit-unowned** [design-pending] — No stage owns a post-build tree edit.
-- **dod-size-figure-stales-in-iteration** [design-pending] — Spec's promotion ages its own DoD size.
-- **portability-count-on-two-surfaces** [design-pending] — Hand-spelled census; both true today.
-- **wrap-budget-caps-lead-line-tags** [design-pending] — A long slug's tag neither fits nor wraps.
-- **smoke-roster-guard-precedes-hand-off** [design-pending] — Guard stricter than its stated reason.
-- **edges-retired-block-name-clash** [design-pending] — A live gate name inflates a retired slug.
-- **lead-report-is-an-ungated-terminal-act** [design-pending] — May close holding unfiled work.
-- **smoke-report-array-carrier-mangling-unexplained** [design-pending] — Witness now needs design.
-- **gate-timing-baseline-comparability** [design-pending] — Timing baseline has no comparer.
-- **amendment-landing-citation-assertions** [design-pending] — Landing citations go unvalidated.
-- **root-doc-roster-registration-parity** [design-pending] — Only one root-doc roster is enforced.
-- **enforcement-first-load-trigger** [design-pending] — No stage loads the enforcement-first rule.
-- **self-revert-reminder-expectation** [design-pending] — Self-revert reminder reads as injection.
-- **consumer-smoke-subset-accounting-verdict** [design-pending] — Kit-subset smoke reds falsely.
-- **co-authored-by-trailer-attribution** [design-pending] — Model trailer is a baked literal.
-- **guard-steer-grant-mismatch** [design-pending] — Tree steers unpaired; the kit's are templated.
-- **reclaim-precondition-outside-the-tree** [design-pending] — Essay-sink reclaim can never fire.
-- **release-drain-ordering-contradiction** [design-pending] — Step 4 opener contradicts its body.
-- **amendment-dod-sibling-dependence** [design-pending] — DoD items depend on unnamed siblings.
-- **recurrence-resolver-literal-match-only** [design-pending] — Unspelled recurrences file as new.
-- **section-prose-outlives-its-entries** [design-pending] — Section preambles outlive Clear-Done.
-- **amendment-roster-stale-by-construction** [design-pending] — Sweep rosters stale mid-iteration.
-- **unregistered-gate-fixture-coverage** [design-pending] — Unregistered gates skip fixture duty.
-- **queue-tier-label-correction-cost** [design-pending] — Fixing a label at the cap costs a trim.
-- **rejected-compound-commit-relabel** [design-pending] — A bare retry mislabels staged work.
-- **survey-record-supersede-invisible** [design-pending] — Superseded survey blocks look live.
-- **probe-before-assertion-doctrine** [design-pending] — Rule shipped; mechanizing it is open.
-- **consumer-smoke-accounting-spelling-unpinned** [design-pending] — Dual-spelling count unpinned.
-- **release-runbook-identity-diagnosis** [design-pending] — Account check is prose, not a step.
-- **dispatch-cited-evidence-unverified** [design-pending] — A sweep's quotations go unverified.
-- **queue-provenance-restates-git-history** [design-pending] — Provenance prose restates git log.
-- **comment-tier-surface-excludes-ci-workflows** [design-pending] — Workflow comments go ungated.
-- **consult-rulings-outside-the-authority-roster** [design-pending] — Consult readings lack a slot.
-- **lead-ruling-reopen-authority-unstated** [design-pending] — Who reopens a lead ruling is open.
-- **ruling-record-prose-staleness-unreachable** [design-pending] — Old rulings evade the probe.
-- **close-surface-reclaim-uncoupled-from-read** [design-pending] — Reclaim may wipe unread rows.
-- **iceboxed-recurrence-judgment-unrecordable** [design-pending] — No room for a recurrence stamp.
-- **queue-citation-line-number-stales-within-its-own-session** [design-pending] — Line cites stale.
-- **post-scope-admission-has-no-promotion-route** [design-pending] — Late debt has no promoter.
-- **declaration-shape-outside-header-unreadable** [design-pending] — Inert literals read as live.
-- **boundary-preserve-covers-names-not-lifetimes** [design-pending] — Keep-list lists names only.
-- **validate-suite-wall-clock-unowned** [design-pending] — Serial smoke suites cost ~16 minutes.
-- **overlay-only-oracle-grants-uncommitted** [design-pending] — Oracle grants live off-tree.
-- **close-triage-log-reclaim-loss-window** [design-pending] — Truncate after read drops appends.
-- **nested-battery-env-inheritance-invisible** [design-pending] — A scoped nested run reads clean.
-- **enforcement-first-behavioral-regressions** [design-pending] — Rule under-cues behavior gates.
-- **spec-split-promotion-review** [design-pending] — Spec-stage default awaits an economics read.
-- **build-stage-tier-economics** [design-pending] — Build tier set by intuition, not a priced A/B.
-- **supervision-overhead-unmeasured** [design-pending] — Supervision burn priced; quality unread.
-- **gate-battery-result-cache** [design-pending] — Battery reruns all gates on an unmoved tree.
-- **state-representation-integrity** [design-pending] — Text-state invariants are gate-held only.
-- **rule-reach-before-merits** [design-pending] — Merits argued before a rule's reach is set.
-- **template-copy-parity-yaml-widening** [design-pending] — YAML template copies mirror by hand.
-- **gate-tests-suite-identity-in-evidence** [design-pending] — Two suites can share one hash.
-- **template-spec-restatement-reach** [design-pending] — No gate holds a SPEC off its template.
-- **amendment-deletion-content-completeness** [design-pending] — Merges can drop rationale unheld.
-- **template-registry-population-predicate** [design-pending] — A name collision would red parity.
-- **lead-line-parser-conformance** [design-pending] — Eight lead-line holders; no conformance.
-- **breadth-declaration-stale-listing** [design-pending] — Spent breadth declarations stay silent.
-- **breadth-declaration-committed-glob-home** [design-pending] — Glob keep-rulings have no home.
-- **criterion-4-two-spellings-disagree** [design-pending] — Criterion 4 reads two ways.
-- **relayed-rule-role-scope-unchecked** [design-pending] — Relayed rules may bind the wrong role.
-- **substrate-parity-assertion-c-reach-unannounced** [design-pending] — C can shrink unannounced.
-- **promotion-commitment-stamp-latency** [design-pending] — At-ceiling stamps wait on promotion.
-- **recurrence-threshold-counts-dates-not-incidences** [design-pending] — Same-day firings merge.
-- **same-stage-journal-append-uncoordinated** [design-pending] — Parallel appends share one file.
-- **survey-engagement-trigger-narrower-than-its-class** [design-pending] — Trigger is scope-only.
-- **recurrence-declaration-grammar-ungated** [design-pending] — Declaration grammar has no gate.
-- **scratch-citation-introducer-form-reach** [design-pending] — Copula pointers evade the scan.
-- **threshold-entry-escalation-travel-unruled** [design-pending] — Rider or competitor, unruled.
-- **one-motion-commit-race-remains-open** [design-pending] — add-then-commit still races.
-- **amendment-target-delta-correspondence-unverified** [design-pending] — Orphans in both ways.
-- **dispatched-child-asserts-an-unverified-base** [design-pending] — Children infer, not probe.
-- **hermetic-harness-export-masks-the-condition-under-test** [design-pending] — Pins void arms.
-- **verbose-battery-idiom-steered-to-its-granted-spelling** [design-pending] — Bare form prompts.
-- **exe-suffix-single-spelling-unenforced** [design-pending] — Suffix owner claim has no gate.
-- **intra-stage-batch-stamp-unobserved** [design-pending] — A skipped batch stamp goes unseen.
-- **boundary-sweep-github-write-skips-identity-step** [design-pending] — Account check unenforced.
-- **wait-primitive-and-record-compose-to-false-completion** [design-pending] — Waiters exit early.
-- **readonly-dispatch-type-cannot-see-gitignored-surfaces** [design-pending] — No ignored files.
-- **kfric-second-field-direction-inverted** [design-pending] — Surface field names the owner.
-- **baseline-self-certification-unasserted** [design-pending] — Self-served verdicts unasserted.
-- **design-pending-boilerplate-reds-its-own-promotion** [design-pending] — Reds on promotion.
-- **wait-mandate-template-spelling-unreachable** [design-pending] — Mandated spelling is refused.
-- **consumer-smoke-single-kit-run-not-self-sufficient** [design-pending] — Per-kit smoke fails.
-- **upgrade-smoke-refuses-inside-a-worktree** [design-pending] — Refuses where .git is a file.
-- **pre-grammar-disposition-authority-ambiguity** [design-pending] — Double-named rulers unread.
-- **kpi-cost-per-unit** [design-pending] — No KPI prices cost per shipped unit.
-- **line-range-citation-stales-inside-its-own-iteration** [design-pending] — Line ranges go stale.
-- **amendment-commit-shape-red-conditions** [design-pending] — Prompt lacks a commit-shape class.
-- **amendment-correction-density** [design-pending] — Correction density goes unmeasured.
-- **probe-evidence-sufficiency** [design-pending] — Rule 12 passes a probe that is no evidence.
-- **scratch-citation-skill-surface-reach** [design-pending] — Skill files escape the pointer scan.
-- **throughput-and-wait-time-unmeasured** [design-pending] — Wait and throughput are unmeasured.
-- **headroom-check-ordering-unruled** [design-pending] — When to read cap headroom is unruled.
-- **dispatch-unreadable-target-fallback** [design-pending] — Blind sweeps echo the prompt as PASS.
-- **queue-write-side-verb** [design-pending] — The queue has no write-side verb.
-- **close-red-push-ownership** [design-pending] — No owner for a close blocked by a red push.
-- **expected-permission-mode-undeclared** [design-pending] — No surface states the expected mode.
-- **consumer-guard-rule-coverage** [design-pending] — Consumer-only guard rules are untested.
-- **scan-prompts-blocking-half-blind** [design-pending] — The KPI cannot see blocked commands.
-- **handoff-premise-reverification-placement** [design-pending] — Premise-check placement unruled.
-- **amendment-work-class-label-placement** [design-pending] — Work-class tag placement unruled.
-- **tracked-to-untracked-pointer-scope** [design-pending] — Untracked-target pointer scope unheld.
-- **born-native-flip-enforcement-gate** [design-pending] — Born-native rule has no enforcing gate.
-- **msrv-move-clippy-arm-coupling** [design-pending] — Floor moves surface unbudgeted lints.
-- **declaration-lib-refusal-output-leak** [design-pending] — Refusal output mixes in good tokens.
-- **deferred-pool-identifier-restatement-sweep** [design-pending] — The pool was never swept.
-- **fixture-assertion-liveness** [design-pending] — Stale fixture expectations go uncaught.
-- **fixture-assertion-coverage-unmeasured** [design-pending] — Driver coverage of arms unmeasured.
-- **survey-engagement-residue-untracked** [design-pending] — Engagement residue rests on conduct.
-- **metric-dir-member-contract-unheld** [design-pending] — The metric dir accretes leftovers.
-- **kit-bin-entry-point-unrostered** [design-pending] — No roster maps bin tools to kits.
-- **recurrence-obligation-residency** [design-pending] — Stamp duty reaches two of six stages.
-- **queue-lib-dead-derivation** [design-pending] — Three queue-lib regexes have no live reader.
-- **gate-test-in-tree-invoker-ruling** [design-pending] — Is a gate-test an in-tree caller?
-- **survey-oracle-liveness-unasserted** [design-pending] — An oracle may name a wiped path.
-- **survey-witness-composed-from-unvalidated-corpus** [design-pending] — Prose corpora pass clean.
-- **stage-completion-unattested** [design-pending] — Entry stamps cannot show completion.
-- **deferred-entry-time-deixis-rot** [design-pending] — Relative deixis rots in deferred bodies.
-- **iteration-scoping-clause-date-ambiguity** [design-pending] — Date scoping names no iteration.
-- **assertion-strength-exit-header-reach** [design-pending] — The gate now reaches no script.
-- **audit-depth-measure-degrades-under-fanout** [design-pending] — Fan-out depth is self-reported.
-- **candidate-list-anchors-a-sweep-obligation** [design-pending] — A relayed list anchors a sweep.
-- **spec-pointer-boundary-legality** [design-pending] — Resolving targets may be illegal owners.
-- **ruled-line-retirement-provenance-census** [design-pending] — Census of the retirement's cuts.
-- **amendment-census-claim-unrun** [design-pending] — Amendment counts skip the shipped oracle.
-- **composition-test-scores-a-section-cut-as-one-unit** [design-pending] — A cut scores as one.
-- **deleted-runner-anchors-across-ten-entries** [design-pending] — Entries cite deleted runners.
-- **port-created-failure-mode-refusal-unruled** [design-pending] — Port-made refusals unruled.
-- **removal-propagation-site-argued-out-of-scope** [design-pending] — Found sites argued away.
-- **wait-form-unallowlistable-by-construction** [design-pending] — No grant reaches the wait.
-- **icebox-trigger-blind-to-retired-carrier** [design-pending] — Blind to retired carriers.
-- **rationale-located-by-reading-not-by-grep** [design-pending] — Grep misses paraphrases.
-- **smoke-whole-tree-precondition-unscoped** [design-pending] — Any dirty path blocks the smoke.
-- **append-grant-decline-cause-unlogged** [design-pending] — Decline cause truncated from the log.
-- **spec-internal-identifier-prefix-drift** [design-pending] — SPECs cite internal names, not knobs.
-- **lint-scope-hook-trigger** [design-pending] — extra lint dirs skip the commit hook, CI-only.
-- **release-note-section-set-derivation** [design-pending] — release gate hand-lists note sections.
-- **release-asset-claim-class-owner** [design-pending] — a release-ships-an-asset claim has no gate.
-- **knob-default-accessor-singularity** [design-pending] — no gate bars re-spelling a knob default.
-- **bin-argv-shape-residual-member** [design-pending] — one bin arm skips the argv-shape contract.
-- **docs-corpus-derivation-manifest-divergence** [design-pending] — two docs gate corpora diverge.
-- **consumer-gate-roster-unread** [design-pending] — no roster reads a consumer-declared gate.
-- **waiter-loop-condition-predicate-gap** [design-pending] — waiting rule misses a lone waiter loop.
-- **crate-toolchain-grant-uncommitted** [design-pending] — overlay keeps cargo grants ruled out.
-- **prose-uniqueness-claim-unchecked** [design-pending] — no gate checks a prose uniqueness claim.
-- **kit-spec-layout-tree-hand-maintained** [design-pending] — kit SPEC layout trees are hand-kept.
-- **expansion-rule-backtick-blind** [design-pending] — expansion rule misses backtick substitution.
-- **fixture-runner-checks-dir-fails-open** [design-pending] — bad checks-dir arg drops silently.
-- **enter-stage-refusal-help-contradicts-its-guard** [design-pending] — help contradicts its hook.
-- **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — untested end to end.
-- **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
-- **readme-bin-roster-underived** [design-pending] — no gate holds a kit README's bin/ tool roster.
+- **lead-held-block-no-sanctioned-surface** — No route records a lead-held block.
+- **survey-record-filed-after-the-fact** — Order to the work goes wholly unread.
+- **amendment-prose-misnumbers-its-delta** — Cites Delta 3 for delta 4's subject.
+- **battery-timing-file-overwritten-by-only-run** — A filtered run reports as all.
+- **worktree-dispatch-rebuilds-the-gate-binary** — Each dispatch pays a cold build.
+- **committed-grant-fallthrough-unexplained** — Three bare grants fell through.
+- **derived-count-literal-in-queue-unscanned** — No corpus reaches the queue file.
+- **bridged-arm-spawned-program-set-unheld** — Declared set unheld; shape ships.
+- **icebox-drops-a-bought-census** — No dormant home for a measured payload.
+- **surplus-arg-drop-in-six-emit-arms** — Six emit arms drop surplus args at 0.
+- **inline-source-literal-ungateable** — Fence-only oracle; no rename pending.
+- **turn-end-refusal-used-as-a-busy-wait** — Sessions busy-wait via the stop hook.
+- **site-health-probe-no-retry-on-transient** — A single non-200 files an issue.
+- **non-gate-arm-roster-hand-maintained** — The arm class's flag list is ungated.
+- **craft-rule-step-has-no-reader** — A broken stage-rules knob reds nothing.
+- **runtime-dir-two-tier-detector** — No two-tier proof for file-pattern ignores.
+- **done-slug-commit-naming-gate** — Done-moving commits need not name their slug.
+- **enter-stage-simulate-no-write-fixture** — Guard present, unpinned by a fixture.
+- **stage-lag-disambiguation** — Hook over-firing is accepted, not a defect.
+- **metric-dir-admission-unstated** — Ad-hoc scripts persist in .metric/.
+- **stage-economics-smoke-jq-arm-dormant** — Its jq-absent arm never runs anywhere.
+- **hermetic-bin-roster-config** — Pinning coverage needs a consumer roster seam.
+- **split-posture-waiver-writer** — A lead-issued waiver stamp has no writer.
+- **supervisor-verification-attestation** — The verification duty is unattested.
+- **gate-spec-claim-assertion-parity** — Ruled a human-audit class, not gateable.
+- **port-takeability-has-no-instrument** — Takeability hand-read on the tree axis.
+- **scope-amendment-authoring-gate** — Scope can do spec's job and stay green.
+- **evidence-journal-hash-chain** — Tamper-evidence wanted only by a hosted rung.
+- **md-section-near-miss-match** — Empty on a near miss; correct on an exact query.
+- **operator-authored-unit-set** — The contract omits operator-authored unit sets.
+- **tarball-build-attestation** — The checksum proves transfer only; docs agree.
+- **action-run-shell-scan-predicate** — No consumer seam on a correct gate.
+- **scratch-execution-allowlist-bar** — Each close re-derives this standing bar.
+- **gate-tamper-consumer-gate-coverage** — A glob and a roster audit remain.
+- **upgrade-contract-rename-routing-unstated** — One clause leans on it.
+- **md-refs-tree-link-resolution** — Unreachable while one generator produces.
+- **recurrence-judgment-vs-declaration** — The two share a noun, not a meaning.
+- **interpreter-floor-gawk-residue-empty** — Its ground died; awk stands.
+- **advisory-lane-draft-state-unswept** — GitHub's notifications are the sweep.
+- **amendment-done-move-assertions** — Zero cost while merges are hand-checked.
+- **guard-advise-jq-dependency** — Needs jq; the one consumer works around it.
+- **survey-record-extension-tier-hybrid** — Paid only by a future workflow author.
+- **install-lifecycle-reversibility** — A declined branch; only optionality owed.
+- **pack-installer-payload-kit-set-anchor** — Latent --root trap, no caller.
+- **installer-jq-usability-probe** — Broken-but-present jq is unobserved.
+- **rendered-site-link-monitor** — Rendered-site link rot waits on a launch crawl.
+- **kit-index-page-vocabulary-ungated** — Index-page enums are ungated.
+- **absence-statement-grammar** — When to state absence, and how, is unruled.
+- **contributor-writeback-disposition** — Write-back is dormant pre-launch.
+- **context-pressure-signal** — Compaction timing has no per-session signal.
+- **post-immutability-machine-read-carveout** — Immutable prose, live machine read.
+- **path-pinned-allow-entry-oracle** — No scanner reds a path-naming grant.
+- **price-table-roster-coverage-oracle** — An unpriced model id reds nothing.
+- **economics-posture-binding-stale** — A shim restates a ruling it should cite.
+- **align-context-draw-growth** — Two falls read the draw as work-side.
+- **customer-facing-iteration-cadence** — No tracked classifier for the bound.
+- **scan-prompts-truncation-quote-desync** — Truncation inflates the scan only.
+- **template-out-of-tree-copy-obligation** — Out-of-tree copies are unreachable.
+- **queue-entry-grammar-single-owner** — Two entry grammars disagree, latently.
+- **installer-artifact-omission-residue** — An omission update strands a binary.
+- **installer-graph-artifact-literal** — Init literalises a resolver-owned path.
+- **doctrine-rule-number-citation-liveness** — A renumber stales citations.
+- **false-ground-citation-propagation** — Nothing re-reads a ground once cited.
+- **spec-embedded-source-criterion-4-membership** — Its port sizing stays unruled.
+- **lead-dispatch-simulate-optionality** — Dispatch may skip the pre-flight.
+- **self-repo-prefix-normalisation-unheld** — Two link-prefix holders, unheld.
+- **stage-cursor-rerun-stamp-gap** — A skipped re-run stamp points the cursor back.
+- **interpreter-grant-redirect-residue** — Seven redirected shapes stay ungranted.
+- **canonicalize-extended-length-prefix** — A Windows `\\?\` root is unconverted.
+- **stage-cursor-unread-by-index-check** — A clean index hides who holds the stage.
+- **crate-arms-relink-under-worker-pool** — It relinks the binary it runs in.
+- **build-native-obligation-unconditional** — A crate-free commit still rebuilds.
+- **port-blockers-library-mediated-scan** — A library-mediated spawn reads clean.
+- **bridged-arm-requirements-undeclared** — `--needs` omits what an arm spawns.
+- **delta-citation-unresolvable** — A delta number names no openable file.
+- **scratch-grant-backtick-declined** — Rule 17's own clause voids its use case.
+- **walk-entry-model-unstated** — Walk drops symlinks unstated; tree has none.
+- **prune-set-matches-walk-root-ancestors** — A leaf above the root prunes it all.
+- **evidence-baseline-orphan-suite-row** — A row for a retired suite is unread.
+- **port-archaeology-restatement-residue** — Prose narrates deleted shell forms.
+- **non-gate-arm-testing-floor-unstated** — A new arm's testing floor is unstated.
+- **prune-set-convergence-question** — Two kits' prune sets diverge, unruled.
+- **gap-inbox-slug-predicate-ground** — Its anti-cycle premise died unreplaced.
+- **emit-arm-usage-unreachable** — Prints only on a refusal; lead-ruled 2026-09-03.
+- **check-graph-trigger-consumer-path-reach** — couples= misses installer/.
+- **precondition-gate-negation-false-positive** — Reds a true negated precondition.
+- **worktree-isolated-dispatch-cannot-reach-the-main-checkout** — Bridge undecided.
+- **cited-object-token-sweep-corpus-narrower-than-the-class** — Corpus unruled.
+- **worktree-lock-start-time-guard-untaken** — Dormant until a consumer acts on it.
+- **worktree-cleanliness-assertion-scopes-to-checkout** — Reds on foreign dirt.
+- **release-record-retired-knob** — A removal's basis may not name its own knob.
+- **friction-key-segment-selection-unruled** — Which segment to key is unruled.
+- **scratch-auto-allow-no-decoration-steer** — Chained writes lose the steer.
+- **cost-series-limb-unreadable-inside-close** — Close cannot price its open row.
+- **post-build-instrument-edit-unowned** — No stage owns a post-build tree edit.
+- **dod-size-figure-stales-in-iteration** — Spec's promotion ages its own DoD size.
+- **portability-count-on-two-surfaces** — Hand-spelled census; both true today.
+- **wrap-budget-caps-lead-line-tags** — A long slug's tag neither fits nor wraps.
+- **smoke-roster-guard-precedes-hand-off** — Guard stricter than its stated reason.
+- **edges-retired-block-name-clash** — A live gate name inflates a retired slug.
+- **lead-report-is-an-ungated-terminal-act** — May close holding unfiled work.
+- **smoke-report-array-carrier-mangling-unexplained** — Witness now needs design.
+- **gate-timing-baseline-comparability** — Timing baseline has no comparer.
+- **amendment-landing-citation-assertions** — Landing citations go unvalidated.
+- **root-doc-roster-registration-parity** — Only one root-doc roster is enforced.
+- **enforcement-first-load-trigger** — No stage loads the enforcement-first rule.
+- **self-revert-reminder-expectation** — Self-revert reminder reads as injection.
+- **consumer-smoke-subset-accounting-verdict** — Kit-subset smoke reds falsely.
+- **co-authored-by-trailer-attribution** — Model trailer is a baked literal.
+- **guard-steer-grant-mismatch** — Tree steers unpaired; the kit's are templated.
+- **reclaim-precondition-outside-the-tree** — Essay-sink reclaim can never fire.
+- **release-drain-ordering-contradiction** — Step 4 opener contradicts its body.
+- **amendment-dod-sibling-dependence** — DoD items depend on unnamed siblings.
+- **recurrence-resolver-literal-match-only** — Unspelled recurrences file as new.
+- **section-prose-outlives-its-entries** — Section preambles outlive Clear-Done.
+- **amendment-roster-stale-by-construction** — Sweep rosters stale mid-iteration.
+- **unregistered-gate-fixture-coverage** — Unregistered gates skip fixture duty.
+- **queue-tier-label-correction-cost** — Fixing a label at the cap costs a trim.
+- **rejected-compound-commit-relabel** — A bare retry mislabels staged work.
+- **survey-record-supersede-invisible** — Superseded survey blocks look live.
+- **probe-before-assertion-doctrine** — Rule shipped; mechanizing it is open.
+- **consumer-smoke-accounting-spelling-unpinned** — Dual-spelling count unpinned.
+- **release-runbook-identity-diagnosis** — Account check is prose, not a step.
+- **dispatch-cited-evidence-unverified** — A sweep's quotations go unverified.
+- **queue-provenance-restates-git-history** — Provenance prose restates git log.
+- **comment-tier-surface-excludes-ci-workflows** — Workflow comments go ungated.
+- **consult-rulings-outside-the-authority-roster** — Consult readings lack a slot.
+- **lead-ruling-reopen-authority-unstated** — Who reopens a lead ruling is open.
+- **ruling-record-prose-staleness-unreachable** — Old rulings evade the probe.
+- **close-surface-reclaim-uncoupled-from-read** — Reclaim may wipe unread rows.
+- **iceboxed-recurrence-judgment-unrecordable** — No room for a recurrence stamp.
+- **queue-citation-line-number-stales-within-its-own-session** — Line cites stale.
+- **post-scope-admission-has-no-promotion-route** — Late debt has no promoter.
+- **declaration-shape-outside-header-unreadable** — Inert literals read as live.
+- **boundary-preserve-covers-names-not-lifetimes** — Keep-list lists names only.
+- **validate-suite-wall-clock-unowned** — Serial smoke suites cost ~16 minutes.
+- **overlay-only-oracle-grants-uncommitted** — Oracle grants live off-tree.
+- **close-triage-log-reclaim-loss-window** — Truncate after read drops appends.
+- **nested-battery-env-inheritance-invisible** — A scoped nested run reads clean.
+- **enforcement-first-behavioral-regressions** — Rule under-cues behavior gates.
+- **spec-split-promotion-review** — Spec-stage default awaits an economics read.
+- **build-stage-tier-economics** — Build tier set by intuition, not a priced A/B.
+- **supervision-overhead-unmeasured** — Supervision burn priced; quality unread.
+- **gate-battery-result-cache** — Battery reruns all gates on an unmoved tree.
+- **state-representation-integrity** — Text-state invariants are gate-held only.
+- **rule-reach-before-merits** — Merits argued before a rule's reach is set.
+- **template-copy-parity-yaml-widening** — YAML template copies mirror by hand.
+- **gate-tests-suite-identity-in-evidence** — Two suites can share one hash.
+- **template-spec-restatement-reach** — No gate holds a SPEC off its template.
+- **amendment-deletion-content-completeness** — Merges can drop rationale unheld.
+- **template-registry-population-predicate** — A name collision would red parity.
+- **lead-line-parser-conformance** — Eight lead-line holders; no conformance.
+- **breadth-declaration-stale-listing** — Spent breadth declarations stay silent.
+- **breadth-declaration-committed-glob-home** — Glob keep-rulings have no home.
+- **criterion-4-two-spellings-disagree** — Criterion 4 reads two ways.
+- **relayed-rule-role-scope-unchecked** — Relayed rules may bind the wrong role.
+- **substrate-parity-assertion-c-reach-unannounced** — C can shrink unannounced.
+- **promotion-commitment-stamp-latency** — At-ceiling stamps wait on promotion.
+- **recurrence-threshold-counts-dates-not-incidences** — Same-day firings merge.
+- **same-stage-journal-append-uncoordinated** — Parallel appends share one file.
+- **survey-engagement-trigger-narrower-than-its-class** — Trigger is scope-only.
+- **recurrence-declaration-grammar-ungated** — Declaration grammar has no gate.
+- **scratch-citation-introducer-form-reach** — Copula pointers evade the scan.
+- **threshold-entry-escalation-travel-unruled** — Rider or competitor, unruled.
+- **one-motion-commit-race-remains-open** — add-then-commit still races.
+- **amendment-target-delta-correspondence-unverified** — Orphans in both ways.
+- **dispatched-child-asserts-an-unverified-base** — Children infer, not probe.
+- **hermetic-harness-export-masks-the-condition-under-test** — Pins void arms.
+- **verbose-battery-idiom-steered-to-its-granted-spelling** — Bare form prompts.
+- **exe-suffix-single-spelling-unenforced** — Suffix owner claim has no gate.
+- **intra-stage-batch-stamp-unobserved** — A skipped batch stamp goes unseen.
+- **boundary-sweep-github-write-skips-identity-step** — Account check unenforced.
+- **wait-primitive-and-record-compose-to-false-completion** — Waiters exit early.
+- **readonly-dispatch-type-cannot-see-gitignored-surfaces** — No ignored files.
+- **kfric-second-field-direction-inverted** — Surface field names the owner.
+- **baseline-self-certification-unasserted** — Self-served verdicts unasserted.
+- **design-pending-boilerplate-reds-its-own-promotion** — Reds on promotion.
+- **wait-mandate-template-spelling-unreachable** — Mandated spelling is refused.
+- **consumer-smoke-single-kit-run-not-self-sufficient** — Per-kit smoke fails.
+- **upgrade-smoke-refuses-inside-a-worktree** — Refuses where .git is a file.
+- **pre-grammar-disposition-authority-ambiguity** — Double-named rulers unread.
+- **kpi-cost-per-unit** — No KPI prices cost per shipped unit.
+- **line-range-citation-stales-inside-its-own-iteration** — Line ranges go stale.
+- **amendment-commit-shape-red-conditions** — Prompt lacks a commit-shape class.
+- **amendment-correction-density** — Correction density goes unmeasured.
+- **probe-evidence-sufficiency** — Rule 12 passes a probe that is no evidence.
+- **scratch-citation-skill-surface-reach** — Skill files escape the pointer scan.
+- **throughput-and-wait-time-unmeasured** — Wait and throughput are unmeasured.
+- **headroom-check-ordering-unruled** — When to read cap headroom is unruled.
+- **dispatch-unreadable-target-fallback** — Blind sweeps echo the prompt as PASS.
+- **queue-write-side-verb** — The queue has no write-side verb.
+- **close-red-push-ownership** — No owner for a close blocked by a red push.
+- **expected-permission-mode-undeclared** — No surface states the expected mode.
+- **consumer-guard-rule-coverage** — Consumer-only guard rules are untested.
+- **scan-prompts-blocking-half-blind** — The KPI cannot see blocked commands.
+- **handoff-premise-reverification-placement** — Premise-check placement unruled.
+- **amendment-work-class-label-placement** — Work-class tag placement unruled.
+- **tracked-to-untracked-pointer-scope** — Untracked-target pointer scope unheld.
+- **born-native-flip-enforcement-gate** — Born-native rule has no enforcing gate.
+- **msrv-move-clippy-arm-coupling** — Floor moves surface unbudgeted lints.
+- **declaration-lib-refusal-output-leak** — Refusal output mixes in good tokens.
+- **deferred-pool-identifier-restatement-sweep** — The pool was never swept.
+- **fixture-assertion-liveness** — Stale fixture expectations go uncaught.
+- **fixture-assertion-coverage-unmeasured** — Driver coverage of arms unmeasured.
+- **survey-engagement-residue-untracked** — Engagement residue rests on conduct.
+- **metric-dir-member-contract-unheld** — The metric dir accretes leftovers.
+- **kit-bin-entry-point-unrostered** — No roster maps bin tools to kits.
+- **recurrence-obligation-residency** — Stamp duty reaches two of six stages.
+- **queue-lib-dead-derivation** — Three queue-lib regexes have no live reader.
+- **gate-test-in-tree-invoker-ruling** — Is a gate-test an in-tree caller?
+- **survey-oracle-liveness-unasserted** — An oracle may name a wiped path.
+- **survey-witness-composed-from-unvalidated-corpus** — Prose corpora pass clean.
+- **stage-completion-unattested** — Entry stamps cannot show completion.
+- **deferred-entry-time-deixis-rot** — Relative deixis rots in deferred bodies.
+- **iteration-scoping-clause-date-ambiguity** — Date scoping names no iteration.
+- **assertion-strength-exit-header-reach** — The gate now reaches no script.
+- **audit-depth-measure-degrades-under-fanout** — Fan-out depth is self-reported.
+- **candidate-list-anchors-a-sweep-obligation** — A relayed list anchors a sweep.
+- **spec-pointer-boundary-legality** — Resolving targets may be illegal owners.
+- **ruled-line-retirement-provenance-census** — Census of the retirement's cuts.
+- **amendment-census-claim-unrun** — Amendment counts skip the shipped oracle.
+- **composition-test-scores-a-section-cut-as-one-unit** — A cut scores as one.
+- **deleted-runner-anchors-across-ten-entries** — Entries cite deleted runners.
+- **port-created-failure-mode-refusal-unruled** — Port-made refusals unruled.
+- **removal-propagation-site-argued-out-of-scope** — Found sites argued away.
+- **wait-form-unallowlistable-by-construction** — No grant reaches the wait.
+- **icebox-trigger-blind-to-retired-carrier** — Blind to retired carriers.
+- **rationale-located-by-reading-not-by-grep** — Grep misses paraphrases.
+- **smoke-whole-tree-precondition-unscoped** — Any dirty path blocks the smoke.
+- **append-grant-decline-cause-unlogged** — Decline cause truncated from the log.
+- **spec-internal-identifier-prefix-drift** — SPECs cite internal names, not knobs.
+- **lint-scope-hook-trigger** — extra lint dirs skip the commit hook, CI-only.
+- **release-note-section-set-derivation** — release gate hand-lists note sections.
+- **release-asset-claim-class-owner** — a release-ships-an-asset claim has no gate.
+- **knob-default-accessor-singularity** — no gate bars re-spelling a knob default.
+- **bin-argv-shape-residual-member** — one bin arm skips the argv-shape contract.
+- **docs-corpus-derivation-manifest-divergence** — two docs gate corpora diverge.
+- **consumer-gate-roster-unread** — no roster reads a consumer-declared gate.
+- **waiter-loop-condition-predicate-gap** — waiting rule misses a lone waiter loop.
+- **crate-toolchain-grant-uncommitted** — overlay keeps cargo grants ruled out.
+- **prose-uniqueness-claim-unchecked** — no gate checks a prose uniqueness claim.
+- **kit-spec-layout-tree-hand-maintained** — kit SPEC layout trees are hand-kept.
+- **expansion-rule-backtick-blind** — expansion rule misses backtick substitution.
+- **fixture-runner-checks-dir-fails-open** — bad checks-dir arg drops silently.
+- **enter-stage-refusal-help-contradicts-its-guard** — help contradicts its hook.
+- **artifact-substitution-remedy-has-no-end-to-end-arm** — untested end to end.
+- **uninstall-artifact-ownership-asymmetry** — uninstall leaves init's artifact.
+- **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- design-pending-tag-restates-its-own-section
 
 ## Lessons Learned

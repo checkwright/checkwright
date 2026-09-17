@@ -5,7 +5,7 @@ use crate::queue;
 
 // spec: queue-kit/SPEC.md §check-queue-prose-precondition — the three rewrites, patterns baked
 // literally into this member's own source rather than resolved from consumer config: bracket tags
-// and links, then past-tense narration, then the queue's own tag name spelled unbracketed
+// and links, then past-tense narration, then the queue's own state name spelled unbracketed
 const BRACKET_RE_SRC: &str = "\\[[^]]*\\]";
 const PAST_TENSE_RE_SRC: &str =
     "(once|when|after)[^.,;]*(landed|shipped|merged|resolved|completed|was [a-z]+ed)";
@@ -88,7 +88,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let past_tense = Ere::compile(PAST_TENSE_RE_SRC)
         .map_err(|e| format!("the past-tense pattern failed to compile: {}", e))?;
     let tag_word = Ere::compile(TAG_WORD_RE_SRC)
-        .map_err(|e| format!("the tag-name pattern failed to compile: {}", e))?;
+        .map_err(|e| format!("the state-name pattern failed to compile: {}", e))?;
 
     let file = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),

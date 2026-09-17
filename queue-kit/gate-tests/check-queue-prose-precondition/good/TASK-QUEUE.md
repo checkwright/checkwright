@@ -12,7 +12,7 @@
 
 - **tidy-logs** — collapse the duplicated log lines, stop appending closing notes, and keep the
   banner delegated on each host.
-- **narrate-the-tag** — describe the design-pending tag and the design-pending work it marks.
+- **narrate-the-tag** — describe the design-pending state and the design-pending work it marks.
 
 ## Deferred
 

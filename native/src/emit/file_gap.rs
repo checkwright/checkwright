@@ -204,7 +204,7 @@ mod tests {
 
 ## Deferred
 
-- **fork-dispatch-prohibition** [design-pending] — the deferred entry.
+- **fork-dispatch-prohibition** — the deferred entry.
   Cost while deferred: recovery is re-paid each time.
   - **nested-subtask** — a sub-task, indented, deliberately out of the entry scan.
 

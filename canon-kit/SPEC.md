@@ -61,23 +61,18 @@ sessions never author specs. The feature/debt litmus runs at filing in the
 scoping stage's triage; the amendment is *authored* in whichever stage the
 roster designates for it (scope by default, or a dedicated authoring stage where
 the roster splits one out).
-A feature task is therefore in exactly one of two states, marked with the
-queue tags whose syntax queue-kit defines:
+A feature task is therefore in exactly one of two states, marked by its
+section and the queue tag whose syntax queue-kit defines:
 
 - **Design-pending** — no amendment yet; the entry sits in a **design-pending
-  section** tagged `[design-pending]`, excluded from selection. That set is
-  the deferred section plus, where the consumer configures one, queue-kit's
-  optional icebox tier (`CANON_KIT_ICEBOX_SECTION`; the tier is
-  queue-kit/SPEC.md §The icebox tier). A dormant entry is unbuilt design, so
-  the state and its tag reach it unchanged. Every entry in the set carries the
-  tag — all such work is design-pending by definition.
-  The token names the *state*, not a promised artifact — a deferred **debt**
-  entry promotes with the tag deleted rather than converted, and the tag has
-  to be true of that entry too. A promotion drops queue-kit's two deferred
-  board tags (queue-kit/SPEC.md §The tag algebra) along with the
-  design-pending tag: both are read off the deferred pool alone, and
-  where `check-deferred-board-tags` is registered its assertion B is the
-  checksum on the drop.
+  section**, excluded from selection. That set is the deferred section plus,
+  where the consumer configures one, queue-kit's optional icebox tier
+  (`CANON_KIT_ICEBOX_SECTION`; the tier is queue-kit/SPEC.md §The icebox tier).
+  A dormant entry is unbuilt design, so the state reaches it unchanged. A
+  promotion drops queue-kit's two deferred board tags (queue-kit/SPEC.md §The
+  tag algebra): both are read off the deferred pool alone, and where
+  `check-deferred-board-tags` is registered its assertion B is the checksum on
+  the drop.
 - **Spec-ready** — the amendment exists; the entry sits in the feature
   section tagged `[spec: <ref>]`, eligible for selection.
 
@@ -88,8 +83,8 @@ one amendment. Writing the amendment *is* promoting
 the deferred entry — without the pairing, design rationale and ruled-out
 alternatives get re-derived under build pressure. Technical debt needs no
 amendment (it fixes behavior to an existing spec); a debt task that needs a
-design *ruling* is design work — it goes to the deferred section
-`[design-pending]` until scope rules on it. Enforced by
+design *ruling* is design work — it goes to the deferred section until
+scope rules on it. Enforced by
 `check-amendment-queue`.
 
 **The delta-ID grammar.** An amendment's `## What changes` is a sequence of
@@ -169,14 +164,20 @@ gates never scan one. Their obligations attach at the merge rather than at the
 amendment — an amendment may carry a citation or a knob mention that would red
 once integrated, and §Merging an amendment step 2 is where that debt comes due.
 
-The tag is a **checksum on the promotion move**, not a second source of the
-state its section already carries. Its redundancy is the mechanism: a
-promotion crosses a section boundary *and* swaps the tag, so
-forbidden-in-active catches a move that dropped the swap and
-`[spec:]`-in-design-pending catches a swap that dropped the move. That is
-also the test a further tag has to pass: a tag marking a move that crosses no
-pending/ready boundary adds a state name without adding a caught error class,
-and is refused.
+The `[spec:]` tag is a **checksum on the promotion move**, not a second source
+of the state its section already carries. Its redundancy is the mechanism: a
+promotion crosses a section boundary *and* adds the ref, so a feature entry
+without the ref catches a move that dropped the ref and `[spec:]` in a
+design-pending section catches a ref that dropped the move. A debt entry's
+deferred ↔ active move is held by the board tags instead: an active entry
+carrying them and a deferred entry lacking them each red — **honest limit:**
+only where `check-deferred-board-tags` is registered, and an icebox one-liner
+moved into an active section by accident reds nowhere, because the icebox
+carries no board tags. That is also the test a further tag has to pass: **a
+state tag is admitted only when it carries information its section does not.**
+A tag restating the section that holds it is the two-sources defect and is
+refused, as an icebox tag was and as the retired design-pending tag is
+(§check-amendment-queue arm (d) reds a leftover).
 
 That test admits **state** tags and is the wrong test for an **attribute**. An
 attribute a lead-line reader consumes — the session board, a ranking or
@@ -259,7 +260,7 @@ templates carry these hooks; canon-kit owns the checklist and the promotion gate
    **Unless the entry outlives the amendment.** Where an entry's deliverable is a
    *corpus* and the amendment delivered one **increment** of it, the terminal move
    is a **demotion** rather than a Done move: drop the `[spec:]` tag and return the
-   entry to the deferred section under its design-pending tag, so the next
+   entry into its design-pending section, so the next
    increment re-promotes with a fresh amendment. A Done move there asserts a
    finished deliverable that is not finished. It also costs a second thing that is
    easy to miss: a done entry is a bare slug, so **every** tag the entry carried
@@ -358,8 +359,8 @@ filename (`canon-config.knobs`, the `<kit>-config.knobs` convention), and the
 docs-site page dir (`docs/canon-kit/`). Generic vocabulary names the spec
 *artifact* discipline rather than the brand and is fixed regardless of the
 kit's name: the `SPEC.md` canonical-spec filename, the `SPEC-*.md` amendment
-glob, the `spec:` and `contract:` source directives, the `[spec:]` and
-`[design-pending]` queue tags, the `check-spec-*` gate names, and the shared
+glob, the `spec:` and `contract:` source directives, the `[spec:]` queue
+tag, the `check-spec-*` gate names, and the shared
 `native/src/spec.rs` adapters (where "spec" names the discipline). The consumer gate
 `check-kit-ref-liveness` (declared by a `.gate` descriptor in `scripts/` and
 dispatched to the binary substrate — the dangling-reference hazard is a kit
@@ -433,10 +434,10 @@ Knobs:
 - `CANON_KIT_FEATURE_SECTIONS` — array, default `("New Features")`: active
   sections whose entries require `[spec:]`.
 - `CANON_KIT_ACTIVE_SECTIONS` — array, default
-  `("New Features" "Technical Debt")`: sections where `[design-pending]` is a
-  violation.
-- `CANON_KIT_DEFERRED_SECTION` — default `Deferred`: the section whose
-  every entry requires `[design-pending]`.
+  `("New Features" "Technical Debt")`: sections where a `[spec:]`-tagged entry
+  is misfiled unless the section is also a feature section.
+- `CANON_KIT_DEFERRED_SECTION` — default `Deferred`: the deferred section, the
+  first member of the design-pending section set.
 - `CANON_KIT_ICEBOX_SECTION` — scalar, default **empty**: the second
   design-pending section, queue-kit's optional icebox tier. Empty means the
   set is the deferred section alone. Naming the deferred section is malformed
@@ -646,8 +647,8 @@ the knobs are independent (either kit runs without the other), so a
 consumer renaming its sections sets both — and the icebox section name spans
 every kit that reads the tier on that same shape (queue-kit's
 `QUEUE_KIT_ICEBOX_SECTION`, this knob, drift-kit's `DRIFT_KIT_ICEBOX_SECTION`),
-each degrading to "no icebox" rather than to a wrong section when left unset. Valve and marker spellings <!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
-(`[design-pending]`, `[spec:]`, `vision-introduces` / `spec-introduces`,
+each degrading to "no icebox" rather than to a wrong section when left unset. Valve and marker spellings <!-- prose-enum-exempt: names the one amendment-lifecycle tag specifically; the other task tags sit outside that lifecycle, not dropped members -->
+(`[spec:]`, `vision-introduces` / `spec-introduces`,
 `spec-embedded-source-exempt: <reason>`) are mechanism, not config.
 
 ## Per-component contracts
@@ -673,7 +674,7 @@ the same shapes:
 
 - **Section grammar and queue resolution:** the one queue walk that emits a live
   slug for a bold lead-in bullet in an active or **design-pending** section —
-  deferred plus a configured icebox, one section set so the tag rule and the walk
+  deferred plus a configured icebox, one section set so the pairing arms and the walk
   can never disagree on it — and a done slug for a bare-slug bullet outside them;
   the single grammar `check-todo-task-liveness` and `check-deprecation-task`
   resolve a `task: <slug>` binding through. **The walk is `queue_slugs`**, and its
@@ -864,13 +865,20 @@ the same shapes:
 ### check-amendment-queue
 
 Invariant: the bidirectional rule holds — (a) no feature-section entry
-without `[spec:]`, no `[design-pending]` anywhere in the active sections
-(entries or prose; a prose mention masks the tag's absence), and no
-`[spec:]`-tagged entry in an active non-feature section (a spec-ready
-entry is misfiled there — it belongs in a feature section); (b) every entry in
-a **design-pending section** carries `[design-pending]`, and one already
-carrying `[spec:]` must be promoted; (c) every amendment on disk pairs
-with a `[spec:]` queue entry and every `[spec:]` ref resolves to a file.
+without `[spec:]`, and no `[spec:]`-tagged entry in an active non-feature
+section (a spec-ready entry is misfiled there — it belongs in a feature
+section); (b) an entry in a **design-pending section** already carrying
+`[spec:]` must be promoted; (c) every amendment on disk pairs with a `[spec:]`
+queue entry and every `[spec:]` ref resolves to a file; (d) the retired
+design-pending tag appears on no line of a feature, active or design-pending
+section, lead line or body alike — section membership is the state
+(§The amendment lifecycle), and prose about the state spells it without
+brackets (queue-kit/SPEC.md §check-tag-lead-line). Arm (d) reds rather than
+leaving the token inert because an inert leftover keeps the two sources alive
+in every adopter queue with nothing to say so, and habit re-mints a spelling
+the record still shows — the ground queue-kit/SPEC.md
+§check-queue-entry-budget assertion (D) gives for its retired token; the
+migration is mechanical and the finding names it.
 
 Calibration: a ref is a bare amendment basename (searched tree-wide) or a
 repo-relative path (resolved directly — the generalization that lets a
@@ -878,16 +886,16 @@ consumer point a task at any design artifact, e.g. this repo's kit-SPEC
 drafts). Sub-bullets and prose notes are outside the entry grammar;
 `precommit` tier.
 
-Coverage limit, stated because the tag's section-wide reach invites the
+Coverage limit, stated because the arms' section-wide reach invites the
 stronger claim: any heading that is not a feature, active, or deferred
 section classifies as `other` and skips every arm, so the **done section is
-an exempt population** — an entry moved out of design-pending into it still
-carrying the tag reds nowhere, and queue-kit's lead-line gate misses it too
-(its scanned surface is the task sections alone). In practice the done
-grammar is a bare slug line, so the tag is dropped by that grammar rather
-than by a gate. The guard is total over the *promotion* moves it exists to
-catch — design-pending → an active section — and silent on the disposition
-move. This is a limit on *this* gate's axis only: the amendment artifact is
+an exempt population** for the `[spec:]` arms and arm (d) — an entry carried
+into done still carrying its `[spec:]` tag reds only through arm (c)'s ref
+resolution, and queue-kit's lead-line gate misses it too (its scanned surface
+is the task sections alone). In practice the done grammar is a bare slug line,
+so the tag is dropped by that grammar rather than by a gate. The `[spec:]`
+guard is total over the *promotion* moves it exists to catch — design-pending
+→ a feature section — and silent on the disposition move. This is a limit on *this* gate's axis only: the amendment artifact is
 held on a second axis by `check-amendment-update-target`
 (§check-amendment-update-target), whose corpus is the same amendment set and
 whose subject is what the file says about itself rather than how it pairs with

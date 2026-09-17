@@ -34,7 +34,7 @@
 
 ### Someday
 
-- **example-deferred** [cost: once/low] [surface: TASK-QUEUE.md] — a design-pending entry. [design-pending]
+- **example-deferred** [cost: once/low] [surface: TASK-QUEUE.md] — a design-pending entry.
   **Cost while deferred:** what staying parked costs — a red gate, a stale
   doc, a foregone lever — stated so a later scope can weigh it against the
   work of landing it. The lead line carries its class (when the cost is paid,

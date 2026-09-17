@@ -16,9 +16,9 @@
 
 ## Deferred
 
-- **delta-idea** — a parked idea whose state marker reflowed off the lead
-  line: it is still [design-pending] but no tag reader scans this far.
-- **eta-idea** [design-pending] — a parked idea whose board tags reflowed off the lead
+- **delta-idea** — a parked idea whose roadmap placement reflowed off the lead
+  line: it is still [roadmap: later/delta] but no tag reader scans this far.
+- **eta-idea** — a parked idea whose board tags reflowed off the lead
   line: [cost: once/low] [surface: queue-kit] so the board never ranks it.
 
 ## Done

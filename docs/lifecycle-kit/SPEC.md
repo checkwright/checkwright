@@ -453,7 +453,7 @@ existing gates.
 
 **The demote ritual** is the shared step the other shapes compose. To take a
 promoted entry out of a live iteration: move it back to the deferred queue
-section restoring its design-pending tag, and delete its amendment file in the
+section restoring its board tags, and delete its amendment file in the
 same commit. Git history preserves the design — a later scope re-promotes by
 resurrecting the file from history rather than re-deriving it. The enforcement
 is already on the books: canon-kit's `check-amendment-queue` reds the commit on
@@ -1409,7 +1409,7 @@ close-surface: .workflow/gap-inbox.md forced=lifecycle-kit/SPEC.md §bin/enter-s
 via `--emit file-gap` — the knob default makes the channel live everywhere the
 kit is vendored. Consumers, **two**, one per disposition of the boundary check.
 The close skill's drain step (§templates/stages/) dispositions every bullet —
-promoted to a deferred `[design-pending]` entry, fixed inline that session, or
+promoted to a deferred entry, fixed inline that session, or
 discarded with cause in the close commit message — then truncates the inbox to
 its header. The **first stage's intake step** (§templates/stages/) takes the
 bullets the boundary carried, with the same disposition set and the same
@@ -4083,8 +4083,8 @@ active, tagged or not. So untagged entries drain by drain-stage entry, tagged
 entries by successor entry. A roster whose drain stage is terminal (zero
 successors) is refused fail-closed at config load (the table validator,
 §The stage-machine adapters): an exemption with no reachable backstop would be permanent.
-Ruled-but-unpromoted work is never exempt residue — it files as Deferred
-`[design-pending]` for a later scope's promotion (deferred-filing is the model
+Ruled-but-unpromoted work is never exempt residue — it files as a Deferred
+entry for a later scope's promotion (deferred-filing is the model
 for designed-but-unscheduled work). The blockers this assertion lists are
 **partitioned**: any carrying `[observed-by:]` (queue-kit/SPEC.md §The tag
 algebra) are named in a message of their own, because their remedy is not the

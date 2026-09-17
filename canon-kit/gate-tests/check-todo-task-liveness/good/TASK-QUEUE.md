@@ -14,7 +14,7 @@
 
 ## Deferred
 
-- **later-thing** [design-pending] — a deferred design.
+- **later-thing** — a deferred design.
 
 ## Done
 

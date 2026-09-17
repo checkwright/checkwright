@@ -7,7 +7,7 @@ generated: true
 
 A git-native, agent-readable task tracker: one Markdown file where `##`
 sections are queues, bold kebab-case slugs are the task handles, and
-square-bracket tags (`[blocked-by:]`, `[design-pending]`, `[spec:]`,
+square-bracket tags (`[blocked-by:]`, `[spec:]`,
 `[drain-exempt:]`, `[roadmap:]`, `[observed-by:]`, `[cost:]`, `[surface:]`,
 `[precondition-ok:]`, plus the
 Lessons Learned

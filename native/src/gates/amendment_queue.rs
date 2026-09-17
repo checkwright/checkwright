@@ -4,6 +4,10 @@
 use crate::spec;
 use std::path::Path;
 
+// spec: canon-kit/SPEC.md §check-amendment-queue — arm (d): the retired design-pending tag, red on
+// any line of a feature, active or design-pending section
+const RETIRED_TAG: &str = "[design-pending]";
+
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
         Ok(rc) => rc,
@@ -126,11 +130,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let text = spec::read_text(Path::new(&queue))?;
 
     let mut missing: Vec<String> = Vec::new();
-    let mut an: Vec<String> = Vec::new();
-    let mut pn: Vec<String> = Vec::new();
-    let mut dopen: Vec<String> = Vec::new();
     let mut dready: Vec<String> = Vec::new();
     let mut mready: Vec<String> = Vec::new();
+    let mut retired: Vec<String> = Vec::new();
 
     // spec: canon-kit/SPEC.md §check-amendment-queue — awk's `sec` is unset until the first
     // heading, so a line above every section is classified by no arm; `Other` is that state
@@ -140,32 +142,21 @@ fn rule(args: &[String]) -> Result<i32, String> {
             sec = c;
             continue;
         }
+        if matches!(sec, Sec::Other) {
+            continue;
+        }
         let at = format!("{}:{}: {}", queue, idx + 1, line);
-        let bullet = line.starts_with("- ");
+        if line.contains(RETIRED_TAG) {
+            retired.push(at.clone());
+        }
+        if !line.starts_with("- ") {
+            continue;
+        }
         match sec {
-            Sec::Feature | Sec::Active => {
-                if bullet {
-                    if line.contains("[design-pending]") {
-                        an.push(at);
-                    } else if matches!(sec, Sec::Feature) && !line.contains("[spec:") {
-                        missing.push(at);
-                    } else if matches!(sec, Sec::Active) && line.contains("[spec:") {
-                        mready.push(at);
-                    }
-                } else if line.contains("[design-pending]") {
-                    pn.push(at);
-                }
-            }
-            Sec::Deferred => {
-                if bullet {
-                    if !line.contains("[design-pending]") {
-                        dopen.push(at);
-                    } else if line.contains("[spec:") {
-                        dready.push(at);
-                    }
-                }
-            }
-            Sec::Other => {}
+            Sec::Feature if !line.contains("[spec:") => missing.push(at),
+            Sec::Active if line.contains("[spec:") => mready.push(at),
+            Sec::Deferred if line.contains("[spec:") => dready.push(at),
+            _ => {}
         }
     }
 
@@ -187,27 +178,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
         &missing,
     );
     block(
-        &format!(
-            "[design-pending] tag in an active-queue entry (move it to {}):",
-            sets.deferred
-        ),
-        &an,
-    );
-    block(
-        "[design-pending] tag in active-queue prose (a design-pending-section-only tag; say \"needs design\" in prose):",
-        &pn,
-    );
-    block(
-        "design-pending-section entries without [design-pending] (all deferred work is design-pending):",
-        &dopen,
-    );
-    block(
         "design-pending-section entries already carrying [spec:] (promote to a feature section):",
         &dready,
     );
     block(
         "[spec:]-tagged entries misfiled in an active non-feature section (a spec-ready entry belongs in a feature section):",
         &mready,
+    );
+    block(
+        "[design-pending] is retired — section membership is the state; delete the tag:",
+        &retired,
     );
 
     // spec: canon-kit/SPEC.md §check-amendment-queue — bidirectional pairing on disk. The
@@ -260,11 +240,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("check-amendment-queue: Task↔amendment bidirectional-rule violation(s):");
         println!();
         print!("{}", errors);
-        println!("  help: pair every amendment with a [spec: …] queue entry and vice versa; tag every design-pending-section entry [design-pending]; give every feature entry a [spec:] ref");
+        println!("  help: pair every amendment with a [spec: …] queue entry and vice versa; delete every retired [design-pending] tag (section membership is the state); give every feature entry a [spec:] ref");
         return Ok(1);
     }
 
-    println!("AMENDMENT-QUEUE: clean (every amendment ↔ a queue entry; feature entries spec-ready; every design-pending-section entry tagged)");
+    println!("AMENDMENT-QUEUE: clean (every amendment ↔ a queue entry; feature entries spec-ready; no retired design-pending tag)");
     Ok(0)
 }
 

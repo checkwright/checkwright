@@ -142,7 +142,7 @@ mod tests {
     fn eviction_conserves_but_a_relocated_live_shape_does_not() {
         let head = "## New Features\n- **a** x\n";
         assert_eq!(diff(head, "## Icebox\n- **a** x\n", &sections()), (1, vec![]));
-        let (_, lost) = diff(head, "## Done\n- **a** [design-pending] — x\n", &sections());
+        let (_, lost) = diff(head, "## Done\n- **a** — x\n", &sections());
         assert_eq!(lost, vec!["a".to_string()]);
     }
 }

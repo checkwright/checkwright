@@ -15,29 +15,29 @@
 
 ### Someday
 
-- **beta-idea** [design-pending] — a parked idea, within the cap.
+- **beta-idea** — a parked idea, within the cap.
   **Cost while deferred:** low and non-rotting — nothing degrades meanwhile.
   Filed 2026-01-01 by scope.
 
-- **gamma-idea** [design-pending] — cost stated with the em-dash variant.
+- **gamma-idea** — cost stated with the em-dash variant.
   **Cost while deferred — bounded:** one stale paragraph, no gate gap.
   Filed 2026-01-02 by scope.
 
-- **zeta-idea** [design-pending] — seven extent lines against a six-line cap,
+- **zeta-idea** — seven extent lines against a six-line cap,
   and the sole excess is the machine-written declaration below, which the
   count discounts one of per entry.
   recurrence: zeta-idea 2026-01-03 2026-01-09
   **Cost while deferred:** low — the discount is what keeps this filing legible.
   Filed 2026-01-03 by scope.
 
-- **theta-idea** [design-pending] — seven extent lines against the same cap, with
+- **theta-idea** — seven extent lines against the same cap, with
   its ruling's provenance stated inline — ruled 2026-01-05 (operator, relay) —
   rather than as a declaration line, so only the recurrence line is discounted
   and the entry lands exactly on the cap.
   recurrence: theta-idea 2026-01-05
   **Cost while deferred:** low.
 
-- **iota-idea** [design-pending] — seven extent lines against the same cap, one
+- **iota-idea** — seven extent lines against the same cap, one
   of them the standing-exclusion declaration below, which the count discounts
   as it discounts a recurrence line, so the entry lands exactly on the cap.
   not-icebox-eligible: iota-idea 2026-01-07 a recorded decision keeps it deferred
@@ -46,8 +46,8 @@
 
 ## Icebox
 
-- **delta-idea** [design-pending] — dormant: cheap to carry, nothing waiting.
-- **epsilon-idea** [design-pending] — dormant: the premise cannot rot.
+- **delta-idea** — dormant: cheap to carry, nothing waiting.
+- **epsilon-idea** — dormant: the premise cannot rot.
 
 ## Done
 

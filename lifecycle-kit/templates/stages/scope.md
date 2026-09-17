@@ -4,7 +4,7 @@ features only where scope also authors (below) — and suggest the
 iteration name; author the promoted features' design amendments here **unless
 the roster splits out a dedicated authoring stage** (below), which then owns
 them. Exit condition: *<exit-condition: your scope exit
-condition — e.g. no design-pending tag left in the active queue; your
+condition — e.g. every active feature entry spec-ready; your
 amendment-readiness gate green>*.
 
 **First step — reset + stamp evidence.** Run the lifecycle arm

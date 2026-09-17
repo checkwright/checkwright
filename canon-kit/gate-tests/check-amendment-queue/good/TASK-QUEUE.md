@@ -10,6 +10,7 @@
 
 ## Deferred
 
-- **later-thing** [design-pending] — a design-pending idea; needs a ruling first.
+- **later-thing** — a design-pending idea; needs a ruling first.
+  Why design-pending: the state named in prose, without brackets.
 
 ## Done

@@ -882,7 +882,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
                 say.body(&body);
                 say.help(&format!(
                     "run the closing stage's gap-drain step — disposition each bullet (promote to \
-                     a deferred [design-pending] entry, fix inline, or discard with cause in the \
+                     a deferred entry, fix inline, or discard with cause in the \
                      commit message), truncate the inbox to its header, then re-run enter-stage {}.",
                     stage
                 ));

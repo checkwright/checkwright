@@ -12,7 +12,7 @@ work and its history from the same tree it commits to, with no credential and
 no network round-trip.
 
 queue-kit formalizes that file: one slug namespace, a small tag algebra
-(blocked-by, design-pending, spec, drain-exempt, roadmap, observed-by, cost,
+(blocked-by, spec, drain-exempt, roadmap, observed-by, cost,
 surface) that
 encodes
 preconditions an agent can resolve

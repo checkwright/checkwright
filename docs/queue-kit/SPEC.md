@@ -34,7 +34,7 @@ as `##` sections over column-0 bullets:
   prose may carry a `Surfaced <date>` mark — an ungated convention recording
   when the premise was observed. A deferred body is free prose, and four
   bold-lead-in fields recur, each answering a question a later scope asks:
-  `Deliverable` (what landing looks like), `Why [design-pending]` (what the
+  `Deliverable` (what landing looks like), `Why design-pending` (what the
   open design actually is), `Cost while deferred`, and a closing
   `Filed <date> by <stage>` provenance line. Three are conventions no gate
   reads; **`Cost while deferred` is required** — the Gap-disposition rule's
@@ -191,14 +191,13 @@ removed rather than added.
 **The grammar is the lead line and nothing else:**
 
 ```
-- **<slug>** [design-pending] — <one sentence: what it is, and why it is dormant>
+- **<slug>** — <one sentence: what it is, and why it is dormant>
 ```
 
-- **It carries the same `[design-pending]` tag every deferred entry carries.**
-  No `[icebox]` tag is minted: section membership *is* the state, and a tag
-  restating its own section is the two-sources defect. What generalizes across
-  the amendment lifecycle is the design-pending **section set**, not its tag
-  set. The "why it is dormant" clause is written where it fits and otherwise
+- **No state tag.** Section membership *is* the state, for this tier as for the
+  deferred section; a tag restating its own section is the two-sources defect.
+  What generalizes across the amendment lifecycle is the design-pending
+  **section set**, not a tag. The "why it is dormant" clause is written where it fits and otherwise
   left to the tier — membership already declares it.
 - **No `###` subsections and no sub-tasks.** Grouping is presentation on a
   surface whose entire purpose is minimum residency, and a sub-task is a
@@ -405,12 +404,9 @@ adoption step between landing it and reading it.
   deferred blocker stands; it is unbuilt); a blocker in the done section is a
   *stale* tag that must be removed, because the tag alone marks a task
   unpickable.
-- `[design-pending]` — design-pending marker, spanning **both** design-pending
-  sections (deferred and, where configured, the icebox). queue-kit parses and
-  displays it; the placement semantics (section-wide enforcement, promotion
-  rules) are canon-kit's amendment lifecycle and land with that kit.
-- `[spec: <file>]` — spec-ready pointer. Same split: syntax here, amendment
-  semantics in canon-kit.
+- `[spec: <file>]` — spec-ready pointer. queue-kit parses and displays it; the
+  amendment semantics (section-wide enforcement, promotion rules) are canon-kit's
+  amendment lifecycle and land with that kit.
 - `[drain-exempt: <reason>]` — drain-stage residue marker: the entry
   legitimately stays active into the drain stage (a drain-spanning feature
   whose remaining half *is* drain-stage work). Same split: syntax here;
@@ -1407,7 +1403,7 @@ table from swallowing its marker.
 
 Honest limit — the lead line is a shared budget, and `[roadmap:]` competes for it
 with every other tag the entry carries. Against `check-queue-wrap`'s floor a
-`[spec: <file>]` tag is far wider than `[design-pending]`, so an entry carrying
+`[spec: <file>]` tag spends a large share of the line, so an entry carrying
 a spec pointer and a long slug may have room for the `[roadmap:]` tag but none
 for prose after it. That costs nothing now the summary lives on its own line:
 the lead line needs room for the tag alone. It does bound the tag itself — a
@@ -1974,8 +1970,8 @@ deferred pool off the board rather than off its bodies. Two assertions:
   the colon and no whitespace inside the value, the fixed spelling that bounds
   their width (§check-queue-wrap).
 - **(B) Absent from the active sections.** No bullet lead line in an active
-  section carries either tag. A promotion drops both, as it drops
-  `[design-pending]`, and this assertion is the checksum on that move.
+  section carries either tag. A promotion drops both, and this assertion is
+  the checksum on that move.
 
 **Not applied to the icebox:** an eviction drops both tags, and a one-line entry
 has no reader for either. A sub-task rides its parent's tags, the same scope
@@ -2040,7 +2036,7 @@ already carries sit on the line, no spelling of the two fits every entry.
 
 Invariant: every **lead-line-scoped** tag sits on its bullet's lead line — the
 only line *its* readers scan; such a tag pushed to a continuation line by a
-reflow silently unblocks a task, masks a design-pending state, voids a drain
+reflow silently unblocks a task, voids a drain
 exemption, drops a deferred entry's class or surface off the board, or drops a
 lesson out of the attention block. Membership tracks reader semantics, not §The tag
 algebra: a tag is governed here when its readers scan lead lines alone, so the
@@ -2054,7 +2050,7 @@ queue happens to carry one. Membership keyed to instance count would be a set
 that disarms itself exactly when the last user drains — the reverse of what a
 lead-line guard is for. The governed set and
 scanned surface both widen with the lesson channels: `[blocked-by:]` /
-`[spec:]` / `[design-pending]` / `[drain-exempt:]` / `[roadmap:]` /
+`[spec:]` / `[drain-exempt:]` / `[roadmap:]` /
 `[observed-by:]` / `[cost:]` / `[surface:]` in the task
 sections (active + deferred), plus
 `[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
@@ -2126,10 +2122,10 @@ live set, so the gate stays silent and no sanctioned-disappearance escape had
 to be invented. The done side is where care is owed: a done entry is matched as
 a **bare `- <slug>` line and nothing else** — no bold, no tag, no trailing
 prose. An entry *carried* into the done section with its
-`- **<slug>** [design-pending] — …` shape intact therefore matches neither the
+`- **<slug>** [cost: …] — …` shape intact therefore matches neither the
 done grammar nor the live one, lands in no set, and reds here as a lost task.
 Dispositioning an entry to done is a **rewrite to its slug**, not a relocation
-of the entry; the tag is dropped by that reduction rather than swapped.
+of the entry; the tags are dropped by that reduction rather than swapped.
 
 Calibration: diffs `git show HEAD:<queue>` against the worktree, hence
 `no-fixture:` (a committed fixture has HEAD == worktree; the bad case needs
@@ -2165,10 +2161,10 @@ Calibration: the trigger set (`QUEUE_KIT_PRECONDITION_REGEX`) is deliberately
 narrow — forward-looking phrasing only, the default's phrases left-bounded on a
 non-letter so a trigger embedded in a longer word (`appending close`, `delegated
 on`) does not fire, past-tense narration stripped before
-matching, and **the queue's own `design-pending` tag name stripped in its
-unbracketed spelling too**. That third rewrite exists because the tag name ends
-in a trigger word: the bracket rewrite reaches `[design-pending]` and nothing
-reached a prose mention of the same governed token, so an entry narrating a
+matching, and **the queue's own state name `design-pending` stripped in its
+unbracketed spelling too**. That third rewrite exists because the state name ends
+in a trigger word: the bracket rewrite reaches any bracketed tag and nothing
+reached a prose mention of the state and its section set, so an entry narrating a
 demotion route or an amendment-pairing rule reddened for using the queue's own
 vocabulary. It is stripped in the member's source rather than excluded in the
 regex for two reasons — POSIX ERE has no lookbehind, so a preceding hyphen
@@ -2259,8 +2255,8 @@ kit first and no adopter ever received the file.
 
 ## Out of scope
 
-<!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
-The amendment lifecycle around `[design-pending]`/`[spec:]` (section-wide
+<!-- prose-enum-exempt: names the one amendment-lifecycle tag specifically; the other task tags sit outside that lifecycle, not dropped members -->
+The amendment lifecycle around the design-pending sections and `[spec:]` (section-wide
 enforcement, promotion procedure, `check-amendment-queue`) is canon-kit's
 scope. Code-comment TODO scanning (`TODO(task:<slug>)` resolution against
 the queue) couples to source-file conventions and is canon-kit's, on the

@@ -11281,7 +11281,7 @@ directory. A Rust rewrite would not naturally spell `is_dir()` — the idiomatic
 write is the honest predicate — so the port carries the predicate across
 unchanged and the parity run **reproduces the refusal from inside a worktree**
 rather than routing around it. The ground is that settling a live
-`[design-pending]` fork inside a port cut is non-port design work: a port proves
+design-pending fork inside a port cut is non-port design work: a port proves
 parity and does not fix the rules it ports. The open entry for that refusal keeps its premise, its
 verdict and its fixture obligation, and it is the second member of the class of
 design forks a port carries across unchanged.

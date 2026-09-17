@@ -29,7 +29,7 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 ## New Features
 
 - **feat-a** [cost: event/low] — do a thing.
-- **feat-b** [design-pending] — do another.
+- **feat-b** [roadmap: now/x] — do another.
 
 ## Technical Debt
 

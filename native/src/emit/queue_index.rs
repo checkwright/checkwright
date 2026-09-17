@@ -606,9 +606,9 @@ mod tests {
 
 ## New Features
 
-- **feat-tagged** [design-pending] — a tagged active entry.
-- **feat-two-tags** [design-pending] [roadmap: later/thing] — two tags here.
-- **feat-alltag** [design-pending]
+- **feat-tagged** [spec: SPEC-x.md] — a tagged active entry.
+- **feat-two-tags** [spec: SPEC-x.md] [roadmap: later/thing] — two tags here.
+- **feat-alltag** [spec: SPEC-x.md]
 - **feat-exempt** [drain-exempt: half pending] — exempt and titled.
 - **feat-blocked** [blocked-by: feat-tagged] — waiting on one.
 
@@ -616,7 +616,7 @@ mod tests {
 
 ## Deferred
 
-- **def-tagged** [design-pending] [cost: event/low] [surface: queue-kit] — a tagged deferred entry.
+- **def-tagged** [cost: event/low] [surface: queue-kit] — a tagged deferred entry.
 - **def-alltag** [spec: some-kit/SPEC.md §A Long Pointer Section]
 
 ## Done
@@ -838,17 +838,17 @@ mod tests {
 
 ## New Features
 
-- **live-one** [design-pending] — an unbuilt active entry.
+- **live-one** — an unbuilt active entry.
 
 ## Deferred
 
-- **keeper** [design-pending] [cost: event/low] [surface: queue-kit] — nothing holds it.
+- **keeper** [cost: event/low] [surface: queue-kit] — nothing holds it.
   **Cost while deferred:** paid when the surface is touched.
   Filed 2020-01-01 by close.
-- **tagged** [design-pending] [cost: event/low] [surface: queue-kit] [roadmap: now/x] — published.
+- **tagged** [cost: event/low] [surface: queue-kit] [roadmap: now/x] — published.
   **Cost while deferred:** paid when the surface is touched.
   Filed 2020-01-01 by close.
-- **held** [design-pending] [cost: event/low] [surface: queue-kit] — waits.
+- **held** [cost: event/low] [surface: queue-kit] — waits.
   **Cost while deferred:** paid when the surface is touched.
   Filed 2020-01-01 by close, and it waits on `live-one`.
 
@@ -878,22 +878,22 @@ mod tests {
 
 ## Deferred
 
-- **ev-low** [design-pending] [cost: event/low] [surface: queue-kit] — t.
+- **ev-low** [cost: event/low] [surface: queue-kit] — t.
   **Cost while deferred:** every iteration re-reads it.
   Filed 2020-01-01 by close.
-- **once-low** [design-pending] [cost: once/low] [surface: queue-kit] — t.
+- **once-low** [cost: once/low] [surface: queue-kit] — t.
   **Cost while deferred:** fixed.
   Filed 2020-01-01 by close.
-- **it-low** [design-pending] [cost: iteration/low] [surface: queue-kit] — t.
+- **it-low** [cost: iteration/low] [surface: queue-kit] — t.
   **Cost while deferred:** low and quiet.
   Filed 2020-01-01 by close.
-- **ev-high** [design-pending] [cost: event/high] [surface: queue-kit] — t.
+- **ev-high** [cost: event/high] [surface: queue-kit] — t.
   **Cost while deferred:** low and quiet.
   Filed 2020-01-01 by close.
-- **untagged** [design-pending] — t.
+- **untagged** — t.
   **Cost while deferred:** low and quiet.
   Filed 2020-01-01 by close.
-- **malformed** [design-pending] [cost: event/lo] [surface: queue-kit] — t.
+- **malformed** [cost: event/lo] [surface: queue-kit] — t.
   **Cost while deferred:** low and quiet.
   Filed 2020-01-01 by close.
 
@@ -920,7 +920,7 @@ mod tests {
 
 ## Deferred
 
-- **long-grounds** [design-pending] [cost: event/low] [surface: queue-kit] — t.
+- **long-grounds** [cost: event/low] [surface: queue-kit] — t.
   not-icebox-eligible: long-grounds 2026-08-17 a very long declared reason that runs well past the forty eight character mark on its own
   Filed 2020-01-01 by close.
 
