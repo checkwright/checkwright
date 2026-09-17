@@ -3699,8 +3699,4 @@
 
 ## Done
 
-- close-differential-instruction-sweep
-- spec-authoring-self-check-pass
-- survey-inferred-claim-has-no-execution-obligation
-
 ## Lessons Learned
