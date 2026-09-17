@@ -4,9 +4,4 @@
 
 ---
 
-interpreter-steer-census scope af324070 2026-09-17 e2ef406b
-interpreter-steer-census spec a29386aa 2026-09-17 529e0183
-interpreter-steer-census align a1e50339 2026-09-17 f5b8893b
-interpreter-steer-census build a928b632 2026-09-17 75ae9a63
-interpreter-steer-census validate a065797d 2026-09-17 63f42456
-interpreter-steer-census close a533dfa0 2026-09-17 f47dd0b0
+— scope aeb94296 2026-09-17 978cb7f7
