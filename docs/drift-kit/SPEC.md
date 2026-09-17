@@ -229,8 +229,8 @@ Lead:
   doc, two implementations, both carrying a `spec:` line citing the owner.
   Both marks count, because a pool whose entries carry provenance lines rather
   than `Surfaced` marks would otherwise leave the input covering a fraction of
-  it. The KPI de-duplicates the dates it finds and reports the oldest, so it
-  trends dates rather than counting entries. Its unknown-heading reset drops an
+  it. Each entry contributes its one defer date, and the KPI reports the oldest,
+  so it trends dates rather than counting entries. Its unknown-heading reset drops an
   icebox placed after the deferred section out of the input **by
   construction**, which is wanted: an evicted entry's age is not the thing this
   KPI trends. gate-sdk's `check-gate-exemption-tasks` carries the

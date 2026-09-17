@@ -1622,8 +1622,9 @@
   not list the evicting commit at all and its newest hit is an unrelated earlier commit; and on a
   real icebox eviction, `-S'scratch-execution-allowlist-bar'` returns 3 commits where `-G`
   returns 5. `-G` matches diff content and reaches both.
-  **Four surfaces carry the wrong spelling**, which is why this is one unit rather than a typo:
-  this file's `## Icebox` preamble, `queue-entry-evidence-tier`'s body, queue-kit/SPEC.md §The
+  **Three surfaces carry the wrong spelling**, which is why this is one unit rather than a typo
+  (a fourth, `queue-entry-evidence-tier`'s body, left with that entry at its 2026-09-17 landing):
+  this file's `## Icebox` preamble, queue-kit/SPEC.md §The
   icebox tier, and `check-queue-entry-budget`'s own help text — that last one is a compiled
   subcommand now, so the fix costs a crate edit and a rebuild rather than a string swap.
   **It does not re-open `queue-entry-evidence-tier`'s narrowing, and that is deliberate.** That
@@ -2207,6 +2208,9 @@
   thin line; this one cost one round-trip and landed no line at all. Both branches are now
   attested, which retires the "predicted" half of the deliverable — the three candidate rulings
   stand unchanged and none of them is chosen here.
+  **Premise loosened 2026-09-17:** the icebox lead line no longer carries the design-pending tag,
+  so each attested slug gains 17 columns (31 → 48, 22 → 39). The squeeze stands, because slug
+  length is still unbounded, but its threshold moved; re-measure before ruling.
   recurrence: icebox-eviction-line-budget-squeeze 2026-09-03
 
 - **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [cost: event/high] [surface: delegation-kit] — an isolated
@@ -2889,8 +2893,8 @@
   mechanism rather than deleting it, and each needs a per-passage read of whether
   lifecycle-kit/SPEC.md already
   carries it — a spec-stage judgment, not a brevity-pass deletion.
-  **DISTINCT from `close-differential-instruction-sweep`**, the forward mechanism over future edits,
-  which is unchanged by this and cannot see these lines.
+  **DISTINCT from `close-differential-instruction-sweep`, landed**, the forward mechanism over
+  future edits, which is unchanged by this and cannot see these lines.
   **Cost while deferred:** three grounds slabs ride the lead template at every dispatch, inside the
   surface ratchet's ceiling for that file.
   Filed 2026-09-12 at build to the gap inbox; promoted here by close after →fix took only the
@@ -3442,7 +3446,6 @@
 - **readonly-dispatch-type-cannot-see-gitignored-surfaces** — No ignored files.
 - **kfric-second-field-direction-inverted** — Surface field names the owner.
 - **baseline-self-certification-unasserted** — Self-served verdicts unasserted.
-- **design-pending-boilerplate-reds-its-own-promotion** — Reds on promotion.
 - **wait-mandate-template-spelling-unreachable** — Mandated spelling is refused.
 - **consumer-smoke-single-kit-run-not-self-sufficient** — Per-kit smoke fails.
 - **upgrade-smoke-refuses-inside-a-worktree** — Refuses where .git is a file.
@@ -3521,5 +3524,6 @@
 - queue-entry-evidence-tier
 - design-pending-tag-restates-its-own-section
 - amendment-owner-position-citation
+- design-pending-boilerplate-reds-its-own-promotion
 
 ## Lessons Learned

@@ -185,3 +185,4 @@
 | install-smoke-slow-leg | sc sp a b v c | 1f/0d | 1 · ≤0d | 20s clean | 115 |
 | validate-red-holding | sc sp a b v c | 3f/2d | 2 · ≤0d | 20s clean | 115 |
 | claim-execution-obligations | sc sp · b v c | 3f/0d | 2 · ≤0d | 20s clean | 115 |
+| queue-entry-grammar | sc sp a b v c | 7f/0d | 3 · ≤0d | 20s clean | 115 |
