@@ -95,8 +95,9 @@ log.
 
 ### (3) The feeding point: a consumer whose decisions read the log runs the meter at its terminal stage
 
-drift-kit/SPEC.md §The stage-economics meter gains a short **Feeding** paragraph,
-and this repo's close binding gains the run {design-bearing}.
+drift-kit/SPEC.md §The stage-economics meter gains a short **Feeding** paragraph at
+the section's close, after the fan-out row paragraph, and this repo's close
+binding gains the run {design-bearing}.
 **Not yet applied** (either half).
 
 **Kit contract (drift-kit/SPEC.md).** The meter is on-demand by construction. A
@@ -226,7 +227,10 @@ corpus increment, so neither demotes {mechanical}.
     orders bare `align` rows by date. Its contract is unbroken, and its series is
     now in stage order;
   - the operator reading `cost` close-over-close;
-  - the A/B benchmark rung, which would consume the log.
+  - the A/B benchmark rung, which would consume the log;
+  - `kpi-stage-economics-lag` (delta 4), whose **Priced** check reads the log's
+    iteration field (field 2) directly, not through the date map — a fourth
+    consumer this amendment itself introduces.
 
   No gate reads the log.
 - *Field reader:* `date` is read by those same three. The stdout `dated by
@@ -250,6 +254,9 @@ corpus increment, so neither demotes {mechanical}.
 **`kpi-stage-economics-lag` (delta 4).**
 - *Producer:* the drift-report collator, via the `BUILTINS` table, when
   `kpis.list` registers the name. This repo registers it in `scripts/kpis.list`.
+- *Reads:* the stage-economics log file directly, for the **Priced** check —
+  listed as this KPI's own fourth-consumer entry under "The row date (delta 1)"
+  above, so the relation is stated once and cross-referenced rather than twice.
 - *Consumers:*
   - the session-start trend line, which context-kit's hook injects;
   - the full report;
@@ -285,7 +292,10 @@ No delta narrows a corpus, so point 5 binds only where a reader was named above.
   (deltas 1 and 2).
 - `drift-kit/SPEC.md` §The stage-economics meter: the supervision and fan-out
   "No new field" bullets state their row's date rule (delta 1). A new Feeding
-  paragraph follows §The trend log (delta 3).
+  paragraph closes the section, after the fan-out row paragraph and before §The
+  `/economics` skill (delta 3) — not directly after §The trend log, which would
+  wedge it between the trend-log, supervision and fan-out row-shape paragraphs
+  that read as one sequence.
 - `drift-kit/SPEC.md` §Bundled KPIs gains the Lead member. §The report skeleton's
   session-start cost paragraph names the second read. §Layout and configuration's
   entries for `DRIFT_KIT_STATE_FILE`, `DRIFT_KIT_STAGES` and
@@ -294,8 +304,9 @@ No delta narrows a corpus, so point 5 binds only where a reader was named above.
 - `native/src/emit/stage_economics.rs`: date maps, the retained-line re-date, the
   in-place write and the count caveat (deltas 1 and 2). The stamp collector moves
   to the shared function (delta 4).
-- `native/src/emit/kpi/` gains a new module, with `mod.rs` `BUILTINS` and the `Ctx`
-  fields in `native/src/emit/drift_report.rs` (delta 4).
+- `native/src/emit/kpi/` gains a new module, and `mod.rs` gains the new `BUILTINS`
+  entry and the new `Ctx` fields — the struct is declared there, not in
+  `drift_report.rs`, which only constructs a `Ctx` value from it (delta 4).
 - `drift-kit/templates/kpis.list`, `scripts/kpis.list` and
   `gate-sdk/gate-tests/check-template-registry-parity/good/drift-kit/templates/kpis.list`
   (delta 4).
@@ -304,7 +315,7 @@ No delta narrows a corpus, so point 5 binds only where a reader was named above.
 - `.claude/commands/close.md` §housekeeping: the replacement text in delta 3.
 - `drift-kit/smoke/install.sh` (delta 5).
 - `TASK-QUEUE.md`: both entries move to Done at merge (delta 6).
-- <!-- update-target-exempt: generated projections, each rostered with its freshness gate and regen command in docs/site-architecture.md §Generated projections and their freshness gates --> The `docs/` mirrors of `drift-kit/SPEC.md` and `drift-kit/README.md`, `docs/enforcement.md`, `docs/footprint.md`, `docs/value.md`, and the generated pre-commit hook.
+- <!-- update-target-exempt: generated projections, each rostered with its freshness gate and regen command in docs/site-architecture.md §Generated projections and their freshness gates --> The `docs/` mirrors of `drift-kit/SPEC.md` and `drift-kit/README.md`, `docs/enforcement.md`, and `docs/value.md` — the KPI-roster fan-out (docs/site-architecture.md §The KPI-roster fan-out). `docs/footprint.md` and the generated pre-commit hook are **not** in this fan-out: the footprint measures no script, and the hooks stale on a gate's `# graph:` manifest or a new `gate-tests/*.test.sh`, neither of which this amendment touches — it ships a KPI, not a gate.
 
 ## Retired spellings
 
