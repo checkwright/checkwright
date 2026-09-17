@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: validate-red-holding
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,34 @@
 ## New Features
 
 ## Technical Debt
+
+- **baseline-move-stales-evidence-line** — promoting a task and moving a suite's
+  baseline is not enough to close: the evidence line already recorded against the *old* baseline is
+  stale, and nothing says so until the entry gate refuses a second time for a different reason.
+  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed**, unit of
+  `validate-red-holding`: the recipe and help-text widening add no name, so no amendment is owed.
+  **The second face of `close-entry-baseline-bootstrap-deadlock`**, which owned the first (close is
+  the only stage that may file the blocking slug, and cannot enter without it) and has since been
+  ruled and retired. Its fix addressed the first face and left this one standing, which is why this
+  was filed apart rather than folded in, and is why the retirement does not carry it away.
+  **The mechanism.** A recorded verdict is *relative* to whichever baseline was live when the suite
+  ran, so moving a suite from `pass` to a slug-carrying `fail` invalidates every line computed
+  before the move. `check-evidence-manifest`'s close-entry assertion then still refuses on "no clean
+  evidence line" with the promotion and the baseline row both correctly landed — the refusal a
+  session reads as the first fix having failed.
+  **Attested, not predicted:** hit at this iteration's validate/close boundary. The first refusal
+  was fixed by `f8c34c20` + `f5664bbf`; a `--simulate close` recheck still refused, for a second
+  reason nothing had flagged, forcing a round trip the recipe would have saved.
+  **Re-verified at this drain; both claims hold.** No promote → baseline → fresh-evidence recipe
+  exists anywhere in `evidence-kit/SPEC.md`, and `check-evidence-baseline`'s own help
+  (`native/src/gates/evidence_baseline.rs:224`) names the line grammar, the liveness requirement
+  and the human-commit rule — never the evidence manifest as the other surface a promotion stales.
+  **Deliverable, enforcement-first shaped:** document the three-step recipe wherever the
+  deferred-known-red path is described, *and* widen that help text to name the manifest, so the
+  session that reaches the second refusal is told by the gate rather than by a round trip.
+  **Cost while deferred:** one wasted close-entry round trip per iteration that ends non-clean,
+  landing on top of the operator interrupt the first face already charges for the same boundary.
+  Filed 2026-08-18 by close, draining the gap inbox; the first face stamped as a recurrence there.
 
 ## Deferred
 
@@ -488,7 +516,7 @@
   that iteration could drain; promoted 2026-09-09 at this iteration's scope intake, so the record
   is late and says so.
 
-- **binding-intel-leg-failed-one-run-in-two** [design-pending] [cost: iteration/high] [surface: .github] — a leg this project made binding
+- **binding-intel-leg-failed-one-run-in-two** [design-pending] [cost: event/high] [surface: .github] — a leg this project made binding
   failed one of its first two runs, non-deterministically, in a way no finished run can diagnose;
   master is green and nothing needs reverting.
   **Read the resolution first.** Master went red at `adb7379f` and GREEN again at `7329b319`, the
@@ -522,6 +550,8 @@
   record is late and says so.
   **Joins `install-smoke-slow-leg` — operator direction, 2026-09-17, lead-relayed:** its scratch
   witness only, riding that unit's `run-smoke.sh` upgrade arm; green in 12 master runs since.
+  **Re-costed iteration/high to event/high — operator direction, 2026-09-17, lead-relayed:** the
+  cost is per firing, and the leg passed in the last 20 master `gates` runs.
 
 - **substrate-parity-audits-one-producer-of-two** [design-pending] [cost: event/high] [surface: gate-sdk] — the parity gate's release-path
   assertions read a single named workflow, and the tree now has two workflows that build and hash a
@@ -775,32 +805,6 @@
   Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
   whether the tag earns its keep; the operator noted having proposed removal before and gave no
   ruling. Promoted 2026-09-06 by close — too wide to fix inline, live trigger bars the icebox.
-
-- **baseline-move-stales-evidence-line** [design-pending] [cost: iteration/low] [surface: evidence-kit] — promoting a task and moving a suite's
-  baseline is not enough to close: the evidence line already recorded against the *old* baseline is
-  stale, and nothing says so until the entry gate refuses a second time for a different reason.
-  **The second face of `close-entry-baseline-bootstrap-deadlock`**, which owned the first (close is
-  the only stage that may file the blocking slug, and cannot enter without it) and has since been
-  ruled and retired. Its fix addressed the first face and left this one standing, which is why this
-  was filed apart rather than folded in, and is why the retirement does not carry it away.
-  **The mechanism.** A recorded verdict is *relative* to whichever baseline was live when the suite
-  ran, so moving a suite from `pass` to a slug-carrying `fail` invalidates every line computed
-  before the move. `check-evidence-manifest`'s close-entry assertion then still refuses on "no clean
-  evidence line" with the promotion and the baseline row both correctly landed — the refusal a
-  session reads as the first fix having failed.
-  **Attested, not predicted:** hit at this iteration's validate/close boundary. The first refusal
-  was fixed by `f8c34c20` + `f5664bbf`; a `--simulate close` recheck still refused, for a second
-  reason nothing had flagged, forcing a round trip the recipe would have saved.
-  **Re-verified at this drain; both claims hold.** No promote → baseline → fresh-evidence recipe
-  exists anywhere in `evidence-kit/SPEC.md`, and `check-evidence-baseline`'s own help
-  (`native/src/gates/evidence_baseline.rs:224`) names the line grammar, the liveness requirement
-  and the human-commit rule — never the evidence manifest as the other surface a promotion stales.
-  **Deliverable, enforcement-first shaped:** document the three-step recipe wherever the
-  deferred-known-red path is described, *and* widen that help text to name the manifest, so the
-  session that reaches the second refusal is told by the gate rather than by a round trip.
-  **Cost while deferred:** one wasted close-entry round trip per iteration that ends non-clean,
-  landing on top of the operator interrupt the first face already charges for the same boundary.
-  Filed 2026-08-18 by close, draining the gap inbox; the first face stamped as a recurrence there.
 
 - **plugin-marketplace** [design-pending] [roadmap: later/ecosystem] [cost: once/low] [surface: installer] — harness plugin packaging.
   roadmap-summary: The stage skills and guards installable as a harness plugin.
@@ -2224,9 +2228,8 @@
   validate dispatch, it fired as intended — validate met a real defect and ESCALATED, not ground.
   `validate` stays on the cheaper model, and a validate that discovers it must **fix** what it found
   gets a named, cheap transition to the judgment tier rather than an improvisation. That CLOSES this
-  entry's design fork: what remains is delivery, not design. **Deliberately NOT promoted into
-  `shell-gate-tail-port-and-completion-oracle`** — the operator set that unit set and this is not in
-  it, so the entry is a unit with a settled shape awaiting a later scope's attention.
+  entry's design fork: what remains is delivery, not design. **Unit of `validate-red-holding` —
+  operator direction, 2026-09-17, lead-relayed:** the clause names a transition, so spec authors it.
   **The `[design-pending]` tag STAYS, and this line exists so a later session does not strip it on
   the strength of the paragraph above.** It is a section-membership invariant (canon-kit/SPEC.md
   §The amendment lifecycle — every entry in the set carries it), so it marks the section rather than
@@ -3595,9 +3598,9 @@
   baseline diff stops it.
   Filed 2026-09-17 to the gap inbox by `enum-and-citation-parity`'s lead after its close;
   promoted at the next scope's intake, so the record is late and says so.
-  **Offered as a later set, not directed:** with `validate-tier-premise-mechanical-only` and
-  `baseline-move-stales-evidence-line`, all three governing how validate holds a red; judged not
-  combinable with `install-smoke-slow-leg` at its 2026-09-17 scope.
+  **Unit of `validate-red-holding` — operator direction, 2026-09-17, lead-relayed:** with
+  `validate-tier-premise-mechanical-only` and `baseline-move-stales-evidence-line`; spec picks the
+  open shape and authors the amendment.
 
 - **smoke-leg-crate-build-uncached** [design-pending] [cost: iteration/low] [surface: .github] — the
   platform install-smoke legs rebuild the gate crate from cold on every push.
