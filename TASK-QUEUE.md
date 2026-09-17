@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **validate-hold-rule-admits-iteration-caused-red** [spec: SPEC-hold-cause.md] — validate's
-  triage rule lets a filed entry's *match* stand in for a *cause*, so a red this iteration
-  introduced can be committed as held.
-  **The instance.** At `enum-and-citation-parity` validate, `e22f7221` held `agents_md_smoke`'s
-  flipped row against the iceboxed `spec-pointer-boundary-legality`, though that iteration's own
-  widened `check-spec-pointer` caused the red; the lead caught it reading the diff
-  (fixed `f78f5c8a`).
-  **Designed as** (spec picked the enforced shape, per the operator direction below): a baseline
-  row gains an optional `reproduces-at=<rev>` token, and `check-evidence-baseline` reds a row that
-  passed at the iteration-start commit and is held red now unless the token names a commit at or
-  before that start. The gate checks the commit's position, never the reproduction. The validate
-  template reads a filed match as a candidate cause and reproduces before holding; the valve payload
-  carries the reproducing commit (amendment deltas 1 to 5).
-  **DISTINCT from `spec-pointer-boundary-legality`**, the gate-design question the red matched.
-  **Unit of `validate-red-holding` — operator direction, 2026-09-17, lead-relayed:** with
-  `validate-tier-premise-mechanical-only` and `baseline-move-stales-evidence-line`; spec picks the
-  open shape and authors the amendment.
-  Filed 2026-09-17 to the gap inbox by `enum-and-citation-parity`'s lead after its close.
-
 - **validate-tier-premise-mechanical-only** [spec: SPEC-tier-discovery.md] — the ruling-config
   assigns `validate` the cheaper model on the premise that its batches are uniformly mechanical
   oracle-running, and one iteration falsified that premise.
@@ -3843,5 +3824,7 @@
 - **readme-bin-roster-underived** [design-pending] — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- validate-hold-rule-admits-iteration-caused-red
 
 ## Lessons Learned

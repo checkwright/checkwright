@@ -160,7 +160,9 @@ session.
 3. **Disposition the pre-flight valve ledger** — every line of the closing
    iteration, in this session. A `used` line means an entry of this iteration
    was admitted past a refusing pre-flight: **file the blocking task its reason
-   names and land the baseline row that names that task**, so the next
+   names and land the baseline row that names that task**, carrying the reason's
+   `reproduces-at=<rev>` commit onto that row where evidence-kit/SPEC.md
+   §check-evidence-baseline's flip assertion binds it, so the next
    iteration's pre-flight passes without a valve. Inline the finding into the
    filed task rather than pointing it at the ledger — the ledger dies at the
    next boundary, so a pointer would resolve to nothing. A residual `armed`

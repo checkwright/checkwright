@@ -430,7 +430,7 @@ if staged_matches '*.sh' '*.gate' '*.rs' '.workflow/*' 'TASK-QUEUE.md' '**.sh' '
     run_gate check-deprecation-task native/target/release/checkwright-gates check-deprecation-task
 fi
 
-if staged_matches '.workflow/validate-baseline.txt' 'TASK-QUEUE.md' 'native/src/gates/evidence_baseline.rs' 'native/src/evidence.rs' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs'; then
+if staged_matches '.workflow/validate-baseline.txt' 'TASK-QUEUE.md' 'native/src/gates/evidence_baseline.rs' 'native/src/evidence.rs' 'native/src/stages.rs' '.workflow/WORKFLOW-STATE.txt' '*.workflow/WORKFLOW-STATE.txt' 'scripts/evidence-config.knobs' 'scripts/gate-sdk-config.knobs'; then
     run_gate check-evidence-baseline native/target/release/checkwright-gates check-evidence-baseline
 fi
 

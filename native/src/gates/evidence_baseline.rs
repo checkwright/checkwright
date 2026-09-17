@@ -1,6 +1,8 @@
 // spec: evidence-kit/SPEC.md §check-evidence-baseline — baseline grammar, blocking-slug
-// liveness against the queue, and per-suite manifest↔disk set equality
+// liveness against the queue, per-suite manifest↔disk set equality, and flip causation
 use crate::evidence::data_lines;
+use crate::proc;
+use crate::stages;
 use crate::walk;
 use std::path::Path;
 
@@ -51,16 +53,101 @@ fn queue_entries(text: &str) -> Vec<(String, String)> {
     out
 }
 
+const GRAMMAR: &str = "<suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]";
+
+// spec: evidence-kit/SPEC.md §Baseline manifest — the fifth token's one legal shape, a head in
+// the 7-to-40 lowercase-hex form `--enter-stage` writes
+fn reproduces_at(tok: &str) -> Option<&str> {
+    let rev = tok.strip_prefix("reproduces-at=")?;
+    let hex = rev.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c));
+    ((7..=40).contains(&rev.len()) && hex).then_some(rev)
+}
+
+struct Row<'a> {
+    line: &'a str,
+    suite: String,
+    scenario: String,
+    status: String,
+    rev: Option<String>,
+}
+
+// spec: evidence-kit/SPEC.md §check-evidence-baseline — a flip is a row held red now whose
+// scenario the prior baseline held `pass`; a scenario the prior baseline lacks is never one
+fn untokened_flips<'r, 'a>(prior: &str, rows: &'r [Row<'a>]) -> Vec<&'r Row<'a>> {
+    let passed: Vec<(String, String)> = data_lines(prior)
+        .iter()
+        .map(|l| fields(l))
+        .filter(|f| f.2 == "pass")
+        .map(|f| (f.0, f.1))
+        .collect();
+    rows.iter()
+        .filter(|r| r.status == "fail" || r.status == "ignore")
+        .filter(|r| r.rev.is_none())
+        .filter(|r| passed.iter().any(|(s, sc)| *s == r.suite && *sc == r.scenario))
+        .collect()
+}
+
+// spec: evidence-kit/SPEC.md §check-evidence-baseline — the flip assertion: Ok carries the clean
+// line's account of which branch ran, Err the fail-closed refusal
+fn flip_causation(baseline: &str, state: &str, rows: &[Row], errors: &mut Vec<String>) -> Result<String, String> {
+    let start = stages::iteration_start(state);
+    if start.is_empty() {
+        return Ok("flip causation off: no iteration-start commit".to_string());
+    }
+    let closed = |what: String| {
+        format!("{} — the check could not run; treating as failure (not clean)", what)
+    };
+    let listed = proc::run("git", &["ls-tree", "--full-name", "--name-only", &start, "--", baseline])?;
+    let Some(listed) = listed.stdout() else {
+        return Err(closed(format!("cannot list {} at the iteration start {}", baseline, start)));
+    };
+    let name = String::from_utf8_lossy(listed).trim().to_string();
+    let prior = if name.is_empty() {
+        String::new()
+    } else {
+        let shown = proc::run("git", &["show", &format!("{}:{}", start, name)])?;
+        match shown.stdout() {
+            Some(b) => String::from_utf8_lossy(b).into_owned(),
+            None => return Err(closed(format!("cannot read {} at the iteration start {}", name, start))),
+        }
+    };
+    let flips = untokened_flips(&prior, rows);
+    for r in &flips {
+        errors.push(format!(
+            "{} {} passed at the iteration start {} and is now {}; a hold needs reproduces-at=<rev> at or before {}, or the red is a regression to fix: {}",
+            r.suite, r.scenario, start, r.status, start, r.line
+        ));
+    }
+    for r in rows {
+        let Some(rev) = &r.rev else { continue };
+        if !stages::commit_resolves(rev) {
+            errors.push(format!("reproduces-at '{}' resolves to no commit: {}", rev, r.line));
+            continue;
+        }
+        let anc = proc::run("git", &["merge-base", "--is-ancestor", rev, &start])?;
+        match anc.code() {
+            Some(0) => {}
+            Some(1) => errors.push(format!(
+                "reproduces-at '{}' names a commit inside the iteration (not at or before its start {}): {}",
+                rev, start, r.line
+            )),
+            _ => return Err(closed(format!("cannot order {} against the iteration start {}", rev, start))),
+        }
+    }
+    Ok(format!("flip causation judged against the iteration start {}", start))
+}
+
 pub fn run(args: &[String]) -> i32 {
-    let (baseline, queue, globs, permanent) = match (
+    let (baseline, queue, state, globs, permanent) = match (
         knob_or(args, 0, "EVIDENCE_KIT_BASELINE_FILE"),
         knob_or(args, 1, "EVIDENCE_KIT_QUEUE_FILE"),
+        knob_or(args, 2, "EVIDENCE_KIT_STATE_FILE"),
         walk::knob_map("EVIDENCE_KIT_SCENARIO_GLOBS"),
         walk::knob_array("EVIDENCE_KIT_PERMANENT_SLUGS"),
     ) {
-        (Ok(a), Ok(b), Ok(c), Ok(d)) => (a, b, c, d),
-        (a, b, c, d) => {
-            let err = [a.err(), b.err(), c.err(), d.err()]
+        (Ok(a), Ok(b), Ok(e), Ok(c), Ok(d)) => (a, b, e, c, d),
+        (a, b, e, c, d) => {
+            let err = [a.err(), b.err(), e.err(), c.err(), d.err()]
                 .into_iter()
                 .flatten()
                 .next()
@@ -72,7 +159,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if !Path::new(&baseline).is_file() {
         println!("EVIDENCE-BASELINE: baseline not found: {}", baseline);
-        println!("  help: create {} with a comment header and one '<suite> <scenario> <status> [<slug>]' line per known scenario", baseline);
+        println!("  help: create {} with a comment header and one '{}' line per known scenario", baseline, GRAMMAR);
         return 1;
     }
     let btext = match std::fs::read(&baseline) {
@@ -89,23 +176,31 @@ pub fn run(args: &[String]) -> i32 {
 
     let mut errors: Vec<String> = Vec::new();
     let mut blocking: Vec<String> = Vec::new();
+    let mut rows: Vec<Row> = Vec::new();
     for line in &blines {
         let (suite, scenario, status, slug, rest) = fields(line);
         if suite.is_empty() || scenario.is_empty() || status.is_empty() {
+            errors.push(format!("malformed line (want '{}'): {}", GRAMMAR, line));
+            continue;
+        }
+        let rev = if rest.is_empty() {
+            None
+        } else if let Some(rev) = reproduces_at(&rest) {
+            Some(rev.to_string())
+        } else {
             errors.push(format!(
-                "malformed line (want '<suite> <scenario> <status> [<slug>]'): {}",
+                "too many fields (a slug is a single token, and the only fifth field is reproduces-at=<rev>): {}",
                 line
             ));
             continue;
-        }
-        if !rest.is_empty() {
-            errors.push(format!("too many fields (a slug is a single token): {}", line));
-            continue;
-        }
+        };
         match status.as_str() {
             "pass" => {
                 if !slug.is_empty() {
                     errors.push(format!("a 'pass' scenario takes no blocking slug: {}", line));
+                }
+                if rev.is_some() {
+                    errors.push(format!("a 'pass' scenario takes no reproduces-at token: {}", line));
                 }
             }
             "fail" | "ignore" => {
@@ -123,6 +218,7 @@ pub fn run(args: &[String]) -> i32 {
                 status, line
             )),
         }
+        rows.push(Row { line, suite, scenario, status, rev });
     }
 
     if !blocking.is_empty() {
@@ -230,6 +326,14 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
+    let flip = match flip_causation(&baseline, &state, &rows, &mut errors) {
+        Ok(f) => f,
+        Err(e) => {
+            eprintln!("check-evidence-baseline: {}", e);
+            return 2;
+        }
+    };
+
     if !errors.is_empty() {
         println!(
             "EVIDENCE-BASELINE: {} issue(s) in {}:",
@@ -239,14 +343,15 @@ pub fn run(args: &[String]) -> i32 {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: each line is '<suite> <scenario> <status> [<slug>]'; a fail/ignore carries a live blocking slug; every configured suite owes at least one row, bought by configuring a parser rather than by hand-authoring rows; the baseline is edited by human commit only");
+        println!("  help: each line is '{}'; a fail/ignore carries a live blocking slug; a row held red that passed at the iteration start carries reproduces-at=<rev> naming a commit at or before that start where its red reproduces (else it is a regression to fix); every configured suite owes at least one row, bought by configuring a parser rather than by hand-authoring rows; the baseline is edited by human commit only", GRAMMAR);
         return 1;
     }
     println!(
-        "EVIDENCE-BASELINE: clean ({} scenario(s) over {} configured suite(s); grammar, slug liveness, suite coverage, and scenario coverage hold in {})",
+        "EVIDENCE-BASELINE: clean ({} scenario(s) over {} configured suite(s); grammar, slug liveness, suite coverage, and scenario coverage hold in {}; {})",
         blines.len(),
         suites.len(),
-        baseline
+        baseline,
+        flip
     );
     0
 }
@@ -289,4 +394,33 @@ mod tests {
         );
     }
 
+    // spec: evidence-kit/SPEC.md §Baseline manifest — the fifth token takes one shape only
+    #[test]
+    fn only_a_hex_head_is_a_reproduces_at_token() {
+        assert_eq!(reproduces_at("reproduces-at=af66137c"), Some("af66137c"));
+        assert_eq!(reproduces_at("reproduces-at=AF66137C"), None);
+        assert_eq!(reproduces_at("reproduces-at=af661"), None);
+        assert_eq!(reproduces_at("reproduces-at=af66137c extra"), None);
+        assert_eq!(reproduces_at("other=af66137c"), None);
+    }
+
+    // spec: evidence-kit/SPEC.md §check-evidence-baseline — a flip is prior `pass` to held red with
+    // no token; a tokened row, a row red already, and a scenario new since the start are not
+    #[test]
+    fn a_flip_is_a_prior_pass_held_red_without_a_token() {
+        let row = |line: &'static str| {
+            let (suite, scenario, status, _, rest) = fields(line);
+            Row { line, suite, scenario, status, rev: reproduces_at(&rest).map(String::from) }
+        };
+        let rows = vec![
+            row("u flipped fail t"),
+            row("u held ignore t reproduces-at=af66137c"),
+            row("u was-red fail t"),
+            row("u new fail t"),
+            row("u still pass"),
+        ];
+        let prior = "# h\nu flipped pass\nu held pass\nu was-red fail t\nu still pass\n";
+        let got: Vec<&str> = untokened_flips(prior, &rows).iter().map(|r| r.line).collect();
+        assert_eq!(got, vec!["u flipped fail t"]);
+    }
 }

@@ -32,9 +32,14 @@ against.>*
 
 **Triage a red against the queue before excavating it.** On any failure,
 first grep the queue's deferred/lessons sections — a pre-existing red is
-usually already a filed task with the diagnosis written. If it's filed: note
-it and move on. Only excavate a failure that is genuinely new or a suspected
-regression from the current diff.
+usually already a filed task with the diagnosis written. A filed entry that
+matches a red is a possible cause, not a cause. A red on an item your baseline
+held passing when the iteration opened is a suspected regression. Reproduce it
+at the iteration-start commit before you hold it. If it reproduces, hold it
+against the filed task and record the reproducing commit where your baseline
+grammar keeps it. If it does not reproduce, this iteration caused it: fix it.
+Only a red on an item already held red at the iteration start is noted and
+passed over on the match alone.
 
 When filing a finding, place it by kind: nameable deliverable + done-state ⇒
 queue task (the deferred section, design-pending, after the owner lookup of
@@ -61,9 +66,10 @@ suite, diffs the held-constant baseline, and appends the evidence line —
 invoke it here rather than hand-running the suites and hand-writing the
 manifest.
 
-Do not declare validate complete until the baseline diff is clean: no
-baseline-pass item regressed, every held-constant red still carries a live
-blocking slug, and any recovered item has been promoted to pass.
+Do not declare validate complete until the baseline diff is clean: no item that
+passed at the iteration start is held red without a recorded reproduction
+outside the iteration, every held-constant red still carries a live blocking
+slug, and any recovered item has been promoted to pass.
 
 **Commit a repair the moment you decide it, before you start or resume the
 suite roster.** Check
@@ -71,12 +77,13 @@ suite roster.** Check
 failure that mentions a dirty tree.
 
 **Arm the pre-flight valve when you end on a deliberately accepted red.** A red
-you understand and that is not a regression from this iteration's diff, and that
+you understand and that reproduces at the iteration-start commit, and that
 the closing stage rather than this one must file against, is a hand-off — not a
 stop for an operator round-trip and not a queue edit. Append one
 `<iteration> <stage> armed <reason>` line to the configured valve ledger and
 commit it with your evidence, writing in the reason what close needs: which
-suite, what the red is, and why it is accepted rather than fixed. The contract,
+suite, what the red is, why it is accepted rather than fixed, and the commit it
+reproduces at. The contract,
 its narrowings, and the fact that reaching for it twice in one iteration is the
 failure: lifecycle-kit/SPEC.md §bin/enter-stage.sh. With no ledger configured
 there is no valve, and an accepted red stops here as it always did.

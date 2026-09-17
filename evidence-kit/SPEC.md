@@ -277,12 +277,18 @@ the placement was right.
 Held-constant, edited by human commit only. It is a tracked checked projection
 of the workflow directory, so its first line is the pointer-form header
 `# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate
-baseline: <suite> <scenario> <status> [<slug>]` (the form ruled by
-gate-sdk/SPEC.md §The workflow directory, whose em-dash tail carries the line
-grammar). Below it, one line per known scenario,
-`<suite> <scenario> <status> [<slug>]`. A blocking `<slug>` is required exactly
-when status is `fail` or `ignore` and forbidden when `pass`; each slug resolves
-to a live queue task (the queue-file knob) or a configured permanent marker.
+baseline: <suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]` (the form
+ruled by gate-sdk/SPEC.md §The workflow directory, whose em-dash tail carries the
+line grammar). Below it, one line per known scenario,
+`<suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]`. A blocking `<slug>`
+is required exactly when status is `fail` or `ignore` and forbidden when `pass`;
+each slug resolves to a live queue task (the queue-file knob) or a configured
+permanent marker. `reproduces-at=<rev>` records a commit at which the row's red
+reproduces. It is allowed only after a slug, `<rev>` is 7 to 40 lowercase hex
+characters, and §check-evidence-baseline says when a row owes it. A `pass` row
+carrying it is red, and a fifth field of any other shape, or a sixth field, is a
+grammar error. The token is optional, so a baseline with no flips never mentions
+it and an older row needs no migration.
 Tooling never writes it — a promotion (a held-constant red recovering to pass)
 is a human commit, which is what keeps the baseline honest.
 
@@ -736,16 +742,45 @@ gains nor loses a producer.
 ### check-evidence-baseline
 
 Invariant: the held-constant baseline stays grammatical and honest. It asserts
-the `<suite> <scenario> <status> [<slug>]` shape, blocking-slug liveness — every
-`fail`/`ignore` slug resolves to a live queue task or a permanent marker, and a
-slug present only under `## Done` is stale-red — for every suite carrying a
-configured scenario glob, manifest↔disk set equality (a baseline scenario with
-no matching file, or a file with no baseline line, reddens); and **suite
-coverage**, that every suite in `EVIDENCE_KIT_SUITES`
-(§Layout and configuration) carries at least one row. Argument mode
-`$1 $2` (baseline, queue) with configured defaults makes it fixture-capable; the
-liveness and coverage branches beyond the one good/bad pair are covered by
+the `<suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]` shape,
+blocking-slug liveness — every `fail`/`ignore` slug resolves to a live queue task
+or a permanent marker, and a slug present only under `## Done` is stale-red — for
+every suite carrying a configured scenario glob, manifest↔disk set equality (a
+baseline scenario with no matching file, or a file with no baseline line,
+reddens); **suite coverage**, that every suite in `EVIDENCE_KIT_SUITES`
+(§Layout and configuration) carries at least one row; and **flip causation**: a
+row held red that passed when the iteration opened carries `reproduces-at=<rev>`
+naming a commit at or before the iteration-start commit. Argument mode `$1 $2 $3`
+(baseline, queue, state) with configured defaults makes it fixture-capable; the
+liveness, coverage and flip branches beyond the one good/bad pair are covered by
 `gate-tests/check-evidence-baseline.test.sh`.
+
+**A filed task that matches a red is not what caused it.** A regression this
+iteration introduced can match a red someone filed earlier, and a hold keyed on
+the match commits the regression as expected. So a hold on a row that passed at
+the iteration start (the first state-file stamp's head, read through
+`stages::iteration_start`) must say where the red reproduces, and that commit must
+be outside the iteration. The gate checks the commit's position and **not** the
+reproduction, so a false commit still passes. What the rule buys is that holding a
+regression takes a claim the diff shows, rather than a match nobody wrote down.
+
+**The flip assertion's corpus and branches.** A flip is a `(suite, scenario)` pair
+that is `pass` in the baseline as committed at the iteration-start commit and
+`fail` or `ignore` now. A scenario missing from that prior baseline is never a
+flip: a new scenario red from the start can be a new test for an old defect, and
+widening to it is a separate argued change. A flip row with no token is red, and
+so is any token whose `<rev>` resolves to no commit or is not the start commit or
+one of its ancestors ("names a commit inside the iteration"). The resolution and
+ancestry checks cover every token, not only flip rows; a token valid in an earlier
+iteration stays valid, because each iteration starts after the one before. The
+prior baseline is read from git at the start commit: a path absent there makes
+every row new, so there are no flips, and any other git failure is fail-closed
+(exit 2). The assertion — resolution and ancestry included, while the token's
+shape stays a grammar check — is off wherever there is no iteration-start commit
+(every case lifecycle-kit/SPEC.md §The state machine lists, a clone that cannot
+resolve the commit included), and the clean line says which way it went. A
+shallow clone is one such case, so a consumer whose CI clones shallow gets the
+check only from the local hook.
 
 **The gate dispatches to the binary substrate** — `checks/check-evidence-baseline.gate`
 to `native/src/gates/evidence_baseline.rs`, the shell script deleted — and asserts
@@ -1286,7 +1321,12 @@ evidence line proves the green result once the suites have run.
   scratch-boundary wipe.
 - **Baseline line** — produced by human commits (initial seed, promotions);
   consumed by `--diff-baseline` (the per-scenario diff) and
-  `check-evidence-baseline` (grammar, liveness, coverage).
+  `check-evidence-baseline` (grammar, liveness, coverage, flip causation).
+  Its `reproduces-at=<rev>` token is produced by a human commit too — a validate
+  session after reproducing a red at or before the iteration-start commit, or the
+  closing stage landing the row a `used` valve line owes, carrying the commit the
+  valve reason names — and consumed by the flip assertion only; `--diff-baseline`
+  and `--run-validate` read fields one to three and ignore it.
 - **Skip record** — produced by a consumer harness that self-skips a scenario;
   consumed by `--diff-baseline`. An absent file means no skips.
 - **Per-suite parser override** — produced by consumer config

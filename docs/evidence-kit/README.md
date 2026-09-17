@@ -12,7 +12,7 @@ contract (`# contract: evidence-manifest v1`) an external verifier can consume,
 so the kit is adoptable with or without an iteration lifecycle.
 
 The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness,
-scenario coverage), `check-evidence-manifest` (manifest grammar and, where
+scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where
 lifecycle drives the tree, close-entry green block + validate-stamp coupling),
 `check-battery-roster` (the runner doc's battery block against the suite roster)
 and `check-producer-liveness` (no stage entry while the producer is still
@@ -44,7 +44,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 2. Seed the two surfaces — `.workflow/validate-baseline.txt`:
 
-       # contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug>]
+       # contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]
 
    and `.workflow/validate-evidence.txt`:
 

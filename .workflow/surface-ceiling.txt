@@ -11,7 +11,7 @@
 13 .claude/commands/release-sweep.md
 111 .claude/commands/scope.md
 19 .claude/commands/spec.md
-20 .claude/commands/validate.md
+21 .claude/commands/validate.md
 172 CLAUDE.md
 111 canon-kit/templates/SPEC-amendment.md
 37 context-kit/templates/close-brevity.md
@@ -25,9 +25,9 @@
 33 lifecycle-kit/templates/release-sweep.md
 103 lifecycle-kit/templates/stages/align.md
 118 lifecycle-kit/templates/stages/build.md
-295 lifecycle-kit/templates/stages/close.md
+297 lifecycle-kit/templates/stages/close.md
 241 lifecycle-kit/templates/stages/scope.md
 122 lifecycle-kit/templates/stages/spec.md
-88 lifecycle-kit/templates/stages/validate.md
+95 lifecycle-kit/templates/stages/validate.md
 41 lifecycle-kit/templates/upgrade.md
 47 queue-kit/templates/TASK-QUEUE.md

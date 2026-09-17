@@ -173,7 +173,7 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path) -> Result<Vec<Seeded>, S
             seed_absent(
                 root,
                 ".workflow/validate-baseline.txt",
-                "# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug>]\n",
+                "# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]\n",
                 &mut out,
             )?;
             seed_absent(

@@ -4728,7 +4728,7 @@ for the copy shape; the tier judgment (residue vs owned fact) stays the author's
 template carries its disposition step** (§bin/enter-stage.sh owns the valve's
 contract; both templates point at it rather than restating it). A validate that
 ends on a **deliberately accepted** red — a suite whose failure is understood and
-is not a regression from this iteration's diff — arms the valve for the closing
+reproduces at the iteration-start commit — arms the valve for the closing
 stage and commits the ledger, rather than stopping for an operator round-trip.
 
 **Arming is not a queue write, and that distinction is what makes it validate's
@@ -4739,7 +4739,8 @@ this exact point in its ritual, beside the evidence manifest and the baseline
 diff. The move the machine lacked was never a queue edit; it was a **hand-off**,
 and the ledger is the artifact that carries it. **The reason field is that
 hand-off's payload**, so validate writes what close needs — which suite, what the
-red is, and why it is accepted rather than fixed — and close reads it as the
+red is, why it is accepted rather than fixed, and the commit it reproduces at,
+which the row close lands must record — and close reads it as the
 input to the task it is about to file.
 
 **A `used` line is a close-stage obligation, not a free pass.** For every `used`

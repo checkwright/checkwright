@@ -1050,9 +1050,10 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_SCENARIO_GLOBS",
             "EVIDENCE_KIT_PERMANENT_SLUGS",
             "EVIDENCE_KIT_SUITES",
+            "EVIDENCE_KIT_STATE_FILE",
         ],
         "evidence-kit",
-        &[("bash", "")],
+        &[("bash", ""), ("git", "")],
     ),
     // spec: evidence-kit/SPEC.md §check-evidence-manifest — three named-file reads and no walk,
     // so the declared root set is empty and unit test A holds that to executed behavior
