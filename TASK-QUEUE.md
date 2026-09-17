@@ -12,19 +12,6 @@
 
 ## New Features
 
-- **close-differential-instruction-sweep** [spec: SPEC-differential-sweep.md] — after the full
-  instruction-surface pass, close keeps the template and agent-definition corpus swept by reading
-  only what changed, instead of re-reading it whole.
-  **Operator-ruled 2026-08-13** as the second half of the sweep shape: one full pass, then close
-  runs differential passes in future iterations.
-  **Designed as** an audit-roster class rather than a new close step: the roster is the kit's
-  cadence mechanism for an un-gateable duty and close step 8 already reviews it. The open question,
-  which surface owns the range base, lands in lifecycle-kit/SPEC.md §The state machine as the
-  previous-close commit. The iteration-start range misses the previous close's own later commits
-  (measured: the brevity pass at the iteration-start commit falls outside it). The first base is
-  the full pass's landing commit (amendment deltas 1-3).
-  Filed 2026-08-13 by close, on operator direction.
-
 - **spec-authoring-self-check-pass** [spec: SPEC-claim-execution.md] — spec-stage amendment
   authoring asserts tree facts a one-command probe refutes, and every instance is caught downstream
   rather than at authoring exit (measured: six in one iteration's amendment set, across at least
@@ -3734,5 +3721,7 @@
 - **readme-bin-roster-underived** [design-pending] — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- close-differential-instruction-sweep
 
 ## Lessons Learned

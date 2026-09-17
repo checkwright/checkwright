@@ -54,6 +54,26 @@ Two governed surfaces, carrying **one axis each**:
   `<head>` is `none`, or when this clone cannot resolve it. Each reader states
   what it does then.
 
+  **The previous-close commit is the `<head>` of the last stamp naming the last
+  configured stage, in the state file as it stood at the iteration-start
+  commit.** Read it with `git show <iteration-start>:<state-file>`, the path
+  repo-relative, and take the `<head>` of its last data line whose `<stage>` is
+  `LIFECYCLE_KIT_STAGES`' last member. The boundary truncation has not yet run at
+  that commit, so the blob still holds the previous iteration's stamps. It exists
+  because the iteration-start range has a hole: everything the previous close
+  committed after its own audit review, and any interstitial commit, lies before
+  the iteration-start commit. A reader that must see those commits measures from
+  the previous-close commit instead. The price is overlap: the range re-covers the
+  previous close's commits from its entry up to its review, which that review
+  already read. A re-read costs reading time and a hole costs an unswept edit, so
+  the overlap is taken. There is **no** previous-close commit where there is no
+  iteration-start commit, where the blob at it carries no last-stage stamp (a
+  first iteration, or a tree adopting the kit mid-history), or where that
+  `<head>` is `none` or does not resolve. Each reader states what it does then.
+  It is a prose derivation rather than a stage-machine adapter
+  (§The stage-machine adapters): its one reader is a closing session deriving a
+  corpus, and an adapter earns its place only when two readers must agree.
+
   **The five-field grammar is a breaking change to a shipped file format**, and
   a consumer vendoring it mid-iteration reds until they rewrite their own
   stamps: for each, `<head>` is the first parent of the commit that introduced
@@ -2011,7 +2031,13 @@ and `check-audit-roster` grades them.
 probe goes stale whenever a class's instances are event-derived, such as the path
 components a deletion touched. So `scope` states how to derive the corpus, each
 sweep derives its own, and the predecessor's `corpus` is a floor that the sweep
-widens. A class with no single-command corpus stamps
+widens. A class whose `scope` derives its corpus from a commit range bases that
+range on the iteration-start commit by default. A class that must also see the
+previous close's own later commits and interstitial commits names the
+previous-close commit instead (§The state machine). A differential sweep of an
+un-gateable class is such a roster block, never a new close step: the roster is
+already the event-keyed cadence close reviews, and a second cadence mechanism
+for one class would also sit on a surface the class may itself govern. A class with no single-command corpus stamps
 `corpus: surfaces:` and the list of surfaces it actually read. A capability claim's
 instances are an example: they are a tree set that no scanner infers. A sweep
 that read nothing has nothing to stamp there, so it cannot record a verdict.

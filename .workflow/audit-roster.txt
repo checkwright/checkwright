@@ -79,3 +79,8 @@ last: validate-red-holding close
 corpus: the range's added lines of evidence-kit/{SPEC,README}.md, lifecycle-kit/SPEC.md and lifecycle-kit/templates/{lead.md,stages/validate.md,stages/close.md}, read for every listed shape and every live queue slug
 hits: 0
 declined: no whole-corpus lexical pass, since neither the gate's arms nor its seam knobs changed
+
+class: instruction-surface-tier
+scope: an instruction surface carrying grounds or history rather than the instruction alone (doctrine-kit/DOCTRINE.md rule 1, Content-tiering / SSOT); un-gateable, since telling a ground from a scoping clause or a mechanism the reader needs is a reading. Corpus: git diff --stat <base>..HEAD -- '*/templates/*.md' '.claude/agents/*.md' ':!*/gate-tests/*', read hunk by hunk. <base> is the previous-close commit (lifecycle-kit/SPEC.md §The state machine); while last: is never, it is 63dce1be, the full pass's landing commit, whose message lists the compliant calls a sweep inherits rather than re-deciding. Judge added and rewritten lines only. A verbatim move keeps its earlier verdict. A ground goes to the section owning the mechanism in the sweep's own commit; history is deleted; a passage whose owner already carries the ground is deleted. queue-kit/templates/TASK-QUEUE.md is a grammar skeleton and outside the rule. Binding shims (.claude/commands/) are outside this class; check-shim-restatement holds their restatement half.
+due: any change to the corpus since <base>
+last: never
