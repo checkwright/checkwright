@@ -16,6 +16,82 @@
 
 ## Deferred
 
+- **residency-roster-template-reach-ungated** [cost: event/low] [surface: context-kit] —
+  nothing asserts the roster↔template relation context-kit/SPEC.md §The consumer footprint rules:
+  an obligation whose bound actor is any session is carried at the consumer's resident tier and is
+  **not** also restated in the kit templates those sessions load, with one corollary permitting a
+  template statement where the reader's discharge differs and never the channel or disposal-time
+  half alone. The ruling landed this iteration and no oracle reads it, so the next template shipping
+  an unsanctioned restatement — or an obligation losing its only carrier — reds nothing.
+  **Premise corrected at the drain that promoted this:** the filing bullet credited the no-gate
+  claim to delegation-kit/SPEC.md §Operative residency. That section makes no such claim; it says
+  the opposite ("never a substitute for an oracle where one is buildable"). The claim sits in
+  §Verify after every agent commit, whose honest-limit paragraph asserts §Operative residency
+  owes no gate "the same structural reason" — a supervisor's choice of command leaving no tracked
+  artifact to read. That ground does not reach this defect, which is a grep over tracked files, so
+  **that sentence is what narrows** if this lands.
+  **Why design-pending:** the assertable direction is the open question. The ruling forbids the
+  per-template copy, so the negative direction (no template restates a rostered resident obligation)
+  is the one the ruling supports, while the bullet as filed named the positive one (each rostered
+  obligation reaches the templates of the readers it binds). Which the corollary's exception can be
+  expressed in, and whether a grep can tell a sanctioned discharge-differs statement from a
+  restatement, are the two calls.
+  **Cost while deferred:** the placement ruling can rot exactly as the obligations it corrected did,
+  with no oracle to catch the next template that ships unserved or doubly served.
+  Filed 2026-09-17 to the gap inbox at build (gate candidate declined under operator direction,
+  2026-09-17, lead-relayed), promoted at this iteration's close drain. Owner lookup: `Operative
+  residency`, `consumer footprint`, `footprint`, `residency`, `obligation` — none.
+
+- **footprint-roster-rows-price-unevenly** [cost: event/low] [surface: lifecycle-kit] —
+  the roster in context-kit/SPEC.md §The consumer footprint names each kit's resident ask by
+  citation, and the cited sections are asymmetric in what a reader learns from them. drift-kit's row
+  points at §The knowledge-friction loop, which states its own resident cost and the condition that
+  earns it back ("costs one always-loaded bullet in the consumer's instructions file; that line is
+  the loop's hook and must earn its recurring cost by the log actually filling"). lifecycle-kit's
+  row points at §The committed gap inbox and §The survey record, which state neither, so a consumer
+  costing adoption reads a citation that names the ask without pricing it.
+  **Verified at the drain:** both cited lifecycle-kit sections were read and carry no resident-cost
+  or earn-back sentence; drift-kit's does, at the line quoted above.
+  **Why design-pending:** the deliverable is one cost-and-earn-back sentence per obligation in
+  lifecycle-kit/SPEC.md, and the earn-back condition is a design claim about when each resident line
+  would stop being worth its cost. One of the three lines — the recurrence stamp — landed this
+  iteration under an operator direction, so stating the condition under which it would be withdrawn
+  settles semantics neither that direction nor the amendment reached.
+  **Cost while deferred:** the roster understates nothing but prices only one of the kits it lists,
+  so docs/footprint.md and the roster disagree about what a reader can learn without opening a SPEC.
+  Filed 2026-09-17 to the gap inbox at build while landing
+  `consumer-footprint-roster-omits-lifecycle-kit`; promoted at this iteration's close drain.
+  Owner lookup: `consumer footprint`, `footprint`,
+  `earn-back`, `resident ask`, `obligation` — none.
+
+- **baseline-suite-coverage-arm-one-directional** [cost: event/low] [surface: evidence-kit] —
+  evidence-kit/SPEC.md §check-evidence-baseline says the suite-coverage arm closes the failure of a
+  suite "silently ceasing to run — dropped from the roster, or renamed under a config edit". The arm
+  asserts one direction only: every `EVIDENCE_KIT_SUITES` entry carries a baseline row. A *rename*
+  is caught, because the new name is rowless; a *pure drop* is not, because nothing reads a row
+  whose suite left the roster. So the prose claims an enforcement the gate does not deliver.
+  **Attested, and the counterexample is in the tree:** `.workflow/validate-baseline.txt` still
+  lists `budget_guard_tests` and `dispatch_guard_tests`, whose producers
+  `delegation-kit/bin/run-{budget,dispatch}-guard-tests.sh` were deleted at `7a4da575`
+  (2026-08-31, their coverage absorbed into `native_crate`). The battery has been green over them
+  for sixteen days.
+  **Probed at promotion, not inferred:** `native/src/gates/evidence_baseline.rs:314-327` iterates
+  the configured suites and never the rows; `.workflow/validate-evidence.txt` carries no line for
+  either name, so a row removal would stale no recorded evidence.
+  **DISTINCT from `evidence-baseline-orphan-suite-row`** (icebox), whose subject is the unread rows
+  themselves — the instance this entry's fix would catch — and which this drain re-observed rather
+  than re-fired. **Adjacent to `gate-spec-claim-assertion-parity`** (icebox, ruled a human-audit
+  class): this is one concrete instance with a mechanical oracle, not that class.
+  **Why design-pending:** whether the reverse assertion is a row-level red or an advisory, and how
+  it interacts with the declared no-suites early-out, are the two calls; the SPEC sentence quoted
+  above narrows in the same unit either way.
+  **Cost while deferred:** a baseline surface whose whole job is a held-constant comparison keeps
+  rows that assert nothing, and the next suite retirement leaves another pair the same way.
+  Filed 2026-09-17 at this iteration's close drain, on re-verification of the bullet the lead filed
+  from validate's observation. Owner lookup: `EVIDENCE_KIT_SUITES`, `validate-baseline`,
+  `suite coverage`, `evidence-baseline`, `orphan` — matched `evidence-baseline-orphan-suite-row`,
+  read and ruled distinct above.
+
 - **allow-match-colon-star-over-grants** [cost: event/low] [surface: guard-kit] —
   `guard_allow_match` and its compiled twin normalize the harness `:*` prefix idiom to a trailing
   `*` (guard-kit/SPEC.md §The guard framework), but a `claude -p` probe found `Bash(python3 -:*)`
