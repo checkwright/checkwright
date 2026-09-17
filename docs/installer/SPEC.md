@@ -2791,15 +2791,15 @@ id comes from `gh run view <id> --json jobs`. Measured at round 15.
 printed none of the five things it existed to print, twice, each time for a
 reason the arm cannot have. It installed at `--profile full` where the smoke's
 failing check is on `starter`, so it reproduced a different run; and the full
-profile is what met `init-vendor-staging-argv-overflow` — `git` refusing an
-over-wide argv while staging the vendored set — so it bailed at its own early
-guard. The arm inherits the right profile by construction, running inside
-whichever profile failed, so there is no profile to select and none to get
-wrong. **Deleting that step repairs no part of the overflow and must not be read
-as repairing it**: `init-vendor-staging-argv-overflow` owns one `git`
-invocation's argv width, a native-Windows adopter on the full profile still
-cannot install, and that entry stands untouched. What the deletion removes is
-this leg's *dependence* on the full profile, not the defect.
+profile is what met the staging argv overflow — `git` refusing an over-wide argv
+while staging the vendored set — so it bailed at its own early guard. The arm
+inherits the right profile by construction, running inside whichever profile
+failed, so there is no profile to select and none to get wrong. **Deleting that
+step repaired no part of the overflow and must not be read as having repaired
+it**: the overflow was one `git` invocation's argv width, and the batched calls
+§init states ("An install's size is not bounded by the host's argv width") are
+what repair it. What the deletion removed is this leg's *dependence* on the full
+profile, not the defect.
 
 **The payload every profile installs carries a real gate binary**, because the
 value claim is a claim about the product an adopter receives. The smoke compiles
