@@ -12,6 +12,60 @@
 
 ## New Features
 
+- **design-partner-preview** [spec: SPEC-install-observation.md] — a narrow external preview
+  before any broad announcement: a preview cohort whose composition is ruled in the operator's
+  private brief, installs observed live rather than by written feedback, instrumented for
+  time-to-first-green, first useful red, false-positive dispositions, and 7/30-day retention
+  per kit. It is the first rung on this queue whose deliverable is **evidence from outside
+  this tree** rather than a tree change.
+  **Promoted scope is the TREE HALF alone** — the observation protocol on disk, whose
+  completion predicate is the per-install record and its public aggregate projection. The
+  operator hours and the thirty-day-or-longer calendar window run beside later iterations and
+  never inside a stage session; they are what this entry keeps when the amendment merges,
+  whose Definition of Done rules the terminal move a **demotion** rather than a Done move —
+  the tree half is one increment of the corpus.
+  **Sequencing is the load-bearing part.** The preview runs *before*
+  `benchmark-ab-experiment`, so pilot findings shape that experiment's task classes and
+  metrics rather than being retrofitted to them; per-gate true/false-positive history and
+  profile retention are preview deliverables, not pre-launch builds. The full launch ruling
+  behind this sequencing is operator material and stays in the local-only private brief; this
+  entry carries only the queue-visible rung.
+  **The cohort was a named population here until 2026-08-09 and is deliberately no longer
+  one** — the composition it stated had since been re-ruled, so the sentence contradicted the
+  ruling it was meant to carry; the fix is to name the owner rather than restate a ruling
+  this file does not hold.
+  **Expected FIRST FINDING, not a precondition:** today's quick start is curl, sha256sum, tar
+  and `bash … init` from a repository root; macOS needs GNU bash and coreutils by adopter
+  action; native Windows needs Git for Windows. That is why the amendment gives the installer
+  no delta of its own — those host-floor facts are an output of the observation, not an input.
+  **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` or the
+  git-only-floor discharge (the trigger is what the preview measures); the icebox (the
+  highest cost-while-deferred in the intake).
+
+- **external-gate-quality-evidence** [spec: SPEC-install-observation.md] — durable, published
+  evidence of **gate quality as experienced outside this tree**: per-gate true/false-positive
+  history, the disposition of each red a non-author hit, and whether a red changed behaviour
+  or was worked around. The direct answer to the standing threat that a false positive
+  converts the enforcement advantage into bypass and distrust — every blocking gate raises
+  the stakes of a wrong red.
+  **Why it is not just a report.** The tree already publishes evidence projections, so the
+  mechanism exists; what does not exist is a *population* to measure. A red in this repo is
+  authored and dispositioned by the same party, which cannot distinguish a gate that is right
+  from a gate whose author agrees with it.
+  **The amendment settles the open design question the deferred form carried:** the
+  collection surface is a new capture stream — the observation record's `red` line — rather
+  than a field on a disposition this tree already records, because the disposition being
+  measured is the *adopter's*, which no surface here holds.
+  **Promoted scope is the record's FIELDS, not the evidence itself.** The published history
+  accrues only after observations exist, so the amendment's Definition of Done rules this
+  entry's terminal move a **demotion** as well.
+  **The bundle with `design-partner-preview` is not convenience.** This entry's own carry
+  sentence rules the history unrecoverable — it cannot be retroactively collected, and starts
+  accruing only once someone decides to record it — so a protocol landing without the
+  gate-quality fields designed into it sends the first installs' reds somewhere this baseline
+  can never read. There is one chance to fix the record's fields and it is before the
+  observation window opens, which is what makes the two units one iteration rather than two.
+
 ## Technical Debt
 
 ## Deferred
@@ -1066,96 +1120,6 @@
   is that claims are mechanically proven rather than asserted. The carry is
   reputational and front-door-resident, accruing on every reader rather than with
   time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
-
-- **design-partner-preview** [cost: event/low] [surface: installer] — a narrow external preview before
-  any broad announcement: a narrow external preview cohort, its composition ruled
-  in the operator's brief, installs observed live rather than by written feedback,
-  instrumented for
-  time-to-first-green, first useful red, false-positive dispositions, and 7/30-day
-  retention per kit. It is the first rung on this queue whose deliverable is
-  **evidence from outside this tree** rather than a tree change.
-  **The cohort was a named population here until 2026-08-09 and is deliberately no
-  longer one.** The composition it stated had since been re-ruled, so the sentence
-  contradicted the ruling it was meant to carry; the fix is to name the owner rather
-  than to re-state a ruling this file does not hold. The rung's own sequencing is
-  unchanged, and the `prose-profile` dependency it named landed 2026-08-09.
-  **Sequencing is the load-bearing part.** The preview runs *before*
-  `benchmark-ab-experiment`, so pilot findings shape that experiment's task
-  classes and metrics rather than being retrofitted to them; per-gate
-  true/false-positive history and profile retention are preview deliverables,
-  not pre-launch builds. Broad announcement waits on the activation path, the
-  trust baseline, and two externally observed defect stories. The full launch
-  ruling behind this sequencing is operator material and stays in the local-only
-  private brief; this entry carries only the queue-visible rung.
-  **RUN IT (operator direction, 2026-09-16, consult-relayed) — a PROMOTION SIGNAL FOR THE NEXT
-  SCOPE.** Cohort 1–2, one observed install first, the retention field accepted as thin at that
-  n; the window starts on the first install, sought as soon as the observation protocol lands.
-  Re-costed: the tree half is event/low — an observation protocol naming the per-install record
-  (time-to-first-green, first useful red, false-positive dispositions, 7/30-day check-ins) as a
-  `.metric/`-class private record with a public aggregate projection; the expensive half is
-  operator hours and a calendar window of thirty days or more running beside later iterations,
-  never inside a stage session. Expected FIRST FINDING, not a precondition: today's quick start
-  is curl, sha256sum, tar and `bash … init` from a repository root; macOS needs GNU bash and
-  coreutils by adopter action; native Windows needs Git for Windows. Refused, grounds in the
-  landing commit: parking behind `native-windows-bash-floor` or the git-only-floor discharge (the
-  trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
-  **Intake provenance:** item 4 of the external review's own priority order, and
-  like `companion-toolkit-profile` it fell outside the 2026-07-23 intake's
-  "top pre-announcement gaps" filter rather than being judged and declined —
-  consciously out of scope for that pass, with no record left behind.
-  **Cost while deferred:** the highest of this intake, and it compounds. Every
-  claim in the tree that would be strongest with external evidence — false
-  positives, retention, time-to-first-value — stays supported by internal
-  dogfooding alone, and no external install has ever been observed. That is not
-  a rot risk that ages passively: each iteration adds governed surface whose
-  quality is unattested outside, so the volume of unattested claim grows while
-  the evidence stays at zero. Deferring also silently defers
-  `benchmark-ab-experiment`, since running it first would fix the wrong metrics.
-  Surfaced 2026-08-02 at close, in the same intake pass, as the review's own
-  fourth-ranked priority.
-  **DIRECTED into `external-install-evidence` (operator direction, 2026-09-18, lead-relayed): the
-  TREE HALF only, completion predicate the protocol on disk; the operator-hours and calendar half
-  stays here, out of every stage session. Revisable; `/spec` authors and promotes it, not scope.**
-
-- **external-gate-quality-evidence** [cost: event/low] [surface: evidence-kit] — durable, published
-  evidence of **gate quality as experienced outside this tree**: per-gate
-  true/false-positive history, the disposition of each red a non-author hit, and
-  whether a red changed behaviour or was worked around. The review's own
-  suggested new initiative, and the direct answer to the standing threat that a
-  false positive converts the enforcement advantage into bypass and distrust —
-  every blocking gate raises the stakes of a wrong red.
-  **Why it is not just a report.** The tree already publishes evidence
-  projections, so the mechanism exists; what does not exist is a *population* to
-  measure. A red in this repo is authored and dispositioned by the same party,
-  which cannot distinguish a gate that is right from a gate whose author agrees
-  with it. That makes this entry structurally downstream of
-  `design-partner-preview` — not blocked by it in the tag sense, since a
-  narrower internal cut is conceivable, but the honest version needs external
-  reds. The open design question is which of the two it should be, and whether
-  the collection surface is a per-gate field the disposition already records or
-  a new capture stream.
-  **Intake provenance:** the third unfiled item of the external review's growth
-  half, outside the 2026-07-23 intake's stated pre-announcement filter rather
-  than declined by it.
-  **Cost while deferred:** moderate and asymmetric. The gate-quality claim is
-  currently supported by fixture pairs and a green battery, which prove a gate
-  does what its author specified and say nothing about whether that was the
-  right thing to specify — exactly the gap this measures. The carry is that the
-  first externally-hit false positive will be argued from anecdote, because no
-  baseline exists to argue from. It does not rot, but it cannot be
-  retroactively collected either: the history it wants starts accruing only once
-  someone decides to record it.
-  Surfaced 2026-08-02 at close, in the same intake pass, as the third and last
-  of the growth half's unfiled items.
-  **DIRECTED into `external-install-evidence` (operator direction, 2026-09-18, lead-relayed),
-  bundled with `design-partner-preview` on the shared surface both write: the per-install
-  observation record.** The bundle is not convenience. This entry's own carry sentence rules the
-  history unrecoverable — it "cannot be retroactively collected", and starts accruing "only once
-  someone decides to record it" — so a protocol landing without the gate-quality fields designed
-  into it sends the first installs' reds somewhere this baseline can never read. There is one
-  chance to fix the record's fields and it is before the observation window opens, which is what
-  makes the two units one iteration rather than two. A direction, revisable at a later scope or
-  spec; `/spec` authors the amendment and promotes this entry, scope promoting no features.
 
 - **gate-authoring-sdk-surface** [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] — a gate-authoring SDK.
   `.gate` as the substrate-neutral surface. **Operator-surfaced during
