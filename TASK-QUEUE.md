@@ -12,6 +12,21 @@
 
 ## New Features
 
+- **design-pending-tag-restates-its-own-section** [spec: SPEC-design-pending-tag.md] — the
+  tag every deferred entry carries is derivable from section membership alone, which is the
+  two-sources defect queue-kit/SPEC.md §The icebox tier refuses by name for `[icebox]`.
+  **Shape: REMOVE the tag and rely on section membership as the icebox tier does — operator
+  direction, 2026-09-17, lead-relayed**, chosen over a rename and keep-and-document.
+  **Measured confusion cost, one iteration, two sessions:** a lead read the tag as a semantic
+  claim and proposed a stale-tag correction on an entry an operator ruling had already settled;
+  a scope session dropped the tag and took the red learning the same thing.
+  **The demote-direction residual this entry owed is answered at spec:** the board tags already
+  checksum a move between the deferred and active sections in both directions, probed on a
+  scratch queue, so no history measurement is owed (the amendment's preamble).
+  Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
+  whether the tag earns its keep; promoted 2026-09-06 by close; paired 2026-09-17 at spec,
+  unit of `queue-entry-grammar`.
+
 ## Technical Debt
 
 - **deferred-entry-defer-date-unasserted** — a deferred entry whose provenance
@@ -730,53 +745,6 @@
   Filed 2026-08-31 by close, draining two 2026-08-30 gap bullets. Fix was tried first and refused
   (the assertion the second bullet proposes reds a benign population); icebox second, refused
   because a gate's verdict on an adopter's host is adopter-facing.
-
-- **design-pending-tag-restates-its-own-section** [design-pending] [cost: iteration/low] [surface: queue-kit] — the tag every deferred entry
-  carries is derivable from section membership alone, which is the two-sources defect
-  queue-kit/SPEC.md refuses by name for a challenger while exempting the incumbent.
-  **The argument is the spec's own, not a filer's.** queue-kit/SPEC.md:190-194, ruling out an
-  `[icebox]` tag for the icebox tier: "No `[icebox]` tag is minted: section membership *is* the
-  state, and a tag restating its own section is the two-sources defect. What generalizes across
-  the amendment lifecycle is the design-pending **section set**, not its tag set." This tag
-  restates its own section set exactly as the refused one would have, and derivation-first says
-  the same independently. The coupling is total and BIDIRECTIONAL —
-  `native/src/gates/amendment_queue.rs` reds a deferred entry lacking the tag (:201) and an
-  active entry carrying it (:191, :197) — which is a proof of derivability, not a protection.
-  **Mechanical cause of the misreading, the part a rename fixes and a warning does not:** the
-  identical string names two things. On a lead line it is a structural section marker carrying no
-  information; in a body, `Why [design-pending]` is a conventional field (queue-kit/SPEC.md:32)
-  whose stated job is "what the open design actually is" — genuinely semantic. Re-derived at the
-  2026-09-06 drain: 4 body fields against 382 lead-line tags, 579 occurrences file-wide;
-  re-derive rather than compare a number, which drifts every demotion.
-  **Measured confusion cost, one iteration, two sessions:** a lead read the tag as a semantic
-  claim and proposed a stale-tag correction on an entry an operator ruling had already settled;
-  a scope session dropped the tag and TOOK THE RED learning the same thing, finding its own drain
-  prose contradicting itself in the process.
-  **The accidental-move defence does not survive contact, and it was this filer's own.** The
-  claimed value is a checksum making a cross-section move detectable. The promote direction is
-  ALREADY guarded by `amendment_queue.rs:205`, which reds a design-pending-section entry carrying
-  a spec-ref tag — keyed on a marker that carries real information. And the tag CREATES the
-  error class it detects: without it, relocating an entry is moving lines and there is nothing to
-  forget. That is a redundant field, not a guard. **The one honest residual, owed inside the
-  unit:** the demote direction keeps no equivalent checksum, and nobody has measured whether an
-  accidental demotion ever occurred — one `git log -L` over a section boundary answers it.
-  **Costed, mechanical and wide rather than deep:** the file-wide occurrences above; three checks
-  in `amendment_queue.rs` plus `tag_lead_line.rs` and `task_conservation.rs`; the grammar block
-  at queue-kit/SPEC.md:187 and the icebox paragraph whose argument would invert; four gate-test
-  fixture pairs under `queue-kit/gate-tests/`; and the docs mirrors. Far past fix-inline.
-  **PRODUCT-CLASS by the 2026-08-30 discriminator, without needing its counterfactual clause:**
-  shipped queue-kit grammar every adopter's queue wears and every adopter's gate enforces.
-  **Shape: REMOVE the tag and rely on section membership as the icebox tier does — operator
-  direction, 2026-09-17, lead-relayed**, chosen over a rename (keeps the demote checksum) and
-  keep-and-document; a unit of `queue-entry-grammar`, whose spec stage authors the amendment.
-  **This entry wears the tag it questions, and that is correct rather than a joke** — the grammar
-  binds until it is changed, and an entry exempting itself would be the second source it names.
-  **Cost while deferred:** every reader meets a string that is a section marker in one place and
-  a semantic field in another; the two sightings above are what that costs per iteration, and the
-  sweep grows by one lead line per demotion.
-  Filed 2026-09-06 by the lead at the spec dispatch boundary on an operator question about
-  whether the tag earns its keep; the operator noted having proposed removal before and gave no
-  ruling. Promoted 2026-09-06 by close — too wide to fix inline, live trigger bars the icebox.
 
 - **plugin-marketplace** [design-pending] [roadmap: later/ecosystem] [cost: once/low] [surface: installer] — harness plugin packaging.
   roadmap-summary: The stage skills and guards installable as a harness plugin.
