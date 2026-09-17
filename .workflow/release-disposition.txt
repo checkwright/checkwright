@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-seam-sweep-remainder release deferred:v0.26.0 — MINOR, the level the outstanding v0.26.0 deferral already set (this iteration appends one Tightened-gates declaration, `check-provenance-seam` new and inert until CANON_KIT_SCAN_KIT_ROOTS is 1, and removes nothing); no event trigger fired: elapsed time dormant under the preview channel, no major, no security or supply-chain fix, no operator direction, no audience arrival
