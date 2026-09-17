@@ -68,7 +68,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut captures = 0usize;
 
     for row in &roster.rows {
-        let mut f = row.splitn(4, '\t');
+        // spec: lifecycle-kit/SPEC.md §check-close-surfaces — the fifth field, the row's state, is
+        // split off and never read: a four-way split would fold it into the owner
+        let mut f = row.splitn(5, '\t');
         let path = f.next().unwrap_or("");
         let mode = f.next().unwrap_or("");
         let reclaim = f.next().unwrap_or("");

@@ -144,6 +144,41 @@ pub fn iteration_start(state_file: &str) -> String {
     head
 }
 
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the header run stops at a markdown '## '
+// section heading as well as at the first data line: on a markdown surface whose blocks are '## '
+// headings (the survey record) a bare /^#/ predicate reads the first block's heading as header
+fn is_header_line(l: &str) -> bool {
+    let mut b = l.bytes();
+    b.next() == Some(b'#') && b.next() != Some(b'#')
+}
+
+pub fn truncate_to_header(text: &str) -> String {
+    let mut out = String::new();
+    let mut pend = String::new();
+    for l in text.lines() {
+        if l.trim().is_empty() {
+            pend.push_str(l);
+            pend.push('\n');
+            continue;
+        }
+        if is_header_line(l) {
+            out.push_str(&pend);
+            pend.clear();
+            out.push_str(l);
+            out.push('\n');
+            continue;
+        }
+        break;
+    }
+    out
+}
+
+// spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — `empty` is the truncate's own header
+// run read as a predicate, so a surface the boundary truncated reads as drained
+pub fn header_only(text: &str) -> bool {
+    text.lines().all(|l| l.trim().is_empty() || is_header_line(l))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -180,6 +215,21 @@ mod tests {
             .expect("cannot write the fixture state file");
         assert_eq!(iteration_start(&unresolvable.display().to_string()), head);
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the header run stops at a '## ' heading as
+    // well as at the first data line, and the retained blank run does not grow by one per boundary
+    #[test]
+    fn the_truncate_stops_at_a_section_heading_and_holds_blanks_pending() {
+        let rec = "# contract: x\n\n## 2026-01-01 scope — q?\n- finding: body\n";
+        assert_eq!(truncate_to_header(rec), "# contract: x\n");
+        assert_eq!(truncate_to_header(&truncate_to_header(rec)), "# contract: x\n");
+        let two = "# a\n# b\n\ndata\n";
+        assert_eq!(truncate_to_header(two), "# a\n# b\n");
+        assert!(header_only(&truncate_to_header(rec)));
+        assert!(header_only(""));
+        assert!(!header_only(rec));
+        assert!(!header_only(two));
     }
 
     #[test]

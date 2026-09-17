@@ -1091,7 +1091,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
             if !Path::new(&bt).is_file() {
                 continue;
             }
-            let kept = truncate_to_header(&read(&bt));
+            let kept = stages::truncate_to_header(&read(&bt));
             write_file(&bt, &kept)?;
             truncated.push(bt);
         }
@@ -1673,32 +1673,6 @@ fn worktree_loss(p: &str, h: &str) -> String {
     )
 }
 
-// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the header run stops at a markdown '## '
-// section heading as well as at the first data line: on a markdown surface whose blocks are '## '
-// headings (the survey record) a bare /^#/ predicate reads the first block's heading as part of
-fn truncate_to_header(text: &str) -> String {
-    let mut out = String::new();
-    let mut pend = String::new();
-    for l in text.lines() {
-        if l.trim().is_empty() {
-            pend.push_str(l);
-            pend.push('\n');
-            continue;
-        }
-        let mut b = l.bytes();
-        let heading = b.next() == Some(b'#') && b.next() != Some(b'#');
-        if heading {
-            out.push_str(&pend);
-            pend.clear();
-            out.push_str(l);
-            out.push('\n');
-            continue;
-        }
-        break;
-    }
-    out
-}
-
 fn through_separator(text: &str) -> String {
     let mut out: Vec<&str> = Vec::new();
     for l in text.lines() {
@@ -2015,17 +1989,6 @@ mod tests {
             mixed,
             "segmenting must lose no byte"
         );
-    }
-
-    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the header run stops at a '## ' heading as
-    // well as at the first data line, and the retained blank run does not grow by one per boundary
-    #[test]
-    fn the_truncate_stops_at_a_section_heading_and_holds_blanks_pending() {
-        let rec = "# contract: x\n\n## 2026-01-01 scope — q?\n- finding: body\n";
-        assert_eq!(truncate_to_header(rec), "# contract: x\n");
-        assert_eq!(truncate_to_header(&truncate_to_header(rec)), "# contract: x\n");
-        let two = "# a\n# b\n\ndata\n";
-        assert_eq!(truncate_to_header(two), "# a\n# b\n");
     }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the consumption rewrites field 3 of exactly

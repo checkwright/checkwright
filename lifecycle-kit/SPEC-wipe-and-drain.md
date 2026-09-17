@@ -114,7 +114,7 @@ the read being missing.
 `--emit close-surfaces` gains a fifth tab-separated column, `<state>`, one of
 `absent`, `empty` or `non-empty` for a file row, and `absent` or `-` for a
 `<file>#<section>` row {design-bearing}.
-**Not yet applied.**
+**Applied.**
 
 - **`absent`**: the row's file (a locator's part before `#`) does not exist under the
   computed base.

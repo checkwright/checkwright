@@ -3433,13 +3433,28 @@ it cannot meet.
 ### The close-surfaces emit arm
 
 Prints the derived close-surface roster (§The close-surface roster), one row per
-surface, tab-separated `<path>	<mode>	<reclaim>	<owner>`, sorted by path. A
+surface, tab-separated `<path>	<mode>	<reclaim>	<owner>	<state>`, sorted by path. A
 field with nothing declared is `-`; an owner-less row is a capture surface source
 2 found with no declaration, whose mode reads `(undeclared)`. The mode is echoed
 verbatim — a malformed one is passed through for `check-close-surfaces` to rule
 on, so the derivation never silently repairs what the gate exists to catch. An
 empty roster prints nothing and succeeds: a resolved-empty derivation is an
 answer, never an error.
+
+`<state>` is the row's on-disk state under the computed base. A file row reads
+`absent` (no such file), `empty` (the file holds nothing past the header run
+§bin/enter-stage.sh's truncate keeps, so a surface truncated to its `# contract:`
+header reads as the drained surface it is — the arm and the truncate share one
+predicate in the stage module rather than two copies of one rule) or `non-empty`.
+A `<file>#<section>` row reads `absent` when its file is, else `-`: a section's
+emptiness is its owner's read (the Lessons row is forced by the boundary refusal,
+the Deferred row is never empty), and resolving an anchor-form heading would give
+this arm a heading resolver it needs nowhere else. The state is **three named
+states, not a byte size**, on drift-kit/SPEC.md §The knowledge-friction loop's
+precedent: a size is a number whose only consumer is this question, and a
+header-only file has a non-zero one. The column is appended rather than inserted,
+so the four positions every reader indexes stay put. Close's triage sweep is its
+reader, stating `empty` as a clean read and taking `absent` as a finding.
 
 A **non-gate arm** (gate-sdk/SPEC.md §The non-gate arm), invoked as
 `bash gate-sdk/bin/run-gates.sh --emit close-surfaces [scan-root]`. Its two callers
@@ -3689,7 +3704,12 @@ The gate reads the roster by **calling the derivation in process**
 so a roster it could not derive is fail-closed (exit
 2), as is an unreadable declaration surface. The in-process call is the point
 rather than an optimization: it makes "the derivation and the gate can never
-disagree" structural instead of conventional. It also means the descriptor
+disagree" structural instead of conventional. The gate splits the row's fifth
+field, `<state>`, off and reads it as nothing — a four-way split would fold it
+into the owner of every error line — and **never reds on `absent`**: a
+capture-tier surface is gitignored and legitimately absent in CI and a fresh
+clone, so an absence is a closing session's finding, never a tree violation. It
+also means the descriptor
 acquires a **source coupling** — the gate module and the emit module it reaches
 transitively join `couples=` beside the surfaces already named, or the gate
 stays registered, green, and never triggered on the edit that broke it.

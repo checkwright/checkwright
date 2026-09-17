@@ -162,13 +162,15 @@ session.
    why a second reach in one iteration is the failure:
    lifecycle-kit/SPEC.md §bin/enter-stage.sh.
 4. **Sweep the inbound triage surfaces** — run
-   `bash gate-sdk/bin/run-gates.sh --emit close-surfaces` and
-   disposition every row (§The close-surface roster). The roster is derived, not
-   enumerated here or in the binding below: a `forced=` row has a structural
-   forcing function and cannot be skipped silently; an `advisory` row may be
-   skipped, but the skip is a judgment to state, not an omission to leave
-   invisible. An `(undeclared)` row is a capture surface nobody declared — file
-   the missing declaration rather than reading past it.
+   `bash gate-sdk/bin/run-gates.sh --emit close-surfaces` and disposition every row
+   (§The close-surface roster). The roster is derived, not enumerated here or in
+   the binding below: a `forced=` row has a structural forcing function and cannot
+   be skipped silently; an `advisory` row may be skipped, but the skip is a
+   judgment to state, not an omission to leave invisible. An `(undeclared)` row is
+   a capture surface nobody declared: file the missing declaration. A row's state
+   is read too: `empty` is a clean read to state, and `absent` is a finding —
+   nothing ever wrote the surface or its writer is gone, so confirm the writer or
+   file the gap.
    *<housekeeping: your housekeeping sweeps beyond the roster: deprecation scan,
    gate-runtime budget check, backlog-aging / premise-rot review, and the
    per-surface triage procedures the roster's rows route to.>*

@@ -21,14 +21,6 @@
   an assertion over DoD prose is refused, having no stage grammar to read (amendment delta 3).
   Joined 2026-09-17 the wipe set as its DoD drain-stage member (operator direction, lead-relayed).
 
-- **close-surface-row-absent-reads-as-empty** [spec: SPEC-wipe-and-drain.md] — the close-surface
-  roster prints a declared row identically whether its file is empty or absent, so a dead
-  capture writer is invisible (measured 2026-09-12: two of eleven rows had no file). **Designed
-  as** a fifth `<state>` column, `absent`/`empty`/`non-empty` on drift-kit's kfric three-state
-  precedent, `-` for a section row whose file exists; `empty` reuses the boundary truncate's
-  header-run predicate; the gate never reds on `absent` (amendment delta 4).
-  Joined 2026-09-17 the wipe set as its roster member (operator direction, lead-relayed).
-
 - **gap-drain-precedes-its-own-kfric-read** [spec: SPEC-wipe-and-drain.md] — close drains the gap
   inbox at step 2 and reaches the knowledge-friction log only at step 4, so a fact captured
   mid-iteration misses the drain that needs it (measured at `installer-front-door-cut`'s close:
@@ -4275,5 +4267,6 @@
 ## Done
 
 - boundary-wipe-preserve-basename-reach
+- close-surface-row-absent-reads-as-empty
 
 ## Lessons Learned

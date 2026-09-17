@@ -2,6 +2,7 @@
 // declaration across the resolved declaration surfaces, unioned with the workflow directory's
 // capture tier so an undeclared capture surface is reported rather than missing
 use crate::proc;
+use crate::stages;
 use crate::walk;
 use std::path::Path;
 
@@ -111,6 +112,27 @@ fn sort_rows(rows: &mut [String]) {
     });
 }
 
+// spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — the row's on-disk state as three named
+// states rather than a size: a section row reads `-` unless its file is absent, a section's
+// emptiness being its owner's read
+fn row_state(base: &str, locator: &str) -> &'static str {
+    let (file, section) = match locator.find('#') {
+        Some(i) => (&locator[..i], true),
+        None => (locator, false),
+    };
+    let p = under(base, file);
+    if !Path::new(&p).exists() {
+        return "absent";
+    }
+    if section {
+        return "-";
+    }
+    match std::fs::read(&p) {
+        Ok(b) if stages::header_only(&String::from_utf8_lossy(&b)) => "empty",
+        _ => "non-empty",
+    }
+}
+
 pub struct Roster {
     pub base: String,
     pub workflow_dir: String,
@@ -143,7 +165,8 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
             .map_err(|e| format!("declaration surface not readable: {}: {}", s, e))?;
         for line in declaration_lines(&text) {
             let (path, mode, reclaim) = split_declaration(line);
-            rows.push(format!("{}\t{}\t{}\t{}", path, mode, reclaim, s));
+            let state = row_state(&base, &path);
+            rows.push(format!("{}\t{}\t{}\t{}\t{}", path, mode, reclaim, s, state));
             declared.push(path);
         }
     }
@@ -172,7 +195,7 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
                 }
             }
             if !declared.contains(&rel) {
-                rows.push(format!("{}\t(undeclared)\t-\t-", rel));
+                rows.push(format!("{}\t(undeclared)\t-\t-\t{}", rel, row_state(&base, &rel)));
             }
         }
     }
@@ -238,6 +261,24 @@ mod tests {
             split_declaration("close-surface: bare.md"),
             ("bare.md".to_string(), String::new(), "-".to_string())
         );
+    }
+
+    #[test]
+    fn a_row_reads_absent_empty_or_non_empty_and_a_section_row_dash_unless_absent() {
+        let dir = std::env::temp_dir().join(format!("close-surfaces-state-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("mk");
+        std::fs::write(dir.join("header.txt"), "# contract: x\n\n").expect("w");
+        std::fs::write(dir.join("zero.log"), "").expect("w");
+        std::fs::write(dir.join("data.md"), "# contract: x\n- a bullet\n").expect("w");
+        let base = dir.display().to_string();
+        assert_eq!(row_state(&base, "missing.log"), "absent");
+        assert_eq!(row_state(&base, "zero.log"), "empty");
+        assert_eq!(row_state(&base, "header.txt"), "empty");
+        assert_eq!(row_state(&base, "data.md"), "non-empty");
+        assert_eq!(row_state(&base, "data.md#Deferred"), "-");
+        assert_eq!(row_state(&base, "missing.md#Deferred"), "absent");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — the tie-break is the whole row and it is
