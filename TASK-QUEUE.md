@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: external-install-evidence
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -1113,6 +1113,9 @@
   `benchmark-ab-experiment`, since running it first would fix the wrong metrics.
   Surfaced 2026-08-02 at close, in the same intake pass, as the review's own
   fourth-ranked priority.
+  **DIRECTED into `external-install-evidence` (operator direction, 2026-09-18, lead-relayed): the
+  TREE HALF only, completion predicate the protocol on disk; the operator-hours and calendar half
+  stays here, out of every stage session. Revisable; `/spec` authors and promotes it, not scope.**
 
 - **external-gate-quality-evidence** [cost: event/low] [surface: evidence-kit] — durable, published
   evidence of **gate quality as experienced outside this tree**: per-gate
@@ -1144,6 +1147,15 @@
   someone decides to record it.
   Surfaced 2026-08-02 at close, in the same intake pass, as the third and last
   of the growth half's unfiled items.
+  **DIRECTED into `external-install-evidence` (operator direction, 2026-09-18, lead-relayed),
+  bundled with `design-partner-preview` on the shared surface both write: the per-install
+  observation record.** The bundle is not convenience. This entry's own carry sentence rules the
+  history unrecoverable — it "cannot be retroactively collected", and starts accruing "only once
+  someone decides to record it" — so a protocol landing without the gate-quality fields designed
+  into it sends the first installs' reds somewhere this baseline can never read. There is one
+  chance to fix the record's fields and it is before the observation window opens, which is what
+  makes the two units one iteration rather than two. A direction, revisable at a later scope or
+  spec; `/spec` authors the amendment and promotes this entry, scope promoting no features.
 
 - **gate-authoring-sdk-surface** [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] — a gate-authoring SDK.
   `.gate` as the substrate-neutral surface. **Operator-surfaced during
@@ -2665,6 +2677,22 @@
   stage entry runs the path.
   **Cost while deferred:** one bash spawn per iteration-boundary worktree row, and a divergence
   invisible once green, since nothing compares the two interpreters.
+  **PREMISE CORRECTED 2026-09-18 at scope (lead decision, own-authority), measured not reasoned;
+  the entry stays deferred and is not re-costed beyond what the measurement forces.** The sizing
+  above prices a Pike-VM upgrade against a corpus of ONE consumer, and that corpus was never
+  measured. `grep -rhno -E 'proc::run\("[a-z0-9_.-]+"' native/src/` finds SIX production `bash -c`
+  sites, not one: `emit/enter_stage.rs:1633` (`capture_group_one`, this entry's subject),
+  `knobs/lifecycle_kit.rs:143` (ERE validation), `evidence.rs:322` and `emit/wait_probe.rs:500`
+  (both `kill -0`), `emit/wait_probe.rs:202`, `emit/port_blockers.rs:291`, `emit/pub_index.rs:53`.
+  **Three of them — the two `kill -0` probes and the ERE validation — look retirable with no
+  capture-group engine at all**, so the Pike-VM cost may buy one call site rather than the path,
+  and the cheaper cut (remove the consumer) was never weighed against it.
+  **Second measured fact, same sweep:** `native/src/toolfloor.rs:9-17` publishes a seven-member
+  floor (`bash:4.3 git jq awk::GNU sort::coreutils shellcheck cargo`) while production code also
+  spawns `date`, `mktemp`, `cp`, `uname`, `ps` and `touch` — the roster and the real spawn set
+  disagree in BOTH directions, which is `toolchain-floor-spawn-on-native-windows`' subject and is
+  recorded here because the two entries share the corpus. Both facts re-derive from the grep above
+  against `PROBE_SET`, so this entry carries its own witness and needs no pointer to one.
   Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
 
 - **release-note-removal-declaration-uncoupled** [cost: event/high] [surface: gate-sdk] — no oracle couples a removed
