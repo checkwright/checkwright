@@ -9,3 +9,4 @@ scratch-wipe-and-drain-contracts spec a7f328f9 2026-09-17 2b4c192e
 scratch-wipe-and-drain-contracts align a1f65556 2026-09-17 ebc9cbdf
 scratch-wipe-and-drain-contracts build a3d2fa6d 2026-09-17 350f7139
 scratch-wipe-and-drain-contracts validate a78e5e76 2026-09-17 83a724bf
+scratch-wipe-and-drain-contracts close a6174ac3 2026-09-17 c26362cd
