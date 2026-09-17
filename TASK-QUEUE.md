@@ -1254,7 +1254,7 @@
   deferred bodies, and the sweep found **five**, not the two validate filed: three more
   naming `gate-payload-disclosure-ruling` and one naming `native-gate-meta-layer-reach`,
   all phrased in present tense against slugs that are now bare `## Done` lines.
-  `check-spec-pointer` catches none — it matches path-form only, and all five are slug-form.
+  `check-spec-pointer` catches none — it reads `§` citations, and all five are bare slug-form.
   **Recurred 2026-08-06 on a second surface that re-verification did not cover, falsifying its
   "entirely inside `TASK-QUEUE.md`" scoping.** Sibling amendments *inside one iteration* cite
   each other by path, so merge order decides which side dangles: `SPEC-verify-verb.md` cited
@@ -2665,38 +2665,6 @@
   Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; attested
   2026-08-27 by the `windows-adopter-unblock` close's own verifying push.
 
-- **readme-bin-roster-underived** [design-pending] [cost: event/low] [surface: gate-sdk] — every kit README's **gate** roster is held by a
-  gate and its **`bin/` tool** roster is held by nothing, so a tool added, renamed or retired leaves
-  a hand-authored list silently stale.
-  **The scope limit is the gate's, stated and verified rather than inferred.** `check-readme-roster`
-  asserts name-set parity in both directions over exactly two sets: the names inside a README's
-  gate-roster marker block, and the kit's `checks/` basenames (gate-sdk/SPEC.md
-  §check-readme-roster; the descriptor's `couples=` field and the compiled rule agree). A `bin/`
-  tool sits outside both sets, so nothing reds.
-  **The witness is dated now rather than live, and it still does its work.**
-  `gate-sdk/bin/upgrade-smoke.sh` shipped in `gate-sdk/bin/` and appeared nowhere in that
-  README's hand-authored `bin/` prose, from before the surfacing iteration until its 2026-09-02
-  port. The roster was wrong across that whole span: the omission is a class, not a one-off.
-  **This is Derivation-first in the shape the doctrine names:** a roster maintained rather than
-  derived, with a freshness gate sitting one directory away that does not reach it.
-  **Why `[design-pending]`, two dispositions trading different properties.** Make the `bin/` roster
-  a **generated projection**, rostered in docs/site-architecture.md with a trigger and a regen
-  command like every other — which buys derivation but puts a marker block and a freshness gate on
-  a surface whose annotation prose is the part a reader wants. Or **widen `check-readme-roster`**
-  to a second marker block over `bin/` basenames — cheaper, reuses the shape the gate already
-  has, but asserts parity over a set whose membership rule ("a shipped tool") is less crisp than
-  `checks/`'s, since `bin/` mixes adopter-facing entry points with internal helpers and the gate
-  would have to rule which are roster-owed.
-  **DISTINCT from `readme-roster-enum-coverage`**, whose subject is the gate's own enum coverage
-  inside the block it already reads. This one is a corpus the gate never reaches at all.
-  **Cost while deferred:** one stale roster line per tool retired or added, each unattributable by a
-  later reader, on the surface an adopter reads first to learn what a kit ships. The tree carries
-  none today — the 2026-09-02 port deleted the omitted tool, which fixes the instance and leaves
-  the class exactly where it was.
-  Relayed 2026-08-28 by the lead on the spec session's behalf (`file-gap.sh` contended on an
-  uncommitted inbox); promoted 2026-08-28 by close at this boundary's drain, its scope claim
-  re-verified against the descriptor and the compiled rule and its witness found here.
-
 - **harness-project-dir-fold-dialect-unresolved** [design-pending] [cost: event/low] [surface: context-kit] — the harness project-dir
   derivation `check-memory-off` and its two shell twins share folds a repo root's `/` and `.` to
   `-`, and under gate-sdk/SPEC.md §The path-dialect contract's per-substrate dialects the two
@@ -3888,6 +3856,7 @@
 - **enter-stage-refusal-help-contradicts-its-guard** [design-pending] — help contradicts its hook.
 - **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — untested end to end.
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
+- **readme-bin-roster-underived** [design-pending] — no gate holds a kit README's bin/ tool roster.
 
 ## Done
 
