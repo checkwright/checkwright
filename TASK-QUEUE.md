@@ -12,6 +12,33 @@
 
 ## New Features
 
+- **scan-prompts-heredoc-grant-split** [spec: SPEC-interpreter-steer.md] — scan-prompts' grant
+  test splits a flattened heredoc body on `;` and `|`, so a granted `python3 -` heredoc reads
+  prompting. **Probed at spec, not guessed:** under a lone `Bash(python3 -*)` grant in a
+  deny-unmatched harness session, multi-line bodies carrying `;` and `|` ran, while a command after
+  the terminator, an opener-line pipe and an unquoted body carrying `$HOME` were denied. The
+  owed-port-tail report did not reproduce. **Designed as:** the friction log encodes `\`, newline
+  and tab instead of flattening, and is cut at the harness's 10,000-character analysis bound. The
+  compiled skeleton and splitter twins gain the heredoc arm. The ranker drops each body and
+  terminator from the grant test, reads unquoted bodies live for expansion, and marks an over-bound
+  call allowlist-unreachable (amendment deltas 1 to 3, which build first).
+  Directed 2026-09-17 at scope into `interpreter-steer-census`'s set (operator direction,
+  lead-relayed); filed 2026-09-15 at `guard-friction-reach`'s spec.
+
+- **inline-interpreter-substrate-census** [spec: SPEC-interpreter-steer.md] — whether the recurring
+  inline-interpreter computations are one-off scratch or unported tooling, and which predictable
+  tools would replace them as steer targets (operator direction, 2026-09-15, lead-relayed).
+  recurrence: inline-interpreter-substrate-census 2026-09-15
+  **Census at spec** (survey record, 2026-09-17 spec block): 871 inline bodies since 2026-09-08, all
+  `python3`. The recurring idiom is a literal read, assert, replace and write-back (280 calls over
+  26 sessions, plus 157 heading-anchored splices). Computed rewrites, tallies and probes have no
+  predictable tool. **Designed as** one steer to an existing arm, with no new tool: rule 8 gains a
+  python arm that blocks an inline body that is a literal rewrite, meaning it writes a file, calls
+  `.replace(`, and carries no computed-text construct. The arm steers to `--rewrite` or Edit, and
+  everything else passes as measured friction (amendment delta 4).
+  Directed 2026-09-17 at scope as the set's lead (operator direction, lead-relayed); filed
+  2026-08-30, returned from the icebox 2026-09-15.
+
 ## Technical Debt
 
 ## Deferred
@@ -53,54 +80,6 @@
   discipline, and this repo's numbers stay a restatement a kit cannot see.
   Filed 2026-09-15 by `config-seam-fourth-cut`'s close into the gap inbox, beside the hotfix-push
   allowance it landed in CLAUDE.md; promoted at the next iteration's scope.
-
-- **inline-interpreter-substrate-census** [design-pending] [cost: iteration/high] [surface: guard-kit]
-  — whether the recurring inline-interpreter computations are one-off scratch or unported tooling,
-  and which predictable, side-effect-bounded tools in the binary would replace them as steer
-  targets.
-  **What this asks that no ruled entry did**: the 2026-08-30 grant settled whether the inline
-  `python3` shape is GRANTED, never whether it is the right SUBSTRATE. A computation re-derived
-  every iteration is unported tooling the grant entrenches.
-  recurrence: inline-interpreter-substrate-census 2026-09-15
-  **Returned from the icebox by `guard-friction-reach`'s spec, on a second datum and a direction.**
-  First datum (2026-08-30 drain): 1 inline-interpreter call in 556 fall-throughs. Second datum,
-  read from the harness session transcripts rather than the friction log, 2026-09-08 to 2026-09-15:
-  743 inline `python3` calls in about 27k Bash calls, 572 writing one path and 50 several. So the
-  shape recurs. The direction widens the ask (operator direction, 2026-09-15, lead-relayed): steer
-  agents off interpreters and utilities whose side effects cannot be read, onto predictable tools
-  checkwright builds in Rust. The landed `--rewrite` arm is that family's first member, and its
-  steer (Done 2026-09-15) left `python3` bodies unsteered for want of a target.
-  **Why `[design-pending]`:** the census comes first. It classifies what the inline bodies
-  compute, and only then can a tool be named. Whether a steer can read a body the guard's skeleton
-  blanks is a second call.
-  **Cost while deferred:** every inline computation stays an unreviewable-effect call, granted by a
-  committed glob or decided out of band, and nothing counts what the calls recompute.
-  Filed 2026-08-30 by close from the gap inbox; iceboxed at a pool triage; returned 2026-09-15.
-  **Re-verified 2026-09-17 at scope:** about 224 inline `python3` calls in about 9350 Bash calls
-  since 2026-09-15, so the shape still recurs.
-  **Directed 2026-09-17 at scope into `interpreter-steer-census`'s set, as its lead — operator
-  direction, lead-relayed, revisable at a later scope or spec; no ruling record carries it.** The
-  set: this entry and `scan-prompts-heredoc-grant-split`. Composition: bundled — both sit on
-  guard-kit's `scan-prompts` friction reading, and the joiner's skewed `python3 -` count is the
-  figure this census reads. Both add names, so the authoring stage promotes them.
-
-- **scan-prompts-heredoc-grant-split** [design-pending] [cost: event/low] [surface: guard-kit] —
-  scan-prompts' grant test reads a flattened heredoc-bearing log line whole, so `split_compound`
-  cuts the body on `;` and `|` (`native/src/emit/scan_prompts.rs`, `granted`), while the
-  reachability verdict beside it stops at the first heredoc opener (`before_heredoc`).
-  **Re-verified at the drain:** under a committed `Bash(python3 -:*)` grant, a one-line log of
-  `python3 - <<'EOF' import sys; print(1) EOF` ranks 1 prompting call and the same body without
-  the `;` reads clean.
-  **Why `[design-pending]`, not a drain fix:** either reading is a guess at the harness. The
-  owed-port-tail close reported that multi-line `python3 -` heredocs prompt despite the grant, which
-  argues for a third allowlist-unreachable shape; stopping the grant test at the opener would
-  instead read every such call granted. §scan-prompts rules two shapes, so the choice is an
-  envelope change, and it wants a probe of the harness's multi-line match first.
-  **Cost while deferred:** the `python3 -` row's prompting count is neither a floor nor a ceiling,
-  so the census above reads a skewed friction figure.
-  Filed 2026-09-15 to the gap inbox at `guard-friction-reach`'s spec; promoted at its close.
-  **Directed 2026-09-17 at scope into `interpreter-steer-census`'s set**;
-  `inline-interpreter-substrate-census` records the set's argument.
 
 - **gap-inbox-kit-ref-valve** [design-pending] [cost: event/low] [surface: canon-kit] —
   `check-kit-ref-liveness` valves the queue file out by basename because the queue is design-ahead
