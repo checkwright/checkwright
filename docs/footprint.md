@@ -51,7 +51,7 @@ host repository's residue.
 | gate-sdk | — | — |
 | guard-kit | — | 68l · ~1119t |
 | installer | — | — |
-| lifecycle-kit | 5l · ~76t | 1724l · ~27852t |
+| lifecycle-kit | 5l · ~76t | 1732l · ~28005t |
 | queue-kit | — | 47l · ~465t |
 | site-kit | — | — |
-| **total** | 23l · ~489t | 2643l · ~43328t |
+| **total** | 23l · ~489t | 2651l · ~43482t |

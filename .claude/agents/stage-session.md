@@ -33,6 +33,9 @@ lead** — every other branch is unchanged.
   would decide it — the owner doc is ground truth and history answers what
   happened, never what is correct (CLAUDE.md §Delivery doctrine, spec-over-precedent).
 - A **cross-component gap** you cannot close from the specs alone this session.
+- A **work-class discovery**: you were dispatched on a cheaper tier and find a fix you would
+  have to author. Journal the diagnosis, author none of the fix, and escalate a re-tier
+  (lifecycle-kit/templates/lead.md §Economics, *Tier each batch to its work class*).
 
 **Decide alone** (proceed; land the decision in the governed surface *before*
 you act on it — the classes are lifecycle-kit/SPEC.md §The steering vocabulary):

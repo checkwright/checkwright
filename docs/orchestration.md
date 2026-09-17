@@ -106,8 +106,8 @@ an iteration under it:
    ride every authoring turn). A debt-only iteration skips it.
 4. **The lead dispatches each remaining stage** — `/align`, `/build`,
    `/validate`, `/close` — as a background stage session that runs its skill
-   unchanged, on the tier the ruling-config pins: `validate`'s uniformly
-   mechanical oracle-running rides a cheaper tier, while `build` is tiered **per
+   unchanged, on the tier the ruling-config pins: `validate`, priced as
+   mechanical oracle-running, rides a cheaper tier, while `build` is tiered **per
    batch** from its deltas' work-class labels, its judgment-heavy work staying
    on the premium tier (the per-batch tier-differentiation rule,
    the lead template's [Economics section](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics-batch-and-compact-where-it-pays)). A stage whose
@@ -119,7 +119,10 @@ an iteration under it:
    restarting cold. The lead rules machinery questions itself; a question
    about the iteration's *intent* it forwards — with the working-state excerpt
    the question turns on — to the scope oracle and relays the answer back.
-   Anything outside the ruling roster reaches the operator.
+   Anything outside the ruling roster reaches the operator. The one move that
+   does not resume is a re-tier: a cheaper-tier session that finds a fix it must
+   author journals the diagnosis and escalates, and the lead re-dispatches the
+   rest on the judgment tier, since a resume keeps the session's model.
 6. **If the oracle cannot be resumed,** the lead answers from the governed
    surfaces the rulings already live in — the amendments, the queue entries —
    and hands anything not derivable there to the operator.

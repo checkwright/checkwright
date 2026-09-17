@@ -5075,7 +5075,9 @@ one, so a cut across a producer/consumer edge between deltas dispatches the
 consumer against an input that does not exist yet), the per-batch work-class
 tiering (judgment being what the tier buys, downgrading a design-bearing batch
 trades a large correctness risk for a small window saving, while a stage-uniform
-class is a collapsed default and not a bound roster) and
+class is a collapsed default and not a bound roster; a downgraded dispatch
+carries an escalate-on-discovery transition to a same-stage re-dispatch on the
+judgment tier, because a resume cannot change a session's model) and
 the lead-owns-batching clause (an intra-stage batch split is N sibling stage
 sessions the lead dispatches and verifies — each a same-stage re-entry,
 §The state machine — and a stage session never dispatches a sibling stage
@@ -5091,6 +5093,23 @@ expensive dispatch with `--simulate`, and reads that same drain-entry verdict
 §bin/enter-stage.sh), and a ruling
 whose acting session is not imminent is filed to a durable governed surface
 in the moment it is made.
+**The escalate-on-discovery transition sits on the tiering rule, not on any one
+stage.** The premise a downgrade rests on — this dispatch's work is mechanical —
+is behind every cheaper-tier dispatch, a stage-uniform cheaper default being one
+case among them, and an all-mechanical build batch can equally turn out to need
+a repair designed. Its trigger is a fix the session would have to author (code,
+a contract, a fixture, or a diagnosis that crosses components); running an
+oracle, editing a grammar-governed record and filing a finding are not triggers.
+The session commits whatever is complete and unrelated, and its escalation's
+Evidence names the journal heading the re-dispatched session reads at entry, so
+the diagnosis is not bought twice. The lead rules it alone because a batch's tier
+is already its assignment, and it re-dispatches rather than answering because a
+resume keeps the paused session's tier: one lead turn and one session start
+against a grind on the wrong tier nobody sees. A consumer that bound a
+stage-uniform cheaper tier keeps it — one re-dispatch fits inside the binding.
+**Honest limit:** nothing detects a session that does not recognize its
+discovery; the transition makes the right move cheap and named, and a grinding
+session stays unseen.
 **Relay-never-assert and the checked-figure rule rest on one asymmetry.** A stage
 session writes lifecycle state under oracle-first, fixture pairs and a validate
 battery; the lead writes none and carries no verification discipline, yet its

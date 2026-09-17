@@ -12,27 +12,6 @@
 
 ## New Features
 
-- **validate-tier-premise-mechanical-only** [spec: SPEC-tier-discovery.md] — the ruling-config
-  assigns `validate` the cheaper model on the premise that its batches are uniformly mechanical
-  oracle-running, and one iteration falsified that premise.
-  **RULED BY THE OPERATOR 2026-08-23 — (b): KEEP THE TIER, ADD AN ESCALATE-ON-DISCOVERY CLAUSE.**
-  Re-tier validate and record-the-limit-only were refused. **OPERATOR-CLASS:** the tier is a
-  recorded ruling carried in the lead binding; this unit delivers the clause and re-judges nothing.
-  **The instance, from `battery-runner-port` 2026-08-23:** validate's spine went red on an
-  inherited defect whose fix took a diagnosis, a self-caught overreach (narrowed at `80d74291`) and
-  three spine runs; the lead re-dispatched on the capable tier. A one-off clause carried in the
-  2026-08-24 validate dispatch fired as intended.
-  **Designed as:** lifecycle-kit's lead template gives every cheaper-tier dispatch an
-  escalate-on-discovery transition — a session that finds a fix it must author journals the
-  diagnosis, authors none of it, and escalates a re-tier; the lead re-dispatches a same-stage
-  session on the judgment tier, since a resume keeps its tier. The stage-session roster names the
-  class and the lead binding prices validate as mechanical (amendment deltas 1 to 3).
-  **Not ridden:** `build-stage-tier-economics`'s "demonstrably works" sentence, corrected only when
-  that entry is worked.
-  **Unit of `validate-red-holding` — operator direction, 2026-09-17, lead-relayed:** the clause
-  names a transition, so spec authors it.
-  Filed 2026-08-23 at `battery-runner-port`'s close; ruled by the operator the same day.
-
 ## Technical Debt
 
 ## Deferred
@@ -3799,5 +3778,6 @@
 
 - validate-hold-rule-admits-iteration-caused-red
 - baseline-move-stales-evidence-line
+- validate-tier-premise-mechanical-only
 
 ## Lessons Learned

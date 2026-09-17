@@ -39,9 +39,11 @@ anywhere; the series, its every reading and its refused premises are in git hist
 with `lead-split-posture-limb-unjudged`. Nothing re-opens this on one point.
 
 - **`validate`** — the lead dispatches it with a `model: sonnet` override.
-  validate's batches are uniformly *mechanical oracle-running* (run the battery,
-  report), so the stage collapses to a single stage-uniform-mechanical default —
-  the degenerate case of per-batch tiering, not a bound per-stage roster.
+  validate is priced as *mechanical oracle-running* (run the battery, report), so
+  the stage collapses to a single stage-uniform-mechanical default. That is the
+  degenerate case of per-batch tiering, not a bound per-stage roster. A validate
+  that finds a fix it must author takes the escalate-on-discovery transition
+  (template §Economics, *Tier each batch*), and the tier stays.
 - **`build`** — tiered **per batch**, not stage-uniform. The lead reads the
   work-class labels of a batch's deltas (via the `[spec:]` amendments its entries
   point at) and pins `model: sonnet` on a batch whose deltas are **all
