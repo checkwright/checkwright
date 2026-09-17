@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: queue-entry-grammar
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,41 @@
 ## New Features
 
 ## Technical Debt
+
+- **deferred-entry-defer-date-unasserted** — a deferred entry whose provenance
+  date is malformed reads as **undated**, and no gate reds on it.
+  recurrence: deferred-entry-defer-date-unasserted 2026-08-24
+  **FIRST RECURRENCE 2026-08-24, in a SHAPE no prior instance covers: the spelling was CANONICAL
+  and a LINE WRAP broke it.** At this close a new deferred entry ended a body line on the word
+  `Filed` with `2026-08-24` beginning the next, and the arm listed it `(undated)`. Probed the same
+  way this entry's founding measurement was: moving the marker and the date onto one line dropped
+  the row from the worklist on re-measure. The reading that widens the class — the parse is
+  LINE-SCOPED, so the defect is reachable by ordinary reflow and not only by careless spelling,
+  which means any session that rewraps an entry can silently create one.
+  **PROBED both ways at the 2026-08-18 close, on entries that close itself wrote.** Two of its
+  seven new deferred entries spelled the date `filed 2026-08-18 by close` (lowercase, mid-line)
+  and `Filed at build 2026-08-18` (a word between the marker and the date). Both were listed by
+  `run-gates.sh --emit queue-index --icebox-candidates` with defer-date `(undated)`; rewriting
+  the two lines to the canonical form dropped both from the worklist on re-measure.
+  **The failure is silent by construction.** Such an entry is well-formed to every other gate —
+  the cost field is present, the budget gate is clean, the battery is green.
+  **Cost while deferred:** an undated entry never ages out of the age filter, so it is a
+  permanent icebox candidate *and* is invisible to drift-kit's deferred-age KPI, both readers of
+  the one definition (queue-kit/SPEC.md §The queue format).
+  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed**, unit of
+  `queue-entry-grammar`: an assertion inside a shipped gate adds no name, so no amendment is owed.
+  **Deliverable:** one more assertion on the walk `check-queue-entry-budget` already makes for its
+  (C) — every top-level deferred entry resolves a defer date under queue-kit/SPEC.md §The queue
+  format's definition — with its fixture pair, and that section's "conventions no gate reads"
+  sentence converged on it.
+  **Holder set, settled at promotion:** the assertion lands once, on queue-kit's own parse; a queue
+  that passes it resolves a date for every holder reading the same one-definition, so drift-kit's
+  KPI and `check-gate-exemption-tasks` owe no second assertion. Build reads both re-implementations
+  for parity with the definition, and a divergence found is filed, not folded in.
+  **Live instance, repaired in this unit:** `site-health-issue-venue-unwanted` lists `(undated)`
+  (probed 2026-09-17 at scope) — its provenance line reads `Operator-directed filing 2026-08-25`.
+  Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, at its backlog-eviction
+  step; promoted from the gap inbox at that iteration's scope.
 
 ## Deferred
 
@@ -731,10 +766,9 @@
   fixture pairs under `queue-kit/gate-tests/`; and the docs mirrors. Far past fix-inline.
   **PRODUCT-CLASS by the 2026-08-30 discriminator, without needing its counterfactual clause:**
   shipped queue-kit grammar every adopter's queue wears and every adopter's gate enforces.
-  **Three alternative shapes, and this entry rules none — the choice is operator-class.** Remove
-  the tag and rely on section membership as the icebox tier does; or RENAME so the string cannot
-  be read as the body field's semantics, preserving the demote-direction checksum at the same
-  sweep cost; or keep as-is and document the trap, cheapest and leaving the confusion in place.
+  **Shape: REMOVE the tag and rely on section membership as the icebox tier does — operator
+  direction, 2026-09-17, lead-relayed**, chosen over a rename (keeps the demote checksum) and
+  keep-and-document; a unit of `queue-entry-grammar`, whose spec stage authors the amendment.
   **This entry wears the tag it questions, and that is correct rather than a joke** — the grammar
   binds until it is changed, and an entry exempting itself would be the second source it names.
   **Cost while deferred:** every reader meets a string that is a section marker in one place and
@@ -922,7 +956,6 @@
   is the budget-oracle prerequisite cluster heterogeneous-agent-delegation
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
-
 
 - **gate-file-coverage-closure** [design-pending] [cost: event/high] [surface: delegation-kit] — the missing check class behind a
   hole this close fixed inline: nothing asserts that every gate script in the
@@ -1192,14 +1225,12 @@
   `amendment-landing-citation-assertions` covers (amendment-to-spec landing citations) and
   of `amendment-deletion-content-completeness` (content that fails to land): here the
   canonical side is the one that goes stale.
-  **Re-verified 2026-08-03 at close against the tree, and half the filing was already
-  false.** The `gate-sdk/SPEC.md` instances the base bullet named are **gone** — build
-  batch 5 repointed them to `TRAJECTORY.md` when the ruling record landed, and the slug now
-  has zero occurrences in that file. The live residue is entirely inside `TASK-QUEUE.md`
-  deferred bodies, and the sweep found **five**, not the two validate filed: three more
-  naming `gate-payload-disclosure-ruling` and one naming `native-gate-meta-layer-reach`,
-  all phrased in present tense against slugs that are now bare `## Done` lines.
-  `check-spec-pointer` catches none — it reads `§` citations, and all five are bare slug-form.
+  **Re-verified 2026-09-17 at scope: the slug-form residue the 2026-08-03 close counted is GONE.**
+  None of the five present-tense queue citations it found (four naming
+  `gate-payload-disclosure-ruling` or `native-gate-meta-layer-reach`) still stands; the one
+  surviving mention outside this entry is settled-history form, and no amendment file is on disk.
+  The repoint half of the old deliverable is discharged, and this body is cut to the half that
+  remains — the rewrite the lead relayed without operator objection the same day.
   **Recurred 2026-08-06 on a second surface that re-verification did not cover, falsifying its
   "entirely inside `TASK-QUEUE.md`" scoping.** Sibling amendments *inside one iteration* cite
   each other by path, so merge order decides which side dangles: `SPEC-verify-verb.md` cited
@@ -1209,23 +1240,24 @@
   surface is path-form, so unlike the five slug-form instances it is in `check-spec-pointer`'s
   reach — and its cost lands on the session reading the amendment as governing input, not on a
   reader of the queue.
-  **The design question is exactly where those five differ from two that are fine.** The
-  tag algebra's unresolved-token rule *explicitly* sanctions naming landed work: "entries
+  **The design question is where an owner citation differs from a lawful one.** The tag
+  algebra's unresolved-token rule *explicitly* sanctions naming landed work: "entries
   legitimately name a closed defect class, a shipped contract, a settled ruling, and that
-  citation is valuable prose no gate may punish." Two live citations do it correctly — they
-  say a merged slug *holds* a decision, past tense, settled. The five defective ones say a
-  merged slug *rules* something, present tense, as though the reader could go read it. Both
-  forms sit in the tree today, which is the calibration set.
-  **Deliverable:** repoint the five to `TRAJECTORY.md`, then extend `check-amendment-queue`
-  (its `couples=` already reach `TASK-QUEUE.md` and the amendment glob) with an
-  owner-position assertion. Structural removal first, gate second.
+  citation is valuable prose no gate may punish." A lawful citation says a merged slug *holds* a
+  decision, past tense; a defective one says it *rules* something, present tense, as though the
+  reader could go read it. The 2026-08-03 instances are the calibration set, recoverable from git.
+  **Deliverable:** an owner-position assertion in `check-amendment-queue` (its `couples=` already
+  reach `TASK-QUEUE.md` and the amendment glob), so the next dangling owner citation reds.
   **Why `[design-pending]`:** owner position needs a decidable spelling that separates those
   two forms, and tense is not mechanically decidable. The tractable proxy is the
   `§`-heading form and the amendment path form; whether that catches enough of the
   present-tense class to be worth its false-negative surface is the open call, and getting
   it wrong permissively punishes the prose the tag algebra protects.
-  **Cost while deferred:** five false statements stand in the queue, each pointing a future
-  scope at a content-free Done line, and the next merged amendment adds more for free.
+  **Cost while deferred:** nothing stands false today, but each merged amendment can leave a
+  dangling owner citation — in a queue body, or in a sibling amendment read as governing input —
+  and nothing fires.
+  **A unit of `queue-entry-grammar` — operator direction, 2026-09-17, lead-relayed**; its spec
+  stage authors the amendment and pairs the entry.
   Filed 2026-08-03 at close from the gap inbox, merging the validate-filed instances into
   the base class and re-verifying both against the tree; found by build batch 1 and
   validate, corrected and widened at close.
@@ -1373,7 +1405,6 @@
   Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was
   escalated as an envelope call and folded in here on the lead's ruling the same day.
 
-
 - **docs-link-red-remedy-first** [design-pending] [cost: event/high] [surface: site-kit] — `check-docs-link-convention` reds on the
   most ordinary thing a docs subpage author writes, and leads with the diagnosis.
   **Measured 2026-08-09 at spec on a real `init` consumer.** A `docs/` tree whose `index.md`
@@ -1441,7 +1472,6 @@
   surfaces as behavior, not as a red.
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
 
-
 - **vendored-library-identifier-reach** [design-pending] [cost: iteration/low] [surface: doctrine-kit] — De-literalization's reach test gives
   two answers for a vendored `lib/*.sh` function, and the corpus holds both populations.
   The rule bans prose restating a source's **internal** identifier roster while allowing public
@@ -1483,7 +1513,6 @@
   cross-kit shape added, the fork now has a branch no reading answers at all.
   Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it;
   third population added 2026-08-14 by close from the same rostered sweep, which declined again.
-
 
 - **guard-ruleset-registration-lockstep** [design-pending] [cost: event/low] [surface: guard-kit] — guard-kit's generic ruleset exists in
   three places and nothing holds them in lockstep.
@@ -1645,8 +1674,6 @@
   Filed 2026-08-15 by close, draining the gap inbox; mechanism re-derived against
   `gate-sdk/lib/gate.sh` at the drain and the bullet's account corrected here.
 
-
-
 - **in-crate-module-coupling-derivation** [design-pending] [cost: event/low] [surface: gate-sdk] — a ported gate's descriptor can omit
   the crate modules its own verdict depends on, and no gate says so.
   recurrence: in-crate-module-coupling-derivation 2026-08-19
@@ -1746,7 +1773,6 @@
   Filed 2026-08-17 by close, from re-verifying a gap-inbox bullet; both probes were run before
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
-
 
 - **threshold-recurrence-routing-residency** [design-pending] [cost: once/low] [surface: lifecycle-kit] — where the threshold-recurrence
   routing clause lives, now that its only carrier has left the live tree.
@@ -1848,38 +1874,6 @@
   are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
   adopted close's own refusal to take the envelope change alone.
 
-- **deferred-entry-defer-date-unasserted** [design-pending] [cost: iteration/low] [surface: queue-kit] — a deferred entry whose provenance
-  date is malformed reads as **undated**, and no gate reds on it.
-  recurrence: deferred-entry-defer-date-unasserted 2026-08-24
-  **FIRST RECURRENCE 2026-08-24, in a SHAPE no prior instance covers: the spelling was CANONICAL
-  and a LINE WRAP broke it.** At this close a new deferred entry ended a body line on the word
-  `Filed` with `2026-08-24` beginning the next, and the arm listed it `(undated)`. Probed the same
-  way this entry's founding measurement was: moving the marker and the date onto one line dropped
-  the row from the worklist on re-measure. The reading that widens the class — the parse is
-  LINE-SCOPED, so the defect is reachable by ordinary reflow and not only by careless spelling,
-  which means any session that rewraps an entry can silently create one.
-  **PROBED both ways at the 2026-08-18 close, on entries that close itself wrote.** Two of its
-  seven new deferred entries spelled the date `filed 2026-08-18 by close` (lowercase, mid-line)
-  and `Filed at build 2026-08-18` (a word between the marker and the date). Both were listed by
-  `run-gates.sh --emit queue-index --icebox-candidates` with defer-date `(undated)`; rewriting
-  the two lines to the canonical form dropped both from the worklist on re-measure.
-  **The failure is silent by construction.** Such an entry is well-formed to every other gate —
-  the cost field is present, the budget gate is clean, the battery is green.
-  **Cost while deferred:** an undated entry never ages out of the age filter, so it is a
-  permanent icebox candidate *and* is invisible to drift-kit's deferred-age KPI, both readers of
-  the one definition (queue-kit/SPEC.md §The queue format).
-  **Why the fix looks cheap, and what the design still owes.** Every top-level deferred entry
-  resolves a defer date, and `check-queue-entry-budget` already walks every one of them to
-  enforce the cost field — so this reads as one more assertion on an existing walk, the shape of
-  its own assertion (C): a required field whose absence is invisible. What is open is the
-  **holder set**: that same SPEC section names three re-implementations of the definition
-  (queue-kit's, drift-kit's KPI, gate-sdk's `check-gate-exemption-tasks`), so an assertion on one
-  leaves the others parsing the same malformed line their own way.
-  Class: an assertion inside a shipped gate mints no name and is **debt** on that path; a new
-  gate or knob would make it a feature, and the promoting scope call settles it.
-  Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, at its backlog-eviction
-  step; promoted from the gap inbox at this iteration's scope.
-
 - **projection-trigger-witness** [design-pending] [cost: event/low] [surface: docs] — the generated-projections roster states each
   projection's staleness trigger in prose, and nothing checks the prose against the emitter.
   **The missing check class, named because a staleness fix without one forfeits it.** This close
@@ -1938,7 +1932,6 @@
   two-phase upgrade contract exists to convert into a worklist.
   Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
   whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
-
 
 - **prose-tell-threshold-validation** [design-pending] [cost: event/high] [surface: canon-kit] — `check-prose-tells`' numeric thresholds
   are read unvalidated, so a typo turns a calibrated gate into a silent no-op
@@ -3031,7 +3024,6 @@
   Filed 2026-09-12 at build to the gap inbox; promoted here by close after →fix took only the
   history half.
 
-
 - **push-account-selection-has-an-explicit-per-command-form** [design-pending] [cost: event/low] [surface: RELEASING.md]
   — the pre-push account step is check-then-write, and the ops runbook's own open section measures
   the active account re-arming between pushes inside one session, so the check narrows a window it
@@ -3308,6 +3300,8 @@
   **Cost while deferred:** every entry filed at close-stage speed carries premises a session reads
   iterations later with no way to tell how much evidence stood behind them, and the whole
   correction cost falls on the reading stage.
+  **Joins `queue-entry-grammar` — operator direction, 2026-09-17, lead-relayed**; the spec stage
+  authors its amendment and pairs it.
   Iceboxed on the ground that nothing shipped wrong; that ground still holds and is not what
   returned it — the rate did. Recurrence filed 2026-09-16 to the gap inbox by
   `queue-arm-report-fidelity`'s close as the second of its four bullets; returned to this pool at
