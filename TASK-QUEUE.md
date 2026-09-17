@@ -4229,8 +4229,4 @@
 
 ## Done
 
-- scan-prompts-heredoc-grant-split
-- inline-interpreter-substrate-census
-- inline-interpreter-heredoc-unsteered
-
 ## Lessons Learned
