@@ -41,6 +41,20 @@
   Filed 2026-08-03 at close from the gap inbox; recurred 2026-08-06; body cut to the
   owner-position assertion at scope 2026-09-17; paired at spec, unit of `queue-entry-grammar`.
 
+- **queue-entry-evidence-tier** [spec: SPEC-queue-entry-marker.md] — a later reader cannot tell a
+  queue entry's premise written at full evidence from one written at close-stage speed.
+  recurrence: queue-entry-evidence-tier 2026-09-16
+  **The rate:** five filed premises probed false across `queue-arm-report-fidelity`, all caught
+  downstream by re-verification that re-bought every premise; point (7) at
+  `installer-front-door-cut` showed an unconsumed annotation going unused, the half
+  claim-execution-obligations landed for amendments.
+  **Shape — intent-oracle decision (scope's reading, lead-relayed 2026-09-17, revisable, not
+  operator direction):** the inferred marker in queue-entry bodies, with check-stage-entry
+  assertion D widened to the active sections; chosen over a template-only convention and over
+  declining. The compression-signal half is answered by the `entry-history` arm.
+  Filed 2026-08-02 by scope on operator intake; iceboxed, returned 2026-09-16 on a judged
+  recurrence; joined `queue-entry-grammar` by operator direction 2026-09-17; paired at spec.
+
 ## Technical Debt
 
 - **deferred-entry-defer-date-unasserted** — a deferred entry whose provenance
@@ -3195,54 +3209,6 @@
   that case, because the terms it re-reads are the declining session's own.
   Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could not drain
   it; promoted at the following iteration's scope.
-
-- **queue-entry-evidence-tier** [design-pending] [cost: iteration/low] [surface: queue-kit] — nothing signals that an
-  entry's body was compressed, so a later reader cannot tell a premise written at full evidence
-  from one written at close-stage speed.
-  **RETURNED FROM THE ICEBOX 2026-09-16 on a judged recurrence**, by the round trip
-  queue-kit/SPEC.md §The icebox tier conserves: a dated `recurrence:` line is a live trigger, and
-  a one-line entry has nowhere to carry one. The narrowing that iceboxed it is NOT re-opened here;
-  what returned it is the first measured rate to size that narrowing against.
-  **The rate, measured across `queue-arm-report-fidelity`: FIVE filed premises probed FALSE in one
-  iteration**, three corrected by scope and two by spec, one of them the lead unit's core claim.
-  **Every unit survived with a corrected framing and nothing was wasted**, which is why this is a
-  filing-quality datum and not a defect: the re-verification that catches these is all downstream,
-  and it worked five times out of five. What the rate sizes is the narrowing itself — whether a
-  signal at authoring earns its cost when the downstream catch rate is that high.
-  **TWO MORE POINTS AT `installer-front-door-cut`, AND BOTH WIDEN THIS ENTRY'S SUBJECT.**
-  (6) `SPEC-payload-withholding.md` delta 5 tied the presentation gap CAUSALLY to the withholding,
-  implying delta 1 would otherwise break the second shipped member's reason — which one head of a
-  shipped `.gate` file refutes: the descriptor ships, `checks/` is not withheld, the invariant was
-  reachable throughout. **RECURRENCE DECLINED, and the decline is the datum**: the lead filed this
-  as a false premise of unreachability and the spec session proved otherwise (no unreachability
-  claim occurs anywhere in the tree), so it was one OVERSTATED CAUSAL CLAUSE plus a lead relaying an
-  oracle's paraphrase as the tree's words. An overstatement does not count toward the rate.
-  (7) `SPEC-installer-front-door.md` delta 5 gave `check-value-rollup-fresh` a satisfying value
-  grounded on "the footprint's axis is the kit roster, which `installer/` does not join". Measured
-  FALSE at build: `native/src/emit/footprint.rs` derives its set from a `*/SPEC.md` glob over
-  top-level directories, so `installer/` joined the moment the file was named `SPEC.md`, and both
-  `docs/footprint.md` and `docs/value.md` gained a row and needed regeneration — neither on the
-  amendment's update-target roster. **RECURRENCE JUDGED**, idempotent against the date below.
-  **TWO AXES THE CLASS DOES NOT COVER, AND BOTH POINTS SHOW IT.** The subject was filed as a queue
-  ENTRY's compressed body; both of these were **authored in-iteration by a spec-stage AMENDMENT**
-  rather than inherited from an aged entry, and (7) was load-bearing for a delta's REACH — which
-  projections it had to regenerate — rather than for whether the work was worth doing. A signal
-  marking evidence tier on a queue entry alone reaches neither.
-  **WHAT (7) ASKS THAT DETECTION DOES NOT**, and why
-  `survey-inferred-claim-has-no-execution-obligation` was split out rather than folded in: the spec
-  survey flagged that exact claim as inferred-not-executed and said to run the arm before relying on
-  it. The disclaimer did its job; no later stage ran the arm, and align returned zero defects over
-  an amendment carrying a self-declared unrun probe. Executing it cost one emit arm.
-  **Cost while deferred:** every entry filed at close-stage speed carries premises a session reads
-  iterations later with no way to tell how much evidence stood behind them, and the whole
-  correction cost falls on the reading stage.
-  **Joins `queue-entry-grammar` — operator direction, 2026-09-17, lead-relayed**; the spec stage
-  authors its amendment and pairs it.
-  Iceboxed on the ground that nothing shipped wrong; that ground still holds and is not what
-  returned it — the rate did. Recurrence filed 2026-09-16 to the gap inbox by
-  `queue-arm-report-fidelity`'s close as the second of its four bullets; returned to this pool at
-  the following scope, which judged the recurrence.
-  recurrence: queue-entry-evidence-tier 2026-09-16
 
 - **gate-fixture-fanout-arm** [design-pending] [cost: event/low] [surface: gate-sdk] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
