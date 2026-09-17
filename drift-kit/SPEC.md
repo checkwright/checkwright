@@ -370,8 +370,7 @@ Lead:
   deliberately not a count, since with nothing priced the count would be every
   close in history, measuring when the log was started rather than lapse. It is
   the visible half of the meter's feeding obligation (§The stage-economics meter,
-  Feeding): a KPI rather than a freshness gate, on the grounds that paragraph
-  states.
+  Feeding).
 
 Lag:
 
@@ -1404,9 +1403,8 @@ by the advisory contract: the log lives under the gitignored, account-bearing
 `DRIFT_KIT_METRIC_DIR`, absent in CI, so a gate there could only pass vacuously or
 red on a cause no commit produced — the ground §Bundled KPIs already gives for the
 price table, which is why the signal is a KPI. **On-demand only** would cut the
-log's one parsing reader, a lead binding's tier-revert signal, and leave that tier
-with no way to be re-judged. The stage step is the shape the overhead meter's
-per-close run already proves.
+log's decision reader, a lead binding's tier-revert signal, and leave that tier
+with no way to be re-judged.
 
 ## The `/economics` skill
 
