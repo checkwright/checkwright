@@ -4,11 +4,4 @@
 
 ---
 
-queue-entry-grammar scope aba3b980 2026-09-17 e559f31f
-queue-entry-grammar spec ac842d89 2026-09-17 ab533ee2
-queue-entry-grammar align a1978e8b 2026-09-17 f357de76
-queue-entry-grammar build a72396f2 2026-09-17 99d8341e
-queue-entry-grammar build af235948 2026-09-17 65c72068
-queue-entry-grammar build a6ab15e9 2026-09-17 fa92a6e5
-queue-entry-grammar validate add84c57 2026-09-17 ac5e67df
-queue-entry-grammar close afb94bcc 2026-09-17 dbdbc18b
+— scope a3cef882 2026-09-17 bfa7a0e9
