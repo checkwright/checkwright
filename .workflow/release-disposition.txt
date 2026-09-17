@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-install-smoke-slow-leg release none — all three note sections None: the iteration batches the consumer smoke's manifest hash, adds its scratch witness and fixes the batch's stdin path spelling on MSYS, all inside the repo's own smoke harness outside the npm files set, plus installer/SPEC.md prose; no gate, knob or shipped behavior changed and no release declaration was appended. The outstanding deferred:v0.26.0 floor stands, read from disposition history, and no release trigger fired.
