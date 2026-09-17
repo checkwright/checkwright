@@ -35,34 +35,6 @@
 
 ## Technical Debt
 
-- **baseline-move-stales-evidence-line** — promoting a task and moving a suite's
-  baseline is not enough to close: the evidence line already recorded against the *old* baseline is
-  stale, and nothing says so until the entry gate refuses a second time for a different reason.
-  **Promoted 2026-09-17 at scope as debt — operator direction, 2026-09-17, lead-relayed**, unit of
-  `validate-red-holding`: the recipe and help-text widening add no name, so no amendment is owed.
-  **The second face of `close-entry-baseline-bootstrap-deadlock`**, which owned the first (close is
-  the only stage that may file the blocking slug, and cannot enter without it) and has since been
-  ruled and retired. Its fix addressed the first face and left this one standing, which is why this
-  was filed apart rather than folded in, and is why the retirement does not carry it away.
-  **The mechanism.** A recorded verdict is *relative* to whichever baseline was live when the suite
-  ran, so moving a suite from `pass` to a slug-carrying `fail` invalidates every line computed
-  before the move. `check-evidence-manifest`'s close-entry assertion then still refuses on "no clean
-  evidence line" with the promotion and the baseline row both correctly landed — the refusal a
-  session reads as the first fix having failed.
-  **Attested, not predicted:** hit at this iteration's validate/close boundary. The first refusal
-  was fixed by `f8c34c20` + `f5664bbf`; a `--simulate close` recheck still refused, for a second
-  reason nothing had flagged, forcing a round trip the recipe would have saved.
-  **Re-verified at this drain; both claims hold.** No promote → baseline → fresh-evidence recipe
-  exists anywhere in `evidence-kit/SPEC.md`, and `check-evidence-baseline`'s own help
-  (`native/src/gates/evidence_baseline.rs:224`) names the line grammar, the liveness requirement
-  and the human-commit rule — never the evidence manifest as the other surface a promotion stales.
-  **Deliverable, enforcement-first shaped:** document the three-step recipe wherever the
-  deferred-known-red path is described, *and* widen that help text to name the manifest, so the
-  session that reaches the second refusal is told by the gate rather than by a round trip.
-  **Cost while deferred:** one wasted close-entry round trip per iteration that ends non-clean,
-  landing on top of the operator interrupt the first face already charges for the same boundary.
-  Filed 2026-08-18 by close, draining the gap inbox; the first face stamped as a recurrence there.
-
 ## Deferred
 
 - **allow-match-colon-star-over-grants** [design-pending] [cost: event/low] [surface: guard-kit] —
@@ -3826,5 +3798,6 @@
 ## Done
 
 - validate-hold-rule-admits-iteration-caused-red
+- baseline-move-stales-evidence-line
 
 ## Lessons Learned

@@ -206,7 +206,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: record a --run-validate evidence line per suite before the close entry is stamped; the entry stamp proves invocation, the evidence line proves the green result");
+        println!("  help: record a --run-validate evidence line per suite before the close entry is stamped; the entry stamp proves invocation, the evidence line proves the green result; a line recorded before a baseline row moved keeps the old baseline's verdict, so after deferring a known red (file the task, move the row) re-run that suite for a fresh line (evidence-kit/SPEC.md §check-evidence-manifest)");
         return Ok(1);
     }
     println!("EVIDENCE-MANIFEST: clean (grammar + close-entry/stamp-coupling hold for '{}' at stage '{}' in {})", iter, stage, manifest);

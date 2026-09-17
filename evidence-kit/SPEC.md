@@ -290,7 +290,7 @@ carrying it is red, and a fifth field of any other shape, or a sixth field, is a
 grammar error. The token is optional, so a baseline with no flips never mentions
 it and an older row needs no migration.
 Tooling never writes it — a promotion (a held-constant red recovering to pass)
-is a human commit, which is what keeps the baseline honest.
+is a human commit, which is what keeps the baseline honest. Any row move also stales the suite's recorded evidence line; the deferral recipe that re-records it is §check-evidence-manifest's.
 
 **The fail-closed rule keys on `fail` alone, and one consequence of that reads
 back onto a tool's argument grammar rather than onto this file.** An observed set
@@ -840,6 +840,27 @@ through the three path knobs instead, which is the branch the production battery
 takes; the positional arm keeps its coverage in
 `gate-tests/check-evidence-manifest.test.sh`, which also owns the close-entry
 and stamp-coupling assertions.
+
+**Moving a baseline row stales every evidence line recorded before the move.** A
+line's verdict is relative to the baseline live when its suite ran, and the
+manifest records that verdict rather than recomputing it. So when a known red is
+deferred rather than fixed — the scenario moved from `pass` to a slug-carrying
+`fail`/`ignore` — the suite's recorded line still carries the non-clean verdict of
+the old baseline, and (A) keeps refusing the close entry with "no clean evidence
+line" even though the task and the row both landed. The deferral is three steps,
+in order, before the close entry is stamped:
+
+1. **File the blocking task** the row will name, so the slug resolves to a live
+   queue entry (§check-evidence-baseline's liveness).
+2. **Move the baseline row** to `fail`/`ignore <slug>`, with
+   `reproduces-at=<rev>` where §check-evidence-baseline's flip assertion binds
+   it, by human commit (§Baseline manifest).
+3. **Re-run the suite** with `--run-validate` and commit the fresh evidence line,
+   which the moved baseline now diffs clean.
+
+Stopping after step 2 is what reads as the first fix having failed: the refusal
+repeats for a reason neither landed change names. Both gates' help text names
+step 3 for that reason.
 
 **A pre-flight caller names this gate, never its declaration path, and the port
 is what made that binding.** `LIFECYCLE_KIT_ENTRY_PREFLIGHT`

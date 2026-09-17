@@ -343,7 +343,7 @@ pub fn run(args: &[String]) -> i32 {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: each line is '{}'; a fail/ignore carries a live blocking slug; a row held red that passed at the iteration start carries reproduces-at=<rev> naming a commit at or before that start where its red reproduces (else it is a regression to fix); every configured suite owes at least one row, bought by configuring a parser rather than by hand-authoring rows; the baseline is edited by human commit only", GRAMMAR);
+        println!("  help: each line is '{}'; a fail/ignore carries a live blocking slug; a row held red that passed at the iteration start carries reproduces-at=<rev> naming a commit at or before that start where its red reproduces (else it is a regression to fix); every configured suite owes at least one row, bought by configuring a parser rather than by hand-authoring rows; the baseline is edited by human commit only, and moving a row stales every evidence line recorded against the old baseline, so re-run the suite with --run-validate and commit a fresh line in the evidence manifest before the close entry (evidence-kit/SPEC.md §check-evidence-manifest)", GRAMMAR);
         return 1;
     }
     println!(
