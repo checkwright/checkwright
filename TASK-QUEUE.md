@@ -3860,17 +3860,4 @@
 
 ## Done
 
-- readme-roster-enum-coverage
-- prose-enum-common-word-tag-members
-- unqualified-section-citation-liveness
-- spec-pointer-self-section-citation
-- link-wrapped-section-citation-liveness
-- spec-section-title-collision
-- qualified-pointer-section-ownership
-- prose-filename-citation-liveness
-- retired-slug-live-pointer-citation
-- queue-status-parenthetical-liveness
-- done-slug-ownership-citation-report
-- citation-liveness-family-convergence
-
 ## Lessons Learned
