@@ -2137,12 +2137,12 @@
   **Why `[design-pending]`:** the second is a one-paragraph boundary note plus a sweep of unknown
   size, and whether a bare "rule N" outside the kit is gateable at all needs a false-positive
   budget nobody has measured.
-  **THIS ENTRY AND ITS `guard-rule-number-intra-kit-citations-ungated` SIBLING ARE THE (D) ISLAND
-  of `citation-liveness-family-convergence`, and its LONG POLE rather than an equal quarter** —
+  **THIS ENTRY AND ITS `guard-rule-number-intra-kit-citations-ungated` SIBLING WERE THE (D) ISLAND
+  of `citation-liveness-family-convergence`, which landed 2026-09-17 with (A)-(C) only** —
   grounds relocated here 2026-09-08 from that hub, under `check-queue-entry-budget`'s rule that an
-  unanswered ground moves to the entry already owning its subject. Slices (A)-(C) widen gates that
+  unanswered ground moves to the entry already owning its subject. Slices (A)-(C) widened gates that
   already resolve citations; (D) has no gate to widen and an unmeasured false-positive budget over
-  111 intra-kit citations. Never average it into that family's size floor.
+  111 intra-kit citations, so it stays open here.
   **Cost while deferred:** a reader follows the number to the wrong rule and reasons from it.
   recurrence: guard-rule-number-not-citable-outside-kit 2026-08-29
   Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the

@@ -2218,7 +2218,11 @@ so the verdict never depends on another kit's knobs and the kit vendors alone.
 The knob ships empty, and it stays apart from the membership surfaces, because
 emphasis in bold code on a SPEC is not a queue claim. The retired set is the
 shared adapter's, so a missing `git` or a shallow clone under-reds and never
-invents.
+invents. The live-name test reads the tracked listing, which the descriptor does
+not couple: a commit deleting the last file named after a retired slug, and
+touching no citation surface, does not fire the gate at pre-commit, so that
+citation reds at the next full battery. Coupling every path would run the gate on
+every commit for an event that nearly always rides a SPEC edit anyway.
 
 **Assertion C, the status parenthetical.** Inside the queue file, a cited slug
 followed by exactly `(<status>)` (one space allowed before it) must be where the
