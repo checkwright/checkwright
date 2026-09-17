@@ -5,3 +5,4 @@
 ---
 
 validate-red-holding scope a008e311 2026-09-17 af66137c
+validate-red-holding spec a930cb79 2026-09-17 66682ce6
