@@ -254,7 +254,10 @@ The paragraph "**`python3 -` bodies are not steered, because no target exists ye
   and a line logged before the upgrade may mis-decode until the next close clears the log. Rule 8 now
   blocks an inline python literal rewrite, which a committed `Bash(python3 -*)` grant previously let
   through. No action is required.
-- `guard-kit/SPEC.md` §Testing, where it describes the parity corpus's newline-free scope.
+- `guard-kit/gate-tests/guard-lib-parity.test.sh`'s own header comment, which states the corpus's
+  newline-free scope and the `newline-out-of-contract` refusal it asserts. No `guard-kit/SPEC.md`
+  passage carries this claim — it lives only in that comment, already this file's roster entry
+  under deltas 2 and 5, so this bullet names no edit beyond what that entry already owns.
 
 ## Producers and consumers
 
@@ -300,7 +303,9 @@ Roster derivations, re-derived by the build:
   `guard_skeleton` and `guard_split_compound` bullets (delta 2).
 - `guard-kit/SPEC.md` — §scan-prompts: the reachability paragraph, the grant-test paragraph and the
   definitional-step record (delta 3).
-- `guard-kit/SPEC.md` — §The generic ruleset's rule 8 (delta 4) and §Testing (delta 6).
+- `guard-kit/SPEC.md` — §The generic ruleset's rule 8 (delta 4). No §Testing edit is owed: the
+  parity corpus's newline-free scope is stated only in `guard-lib-parity.test.sh`'s own comment
+  (delta 2/5's roster entry below), not in this SPEC.
 - `guard-kit/lib/guard.sh` — `guard_log_fallthrough` (delta 1); `_guard_heredoc_body`, the python row
   of `_guard_program_operands` and rule 8's python arm (delta 4).
 - `native/src/guard.rs` — `skeleton`, `split_compound`, their tests and the retired error type
