@@ -16,6 +16,21 @@
 
 ## Deferred
 
+- **allow-match-colon-star-over-grants** [design-pending] [cost: event/low] [surface: guard-kit] —
+  `guard_allow_match` and its compiled twin normalize the harness `:*` prefix idiom to a trailing
+  `*` (guard-kit/SPEC.md §The guard framework), but a `claude -p` probe found `Bash(python3 -:*)`
+  does not grant `python3 -c`, so the harness `:*` looks word-bounded and the normalization models
+  a consumer's `:*` grant wider than the harness grants it (`printf:*` would admit `printfx`).
+  **Carried as a claim:** the probe ran at `interpreter-steer-census`'s build and its output died
+  with that iteration's scratch; one re-run settles the boundary rule before any fix.
+  **Why [design-pending]:** the fix rewrites the SPEC's stated equivalence and both twins, and
+  whether the boundary is a space, end of string, or any non-word character is the harness's call.
+  **Cost while deferred:** compare-settings-allow can call a narrower grant redundant and rule 20
+  can treat an ungranted spelling as silently granted; no `:*` entry is committed here, so nothing
+  mis-ranks today.
+  Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s close; promoted at the next
+  scope.
+
 - **native-windows-bash-floor** [design-pending] [cost: event/high] [surface: gate-sdk] — after the
   config bridge retires, a native-Windows runtime still needs bash in three places: the
   `bin/run-gates.sh` front-end stub, which locates the binary before any binary runs; the two
