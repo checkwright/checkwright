@@ -1538,7 +1538,7 @@ list does not name one for:
   `records=1` it names the candidate set and not the match.** The hook holds no
   reading that distinguishes them — `check-producer-liveness` does print the
   matched record on stdout, and the bounded call discards that stream (§The
-  bounded call stays) — so claiming the set were the match would be a claim the
+  turn-end liveness hook, *The bounded call stays*) — so claiming the set were the match would be a claim the
   discarded output cannot support. A superset is strictly more than the nothing
   the record carried before it, which is what makes the field worth its column
   anyway.
@@ -1646,8 +1646,9 @@ closed by a finding rather than by a choice.** Of its three candidates:
   `check-producer-liveness` in set mode does print the matched record, its run key
   and its pid — on a stdout that goes nowhere. Recovering it would need either a
   bounded **and capturing** call, where the bound is itself load-bearing (§The
-  bounded call stays), or the hook parsing records for itself, which §The liveness
-  reading reuses `check-producer-liveness` forbids outright as a third copy of a
+  turn-end liveness hook, *The bounded call stays*), or the hook parsing records
+  for itself, which *The liveness reading reuses `check-producer-liveness`* (same
+  section) forbids outright as a third copy of a
   grammar evidence-kit owns. So this candidate is not one table edit and never
   was, and that is recorded here so the next reader finds it costed.
 - **The record set stands in for it**, which is what `runs` above is: the same
@@ -1658,7 +1659,8 @@ closed by a finding rather than by a choice.** Of its three candidates:
 
 What remains open is narrower than it was: not *can this record be extended*, and
 not *what stands in for the matched key*, but only whether any **payload** field
-attributes a firing — which §`session` holds is unsettleable from this tree.
+attributes a firing — which the `session` field's bullet above holds is
+unsettleable from this tree.
 
 **One value's spelling moved with the substrate and is recorded rather than left
 to be noticed.** `keys` is the payload's top-level key set **sorted**, where the

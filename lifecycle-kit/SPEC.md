@@ -4242,8 +4242,8 @@ a false clean.
 
 `LIFECYCLE_KIT_SHIM_NGRAM` is calibrated to the smallest window with zero false
 positives on the post-rewrite corpus, with a floor of 8 words so a citation line
-(a path plus a §heading) never fires — this repo's default is 9, the width at
-which the 8-word §heading `This repo is governed by its own kits` stops
+(a path plus a `§<heading>`) never fires — this repo's default is 9, the width at
+which the 8-word heading `This repo is governed by its own kits` stops
 tripping. Honest limit: the n-gram holds the *copy shape* only. Which tier a
 fact belongs to stays semantic judgment — a paraphrase below N words passes the
 gate and is still a defect to fix on sight (the same doctrine as
@@ -4713,7 +4713,7 @@ shim↔template slot parity.
 nothing).** A binding a slot supplies carries only what is local to this
 consumer — the residue: which surfaces to sweep, which config knobs, which log
 sinks. Procedure and always-loaded fact that a kit template or the consumer's
-`CLAUDE.md` already owns are named by a citation (a path plus a §heading), never
+`CLAUDE.md` already owns are named by a citation (a path plus a `§<heading>`), never
 copied into the shim: a shim is loaded on every stage invocation, so a
 restatement there is a per-session token tax on a fact with an owner, and it
 drifts the moment the owner changes. `check-shim-restatement` is the tripwire

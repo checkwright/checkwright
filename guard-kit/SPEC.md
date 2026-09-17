@@ -1866,7 +1866,7 @@ the first; whether a mechanism *outside* a consumer's tree blocks a foreground
 coverage claim on one. The rule is built as though nothing outside the tree
 enforced it — the only construction that is correct whichever way that resolves.
 
-### Consumer rules
+### Writing a consumer rule
 
 Project rules — build-cache hygiene, container-build concurrency,
 test-suite serialization, disk reclaim, tool-specific steering — live in a

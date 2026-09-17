@@ -1,8 +1,8 @@
 // spec: canon-kit/SPEC.md §check-spec-pointer — every spec:/contract: directive on a governed
-// source and every free-prose <path>.md §<heading> citation on a governed manifest resolves
+// source and every free-prose §<heading> citation on a governed manifest resolves
 use crate::proc;
 use crate::spec;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
 pub fn run(args: &[String]) -> i32 {
@@ -34,7 +34,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Some(o) => String::from_utf8_lossy(o).into_owned(),
         None => return Err("git ls-files failed".to_string()),
     };
-    let tracked: Vec<&str> = raw.split('\0').filter(|s| !s.is_empty()).collect();
+    let tracked: HashSet<&str> = raw.split('\0').filter(|s| !s.is_empty()).collect();
 
     let whitelist = spec::knob_array_pub("CANON_KIT_COMMENT_WHITELIST")?;
     let mut headings: HeadingCache = HeadingCache::default();
@@ -46,7 +46,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let spec_name = spec::spec_name()?;
 
     for f in spec::comment_surface(root, false)? {
-        let rel = spec::strip_dot_slash(f.strip_prefix(&format!("{}/", root)).unwrap_or(&f));
+        let rel = rel_of(root, &f);
         if spec::comment_whitelisted(&rel, &whitelist) {
             continue;
         }
@@ -93,7 +93,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 ));
                 continue;
             }
-            if !tracked.iter().any(|t| *t == path) {
+            if !tracked.contains(path.as_str()) {
                 errors.push(format!("{}:{}: target file untracked: {}", rel, lineno, path));
                 continue;
             }
@@ -109,36 +109,59 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     // spec: canon-kit/SPEC.md §check-spec-pointer — the prose-citation pass in prefix mode over
-    // the manifest set; an untracked cited path is out of scope
+    // the manifest set; an untracked adjacent path is out of scope, an untracked link target
+    // drops to the unqualified form
     let manifest_files = spec::manifest_files(root)?;
     let mut prose_cites = 0usize;
+    let mut unqualified = 0usize;
     let manifests = manifest_files.len();
-    for cite in prose_citations(&manifest_files)? {
-        if !Path::new(&format!("{}/{}", root, cite.path)).is_file() {
-            continue;
+    let mut union: Vec<Heading> = Vec::new();
+    for m in &manifest_files {
+        let mf = m.display().to_string();
+        let hs = headings.headings(&mf)?;
+        union.extend(hs.iter().cloned());
+        // spec: canon-kit/SPEC.md §check-spec-pointer — a title names one section per file
+        let mut seen: HashMap<&str, usize> = HashMap::new();
+        for h in hs {
+            match seen.get(h.stripped.as_str()) {
+                Some(first) => errors.push(format!(
+                    "{}:{},{}: heading title carried twice in one file: {}",
+                    rel_of(root, &mf),
+                    first,
+                    h.line,
+                    h.stripped
+                )),
+                None => {
+                    seen.insert(h.stripped.as_str(), h.line);
+                }
+            }
         }
-        if !tracked.iter().any(|t| *t == cite.path) {
-            continue;
-        }
-        prose_cites += 1;
-        if cite.frag.is_empty() {
-            continue;
-        }
-        if !headings.present(
-            &format!("{}/{}", root, cite.path),
-            &cite.frag,
-            Mode::Prefix,
-        )? {
-            let prel = spec::strip_dot_slash(
-                cite.file
-                    .strip_prefix(&format!("{}/", root))
-                    .unwrap_or(&cite.file),
-            );
-            let shown: String = cite.frag.chars().take(50).collect();
-            errors.push(format!(
-                "{}:{}: §heading not found in {}: §{}",
-                prel, cite.line, cite.path, shown
-            ));
+    }
+    for cite in prose_citations(root, &manifest_files, &tracked)? {
+        let prel = rel_of(root, &cite.file);
+        let shown: String = cite.frag.chars().take(50).collect();
+        match &cite.path {
+            Some(path) => {
+                prose_cites += 1;
+                if cite.frag.is_empty() {
+                    continue;
+                }
+                if !headings.present(&format!("{}/{}", root, path), &cite.frag, Mode::Prefix)? {
+                    errors.push(format!(
+                        "{}:{}: §heading not found in {}: §{}",
+                        prel, cite.line, path, shown
+                    ));
+                }
+            }
+            None => {
+                unqualified += 1;
+                if !union.iter().any(|h| h.prefix_of(&cite.frag)) {
+                    errors.push(format!(
+                        "{}:{}: §heading in no governed file: §{}",
+                        prel, cite.line, shown
+                    ));
+                }
+            }
         }
     }
 
@@ -147,14 +170,18 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: a spec:/contract: directive and a free-prose <path>.md §<heading> citation each bind a site to the requirement that governs it — the binding is only live if it resolves. Fix the <path> (repo-relative, tracked) or the §<heading> to name the current target, or drop the § fragment for a file-only pointer. A renamed heading updates every inbound pointer and citation in the same commit.");
+        println!("  help: a spec:/contract: directive and a free-prose <path>.md §<heading> citation each bind a site to the requirement that governs it — the binding is only live if it resolves. Fix the <path> (repo-relative, tracked) or the §<heading> to name the current target, or drop the § fragment for a file-only pointer; a § with no path must name a heading some governed file carries, and a title carried twice in one file is renamed apart. A renamed heading updates every inbound pointer and citation in the same commit.");
         return Ok(1);
     }
     println!(
-        "SPEC-POINTER: clean ({} directive pointer(s) across {} governed source(s), {} version-marker header(s) skipped as naming no path, {} naming a withheld kit SPEC; {} prose citation(s) across {} manifest file(s); every target file tracked and named §heading present)",
-        pointers, scanned, markers, withheld, prose_cites, manifests
+        "SPEC-POINTER: clean ({} directive pointer(s) across {} governed source(s), {} version-marker header(s) skipped as naming no path, {} naming a withheld kit SPEC; {} path-qualified and {} unqualified prose citation(s) across {} manifest file(s); every target file tracked, named §heading present, no title carried twice in one file)",
+        pointers, scanned, markers, withheld, prose_cites, unqualified, manifests
     );
     Ok(0)
+}
+
+fn rel_of(root: &str, f: &str) -> String {
+    spec::strip_dot_slash(f.strip_prefix(&format!("{}/", root)).unwrap_or(f))
 }
 
 // spec: canon-kit/SPEC.md §check-spec-pointer — the withheld predicate: the target is a kit root's
@@ -271,38 +298,49 @@ fn target(after: &str) -> (String, String) {
 struct Cite {
     file: String,
     line: usize,
-    path: String,
+    path: Option<String>,
     frag: String,
 }
 
-// spec: canon-kit/SPEC.md §check-spec-pointer — shape-only extraction of prose <path>.md §
-// citations over the blank-line paragraph join, fenced code skipped; the fragment is the whole
-// tail after the §, which the prefix-mode resolver reads a heading off
-fn prose_citations(files: &[std::path::PathBuf]) -> Result<Vec<Cite>, String> {
+// spec: canon-kit/SPEC.md §check-spec-pointer — shape-only extraction of the three prose citation
+// forms over the blank-line paragraph join, fenced code skipped; the fragment is the whole tail
+// after the §, which the prefix-mode resolver reads a heading off
+fn prose_citations(
+    root: &str,
+    files: &[std::path::PathBuf],
+    tracked: &HashSet<&str>,
+) -> Result<Vec<Cite>, String> {
     let mut out: Vec<Cite> = Vec::new();
     for p in files {
         let f = p.display().to_string();
+        let rel = rel_of(root, &f);
         let text = spec::read_text(p)?;
         let mut fence = false;
         let mut para: Vec<(usize, String)> = Vec::new();
         for (idx, raw) in text.lines().enumerate() {
             if spec::is_fence_line(raw) {
-                flush(&f, &mut para, &mut out);
+                flush(&f, &rel, tracked, &mut para, &mut out);
                 fence = !fence;
                 continue;
             }
             if fence || spec::is_blank(raw) {
-                flush(&f, &mut para, &mut out);
+                flush(&f, &rel, tracked, &mut para, &mut out);
                 continue;
             }
             para.push((idx + 1, raw.to_string()));
         }
-        flush(&f, &mut para, &mut out);
+        flush(&f, &rel, tracked, &mut para, &mut out);
     }
     Ok(out)
 }
 
-fn flush(file: &str, para: &mut Vec<(usize, String)>, out: &mut Vec<Cite>) {
+fn flush(
+    file: &str,
+    rel: &str,
+    tracked: &HashSet<&str>,
+    para: &mut Vec<(usize, String)>,
+    out: &mut Vec<Cite>,
+) {
     if para.is_empty() {
         return;
     }
@@ -320,64 +358,137 @@ fn flush(file: &str, para: &mut Vec<(usize, String)>, out: &mut Vec<Cite>) {
             joined.push_str(text);
         }
     }
-    let b = joined.as_bytes();
-    let mut scan = 0usize;
-    while scan < b.len() {
-        let (ms, me, path) = match md_ref(b, scan) {
-            Some(v) => v,
-            None => break,
-        };
+    let line_of = |at: usize| {
         let mut li = 0usize;
         for (i, s) in lstart.iter().enumerate() {
-            if *s <= ms {
+            if *s <= at {
                 li = i;
             }
         }
-        out.push(Cite {
-            file: file.to_string(),
-            line: para[li].0,
-            path,
-            frag: joined[me..].to_string(),
-        });
-        scan = me;
+        para[li].0
+    };
+    let b = joined.as_bytes();
+    let mut cites: Vec<Cite> = Vec::new();
+    for (at, _) in joined.match_indices('§') {
+        let frag = joined[at + "§".len()..].to_string();
+        let gap = back_space(b, at);
+        if let Some((start, path)) = adjacent_path(b, gap) {
+            if tracked.contains(path.as_str()) {
+                cites.push(Cite {
+                    file: file.to_string(),
+                    line: line_of(start),
+                    path: Some(path),
+                    frag,
+                });
+            }
+            continue;
+        }
+        let mut at_line = at;
+        if let Some((start, target)) = link_target(b, gap) {
+            at_line = start;
+            if let Some(path) = link_path(rel, &target).filter(|p| tracked.contains(p.as_str())) {
+                cites.push(Cite {
+                    file: file.to_string(),
+                    line: line_of(start),
+                    path: Some(path),
+                    frag,
+                });
+                continue;
+            }
+        }
+        // spec: canon-kit/SPEC.md §check-spec-pointer — a fragment not opening with a letter, a
+        // digit or a backtick is a placeholder or the mark itself, and so is a § quoted inside a
+        // code span
+        let in_span = b[..at].iter().filter(|&&c| c == b'`').count() % 2 == 1;
+        if !in_span
+            && frag
+                .chars()
+                .next()
+                .is_some_and(|c| c.is_alphanumeric() || c == '`')
+        {
+            cites.push(Cite {
+                file: file.to_string(),
+                line: line_of(at_line),
+                path: None,
+                frag,
+            });
+        }
     }
+    out.extend(cites);
     para.clear();
 }
 
-// spec: canon-kit/SPEC.md §check-spec-pointer — `[A-Za-z0-9._/-]+\.md[[:space:]]*§`, leftmost;
-// the returned end is one past the § so the fragment is the remainder of the joined paragraph
-fn md_ref(b: &[u8], from: usize) -> Option<(usize, usize, String)> {
+fn back_space(b: &[u8], mut k: usize) -> usize {
+    while k > 0 && matches!(b[k - 1], b' ' | b'\t') {
+        k -= 1;
+    }
+    k
+}
+
+// spec: canon-kit/SPEC.md §check-spec-pointer — `[A-Za-z0-9._/-]+\.md[[:space:]]*§`: the maximal
+// path-token run ending at the gap before the § must end in `.md`, bare or as a whole code span
+fn adjacent_path(b: &[u8], gap: usize) -> Option<(usize, String)> {
     let tok = |c: u8| c.is_ascii_alphanumeric() || matches!(c, b'.' | b'_' | b'/' | b'-');
-    let mut i = from;
-    while i < b.len() {
-        if !tok(b[i]) || (i > 0 && tok(b[i - 1]) && i > from) {
-            i += 1;
-            continue;
-        }
-        let mut j = i;
-        let mut best: Option<usize> = None;
-        while j < b.len() && tok(b[j]) {
-            j += 1;
-            if j >= 3 && &b[j - 3..j] == b".md" {
-                best = Some(j);
-            }
-        }
-        if let Some(end) = best {
-            let mut k = end;
-            while k < b.len() && matches!(b[k], b' ' | b'\t') {
-                k += 1;
-            }
-            if b[k..].starts_with("§".as_bytes()) {
-                return Some((
-                    i,
-                    k + "§".len(),
-                    String::from_utf8_lossy(&b[i..end]).into_owned(),
-                ));
-            }
-        }
-        i += 1;
+    let quoted = gap > 0 && b[gap - 1] == b'`';
+    let end = if quoted { gap - 1 } else { gap };
+    let mut i = end;
+    while i > 0 && tok(b[i - 1]) {
+        i -= 1;
+    }
+    if quoted && (i == 0 || b[i - 1] != b'`') {
+        return None;
+    }
+    if end - i > 3 && b[..end].ends_with(b".md") {
+        return Some((i, String::from_utf8_lossy(&b[i..end]).into_owned()));
     }
     None
+}
+
+// spec: canon-kit/SPEC.md §check-spec-pointer — a markdown link `[..](<target>)` closing at the gap
+// before the §; the target is the link's first space-separated word, as check-md-refs reads it
+fn link_target(b: &[u8], end: usize) -> Option<(usize, String)> {
+    if end == 0 || b[end - 1] != b')' {
+        return None;
+    }
+    let close = end - 1;
+    let mut q = close;
+    while q >= 2 {
+        q -= 1;
+        if b[q] == b')' {
+            return None;
+        }
+        if b[q] == b'(' && b[q - 1] == b']' {
+            let inner = String::from_utf8_lossy(&b[q + 1..close]).into_owned();
+            let tgt = inner.split(' ').next().unwrap_or("").to_string();
+            let open = b[..q - 1].iter().rposition(|&c| c == b'[').unwrap_or(q - 1);
+            return (!tgt.is_empty()).then_some((open, tgt));
+        }
+    }
+    None
+}
+
+// spec: canon-kit/SPEC.md §check-spec-pointer — the link target resolved from the citing file's
+// directory with its `#anchor` stripped; a URL or a path climbing out of the tree resolves to none
+fn link_path(citing_rel: &str, target: &str) -> Option<String> {
+    if target.contains("://") || target.starts_with("mailto:") {
+        return None;
+    }
+    let path = target.split('#').next().unwrap_or("");
+    if path.is_empty() {
+        return None;
+    }
+    let dir = citing_rel.rsplit_once('/').map(|(d, _)| d).unwrap_or("");
+    let mut stack: Vec<&str> = Vec::new();
+    for seg in dir.split('/').chain(path.split('/')) {
+        match seg {
+            "" | "." => {}
+            ".." => {
+                stack.pop()?;
+            }
+            s => stack.push(s),
+        }
+    }
+    Some(stack.join("/"))
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -387,22 +498,55 @@ enum Mode {
 }
 
 // spec: canon-kit/SPEC.md §check-spec-pointer — one resolver, two callers: the directive pass
-// matches the fragment whole, the prose pass as a boundary-anchored prefix; both tolerate a
-// trailing "(qualifier)"
+// matches the fragment whole, the prose pass as a boundary-anchored prefix that also takes a lead
+// clause; both tolerate a trailing "(qualifier)"
+#[derive(Clone)]
+struct Heading {
+    line: usize,
+    text: String,
+    stripped: String,
+    lead: Option<String>,
+}
+
+impl Heading {
+    fn prefix_of(&self, frag: &str) -> bool {
+        is_prefix(frag, &self.text)
+            || is_prefix(frag, &self.stripped)
+            || self.lead.as_deref().is_some_and(|l| is_prefix(frag, l))
+    }
+}
+
 #[derive(Default)]
 struct HeadingCache {
-    files: HashMap<String, Vec<(String, String)>>,
+    files: HashMap<String, Vec<Heading>>,
 }
 
 impl HeadingCache {
-    fn headings(&mut self, file: &str) -> Result<&Vec<(String, String)>, String> {
+    fn headings(&mut self, file: &str) -> Result<&Vec<Heading>, String> {
         if !self.files.contains_key(file) {
             let text = spec::read_text(Path::new(file))?;
-            let mut v: Vec<(String, String)> = Vec::new();
-            for line in text.lines() {
+            let markdown = file.ends_with(".md");
+            let mut fence = false;
+            let mut v: Vec<Heading> = Vec::new();
+            for (idx, line) in text.lines().enumerate() {
+                // spec: canon-kit/SPEC.md §check-spec-pointer — a fenced line of a markdown file is
+                // never a heading
+                if markdown && spec::is_fence_line(line) {
+                    fence = !fence;
+                    continue;
+                }
+                if fence {
+                    continue;
+                }
                 if let Some(h) = heading_text(line) {
-                    let hs = strip_qualifier(&h);
-                    v.push((h, hs));
+                    let stripped = strip_qualifier(&h);
+                    let lead = lead_clause(&h);
+                    v.push(Heading {
+                        line: idx + 1,
+                        text: h,
+                        stripped,
+                        lead,
+                    });
                 }
             }
             self.files.insert(file.to_string(), v);
@@ -413,14 +557,25 @@ impl HeadingCache {
     fn present(&mut self, file: &str, frag: &str, mode: Mode) -> Result<bool, String> {
         let stripped = strip_qualifier(frag);
         let hs = self.headings(file)?;
-        Ok(hs.iter().any(|(h, hstripped)| {
+        Ok(hs.iter().any(|h| {
             if mode == Mode::Prefix {
-                is_prefix(frag, h) || is_prefix(frag, hstripped)
+                h.prefix_of(frag)
             } else {
-                h == frag || hstripped == frag || *h == stripped || *hstripped == stripped
+                h.text == frag || h.stripped == frag || h.text == stripped || h.stripped == stripped
             }
         }))
     }
+}
+
+// spec: canon-kit/SPEC.md §check-spec-pointer — the text before the first comma, em dash or colon,
+// kept only when it is shorter than the heading
+fn lead_clause(h: &str) -> Option<String> {
+    let cut = [", ", " — ", ": "]
+        .iter()
+        .filter_map(|sep| h.find(sep))
+        .min()?;
+    let lead = h[..cut].trim_end();
+    (!lead.is_empty()).then(|| lead.to_string())
 }
 
 fn heading_text(line: &str) -> Option<String> {

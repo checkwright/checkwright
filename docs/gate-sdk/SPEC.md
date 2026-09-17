@@ -3994,7 +3994,8 @@ that answers each is the one whose corpus matches its question.
    normalised root and prune nothing at all. A disagreement is a finding to
    adjudicate against the rule, never a defect in whichever side moved.
 
-   **This is not §Meta-gate conservation's *substrate-sensitive* set, and reading
+   **This is not the *substrate-sensitive* set of §Meta-gate conservation for the
+   binary substrate, and reading
    the two as one term is the defect this wording exists to close.** That set is
    derived from a member's expanded `couples=` and is deliberately **trigger**-shaped:
    assertion C's job is anti-vacuity — a member whose *re-run trigger* reaches a
@@ -4026,7 +4027,7 @@ that answers each is the one whose corpus matches its question.
    `check-docs-render-fidelity`, emptied `site-kit/checks/` and with it the last
    `.sh` gate declaration in the tree, so a `*.sh` glob covers no declaration path
    and the derivation selects this member nowhere. Its row at §Meta-gate
-   conservation stands as a **recorded** disposition rather than a re-derived one,
+   conservation for the binary substrate stands as a **recorded** disposition rather than a re-derived one,
    which assertion C admits because it asserts derived ⊆ dispositioned and never
    the converse. The verdict below is the one taken while the derivation still
    selected it, and it is kept because the *predicate* it teaches is what this
@@ -4806,8 +4807,9 @@ that answers each is the one whose corpus matches its question.
    `check-trajectory-fresh`, `check-value-rollup-fresh` and
    `check-docs-mirror-fresh`. All three clear this criterion, exactly as the
    clause above says, and what actually held them was the family's own sequencing
-   finding, since superseded and accounted for at §The generated-projection
-   freshness family rather than waived here. The instance is
+   finding, since superseded and accounted for under *The generated-projection
+   freshness family* (§The first cohort, and the rule that selects the next) rather
+   than waived here. The instance is
    worth naming because it is the first time the two doors were open at once and
    the cohort went through the right one.
 
@@ -7286,8 +7288,8 @@ cite it as precedent for *"what it buys is the engine"*.
 **Selection evidence, from a `--group` run at the cut** (2026-08-14):
 **104 members scanned, 47 groups formed, 0 undecidable, 42 already ported** — 62
 remaining shell. Group sizes are 1×14, 2×2 and 44 singletons, and the 14-member
-group is not a cohort (§The canonical-spec cohort: `fail_closed` derives no
-corpus), while each 2-member group holds one member that stays shell.
+group is not a cohort (§The first cohort, and the rule that selects the next:
+`fail_closed` derives no corpus), while each 2-member group holds one member that stays shell.
 So the **largest takeable derivation group is one member**: the selection rule's
 size arm is exhausted, and this cohort is selected under the documented override
 — *a cohort that retires a blocker several later cohorts are queued behind
@@ -7445,7 +7447,8 @@ section's.
 members scanned, 45 groups formed, 0 undecidable, 44 already ported** — 60
 remaining shell. Group sizes are 1×14, 2×2, 2×2 and 42 singletons, and the
 **largest takeable group is one member**: the 14-member group is not a cohort
-(§The canonical-spec cohort: `fail_closed` derives no corpus), one
+(§The first cohort, and the rule that selects the next: `fail_closed` derives no
+corpus), one
 two-member group holds `check-install-disposition`, which the table above keeps
 on shell, and the other holds `check-docs-render-fidelity`, held on criterion 7.
 So the size arm is **exhausted a second consecutive time** — the settings cohort was
@@ -7741,12 +7744,14 @@ is the second door onto §The declaration cohort's hazard rather than a new one 
 that section's own paragraph carries the finding.
 
 **Three members port ahead of their emitters, and the cost is stated rather than
-absorbed** — §The generated-projection freshness family carries the accounting,
+absorbed** — *The generated-projection freshness family* (§The first cohort, and
+the rule that selects the next) carries the accounting,
 the supersession and the honest zero.
 
 **One member's fail-closed repair came due at the port, and it is this cohort's
-single designed divergence** — `check-docs-mirror-fresh`, at §The
-generated-projection freshness family's table row.
+single designed divergence** — `check-docs-mirror-fresh`, at its table row under
+*The generated-projection freshness family* (§The first cohort, and the rule that
+selects the next).
 
 **`check-installer-no-deps` drops `jq` for the crate's existing JSON reader.**
 The gate's whole predicate is *does this package declare any of three dependency
@@ -7764,7 +7769,7 @@ the lead.
 **Assertion C's derivation was re-run at the cut, in both directions, and this is
 the widest single move it has seen** — ten `<gates-dir>/<name>.sh` paths becoming
 `<gates-dir>/<name>.gate` in one commit. `check-value-rollup-fresh` is itself in
-§Meta-gate conservation's *survive unchanged* row and is itself a member here, so
+the *survive unchanged* row of §Meta-gate conservation for the binary substrate and is itself a member here, so
 its row records that it is now `.gate`-dispatched and that its `scripts/*.sh`
 coupling covers **no** registry member's declaration path any more while
 `kit:*.sh` still does. The other readers were enumerated **by red condition,
@@ -9439,8 +9444,8 @@ takes its members from `knobs::wire` too: `registry::expand_couples` is the one
 expander, and hook generation (§gen-pre-commit) and `run-gates --for` selection
 both ride it, so the generated hook and the runtime selector read one value. The
 rule is stated here because the sites that rely on it all cite it to this section:
-§The port-candidate criteria's criterion 6, §Meta-gate conservation's
-`check-knob-default-coupling` row, §check-core-files' root-set paragraph and
+§The port-candidate criteria's criterion 6, the `check-knob-default-coupling` row
+of §Meta-gate conservation for the binary substrate, §check-core-files' root-set paragraph and
 §gen-pre-commit each turn on it, and a fact whose only statements are its
 citations has no owner.
 
@@ -12337,7 +12342,7 @@ was conflating that state with a real `case` context in the first place.
 the frame depth to zero, the real closing `)` then lands on an empty stack and is
 absorbed, and the file balances at EOF by coincidence while everything after the
 `case` is lost. That is why this pair is covered behaviourally in `smoke/` by a
-declaration carrying both shapes, on the ground §The `bin/`-tool contract states
+declaration carrying both shapes, on the ground §The bin/-tool contract states
 for behavioural coverage — that the predicate that matters is behavioral, a
 ground about the rule rather than about a file's extension, so it followed the
 function into the binary. The pair is **additionally** covered by crate tests over
@@ -12371,7 +12376,7 @@ which is the gates-dir-positional shape §The non-gate arm's distinguishing test
 already rules ports unchanged. `--tree` needs no registry and **takes none**: a
 documented flag that silently changed nothing would be worse than no flag.
 
-Three of §The `bin/`-tool contract's behaviours are adopted — the arm cites that
+Three of §The bin/-tool contract's behaviours are adopted — the arm cites that
 contract for the behaviours it adopts, never for a `bin/` membership it does not
 hold. `-h` / `--help` **as the first argument** prints usage on **stdout** at exit
 **0**, *whatever follows it*: the help-before-arity ordering is what that contract
@@ -14347,7 +14352,8 @@ verdict**, an adjacent `spec:` comment citing §The path-dialect contract, read 
 the occurrence's own trailing comment or the contiguous comment run above it.
 
 **Why `cd` alone clears, and the `pwd -P` read-back is owed only where a root is
-bound.** `cd` is the dialect-tolerant consumer §The judging predicate names, so a
+bound.** `cd` is the dialect-tolerant consumer *The judging predicate* (§The path-dialect
+contract) names, so a
 value handed to it becomes a chdir rather than a tree-internal string — the shell's
 exact counterpart of the `Path`-typed rule, clearing for the same reason. The
 read-back is what a site does when it *wants* a root out of that `cd`, not a second
@@ -14363,8 +14369,8 @@ variable indirectly, and every such site is red.
 **One red rides on that clearance.** Where a producer sits in `cd` position and the
 `cd`'s effect **is** read back into a value, the read-back is `pwd -P` and never a
 bare `pwd`: bash's logical `pwd` prints an absolute argument straight back, so that
-spelling changes nothing while looking exactly like the fix — the trap §The shell
-crossing idiom exists for. The arm is anchored to an already-cleared occurrence and
+spelling changes nothing while looking exactly like the fix — the trap *The shell
+crossing idiom* (§The path-dialect contract) exists for. The arm is anchored to an already-cleared occurrence and
 reads the first non-blank, non-comment line after the `cd` and nothing else, so the
 gate's red set stays inside the producer roster rather than reaching a form the
 roster does not carry.

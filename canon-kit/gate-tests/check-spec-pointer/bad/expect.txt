@@ -4,3 +4,6 @@ bad.gate:2: §heading not found in SPEC-widget.md
 bad.rs:1: target file not found: no-such-file.md
 bad.rs:2: target file not found: no-such-kit/SPEC.md
 .workflow/fixture-state.txt:1: §heading not found in SPEC-target.md
+README.md:6: §heading in no governed file: §The section nobody wrote
+README.md:9: §heading not found in SPEC-widget.md: §The linked heading that drifted
+SPEC-widget.md:3,7: heading title carried twice in one file: The widget contract

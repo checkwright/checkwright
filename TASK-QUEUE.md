@@ -24,30 +24,6 @@
   Admitted to `enum-and-citation-parity` (operator direction, 2026-09-17, AskUserQuestion in a lead
   session, lead-relayed); filed 2026-08-25.
 
-- **unqualified-section-citation-liveness** [spec: SPEC-citation-liveness.md] — a bare
-  `(§Heading)` citation resolves to nothing and no gate reds. **Designed as:** the prose pass
-  resolves a `§` with no path against every manifest file's headings, a placeholder fragment never
-  fires, and a sentence-shaped heading is citable by its lead clause (amendment deltas 1 and 2).
-  Filed 2026-08-02; a member of `citation-liveness-family-convergence`.
-
-- **spec-pointer-self-section-citation** [spec: SPEC-citation-liveness.md] — a same-file `§`
-  citation goes unresolved. **Designed as** delta 1's union resolution, which includes the citing
-  file. Filed 2026-08-08; returned from the icebox as a family member.
-
-- **link-wrapped-section-citation-liveness** [spec: SPEC-citation-liveness.md] — `[x](path.md)
-  §Heading` hides its section from both citation gates. **Designed as:** the link target is the
-  path, and 43 of 45 live sites resolve (amendment delta 1). Filed 2026-08-06; a family member.
-
-- **spec-section-title-collision** [spec: SPEC-citation-liveness.md] — two headings in one SPEC
-  share a title, so a `§` pointer binds to the first. **Designed as:** a duplicated title in a
-  manifest file reds, and guard-kit/SPEC.md's `### Consumer rules` is renamed with its pointers
-  re-read (amendment delta 3). Filed 2026-08-13; a family member.
-
-- **qualified-pointer-section-ownership** [spec: SPEC-citation-liveness.md] — a resolving `§`
-  pointer may name a section that does not own the claim. **Measured at spec:** a token-ownership
-  proxy flagged 15 of 50 citations and none was wrong, so the entry's permitted not-buildable
-  outcome holds, recorded in §check-spec-pointer (amendment delta 4). Filed 2026-08-09.
-
 - **prose-filename-citation-liveness** [spec: SPEC-citation-liveness.md] — a bare amendment
   basename in governed prose outlives the deleted file. **Designed as:** check-docs-cmd assertion
   (C) reads a single-segment `CANON_KIT_AMENDMENT_GLOB` token as path-shaped and resolves it by
@@ -3953,5 +3929,10 @@
 
 - readme-roster-enum-coverage
 - prose-enum-common-word-tag-members
+- unqualified-section-citation-liveness
+- spec-pointer-self-section-citation
+- link-wrapped-section-citation-liveness
+- spec-section-title-collision
+- qualified-pointer-section-ownership
 
 ## Lessons Learned

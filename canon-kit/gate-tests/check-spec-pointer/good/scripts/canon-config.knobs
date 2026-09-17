@@ -1,3 +1,6 @@
 # The candidate glob the finder discriminates: the slot-bearing cand-tmpl.md is
 # excluded, so its dangling citation is never scanned.
 CANON_KIT_PROSE_SURFACE_GLOBS[] = cand-*.md
+# The widget spec joins the manifest set, so a pathless citation resolves against it.
+CANON_KIT_MANIFEST_FILES[] = README.md
+CANON_KIT_MANIFEST_FILES[] = SPEC-widget.md

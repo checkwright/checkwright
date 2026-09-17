@@ -492,8 +492,8 @@ The constrained members and what forces each:
   (gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency) is
   above the `edition = "2021"` floor of 1.56 that governed while the graph was
   empty. It is re-derived against the lock at any dependency change rather than
-  recalled, and a move carries every surface stating it — including **§The
-  rendered verdict below and `docs/site-architecture.md`, both of which quote
+  recalled, and a move carries every surface stating it — including **the
+  rendered verdict below (§bin/env-probe) and `docs/site-architecture.md`, both of which quote
   this element as a *format example***, and both machine-checked by nothing. That
   pair is named rather than described because a format example is the shape a
   floor move keeps missing: it reads as illustration, so it survives the grep a
@@ -1393,8 +1393,8 @@ set-but-missing settings file below. A derived default below names the knob it r
   as a named file, never through stdin — the session-role signal consumes stdin
   exactly once, and a second reader there would starve it.
 - `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file the
-  env-probe arm writes and the session-context hook's step 9 emits (§bin/
-  env-probe); default `ENV.local.md`.
+  env-probe arm writes and the session-context hook's step 9 emits
+  (§bin/env-probe); default `ENV.local.md`.
 - `CONTEXT_KIT_SESSION_ROLE_FILE` — the session-role marker `/lead` writes and
   the session-context hook's identity match reads (§The session-context hook);
   default `${GATE_SDK_TMP_DIR:-.tmp}/session-role` (gitignored scratch).
@@ -1512,8 +1512,8 @@ members it names (gate-sdk/SPEC.md §Porting a gate to the binary substrate). Th
 smoke declared the same section, sourced neither, and its own header called it a
 standalone validate suite, so it was unblocked and has since cut; the driver was
 released on the same test and has since cut too (below). **Releasing the driver
-released nothing else** at the time. `bin/always-loaded.sh` (§The always-loaded <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
-meter) was a different section's owed file, correctly homed and takeable as a
+released nothing else** at the time. `bin/always-loaded.sh` <!-- manifest-temporal-exempt: retirement record, names a shell file since removed -->
+(§The always-loaded meter) was a different section's owed file, correctly homed and takeable as a
 singleton on its own, and it has since cut too — its golden is the arm's parity
 oracle, held byte-for-byte over an unedited expectation file (below). **Nothing
 is owed to context-kit now**: the last two members left by deletion rather than

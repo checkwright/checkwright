@@ -81,9 +81,10 @@ The lead is a role a session *becomes*, not a stage it runs — and running no
 lead is equally valid. The recommended shape is the **split posture**: the
 lead rides a cheap routing tier and only the judgment-heavy work pays premium
 prices. It is a trade rather than a pure saving: a routing-tier lead relays a
-class of question a judgment-tier one would settle itself, and
-[the lead template](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics-batch-and-compact-where-it-pays)
-§Economics states the trade and how to measure it for your own posture. To drive
+class of question a judgment-tier one would settle itself, and the lead
+template's
+[Economics section](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics-batch-and-compact-where-it-pays)
+states the trade and how to measure it for your own posture. To drive
 an iteration under it:
 
 1. **`/lead` in a fresh session on the routing tier.** The lead role writes no
@@ -109,7 +110,7 @@ an iteration under it:
    mechanical oracle-running rides a cheaper tier, while `build` is tiered **per
    batch** from its deltas' work-class labels, its judgment-heavy work staying
    on the premium tier (the per-batch tier-differentiation rule,
-   [the lead template](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics-batch-and-compact-where-it-pays) §Economics). A stage whose
+   the lead template's [Economics section](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics-batch-and-compact-where-it-pays)). A stage whose
    work splits into batches is N sibling stage sessions the lead dispatches and
    verifies (each a same-stage re-entry), never a stage session sub-dispatching
    its own siblings (`lifecycle-kit/SPEC.md §templates/lead.md`, the

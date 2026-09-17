@@ -2265,7 +2265,7 @@ interpreting (gate-sdk/SPEC.md §The POSIX ERE matcher).
 
 Invariant, two passes, forward direction only: every `spec:` / `contract:`
 pointer **directive** on a governed source resolves, and every free-prose
-`<path>.md §<heading>` **citation** on a governed manifest resolves. The
+`§<heading>` **citation** on a governed manifest resolves. The
 directive set is exactly what `check-comment-tier` blesses by shape: full-line
 `spec:` / `contract:` comments on the governed sources, plus the `# contract:`
 headers on the workflow directory's **tracked** members (gate-sdk/SPEC.md §The
@@ -2292,11 +2292,30 @@ paragraph join so a heading that wraps a line reassembles, and resolves the
 heading through one shared resolution path — the directive pass and the
 citation pass call the same helper, so they cannot diverge. Free prose runs on past the heading with no delimiter, so
 the citation pass matches a heading as a boundary-anchored **prefix** of the
-fragment where the directive pass matches it whole. A cited path that is not a
-tracked file is out of this pass's scope — path liveness stays with the gates
-that own it (`check-md-refs`, `check-kit-ref-liveness`); ruling only on headings
-of resolvable files is what holds the false-positive rate at the directive
-pass's level.
+fragment where the directive pass matches it whole.
+
+The pass reads three citation forms. A `<path>.md §` citation (the path bare or
+as a whole code span), and a markdown link followed by `§` (the link target is the
+path, resolved from the citing file's directory with its `#anchor` stripped),
+resolve against that file. An adjacent path that is not a tracked file is out of
+scope, since path liveness stays with the gates that own it (`check-md-refs`,
+`check-kit-ref-liveness`), and a link target that is not a tracked file (a URL, an
+untracked path) drops to the third form. A `§` with no path resolves against the
+headings of the whole manifest set, the citing file included. Its intended file is
+not syntactic, because prose puts the owning path before the heading, after it or
+nowhere. So this form asserts liveness and not provenance: the heading exists
+somewhere in the governed set, and a citation aimed at the wrong file that carries
+a live title passes. A fragment that does not open with a letter, a digit or a
+backtick is a placeholder (`§<heading>`) or the mark itself, and never fires; nor
+does a `§` quoted inside a code span. The finding says "in no governed file".
+Honest limit: a short heading is a prefix of many fragments, so the union
+under-reds around short titles and never over-reds.
+
+**A title names one section per file.** Two headings in one manifest file whose
+qualifier-stripped text is equal are red, at any levels. A resolver takes the first
+match, so a pointer meaning the second binds to the first from the day it is
+written, and no reading of the pointer can tell them apart. The finding names the
+file, both line numbers and the title.
 
 **A *withheld* target is not a dangling one, and the two are told apart by the
 kit root.** A target `<dir>/`*spec name* whose `<dir>` resolves to a directory
@@ -2331,19 +2350,27 @@ dangling, otherwise caught only on review. Heading match tolerates a trailing
 `(qualifier)` on either side: a pointer narrowing a section to a labelled point
 (`§check-graph (assertion G)` → the `check-graph` heading) or a heading carrying
 a locator the pointer omits (`§The guard framework` → `## The guard framework
-(lib/guard.sh)`). Two `§` carve-outs keep the false-positive floor and must not
+(lib/guard.sh)`), and a prose citation may name a heading by its lead clause,
+the text before its first comma, em dash or colon, since a sentence-shaped heading
+is cited by that clause and the fragment runs on into prose. The directive pass
+stays exact. Two `§` carve-outs keep the false-positive floor and must not
 be conflated: a directive's em-dash *prose tail* (`spec: <path> §<h> — <gloss>`)
 strips at the `` — `` so a `§` in the gloss is not read as a heading, while a
-free-prose citation *is* a heading marker — the citation pass fires on a
-tracked `.md` path immediately followed by `§`, and a bare `§` with no tracked
-path before it (the deliberate non-citation use) never fires. Fenced code
-blocks are skipped in both passes — a quoted example is not a citation.
+free-prose citation *is* a heading marker, read in the three forms above. Fenced
+code blocks are skipped in both passes — a quoted example is not a citation — and
+a fenced line of a markdown file is never a heading.
 
 Calibration: forward direction only. The reverse — flagging a requirement with
 no inbound pointer as uncovered code — needs a "what counts as a requirement"
 notion that risks false positives against the cheap-and-FP-free bar, so it is
 ruled out (a separate task with its own ruling if ever wanted; this gate
-reserves no syntax for it). Configuration is shared with `check-comment-tier` —
+reserves no syntax for it). Nor does it judge ownership, meaning whether a
+resolving section is the one carrying the cited claim. That is comprehension. The
+one mechanical proxy measured (a backticked token in the citing paragraph that
+occurs in exactly one other section of the target) flagged 15 of 50 citations, and
+none was a wrong-section citation. A red there would train readers to skip the
+gate. Green means the section exists, and review owns the rest. Configuration is
+shared with `check-comment-tier` —
 the whitelist predicate and the same
 `CANON_KIT_COMMENT_*` knobs, so no new config knob — but this gate scans
 the **pruned** comment surface, which drops `templates/` sources where
@@ -2356,7 +2383,7 @@ directives), so each gate draws the `templates/` line where its own semantics
 put it. `precommit` tier.
 
 Retention ruling: the standing doubt — forward-only checking plus the
-basename↔§heading convention make the pointer largely redundant, its gloss a
+basename↔`§<heading>` convention make the pointer largely redundant, its gloss a
 restatement risk — is answered and the roster slot kept. The convention
 derives a section's *name*, never its liveness: absent an inbound pointer,
 renaming or deleting a SPEC heading reddens nothing, and the pointer is the
@@ -2467,7 +2494,8 @@ The release-boundary disposition walk over the standing marker inventory
 (decommission now, re-justify and carry the task forward, or un-deprecate) is
 lifecycle-kit's `release-sweep` skill template, and the between-major backlog
 trend over the same roster is drift-kit's `kpi-deprecated-surface` example
-(lifecycle-kit SPEC §templates, drift-kit SPEC §Out of scope). `precommit` tier.
+(lifecycle-kit/SPEC.md §templates/release-sweep.md, drift-kit/SPEC.md §Out of
+scope). `precommit` tier.
 
 ### check-tracking-claim
 

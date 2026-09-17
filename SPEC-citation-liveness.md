@@ -69,7 +69,9 @@ resolves to nothing", read through four windows, and the measurements move where
 
 `check-spec-pointer`'s prose pass also extracts a `§<heading>` citation that has no adjacent
 `<path>.md`. That citation resolves when **any** manifest file carries the heading {design-bearing}.
-**Not yet applied.**
+**Applied.** Build calibrations merged with it: a `§` quoted inside a code span never fires, a
+backtick-wrapped adjacent path is the adjacent form, and a fenced line is never a heading. The
+landing sweep fixed 27 citations.
 
 - **Extraction.** A `§` not already consumed by the adjacent-path form starts a citation, and its
   fragment is the paragraph tail, as today. A fragment that does not open with a letter, a digit or
@@ -97,7 +99,7 @@ resolves to nothing", read through four windows, and the measurements move where
   is fixed at landing by citing the enclosing heading or qualifying the path. Build records the
   count it swept in the commit.
 
-**Replacement text, canon-kit/SPEC.md §check-spec-pointer** (**Not yet applied**). The
+**Replacement text, canon-kit/SPEC.md §check-spec-pointer** (**Applied**). The
 prose-citation paragraph's sentence "A cited path that is not a tracked file is out of this pass's
 scope …" and the carve-out sentence "a bare `§` with no tracked path before it (the deliberate
 non-citation use) never fires" are replaced by:
@@ -113,14 +115,14 @@ non-citation use) never fires" are replaced by:
 
 Prefix resolution in both prose forms also matches a heading's **lead clause**: its text up to the
 first `, `, ` — ` or `: `, when that clause is shorter than the heading {mechanical}.
-**Not yet applied.**
+**Applied.**
 
 - A sentence-shaped heading such as `The probe is asymmetric, and no reading may treat it otherwise`
   is cited by its lead clause, and the fragment runs on into prose, so neither whole-heading test
   can pass. The directive pass stays exact.
 - The clause is computed once per heading in `HeadingCache` beside the qualifier-stripped text.
 
-**Replacement text, canon-kit/SPEC.md §check-spec-pointer** (**Not yet applied**). The sentence
+**Replacement text, canon-kit/SPEC.md §check-spec-pointer** (**Applied**). The sentence
 "Heading match tolerates a trailing `(qualifier)` on either side" is followed by: "and a prose
 citation may name a heading by its lead clause, the text before its first comma, em dash or colon".
 
@@ -128,7 +130,8 @@ citation may name a heading by its lead clause, the text before its first comma,
 
 `check-spec-pointer` reds a manifest file that carries two headings whose qualifier-stripped text
 is equal, at any levels {design-bearing}.
-**Not yet applied.**
+**Applied.** The heading became `### Writing a consumer rule`, and all eight pointers meant the
+`## Consumer rules` placement section, so none was repointed.
 
 - **Why a red and not a resolver rule.** Every section resolver takes the first match, so a pointer
   meaning the second one resolves elsewhere from the day it is written. No resolution rule can say
@@ -141,7 +144,7 @@ is equal, at any levels {design-bearing}.
   `guard-kit/templates/bash-guard.sh` and `guard-kit/lib/guard.sh`, and the two prose citations in
   `guard-kit/SPEC.md`. Each is repointed at whichever section its sentence means.
 
-**Replacement text, canon-kit/SPEC.md §check-spec-pointer** (**Not yet applied**). A paragraph after
+**Replacement text, canon-kit/SPEC.md §check-spec-pointer** (**Applied**). A paragraph after
 the heading-match paragraph:
 
 > **A title names one section per file.** Two headings in one manifest file whose qualifier-stripped
@@ -152,9 +155,9 @@ the heading-match paragraph:
 
 `check-spec-pointer` does not judge whether a resolving section owns the cited claim. The measured
 ground is recorded, and the entry closes on the record {mechanical}.
-**Not yet applied.**
+**Applied.**
 
-**Replacement text, canon-kit/SPEC.md §check-spec-pointer** (**Not yet applied**). The calibration
+**Replacement text, canon-kit/SPEC.md §check-spec-pointer** (**Applied**). The calibration
 paragraph opening "Calibration: forward direction only." gains:
 
 > Nor does it judge ownership, meaning whether a resolving section is the one carrying the cited
@@ -275,7 +278,10 @@ same token is a false present-tense pointer, and never inside the queue file."
 ### (9) Fixtures, tests and mirrors
 
 Every assertion lands with its executable statement {mechanical}.
-**Not yet applied.**
+**Partly applied:** the `check-spec-pointer` fixtures and its declaration are in. That declaration
+extends the gate's existing Tightened-gates bullet rather than adding a second one. The
+`docs/canon-kit`, `docs/guard-kit` and other touched SPEC mirrors are regenerated. The deltas 5 to
+8 items are still owed.
 
 - `canon-kit/gate-tests/check-spec-pointer/`: `bad/` adds an unqualified citation resolving
   nowhere, a link-wrapped citation to a missing heading and a duplicated title. `good/` adds a
