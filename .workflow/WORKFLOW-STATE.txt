@@ -4,4 +4,4 @@
 
 ---
 
-— scope aa2c119e 2026-09-17 b43c9aef
+stage-economics-feed scope aa2c119e 2026-09-17 b43c9aef

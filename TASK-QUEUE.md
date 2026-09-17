@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: stage-economics-feed
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -3920,6 +3920,8 @@
   the gap between the log and the close stamps grows by one row per iteration.
   Filed 2026-09-16 to the gap inbox by the iteration lead at `isolated-dispatch-obligations`'
   close, which could not drain it; promoted at the following iteration's scope.
+  Selected 2026-09-17 with `stage-economics-log-redates-rows` as one unit set (operator direction,
+  2026-09-17, lead-relayed).
 
 - **declined-update-target-cause-unaudited** [design-pending] [cost: iteration/low] [surface: lifecycle-kit] — a build
   session that DECLINES a spec-authored update target states a cause, and nothing re-reads that
@@ -4008,6 +4010,8 @@
   Iceboxed as a defect IN a run nobody was making; the feeding obligation is what made it live.
   Recurrence filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could
   not drain it; returned at the following iteration's scope.
+  Selected 2026-09-17 with `stage-economics-meter-has-no-feeding-obligation` as one unit set
+  (operator direction, 2026-09-17, lead-relayed).
   recurrence: stage-economics-log-redates-rows 2026-09-16
 
 - **gate-fixture-fanout-arm** [design-pending] [cost: event/low] [surface: gate-sdk] — nothing
