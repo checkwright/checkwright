@@ -12,33 +12,6 @@
 
 ## New Features
 
-- **scan-prompts-heredoc-grant-split** [spec: SPEC-interpreter-steer.md] — scan-prompts' grant
-  test splits a flattened heredoc body on `;` and `|`, so a granted `python3 -` heredoc reads
-  prompting. **Probed at spec, not guessed:** under a lone `Bash(python3 -*)` grant in a
-  deny-unmatched harness session, multi-line bodies carrying `;` and `|` ran, while a command after
-  the terminator, an opener-line pipe and an unquoted body carrying `$HOME` were denied. The
-  owed-port-tail report did not reproduce. **Designed as:** the friction log encodes `\`, newline
-  and tab instead of flattening, and is cut at the harness's 10,000-character analysis bound. The
-  compiled skeleton and splitter twins gain the heredoc arm. The ranker drops each body and
-  terminator from the grant test, reads unquoted bodies live for expansion, and marks an over-bound
-  call allowlist-unreachable (amendment deltas 1 to 3, which build first).
-  Directed 2026-09-17 at scope into `interpreter-steer-census`'s set (operator direction,
-  lead-relayed); filed 2026-09-15 at `guard-friction-reach`'s spec.
-
-- **inline-interpreter-substrate-census** [spec: SPEC-interpreter-steer.md] — whether the recurring
-  inline-interpreter computations are one-off scratch or unported tooling, and which predictable
-  tools would replace them as steer targets (operator direction, 2026-09-15, lead-relayed).
-  recurrence: inline-interpreter-substrate-census 2026-09-15
-  **Census at spec** (survey record, 2026-09-17 spec block): 871 inline bodies since 2026-09-08, all
-  `python3`. The recurring idiom is a literal read, assert, replace and write-back (280 calls over
-  26 sessions, plus 157 heading-anchored splices). Computed rewrites, tallies and probes have no
-  predictable tool. **Designed as** one steer to an existing arm, with no new tool: rule 8 gains a
-  python arm that blocks an inline body that is a literal rewrite, meaning it writes a file, calls
-  `.replace(`, and carries no computed-text construct. The arm steers to `--rewrite` or Edit, and
-  everything else passes as measured friction (amendment delta 4).
-  Directed 2026-09-17 at scope as the set's lead (operator direction, lead-relayed); filed
-  2026-08-30, returned from the icebox 2026-09-15.
-
 ## Technical Debt
 
 ## Deferred
@@ -4238,5 +4211,8 @@
 - **uninstall-artifact-ownership-asymmetry** [design-pending] — uninstall leaves init's artifact.
 
 ## Done
+
+- scan-prompts-heredoc-grant-split
+- inline-interpreter-substrate-census
 
 ## Lessons Learned

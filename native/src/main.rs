@@ -77,11 +77,18 @@ fn parse_wants(spec: &str) -> Result<guard::Wants, String> {
         match t {
             "sq" => w.sq = true,
             "dq" => w.dq = true,
-            "hd" | "hdq" => {}
+            "hd" => w.hd = true,
+            "hdq" => w.hdq = true,
             _ => return Err(t.to_string()),
         }
     }
     Ok(w)
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — `guard_log_fallthrough`'s encoding, so a
+// newline-bearing command and its view stay one record
+fn log_encoded(s: &str) -> String {
+    s.replace('\\', "\\\\").replace('\n', "\\n").replace('\t', "\\t")
 }
 
 // spec: guard-kit/SPEC.md §The guard framework — the standing oracle criterion 6's *unless* clause
@@ -116,7 +123,7 @@ fn guard_lib_parity(args: &[String]) -> i32 {
         Some("split") => {
             for c in &args[1..] {
                 for (i, seg) in guard::split_compound(c).iter().enumerate() {
-                    println!("split\t{}\t{}\t{}", c, i, seg);
+                    println!("split\t{}\t{}\t{}", log_encoded(c), i, log_encoded(seg));
                 }
             }
             0
@@ -139,16 +146,12 @@ fn guard_lib_parity(args: &[String]) -> i32 {
                 }
             };
             for c in &args[2..] {
-                match guard::skeleton(c, w) {
-                    Ok(s) => println!("skeleton\t{}\t{}\t{}", spec, c, s),
-                    // spec: guard-kit/SPEC.md §The guard framework — the twin implements the
-                    // newline-free contract, so a newline-bearing corpus is out of contract rather
-                    // than something to normalize with a branch this holder does not carry.
-                    Err(guard::NewlineInInput) => {
-                        eprintln!("checkwright-gates: --guard-lib-parity skeleton was handed a newline-bearing command, which is outside the twin's contract ({} flattens every logged line) — the classification could not be reported; treating as failure (not clean)", guard::LIB);
-                        return 2;
-                    }
-                }
+                println!(
+                    "skeleton\t{}\t{}\t{}",
+                    spec,
+                    log_encoded(c),
+                    log_encoded(&guard::skeleton(c, w))
+                );
             }
             0
         }
@@ -157,7 +160,7 @@ fn guard_lib_parity(args: &[String]) -> i32 {
                 match guard::redirect_pairs(c) {
                     Ok(pairs) => {
                         for (i, p) in pairs.iter().enumerate() {
-                            println!("redirect\t{}\t{}\t{}", c, i, p);
+                            println!("redirect\t{}\t{}\t{}", log_encoded(c), i, p);
                         }
                     }
                     Err(e) => {

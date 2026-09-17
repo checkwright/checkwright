@@ -14,11 +14,9 @@
 # committed expected file: a maintained golden would be a third copy to drift, and the failure
 # this exists to catch is one side edited without the other.
 #
-# The corpus is scoped to the shapes a **friction-log line** can carry, and that scope is a
-# property of the input rather than a convenience: `guard_log_fallthrough` flattens every `\n`
-# and `\t` to a space before the append, so a logged line is newline-free by construction and
-# the compiled `skeleton` implements exactly the reachable subset. The newline case is asserted
-# separately below, as an out-of-contract refusal rather than as a compared classification.
+# The corpus is scoped to the shapes a **decoded friction-log line** can carry, heredoc bodies
+# included, and every command and view is printed in `guard_log_fallthrough`'s encoding so a
+# newline-bearing record stays one line.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -82,12 +80,29 @@ CORPUS=(
     'wc -l < in.txt'
     'jq . < a.json > b.json'
     'git commit -m "x; y" && git push'
+    $'ls\ngit status'
+    $'cat <<\'EOF\'\nbody; x | y\nEOF'
+    $'cat <<"EOF"\n$HOME\nEOF'
+    $'cat <<EOF\n$HOME\nEOF'
+    $'cat <<-EOF\n\tbody\n\tEOF'
+    $'a <<A <<\'B\'\n1\nA\n2\nB'
+    $'python3 - <<\'PY\'\nprint("it\'s; a|b")\nPY'
+    $'cat <<\'EOF\'\nx\nEOF\nperl -e 1'
+    $'cat <<EOF\nnever ends'
+    $'cat <<EOF\nEOF'
 )
 
-# The inert-class lists the holder takes. `sq,dq,hd` is `scan-prompts`' own call; it is here
-# rather than alone because `hd` is read only inside the branch a newline-free command never
-# reaches, so agreeing with `sq,dq` over the same corpus is what shows the class inert.
-WANTS=(- sq dq sq,dq sq,dq,hd)
+# The inert-class lists the holder takes: `sq,dq,hd` and `sq,hdq` are `scan-prompts`' own calls.
+WANTS=(- sq dq sq,dq hd hdq sq,dq,hd sq,hdq)
+
+# `guard_log_fallthrough`'s encoding, so a newline-bearing command and view stay one record.
+enc() {
+    local bs='\' s="$1"
+    s="${s//"$bs"/"$bs$bs"}"
+    s="${s//$'\n'/"${bs}n"}"
+    s="${s//$'\t'/"${bs}t"}"
+    printf '%s' "$s"
+}
 
 # `guard_allow_match`'s corpus is scoped to the shapes a **permission rule** can carry rather than
 # to arbitrary globs, and it is a cross product rather than paired cases: the harness `:*` idiom in
@@ -190,12 +205,12 @@ shell_side() {
     (
         # shellcheck source=../lib/guard.sh
         source "$DIR/lib/guard.sh"
-        local c w seg p i
+        local c w seg p i v
         local -a wa
         for c in "${CORPUS[@]}"; do
             i=0
             while IFS= read -r seg; do
-                printf 'split\t%s\t%s\t%s\n' "$c" "$i" "$seg"
+                printf 'split\t%s\t%s\t%s\n' "$(enc "$c")" "$i" "$(enc "$seg")"
                 i=$((i + 1))
             done < <(guard_split_compound "$c")
         done
@@ -203,13 +218,14 @@ shell_side() {
             wa=()
             [[ "$w" != - ]] && IFS=, read -r -a wa <<<"$w"
             for c in "${CORPUS[@]}"; do
-                printf 'skeleton\t%s\t%s\t%s\n' "$w" "$c" "$(guard_skeleton "$c" ${wa[@]+"${wa[@]}"})"
+                v="$(guard_skeleton "$c" ${wa[@]+"${wa[@]}"}; printf .)"
+                printf 'skeleton\t%s\t%s\t%s\n' "$w" "$(enc "$c")" "$(enc "${v%.}")"
             done
         done
         for c in "${CORPUS[@]}"; do
             i=0
             while IFS= read -r p; do
-                printf 'redirect\t%s\t%s\t%s\n' "$c" "$i" "$p"
+                printf 'redirect\t%s\t%s\t%s\n' "$(enc "$c")" "$i" "$p"
                 i=$((i + 1))
             done < <(_guard_redirect_pairs "$c")
         done
@@ -273,13 +289,14 @@ have "split-inside-quotes"     "^split${T}echo 'a;b' && ls${T}1${T}b' \$"
 have "skeleton-sq"             "^skeleton${T}sq,dq${T}echo 'a;b' && ls${T}echo SQ && ls\$"
 have "skeleton-dq"             "^skeleton${T}sq,dq${T}echo \"a && b\" \| wc -l${T}echo DQ \| wc -l\$"
 have "skeleton-no-class"       "^skeleton${T}-${T}echo 'a;b' && ls${T}echo 'a;b' && ls\$"
-have "skeleton-dq-escape"      "^skeleton${T}sq,dq${T}grep -oE \"a.\"b\" file${T}grep -oE DQ file\$"
+have "skeleton-dq-escape"      "^skeleton${T}sq,dq${T}grep -oE \"a..\"b\" file${T}grep -oE DQ file\$"
 have "skeleton-herestring"     "^skeleton${T}sq,dq${T}cat <<<\"here string\"${T}cat <<<DQ\$"
 have "skeleton-heredoc-opener" "^skeleton${T}sq,dq,hd${T}cat <<'EOF'${T}cat <<'EOF'\$"
 have "skeleton-unterminated"   "^skeleton${T}sq,dq${T}echo 'unterminated${T}echo 'unterminated\$"
 have "redirect-descriptorless" "^redirect${T}sort -rn >> out.txt${T}0${T}>> out.txt\$"
 have "redirect-descriptor"     "^redirect${T}cmd 1>>log 2>&-${T}1${T}2>&-\$"
 have "redirect-fd-dup"         "^redirect${T}cmd 2>&1${T}0${T}2>&1\$"
+have "split-newline"           "^split${T}ls.ngit status${T}1${T}git status\$"
 
 # The allow-match rows are asserted as whole lines rather than as patterns: every shape in the
 # corpus is a glob metacharacter, so an ERE over it would be escaping noise around the one thing
@@ -315,31 +332,22 @@ have_line "harness-view-xargs-bare"       "harness-view${T}xargs grep foo${T}gre
 have_line "harness-view-xargs-flag"       "harness-view${T}xargs -0 grep foo${T}xargs -0 grep foo"
 have_line "harness-view-assignment-run"   "harness-view${T}FOO=1 BAR=two git log${T}git log"
 have_line "harness-view-sudo-unstripped"  "harness-view${T}sudo git log${T}sudo git log"
+have_line "skeleton-hd-quoted"            "skeleton${T}hd${T}cat <<'EOF'\\nbody; x | y\\nEOF${T}cat <<'EOF'\\nHD\\nEOF"
+have_line "skeleton-hdq-unquoted-live"    "skeleton${T}sq,hdq${T}cat <<EOF\\n\$HOME\\nEOF${T}cat <<EOF\\n\$HOME\\nEOF"
+have_line "skeleton-hdq-dquoted-inert"    "skeleton${T}hdq${T}cat <<\"EOF\"\\n\$HOME\\nEOF${T}cat <<\"EOF\"\\nHD\\nEOF"
+have_line "skeleton-dash-tab-terminator"  "skeleton${T}hd${T}cat <<-EOF\\n\\tbody\\n\\tEOF${T}cat <<-EOF\\nHD\\n\\tEOF"
+have_line "skeleton-two-openers"          "skeleton${T}hdq${T}a <<A <<'B'\\n1\\nA\\n2\\nB${T}a <<A <<'B'\\n1\\nA\\nHD\\nB"
+have_line "skeleton-after-terminator"     "skeleton${T}sq,dq,hd${T}cat <<'EOF'\\nx\\nEOF\\nperl -e 1${T}cat <<'EOF'\\nHD\\nEOF\\nperl -e 1"
+have_line "skeleton-unterminated-body"    "skeleton${T}hd${T}cat <<EOF\\nnever ends${T}cat <<EOF\\nHD\\n"
+have_line "skeleton-empty-body"           "skeleton${T}hd${T}cat <<EOF\\nEOF${T}cat <<EOF\\nEOF"
 
-# `hd` is inert on a newline-free command, and this is what says so rather than the comment
-# above: the same corpus under `sq,dq` and under `sq,dq,hd` classifies identically, so the
-# branch the compiled twin omits is one no friction-log line can reach.
+# `hd` is still inert on a newline-free command: with no line after an opener there is no body.
 checks=$((checks + 1))
 if ! diff -q \
-    <(grep -F "${T}sq,dq${T}" <<<"$a" | cut -f3-) \
-    <(grep -F "${T}sq,dq,hd${T}" <<<"$a" | cut -f3-) >/dev/null; then
+    <(grep -F "${T}sq,dq${T}" <<<"$a" | cut -f3- | grep -vF '\n') \
+    <(grep -F "${T}sq,dq,hd${T}" <<<"$a" | cut -f3- | grep -vF '\n') >/dev/null; then
     echo "  FAIL [hd-inert]: adding 'hd' changed the shell holder's classification of a newline-free"
-    echo "         corpus, so the branch the compiled twin omits is reachable after all and the"
-    echo "         omission is a defect rather than the reachable subset"
-    fails=$((fails + 1))
-fi
-
-# The precondition delta (5) rests on, carried in the code and checked here: a newline-bearing
-# command is out of the twin's contract, refused at exit 2 rather than normalized by a branch this
-# holder does not carry. The shell holder answers it; the two are not compared on it, and that
-# asymmetry is the point rather than a gap.
-checks=$((checks + 1))
-nl_out="$("$BIN" --guard-lib-parity skeleton sq,dq "$(printf 'cat <<EOF\nbody\nEOF')" 2>&1)"
-nl_rc=$?
-if [[ "$nl_rc" -ne 2 ]]; then
-    echo "  FAIL [newline-out-of-contract]: the compiled twin took a newline-bearing command (exit $nl_rc)"
-    echo "         it omits the heredoc-body machinery, so normalizing one silently is the landmine"
-    echo "         the refusal exists to prevent: $nl_out"
+    echo "         command, which has no heredoc body to blank"
     fails=$((fails + 1))
 fi
 

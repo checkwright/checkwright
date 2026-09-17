@@ -140,12 +140,52 @@ fn quoted_view(cmd: &str) -> String {
     String::from_utf8_lossy(&pass(&sq, b'"', b"DQ")).into_owned()
 }
 
+// spec: guard-kit/SPEC.md §scan-prompts — the harness asks about every command longer than this,
+// whatever the allowlist says; `guard_log_fallthrough` cuts one character past it
+const ANALYSIS_BOUND: usize = 10_000;
+
+// spec: guard-kit/SPEC.md §The guard framework — `guard_log_fallthrough`'s encoding reversed
+pub fn decode(line: &str) -> String {
+    let mut out = String::with_capacity(line.len());
+    let mut chars = line.chars().peekable();
+    while let Some(c) = chars.next() {
+        if c == '\\' {
+            match chars.peek() {
+                Some('\\') => out.push('\\'),
+                Some('n') => out.push('\n'),
+                Some('t') => out.push('\t'),
+                _ => {
+                    out.push('\\');
+                    continue;
+                }
+            }
+            chars.next();
+        } else {
+            out.push(c);
+        }
+    }
+    out
+}
+
+// spec: guard-kit/SPEC.md §scan-prompts — the grant test drops each heredoc body and its terminator
+// line before the quoted-span collapse
+fn without_heredoc_bodies(cmd: &str) -> String {
+    let mut out = String::with_capacity(cmd.len());
+    let mut at = 0usize;
+    for r in guard::heredoc_extents(cmd) {
+        out.push_str(&cmd[at..r.start]);
+        at = r.end;
+    }
+    out.push_str(&cmd[at..]);
+    out
+}
+
 // spec: guard-kit/SPEC.md §scan-prompts — granted only if the call is not allowlist-unreachable and
 // EVERY segment is, so neither a glob's trailing `*` absorbing a redirect or an expansion nor a
 // whole-string glob spanning a compound the harness would split reads as allowed.
 fn granted(cmd: &str, allow: &[String], overlay: Option<&[String]>) -> bool {
     !allowlist_unreachable(cmd)
-        && guard::split_compound(&quoted_view(cmd))
+        && guard::split_compound(&quoted_view(&without_heredoc_bodies(cmd)))
             .iter()
             .filter(|seg| !seg.bytes().all(|c| c == b' '))
             .all(|seg| segment_granted(seg, allow, overlay))
@@ -176,24 +216,6 @@ fn redirect_op(c: &str) -> &'static str {
     write_redirects(c).first().map_or("", |(op, _)| *op)
 }
 
-// spec: guard-kit/SPEC.md §scan-prompts — a flattened log line cannot say where a heredoc body ends,
-// so the reachability scans read only the text before the first opener; a here-string is no opener.
-fn before_heredoc(view: &str) -> &str {
-    let b = view.as_bytes();
-    let mut i = 0usize;
-    while i + 1 < b.len() {
-        if b[i] == b'<' && b[i + 1] == b'<' {
-            if b.get(i + 2) == Some(&b'<') {
-                i += 3;
-                continue;
-            }
-            return &view[..i];
-        }
-        i += 1;
-    }
-    view
-}
-
 // spec: guard-kit/SPEC.md §scan-prompts — rule 6's expansion shapes plus the backtick and output
 // process substitution it does not block, on a view where a single-quoted span and an escaped byte
 // are inert.
@@ -222,15 +244,15 @@ fn carries_expansion(live: &str) -> bool {
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the allowlist-reachability verdict, per logged call over
-// every segment: an expansion, or a write redirect to a target rule 17's own test calls a file.
+// every segment: an expansion, a write redirect to a target rule 17's own test calls a file, or a
+// call past the harness's analysis bound.
 fn allowlist_unreachable(line: &str) -> bool {
-    let live = guard::skeleton(line, guard::Wants { sq: true, dq: false });
-    let structural = guard::skeleton(line, guard::Wants { sq: true, dq: true });
-    let (Ok(live), Ok(structural)) = (live, structural) else {
-        return false;
-    };
-    carries_expansion(before_heredoc(&live))
-        || write_redirects(before_heredoc(&structural))
+    let live = guard::skeleton(line, guard::Wants { sq: true, hdq: true, ..Default::default() });
+    let structural =
+        guard::skeleton(line, guard::Wants { sq: true, dq: true, hd: true, ..Default::default() });
+    line.chars().count() > ANALYSIS_BOUND
+        || carries_expansion(&live)
+        || write_redirects(&structural)
             .iter()
             .any(|(_, tgt)| tgt != "/dev/null")
 }
@@ -248,10 +270,8 @@ fn is_write_token(t: &str) -> bool {
 // common multi-command binaries, plus the write-shape suffix; word and suffix both come from the
 // FIRST segment, so a key can never attribute a write to a command that performs none.
 pub fn ranking_key(line: &str) -> String {
-    let skel = match guard::skeleton(line, guard::Wants { sq: true, dq: true }) {
-        Ok(s) => s,
-        Err(guard::NewlineInInput) => return String::new(),
-    };
+    let skel =
+        guard::skeleton(line, guard::Wants { sq: true, dq: true, hd: true, ..Default::default() });
     let segs = guard::split_compound(&skel);
     let c = trim_start(strip_decoration(segs.first().map_or("", String::as_str)));
     let (t1, rest) = word(c);
@@ -312,10 +332,12 @@ pub fn tally(log_text: &str, allow: &[String], overlay: &[String]) -> Tally {
     if !log_text.ends_with('\n') {
         lines.pop();
     }
-    for line in lines {
-        if line.is_empty() {
+    for raw in lines {
+        if raw.is_empty() {
             continue;
         }
+        let line = decode(raw);
+        let line = line.as_str();
         let key = ranking_key(line);
         if key.is_empty() {
             continue;
@@ -397,8 +419,9 @@ fn unreachable_section(rows: &[(String, u64)], total: u64, out: &mut String) {
     }
     out.push('\n');
     out.push_str("--- Allowlist-unreachable (advisory — every call carries an expansion or a write redirect,\n");
-    out.push_str("    which no allowlist entry can match: (a) is unavailable; resolve by (b) or (c), or leave\n");
-    out.push_str("    it standing as measured friction (guard-kit/SPEC.md §The triage criterion): ---\n");
+    out.push_str("    or runs past the harness's analysis bound, which no allowlist entry can match: (a) is\n");
+    out.push_str("    unavailable; resolve by (b) or (c), or leave it standing as measured friction\n");
+    out.push_str("    (guard-kit/SPEC.md §The triage criterion): ---\n");
     out.push_str(&format!("{} call(s) across {} pattern(s).\n", total, rows.len()));
     rank_section(rows, out);
 }
@@ -606,11 +629,45 @@ mod tests {
             "awk '{print $2}' f",
             "grep \"a \\$b \\`c\\`\" f",
             "echo 'a > b'",
-            "python3 - <<'PY' print(a > b) `x` $y PY",
+            "python3 - <<'PY'\nprint(a > b) `x` $y\nPY",
+            "cat <<EOF\nx > y\nEOF",
             "cat <<<\"here\"",
         ] {
             assert!(!allowlist_unreachable(c), "{:?} was marked unreachable", c);
         }
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — an unquoted-delimiter body is live for expansion, the
+    // command after the terminator is shell, and a call past the analysis bound is the third shape
+    #[test]
+    fn the_verdict_reads_a_heredoc_as_the_harness_does_and_marks_an_over_bound_call() {
+        assert!(allowlist_unreachable("cat <<EOF\n$HOME\nEOF"));
+        assert!(allowlist_unreachable("cat <<'EOF'\nx\nEOF\necho $HOME"));
+        assert!(allowlist_unreachable("cat <<'EOF'\nx\nEOF\nsort > out.txt"));
+        assert!(allowlist_unreachable(&"x".repeat(ANALYSIS_BOUND + 1)));
+        assert!(!allowlist_unreachable(&"x".repeat(ANALYSIS_BOUND)));
+    }
+
+    // spec: guard-kit/SPEC.md §The guard framework — the three pairs decode; any other backslash, a
+    // trailing lone one included, stays literal
+    #[test]
+    fn the_decode_reverses_the_three_pairs_and_leaves_any_other_backslash_literal() {
+        assert_eq!(decode("a\\nb\\tc\\\\d"), "a\nb\tc\\d");
+        assert_eq!(decode("grep \\$x \\"), "grep \\$x \\");
+        assert_eq!(decode("\\\\n"), "\\n");
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — a heredoc body and its terminator line are not segments,
+    // so a separator or an apostrophe inside a python body cannot split or pair across it
+    #[test]
+    fn the_grant_test_drops_each_heredoc_body_and_its_terminator_line() {
+        let allow = vec!["python3 -*".to_string()];
+        assert!(granted("python3 - <<'PY'\nimport x; print(1) | 2\nrm -rf /\nPY", &allow, None));
+        assert!(granted("python3 - <<'PY'\nprint(\"it's\")\nPY", &allow, None));
+        assert!(!granted("python3 - <<'PY'\nx = 1\nPY\nperl -e 1", &allow, None));
+        assert!(!granted("python3 - <<PY\n$HOME\nPY", &allow, None));
+        let t = tally("python3 - <<'PY'\\nimport x; y()\\nPY\n", &allow, &[]);
+        assert_eq!((t.prompting.len(), t.total, t.logged), (0, 0, 1));
     }
 
     // spec: guard-kit/SPEC.md §scan-prompts — the grant test reads the verdict: a trailing `*` that

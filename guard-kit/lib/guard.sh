@@ -66,9 +66,12 @@ guard_rewrite() {
     exit 0
 }
 
+# spec: guard-kit/SPEC.md §The guard framework — cut to the harness's 10,000-character analysis bound plus one, so the ranker can tell an over-bound call, then encoded so one call stays one decodable line
 guard_log_fallthrough() {
-    local fline
-    fline="$(printf '%s' "$1" | tr '\n\t' '  ' | cut -c1-500)"
+    local bs='\' fline="${1:0:10001}"
+    fline="${fline//"$bs"/"$bs$bs"}"
+    fline="${fline//$'\n'/"${bs}n"}"
+    fline="${fline//$'\t'/"${bs}t"}"
     printf '%s\n' "$fline" >>"$GUARD_KIT_LOG" 2>/dev/null || true
 }
 
@@ -82,13 +85,14 @@ guard_allow_match() {
 guard_skeleton() {
     local cmd="$1"
     shift
-    local c want_sq=0 want_dq=0 want_hd=0 want_hdq=0
+    local c want_sq=0 want_dq=0 want_hd=0 want_hdq=0 want_body=0 nbody=0 got_body=''
     for c in "$@"; do
         case "$c" in
             sq) want_sq=1 ;;
             dq) want_dq=1 ;;
             hd) want_hd=1 ;;
             hdq) want_hdq=1 ;;
+            body=[1-9]*) want_body="${c#body=}" ;;
         esac
     done
 
@@ -189,6 +193,7 @@ guard_skeleton() {
                         ((i += ${#line} + 1))
                         ((i > n)) && i=$n
                     done
+                    ((++nbody == want_body)) && got_body="$body"
                     if [[ -n "$body" ]]; then
                         if ((want_hd)) || { ((want_hdq)) && ((quoted)); }; then
                             out+='HD'$'\n'
@@ -213,7 +218,7 @@ guard_skeleton() {
         ((i++))
     done
     [[ -n "$span" ]] && out+="$span"
-    printf '%s' "$out"
+    if ((want_body)); then printf '%s' "$got_body"; else printf '%s' "$out"; fi
 }
 
 # spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 2/4/7/8/12/14/15/17/18/19/20/22/24, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
@@ -425,12 +430,12 @@ guard_rule_brace_glyph() {
     guard_block "quote the '{' if it's literal (an unquoted awk/sed program), or write it out if it expands — the harness's matcher refuses every bare '{' glyph before allowlist matching, so the call is decided out of band. A brace inside quotes of either kind, or in a heredoc body, is already inert and never reaches this block."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's one program-then-operands walk: a per-tool option table separates a sed, awk or perl segment's program word from its file operands, filling the caller's prog (empty when an option supplied the program), inplace and prog_operands; non-zero on an awk or perl option the table does not carry, so the caller declines rather than guess
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's one program-then-operands walk: a per-tool option table separates a sed, awk, perl or python segment's program word from its file operands, filling the caller's prog (empty when an option supplied the program, except python's -c, whose text it holds with prog_inline set), inplace and prog_operands; non-zero on an awk, perl or python option the table does not carry, so the caller declines rather than guess
 _guard_program_operands() {
     local tool="$1" tok skip='' ends=0 have_prog=0 amp='&' bundle letter
     local -a toks
     read -ra toks <<<"$2"
-    prog='' inplace=0 prog_operands=()
+    prog='' inplace=0 prog_inline=0 prog_operands=()
     for tok in ${toks[@]+"${toks[@]:1}"}; do
         tok="${tok//$'\x01'/ }"
         tok="${tok//$'\x02'/$'\t'}"
@@ -439,6 +444,7 @@ _guard_program_operands() {
         tok="${tok//$'\x05'/"$amp"}"
         if [[ -n "$skip" ]]; then
             [[ "$skip" == prog ]] && have_prog=1
+            [[ "$skip" == text ]] && { prog="$tok"; prog_inline=1; have_prog=1; ends=1; }
             skip=''
             continue
         fi
@@ -471,6 +477,13 @@ _guard_program_operands() {
                         esac
                     done
                     continue ;;
+                python:-c) skip=text; continue ;;
+                python:-) have_prog=1; ends=1; continue ;;
+                python:-[uBEIsSOq]) continue ;;
+                python:-[WX]) skip=arg; continue ;;
+                python:'<<' | python:'<<-' | python:'<' | python:'>' | python:'>>' | python:[0-9]'>' | python:[0-9]'>>') skip=arg; continue ;;
+                python:'<'* | python:'>'* | python:[0-9]'>'*) continue ;;
+                python:-*) return 1 ;;
             esac
         fi
         if [[ "$have_prog" == 0 ]]; then
@@ -553,7 +566,7 @@ _guard_vendor_root() {
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 8's awk arm: a pipeline-head awk segment with exactly one file operand whose program is a line range (NR comparisons only) or a markdown heading range, with no action or the print-all one; the steer is chosen by the program's shape
 _guard_awk_read() {
-    local raw="$1" s="$2" v stmt seg prog inplace p
+    local raw="$1" s="$2" v stmt seg prog inplace prog_inline p
     local -a pipes=() prog_operands=()
     local cmp='NR(==|>=|<=|>|<)[0-9]+'
     local conj="${cmp}(&&${cmp})*"
@@ -579,8 +592,60 @@ _guard_awk_read() {
     done < <(sed -E 's/\|\||&&|;/\n/g' <<<"$v")
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's python arm body source: the body of the command's <k>th heredoc opener, with guard_skeleton's own extent
+_guard_heredoc_body() {
+    guard_skeleton "$1" "body=$2"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's literal-rewrite test on a python body: it writes a file, calls .replace( and carries no computed-text construct; the second argument is 1 for an unquoted-delimiter body, where a '$' is computed text
+_guard_is_literal_rewrite() {
+    local b="$1" q="[\"']" w='(^|[^A-Za-z0-9_])'
+    local open_re="open\\(([^)]*,)?[[:space:]]*(mode[[:space:]]*=[[:space:]]*)?${q}[rbtx+]*[wa][rbtx+]*${q}[[:space:]]*[,)]"
+    local computed_re="${w}[rRbB]?[fF][rR]?${q}|${q}[[:space:]]*%|${w}re\\.|${w}import([^A-Za-z0-9_]|\$)|\\.(format|index|find|join|split)\\(|\\[[^]]*:[^]]*\\]|${w}input\\(|${w}sys\\."
+    [[ "$b" == *'.replace('* ]] || return 1
+    [[ "$b" =~ $open_re || "$b" == *'.write_text('* ]] || return 1
+    [[ "$b" =~ $computed_re ]] && return 1
+    [[ "$2" == 1 && "$b" == *'$'* ]] && return 1
+    return 0
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 8's python arm: a segment leading with python or python3 whose -c argument or stdin heredoc is a literal rewrite
+_guard_python_rewrite() {
+    local raw="$1" s="$2" v seg prog inplace prog_inline body k=0 live
+    local -a prog_operands=() openers=()
+    local opener_re='(^|[^<])<<-?[[:space:]]*("[^"]*"|'\''[^'\'']*'\''|[A-Za-z_][A-Za-z0-9_]*)'
+    case "$s" in *python*) ;; *) return 0 ;; esac
+    if v="$(_guard_dequoted_view "$raw" "$s")"; then
+        while IFS= read -r seg; do
+            seg="${seg#"${seg%%[![:space:]]*}"}"
+            case "$seg" in python[[:space:]]* | python3[[:space:]]*) ;; *) continue ;; esac
+            _guard_program_operands python "$seg" || continue
+            ((prog_inline)) && _guard_is_literal_rewrite "$prog" 0 && _guard_block_python
+        done < <(sed -E 's/\|\||&&|;|\|/\n/g' <<<"$v")
+    fi
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        mapfile -t openers < <(grep -oE "$opener_re" <<<"$seg")
+        case "$seg" in
+            python[[:space:]]* | python3[[:space:]]*)
+                if [[ "${#openers[@]}" -ge 1 && "${openers[0]}" != [0-9]* ]] \
+                    && _guard_program_operands python "$seg" && ((!prog_inline)) && [[ -z "$prog" ]]; then
+                    body="$(_guard_heredoc_body "$raw" $((k + 1)))"
+                    case "${openers[0]}" in *\"* | *\'*) live=0 ;; *) live=1 ;; esac
+                    _guard_is_literal_rewrite "$body" "$live" && _guard_block_python
+                fi ;;
+        esac
+        k=$((k + ${#openers[@]}))
+    done < <(guard_split_compound "$s")
+    return 0
+}
+
+_guard_block_python() {
+    guard_block "don't rewrite a file with an inline python body — use the rewrite arm: 'bash $(_guard_front_end) --rewrite [--expect <n>] [--] <find> <replace> <file>…' replaces a literal across every named file and prints each changed span; --expect <n> is the count assertion, one call per find/replace pair, and '\\n' escapes carry a multi-line literal on one line. For a multi-line literal you would rather not escape, use the Edit tool. If the program is intended as written, run it yourself with !<command>."
+}
+
 guard_rule_sed_file() {
-    local cmd="$1" s seg prog inplace tool
+    local cmd="$1" s seg prog inplace prog_inline tool
     local -a prog_operands=()
     s="$(guard_skeleton "$cmd" sq dq hd)"
     while IFS= read -r seg; do
@@ -600,6 +665,7 @@ guard_rule_sed_file() {
         fi
     done < <(guard_split_compound "$s")
     _guard_awk_read "$cmd" "$s"
+    _guard_python_rewrite "$cmd" "$s"
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — a literal echo/printf banner segment: the natural separator of a batched read (no expansion survives here — rule 6 ran first, the caller bailed on substitution/backtick)

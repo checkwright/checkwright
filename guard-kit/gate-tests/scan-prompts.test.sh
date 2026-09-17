@@ -170,6 +170,43 @@ assert_has     grant-unreachable '2 of them allowlist-unreachable' "$grant"
 assert_row     grant-plain-call-granted '1x  echo' "$grant"
 assert_absent  grant-no-overlay 'Overlay-covered' "$grant"
 
+# A heredoc read as the harness reads it, on a log in the friction log's encoding under a lone
+# 'python3 -*' grant: a body carrying ';' is data and grants; a command after the terminator is
+# shell and prompts; an unquoted body carrying '$HOME' expands, so it prompts and is unreachable;
+# and a line past the harness's analysis bound prompts and is unreachable.
+mkdir -p "$sb/hd/.claude"
+printf '%s\n' '{ "permissions": { "allow": ["Bash(python3 -*)"] } }' > "$sb/hd/.claude/settings.json"
+printf '%s\n' '{ "permissions": { "allow": [] } }' > "$sb/hd/.claude/settings.local.json"
+hd_run() { GUARD_KIT_SETTINGS="$sb/hd/.claude/settings.json" \
+           GUARD_KIT_SETTINGS_LOCAL="$sb/hd/.claude/settings.local.json" \
+           bash gate-sdk/bin/run-gates.sh --emit scan-prompts "$@"; }
+hdLOG="$sb/hd.log"
+# shellcheck disable=SC2016  # '$HOME' and the '\n' pairs are the logged line's own text
+printf '%s\n' 'python3 - <<'\''PY'\''\nimport x; print(1)\nPY' > "$hdLOG"
+assert_has hd-body-granted 'clean' "$(hd_run "$hdLOG")"
+# shellcheck disable=SC2016
+printf '%s\n' 'python3 - <<'\''PY'\''\nx = 1\nPY\nperl -e 1' > "$hdLOG"
+hd="$(hd_run "$hdLOG")"
+assert_has hd-after-terminator-prompts '1 prompting call(s)' "$hd"
+assert_has hd-after-terminator-reachable '0 of them allowlist-unreachable' "$hd"
+# shellcheck disable=SC2016
+printf '%s\n' 'python3 - <<PY\nprint("$HOME")\nPY' > "$hdLOG"
+assert_has hd-unquoted-live '1 of them allowlist-unreachable' "$(hd_run "$hdLOG")"
+printf 'python3 - %s\n' "$(printf 'x%.0s' $(seq 1 10000))" > "$hdLOG"
+assert_has hd-over-bound '1 of them allowlist-unreachable' "$(hd_run "$hdLOG")"
+
+# The guard's own log write: a heredoc-bearing fall-through through the template guard lands as
+# one encoded line, and that line reads back as the command it recorded.
+wroteLOG="$sb/wrote.log"
+hd_cmd="$(printf "python3 - <<'PY'\nprint('a\\\\b;\\tc')\nPY")"
+jq -nc --arg c "$hd_cmd" '{tool_name:"Bash",tool_input:{command:$c}}' \
+    | GUARD_KIT_LOG="$wroteLOG" bash guard-kit/templates/bash-guard.sh >/dev/null 2>&1
+wrote="$(cat "$wroteLOG" 2>/dev/null)"
+# shellcheck disable=SC2016
+[[ "$wrote" == 'python3 - <<'\''PY'\''\nprint('\''a\\b;\tc'\'')\nPY' ]] \
+    || { echo "FAIL [log-write-encoded]: got '$wrote'"; fails=$((fails + 1)); }
+assert_has log-write-decodes 'clean' "$(hd_run "$wroteLOG")"
+
 [[ "$fails" -eq 0 ]] || { echo "scan-prompts.test: $fails assertion(s) failed"; exit 1; }
-echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; a write-redirect call ranks in the allowlist-unreachable section without leaving the headline; a glob absorbing a redirect or an expansion grants neither call; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
+echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; a write-redirect call ranks in the allowlist-unreachable section without leaving the headline; a glob absorbing a redirect or an expansion grants neither call; a heredoc body is data to the grant test, the command after its terminator is shell, an unquoted body expands and an over-bound call is unreachable; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
 exit 0

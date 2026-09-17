@@ -119,6 +119,18 @@ fallthrough	perl -pi -e 's/a/b/'
 fallthrough	perl -I lib -pi -e 's/a/b/' notes.md
 fallthrough	perl -ne 'print if /x/' notes.md
 fallthrough	bash gate-sdk/bin/run-gates.sh --rewrite --regex 'a|b' 'c' notes.md
+# rule 8's python arm — an inline body (a quoted heredoc feeding stdin, or a -c argument) that is a
+#          literal rewrite; a computed replacement, an import, a read-only body, a '$' in an
+#          unquoted-delimiter body and a module run all pass
+block	python3 - <<'PY'@NL@p = 'notes.md'@NL@s = open(p).read()@NL@assert s.count('old') == 1@NL@s = s.replace('old', 'new')@NL@open(p, 'w').write(s)@NL@PY
+block	python3 - <<'PY'@NL@def sub(p, o, n):@NL@    s = open(p).read()@NL@    assert s.count(o) == 1@NL@    open(p, 'w').write(s.replace(o, n))@NL@sub('a.md', 'x', 'y')@NL@PY
+block	python3 -c "p='notes.md'; s=open(p).read(); open(p,'w').write(s.replace('a', 'b'))"
+fallthrough	python3 - <<'PY'@NL@p = 'notes.md'@NL@s = open(p).read()@NL@open(p, 'w').write(s.replace('a', f'{p}'))@NL@PY
+fallthrough	python3 - <<'PY'@NL@s = open('n.md').read()@NL@open('n.md', 'w').write(re.sub('a', 'b', s).replace('c', 'd'))@NL@PY
+fallthrough	python3 - <<'PY'@NL@import json@NL@s = open('n.md').read()@NL@open('n.md', 'w').write(s.replace('a', 'b'))@NL@PY
+fallthrough	python3 - <<'PY'@NL@s = open('n.md').read()@NL@print(s.replace('a', 'b'))@NL@PY
+fallthrough	python3 - <<PY@NL@s = open('n.md').read()@NL@open('n.md', 'w').write(s.replace('cost $5', 'b'))@NL@PY
+fallthrough	python3 -m json.tool notes.json
 
 # rule 9 — listing-only find steered to Glob, alone or as a ';'-batch of listings
 #          (a literal banner between them is fine); action-predicate / piped /

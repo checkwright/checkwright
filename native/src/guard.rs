@@ -25,7 +25,7 @@ pub fn split_compound(cmd: &str) -> Vec<String> {
     while i < b.len() {
         let sep = if b[i..].starts_with(b"||") || b[i..].starts_with(b"&&") {
             2
-        } else if b[i] == b';' || b[i] == b'|' {
+        } else if b[i] == b';' || b[i] == b'|' || b[i] == b'\n' {
             1
         } else {
             0
@@ -43,20 +43,14 @@ pub fn split_compound(cmd: &str) -> Vec<String> {
         .collect()
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — the two inert classes reachable on newline-free
-// input. `hd` and `hdq` are read only inside the heredoc-body machinery this twin omits, so they
-// are not fields here: a field with no reader is the defect a dropped branch would be.
+// spec: guard-kit/SPEC.md §The guard framework — the four inert classes `guard_skeleton` takes
 #[derive(Clone, Copy, Default, PartialEq, Eq, Debug)]
 pub struct Wants {
     pub sq: bool,
     pub dq: bool,
+    pub hd: bool,
+    pub hdq: bool,
 }
-
-// spec: guard-kit/SPEC.md §The guard framework — the twin's precondition, carried in the type
-// rather than only in prose: a newline-bearing command is out of contract, refused rather than
-// silently normalized by a machine that omits the branch which would have handled it.
-#[derive(Debug, PartialEq, Eq)]
-pub struct NewlineInInput;
 
 fn is_space(c: u8) -> bool {
     matches!(c, b' ' | b'\t' | b'\n' | 0x0b | 0x0c | b'\r')
@@ -226,7 +220,7 @@ pub fn harness_view(seg: &str) -> &str {
 // spec: guard-kit/SPEC.md §The guard framework — `<<-?[[:space:]]*(<quoted>|<identifier>)`, the
 // opener the holder matches with an anchored ERE. One byte decides the alternative and `[[:space:]]`
 // shares none of their first-character sets, so the greedy run needs no backtracking.
-fn heredoc_header_len(s: &[u8]) -> Option<usize> {
+fn heredoc_header(s: &[u8]) -> Option<(usize, &[u8], bool)> {
     if !s.starts_with(b"<<") {
         return None;
     }
@@ -241,14 +235,14 @@ fn heredoc_header_len(s: &[u8]) -> Option<usize> {
     match first {
         b'"' | b'\'' => {
             let k = s[j + 1..].iter().position(|&c| c == first)?;
-            Some(j + 1 + k + 1)
+            Some((j + 1 + k + 1, &s[j + 1..j + 1 + k], true))
         }
         c if c.is_ascii_alphabetic() || c == b'_' => {
             let mut e = j + 1;
             while e < s.len() && (s[e].is_ascii_alphanumeric() || s[e] == b'_') {
                 e += 1;
             }
-            Some(e)
+            Some((e, &s[j..e], false))
         }
         _ => None,
     }
@@ -260,18 +254,25 @@ enum State {
     Dq,
 }
 
-// spec: guard-kit/SPEC.md §The guard framework — `guard_skeleton` over the reachable subset: a
-// friction-log line is newline-free by construction, so the holder's `$'\n'` arm cannot fire, this
-// twin omits the machinery behind it, and the entry point refuses the input that would need it.
-pub fn skeleton(cmd: &str, w: Wants) -> Result<String, NewlineInInput> {
-    if cmd.as_bytes().contains(&b'\n') {
-        return Err(NewlineInInput);
-    }
+// spec: guard-kit/SPEC.md §The guard framework — `guard_skeleton`, the whole machinery
+pub fn skeleton(cmd: &str, w: Wants) -> String {
+    scan(cmd, w).0
+}
+
+// spec: guard-kit/SPEC.md §scan-prompts — each heredoc body with its terminator line, as byte ranges
+// of the command: the extent the skeleton's `hd` arm blanks, which the ranker's grant test drops
+pub fn heredoc_extents(cmd: &str) -> Vec<std::ops::Range<usize>> {
+    scan(cmd, Wants::default()).1
+}
+
+fn scan(cmd: &str, w: Wants) -> (String, Vec<std::ops::Range<usize>>) {
     let b = cmd.as_bytes();
     let n = b.len();
     let mut out: Vec<u8> = Vec::with_capacity(n);
     let mut span: Vec<u8> = Vec::new();
     let mut state = State::None;
+    let mut pending: std::collections::VecDeque<(&[u8], bool)> = std::collections::VecDeque::new();
+    let mut extents = Vec::new();
     let mut i = 0usize;
     while i < n {
         match state {
@@ -325,12 +326,9 @@ pub fn skeleton(cmd: &str, w: Wants) -> Result<String, NewlineInInput> {
             State::None => {}
         }
 
-        // spec: guard-kit/SPEC.md §The guard framework — the holder jumps between significant
-        // characters rather than stepping per character, and the set it jumps to is the one the
-        // arms below decide on. Newline is absent from it here because the entry point refused it.
         let k = b[i..]
             .iter()
-            .position(|&c| c == b'"' || c == b'\'' || c == b'\\' || c == b'<')
+            .position(|&c| c == b'"' || c == b'\'' || c == b'\\' || c == b'<' || c == b'\n')
             .unwrap_or(n - i);
         if k > 0 {
             out.extend_from_slice(&b[i..i + k]);
@@ -365,11 +363,51 @@ pub fn skeleton(cmd: &str, w: Wants) -> Result<String, NewlineInInput> {
                 i += 3;
                 continue;
             }
-            if let Some(len) = heredoc_header_len(&b[i..]) {
+            if let Some((len, term, quoted)) = heredoc_header(&b[i..]) {
                 out.extend_from_slice(&b[i..i + len]);
                 i += len;
+                pending.push_back((term, quoted));
                 continue;
             }
+        }
+        if ch == b'\n' {
+            out.push(b'\n');
+            i += 1;
+            while let Some((term, quoted)) = pending.pop_front() {
+                let start = i;
+                let mut body: Vec<u8> = Vec::new();
+                while i < n {
+                    let end = b[i..].iter().position(|&c| c == b'\n').map_or(n, |k| i + k);
+                    let line = &b[i..end];
+                    let lead = line.iter().position(|&c| !is_space(c)).unwrap_or(line.len());
+                    if &line[lead..] == term {
+                        break;
+                    }
+                    body.extend_from_slice(line);
+                    body.push(b'\n');
+                    i = (end + 1).min(n);
+                }
+                if !body.is_empty() {
+                    if w.hd || (w.hdq && quoted) {
+                        out.extend_from_slice(b"HD\n");
+                    } else {
+                        out.extend_from_slice(&body);
+                    }
+                }
+                if i < n {
+                    let end = b[i..].iter().position(|&c| c == b'\n').map_or(n, |k| i + k);
+                    out.extend_from_slice(&b[i..end]);
+                    i = end;
+                    extents.push(start..end);
+                    if i < n {
+                        out.push(b'\n');
+                        i += 1;
+                    }
+                } else {
+                    extents.push(start..n);
+                }
+            }
+            continue;
         }
         // spec: guard-kit/SPEC.md §The guard framework — placeholder, never deletion: a construct
         // that survives the scan is live, so an unrecognized `<` is one byte of the command again.
@@ -379,7 +417,7 @@ pub fn skeleton(cmd: &str, w: Wants) -> Result<String, NewlineInInput> {
     if !span.is_empty() {
         out.extend_from_slice(&span);
     }
-    Ok(String::from_utf8_lossy(&out).into_owned())
+    (String::from_utf8_lossy(&out).into_owned(), extents)
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — `_guard_redirect_pairs`' pattern, cited rather
@@ -416,7 +454,9 @@ pub fn redirect_pairs(text: &str) -> Result<Vec<String>, EreError> {
 mod tests {
     use super::*;
 
-    const SQDQ: Wants = Wants { sq: true, dq: true };
+    const SQDQ: Wants = Wants { sq: true, dq: true, hd: false, hdq: false };
+    const HD: Wants = Wants { sq: true, dq: true, hd: true, hdq: false };
+    const HDQ: Wants = Wants { sq: true, dq: false, hd: false, hdq: true };
 
     // spec: guard-kit/SPEC.md §The guard framework — the splitter's separator class and the
     // longest-match rule: `||` is one boundary, not two, and a trailing separator opens a segment
@@ -426,27 +466,20 @@ mod tests {
         assert_eq!(split_compound("echo trailing;"), vec!["echo trailing", ""]);
         assert_eq!(split_compound(""), vec![""]);
         assert_eq!(split_compound("a & b"), vec!["a & b"]);
+        assert_eq!(split_compound("a\nb;c\n"), vec!["a", "b", "c", ""]);
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — placeholder, never deletion, and the two
-    // classes reachable on newline-free input
+    // spec: guard-kit/SPEC.md §The guard framework — placeholder, never deletion
     #[test]
     fn the_skeleton_substitutes_the_inert_spans_and_leaves_the_rest_byte_identical() {
-        assert_eq!(skeleton("echo 'a;b' && ls", SQDQ).unwrap(), "echo SQ && ls");
-        assert_eq!(skeleton("echo \"a && b\" | wc -l", SQDQ).unwrap(), "echo DQ | wc -l");
-        assert_eq!(
-            skeleton("echo 'a;b' && ls", Wants::default()).unwrap(),
-            "echo 'a;b' && ls"
-        );
-        assert_eq!(
-            skeleton("grep -oE \"a\\\"b\" file", SQDQ).unwrap(),
-            "grep -oE DQ file"
-        );
-        assert_eq!(skeleton("echo 'unterminated", SQDQ).unwrap(), "echo 'unterminated");
+        assert_eq!(skeleton("echo 'a;b' && ls", SQDQ), "echo SQ && ls");
+        assert_eq!(skeleton("echo \"a && b\" | wc -l", SQDQ), "echo DQ | wc -l");
+        assert_eq!(skeleton("echo 'a;b' && ls", Wants::default()), "echo 'a;b' && ls");
+        assert_eq!(skeleton("grep -oE \"a\\\"b\" file", SQDQ), "grep -oE DQ file");
+        assert_eq!(skeleton("echo 'unterminated", SQDQ), "echo 'unterminated");
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — the heredoc opener is emitted verbatim and
-    // nothing follows it, which is what the omitted body machinery would otherwise have handled
+    // spec: guard-kit/SPEC.md §The guard framework — an opener with no line after it has no body
     #[test]
     fn the_heredoc_opener_survives_verbatim_and_never_becomes_a_placeholder() {
         for c in [
@@ -459,17 +492,37 @@ mod tests {
             "x <<9BAD",
             "x <<",
         ] {
-            assert_eq!(skeleton(c, SQDQ).unwrap(), c, "opener {:?} did not survive", c);
+            assert_eq!(skeleton(c, HD), c, "opener {:?} did not survive", c);
         }
-        assert_eq!(skeleton("cat <<<\"here string\"", SQDQ).unwrap(), "cat <<<DQ");
+        assert_eq!(skeleton("cat <<<\"here string\"", HD), "cat <<<DQ");
     }
 
-    // spec: guard-kit/SPEC.md §The guard framework — the precondition is checked, not assumed: the
-    // omitted branch's input is refused rather than silently mis-normalized
+    // spec: guard-kit/SPEC.md §The guard framework — the body runs to its terminator line, which
+    // stays live; `hd` blanks every body and `hdq` only a quoted-delimiter one
     #[test]
-    fn a_newline_bearing_command_is_out_of_contract_rather_than_normalized() {
-        assert_eq!(skeleton("cat <<EOF\nbody\nEOF", SQDQ), Err(NewlineInInput));
-        assert!(skeleton("cat <<EOF", SQDQ).is_ok());
+    fn a_heredoc_body_is_blanked_by_its_class_and_the_terminator_stays_live() {
+        let c = "python3 - <<'PY'\nprint('a;b' | c)\nPY\nls";
+        assert_eq!(skeleton(c, HD), "python3 - <<'PY'\nHD\nPY\nls");
+        assert_eq!(skeleton(c, HDQ), "python3 - <<'PY'\nHD\nPY\nls");
+        assert_eq!(skeleton(c, SQDQ), "python3 - <<'PY'\nprint('a;b' | c)\nPY\nls");
+        assert_eq!(skeleton("cat <<EOF\n$HOME\nEOF", HDQ), "cat <<EOF\n$HOME\nEOF");
+        assert_eq!(skeleton("cat <<-EOF\nx\n\tEOF", HD), "cat <<-EOF\nHD\n\tEOF");
+        assert_eq!(skeleton("a <<A <<B\n1\nA\n2\nB", HD), "a <<A <<B\nHD\nA\nHD\nB");
+        assert_eq!(skeleton("cat <<EOF\nnever ends", HD), "cat <<EOF\nHD\n");
+        assert_eq!(skeleton("cat <<EOF\nnever ends", SQDQ), "cat <<EOF\nnever ends\n");
+        assert_eq!(skeleton("cat <<EOF\nEOF", HD), "cat <<EOF\nEOF");
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — the extent is the body plus its terminator line
+    #[test]
+    fn the_heredoc_extent_covers_the_body_and_the_terminator_line() {
+        let c = "python3 - <<'PY'\nx = 1\nPY\nperl -e 1";
+        let e = heredoc_extents(c);
+        assert_eq!(e.len(), 1);
+        assert_eq!(&c[e[0].clone()], "x = 1\nPY");
+        let u = "cat <<EOF\nnever ends";
+        assert_eq!(&u[heredoc_extents(u)[0].clone()], "never ends");
+        assert!(heredoc_extents("cat <<EOF").is_empty());
     }
 
     // spec: guard-kit/SPEC.md §The guard framework — the strip walks each wrapper's own grammar,

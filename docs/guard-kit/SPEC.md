@@ -198,8 +198,9 @@ Primitives a consumer guard composes; each emits the harness's
 - `guard_allow <reason>` — silent grant via `permissionDecision: allow`.
 - `guard_rewrite <cmd> <reason>` — behavior-preserving rewrite via
   `updatedInput` (grant the better spelling of the same command).
-- `guard_log_fallthrough` — append the (truncated, newline-flattened)
-  command to the friction log; best-effort, never affects the decision.
+- `guard_log_fallthrough` — append the command to the friction log, one line per call: `\`, newline
+  and tab encoded as `\\`, `\n` and `\t`, cut to the harness's analysis bound plus one character
+  (§scan-prompts reads both); best-effort, never affects the decision.
 - `guard_allow_match <string> <pattern>` — the shell-glob match core: true when
   the string matches a committed allow pattern, with the harness `:*` prefix
   idiom (`Bash(printf:*)` ≡ any `printf …`) normalized to a trailing `*`. Not a
@@ -223,16 +224,14 @@ Primitives a consumer guard composes; each emits the harness's
   call site — the classes were never the disagreement, since every rule agrees
   that *some* regions are inert; the disagreement was that each decided privately
   and none recorded why. Not a hook primitive, and a pure function of its
-  arguments: no config read, no subprocess, no global. Its **compiled twin
-  implements the reachable subset only**: with no newline in the input the
-  heredoc-body machinery — the pending-terminator queues and the arm that drains
-  them — can never fire, so the twin omits it and refuses a newline-bearing
-  command at its entry point rather than normalizing one with a branch it does
-  not carry. The property that makes the omission the rule rather than an economy
-  is `guard_log_fallthrough`'s: it flattens every `\n` and `\t` to a space before
-  the append, so a logged line is newline-free by construction and `hd`/`hdq` are
-  inert on one. A `<<TERM` opener is therefore emitted verbatim, with nothing
-  following it.
+  arguments: no config read, no subprocess, no global. Its compiled twin carries
+  the whole machinery, the heredoc arm included, because a friction-log line
+  decodes to the multi-line command it recorded (§scan-prompts). One argument is
+  not a class: **`body=<k>`** prints the body of the command's `<k>`th heredoc
+  opener instead of the view, empty when that opener has none, so
+  `_guard_heredoc_body` reads a body with the arm's own extent rather than a
+  second copy of it. It has one shell caller and no compiled reader, so the
+  twin does not carry it.
 - `guard_split_compound <skeleton>` — the compound splitter: emits one segment
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
   `|`). Also not a hook primitive — the single implementation every **shell**
@@ -253,7 +252,8 @@ Primitives a consumer guard composes; each emits the harness's
   this one. Its separator class carries
   **no newline**, and it does not need one: it *emits* segments as lines and
   every consumer reads lines, so a newline already present in the input is
-  already a boundary before the substitution runs.
+  already a boundary before the substitution runs, and its compiled twin, which
+  returns segments rather than lines, ends one at a newline for the same reason.
 - `_guard_harness_view <segment>` — the segment as the harness's permission
   matcher reads it: the leading wrappers the matcher strips before it matches a
   `Bash` rule, removed from the head **repeatedly**. An `_`-prefixed internal
@@ -335,7 +335,9 @@ holders and compares their **classification**, A against B directly with no
 committed expected file, since a maintained golden would be a third copy to
 drift and the failure it exists to catch is one side edited without the other.
 The compiled side answers through `--guard-lib-parity <mode> <arg>...`, one mode
-per twinned predicate. The library's `no-port` ground does not reach the
+per twinned predicate. The `split`, `skeleton` and `redirect` modes print each
+command and view in `guard_log_fallthrough`'s encoding, so a heredoc-bearing
+record stays one line. The library's `no-port` ground does not reach the
 five: each is a pure function of its arguments, resolving no knob,
 and `_guard_redirect_pairs` and `_guard_harness_view` are `_`-prefixed internal
 helpers rather than the documented
@@ -735,7 +737,7 @@ that harness exists would be designing against no case.
    can suppress, block-and-steer strictly dominates; a brace in any inert region
    passes untouched. **Placed before both auto-allow rules**
    so their literal-target premise holds for braces as well.
-8. **`sed` or `awk` reading a file, or `sed` or `perl` rewriting one** — blocked with the
+8. **`sed` or `awk` reading a file, or `sed`, `perl` or an inline `python` body rewriting one** — blocked with the
    steer to a better tool: `sed -i` or `perl -i` (any short bundle carrying
    `i`, on any file operand) to the `--rewrite` arm (§rewrite), with the Edit
    tool named for an edit a fixed replacement cannot express, and a `sed`
@@ -814,14 +816,26 @@ that harness exists would be designing against no case.
    file operand, which reads stdin and rewrites no file; an in-place call behind another command word (`xargs perl -pi`),
    which is its lead's rule's subject; and a `perl` option the walker does not
    model.
-   **`python3 -` bodies are not steered, because no target exists yet.** Deciding
-   whether an inline body rewrites a file needs text inside the heredoc or the
-   `-c` argument, which the skeleton every rule here declares blanks. And unlike a
-   rewrite, what the bodies compute has no predictable tool to be sent to. Rule
-   23's ruling still holds, that a body carried in the command string is shown to
-   the approver verbatim, so the shape stays a reviewable call rather than a
-   hazard. Most inline bodies sampled did write one path, so the shape will keep
-   ranking. That is measured friction waiting on a target, not a missed row.
+   **The `python` arm blocks an inline body that is a literal rewrite**: it writes a file through `open(`
+   with a `w` or `a` mode or through `.write_text(`, it calls `.replace(`, and it carries no
+   computed-text construct (an f-string, `.format(`, `%` formatting, `re.`, an `import`, `.index(`,
+   `.find(`, `.join(`, `.split(`, a slice, `input(`, `sys.`, or a `$` in an unquoted-delimiter body). The
+   body is the `-c` argument (`_guard_program_operands`' `python` row: `-c` supplies the program, `-W`
+   and `-X` consume one word, `-u -B -E -I -s -S -O -q` none, a redirect token and its target are
+   skipped, anything else declines) or the heredoc feeding the segment's stdin (`_guard_heredoc_body`).
+   The `-c` argument is read off the dequoted view, so it declines where that view does. It steers to
+   `--rewrite` (`--expect` for a count assertion) or the Edit tool, and names `!<command>`. **Why this
+   shape and no wider one:** the inline bodies that recur across sessions are a literal read, replace
+   and write-back, which `--rewrite` performs with an effect its command line states. Computed
+   replacements, tallies and probes have no such tool, so they pass and stay measured friction. The arm
+   reads spelling, not semantics, and leans toward passing: a literal rewrite spelled through a
+   construct on that list passes, a computed one hiding behind none of them is blocked, and its steer
+   names `!<command>` for that case. The spellings it reads are python's, a language literal that
+   mints no knob, and a python revision that adds a write or formatting spelling is drift it does not
+   detect. **What passes besides:** a read-only body, a body writing through `shutil`, `os` or
+   `pathlib` without `.write_text(`, a `python` behind another command word, and any other
+   interpreter, since none was found inline. A committed `Bash(python3 -*)` grant is not argued with,
+   on the `awk` arm's ground: the grant stays load-bearing for every body the arm declines.
    **Placed before both auto-allow rules:** a consumer that widens
    `GUARD_KIT_RO_BINS` with `sed` would otherwise have rule 18 silently grant an
    in-place rewrite. `awk` has no honest place on that roster, since a program
@@ -2249,7 +2263,7 @@ The friction log's fall-throughs split three ways:
 
 **The allowlist-reachability verdict, and why it is narrower than "anything the
 allowlist cannot fix".** A logged call is **allowlist-unreachable** when it
-carries a shape the permission matcher refuses outright, and two shapes qualify,
+carries a shape the permission matcher refuses outright, and three shapes qualify,
 each on a ground a rule already states in its own refusal text: an
 **expansion, substitution or backtick** — rule 6's "the harness's matcher refuses
 every expansion", with the output process substitution and the backtick it does
@@ -2270,9 +2284,13 @@ the function computing the partition and retire rows an allowlist can fix. The
 verdict reads **every segment** of the line, not the key's first one — one
 unmatched segment takes the whole line off the match path — on a view where a
 single-quoted span and a backslash-escaped byte are inert and a double-quoted span
-is live for expansion. **A heredoc body is not read**: the log flattens a call's
-newlines, so past the first heredoc opener the line cannot say where the body ends
-and which text is shell, and the scan stops there. **A key is reported unreachable
+is live for expansion. **A heredoc body is read the way the harness reads it**, which
+was probed rather than assumed: the body is data, the text after its terminator line
+is shell, and an unquoted-delimiter body still expands. So the expansion test blanks
+only a quoted-delimiter body, the redirect test blanks every body, and the log line
+is decoded first (§The guard framework, `guard_log_fallthrough`). The third shape is
+a call longer than the harness's analysis bound, which the harness asks about
+whatever the allowlist says. A decoded line longer than that bound is one. **A key is reported unreachable
 only when every call under it is**, and both limits lean the same way on purpose:
 under-retiring leaves an unactionable row on the actionable list, which is visible,
 while over-retiring hides friction a reader could have fixed, which is silent. The
@@ -2300,6 +2318,14 @@ permission rule, which this arm does not read. Such a call reads prompting altho
 it was granted. That over-count is visible on the ranking, where an under-count
 would be silent. A write rule 17 grants never reaches the log, so the common
 gitignored case is untouched.
+
+**The grant test drops each heredoc body and its terminator line from the segments it matches.** A
+body is not a command, and a split inside it would read `;` and `|` in a python body as separators.
+The honest limit is that the analysis bound is the harness's literal, so a revision that moves it is
+drift this arm cannot detect. Two more limits ride on the log line itself: the cut counts characters
+the way the hook's shell locale counts them, so under a byte locale a multi-byte command near the
+bound may read under it; and a line logged flattened before a consumer upgraded decodes wrongly where
+it carries a backslash, which lasts until the next close clears the log.
 
 **Every segment is read through the harness view before it is matched or
 keyed.** The grant test and the ranking key both take the segment through
@@ -2455,12 +2481,12 @@ Its behavior
 argument-override in both orders, the
 write-shape suffix's create/append/fd-dup/first-segment cases, the reachability
 partition's sections and headline clause, the grant test's refusal of a call the
-verdict marks, and the
+verdict marks, the heredoc reading and the over-bound shape on an encoded log, and the
 argv-shape refusal with its `--` escape — is pinned by
 `gate-tests/scan-prompts.test.sh`, which reaches the arm through the front-end
 so the end-to-end path keeps a holder; the key derivation, the reachability
 verdict's shapes and exclusions, the grant test's reading of it on both passes,
-and the mixed-key rule are additionally pinned
+the log line's decode, the grant test's body drop and the mixed-key rule are additionally pinned
 in-crate, where `check-crate-arms` runs it. What that test pins is the split,
 the count semantics and those cases; the key's granularity beyond them is not a
 contract, which is why an additive suffix leaves its substring assertions true.
@@ -2491,6 +2517,12 @@ every logged call carrying a write redirect or an expansion that a committed or
 overlay glob matched from granted to prompting, and re-keys nothing. On one log,
 **20 patterns across 69 prompting calls** immediately before and **23 across 77**
 immediately after. The KPI is left as it is, on the ground above.
+
+**Reading a heredoc as the harness does is a step of the same kind.** The grant test moves
+heredoc-bearing calls from prompting to granted, and the third unreachable shape can move an
+over-bound call the other way. On one log, **27 patterns across 43 prompting calls** immediately
+before and **27 across 43** immediately after: that log was written flattened, so no line carried a
+body to drop and none passed the bound. The KPI is left as it is, on the ground above.
 
 **A substrate change is not such a step, and that is recorded rather than
 assumed.** Moving the measurement off a spawn-and-parse and onto an in-crate
