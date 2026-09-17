@@ -11,9 +11,10 @@
 # assertion C drives four
 # cross-component build-entry scenarios (2-dir amendments ±waiver,
 # single-amendment cross-component body, single-component amendment);
-# assertion D drives four build-entry marker scenarios (not-run red,
-# reasoned cannot-run clean with its count, empty-reason red, and a fenced,
-# mid-line and templates/-stub mention all clean).
+# assertion D drives six build-entry marker scenarios (not-run red,
+# reasoned cannot-run clean with its count, empty-reason red, a fenced,
+# mid-line and templates/-stub mention all clean, a marker on an active
+# queue entry red, and the same marker on a deferred entry clean).
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -303,9 +304,38 @@ mkdir -p "$SANDBOX/d4/some-kit/templates"
 printf '**Inferred, not run:** stub — `x`\n' >"$SANDBOX/d4/some-kit/templates/SPEC-amendment.md"
 check_case "D4 fence-prose-stub-not-markers" "$SANDBOX/d4" 0 "STAGE-ENTRY: clean"
 
+d_queue() {  # $1=dir  $2=debt-section body  $3=deferred-section body — rewrites the queue D5/D6 share
+    cat >"$1/TASK-QUEUE.md" <<EOF
+# TASK-QUEUE.md
+
+## Iteration: demo-iteration
+
+---
+
+## New Features
+
+## Technical Debt
+$2
+## Deferred
+$3
+## Done
+EOF
+}
+marked_entry=$'- **marked-entry** — a premise the filer did not run\n  **Inferred, not run:** the arm refuses — `run-gates.sh --only x`'
+
+# D5 (bad): a not-run marker on an active debt entry — refused, naming the queue line.
+d_sandbox "$SANDBOX/d5" 'no marker here'
+d_queue "$SANDBOX/d5" "$marked_entry" ""
+check_case "D5 active-queue-entry-marker" "$SANDBOX/d5" 1 "TASK-QUEUE.md:11:   **Inferred, not run:**"
+
+# D6 (good): the same marker on a deferred entry — the pool is not read.
+d_sandbox "$SANDBOX/d6" 'no marker here'
+d_queue "$SANDBOX/d6" "" "$marked_entry"
+check_case "D6 deferred-queue-entry-marker-unread" "$SANDBOX/d6" 0 "STAGE-ENTRY: clean"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + assertion D inferred-claim residue, 14 scenarios)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + assertion D inferred-claim residue over amendments and active queue entries, 16 scenarios)"
 exit 0

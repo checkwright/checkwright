@@ -43,10 +43,10 @@ passed over on the match alone.
 
 When filing a finding, place it by kind: nameable deliverable + done-state ⇒
 queue task (the deferred section, design-pending, after the owner lookup of
-lifecycle-kit/SPEC.md §The committed gap inbox); an observation about how
-the work should be done ⇒ the lessons section, dispositioned at close.
-Undone work parked as a lesson evaporates; a process insight parked as a
-task rots.
+lifecycle-kit/SPEC.md §The committed gap inbox, each claim you did not run
+carrying its inferred marker); an observation about how the work should be
+done ⇒ the lessons section, dispositioned at close. Undone work parked as a
+lesson evaporates; a process insight parked as a task rots.
 
 **Excavation that spans a corpus is a survey, not a triage.** When a red sends
 you across a whole corpus rather than into one failure, check the survey record

@@ -28,9 +28,9 @@ finding, or a dispatch's "capture as debt". The active sections must be empty
 at the drain boundary, so a finding mis-filed into one is caught only later as
 a red `check-stage-entry` at the next iteration's entry; filing to Deferred
 keeps the boundary clean (lifecycle-kit/SPEC.md §check-stage-entry owns the
-deferred-filing model for ruled-but-unpromoted work). Every filing, including a
-drain →promote, runs the owner lookup first and records it in the commit message
-(lifecycle-kit/SPEC.md §The committed gap inbox).
+deferred-filing model for ruled-but-unpromoted work). Every filing (a drain
+→promote too) runs the owner lookup first and records it in the commit message;
+each claim it did not run takes the inferred marker (§The committed gap inbox).
 
 **The survey record is not a close surface.** It carries no disposition
 obligation and blocks no boundary — the next first-stage entry truncates it,
@@ -106,9 +106,9 @@ session.
    Record the outcome in the close commit message beside the bullet's disposition
    — which bullets were re-verified and what fell — so a corrected premise is
    visible rather than silently absorbed. A claim no cheap command settles is
-   dispositioned *as a claim*: say so, and let the promoted entry carry the
-   unverified premise openly (§The committed gap inbox rules why this sits at the
-   drain and not at filing time).
+   dispositioned *as a claim*: say so, and carry it on the promoted entry as the
+   inferred marker (§templates/stages/; §The committed gap inbox rules why this
+   sits at the drain and not at filing time).
    The next iteration's first-stage entry refuses a non-empty inbox **when this
    stage was skipped** (§bin/enter-stage.sh), so an undrained gap blocks the
    boundary rather than crossing it silently.

@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **queue-entry-evidence-tier** [spec: SPEC-queue-entry-marker.md] — a later reader cannot tell a
-  queue entry's premise written at full evidence from one written at close-stage speed.
-  recurrence: queue-entry-evidence-tier 2026-09-16
-  **The rate:** five filed premises probed false across `queue-arm-report-fidelity`, all caught
-  downstream by re-verification that re-bought every premise; point (7) at
-  `installer-front-door-cut` showed an unconsumed annotation going unused, the half
-  claim-execution-obligations landed for amendments.
-  **Shape — intent-oracle decision (scope's reading, lead-relayed 2026-09-17, revisable, not
-  operator direction):** the inferred marker in queue-entry bodies, with check-stage-entry
-  assertion D widened to the active sections; chosen over a template-only convention and over
-  declining. The compression-signal half is answered by the `entry-history` arm.
-  Filed 2026-08-02 by scope on operator intake; iceboxed, returned 2026-09-16 on a judged
-  recurrence; joined `queue-entry-grammar` by operator direction 2026-09-17; paired at spec.
-
 ## Technical Debt
 
 - **deferred-entry-defer-date-unasserted** — a deferred entry whose provenance
@@ -3566,6 +3552,7 @@
 
 ## Done
 
+- queue-entry-evidence-tier
 - design-pending-tag-restates-its-own-section
 - amendment-owner-position-citation
 

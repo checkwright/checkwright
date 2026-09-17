@@ -178,7 +178,9 @@ follows it here.
 
 A premise inherited from a queued task ("clean/mechanical", "already filed",
 "dead code") is a dated hypothesis — re-verify it against the current tree
-before building on it, whether or not this stage goes on to author.
+before building on it, whether or not this stage goes on to author. On each entry
+you promote as debt, run every `**Inferred, not run:**` marker's command, correct
+the entry and delete the marker, or rewrite it to the cannot-run form.
 
 That re-verifies the entry's *own* claims — which is the half a survey already
 reads. The other half is what the **rest of the queue** says about that entry:

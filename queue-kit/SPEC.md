@@ -38,7 +38,9 @@ as `##` sections over column-0 bullets:
   `[cost:]` tag (§The tag algebra), and the field carries the prose that class
   summarises. The field's bold lead-in is
   line-local like a tag: split across a reflow it is invisible to the scanner
-  and the entry reads as uncosted.
+  and the entry reads as uncosted. A body may also carry lifecycle-kit's
+  inferred marker on a line of its own, with no `- ` lead
+  (lifecycle-kit/SPEC.md §templates/stages/); queue-kit reads it nowhere.
 - **The icebox section** (optional, `QUEUE_KIT_ICEBOX_SECTION`, default
   **empty** — no section, no tier) — dormant tasks compressed to one line
   each, sitting **after the deferred section and before the done section**.
@@ -1585,7 +1587,9 @@ assertions:
   keeps the equality above a statement about the *range* while the cap binds the
   *count*. A sub-task nests inside its parent's extent and is measured as its own
   entry too — and claims its own at-most-one-per-grammar discount, so a parent
-  whose extent holds two `recurrence:` lines still discounts one of them.
+  whose extent holds two `recurrence:` lines still discounts one of them. An
+  inferred-marker line is a counted body line — it is content rather than a declaration
+  grammar this format defines.
 - **(B) Icebox shape.** Every icebox entry is exactly one line; a continuation
   line under an icebox bullet is a violation. Skips clean when
   `QUEUE_KIT_ICEBOX_SECTION` is empty, the empty-knob behavior

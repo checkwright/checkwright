@@ -1308,6 +1308,14 @@ below stands). *Honest limit:* a filer whose terms miss the owner files a
 duplicate and nothing reds — `check-task-conservation` conserves a duplicate pair —
 so the commit-message record is the only residue a later reader can audit.
 
+**Filing marks what it did not run.** Each of those writes marks every claim its
+disposition turns on that the session did not run with the inferred marker
+(§templates/stages/), on a body line of its own — a drain's claim dispositioned
+*as a claim* is carried that way, as a marker a later stage runs rather than prose
+nobody consumes. The marker is written where the entry is written and never at
+capture: a gap-inbox bullet gains nothing, and the drain turning the bullet into an
+entry is where the marker first appears.
+
 **Two capture-time shapes are refused, recorded so they are not re-drafted.** A
 filing-time prompt for the establishing command, and a grammar separating
 observed fact from inferred mechanism, both add friction at the moment this inbox
@@ -1318,7 +1326,7 @@ away to fix a different failure mode. The affordance gains no prompt and no
 grammar; §check-gap-inbox-neutrality keeps the bullet's fields at two. The
 refusal is this channel's and reaches no surface where capture is not cheap or no
 drain re-verifies. The survey record is such a surface, and it takes the split
-(§The survey record).
+(§The survey record); so is a queue entry, which takes the inferred marker.
 
 **Merge semantics.** The inbox carries `merge=union` (git-native, so no per-clone
 driver registration), not the keep-ours `merge=iteration-scoped` the
@@ -1673,8 +1681,8 @@ is here, because the copy is not truncated.
 
 Both hold → **cite the record; do not re-buy the survey** — cite its `finding`.
 A claim in its `inferred` field is not carried by the witness: re-establish it
-before your work turns on it, or carry it onward as inferred — into an amendment,
-as the passage's inferred marker (§templates/stages/). Either moved →
+before your work turns on it, or carry it onward as inferred — into an amendment
+passage or a queue entry, as its inferred marker (§templates/stages/). Either moved →
 **dispatch only the delta**, the dispatch prompt naming the record block and the
 diff, so the child re-surveys what changed rather than the corpus. The
 asymmetry is what makes this safe to ship: a false *stale* costs one
@@ -4118,28 +4126,38 @@ waiver rides the same file the stamps do (auditable) and is written only on
 an explicit user ruling — never self-issued by the entering session; it
 satisfies only assertion C (assertion A's predecessor scan matches the audit
 stage exactly, so a waiver is never read as an audit *stamp*); and (D)
-inferred-claim residue — at audit-entry-stage entry, any on-disk amendment line
-carrying an `**Inferred, not run:**` marker, or a cannot-run marker whose reason is
-empty, is a refusal (the marker grammar: §templates/stages/).
+inferred-claim residue — at audit-entry-stage entry, any on-disk amendment line or
+active queue-entry line carrying an `**Inferred, not run:**` marker, or a cannot-run
+marker whose reason is empty, is a refusal (the marker grammar: §templates/stages/).
 
-**Assertion D reads C's corpus and nothing else** — the same walk, prune set,
-`templates/` exclusion and `LIFECYCLE_KIT_AMENDMENT_GLOB` basenames — so it needs no
-knob and no `--reads` root of its own. It runs **whether or not an audit stamp
-exists**, because the audit stamp proves the audit ran, not that the markers were
-consumed. A line is read as a marker only where the marker opens it, after optional
-indentation and one optional `- ` or `> ` lead, and never inside a fence (a line
-opening a backtick or tilde fence toggles one); a cannot-run marker's reason is the
-text after its last spaced em dash, empty when that separator is absent or nothing
-follows it. **Red**
-prints one `<file>:<line>: <marker line>` per marker, and the help line names the
-remedy: run the command, correct the passage and delete the marker, or rewrite it to
-the cannot-run form with a reason — made at the stage the refused entry leaves the
-cursor at, since a refused `--enter-stage` writes nothing. **Clean** detail adds
-`N cannot-run claim(s) carried` when N > 0, the count build's run-the-system
-paragraph consumes. **Inert** where `LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` is empty.
-**The honest limit:** a roster with no audit stage gets the template obligations
-without this backstop; a dedicated knob for the implementing stage would mint a name
-for one assertion, which the knob roster refuses without an attested consumer.
+**Assertion D reads C's amendment walk and B's queue read, and nothing else.** The
+walk is C's — prune set, `templates/` exclusion and `LIFECYCLE_KIT_AMENDMENT_GLOB`
+basenames. The queue read is every line inside a top-level entry of a
+`LIFECYCLE_KIT_ACTIVE_SECTIONS` section of `LIFECYCLE_KIT_QUEUE_FILE`: an entry's
+extent runs from its top-level `- ` line to the line before the next top-level
+bullet, heading or `---` rule, so a section's preamble is in no entry. Both are
+already this gate's reads, so D needs no knob and no `--reads` root of its own; the
+queue read is a named file, outside the walk class gate-sdk/SPEC.md
+§check-reads-couples rules on, and `couples=` already carries it. The deferred
+section, the icebox and the done section are not read. It runs **whether or not an
+audit stamp exists**, because the audit stamp proves the audit ran, not that the
+markers were consumed. A line is read as a marker only where the marker opens it,
+after optional indentation and one optional `- ` or `> ` lead, and never inside a
+fence (a line opening a backtick or tilde fence toggles one, over the whole file); a
+cannot-run marker's reason is the text after its last spaced em dash, empty when
+that separator is absent or nothing follows it. **Red** prints one
+`<file>:<line>: <marker line>` per marker, amendment or queue alike, and the help
+line names the remedy: run the command, correct the passage or entry and delete the
+marker, or rewrite it to the cannot-run form with a reason — made at the stage the
+refused entry leaves the cursor at, since a refused `--enter-stage` writes nothing.
+**Clean** detail adds `N cannot-run claim(s) carried` when N > 0, summed over both
+corpora, the count build's run-the-system paragraph consumes. **Inert** where
+`LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` is empty. **The honest limits:** a roster with no
+audit stage gets the template obligations without this backstop; a dedicated knob
+for the implementing stage would mint a name for one assertion, which the knob
+roster refuses without an attested consumer. A queue file whose active-section names
+are misconfigured reads no entries for D, exactly as for B, and nothing more is
+asserted about it.
 
 **Why a block and not an annotation.** An annotation already existed — the survey
 record's `inferred` field — and the failure D closes is that nothing consumed it; a
@@ -4758,12 +4776,29 @@ record is boundary-truncated and holds a claim per block, not per passage, and a
 restatement drops the record's flag; the marker sits where the next reader reads,
 the rule the **Not yet applied** marker already follows.
 
-**Align runs every not-run marker and build runs the cannot-run ones first**, and
-both templates carry it although §check-stage-entry assertion D already refuses
-the build entry on an unrun marker: align is trigger-gated and can be skipped, so D
-is what holds the obligation when it is, while align's sentence names the stage
-that meets a marker first when align does run — so the refusal is not the first
-time the marker is noticed.
+**A queue entry carries the marker too**, written by every session that writes a
+new deferred entry (§The committed gap inbox), on a continuation line of its own
+with **no `- ` lead**: with the lead the line parses as a sub-task whose bold
+lead-in is not a slug, which `check-task-names` reds. In the deferred pool and the
+icebox no gate reads it; the marker is the carried signal, dropped with the body at
+an eviction and recovered with it (queue-kit/SPEC.md §The icebox tier). It counts
+toward the entry cap like any body line (queue-kit/SPEC.md
+§check-queue-entry-budget).
+
+**The promoting stage runs an entry's not-run markers before it promotes the
+entry** — scope for debt, the authoring stage that pairs the entry for a feature —
+correcting the entry and deleting the marker, or rewriting it to the cannot-run
+form. **Scope owes debt this and not only assertion D** because a debt entry
+promoted straight into an active section meets no stage between scope and the
+audit-entry stage, so without the scope sentence the first reader of its marker is
+the refusal — the failure the align/D pairing below already closes for amendments.
+
+**Align runs every not-run marker and build runs the cannot-run ones first** — in an
+amendment or an active queue entry — and both templates carry it although
+§check-stage-entry assertion D already refuses the build entry on an unrun marker:
+align is trigger-gated and can be skipped, so D is what holds the obligation when it
+is, while align's sentence names the stage that meets a marker first when align does
+run — so the refusal is not the first time the marker is noticed.
 
 The directory holds the **stage-class** template set, not any one consumer's
 roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five,

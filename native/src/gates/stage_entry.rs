@@ -152,9 +152,31 @@ fn inferred_marker(line: &str) -> Option<Marker> {
     })
 }
 
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — D's queue read: a line is in scope only inside a
+// top-level entry of an active section, from its `- ` line to the line before the next top-level
+// bullet, heading or `---` rule. Indexed by 0-based line number.
+fn active_entry_lines(text: &str, sections: &[String]) -> Vec<bool> {
+    let (mut out, mut in_section, mut in_entry) = (Vec::new(), false, false);
+    for line in text.lines() {
+        if line.starts_with('#') || line.trim_end_matches([' ', '\t']) == "---" {
+            in_entry = false;
+            if let Some(rest) = line.strip_prefix("## ") {
+                in_section = sections
+                    .iter()
+                    .any(|s| rest.trim_end_matches([' ', '\t']) == s);
+            }
+        } else if line.starts_with("- ") {
+            in_entry = in_section;
+        }
+        out.push(in_entry);
+    }
+    out
+}
+
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — a fence line toggles the window no marker is
-// read inside. Returns the unrun markers as `<line>: <text>` and the reasoned cannot-run count.
-fn scan_markers(text: &str) -> (Vec<String>, usize) {
+// read inside, and `in_scope` narrows which lines are read. Returns the unrun markers as
+// `<line>: <text>` and the reasoned cannot-run count.
+fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> (Vec<String>, usize) {
     let (mut unrun, mut carried, mut fenced) = (Vec::new(), 0usize, false);
     for (i, line) in text.lines().enumerate() {
         let t = line.trim_start_matches([' ', '\t']);
@@ -162,7 +184,7 @@ fn scan_markers(text: &str) -> (Vec<String>, usize) {
             fenced = !fenced;
             continue;
         }
-        if fenced {
+        if fenced || !in_scope(i) {
             continue;
         }
         match inferred_marker(line) {
@@ -440,8 +462,8 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    // assertion D: audit-entry refuses an on-disk amendment still carrying an unrun inferred-claim
-    // marker, audit stamp or not (lifecycle-kit/SPEC.md §check-stage-entry)
+    // assertion D: audit-entry refuses an on-disk amendment or active queue entry still carrying an
+    // unrun inferred-claim marker, audit stamp or not (lifecycle-kit/SPEC.md §check-stage-entry)
     let mut d_fired = false;
     let mut carried = 0usize;
     if at_audit_entry {
@@ -460,16 +482,22 @@ pub fn run(args: &[String]) -> i32 {
                     return 2;
                 }
             };
-            let (hits, n) = scan_markers(&text);
+            let (hits, n) = scan_markers(&text, &|_| true);
             carried += n;
             for h in hits {
                 unrun.push_str(&format!("\n    {}:{}", af, h));
             }
         }
+        let scope = active_entry_lines(&qtext, &k.active_sections);
+        let (hits, n) = scan_markers(&qtext, &|i| scope.get(i).copied().unwrap_or(false));
+        carried += n;
+        for h in hits {
+            unrun.push_str(&format!("\n    {}:{}", k.queue, h));
+        }
         if !unrun.is_empty() {
             d_fired = true;
             errors.push(format!(
-                "entering '{}' but on-disk amendments carry inferred-claim marker(s) nobody ran (a not-run marker, or a cannot-run marker with no reason):{}",
+                "entering '{}' but on-disk amendments or active queue entries carry inferred-claim marker(s) nobody ran (a not-run marker, or a cannot-run marker with no reason):{}",
                 stage, unrun
             ));
         }
@@ -491,7 +519,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("  help: a stage entry re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps {}) and drain the active queue before entering {}", k.state, k.drain);
         }
         if d_fired {
-            println!("  help: at the stage the refused entry leaves the cursor at, run each marker's command, correct the passage to what it returned and delete the marker — or rewrite it to '{} <claim> — <reason>' where the claim's subject does not exist until {}", CANNOT_RUN, k.audit_entry_stage);
+            println!("  help: at the stage the refused entry leaves the cursor at, run each marker's command, correct the passage or entry to what it returned and delete the marker — or rewrite it to '{} <claim> — <reason>' where the claim's subject does not exist until {}", CANNOT_RUN, k.audit_entry_stage);
         }
         return 1;
     }
@@ -563,7 +591,22 @@ mod tests {
             Some(Marker::CannotRun { reason_empty: true })
         );
         let text = "```\n**Inferred, not run:** a — `c`\n```\n**Inferred, cannot run before build:** b — why\n**Inferred, not run:** d — `c`\n";
-        assert_eq!(scan_markers(text), (vec!["5: **Inferred, not run:** d — `c`".to_string()], 1));
+        assert_eq!(
+            scan_markers(text, &|_| true),
+            (vec!["5: **Inferred, not run:** d — `c`".to_string()], 1)
+        );
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-entry — D reads a queue marker inside an active
+    // entry only: a deferred entry's marker, a section preamble's and a fenced one are unread
+    #[test]
+    fn a_queue_marker_is_read_only_inside_an_active_entry_and_outside_a_fence() {
+        let text = "## Technical Debt\n  **Inferred, not run:** preamble — `c`\n- **a** — x\n  **Inferred, not run:** active — `c`\n  ```\n  **Inferred, not run:** fenced — `c`\n  ```\n## Deferred\n- **b** — y\n  **Inferred, not run:** deferred — `c`\n";
+        let secs = vec!["New Features".to_string(), "Technical Debt".to_string()];
+        let scope = active_entry_lines(text, &secs);
+        let (hits, n) = scan_markers(text, &|i| scope.get(i).copied().unwrap_or(false));
+        assert_eq!(hits, vec!["4:   **Inferred, not run:** active — `c`".to_string()]);
+        assert_eq!(n, 0);
     }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — `grep -oE` takes every non-overlapping
