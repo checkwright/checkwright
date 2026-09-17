@@ -105,8 +105,10 @@ nothing here loads the release runbook. Only what ships inside a kit is declared
 
 **Run the system; don't reason about it** — when a running system is
 reachable, reproduce first, read second. Recorded evidence rots: a static
-trace in a task body is a dated hypothesis to re-verify, not a premise. A
-change carrying an artifact surface — a change whose real output is a deployed
+trace in a task body is a dated hypothesis to re-verify, not a premise. An
+amendment passage marked `**Inferred, cannot run before build:**` is run as
+soon as its subject exists, before the delta resting on it lands, and the
+merge carries what it returned. A change carrying an artifact surface — a change whose real output is a deployed
 or generated artifact — names that surface and exercises the artifact
 deployment-faithfully before the stage exits; a green battery is tree-correct,
 not artifact-correct (Oracle-first).

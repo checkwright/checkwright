@@ -23,11 +23,11 @@
 69 lifecycle-kit/templates/consult.md
 613 lifecycle-kit/templates/lead.md
 33 lifecycle-kit/templates/release-sweep.md
-103 lifecycle-kit/templates/stages/align.md
-118 lifecycle-kit/templates/stages/build.md
+106 lifecycle-kit/templates/stages/align.md
+120 lifecycle-kit/templates/stages/build.md
 297 lifecycle-kit/templates/stages/close.md
 241 lifecycle-kit/templates/stages/scope.md
-122 lifecycle-kit/templates/stages/spec.md
+133 lifecycle-kit/templates/stages/spec.md
 95 lifecycle-kit/templates/stages/validate.md
 41 lifecycle-kit/templates/upgrade.md
 47 queue-kit/templates/TASK-QUEUE.md

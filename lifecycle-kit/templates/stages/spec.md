@@ -57,6 +57,17 @@ set**, never a hand-picked subset, and never silence a probe's stderr — a
 `2>/dev/null` on a path grep reads a bad path as "no reader", the false
 negative that hides a cross-component reader.
 
+**Before committing an amendment, run each delta's own claims.** Run the
+command that tells whether the tree already does what the delta instructs; a
+delta the tree already satisfies is rewritten or deleted, never shipped. Then,
+for each premise the delta's ruling or reach rests on — what a program does, what
+a file holds, a count, which readers a surface has — run the one command that
+settles it and correct the delta to what it returned. That includes every claim a
+survey block you rely on lists under `inferred`. A premise no command settles
+before build takes the inferred marker on its passage. An illustration the delta
+does not rest on is exempt. The marker grammar and why the pass is bounded this
+way: lifecycle-kit/SPEC.md §templates/stages/.
+
 **Replacement text re-phrases; it never appends.** Rewrite the passage a
 delta refines, clearer and briefer, and add text only where no rewrite
 carries the change (canon-kit's amendment-merge rule).

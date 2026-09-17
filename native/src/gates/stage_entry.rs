@@ -1,5 +1,5 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — prior-stage invocation-stamp ordering +
-// drain-entry queue-empty + audit-trigger signal
+// drain-entry queue-empty + audit-trigger signal + inferred-claim residue
 use crate::ere::Ere;
 use crate::stages;
 use crate::walk;
@@ -104,9 +104,9 @@ fn knobs(args: &[String]) -> Result<Knobs, String> {
     })
 }
 
-// spec: lifecycle-kit/SPEC.md §check-stage-entry — assertion C's signal, or None. templates/
-// paths are excluded from both scans (a shipped stub is not a live amendment).
-fn audit_signal(k: &Knobs) -> Result<Option<String>, String> {
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — the tree C and D both scan: prune set applied,
+// templates/ paths excluded (a shipped stub is not a live amendment).
+fn live_tree() -> Result<Vec<String>, String> {
     let prune = walk::prune_dirs()?;
     let files = walk::find_with_prune(Path::new("."), &|n| prune.iter().any(|d| d == n))?;
     let mut rel: Vec<String> = Vec::new();
@@ -118,7 +118,67 @@ fn audit_signal(k: &Knobs) -> Result<Option<String>, String> {
         }
         rel.push(p);
     }
-    let base = |p: &str| p.rsplit('/').next().unwrap_or(p).to_string();
+    Ok(rel)
+}
+
+fn basename(p: &str) -> &str {
+    p.rsplit('/').next().unwrap_or(p)
+}
+
+#[derive(Debug, PartialEq)]
+enum Marker {
+    NotRun,
+    CannotRun { reason_empty: bool },
+}
+
+const NOT_RUN: &str = "**Inferred, not run:**";
+const CANNOT_RUN: &str = "**Inferred, cannot run before build:**";
+
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — the marker grammar: line start after optional
+// indentation and one optional `- ` or `> ` lead; the reason is the text after the last ` — `.
+fn inferred_marker(line: &str) -> Option<Marker> {
+    let s = line.trim_start_matches([' ', '\t']);
+    let s = s
+        .strip_prefix("- ")
+        .or_else(|| s.strip_prefix("> "))
+        .unwrap_or(s);
+    if s.starts_with(NOT_RUN) {
+        return Some(Marker::NotRun);
+    }
+    let rest = s.strip_prefix(CANNOT_RUN)?;
+    let reason = rest.rsplit_once(" — ").map(|(_, r)| r.trim()).unwrap_or("");
+    Some(Marker::CannotRun {
+        reason_empty: reason.is_empty(),
+    })
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — a fence line toggles the window no marker is
+// read inside. Returns the unrun markers as `<line>: <text>` and the reasoned cannot-run count.
+fn scan_markers(text: &str) -> (Vec<String>, usize) {
+    let (mut unrun, mut carried, mut fenced) = (Vec::new(), 0usize, false);
+    for (i, line) in text.lines().enumerate() {
+        let t = line.trim_start_matches([' ', '\t']);
+        if t.starts_with("```") || t.starts_with("~~~") {
+            fenced = !fenced;
+            continue;
+        }
+        if fenced {
+            continue;
+        }
+        match inferred_marker(line) {
+            Some(Marker::CannotRun {
+                reason_empty: false,
+            }) => carried += 1,
+            Some(_) => unrun.push(format!("{}: {}", i + 1, line)),
+            None => {}
+        }
+    }
+    (unrun, carried)
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — assertion C's signal, or None.
+fn audit_signal(k: &Knobs, rel: &[String]) -> Result<Option<String>, String> {
+    let base = |p: &str| basename(p).to_string();
     let dir = |p: &str| match p.rfind('/') {
         Some(i) => p[..i].to_string(),
         None => p.to_string(),
@@ -127,7 +187,7 @@ fn audit_signal(k: &Knobs) -> Result<Option<String>, String> {
     let mut roster: Vec<String> = Vec::new();
     let mut amend_dirs: Vec<String> = Vec::new();
     let mut amend_files: Vec<String> = Vec::new();
-    for p in &rel {
+    for p in rel {
         if base(p) == k.roster_basename {
             let d = dir(p);
             if !roster.contains(&d) {
@@ -336,13 +396,30 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
+    let ab_fired = !errors.is_empty();
+    let at_audit_entry = !k.audit_entry_stage.is_empty() && stage == k.audit_entry_stage;
+    let tree = if at_audit_entry {
+        match live_tree() {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!(
+                    "check-stage-entry: {} — the check could not run; treating as failure (not clean)",
+                    e
+                );
+                return 2;
+            }
+        }
+    } else {
+        Vec::new()
+    };
+
     // assertion C: audit-entry with a cross-component amendment signal and no audit stamp demands
     // that stamp or a recorded waiver (lifecycle-kit/SPEC.md §check-stage-entry)
     if !k.audit_stage.is_empty()
-        && stage == k.audit_entry_stage
+        && at_audit_entry
         && !stamp_present(&stext, &iter, &k.audit_stage)
     {
-        match audit_signal(&k) {
+        match audit_signal(&k, &tree) {
             Err(e) => {
                 eprintln!(
                     "check-stage-entry: {} — the check could not run; treating as failure (not clean)",
@@ -363,6 +440,41 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
+    // assertion D: audit-entry refuses an on-disk amendment still carrying an unrun inferred-claim
+    // marker, audit stamp or not (lifecycle-kit/SPEC.md §check-stage-entry)
+    let mut d_fired = false;
+    let mut carried = 0usize;
+    if at_audit_entry {
+        let mut unrun = String::new();
+        for af in tree
+            .iter()
+            .filter(|p| walk::pattern_match(&k.amendment_glob, basename(p)))
+        {
+            let text = match std::fs::read(af) {
+                Ok(b) => String::from_utf8_lossy(&b).into_owned(),
+                Err(e) => {
+                    eprintln!(
+                        "check-stage-entry: cannot read {}: {} — the check could not run; treating as failure (not clean)",
+                        af, e
+                    );
+                    return 2;
+                }
+            };
+            let (hits, n) = scan_markers(&text);
+            carried += n;
+            for h in hits {
+                unrun.push_str(&format!("\n    {}:{}", af, h));
+            }
+        }
+        if !unrun.is_empty() {
+            d_fired = true;
+            errors.push(format!(
+                "entering '{}' but on-disk amendments carry inferred-claim marker(s) nobody ran (a not-run marker, or a cannot-run marker with no reason):{}",
+                stage, unrun
+            ));
+        }
+    }
+
     if !errors.is_empty() {
         println!(
             "STAGE-ENTRY: {} prior-stage readiness issue(s) entering '{}' of '{}':",
@@ -375,13 +487,16 @@ pub fn run(args: &[String]) -> i32 {
         }
         if c_fired {
             println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date> <head>'), or — on an explicit user ruling, never self-issued by the entering session — record a deliberate waiver line '{} {} <session> <date> <head>' in {}", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, iter, k.waiver, k.state);
-        } else {
+        } else if ab_fired {
             println!("  help: a stage entry re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps {}) and drain the active queue before entering {}", k.state, k.drain);
+        }
+        if d_fired {
+            println!("  help: at the stage the refused entry leaves the cursor at, run each marker's command, correct the passage to what it returned and delete the marker — or rewrite it to '{} <claim> — <reason>' where the claim's subject does not exist until {}", CANNOT_RUN, k.audit_entry_stage);
         }
         return 1;
     }
 
-    let detail = if pred.is_empty() {
+    let mut detail = if pred.is_empty() {
         format!("'{}' has no mandatory predecessor", stage)
     } else if b_drain {
         let mut d = format!("predecessor '{}' stamped; active queue drained", pred);
@@ -394,6 +509,9 @@ pub fn run(args: &[String]) -> i32 {
     } else {
         format!("predecessor '{}' stamped", pred)
     };
+    if carried > 0 {
+        detail.push_str(&format!("; {} cannot-run claim(s) carried", carried));
+    }
     println!("STAGE-ENTRY: clean ('{}' / '{}' — {})", iter, stage, detail);
     0
 }
@@ -421,6 +539,31 @@ mod tests {
         assert_eq!(drain_exempt_reason("- x [drain-exempt:]"), Some(""));
         assert_eq!(drain_exempt_reason("- x"), None);
         assert_eq!(drain_exempt_reason("- x [drain-exempt: unterminated"), None);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-entry — a marker opens its line; a mid-line or
+    // backticked mention, and any line inside a fence, is prose
+    #[test]
+    fn a_marker_is_read_only_at_line_start_and_outside_a_fence() {
+        assert_eq!(inferred_marker("**Inferred, not run:** x — `cmd`"), Some(Marker::NotRun));
+        assert_eq!(inferred_marker("  - **Inferred, not run:** x — `cmd`"), Some(Marker::NotRun));
+        assert_eq!(inferred_marker("> **Inferred, not run:** x"), Some(Marker::NotRun));
+        assert_eq!(inferred_marker("prose **Inferred, not run:** x"), None);
+        assert_eq!(inferred_marker("- `**Inferred, not run:**` x"), None);
+        assert_eq!(
+            inferred_marker("**Inferred, cannot run before build:** x — the gate is unwritten"),
+            Some(Marker::CannotRun { reason_empty: false })
+        );
+        assert_eq!(
+            inferred_marker("**Inferred, cannot run before build:** x — "),
+            Some(Marker::CannotRun { reason_empty: true })
+        );
+        assert_eq!(
+            inferred_marker("**Inferred, cannot run before build:** x"),
+            Some(Marker::CannotRun { reason_empty: true })
+        );
+        let text = "```\n**Inferred, not run:** a — `c`\n```\n**Inferred, cannot run before build:** b — why\n**Inferred, not run:** d — `c`\n";
+        assert_eq!(scan_markers(text), (vec!["5: **Inferred, not run:** d — `c`".to_string()], 1));
     }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — `grep -oE` takes every non-overlapping

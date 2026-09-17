@@ -17,8 +17,8 @@ command). That stamp *is* the stage transition — there is no second copy of
 the cursor to keep in sync, and stage motion writes no queue at all.
 `check-stage-evidence` verifies the stamp file's grammar and that every stamp
 belongs to the header's iteration; `check-stage-entry` verifies the
-predecessor stamp, the drained queue at validate entry, and the
-cross-component audit trigger at build entry. See [SPEC.md](SPEC.md) for the
+predecessor stamp, the drained queue at validate entry, and, at build entry,
+the cross-component audit trigger and no unrun inferred-claim marker. See [SPEC.md](SPEC.md) for the
 full contracts.
 
 An installer-vendored tree does not carry this file. The payload withholds each

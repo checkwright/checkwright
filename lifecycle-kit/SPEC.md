@@ -1673,7 +1673,8 @@ is here, because the copy is not truncated.
 
 Both hold → **cite the record; do not re-buy the survey** — cite its `finding`.
 A claim in its `inferred` field is not carried by the witness: re-establish it
-before your work turns on it, or carry it onward as inferred. Either moved →
+before your work turns on it, or carry it onward as inferred — into an amendment,
+as the passage's inferred marker (§templates/stages/). Either moved →
 **dispatch only the delta**, the dispatch prompt naming the record block and the
 diff, so the child re-surveys what changed rather than the corpus. The
 asymmetry is what makes this safe to ship: a false *stale* costs one
@@ -4056,7 +4057,7 @@ rather than overlooked. An empty
 cursor is unreachable by construction here and stays a hard parse error rather
 than a disarm: `--enter-stage` hands the gate a temp state file that always
 carries the candidate stamp, and at commit time the entry commit stages that
-same stamp. It owns three assertions, (A)
+same stamp. It owns four assertions, (A)
 prerequisite-stamp ordering — for an entered stage X the file carries a
 stamp for X's configured mandatory predecessor, which closes the "jumped
 straight to the last stage with no prior stamp" hole its sibling — which no
@@ -4093,7 +4094,7 @@ branch enforces nothing. A push's timing is not a tree state, so no arm here can
 observe that the placement rule was kept; what the branch buys is that the
 failure, when it happens, names its own remedy at the moment it fires instead of
 costing a fresh derivation. The enforceable half of this class is the tag's
-lead-line hygiene (queue-kit/SPEC.md §check-tag-lead-line); and (C)
+lead-line hygiene (queue-kit/SPEC.md §check-tag-lead-line); (C)
 audit-trigger — an audit-entry-stage header carrying a cross-component
 amendment signal but no `<iter> <audit-stage>` stamp demands either that
 stamp or an explicit recorded waiver line, mechanizing the audit stage's
@@ -4116,7 +4117,39 @@ The
 waiver rides the same file the stamps do (auditable) and is written only on
 an explicit user ruling — never self-issued by the entering session; it
 satisfies only assertion C (assertion A's predecessor scan matches the audit
-stage exactly, so a waiver is never read as an audit *stamp*).
+stage exactly, so a waiver is never read as an audit *stamp*); and (D)
+inferred-claim residue — at audit-entry-stage entry, any on-disk amendment line
+carrying an `**Inferred, not run:**` marker, or a cannot-run marker whose reason is
+empty, is a refusal (the marker grammar: §templates/stages/).
+
+**Assertion D reads C's corpus and nothing else** — the same walk, prune set,
+`templates/` exclusion and `LIFECYCLE_KIT_AMENDMENT_GLOB` basenames — so it needs no
+knob and no `--reads` root of its own. It runs **whether or not an audit stamp
+exists**, because the audit stamp proves the audit ran, not that the markers were
+consumed. A line is read as a marker only where the marker opens it, after optional
+indentation and one optional `- ` or `> ` lead, and never inside a fence (a line
+opening a backtick or tilde fence toggles one); a cannot-run marker's reason is the
+text after its last spaced em dash, empty when that separator is absent or nothing
+follows it. **Red**
+prints one `<file>:<line>: <marker line>` per marker, and the help line names the
+remedy: run the command, correct the passage and delete the marker, or rewrite it to
+the cannot-run form with a reason — made at the stage the refused entry leaves the
+cursor at, since a refused `--enter-stage` writes nothing. **Clean** detail adds
+`N cannot-run claim(s) carried` when N > 0, the count build's run-the-system
+paragraph consumes. **Inert** where `LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` is empty.
+**The honest limit:** a roster with no audit stage gets the template obligations
+without this backstop; a dedicated knob for the implementing stage would mint a name
+for one assertion, which the knob roster refuses without an attested consumer.
+
+**Why a block and not an annotation.** An annotation already existed — the survey
+record's `inferred` field — and the failure D closes is that nothing consumed it; a
+marker that blocks nothing reproduces that failure one surface later. D is **not**
+the assertion-C sibling for the authoring stage refused below: that refusal rests on
+an authoring stage's *output* being verified by the pairing rule, and D asserts a
+property of the amendment's content the pairing rule never reads. **Not gated, and
+stated so:** whether the authoring-exit pass ran, which leaves no tracked residue,
+and whether an unmarked claim is true — the premise its author believed verified,
+the class the pass concedes (§templates/stages/).
 
 Calibration: the predecessor map deliberately omits a **trigger-gated stage**
 as anyone's mandatory predecessor — the audit stage, and equally a trigger-gated
@@ -4144,7 +4177,7 @@ false-negative, strictly better than self-report.
 
 **The gate dispatches to the binary substrate** — `checks/check-stage-entry.gate`
 to `native/src/gates/stage_entry.rs`, the shell script deleted — and the port
-asserts nothing new: the three assertions, their calibration and assertion C's
+asserts nothing new: assertions A to C, their calibration and assertion C's
 honest limit are exactly as stated above. The predecessor map is a keyed knob
 and is read **by key** (gate-sdk/SPEC.md §The knob file). Two
 consequences are worth stating where a reader of this gate will look for them.
@@ -4162,13 +4195,15 @@ empty observation for this member and the scans' coverage rests on the
 behavioral test below and on the live battery.
 
 The good/bad pair covers
-assertion A; `gate-tests/check-stage-entry.test.sh` covers B and C over ten
-sandbox scenarios (untagged residue red, tagged residue at drain entry green,
+assertion A; `gate-tests/check-stage-entry.test.sh` covers B, C and D over
+fourteen sandbox scenarios (untagged residue red, tagged residue at drain entry green,
 empty-reason tag red, tagged residue at successor entry red, `[observed-by:]`
 residue red and naming its own remedy; two-dir
 amendments ±waiver, a single-amendment cross-component body, a
 single-component amendment, and a `templates/` stub that must not fabricate a
-second component). Suite *runs* and other
+second component; a not-run marker red naming its file and line, a reasoned
+cannot-run marker green with its count, an empty-reason cannot-run marker red, and
+a fenced, a mid-line and a `templates/`-stub mention green). Suite *runs* and other
 non-static exits are not re-runnable as pre-commit gates and stay
 human-judged at the stage approval; the prerequisite-stamp floor is their
 mechanical residual.
@@ -4688,6 +4723,54 @@ mention, or mint a stage field in a second kit's grammar to catch one authoring
 slip. The mechanical backstop already exists: the lead's pre-completion
 `--enter-stage --simulate <next stage>` read (§templates/lead.md) refuses exactly
 this case, provided it runs before the push.
+
+`spec.md`'s **authoring-exit pass** runs each delta's own claims before the
+amendment is committed, because the stage that wrote a claim is the cheapest place
+to run it: otherwise an amendment reaches build carrying claims nobody ran, and a
+survey's `inferred` claim restated in an amendment loses its flag at the
+restatement. The pass sorts what a delta asserts into **three classes**, whose
+costs differ by an order of magnitude:
+
+- **A spent delta** is an instruction whose predicate the authoring commit already
+  satisfied. The pass catches it outright — the one class fully visible from the
+  commit that wrote it. Its hazard is inverted: a build session trusting it hunts a
+  discrepancy that does not exist, or "corrects" a correct figure.
+- **A premise** is load-bearing: a ruling's ground, or a contract sentence cited to
+  a section. The pass reaches every premise its author recognizes as one, by running
+  it or by marking it. What stays uncaught is a premise the author believed
+  verified — a class strictly smaller than the one uncaught without the pass, the
+  survey record's `inferred` argument applied to amendments.
+- **An illustration** moves no oracle row, and its delta's ruling stands on its own
+  derivation; it is exempt, because probing it buys nothing a reader acts on.
+
+**Refused: probing every tree fact the amendment asserts.** That is open-ended and
+most asserted facts are illustrations, so the pass is bounded by the deltas'
+predicates and the premises their rulings name.
+
+**The inferred marker** carries a premise the pass could not run, in one of two
+forms, each opening its own line:
+
+- `**Inferred, not run:** <claim> — <command>` — the command is mandatory, since
+  the marker exists to hand a later stage something to run.
+- `**Inferred, cannot run before build:** <claim> — <reason>` — for a claim whose
+  subject does not exist until build lands something; the reason is mandatory.
+
+A marker is recognized only at the start of a line, after optional indentation and
+one optional `- ` or `> ` lead, and never inside a fence, so a mention of the
+spelling in running prose or in backticks is not a marker. The spellings are **kit
+constants, not config**: they belong to this kit's authoring template, on
+canon-kit's precedent that a kit-shipped template's own headings are constants.
+**The marker sits on the passage and not only in the survey record** because the
+record is boundary-truncated and holds a claim per block, not per passage, and a
+restatement drops the record's flag; the marker sits where the next reader reads,
+the rule the **Not yet applied** marker already follows.
+
+**Align runs every not-run marker and build runs the cannot-run ones first**, and
+both templates carry it although §check-stage-entry assertion D already refuses
+the build entry on an unrun marker: align is trigger-gated and can be skipped, so D
+is what holds the obligation when it is, while align's sentence names the stage
+that meets a marker first when align does run — so the refusal is not the first
+time the marker is noticed.
 
 The directory holds the **stage-class** template set, not any one consumer's
 roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five,

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of check-stage-entry assertions B and C — the
+# Behavioral test of check-stage-entry assertions B, C and D — the
 # scenarios the one-pair good/bad harness cannot hold. The good/bad fixture
 # pair (--run-gate-tests) covers assertion A (prerequisite-stamp ordering: a
 # close cursor with no validate stamp); the harness admits only one
@@ -10,7 +10,10 @@
 # drain entry (exit 1, named separately and citing its own remedy);
 # assertion C drives four
 # cross-component build-entry scenarios (2-dir amendments ±waiver,
-# single-amendment cross-component body, single-component amendment).
+# single-amendment cross-component body, single-component amendment);
+# assertion D drives four build-entry marker scenarios (not-run red,
+# reasoned cannot-run clean with its count, empty-reason red, and a fenced,
+# mid-line and templates/-stub mention all clean).
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -267,9 +270,42 @@ demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C5 templates-stub-not-counted" "$c5" 0 "STAGE-ENTRY: clean"
 
+# --- assertion D: a build entry refuses an amendment still carrying an unrun inferred-claim marker ---
+
+d_sandbox() {  # $1=dir  $2=amendment body — a single-component amendment at build entry
+    build_queue "$1"
+    mkdir -p "$1/.workflow" "$1/widget-service"
+    : >"$1/widget-service/SPEC.md"
+    printf '%s\n' "$2" >"$1/widget-service/SPEC-foo.md"
+    cat >"$1/.workflow/WORKFLOW-STATE.txt" <<'EOF'
+---
+
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
+EOF
+}
+
+# D1 (bad): a not-run marker — refused, naming the file and line.
+d_sandbox "$SANDBOX/d1" $'intro\n**Inferred, not run:** the arm refuses — `run-gates.sh --only x`'
+check_case "D1 not-run-marker" "$SANDBOX/d1" 1 "widget-service/SPEC-foo.md:2: **Inferred, not run:**"
+
+# D2 (good): a cannot-run marker with a reason — clean, the count in the detail.
+d_sandbox "$SANDBOX/d2" '- **Inferred, cannot run before build:** the gate reds — the gate is unwritten'
+check_case "D2 cannot-run-with-reason" "$SANDBOX/d2" 0 "1 cannot-run claim(s) carried"
+
+# D3 (bad): a cannot-run marker with an empty reason — refused.
+d_sandbox "$SANDBOX/d3" '**Inferred, cannot run before build:** the gate reds'
+check_case "D3 cannot-run-empty-reason" "$SANDBOX/d3" 1 "SPEC-foo.md:1:"
+
+# D4 (good): a marker inside a fence, a mid-line mention in prose, and a templates/ stub — none a marker.
+d_sandbox "$SANDBOX/d4" $'```\n**Inferred, not run:** fenced — `x`\n```\nprose naming **Inferred, not run:** mid-line'
+mkdir -p "$SANDBOX/d4/some-kit/templates"
+printf '**Inferred, not run:** stub — `x`\n' >"$SANDBOX/d4/some-kit/templates/SPEC-amendment.md"
+check_case "D4 fence-prose-stub-not-markers" "$SANDBOX/d4" 0 "STAGE-ENTRY: clean"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion, 10 scenarios)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + assertion D inferred-claim residue, 14 scenarios)"
 exit 0

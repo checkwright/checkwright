@@ -12,29 +12,6 @@
 
 ## New Features
 
-- **spec-authoring-self-check-pass** [spec: SPEC-claim-execution.md] — spec-stage amendment
-  authoring asserts tree facts a one-command probe refutes, and every instance is caught downstream
-  rather than at authoring exit (measured: six in one iteration's amendment set, across at least
-  three of four amendments).
-  **Designed as** an authoring-exit pass in the spec template. Re-running each delta's own
-  predicate catches the spent-delta class outright. Load-bearing premises are run or carry an
-  inferred marker on their passage. Illustrations are exempt, and probing every asserted tree fact
-  is refused as open-ended (amendment delta 1).
-  recurrence: spec-authoring-self-check-pass 2026-08-31
-  Filed 2026-08-30 by scope into the icebox; returned 2026-08-31 by close on a judged recurrence.
-
-- **survey-inferred-claim-has-no-execution-obligation** [spec: SPEC-claim-execution.md] — a
-  survey can mark a claim inferred-not-executed and no later stage is obliged to execute it
-  (measured: an amendment restated such a claim as fact, align returned zero defects, and build
-  measured it false and landed two unplanned regenerations).
-  **Designed as** a passage-level inferred marker (not-run with its command, or cannot-run before
-  build with a reason). Align runs the not-run ones, build runs the cannot-run ones first, and
-  check-stage-entry assertion D refuses the audit-entry stage on a remaining not-run marker. It is
-  a block rather than an annotation because the annotation already existed and went unconsumed
-  (amendment deltas 2-5).
-  Split out at `installer-front-door-cut`'s close from `queue-entry-evidence-tier`'s seventh rate
-  point.
-
 ## Technical Debt
 
 ## Deferred
@@ -3723,5 +3700,7 @@
 ## Done
 
 - close-differential-instruction-sweep
+- spec-authoring-self-check-pass
+- survey-inferred-claim-has-no-execution-obligation
 
 ## Lessons Learned

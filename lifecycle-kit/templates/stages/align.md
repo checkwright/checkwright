@@ -65,7 +65,10 @@ must name the delta that owns it (canon-kit/templates/SPEC-amendment.md).
 **A claim about an existing program is checked against that program** — a
 modelled grammar, a check a gate applies, a refusal an arm makes: one invocation,
 or the implementing line where none is cheap. If the named program lacks the
-behaviour, find the one that holds it.
+behaviour, find the one that holds it. Run every
+`**Inferred, not run:**` marker's command, correct the passage to what it
+returned and delete the marker, or rewrite it to the cannot-run form with its
+reason.
 
 **The `## Existing sections updated` roster is checked from the tree, and the
 half that stays yours is the larger one.** A roster entry with no delta is
