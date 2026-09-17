@@ -3514,9 +3514,4 @@
 
 ## Done
 
-- consumer-footprint-roster-omits-lifecycle-kit
-- kfric-obligation-residency
-- instruction-sweep-grounds-residue-unrelocated
-- recurrence-obligation-residency
-
 ## Lessons Learned
