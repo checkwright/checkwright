@@ -4,10 +4,4 @@
 
 ---
 
-reach-ruling-lockstep scope a8100f07 2026-09-18 7792018a
-reach-ruling-lockstep spec a59763a2 2026-09-18 1235dc82
-reach-ruling-lockstep align adde364c 2026-09-18 6b4a14c9
-reach-ruling-lockstep build a7511bc9 2026-09-18 deca3faa
-reach-ruling-lockstep build ab317069 2026-09-18 3e5e4f48
-reach-ruling-lockstep validate a7871d20 2026-09-18 f9ff18a8
-reach-ruling-lockstep close a462d784 2026-09-18 6cf7d475
+— scope a901c45a 2026-09-18 2d2ad77b
