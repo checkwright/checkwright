@@ -4,10 +4,4 @@
 
 ---
 
-native-spawn-residue scope a901c45a 2026-09-18 2d2ad77b
-native-spawn-residue spec af04347d 2026-09-18 f09ac9e7
-native-spawn-residue align ab3311a5 2026-09-18 e93130f3
-native-spawn-residue build ae2db9c1 2026-09-18 6364680f
-native-spawn-residue build a0fc59c8 2026-09-18 13ed0a0f
-native-spawn-residue validate a948ee35 2026-09-18 f9d16cda
-native-spawn-residue close aee694a8 2026-09-18 705d858e
+— scope a1041d66 2026-09-18 8eb2104a
