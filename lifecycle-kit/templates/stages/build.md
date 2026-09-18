@@ -88,9 +88,11 @@ against the tree. Grep each name the change moves or retires over the tracked tr
 silencing stderr. Ask what consumes the changed behaviour without spelling any of
 those names. Then run the battery and the touched kit's fixture suite. Land every
 site the roster missed in the same unit as in-envelope work, and name the missed
-sites in the commit message. A rostered target the re-derivation finds nothing to
-update in is reported in the commit message as a finding, naming the target;
-never write an edit to make it non-vacuous, and never drop it silently.
+sites in the commit message. Decline a rostered target only when the surface
+already says what its citing delta needs from it, naming in the commit message the
+target, that need and the passage that already meets it. A surface lacking what
+the delta needs, a missing passage included, is a missed site you land in this
+unit. Never write an edit a met need does not call for, nor drop a target silently.
 
 **Declare what a vendoring consumer will meet, in the unit that lands it.** A unit
 that lands or tightens a gate, renames or removes a knob, or changes what a kit

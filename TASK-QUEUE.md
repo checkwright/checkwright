@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **declined-update-target-cause-unaudited** [spec: SPEC-declined-target.md] — a build session
-  that declines a rostered update target states a cause in edit-site terms ("no line to widen"), and
-  a later confirmation reads it on those terms, so a true cause can hide an unmet target.
-  **Ruled at spec:** neither filed reading. The roster was right and no per-surface assertion is
-  earned on one datum. The declination test itself was mis-shaped, so a declination now names the
-  citing delta's need and the passage that already meets it, and a missing passage is a missed
-  site landed in-unit. Template and SPEC prose only, no new name.
-  Measured 2026-09-16 (three declined, one a real roster hole); filed by that iteration's close.
-  Leads `declined-target-audit` by operator direction (2026-09-18, lead-relayed).
-
 - **footprint-roster-rows-price-unevenly** [spec: SPEC-resident-pricing.md] — the consumer
   footprint roster's lifecycle-kit row cites three resident obligations (gap capture, the recurrence
   stamp, survey capture) whose owning sections state neither the line's cost nor what earns it
@@ -3381,5 +3371,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- declined-update-target-cause-unaudited
 
 ## Lessons Learned

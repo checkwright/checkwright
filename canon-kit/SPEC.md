@@ -1063,9 +1063,9 @@ hold the text attributed to it. The second requires that the amendment's cited
 string be present in the named file. It is refused because an update target's text
 is what the merge will write, so at authoring time it has no subject to find. What
 remains is a claim the merging session checks: the build stage re-derives the
-roster and reports an empty target as a finding in its commit
-(lifecycle-kit/SPEC.md §templates/stages/), which is what separates a vacuous
-bullet from a skipped one.
+roster and declines a target only by naming the passage that already meets its
+delta's need (lifecycle-kit/SPEC.md §templates/stages/). That separates a met
+target from a skipped one.
 
 **Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears**: the
 corpus is `spec_amendments`, which reaches no gate declaration path. **Born

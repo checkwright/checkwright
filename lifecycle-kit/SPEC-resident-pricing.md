@@ -149,8 +149,8 @@ is a target), and the context-kit roster row.
       canonical-spec text it refines rather than appending to it; the merged spec
       reads as one document a reader who never saw the amendment can use alone.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
-      component (`ls lifecycle-kit/SPEC-*.md`) once `SPEC-declined-target.md` has
-      merged too.
+      component (`ls lifecycle-kit/SPEC-*.md`); the sibling declination
+      amendment has merged into lifecycle-kit/SPEC.md §templates/stages/.
 - [ ] **Removals propagated** — `## Retired spellings` above is accurate, and
       `check-amendment-retired-spelling` is green.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as

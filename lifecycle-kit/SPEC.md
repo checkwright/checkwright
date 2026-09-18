@@ -5081,9 +5081,19 @@ still spells a name, and a semantic reader spells none. **The honest limit:** no
 gate observes that the re-derivation ran. The battery reds on what it reaches, and
 a site no gate reaches is found only by the landing session's reading, which is
 what the paragraph obliges and does not verify. **The same re-derivation meets the
-over-count:** a rostered target with nothing to update tempts a fabricated edit or
-a silent drop, and a silent drop reads as a skip, so the empty result is a stated
-finding.
+over-count, and it is judged by the delta's need, never by an edit site.** A
+rostered target with nothing to update tempts a fabricated edit or a silent drop,
+so the empty result is a stated finding. The finding's terms are the citing
+delta's need and the passage that meets it, because the other terms can be true
+while the target's purpose goes unmet. A roster of queue-reading arms that lacked
+one arm's line was declined on "no line to widen", confirmed on those terms, and
+later repaired by adding the line. Any later reader who confirms a declination now
+confirms it against the author's need. **The honest limit:** no gate reads a
+commit message's declination, on the same ground as the re-derivation itself, so a
+declination stated on edit-site terms is caught only by the reader who re-reads
+it. Two heavier fixes were weighed and refused on one measured instance: narrowing
+rosters at authoring, when the roster was right, and a coverage assertion on every
+roster-shaped surface, a new oracle per surface.
 
 The `scope` template's recurrence override **decides** the collision rather than
 resolving it in the theme's favour: an automatic promotion would be a second
