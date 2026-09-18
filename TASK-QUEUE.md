@@ -16,6 +16,50 @@
 
 ## Deferred
 
+- **init-next-block-bash-spelled-on-windows** [cost: event/low] [surface: installer] — `init`'s
+  follow-up block prints `bash gate-sdk/bin/run-gates.sh --install-hooks` and the bare battery line
+  on every host, so a native-Windows adopter in PowerShell types a bare `bash` that reaches the WSL
+  launcher; with `gate-sdk/bin/run-gates.ps1` shipped, the block could name the host's front-end.
+  **Re-verified at the drain:** `native/src/installer/init.rs` prints both lines unconditionally
+  after `next:`, and its directive names the block a stated grammar the consumer smoke parses.
+  **Why design-pending:** a host-keyed block is a user-facing output change and a grammar change
+  the smoke's reader must follow, neither settled by the landing unit's envelope.
+  **Cost while deferred:** a PowerShell adopter's first follow-up command may reach WSL rather
+  than the vendored tree's front-end.
+  Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s scope; promoted at its close drain.
+  Owner lookup: `run-gates.ps1`, `install-hooks`, `follow-up`, `next:` — matched
+  `guard-hook-windows-substrate` (harness-hook wiring, distinct).
+
+- **windows-remedy-path-step-undocumented** [cost: event/low] [surface: docs] — the
+  `install-smoke-powershell` leg prepends Git for Windows' `usr\bin` and `bin` to `PATH` before
+  `doctor`, because `windows-latest` resolves no GNU `sort` otherwise, but `docs/install.md` names
+  no such step for a native-Windows adopter: the leg greens on a step the page does not describe.
+  The Windows analogue of `macos-remedy-path-lasts-one-shell`.
+  **Re-verified at the drain:** the prepend is the `$env:PATH =` line in
+  `.github/workflows/gates.yml` ahead of the leg's `windows-remedy` extraction, and that block in
+  `docs/install.md` holds only `choco install shellcheck -y`.
+  **Why design-pending:** whether the page's step is a session `PATH` line the leg then runs
+  verbatim (dropping its own prepend) or a persisted user `PATH` edit is an adopter-facing choice,
+  the one `macos-remedy-path-lasts-one-shell` waits on, and only a Windows leg verifies it.
+  **Cost while deferred:** an adopter following the page on native Windows meets a `doctor`
+  refusal the page gives no remedy for.
+  Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s scope and promoted at its close.
+  Owner lookup: `windows-remedy`, `Git for Windows`, `usr/bin` — matched
+  `macos-remedy-path-lasts-one-shell` (the macOS block, distinct).
+
+- **run-gates-ps1-windows-powershell-host-unexercised** [cost: event/low] [surface: gate-sdk] —
+  gate-sdk/SPEC.md §run-gates claims the front-end's PowerShell twin runs under Windows PowerShell
+  5.1 and PowerShell 7, but `--run-front-end-parity` spawns `pwsh` only, so the 5.1 half of the
+  host class is asserted and never run.
+  **Re-verified at the drain:** the SPEC sentence names both hosts, and
+  `native/src/emit/front_end_parity.rs` builds its twin transcript from `programs::PWSH` alone.
+  **Why design-pending:** the two closes are a parity pass under `powershell.exe` on the Windows
+  leg, or narrowing the claim to PowerShell 7 — the second narrows asserted behavior, and the first
+  is verifiable on a Windows runner only.
+  **Cost while deferred:** a 5.1-only construct regression in the twin reds nothing.
+  Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s build; promoted at its close drain.
+  Owner lookup: `front-end-parity`, `powershell.exe`, `PowerShell 5` — none.
+
 - **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
   — `check-stage-entry` assertion D reads an inferred marker only where the full spelling opens a
   physical line (`inferred_marker` in `native/src/gates/stage_entry.rs`), so a marker an author
@@ -2343,6 +2387,13 @@
   named — the defect docs/install.md assigns to the release rather than to the adopter's work.
   Surfaced 2026-08-26 to the gap inbox by the close of the `platform-reach-and-target-roster`
   iteration, while re-probing that close's release disposition; promoted 2026-08-26 at scope.
+  **Recurred 2026-09-18, judged at `windows-bash-floor`'s close.** That iteration's validate fix
+  added a banned construct (`cd` onto a `git` command substitution) to
+  `gate-sdk/templates/portability-patterns.list`, a kit-shipped template `init` does not seed, so
+  it reaches a consumer only as a copied-out list diverging — a Behavior-changes subject — and
+  `.workflow/release-declarations.md` carries no bullet for it. The landing session had ended, so
+  the open call above is again what leaves it with no producer.
+  recurrence: shipped-config-tightening-undeclared 2026-09-18
 
 - **shellcheck-analyser-version-unpinned-in-ci** [cost: event/high] [surface: .github] — one battery member's verdict is
   a function of the host, so a green local battery is not evidence of a green CI battery.
