@@ -1505,6 +1505,10 @@
   **Cost while deferred:** every run of that rostered audit re-derives the same fork over the
   same two libraries, and two auditors can reach opposite verdicts on identical prose. With the
   cross-kit shape added, the fork now has a branch no reading answers at all.
+  **Premise re-read at `smoke-leg-crate-cache`'s close: no live population turns on the fork.**
+  `canon-kit/lib/` is gone, so the third population's `_spec_prune_kit_roots` is a retired shell
+  helper named in `gate-sdk/SPEC.md` and native comments, not a vendored library's export. The
+  two live libraries are public on either reading. The ruling now guards only a future library.
   Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it;
   third population added 2026-08-14 by close from the same rostered sweep, which declined again.
 
