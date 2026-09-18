@@ -239,7 +239,14 @@ Primitives a consumer guard composes; each emits the harness's
   twin does not carry it.
 - `guard_split_compound <skeleton>` — the compound splitter: emits one segment
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
-  `|`). Also not a hook primitive — the single implementation every **shell**
+  `|&`, `|`), the two-character ones taken whole so `|&` never leaves an `&`
+  heading the next segment. **The class is the harness's, measured:** a
+  `claude -p` run under `dontAsk` granted `touch a |& touch b` on the two exact
+  grants `Bash(touch a)` and `Bash(touch b)` and refused it with `touch c` on the
+  right. A lone `&` is **not** in the class, because the harness does not split
+  on it: the same run refused `touch a & touch b` on those two grants, and
+  refused `touch a &` even under `Bash(touch a *)`, so a backgrounding `&` is a
+  call no allowlist entry grants rather than a segment boundary. Also not a hook primitive — the single implementation every **shell**
   consumer that reasons *per segment* shares (rules
   2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules
   9/10), so the harness's

@@ -68,6 +68,7 @@ CORPUS=(
     'x <<9BAD'
     'x <<'
     'a;b&&c||d|e'
+    'a |& b & c'
     'echo trailing;'
     'echo "unterminated'
     "echo 'unterminated"
@@ -320,6 +321,8 @@ have_line() {   # $1=label $2=exact line
 # only because the rewrite happened, and the second only because it did not.
 have_line "allow-match-colon-star-glob"   "allow-match${T}Bash(git status --short)${T}Bash(git status:*)${T}true"
 have_line "allow-match-colon-star-string" "allow-match${T}Bash(git:*)${T}Bash(git[:]*)${T}true"
+# `|&` is one separator taken whole; a lone `&` separates nothing.
+have_line "split-pipe-amp"                "split${T}a |& b & c${T}1${T} b & c"
 # The closing `:*` is word-bounded: the bare head and a spaced continuation match, a glued or a
 # punctuated one does not, in the wrapped and the inner rule form alike.
 have_line "allow-match-colon-star-bare"   "allow-match${T}Bash(git status)${T}Bash(git status:*)${T}true"

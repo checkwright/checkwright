@@ -26,14 +26,17 @@ pub fn allow_match(s: &str, glob: &str) -> bool {
 }
 
 // spec: guard-kit/SPEC.md §The guard framework — `guard_split_compound`: one segment per line,
-// split on the harness's statement separators. `||` and `&&` are tested before `|`, which is the
+// split on the harness's statement separators. `||`, `&&` and `|&` are tested before `|`, which is the
 // leftmost-longest alternation the shell holder's `sed -E` gives for free and a scanner must spell.
 pub fn split_compound(cmd: &str) -> Vec<String> {
     let b = cmd.as_bytes();
     let mut segs: Vec<Vec<u8>> = vec![Vec::new()];
     let mut i = 0usize;
     while i < b.len() {
-        let sep = if b[i..].starts_with(b"||") || b[i..].starts_with(b"&&") {
+        let sep = if b[i..].starts_with(b"||")
+            || b[i..].starts_with(b"&&")
+            || b[i..].starts_with(b"|&")
+        {
             2
         } else if b[i] == b';' || b[i] == b'|' || b[i] == b'\n' {
             1
@@ -476,6 +479,7 @@ mod tests {
         assert_eq!(split_compound("echo trailing;"), vec!["echo trailing", ""]);
         assert_eq!(split_compound(""), vec![""]);
         assert_eq!(split_compound("a & b"), vec!["a & b"]);
+        assert_eq!(split_compound("a |& b"), vec!["a ", " b"]);
         assert_eq!(split_compound("a\nb;c\n"), vec!["a", "b", "c", ""]);
     }
 

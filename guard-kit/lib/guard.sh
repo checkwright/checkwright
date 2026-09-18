@@ -233,7 +233,7 @@ guard_skeleton() {
 
 # spec: guard-kit/SPEC.md §The guard framework — one splitter for every shell consumer that reasons per compound segment (rules 2/4/7/8/12/14/15/17/18/19/20/22/24, the read-compound carve-out), fed a guard_skeleton view so the harness's per-segment boundary set never drifts; the compiled twin holds the other substrate
 guard_split_compound() {
-    sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
+    sed -E 's/\|\||&&|\|&|;|\|/\n/g' <<<"$1"
 }
 
 # spec: guard-kit/SPEC.md §The guard framework — the harness view's word step: moves the head word of the caller's cur into its w and drops the blanks after it; non-zero when cur is empty
@@ -631,7 +631,7 @@ _guard_python_rewrite() {
             case "$seg" in python[[:space:]]* | python3[[:space:]]*) ;; *) continue ;; esac
             _guard_program_operands python "$seg" || continue
             ((prog_inline)) && _guard_is_literal_rewrite "$prog" 0 && _guard_block_python
-        done < <(sed -E 's/\|\||&&|;|\|/\n/g' <<<"$v")
+        done < <(guard_split_compound "$v")
     fi
     while IFS= read -r seg; do
         seg="${seg#"${seg%%[![:space:]]*}"}"
