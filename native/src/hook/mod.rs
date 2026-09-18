@@ -148,8 +148,7 @@ pub fn read_payload() -> Option<Value> {
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the UTC stamp the log line carries,
-// computed rather than spawned: `date -u` asks no question about the operator's zone, so the
-// subprocess drift-kit's KPIs keep for `date +%F` has no ground here.
+// computed rather than spawned: `date -u` asks no question about the operator's zone.
 pub fn utc_stamp(epoch: i64) -> String {
     let days = epoch.div_euclid(86_400);
     let secs = epoch.rem_euclid(86_400);
@@ -167,7 +166,7 @@ pub fn utc_stamp(epoch: i64) -> String {
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — Howard Hinnant's civil-from-days, the
 // inverse of `emit::trajectory`'s days-from-civil, which is the crate's existing half of this pair.
-fn civil_from_days(z: i64) -> (i64, u32, u32) {
+pub(crate) fn civil_from_days(z: i64) -> (i64, u32, u32) {
     let z = z + 719_468;
     let era = z.div_euclid(146_097);
     let doe = z.rem_euclid(146_097);

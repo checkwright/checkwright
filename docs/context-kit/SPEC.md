@@ -473,12 +473,12 @@ The constrained members and what forces each:
   earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
   battery would fail with an obscure syntax error.
 - `sort::coreutils` — no version floor, one implementation constraint, and one
-  member standing for a whole package family: GNU coreutils is forced by GNU
-  `date -d`, which the binary spawns in its KPI and queue-index arms
-  (`native/src/emit/kpi/mod.rs`, `native/src/emit/queue_index.rs`), and by the
-  floor predicate's own `sort -V`. Neither is BSD-portable. The representative
-  member is the binary carrying a forcing construct, which is also the floor
-  predicate's own comparison tool. `realpath --relative-to` and `stat -c` do
+  member standing for a whole package family: GNU coreutils is forced by the
+  floor predicate's own `sort -V`, which is not BSD-portable. GNU `date -d` does
+  not force it: the binary reads civil dates in-process on unix
+  (drift-kit/SPEC.md §Bundled KPIs). The representative member is the binary
+  carrying the forcing construct, which is the floor predicate's own comparison
+  tool. `realpath --relative-to` and `stat -c` do
   not force it: the binary computes relative paths lexically, and `stat -c` has
   no live site.
 - `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one,

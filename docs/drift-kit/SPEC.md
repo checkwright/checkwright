@@ -181,8 +181,14 @@ substrates, captured before the originals were deleted and diffed after, in both
 the full and `--trend` modes.
 
 Two members read a date and are held to the operator's civil zone rather than to
-UTC: they resolve a day through `date -d`, the choice queue-kit's queue-index
-cutoff already made and for the same reason. `kpi-settings-local` has one
+UTC, as queue-kit's queue-index cutoff is. The binary resolves the day in-process
+rather than spawning GNU `date -d`, which no adopter floor may assume: an ISO day
+or an ISO datetime with no written zone is local time, read through `mktime(3)` on
+unix so the offset is the one in force on that day, and a written `Z` or `±HH[:MM]`
+applies as written; today is the local civil day, and any other shape is no
+reading. A non-unix build has no zone reader in `std` and its MSYS userland's
+`date` is GNU, so there the local reading alone stays a `date -d` subprocess.
+`kpi-settings-local` has one
 degrade fewer than its shell original: the compiled member parses the overlay
 itself, so it carries no external-program dependency an absent `jq` could take.
 

@@ -16,6 +16,7 @@ pub mod settings_local;
 pub mod stage_economics_lag;
 pub mod task_split;
 
+#[cfg(not(unix))]
 use crate::proc;
 
 // spec: drift-kit/SPEC.md §The KPI plugin contract — the resolved knob set plus the two driver
@@ -112,22 +113,147 @@ pub fn now_epoch() -> i64 {
         .unwrap_or(0)
 }
 
-// spec: drift-kit/SPEC.md §Bundled KPIs — `date -d` is kept rather than replaced by an in-crate
-// civil-date conversion, which would resolve UTC where every shell original resolved the operator's
-// zone; the queue-index arm's cutoff is the standing precedent for that choice.
-pub fn date_epoch(day: &str) -> Option<i64> {
-    let c = proc::run("date", &["-d", day, "+%s"]).ok()?;
-    let out = c.stdout()?;
-    String::from_utf8_lossy(out).trim().parse::<i64>().ok()
+// spec: drift-kit/SPEC.md §Bundled KPIs — a civil day or an ISO datetime to an epoch in-process: a
+// stated zone applies as written, an unstated one is the operator's (`local_epoch`), and any other
+// shape is no reading.
+pub fn date_epoch(s: &str) -> Option<i64> {
+    let days = civil_days(s.get(..10)?)?;
+    let rest = &s[10..];
+    if rest.is_empty() {
+        return local_epoch(days, 0);
+    }
+    let (secs, zone) = clock(rest.strip_prefix(['T', 't', ' '])?)?;
+    match zone {
+        Some(offset) => Some(days * 86_400 + secs - offset),
+        None => local_epoch(days, secs),
+    }
 }
 
-// spec: drift-kit/SPEC.md §Bundled KPIs — `date +%F`, the operator's civil today, which is the
-// anchor an expiry counts from; the same zone question `date_epoch` answers keeps it a subprocess.
+fn civil_days(day: &str) -> Option<i64> {
+    if !is_iso_day(day) {
+        return None;
+    }
+    let days = super::trajectory::days_from_civil(day)?;
+    (iso_day(days) == day).then_some(days)
+}
+
+pub fn iso_day(days: i64) -> String {
+    let (y, m, d) = crate::hook::civil_from_days(days);
+    format!("{:04}-{:02}-{:02}", y, m, d)
+}
+
+fn two_digits(b: &[u8], at: usize) -> Option<i64> {
+    let d = b.get(at..at + 2)?;
+    d.iter()
+        .all(u8::is_ascii_digit)
+        .then(|| i64::from(d[0] - b'0') * 10 + i64::from(d[1] - b'0'))
+}
+
+// spec: drift-kit/SPEC.md §Bundled KPIs — `HH:MM[:SS[.frac]]` then an optional `Z` or `±HH[[:]MM]`;
+// the seconds past midnight and the zone's offset east of UTC, `None` where no zone is written.
+fn clock(t: &str) -> Option<(i64, Option<i64>)> {
+    let b = t.as_bytes();
+    let (h, m) = (two_digits(b, 0)?, two_digits(b, 3)?);
+    if b[2] != b':' {
+        return None;
+    }
+    let (mut s, mut i) = (0, 5);
+    if b.get(i) == Some(&b':') {
+        s = two_digits(b, i + 1)?;
+        i += 3;
+        if matches!(b.get(i), Some(b'.' | b',')) {
+            let start = i + 1;
+            i = start + b[start..].iter().take_while(|c| c.is_ascii_digit()).count();
+            if i == start {
+                return None;
+            }
+        }
+    }
+    if h > 23 || m > 59 || s > 60 {
+        return None;
+    }
+    let zone = match &b[i..] {
+        [] => None,
+        [b'Z' | b'z'] => Some(0),
+        [sign @ (b'+' | b'-'), tail @ ..] => {
+            let oh = two_digits(tail, 0)?;
+            let om = match tail.len() {
+                2 => 0,
+                4 => two_digits(tail, 2)?,
+                5 if tail[2] == b':' => two_digits(tail, 3)?,
+                _ => return None,
+            };
+            if oh > 23 || om > 59 {
+                return None;
+            }
+            let off = oh * 3600 + om * 60;
+            Some(if *sign == b'+' { off } else { -off })
+        }
+        _ => return None,
+    };
+    Some((h * 3600 + m * 60 + s, zone))
+}
+
+// spec: drift-kit/SPEC.md §Bundled KPIs — the operator's zone, from `mktime(3)` on unix, which
+// resolves the offset in force on that day rather than today's
+#[cfg(unix)]
+fn local_epoch(days: i64, secs: i64) -> Option<i64> {
+    let (y, m, d) = crate::hook::civil_from_days(days);
+    // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound because
+    // `tm` is plain integers, zeroed is a valid value, and `mktime` writes only the one we own
+    let mut tm: libc::tm = unsafe { std::mem::zeroed() };
+    tm.tm_year = libc::c_int::try_from(y - 1900).ok()?;
+    tm.tm_mon = m as libc::c_int - 1;
+    tm.tm_mday = d as libc::c_int;
+    tm.tm_hour = (secs / 3600) as libc::c_int;
+    tm.tm_min = (secs % 3600 / 60) as libc::c_int;
+    tm.tm_sec = (secs % 60) as libc::c_int;
+    tm.tm_isdst = -1;
+    let t = unsafe { libc::mktime(&mut tm) };
+    (t != -1).then_some(t as i64)
+}
+
+// spec: drift-kit/SPEC.md §Bundled KPIs — a non-unix build has no zone reader in `std`, and its
+// MSYS userland's `date` is GNU, so the local reading stays a subprocess there
+#[cfg(not(unix))]
+fn local_epoch(days: i64, secs: i64) -> Option<i64> {
+    let stamp = format!(
+        "{} {:02}:{:02}:{:02}",
+        iso_day(days),
+        secs / 3600,
+        secs % 3600 / 60,
+        secs % 60
+    );
+    let c = proc::run("date", &["-d", &stamp, "+%s"]).ok()?;
+    String::from_utf8_lossy(c.stdout()?).trim().parse::<i64>().ok()
+}
+
+// spec: drift-kit/SPEC.md §Bundled KPIs — the operator's civil today, the anchor an expiry counts
+// from: the one day whose local midnights bracket now
+#[cfg(unix)]
+pub fn today_iso() -> String {
+    let now = now_epoch();
+    let utc = now.div_euclid(86_400);
+    (utc - 1..=utc + 1)
+        .find(|c| {
+            matches!((local_epoch(*c, 0), local_epoch(c + 1, 0)),
+                (Some(a), Some(b)) if a <= now && now < b)
+        })
+        .map(iso_day)
+        .unwrap_or_default()
+}
+
+#[cfg(not(unix))]
 pub fn today_iso() -> String {
     proc::run("date", &["+%F"])
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
         .unwrap_or_default()
+}
+
+// spec: queue-kit/SPEC.md §The queue-index arm — `days` civil days before the operator's today
+pub fn days_ago(days: i64) -> Option<String> {
+    Some(iso_day(civil_days(&today_iso())? - days))
 }
 
 pub fn is_iso_day(s: &str) -> bool {
@@ -191,5 +317,49 @@ mod tests {
         assert!(!is_iso_day("2026-8-29"));
         assert!(!is_iso_day("2026-08-291"));
         assert!(!is_iso_day("not-a-date"));
+    }
+
+    // spec: drift-kit/SPEC.md §Bundled KPIs — a written zone is applied as written, whatever the
+    // host's zone, and every shape outside the grammar is no reading
+    #[test]
+    fn a_datetime_with_a_zone_reads_the_same_instant_on_every_host() {
+        for s in [
+            "1970-01-02T00:00:00Z",
+            "1970-01-02t00:00:00z",
+            "1970-01-02T00:00:00.123456Z",
+            "1970-01-02 01:30:00+01:30",
+            "1970-01-02T01:30:00+0130",
+            "1970-01-01T22:00:00-02",
+            "1970-01-02T00:00Z",
+        ] {
+            assert_eq!(date_epoch(s), Some(86_400), "{}", s);
+        }
+        for s in [
+            "",
+            "not a time at all",
+            "2026-02-31",
+            "2026-13-01",
+            "2026-09-18x",
+            "2026-09-18T25:00:00Z",
+            "2026-09-18T12:00:00.Z",
+            "2026-09-18T12:00:00+1",
+            "2026-09-18T12:00:00 UTC",
+        ] {
+            assert_eq!(date_epoch(s), None, "{:?}", s);
+        }
+    }
+
+    // spec: drift-kit/SPEC.md §Bundled KPIs — an unwritten zone is the operator's: a bare day is its
+    // local midnight, and today is the day whose local midnights bracket now
+    #[test]
+    fn an_unzoned_reading_is_the_local_one_and_today_brackets_now() {
+        assert_eq!(date_epoch("2026-09-18"), date_epoch("2026-09-18T00:00:00"));
+        let today = today_iso();
+        let start = date_epoch(&today).expect("today has a local midnight");
+        let now = now_epoch();
+        assert!(start <= now && now - start < 90_000, "{} does not bracket now", today);
+        assert_eq!(days_ago(0).as_deref(), Some(today.as_str()));
+        let yesterday = days_ago(1).expect("yesterday");
+        assert!(yesterday < today, "{} is not before {}", yesterday, today);
     }
 }

@@ -1099,11 +1099,11 @@ always-loaded through the session-context hook that embeds this output, so the
 cap is its token budget. This is the inbound lesson channel reaching every
 later session of the iteration with zero consumer-hook edits.
 
-The age cutoff keeps its `date -d` derivation rather than moving to an in-crate
-civil-date computation, and the reason is behaviour preservation: `date` resolves
-the operator's local zone where an in-crate computation would resolve UTC, and a
-port that shifts the cutoff by a day is not the behaviour-preserving port this
-was. Its refusal on a `date` without `-d` survives with it.
+The age cutoff is civil-day arithmetic on the operator's **local** today, never
+UTC's: a cutoff shifted by a day is not the behaviour the shell form's `date -d`
+gave. The local day is drift-kit's reading (drift-kit/SPEC.md §Bundled KPIs), so
+the arm spawns no `date -d`, and a today it cannot read refuses rather than
+guessing a zone.
 
 This is a *task-selection* surface, walking bullet lead lines. Its sibling
 §The queue-edges arm walks entry **bodies** to aggregate citations — a
@@ -1528,8 +1528,7 @@ table, its value a shell string crossing verbatim, so `bash -c` execution is
 unchanged; gate-sdk/SPEC.md §The knob file's command-knob bullet governs `*_CMD`
 knobs, and this knob is not one. `bash` is the arm's one program requirement, recorded here in
 prose rather than in a `--needs` declaration, because `--needs` answers over the
-`.gate`-declared registry and a non-gate arm carries no descriptor — the same
-disposition §The queue-index arm's `date -d` derivation takes.
+`.gate`-declared registry and a non-gate arm carries no descriptor.
 
 **The child's status is reported rather than inherited.** The observable
 contract is unchanged — the sink's exit status becomes the arm's — but the arm

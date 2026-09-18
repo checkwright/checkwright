@@ -48,19 +48,6 @@
   Filed 2026-09-16 by `installer-front-door-cut`'s build to the gap inbox; lead unit of
   `native-spawn-residue` on the unit-set ruling (operator direction, 2026-09-18, lead-relayed).
 
-- **gnu-date-spawn-retired** — the binary spawns GNU `date -d` at
-  `native/src/emit/kpi/mod.rs:119` and `native/src/emit/queue_index.rs:383`, which is what keeps
-  `sort::coreutils` forced on the adopter floor (context-kit/SPEC.md §bin/env-probe) against
-  objective 1; `kpi/mod.rs:127` also spawns `date +%F` for today's date.
-  **Re-verified at this scope:** all three sites read at HEAD.
-  **Deliverable:** a native civil-date computation replacing all three spawns, whose local-day
-  semantics match the stamps they compare (std has no timezone, so the local offset source is the
-  build's one open call), and the floor's coreutils forcing narrowed if no other GNU-only use
-  remains.
-  Filed 2026-09-18 to the gap inbox at `native-spawn-floor`'s spec with the non-GNU awk leg half,
-  split at this scope and left deferred as `adopter-floor-gnu-date-and-awk-unheld`; promoted on the
-  unit-set ruling (operator direction, 2026-09-18, lead-relayed).
-
 ## Deferred
 
 - **guard-declares-class-correspondence-ungated** [cost: event/low] [surface: guard-kit] — items
@@ -3439,5 +3426,6 @@
 ## Done
 
 - pid-liveness-spawns-bash
+- gnu-date-spawn-retired
 
 ## Lessons Learned

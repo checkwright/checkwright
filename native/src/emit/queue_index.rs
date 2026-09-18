@@ -1,7 +1,6 @@
 // spec: queue-kit/SPEC.md §The queue-index arm — the compact queue surface for task selection.
 // Three modes on one arm, selected from the arm's own argv tail rather than from three arms:
 // the emitter type is defined over an argv slice precisely so a mode rides as a flag.
-use crate::proc;
 use crate::queue::{self, is_top_level_bullet, Sections};
 
 const TITLE_CAP: usize = 64;
@@ -375,20 +374,18 @@ fn extent(text: &str, slug: &str) -> Result<String, String> {
     Err(format!("slug not found: {}", slug))
 }
 
-// spec: queue-kit/SPEC.md §The queue-index arm — the cutoff keeps its `date -d` derivation rather
-// than an in-crate civil-date one, which would resolve UTC where this resolves the operator's zone
+// spec: queue-kit/SPEC.md §The queue-index arm — the cutoff is civil-day arithmetic on the
+// operator's today, and an unreadable today refuses rather than guessing a zone
 fn age_cutoff() -> Result<String, String> {
     let days = queue::knob_scalar("QUEUE_KIT_ICEBOX_AGE_DAYS")?;
-    let spec = format!("{} days ago", days.trim());
-    let c = proc::run("date", &["-d", &spec, "+%F"])?;
-    let out = c
-        .stdout()
-        .ok_or_else(|| "cannot compute the age cutoff (date -d unavailable)".to_string())?;
-    let s = String::from_utf8_lossy(out).trim().to_string();
-    if s.is_empty() {
-        return Err("cannot compute the age cutoff (date -d unavailable)".to_string());
-    }
-    Ok(s)
+    let n: i64 = days.trim().parse().map_err(|_| {
+        format!(
+            "cannot compute the age cutoff (QUEUE_KIT_ICEBOX_AGE_DAYS='{}' is not a day count)",
+            days.trim()
+        )
+    })?;
+    super::kpi::days_ago(n)
+        .ok_or_else(|| "cannot compute the age cutoff (the local civil date is unreadable)".to_string())
 }
 
 // spec: queue-kit/SPEC.md §The queue-index arm — the class is the lead line's first `[cost:]` value

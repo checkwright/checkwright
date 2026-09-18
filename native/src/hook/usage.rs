@@ -106,8 +106,7 @@ pub fn json_field(file: &str, path: &[&str]) -> String {
 }
 
 // spec: delegation-kit/SPEC.md §The usage.txt contract — the reset stamp normalised to an epoch: an
-// all-digit value is already one, anything else goes through `date -d`, whose zone reading is the
-// operator's and is why drift-kit keeps that call a subprocess rather than an in-crate conversion.
+// all-digit value is already one, anything else is drift-kit's ISO datetime reading.
 pub fn epoch_of(v: &str) -> String {
     if v.is_empty() {
         return String::new();

@@ -169,9 +169,10 @@ your `PATH`, and the note says what breaks without it:
   3-argument `match()` was the one construct that required **GNU** awk, runs in
   the binary.
 - `sort` (coreutils) — the battery assumes GNU coreutils, and `sort` is the
-  member standing for that family. The binding construct is GNU `date -d`, which
-  the gate binary's KPI and queue-index arms run; the floor check itself compares
-  versions with `sort -V`. No BSD equivalent carries those flags. A construct named here is what a
+  member standing for that family. The binding construct is `sort -V`, with which
+  the floor check itself compares versions; no BSD equivalent carries that flag.
+  On Linux and macOS the gate binary reads civil dates itself rather than
+  through GNU `date -d`. A construct named here is what a
   `# portability-declared:` marker cites at the site that uses it, so the
   declaration and the enforcement are one fact with one owner rather than two
   lists that agree by habit — `check-portability-floor` reds a new undeclared
