@@ -203,7 +203,17 @@ Primitives a consumer guard composes; each emits the harness's
   (§scan-prompts reads both); best-effort, never affects the decision.
 - `guard_allow_match <string> <pattern>` — the shell-glob match core: true when
   the string matches a committed allow pattern, with the harness `:*` prefix
-  idiom (`Bash(printf:*)` ≡ any `printf …`) normalized to a trailing `*`. Not a
+  idiom modelled as the harness grants it: **word-bounded**, so `Bash(printf:*)`
+  matches `printf` alone or `printf` then a space then anything, and never
+  `printfx`, `printf-x` or `printf.x` — the closing `:*`, bare or before the
+  rule's own `)`, is read as the head alone or the head and a space-led `*`, and any other `:*`
+  is a plain `*`. **Measured, not read off documentation:** a `claude -p` run
+  under `dontAsk` with the rule as its one grant refused every glued and
+  punctuated continuation and granted the bare head and a spaced one, and
+  `Bash(python3 -:*)` refused `python3 -c …`. A model wider than the harness is
+  the failure that matters here — it would let compare-settings-allow call a
+  narrower grant redundant and rule 20 read an ungranted spelling as silently
+  granted. Not a
   hook primitive — a shared helper, one implementation behind
   compare-settings-allow's redundancy detection and rule 20's silent-grant
   guard so the two never drift. It carries a **compiled twin**, `guard::allow_match`
@@ -356,8 +366,9 @@ comparison is its one reader.
 
 **`allow-match`'s corpus is scoped to the shapes a permission rule can carry**,
 rather than to arbitrary globs, and it is a cross product of strings against globs
-rather than paired cases: the harness `:*` idiom in both positions — rewritten in
-the glob, left literal in the string — a bare trailing `*`, an interior `*`, a `?`,
+rather than paired cases: the harness `:*` idiom in both positions — read
+word-bounded in the glob, against a glued and a punctuated continuation, left
+literal in the string — a bare trailing `*`, an interior `*`, a `?`,
 bracket classes plain, negated and ranged, and literals with no metacharacter at
 all, the last because a rule string is compared as a pattern and a consumer's
 literal must not acquire one.
@@ -2548,9 +2559,9 @@ if it was taken while both holders were present.
 Advisory: lists local-overlay allow entries already granted by a glob in
 the committed settings, and those naming a script absent from the tree — the deterministic prune-candidate set for the
 close-stage audit. A committed pattern subsumes a local entry when the
-local string matches it under shell-glob semantics; the harness `:*` prefix
-idiom (`Bash(printf:*)` ≡ any `printf …`) is normalized to a trailing `*`
-so one glob test covers both forms — the match core is `guard_allow_match`
+local string matches it under shell-glob semantics, with the harness `:*` prefix
+idiom read word-bounded (§The guard framework) so one test covers both forms —
+the match core is `guard_allow_match`
 in `lib/guard.sh`, shared with rule 20. Read-only — reports candidates, never
 mutates (the operator prunes). It is the detector, not the policy: a
 non-redundant local entry can still be one-off junk worth pruning by
@@ -2610,7 +2621,7 @@ are *too broad*. Redundancy asks whether a committed glob already grants a local
 entry; breadth asks whether a local glob would auto-allow a command the consumer
 called bad. Both are one call to `guard_allow_match` — the breadth question
 simply swaps its arguments, `guard_allow_match <probe> <local-glob>`, so there is
-no second matching implementation and the `:*` normalization is shared. The two
+no second matching implementation and the word-bounded `:*` reading is shared. The two
 findings are reported as distinct sets, and breadth is advisory in the same sense
 as redundancy: the report names the local glob and the one probe that witnesses
 its breadth, and the operator disposes — narrow the glob, or record that the

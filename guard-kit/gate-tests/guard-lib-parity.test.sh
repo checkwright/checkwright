@@ -106,20 +106,28 @@ enc() {
 
 # `guard_allow_match`'s corpus is scoped to the shapes a **permission rule** can carry rather than
 # to arbitrary globs, and it is a cross product rather than paired cases: the harness `:*` idiom in
-# both positions, a bare trailing `*`, an interior `*`, a `?`, bracket classes plain, negated and
+# both positions and in both the wrapped and the inner rule form, with its word boundary tested
+# against a glued and a punctuated continuation, a bare trailing `*`, an interior `*`, a `?`, bracket classes plain, negated and
 # ranged, and literals with no metacharacter at all — the last because a rule string is compared as
 # a pattern and a consumer's literal must not acquire one.
 ALLOW_STRINGS=(
     "Bash(git status)"
     "Bash(git status --short)"
     "Bash(git statuz)"
+    "Bash(git statusx)"
+    "Bash(git status-x)"
     "Bash(gh repo delete)"
     "Bash(git:*)"
+    "git status"
+    "git status --short"
+    "git statusx"
     "a"
     ""
 )
 ALLOW_GLOBS=(
     "Bash(git status:*)"
+    "git status:*"
+    "git sta*s:*"
     "Bash(git status)"
     "Bash(git*)"
     "Bash(*status*)"
@@ -312,6 +320,13 @@ have_line() {   # $1=label $2=exact line
 # only because the rewrite happened, and the second only because it did not.
 have_line "allow-match-colon-star-glob"   "allow-match${T}Bash(git status --short)${T}Bash(git status:*)${T}true"
 have_line "allow-match-colon-star-string" "allow-match${T}Bash(git:*)${T}Bash(git[:]*)${T}true"
+# The closing `:*` is word-bounded: the bare head and a spaced continuation match, a glued or a
+# punctuated one does not, in the wrapped and the inner rule form alike.
+have_line "allow-match-colon-star-bare"   "allow-match${T}Bash(git status)${T}Bash(git status:*)${T}true"
+have_line "allow-match-colon-star-glued"  "allow-match${T}Bash(git statusx)${T}Bash(git status:*)${T}false"
+have_line "allow-match-colon-star-punct"  "allow-match${T}Bash(git status-x)${T}Bash(git status:*)${T}false"
+have_line "allow-match-colon-star-inner"  "allow-match${T}git status --short${T}git status:*${T}true"
+have_line "allow-match-colon-star-inner-glued" "allow-match${T}git statusx${T}git sta*s:*${T}false"
 have_line "allow-match-literal-exact"     "allow-match${T}Bash(git status --short)${T}Bash(git status)${T}false"
 have_line "allow-match-literal-no-meta"   "allow-match${T}a${T}a${T}true"
 have_line "allow-match-trailing-star"     "allow-match${T}Bash(gh repo delete)${T}Bash(git*)${T}false"

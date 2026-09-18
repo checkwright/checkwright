@@ -75,8 +75,18 @@ guard_log_fallthrough() {
     printf '%s\n' "$fline" >>"$GUARD_KIT_LOG" 2>/dev/null || true
 }
 
+# spec: guard-kit/SPEC.md §The guard framework — a closing `:*` (bare, or before the rule's own `)`) is word-bounded: the head alone or the head, a space, anything
 guard_allow_match() {
-    local s="$1" glob="${2//:\*/\*}"
+    local s="$1" glob="$2" tail=''
+    [[ "$glob" == *':*)' ]] && { tail=')'; glob="${glob%)}"; }
+    if [[ "$glob" == *':*' ]]; then
+        glob="${glob%:\*}"
+        glob="${glob//:\*/\*}"
+        # shellcheck disable=SC2053  # intentional glob match: $glob is a pattern, not a literal
+        [[ "$s" == $glob"$tail" || "$s" == $glob' '*"$tail" ]]
+        return
+    fi
+    glob="${glob//:\*/\*}"
     # shellcheck disable=SC2053  # intentional glob match: $glob is a pattern, not a literal
     [[ "$s" == $glob ]]
 }

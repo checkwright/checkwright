@@ -8,11 +8,21 @@ use crate::ere::{Ere, EreError};
 // vendored, which is how `kpi-prompt-friction` witnesses the kit (drift-kit/SPEC.md §Bundled KPIs).
 pub const LIB: &str = "lib/guard.sh";
 
-// spec: guard-kit/SPEC.md §The guard framework — `guard_allow_match`: `[[ "$s" == ${glob//:\*/\*} ]]`,
-// the settings-allow match core. One compiled holder, because two compiled members now depend on
-// it and an edit to one inline copy would change one member's verdicts while the other's stay right.
+// spec: guard-kit/SPEC.md §The guard framework — `guard_allow_match`, the settings-allow match
+// core and its one compiled holder: a closing `:*` is the head alone or the head, a space, anything.
 pub fn allow_match(s: &str, glob: &str) -> bool {
-    crate::walk::glob_match(&glob.replace(":*", "*"), s)
+    let (body, tail) = match glob.strip_suffix(":*)") {
+        Some(b) => (Some(b), ")"),
+        None => (glob.strip_suffix(":*"), ""),
+    };
+    match body {
+        Some(head) => {
+            let head = head.replace(":*", "*");
+            crate::walk::glob_match(&format!("{head}{tail}"), s)
+                || crate::walk::glob_match(&format!("{head} *{tail}"), s)
+        }
+        None => crate::walk::glob_match(&glob.replace(":*", "*"), s),
+    }
 }
 
 // spec: guard-kit/SPEC.md §The guard framework — `guard_split_compound`: one segment per line,
@@ -467,6 +477,23 @@ mod tests {
         assert_eq!(split_compound(""), vec![""]);
         assert_eq!(split_compound("a & b"), vec!["a & b"]);
         assert_eq!(split_compound("a\nb;c\n"), vec!["a", "b", "c", ""]);
+    }
+
+    // spec: guard-kit/SPEC.md §The guard framework — a closing `:*` grants the head alone or the
+    // head and a space, never a glued continuation, in both the inner and the wrapped rule form
+    #[test]
+    fn a_closing_colon_star_is_bounded_by_a_space_or_the_end() {
+        for s in ["touch f", "touch f g"] {
+            assert!(allow_match(s, "touch f:*"), "{s}");
+        }
+        for s in ["touch fg", "touch f-g", "touch f.g"] {
+            assert!(!allow_match(s, "touch f:*"), "{s}");
+        }
+        assert!(!allow_match("python3 -c x", "python3 -:*"));
+        assert!(allow_match("Bash(git status)", "Bash(git status:*)"));
+        assert!(allow_match("Bash(git status --short)", "Bash(git status:*)"));
+        assert!(!allow_match("Bash(git statusx)", "Bash(git status:*)"));
+        assert!(allow_match("touch fg", "touch f*"));
     }
 
     // spec: guard-kit/SPEC.md §The guard framework — placeholder, never deletion
