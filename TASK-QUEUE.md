@@ -12,6 +12,39 @@
 
 ## New Features
 
+- **declined-update-target-cause-unaudited** [spec: SPEC-declined-target.md] — a build session
+  that declines a rostered update target states a cause in edit-site terms ("no line to widen"), and
+  a later confirmation reads it on those terms, so a true cause can hide an unmet target.
+  **Ruled at spec:** neither filed reading. The roster was right and no per-surface assertion is
+  earned on one datum. The declination test itself was mis-shaped, so a declination now names the
+  citing delta's need and the passage that already meets it, and a missing passage is a missed
+  site landed in-unit. Template and SPEC prose only, no new name.
+  Measured 2026-09-16 (three declined, one a real roster hole); filed by that iteration's close.
+  Leads `declined-target-audit` by operator direction (2026-09-18, lead-relayed).
+
+- **footprint-roster-rows-price-unevenly** [spec: SPEC-resident-pricing.md] — the consumer
+  footprint roster's lifecycle-kit row cites three resident obligations (gap capture, the recurrence
+  stamp, survey capture) whose owning sections state neither the line's cost nor what earns it
+  back, where drift-kit's cited section states both.
+  **Ruled at spec:** one cost-and-earn-back sentence per obligation, each naming the act only the
+  line's marginal reader performs. None names a threshold or a withdrawal trigger, which leaves the
+  recurrence line's operator direction unconditioned. The roster row gains drift-kit's clause.
+  Filed 2026-09-17 at build; joins `declined-target-audit` by operator direction (2026-09-18,
+  lead-relayed).
+
+- **consumer-smoke-single-kit-run-not-self-sufficient** [spec: SPEC-smoke-alone.md] — a
+  `--run-consumer-smoke` narrowed to one kit root reds while the all-kit run is green, because
+  installs lean on sibling kits' installs.
+  **Re-measured at spec, 2026-09-18:** all 11 kit roots are red alone, in five classes (the
+  amendment's table), so this is a harness-and-contract unit across gate-sdk, native, and four
+  kits' smoke installs, not the lifecycle-kit seed alone.
+  **Ruled at spec:** per-kit self-sufficiency (operator direction, 2026-09-18, lead-relayed),
+  enforced by a self-sufficiency phase in the default run that repeats the pass for each root
+  alone. gate-sdk's leg installs its own workflow template and registers the four `check-action-*`
+  gates, which retires the cross-leg placeholder-and-retraction.
+  Filed 2026-08-29, iceboxed 2026-09-11, revived on recurrence.
+  recurrence: consumer-smoke-single-kit-run-not-self-sufficient 2026-09-18
+
 ## Technical Debt
 
 ## Deferred
@@ -107,33 +140,6 @@
   Owner lookup: `coreutils`, `PROBE_SET`, `mawk`, `awk::GNU` — matched
   `macos-adopter-package-set-copied-per-leg` (brew set copying, distinct).
 
-- **consumer-smoke-single-kit-run-not-self-sufficient** [cost: event/low] [surface: lifecycle-kit] —
-  narrowing the consumer smoke to one kit fails for `lifecycle-kit`, because the scratch consumer's
-  agent file is seeded by a sibling kit's install earlier in the full run:
-  `run-gates.sh --run-consumer-smoke lifecycle-kit` exits at `install-lifecycle: agent file not
-  found: CLAUDE.md — nothing to install into` and reports an environment failure, while the full run
-  is green, so CI never sees it.
-  **Revived from the icebox on real recurrence:** `native-spawn-floor`'s build hit it on 2026-09-18,
-  exactly the costed case — a session that touched one kit and wanted the cheap check. That bullet
-  read the kit argument as misparsed; the drain re-ran it and it is a filter, and the failure is
-  this one, reproduced verbatim. Filed 2026-08-29 at a close drain, iceboxed 2026-09-11.
-  **The class is wider than lifecycle-kit** (re-verified at the `native-spawn-residue` close, also
-  red at the prior close's head): `--run-consumer-smoke gate-sdk` reds on four unaccounted
-  `check-action-*` placeholders only site-kit's install retracts, and `drift-kit` alone reds
-  `check-graph` on stale hook/graph artifacts after its install. drift-kit's own install step was
-  also failing silently (every bundled KPI opts out of `--trend` there, and `grep -c` aborted under
-  `pipefail` before `fail`); that step was fixed at that close, so the close this entry needs is
-  per-kit self-sufficiency or a refused narrowed run, not per-kit patching.
-  **Why design-pending — two closes that differ in kind:** have lifecycle-kit's smoke seed the
-  agent file it installs into, self-sufficient per kit on the run-gate-tests hermeticity precedent;
-  or have the runner refuse a single-kit argument whose kit declares an install dependency, which
-  is honest but keeps the narrowed run unavailable.
-  **Cost while deferred:** a narrowed run reds on the harness rather than the change, and the
-  cheapest recovery is to stop narrowing.
-  Selected at `declined-target-audit`'s scope (operator direction, 2026-09-18, lead-relayed):
-  the per-kit self-sufficiency close is spec's to author and promote.
-  recurrence: consumer-smoke-single-kit-run-not-self-sufficient 2026-09-18
-
 - **residency-roster-template-reach-ungated** [cost: event/low] [surface: context-kit] —
   nothing asserts the roster↔template relation context-kit/SPEC.md §The consumer footprint rules:
   an obligation whose bound actor is any session is carried at the consumer's resident tier and is
@@ -163,30 +169,6 @@
   Filed 2026-09-17 to the gap inbox at build (gate candidate declined under operator direction,
   2026-09-17, lead-relayed), promoted at this iteration's close drain. Owner lookup: `Operative
   residency`, `consumer footprint`, `footprint`, `residency`, `obligation` — none.
-
-- **footprint-roster-rows-price-unevenly** [cost: event/low] [surface: lifecycle-kit] —
-  the roster in context-kit/SPEC.md §The consumer footprint names each kit's resident ask by
-  citation, and the cited sections are asymmetric in what a reader learns from them. drift-kit's row
-  points at §The knowledge-friction loop, which states its own resident cost and the condition that
-  earns it back ("costs one always-loaded bullet in the consumer's instructions file; that line is
-  the loop's hook and must earn its recurring cost by the log actually filling"). lifecycle-kit's
-  row points at §The committed gap inbox and §The survey record, which state neither, so a consumer
-  costing adoption reads a citation that names the ask without pricing it.
-  **Verified at the drain:** both cited lifecycle-kit sections were read and carry no resident-cost
-  or earn-back sentence; drift-kit's does, at the line quoted above.
-  **Why design-pending:** the deliverable is one cost-and-earn-back sentence per obligation in
-  lifecycle-kit/SPEC.md, and the earn-back condition is a design claim about when each resident line
-  would stop being worth its cost. One of the three lines — the recurrence stamp — landed this
-  iteration under an operator direction, so stating the condition under which it would be withdrawn
-  settles semantics neither that direction nor the amendment reached.
-  **Cost while deferred:** the roster understates nothing but prices only one of the kits it lists,
-  so docs/footprint.md and the roster disagree about what a reader can learn without opening a SPEC.
-  Filed 2026-09-17 to the gap inbox at build while landing
-  `consumer-footprint-roster-omits-lifecycle-kit`; promoted at this iteration's close drain.
-  Owner lookup: `consumer footprint`, `footprint`,
-  `earn-back`, `resident ask`, `obligation` — none.
-  Joins `declined-target-audit` by operator direction (2026-09-18, lead-relayed) at that
-  scope; its earn-back sentences are spec's to author and promote.
 
 - **baseline-suite-coverage-arm-one-directional** [cost: event/low] [surface: evidence-kit] —
   evidence-kit/SPEC.md §check-evidence-baseline says the suite-coverage arm closes the failure of a
@@ -3039,28 +3021,6 @@
   dispatch itself would have been refused, and nothing reds.
   Filed 2026-09-16 to that same close's gap inbox, undrainable there; promoted at the following
   iteration's scope.
-
-- **declined-update-target-cause-unaudited** [cost: iteration/low] [surface: lifecycle-kit] — a build
-  session that DECLINES a spec-authored update target states a cause, and nothing re-reads that
-  cause against the target's own purpose: validate confirms the declination on the terms the
-  declining session set.
-  **Measured 2026-09-16** across `queue-arm-report-fidelity`'s two build batches. Three targets
-  declined, all three probed by validate, all three confirmed — and one was nevertheless a real
-  roster hole. `queue-kit/README.md` enumerates the arms that read the queue file and omitted
-  entry-history entirely, so the stated cause "no entry-history line to widen" was literally true
-  while the right act was to ADD the line, which that iteration's close did.
-  **Why design-pending: the datum admits two opposite readings and nothing separates them.**
-  Either the spec stage's update-target roster over-reaches systematically, in which case the fix
-  is an authoring-side narrowing; or these are holes in the target surfaces, in which case the fix
-  is a coverage assertion on the surface itself. The candidate deliverables differ by an order,
-  and one measured instance cannot choose between them.
-  **Cost while deferred:** every iteration's build stage may decline a target on a true cause and
-  leave a roster hole behind it, and validate's confirmation is structurally incapable of catching
-  that case, because the terms it re-reads are the declining session's own.
-  Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could not drain
-  it; promoted at the following iteration's scope.
-  Leads `declined-target-audit`'s unit set by operator direction (2026-09-18, lead-relayed)
-  at its scope; choosing between the two readings is spec's, which authors and promotes.
 
 - **gate-fixture-fanout-arm** [cost: event/low] [surface: gate-sdk] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
