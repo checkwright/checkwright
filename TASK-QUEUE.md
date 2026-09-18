@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: windows-bash-floor
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -12,7 +12,35 @@
 
 ## New Features
 
+- **native-windows-bash-floor** [spec: SPEC-windows-front-end.md] — a native-Windows host
+  reaches the battery only through bash: the `run-gates.sh` front-end stub and both generated git
+  hooks are bash, and a bare `bash` typed in PowerShell reaches the WSL launcher.
+  **Ruled at scope:** a PowerShell twin `gate-sdk/bin/run-gates.ps1`, held to the bash stub by an
+  executed comparison (`--run-front-end-parity`) on the binding Windows leg. The git hooks stay one
+  bash implementation, which Git for Windows runs under its own shell, and a leg proves it by
+  committing with every bash stripped from `PATH`. guard-kit's hook is split out as
+  `guard-hook-windows-substrate`.
+  Filed 2026-09-14 by `config-seam-fourth-cut`'s spec (operator direction, lead-relayed). Leads
+  `windows-bash-floor` by operator direction (2026-09-18, lead-relayed).
+
+- **windows-shellcheck-step-copies-page-route** [spec: SPEC-windows-front-end.md] — both Windows
+  legs install `shellcheck` from a copy of docs/install.md's Chocolatey route, which nothing holds
+  equal to the page.
+  **Ruled at scope:** a `windows-remedy` marker block on the page, run verbatim under PowerShell by
+  both legs, as the macOS legs run theirs. The legs' copies are deleted.
+  Filed 2026-09-18 at `smoke-leg-crate-cache`'s spec. Joins `windows-bash-floor` by operator
+  direction (2026-09-18, lead-relayed).
+
 ## Technical Debt
+
+- **windows-build-dead-code-warnings-unheld** — the Windows `native-artifacts` leg compiles with
+  two `dead_code` warnings no other target shows: `WAIT_BODY` and `resolve_interpreter`.
+  **Ruled at scope:** delete `resolve_interpreter`, since `spawn_target`'s funnel already applies
+  its `Refuse` face to every spawn. Fence `WAIT_BODY` behind `cfg(unix)`. Hold the class with a
+  clippy `-D warnings` step on every `native-artifacts` leg, separate from the artifact build
+  (delta 4 of `windows-bash-floor`'s amendment).
+  Filed 2026-09-18 at the `native-spawn-residue` close drain. Joins `windows-bash-floor` by
+  operator direction (2026-09-18, lead-relayed).
 
 ## Deferred
 
@@ -34,23 +62,6 @@
   line-start discipline holds.
   Filed 2026-09-18 to the gap inbox at declined-target-audit's align; promoted at its close drain.
   Owner lookup: `inferred marker`, `inferred_marker`, `scan_markers`, `malformed marker` — none.
-
-- **windows-build-dead-code-warnings-unheld** [cost: event/low] [surface: native] — the
-  `x86_64-pc-windows-msvc` `native-artifacts` leg compiles with two `dead_code` warnings no other
-  target shows: `WAIT_BODY` in `native/src/emit/wait_probe.rs` and `resolve_interpreter` in
-  `native/src/proc.rs`. `WAIT_BODY`'s only non-test reader is a `cfg(unix)` function;
-  `resolve_interpreter` has no caller on any target and carries `allow(dead_code)` on every target
-  but Windows, so whether a Windows call site was meant to land is itself the open question.
-  Nothing reds on a warning, so a third such item lands silently, and the leg is the only compile of
-  `cfg(not(unix))` code.
-  **Re-verified at the `native-spawn-residue` close:** both warnings print in that close's pushed
-  run and in the prior close's run, so they predate the iteration.
-  **Why design-pending:** `WAIT_BODY` takes `cfg(unix)`, but `resolve_interpreter` needs a ruling
-  (delete it, or land its Windows caller); and whether the Windows leg should deny warnings, the
-  check that holds the class, turns a warning into a red release artifact.
-  **Cost while deferred:** the Windows build's warning count carries no signal.
-  Filed 2026-09-18 at the `native-spawn-residue` close drain. Owner lookup: `resolve_interpreter`,
-  `WAIT_BODY`, `dead_code`, `windows` with `warn` — none matched.
 
 - **guard-declares-class-correspondence-ungated** [cost: event/low] [surface: guard-kit] — items
   in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes their rule's
@@ -88,26 +99,6 @@
   entries across steps.
   Filed 2026-09-18 to the gap inbox at `smoke-leg-crate-cache`'s build; promoted at its close drain.
   Owner lookup: `macos-remedy`, `gnubin`, `shell profile`, `persist` — none.
-
-- **windows-shellcheck-step-copies-page-route** [cost: event/low] [surface: .github] — the Windows
-  legs install `shellcheck` from a literal copy of `docs/install.md` §Requirements' Chocolatey route
-  (`choco install shellcheck`), held equal to the page by nothing: the Windows analogue of the macOS
-  copy the `macos-remedy` block retired by having the legs run the page's own block. Candidate: a
-  Windows remedy marker block on the page, extracted and run by the legs the way the macOS legs run
-  theirs.
-  **Re-verified at the drain:** the copy sits at **two** sites, not the one the filer named —
-  `install-smoke-windows`' shellcheck step and a second `choco install shellcheck` in
-  `install-smoke-powershell` (`.github/workflows/gates.yml`); the page's route is the
-  `shellcheck` bullet's prose at `docs/install.md:190`, not a block.
-  **Why design-pending:** the route is a prose clause today, so deriving from it means authoring a
-  new page block, a user-facing page change, and a PowerShell extraction beside the awk one.
-  **Cost while deferred:** a drift between the page and either step greens a leg over an adopter
-  path the page no longer describes; one formula, so low.
-  Filed 2026-09-18 to the gap inbox at `smoke-leg-crate-cache`'s spec; promoted at its close drain.
-  Owner lookup: `choco`, `Chocolatey`, `windows-remedy`, `install-smoke-windows` — matched
-  `install-smoke-leg-names-mix-two-axes` and
-  `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set` (leg naming and expiry,
-  distinct).
 
 - **adopter-floor-gnu-date-and-awk-unheld** [cost: event/low] [surface: .github] — no CI leg runs the
   adopter floor on mawk or BusyBox awk, so `native-spawn-floor`'s narrowing of the awk member to
@@ -184,27 +175,18 @@
   `suite coverage`, `evidence-baseline`, `orphan` — matched `evidence-baseline-orphan-suite-row`,
   read and ruled distinct above.
 
-- **native-windows-bash-floor** [cost: event/high] [surface: gate-sdk] — after the
-  config bridge retires, a native-Windows runtime still needs bash in three places: the
-  `bin/run-gates.sh` front-end stub, which locates the binary before any binary runs; the two
-  generated git hooks; and guard-kit's `PreToolUse` hook, whose rules stay bash on the
-  extension-point ground (guard-kit/SPEC.md §Consumer rules). TRAJECTORY objective 6 rules a
-  surviving script surface dual-implementable, bash and PowerShell, and objective 2 rules a
-  bash-only path a failure.
-  **Measured at spec:** every harness hook this repo wires runs `bash`, either through the front-end
-  or as a bash hook, and docs/install.md requires `bash` 4.3 or later.
-  **Candidates, none ruled:** a PowerShell twin of the front-end stub (resolve the root, read the
-  pre-binary knobs, exec the binary), held to the bash stub by a standing comparison; hooks that
-  invoke the binary directly with the locators the stub exports; and, for the git hooks, whatever
-  shell Git for Windows runs them under. guard-kit's hook is the hardest: its rules are the consumer
-  extension point, so a twin doubles every consumer rule.
-  **Why design-pending:** the twin's parity oracle, the hook invocation form, and whether
-  guard-kit needs a second substrate at all are three separate decisions.
-  **Cost while deferred:** a native-Windows adopter still needs Git-for-Windows bash for every
-  battery run and tool call, and docs/install.md says so.
-  Filed 2026-09-14 by `config-seam-fourth-cut`'s spec, a direct entry the operator authorized
-  (operator direction, 2026-09-14, lead-relayed), splitting the floor out of the bridge's
-  retirement.
+- **guard-hook-windows-substrate** [cost: event/high] [surface: guard-kit] — whether guard-kit's
+  `PreToolUse` hook needs a second implementation language on native Windows. Its rules are bash
+  and jq, and they stay bash on the extension-point ground (guard-kit/SPEC.md §Consumer rules), so a
+  PowerShell twin would double every consumer rule. The harness-hook commands that already reach
+  the binary through the front-end take `run-gates.ps1` once a Windows consumer's settings name it,
+  and which command those settings carry is part of this same wiring decision.
+  **Why design-pending:** a twin's parity oracle across consumer-authored rules, or a ruling that
+  Git for Windows' bundled bash serves the hook (as it serves the git hooks), are both open.
+  **Cost while deferred:** a native-Windows harness session still needs Git-for-Windows bash
+  reachable for every tool call the guard sees, which TRAJECTORY objective 6 counts against.
+  Filed 2026-09-18 at `windows-bash-floor`'s scope, split out of `native-windows-bash-floor`
+  (operator direction, lead-relayed), whose other two thirds that iteration took.
 
 - **push-budget-unshipped** [cost: event/low] [surface: lifecycle-kit] — the push
   budget (one to two pushes per iteration, two unasked hotfix pushes) lives only in this repo's
