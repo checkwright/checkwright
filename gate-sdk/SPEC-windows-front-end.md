@@ -176,6 +176,12 @@ The stdin case settles it. If the child does not inherit stdin, the twin reads
 §The program roster's member list gains `pwsh` (contributor), and
 `native/src/programs.rs` gains the row.
 
+**Also not yet applied.** §The non-gate arm's `Arm::Run` members-that-are-neither
+list — the roster a mistyped arm is sent to, so an addition here is the arm's
+registration and not documentation — gains, after `--pack-installer`'s entry:
+`, and `--run-front-end-parity`, the front-end twin's held comparison
+(§run-gates)`.
+
 ### (3) The generated hooks on native Windows: run by git's own shell, no second implementation {design-bearing}
 
 The two generated hooks stay bash and gain no PowerShell twin. On a native
@@ -360,6 +366,9 @@ is required. It does not drop bash from the floor.
   the port-disposition paragraph at 10159-10175, and the `ARM_UNAVAILABLE_STATUS`
   paragraph from 10198 (deltas 1 and 2).
 - `gate-sdk/SPEC.md` §The program roster: the `pwsh` member (delta 2).
+- `gate-sdk/SPEC.md` §The non-gate arm: the `Arm::Run` members-that-are-neither
+  list gains `--run-front-end-parity`, on the ground the section states of
+  itself — arm registration, not documentation (delta 2).
 - `gate-sdk/SPEC.md` §gen-pre-commit and §install-hooks (delta 3).
 - `gate-sdk/SPEC.md` at lines 2063 and 14980-14985, the `resolve_interpreter`
   citations. Probe: `grep -n resolve_interpreter gate-sdk/SPEC.md` (delta 4).
