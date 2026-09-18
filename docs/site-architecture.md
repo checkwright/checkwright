@@ -313,12 +313,14 @@ recoverable:
   legs and run verbatim. The HTML-comment pair `macos-remedy:begin` and
   `macos-remedy:end` holds one `sh` fence; its readers are `install-smoke-macos`
   and `install-smoke-macos-intel`, and each runs the body in the step's shell and
-  persists the `PATH` entries the body prepended to `$GITHUB_PATH`. The pair
+  persists the `PATH` entries the body prepended to `$GITHUB_PATH`, then asserts a
+  fresh login shell resolves the ordering. The pair
   `windows-remedy:begin` and `windows-remedy:end` holds one `powershell` fence;
   its readers are `install-smoke-windows` and `install-smoke-powershell`, and both
   run the body under PowerShell, the shell a native-Windows adopter types it
   into — the bash leg extracts it with the macOS legs' awk program and hands it
-  to `pwsh -NoProfile -Command`, the pwsh leg extracts it in PowerShell. In every
+  to `pwsh -NoProfile -Command`, the pwsh leg extracts it in PowerShell; the pwsh
+  leg then runs `doctor` under the `PATH` a new terminal would compose. In every
   leg only the fence lines and blank lines are skipped, and an empty extraction
   reds the leg by name. **No gate holds either block.** Each is hand-authored
   source with no emitter, and the binding legs are its enforcement: a malformed

@@ -72,10 +72,10 @@ serves it, and joining native Windows took nothing away from it.
 
 macOS runs it too, but as an adopter action rather than something the stock
 system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort` and
-`date` reject the flags the gates pass. The remedy is the two commands below.
-They are the whole of it: this page names no other step for a Mac. The first
+`date` reject the flags the gates pass. The remedy is the block below, and it
+is the whole of it: this page names no other step for a Mac. Its first line
 installs GNU bash for the 4.3 floor, coreutils for `sort` and `date`, and
-`shellcheck`, which `init` refuses a machine without. The second puts
+`shellcheck`, which `init` refuses a machine without. The other two put
 coreutils' `gnubin` directory and Homebrew's own `bin` ahead of `/usr/bin` on
 `PATH`; `gnubin` is what makes the GNU names resolve unprefixed, as `sort`
 rather than `gsort`, and without it every gate that sorts would still reach the
@@ -85,16 +85,20 @@ BSD one.
 
 ```sh
 brew install bash coreutils shellcheck
+echo "export PATH=\"$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile
 export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/bin:$PATH"
 ```
 
 <!-- macos-remedy:end -->
 
-The `PATH` line is the honest limit: the requirements below assert what `PATH`
-actually resolves, so a Mac carrying Homebrew coreutils that is not
-`PATH`-ordered reports below contract — correctly, since BSD `sort` is what the
-gates would invoke. The two macOS install-smoke legs run this block verbatim, so
-it is measured rather than suggested.
+The block's middle line writes the ordering into `~/.zprofile`, the profile a
+new zsh Terminal window reads. If your login shell is bash, append the same line
+to `~/.bash_profile` instead. The last line orders the shell you are in. The
+requirements below assert what `PATH` actually resolves, so a Mac carrying
+Homebrew coreutils that is not `PATH`-ordered reports below contract. That is
+correct, since BSD `sort` is what the gates would invoke. The two macOS
+install-smoke legs run this block verbatim and then open a fresh login shell, so
+both the ordering and its persistence are measured rather than suggested.
 
 Those are the platforms the **battery** runs on. A second and narrower fact sits
 beside them: whether a **prebuilt gate binary** is published for a platform,
@@ -216,16 +220,25 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:end -->
 
-The Windows remedy block: the one floor member Git for Windows does not supply,
-installed from PowerShell.
+The Windows remedy block, typed into PowerShell. It installs the two floor
+members Git for Windows does not supply, `shellcheck` and `jq`. It then puts
+Git's own `usr\bin` and `bin` on `PATH`, for this session and, through your user
+`Path`, for every later one: Git's installer puts only its `cmd` directory there
+by default, and that directory holds no userland.
 
 <!-- windows-remedy:begin -->
 
 ```powershell
-choco install shellcheck -y
+choco install shellcheck jq -y
+$git = Split-Path (Split-Path (Split-Path ((git --exec-path) -replace '/', '\')))
+[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$git\usr\bin;$git\bin", 'User')
+$env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
 ```
 
 <!-- windows-remedy:end -->
+
+These lines change your machine, not your repository, so `checkwright uninstall`
+does not reverse them, just as it does not uninstall a Homebrew package.
 
 A member is pinned only where a construct the battery actually runs forces the
 pin, and each pinned member names that construct above. A floor nobody's code

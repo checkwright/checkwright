@@ -32,8 +32,8 @@ engineering grounds undated.
 - The guard decision table runs only on the Linux `gates` job
   (`grep -n run-guard-tests .github/workflows/gates.yml` prints line 71).
 - Git for Windows ships no `jq` (run 35390249229's Windows probe resolves `jq`
-  from Chocolatey). `SPEC-remedy-persistence.md` puts `jq` into the Windows
-  remedy block, and that is the floor this hook's jq use rests on.
+  from Chocolatey). docs/install.md §Requirements' Windows remedy block
+  installs `jq`, and that is the floor this hook's jq use rests on.
 - The generated git hooks already take this shape: gate-sdk/SPEC.md
   §gen-pre-commit rules them one bash implementation that git runs under Git for
   Windows' own shell, and a MinGit host is not claimed.

@@ -785,13 +785,13 @@ jobs:
           # and ONE missing implementation reported as `sort` wrong-impl AND as every
           # versioned member being uncomparable. The repair is in the crate — the
           # floor probes resolve outside that directory, context-kit/SPEC.md
-          # §bin/env-probe — and this prepend remains its precondition, since the
-          # resolver walks PATH and reaches nothing PATH never carried.
-          # `shellcheck` the image does not ship at all and is the only genuine
-          # addition, taken by running docs/install.md's `windows-remedy` block
-          # verbatim, as an adopter following the page would; an empty extraction
-          # reds by name.
-          $env:PATH = "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin;$env:PATH"
+          # §bin/env-probe — and Git's userland on PATH remains its precondition,
+          # since the resolver walks PATH and reaches nothing PATH never carried.
+          # This leg puts nothing on PATH itself: docs/install.md's
+          # `windows-remedy` block is run verbatim, as an adopter following the
+          # page would, and its session line is what orders Git's `usr\bin` and
+          # `bin` here; `shellcheck` the image does not ship at all. An empty
+          # extraction reds by name.
           $remedy = @()
           $inBlock = $false
           foreach ($line in (Get-Content -LiteralPath docs/install.md)) {
@@ -824,6 +824,20 @@ jobs:
           # diagnosis where a reader needs it: a runner image that stops shipping a
           # member reds by name with doctor's own table inline, instead of surfacing
           # one assertion later as an opaque init refusal.
+          #
+          # The adopter's next terminal is asked first: a child whose PATH is the
+          # one Windows composes for a new process, the machine value followed by
+          # the user value the block appended to, with nothing this session
+          # prepended. A green here is the block's persistence measured; the
+          # session's own doctor below is its ordering.
+          $pwshExe = (Get-Command pwsh -CommandType Application | Select-Object -First 1).Source
+          $sessionPath = $env:PATH
+          $env:PATH = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
+          $nout = (& $pwshExe -NoProfile -File (Join-Path $pkg 'bin/checkwright.ps1') doctor 2>&1) -join "`n"
+          $ncode = $LASTEXITCODE
+          $env:PATH = $sessionPath
+          Check "a new terminal's PATH meets the toolchain floor doctor holds" `
+                ($ncode -eq 0) "doctor exit $ncode -- $nout"
           $dout = (& pwsh -NoProfile -File (Join-Path $pkg 'bin/checkwright.ps1') doctor 2>&1) -join "`n"
           $dcode = $LASTEXITCODE
           Check "the runner meets the toolchain floor doctor holds" `
@@ -1252,10 +1266,14 @@ jobs:
       # The body keeps to bash 3.2, since it runs before the block has installed
       # a newer bash. The block's own lines never fail the step: a brew that did
       # not land is read off the probe below, where it appears as the
-      # `<MISSING>` or the BSD flavour it actually is. The one refusal is an
+      # `<MISSING>` or the BSD flavour it actually is. The first refusal is an
       # empty extraction — with no block there is no remedy to perform. The
       # `PATH` entries the block prepended are persisted last to first, because
       # the runner puts each `$GITHUB_PATH` line ahead of the ones before it.
+      # That carry is the runner's and no adopter has it, so the second refusal
+      # is the adopter's next terminal — a login zsh with no inherited `PATH` —
+      # resolving `sort` anywhere but coreutils' `gnubin`: the block's profile
+      # line is what must persist the ordering (docs/install.md §Requirements).
       - name: install the GNU userland docs/install.md names, and PATH-order it
         run: |
           set +e
@@ -1280,6 +1298,15 @@ jobs:
             i=$((i - 1))
             echo "${entries[$i]}" >> "$GITHUB_PATH"
           done
+          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v sort')"
+          echo "a fresh login shell resolves sort to: ${next:-<MISSING>}"
+          case "$next" in
+            */coreutils/libexec/gnubin/sort) ;;
+            *)
+              echo "::error::a fresh login shell resolves sort to '${next:-<MISSING>}', not coreutils' gnubin — the block did not persist its PATH ordering for the adopter's next terminal"
+              exit 1
+              ;;
+          esac
           exit 0
 
       # Reporting only, and it never fails. It is what makes a red suite below
@@ -1582,6 +1609,15 @@ jobs:
             i=$((i - 1))
             echo "${entries[$i]}" >> "$GITHUB_PATH"
           done
+          next="$(env -i HOME="$HOME" /bin/zsh -l -c 'command -v sort')"
+          echo "a fresh login shell resolves sort to: ${next:-<MISSING>}"
+          case "$next" in
+            */coreutils/libexec/gnubin/sort) ;;
+            *)
+              echo "::error::a fresh login shell resolves sort to '${next:-<MISSING>}', not coreutils' gnubin — the block did not persist its PATH ordering for the adopter's next terminal"
+              exit 1
+              ;;
+          esac
           exit 0
 
       # Reporting only, never fails, and it runs AFTER the install so what it

@@ -21,22 +21,6 @@
   limit and filed as `guard-powershell-tool-unguarded`. The oracle is the decision table run
   under Git Bash on `install-smoke-windows`.
 
-- **windows-remedy-path-step-undocumented** [spec: SPEC-remedy-persistence.md] — the
-  `install-smoke-powershell` leg prepends Git for Windows' `usr\bin` and `bin` to `PATH` before
-  `doctor`, a step `docs/install.md` never names, and the page's block omits `jq`, which Git for
-  Windows does not ship (run 35390249229's probe resolves it from Chocolatey).
-  **Ruled at spec:** the block installs `shellcheck` and `jq`, appends Git's userland to the user
-  `Path` and prepends it for the session; the leg drops its own prepend and runs `doctor` under
-  the `PATH` a new terminal composes.
-
-- **macos-remedy-path-lasts-one-shell** [spec: SPEC-remedy-persistence.md] — the `macos-remedy`
-  block's `export PATH=` lasts one shell, so the adopter's next terminal resolves BSD `sort` and
-  `date` and `doctor` refuses.
-  **Ruled at spec:** the block appends the ordering, prefix resolved at append time, to
-  `~/.zprofile` (the default zsh login profile; bash-login adopters are pointed at
-  `~/.bash_profile` in prose), and both macOS legs assert a fresh `env -i` login shell resolves
-  gnubin `sort`.
-
 ## Technical Debt
 
 ## Deferred
@@ -3358,5 +3342,7 @@
 
 - run-gates-ps1-windows-powershell-host-unexercised
 - init-next-block-bash-spelled-on-windows
+- windows-remedy-path-step-undocumented
+- macos-remedy-path-lasts-one-shell
 
 ## Lessons Learned
