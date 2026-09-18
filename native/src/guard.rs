@@ -9,15 +9,22 @@ use crate::ere::{Ere, EreError};
 pub const LIB: &str = "lib/guard.sh";
 
 // spec: guard-kit/SPEC.md §The guard framework — `guard_allow_match`, the settings-allow match
-// core and its one compiled holder: a closing `:*` is the head alone or the head, a space, anything.
+// core and its one compiled holder: a closing `:*`, or a closing ` *` that is the rule's only `*`,
+// is the head alone or the head, a space, anything.
 pub fn allow_match(s: &str, glob: &str) -> bool {
-    let (body, tail) = match glob.strip_suffix(":*)") {
-        Some(b) => (Some(b), ")"),
-        None => (glob.strip_suffix(":*"), ""),
+    let (body, tail) = match glob.strip_suffix(')').filter(|b| b.ends_with('*')) {
+        Some(b) => (b, ")"),
+        None => (glob, ""),
     };
-    match body {
+    let head = if let Some(h) = body.strip_suffix(":*") {
+        Some(h.replace(":*", "*"))
+    } else {
+        body.strip_suffix(" *")
+            .filter(|h| !h.contains('*'))
+            .map(String::from)
+    };
+    match head {
         Some(head) => {
-            let head = head.replace(":*", "*");
             crate::walk::glob_match(&format!("{head}{tail}"), s)
                 || crate::walk::glob_match(&format!("{head} *{tail}"), s)
         }
@@ -498,6 +505,18 @@ mod tests {
         assert!(allow_match("Bash(git status --short)", "Bash(git status:*)"));
         assert!(!allow_match("Bash(git statusx)", "Bash(git status:*)"));
         assert!(allow_match("touch fg", "touch f*"));
+    }
+
+    // spec: guard-kit/SPEC.md §The guard framework — a closing ` *` that is the rule's only `*`
+    // grants the bare head too; beside another `*` it does not
+    #[test]
+    fn a_sole_trailing_space_star_also_grants_the_bare_head() {
+        assert!(allow_match("git status", "git status *"));
+        assert!(allow_match("Bash(git status)", "Bash(git status *)"));
+        assert!(allow_match("touch f", "touch f *"));
+        assert!(!allow_match("touch fg", "touch f *"));
+        assert!(!allow_match("git -C . status", "git -C * status *"));
+        assert!(allow_match("git -C . status --short", "git -C * status *"));
     }
 
     // spec: guard-kit/SPEC.md §The guard framework — placeholder, never deletion

@@ -207,10 +207,20 @@ Primitives a consumer guard composes; each emits the harness's
   matches `printf` alone or `printf` then a space then anything, and never
   `printfx`, `printf-x` or `printf.x` — the closing `:*`, bare or before the
   rule's own `)`, is read as the head alone or the head and a space-led `*`, and any other `:*`
-  is a plain `*`. **Measured, not read off documentation:** a `claude -p` run
-  under `dontAsk` with the rule as its one grant refused every glued and
-  punctuated continuation and granted the bare head and a spaced one, and
-  `Bash(python3 -:*)` refused `python3 -c …`. A model wider than the harness is
+  is a plain `*`. **A closing space-led `*` that is the rule's only `*` reads the
+  same way**, so `Bash(git status *)` matches `git status` alone as well; beside
+  another `*` it does not, so `Bash(git -C * status *)` never matches a command
+  ending at `status`. **Measured, not read off documentation:** `claude -p
+  --safe-mode --setting-sources '' --permission-mode dontAsk --settings <file>`,
+  the rule as the file's one grant, told to run one command verbatim, read off
+  the JSON result's `permission_denials`. `Bash(touch f:*)` granted `touch f`
+  and `touch f g` and refused `touch fg`, `touch f-g` and `touch f.g`;
+  `Bash(python3 -:*)` refused `python3 -c …`; `Bash(touch f *)` granted
+  `touch f` and refused `touch fg`; `Bash(git status *)` granted `git status`;
+  `Bash(git -C * status *)` granted `git -C . status --short`, refused
+  `git -C . status`, and granted `git -C . log --oneline -1 -- status x` — an
+  interior `*` spans words, which is why a grant mirrored with a wildcard `-C`
+  target is not narrow. A model wider than the harness is
   the failure that matters here — it would let compare-settings-allow call a
   narrower grant redundant and rule 20 read an ungranted spelling as silently
   granted. Not a
@@ -2567,7 +2577,8 @@ Advisory: lists local-overlay allow entries already granted by a glob in
 the committed settings, and those naming a script absent from the tree — the deterministic prune-candidate set for the
 close-stage audit. A committed pattern subsumes a local entry when the
 local string matches it under shell-glob semantics, with the harness `:*` prefix
-idiom read word-bounded (§The guard framework) so one test covers both forms —
+idiom and a sole closing space-led `*` read word-bounded (§The guard framework)
+so one test covers every form —
 the match core is `guard_allow_match`
 in `lib/guard.sh`, shared with rule 20. Read-only — reports candidates, never
 mutates (the operator prunes). It is the detector, not the policy: a
