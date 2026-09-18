@@ -188,3 +188,4 @@
 | queue-entry-grammar | sc sp a b v c | 7f/0d | 3 · ≤0d | 20s clean | 115 |
 | obligation-residency | sc · · b v c | 0f/3d | 0 | 20s clean | 115 |
 | external-install-evidence | sc sp a b v c | 3f/1d | 1 · ≤0d | 20s clean | 116 |
+| guard-grant-fidelity | sc · · b v c | 0f/4d | 0 | 20s clean | 116 |

@@ -3553,9 +3553,4 @@
 
 ## Done
 
-- local-only-grounds-unhomed
-- allow-match-colon-star-over-grants
-- git-dash-c-grant-unmirrored
-- compound-splitter-background-separators
-
 ## Lessons Learned
