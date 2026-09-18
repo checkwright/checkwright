@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: smoke-leg-crate-cache
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,24 @@
 ## New Features
 
 ## Technical Debt
+
+- **macos-adopter-legs-brew-gawk** — the two macOS
+  install-smoke legs' adopter-claim step still runs `brew install bash coreutils gawk shellcheck`
+  and PATH-orders gawk's gnubin, while docs/install.md §Requirements no longer names gawk for a
+  Mac, against that step's own header rule holding the set and the page equal in both directions.
+  **Re-verified at this scope:** `.github/workflows/gates.yml` `:1110`/`:1392` (brew) and
+  `:1118`/`:1400` (gnubin) read at HEAD, and `grep -n gawk docs/install.md` returns nothing.
+  **Deliverable:** drop gawk and its gnubin line from both adopter-claim legs and the header's
+  "coreutils and gawk" wording; `scripts/ci-macos-floor.sh` is the build legs' runner floor, not
+  an adopter claim, and keeps it. The legs then run the adopter floor on BSD awk, which discharges
+  the awk half of `adopter-floor-gnu-date-and-awk-unheld` (distinct: its `date -d` half stays).
+  Distinct from `macos-adopter-package-set-copied-per-leg`, whose subject is that nothing holds the
+  copies equal; this entry is one copy's content having drifted.
+  **Push risk:** those legs are binding, so a shipped GNU-only awk construct reds `master` on the
+  first watched push; that red is the claim being tested.
+  Filed 2026-09-18 to the gap inbox by `native-spawn-floor`'s close (capability-pendency audit);
+  promoted to Deferred at the next iteration's scope drain, then to this section on the unit-set
+  ruling (operator direction, 2026-09-18).
 
 ## Deferred
 
@@ -3255,22 +3273,6 @@
   **Cost while deferred:** local-only surfaces drift until a consult happens to audit them.
   Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after
   `external-install-evidence`'s close; promoted to Deferred at the next scope.
-
-- **macos-adopter-legs-brew-gawk** [cost: event/low] [surface: .github] — the two macOS
-  install-smoke legs' adopter-claim step still runs `brew install bash coreutils gawk shellcheck`
-  and PATH-orders gawk's gnubin, while docs/install.md §Requirements no longer names gawk for a
-  Mac, against that step's own header rule holding the set and the page equal in both directions.
-  **Re-verified at this scope:** `.github/workflows/gates.yml` `:1110`/`:1392` (brew) and
-  `:1118`/`:1400` (gnubin) read at HEAD, and `grep -n gawk docs/install.md` returns nothing.
-  **Deliverable:** drop gawk and its gnubin line from both adopter-claim legs and the header's
-  "coreutils and gawk" wording; `scripts/ci-macos-floor.sh` is the build legs' runner floor, not
-  an adopter claim, and keeps it. The legs then run the adopter floor on BSD awk, which discharges
-  the awk half of `adopter-floor-gnu-date-and-awk-unheld` (distinct: its `date -d` half stays).
-  Distinct from `macos-adopter-package-set-copied-per-leg`, whose subject is that nothing holds the
-  copies equal; this entry is one copy's content having drifted.
-  **Cost while deferred:** a binding leg greens over a host no adopter following the page has.
-  Filed 2026-09-18 to the gap inbox by `native-spawn-floor`'s close (capability-pendency audit);
-  promoted to Deferred at the next iteration's scope drain.
 
 ## Icebox
 
