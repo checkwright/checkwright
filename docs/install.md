@@ -72,12 +72,29 @@ serves it, and joining native Windows took nothing away from it.
 
 macOS runs it too, but as an adopter action rather than something the stock
 system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort` and
-`date` reject the flags the gates pass. Install GNU bash together
-with coreutils, then put them ahead of `/usr/bin` on `PATH`. That last
-clause is the honest limit: the requirements below assert what `PATH` actually
-resolves, so a Mac carrying Homebrew coreutils that is not `PATH`-ordered
-reports below contract — correctly, since BSD `sort` is what the gates would
-invoke.
+`date` reject the flags the gates pass. The remedy is the two commands below.
+They are the whole of it: this page names no other step for a Mac. The first
+installs GNU bash for the 4.3 floor, coreutils for `sort` and `date`, and
+`shellcheck`, which `init` refuses a machine without. The second puts
+coreutils' `gnubin` directory and Homebrew's own `bin` ahead of `/usr/bin` on
+`PATH`; `gnubin` is what makes the GNU names resolve unprefixed, as `sort`
+rather than `gsort`, and without it every gate that sorts would still reach the
+BSD one.
+
+<!-- macos-remedy:begin -->
+
+```sh
+brew install bash coreutils shellcheck
+export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/bin:$PATH"
+```
+
+<!-- macos-remedy:end -->
+
+The `PATH` line is the honest limit: the requirements below assert what `PATH`
+actually resolves, so a Mac carrying Homebrew coreutils that is not
+`PATH`-ordered reports below contract — correctly, since BSD `sort` is what the
+gates would invoke. The two macOS install-smoke legs run this block verbatim, so
+it is measured rather than suggested.
 
 Those are the platforms the **battery** runs on. A second and narrower fact sits
 beside them: whether a **prebuilt gate binary** is published for a platform,
@@ -169,8 +186,8 @@ your `PATH`, and the note says what breaks without it:
   before any partial install (see the three preconditions under `init` below),
   and a machine without ShellCheck is **refused rather than half-installed**.
   Nothing in the install supplies it. Take it from your distribution on Linux or
-  on a Windows adopter's WSL where that is the chosen route. On macOS it comes
-  from Homebrew. On native Windows the source is Chocolatey (`choco install
+  on a Windows adopter's WSL where that is the chosen route. On macOS the remedy
+  block above installs it. On native Windows the source is Chocolatey (`choco install
   shellcheck`), which is the route the Windows install-smoke leg itself takes, so
   it is measured rather than suggested.
 - `cargo` (≥ 1.71, @contributor) — a **contributor** requirement with **no install-time role at

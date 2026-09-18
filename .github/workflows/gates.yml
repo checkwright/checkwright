@@ -381,9 +381,9 @@ jobs:
       # is what that section has to name, or the leg goes back to measuring
       # nobody's path" — and that obligation is discharged: docs/install.md
       # §Requirements' `shellcheck` bullet names Chocolatey for native Windows,
-      # citing this leg as what measures it. Read it the way the macOS legs'
-      # `brew` step is read: the package set is an adopter claim, held equal to
-      # what that section states, and not a convenience for CI.
+      # citing this leg as what measures it. Unlike the macOS legs, which run the
+      # page's own block, this step is a copy of that bullet's Chocolatey route
+      # and nothing holds the two equal; the gap inbox carries that gap.
       - name: install the one adopter floor member this runner lacks
         shell: bash
         run: |
@@ -979,9 +979,8 @@ jobs:
       # installs the declared floor rather than working around its absence.
       #
       # **Read this as scaffolding, which is what separates it from the macOS
-      # install-smoke leg's brew step below.** That step's package set IS an
-      # adopter claim and is held equal to §Requirements' list in both
-      # directions; this one is the producer's own prerequisite and is held to
+      # install-smoke leg's remedy step below.** That step runs §Requirements'
+      # own macOS block; this one is the producer's own prerequisite and is held to
       # what this job's path executes — bash for the library's accessors, and the
       # GNU userland for `build-native.sh`'s `grep -aoEhf -` and `sort -u`. `shellcheck` is
       # deliberately absent: nothing this job runs invokes it (both files carry
@@ -1078,38 +1077,47 @@ jobs:
       # **Read this step as the assertion, not as scaffolding** — which is what
       # separates it from the Windows sibling's `choco install`. It performs
       # exactly the adopter action docs/install.md §Requirements documents for a
-      # Mac: GNU bash, coreutils and gawk, `PATH`-ordered ahead of `/usr/bin`,
-      # plus the `shellcheck` that same section sends a Mac to Homebrew for and
-      # `init` refuses without. The whole value of this leg is that the documented
-      # remedy stops being a reading and becomes a run, so a leg reaching green by
-      # installing something the page does not name would be measuring a host no
-      # adopter has.
+      # Mac. The whole value of this leg is that the documented remedy stops
+      # being a reading and becomes a run, so a leg reaching green by installing
+      # something the page does not name would be measuring a host no adopter has.
       #
-      # **Hold this package set and §Requirements' list equal, in both
-      # directions.** In particular do not add `findutils`: the vendoring loop's
-      # `-printf` was replaced in the same unit that landed this leg, so the
-      # documented list is complete — and a leg that installed findutils anyway
-      # would go green over an adopter path that stayed broken for everyone who
-      # installed exactly what the page names. A divergence between this list and
-      # that section is a defect in whichever of the two moved.
+      # **This step runs §Requirements' macOS block verbatim, so the leg has no
+      # package set of its own.** Do not add a formula here: a leg that needs one
+      # the block lacks is the page's defect, fixed in the block — a leg that
+      # installed it anyway would go green over an adopter path that stayed
+      # broken for everyone who ran exactly what the page prints.
       #
-      # It never fails: a brew that did not land is read off the probe below,
-      # where it appears as the `<MISSING>` or the BSD flavour it actually is,
-      # rather than truncating the job before the measurements.
+      # The body keeps to bash 3.2, since it runs before the block has installed
+      # a newer bash. The block's own lines never fail the step: a brew that did
+      # not land is read off the probe below, where it appears as the
+      # `<MISSING>` or the BSD flavour it actually is. The one refusal is an
+      # empty extraction — with no block there is no remedy to perform. The
+      # `PATH` entries the block prepended are persisted last to first, because
+      # the runner puts each `$GITHUB_PATH` line ahead of the ones before it.
       - name: install the GNU userland docs/install.md names, and PATH-order it
         run: |
           set +e
-          brew install bash coreutils gawk shellcheck
-          echo "brew exited $?"
-          prefix="$(brew --prefix)"
-          # gnubin carries the members under their unprefixed names, which is what
-          # `PATH`-ordering means for a page that asks for `sort` and `awk` and not
-          # for `gsort` and `gawk`.
-          {
-            echo "$prefix/opt/coreutils/libexec/gnubin"
-            echo "$prefix/opt/gawk/libexec/gnubin"
-            echo "$prefix/bin"
-          } >> "$GITHUB_PATH"
+          block="$(awk '
+            $0 == "<!-- macos-remedy:end -->" { f = 0 }
+            f && NF && $0 !~ /^```/ { print }
+            $0 == "<!-- macos-remedy:begin -->" { f = 1 }
+          ' docs/install.md)"
+          if [ -z "$block" ]; then
+            echo "::error::docs/install.md carries no macos-remedy block; this leg performs the page's remedy and has none to perform"
+            exit 1
+          fi
+          printf '== docs/install.md macos-remedy block ==\n%s\n' "$block"
+          before="$PATH"
+          eval "$block"
+          echo "block exited $?"
+          front="${PATH%"$before"}"
+          front="${front%:}"
+          IFS=: read -r -a entries <<< "$front"
+          i=${#entries[@]}
+          while [ "$i" -gt 0 ]; do
+            i=$((i - 1))
+            echo "${entries[$i]}" >> "$GITHUB_PATH"
+          done
           exit 0
 
       # Reporting only, and it never fails. It is what makes a red suite below
@@ -1379,29 +1387,39 @@ jobs:
 
       # The adopter action docs/install.md §Requirements documents for a Mac,
       # performed rather than read — the arm64 sibling's step header owns the
-      # whole argument, including why this package set and §Requirements' list
-      # are held equal in BOTH directions and why `findutils` is not here. This
-      # is a SECOND copy of that claim on a second host, which is the point: the
-      # page names no architecture, so a remedy proved on arm64 alone is proved
-      # on half the Macs it is written for.
+      # whole argument, including why this step runs §Requirements' macOS block
+      # verbatim and why no formula is added here. This is a second run of the
+      # same block on a second host, which is the point: the page names no
+      # architecture, so a remedy proved on arm64 alone is proved on half the
+      # Macs it is written for.
       #
-      # It never fails, for the sibling's reason: a brew that did not land is
-      # read off the probe below rather than truncating the job.
+      # Its failure posture and its bash 3.2 body are the sibling's, for the
+      # sibling's reasons.
       - name: install the GNU userland docs/install.md names, and PATH-order it
         shell: bash
         run: |
           set +e
-          brew install bash coreutils gawk shellcheck
-          echo "brew exited $?"
-          prefix="$(brew --prefix)"
-          # gnubin carries the members under their unprefixed names, which is what
-          # `PATH`-ordering means for a page that asks for `sort` and `awk` and not
-          # for `gsort` and `gawk`.
-          {
-            echo "$prefix/opt/coreutils/libexec/gnubin"
-            echo "$prefix/opt/gawk/libexec/gnubin"
-            echo "$prefix/bin"
-          } >> "$GITHUB_PATH"
+          block="$(awk '
+            $0 == "<!-- macos-remedy:end -->" { f = 0 }
+            f && NF && $0 !~ /^```/ { print }
+            $0 == "<!-- macos-remedy:begin -->" { f = 1 }
+          ' docs/install.md)"
+          if [ -z "$block" ]; then
+            echo "::error::docs/install.md carries no macos-remedy block; this leg performs the page's remedy and has none to perform"
+            exit 1
+          fi
+          printf '== docs/install.md macos-remedy block ==\n%s\n' "$block"
+          before="$PATH"
+          eval "$block"
+          echo "block exited $?"
+          front="${PATH%"$before"}"
+          front="${front%:}"
+          IFS=: read -r -a entries <<< "$front"
+          i=${#entries[@]}
+          while [ "$i" -gt 0 ]; do
+            i=$((i - 1))
+            echo "${entries[$i]}" >> "$GITHUB_PATH"
+          done
           exit 0
 
       # Reporting only, never fails, and it runs AFTER the install so what it

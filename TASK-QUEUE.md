@@ -12,36 +12,7 @@
 
 ## New Features
 
-- **macos-adopter-package-set-copied-per-leg** [spec: SPEC-macos-remedy.md] — the macOS
-  adopter remedy exists as prose on docs/install.md and as two literal brew copies in
-  gates.yml, and nothing holds either copy equal to the page.
-  **Ruled at spec, 2026-09-18:** neither filed shape. The page carries the remedy as a marked
-  `macos-remedy` block of commands, and both legs extract and run it, so page and legs are equal
-  by construction. That removes the duplication rather than gating it, and it needs no
-  floor-member-to-formula mapping. It subsumes `macos-adopter-legs-brew-gawk`'s leg edit, since
-  the block names no gawk. The Windows `choco` copy is filed to the gap inbox.
-  Filed 2026-09-08 by build; the gate shape's entry merged in 2026-09-11; paired at spec.
-  recurrence: macos-adopter-package-set-copied-per-leg 2026-09-18
-
 ## Technical Debt
-
-- **macos-adopter-legs-brew-gawk** — the two macOS
-  install-smoke legs' adopter-claim step still runs `brew install bash coreutils gawk shellcheck`
-  and PATH-orders gawk's gnubin, while docs/install.md §Requirements no longer names gawk for a
-  Mac, against that step's own header rule holding the set and the page equal in both directions.
-  **Re-verified at this scope:** `.github/workflows/gates.yml` `:1110`/`:1392` (brew) and
-  `:1118`/`:1400` (gnubin) read at HEAD, and `grep -n gawk docs/install.md` returns nothing.
-  **Deliverable:** drop gawk and its gnubin line from both adopter-claim legs and the header's
-  "coreutils and gawk" wording; `scripts/ci-macos-floor.sh` is the build legs' runner floor, not
-  an adopter claim, and keeps it. The legs then run the adopter floor on BSD awk, which discharges
-  the awk half of `adopter-floor-gnu-date-and-awk-unheld` (distinct: its `date -d` half stays).
-  Distinct from `macos-adopter-package-set-copied-per-leg`, whose subject is that nothing holds the
-  copies equal; this entry is one copy's content having drifted.
-  **Push risk:** those legs are binding, so a shipped GNU-only awk construct reds `master` on the
-  first watched push; that red is the claim being tested.
-  Filed 2026-09-18 to the gap inbox by `native-spawn-floor`'s close (capability-pendency audit);
-  promoted to Deferred at the next iteration's scope drain, then to this section on the unit-set
-  ruling (operator direction, 2026-09-18).
 
 ## Deferred
 
@@ -3491,5 +3462,7 @@
 ## Done
 
 - smoke-leg-crate-build-uncached
+- macos-adopter-package-set-copied-per-leg
+- macos-adopter-legs-brew-gawk
 
 ## Lessons Learned
