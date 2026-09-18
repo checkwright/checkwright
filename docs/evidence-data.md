@@ -191,3 +191,4 @@
 | guard-grant-fidelity | sc · · b v c | 0f/4d | 0 | 20s clean | 116 |
 | native-spawn-floor | sc sp a b v c | 3f/0d | 2 · ≤0d | 20s clean | 116 |
 | smoke-leg-crate-cache | sc sp a b v c | 3f/0d | 2 · ≤0d | 20s clean | 116 |
+| reach-ruling-lockstep | sc sp a b v c | 4f/0d | 2 · ≤0d | 20s clean | 117 |

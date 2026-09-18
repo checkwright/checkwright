@@ -1663,8 +1663,10 @@ drift-kit/
   smoke/overhead-fixture.jsonl   # synthetic transcript driving the classifier smoke
 ```
 
-Registers no gates (advisory; the guard-kit precedent), so no `checks/`,
-`gate-tests/`, or `smoke/violation.sh`. **So every assertion this kit makes —
+Registers no gates (advisory), so no `checks/` or `smoke/violation.sh`; and it
+ships no bespoke unit tests either, so no `gate-tests/` — a gateless kit may
+carry one (gate-sdk/SPEC.md §run-gate-tests, as guard-kit does), drift-kit
+does not. **So every assertion this kit makes —
 the stage-economics meter, the overhead meter, the bundled KPIs — runs from
 `smoke/install.sh`**, reached by `--run-consumer-smoke` with **every** kit
 vendored. Two invocations a session reaches for first do not work and are not

@@ -16,6 +16,26 @@
 
 ## Deferred
 
+- **guard-declares-class-correspondence-ungated** [cost: event/low] [surface: guard-kit] — items
+  in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes their rule's
+  `guard_skeleton` call strips (`Declares sq dq hd`), transcribed by hand, and nothing holds the two
+  equal: an edited skeleton call silently stales its SPEC declaration.
+  `check-guard-registration` holds roster, definitions and dispatch only, and the class
+  correspondence stays outside it because a rule has no single value — rule 6 builds two skeletons,
+  rule 18 four, some rules skeletonize inside a helper, and only some items declare. Candidate: a
+  declaration shape each skeleton call can satisfy per member (one declaration per call, keyed to
+  the call), then a fourth-roster assertion over it.
+  **Re-verified at the drain:** the `Declares` lines sit in the section (e.g. guard-kit/SPEC.md
+  rules at lines 681, 742, 759) and §check-guard-registration's assertions A-D name no class
+  correspondence.
+  **Why design-pending:** the declaration shape is a SPEC-grammar change across every declaring
+  item plus a gate extension, a spec-stage amendment rather than a drain fix.
+  **Cost while deferred:** a skeleton edit leaves a declaration that misstates what a quoted
+  mention does; a reader, not the guard, pays.
+  Filed 2026-09-18 to the gap inbox during `guard-ruleset-registration-lockstep`; promoted at its
+  close drain. Owner lookup: `guard_skeleton`, `Declares`, `inert class`, `skeleton call` —
+  none.
+
 - **macos-remedy-path-lasts-one-shell** [cost: event/low] [surface: docs] — `docs/install.md`
   §Requirements' `macos-remedy` block ends in an `export PATH=` line that lasts one shell, and the
   page names no step persisting the `gnubin` ordering (a shell-profile line), so an adopter who runs
@@ -2036,8 +2056,9 @@
   match the bodies. Which claims are derivable and which are prose is the open question.
   **DISTINCT from `guard-rule-number-not-citable-outside-kit`**, whose dispositions are about
   cross-corpus prose *outside* the kit and which therefore leaves intra-kit numbers citable and
-  ungated by construction; and from `guard-ruleset-registration-lockstep`, whose subject is the
-  roster/function/dispatch-order triple agreeing, not what cites a rule by number.
+  ungated by construction; and from `guard-ruleset-registration-lockstep`, Done 2026-09-18 as
+  `check-guard-registration`, whose subject is the roster/function/dispatch-order triple agreeing,
+  not what cites a rule by number.
   **Cost while deferred:** every insertion into the ruleset re-buys a hand sweep whose
   completeness nothing checks, and a stale roster reads as authoritative to the next author —
   which is exactly how the raw-vs-skeleton one survived.
