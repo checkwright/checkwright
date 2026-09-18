@@ -160,7 +160,8 @@ your `PATH`, and the note says what breaks without it:
   written in bash, and so are both generated git hooks, which git runs under its
   own shell. On native Windows, run the battery from PowerShell through
   `gate-sdk/bin/run-gates.ps1`, the twin of `run-gates.sh`. Git for Windows'
-  bundled bash is what serves guard-kit's hook there. The floor is the highest construct the
+  bundled bash serves guard-kit's hook there, because the harness runs both its
+  `Bash` tool and its hook commands under that shell. The floor is the highest construct the
   battery runs: a nameref (`local -n`) in the gate library the front-end sources.
   Associative arrays, `mapfile`, and the lowercasing case expansion are more
   widespread but only reach 4.0.

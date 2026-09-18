@@ -12,15 +12,6 @@
 
 ## New Features
 
-- **guard-hook-windows-substrate** [spec: SPEC-windows-hook.md] — guard-kit's `PreToolUse` hook
-  is bash and jq, and guard-kit/SPEC.md says nothing about native Windows.
-  **Ruled at spec (operator direction, 2026-09-18, lead-relayed):** Git for Windows' bundled bash
-  serves the hook, with no second implementation — the guarded `Bash` tool and every hook command
-  already run under Git Bash, and the wiring stays one host-neutral settings file. A PowerShell
-  twin and a native hook front are refused. The `PowerShell` tool's bypass is stated as an honest
-  limit and filed as `guard-powershell-tool-unguarded`. The oracle is the decision table run
-  under Git Bash on `install-smoke-windows`.
-
 ## Technical Debt
 
 ## Deferred
@@ -145,7 +136,7 @@
   Widening the matcher is no fix: every generic rule reads bash grammar.
   **Probed at filing:** the harness tools reference names the tool `PowerShell` and advises
   matching `Bash|PowerShell`; `grep -rn -i 'powershell tool' guard-kit` finds nothing before
-  `guard-kit/SPEC-windows-hook.md`, which states the bypass as an honest limit.
+  guard-kit/SPEC.md §The hook on native Windows, which states the bypass as an honest limit.
   **Why design-pending:** a PowerShell-grammar guard needs its own skeleton and splitter, rules
   that model PowerShell rather than bash, and a decision table on a Windows leg. None of that is
   designed, and whether a consumer-rule seam belongs on it is open.
@@ -3344,5 +3335,6 @@
 - init-next-block-bash-spelled-on-windows
 - windows-remedy-path-step-undocumented
 - macos-remedy-path-lasts-one-shell
+- guard-hook-windows-substrate
 
 ## Lessons Learned

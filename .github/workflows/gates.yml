@@ -477,6 +477,15 @@ jobs:
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-front-end-parity
 
+      # guard-kit/SPEC.md §The hook on native Windows claims Git for Windows'
+      # bash serves the hook with no second implementation; this is that claim's
+      # oracle. The decision table runs under Git Bash, on the producer's
+      # artifact the normalize step placed, so every generic rule's firing and
+      # non-firing case executes on the substrate the section claims.
+      - name: guard decision table under Git Bash
+        shell: bash
+        run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
+
       # The suite itself, under one steering that is **measurement scaffolding
       # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
       # this host, and this host is not the one declared triple. The re-entry is

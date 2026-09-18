@@ -625,6 +625,47 @@ own rules have no verification lane at all is a real gap and a separate one; it
 is named here rather than solved, since solving it designs a testing lane for
 consumer copies.
 
+## The hook on native Windows
+
+On native Windows the hook runs under Git for Windows' bundled bash, and the kit
+ships no second implementation. The ground is what the hook guards. It inspects
+calls to the harness's `Bash` tool, and the harness runs that tool only through
+Git Bash, so any session that has a call to guard already has the shell the
+guard needs. The harness also runs a command hook under Git Bash when it is
+installed. So the committed wiring (`templates/settings-hooks.json`) is the same
+on every host, which is what a settings file shared across a team's machines
+requires. A host-keyed hook command could not be committed at all. The ruleset
+models bash quoting, heredocs and the harness's per-segment matching of bash
+commands (§The generic ruleset). A PowerShell twin would re-implement a bash
+reader in PowerShell to guard bash commands, and it would double every consumer
+rule on a seam whose interface is shell functions (§Consumer rules). A native
+hook front would port the ruleset and delete that extension point, which the
+library's permanent-shell ground refuses (§The guard framework (`lib/guard.sh`)).
+Both are refused.
+
+The hook's floor on that host is the install page's: Git for Windows' bash plus
+`jq`, which Git for Windows does not ship. A host carrying MinGit or no Git Bash
+is not claimed. On such a host the harness runs hook commands under PowerShell,
+where a bare `bash` reaches the system directory's WSL launcher.
+`checkwright doctor` refuses that host before any hook is wired.
+
+**The honest limit: the harness's `PowerShell` tool is not guarded.** On Windows
+the harness carries a second shell tool, named `PowerShell`, which is on by
+default beside `Bash`. A `Bash`-matched hook never sees its calls, and the
+ruleset could not read them anyway, because every rule is a claim about bash
+grammar. So on a Windows host, a command the agent sends through that tool
+reaches the harness's own permission path unguarded and unlogged, and the
+friction loop does not measure it. Widening the matcher to `Bash|PowerShell` is
+refused, because it would run bash-grammar rules over PowerShell commands. A
+guard over PowerShell-grammar commands is separate work, not this kit's today. A
+consumer who wants every shell call guarded turns the tool off with the
+harness's own switch (`CLAUDE_CODE_USE_POWERSHELL_TOOL=0`). That is the
+consumer's call, and the kit does not recommend it.
+
+**The oracle** is the decision table (§Testing) run under Git Bash on the
+binding native-Windows install-smoke leg. Every generic rule's firing and
+non-firing case then executes on the substrate this section claims.
+
 ## The generic ruleset
 
 Rules that encode **harness behavior, shell-substrate behavior, or behavior over
