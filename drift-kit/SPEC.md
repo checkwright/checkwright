@@ -1408,6 +1408,221 @@ price table, which is why the signal is a KPI. **On-demand only** would cut the
 log's decision reader, a lead binding's tier-revert signal, and leave that tier
 with no way to be re-judged.
 
+## The install-observation record
+
+A gate's fixture pair proves it does what its author specified. It cannot
+distinguish a gate that is right from a gate whose author agrees with it,
+because in the authoring tree the party that writes a red and the party that
+dispositions it are the same party. The distinguishing evidence is a red hit by
+someone who did not write it, and that evidence has one property the kit's
+other channels do not: it is **unrecoverable**. A red nobody wrote down was
+never observed. So the channel's field set is fixed before the first
+observation, not grown to fit the observations that arrive.
+
+The record is one file, `DRIFT_KIT_INSTALL_RECORD`, resolving under
+`DRIFT_KIT_METRIC_DIR` and inheriting that dir's retention and privacy
+contract in full (§Layout and configuration): append-only, surviving a scratch
+wipe, gitignored, never committed. Here the privacy half is the load-bearing
+one — the record keys to people, so the file is the private half of this
+channel and §The install-evidence projection is the only thing about it that is
+ever published.
+
+One line per observation event, whitespace-separated positional fields, the
+date first and the event kind second:
+
+```
+<date> install <id> <profile> <floor> <ttfg>
+<date> red     <id> <gate> <verdict> <disposition> <behaviour>
+<date> checkin <id> <day> <kit> <retained>
+```
+
+Fields split into two classes, and the split is the seam rather than a
+convenience. A field the projection aggregates into a published count takes a
+**closed value set**, because an open value there produces a column no
+projection can render honestly:
+
+- `<verdict>` — `true-positive` | `false-positive` | `unclear`. Whether the red
+  named a real defect.
+- `<disposition>` — `fixed` | `worked-around` | `bypassed` | `abandoned`. What
+  the person hit by it did.
+- `<behaviour>` — `changed` | `unchanged`. Whether the red changed what the
+  tree does, which is what separates a gate that taught something from one that
+  was merely satisfied.
+- `<day>` — `7` | `30`. The check-in horizon.
+- `<retained>` — `yes` | `no`.
+- `<ttfg>` — a non-negative integer, minutes from the first install command to
+  the first green gate run, or `-` where no green was reached. `-` is a value,
+  not a gap: an install that never went green is the observation this channel
+  most needs and the one a missing line would erase.
+
+Every other field is **free text validated for shape alone** — `<id>`,
+`<profile>`, `<floor>`, `<gate>`, `<kit>` — because each names a *consumer's*
+vocabulary. A kit literal enumerating one consumer's profile names, host floors
+or gate roster would publish that consumer's vocabulary and be false for every
+other (gate-sdk/SPEC.md §The provenance seam). The roster a `<gate>` value would
+be checked against is the consumer's own `DRIFT_KIT_GATES_FILE`, and it is read
+by the projection as a *classifier*, never as a validator: an adopter's red may
+name a gate this roster does not carry, and refusing it would discard the
+observation over a naming disagreement.
+
+`<id>` is an opaque install key the observer mints. It is the record's privacy
+hinge: it joins an install's rows to each other without carrying anything about
+who ran it, so the private file can be read by a human and the public
+projection can aggregate over it without either needing a name.
+
+**One key rule per kind, because assuming a single rule would be wrong for two
+of them.** The sibling meters replace a measured line; this channel mostly does
+not.
+
+- `red` is **pure append**. Two identical red lines are two reds. A red event
+  has no natural key — the same person can hit the same gate twice, and
+  collapsing that would erase the recurrence the channel exists to measure.
+- `install` **replaces on `<id>`**. One install has one first-green time; a
+  re-measure corrects it rather than adding a second install.
+- `checkin` **replaces on the `<id> <day> <kit>` triple**, the shape
+  §The stage-economics meter already uses for the same reason: a re-run of a
+  check-in must not double-count retention.
+
+**A replace is in place**, the shape §The stage-economics meter's trend log
+fixes: the key's first line is rewritten where it stands, any later duplicate of
+that key is dropped, and only a key new to the record appends — so a re-file
+corrects rather than reorders, and a re-file of unchanged fields leaves the
+record byte-identical.
+
+**What is not stored, because it is derived.** *First useful red* is the first
+`red` line for an install whose verdict is `true-positive`; *per-gate
+true/false-positive history* is a group-by over `red` lines. Storing either
+would be maintaining a fact the record already determines, and the two would
+then be able to disagree.
+
+**Interface.** The arm is
+`bash gate-sdk/bin/run-gates.sh --emit file-install [--] <kind> <field>...`.
+It appends one line, stamping the date from `date +%F` and creating
+the record's parent dir if missing. Its arities are the grammars
+above, less the date:
+
+```
+--emit file-install install <id> <profile> <floor> <ttfg>
+--emit file-install red     <id> <gate> <verdict> <disposition> <behaviour>
+--emit file-install checkin <id> <day> <kit> <retained>
+```
+
+It refuses with a usage message at **exit 2**, writing nothing, on an unknown
+kind, on the wrong arity for the kind, on an empty positional, on a closed-set
+field whose value is outside its set, and on a free-text positional failing the
+shape scan (gate-sdk/SPEC.md §The bin/-tool contract) — every positional
+scanned, not the first, since several slots make arity safe in none. `--`
+ends option processing, which is also how a `-` `<ttfg>` is filed. `--help` is a
+**refusal at exit 2**, not usage: a
+non-gate arm's usage lives in `bin/run-gates.sh`'s own help and in this kit's
+README, the spelling `--emit kfric` already carries.
+
+Its declared knob roster is the one row `DRIFT_KIT_INSTALL_RECORD`.
+
+The refusals are the protocol. An observer who runs the arm is told what the
+record wants — that is why the closed sets are enforced at capture rather than
+at projection, and it is the whole of the observation protocol this channel
+needs: a separate protocol doc would be a second home for a contract the arm
+already states, and an always-loaded instruction bullet would convert a bounded
+campaign into a permanent per-session tax (§The knowledge-friction loop's
+standing-instruction rule binds capture here too).
+
+**Named caller and transition**, which gate-sdk/SPEC.md §The non-gate arm
+requires of every arm: the caller is a human observer at an observed install or
+a check-in, and the transition where the output is read is the projection's
+next emission.
+
+## The install-evidence projection
+
+`bash gate-sdk/bin/run-gates.sh --emit install-evidence` writes a markdown table
+set to stdout — the shape a consumer's committed projection pins; `--human`
+prepends a human-oriented header, the spelling §The published-evidence
+extractor's arm carries so a comparator's default is the document rather than a
+banner. It degrades per block to an
+`n/a (<reason>)` cell and exits 0, this kit's fail-visible discipline,
+registering no gate of its own.
+
+It is a **pure function of the record**, and byte-stable over an unchanged one:
+it reads no now-relative field, so nothing ages between emissions, and every
+group-by renders in a fixed order — gate and kit names sorted, `<day>`
+ascending — so two emissions over one record cannot differ by iteration order
+alone. That property is what a byte-comparing freshness gate rests on; without
+it the gate would flap rather than assert.
+
+**An absent record and a record of zero observations are one reading**, the
+counted zero, and the projection says so rather than degrading: every block
+renders, its denominators read `0`, and `n/a (<reason>)` appears only where a
+statistic has no population to be taken over. A published zero is the candid
+form of the same gap a missing page would leave unstated.
+
+**Every published figure carries its denominator.** The population this
+measures is small by construction, and a rate published without its n is the
+dishonest form of exactly the claim this channel exists to make honest. Blocks:
+
+- **Installs** — observed; how many reached a first green; the min, median and
+  max time-to-first-green over those that did. An install whose `<ttfg>` is the
+  no-green sentinel is outside that population rather than a zero in it.
+- **Reds hit by a non-author** — the total, split by `<verdict>`.
+- **Per gate** — one row per gate a `red` line names: reds, false positives,
+  reds that changed behaviour. A gate name absent from `DRIFT_KIT_GATES_FILE`
+  is rendered in its own `unrostered` count rather than dropped, so an adopter
+  running a roster this consumer does not carry still contributes. It is a
+  *count* and not a named row for the same reason `<gate>` is publishable at all
+  — a rostered name is the publisher's own vocabulary and an unrostered one is
+  the adopter's, which the rule below never publishes. The aggregate row sorts
+  last whatever the roster holds, so its position is the block's rule rather
+  than its spelling's.
+- **Dispositions** — the `<disposition>` split over the same total.
+- **Retention** — per `<day>`, per `<kit>`.
+- **First useful red** — installs reaching one, and the median days from the
+  install line to it. The population is the `install` lines, so an `<id>`
+  carrying a red and no install line contributes no span.
+
+**A median over an even population is the lower of its two middle values**,
+stated as a rule because an even count needs one and an average would publish a
+figure no observation took.
+
+**Three fields never reach the projection**, and the rule is stated as a rule
+rather than left to each block: `<id>`, `<profile>` and `<floor>`. `<id>` keys
+to a person. The other two describe an adopter's machine and choices, which at
+the population sizes this channel is for are near-identifying in combination
+with a date. What is published is the fields whose vocabulary is the
+*publisher's* own — `<gate>`, `<kit>` — plus counts and statistics derived from
+the rest. `<profile>` and `<floor>` are recorded and unpublished deliberately:
+their reader is the observer, at the write-up transition, the same
+human-reader-at-a-named-transition shape queue-kit's `[observed-by:]` value
+already takes.
+
+No row keyed to a single install is ever emitted.
+
+**Named caller and transition**: the caller is the consumer's regeneration step
+before committing its projection, and the gate that byte-compares it at the
+commit — the shape §The published-evidence extractor already carries, and what
+gate-sdk/SPEC.md §The non-gate arm requires of an arm rather than leaving it
+dead weight.
+
+Consumer wiring (this repo, not kit mechanism): the emission is committed at
+`docs/install-evidence.md`, with no framing page around it, so every number a
+reader meets there is emitted and none is hand-copied — the rule
+`docs/evidence-data.md` already follows. The consumer gate
+`check-install-evidence-fresh` (registered in `gates.list`, declared by
+`scripts/check-install-evidence-fresh.gate` and dispatching to the compiled
+binary) re-emits and byte-compares; its `# graph:` manifest couples the page to
+the record through `knob:DRIFT_KIT_INSTALL_RECORD`, and a `good/`+`bad/` fixture
+pair exercises the byte-compare hermetically by supplying a synthetic emission
+as a second argument, the shape `check-trajectory-fresh` uses for the same
+reason — the real source is not in the tree. **The gate is inert — clean on a
+counted zero, and says so — when the record does not resolve to a file.** The
+record is gitignored, so in CI, in a fresh clone and in every adopter's tree
+there is nothing to re-emit from, and an armed gate there would red on every
+commit. Counted inertness is the shape `check-action-pinning` already carries
+for a tree holding none of its subject, and it keeps this gate armed on the one
+machine that holds the record, where a hand-edited or stale page is caught at
+commit, and silent everywhere else. **The honest limit, stated because it is
+real:** this gate's coverage is one machine's, not the battery's, so it is a
+guard against the authoring session's own drift and not an attestation to
+anyone else.
+
 ## The `/economics` skill
 
 `/economics` is the customer-facing post-iteration narrative: run at close, it
@@ -1553,8 +1768,11 @@ consumer knob rather than a refusal. Knobs:
   `<state-file> <evidence-file>`, never an array; default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt ${GATE_SDK_WORKFLOW_DIR:-.workflow}/validate-evidence.txt`. A surface it cannot read degrades that
   iteration's cell to `n/a`.
-- `DRIFT_KIT_GATES_FILE` — the registry whose member count the trajectory
-  extractor reads at each close commit (gate-roster growth); default
+- `DRIFT_KIT_GATES_FILE` — the registry two readers take: the trajectory
+  extractor reads its member count at each close commit (gate-roster growth),
+  and the install-evidence projection reads its membership as the classifier
+  that sorts a red's gate name into a named row or the `unrostered` count
+  (§The install-evidence projection); default
   `${GATE_SDK_GATES_DIR}/gates.list`.
 - `DRIFT_KIT_STAGES` — array, the ordered stage roster the trajectory extractor
   renders (one slot per stage, labelled by its shortest roster-unique prefix);
@@ -1599,6 +1817,12 @@ consumer knob rather than a refusal. Knobs:
   named one), and an opt-out for reading the meta layer would either default on
   and be set by nobody or default off and ship the feature as dead code — the
   degradation contract already gives a consumer the only thing an opt-out buys.
+- `DRIFT_KIT_INSTALL_RECORD` — the install-observation record
+  (§The install-observation record); default `.metric/install-observations.log`,
+  derived as `${DRIFT_KIT_METRIC_DIR}/install-observations.log` so a set metric
+  dir moves it (gitignored; the capture arm `mkdir -p`s the dirname). The table
+  is the one resolver of this default, and the capture arm and the projection
+  both read it there.
 - `DRIFT_KIT_STATE_FILE` — the WORKFLOW-STATE path whose *committed history and
   live content* the stage-economics join reads for stamps (§The stage-economics
   meter, history ∪ live), and whose first stamp the report skeleton reads for
@@ -1759,7 +1983,23 @@ fixture writes — so `smoke/install.sh` drives it over a purpose-built queue an
 asserts the single lag row, that the count **sums dates across declarations**
 rather than counting declarations, the highest-count slug, the `recur <N>` trend
 fragment, and both degradations (a queue with no declaration, and no queue file at
-all) including the trend's silence under the first. Gate-sdk's `check-shellcheck`
+all) including the trend's silence under the first.
+The install-observation pair is fixture-stable for the reason its own contract
+gives — the projection is a pure function of the record — so `smoke/install.sh`
+drives both arms **through the front-end** over a throwaway record named by
+`DRIFT_KIT_INSTALL_RECORD`. For the capture arm: the line grammar of each of the
+three kinds, the per-kind key rules (a re-filed `install` and a re-filed
+`checkin` each replace rather than double, a re-filed `red` appends), and one
+refusal per
+refusal class — an unknown kind, the wrong arity, an empty positional, a
+closed-set field outside its set, and a flag in a positional slot, each asserted
+to leave the record unchanged, since a refusal that wrote is the failure the
+exit code alone would not show. For the projection: each block's denominator over
+that record, the sorted group-by order, the byte-identity of two emissions over
+one unchanged record, the `unrostered` classification against a throwaway gates
+file, and the record-absent degradation — which is asserted to be the counted
+zero rather than a missing block, that being the reading the committed page
+rests on. Gate-sdk's `check-shellcheck`
 lints all kit sources as usual.
 
 `smoke/install.sh` stays on the shell substrate permanently and carries

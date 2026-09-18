@@ -669,3 +669,120 @@ cmp -s "$work/kfric-argv.before" "$kflog" \
 kf -- "--list is captured at exit 0" "a surface" >/dev/null
 grep -q -- '--list is captured at exit 0 ← a surface$' "$kflog" \
     || fail "--emit kfric -- did not file a fact beginning with a dash"
+
+# spec: drift-kit/SPEC.md §Testing — the install-observation pair, both arms driven through the
+# front-end over a throwaway record and a throwaway gates roster, the seam a crate unit test cannot
+# see: the front-end's arm composition, the consumer knobs, and the record as a file on disk.
+irec="$work/install-observations.log"
+iroster="$work/install-gates.list"
+printf '# a throwaway roster\ncheck-alpha\ncheck-zeta\n' > "$iroster"
+fin() { DRIFT_KIT_INSTALL_RECORD="$irec" bash "$DRIFT_ARM" --emit file-install "$@"; }
+iev() { DRIFT_KIT_INSTALL_RECORD="$irec" DRIFT_KIT_GATES_FILE="$iroster" bash "$DRIFT_ARM" --emit install-evidence; }
+today="$(date +%F)"
+
+# spec: drift-kit/SPEC.md §The install-evidence projection — an absent record and a record of zero
+# observations are one reading, the counted zero: the committed page rests on that, so a degradation
+# to a missing block would take the page's meaning with it.
+set +e
+iempty="$(iev)"; ircq=$?
+set -e
+[[ "$ircq" -eq 0 ]] || fail "the install-evidence arm exited $ircq over an absent record (advisory emission must exit 0)"
+grep -q '^| 0 | 0 | n/a (no install reached a first green) |$' <<<"$iempty" \
+    || fail "an absent record did not render the Installs block as a counted zero: $iempty"
+grep -q 'n/a (no red observed)' <<<"$iempty" \
+    || fail "an absent record did not degrade the Per-gate block to its named n/a: $iempty"
+grep -q 'n/a (no check-in observed)' <<<"$iempty" \
+    || fail "an absent record did not degrade the Retention block to its named n/a: $iempty"
+
+# spec: drift-kit/SPEC.md §The install-observation record — the line grammar of each of the three
+# kinds, the date stamped by the producer rather than by its caller.
+fin install i1 a-profile a-floor 12 >/dev/null
+fin -- install i2 b-profile b-floor - >/dev/null
+fin red i1 check-zeta true-positive fixed changed >/dev/null
+fin red i1 check-alpha false-positive bypassed unchanged >/dev/null
+fin red i2 check-outside-this-roster unclear abandoned unchanged >/dev/null
+fin checkin i1 7 gate-sdk yes >/dev/null
+fin checkin i2 30 drift-kit no >/dev/null
+grep -q "^$today install i1 a-profile a-floor 12\$" "$irec" \
+    || fail "the install line grammar moved: $(cat "$irec")"
+grep -q "^$today install i2 b-profile b-floor -\$" "$irec" \
+    || fail "a '-' ttfg did not file through the '--' separator: $(cat "$irec")"
+grep -q "^$today red i1 check-zeta true-positive fixed changed\$" "$irec" \
+    || fail "the red line grammar moved: $(cat "$irec")"
+grep -q "^$today checkin i1 7 gate-sdk yes\$" "$irec" \
+    || fail "the checkin line grammar moved: $(cat "$irec")"
+
+# spec: drift-kit/SPEC.md §The install-observation record — one key rule per kind: install replaces
+# on <id>, checkin on the <id> <day> <kit> triple, and red is pure append because a red event has no
+# natural key and collapsing two would erase the recurrence the channel exists to measure.
+ilines() { grep -c '' "$irec"; }
+ibefore="$(ilines)"
+fin install i1 a-profile a-floor 40 >/dev/null
+[[ "$(ilines)" -eq "$ibefore" ]] || fail "a re-filed install added a line rather than replacing its <id>'s"
+grep -q "^$today install i1 a-profile a-floor 40\$" "$irec" \
+    || fail "a re-filed install did not correct the row it replaced: $(cat "$irec")"
+[[ "$(grep -n 'install i1 ' "$irec" | cut -d: -f1)" -eq 1 ]] \
+    || fail "the replace did not rewrite the key's line where it stood"
+fin checkin i1 7 gate-sdk no >/dev/null
+[[ "$(ilines)" -eq "$ibefore" ]] || fail "a re-filed checkin added a line rather than replacing its triple's"
+fin checkin i1 30 gate-sdk yes >/dev/null
+[[ "$(ilines)" -eq "$((ibefore + 1))" ]] || fail "a check-in at a second horizon must be its own row, not a replacement"
+fin red i1 check-zeta true-positive fixed changed >/dev/null
+[[ "$(ilines)" -eq "$((ibefore + 2))" ]] || fail "a re-filed red replaced rather than appending — two identical reds are two reds"
+
+# spec: drift-kit/SPEC.md §The install-observation record — the refusals are the protocol, and each
+# is asserted to leave the record byte-unchanged: a refusal that wrote is the failure an exit code
+# alone would not show.
+cp "$irec" "$work/install-record.before"
+irefuse() {
+    local what="$1"; shift
+    local rc=0
+    fin "$@" >/dev/null 2>&1 || rc=$?
+    [[ "$rc" -eq 2 ]] || fail "--emit file-install took $what with exit $rc, want 2"
+    cmp -s "$work/install-record.before" "$irec" \
+        || fail "--emit file-install wrote the record on the $what refusal path"
+}
+irefuse "an unknown kind"                  deploy i1 a b c
+irefuse "a short arity"                    install i1 a-profile a-floor
+irefuse "a long arity"                     install i1 a-profile a-floor 12 extra
+irefuse "an empty positional"              install i1 "" a-floor 12
+irefuse "a verdict outside its set"        red i1 check-alpha probably fixed changed
+irefuse "a disposition outside its set"    red i1 check-alpha unclear reverted changed
+irefuse "a behaviour outside its set"      red i1 check-alpha unclear fixed maybe
+irefuse "a day outside its set"            checkin i1 14 gate-sdk yes
+irefuse "a retained value outside its set" checkin i1 7 gate-sdk maybe
+irefuse "a malformed ttfg"                 install i1 a-profile a-floor 12m
+irefuse "a flag in a positional slot"      install i1 --list a-floor 12
+
+# spec: drift-kit/SPEC.md §The install-evidence projection — every published figure carries its
+# denominator, the group-bys render in a fixed order with the unrostered aggregate last, and two
+# emissions over one unchanged record are byte-identical — the property the freshness gate rests on.
+ifull="$(iev)"
+grep -q '^| 2 | 1 | 40 · 40 · 40 |$' <<<"$ifull" \
+    || fail "the Installs block lost its denominator or counted the no-green sentinel as a zero: $ifull"
+grep -q '^| 4 | 2 | 1 | 1 |$' <<<"$ifull" \
+    || fail "the Reds block lost its denominator or its verdict split: $ifull"
+grep -q '^| 4 | 2 | 0 | 1 | 1 |$' <<<"$ifull" \
+    || fail "the Dispositions block lost its denominator or its split: $ifull"
+grep -q '^| check-alpha | 1 | 1 | 0 |$' <<<"$ifull" \
+    || fail "the Per-gate block tallied a rostered gate's columns off the wrong fields: $ifull"
+grep -q '^| check-zeta | 2 | 0 | 2 |$' <<<"$ifull" \
+    || fail "the Per-gate block's changed-behaviour column does not read the <behaviour> field: $ifull"
+grep -q '^| unrostered | 1 | 0 | 0 |$' <<<"$ifull" \
+    || fail "a red naming a gate outside the roster was dropped rather than counted: $ifull"
+gorder="$(grep -o '^| check-alpha \|^| check-zeta \|^| unrostered ' <<<"$ifull" | tr -d '| ' | tr '\n' ' ')"
+[[ "$gorder" == "check-alpha check-zeta unrostered " ]] \
+    || fail "the Per-gate group-by is not sorted with the unrostered aggregate last: $gorder"
+grep -q '^| 7 | gate-sdk | 1 | 0 |$' <<<"$ifull" \
+    || fail "the Retention block lost a horizon/kit row or its denominator: $ifull"
+grep -q '^| 2 | 1 | 0 |$' <<<"$ifull" \
+    || fail "the First-useful-red block lost its denominator or its median span: $ifull"
+grep -q '^| 30 | drift-kit | 1 | 0 |$' <<<"$ifull" \
+    || fail "the Retention block dropped a kit at the second horizon: $ifull"
+for ileak in i1 i2 a-profile b-profile a-floor b-floor; do
+    if grep -q -- "$ileak" <<<"$ifull"; then
+        fail "the projection published \"$ileak\" — <id>, <profile> and <floor> never reach it: $ifull"
+    fi
+done
+[[ "$(iev)" == "$ifull" ]] \
+    || fail "two emissions over one unchanged record differed, so a byte-comparing freshness gate would flap rather than assert"

@@ -50,7 +50,9 @@ fn abbreviations(stages: &[String]) -> Vec<String> {
 // spec: gate-sdk/SPEC.md §The non-gate arm — `date -d` over git's own `--date=short` output was a
 // day-difference dressed as an epoch subtraction, so it becomes a civil-date-to-day-count helper
 // needing no dependency; it is also exact where the shell form truncated across a DST boundary.
-fn days_from_civil(date: &str) -> Option<i64> {
+// spec: drift-kit/SPEC.md §The install-evidence projection — the sibling projection's day spans are
+// the same civil-date arithmetic, so it imports this one rather than a second implementation.
+pub(super) fn days_from_civil(date: &str) -> Option<i64> {
     let mut it = date.split('-');
     let y: i64 = it.next()?.parse().ok()?;
     let m: i64 = it.next()?.parse().ok()?;

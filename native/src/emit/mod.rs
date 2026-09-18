@@ -17,10 +17,12 @@ pub mod entry_history;
 pub mod enum_sets;
 pub mod env_probe;
 pub mod file_gap;
+pub mod file_install;
 pub mod file_survey;
 pub mod footprint;
 pub mod git_hooks;
 pub mod graph;
+pub mod install_evidence;
 pub mod install_hooks;
 pub mod install_lifecycle;
 pub mod kfric;
@@ -438,6 +440,22 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-kfric",
         Arm::Emit(kfric::emit),
         kfric::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The install-observation record — the observation-capture affordance,
+    // riding the same argv-shape split as `--emit-kfric`: the refusal and the `--` escape cross the
+    // port with the argument, the help arm retires to the front-end.
+    (
+        "--emit-file-install",
+        Arm::Emit(file_install::emit),
+        file_install::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The install-evidence projection — the public half of the same
+    // channel, an aggregate-only projection a consumer's freshness gate byte-compares; it declares
+    // the gates file because it classifies a red's gate name against that roster.
+    (
+        "--emit-install-evidence",
+        Arm::Emit(install_evidence::emit),
+        install_evidence::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The overhead meter — an `Arm::Emit` on the variant's own test: the
     // meter is advisory and exit is always 0, so no `1` is load-bearing and the `{0, 2}` collapse

@@ -66,6 +66,10 @@ fn stage_economics_log(resolve: Resolve) -> Result<Value, String> {
     under(resolve, "DRIFT_KIT_METRIC_DIR", "stage-economics-log.txt")
 }
 
+fn install_record(resolve: Resolve) -> Result<Value, String> {
+    under(resolve, "DRIFT_KIT_METRIC_DIR", "install-observations.log")
+}
+
 pub const KIT: Kit = Kit {
     root: "drift-kit",
     rows: &[
@@ -92,6 +96,12 @@ pub const KIT: Kit = Kit {
             "DRIFT_KIT_STAGE_ECONOMICS_LOG",
             Shape::Scalar,
             stage_economics_log,
+            &["DRIFT_KIT_METRIC_DIR"],
+        ),
+        Row::derived(
+            "DRIFT_KIT_INSTALL_RECORD",
+            Shape::Scalar,
+            install_record,
             &["DRIFT_KIT_METRIC_DIR"],
         ),
         Row::derived("DRIFT_KIT_STATE_FILE", Shape::Scalar, state_file, &["GATE_SDK_WORKFLOW_DIR"]),

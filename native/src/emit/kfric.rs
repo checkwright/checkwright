@@ -16,7 +16,9 @@ fn line(today: &str, fact: &str, surface: &str) -> String {
 // spec: drift-kit/SPEC.md §The knowledge-friction loop — the log is created by its first line and
 // never seeded: **absent** and **present and empty** are two of the three states the KPI reads
 // apart, so a seeding write would report a capture loop that has captured nothing.
-fn append_creating(path: &std::path::Path, body: &str) -> std::io::Result<()> {
+// spec: drift-kit/SPEC.md §The install-observation record — the sibling capture arm's record is
+// created by its first line for the same reason, so it imports this writer rather than a second one.
+pub(super) fn append_creating(path: &std::path::Path, body: &str) -> std::io::Result<()> {
     use std::io::Write;
     let mut f = std::fs::OpenOptions::new()
         .create(true)

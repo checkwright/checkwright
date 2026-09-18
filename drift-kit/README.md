@@ -20,7 +20,7 @@ kit's `SPEC.md` and its `smoke/`, publishing the specification at the location
 `GATE_SDK_SPEC_BASE_URL` names instead (gate-sdk/SPEC.md §Consumer payload).
 
 Like [guard-kit](../guard-kit/), drift-kit registers **no gates**: its surface
-is a pair of advisory `--emit` arms and a KPI registry, so nothing joins
+is a set of advisory `--emit` arms and a KPI registry, so nothing joins
 `gates.list`. It
 follows gate-sdk's resolution and smoke conventions without depending on its
 registry.
@@ -80,6 +80,8 @@ bash gate-sdk/bin/run-gates.sh --emit drift-report --trend  # one compact line (
 bash gate-sdk/bin/run-gates.sh --emit trajectory   # governed-trajectory table (one row per closed iteration)
 bash gate-sdk/bin/run-gates.sh --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript (a delegated session passes its transcript or stamp id)
 bash gate-sdk/bin/run-gates.sh --emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
+bash gate-sdk/bin/run-gates.sh --emit file-install [--] <kind> <field>...  # record one observed install, red or check-in (three kinds, three arities)
+bash gate-sdk/bin/run-gates.sh --emit install-evidence  # the aggregate-only projection over that record, for a consumer to pin behind a freshness gate
 ```
 
 `--emit overhead-meter` is the overhead meter (drift-kit/SPEC.md §The overhead
@@ -109,6 +111,18 @@ invoke, not a lifecycle stage and not a gate. If your decisions read the log, ru
 the meter at your terminal stage — its rows are dated by their stamps, so a re-run
 at every close re-dates nothing — and `kpi-stage-economics-lag` shows how many
 closes have gone unpriced when that feed is skipped.
+
+`--emit file-install` and `--emit install-evidence` are the two halves of the
+install-observation channel (drift-kit/SPEC.md §The install-observation record
+and §The install-evidence projection): the first appends one dated line per
+install, per red a non-author hit, and per retention check-in to a private,
+gitignored record under your metric dir; the second emits an aggregate-only
+markdown table set over it — every figure with its denominator, no row keyed to
+a single install, and `<id>`, `<profile>` and `<floor>` never published. The
+field set is fixed before the first observation on purpose: a red nobody wrote
+down was never observed, so the evidence cannot be collected retrospectively.
+Closed-set fields are enforced at capture, so the arm's refusals are the whole
+observation protocol.
 
 A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
 dirs, then each vendored kit's `kpis/`, then the binary's built-in members —

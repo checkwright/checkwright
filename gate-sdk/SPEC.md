@@ -1092,8 +1092,8 @@ free-text positional **absorbs whatever it is handed**, and that is a property
 of the argument, not of the substrate the argument arrives on. §The non-gate arm
 carries the split — the shape refusal and the `--` escape
 cross the port, the `-h`/`--help` arm retires to the front-end — and
-`--emit-file-survey`, `--emit-file-gap` and `--emit-kfric` are the three capture
-instances.
+`--emit-file-survey`, `--emit-file-gap`, `--emit-kfric` and `--emit-file-install`
+are the capture instances.
 
 **`--emit-scan-prompts` is the clause's first *reader* instance, and it is what
 shows the clause does not turn on capture** (guard-kit/SPEC.md §scan-prompts).
@@ -2859,7 +2859,9 @@ the bundled enum-set emitter a `CANON_KIT_ENUM_SETS_CMD` value may name
 (canon-kit/SPEC.md §check-prose-enum), and `--emit-file-gap`, lifecycle-kit's
 mid-iteration gap-capture affordance (lifecycle-kit/SPEC.md §The committed gap
 inbox), and `--emit-kfric`, drift-kit's knowledge-friction capture affordance
-(drift-kit/SPEC.md §The knowledge-friction loop) — both free-text capture members
+(drift-kit/SPEC.md §The knowledge-friction loop), and `--emit-file-install`,
+drift-kit's install-observation capture affordance (drift-kit/SPEC.md §The
+install-observation record) — the three free-text capture members
 the argv-shape split below governs —
 and `--emit-scan-prompts`, guard-kit's friction-log ranker
 (guard-kit/SPEC.md §scan-prompts), and `--emit-compare-settings-allow`,
@@ -2873,6 +2875,8 @@ governance-overhead byte proxy (drift-kit/SPEC.md §The overhead meter), and
 `--emit-stage-economics`, the stage × model × iteration spend pricer
 (drift-kit/SPEC.md §The stage-economics meter) — which spawns `git` and `date`
 and no interpreter, the shell form's `jq`, `awk` and `sed` all leaving with it;
+and `--emit-install-evidence`, the aggregate-only projection over that kit's
+install-observation record (drift-kit/SPEC.md §The install-evidence projection);
 and `--emit-ruling-staleness`, lifecycle-kit's discharge-condition and
 citing-site reporter over a consumer's ruling record (lifecycle-kit/SPEC.md
 §The ruling-staleness probe), whose spawned set the paragraph below records as
@@ -3022,7 +3026,8 @@ roster, and no requirement element at all. An arm's spawned programs are
 therefore recorded in prose and nowhere a machine reads, and the set is wider
 than a reader would guess: `git` under several `--emit-` arms and under the
 origin-URL lookup this table's own module makes, `date` under
-`--emit-queue-index`, `--emit-file-gap`, `--emit-kfric` and `--emit-file-survey`
+`--emit-queue-index`, `--emit-file-gap`, `--emit-kfric`, `--emit-file-install`
+and `--emit-file-survey`
 (which spawns `git` too, for the
 `rev` it machine-stamps), `bash` under `--lesson-sink`, `--emit-port-blockers`,
 `--run-gate-tests` — once per case to read `gate_command`'s answer out of the
