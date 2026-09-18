@@ -151,7 +151,7 @@ under §Testing:
 > **Out of its reach, by construction: the inert classes a rule declares.** An
 > item's `Declares sq dq hd` is transcribed from the rule's `guard_skeleton`
 > call. It is not one value per rule: rule 6 builds two skeletons with different
-> class sets, rule 18 three, and some rules skeletonize inside a helper. Only
+> class sets, rule 18 four, and some rules skeletonize inside a helper. Only
 > some items carry a declaration at all. An equality check would have no single
 > satisfying value per member.
 

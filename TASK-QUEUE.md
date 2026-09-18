@@ -31,6 +31,19 @@
   Filed 2026-08-13 by close. Joined `reach-ruling-lockstep` 2026-09-18 (operator direction,
   lead-relayed). Paired at spec.
 
+- **vendored-library-identifier-reach** [spec: SPEC-identifier-reach.md] — De-literalization
+  bans prose restating a source's internal identifiers but never says which are internal, so every
+  `internal-identifier-restatement` audit re-derives the fork, and two auditors can reach opposite
+  verdicts on the same prose.
+  **Directed 2026-09-18** (operator direction, lead-relayed; the native sentence came after an
+  advisory consult). Reach is judged at the file. The owning kit may name any function of its
+  shipped library. Another kit's underscore helper is a finding. A native item visible past its
+  module may be named; a private one belongs to its nearest `spec:` pointer's component. Reach is
+  checked before the citation test.
+  **Measured at spec:** three cross-component findings in gate-sdk/SPEC.md (lines 4627, 6964 and
+  14901), plus an off-class dead name at line 3633. guard-kit's 37 own-helper citations are clean.
+  Filed 2026-08-13 by close. Third population added 2026-08-14. Paired at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -1484,56 +1497,6 @@
   while binding nothing — the failure mode is a knob silently never applied, which
   surfaces as behavior, not as a red.
   Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
-
-- **vendored-library-identifier-reach** [cost: iteration/low] [surface: doctrine-kit] — De-literalization's reach test gives
-  two answers for a vendored `lib/*.sh` function, and the corpus holds both populations.
-  The rule bans prose restating a source's **internal** identifier roster while allowing public
-  contract names. Two readings of "internal" are both defensible and they disagree:
-  **file-level** — a shipped vendored library is a public contract by construction, so its
-  owning `§lib/*.sh` section may name its exports — or **kit-level**, the reach test an audit
-  actually applies: nothing outside the kit calls it, so it is internal.
-  **Both populations exist, which is why no reading can be adopted silently.**
-  `gate-sdk/lib/gate.sh` and `guard-kit/lib/guard.sh` have
-  verified callers in other kits and in `scripts/` — public on either reading, so they decide
-  nothing. The second population — a library with **zero callers outside its own kit**, public
-  under the first reading and textbook "a SPEC subsection that inventories internal helpers"
-  under the second — was canon-kit's and then evidence-kit's, and both left the tree with their
-  kits' static knob cuts (`config-seam-third-cut`, `config-seam-fourth-cut`); none is live now.
-  **What turns on it:** the kit-level reading makes those two inventories findings and buys a
-  large corrective across two SPECs; the file-level reading clears them and matches the
-  doctrine's own carve-out for a SPEC naming public functions as contracts.
-  **Deliverable:** rule it in doctrine-kit/DOCTRINE.md's De-literalization rule so the reach test
-  is stated rather than re-derived per audit, then sweep whichever population the ruling makes
-  findings.
-  **Why design-pending and not simply decided:** the governing docs do not resolve it and
-  only precedent would, which is the case the spec-over-precedent rule says not to settle from
-  history. Escalated to the lead at this close alongside filing.
-  **Not blocking the audit it came from:** all seven findings that close's
-  `internal-identifier-restatement` sweep fixed fail **both** readings, so the ruling changes
-  nothing already landed.
-  **A third population, found 2026-08-14 and settled by neither reading — the cross-kit
-  citation.** `gate-sdk/SPEC.md` §The canonical-spec `spec_canonical_specs` cohort names and
-  describes the algorithmic fault of `_spec_prune_kit_roots`, which is **canon-kit's**
-  underscore-prefixed helper with zero callers outside `canon-kit/lib/spec.sh`. The fork above is
-  posed as a kit's own SPEC inventorying its own helpers; here one kit's governed doc names
-  another kit's private helper, and the file-level reading — "a shipped vendored library is a
-  public contract, so *its owning* section may name its exports" — is silent on a section that
-  does not own it. Recorded rather than ruled, and the entry is **not** widened by fiat: whichever
-  reading the deliverable adopts must say what it does with a citation that crosses kits, because
-  a sweep will keep meeting this shape. Re-escalated to the lead at the 2026-08-14 close.
-  **Cost while deferred:** every run of that rostered audit re-derives the same fork over the
-  same two libraries, and two auditors can reach opposite verdicts on identical prose. With the
-  cross-kit shape added, the fork now has a branch no reading answers at all.
-  **Premise re-read at `smoke-leg-crate-cache`'s close:** `canon-kit/lib/` is gone, so
-  `_spec_prune_kit_roots` is a retired helper, and the two live libraries are public on either
-  reading — yet the fork stays live through the audit roster (below).
-  Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it;
-  third population added 2026-08-14 by close from the same rostered sweep, which declined again.
-  **Directed 2026-09-18 as lead unit of `reach-ruling-lockstep`** (operator direction,
-  lead-relayed): the file-level reading, plus two clauses — a citation of another kit's
-  underscore-prefixed helper is internal and a finding, and one sentence covers native-crate
-  identifiers (a widening the operator accepted). The audit roster's scope line still defers here;
-  /spec authors the amendment and pairs this entry.
 
 - **install-disposition-smoke-accounting-split** [cost: event/low] [surface: gate-sdk] — the precommit gate checks smoke
   registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
