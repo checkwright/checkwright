@@ -4,4 +4,4 @@
 
 ---
 
-— scope a66aeebb 2026-09-18 8ced0fbc
+guard-grant-fidelity scope a66aeebb 2026-09-18 8ced0fbc

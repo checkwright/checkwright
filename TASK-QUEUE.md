@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-grant-fidelity
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,88 @@
 ## New Features
 
 ## Technical Debt
+
+- **git-dash-c-grant-unmirrored** — the bash guard steers a session off `cd <dir> && git …` and
+  onto `git -C <dir> …`, and the committed allowlist grants git only subcommand-first
+  (`Bash(git status *)` and its siblings), so every call the guard steers falls through to a
+  permission prompt. The guard manufactures the prompt it then leaves unanswered.
+  **Re-measured 2026-09-18 at scope, not inherited:** `--emit scan-prompts` ranks `git -C` the top
+  prompting pattern at 10 of 39 prompting calls (the filing close counted 17 of 71), and
+  `.claude/settings.json` holds 20 `Bash(git ` grants, none spelled `git -C` and none for `gh auth`.
+  **The narrowing is the work:** a bare `Bash(git -C *)` would reach `git -C . reset --hard` and
+  `git -C . push`, so the grant mirrors the existing subcommand set one entry per subcommand
+  (`Bash(git -C * status *)` and siblings) rather than one glob. Second half: `gh auth`, the ops
+  runbook's per-write account step, is granted only by the uncommitted local overlay, so a fresh
+  clone re-prompts on a step every GitHub write owes.
+  **Deliverable, and who applies it:** a permission-settings edit is applied on the operator's
+  behalf (CLAUDE.md §Housekeeping; guard-kit/SPEC.md §compare-settings-allow), so build prepares
+  the diff and the lead relays it for the operator's confirmation; a widening is never
+  self-granted. How guard-kit's matcher models the mirrored grants is
+  `allow-match-colon-star-over-grants`' subject, taken beside it.
+  **Promoted 2026-09-18 at scope as debt, lead unit of `guard-grant-fidelity`** (operator
+  direction, 2026-09-18, lead-relayed): new grants mint no name on a governed surface.
+  **Cost while deferred:** one permission prompt per steered git call, in every session.
+  Filed 2026-09-18 to the gap inbox by `external-install-evidence`'s close; drained at the
+  following scope.
+
+- **allow-match-colon-star-over-grants** —
+  `guard_allow_match` and its compiled twin normalize the harness `:*` prefix idiom to a trailing
+  `*` (guard-kit/SPEC.md §The guard framework), but a `claude -p` probe found `Bash(python3 -:*)`
+  does not grant `python3 -c`, so the harness `:*` looks word-bounded and the normalization models
+  a consumer's `:*` grant wider than the harness grants it (`printf:*` would admit `printfx`).
+  **Carried as a claim:** the probe ran at `interpreter-steer-census`'s build and its output died
+  with that iteration's scratch; one re-run settles the boundary rule before any fix.
+  **Why design-pending:** the fix rewrites the SPEC's stated equivalence and both twins, and
+  whether the boundary is a space, end of string, or any non-word character is the harness's call.
+  **Promoted 2026-09-18 at scope as debt into `guard-grant-fidelity`** (operator direction,
+  2026-09-18, lead-relayed): the rewrite converges a stated equivalence on the harness's behaviour
+  and mints no name, and it decides how the lead unit's mirrored grants are modelled.
+  **Cost while deferred:** compare-settings-allow can call a narrower grant redundant and rule 20
+  can treat an ungranted spelling as silently granted; no `:*` entry is committed here, so nothing
+  mis-ranks today.
+  Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s close; promoted at the next
+  scope.
+
+- **compound-splitter-background-separators** —
+  `guard_split_compound` and its compiled twin split on `;`, `&&`, `||` and `|` (plus a newline,
+  in the twin) but not on a lone `&` or `|&`, so a backgrounded compound `a & b` is one segment to
+  every per-segment guard rule and to the `scan-prompts` ranker's grant test.
+  **Measured at the close drain:** the shell class in `guard-kit/lib/guard.sh` is
+  `\|\||&&|;|\|`, and `native/src/guard.rs`'s `split_compound` tests only `||`, `&&`, `;`, `|` and
+  `\n`; `|&` splits at the `|` and leaves `&` heading the next segment.
+  **Carried as a claim, not probed:** that the harness's permission matcher treats `&` and `|&` as
+  separators rests on a read of the harness permissions page at spec, not on a `claude -p` probe.
+  **Why design-pending:** a lone `&` also occurs inside redirects (`&>`, `>&`, `2>&1`), so the
+  class needs a redirect-aware spelling held equal across both substrates by `--guard-lib-parity`,
+  and widening it re-segments every rule guard-kit/SPEC.md §The guard framework lists.
+  **Joined `guard-grant-fidelity` at its 2026-09-18 scope as debt** (operator direction,
+  2026-09-18, lead-relayed): the same grant test the lead unit's grants are read through.
+  **Cost while deferred:** a rule can miss a segment that follows `&`, and the ranker can mis-read
+  a grant the harness would split. Unattested so far: the prompt-friction log at this close held
+  five lines carrying `&`, every one inside a quoted argument.
+  Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s spec; promoted at its close
+  drain.
+
+- **local-only-grounds-unhomed** — two engineering grounds true for every reader live only on
+  local-only surfaces, found by a consult audit.
+  (a) **The calibration rule for a pattern list with two readers:** a commit-message reader's
+  over-refusal is argued down once, at the one commit it blocks; a tracked-tree reader's is a
+  standing red clearable only by rewording prose that was never wrong, so the stricter
+  calibration governs and the tree half must be exact. gate-sdk/SPEC.md names the list's two
+  readers (§Layout and configuration) and carries no such rule; it is owed there, undated.
+  (b) **The permission mode's limits:** the harness reads `permissions.defaultMode` at process
+  launch only, a conversation reset keeps the live mode, and the live mode is readable from a
+  per-tool-call hook payload and never from the session-start hook. guard-kit/SPEC.md states the
+  payload half ("The live permission mode is in that payload and no rule reads it") without the
+  launch-only and reset limits; they are owed beside it.
+  **Re-verified 2026-09-18 at scope** by grep of both SPECs. The local copies are cut to pointers
+  once the sections land.
+  **Taken into `guard-grant-fidelity` as debt, 2026-09-18 at scope** (operator direction,
+  2026-09-18, lead-relayed): landing stated grounds mints no name, and half is guard-kit's.
+  **Cost while deferred:** a reader without the local-only files re-derives both, or calibrates
+  the shared list the wrong way.
+  Filed 2026-09-18 to the gap inbox by a consult after `external-install-evidence`'s close;
+  drained at the following scope.
 
 ## Deferred
 
@@ -95,21 +177,6 @@
   from validate's observation. Owner lookup: `EVIDENCE_KIT_SUITES`, `validate-baseline`,
   `suite coverage`, `evidence-baseline`, `orphan` — matched `evidence-baseline-orphan-suite-row`,
   read and ruled distinct above.
-
-- **allow-match-colon-star-over-grants** [cost: event/low] [surface: guard-kit] —
-  `guard_allow_match` and its compiled twin normalize the harness `:*` prefix idiom to a trailing
-  `*` (guard-kit/SPEC.md §The guard framework), but a `claude -p` probe found `Bash(python3 -:*)`
-  does not grant `python3 -c`, so the harness `:*` looks word-bounded and the normalization models
-  a consumer's `:*` grant wider than the harness grants it (`printf:*` would admit `printfx`).
-  **Carried as a claim:** the probe ran at `interpreter-steer-census`'s build and its output died
-  with that iteration's scratch; one re-run settles the boundary rule before any fix.
-  **Why design-pending:** the fix rewrites the SPEC's stated equivalence and both twins, and
-  whether the boundary is a space, end of string, or any non-word character is the harness's call.
-  **Cost while deferred:** compare-settings-allow can call a narrower grant redundant and rule 20
-  can treat an ungranted spelling as silently granted; no `:*` entry is committed here, so nothing
-  mis-ranks today.
-  Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s close; promoted at the next
-  scope.
 
 - **native-windows-bash-floor** [cost: event/high] [surface: gate-sdk] — after the
   config bridge retires, a native-Windows runtime still needs bash in three places: the
@@ -3262,24 +3329,6 @@
   corrected from five to three at that iteration's close drain, by re-probing the static tables the
   filing asserted were empty.
 
-- **compound-splitter-background-separators** [cost: event/low] [surface: guard-kit] —
-  `guard_split_compound` and its compiled twin split on `;`, `&&`, `||` and `|` (plus a newline,
-  in the twin) but not on a lone `&` or `|&`, so a backgrounded compound `a & b` is one segment to
-  every per-segment guard rule and to the `scan-prompts` ranker's grant test.
-  **Measured at the close drain:** the shell class in `guard-kit/lib/guard.sh` is
-  `\|\||&&|;|\|`, and `native/src/guard.rs`'s `split_compound` tests only `||`, `&&`, `;`, `|` and
-  `\n`; `|&` splits at the `|` and leaves `&` heading the next segment.
-  **Carried as a claim, not probed:** that the harness's permission matcher treats `&` and `|&` as
-  separators rests on a read of the harness permissions page at spec, not on a `claude -p` probe.
-  **Why design-pending:** a lone `&` also occurs inside redirects (`&>`, `>&`, `2>&1`), so the
-  class needs a redirect-aware spelling held equal across both substrates by `--guard-lib-parity`,
-  and widening it re-segments every rule guard-kit/SPEC.md §The guard framework lists.
-  **Cost while deferred:** a rule can miss a segment that follows `&`, and the ranker can mis-read
-  a grant the harness would split. Unattested so far: the prompt-friction log at this close held
-  five lines carrying `&`, every one inside a quoted argument.
-  Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s spec; promoted at its close
-  drain.
-
 - **smoke-leg-crate-build-uncached** [cost: iteration/low] [surface: .github] — the
   platform install-smoke legs rebuild the gate crate from cold on every push.
   **Measured at the drain, correcting the filed premise.** In gates run 35214069775 the
@@ -3295,6 +3344,39 @@
   **Cost while deferred:** about 90s of wall-clock on the two slowest legs per watched push.
   Filed 2026-09-17 to the gap inbox by `install-smoke-slow-leg`'s lead at spec; promoted at its
   close.
+
+- **queue-backlog-vocabulary-undeclared** [cost: once/low] [surface: queue-kit] — the tree uses
+  "queue" for the governed file and its drain mechanics (`--emit queue-counts`, the drain-entry
+  assertion, `QUEUE_KIT_ENTRY_LINE_CAP`) and "backlog" for the accumulating mass and its aging
+  (`kpi-gate-backlog`, the backlog-aging findings), and no doc states which word owns which half.
+  **Probed at filing:** queue-kit/SPEC.md and lifecycle-kit/SPEC.md carry usages only, no
+  definition. **Deliverable:** one section in queue-kit/SPEC.md declaring the split and its
+  ground. It salvages an operator-declined rename of the queue file (operator direction,
+  2026-09-18): collapsing the two words would cost the live distinction and leave
+  `kpi-gate-backlog` naming something other than the backlog, and the path was always consumer
+  config (`QUEUE_KIT_QUEUE_FILE`).
+  **Cost while deferred:** each reader infers the distinction, and a rename proposal can recur.
+  Filed 2026-09-18 to the gap inbox by the lead after `external-install-evidence`'s close;
+  promoted at the following scope.
+
+- **local-only-files-write-back-untriggered** [cost: event/low] [surface: lifecycle-kit] — the
+  consumer's local-only companion files have read triggers at three skills and no write-back
+  trigger. A consult audit found the private brief still carrying forward memory for two shipped
+  rungs, its truncate-on-landing rule run by no stage (close's lesson drain routes only
+  private-rule discards there); the ops runbook's desired-state verifier had no recorded run and
+  no tracked trigger; and `check-queue-slug-liveness` reads the prose-surface globs by bold code
+  only, so a plain-code retired slug on a local-only surface passed every battery.
+  **Owed:** (a) a close drain step truncating the consumer's private-brief forward memory for each
+  unit shipped, as a template slot naming the consumer's surface; (b) a slot in release-sweep or
+  close's audit classes running the consumer's out-of-tree state verifier, slot-bound and never a
+  path literal; (c) weigh a retired-slug arm over plain code on the local-only globs.
+  **Refused in the consult:** leaving `/consult` as the only maintenance channel.
+  **Held Deferred by the enhancement admission filter** (TRAJECTORY.md §The rulings): new
+  template slots are an enhancement that cuts no time-to-first-value, closes no trust gap and
+  produces no external proof.
+  **Cost while deferred:** local-only surfaces drift until a consult happens to audit them.
+  Filed 2026-09-18 to the gap inbox by the consult that audited the local-only files, after
+  `external-install-evidence`'s close; promoted to Deferred at the next scope.
 
 ## Icebox
 
