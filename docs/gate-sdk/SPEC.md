@@ -125,6 +125,14 @@ override with `GATE_SDK_GATES_DIR`) holding:
   `check-tree-terms` (generic patterns; copy `templates/msg-patterns.list`);
   `msg-patterns.local.list` — its gitignored companion for private terms, which
   must never be tracked (tracking the banned terms would itself be the leak).
+  **The two readers are calibrated to the stricter one, and the tree half must be
+  exact.** Their costs of over-refusal differ: a commit message that trips a
+  pattern is argued down once, at the one commit it blocks, while a tracked-tree
+  match is a standing red clearable only by rewording prose that was never wrong
+  — pressure to bend the repo to the heuristic. So a pattern earns a place only
+  if it refuses nothing true in the tree; a red the tree half raises on correct
+  prose is fixed in the list, never by rewording the prose, least of all a
+  quotation.
 - `portability-patterns.list` — optional banned-construct roster for
   `check-portability-floor` (copy `templates/portability-patterns.list`), read
   together with the corpus knob that gate's section owns; absent, the assertion

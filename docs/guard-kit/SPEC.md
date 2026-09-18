@@ -465,6 +465,17 @@ asserts a mode rather than reading one. Whether a guard *should* read the mode i
 a consumer decision and is not settled here; the same holds for `agent_id`,
 `agent_type` and `effort`, each of which belongs to a question of its own.
 
+**The payload is the only reliable reader of the mode, because the configured mode
+is not the live one.** The harness reads `permissions.defaultMode` at process
+launch only, and a conversation reset (`/clear`) resets the conversation but not
+the process: a mode switched in-session carries across the reset, and a
+`defaultMode` written from inside a running session takes effect only at the next
+launch. So a session can run for hours in a narrower mode than the settings file
+names, and the settings file is never evidence of the mode a call ran under. The
+live mode reaches a hook only on the per-tool-call payload above; the
+session-start hook's payload does not carry it, so no session-start check can
+report the mode the session will run in.
+
 Fail-open is the default posture. The one sanctioned fail-closed shape is a
 deny-guard whose hook *matcher* already proves the tool identity (see
 wakeup-guard): there, a logging or parse failure still denies.

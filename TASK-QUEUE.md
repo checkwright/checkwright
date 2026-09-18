@@ -75,27 +75,6 @@
   Filed 2026-09-17 to the gap inbox by `interpreter-steer-census`'s spec; promoted at its close
   drain.
 
-- **local-only-grounds-unhomed** — two engineering grounds true for every reader live only on
-  local-only surfaces, found by a consult audit.
-  (a) **The calibration rule for a pattern list with two readers:** a commit-message reader's
-  over-refusal is argued down once, at the one commit it blocks; a tracked-tree reader's is a
-  standing red clearable only by rewording prose that was never wrong, so the stricter
-  calibration governs and the tree half must be exact. gate-sdk/SPEC.md names the list's two
-  readers (§Layout and configuration) and carries no such rule; it is owed there, undated.
-  (b) **The permission mode's limits:** the harness reads `permissions.defaultMode` at process
-  launch only, a conversation reset keeps the live mode, and the live mode is readable from a
-  per-tool-call hook payload and never from the session-start hook. guard-kit/SPEC.md states the
-  payload half ("The live permission mode is in that payload and no rule reads it") without the
-  launch-only and reset limits; they are owed beside it.
-  **Re-verified 2026-09-18 at scope** by grep of both SPECs. The local copies are cut to pointers
-  once the sections land.
-  **Taken into `guard-grant-fidelity` as debt, 2026-09-18 at scope** (operator direction,
-  2026-09-18, lead-relayed): landing stated grounds mints no name, and half is guard-kit's.
-  **Cost while deferred:** a reader without the local-only files re-derives both, or calibrates
-  the shared list the wrong way.
-  Filed 2026-09-18 to the gap inbox by a consult after `external-install-evidence`'s close;
-  drained at the following scope.
-
 ## Deferred
 
 - **residency-roster-template-reach-ungated** [cost: event/low] [surface: context-kit] —
@@ -3634,5 +3613,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- local-only-grounds-unhomed
 
 ## Lessons Learned
