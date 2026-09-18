@@ -14,29 +14,6 @@
 
 ## Technical Debt
 
-- **git-dash-c-grant-unmirrored** — the bash guard steers a session off `cd <dir> && git …` and
-  onto `git -C <dir> …`, and the committed allowlist grants git only subcommand-first
-  (`Bash(git status *)` and its siblings), so every call the guard steers falls through to a
-  permission prompt. The guard manufactures the prompt it then leaves unanswered.
-  **Re-measured 2026-09-18 at scope, not inherited:** `--emit scan-prompts` ranks `git -C` the top
-  prompting pattern at 10 of 39 prompting calls (the filing close counted 17 of 71), and
-  `.claude/settings.json` holds 20 `Bash(git ` grants, none spelled `git -C` and none for `gh auth`.
-  **The narrowing is the work:** a bare `Bash(git -C *)` would reach `git -C . reset --hard` and
-  `git -C . push`, so the grant mirrors the existing subcommand set one entry per subcommand
-  (`Bash(git -C * status *)` and siblings) rather than one glob. Second half: `gh auth`, the ops
-  runbook's per-write account step, is granted only by the uncommitted local overlay, so a fresh
-  clone re-prompts on a step every GitHub write owes.
-  **Deliverable, and who applies it:** a permission-settings edit is applied on the operator's
-  behalf (CLAUDE.md §Housekeeping; guard-kit/SPEC.md §compare-settings-allow), so build prepares
-  the diff and the lead relays it for the operator's confirmation; a widening is never
-  self-granted. How guard-kit's matcher models the mirrored grants is
-  `allow-match-colon-star-over-grants`' subject, taken beside it.
-  **Promoted 2026-09-18 at scope as debt, lead unit of `guard-grant-fidelity`** (operator
-  direction, 2026-09-18, lead-relayed): new grants mint no name on a governed surface.
-  **Cost while deferred:** one permission prompt per steered git call, in every session.
-  Filed 2026-09-18 to the gap inbox by `external-install-evidence`'s close; drained at the
-  following scope.
-
 - **compound-splitter-background-separators** —
   `guard_split_compound` and its compiled twin split on `;`, `&&`, `||` and `|` (plus a newline,
   in the twin) but not on a lone `&` or `|&`, so a backgrounded compound `a & b` is one segment to
@@ -3598,5 +3575,6 @@
 
 - local-only-grounds-unhomed
 - allow-match-colon-star-over-grants
+- git-dash-c-grant-unmirrored
 
 ## Lessons Learned
