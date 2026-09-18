@@ -3454,7 +3454,4 @@
 
 ## Done
 
-- vendored-library-identifier-reach
-- guard-ruleset-registration-lockstep
-
 ## Lessons Learned
