@@ -742,11 +742,16 @@ as the date), and a log field with no reader is a field removed. One residual
 limit is stated rather than closed: `kpi-overhead` summarizes a trailing window,
 so for about that many measured sessions after the upgrade its average blends the two
 populations. The blend is finite and self-clearing, and a special case keyed on a
-date would be a second thing to stale.
+date would be a second thing to stale. The gate row's marker for the runner's
+per-`FAIL` invariant line (gate-sdk/SPEC.md §run-gates) moves bytes from task or
+`govdoc` into `gate` on the same terms: the `date` field partitions the series at
+the upgrade that carries it, and no break marker is owed.
 
 The measurement is a **byte-proxy at line granularity**, honesty first. Each
 JSONL transcript line is classified whole by a fixed marker table in the script
-— gate-verdict shapes to `gate`, hook/system-reminder blocks and stage-skill
+— gate-verdict shapes to `gate`, the runner's invariant-line prefix among them
+(the binary's own constant, so the producer and this row spell it once),
+hook/system-reminder blocks and stage-skill
 loads and governed-doc reads to the rest of governance, everything unmatched to
 task work — and its byte length lands in that category. The markers are
 mechanism (kit names, gate-output shapes), never a private vocabulary, so the

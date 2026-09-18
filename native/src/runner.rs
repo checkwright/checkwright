@@ -477,8 +477,7 @@ struct Dispatch<'a> {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the invariant line's reserved prefix, held here because the
-// producer and §Consumer smoke's demo excerpt, which terminates by recognising this line, may not
-// spell it twice
+// producer, §Consumer smoke's demo excerpt and the overhead meter's gate row may not spell it twice
 pub const SPEC_LINE_PREFIX: &str = "    spec: ";
 
 // spec: gate-sdk/SPEC.md §run-gates — the failing member's own declared invariant, read off the

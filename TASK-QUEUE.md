@@ -31,23 +31,6 @@
 
 ## Technical Debt
 
-- **overhead-meter-gate-output-classifier-blind** — the overhead meter classifies the runner's
-  per-`FAIL` invariant line as non-gate output, so a line the battery prints is metered as task
-  (or, with `GATE_SDK_SPEC_BASE_URL` empty, as `govdoc`) rather than governance, against
-  drift-kit/SPEC.md §The overhead meter's "gate-verdict shapes to `gate`".
-  **Re-verified at this scope:** `runner::SPEC_LINE_PREFIX` is `"    spec: "`
-  (`native/src/runner.rs:482`) and `MARKERS` in `native/src/emit/overhead_meter.rs:22` has four
-  rows, none matching it.
-  **Deliverable:** drift-kit's gate row gains the runner's `spec: ` prefix as a marker, the same
-  cross-kit literal coupling `PASS: check-` already is, with a fixture or unit case classifying the
-  line as `gate` under both knob settings.
-  **Series-break question, ruled at scope:** no break marker is owed. §The overhead meter already
-  rules that the log's `date` field partitions a series at a consumer's upgrade across a release and
-  a field with no reader is a field removed; the section gains one sentence naming this change
-  beside that precedent.
-  Filed 2026-09-16 by `installer-front-door-cut`'s build to the gap inbox; lead unit of
-  `native-spawn-residue` on the unit-set ruling (operator direction, 2026-09-18, lead-relayed).
-
 ## Deferred
 
 - **guard-declares-class-correspondence-ungated** [cost: event/low] [surface: guard-kit] — items
@@ -3427,5 +3410,6 @@
 
 - pid-liveness-spawns-bash
 - gnu-date-spawn-retired
+- overhead-meter-gate-output-classifier-blind
 
 ## Lessons Learned

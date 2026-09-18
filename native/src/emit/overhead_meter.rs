@@ -28,6 +28,7 @@ const MARKERS: [(&str, &[&str]); 4] = [
             "===== check",
             ": clean (",
             "run-gate",
+            crate::runner::SPEC_LINE_PREFIX,
         ],
     ),
     (
@@ -271,6 +272,20 @@ mod tests {
         assert_eq!(c.hook, 17);
         assert_eq!(c.total, 25 + 17 + 13);
         assert_eq!(c.task(), 13, "the unmatched line is task, and only it");
+    }
+
+    // spec: drift-kit/SPEC.md §The overhead meter — the runner's per-`FAIL` invariant line is a
+    // gate-verdict shape whichever way `GATE_SDK_SPEC_BASE_URL` renders its location
+    #[test]
+    fn the_runner_invariant_line_is_gate_output_under_both_link_settings() {
+        for located in [
+            "gate-sdk/SPEC.md §run-gates — the rule it holds",
+            "https://example.org/gate-sdk/SPEC#run-gates — the rule it holds",
+        ] {
+            let line = format!("{}{}\n", crate::runner::SPEC_LINE_PREFIX, located);
+            let c = classify(line.as_bytes());
+            assert_eq!(c.gate, c.total, "{:?} scored outside the gate row", line);
+        }
     }
 
     // spec: drift-kit/SPEC.md §The overhead meter — the byte-proxy contract counts *bytes*, so a

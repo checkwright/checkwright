@@ -10269,8 +10269,10 @@ classifies a transcript line as gate output by `contains`, so its condition is o
 **content, not position**: an extra line carrying a verdict substring would
 inflate a measurement wherever it appeared. §Consumer smoke's demo excerpt quotes
 a reddened gate's block and terminates on the verdict, so its condition is on
-**order**. The invariant line's four-space `spec:` prefix satisfies the first
-two by construction, and the third is satisfied by that reader changing: its
+**order**. The invariant line's four-space `spec:` prefix satisfies the first by
+construction. The second reader counts the line as gate output on purpose, by a
+marker on the prefix constant itself (drift-kit/SPEC.md §The overhead meter),
+since it *is* gate output. The third is satisfied by that reader changing: its
 terminator runs past the invariant line, which §Consumer smoke owns.
 
 **A declared omission is what keeps that tripwire honest.** A member a consumer
