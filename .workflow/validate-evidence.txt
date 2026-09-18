@@ -1,5 +1,5 @@
 # contract: evidence-manifest v1
-windows-adopter-path gates sha256=3fb0b414c06195a5e2bc055b835f4ded8cecd7e68ff1fcbcccc9d5a7ca95ffa1 pass=117 fail=0 ignore=0 verdict=clean 2026-09-19
+windows-adopter-path gates sha256=67ce732f227c8e42d75eaa59fb9c8c302687d5af75e1de5372153bce50bbe9fd pass=117 fail=0 ignore=0 verdict=clean 2026-09-19
 windows-adopter-path gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
 windows-adopter-path canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
 windows-adopter-path context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
@@ -12,10 +12,10 @@ windows-adopter-path queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aed
 windows-adopter-path site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
 windows-adopter-path scripts sha256=b87b46f3a812452329297073b7dd2c6181caadfc1461c4298e5c2c0f0f7044f6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
 windows-adopter-path guard_tests sha256=660ff1399386ea7ee064c052fbc5dd0fa4083498cc6ac70240f71fb571830e27 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
-windows-adopter-path demo sha256=6028860dd691fcfd3b9a6529e8058a4dcd869b8986bf0cdd266ffdefbe26104a pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
-windows-adopter-path installer_smoke sha256=dab81e3a0ccd253f2e249b5aaf2aa3cb71b9ac2124f9747b06d1c53aa0d802b3 pass=13 fail=0 ignore=0 verdict=clean 2026-09-19
-windows-adopter-path consumer_smoke sha256=16fd3c84c4c10a443d9141619fc0a460381454b3aeef3e0433ff14adf8152917 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
-windows-adopter-path upgrade sha256=fa9927bd395df80f7c25babae6d69ebff00608e7744dd1740612011fde46e29b pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
-windows-adopter-path agents_md_smoke sha256=87c8e41496556b876b1722ccc76c4b41a8f31827714453bc037677af114e5462 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+windows-adopter-path demo sha256=7fea66ae5afe995ed8152fc90310e302e3207cc79c5266293b9058c16236ae9a pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+windows-adopter-path installer_smoke sha256=43b7bcf7a4a2af8932ed4824d5f2255eb97036c4e33dcead3bfc55a20b5f3116 pass=13 fail=0 ignore=0 verdict=clean 2026-09-19
+windows-adopter-path consumer_smoke sha256=56629c80d5b478e1ff73a4e98d955eeec6b240898e4dc75fd21e675ac4b3f61b pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+windows-adopter-path upgrade sha256=2b7c9e17c9d0277ef6fa688cd789a3b77a7a527050548f2cec952e0bd4a026a7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+windows-adopter-path agents_md_smoke sha256=386ad60eb1c9d797c0fc0323ee03078fbf0b09c262341727782dfc55235f038a pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
 windows-adopter-path index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
-windows-adopter-path native_crate sha256=26e37e2b0da41df481b8f5210c0ed1d8fb0b9616e2d5850a3e5ddcb736f89812 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
+windows-adopter-path native_crate sha256=8afb9631a60800f39cb36cdfd00b94f51f4be4a6591ba6b7f05d38dc6acfb4c3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-19
