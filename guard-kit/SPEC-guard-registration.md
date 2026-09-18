@@ -79,9 +79,16 @@ would silently take that exemption. **Not yet applied.** This text replaces item
 > appends anything neither blocked nor auto-allowed to the friction log. It runs
 > last and never affects the decision.
 
-Repoint the one citation of the old number, `guard-kit/SPEC.md:2487` "(rule 27)",
-to "(§The generic ruleset, fall-through logging)". Found with `git grep -n "rule
-27"`, which also hits only that line's `docs/` mirror.
+Repoint every live citation of the old number, found with `git grep -n "rule
+27"`: `guard-kit/SPEC.md:2487` "(rule 27)" becomes "(§The generic ruleset,
+fall-through logging)" (its `docs/` mirror follows at delta 5), and
+`guard-kit/guard-tests/cases.tsv:483`'s section comment "# rule 27 — anything
+else falls through to the friction log" becomes "# fall-through logging —
+anything else falls through to the friction log", matching items 1-26's own
+"# rule N — …" convention and this delta's "is no rule" framing. The grep's
+other hit, `.workflow/release-declarations.md:213`, narrates a past release
+("Fall-through logging is now rule 27") and is left as is: a dated release
+declaration records history, not a live citation.
 
 ### (4) `check-guard-registration`, a repo-local native gate {design-bearing}
 
@@ -209,6 +216,7 @@ Run the regen command each freshness gate prints on red. The members, from
 - `guard-kit/SPEC.md` §The generic ruleset: the opening paragraph, the tokens on
   items 1-26, and item 27 (deltas 1, 2 and 3).
 - `guard-kit/SPEC.md` §scan-prompts, the "(rule 27)" citation (delta 3).
+- `guard-kit/guard-tests/cases.tsv:483`, the "# rule 27" section comment (delta 3).
 - `guard-kit/SPEC.md` §Testing, the new §check-guard-registration (delta 4).
 - `native/src/gates/guard_registration.rs`, `native/src/gates/mod.rs`,
   `scripts/check-guard-registration.gate`, `scripts/gates.list` and
@@ -219,8 +227,8 @@ Run the regen command each freshness gate prints on red. The members, from
 ## Retired spellings
 
 - None — no delta retires a spelling: the rule numbers 1-26 keep their numbers,
-  and "rule 27" is repointed at its one citation by delta 3 rather than retired
-  as a name.
+  and "rule 27" is repointed at its live citations by delta 3 rather than
+  retired as a name.
 
 ## Definition of Done
 
