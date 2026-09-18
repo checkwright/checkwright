@@ -38,6 +38,13 @@ impl Completed {
         exit_code(&self.status)
     }
 
+    // spec: gate-sdk/SPEC.md §run-gates — the comparison face: both streams whatever the status,
+    // for a caller that compares one child's whole account against another's and grades neither
+    // by its emptiness
+    pub fn streams(&self) -> (&[u8], &[u8]) {
+        (&self.stdout, &self.stderr)
+    }
+
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the sanctioned widening: the failed child's
     // whole account of itself, reachable only where `stdout()` already said `None`, composed into
     // a `String` so no caller can parse it back into a verdict
@@ -591,6 +598,25 @@ static MERGE_SEQ: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsiz
 // the one shape `run` cannot carry: a shell caller's `printf … | git hash-object --stdin` has no
 // argv spelling, and routing it here keeps the spawn site single
 pub fn run_with_stdin(program: &Program, args: &[&str], input: &[u8]) -> Result<Completed, String> {
+    run_with_stdin_in(program, args, input, &ChildEnv::default())
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the child's working directory and an environment both added
+// to and stripped, the shape `run_with_stdin` cannot carry: the front-end parity arm hands both
+// halves one environment, which the knob values this process inherited must not reach
+#[derive(Default)]
+pub struct ChildEnv<'a> {
+    pub set: &'a [(String, String)],
+    pub unset: &'a [String],
+    pub cwd: Option<&'a std::path::Path>,
+}
+
+pub fn run_with_stdin_in(
+    program: &Program,
+    args: &[&str],
+    input: &[u8],
+    child_env: &ChildEnv,
+) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
     use std::io::Write;
@@ -601,13 +627,21 @@ pub fn run_with_stdin(program: &Program, args: &[&str], input: &[u8]) -> Result<
             program.label(), e
         )
     };
-    let mut child = Command::new(spawn_target(program.invocation())?.as_ref())
-        .args(args)
+    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    cmd.args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .map_err(spawn_err)?;
+        .stderr(Stdio::piped());
+    for k in child_env.unset {
+        cmd.env_remove(k);
+    }
+    for (k, v) in child_env.set {
+        cmd.env(k, v);
+    }
+    if let Some(dir) = child_env.cwd {
+        cmd.current_dir(dir);
+    }
+    let mut child = cmd.spawn().map_err(spawn_err)?;
     let mut pipe = child
         .stdin
         .take()

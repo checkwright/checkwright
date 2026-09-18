@@ -69,6 +69,12 @@ jobs:
           exit $rc
       - name: guard-kit decision table
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
+      # The front-end twin's held comparison (gate-sdk/SPEC.md §run-gates). It is
+      # not a battery member because the battery's host may carry no PowerShell;
+      # it rides this leg too so a divergence reds on the leg every push runs
+      # first, not only on the binding Windows leg.
+      - name: front-end parity, bash stub against its PowerShell twin
+        run: bash gate-sdk/bin/run-gates.sh --run-front-end-parity
 
   # The activation path, exercised server-side. It is a job rather than a step in
   # `gates` because it asserts a different thing — that an adopter's install
@@ -381,15 +387,26 @@ jobs:
       # is what that section has to name, or the leg goes back to measuring
       # nobody's path" — and that obligation is discharged: docs/install.md
       # §Requirements' `shellcheck` bullet names Chocolatey for native Windows,
-      # citing this leg as what measures it. Unlike the macOS legs, which run the
-      # page's own block, this step is a copy of that bullet's Chocolatey route
-      # and nothing holds the two equal; the gap inbox carries that gap.
+      # citing this leg as what measures it. Like the macOS legs, this step runs
+      # the page's own block: it reads `windows-remedy` with the macOS legs' awk
+      # program and runs the body verbatim under PowerShell, the shell a
+      # native-Windows adopter types it into. An empty extraction reds by name.
       - name: install the one adopter floor member this runner lacks
         shell: bash
         run: |
           set +e
-          choco install shellcheck -y --no-progress
-          echo "choco exited $?"
+          block="$(awk '
+            $0 == "<!-- windows-remedy:end -->" { f = 0 }
+            f && NF && $0 !~ /^```/ { print }
+            $0 == "<!-- windows-remedy:begin -->" { f = 1 }
+          ' docs/install.md)"
+          if [ -z "$block" ]; then
+            echo "::error::docs/install.md carries no windows-remedy block; this leg performs the page's remedy and has none to perform"
+            exit 1
+          fi
+          printf '== docs/install.md windows-remedy block ==\n%s\n' "$block"
+          pwsh -NoProfile -Command "$block"
+          echo "block exited $?"
           hash -r
           echo "shellcheck resolves to: $(command -v shellcheck || echo '<MISSING>')"
           shellcheck --version
@@ -450,6 +467,14 @@ jobs:
           chmod +x "$dest"
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
+
+      # The front-end twin's held comparison on the platform the twin exists for
+      # (gate-sdk/SPEC.md §run-gates): this host carries Git-for-Windows bash and
+      # PowerShell both, so it measures the pair where a native-Windows adopter
+      # meets them. It runs the producer's artifact the step above placed.
+      - name: front-end parity, bash stub against its PowerShell twin
+        shell: bash
+        run: bash gate-sdk/bin/run-gates.sh --run-front-end-parity
 
       # The suite itself, under one steering that is **measurement scaffolding
       # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
@@ -762,10 +787,28 @@ jobs:
           # §bin/env-probe — and this prepend remains its precondition, since the
           # resolver walks PATH and reaches nothing PATH never carried.
           # `shellcheck` the image does not ship at all and is the only genuine
-          # addition.
+          # addition, taken by running docs/install.md's `windows-remedy` block
+          # verbatim, as an adopter following the page would; an empty extraction
+          # reds by name.
           $env:PATH = "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin;$env:PATH"
+          $remedy = @()
+          $inBlock = $false
+          foreach ($line in (Get-Content -LiteralPath docs/install.md)) {
+              if ($line -eq '<!-- windows-remedy:end -->') { $inBlock = $false }
+              if ($inBlock -and $line.Trim() -and $line -notmatch '^```') { $remedy += $line }
+              if ($line -eq '<!-- windows-remedy:begin -->') { $inBlock = $true }
+          }
+          if ($remedy.Count -eq 0) {
+              Write-Host "::error::docs/install.md carries no windows-remedy block; this leg performs the page's remedy and has none to perform"
+              exit 1
+          }
+          Write-Host "== docs/install.md windows-remedy block =="
+          $remedy | ForEach-Object { Write-Host $_ }
+          Invoke-Expression ($remedy -join "`n") | Out-Host
+          Write-Host "block exited $LASTEXITCODE"
+          Write-Host "shellcheck resolves to: $((Get-Command shellcheck -ErrorAction SilentlyContinue).Source)"
           if (-not (Get-Command shellcheck -ErrorAction SilentlyContinue)) {
-              choco install shellcheck -y --no-progress | Out-Null
+              Write-Host "SCAFFOLDING FAILED -- shellcheck is still absent, so a doctor refusal below is THIS block's failure and not a new finding"
           }
           # Printed rather than asserted, and printed unconditionally: the resolution
           # order above is a claim about this image that no local host can check, so a
@@ -826,6 +869,87 @@ jobs:
           Write-Host "scratch consumer. Nothing in that oracle is owed."
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "the PowerShell bootstrap answered all five steps and carried an install end to end"
+
+      # The generated hooks stay one bash implementation on native Windows because
+      # git runs them under the shell Git for Windows bundles, whatever PATH carries
+      # (gate-sdk/SPEC.md §gen-pre-commit). This step is that claim's oracle, in the
+      # consumer the step above initialised: it strips every directory holding a
+      # bash.exe from PATH first, so a green cannot be a PATH bash serving the hook.
+      # The system directory is spared, since its bash.exe, where one exists, is
+      # the WSL launcher and not a shell; git stays reachable through its own
+      # `cmd` launcher directory, which holds no bash. The hooks are wired through
+      # the PowerShell front-end, a clean change must commit with the pre-commit
+      # hook's passed line, and a change binding an uncrossed repository root in a
+      # shell file must be refused by name by check-path-dialect, a precommit
+      # member that runs on every commit.
+      - name: commit through the generated hooks with no bash on PATH
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
+          $consumer = Join-Path $env:PWSH_SCRATCH 'init-consumer'
+          $script:fails = 0
+          function Check([string] $label, [object] $cond, [string] $detail) {
+              if ($cond) { Write-Host "ok   $label" }
+              else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
+          }
+          if (-not (Test-Path -LiteralPath (Join-Path $consumer 'gate-sdk/bin/run-gates.ps1') -PathType Leaf)) {
+              Write-Host "BAD  the init consumer carries no vendored gate-sdk/bin/run-gates.ps1 -- nothing below can run"
+              exit 1
+          }
+
+          Write-Host "== step 1: every bash stripped from PATH =="
+          $sysDir = [Environment]::SystemDirectory.TrimEnd('\')
+          $gitRoot = Split-Path (Split-Path (Split-Path (& git --exec-path)))
+          $kept = New-Object System.Collections.Generic.List[string]
+          foreach ($d in ($env:PATH -split ';')) {
+              if (-not $d) { continue }
+              if ((Test-Path -LiteralPath (Join-Path $d 'bash.exe')) -and $d.TrimEnd('\') -ne $sysDir) {
+                  Write-Host "  stripped $d"
+              } else { $kept.Add($d) }
+          }
+          $gitCmd = if ($gitRoot) { Join-Path $gitRoot 'cmd' } else { '' }
+          if ($gitCmd -and (Test-Path -LiteralPath (Join-Path $gitCmd 'git.exe')) -and -not $kept.Contains($gitCmd)) {
+              $kept.Add($gitCmd)
+              Write-Host "  kept git reachable through $gitCmd, which holds no bash"
+          }
+          $env:PATH = $kept -join ';'
+          $reachable = @(Get-Command bash -CommandType Application -All -ErrorAction SilentlyContinue |
+              Where-Object { (Split-Path $_.Source).TrimEnd('\') -ne $sysDir })
+          Check "no bash resolves on PATH" ($reachable.Count -eq 0) "still resolves: $($reachable.Source -join ', ')"
+          Check "git still resolves on PATH" (Get-Command git -CommandType Application -ErrorAction SilentlyContinue) "PATH=$env:PATH"
+
+          Push-Location $consumer
+          try {
+              Write-Host "== step 2: the hooks wired through the PowerShell front-end =="
+              $iout = (& pwsh -NoProfile -File gate-sdk/bin/run-gates.ps1 --install-hooks 2>&1) -join "`n"
+              $icode = $LASTEXITCODE
+              Check "run-gates.ps1 --install-hooks wired the hooks" `
+                    ($icode -eq 0 -and (git config --get core.hooksPath)) "exit $icode -- $iout"
+
+              Write-Host "== step 3: a clean change commits through the bash hook git runs itself =="
+              $head = git rev-parse HEAD
+              [IO.File]::WriteAllText((Join-Path $consumer 'hooks-probe.txt'), "probe`n")
+              git add hooks-probe.txt
+              $cout = (& git commit -m 'docs: probe the generated hooks' 2>&1) -join "`n"
+              $ccode = $LASTEXITCODE
+              Check "the clean commit landed" ($ccode -eq 0 -and (git rev-parse HEAD) -ne $head) "exit $ccode -- $cout"
+              Check "the pre-commit hook ran and printed its passed line" ($cout -match 'pre-commit: \d+ gate\(s\) passed') "$cout"
+
+              Write-Host "== step 4: a violation is refused by the gate that owns it =="
+              $head = git rev-parse HEAD
+              [IO.File]::WriteAllText((Join-Path $consumer 'hooks-violation.sh'),
+                  "#!/usr/bin/env bash`nroot=`"`$(git rev-parse --show-toplevel)`"`necho `"`$root`"`n")
+              git add hooks-violation.sh
+              $vout = (& git commit -m 'chore: add a script that binds an uncrossed root' 2>&1) -join "`n"
+              $vcode = $LASTEXITCODE
+              Check "the violating commit was refused" ($vcode -ne 0 -and (git rev-parse HEAD) -eq $head) "exit $vcode -- $vout"
+              Check "the refusal names the gate that owns the violation" ($vout -match 'check-path-dialect failed') "$vout"
+          } finally { Pop-Location }
+
+          if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
+          Write-Host "git ran the bash hooks with no bash on PATH, and they both passed and refused"
 
   # The RELEASE-SHAPED PRODUCER, and its whole reason for existing is that no leg
   # which builds from the host it runs on can ever discharge a roster join.
@@ -1087,8 +1211,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      # **Read this step as the assertion, not as scaffolding** — which is what
-      # separates it from the Windows sibling's `choco install`. It performs
+      # **Read this step as the assertion, not as scaffolding**, as the Windows
+      # legs' run of the page's `windows-remedy` block is. It performs
       # exactly the adopter action docs/install.md §Requirements documents for a
       # Mac. The whole value of this leg is that the documented remedy stops
       # being a reading and becomes a run, so a leg reaching green by installing

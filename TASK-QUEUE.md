@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **native-windows-bash-floor** [spec: SPEC-windows-front-end.md] — a native-Windows host
-  reaches the battery only through bash: the `run-gates.sh` front-end stub and both generated git
-  hooks are bash, and a bare `bash` typed in PowerShell reaches the WSL launcher.
-  **Ruled at scope:** a PowerShell twin `gate-sdk/bin/run-gates.ps1`, held to the bash stub by an
-  executed comparison (`--run-front-end-parity`) on the binding Windows leg. The git hooks stay one
-  bash implementation, which Git for Windows runs under its own shell, and a leg proves it by
-  committing with every bash stripped from `PATH`. guard-kit's hook is split out as
-  `guard-hook-windows-substrate`.
-  Filed 2026-09-14 by `config-seam-fourth-cut`'s spec (operator direction, lead-relayed). Leads
-  `windows-bash-floor` by operator direction (2026-09-18, lead-relayed).
-
-- **windows-shellcheck-step-copies-page-route** [spec: SPEC-windows-front-end.md] — both Windows
-  legs install `shellcheck` from a copy of docs/install.md's Chocolatey route, which nothing holds
-  equal to the page.
-  **Ruled at scope:** a `windows-remedy` marker block on the page, run verbatim under PowerShell by
-  both legs, as the macOS legs run theirs. The legs' copies are deleted.
-  Filed 2026-09-18 at `smoke-leg-crate-cache`'s spec. Joins `windows-bash-floor` by operator
-  direction (2026-09-18, lead-relayed).
-
 ## Technical Debt
 
 ## Deferred
@@ -3341,5 +3322,7 @@
 ## Done
 
 - windows-build-dead-code-warnings-unheld
+- native-windows-bash-floor
+- windows-shellcheck-step-copies-page-route
 
 ## Lessons Learned

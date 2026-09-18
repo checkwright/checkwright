@@ -308,28 +308,33 @@ recoverable:
   roster step's keyed output exactly as the Intel leg does, so no platform leg's
   posture is hard-coded any more.
 
-- **The macOS remedy block** — `docs/install.md`'s Requirements section carries a
-  **third** marker block, the HTML-comment pair `macos-remedy:begin` and
-  `macos-remedy:end`. It is hand-authored. It holds one `sh` fence whose
-  lines are shell commands run verbatim, and only the fence lines and blank lines
-  are skipped. Its readers are the two macOS install-smoke legs, `install-smoke-macos`
-  and `install-smoke-macos-intel`. Each leg's remedy step extracts the fence body
-  with awk and refuses on an empty extraction; otherwise it runs the body in the
-  step's shell and persists the `PATH` entries the body prepended to
-  `$GITHUB_PATH`. **No gate holds it.** The block is hand-authored source with no
-  emitter, and the binding legs are its enforcement: a malformed block, or one
-  missing a formula a Mac needs, reds the push that carries it. **Honest limit:**
-  that red arrives at push rather than at commit, since no local battery runs a Mac.
-  **Two shapes were refused for it.** A shared script both legs call would merge
-  the two copies the legs once carried, yet would still hold nothing equal to
-  the page. A gate holding the legs' package set to the toolchain list would need
-  a mapping from floor members to Homebrew formulae, and that mapping is neither
-  one-to-one nor derivable, so no surface for it exists. Running the page's own
-  block removes the duplication instead of policing it. A formula the page drops
-  leaves the legs on the same run; one the legs need but the page lacks is the
-  adopter's broken path showing up as a red. `scripts/ci-macos-floor.sh` reads
-  nothing here. It is the `native-artifacts` build legs' runner floor, and it
-  answers to what that job executes.
+- **The remedy blocks** — `docs/install.md`'s Requirements section carries two
+  more marker blocks, hand-authored, each read by its platform's install-smoke
+  legs and run verbatim. The HTML-comment pair `macos-remedy:begin` and
+  `macos-remedy:end` holds one `sh` fence; its readers are `install-smoke-macos`
+  and `install-smoke-macos-intel`, and each runs the body in the step's shell and
+  persists the `PATH` entries the body prepended to `$GITHUB_PATH`. The pair
+  `windows-remedy:begin` and `windows-remedy:end` holds one `powershell` fence;
+  its readers are `install-smoke-windows` and `install-smoke-powershell`, and both
+  run the body under PowerShell, the shell a native-Windows adopter types it
+  into — the bash leg extracts it with the macOS legs' awk program and hands it
+  to `pwsh -NoProfile -Command`, the pwsh leg extracts it in PowerShell. In every
+  leg only the fence lines and blank lines are skipped, and an empty extraction
+  reds the leg by name. **No gate holds either block.** Each is hand-authored
+  source with no emitter, and the binding legs are its enforcement: a malformed
+  block, or one missing a package its platform needs, reds the push that carries
+  it. **Honest limit:** that red arrives at push rather than at commit, since no
+  local battery runs a Mac or a native-Windows host. **Two shapes were refused.**
+  A shared script the legs call would merge the copies the legs once carried, yet
+  would still hold nothing equal to the page. A gate holding the legs' package
+  set to the toolchain list would need a mapping from floor members to Homebrew
+  formulae or Chocolatey packages, and that mapping is neither one-to-one nor
+  derivable, so no surface for it exists. Running the page's own block removes
+  the duplication instead of policing it. A package the page drops leaves the legs
+  on the same run; one the legs need but the page lacks is the adopter's broken
+  path showing up as a red. `scripts/ci-macos-floor.sh` reads nothing here. It is
+  the `native-artifacts` build legs' runner floor, and it answers to what that
+  job executes.
 
 **A derived surface earns a row here only when it has a reader who cannot run
 the emitter** — a public page, a file a fresh clone needs before its tooling

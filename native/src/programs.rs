@@ -61,6 +61,7 @@ roster! {
     TAR = "tar", "contributor";
     NPM = "npm", "contributor";
     UNAME = "uname", "contributor";
+    PWSH = "pwsh", "contributor";
     CHECKWRIGHT_GATES = env!("CARGO_PKG_NAME"), "";
 }
 

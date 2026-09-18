@@ -19,6 +19,8 @@ honest:
   files or the output contract: `--only <name>...` runs the gates you name (in
   registry order; an unregistered name is a refusal), and `--for <path>...` runs
   the gates coupling to the paths you name, exactly as the generated hook would.
+  On a native-Windows host with no bash on `PATH`, its PowerShell twin
+  `bin/run-gates.ps1` takes the same arguments: `pwsh -File gate-sdk/bin/run-gates.ps1`.
 - the `--run-gate-tests` arm — the golden-fixture runner: every gate proves it
   accepts a `good/` case and rejects a `bad/` case with the right error text.
 - the `--run-consumer-smoke` arm — the end-to-end check no fixture makes: builds a

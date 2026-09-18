@@ -21,6 +21,7 @@ pub mod file_gap;
 pub mod file_install;
 pub mod file_survey;
 pub mod footprint;
+pub mod front_end_parity;
 pub mod git_hooks;
 pub mod graph;
 pub mod install_evidence;
@@ -726,6 +727,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--pack-installer",
         Arm::Run(pack_installer::run),
         pack_installer::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §run-gates — the front-end twin's held comparison, an `Arm::Run`
+    // because its contract is the 0/1/2 split of identical, divergent and could-not-run
+    (
+        "--run-front-end-parity",
+        Arm::Run(front_end_parity::run),
+        front_end_parity::KNOBS,
     ),
 ];
 

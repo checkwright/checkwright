@@ -152,9 +152,11 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:begin -->
 
-- `bash` (≥ 4.3) — the `run-gates.sh` front-end that locates the gate binary,
-  both generated git hooks and guard-kit's hook are written in bash; nothing in
-  the battery runs without it. The floor is the highest construct the
+- `bash` (≥ 4.3) — guard-kit's hook and the shipped session templates are
+  written in bash, and so are both generated git hooks, which git runs under its
+  own shell. On native Windows, run the battery from PowerShell through
+  `gate-sdk/bin/run-gates.ps1`, the twin of `run-gates.sh`. Git for Windows'
+  bundled bash is what serves guard-kit's hook there. The floor is the highest construct the
   battery runs: a nameref (`local -n`) in the gate library the front-end sources.
   Associative arrays, `mapfile`, and the lowercasing case expansion are more
   widespread but only reach 4.0.
@@ -192,9 +194,10 @@ your `PATH`, and the note says what breaks without it:
   and a machine without ShellCheck is **refused rather than half-installed**.
   Nothing in the install supplies it. Take it from your distribution on Linux or
   on a Windows adopter's WSL where that is the chosen route. On macOS the remedy
-  block above installs it. On native Windows the source is Chocolatey (`choco install
-  shellcheck`), which is the route the Windows install-smoke leg itself takes, so
-  it is measured rather than suggested.
+  block above installs it. On native Windows the source is Chocolatey, and the
+  Windows remedy block after this list is the command, typed into PowerShell.
+  Both Windows install-smoke legs run that block verbatim under PowerShell, so it
+  is measured rather than suggested.
 - `cargo` (≥ 1.71, @contributor) — a **contributor** requirement with **no install-time role at
   all**: the `native/` crate carries the gate implementations that dispatch to a
   binary subcommand, and the floor is the highest MSRV in the crate's resolved
@@ -212,6 +215,17 @@ your `PATH`, and the note says what breaks without it:
   A gate on that substrate shells out to git at runtime and embeds nothing.
 
 <!-- toolchain:end -->
+
+The Windows remedy block: the one floor member Git for Windows does not supply,
+installed from PowerShell.
+
+<!-- windows-remedy:begin -->
+
+```powershell
+choco install shellcheck -y
+```
+
+<!-- windows-remedy:end -->
 
 A member is pinned only where a construct the battery actually runs forces the
 pin, and each pinned member names that construct above. A floor nobody's code

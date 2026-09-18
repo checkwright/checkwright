@@ -1616,7 +1616,9 @@ which arm or member spawns a program is recorded per member in `REGISTRY` for
 gates and in prose for arms (§The non-gate arm). A per-arm declaration nothing
 runs is the self-declaration §The `# graph:` manifest refuses. `which` stays a
 name-typed presence probe, since a name probed and never run is no
-requirement.
+requirement. `pwsh` is a `contributor` member: only `--run-front-end-parity`
+spawns it (§run-gates), on CI legs, so no adopter host needs it and the
+floor-or-probe relation does not bind it.
 
 ### Fixture-pair discipline
 
@@ -2955,7 +2957,8 @@ whose port **removes** a grant naming its own path rather than relocating one),
 scratch-consumer harness (both §Consumer smoke),
 and `--pack-installer`, the payload assembler (§Consumer payload; the route a
 consumer's release path invokes it by is that consumer's own surface and not a
-kit's — installer/SPEC.md §The packer is this repo's) —
+kit's — installer/SPEC.md §The packer is this repo's), and
+`--run-front-end-parity`, the front-end twin's held comparison (§run-gates) —
 and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
@@ -10110,12 +10113,43 @@ here.** The **arm** is `--run`, a non-gate arm of the binary (§The
 non-gate arm): it owns the registry walk, both selectors, the dispatch, the
 worker pool, the timings, the omission accounting, the output contract, **the
 usage text, and the argument grammar below with every refusal decidable from
-it**. `bin/run-gates.sh` is the **front-end**, and after the stub cut it is a
-residue: it resolves the repo root, sources `lib/gate.sh` for `gate_native_bin`
-and `gate_sdk_gates_dir`, resolves the **gates-dir positional**, exports the
-`GATE_SDK_ROOT` locator (§Layout and configuration), and `exec`s the binary with
-no knob environment — the shape `--emit` already had, which is the precedent the
-runner's own arm is built on.
+it**. The **front-end** is `bin/run-gates.sh` and its PowerShell twin
+`bin/run-gates.ps1`, and after the stub cut each is a residue: resolve the repo
+root, locate the binary over `GATE_SDK_NATIVE_BIN`'s pre-binary precedence,
+resolve the **gates-dir positional**, export the `GATE_SDK_ROOT` locator
+(§Layout and configuration), and run the binary with no knob environment — the
+shape `--emit` already had, which is the precedent the runner's own arm is built
+on. The bash stub sources `lib/gate.sh` for `gate_native_bin` and
+`gate_sdk_gates_dir` and `exec`s the binary. The twin runs it as a child and
+exits with its status. The twin exists for a native-Windows host with no bash on
+`PATH`, whose bare `bash` reaches the WSL launcher; it runs under Windows
+PowerShell 5.1 and PowerShell 7 and pins the installer bootstrap's two
+argument-passing settings on that bootstrap's ground (installer/SPEC.md §The
+install boundary). It sources nothing, so it re-holds the three accessors it
+needs — `_gate_prebinary_knob` for the one knob, `gate_sdk_gates_dir`, and the
+host half of `gate_exe_suffix` — and writes the stub's lines as UTF-8 bytes with
+a bare LF. That makes it a second holder of the stub's contract. Its argv is
+PowerShell's own `$args`, so the binder's rewrites happen before the twin sees a
+token: a `-name:value` token arrives split at its colon, and a `--%` token is
+consumed.
+
+**The twin is held by `--run-front-end-parity`**, an executed comparison of
+both halves' transcripts over a fixed corpus: each exit path, each precedence
+tier of `GATE_SDK_NATIVE_BIN`, each residual-grammar form, and forwarded stdin.
+Each case runs in a fresh scratch repository vendoring this tree's own
+`gate-sdk/bin/` and `gate-sdk/lib/`, both halves by relative path under one
+environment stripped of every static kit's knobs, with `GATE_SDK_NATIVE_BIN`
+naming the running binary where a case needs one to run. Transcripts — exit
+status, stdout and stderr — must be byte-identical after CRLF becomes LF,
+PowerShell's console writer ending lines with CRLF on Windows being no contract
+difference. The arm exits 0 when every case is identical and 1 when one diverges,
+printing the case, both transcripts and the first differing line. It exits 2 when
+the check could not run: no `bash` or `pwsh` resolves, the sandbox cannot be
+built, or the bash stub itself does not do what a case names, so two halves
+failing the same way cannot pass as parity. It runs on the binding Windows
+install-smoke leg and on the `gates` job, never in the battery, whose host may
+carry no PowerShell. So a divergence reds at push, not at commit — the trade the
+macOS remedy block and the installer's PowerShell half already accept.
 
 **The positional is the whole of what the front-end still knows about argv, and
 the reason is a genuine ambiguity rather than an unfinished cut.** The binary is
@@ -10127,7 +10161,8 @@ member, can read it unambiguously. So the front-end resolves it and spells it
 
 **The front-end requires a checkout and the arm does not, which decides who may
 call what.** Resolving the repo root is the front-end's first act and it refuses
-with exit 2 outside one, so an arm whose work happens *outside* a
+with exit 2 outside one — its own `run-gates: not inside a git repository` line
+and no shell diagnostic before it, a line the twin can reproduce — so an arm whose work happens *outside* a
 checkout — a hermetic `mktemp` sandbox — is unreachable through
 `bin/run-gates.sh` however correct its argv, and the refusal reads as a broken
 invocation rather than as a boundary. Such a caller reaches the binary through
@@ -10172,9 +10207,9 @@ nothing left to dispatch actually earns. The per-arm dispatch branches, which gr
 the file by one per arm, moved into the binary's own argv parsing. What
 remains is the residue this section names: resolve the repo root, locate the
 binary, resolve the gates-dir positional, export the gate-sdk root locator, and
-`exec` the binary. That stub declares `# no-port:` on a per-file bootstrap cause:
+`exec` the binary. Both halves declare `# no-port:` on a per-file bootstrap cause:
 the front-end locates the binary it executes, which the binary cannot do for
-itself. It is the whole of what stays shell on the front-end's path to the binary. Two readings were
+itself. They are the whole of what stays script on the front-end's path to the binary. Two readings were
 refused: porting the file whole with the loop inside, which keeps a duplication
 serving no branch; and declaring the whole file, a subtraction that grows with
 every arm.
@@ -10205,7 +10240,7 @@ cannot be asked of an absent binary.** `ARM_UNAVAILABLE_STATUS` is read on
 precisely the path where the binary is absent or not executable — the branch that
 prints the build remedy naming `bash gate-sdk/bin/build-native.sh` — so a property
 the binary would have to be running to report is unavailable exactly when it is
-needed. The stub holds it as a two-name test on the leading token, `--hook` and
+needed. Each half holds it as the same two-name test on the leading token, `--hook` and
 `--statusline` taking the fail-open `0`, not as a per-arm table. **It is a
 second source and this section says so rather than claiming otherwise**: each
 arm's contract prose states its own unavailable status and nothing holds the two
@@ -11485,7 +11520,15 @@ rewrites `pre-commit` always and `commit-msg` only when a `tier=commit-msg` gate
 is registered (`check-graph` compares the committed hooks against the same
 emission, in process). Adding a gate to either hook is manifest-only — there is
 no second hand-wiring step to drift. The emission is deterministic (no
-timestamps) so the committed hooks are byte-stable. **A `tier=commit-msg` member
+timestamps) so the committed hooks are byte-stable.
+**The hooks are bash and stay one implementation on every platform.** On native
+Windows, git runs them under the shell Git for Windows bundles, whatever `PATH`
+carries, and they call nothing but bash builtins, `git` and the binary. So they
+add nothing to that host's floor beyond git. `install-smoke-powershell` holds
+this by committing with every bash stripped from `PATH` — the system directory's
+WSL launcher, which is no shell, excepted — once through a clean change and once
+through a violation the hook must refuse by gate name. A MinGit host, whose
+distribution may omit bash, is not claimed. **A `tier=commit-msg` member
 therefore ports with no new emitter arm** — both hooks resolve every member's
 invocation through one registry resolution in the emitter — which the generated
 hook's own shell spelling reads against.
@@ -11677,8 +11720,9 @@ without a red.
 
 ### install-hooks
 
-`bash gate-sdk/bin/run-gates.sh --install-hooks` is the one-time per-clone
-opt-in: it sets `core.hooksPath → <hooks-dir>` (and
+`bash gate-sdk/bin/run-gates.sh --install-hooks` — or
+`pwsh -File gate-sdk/bin/run-gates.ps1 --install-hooks` on a host without bash on
+`PATH` — is the one-time per-clone opt-in: it sets `core.hooksPath → <hooks-dir>` (and
 `blame.ignoreRevsFile` when `.git-blame-ignore-revs` exists). The wiring is
 hooks-dir granular, so it enables every generated hook (`pre-commit` and, when
 present, `commit-msg`) with no per-hook step. Refuses to point at a nonexistent

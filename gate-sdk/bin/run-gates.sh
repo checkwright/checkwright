@@ -11,7 +11,8 @@ SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-cd "$(git rev-parse --show-toplevel 2>/dev/null)" || {
+# spec: gate-sdk/SPEC.md §run-gates — the refusal is the stub's own line alone: an empty `cd` prints bash's diagnostic first, which no second holder of this contract could reproduce
+cd "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || {
     echo "run-gates: not inside a git repository" >&2
     exit 2
 }
