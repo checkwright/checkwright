@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-spawn-floor
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -491,6 +491,8 @@
   Filed 2026-09-09 by the consult session beside `windows-roster-join`, on the same ruling;
   re-scoped the same day at scope, its filed premise having been overtaken by a commit that
   preceded the filing.
+  **Directed 2026-09-18 into `native-spawn-floor`** (operator direction, lead-relayed): the
+  published-floor narrowing is an envelope change, so /spec authors it and pairs the entry.
 
 - **instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set** [cost: event/high] [surface: .github] — an
   instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running
@@ -2553,6 +2555,8 @@
   **DISTINCT from `crate-interpreter-resolution-residue`, retired**, whose deliverable is the
   spawn sites themselves; this is the declaration grammar every registry member shares.
   Filed 2026-09-03 by spec; drained here with the disagreement re-read at the source.
+  **Joins `native-spawn-floor` 2026-09-18** (operator direction, lead-relayed): the
+  declaration-grammar contract is §The `# graph:` manifest's, so /spec rules it and pairs this.
 
 - **bin-tool-help-arm-absent-tree-wide** [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
@@ -2686,6 +2690,8 @@
   recorded here because the two entries share the corpus. Both facts re-derive from the grep above
   against `PROBE_SET`, so this entry carries its own witness and needs no pointer to one.
   Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
+  **Directed 2026-09-18 as lead unit of `native-spawn-floor`** (operator direction,
+  lead-relayed); /spec authors the amendment and pairs it.
 
 - **release-note-removal-declaration-uncoupled** [cost: event/high] [surface: gate-sdk] — no oracle couples a removed
   adopter-facing entry point to its release-note declaration, so a note that omits one passes
