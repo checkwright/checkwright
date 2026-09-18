@@ -292,16 +292,28 @@ exactly as `docs/evidence-data.md` is {design-bearing}.
   adds files: stage first, regenerate second.
 
 **The page is committed from the first build, reading `observed: 0`, rather than
-held back until an install exists.** Two grounds: a freshness gate whose target
-does not exist asserts nothing and a projections roster naming a missing file is
-false, so holding the page back costs the enforcement this delta is for; and a
-published zero is a candid statement of the same gap this tree already carries
-unstated elsewhere, in a project whose posture is that claims are proven rather
-than asserted. **Open for the lead to flip before build:** the alternative is to
-land the arms and the gate now and commit the page at the first observation,
-which trades that enforcement for not publishing a zero pre-launch. Flipping it
-changes this bullet and the roster row's timing and nothing else in this
-amendment.
+held back until an install exists** (operator direction, 2026-09-18,
+lead-relayed — a **direction**, revisable at a later scope or spec, and not a
+ruling). Two grounds carried it: a freshness gate whose target does not exist
+asserts nothing and a projections roster naming a missing file is false, so
+holding the page back costs the enforcement this delta is for; and a published
+zero is a candid statement of the same gap this tree already carries unstated
+elsewhere, in a project whose posture is that claims are proven rather than
+asserted.
+
+**The path not taken**, recorded so build reads a settled question rather than an
+open one: land the arms and the gate now and commit the page at the first
+observation, trading that enforcement for not publishing a zero pre-launch. It is
+revisable on the direction's own terms, but it is **not build's to re-open** —
+taking it would change this bullet and the roster row's timing, and nothing else
+in this amendment.
+
+**This paragraph is amendment-scoped and does not merge.** The direction's date
+and channel are provenance: they belong to this file and to the landing commit,
+never to `drift-kit/SPEC.md`, whose consumer-wiring paragraph this delta's
+content otherwise joins. What merges is the wiring above; what dies with this
+file is the stamp (gate-sdk/SPEC.md §The provenance seam, the publisher-provenance
+class).
 
 ### (5) Knob rows
 
