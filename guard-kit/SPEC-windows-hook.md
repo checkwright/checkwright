@@ -85,7 +85,7 @@ engineering grounds undated.
 > binding native-Windows install-smoke leg. Every generic rule's firing and
 > non-firing case then executes on the substrate this section claims.
 
-**Inferred, not run:** on a Windows host with no Git Bash, `checkwright doctor` reports `bash` below contract, because the floor probe skips the system directory's WSL launcher — `checkwright doctor` on a Windows runner with every Git directory stripped from `PATH`.
+**Verified at align, 2026-09-19, at `902e4e1e`:** no Windows host is reachable from this session, so the named run could not be made; the implementing lines are read instead. `bash` is `SYSTEM_DIR_HOMONYMS`'s one `Refuse` member (`native/src/proc.rs`), so `resolve_floor_tool` (`#[cfg(windows)]`, same file) never accepts a `bash` reachable only through the system directory and falls back to the unresolved bare name; `doctor.rs::probe_banner` still finds it "on path" first through the naive, non-skipping `proc::on_path`, so it spawns that unresolved name, which the OS's own search still lands on the system directory's WSL-launcher stub. On a host with no Git Bash that stub produces no bash version banner, so `toolfloor::check` reads `Verdict::Uncomparable`, and `doctor.rs::render_member` counts that toward `failed` exactly as it counts `Absent` — printing "could not be compared against the floor" rather than "NOT FOUND", but reaching the same `DOCTOR: below contract` exit the section claims.
 
 ### (2) The Windows leg runs the decision table {design-bearing}
 

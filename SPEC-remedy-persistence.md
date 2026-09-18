@@ -100,7 +100,7 @@ $env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
 - **No administrator rights.** The user scope needs none. Chocolatey's install
   still does, as it does today.
 
-**Inferred, not run:** Git for Windows' default installer choice puts only its `cmd` directory on `PATH`, so PowerShell resolves none of Git's userland — `$env:PATH -split ';' | Select-String 'Git'` in PowerShell on a stock Windows host after a default Git for Windows install.
+**Verified at align, 2026-09-19, at `902e4e1e`:** no Windows host is reachable from this session, so the named command could not be run; the Git for Windows project's own installer documentation is checked instead. Its silent-install reference lists the `PathOption` values `BashOnly`, `Cmd` and `CmdTools` with default `Cmd` — the option the GUI installer labels "Git from the command line and also from 3rd-party software" — and the project's own history (`git-for-windows/build-extra` PR #102, which made `Cmd` the default) states that option "only adds the `cmd/` directory to the `PATH`"; `usr\bin` and `bin` are added only by `CmdTools`. So the default installer choice puts only `cmd` on `PATH`, confirming the claim.
 
 **Inferred, cannot run before build:** `doctor` exits 0 in a process whose `PATH` is the machine value followed by the user value this block wrote, with nothing else prepended — delta 3's next-shell measurement on `install-smoke-powershell` is the run.
 

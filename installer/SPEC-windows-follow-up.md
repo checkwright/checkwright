@@ -69,7 +69,7 @@ The spelling has four parts, each with its own ground:
   launches, and it changes no machine or user policy.
 - **`-NoProfile`.** An adopter's profile is not part of the command.
 
-**Inferred, not run:** a Windows client's default execution policy (`Restricted`) refuses `powershell -File <script>` without the flag — `powershell -NoProfile -Command Get-ExecutionPolicy` on a stock Windows 10/11 client.
+**Verified at align, 2026-09-19, at `902e4e1e`:** no Windows host is reachable from this session, so the named command could not be run; Microsoft's own reference (`about_Execution_Policies`) is checked instead and states it directly: "If no execution policy is set in any scope, the effective execution policy is **Restricted**, which is the default for Windows clients," and `Restricted` "[p]revents running of all script files." That confirms the parenthetical without a live host, and is the ground the flag rests on.
 
 **Not yet applied.** In installer/SPEC.md §init, after "prints a
 **follow-up block**: the commands that finish the setup, one per line, each
