@@ -12,6 +12,25 @@
 
 ## New Features
 
+- **guard-ruleset-registration-lockstep** [spec: SPEC-guard-registration.md] — guard-kit's
+  generic ruleset exists three times: the numbered roster in §The generic ruleset, the
+  `guard_rule_*` definitions in `lib/guard.sh`, and the dispatch order in `guard_generic_rules`.
+  No gate holds them equal.
+  **Measured at spec, 2026-09-18:** 26 definitions, 26 dispatch calls in the same order, and 27
+  numbered items. Items 1-26 pair with the calls one for one. Item 27, fall-through logging, is
+  the template guard's `guard_log_fallthrough` and not a rule. The SPEC names neither the prefix
+  nor the dispatcher. The only statement of the convention is the `spec:` comment at
+  `lib/guard.sh:337`.
+  **Ruled at spec:** each item names its function. Fall-through logging leaves the numbered list.
+  A repo-local native gate, `check-guard-registration`, holds numbering, tokens, order and the
+  definition set. It is repo-local because its subject exists only where guard-kit is authored,
+  and because three SPEC grounds rest on guard-kit registering no gates. The file-level reach
+  ruling licenses the names.
+  **The fourth correspondence**, each item's `Declares` classes, stays ungated: no rule has a
+  single value for it. It is filed to the gap inbox.
+  Filed 2026-08-13 by close. Joined `reach-ruling-lockstep` 2026-09-18 (operator direction,
+  lead-relayed). Paired at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -1515,36 +1534,6 @@
   underscore-prefixed helper is internal and a finding, and one sentence covers native-crate
   identifiers (a widening the operator accepted). The audit roster's scope line still defers here;
   /spec authors the amendment and pairs this entry.
-
-- **guard-ruleset-registration-lockstep** [cost: event/low] [surface: guard-kit] — guard-kit's generic ruleset exists in
-  three places and nothing holds them in lockstep.
-  The numbered roster in `guard-kit/SPEC.md` §The generic ruleset, the set of named
-  `guard_rule_*` functions in `lib/guard.sh`, and the fixed dispatch order inside
-  `guard_generic_rules` must agree, and no gate asserts it.
-  **Re-verified at the drain:** the SPEC names neither the `guard_rule_` prefix nor the
-  dispatcher — a grep for either over `guard-kit/SPEC.md` returns nothing — so the only statement
-  of the convention is a code comment in `lib/guard.sh` citing a section that does not carry the
-  fact. (The gap bullet cited that comment at line 89; it is now line 262, the file having grown
-  at build — the citation was already stale when filed, which is the class's own failure mode.)
-  `check-lifecycle-registration` and `check-doctrine-registration` are the analogue gates and
-  guard-kit has none.
-  **Declined once, on stated grounds**, inside the guard-context-matching amendment's delta 9: the
-  convention is unwritten, so gating it means authoring it, on a surface the operator ruled out of
-  the 2026-08-13 unit set — and the gate would have been green before and after every delta in
-  that amendment. The amendment is deleted at merge, so the decline survives only here.
-  **A fourth correspondence sits beside the three**, surfaced by the close audit that reviewed
-  this surface: each rule's SPEC subsection states the inert classes it declares
-  (`Declares sq dq hd`), transcribed from the rule's own `guard_skeleton` call site, and nothing
-  holds those in step either. Judged legitimate rather than a restatement defect — the class
-  vocabulary is `guard_skeleton`'s public parameter contract and which classes a rule treats as
-  inert is a behavioral fact about the rule — but it is a fourth un-gated correspondence, and
-  whether a vendored library's exports read as public or internal is the open question
-  `vendored-library-identifier-reach` owns. Size this unit against that ruling, not ahead of it.
-  **Cost while deferred:** a rule added to the roster and not to the dispatcher, or the reverse,
-  ships silently; the three-way correspondence is exactly what a registration gate is for.
-  Filed 2026-08-13 by close, draining the gap inbox; the SPEC re-grepped for both identifiers.
-  **Joins `reach-ruling-lockstep` 2026-09-18** (operator direction, lead-relayed): sized against
-  the lead unit's file-level ruling; a new gate, so /spec authors it and pairs this entry.
 
 - **install-disposition-smoke-accounting-split** [cost: event/low] [surface: gate-sdk] — the precommit gate checks smoke
   registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
