@@ -6,3 +6,4 @@
 
 native-spawn-floor scope ac3ba579 2026-09-18 a11d2530
 native-spawn-floor spec a2fc22a0 2026-09-18 32c4c871
+native-spawn-floor align a7c0994f 2026-09-18 4c2216c4
