@@ -38,7 +38,8 @@
   171 literal spawn sites and about 24 variable ones across `emit/`, `gates/`, `hook/`,
   `installer/` and shared modules. It lands in one commit with the type (deltas 1-3). Build
   after `pid-liveness-spawns-bash`.
-  **Pending:** `curl`'s disposition (delta 5) waits on the lead.
+  **`curl` directed at spec:** it joins `PROBE_SET`, adopter-side (operator direction via the
+  lead), so `doctor` and `init` now refuse a host without it.
   Filed 2026-09-18 by `native-spawn-floor`'s spec, and kept in `native-spawn-residue` against
   scope's filter flag (operator direction, 2026-09-18, lead-relayed).
 

@@ -110,7 +110,7 @@ A new module declared in `main.rs`, holding:
   | `JQ` | `jq` | empty | `PROBE_SET` |
   | `SHELLCHECK` | `shellcheck` | empty | `PROBE_SET` |
   | `PS` (`cfg(not(unix))`) | `ps` | empty | floor, via delta 5 |
-  | `CURL` | `curl` | **pending the lead's confirmation**, delta 5 | — |
+  | `CURL` | `curl` | empty | `PROBE_SET`, via delta 5 |
   | `CARGO` | `cargo` | `contributor` | `PROBE_SET` (`::contributor`) |
   | `RUSTC` | `rustc` | `contributor` | — |
   | `TAR` | `tar` | `contributor` | — (the installer packer) |
@@ -254,15 +254,30 @@ panics:
   off-floor requirement of `check-producer-liveness` on non-unix. That is the
   floor's own reading, and `ek_pid_alive`'s refusal on an absent `ps` stays,
   because floor membership never waived a refusal.
-- **`curl` — pending the lead's confirmation, not yet decided.** It is spawned by
-  the usage poller (`hook/poll.rs:36,109`), an adopter-side hook that refuses by
-  name when it is absent. It is on neither set. The recommended disposition is
-  `PROBE_SET` gains `curl`, unconstrained and adopter-side, on the `jq` and
-  `shellcheck` precedent: kit-scoped programs the doctor already requires of
-  every adopter. The cost is user-facing, which is why it is escalated: the
-  installer's `doctor`, whose exit status is `init`'s last precondition, starts
-  refusing a host with no `curl`. Build does not land this bullet until the
-  lead's answer is recorded here.
+- **`curl` joins `PROBE_SET`, unconstrained and adopter-side.** This follows
+  the `jq` and `shellcheck` precedent: programs only some kits spawn, which
+  `doctor` still requires of every adopter. It was the operator's direction
+  (2026-09-18, lead-relayed via AskUserQuestion; a direction, not a ruling) over
+  the floor default, which is POSIX and coreutils only, and over a new audience
+  value. `curl` is spawned by the usage poller (`hook/poll.rs:36,109`), an
+  adopter-side hook that refuses by name when it is absent. Three things change:
+  - `native/src/toolfloor.rs`'s `PROBE_SET` gains the bare element `curl`, after
+    `jq`.
+  - `docs/install.md` §Requirements' `toolchain` block gains a `curl` bullet,
+    because `check-install-toolchain` holds that block and `PROBE_SET` equal
+    element for element, in both directions. The bullet says the usage poller
+    fetches its source with it, and that `init` refuses a machine without it,
+    as the `shellcheck` bullet says.
+  - The fixtures change only if they read the live roster. Its fixture pair
+    passes its own `probe.sh` through `args`, so it does not.
+
+  **The adopter-facing consequence is deliberate:** the installer's `doctor`,
+  whose exit status is `init`'s last precondition, now refuses a host with no
+  `curl` on `PATH`. So `init` refuses rather than half-installs, exactly as for a
+  missing `jq` or `shellcheck` (installer/SPEC.md §doctor). The consumer smoke,
+  install-smoke and doctor-running CI legs run on hosted runners that ship `curl`
+  on Linux, macOS and Windows. The first pushed run after this lands confirms
+  this rather than assuming it.
 - `rustc`, `tar`, `npm` and `uname` take the `contributor` audience on the roster
   (delta 1) and change no other surface.
 
@@ -329,9 +344,9 @@ the docs knob table print their own commands on red.
   > either. Every element of this roster is a program-roster member, so the walk
   > never probes a program the binary cannot name.
 
-  If the lead confirms delta 5's `curl` bullet, `curl` joins the list of members
-  in the constrained-member paragraph that follows only if it gains a floor. It
-  does not: it is unconstrained, so no paragraph changes beyond its roster line.
+  `curl` (delta 5) is unconstrained, so the constrained-member list after that
+  paragraph does not change. Its `PROBE_SET` line and its `docs/install.md`
+  bullet are the whole of its record.
 
 ### (7) Regenerate the projections the SPEC edits stale {mechanical}
 
@@ -370,8 +385,13 @@ freshness gates).
   `proc.rs`) are comments. Delta 2's `which` exclusion
   narrows nothing, because `which` was never a spawn face.
 - **Point 6.** Delta 1's table names each roster member's audience and set.
-  Delta 3's table names each variable site's value. `curl`'s value is the one
-  pending, and it is escalated, not left open.
+  Delta 3's table names each variable site's value. `curl`'s value is decided in
+  delta 5.
+- **`curl` on `PROBE_SET`** (delta 5). Its readers:
+  - `doctor`, which now refuses a host without it;
+  - the env-probe arm, which reports it;
+  - `check-install-toolchain`, which needs the matching `docs/install.md` bullet;
+  - assertions A and C, which it satisfies.
 
 ## Existing sections updated
 
@@ -385,6 +405,9 @@ freshness gates).
 - `native/src/gates/crate_arms.rs` — `CARGO`/`RUSTC` consts deleted (delta 3).
 - `native/src/` — every other module in delta 3's census (delta 3).
 - `native/src/knobs/gate_sdk.rs` (delta 5).
+- `native/src/toolfloor.rs` — `PROBE_SET` gains `curl` (delta 5).
+- `docs/install.md` — §Requirements' `toolchain` block gains the `curl` bullet
+  (delta 5).
 - `docs/gate-sdk/SPEC.md` and `docs/context-kit/SPEC.md` (delta 7).
 
 ## Retired spellings
@@ -412,8 +435,8 @@ freshness gates).
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
-- [ ] **`curl` disposed** — delta 5's pending bullet carries the lead's recorded
-      answer before build lands it.
+- [x] **`curl` disposed** — recorded in delta 5 at spec: `PROBE_SET`, adopter-side,
+      on the operator's direction relayed by the lead on 2026-09-18.
 - [ ] **The type, the faces and the sweep land in one commit** — deltas 1-3,
       with `bash gate-sdk/bin/build-native.sh` and the battery green at it; the
       tests land with delta 4 (the Enforcement-first rule).
