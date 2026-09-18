@@ -7,3 +7,4 @@
 declined-target-audit scope a1041d66 2026-09-18 8eb2104a
 declined-target-audit spec aeb58715 2026-09-18 3813a52f
 declined-target-audit align a747ae85 2026-09-18 f5caca63
+declined-target-audit build a5788fb9 2026-09-18 46d37846
