@@ -48,3 +48,8 @@ echo -e
 (^|[^[:alnum:]_.-])seq[[:space:]]
 (^|[^[:alnum:]_.-])nproc([^[:alnum:]_.-]|$)
 (^|[^[:alnum:]_.-])tac([^[:alnum:]_.-]|$)
+
+# cd to a command substitution that prints nothing outside its context: bash before
+# 5.3 takes cd "" as a silent success, so the || refusal after it never fires.
+# Give the substitution a || fallback that is never a directory: || echo /dev/null.
+cd "?\$\(git [^|)]*\)

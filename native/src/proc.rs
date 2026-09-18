@@ -1070,7 +1070,7 @@ pub fn dispatch(
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
-    use crate::programs::{name_of, BASH, GIT, SORT};
+    use crate::programs::{name_of, BASH, GIT};
     use crate::walk;
     use std::path::Path;
 
@@ -1396,7 +1396,7 @@ pub(crate) mod tests {
     #[cfg(not(windows))]
     #[test]
     fn a_posix_floor_tool_is_spawned_under_its_bare_name() {
-        assert_eq!(resolve_floor_tool(&SORT).invocation(), "sort");
+        assert_eq!(resolve_floor_tool(&crate::programs::SORT).invocation(), "sort");
     }
 
     // spec: gate-sdk/SPEC.md §check-graph — the half no resolver case reaches: that a BARE-NAME

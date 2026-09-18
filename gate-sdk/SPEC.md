@@ -10157,7 +10157,10 @@ member, can read it unambiguously. So the front-end resolves it and spells it
 **The front-end requires a checkout and the arm does not, which decides who may
 call what.** Resolving the repo root is the front-end's first act and it refuses
 with exit 2 outside one — its own `run-gates: not inside a git repository` line
-and no shell diagnostic before it, a line the twin can reproduce — so an arm whose work happens *outside* a
+and no shell diagnostic before it, a line the twin can reproduce; a failed
+lookup hands `cd` a path that is never a directory rather than an empty string,
+because bash before 5.3 takes `cd ""` as a silent success and would run on into
+the binary's refusal instead — so an arm whose work happens *outside* a
 checkout — a hermetic `mktemp` sandbox — is unreachable through
 `bin/run-gates.sh` however correct its argv, and the refusal reads as a broken
 invocation rather than as a boundary. Such a caller reaches the binary through
