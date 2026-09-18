@@ -305,6 +305,7 @@ _guard_allow_inners() {
     [[ -f "$GUARD_KIT_SETTINGS" ]] || return 0
     local e inner
     while IFS= read -r e; do
+        e="${e%$'\r'}"
         case "$e" in
             Bash\(*\)) inner="${e#Bash(}"; inner="${inner%)}" ;;
             *) continue ;;

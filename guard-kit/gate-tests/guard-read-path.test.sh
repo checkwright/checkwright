@@ -44,9 +44,17 @@ eq "garbage-output" "$got" ""
 got="$(guard_read_path <<<'{"tool_input":{"file_path":""}}')"; rc=$?
 eq "empty-status" "$rc" "1"
 
+# _guard_allow_inners reads jq through `read`, which keeps the CR a native Windows jq's text-mode
+# stdout ends each line with; an entry ending in a JSON "\r" makes any jq emit that byte stream
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+printf '{"permissions":{"allow":["Bash(git status)\\r","Bash(ls)","Read"]}}\n' >"$tmp/settings.json"
+got="$(GUARD_KIT_SETTINGS="$tmp/settings.json" _guard_allow_inners)"
+eq "allow-inners-crlf" "$got" "$(printf 'git status\nls')"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "guard-read-path.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-read-path.test: ok ($checks assertions; path extraction plus the absent/unparseable/empty fall-through contract)"
+echo "guard-read-path.test: ok ($checks assertions; path extraction plus the absent/unparseable/empty fall-through contract, and the allow read's CRLF line ending)"
 exit 0
