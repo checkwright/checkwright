@@ -130,8 +130,8 @@ record, replacement text below.
 A capture affordance on the `kfric` precedent, so an observation is recorded in
 the moment rather than reconstructed afterwards {design-bearing}. New arm
 `--emit file-install`, specified in §The install-observation record's interface
-paragraph, replacement text below; and one new row in `bin/run-gates.sh`'s help
-and in drift-kit/README.md §Use.
+paragraph, replacement text below; and one new row in drift-kit/README.md
+§Use.
 
 **Not yet applied** — proposal text for build to land.
 
@@ -317,8 +317,9 @@ class).
 
 ### (5) Knob rows
 
-Three rows in `drift-kit/SPEC.md` §Layout and configuration's static table, in
-the kit's established derived-default spelling {mechanical}.
+One new row and one existing row's prose, in `drift-kit/SPEC.md` §Layout and
+configuration's static table, in the kit's established derived-default
+spelling {mechanical}.
 
 **Not yet applied** — proposal text for build to land.
 
@@ -352,19 +353,26 @@ and no new ignore is minted — verified with `git check-ignore -v .metric/`.
 **The `file-install` arm** (new interface, delta 2).
 *Producer:* a human observer; invoked through `bash gate-sdk/bin/run-gates.sh`.
 *Consumer:* the record file.
-*Roster-holding readers of the arm-name surface:* gate-sdk/SPEC.md §The non-gate
-arm, `bin/run-gates.sh`'s own help text, the crate's single emit dispatch table
-in `native/src/emit/mod.rs`, and drift-kit/README.md §Use. Each is an update
-target below. The declared knob roster is one row, the shape
-§The knowledge-friction loop fixes for a capture arm. The arm is absent from
-`--list` by construction, so the gate-roster parity assertion does not reach it.
+*Roster-holding readers of the arm-name surface:* gate-sdk/SPEC.md §The
+non-gate arm, the crate's single emit dispatch table in
+`native/src/emit/mod.rs`, and drift-kit/README.md §Use — not
+`bin/run-gates.sh`'s own help text, checked against the tree rather than
+assumed: no existing `--emit` arm (kfric included) carries a per-arm line
+there, because that text is the thin exec wrapper's, and the mistyped-`--emit`
+roster it prints on a bad name is derived from the dispatch table with no
+second edit (gate-sdk/SPEC.md §The non-gate arm), so `native/src/emit/mod.rs`'s
+row is the only edit this surface needs. Each of the three is an update target
+below. The declared knob roster is one row, the shape §The knowledge-friction
+loop fixes for a capture arm. The arm is absent from `--list` by construction,
+so the gate-roster parity assertion
+does not reach it.
 
 **The `install-evidence` arm** (new interface, delta 3).
 *Producer:* any caller; and this repo's regeneration step before committing the
 page.
 *Consumer:* `docs/install-evidence.md`, and `check-install-evidence-fresh`
 byte-comparing against it.
-*Roster-holding readers:* the same four arm-name rosters as delta 2, plus
+*Roster-holding readers:* the same three arm-name rosters as delta 2, plus
 `docs/site-architecture.md` §Generated projections and their freshness gates,
 which reds a generated projection missing from it.
 
@@ -436,7 +444,6 @@ observation mechanism.
   the surface a mistyped arm is sent to, which is what makes it governed rather
   than documentation, so an arm absent from it makes that refusal's own citation
   false (deltas 2 and 3).
-- `gate-sdk/bin/run-gates.sh` — the help text's arm listing (deltas 2 and 3).
 - `native/src/emit/mod.rs` — the crate's single `--emit-<name>` dispatch table:
   one row per new arm (deltas 2 and 3).
 - `scripts/gates.list` — registration of `check-install-evidence-fresh`
