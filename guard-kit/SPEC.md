@@ -628,9 +628,13 @@ consumer copies.
 ## The generic ruleset
 
 Rules that encode **harness behavior, shell-substrate behavior, or behavior over
-an artifact whose grammar a kit owns**, never any project's toolchain — shipped
-as `lib/guard.sh` functions the template guard invokes. Order is load-bearing
-where noted.
+an artifact whose grammar a kit owns**, never any project's toolchain. Each rule
+is one `lib/guard.sh` function named `guard_rule_<name>`. Its roster item below
+names that function, and the template guard runs the ruleset through
+`guard_generic_rules`, one call per item in roster order. Order is load-bearing
+where noted. An item's number, its function and its dispatch position therefore
+say one thing three times, and `check-guard-registration` (§Testing) holds
+them equal.
 
 **The clause has taken two widenings, and each is recorded with the rule that
 forced it, because a rule slipped in unremarked is what would rot it.**
@@ -662,11 +666,18 @@ literal does cost is portability: a second harness with different form names is
 what would force these into a configurable slot, and building that slot before
 that harness exists would be designing against no case.
 
-1. **`cd` in a compound command** — blocked: cwd drift, plus a compound the
+**The item grammar the gate reads.** Each top-level numbered item carries exactly
+one backticked `guard_rule_<name>` token, placed right after its bold title. An
+item never names another rule's function: a cross-reference between rules stays
+by number ("rule 14's walk").
+
+1. **`cd` in a compound command** (`guard_rule_cd_compound`) — blocked: cwd
+   drift, plus a compound the
    allowlist cannot match, so the call is decided out of band. Corrective form:
    absolute paths, or `git -C <dir>` for git.
 2. **A prefix spelling that falls off the match path, steered to the spelling
-   that stays on it** — three arms, each blocked with the spelling the matcher
+   that stays on it** (`guard_rule_git_c_root`) — three arms, each blocked with
+   the spelling the matcher
    resolves. Declares `sq dq hd`, so a quoted mention is not the command.
    - **(a) `git -C <repo-root>` when cwd is the root**: the absolute `-C` target
      matches no allowlist entry and falls off the match path, while the bare
@@ -694,12 +705,14 @@ that harness exists would be designing against no case.
    fire on commands decided out of band anyway, so blocking converts that
    decision into a durable steer at no extra cost, and a grant of (b) would bless
    the program reach above.
-3. **Bare-name scratch redirect** — a `>`/`>>` to a slash-free
+3. **Bare-name scratch redirect** (`guard_rule_scratch_redirect`) — a `>`/`>>`
+   to a slash-free
    `*.err`/`*.out`/`*.log` target is blocked (it lands in the tracked tree
    and risks a `git add -A`); the no-slash class lets path-bearing targets,
    `/dev/null`, and fd-dups through. The corrective message points at the
    consumer's gitignored scratch dirs (`GUARD_KIT_SCRATCH_DIRS`).
-4. **Absolute-path execution of a known read-only repo script** — silently
+4. **Absolute-path execution of a known read-only repo script**
+   (`guard_rule_abs_script`) — silently
    rewritten to the repo-relative form via `guard_rewrite` (the relative
    spelling is what allowlist globs match). The roster is the
    `GUARD_KIT_RO_SCRIPTS` globs (default `check-*.sh`). Any other
@@ -719,10 +732,12 @@ that harness exists would be designing against no case.
    now blocks rather than being granted ahead of rule 23. The shared test is
    `_guard_rewrite_granted`, which rule 7 calls too. **Placed before**
    rule 5, which would otherwise steer the same command less precisely.
-5. **Repo-root absolute prefix (non-script)** — any other command carrying
+5. **Repo-root absolute prefix (non-script)** (`guard_rule_abs_prefix`) — any
+   other command carrying
    the literal repo-root prefix is steered to the repo-relative spelling.
    `git` is excluded — rule 2 already owns its `-C` handling.
-6. **Shell expansion / assignment** — a residual `${…}`/`$(…)`/`<(…)`/
+6. **Shell expansion / assignment** (`guard_rule_expansion`) — a residual
+   `${…}`/`$(…)`/`<(…)`/
    `$NAME` in the skeleton is blocked (the harness's matcher refuses every
    expansion before allowlist matching). **Declares `sq hdq`** for the expansion
    check and **`sq dq hdq`** for the assignment check, and every part of that is
@@ -737,7 +752,8 @@ that harness exists would be designing against no case.
    check adds `dq` because a `NAME="value"` assigns whatever the quotes hold. A
    standalone `NAME=value` assignment is
    caught separately, since the expansion check only sees a *used* `$VAR`.
-7. **Unquoted brace glyph** — the harness's matcher refuses the bare `{` glyph
+7. **Unquoted brace glyph** (`guard_rule_brace_glyph`) — the harness's matcher
+   refuses the bare `{` glyph
    before allowlist matching, the same behavior class rule 6 pre-empts for
    `$`-expansions, so a `{` surviving in the skeleton is handled by shape.
    **Declares `sq dq hd`, and the difference from rule 6 is the point rather
@@ -780,7 +796,8 @@ that harness exists would be designing against no case.
    can suppress, block-and-steer strictly dominates; a brace in any inert region
    passes untouched. **Placed before both auto-allow rules**
    so their literal-target premise holds for braces as well.
-8. **`sed` or `awk` reading a file, or `sed`, `perl` or an inline `python` body rewriting one** — blocked with the
+8. **`sed` or `awk` reading a file, or `sed`, `perl` or an inline `python` body
+   rewriting one** (`guard_rule_sed_file`) — blocked with the
    steer to a better tool: `sed -i` or `perl -i` (any short bundle carrying
    `i`, on any file operand) to the `--rewrite` arm (§rewrite), with the Edit
    tool named for an edit a fixed replacement cannot express, and a `sed`
@@ -884,7 +901,8 @@ that harness exists would be designing against no case.
    in-place rewrite. `awk` has no honest place on that roster, since a program
    can print to a file or call `system()`, and the placement guards a consumer
    who adds it anyway.
-9. **Listing-only `find`** — a bare `find` that only lists is blocked with
+9. **Listing-only `find`** (`guard_rule_find_glob`) — a bare `find` that only
+   lists is blocked with
    the steer to the harness's Glob tool (the same shape as rule 8's `sed`
    read-steer: a better tool exists, and Glob returns paths registered for a
    later Read). Fires on the conjunction no allowlist glob can express: every
@@ -912,7 +930,8 @@ that harness exists would be designing against no case.
    otherwise have displaced. The firing corrective adds the bare
    fallback beside the tool — keep `find` and pipe the listing into a read-only
    consumer, which rule 18 grants.
-10. **Bare single-file `cat`** — a `cat` read is blocked with the steer to the
+10. **Bare single-file `cat`** (`guard_rule_cat_file`) — a `cat` read is blocked
+    with the steer to the
     harness's Read tool (rule 8's read-steer shape: Read returns numbered lines
     registered for a later Edit). Fires on the conjunction no allowlist glob
     expresses: every segment leads with `cat` and carries **exactly one**
@@ -931,7 +950,8 @@ that harness exists would be designing against no case.
     reasoning as rule 8): a bare `cat <file>` meets the steer rather than a
     silent read-only-pipeline grant, since `cat` is in the default
     `GUARD_KIT_RO_BINS` roster.
-11. **Working-tree `git grep`** — a `git grep` that searches the working tree
+11. **Working-tree `git grep`** (`guard_rule_git_grep`) — a `git grep` that
+    searches the working tree
     is blocked with the steer to the harness's Grep tool (rule 8's read-steer
     shape: Grep returns matching lines with files registered for a later Read).
     Fires on the discriminator no allowlist glob expresses: the command leads
@@ -950,7 +970,8 @@ that harness exists would be designing against no case.
     9's reasoning, and is inert otherwise. The firing corrective adds the bare
     fallback beside the tool: `grep -rn <pattern> <path>` searches the same
     working tree.
-12. **Self-matching process-liveness predicate** — a `pgrep`/`pkill -f` whose
+12. **Self-matching process-liveness predicate** (`guard_rule_pgrep_self_match`)
+    — a `pgrep`/`pkill -f` whose
     pattern literal the command's own text repeats is **blocked**. `-f` matches
     against full argv, and the waiter's own argv — the harness's wrapper included
     — carries that literal, so `until ! pgrep -f '<script>'; do …; done` has a
@@ -987,7 +1008,8 @@ that harness exists would be designing against no case.
     reasoning: `pgrep` is a plausible member of a widened `GUARD_KIT_RO_BINS` — it
     is, after all, a read-only query — and a consumer who added it would otherwise
     have rule 18 silently bless a waiter that can never exit.
-13. **Bare foreground `sleep`** — a `sleep` standing in for a wait is
+13. **Bare foreground `sleep`** (`guard_rule_bare_sleep`) — a `sleep` standing
+    in for a wait is
     **blocked**, and the discriminator is the whole rule: a blanket `sleep` block
     is wrong and is refused. The sanctioned wait *is* a condition loop, and such
     a loop is expressly legitimate **in either spelling** —
@@ -1037,7 +1059,8 @@ that harness exists would be designing against no case.
     auto-allow rules,** for the same reason: `sleep` is not on the default
     read-only roster, but the placement argument is about what a consumer may add
     and the whole family of steer rules already sits there.
-14. **Tracked-tree mutation under a live producer** — a `git` command that
+14. **Tracked-tree mutation under a live producer**
+    (`guard_rule_git_mutation_under_producer`) — a `git` command that
     writes the index, the worktree or a ref is **blocked** while a `*.run`
     record under a `GUARD_KIT_SCRATCH_DIRS` member names a live PID. The record
     is the launch-time liveness record a session writes when it backgrounds a
@@ -1121,7 +1144,8 @@ that harness exists would be designing against no case.
     the record this rule reads is owed at every explicit launch. What stays
     invisible is a command the harness moves to the background on its timeout,
     which is rule 15's stated residue.
-15. **Backgrounded launch that records no producer** — a backgrounding Bash call
+15. **Backgrounded launch that records no producer**
+    (`guard_rule_background_no_record`) — a backgrounding Bash call
     that neither writes a liveness record nor meets an exemption below is
     **blocked**. The message names the record, its grammar, its home, and the two
     things it buys — rule 14's reach, and the next arrival's ability to tell
@@ -1227,7 +1251,8 @@ that harness exists would be designing against no case.
     exactly the consumer vocabulary the provenance seam keeps out of a kit, so the
     rule recognizes shapes and blocks, and a consumer wanting a narrower
     population narrows the two knobs that already exist.
-16. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
+16. **Auto-allow `: > file` truncation** (`guard_rule_truncate_scratch`) — a
+    leading `:` plus redirect
     defeats the permission matcher, so it is always decided out of band. Granted
     silently when the command is *only* `:` followed by redirects and every target is
     gitignored (`git check-ignore`): truncating scratch is safe; a tracked
@@ -1239,8 +1264,8 @@ that harness exists would be designing against no case.
     truncating a gitignored target is granted here and appending to one is
     granted there, creating one is the composition of the two and not a third
     decision. A reader narrowing *this* rule narrows that one with it.
-17. **Auto-allow a write to a gitignored target** — the mandated
-    resume-journal append that
+17. **Auto-allow a write to a gitignored target** (`guard_rule_append_scratch`)
+    — the mandated resume-journal append that
     delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps
     obliges is a redirect, and the harness checks a redirect
     **target** as a file write, so no `Bash(…)` allow entry can grant it: such a
@@ -1354,7 +1379,8 @@ that harness exists would be designing against no case.
     have covered. Every measured call is also a **compound**, which is what rule
     19's clause (d) exists for. The waiter/producer partition this rule's own
     clause (0) draws is the one rule 19 draws beside it.
-18. **Auto-allow read-only pipeline** — granted silently when every pipe
+18. **Auto-allow read-only pipeline** (`guard_rule_ro_pipeline`) — granted
+    silently when every pipe
     segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
     grep/head/cat/find/jq family) invoked in none of its declared write and
     execute forms, and every redirect target is `/dev/null` or an fd-dup.
@@ -1454,7 +1480,8 @@ that harness exists would be designing against no case.
       exactly as it behaves without it. A grant that depends on a settings read
       must never turn a missing settings file into a grant, and declining is the
       only direction that cannot.
-19. **Auto-allow a sanctioned wait** — two arms, each granted silently when
+19. **Auto-allow a sanctioned wait** (`guard_rule_bounded_wait`) — two arms,
+    each granted silently when
     **every** one of its clauses holds, the call falling through untouched
     otherwise. Every clause is a safety argument, because
     `permissionDecision: allow` blesses the *whole call* — so the rule bounds the
@@ -1611,7 +1638,8 @@ that harness exists would be designing against no case.
     it regardless. Placement at the tail of the band rather than at its
     head is also the cheap choice: it renumbers the rules below it rather than
     every rule in the band and every rule after it.
-20. **Decorated allowlisted command** — the leading command exactly matches a
+20. **Decorated allowlisted command** (`guard_rule_allowlist_chain`) — the
+    leading command exactly matches a
     committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
     the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
     `2>&1` — which leaves a segment nothing grants, so the whole call falls off
@@ -1644,7 +1672,8 @@ that harness exists would be designing against no case.
     ahead of this rule, so a granted pipeline never arrives and nothing
     ungranted becomes granted that either half would not have granted alone.
     Declares `sq dq hd`.
-21. **Git history-rewrite advisory** — a `git commit` carrying `--amend`, `-F`,
+21. **Git history-rewrite advisory** (`guard_rule_git_rewrite`) — a `git commit`
+    carrying `--amend`, `-F`,
     or `--file`, or a `git reset --soft`, gets a `guard_advise` steer carrying
     the checklist from DOCTRINE.md's *Re-verify volatile state before a git
     history rewrite* rule (verify HEAD before amend/squash; re-stage and verify
@@ -1663,7 +1692,8 @@ that harness exists would be designing against no case.
     so it fires only on a bare rewrite command none of those claimed; a
     decorated form meets rule 20's block first and the advisory fires on the
     re-issued bare command.
-22. **Bare `rm` of a tracked path** — an `rm` statement naming a git-tracked
+22. **Bare `rm` of a tracked path** (`guard_rule_rm_tracked`) — an `rm`
+    statement naming a git-tracked
     file (`git ls-files --error-unmatch`) is **blocked** with the steer to
     `git rm -q <path>`, which deletes and stages that one deletion in a single
     motion. The deletion is the point: a bare `rm` leaves it unstaged, so it
@@ -1697,7 +1727,8 @@ that harness exists would be designing against no case.
     form that destroys uncommitted work. The arm fires whether or not a grant
     matches, on rule 20's reasoning: ungranted, the call is decided out of band
     anyway, and granted by a committed `git rm` glob it is silent data loss.
-23. **Script execution off a body the command string does not carry** — a
+23. **Script execution off a body the command string does not carry**
+    (`guard_rule_script_interpreter`) — a
     command that invokes a script interpreter on a program body it takes from
     **outside** the command string is **blocked** when that body's source is a
     path under a `GUARD_KIT_SCRATCH_DIRS` member. Two arms, one predicate:
@@ -1776,7 +1807,8 @@ that harness exists would be designing against no case.
     the population whose body source is worth resolving. Rule 24 grants nothing
     either, so the order of the two decides only which block a command meeting
     both receives.
-24. **A committed grant matched only by reaching past its path slot** — a
+24. **A committed grant matched only by reaching past its path slot**
+    (`guard_rule_grant_path_slot`) — a
     segment a committed `Bash(…)` allow pattern matches is **blocked** when that
     pattern's **path slot** absorbs text reaching outside the path the pattern
     names. A `*` in a committed pattern is a path slot when the
@@ -1847,7 +1879,8 @@ that harness exists would be designing against no case.
     a reach the matcher would grant. And a command the rule declines — a
     heredoc-bearing one among them — is left to the harness's own decision,
     grant included.
-25. **An emitter write the harness cannot grant** — blocked, with a steer per arm.
+25. **An emitter write the harness cannot grant** (`guard_rule_emitter_write`) —
+    blocked, with a steer per arm.
     Every arm reads a statement whose leading command is a `GUARD_KIT_APPEND_BINS`
     member writing through `>>` or `>`, the shape rule 17 grants, and declare rule
     17's classes. A statement is what `;`, `&&`, `||` and a newline separate,
@@ -1889,7 +1922,8 @@ that harness exists would be designing against no case.
     and no steer names a capture arm or its surface: that would put another
     kit's surfaces inside guard-kit, a destination roster a consumer would then keep
     in step, where the generic steer lets the agent's own instructions name the arm.
-26. **A `bash -c` or `sh -c` wrapper** — blocked, with the steer to run the payload
+26. **A `bash -c` or `sh -c` wrapper** (`guard_rule_shell_wrapper`) — blocked,
+    with the steer to run the payload
     as the command itself, or, for a body that needs a shell of its own, to write it
     to a scratch script and run it through the `--scratch-run` arm. Fires when a
     segment's first word is `bash` or `sh` and its next word is `-c`. The wrapper
@@ -1908,8 +1942,11 @@ that harness exists would be designing against no case.
     and teach nothing durable. Both sit at the tail, after rule 24, because neither
     grants anything and a command reaching them has been declined by every grant
     above.
-27. **Fall-through logging** — anything neither blocked nor auto-allowed is
-    appended to the friction log. Always last; never affects the decision.
+
+**Fall-through logging closes every call and is no rule:** after
+`guard_generic_rules` returns, the template guard's `guard_log_fallthrough`
+appends anything neither blocked nor auto-allowed to the friction log. It runs
+last and never affects the decision.
 
 **Nothing above claims the sleep half was already enforced.** Before rule 13, no
 rule in this ruleset enforced the never-poll rule's `sleep` half and rule 13 is
@@ -2484,7 +2521,8 @@ it needs to know the bite was measured rather than assumed.
 **This instrument cannot size the population its neighbouring rules already
 admit, and that is a property of the grant boundary rather than a gap in the
 sweep.** `guard_log_fallthrough` runs only after every rule has declined
-(rule 27), so a granted call is never a log line. Two consequences a reader of
+(§The generic ruleset, fall-through logging), so a granted call is never a log
+line. Two consequences a reader of
 this ranking has to carry. First, a question of the form *how often does the
 shape rule 17 grants actually occur* has **no answer in this log** — a zero here
 is zero by design, not zero by finding, and any sizing of that population needs a
@@ -3408,6 +3446,56 @@ sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`
 alone would leave this kit undiscovered — its `smoke/install.sh` would never
 run under `--run-consumer-smoke`, and its `lib/` and `bin/` would escape
 `check-shellcheck`'s self-lint sweep.
+
+### check-guard-registration
+
+Invariant: §The generic ruleset's top-level numbered items, the `guard_rule_*`
+functions `lib/guard.sh` defines and the calls `guard_generic_rules` makes are
+one roster. It holds four assertions, each a finding at exit 1:
+
+- **A**, the items are numbered from 1 with no gap or repeat, because prose
+  cites rules by number;
+- **B**, every item carries exactly one distinct `guard_rule_<name>` token;
+- **C**, the items' tokens in roster order equal the dispatcher's calls in
+  order, and a finding prints the diff (`<` roster, `>` dispatch);
+- **D**, the set of defined `guard_rule_*` functions equals the set dispatched,
+  and each side's extra member is named.
+
+The section is its own body, from its heading to the next heading of any level.
+An item runs from its numbered lead line through every following blank or
+indented line, and ends at the first unindented non-blank line. A token is
+`guard_rule_` followed by at least one name character, so the prose glob
+`guard_rule_*` is none. A definition is a column-0 `guard_rule_<name>() {` line.
+A dispatcher line is a call `guard_rule_<name> "$cmd"`, the `local cmd="$1"`
+binding, or blank, and the body ends at a column-0 `}`. **Resolution fails
+closed, at exit 2:** an unreadable SPEC or library, an absent section, a section
+with no numbered item, an absent or unterminated `guard_generic_rules`, or a
+dispatcher line of any other shape. The gate refuses to guess at a body it cannot
+read, because a guessed body passes a skipped rule. The clean line is
+`GUARD-REGISTRATION: clean (<n> rule(s): roster, definitions and dispatch order in
+lockstep)`.
+
+The gate takes no knob: a vendored guard-kit is never edited, so no deployed
+configuration would set one. It finds guard-kit the way `--run-guard-tests`
+does, as the kit root whose basename is `guard-kit` among the derived kit roots,
+so a relocated `GATE_SDK_KIT_DIRS` moves it too. The positional form
+`check-guard-registration [spec-file [lib-file]]` points it at a synthetic pair.
+
+The gate is registered from this repo's gates dir rather than shipped in a kit
+`checks/`, because its subject exists only where guard-kit is authored: a
+consumer rule lives in the consumer's copied `bash-guard.sh`, never under
+`guard_generic_rules`, so no consumer tree holds an instance to red on.
+guard-kit still registers no gates. Its fixture pair holds one roster in
+lockstep and one tree firing all four assertions; the exit-2 cases a one-pair
+harness cannot hold (section absent, dispatcher absent, dispatcher unterminated,
+a foreign dispatcher line) are the sibling `check-guard-registration.test.sh`.
+
+**Out of its reach, by construction: the inert classes a rule declares.** An
+item's `Declares sq dq hd` is transcribed from the rule's `guard_skeleton`
+call. It is not one value per rule: rule 6 builds two skeletons with different
+class sets, rule 18 four, and some rules skeletonize inside a helper. Only
+some items carry a declaration at all. An equality check would have no single
+satisfying value per member.
 
 ## Out of scope
 

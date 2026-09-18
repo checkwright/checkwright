@@ -1,0 +1,5 @@
+# All four assertions fire in one tree: a numbering gap (A), an item naming no
+# function (B), two dispatch calls swapped against the roster (C), and a function
+# defined but never dispatched (D).
+SPEC.md
+guard.sh

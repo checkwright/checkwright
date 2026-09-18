@@ -26,6 +26,7 @@ check-docs-kit-parity
 check-docs-nav-reachable
 check-doctrine-registration
 check-lifecycle-registration
+check-guard-registration
 check-kit-ref-liveness
 check-trajectory-fresh
 check-install-evidence-fresh

@@ -1,0 +1,5 @@
+# Lockstep case: three items, each naming its own function once (a repeat of the
+# same token inside the item is still one), defined and dispatched in roster order.
+# A numbered list under a later heading is outside the section and is not read.
+SPEC.md
+guard.sh

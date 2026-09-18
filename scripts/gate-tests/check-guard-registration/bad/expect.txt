@@ -1,0 +1,4 @@
+roster item numbered 4 where 3 is next
+roster item 5 names no guard_rule_* function where exactly one is owed
+the roster's tokens in order differ from guard_generic_rules' calls in order
+guard_rule_delta is defined but never dispatched

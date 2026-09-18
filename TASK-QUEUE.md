@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **guard-ruleset-registration-lockstep** [spec: SPEC-guard-registration.md] — guard-kit's
-  generic ruleset exists three times: the numbered roster in §The generic ruleset, the
-  `guard_rule_*` definitions in `lib/guard.sh`, and the dispatch order in `guard_generic_rules`.
-  No gate holds them equal.
-  **Measured at spec, 2026-09-18:** 26 definitions, 26 dispatch calls in the same order, and 27
-  numbered items. Items 1-26 pair with the calls one for one. Item 27, fall-through logging, is
-  the template guard's `guard_log_fallthrough` and not a rule. The SPEC names neither the prefix
-  nor the dispatcher. The only statement of the convention is the `spec:` comment at
-  `lib/guard.sh:337`.
-  **Ruled at spec:** each item names its function. Fall-through logging leaves the numbered list.
-  A repo-local native gate, `check-guard-registration`, holds numbering, tokens, order and the
-  definition set. It is repo-local because its subject exists only where guard-kit is authored,
-  and because three SPEC grounds rest on guard-kit registering no gates. The file-level reach
-  ruling licenses the names.
-  **The fourth correspondence**, each item's `Declares` classes, stays ungated: no rule has a
-  single value for it. It is filed to the gap inbox.
-  Filed 2026-08-13 by close. Joined `reach-ruling-lockstep` 2026-09-18 (operator direction,
-  lead-relayed). Paired at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -3453,5 +3434,6 @@
 ## Done
 
 - vendored-library-identifier-reach
+- guard-ruleset-registration-lockstep
 
 ## Lessons Learned

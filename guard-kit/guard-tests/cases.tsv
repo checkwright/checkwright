@@ -480,5 +480,5 @@ fallthrough	xargs bash -c 'x'
 fallthrough	timeout 5 bash -c 'x'
 fallthrough	bash gate-sdk/bin/run-gates.sh --scratch-run .tmp/x.sh
 
-# rule 27 — anything else falls through to the friction log
+# fall-through logging — anything else falls through to the friction log
 fallthrough	make build

@@ -140,6 +140,10 @@ if staged_matches 'CLAUDE.md' 'native/src/knobs/lifecycle_kit.rs' 'scripts/gate-
     run_gate check-lifecycle-registration native/target/release/checkwright-gates check-lifecycle-registration
 fi
 
+if staged_matches 'guard-kit/SPEC.md' 'guard-kit/lib/guard.sh' 'native/src/gates/guard_registration.rs' 'scripts/gate-sdk-config.knobs'; then
+    run_gate check-guard-registration native/target/release/checkwright-gates check-guard-registration
+fi
+
 run_gate check-kit-ref-liveness native/target/release/checkwright-gates check-kit-ref-liveness
 
 if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workflow/validate-evidence.txt' 'scripts/gates.list' 'TASK-QUEUE.md' 'native/src/gates/trajectory_fresh.rs' 'native/src/emit/trajectory.rs' 'native/src/fresh.rs' 'native/src/diff.rs' 'scripts/drift-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs'; then

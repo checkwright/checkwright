@@ -47,6 +47,7 @@ pub mod install_evidence_fresh;
 pub mod install_platforms;
 pub mod install_toolchain;
 pub mod installer_no_deps;
+pub mod guard_registration;
 pub mod kit_ref_liveness;
 pub mod npm_publish_spec;
 pub mod release_channel_parity;
@@ -1330,6 +1331,14 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         "-",
         &[("git", "")],
+    ),
+    (
+        "check-guard-registration",
+        guard_registration::run,
+        &[],
+        &["GATE_SDK_KIT_DIRS"],
+        "-",
+        &[],
     ),
     (
         "check-kit-ref-liveness",

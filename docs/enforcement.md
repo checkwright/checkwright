@@ -56,6 +56,7 @@ leaves its section absent.
 | (consumer) | check-docs-nav-reachable | precommit |
 | [doctrine-kit](doctrine-kit/index.md) | check-doctrine-registration | precommit |
 | [lifecycle-kit](lifecycle-kit/index.md) | check-lifecycle-registration | precommit |
+| (consumer) | check-guard-registration | precommit |
 | (consumer) | check-kit-ref-liveness | precommit |
 | (consumer) | check-trajectory-fresh | precommit |
 | (consumer) | check-install-evidence-fresh | precommit |

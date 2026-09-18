@@ -1,0 +1,2 @@
+# graph: couples=guard-kit/SPEC.md,guard-kit/lib/guard.sh,native/src/gates/guard_registration.rs dir=one valve=none tier=precommit
+# spec: guard-kit/SPEC.md §check-guard-registration — the generic ruleset's numbered roster, its guard_rule_* definitions and guard_generic_rules' dispatch order agree one-for-one and in order, fail-closed on an unreadable section or dispatcher
