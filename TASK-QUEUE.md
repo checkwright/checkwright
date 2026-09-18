@@ -73,8 +73,8 @@
   **Awk half, narrowed at `smoke-leg-crate-cache`'s close:** `macos-adopter-legs-brew-gawk` (Done)
   dropped the macOS legs' Homebrew `gawk`, so both binding macOS install-smoke legs now run the
   adopter floor on BSD awk; what stays open is mawk and BusyBox, and the `date -d` half whole.
-  **Inferred, not run:** the macOS legs pass on BSD awk — `gh run view <close push run> --log`,
-  settled by that close's watched push.
+  **Re-verified at that close's push:** both macOS install-smoke legs went green with the probe
+  resolving `awk` to `/usr/bin/awk` and `gawk` missing.
   Filed 2026-09-18 to the gap inbox at `native-spawn-floor`'s spec, promoted at its close drain.
   Owner lookup: `date -d`, `coreutils`, `PROBE_SET`, `mawk`, `awk::GNU` — matched
   `native-windows-bash-floor` (cited, distinct above) and `macos-adopter-package-set-copied-per-leg`
