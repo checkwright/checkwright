@@ -1462,7 +1462,7 @@
   accounting out of `consumer_smoke` into a precommit member — the second buys the coverage but may
   re-buy smoke cost at every commit, which is the trade nothing here settles.
   **Distinct from `consumer-smoke-targeted-mode-registrar-scope`** (merged 2026-09-11 into the
-  iceboxed `consumer-smoke-subset-accounting-verdict`), whose axis is the targeted
+  `consumer-smoke-subset-accounting-verdict`, mooted since), whose axis is the targeted
   single-kit mode severing a cross-kit registrar. This one is about which TIER holds the accounting
   at all, and it fires on the untargeted run that neighbour reports clean.
   **Cost while deferred:** one stage of latency on a mechanical zero-judgement condition a precommit
@@ -3227,7 +3227,6 @@
 - **root-doc-roster-registration-parity** — Only one root-doc roster is enforced.
 - **enforcement-first-load-trigger** — No stage loads the enforcement-first rule.
 - **self-revert-reminder-expectation** — Self-revert reminder reads as injection.
-- **consumer-smoke-subset-accounting-verdict** — Kit-subset smoke reds falsely.
 - **co-authored-by-trailer-attribution** — Model trailer is a baked literal.
 - **guard-steer-grant-mismatch** — Tree steers unpaired; the kit's are templated.
 - **reclaim-precondition-outside-the-tree** — Essay-sink reclaim can never fire.
@@ -3371,5 +3370,6 @@
 - declined-update-target-cause-unaudited
 - footprint-roster-rows-price-unevenly
 - consumer-smoke-single-kit-run-not-self-sufficient
+- consumer-smoke-subset-accounting-verdict
 
 ## Lessons Learned
