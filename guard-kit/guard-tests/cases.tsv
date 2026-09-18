@@ -209,6 +209,8 @@ fallthrough	bash worker.sh & printf 'pid=1 run=worker\n' > .tmp/worker.run
 # through a member's own option owns work a commit could corrupt
 block	grep -rn foo src | sort -o out.txt &
 fallthrough	grep -rn foo src | head &
+# '|&' pipes stderr too and backgrounds nothing
+fallthrough	make build |& tail -5
 
 # rule 16 — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
@@ -364,6 +366,11 @@ fallthrough	git status
 fallthrough	frobnicate && git status
 fallthrough	git status && ls
 fallthrough	git status && printf done
+# a segment the allowlist glob matches but a backgrounding '&' ends is not granted — the harness
+# grants no backgrounded call — so it is the unmatched segment; printf's word-bounded ':*' matches
+# the bare 'printf' the harness also grants
+block	git status && printf done &
+fallthrough	git status && printf
 
 # rule 21 — git history-rewrite advisory: amend / commit -F / soft-reset steered;
 #           a plain commit and a non-soft reset pass

@@ -256,7 +256,19 @@ Primitives a consumer guard composes; each emits the harness's
   right. A lone `&` is **not** in the class, because the harness does not split
   on it: the same run refused `touch a & touch b` on those two grants, and
   refused `touch a &` even under `Bash(touch a *)`, so a backgrounding `&` is a
-  call no allowlist entry grants rather than a segment boundary. Also not a hook primitive — the single implementation every **shell**
+  call no allowlist entry grants rather than a segment boundary. So every grant
+  test reads a segment carrying one as ungranted, on rule 15's
+  statement-ending-`&` predicate: rule 20 counts it as the unmatched segment,
+  rules 4 and 7's rewrite grant withholds its allow, and §scan-prompts marks the
+  call allowlist-unreachable. **What a rule loses by the unsplit `&` was measured
+  rather than assumed:** ten rule targets (a compound `cd`, a `sed` and an `awk`
+  range read, a `git -c` override, a forced `git rm`, a bare `cat`, an inline
+  python rewrite, an expansion, an `rm`, an absolute wrapper) each placed after
+  `sleep 1 &` and after `true &` were every one blocked — by their own rule, or
+  by rule 13's foreground sleep or rule 15's unrecorded launch before it. The one
+  backgrounding shape no rule blocks is rule 19's recorded launch, whose
+  statement after the `&` is the record write, and a target after its `;` is a
+  segment of its own that its rule reads. Also not a hook primitive — the single implementation every **shell**
   consumer that reasons *per segment* shares (rules
   2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules
   9/10), so the harness's
@@ -701,7 +713,8 @@ that harness exists would be designing against no case.
    `permissionDecision: allow`, so the rewrite attaches only when every segment
    of the relative command, split as §The guard framework's splitter splits it
    over the dequoted view, matches a committed `Bash(…)` pattern through
-   `guard_allow_match`, and the command passes rule 24's test taken as a
+   `guard_allow_match` with no backgrounding `&` ending it (the harness grants
+   no backgrounded call), and the command passes rule 24's test taken as a
    predicate. A missing `jq`, a missing settings file or a parse error fails the
    first test, so a grant resting on a settings read never turns a missing file
    into an allow, which is rule 18's contract for its own read. Otherwise the
@@ -1137,7 +1150,8 @@ that harness exists would be designing against no case.
     `.tool_input.run_in_background` is `true`, read through `guard_input_field`
     (§The guard framework records the field and its shape). *Shell form* — the
     skeleton (`sq dq hd`) ends a statement with a bare `&` that is neither the
-    `&&` operator nor a redirect's fd-dup. Building only the shell arm was
+    `&&` operator, the `|&` separator (which pipes stderr too and backgrounds
+    nothing) nor a redirect's fd-dup. Building only the shell arm was
     refused as worse than not building it: every attested firing used the harness
     form, so a shell-only rule would cover the spelling nobody uses and pass the
     one that fires — coverage in appearance
@@ -1618,7 +1632,10 @@ that harness exists would be designing against no case.
     whose every segment matches the committed allowlist resolves on the match
     and blocking it would regress — the rule therefore fires only when a
     non-leading segment (or a redirect on the lead) fails to match any committed
-    allow entry, reusing `guard_allow_match`'s shell-glob semantics. Reads
+    allow entry, reusing `guard_allow_match`'s shell-glob semantics — and a
+    segment a backgrounding `&` ends fails to match whatever glob covers its
+    words, since the harness grants no backgrounded call (§The guard framework,
+    `guard_split_compound`). Reads
     `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
     parse error and the rule silently declines and falls through. Placed after
     the auto-allow rules (16, 17, 18, 19) so a silently granted read-only pipeline never
@@ -2297,7 +2314,7 @@ The friction log's fall-throughs split three ways:
 
 **The allowlist-reachability verdict, and why it is narrower than "anything the
 allowlist cannot fix".** A logged call is **allowlist-unreachable** when it
-carries a shape the permission matcher refuses outright, and three shapes qualify,
+carries a shape the permission matcher refuses outright, and four shapes qualify,
 each on a ground a rule already states in its own refusal text: an
 **expansion, substitution or backtick** — rule 6's "the harness's matcher refuses
 every expansion", with the output process substitution and the backtick it does
@@ -2324,7 +2341,11 @@ is shell, and an unquoted-delimiter body still expands. So the expansion test bl
 only a quoted-delimiter body, the redirect test blanks every body, and the log line
 is decoded first (§The guard framework, `guard_log_fallthrough`). The third shape is
 a call longer than the harness's analysis bound, which the harness asks about
-whatever the allowlist says. A decoded line longer than that bound is one. **A key is reported unreachable
+whatever the allowlist says. A decoded line longer than that bound is one. The
+fourth is a **backgrounding `&`** — rule 15's statement-ending bare `&` on the
+structural view, with `|&` excluded as the separator it is — because the harness
+grants no backgrounded call whatever its grants cover (§The guard framework,
+`guard_split_compound`, which records the probe). **A key is reported unreachable
 only when every call under it is**, and both limits lean the same way on purpose:
 under-retiring leaves an unactionable row on the actionable list, which is visible,
 while over-retiring hides friction a reader could have fixed, which is silent. The
@@ -2557,6 +2578,13 @@ heredoc-bearing calls from prompting to granted, and the third unreachable shape
 over-bound call the other way. On one log, **27 patterns across 43 prompting calls** immediately
 before and **27 across 43** immediately after: that log was written flattened, so no line carried a
 body to drop and none passed the bound. The KPI is left as it is, on the ground above.
+
+**Reading allow rules and separators as the harness does is a step of the same kind.** The
+word-bounded `:*`, the bare match of a sole closing space-led `*`, `|&` as one separator and the
+backgrounding `&` as a fourth unreachable shape each move calls between granted and prompting.
+On one log snapshot, both binaries reading the same committed settings, **27 patterns across 63
+prompting calls** before the four and **26 across 62** after; the backgrounding shape alone moved
+nothing on that log. The KPI is left as it is, on the ground above.
 
 **A substrate change is not such a step, and that is recorded rather than
 assumed.** Moving the measurement off a spawn-and-parse and onto an in-crate

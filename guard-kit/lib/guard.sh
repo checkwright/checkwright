@@ -1121,9 +1121,9 @@ _guard_ro_forms_clear() {
     return 0
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's shell arm: a statement-ending bare '&' in the skeleton, never the '&&' operator and never a redirect's fd-dup
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's shell arm: a statement-ending bare '&' in the skeleton, never the '&&' operator, the '|&' separator or a redirect's fd-dup
 _guard_shell_backgrounds() {
-    grep -qE '(^|[^&>])&([[:space:]]|;|$)' <<<"$1"
+    grep -qE '(^|[^&>|])&([[:space:]]|;|$)' <<<"$1"
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 15's record-writing test: at PreToolUse the child has not started and no record can exist yet, so the only observable is whether the launch is going to write one
@@ -1514,6 +1514,7 @@ guard_rule_allowlist_chain() {
         seg="${segs[i]}"
         seg="${seg#"${seg%%[![:space:]]*}"}"; seg="${seg%"${seg##*[![:space:]]}"}"
         [[ -z "$seg" ]] && continue
+        _guard_shell_backgrounds "$seg" && guard_block "$steer"
         seg_matched=0
         for p in "${pattern_inners[@]}"; do
             if guard_allow_match "$seg" "$p"; then seg_matched=1; break; fi
@@ -1897,6 +1898,7 @@ _guard_rewrite_granted() {
     s="$(guard_skeleton "$cmd" sq dq hd)"
     v="$(_guard_dequoted_view "$cmd" "$s")" || return 1
     while IFS= read -r seg; do
+        _guard_shell_backgrounds "$seg" && return 1
         seg="${seg//$'\x01'/ }"
         seg="${seg//$'\x02'/$'\t'}"
         seg="${seg//$'\x03'/;}"

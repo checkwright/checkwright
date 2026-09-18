@@ -243,14 +243,27 @@ fn carries_expansion(live: &str) -> bool {
     false
 }
 
+// spec: guard-kit/SPEC.md §scan-prompts — rule 15's statement-ending bare `&` on the structural
+// view, with `|&` excluded as the separator it is: never after `&`, `>` or `|`, and followed by a
+// blank, a `;` or the end.
+fn backgrounds(structural: &str) -> bool {
+    let b = structural.as_bytes();
+    (0..b.len()).any(|i| {
+        b[i] == b'&'
+            && (i == 0 || !matches!(b[i - 1], b'&' | b'>' | b'|'))
+            && b.get(i + 1).map_or(true, |c| is_space(*c) || *c == b';')
+    })
+}
+
 // spec: guard-kit/SPEC.md §scan-prompts — the allowlist-reachability verdict, per logged call over
-// every segment: an expansion, a write redirect to a target rule 17's own test calls a file, or a
-// call past the harness's analysis bound.
+// every segment: an expansion, a write redirect to a target rule 17's own test calls a file, a
+// backgrounding `&`, or a call past the harness's analysis bound.
 fn allowlist_unreachable(line: &str) -> bool {
     let live = guard::skeleton(line, guard::Wants { sq: true, hdq: true, ..Default::default() });
     let structural =
         guard::skeleton(line, guard::Wants { sq: true, dq: true, hd: true, ..Default::default() });
     line.chars().count() > ANALYSIS_BOUND
+        || backgrounds(&structural)
         || carries_expansion(&live)
         || write_redirects(&structural)
             .iter()
@@ -646,6 +659,27 @@ mod tests {
         assert!(allowlist_unreachable("cat <<'EOF'\nx\nEOF\nsort > out.txt"));
         assert!(allowlist_unreachable(&"x".repeat(ANALYSIS_BOUND + 1)));
         assert!(!allowlist_unreachable(&"x".repeat(ANALYSIS_BOUND)));
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — a backgrounding `&` is the fourth shape; `&&`, `|&`,
+    // an fd-dup, `&>` and a quoted `&` are not
+    #[test]
+    fn the_verdict_marks_a_backgrounding_ampersand_and_no_other_ampersand() {
+        for c in ["touch a & touch c", "touch a &", "sleep 5 &\nls", "a &; b"] {
+            assert!(allowlist_unreachable(c), "{:?} was not marked unreachable", c);
+        }
+        for c in [
+            "a && b",
+            "a |& b",
+            "make 2>&1",
+            "make &>/dev/null",
+            "echo 'a & b'",
+            "grep \"x & y\" f",
+        ] {
+            assert!(!allowlist_unreachable(c), "{:?} was marked unreachable", c);
+        }
+        let allow = vec!["touch a *".to_string()];
+        assert!(!granted("touch a & touch c", &allow, None));
     }
 
     // spec: guard-kit/SPEC.md §The guard framework — the three pairs decode; any other backslash, a
