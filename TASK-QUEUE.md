@@ -16,6 +16,78 @@
 
 ## Deferred
 
+- **adopter-floor-gnu-date-and-awk-unheld** [cost: event/low] [surface: gate-sdk] — the published
+  adopter floor keeps GNU coreutils for one reason the binary could retire, and holds its awk
+  narrowing by grep rather than by a run. `native/src/emit/kpi/mod.rs:119` and
+  `native/src/emit/queue_index.rs:383` spawn GNU `date -d`, which is what keeps `sort::coreutils`
+  forced beside the predicate's `sort -V` (context-kit/SPEC.md §bin/env-probe); and no CI leg runs
+  the adopter floor on a non-GNU awk (mawk, BusyBox, BSD), so `native-spawn-floor`'s narrowing of
+  the awk member to unconstrained is held by the site census, not by an execution.
+  **Re-verified at the drain:** both `date -d` sites read at HEAD; a grep of `.github/workflows`
+  for mawk, BusyBox, nawk or original-awk returns nothing.
+  **Not this entry:** bash stays on the floor on the shell front end, the hooks and about twenty
+  consumer-command bash executors in the binary; `native-windows-bash-floor` owns the shell-surface
+  half and the executors run consumer-supplied shell, so neither is residue here.
+  **Why design-pending:** std has no timezone, so retiring `date -d` needs a native civil-date
+  arithmetic whose local-day semantics must match the stamps it compares; and a non-GNU awk leg is a
+  CI-cost call against a claim no shipped construct currently breaks.
+  **Cost while deferred:** the front door advertises coreutils against objective 1, and the next
+  GNU-only awk construct to ship reds nothing.
+  Filed 2026-09-18 to the gap inbox at `native-spawn-floor`'s spec, promoted at its close drain.
+  Owner lookup: `date -d`, `coreutils`, `PROBE_SET`, `mawk`, `awk::GNU` — matched
+  `native-windows-bash-floor` (cited, distinct above) and `macos-adopter-package-set-copied-per-leg`
+  (brew set copying, distinct).
+
+- **arm-spawn-requirements-unrecorded** [cost: event/low] [surface: gate-sdk] — a non-gate arm's
+  spawned programs are recorded only in prose (gate-sdk/SPEC.md §The non-gate arm): `ARMS` rows in
+  `native/src/emit/mod.rs` carry a knob roster and no requirement element, so nothing machine-reads
+  the binary's whole spawn set and `PROBE_SET` cannot be held against it. Candidate: a requirement
+  element on `ARMS` rows, held by the spawn recorder as unit test A holds registry `needs`, then a
+  parity test that every spawned program is on `PROBE_SET`, on `GATE_SDK_PROGRAM_FLOOR`, or declared
+  contributor-side.
+  **Re-verified at the drain:** `uname` (`env_probe.rs:68`), `ps` (`evidence.rs:332`), `tar`
+  (`pack_installer.rs:462`) and `npm` (`pack_installer.rs:635`) are spawned and on neither set.
+  **Why design-pending:** the element's grammar and whether contributor-side is a third set or a tag
+  are open, and it mints a governed name.
+  **Cost while deferred:** every floor census is re-bought by grep, and a literal-only grep misses
+  variable-program spawns, as `native-spawn-floor`'s scope census did.
+  Filed 2026-09-18 to the gap inbox by `native-spawn-floor`'s spec; promoted at that close's drain.
+  Owner lookup: `ARMS`, `requirement element`, `spawn set`, `PROBE_SET`, `needs` — none.
+
+- **pid-liveness-spawns-bash** [cost: event/low] [surface: gate-sdk] — `pid_alive` in
+  `native/src/evidence.rs:322` and in `native/src/emit/wait_probe.rs:500` spawns
+  `bash -c 'kill -0'`, because std has no spelling and the crate carries no libc;
+  gate-sdk/SPEC.md §Fail-closed contract rules that the honest route today. A libc dependency on
+  unix would retire both bash spawns and the `ps -p` fallback leg (`evidence.rs:332`), since
+  `kill(pid, 0)` answering EPERM already means the process exists; native Windows needs its own
+  answer, because the pids recorded there come from an MSYS shell.
+  **Re-verified at the drain:** both `bash -c` sites and the `ps` fallback read at HEAD.
+  **Inferred, not run:** libc clears the settings-cohort bar (no walk, no spawn, no socket) with
+  an MSRV at or under 1.71 and no transitive dependencies — `cargo info libc`
+  **Why design-pending:** a new crate dependency and a platform split in one liveness owner.
+  **Cost while deferred:** two bash spawns and an off-floor `ps` on each liveness probe; low,
+  because bash stays on the floor for other reasons.
+  Filed 2026-09-18 to the inbox at `native-spawn-floor`'s spec (kill -0 route ruled out of scope).
+  Owner lookup: `kill -0`, `libc`, `pid_alive`, `ps -p` — none.
+
+- **consumer-smoke-single-kit-run-not-self-sufficient** [cost: event/low] [surface: lifecycle-kit] —
+  narrowing the consumer smoke to one kit fails for `lifecycle-kit`, because the scratch consumer's
+  agent file is seeded by a sibling kit's install earlier in the full run:
+  `run-gates.sh --run-consumer-smoke lifecycle-kit` exits at `install-lifecycle: agent file not
+  found: CLAUDE.md — nothing to install into` and reports an environment failure, while the full run
+  is green, so CI never sees it.
+  **Revived from the icebox on real recurrence:** `native-spawn-floor`'s build hit it on 2026-09-18,
+  exactly the costed case — a session that touched one kit and wanted the cheap check. That bullet
+  read the kit argument as misparsed; the drain re-ran it and it is a filter, and the failure is
+  this one, reproduced verbatim. Filed 2026-08-29 at a close drain, iceboxed 2026-09-11.
+  **Why design-pending — two closes that differ in kind:** have lifecycle-kit's smoke seed the
+  agent file it installs into, self-sufficient per kit on the run-gate-tests hermeticity precedent;
+  or have the runner refuse a single-kit argument whose kit declares an install dependency, which
+  is honest but keeps the narrowed run unavailable.
+  **Cost while deferred:** a narrowed run reds on the harness rather than the change, and the
+  cheapest recovery is to stop narrowing.
+  recurrence: consumer-smoke-single-kit-run-not-self-sufficient 2026-09-18
+
 - **residency-roster-template-reach-ungated** [cost: event/low] [surface: context-kit] —
   nothing asserts the roster↔template relation context-kit/SPEC.md §The consumer footprint rules:
   an obligation whose bound actor is any session is carried at the consumer's resident tier and is
@@ -3367,7 +3439,6 @@
 - **kfric-second-field-direction-inverted** — Surface field names the owner.
 - **baseline-self-certification-unasserted** — Self-served verdicts unasserted.
 - **wait-mandate-template-spelling-unreachable** — Mandated spelling is refused.
-- **consumer-smoke-single-kit-run-not-self-sufficient** — Per-kit smoke fails.
 - **upgrade-smoke-refuses-inside-a-worktree** — Refuses where .git is a file.
 - **pre-grammar-disposition-authority-ambiguity** — Double-named rulers unread.
 - **kpi-cost-per-unit** — No KPI prices cost per shipped unit.
