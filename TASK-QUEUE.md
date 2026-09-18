@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: declined-target-audit
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -130,6 +130,8 @@
   is honest but keeps the narrowed run unavailable.
   **Cost while deferred:** a narrowed run reds on the harness rather than the change, and the
   cheapest recovery is to stop narrowing.
+  Selected at `declined-target-audit`'s scope (operator direction, 2026-09-18, lead-relayed):
+  the per-kit self-sufficiency close is spec's to author and promote.
   recurrence: consumer-smoke-single-kit-run-not-self-sufficient 2026-09-18
 
 - **residency-roster-template-reach-ungated** [cost: event/low] [surface: context-kit] —
@@ -183,6 +185,8 @@
   `consumer-footprint-roster-omits-lifecycle-kit`; promoted at this iteration's close drain.
   Owner lookup: `consumer footprint`, `footprint`,
   `earn-back`, `resident ask`, `obligation` — none.
+  Joins `declined-target-audit` by operator direction (2026-09-18, lead-relayed) at that
+  scope; its earn-back sentences are spec's to author and promote.
 
 - **baseline-suite-coverage-arm-one-directional** [cost: event/low] [surface: evidence-kit] —
   evidence-kit/SPEC.md §check-evidence-baseline says the suite-coverage arm closes the failure of a
@@ -3055,6 +3059,8 @@
   that case, because the terms it re-reads are the declining session's own.
   Filed 2026-09-16 to the gap inbox by `queue-arm-report-fidelity`'s close, which could not drain
   it; promoted at the following iteration's scope.
+  Leads `declined-target-audit`'s unit set by operator direction (2026-09-18, lead-relayed)
+  at its scope; choosing between the two readings is spec's, which authors and promotes.
 
 - **gate-fixture-fanout-arm** [cost: event/low] [surface: gate-sdk] — nothing
   enumerates the fixture pairs a change to a shared implementation module has to re-run:
