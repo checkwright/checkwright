@@ -21,14 +21,6 @@
   limit and filed as `guard-powershell-tool-unguarded`. The oracle is the decision table run
   under Git Bash on `install-smoke-windows`.
 
-- **init-next-block-bash-spelled-on-windows** [spec: SPEC-windows-follow-up.md] — `init`'s
-  follow-up block prints bash-spelled lines on every host, so a native-Windows adopter in PowerShell
-  types a bare `bash` that reaches the WSL launcher.
-  **Ruled at spec:** the block is keyed on the OS `init` runs on — a Windows host prints
-  `powershell -NoProfile -ExecutionPolicy Bypass -File gate-sdk/bin/run-gates.ps1 …`, which runs
-  from PowerShell and Git Bash alike; the smoke's follow-up arm requires an executable target only
-  where no interpreter is spelled; the PowerShell leg runs the printed `--install-hooks` line.
-
 - **windows-remedy-path-step-undocumented** [spec: SPEC-remedy-persistence.md] — the
   `install-smoke-powershell` leg prepends Git for Windows' `usr\bin` and `bin` to `PATH` before
   `doctor`, a step `docs/install.md` never names, and the page's block omits `jq`, which Git for
@@ -3365,5 +3357,6 @@
 ## Done
 
 - run-gates-ps1-windows-powershell-host-unexercised
+- init-next-block-bash-spelled-on-windows
 
 ## Lessons Learned

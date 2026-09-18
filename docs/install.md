@@ -474,7 +474,9 @@ your repo root and wire it in:
 3. Point the kit at your layout through its external configuration — consumers
    never edit vendored kit files, so configuration always lives outside them.
 4. Opt each clone into the generated pre-commit hook with
-   `bash gate-sdk/bin/run-gates.sh --install-hooks`.
+   `bash gate-sdk/bin/run-gates.sh --install-hooks`. On native Windows, from
+   PowerShell:
+   `powershell -NoProfile -ExecutionPolicy Bypass -File gate-sdk/bin/run-gates.ps1 --install-hooks`.
 
 Where a kit ships adoptable skills, take each as a binding shim by default — a
 one-line directive that references the vendored template, so a re-vendor reaches

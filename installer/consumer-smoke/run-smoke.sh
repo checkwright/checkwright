@@ -559,8 +559,11 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
         [[ "$ti" -ge 0 ]] \
             || blocked "$profile: the follow-up command '$line' names no repo-relative script path, so this arm cannot tell which file init is telling the adopter to run."
         target="${toks[$ti]}"
-        [[ -f "$C/$target" && -x "$C/$target" ]] \
-            || fail "$profile: init told the adopter to run '$line', and $target is not an executable file in the tree init just wrote"
+        [[ -f "$C/$target" ]] \
+            || fail "$profile: init told the adopter to run '$line', and $target is not a file in the tree init just wrote"
+        # spec: installer/SPEC.md §The consumer smoke — the mode bit is asserted only where the line spells no interpreter before the target: an interpreter reads the file rather than executing it
+        [[ "$ti" -gt 0 || -x "$C/$target" ]] \
+            || fail "$profile: init told the adopter to run '$line' directly, and $target is not executable in the tree init just wrote"
         for (( i = ti + 1; i < ${#toks[@]}; i++ )); do
             flag="${toks[$i]}"
             [[ "$flag" == -* ]] || continue

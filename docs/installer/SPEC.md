@@ -206,7 +206,10 @@ It writes the selected profile's kit directories, a `gates.list` seeded with
 each kit's starting gates, the config seam files those kits need, and the
 manifest. Then it makes **one commit** naming the profile and the version, and
 prints a **follow-up block**: the commands that finish the setup, one per line,
-each carrying its reason beside it. The commands are deliberately **not spelled
+each carrying its reason beside it. The block is keyed on the host `init` runs
+on. A Windows host is told to run the PowerShell front-end through Windows
+PowerShell, a spelling that runs from PowerShell and from Git Bash alike. Every
+other host is told to run the bash front-end. The commands are deliberately **not spelled
 on this page** — what `init` prints is `init`'s to say, and a second copy here is
 a string a rename has to be remembered to move.
 
@@ -1944,7 +1947,10 @@ command, in this order because each makes the next meaningful:
 - **The block is present and non-empty.** Zero commands extracted is a red, never
   a skip: an assertion over an empty set passes vacuously, so a reflowed banner
   would otherwise turn full coverage into silent zero coverage.
-- **The target resolves and is executable** inside the consumer the arm was handed.
+- **The target resolves** to a file inside the consumer the arm was handed, **and
+  is executable where the line spells no interpreter before it**: an interpreter
+  reads the file rather than executing it, so the mode bit is not part of the
+  instruction.
 - **Each flag the line names is accepted by that target.** `--install-hooks` is
   the live case: a path that still resolves while its flag does not is precisely
   the half a path check alone misses. The probe is the target's **own refusal
