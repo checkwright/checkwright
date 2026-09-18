@@ -9,3 +9,4 @@ reach-ruling-lockstep spec a59763a2 2026-09-18 1235dc82
 reach-ruling-lockstep align adde364c 2026-09-18 6b4a14c9
 reach-ruling-lockstep build a7511bc9 2026-09-18 deca3faa
 reach-ruling-lockstep build ab317069 2026-09-18 3e5e4f48
+reach-ruling-lockstep validate a7871d20 2026-09-18 f9ff18a8
