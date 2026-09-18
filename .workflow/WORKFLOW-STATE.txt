@@ -4,4 +4,4 @@
 
 ---
 
-— scope a89e5fde 2026-09-18 bba767c6
+windows-adopter-path scope a89e5fde 2026-09-18 bba767c6

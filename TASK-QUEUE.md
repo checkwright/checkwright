@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: windows-adopter-path
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -29,6 +29,8 @@
   Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s scope; promoted at its close drain.
   Owner lookup: `run-gates.ps1`, `install-hooks`, `follow-up`, `next:` — matched
   `guard-hook-windows-substrate` (harness-hook wiring, distinct).
+  Joins `windows-adopter-path` by operator direction (2026-09-18, lead-relayed) at its scope;
+  the host-keyed block and its smoke grammar are spec's to author and promote.
 
 - **windows-remedy-path-step-undocumented** [cost: event/low] [surface: docs] — the
   `install-smoke-powershell` leg prepends Git for Windows' `usr\bin` and `bin` to `PATH` before
@@ -46,6 +48,8 @@
   Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s scope and promoted at its close.
   Owner lookup: `windows-remedy`, `Git for Windows`, `usr/bin` — matched
   `macos-remedy-path-lasts-one-shell` (the macOS block, distinct).
+  Selected for `windows-adopter-path` at its scope (operator direction, 2026-09-18, lead-relayed);
+  the session-versus-persisted `PATH` step is spec's to author and promote with the macOS twin.
 
 - **run-gates-ps1-windows-powershell-host-unexercised** [cost: event/low] [surface: gate-sdk] —
   gate-sdk/SPEC.md §run-gates claims the front-end's PowerShell twin runs under Windows PowerShell
@@ -59,6 +63,8 @@
   **Cost while deferred:** a 5.1-only construct regression in the twin reds nothing.
   Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s build; promoted at its close drain.
   Owner lookup: `front-end-parity`, `powershell.exe`, `PowerShell 5` — none.
+  In `windows-adopter-path`'s unit set by operator direction (2026-09-18, lead-relayed);
+  choosing the 5.1 parity pass or the narrowed claim is spec's, which promotes it.
 
 - **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
   — `check-stage-entry` assertion D reads an inferred marker only where the full spelling opens a
@@ -115,6 +121,8 @@
   entries across steps.
   Filed 2026-09-18 to the gap inbox at `smoke-leg-crate-cache`'s build; promoted at its close drain.
   Owner lookup: `macos-remedy`, `gnubin`, `shell profile`, `persist` — none.
+  Taken into `windows-adopter-path` at its scope by operator direction (2026-09-18,
+  lead-relayed); the profile-file choice is spec's to author and promote with the Windows twin.
 
 - **adopter-floor-gnu-date-and-awk-unheld** [cost: event/low] [surface: .github] — no CI leg runs the
   adopter floor on mawk or BusyBox awk, so `native-spawn-floor`'s narrowing of the awk member to
@@ -203,6 +211,27 @@
   reachable for every tool call the guard sees, which TRAJECTORY objective 6 counts against.
   Filed 2026-09-18 at `windows-bash-floor`'s scope, split out of `native-windows-bash-floor`
   (operator direction, lead-relayed), whose other two thirds that iteration took.
+  Leads `windows-adopter-path`'s unit set by operator direction (2026-09-18, lead-relayed) at
+  its scope, with no design direction chosen there: weighing bundled Git-for-Windows bash, a
+  PowerShell twin under a parity oracle, and a native hook front is spec's, which authors and
+  promotes, and escalates a choice that narrows TRAJECTORY objective 6.
+
+- **adopter-floor-collapse-rung-unqueued** [cost: event/high] [surface: native] — TRAJECTORY
+  objective 1 (the dependency floor collapses to git) has no queued rung: the adopter floor
+  `docs/install.md` renders is still bash, git, jq, curl, awk, sort and shellcheck, and no
+  deferred or icebox entry owns retiring any member.
+  **Probed at filing:** the binary spawns `sort -V` in `native/src/toolfloor.rs` (a spawn the
+  context-kit env-probe section keeps deliberately), `curl` in `native/src/hook/poll.rs`, `jq` in
+  `native/src/gates/settings_pins_parity.rs`, and `shellcheck` in `native/src/gates/shellcheck.rs`
+  and `action_run_shell.rs`; bash and awk ride the bootstrap, the generated hooks, guard-kit's
+  hook and the shipped templates.
+  **Why design-pending:** each member needs a per-site disposition — ported in-process, kept as
+  a rule that *is* an external program (shellcheck's likely case), or moved off the adopter
+  audience — and the rung order among them is a ranking call no survey has made.
+  **Cost while deferred:** the objective the queue ranks against has no rung to rank, so every
+  scope reads it as satisfied, and the git-only discharge condition cannot approach.
+  Filed 2026-09-18 at `windows-adopter-path`'s scope by operator direction, lead-relayed, from
+  that scope's ranking survey.
 
 - **push-budget-unshipped** [cost: event/low] [surface: lifecycle-kit] — the push
   budget (one to two pushes per iteration, two unasked hotfix pushes) lives only in this repo's
