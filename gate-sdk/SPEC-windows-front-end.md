@@ -156,13 +156,13 @@ comparison on a host without PowerShell, so a divergence reds at push, not at
 commit. That is the same trade the macOS remedy block and the installer's
 PowerShell half accept.
 
-**Inferred, cannot run before build:** that `ubuntu-latest` ships `pwsh`
-preinstalled. If it does not, the `gates` step is dropped and
-`install-smoke-windows` alone carries the oracle. Neither this host nor any
-recorded run has probed it.
-**Inferred, cannot run before build:** that a native child run from `pwsh -File`
-inherits the script's stdin when no pipeline input is bound. The stdin case is
-what settles it, and the twin reads `[Console]::In` explicitly if it does not.
+**Inferred, cannot run before build:** `ubuntu-latest` ships `pwsh` — only a pushed run with the step can show it.
+If it does not, the `gates` step is dropped and `install-smoke-windows` alone
+carries the oracle.
+
+**Inferred, cannot run before build:** a native child inherits `pwsh -File`'s stdin — the twin does not exist yet.
+The stdin case settles it. If the child does not inherit stdin, the twin reads
+`[Console]::In` explicitly.
 
 **Not yet applied.** §run-gates gains, after the twin sentence of delta 1:
 
@@ -197,10 +197,10 @@ assertions, in the scratch consumer:
 4. Commit a change carrying a violation a registered precommit gate refuses.
    Assert that the commit is refused and names that gate.
 
-**Inferred, cannot run before build:** that Git for Windows runs a
-`#!/usr/bin/env bash` hook with no bash on `PATH`, resolving the shebang inside
-its own install root. Step 1 is the proof, which is why it strips `PATH` rather
-than trusting it. A MinGit host, whose distribution may omit bash, is not
+**Inferred, cannot run before build:** Git for Windows runs a bash hook with no bash on `PATH` — the leg step is the only Windows host.
+Git is expected to resolve the `#!/usr/bin/env bash` shebang inside its own
+install root. Step 1 is the proof, which is why it strips `PATH` rather than
+trusting it. A MinGit host, whose distribution may omit bash, is not
 claimed. If the step shows git cannot run the hook, this delta stops and goes
 back to the lead: the invocation form would then need a design this amendment
 does not hold.
@@ -234,9 +234,9 @@ does not hold.
   leg and never a release artifact. Of the targets, only the Windows leg compiles
   `cfg(not(unix))` code, so that is where the class gets held.
 
-**Inferred, cannot run before build:** that each `native-artifacts` runner's
-Rust toolchain carries `clippy`. The first pushed run shows it. If a runner's
-toolchain lacks it, the step adds the component with `rustup` first.
+**Inferred, cannot run before build:** every `native-artifacts` runner carries `clippy` — only a pushed run can show it.
+If a runner's toolchain lacks it, the step adds the component with `rustup`
+first.
 
 **Not yet applied.** gate-sdk/SPEC.md, the sentence opening "The two
 dispositions are implemented by `proc::resolve_interpreter` and
