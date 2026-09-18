@@ -266,14 +266,10 @@ Primitives a consumer guard composes; each emits the harness's
   statement-ending-`&` predicate: rule 20 counts it as the unmatched segment,
   rules 4 and 7's rewrite grant withholds its allow, and §scan-prompts marks the
   call allowlist-unreachable. **What a rule loses by the unsplit `&` was measured
-  rather than assumed:** ten rule targets (a compound `cd`, a `sed` and an `awk`
-  range read, a `git -c` override, a forced `git rm`, a bare `cat`, an inline
-  python rewrite, an expansion, an `rm`, an absolute wrapper) each placed after
-  `sleep 1 &` and after `true &` were every one blocked — by their own rule, or
-  by rule 13's foreground sleep or rule 15's unrecorded launch before it. The one
-  backgrounding shape no rule blocks is rule 19's recorded launch, whose
-  statement after the `&` is the record write, and a target after its `;` is a
-  segment of its own that its rule reads. Also not a hook primitive — the single implementation every **shell**
+  rather than assumed:** ten rule targets each placed after `sleep 1 &` and after
+  `true &` were every one blocked, by their own rule or by rule 13's or 15's
+  before it. The one backgrounding shape no rule blocks is rule 19's recorded
+  launch, and a target after its `;` is a segment of its own that its rule reads. Also not a hook primitive — the single implementation every **shell**
   consumer that reasons *per segment* shares (rules
   2/4/7/8/12/14/15/17/18/19/20/22/24/25/26 and the read-compound carve-out of rules
   9/10), so the harness's
