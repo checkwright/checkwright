@@ -1,5 +1,5 @@
 # contract: evidence-manifest v1
-windows-bash-floor gates sha256=f75a073b0e91260974218581d523838bfcc44c1588e3dc37d60933022fd58cfc pass=117 fail=0 ignore=0 verdict=clean 2026-09-18
+windows-bash-floor gates sha256=d4e7484fc7de6a74e1bc3f9067a3cbf7206d450fcd04b6dd0b5ba6ce384b8c7a pass=117 fail=0 ignore=0 verdict=clean 2026-09-18
 windows-bash-floor gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
 windows-bash-floor canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
 windows-bash-floor context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
@@ -12,10 +12,10 @@ windows-bash-floor queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc7
 windows-bash-floor site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
 windows-bash-floor scripts sha256=b87b46f3a812452329297073b7dd2c6181caadfc1461c4298e5c2c0f0f7044f6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
 windows-bash-floor guard_tests sha256=660ff1399386ea7ee064c052fbc5dd0fa4083498cc6ac70240f71fb571830e27 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
-windows-bash-floor demo sha256=c98ba6df2cda2bfd562820f5cbb26580617fbfd5f97e1860bc0a46cec793ed83 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
-windows-bash-floor installer_smoke sha256=c5b1cc68dce1938875ffa22830800147bfee71d3a0a947b665df1201fb9dc799 pass=13 fail=0 ignore=0 verdict=clean 2026-09-18
-windows-bash-floor consumer_smoke sha256=eb604e9a574dec0964d317ea8b754f6b6fae9fdd8d0c929869083fb772cbab53 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
-windows-bash-floor upgrade sha256=55b10260c5df15a97a85901091d9ed13f1d6634ae81b4b0dbfca37d6bcf485c8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
-windows-bash-floor agents_md_smoke sha256=9f73d222a55f955f6cd7cd1b15c325d04c69d7eba04fb61043ac9c1dcd947e41 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+windows-bash-floor demo sha256=07a2a771fd700fd0e47584e20d193f58fbbf1f6a9589861e227173e3fbccc889 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+windows-bash-floor installer_smoke sha256=e11278e0cb9b7e574b5c6806488f50295cf18699b26d9bbfc393eef2ac349614 pass=13 fail=0 ignore=0 verdict=clean 2026-09-18
+windows-bash-floor consumer_smoke sha256=65a3abf9b3326a26dc7c026aabdca437af9b9299ca40149cb842020ea6a337c1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+windows-bash-floor upgrade sha256=c70549c7a64c711cfb8bdbf7767b714771a13d764baf567c30b4153280f81a77 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+windows-bash-floor agents_md_smoke sha256=e21c6de72fc926b54f172afd1c7d594b7bc01fe01d25718df5b6f1bdbf83bd6e pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
 windows-bash-floor index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
-windows-bash-floor native_crate sha256=94b8ff6778de05671677d0f0d4936c48f9d717447382482e1de61fa48dff7589 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+windows-bash-floor native_crate sha256=21e453261dea455d497a94e50ab296c4956ffb62fd2728abf579919c66a3721d pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
