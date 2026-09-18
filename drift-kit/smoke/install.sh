@@ -158,10 +158,10 @@ grep -q 'n/a (plugin failed)' <<<"$(xp)" \
 chmod +x "$work/consumer-kpis/kpi-knowledge-friction.sh"
 
 set +e
-trend="$(report --trend)"; trc=$?
+trend="$(DRIFT_KIT_KNOWLEDGE_LOG="$work/kfric-empty.log" report --trend)"; trc=$?
 set -e
 [[ "$trc" -eq 0 ]] || fail "--trend exited $trc"
-trend_lines="$(printf '%s' "$trend" | grep -c '')"
+trend_lines="$(printf '%s' "$trend" | grep -c '' || true)"
 [[ "$trend_lines" -eq 1 ]] || fail "--trend must emit exactly one line, got $trend_lines"
 
 # spec: drift-kit/SPEC.md §The published-evidence extractor — a hermetic fake-history

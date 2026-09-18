@@ -16,6 +16,23 @@
 
 ## Deferred
 
+- **windows-build-dead-code-warnings-unheld** [cost: event/low] [surface: native] — the
+  `x86_64-pc-windows-msvc` `native-artifacts` leg compiles with two `dead_code` warnings no other
+  target shows: `WAIT_BODY` in `native/src/emit/wait_probe.rs` and `resolve_interpreter` in
+  `native/src/proc.rs`. `WAIT_BODY`'s only non-test reader is a `cfg(unix)` function;
+  `resolve_interpreter` has no caller on any target and carries `allow(dead_code)` on every target
+  but Windows, so whether a Windows call site was meant to land is itself the open question.
+  Nothing reds on a warning, so a third such item lands silently, and the leg is the only compile of
+  `cfg(not(unix))` code.
+  **Re-verified at the `native-spawn-residue` close:** both warnings print in that close's pushed
+  run and in the prior close's run, so they predate the iteration.
+  **Why design-pending:** `WAIT_BODY` takes `cfg(unix)`, but `resolve_interpreter` needs a ruling
+  (delete it, or land its Windows caller); and whether the Windows leg should deny warnings, the
+  check that holds the class, turns a warning into a red release artifact.
+  **Cost while deferred:** the Windows build's warning count carries no signal.
+  Filed 2026-09-18 at the `native-spawn-residue` close drain. Owner lookup: `resolve_interpreter`,
+  `WAIT_BODY`, `dead_code`, `windows` with `warn` — none matched.
+
 - **guard-declares-class-correspondence-ungated** [cost: event/low] [surface: guard-kit] — items
   in guard-kit/SPEC.md §The generic ruleset state the inert quoting classes their rule's
   `guard_skeleton` call strips (`Declares sq dq hd`), transcribed by hand, and nothing holds the two
@@ -84,7 +101,8 @@
   currently breaks.
   **Cost while deferred:** the next GNU-only awk construct to ship reds nothing.
   **The slug outlives its `date -d` half,** split out at `native-spawn-residue`'s scope as
-  `gnu-date-spawn-retired` (operator direction, 2026-09-18, lead-relayed); only the awk half stays.
+  `gnu-date-spawn-retired` (operator direction, 2026-09-18, lead-relayed), landed there — civil
+  dates are read in-process and no `date -d` spawn remains; only the awk half stays.
   Filed 2026-09-18 to the gap inbox at `native-spawn-floor`'s spec, promoted at its close drain.
   Owner lookup: `coreutils`, `PROBE_SET`, `mawk`, `awk::GNU` — matched
   `macos-adopter-package-set-copied-per-leg` (brew set copying, distinct).
@@ -99,6 +117,13 @@
   exactly the costed case — a session that touched one kit and wanted the cheap check. That bullet
   read the kit argument as misparsed; the drain re-ran it and it is a filter, and the failure is
   this one, reproduced verbatim. Filed 2026-08-29 at a close drain, iceboxed 2026-09-11.
+  **The class is wider than lifecycle-kit** (re-verified at the `native-spawn-residue` close, also
+  red at the prior close's head): `--run-consumer-smoke gate-sdk` reds on four unaccounted
+  `check-action-*` placeholders only site-kit's install retracts, and `drift-kit` alone reds
+  `check-graph` on stale hook/graph artifacts after its install. drift-kit's own install step was
+  also failing silently (every bundled KPI opts out of `--trend` there, and `grep -c` aborted under
+  `pipefail` before `fail`); that step was fixed at that close, so the close this entry needs is
+  per-kit self-sufficiency or a refused narrowed run, not per-kit patching.
   **Why design-pending — two closes that differ in kind:** have lifecycle-kit's smoke seed the
   agent file it installs into, self-sufficient per kit on the run-gate-tests hermeticity precedent;
   or have the runner refuse a single-kit argument whose kit declares an install dependency, which
