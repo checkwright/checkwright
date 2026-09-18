@@ -12,6 +12,46 @@
 
 ## New Features
 
+- **ere-matcher-capture-groups-unowned** [spec: SPEC-ere-capture.md] — the crate's POSIX ERE
+  matcher cannot report a capture group, so the stage-entry path runs a second ERE interpreter.
+  `capture_group_one` (`native/src/emit/enter_stage.rs`) captures the worktree-lock pid through
+  `bash -c` and `BASH_REMATCH[1]`, and the knob validator reads compilability off bash's
+  `[[ =~ ]]` status, so one pattern is judged in the host `regcomp` dialect and nothing compares
+  it with `native/src/ere.rs`.
+  **Shape settled at spec, 2026-09-18 (lead decision, relayed):** no Pike-VM. A one-group capture
+  whose group stands in the top-level concatenation answers the POSIX subpattern rule with the
+  existing span engine, held by a bash differential oracle; the lock-pattern grammar narrows to
+  that shape, fail-closed and release-declared. Of the seven production `proc::run("bash"` sites
+  (an earlier count said six over a seven-item list) only these two are ERE sites; the two
+  `kill -0` probes need a `libc` route and are filed to the gap inbox, and the other three are
+  bash by subject.
+  Filed 2026-09-04 by build; directed 2026-09-18 as lead unit of `native-spawn-floor` (operator
+  direction, lead-relayed); paired at spec.
+
+- **toolchain-floor-spawn-on-native-windows** [spec: SPEC-spawn-floor.md] — the published
+  toolchain floor carries a member no shipped construct forces, and its forcing grounds are stale.
+  **Re-scoped at spec, 2026-09-18 (lead decision, relayed), measured:** a git-only floor is not
+  reachable in this unit (bash is forced by the shipped shell surfaces and the binary's
+  consumer-command executors, coreutils by native `date -d`), and scope's "the roster and the
+  spawn set disagree both ways" was an artifact of its `proc::run`-only oracle. What remains is
+  making the roster true: `awk::GNU` narrows to `awk` (every shipped awk program is POSIX),
+  absorbing Icebox's `interpreter-floor-gawk-residue-empty`, and each constrained member cites a
+  live forcing construct. The remainder and the ARMS requirement-element mechanization are in the
+  gap inbox.
+  Filed 2026-09-09 by the consult session beside `windows-roster-join`; re-scoped that day at
+  scope; directed 2026-09-18 into `native-spawn-floor`; paired at spec.
+
+- **registry-needs-conflates-requirement-and-spawn** [spec: SPEC-spawn-floor.md] — the spawn
+  recorder notes the literal program string a spawn passed, so a member that resolves its
+  interpreter to a path cannot declare anything unit test A would match.
+  **Ruled at spec, 2026-09-18 (lead decision, relayed):** a declared `<program>` is a
+  requirement matched by name, and the recorder reduces a path to its final component minus the
+  executable suffix. Measured: `--needs` is read only by the CLI flag and port-blockers, not by
+  anything an adopter provisions from; no registry member spawns a resolved path today; and the
+  fixture-vacuity half is already a stated honest limit in gate-sdk/SPEC.md §The `# graph:`
+  manifest.
+  Filed 2026-09-03 by spec; joined `native-spawn-floor` 2026-09-18; paired at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -459,40 +499,6 @@
   Filed 2026-09-10 by close from the gap inbox, on a reach premise this drain falsified;
   re-priced 2026-09-11 at close onto the scheme-ranking ground, which survives.
   not-icebox-eligible: install-smoke-leg-names-mix-two-axes 2026-09-09 operator ruled it a defect
-
-- **toolchain-floor-spawn-on-native-windows** [cost: event/high] [surface: gate-sdk] — a compiled gate binary should not
-  need a GNU userland on the host at all, and the floor roster it advertises is wider than the set
-  it actually spawns.
-  **RE-SCOPED 2026-09-09 at scope, `lead, own-authority` through the message channel, because the
-  entry's filed premise was ALREADY FALSE when it was written.** It was filed at 15:44 asserting
-  that `native/src/toolfloor.rs` spawns each floor tool by bare name, that a System32-first
-  resolution leaves the floor unmeetable however the runner is provisioned, and that "the
-  discriminating probe has not been run". `d9c7a004` landed at 14:01 the same day and is exactly
-  that fix: `proc::resolve_floor_tool` resolves outside the Windows system directory and is taken
-  by all three floor probes — the comparator, doctor's banner and the env-probe emitter — its
-  ground and its single fall-back stated at gate-sdk/SPEC.md §check-graph. The PowerShell leg went
-  green on it. So the provisioning reading is CLOSED rather than deferred, and the slug now names
-  the half that survives.
-  **Its "blocks `windows-roster-join`'s leg going green" sequencing is FALSE and is deleted rather
-  than left standing beside a correction.** That leg's floor is met — its own run resolves `sort`
-  to GNU coreutils and scaffolds shellcheck — and the single assertion reddening it belonged to
-  `smoke-harness-mapfile-inherits-host-line-terminator`, since Done, measured at this scope off
-  the finished run's free log.
-  **WHAT SURVIVES IS THE PRODUCT READING, and it is objective 1's rather than Windows'.** A binary
-  requiring GNU `sort`, `date` and `stat` on the host is bash-era residue the pivot exists to
-  collapse; the roster should shrink to what the binary's gates actually spawn, and on a native
-  host that may be git alone.
-  **Why design-pending:** the roster is a published adopter claim as well as a runtime
-  precondition, so narrowing it is an envelope change rather than a measurement — and what the
-  binary spawns is itself moving while the port's remainder lands, so choosing the corpus to
-  measure against is the design call.
-  **Cost while deferred:** the front door advertises a dependency floor objective 1 exists to
-  remove, which is the shape §What the objectives are not names as the front-door false claim.
-  Filed 2026-09-09 by the consult session beside `windows-roster-join`, on the same ruling;
-  re-scoped the same day at scope, its filed premise having been overtaken by a commit that
-  preceded the filing.
-  **Directed 2026-09-18 into `native-spawn-floor`** (operator direction, lead-relayed): the
-  published-floor narrowing is an envelope change, so /spec authors it and pairs the entry.
 
 - **instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set** [cost: event/high] [surface: .github] — an
   instrument leg's `continue-on-error` is dropped by an argued expiry that fires on the leg running
@@ -2520,44 +2526,6 @@
   committed in one motion. FILED AND NOT BUILT: it rides no cut, no iteration since has shared its
   surface (scope's composition test, re-grounded 2026-09-11), and this is no hotfix.
 
-- **registry-needs-conflates-requirement-and-spawn** [cost: event/high] [surface: gate-sdk] — the crate's registry
-  declares a member's HOST REQUIREMENT while the test guarding it compares that declaration
-  against the literal program string a spawn used, so a member that resolves its interpreter is
-  undeclarable by construction.
-  **THE SYMPTOM THAT MADE IT NON-LATENT IS GONE, and only the symptom.** It briefly stopped
-  being latent when `graph.rs` spawned `proc::resolve_interpreter("bash")`'s resolved absolute
-  path against a bare `bash` declaration that `declaration_covers` matches by EXACT equality.
-  `host-resolution-fail-open-cut` repaired that 2026-09-11: `native/src/gates/graph.rs` and
-  `native/src/installer/init.rs` no longer resolve at the call site, so the recorder observes
-  the bare literal `native/src/gates/mod.rs` declares and the guarding assertion matches again.
-  **THIS ENTRY IS NOT THEREBY CLOSED**, and the note exists so a later drain does not read a
-  vanished symptom as a vanished subject: the repair moved one member back into agreement and
-  changed nothing about the grammar, so the next member that resolves an interpreter is
-  undeclarable on exactly the same construction.
-  **The assertion that would have said so cannot reach the spawn.** Both `check-graph` fixtures
-  pass `--amend-only`, which returns before the generator arm, so the recorder observes nothing
-  and `every_registry_member_declares_the_programs_it_spawns` passes VACUOUSLY on the one member
-  the hotfix changed. The fixture's own comment states why the alternative is hard: the whole-tree
-  generator run anchors to the real repo root and is unfixturable. The vacuity is UNTOUCHED by
-  the 2026-09-11 repair above — the assertion still cannot reach that spawn, so it would not
-  have caught the disagreement and will not catch the next one.
-  **Two halves, and only the first is cheap.** The grammar half — teaching the comparison that a
-  resolved path satisfies a declared program name — is a small change to a crate-wide test made on
-  behalf of every registry member. The vacuity half needs a fixture that reaches the generator arm
-  and may not be buildable at all.
-  **Why design-pending:** whether the declaration is a REQUIREMENT (a resolved path matches by
-  its name) or a LITERAL argv[0] (then a resolving member can declare nothing host-independent) is
-  a contract question gate-sdk/SPEC.md §The `# graph:` manifest owns, and the two answers differ
-  in what `--needs` promises a consumer's machine must carry.
-  **Cost while deferred:** `--needs` is the roster an adopter provisions from, so a member whose
-  declaration silently stops matching its spawn under-reports it; that payload-facing claim is the
-  witness, which puts this on the product side of the 2026-08-30 discriminator.
-  **DISTINCT from `crate-interpreter-resolution-residue`, retired**, whose deliverable is the
-  spawn sites themselves; this is the declaration grammar every registry member shares.
-  Filed 2026-09-03 by spec; drained here with the disagreement re-read at the source.
-  **Joins `native-spawn-floor` 2026-09-18** (operator direction, lead-relayed): the
-  declaration-grammar contract is §The `# graph:` manifest's, so /spec rules it and pairs this.
-
 - **bin-tool-help-arm-absent-tree-wide** [cost: event/low] [surface: gate-sdk] — most shipped `bin/` tools answer
   `-h`/`--help` with something other than usage on stdout at exit 0; the count is derived below
   and deliberately not frozen in this sentence.
@@ -2645,53 +2613,6 @@
   session has to be told about.
   Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
   2026-09-04 at this iteration's scope entry, the boundary having carried it.
-
-- **ere-matcher-capture-groups-unowned** [cost: iteration/low] [surface: gate-sdk] — the crate's POSIX ERE matcher reports
-  spans and cannot report a capture group, so the first consumer needing one shells out to bash.
-  **The sizing this falsifies, and the axis it falsifies it on.** gate-sdk/SPEC.md §The POSIX ERE
-  matcher rules the owed engine "a POSIX ERE matcher with leftmost-longest span reporting, and no
-  substitution engine or capture-group replacement", argued from the nine cohort-held members —
-  eight apply their pattern as a match test and one extracts a span. That argument is about GATE
-  members and holds for them. The `--enter-stage` arm is a non-gate arm, and the worktree-lock pid
-  pattern it reads is consumer config whose whole classification turns on the captured pid, so the
-  API foreclosure below it ("no future consumer can turn a match test into a substitution") was
-  written against a corpus that did not yet contain one.
-  **What shipped instead, ruled 2026-09-04 by the lead at the cut.** `capture_group_one` in
-  `native/src/emit/enter_stage.rs` runs the match through `bash -c` and reads `BASH_REMATCH[1]`.
-  Parity by construction, bash's `[[ =~ ]]` being the semantics the shell original had; the residue
-  is TWO ERE interpreters live on the stage-entry path, which can disagree on a pattern neither this
-  repo nor an adopter is barred from writing. Asserted at the cut, enforced by nothing afterwards.
-  **Verified at the close drain rather than taken from the filing bullet.** `native/src/ere.rs`
-  `enum Inst` is Byte/Split/Jmp/Bol/Eol/Match — there is no `Save`, so the gap is structural rather
-  than an unexposed API, and twenty crate modules reference `ere::`.
-  **COST OF THE FIX, which is why this is a unit and not a line item in a port cut.** A Pike-VM
-  upgrade: an `Inst::Save`, per-thread slot vectors, and a STATED POSIX leftmost-longest
-  subexpression rule — the sub-match rule is the half POSIX specifies and ordinary leftmost-first
-  engines get wrong — against a governed matcher carrying its own acceptance oracle.
-  **Deferred on scope's composition test** (re-grounded 2026-09-11): no iteration since its filing
-  has shared its surface. The icebox tier cannot take it either, the trigger being live — every
-  stage entry runs the path.
-  **Cost while deferred:** one bash spawn per iteration-boundary worktree row, and a divergence
-  invisible once green, since nothing compares the two interpreters.
-  **PREMISE CORRECTED 2026-09-18 at scope (lead decision, own-authority), measured not reasoned;
-  the entry stays deferred and is not re-costed beyond what the measurement forces.** The sizing
-  above prices a Pike-VM upgrade against a corpus of ONE consumer, and that corpus was never
-  measured. `grep -rhno -E 'proc::run\("[a-z0-9_.-]+"' native/src/` finds SIX production `bash -c`
-  sites, not one: `emit/enter_stage.rs:1633` (`capture_group_one`, this entry's subject),
-  `knobs/lifecycle_kit.rs:143` (ERE validation), `evidence.rs:322` and `emit/wait_probe.rs:500`
-  (both `kill -0`), `emit/wait_probe.rs:202`, `emit/port_blockers.rs:291`, `emit/pub_index.rs:53`.
-  **Three of them — the two `kill -0` probes and the ERE validation — look retirable with no
-  capture-group engine at all**, so the Pike-VM cost may buy one call site rather than the path,
-  and the cheaper cut (remove the consumer) was never weighed against it.
-  **Second measured fact, same sweep:** `native/src/toolfloor.rs:9-17` publishes a seven-member
-  floor (`bash:4.3 git jq awk::GNU sort::coreutils shellcheck cargo`) while production code also
-  spawns `date`, `mktemp`, `cp`, `uname`, `ps` and `touch` — the roster and the real spawn set
-  disagree in BOTH directions, which is `toolchain-floor-spawn-on-native-windows`' subject and is
-  recorded here because the two entries share the corpus. Both facts re-derive from the grep above
-  against `PROBE_SET`, so this entry carries its own witness and needs no pointer to one.
-  Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
-  **Directed 2026-09-18 as lead unit of `native-spawn-floor`** (operator direction,
-  lead-relayed); /spec authors the amendment and pairs it.
 
 - **release-note-removal-declaration-uncoupled** [cost: event/high] [surface: gate-sdk] — no oracle couples a removed
   adopter-facing entry point to its release-note declaration, so a note that omits one passes
