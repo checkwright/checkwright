@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-spawn-residue
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,36 @@
 ## New Features
 
 ## Technical Debt
+
+- **overhead-meter-gate-output-classifier-blind** — the overhead meter classifies the runner's
+  per-`FAIL` invariant line as non-gate output, so a line the battery prints is metered as task
+  (or, with `GATE_SDK_SPEC_BASE_URL` empty, as `govdoc`) rather than governance, against
+  drift-kit/SPEC.md §The overhead meter's "gate-verdict shapes to `gate`".
+  **Re-verified at this scope:** `runner::SPEC_LINE_PREFIX` is `"    spec: "`
+  (`native/src/runner.rs:482`) and `MARKERS` in `native/src/emit/overhead_meter.rs:22` has four
+  rows, none matching it.
+  **Deliverable:** drift-kit's gate row gains the runner's `spec: ` prefix as a marker, the same
+  cross-kit literal coupling `PASS: check-` already is, with a fixture or unit case classifying the
+  line as `gate` under both knob settings.
+  **Series-break question, ruled at scope:** no break marker is owed. §The overhead meter already
+  rules that the log's `date` field partitions a series at a consumer's upgrade across a release and
+  a field with no reader is a field removed; the section gains one sentence naming this change
+  beside that precedent.
+  Filed 2026-09-16 by `installer-front-door-cut`'s build to the gap inbox; lead unit of
+  `native-spawn-residue` on the unit-set ruling (operator direction, 2026-09-18, lead-relayed).
+
+- **gnu-date-spawn-retired** — the binary spawns GNU `date -d` at
+  `native/src/emit/kpi/mod.rs:119` and `native/src/emit/queue_index.rs:383`, which is what keeps
+  `sort::coreutils` forced on the adopter floor (context-kit/SPEC.md §bin/env-probe) against
+  objective 1; `kpi/mod.rs:127` also spawns `date +%F` for today's date.
+  **Re-verified at this scope:** all three sites read at HEAD.
+  **Deliverable:** a native civil-date computation replacing all three spawns, whose local-day
+  semantics match the stamps they compare (std has no timezone, so the local offset source is the
+  build's one open call), and the floor's coreutils forcing narrowed if no other GNU-only use
+  remains.
+  Filed 2026-09-18 to the gap inbox at `native-spawn-floor`'s spec with the non-GNU awk leg half,
+  split at this scope and left deferred as `adopter-floor-gnu-date-and-awk-unheld`; promoted on the
+  unit-set ruling (operator direction, 2026-09-18, lead-relayed).
 
 ## Deferred
 
@@ -73,32 +103,21 @@
   `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set` (leg naming and expiry,
   distinct).
 
-- **adopter-floor-gnu-date-and-awk-unheld** [cost: event/low] [surface: gate-sdk] — the published
-  adopter floor keeps GNU coreutils for one reason the binary could retire, and holds its awk
-  narrowing by grep rather than by a run. `native/src/emit/kpi/mod.rs:119` and
-  `native/src/emit/queue_index.rs:383` spawn GNU `date -d`, which is what keeps `sort::coreutils`
-  forced beside the predicate's `sort -V` (context-kit/SPEC.md §bin/env-probe); and no CI leg runs
-  the adopter floor on a non-GNU awk (mawk, BusyBox, BSD), so `native-spawn-floor`'s narrowing of
-  the awk member to unconstrained is held by the site census, not by an execution.
-  **Re-verified at the drain:** both `date -d` sites read at HEAD; a grep of `.github/workflows`
-  for mawk, BusyBox, nawk or original-awk returns nothing.
-  **Not this entry:** bash stays on the floor on the shell front end, the hooks and about twenty
-  consumer-command bash executors in the binary; `native-windows-bash-floor` owns the shell-surface
-  half and the executors run consumer-supplied shell, so neither is residue here.
-  **Why design-pending:** std has no timezone, so retiring `date -d` needs a native civil-date
-  arithmetic whose local-day semantics must match the stamps it compares; and a non-GNU awk leg is a
-  CI-cost call against a claim no shipped construct currently breaks.
-  **Cost while deferred:** the front door advertises coreutils against objective 1, and the next
-  GNU-only awk construct to ship reds nothing.
-  **Awk half, narrowed at `smoke-leg-crate-cache`'s close:** `macos-adopter-legs-brew-gawk` (Done)
-  dropped the macOS legs' Homebrew `gawk`, so both binding macOS install-smoke legs now run the
-  adopter floor on BSD awk; what stays open is mawk and BusyBox, and the `date -d` half whole.
-  **Re-verified at that close's push:** both macOS install-smoke legs went green with the probe
-  resolving `awk` to `/usr/bin/awk` and `gawk` missing.
+- **adopter-floor-gnu-date-and-awk-unheld** [cost: event/low] [surface: .github] — no CI leg runs the
+  adopter floor on mawk or BusyBox awk, so `native-spawn-floor`'s narrowing of the awk member to
+  unconstrained is held by the site census, not by an execution. Both binding macOS install-smoke
+  legs run it on BSD awk since `macos-adopter-legs-brew-gawk` (Done), re-verified at that close's
+  push with the probe resolving `awk` to `/usr/bin/awk` and `gawk` missing.
+  **Re-verified at the drain:** a grep of `.github/workflows` for mawk, BusyBox, nawk or
+  original-awk returns nothing.
+  **Why design-pending:** a non-GNU awk leg is a CI-cost call against a claim no shipped construct
+  currently breaks.
+  **Cost while deferred:** the next GNU-only awk construct to ship reds nothing.
+  **The slug outlives its `date -d` half,** split out at `native-spawn-residue`'s scope as
+  `gnu-date-spawn-retired` (operator direction, 2026-09-18, lead-relayed); only the awk half stays.
   Filed 2026-09-18 to the gap inbox at `native-spawn-floor`'s spec, promoted at its close drain.
-  Owner lookup: `date -d`, `coreutils`, `PROBE_SET`, `mawk`, `awk::GNU` — matched
-  `native-windows-bash-floor` (cited, distinct above) and `macos-adopter-package-set-copied-per-leg`
-  (brew set copying, distinct).
+  Owner lookup: `coreutils`, `PROBE_SET`, `mawk`, `awk::GNU` — matched
+  `macos-adopter-package-set-copied-per-leg` (brew set copying, distinct).
 
 - **arm-spawn-requirements-unrecorded** [cost: event/low] [surface: gate-sdk] — a non-gate arm's
   spawned programs are recorded only in prose (gate-sdk/SPEC.md §The non-gate arm): `ARMS` rows in
@@ -115,6 +134,10 @@
   variable-program spawns, as `native-spawn-floor`'s scope census did.
   Filed 2026-09-18 to the gap inbox by `native-spawn-floor`'s spec; promoted at that close's drain.
   Owner lookup: `ARMS`, `requirement element`, `spawn set`, `PROBE_SET`, `needs` — none.
+  **Directed 2026-09-18 into `native-spawn-residue`** (operator direction, lead-relayed): scope
+  read it as an objective-1 rung, holding the floor census rather than shrinking the floor, and
+  flagged the filter question; the operator kept it in. It mints a name, so /spec authors and
+  pairs it.
 
 - **pid-liveness-spawns-bash** [cost: event/low] [surface: gate-sdk] — `pid_alive` in
   `native/src/evidence.rs:322` and in `native/src/emit/wait_probe.rs:500` spawns
@@ -124,9 +147,12 @@
   `kill(pid, 0)` answering EPERM already means the process exists; native Windows needs its own
   answer, because the pids recorded there come from an MSYS shell.
   **Re-verified at the drain:** both `bash -c` sites and the `ps` fallback read at HEAD.
-  **Inferred, not run:** libc clears the settings-cohort bar (no walk, no spawn, no socket) with
-  an MSRV at or under 1.71 and no transitive dependencies — `cargo info libc`
+  **Probed at `native-spawn-residue`'s scope:** `cargo info libc@0.2` reads 0.2.189 with
+  `rust-version` 1.65, under the crate's 1.71, and its one dependency is optional behind
+  `rustc-dep-of-std`, so a default build pulls nothing transitive.
   **Why design-pending:** a new crate dependency and a platform split in one liveness owner.
+  **Directed 2026-09-18 into `native-spawn-residue`** (operator direction, lead-relayed); the libc
+  dependency is spec's to rule, so /spec authors the amendment and pairs this entry.
   **Cost while deferred:** two bash spawns and an off-floor `ps` on each liveness probe; low,
   because bash stays on the floor for other reasons.
   Filed 2026-09-18 to the inbox at `native-spawn-floor`'s spec (kill -0 route ruled out of scope).
@@ -3097,26 +3123,6 @@
   commit, which is how it was found.
   Filed 2026-09-16 by `installer-front-door-cut`'s close, as the gap generalization owed by the
   lesson that dispositioned to that SPEC section.
-
-- **overhead-meter-gate-output-classifier-blind** [cost: iteration/low] [surface: drift-kit]
-  — the overhead meter classifies the runner's per-`FAIL` invariant line as non-gate output, so a
-  line the battery prints is metered as task rather than governance.
-  **Measured rather than reasoned:** the line printed beneath every `FAIL`
-  (gate-sdk/SPEC.md §run-gates) matches no row of `native/src/emit/overhead_meter.rs`'s `MARKERS`
-  table under this repo's URL-resolved configuration, so it falls to the task bucket; with
-  `GATE_SDK_SPEC_BASE_URL` empty it carries `<dir>/SPEC.md` and lands in `govdoc` instead — the
-  classification depends on a knob that has nothing to do with what the line is.
-  **Candidate, not ruled:** give drift-kit's gate row the runner's four-space `spec: ` prefix as a
-  marker, a second spelling of `runner::SPEC_LINE_PREFIX` and the same cross-kit literal coupling
-  `PASS: check-` already is.
-  **Why design-pending:** whether a classifier change owes a SERIES BREAK is the real question.
-  The meter feeds a live measurement, and changing the classifier mid-series costs comparability the
-  correction does not buy back.
-  **Cost while deferred:** ~150 B per red gate against a transcript of megabytes — no reading moves,
-  which is why this was costed and deferred at build rather than fixed there.
-  Filed 2026-09-16 by `installer-front-door-cut`'s build to the gap inbox;
-  `SPEC-payload-withholding.md` delta 5 rostered this reader and asked only whether the line
-  INFLATES the gate count (answered no, correctly), never whether it should COUNT as gate output.
 
 - **vendored-kit-readme-spec-link-dangles** [cost: event/high] [surface: gate-sdk]
   — a vendored kit README still links a `SPEC.md` its installed tree no longer carries. This is the
