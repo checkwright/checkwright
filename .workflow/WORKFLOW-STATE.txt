@@ -10,3 +10,4 @@ smoke-leg-crate-cache align afd8d331 2026-09-18 7d851c01
 smoke-leg-crate-cache build adbfcb67 2026-09-18 96c78cd2
 smoke-leg-crate-cache build a32b5ea5 2026-09-18 87f09886
 smoke-leg-crate-cache validate a99506a0 2026-09-18 b459250f
+smoke-leg-crate-cache close ae23701f 2026-09-18 e83e37d8
