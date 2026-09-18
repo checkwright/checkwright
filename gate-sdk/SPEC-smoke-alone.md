@@ -172,7 +172,8 @@ any more, and the retraction mechanism has no remaining instance.
 **Not yet applied — site-kit/SPEC.md**, the two paragraphs at lines 659-672. The
 sentence "this kit contributes `check-docs-cname-parity` and — because it writes
 the only Actions-shaped surface any install writes — the gates that lint a
-workflow's Actions shape: …" becomes "this kit contributes
+workflow's Actions shape: `check-action-pinning`, `check-action-run-shell`,
+`check-action-gh-repo`." becomes "this kit contributes
 `check-docs-cname-parity`, and its workflow is linted by the `check-action-*`
 gates gate-sdk's own leg registers beside the workflow template gate-sdk
 installs". The next paragraph's "Those four qualify … because this install

@@ -117,10 +117,13 @@ command.
 
 ## Existing sections updated
 
-Roster probe: `git grep -n "gap capture\|survey capture\|recurrence stamp" -- '*.md'`
+Roster probe: `git grep -n -i "gap capture\|survey capture\|recurrence stamp" -- '*.md'`
 over the tracked tree, with `docs/` mirrors and `TASK-QUEUE.md` excluded. It hits
 `CLAUDE.md` (this repo's own resident lines, which state the obligations and not
-their prices, so they are not a target) and the context-kit roster row.
+their prices, so they are not a target), `.workflow/gap-inbox.md` and
+`lifecycle-kit/gate-tests/check-gap-inbox-neutrality/{good,bad}/gap-inbox.md`
+(each a `# contract:` header citing the section name, not price prose, so none
+is a target), and the context-kit roster row.
 
 - `lifecycle-kit/SPEC.md` §The committed gap inbox, the opening paragraph and the
   resident-tier paragraph (deltas 1 and 2).
