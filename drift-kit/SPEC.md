@@ -666,7 +666,7 @@ bound.
 
 Interface: `bash gate-sdk/bin/run-gates.sh --emit trajectory` writes the markdown table (one row per closed
 iteration, stable columns) to stdout — the shape the committed projection
-pins; bare invocation prepends a human-oriented header. The extractor degrades
+pins; `--human` prepends a human-oriented header. The extractor degrades
 per surface to an `n/a (<reason>)` cell and exits 0 — drift-kit's fail-visible
 discipline, registering no gate. `DRIFT_KIT_TRAJECTORY_SURFACES` overrides the
 harvested state-file paths (§Layout and configuration).
@@ -1665,8 +1665,10 @@ the stage-economics meter, the overhead meter, the bundled KPIs — runs from
 vendored. Two invocations a session reaches for first do not work and are not
 worth re-deriving: `--run-gate-tests drift-kit/gate-tests` errors *no fixture
 tree*, because there is none by the line above; and naming a subset of kits
-fails in gate-sdk's own install, because `check-reads-couples` declares a
-lifecycle-kit knob a tree without lifecycle-kit cannot resolve.
+fails, because a smoke in the named set asserts over the whole vendored tree
+and a subset scratch cannot supply it — the failing install is whichever kit
+holds that assertion, not a fixed one, so read the runner's own *`<kit>`
+failed* line rather than assuming a site.
 
 `templates/kpis.list` names every bundled member, never a starter subset: it is
 the kit's claim about what it bundles, which the roster above, this SPEC, and the

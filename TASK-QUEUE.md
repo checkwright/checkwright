@@ -472,9 +472,8 @@
   **Cost while deferred:** two surfaces keep paying a correcting paragraph at every read, and
   every new reader of the CI matrix starts from a miscount the prose then walks back.
   Filed 2026-09-10 by close from the gap inbox, on a reach premise this drain falsified;
-  re-priced 2026-09-11 at close onto the scheme-ranking ground, which survives. Not iceboxed,
-  because the operator's ruling makes the current naming a defect to close rather than a
-  state to accept.
+  re-priced 2026-09-11 at close onto the scheme-ranking ground, which survives.
+  not-icebox-eligible: install-smoke-leg-names-mix-two-axes 2026-09-09 operator ruled it a defect
 
 - **toolchain-floor-spawn-on-native-windows** [cost: event/high] [surface: gate-sdk] — a compiled gate binary should not
   need a GNU userland on the host at all, and the floor roster it advertises is wider than the set
@@ -1828,6 +1827,37 @@
   the five errors here.
   Surfaced 2026-08-18. Filed 2026-08-18 by close, as the gap generalization owed by the
   `docs/site-architecture.md` staleness fixed in the same commit.
+
+- **generated-projections-roster-ungated** [cost: event/low] [surface: docs] — the
+  generated-projections roster names every projection and the wide new-gate and
+  new-tag-class fan-outs, and nothing asserts it gains a row when a new projection
+  or a new gate lands. Each rostered projection has its own freshness gate; the
+  roster itself has none.
+  **The instance, measured at the drain rather than recalled.** This iteration
+  landed `docs/install-evidence.md` and `check-install-evidence-fresh`; each took a
+  hand-written row, and the roster now stands at 12. Nothing would have reddened
+  had the build forgotten either — and that row is what a later author reads
+  *instead of* meeting the fan-out one red gate at a time, so an omission costs
+  exactly the discovery the roster exists to sell.
+  **Deliverable:** derive the population from the freshness gates' own `# graph:`
+  manifests — every rostered projection carries one, which is what makes the set
+  machine-readable — and assert a row per member, both directions.
+  **Why design-pending:** the row-to-member binding is the open part. Rows are
+  prose headed by a bold name rather than a declared key, so matching one to a
+  manifest needs either a per-row key or a path match into the row's body, and both
+  are docs-surface changes carrying their own freshness question.
+  **Adjacent to `projection-trigger-witness`**, whose subject is whether each row's
+  stated *trigger* is true, settled by perturbing the class and diffing the
+  emission. This one asserts the row *exists*, and a differential witness over
+  present rows cannot find an absent one. The machine-readable per-row declaration
+  that entry names as its own open part would serve both, which is why they are
+  read together rather than merged.
+  **Cost while deferred:** one unprompted hand edit per new projection or gate,
+  against a roster whose entire value is that the next author reads it rather than
+  rediscovering the fan-out.
+  Filed 2026-09-18 by spec while landing a new projection; drained at this
+  iteration's close, which re-measured the roster at 12 rows and confirmed no gate
+  reads it.
 
 - **shipped-bin-removal-deprecation-path** [cost: event/high] [surface: canon-kit] — deleting a kit-shipped `bin/` tool
   needs no deprecation marker, so that arm of the major-bump criterion is unreachable by design.

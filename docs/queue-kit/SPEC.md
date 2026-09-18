@@ -1562,6 +1562,12 @@ labour with `check-queue-sections`: hygiene owns line *shape* (what a column-0
 line may be), the sections gate owns heading *presence* (that each required
 `##` heading exists exactly once) — neither subsumes the other.
 
+The duplicate arm's commonest true positive is a **wrapped fragment**: promoting
+several entries in one commit gives them a shared sentence whose wrapping lands
+one identical line in each. The prose is correct and the collision is an artifact
+of where it broke, so the fix is to **re-wrap**, not to reword as the red
+suggests — and a `check-queue-wrap` red on the widened line commonly follows.
+
 ### check-queue-sections
 
 Invariant: the queue file carries each `QUEUE_KIT_REQUIRED_SECTIONS` heading
