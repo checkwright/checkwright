@@ -57,6 +57,13 @@ This amendment leaves that ruling and `publish.yml` unchanged. The leg header ci
 the ruling's reach so that a reader comparing the two jobs does not see a
 contradiction.
 
+**This reading of the ruling's reach is confirmed, operator direction,
+2026-09-18:** the 2026-09-09 refusal (installer/SPEC.md §The packer) is scoped
+to `publish.yml`'s `pack:` job and does not reach the install-smoke legs; they
+may adopt the producer's downloaded artifact. The scoping above is this
+amendment's own argument for that reach; the direction settles it rather than
+resting on the argument alone.
+
 **Not reached.** `install-smoke` (the baseline Linux leg) and
 `install-smoke-powershell` build on purpose. The first sets no hand-off, so its
 suite compiles the payload's artifact. The second packs a locally built artifact
