@@ -193,3 +193,4 @@
 | smoke-leg-crate-cache | sc sp a b v c | 3f/0d | 2 · ≤0d | 20s clean | 116 |
 | reach-ruling-lockstep | sc sp a b v c | 4f/0d | 2 · ≤0d | 20s clean | 117 |
 | native-spawn-residue | sc sp a b v c | 5f/2d | 2 · ≤0d | 20s clean | 117 |
+| declined-target-audit | sc sp a b v c | 4f/0d | 3 · ≤0d | 20s clean | 117 |

@@ -16,6 +16,25 @@
 
 ## Deferred
 
+- **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
+  — `check-stage-entry` assertion D reads an inferred marker only where the full spelling opens a
+  physical line (`inferred_marker` in `native/src/gates/stage_entry.rs`), so a marker an author
+  places mid-line, or whose spelling a hard wrap splits, is invisible and its unrun claim passes the
+  build entry. Both attested instances were mid-line: two of three markers in a
+  declined-target-audit amendment, found only because the third, well-formed one redded
+  `--simulate build`. A line-start marker whose reason wraps to the next line already reds (empty
+  reason), so that case fails closed.
+  **Re-verified at the drain:** the unit test `a_marker_is_read_only_at_line_start` passes and
+  asserts a mid-line `**Inferred, not run:**` reads as `None`; a line opening with a split spelling
+  fails both `strip_prefix` arms.
+  **Why design-pending:** lifecycle-kit/SPEC.md §templates/stages/ rules a mid-line mention prose,
+  not a marker, and the test pins it. Refusing a bold unbackticked mid-line spelling as a malformed
+  marker narrows that rule, and prose mentions in an amendment would red.
+  **Cost while deferred:** a misplaced marker's claim reaches build unrun, and only the author's own
+  line-start discipline holds.
+  Filed 2026-09-18 to the gap inbox at declined-target-audit's align; promoted at its close drain.
+  Owner lookup: `inferred marker`, `inferred_marker`, `scan_markers`, `malformed marker` — none.
+
 - **windows-build-dead-code-warnings-unheld** [cost: event/low] [surface: native] — the
   `x86_64-pc-windows-msvc` `native-artifacts` leg compiles with two `dead_code` warnings no other
   target shows: `WAIT_BODY` in `native/src/emit/wait_probe.rs` and `resolve_interpreter` in
