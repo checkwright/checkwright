@@ -992,7 +992,8 @@ ask adds its row below, which is the review seam:
   obligation whose bound actor is any session and whose owning section no such
   session's trigger loads: gap capture and the recurrence stamp, both
   lifecycle-kit/SPEC.md §The committed gap inbox, and survey capture
-  (§The survey record).
+  (§The survey record), each of which states its line's cost and earn-back
+  condition.
 - **every other kit** — none: their hooks, skills, gates, and SPECs are load-
   or event-triggered, so they cost nothing until opened. The discriminator this
   row turns on, and the one the brevity pass reads: a resident line that

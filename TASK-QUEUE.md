@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **footprint-roster-rows-price-unevenly** [spec: SPEC-resident-pricing.md] — the consumer
-  footprint roster's lifecycle-kit row cites three resident obligations (gap capture, the recurrence
-  stamp, survey capture) whose owning sections state neither the line's cost nor what earns it
-  back, where drift-kit's cited section states both.
-  **Ruled at spec:** one cost-and-earn-back sentence per obligation, each naming the act only the
-  line's marginal reader performs. None names a threshold or a withdrawal trigger, which leaves the
-  recurrence line's operator direction unconditioned. The roster row gains drift-kit's clause.
-  Filed 2026-09-17 at build; joins `declined-target-audit` by operator direction (2026-09-18,
-  lead-relayed).
-
 - **consumer-smoke-single-kit-run-not-self-sufficient** [spec: SPEC-smoke-alone.md] — a
   `--run-consumer-smoke` narrowed to one kit root reds while the all-kit run is green, because
   installs lean on sibling kits' installs.
@@ -3373,5 +3363,6 @@
 ## Done
 
 - declined-update-target-cause-unaudited
+- footprint-roster-rows-price-unevenly
 
 ## Lessons Learned

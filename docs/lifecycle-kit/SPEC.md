@@ -1020,9 +1020,13 @@ index: a gap surfaced mid-stage has no committed place to land except the queue
 file that stage session is already contending on. So mid-iteration gap *filing*
 gets a committed, append-only channel of its own — distinct from the
 knowledge-friction log, which stays the narrow sensor for a fact re-derived
-because no doc owns it (drift-kit/SPEC.md §The knowledge-friction loop): a
+because no doc owns it (drift-kit/SPEC.md §The knowledge-friction loop). A
 *work-shaped* finding (a gap, a task, a defect) is backlog, not knowledge
-friction, and routes here.
+friction, and routes here. The route costs one always-loaded line in the
+consumer's instructions file, because the mid-iteration session that finds a gap
+loads no trigger for this section. It earns that cost by the inbox actually
+filling: the bullets a close drain dispositions are gaps that would otherwise
+have been a queue edit racing a stage session, or nothing at all.
 
 **The surface.** `.workflow/gap-inbox.md` (knob `LIFECYCLE_KIT_GAP_INBOX_FILE`,
 §Layout and configuration) is a committed, append-only capture buffer. Grammar:
@@ -1484,9 +1488,12 @@ templates.** The obligation binds *any session*, and context-kit/SPEC.md §The
 consumer footprint rules that class carried resident once: no kit-side surface
 every session shape loads exists, so a clause in each unserved stage template
 would be four restatements reaching no reader the resident line misses. This
-section stays the owner and the templates stay silent — with the one exception
-that ruling's corollary preserves, a reader whose *discharge differs*, which is
-the lead immediately below.
+section stays the owner and the templates stay silent, except where that ruling's
+corollary lets a reader whose *discharge differs* be told directly: the lead,
+immediately below. The resident line costs one always-loaded bullet. It earns
+that cost by direct stamps, meaning `recurrence:` dates that land in commits
+other than the close drain's. The drain loads this rule through its own
+template, so the line's only marginal reader is a session that is not the drain.
 
 *Not forbidden*, on three independent grounds. It would strand a class by
 construction: this drain runs once, early in close, while close's own later steps
@@ -1580,7 +1587,11 @@ dispatching session's context and dies with it. The next stage needing the same
 roster has no artifact to read, so it dispatches the same survey again. Neither
 session is undisciplined: each is correct in isolation, and the cost is
 structural. This surface is where the expensive half of a survey is carried
-across the stage boundary.
+across the stage boundary. It is reached through one always-loaded line in the
+consumer's instructions file, because both halves of the obligation bind every
+stage session: reading the record before buying a survey, and filing one a later
+stage will want. It earns that cost by citation. A later stage runs a recorded
+block's witness and cites the finding instead of re-buying the survey.
 
 **The decomposition that makes carrying safe.** A carried finding has a
 staleness problem a re-derivation does not: a census written at scope and read
