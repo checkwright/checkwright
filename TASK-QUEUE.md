@@ -12,60 +12,6 @@
 
 ## New Features
 
-- **design-partner-preview** [spec: SPEC-install-observation.md] — a narrow external preview
-  before any broad announcement: a preview cohort whose composition is ruled in the operator's
-  private brief, installs observed live rather than by written feedback, instrumented for
-  time-to-first-green, first useful red, false-positive dispositions, and 7/30-day retention
-  per kit. It is the first rung on this queue whose deliverable is **evidence from outside
-  this tree** rather than a tree change.
-  **Promoted scope is the TREE HALF alone** — the observation protocol on disk, whose
-  completion predicate is the per-install record and its public aggregate projection. The
-  operator hours and the thirty-day-or-longer calendar window run beside later iterations and
-  never inside a stage session; they are what this entry keeps when the amendment merges,
-  whose Definition of Done rules the terminal move a **demotion** rather than a Done move —
-  the tree half is one increment of the corpus.
-  **Sequencing is the load-bearing part.** The preview runs *before*
-  `benchmark-ab-experiment`, so pilot findings shape that experiment's task classes and
-  metrics rather than being retrofitted to them; per-gate true/false-positive history and
-  profile retention are preview deliverables, not pre-launch builds. The full launch ruling
-  behind this sequencing is operator material and stays in the local-only private brief; this
-  entry carries only the queue-visible rung.
-  **The cohort was a named population here until 2026-08-09 and is deliberately no longer
-  one** — the composition it stated had since been re-ruled, so the sentence contradicted the
-  ruling it was meant to carry; the fix is to name the owner rather than restate a ruling
-  this file does not hold.
-  **Expected FIRST FINDING, not a precondition:** today's quick start is curl, sha256sum, tar
-  and `bash … init` from a repository root; macOS needs GNU bash and coreutils by adopter
-  action; native Windows needs Git for Windows. That is why the amendment gives the installer
-  no delta of its own — those host-floor facts are an output of the observation, not an input.
-  **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` or the
-  git-only-floor discharge (the trigger is what the preview measures); the icebox (the
-  highest cost-while-deferred in the intake).
-
-- **external-gate-quality-evidence** [spec: SPEC-install-observation.md] — durable, published
-  evidence of **gate quality as experienced outside this tree**: per-gate true/false-positive
-  history, the disposition of each red a non-author hit, and whether a red changed behaviour
-  or was worked around. The direct answer to the standing threat that a false positive
-  converts the enforcement advantage into bypass and distrust — every blocking gate raises
-  the stakes of a wrong red.
-  **Why it is not just a report.** The tree already publishes evidence projections, so the
-  mechanism exists; what does not exist is a *population* to measure. A red in this repo is
-  authored and dispositioned by the same party, which cannot distinguish a gate that is right
-  from a gate whose author agrees with it.
-  **The amendment settles the open design question the deferred form carried:** the
-  collection surface is a new capture stream — the observation record's `red` line — rather
-  than a field on a disposition this tree already records, because the disposition being
-  measured is the *adopter's*, which no surface here holds.
-  **Promoted scope is the record's FIELDS, not the evidence itself.** The published history
-  accrues only after observations exist, so the amendment's Definition of Done rules this
-  entry's terminal move a **demotion** as well.
-  **The bundle with `design-partner-preview` is not convenience.** This entry's own carry
-  sentence rules the history unrecoverable — it cannot be retroactively collected, and starts
-  accruing only once someone decides to record it — so a protocol landing without the
-  gate-quality fields designed into it sends the first installs' reds somewhere this baseline
-  can never read. There is one chance to fix the record's fields and it is before the
-  observation window opens, which is what makes the two units one iteration rather than two.
-
 ## Technical Debt
 
 ## Deferred
@@ -1120,6 +1066,73 @@
   is that claims are mechanically proven rather than asserted. The carry is
   reputational and front-door-resident, accruing on every reader rather than with
   time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
+
+- **design-partner-preview** [cost: event/low] [surface: drift-kit] — a narrow external preview
+  before any broad announcement: a preview cohort whose composition is ruled in the operator's
+  private brief, installs observed live rather than by written feedback, instrumented for
+  time-to-first-green, first useful red, false-positive dispositions, and 7/30-day retention
+  per kit. It is the first rung on this queue whose deliverable is **evidence from outside
+  this tree** rather than a tree change.
+  **The TREE HALF landed in `external-install-evidence`** — drift-kit/SPEC.md §The
+  install-observation record and §The install-evidence projection, the `--emit file-install`
+  capture arm, and `docs/install-evidence.md` behind `check-install-evidence-fresh`. What is
+  kept here is the expensive half: operator hours and a calendar window of thirty days or
+  more, running beside later iterations and never inside a stage session. What re-promotes
+  this entry is an observed install, not another tree change.
+  **Sequencing is the load-bearing part.** The preview runs *before*
+  `benchmark-ab-experiment`, so pilot findings shape that experiment's task classes and
+  metrics rather than being retrofitted to them; per-gate true/false-positive history and
+  profile retention are preview deliverables, not pre-launch builds. The full launch ruling
+  behind this sequencing is operator material and stays in the local-only private brief; this
+  entry carries only the queue-visible rung.
+  **The cohort was a named population here until 2026-08-09 and is deliberately no longer
+  one** — the composition it stated had since been re-ruled, so the sentence contradicted the
+  ruling it was meant to carry; the fix is to name the owner rather than restate a ruling
+  this file does not hold.
+  **Expected FIRST FINDING, not a precondition:** today's quick start is curl, sha256sum, tar
+  and `bash … init` from a repository root; macOS needs GNU bash and coreutils by adopter
+  action; native Windows needs Git for Windows. That is why the merged channel gives the
+  installer no delta — those host-floor facts are an output of the observation, not an input.
+  **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` or the
+  git-only-floor discharge (the trigger is what the preview measures); the icebox (the
+  highest cost-while-deferred in the intake).
+  **Cost while deferred — still the highest of its intake, and now the more exposed half.**
+  Every claim that would be strongest with external evidence still rests on internal
+  dogfooding, and the channel that would carry it is built and reading zero: the published
+  page states an honest `0` on every pass while the volume of unattested governed surface
+  keeps growing. Deferring also silently defers `benchmark-ab-experiment`, since running that
+  first would fix the wrong metrics.
+  Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
+
+- **external-gate-quality-evidence** [cost: event/low] [surface: drift-kit] — durable, published
+  evidence of **gate quality as experienced outside this tree**: per-gate true/false-positive
+  history, the disposition of each red a non-author hit, and whether a red changed behaviour
+  or was worked around. The direct answer to the standing threat that a false positive
+  converts the enforcement advantage into bypass and distrust — every blocking gate raises
+  the stakes of a wrong red.
+  **Why it is not just a report.** The tree already publishes evidence projections, so the
+  mechanism exists; what does not exist is a *population* to measure. A red in this repo is
+  authored and dispositioned by the same party, which cannot distinguish a gate that is right
+  from a gate whose author agrees with it.
+  **The record's FIELDS landed in `external-install-evidence`**, settling the open design
+  question the deferred form carried: the collection surface is a new capture stream — the
+  observation record's `red` line, with its closed `<verdict>`, `<disposition>` and
+  `<behaviour>` sets — rather than a field on a disposition this tree already records, the
+  disposition being measured being the *adopter's*. What is kept here is the evidence itself,
+  which accrues only once observations exist; `docs/install-evidence.md` publishes zero reds
+  today, and a population is what re-promotes this entry.
+  **The bundle with `design-partner-preview` was not convenience.** This entry's own carry
+  sentence rules the history unrecoverable — it cannot be retroactively collected, and starts
+  accruing only once someone decides to record it — so a protocol landing without the
+  gate-quality fields designed into it would have sent the first installs' reds somewhere this
+  baseline can never read. There was one chance to fix the record's fields and it is spent.
+  **Cost while deferred — moderate, asymmetric, and no longer unrecoverable.** The
+  gate-quality claim still rests on fixture pairs and a green battery, which prove a gate does
+  what its author specified and say nothing about whether that was the right thing to specify.
+  The irreversible half is discharged: the record exists, so the history starts accruing at
+  the first observation rather than never. What remains is that the first externally-hit false
+  positive is argued from anecdote until a population exists.
+  Surfaced 2026-08-02 at close, in the same intake pass, as the last of the growth half.
 
 - **gate-authoring-sdk-surface** [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] — a gate-authoring SDK.
   `.gate` as the substrate-neutral surface. **Operator-surfaced during
