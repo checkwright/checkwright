@@ -33,15 +33,6 @@
 
 ## Technical Debt
 
-- **windows-build-dead-code-warnings-unheld** — the Windows `native-artifacts` leg compiles with
-  two `dead_code` warnings no other target shows: `WAIT_BODY` and `resolve_interpreter`.
-  **Ruled at scope:** delete `resolve_interpreter`, since `spawn_target`'s funnel already applies
-  its `Refuse` face to every spawn. Fence `WAIT_BODY` behind `cfg(unix)`. Hold the class with a
-  clippy `-D warnings` step on every `native-artifacts` leg, separate from the artifact build
-  (delta 4 of `windows-bash-floor`'s amendment).
-  Filed 2026-09-18 at the `native-spawn-residue` close drain. Joins `windows-bash-floor` by
-  operator direction (2026-09-18, lead-relayed).
-
 ## Deferred
 
 - **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
@@ -3348,5 +3339,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- windows-build-dead-code-warnings-unheld
 
 ## Lessons Learned

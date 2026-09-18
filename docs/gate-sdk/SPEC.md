@@ -2065,7 +2065,7 @@ a named reader at a named transition:
   declaration could not be written host-independently for exactly the members
   that resolve. The spawn recorder therefore notes a name — a bare name as
   passed, a value carrying a path separator as its final component minus the
-  host's executable suffix — so a member spawning `resolve_interpreter("bash")`'s
+  host's executable suffix — so a member whose spawn the funnel resolved to a
   path declares `bash` and is covered, and a `?<TAB><knob>` declaration still
   absorbs its knob's command word whatever form that word takes.
 - **`?<TAB><knob-name>`** — the requirement is the **command word of that knob's
@@ -14172,6 +14172,15 @@ ranks removing the duplication above gating it. The workflow's preceding
 build-the-binary step stays — §check-gate-binary-fresh still needs the artifact,
 and that step duplicates nothing.
 
+**The lint half does have one CI spelling, and it holds a different target.**
+Every `native-artifacts` leg runs `cargo clippy --release --all-targets` at
+`-D warnings` on its own `--target`, after the artifact build rather than inside
+it, so a warning reds the leg and never changes what a release publishes. It is
+not the deleted duplicate: the battery's host compiles one target, and only a
+Windows leg compiles the crate's `cfg(not(unix))` code, so a dead item there is
+invisible to this gate on every contributor host. The step exists for that class.
+The test half stays this gate's alone.
+
 **The predicate is the crate's presence, not cargo's**, and that is what keeps the
 gate simple:
 
@@ -14981,13 +14990,12 @@ absent-or-wrong-impl, which context-kit/SPEC.md §bin/env-probe owns and which i
 the true reading of such a host. **A name belongs on the roster when the Windows
 system directory ships a program of that name that is not the program the
 payload wants** — a fact about the platform and not about a consumer, which is
-why no knob widens it, on `WINDOWS_SYSTEM_DIR_VIEWS`'s own ground. The two
-dispositions are implemented by `proc::resolve_interpreter` and
-`proc::resolve_floor_tool`, which the funnel selects between by the roster rather
-than a call site selecting one by which function it calls. `resolve_floor_tool`
-additionally keeps its own callers, because it is a **reporting** resolver whose
-value is rendered in doctor's banner and the env-probe emitter rather than only
-spawned — the one identity the funnel cannot absorb.
+why no knob widens it, on `WINDOWS_SYSTEM_DIR_VIEWS`'s own ground. The funnel,
+`spawn_target`, applies the roster's disposition to every spawn.
+`proc::resolve_floor_tool` also keeps its own callers, because it is a
+**reporting** resolver whose value is rendered in doctor's banner and in the
+env-probe emitter rather than only spawned. That is the one identity the funnel
+cannot absorb.
 
 **Why the owner and not the call sites, which is the part a sweep would get
 wrong.** A sweep is refused on measurement rather than on taste: the

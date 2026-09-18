@@ -244,7 +244,7 @@ does not hold.
 If a runner's toolchain lacks it, the step adds the component with `rustup`
 first.
 
-**Not yet applied.** gate-sdk/SPEC.md, the sentence opening "The two
+**Applied at build,** with §check-crate-arms gaining the CI lint step's paragraph. gate-sdk/SPEC.md, the sentence opening "The two
 dispositions are implemented by `proc::resolve_interpreter` and
 `proc::resolve_floor_tool`" (currently lines 14980-14985), becomes:
 

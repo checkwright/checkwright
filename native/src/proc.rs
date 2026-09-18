@@ -231,8 +231,8 @@ fn resolve_on_path<F: Fn(&std::path::Path) -> bool>(
 const WINDOWS_SYSTEM_DIR_VIEWS: [&str; 3] = ["System32", "SysWOW64", "Sysnative"];
 
 // spec: gate-sdk/SPEC.md §check-graph — what a host offering only the system directory's homonym
-// earns. `Refuse` is `resolve_interpreter`'s face and `FallBack` is `resolve_floor_tool`'s, so the
-// roster below picks the face rather than a call site picking it by which function it calls
+// earns. `spawn_target`'s funnel applies `Refuse` to every spawn and `FallBack` is also
+// `resolve_floor_tool`'s, so the roster below picks the face rather than a call site picking it
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 #[cfg_attr(not(windows), allow(dead_code))]
 enum NoResolution {
@@ -312,34 +312,6 @@ fn resolve_outside_system_dir<F: Fn(&std::path::Path) -> bool>(
                 program
             )
         })
-}
-
-// spec: gate-sdk/SPEC.md §check-graph — the interpreter a spawn runs, resolved to a path rather
-// than named: `GATE_SDK_PROGRAM_FLOOR` guarantees a `bash` exists on the host, never that a bare
-// name reaches it, and on Windows the bare name reaches System32's WSL launcher instead.
-// spec: gate-sdk/SPEC.md §check-graph — the `Refuse` face of `SYSTEM_DIR_HOMONYMS`, reached
-// through the funnel rather than pointed at a call site: the roster owns which names take it, so
-// no site chooses a disposition by choosing which resolver it calls
-#[cfg_attr(not(windows), allow(dead_code))]
-pub fn resolve_interpreter(program: &Program) -> Result<Program, String> {
-    #[cfg(windows)]
-    let (pathext, system_root) = (
-        Some(std::env::var("PATHEXT").unwrap_or_default()),
-        std::env::var("SystemRoot").ok(),
-    );
-    #[cfg(not(windows))]
-    let (pathext, system_root): (Option<String>, Option<String>) = (None, None);
-    let dirs: Vec<std::path::PathBuf> = std::env::var_os("PATH")
-        .map(|p| std::env::split_paths(&p).collect())
-        .unwrap_or_default();
-    resolve_outside_system_dir(
-        program.invocation(),
-        &dirs,
-        pathext.as_deref(),
-        system_root.as_deref(),
-        is_executable,
-    )
-    .map(|p| program.clone().at(p))
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the `FallBack` face of `SYSTEM_DIR_HOMONYMS`, and a

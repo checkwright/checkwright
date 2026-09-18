@@ -1021,6 +1021,19 @@ jobs:
           TARGET: ${{ matrix.target }}
         run: bash scripts/ci-build-artifact.sh "$TARGET" "$RUNNER_TEMP/artifact"
 
+      # check-crate-arms' lint half, run on this leg's own target and after the
+      # artifact build rather than inside it, so a warning reds the leg and never
+      # changes what a release publishes. Only the Windows leg compiles the crate's
+      # `cfg(not(unix))` code, which is where this holds the dead-code class no
+      # other target can see (gate-sdk/SPEC.md §check-crate-arms).
+      - name: lint the crate for ${{ matrix.target }} at -D warnings
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          cargo clippy --version >/dev/null 2>&1 || rustup component add clippy
+          cargo clippy --release --all-targets --manifest-path native/Cargo.toml --target "$TARGET" -- -D warnings
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           # Named for its target and carrying the target directory, so a

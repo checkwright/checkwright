@@ -14,6 +14,7 @@ pub const KNOBS: &[&str] = &["GATE_SDK_TMP_DIR", "GATE_SDK_WORKFLOW_DIR"];
 // spec: delegation-kit/SPEC.md §bin/wait-probe — one wait body for every form, so no form's result
 // rests on a differently-shaped trial: the loop, its beat and its four exit traps are one constant
 // the arm execs into, never a compiled re-expression of the form under measurement
+#[cfg(unix)]
 const WAIT_BODY: &str = r#"
 set -uo pipefail
 t0="$1"; ppid_rec="$2"; hb="$3"; marker="$4"; pred="$5"; st="$6"; key="$7"; form="$8"
@@ -579,6 +580,7 @@ form=harness predicate=liveness producer_ms=10000 waiter_exit=0 marker_at_ms=- w
 
     // spec: delegation-kit/SPEC.md §bin/wait-probe — the wait body is one constant every form arms,
     // and its polarity is the property this tool's own trials corrected
+    #[cfg(unix)]
     #[test]
     fn the_one_wait_body_keeps_the_measured_polarity() {
         assert!(WAIT_BODY.contains("until [ -f \"$marker\" ]"));
