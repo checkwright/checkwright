@@ -3367,9 +3367,4 @@
 
 ## Done
 
-- declined-update-target-cause-unaudited
-- footprint-roster-rows-price-unevenly
-- consumer-smoke-single-kit-run-not-self-sufficient
-- consumer-smoke-subset-accounting-verdict
-
 ## Lessons Learned
