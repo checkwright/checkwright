@@ -14220,8 +14220,8 @@ Every `native-artifacts` leg runs `cargo clippy --release --all-targets` at
 it, so a warning reds the leg and never changes what a release publishes. It is
 not the deleted duplicate: the battery's host compiles one target, and only a
 Windows leg compiles the crate's `cfg(not(unix))` code, so a dead item there is
-invisible to this gate on every contributor host. The step exists for that class.
-The test half stays this gate's alone.
+invisible to this gate on every contributor host. The test half stays this gate's
+alone.
 
 **The predicate is the crate's presence, not cargo's**, and that is what keeps the
 gate simple:
