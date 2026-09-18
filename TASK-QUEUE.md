@@ -3507,8 +3507,4 @@
 
 ## Done
 
-- smoke-leg-crate-build-uncached
-- macos-adopter-package-set-copied-per-leg
-- macos-adopter-legs-brew-gawk
-
 ## Lessons Learned

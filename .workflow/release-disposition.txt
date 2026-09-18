@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+smoke-leg-crate-cache release deferred:v0.26.0 — minor by the accumulated declarations since v0.25.0, this iteration adding one tightened gate (check-prose-tells: an inline marker mention no longer opens a held-out region), its CI-leg changes shipping no kit surface; no trigger fired: elapsed time is dormant under the preview channel, no decommission waits behind the floor, no security or supply-chain fix in the batch, no operator direction to release, and the launch audience has not arrived.
