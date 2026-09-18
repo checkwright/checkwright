@@ -2823,6 +2823,7 @@
   Filed 2026-09-08 by build to the gap inbox and promoted at this close's drain: →fix refused, since
   choosing between extraction and a gate is design work and delta 3 already refused the extraction
   half once; →icebox refused on the adopter witness above.
+  recurrence: macos-adopter-package-set-copied-per-leg 2026-09-18
 
 - **stage-journal-path-unsourced-mid-stage** [cost: event/high] [surface: lifecycle-kit] — a stage session dispatched into an
   ALREADY-ENTERED stage has no mechanical source for that stage's journal path, so it invents a
@@ -3509,10 +3510,5 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
-
-- ere-matcher-capture-groups-unowned
-- toolchain-floor-spawn-on-native-windows
-- registry-needs-conflates-requirement-and-spawn
-- interpreter-floor-gawk-residue-empty
 
 ## Lessons Learned

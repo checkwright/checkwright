@@ -1434,9 +1434,7 @@ in `proc.rs` so a cohort of wrappers buys them once:
   deliberately the naming-dialect half's posture: §check-graph's refusing
   resolver answers a different question — a system-directory homonym rather than
   a naming dialect — and the roster is what keeps the two apart per name rather
-  than per call site. Where it resolves relative to the spawn recorder's note is
-  not a third: the recorder notes a name either way (§The `# graph:` manifest).
-  `dispatch` is outside the funnel and needs no
+  than per call site. `dispatch` is outside the funnel and needs no
   place in it: its `argv[0]` is a resolved binary or script **path** its caller
   computed, never a name for the platform to search.
 - **What `Command::new` does with a resolved `.cmd` is an observation, so the
@@ -7170,8 +7168,8 @@ show it, until `check-deprecation-task` ports and extracts the wrong marker from
 `(deprecated|deprecated-since)`.
 
 **An unsupported construct is a fail-closed refusal, never a silent mis-parse.**
-awk on the shell side is GNU awk, whose ERE dialect carries extensions POSIX does
-not: `\y` `\<` `\>` `\B` `\w` `\s` and the backreference forms. `compile` returns
+GNU awk, which the adopter floor admits beside any POSIX awk, carries ERE
+extensions POSIX does not: `\y` `\<` `\>` `\B` `\w` `\s` and the backreference forms. `compile` returns
 `EreError` for any escape or construct outside the POSIX ERE grammar, and each
 member turns that into **exit 2** naming the offending pattern, the knob it came
 from, and the extension. Three constructs are refused for the same reason rather
@@ -14922,10 +14920,7 @@ value is rendered in doctor's banner and the env-probe emitter rather than only
 spawned — the one identity the funnel cannot absorb.
 
 **Why the owner and not the call sites, which is the part a sweep would get
-wrong.** A pointed repair cannot break the registry's requirement
-comparison — the recorder reduces a resolved path to its name (§The `# graph:`
-manifest) — so the owner's claim rests on cost and correctness. A sweep is
-refused on measurement rather than on taste: the
+wrong.** A sweep is refused on measurement rather than on taste: the
 shipped bare-literal spawn population is `git` and `bash` at two and three orders
 of magnitude past what a call-site sweep can be costed at, with nine other
 programs behind them. A lint forbidding the bare literal is refused on its own
