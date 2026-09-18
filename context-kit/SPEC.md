@@ -402,7 +402,7 @@ this set bounded by the paragraph below rather than by a consumer's file.
 `mktemp` and `cp` are spawned and not probed: they rest on
 `GATE_SDK_PROGRAM_FLOOR`'s assumption that the payload's host carries them
 (gate-sdk/SPEC.md §lib/gate.sh). `uname` (this arm), `ps` (the pid predicate's
-fallback leg) and `tar` and `npm` (the installer packer) are on neither set.
+fallback leg, non-unix builds only) and `tar` and `npm` (the installer packer) are on neither set.
 Nothing yet holds the three sets in a checked relation — an `ARMS` row carries no
 requirement element to derive one from — so a census that finds a spawned
 program off the roster has found this honest limit, not drift, and the roster is

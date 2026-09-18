@@ -1532,24 +1532,25 @@ form prints a clean line, which is precisely the *clean because the program was
 missing* vacuity this section exists to close. There is no shell refusal to match,
 so the class rule *fire where the shell form fired it* has nothing to say and the
 **exit-2 rule decides instead**: the port refuses, on the fallback leg only,
-because a `kill -0` that answers never reaches the program. A member reading this
+because a `kill -0` that answers never reaches the program — a leg only the
+non-unix build still has. A member reading this
 should take the ordering rule as **the constraint when a shell refusal exists**,
 not as a licence to inherit a false green where one does not. The divergence is
 asserted at the member (evidence-kit/SPEC.md §check-producer-liveness) with its
 cost stated, never normalised away, and the parity run reports it as a differing
 arm rather than hiding it.
 
-**A wrapper's program can be a shell builtin, and the route to it is `bash` on the
-floor rather than a second off-floor dependency.** `ek_pid_alive`'s first leg is
-bash's own `kill -0`, which `std` has no spelling for and this crate carries no
-`libc` to reach. Three routes exist and only one keeps the requirement set honest:
-dropping the leg and probing with `ps` alone makes the program required on every
-call rather than on the fallback; spawning `/bin/kill` mints a second off-floor
-requirement and moves the refusal to the first leg; `proc::run("bash", &["-c",
-…])` reaches the *same builtin the shell form used*, and `bash` is on
-`GATE_SDK_PROGRAM_FLOOR`, so the report still counts one program. The declared set
-carries both, because unit test A is *observed ⊆ declared* and floor membership is
-what the report filters on, not what the registry records.
+**A wrapper's program can be a shell builtin, and the route to it is chosen
+per platform.** The pid predicate's first leg is signal 0. On unix the crate
+calls `kill(2)` through `libc`, which returns *exists but not yours* as
+`EPERM`, so no fallback program is needed and the unix build declares none.
+On a non-unix build the pids are an MSYS shell's, which only that shell's
+builtin resolves. So the leg stays `bash -c 'kill -0'`, whose exit status
+conflates EPERM with ESRCH, and `ps -p` answers existence behind it. Spawning
+`/bin/kill` there would mint a second off-floor requirement, and probing with
+`ps` alone would require it on every call. The non-unix declared set carries
+both, because unit test A is *observed ⊆ declared* and floor membership is what
+the report filters on, not what the registry records.
 
 **Neither half has a fixture representation, so each wrapper's parity run carries
 a constructed scenario**: both implementations over the same cases with the
@@ -4778,11 +4779,12 @@ that answers each is the one whose corpus matches its question.
      off-floor program *leaves* and a second stays** (evidence-kit/SPEC.md
      §bin/run-validate.sh). The shell spine spawned `sha256sum`, which the crate
      already answers in `native/src/sha256.rs`, so that dependency is gone; `ps`
-     is reached transitively through the pid predicate's second leg and stays,
+     stays only on non-unix builds, where the pid predicate keeps its second leg,
      because §The producer-liveness lock rules that leg the *content* of the rule
-     — `kill -0` conflates *no such process* with *not yours* and must never
-     produce a false **free** reading. The honest reading is that the member never
-     cleared this criterion and does not clear it now: what the port bought is
+     — the builtin's exit status conflates *no such process* with *not yours* and
+     must never produce a false **free** reading. The honest reading is that the
+     member never cleared this criterion and on a non-unix build does not clear it
+     now: what the port bought is
      that the surviving dependency is visible in a declared prose set instead of
      sitting unregistered in a `bin/` script.
    - **The program is incidental spelling.** A text utility the rule uses to
@@ -4976,7 +4978,8 @@ that answers each is the one whose corpus matches its question.
    refusal, so *fire where the shell form fired it* is the constraint when a shell
    refusal exists and never a licence to inherit a false green where one does not.
    Second, a wrapper's program can be a **shell builtin**, and the honest route to
-   it is `bash -c` — on the program floor — rather than a second off-floor
+   it is `kill(2)` through `libc` where the platform has one, and `bash -c` on the
+   program floor where the pids are a shell's own — never a second off-floor
    dependency on `/bin/kill` or a narrowing to the fallback program alone. Its
    sibling `check-surface-duplication` is the counter-case in the same batch and
    worth stating beside it: measured the same way, every program its shell form
@@ -7371,11 +7374,10 @@ candidate clears, a bar rather than a precedent: it performs **no filesystem
 walk** (the condition `native/src/walk.rs`'s own assertion states), spawns no
 subprocess, opens no socket, its MSRV is at or below the crate's floor or the
 floor moves deliberately, and its **transitive** set is small, enumerable, and
-admitted under the same clauses. The resolved graph is **11 packages** — five
-feature-activated (`serde_json`, `serde_core`, `memchr`, `itoa`, `zmij`) and six
-carried by the lock as unactivated optional deps — each named with its admitting
-clause in `walk.rs`'s allowlist, which is the machine-held form of this bar rather
-than a second list beside it.
+admitted under the same clauses. Every package in the resolved graph, activated or
+carried by the lock as an unactivated optional dependency, is named with its
+admitting clause in `walk.rs`'s allowlist, which is the machine-held form of this
+bar rather than a second list beside it.
 
 **The floor moved, and the measurement is what moved it.** Taking the dependency
 raised the crate's MSRV from **1.56 to 1.71** — the binding crate is `zmij`, and
@@ -7383,6 +7385,14 @@ it binds through the activated set, so no feature trim avoids it. The alternativ
 was priced: pinning a pre-`zmij` `serde_json` would hold 1.56 at the cost of
 freezing a dependency at an EOL version, which contradicts the maintained-
 dependency premise the bar rests on.
+
+**The second dependency is `libc`, taken on unix targets only.** It cleared the
+bar with an empty transitive set and an MSRV below the floor, and it is what lets
+the pid predicate read `EPERM` in-process (evidence-kit/SPEC.md §The
+producer-liveness lock). Its one `unsafe` call is `kill(pid, 0)`, which touches no
+memory the crate owns. The target scoping is the point of the admission and not a
+size trim: the native Windows build resolves pids in a shell's namespace, where the
+crate's `kill` would read the wrong processes.
 
 **An MSRV bump is a `check-crate-arms` input, which no surface said.** Clippy
 suppresses a lint whose suggested API postdates the declared `rust-version`, so
@@ -12359,7 +12369,8 @@ resolved, and saying so is what keeps the limit honest.**
 `check-producer-liveness` reached `ps` only through `ek_pid_alive` in
 evidence-kit's library, and was both unregistered and library-mediated — one
 member attesting both limits at once. It is now a `.gate` member whose `--needs`
-declares `ps` outright, so the default arm would read its requirement correctly if
+declares `ps` outright on the one platform class that still spawns it, and nothing
+on unix, so the default arm would read its requirement correctly if
 it were registered. **The instance is discharged and neither limit is**: the scan
 still does not follow a library call, and the next member to reach a program that
 way will be reported clean by a report that cannot see it.

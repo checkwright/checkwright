@@ -440,16 +440,17 @@ tuned short enough to reclaim a crashed run promptly is guaranteed to declare a
 healthy long run dead — restoring the false-green the lock removes.
 
 The liveness predicate is the one all three readers share, and its two legs are
-a ruling rather than belt-and-braces. `kill -0` is the cheap same-uid answer, but
-it conflates *no such process* with *not yours*: against a producer running under
-another uid it reports the live process as dead, which is a false **free**
-reading — the one direction this design may not take. `ps -p` answers existence
-without needing the permission to signal, so it runs as the fallback and any
-evidence of existence means held. Reading `/proc` to confirm process *identity*
+a ruling rather than belt-and-braces. Signal 0 is the cheap existence probe, and
+the reading it must never give is a false **free**: a producer running under
+another uid exists but cannot be signalled. On unix the predicate calls `kill(2)`
+and reads `EPERM` as held and `ESRCH` as gone. On a non-unix build it reaches the
+shell's `kill -0` builtin, whose exit status conflates the two, so `ps -p` runs as
+the fallback and any evidence of existence means held. Reading `/proc` to confirm process *identity*
 is rejected separately: it is unportable, and the OS-reach objective makes a
 Linux-only predicate a cost rather than a refinement.
 
-**Where `ps` is absent the predicate cannot answer, and every reader — the
+**On a non-unix build, where `ps` is the fallback leg, an absent `ps` leaves the
+predicate unable to answer, and every reader — the
 writer's own claim included — refuses rather than reads free.** That is the same
 direction the two legs exist for: without the fallback, a process that exists but
 cannot be signalled is indistinguishable from one that is gone, so treating the
@@ -594,14 +595,14 @@ So the arm's spawned-program set is the consumer's roster and not the arm's:
 `bash`, each suite's own run command, and whatever the parser and pre-hook values
 name.
 
-**`sha256sum` leaves the spawn set and `ps` does not.** The per-suite log's digest
-is computed in-crate (`native/src/sha256.rs`), whose hex encoding is
+**`sha256sum` leaves the spawn set, and `ps` leaves it on unix.** The per-suite
+log's digest is computed in-crate (`native/src/sha256.rs`), whose hex encoding is
 byte-compatible with `sha256sum`'s first field — verified in the porting session
 rather than assumed, because every manifest line already written carries the shell
-form's digest and a divergence would silently supersede real history. `ps` stays,
-reached through the pid predicate's second leg, and §The producer-liveness lock
-rules that leg the content of the rule rather than incidental spelling
-(gate-sdk/SPEC.md §The port-candidate criteria, criterion 7).
+form's digest and a divergence would silently supersede real history. `ps` stays
+only on a non-unix build, reached through the pid predicate's fallback leg, which
+§The producer-liveness lock rules the content of the rule there rather than
+incidental spelling (gate-sdk/SPEC.md §The port-candidate criteria, criterion 7).
 
 **The claim's placement is asserted, not left to the implementer**: after the
 preflight guards and the scratch directory's creation — a run that refuses to
@@ -646,8 +647,8 @@ This is why the tool has **two** non-zero exits with different meanings: exit 1
 when a suite records `new-failures` — the verdict — and the guards' exit 2 when
 the run cannot start at all, which a held or unclaimable lock now joins. The
 refusal is a start-time verdict about the world, not a result, so it takes the
-guards' code and not the verdict's. The lock cannot be classified at all where
-`ps` is absent, and that reading is the guards' code too: a holder that cannot be
+guards' code and not the verdict's. On a non-unix build the lock cannot be
+classified at all where `ps` is absent, and that reading is the guards' code too: a holder that cannot be
 read as free must not be reclaimed, which is the readers' own disposition applied
 to the writer.
 
@@ -1077,7 +1078,7 @@ away: the deleted shell caller sourced this kit's library conditionally, while a
 compiled module is linked whether or not it is ever called, so the whole of the
 guard now sits at the call site.
 Two consequences of the ruling above ride along unchanged and are
-worth the caller knowing: the `kill -0`-then-`ps -p` pair means a holder running
+worth the caller knowing: the pid predicate's EPERM-is-held reading means a holder running
 under another uid reads **alive** rather than free, and the accepted PID-reuse
 residual means a recycled pid reads **live** — in the worktree caller that
 refuses and says wait, which is the same fail-closed direction, reached by the
@@ -1136,8 +1137,8 @@ design would put it beyond every front end a consumer could reach it with.
 
 The fixture pair carries the two static verdicts — a dead PID and a live one.
 Its `bad/` case names PID 1, the one PID a checked-in fixture can assert the
-liveness of on every platform, which is exactly what the predicate's `ps -p`
-leg makes reliable: under `kill -0` alone, an unprivileged run reads init as
+liveness of on every platform, which is exactly what the predicate's EPERM
+reading makes reliable: under the builtin's exit status alone, an unprivileged run reads init as
 dead and the case would silently invert. Everything the pair cannot hold — a
 live PID the test itself owns, the unparseable-lock exit, and the writer-side
 behavior — is covered by `gate-tests/producer-lock.test.sh`.
@@ -1173,17 +1174,15 @@ this repo names it through the gate-resolving front end rather than by a literal
 `.sh` path — the form §lifecycle-kit integration says would have broken at the
 port. That clause stops being a warning and becomes a discharged one.
 
-**It is a wrapper, and the requirement lives in the library rather
-than in the gate's own text.** The pid predicate tries the `kill -0` builtin and
-falls back to `ps -p`, and `ps` is not on `GATE_SDK_PROGRAM_FLOOR`. Neither the
-gate's declaration text nor a registry walk could have reported that, which is
-why the compiled form declares it explicitly: `ps` for the fallback leg, and
-`bash` — on the floor, so uncounted — because the builtin has no `std` spelling
-and this crate carries no `libc`, so the compiled form reaches the *same* builtin
-through `bash -c` rather than minting a second off-floor dependency on
-`/bin/kill`. The lock reader spawns nothing.
+**On a non-unix build it is a wrapper, and the requirement lives in the
+library rather than in the gate's own text.** There the pid predicate tries the
+`kill -0` builtin through `bash -c` and falls back to `ps -p`, which is off
+`GATE_SDK_PROGRAM_FLOOR`. So that build's registry row declares `ps` for the
+fallback leg, and `bash`, which is on the floor and so uncounted. On unix the
+predicate is one `kill(2)` call and the row declares nothing. The lock reader
+spawns nothing on either.
 
-**The absent-`ps` refusal is a deliberate divergence from the shell form, not
+**On a non-unix build, the absent-`ps` refusal is a deliberate divergence from the shell form, not
 parity with it, and asserting that is the point.** The shell `ek_pid_alive`
 discarded `ps`'s 127 into its boolean and reported *not alive*, so it printed a
 clean line — the *clean because the program was missing* vacuity

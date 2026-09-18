@@ -1,6 +1,6 @@
 // spec: evidence-kit/SPEC.md §check-producer-liveness — a stage entry is refused while a producer
-// named by the record, or by any '*.run' record in the directory, is still alive. It is a wrapper
-// through `evidence::pid_alive`, the compiled twin of the library's `ek_pid_alive`, not by own text.
+// named by the record, or by any '*.run' record in the directory, is still alive. On a non-unix
+// build it is a wrapper through `evidence::pid_alive`, not by own text.
 use crate::evidence::{self, LockRead, PidProbe};
 use crate::walk;
 
@@ -9,6 +9,7 @@ const NAME: &str = "check-producer-liveness";
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the wrapper refusal this member owns text for,
 // and the one member of the class where it is a deliberate divergence rather than parity: that
 // section and evidence-kit/SPEC.md §check-producer-liveness own the reasoning and the cost.
+#[cfg(not(unix))]
 fn refuse_absent_ps() -> i32 {
     eprintln!("{}: ps not found on PATH — the gate cannot run.", NAME);
     eprintln!("  A gate that cannot run is not clean (fail-closed): without ps a PID that exists");
@@ -41,8 +42,9 @@ fn verdict(path: &std::path::Path) -> Result<Verdict, PidProbe> {
 
 fn probe_failed(e: PidProbe) -> i32 {
     match e {
+        #[cfg(not(unix))]
         PidProbe::PsAbsent => refuse_absent_ps(),
-        PidProbe::Spawn(msg) => {
+        PidProbe::Unanswered(msg) => {
             eprintln!("{}: {}", NAME, msg);
             2
         }
@@ -247,5 +249,23 @@ mod tests {
             !evidence::pid_alive("2147483646").expect("the pid probe could not answer"),
             "the probe read a pid past the system maximum as alive"
         );
+    }
+
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — EPERM is held: init exists under
+    // any uid, so an unprivileged run reaches it only through that reading
+    #[cfg(unix)]
+    #[test]
+    fn a_process_that_is_not_ours_reads_alive() {
+        assert!(
+            evidence::pid_alive("1").expect("the pid probe could not answer"),
+            "the probe read init as dead, so a producer under another uid would read free"
+        );
+    }
+
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — a pid no process can hold is gone
+    #[cfg(unix)]
+    #[test]
+    fn a_pid_past_the_pid_width_is_dead() {
+        assert!(!evidence::pid_alive("99999999999").unwrap_or(true));
     }
 }

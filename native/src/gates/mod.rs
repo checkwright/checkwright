@@ -178,6 +178,14 @@ const SPEC_POINTER_ROOTS: &[RootDecl] = &[
     (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", "", ""),
 ];
 
+// spec: evidence-kit/SPEC.md §check-producer-liveness — the unix predicate is one `kill(2)` call
+// and spawns nothing; a non-unix build spawns `bash` for the `kill -0` builtin, on the floor, and
+// `ps` for the fallback leg, the one the report counts.
+#[cfg(unix)]
+const PRODUCER_LIVENESS_NEEDS: &[(&str, &str)] = &[];
+#[cfg(not(unix))]
+const PRODUCER_LIVENESS_NEEDS: &[(&str, &str)] = &[("bash", ""), ("ps", "")];
+
 pub const REGISTRY: &[GateEntry] = &[
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because each member's scan root is
     // its own first argument with a default, the same variable-first-argument shape the
@@ -1896,15 +1904,14 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
     ),
     // spec: evidence-kit/SPEC.md §check-producer-liveness — no walk root: both modes read named
-    // files, set mode's `*.run` glob resolving a corpus rather than reading one. `bash` carries the
-    // `kill -0` builtin and is on the floor; `ps` is the fallback leg's, and the one the report counts.
+    // files, set mode's `*.run` glob resolving a corpus rather than reading one.
     (
         "check-producer-liveness",
         producer_liveness::run,
         &[],
         &["EVIDENCE_KIT_LOCK_FILE"],
         "evidence-kit",
-        &[("bash", ""), ("ps", "")],
+        PRODUCER_LIVENESS_NEEDS,
     ),
     // spec: gate-sdk/SPEC.md §check-path-dialect — one unbounded root, the crate source tree,
     // whose location is a knob's value rather than a literal this entry could name. The shell

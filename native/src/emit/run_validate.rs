@@ -306,14 +306,16 @@ fn claim(cfg: &Cfg, key: &str) -> Result<Claimed, Refusal> {
     })
 }
 
+#[cfg_attr(unix, allow(unused_variables))]
 fn probe_message(e: PidProbe, lock: &str) -> String {
     match e {
+        #[cfg(not(unix))]
         PidProbe::PsAbsent => format!(
             "ps not found on PATH — the holder of {} cannot be classified, and a lock that cannot \
              be read as free must not be reclaimed; refusing to start",
             lock
         ),
-        PidProbe::Spawn(m) => m,
+        PidProbe::Unanswered(m) => m,
     }
 }
 

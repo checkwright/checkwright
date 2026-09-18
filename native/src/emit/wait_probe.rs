@@ -483,7 +483,7 @@ fn cmd_sweep() -> Result<i32, String> {
         let key = format!("sweep{}", ms);
         let waiter_run = format!("{}/{}-local.run", p.scratch, key);
         if let Some(pid) = recorded_pid(&read_trimmed(&waiter_run)?) {
-            while pid_alive(&pid) {
+            while crate::evidence::pid_alive(&pid).unwrap_or(false) {
                 std::thread::sleep(std::time::Duration::from_secs(1));
             }
         }
@@ -492,14 +492,6 @@ fn cmd_sweep() -> Result<i32, String> {
         std::fs::remove_file(&waiter_run).ok();
     }
     cmd_report()
-}
-
-// spec: delegation-kit/SPEC.md §bin/wait-probe — liveness is `kill -0` on the recorded pid and never
-// a process-table pattern, which is the protocol's own rule
-fn pid_alive(pid: &str) -> bool {
-    proc::run("bash", &["-c", "kill -0 \"$1\" 2>/dev/null", "_", pid])
-        .map(|d| d.code() == Some(0))
-        .unwrap_or(false)
 }
 
 #[cfg(test)]

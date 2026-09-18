@@ -1298,6 +1298,10 @@ mod tests {
     // under
     const ADMITTED_CRATES: &[(&str, &str)] = &[
         ("itoa", "integer formatting; no walk, no subprocess, no socket"),
+        (
+            "libc",
+            "raw C bindings, unix targets only; no walk, no subprocess, no socket",
+        ),
         ("memchr", "byte search; no walk, no subprocess, no socket"),
         (
             "proc-macro2",

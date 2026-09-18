@@ -63,8 +63,9 @@ faces, in shipped scope (a `#[cfg(test)]` item dropped, the rule `proc.rs`'s
 The tree does not already do this: `grep -rn "struct Program\|mod programs"
 native/src` returns nothing.
 
-**Build order.** Build lands this amendment **after** `SPEC-pid-liveness-libc.md`.
-That amendment leaves `ps` spawned only under `cfg(not(unix))`, so the roster's
+**Build order.** Build lands this amendment **after** the pid-liveness change, now
+merged into gate-sdk/SPEC.md §Fail-closed contract. That change leaves `ps`
+spawned only under `cfg(not(unix))`, so the roster's
 `PS` member is `cfg(not(unix))` too (delta 1).
 
 ## What changes
@@ -428,8 +429,7 @@ freshness gates).
       canonical-spec text it refines rather than appending to it; the merged spec
       reads as one document a reader who never saw the amendment can use alone.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
-      component (`ls gate-sdk/SPEC-*.md`) once `SPEC-pid-liveness-libc.md` has
-      merged too.
+      component (`ls gate-sdk/SPEC-*.md`).
 - [ ] **Removals propagated** — `## Retired spellings` above is accurate, and
       `check-amendment-retired-spelling` is green.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as

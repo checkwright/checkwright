@@ -308,19 +308,45 @@ fn is_posix_space(b: u8) -> bool {
 // for; the other is `proc::run`'s standing backstop.
 #[derive(Debug)]
 pub enum PidProbe {
+    #[cfg(not(unix))]
     PsAbsent,
-    Spawn(String),
+    Unanswered(String),
 }
 
-// spec: evidence-kit/SPEC.md §check-producer-liveness — `ek_pid_alive`: the pid grammar, bash's
-// `kill -0` builtin, then `ps -p` for the EPERM case. gate-sdk/SPEC.md §Fail-closed contract owns
-// why the builtin is reached through `bash -c` rather than through a second off-floor program.
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — the pid grammar, then signal 0: on unix
+// `kill(2)` reads EPERM as held and ESRCH as gone; gate-sdk/SPEC.md §Fail-closed contract owns the
+// per-platform route.
 pub fn pid_alive(pid: &str) -> Result<bool, PidProbe> {
     if pid.is_empty() || pid.starts_with('0') || !pid.bytes().all(|b| b.is_ascii_digit()) {
         return Ok(false);
     }
+    signal_zero(pid)
+}
+
+#[cfg(unix)]
+fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
+    let Ok(n) = pid.parse::<libc::pid_t>() else {
+        return Ok(false);
+    };
+    // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound because
+    // `kill` takes two integers and touches no memory this crate owns
+    if unsafe { libc::kill(n, 0) } == 0 {
+        return Ok(true);
+    }
+    let err = std::io::Error::last_os_error();
+    match err.raw_os_error() {
+        Some(libc::EPERM) => Ok(true),
+        Some(libc::ESRCH) => Ok(false),
+        _ => Err(PidProbe::Unanswered(format!(
+            "kill(2) could not answer for pid {pid}: {err}"
+        ))),
+    }
+}
+
+#[cfg(not(unix))]
+fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
     let signalled = crate::proc::run("bash", &["-c", "kill -0 \"$1\"", "bash", pid])
-        .map_err(PidProbe::Spawn)?;
+        .map_err(PidProbe::Unanswered)?;
     if signalled.code() == Some(0) {
         return Ok(true);
     }
@@ -329,7 +355,7 @@ pub fn pid_alive(pid: &str) -> Result<bool, PidProbe> {
     if !crate::proc::on_path("ps") {
         return Err(PidProbe::PsAbsent);
     }
-    let listed = crate::proc::run("ps", &["-p", pid]).map_err(PidProbe::Spawn)?;
+    let listed = crate::proc::run("ps", &["-p", pid]).map_err(PidProbe::Unanswered)?;
     Ok(listed.code() == Some(0))
 }
 

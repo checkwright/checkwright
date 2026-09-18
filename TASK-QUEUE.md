@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **pid-liveness-spawns-bash** [spec: SPEC-pid-liveness-libc.md] — `pid_alive` in
-  `native/src/evidence.rs:322` and `native/src/emit/wait_probe.rs:500` spawns
-  `bash -c 'kill -0'`, and the evidence twin falls back to an off-floor `ps -p`
-  (`evidence.rs:332`) for the EPERM case the builtin's exit status hides.
-  **Ruled at spec, 2026-09-18:** `libc` joins the crate on unix targets only. It clears
-  gate-sdk/SPEC.md's dependency bar as that section states it, so no new ruling is needed. On
-  unix, `kill(pid, 0)` answers with EPERM read as held and ESRCH as gone. `evidence::pid_alive`
-  becomes the one liveness owner. The non-unix build keeps the bash-and-`ps` route, because its
-  pids are an MSYS shell's.
-  **Measured at spec:** the lock gains exactly `libc 0.2.189` (MSRV 1.65, under the crate's 1.71,
-  with no transitive package), and `native/src` has no `unsafe` today.
-  Filed 2026-09-18 at `native-spawn-floor`'s spec; directed into `native-spawn-residue`
-  (operator direction, 2026-09-18, lead-relayed).
-
 - **arm-spawn-requirements-unrecorded** [spec: SPEC-program-roster.md] — nothing machine-reads
   the binary's spawn set, so `PROBE_SET` and `GATE_SDK_PROGRAM_FLOOR` cannot be held against it and
   every floor census is re-bought by grep, which misses variable-program spawns.
@@ -3451,5 +3437,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- pid-liveness-spawns-bash
 
 ## Lessons Learned
