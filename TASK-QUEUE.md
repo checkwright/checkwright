@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **smoke-leg-crate-build-uncached** [spec: SPEC-smoke-leg-binary.md] — the four hand-off
-  install-smoke legs each compile the gate crate, which the same run's producer leg has already
-  compiled cold on the same runner label.
-  **Measured at spec, 2026-09-18, correcting the filed premise.** The step is load-bearing: with
-  `INSTALLER_SMOKE_ARTIFACTS_DIR` set, `run-smoke.sh` adopts the upload and never builds, so the
-  step's host binary is what `run-gates.sh` dispatches the suite's pack to. A cross-run cache is
-  refused on measurement: in run 35214069775 the dependencies took 3-11s of each compile, and
-  the crate, which changes on most pushes, took the rest.
-  **Ruled at spec:** each leg installs the producer's artifact as the tree's gate binary. No
-  compile, no cache, and no cold-build coverage lost, because the producer leg still compiles
-  cold. The publish-path refusal in installer/SPEC.md §The packer is not reached. Saving: about
-  79s of wall-clock (the Windows leg is the critical path) and 236s of runner time per push.
-  Filed 2026-09-17 to the gap inbox by `install-smoke-slow-leg`'s lead at spec; promoted at its
-  close; paired at spec.
-
 - **macos-adopter-package-set-copied-per-leg** [spec: SPEC-macos-remedy.md] — the macOS
   adopter remedy exists as prose on docs/install.md and as two literal brew copies in
   gates.yml, and nothing holds either copy equal to the page.
@@ -3504,5 +3489,7 @@
 - **readme-bin-roster-underived** — no gate holds a kit README's bin/ tool roster.
 
 ## Done
+
+- smoke-leg-crate-build-uncached
 
 ## Lessons Learned

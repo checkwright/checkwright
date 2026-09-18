@@ -366,23 +366,6 @@ jobs:
           fi
           exit 0
 
-      # Reporting only. The crate is where a non-Linux host fails first if it
-      # fails at all, and a build that dies inside the suite makes every later
-      # step's silence unreadable — so it is probed alone, before the suite that
-      # depends on it, and the worktree is re-read afterwards because a release
-      # build leaving mode or line-ending churn is what breaks the clean-tree
-      # precondition the pack step holds.
-      - name: probe the crate build
-        shell: bash
-        run: |
-          set +e
-          bash gate-sdk/bin/build-native.sh
-          echo "build-native exited $?"
-          ls -l native/target/release/ 2>&1 | head -n 20
-          echo "-- porcelain after a release build; the smoke asserts this is empty --"
-          git status --porcelain | head -n 40
-          exit 0
-
       # `shellcheck` is an ADOPTER floor member (docs/install.md §Requirements,
       # native/src/toolfloor.rs's PROBE_SET, where it carries no audience
       # token) and windows-latest ships without it — so `checkwright init`
@@ -438,6 +421,10 @@ jobs:
       # The host triple is derived from `rustc -vV` and never spelled, so this
       # step asserts nothing about which platform it is on — it demands only that
       # the producer uploaded a complete artifact for whatever host it woke up on.
+      #
+      # The copy below places that artifact as this tree's own gate binary, for
+      # the reason the arm64 macOS sibling's normalize step states in full and
+      # this header does not restate.
       - name: normalize the producer's upload onto the layout pack reads
         shell: bash
         run: |
@@ -457,6 +444,11 @@ jobs:
             echo "exercises a release-shaped artifact and has none to exercise."
             exit 1
           }
+          dest="$(gate_native_bin)"
+          mkdir -p "$(dirname "$dest")"
+          cp "$art/$host/$binary" "$dest"
+          chmod +x "$dest"
+          [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
       # The suite itself, under one steering that is **measurement scaffolding
@@ -1171,22 +1163,6 @@ jobs:
           echo "TMPDIR=${TMPDIR:-<unset>}"
           exit 0
 
-      # Reporting only. The crate is where a non-Linux host fails first if it
-      # fails at all, and a build that dies inside the suite makes every later
-      # step's silence unreadable — so it is probed alone, before the suite that
-      # depends on it, for the reason the Windows sibling states. The worktree is
-      # re-read afterwards because a release build leaving mode churn is what
-      # breaks the clean-tree precondition the pack step holds.
-      - name: probe the crate build
-        run: |
-          set +e
-          bash gate-sdk/bin/build-native.sh
-          echo "build-native exited $?"
-          ls -l native/target/release/ 2>&1 | head -n 20
-          echo "-- porcelain after a release build; the smoke asserts this is empty --"
-          git status --porcelain | head -n 40
-          exit 0
-
       # The artifact this leg installs is the `native-artifacts` producer's, not
       # this host's. Downloaded by PATTERN rather than by name because a name
       # would have to spell this host's triple in the workflow, and a platform
@@ -1203,6 +1179,27 @@ jobs:
       # specified against. Nothing is rehashed on the way: the sidecar that
       # arrives is the sidecar the producer emitted beside the bytes, which is
       # what keeps one producer per digest across this new hop.
+      #
+      # **The copy below places the producer's upload as this tree's own gate
+      # binary, and no leg here compiles the crate.** The producer's upload
+      # becomes this tree's gate binary because `run-gates.sh`'s `exec_arm`
+      # dispatches the suite's `--pack-installer` call to whatever sits at
+      # `gate_native_bin`'s path, and with `INSTALLER_SMOKE_ARTIFACTS_DIR` set the
+      # suite itself never builds one. The producer leg on this same runner label
+      # already compiled this commit cold on this run, so a compile here would
+      # repeat that build and catch nothing a compile has not already caught.
+      # This is not the case installer/SPEC.md §The packer's publish-path refusal
+      # rules on: nothing packed on this leg is ever published, and the leg
+      # installs these exact bytes into its scratch consumer regardless, so
+      # running them once, off the producer's upload, is the whole assertion.
+      #
+      # **Do not add a build cache here.** The crate is nearly all of a cold
+      # compile and changes on most pushes (`native/src`, `native/Cargo.toml`'s
+      # one dependency): in run 35214069775 the dependencies finished in 3 to 11
+      # seconds and the crate took the rest, so a cache keyed on the crate's
+      # sources misses on every push that touches it and a cache keyed on
+      # `Cargo.lock` alone restores only the dependencies it does not need. A leg
+      # that needs the crate compiled on its host has the producer leg for that.
       - name: normalize the producer's upload onto the layout pack reads
         run: |
           set -euo pipefail
@@ -1221,6 +1218,11 @@ jobs:
             echo "exercises a release-shaped artifact and has none to exercise."
             exit 1
           }
+          dest="$(gate_native_bin)"
+          mkdir -p "$(dirname "$dest")"
+          cp "$art/$host/$binary" "$dest"
+          chmod +x "$dest"
+          [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
       # The suite itself, under one steering that is **measurement scaffolding and
@@ -1362,9 +1364,9 @@ jobs:
     runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-apple-darwin'].runner }}
     continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-apple-darwin'].held }}
     # Carried from the arm64 sibling rather than re-derived: same suite, same
-    # cold Homebrew and cold cargo build, and no Intel measurement exists yet to
-    # narrow against. That sibling's timeout header owns why widening beats
-    # narrowing, and it is not restated here.
+    # cold Homebrew install, and no Intel measurement exists yet to narrow
+    # against. That sibling's timeout header owns why widening beats narrowing,
+    # and it is not restated here.
     timeout-minutes: 45
     permissions:
       contents: read
@@ -1446,20 +1448,6 @@ jobs:
           echo "TMPDIR=${TMPDIR:-<unset>}"
           exit 0
 
-      # Reporting only, and probed alone before the suite that depends on it for
-      # the reason the arm64 and Windows siblings state: a build that dies inside
-      # the suite makes every later step's silence unreadable.
-      - name: probe the crate build
-        shell: bash
-        run: |
-          set +e
-          bash gate-sdk/bin/build-native.sh
-          echo "build-native exited $?"
-          ls -l native/target/release/ 2>&1 | head -n 20
-          echo "-- porcelain after a release build; the smoke asserts this is empty --"
-          git status --porcelain | head -n 40
-          exit 0
-
       # By PATTERN and not by name, for the reason the arm64 sibling states: a
       # name would spell this host's triple in a workflow step, and a platform
       # literal in CI is a second spelling of the support commitment
@@ -1476,6 +1464,10 @@ jobs:
       # spelled, so this step asserts nothing about which platform it is on — it
       # demands only that the producer uploaded a complete artifact for whatever
       # host it woke up on, which on this leg is the assertion that matters.
+      #
+      # The copy below places that artifact as this tree's own gate binary, for
+      # the reason the arm64 sibling's normalize step states in full and this
+      # header does not restate.
       - name: normalize the producer's upload onto the layout pack reads
         shell: bash
         run: |
@@ -1495,6 +1487,11 @@ jobs:
             echo "exercises a release-shaped artifact and has none to exercise."
             exit 1
           }
+          dest="$(gate_native_bin)"
+          mkdir -p "$(dirname "$dest")"
+          cp "$art/$host/$binary" "$dest"
+          chmod +x "$dest"
+          [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
       # The suite, steered exactly as the arm64 sibling steers it — that step's
@@ -1637,25 +1634,6 @@ jobs:
           echo "RUNNER_TEMP=$RUNNER_TEMP"
           exit 0
 
-      # Reporting only, and probed alone before the suite for the siblings' reason:
-      # a build that dies inside the suite makes every later step's silence
-      # unreadable. **It is also load-bearing and not only a probe**, measured on
-      # this leg's own first run (34543644528, job 103092038391): the suite adopts
-      # the producer's artifact rather than building one, so nothing else on this
-      # leg leaves a host binary in `native/target/release/`, and the pack step's
-      # dispatch then finds no binary to run. The siblings pay for that binary here
-      # too — this leg reproduced their shape without this step and died at `pack`.
-      - name: probe the crate build
-        shell: bash
-        run: |
-          set +e
-          bash gate-sdk/bin/build-native.sh
-          echo "build-native exited $?"
-          ls -l native/target/release/ 2>&1 | head -n 20
-          echo "-- porcelain after a release build; the smoke asserts this is empty --"
-          git status --porcelain | head -n 40
-          exit 0
-
       # By PATTERN and not by name, for the reason the siblings state: a name would
       # spell this host's triple in a workflow step, and a platform literal in CI is
       # a second spelling of the support commitment native/targets.list is supposed
@@ -1670,6 +1648,15 @@ jobs:
       # the --pack-installer arm reads and INSTALLER_SMOKE_ARTIFACTS_DIR is
       # specified against. The host triple is derived from `rustc -vV` and never
       # spelled, so this step asserts nothing about which platform it is on.
+      #
+      # The copy below places that artifact as this tree's own gate binary, for
+      # the reason the arm64 macOS sibling's normalize step states in full and
+      # this header does not restate. It is what carries this leg's own
+      # load-bearing obligation forward from the deleted probe step, measured on
+      # this leg's first run (34543644528, job 103092038391): with
+      # `INSTALLER_SMOKE_ARTIFACTS_DIR` set the suite never builds a binary, so
+      # something on this leg has to place one at `gate_native_bin`'s path before
+      # the pack step's dispatch runs.
       - name: normalize the producer's upload onto the layout pack reads
         shell: bash
         run: |
@@ -1689,6 +1676,11 @@ jobs:
             echo "exercises a release-shaped artifact and has none to exercise."
             exit 1
           }
+          dest="$(gate_native_bin)"
+          mkdir -p "$(dirname "$dest")"
+          cp "$art/$host/$binary" "$dest"
+          chmod +x "$dest"
+          [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
       # The suite, steered exactly as the Intel macOS sibling steers it — that
