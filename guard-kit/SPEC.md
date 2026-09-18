@@ -3196,7 +3196,15 @@ keeping its specified behavior:
   `fallthrough`; else `unknown`. The order is load-bearing and is transcribed
   rather than re-derived: a rewrite payload may also carry an
   `additionalContext`, and the ladder is what makes the first match win.
-- **The sandbox** is a `mktemp -d` tree carrying five preconditions, each a
+- **The sandbox** is a fresh directory under the host's temporary directory,
+  made in-crate and held in **two spellings**: the crate's own for the
+  filesystem and `git`, and the guard's shell's for the case's working
+  directory, its `GUARD_KIT_LOG` and every `@ROOT@`, read back once through
+  the `pwd -P` crossing (gate-sdk/SPEC.md §The path-dialect contract). On
+  Linux and macOS the two are one string. Under Git Bash on native Windows a
+  `mktemp -d` path is MSYS-spelled, which a native `git` cannot resolve, and a
+  drive-lettered `@ROOT@` never meets the `$PWD` the guard compares against,
+  so rules 2, 4 and 5 would read as the wrong verdict on that host. The tree carries five preconditions, each a
   case's precondition rather than scenery, so a harness that builds four of them
   turns real rows green for the wrong reason: `git init`, the three-line
   `.gitignore`, a tracked `tracked.md` beside an untracked `scratch.txt` (rule 22

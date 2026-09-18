@@ -17,8 +17,11 @@ const NAME: &str = "run-guard-tests";
 
 // spec: guard-kit/SPEC.md §Testing — `Drop` is the shell form's `trap 'rm -rf' EXIT`, armed the
 // moment the directory exists so no later refusal can leak it.
+// spec: gate-sdk/SPEC.md §The path-dialect contract — `root` is the crate's spelling, read by the
+// filesystem and `git`; `shell` is the guard's, the one its `$PWD` and every `@ROOT@` row carry.
 struct Sandbox {
     root: String,
+    shell: String,
 }
 
 impl Drop for Sandbox {
@@ -55,21 +58,21 @@ fn execute(args: &[String]) -> Result<i32, String> {
     }
 
     let sandbox = build_sandbox()?;
-    let log = format!("{}/friction.log", sandbox.root);
+    let log = format!("{}/friction.log", sandbox.shell);
 
     let mut tally = Tally::default();
     for (want, cmd) in rows(&cases, 2)?
         .into_iter()
         .map(|r| (r[0].clone(), r[1].clone()))
     {
-        let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &lib, &log, &guard, &cmd, None)?;
+        let cmd = substitute(&cmd, &sandbox.shell);
+        let got = decide(&sandbox.shell, &lib, &log, &guard, &cmd, None)?;
         tally.check(&want, &got, &cmd);
     }
     for row in rows(&bg_cases, 3)? {
         let (want, rib, cmd) = (row[0].clone(), row[1].clone(), row[2].clone());
-        let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &lib, &log, &guard, &cmd, Some(&rib))?;
+        let cmd = substitute(&cmd, &sandbox.shell);
+        let got = decide(&sandbox.shell, &lib, &log, &guard, &cmd, Some(&rib))?;
         tally.check(&want, &got, &format!("[run_in_background={}] {}", rib, cmd));
     }
 
@@ -187,7 +190,7 @@ fn decide(
     // repo-relative default names nothing from inside the sandbox, so the running binary is exported
     let bin = std::env::current_exe()
         .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
-    let bin = bin.to_string_lossy();
+    let bin = walk::normalize_abs(&bin.to_string_lossy());
     let script = r#"cd "$1" || exit 2; GUARD_KIT_LIB="$2" GUARD_KIT_LOG="$3" GATE_SDK_NATIVE_BIN="$5" exec bash "$4""#;
     let done = proc::run_streamed(
         &programs::BASH,
@@ -250,13 +253,16 @@ fn classify(rc: i32, out: &str) -> String {
 // rather than scenery: the section enumerates them and says what turns green for the wrong reason
 // when a harness builds four.
 fn build_sandbox() -> Result<Sandbox, String> {
-    let made = proc::run(&programs::MKTEMP, &["-d"])?;
-    let root = made
-        .stdout()
-        .map(|o| String::from_utf8_lossy(o).trim().to_string())
-        .filter(|r| !r.is_empty())
-        .ok_or_else(|| format!("{}: cannot create a sandbox directory", NAME))?;
-    let sandbox = Sandbox { root };
+    let made = std::env::temp_dir().join(format!("checkwright-guard-tests.{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&made);
+    mkdir(&made.display().to_string())?;
+    // spec: gate-sdk/SPEC.md §The path-dialect contract — a long-name, prefix-free root: Windows
+    // hands the temporary directory out in its 8.3 spelling and `canonicalize` adds a verbatim prefix
+    let root = walk::canonicalize(&made)
+        .map(|c| walk::normalize_abs(c.strip_prefix(r"\\?\").unwrap_or(&c)))
+        .ok_or_else(|| format!("{}: cannot resolve the sandbox {}", NAME, made.display()))?;
+    let mut sandbox = Sandbox { root, shell: String::new() };
+    sandbox.shell = shell_spelling(&sandbox.root)?;
     let at = |rel: &str| format!("{}/{}", sandbox.root, rel);
 
     git(&sandbox.root, &["init", "-q"])?;
@@ -288,14 +294,32 @@ fn git(root: &str, args: &[&str]) -> Result<(), String> {
     let mut argv: Vec<&str> = vec!["-C", root];
     argv.extend_from_slice(args);
     let done = proc::run(&programs::GIT, &argv)?;
-    if done.code() != Some(0) {
+    if let Some(report) = done.failure_report() {
         return Err(format!(
-            "{}: cannot build the sandbox — git {} failed",
+            "{}: cannot build the sandbox — git {} failed ({})",
             NAME,
-            args.join(" ")
+            args.join(" "),
+            report
         ));
     }
     Ok(())
+}
+
+// spec: gate-sdk/SPEC.md §The path-dialect contract — the shell crossing idiom: `pwd -P` is the half
+// that crosses, since `cd` with an absolute argument hands the argument back as `$PWD` unconverted.
+fn shell_spelling(root: &str) -> Result<String, String> {
+    let done = proc::run(&programs::BASH, &["-c", r#"cd "$1" && pwd -P"#, "bash", root])?;
+    done.stdout()
+        .map(|o| String::from_utf8_lossy(o).trim_end_matches(['\r', '\n']).to_string())
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| {
+            format!(
+                "{}: cannot build the sandbox — bash cannot spell {} ({})",
+                NAME,
+                root,
+                done.failure_report().unwrap_or_else(|| "empty answer".to_string())
+            )
+        })
 }
 
 fn mkdir(path: &str) -> Result<(), String> {
