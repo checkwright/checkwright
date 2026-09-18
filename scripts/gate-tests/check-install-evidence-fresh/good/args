@@ -1,0 +1,5 @@
+# Hermetic freshness case: the committed projection byte-matches the emission.
+# Two args steer the gate off the live record onto pre-baked fixture files, the
+# record being gitignored and absent from every tree but the observer's.
+projection.txt
+emit.txt

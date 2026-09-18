@@ -43,6 +43,7 @@ pub mod enforcement_fresh;
 pub mod evidence_baseline;
 pub mod evidence_manifest;
 pub mod footprint_fresh;
+pub mod install_evidence_fresh;
 pub mod install_platforms;
 pub mod install_toolchain;
 pub mod installer_no_deps;
@@ -1373,6 +1374,17 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "-",
         &[("date", ""), ("git", "")],
+    ),
+    // spec: drift-kit/SPEC.md §The install-evidence projection — the comparator calls the arm in
+    // process, so it declares the arm's own two knobs: the record it re-emits from and the gate
+    // roster the emission classifies a red's gate name against.
+    (
+        "check-install-evidence-fresh",
+        install_evidence_fresh::run,
+        &[],
+        &["DRIFT_KIT_INSTALL_RECORD", "DRIFT_KIT_GATES_FILE"],
+        "-",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the join reaches both emitters' walks; its good/
     // case stages one kit, so the per-kit templates `?` is held to one iteration of that loop

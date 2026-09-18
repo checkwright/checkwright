@@ -1,0 +1,35 @@
+**Installs**
+
+| observed | reached a first green | time-to-first-green in minutes (min · median · max) |
+| --- | --- | --- |
+| 2 | 1 | 40 · 40 · 40 |
+
+**Reds hit by a non-author**
+
+| reds | true-positive | false-positive | unclear |
+| --- | --- | --- | --- |
+| 3 | 1 | 1 | 1 |
+
+**Per gate**
+
+| gate | reds | false positives | changed behaviour |
+| --- | --- | --- | --- |
+| check-alpha | 2 | 0 | 1 |
+
+**Dispositions**
+
+| reds | fixed | worked-around | bypassed | abandoned |
+| --- | --- | --- | --- | --- |
+| 3 | 1 | 0 | 1 | 1 |
+
+**Retention**
+
+| horizon (days) | kit | check-ins | retained |
+| --- | --- | --- | --- |
+| 7 | gate-sdk | 2 | 1 |
+
+**First useful red**
+
+| installs | reaching a first useful red | median days from the install line |
+| --- | --- | --- |
+| 2 | 1 | 2 |

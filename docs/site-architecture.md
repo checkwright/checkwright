@@ -139,6 +139,19 @@ recoverable:
   construction. **The name collides and the two surfaces are unrelated:**
   `check-trajectory-fresh` and the `trajectory` arm govern *this* generated page, never
   the hand-authored `TRAJECTORY.md` ruling record, which no gate byte-checks.
+- **The install-evidence projection** — `docs/install-evidence.md` is the
+  install-evidence arm's output (`bash gate-sdk/bin/run-gates.sh --emit
+  install-evidence > docs/install-evidence.md`,
+  `check-install-evidence-fresh` byte-gates it), stale on any capture into the
+  install-observation record and on a `scripts/gates.list` edit, that roster
+  being the classifier the per-gate block sorts a red's gate name against
+  (drift-kit/SPEC.md §The install-evidence projection). **Its gate is inert
+  everywhere but the observing machine, by construction**: the record is
+  gitignored, so in CI, in a fresh clone and in an adopter's tree there is
+  nothing to re-emit from and the gate reports a counted zero. The page is
+  committed carrying published zeros from the first build rather than held back
+  until an install exists, so the freshness gate has a target and the roster row
+  above it names a file that is there.
 - **The roadmap projection** — `ROADMAP.md` is a root projection of the queue's
   curated `[roadmap:]` tags (`bash gate-sdk/bin/run-gates.sh --emit roadmap --write`,
   `check-roadmap-fresh` byte-gates its marker block), stale on any `[roadmap:]`

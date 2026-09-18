@@ -28,6 +28,7 @@ check-doctrine-registration
 check-lifecycle-registration
 check-kit-ref-liveness
 check-trajectory-fresh
+check-install-evidence-fresh
 check-footprint-fresh
 check-docs-mirror-fresh
 check-enforcement-fresh

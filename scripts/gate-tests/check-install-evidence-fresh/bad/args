@@ -1,0 +1,5 @@
+# Stale case: the committed projection lags the emission — a hand-edited
+# false-positive count and a dropped unrostered row — so the byte-compare must
+# reject. The hand edit is the defect this gate exists to catch.
+projection.txt
+emit.txt

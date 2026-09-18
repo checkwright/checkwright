@@ -16,5 +16,6 @@
 # listed, being reached from the install page's pointer.
 docs/installer/README.md
 docs/evidence-data.md
+docs/install-evidence.md
 docs/site-architecture.md
 docs/posts/2026-07-09-announcing-checkwright.md
