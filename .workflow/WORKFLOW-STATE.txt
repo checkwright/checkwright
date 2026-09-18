@@ -8,3 +8,4 @@ external-install-evidence scope a3a1dd4a 2026-09-18 37b578b2
 external-install-evidence spec a17c2385 2026-09-18 8f31d2c4
 external-install-evidence align a99d99dd 2026-09-18 6fcf1e27
 external-install-evidence build ad002d1e 2026-09-18 a5748049
+external-install-evidence validate a5e4490d 2026-09-18 0dda1d40
