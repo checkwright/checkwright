@@ -12,6 +12,20 @@
 
 ## New Features
 
+- **pid-liveness-spawns-bash** [spec: SPEC-pid-liveness-libc.md] — `pid_alive` in
+  `native/src/evidence.rs:322` and `native/src/emit/wait_probe.rs:500` spawns
+  `bash -c 'kill -0'`, and the evidence twin falls back to an off-floor `ps -p`
+  (`evidence.rs:332`) for the EPERM case the builtin's exit status hides.
+  **Ruled at spec, 2026-09-18:** `libc` joins the crate on unix targets only. It clears
+  gate-sdk/SPEC.md's dependency bar as that section states it, so no new ruling is needed. On
+  unix, `kill(pid, 0)` answers with EPERM read as held and ESRCH as gone. `evidence::pid_alive`
+  becomes the one liveness owner. The non-unix build keeps the bash-and-`ps` route, because its
+  pids are an MSYS shell's.
+  **Measured at spec:** the lock gains exactly `libc 0.2.189` (MSRV 1.65, under the crate's 1.71,
+  with no transitive package), and `native/src` has no `unsafe` today.
+  Filed 2026-09-18 at `native-spawn-floor`'s spec; directed into `native-spawn-residue`
+  (operator direction, 2026-09-18, lead-relayed).
+
 ## Technical Debt
 
 - **overhead-meter-gate-output-classifier-blind** — the overhead meter classifies the runner's
@@ -138,25 +152,6 @@
   read it as an objective-1 rung, holding the floor census rather than shrinking the floor, and
   flagged the filter question; the operator kept it in. It mints a name, so /spec authors and
   pairs it.
-
-- **pid-liveness-spawns-bash** [cost: event/low] [surface: gate-sdk] — `pid_alive` in
-  `native/src/evidence.rs:322` and in `native/src/emit/wait_probe.rs:500` spawns
-  `bash -c 'kill -0'`, because std has no spelling and the crate carries no libc;
-  gate-sdk/SPEC.md §Fail-closed contract rules that the honest route today. A libc dependency on
-  unix would retire both bash spawns and the `ps -p` fallback leg (`evidence.rs:332`), since
-  `kill(pid, 0)` answering EPERM already means the process exists; native Windows needs its own
-  answer, because the pids recorded there come from an MSYS shell.
-  **Re-verified at the drain:** both `bash -c` sites and the `ps` fallback read at HEAD.
-  **Probed at `native-spawn-residue`'s scope:** `cargo info libc@0.2` reads 0.2.189 with
-  `rust-version` 1.65, under the crate's 1.71, and its one dependency is optional behind
-  `rustc-dep-of-std`, so a default build pulls nothing transitive.
-  **Why design-pending:** a new crate dependency and a platform split in one liveness owner.
-  **Directed 2026-09-18 into `native-spawn-residue`** (operator direction, lead-relayed); the libc
-  dependency is spec's to rule, so /spec authors the amendment and pairs this entry.
-  **Cost while deferred:** two bash spawns and an off-floor `ps` on each liveness probe; low,
-  because bash stays on the floor for other reasons.
-  Filed 2026-09-18 to the inbox at `native-spawn-floor`'s spec (kill -0 route ruled out of scope).
-  Owner lookup: `kill -0`, `libc`, `pid_alive`, `ps -p` — none.
 
 - **consumer-smoke-single-kit-run-not-self-sufficient** [cost: event/low] [surface: lifecycle-kit] —
   narrowing the consumer smoke to one kit fails for `lifecycle-kit`, because the scratch consumer's
