@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+native-spawn-residue gates sha256=47b7310b277d971d699ac2733d8ace1a2d06e89737956f917c89579db8f7284c pass=117 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue gate_sdk sha256=daa0682db307a97ddcc088b14d9fa283dd3478f756d63c2cd411b860c9d80a88 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue canon_kit sha256=7fa6f15316eae59bac76441d7c44c7846b2a7d06de9311b07f68c0b041433f95 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue guard_kit sha256=7418de9de4572487cd88ef9d9415f87790a067e3d5dc68278afb7dfb8c61e109 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue lifecycle_kit sha256=1c39766343c6e46e13c6da2d3026398f0654a7cc53985ef01cf0e71653f68431 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue queue_kit sha256=4d50cf613cf514a9f5c5f92ad7c46acf5d8f750aedc71c9e629514a415bad337 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue scripts sha256=b87b46f3a812452329297073b7dd2c6181caadfc1461c4298e5c2c0f0f7044f6 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue guard_tests sha256=660ff1399386ea7ee064c052fbc5dd0fa4083498cc6ac70240f71fb571830e27 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue demo sha256=7d89277a2fa7549ba004d63331f8563d8d415910301797fc5c90a8369a6ba14f pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue installer_smoke sha256=80265cd36604018d35d0c84c4e9fc3b1d20331e08b78a74a55fbc5445226e507 pass=13 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue consumer_smoke sha256=e0fda6ba72f9a00e6e62cbfd630677fa8b6236672e87ee28cf792881d62bb375 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue upgrade sha256=9c0a1e16b9e2347d8b51fb539b56093c79b7db4b8e299df281c1b84351011509 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue agents_md_smoke sha256=1dfa41674940801d01b5a573a324cddf5d70d2d9a3aa52033ddcffcf90003433 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
+native-spawn-residue native_crate sha256=58fa23f4c42a445cf37c43c3c59625a1c1eab16c08f9bac5c11094f6d44a26f5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-18
