@@ -90,31 +90,30 @@ recoverable:
   the footprint's per-kit token cost. Regenerate on any change either emitter
   reports: `bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`
   (`check-value-rollup-fresh` byte-gates the block, the byte-fresh projection of
-  the same arm without `--write`). The join reads the two emitters live — never
-  the committed detail pages, so a stale page cannot poison the rollup — and
-  reads them as **structured values rather than rendered markdown**, so the class
+  the same arm without `--write`). The join reads the two emitters live, never
+  the committed detail pages, so a stale page cannot poison the rollup; it reads
+  them as **structured values rather than rendered markdown**, so the class
   taxonomy and the per-kit figures arrive as data and no heading or table row is
-  re-parsed. The taxonomy and its hardest-to-softest column order are still owned
-  by the enforcement page, now as its section order rather than as text scraped
-  back out of it; the cost columns are the footprint's per-kit
-  token figure, and the totals row reuses the footprint's pre-summed token totals
-  rather than re-summing; the kit axis follows the footprint roster, then any
-  enforcement-only label (a surface under no kit) groups as `(consumer)`. It is a
-  consumer docs ruling, not kit mechanism — the join axis and column choice live
-  here, never in a kit. `docs/value.md` holds the nav slot; `docs/enforcement.md`
-  and `docs/footprint.md` persist as its off-nav drill-downs, link-reachable from
-  it.
+  ever re-parsed. The enforcement page owns the taxonomy. Its section order is
+  the hardest-to-softest column order; the cost columns are the footprint's
+  per-kit token figure; the totals row reuses the footprint's pre-summed
+  totals rather than re-summing them; the kit axis follows the footprint roster,
+  then any enforcement-only label (a surface under no kit) groups as
+  `(consumer)`. This is a consumer docs ruling. The join axis and column choice
+  live here, never in a kit. `docs/value.md` holds the nav slot, while
+  `docs/enforcement.md` and `docs/footprint.md` persist as its off-nav
+  drill-downs, link-reachable from it.
 - **The KPI-roster fan-out** — a `scripts/kpis.list` edit is the widest single
   trigger on this page: adding or removing one KPI moves **three** byte-gated
-  surfaces, not the one an amendment naturally names — the on-site SPEC
-  mirror (the owning kit's SPEC documents the KPI), `docs/enforcement.md` (the
-  KPI joins the class registry), and `docs/value.md`'s rollup block (its per-kit
+  surfaces, not the one an amendment naturally names. They are the on-site SPEC
+  mirror (the owning kit's SPEC documents the KPI); `docs/enforcement.md` (the
+  KPI joins the class registry); and `docs/value.md`'s rollup block (its per-kit
   Advisory count is derived from the enforcement map). Each of the three gates
   names its own regen command on a red, so recovery is mechanical once the
-  fan-out is known — knowing it in advance is the part nothing else states.
+  fan-out is known. Knowing it in advance is the part nothing else states.
   `docs/footprint.md` is **not** in this fan-out, though the shape of the list
   invites the guess: the footprint measures no script, so a KPI's bytes never
-  reach it — its actual trigger is the row below.
+  reach it. Its actual trigger is the row below.
 - **The enforcement map** — `docs/enforcement.md` is the class registry's
   projection, stale on any **class-registry** change rather than on a content
   edit: a gate's `tier=`, a `scripts/kpis.list` entry, the settings hooks, a
@@ -124,11 +123,11 @@ recoverable:
   gate-sdk/bin/run-gates.sh --emit footprint > docs/footprint.md`, the emitter
   having ported to a non-gate arm the runner resolves config for). **Its measured
   set is narrower than "any kit file", and that misreading is the standing mistake
-  here** — context-kit/SPEC.md §bin/footprint owns the set, and what follows from
+  here**. context-kit/SPEC.md §bin/footprint owns the set, and what follows from
   it is this row's business: the trigger is an injected-block edit, a `templates/`
-  markdown edit, or a kit joining or leaving the roster — **not** a SPEC body
-  edit and not any script under `bin/`, `checks/` or `scripts/`, since the set
-  contains none of those. It reads the worktree rather
+  markdown edit, or a kit joining or leaving the roster. A SPEC body edit is
+  **not** a trigger, nor is any script under `bin/`, `checks/` or `scripts/`,
+  since the set contains none of those. It reads the worktree rather
   than the index, so no staging order binds its regen. Both are `docs/value.md`'s
   inputs, so a red in either implies a rollup regen.
 - **The trajectory projection** — `docs/evidence-data.md` is the published
@@ -160,16 +159,15 @@ recoverable:
   destroys the prose above it.
 - **The graph artifact** — `docs/check-graph.html` and the generated `pre-commit`
   and `commit-msg` hooks are one set with one trigger, a gate's `# graph:`
-  manifest — plus, for the hooks, the resolved knob values a ported member's
-  invocation bakes into them (gate-sdk/SPEC.md §gen-pre-commit), so a kit-config
-  edit stales them too — and so does adding a kit `gate-tests/*.test.sh`, whose
-  basename `--emit-enum-sets` derives into the `check-prose-enum` roster the
-  hooks bake verbatim, staling them with no manifest or config touched at all —
-  and so does any tree edit that *moves* a measured claim, since the baked
-  invocation carries `check-measured-claim`'s resolved values, so a script header
-  gaining a `# no-port:` cause moves the `tree-shell-owed` key and stales the
-  hooks from a file no manifest names either:
-  one command emits both hooks
+  manifest. The hooks also stale on three edits no manifest names. A kit-config
+  edit stales them, since a ported member's invocation bakes its resolved knob
+  values in (gate-sdk/SPEC.md §gen-pre-commit). Adding a kit
+  `gate-tests/*.test.sh` stales them: `--emit-enum-sets` derives its basename into
+  the `check-prose-enum` roster the hooks bake verbatim. Any tree edit that
+  *moves* a measured claim stales them, since the baked invocation carries
+  `check-measured-claim`'s resolved values; a script header gaining a
+  `# no-port:` cause moves the `tree-shell-owed` key this way. One command emits
+  both hooks
   (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`), then the artifact
   (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`), which
   `check-graph` asserts fresh together. The hooks are never hand-edited;
@@ -186,67 +184,74 @@ recoverable:
   row above pairs with them). The new-gate row is the fan-out this file already
   rostered; this is the other one, and nothing derived it for the author.
 - **The new-gate fan-out** — the other wide trigger, and the one with no single
-  owner elsewhere: `gate-sdk/SPEC.md`'s kit-landing checklist covers the kit-side
+  owner elsewhere. `gate-sdk/SPEC.md`'s kit-landing checklist covers the kit-side
   obligations (SPEC section, `good/`+`bad/` fixture pair, the README's
   `<!-- gate-roster:begin -->` block, `smoke/`, registration in
   `scripts/gates.list`) and is silent on the projections a new gate stales,
   because a kit may not name a consumer's docs surfaces. Assembled here so the
   next author reads the list instead of discovering it one red gate at a time:
-  the on-site SPEC mirror (`bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`),
-  `docs/enforcement.md` (`bash gate-sdk/bin/run-gates.sh --emit enforcement-map >
-  docs/enforcement.md` — the gate joins the class registry), `docs/value.md`'s
-  rollup block (`bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`,
-  derived from the map above),
-  `docs/check-graph.html` (`bash gate-sdk/bin/run-gates.sh --emit graph >
-  docs/check-graph.html`), the owning kit's `smoke/install.sh` expected-gate
-  roster (hand-maintained, so a new gate is added there or carries a
-  `smoke-unregistered:` declaration — `gate-sdk/SPEC.md` §Consumer smoke owns
-  which), `docs/install.md`'s
-  `ported-gate-members` measured claim (for a gate born native, which every new
-  gate now is), and — for a hook-tier gate — the generated hooks
-  (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`). `docs/footprint.md` is absent
-  for the reason the row above gives: a gate is a script or a crate module and
-  the footprint measures neither. A prose-only SPEC edit reds the on-site mirror
-  alone. **Two of these regenerations are staging-ordered** — the generated hooks
-  and the gate binary both derive through `git ls-files`, so a unit adding a file
-  stages first and regenerates second; the two hazards and their routes are the
-  closing paragraphs of this page, and a new-gate unit adds files by definition.
+  - the on-site SPEC mirror (`bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`);
+  - `docs/enforcement.md`, which the gate joins as a class-registry member
+    (`bash gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md`);
+  - `docs/value.md`'s rollup block, derived from that map
+    (`bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`);
+  - `docs/check-graph.html`
+    (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`);
+  - the owning kit's `smoke/install.sh` expected-gate roster, hand-maintained, so
+    a new gate is added there or carries a `smoke-unregistered:` declaration
+    (`gate-sdk/SPEC.md` §Consumer smoke owns which);
+  - `docs/install.md`'s `ported-gate-members` measured claim, for a gate born
+    native, which every new gate now is;
+  - for a hook-tier gate, the generated hooks
+    (`bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`).
+
+  `docs/footprint.md` is absent for the reason the row above gives: a gate is a
+  script or a crate module and the footprint measures neither. A prose-only SPEC
+  edit reds the on-site mirror alone. **Two of these regenerations are
+  staging-ordered.** The generated hooks and the gate binary both derive through
+  `git ls-files`, so a unit adding a file stages first and regenerates second.
+  The two hazards and their routes are this page's closing paragraphs; a
+  new-gate unit adds files by definition.
 - **The install-toolchain parity contract** — `docs/install.md`'s Requirements
   section holds the toolchain list to the probe roster:
   `check-install-toolchain` asserts whole-element parity between its
   `<!-- toolchain:begin -->` bullets and `native/src/toolfloor.rs`'s
-  `PROBE_SET` array both directions — name, version floor, implementation
-  token, and audience, since each bullet's parenthetical renders its roster
-  element verbatim
-  (`` - `bash` (≥ 4.3) — … ``, `` - `sort` (coreutils) — … ``,
-  `` - `cargo` (≥ 1.71, @contributor) — … ``, the axes comma-joined,
-  no parenthetical for an unconstrained member). The audience carries a leading
-  `@` for the same reason the floor carries `≥`: the gate's reader is
-  positional, so an axis with no sigil would be indistinguishable from the
-  implementation token. Elements are derivable, purpose
-  clauses hand prose, so a roster edit reds the docs list without an emitter
-  handshake. The roster the gate reads by default is the crate's own constant; a
+  `PROBE_SET` array both directions. Each bullet's parenthetical renders its
+  roster element verbatim, so all four axes are held: name, version floor,
+  implementation token and audience. The axes are comma-joined, and an
+  unconstrained member takes no parenthetical:
+
+  ```text
+  - `bash` (≥ 4.3) — …
+  - `sort` (coreutils) — …
+  - `cargo` (≥ 1.71, @contributor) — …
+  ```
+
+  The audience carries a leading `@` for the same reason the floor carries `≥`:
+  the gate's reader is positional, so an axis with no sigil would be
+  indistinguishable from the implementation token. Elements are derivable and
+  purpose clauses hand prose, so a roster edit reds the docs list without an
+  emitter handshake. The gate reads the crate's own constant by default. A
   hermetic fixture may steer it onto a roster file instead, and that file is
-  **parsed and never sourced** — a fixture path is untrusted input, so the reader
-  that lints the array must not be made to execute the file it reads.
+  **parsed and never sourced**, because a fixture path is untrusted input and the
+  reader that lints the array must not be made to execute the file it reads.
 
 - **The install-platforms parity contract** — `docs/install.md`'s Requirements
-  section carries a **second** marker block, `<!-- platforms:begin -->`, and this
-  row is where a reader looks for what holds it, exactly as the row above is for
-  the first. It is hand-authored, like its neighbour; what it declares is one
-  entry per **supported platform**, and the grammar is deliberately its
-  neighbour's so one positional reader shape serves both: `` - `<triple>` ``
-  followed by a parenthetical carrying the **join state**, then an em dash and
-  free prose. Two states and no third — `(joined)`, meaning the triple is a live
-  line in `native/targets.list`; and `(held: <precondition>)`, meaning the
-  platform is documented as supported, is **not** in the roster, and carries the
-  named run that would join it. A hold with no stated cause is how a pile grows
+  section carries a **second** marker block (`<!-- platforms:begin -->`), and
+  this row is where a reader looks for what holds it, as the row above is for the
+  first. It is hand-authored like its neighbour. It declares one entry per
+  **supported platform** in its neighbour's grammar, so one positional reader
+  shape serves both: `` - `<triple>` `` followed by a parenthetical carrying the
+  **join state**, then an em dash and free prose. There are two states and no
+  third. `(joined)` means the triple is a live line in `native/targets.list`.
+  `(held: <precondition>)` means the platform is documented as supported but is
+  **not** in the roster, and it carries the named run that would join it. A hold with no stated cause is how a pile grows
   silently, so the precondition is mandatory rather than conventional. The
   parenthetical is read to its first `)` and the triple is the line's first
   backticked run, so neither may carry a nested parenthesis and the state must
   sit on the bullet's own first line; continuation lines are prose and are not
   read. A platform the page does not state as supported is **absent** rather than
-  held — a held entry is still a support claim, so absence is the state for a
+  held: a held entry is still a support claim, so absence is the state for a
   platform nothing has been promised about.
   Two readers: `.github/workflows/gates.yml`'s `native-artifacts` roster step,
   which derives the producer's build matrix from **every** declared triple
@@ -255,28 +260,28 @@ recoverable:
   and the roster in lockstep in both directions and is what mechanizes
   gate-sdk/SPEC.md §Consumer payload's first bound. **That gate has landed**, a
   born-native repo-root member at `precommit` tier, so the lockstep is
-  machine-held rather than discipline: a `joined` declaration with no roster
-  line reds, a roster line no bullet declares `joined` reds, and a hold reds on
+  machine-held rather than discipline. A `joined` declaration with no roster
+  line reds; so does a roster line no bullet declares `joined`; a hold reds on
   an empty precondition or on a roster line it should not have.
-  **The binding is four-way, not three-way, and the fourth and fifth surfaces
-  are the two host detectors** — `target_of_host` in
+  **The binding is four-way rather than three-way, and the fourth and fifth
+  surfaces are the two host detectors:** `target_of_host` in
   `installer/bin/checkwright.sh` and `Get-HostTarget` in
   `installer/bin/checkwright.ps1`, whose extraction shapes installer/SPEC.md
   §The gate binary pins. Each detector's **emitted** triple set is held equal to
-  the block's **declared** set — equality rather than containment, because each
-  direction closes a distinct failure. A triple a detector emits that the block
+  the block's **declared** set. It is equality rather than containment because
+  each direction closes a distinct failure. A triple a detector emits that the block
   does not declare is the attested case: detected by the installer while on no
   roster, with nothing going red. A triple the block declares that no detector
   emits is a support claim the installer can never honour, and it has no live
   instance, which is exactly why it is asserted rather than assumed. It carries a
-  fourth arm that asserts nothing and reports instead — per held platform, the
-  count of registry members a host with no published artifact loses, printed on
-  the clean line as well as the red one. **That arm carries two limits, and it
+  fourth arm that asserts nothing and reports instead. Per held platform it
+  prints the count of registry members a host with no published artifact loses,
+  on the clean line as well as the red one. **That arm carries two limits, and it
   is not the standing instrument a reader looking for the aggregate cost
   wants.** Its subject is the held set, so it reports only *while* something is
-  held: a join that empties the block of holds silences it — the state the
-  declaration is in with `x86_64-apple-darwin` joined — and a report with no
-  subject is the arm working rather than a gap. And the aggregate cost
+  held. A join that empties the block of holds silences it (the declaration's
+  state with `x86_64-apple-darwin` joined), and a report with no subject is the
+  arm working rather than a gap. And the aggregate cost
   gate-sdk/SPEC.md §The port-candidate criteria names has a different
   instrument, the **binary-less leg**; that section owns how the two relate and
   why this arm is not a second measurement of it. Two
@@ -284,20 +289,20 @@ recoverable:
   reader and a compiled one), not a duplication to collapse.
   **The state word now decides a binding posture on both sides of the artifact
   hand-off, and that is a wider consequence than "which platforms get built".**
-  The roster step publishes what it derives twice — as the producer matrix, and
-  as an object keyed by triple — and that second output is read at *job* level by
+  The roster step publishes what it derives twice, as the producer matrix and
+  as an object keyed by triple. That second output is read at *job* level by
   the Intel `install-smoke` leg, whose `runs-on` and `continue-on-error` both
   resolve from it. So flipping a bullet from `held:` to `joined` makes that
   triple's **producer** leg binding and its **consumer** leg binding, in one
   edit, with no workflow change and nobody remembering to make it so. Read the
   state word as a support commitment taking effect rather than as documentation:
-  the legs are green at the moment of a flip, so nothing reds at the landing, and
-  the cost arrives the first time that platform breaks.
+  the legs are green at the moment of a flip, so nothing reds at the landing. The
+  cost arrives the first time that platform breaks.
   **The mechanism has worked instances now, and the second is what makes it a
   mechanism rather than one file's arrangement.** `x86_64-apple-darwin`'s flip to
   `joined` made that triple's producer leg and its Intel `install-smoke` consumer
   leg binding on master at the landing commit, and the diff that did it edits
-  `.github/workflows/gates.yml` nowhere — a roster line and a state word are the
+  `.github/workflows/gates.yml` nowhere; a roster line and a state word are the
   whole of it. `x86_64-pc-windows-msvc` then took the same route, and its
   `install-smoke-windows` leg reads its `runs-on` and `continue-on-error` off the
   roster step's keyed output exactly as the Intel leg does, so no platform leg's
@@ -328,39 +333,35 @@ recoverable:
 
 **A derived surface earns a row here only when it has a reader who cannot run
 the emitter** — a public page, a file a fresh clone needs before its tooling
-works. Derivation-first is satisfied by deriving on demand otherwise, and a
-committed copy of a high-churn source's derivation buys a per-commit
-regeneration tax for nobody. So **a tool with no stored projection has nothing to
-hold fresh** and stays off this roster: queue-kit's `queue-index` and
-`queue-edges` arms are the standing instances, the latter with its refusal
-reasoned in its own contract (queue-kit/SPEC.md §The queue-edges arm). Their
-absence is a
-ruling, not an oversight — the question to ask of a new derived surface is who
-reads it, not whether it could be generated. **Both rulings survived a port onto
+works. Otherwise deriving on demand satisfies derivation-first, and a committed
+copy of a high-churn source's derivation buys a per-commit regeneration tax for
+nobody. So **a tool with no stored projection has nothing to hold fresh** and
+stays off this roster: queue-kit's `queue-index` and `queue-edges` arms are the
+standing instances, the latter with its refusal reasoned in its own contract
+(queue-kit/SPEC.md §The queue-edges arm). Their absence is a ruling. Ask of a
+new derived surface who reads it, not whether it could be generated. **Both rulings survived a port onto
 the binary on that stored-projection ground alone**, and the shell-consumer half
 of each stopped being true at its own port, when the consumer became a session
 reaching a compiled arm through the `--emit` front-end.
 
 **The compiled gate binary is the third standing instance, and it fails the
-admission test in both directions.** It is not committed at all (`native/target/`
-is gitignored), so there is no tracked copy for a freshness gate to byte-compare;
-and every reader of it in this repo can run the emitter, which is `cargo build`. A
+admission test in both directions.** It is never committed. With
+`native/target/` gitignored there is no tracked copy for a freshness gate to
+byte-compare, and every reader of it in this repo can run the emitter, which is
+`cargo build`. A
 consumer is not a counter-example: a consumer never receives the crate source and
 never builds, and the artifact they do receive is held by a published digest
-verified before it is written (gate-sdk/SPEC.md §Consumer payload) — a different
-guarantee with a different mechanism. What the binary does owe is build currency,
-and that obligation is discharged by an oracle rather than by a row here:
-`check-gate-binary-fresh` (gate-sdk/SPEC.md §check-gate-binary-fresh) compares the
-binary's baked source stamp against the crate's tracked source whenever a `.gate`
-descriptor makes it load-bearing. Recorded because the derivation-first reflex
-reads "generated artifact" and reaches for this roster; the answer is that the
-roster's admission rule is narrower than that reflex, and the obligation has a
-home. **It carries a staging-order hazard** — the stamp is computed over *tracked*
-crate source, so a unit adding a crate file builds after `git add`, never before,
-or the binary is stamped against a source set the gate does not hash. The rule
-and its mechanism are the owner's (gate-sdk/SPEC.md §check-gate-binary-fresh); it
-is restated here because the reflex is to read the hazard off the artifact's own
-freshness rule, which is not where it lives.
+verified before it is written (gate-sdk/SPEC.md §Consumer payload), a different
+guarantee. The binary owes build currency, discharged by an oracle rather than a
+row here: `check-gate-binary-fresh` (gate-sdk/SPEC.md §check-gate-binary-fresh)
+compares the binary's baked source stamp against the crate's tracked source
+whenever a `.gate` descriptor makes it load-bearing. **It carries a
+staging-order hazard.** The stamp is computed over *tracked* crate source, so a
+unit adding a crate file builds after `git add`, never before, or the binary is
+stamped against a source set the gate does not hash; the rule is the owner's
+(gate-sdk/SPEC.md §check-gate-binary-fresh), named here because the reflex is to
+read the hazard off the artifact's own freshness rule, which is not where it
+lives, and the next paragraph's hook hazard is its only sibling.
 
 **The generated pre-commit hook carries one too, by a different route, and the
 two are the whole set.** The hook bakes each gate's resolved argv, and

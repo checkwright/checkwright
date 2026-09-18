@@ -17,5 +17,11 @@ The API rides the shipped allow-list and ZFS rides the consumer's own extra list
 
 Each item above is one em-dash of a well-formed definition list, so the unitized model reads four clean units where the old blank-line-block model saw one four-em-dash paragraph and false-tripped.
 
+<!-- roster:begin -->
+
+It's worth noting that this generated line — held out — by its marker pair — stays clean.
+
+<!-- roster:end -->
+
 <!-- prose-tell-exempt: a deliberate dash cluster kept to demonstrate the valve -->
 This kept line leans on the em-dash — again — and once more — yet the valve holds it clean.

@@ -16,6 +16,43 @@
 
 ## Deferred
 
+- **macos-remedy-path-lasts-one-shell** [cost: event/low] [surface: docs] — `docs/install.md`
+  §Requirements' `macos-remedy` block ends in an `export PATH=` line that lasts one shell, and the
+  page names no step persisting the `gnubin` ordering (a shell-profile line), so an adopter who runs
+  the block verbatim reports below contract in the next terminal. The page rules the block the whole
+  remedy ("this page names no other step for a Mac"), so persistence is a user-facing change to the
+  block and its surrounding prose, not a calibration.
+  **Re-verified at the drain:** the block's last line is the `export PATH=` at `docs/install.md:88`
+  and the prose at lines 76 and 93-97 names no persistence step.
+  **Why design-pending:** which profile file (`~/.zprofile` for the default zsh, `~/.bash_profile`
+  for the Homebrew bash the block installs) is an adopter-facing choice, and the CI legs run the
+  block verbatim, so a profile-writing line changes what the legs execute.
+  **Cost while deferred:** an adopter's second shell resolves BSD `sort` and `date` and
+  `checkwright doctor` refuses; the CI legs are unaffected because `GITHUB_PATH` persists the
+  entries across steps.
+  Filed 2026-09-18 to the gap inbox at `smoke-leg-crate-cache`'s build; promoted at its close drain.
+  Owner lookup: `macos-remedy`, `gnubin`, `shell profile`, `persist` — none.
+
+- **windows-shellcheck-step-copies-page-route** [cost: event/low] [surface: .github] — the Windows
+  legs install `shellcheck` from a literal copy of `docs/install.md` §Requirements' Chocolatey route
+  (`choco install shellcheck`), held equal to the page by nothing: the Windows analogue of the macOS
+  copy the `macos-remedy` block retired by having the legs run the page's own block. Candidate: a
+  Windows remedy marker block on the page, extracted and run by the legs the way the macOS legs run
+  theirs.
+  **Re-verified at the drain:** the copy sits at **two** sites, not the one the filer named —
+  `install-smoke-windows`' shellcheck step and a second `choco install shellcheck` in
+  `install-smoke-powershell` (`.github/workflows/gates.yml`); the page's route is the
+  `shellcheck` bullet's prose at `docs/install.md:190`, not a block.
+  **Why design-pending:** the route is a prose clause today, so deriving from it means authoring a
+  new page block, a user-facing page change, and a PowerShell extraction beside the awk one.
+  **Cost while deferred:** a drift between the page and either step greens a leg over an adopter
+  path the page no longer describes; one formula, so low.
+  Filed 2026-09-18 to the gap inbox at `smoke-leg-crate-cache`'s spec; promoted at its close drain.
+  Owner lookup: `choco`, `Chocolatey`, `windows-remedy`, `install-smoke-windows` — matched
+  `install-smoke-leg-names-mix-two-axes` and
+  `instrument-leg-expiry-keyed-to-a-green-run-not-its-assertion-set` (leg naming and expiry,
+  distinct).
+
 - **adopter-floor-gnu-date-and-awk-unheld** [cost: event/low] [surface: gate-sdk] — the published
   adopter floor keeps GNU coreutils for one reason the binary could retire, and holds its awk
   narrowing by grep rather than by a run. `native/src/emit/kpi/mod.rs:119` and
@@ -33,6 +70,11 @@
   CI-cost call against a claim no shipped construct currently breaks.
   **Cost while deferred:** the front door advertises coreutils against objective 1, and the next
   GNU-only awk construct to ship reds nothing.
+  **Awk half, narrowed at `smoke-leg-crate-cache`'s close:** `macos-adopter-legs-brew-gawk` (Done)
+  dropped the macOS legs' Homebrew `gawk`, so both binding macOS install-smoke legs now run the
+  adopter floor on BSD awk; what stays open is mawk and BusyBox, and the `date -d` half whole.
+  **Inferred, not run:** the macOS legs pass on BSD awk — `gh run view <close push run> --log`,
+  settled by that close's watched push.
   Filed 2026-09-18 to the gap inbox at `native-spawn-floor`'s spec, promoted at its close drain.
   Owner lookup: `date -d`, `coreutils`, `PROBE_SET`, `mawk`, `awk::GNU` — matched
   `native-windows-bash-floor` (cited, distinct above) and `macos-adopter-package-set-copied-per-leg`

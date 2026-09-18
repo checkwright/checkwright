@@ -3110,8 +3110,9 @@ per item is well-formed markdown, not flowing prose, so its items are never
 lumped into one block (the same structural holdout the non-prose surfaces below
 earn). Because the tells measure authored prose, three non-prose surfaces are
 held out before any assertion runs: inline `` `code` `` spans, markdown table
-rows, and generated `<!-- name:begin -->`…`<!-- name:end -->` regions (each
-byte-gated elsewhere — a prose gate that forced edits to generated content
+rows, and generated `<!-- name:begin -->`…`<!-- name:end -->` regions, a marker
+being a line whose whole trimmed content is the comment, so prose naming one
+opens nothing (each region is byte-gated elsewhere — a prose gate that forced edits to generated content
 would contradict its generation, the same reasoning that keeps `docs/posts/`
 out of the opt-in). Fenced code the shared walk driver already drops.
 

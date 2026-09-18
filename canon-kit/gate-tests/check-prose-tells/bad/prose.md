@@ -1,5 +1,7 @@
 # Sample Page
 
+Prose naming the `<!-- roster:begin -->` marker inline opens no generated region, so every tell below still counts.
+
 ## First section
 
 It's worth noting that the pipeline runs green — every time — without fail — really, and XYZ is leaned on throughout while the reader never learns what XYZ stands for.

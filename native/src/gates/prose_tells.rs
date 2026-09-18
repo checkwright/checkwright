@@ -111,36 +111,25 @@ fn heading_level(s: &str) -> usize {
     i
 }
 
+// spec: gate-sdk/SPEC.md §lib/inject.sh — a marker is the line's whole trimmed content; prose naming one opens nothing.
 fn gen_marker(s: &str, suffix: &str) -> bool {
-    let b = s.as_bytes();
-    let mut i = 0usize;
-    while i + 4 <= b.len() {
-        if &b[i..i + 4] != b"<!--" {
-            i += 1;
-            continue;
+    let inner = match s
+        .trim()
+        .strip_prefix("<!--")
+        .and_then(|t| t.strip_suffix("-->"))
+    {
+        Some(t) => t.trim(),
+        None => return false,
+    };
+    match inner.strip_suffix(suffix) {
+        Some(name) => {
+            !name.is_empty()
+                && name
+                    .bytes()
+                    .all(|c| c.is_ascii_alphanumeric() || c == b'_' || c == b'-')
         }
-        let mut j = i + 4;
-        while j < b.len() && (b[j] == b' ' || b[j] == b'\t') {
-            j += 1;
-        }
-        let name_start = j;
-        while j < b.len()
-            && (b[j].is_ascii_alphanumeric() || b[j] == b'_' || b[j] == b'-')
-        {
-            j += 1;
-        }
-        if j > name_start && s[j..].starts_with(suffix) {
-            let mut k = j + suffix.len();
-            while k < b.len() && (b[k] == b' ' || b[k] == b'\t') {
-                k += 1;
-            }
-            if s[k..].starts_with("-->") {
-                return true;
-            }
-        }
-        i += 1;
+        None => false,
     }
-    false
 }
 
 fn count_matches(re: &Ere, hay: &str) -> usize {
