@@ -12,6 +12,15 @@
 
 ## New Features
 
+- **guard-hook-windows-substrate** [spec: SPEC-windows-hook.md] — guard-kit's `PreToolUse` hook
+  is bash and jq, and guard-kit/SPEC.md says nothing about native Windows.
+  **Ruled at spec (operator direction, 2026-09-18, lead-relayed):** Git for Windows' bundled bash
+  serves the hook, with no second implementation — the guarded `Bash` tool and every hook command
+  already run under Git Bash, and the wiring stays one host-neutral settings file. A PowerShell
+  twin and a native hook front are refused. The `PowerShell` tool's bypass is stated as an honest
+  limit and filed as `guard-powershell-tool-unguarded`. The oracle is the decision table run
+  under Git Bash on `install-smoke-windows`.
+
 - **run-gates-ps1-windows-powershell-host-unexercised** [spec: SPEC-windows-powershell-host.md]
   — gate-sdk/SPEC.md §run-gates claims the PowerShell twin runs under Windows PowerShell 5.1 and
   PowerShell 7, but `--run-front-end-parity` spawns `pwsh` only, so the 5.1 half is never run.
@@ -162,22 +171,21 @@
   `suite coverage`, `evidence-baseline`, `orphan` — matched `evidence-baseline-orphan-suite-row`,
   read and ruled distinct above.
 
-- **guard-hook-windows-substrate** [cost: event/high] [surface: guard-kit] — whether guard-kit's
-  `PreToolUse` hook needs a second implementation language on native Windows. Its rules are bash
-  and jq, and they stay bash on the extension-point ground (guard-kit/SPEC.md §Consumer rules), so a
-  PowerShell twin would double every consumer rule. The harness-hook commands that already reach
-  the binary through the front-end take `run-gates.ps1` once a Windows consumer's settings name it,
-  and which command those settings carry is part of this same wiring decision.
-  **Why design-pending:** a twin's parity oracle across consumer-authored rules, or a ruling that
-  Git for Windows' bundled bash serves the hook (as it serves the git hooks), are both open.
-  **Cost while deferred:** a native-Windows harness session still needs Git-for-Windows bash
-  reachable for every tool call the guard sees, which TRAJECTORY objective 6 counts against.
-  Filed 2026-09-18 at `windows-bash-floor`'s scope, split out of `native-windows-bash-floor`
-  (operator direction, lead-relayed), whose other two thirds that iteration took.
-  Leads `windows-adopter-path`'s unit set by operator direction (2026-09-18, lead-relayed) at
-  its scope, with no design direction chosen there: weighing bundled Git-for-Windows bash, a
-  PowerShell twin under a parity oracle, and a native hook front is spec's, which authors and
-  promotes, and escalates a choice that narrows TRAJECTORY objective 6.
+- **guard-powershell-tool-unguarded** [cost: event/high] [surface: guard-kit] — on native
+  Windows the harness's `PowerShell` tool is on by default beside `Bash`, and guard-kit's hook
+  matches `Bash` alone, so a PowerShell-tool call is neither steered nor logged to the friction log.
+  Widening the matcher is no fix: every generic rule reads bash grammar.
+  **Probed at filing:** the harness tools reference names the tool `PowerShell` and advises
+  matching `Bash|PowerShell`; `grep -rn -i 'powershell tool' guard-kit` finds nothing before
+  `guard-kit/SPEC-windows-hook.md`, which states the bypass as an honest limit.
+  **Why design-pending:** a PowerShell-grammar guard needs its own skeleton and splitter, rules
+  that model PowerShell rather than bash, and a decision table on a Windows leg. None of that is
+  designed, and whether a consumer-rule seam belongs on it is open.
+  **Cost while deferred:** on a Windows host a command routed through the PowerShell tool
+  bypasses every steer and block, and the close-stage triage never sees it.
+  Filed 2026-09-18 at `windows-adopter-path`'s spec by operator direction (lead-relayed), when
+  `guard-hook-windows-substrate` was designed. Owner lookup: `PowerShell tool`,
+  `USE_POWERSHELL_TOOL`, `Bash|PowerShell` — none.
 
 - **adopter-floor-collapse-rung-unqueued** [cost: event/high] [surface: native] — TRAJECTORY
   objective 1 (the dependency floor collapses to git) has no queued rung: the adopter floor
