@@ -9,3 +9,4 @@ windows-adopter-path spec a740eb0e 2026-09-18 c4f5ec83
 windows-adopter-path align aed65cfe 2026-09-18 cb9669ab
 windows-adopter-path build ad7c7fbc 2026-09-19 a41e1819
 windows-adopter-path build a19cedda 2026-09-19 e24d1335
+windows-adopter-path validate a9ae3831 2026-09-19 61a86bd4
