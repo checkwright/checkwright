@@ -12,59 +12,41 @@
 
 ## New Features
 
+- **run-gates-ps1-windows-powershell-host-unexercised** [spec: SPEC-windows-powershell-host.md]
+  — gate-sdk/SPEC.md §run-gates claims the PowerShell twin runs under Windows PowerShell 5.1 and
+  PowerShell 7, but `--run-front-end-parity` spawns `pwsh` only, so the 5.1 half is never run.
+  **Ruled at spec:** keep the claim and run it — on a Windows host the arm compares the stub
+  against the twin under both `pwsh` and `powershell`, exit 2 if either is missing; `pwsh` alone
+  elsewhere. Narrowing to PowerShell 7 refused: 5.1 is the only PowerShell a stock Windows ships.
+  Lands before `init-next-block-bash-spelled-on-windows`, whose printed line runs under 5.1.
+
+- **init-next-block-bash-spelled-on-windows** [spec: SPEC-windows-follow-up.md] — `init`'s
+  follow-up block prints bash-spelled lines on every host, so a native-Windows adopter in PowerShell
+  types a bare `bash` that reaches the WSL launcher.
+  **Ruled at spec:** the block is keyed on the OS `init` runs on — a Windows host prints
+  `powershell -NoProfile -ExecutionPolicy Bypass -File gate-sdk/bin/run-gates.ps1 …`, which runs
+  from PowerShell and Git Bash alike; the smoke's follow-up arm requires an executable target only
+  where no interpreter is spelled; the PowerShell leg runs the printed `--install-hooks` line.
+
+- **windows-remedy-path-step-undocumented** [spec: SPEC-remedy-persistence.md] — the
+  `install-smoke-powershell` leg prepends Git for Windows' `usr\bin` and `bin` to `PATH` before
+  `doctor`, a step `docs/install.md` never names, and the page's block omits `jq`, which Git for
+  Windows does not ship (run 35390249229's probe resolves it from Chocolatey).
+  **Ruled at spec:** the block installs `shellcheck` and `jq`, appends Git's userland to the user
+  `Path` and prepends it for the session; the leg drops its own prepend and runs `doctor` under
+  the `PATH` a new terminal composes.
+
+- **macos-remedy-path-lasts-one-shell** [spec: SPEC-remedy-persistence.md] — the `macos-remedy`
+  block's `export PATH=` lasts one shell, so the adopter's next terminal resolves BSD `sort` and
+  `date` and `doctor` refuses.
+  **Ruled at spec:** the block appends the ordering, prefix resolved at append time, to
+  `~/.zprofile` (the default zsh login profile; bash-login adopters are pointed at
+  `~/.bash_profile` in prose), and both macOS legs assert a fresh `env -i` login shell resolves
+  gnubin `sort`.
+
 ## Technical Debt
 
 ## Deferred
-
-- **init-next-block-bash-spelled-on-windows** [cost: event/low] [surface: installer] — `init`'s
-  follow-up block prints `bash gate-sdk/bin/run-gates.sh --install-hooks` and the bare battery line
-  on every host, so a native-Windows adopter in PowerShell types a bare `bash` that reaches the WSL
-  launcher; with `gate-sdk/bin/run-gates.ps1` shipped, the block could name the host's front-end.
-  **Re-verified at the drain:** `native/src/installer/init.rs` prints both lines unconditionally
-  after `next:`, and its directive names the block a stated grammar the consumer smoke parses.
-  **Why design-pending:** a host-keyed block is a user-facing output change and a grammar change
-  the smoke's reader must follow, neither settled by the landing unit's envelope.
-  **Cost while deferred:** a PowerShell adopter's first follow-up command may reach WSL rather
-  than the vendored tree's front-end.
-  Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s scope; promoted at its close drain.
-  Owner lookup: `run-gates.ps1`, `install-hooks`, `follow-up`, `next:` — matched
-  `guard-hook-windows-substrate` (harness-hook wiring, distinct).
-  Joins `windows-adopter-path` by operator direction (2026-09-18, lead-relayed) at its scope;
-  the host-keyed block and its smoke grammar are spec's to author and promote.
-
-- **windows-remedy-path-step-undocumented** [cost: event/low] [surface: docs] — the
-  `install-smoke-powershell` leg prepends Git for Windows' `usr\bin` and `bin` to `PATH` before
-  `doctor`, because `windows-latest` resolves no GNU `sort` otherwise, but `docs/install.md` names
-  no such step for a native-Windows adopter: the leg greens on a step the page does not describe.
-  The Windows analogue of `macos-remedy-path-lasts-one-shell`.
-  **Re-verified at the drain:** the prepend is the `$env:PATH =` line in
-  `.github/workflows/gates.yml` ahead of the leg's `windows-remedy` extraction, and that block in
-  `docs/install.md` holds only `choco install shellcheck -y`.
-  **Why design-pending:** whether the page's step is a session `PATH` line the leg then runs
-  verbatim (dropping its own prepend) or a persisted user `PATH` edit is an adopter-facing choice,
-  the one `macos-remedy-path-lasts-one-shell` waits on, and only a Windows leg verifies it.
-  **Cost while deferred:** an adopter following the page on native Windows meets a `doctor`
-  refusal the page gives no remedy for.
-  Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s scope and promoted at its close.
-  Owner lookup: `windows-remedy`, `Git for Windows`, `usr/bin` — matched
-  `macos-remedy-path-lasts-one-shell` (the macOS block, distinct).
-  Selected for `windows-adopter-path` at its scope (operator direction, 2026-09-18, lead-relayed);
-  the session-versus-persisted `PATH` step is spec's to author and promote with the macOS twin.
-
-- **run-gates-ps1-windows-powershell-host-unexercised** [cost: event/low] [surface: gate-sdk] —
-  gate-sdk/SPEC.md §run-gates claims the front-end's PowerShell twin runs under Windows PowerShell
-  5.1 and PowerShell 7, but `--run-front-end-parity` spawns `pwsh` only, so the 5.1 half of the
-  host class is asserted and never run.
-  **Re-verified at the drain:** the SPEC sentence names both hosts, and
-  `native/src/emit/front_end_parity.rs` builds its twin transcript from `programs::PWSH` alone.
-  **Why design-pending:** the two closes are a parity pass under `powershell.exe` on the Windows
-  leg, or narrowing the claim to PowerShell 7 — the second narrows asserted behavior, and the first
-  is verifiable on a Windows runner only.
-  **Cost while deferred:** a 5.1-only construct regression in the twin reds nothing.
-  Filed 2026-09-18 to the gap inbox at `windows-bash-floor`'s build; promoted at its close drain.
-  Owner lookup: `front-end-parity`, `powershell.exe`, `PowerShell 5` — none.
-  In `windows-adopter-path`'s unit set by operator direction (2026-09-18, lead-relayed);
-  choosing the 5.1 parity pass or the narrowed claim is spec's, which promotes it.
 
 - **inferred-marker-malformed-placement-passes-unseen** [cost: event/low] [surface: lifecycle-kit]
   — `check-stage-entry` assertion D reads an inferred marker only where the full spelling opens a
@@ -104,25 +86,6 @@
   Filed 2026-09-18 to the gap inbox during `guard-ruleset-registration-lockstep`; promoted at its
   close drain. Owner lookup: `guard_skeleton`, `Declares`, `inert class`, `skeleton call` —
   none.
-
-- **macos-remedy-path-lasts-one-shell** [cost: event/low] [surface: docs] — `docs/install.md`
-  §Requirements' `macos-remedy` block ends in an `export PATH=` line that lasts one shell, and the
-  page names no step persisting the `gnubin` ordering (a shell-profile line), so an adopter who runs
-  the block verbatim reports below contract in the next terminal. The page rules the block the whole
-  remedy ("this page names no other step for a Mac"), so persistence is a user-facing change to the
-  block and its surrounding prose, not a calibration.
-  **Re-verified at the drain:** the block's last line is the `export PATH=` at `docs/install.md:88`
-  and the prose at lines 76 and 93-97 names no persistence step.
-  **Why design-pending:** which profile file (`~/.zprofile` for the default zsh, `~/.bash_profile`
-  for the Homebrew bash the block installs) is an adopter-facing choice, and the CI legs run the
-  block verbatim, so a profile-writing line changes what the legs execute.
-  **Cost while deferred:** an adopter's second shell resolves BSD `sort` and `date` and
-  `checkwright doctor` refuses; the CI legs are unaffected because `GITHUB_PATH` persists the
-  entries across steps.
-  Filed 2026-09-18 to the gap inbox at `smoke-leg-crate-cache`'s build; promoted at its close drain.
-  Owner lookup: `macos-remedy`, `gnubin`, `shell profile`, `persist` — none.
-  Taken into `windows-adopter-path` at its scope by operator direction (2026-09-18,
-  lead-relayed); the profile-file choice is spec's to author and promote with the Windows twin.
 
 - **adopter-floor-gnu-date-and-awk-unheld** [cost: event/low] [surface: .github] — no CI leg runs the
   adopter floor on mawk or BusyBox awk, so `native-spawn-floor`'s narrowing of the awk member to
