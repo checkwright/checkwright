@@ -3416,9 +3416,4 @@
 
 ## Done
 
-- pid-liveness-spawns-bash
-- gnu-date-spawn-retired
-- overhead-meter-gate-output-classifier-blind
-- arm-spawn-requirements-unrecorded
-
 ## Lessons Learned
