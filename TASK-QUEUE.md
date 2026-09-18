@@ -12,6 +12,32 @@
 
 ## New Features
 
+- **smoke-leg-crate-build-uncached** [spec: SPEC-smoke-leg-binary.md] — the four hand-off
+  install-smoke legs each compile the gate crate, which the same run's producer leg has already
+  compiled cold on the same runner label.
+  **Measured at spec, 2026-09-18, correcting the filed premise.** The step is load-bearing: with
+  `INSTALLER_SMOKE_ARTIFACTS_DIR` set, `run-smoke.sh` adopts the upload and never builds, so the
+  step's host binary is what `run-gates.sh` dispatches the suite's pack to. A cross-run cache is
+  refused on measurement: in run 35214069775 the dependencies took 3-11s of each compile, and
+  the crate, which changes on most pushes, took the rest.
+  **Ruled at spec:** each leg installs the producer's artifact as the tree's gate binary. No
+  compile, no cache, and no cold-build coverage lost, because the producer leg still compiles
+  cold. The publish-path refusal in installer/SPEC.md §The packer is not reached. Saving: about
+  79s of wall-clock (the Windows leg is the critical path) and 236s of runner time per push.
+  Filed 2026-09-17 to the gap inbox by `install-smoke-slow-leg`'s lead at spec; promoted at its
+  close; paired at spec.
+
+- **macos-adopter-package-set-copied-per-leg** [spec: SPEC-macos-remedy.md] — the macOS
+  adopter remedy exists as prose on docs/install.md and as two literal brew copies in
+  gates.yml, and nothing holds either copy equal to the page.
+  **Ruled at spec, 2026-09-18:** neither filed shape. The page carries the remedy as a marked
+  `macos-remedy` block of commands, and both legs extract and run it, so page and legs are equal
+  by construction. That removes the duplication rather than gating it, and it needs no
+  floor-member-to-formula mapping. It subsumes `macos-adopter-legs-brew-gawk`'s leg edit, since
+  the block names no gawk. The Windows `choco` copy is filed to the gap inbox.
+  Filed 2026-09-08 by build; the gate shape's entry merged in 2026-09-11; paired at spec.
+  recurrence: macos-adopter-package-set-copied-per-leg 2026-09-18
+
 ## Technical Debt
 
 - **macos-adopter-legs-brew-gawk** — the two macOS
@@ -2809,40 +2835,6 @@
   taking only the overclaim clause (the widening is a Rust change owing a `good/`+`bad/` fixture
   pair, which a close cannot land test-and-doc-complete) and →icebox refused on the live trigger.
 
-- **macos-adopter-package-set-copied-per-leg** [cost: event/high] [surface: .github] — the adopter-claim brew set now
-  exists twice in gates.yml and nothing holds either copy equal to the page it claims to mirror.
-  **Re-probed at this drain, and the census is three-way rather than the filed two-way.**
-  `grep -n 'brew install' .github/workflows/*.yml scripts/ci-macos-floor.sh`: gates.yml `:899` and
-  `:1166` both run `brew install bash coreutils gawk shellcheck` — the two install-smoke legs'
-  adopter claim — while `scripts/ci-macos-floor.sh:16` runs `brew install bash coreutils gawk`, a
-  DIFFERENT set with no shellcheck, which is the build legs' runner floor and not an adopter claim
-  at all. So a reader comparing copies must first know which two of the three are meant to agree,
-  and no surface says.
-  **The step's own header rules the set an adopter claim held equal to docs/install.md §Requirements
-  IN BOTH DIRECTIONS**, so the drift that matters is the silent one: a leg quietly gaining or losing
-  a formula goes green over an adopter path that stayed broken.
-  **Not a delta-5 omission.** The amendment's delta 3 names a third `scripts/ci-*` body as the thing
-  not to create, and mirroring the sibling leg is what it specified.
-  **Two shapes, and they are not equivalent.** Extract the shared adopter step into one script both
-  legs call, accepting the third body delta 3 refused; or gate the package set against
-  §Requirements' list. The second is enforcement-first and reaches the page as well as the legs,
-  which the first does not.
-  **THE GATE SHAPE'S OWN ENTRY WAS MERGED HERE 2026-09-11 BY THE POOL TRIAGE**, and
-  `macos-leg-brew-set-vs-documented-requirements` is Done; its grounds ride on here. That gate
-  needs a floor-member-to-brew-formula mapping surface that does not exist: §Requirements derives
-  its toolchain block from context-kit's `PROBE_SET`, whose floor members map to brew formulae
-  neither one-to-one nor derivably. The legs are BINDING, so drift greens `master` over a broken
-  adopter path. Scope cut that entry from the 2026-09-07 set on sizing, never merit, as first back
-  in at the next window.
-  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator** — the subject is what a
-  documented adopter host needs, and a §Requirements list gone wrong is an adopter's own witness.
-  **Cost while deferred:** two copies and a near-copy, none of them held; the failure mode is a
-  green leg over a broken install page.
-  Filed 2026-09-08 by build to the gap inbox and promoted at this close's drain: →fix refused, since
-  choosing between extraction and a gate is design work and delta 3 already refused the extraction
-  half once; →icebox refused on the adopter witness above.
-  recurrence: macos-adopter-package-set-copied-per-leg 2026-09-18
-
 - **stage-journal-path-unsourced-mid-stage** [cost: event/high] [surface: lifecycle-kit] — a stage session dispatched into an
   ALREADY-ENTERED stage has no mechanical source for that stage's journal path, so it invents a
   discriminated filename and the successor's entry assertion then refuses.
@@ -3224,22 +3216,6 @@
   Filed 2026-09-16 at the lead's decision during `installer-front-door-cut`'s build; its sizing
   corrected from five to three at that iteration's close drain, by re-probing the static tables the
   filing asserted were empty.
-
-- **smoke-leg-crate-build-uncached** [cost: iteration/low] [surface: .github] — the
-  platform install-smoke legs rebuild the gate crate from cold on every push.
-  **Measured at the drain, correcting the filed premise.** In gates run 35214069775 the
-  `probe the crate build` step took 90s on `install-smoke-macos-intel` and 82s on
-  `install-smoke-windows`, but 38s on `install-smoke-macos` and 32s on
-  `install-smoke-linux-arm64`, and the baseline `install-smoke` leg has no such step; the filed
-  "each leg 81-90s" held for two legs of five.
-  **Removing the step buys nothing:** `installer/consumer-smoke/run-smoke.sh` builds with
-  `build-native.sh` itself, so the probe only moves the build ahead of the suite, for the
-  diagnosis reason its workflow comment states. The saving needs a build cache that outlives a
-  run, which is the design question: a cache action, and what a restored target directory may
-  mask on legs that exist to catch a host's cold-build failure.
-  **Cost while deferred:** about 90s of wall-clock on the two slowest legs per watched push.
-  Filed 2026-09-17 to the gap inbox by `install-smoke-slow-leg`'s lead at spec; promoted at its
-  close.
 
 - **queue-backlog-vocabulary-undeclared** [cost: once/low] [surface: queue-kit] — the tree uses
   "queue" for the governed file and its drain mechanics (`--emit queue-counts`, the drain-entry
