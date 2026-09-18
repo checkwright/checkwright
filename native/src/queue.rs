@@ -2,6 +2,7 @@
 // surface: the derived section matchers, the slug adapters and the roadmap parse
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the knob read has exactly one implementation in the
 // crate, `walk`'s; these two are the queue-kit-facing spelling of it
+use crate::programs;
 pub fn knob_array(name: &str) -> Result<Vec<String>, String> {
     crate::walk::knob_array(name)
 }
@@ -314,7 +315,7 @@ pub fn live_slugs(text: &str, sec: &Sections) -> Vec<String> {
 // spec: queue-kit/SPEC.md §The shared queue adapters — the retired set, derived from the queue
 // file's own history; every degradation §The queue-edges arm declares yields the empty set
 pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
-    if !crate::proc::on_path("git") {
+    if !crate::proc::on_path(&programs::GIT) {
         return Vec::new();
     }
     let path = std::path::Path::new(file);
@@ -325,11 +326,11 @@ pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
     let Some(base) = path.file_name().map(|b| b.to_string_lossy().into_owned()) else {
         return Vec::new();
     };
-    match crate::proc::run("git", &["-C", &dir, "rev-parse", "--is-inside-work-tree"]) {
+    match crate::proc::run(&programs::GIT, &["-C", &dir, "rev-parse", "--is-inside-work-tree"]) {
         Ok(c) if c.stdout().is_some() => {}
         _ => return Vec::new(),
     }
-    let log = match crate::proc::run("git", &["-C", &dir, "log", "-p", "--format=", "--", &base]) {
+    let log = match crate::proc::run(&programs::GIT, &["-C", &dir, "log", "-p", "--format=", "--", &base]) {
         Ok(c) => match c.stdout() {
             Some(o) => String::from_utf8_lossy(o).into_owned(),
             None => return Vec::new(),
@@ -388,7 +389,7 @@ pub fn backtick_slugs(line: &str) -> Vec<(usize, usize)> {
 // listing and not a curated roster; an absent `git` or a queue file outside a work tree marks
 // nothing, the same direction the retired set's own degradations take
 pub fn tracked_stems(file: &str) -> Vec<(String, String)> {
-    if !crate::proc::on_path("git") {
+    if !crate::proc::on_path(&programs::GIT) {
         return Vec::new();
     }
     let path = std::path::Path::new(file);
@@ -397,7 +398,7 @@ pub fn tracked_stems(file: &str) -> Vec<(String, String)> {
         _ => ".".to_string(),
     };
     let listing =
-        match crate::proc::run("git", &["-C", &dir, "ls-files", "--full-name", "--", ":/"]) {
+        match crate::proc::run(&programs::GIT, &["-C", &dir, "ls-files", "--full-name", "--", ":/"]) {
             Ok(c) => match c.stdout() {
                 Some(o) => String::from_utf8_lossy(o).into_owned(),
                 None => return Vec::new(),

@@ -2,7 +2,7 @@
 // cycle per invocation, an atomic snapshot rewrite, fail-soft. Its caller is a refresh command or a
 // session rather than a gate on a tool call, so it keeps exit 2 where the guard arms fail open.
 use crate::hook::usage::{self, Snapshot};
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use serde_json::Value;
 
@@ -33,7 +33,7 @@ pub fn run(_args: &[String]) -> i32 {
     // spec: delegation-kit/SPEC.md §The usage.txt contract — curl stays external and stays spawned:
     // no HTTP client enters the crate and no dependency is added. `jq` leaves the path entirely,
     // its two jobs — reading the credential file and mapping the payload — now being the crate's.
-    if !proc::on_path("curl") {
+    if !proc::on_path(&programs::CURL) {
         return fail(
             "curl not found",
             "install curl; the poller fetches the usage source over HTTPS (file:// for a test stub).",
@@ -107,7 +107,7 @@ pub fn run(_args: &[String]) -> i32 {
 
 fn fetch(token: &str, endpoint: &str) -> Option<Value> {
     let out = proc::run(
-        "curl",
+        &programs::CURL,
         &[
             "-fsS",
             "--max-time",

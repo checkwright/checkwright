@@ -2,7 +2,7 @@
 // index mode 100755 and every tracked *.gate descriptor carries 100644, or a by-path-invoked kit
 // script degrades silently to a skipped check / failed plugin in a fresh clone
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 
 // spec: gate-sdk/SPEC.md §check-exec-bit — the prune set exempts by path *segment*, so a
@@ -38,7 +38,7 @@ pub fn run(args: &[String]) -> i32 {
             }
         },
         None => {
-            let probe = match proc::run("git", &["rev-parse", "--git-dir"]) {
+            let probe = match proc::run(&programs::GIT, &["rev-parse", "--git-dir"]) {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-exec-bit: {}", e);
@@ -49,7 +49,7 @@ pub fn run(args: &[String]) -> i32 {
                 eprintln!("check-exec-bit: not a git repository — cannot read index modes");
                 return 2;
             }
-            let ls = match proc::run("git", &["ls-files", "-s"]) {
+            let ls = match proc::run(&programs::GIT, &["ls-files", "-s"]) {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-exec-bit: {}", e);

@@ -5,6 +5,7 @@
 // product is a tarball plus a receipt, so an emitting arm would return a receipt for a side effect
 use crate::ere::Ere;
 use crate::proc::{self, Stderr};
+use crate::programs;
 use crate::walk;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the declared names, each defined in gate-sdk's knob
@@ -122,7 +123,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     // spec: installer/SPEC.md §The packer — the preflight tool set tracks the spawned set in
     // both directions: `jq` is unreached, so probing it would refuse on a program nothing runs,
     // and `mktemp` is reached, so omitting it reported a generic spawn failure
-    for tool in ["npm", "git", "tar", "mktemp"] {
+    for tool in [&programs::NPM, &programs::GIT, &programs::TAR, &programs::MKTEMP] {
         if !proc::on_path(tool) {
             return Err(refuse(format!(
                 "{} not found on PATH — the pack step cannot run.",
@@ -362,7 +363,7 @@ fn env_or(name: &str) -> Option<String> {
 // bytes ARE its state code, so trimming both ends would re-column the one line the dirty
 // diagnostic prints first, and no other caller here reads a leading blank
 fn git(args: &[&str]) -> Result<String, Refusal> {
-    let done = proc::run("git", args).map_err(refuse)?;
+    let done = proc::run(&programs::GIT, args).map_err(refuse)?;
     match done.stdout() {
         Some(o) => Ok(String::from_utf8_lossy(o).trim_end().to_string()),
         None => Err(refuse(format!(
@@ -380,7 +381,7 @@ fn mkdir(path: &str) -> Result<(), Refusal> {
 
 fn make_scratch(base: &str, scratch: &mut Scratch) -> Result<String, Refusal> {
     let template = format!("{}/checkwright-pack.XXXXXX", base.trim_end_matches('/'));
-    let made = proc::run("mktemp", &["-d", &template]).map_err(refuse)?;
+    let made = proc::run(&programs::MKTEMP, &["-d", &template]).map_err(refuse)?;
     let dir = made
         .stdout()
         .map(|o| String::from_utf8_lossy(o).trim().to_string())
@@ -446,7 +447,7 @@ fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Resu
     mkdir(dst)?;
     let mut archive_args: Vec<&str> = vec!["archive", commit, "--"];
     archive_args.extend(spec.iter().map(String::as_str));
-    let archive = proc::run("git", &archive_args).map_err(refuse)?;
+    let archive = proc::run(&programs::GIT, &archive_args).map_err(refuse)?;
     let bytes = match archive.stdout() {
         Some(b) => b.to_vec(),
         None => {
@@ -459,7 +460,7 @@ fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Resu
         }
     };
     let strip = format!("--strip-components={}", depth);
-    let done = proc::run_streamed("tar", &["-x", &strip, "-C", dst], &bytes, Stderr::Inherit)
+    let done = proc::run_streamed(&programs::TAR, &["-x", &strip, "-C", dst], &bytes, Stderr::Inherit)
         .map_err(refuse)?;
     if done.code() != 0 {
         return Err(refuse(format!(
@@ -632,7 +633,7 @@ fn stamp(asm: &str, version: &str, commit: &str, spec_base_url: &str) -> Result<
 // spec: installer/SPEC.md §The packer — `npm pack` stays a spawn deliberately: reproducing the
 // package format in-crate is a second implementation of a format, not a port
 fn npm_pack(asm: &str) -> Result<String, Refusal> {
-    let done = proc::run_merged_in("npm", &["pack"], &[], Some(std::path::Path::new(asm)))
+    let done = proc::run_merged_in(&programs::NPM, &["pack"], &[], Some(std::path::Path::new(asm)))
         .map_err(refuse)?;
     if !done.succeeded() {
         return Err(refuse(format!(

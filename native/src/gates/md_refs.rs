@@ -1,6 +1,6 @@
 // spec: canon-kit/SPEC.md §check-md-refs — every internal markdown link in the governed doc
 // set resolves (relative path to a tracked file/dir, #anchor to a heading slug)
-use crate::proc;
+use crate::{proc, programs};
 use crate::spec;
 use crate::walk;
 use std::collections::{HashMap, HashSet};
@@ -17,7 +17,7 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let probe = proc::run("git", &["rev-parse", "--git-dir"])?;
+    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])?;
     if probe.stdout().is_none() {
         return Err("not a git repository — cannot verify tracked targets".to_string());
     }
@@ -39,7 +39,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: canon-kit/SPEC.md §check-md-refs — the tracked-file membership set, filled once
     // rather than by a per-link exec
-    let listing = proc::run("git", &["ls-files", "-z"])?;
+    let listing = proc::run(&programs::GIT, &["ls-files", "-z"])?;
     let tracked: HashSet<String> = match listing.stdout() {
         Some(o) => String::from_utf8_lossy(o)
             .split('\0')
@@ -196,13 +196,13 @@ fn target_resolves(tracked: &HashSet<String>, p: &str) -> Result<bool, String> {
         if tracked.contains(p) {
             return Ok(true);
         }
-        let ci = proc::run("git", &["check-ignore", "-q", "--", p])?;
+        let ci = proc::run(&programs::GIT, &["check-ignore", "-q", "--", p])?;
         return Ok(ci.code() == Some(0));
     }
     if !Path::new(p).is_dir() {
         return Ok(false);
     }
-    let ls = proc::run("git", &["ls-files", "--", p])?;
+    let ls = proc::run(&programs::GIT, &["ls-files", "--", p])?;
     Ok(ls.stdout().map(|o| !o.is_empty()).unwrap_or(false))
 }
 
@@ -258,7 +258,7 @@ fn is_space(c: u8) -> bool {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_self_repo_prefix`: the git@ and https remote
 // forms normalize to one https identity, so no kit ships a repo name
 fn self_repo_prefix(git_ref: &str) -> Result<String, String> {
-    let out = proc::run("git", &["remote", "get-url", "origin"])?;
+    let out = proc::run(&programs::GIT, &["remote", "get-url", "origin"])?;
     let origin = match out.stdout() {
         Some(o) => String::from_utf8_lossy(o).trim().to_string(),
         None => return Ok(String::new()),

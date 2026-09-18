@@ -10,6 +10,7 @@ pub mod recipe;
 pub mod uninstall;
 pub mod update;
 
+use crate::programs;
 use crate::{proc, walk};
 use std::path::{Path, PathBuf};
 
@@ -174,7 +175,7 @@ pub fn git_capture(root: &Path, args: &[&str]) -> Result<String, String> {
     let root = root.to_string_lossy().into_owned();
     let mut argv: Vec<&str> = vec!["-C", &root];
     argv.extend_from_slice(args);
-    let out = proc::run("git", &argv)?;
+    let out = proc::run(&programs::GIT, &argv)?;
     Ok(out
         .stdout()
         .map(|o| String::from_utf8_lossy(o).into_owned())
@@ -188,7 +189,7 @@ pub fn git_code(root: &Path, args: &[&str]) -> Option<i32> {
     let root = root.to_string_lossy().into_owned();
     let mut argv: Vec<&str> = vec!["-C", &root];
     argv.extend_from_slice(args);
-    proc::run("git", &argv).ok()?.code()
+    proc::run(&programs::GIT, &argv).ok()?.code()
 }
 
 // spec: installer/SPEC.md §init — the roster goes to git in batches, so a large profile's install
@@ -202,7 +203,7 @@ pub fn git_batched(root: &Path, fixed: &[&str], paths: &[String]) -> Result<Vec<
         argv.extend_from_slice(fixed);
         argv.push("--");
         argv.extend(chunk.iter().map(String::as_str));
-        let out = proc::run("git", &argv)?;
+        let out = proc::run(&programs::GIT, &argv)?;
         match out.stdout() {
             Some(o) => collected.extend_from_slice(o),
             None => {

@@ -1,7 +1,7 @@
 // spec: installer/SPEC.md §The manifest — the crate's owner of the `checkwright.lock` schema:
 // the wire key, the field accessors, and how a recorded content hash is obtained, so the arm that
 // writes the manifest and the arms that read it share one definition instead of a copy each.
-use crate::proc;
+use crate::{proc, programs};
 use serde_json::{Map, Value};
 use std::path::{Path, PathBuf};
 
@@ -24,7 +24,7 @@ pub fn path(root: &Path) -> PathBuf {
 // change detection stays inside the toolchain the contract asserts.
 pub fn hash(file: &Path) -> Result<String, String> {
     let p = file.to_string_lossy().into_owned();
-    let out = proc::run("git", &["hash-object", "--", &p])?;
+    let out = proc::run(&programs::GIT, &["hash-object", "--", &p])?;
     let text = out
         .stdout()
         .map(|o| String::from_utf8_lossy(o).into_owned())
@@ -47,7 +47,7 @@ pub fn hash_all(files: &[PathBuf]) -> Vec<String> {
     }
     let mut body = paths.join("\n");
     body.push('\n');
-    let Ok(out) = proc::run_with_stdin("git", &["hash-object", "--stdin-paths"], body.as_bytes())
+    let Ok(out) = proc::run_with_stdin(&programs::GIT, &["hash-object", "--stdin-paths"], body.as_bytes())
     else {
         return per_file();
     };

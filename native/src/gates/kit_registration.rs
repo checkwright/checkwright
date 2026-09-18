@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-kit-registration — every gate_kit_roots kit is registered in
 // the human-facing docs: a registry-doc row linking into each root, and a fixture-runner line
 // for each root that ships gate-tests
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -135,7 +135,7 @@ pub fn run_captured(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<
         // assertion B: fixture-runner line — a '<kit>/gate-tests' line for each root shipping
         // gate-tests; the enumeration is git metadata, so an untracked fixture owes nothing
         let pathspec = format!("{}/gate-tests/", r);
-        let completed = match proc::run("git", &["-C", &repo_root, "ls-files", "--", &pathspec]) {
+        let completed = match proc::run(&programs::GIT, &["-C", &repo_root, "ls-files", "--", &pathspec]) {
             Ok(c) => c,
             Err(e) => {
                 stderr.push(format!("check-kit-registration: {}", e));

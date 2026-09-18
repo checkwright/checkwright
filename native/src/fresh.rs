@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §The diff renderer — the freshness family's shared shape: a projection
 // read with command-substitution semantics, and the one site the cap is applied at
 use crate::diff;
-use crate::proc;
+use crate::{proc, programs};
 use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `fail_closed`'s wording, reproduced verbatim
@@ -25,7 +25,7 @@ pub fn toplevel() -> Result<String, String> {
 // one runtime helper both its readers call. `None` where git cannot answer, so a caller fails
 // closed rather than comparing against an empty string.
 pub fn source_stamp(crate_dir: &str) -> Option<String> {
-    let listing = proc::run("git", &["-C", crate_dir, "ls-files"])
+    let listing = proc::run(&programs::GIT, &["-C", crate_dir, "ls-files"])
         .ok()?
         .stdout()
         .map(|o| String::from_utf8_lossy(o).into_owned())?;
@@ -35,7 +35,7 @@ pub fn source_stamp(crate_dir: &str) -> Option<String> {
     }
     let mut args: Vec<&str> = vec!["-C", crate_dir, "hash-object", "--"];
     args.extend(paths.iter().copied());
-    let hashed = proc::run("git", &args)
+    let hashed = proc::run(&programs::GIT, &args)
         .ok()?
         .stdout()
         .map(|o| String::from_utf8_lossy(o).into_owned())?;
@@ -51,7 +51,7 @@ pub fn source_stamp(crate_dir: &str) -> Option<String> {
         manifest.push('\n');
     }
     let stamp = proc::run_with_stdin(
-        "git",
+        &programs::GIT,
         &["-C", crate_dir, "hash-object", "--stdin"],
         manifest.as_bytes(),
     )

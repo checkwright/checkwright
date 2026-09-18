@@ -268,7 +268,8 @@ fn refresh(cfg: &Config) {
         }
     }
     let args: Vec<&str> = rest.iter().map(String::as_str).collect();
-    let _ = proc::run(program, &args);
+    let program = crate::programs::Program::consumer("DELEGATION_KIT_REFRESH_CMD", program.as_str());
+    let _ = proc::run(&program, &args);
 }
 
 // spec: delegation-kit/SPEC.md §usage-verdict — the rule itself, returning the verdict line and the

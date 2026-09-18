@@ -3,7 +3,7 @@
 // contract and `Arm::Emit` collapses it.
 // spec: context-kit/SPEC.md §Testing — the checks reach their arms through the `--emit` front-end
 // rather than through the binary, which is the property the port must not lose.
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::{Path, PathBuf};
 
@@ -174,7 +174,7 @@ impl Runner {
     ) -> Result<(), String> {
         let mut argv: Vec<&str> = vec![script];
         argv.extend_from_slice(rest);
-        let done = proc::run_with_env_in("bash", &argv, env, Some(&self.host))?;
+        let done = proc::run_with_env_in(&programs::BASH, &argv, env, Some(&self.host))?;
         // spec: context-kit/SPEC.md §Testing — the shell form read the tool's own status out of
         // `PIPESTATUS[0]` and called any non-zero a *harness* error rather than a finding; the
         // fail-closed accessor withholds stdout on exactly that status, so the branch is the same.
@@ -226,7 +226,7 @@ impl Runner {
     fn refusal_case(&mut self, cfg: &str) -> Result<(), String> {
         let env = [("CONTEXT_KIT_KNOB_FILE".to_string(), cfg.to_string())];
         let done = proc::run_with_env_in(
-            "bash",
+            &programs::BASH,
             &[&self.front_end, "--emit", "always-loaded", "--growht"],
             &env,
             Some(&self.host),

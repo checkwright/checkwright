@@ -1,6 +1,6 @@
 // spec: canon-kit/SPEC.md §check-spec-pointer — every spec:/contract: directive on a governed
 // source and every free-prose §<heading> citation on a governed manifest resolves
-use crate::proc;
+use crate::{proc, programs};
 use crate::spec;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
@@ -20,7 +20,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(root).is_dir() {
         return Err(format!("not a directory: {}", root));
     }
-    let probe = proc::run("git", &["-C", root, "rev-parse", "--git-dir"])?;
+    let probe = proc::run(&programs::GIT, &["-C", root, "rev-parse", "--git-dir"])?;
     if probe.stdout().is_none() {
         return Err(format!(
             "{} is not a git repository — cannot verify tracked targets",
@@ -29,7 +29,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     // spec: canon-kit/SPEC.md §check-spec-pointer — the tracked-file membership set, filled once
     // from a single `git ls-files` pass rather than a per-pointer `--error-unmatch` exec
-    let ls = proc::run("git", &["-C", root, "ls-files", "-z"])?;
+    let ls = proc::run(&programs::GIT, &["-C", root, "ls-files", "-z"])?;
     let raw = match ls.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),
         None => return Err("git ls-files failed".to_string()),

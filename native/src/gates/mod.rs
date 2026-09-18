@@ -2158,6 +2158,7 @@ fn declaration_covers(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::programs;
     use crate::walk;
 
     #[test]
@@ -2227,7 +2228,7 @@ mod tests {
     fn resolve_gates_dir(repo: &std::path::Path) -> String {
         let at = repo.display().to_string();
         let completed = crate::proc::run(
-            "bash",
+            &programs::BASH,
             &[
                 "-c",
                 "cd \"$1\" || exit 2; . gate-sdk/lib/gate.sh; gate_sdk_gates_dir",
@@ -2442,7 +2443,7 @@ mod tests {
             ("GATE_SDK_ROOT".to_string(), walk::normalize_abs(&sdk.display().to_string())),
         ];
         let merged = crate::proc::run_merged_in(
-            &exe,
+            &programs::Program::consumer("test", exe),
             &[&observer, "--exact", "--ignored", "--nocapture"],
             &env,
             Some(case),

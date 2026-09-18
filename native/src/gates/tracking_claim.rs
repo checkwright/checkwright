@@ -1,6 +1,6 @@
 // spec: canon-kit/SPEC.md §check-tracking-claim — every fixed-vocabulary tracking claim on a
 // governed manifest surface agrees with git
-use crate::proc;
+use crate::{proc, programs};
 use crate::spec;
 use std::path::Path;
 
@@ -28,7 +28,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(root).is_dir() {
         return Err(format!("not a directory: {}", root));
     }
-    let probe = proc::run("git", &["-C", root, "rev-parse", "--git-dir"])?;
+    let probe = proc::run(&programs::GIT, &["-C", root, "rev-parse", "--git-dir"])?;
     if probe.stdout().is_none() {
         return Err(format!(
             "{} is not a git repository — a tracking claim is unverifiable",
@@ -54,7 +54,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 .unwrap_or(&c.file),
         );
 
-        let ls = proc::run("git", &["-C", root, "ls-files", "--", &c.path])?;
+        let ls = proc::run(&programs::GIT, &["-C", root, "ls-files", "--", &c.path])?;
         let tracked = match ls.stdout() {
             Some(o) => !o.is_empty(),
             None => {
@@ -66,7 +66,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // spec: canon-kit/SPEC.md §check-tracking-claim — the ignored side is rule-based
         // (check-ignore --no-index), not presence-based, so it resolves in a fresh checkout
         let ci = proc::run(
-            "git",
+            &programs::GIT,
             &["-C", root, "check-ignore", "-q", "--no-index", "--", &c.path],
         )?;
         let nignored = usize::from(ci.code() == Some(0));

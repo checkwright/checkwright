@@ -3,11 +3,10 @@
 // dependencies this spawns, and the source-stamp cache is relocated rather than redesigned
 use crate::fresh;
 use crate::proc;
+use crate::programs::{self, Program, CARGO, RUSTC};
 use crate::walk;
 
 const NAME: &str = "check-crate-arms";
-const CARGO: &str = "cargo";
-const RUSTC: &str = "rustc";
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — this member's own refusal text at the shell
 // form's own point in the order, which that section states is *after* the crate-presence branch
@@ -25,7 +24,7 @@ fn refuse_absent_cargo(crate_dir: &str) -> i32 {
 // spec: gate-sdk/SPEC.md §check-crate-arms — `<prog> --version` captured with stderr discarded and
 // its emptiness never tested: an absent program contributes an empty field, which is a cache
 // *miss* against any key written while it was present rather than a refusal
-fn version_of(program: &str) -> String {
+fn version_of(program: &Program) -> String {
     proc::run(program, &["--version"])
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
@@ -37,7 +36,7 @@ fn version_of(program: &str) -> String {
 // spec: gate-sdk/SPEC.md §check-crate-arms — the cache file is named for the crate it caches, by
 // git's content identity of that path, so two crates under one scratch dir cannot share a record
 fn cache_path(tmp_dir: &str, crate_dir: &str) -> String {
-    let id = proc::run_with_stdin("git", &["hash-object", "--stdin"], crate_dir.as_bytes())
+    let id = proc::run_with_stdin(&programs::GIT, &["hash-object", "--stdin"], crate_dir.as_bytes())
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
         .map(|s| s.trim_end_matches('\n').to_string())
@@ -50,7 +49,7 @@ fn cache_path(tmp_dir: &str, crate_dir: &str) -> String {
 // read whatever the status, because for these two the *failing* run is the one whose report has to
 // print, and a command substitution's value keeps exactly one trailing newline when echoed back
 fn arm(label: &str, crate_dir: &str, argv: &[&str]) -> Result<bool, String> {
-    let m = proc::run_merged(CARGO, argv)?;
+    let m = proc::run_merged(&CARGO, argv)?;
     if m.succeeded() {
         return Ok(true);
     }
@@ -103,7 +102,7 @@ pub fn run(_args: &[String]) -> i32 {
         return 0;
     }
 
-    if !proc::on_path(CARGO) {
+    if !proc::on_path(&CARGO) {
         return refuse_absent_cargo(&crate_dir);
     }
 
@@ -117,14 +116,14 @@ pub fn run(_args: &[String]) -> i32 {
         // that succeeded, which is what proves git can answer for this crate root; an unreadable
         // listing here is the shell form's discarded-stderr capture and not a second verdict
         let untracked = proc::run(
-            "git",
+            &programs::GIT,
             &["-C", &crate_dir, "ls-files", "--others", "--exclude-standard", "--", "."],
         )
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
         .unwrap_or_default();
         if untracked.trim_end_matches('\n').is_empty() {
-            key = format!("{} {} {}", stamp, version_of(RUSTC), version_of(CARGO));
+            key = format!("{} {} {}", stamp, version_of(&RUSTC), version_of(&CARGO));
             if let Ok(recorded) = std::fs::read_to_string(&cache) {
                 if recorded.trim_end_matches('\n') == key {
                     println!(
@@ -225,9 +224,12 @@ mod tests {
     // case can take a program off PATH, and `rustc` is read at exactly this one site.
     #[test]
     fn an_absent_program_yields_an_empty_version_field_not_a_refusal() {
-        assert_eq!(version_of("checkwright-no-such-program-exists"), "");
+        assert_eq!(
+            version_of(&Program::consumer("test", "checkwright-no-such-program-exists")),
+            ""
+        );
         assert!(
-            !version_of(CARGO).is_empty(),
+            !version_of(&CARGO).is_empty(),
             "cargo printed no version, so every cache key would collapse to one field"
         );
     }

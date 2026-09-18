@@ -1,6 +1,6 @@
 // spec: drift-kit/SPEC.md §Bundled KPIs — kpi-queue-net-delta: the design-pending pool at the iteration-start commit against the worktree, two rows because one number would be gameable
 use super::{read, Ctx};
-use crate::proc;
+use crate::{proc, programs};
 
 // spec: drift-kit/SPEC.md §Bundled KPIs — both rows carry the same degrade text, because a pool
 // this member cannot read leaves the entry axis and the weight axis equally unmeasured.
@@ -98,7 +98,7 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
     }
 
     let spec = format!("{}:{}", ctx.iteration_start, ctx.queue_file);
-    let base_text = proc::run("git", &["show", &spec])
+    let base_text = proc::run(&programs::GIT, &["show", &spec])
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()));
     let base_text = match base_text {

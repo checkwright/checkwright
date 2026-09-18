@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §The workflow directory — every workflow-dir member is tracked or
 // ignored, and every tracked non-directory member's first line is a ruled '# contract: ' header
 use crate::ere::Ere;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -15,7 +15,7 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("check-workflow-tiering: not a directory: {}", root);
         return 2;
     }
-    let probe = match proc::run("git", &["-C", root, "rev-parse", "--git-dir"]) {
+    let probe = match proc::run(&programs::GIT, &["-C", root, "rev-parse", "--git-dir"]) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("check-workflow-tiering: {}", e);
@@ -75,7 +75,7 @@ pub fn run(args: &[String]) -> i32 {
         let rel = format!("{}/{}", wf, name);
 
         let is_tracked = if is_dir {
-            let ls = match proc::run("git", &["-C", root, "ls-files", "--", &rel]) {
+            let ls = match proc::run(&programs::GIT, &["-C", root, "ls-files", "--", &rel]) {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-workflow-tiering: {}", e);
@@ -95,7 +95,7 @@ pub fn run(args: &[String]) -> i32 {
             }
         } else {
             match proc::run(
-                "git",
+                &programs::GIT,
                 &["-C", root, "ls-files", "--error-unmatch", "--", &rel],
             ) {
                 Ok(c) => c.code() == Some(0),
@@ -107,7 +107,7 @@ pub fn run(args: &[String]) -> i32 {
         };
 
         let is_ignored = {
-            let ci = match proc::run("git", &["-C", root, "check-ignore", "-q", "--", &rel]) {
+            let ci = match proc::run(&programs::GIT, &["-C", root, "check-ignore", "-q", "--", &rel]) {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-workflow-tiering: {}", e);

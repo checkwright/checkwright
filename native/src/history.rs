@@ -4,7 +4,7 @@
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — the field parse stays per-reader and is
 // deliberately not folded in: one consumer filters against a configured stage roster and the other
 // must not acquire that dependency, since a stamp outside the roster still carries real spend.
-use crate::proc;
+use crate::{proc, programs};
 
 pub struct Git {
     pub top: String,
@@ -17,7 +17,7 @@ impl Git {
     pub fn read(&self, args: &[&str]) -> Option<String> {
         let mut argv: Vec<&str> = vec!["-C", &self.top];
         argv.extend_from_slice(args);
-        proc::run("git", &argv)
+        proc::run(&programs::GIT, &argv)
             .ok()
             .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
     }
@@ -121,7 +121,7 @@ pub struct Blobs {
 impl Blobs {
     pub fn open(top: &str) -> Result<Self, String> {
         Ok(Blobs {
-            p: crate::proc::piped("git", &["-C", top, "cat-file", "--batch"])?,
+            p: crate::proc::piped(&programs::GIT, &["-C", top, "cat-file", "--batch"])?,
         })
     }
 

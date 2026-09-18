@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the crate's one shipped spawn site outside the
 // one declared `spawn-funnel-exempt:` shape, so the captured-emptiness false-green has no
 // spelling elsewhere and no spawn goes around the Windows resolution below
+use crate::programs::Program;
 use std::process::Command;
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a child that ran. Constructing one is the
@@ -64,14 +65,14 @@ impl Completed {
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `Err` is a *spawn* failure and nothing
 // else, so folding it into a benign branch is something a caller has to write down rather
 // than inherit from one `Result` that meant two things at once
-pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
+pub fn run(program: &Program, args: &[&str]) -> Result<Completed, String> {
     #[cfg(test)]
-    recorder::note(program);
-    let target = spawn_target(program)?;
+    recorder::note(program.invocation());
+    let target = spawn_target(program.invocation())?;
     let out = Command::new(target.as_ref()).args(args).output().map_err(|e| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     })?;
     Ok(Completed {
@@ -84,8 +85,8 @@ pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the wrapper contract's presence probe, bash's
 // `command -v <prog>`: it exists so a wrapper's refusal is its own message at the shell form's
 // own point in the order, with `run`'s `Err` arm left as the backstop
-pub fn on_path(program: &str) -> bool {
-    which(program).is_some()
+pub fn on_path(program: &Program) -> bool {
+    which(program.invocation()).is_some()
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the same probe reporting *where* it resolved,
@@ -320,7 +321,7 @@ fn resolve_outside_system_dir<F: Fn(&std::path::Path) -> bool>(
 // through the funnel rather than pointed at a call site: the roster owns which names take it, so
 // no site chooses a disposition by choosing which resolver it calls
 #[cfg_attr(not(windows), allow(dead_code))]
-pub fn resolve_interpreter(program: &str) -> Result<String, String> {
+pub fn resolve_interpreter(program: &Program) -> Result<Program, String> {
     #[cfg(windows)]
     let (pathext, system_root) = (
         Some(std::env::var("PATHEXT").unwrap_or_default()),
@@ -332,12 +333,13 @@ pub fn resolve_interpreter(program: &str) -> Result<String, String> {
         .map(|p| std::env::split_paths(&p).collect())
         .unwrap_or_default();
     resolve_outside_system_dir(
-        program,
+        program.invocation(),
         &dirs,
         pathext.as_deref(),
         system_root.as_deref(),
         is_executable,
     )
+    .map(|p| program.clone().at(p))
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the `FallBack` face of `SYSTEM_DIR_HOMONYMS`, and a
@@ -347,28 +349,30 @@ pub fn resolve_interpreter(program: &str) -> Result<String, String> {
 // directory falls back to the bare name rather than refusing: the verdict is then the roster's own
 // absent or wrong-impl, which is the true reading of such a host and the fail-closed direction.
 #[cfg(windows)]
-pub fn resolve_floor_tool(program: &str) -> String {
+pub fn resolve_floor_tool(program: &Program) -> Program {
     let dirs: Vec<std::path::PathBuf> = std::env::var_os("PATH")
         .map(|p| std::env::split_paths(&p).collect())
         .unwrap_or_default();
     let pathext = std::env::var("PATHEXT").unwrap_or_default();
     let system_root = std::env::var("SystemRoot").ok();
-    resolve_outside_system_dir(
-        program,
+    match resolve_outside_system_dir(
+        program.invocation(),
         &dirs,
         Some(pathext.as_str()),
         system_root.as_deref(),
         is_executable,
-    )
-    .unwrap_or_else(|_| program.to_string())
+    ) {
+        Ok(p) => program.clone().at(p),
+        Err(_) => program.clone(),
+    }
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the name passes through where the platform has no
 // system-directory homonym: a POSIX spawn already searches `PATH` and nothing else, and resolving
 // here would swap the spawned literal for an absolute path on every host the battery runs on.
 #[cfg(not(windows))]
-pub fn resolve_floor_tool(program: &str) -> String {
-    program.to_string()
+pub fn resolve_floor_tool(program: &Program) -> Program {
+    program.clone()
 }
 
 // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the crate's one executability predicate, in
@@ -422,7 +426,7 @@ impl Merged {
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run`'s merged-capture face: two handles on one
 // file description (`try_clone` is `dup`), `dispatch`'s own technique, so the streams interleave
 // as bash's `2>&1` did rather than concatenating in the wrong order
-pub fn run_merged(program: &str, args: &[&str]) -> Result<Merged, String> {
+pub fn run_merged(program: &Program, args: &[&str]) -> Result<Merged, String> {
     run_merged_in(program, args, &[], None)
 }
 
@@ -430,17 +434,17 @@ pub fn run_merged(program: &str, args: &[&str]) -> Result<Merged, String> {
 // environment additions, the one shape `run_merged` cannot carry: a fixture case runs *inside* its
 // own case dir, and setting the caller's cwd instead would be process-global.
 pub fn run_merged_in(
-    program: &str,
+    program: &Program,
     args: &[&str],
     env: &[(String, String)],
     cwd: Option<&std::path::Path>,
 ) -> Result<Merged, String> {
     #[cfg(test)]
-    recorder::note(program);
+    recorder::note(program.invocation());
     let spawn_err = |e: std::io::Error| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     };
     let capture = std::env::temp_dir().join(format!(
@@ -450,7 +454,7 @@ pub fn run_merged_in(
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
     let err = out.try_clone().map_err(spawn_err)?;
-    let mut cmd = Command::new(spawn_target(program)?.as_ref());
+    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
@@ -485,10 +489,10 @@ pub enum BoundedError {
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — `run` under a wall-clock bound, the
 // one shape `run` cannot carry: a hook member calling a consumer-named reader must not hang a turn
 // on it. `Ok(None)` is the bound expiring, `timeout(1)`'s 124 without the optional program.
-pub fn run_bounded(program: &str, args: &[&str], secs: u64) -> Result<Option<i32>, BoundedError> {
+pub fn run_bounded(program: &Program, args: &[&str], secs: u64) -> Result<Option<i32>, BoundedError> {
     #[cfg(test)]
-    recorder::note(program);
-    let target = spawn_target(program).map_err(BoundedError::Spawn)?;
+    recorder::note(program.invocation());
+    let target = spawn_target(program.invocation()).map_err(BoundedError::Spawn)?;
     let mut child = Command::new(target.as_ref())
         .args(args)
         .stdin(std::process::Stdio::null())
@@ -516,16 +520,16 @@ pub fn run_bounded(program: &str, args: &[&str], secs: u64) -> Result<Option<i32
 // the child's *output* and not only its code. Capture goes to a file, not a pipe: a poll loop and a
 // filled pipe buffer deadlock each other. `Ok(None)` is the bound expiring.
 pub fn run_bounded_capture(
-    program: &str,
+    program: &Program,
     args: &[&str],
     secs: u64,
 ) -> Result<Option<(i32, Vec<u8>)>, String> {
     #[cfg(test)]
-    recorder::note(program);
+    recorder::note(program.invocation());
     let spawn_err = |e: std::io::Error| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     };
     let capture = std::env::temp_dir().join(format!(
@@ -534,7 +538,7 @@ pub fn run_bounded_capture(
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
-    let mut child = Command::new(spawn_target(program)?.as_ref())
+    let mut child = Command::new(spawn_target(program.invocation())?.as_ref())
         .args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
@@ -570,7 +574,7 @@ pub fn run_bounded_capture(
 // environment, the one shape `run` cannot carry. Writing the child's rather than the process's is
 // what leaves knobenv's guard the only writer of the process-global one.
 pub fn run_with_env(
-    program: &str,
+    program: &Program,
     args: &[&str],
     env: &[(String, String)],
 ) -> Result<Completed, String> {
@@ -581,14 +585,14 @@ pub fn run_with_env(
 // one shape it cannot carry: an arm invoking a front-end by absolute path must still place the
 // child inside the tree, that front-end refusing outside a git repository.
 pub fn run_with_env_in(
-    program: &str,
+    program: &Program,
     args: &[&str],
     env: &[(String, String)],
     cwd: Option<&std::path::Path>,
 ) -> Result<Completed, String> {
     #[cfg(test)]
-    recorder::note(program);
-    let mut cmd = Command::new(spawn_target(program)?.as_ref());
+    recorder::note(program.invocation());
+    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -599,7 +603,7 @@ pub fn run_with_env_in(
     let out = cmd.output().map_err(|e| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     })?;
     Ok(Completed {
@@ -614,18 +618,18 @@ static MERGE_SEQ: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsiz
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run` with a body written to the child's stdin,
 // the one shape `run` cannot carry: a shell caller's `printf … | git hash-object --stdin` has no
 // argv spelling, and routing it here keeps the spawn site single
-pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Completed, String> {
+pub fn run_with_stdin(program: &Program, args: &[&str], input: &[u8]) -> Result<Completed, String> {
     #[cfg(test)]
-    recorder::note(program);
+    recorder::note(program.invocation());
     use std::io::Write;
     use std::process::Stdio;
     let spawn_err = |e: std::io::Error| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     };
-    let mut child = Command::new(spawn_target(program)?.as_ref())
+    let mut child = Command::new(spawn_target(program.invocation())?.as_ref())
         .args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -723,17 +727,17 @@ impl Piped {
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run`'s spawn contract with both pipes kept open:
 // `Err` is a spawn failure and nothing else, exactly as there
-pub fn piped(program: &str, args: &[&str]) -> Result<Piped, String> {
+pub fn piped(program: &Program, args: &[&str]) -> Result<Piped, String> {
     #[cfg(test)]
-    recorder::note(program);
+    recorder::note(program.invocation());
     use std::process::Stdio;
     let spawn_err = |e: std::io::Error| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     };
-    let mut child = Command::new(spawn_target(program)?.as_ref())
+    let mut child = Command::new(spawn_target(program.invocation())?.as_ref())
         .args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -779,17 +783,17 @@ impl Streamed {
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run_with_stdin`'s file-backed counterpart: two
 // capture files, so a body too large for a pipe cannot deadlock, and an unmerged stderr
 pub fn run_streamed(
-    program: &str,
+    program: &Program,
     args: &[&str],
     input: &[u8],
     stderr: Stderr,
 ) -> Result<Streamed, String> {
     #[cfg(test)]
-    recorder::note(program);
+    recorder::note(program.invocation());
     let io_err = |e: std::io::Error| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     };
     let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
@@ -815,7 +819,7 @@ pub fn run_streamed(
             return Err(io_err(e));
         }
     };
-    let mut cmd = Command::new(spawn_target(program)?.as_ref());
+    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::from(feed))
         .stdout(std::process::Stdio::from(sink));
@@ -875,14 +879,14 @@ pub enum Sink {
 // spec: evidence-kit/SPEC.md §bin/run-validate.sh — the spine's own spawn: a configured command
 // whose output is a captured *artifact* rather than a value this process reads, so it is written
 // through as the child produces it. `Err` stays a spawn failure alone, `run`'s rule.
-pub fn run_to(program: &str, args: &[&str], sink: &Sink) -> Result<i32, String> {
+pub fn run_to(program: &Program, args: &[&str], sink: &Sink) -> Result<i32, String> {
     run_to_env(program, args, &[], sink)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — `run_to` with environment pairs added over the invoking
 // environment the child otherwise inherits unchanged.
 pub fn run_to_env(
-    program: &str,
+    program: &Program,
     args: &[&str],
     env: &[(String, String)],
     sink: &Sink,
@@ -894,21 +898,21 @@ pub fn run_to_env(
 // kit's `smoke/install.sh` runs inside the scratch consumer, and moving the caller's cwd instead
 // would be process-global.
 pub fn run_to_in(
-    program: &str,
+    program: &Program,
     args: &[&str],
     env: &[(String, String)],
     cwd: Option<&std::path::Path>,
     sink: &Sink,
 ) -> Result<i32, String> {
     #[cfg(test)]
-    recorder::note(program);
+    recorder::note(program.invocation());
     let spawn_err = |e: std::io::Error| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     };
-    let mut cmd = Command::new(spawn_target(program)?.as_ref());
+    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -935,23 +939,23 @@ pub fn run_to_in(
 // terminal: `run_streamed`'s stdout capture for a child that needs its own working directory and
 // environment and is fed no body.
 pub fn run_stdout_in(
-    program: &str,
+    program: &Program,
     args: &[&str],
     env: &[(String, String)],
     cwd: &std::path::Path,
 ) -> Result<Streamed, String> {
     #[cfg(test)]
-    recorder::note(program);
+    recorder::note(program.invocation());
     let io_err = |e: std::io::Error| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
-            program, e
+            program.label(), e
         )
     };
     let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     let outp = std::env::temp_dir().join(format!("checkwright-out.{}.{}", std::process::id(), seq));
     let sink = std::fs::File::create(&outp).map_err(io_err)?;
-    let mut cmd = Command::new(spawn_target(program)?.as_ref());
+    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .current_dir(cwd)
         .stdout(std::process::Stdio::from(sink));
@@ -987,31 +991,8 @@ pub mod recorder {
         OBSERVED.with(|o| o.borrow_mut().take()).unwrap_or_default()
     }
 
-    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a declared `<program>` is a requirement
-    // named as `PATH` names it, so a path is noted as its final component minus the host's
-    // executable suffix and a bare name as passed
-    pub fn name_of(program: &str) -> String {
-        if !program.chars().any(std::path::is_separator) {
-            return program.to_string();
-        }
-        let last = program
-            .rsplit(std::path::is_separator)
-            .next()
-            .unwrap_or(program);
-        let suffix = std::env::consts::EXE_SUFFIX;
-        let cut = last.len().saturating_sub(suffix.len());
-        if !suffix.is_empty()
-            && last.len() > suffix.len()
-            && last.is_char_boundary(cut)
-            && last[cut..].eq_ignore_ascii_case(suffix)
-        {
-            return last[..cut].to_string();
-        }
-        last.to_string()
-    }
-
     pub fn note(program: &str) {
-        let name = name_of(program);
+        let name = crate::programs::name_of(program);
         OBSERVED.with(|o| {
             if let Some(v) = o.borrow_mut().as_mut() {
                 if !v.contains(&name) {
@@ -1053,13 +1034,11 @@ fn exit_code(status: &std::process::ExitStatus) -> i32 {
 // spec: gate-sdk/SPEC.md §run-gates — stdin is `/dev/null`: under a worker pool an inherited
 // terminal is a shared resource two concurrent members could both read from.
 pub fn dispatch(
-    argv: &[String],
+    program: &Program,
+    args: &[String],
     tmpdir: &std::path::Path,
     capture: &std::path::Path,
 ) -> Result<Dispatched, String> {
-    let program = argv
-        .first()
-        .ok_or_else(|| "dispatch: empty argv — treating as failure (not clean)".to_string())?;
     let io_err = |what: &str, e: std::io::Error| {
         format!(
             "cannot {} for {}: {} — the check could not run; treating as failure (not clean)",
@@ -1068,8 +1047,8 @@ pub fn dispatch(
     };
     let out = std::fs::File::create(capture).map_err(|e| io_err("create the capture file", e))?;
     let err = out.try_clone().map_err(|e| io_err("share the capture file", e))?;
-    let mut cmd = Command::new(program);
-    cmd.args(&argv[1..])
+    let mut cmd = Command::new(program.invocation());
+    cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::from(err))
@@ -1083,8 +1062,9 @@ pub fn dispatch(
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
+    use crate::programs::{name_of, BASH, GIT, SORT};
     use crate::walk;
     use std::path::Path;
 
@@ -1099,21 +1079,21 @@ mod tests {
             path
         );
         recorder::start();
-        let spawned = run(&path, &["--version"]);
+        let spawned = run(&GIT.at(path), &["--version"]);
         let noted = recorder::stop();
         spawned.expect("git did not spawn through its resolved path");
         assert_eq!(noted, vec!["git".to_string()], "the recorder kept the path it was handed");
         let suffixed = format!("/opt/tools/bin/git{}", std::env::consts::EXE_SUFFIX);
-        assert_eq!(recorder::name_of(&suffixed), "git");
-        assert_eq!(recorder::name_of("git"), "git");
-        assert_eq!(recorder::name_of("git.exe"), "git.exe", "a bare name is noted as passed");
+        assert_eq!(name_of(&suffixed), "git");
+        assert_eq!(name_of("git"), "git");
+        assert_eq!(name_of("git.exe"), "git.exe", "a bare name is noted as passed");
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the wrapper is exercised directly,
     // because a gate's own fixture pair cannot prove it: no static input crashes a child.
     #[test]
     fn a_child_that_exited_non_zero_yields_no_stdout() {
-        let c = run("git", &["--no-such-flag-whatsoever"])
+        let c = run(&GIT, &["--no-such-flag-whatsoever"])
             .expect("git is absent — the crate's own test suite already requires it");
         assert!(
             c.stdout().is_none(),
@@ -1124,7 +1104,7 @@ mod tests {
 
     #[test]
     fn a_spawn_that_never_happened_is_an_error_not_an_empty_capture() {
-        let e = run("checkwright-no-such-program-exists", &[])
+        let e = run(&Program::consumer("test", "checkwright-no-such-program-exists"), &[])
             .err()
             .expect("a missing program reported success");
         assert!(
@@ -1140,7 +1120,7 @@ mod tests {
     // does by default, and which `stdout()` withholds on a non-zero exit
     #[test]
     fn a_child_that_failed_on_stdout_alone_still_reports_what_it_said() {
-        let c = run("bash", &["-c", "echo the-generator-said-this; exit 3"])
+        let c = run(&BASH, &["-c", "echo the-generator-said-this; exit 3"])
             .expect("bash is absent — it is on the program floor the gate modules spawn against");
         let report = c
             .failure_report()
@@ -1163,7 +1143,7 @@ mod tests {
     // with, because the exit code is the datum that always exists
     #[test]
     fn a_child_that_failed_silently_still_reports_its_exit_code() {
-        let c = run("bash", &["-c", "exit 4"])
+        let c = run(&BASH, &["-c", "exit 4"])
             .expect("bash is absent — it is on the program floor the gate modules spawn against");
         let report = c
             .failure_report()
@@ -1178,7 +1158,7 @@ mod tests {
 
     #[test]
     fn a_child_that_succeeded_yields_its_stdout() {
-        let c = run("git", &["--version"]).expect("cannot run git --version");
+        let c = run(&GIT, &["--version"]).expect("cannot run git --version");
         assert!(
             !c.stdout()
                 .expect("no stdout from a child that exited zero")
@@ -1410,7 +1390,7 @@ mod tests {
     #[cfg(not(windows))]
     #[test]
     fn a_posix_floor_tool_is_spawned_under_its_bare_name() {
-        assert_eq!(resolve_floor_tool("sort"), "sort");
+        assert_eq!(resolve_floor_tool(&SORT).invocation(), "sort");
     }
 
     // spec: gate-sdk/SPEC.md §check-graph — the half no resolver case reaches: that a BARE-NAME
@@ -1516,7 +1496,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the shipped half of a module: a
     // `#[cfg(test)]`-gated item is dropped, so a test helper's own spawn is not a shipped one.
     // rustfmt's shape is the boundary — the gated item ends at a `}` in the attribute's column
-    fn shipped_scope(text: &str) -> String {
+    pub(crate) fn shipped_scope(text: &str) -> String {
         let lines: Vec<&str> = text.lines().collect();
         let mut keep = vec![true; lines.len()];
         let mut i = 0usize;

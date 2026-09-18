@@ -2,7 +2,7 @@
 // tightened gates or renamed knobs, or inheriting an outstanding deferred release's floor, may
 // not ride a patch-only bump over its predecessor
 use crate::declaration;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -74,7 +74,7 @@ pub fn front_matter_release(text: &str) -> Option<String> {
 fn collect_dispositions(file: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     if let Ok(c) = proc::run(
-        "git",
+        &programs::GIT,
         &["log", "--reverse", "--format=%H", "-p", "-U0", "--", file],
     ) {
         if let Some(bytes) = c.stdout() {
@@ -211,7 +211,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // under composition; a note published before the section existed is history and is not
     // retro-fitted
     let tag = format!("refs/tags/v{}", newest.raw);
-    let under_composition = proc::run("git", &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0);
+    let under_composition = proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0);
     let text = read_text(&newest.file)?;
     let in_brief_state = if under_composition {
         if declaration::section_bullets(&text, "In brief").is_none() {

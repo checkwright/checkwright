@@ -1,11 +1,10 @@
 // spec: gate-sdk/SPEC.md §check-shellcheck — ShellCheck lint of the gate family at -S warning
 // (the self-lint contract), as the wrapper a program-is-the-rule member ports to: the program
 // stays a declared dependency this spawns and refuses at exit 2 without
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 
 const NAME: &str = "check-shellcheck";
-const PROGRAM: &str = "shellcheck";
 
 // spec: gate-sdk/SPEC.md §check-shellcheck — each kit root contributes these four directories and
 // no other, so the derived set is the shell form's own `"$k/lib" "$k/bin" "$k/checks" "$k/templates"`
@@ -16,7 +15,7 @@ const KIT_SUBDIRS: &[&str] = &["lib", "bin", "checks", "templates"];
 // shell form's own point in the order: before the target glob, so a tree with nothing to lint and
 // no linter reports the linter. *Cannot verify* and *verified clean* do not share an exit code.
 fn refuse_absent_program() -> i32 {
-    eprintln!("{}: {} not found on PATH — the gate cannot run.", NAME, PROGRAM);
+    eprintln!("{}: {} not found on PATH — the gate cannot run.", NAME, programs::SHELLCHECK);
     eprintln!("  A gate that cannot run is not clean (fail-closed).");
     eprintln!("  help: install ShellCheck (e.g. 'apt install shellcheck' / 'brew install shellcheck').");
     2
@@ -51,7 +50,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    if !proc::on_path(PROGRAM) {
+    if !proc::on_path(&programs::SHELLCHECK) {
         return refuse_absent_program();
     }
 
@@ -74,7 +73,7 @@ pub fn run(args: &[String]) -> i32 {
 
     let mut argv: Vec<&str> = vec!["-S", "warning"];
     argv.extend(targets.iter().map(String::as_str));
-    let completed = match proc::run_merged(PROGRAM, &argv) {
+    let completed = match proc::run_merged(&programs::SHELLCHECK, &argv) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
@@ -123,13 +122,16 @@ mod tests {
     #[test]
     fn the_presence_probe_answers_for_a_program_that_is_not_installed() {
         assert!(
-            !proc::on_path("checkwright-no-such-program-exists"),
+            !proc::on_path(&programs::Program::consumer(
+                "test",
+                "checkwright-no-such-program-exists"
+            )),
             "the presence probe found a program that does not exist, so the wrapper would \
              spawn instead of printing its own refusal"
         );
         assert!(
-            proc::on_path("sh"),
-            "the presence probe missed /bin/sh, so every wrapper would refuse at exit 2 with \
+            proc::on_path(&programs::BASH),
+            "the presence probe missed bash, so every wrapper would refuse at exit 2 with \
              its program installed"
         );
     }
@@ -138,8 +140,8 @@ mod tests {
     // whatever its status, and the clean-line predicate reads the status rather than the capture
     #[test]
     fn a_merged_capture_carries_stderr_and_grades_by_status_not_emptiness() {
-        let m = proc::run_merged("sh", &["-c", "printf out; printf err >&2; exit 3"])
-            .expect("cannot run sh");
+        let m = proc::run_merged(&programs::BASH, &["-c", "printf out; printf err >&2; exit 3"])
+            .expect("cannot run bash");
         assert!(!m.succeeded(), "a child that exited 3 reported success");
         let text = String::from_utf8_lossy(m.output()).into_owned();
         assert!(

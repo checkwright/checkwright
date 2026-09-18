@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §The shared spec adapters — the binary side of the corpus primitive the
 // manifest-narration gate family shares: ported once and proved N times, so a per-gate
 // copy of the derivation has no place to exist
+use crate::programs;
 use crate::walk;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -262,7 +263,7 @@ pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, 
 // shell's per-file `|| continue` does; the arm is reproduced rather than tightened here.
 fn workflow_tier(root: &str) -> Result<Vec<String>, String> {
     let wf = knob("GATE_SDK_WORKFLOW_DIR")?;
-    let tracked = crate::proc::run("git", &["-C", root, "ls-files", "--", &wf])?;
+    let tracked = crate::proc::run(&programs::GIT, &["-C", root, "ls-files", "--", &wf])?;
     let listing = match tracked.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),
         None => return Ok(Vec::new()),
@@ -601,7 +602,7 @@ fn spawned() -> &'static Spawned {
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — the argv spawned once per process and read as
 // `<first>⇥<second>` lines under the two validation contracts that section states
-fn command_lines(knob: &str, slug_keyed: bool) -> Result<Lines, String> {
+fn command_lines(knob: &'static str, slug_keyed: bool) -> Result<Lines, String> {
     let argv = command(knob)?;
     let key = (knob.to_string(), argv.clone());
     if let Some((_, r)) = spawned().lock().unwrap_or_else(|e| e.into_inner()).iter().find(|(k, _)| *k == key) {
@@ -612,7 +613,8 @@ fn command_lines(knob: &str, slug_keyed: bool) -> Result<Lines, String> {
             return Ok(Vec::new());
         };
         let args: Vec<&str> = rest.iter().map(String::as_str).collect();
-        let done = crate::proc::run(program, &args).map_err(|e| format!("{}: {}", knob, e))?;
+        let program = programs::Program::consumer(knob, program.as_str());
+        let done = crate::proc::run(&program, &args).map_err(|e| format!("{}: {}", knob, e))?;
         let Some(stdout) = done.stdout() else {
             return Err(format!(
                 "{} exited {} — the vocabulary could not be read; treating as failure (not clean) ({})",
@@ -665,7 +667,7 @@ pub fn measured_claims() -> Result<Lines, String> {
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — a claim vocabulary's `<id>⇥<ERE>` lines, every
 // pattern compiled before the first corpus line is read
-pub fn claim_vocabulary(cmd_knob: &str) -> Result<Vec<(String, crate::ere::Ere)>, String> {
+pub fn claim_vocabulary(cmd_knob: &'static str) -> Result<Vec<(String, crate::ere::Ere)>, String> {
     let mut out: Vec<(String, crate::ere::Ere)> = Vec::new();
     for (id, p) in command_lines(cmd_knob, true)? {
         let ere = compile_pattern(&p, cmd_knob)?;

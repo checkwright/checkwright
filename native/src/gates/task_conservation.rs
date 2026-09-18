@@ -1,6 +1,6 @@
 // spec: queue-kit/SPEC.md §check-task-conservation — every live slug present at HEAD is still
 // present (live or done) in the working tree; the absence class diff-review misses
-use crate::proc;
+use crate::{proc, programs};
 use crate::queue;
 use std::collections::HashSet;
 
@@ -8,7 +8,7 @@ use std::collections::HashSet;
 // could not be spawned is `Err` and reaches the caller's exit 2, while `Ok(None)` is a git
 // that ran and said no. Folding them is how "no repository" comes to mean "no git".
 fn git_capture(args: &[&str]) -> Result<Option<Vec<u8>>, String> {
-    Ok(proc::run("git", args)?.stdout().map(<[u8]>::to_vec))
+    Ok(proc::run(&programs::GIT, args)?.stdout().map(<[u8]>::to_vec))
 }
 
 // spec: queue-kit/SPEC.md §check-task-conservation — the rule itself, taken apart from git so

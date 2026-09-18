@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-kit-enum — a literal hand list of >=2 kit roots sharing a glob
 // must name every kit root with matching tracked files; the fix is the kit:<glob> token
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::registry;
 use crate::walk;
 use std::path::Path;
@@ -122,7 +122,7 @@ pub fn run(args: &[String]) -> i32 {
             let mut missing: Vec<String> = Vec::new();
             for r in &kit_roots {
                 let spec = format!("{}/{}", r, glob);
-                let out = match proc::run("git", &["-C", &repo_root, "ls-files", "--", &spec]) {
+                let out = match proc::run(&programs::GIT, &["-C", &repo_root, "ls-files", "--", &spec]) {
                     Ok(c) => c,
                     Err(e) => {
                         eprintln!("check-kit-enum: {}", e);

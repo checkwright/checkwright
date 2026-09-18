@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: it needs the vendored guard-kit root.
 use crate::proc::{self, Stderr};
+use crate::programs;
 use crate::walk;
 use std::path::Path;
 
@@ -49,7 +50,7 @@ fn execute(args: &[String]) -> Result<i32, String> {
     }
     // spec: guard-kit/SPEC.md §Testing — the `jq` precondition survives the port because the
     // *subject* still spawns it; the section states what an absent `jq` would red instead.
-    if !proc::on_path("jq") {
+    if !proc::on_path(&programs::JQ) {
         return Err(format!("{}: jq not found on PATH", NAME));
     }
 
@@ -189,7 +190,7 @@ fn decide(
     let bin = bin.to_string_lossy();
     let script = r#"cd "$1" || exit 2; GUARD_KIT_LIB="$2" GUARD_KIT_LOG="$3" GATE_SDK_NATIVE_BIN="$5" exec bash "$4""#;
     let done = proc::run_streamed(
-        "bash",
+        &programs::BASH,
         &["-c", script, "bash", root, lib, log, guard, &bin],
         payload(cmd, background).as_bytes(),
         Stderr::Discard,
@@ -249,7 +250,7 @@ fn classify(rc: i32, out: &str) -> String {
 // rather than scenery: the section enumerates them and says what turns green for the wrong reason
 // when a harness builds four.
 fn build_sandbox() -> Result<Sandbox, String> {
-    let made = proc::run("mktemp", &["-d"])?;
+    let made = proc::run(&programs::MKTEMP, &["-d"])?;
     let root = made
         .stdout()
         .map(|o| String::from_utf8_lossy(o).trim().to_string())
@@ -286,7 +287,7 @@ fn build_sandbox() -> Result<Sandbox, String> {
 fn git(root: &str, args: &[&str]) -> Result<(), String> {
     let mut argv: Vec<&str> = vec!["-C", root];
     argv.extend_from_slice(args);
-    let done = proc::run("git", &argv)?;
+    let done = proc::run(&programs::GIT, &argv)?;
     if done.code() != Some(0) {
         return Err(format!(
             "{}: cannot build the sandbox — git {} failed",

@@ -1,7 +1,7 @@
 // spec: context-kit/SPEC.md §bin/env-probe — the marker-bounded machine profile, derived into the
 // consumer-local, gitignored profile file; hand-authored gotchas live outside the markers and
 // survive every re-probe. An action that reports: it rewrites a block and prints what it did.
-use crate::proc;
+use crate::{proc, programs};
 use crate::toolfloor;
 
 // spec: context-kit/SPEC.md §bin/env-probe — one declared knob and no other: context-kit's table
@@ -29,7 +29,7 @@ this box; resolve names with `getent hosts` or a DoH `curl`.
 // spec: context-kit/SPEC.md §bin/env-probe — both version probes read from an empty stdin: `-V`
 // prints a banner for most tools but is an ordinary flag for some (GNU sort's version-sort), so a
 // tool rejecting `--version` would otherwise fall through to a `-V` that hangs on inherited stdin.
-fn banner(tool: &str, flag: &str) -> String {
+fn banner(tool: &programs::Program, flag: &str) -> String {
     match proc::run_streamed(
         &proc::resolve_floor_tool(tool),
         &[flag],
@@ -47,9 +47,12 @@ fn banner(tool: &str, flag: &str) -> String {
 // (shellcheck buries it past a banner), else the first line, else the resolved path.
 fn probe_version(tool: &str) -> Option<String> {
     let path = proc::which(tool)?;
-    let mut raw = banner(tool, "--version");
+    // spec: gate-sdk/SPEC.md §The program roster — a present tool the roster cannot name is
+    // reported absent, the fail-closed reading; `by_name`'s unit test keeps it unreachable
+    let program = programs::by_name(tool)?;
+    let mut raw = banner(&program, "--version");
     if raw.is_empty() {
-        raw = banner(tool, "-V");
+        raw = banner(&program, "-V");
     }
     let dotted = crate::ere::Ere::compile("[0-9]+\\.[0-9]+").ok();
     let out = raw
@@ -65,7 +68,7 @@ fn probe_version(tool: &str) -> Option<String> {
 // `PRETTY_NAME` else its `ID`. The shell sourced that file; a port parses it, the rule
 // check-install-toolchain's roster reader already states for an untrusted path.
 fn os_line() -> String {
-    let uname = match proc::run("uname", &["-s", "-r", "-m"]) {
+    let uname = match proc::run(&programs::UNAME, &["-s", "-r", "-m"]) {
         Ok(c) => c
             .stdout()
             .map(|o| String::from_utf8_lossy(o).trim().to_string())
@@ -252,7 +255,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     // module that also holds the floor predicate, so the probe and the verdict share one owner.
     let roster: Vec<String> = toolfloor::PROBE_SET.iter().map(|e| e.to_string()).collect();
 
-    let date = proc::run("date", &["+%F"])
+    let date = proc::run(&programs::DATE, &["+%F"])
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
         .ok_or_else(|| "cannot read the probe date (date +%F unavailable)".to_string())?;

@@ -1,7 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-evidence — stamp grammar + name-axis agreement
 // (staleness) between the header and every stamp; cross-stage session-id distinctness; the
 // stamp-provenance and stamp-commit-purity assertions over the fifth <head> field
-use crate::proc;
+use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -41,13 +41,13 @@ fn norm(p: &str) -> String {
 }
 
 fn git_line(args: &[&str]) -> Option<String> {
-    let c = proc::run("git", args).ok()?;
+    let c = proc::run(&programs::GIT, args).ok()?;
     let b = c.stdout()?;
     Some(String::from_utf8_lossy(b).trim().to_string())
 }
 
 fn git_blob(args: &[&str]) -> Option<String> {
-    let c = proc::run("git", args).ok()?;
+    let c = proc::run(&programs::GIT, args).ok()?;
     let b = c.stdout()?;
     Some(String::from_utf8_lossy(b).into_owned())
 }
@@ -166,7 +166,7 @@ fn provenance(
     // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the purity assertion is gated on the
     // state file being STAGED: a stamp nothing is committing is not a stamp this commit
     // introduces
-    let staged_raw = proc::run("git", &["diff", "--cached", "--name-only"])?;
+    let staged_raw = proc::run(&programs::GIT, &["diff", "--cached", "--name-only"])?;
     let Some(bytes) = staged_raw.stdout() else {
         return Err("git diff --cached failed — the staged path set could not be read; treating as failure (not clean)".to_string());
     };

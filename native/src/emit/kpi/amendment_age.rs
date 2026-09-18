@@ -1,6 +1,6 @@
 // spec: drift-kit/SPEC.md §Bundled KPIs — kpi-amendment-age: age of the oldest amendment on disk
 use super::{na, now_epoch, Ctx};
-use crate::proc;
+use crate::{proc, programs};
 
 const LABEL: &str = "amendment age";
 
@@ -15,7 +15,7 @@ pub fn is_amendment(path: &str) -> bool {
 }
 
 fn git_lines(args: &[&str]) -> Vec<String> {
-    proc::run("git", args)
+    proc::run(&programs::GIT, args)
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
         .map(|s| s.lines().map(String::from).collect())

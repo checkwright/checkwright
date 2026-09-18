@@ -3,7 +3,7 @@
 // exit status alone — 2 with a stderr reason on a red, corrupt or unresolved reading, 0 otherwise.
 use crate::emit::kpi;
 use crate::hook;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use serde_json::Value;
 
@@ -216,6 +216,17 @@ fn reader_argv(cmd: &[String], run_dir: &str) -> Option<Vec<String>> {
     Some(argv)
 }
 
+// spec: gate-sdk/SPEC.md §The program roster — the default reader's head is this binary itself;
+// any other head is the override's, named by its knob
+fn reader_program(head: &str) -> programs::Program {
+    let own = std::env::current_exe().ok().map(|p| p.display().to_string());
+    if own.as_deref() == Some(head) {
+        programs::CHECKWRIGHT_GATES.at(head)
+    } else {
+        programs::Program::consumer("DELEGATION_KIT_LIVENESS_CMD", head)
+    }
+}
+
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — what a resolved reader yielded: its
 // exit class, no answer from a child that ran, or the operating system's refusal to start it
 enum Reading {
@@ -229,7 +240,7 @@ enum Reading {
 // row of the verdict table stays true of both.
 fn read_liveness(argv: &[String]) -> Reading {
     let args: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
-    match proc::run_bounded(&argv[0], &args, READER_BOUND_SECS) {
+    match proc::run_bounded(&reader_program(&argv[0]), &args, READER_BOUND_SECS) {
         Ok(Some(code)) => Reading::Exit(code),
         // spec: delegation-kit/SPEC.md §The turn-end liveness hook — a timeout and a failed wait are
         // a reader that RAN and did not answer: `error`, which allows, so a refusal is only ever the
@@ -328,7 +339,7 @@ mod tests {
         fn script(&self, name: &str, text: &str) -> String {
             let p = self.at(name);
             let writer = proc::run(
-                "bash",
+                &programs::BASH,
                 &["-c", "printf '%s' \"$1\" > \"$2\" && chmod +x \"$2\"", "stub", text, &p],
             )
             .expect("the stub writer must spawn");

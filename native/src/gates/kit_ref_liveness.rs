@@ -2,7 +2,7 @@
 // resolves to a live kit root: a slash/line-anchored <name>-kit or gate-sdk path segment names a
 // gate_kit_roots dir, and a live-prefix kit knob resolves to a tracked kit knob
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::collections::HashSet;
 use std::path::Path;
@@ -178,7 +178,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     argv.push(":!*.md");
     argv.push(":!*/gate-tests/*");
-    let completed = proc::run("git", &argv).map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+    let completed = proc::run(&programs::GIT, &argv).map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
     let code = completed.code().unwrap_or(-1);
     if code > 1 {
         return Err(format!(
@@ -208,7 +208,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let queue_base = queue_file.rsplit('/').next().unwrap_or(&queue_file).to_string();
     let prune = walk::prune_dirs().map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
 
-    let ls = proc::run("git", &["ls-files", "--", scanroot])
+    let ls = proc::run(&programs::GIT, &["ls-files", "--", scanroot])
         .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
     let listing = match ls.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),

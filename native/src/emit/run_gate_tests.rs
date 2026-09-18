@@ -4,7 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: a top-level flag has no row, so
 // the knob-file derivation could not see the three knobs below.
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -120,7 +120,7 @@ fn sdk_root() -> Result<String, String> {
 // §The non-gate arm records, so the crate learns the set and nothing about how it was derived.
 fn check_dirs(sdk: &str) -> Result<Vec<String>, String> {
     let script = r#"source "$1/lib/gate.sh"; gate_check_dirs"#;
-    let done = proc::run_streamed("bash", &["-c", script, "bash", sdk], b"", proc::Stderr::Inherit)?;
+    let done = proc::run_streamed(&programs::BASH, &["-c", script, "bash", sdk], b"", proc::Stderr::Inherit)?;
     if done.code() != 0 {
         return Err(format!(
             "{}: the shell library could not resolve the gate-declaration dirs",
@@ -189,7 +189,7 @@ fn execute(h: &Harness, tests_dir: &str) -> i32 {
     for t in &unit_tests {
         unit += 1;
         let path = format!("{}/{}", tests_dir, t);
-        match proc::run_merged_in("bash", &[path.as_str()], &h.exported, None) {
+        match proc::run_merged_in(&programs::BASH, &[path.as_str()], &h.exported, None) {
             Ok(m) if m.succeeded() => {}
             Ok(m) => {
                 println!("  FAIL: {}", t);
@@ -327,7 +327,8 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
     spawn.extend(args.iter().map(String::as_str));
     // spec: gate-sdk/SPEC.md §run-gate-tests — the working directory is set on the *child* rather
     // than entered by this process, so no code path can leave the harness in a case dir.
-    let done = match proc::run_merged_in(&argv[0], &spawn, &env, Some(Path::new(casedir))) {
+    let program = programs::Program::consumer(programs::GATE_DECLARATION, argv[0].as_str());
+    let done = match proc::run_merged_in(&program, &spawn, &env, Some(Path::new(casedir))) {
         Ok(m) => m,
         Err(e) => {
             println!("  HARNESS: {} {} exited 2 (gate could not run / malformed fixture):", gate, casedir);
@@ -415,7 +416,7 @@ fn resolve_argv(h: &Harness, gate: &str, casedir: &str) -> Option<(String, Vec<S
     // spec: gate-sdk/SPEC.md §run-gate-tests — a refusal is a status, not a parse: `gate_command`
     // names the refusal on stderr, which is inherited, and its status becomes the caller's
     // `HARNESS:` line.
-    let done = proc::run_streamed("bash", &argv, b"", proc::Stderr::Inherit).ok()?;
+    let done = proc::run_streamed(&programs::BASH, &argv, b"", proc::Stderr::Inherit).ok()?;
     if done.code() != 0 {
         return None;
     }

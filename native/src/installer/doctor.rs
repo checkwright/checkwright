@@ -3,7 +3,7 @@
 // (context-kit/SPEC.md §bin/env-probe), because at init time nothing is vendored in the tree yet.
 use super::{lock, GATES_DIR};
 use crate::toolfloor::{self, Verdict as Floor};
-use crate::{proc, sha256};
+use crate::{proc, programs, sha256};
 use std::fmt::Write as _;
 
 const USAGE: &[&str] = &[
@@ -28,10 +28,15 @@ pub struct Report {
 // is only the fallback: a tool rejecting `--version` would otherwise reach a `-V` that reads
 // inherited stdin and hangs.
 fn probe_banner(tool: &str) -> String {
-    if !proc::on_path(tool) {
+    // spec: gate-sdk/SPEC.md §The program roster — a name the roster cannot answer for renders as
+    // absent, which fails the verdict; `by_name`'s unit test keeps it unreachable
+    let Some(program) = programs::by_name(tool) else {
+        return String::new();
+    };
+    if !proc::on_path(&program) {
         return String::new();
     }
-    let resolved = proc::resolve_floor_tool(tool);
+    let resolved = proc::resolve_floor_tool(&program);
     for flag in ["--version", "-V"] {
         if let Ok(c) = proc::run_with_stdin(&resolved, &[flag], b"") {
             let raw = c

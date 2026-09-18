@@ -1,7 +1,7 @@
 // spec: docs/install.md §Versioning — the declared release channel agrees with the publish
 // workflow's prerelease posture (A) and with the project's own version line (B)
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use std::path::Path;
 
 const DEFAULT_INSTALL_MD: &str = "docs/install.md";
@@ -220,7 +220,7 @@ fn indent4(lines: &[String]) -> String {
 // rather than red; the conflation is preserved, because a port proves parity.
 fn newest_tag() -> String {
     proc::run(
-        "git",
+        &programs::GIT,
         &[
             "for-each-ref",
             "--sort=-creatordate",

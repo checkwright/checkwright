@@ -1,6 +1,6 @@
 // spec: drift-kit/SPEC.md §Bundled KPIs — kpi-task-split: feature↔debt split of the queue's Done slugs
 use super::{na, read, section_lines, Ctx};
-use crate::proc;
+use crate::{proc, programs};
 
 const LABEL: &str = "task split (feat/debt)";
 
@@ -44,7 +44,7 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
 
     let (mut feat, mut debt) = (0usize, 0usize);
     for s in &slugs {
-        let subj = proc::run("git", &["log", "-1", "--format=%s", &format!("--grep={}", s)])
+        let subj = proc::run(&programs::GIT, &["log", "-1", "--format=%s", &format!("--grep={}", s)])
             .ok()
             .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
             .unwrap_or_default();

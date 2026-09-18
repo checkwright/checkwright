@@ -3,7 +3,7 @@
 use crate::ere::Ere;
 use crate::fresh;
 use crate::gates::commit_msg::{is_pattern, resolve_files};
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -40,7 +40,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — the tracked set is the subject, so a non-repo
     // cwd is fail-closed before anything else: there is no listing to be clean about
-    let probe = proc::run("git", &["rev-parse", "--git-dir"])
+    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
         .map_err(|e| format!("check-tree-terms: {}", e))?;
     if probe.stdout().is_none() {
         return Err(
@@ -102,7 +102,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     }
 
     let prune = walk::prune_dirs().map_err(|e| format!("check-tree-terms: {}", e))?;
-    let ls = proc::run("git", &["ls-files", "--", &scanroot])
+    let ls = proc::run(&programs::GIT, &["ls-files", "--", &scanroot])
         .map_err(|e| format!("check-tree-terms: {}", e))?;
     let listing = match ls.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),

@@ -2,7 +2,7 @@
 // backticked/fenced kit-prefixed env knob and every inline-span path citation in the governed doc
 // set resolves against the tree or names no path the tree has retired
 use super::manifest_temporal::{LineKind, TemporalValve};
-use crate::proc;
+use crate::{proc, programs};
 use crate::spec;
 use crate::walk;
 use std::collections::HashSet;
@@ -168,7 +168,7 @@ fn defined_knobs(
     argv.push(":!*.md".into());
     argv.push(":!*/gate-tests/*".into());
     let borrowed: Vec<&str> = argv.iter().map(String::as_str).collect();
-    let out = proc::run("git", &borrowed)?;
+    let out = proc::run(&programs::GIT, &borrowed)?;
     let text = match out.code() {
         Some(0) => String::from_utf8_lossy(out.stdout().unwrap_or(&[])).into_owned(),
         Some(1) => String::new(),
@@ -246,7 +246,7 @@ fn basename(p: &str) -> &str {
 // the index deletes against HEAD, so the deleting commit reds at pre-commit; an unborn HEAD has
 // retired nothing
 fn retired_set(top: &str) -> Result<HashSet<String>, String> {
-    let head = proc::run("git", &["-C", top, "rev-parse", "--verify", "-q", "HEAD"])?;
+    let head = proc::run(&programs::GIT, &["-C", top, "rev-parse", "--verify", "-q", "HEAD"])?;
     match head.code() {
         Some(0) => {}
         Some(1) => return Ok(HashSet::new()),
@@ -269,7 +269,7 @@ fn retired_set(top: &str) -> Result<HashSet<String>, String> {
 fn git_text(top: &str, args: &[&str], what: &str) -> Result<String, String> {
     let mut argv: Vec<&str> = vec!["-C", top];
     argv.extend_from_slice(args);
-    let out = proc::run("git", &argv)?;
+    let out = proc::run(&programs::GIT, &argv)?;
     match out.code() {
         Some(0) => Ok(String::from_utf8_lossy(out.stdout().unwrap_or(&[])).into_owned()),
         Some(c) => Err(format!("git {} failed (exit {}) {}", args[0], c, what)),
@@ -331,7 +331,7 @@ fn path_ok(docdir: &str, tok: &str) -> Result<bool, String> {
         if cand.is_empty() || cand.starts_with("../") {
             continue;
         }
-        let ls = proc::run("git", &["ls-files", "--error-unmatch", "--", &cand])?;
+        let ls = proc::run(&programs::GIT, &["ls-files", "--error-unmatch", "--", &cand])?;
         if ls.code() == Some(0) {
             return Ok(true);
         }
@@ -576,7 +576,7 @@ mod tests {
     fn git(dir: &str, args: &[&str]) {
         let mut argv: Vec<&str> = vec!["-C", dir, "-c", "user.name=t", "-c", "user.email=t@t"];
         argv.extend_from_slice(args);
-        let out = proc::run("git", &argv).expect("git runs");
+        let out = proc::run(&programs::GIT, &argv).expect("git runs");
         assert_eq!(out.code(), Some(0), "git {:?}", args);
     }
 

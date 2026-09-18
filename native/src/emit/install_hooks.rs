@@ -3,7 +3,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the contract is three-state and
 // every code is load-bearing: `check-identity`'s 1 propagates through, and an emitting arm cannot
 // carry it.
-use crate::proc;
+use crate::{proc, programs};
 use crate::registry;
 use crate::walk;
 use std::path::Path;
@@ -88,7 +88,7 @@ fn chmod_hooks(dir: &str) {
 // repository, the shape the sibling per-clone installer already rules for its own driver step,
 // rather than crashing the opt-in.
 fn config(key: &str, value: &str) {
-    match proc::run("git", &["config", key, value]) {
+    match proc::run(&programs::GIT, &["config", key, value]) {
         Ok(c) if c.stdout().is_some() => println!("Installed: {} = {}", key, value),
         Ok(c) => eprintln!(
             "install-hooks: could not set {} ({})",
@@ -143,7 +143,7 @@ fn identity_rung(gates_dir: &str) -> i32 {
                 return 2;
             }
         };
-        match proc::run_to(&exe, &[IDENTITY], &proc::Sink::Inherit) {
+        match proc::run_to(&programs::CHECKWRIGHT_GATES.at(exe), &[IDENTITY], &proc::Sink::Inherit) {
             Ok(code) => code,
             Err(e) => {
                 eprintln!("install-hooks: {}", e);
@@ -154,7 +154,8 @@ fn identity_rung(gates_dir: &str) -> i32 {
         // spec: gate-sdk/SPEC.md §install-hooks — a consumer `.sh` shadow is that consumer's rule
         // and this arm is not entitled to substitute its own, so it is spawned as the shell rung
         // spawned it, with its two streams in the caller's terminal and its status propagated.
-        match proc::run_to(&src, &[], &proc::Sink::Inherit) {
+        let shadow = programs::Program::consumer(programs::GATE_DECLARATION, src);
+        match proc::run_to(&shadow, &[], &proc::Sink::Inherit) {
             Ok(code) => code,
             Err(e) => {
                 eprintln!("install-hooks: {}", e);

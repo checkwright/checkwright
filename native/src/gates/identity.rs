@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-identity — every expectation in the identity manifest matches
 // this clone's local git identity
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -46,7 +46,7 @@ fn actual_email(email_file: &str) -> String {
     if !email_file.is_empty() {
         return first_line(email_file).unwrap_or_default();
     }
-    proc::run("git", &["config", "user.email"])
+    proc::run(&programs::GIT, &["config", "user.email"])
         .ok()
         .and_then(|c| c.stdout().map(captured))
         .unwrap_or_default()
@@ -67,7 +67,7 @@ fn actual_remote_url(remote: &str, remotes_file: &str) -> Option<String> {
         }
         return None;
     }
-    proc::run("git", &["remote", "get-url", remote])
+    proc::run(&programs::GIT, &["remote", "get-url", remote])
         .ok()?
         .stdout()
         .map(captured)
@@ -251,7 +251,7 @@ pub fn run(_args: &[String]) -> i32 {
             println!("IDENTITY: clean (CI context — not a committing clone; identity guard skipped)");
             return 0;
         }
-        let in_repo = proc::run("git", &["rev-parse", "--git-dir"])
+        let in_repo = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
             .ok()
             .and_then(|c| c.stdout().map(|_| ()))
             .is_some();

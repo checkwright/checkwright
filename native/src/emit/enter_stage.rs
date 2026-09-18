@@ -3,6 +3,7 @@
 // an `Arm::Run` because the exit contract is three-state and every code is load-bearing: 0 a
 use crate::ere::EreCapture;
 use crate::proc;
+use crate::programs::{self, Program};
 use crate::registry;
 use crate::stages;
 use crate::walk;
@@ -1499,7 +1500,8 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
         );
         return Ok(GateRun::Undispatchable);
     };
-    let mut argv: Vec<String>;
+    let program;
+    let mut argv: Vec<String> = Vec::new();
     if src.ends_with(".gate") {
         if crate::gates::declared(name).is_none() {
             eprintln!(
@@ -1511,15 +1513,16 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
         }
         let exe = std::env::current_exe()
             .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?;
-        argv = vec![exe.display().to_string(), name.to_string()];
+        program = programs::CHECKWRIGHT_GATES.at(exe.display().to_string());
+        argv.push(name.to_string());
     } else {
-        argv = vec![src];
+        program = Program::consumer(programs::GATE_DECLARATION, src);
     }
     argv.push(queue.to_string());
     argv.push(state.to_string());
 
-    let args: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
-    let merged = proc::run_merged_in(&argv[0], &args, &[], None)?;
+    let args: Vec<&str> = argv.iter().map(String::as_str).collect();
+    let merged = proc::run_merged_in(&program, &args, &[], None)?;
     if merged.succeeded() {
         Ok(GateRun::Passed)
     } else {
@@ -1545,7 +1548,8 @@ fn run_preflight_command(
     let mut args: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
     args.push(queue);
     args.push(state);
-    let merged = proc::run_merged_in(&argv[0], &args, &[], None)?;
+    let program = Program::consumer("LIFECYCLE_KIT_ENTRY_PREFLIGHT", argv[0].as_str());
+    let merged = proc::run_merged_in(&program, &args, &[], None)?;
     Ok(PreflightOut {
         ok: merged.succeeded(),
         text: String::from_utf8_lossy(merged.output()).into_owned(),
@@ -1566,7 +1570,7 @@ struct Row {
 }
 
 fn inside_git() -> bool {
-    proc::run("git", &["rev-parse", "--git-dir"])
+    proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
         .map(|c| c.stdout().is_some())
         .unwrap_or(false)
 }
@@ -1575,7 +1579,7 @@ fn inside_git() -> bool {
 // classified live/orphaned/unclassified, shared by the boundary refusal and the mid-iteration
 // advisory so the two cannot disagree about what a path is. The main checkout is skipped.
 fn worktree_scan(re: Option<&EreCapture>) -> Vec<Row> {
-    let Ok(c) = proc::run("git", &["worktree", "list", "--porcelain"]) else {
+    let Ok(c) = proc::run(&programs::GIT, &["worktree", "list", "--porcelain"]) else {
         return Vec::new();
     };
     let Some(raw) = c.stdout() else {
@@ -1646,14 +1650,14 @@ fn worktree_loss(p: &str, h: &str) -> String {
     if !Path::new(p).is_dir() {
         return "directory already gone — prunable residue".to_string();
     }
-    let dirty = match proc::run("git", &["-C", p, "status", "--porcelain"]) {
+    let dirty = match proc::run(&programs::GIT, &["-C", p, "status", "--porcelain"]) {
         Ok(c) => match c.stdout() {
             Some(o) => !String::from_utf8_lossy(o).trim().is_empty(),
             None => false,
         },
         Err(_) => false,
     };
-    let commits = match proc::run("git", &["rev-list", "--count", h, "^HEAD"]) {
+    let commits = match proc::run(&programs::GIT, &["rev-list", "--count", h, "^HEAD"]) {
         Ok(c) => match c.stdout() {
             Some(o) => {
                 let s = String::from_utf8_lossy(o).trim().to_string();
@@ -1845,7 +1849,7 @@ fn lines_with_ends(text: &str) -> Vec<&str> {
 }
 
 fn date_today() -> Result<String, String> {
-    let c = proc::run("date", &["+%F"])?;
+    let c = proc::run(&programs::DATE, &["+%F"])?;
     match c.stdout() {
         Some(o) => Ok(String::from_utf8_lossy(o).trim().to_string()),
         None => Err("could not read today's date — nothing written.".to_string()),
@@ -1858,7 +1862,7 @@ fn head_of(state: &str) -> String {
         .filter(|p| !p.as_os_str().is_empty())
         .map(|p| p.display().to_string())
         .unwrap_or_else(|| ".".to_string());
-    match proc::run("git", &["-C", &dir, "rev-parse", "--short", "HEAD"]) {
+    match proc::run(&programs::GIT, &["-C", &dir, "rev-parse", "--short", "HEAD"]) {
         Ok(c) => match c.stdout() {
             Some(o) => {
                 let s = String::from_utf8_lossy(o).trim().to_string();

@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the Rust counterpart of gate_find's pruned walk, over the
 // one prune set both substrates read
+use crate::programs;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -32,7 +33,7 @@ pub fn path_pruned(p: &str, prune: &[String]) -> bool {
 // tracked set yields none, on `authoring_tree`'s own degrade; an unresolved knob still fails closed
 pub fn tracked_shell_tree() -> Result<Vec<String>, String> {
     let prune = prune_dirs()?;
-    let bytes = match crate::proc::run("git", &["ls-files", "--", "*.sh"]) {
+    let bytes = match crate::proc::run(&programs::GIT, &["ls-files", "--", "*.sh"]) {
         Ok(c) => match c.stdout() {
             Some(b) => b.to_vec(),
             None => return Ok(Vec::new()),
@@ -387,7 +388,7 @@ pub fn toplevel_opt() -> Result<Option<String>, String> {
 fn toplevel_args(anchor: &[&str]) -> Result<Option<String>, String> {
     let mut args: Vec<&str> = anchor.to_vec();
     args.extend_from_slice(&["rev-parse", "--show-toplevel"]);
-    let c = crate::proc::run("git", &args)?;
+    let c = crate::proc::run(&programs::GIT, &args)?;
     Ok(c.stdout()
         .map(|o| String::from_utf8_lossy(o).trim().to_string())
         .filter(|s| !s.is_empty())
@@ -401,7 +402,7 @@ pub fn authoring_tree(crate_dir: &str) -> bool {
     if !Path::new(crate_dir).is_dir() {
         return false;
     }
-    match crate::proc::run("git", &["-C", crate_dir, "ls-files"]) {
+    match crate::proc::run(&programs::GIT, &["-C", crate_dir, "ls-files"]) {
         Ok(c) => c
             .stdout()
             .map(|o| !String::from_utf8_lossy(o).trim().is_empty())

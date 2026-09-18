@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — the ported arms. Each owes no descriptor, no
 // registration and no fixture pair, and owes a named caller instead: a regen command, a
 // comparator calling `emit()`, a stage step, a gate reaching it in process.
+use crate::programs;
 pub mod agents_md_smoke;
 pub mod always_loaded;
 pub mod cite_survey;
@@ -64,7 +65,7 @@ pub mod wait_probe;
 // or an unrecognised form. It sits on the family because two arms render self-repo links, and a
 // second copy of the normalisation is a second identity to disagree about.
 pub fn self_repo_prefix(reference: &str) -> String {
-    let origin = match crate::proc::run("git", &["remote", "get-url", "origin"]) {
+    let origin = match crate::proc::run(&programs::GIT, &["remote", "get-url", "origin"]) {
         Ok(c) => match c.stdout() {
             Some(o) => String::from_utf8_lossy(o).trim().to_string(),
             None => return String::new(),

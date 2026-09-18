@@ -1,7 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §The close-surface roster — the derivation: every close-surface:
 // declaration across the resolved declaration surfaces, unioned with the workflow directory's
 // capture tier so an undeclared capture surface is reported rather than missing
-use crate::proc;
+use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -13,7 +13,7 @@ pub fn base(args: &[String]) -> Result<String, String> {
     match args.first().filter(|a| !a.is_empty()) {
         Some(a) => {
             let root = if a.len() > 1 { a.trim_end_matches('/') } else { a.as_str() };
-            let probe = proc::run("git", &["-C", root, "rev-parse", "--git-dir"])?;
+            let probe = proc::run(&programs::GIT, &["-C", root, "rev-parse", "--git-dir"])?;
             if probe.stdout().is_none() {
                 return Err(not_a_repo());
             }
@@ -182,7 +182,7 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
             if !Path::new(&under(&base, &rel)).is_file() {
                 continue;
             }
-            let ci = proc::run("git", &["-C", &base, "check-ignore", "-q", "--", &rel])?;
+            let ci = proc::run(&programs::GIT, &["-C", &base, "check-ignore", "-q", "--", &rel])?;
             match ci.code() {
                 Some(0) => {}
                 Some(1) => continue,

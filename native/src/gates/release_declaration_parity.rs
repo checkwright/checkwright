@@ -4,7 +4,7 @@
 use crate::declaration;
 use crate::declaration::{SectionVerdict, TokenRule};
 use crate::gates::release_bump::{front_matter_release, read_text};
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -71,7 +71,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             _ => continue,
         };
         let tag = format!("refs/tags/{}", v);
-        if proc::run("git", &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0) {
+        if proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0) {
             untagged.push((v, path));
         }
     }

@@ -1,18 +1,17 @@
 // spec: gate-sdk/SPEC.md §check-action-run-shell — every GitHub Actions `run:` literal block
 // scalar in an Actions-shaped YAML file is ShellCheck-clean at -S warning under the dialect the
 // step actually runs, as the wrapper criterion 7's worked example ports to
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::{Path, PathBuf};
 
 const NAME: &str = "check-action-run-shell";
-const PROGRAM: &str = "shellcheck";
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the wrapper's own refusal text at the shell
 // form's own point in the order: after the scan-root check and before the walk, so a tree with
 // no YAML and no linter reports the linter rather than exiting clean on a zero count
 fn refuse_absent_program() -> i32 {
-    eprintln!("{}: {} not found on PATH — the gate cannot run.", NAME, PROGRAM);
+    eprintln!("{}: {} not found on PATH — the gate cannot run.", NAME, programs::SHELLCHECK);
     eprintln!("  A gate that cannot run is not clean (fail-closed).");
     eprintln!("  help: install ShellCheck (e.g. 'apt install shellcheck' / 'brew install shellcheck').");
     2
@@ -637,7 +636,7 @@ fn lint_block(
     tally: &mut Tally,
 ) -> Result<(), i32> {
     let frag_s = frag.display().to_string();
-    let merged = match proc::run_merged(PROGRAM, &["-f", "gcc", "-S", "warning", "-s", dialect, &frag_s])
+    let merged = match proc::run_merged(&programs::SHELLCHECK, &["-f", "gcc", "-S", "warning", "-s", dialect, &frag_s])
     {
         Ok(m) => m,
         Err(e) => {
@@ -785,7 +784,7 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    if !proc::on_path(PROGRAM) {
+    if !proc::on_path(&programs::SHELLCHECK) {
         return refuse_absent_program();
     }
 

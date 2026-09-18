@@ -2,7 +2,7 @@
 // vocabulary plus the derived roster families over the kit tree, one `<set-name>`⇥`<member>` line
 // per member, every member read from the tree or from the gate that owns it
 // spec: gate-sdk/SPEC.md §The non-gate arm — a two-kit declared roster
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 
 pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "QUEUE_KIT_LESSON_TAGS"];
@@ -42,7 +42,7 @@ fn emit_set(out: &mut String, set: &str, members: &[String]) {
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — `git` is criterion 7's one sanctioned
 // exception on GATE_SDK_PROGRAM_FLOOR
 fn tracked_under(dir: &str, suffix: &str) -> Result<Vec<String>, String> {
-    let listed = proc::run("git", &["ls-files", "--", dir])?;
+    let listed = proc::run(&programs::GIT, &["ls-files", "--", dir])?;
     let text = listed
         .stdout()
         .map(|o| String::from_utf8_lossy(o).into_owned())

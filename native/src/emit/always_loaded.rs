@@ -1,7 +1,7 @@
 // spec: context-kit/SPEC.md §The always-loaded meter — the standing per-session surface against
 // the committed baseline. Two levels: `measure` produces the figures and `emit` renders the three
 // modes over them, which is what lets `kpi-always-loaded` read them as data (§bin/footprint).
-use crate::proc;
+use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
 
@@ -114,7 +114,8 @@ fn hook_lines(argv: &[String]) -> u64 {
         return 0;
     };
     let args: Vec<&str> = rest.iter().map(String::as_str).collect();
-    let out = match proc::run_streamed(program, &args, b"", proc::Stderr::Discard) {
+    let program = programs::Program::consumer("CONTEXT_KIT_HOOK_CMD", program.as_str());
+    let out = match proc::run_streamed(&program, &args, b"", proc::Stderr::Discard) {
         Ok(o) => o,
         // spec: context-kit/SPEC.md §The always-loaded meter — a hook command that could not run
         // contributes nothing, the holder's `|| true`: its stdout is read whatever its status, so
@@ -141,7 +142,7 @@ pub fn governed() -> Result<Vec<(String, u64)>, String> {
     if !specs.is_empty() {
         let mut args: Vec<&str> = vec!["ls-files", "--"];
         args.extend(specs);
-        let done = proc::run("git", &args)?;
+        let done = proc::run(&programs::GIT, &args)?;
         let listed = done
             .stdout()
             .ok_or_else(|| "git ls-files could not list the ratchet pathspecs".to_string())?;
@@ -216,7 +217,7 @@ fn surface_at(commit: &str, surfaces: &[String]) -> u64 {
     surfaces
         .iter()
         .filter_map(|p| {
-            proc::run("git", &["show", &format!("{}:{}", commit, p)])
+            proc::run(&programs::GIT, &["show", &format!("{}:{}", commit, p)])
                 .ok()
                 .and_then(|c| c.stdout().map(newlines))
         })
@@ -311,7 +312,7 @@ fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
     let paths = walk::knob_array("CONTEXT_KIT_GROWTH_PATHS")?;
     let mut args: Vec<&str> = vec!["diff", "--numstat", from, "--"];
     args.extend(paths.iter().map(String::as_str));
-    let numstat = proc::run("git", &args)
+    let numstat = proc::run(&programs::GIT, &args)
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
         .unwrap_or_default();
@@ -361,7 +362,7 @@ fn update_baseline(m: &Measurement, baseline_file: &str) -> Result<String, Strin
     } else {
         None
     };
-    let commit = proc::run("git", &["rev-parse", "HEAD"])
+    let commit = proc::run(&programs::GIT, &["rev-parse", "HEAD"])
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
         .unwrap_or_else(|| "unknown".to_string());

@@ -2,6 +2,7 @@
 // harness, an `Arm::Run` member: its contract is the 0/1/2 exit status an emitting arm collapses.
 use crate::emit::csmoke;
 use crate::proc::{self, Sink};
+use crate::programs;
 use crate::registry;
 use crate::walk;
 use std::collections::{BTreeMap, BTreeSet};
@@ -274,7 +275,7 @@ fn smoke(given: &[String], teardown: &mut Teardown) -> Outcome {
 // newlines stripped, as a command substitution holds it
 fn battery(scratch: &str) -> Result<(i32, String), Outcome> {
     let m = proc::run_merged_in(
-        "bash",
+        &programs::BASH,
         &["gate-sdk/bin/run-gates.sh"],
         &[],
         Some(Path::new(scratch)),
@@ -305,7 +306,7 @@ fn restore(scratch: &str) -> Result<(), Outcome> {
     for args in [&["reset", "-q", "--hard"][..], &["clean", "-qfd"][..]] {
         let mut argv: Vec<&str> = vec!["-C", scratch];
         argv.extend_from_slice(args);
-        let done = proc::run("git", &argv).map_err(env)?;
+        let done = proc::run(&programs::GIT, &argv).map_err(env)?;
         if let Some(r) = done.failure_report() {
             return Err(env(format!("git {} failed in {} — {}", args.join(" "), scratch, r)));
         }
@@ -321,7 +322,7 @@ fn fire(scratch: &str, kit: &str, vio: &str) -> Result<String, Outcome> {
         ("SMOKE_KIT_ROOT".to_string(), format!("{}/{}", scratch, kit)),
     ];
     let done =
-        proc::run_stdout_in("bash", &[vio], &recipe_env, Path::new(scratch)).map_err(env)?;
+        proc::run_stdout_in(&programs::BASH, &[vio], &recipe_env, Path::new(scratch)).map_err(env)?;
     Ok(String::from_utf8_lossy(done.stdout())
         .lines()
         .next()
@@ -344,7 +345,7 @@ fn probe(tree: &str, checks_dir: &str, gate: &str) -> Result<Probe, Outcome> {
     let Some(decl) = registry::resolve(gate, &[checks_dir.to_string()]) else {
         return Ok(Probe::Exit(2));
     };
-    let (program, args): (String, Vec<&str>) = if decl.ends_with(".gate") {
+    let (program, args): (programs::Program, Vec<&str>) = if decl.ends_with(".gate") {
         let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(env)?;
         let path = format!("{}/{}", tree, bin);
         if !proc::is_executable(Path::new(&path)) {
@@ -353,9 +354,9 @@ fn probe(tree: &str, checks_dir: &str, gate: &str) -> Result<Probe, Outcome> {
                 gate, path, tree
             )));
         }
-        (path, vec![gate])
+        (programs::CHECKWRIGHT_GATES.at(path), vec![gate])
     } else {
-        (decl, Vec::new())
+        (programs::Program::consumer(programs::GATE_DECLARATION, decl), Vec::new())
     };
     let locator = [("GATE_SDK_ROOT".to_string(), format!("{}/gate-sdk", tree))];
     match proc::run_with_env_in(&program, &args, &locator, Some(Path::new(tree))) {

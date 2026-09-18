@@ -6,6 +6,7 @@ use crate::emit::csmoke;
 use crate::ere::Ere;
 use crate::installer::{recipe, GATES_DIR};
 use crate::proc::{self, Sink, Stderr};
+use crate::programs;
 use crate::walk;
 use std::path::Path;
 
@@ -69,7 +70,7 @@ impl Drop for Scratch {
     fn drop(&mut self) {
         for w in &self.worktrees {
             let _ = proc::run(
-                "git",
+                &programs::GIT,
                 &["-C", &self.repo, "worktree", "remove", "--force", w],
             );
         }
@@ -262,7 +263,7 @@ fn resolve_from(repo: &str) -> Result<String, Fail> {
     let mut from = knob("GATE_SDK_UPGRADE_FROM")?;
     if from.is_empty() {
         let c = proc::run(
-            "git",
+            &programs::GIT,
             &["-C", repo, "tag", "--list", "v*", "--sort=-v:refname"],
         )
         .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
@@ -305,7 +306,7 @@ fn resolve_to(repo: &str) -> Result<String, Fail> {
 fn resolves(repo: &str, git_ref: &str) -> bool {
     let spec = format!("{}^{{commit}}", git_ref);
     matches!(
-        proc::run("git", &["-C", repo, "rev-parse", "--verify", "-q", &spec]),
+        proc::run(&programs::GIT, &["-C", repo, "rev-parse", "--verify", "-q", &spec]),
         Ok(c) if c.stdout().is_some()
     )
 }
@@ -322,7 +323,7 @@ fn scratch_base() -> Result<String, Fail> {
 
 fn mktemp_dir(base: &str) -> Result<String, Fail> {
     let template = format!("{}/upgrade-smoke.XXXXXX", base);
-    let c = proc::run("mktemp", &["-d", &template])
+    let c = proc::run(&programs::MKTEMP, &["-d", &template])
         .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
     match c.stdout() {
         Some(o) => Ok(String::from_utf8_lossy(o).trim().to_string()),
@@ -373,7 +374,7 @@ fn kit_dirs_in(tree: &str) -> Result<Vec<String>, Fail> {
 fn bash(script: &str, args: &[&str], stderr: Stderr) -> Result<proc::Streamed, Fail> {
     let mut argv: Vec<&str> = vec!["-c", script, "bash"];
     argv.extend_from_slice(args);
-    proc::run_streamed("bash", &argv, b"", stderr)
+    proc::run_streamed(&programs::BASH, &argv, b"", stderr)
         .map_err(|e| broken(one(format!("{}: {}", NAME, e))))
 }
 
@@ -470,7 +471,7 @@ fn retire_shell_configs(consumer: &Path, to_roots: &[String]) -> Result<Vec<Stri
 fn amend_baseline(consumer: &str, from: &str) -> Result<(), Fail> {
     stage_all(consumer)?;
     let amended = proc::run(
-        "git",
+        &programs::GIT,
         &[
             "-C", consumer, "-c", "user.email=smoke@example.invalid", "-c", "user.name=smoke",
             "commit", "-q", "--no-verify", "--amend", "--no-edit",
@@ -509,7 +510,7 @@ fn ref_binary_tree(
     label: &str,
     work: &str,
 ) -> Result<String, Fail> {
-    if !proc::on_path("cargo") {
+    if !proc::on_path(&programs::CARGO) {
         return Err(broken(one(format!(
             "{}: FAIL(env) — the {} ref ({}) dispatches gate(s) to the binary and cargo is not on PATH; this suite builds one binary per ref",
             NAME, label, git_ref
@@ -517,7 +518,7 @@ fn ref_binary_tree(
     }
     let wt = format!("{}/checkout-{}", work, label);
     let added = proc::run(
-        "git",
+        &programs::GIT,
         &[
             "-C", &env.repo, "worktree", "add", "--detach", "-q", &wt, git_ref,
         ],
@@ -540,7 +541,7 @@ fn ref_binary_tree(
         ))));
     }
     let built = proc::run_merged(
-        "bash",
+        &programs::BASH,
         &["-c", r#"cd "$1/native" && exec cargo build --release"#, "bash", &wt],
     )
     .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
@@ -560,7 +561,7 @@ fn ref_binary_tree(
 // against its own ref's binary, with the two streams merged as the shell form's `2>&1` merged them
 fn run_battery(consumer: &str) -> Result<(i32, String), Fail> {
     let m = proc::run_merged(
-        "bash",
+        &programs::BASH,
         &[
             "-c",
             r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh"#,
@@ -617,7 +618,7 @@ fn copy_tree(src: &str, dest: &str) -> Result<(), Fail> {
 // regen step has run, so the claim stays exactly the sync's: it loses nothing a consumer owns
 fn determinism(consumer: &str, seen: &[String]) -> Result<(), Fail> {
     stage_all(consumer)?;
-    let c = proc::run("git", &["-C", consumer, "diff", "--cached", "--name-only"])
+    let c = proc::run(&programs::GIT, &["-C", consumer, "diff", "--cached", "--name-only"])
         .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
     let listed = c
         .stdout()
@@ -653,7 +654,7 @@ fn determinism(consumer: &str, seen: &[String]) -> Result<(), Fail> {
 }
 
 fn stage_all(consumer: &str) -> Result<(), Fail> {
-    proc::run("git", &["-C", consumer, "add", "-A"])
+    proc::run(&programs::GIT, &["-C", consumer, "add", "-A"])
         .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
     Ok(())
 }
@@ -733,7 +734,7 @@ fn commit_phase_a(consumer: &str, to: &str) -> Result<(), Fail> {
     stage_all(consumer)?;
     let msg = format!("phase A: kits at {}", to);
     proc::run(
-        "git",
+        &programs::GIT,
         &[
             "-C", consumer, "-c", "user.email=smoke@example.invalid", "-c", "user.name=smoke",
             "commit", "-q", "--no-verify", "--allow-empty", "-m", &msg,
@@ -816,7 +817,7 @@ fn read(path: &str) -> Result<String, Fail> {
 
 fn points_at(repo: &str, to: &str) -> String {
     match proc::run(
-        "git",
+        &programs::GIT,
         &["-C", repo, "tag", "--points-at", to, "--list", "v*"],
     ) {
         Ok(c) => c

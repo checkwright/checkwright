@@ -1,6 +1,7 @@
 // spec: installer/SPEC.md §init — vendors the selected profile's kit source out of the package
 // payload into the consumer's repository and commits it, so what governs their tree afterwards is
 // committed, auditable source rather than something resolved at their build time.
+use crate::programs;
 use super::{lock, profile, recipe, refuse, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
 use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
@@ -770,7 +771,7 @@ fn run_vendored(
     argv.extend_from_slice(args);
     // spec: gate-sdk/SPEC.md §check-graph — the bare name is spawned and `proc::run*` resolves it
     // off the homonym roster, the owner rather than a call site
-    let out = crate::proc::run_merged_in("bash", &argv, &[], Some(root))
+    let out = crate::proc::run_merged_in(&programs::BASH, &argv, &[], Some(root))
         .map_err(|e| refuse(format!("{} failed: {}", script, e), "", 2))?;
     if !out.succeeded() {
         eprintln!("{}", String::from_utf8_lossy(out.output()));

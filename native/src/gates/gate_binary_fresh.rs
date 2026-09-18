@@ -108,7 +108,7 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    let stamped = match proc::run(&bin, &["--source-stamp"]) {
+    let stamped = match proc::run(&crate::programs::CHECKWRIGHT_GATES.at(bin.as_str()), &["--source-stamp"]) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("check-gate-binary-fresh: {}", e);

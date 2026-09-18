@@ -3,7 +3,7 @@
 use crate::ere::Ere;
 use crate::fresh;
 use crate::gates::commit_msg::is_pattern;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 
 // spec: gate-sdk/SPEC.md §check-portability-floor — the self-exemption is a *prefix* glob over
@@ -130,7 +130,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     for p in &paths {
         argv.push(p.as_str());
     }
-    let ls = proc::run("git", &argv).map_err(|e| format!("check-portability-floor: {}", e))?;
+    let ls = proc::run(&programs::GIT, &argv).map_err(|e| format!("check-portability-floor: {}", e))?;
     let listing = match ls.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),
         None => {

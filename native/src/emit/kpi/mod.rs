@@ -18,6 +18,8 @@ pub mod task_split;
 
 #[cfg(not(unix))]
 use crate::proc;
+#[cfg(not(unix))]
+use crate::programs;
 
 // spec: drift-kit/SPEC.md §The KPI plugin contract — the resolved knob set plus the two driver
 // handoffs, which is what a built-in reads where a consumer plugin reads the exported environment;
@@ -224,7 +226,7 @@ fn local_epoch(days: i64, secs: i64) -> Option<i64> {
         secs % 3600 / 60,
         secs % 60
     );
-    let c = proc::run("date", &["-d", &stamp, "+%s"]).ok()?;
+    let c = proc::run(&programs::DATE, &["-d", &stamp, "+%s"]).ok()?;
     String::from_utf8_lossy(c.stdout()?).trim().parse::<i64>().ok()
 }
 
@@ -245,7 +247,7 @@ pub fn today_iso() -> String {
 
 #[cfg(not(unix))]
 pub fn today_iso() -> String {
-    proc::run("date", &["+%F"])
+    proc::run(&programs::DATE, &["+%F"])
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
         .unwrap_or_default()

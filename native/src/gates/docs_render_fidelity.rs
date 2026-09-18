@@ -2,7 +2,7 @@
 // through the Pages parser, leaks no code-span corruption symptom into text, promotes no
 // code-fenced heading, and renders no fewer tables than its source GFM table starts
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -35,14 +35,20 @@ pub fn run(args: &[String]) -> i32 {
 // spec: site-kit/SPEC.md §check-docs-render-fidelity — a renderer knob is an argv, so the shell
 // form's `"${KNOB[@]}"` is a program plus its arguments; an empty array is the branch the batch
 // knob's conditional default produces and never a program named the empty string
-fn spawn_filter(argv: &[String], input: &[u8], stderr: proc::Stderr) -> Result<(i32, Vec<u8>), String> {
+fn spawn_filter(
+    ground: &'static str,
+    argv: &[String],
+    input: &[u8],
+    stderr: proc::Stderr,
+) -> Result<(i32, Vec<u8>), String> {
     let Some((program, rest)) = argv.split_first() else {
         // spec: site-kit/SPEC.md §check-docs-render-fidelity — bash runs an empty expansion as the
         // null command: status 0 and no output, which the caller's own emptiness test then reds
         return Ok((0, Vec::new()));
     };
     let args: Vec<&str> = rest.iter().map(String::as_str).collect();
-    let s = proc::run_streamed(program, &args, input, stderr)?;
+    let program = programs::Program::consumer(ground, program.as_str());
+    let s = proc::run_streamed(&program, &args, input, stderr)?;
     Ok((s.code(), s.stdout().to_vec()))
 }
 
@@ -79,7 +85,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let docs_knob = walk::knob_scalar("SITE_KIT_DOCS_DIR").map_err(|e| format!("{}: {}", NAME, e))?;
     let docs = fresh::strip_trailing_slash(fresh::positional(args, 0, &docs_knob)).to_string();
 
-    let probe = proc::run("git", &["rev-parse", "--git-dir"]).map_err(|e| format!("{}: {}", NAME, e))?;
+    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"]).map_err(|e| format!("{}: {}", NAME, e))?;
     if probe.stdout().is_none() {
         return Err(format!(
             "{}: not a git repository — cannot enumerate tracked pages",
@@ -97,7 +103,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     // run, and only that one: a set batch knob is the consumer's statement of which parser is
     // authoritative
     if !batch.is_empty() {
-        let (_, out) = spawn_filter(&batch, b"# probe one\n\0# probe two\n\0", proc::Stderr::Discard)?;
+        let (_, out) = spawn_filter("SITE_KIT_RENDERER_BATCH", &batch, b"# probe one\n\0# probe two\n\0", proc::Stderr::Discard)?;
         // spec: site-kit/SPEC.md §check-docs-render-fidelity — two documents in, exactly two
         // *non-empty* documents back. Emptiness is bash's `${d//[[:space:]]/}`, whose C-locale
         // class carries the vertical tab Rust's `is_ascii_whitespace` leaves out.
@@ -114,7 +120,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
             ));
         }
     } else {
-        let (pst, out) = spawn_filter(&renderer, b"# probe\n", proc::Stderr::Discard)?;
+        let (pst, out) = spawn_filter("SITE_KIT_RENDERER", &renderer, b"# probe\n", proc::Stderr::Discard)?;
         let text = String::from_utf8_lossy(&out).into_owned();
         if pst != 0 || trim_trailing_newlines(&text).is_empty() {
             return Err(format!(
@@ -126,7 +132,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let ls = proc::run("git", &["ls-files", "--", &docs]).map_err(|e| format!("{}: {}", NAME, e))?;
+    let ls = proc::run(&programs::GIT, &["ls-files", "--", &docs]).map_err(|e| format!("{}: {}", NAME, e))?;
     let listing = match ls.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),
         None => {
@@ -171,7 +177,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
             stream.extend_from_slice(render_input(b).as_bytes());
             stream.push(0);
         }
-        let (_, out) = spawn_filter(&batch, &stream, proc::Stderr::Inherit)?;
+        let (_, out) = spawn_filter("SITE_KIT_RENDERER_BATCH", &batch, &stream, proc::Stderr::Inherit)?;
         for d in nul_records(&out) {
             let text = String::from_utf8_lossy(&d).into_owned();
             htmls.push(trim_trailing_newlines(&text).to_string());
@@ -189,7 +195,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         }
     } else {
         for b in &bodies {
-            let (rst, out) = spawn_filter(&renderer, render_input(b).as_bytes(), proc::Stderr::Inherit)?;
+            let (rst, out) = spawn_filter("SITE_KIT_RENDERER", &renderer, render_input(b).as_bytes(), proc::Stderr::Inherit)?;
             if rst != 0 {
                 return Err(format!(
                     "DOCS-RENDER-FIDELITY: {}",

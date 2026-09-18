@@ -1,6 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the sole holder of the stage machine's
 // shared surface: the derived stage roster, the two boundary sets, the registration block
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 
 pub fn stages() -> Result<Vec<String>, String> {
@@ -123,7 +123,7 @@ pub fn first_head(text: &str) -> String {
 
 pub fn commit_resolves(commit: &str) -> bool {
     proc::run(
-        "git",
+        &programs::GIT,
         &["rev-parse", "-q", "--verify", &format!("{}^{{commit}}", commit)],
     )
     .map(|c| c.stdout().is_some())
@@ -207,7 +207,7 @@ mod tests {
         std::fs::write(&unresolvable, format!("{}a scope s1 2026-09-14 0000000\n", hdr))
             .expect("cannot write the fixture state file");
         assert_eq!(iteration_start(&unresolvable.display().to_string()), "");
-        let head = proc::run("git", &["rev-parse", "--short", "HEAD"])
+        let head = proc::run(&programs::GIT, &["rev-parse", "--short", "HEAD"])
             .ok()
             .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
             .expect("the crate's tests run inside a work tree");

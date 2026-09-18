@@ -3,6 +3,7 @@
 // is the front-end that locates the binary and execs this arm.
 use crate::gates;
 use crate::proc;
+use crate::programs::{self, Program};
 use crate::registry;
 use crate::walk;
 use std::io::Write;
@@ -571,7 +572,7 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
             )
         }
     };
-    let argv = if src.ends_with(".gate") {
+    let (program, mut args) = if src.ends_with(".gate") {
         if gates::declared(&sel.name).is_none() {
             {
                 return fail(
@@ -585,12 +586,14 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
                 );
             }
         }
-        vec![d.self_exe.to_string(), sel.name.clone()]
+        (
+            programs::CHECKWRIGHT_GATES.at(d.self_exe),
+            vec![sel.name.clone()],
+        )
     } else {
-        vec![src]
+        (Program::consumer(programs::GATE_DECLARATION, src), Vec::new())
     };
-    let mut full = argv;
-    full.extend(sel.args.iter().cloned());
+    args.extend(sel.args.iter().cloned());
 
     let tmpdir = d.scratch.join(format!("t{}", idx));
     if let Err(e) = std::fs::create_dir_all(&tmpdir) {
@@ -606,7 +609,7 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
         );
     }
     let capture = d.scratch.join(format!("c{}", idx));
-    match proc::dispatch(&full, &tmpdir, &capture) {
+    match proc::dispatch(&program, &args, &tmpdir, &capture) {
         Err(e) => fail(
             "dispatch harness error, exit 2",
             e,
@@ -1047,7 +1050,7 @@ mod tests {
             "done"
         );
         let out = crate::proc::run_with_stdin(
-            "bash",
+            &programs::BASH,
             &["-c", script, "bash", &lib.display().to_string()],
             corpus.as_bytes(),
         )

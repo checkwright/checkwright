@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-root-tiering — the repo root holds only allowlisted orientation
 // entries; workflow machinery stays under the configured dirs
+use crate::programs;
 use crate::gates::template_registry_parity::list_members;
 use crate::{fresh, proc, walk};
 
@@ -43,7 +44,7 @@ pub fn run(args: &[String]) -> i32 {
 
     // spec: gate-sdk/SPEC.md §check-root-tiering — the tracked set is the subject, so a
     // non-repo cwd is fail-closed: there is no listing to be clean about
-    match proc::run("git", &["rev-parse", "--git-dir"]) {
+    match proc::run(&programs::GIT, &["rev-parse", "--git-dir"]) {
         Ok(c) if c.stdout().is_some() => {}
         Ok(_) => {
             eprintln!(
@@ -94,7 +95,7 @@ pub fn run(args: &[String]) -> i32 {
         format!("{}/", scanroot.trim_end_matches('/'))
     };
 
-    let ls = match proc::run("git", &["ls-files", "--", &scanroot]) {
+    let ls = match proc::run(&programs::GIT, &["ls-files", "--", &scanroot]) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("check-root-tiering: {}", e);

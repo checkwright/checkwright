@@ -1546,9 +1546,10 @@ calls `kill(2)` through `libc`, which returns *exists but not yours* as
 `EPERM`, so no fallback program is needed and the unix build declares none.
 On a non-unix build the pids are an MSYS shell's, which only that shell's
 builtin resolves. So the leg stays `bash -c 'kill -0'`, whose exit status
-conflates EPERM with ESRCH, and `ps -p` answers existence behind it. Spawning
-`/bin/kill` there would mint a second off-floor requirement, and probing with
-`ps` alone would require it on every call. The non-unix declared set carries
+conflates EPERM with ESRCH, and `ps -p` answers existence behind it; `ps` is on
+`GATE_SDK_PROGRAM_FLOOR`'s default (§The program roster). Spawning `/bin/kill`
+there would mint an off-floor requirement, and probing with `ps` alone would
+require it on every call. The non-unix declared set carries
 both, because unit test A is *observed ⊆ declared* and floor membership is what
 the report filters on, not what the registry records.
 
@@ -1569,7 +1570,8 @@ kit roots through `realpath`.
 spawn recorder lives here rather than beside the registry.** `proc.rs` carries a
 `#[cfg(test)]` recorder on the shape `walk.rs`'s read recorder has: **every**
 spawning entry point — `run`, `run_with_stdin`, `run_merged`, `run_streamed` — notes the name
-of the program it is about to spawn, a path reduced to its final component (the
+of the program it is about to spawn — the `Program` it is handed, named as `name_of` names its
+invocation, so §The program roster changes nothing unit test A observes — a path reduced to its final component (the
 requirement ground is §The `# graph:` manifest's `<program>` line kind), and §The `# graph:` manifest's unit test A reads the note
 back after running a member over a fixture case, inside the child that runs it
 (§lib/gate.sh). A face added to `proc.rs`
@@ -1580,6 +1582,36 @@ from becoming a runtime surface. Because the routing test already proves no gate
 module builds its own `Command`, hooking the two wrapper functions observes every
 spawn a member can make; a recorder placed anywhere else would observe only the
 spawns that happened to pass through it.
+
+### The program roster
+
+Every program the binary may spawn is a constant in `native/src/programs.rs`,
+of a type no other module can construct, and `proc`'s spawning faces take
+nothing else. So the roster *is* the binary's spawn set, held by the compiler
+rather than by a census. A command a consumer names — a knob's argv, a gate's
+`.sh` declaration — enters through `Program::consumer`, which carries the knob
+or declaration that named it, and is the consumer's requirement rather than
+the payload's; a spawn failure names that ground beside the program. A resolved
+invocation path is taken with `Program::at`, which keeps the identity it
+retargets, so `current_exe()` and `GATE_SDK_NATIVE_BIN` spawn as the payload
+member rather than as a second name. Each roster member carries `toolfloor`'s
+audience field. Unit tests hold four relations: an adopter-side member is on
+`GATE_SDK_PROGRAM_FLOOR`'s default, on `PROBE_SET`, or is the payload itself;
+a member on both roster and `PROBE_SET` has one audience; every `PROBE_SET`
+element is a roster member; and every consumer command's ground names a knob
+or the gate-declaration ground. That last scan reads call syntax over shipped
+scope, and a ground forwarded as a `&'static str` parameter is followed to its
+callers, which are held to the same form; a ground built at runtime would
+escape it, and `&'static str` ruling out a formatted string is the rest of the
+floor. The `PROBE_SET` walk names its members through `programs::by_name`,
+which answers only from the members that walk probes — a test holds that set
+equal to `PROBE_SET`'s names — so a row nothing spawns is still dead code,
+which the crate's deny-warnings lint reds. The roster records the **union**;
+which arm or member spawns a program is recorded per member in `REGISTRY` for
+gates and in prose for arms (§The non-gate arm). A per-arm declaration nothing
+runs is the self-declaration §The `# graph:` manifest refuses. `which` stays a
+name-typed presence probe, since a name probed and never run is no
+requirement.
 
 ### Fixture-pair discipline
 
@@ -3038,8 +3070,9 @@ A **non-gate arm** is specified by three properties:
 **`--needs` answers about registry members only, and a non-gate arm is not one.**
 That flag takes a *gate* name and reads the requirement element of that gate's
 `REGISTRY` row; an `ARMS` row carries a flag spelling, the arm and a knob
-roster, and no requirement element at all. An arm's spawned programs are
-therefore recorded in prose and nowhere a machine reads, and the set is wider
+roster, and no requirement element at all. An arm's own set is therefore
+recorded in prose; the union of every arm's set, and the rest of the binary's,
+is §The program roster. The set is wider
 than a reader would guess: `git` under several `--emit-` arms and under the
 origin-URL lookup this table's own module makes, `date` under
 `--emit-queue-index`, `--emit-file-gap`, `--emit-kfric`, `--emit-file-install`
@@ -3143,10 +3176,9 @@ it. That is not a gap in the record: an arm that dispatches a declared command
 has no set to state, and stating that it has none is what stops a later reader
 taking the omission for an oversight. The bound the timeout knob carries is the
 mitigation the shape admits.
-`grep -rn 'proc::' native/src/emit/` is the derivation; nothing maintains a
-list, and an enumeration written here would be one more thing to stale. This states
-the scope as it stands and rules nothing about whether it should: making arm
-requirements machine-readable is open work.
+`native/src/programs.rs` is the machine-held union of these sets, and the
+per-arm attribution above stays prose: no fixture corpus runs an arm, so a
+per-arm declaration would be one nothing holds.
 
 **The consumer smoke joined the class as `--run-consumer-smoke`, and its probes
 stay spawned.** Its registration accounting runs each unregistered gate with its
@@ -4786,7 +4818,9 @@ that answers each is the one whose corpus matches its question.
      member never cleared this criterion and on a non-unix build does not clear it
      now: what the port bought is
      that the surviving dependency is visible in a declared prose set instead of
-     sitting unregistered in a `bin/` script.
+     sitting unregistered in a `bin/` script. `ps` sits on
+     `GATE_SDK_PROGRAM_FLOOR`'s default (§The program roster), so it is not counted
+     off-floor; the spawn, and the refusal on its absence, stand.
    - **The program is incidental spelling.** A text utility the rule uses to
      assemble, split or order a string the port re-expresses in the target
      language — `paste -sd, -` is `.join(",")`, and the verdict is identical
@@ -11336,10 +11370,9 @@ abandoned producer's SIGPIPE under `pipefail` would flip the verdict; the crate
 expresses set membership directly and the hazard has no spelling there, which is
 criterion 7's incidental-spelling class.
 
-**An arm's spawned programs are recorded in prose and nowhere a machine reads.**
-This member carries the heaviest set in the class — `git`, `bash`, `cargo`, `tar`
-and floor utilities — and re-instances the open gap that an arm's
-spawned-program requirements go undeclared, by construction rather than widening
+**An arm's own spawned set is recorded in prose; §The program roster holds the
+union.** This member carries the heaviest set in the class — `git`, `bash`,
+`cargo`, `tar` and floor utilities — stated here rather than by widening
 `--needs`, which answers about registry members only (§The non-gate arm).
 
 **This member cut as a singleton, and that is well-formed rather than thin.**

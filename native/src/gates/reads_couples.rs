@@ -2,7 +2,7 @@
 // registered gate has its tracked read set covered by the gate's expanded couples; the
 // undecidable remainder is skipped-and-counted
 use crate::gates;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -393,7 +393,7 @@ fn tracked_under(repo: Option<&str>, root: &str) -> Result<String, String> {
     if root != "." {
         args.extend(["--", root]);
     }
-    proc::run("git", &args)
+    proc::run(&programs::GIT, &args)
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
         .ok_or_else(|| format!("git ls-files failed for root '{}'", root))

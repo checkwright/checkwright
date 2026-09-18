@@ -1,6 +1,7 @@
 // spec: evidence-kit/SPEC.md §The evidence adapters — evidence-kit's adapters and the readers its
 // gates share, kept here rather than reached for in `crate::stages` so the kit stays independent of
 // lifecycle-kit
+use crate::programs;
 
 // spec: evidence-kit/SPEC.md §Evidence manifest — the versioned wire format the header declares
 pub const MANIFEST_CONTRACT: &str = "evidence-manifest v1";
@@ -118,10 +119,10 @@ pub fn parse(
             if words.is_empty() {
                 return Ok(Vec::new());
             }
-            let program = words.remove(0);
+            let program = programs::Program::consumer("EVIDENCE_KIT_PARSER", words.remove(0));
             let display = log.display().to_string();
             words.push(&display);
-            let out = crate::proc::run_streamed(program, &words, b"", crate::proc::Stderr::Inherit)?;
+            let out = crate::proc::run_streamed(&program, &words, b"", crate::proc::Stderr::Inherit)?;
             Ok(String::from_utf8_lossy(out.stdout())
                 .lines()
                 .map(String::from)
@@ -345,17 +346,17 @@ fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
 
 #[cfg(not(unix))]
 fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
-    let signalled = crate::proc::run("bash", &["-c", "kill -0 \"$1\"", "bash", pid])
+    let signalled = crate::proc::run(&programs::BASH, &["-c", "kill -0 \"$1\"", "bash", pid])
         .map_err(PidProbe::Unanswered)?;
     if signalled.code() == Some(0) {
         return Ok(true);
     }
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the probe sits *here*, on the fallback leg,
     // because that is the only leg that reaches the program: a `kill -0` that answers never does.
-    if !crate::proc::on_path("ps") {
+    if !crate::proc::on_path(&programs::PS) {
         return Err(PidProbe::PsAbsent);
     }
-    let listed = crate::proc::run("ps", &["-p", pid]).map_err(PidProbe::Unanswered)?;
+    let listed = crate::proc::run(&programs::PS, &["-p", pid]).map_err(PidProbe::Unanswered)?;
     Ok(listed.code() == Some(0))
 }
 

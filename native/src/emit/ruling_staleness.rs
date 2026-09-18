@@ -1,7 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the reporting arm over a consumer's
 // ruling record: it dispatches each declared oracle, reports every conditioned ruling left
 // undeclared, quotes the citing sites, and proposes no edit.
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -286,7 +286,7 @@ fn dispatch(oracle: &str, timeout: u64) -> Band {
     if let Some(prose) = manual_prose(oracle) {
         return Band::Manual(prose);
     }
-    match proc::run_bounded_capture("bash", &["-c", oracle], timeout) {
+    match proc::run_bounded_capture(&programs::BASH, &["-c", oracle], timeout) {
         Err(e) => Band::DispatchFailure(e),
         Ok(None) => Band::DispatchFailure(format!("exceeded the {}s bound", timeout)),
         Ok(Some((code, bytes))) => {

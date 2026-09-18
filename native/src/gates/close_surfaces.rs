@@ -2,7 +2,7 @@
 // and moded: no undeclared capture surface, every declaration carries a mode with a well-formed
 // forced= citation, every capture-tier declaration names a reclaim command
 use crate::emit::close_surfaces;
-use crate::proc;
+use crate::{proc, programs};
 
 fn is_space(b: u8) -> bool {
     matches!(b, b' ' | b'\t' | b'\n' | 0x0b | 0x0c | b'\r')
@@ -106,7 +106,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // assertion C: a capture-tier declaration names its reclaim command
         if path.starts_with(&wf_prefix) {
             let ci = proc::run(
-                "git",
+                &programs::GIT,
                 &["-C", &roster.base, "check-ignore", "-q", "--", path],
             )?;
             if ci.code() == Some(0) {

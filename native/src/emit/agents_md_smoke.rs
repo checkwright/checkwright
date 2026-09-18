@@ -6,6 +6,7 @@
 use crate::emit::csmoke;
 use crate::ere::Ere;
 use crate::proc::{self, Sink, Stderr};
+use crate::programs;
 use crate::walk;
 use std::path::Path;
 
@@ -201,7 +202,7 @@ fn vendor(scratch: &mut Scratch, host: &str, roots: &[String]) -> Result<String,
 fn spawn(script: &str, args: &[&str]) -> Result<proc::Streamed, Outcome> {
     let mut argv: Vec<&str> = vec!["-c", script, "bash"];
     argv.extend_from_slice(args);
-    proc::run_streamed("bash", &argv, b"", Stderr::Inherit)
+    proc::run_streamed(&programs::BASH, &argv, b"", Stderr::Inherit)
         .map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))
 }
 
@@ -275,7 +276,7 @@ fn battery_env() -> Vec<(String, String)> {
 // rewritten here under the same env the battery will run with.
 fn regenerate(consumer: &str) -> Result<(), Outcome> {
     let hook = proc::run_merged_in(
-        "bash",
+        &programs::BASH,
         &["gate-sdk/bin/run-gates.sh", "--emit", "git-hooks", "--write"],
         &battery_env(),
         Some(Path::new(consumer)),
@@ -324,7 +325,7 @@ fn commit(consumer: &str, message: &str) -> Result<(), Outcome> {
 fn git(repo: &str, args: &[&str]) -> Result<(), Outcome> {
     let mut argv: Vec<&str> = vec!["-C", repo];
     argv.extend_from_slice(args);
-    let done = proc::run("git", &argv).map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))?;
+    let done = proc::run(&programs::GIT, &argv).map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))?;
     match done.failure_report() {
         None => Ok(()),
         Some(r) => Err(Outcome::Refuse(format!(
@@ -341,7 +342,7 @@ fn git(repo: &str, args: &[&str]) -> Result<(), Outcome> {
 // matched on the summary line's own grammar rather than on a gate count.
 fn battery_is_green(consumer: &str) -> Result<(), Outcome> {
     let m = proc::run_merged_in(
-        "bash",
+        &programs::BASH,
         &["gate-sdk/bin/run-gates.sh"],
         &battery_env(),
         Some(Path::new(consumer)),
@@ -446,7 +447,7 @@ fn root_tiering_accepts_one_agent_file(
 fn orientation_repo(scratch: &mut Scratch) -> Result<String, Outcome> {
     let tmp = std::env::var("TMPDIR").unwrap_or_else(|_| "/tmp".to_string());
     let template = format!("{}/agents-md-rt.XXXXXX", tmp.trim_end_matches('/'));
-    let made = proc::run("mktemp", &["-d", &template])
+    let made = proc::run(&programs::MKTEMP, &["-d", &template])
         .map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))?;
     let rt = made
         .stdout()
@@ -515,7 +516,8 @@ fn run_dispatch(
     env: &[(String, String)],
 ) -> Result<(i32, String), Outcome> {
     let rest: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
-    let m = proc::run_merged_in(&argv[0], &rest, env, Some(Path::new(cwd)))
+    let program = programs::Program::consumer(programs::GATE_DECLARATION, argv[0].as_str());
+    let m = proc::run_merged_in(&program, &rest, env, Some(Path::new(cwd)))
         .map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))?;
     Ok((
         m.reported_code(),

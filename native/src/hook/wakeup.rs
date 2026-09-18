@@ -2,7 +2,7 @@
 // denies fail-closed whatever the payload said, and logs the attempt for close's triage. It emits
 // no envelope and speaks the protocol through its exit status alone.
 use crate::hook;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use serde_json::Value;
 
@@ -31,7 +31,7 @@ fn append_attempt(log: &str, payload: Option<&Value>) {
 // is the answer, which `date -Is` asks and `date -u` does not; an absent `date` costs the stamp
 // alone, exactly as the shell form's discarded stderr did.
 fn local_stamp() -> String {
-    proc::run("date", &["-Is"])
+    proc::run(&programs::DATE, &["-Is"])
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
         .unwrap_or_default()

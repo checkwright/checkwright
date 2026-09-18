@@ -1,7 +1,7 @@
 // spec: context-kit/SPEC.md §bin/env-probe — the crate's holder of the probe roster's grammar and
 // its floor predicate. Promoted here from check-install-toolchain rather than copied, so the
 // roster keeps exactly one crate-side parser and the gate and the arm cannot disagree about it.
-use crate::proc;
+use crate::{proc, programs};
 
 // spec: context-kit/SPEC.md §bin/env-probe — the roster itself, beside the predicate that reads it.
 // It carries no knob and never did, on that section's own ground, so holding it here rather than in
@@ -10,6 +10,7 @@ pub const PROBE_SET: &[&str] = &[
     "bash:4.3",
     "git",
     "jq",
+    "curl",
     "awk",
     "sort::coreutils",
     "shellcheck",
@@ -121,7 +122,7 @@ fn first_word(banner: &str) -> String {
 // `-V`*, which no in-process comparison can reach, and the golden pins that cause.
 pub fn floor_met(min: &str, found: &str) -> Option<bool> {
     let body = format!("{}\n{}\n", min, found);
-    let sort = proc::resolve_floor_tool("sort");
+    let sort = proc::resolve_floor_tool(&programs::SORT);
     let out = proc::run_streamed(&sort, &["-V"], body.as_bytes(), proc::Stderr::Discard).ok()?;
     if out.code() != 0 {
         return None;

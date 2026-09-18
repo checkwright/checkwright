@@ -138,7 +138,7 @@ pub const KIT: Kit = Kit {
             &[
                 "awk", "basename", "bash", "cat", "cd", "chmod", "cmp", "comm", "cp", "cut", "date", "diff",
                 "dirname", "env", "find", "git", "grep", "head", "ln", "ls", "mkdir", "mktemp", "mv",
-                "printf", "pwd", "realpath", "rm", "sed", "sh", "sort", "tail", "tee", "touch", "tr",
+                "printf", "ps", "pwd", "realpath", "rm", "sed", "sh", "sort", "tail", "tee", "touch", "tr",
                 "uniq", "wc", "xargs",
             ],
         ),

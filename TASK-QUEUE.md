@@ -12,23 +12,6 @@
 
 ## New Features
 
-- **arm-spawn-requirements-unrecorded** [spec: SPEC-program-roster.md] — nothing machine-reads
-  the binary's spawn set, so `PROBE_SET` and `GATE_SDK_PROGRAM_FLOOR` cannot be held against it and
-  every floor census is re-bought by grep, which misses variable-program spawns.
-  **Shape directed at spec, 2026-09-18** (operator direction via the lead, option B; not a
-  ruling): a crate-wide typed program roster that `proc`'s faces alone accept, with one
-  `Program::consumer` constructor, a floor-parity unit test on toolfloor's audience field, and the
-  full call-site sweep this iteration. The per-`ARMS` element was dropped, because no fixture
-  corpus runs an arm; the scope oracle confirmed it departs from no intent.
-  **Re-costed at spec:** filed as a small unit, it is now a crate-wide change. The census covers
-  171 literal spawn sites and about 24 variable ones across `emit/`, `gates/`, `hook/`,
-  `installer/` and shared modules. It lands in one commit with the type (deltas 1-3). Build
-  after `pid-liveness-spawns-bash`.
-  **`curl` directed at spec:** it joins `PROBE_SET`, adopter-side (operator direction via the
-  lead), so `doctor` and `init` now refuse a host without it.
-  Filed 2026-09-18 by `native-spawn-floor`'s spec, and kept in `native-spawn-residue` against
-  scope's filter flag (operator direction, 2026-09-18, lead-relayed).
-
 ## Technical Debt
 
 ## Deferred
@@ -3411,5 +3394,6 @@
 - pid-liveness-spawns-bash
 - gnu-date-spawn-retired
 - overhead-meter-gate-output-classifier-blind
+- arm-spawn-requirements-unrecorded
 
 ## Lessons Learned

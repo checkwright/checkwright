@@ -4,7 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the exit contract is three-state
 // and the difference is the product: 1 is the verdict a suite regressed, 2 the run could not start.
 use crate::evidence::{self, LockRead, PidProbe};
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::io::Write;
 use std::path::Path;
@@ -149,7 +149,8 @@ fn dispatch(_args: &[String]) -> Result<i32, Refusal> {
         // guards' code with no evidence appended, and that ordering is the contract: it is what
         // keeps a refused run from writing a line.
         if !cfg.pre_hook.is_empty() {
-            let status = spawn(&cfg.pre_hook, Some(suite), &proc::Sink::Inherit).map_err(guard)?;
+            let status = spawn("EVIDENCE_KIT_PRE_HOOK", &cfg.pre_hook, Some(suite), &proc::Sink::Inherit)
+                .map_err(guard)?;
             if status != 0 {
                 return Err(guard(format!(
                     "pre-hook failed for suite '{}' — aborting (no evidence appended)",
@@ -159,7 +160,8 @@ fn dispatch(_args: &[String]) -> Result<i32, Refusal> {
         }
 
         let log = format!("{}/validate-{}.log", cfg.tmpdir, suite);
-        let status = spawn(&cmd, None, &proc::Sink::File(log.clone().into())).map_err(guard)?;
+        let status = spawn("EVIDENCE_KIT_RUN_*", &cmd, None, &proc::Sink::File(log.clone().into()))
+            .map_err(guard)?;
         if status != 0 {
             eprintln!(
                 "run-validate: suite '{}' exited {} (log: {})",
@@ -344,20 +346,25 @@ impl Drop for Claimed {
 // spec: evidence-kit/SPEC.md §bin/run-validate.sh — a configured command word-splits by design: the
 // suite runner, the parser and the pre-hook are consumer seams the port may not narrow, so the
 // value's words are the argv and this member's spawned-program set is the consumer's to widen.
-fn spawn(command: &str, operand: Option<&str>, sink: &proc::Sink) -> Result<i32, String> {
+fn spawn(
+    ground: &'static str,
+    command: &str,
+    operand: Option<&str>,
+    sink: &proc::Sink,
+) -> Result<i32, String> {
     let mut words: Vec<&str> = command.split_whitespace().collect();
     if words.is_empty() {
         return Ok(0);
     }
-    let program = words.remove(0);
+    let program = programs::Program::consumer(ground, words.remove(0));
     if let Some(o) = operand {
         words.push(o);
     }
-    proc::run_to(program, &words, sink)
+    proc::run_to(&program, &words, sink)
 }
 
 fn date_today() -> Result<String, String> {
-    let c = proc::run("date", &["+%F"])?;
+    let c = proc::run(&programs::DATE, &["+%F"])?;
     match c.stdout() {
         Some(o) => Ok(String::from_utf8_lossy(o).trim().to_string()),
         None => Err("could not read today's date — nothing recorded.".to_string()),

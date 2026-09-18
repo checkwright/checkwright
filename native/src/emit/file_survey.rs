@@ -2,6 +2,7 @@
 // survey, the grammar stamped by the producer rather than by its author.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
 // arm reads two consumer knobs, which a hardcoded flag would hide from the knob-file derivation.
+use crate::programs;
 use crate::stages;
 use crate::walk;
 
@@ -56,7 +57,7 @@ fn head_rev() -> Result<String, String> {
          against; commit first."
             .to_string()
     };
-    let out = crate::proc::run("git", &["rev-parse", "HEAD"]).map_err(|_| refusal())?;
+    let out = crate::proc::run(&programs::GIT, &["rev-parse", "HEAD"]).map_err(|_| refusal())?;
     let rev = match out.stdout() {
         Some(o) => String::from_utf8_lossy(o).trim().to_string(),
         None => return Err(refusal()),

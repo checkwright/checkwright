@@ -2,7 +2,7 @@
 // source of truth for the docs host; no tracked file names a configured host alias other than
 // that host in a URL
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -55,7 +55,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let scanroot = fresh::strip_trailing_slash(fresh::positional(args, 0, &scan_knob)).to_string();
     let cname = fresh::positional(args, 1, &cname_knob).to_string();
 
-    let probe = proc::run("git", &["rev-parse", "--git-dir"])
+    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
         .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
     if probe.stdout().is_none() {
         return Err(
@@ -97,7 +97,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
     let prune = walk::prune_dirs().map_err(|e| format!("check-docs-cname-parity: {}", e))?;
 
-    let ls = proc::run("git", &["ls-files", "--", &scanroot])
+    let ls = proc::run(&programs::GIT, &["ls-files", "--", &scanroot])
         .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
     let listing = match ls.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),

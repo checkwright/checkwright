@@ -1,6 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-path-dialect — every platform-native path producer in the two
 // corpora converts at its own point of production, or records at the site why it does not
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -319,7 +319,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the shell corpus degrades to empty outside a
     // work tree, so the repository is probed first and an absent one refuses rather than reporting
     // a clean scan over nothing
-    let inside = proc::run("git", &["rev-parse", "--git-dir"])
+    let inside = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
         .map(|c| c.stdout().is_some())
         .unwrap_or(false);
     if !inside {

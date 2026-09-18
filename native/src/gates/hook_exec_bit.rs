@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-hook-exec-bit — every tracked file in the hooks dir carries
 // index mode 100755, or a fresh clone silently skips a non-executable hook
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -17,7 +17,7 @@ pub fn run(args: &[String]) -> i32 {
         },
     };
 
-    let probe = match proc::run("git", &["rev-parse", "--git-dir"]) {
+    let probe = match proc::run(&programs::GIT, &["rev-parse", "--git-dir"]) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("check-hook-exec-bit: {}", e);
@@ -37,7 +37,7 @@ pub fn run(args: &[String]) -> i32 {
         return 0;
     }
 
-    let listing = match proc::run("git", &["ls-files", "-s", "--", &dir]) {
+    let listing = match proc::run(&programs::GIT, &["ls-files", "-s", "--", &dir]) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("check-hook-exec-bit: {}", e);

@@ -6,6 +6,7 @@
 use crate::emit::csmoke;
 use crate::ere::Ere;
 use crate::proc::{self, Sink, Stderr};
+use crate::programs;
 use crate::walk;
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — the roster is the *consumer's*: which kits the
@@ -239,7 +240,7 @@ fn make_scratch(scratch: &mut Scratch) -> Result<String, Outcome> {
         .or_else(|| std::env::var("TMPDIR").ok().filter(|v| !v.is_empty()))
         .unwrap_or_else(|| "/tmp".to_string());
     let template = format!("{}/demo-consumer.XXXXXX", base.trim_end_matches('/'));
-    let made = proc::run("mktemp", &["-d", &template]).map_err(refuse)?;
+    let made = proc::run(&programs::MKTEMP, &["-d", &template]).map_err(refuse)?;
     let dir = made
         .stdout()
         .map(|o| String::from_utf8_lossy(o).trim().to_string())
@@ -262,7 +263,7 @@ fn write(path: &str, body: &str) -> Result<(), Outcome> {
 fn git(repo: &str, args: &[&str]) -> Result<(), Outcome> {
     let mut argv: Vec<&str> = vec!["-C", repo];
     argv.extend_from_slice(args);
-    let done = proc::run("git", &argv).map_err(refuse)?;
+    let done = proc::run(&programs::GIT, &argv).map_err(refuse)?;
     match done.failure_report() {
         None => Ok(()),
         Some(r) => Err(Outcome::Refuse(format!(
@@ -291,7 +292,7 @@ fn commit(repo: &str, extra: &[&str], message: &str) -> Result<(), Outcome> {
 
 fn vendor(root: &str, consumer: &str) -> Result<(), Outcome> {
     let into = format!("{}/{}", consumer, basename(root));
-    let done = proc::run("cp", &["-R", root, &into]).map_err(refuse)?;
+    let done = proc::run(&programs::CP, &["-R", root, &into]).map_err(refuse)?;
     match done.failure_report() {
         None => Ok(()),
         Some(r) => Err(Outcome::Refuse(format!(
@@ -320,7 +321,7 @@ fn place_binary(consumer: &str, host: &str, roots: &[String]) -> Result<(), Outc
 fn install(consumer: &str, kit: &str) -> Result<(), Outcome> {
     let script = r#"cd "$1" || exit 2; export GATE_SDK_ROOT="$1/gate-sdk" SMOKE_KIT_ROOT="$1/$2"; exec bash "$1/$2/smoke/install.sh""#;
     let code = proc::run_to_env(
-        "bash",
+        &programs::BASH,
         &["-c", script, "bash", consumer, kit],
         &[],
         &Sink::Inherit,
@@ -340,7 +341,7 @@ fn install(consumer: &str, kit: &str) -> Result<(), Outcome> {
 // scratch tree, which is the pairing defect the placement's own record names.
 fn run_battery(consumer: &str) -> Result<(i32, String), Outcome> {
     let m = proc::run_merged_in(
-        "bash",
+        &programs::BASH,
         &["gate-sdk/bin/run-gates.sh"],
         &[("GATE_SDK_VERBOSE".to_string(), "1".to_string())],
         Some(std::path::Path::new(consumer)),
@@ -374,7 +375,7 @@ fn ends_with_newline(out: &str) -> String {
 fn fire_violation(consumer: &str, sdk_kit: &str) -> Result<String, Outcome> {
     let script =
         r#"cd "$1" || exit 2; export GATE_SDK_ROOT="$1/gate-sdk" SMOKE_KIT_ROOT="$1/$2"; exec bash "$1/$2/smoke/violation.sh""#;
-    let done = proc::run_streamed("bash", &["-c", script, "bash", consumer, sdk_kit], b"", Stderr::Inherit)
+    let done = proc::run_streamed(&programs::BASH, &["-c", script, "bash", consumer, sdk_kit], b"", Stderr::Inherit)
         .map_err(refuse)?;
     Ok(String::from_utf8_lossy(done.stdout())
         .lines()

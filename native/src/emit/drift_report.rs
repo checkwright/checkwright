@@ -2,7 +2,7 @@
 // measurement lives in a member. Advisory by construction, so the arm's exit is always 0 and a
 // member that fails yields a visible row rather than a missing one.
 use super::kpi::{self, Ctx};
-use crate::proc;
+use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -116,7 +116,8 @@ fn invoke(r: &Resolved, ctx: &Ctx, trend: bool, env: &[(String, String)]) -> Opt
         Resolved::Builtin(f) => f(ctx, trend),
         Resolved::Plugin(p) => {
             let args: Vec<&str> = if trend { vec!["--trend"] } else { vec![] };
-            proc::run_with_env(p, &args, env)
+            let plugin = programs::Program::consumer("DRIFT_KIT_KPIS_FILE", p.as_str());
+            proc::run_with_env(&plugin, &args, env)
                 .ok()
                 .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
         }
@@ -287,7 +288,7 @@ mod tests {
     // absent state file hands every member the empty string
     #[test]
     fn the_iteration_start_reaching_ctx_is_the_state_files_first_head() {
-        let head = proc::run("git", &["rev-parse", "--short", "HEAD"])
+        let head = proc::run(&programs::GIT, &["rev-parse", "--short", "HEAD"])
             .ok()
             .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
             .expect("the crate's tests run inside a work tree");

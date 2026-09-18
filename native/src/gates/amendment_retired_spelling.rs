@@ -1,7 +1,7 @@
 // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — every amendment carries a
 // `## Retired spellings` block, and every spelling it declares survives only at a path its
 // `## Existing sections updated` roster names
-use crate::proc;
+use crate::{proc, programs};
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -185,11 +185,11 @@ struct Declared {
 // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — the reconciliation corpus:
 // `git ls-files` minus the amendment set, minus the configured exclusion
 fn corpus(root: &str, amendments: &[String]) -> Result<Vec<String>, String> {
-    let probe = proc::run("git", &["rev-parse", "--git-dir"])?;
+    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])?;
     if probe.stdout().is_none() {
         return Err("not a git repository — cannot enumerate the reconciliation corpus".into());
     }
-    let ls = proc::run("git", &["ls-files", "--", root])?;
+    let ls = proc::run(&programs::GIT, &["ls-files", "--", root])?;
     let listing = match ls.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),
         None => {

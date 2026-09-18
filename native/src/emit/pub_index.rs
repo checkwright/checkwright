@@ -1,5 +1,6 @@
 // spec: context-kit/SPEC.md §Index-first reading — the public-surface index: a dispatcher over
 // per-language extractors, whose seam that section rules survives the port intact.
+use crate::programs;
 use super::pub_lang;
 use super::{corpus, read_text, relative, targets};
 use std::path::Path;
@@ -50,7 +51,7 @@ fn resolve(lang: &str, dir: &str) -> Result<Extractor, String> {
 fn shell(script: &str, args: &[&str]) -> Result<String, String> {
     let mut argv: Vec<&str> = vec!["-c", script, "bash"];
     argv.extend_from_slice(args);
-    let done = crate::proc::run("bash", &argv)?;
+    let done = crate::proc::run(&programs::BASH, &argv)?;
     match done.stdout() {
         Some(o) => Ok(String::from_utf8_lossy(o).into_owned()),
         None => Err(format!(

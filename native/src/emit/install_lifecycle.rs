@@ -5,7 +5,7 @@
 // an exit status, and a table member because it reads eight knobs a hardcoded flag would hide
 // from the knob-file derivation
 use crate::marker;
-use crate::proc;
+use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -89,14 +89,14 @@ fn install(args: &[String]) -> Result<(), String> {
 // `--install-hooks` per-clone opt-in class: a non-repo cwd degrades to a printed skip on stderr
 // at exit 0, never a hard failure, because the recorded honest limit depends on it failing soft
 fn register_driver() {
-    let inside = proc::run("git", &["rev-parse", "--git-dir"])
+    let inside = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
         .map(|c| c.stdout().is_some())
         .unwrap_or(false);
     if !inside {
         eprintln!("install-lifecycle: not a git repository — skipped the merge.iteration-scoped driver (the .gitattributes attribute stays inert until 'git config merge.iteration-scoped.driver true' is run in a clone)");
         return;
     }
-    match proc::run("git", &["config", "merge.iteration-scoped.driver", "true"]) {
+    match proc::run(&programs::GIT, &["config", "merge.iteration-scoped.driver", "true"]) {
         Ok(c) if c.stdout().is_some() => {
             println!("install-lifecycle: registered the keep-ours merge.iteration-scoped driver (per-clone git config)");
         }

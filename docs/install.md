@@ -162,6 +162,10 @@ your `PATH`, and the note says what breaks without it:
   model is git-native end to end.
 - `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse
   their inputs with it.
+- `curl` — the usage poller fetches its source with it, and it refuses by name
+  where `curl` is absent. Like `shellcheck` below, it is part of the toolchain
+  contract `checkwright doctor` decides, so `init` refuses a machine without it
+  rather than half-installing.
 - `awk` — the bash activation bootstrap reads its release digest with it, and the
   shipped session-context, deprecated-surface KPI and gate-skeleton templates
   run it. Every one of those programs is POSIX awk, so any implementation

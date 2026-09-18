@@ -1,6 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-lesson-disposition — every Lessons entry present at HEAD
 // and gone from the worktree leaves a well-formed disposition stamp in the evidence file
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -80,7 +80,7 @@ pub fn run(args: &[String]) -> i32 {
                 return 2;
             }
         };
-        let in_repo = proc::run("git", &["rev-parse", "--git-dir"])
+        let in_repo = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
             .map(|c| c.stdout().is_some())
             .unwrap_or(false);
         if !in_repo {
@@ -88,7 +88,7 @@ pub fn run(args: &[String]) -> i32 {
             return 0;
         }
         let spec = format!("HEAD:{}", queue);
-        let shown = match proc::run("git", &["show", &spec]) {
+        let shown = match proc::run(&programs::GIT, &["show", &spec]) {
             Ok(c) => c.stdout().map(|b| String::from_utf8_lossy(b).into_owned()),
             Err(e) => {
                 eprintln!("check-lesson-disposition: {}", e);

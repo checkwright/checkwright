@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-template-registry-parity — a kit's shipped `.list` registry
 // template names exactly the artifacts of its sibling directory, both directions
 use crate::gates::smoke_entry_guard::{kit_name, scan_root};
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -156,7 +156,7 @@ pub fn run(args: &[String]) -> i32 {
                 );
                 return 2;
             }
-            let completed = match proc::run("git", &["-C", &dir, "ls-files", "--", "*.sh"]) {
+            let completed = match proc::run(&programs::GIT, &["-C", &dir, "ls-files", "--", "*.sh"]) {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-template-registry-parity: {}", e);

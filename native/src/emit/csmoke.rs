@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §Consumer smoke — the scratch-consumer builder: one holder of the build
 // every consumer-smoke caller shares, so no caller keeps a copy of the mechanics.
 use crate::proc::{self, Sink};
+use crate::programs;
 use crate::walk;
 use std::path::Path;
 
@@ -97,7 +98,7 @@ fn basename(p: &str) -> &str {
 fn git(dir: &str, args: &[&str]) -> Result<(), String> {
     let mut argv: Vec<&str> = vec!["-C", dir];
     argv.extend_from_slice(args);
-    let done = proc::run("git", &argv)?;
+    let done = proc::run(&programs::GIT, &argv)?;
     match done.failure_report() {
         None => Ok(()),
         Some(r) => Err(format!("git {} failed in {} — {}", args.join(" "), dir, r)),
@@ -132,7 +133,7 @@ pub fn vendor_and_install(
     out: &Sink,
 ) -> Result<Scratch, BuildError> {
     let template = format!("{}/consumer-smoke.XXXXXX", base.trim_end_matches('/'));
-    let made = proc::run("mktemp", &["-d", &template]).map_err(|e| BuildError {
+    let made = proc::run(&programs::MKTEMP, &["-d", &template]).map_err(|e| BuildError {
         dir: String::new(),
         message: e,
     })?;
@@ -159,7 +160,7 @@ pub fn vendor_and_install(
 
     for r in roots {
         let into = format!("{}/{}", dir, basename(r));
-        let copied = proc::run("cp", &["-R", r, &into]).map_err(fail)?;
+        let copied = proc::run(&programs::CP, &["-R", r, &into]).map_err(fail)?;
         if let Some(report) = copied.failure_report() {
             return Err(fail(format!("could not vendor {} — {}", r, report)));
         }
@@ -175,7 +176,7 @@ pub fn vendor_and_install(
             ("GATE_SDK_ROOT".to_string(), format!("{}/gate-sdk", dir)),
             ("SMOKE_KIT_ROOT".to_string(), format!("{}/{}", dir, kit)),
         ];
-        let code = proc::run_to_in("bash", &[&script], &env, Some(Path::new(&dir)), out)
+        let code = proc::run_to_in(&programs::BASH, &[&script], &env, Some(Path::new(&dir)), out)
             .map_err(fail)?;
         if code != 0 {
             return Err(fail(format!(

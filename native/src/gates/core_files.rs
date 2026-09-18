@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-core-files — every path in the core-files manifest exists in the
 // worktree and is tracked, a `kit:` line deriving one path per kit root
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::registry;
 use crate::walk;
 use std::path::Path;
@@ -84,7 +84,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    let probe = match proc::run("git", &["rev-parse", "--git-dir"]) {
+    let probe = match proc::run(&programs::GIT, &["rev-parse", "--git-dir"]) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("check-core-files: {}", e);
@@ -103,7 +103,7 @@ pub fn run(args: &[String]) -> i32 {
             missing.push(p.clone());
             continue;
         }
-        let tracked = proc::run("git", &["ls-files", "--error-unmatch", "--", p])
+        let tracked = proc::run(&programs::GIT, &["ls-files", "--error-unmatch", "--", p])
             .map(|c| c.stdout().is_some())
             .unwrap_or(false);
         if tracked {

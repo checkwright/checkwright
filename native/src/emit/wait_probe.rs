@@ -3,7 +3,7 @@
 // emitting variant collapses every outcome to {0, 2}
 // spec: gate-sdk/SPEC.md §The non-gate arm — the member whose subject, not whose implementation,
 // fixes its spawned-program set: the wait body, the local arming and the producer stay shell
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::io::Write;
 
@@ -199,7 +199,7 @@ fn cmd_produce(key: &str, ms: &str) -> Result<i32, String> {
 fn spawned_pid(script: &str, argv: &[&str]) -> Result<u32, String> {
     let mut call: Vec<&str> = vec!["-c", script];
     call.extend_from_slice(argv);
-    let done = proc::run("bash", &call)?;
+    let done = proc::run(&programs::BASH, &call)?;
     let out = done
         .stdout()
         .map(|b| String::from_utf8_lossy(b).to_string())

@@ -2,6 +2,7 @@
 // rather than an `Arm::Emit` member because the sink's exit status *is* this arm's
 // spec: gate-sdk/SPEC.md §The non-gate arm — the member the flag-keyed table exists for
 use crate::proc::{self, Stderr};
+use crate::programs;
 use crate::walk;
 use std::io::Read;
 use std::io::Write;
@@ -51,7 +52,7 @@ fn route(args: &[String]) -> Result<i32, String> {
 // wraps the signal-aware exit-code spelling, and `run_streamed` captures stdout rather than
 // inheriting it, so the arm re-emits what the child wrote
 fn spawn_sink(command: &str, body: &[u8]) -> Result<i32, String> {
-    let done = proc::run_streamed("bash", &["-c", command], body, Stderr::Inherit)?;
+    let done = proc::run_streamed(&programs::BASH, &["-c", command], body, Stderr::Inherit)?;
     std::io::stdout()
         .write_all(done.stdout())
         .map_err(|e| format!("cannot re-emit the sink's output: {}", e))?;

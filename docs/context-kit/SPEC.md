@@ -403,15 +403,16 @@ spawned programs are `uname`, `date`, `sort`, and every roster member it probes.
 The roster is the kit's own and a consumer cannot shadow it, which is what keeps
 this set bounded by the paragraph below rather than by a consumer's file.
 
-**The roster is what doctor verifies, not the set the binary spawns.** `date`,
-`mktemp` and `cp` are spawned and not probed: they rest on
-`GATE_SDK_PROGRAM_FLOOR`'s assumption that the payload's host carries them
-(gate-sdk/SPEC.md §lib/gate.sh). `uname` (this arm), `ps` (the pid predicate's
-fallback leg, non-unix builds only) and `tar` and `npm` (the installer packer) are on neither set.
-Nothing yet holds the three sets in a checked relation — an `ARMS` row carries no
-requirement element to derive one from — so a census that finds a spawned
-program off the roster has found this honest limit, not drift, and the roster is
-not derived from the spawn set.
+**The roster is what doctor verifies, not the set the binary spawns;
+gate-sdk/SPEC.md §The program roster is that set, and a unit test holds the
+two in relation.** A spawned program with an empty audience is on this
+roster, on `GATE_SDK_PROGRAM_FLOOR`'s default, or is the payload itself;
+`date`, `mktemp`, `cp` and `ps` rest on the floor's assumption that the host
+carries them (gate-sdk/SPEC.md §lib/gate.sh). A contributor-side program —
+`uname` (this arm), `tar` and `npm` (the installer packer), `rustc` —
+carries the `contributor` audience on the program roster and need not be on
+either. Every element of this roster is a program-roster member, so the walk
+never probes a program the binary cannot name.
 
 **The roster and its floor axis (`native/src/toolfloor.rs`).** The roster lives
 beside the predicate that reads it, in the module the whole crate resolves it

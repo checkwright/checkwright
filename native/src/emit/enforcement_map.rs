@@ -3,7 +3,7 @@
 // `emit` renders them, so the value-rollup join consumes data rather than re-parsing the page.
 use crate::emit::self_repo_prefix;
 use crate::fresh;
-use crate::proc;
+use crate::{proc, programs};
 use crate::registry;
 use crate::walk;
 use serde_json::Value;
@@ -66,7 +66,7 @@ fn kit_cell(kit: &str) -> String {
 }
 
 fn tracked(path: &str) -> bool {
-    proc::run("git", &["ls-files", "--error-unmatch", "--", path])
+    proc::run(&programs::GIT, &["ls-files", "--error-unmatch", "--", path])
         .map(|c| c.stdout().is_some())
         .unwrap_or(false)
 }

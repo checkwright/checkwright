@@ -4,7 +4,7 @@
 #![cfg(test)]
 
 use crate::json::{values_equal, Path};
-use crate::proc;
+use crate::{proc, programs};
 use serde_json::Value;
 
 // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — the shell
@@ -16,7 +16,7 @@ enum Verdict {
 }
 
 fn jq_available() -> bool {
-    proc::run("jq", &["--version"])
+    proc::run(&programs::JQ, &["--version"])
         .map(|c| c.stdout().is_some())
         .unwrap_or(false)
 }
@@ -30,7 +30,7 @@ fn shell_verdict(doc_src: &str, path: &str, file: &std::path::Path) -> Verdict {
     }
     std::fs::write(file, doc_src).expect("cannot write the differential case document");
     let file_arg = file.display().to_string();
-    let completed = proc::run("jq", &["-c", path, &file_arg]).expect("cannot run jq");
+    let completed = proc::run(&programs::JQ, &["-c", path, &file_arg]).expect("cannot run jq");
     let Some(out) = completed.stdout() else {
         return Verdict::Malformed;
     };

@@ -1,7 +1,7 @@
 // spec: evidence-kit/SPEC.md §check-evidence-baseline — baseline grammar, blocking-slug
 // liveness against the queue, per-suite manifest↔disk set equality, and flip causation
 use crate::evidence::data_lines;
-use crate::proc;
+use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -97,7 +97,7 @@ fn flip_causation(baseline: &str, state: &str, rows: &[Row], errors: &mut Vec<St
     let closed = |what: String| {
         format!("{} — the check could not run; treating as failure (not clean)", what)
     };
-    let listed = proc::run("git", &["ls-tree", "--full-name", "--name-only", &start, "--", baseline])?;
+    let listed = proc::run(&programs::GIT, &["ls-tree", "--full-name", "--name-only", &start, "--", baseline])?;
     let Some(listed) = listed.stdout() else {
         return Err(closed(format!("cannot list {} at the iteration start {}", baseline, start)));
     };
@@ -105,7 +105,7 @@ fn flip_causation(baseline: &str, state: &str, rows: &[Row], errors: &mut Vec<St
     let prior = if name.is_empty() {
         String::new()
     } else {
-        let shown = proc::run("git", &["show", &format!("{}:{}", start, name)])?;
+        let shown = proc::run(&programs::GIT, &["show", &format!("{}:{}", start, name)])?;
         match shown.stdout() {
             Some(b) => String::from_utf8_lossy(b).into_owned(),
             None => return Err(closed(format!("cannot read {} at the iteration start {}", name, start))),
@@ -124,7 +124,7 @@ fn flip_causation(baseline: &str, state: &str, rows: &[Row], errors: &mut Vec<St
             errors.push(format!("reproduces-at '{}' resolves to no commit: {}", rev, r.line));
             continue;
         }
-        let anc = proc::run("git", &["merge-base", "--is-ancestor", rev, &start])?;
+        let anc = proc::run(&programs::GIT, &["merge-base", "--is-ancestor", rev, &start])?;
         match anc.code() {
             Some(0) => {}
             Some(1) => errors.push(format!(

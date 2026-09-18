@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §port-blockers — the derived roster for the port's remaining work, at each
 // invocation. Three exclusive arms over two corpora: the registry arms answer criteria 7 and 6 and
 // speak for the battery alone, while `--tree` answers the completion predicate over the tree.
+use crate::programs;
 use crate::bashscan::{self, Kind};
 use crate::registry;
 use crate::walk;
@@ -133,7 +134,7 @@ fn tree() -> Result<String, String> {
     // empty corpus where git cannot answer, deliberately and on a monotonicity ground for its other
     // reader; this arm absorbs the divergence by probing first rather than printing `0 owed`.
     let repo = matches!(
-        crate::proc::run("git", &["rev-parse", "--git-dir"]),
+        crate::proc::run(&programs::GIT, &["rev-parse", "--git-dir"]),
         Ok(ref c) if c.stdout().is_some()
     );
     if !repo {
@@ -288,7 +289,7 @@ fn builtins(words: &BTreeSet<String>) -> BTreeSet<String> {
         "bash",
     ];
     argv.extend(words.iter().map(String::as_str));
-    let out_bytes = match crate::proc::run("bash", &argv) {
+    let out_bytes = match crate::proc::run(&programs::BASH, &argv) {
         Ok(c) => match c.stdout() {
             Some(b) => b.to_vec(),
             None => return out,

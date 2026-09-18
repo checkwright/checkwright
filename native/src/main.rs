@@ -24,6 +24,7 @@ mod knobfile;
 mod knobs;
 mod marker;
 mod proc;
+mod programs;
 mod queue;
 mod registry;
 mod runner;

@@ -3,6 +3,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and `Arm::Run`, both forced rather
 // than chosen: the runner reads `GATE_SDK_TMP_DIR`, and it passes the child's exit code through
 // verbatim while its stdout must reach the terminal as the child produces it.
+use crate::programs;
 
 pub const KNOBS: &[&str] = &["GATE_SDK_TMP_DIR"];
 
@@ -108,7 +109,7 @@ pub fn run(args: &[String]) -> i32 {
     // one for "run anything on a reviewed body" with no settings edit, which is refused outright.
     let mut argv: Vec<&str> = vec![target.as_str()];
     argv.extend(args[1..].iter().map(String::as_str));
-    match crate::proc::run_to("bash", &argv, &crate::proc::Sink::Inherit) {
+    match crate::proc::run_to(&programs::BASH, &argv, &crate::proc::Sink::Inherit) {
         Ok(code) => code,
         Err(e) => refuse(&e),
     }

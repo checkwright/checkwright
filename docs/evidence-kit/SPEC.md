@@ -1181,9 +1181,12 @@ port. That clause stops being a warning and becomes a discharged one.
 
 **On a non-unix build it is a wrapper, and the requirement lives in the
 library rather than in the gate's own text.** There the pid predicate tries the
-`kill -0` builtin through `bash -c` and falls back to `ps -p`, which is off
-`GATE_SDK_PROGRAM_FLOOR`. So that build's registry row declares `ps` for the
-fallback leg, and `bash`, which is on the floor and so uncounted. On unix the
+`kill -0` builtin through `bash -c` and falls back to `ps -p`. So that build's
+registry row declares `ps` for the fallback leg, and `bash`; both sit on the
+program floor and so go uncounted, `ps` because it is POSIX-mandated and the
+program roster's parity test requires an adopter-side spawn to sit on the floor
+or the probe roster (gate-sdk/SPEC.md §The program roster). Floor membership
+waives no refusal: the absent-`ps` refusal below stands. On unix the
 predicate is one `kill(2)` call and the row declares nothing. The lock reader
 spawns nothing on either.
 

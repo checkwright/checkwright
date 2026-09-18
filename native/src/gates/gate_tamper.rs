@@ -1,7 +1,7 @@
 // spec: delegation-kit/SPEC.md §Verify after every agent commit — a gate-weakening commit is
 // blocked by shape (A gate edits stay meta-isolated; B a new path-exemption can't excuse a
 // co-staged file)
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -121,14 +121,14 @@ fn opens_array(t: &str) -> bool {
 }
 
 fn git_blob(rev: &str) -> Result<String, String> {
-    let c = proc::run("git", &["show", rev])?;
+    let c = proc::run(&programs::GIT, &["show", rev])?;
     Ok(c.stdout()
         .map(|b| String::from_utf8_lossy(b).into_owned())
         .unwrap_or_default())
 }
 
 fn collect_live(globs: &[String]) -> Result<(Vec<String>, Vec<String>), String> {
-    let c = proc::run("git", &["diff", "--cached", "--name-only"])?;
+    let c = proc::run(&programs::GIT, &["diff", "--cached", "--name-only"])?;
     let staged: Vec<String> = c
         .stdout()
         .map(|b| {

@@ -1,7 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-survey-record — every survey block carries its whole
 // witness: the five keys in order, a full-sha rev naming a real commit, a non-empty corpus
 // and a non-empty oracle and inferred
-use crate::proc;
+use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -133,7 +133,7 @@ pub fn run(args: &[String]) -> i32 {
                 );
                 return 0;
             }
-            let in_repo = proc::run("git", &["rev-parse", "--git-dir"])
+            let in_repo = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
                 .map(|c| c.stdout().is_some())
                 .unwrap_or(false);
             (p, in_repo)
@@ -225,7 +225,7 @@ pub fn run(args: &[String]) -> i32 {
     if probe_rev {
         for (line, rev) in &revs {
             let spec = format!("{}^{{commit}}", rev);
-            let ok = proc::run("git", &["cat-file", "-e", &spec])
+            let ok = proc::run(&programs::GIT, &["cat-file", "-e", &spec])
                 .map(|c| c.stdout().is_some())
                 .unwrap_or(false);
             if ok {
@@ -240,7 +240,7 @@ pub fn run(args: &[String]) -> i32 {
         // spec: lifecycle-kit/SPEC.md §check-survey-record — the same probe over a wider corpus:
         // any object type resolves, because a sha naming a blob or a tree is a real citation
         for (line, tok) in &tokens {
-            let ok = proc::run("git", &["cat-file", "-e", tok])
+            let ok = proc::run(&programs::GIT, &["cat-file", "-e", tok])
                 .map(|c| c.stdout().is_some())
                 .unwrap_or(false);
             if ok {
