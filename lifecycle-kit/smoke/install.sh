@@ -13,12 +13,6 @@ SDK="$(cd "$SMOKE_KIT_ROOT/../gate-sdk" && pwd)"   # the vendored gate-sdk besid
 # absent, and an absent binary is exit 2 — never a skip, never a pass, never an invented fallback.
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the binary pinned absolute off its own default spelling,
-# because two of the dispatches below run from a sandbox cwd where the knob's repo-relative
-# default resolves to nothing (the rule lib/test-hermetic.sh already applies in the test lane)
-smoke_bin="$(gate_native_bin)"
-[[ "$smoke_bin" == /* ]] || export GATE_SDK_NATIVE_BIN="$PWD/$smoke_bin"
-unset smoke_bin
 
 kit_gate() {   # $1=gate-name  $2.. = gate args — dispatch a vendored lifecycle-kit gate by name
     local g="$1"; shift
@@ -87,10 +81,25 @@ bash "$SDK/bin/run-gates.sh" --emit file-survey \
     "yes — a filed block naming the seed commit parses clean" >/dev/null
 
 # spec: lifecycle-kit/README.md §Install — step 4 points the consumer's own always-loaded agent file at the machine; run it on the consumer, not only on a scratch copy, or check-lifecycle-registration has nothing to hold
+if [[ ! -f CLAUDE.md ]]; then
+    cat > CLAUDE.md <<'EOF'
+# CLAUDE.md — smoke consumer
+
+Resident bindings the consumer keeps.
+EOF
+fi
 bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null
 
 bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — pinned after the artifacts above, never before them
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the binary pinned absolute off its own default spelling,
+# because two of the dispatches below run from a sandbox cwd where the knob's repo-relative
+# default resolves to nothing (the rule lib/test-hermetic.sh already applies in the test lane)
+smoke_bin="$(gate_native_bin)"
+[[ "$smoke_bin" == /* ]] || export GATE_SDK_NATIVE_BIN="$PWD/$smoke_bin"
+unset smoke_bin
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — exercise the --enter-stage arm end-to-end under .tmp (advisory tooling, no fixture pair). The knob paths are absolute, so the front-end's cd to the git toplevel leaves every one of them resolving where this smoke put it.
 es="$PWD/.tmp/enter-stage-smoke"

@@ -134,7 +134,60 @@ fn kit_roots(given: &[String]) -> Result<(String, Vec<String>), Outcome> {
 
 fn smoke(given: &[String], teardown: &mut Teardown) -> Outcome {
     let (sdk, roots) = step!(kit_roots(given));
-    for r in &roots {
+    let clean = match pass(&sdk, &roots, teardown, &Sink::Inherit, true) {
+        Outcome::Clean(line) => line,
+        other => return other,
+    };
+    if roots.len() <= 2 {
+        return Outcome::Clean(clean);
+    }
+    let started = Instant::now();
+    for (i, r) in roots.iter().enumerate() {
+        let alone: Vec<String> = if i == 0 {
+            vec![sdk.clone()]
+        } else {
+            vec![sdk.clone(), r.clone()]
+        };
+        let mut own = Teardown {
+            dir: String::new(),
+            keep: false,
+        };
+        // spec: gate-sdk/SPEC.md §Consumer smoke — the union run already ran this installer green in
+        // this environment, so a red alone is the kit's finding at exit 1, never the exit-2 band
+        let lines = match pass(&sdk, &alone, &mut own, &Sink::Stderr, false) {
+            Outcome::Clean(_) => continue,
+            Outcome::Fail(l) | Outcome::Env(l) => l,
+        };
+        let mut report = vec![format!(
+            "{}: FAIL — {} is not green alone (the self-sufficiency phase)",
+            VERDICT,
+            basename(r)
+        )];
+        report.extend(lines);
+        report.push(format!(
+            "  help: reproduce with bash gate-sdk/bin/run-gates.sh --run-consumer-smoke --keep {}",
+            r
+        ));
+        return Outcome::Fail(report);
+    }
+    println!(
+        "{}: alone — {} kit root(s) green alone in {}ms",
+        VERDICT,
+        roots.len(),
+        started.elapsed().as_millis()
+    );
+    Outcome::Clean(clean)
+}
+
+// spec: gate-sdk/SPEC.md §Consumer smoke — one pass over one vendoring: install, zero-config green,
+// accounting, each kit's violation, final green; `verbose` gates the verdict lines a green pass prints
+fn pass(sdk: &str, roots: &[String], teardown: &mut Teardown, sink: &Sink, verbose: bool) -> Outcome {
+    let say = |l: &str| {
+        if verbose {
+            println!("{}", l);
+        }
+    };
+    for r in roots {
         if !Path::new(&format!("{}/smoke/install.sh", r)).is_file() {
             // spec: gate-sdk/SPEC.md §Consumer smoke — the refusal names its vendored-tree cause,
             // so a tree installed from the payload reads it as a boundary and not a broken install
@@ -149,12 +202,12 @@ fn smoke(given: &[String], teardown: &mut Teardown) -> Outcome {
         }
     }
 
-    let host = parent_of(&sdk);
+    let host = parent_of(sdk);
     let base = std::env::var("TMPDIR")
         .ok()
         .filter(|v| !v.is_empty())
         .unwrap_or_else(|| "/tmp".to_string());
-    let built = match csmoke::vendor_and_install(&host, &roots, &base, &Sink::Inherit) {
+    let built = match csmoke::vendor_and_install(&host, roots, &base, sink) {
         Ok(s) => s,
         Err(e) => {
             teardown.dir = e.dir;
@@ -173,7 +226,7 @@ fn smoke(given: &[String], teardown: &mut Teardown) -> Outcome {
         ]);
     }
 
-    let acct = step!(account(scratch, &host, &roots));
+    let acct = step!(account(scratch, &host, roots));
     step!(restore(scratch));
 
     let mut report = vec![format!(
@@ -206,18 +259,18 @@ fn smoke(given: &[String], teardown: &mut Teardown) -> Outcome {
         return Outcome::Fail(report);
     }
     for l in &report {
-        println!("{}", l);
+        say(l);
     }
 
     let mut fired = 0;
-    for r in &roots {
+    for r in roots {
         let kit = basename(r);
         let vio = format!("{}/{}/smoke/violation.sh", scratch, kit);
         if !Path::new(&vio).is_file() {
-            println!(
+            say(&format!(
                 "{}: {} has no violation script — install coverage only",
                 VERDICT, kit
-            );
+            ));
             continue;
         }
         let expected = step!(fire(scratch, &kit, &vio));

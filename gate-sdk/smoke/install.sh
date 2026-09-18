@@ -43,6 +43,10 @@ check-template-copy-parity
 check-template-registry-parity
 check-test-hermetic
 check-workflow-tiering
+check-action-pinning
+check-action-run-shell
+check-action-gh-repo
+check-action-permissions
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration
 # grammar (a sibling of §The install disposition's `# smoke-unregistered:`, on a second
 # roster): gate-sdk-owned subcommands this leg's minimal registry deliberately omits,
@@ -51,10 +55,6 @@ check-workflow-tiering
 # unregistered: check-root-tiering — its subject is the consumer-curated root manifest, which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
 # unregistered: check-enforcement-fresh — compares docs/enforcement.md against its emitter; the scratch consumer vendors no docs/ site
 # unregistered: check-kit-registration — checks a root README kit-registry table and a fixture-runner doc; the scratch consumer vendors neither
-# unregistered: check-action-pinning — site-kit's own install writes the only Actions-shaped content any install here ever does and registers this gate there, retracting this placeholder in the same motion (see site-kit/smoke/install.sh)
-# unregistered: check-action-run-shell — site-kit's own install writes the only Actions-shaped content any install here ever does and registers this gate there, retracting this placeholder in the same motion (see site-kit/smoke/install.sh)
-# unregistered: check-action-gh-repo — site-kit's own install writes the only Actions-shaped content any install here ever does and registers this gate there, retracting this placeholder in the same motion (see site-kit/smoke/install.sh)
-# unregistered: check-action-permissions — site-kit's own install writes the only Actions-shaped content any install here ever does and registers this gate there, retracting this placeholder in the same motion (see site-kit/smoke/install.sh)
 EOF
 
 # smoke-unregistered: check-root-tiering — its subject is the consumer-curated root manifest GATE_SDK_ROOT_ALLOWLIST (default scripts/root-allowlist.list), which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
@@ -62,6 +62,15 @@ EOF
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — ship the tracked default pattern list; the local companion is absent, exercising the fresh-clone path
 cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — the workflow template installed verbatim (starter-template conformance) is the Actions surface the four check-action-* members above lint
+mkdir -p .github/workflows
+cp "$SDK/templates/gates-workflow.yml" .github/workflows/gates.yml
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — this leg's one tracked .workflow/ member: the drained release declaration surface, so the directory check-workflow-tiering reads survives the restore's clean
+cat > .workflow/release-declarations.md <<'EOF'
+# contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's three declaration-bearing sections in the note's grammar, appended by the session landing a kit-shipped change, composed into the release note and drained to this header at the tag.
+EOF
 
 bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
@@ -312,3 +321,7 @@ if grep -q ' owed' <<<"$out"; then
     rm -rf "$nogit"; exit 1
 fi
 rm -rf "$nogit"
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — the leg's last act: its artifacts describe every vendored kit root, the tree the battery reads, so they are regenerated outside this leg's narrowing once the narrowed hook exercise above is done
+env -u GATE_SDK_KIT_DIRS bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
+env -u GATE_SDK_KIT_DIRS bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html

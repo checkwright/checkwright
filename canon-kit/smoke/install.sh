@@ -60,5 +60,11 @@ if [[ ! -f TASK-QUEUE.md ]]; then
 EOF
 fi
 
+# spec: gate-sdk/SPEC.md §Consumer smoke — seed check-docs-link-convention's surface (guarded, so it composes with site-kit's docs/ in any order)
+if [[ ! -f docs/index.md ]]; then
+    mkdir -p docs
+    printf '# Smoke consumer\n' > docs/index.md
+fi
+
 bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html

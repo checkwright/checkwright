@@ -12,19 +12,6 @@
 
 ## New Features
 
-- **consumer-smoke-single-kit-run-not-self-sufficient** [spec: SPEC-smoke-alone.md] — a
-  `--run-consumer-smoke` narrowed to one kit root reds while the all-kit run is green, because
-  installs lean on sibling kits' installs.
-  **Re-measured at spec, 2026-09-18:** all 11 kit roots are red alone, in five classes (the
-  amendment's table), so this is a harness-and-contract unit across gate-sdk, native, and four
-  kits' smoke installs, not the lifecycle-kit seed alone.
-  **Ruled at spec:** per-kit self-sufficiency (operator direction, 2026-09-18, lead-relayed),
-  enforced by a self-sufficiency phase in the default run that repeats the pass for each root
-  alone. gate-sdk's leg installs its own workflow template and registers the four `check-action-*`
-  gates, which retires the cross-leg placeholder-and-retraction.
-  Filed 2026-08-29, iceboxed 2026-09-11, revived on recurrence.
-  recurrence: consumer-smoke-single-kit-run-not-self-sufficient 2026-09-18
-
 ## Technical Debt
 
 ## Deferred
@@ -3364,5 +3351,6 @@
 
 - declined-update-target-cause-unaudited
 - footprint-roster-rows-price-unevenly
+- consumer-smoke-single-kit-run-not-self-sufficient
 
 ## Lessons Learned

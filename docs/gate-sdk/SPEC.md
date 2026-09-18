@@ -5679,7 +5679,7 @@ own reasoning is unaffected and stands: a prebuilt binary is still how a
 most needs.** It clears every tree that *declares* without dispatching. A tree
 that legitimately **dispatches** and has no binary is a different problem and it
 had a real instance: `--run-consumer-smoke` vendors kit roots by copy, and
-site-kit's `smoke/install.sh` registers both members of this cohort because it
+gate-sdk's own `smoke/install.sh` registers both members of this cohort because it
 installs the workflow template they lint. No predicate can make that green — a
 registered dispatch with no binary is exactly the harness error `gate_command`
 exists to raise. That harness therefore receives the built artifact now
@@ -8673,7 +8673,8 @@ line naming the expected gate, then restores the tree (`git reset --hard &&
 git clean -fd` — a hard reset, not `git checkout`, so a violation that staged
 its shape is unstaged too: an index-reading gate like `check-gate-tamper` sees
 only the index) before the next kit; it asserts green once more after the last
-restore. Exit codes follow the gate convention (0 all hold, 1 an assertion
+restore, then, for a run vendoring more than one kit root beyond gate-sdk, runs
+the self-sufficiency phase below. Exit codes follow the gate convention (0 all hold, 1 an assertion
 failed, 2 usage/environment); the success token is `CONSUMER-SMOKE: clean
 (<n> kits installed, <m> violations fired, <r> gates registered, <s>
 self-declared, <h> hand-declared)`. `--keep` retains the temp dir and
@@ -8688,7 +8689,7 @@ subject is *do the kits work when vendored by copy* — a publisher's question,
 asked of a tree that has the kit sources — so refusing there is correct; refusing
 there without saying why reads as a broken install. Diagnostics go to stderr
 under a `run-consumer-smoke:` prefix, the arm's name without its dashes; the
-verdict lines, and the installers' own output, go to stdout. It is a bare flag
+verdict lines, and the union pass's installer output, go to stdout. It is a bare flag
 rather than an `--emit` member because its contract is the exit status an emitting
 arm collapses (§The non-gate arm), and a table member because it reads
 `GATE_SDK_KIT_DIRS` and `GATE_SDK_NATIVE_BIN`. `bin/run-gates.sh` passes it through
@@ -8704,14 +8705,26 @@ and runs `init` against it. The two harnesses must not blur: this one answers
 *do the kits work when vendored*, that one answers *does the installer deliver
 them*.
 
-**Its default run vendors every kit, so its silence on a subset vendoring is not
-coverage.** `--run-consumer-smoke` takes kit roots as operands, and the
-subset invocation — vendoring one kit while the shared binary carries every
-ported kit's subcommands — is a real configuration this harness can be put in and
-is not put in by any scheduled run. That configuration is covered instead by the
-bespoke `check-gate-substrate-parity` test, which reaches it in a sandbox at
-commit time (§check-gate-substrate-parity); recorded here so a later reader does
-not read the default run's green as an answer about the subset.
+**Each kit is also run alone, because the union run cannot see an install that
+leans on a sibling.** A kit's `smoke/install.sh` may assume gate-sdk and
+nothing else, and a tree that vendors every kit satisfies every
+cross-dependency by accident. So when the run vendors more than gate-sdk and one
+other root, it repeats the pass for gate-sdk alone and then for gate-sdk plus
+each root, each in a fresh scratch tree torn down whatever `--keep` says, and
+prints `CONSUMER-SMOKE: alone — <n> kit root(s) green alone in <ms>ms` before the
+clean line. A repeat's installer output goes to stderr, and a green repeat prints
+no verdict lines. A red repeat is exit 1 even when its cause is an installer's
+exit. The union run has already shown the environment works, so a failure alone
+is the kit's. The red names the kit, prints that repeat's own failure lines, and
+ends with a help line naming the narrowed `--keep` run that reproduces it. The
+phase is skipped for a single-root run, which is already its own repeat. That
+keeps the narrowed run a session reaches for as the cheap check, and the default
+run as validate's; the phase line reports its cost on every run (first measured
+at about 25s over 11 roots, beside the union pass's 22s). The repeats also put
+the harness into the subset vendoring on every run: one kit vendored while the
+shared binary carries every ported kit's subcommands. `check-gate-substrate-parity`
+still reaches that subset at commit time (§check-gate-substrate-parity), and this
+phase now reaches it at validate too.
 
 **It does place the gate binary, and the rule is stated rather than left as an
 exception, because a reader will otherwise lean on the older
@@ -8722,10 +8735,10 @@ already-built artifact out of a checkout the caller names**
 The ground is that a kit root vendoring a `.gate` descriptor is now the ordinary
 case — the first cohort ships two (§The first cohort, and the rule that selects
 the next) — and a kit's `smoke/install.sh` may legitimately register a ported
-member, which `site-kit`'s does: it copies `templates/site-health.yml` in, and
-that template is the only Actions-shaped surface any install writes, so
-§check-action-pinning and §check-action-gh-repo earn their scratch-battery slot
-under *The registration accounting* below. Refusing the binary would have made
+member, which gate-sdk's own does: it installs its `templates/gates-workflow.yml`
+verbatim, so the four `check-action-*` members earn their scratch-battery slot on
+gate-sdk's leg under *The registration accounting* below, and site-kit's
+`templates/site-health.yml` is linted by them wherever site-kit is vendored. Refusing the binary would have made
 that registration permanently red and forced the coverage out, which is the
 opposite of what this harness exists for.
 
@@ -8774,15 +8787,17 @@ exempts is the inversion *The declaration valve* names as a finding. Recorded
 here because a reader finding an omission with no reason beside it will otherwise
 add one and redden the harness.
 
-**§check-gate-substrate-parity assertion I sees every kit vendored from the first
-leg on.** Its kit-vendored scope is a directory scan, and the harness copies every
-kit's tree before any `smoke/install.sh` registers a gate, so gate-sdk's leg — first,
-with only its own lines in the registry — scopes itself with `GATE_SDK_KIT_DIRS` for
-its own process. A member only a later leg registers (the `check-action-*` gates,
-which site-kit's leg registers beside the only Actions-shaped content any install
-writes) is declared `# unregistered:` by the earlier leg and retracted by the
-registering leg in the same edit, since a declaration beside its own registration
-is itself a red.
+**§check-gate-substrate-parity assertion I sees every kit vendored from the
+first leg on.** Its kit-vendored scope is a directory scan, and the harness
+copies every kit's tree before any `smoke/install.sh` registers a gate. So
+gate-sdk's leg, which runs first with only its own lines in the registry,
+scopes itself with `GATE_SDK_KIT_DIRS` for its own process. Every gate-sdk-owned
+member that leg omits is declared `# unregistered:` there, and no later leg
+registers one. A registration split across legs cannot be green in the owning
+kit's alone run, and the self-sufficiency phase is that run. The leg's hook and
+graph artifacts are the one exception to its narrowing: its last act regenerates
+them un-narrowed, after its own hook exercise, so they describe every vendored kit
+root, the tree the battery reads.
 
 **What a ported gate a `smoke/install.sh` does *not* register looks like.** Its
 descriptor vendors with the kit root and nothing dispatches to it, so both binary
@@ -8943,20 +8958,26 @@ enforcing it.
   `SMOKE_KIT_ROOT` = the vendored copy of the installing kit. The executable
   form of that kit's README install steps: register its gates in
   `scripts/gates.list`, establish the minimal governed surface its gates need
-  to be green, and regenerate the hook + graph artifacts. **Copying the kit's own
+  to be green, and regenerate the hook + graph artifacts whenever it changes the
+  registry — under the environment the battery reads, since the artifacts bake a
+  knob's spelling, so a knob the script overrides for its own later dispatches is
+  set only after the regeneration. **Copying the kit's own
   templates in is not part of that contract**: a smoke script installs a template
-  only where a registered gate reads one — site-kit's `templates/site-health.yml`
-  is the shipped instance — so a kit whose templates no gate reads copies none,
+  only where a registered gate reads one — gate-sdk's `templates/gates-workflow.yml`
+  and site-kit's `templates/site-health.yml` are the shipped instances — so a kit whose templates no gate reads copies none,
   and whether a given kit copies is read off its script rather than assumed.
   *Which* gates it
   registers is not the author's discretion — *The registration accounting*
   below rules on every omission, and the installer's own narrower subset is
   derived from the same per-gate declarations (§The install disposition) rather
   than listed anywhere. This roster is the **superset** of that subset, held so
-  by `check-install-disposition` assertion B. It may assume gate-sdk
-  is already installed (it runs first), nothing else. A non-zero exit aborts the
-  harness with exit 2 (a broken installer is an environment failure, not a gate
-  finding).
+  by `check-install-disposition` assertion B. It may assume gate-sdk is installed
+  (it runs first) and nothing else. It establishes every surface its registered
+  gates read, never a surface only a sibling kit's install writes, and leaves the
+  scratch tree green with only gate-sdk beside it. The self-sufficiency phase above
+  checks this on every default run. A non-zero exit aborts the harness with exit 2
+  (a broken installer is an environment failure, not a gate finding), except in a
+  self-sufficiency repeat, where it is exit 1 on that phase's ground.
 - `smoke/violation.sh` (optional) — same cwd/env contract and entry-point guard
   (above); mutates the scratch
   tree to introduce exactly one violation the harness restore (`git reset --hard`

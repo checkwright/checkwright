@@ -664,19 +664,17 @@ exactly the old releases where this class of defect has actually been found.
 The kit's `smoke/install.sh` installs the template verbatim into the scratch tree
 as governed surface, and registers the gates that read it. The scratch battery is
 the union of what each kit's `smoke/install.sh` registers; this kit contributes
-`check-docs-cname-parity` and — because it writes the only Actions-shaped surface
-any install writes — the gates that lint a workflow's Actions shape:
-`check-action-pinning`, `check-action-run-shell`, `check-action-gh-repo`.
-`check-tree-terms` reads the installed file too, for tree terms. So a template
-regression in the workflow's bash, its action pins, or its `gh` repository
-context reds the smoke rather than surfacing at a consumer.
+`check-docs-cname-parity`, and its workflow is linted by the `check-action-*`
+gates gate-sdk's own leg registers beside the workflow template gate-sdk
+installs. `check-tree-terms` reads the installed file too, for tree terms. So a
+template regression in the workflow's bash, its action pins, or its `gh`
+repository context reds the smoke rather than surfacing at a consumer.
 
-Those four qualify under the registration accounting's predicate — a gate earns a
-scratch-battery slot when it reads a surface the install writes — because this
-install writes the workflow they lint. The predicate binds every kit and is owned
-by gate-sdk/SPEC.md §Consumer smoke, which also rules on the omissions: what this
-kit leaves unregistered is decided by the accounting's probe, not by a judgment
-recorded here.
+Those four qualify on gate-sdk's leg under the registration accounting's
+predicate — a gate earns a scratch-battery slot when it reads a surface the
+install writes (gate-sdk/SPEC.md §Consumer smoke). The predicate binds every kit,
+and the same section rules on the omissions: what this kit leaves unregistered is
+decided by the accounting's probe, not by a judgment recorded here.
 
 ## Out of scope
 
